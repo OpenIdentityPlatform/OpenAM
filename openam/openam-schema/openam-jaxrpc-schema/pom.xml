@@ -1,0 +1,214 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <!--
+    * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
+    *
+    * Copyright (c) 2011 ForgeRock AS. All Rights Reserved
+    *
+    * The contents of this file are subject to the terms
+    * of the Common Development and Distribution License
+    * (the License). You may not use this file except in
+    * compliance with the License.
+    *
+    * You can obtain a copy of the License at
+    * http://forgerock.org/license/CDDLv1.0.html
+    * See the License for the specific language governing
+    * permission and limitations under the License.
+    *
+    * When distributing Covered Code, include this CDDL
+    * Header Notice in each file and include the License file
+    * at http://forgerock.org/license/CDDLv1.0.html
+    * If applicable, add the following below the CDDL Header,
+    * with the fields enclosed by brackets [] replaced by
+    * your own identifying information:
+    * "Portions Copyrighted [year] [name of copyright owner]"
+    *
+    -->
+
+    <!-- Parent Project -->
+    <parent>
+        <groupId>org.forgerock</groupId>
+        <artifactId>openam-schema</artifactId>
+        <version>10.1.0-SNAPSHOT</version>
+    </parent>
+
+    <!-- Component Definition -->
+    <name>OpenAM JAXRPC Schema</name>
+    <description>OpenAM JAXRPC Schema Components
+    </description>
+    <artifactId>openam-jaxrpc-schema</artifactId>
+    <version>10.1.0-SNAPSHOT</version>
+    <packaging>jar</packaging>
+    <organization>
+        <name>ForgeRock</name>
+        <url>http://www.forgerock.com</url>
+    </organization>
+
+    <!-- Build -->
+    <build>
+        <plugins>
+            <!-- Generate jaxrpc WSDL -->
+            <!-- see http://docs.oracle.com/cd/E17802_01/webservices/webservices/docs/1.5/jaxrpc/jaxrpc-tools.html
+                 for Documentation on the wscompile tool. -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-antrun-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>generate-jaxrpc-wsdl</id>
+                        <phase>generate-sources</phase>
+                        <configuration>
+                            <target name="jaxrpc">
+                                <property name="build.class.path" refid="maven.compile.classpath"/>
+
+                                <mkdir dir="${project.build.directory}/classes" />
+
+                                <java classname="com.sun.xml.rpc.tools.wscompile.Main" fork="true"
+                                      classpath="${build.class.path}">
+                                    <arg value="-g" />
+                                    <arg value="-gen:server" />
+                                    <arg value="-d" />
+                                    <arg value="${project.build.directory}/classes" />
+                                    <arg value="${project.basedir}/src/main/resources/xml/jaxrpc/config.xml" />
+                                </java>
+
+                                <move file="${project.build.directory}/classes/IdentityManagementServices.wsdl"
+                                      tofile="${project.build.directory}/classes/jaxrpc/IdentityManagementServices.wsdl" />
+
+                                <!-- Clean-up duplicate generated WSDL and Classes -->
+                                <delete file="${project.basedir}/IdentityManagementServices.wsdl" />
+
+                            </target>
+                        </configuration>
+                        <goals>
+                            <goal>run</goal>
+                        </goals>
+                    </execution>
+                </executions>
+                <dependencies>
+                    <dependency>
+                        <groupId>org.forgerock</groupId>
+                        <artifactId>openam-idsvcs-schema</artifactId>
+                        <version>10.1.0-SNAPSHOT</version>
+                    </dependency>
+                    <dependency>
+                        <groupId>org.forgerock</groupId>
+                        <artifactId>openam-core</artifactId>
+                        <version>10.1.0-SNAPSHOT</version>
+                    </dependency>
+                    <dependency>
+                        <groupId>com.sun.xml.rpc</groupId>
+                        <artifactId>jaxrpc-impl</artifactId>
+                        <version>1.1.3_01</version>
+                        <!-- Originally ? -->
+                    </dependency>
+                    <dependency>
+                        <groupId>javax.activation</groupId>
+                        <artifactId>activation</artifactId>
+                        <version>1.1.1</version>
+                    </dependency>
+                </dependencies>
+
+            </plugin>
+
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-jar-plugin</artifactId>
+                <configuration>
+                    <forceCreation>true</forceCreation>
+                    <archive>
+                        <index>true</index>
+                        <manifest>
+                            <addClasspath>true</addClasspath>
+                            <classpathPrefix>lib/</classpathPrefix>
+                        </manifest>
+                        <manifestEntries>
+                            <Specification-Title>OpenAM Identity Services JAXRPC</Specification-Title>
+                            <Specification-Version>${project.version} - ${maven.build.timestamp}</Specification-Version>
+                            <Specification-Vendor>ForgeRock</Specification-Vendor>
+                            <Implementation-Title>OpenAM Identity Services JAXRPC</Implementation-Title>
+                            <Implementation-Version>${project.version} - ${maven.build.timestamp}
+                            </Implementation-Version>
+                            <Implementation-Vendor>ForgeRock</Implementation-Vendor>
+                            <Built-By>${user.name}</Built-By>
+                            <Build-Jdk>${java.version}</Build-Jdk>
+                            <Build-Time>${maven.build.timestamp}</Build-Time>
+                            <Version>${project.version}</Version>
+                            <Create-On>${maven.build.timestamp}</Create-On>
+                            <SVN-Revision>R${svn-revision.revision}</SVN-Revision>
+                            <!-- TODO Add License to Manifest -->
+                            <License></License>
+                        </manifestEntries>
+                    </archive>
+                </configuration>
+            </plugin>
+
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-javadoc-plugin</artifactId>
+                <configuration>
+                    <skip>true</skip>
+                </configuration>
+            </plugin>
+
+        </plugins>
+
+    </build>
+
+    <dependencies>
+
+        <dependency>
+            <groupId>org.forgerock</groupId>
+            <artifactId>openam-idsvcs-schema</artifactId>
+            <version>10.1.0-SNAPSHOT</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.forgerock</groupId>
+            <artifactId>openam-core</artifactId>
+            <version>10.1.0-SNAPSHOT</version>
+        </dependency>
+
+        <dependency>
+            <groupId>javax.xml.bind</groupId>
+            <artifactId>jaxb-api</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>com.sun.xml.bind</groupId>
+            <artifactId>jaxb-impl</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>com.sun.xml.bind</groupId>
+            <artifactId>jaxb-libs</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>javax.xml</groupId>
+            <artifactId>jaxrpc-api</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>com.sun.xml.rpc</groupId>
+            <artifactId>jaxrpc-impl</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>external</groupId>
+            <artifactId>webservices-api</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>org.forgerock</groupId>
+            <artifactId>openam-federation-library</artifactId>
+            <version>10.1.0-SNAPSHOT</version>
+        </dependency>
+
+    </dependencies>
+
+</project>
+

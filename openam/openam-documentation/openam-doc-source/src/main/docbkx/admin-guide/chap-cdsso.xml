@@ -1,0 +1,235 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  ! CCPL HEADER START
+  !
+  ! This work is licensed under the Creative Commons
+  ! Attribution-NonCommercial-NoDerivs 3.0 Unported License.
+  ! To view a copy of this license, visit
+  ! http://creativecommons.org/licenses/by-nc-nd/3.0/
+  ! or send a letter to Creative Commons, 444 Castro Street,
+  ! Suite 900, Mountain View, California, 94041, USA.
+  !
+  ! You can also obtain a copy of the license at
+  ! src/main/resources/legal-notices/CC-BY-NC-ND.txt.
+  ! See the License for the specific language governing permissions
+  ! and limitations under the License.
+  !
+  ! If applicable, add the following below this CCPL HEADER, with the fields
+  ! enclosed by brackets "[]" replaced with your own identifying information:
+  !      Portions Copyright [yyyy] [name of copyright owner]
+  !
+  ! CCPL HEADER END
+  !
+  !      Copyright 2011-2012 ForgeRock AS
+  !    
+-->
+<chapter xml:id='chap-cdsso'
+ xmlns='http://docbook.org/ns/docbook'
+ version='5.0' xml:lang='en'
+ xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance'
+ xsi:schemaLocation='http://docbook.org/ns/docbook http://docbook.org/xml/5.0/xsd/docbook.xsd'
+ xmlns:xlink='http://www.w3.org/1999/xlink'
+ xmlns:xinclude='http://www.w3.org/2001/XInclude'>
+ <title>Configuring Cross-Domain Single Sign On</title>
+
+ <para>This chapter shows you how to configure cross-domain single sign on
+ (CDSSO). When you have multiple domains in a single organization, CDSSO lets
+ your OpenAM servers in one domain work with policy agents from other
+ domains.</para>
+
+ <para>CDSSO is an OpenAM-specific capability. For single sign on across
+ multiple organizations or when integrating with other access management
+ software, use OpenAM's federation capabilities.</para>
+
+ <indexterm><primary>Cross-domain single sign on (CDSSO)</primary></indexterm>
+ <para><firstterm>Cross-domain single sign on</firstterm> provides
+ a safe mechanism for managing access across multiple different domains that
+ you control. CDSSO lets OpenAM authenticate users redirected by policy agents
+ in other DNS domains.</para>
+
+ <para>Single sign on depends on cookies to store session information. Yet for
+ for security reasons, browsers do not let a web site in one domain to get
+ access to a cookie from another domain. With CDSSO, the policy agents work
+ around this by negotiating with OpenAM to allow access.</para>
+
+ <para>The Java EE policy agent allows CDSSO by using a mechanism to write
+ the SSO token from OpenAM authentication to a cookie with the domain
+ the host where the agent runs. The following sequence diagram illustrates
+ this mechanism.</para>
+
+ <mediaobject xml:id="figure-cdsso-jee-sequence">
+  <alt>Java EE policy agent mechanism for CDSSO</alt>
+  <imageobject>
+   <imagedata fileref="images/cdsso-jee-sequence.png" format="PNG"/>
+  </imageobject>
+  <textobject>
+   <para>The sequence diagram illustrates the Java EE policy agent mechanism
+   for CDSSO.</para>
+  </textobject>
+ </mediaobject>
+
+ <para>Whereas the Java EE policy agent has an endpoint specifically to handle
+ the cookie domain translation, the web policy agent handles the request
+ directly as shown in the following sequence diagram.</para>
+
+ <mediaobject xml:id="figure-cdsso-web-sequence">
+  <alt>Web policy agent mechanism for CDSSO</alt>
+  <imageobject>
+   <imagedata fileref="images/cdsso-web-sequence.png" format="PNG"/>
+  </imageobject>
+  <textobject>
+   <para>The sequence diagram illustrates the web policy agent mechanism
+   for CDSSO.</para>
+  </textobject>
+ </mediaobject>
+
+ <procedure xml:id="enable-cdsso-jee-agent">
+  <title>To Enable CDSSO For a Java EE Policy Agent</title>
+
+  <step>
+   <para>In the OpenAM console, browse to Access Control &gt;
+   <replaceable>Realm Name</replaceable> &gt; Agents &gt; J2EE &gt;
+   <replaceable>Agent Name</replaceable> &gt; SSO.</para>
+  </step>
+  <step>
+   <para>Select Enable Cross Domain SSO.</para>
+  </step>
+  <step>
+   <para>Check that the CDSSO Redirect URI is set.</para>
+   <para>Depending on where you deployed your Java EE agent application, the
+   default is something like <literal>/agentapp/sunwCDSSORedirectURI</literal>.</para>
+  </step>
+  <step>
+   <para>Set the list of URLs for CDSSO Servlet URL to the Cross Domain
+   Controller Servlet URLs of the servers the agent accesses, such as
+   <literal>http://openam.example.com:8080/openam/cdcservlet</literal>.</para>
+   <para>If the agent accesses OpenAM through a load balancer, use the load
+   balancer URLs, such as
+   <literal>http://load-balancer.example.com:8080/openam/cdcservlet</literal>.</para>
+  </step>
+  <step>
+   <para>Leave the CDSSO Clock Skew set to 0.</para>
+   <para>Make sure instead that the clocks on the servers where you run OpenAM
+   and policy agents are synchronized.</para>
+  </step>
+  <step>
+   <para>Set the list of URLs for CDSSO Trusted ID Provider to the Cross Domain
+   Controller Servlet URLs of the OpenAM servers the agent accesses, such
+   <literal>http://openam.example.com:8080/openam/cdcservlet</literal>.</para>
+   <para>Even if the agent accesses OpenAM through a load balancer, use the
+   OpenAM server URLs here.</para>
+  </step>
+  <step performance="optional">
+   <para>To protect the SSO token from network snooping, you can select CDSSO
+   Secure Enable to mark the SSO token cookie as secure.</para>
+   <para>If you select this, then the SSO token cookie can only be sent over
+   a secure connection (HTTPS).</para>
+  </step>
+  <step>
+   <para>Add the domains involved in CDSSO in the CDSSO Domain List.</para>
+  </step>
+  <step>
+   <para>Save your work.</para>
+  </step>
+ </procedure>
+
+ <procedure xml:id="enable-cdsso-web-agent">
+  <title>To Enable CDSSO For a Web Policy Agent</title>
+  
+  <step>
+   <para>In the OpenAM console, browse to Access Control &gt;
+   <replaceable>Realm Name</replaceable> &gt; Agents &gt; Web &gt;
+   <replaceable>Agent Name</replaceable> &gt; SSO.</para>
+  </step>
+  <step>
+   <para>Select Enable Cross Domain SSO.</para>
+  </step>
+  <step>
+   <para>Set the list of URLs for CDSSO Servlet URL to the Cross Domain
+   Controller Servlet URLs of the servers the agent accesses, such as
+   <literal>http://openam.example.com:8080/openam/cdcservlet</literal>.</para>
+   <para>If the agent accesses OpenAM through a load balancer, use the load
+   balancer URLs, such as
+   <literal>http://load-balancer.example.com:8080/openam/cdcservlet</literal>.</para>
+  </step>
+  <step>
+   <para>Add the domains involved in CDSSO in the Cookies Domain List.</para>
+  </step>
+  <step>
+   <para>Save your work.</para>
+  </step>
+ </procedure>
+
+ <procedure xml:id="enable-cdsso-cookie-hijacking-protection">
+  <title>To Protect Against CDSSO Cookie Hijacking</title>
+
+  <para>When cookies are set for an entire domain such as
+  <literal>.example.com</literal>, an attacker who steals a cookie can use it
+  from any host in the domain such as <literal>untrusted.example.com</literal>.
+  Cookie hijacking protection restricts cookies to the fully-qualified domain
+  name (FQDN) of the host where they are issued, such as
+  <literal>openam-server.example.com</literal> and
+  <literal>server-with-agent.example.com</literal>, using CDSSO to handle
+  authentication and authorization.</para>
+
+  <para>For CDSSO with cookie hijacking protection, when a client successfully
+  authenticates OpenAM issues the master SSO token cookie for its FQDN.
+  OpenAM issues <firstterm>restricted token</firstterm> cookies for the
+  other FQDNs where the policy agents reside. The client ends up with cookies
+  having different session identifiers for different FQDNs, and the OpenAM
+  server stores the correlation between the master SSO token and restricted
+  tokens, such that the client only has one master session internally in
+  OpenAM.</para>
+
+  <para>To protect against cookie hijacking you restrict the OpenAM server
+  domain to the server where OpenAM runs. This sets the domain of the SSO token
+  cookie to the host running the OpenAM server that issued the token. You also
+  enable use of a unique SSO token cookie. For your Java EE policy agents, you
+  enable use of the unique SSO token cookie in the agent configuration as
+  well.</para>
+
+  <step>
+   <para>In the OpenAM console, browse to Configuration &gt; System &gt;
+   Platform.</para>
+  </step>
+  <step>
+   <para>Remove the domain such as <literal>.example.com</literal> from the
+   Cookies Domains list, and replace it with the server host name such as
+   <literal>openam.example.com</literal>, or if OpenAM is behind a load
+   balancer with the load balancer host name, such as
+   <literal>load-balancer.example.com</literal>.</para>
+  </step>
+  <step>
+   <para>Save your work.</para>
+  </step>
+  <step>
+   <para>In the OpenAM console, browse to Configuration &gt; Servers and Sites
+   &gt; <replaceable>Server Name</replaceable> &gt; Default Server Settings,
+   and then make these changes:</para>
+   <substeps>
+    <step>
+     <para>Set the property
+     <literal>com.sun.identity.enableUniqueSSOTokenCookie</literal> to
+     <literal>true</literal>.</para>
+    </step>
+    <step>
+     <para>Add the property
+     <literal>com.sun.identity.authentication.uniqueCookieDomain</literal>,
+     setting the value to the fully-qualified domain name of the OpenAM
+     server, such as <literal>openam.example.com</literal>.</para>
+    </step>
+   </substeps>
+   <para>Save your work.</para>
+  </step>
+  <step performance="optional">
+   <para>For each Java EE policy agent, browse in the OpenAM console to Access
+   Control &gt; <replaceable>Realm Name</replaceable> &gt; Agents &gt; J2EE &gt;
+   <replaceable>Agent Name</replaceable> &gt; Advanced &gt; Custom Properties,
+   and add <literal>com.sun.identity.enableUniqueSSOTokenCookie=true</literal>
+   to the list.</para>
+  </step>
+  <step>
+   <para>Save your work.</para>
+  </step>
+ </procedure>
+</chapter>

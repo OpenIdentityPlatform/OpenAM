@@ -1,0 +1,292 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  ! CCPL HEADER START
+  !
+  ! This work is licensed under the Creative Commons
+  ! Attribution-NonCommercial-NoDerivs 3.0 Unported License.
+  ! To view a copy of this license, visit
+  ! http://creativecommons.org/licenses/by-nc-nd/3.0/
+  ! or send a letter to Creative Commons, 444 Castro Street,
+  ! Suite 900, Mountain View, California, 94041, USA.
+  !
+  ! You can also obtain a copy of the license at
+  ! src/main/resources/legal-notices/CC-BY-NC-ND.txt.
+  ! See the License for the specific language governing permissions
+  ! and limitations under the License.
+  !
+  ! If applicable, add the following below this CCPL HEADER, with the fields
+  ! enclosed by brackets "[]" replaced with your own identifying information:
+  !      Portions Copyright [yyyy] [name of copyright owner]
+  !
+  ! CCPL HEADER END
+  !
+  !      Copyright 2011 ForgeRock AS
+  !    
+-->
+<chapter xml:id='chap-error-messages'
+ xmlns='http://docbook.org/ns/docbook'
+ version='5.0' xml:lang='en'
+ xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance'
+ xsi:schemaLocation='http://docbook.org/ns/docbook http://docbook.org/xml/5.0/xsd/docbook.xsd'
+ xmlns:xlink='http://www.w3.org/1999/xlink'
+ xmlns:xinclude='http://www.w3.org/2001/XInclude'>
+ <title>Error Messages</title>
+ 
+ <para>This chapter lists common error messages from OpenAM, with remedial
+ actions where possible.</para>
+ 
+ <variablelist xml:id="authentication-error-messages">
+  <title>Common Authentication Errors</title>
+  <indexterm>
+   <primary>Error messages</primary>
+   <secondary>Authentication</secondary>
+  </indexterm>
+  <varlistentry>
+   <term>An error occurred while storing the user profile.</term>
+   <listitem>
+    <para>When using the Membership module, the attributes and elements likely
+    do not match the self-registration settings in the
+    <filename>Membership.xml</filename> file.</para>
+    <para>Action: Enter a unique user name.</para>
+   </listitem>
+  </varlistentry>
+  <varlistentry>
+   <term>A user already exists with this name in the given organization.</term>
+   <listitem>
+    <para>When using the Membership module, you cannot create a new user with
+    the same user name as an existing user.</para>
+    <para>Action: Enter a unique user name.</para>
+   </listitem>
+  </varlistentry>
+  <varlistentry>
+   <term>Authentication Exception</term>
+   <listitem>
+    <para>The authentication was not handled properly.</para>
+    <para>Action: Check the login URL for invalid characters, especially in the
+    query string parameters.</para>
+   </listitem>
+  </varlistentry>
+  <varlistentry>
+   <term>Authentication Failed</term>
+   <listitem>
+    <para>Usually this occurs when the user provides incorrect
+    credentials.</para>
+    <para>Action: If the credentials are valid and correct, check that you are
+    using the correct authentication module.</para>
+   </listitem>
+  </varlistentry>
+  <varlistentry>
+   <term>Cannot redirect to default page</term>
+   <listitem>
+    <para>OpenAM cannot redirect to the Success URL or the Failure URL.</para>
+    <para>Action: Check the web application container logs where OpenAM is
+    running.</para>
+   </listitem>
+  </varlistentry>
+  <varlistentry>
+   <term>Invalid Password</term>
+   <listitem>
+    <para>The password is not valid.</para>
+    <para>Action: If you have not incorrectly typed the password, check that
+    the password has at least 8 characters, and has not expired.</para>
+   </listitem>
+  </varlistentry>
+  <varlistentry>
+   <term>Logout Failure</term>
+   <listitem>
+    <para>The user cannot log out.</para>
+    <para>Action: Restart OpenAM.</para>
+   </listitem>
+  </varlistentry>
+  <varlistentry>
+   <term>Maximum Session Limit was reached </term>
+   <listitem>
+    <para>Action: Logout and login again. </para>
+   </listitem>
+  </varlistentry>
+  <varlistentry>
+   <term>Missing the confirmation password field.</term>
+   <listitem>
+    <para>When using the Membership module to create a user account, you must
+    confirm the password value.</para>
+    <para>Action: Enter a the password again.</para>
+   </listitem>
+  </varlistentry>
+  <varlistentry>
+   <term>No password was entered</term>
+   <listitem>
+    <para>When using the Membership module to create a user account, you must
+    enter a password.</para>
+    <para>Action: Enter a password.</para>
+   </listitem>
+  </varlistentry>
+  <varlistentry>
+   <term>No user name was entered</term>
+   <listitem>
+    <para>When using the Membership module to create a user account, you must
+    enter a user name.</para>
+    <para>Action: Enter a user name.</para>
+   </listitem>
+  </varlistentry>
+  <varlistentry>
+   <term>No user profile was found matching the entered user name in the given
+   organization.</term>
+   <listitem>
+    <para>When using the Membership module, no profile exists for the
+    user.</para>
+    <para>Action: Select New User from the login screen.</para>
+   </listitem>
+  </varlistentry>
+  <varlistentry>
+   <term>No configuration found</term>
+   <listitem>
+    <para>Action: Check the configuration for the authentication module or
+    chain for the realm.</para>
+   </listitem>
+  </varlistentry>
+  <varlistentry>
+   <term>No organization found</term>
+   <listitem>
+    <para>Action: Check that the requested realm exists. </para>
+   </listitem>
+  </varlistentry>
+  <varlistentry>
+   <term>One of the required fields was not completed.</term>
+   <listitem>
+    <para>Action: Check for missing required fields.</para>
+   </listitem>
+  </varlistentry>
+  <varlistentry>
+   <term>Specified authentication module is denied.</term>
+   <listitem>
+    <para>Action: Check that the authentication module is registered in the
+    realm, that templates are in place for the module, and that the module is
+    selected in the Core Authentication module list.</para>
+   </listitem>
+  </varlistentry>
+  <varlistentry>
+   <term>This organization is not active</term>
+   <listitem>
+    <para>The requested realm is set to Inactive.</para>
+    <para>Action: Change the status in OpenAM Console.</para>
+   </listitem>
+  </varlistentry>
+  <varlistentry>
+   <term>The password and the confirm password do not match.</term>
+   <listitem>
+    <para>Error shown when using the Membership module.</para>
+    <para>Action: Type the password values again.</para>
+   </listitem>
+  </varlistentry>
+  <varlistentry>
+   <term>The password entered does not contain enough characters.</term>
+   <listitem>
+    <para>When using the Membership module, the password provided has fewer
+    than 8 characters.</para>
+    <para>Action: Enter a longer password.</para>
+   </listitem>
+  </varlistentry>
+  <varlistentry>
+   <term>The User Name and Password fields cannot have the same value.</term>
+   <listitem>
+    <para>When using the Membership module, you cannot create a user with
+    identical user name and password values.</para>
+    <para>Action: Use a different user name or password.</para>
+   </listitem>
+  </varlistentry>
+  <varlistentry>
+   <term>User has no profile in the specified organization.</term>
+   <listitem>
+    <para>Action: Check that the user exists in the subjects for the
+    realm.</para>
+   </listitem>
+  </varlistentry>
+  <varlistentry>
+   <term>User is not active</term>
+   <listitem>
+    <para>Action: Change the user status from inactive to active in OpenAM
+    console.</para>
+   </listitem>
+  </varlistentry>
+  <varlistentry>
+   <term>User session has timed out.</term>
+   <listitem>
+    <para>Action: Log in again.</para>
+   </listitem>
+  </varlistentry>
+  <varlistentry>
+   <term>You are already logged in</term>
+   <listitem>
+    <para>No Success URL redirect is defined for the user.</para>
+    <para>Action: Set up an appropriate Success URL redirect, or use the
+    <literal>goto</literal> parameter in the login URL query string.</para>
+   </listitem>
+  </varlistentry>
+ </variablelist>
+ 
+ <variablelist xml:id="console-error-messages">
+  <title>Common Console Errors</title>
+  <indexterm>
+   <primary>Error messages</primary>
+   <secondary>Console</secondary>
+  </indexterm>
+  <varlistentry>
+   <term>Could not create identity object. User does not have sufficient
+   access.</term>
+   <listitem>
+    <para>Permissions prevented the operation.</para>
+    <para>Action: Perform the operation as a user with sufficient access, or
+    have an administrator grant you sufficient access.</para>
+   </listitem>
+  </varlistentry>
+  <varlistentry>
+   <term>Invalid user's start location. Please contact your
+   administrator.</term>
+   <listitem>
+    <para>The Administrator DN is no longer valid.</para>
+    <para>Action: Edit the User service to use the proper value for the
+    Administrator DN.</para>
+   </listitem>
+  </varlistentry>
+  <varlistentry>
+   <term>Size limit exceeded.</term>
+   <listitem>
+    <para>Your search returned more entries that the data store allows.</para>
+    <para>Action: Refine your search, or increase Maximum Results Returned from
+    a Search in the Administration service.</para>
+   </listitem>
+  </varlistentry>
+  <varlistentry>
+   <term>Time limit exceeded.</term>
+   <listitem>
+    <para>Your search took more time to search the data store than was
+    allowed.</para>
+    <para>Action: Refine your search, or increase Timeout for Search in the
+    Administration Service.</para>
+   </listitem>
+  </varlistentry>
+  <varlistentry>
+   <term>There are no attributes to display.</term>
+   <listitem>
+    <para>No user-editable attributes are defined for the selected
+    object.</para>
+   </listitem>
+  </varlistentry>
+  <varlistentry>
+   <term>There are no entities.</term>
+   <listitem>
+    <para>What you are searching for did not match anything in the data
+    store.</para>
+    <para>Action: Refine your search.</para>
+   </listitem>
+  </varlistentry>
+  <varlistentry>
+   <term>Unable to get attribute from data store.</term>
+   <listitem>
+    <para>Occurs when a profile has been modified concurrently by another
+    user.</para>
+    <para>Action: Refresh the display.</para>
+   </listitem>
+  </varlistentry>
+ </variablelist>
+</chapter>

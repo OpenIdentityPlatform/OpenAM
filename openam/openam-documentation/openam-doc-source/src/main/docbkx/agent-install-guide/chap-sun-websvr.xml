@@ -1,0 +1,331 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  ! CCPL HEADER START
+  !
+  ! This work is licensed under the Creative Commons
+  ! Attribution-NonCommercial-NoDerivs 3.0 Unported License.
+  ! To view a copy of this license, visit
+  ! http://creativecommons.org/licenses/by-nc-nd/3.0/
+  ! or send a letter to Creative Commons, 444 Castro Street,
+  ! Suite 900, Mountain View, California, 94041, USA.
+  !
+  ! You can also obtain a copy of the license at
+  ! src/main/resources/legal-notices/CC-BY-NC-ND.txt.
+  ! See the License for the specific language governing permissions
+  ! and limitations under the License.
+  !
+  ! If applicable, add the following below this CCPL HEADER, with the fields
+  ! enclosed by brackets "[]" replaced with your own identifying information:
+  !      Portions Copyright [yyyy] [name of copyright owner]
+  !
+  ! CCPL HEADER END
+  !
+  !      Copyright 2011-2012 ForgeRock AS
+  !    
+-->
+<chapter xml:id='chap-sun-websvr'
+ xmlns='http://docbook.org/ns/docbook'
+ version='5.0' xml:lang='en'
+ xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance'
+ xsi:schemaLocation='http://docbook.org/ns/docbook http://docbook.org/xml/5.0/xsd/docbook.xsd'
+ xmlns:xlink='http://www.w3.org/1999/xlink'
+ xmlns:xinclude='http://www.w3.org/2001/XInclude'>
+ <title>Installing the Sun Web Server Policy Agent</title>
+ <indexterm><primary>Sun Web Server</primary></indexterm>
+ <para>This chapter covers installation of the policy agent for Sun
+ Web Server.</para>
+ 
+ <section xml:id="before-sjsws-agent-install">
+  <title>Before You Install</title>
+  
+  <para>You must install Apache HTTP Server before you install the policy
+  agent, and you must stop the server during installation.</para>
+  
+  <para>You must install a Java 6 runtime environment, and set the
+  <literal>JAVA_HOME</literal> environment variable. The policy agent installer
+  requires Java.</para>
+
+  <screen>$ echo $JAVA_HOME
+/path/to/java1.6
+$ which java
+/usr/bin/java</screen>
+
+  <para>Download the Sun Web Server policy agent for your platform from the
+  <link xlink:href="http://forgerock.org/openam.html">download page</link>.
+  Also verify the checksum of the file you download against the checksum
+  posted on the download page.</para>
+  
+  <para>Unzip the file in the directory where you plan to install the web
+  policy agent. The agent you install stores its configuration and logs
+  under this directory.</para>
+  
+  <variablelist>
+   <para>When you unzip the policy agent .zip download, you find the following
+   directories under the <filename>web_agents/sjsws_agent</filename>
+   directory.</para>
+   <varlistentry>
+    <term><filename>bin</filename></term>
+    <listitem>
+     <para>Contains the installation and configuration program,
+     <command>agentadmin</command>; the certificate management tool
+     <command>certutil</command> and the password hashing tool
+     <command>crypt_util</command>.</para>
+    </listitem>
+   </varlistentry>
+   <varlistentry>
+    <term><filename>config</filename></term>
+    <listitem>
+     <para>Configuration templates used by the <command>agentadmin</command>
+     command during installation</para>
+    </listitem>
+   </varlistentry>
+   <varlistentry>
+    <term><filename>data</filename></term>
+    <listitem>
+     <para>Not used</para>
+    </listitem>
+   </varlistentry>
+   <varlistentry>
+    <term><filename>etc</filename></term>
+    <listitem>
+     <para>Not used</para>
+    </listitem>
+   </varlistentry>
+   <varlistentry>
+    <term><filename>installer-logs</filename></term>
+    <listitem>
+     <para>Location for log files written during installation</para>
+    </listitem>
+   </varlistentry>
+   <varlistentry>
+    <term><filename>lib</filename></term>
+    <listitem>
+     <para>Shared libraries used by the web policy agent</para>
+    </listitem>
+   </varlistentry>
+   <varlistentry>
+    <term><filename>locale</filename></term>
+    <listitem>
+     <para>Property files used by the installation program</para>
+    </listitem>
+   </varlistentry>
+  </variablelist>
+ </section>
+ 
+ <section xml:id="install-sjsws-web-agent">
+  <title>Installing Sun Web Server Web Policy Agent</title>
+  
+  <para>Complete the following procedures to install the policy agent.</para>
+  
+  <procedure xml:id="create-sjsws-agent-profile">
+   <title>To Create the Sun Web Server Web Agent Profile</title>
+   
+   <para>Regardless of whether you store configurations centrally in OpenAM
+   or locally with your agents, the agent requires a profile so that it can
+   connect to and communicate with OpenAM.</para>
+   <step>
+    <para>In the OpenAM console, browse to Access Control &gt;
+    <replaceable>Realm Name</replaceable>&gt; Agents &gt; Web,
+    and then click the New... button in the Agent table.</para>
+   </step>
+   <step>
+    <para>Complete the web form using the following hints.</para>
+    <variablelist>
+     <varlistentry>
+      <term>Name</term>
+      <listitem>
+       <para>The name for the agent profile used when you install the
+       agent</para>
+      </listitem>
+     </varlistentry>
+     <varlistentry>
+      <term>Password</term>
+      <listitem>
+       <para>Password the agent uses to authenticate to OpenAM</para>
+      </listitem>
+     </varlistentry>
+     <varlistentry>
+      <term>Configuration</term>
+      <listitem>
+       <para>Centralized configurations are stored in the OpenAM configuration
+       store. You can manage the centralized configuration through the OpenAM
+       console. Local configurations are stored in a file alongside the
+       agent.</para>
+      </listitem>
+     </varlistentry>
+     <varlistentry>
+      <term>Server URL</term>
+      <listitem>
+       <para>The full URL to an OpenAM instance, or if OpenAM is deployed in
+       a site configuration (behind a load balancer) then the site URL</para>
+       <para>In centralized configuration mode, the Server URL is used to
+       populate the agent profile for services such as Login, Logout, Naming,
+       and Cross Domain SSO.</para>
+      </listitem>
+     </varlistentry>
+     <varlistentry>
+      <term>Agent URL</term>
+      <listitem>
+       <para>The web server URL that the agent protects</para>
+       <para>In centralized configuration mode, the Agent URL is used to
+       populate the Agent Profile for services such as notifications.</para>
+      </listitem>
+     </varlistentry>
+    </variablelist>
+   </step>
+  </procedure>
+  
+  <procedure xml:id="create-sjsws-agent-pwdfile">
+   <title>To Create the Password File</title>
+   
+   <step>
+    <para>Create a text file containing only the password.</para>
+    <screen>$ echo password > /tmp/pwd.txt</screen>
+   </step>
+   <step>
+    <para>Protect the password file you create as appropriate for your
+    operating system.</para>
+    <screen>$ chmod 400 /tmp/pwd.txt</screen>
+   </step>
+  </procedure>
+  
+  <procedure xml:id="install-agent-into-sjsws">
+   <title>To Install the Policy Agent into Sun Web Server</title>
+   
+   <step>
+    <para>Shut down Sun Web Server instance where you plan to install the
+    agent.</para>
+   </step>
+   <step>
+    <para>Make sure OpenAM is running.</para>
+   </step>
+   <step>
+    <para>Run <command>agentadmin --install</command> to install the
+    agent.</para>
+    <screen>$ /path/to/web_agents/sjsws_agent/bin/agentadmin --install
+...
+-----------------------------------------------
+SUMMARY OF YOUR RESPONSES
+-----------------------------------------------
+Sun Java System Web Server Config Directory :
+/path/to/webserver7/https-www.example.com/config/
+OpenAM server URL : http://openam.example.com:8080/openam
+Agent URL : http://www.example.com:8080
+Agent Profile name : Sun Web Server Agent
+Agent Profile Password file name : /tmp/pwd.txt
+
+...
+SUMMARY OF AGENT INSTALLATION
+-----------------------------
+Agent instance name: Agent_001
+Agent Bootstrap file location:
+/path/to/web_agents/sjsws_agent/Agent_001/config/
+ <?eval ${agentsBootstrapFile}?>
+Agent Configuration Tag file location
+/path/to/web_agents/sjsws_agent/Agent_001/config/
+ <?eval ${agentsConfigurationFile}?>
+Agent Audit directory location:
+/path/to/web_agents/sjsws_agent/Agent_001/logs/audit
+Agent Debug directory location:
+/path/to/web_agents/sjsws_agent/Agent_001/logs/debug
+
+
+Install log file location:
+/path/to/web_agents/sjsws_agent/installer-logs/audit/install.log
+...</screen>
+    <para>Upon successful completion, the installer has backed up and updated
+    the Sun Web Server instance configuration, and has also set up
+    configuration and log directories for the agent.</para>
+    <note>
+     <para>If the agent is in a different domain than the server, refer to <citetitle>Administration Guide</citetitle> procedure, <link
+   xlink:href="admin-guide#chap-cdsso"
+   xlink:role="http://docbook.org/xlink/role/olink"><citetitle>Configuring Cross-Domain
+   Single Sign On</citetitle></link>.</para>
+    </note>
+   </step>
+   <step>
+    <para>Take note of the configuration files and log locations.</para>
+    <para>Each agent instance that you install on the system has its own
+    numbered configuration and logs directory. The first agent's configuration
+    and logs are thus located under the directory
+    <filename>web_agents/sjsws_agent/Agent_001/</filename>.</para>
+    <variablelist>
+     <varlistentry>
+      <term><filename>config/<?eval ${agentsBootstrapFile}?></filename></term>
+      <listitem>
+       <para>Used to bootstrap the web policy agent, allowing the agent to
+       connect to OpenAM and download its configuration</para>
+      </listitem>
+     </varlistentry>
+     <varlistentry>
+      <term><filename>config/<?eval ${agentsConfigurationFile}?></filename></term>
+      <listitem>
+       <para>Only used if you configured the web policy agent to use local
+       configuration</para>
+      </listitem>
+     </varlistentry>
+     <varlistentry>
+      <term><filename>logs/audit/</filename></term>
+      <listitem>
+       <para>Operational audit log directory, only used if remote logging
+       to OpenAM is disabled</para>
+      </listitem>
+     </varlistentry>
+     <varlistentry>
+      <term><filename>logs/debug/</filename></term>
+      <listitem>
+       <para>Debug log directory. Useful in troubleshooting policy agent
+       issues.</para>
+      </listitem>
+     </varlistentry>
+    </variablelist>
+   </step>
+   <step>
+    <para>If your policy agent configuration is not in the top-level realm (/),
+       then you must edit config/<?eval ${agentsBootstrapFile}?> to identify
+       the sub-realm that has your policy agent configuration.
+       Find com.sun.identity.agents.config.organization.name and change
+       the / to the path to your policy agent profile. This allows the policy agent
+       to properly identify itself to the OpenAM server. </para>
+   </step>
+   <step>
+    <para>Restart the Sun Web Server instance where you installed the
+    agent.</para>
+   </step>
+   <step>
+    <para>Check that the agent protects the web site.</para>
+    <para>If you have not yet configured any policies to allow access, then
+    you should receive an HTTP 403 Forbidden error. In the above example, when
+    accessing <literal>http://www.example.com:8080/</literal>, the content of
+    the page returned appears in the browser as follows.</para>
+    <literallayout><emphasis role="strong">Forbidden</emphasis>
+
+Your client is not allowed to access the requested object.</literallayout>
+   </step>
+  </procedure>
+ </section>
+ 
+ <section xml:id="custom-sjsws-agent-installation">
+  <title>Custom Sun Web Policy Agent Installation</title>
+  
+  <para>For alternative installations, use <command>agentadmin
+  --custom-install</command>.</para>
+  
+  <para>When performing a scripted, silent installation, use
+  <command>agentadmin --install --saveResponse
+  <replaceable>response-file</replaceable></command>
+  to create a response file for scripted installation. Then install silently
+  using <command>agentadmin --install --useResponse
+  <replaceable>response-file</replaceable></command>.</para>
+ </section>
+ 
+ <section xml:id="uninstall-sjsws-agent">
+  <title>Remove Sun Web Policy Agent Software</title>
+  
+  <para>Shut down the Sun Web Server before you uninstall the
+    policy agent.</para>
+  
+  <para>To remove the web policy agent, use <command>agentadmin
+  --uninstall</command>.</para>
+ </section>
+</chapter>

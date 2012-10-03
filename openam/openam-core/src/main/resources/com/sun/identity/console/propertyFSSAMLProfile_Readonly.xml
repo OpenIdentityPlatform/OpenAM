@@ -1,0 +1,144 @@
+<!--
+   DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
+  
+   Copyright (c) 2007 Sun Microsystems Inc. All Rights Reserved
+  
+   The contents of this file are subject to the terms
+   of the Common Development and Distribution License
+   (the License). You may not use this file except in
+   compliance with the License.
+
+   You can obtain a copy of the License at
+   https://opensso.dev.java.net/public/CDDLv1.0.html or
+   opensso/legal/CDDLv1.0.txt
+   See the License for the specific language governing
+   permission and limitations under the License.
+
+   When distributing Covered Code, include this CDDL
+   Header Notice in each file and include the License file
+   at opensso/legal/CDDLv1.0.txt.
+   If applicable, add the following below the CDDL Header,
+   with the fields enclosed by brackets [] replaced by
+   your own identifying information:
+   "Portions Copyrighted [year] [name of copyright owner]"
+
+   $Id: propertyFSSAMLProfile_Readonly.xml,v 1.2 2008/06/25 05:45:11 qcheng Exp $
+
+-->
+
+<!DOCTYPE propertysheet SYSTEM "propertysheet.dtd">
+
+<propertysheet>
+    <section name="properties" defaultValue="saml.profile.properties.header">
+    <property>
+	<label name="lbliplanet-am-saml-target-specifier" labelFor="iplanet-am-saml-target-specifier" />
+	<cc name="iplanet-am-saml-target-specifier" tagclass="com.sun.web.ui.taglib.html.CCStaticTextFieldTag" />
+    </property>
+
+    <property span="true">
+	<cc name="iplanet-am-saml-siteid-issuername-list" tagclass="com.sun.web.ui.taglib.table.CCActionTableTag" >
+            <attribute name="title" value="saml.profile.siteid.table.header" />
+            <attribute name="empty" value="saml.profile.siteid.table.noentries" />
+            <attribute name="showPaginationControls" value="false" />
+            <attribute name="selectionType" value="multiple" />
+            <attribute name="selectionJavascript" value="toggleTblButtonState('FSSAMLService', 'FSSAMLService.iplanet-am-saml-siteid-issuername-list', 'siteIDCount', 'FSSAMLService.tblSiteIDButtonDelete', this)" />
+            <attribute name="showAdvancedSortingIcon" value="false" />
+            <attribute name="showLowerActions" value="false" />
+            <attribute name="showPaginationControls" value="false" />
+            <attribute name="showPaginationIcon" value="false" />
+            <attribute name="showSelectionIcons" value="true" />
+            <attribute name="showSelectionSortIcon" value="false" />
+            <attribute name="showSortingRow" value="true" />
+        </cc>
+    </property>
+
+    <property span="true">
+	<cc name="iplanet-am-saml-partner-urls" tagclass="com.sun.web.ui.taglib.table.CCActionTableTag" >
+            <attribute name="title" value="saml.profile.trustedPartners.table.header" />
+            <attribute name="empty" value="saml.profile.trustedPartners.noentries" />
+            <attribute name="showPaginationControls" value="false" />
+            <attribute name="selectionType" value="multiple" />
+            <attribute name="selectionJavascript" value="toggleTblButtonState('FSSAMLService', 'FSSAMLService.iplanet-am-saml-partner-urls', 'trustedPartnersCount', 'FSSAMLService.tblTrustedPartnersButtonDelete', this)" />
+            <attribute name="showAdvancedSortingIcon" value="false" />
+            <attribute name="showLowerActions" value="false" />
+            <attribute name="showPaginationControls" value="false" />
+            <attribute name="showPaginationIcon" value="false" />
+            <attribute name="showSelectionIcons" value="true" />
+	    <attribute name="showSelectionSortIcon" value="false" />
+            <attribute name="showSortingRow" value="true" />
+	</cc>
+    </property>
+
+    <property span="true">
+        <cc name="iplanet-am-saml-post-to-target-urls" tagclass="com.sun.web.ui.taglib.table.CCActionTableTag" >
+            <attribute name="title" value="saml.profile.targetURLs.table.header" />
+            <attribute name="empty" value="saml.profile.targetURLs.table.noentries" />
+            <attribute name="showPaginationControls" value="false" />
+            <attribute name="selectionType" value="multiple" />
+            <attribute name="selectionJavascript" value="toggleTblButtonState('FSSAMLService', 'FSSAMLService.iplanet-am-saml-post-to-target-urls', 'targetURLsCount', 'FSSAMLService.tblTargetURLsButtonDelete', this)" />
+            <attribute name="showAdvancedSortingIcon" value="false" />
+            <attribute name="showLowerActions" value="false" />
+            <attribute name="showPaginationControls" value="false" />
+            <attribute name="showPaginationIcon" value="false" />
+            <attribute name="showSelectionIcons" value="true" />
+            <attribute name="showSelectionSortIcon" value="false" />
+            <attribute name="showSortingRow" value="true" />
+        </cc>
+    </property>
+
+    </section>
+
+    <section name="assertion" defaultValue="saml.profile.assertion.header">
+    <property>
+	<label name="lbliplanet-am-saml-assertion-timeout" labelFor="iplanet-am-saml-assertion-timeout" />
+	<cc name="iplanet-am-saml-assertion-timeout" tagclass="com.sun.web.ui.taglib.html.CCTextFieldTag">
+	    <attribute name="size" value="5" />
+	</cc>
+	<fieldhelp name="helpiplanet-am-saml-assertion-timeout" />
+    </property>
+    <property>
+	<label name="lbliplanet-am-saml-notbefore-timeskew" labelFor="iplanet-am-saml-notbefore-timeskew" />
+	<cc name="iplanet-am-saml-notbefore-timeskew" tagclass="com.sun.web.ui.taglib.html.CCTextFieldTag">
+	    <attribute name="size" value="5" />
+	</cc>
+	<fieldhelp name="helpiplanet-am-saml-notbefore-timeskew" />
+    </property>
+    </section>
+
+    <section name="artifact" defaultValue="saml.profile.artifact.header">
+    <property>
+	<label name="lbliplanet-am-saml-artifact-timeout" labelFor="iplanet-am-saml-artifact-timeout" />
+	<cc name="iplanet-am-saml-artifact-timeout" tagclass="com.sun.web.ui.taglib.html.CCTextFieldTag">
+	    <attribute name="size" value="5" />
+	</cc>
+	<fieldhelp name="helpiplanet-am-saml-artifact-timeout" />
+    </property>
+    <property>
+	<label name="lbliplanet-am-saml-artifact-name" labelFor="iplanet-am-saml-artifact-name" />
+	<cc name="iplanet-am-saml-artifact-name" tagclass="com.sun.web.ui.taglib.html.CCTextFieldTag" />
+	<fieldhelp name="helpiplanet-am-saml-artifact-name" />
+    </property>
+    </section>
+
+    <section name="signing" defaultValue="saml.profile.signing.header">
+    <property>
+	<label name="lbliplanet-am-saml-signassertion" labelFor="iplanet-am-saml-signassertion" />
+	<cc name="iplanet-am-saml-signassertion" tagclass="com.sun.web.ui.taglib.html.CCCheckBoxTag">
+	    <attribute name="label" value="label.Yes" />
+	</cc>
+    </property>
+    <property>
+	<label name="lbliplanet-am-saml-signrequest" labelFor="iplanet-am-saml-signrequest" />
+	<cc name="iplanet-am-saml-signrequest" tagclass="com.sun.web.ui.taglib.html.CCCheckBoxTag">
+	    <attribute name="label" value="label.Yes" />
+	</cc>
+    </property>
+    <property>
+	<label name="lbliplanet-am-saml-signresponse" labelFor="iplanet-am-saml-signresponse" />
+	<cc name="iplanet-am-saml-signresponse" tagclass="com.sun.web.ui.taglib.html.CCCheckBoxTag">
+	    <attribute name="label" value="label.Yes" />
+	</cc>
+    </property>
+    </section>
+
+</propertysheet>

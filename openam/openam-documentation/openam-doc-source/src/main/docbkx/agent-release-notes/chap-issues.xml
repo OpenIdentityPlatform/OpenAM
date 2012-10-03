@@ -1,0 +1,212 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  ! CCPL HEADER START
+  !
+  ! This work is licensed under the Creative Commons
+  ! Attribution-NonCommercial-NoDerivs 3.0 Unported License.
+  ! To view a copy of this license, visit
+  ! http://creativecommons.org/licenses/by-nc-nd/3.0/
+  ! or send a letter to Creative Commons, 444 Castro Street,
+  ! Suite 900, Mountain View, California, 94041, USA.
+  !
+  ! You can also obtain a copy of the license at
+  ! src/main/resources/legal-notices/CC-BY-NC-ND.txt.
+  ! See the License for the specific language governing permissions
+  ! and limitations under the License.
+  !
+  ! If applicable, add the following below this CCPL HEADER, with the fields
+  ! enclosed by brackets "[]" replaced with your own identifying information:
+  !      Portions Copyright [yyyy] [name of copyright owner]
+  !
+  ! CCPL HEADER END
+  !
+  !      Copyright 2011-2012 ForgeRock AS
+  !    
+-->
+<chapter xml:id='chap-issues'
+ xmlns='http://docbook.org/ns/docbook' version='5.0' xml:lang='en'
+ xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance'
+ xsi:schemaLocation='http://docbook.org/ns/docbook http://docbook.org/xml/5.0/xsd/docbook.xsd'
+ xmlns:xlink='http://www.w3.org/1999/xlink'
+ xmlns:xinclude='http://www.w3.org/2001/XInclude'>
+ <title>Policy Agent Fixes, Limitations, &amp; Known Issues</title>
+
+ <para>OpenAM policy agent issues are tracked at <link
+ xlink:href='https://bugster.forgerock.org/jira/browse/OPENAM'
+ >https://bugster.forgerock.org/jira/browse/OPENAM</link>.</para>
+
+ <section xml:id="web-agent-issues">
+  <title>Web Policy Agents <?eval ${webAgentsDocTargetVersion}?></title>
+  <para>This section covers the status of key issues and limitations at release
+  <?eval ${webAgentsDocTargetVersion}?>.</para>
+
+  <section xml:id="web-agent-fixes">
+   <title>Fixes Since Last Release</title>
+
+   <para>The following issues were fixed in this release.</para>
+
+  <itemizedlist>
+  <!-- This list does not include some fixes for typos, doc issues, removed
+  functionality, and issues raised on new features during testing. -->
+<!-- Template
+   <listitem>
+    <para><link
+    xlink:href="https://bugster.forgerock.org/jira/browse/OPENAM-XXXX"
+    xlink:show="new">OPENAM-XXXX</link>: DSCP</para>
+   </listitem>  -->
+
+   <listitem>
+    <para><link
+    xlink:href="https://bugster.forgerock.org/jira/browse/OPENAM-1498"
+    xlink:show="new">OPENAM-1498</link>: Varnish PA crash on invalid bootstrap properties</para>
+   </listitem>
+   <listitem>
+    <para><link
+    xlink:href="https://bugster.forgerock.org/jira/browse/OPENAM-1497"
+    xlink:show="new">OPENAM-1497</link>: Varnish PA sets wrong http 302 header</para>
+   </listitem>
+   <listitem>
+    <para><link
+    xlink:href="https://bugster.forgerock.org/jira/browse/OPENAM-1448"
+    xlink:show="new">OPENAM-1448</link>: IIS6 policy agent returns http 415 error when used 
+    with SOAP web-services and custom headers</para>
+   </listitem>
+   <listitem>
+    <para><link
+    xlink:href="https://bugster.forgerock.org/jira/browse/OPENAM-1420"
+    xlink:show="new">OPENAM-1420</link>: http HEAD request gets transformed into GET</para>
+   </listitem>
+   <listitem>
+    <para><link
+    xlink:href="https://bugster.forgerock.org/jira/browse/OPENAM-1419"
+    xlink:show="new">OPENAM-1419</link>: Provider configuration message is garbled when using DBCS languages</para>
+   </listitem>
+   <listitem>
+    <para><link
+    xlink:href="https://bugster.forgerock.org/jira/browse/OPENAM-1392"
+    xlink:show="new">OPENAM-1392</link>: Password reset service does not work when using DBCS languages</para>
+   </listitem>
+   <listitem>
+    <para><link
+    xlink:href="https://bugster.forgerock.org/jira/browse/OPENAM-1386"
+    xlink:show="new">OPENAM-1386</link>: Password reset form is garbled when using DBCS languages</para>
+   </listitem>
+   <listitem>
+    <para><link
+    xlink:href="https://bugster.forgerock.org/jira/browse/OPENAM-1379"
+    xlink:show="new">OPENAM-1379</link>: openAM IIS 7 webagent bug</para>
+   </listitem>
+   <listitem>
+    <para><link
+    xlink:href="https://bugster.forgerock.org/jira/browse/OPENAM-1357"
+    xlink:show="new">OPENAM-1357</link>: WebSphere Policy Agent authentication issue for syncNode 
+    script when OpenAM authentication chain updated to not use Datastore as first module.</para>
+   </listitem>
+   <listitem>
+    <para><link
+    xlink:href="https://bugster.forgerock.org/jira/browse/OPENAM-1344"
+    xlink:show="new">OPENAM-1344</link>: Wrong library being loaded by apache 2.4 policy agent</para>
+   </listitem>
+   <listitem>
+    <para><link
+    xlink:href="https://bugster.forgerock.org/jira/browse/OPENAM-1339"
+    xlink:show="new">OPENAM-1339</link>: Empty audit log message for windows policy agents</para>
+   </listitem>
+   <listitem>
+    <para><link
+    xlink:href="https://bugster.forgerock.org/jira/browse/OPENAM-1337"
+    xlink:show="new">OPENAM-1337</link>: LDAPv3Repo (debug) logging does not show variable values</para>
+   </listitem>
+   <listitem>
+    <para><link
+    xlink:href="https://bugster.forgerock.org/jira/browse/OPENAM-1273"
+    xlink:show="new">OPENAM-1273</link>: support tomcat_v7 j2ee agent</para>
+   </listitem>
+   <listitem>
+    <para><link
+    xlink:href="https://bugster.forgerock.org/jira/browse/OPENAM-1271"
+    xlink:show="new">OPENAM-1271</link>: webagent namingUrl validation fails if datastore auth module is not
+    configured within auth-chain of agent realm</para>
+   </listitem>
+   <listitem>
+    <para><link
+    xlink:href="https://bugster.forgerock.org/jira/browse/OPENAM-1270"
+    xlink:show="new">OPENAM-1270</link>: Web policy agent/sdk needs an option to disable extended OpenAM naming URL validation during bootstrap</para>
+   </listitem>
+<!-- Not sure 1267 should be included, it's more of a typo than actual correction -->
+   <listitem>
+    <para><link
+    xlink:href="https://bugster.forgerock.org/jira/browse/OPENAM-1267"
+    xlink:show="new">OPENAM-1267</link>: WebAgent installer shows 'OpenSSO Policy Agent' at welcome screen</para>
+   </listitem>
+   <listitem>
+    <para><link
+    xlink:href="https://bugster.forgerock.org/jira/browse/OPENAM-1264"
+    xlink:show="new">OPENAM-1264</link>: OpenAM Web Agent crashes while cleaning Agent Config</para>
+   </listitem>
+   <listitem>
+    <para><link
+    xlink:href="https://bugster.forgerock.org/jira/browse/OPENAM-1220"
+    xlink:show="new">OPENAM-1220</link>: Invalid date header -1 with Java agents</para>
+   </listitem>
+   <listitem>
+   <para><link
+    xlink:href="https://bugster.forgerock.org/jira/browse/OPENAM-1208"
+    xlink:show="new">OPENAM-1208</link>: IIS6 policy agent sticks in a loop on a session refresh advice</para>
+   </listitem>
+   <listitem>
+    <para><link
+    xlink:href="https://bugster.forgerock.org/jira/browse/OPENAM-1190"
+    xlink:show="new">OPENAM-1190</link>: IIS6 policy agent erroneously overwrites http headers</para>
+   </listitem>
+  </itemizedlist>
+  </section>
+
+  <section xml:id="web-agent-limitations">
+   <title>Limitations</title>
+
+   <para>OpenAM web policy agents do not currently support IPv6.</para>
+  </section>
+
+  <section xml:id="web-agent-known-issues">
+   <title>Known Issues At Release Time</title>
+
+   <para>The following known issues remained open at the time this release
+   became available.</para>
+
+   <para>TODO: build the known issues list based on
+   https://bugster.forgerock.org/jira/browse/OPENAM</para>
+  </section>
+ </section>
+
+ <section xml:id="javaee-agent-issues">
+  <title>Java EE Policy Agents <?eval ${javaEEAgentsDocTargetVersion}?></title>
+  <para>This section covers the status of key issues and limitations at release
+  <?eval ${javaEEAgentsDocTargetVersion}?>.</para>
+
+  <section xml:id="javaee-agent-fixes">
+   <title>Fixes Since Last Release</title>
+
+   <para>The following issues were fixed in this release.</para>
+
+   <para>TODO: build the list of fixes based on
+   https://bugster.forgerock.org/jira/browse/OPENAM</para>
+  </section>
+
+  <section xml:id="javaee-agent-limitations">
+   <title>Limitations</title>
+
+   <para>Not all features of OpenAM Java EE policy agents work with IPv6.</para>
+  </section>
+
+  <section xml:id="javaee-agent-known-issues">
+   <title>Known Issues At Release Time</title>
+
+   <para>The following known issues remained open at the time this release
+   became available.</para>
+
+   <para>TODO: build the known issues list based on
+   https://bugster.forgerock.org/jira/browse/OPENAM</para>
+  </section>
+ </section>
+</chapter>

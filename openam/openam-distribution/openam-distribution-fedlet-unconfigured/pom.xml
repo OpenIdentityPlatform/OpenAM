@@ -1,0 +1,281 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <!--
+    * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
+    *
+    * Copyright (c) 2011 ForgeRock AS. All Rights Reserved
+    *
+    * The contents of this file are subject to the terms
+    * of the Common Development and Distribution License
+    * (the License). You may not use this file except in
+    * compliance with the License.
+    *
+    * You can obtain a copy of the License at
+    * http://forgerock.org/license/CDDLv1.0.html
+    * See the License for the specific language governing
+    * permission and limitations under the License.
+    *
+    * When distributing Covered Code, include this CDDL
+    * Header Notice in each file and include the License file
+    * at http://forgerock.org/license/CDDLv1.0.html
+    * If applicable, add the following below the CDDL Header,
+    * with the fields enclosed by brackets [] replaced by
+    * your own identifying information:
+    * "Portions Copyrighted [year] [name of copyright owner]"
+    *
+    -->
+
+    <!-- Parent Project -->
+    <parent>
+        <groupId>org.forgerock</groupId>
+        <artifactId>openam-distribution</artifactId>
+        <version>10.1.0-SNAPSHOT</version>
+    </parent>
+
+    <!-- Component Definition -->
+    <name>OpenAM Distribution Fedlet UnConfigured</name>
+    <description>OpenAM Distribution Fedlet UnConfigured.
+    </description>
+    <artifactId>openam-distribution-fedlet-unconfigured</artifactId>
+    <version>10.1.0-SNAPSHOT</version>
+    <packaging>pom</packaging>
+    <organization>
+        <name>ForgeRock</name>
+        <url>http://www.forgerock.com</url>
+    </organization>
+
+    <!-- Build -->
+    <build>
+        <plugins>
+
+            <!-- Pre-Packaging step for Zip Elements. -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-antrun-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>zip-pre-packaging</id>
+                        <phase>package</phase>
+                        <configuration>
+                            <target>
+
+                                <tstamp>
+                                    <format property="war.time.stamp" pattern="yyyy-MMMM-dd HH:mm" locale="en,UK"/>
+                                </tstamp>
+                                <property name="version.set" value="${project.version}"/>
+
+                                <filter token="DATESTAMP" value="${war.time.stamp}"/>
+                                <filter token="VERSION" value="${version.set}"/>
+
+                                <copy todir="${project.build.outputDirectory}/locale/en_US" filtering="true">
+                                    <fileset dir="${project.basedir}/../../openam-server/src/main/resources/federation-locale">
+                                        <include name="*.properties"/>
+                                        <exclude name="Services.properties"/>
+                                        <exclude name="ums.properties"/>
+                                        <exclude name="sso.properties"/>
+                                        <exclude name="SMS.properties"/>
+                                        <exclude name="authentication_util.properties"/>
+                                    </fileset>
+                                    <globmapper from="*.properties" to="*_en.properties"/>
+                                </copy>
+                                <copy todir="${project.build.outputDirectory}/locale/en_US" filtering="false">
+                                    <fileset dir="${project.basedir}/../../openam-server/src/main/resources/locale">
+                                        <include name="*.properties"/>
+                                        <exclude name="Services.properties"/>
+                                        <exclude name="ums.properties"/>
+                                        <exclude name="sso.properties"/>
+                                        <exclude name="SMS.properties"/>
+                                        <exclude name="authentication_util.properties"/>
+                                    </fileset>
+                                    <globmapper from="*.properties" to="*_en.properties"/>
+                                </copy>
+                                <copy todir="${project.build.outputDirectory}/locale/en_US" filtering="false">
+                                    <fileset dir="${project.basedir}/../../openam-server/src/main/resources/openfm-locale">
+                                        <include name="*.properties"/>
+                                        <exclude name="Services.properties"/>
+                                        <exclude name="ums.properties"/>
+                                        <exclude name="sso.properties"/>
+                                        <exclude name="SMS.properties"/>
+                                        <exclude name="authentication_util.properties"/>
+                                    </fileset>
+                                    <globmapper from="*.properties" to="*_en.properties"/>
+                                </copy>
+                            </target>
+                        </configuration>
+                        <goals>
+                            <goal>run</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-assembly-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>fedlet-assembly_1</id>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>single</goal>
+                        </goals>
+                        <configuration>
+                            <finalName>openam-distribution-fedlet-unconfigured-${project.version}</finalName>
+                            <appendAssemblyId>false</appendAssemblyId>
+                            <tarLongFileMode>gnu</tarLongFileMode>
+                            <descriptors>
+                                <descriptor>src/main/assembly/openAMFedlet_WAR_Assembly_Descriptor.xml</descriptor>
+                            </descriptors>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>fedlet-assembly_2</id>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>single</goal>
+                        </goals>
+                        <configuration>
+                            <finalName>openam-distribution-fedlet-unconfigured-${project.version}</finalName>
+                            <appendAssemblyId>false</appendAssemblyId>
+                            <tarLongFileMode>gnu</tarLongFileMode>
+                            <descriptors>
+                                <descriptor>src/main/assembly/openAMFedlet_ZIP_Assembly_Descriptor.xml</descriptor>
+                            </descriptors>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+
+        </plugins>
+
+    </build>
+
+
+    <dependencies>
+
+        <dependency>
+            <groupId>org.forgerock</groupId>
+            <artifactId>openam-shared</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>org.forgerock</groupId>
+            <artifactId>openam-federation-library</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>org.forgerock</groupId>
+            <artifactId>openam-dtd-schema</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>org.forgerock</groupId>
+            <artifactId>openam-jaxrpc-schema</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>org.forgerock</groupId>
+            <artifactId>openam-saml2-schema</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>org.forgerock</groupId>
+            <artifactId>openam-mib-schema</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>org.forgerock</groupId>
+            <artifactId>openam-liberty-schema</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>org.forgerock</groupId>
+            <artifactId>openam-wsfederation-schema</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>org.forgerock</groupId>
+            <artifactId>openam-rest</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>external</groupId>
+            <artifactId>esapiport</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>javax.mail</groupId>
+            <artifactId>mail</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>relaxngDatatype</groupId>
+            <artifactId>relaxngDatatype</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>external</groupId>
+            <artifactId>webservices-api</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>external</groupId>
+            <artifactId>webservices-extra</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>external</groupId>
+            <artifactId>webservices-extra-api</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>external</groupId>
+            <artifactId>webservices-rt</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>com.sun.tools.ws</groupId>
+            <artifactId>webservices-tools</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>xalan</groupId>
+            <artifactId>xalan</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>xerces-J</groupId>
+            <artifactId>xercesImpl</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>xerces-J</groupId>
+            <artifactId>xml-apis</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>xerces-J</groupId>
+            <artifactId>xml-resolver</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>xerces-J</groupId>
+            <artifactId>xml-serializer</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>net.java.dev.msv.datatype.xsd</groupId>
+            <artifactId>xsdlib</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>xml-security</groupId>
+            <artifactId>xmlsec</artifactId>
+        </dependency>
+
+    </dependencies>
+</project>
+

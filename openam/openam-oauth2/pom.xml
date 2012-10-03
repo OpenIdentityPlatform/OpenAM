@@ -1,0 +1,207 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!--
+  ~ DO NOT REMOVE COPYRIGHT NOTICES OR THIS HEADER.
+  ~
+  ~ Copyright (c) 2012 ForgeRock Inc. All rights reserved.
+  ~
+  ~ The contents of this file are subject to the terms
+  ~ of the Common Development and Distribution License
+  ~ (the License). You may not use this file except in
+  ~ compliance with the License.
+  ~
+  ~ You can obtain a copy of the License at
+  ~ http://forgerock.org/license/CDDLv1.0.html
+  ~ See the License for the specific language governing
+  ~ permission and limitations under the License.
+  ~
+  ~ When distributing Covered Code, include this CDDL
+  ~ Header Notice in each file and include the License file
+  ~ at http://forgerock.org/license/CDDLv1.0.html
+  ~ If applicable, add the following below the CDDL Header,
+  ~ with the fields enclosed by brackets [] replaced by
+  ~ your own identifying information:
+  ~ "Portions Copyrighted [year] [name of copyright owner]"
+  -->
+
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <parent>
+        <groupId>org.forgerock</groupId>
+        <artifactId>openam</artifactId>
+        <version>10.1.0-SNAPSHOT</version>
+    </parent>
+    <groupId>org.forgerock</groupId>
+    <artifactId>openam-oauth2</artifactId>
+    <version>10.1.0-SNAPSHOT</version>
+    <packaging>pom</packaging>
+    <name>OpenAM OAuth2</name>
+
+    <modules>
+        <module>openam-oauth2-restlet-extension</module>
+        <module>openam-oauth2-openam-extension</module>
+        <module>openam-oauth2-core-token-service</module>
+        <module>openam-oauth2-main</module>
+        <module>openam-oauth2-demo</module>
+    </modules>
+
+
+    <properties>
+        <maven.compiler.target>1.6</maven.compiler.target>
+        <maven.compiler.source>1.6</maven.compiler.source>
+        <jackson.version>1.9.3</jackson.version>
+        <restlet.version>2.1-RC4</restlet.version>
+        <!-- Commons JSON versions -->
+        <commons.json-fluent.version>1.1.0</commons.json-fluent.version>
+        <commons.json-resource.version>1.2.2</commons.json-resource.version>
+        <commons.json-patch.version>1.0.0</commons.json-patch.version>
+    </properties>
+
+    <dependencyManagement>
+        <dependencies>
+
+            <!-- Java EE -->
+            <dependency>
+                <groupId>javax.servlet</groupId>
+                <artifactId>servlet-api</artifactId>
+                <version>2.5</version>
+                <scope>provided</scope>
+            </dependency>
+
+            <!-- OpenAM -->
+            <dependency>
+                <groupId>org.forgerock</groupId>
+                <artifactId>openam-core</artifactId>
+                <version>10.1.0-SNAPSHOT</version>
+            </dependency>
+            <dependency>
+                <groupId>org.forgerock</groupId>
+                <artifactId>openam-shared</artifactId>
+                <version>10.1.0-SNAPSHOT</version>
+            </dependency>
+            <dependency>
+                <groupId>org.forgerock</groupId>
+                <artifactId>openam-coretoken</artifactId>
+                <version>10.1.0-SNAPSHOT</version>
+            </dependency>
+            <dependency>
+                <groupId>org.forgerock</groupId>
+                <artifactId>openam-rest</artifactId>
+                <version>10.1.0-SNAPSHOT</version>
+            </dependency>
+            <dependency>
+                <groupId>org.forgerock</groupId>
+                <artifactId>openam-idsvcs-schema</artifactId>
+                <version>10.1.0-SNAPSHOT</version>
+            </dependency>
+            <dependency>
+                <groupId>org.forgerock</groupId>
+                <artifactId>openam-session-ha-core</artifactId>
+                <version>10.1.0-SNAPSHOT</version>
+            </dependency>
+
+            <!-- Commons -->
+            <dependency>
+                <groupId>org.forgerock.commons</groupId>
+                <artifactId>org.forgerock.json.resource</artifactId>
+                <version>${commons.json-resource.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.forgerock.commons</groupId>
+                <artifactId>org.forgerock.restlet.ext.openam</artifactId>
+                <version>1.0.0-SNAPSHOT</version>
+            </dependency>
+            <dependency>
+                <groupId>org.forgerock.commons</groupId>
+                <artifactId>org.forgerock.restlet.ext.oauth2</artifactId>
+                <version>1.0.0-SNAPSHOT</version>
+            </dependency>
+            <dependency>
+                <groupId>org.forgerock.commons</groupId>
+                <artifactId>json-patch</artifactId>
+                <version>${commons.json-patch.version}</version>
+            </dependency>
+            <!-- Restlet -->
+            <dependency>
+                <groupId>org.restlet.jse</groupId>
+                <artifactId>org.restlet</artifactId>
+                <version>${restlet.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.restlet.jse</groupId>
+                <artifactId>org.restlet.ext.jackson</artifactId>
+                <version>${restlet.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.restlet.osgi</groupId>
+                <artifactId>org.restlet</artifactId>
+                <version>${restlet.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.restlet.osgi</groupId>
+                <artifactId>org.restlet.ext.jackson</artifactId>
+                <version>${restlet.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.restlet.osgi</groupId>
+                <artifactId>org.restlet.ext.servlet</artifactId>
+                <version>${restlet.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.restlet.osgi</groupId>
+                <artifactId>org.restlet.ext.freemarker</artifactId>
+                <version>${restlet.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.restlet.osgi</groupId>
+                <artifactId>org.restlet.ext.ssl</artifactId>
+                <version>${restlet.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.restlet.jse</groupId>
+                <artifactId>org.restlet.ext.simple</artifactId>
+                <version>${restlet.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.restlet.jse</groupId>
+                <artifactId>org.restlet.ext.crypto</artifactId>
+                <version>${restlet.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>org.restlet.jse</groupId>
+                <artifactId>org.restlet.ext.httpclient</artifactId>
+                <version>${restlet.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>javax.ws.rs</groupId>
+                <artifactId>jsr311-api</artifactId>
+                <version>1.1.1</version>
+            </dependency>
+
+            <!-- Test Dependencies -->
+            <dependency>
+                <groupId>org.easytesting</groupId>
+                <artifactId>fest-assert</artifactId>
+                <version>1.4</version>
+                <scope>test</scope>
+            </dependency>
+            <dependency>
+                <groupId>org.testng</groupId>
+                <artifactId>testng</artifactId>
+                <version>6.3.1</version>
+                <scope>test</scope>
+            </dependency>
+            <dependency>
+                <groupId>org.mockito</groupId>
+                <artifactId>mockito-all</artifactId>
+                <version>1.9.0</version>
+                <scope>test</scope>
+            </dependency>
+
+        </dependencies>
+    </dependencyManagement>
+
+</project>

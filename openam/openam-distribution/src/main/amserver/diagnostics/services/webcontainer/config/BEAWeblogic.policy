@@ -1,0 +1,102 @@
+/**
+ * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
+ *
+ * Copyright (c) 2008 Sun Microsystems Inc. All Rights Reserved
+ *
+ * The contents of this file are subject to the terms
+ * of the Common Development and Distribution License
+ * (the License). You may not use this file except in
+ * compliance with the License.
+ *
+ * You can obtain a copy of the License at
+ * https://opensso.dev.java.net/public/CDDLv1.0.html or
+ * opensso/legal/CDDLv1.0.txt
+ * See the License for the specific language governing
+ * permission and limitations under the License.
+ *
+ * When distributing Covered Code, include this CDDL
+ * Header Notice in each file and include the License file
+ * at opensso/legal/CDDLv1.0.txt.
+ * If applicable, add the following below the CDDL Header,
+ * with the fields enclosed by brackets [] replaced by
+ * your own identifying information:
+ * "Portions Copyrighted [year] [name of copyright owner]"
+ *
+ * $Id: BEAWeblogic.policy,v 1.1 2008/11/22 02:41:23 ak138937 Exp $
+ *
+ */
+
+pattern.policies.1=\\s*permission\\s+java[.]net[.]SocketPermission\\s+"\\s*[*]\\s*"\\s*,\\s*"\\s*listen\\s*,\\s*connect\\s*,\\s*accept\\s*,\\s*resolve\\s*"\\s*;
+cleartext.policies.1=permission java.net.SocketPermission "*", "listen,connect,accept,resolve";
+pattern.policies.2=\\s*permission\\s+java[.]util[.]PropertyPermission\\s+"\\s*[*]\\s*"\\s*,\\s*"\\s*read\\s*,\\s*write\\s*"\\s*;
+cleartext.policies.2=permission java.util.PropertyPermission "*", "read, write";
+pattern.policies.3=\\s*permission\\s+java[.]lang[.]RuntimePermission\\s+"\\s*modifyThreadGroup\\s*"\\s*;
+cleartext.policies.3=permission java.lang.RuntimePermission "modifyThreadGroup";
+pattern.policies.4=\\s*permission\\s+java[.]lang[.]RuntimePermission\\s+"\\s*setFactory\\s*"\\s*;
+cleartext.policies.4=permission java.lang.RuntimePermission "setFactory";
+pattern.policies.5=\\s*ermission\\s+java[.]lang[.]RuntimePermission\\s+"\\s*accessClassInPackage[.][*]\\s*"\\s*;
+cleartext.policies.5=permission java.lang.RuntimePermission "accessClassInPackage.*";
+pattern.policies.6=\\s*permission\\s+java[.]util[.]logging[.]LoggingPermission\\s+"\\s*control\\s*"\\s*;
+cleartext.policies.6=permission java.util.logging.LoggingPermission "control";
+pattern.policies.7=\\s*permission\\s+java[.]lang[.]RuntimePermission\\s+"\\s*shutdownHooks\\s*"\\s*;
+cleartext.policies.7=permission java.lang.RuntimePermission "shutdownHooks";
+pattern.policies.8=\\s*permission\\s+javax[.]security[.]auth[.]AuthPermission\\s+"\\s*getLoginConfiguration\\s*"\\s*;
+cleartext.policies.8=permission javax.security.auth.AuthPermission "getLoginConfiguration";
+pattern.policies.9=\\s*permission\\s+javax[.]security[.]auth[.]AuthPermission\\s+"\\s*setLoginConfiguration\\s*"\\s*;
+cleartext.policies.9=permission javax.security.auth.AuthPermission "setLoginConfiguration";
+pattern.policies.10=\\s*permission\\s+javax[.]security[.]auth[.]AuthPermission\\s+"\\s*modifyPrincipals\\s*"\\s*;
+cleartext.policies.10=permission javax.security.auth.AuthPermission "modifyPrincipals";
+pattern.policies.11=\\s*permission\\s+javax[.]security[.]auth[.]AuthPermission\\s+"\\s*createLoginContext[.][*]\\s*"\\s*;
+cleartext.policies.11=permission javax.security.auth.AuthPermission "createLoginContext.*";
+pattern.policies.12=\\s*permission\\s+java[.]io[.]FilePermission\\s+"\\s*<<ALL FILES>>\\s*"\\s*,\\s*"\\s*read\\s*,\\s*write\\s*,\\s*execute\\s*,\\s*delete\\s*"\\s*;
+cleartext.policies.12=permission java.io.FilePermission "<<ALL FILES>>", "read,write,execute,delete";
+pattern.policies.13=\\s*permission\\s+java[.]util[.]PropertyPermission\\s+"\\s*java[.]util[.]logging[.]config[.]class\\s*"\\s*,\\s*"\\s*write\\s*"\\s*;
+cleartext.policies.13=permission java.util.PropertyPermission "java.util.logging.config.class", "write";
+pattern.policies.14=\\s*permission\\s+java[.]security[.]SecurityPermission\\s+"\\s*removeProvider[.]SUN\\s*"\\s*;
+cleartext.policies.14=permission java.security.SecurityPermission "removeProvider.SUN";
+pattern.policies.15=\\s*permission\\s+java[.]security[.]SecurityPermission\\s+"\\s*insertProvider[.]SUN\\s*"\\s*;
+cleartext.policies.15=permission java.security.SecurityPermission "insertProvider.SUN";
+pattern.policies.16=\\s*permission\\s+javax[.]security[.]auth[.]AuthPermission\\s+"\\s*doAs\\s*"\\s*;
+cleartext.policies.16=permission javax.security.auth.AuthPermission "doAs";
+pattern.policies.17=\\s*permission\\s+java[.]util[.]PropertyPermission\\s+"\\s*java[.]security[.]krb5[.]realm\\s*"\\s*,\\s*"\\s*write\\s*"\\s*;
+cleartext.policies.17=permission java.util.PropertyPermission "java.security.krb5.realm", "write";
+pattern.policies.18=\\s*permission\\s+java[.]util[.]PropertyPermission\\s+"\\s*java[.]security[.]krb5[.]kdc\\s*"\\s*,\\s*"\\s*write\\s*"\\s*;
+cleartext.policies.18=permission java.util.PropertyPermission "java.security.krb5.kdc", "write";
+pattern.policies.19=\\s*permission\\s+java[.]util[.]PropertyPermission\\s+"\\s*java[.]security[.]auth[.]login[.]config\\s*"\\s*,\\s*"\\s*write\\s*"\\s*;
+cleartext.policies.19=permission java.util.PropertyPermission "java.security.auth.login.config", "write";
+pattern.policies.20=\\s*permission\\s+java[.]util[.]PropertyPermission\\s+"\\s*user[.]language\\s*"\\s*,\\s*"\\s*write\\s*"\\s*;
+cleartext.policies.20=permission java.util.PropertyPermission "user.language", "write";
+pattern.policies.21=\\s*permission\\s+javax[.]security[.]auth[.]kerberos[.]ServicePermission\\s+"\\s*[*]\\s*"\\s*,\\s*"\\s*accept\\s*"\\s*;
+cleartext.policies.21=permission javax.security.auth.kerberos.ServicePermission "*", "accept";
+pattern.policies.22=\\s*permission\\s+javax[.]net[.]ssl[.]SSLPermission\\s+"\\s*setHostnameVerifier\\s*"\\s*;
+cleartext.policies.22=permission javax.net.ssl.SSLPermission "setHostnameVerifier";
+pattern.policies.23=\\s*permission\\s+java[.]security[.]SecurityPermission\\s+"\\s*putProviderProperty[.]IAIK\\s*"\\s*;
+cleartext.policies.23=permission java.security.SecurityPermission "putProviderProperty.IAIK";
+pattern.policies.24=\\s*permission\\s+java[.]security[.]SecurityPermission\\s+"\\s*removeProvider[.]IAIK\\s*"\\s*;
+cleartext.policies.24=permission java.security.SecurityPermission "removeProvider.IAIK";
+pattern.policies.25=\\s*permission\\s+java[.]security[.]SecurityPermission\\s+"\\s*insertProvider[.]IAIK\\s*"\\s*;
+cleartext.policies.25=permission java.security.SecurityPermission "insertProvider.IAIK";
+pattern.policies.26=\\s*permission\\s+java[.]lang[.]RuntimePermission\\s+"\\s*setDefaultUncaughtExceptionHandler\\s*"\\s*;
+cleartext.policies.26=permission java.lang.RuntimePermission "setDefaultUncaughtExceptionHandler";
+pattern.policies.27=\\s*permission\\s+javax[.]management[.]MBeanServerPermission\\s+"\\s*newMBeanServer\\s*"\\s*;
+cleartext.policies.27=permission javax.management.MBeanServerPermission "newMBeanServer";
+pattern.policies.28=\\s*permission\\s+javax[.]management[.]MBeanPermission\\s+"\\s*[*]\\s*"\\s*,\\s*"\\s*registerMBean\\s*"\\s*;
+cleartext.policies.28=permission javax.management.MBeanPermission "*", "registerMBean";
+pattern.policies.29=\\s*permission\\s+java[.]lang[.]RuntimePermission\\s+"\\s*createClassLoader\\s*"\\s*;
+cleartext.policies.29=permission java.lang.RuntimePermission "createClassLoader";
+pattern.policies.30=\\s*permission\\s+javax[.]security[.]auth[.]AuthPermission\\s+"\\s*getSubject\\s*"\\s*;
+cleartext.policies.30=permission javax.security.auth.AuthPermission "getSubject";
+pattern.policies.31=\\s*permission\\s+javax[.]management[.]MBeanTrustPermission\\s+"\\s*register\\s*"\\s*;
+cleartext.policies.31=permission javax.management.MBeanTrustPermission "register";
+pattern.policies.32=\\s*permission\\s+java[.]lang[.]management[.]ManagementPermission\\s+"\\s*monitor\\s*"\\s*;
+cleartext.policies.32=permission java.lang.management.ManagementPermission "monitor";
+pattern.policies.33=\\s*permission\\s+javax[.]management[.]MBeanServerPermission\\s+"\\s*createMBeanServer\\s*"\\s*;
+cleartext.policies.33=permission javax.management.MBeanServerPermission "createMBeanServer";
+pattern.policies.34=\\s*permission\\s+java[.]util[.]PropertyPermission\\s+"\\s*javax[.]xml[.]soap[.]MetaFactory\\s*"\\s*,\\s*"\\s*write\\s*"\\s*;
+cleartext.policies.34=permission java.util.PropertyPermission "javax.xml.soap.MetaFactory", "write";
+pattern.policies.35=\\s*permission\\s+java[.]util[.]PropertyPermission\\s+"\\s*javax[.]xml[.]soap[.]MessageFactory\\s*"\\s*,\\s*"\\s*write\\s*"\\s*;
+cleartext.policies.35=permission java.util.PropertyPermission "javax.xml.soap.MessageFactory", "write";
+pattern.policies.36=\\s*permission\\s+java[.]util[.]PropertyPermission\\s+"\\s*javax[.]xml[.]soap[.]SOAPConnectionFactory\\s*"\\s*,\\s*"\\s*write\\s*"\\s*;
+cleartext.policies.36=permission java.util.PropertyPermission "javax.xml.soap.SOAPConnectionFactory", "write";
+pattern.policies.37=\\s*permission\\s+java[.]util[.]PropertyPermission\\s+"\\s*javax[.]xml[.]soap[.]SOAPFactory\\s*"\\s*,\\s*"\\s*write\\s*"\\s*;
+cleartext.policies.37=permission java.util.PropertyPermission "javax.xml.soap.SOAPFactory", "write";

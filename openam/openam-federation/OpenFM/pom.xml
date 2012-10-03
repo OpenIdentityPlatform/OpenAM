@@ -1,0 +1,210 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <!--
+    * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
+    *
+    * Copyright (c) 2011 ForgeRock AS. All Rights Reserved
+    *
+    * The contents of this file are subject to the terms
+    * of the Common Development and Distribution License
+    * (the License). You may not use this file except in
+    * compliance with the License.
+    *
+    * You can obtain a copy of the License at
+    * http://forgerock.org/license/CDDLv1.0.html
+    * See the License for the specific language governing
+    * permission and limitations under the License.
+    *
+    * When distributing Covered Code, include this CDDL
+    * Header Notice in each file and include the License file
+    * at http://forgerock.org/license/CDDLv1.0.html
+    * If applicable, add the following below the CDDL Header,
+    * with the fields enclosed by brackets [] replaced by
+    * your own identifying information:
+    * "Portions Copyrighted [year] [name of copyright owner]"
+    *
+    -->
+
+    <!-- Parent Project -->
+    <parent>
+        <groupId>org.forgerock</groupId>
+        <artifactId>openam-federation</artifactId>
+        <version>10.1.0-SNAPSHOT</version>
+    </parent>
+
+    <!-- Component Definition -->
+    <name>OpenFM</name>
+    <description>OpenAM Federation
+    </description>
+    <artifactId>OpenFM</artifactId>
+    <version>10.1.0-SNAPSHOT</version>
+    <packaging>jar</packaging>
+    <organization>
+        <name>ForgeRock</name>
+        <url>http://www.forgerock.com</url>
+    </organization>
+
+    <!-- Build -->
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-antrun-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>zip-pre-packaging</id>
+                        <phase>compile</phase>
+                        <configuration>
+                            <target>
+                                <tstamp>
+                                    <format property="war.time.stamp" pattern="yyyy-MMMM-dd HH:mm" locale="en,UK"/>
+                                </tstamp>
+                                <property name="version.set" value="${project.version}"/>
+
+                                <filter token="DATESTAMP" value="${war.time.stamp}"/>
+                                <filter token="VERSION" value="${version.set}"/>
+
+                                <copy todir="${project.build.directory}/classes" filtering="true">
+                                    <fileset
+                                            dir="${project.basedir}/../../openam-server/src/main/resources/openfm-locale/">
+                                        <include name="deployablewar.properties"/>
+                                    </fileset>
+                                </copy>
+                                <copy todir="${project.build.directory}/classes" filtering="true">
+                                    <fileset
+                                            dir="${project.basedir}/../../openam-server/src/main/resources/openfm-locale/">
+                                        <include name="deployablewar.properties"/>
+                                    </fileset>
+                                    <globmapper from="*.properties" to="*_en_US.properties"/>
+                                </copy>
+                                <copy todir="${project.build.directory}/classes" filtering="true">
+                                    <fileset
+                                            dir="${project.basedir}/../../openam-server/src/main/resources/openfm-locale/de_DE">
+                                        <include name="deployablewar_de.properties"/>
+                                    </fileset>
+                                </copy>
+                                <copy todir="${project.build.directory}/classes" filtering="true">
+                                    <fileset
+                                            dir="${project.basedir}/../../openam-server/src/main/resources/openfm-locale/es_ES">
+                                        <include name="deployablewar_es.properties"/>
+                                    </fileset>
+                                </copy>
+                                <copy todir="${project.build.directory}/classes" filtering="true">
+                                    <fileset
+                                            dir="${project.basedir}/../../openam-server/src/main/resources/openfm-locale/fr_FR">
+                                        <include name="deployablewar_fr.properties"/>
+                                    </fileset>
+                                </copy>
+                                <copy todir="${project.build.directory}/classes" filtering="true">
+                                    <fileset
+                                            dir="${project.basedir}/../../openam-server/src/main/resources/openfm-locale/ja_JP">
+                                        <include name="deployablewar_ja.properties"/>
+                                    </fileset>
+                                </copy>
+                                <copy todir="${project.build.directory}/classes" filtering="true">
+                                    <fileset
+                                            dir="${project.basedir}/../../openam-server/src/main/resources/openfm-locale/ko_KR">
+                                        <include name="deployablewar_ko.properties"/>
+                                    </fileset>
+                                </copy>
+                                <copy todir="${project.build.directory}/classes" filtering="true">
+                                    <fileset
+                                            dir="${project.basedir}/../../openam-server/src/main/resources/openfm-locale/zh_TW">
+                                        <include name="deployablewar_zh_TW.properties"/>
+                                    </fileset>
+                                </copy>
+                            </target>
+                        </configuration>
+                        <goals>
+                            <goal>run</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-jar-plugin</artifactId>
+                <configuration>
+                    <archive>
+                        <index>true</index>
+                        <manifest>
+                            <addClasspath>true</addClasspath>
+                            <classpathPrefix>lib/</classpathPrefix>
+                        </manifest>
+                        <manifestEntries>
+                            <Specification-Title>OpenAM Federation</Specification-Title>
+                            <Specification-Version>${project.version} - ${maven.build.timestamp}</Specification-Version>
+                            <Specification-Vendor>ForgeRock</Specification-Vendor>
+                            <Implementation-Title>OpenAM Federation</Implementation-Title>
+                            <Implementation-Version>${project.version} - ${maven.build.timestamp}
+                            </Implementation-Version>
+                            <Implementation-Vendor>ForgeRock</Implementation-Vendor>
+                            <Built-By>${user.name}</Built-By>
+                            <Build-Jdk>${java.version}</Build-Jdk>
+                            <Build-Time>${maven.build.timestamp}</Build-Time>
+                            <Version>${project.version}</Version>
+                            <Create-On>${maven.build.timestamp}</Create-On>
+                            <SVN-Revision>R${svn-revision.revision}</SVN-Revision>
+                            <!-- TODO Add License to Manifest -->
+                            <License></License>
+                        </manifestEntries>
+                    </archive>
+                </configuration>
+            </plugin>
+
+        </plugins>
+
+    </build>
+
+
+    <dependencies>
+        <dependency>
+            <groupId>org.forgerock</groupId>
+            <artifactId>openam-core</artifactId>
+            <version>10.1.0-SNAPSHOT</version>
+        </dependency>
+        <dependency>
+            <groupId>org.forgerock</groupId>
+            <artifactId>openam-entitlements</artifactId>
+            <version>10.1.0-SNAPSHOT</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.forgerock</groupId>
+            <artifactId>openam-session-ha-core</artifactId>
+            <version>10.1.0-SNAPSHOT</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.forgerock</groupId>
+            <artifactId>openam-federation-library</artifactId>
+            <version>10.1.0-SNAPSHOT</version>
+        </dependency>
+
+        <dependency>
+            <groupId>javax.servlet</groupId>
+            <artifactId>servlet-api</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>org.testng</groupId>
+            <artifactId>testng</artifactId>
+            <scope>test</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>org.forgerock</groupId>
+            <artifactId>openam-test</artifactId>
+            <version>10.1.0-SNAPSHOT</version>
+            <scope>test</scope>
+            <classifier>tests</classifier>
+        </dependency>
+
+
+    </dependencies>
+
+</project>
+

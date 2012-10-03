@@ -1,0 +1,98 @@
+<!--
+   DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
+  
+   Copyright (c) 2005 Sun Microsystems Inc. All Rights Reserved
+  
+   The contents of this file are subject to the terms
+   of the Common Development and Distribution License
+   (the License). You may not use this file except in
+   compliance with the License.
+
+   You can obtain a copy of the License at
+   https://opensso.dev.java.net/public/CDDLv1.0.html or
+   opensso/legal/CDDLv1.0.txt
+   See the License for the specific language governing
+   permission and limitations under the License.
+
+   When distributing Covered Code, include this CDDL
+   Header Notice in each file and include the License file
+   at opensso/legal/CDDLv1.0.txt.
+   If applicable, add the following below the CDDL Header,
+   with the fields enclosed by brackets [] replaced by
+   your own identifying information:
+   "Portions Copyrighted [year] [name of copyright owner]"
+
+   $Id: build.xml,v 1.12 2009/07/09 17:04:14 veiming Exp $
+
+-->
+
+<project name="opensso-demo" default="all">
+    <description>Open Web Single Sign-On: Simple Demo</description>
+
+    <fail message="*** jdk target is not set ***">
+        <condition>
+            <not><isset property="target.jdk.set"/></not>
+        </condition>
+    </fail>
+
+    <!-- enforce invocation via top level build only -->
+    <fail message="*** demo may be built from top level only ***">
+        <condition>
+            <or>
+                <not><isset property="amserver.demobase.dir"/></not>
+            </or>
+        </condition>
+    </fail>
+
+    <!-- demo environment variables -->
+    <property name="demo.src.dir" location="${amserver.demobase.dir}/source"/>
+    <property name="demo.www.dir" location="${amserver.demobase.dir}/www"/>
+    <property name="demo.classes.dir" location="${amserver.demo.built.dir}/classes"/>
+    <property name="demo.package.dir" location="${amserver.demo.built.dir}/package"/>
+
+    <target name="all" depends="build">
+        <delete dir="${demo.package.dir}" />
+        <unjar src="${amserver.dist.dir}/opensso-amserver.war" dest="${demo.package.dir}" />
+        <copy file="${demo.www.dir}/jsp/EvaluatePolicy.jsp" todir="${demo.package.dir}" />
+        <mkdir dir="${demo.package.dir}/WEB-INF/classes/com/sun/identity/demo/server" />
+        <copy file="${demo.classes.dir}/com/sun/identity/demo/server/EvaluatePolicyServlet.class"
+            todir="${demo.package.dir}/WEB-INF/classes/com/sun/identity/demo/server" />
+        <replace file="${demo.package.dir}/WEB-INF/web.xml"
+            value="&lt;servlet&gt;&lt;servlet-name&gt;EvaluatePolicyServlet&lt;/servlet-name&gt;&lt;servlet-class&gt;com.sun.identity.demo.server.EvaluatePolicyServlet&lt;/servlet-class&gt;&lt;/servlet&gt;&lt;!-- servlet declaration --&gt;">
+            <replacetoken>&lt;!-- servlet declaration --&gt;</replacetoken>
+        </replace>
+        <replace file="${demo.package.dir}/WEB-INF/web.xml"
+            value="&lt;servlet-mapping&gt;&lt;servlet-name&gt;EvaluatePolicyServlet&lt;/servlet-name&gt;&lt;url-pattern&gt;/evaluatePolicy&lt;/url-pattern&gt;&lt;/servlet-mapping&gt;&lt;!-- servlet mapping --&gt;">
+            <replacetoken>&lt;!-- servlet mapping --&gt;</replacetoken>
+        </replace>
+        <jar destfile="${amserver.dist.dir}/openssodemo.war">
+            <fileset dir="${demo.package.dir}" />
+        </jar>
+        <checksum file="${amserver.dist.dir}/openssodemo.war" algorithm="SHA" fileext=".sha" />
+    </target>
+
+    <target name="build" depends="preparebuild">
+        <javac destdir="${demo.classes.dir}"
+            source="${target.jdk.set}" target="${target.jdk.set}"
+            debug="${build.debug}" debuglevel="${build.debuglevel}">
+            <src path="${demo.src.dir}"/>
+            <classpath refid="build.class.path"/>
+        </javac>
+    </target>
+
+    <target name="preparebuild">
+        <mkdir dir="${amserver.demo.built.dir}"/>
+        <mkdir dir="${demo.classes.dir}"/>
+        <mkdir dir="${demo.package.dir}"/>
+        <mkdir dir="${amserver.dist.dir}"/>
+    </target>
+
+    <target name="clean">
+        <delete file="${amserver.dist.dir}/openssodemo.war"/>
+        <delete file="${amserver.dist.dir}/openssodemo.war.sha"/>
+        <delete dir="${demo.classes.dir}"/>
+        <delete dir="${demo.package.dir}"/>
+        <delete dir="${amserver.demo.built.dir}"/>
+    </target>
+
+</project>

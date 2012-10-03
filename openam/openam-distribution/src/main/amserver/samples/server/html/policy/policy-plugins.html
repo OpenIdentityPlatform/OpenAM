@@ -1,0 +1,236 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<!--
+ Copyright © 2008 Sun Microsystems, Inc. All rights reserved.  
+ Sun Microsystems, Inc. has intellectual property rights relating to 
+ technology embodied in the product that is described in this document. 
+ In particular, and without limitation, these intellectual property 
+ rights may include one or more of the U.S. patents listed at 
+ http://www.sun.com/patents and one or more additional patents or pending 
+ patent applications in the U.S. and in other countries.
+ U.S. Government Rights - Commercial software. Government users are subject 
+ to the Sun Microsystems, Inc. standard license agreement and applicable 
+ provisions of the FAR and its supplements.
+ Use is subject to license terms.
+ This distribution may include materials developed by third parties.Sun, Sun 
+ Microsystems, the Sun logo, Java and Solaris are trademarks or registered 
+ trademarks of Sun Microsystems, Inc. in the U.S. and other countries. All 
+ SPARC trademarks are used under license and are trademarks or registered 
+ trademarks of SPARC International, Inc. in the U.S. and other countries.
+ UNIX is a registered trademark in the U.S. and other countries, exclusively 
+ licensed through X/Open Company, Ltd.
+ 
+ Copyright © 2008 Sun Microsystems, Inc. Tous droits réservés.
+ Sun Microsystems, Inc. détient les droits de propriété intellectuels 
+ relatifs à la technologie incorporée dans le produit qui est décrit 
+ dans ce document. En particulier, et ce sans limitation, ces droits de 
+ propriété intellectuelle peuvent inclure un ou plus des brevets américains 
+ listés à l'adresse http://www.sun.com/patents et un ou les brevets 
+ supplémentaires ou les applications de brevet en attente aux Etats - Unis 
+ et dans les autres pays.
+ L'utilisation est soumise aux termes du contrat de licence.
+ Cette distribution peut comprendre des composants développés par des tierces 
+ parties.
+ Sun, Sun Microsystems, le logo Sun, Java et Solaris sont des marques de 
+ fabrique ou des marques déposées de Sun Microsystems, Inc. aux 
+ Etats-Unis et dans d'autres pays. Toutes les marques SPARC sont utilisées 
+ sous licence et sont des marques de fabrique ou des marques déposées de 
+ SPARC International, Inc. aux Etats-Unis et dans d'autres pays.
+ UNIX est une marque déposée aux Etats-Unis et dans d'autres pays et 
+ licenciée exlusivement par X/Open Company, Ltd.
+
+ $Id: policy-plugins.html,v 1.2 2009/04/10 22:58:32 mrudul_uchil Exp $
+-->
+
+<HTML>
+<HEAD>
+	<META HTTP-EQUIV="CONTENT-TYPE" CONTENT="text/html; charset=iso-8859-1">
+	<TITLE>OpenAM Server - Policy Plugin Samples</TITLE>
+	<META NAME="GENERATOR" CONTENT="StarOffice 8  (Solaris Sparc)">
+	<META NAME="CREATED" CONTENT="0;0">
+	<META NAME="CHANGEDBY" CONTENT="dilli arumugam">
+	<META NAME="CHANGED" CONTENT="20080722;14285300">
+	<!-- DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
+  
+   Copyright (c) 2008 Sun Microsystems Inc. All Rights Reserved
+  
+   The contents of this file are subject to the terms
+   of the Common Development and Distribution License
+   (the License). You may not use this file except in
+   compliance with the License.
+
+   You can obtain a copy of the License at
+   https://opensso.dev.java.net/public/CDDLv1.0.html or
+   opensso/legal/CDDLv1.0.txt
+   See the License for the specific language governing
+   permission and limitations under the License.
+
+   When distributing Covered Code, include this CDDL
+   Header Notice in each file and include the License file
+   at opensso/legal/CDDLv1.0.txt.
+   If applicable, add the following below the CDDL Header,
+   with the fields enclosed by brackets [] replaced by
+   your own identifying information:
+   "Portions Copyrighted [year] [name of copyright owner]"
+
+   $Id: policy-plugins.html,v 1.2 2009/04/10 22:58:32 mrudul_uchil Exp $
+
+-->
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<title>OpenAM - Policy Plugins Sample</title>
+                                                                                
+<link rel="stylesheet" type="text/css" href="../../com_sun_web_ui/css/css_ns6up.css" />
+<link rel="shortcut icon" href="../../com_sun_web_ui/images/favicon/favicon.ico" type="image/x-icon"></link>
+</head>
+<body class="DefBdy">
+<div class="SkpMedGry1"><a href="#SkipAnchor2019"><img src="../../com_sun_web_ui/images/other/dot.gif" alt="Jump to End of Masthead" border="0" height="1" width="1" /></a></div>
+<div class="MstDiv">
+<table width="100%" border="0" cellpadding="0" cellspacing="0" class="MstTblTop" title="">
+<tbody><tr>
+<td nowrap="nowrap">&nbsp;</td>
+<td nowrap="nowrap">&nbsp;</td>
+</tr></tbody></table>
+<table width="100%" border="0" cellpadding="0" cellspacing="0" class="MstTblBot" title="">
+<tbody><tr>
+<td class="MstTdTtl" width="99%">
+<div class="MstDivTtl"><img src="../../console/images/PrimaryProductName.png" alt="" /></div></td>
+<td class="MstTdLogo" width="1%"><img src="../../com_sun_web_ui/images/other/javalogo.gif" alt="Java(TM) Logo" border="0" height="55" width="31" /></td>
+</tr></tbody></table>
+                                                                                
+<table class="MstTblEnd" border="0" cellpadding="0" cellspacing="0" width="100%"><tbody><tr><td><img name="RMRealm.mhCommon.EndorserLogo" src="../../com_sun_web_ui/images/masthead/masthead-sunname.gif" alt="Sun(TM) Microsystems, Inc." align="right" border="0" height="10" width="108" /></td></tr></tbody></table></div>
+                                                                                
+<div class="SkpMedGry1"><a name="SkipAnchor2019" id="SkipAnchor2019"></a></div>
+<div class="SkpMedGry1"><a href="#SkipAnchor4161"><img src="../../com_sun_web_ui/images/other/dot.gif" alt="Jump Over Tab Navigation Area. Current Selection is: Access Control" border="0" height="1" width="1" /></a></div>
+                                                                                
+
+<TABLE WIDTH=100% BORDER=0 CELLPADDING=4 CELLSPACING=8 BGCOLOR="#ffffff">
+	<TR>
+		<TD>
+			<H2>OpenAM Server - Policy Plugin Samples</H2>
+			<HR SIZE=1 NOSHADE>
+			<H2>How to implement and use custom implementations for Subject,
+			Condition, Referral and ResponseProvider interfaces?</H2>
+			<OL>
+				<P>OpenAM policy framework defines Subject, Condition, Referral
+				and ResponseProvider interfaces to let developers implement their
+				own plugins to extend the functionality. This sample illustrates
+				the steps involved.</P>
+				<LI><P>Write java source java files implementing Subject,
+				Condition, Referral or ResponseProvider interface. See the sample
+				files: <A HREF="../../source/com/sun/identity/samples/policy/SampleSubject.java">SampleSubject.java</A>,
+				<A HREF="../../source/com/sun/identity/samples/policy/SampleCondition.java">SampleCondition.java</A>,
+				<A HREF="../../source/com/sun/identity/samples/policy/SampleReferral.java">SampleReferral.java</A>,
+				<A HREF="../../source/com/sun/identity/samples/policy/SampleResponseProvider.java">SampleResponseProvider.java</A></P>
+				<LI><P>Compile the source files to create class files. You would
+				have to include opensso.jar and opesnsso-sharedlib.jar in
+				classpath at compilation time.</P>
+				<LI><P>Pacakge the compiled classes into jar file, let us call it
+				policy-plugins.jar.</P>
+				<LI><P>Explode opensso.war file. 
+				</P>
+				<LI><P>Add the policy-plugins.jar file to WEB-INF/lib directory. 
+                                You could alernatively copy the custom plugin classes to 
+                                WEB-INF/classes maintaining directory structure corresponding 
+                                to the the java package of the plugin classes.
+				</P>
+				<LI><P>Update WEB-INF/classes/amPolicy.properties to add l10n
+				values for the new i18n keys used by iPlanetAMPolicyService.
+                                </P><P>Note : The new i18n keys and their respective values refered here 
+                                are the ones you would be using in "amPolicy_mod.xml" at step 9.</P>
+				<LI><P>Update WEB-INF/classes/amPolicyConfig.properties to add
+				l10n values for the new i18n keys used by
+				iPlanetAMPolicyConfigService.
+                                </P><P>Note : The new i18n keys and their respective values refered here 
+                                are the ones you would be using at step 10.</P>
+				<LI><P>Recreate the war file and redeploy the war file. </P>
+				<P>Steps 1
+				through 8 have been already taken care of for the sample
+				plugins included in OpenAM distribution.</P>
+				<LI><P>Register the new plugins with iPlanetAMPolicyService using
+				ssoadm command.  Assuming password.txt file has
+                                the password of amadmin</P>
+				<P>ssoadm create-svc -X &lt;amPolicy_mod.xml &gt;-u amadmin -f
+				&lt;password.txt&gt;</P>
+				<P>See the sample <A HREF="../../source/com/sun/identity/samples/policy/xml/amPolicy_mod.xml">amPolicy_mod.xml</A>.
+				Notice the new i18keys referred in the xml file. Corresponding
+				l10n values should be added in amPolicy.properties</P>
+				<LI><P>Register the new plugins as choice values in
+				iPlanetAMPolicyConfigService using ssoadm command.</P>
+			</OL>
+			<UL>
+				<LI><P>ssoadm set-attr-choicevals -s iPlanetAMPolicyConfigService
+				-t Organization -a iplanet-am-policy-selected-subjects -k
+				a160=SampleSubject -u amadmin -f password.txt</P>
+				<LI><P>ssoadm set-attr-choicevals -s iPlanetAMPolicyConfigService
+				-t Organization -a iplanet-am-policy-selected-conditions -k
+				a161=SampleCondition -u amadmin -f password.txt</P>
+				<LI><P>ssoadm set-attr-choicevals -s iPlanetAMPolicyConfigService
+				-t Organization -a iplanet-am-policy-selected-referrals -k
+				a162=SampleReferral -u amadmin -f password.txt</P>
+				<LI><P>ssoadm set-attr-choicevals -s iPlanetAMPolicyConfigService
+				-t Organization -a sun-am-policy-selected-responseproviders
+				-k a163=SampleResponseProvider -u amadmin -f password.txt</P>
+			</UL>
+			<OL START=11>
+				<LI><P>Optionally register the new plugins as enabled for the
+				selected realm using ssoadm command. 
+				</P>
+			</OL>
+			<UL>
+				<LI><P>ssoadm add-attr-defs -s iPlanetAMPolicyConfigService -t
+				Organization -a iplanet-am-policy-selected-subjects=SampleSubject
+				-u amadmin -f password.txt</P>
+				<LI><P>ssoadm add-attr-defs -s iPlanetAMPolicyConfigService -t
+				Organization -a
+				iplanet-am-policy-selected-conditions=SampleCondition -u amadmin
+				-f password.txt</P>
+				<LI><P>ssoadm add-attr-defs -s iPlanetAMPolicyConfigService -t
+				Organization -a
+				iplanet-am-policy-selected-referrals=SampleReferral -u amadmin -f
+				password.txt</P>
+				<LI><P>ssoadm add-attr-defs -s iPlanetAMPolicyConfigService -t
+				Organization -a
+				sun-am-policy-selected-responseproviders=SampleResponseProvider -u
+				amadmin -f password.txt</P>
+			</UL>
+			<OL START=12>
+				<P>You can also use openam console to do the previous setp:
+				Login as amadmin or administrator at the realm, navigate to the
+				realm, services, policy configuration and enable or disable the
+				selection of the plugin. You would have to do this step using
+				console for the realms that have been already created.</P>
+				<LI><P>Restart the webapp or the container</P>
+				<LI><P>You can now add the instances of the new plugins while
+				defining policies using either console of ssoadm commad. The new
+				plugins would be availabe as choices in right policy management
+				pages in the console.</P>
+				<LI><P>To disable the custom plugins from being added newly to
+				policies, using openam console navigate to Access Control &gt;
+				Realm &gt; Services | Policy Configuration and   deselect the
+				appropriate custom plugins and save the Policy Configuration
+				properties page for exisiting realms. If you  navigate to
+				Configuration &gt; Global &gt; Policy Configuration and do this,
+				the custom plugins would be deselected for the realms that would
+				be created subsequently.</P>
+				<LI><P>
+                                Copy the custom plugin classes to &lt;TOOLS_HOME&gt;/classes
+                                maintaining directory structure corresponding 
+                                to the the java package of the plugin classes.
+                                You can copy the classes of bundled custom
+                                sample plugins from explosed openam.war,
+                                WEB-INF/classes/com/sun/identity/samples/policy.
+                                This is required if you would use ssoadm to export or 
+                            add policies. </P><P>Note : &lt;TOOLS_HOME&gt; is the ssoadm home directory
+                                from where you would be running ssoadm CLI tool.
+                                </P>
+			</OL>
+			<P><BR>
+			<HR SIZE=1 NOSHADE>
+			</P>
+		</TD>
+	</TR>
+</TABLE>
+<P><BR><BR>
+</P>
+</BODY>
+</HTML>

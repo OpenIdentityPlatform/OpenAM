@@ -1,0 +1,109 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!--
+   DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
+  
+   Copyright (c) 2006 Sun Microsystems Inc. All Rights Reserved
+  
+   The contents of this file are subject to the terms
+   of the Common Development and Distribution License
+   (the License). You may not use this file except in
+   compliance with the License.
+
+   You can obtain a copy of the License at
+   https://opensso.dev.java.net/public/CDDLv1.0.html or
+   opensso/legal/CDDLv1.0.txt
+   See the License for the specific language governing
+   permission and limitations under the License.
+
+   When distributing Covered Code, include this CDDL
+   Header Notice in each file and include the License file
+   at opensso/legal/CDDLv1.0.txt.
+   If applicable, add the following below the CDDL Header,
+   with the fields enclosed by brackets [] replaced by
+   your own identifying information:
+   "Portions Copyrighted [year] [name of copyright owner]"
+
+   $Id: web.xml,v 1.6 2008/08/19 19:08:19 veiming Exp $
+
+-->
+
+<!--
+   Portions Copyrighted 2011 ForgeRock AS
+-->
+<web-app version="2.4" xmlns="http://java.sun.com/xml/ns/j2ee" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://java.sun.com/xml/ns/j2ee http://java.sun.com/xml/ns/j2ee/web-app_2_4.xsd">
+
+    <display-name>OpenSSO Distributed Authentication UI</display-name>
+    
+    <distributable/>
+    
+    <context-param>
+        <param-name>jato:com.sun.identity.authentication.distUI.*:moduleURL</param-name>
+        <param-value>../UI</param-value>
+    </context-param>
+    
+    <filter>
+        <filter-name>distAuthConfiguratorFilter</filter-name>
+        <filter-class>com.sun.identity.distauth.setup.DistAuthConfiguratorFilter</filter-class>
+    </filter>
+    <filter-mapping>
+        <filter-name>distAuthConfiguratorFilter</filter-name>
+        <url-pattern>/*</url-pattern>
+    </filter-mapping>    
+
+    <listener>
+        <listener-class>com.sun.identity.common.ShutdownServletContextListener</listener-class>
+    </listener>
+
+    <servlet>
+        <servlet-name>LoginServlet</servlet-name>
+        <servlet-class>com.sun.identity.authentication.distUI.LoginServlet</servlet-class>
+    </servlet>
+    <servlet>
+        <servlet-name>LoginLogoutMapping</servlet-name>
+        <servlet-class>com.sun.identity.authentication.distUI.LoginLogoutMapping</servlet-class>        
+    </servlet>
+    <servlet>
+        <servlet-name>notificationservice</servlet-name>
+        <servlet-class>com.iplanet.services.comm.client.PLLNotificationServlet</servlet-class>
+    </servlet>
+    <servlet>
+        <servlet-name>CDCClientServlet</servlet-name>
+        <servlet-class>com.iplanet.services.cdc.client.CDCClientServlet</servlet-class>
+    </servlet>   
+
+    <servlet-mapping>
+        <servlet-name>LoginLogoutMapping</servlet-name>
+        <url-pattern>/login</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>LoginLogoutMapping</servlet-name>
+        <url-pattern>/logout</url-pattern>
+    </servlet-mapping>    
+    <servlet-mapping>
+        <servlet-name>LoginServlet</servlet-name>
+        <url-pattern>/UI/*</url-pattern>
+    </servlet-mapping>    
+    <servlet-mapping>
+        <servlet-name>notificationservice</servlet-name>
+        <url-pattern>/notificationservice</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>CDCClientServlet</servlet-name>
+        <url-pattern>/cdcservlet</url-pattern>
+    </servlet-mapping>        
+
+    <!-- This tag is for the welcome files such as index.html -->
+    <welcome-file-list>
+        <welcome-file>
+            index.html
+        </welcome-file>
+    </welcome-file-list>
+    
+    <jsp-config> 
+    <taglib>
+        <taglib-uri>/WEB-INF/jato.tld</taglib-uri>
+        <taglib-location>/WEB-INF/jato.tld</taglib-location>
+    </taglib>
+    </jsp-config> 
+</web-app>

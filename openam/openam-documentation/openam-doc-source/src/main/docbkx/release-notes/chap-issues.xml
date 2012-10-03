@@ -1,0 +1,257 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  ! CCPL HEADER START
+  !
+  ! This work is licensed under the Creative Commons
+  ! Attribution-NonCommercial-NoDerivs 3.0 Unported License.
+  ! To view a copy of this license, visit
+  ! http://creativecommons.org/licenses/by-nc-nd/3.0/
+  ! or send a letter to Creative Commons, 444 Castro Street,
+  ! Suite 900, Mountain View, California, 94041, USA.
+  !
+  ! You can also obtain a copy of the license at
+  ! src/main/resources/legal-notices/CC-BY-NC-ND.txt.
+  ! See the License for the specific language governing permissions
+  ! and limitations under the License.
+  !
+  ! If applicable, add the following below this CCPL HEADER, with the fields
+  ! enclosed by brackets "[]" replaced with your own identifying information:
+  !      Portions Copyright [yyyy] [name of copyright owner]
+  !
+  ! CCPL HEADER END
+  !
+  !      Copyright 2011-2012 ForgeRock AS
+  !    
+-->
+<chapter xml:id='chap-issues'
+ xmlns='http://docbook.org/ns/docbook' version='5.0' xml:lang='en'
+ xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance'
+ xsi:schemaLocation='http://docbook.org/ns/docbook http://docbook.org/xml/5.0/xsd/docbook.xsd'
+ xmlns:xlink='http://www.w3.org/1999/xlink'
+ xmlns:xinclude='http://www.w3.org/2001/XInclude'>
+ <title>OpenAM Fixes, Limitations, &amp; Known Issues</title>
+
+ <para>OpenAM issues are tracked at <link
+ xlink:href='https://bugster.forgerock.org/jira/browse/OPENAM'
+ >https://bugster.forgerock.org/jira/browse/OPENAM</link>. This chapter
+ covers the status of key issues and limitations at release
+ <?eval ${serverDocTargetVersion}?>.</para>
+
+ <note>
+  <para>This release contains fixes that resolve security issues within OpenAM.
+  Older versions of OpenAM contain these security issues. It is recommended
+  that you upgrade to this release to resolve these security issues. ForgeRock
+  customers can contact support for details on the security issues.</para>
+ </note>
+
+ <section xml:id="fixes">
+  <title>Fixes</title>
+
+  <para>The following issues were fixed in release
+  <?eval ${serverDocTargetVersion}?>.</para>
+  
+  <itemizedlist>
+  <!-- This list does not include some fixes for typos, doc issues, removed
+  functionality, and issues raised on new features during testing. -->
+<!-- Template
+   <listitem>
+    <para><link
+    xlink:href="https://bugster.forgerock.org/jira/browse/OPENAM-XXXX"
+    xlink:show="new">OPENAM-XXXX</link>: DSCP</para>
+   </listitem>  -->
+
+
+   <listitem>
+    <para><link
+    xlink:href="https://bugster.forgerock.org/jira/browse/OPENAM-1447"
+    xlink:show="new">OPENAM-1447</link>: duplicate keys in property file</para>
+   </listitem>
+   <listitem>
+    <para><link
+    xlink:href="https://bugster.forgerock.org/jira/browse/OPENAM-1438"
+    xlink:show="new">OPENAM-1438</link>: Multiple failing null-callback sufficient modules can result in NPE</para>
+   </listitem>
+   <listitem>
+    <para><link
+    xlink:href="https://bugster.forgerock.org/jira/browse/OPENAM-1444"
+    xlink:show="new">OPENAM-1444</link>: SecurID.properties is in resources/locale/ko_KR</para>
+   </listitem>
+   <listitem>
+    <para><link
+    xlink:href="https://bugster.forgerock.org/jira/browse/OPENAM-1347"
+    xlink:show="new">OPENAM-1347</link>: Multiple tabs setting not listed in validserverconfig</para>
+   </listitem>
+   <listitem>
+    <para><link
+    xlink:href="https://bugster.forgerock.org/jira/browse/OPENAM-1346"
+    xlink:show="new">OPENAM-1346</link>: Saving WS-Fed IdP properties loses entity configuration data</para>
+   </listitem>
+   <listitem>
+    <para><link
+    xlink:href="https://bugster.forgerock.org/jira/browse/OPENAM-1333"
+    xlink:show="new">OPENAM-1333</link>: SAML2 does not set content type when using HTTP-POST binding</para>
+   </listitem>
+   <listitem>
+    <para><link
+    xlink:href="https://bugster.forgerock.org/jira/browse/OPENAM-1329"
+    xlink:show="new">OPENAM-1329</link>: EntitlementException locale files missing from ClientSDK</para>
+   </listitem>
+   <listitem>
+    <para><link
+    xlink:href="https://bugster.forgerock.org/jira/browse/OPENAM-1326"
+    xlink:show="new">OPENAM-1326</link>: Deadlock in PeriodicRunnable (side effect of OPENSSO-5377)</para>
+   </listitem>
+   <listitem>
+    <para><link
+    xlink:href="https://bugster.forgerock.org/jira/browse/OPENAM-1315"
+    xlink:show="new">OPENAM-1315</link>: The IDPSSOUtil.getIDPAdapterClass call does not cater for an
+     empty value coming from metadata lookup resulting in ClassNotFound exceptions in debug logs</para>
+   </listitem>
+   <listitem>
+    <para><link
+    xlink:href="https://bugster.forgerock.org/jira/browse/OPENAM-1311"
+    xlink:show="new">OPENAM-1311</link>: DSAMEHrefTag generates attributes wrong</para>
+   </listitem>
+   <listitem>
+    <para><link
+    xlink:href="https://bugster.forgerock.org/jira/browse/OPENAM-1307"
+    xlink:show="new">OPENAM-1307</link>: Goto validation not carried out on Logout if there is no SSO session</para>
+   </listitem>
+   <listitem>
+    <para><link
+    xlink:href="https://bugster.forgerock.org/jira/browse/OPENAM-1288"
+    xlink:show="new">OPENAM-1288</link>: Registered Authentication Post Processors are not called 
+    during SAML single logout</para>
+   </listitem>
+   <listitem>
+    <para><link
+    xlink:href="https://bugster.forgerock.org/jira/browse/OPENAM-1286"
+    xlink:show="new">OPENAM-1286</link>: AgentMigration71.java is in a wrong folder</para>
+   </listitem>
+   <listitem>
+    <para><link
+    xlink:href="https://bugster.forgerock.org/jira/browse/OPENAM-1285"
+    xlink:show="new">OPENAM-1285</link>: Incorrect JAVA EE API usage in FileUpload.jsp</para>
+   </listitem>
+   <listitem>
+    <para><link
+    xlink:href="https://bugster.forgerock.org/jira/browse/OPENAM-1283"
+    xlink:show="new">OPENAM-1283</link>: OpenAM does not return adequate SOAP faults during ArtifactResolution</para>
+   </listitem>
+   <listitem>
+    <para><link
+    xlink:href="https://bugster.forgerock.org/jira/browse/OPENAM-1260"
+    xlink:show="new">OPENAM-1260</link>: Error The Directory Server has been configured to deny access
+    to LDAPv2 clients. This connection will be closed</para>
+   </listitem>
+   <listitem>
+    <para><link
+    xlink:href="https://bugster.forgerock.org/jira/browse/OPENAM-1252"
+    xlink:show="new">OPENAM-1252</link>: ssoadm loses exception causes</para>
+   </listitem>
+   <listitem>
+    <para><link
+    xlink:href="https://bugster.forgerock.org/jira/browse/OPENAM-1246"
+    xlink:show="new">OPENAM-1246</link>: More than 5 referral policies under a realm would
+	 hang PrivilegeEvaluator</para>
+    </listitem>
+   <listitem>
+    <para><link
+    xlink:href="https://bugster.forgerock.org/jira/browse/OPENAM-1221"
+    xlink:show="new">OPENAM-1221</link>: WSSAgent can not sign request if security mechanism 'X509Token' 
+    and Signing Reference Type 'KeyIdentifier Reference' is configured in Web Service Client profile</para>
+   </listitem>
+   <listitem>
+    <para><link
+    xlink:href="https://bugster.forgerock.org/jira/browse/OPENAM-1205"
+    xlink:show="new">OPENAM-1205</link>: Missing SAML2Exception handler in spAssertionConsumer.jsp means 
+    a 500 error page is shown rather than the configured OpenAM SAML error page</para>
+   </listitem>
+   <listitem>
+    <para><link
+    xlink:href="https://bugster.forgerock.org/jira/browse/OPENAM-1204"
+    xlink:show="new">OPENAM-1204</link>: Creation of xamcl policy (entitlement) with cli ssoadm tool fails when using Secure Logging</para>
+   </listitem>
+   <listitem>
+    <para><link
+    xlink:href="https://bugster.forgerock.org/jira/browse/OPENAM-1054"
+    xlink:show="new">OPENAM-1054</link>: MySQL (JDBC) IdRepo shares configurations in all realms in the wrong</para>
+   </listitem>
+   <listitem>
+    <para><link
+    xlink:href="https://bugster.forgerock.org/jira/browse/OPENAM-1047"
+    xlink:show="new">OPENAM-1047</link>: isSessionQuotaReached does not work correctly if users session quota > 1</para>
+   </listitem>
+   <listitem>
+    <para><link
+    xlink:href="https://bugster.forgerock.org/jira/browse/OPENAM-987"
+    xlink:show="new">OPENAM-987</link>: special character used in membership search filter should be escaped </para>
+   </listitem>
+   <listitem>
+    <para><link
+    xlink:href="https://bugster.forgerock.org/jira/browse/OPENAM-995"
+    xlink:show="new">OPENAM-995</link>: using UTF-8 characters in policy names breaks the policy console</para>
+   </listitem>
+   <listitem>
+    <para><link
+    xlink:href="https://bugster.forgerock.org/jira/browse/OPENAM-925"
+    xlink:show="new">OPENAM-925</link>: ssoadm.jsp fails to encode &lt; and &gt;, causing browser to skip replaceable values in help strings</para>
+   </listitem>
+   <listitem>
+    <para><link
+    xlink:href="https://bugster.forgerock.org/jira/browse/OPENAM-732"
+    xlink:show="new">OPENAM-732</link>: encode issue in CDCServlet if url contains blank</para>
+   </listitem>
+   <listitem>
+    <para><link
+    xlink:href="https://bugster.forgerock.org/jira/browse/OPENAM-619"
+    xlink:show="new">OPENAM-619</link>: Editing a J2EE agent profile in the console cause triggers error saving due to new style 
+    settings for sunIdentityServerDeviceKeyValue</para>
+   </listitem>
+   <listitem>
+    <para><link
+    xlink:href="https://bugster.forgerock.org/jira/browse/OPENAM-507"
+    xlink:show="new">OPENAM-507</link>: Adding to existing deployment fails for non-default 
+    Org. Auth. configuration</para>
+   </listitem>
+  </itemizedlist>
+ </section>
+
+ <section xml:id="limitations">
+  <title>Limitations</title>
+  
+  <para>ForgeRock supports the stable software releases that you can download
+  from ForgeRock, not nightly builds or pre-release software. ForgeRock
+  OpenAM downloads do not include OpenAM extensions. Therefore, ForgeRock does
+  not support OpenAM extensions. If you have a special request for capabilities
+  not currently in a software release, contact ForgeRock at <link
+  xlink:href="mailto:info@forgerock.com">info@forgerock.com</link>.</para>
+  
+  <para>Do not run different versions of OpenAM together in the same OpenAM
+  site.</para>
+
+  <para>Not all features of OpenAM work with IPv6.</para>
+
+  <para>The Database Repository type of data store is experimental and not
+  supported for production use.</para>
+
+  <!-- Fix for OPENAM-1032: Add details to the release notes and documentation of OpenAM (for 875) -->
+  <para>By default OpenAM does not enforce session quotas when running in Site
+  mode without session failover. To work around this behavior, set the server
+  configuration property
+  <literal>openam.session.useLocalSessionsInMultiServerMode=true</literal>.
+  You can set this property in OpenAM console under Configuration &gt; Servers
+  and Sites &gt; Servers &gt; Server Name &gt; Advanced.</para>
+ </section>
+ 
+ <section xml:id="known-issues">
+  <title>Known Issues</title>
+
+  <para>The following important known issues remained open at the time
+  release <?eval ${serverDocTargetVersion}?> became available.</para>
+
+  <itemizedlist>
+<listitem><para>TODO</para></listitem>
+  </itemizedlist>
+ </section>
+</chapter>

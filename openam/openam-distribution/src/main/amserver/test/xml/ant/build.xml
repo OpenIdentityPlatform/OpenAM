@@ -1,0 +1,105 @@
+<!--
+   DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
+  
+   Copyright (c) 2006 Sun Microsystems Inc. All Rights Reserved
+  
+   The contents of this file are subject to the terms
+   of the Common Development and Distribution License
+   (the License). You may not use this file except in
+   compliance with the License.
+
+   You can obtain a copy of the License at
+   https://opensso.dev.java.net/public/CDDLv1.0.html or
+   opensso/legal/CDDLv1.0.txt
+   See the License for the specific language governing
+   permission and limitations under the License.
+
+   When distributing Covered Code, include this CDDL
+   Header Notice in each file and include the License file
+   at opensso/legal/CDDLv1.0.txt.
+   If applicable, add the following below the CDDL Header,
+   with the fields enclosed by brackets [] replaced by
+   your own identifying information:
+   "Portions Copyrighted [year] [name of copyright owner]"
+
+   $Id: build.xml,v 1.13 2008/11/20 17:53:01 veiming Exp $
+
+-->
+<!--
+   Portions Copyrighted 2012 ForgeRock Inc
+-->
+<project name="openam" default="all">
+    <description>OpenAM - AM Server Unit Tests</description>
+
+    <taskdef resource="testngtasks" classpath="lib/testng-5.9-jdk15.jar"/>
+    <property name="classes.dir" location="classes"/>
+    <property name="test.classes.dir" location="test/classes"/>
+    <property name="lib.dir" location="lib"/>
+    <property name="output.dir" location="output"/>
+    <property name="logs.dir" location="logs"/>
+    <property name="template.dir" location="template"/>
+    <property name="report.dir" location="report"/>
+    <property name="testng.dir" value="testng"/>
+
+    <property name="log.level" value="ALL"/>
+
+    <path id="build.class.path">
+        <pathelement location="${classes.dir}"/>
+        <pathelement location="${test.classes.dir}"/>
+        <fileset dir="${lib.dir}">
+            <include name="**/*.jar"/>
+        </fileset>
+    </path>
+
+    <target name="all">
+        <condition property="debug" value="-Xdebug -Xrunjdwp:transport=dt_socket,server=y,suspend=y,address=9009 -Xnoagent">
+            <isset property="debugTest" />
+        </condition>
+        <property name="debug" value="" />
+        <delete dir="${output.dir}" />
+        <mkdir dir="${output.dir}" />
+        <delete dir="${logs.dir}" />
+        <mkdir dir="${logs.dir}" />
+
+    <testng outputdir="${output.dir}" dumpCommand="true" classpathref="build.class.path">
+        <xmlfileset dir="${testng.dir}" includes="*" />
+        <jvmarg value="-ea" />
+        <jvmarg line="${debug}" />
+        <sysproperty key="bootstrap.dir" value="${bootstrap.dir}" />
+        <sysproperty key="log.level" value="${log.level}" />
+    </testng>
+<!--        <java classname="org.testng.TestNG" fork="true">
+            <jvmarg value="-Dbootstrap.dir=${bootstrap.dir}" />
+            <jvmarg value="-Dlog.level=${log.level}"/>
+            <jvmarg value="-ea"/>
+            <arg value="-d"/>
+            <arg value="${output.dir}"/>
+            <arg value="${testng.dir}/idm-testng.xml"/>
+            <arg value="${testng.dir}/sms-testng.xml"/>
+            <arg value="${testng.dir}/cli-testng.xml"/>
+	    <arg value="${testng.dir}/log-testng.xml"/>
+	    <arg value="${testng.dir}/policy-testng.xml"/>
+            <classpath refid="build.class.path"/>
+        </java-->
+
+        <antcall target="report" />
+    </target>
+
+    <target name="report">
+        <delete dir="${report.dir}" />
+        <mkdir dir="${report.dir}" />
+        <copy file="${template.dir}/default.css" tofile="${report.dir}/default.css" />
+        <java classname="com.sun.identity.shared.test.tools.ReportGenerator" fork="true">
+            <arg value="${output.dir}"/>
+            <arg value="${template.dir}"/>
+            <arg value="${report.dir}"/>
+            <classpath refid="build.class.path"/>
+        </java>
+    </target>
+
+    <target name="clean">
+        <delete dir="${output.dir}" />
+        <delete dir="${report.dir}" />
+    </target>
+
+</project>

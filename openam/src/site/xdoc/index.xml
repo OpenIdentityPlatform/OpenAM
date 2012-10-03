@@ -1,0 +1,106 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  ! CCPL HEADER START
+  !
+  ! This work is licensed under the Creative Commons
+  ! Attribution-NonCommercial-NoDerivs 3.0 Unported License.
+  ! To view a copy of this license, visit
+  ! http://creativecommons.org/licenses/by-nc-nd/3.0/
+  ! or send a letter to Creative Commons, 444 Castro Street,
+  ! Suite 900, Mountain View, California, 94041, USA.
+  !
+  ! You can also obtain a copy of the license at
+  ! src/main/resources/legal-notices/CC-BY-NC-ND.txt.
+  ! See the License for the specific language governing permissions
+  ! and limitations under the License.
+  !
+  ! If applicable, add the following below this CCPL HEADER, with the fields
+  ! enclosed by brackets "[]" replaced with your own identifying information:
+  !      Portions Copyright [yyyy] [name of copyright owner]
+  !
+  ! CCPL HEADER END
+  !
+  !      Copyright 2011 ForgeRock AS
+  !    
+-->
+<document
+ xmlns="http://maven.apache.org/XDOC/2.0"
+ xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+ xsi:schemaLocation="http://maven.apache.org/XDOC/2.0 http://maven.apache.org/xsd/xdoc-2.0.xsd">
+ <properties>
+  <title>About OpenAM</title>
+  <author email="openam-dev@forgerock.org">ForgeRock AS</author>
+ </properties>
+ <body>
+  <section name="About the OpenAM Project">
+   <p>OpenAM provides open source Authentication, Authorization, Entitlement
+   and Federation software. Through OpenAM, the community actively continues
+   development of OpenSSO.</p>
+   <p>OpenAM provides core identity services to simplify the implementation of
+   transparent single sign-on (SSO) as a security component in a network
+   infrastructure. OpenAM provides the foundation for integrating diverse
+   web applications that might typically operate against a disparate set of
+   identity repositories and are hosted on a variety of platforms such as web
+   and application servers.</p>
+   <p>From the <a
+   href="https://wikis.forgerock.org/confluence/display/openam/OpenAM+Roadmap"
+   >OpenAM Roadmap</a>, you see that the community has extensive plans for
+   future deliveries.</p>
+  </section>
+  <section name="Welcome Users">
+   <p>The OpenAM community shares an interest in improving and extending
+   OpenAM software, and in adapting OpenAM to best fit our needs.</p>
+   <p>You are welcome to join us. Here are some ways to get started.</p>
+   <ul>
+    <li>Download and install a build from the <a
+    href="http://forgerock.org/openam.html">download page</a>.</li>
+    <li>Join the <a
+    href="https://lists.forgerock.org/mailman/listinfo/openam">OpenAM
+    mailing list</a> to ask questions, make suggestions, and tell us what
+    you think of OpenAM.</li>
+    <li><a
+    href="https://idp.forgerock.org/openam/UI/Login?service=register">Register
+    to join the community</a>.</li>
+    <li>Read and edit <a
+    href="https://wikis.forgerock.org/confluence/display/OPENAM/Home"
+    >OpenAM Wiki documentation</a>.</li>
+   </ul>
+   <p>Looking forward to hearing from you.</p>
+  </section>
+  <section name="Welcome Developers">
+   <p>If you are a developer interested in OpenAM, there are plenty of
+   ways you can get actively involved in the community in addition to joining
+   as an OpenAM user.</p>
+   <ul>
+    <li>Get the source. See instructions in the <a
+    href="https://wikis.forgerock.org/confluence/display/openam/Guide+to+OpenAM+Subversion"
+    >Guide to OpenAM Subversion</a>.</li>   
+    <li>Make sure you <a
+    href="https://idp.forgerock.org/openam/UI/Login?service=register">register
+    to join the community</a>, thus also registering to <a
+    href="https://bugster.forgerock.org/jira/browse/OPENAM">report issues, and
+    describe requests for enhancements</a>, as well as to edit <a
+    href="https://wikis.forgerock.org/confluence/display/OPENAM/Home"
+    >OpenAM Wiki documentation</a>.</li>
+    <li>Participate and discuss your work on the <a
+    href="https://lists.forgerock.org/mailman/listinfo/openam-dev">OpenAM
+    developer mailing list</a> in addition to the <a
+    href="https://lists.forgerock.org/mailman/listinfo/openam">OpenAM
+    mailing list</a>.</li>
+   </ul>
+  </section>
+  <section name="Welcome Partners">
+   <p>Want to partner with other OpenAM community members to bring solutions
+   based on OpenAM to your customers?</p>
+   <ul>
+    <li>Come show off your expertise on the <a
+    href="https://lists.forgerock.org/mailman/listinfo/openam">mailing
+    list</a>.</li>
+    <li>Post your success stories and white papers on the <a
+    href="https://wikis.forgerock.org/confluence/display/OPENAM/Home"
+    >OpenAM Wiki</a>.</li>
+   </ul>
+  </section>
+ </body>
+</document>
+
