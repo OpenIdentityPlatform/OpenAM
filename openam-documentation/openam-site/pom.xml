@@ -1,0 +1,297 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  ! CCPL HEADER START
+  !
+  ! This work is licensed under the Creative Commons
+  ! Attribution-NonCommercial-NoDerivs 3.0 Unported License.
+  ! To view a copy of this license, visit
+  ! http://creativecommons.org/licenses/by-nc-nd/3.0/
+  ! or send a letter to Creative Commons, 444 Castro Street,
+  ! Suite 900, Mountain View, California, 94041, USA.
+  !
+  ! You can also obtain a copy of the license at
+  ! src/main/resources/legal-notices/CC-BY-NC-ND.txt.
+  ! See the License for the specific language governing permissions
+  ! and limitations under the License.
+  !
+  ! If applicable, add the following below this CCPL HEADER, with the fields
+  ! enclosed by brackets "[]" replaced with your own identifying information:
+  !      Portions Copyright [yyyy] [name of copyright owner]
+  !
+  ! CCPL HEADER END
+  !
+  !      Copyright 2011-2012 ForgeRock Inc
+  !    
+-->
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <!-- Parent Project -->
+    <parent>
+        <groupId>org.forgerock</groupId>
+        <artifactId>openam-documentation</artifactId>
+        <version>10.1.0-SNAPSHOT</version>
+    </parent>
+
+    <!-- Documentation Module -->
+    <groupId>org.forgerock</groupId>
+    <artifactId>openam-site</artifactId>
+    <version>10.1.0-SNAPSHOT</version>
+
+    <name>OpenAM Site Documentation</name>
+
+    <inceptionYear>2011</inceptionYear>
+    <packaging>jar</packaging>
+    <description>DocBook XML source for OpenAM core user documentation. Java API reference documentation is generated
+        from OpenAM source code.
+    </description>
+
+    <url>http://openam.forgerock.org/</url>
+
+    <mailingLists>
+        <mailingList>
+            <name>OpenAM Users Mailing List</name>
+            <archive>http://lists.forgerock.org/pipermail/openam/</archive>
+            <subscribe>https://lists.forgerock.org/mailman/listinfo/openam/</subscribe>
+            <unsubscribe>https://lists.forgerock.org/mailman/listinfo/openam/</unsubscribe>
+            <post>openam@forgerock.org</post>
+        </mailingList>
+        <mailingList>
+            <name>OpenAM Developers Mailing List</name>
+            <archive>http://lists.forgerock.org/pipermail/openam-dev/</archive>
+            <subscribe>https://lists.forgerock.org/mailman/listinfo/openam-dev/</subscribe>
+            <unsubscribe>https://lists.forgerock.org/mailman/listinfo/openam-dev/</unsubscribe>
+            <post>openam-dev@forgerock.org</post>
+        </mailingList>
+        <mailingList>
+            <name>OpenAM Commit Notifications</name>
+            <archive>http://lists.forgerock.org/pipermail/commitopenam/</archive>
+            <subscribe>https://lists.forgerock.org/mailman/listinfo/commitopenam/</subscribe>
+            <unsubscribe>https://lists.forgerock.org/mailman/listinfo/commitopenam/</unsubscribe>
+            <post>commitopenam@forgerock.org</post>
+        </mailingList>
+    </mailingLists>
+
+    <!-- Source Control -->
+    <scm>
+        <url>https://svn.forgerock.org/openam/trunk/openam/</url>
+        <connection>scm:svn:https://svn.forgerock.org/openam/trunk/openam/</connection>
+        <developerConnection>scm:svn:https://svn.forgerock.org/openam/trunk/openam/</developerConnection>
+        <tag>HEAD</tag>
+    </scm>
+
+    <issueManagement>
+        <system>Jira</system>
+        <url>https://bugster.forgerock.org/jira/browse/OPENAM</url>
+    </issueManagement>
+    <licenses>
+        <license>
+            <name>CDDL-1.0</name>
+            <url>http://www.opensource.org/licenses/cddl1.php</url>
+            <comments>Common Development and Distribution License (CDDL) 1.0.
+                This license applies to OpenAM source code as indicated in the
+                sources themselves.
+            </comments>
+            <distribution>repo</distribution>
+        </license>
+        <license>
+            <name>CC BY-NC-ND 3.0</name>
+            <url>http://creativecommons.org/licenses/by-nc-nd/3.0/</url>
+            <comments>Creative Commons Attribution-NonCommercial-NoDerivs 3.0
+                Unported. This license applies to the site content, and to the
+                documentation as indicated in the documentation source code.
+            </comments>
+            <distribution>repo</distribution>
+        </license>
+    </licenses>
+    <properties>
+        <serverDocTargetVersion>10.1.0</serverDocTargetVersion>
+        <agentsDocTargetVersion>3.1.0</agentsDocTargetVersion>
+        <webAgentsDocTargetVersion>3.1.0</webAgentsDocTargetVersion>
+        <javaEEAgentsDocTargetVersion>3.1.0</javaEEAgentsDocTargetVersion>
+        <agentsBootstrapFile>OpenSSOAgentBootstrap.properties</agentsBootstrapFile>
+        <agentsConfigurationFile>OpenSSOAgentConfiguration.properties</agentsConfigurationFile>
+        <oldProjectName>OpenSSO</oldProjectName>
+
+        <site-out>${project.build.outputDirectory}/site</site-out>
+
+        <products-basedir>${basedir}</products-basedir>
+        <gaId>UA-23412190-7</gaId>
+        <!--
+             Release date is specified only when building the documentation
+             for publication. For example:
+                 -D"releaseDate=Software release date: January 1, 1970"
+             Otherwise release date should remain empty.
+        -->
+        <releaseDate />
+        <softwareReleaseDate>${releaseDate}</softwareReleaseDate>
+        <defaultRootSuffix>dc=openam,dc=java,dc=net</defaultRootSuffix>
+    </properties>
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-javadoc-plugin</artifactId>
+                <configuration>
+                    <skip>true</skip>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>xml-maven-plugin</artifactId>
+                <version>1.0</version>
+                <executions>
+                    <execution>
+                        <phase>generate-resources</phase>
+                        <goals>
+                            <goal>transform</goal>
+                        </goals>
+                        <configuration>
+                            <transformationSets>
+                                <transformationSet>
+                                    <dir>../..</dir>
+                                    <includes>
+                                        <include>
+                                            openam-schema/openam-dtd-schema/src/main/resources/com/sun/identity/log/messageid/AuthenticationLogMessageIDs.xml
+                                        </include>
+                                        <include>
+                                            openam-schema/openam-dtd-schema/src/main/resources/com/sun/identity/log/messageid/CLILogMessageIDs.xml
+                                        </include>
+                                        <include>
+                                            openam-schema/openam-dtd-schema/src/main/resources/com/sun/identity/log/messageid/ConsoleLogMessageIDs.xml
+                                        </include>
+                                        <include>
+                                            openam-schema/openam-dtd-schema/src/main/resources/com/sun/identity/log/messageid/CoreTokenLogMessageIDs.xml
+                                        </include>
+                                        <include>
+                                            openam-schema/openam-dtd-schema/src/main/resources/com/sun/identity/log/messageid/ntitlementLogMessageIDs.xml
+                                        </include>
+                                        <include>
+                                            openam-schema/openam-dtd-schema/src/main/resources/com/sun/identity/log/messageid/LoggingLogMessageIDs.xml
+                                        </include>
+                                        <include>
+                                            openam-schema/openam-dtd-schema/src/main/resources/com/sun/identity/log/messageid/PolicyLogMessageIDs.xml
+                                        </include>
+                                        <include>
+                                            openam-schema/openam-dtd-schema/src/main/resources/com/sun/identity/log/messageid/SessionLogMessageIDs.xml
+                                        </include>
+
+                                        <include>
+                                            openam-federation/OpenFM/src/main/resources/com/sun/identity/log/messageid/COTLogMessageIDs.xml
+                                        </include>
+                                        <include>
+                                            openam-federation/OpenFM/src/main/resources/com/sun/identity/log/messageid/IDFFLogMessageIDs.xml
+                                        </include>
+                                        <include>
+                                            openam-federation/OpenFM/src/main/resources/com/sun/identity/log/messageid/LibertyLogMessageIDs.xml
+                                        </include>
+                                        <include>
+                                            openam-federation/OpenFM/src/main/resources/com/sun/identity/log/messageid/SAML2LogMessageIDs.xml
+                                        </include>
+                                        <include>
+                                            openam-federation/OpenFM/src/main/resources/com/sun/identity/log/messageid/SAMLLogMessageIDs.xml
+                                        </include>
+                                        <include>
+                                            openam-federation/OpenFM/src/main/resources/com/sun/identity/log/messageid/WebServicesSecurityLogMessageIDs.xml
+                                        </include>
+                                        <include>
+                                            openam-federation/OpenFM/src/main/resources/com/sun/identity/log/messageid/WSFederationLogMessageIDs.xml
+                                        </include>
+
+                                        <!--  <include>legacy/xml/log/Amadmin_CLILogMessageIDs.xml</include>  THIS FILE DOES NOT EXIST -->
+                                    </includes>
+                                    <stylesheet>${basedir}/src/main/xslt/logs.xsl</stylesheet>
+                                    <outputProperties>
+                                        <outputProperty>
+                                            <name>omit-xml-declaration</name>
+                                            <value>yes</value>
+                                        </outputProperty>
+                                    </outputProperties>
+                                    <validating>false</validating>
+                                </transformationSet>
+                            </transformationSets>
+                            <catalogs>
+                                <catalog>src/main/xslt/catalog.xml</catalog>
+                            </catalogs>
+                        </configuration>
+                    </execution>
+                </executions>
+                <dependencies>
+                    <dependency>
+                        <groupId>xalan</groupId>
+                        <artifactId>xalan</artifactId>
+                        <version>2.7.1</version>
+                    </dependency>
+                </dependencies>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-antrun-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>generate-log-message-ref</id>
+                        <phase>generate-resources</phase>
+                        <inherited>false</inherited>
+                        <goals>
+                            <goal>run</goal>
+                        </goals>
+                        <configuration>
+                            <target>
+                                <concat destfile="${project.build.directory}/generated-resources/chap-log-messages.xml">
+                                    <header file="${basedir}/src/main/docbkx/reference/log-messages-preface.header"/>
+                                    <fileset dir="${project.build.directory}/generated-resources/xml/xslt"
+                                             includes="**/*.xml">
+
+                                    </fileset>
+                                    <footer file="${basedir}/src/main/docbkx/reference/log-messages-preface.footer"/>
+                                </concat>
+                            </target>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+
+            <plugin>
+                <groupId>org.forgerock.commons</groupId>
+                <artifactId>forgerock-doc-maven-plugin</artifactId>
+                <inherited>false</inherited>
+                <configuration>
+                    <projectName>OpenAM</projectName>
+                    <googleAnalyticsId>${gaId}</googleAnalyticsId>
+                    <runLinkTester>false</runLinkTester>
+                </configuration>
+                <version>1.1.0-SNAPSHOT</version>
+                <executions>
+                    <execution>
+                        <id>build-doc</id>
+                        <phase>pre-site</phase>
+                        <goals>
+                            <goal>build</goal>
+                        </goals>
+                    </execution>
+                    <execution>
+                        <id>layout-doc</id>
+                        <phase>site</phase>
+                        <goals>
+                            <goal>layout</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+
+        </plugins>
+
+    </build>
+
+    <dependencies>
+        <dependency>
+            <groupId>org.forgerock</groupId>
+            <artifactId>openam-site-helper</artifactId>
+            <version>10.1.0-SNAPSHOT</version>
+        </dependency>
+    </dependencies>
+
+</project>

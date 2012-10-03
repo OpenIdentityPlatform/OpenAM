@@ -1,0 +1,186 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  ! CCPL HEADER START
+  !
+  ! This work is licensed under the Creative Commons
+  ! Attribution-NonCommercial-NoDerivs 3.0 Unported License.
+  ! To view a copy of this license, visit
+  ! http://creativecommons.org/licenses/by-nc-nd/3.0/
+  ! or send a letter to Creative Commons, 444 Castro Street,
+  ! Suite 900, Mountain View, California, 94041, USA.
+  !
+  ! You can also obtain a copy of the license at
+  ! src/main/resources/legal-notices/CC-BY-NC-ND.txt.
+  ! See the License for the specific language governing permissions
+  ! and limitations under the License.
+  !
+  ! If applicable, add the following below this CCPL HEADER, with the fields
+  ! enclosed by brackets "[]" replaced with your own identifying information:
+  !      Portions Copyright [yyyy] [name of copyright owner]
+  !
+  ! CCPL HEADER END
+  !
+  !      Copyright 2011-2012 ForgeRock AS
+  !    
+-->
+<chapter xml:id='chap-install-das'
+ xmlns='http://docbook.org/ns/docbook'
+ version='5.0' xml:lang='en'
+ xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance'
+ xsi:schemaLocation='http://docbook.org/ns/docbook http://docbook.org/xml/5.0/xsd/docbook.xsd'
+ xmlns:xlink='http://www.w3.org/1999/xlink'
+ xmlns:xinclude='http://www.w3.org/2001/XInclude'>
+ <title>Installing OpenAM Distributed Authentication</title>
+ <indexterm>
+  <primary>Installing</primary>
+  <secondary>Behind the firewall</secondary>
+ </indexterm>
+ <para>When you need to prevent end users from having direct access to the
+ service URLs OpenAM uses to manage access, you can deploy the distributed
+ authentication service (DAS) in your DMZ, leaving OpenAM core services behind
+ the firewall that end users cannot access.</para>
+ 
+ <para>You complete the following stages in deploying the DAS web
+ service.</para>
+ <orderedlist>
+  <listitem>
+   <para>Make sure the cookie domain for the DAS is configured in OpenAM under
+   Configuration &gt; System &gt; Platform.</para>
+  </listitem>
+  <listitem>
+   <para>Make sure the realms used have a Realm/DNS alias for the DAS
+   configured in OpenAM under Access Control &gt; <replaceable>Realm
+   Name</replaceable> &gt; General.</para>
+  </listitem>
+  <listitem>
+   <para>Create the .war file for the DAS using OpenAM software.</para>
+  </listitem>
+  <listitem>
+   <para>Deploy the DAS .war file into your web application container.</para>
+   <para>How you deploy the DAS .war file depends on your web application
+   container. The procedure in this section shows how to deploy on
+   Apache Tomcat.</para>
+  </listitem>
+  <listitem>
+   <para>Configure the DAS UI to access OpenAM core services.</para>
+  </listitem>
+  <listitem>
+   <para>Configure your firewall to allow end user access to the DAS.</para>
+   <para>Firewall configuration is not described here.</para>
+  </listitem>
+ </orderedlist>
+ 
+ <procedure xml:id="create-distributed-auth-file">
+  <title>To Create the DAS <filename>.war</filename> File</title>
+  
+  <step>
+   <para>Unpack the <filename>opensso.war</filename> file into a temporary
+   directory.</para>
+   <screen>$ mkdir -p /tmp/das ; cd /tmp/das
+$ jar xf ~/Downloads/opensso/deployable-war/opensso.war</screen>
+  </step>
+  <step>
+   <para>Create the <filename>das.war</filename> file.</para>
+   <screen>$ cd ~/Downloads/opensso/deployable-war
+$ sh createwar.sh --staging /tmp/das --type distauth --warfile das.war</screen>
+  </step>
+ </procedure>
+ 
+ <procedure xml:id="deploy-distributed-auth-on-tomcat">
+  <title>To Deploy the DAS on Tomcat</title>
+ 
+  <step>
+   <para>Put the <filename>das.war</filename> you created in the Tomcat
+   <filename>webapps/</filename> directory.</para>
+   <screen>$ mv das.war /path/to/tomcat/webapps/</screen>
+  </step>
+  <step>
+   <para>Check that you see the initial DAS configuration screen
+   in your browser.</para>
+  </step>
+ </procedure>
+ 
+ <procedure xml:id="configure-distributed-auth">
+  <title>To Configure the DAS</title>
+ 
+  <step>
+   <para>Configure the DAS using the agent profile to connect to OpenAM.</para>
+   <mediaobject xml:id="figure-das-complete-config">
+    <alt>Completed DAS configuration screen</alt>
+    <imageobject>
+     <imagedata fileref="images/das-complete-config.png" format="PNG" />
+    </imageobject>
+    <textobject><para>Configure access to OpenAM.</para></textobject>
+   </mediaobject>
+   <para>Most DAS configuration choices require no clarification. Hints for
+   equivocal parameters follow.</para>
+   <variablelist>
+    <varlistentry>
+     <term>Debug Level</term>
+     <listitem>
+      <para>Default is <literal>error</literal>. Other options include
+      <literal>error</literal>, <literal>warning</literal>,
+      <literal>message</literal>, and <literal>off</literal>.</para>
+     </listitem>
+    </varlistentry>
+    <varlistentry>
+     <term>Encryption Key</term>
+     <listitem>
+      <para>Do not change the password encryption key.</para>
+     </listitem>
+    </varlistentry>
+    <varlistentry>
+     <term>Application User Name</term>
+     <listitem>
+      <para>The DAS uses this identity, such as
+      <literal>UrlAccessAgent</literal>, to authenticate to OpenAM.</para>
+     </listitem>
+    </varlistentry>
+    <varlistentry>
+     <term>Application User Password</term>
+     <listitem>
+      <para>The DAS uses this password to authenticate to OpenAM.</para>
+     </listitem>
+    </varlistentry>
+   </variablelist>
+  </step>
+  <step>
+   <para>Login through the DAS to access OpenAM services.</para>
+   <para>For testing, you can login as user <literal>demo</literal>,
+   password <literal>changeit</literal>.</para>
+   <mediaobject xml:id="figure-das-login-success">
+    <alt>Successfully logged in through the DAS</alt>
+    <imageobject>
+     <imagedata fileref="images/das-login-success.png" format="PNG" />
+    </imageobject>
+    <textobject><para>The DAS UI redirects the user to the URL
+    configured for the realm.</para></textobject>
+   </mediaobject>
+   <para>When the <literal>/openam/idm/EndUser</literal> page is inside the
+   firewall, and therefore not visible to users outside, redirect the
+   browser after successful login to a page that exists. One way to do this
+   is to use the <literal>goto</literal> parameter in the URL.</para>
+   <literallayout class="monospaced">https://das.example.com/das/UI/Login?goto=<replaceable>absolute-successful-redirect-URL</replaceable></literallayout>
+   <!-- Tips from Peter follow. See
+   http://blogs.forgerock.org/petermajor/2011/09/how-to-set-up-multiple-daui-instances/ -->
+   <para>On successful login, your browser stores an
+   <literal>AMDistAuthConfig</literal> cookie that identifies the DAS.</para>
+  </step>
+  <step>
+   <para>Restrict permissions to the configuration for the DAS under the
+   <filename>$HOME/FAMDistAuth</filename> directory of the user who runs the
+   web container where you deployed the service.</para>
+   <para>The configuration file name ends in
+   <filename>AMDistAuthConfig.properties</filename>.</para>
+   <para>If you deploy multiple DAS servers, you can configure them to forward
+   requests to each other based on the <literal>AMDistAuthConfig</literal>
+   cookie by setting the <literal>com.sun.identity.distauth.cluster</literal>
+   property in this file. The following example lines are wrapped to fit on the
+   page, but you put the entire property on a single line in the configuration
+   file.</para>
+   <programlisting language="ini">com.sun.identity.distauth.cluster=
+ http://das.example.com:8080/das/UI/Login,
+ http://das2.example.com:8080/das/UI/Login</programlisting>
+  </step>
+ </procedure>
+</chapter>
