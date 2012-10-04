@@ -78,6 +78,7 @@ public final class IdentityResource implements CollectionResourceProvider {
     private final Object writeLock = new Object();
 
     private final List<Attribute> iDSvcsAttrList = new ArrayList();
+    private  String realm = null;
 
     /**
      * Creates a new empty backend.
@@ -88,6 +89,7 @@ public final class IdentityResource implements CollectionResourceProvider {
     public IdentityResource(String userType,String realm) {
         String[] userval = {userType} ;
         String[] realmval = {realm} ;
+        this.realm = realm;
         iDSvcsAttrList.add(new Attribute("objecttype",userval)) ;
         iDSvcsAttrList.add(new Attribute("realm",realmval)) ;
     }
@@ -249,6 +251,10 @@ public final class IdentityResource implements CollectionResourceProvider {
         admin.setId(adminToken.getTokenID().toString());
 
         try {
+            String component = request.getComponent();
+            JsonValue result = new JsonValue(new LinkedHashMap<String, Object>(1));
+
+
             IdentityServicesImpl idsvc = new IdentityServicesImpl();
             IdentityDetails dtls = idsvc.read(id, iDSvcsAttrList, admin);
 
@@ -256,15 +262,14 @@ public final class IdentityResource implements CollectionResourceProvider {
                 throw new NotFoundException("The resource with ID '" + id
                         + " could not be read because it does not exist");
             }
-            JsonValue result = new JsonValue(new LinkedHashMap<String, Object>(1));
             result.put("name", dtls.getName());
             result.put("realm", dtls.getRealm());
             Attribute[] attrs = dtls.getAttributes();
 
-            for (Attribute aix : attrs)  {
-                result.put(aix.getName(),aix.getValues()) ;
+            for (Attribute aix : attrs) {
+                result.put(aix.getName(), aix.getValues());
             }
-            Resource resource = new Resource("0","0",result)  ;
+            Resource resource = new Resource("0", "0", result);
 
             handler.handleResult(resource);
         } catch (final ResourceException e) {

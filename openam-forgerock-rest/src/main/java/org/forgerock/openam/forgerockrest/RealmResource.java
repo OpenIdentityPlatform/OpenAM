@@ -163,8 +163,15 @@ public final class RealmResource implements CollectionResourceProvider {
     @Override
     public void readInstance(final Context context, final ReadRequest request,
                              final ResultHandler<Resource> handler) {
-        final ResourceException e = new NotSupportedException("Read operations are not supported for resource Realms");
-        handler.handleError(e);
+        final String id = request.getResourceId();
+
+        for (Object theRealm : subRealms ) {
+            String realm = (String) theRealm;
+            JsonValue val = new JsonValue(realm);
+            Resource resource = new Resource("0","0",val)  ;
+            handler.handleResource(resource);
+        }
+        handler.handleResult(new QueryResult());
     }
 
     /**
