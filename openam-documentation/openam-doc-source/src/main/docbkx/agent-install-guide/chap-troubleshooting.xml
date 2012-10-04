@@ -47,7 +47,7 @@
   after installation. What happened?</para>
    </question>
    <answer>
-    <para>SELinux must be properly configured to connect the WPA and Openam
+    <para>SELinux must be properly configured to connect the web policy agent and OpenAM
   nodes. Either re-configure SELinux or disable it, then reinstall the policy agent.</para>
    </answer>
   </qandaentry>
