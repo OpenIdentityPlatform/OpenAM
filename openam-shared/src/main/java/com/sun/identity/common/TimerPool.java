@@ -26,6 +26,10 @@
  *
  */
 
+/*
+ * Portions Copyrighted 2012 ForgeRock Inc
+ */
+
 package com.sun.identity.common;
 
 import com.sun.identity.shared.debug.Debug;
@@ -422,7 +426,7 @@ public class TimerPool implements Triggerable {
                                 // skip head task
                                 localHeadTask.timeout();
                                 localTask = localHeadTask.next();
-                                do {
+                                while (localTask != null) {
                                     runTask = localTask;
                                     localTask = localTask.next();
                                     // cut the connection before run the task.
@@ -434,7 +438,7 @@ public class TimerPool implements Triggerable {
                                             .scheduledExecutionTime()
                                             + runTask.getRunPeriod()));
                                     }
-                                } while (localTask != null);
+                                }
                                 localHeadTask.expire();
                             } finally {
                                 localHeadTask.releaseLockAndNotify();
