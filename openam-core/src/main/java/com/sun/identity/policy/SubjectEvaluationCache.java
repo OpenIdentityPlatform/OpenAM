@@ -26,7 +26,9 @@
  *
  */
 
-
+/*
+ * Portions Copyrighted 2012 ForgeRock Inc
+ */
 
 package com.sun.identity.policy;
 
@@ -41,7 +43,7 @@ import com.sun.identity.shared.stats.Stats;
 /* 
  * This class maintains the Subject Evaluation Cache
  * with respect to the membersip of a user to the
- * <code>Subjects</code> specified in a policy. Also maintains a cahce
+ * <code>Subjects</code> specified in a policy. Also maintains a cache
  * of membership of user across <code>Subject</code>s
  * occuring in different policies.
  */
@@ -68,8 +70,10 @@ public class SubjectEvaluationCache {
     *                ....
     */
 
-    public static Map subjectEvaluationCache = new HashMap();
-    public  static long subjectEvalCacheTTL = 0; // milliseconds
+    // A value of 0 indicates do not cache.
+    public static long subjectEvalCacheTTL = 0; // milliseconds
+
+    public static Map<String, Map<String, Long[]>> subjectEvaluationCache;
 
     //in milliseconds
     private static final long DEFAULT_SUBJECT_EVAL_CACHE_TTL = 600000;
@@ -79,106 +83,105 @@ public class SubjectEvaluationCache {
      * Initializes the <code>SubjectEvaluationCache</code>.
      * Uses configuration specified in Policy Configuration Service.
      */
-    static void initSubjectEvalTTLFromPolicyConfig() {
-        if (subjectEvalCacheTTL == 0) {
-            String orgName = ServiceManager.getBaseDN();
-            try {
-                Map pConfigValues = PolicyConfig.getPolicyConfig(orgName);
-                subjectEvalCacheTTL =
-                     PolicyConfig.getSubjectsResultTtl(pConfigValues);
-                if (subjectEvalCacheTTL <= 0) {
-                    subjectEvalCacheTTL = DEFAULT_SUBJECT_EVAL_CACHE_TTL;
-                    if (DEBUG.warningEnabled()) {
-                        DEBUG.warning("Invalid Subject TTL got from "
-                            + "configuration. Set TTL to default:"
-                            + subjectEvalCacheTTL);
-                    }
-                }
-            } catch ( PolicyException pe ) {
+    static {
+        subjectEvaluationCache = new HashMap<String, Map<String, Long[]>>();
+        String orgName = ServiceManager.getBaseDN();
+        try {
+            Map pConfigValues = PolicyConfig.getPolicyConfig(orgName);
+            subjectEvalCacheTTL = PolicyConfig.getSubjectsResultTtl(pConfigValues);
+            if (subjectEvalCacheTTL < 0) {
+                subjectEvalCacheTTL = DEFAULT_SUBJECT_EVAL_CACHE_TTL;
                 if (DEBUG.warningEnabled()) {
-                    DEBUG.warning("Could not read Policy Config data"
-                        + ". Set TTL to default:" + subjectEvalCacheTTL, pe);
+                    DEBUG.warning("Invalid Subject TTL got from "
+                        + "configuration. Set TTL to default:"
+                        + subjectEvalCacheTTL);
                 }
             }
-            if (DEBUG.messageEnabled()) {
-                DEBUG.message("subjectEvalCacheTTL="
-                               + subjectEvalCacheTTL);
+        } catch ( PolicyException pe ) {
+            subjectEvalCacheTTL = DEFAULT_SUBJECT_EVAL_CACHE_TTL;
+            if (DEBUG.warningEnabled()) {
+                DEBUG.warning("Could not read Policy Config data"
+                    + ". Set TTL to default:" + subjectEvalCacheTTL, pe);
             }
+        }
+        if (DEBUG.messageEnabled()) {
+            DEBUG.message("subjectEvalCacheTTL=" + subjectEvalCacheTTL);
         }
     }
 
     /**
      * Returns the duration for which subject evaluation results would be cached
      * @return the duration for which subject evaluation results would be cached
-     * from the time of evaluation,  expressed in milliseconds
+     * from the time of evaluation,  expressed in milliseconds. A value of 0 means
+     * don't cache.
      */
     public static long getSubjectEvalTTL() {
-        initSubjectEvalTTLFromPolicyConfig();
         return subjectEvalCacheTTL;
     }
 
     /**
      * Adds a new entry to <code>SubjectEvaluationCache</code>.
-     * @param tokenID sesstion token id of user.
+     * @param tokenID session token id of user.
      * @param ldapServer ldap server having the entry corresponding to 
      * <code>Subject</code> name value.
      * @param valueDN subject name value.
      * @param member result of membership evaluation.
      */
     public static void addEntry(
-        String tokenID, 
+        String tokenID,
         String ldapServer,
         String valueDN, 
-        boolean member
-    ) {
-        String subjectId = ldapServer+":"+valueDN;
-        Map subjectEntries = null;
-        long[] elem = new long[2];
-        synchronized (subjectEvaluationCache) {
-            elem[0] = System.currentTimeMillis() + getSubjectEvalTTL();
-            elem[1] = (member == true) ? 1:0;
-            if ((subjectEntries = (Map)subjectEvaluationCache.get(tokenID))
-                != null) 
-            {
-                subjectEntries.put(subjectId, elem);
-            } else {
-                subjectEntries = Collections.synchronizedMap(new HashMap());
-                subjectEntries.put(subjectId, elem);
-                subjectEvaluationCache.put(tokenID,subjectEntries);
+        boolean member) {
+
+        // A value of 0 for the subjectEvalCacheTTL means caching is disabled.
+        if (subjectEvalCacheTTL > 0) {
+            String subjectId = ldapServer+":"+valueDN;            
+            Long[] elem = new Long[2];
+            synchronized (subjectEvaluationCache) {
+                elem[0] = System.currentTimeMillis() + getSubjectEvalTTL();
+                elem[1] = (member == true) ? Long.valueOf(1) : Long.valueOf(0);
+                Map<String, Long[]> subjectEntries = subjectEvaluationCache.get(tokenID);
+                if (subjectEntries != null) {
+                    subjectEntries.put(subjectId, elem);
+                } else {
+                    subjectEntries = Collections.synchronizedMap(new HashMap<String, Long[]>());
+                    subjectEntries.put(subjectId, elem);
+                    subjectEvaluationCache.put(tokenID, subjectEntries);
+                }
             }
         }
     }
 
     /**
-     * Checks whether the user identified by session token id is 
+     * Checks whether the user identified by session token id is
      * a member of a <code>Subject</code> name value
-     * @param tokenID sesstion token id of user
+     * @param tokenID session token id of user
      * @param ldapServer ldap server having the entry corresponding to 
      * <code>Subject</code> name value
      * @param valueDN subject name value
      * @return cached result of membership evaluation
      */
-    public static Boolean isMember(String tokenID, 
-        String ldapServer, String valueDN ) 
-    {
+    public static Boolean isMember(String tokenID,
+        String ldapServer, String valueDN) {
+        
         Boolean member = null;
-        String subjectId = ldapServer+":"+valueDN;
-        Map subjectEntries = null;
-        if ((subjectEntries = (Map)subjectEvaluationCache.get(tokenID))
-            != null) 
-        {
-            long[] element = (long[])subjectEntries.get(subjectId);
-            long timeToLive = 0;
-            if (element != null) {
-                timeToLive = (long)element[0];
-                long currentTime = System.currentTimeMillis();
-                if (timeToLive > currentTime) {
-                    if (DEBUG.messageEnabled()) {
-                        DEBUG.message("SubjectEvaluationCache.isMember():"
-                          + " get the membership result from cache.\n");
+
+        // A value of 0 for the subjectEvalCacheTTL means caching is disabled.
+        if (subjectEvalCacheTTL > 0) {
+            String subjectId = ldapServer+":"+valueDN;
+            Map<String, Long[]> subjectEntries = subjectEvaluationCache.get(tokenID);
+            if (subjectEntries != null) {
+                Long[] element = subjectEntries.get(subjectId);
+                if (element != null) {
+                    long timeToLive = element[0].longValue();
+                    long currentTime = System.currentTimeMillis();
+                    if (timeToLive > currentTime) {
+                        if (DEBUG.messageEnabled()) {
+                            DEBUG.message("SubjectEvaluationCache.isMember():"
+                            + " getting the membership result from cache.\n");
+                        }
+                        member = Boolean.valueOf(element[1].longValue() == 1);
                     }
-                    member = (element[1] == 1) ? Boolean.TRUE: 
-                        Boolean.FALSE;
                 }
             }
         }
