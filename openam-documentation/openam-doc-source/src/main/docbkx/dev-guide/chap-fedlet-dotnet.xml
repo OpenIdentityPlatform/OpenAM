@@ -54,9 +54,10 @@
   application.</para>
 
   <step>
-   <para>Download the .NET Fedlet .zip from the <link xlink:show="new"
-   xlink:href="http://forgerock.org/openam.html">OpenAM download page</link>.
-   Unpack the contents of the .zip file into a working directory.</para>
+   <para>Download the .NET Fedlet (<filename>Fedlet-aspnet.zip</filename>) from
+   the <link xlink:show="new" xlink:href="http://forgerock.org/openam.html"
+   >OpenAM download page</link>. Unpack the contents of the .zip file into a
+   working directory.</para>
    <variablelist>
     <varlistentry>
      <term><filename>bin\</filename></term>
