@@ -27,7 +27,7 @@
  */
 
 /**
- * Portions Copyrighted [2011] [ForgeRock AS]
+ * Portions Copyrighted 2011-2012 ForgeRock Inc
  */
 package com.iplanet.am.sdk;
 
@@ -35,7 +35,6 @@ import com.iplanet.am.sdk.common.IDirectoryServices;
 import com.iplanet.sso.SSOException;
 import com.iplanet.sso.SSOToken;
 import com.iplanet.sso.SSOTokenManager;
-import com.sun.identity.shared.debug.Debug;
 import com.sun.identity.sm.SMSEntry;
 import com.sun.identity.sm.SMSException;
 import com.sun.identity.sm.SchemaType;
@@ -145,11 +144,6 @@ public final class AMStoreConnection implements AMConstants {
 
     protected static Map orgMapCache = new AMHashMap();
 
-    protected static Debug debug = AMCommonUtils.debug;
-
-    static {
-    }
-
     // ~ Instance fields
     // --------------------------------------------------------
 
@@ -193,13 +187,14 @@ public final class AMStoreConnection implements AMConstants {
         defaultOrg = rootSuffix = 
             com.sun.identity.common.DNUtils.normalizeDN(
                 SMSEntry.getAMSdkBaseDN());
-        if (debug.messageEnabled()) {
-            debug.message("AMStoreConnection:getAMSdkBaseDN():rootsuffix " + 
+        // Get an instance as required otherwise it causes issues on container restart.
+        if (AMCommonUtils.debug.messageEnabled()) {
+            AMCommonUtils.debug.message("AMStoreConnection:getAMSdkBaseDN():rootsuffix " +
                 rootSuffix);
         }
-        if (debug.messageEnabled()) {
-            debug.message("default org: " + defaultOrg);
-            debug.message("AMStoreConnection:getAMSdkBaseDN():default org " + 
+        if (AMCommonUtils.debug.messageEnabled()) {
+            AMCommonUtils.debug.message("default org: " + defaultOrg);
+            AMCommonUtils.debug.message("AMStoreConnection:getAMSdkBaseDN():default org " +
                 defaultOrg);
         }
         return defaultOrg;
@@ -432,11 +427,11 @@ public final class AMStoreConnection implements AMConstants {
 
             return ssm.getServiceAttributeNames(st);
         } catch (SSOException se) {
-            debug.message("AMStoreConnection.getAttributeNames(String, " 
+            AMCommonUtils.debug.message("AMStoreConnection.getAttributeNames(String, "
                     + "AMSchema.Type)", se);
             throw new AMException(AMSDKBundle.getString("902", locale), "902");
         } catch (SMSException se) {
-            debug.message("AMStoreConnection.getAttributeNames(String, " +
+            AMCommonUtils.debug.message("AMStoreConnection.getAttributeNames(String, " +
                     "AMSchema.Type)", se);
             throw new AMException(AMSDKBundle.getString("911", locale), "911");
         }
@@ -545,10 +540,10 @@ public final class AMStoreConnection implements AMConstants {
 
             return scm.getI18NFileName();
         } catch (SSOException so) {
-            debug.error("AMStoreConnection.getI18NPropertiesFileName(): ", so);
+            AMCommonUtils.debug.error("AMStoreConnection.getI18NPropertiesFileName(): ", so);
             throw new AMException(AMSDKBundle.getString("902", locale), "902");
         } catch (SMSException se) {
-            debug.error("AMStoreConnection.getServiceNames(): ", se);
+            AMCommonUtils.debug.error("AMStoreConnection.getServiceNames(): ", se);
             throw new AMException(AMSDKBundle.getString("909", locale), "909");
         }
     }
@@ -654,7 +649,7 @@ public final class AMStoreConnection implements AMConstants {
         } catch (AMException ae) {
             // do nothing. will try to search the organization
             // using search template
-            debug.error("AMStoreConnection.getOrganizationDN-> "
+            AMCommonUtils.debug.error("AMStoreConnection.getOrganizationDN-> "
                     + "In DC tree mode, unabe to find organization "
                     + " for domain: " + domainname);
         }
@@ -691,8 +686,8 @@ public final class AMStoreConnection implements AMConstants {
                 searchFilter = sb.toString();
             }
 
-            if (debug.messageEnabled()) {
-                debug.message("AMSC:getOrgDN-> " + "using searchfilter "
+            if (AMCommonUtils.debug.messageEnabled()) {
+                AMCommonUtils.debug.message("AMSC:getOrgDN-> " + "using searchfilter "
                         + searchFilter);
             }
 
@@ -819,10 +814,10 @@ public final class AMStoreConnection implements AMConstants {
 
             return scm.getPropertiesViewBeanURL();
         } catch (SSOException so) {
-            debug.error("AMStoreConnection.getPropertiesViewBeanURL(): ", so);
+            AMCommonUtils.debug.error("AMStoreConnection.getPropertiesViewBeanURL(): ", so);
             throw new AMException(AMSDKBundle.getString("902", locale), "902");
         } catch (SMSException se) {
-            debug.error("AMStoreConnection.getServiceNames(): ", se);
+            AMCommonUtils.debug.error("AMStoreConnection.getServiceNames(): ", se);
             throw new AMException(AMSDKBundle.getString("910", locale), "910");
         }
     }
@@ -954,10 +949,10 @@ public final class AMStoreConnection implements AMConstants {
 
             return retSet;
         } catch (SSOException so) {
-            debug.error("AMStoreConnection.getServiceNames(): ", so);
+            AMCommonUtils.debug.error("AMStoreConnection.getServiceNames(): ", so);
             throw new AMException(AMSDKBundle.getString("902", locale), "902");
         } catch (SMSException se) {
-            debug.error("AMStoreConnection.getServiceNames(): ", se);
+            AMCommonUtils.debug.error("AMStoreConnection.getServiceNames(): ", se);
             throw new AMException(AMSDKBundle.getString("905", locale), "905");
         }
     }
@@ -977,10 +972,10 @@ public final class AMStoreConnection implements AMConstants {
 
             return sm.getServiceNames();
         } catch (SSOException so) {
-            debug.error("AMStoreConnection.getServiceNames(): ", so);
+            AMCommonUtils.debug.error("AMStoreConnection.getServiceNames(): ", so);
             throw new AMException(AMSDKBundle.getString("902", locale), "902");
         } catch (SMSException se) {
-            debug.error("AMStoreConnection.getServiceNames(): ", se);
+            AMCommonUtils.debug.error("AMStoreConnection.getServiceNames(): ", se);
             throw new AMException(AMSDKBundle.getString("906", locale), "906");
         }
     }
@@ -1134,8 +1129,8 @@ public final class AMStoreConnection implements AMConstants {
 
         SSOTokenManager.getInstance().validateToken(token);
 
-        if (debug.messageEnabled()) {
-            debug.message("AMStoreConnection.isValidEntry(): DN=" + dn);
+        if (AMCommonUtils.debug.messageEnabled()) {
+            AMCommonUtils.debug.message("AMStoreConnection.isValidEntry(): DN=" + dn);
         }
 
         return dsServices.doesEntryExists(token, dn);
@@ -1207,8 +1202,8 @@ public final class AMStoreConnection implements AMConstants {
             filter = AMObjectImpl.constructFilter(AMNamingAttrManager
                     .getNamingAttr(AMObject.ORGANIZATION), filter, domainName);
 
-            if (debug.messageEnabled()) {
-                debug.message("AMStoreConnection.purgeOrg: "
+            if (AMCommonUtils.debug.messageEnabled()) {
+                AMCommonUtils.debug.message("AMStoreConnection.purgeOrg: "
                         + "Using org filter= " + filter);
             }
 
@@ -1228,8 +1223,8 @@ public final class AMStoreConnection implements AMConstants {
         Iterator delIter = orgSet.iterator();
         while (delIter.hasNext()) {
             orgDN = (String) delIter.next();
-            if (debug.messageEnabled()) {
-                debug.message("AMStoreConnection.purge: " + "Organization= "
+            if (AMCommonUtils.debug.messageEnabled()) {
+                AMCommonUtils.debug.message("AMStoreConnection.purge: " + "Organization= "
                         + orgDN);
             }
 
@@ -1244,8 +1239,8 @@ public final class AMStoreConnection implements AMConstants {
                 // try to purge them, if graceperiod as expired.
                 String filter = AMCompliance.getDeletedObjectFilter(-1);
 
-                if (debug.messageEnabled()) {
-                    debug.message("AMStoreConnection.purge: "
+                if (AMCommonUtils.debug.messageEnabled()) {
+                    AMCommonUtils.debug.message("AMStoreConnection.purge: "
                             + "Searching deleted objects. Filter: " + filter);
                 }
 
@@ -1254,8 +1249,8 @@ public final class AMStoreConnection implements AMConstants {
 
                 if (deletedObjs == null) {
                     // No objecxts to delete
-                    if (debug.messageEnabled()) {
-                        debug.message("AMStoreConnection.purge: "
+                    if (AMCommonUtils.debug.messageEnabled()) {
+                        AMCommonUtils.debug.message("AMStoreConnection.purge: "
                                 + "No objects to be deleted found for "
                                 + orgDN);
                     }
@@ -1295,8 +1290,8 @@ public final class AMStoreConnection implements AMConstants {
                             int objType = getAMObjectType(thisDN);
                             AMObject thisObj;
 
-                            if (debug.messageEnabled()) {
-                                debug.message("AMStoreConnection:purgeOrg: " 
+                            if (AMCommonUtils.debug.messageEnabled()) {
+                                AMCommonUtils.debug.message("AMStoreConnection:purgeOrg: "
                                         + "deleting child " + thisDN);
                             }
                             try { // catch PreCallBackException
@@ -1352,7 +1347,7 @@ public final class AMStoreConnection implements AMConstants {
                                     break;
                                 } // switch
                             } catch (AMPreCallBackException amp) {
-                                debug.error("AMStoreConnection.purge: "
+                                AMCommonUtils.debug.error("AMStoreConnection.purge: "
                                         + "Aborting delete of: "
                                         + thisDN
                                         + " due to pre-callback exception",
@@ -1399,8 +1394,8 @@ public final class AMStoreConnection implements AMConstants {
         filter = AMObjectImpl.constructFilter(AMNamingAttrManager
                 .getNamingAttr(AMObject.USER), filter, uid);
 
-        if (debug.messageEnabled()) {
-            debug.message("AMStoreConnection.purgeGroup: "
+        if (AMCommonUtils.debug.messageEnabled()) {
+            AMCommonUtils.debug.message("AMStoreConnection.purgeGroup: "
                     + "Using deleted user filter= " + filter);
         }
 
@@ -1451,8 +1446,8 @@ public final class AMStoreConnection implements AMConstants {
         filter = AMObjectImpl.constructFilter(AMNamingAttrManager
                 .getNamingAttr(AMObject.RESOURCE), filter, rid);
 
-        if (debug.messageEnabled()) {
-            debug.message("AMStoreConnection.purgeGroup: "
+        if (AMCommonUtils.debug.messageEnabled()) {
+            AMCommonUtils.debug.message("AMStoreConnection.purgeGroup: "
                     + "Using deleted user filter= " + filter);
         }
 
@@ -1504,8 +1499,8 @@ public final class AMStoreConnection implements AMConstants {
         filter = AMObjectImpl.constructFilter(AMNamingAttrManager
                 .getNamingAttr(AMObject.GROUP), filter, gid);
 
-        if (debug.messageEnabled()) {
-            debug.message("AMStoreConnection.purgeGroup: "
+        if (AMCommonUtils.debug.messageEnabled()) {
+            AMCommonUtils.debug.message("AMStoreConnection.purgeGroup: "
                     + "Using deleted group filter= " + filter);
         }
 
@@ -1683,8 +1678,8 @@ public final class AMStoreConnection implements AMConstants {
         try {
             n = nf.parse(value);
         } catch (ParseException pe) {
-            if (debug.warningEnabled()) {
-                debug.warning("AMStoreConnection.daysSinceModified: "
+        if (AMCommonUtils.debug.warningEnabled()) {
+            AMCommonUtils.debug.warning("AMStoreConnection.daysSinceModified: "
                         + "unable to parse date: " + value
                         + " :Returning default= -1", pe);
             }
@@ -1703,8 +1698,8 @@ public final class AMStoreConnection implements AMConstants {
         long elapsedTimeMSecs = nowTimeMSecs - modTimeMSecs;
         int elapsedDays = (int) (elapsedTimeMSecs / (1000 * 60 * 60 * 24));
 
-        if (debug.messageEnabled()) {
-            debug.message("AMStoreConnection.daysSinceModified() for dn: "
+        if (AMCommonUtils.debug.messageEnabled()) {
+            AMCommonUtils.debug.message("AMStoreConnection.daysSinceModified() for dn: "
                     + entryDN + ", days: " + elapsedDays + " days");
         }
 
@@ -1793,8 +1788,8 @@ public final class AMStoreConnection implements AMConstants {
             searchFilter = sb.toString();
         }
 
-        if (debug.messageEnabled()) {
-            debug.message("AMSC:getOrgDN-> " + "using searchfilter "
+        if (AMCommonUtils.debug.messageEnabled()) {
+            AMCommonUtils.debug.message("AMSC:getOrgDN-> " + "using searchfilter "
                     + searchFilter);
         }
 

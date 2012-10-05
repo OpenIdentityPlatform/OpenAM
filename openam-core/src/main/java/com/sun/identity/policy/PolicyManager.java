@@ -26,8 +26,8 @@
  *
  */
 
-/*
- * Portions Copyrighted 2011 ForgeRock AS
+/**
+ * Portions Copyrighted 2011-2012 ForgeRock Inc
  */
 package com.sun.identity.policy;
 
@@ -186,25 +186,14 @@ public final class PolicyManager {
     private ResourceIndexManager rim;
 
     private static ServiceSchemaManager ssm;
-    private static SSOToken superAdminToken =
-        (SSOToken) AccessController.doPrivileged(
-        AdminTokenAction.getInstance());
-    private static javax.security.auth.Subject adminSubject =
-        SubjectUtils.createSubject(superAdminToken);
+    private static javax.security.auth.Subject adminSubject;
+
     SSOToken token;
 
     // Can be shared by classes
     static Debug debug = Debug.getInstance(POLICY_DEBUG_NAME);
     static DN delegationRealm = new DN(DNMapper.orgNameToDN(DELEGATION_REALM));
     private static boolean migratedToEntitlementService = false;
-
-    static {
-        EntitlementConfiguration ec = EntitlementConfiguration.getInstance(
-            adminSubject, "/");
-        migratedToEntitlementService = ec.migratedToEntitlementService();
-    }
-
-
 
     /**
      * Constructor for <code>PolicyManager</code> for the
@@ -1364,7 +1353,10 @@ public final class PolicyManager {
                     Rule rule = (Rule) policy.getRule(ruleName);
                     String serviceTypeName = rule.getServiceTypeName();
                     String ruleResource = rule.getResourceName();
-
+                    // Make sure adminSubject has been set before using
+                    if (adminSubject == null) {
+                       initialise();
+                    }
                     Set<String> referredResources = ApplicationManager.
                         getReferredResources(adminSubject,
                         realm, serviceTypeName);
@@ -1620,7 +1612,7 @@ public final class PolicyManager {
 
     public Set getManagedResourceNames(String serviceName)
             throws PolicyException {
-        return (migratedToEntitlementService) ?
+        return (isMigratedToEntitlementService()) ?
             getManagedResourceNamesE(serviceName) :
             getManagedResourceNamesO(serviceName);
     }
@@ -1773,12 +1765,29 @@ public final class PolicyManager {
     }
 
     static boolean isMigratedToEntitlementService() {
+
+        // This must be non-null for the migratedToEntitlementService to have been
+        // calculated correctly
+        if (adminSubject == null) {
+            initialise();
+        }
+
         return migratedToEntitlementService;
+    }
+
+    private static void initialise() {
+
+        // Do this outside of a static block to avoid issues on container shutdown/restart
+        adminSubject = SubjectUtils.createSubject(
+                (SSOToken)AccessController.doPrivileged(AdminTokenAction.getInstance()));
+        EntitlementConfiguration ec =
+                EntitlementConfiguration.getInstance(adminSubject, "/");
+        migratedToEntitlementService = ec.migratedToEntitlementService();
     }
 
     public boolean canCreateNewResource(String svcTypeName) {
         boolean can = false;
-        if (migratedToEntitlementService) {
+        if (isMigratedToEntitlementService()) {
             ResourceManager resMgr = getResourceManager();
             if (resMgr != null) {
                 try {

@@ -27,7 +27,7 @@
  */
 
 /*
- * Portions Copyrighted 2010-2012 ForgeRock AS
+ * Portions Copyrighted 2010-2012 ForgeRock Inc
  */
 
 package com.iplanet.dpro.session;
@@ -52,7 +52,6 @@ import com.sun.identity.common.SearchResults;
 import com.sun.identity.common.ShutdownListener;
 import com.sun.identity.common.ShutdownManager;
 import com.sun.identity.common.SystemTimerPool;
-import com.sun.identity.common.TimerPool;
 import com.sun.identity.shared.Constants;
 import com.sun.identity.shared.debug.Debug;
 import com.sun.identity.session.util.RestrictedTokenAction;
@@ -307,8 +306,6 @@ public class Session extends GeneralTaskRunnable {
      */
     private volatile boolean isPolling = false;
 
-    private static TimerPool timerPool = null;
-    
     static private ThreadPool threadPool = null;
     private static final int DEFAULT_POOL_SIZE = 5;
     private static final int DEFAULT_THRESHOLD = 10000;
@@ -337,10 +334,7 @@ public class Session extends GeneralTaskRunnable {
         } catch (Exception le) {
             appSSOTokenRefreshTime = 3;
         }
-        if (pollingEnabled || sessionCleanupEnabled){
-            timerPool = SystemTimerPool.getTimerPool();
-        }        
-    }
+    }        
 
     static private String getAMServerID() {
         String serverid = null;
@@ -414,6 +408,8 @@ public class Session extends GeneralTaskRunnable {
                             new ShutdownListener() {
                                 public void shutdown() {
                                     threadPool.shutdown();
+                                    threadPool = null;
+                                    pollerPoolInitialized = false;
                                 }
                             }
                         );
@@ -428,10 +424,6 @@ public class Session extends GeneralTaskRunnable {
                         + sessionCleanupEnabled);
                 }
             }	        
-        }
-        
-        if ((pollingEnabled || sessionCleanupEnabled) && timerPool == null) {
-            timerPool = SystemTimerPool.getTimerPool();
         }
         
         return pollingEnabled;
@@ -490,7 +482,8 @@ public class Session extends GeneralTaskRunnable {
                             (appSSOTokenRefreshTime * 60)) * 1000;
                     }
                     if (expectedTime > scheduledExecutionTime()) {
-                        timerPool.schedule(this, new Date(expectedTime));
+                        // Get an instance as required otherwise it causes issues on container restart.
+                        SystemTimerPool.getTimerPool().schedule(this, new Date(expectedTime));
                         return;
                     }
                     if (sender == null) {
@@ -529,7 +522,7 @@ public class Session extends GeneralTaskRunnable {
                         * 1000;
                 }
                 if (expectedTime > scheduledExecutionTime()) {
-                    timerPool.schedule(this, new Date(expectedTime));
+                    SystemTimerPool.getTimerPool().schedule(this, new Date(expectedTime));
                     return;
                 }
                 try {                        
@@ -1115,7 +1108,7 @@ public class Session extends GeneralTaskRunnable {
                 cancel();
             }
             if (scheduledExecutionTime() == -1) {
-                timerPool.schedule(this, new Date(timeoutTime));
+                SystemTimerPool.getTimerPool().schedule(this, new Date(timeoutTime));
             }
         } else {
             if ((sessionCleanupEnabled) && (maxSessionTime < (Long.MAX_VALUE /
@@ -1126,7 +1119,7 @@ public class Session extends GeneralTaskRunnable {
                     cancel();
                 }
                 if (scheduledExecutionTime() == -1) {
-                    timerPool.schedule(this, new Date(timeoutTime));
+                    SystemTimerPool.getTimerPool().schedule(this, new Date(timeoutTime));
                 }
             }
         }
@@ -1674,7 +1667,7 @@ public class Session extends GeneralTaskRunnable {
      * 
      * @param svcurl Session Service URL.
      * @param sreq Session Request object.
-     * @exception SessionException 
+     * @exception SessionException
      */    
     private SessionResponse getSessionResponse(URL svcurl, SessionRequest sreq)
             throws SessionException {

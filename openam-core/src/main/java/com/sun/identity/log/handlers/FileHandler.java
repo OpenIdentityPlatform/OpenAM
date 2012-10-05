@@ -26,7 +26,7 @@
  *
  */
 /*
- * Portions Copyrighted 2011 ForgeRock AS
+ * Portions Copyrighted 2011-2012 ForgeRock Inc
  */
 package com.sun.identity.log.handlers;
 
@@ -94,7 +94,6 @@ public class FileHandler extends java.util.logging.Handler {
     private String fileName;
     private int recCountLimit;
     private LinkedList recordBuffer;
-    private static LoggingThread thread = LoggingThread.getInstance();
     private TimeBufferingTask bufferTask;
     private boolean timeBufferingEnabled = false;
     private static String headerString = null;
@@ -523,7 +522,8 @@ public class FileHandler extends java.util.logging.Handler {
         }
         LogTask task = new LogTask(writeBuffer);
         try {
-            thread.run(task);
+            // Get an instance as required otherwise it can cause issues on container restart.
+            LoggingThread.getInstance().run(task);
         } catch (ThreadPoolException ex) {
             // use current thread to flush the data if ThreadPool is shutdown
             synchronized (this) {

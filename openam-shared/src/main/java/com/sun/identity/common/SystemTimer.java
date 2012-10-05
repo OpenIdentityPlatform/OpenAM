@@ -26,6 +26,9 @@
  *
  */
 
+/*
+ * Portions Copyrighted 2012 ForgeRock Inc
+ */
 package com.sun.identity.common;
 
 import com.sun.identity.shared.debug.Debug;
@@ -38,7 +41,6 @@ public class SystemTimer {
     
 
     protected static TimerPool instance;
-    protected static Debug debug;
     
     /**
      * Create and return the system timer.
@@ -46,14 +48,16 @@ public class SystemTimer {
     
     public static synchronized TimerPool getTimer() {
         if (instance == null) {
-            debug = Debug.getInstance("SystemTimer");
             ShutdownManager shutdownMan = ShutdownManager.getInstance();
             if (shutdownMan.acquireValidLock()) {
                 try {
-                    instance = new TimerPool("SystemTimer", 1, false, debug);
+                    // Don't load the Debug object in static block as it can
+                    // cause issues when doing a container restart.
+                    instance = new TimerPool("SystemTimer", 1, false, Debug.getInstance("SystemTimer"));
                     shutdownMan.addShutdownListener(new ShutdownListener() {
                         public void shutdown() {
                             instance.shutdown();
+                            instance = null;
                         }
                     });
                 } finally {
@@ -63,5 +67,4 @@ public class SystemTimer {
         }
         return instance;
     }
-    
 }

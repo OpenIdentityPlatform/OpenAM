@@ -27,7 +27,7 @@
  */
 
 /*
- * Portions Copyrighted 2011 ForgeRock AS
+ * Portions Copyrighted 2011-2012 ForgeRock Inc
  */
 package com.sun.identity.log.handlers;
 
@@ -98,7 +98,6 @@ public class DBHandler extends Handler {
     private String oraDataType;
     private String mysqlDataType;
     private int dbFieldMax = 0;
-    private static LoggingThread threadPool = LoggingThread.getInstance();
 
     private void configure() throws NullLocationException,
         FormatterInitException
@@ -495,7 +494,8 @@ public class DBHandler extends Handler {
 
         LogTask task = new LogTask(tempBuffer);
         try {
-            threadPool.run(task);
+            // Get an instance as required otherwise it can cause issues on container restart.
+            LoggingThread.getInstance().run(task);
         } catch (ThreadPoolException ex) {
             // use current thread to flush the data if ThreadPool is shutdown
             synchronized (this) {

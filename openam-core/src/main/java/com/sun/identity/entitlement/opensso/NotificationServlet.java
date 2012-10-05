@@ -25,6 +25,9 @@
  * $Id: NotificationServlet.java,v 1.2 2010/01/20 17:01:36 veiming Exp $
  */
 
+/*
+ * Portions Copyrighted 2012 ForgeRock Inc
+ */
 package com.sun.identity.entitlement.opensso;
 
 import com.sun.identity.entitlement.ApplicationManager;
@@ -51,7 +54,6 @@ public class NotificationServlet extends HttpServlet {
     public static final String APPLICATIONS_CHANGED = "applicationsChanged";
     public static final String ATTR_REALM_NAME = "realm";
     public static final String ATTR_NAME = "name";
-    public static DataStore dataStore = DataStore.getInstance();
 
     @Override
     public void doGet(HttpServletRequest req, HttpServletResponse res)
@@ -105,12 +107,13 @@ public class NotificationServlet extends HttpServlet {
     private void handleReferralPrivilegeAdded(HttpServletRequest req) {
         String realm = req.getParameter(ATTR_REALM_NAME);
         ReferredApplicationManager.getInstance().clearCache();
-        dataStore.clearIndexCount(realm, true);
+        // Get an instance as required otherwise it can cause issues on container restart.
+        DataStore.getInstance().clearIndexCount(realm, true);
     }
 
     private void handlePrivilegeAdded(HttpServletRequest req) {
         String realm = req.getParameter(ATTR_REALM_NAME);
-        dataStore.clearIndexCount(realm, false);
+        DataStore.getInstance().clearIndexCount(realm, false);
     }
 
     private void handlePrivilegeDeleted(HttpServletRequest req) {
@@ -124,7 +127,8 @@ public class NotificationServlet extends HttpServlet {
         } catch (EntitlementException e) {
             //ignore
         }
-        dataStore.clearIndexCount(realm, false);
+        // Get an instance as required otherwise it can cause issues on container restart.
+        DataStore.getInstance().clearIndexCount(realm, false);
     }
 
     private void handleReferralPrivilegeDeleted(HttpServletRequest req) {
@@ -139,7 +143,8 @@ public class NotificationServlet extends HttpServlet {
         } catch (EntitlementException e) {
             //ignore
         }
-        dataStore.clearIndexCount(realm, true);
+        // Get an instance as required otherwise it can cause issues on container restart.
+        DataStore.getInstance().clearIndexCount(realm, true);
     }
 
     private void handleApplicationsChanged(HttpServletRequest req) {

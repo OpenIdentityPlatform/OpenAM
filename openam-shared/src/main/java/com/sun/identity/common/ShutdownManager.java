@@ -27,7 +27,7 @@
  */
 
 /*
- * Portions Copyrighted 2011 ForgeRock AS
+ * Portions Copyrighted 2011-2012 ForgeRock Inc
  */
 package com.sun.identity.common;
 
@@ -71,15 +71,12 @@ public class ShutdownManager {
             // add the trigger for stand alone application to shutdown.
             Runtime.getRuntime().addShutdownHook(new Thread(
                     new Runnable() {
-
                         public void run() {
-                            ShutdownManager shutdownMan =
-                                    ShutdownManager.getInstance();
-                            if (shutdownMan.acquireValidLock()) {
+                            if (acquireValidLock()) {
                                 try {
                                     shutdown();
                                 } finally {
-                                    shutdownMan.releaseLockAndNotify();
+                                    releaseLockAndNotify();
                                 }
                             }
                         }
@@ -198,6 +195,7 @@ public class ShutdownManager {
                 appSSOTokenDestroyer.shutdown();
                 appSSOTokenDestroyer = null;
             }
+            instance = null;
         } else {
             throw new IllegalMonitorStateException(
                 "The calling thread is not the owner of the lock!");

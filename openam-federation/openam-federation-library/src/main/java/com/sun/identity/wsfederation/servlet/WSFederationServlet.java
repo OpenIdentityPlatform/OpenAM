@@ -26,27 +26,24 @@
  *
  */
 
+/*
+ * Portions Copyrighted 2012 ForgeRock Inc
+ */
 package com.sun.identity.wsfederation.servlet;
 
-import java.io.*;
-import java.net.*;
-import java.util.*;
-
-import javax.servlet.*;
-import javax.servlet.http.*;
-
-import com.sun.identity.shared.debug.Debug;
 import com.sun.identity.wsfederation.common.WSFederationException;
 import com.sun.identity.wsfederation.common.WSFederationUtils;
-import com.sun.identity.wsfederation.logging.LogUtil;
-import java.util.logging.Level;
+import java.io.IOException;
+import javax.servlet.ServletException;
+import javax.servlet.http.HttpServlet;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 
 /**
  * Servlet endpoint for WS-Federation. All requests and responses flow through 
  * here.
  */
 public class WSFederationServlet extends HttpServlet {
-    private static Debug debug = WSFederationUtils.debug;
         
     /** Handles the HTTP <code>GET</code> method.
      * @param request servlet request
@@ -57,7 +54,6 @@ public class WSFederationServlet extends HttpServlet {
     protected void doGet(HttpServletRequest request, 
         HttpServletResponse response)
     throws ServletException, IOException {
-        String classMethod = "WSFederationServlet.doGet: ";
         
         // TODO - log request
         WSFederationAction action = 
@@ -65,18 +61,20 @@ public class WSFederationServlet extends HttpServlet {
 
         if ( action == null )
         {
-            debug.error("Can't create WSFederationAction");
-            response.sendError(response.SC_FORBIDDEN);
+            // Don't load the Debug object in static block as it can
+            // cause issues when doing a container shutdown/restart.
+            WSFederationUtils.debug.error("Can't create WSFederationAction");
+            response.sendError(HttpServletResponse.SC_FORBIDDEN);
             return;
         }
 
         try {
             action.process();
         } catch (WSFederationException wsfe ) {
-            if (debug.messageEnabled()) {
-                debug.message("WSFedServlet.doGet: Can't process action", wsfe);
+            if (WSFederationUtils.debug.messageEnabled()) {
+                WSFederationUtils.debug.message("WSFedServlet.doGet: Can't process action", wsfe);
             }
-            response.sendError(response.SC_FORBIDDEN);
+            response.sendError(HttpServletResponse.SC_FORBIDDEN);
             return;
         }
     }
@@ -90,7 +88,6 @@ public class WSFederationServlet extends HttpServlet {
     protected void doPost(HttpServletRequest request, 
         HttpServletResponse response)
     throws ServletException, IOException {
-        String classMethod = "WSFederationServlet.doGet: ";
         
         // TODO - log request
         WSFederationAction action = 
@@ -98,18 +95,18 @@ public class WSFederationServlet extends HttpServlet {
         
         if ( action == null )
         {
-            debug.error("Can't create WSFederationAction");
-            response.sendError(response.SC_FORBIDDEN);
+            WSFederationUtils.debug.error("Can't create WSFederationAction");
+            response.sendError(HttpServletResponse.SC_FORBIDDEN);
             return;
         }
 
         try {
             action.process();
         } catch (WSFederationException wsfe ) {
-            if (debug.messageEnabled()) {
-                debug.message("WSFedServlet.doPost:Can't process action", wsfe);
+            if (WSFederationUtils.debug.messageEnabled()) {
+                WSFederationUtils.debug.message("WSFedServlet.doPost:Can't process action", wsfe);
             }
-            response.sendError(response.SC_FORBIDDEN);
+            response.sendError(HttpServletResponse.SC_FORBIDDEN);
             return;
         }
     }
@@ -118,7 +115,7 @@ public class WSFederationServlet extends HttpServlet {
      * @return a short description of the servlet
      */
     public String getServletInfo() {
-        return "OpenSSO WS-Federation Servlet";
+        return "OpenAM WS-Federation Servlet";
     }
     // </editor-fold>
 }

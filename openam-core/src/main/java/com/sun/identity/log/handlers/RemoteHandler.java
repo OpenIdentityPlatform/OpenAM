@@ -27,7 +27,7 @@
  */
 
 /*
- * Portions Copyrighted [2011] [ForgeRock AS]
+ * Portions Copyrighted 2011-2012 ForgeRock Inc
  */
 package com.sun.identity.log.handlers;
 
@@ -82,7 +82,6 @@ public class RemoteHandler extends Handler {
     private boolean timeBufferingEnabled = false;
     private String logName;
     private URL logServURL;
-    private LoggingThread thread = LoggingThread.getInstance();
     
     private void configure() {
         
@@ -256,7 +255,8 @@ public class RemoteHandler extends Handler {
 
         FlushTask task = new FlushTask(reqSetMap);
         try {
-            thread.run(task);
+            // Get an instance as required otherwise it can cause issues on container restart.
+            LoggingThread.getInstance().run(task);
         } catch (ThreadPoolException ex) {
             //Use current thread to complete the task if ThreadPool can not
             //execute it.

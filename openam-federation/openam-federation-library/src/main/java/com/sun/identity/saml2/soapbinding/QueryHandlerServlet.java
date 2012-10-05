@@ -26,7 +26,9 @@
  *
  */
 
-
+/*
+ * Portions Copyrighted 2012 ForgeRock Inc
+ */
 package com.sun.identity.saml2.soapbinding;
 
 import com.sun.identity.saml2.key.KeyUtil;
@@ -59,7 +61,6 @@ import com.sun.identity.saml2.protocol.RequestAbstract;
 import com.sun.identity.saml2.protocol.Response;
 import com.sun.identity.shared.debug.Debug;
 import com.sun.identity.xacml.context.ContextFactory;
-import com.sun.identity.xacml.context.Request;
 import com.sun.identity.shared.xml.XMLUtils;
 import java.security.PrivateKey;
 import java.security.cert.X509Certificate;
@@ -79,7 +80,6 @@ public class QueryHandlerServlet extends HttpServlet {
     static final String XACML_AUTHZ_QUERY = "XACMLAuthzDecisionQuery";
     static final String METAALIAS_KEY = "/metaAlias" ;
     static Debug debug = Debug.getInstance("libSAML2");
-    static KeyProvider keyProvider = KeyUtil.getKeyProviderInstance();
 
     
     public void init() throws ServletException {
@@ -232,7 +232,10 @@ public class QueryHandlerServlet extends HttpServlet {
     static void signAssertion(String realm,String pdpEntityID,
                             Assertion assertion) throws SAML2Exception {
         String classMethod = "QueryHandlerServlet.signAssertion: ";
-        
+
+        // Don't load the KeyProvider object in static block as it can
+        // cause issues when doing a container shutdown/restart.
+        KeyProvider keyProvider = KeyUtil.getKeyProviderInstance();
         if (keyProvider == null) {
             debug.error(classMethod +
                     "Unable to get a key provider instance.");
@@ -514,6 +517,14 @@ public class QueryHandlerServlet extends HttpServlet {
                 debug.message(classMethod+ "wantResponseSigned" +
                                                 wantResponseSigned);
                 debug.message(classMethod + "Cert Alias:" + pdpSignCertAlias);
+            }
+            // Don't load the KeyProvider object in static block as it can
+            // cause issues when doing a container shutdown/restart.
+            KeyProvider keyProvider = KeyUtil.getKeyProviderInstance();
+            if (keyProvider == null) {
+                debug.error(classMethod +
+                        "Unable to get a key provider instance.");
+                throw new SAML2Exception("nullKeyProvider");
             }
             PrivateKey signingKey = keyProvider.getPrivateKey(pdpSignCertAlias);
             X509Certificate signingCert = 

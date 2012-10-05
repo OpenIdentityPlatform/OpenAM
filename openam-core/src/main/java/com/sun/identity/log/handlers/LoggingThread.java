@@ -26,7 +26,9 @@
  *
  */
 
-
+/*
+ * Portions Copyrighted 2012 ForgeRock Inc
+ */
 package com.sun.identity.log.handlers;
 
 import com.iplanet.am.util.ThreadPool;
@@ -38,27 +40,21 @@ import com.sun.identity.shared.debug.Debug;
 
 public class LoggingThread {
 
-    private static Debug loggingDebug;
-
-    static {
-        loggingDebug = Debug.getInstance("amLogging");
-    }
-
     private static LoggingThread instance = null;
-
-    private static ThreadPool thread;
-
+    private ThreadPool thread;
 
     protected LoggingThread() {
         ShutdownManager shutdownMan = ShutdownManager.getInstance();
         if (shutdownMan.acquireValidLock()) {
             try {
-                thread = new ThreadPool("LoggingThread", 1, 0, false,
-                    loggingDebug);
+                // Don't load the Debug object in static block as it can
+                // cause issues when doing a container restart.
+                thread = new ThreadPool("LoggingThread", 1, 0, false, Debug.getInstance("amLogging"));
                 shutdownMan.addShutdownListener(
                     new ShutdownListener() {
                         public void shutdown() {
                             thread.shutdown();
+                            instance = null;
                         }
                     }, ShutdownPriority.LOWEST
                 );

@@ -26,6 +26,9 @@
  *
  */
 
+/*
+ * Portions Copyrighted 2012 ForgeRock Inc
+ */
 package com.sun.identity.common;
 
 import com.sun.identity.shared.Constants;
@@ -39,12 +42,10 @@ import com.sun.identity.shared.configuration.SystemPropertiesManager;
 public class SystemTimerPool {
     
     protected static TimerPool instance;
-    protected static Debug debug;
     public static final int DEFAULT_POOL_SIZE = 3;
     private static int poolSize;
 
     static {
-        debug = Debug.getInstance("SystemTimerPool");
         poolSize = DEFAULT_POOL_SIZE;
         String size = SystemPropertiesManager.get(
             Constants.SYSTEM_TIMERPOOL_SIZE);
@@ -52,6 +53,9 @@ public class SystemTimerPool {
             try {
                 poolSize = Integer.parseInt(size);
             } catch (NumberFormatException ex) {
+                // Don't load the Debug object in static block as it can
+                // cause issues when doing a container restart.
+                Debug debug = Debug.getInstance("SystemTimerPool");
                 debug.error("SystemTimerPool.<init>: incorrect pool size "
                     + size + " defaulting to " + DEFAULT_POOL_SIZE);
             }
@@ -67,11 +71,14 @@ public class SystemTimerPool {
             ShutdownManager shutdownMan = ShutdownManager.getInstance();
             if (shutdownMan.acquireValidLock()) {
                 try {
+                    // Don't load the Debug object in static block as it can
+                    // cause issues when doing a container restart.
                     instance = new TimerPool("SystemTimerPool", 
-                        poolSize, false, debug);
+                        poolSize, false, Debug.getInstance("SystemTimerPool"));
                     shutdownMan.addShutdownListener(new ShutdownListener() {
                         public void shutdown() {
                             instance.shutdown();
+                            instance = null;
                         }
                     });
                 } finally {
