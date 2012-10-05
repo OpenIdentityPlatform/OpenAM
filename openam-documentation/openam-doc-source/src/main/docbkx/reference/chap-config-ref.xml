@@ -3243,6 +3243,15 @@
     </listitem>
    </varlistentry>
    <varlistentry>
+    <term><literal>com.sun.identity.cookie.httponly</literal></term>
+    <listitem>
+     <para>When set to <literal>true</literal>, mark cookies as
+     <literal>HTTPOnly</literal> to prevent scripts and third-party programs
+     from accessing the cookies.</para>
+     <para>Default: <literal>false</literal></para>
+    </listitem>
+   </varlistentry>
+   <varlistentry>
     <term><literal>com.sun.identity.sm.sms_object_class_name</literal></term>
     <listitem>
      <para>Default: <literal>com.sun.identity.sm.ldap.SMSEmbeddedLdapObject</literal></para>
