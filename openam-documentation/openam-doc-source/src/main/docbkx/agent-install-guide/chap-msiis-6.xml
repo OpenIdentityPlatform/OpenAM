@@ -239,7 +239,11 @@ Internet services successfully restarted</screen>
     configuration and logs directory. The agent protecting the Default Web
     Site (1) shown in the examples above has configuration and logs located
     under the directory
-    <filename>web_agents\iis6_agent\Identifier_1</filename>.</para>
+    <filename>web_agents\iis6_agent\Identifier_1</filename>.
+    The number in the path to the agent configuration reflects the IIS site ID,
+    unlike the other agents for which the number in the path is a counter.
+    The number in the path therefore remains the same when you uninstall and
+    then reinstall an agent to protect the same site.</para>
     <variablelist>
      <varlistentry>
       <term><filename>config\<?eval ${agentsBootstrapFile}?></filename></term>
