@@ -2608,6 +2608,7 @@
     <term>Password Encryption Key</term>
     <listitem>
      <para>Encryption key for decrypting stored passwords</para>
+     <para>Example: <literal>TF1Aue9c63bWTTY4mmZJeFYubJbNiSE3</literal></para>
 
      <para>property:
      <literal>am.encryption.password</literal></para>
@@ -2618,6 +2619,7 @@
     <term>Authentication Service Shared Secret</term>
     <listitem>
      <para>Shared secret for application authentication</para>
+     <para>Example: <literal>AQICQ7QMKN5TSt1fpyFZBMZ8hRwkYkkrUaFk</literal></para>
 
      <para>property:
      <literal>com.iplanet.am.service.secret</literal></para>
@@ -2628,6 +2630,8 @@
     <term>Encryption class</term>
     <listitem>
      <para>Default class used to handle encryption</para>
+     <para>Default: <literal>com.iplanet.services.util.JCEEncryption</literal></para>
+     <para></para>
 
      <para>property:
      <literal>com.iplanet.security.encryptor</literal></para>
@@ -2638,6 +2642,7 @@
     <term>Secure Random Factory Class</term>
     <listitem>
      <para>The default implementation uses pure Java, rather than JSS.</para>
+     <para>Default: <literal>com.iplanet.am.util.SecureRandomFactoryImpl</literal></para>
 
      <para>property:
      <literal>com.iplanet.security.SecureRandomFactorImpl</literal></para>
@@ -2648,6 +2653,7 @@
     <term>Platform Low Level Comm. Max. Content Length</term>
     <listitem>
      <para>Maximum content length for an HTTP request</para>
+     <para>Default: 16384</para>
 
      <para>property:
      <literal>com.iplanet.services.comm.server.pllrequest.maxContentLength</literal></para>
@@ -2659,6 +2665,7 @@
     <listitem>
      <para>If yes, then OpenAM checks client IP addresses when creating and
      validating SSO tokens.</para>
+     <para>Default: No</para>
 
      <para>property:
      <literal>com.iplanet.am.clientIPCheckEnabled</literal></para>
@@ -2670,6 +2677,7 @@
     <listitem>
      <para>Cookie name OpenAM uses to set a session handler ID during
      authentication.</para>
+     <para>Default: <literal>iPlanetDirectoryPro</literal></para>
 
      <para>property:
      <literal>com.iplanet.am.cookie.name</literal></para>
@@ -2682,6 +2690,7 @@
      <para>If yes, then OpenAM sets the cookie in secure mode such that the
      browser only returns the cookie if a secure protocol such as HTTPS is
      used.</para>
+     <para>Default: No</para>
 
      <para>property:
      <literal>com.iplanet.am.cookie.secure</literal></para>
@@ -2692,6 +2701,7 @@
     <term>Encode Cookie Value</term>
     <listitem>
      <para>If yes, then OpenAM URL encodes cookie values.</para>
+     <para>Default: No</para>
 
      <para>property:
      <literal>com.iplanet.am.cookie.encode</literal></para>
@@ -2702,6 +2712,9 @@
     <term>Keystore File</term>
     <listitem>
      <para>Path to OpenAM key store file</para>
+     <para>Default: Path to <filename>keystore.jks</filename>, located in the
+     directory that holds the OpenAM configuration.</para>
+     <para>Example: <filename>~/openam/openam/keystore.jks</filename></para>
 
      <para>property:
      <literal>com.sun.identity.saml.xmlsig.keystore</literal></para>
@@ -2712,6 +2725,9 @@
     <term>Keystore Password File</term>
     <listitem>
      <para>Path to password file for key store</para>
+     <para>Default: Path to <filename>.storepass</filename>, located in the
+     directory that holds the OpenAM configuration.</para>
+     <para>Example: <filename>~/openam/openam/.storepass</filename></para>
 
      <para>property:
      <literal>com.sun.identity.saml.xmlsig.storepass</literal></para>
@@ -2722,6 +2738,9 @@
     <term>Private Key Password File</term>
     <listitem>
      <para>Path to password file for OpenAM private key</para>
+     <para>Default: Path to <filename>.keypass</filename>, located in the
+     directory that holds the OpenAM configuration.</para>
+     <para>Example: <filename>~/openam/openam/.keypass</filename></para>
 
      <para>property:
      <literal>com.sun.identity.saml.xmlsig.keypass</literal></para>
@@ -2732,6 +2751,7 @@
     <term>Certificate Alias</term>
     <listitem>
      <para>Alias for OpenAM certificate stored in key store</para>
+     <para>Not set by default</para>
 
      <para>property:
      <literal>com.sun.identity.saml.xmlsig.certalias</literal></para>
@@ -2743,6 +2763,7 @@
     <listitem>
      <para>Directory server host name where the certificate revocation list
      (CRL) is cached</para>
+     <para>Not set by default</para>
 
      <para>property:
      <literal>com.sun.identity.crl.cache.directory.host</literal></para>
@@ -2754,6 +2775,7 @@
     <listitem>
      <para>Directory server port number where the certificate revocation list
      is cached</para>
+     <para>Not set by default</para>
 
      <para>property:
      <literal>com.sun.identity.crl.cache.directory.port</literal></para>
@@ -2765,6 +2787,7 @@
     <listitem>
      <para>If yes, then connect securely when accessing the CRL cache
      directory server</para>
+     <para>Default: No</para>
 
      <para>property:
      <literal>com.sun.identity.crl.cache.directory.ssl</literal></para>
@@ -2775,6 +2798,7 @@
     <term>CRL: LDAP server bind user name</term>
     <listitem>
      <para>Bind DN to access CRL cache directory server</para>
+     <para>Not set by default</para>
 
      <para>property:
      <literal>com.sun.identity.crl.cache.directory.user</literal></para>
@@ -2785,6 +2809,7 @@
     <term>CRL: LDAP server bind password</term>
     <listitem>
      <para>Bind password to access CRL cache directory server</para>
+     <para>Not set by default</para>
 
      <para>property:
      <literal>com.sun.identity.crl.cache.directory.password</literal></para>
@@ -2795,6 +2820,7 @@
     <term>CRL: LDAP search base DN</term>
     <listitem>
      <para>Base DN under which to search for CRL</para>
+     <para>Not set by default</para>
 
      <para>property:
      <literal>com.sun.identity.crl.cache.directory.searchlocs</literal></para>
@@ -2805,6 +2831,7 @@
     <term>CRL: Search Attributes</term>
     <listitem>
      <para>DN component of issuer's subject DN used to retrieve the CRL</para>
+     <para>Not set by default</para>
 
      <para>property:
      <literal>com.sun.identity.crl.cache.directory.searchattr</literal></para>
@@ -2816,6 +2843,7 @@
     <listitem>
      <para>If yes, then OpenAM runs Online Certificate Status Protocol (OSCP)
      checks.</para>
+     <para>Default: Yes</para>
 
      <para>property:
      <literal>com.sun.identity.authentication.ocspCheck</literal></para>
@@ -2826,6 +2854,7 @@
     <term>Responder URL</term>
     <listitem>
      <para>URL for OSCP responder</para>
+     <para>Not set by default</para>
 
      <para>property:
      <literal>com.sun.identity.authentication.ocsp.responder.url</literal></para>
@@ -2836,6 +2865,7 @@
     <term>Certificate Nickname</term>
     <listitem>
      <para>Nickname for OSCP responder certificate</para>
+     <para>Not set by default</para>
 
      <para>property:
      <literal>com.sun.identity.authentication.ocsp.responder.nickname</literal></para>
@@ -2847,6 +2877,7 @@
     <listitem>
      <para>If yes, then OpenAM runs in Federal Information Processing Standards
      mode.</para>
+     <para>Default: No</para>
 
      <para>property:
      <literal>com.sun.identity.security.fipsmode</literal></para>
