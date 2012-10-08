@@ -37,9 +37,24 @@
  
  <section xml:id="before-iis7-agent-install">
   <title>Before You Install</title>
-  
+
+  <para>Make sure OpenAM is installed, running, that you can contact OpenAM
+  from the system running the policy agent. Next, create a profile for your
+  policy agent as described in the <citetitle>Administration Guide</citetitle>
+  section on <link xlink:href="admin-guide#create-agent-profiles"
+  xlink:role="http://docbook.org/xlink/role/olink"><citetitle>Creating Agent
+  Profiles</citetitle></link>. To protect resources with the agent also create
+  at least one policy as described in the section on <link
+  xlink:href="admin-guide#configure-authz-policy"
+  xlink:role="http://docbook.org/xlink/role/olink"><citetitle>Configuring
+  Policies</citetitle></link>. Consider creating a simple policy, such as a
+  policy that allows only authenticated users to access your resources, in order
+  to test your policy agent after installation.</para>
+
   <para>You must install Microsoft IIS 7 before you install the policy agent,
-  and make sure that IIS 7 allows anonymous authentication. Furthermore, you
+  and make sure that IIS 7 allows anonymous authentication. Make sure that IIS
+  7 listens on the URL used during the web policy agent installation, such as
+  <literal>http://windows7.example.com:80/</literal>. Furthermore, you
   must reset IIS 7 after installing the policy agent.</para>
   
   <para>Download the IIS 7 policy agent for 32 or 64-bit Windows from the
@@ -215,6 +230,8 @@ Creating the Agent Config Directory
 Creating the <?eval ${agentsBootstrapFile}?> and
  <?eval ${agentsConfigurationFile}?> File
 Updating the Windows Product Registry
+Installing policy web agent module in IIS (status: 0)
+Adding policy web agent module to "Default Web Site" (status: 0)
 Completed Configuring the IIS 7.0 Agent</screen>
    </step>
    <step>
@@ -285,6 +302,14 @@ Internet services successfully restarted</screen>
        Find com.sun.identity.agents.config.organization.name and change
        the / to the path to your policy agent profile. This allows the policy agent
        to properly identify itself to the OpenAM server. </para>
+    </step>
+    <step performance="optional">
+     <para>If you have a policy configured, you can test your policy agent.
+     For example, try to browse to a resource that your policy agent protects.
+     You should be redirected to OpenAM to authenticate, for example as user
+     <literal>demo</literal>, password <literal>changeit</literal>. After
+     you authenticate, OpenAM then redirects you back to the resource you tried
+     to access.</para>
     </step>
   </procedure>
  </section>

@@ -38,6 +38,19 @@
  <section xml:id="before-sjsws-agent-install">
   <title>Before You Install</title>
   
+  <para>Make sure OpenAM is installed, running, that you can contact OpenAM
+  from the system running the policy agent. Next, create a profile for your
+  policy agent as described in the <citetitle>Administration Guide</citetitle>
+  section on <link xlink:href="admin-guide#create-agent-profiles"
+  xlink:role="http://docbook.org/xlink/role/olink"><citetitle>Creating Agent
+  Profiles</citetitle></link>. To protect resources with the agent also create
+  at least one policy as described in the section on <link
+  xlink:href="admin-guide#configure-authz-policy"
+  xlink:role="http://docbook.org/xlink/role/olink"><citetitle>Configuring
+  Policies</citetitle></link>. Consider creating a simple policy, such as a
+  policy that allows only authenticated users to access your resources, in order
+  to test your policy agent after installation.</para>
+
   <para>You must install Apache HTTP Server before you install the policy
   agent, and you must stop the server during installation.</para>
   
