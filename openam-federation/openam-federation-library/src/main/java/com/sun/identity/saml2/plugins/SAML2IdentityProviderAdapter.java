@@ -1,7 +1,7 @@
 /**
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright (c) 2010 ForgeRock AS. All Rights Reserved.
+ * Copyright (c) 2010-2012 ForgeRock Inc. All Rights Reserved.
  *
  * The contents of this file are subject to the terms
  * of the Common Development and Distribution License
@@ -27,6 +27,7 @@ package com.sun.identity.saml2.plugins;
 
 import com.sun.identity.saml2.common.SAML2Exception;
 import com.sun.identity.saml2.protocol.AuthnRequest;
+
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
@@ -35,29 +36,111 @@ import javax.servlet.http.HttpServletResponse;
  * specific tasks in the IdP
  *
  * @supported.all.api
- */ 
+ */
 public interface SAML2IdentityProviderAdapter {
 
     /**
-     * This method is invoked immediately before sending the SAML2 Response
+     * Initializes the federation adapter, this method will only be executed
+     * once after creation of the adapter instance.
+     *
+     * @param hostedEntityID entity ID for the hosted IDP
+     * @param realm realm of the hosted IDP
+     */
+    public void initialize(String hostedEntityID, String realm);
+
+    /**
+     * Invokes when OpenAM receives the authentication request for the first time
+     * from the SP, and is called before any processing started on the IDP side.
+     * If the authentication request is subsequently cached and retrieved, this method will not be called again.
+     * This method is not triggered in the case of IDP initiated SSO or a proxied request.
+     *
+     * @param hostedEntityID entity ID for the hosted IDP
+     * @param realm realm of the hosted IDP
+     * @param request servlet request
+     * @param response servlet response
+     * @param authnRequest the original authentication request sent from SP
+     * @param reqID the id to use for continuation of processing if the adapter redirects
+     * @return true if browser redirection is happening after processing, false otherwise. Default to false.
+     * @throws SAML2Exception for any exceptions occurring in the adapter. The federation process will continue.
+     */
+    public boolean preSingleSignOn(
+            String hostedEntityID,
+            String realm,
+            HttpServletRequest request,
+            HttpServletResponse response,
+            AuthnRequest authnRequest,
+            String reqID)
+            throws SAML2Exception;
+
+    /**
+     * Invokes when OpenAM has received the authn request, processed it, and is ready to redirect to authentication.
+     * This occurs when redirecting to authentication where there is no session, or during session upgrade.
+     * This method is not triggered in the case of IDP initiated SSO or a proxied request.
+     *
+     * @param hostedEntityID entity ID for the hosted IDP
+     * @param realm realm of the hosted IDP
+     * @param request servlet request
+     * @param response servlet response
+     * @param authnRequest the original authentication request sent from SP
+     * @param session the user session or null if the user has no session
+     * @param reqID the id to use for continuation of processing if the adapter redirects
+     * @param relayState the relayState that will be used in the redirect
+     * @return true if browser redirection is happening after processing, false otherwise. Default to false.
+     * @throws SAML2Exception for any exceptions occurring in the adapter. The federation process will continue.
+     */
+    public boolean preAuthentication(
+            String hostedEntityID,
+            String realm,
+            HttpServletRequest request,
+            HttpServletResponse response,
+            AuthnRequest authnRequest,
+            Object session,
+            String reqID,
+            String relayState)
+            throws SAML2Exception;
+
+    /**
+     * This method is invoked immediately before sending a non-error SAML2 Response.
+     * Called after successful authentication (including session upgrade) or if a valid session already exists.
+     * This method is not triggered in the case of a proxied request.
      *
      * @param authnRequest original authnrequest
      * @param hostProviderID hosted providerID.
-     * @param realm Realm
+     * @param realm realm of the hosted IDP
      * @param request HttpServletRequest
      * @param response HttpServletResponse
-     * @return true if browser redirection happened after processing,
-     *     false otherwise. Default to false.
-     * @exception SAML2Exception if error occurs. 
+     * @param session the user session or null if the user has no session
+     * @param reqID the id to use for continuation of processing if the adapter redirects
+     * @param relayState the relayState that will be used in the redirect
+     * @return true if browser redirection happened after processing, false otherwise. Default to false.
+     * @throws SAML2Exception if error occurs. The federation process will continue.
      */
-    public boolean preSendResponse (
-          AuthnRequest authnRequest, 
-          String hostProviderID,
-          String realm, 
-          HttpServletRequest request,
-          HttpServletResponse response,
-          Object Session,
-          String reqID,
-          String relayState
-    ) throws SAML2Exception;
+    public boolean preSendResponse(
+            AuthnRequest authnRequest,
+            String hostProviderID,
+            String realm,
+            HttpServletRequest request,
+            HttpServletResponse response,
+            Object session,
+            String reqID,
+            String relayState)
+            throws SAML2Exception;
+
+    /**
+     * Called before a SAML error message is returned.
+     * This method is not triggered during IDP initiated SSO.
+     *
+     * @param request        HttpServletRequest
+     * @param response       HttpServletResponse
+     * @param faultCode      the fault code that will be returned in the SAML response
+     * @param faultDetail    the fault detail that will be returned in the SAML response
+     * @throws SAML2Exception if error occurs. The federation process will continue.
+     */
+    public void preSendFailureResponse(
+            HttpServletRequest request,
+            HttpServletResponse response,
+            String faultCode,
+            String faultDetail)
+            throws SAML2Exception;
+
 }

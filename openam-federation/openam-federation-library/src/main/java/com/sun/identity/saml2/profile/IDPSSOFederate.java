@@ -22,12 +22,10 @@
  * your own identifying information:
  * "Portions Copyrighted [year] [name of copyright owner]"
  *
- * $Id: IDPSSOFederate.java,v 1.27 2009/10/14 23:59:09 exu Exp $
- *
  */
 
  /*
- * Portions Copyrighted 2010-2011 ForgeRock AS
+ * Portions Copyrighted 2010-2012 ForgeRock, Inc
  */
 
 package com.sun.identity.saml2.profile;
@@ -74,7 +72,6 @@ import java.util.Set;
 import java.util.Map;
 import java.util.HashMap;
 import java.util.List;
-import java.util.logging.Logger;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.xml.soap.MimeHeaders;
@@ -180,7 +177,7 @@ public class IDPSSOFederate {
                         sendError(request, response, 
                             SAML2Constants.SERVER_FAULT,
                             "UnableToRedirectToPreferredIDP",
-                            re.getMessage(), isFromECP);
+                            re.getMessage(), isFromECP, null);
                         return;
                    }
                } 
@@ -198,7 +195,7 @@ public class IDPSSOFederate {
                         "unable to get IDP meta alias from request.");
                 }
                 sendError(request, response, SAML2Constants.CLIENT_FAULT,
-                    "IDPMetaAliasNotFound", null, isFromECP);
+                    "IDPMetaAliasNotFound", null, isFromECP, null);
                 return;
             }
       
@@ -210,7 +207,7 @@ public class IDPSSOFederate {
                     SAML2Utils.debug.error(classMethod +
                         "Unable to get meta manager.");
                     sendError(request, response, SAML2Constants.SERVER_FAULT,
-                        "errorMetaManager", null, isFromECP);
+                        "errorMetaManager", null, isFromECP, null);
                     return;
                 }
                 idpEntityID = IDPSSOUtil.metaManager.getEntityByMetaAlias(
@@ -222,7 +219,7 @@ public class IDPSSOFederate {
                     String[] data = { idpEntityID };
                     LogUtil.error(Level.INFO, LogUtil.INVALID_IDP, data, null);
                     sendError(request, response, SAML2Constants.CLIENT_FAULT,
-                        "nullIDPEntityID", null, isFromECP);
+                        "nullIDPEntityID", null, isFromECP, null);
                     return;
                 }
                 realm = SAML2MetaUtils.getRealmByMetaAlias(idpMetaAlias);
@@ -241,7 +238,7 @@ public class IDPSSOFederate {
                     LogUtil.error(
                         Level.INFO, LogUtil.BINDING_NOT_SUPPORTED, data, null);
                     sendError(request, response, SAML2Constants.CLIENT_FAULT,
-                        "unsupportedBinding", null, isFromECP);
+                        "unsupportedBinding", null, isFromECP, null);
                     return;
                 }
             } catch (SAML2MetaException sme) {
@@ -251,8 +248,20 @@ public class IDPSSOFederate {
                 LogUtil.error(Level.INFO, LogUtil.IDP_METADATA_ERROR, data,
                     null);
                 sendError(request, response, SAML2Constants.SERVER_FAULT,
-                    "nullIDPEntityID", sme.getMessage(), isFromECP);
+                    "nullIDPEntityID", sme.getMessage(), isFromECP, null);
                 return;
+            }
+
+            // Get the IDP adapter
+            SAML2IdentityProviderAdapter idpAdapter = null;
+            if (realm != null && idpEntityID != null) {
+                try {
+                    idpAdapter = IDPSSOUtil.getIDPAdapterClass(realm, idpEntityID);
+                } catch (SAML2Exception se2) {
+                    SAML2Utils.debug.error(classMethod + " There was a problem instantiating the IDP Adapter: ", se2);
+                }
+            } else {
+                SAML2Utils.debug.error(classMethod + " Unable to find IDP Adapter, no realm/entity ID");
             }
 
             // get the request id query parameter from the request. If this
@@ -276,7 +285,7 @@ public class IDPSSOFederate {
                 authnReq = getAuthnRequest(request, isFromECP, binding);
                 if (authnReq == null) {
                     sendError(request, response, SAML2Constants.CLIENT_FAULT,
-                        "InvalidSAMLRequest", null, isFromECP);
+                        "InvalidSAMLRequest", null, isFromECP, idpAdapter);
                     return;
                 }
 
@@ -292,7 +301,7 @@ public class IDPSSOFederate {
                 } catch (SAML2Exception saml2ex) {
                     SAML2Utils.debug.error(classMethod, saml2ex);
                     sendError(request, response, SAML2Constants.CLIENT_FAULT,
-                        "InvalidSAMLRequest", saml2ex.getMessage(), isFromECP);
+                        "InvalidSAMLRequest", saml2ex.getMessage(), isFromECP, idpAdapter);
                     return;
                 }
 
@@ -303,7 +312,7 @@ public class IDPSSOFederate {
                             "Issuer in Request is not valid.");
                     }
                     sendError(request, response, SAML2Constants.CLIENT_FAULT,
-                        "InvalidSAMLRequest", null, isFromECP);
+                        "InvalidSAMLRequest", null, isFromECP, idpAdapter);
                     return;
                 }
  
@@ -320,7 +329,7 @@ public class IDPSSOFederate {
                     SAML2Utils.debug.error(classMethod +
                         "Unable to get IDP SSO Descriptor from meta.");
                     sendError(request, response, SAML2Constants.SERVER_FAULT,
-                        "metaDataError", null, isFromECP);
+                        "metaDataError", null, isFromECP, idpAdapter);
                     return;
                 } 
                 try {
@@ -337,7 +346,7 @@ public class IDPSSOFederate {
                         (spEntityID.trim().length() == 0)) {
                         sendError(request, response, 
                             SAML2Constants.CLIENT_FAULT,
-                            "InvalidSAMLRequest", null, isFromECP);
+                            "InvalidSAMLRequest", null, isFromECP, idpAdapter);
                         return;
                     }
                 
@@ -346,7 +355,7 @@ public class IDPSSOFederate {
                             "Unable to get SP SSO Descriptor from meta.");
                         sendError(request, response, 
                             SAML2Constants.SERVER_FAULT,
-                            "metaDataError", null, isFromECP);
+                            "metaDataError", null, isFromECP, idpAdapter);
                         return;
                     }
                     X509Certificate spCert = KeyUtil.getVerificationCert(
@@ -372,7 +381,7 @@ public class IDPSSOFederate {
                                 "authn request verification failed.");
                             sendError(request, response, 
                                 SAML2Constants.CLIENT_FAULT,
-                                "invalidSignInRequest", null, isFromECP);
+                                "invalidSignInRequest", null, isFromECP, idpAdapter);
                             return;
                         }
 
@@ -390,7 +399,7 @@ public class IDPSSOFederate {
                                     "request destination verification failed.");
                                 sendError(request, response, 
                                     SAML2Constants.CLIENT_FAULT,
-                                    "invalidDestination", null, isFromECP);
+                                    "invalidDestination", null, isFromECP, idpAdapter);
                                 return;
                             }
                         }
@@ -399,7 +408,7 @@ public class IDPSSOFederate {
                             "authn request verification failed.", se);
                         sendError(request, response, 
                             SAML2Constants.CLIENT_FAULT,
-                            "invalidSignInRequest", null, isFromECP);
+                            "invalidSignInRequest", null, isFromECP, idpAdapter);
                         return;
                     } 
                 
@@ -417,7 +426,7 @@ public class IDPSSOFederate {
                 if (reqID == null) {
                     SAML2Utils.debug.error(classMethod + "Request id is null");
                     sendError(request, response, SAML2Constants.CLIENT_FAULT,
-                        "InvalidSAMLRequestID", null, isFromECP);
+                        "InvalidSAMLRequestID", null, isFromECP, idpAdapter);
                     return;
                 }
 
@@ -448,6 +457,22 @@ public class IDPSSOFederate {
                     }
                 }
 
+                // preSingleSignOn adapter hook
+                // NB: This method is not called in IDPSSOUtil.doSSOFederate(...) so proxy requests or idp init sso
+                // will not trigger this adapter call
+                try {
+                    if (idpAdapter != null) {
+                        SAML2Utils.debug.message("Invoking the IDP Adapter preSingleSignOn hook");
+                        // If the preSingleSignOnProcess returns true we end here
+                        if (idpAdapter.preSingleSignOn(idpEntityID, realm, request, response, authnReq, reqID)) {
+                            return;
+                        }  // else we continue with the logic. Beware of loops
+                    }
+                } catch (SAML2Exception se2) {
+                    SAML2Utils.debug.error("Error invoking the IDP Adapter", se2);
+                }
+                // End of adapter invocation
+
                 IDPAuthnContextMapper idpAuthnContextMapper = null;
                 try {
                     idpAuthnContextMapper =
@@ -459,7 +484,7 @@ public class IDPSSOFederate {
                     SAML2Utils.debug.error(classMethod +
                         "Unable to get IDPAuthnContextMapper from meta.");
                     sendError(request, response, SAML2Constants.SERVER_FAULT,
-                        "metaDataError", null, isFromECP);
+                        "metaDataError", null, isFromECP, idpAdapter);
                     return;
                 } 
 
@@ -492,15 +517,14 @@ public class IDPSSOFederate {
                         SAML2Utils.debug.error(classMethod, sme);
                         sendError(request, response, 
                             SAML2Constants.SERVER_FAULT,
-                            "metaDataError", null, isFromECP);
+                            "metaDataError", null, isFromECP, idpAdapter);
                     }
                     return;
                 }
 
                 // get the relay state query parameter from the request
                 relayState = request.getParameter(SAML2Constants.RELAY_STATE);
-                AuthnContext matchingAuthnContext =
-                    idpAuthnContextInfo.getAuthnContext();
+                AuthnContext matchingAuthnContext = idpAuthnContextInfo.getAuthnContext();
     
                 if (session == null) {
                     // the user has not logged in yet, redirect to auth
@@ -575,9 +599,24 @@ public class IDPSSOFederate {
                         sendError(request, response, 
                             SAML2Constants.SERVER_FAULT,
                             "UnableToRedirectToPreferredIDP", re.getMessage(),
-                            isFromECP);
+                            isFromECP, idpAdapter);
                     }
-   
+
+                    // preAuthentication adapter hook
+                    try {
+                        if (idpAdapter != null) {
+                            SAML2Utils.debug.message("Invoking the IDP Adapter preAuthentication hook");
+                            // If preAuthentication returns true we end here
+                            if (idpAdapter.preAuthentication(idpEntityID, realm, request, response, authnReq, null,
+                                    reqID, relayState)) {
+                                return;
+                            }  // else continue - beware of loops
+                        }
+                    } catch (SAML2Exception se2) {
+                        SAML2Utils.debug.error("Error invoking the IDP Adapter", se2);
+                    }
+                    // End of adapter invocation
+
                     // redirect to the authentication service
                     try {
                         if (!Boolean.TRUE.equals(authnReq.isPassive())) {
@@ -600,7 +639,7 @@ public class IDPSSOFederate {
                                 SAML2Utils.debug.error(classMethod, sme);
                                 sendError(request, response,
                                         SAML2Constants.SERVER_FAULT,
-                                        "metaDataError", null, isFromECP);
+                                        "metaDataError", null, isFromECP, idpAdapter);
                             }
                         }
                     } catch (IOException ioe) {
@@ -609,14 +648,14 @@ public class IDPSSOFederate {
                         sendError(request, response, 
                             SAML2Constants.SERVER_FAULT,
                             "UnableToRedirectToAuth", ioe.getMessage(),
-                            isFromECP);
+                            isFromECP, idpAdapter);
                     } catch (SAML2Exception se) {
                         SAML2Utils.debug.error(classMethod +
                             "Unable to redirect to authentication.", se);
                         sendError(request, response, 
                             SAML2Constants.SERVER_FAULT,
                             "UnableToRedirectToAuth", se.getMessage(),
-                            isFromECP);
+                            isFromECP, idpAdapter);
                     } 
                     return;
                 } else {
@@ -677,78 +716,73 @@ public class IDPSSOFederate {
                         //IDP Proxy: Initiate proxying when session upgrade is requested
                         // Session upgrade could be requested by asking a greater AuthnContext
                         if (isValidSessionInRealm) {
-                        try {
-                            boolean isProxy = IDPProxyUtil.isIDPProxyEnabled(
-                                    authnReq, realm);
-                            if (isProxy) {
-                                preferredIDP = IDPProxyUtil.getPreferredIDP(
-                                        authnReq, idpEntityID, realm, request,
-                                        response);
-                                if (preferredIDP != null) {
-                                    if ((SPCache.reqParamHash != null)
-                                            && (!(SPCache.reqParamHash.containsKey(preferredIDP)))) {
-                                        // IDP Proxy with configured proxy list
-                                        if (SAML2Utils.debug.messageEnabled()) {
-                                            SAML2Utils.debug.message(classMethod
-                                                    + "IDP to be proxied" + preferredIDP);
+                            try {
+                                boolean isProxy = IDPProxyUtil.isIDPProxyEnabled(
+                                        authnReq, realm);
+                                if (isProxy) {
+                                    preferredIDP = IDPProxyUtil.getPreferredIDP(
+                                            authnReq, idpEntityID, realm, request,
+                                            response);
+                                    if (preferredIDP != null) {
+                                        if ((SPCache.reqParamHash != null)
+                                                && (!(SPCache.reqParamHash.containsKey(preferredIDP)))) {
+                                            // IDP Proxy with configured proxy list
+                                            if (SAML2Utils.debug.messageEnabled()) {
+                                                SAML2Utils.debug.message(classMethod
+                                                        + "IDP to be proxied" + preferredIDP);
+                                            }
+                                            IDPProxyUtil.sendProxyAuthnRequest(
+                                                    authnReq, preferredIDP, spSSODescriptor,
+                                                    idpEntityID, request, response, realm,
+                                                    relayState, binding);
+                                            return;
+                                        } else {
+                                            // IDP proxy with introduction cookie
+                                            paramsMap = (Map) SPCache.reqParamHash.get(preferredIDP);
+                                            paramsMap.put("authnReq", authnReq);
+                                            paramsMap.put("spSSODescriptor",
+                                                    spSSODescriptor);
+                                            paramsMap.put("idpEntityID", idpEntityID);
+                                            paramsMap.put("realm", realm);
+                                            paramsMap.put("relayState", relayState);
+                                            paramsMap.put("binding", binding);
+                                            SPCache.reqParamHash.put(preferredIDP,
+                                                    paramsMap);
+                                            return;
                                         }
-                                        IDPProxyUtil.sendProxyAuthnRequest(
-                                                authnReq, preferredIDP, spSSODescriptor,
-                                                idpEntityID, request, response, realm,
-                                                relayState, binding);
-                                        return;
-                                    } else {
-                                        // IDP proxy with introduction cookie
-                                        paramsMap = (Map) SPCache.reqParamHash.get(preferredIDP);
-                                        paramsMap.put("authnReq", authnReq);
-                                        paramsMap.put("spSSODescriptor",
-                                                spSSODescriptor);
-                                        paramsMap.put("idpEntityID", idpEntityID);
-                                        paramsMap.put("realm", realm);
-                                        paramsMap.put("relayState", relayState);
-                                        paramsMap.put("binding", binding);
-                                        SPCache.reqParamHash.put(preferredIDP,
-                                                paramsMap);
-                                        return;
                                     }
                                 }
+                                //else continue for the local authentication.
+                            } catch (SAML2Exception re) {
+                                if (SAML2Utils.debug.messageEnabled()) {
+                                    SAML2Utils.debug.message(classMethod
+                                            + "Redirecting for the proxy handling error: "
+                                            + re.getMessage());
+                                }
+                                sendError(request, response,
+                                        SAML2Constants.SERVER_FAULT,
+                                        "UnableToRedirectToPreferredIDP", re.getMessage(),
+                                        isFromECP, idpAdapter);
                             }
-                            //else continue for the local authentication.
-                        } catch (SAML2Exception re) {
-                            if (SAML2Utils.debug.messageEnabled()) {
-                                SAML2Utils.debug.message(classMethod
-                                        + "Redirecting for the proxy handling error: "
-                                        + re.getMessage());
-                            }
-                            sendError(request, response,
-                                    SAML2Constants.SERVER_FAULT,
-                                    "UnableToRedirectToPreferredIDP", re.getMessage(),
-                                    isFromECP);
-                        }
-                        // End of IDP Proxy: Initiate proxying when session upgrade is requested
+                            // End of IDP Proxy: Initiate proxying when session upgrade is requested
 
-                        // Invoke the IDP Adapter when a session upgrade has been requested
+                        }
+
+                        // Invoke the IDP Adapter before redirecting to authn
                         try {
-                            SAML2Utils.debug.message(classMethod + " Invoking the " +
-                                    "IDP Adapter after session upgrade requested");
-                            // Get the IDP Adapter
-                            SAML2IdentityProviderAdapter idpAdapter =
-                                    IDPSSOUtil.getIDPAdapterClass(realm, idpEntityID);
+                            SAML2Utils.debug.message("Invoking IDP Adapter preAuthentication hook");
                             if (idpAdapter != null) {
-                                // If the preSendResponse method returns true we end here
-                                if (idpAdapter.preSendResponse(authnReq, idpEntityID,
-                                        realm, request, response, session, reqID, relayState)) {
+                                // If the preAuthentication method returns true we end here
+                                if (idpAdapter.preAuthentication(idpEntityID, realm, request, response,
+                                        authnReq, session, reqID, relayState)) {
                                     return;
-                                }  // else we continue with the logic. Beware of loops
+                                }  // else continue - beware of loops
                             }
                         } catch (SAML2Exception se2) {
-                            SAML2Utils.debug.error(classMethod + " There was a problem when invoking"
-                                    + "the preSendResponse of the IDP Adapter " +
-                                    "during the session upgrade request: ", se2);
+                            SAML2Utils.debug.error("Error invoking the IDP Adapter", se2);
                         }
                         // End of block for IDP Adapter invocation
-                        }
-                        
+
                         try {
                             if (!Boolean.TRUE.equals(authnReq.isPassive())) {
                                 redirectAuthentication(request, response, reqID,
@@ -771,7 +805,7 @@ public class IDPSSOFederate {
                                     SAML2Utils.debug.error(classMethod, sme);
                                     sendError(request, response,
                                             SAML2Constants.SERVER_FAULT,
-                                            "metaDataError", null, isFromECP);
+                                            "metaDataError", null, isFromECP, idpAdapter);
                                 }
                             }
                         } catch (IOException ioe) {
@@ -782,7 +816,7 @@ public class IDPSSOFederate {
                             sendError(request, response, 
                                 SAML2Constants.SERVER_FAULT,
                                 "UnableToRedirectToAuth", ioe.getMessage(),
-                                isFromECP);
+                                isFromECP, idpAdapter);
                         } catch (SAML2Exception se) {
                             SAML2Utils.debug.error(classMethod +
                                 "Unable to redirect to authentication.", se);
@@ -791,7 +825,7 @@ public class IDPSSOFederate {
                             sendError(request, response, 
                                 SAML2Constants.SERVER_FAULT,
                                 "UnableToRedirectToAuth", se.getMessage(),
-                                isFromECP);
+                                isFromECP, idpAdapter);
                         }
                     } 
                     // comes here if either no session upgrade or error
@@ -822,21 +856,16 @@ public class IDPSSOFederate {
                         }
 
                         try {
-                            SAML2Utils.debug.message(classMethod + " Invoking the " +
-                                    "IDP Adapter after NO session upgrade requested");
-                            SAML2IdentityProviderAdapter idpAdapter =
-                                    IDPSSOUtil.getIDPAdapterClass(realm, idpEntityID);
+                            SAML2Utils.debug.message("Invoking the IDP Adapter preSendResponse");
                             if (idpAdapter != null) {
                                 // If the preSendResponse returns true we end here
                                 if (idpAdapter.preSendResponse(authnReq, idpEntityID,
                                         realm, request, response, session, reqID, relayState)) {
                                     return;
-                                }  // else we continue with the logic. Beware of loops
+                                }  // else continue - beware of loops
                             }
                         } catch (SAML2Exception se2) {
-                            SAML2Utils.debug.error(classMethod + " There was a problem when invoking"
-                                    + "the preSendResponse of the IDP Adapter " +
-                                    "during the session upgrade request: ", se2);
+                            SAML2Utils.debug.error("Error invoking the IDP Adapter", se2);
                         }
                         // preSendResponse IDP adapter invocation ended
 
@@ -857,7 +886,7 @@ public class IDPSSOFederate {
                             sendError(request, response, 
                                 SAML2Constants.SERVER_FAULT,
                                 "UnableToDOSSOOrFederation", se.getMessage(),
-                                isFromECP);
+                                isFromECP, idpAdapter);
                         }
                     }
                 }
@@ -884,8 +913,7 @@ public class IDPSSOFederate {
                 relayState =(String)IDPCache.relayStateCache.get(reqID);
                 
                 // Let's verify if the session belongs to the proper realm
-                boolean isValidSessionInRealm = isValidSessionInRealm(
-                        realm, session);
+                boolean isValidSessionInRealm = isValidSessionInRealm(realm, session);
                 if (!isValidSessionInRealm) {
                     SAML2Utils.debug.error(classMethod + "The realm of the session"
                             + " does not correspond to that of the IdP");
@@ -906,27 +934,22 @@ public class IDPSSOFederate {
                     sendError(request, response, 
                                 SAML2Constants.CLIENT_FAULT,
                                 "UnableToDOSSOOrFederation", null,
-                                isFromECP);
+                                isFromECP, idpAdapter);
                     return;
                 }
 
                 // Invoke the IDP Adapter after the user has been authenticated
                 try {
-                        SAML2Utils.debug.message(classMethod + " Invoking the " +
-                                    "IDP Adapter after the user has been authenticated");
-                        SAML2IdentityProviderAdapter idpAdapter =
-                                IDPSSOUtil.getIDPAdapterClass(realm, idpEntityID);
+                        SAML2Utils.debug.message("Invoking the IDP Adapter preSendResponse hook");
                         if (idpAdapter != null) {
                             // Id adapter returns true we end here
                             if (idpAdapter.preSendResponse(authnReq, idpEntityID,
                                     realm, request, response, session, reqID, relayState)) {
                                 return;
-                            }  // else we continue with the logic. Beware of loops
+                            }  // else continue - beware of loops
                         }           
                 } catch (SAML2Exception se2) {
-                    SAML2Utils.debug.error(classMethod + " There was a problem when invoking"
-                                    + "the preSendResponse of the IDP Adapter " +
-                                    "after the user authenticated: ", se2);
+                    SAML2Utils.debug.error("Error invoking the IDP Adapter", se2);
                 }
                 // End of block for IDP Adapter invocation
 
@@ -951,7 +974,7 @@ public class IDPSSOFederate {
                     SAML2Utils.debug.error(classMethod +
                         "Unable to get AuthnRequest from cache.");
                     sendError(request, response, SAML2Constants.SERVER_FAULT,
-                        "UnableToGetAuthnReq", null, isFromECP);
+                        "UnableToGetAuthnReq", null, isFromECP, idpAdapter);
                     return;
                 }
                 if (SAML2Utils.debug.messageEnabled()) {
@@ -1002,11 +1025,11 @@ public class IDPSSOFederate {
                         "Unable to do sso or federation.", se);
                     sendError(request, response, SAML2Constants.SERVER_FAULT,
                         "UnableToDOSSOOrFederation", se.getMessage(),
-                        isFromECP);
+                        isFromECP, idpAdapter);
                 }
             }
         } catch (IOException ioe) {
-            SAML2Utils.debug.error(classMethod + "I/O rrror", ioe);
+            SAML2Utils.debug.error(classMethod + "I/O error", ioe);
         } catch (SessionException sso) {
             SAML2Utils.debug.error("SSOException : " , sso);
         } catch (SOAPException soapex) {
@@ -1016,7 +1039,7 @@ public class IDPSSOFederate {
 
     private static void sendError(HttpServletRequest request,
         HttpServletResponse response,
-        String faultCode, String rbKey, String detail, boolean isFromECP)
+        String faultCode, String rbKey, String detail, boolean isFromECP, SAML2IdentityProviderAdapter idpAdapter)
         throws IOException, SOAPException {
 
         if (isFromECP) {
@@ -1041,7 +1064,19 @@ public class IDPSSOFederate {
                 response.setStatus(HttpServletResponse.SC_NO_CONTENT);
             }
         } else {
-            SAMLUtils.sendError(request, response, 
+
+            // Invoke the IDP Adapter after the user has been authenticated
+            try {
+                SAML2Utils.debug.message("Invoking IDP adapter preSendFailureResponse hook");
+                if (idpAdapter != null) {
+                    idpAdapter.preSendFailureResponse(request, response, faultCode, detail);
+                }
+            } catch (SAML2Exception se2) {
+                SAML2Utils.debug.error("Error invoking the IDP Adapter", se2);
+            }
+            // End of block for IDP Adapter invocation
+
+            SAMLUtils.sendError(request, response,
                 HttpServletResponse.SC_INTERNAL_SERVER_ERROR, rbKey,
                 SAML2Utils.bundle.getString(rbKey));
         }

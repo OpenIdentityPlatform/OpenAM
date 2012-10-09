@@ -231,7 +231,6 @@ public class IDPSSOUtil {
         LogUtil.access(Level.INFO, 
             LogUtil.RECEIVED_AUTHN_REQUEST, logdata, session);
 
-
         // retrieve IDP entity id from meta alias
         String idpEntityID = null;
         String realm = null;
@@ -2945,44 +2944,9 @@ public class IDPSSOUtil {
      * @return the <code>SAML2IdenityProviderAdapter</code>
      * @exception SAML2Exception if the operation is not successful
      */
-    static SAML2IdentityProviderAdapter getIDPAdapterClass(
-                                 String realm, String idpEntityID)
+    static SAML2IdentityProviderAdapter getIDPAdapterClass(String realm, String idpEntityID)
         throws SAML2Exception {
-        String classMethod = "SAML2Utils.getIDPAdapterClass: ";
-        String idpAdapterName = null;
-        SAML2IdentityProviderAdapter idpAdapter = null;
-        try {
-            idpAdapterName = IDPSSOUtil.getAttributeValueFromIDPSSOConfig(
-                realm, idpEntityID, SAML2Constants.IDP_ADAPTER_CLASS);
-            if (idpAdapterName == null || idpAdapterName.trim().isEmpty()) {
-                idpAdapterName =
-                    SAML2Constants.DEFAULT_IDP_ADAPTER;
-                if (SAML2Utils.debug.messageEnabled()) {
-                    SAML2Utils.debug.message(classMethod + "use " +
-                    SAML2Constants.DEFAULT_IDP_ADAPTER);
-                }
-            }
-            idpAdapter = (SAML2IdentityProviderAdapter)
-                IDPCache.idpAdapterCache.get(
-                                           idpAdapterName);
-            if (idpAdapter == null) {
-                idpAdapter = (SAML2IdentityProviderAdapter)
-                    Class.forName(idpAdapterName).newInstance();
-                IDPCache.idpAdapterCache.put(
-                    idpAdapterName, idpAdapter);
-            } else {
-                if (SAML2Utils.debug.messageEnabled()) {
-                    SAML2Utils.debug.message(classMethod +
-                        "got the IDPAdapter from cache");
-                }
-            }
-        } catch (Exception ex) {
-            SAML2Utils.debug.error(classMethod +
-                "Unable to get IDP Adapter.", ex);
-            throw new SAML2Exception(ex);
-        }
-
-        return idpAdapter;
+        return SAML2Utils.getIDPAdapterClass(realm, idpEntityID);
     }
 
     /**

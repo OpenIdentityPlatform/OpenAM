@@ -1,7 +1,7 @@
 /**
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright (c) 2010 ForgeRock AS. All Rights Reserved.
+ * Copyright (c) 2010-2012 ForgeRock AS. All Rights Reserved.
  *
  * The contents of this file are subject to the terms
  * of the Common Development and Distribution License
@@ -26,17 +26,15 @@
 package com.sun.identity.saml2.plugins;
 
 import com.sun.identity.saml2.common.SAML2Exception;
-import com.sun.identity.saml2.common.SAML2Utils;
 import com.sun.identity.saml2.protocol.AuthnRequest;
+
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 /**
- * This class <code>DefaultIDPAdapter</code> implements a
- * SAML2 Identity Provider Adapter
+ * This class <code>DefaultIDPAdapter</code> implements a SAML2 Identity Provider Adapter.
  */
 public class DefaultIDPAdapter implements SAML2IdentityProviderAdapter {
-
 
     /**
      * Default Constructor.
@@ -44,7 +42,46 @@ public class DefaultIDPAdapter implements SAML2IdentityProviderAdapter {
     public DefaultIDPAdapter() {
     }
 
-    public boolean preSendResponse(AuthnRequest authnRequest,
+    /**
+     * Default implementation, takes no action.
+     */
+    public void initialize(String hostedEntityID, String realm) {
+        // Do nothing
+    }
+
+    /**
+     * Default implementation, takes no action and returns false (no interruption to processing).
+     */
+    public boolean preSingleSignOn(
+            String hostedEntityID,
+            String realm,
+            HttpServletRequest request,
+            HttpServletResponse response,
+            AuthnRequest authnRequest,
+            String reqID) throws SAML2Exception {
+        return false;
+    }
+
+    /**
+     * Default implementation, takes no action and returns false (no interruption to processing).
+     */
+    public boolean preAuthentication(
+            String hostedEntityID,
+            String realm,
+            HttpServletRequest request,
+            HttpServletResponse response,
+            AuthnRequest authnRequest,
+            Object session,
+            String reqID,
+            String relayState) throws SAML2Exception {
+        return false;
+    }
+
+    /**
+     * Default implementation, takes no action and returns false (no interruption to processing).
+     */
+    public boolean preSendResponse(
+            AuthnRequest authnRequest,
             String hostProviderID,
             String realm,
             HttpServletRequest request,
@@ -52,8 +89,17 @@ public class DefaultIDPAdapter implements SAML2IdentityProviderAdapter {
             Object session,
             String reqID,
             String relayState) throws SAML2Exception {
-        String classMethod = "DefaultIDPAdapter.preSendResponse: ";
-        SAML2Utils.debug.message(classMethod + "Entering");
         return false;
+    }
+
+    /**
+     * Default implementation, takes no action.
+     */
+    public void preSendFailureResponse(
+            HttpServletRequest request,
+            HttpServletResponse response,
+            String faultCode,
+            String faultDetail) throws SAML2Exception {
+        // Do nothing
     }
 }

@@ -22,8 +22,6 @@
  * your own identifying information:
  * "Portions Copyrighted [year] [name of copyright owner]"
  *
- * $Id: SAML2Utils.java,v 1.52 2009/11/24 21:53:02 madan_ranganath Exp $
- *
  */
 
 /*
@@ -84,6 +82,8 @@ import javax.xml.soap.SOAPException;
 import javax.xml.soap.SOAPFault;
 import javax.xml.soap.SOAPMessage;
 
+import com.sun.identity.saml2.plugins.*;
+import com.sun.identity.saml2.profile.*;
 import org.forgerock.openam.utils.IOUtils;
 import org.forgerock.openam.utils.StringUtils;
 import org.owasp.esapi.ESAPI;
@@ -134,18 +134,6 @@ import com.sun.identity.saml2.logging.LogUtil;
 import com.sun.identity.saml2.meta.SAML2MetaException;
 import com.sun.identity.saml2.meta.SAML2MetaManager;
 import com.sun.identity.saml2.meta.SAML2MetaUtils;
-import com.sun.identity.saml2.plugins.DefaultSPAuthnContextMapper;
-import com.sun.identity.saml2.plugins.FedletAdapter;
-import com.sun.identity.saml2.plugins.IDPAccountMapper;
-import com.sun.identity.saml2.plugins.SAML2IDPFinder;
-import com.sun.identity.saml2.plugins.SAML2ServiceProviderAdapter;
-import com.sun.identity.saml2.plugins.SPAccountMapper;
-import com.sun.identity.saml2.plugins.SPAuthnContextMapper;
-import com.sun.identity.saml2.profile.AuthnRequestInfo;
-import com.sun.identity.saml2.profile.AuthnRequestInfoCopy;
-import com.sun.identity.saml2.profile.CacheCleanUpScheduler;
-import com.sun.identity.saml2.profile.IDPCache;
-import com.sun.identity.saml2.profile.SPCache;
 import com.sun.identity.saml2.protocol.AuthnRequest;
 import com.sun.identity.saml2.protocol.ProtocolFactory;
 import com.sun.identity.saml2.protocol.RequestAbstract;
@@ -3103,7 +3091,56 @@ public class SAML2Utils extends SAML2SDKUtils {
         
         return idpAccountMapper;
     }
-        
+
+    /**
+     * Returns a <code>SAML2IdentityProviderAdapter</code>
+     *
+     * @param realm the realm name
+     * @param idpEntityID the entity id of the identity provider
+     *
+     * @return the <code>SAML2IdentityProviderAdapter</code>
+     * @exception SAML2Exception if the operation is not successful
+     */
+    public static SAML2IdentityProviderAdapter getIDPAdapterClass(
+            String realm, String idpEntityID)
+            throws SAML2Exception {
+        String classMethod = "SAML2Utils.getIDPAdapterClass: ";
+        String idpAdapterName = null;
+        SAML2IdentityProviderAdapter idpAdapter = null;
+        try {
+            idpAdapterName = IDPSSOUtil.getAttributeValueFromIDPSSOConfig(
+                    realm, idpEntityID, SAML2Constants.IDP_ADAPTER_CLASS);
+            if (idpAdapterName == null || idpAdapterName.trim().isEmpty()) {
+                idpAdapterName = SAML2Constants.DEFAULT_IDP_ADAPTER;
+                if (SAML2Utils.debug.messageEnabled()) {
+                    SAML2Utils.debug.message(classMethod + " uses " + SAML2Constants.DEFAULT_IDP_ADAPTER);
+                }
+            }
+
+            // Attempt to retrieve the adapter from the cache
+            idpAdapter = (SAML2IdentityProviderAdapter) IDPCache.idpAdapterCache.get(realm + "$" + idpEntityID + "$" + idpAdapterName);
+
+            if (idpAdapter == null) {
+                // NB: multiple threads may cause several adapter objects to be created
+                idpAdapter = (SAML2IdentityProviderAdapter) Class.forName(idpAdapterName).newInstance();
+                idpAdapter.initialize(idpEntityID, realm);
+
+                // Add the adapter to the cache after initialization
+                IDPCache.idpAdapterCache.put(realm + "$" + idpEntityID + "$" + idpAdapterName, idpAdapter);
+            } else {
+                if (SAML2Utils.debug.messageEnabled()) {
+                    SAML2Utils.debug.message(classMethod + " got the IDPAdapter from cache");
+                }
+            }
+        } catch (Exception ex) {
+            SAML2Utils.debug.error(classMethod + " unable to get IDP Adapter.", ex);
+            throw new SAML2Exception(ex);
+        }
+
+        return idpAdapter;
+    }
+
+
     /**
      * Returns an <code>SP</code> adapter class
      *
