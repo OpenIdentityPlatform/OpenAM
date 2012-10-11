@@ -27,9 +27,8 @@
  */
 
 /*
- * Portions Copyrighted 2010-2012 ForgeRock AS
+ * Portions Copyrighted 2010-2012 ForgeRock Inc
  */
-
 package com.sun.identity.authentication.client;
 
 import java.io.PrintWriter;
@@ -324,6 +323,10 @@ public class AuthClientUtils {
                 Constants.RETAINED_HTTP_REQUEST_HEADERS_LIST);
         String forbiddenHeaders = SystemProperties.get(
                 Constants.FORBIDDEN_TO_COPY_REQUEST_HEADERS);
+        if (utilDebug.messageEnabled()) {
+            utilDebug.message("Retained request headers: " + retainedHeaders);
+            utilDebug.message("Forbidden to copy request headers: " + forbiddenHeaders);
+        }
         if (retainedHeaders != null) {
             RETAINED_HTTP_REQUEST_HEADERS.addAll(Arrays.asList(retainedHeaders.toLowerCase().split(",")));
         }
@@ -2488,6 +2491,7 @@ public class AuthClientUtils {
 
             // Sending Output to Original Auth server...
             utilDebug.message("SENDING DATA ... ");
+            copyRequestHeaders(request, conn);
 
             if (request.getMethod().equals("GET")) {
                 conn.connect();
@@ -2512,7 +2516,6 @@ public class AuthClientUtils {
 
                 conn.setRequestProperty(
                     "Content-Type", "application/x-www-form-urlencoded");
-                copyRequestHeaders(request, conn);
                 // merged parameter list containing both GET and POST parameters
                 Map<String, String[]> params = request.getParameterMap();
                 Map<String, Set<String>> postParams = new HashMap<String, Set<String>>();
@@ -2638,6 +2641,7 @@ public class AuthClientUtils {
     }
 
     private static void copyRequestHeaders(HttpServletRequest request, HttpURLConnection conn) {
+        utilDebug.message("AuthClientUtils.copyRequestHeaders: starting to copy request headers");
         Enumeration<String> headerNames = request.getHeaderNames();
         while (headerNames.hasMoreElements()) {
             String headerName = headerNames.nextElement();
