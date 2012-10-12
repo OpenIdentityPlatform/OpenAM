@@ -50,8 +50,8 @@ import javax.lang.model.element.TypeElement;
  * for the ssoadm command.
  *
  * Annotations specifying ssoadm subcommand info are provided by two files:
- * trunk/opensso/products/amserver/source/com/sun/identity/cli/definition/AccessManager.java
- * trunk/opensso/products/federation/openfm/source/com/sun/identity/federation/cli/definition/FederationManager.java
+ * openam-core/src/main/java/com/sun/identity/cli/definition/AccessManager.java
+ * openam-federation/OpenFM/src/main/java/com/sun/identity/federation/cli/definition/FederationManager.java
  *
  * The ssoadm &lt;refentry&gt; incorporates a sorted list of subcommands and
  * their options.
