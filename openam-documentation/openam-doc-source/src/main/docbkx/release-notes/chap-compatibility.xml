@@ -164,7 +164,7 @@
   <title>Removed Functionality</title>
   
   <para>With the implementation of OAuth 2.0 in OpenAM release 10.1.0, OAuth 1.0 is 
-  no longer supported. OAuth 1.0 was originally released in OpenAM 9. 
+  no longer supported. OAuth 1.0 was originally released in OpenAM 9.</para> 
   
   <para>OpenAM <?eval ${serverDocTargetVersion}?> does not include the
   <command>amtune</command> command.</para>
