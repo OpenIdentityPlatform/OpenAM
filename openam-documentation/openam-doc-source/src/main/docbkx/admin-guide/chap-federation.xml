@@ -30,7 +30,7 @@
  xsi:schemaLocation='http://docbook.org/ns/docbook http://docbook.org/xml/5.0/xsd/docbook.xsd'
  xmlns:xlink='http://www.w3.org/1999/xlink'
  xmlns:xinclude='http://www.w3.org/2001/XInclude'>
- <title>Managing SAML 2.0 SSO</title>
+ <title>Managing SAML 2.0 Federation</title>
 
  <para>This chapter addresses how to set up and manage SAML 2.0 SSO for
  single sign on and single log out across resources belonging to
@@ -2107,5 +2107,358 @@ CookieWriterServlet.doGetPost: Redirect to
   the resource at <literal>http://openam.forgerock.org/index.html</literal>
   could be
   <literal>http://www.sp.com:8080/openam/SPECP?metaAlias=/sp&amp;RelayState=http%3A%2F%2Fopenam.forgerock.org%2Findex.html</literal>.</para>
+ </section>
+
+ <section xml:id="federation-linking-accounts">
+  <title>Managing Federated Accounts</title>
+  <indexterm>
+   <primary>Federation</primary>
+   <secondary>Linking accounts</secondary>
+  </indexterm>
+
+  <para>Identity providers and service providers must be able to communicate
+  about users. Yet in some cases the identity provider can choose to communicate
+  a minimum of information about an authenticated user, with no user account
+  maintained on the service provider side. In other cases the identity provider
+  and service provider can choose to link user accounts in a persistent way, in
+  a more permanent way, or even in automatic fashion by using some shared value
+  in the user's profiles such as an email address or by dynamically creating
+  accounts on the service provider when necessary. OpenAM supports all these
+  alternatives.</para>
+
+  <section xml:id="transient-federation">
+   <title>Using Transient Federation Identifiers</title>
+
+   <para>OpenAM allows you to link accounts using transient name identifiers,
+   where the identity provider shares a temporary identifier with the service
+   provider for the duration of the user session. Nothing is written to the
+   user profile.</para>
+
+   <para>Transient identifiers are useful where the service is anonymous, and
+   all users have similar access on the service provider side.</para>
+
+   <para>To use transient name identifiers, specify the name ID format
+   <literal>urn:oasis:names:tc:SAML:2.0:nameid-format:transient</literal> when
+   initiating single sign on.</para>
+
+   <para>The examples below work in an environment where the identity provider
+   is <literal>www.idp.com</literal> and the service provider is
+   <literal>www.sp.com</literal>. Both providers have deployed OpenAM on port
+   8080 under deployment URI <literal>/openam</literal>.</para>
+
+   <para>To initiate single sign on from the service provider, access the
+   following URL with at least the query parameters shown.</para>
+   <literallayout class="monospaced"
+   >http://www.sp.com:8080/openam/saml2/jsp/spSSOInit.jsp?
+ idpEntityID=http%3A%2F%2Fwww.idp.com%3A8080%2Fopenam
+ &amp;metaAlias=/sp
+ &amp;NameIDFormat=urn:oasis:names:tc:SAML:2.0:nameid-format:transient</literallayout>
+   <para>For a complete list of query parameters, see <xref
+   linkend="spssoinit-parameters" />.</para>
+
+   <para>To initiate single sign on from the identity provider, access the
+   following URL with at least the query parameters shown.</para>
+   <literallayout class="monospaced"
+   >http://www.idp.com:8080/openam/saml2/jsp/idpSSOInit.jsp?
+ spEntityID=http%3A%2F%2Fwww.sp.com%3A8080%2Fopenam
+ &amp;metaAlias=/idp
+ &amp;NameIDFormat=urn:oasis:names:tc:SAML:2.0:nameid-format:transient</literallayout>
+   <para>For a complete list of query parameters, see <xref
+   linkend="idpssoinit-parameters" />.</para>
+
+   <para>The accounts are only linked for the duration of the session. Once the
+   user logs out for example the accounts are no longer linked.</para>
+  </section>
+
+  <section xml:id="persistent-federation">
+   <title>Using Persistent Federation Identifiers</title>
+
+   <para>OpenAM lets you use persistent pseudonym identifiers to federate user
+   identities, linking accounts on the identity provider and service provider
+   with a SAML persistent identifier.</para>
+
+   <para>Persistent identifiers are useful for establishing links between
+   otherwise unrelated accounts.</para>
+
+   <para>The examples below work in an environment where the identity provider
+   is <literal>www.idp.com</literal> and the service provider is
+   <literal>www.sp.com</literal>. Both providers have deployed OpenAM on port
+   8080 under deployment URI <literal>/openam</literal>.</para>
+
+   <para>To initiate single sign on from the service provider, access the
+   following URL with at least the query parameters shown.</para>
+   <literallayout class="monospaced"
+   >http://www.sp.com:8080/openam/saml2/jsp/spSSOInit.jsp?
+ idpEntityID=http%3A%2F%2Fwww.idp.com%3A8080%2Fopenam
+ &amp;metaAlias=/sp
+ &amp;NameIDFormat=urn:oasis:names:tc:SAML:2.0:nameid-format:persistent</literallayout>
+   <para>For a complete list of query parameters, see <xref
+   linkend="spssoinit-parameters" />.</para>
+
+   <para>To initiate single sign on from the identity provider, access the
+   following URL with at least the query parameters shown.</para>
+   <literallayout class="monospaced"
+   >http://www.idp.com:8080/openam/saml2/jsp/idpSSOInit.jsp?
+ spEntityID=http%3A%2F%2Fwww.sp.com%3A8080%2Fopenam
+ &amp;metaAlias=/idp
+ &amp;NameIDFormat=urn:oasis:names:tc:SAML:2.0:nameid-format:persistent</literallayout>
+   <para>For a complete list of query parameters, see <xref
+   linkend="idpssoinit-parameters" />.</para>
+
+   <para>On successful login, the accounts are persistently linked, with
+   persistent identifiers stored in the user's accounts on the identity provider
+   and the service provider.</para>
+  </section>
+
+  <section xml:id="terminate-federation">
+   <title>Terminating Federation of Persistently Linked Accounts</title>
+
+   <para>OpenAM lets you terminate account federation, where the accounts have
+   been linked with a persistent identifier as described in <xref
+   linkend="persistent-federation" />.</para>
+
+   <para>The examples below work in an environment where the identity provider
+   is <literal>www.idp.com</literal> and the service provider is
+   <literal>www.sp.com</literal>. Both providers have deployed OpenAM on port
+   8080 under deployment URI <literal>/openam</literal>.</para>
+
+   <para>To initiate the process of terminating account federation from the
+   service provider, access the following URL with at least the query
+   parameters shown.</para>
+   <literallayout class="monospaced"
+   >http://www.sp.com:8080/openam/saml2/jsp/spMNIRequestInit.jsp?
+ idpEntityID=http%3A%2F%2Fwww.idp.com%3A8080%2Fopenam
+ &amp;metaAlias=/sp
+ &amp;requestType=Terminate</literallayout>
+
+   <para>To initiate the process of terminating account federation from the
+   identity provider, access the following URL with at least the query
+   parameters shown.</para>
+   <literallayout class="monospaced"
+   >http://www.idp.com:8080/openam/saml2/jsp/idpMNIRequestInit.jsp?
+ spEntityID=http%3A%2F%2Fwww.sp.com%3A8080%2Fopenam
+ &amp;metaAlias=/idp
+ &amp;requestType=Terminate</literallayout>
+ </section>
+
+ <section xml:id="auto-federation">
+   <title>Configuring Auto-Federation</title>
+
+   <para>OpenAM lets you configure the service provider to link an account
+   based on an attribute value from the identity provider. When you know
+   the user accounts on both the identity provider and the service provider
+   share a common attribute value, such as an email address or other unique
+   user identifier, you can use this method to link accounts without user
+   interaction. See <xref linkend="auto-federate-based-on-attribute"
+   />.</para>
+
+   <para>OpenAM also lets you map users on the identity provider temporarily to
+   a single anonymous user account on the service provider, in order to
+   exchange attributes about the user without a user-specific account on the
+   service provider. This approach can be useful when the service provider
+   either needs no user-specific account to provide a service, or when you
+   do not want to retain a user profile on the service provider but instead
+   you make authorization decisions based on attribute values from the identity
+   provider. See <xref linkend="auto-federate-using-anonymous" />.</para>
+
+   <para>OpenAM further allows you to use attributes from the identity provider
+   to create accounts dynamically on the service provider. When using this
+   method, you should inform the user and obtain consent to create the account
+   if necessary. See <xref linkend="auto-federate-with-dynamic-creation"
+   />.</para>
+
+   <procedure xml:id="auto-federate-based-on-attribute">
+    <title>To Auto-Federate Accounts Based on an Attribute Value</title>
+
+    <para>The following steps demonstrate how to auto-federate accounts based
+    on an attribute value that is the same in both accounts.</para>
+
+    <para>Perform the following steps on the hosted identity provider(s), and
+    again on the hosted service provider(s).</para>
+
+    <step>
+     <para>Login to the OpenAM console as administrator.</para>
+    </step>
+    <step>
+     <para>Browse to Federation &gt; <replaceable
+     >hosted-provider-name</replaceable> &gt; Assertion Processing.</para>
+    </step>
+    <step performance="optional">
+     <para>If the attribute to use for auto-federation is not yet in the
+     attribute map, add the attribute mapping, and then Save your work.</para>
+    </step>
+    <step>
+     <para>On the hosted service provider, under Auto Federation, select
+     Enabled and enter the local attribute name in the Attribute field, and
+     then Save your work.</para>
+    </step>
+   </procedure>
+
+   <procedure xml:id="auto-federate-using-anonymous">
+    <title>To Auto-Federate Using a Single Service Provider Account</title>
+
+    <para>The following steps demonstrate how to auto-federate using a single
+    anonymous user account on the service provider.</para>
+
+    <para>Perform the following steps on the hosted identity provider(s), and
+    again on the hosted service provider(s).</para>
+
+    <step>
+     <para>Login to the OpenAM console as administrator.</para>
+    </step>
+    <step>
+     <para>Browse to Federation &gt; <replaceable
+     >hosted-provider-name</replaceable> &gt; Assertion Processing.</para>
+    </step>
+    <step performance="optional">
+     <para>If you want to get attributes from the identity provider and the
+     attributes are is not yet in the attribute map, add the attribute mapping,
+     and then Save your work.</para>
+    </step>
+    <step>
+     <para>On the hosted service provider, under Transient User, set the
+     single account to which to map all users, such as
+     <literal>anonymous</literal>, and then Save your work.</para>
+    </step>
+    <step>
+     <para>After completing configuration on the providers, use transient
+     identifiers to federate as described in <xref
+     linkend="transient-federation" />.</para>
+    </step>
+   </procedure>
+
+   <procedure xml:id="auto-federate-with-dynamic-creation">
+    <title>To Auto-Federate With Dynamic Service Provider Account Creation</title>
+
+    <para>The following steps demonstrate how to auto-federate, dynamically
+    creating an account on the service provider if necessary.</para>
+
+    <step>
+     <para>Set up auto-federation as described in <xref
+     linkend="auto-federate-based-on-attribute" />. The attributes you map
+     from the identity provider are those that the service provider sets on
+     the dynamically created accounts.</para>
+    </step>
+    <step>
+     <para>On the service provider console, browse to Access Control &gt;
+     <replaceable>realm-name</replaceable> &gt; Authentication &gt; All Core
+     Settings..., and Dynamic or Dynamic with User Alias, which are described
+     in <link xlink:href="admin-guide#core-module-conf-hints"
+     xlink:role="http://docbook.org/xlink/role/olink"><citetitle>Hints For the
+     Core Authentication Module</citetitle></link>, and then Save your
+     work.</para>
+    </step>
+    <step>
+     <para>To test your work, create a user on the identity provider, log
+     out of the console, and initiate SSO logging in as the user you
+     created.</para>
+
+     <para>To initiate SSO, browse to one of the OpenAM SAML 2.0 JSPs with the
+     appropriate query parameters. The following is an example URL for service
+     provider initiated SSO.</para>
+     <literallayout class="monospaced"
+     >http://www.sp.com:8080/openam/saml2/jsp/spSSOInit.jsp?
+ idpEntityID=http%3A%2F%2Fwww.idp.com%3A8080%2Fopenam
+ &amp;metaAlias=/sp</literallayout>
+
+     <para>On success, check <literal
+     >http://www.sp.com:8080/openam/idm/EndUser</literal> to see the new user
+     account.</para>
+    </step>
+   </procedure>
+  </section>
+
+  <section xml:id="bulk-federation">
+   <title>Linking Federated Accounts in Bulk</title>
+
+   <para>If you manage both the identity provider and service provider, you
+   can link accounts out-of-band, in bulk. You make permanent connections for a
+   list of identity provider and service provider by using the
+   <command>ssoadm</command> bulk federation commands.</para>
+
+   <para>Before you can run the bulk federation commands, first establish the
+   relationship between accounts, set up the providers as described in
+   <xref linkend="set-up-federation" />, and install the
+   <command>ssoadm</command> command as described in <link
+   xlink:href="install-guide#install-openam-admin-tools"
+   xlink:role="http://docbook.org/xlink/role/olink"><citetitle>To Set Up
+   Administration Tools</citetitle></link>.</para>
+
+   <para>To understand the relationships between accounts, consider an example
+   where the identity provider is at <literal>idp.example.org</literal> and the
+   service provider is at <literal>sp.example.com</literal>. A demo user
+   account has the Universal ID,
+   <literal>id=demo,ou=user,dc=example,dc=org</literal>, on the identity
+   provider. That maps to the Universal ID,
+   <literal>id=demo,ou=user,dc=example,dc=com</literal>, on the service
+   provider.</para>
+
+   <para>The <command>ssoadm</command> command then needs a file that maps
+   local user IDs to remote user IDs, one per line, separated by the vertical
+   bar character <literal>|</literal>. Each line of the file appears as
+   follows.</para>
+
+   <literallayout class="monospaced"><replaceable>local-user-ID</replaceable
+   >|<replaceable>remote-user-ID</replaceable></literallayout>
+
+   <para>In the example, starting on the service provider side, the line for
+   the demo user reads as follows.</para>
+
+   <literallayout class="monospaced"
+   >id=demo,ou=user,dc=example,dc=com|id=demo,ou=user,dc=example,dc=org</literallayout>
+
+   <para>All the users’ accounts mapped in your file must exist at the identity
+   provider and the service provider when you run the commands to link
+   them.</para>
+
+   <orderedlist>
+    <para>Link the accounts using the <command>ssoadm</command> bulk federation
+    commands.</para>
+
+    <listitem>
+     <para>Prepare the data with the
+     <command>ssoadm do-bulk-federation</command> command.</para>
+
+     <para>The following example starts on the service provider side.</para>
+
+     <screen>$ cat /tmp/user-map.txt
+id=demo,ou=user,dc=example,dc=com|id=demo,ou=user,dc=example,dc=org
+$ ssoadm do-bulk-federation --metaalias /sp
+ --remoteentityid http://idp.example.org:8080/openam
+ --useridmapping /tmp/user-map.txt
+ --nameidmapping /tmp/name-map.txt
+ --adminid amadmin --password-file /tmp/pwd.txt
+ --spec saml2
+
+Bulk Federation for this host was completed. To complete the
+federation, name Id mapping file should be loaded to remote
+provider.</screen>
+    </listitem>
+
+    <listitem>
+     <para>Copy the name ID mapping output file to the other provider.</para>
+
+     <screen>$ scp /tmp/name-map.txt idp.example.org:/tmp/name-map.txt
+openam@idp.example.org's password:
+name-map.txt                     100%  177     0.2KB/s   00:00</screen>
+    </listitem>
+
+    <listitem>
+     <para>Import the name ID mapping file with the
+     <command>ssoadm import-bulk-fed-data</command> command.</para>
+
+     <para>The following example is performed on the identity provider
+     side.</para>
+
+     <screen>$ ssoadm import-bulk-fed-data
+ --adminid amadmin --password-file /tmp/pwd.txt
+ --metaalias /idp --bulk-data-file /tmp/name-map.txt
+
+Bulk Federation for this host was completed.</screen>
+    </listitem>
+   </orderedlist>
+
+   <para>At this point the accounts are linked.</para>
+  </section>
  </section>
 </chapter>
