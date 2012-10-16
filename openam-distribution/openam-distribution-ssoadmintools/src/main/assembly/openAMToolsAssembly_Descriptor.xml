@@ -12,18 +12,18 @@
         <dependencySet>
             <outputDirectory>lib</outputDirectory>
             <includes>
-                <include>org.forgerock:openam-shared</include>
-                <include>org.forgerock:openam-core</include>
-                <include>org.forgerock:openam-entitlements</include>
-                <include>org.forgerock:openam-federation-library</include>
-                <include>org.forgerock:OpenFM</include>
-                <include>org.forgerock:openam-dtd-schema</include>
-                <include>org.forgerock:openam-jaxrpc-schema</include>
-                <include>org.forgerock:openam-idsvcs-schema</include>
-                <include>org.forgerock:openam-liberty-schema</include>
-                <include>org.forgerock:openam-saml2-schema</include>
-                <include>org.forgerock:openam-wsfederation-schema</include>
-                <include>org.forgerock:openam-distribution-amadmsetup</include>
+                <include>org.forgerock.openam:openam-shared</include>
+                <include>org.forgerock.openam:openam-core</include>
+                <include>org.forgerock.openam:openam-entitlements</include>
+                <include>org.forgerock.openam:openam-federation-library</include>
+                <include>org.forgerock.openam:OpenFM</include>
+                <include>org.forgerock.openam:openam-dtd-schema</include>
+                <include>org.forgerock.openam:openam-jaxrpc-schema</include>
+                <include>org.forgerock.openam:openam-idsvcs-schema</include>
+                <include>org.forgerock.openam:openam-liberty-schema</include>
+                <include>org.forgerock.openam:openam-saml2-schema</include>
+                <include>org.forgerock.openam:openam-wsfederation-schema</include>
+                <include>org.forgerock.openam:openam-distribution-amadmsetup</include>
                 <include>external:OpenDJ</include>
                 <include>javax.xml:jaxrpc-api</include>
                 <include>com.sun.xml.rpc:jaxrpc-impl</include>

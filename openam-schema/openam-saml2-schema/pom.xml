@@ -29,7 +29,7 @@
 
     <!-- Parent Project -->
     <parent>
-        <groupId>org.forgerock</groupId>
+        <groupId>org.forgerock.openam</groupId>
         <artifactId>openam-schema</artifactId>
         <version>10.1.0-SNAPSHOT</version>
     </parent>
@@ -158,7 +158,7 @@
     
     <dependencies>
     	<dependency>
-	   	    <groupId>org.forgerock</groupId>
+	   	    <groupId>org.forgerock.openam</groupId>
         	<artifactId>openam-shared</artifactId>
             <version>10.1.0-SNAPSHOT</version>
         </dependency>

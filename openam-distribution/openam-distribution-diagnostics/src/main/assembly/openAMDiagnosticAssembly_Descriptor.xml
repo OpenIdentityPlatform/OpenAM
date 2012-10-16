@@ -35,10 +35,10 @@
         <dependencySet>
             <outputDirectory>lib</outputDirectory>
             <includes>
-                <include>org.forgerock:openam-diagnostics-base</include>
-                <include>org.forgerock:openam-diagnostics-schema</include>
-                <include>org.forgerock:openam-core</include>
-                <include>org.forgerock:openam-shared</include>
+                <include>org.forgerock.openam:openam-diagnostics-base</include>
+                <include>org.forgerock.openam:openam-diagnostics-schema</include>
+                <include>org.forgerock.openam:openam-core</include>
+                <include>org.forgerock.openam:openam-shared</include>
                 <include>javax.xml.bind:jaxb-api</include>
                 <include>com.sun.xml.bind:jaxb-impl</include>
                 <include>net.java.dev.msv.datatype.xsd:xsdlib</include>
@@ -49,7 +49,7 @@
         <dependencySet>
             <outputDirectory>services/lib</outputDirectory>
             <includes>
-                <include>org.forgerock:openam-diagnostics-plugins</include>
+                <include>org.forgerock.openam:openam-diagnostics-plugins</include>
                 <include>com.sun.messaging.mq:jms</include>
                 <include>com.sun.messaging.mq:imq</include>
             </includes>

@@ -12,16 +12,16 @@
         <dependencySet>
             <outputDirectory>WEB-INF/lib</outputDirectory>
             <includes>
-                <include>org.forgerock:openam-shared</include>
-                <include>org.forgerock:openam-federation-library</include>
-                <include>org.forgerock:openam-dtd-schema</include>
-                <include>org.forgerock:openam-jaxrpc-schema</include>
-                <include>org.forgerock:openam-saml2-schema</include>
-                <include>org.forgerock:openam-liberty-schema</include>
-                <include>org.forgerock:openam-mib-schema</include>
-                <include>org.forgerock:openam-wsfederation-schema</include>
-                <include>org.forgerock:openam-xacml3-schema</include>
-                <include>org.forgerock:openam-rest</include>
+                <include>org.forgerock.openam:openam-shared</include>
+                <include>org.forgerock.openam:openam-federation-library</include>
+                <include>org.forgerock.openam:openam-dtd-schema</include>
+                <include>org.forgerock.openam:openam-jaxrpc-schema</include>
+                <include>org.forgerock.openam:openam-saml2-schema</include>
+                <include>org.forgerock.openam:openam-liberty-schema</include>
+                <include>org.forgerock.openam:openam-mib-schema</include>
+                <include>org.forgerock.openam:openam-wsfederation-schema</include>
+                <include>org.forgerock.openam:openam-xacml3-schema</include>
+                <include>org.forgerock.openam:openam-rest</include>
                 <include>external:esapiport</include>
                 <include>javax.mail:mail</include>
                 <include>relaxngDatatype:relaxngDatatype</include>

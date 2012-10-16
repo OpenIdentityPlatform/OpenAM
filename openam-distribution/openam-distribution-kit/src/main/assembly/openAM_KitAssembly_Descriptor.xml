@@ -39,12 +39,12 @@
             <outputDirectory></outputDirectory>
             <!-- Include fully packaged Modules -->
             <includes>
-                <include>org.forgerock:openam-server:war</include>
-                <include>org.forgerock:openam-distribution-amadmsetup:jar</include>
-                <include>org.forgerock:openam-distribution-library:zip</include>
-                <include>org.forgerock:openam-distribution-fedlet-unconfigured:zip</include>
-                <include>org.forgerock:openam-distribution-ssoadmintools:zip</include>
-                <include>org.forgerock:openam-distribution-ssoconfiguratortools:zip</include>
+                <include>org.forgerock.openam:openam-server:war</include>
+                <include>org.forgerock.openam:openam-distribution-amadmsetup:jar</include>
+                <include>org.forgerock.openam:openam-distribution-library:zip</include>
+                <include>org.forgerock.openam:openam-distribution-fedlet-unconfigured:zip</include>
+                <include>org.forgerock.openam:openam-distribution-ssoadmintools:zip</include>
+                <include>org.forgerock.openam:openam-distribution-ssoconfiguratortools:zip</include>
             </includes>
         </dependencySet>
     </dependencySets>

@@ -30,7 +30,7 @@
 
     <!-- Parent Project -->
     <parent>
-        <groupId>org.forgerock</groupId>
+        <groupId>org.forgerock.openam</groupId>
         <artifactId>openam-authentication</artifactId>
         <version>10.1.0-SNAPSHOT</version>
     </parent>
@@ -140,7 +140,7 @@
     </build>
     <dependencies>
         <dependency>
-            <groupId>org.forgerock</groupId>
+            <groupId>org.forgerock.openam</groupId>
             <artifactId>openam-auth-hotp</artifactId>
             <version>10.1.0-SNAPSHOT</version>
         </dependency>

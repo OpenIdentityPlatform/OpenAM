@@ -30,7 +30,7 @@
 
     <!-- Parent Project -->
     <parent>
-        <groupId>org.forgerock</groupId>
+        <groupId>org.forgerock.openam</groupId>
         <artifactId>openam-schema</artifactId>
         <version>10.1.0-SNAPSHOT</version>
     </parent>
@@ -90,12 +90,12 @@
                 </executions>
                 <dependencies>
                     <dependency>
-                        <groupId>org.forgerock</groupId>
+                        <groupId>org.forgerock.openam</groupId>
                         <artifactId>openam-idsvcs-schema</artifactId>
                         <version>10.1.0-SNAPSHOT</version>
                     </dependency>
                     <dependency>
-                        <groupId>org.forgerock</groupId>
+                        <groupId>org.forgerock.openam</groupId>
                         <artifactId>openam-core</artifactId>
                         <version>10.1.0-SNAPSHOT</version>
                     </dependency>
@@ -161,13 +161,13 @@
     <dependencies>
 
         <dependency>
-            <groupId>org.forgerock</groupId>
+            <groupId>org.forgerock.openam</groupId>
             <artifactId>openam-idsvcs-schema</artifactId>
             <version>10.1.0-SNAPSHOT</version>
         </dependency>
 
         <dependency>
-            <groupId>org.forgerock</groupId>
+            <groupId>org.forgerock.openam</groupId>
             <artifactId>openam-core</artifactId>
             <version>10.1.0-SNAPSHOT</version>
         </dependency>
@@ -203,7 +203,7 @@
         </dependency>
 
         <dependency>
-            <groupId>org.forgerock</groupId>
+            <groupId>org.forgerock.openam</groupId>
             <artifactId>openam-federation-library</artifactId>
             <version>10.1.0-SNAPSHOT</version>
         </dependency>

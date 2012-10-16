@@ -30,7 +30,7 @@
 
     <!-- Parent Project -->
     <parent>
-        <groupId>org.forgerock</groupId>
+        <groupId>org.forgerock.openam</groupId>
         <artifactId>openam</artifactId>
         <version>10.1.0-SNAPSHOT</version>
     </parent>
@@ -123,44 +123,44 @@
 
     <dependencies>
         <dependency>
-            <groupId>org.forgerock</groupId>
+            <groupId>org.forgerock.openam</groupId>
             <artifactId>openam-shared</artifactId>
             <version>10.1.0-SNAPSHOT</version>
             <!-- This Version -->
         </dependency>
         <dependency>
-            <groupId>org.forgerock</groupId>
+            <groupId>org.forgerock.openam</groupId>
             <artifactId>openam-entitlements</artifactId>
             <version>10.1.0-SNAPSHOT</version>
             <!-- This Version -->
         </dependency>
         <dependency>
-            <groupId>org.forgerock</groupId>
+            <groupId>org.forgerock.openam</groupId>
             <artifactId>openam-coretoken</artifactId>
             <version>10.1.0-SNAPSHOT</version>
             <!-- This Version -->
         </dependency>
         <dependency>
-            <groupId>org.forgerock</groupId>
+            <groupId>org.forgerock.openam</groupId>
             <artifactId>openam-rest</artifactId>
             <version>10.1.0-SNAPSHOT</version>
             <!-- This Version -->
         </dependency>
         <dependency>
-            <groupId>org.forgerock</groupId>
+            <groupId>org.forgerock.openam</groupId>
             <artifactId>openam-idsvcs-schema</artifactId>
             <version>10.1.0-SNAPSHOT</version>
 
             <!-- This Version -->
         </dependency>
         <dependency>
-            <groupId>org.forgerock</groupId>
+            <groupId>org.forgerock.openam</groupId>
             <artifactId>openam-mib-schema</artifactId>
             <version>10.1.0-SNAPSHOT</version>
             <!-- This Version -->
         </dependency>
         <dependency>
-            <groupId>org.forgerock</groupId>
+            <groupId>org.forgerock.openam</groupId>
             <artifactId>openam-xacml3-schema</artifactId>
             <version>10.1.0-SNAPSHOT</version>
             <!-- This Version -->

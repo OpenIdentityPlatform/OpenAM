@@ -30,7 +30,7 @@
 
     <!-- Parent Project -->
     <parent>
-        <groupId>org.forgerock</groupId>
+        <groupId>org.forgerock.openam</groupId>
         <artifactId>openam-session-ha</artifactId>
         <version>10.1.0-SNAPSHOT</version>
     </parent>
@@ -90,13 +90,13 @@
     <dependencies>
 
         <dependency>
-            <groupId>org.forgerock</groupId>
+            <groupId>org.forgerock.openam</groupId>
             <artifactId>openam-session-ha-locale</artifactId>
             <version>10.1.0-SNAPSHOT</version>
         </dependency>
 
         <dependency>
-            <groupId>org.forgerock</groupId>
+            <groupId>org.forgerock.openam</groupId>
             <artifactId>openam-core</artifactId>
         </dependency>
 

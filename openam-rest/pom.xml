@@ -29,7 +29,7 @@
 
     <!-- Parent Project -->
     <parent>
-        <groupId>org.forgerock</groupId>
+        <groupId>org.forgerock.openam</groupId>
         <artifactId>openam</artifactId>
         <version>10.1.0-SNAPSHOT</version>
     </parent>
@@ -138,20 +138,20 @@
     </build>
     <dependencies>
         <dependency>
-            <groupId>org.forgerock</groupId>
+            <groupId>org.forgerock.openam</groupId>
             <artifactId>openam-shared</artifactId>
             <version>10.1.0-SNAPSHOT</version>
             <!-- This Version -->
         </dependency>
 
         <dependency>
-            <groupId>org.forgerock</groupId>
+            <groupId>org.forgerock.openam</groupId>
             <artifactId>openam-entitlements</artifactId>
             <version>10.1.0-SNAPSHOT</version>
         </dependency>
 
         <dependency>
-            <groupId>org.forgerock</groupId>
+            <groupId>org.forgerock.openam</groupId>
             <artifactId>openam-coretoken</artifactId>
             <version>10.1.0-SNAPSHOT</version>
         </dependency>

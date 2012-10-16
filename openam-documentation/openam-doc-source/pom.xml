@@ -30,13 +30,13 @@
 
     <!-- Parent Project -->
     <parent>
-        <groupId>org.forgerock</groupId>
+        <groupId>org.forgerock.openam</groupId>
         <artifactId>openam-documentation</artifactId>
         <version>10.1.0-SNAPSHOT</version>
     </parent>
 
     <!-- Documentation Module -->
-    <groupId>org.forgerock</groupId>
+    <groupId>org.forgerock.openam</groupId>
     <artifactId>openam-doc-source</artifactId>
     <version>10.1.0-SNAPSHOT</version>
 
@@ -288,7 +288,7 @@
 
     <dependencies>
         <dependency>
-            <groupId>org.forgerock</groupId>
+            <groupId>org.forgerock.openam</groupId>
             <artifactId>openam-doc-content</artifactId>
             <version>10.1.0-SNAPSHOT</version>
         </dependency>

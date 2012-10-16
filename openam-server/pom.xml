@@ -30,7 +30,7 @@
 
     <!-- Parent Project -->
     <parent>
-        <groupId>org.forgerock</groupId>
+        <groupId>org.forgerock.openam</groupId>
         <artifactId>openam</artifactId>
         <version>10.1.0-SNAPSHOT</version>
     </parent>
@@ -120,7 +120,7 @@
                         <configuration>
                             <artifactItems>
                                 <artifactItem>
-                                    <groupId>org.forgerock</groupId>
+                                    <groupId>org.forgerock.openam</groupId>
                                     <artifactId>openam-jaxrpc-schema</artifactId>
                                     <version>10.1.0-SNAPSHOT</version>
                                     <type>jar</type>
@@ -363,183 +363,183 @@
     <dependencies>
 
         <dependency>
-            <groupId>org.forgerock</groupId>
+            <groupId>org.forgerock.openam</groupId>
             <artifactId>openam-installtools</artifactId>
             <version>10.1.0-SNAPSHOT</version>
         </dependency>
 
         <dependency>
-            <groupId>org.forgerock</groupId>
+            <groupId>org.forgerock.openam</groupId>
             <artifactId>openam-core</artifactId>
             <version>10.1.0-SNAPSHOT</version>
         </dependency>
 
         <dependency>
-            <groupId>org.forgerock</groupId>
+            <groupId>org.forgerock.openam</groupId>
             <artifactId>openam-federation-library</artifactId>
             <version>10.1.0-SNAPSHOT</version>
         </dependency>
 
         <dependency>
-            <groupId>org.forgerock</groupId>
+            <groupId>org.forgerock.openam</groupId>
             <artifactId>OpenFM</artifactId>
             <version>10.1.0-SNAPSHOT</version>
         </dependency>
 
         <dependency>
-            <groupId>org.forgerock</groupId>
+            <groupId>org.forgerock.openam</groupId>
             <artifactId>openam-oauth</artifactId>
             <version>10.1.0-SNAPSHOT</version>
         </dependency>
 
         <dependency>
-            <groupId>org.forgerock</groupId>
+            <groupId>org.forgerock.openam</groupId>
             <artifactId>openam-dtd-schema</artifactId>
             <version>10.1.0-SNAPSHOT</version>
         </dependency>
 
         <dependency>
-            <groupId>org.forgerock</groupId>
+            <groupId>org.forgerock.openam</groupId>
             <artifactId>openam-jaxrpc-schema</artifactId>
             <version>10.1.0-SNAPSHOT</version>
         </dependency>
 
         <dependency>
-            <groupId>org.forgerock</groupId>
+            <groupId>org.forgerock.openam</groupId>
             <artifactId>openam-saml2-schema</artifactId>
             <version>10.1.0-SNAPSHOT</version>
         </dependency>
 
         <dependency>
-            <groupId>org.forgerock</groupId>
+            <groupId>org.forgerock.openam</groupId>
             <artifactId>openam-session-ha-core</artifactId>
             <version>10.1.0-SNAPSHOT</version>
         </dependency>
 
         <dependency>
-            <groupId>org.forgerock</groupId>
+            <groupId>org.forgerock.openam</groupId>
             <artifactId>openam-rest</artifactId>
             <version>10.1.0-SNAPSHOT</version>
         </dependency>
 
-        <dependency>
-            <groupId>org.forgerock</groupId>
+        <!--dependency>
+            <groupId>org.forgerock.openam</groupId>
             <artifactId>openam-forgerock-rest</artifactId>
             <version>10.1.0-SNAPSHOT</version>
-        </dependency>
+        </dependency-->
 
         <!-- Include all Authentication Modules -->
         <dependency>
-            <groupId>org.forgerock</groupId>
+            <groupId>org.forgerock.openam</groupId>
             <artifactId>openam-auth-ad</artifactId>
             <version>10.1.0-SNAPSHOT</version>
         </dependency>
 
         <dependency>
-            <groupId>org.forgerock</groupId>
+            <groupId>org.forgerock.openam</groupId>
             <artifactId>openam-auth-anonymous</artifactId>
             <version>10.1.0-SNAPSHOT</version>
         </dependency>
 
         <dependency>
-            <groupId>org.forgerock</groupId>
+            <groupId>org.forgerock.openam</groupId>
             <artifactId>openam-auth-adaptive</artifactId>
             <version>10.1.0-SNAPSHOT</version>
         </dependency>
 
         <dependency>
-            <groupId>org.forgerock</groupId>
+            <groupId>org.forgerock.openam</groupId>
             <artifactId>openam-auth-application</artifactId>
             <version>10.1.0-SNAPSHOT</version>
         </dependency>
 
         <dependency>
-            <groupId>org.forgerock</groupId>
+            <groupId>org.forgerock.openam</groupId>
             <artifactId>openam-auth-cert</artifactId>
             <version>10.1.0-SNAPSHOT</version>
         </dependency>
 
         <dependency>
-            <groupId>org.forgerock</groupId>
+            <groupId>org.forgerock.openam</groupId>
             <artifactId>openam-auth-datastore</artifactId>
             <version>10.1.0-SNAPSHOT</version>
         </dependency>
 
         <dependency>
-            <groupId>org.forgerock</groupId>
+            <groupId>org.forgerock.openam</groupId>
             <artifactId>openam-auth-hotp</artifactId>
             <version>10.1.0-SNAPSHOT</version>
         </dependency>
 
         <dependency>
-            <groupId>org.forgerock</groupId>
+            <groupId>org.forgerock.openam</groupId>
             <artifactId>openam-auth-httpbasic</artifactId>
             <version>10.1.0-SNAPSHOT</version>
         </dependency>
 
         <dependency>
-            <groupId>org.forgerock</groupId>
+            <groupId>org.forgerock.openam</groupId>
             <artifactId>openam-auth-jdbc</artifactId>
             <version>10.1.0-SNAPSHOT</version>
         </dependency>
 
         <dependency>
-            <groupId>org.forgerock</groupId>
+            <groupId>org.forgerock.openam</groupId>
             <artifactId>openam-auth-ldap</artifactId>
             <version>10.1.0-SNAPSHOT</version>
         </dependency>
 
         <dependency>
-            <groupId>org.forgerock</groupId>
+            <groupId>org.forgerock.openam</groupId>
             <artifactId>openam-auth-membership</artifactId>
             <version>10.1.0-SNAPSHOT</version>
         </dependency>
 
         <dependency>
-            <groupId>org.forgerock</groupId>
+            <groupId>org.forgerock.openam</groupId>
             <artifactId>openam-auth-msisdn</artifactId>
             <version>10.1.0-SNAPSHOT</version>
         </dependency>
 
         <dependency>
-            <groupId>org.forgerock</groupId>
+            <groupId>org.forgerock.openam</groupId>
             <artifactId>openam-auth-nt</artifactId>
             <version>10.1.0-SNAPSHOT</version>
         </dependency>
 
         <dependency>
-            <groupId>org.forgerock</groupId>
+            <groupId>org.forgerock.openam</groupId>
             <artifactId>openam-auth-oath</artifactId>
             <version>10.1.0-SNAPSHOT</version>
         </dependency>
 
         <dependency>
-            <groupId>org.forgerock</groupId>
+            <groupId>org.forgerock.openam</groupId>
             <artifactId>openam-auth-oauth2</artifactId>
             <version>10.1.0-SNAPSHOT</version>
         </dependency>
 
         <dependency>
-            <groupId>org.forgerock</groupId>
+            <groupId>org.forgerock.openam</groupId>
             <artifactId>openam-auth-radius</artifactId>
             <version>10.1.0-SNAPSHOT</version>
         </dependency>
 
         <dependency>
-            <groupId>org.forgerock</groupId>
+            <groupId>org.forgerock.openam</groupId>
             <artifactId>openam-auth-safeword</artifactId>
             <version>10.1.0-SNAPSHOT</version>
         </dependency>
 
         <dependency>
             <artifactId>openam-auth-securid</artifactId>
-            <groupId>org.forgerock</groupId>
+            <groupId>org.forgerock.openam</groupId>
             <version>10.1.0-SNAPSHOT</version>
         </dependency>
 
         <dependency>
             <artifactId>openam-auth-windowsdesktopsso</artifactId>
-            <groupId>org.forgerock</groupId>
+            <groupId>org.forgerock.openam</groupId>
             <version>10.1.0-SNAPSHOT</version>
         </dependency>
 
@@ -559,25 +559,25 @@
         <!-- Oauth2 dependencies -->
 	<!--
         <dependency>
-            <groupId>org.forgerock</groupId>
+            <groupId>org.forgerock.openam</groupId>
             <artifactId>openam-oauth2-restlet-extension</artifactId>
             <version>10.1.0-SNAPSHOT</version>
         </dependency>
 
         <dependency>
-            <groupId>org.forgerock</groupId>
+            <groupId>org.forgerock.openam</groupId>
             <artifactId>openam-oauth2-openam-extension</artifactId>
             <version>10.1.0-SNAPSHOT</version>
         </dependency>
 
         <dependency>
-            <groupId>org.forgerock</groupId>
+            <groupId>org.forgerock.openam</groupId>
             <artifactId>openam-oauth2-core-token-service</artifactId>
             <version>10.1.0-SNAPSHOT</version>
         </dependency>
 
         <dependency>
-            <groupId>org.forgerock</groupId>
+            <groupId>org.forgerock.openam</groupId>
             <artifactId>openam-oauth2-main</artifactId>
             <version>10.1.0-SNAPSHOT</version>
         </dependency>
