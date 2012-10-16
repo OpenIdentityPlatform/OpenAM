@@ -52,5 +52,26 @@
    </answer>
   </qandaentry>
 
+  <qandaentry xml:id="apache-defaults-to-port-80">
+   <question>
+    <para>My Apache HTTPD server is not using port 80. But when I install the
+    web policy agent it defaults to port 80. How do I fix this?</para>
+   </question>
+
+   <answer>
+    <para>You probably set <literal>ServerName</literal> in Apache HTTPD's
+    configuration to the host name, but did not specify the port number.</para>
+
+    <para>Instead you must set both the host name and port number for
+    <literal>ServerName</literal> in Apache HTTPD's configuration. For
+    example, if you have Apache HTTPD configured to listen on port 8080, then
+    set <literal>ServerName</literal> appropriately as in the following
+    excerpt.</para>
+
+    <programlisting language="plain"
+    >&lt;VirtualHost *:8080&gt;
+ServerName www.localhost.net:8080</programlisting>
+   </answer>
+  </qandaentry>
  </qandaset>
 </chapter>
