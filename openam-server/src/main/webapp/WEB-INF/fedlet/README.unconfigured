@@ -24,7 +24,8 @@ with the fields enclosed by brackets [] replaced by
 your own identifying information:
 "Portions Copyrighted [year] [name of copyright owner]"
 
-$Id: README.unconfigured,v 1.15 2009/11/12 17:30:30 exu Exp $
+Portions Copyright 2012 ForgeRock AS
+
 
 
 
@@ -129,9 +130,9 @@ $Id: README.unconfigured,v 1.15 2009/11/12 17:30:30 exu Exp $
      OpenSSO Enterprise 8.0 documentation.
 
      * SAMLv2 Service Provider Customization link-
-      http://docs.sun.com/app/docs/doc/820-3886/federation.samlv2idpassertioncontent?a=view
+       http://openam.forgerock.org/doc/admin-guide/index.html#configure-sp
      * SAMLv2 Identity Provider Customization link-
-     http://docs.sun.com/app/docs/doc/820-3886/federation.samlv2idpassertioncontent?a=view
+       http://openam.forgerock.org/doc/admin-guide/index.html#configure-idp
 
      If the identity provider is using a product other than OpenSSO Enterprise,
      they would make the changes according to their product's documentation.
@@ -306,9 +307,10 @@ I. Signing
       Step 1)
       Following steps need to be performed on Fedlet:
 
-      a) The Attribute Query needs to be signed. Please follow the below
-	 link on creating a KeyStore, importing the certificate. 
-	   http://wikis.sun.com/display/OpenSSO/Enabling+XML+Signing+and+Decryption+in+the+OpenSSO+Java+Fedlet
+      a) The Attribute Query needs to be signed. Please follow the links
+         below on creating a key store and using the certificate.
+         http://openam.forgerock.org/doc/admin-guide/index.html#changing-signing-key
+         http://openam.forgerock.org/doc/dev-guide/index.html#fedlet-signing-encryption
 	 
 	 Add the certificate to the "RoleDescriptor" element as shown below
 	 inside "sp.xml"
@@ -365,9 +367,10 @@ II. Signing and Encryption
       Step 1)
       Following steps need to be performed on Fedlet:
 
-      a) The Attribute Query needs to be signed. Please follow the below
-	 link on creating a KeyStore, importing the certificate. 
-	   http://wikis.sun.com/display/OpenSSO/Enabling+XML+Signing+and+Decryption+in+the+OpenSSO+Java+Fedlet
+      a) The Attribute Query needs to be signed. Please follow the links
+         below on creating a key store and using the certificate.
+         http://openam.forgerock.org/doc/admin-guide/index.html#changing-signing-key
+         http://openam.forgerock.org/doc/dev-guide/index.html#fedlet-signing-encryption
 	 
 	 Add the certificate to the "RoleDescriptor" element as shown below
 	 inside "sp.xml"
@@ -512,9 +515,10 @@ XACML Query. Signing and Encryption are optional.
 II. Signing
 ==========
 
-   a) On the Fedlet Side, Please follow the below link on creating a KeyStore, 
-      importing the certificate.
-	   http://wikis.sun.com/display/OpenSSO/Enabling+XML+Signing+and+Decryption+in+the+OpenSSO+Java+Fedlet
+   a) On the Fedlet Side, please follow the links
+      below on creating a key store and using the certificate.
+      http://openam.forgerock.org/doc/admin-guide/index.html#changing-signing-key
+      http://openam.forgerock.org/doc/dev-guide/index.html#fedlet-signing-encryption
 	 
 	 Add the certificate to the "XACMLAuthzDecisionQueryDescriptor" 
          element as shown below inside "sp.xml".
@@ -583,7 +587,7 @@ III. Encryption
            </Attribute>
 
       b) For signing and encryption follow the below link:
-	   http://wikis.sun.com/display/OpenSSO/Enabling+XML+Signing+and+Decryption+in+the+OpenSSO+Java+Fedlet
+         http://openam.forgerock.org/doc/dev-guide/index.html#fedlet-signing-encryption
 
 	 Add the certificate to the "XACMLAuthzDecisionQueryDescriptor" 
          element as shown below inside "sp.xml".

@@ -24,7 +24,8 @@ with the fields enclosed by brackets [] replaced by
 your own identifying information:
 "Portions Copyrighted [year] [name of copyright owner]"
 
-$Id: README,v 1.13 2009/11/12 17:30:30 exu Exp $
+Portions Copyright 2012 ForgeRock AS
+
 
 
 
@@ -255,9 +256,10 @@ I. Signing
 
       a) Deploy fedlet.war and configure the fedlet
 
-      b) The Attribute Query needs to be signed. Please follow the below
-	 link on creating a KeyStore, importing the certificate. 
-	   http://wikis.sun.com/display/OpenSSO/Enabling+XML+Signing+and+Decryption+in+the+OpenSSO+Java+Fedlet
+      b) The Attribute Query needs to be signed. Please follow the links
+         below on creating a key store and using the certificate.
+         http://openam.forgerock.org/doc/admin-guide/index.html#changing-signing-key
+         http://openam.forgerock.org/doc/dev-guide/index.html#fedlet-signing-encryption
 	 
 	 Add the certificate to the "RoleDescriptor" element as shown below
 	 inside "sp.xml".
@@ -315,8 +317,10 @@ II. Signing and Encryption
 
       a) Deploy fedlet.war and configure the fedlet
 
-      b) For signing and encryption follow the below link:
-	   http://wikis.sun.com/display/OpenSSO/Enabling+XML+Signing+and+Decryption+in+the+OpenSSO+Java+Fedlet
+      b) For signing and encryption, please follow the links
+         below on creating a key store and using the certificate.
+         http://openam.forgerock.org/doc/admin-guide/index.html#changing-signing-key
+         http://openam.forgerock.org/doc/dev-guide/index.html#fedlet-signing-encryption
 
 	 Add the certificate to the "RoleDescriptor" element as shown below
 	 inside "sp.xml".
@@ -432,8 +436,10 @@ XACML Query. Signing and Encryption are optional.
 
 II. Signing
 ==========
-      Please follow the below link on creating a KeyStore, importing the certificate.
-	   http://wikis.sun.com/display/OpenSSO/Enabling+XML+Signing+and+Decryption+in+the+OpenSSO+Java+Fedlet
+      Please follow the links below on creating a key store and using the
+      certificate.
+      http://openam.forgerock.org/doc/admin-guide/index.html#changing-signing-key
+      http://openam.forgerock.org/doc/dev-guide/index.html#fedlet-signing-encryption
 	 
          Add the certificate to the "XACMLAuthzDecisionQueryDescriptor" 
          element as shown below inside "sp.xml".
@@ -501,8 +507,10 @@ III. Encryption
 		<Value>true</Value>
            </Attribute>
 
-      b) For signing and encryption follow the below link:
-	   http://wikis.sun.com/display/OpenSSO/Enabling+XML+Signing+and+Decryption+in+the+OpenSSO+Java+Fedlet
+      b) For signing and encryption, please follow the links
+         below on creating a key store and using the certificate.
+         http://openam.forgerock.org/doc/admin-guide/index.html#changing-signing-key
+         http://openam.forgerock.org/doc/dev-guide/index.html#fedlet-signing-encryption
 
          Add the certificate to the "XACMLAuthzDecisionQueryDescriptor" 
          element as shown below inside "sp.xml".

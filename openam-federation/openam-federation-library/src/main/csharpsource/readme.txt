@@ -24,7 +24,8 @@ with the fields enclosed by brackets [] replaced by
 your own identifying information:
 "Portions Copyrighted [year] [name of copyright owner]"
 
-$Id: README.net,v 1.8 2010/01/26 01:20:15 ggennaro Exp $
+Portions Copyright 2012 ForgeRock AS
+
 
 %% Contents:
     %%  1. Contents of this directory
@@ -125,9 +126,9 @@ $Id: README.net,v 1.8 2010/01/26 01:20:15 ggennaro Exp $
    OpenSSO Enterprise 8.0 documentation.
 
    * SAMLv2 Service Provider Customization link:
-     http://docs.sun.com/app/docs/doc/820-3886/federation.samlv2idpassertioncontent?a=view
+     http://openam.forgerock.org/doc/admin-guide/index.html#configure-sp
    * SAMLv2 Identity Provider Customization link:
-     http://docs.sun.com/app/docs/doc/820-3886/federation.samlv2idpassertioncontent?a=view
+     http://openam.forgerock.org/doc/admin-guide/index.html#configure-idp
 
    If the identity provider is using a product other than OpenSSO Enterprise,
    they would make the changes according to their product's documentation.
@@ -367,10 +368,10 @@ $Id: README.net,v 1.8 2010/01/26 01:20:15 ggennaro Exp $
             </Attribute>
 
       e) Update the .NET Fedlet's metadata (sp.xml) to include the key
-         descriptor for the signing key similar to what is described in the
-         OpenSSO Wiki article for the Java Fedlet located at:
-
-            http://wikis.sun.com/display/OpenSSO/Enabling+XML+Signing+and+Decryption+in+the+OpenSSO+Java+Fedlet
+         descriptor for the signing key. Please follow the links
+         below on creating a key store and using the certificate.
+         http://openam.forgerock.org/doc/admin-guide/index.html#changing-signing-key
+         http://openam.forgerock.org/doc/dev-guide/index.html#fedlet-signing-encryption
 
          For the Windows environment, use the Certificates Snap-in for the
          Microsoft Management Console used earlier to now export the public key
