@@ -2210,6 +2210,178 @@ CookieWriterServlet.doGetPost: Redirect to
    and the service provider.</para>
   </section>
 
+  <section xml:id="change-federation">
+   <title>Changing Federation of Persistently Linked Accounts</title>
+
+   <para>OpenAM implements the SAML 2.0 Name Identifier Management profile,
+   allowing you to change a persistent identifier that has been set to federate
+   accounts, and also to terminate federation for an account.</para>
+
+   <para>When user accounts are stored in an LDAP directory server, name
+   identifier information is stored on the
+   <literal>sun-fm-saml2-nameid-info</literal> and
+   <literal>sun-fm-saml2-nameid-infokey</literal> attributes of a user's
+   entry.<footnote><para>These attribute types are configurable in the OpenAM
+   console under Configuration &gt; Global &gt; SAMLv2 Service
+   Configuration.</para></footnote> You can retrieve the name identifier value
+   by checking the value of
+   <literal>sun-fm-saml2-nameid-infokey</literal>.</para>
+
+   <para>For example, if the user's entry in the directory shows
+   <literal>sun-fm-saml2-nameid-infokey:
+   http://www.idp.com:8080/openam|http://www.sp.com:8080/openam|
+   XyfFEsr6Vixbnt0BSqIglLFMGjR2</literal>, then the name identifier is
+   <literal>XyfFEsr6Vixbnt0BSqIglLFMGjR2</literal>.</para>
+
+   <para>You can use this identifier to initiate a change request from the
+   service provider as in the following example.</para>
+
+   <literallayout class="monospaced"
+   >http://www.sp.com:8080/openam/saml2/jsp/spMNIRequestInit.jsp?
+ idpEntityID=http%3A%2F%2Fwww.idp.com%3A8080%2Fopenam
+ &amp;metaAlias=/sp
+ &amp;requestType=NewID
+ &amp;IDPProvidedID=XyfFEsr6Vixbnt0BSqIglLFMGjR2</literallayout>
+
+   <para>You can also initiate the change request from the identity provider
+   as in the following example.</para>
+
+   <literallayout class="monospaced"
+   >http://www.idp.com:8080/openam/saml2/jsp/idpMNIRequestInit.jsp?
+ spEntityID=http%3A%2F%2Fwww.sp.com%3A8080%2Fopenam
+ &amp;metaAlias=/idp
+ &amp;requestType=NewID
+ &amp;SPProvidedID=XyfFEsr6Vixbnt0BSqIglLFMGjR2</literallayout>
+
+   <variablelist xml:id="idpmnirequestinit-parameters">
+    <title><filename>idpMNIRequestInit.jsp</filename> Parameters</title>
+
+    <varlistentry>
+     <term><literal>spEntityID</literal></term>
+     <listitem>
+      <para>(Required) Use this parameter to indicate the remote service
+      provider. Make sure you URL encode the value. For example, specify
+      <literal>spEntityID=http://www.sp.com:8080/openam</literal> as
+      <literal>spEntityID=http%3A%2F%2Fwww.sp.com%3A8080%2Fopenam</literal>.</para>
+     </listitem>
+    </varlistentry>
+
+    <varlistentry>
+     <term><literal>metaAlias</literal></term>
+     <listitem>
+      <para>(Required) Use this parameter to specify the local alias for the
+      provider, such as <literal>metaAlias=/myRealm/idp</literal>. This
+      parameter takes the format
+      <literal>/<replaceable>realm-name</replaceable>/<replaceable
+      >provider-name</replaceable></literal> as described in <xref
+      linkend="idp-meta-alias"/>. You do not repeat the slash for
+      the top level realm, for example <literal>metaAlias=/idp</literal>.</para>
+     </listitem>
+    </varlistentry>
+
+    <varlistentry>
+     <term><literal>requestType</literal></term>
+     <listitem>
+      <para>(Required) Type of manage name ID request, either
+      <literal>NewID</literal> to change the ID, or <literal>Terminate</literal>
+      to remove the information that links the accounts on the identity provider
+      and service provider.</para>
+     </listitem>
+    </varlistentry>
+
+    <varlistentry>
+     <term><literal>SPProvidedID</literal></term>
+     <listitem>
+      <para>(Required if <literal>requestType=NewID</literal>) Name identifier
+      in use as described above.</para>
+     </listitem>
+    </varlistentry>
+
+    <varlistentry>
+     <term><literal>affiliationID</literal></term>
+     <listitem>
+      <para>(Optional) Use this parameter to specify a SAML affiliation
+      identifier.</para>
+     </listitem>
+    </varlistentry>
+
+    <varlistentry>
+     <term><literal>relayState</literal></term>
+     <listitem>
+      <para>(Optional) Use this parameter to specify where to redirect the user
+      when the process is complete. Make sure you URL encode the value. For
+      example, <literal>relayState=http%3A%2F%2Fopenam.forgerock.org</literal>
+      takes the user to <literal>http://openam.forgerock.org</literal>.</para>
+     </listitem>
+    </varlistentry>
+   </variablelist>
+
+   <variablelist xml:id="spmnirequestinit-parameters">
+    <title><filename>spMNIRequestInit.jsp</filename> Parameters</title>
+
+    <varlistentry>
+     <term><literal>idpEntityID</literal></term>
+     <listitem>
+      <para>(Required) Use this parameter to indicate the remote identity
+      provider. Make sure you URL encode the value. For example, specify
+      <literal>idpEntityID=http://www.idp.com:8080/openam</literal> as
+      <literal>idpEntityID=http%3A%2F%2Fwww.idp.com%3A8080%2Fopenam</literal>.</para>
+     </listitem>
+    </varlistentry>
+
+    <varlistentry>
+     <term><literal>metaAlias</literal></term>
+     <listitem>
+      <para>(Required) Use this parameter to specify the local alias for the
+      provider, such as <literal>metaAlias=/myRealm/sp</literal>. This parameter
+      takes the format <literal>/<replaceable>realm-name</replaceable>/<replaceable
+      >provider-name</replaceable></literal> as described in <xref
+      linkend="sp-meta-alias"/>. You do not repeat the slash for the
+      top level realm, <literal>metaAlias=/sp</literal>.</para>
+     </listitem>
+    </varlistentry>
+
+    <varlistentry>
+     <term><literal>requestType</literal></term>
+     <listitem>
+      <para>(Required) Type of manage name ID request, either
+      <literal>NewID</literal> to change the ID, or <literal>Terminate</literal>
+      to remove the information that links the accounts on the identity provider
+      and service provider.</para>
+     </listitem>
+    </varlistentry>
+
+    <varlistentry>
+     <term><literal>IDPProvidedID</literal></term>
+     <listitem>
+      <para>(Required if <literal>requestType=NewID</literal>) Name identifier
+      in use as described above.</para>
+     </listitem>
+    </varlistentry>
+
+    <varlistentry>
+     <term><literal>affiliationID</literal></term>
+     <listitem>
+      <para>(Optional) Use this parameter to specify a SAML affiliation
+      identifier.</para>
+     </listitem>
+    </varlistentry>
+
+    <varlistentry>
+     <term><literal>relayState</literal></term>
+     <listitem>
+      <para>(Optional) Use this parameter to specify where to redirect the user
+      when the process is complete. Make sure you URL encode the value. For
+      example, <literal>relayState=http%3A%2F%2Fopenam.forgerock.org</literal>
+      takes the user to <literal>http://openam.forgerock.org</literal>.</para>
+     </listitem>
+    </varlistentry>
+   </variablelist>
+
+   <para>You can terminate federation as described in <xref
+   linkend="terminate-federation" />.</para>
+  </section>
+
   <section xml:id="terminate-federation">
    <title>Terminating Federation of Persistently Linked Accounts</title>
 
