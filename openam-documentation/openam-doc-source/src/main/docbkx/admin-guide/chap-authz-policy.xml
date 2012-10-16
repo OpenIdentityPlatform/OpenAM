@@ -199,8 +199,17 @@
       <para>Name the new rule, add the URL to protect in the Resource Name
       field, and set whether to allow or deny HTTP GET and POST requests
       to the URL.</para>
-      <para>The URL can include asterisks as wildcards (<literal>*</literal>).
-      Wildcard matches for rules work as follows.</para>
+
+      <para>Your Resource Name can use wildcards.<footnote><para>This
+      explanation focuses on how this works for web resources such as
+      <literal>http://www.example.com:80/index.html</literal>,
+      where the delimiter is <literal>/</literal>, the wildcard is
+      <literal>*</literal>, and the one-level wildcard is
+      <literal>-*-</literal>. By default, comparisons are not case sensitive.
+      The delimiter, wildcards and case sensitivity are configurable. To see
+      examples of other configurations, browse in the OpenAM console to
+      Configuration &gt; Global &gt; Policy Configuration &gt; Resource
+      Comparator.</para></footnote></para>
       <itemizedlist>
        <listitem>
         <para>A <literal>*</literal> matches zero or more characters including
@@ -222,7 +231,29 @@
         Name. Therefore <literal>http://www.example.com/images//</literal> and
         <literal>http://www.example.com/images</literal> are equivalent.</para>
        </listitem>
+       <listitem>
+        <para>A <literal>-*-</literal> matches all characters except forward
+        slash (<literal>/</literal>) or question mark (<literal>?</literal>),
+        and cannot be escaped. As it does not match <literal>/</literal>,
+        <literal>-*-</literal> does not span multiple levels in a URL.</para>
+     
+        <para>OpenAM does not let you mix <literal>*</literal> and
+        <literal>-*-</literal> in the same URL.</para>
+       </listitem>
       </itemizedlist>
+
+      <para>To check for a match, OpenAM first normalizes both the policy
+      resource name URL pattern you provide, and also the actual requested
+      resource URL. In addition to sorting the query string field-value pairs,
+      OpenAM ensures that both the URL pattern and the resource URL include the
+      port number. If no port number is specified, OpenAM uses 80 for HTTP or
+      443 for HTTPS. In other words, <literal>http://www.example.com/*</literal>
+      gets normalized to <literal>http://www.example.com:80/*</literal>. Also,
+      <literal>http://*/*</literal> gets normalized to
+      <literal>http://*:80/*</literal>. Notice that <literal>http://*/*</literal>
+      does matches when the port number is 80, but not when the port number is
+      something else, such as
+      <literal>http://www.example.com:1080/index.html</literal>.</para>
      </step>
      <step>
       <para>Click Finish.</para>
