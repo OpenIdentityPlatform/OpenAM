@@ -695,4 +695,26 @@ $ java -server -Xmx1024m -XX:MaxPermSize=256m -jar start.jar</screen>
    </varlistentry>
   </variablelist>
  </section>
+
+ <section xml:id="prepare-ibm-websphere">
+  <title>Preparing IBM<superscript>®</superscript> WebSphere<superscript>®</superscript></title>
+
+  <para>Before you deploy OpenAM, add these JVM parameters in the Administrator console.</para>
+
+  <variablelist>
+   <varlistentry>
+    <term><literal>Generic JVM arguments</literal></term>
+    <listitem>
+     <para>-DamCryptoDescriptor.provider=IBMJCE</para>
+    </listitem>
+    <listitem>
+     <para>-DamKeyGenDescriptor.provider=IBMJCE</para>
+    </listitem>
+   </varlistentry>
+  </variablelist>
+
+  <para>Make sure OpenAM has at least 1 GB heap.</para>
+
+ </section>
+
 </chapter>
