@@ -37,6 +37,14 @@
  <itemizedlist>
   <title>Major New Features</title>
    <listitem>
+    <para>IBM<superscript>®</superscript> WebSphere<superscript>®</superscript> 8.0 is now a supported
+    platform for OpenAM 10.1.0. 
+    <link xlink:href="http://openam.forgerock.org/openam-documentation/openam-doc-source/doc/install-guide/index.html#prepare-ibm-websphere"
+    xlink:show="new">Section 1.10</link> of the <citetitle>Installation Guide</citetitle>
+    details how to setup WebSphere 8.0 and 8.5 before deploying OpenAM 10.1.0.</para>
+   </listitem>
+   
+   <listitem>
     <para>Many legacy naming conventions have been changed to conform to the newer product
     name, OpenAM. This includes the new OpenAM bootstrap file (<link
     xlink:href="https://bugster.forgerock.org/jira/browse/OPENAM-1555"
@@ -44,8 +52,7 @@
     .openssocfg folder so that it appeared as .openamcfg prior to starting the server. Other
     files, such as the openam.war file, and paths have been modified to ensure consistency 
     with the naming conventions.</para>
-   </listitem>
-
+  </listitem>
   <listitem>
    <para>OpenAM now supports YubiKey<superscript>®</superscript> authentication (<link
    xlink:href="https://bugster.forgerock.org/jira/browse/OPENAM-727"
