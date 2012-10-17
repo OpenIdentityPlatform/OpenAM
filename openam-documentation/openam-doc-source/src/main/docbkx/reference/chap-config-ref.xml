@@ -3240,7 +3240,7 @@
    <varlistentry>
     <term><literal>com.iplanet.am.lbcookie.value</literal></term>
     <listitem>
-     <para>Used with stick load balancers that can inspect the cookie value.
+     <para>Used with sticky load balancers that can inspect the cookie value.
      Set this property to a unique value if your load balancer requires it.
      Restart OpenAM for the change to take effect.</para>
      <para>Default: 01</para>
