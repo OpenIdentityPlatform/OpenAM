@@ -2633,4 +2633,29 @@ Bulk Federation for this host was completed.</screen>
    <para>At this point the accounts are linked.</para>
   </section>
  </section>
+
+ <section xml:id="using-saml2-artifacts">
+  <title>Using SAML 2.0 Artifacts</title>
+
+  <para>By default OpenAM transmits SAML messages by value. This makes it
+  possible to access the SAML messages in the user agent. You can instead
+  request that OpenAM transmit SAML messages by reference using SAML artifacts,
+  which are small values that reference a SAML message. Providers then
+  communicate directly to resolve artifacts, rather than sending the messages
+  through the user agent.</para>
+
+  <para>When initiating single sign-on using <filename>idpSSOInit.jsp</filename>
+  or <filename>spSSOInit.jsp</filename> for example, add
+  <literal>binding=HTTP-Artifact</literal> to the list of query parameters.
+  The following example works in an environment where the identity provider is
+  <literal>www.idp.com</literal> and the service provider is
+  <literal>www.sp.com</literal>. Both providers have deployed OpenAM on port
+  8080 under deployment URI <literal>/openam</literal>.</para>
+
+  <literallayout class="monospaced"
+  >http://www.sp.com:8080/openam/saml2/jsp/spSSOInit.jsp?
+   idpEntityID=http%3A%2F%2Fwww.idp.com%3A8080%2Fopenam
+   &amp;metaAlias=/sp
+   &amp;binding=HTTP-Artifact</literallayout>
+ </section>
 </chapter>
