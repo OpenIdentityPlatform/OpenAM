@@ -100,48 +100,9 @@
             <artifactId>openam-core</artifactId>
         </dependency>
 
-        <!-- Session Repository Module Dependencies-->
-        <dependency>
-            <groupId>commons-net</groupId>
-            <artifactId>commons-net</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.codehaus.jackson</groupId>
-            <artifactId>jackson-core-asl</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.codehaus.jackson</groupId>
-            <artifactId>jackson-mapper-asl</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.restlet.jse</groupId>
-            <artifactId>org.restlet</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.restlet.jse</groupId>
-            <artifactId>org.restlet.ext.jackson</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.restlet.jse</groupId>
-            <artifactId>org.restlet.ext.simple</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.restlet.jse</groupId>
-            <artifactId>org.restlet.ext.crypto</artifactId>
-        </dependency>
-
-        <dependency>
-            <groupId>org.restlet.jse</groupId>
-            <artifactId>org.restlet.ext.httpclient</artifactId>
-        </dependency>
-
         <dependency>
             <groupId>external</groupId>
             <artifactId>OpenDJ</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.forgerock.opendj</groupId>
-            <artifactId>opendj-ldap-sdk</artifactId>
         </dependency>
 
         <dependency>

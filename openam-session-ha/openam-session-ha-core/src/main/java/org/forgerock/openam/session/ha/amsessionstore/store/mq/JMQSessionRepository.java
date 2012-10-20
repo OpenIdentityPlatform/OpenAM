@@ -35,6 +35,7 @@ import com.iplanet.dpro.session.SessionException;
 import com.iplanet.dpro.session.SessionID;
 import com.iplanet.dpro.session.exceptions.NotFoundException;
 import com.iplanet.dpro.session.exceptions.StoreException;
+import com.iplanet.dpro.session.service.SessionServiceConfigurationReferenceObject;
 import com.sun.identity.common.GeneralTaskRunnable;
 import com.sun.identity.common.SystemTimer;
 import com.iplanet.am.util.SystemProperties;
@@ -43,10 +44,8 @@ import com.iplanet.dpro.session.service.InternalSession;
 import com.iplanet.dpro.session.service.SessionService;
 import com.sun.identity.session.util.SessionUtils;
 import com.sun.identity.shared.debug.Debug;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Set;
+
+import java.util.*;
 import javax.jms.IllegalStateException;
 
 import org.forgerock.openam.session.model.AMRootEntity;
@@ -61,6 +60,7 @@ import com.sun.identity.shared.Constants;
  * is used in session failover mode to store/recover serialized
  * state of InternalSession object
  */
+@Deprecated
 public class JMQSessionRepository extends GeneralTaskRunnable implements
     AMSessionRepository {
 
@@ -536,4 +536,5 @@ public class JMQSessionRepository extends GeneralTaskRunnable implements
     public Map<String, Long> getRecordCount(String id) throws StoreException {
         return null;  // TODO
     }
+
 }

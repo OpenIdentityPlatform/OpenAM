@@ -472,7 +472,7 @@ public interface SetupConstants {
     static final String CONFIG_VAR_DEFAULT_SHARED_KEY = "KmhUnWR1MYWDYW4xuqdF5nbm+CXIyOVt";
 
     /**
-     * Configuration variable for storing site confiuration data.
+     * Configuration variable for storing site configuration data.
      */
     static final String CONFIG_VAR_SITE_CONFIGURATION = "SITE_CONFIGURATION_MAP";
     
@@ -485,6 +485,11 @@ public interface SetupConstants {
      * Configuration variable for name of site configuration primary url.
      */
     static final String LB_PRIMARY_URL = "wizardLoadBalancerURL";
+
+    /**
+     * Configuration variable for name of site configuration session HA Failover Enablement.
+     */
+    static final String LB_SESSION_HA_SFO = "wizardLoadBalancerSessionHASFO";
 
     /**
      * Schema Template Directory.

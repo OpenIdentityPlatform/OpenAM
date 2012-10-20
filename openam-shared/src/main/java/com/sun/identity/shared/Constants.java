@@ -1206,30 +1206,17 @@ public interface Constants {
     /**
      * Default Session SFO/HA Store Type.
      */
-    static final String DEFAULT_SESSION_HA_STORE_TYPE = "embedded";
+    static final String DEFAULT_SESSION_HA_STORE_TYPE = "none";
 
     /**
-     * Additional AMSessionDB Constants
+     * Additional Directory Constants
      */
-    static final String STATS_ENABLED =
-            "amsessiondb.enabled";
-
-    static final String URI = "amsessiondb.uri";
-
-    static final String OU_FAMRECORDS = "ou=famrecords";
-
-    static final String OU_AMSESSIONDB = "ou=amsessiondb";
-
-    static final String AMRECORD_NAMING_ATTR = "pKey";
 
     static final String TOP = "top";
 
-    static final String FR_FAMRECORD = "frFamRecord";
+    static final String ASTERISK = "*";
 
     static final String OBJECTCLASS = "objectClass";
 
-    static final String FR_AMSESSIONDB = "frAmSessionDb";
-
-    static final String FAMRECORD_FILTER = "(objectclass=*)";
 
 }

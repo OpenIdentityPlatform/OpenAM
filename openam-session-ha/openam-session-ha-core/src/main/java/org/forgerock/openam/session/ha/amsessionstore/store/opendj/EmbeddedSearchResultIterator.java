@@ -35,7 +35,7 @@ import java.util.Set;
 import com.iplanet.dpro.session.service.SessionService;
 import com.sun.identity.shared.debug.Debug;
 import org.forgerock.openam.session.model.AMRecordDataEntry;
-import org.forgerock.openam.session.model.CaseInsensitiveHashMap;
+import com.sun.identity.common.CaseInsensitiveHashMap;
 import com.iplanet.dpro.session.exceptions.StoreException;
 import org.opends.server.types.Attribute;
 import org.opends.server.types.AttributeValue;

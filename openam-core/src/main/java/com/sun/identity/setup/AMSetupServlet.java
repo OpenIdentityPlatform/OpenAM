@@ -33,6 +33,7 @@
 package com.sun.identity.setup;
 
 import com.iplanet.am.util.AdminUtils;
+import com.iplanet.dpro.session.service.AMSessionRepository;
 import com.iplanet.services.ldap.DSConfigMgr;
 import com.iplanet.services.naming.WebtopNaming;
 import com.iplanet.services.util.Crypt;
@@ -72,18 +73,9 @@ import com.sun.identity.shared.Constants;
 import com.sun.identity.shared.debug.Debug;
 import com.sun.identity.shared.encode.Base64;
 import com.sun.identity.shared.locale.Locale;
-import com.sun.identity.sm.AttributeSchema;
-import com.sun.identity.sm.OrganizationConfigManager;
-import com.sun.identity.sm.ServiceConfig;
-import com.sun.identity.sm.ServiceConfigManager;
-import com.sun.identity.sm.ServiceSchema;
-import com.sun.identity.sm.ServiceSchemaManager;
-import com.sun.identity.sm.ServiceManager;
-import com.sun.identity.sm.SMSException;
-import com.sun.identity.sm.SMSEntry;
-import com.sun.identity.sm.CachedSMSEntry;
+import com.sun.identity.sm.*;
 import com.sun.identity.shared.StringUtils;
-import com.sun.identity.sm.SMSPropertiesObserver;
+
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.ByteArrayInputStream;
@@ -144,6 +136,7 @@ import org.forgerock.openam.upgrade.OpenDJUpgrader;
 import org.forgerock.openam.upgrade.UpgradeException;
 import org.forgerock.openam.upgrade.UpgradeServices;
 import org.forgerock.openam.upgrade.UpgradeUtils;
+import com.sun.identity.sm.SessionHAFailoverSetupSubConfig;
 
 /**
  * This class is the first class to get loaded by the Servlet 
@@ -569,7 +562,7 @@ public class AMSetupServlet extends HttpServlet {
             req.addParameter("UserStore", store);
         }
         
-        boolean result = processRequest(req, res);            
+        boolean result = processRequest(req, res);
        
         if (result == false) {
             response.getWriter().write( 
@@ -595,10 +588,10 @@ public class AMSetupServlet extends HttpServlet {
             response);
         return processRequest(req, res);
     }
-    
+
     public static boolean processRequest(
-        IHttpServletRequest request,
-        IHttpServletResponse response
+            IHttpServletRequest request,
+            IHttpServletResponse response
     ) {
         setLocale(request);
         InstallLog.getInstance().open();
@@ -686,6 +679,8 @@ public class AMSetupServlet extends HttpServlet {
                             SetupConstants.LB_SITE_NAME);
                         String primaryURL = (String)siteMap.get(
                             SetupConstants.LB_PRIMARY_URL);
+                        Boolean isSessionHASFOEnabled = Boolean.valueOf( (String)siteMap.get(
+                                SetupConstants.LB_SESSION_HA_SFO));
 
                         /* 
                          * If primary url is null that means we are adding
@@ -706,7 +701,20 @@ public class AMSetupServlet extends HttpServlet {
                             ServerConfiguration.addToSite(
                                 adminToken, serverInstanceName, site);
                         }
-                    }
+
+                        /**
+                         * Now create the SubSchema for Global Session to automate
+                         * setting the Session HA Failover property.
+                         * @since 10.1.0
+                         */
+                        Map values = new HashMap(1);
+                        Set innerValues = new HashSet(1);
+                        innerValues.add(isSessionHASFOEnabled.toString());
+                        values.put(AMSessionRepository.IS_SFO_ENABLED, innerValues);
+                        SessionHAFailoverSetupSubConfig.getInstance().
+                                createSessionHAFOSubConfigEntry(adminToken, site,
+                                        SessionHAFailoverSetupSubConfig.AM_SESSION_SERVICE, values);
+                    } // End of site map check.
                     if (EmbeddedOpenDS.isMultiServer(map)) {
                         // Setup Replication port in SMS for each server
                         updateReplPortInfo(map);
@@ -1992,7 +2000,7 @@ public class AMSetupServlet extends HttpServlet {
     ) throws IOException {
         // Get OpenSSO web application base location.
         URL url = servletCtx.getResource("/WEB-INF/lib/opensso.jar");
-        // TODO: Needs to be Fixed...
+        // TODO: Needs to be Fixed...JAR Name not valid!
         String webAppLocation = (url.toString()).substring(5);
         int index = webAppLocation.indexOf("WEB-INF");
         webAppLocation = webAppLocation.substring(0, index-1);

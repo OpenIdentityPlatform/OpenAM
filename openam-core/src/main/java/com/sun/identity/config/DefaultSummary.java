@@ -27,12 +27,11 @@
  */
 
 /*
- * Portions Copyrighted [2010] [ForgeRock AS]
+ * Portions Copyrighted [2010-2012] [ForgeRock AS]
  */
 
 package com.sun.identity.config;
 
-import com.iplanet.dpro.session.service.AMSessionRepository;
 import com.sun.identity.config.util.AjaxPage;
 import com.sun.identity.setup.AMSetupServlet;
 import com.sun.identity.setup.HttpServletRequestWrapper;

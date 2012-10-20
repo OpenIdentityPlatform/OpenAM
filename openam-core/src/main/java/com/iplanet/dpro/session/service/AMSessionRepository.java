@@ -31,6 +31,8 @@
  */
 package com.iplanet.dpro.session.service;
 
+import java.net.InetSocketAddress;
+import java.net.URL;
 import java.util.Map;
 import java.util.Set;
 
@@ -199,4 +201,5 @@ public interface AMSessionRepository {
      * @return DBStatistics
      */
     public DBStatistics getDBStatistics();
+
 }

@@ -45,8 +45,6 @@ public interface SessionAttributeNames {
     static final  String CONFIG_STORE_LOGIN_ID = "configStoreLoginId";
     static final  String CONFIG_STORE_ROOT_SUFFIX = "rootSuffix";
     static final  String CONFIG_STORE_PWD = "configStorePassword";
-    static final  String CONFIG_STORE_SESSION_STORE_TYPE = "sessionStoreType";
-    static final  String CONFIG_STORE_SESSION_ROOT_DN = "sessionRootDN";
 
     static final  String CONFIG_VAR_DATA_STORE = "DATA_STORE";
     static final  String DS_EMB_REPL_FLAG = "DS_EMB_REPL_FLAG";
@@ -70,4 +68,5 @@ public interface SessionAttributeNames {
 
     static final  String LB_SITE_NAME = "wizardLoadBalancerSiteName";
     static final  String LB_PRIMARY_URL = "wizardLoadBalancerURL";
+    static final  String LB_SESSION_HA_SFO = "wizardLoadBalancerSessionHASFO";
 }

@@ -43,15 +43,24 @@ import java.io.Serializable;
  */
 public class Statistics implements Serializable {
     private static final long serialVersionUID = 42L;
+
+    /**
+     * Globals
+     */
     private static boolean enabled = true;
     private static Statistics instance = null;
-      
+
+    private static final String STATS_ENABLED = "amsessiondb.enabled";
+
+    /**
+     * Static Initialization Stanza.
+     */
     static {
         initialize();
     }
     
     private static void initialize() {
-        enabled = SystemProperties.getAsBoolean(Constants.STATS_ENABLED, true);
+        enabled = SystemProperties.getAsBoolean(STATS_ENABLED, true);
     }
     
     private int totalRequests;

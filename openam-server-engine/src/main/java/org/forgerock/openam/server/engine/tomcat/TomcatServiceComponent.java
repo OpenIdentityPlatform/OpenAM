@@ -29,151 +29,92 @@
 
 package org.forgerock.openam.server.engine.tomcat;
 
-
+import com.sun.identity.common.GeneralTaskRunnable;
 import org.apache.catalina.Context;
 import org.apache.catalina.LifecycleException;
 import org.forgerock.openam.server.engine.commons.shutdown.ServiceInstanceShutdownLogger;
 
-import javax.annotation.PreDestroy;
 import java.io.File;
 
 
 /**
-     * Embedded Tomcat as our WEB Interface Layer.
-     * @author jeffaschenk@gmail.com
+ * Embedded Tomcat Service Component to provide HTTP/HTTPS Server Listeners
+ *
+ * @author jeff.schenk@forgerock.com
+ */
+public class TomcatServiceComponent extends GeneralTaskRunnable {
+    /**
+     * Single Instance
      */
-    //@Service("tomcat")
-    public class TomcatServiceComponent {
-        /**
-         * Logging
-         */
-        //private final static Logger logger = LoggerFactory.getLogger(TomcatServiceComponent.class);
+    private static volatile TomcatServiceComponent instance;
 
+    /**
+     * Tomcat Service Thread
+     */
+    private static final String OPENAM_SERVER_ENGINE =
+            "OPENAM_SERVER_ENGINE";
+    private static Thread tomcatServiceThread;
 
-        //@Value("#{systemEnvironmentProperties['tomcat.app.base']}")
-        private String appBase;
+    /**
+     * Our Tomcat Instance Object.
+     */
+    private BetterTomcat tomcat;
 
-        //@Value("#{systemEnvironmentProperties['tomcat.app.port']}")
-        private Integer appPort;
+    /**
+     * Global Properties and Environment Injected
+     */
+    private String appBase;
 
-        //@Value("#{systemEnvironmentProperties['tomcat.app.context.path']}")
-        private String contextPath;
+    private Integer appPort;
 
-        //@Value("#{systemEnvironmentProperties['tomcat.app.base.dir']}")
-        private String baseDirectory;
+    private String contextPath;
 
-        //@Value("#{systemEnvironmentProperties['tomcat.app.hostname']}")
-        private String appHostName;
+    private String baseDirectory;
 
+    private String appHostName;
 
-        /**
-         * Initialization Indicator.
-         */
-        private boolean initialized = false;
+    /**
+     * Default Constructor
+     */
+    private TomcatServiceComponent() {
+    }
 
-        /**
-         * Tomcat Service Thread
-         */
-        private TomcatServiceThread tomcatServiceThread;
+    /**
+     * Initialize the Embedded Service Component.
+     */
+    private static synchronized void initialize() {
 
-        /**
-         * Task Executor
-         */
-       //TaskExecutor taskExecutor;
-
-        /**
-         * Default Constructor
-         */
-        public TomcatServiceComponent() {
-        }
-
-
-        public synchronized void initialize() {
-
-            if (this.initialized) {
-                // Instance Already Initialized, ignore the request.
-                //logger.error("Tomcat instance already initialized, ignoring request");
-            }
-
-            tomcatServiceThread = new TomcatServiceThread(appBase, appPort, appHostName, contextPath, baseDirectory);
-
+        if (instance == null) {
+            instance = new TomcatServiceComponent();
+            tomcatServiceThread = new Thread(instance);
             //logger.info("Starting Background Thread for Embedded Tomcat Service Facility");
-            //taskExecutor.execute(tomcatServiceThread);
+            tomcatServiceThread.setName(OPENAM_SERVER_ENGINE);
+            tomcatServiceThread.start();
             //logger.info("Completed Background Embedded Tomcat Service Facility Thread Initialization.");
-            this.initialized = true;
+
 
         }
 
-        /**
-         * Destroy Service
-         * Invoked during Termination of the Spring Container.
-         */
-        @PreDestroy
-        public synchronized void destroy() {
-            //logger.info("Stopping Background Thread for Embedded Tomcat Service Facility");
+    }
 
-            this.tomcatServiceThread.endServiceInstance();
+    /**
+     * Destroy Service
+     * Invoked during Termination of the Spring Container.
+     */
+    public synchronized void destroy() {
+        //logger.info("Stopping Background Thread for Embedded Tomcat Service Facility");
 
-            //logger.info("Completed Background Embedded Tomcat Service Facility Thread shutdown.");
-        }
+        endServiceInstance();
 
-        /**
-         * Embedded Tomcat as our WEB Interface Layer.
-         */
-        //@Service("tomcat_service_thread")
-        public class TomcatServiceThread extends Thread {
+        //logger.info("Completed Background Embedded Tomcat Service Facility Thread shutdown.");
+    }
 
 
-            /**
-             * Initialization Indicator.
-             */
-            private boolean running = false;
-
-            /**
-             * Our Tomcat Instance Object.
-             */
-            private BetterTomcat tomcat;
-
-            /**
-             * Global Properties and Environment Injected
-             */
-            private String appBase;
-
-            private Integer appPort;
-
-            private String contextPath;
-
-            private String baseDirectory;
-
-            private String appHostName;
 
 
-            /**
-             * Default Constructor
-             */
-            private TomcatServiceThread() {
-            }
-
-
-            /**
-             * Background Task Constructor with All necessary parameters.
-             */
-            protected TomcatServiceThread(String appBase, Integer appPort, String appHostName, String contextPath, String baseDirectory) {
-                this.appBase = appBase;
-                this.appPort = appPort;
-                this.appHostName = appHostName;
-                this.contextPath = contextPath;
-                this.baseDirectory = baseDirectory;
-            }
-
-            @Override
-            public synchronized void run() {
-                if (running) {
-                    //logger.warn("Attempted to start another thread when Tomcat Thread is running, check for redundant spring wiring.");
-                    return;
-                }
+        public synchronized void run() {
+            if (tomcat == null) {
                 try {
-                    this.running = true;
                     // Configure Our Embedded Tomcat Instance.
                     tomcat = new BetterTomcat();
                     tomcat.addConnector(BetterTomcat.Protocol.HTTP_11_NIO, this.appHostName, this.appPort.intValue());
@@ -204,22 +145,58 @@ import java.io.File;
                 } finally {
                     ServiceInstanceShutdownLogger.log(this.getClass(), "WARN", "Completed Background Thread for Embedded Tomcat Execution.");
                 }
-
             }
+        }
 
-            /**
-             * End the Service Instance.
-             */
-            protected synchronized void endServiceInstance() {
-                ServiceInstanceShutdownLogger.log(this.getClass(), "INFO", "Stopping Embedded Tomcat Service Facility.");
-                try {
-                    this.tomcat.stop();
-                    //this.tomcat.destroy();
-                } catch (LifecycleException lifecycleException) {
-                    ServiceInstanceShutdownLogger.log(this.getClass(), "ERROR", "Embedded Tomcat Life Cycle Exception:" + lifecycleException, lifecycleException);
-                }
+        /**
+         * End the Service Instance.
+         */
+        protected synchronized void endServiceInstance() {
+            ServiceInstanceShutdownLogger.log(this.getClass(), "INFO", "Stopping Embedded Tomcat Service Facility.");
+            try {
+                tomcat.stop();
+                //this.tomcat.destroy();
+            } catch (LifecycleException lifecycleException) {
+                ServiceInstanceShutdownLogger.log(this.getClass(), "ERROR", "Embedded Tomcat Life Cycle Exception:" + lifecycleException, lifecycleException);
             }
+        }
 
+        /**
+         * Adds an element to this TaskRunnable.
+         *
+         * @param key Element to be added to this TaskRunnable
+         * @return a boolean to indicate whether the add success
+         */
+        public boolean addElement(Object key) {
+            return false;
+        }
+
+        /**
+         * Removes an element from this TaskRunnable.
+         *
+         * @param key Element to be removed from this TaskRunnable
+         * @return A boolean to indicate whether the remove success
+         */
+        public boolean removeElement(Object key) {
+            return false;
+        }
+
+        /**
+         * Indicates whether this TaskRunnable is empty.
+         *
+         * @return A boolean to indicate whether this TaskRunnable is empty
+         */
+        public boolean isEmpty() {
+            return false;
+        }
+
+        /**
+         * Returns the run period of this TaskRunnable.
+         *
+         * @return A long value to indicate the run period
+         */
+        public long getRunPeriod() {
+            return 0;
         }
 
 }

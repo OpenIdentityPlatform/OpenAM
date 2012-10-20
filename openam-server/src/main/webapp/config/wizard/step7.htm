@@ -88,11 +88,13 @@
                             #if ($loadBalancerHost)
                             <td>
                                 $page.getLocalizedString("site.name.label")<br>
-                                $page.getLocalizedString("primary.url.label")
+                                $page.getLocalizedString("primary.url.label")<br>
+                                $page.getLocalizedString("session.ha.sfo.enabled.label")
                             </td>                    
                             <td>
                                 $loadBalancerHost<br>
-                                $loadBalancerPort
+                                $loadBalancerPort<br>
+                                $loadBalancerSessionHASFO
                             </td>
                             #else
                             <td colspan="2">

@@ -123,7 +123,7 @@ public final class IdentityResource implements CollectionResourceProvider {
      * {@inheritDoc}
      */
     @Override
-    public void actionInstance(final Context context, final ActionRequest request,
+    public void actionInstance(final Context context, final String resourceId, final ActionRequest request,
                                final ResultHandler<JsonValue> handler) {
         final ResourceException e =
                 new NotSupportedException("Actions are not supported for resource instances");
@@ -137,7 +137,7 @@ public final class IdentityResource implements CollectionResourceProvider {
     public void createInstance(final Context context, final CreateRequest request,
                                final ResultHandler<Resource> handler) {
         final JsonValue value = request.getContent();
-        final String id = request.getResourceId();
+        final String id = request.getResourceName();
         final String rev = "0";
         try {
             final Resource resource;
@@ -175,9 +175,10 @@ public final class IdentityResource implements CollectionResourceProvider {
      * {@inheritDoc}
      */
     @Override
-    public void deleteInstance(final Context context, final DeleteRequest request,
+    public void deleteInstance(final Context context, final String resourceId, final DeleteRequest request,
                                final ResultHandler<Resource> handler) {
-        final String id = request.getResourceId();
+        //final String id = request.getResourceId();
+        final String id = request.getResourceName();
         final String rev = request.getRevision();
         try {
             final Resource resource;
@@ -204,7 +205,7 @@ public final class IdentityResource implements CollectionResourceProvider {
      * {@inheritDoc}
      */
     @Override
-    public void patchInstance(final Context context, final PatchRequest request,
+    public void patchInstance(final Context context, final String resourceId, final PatchRequest request,
                               final ResultHandler<Resource> handler) {
         final ResourceException e = new NotSupportedException("Patch operations are not supported");
         handler.handleError(e);
@@ -242,16 +243,22 @@ public final class IdentityResource implements CollectionResourceProvider {
      * {@inheritDoc}
      */
     @Override
-    public void readInstance(final Context context, final ReadRequest request,
+    public void readInstance(final Context context, final String resourceId, final ReadRequest request,
                              final ResultHandler<Resource> handler) {
-        final String id = request.getResourceId();
+        //final String id = request.getResourceId();
+        final String id = request.getResourceName();
+        SSOToken adminToken = (SSOToken) AccessController.doPrivileged(
+                AdminTokenAction. getInstance());
+        Token admin = new Token();
+        admin.setId(adminToken.getTokenID().toString());
+
         SSOToken adminToken = (SSOToken) AccessController.doPrivileged(
                 AdminTokenAction. getInstance());
         Token admin = new Token();
         admin.setId(adminToken.getTokenID().toString());
 
         try {
-            String component = request.getComponent();
+
             JsonValue result = new JsonValue(new LinkedHashMap<String, Object>(1));
 
 
@@ -282,9 +289,9 @@ public final class IdentityResource implements CollectionResourceProvider {
      * {@inheritDoc}
      */
     @Override
-    public void updateInstance(final Context context, final UpdateRequest request,
+    public void updateInstance(final Context context, final String resourceId, final UpdateRequest request,
                                final ResultHandler<Resource> handler) {
-        final String id = request.getResourceId();
+        final String id = request.getResourceName();
         final String rev = request.getRevision();
         try {
             final Resource resource;
@@ -319,7 +326,7 @@ public final class IdentityResource implements CollectionResourceProvider {
     private void addIdAndRevision(final Resource resource) throws ResourceException {
         final JsonValue content = resource.getContent();
         try {
-            content.asMap().put("_id", resource.getId());
+            content.asMap().put("_id",resource.getResourceName());
             content.asMap().put("_rev", resource.getRevision());
         } catch (final JsonValueException e) {
             throw new BadRequestException(

@@ -217,7 +217,7 @@
         <module>openam-clientsdk</module>
 
         <!-- Documentation -->
-        <module>openam-documentation</module>
+        <!-- <module>openam-documentation</module> -->
 
         <!-- Final Packaging Distribution Kit -->
         <module>openam-distribution</module>

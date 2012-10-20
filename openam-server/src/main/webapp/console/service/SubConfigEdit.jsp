@@ -64,6 +64,8 @@
 <%-- PAGE CONTENT --------------------------------------------------------- --%>
 <cc:pagetitle name="pgtitleTwoBtns" bundleID="amConsole" pageTitleText="page.title.services.edit.subconfig" showPageTitleSeparator="true" viewMenuLabel="" pageTitleHelpMessage="" showPageButtonsTop="true" showPageButtonsBottom="false" />
 
+
+
 <cc:propertysheet name="propertyAttributes" showJumpLinks="true" bundleID="amConsole" />
 </cc:form>
 

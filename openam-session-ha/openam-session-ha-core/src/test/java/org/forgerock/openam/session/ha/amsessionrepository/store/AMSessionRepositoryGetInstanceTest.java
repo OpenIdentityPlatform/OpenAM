@@ -29,11 +29,15 @@
 
 package org.forgerock.openam.session.ha.amsessionrepository.store;
 
+import com.iplanet.am.util.SystemProperties;
+import com.iplanet.dpro.session.service.AMSessionRepository;
 import com.iplanet.dpro.session.service.SessionRepository;
+import org.forgerock.openam.session.ha.amsessionstore.store.opendj.OpenDJPersistentStore;
 import org.junit.Ignore;
 import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
+
 import static org.testng.Assert.*;
 
 /**
@@ -55,11 +59,14 @@ public class AMSessionRepositoryGetInstanceTest {
 
     @Ignore
     public void testGetInstance() throws Exception {
+        // Not working.  As it needs too much environment
+        // to properly test, which is unfortunate.
 
-              assertNotNull(SessionRepository.getInstance());
-
-
-
+        // Acquire System Properties for minimum environment.
+        SystemProperties systemProperties = new SystemProperties();
+        AMSessionRepository amSessionRepository = SessionRepository.getInstance();
+        assertNotNull(amSessionRepository);
+        assertEquals(OpenDJPersistentStore.class.getName(), amSessionRepository.getClass().getName());
     }
 
 

@@ -195,8 +195,7 @@ public class Step3 extends LDAPStoreWizardPage {
         String[] containers = rootsuffix.split(Constants.COMMA);
         int namedDomainContainers = 0;
         int namedOrganizationContainers = 0;
-        for(String container : containers)
-        {
+        for(String container : containers) {
             if (container.startsWith(Constants.DEFAULT_ROOT_NAMING_ATTRIBUTE+Constants.EQUALS))
                 { namedDomainContainers++; }
             else if (container.startsWith(Constants.ORGANIZATION_NAMING_ATTRIBUTE+Constants.EQUALS))
@@ -615,6 +614,10 @@ public class Step3 extends LDAPStoreWizardPage {
             SetupConstants.SMS_DS_DATASTORE);    
     }
 
+    /**
+     * Validate an Existing SM Host for Configuration Backend.
+     * @return
+     */
     public boolean validateSMHost() {
         Context ctx = getContext();
         String strSSL = (String)ctx.getSessionAttribute(

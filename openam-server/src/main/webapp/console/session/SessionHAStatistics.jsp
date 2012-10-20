@@ -79,7 +79,7 @@
             // BLUFF
             window.onload = function () {
 
-                var bluffGraph1 = new Bluff.Pie('graph1', 450);
+                var bluffGraph1 = new Bluff.Bar('graph1', 450);
                 bluffGraph1.theme_keynote();
                 bluffGraph1.title = 'Live Session Counts';
 
@@ -91,7 +91,7 @@
                 bluffGraph1.draw();
 
 
-                var bluffGraph2 = new Bluff.Pie('graph2', 450);
+                var bluffGraph2 = new Bluff.Bar('graph2', 450);
                 bluffGraph2.theme_keynote();
                 bluffGraph2.title = 'Session Replication';
 
@@ -138,15 +138,10 @@
     showPageButtonsTop="true" 
     showPageButtonsBottom="false" />
 
-    <div id="watermark">
-        <p>WIP - Mockup</p>
-    </div>
-
-
     <table>
         <tr>
             <td bgcolor='#EEE8CD' colspan='2'>
-                <h3>OpenAM Session DB Status</h3>
+                <h3>OpenAM Session Persistence Status</h3>
                 <b>Ok</b>
             </td>
         </tr>

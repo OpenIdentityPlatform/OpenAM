@@ -7,11 +7,13 @@
         $('loadBalancerDisable').checked = true;
         $('loadBalancerHostName').value = null;
         $('loadBalancerPort').value = null;
+        $('loadBalancerSessionHASFO').checked = false;
         $('loadBalancerStatus').innerHTML = "";
         loadBalancerValid = false;
         $('nextTabButton').disabled = false;
         $('loadBalancerHostName').disabled = true;
         $('loadBalancerPort').disabled = true;
+        $('loadBalancerSessionHASFO').disabled = true;
         ie7fix++;
         AjaxUtils.call("$context$path?actionLink=clear&ie7fix=" + ie7fix);
     }
@@ -22,6 +24,8 @@
         $('nextTabButton').disabled = true;
         $('loadBalancerHostName').disabled = false;
         $('loadBalancerPort').disabled = false;
+        $('loadBalancerSessionHASFO').disabled = false;
+        $('loadBalancerSessionHASFO').checked = false;
     }
 
     function urlValidated(response) {
@@ -45,6 +49,31 @@
             $('loadBalancerPort').value + "&ie7fix=" + ie7fix, urlValidated);
     }
 
+    <!--                     -->
+    <!-- HA SFO callbacks    -->
+    <!--                     -->
+    function sessionHASFOValidated(body) {
+        loadBalancerValid = true;
+        $('nextTabButton').disabled = false;
+        if( $('loadBalancerHostName').value != null && $('loadBalancerPort').value != null ) {
+            $('loadBalancerSessionHASFOStatus').innerHTML = okString;
+        } else {
+            $('loadBalancerSessionHASFOStatus').innerHTML = null;
+        }
+    }
+
+    function sessionHASFOInvalidated(body) {
+        loadBalancerValid = false;
+        $('nextTabButton').disabled = true;
+        $('loadBalancerSessionHASFOStatus').innerHTML = errorImage + '<small>'+body+'</small>';
+    }
+
+    function validateSessionHASFO() {
+        var params = "sessionHASFOEnabled=" + $('loadBalancerSessionHASFO').value;
+        APP.call("$context$path", "validateSessionHASFO", params,
+                sessionHASFOValidated, sessionHASFOInvalidated);
+
+    }
 
     <!--                     -->
     <!-- site name callbacks -->
@@ -75,11 +104,15 @@
             if( $('loadBalancerEnable').checked ) {
                 $('loadBalancerHostName').disabled = false;
                 $('loadBalancerPort').disabled = false;
+                $('loadBalancerSessionHASFO').disabled = false;
+                $('loadBalancerSessionHASFO').checked = false;
                 validateSiteName();
                 validatePrimaryURL();
+                validateSessionHASFO();
             } else {
                 $('loadBalancerHostName').disabled = true;
                 $('loadBalancerPort').disabled = true;
+                $('loadBalancerSessionHASFO').disabled = true;
             }
         } else {
             $('nextTabButton').disabled = true;
@@ -100,7 +133,7 @@
         <p id="allfields"><em>*</em>&nbsp;$page.getLocalizedString("required.field.label")</p>
         <b class="xtop"><b class="xt1"></b><b class="xt2"></b><b class="xt3"></b><b class="xt4"></b></b>
             <div class="headerBox">$page.getLocalizedString("step5.sub.title")</div>
-        <div class="bodyBox" style="height:100px">
+        <div class="bodyBox" style="height:180px">
             $page.getLocalizedString("step5.help.message")
             <span>
                 <table class="temp">
@@ -109,7 +142,7 @@
                         <td>
                             <input id="loadBalancerHostName" name="loadBalancerHostName" 
                             type="text" value="#if($host)$host#{end}" class="text" 
-                            style="width:150px" 
+                            style="width:180px"
                             onkeyup="APP.callDelayed(this, validateSiteName)"    
                             onchange="APP.callDelayed(this, validateSiteName)"/>
                             <span id="siteNameStatus"></span>                    
@@ -120,10 +153,22 @@
                         <td>
                             <input id="loadBalancerPort" name="loadBalancerPort" 
                             type="text" value="#if($port)$port#{end}" class="text" 
-                            style="width:150px" 
+                            style="width:180px"
                             onkeyup="APP.callDelayed(this, validatePrimaryURL)"    
                             onchange="APP.callDelayed(this, validatePrimaryURL)"/>
                             <span id="loadBalancerStatus"></span>                  
+                        </td>
+                    </tr>
+                    <tr>
+                    <tr>
+                    <td><label for="loadBalancerSessionHASFO"><em>&nbsp;</em>
+                        $page.getLocalizedString("session.ha.sfo.enabled.label")</label></td>
+                        <td>
+                            <input id="loadBalancerSessionHASFO" name="loadBalancerSessionHASFO"
+                                   type="checkbox"
+                                    onkeyup="APP.callDelayed(this, validateSessionHASFO)"
+                                    onchange="APP.callDelayed(this, validateSessionHASFO)"/>
+                             <span id="loadBalancerSessionHASFOStatus"></span>
                         </td>
                     </tr>
                 </table>

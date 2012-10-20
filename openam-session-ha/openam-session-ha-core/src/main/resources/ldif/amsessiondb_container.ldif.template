@@ -7,8 +7,3 @@ aci: (target="ldap:///o=openam-session,@SM_CONFIG_ROOT_SUFFIX@")(targetattr = "*
 dn: ou=famrecords,o=openam-session,@SM_CONFIG_ROOT_SUFFIX@
 ou: famrecords
 objectClass: organizationalUnit
-
-dn: ou=amsessiondb,o=openam-session,@SM_CONFIG_ROOT_SUFFIX@
-ou: amsessiondb
-objectClass: organizationalUnit
-

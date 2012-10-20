@@ -640,7 +640,13 @@ public class NamingService implements RequestHandler, ServiceListener {
         Set<String> siteNamesAndIDs = new HashSet<String>();
         
         for (String siteName : siteNames) {
-            String id = SiteConfiguration.getSiteID(sso, siteName);
+            String id = null;
+            try {
+                id = SiteConfiguration.getSiteID(sso, siteName);
+            } catch(SMSException smsException) {
+              namingDebug.warning("Unable to determine Site ID for SiteName:["+siteName+"], Ignoring.");
+              continue;
+            }
             StringBuilder nameAndID = new StringBuilder();
             nameAndID.append(siteName).append(delimiter).append(id);
             siteNamesAndIDs.add(nameAndID.toString());

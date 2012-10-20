@@ -82,6 +82,8 @@ public class Step4 extends AjaxPage {
         new ActionLink("setStoreType", this, "setStoreType");    
 
     private String responseString = "ok";
+
+    private static final String ObjectClassFilter = "(objectclass=*)";
     
     public Step4() {
     }
@@ -380,9 +382,9 @@ public class Step4 extends AjaxPage {
             ld.setConnectTimeout(5);
             ld.connect(3, host, port, bindDN, bindPwd);
             
-            String filter = "cn=" + "\"" + rootSuffix + "\"";
+            //String filter = "cn=" + "\"" + rootSuffix + "\"";    // NOT SURE Why "cn" is specified. would never work.
             String[] attrs = {""};
-            ld.search(rootSuffix, LDAPConnection.SCOPE_BASE, filter, 
+            ld.search(rootSuffix, LDAPConnection.SCOPE_BASE, ObjectClassFilter,
                 attrs, false);
             writeToResponse("ok");
         } catch (LDAPException lex) {
@@ -477,9 +479,9 @@ public class Step4 extends AjaxPage {
             ld.setConnectTimeout(5);
             ld.connect(3, host, port, bindDN, bindPwd);
             
-            String filter = "cn=" + "\"" + rootSuffix + "\"";
+            //String filter = "cn=" + "\"" + rootSuffix + "\"";
             String[] attrs = {""};
-            ld.search(rootSuffix, LDAPConnection.SCOPE_BASE, filter, 
+            ld.search(rootSuffix, LDAPConnection.SCOPE_BASE, ObjectClassFilter,
                 attrs, false);
             writeToResponse("ok");
         } catch (LDAPException lex) {

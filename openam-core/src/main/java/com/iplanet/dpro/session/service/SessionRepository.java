@@ -33,9 +33,13 @@ import com.iplanet.am.util.SystemProperties;
 import java.lang.reflect.Method;
 
 /**
+ *
  * <code>SessionRepository</code> represents the session
  * repository , default repository 
- * is <code>OpenDJPersistentStore</code>.
+ * is <code>OpenDJPersistentStore</code> or can be overridden
+ * by specifying a valid implementation class name for our
+ * default Session Repository Class.
+ *
  */
 
 public class SessionRepository {
@@ -70,4 +74,5 @@ public class SessionRepository {
         }
         return sessionRepository;
     }
+
 }

@@ -42,17 +42,20 @@ import org.apache.click.Context;
  */
 public class Step7 extends AjaxPage {
 
+    private static final String DISABLED = "Disabled";
+    private static final String ENABLED = "Enabled";
+
     public void onInit() {
         Context ctx = getContext();
         String tmp = getAttribute(
-            SetupConstants.CONFIG_VAR_DATA_STORE, 
-            SetupConstants.SMS_EMBED_DATASTORE);
+                SetupConstants.CONFIG_VAR_DATA_STORE,
+                SetupConstants.SMS_EMBED_DATASTORE);
         boolean isEmbedded = tmp.equals(SetupConstants.SMS_EMBED_DATASTORE);
-            
+
         // Config Store Properties
-        tmp =(String)ctx.getSessionAttribute(SessionAttributeNames.CONFIG_DIR);
+        tmp = (String) ctx.getSessionAttribute(SessionAttributeNames.CONFIG_DIR);
         add("configDirectory", tmp);
-        
+
         if (isEmbedded) {
             add("isEmbedded", "1");
             add("configStoreHost", "localhost");
@@ -61,9 +64,9 @@ public class Step7 extends AjaxPage {
             add("configStoreHost", tmp);
         }
         tmp = getAttribute("configStoreSSL", "");
-        add("displayConfigStoreSSL", tmp.equals("SSL") ? 
-            getLocalizedString("yes.label") : 
-            getLocalizedString("no.label"));
+        add("displayConfigStoreSSL", tmp.equals("SSL") ?
+                getLocalizedString("yes.label") :
+                getLocalizedString("no.label"));
         tmp = getAttribute("rootSuffix", Wizard.defaultRootSuffix);
         add("rootSuffix", tmp);
 
@@ -82,63 +85,76 @@ public class Step7 extends AjaxPage {
         if (!tmp.equals(SetupConstants.DS_EMP_REPL_FLAG_VAL)) {
             // User Config Store Properties
             tmp = (String) ctx.getSessionAttribute(
-                SessionAttributeNames.EXT_DATA_STORE);
+                    SessionAttributeNames.EXT_DATA_STORE);
             if (tmp.equals("true")) {
                 tmp = (String) ctx.getSessionAttribute(
-                    SessionAttributeNames.USER_STORE_HOST);
+                        SessionAttributeNames.USER_STORE_HOST);
                 add("displayUserHostName", tmp);
 
                 tmp = (String) ctx.getSessionAttribute(
-                    SessionAttributeNames.USER_STORE_SSL);
-                add("xuserHostSSL", tmp.equals("SSL") ? 
-                    getLocalizedString("yes.label") : 
-                    getLocalizedString("no.label"));
+                        SessionAttributeNames.USER_STORE_SSL);
+                add("xuserHostSSL", tmp.equals("SSL") ?
+                        getLocalizedString("yes.label") :
+                        getLocalizedString("no.label"));
 
                 tmp = (String) ctx.getSessionAttribute(
-                    SessionAttributeNames.USER_STORE_PORT);
+                        SessionAttributeNames.USER_STORE_PORT);
                 add("userHostPort", tmp);
 
                 tmp = (String) ctx.getSessionAttribute(
-                    SessionAttributeNames.USER_STORE_ROOT_SUFFIX);
+                        SessionAttributeNames.USER_STORE_ROOT_SUFFIX);
                 add("userRootSuffix", tmp);
 
                 tmp = (String) ctx.getSessionAttribute(
-                    SessionAttributeNames.USER_STORE_LOGIN_ID);
+                        SessionAttributeNames.USER_STORE_LOGIN_ID);
                 add("userLoginID", tmp);
 
                 tmp = (String) ctx.getSessionAttribute(
-                    SessionAttributeNames.USER_STORE_TYPE);
+                        SessionAttributeNames.USER_STORE_TYPE);
                 if (tmp.equals("LDAPv3ForODSEE")) {
-                    add("userStoreType", 
-                        getLocalizedString("odsee.ldap.schema"));
+                    add("userStoreType",
+                            getLocalizedString("odsee.ldap.schema"));
                 } else if (tmp.equals("LDAPv3ForAD")) {
                     add("userStoreType", getLocalizedString(
-                        "activedirectory.ldap.schema"));
+                            "activedirectory.ldap.schema"));
                 } else if (tmp.equals("LDAPv3ForADDC")) {
                     add("userStoreType", getLocalizedString(
-                        "activedirectoryfordomainname.ldap.schema"));
+                            "activedirectoryfordomainname.ldap.schema"));
                 } else if (tmp.equals("LDAPv3ForADAM")) {
                     add("userStoreType", getLocalizedString(
-                        "adam.ldap.schema"));
+                            "adam.ldap.schema"));
                 } else if (tmp.equals("LDAPv3ForOpenDS")) {
-                    add("userStoreType", 
-                        getLocalizedString("opends.ldap.schema"));
+                    add("userStoreType",
+                            getLocalizedString("opends.ldap.schema"));
                 } else {
-                    add("userStoreType", 
-                        getLocalizedString("tivoli.ldap.schema"));
+                    add("userStoreType",
+                            getLocalizedString("tivoli.ldap.schema"));
                 }
             }
             add("firstInstance", "1");
         }
-        
-        // Load Balancer Properties
-        add("loadBalancerHost", 
-            (String)ctx.getSessionAttribute(
-                SessionAttributeNames.LB_SITE_NAME));
-        add("loadBalancerPort", 
-            (String)ctx.getSessionAttribute(
-                SessionAttributeNames.LB_PRIMARY_URL));
 
+        // Load Balancer Properties
+        add("loadBalancerHost",
+                (String) ctx.getSessionAttribute(
+                        SessionAttributeNames.LB_SITE_NAME));
+        add("loadBalancerPort",
+                (String) ctx.getSessionAttribute(
+                        SessionAttributeNames.LB_PRIMARY_URL));
+
+        // Normalize the information for Summary.
+        Boolean sessionAttribute = (Boolean) ctx.getSessionAttribute(
+                SessionAttributeNames.LB_SESSION_HA_SFO);
+        if (sessionAttribute == null) {
+            tmp = DISABLED;
+        } else if (sessionAttribute) {
+            tmp = ENABLED;
+        } else {
+            tmp = DISABLED;
+        }
+        add("loadBalancerSessionHASFO", tmp);
+
+        // Initialize our Parent Object.
         super.onInit();
     }
 

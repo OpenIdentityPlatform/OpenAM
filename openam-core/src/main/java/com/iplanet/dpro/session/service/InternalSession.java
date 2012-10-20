@@ -1010,7 +1010,7 @@ public class InternalSession implements TaskRunnable, Serializable {
             // (expensive operation) only when the session constraint
             // needs to be bypassed for the top-level admins.
             boolean checkTopLevelAdminRole = SessionService
-                    .bypassConstratintForToplevelAdmin();
+                    .bypassConstraintForToplevelAdmin();
 
             if (checkTopLevelAdminRole) {
                 if (SessionService.getSessionService().

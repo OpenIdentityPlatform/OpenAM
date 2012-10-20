@@ -60,10 +60,10 @@ public class ServiceConfig {
     private ServiceConfigManager scm;
 
     /**
-     * Default constructor. Makes it private so that it cannot be instantiated.
+     * Default constructor. Makes it private so that it can not be instantiated.
      */
     private ServiceConfig() {
-        // hence cannont be instantiated
+        // hence can not be instantiated
     }
 
     /**

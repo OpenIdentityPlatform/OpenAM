@@ -58,10 +58,9 @@ import javax.net.ssl.HttpsURLConnection;
 import javax.net.ssl.SSLSession;
 
 /**
- * A <code>ClusterStateService </code> class implements monitoring the state of 
- * server instances that are participating in the cluster environment. It is 
+ * A <code>ClusterStateService </code> class implements monitoring the state of
+ * server instances that are participating in the cluster environment. It is
  * used in making routing decisions in "internal request routing" mode
- * 
  */
 public class ClusterStateService extends GeneralTaskRunnable {
 
@@ -69,9 +68,9 @@ public class ClusterStateService extends GeneralTaskRunnable {
     // Contains information about each Server.
     private class ServerInfo implements Comparable {
         String id;
-        
+
         String protocol;
-        
+
         URL url;
 
         InetSocketAddress address;
@@ -80,20 +79,30 @@ public class ClusterStateService extends GeneralTaskRunnable {
 
         boolean isLocal;
 
-        @Override
         public int compareTo(Object o) {
             return id.compareTo(((ServerInfo) o).id);
         }
-        @Override
+
+        /**
+         * toString Override.
+         * @return String representation of this Inner Object Class.
+         */
         public String toString() {
             StringBuilder sb = new StringBuilder();
-            sb.append("ServerInfo ID:["+this.id+"], ");
-            sb.append("Protocol:["+this.protocol+"], ");
-            sb.append("URL:["+((this.url==null)?"null], ":this.url.toString())+"], ");
-            sb.append("Address:["+((this.address==null)?"null], ":this.address.toString()+"], Resolved:["+
-                    (!this.address.isUnresolved()?"true":"false"))+"], \n");
-            sb.append("Local:["+this.isLocal+"\n");
-            sb.append("Up:["+this.isUp+"].\n");
+            sb.append("ServerInfo ID:[").append(this.id).append("], ");
+            sb.append("Protocol:[").append(this.protocol).append("], ");
+            sb.append("URL:[").append(((this.url == null) ? "null" : this.url.toString()));
+            sb.append("], ");
+            sb.append("Address:[");
+            if (this.address == null)
+                { sb.append("null], "); }
+            else
+            {
+                sb.append(this.address.toString()).append("], Unresolved:[");
+                sb.append(this.address.isUnresolved()).append("], ");
+            }
+            sb.append("Local:[").append(this.isLocal).append("], ");
+            sb.append("Up:[").append(this.isUp).append("].\n");
             return sb.toString();
         }
     } //. End of Inner Class Definition.
@@ -103,21 +112,30 @@ public class ClusterStateService extends GeneralTaskRunnable {
      */
     public static Debug sessionDebug = null;
 
-    /** Servers in the cluster environment */
-    private static final Map<String, ServerInfo> servers =
+    /**
+     * Servers in the cluster environment
+     */
+    private static Map<String, ServerInfo> servers =
             new HashMap<String, ServerInfo>();
-    
-    /** Servers are down in the cluster environment*/
+
+    /**
+     * Servers are down in the cluster environment
+     */
     private static Set<String> downServers = new HashSet<String>();
 
-    /** Server Information */
+    /**
+     * Server Information
+     */
     private static ServerInfo[] serverSelectionList = new ServerInfo[0];
 
-    /** Last selected Server*/
-    private static final int lastSelectedNone = -1;
-    private int lastSelected = lastSelectedNone;
+    /**
+     * Last selected Server
+     */
+    private static int lastSelected = -1;
 
-    /** individual server wait default time out 10 milliseconds */
+    /**
+     * individual server wait default time out 10 milliseconds
+     */
     public static final int DEFAULT_TIMEOUT = 1000;
 
     private static String GET_REQUEST = "";
@@ -126,22 +144,24 @@ public class ClusterStateService extends GeneralTaskRunnable {
     private final static String HTTP = "http";
 
     private static String hcPath = SystemProperties.
-                                    get(Constants.URLCHECKER_TARGET_URL, null);
+            get(Constants.URLCHECKER_TARGET_URL, null);
 
     private static boolean doRequest = true;
     private static final String doRequestFlag = SystemProperties.
-                                    get(Constants.URLCHECKER_DOREQUEST, "false");
+            get(Constants.URLCHECKER_DOREQUEST, "false");
 
     private int timeout = DEFAULT_TIMEOUT; // in milliseconds
 
-    /** default ServerInfo check time 10 milliseconds */
+    /**
+     * default ServerInfo check time 10 milliseconds
+     */
     public static final long DEFAULT_PERIOD = 1000;
 
     private static long period = DEFAULT_PERIOD; // in milliseconds
 
     // server instance id 
     private static String localServerId = null;
-    
+
     // SessionService
     private static volatile SessionService sessionService = null;
 
@@ -155,7 +175,7 @@ public class ClusterStateService extends GeneralTaskRunnable {
         }
         if (hcPath == null) {
             String deployuri = SystemProperties.get
-                (Constants.AM_SERVICES_DEPLOYMENT_DESCRIPTOR, "/openam");
+                    (Constants.AM_SERVICES_DEPLOYMENT_DESCRIPTOR, "/openam");
             hcPath = deployuri + "/namingservice";
             if (!hcPath.startsWith("/")) {
                 hcPath += "/" + hcPath;
@@ -184,7 +204,7 @@ public class ClusterStateService extends GeneralTaskRunnable {
      * Get the Server Selection List, common to all Servers
      * in Cluster.
      * @return ServerInfo[] Array of Servers in Selection list in
-     * proper order.
+     *         proper order.
      */
     protected ServerInfo[] getServerSelectionList() {
         return serverSelectionList;
@@ -204,101 +224,109 @@ public class ClusterStateService extends GeneralTaskRunnable {
      * @return boolean indicating true if specified server id is our local Server Id or false ir not.
      */
     protected boolean isLocalServerId(String serverId) {
-        return ((serverId==null)||(!serverId.equalsIgnoreCase(this.localServerId)))?false:true;
+        return ((serverId == null) || (!serverId.equalsIgnoreCase(this.localServerId))) ? false : true;
     }
 
     /**
      * Constructs an instance for the cluster service
-     * @param localServerId id of the server instance in which this 
-     * ClusterStateService instance is running
-     * @param timeout
-     *            timeout for waiting on an individual server (millisec)
-     * @param period
-     *            checking cycle period (millisecs)
-     * @param members
-     *            map if server id - > url for all cluster members
+     * @param localServerId id of the server instance in which this
+     *                      ClusterStateService instance is running
+     * @param timeout       timeout for waiting on an individual server (millisec)
+     * @param period        checking cycle period (millisecs)
+     * @param members       map if server id - > url for all cluster members
      * @throws Exception
      */
     protected ClusterStateService(SessionService sessionService, String localServerId,
-            int timeout, long period, Map<String, String> members) throws Exception {
-        this.sessionService = sessionService;
-        this.localServerId = localServerId;
-        this.timeout = timeout;
-        this.period = period;
-        serverSelectionList = new ServerInfo[members.size()];
-        
-        for (Map.Entry<String, String> entry : members.entrySet()) {
-            ServerInfo info = new ServerInfo();
-            info.id = entry.getKey();
-            URL url = new URL(entry.getValue() + "/namingservice");
-            info.url = url;
-            info.protocol = url.getProtocol();
-            info.address = new InetSocketAddress(url.getHost(), url.getPort());
-            // Fix for Deadlock. If this is our server, set to true, else false.
-            info.isUp = localServerId.equalsIgnoreCase(info.id) ? true : false;
-            info.isLocal = info.isUp; // Set our Local Server Indicator.
-            
-            if (!info.isUp) {
-                downServers.add(info.id);
-            }
-            
-            servers.put(info.id, info);
-            serverSelectionList[getNextSelected()] = info;
-            sessionDebug.error("Adding Server to ClusterStateService: "+info.toString());
-
-            // TODO - Persist the Server to the Directory in ou=amsessiondb container.
-
+                                  int timeout, long period, Map<String, String> members) throws Exception {
+        if ( (localServerId == null)||(localServerId.isEmpty()) )
+        {
+            String message = "ClusterStateService: Local Server Id argument is null, unable to instantiate Cluster State Service!";
+            sessionDebug.error(message);
+            throw new IllegalArgumentException(message);
         }
+        // Ensure we Synchronize this Instantiation.
+        synchronized (this) {
+            this.sessionService = sessionService;
+            this.localServerId = localServerId;
+            this.timeout = timeout;
+            this.period = period;
+            serverSelectionList = new ServerInfo[members.size()];
 
-        // to ensure that ordering in different server instances is identical
-        Arrays.sort(serverSelectionList);
-        SystemTimer.getTimer().schedule(this, new Date((
-            System.currentTimeMillis() / 1000) * 1000));
+            for (Map.Entry<String, String> entry : members.entrySet()) {
+                ServerInfo info = new ServerInfo();
+                info.id = entry.getKey();
+                URL url = new URL(entry.getValue() + "/namingservice");
+                info.url = url;
+                info.protocol = url.getProtocol();
+                info.address = new InetSocketAddress(url.getHost(), url.getPort());
+                // Fix for Deadlock. If this is our server, set to true, else false.
+                info.isUp = isLocalServerId(info.id);
+                info.isLocal = info.isUp; // Set our Local Server Indicator, per above interrogation.
+
+                // Check for Down Servers.
+                if (!info.isUp) {
+                    downServers.add(info.id);
+                }
+
+                // Add Server to Server List.
+                servers.put(info.id, info);
+                // Associate to a Server Selection Bucket.
+                serverSelectionList[getNextSelected()] = info;
+                if (sessionDebug.messageEnabled())
+                    { sessionDebug.error("Added Server to ClusterStateService: " + info.toString()); }
+            } // End of For Loop.
+
+            // to ensure that ordering in different server instances is identical
+            Arrays.sort(serverSelectionList);
+            SystemTimer.getTimer().schedule(this, new Date((
+                    System.currentTimeMillis() / 1000) * 1000));
+        } // End of Synchronized Block.
     }
 
     /**
      * Implements "wrap-around" lastSelected index advancement
-     * 
+     *
      * @return updated lastSelected index value
      */
     private int getNextSelected() {
-        if (lastSelected == lastSelectedNone)
-            { return 0;}
-        else {
-                lastSelected = (lastSelected + 1) % serverSelectionList.length;
-            }
-        return lastSelected;
-     }
+        return lastSelected = (lastSelected + 1) % serverSelectionList.length;
+    }
 
     /**
      * Returns currently known status of the server instance identified by
      * serverId
-     * 
-     * @param serverId
-     *            server instance id
+     *
+     * @param serverId server instance id
      * @return true if server is up, false otherwise
      */
     boolean isUp(String serverId) {
-        if ((serverId == null)||(serverId.isEmpty())||(servers==null))
+        if ((serverId == null) || (serverId.isEmpty()) ) {
+            return false;
+        }
+        if (serverId.equalsIgnoreCase(this.localServerId)) {
+            return true;
+        }
+        if ( (servers == null) || servers.isEmpty() )
             { return false; }
-        if (serverId.equalsIgnoreCase(this.localServerId))
-            { return true; }
-        return servers.get(serverId).isUp;
+        return (servers.get(serverId)!=null) ? servers.get(serverId).isUp : false;
     }
 
     /**
      * Actively checks and updates the status of the server instance identified
      * by serverId
-     * 
-     * @param serverId
-     *            server instance id
+     *
+     * @param serverId server instance id
      * @return true if server is up, false otherwise
      */
     boolean checkServerUp(String serverId) {
-        if ((serverId == null)||(serverId.isEmpty())||(servers==null))
+        if ( (serverId == null) || (serverId.isEmpty()) ) {
+            return false;
+        }
+        if (serverId.equalsIgnoreCase(this.localServerId)) {
+            return true;
+        }
+        if ( (servers == null) || servers.isEmpty() )
             { return false; }
-        if (serverId.equalsIgnoreCase(this.localServerId))
-            { return true; }
         ServerInfo info = servers.get(serverId);
         info.isUp = checkServerUp(info);
         return info.isUp;
@@ -306,70 +334,65 @@ public class ClusterStateService extends GeneralTaskRunnable {
 
     /**
      * Returns size of the server list
-     * 
+     *
      * @return size of the server list
      */
     int getServerSelectionListSize() {
-        return (serverSelectionList==null) ? 0 : serverSelectionList.length;
+        return (serverSelectionList == null) ? 0 : serverSelectionList.length;
     }
 
     /**
      * Returns server id for a given index inside the server list
-     * 
-     * @param index
-     *            index in the server list
+     * or null if out of bounds.
+     * @param index index in the server list, relative to Zero.
      * @return server id
      */
     String getServerSelection(int index) {
-        if ( (serverSelectionList == null)||(serverSelectionList.length <= 0)||(index < 0) )
-            { return null; }
+        if ( (getServerSelectionListSize() <= 0) || (index < 0) || (index >= getServerSelectionListSize()) ) {
+            return null;
+        }
         return serverSelectionList[index].id;
     }
 
     /**
      * Implements for GeneralTaskRunnable
-     * 
+     *
      * @return The run period of the task.
      */
-    @Override
     public long getRunPeriod() {
         return period;
     }
-    
+
     /**
      * Implements for GeneralTaskRunnable.
      *
      * @return false since this class will not be used as container.
      */
-    @Override
     public boolean addElement(Object obj) {
         return false;
     }
-    
+
     /**
      * Implements for GeneralTaskRunnable.
      *
      * @return false since this class will not be used as container.
      */
-    @Override
     public boolean removeElement(Object obj) {
         return false;
     }
-    
+
     /**
      * Implements for GeneralTaskRunnable.
      *
      * @return true since this class will not be used as container.
      */
-    @Override
     public boolean isEmpty() {
         return true;
     }
-    
+
     /**
      * Monitoring logic used by background thread
      */
-    @Override
     public void run() {
         try {
             boolean cleanRemoteSessions = false;
@@ -377,12 +400,12 @@ public class ClusterStateService extends GeneralTaskRunnable {
                 for (Map.Entry<String, ServerInfo> server : servers.entrySet()) {
                     ServerInfo info = server.getValue();
                     info.isUp = checkServerUp(info);
-                    
+
                     if (!info.isUp) {
                         downServers.add(info.id);
                     } else {
                         if (!downServers.isEmpty() &&
-                            downServers.remove(info.id)) {
+                                downServers.remove(info.id)) {
                             cleanRemoteSessions = true;
                         }
                     }
@@ -392,22 +415,22 @@ public class ClusterStateService extends GeneralTaskRunnable {
                 sessionService.cleanUpRemoteSessions();
             }
         } catch (Exception ex) {
-            sessionDebug.error("cleanRemoteSessions Background thread has encountered an Exceptin: "+ex.getMessage(),ex);
+            sessionDebug.error("cleanRemoteSessions Background thread has encountered an Exception: " + ex.getMessage(), ex);
         }
     }
 
     /**
      * Internal method for checking health status using sock.connect()
-     *
+     * <p/>
      * TODO -- Use a better mechanism for alive status. 10.1+.
      *
-     * @param info
-     *            server info instance
+     * @param info server info instance
      * @return true if server is up, false otherwise
      */
     private boolean checkServerUp(ServerInfo info) {
-        if (info == null)
-            { return false; }
+        if (info == null) {
+            return false;
+        }
         if (localServerId.equals(info.id)) {
             return true;
         }
@@ -445,14 +468,14 @@ public class ClusterStateService extends GeneralTaskRunnable {
 
                     try {
                         connection = (HttpsURLConnection) info.url.openConnection();
-                        
+
 
                         connection.setHostnameVerifier(new HostnameVerifier() {
                             public boolean verify(String hostname, SSLSession session) {
                                 return true;
                             }
                         });
-                
+
                         responseCode = connection.getResponseCode();
                         is = connection.getInputStream();
                         int ret = 0;
@@ -469,7 +492,7 @@ public class ClusterStateService extends GeneralTaskRunnable {
                         InputStream es = null;
 
                         try {
-                            es = ((HttpsURLConnection)connection).getErrorStream();
+                            es = ((HttpsURLConnection) connection).getErrorStream();
                             int ret = 0;
                             byte[] buf = new byte[512];
 
@@ -480,11 +503,11 @@ public class ClusterStateService extends GeneralTaskRunnable {
 
                             // close the errorstream
                             es.close();
-                        } catch(IOException ex) {
+                        } catch (IOException ex) {
                             // deal with the exception
                         }
                     }
-                    
+
                     if (responseCode == HttpURLConnection.HTTP_OK) {
                         result = true;
                     } else {
@@ -519,8 +542,9 @@ public class ClusterStateService extends GeneralTaskRunnable {
         sb.append("{ lastSelected=").append(lastSelected);
         sb.append(", timeout=").append(timeout).append("\n");
         sb.append(" Current Server Selection List:").append("\n");
-        for(ServerInfo serverInfo : getServerSelectionList())
-            { sb.append(serverInfo.toString()); }
+        for (ServerInfo serverInfo : getServerSelectionList()) {
+            sb.append(serverInfo.toString());
+        }
         sb.append('}');
         return sb.toString();
     }

@@ -1,7 +1,7 @@
 /**
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright (c) 2011 ForgeRock AS. All Rights Reserved
+ * Copyright (c) 2012 ForgeRock AS Inc. All Rights Reserved
  *
  * The contents of this file are subject to the terms
  * of the Common Development and Distribution License
@@ -9,17 +9,21 @@
  * compliance with the License.
  *
  * You can obtain a copy of the License at
- * http://forgerock.org/license/CDDLv1.0.html
+ * https://opensso.dev.java.net/public/CDDLv1.0.html or
+ * opensso/legal/CDDLv1.0.txt
  * See the License for the specific language governing
  * permission and limitations under the License.
  *
  * When distributing Covered Code, include this CDDL
  * Header Notice in each file and include the License file
- * at http://forgerock.org/license/CDDLv1.0.html
+ * at opensso/legal/CDDLv1.0.txt.
+ *
  * If applicable, add the following below the CDDL Header,
  * with the fields enclosed by brackets [] replaced by
  * your own identifying information:
  * "Portions Copyrighted [year] [name of copyright owner]"
+ *
+ * Portions Copyrighted [2010] [ForgeRock AS]
  *
  */
 
@@ -39,13 +43,13 @@ import java.util.TimeZone;
 import com.iplanet.dpro.session.service.SessionService;
 import com.sun.identity.shared.Constants;
 import com.sun.identity.shared.debug.Debug;
-import org.apache.commons.codec.binary.Base64;
+import com.sun.identity.shared.encode.Base64;
 import org.forgerock.i18n.LocalizableMessage;
 import com.iplanet.dpro.session.exceptions.StoreException;
+import org.forgerock.openam.session.ha.amsessionstore.store.opendj.OpenDJPersistentStore;
+import org.forgerock.openam.session.ha.i18n.AmsessionstoreMessages;
 import org.opends.server.protocols.ldap.LDAPAttribute;
 import org.opends.server.types.RawAttribute;
-
-import static org.forgerock.openam.session.ha.i18n.AmsessionstoreMessages.*;
 
 /**
  * This class encapsulates a distinguished name and its attribute values.
@@ -57,7 +61,7 @@ public class AMRecordDataEntry {
     /**
      * Debug Logging
      */
-    private static Debug debug = SessionService.sessionDebug;
+    private static Debug DEBUG = SessionService.sessionDebug;
 
     /**
      * AMRecordDataEntry Object Properties
@@ -91,7 +95,7 @@ public class AMRecordDataEntry {
     private static void initialize() {
         List<String> valueList = new ArrayList<String>();
         valueList.add(Constants.TOP);
-        valueList.add(Constants.FR_FAMRECORD);
+        valueList.add(OpenDJPersistentStore.FR_FAMRECORD);
         LDAPAttribute ldapAttr = new LDAPAttribute(Constants.OBJECTCLASS, valueList);
         objectClasses = new ArrayList<LDAPAttribute>();
         objectClasses.add(ldapAttr);
@@ -141,8 +145,7 @@ public class AMRecordDataEntry {
         if (attributeValues.get(SERIALIZED_INTERNAL_SESSION_BLOB) != null) {
             Set<String> values = attributeValues.get(SERIALIZED_INTERNAL_SESSION_BLOB);
             for (String value : values) {
-                Base64 base64 = new Base64();
-                record.setSerializedInternalSessionBlob(base64.decode(value));
+                record.setSerializedInternalSessionBlob(Base64.decode(value));
             }
         }
 
@@ -198,8 +201,9 @@ public class AMRecordDataEntry {
                 String key, v;
 
                 if (value.indexOf('=') == -1) {
-                    // TODO Warning
                     key = v = value;
+                    final LocalizableMessage message = AmsessionstoreMessages.EXTRA_ATTRIBUTE_NO_KEY_VALUE_SEPARATOR.get(value, EXTRA_BYTE_ATTR);
+                    DEBUG.warning(this.getClass().getSimpleName() + message.toString());
                 } else {
                     key = value.substring(0, value.indexOf('='));
                     v = value.substring(value.indexOf('=') + 1);
@@ -215,8 +219,9 @@ public class AMRecordDataEntry {
                 String key, v;
 
                 if (value.indexOf('=') == -1) {
-                    // TODO Warning
                     key = v = value;
+                    final LocalizableMessage message = AmsessionstoreMessages.EXTRA_ATTRIBUTE_NO_KEY_VALUE_SEPARATOR.get(value, EXTRA_STRING_ATTR);
+                    DEBUG.warning(this.getClass().getSimpleName()+message.toString());
                 } else {
                     key = value.substring(0, value.indexOf('='));
                     v = value.substring(value.indexOf('=') + 1);
@@ -246,8 +251,7 @@ public class AMRecordDataEntry {
 
         if (record.getSerializedInternalSessionBlob() != null) {
             set = new HashSet<String>();
-            Base64 base64 = new Base64();
-            set.add(base64.encodeAsString(record.getSerializedInternalSessionBlob()));
+            set.add(Base64.encode(record.getSerializedInternalSessionBlob()));
             attributeValues.put(SERIALIZED_INTERNAL_SESSION_BLOB, set);
         }
 
@@ -401,8 +405,8 @@ public class AMRecordDataEntry {
         try {
             expDate = formatter.parse(date);
         } catch (ParseException pe) {
-            final LocalizableMessage message = DB_DJ_PARSE.get(date);
-            debug.error(message.toString());
+            final LocalizableMessage message = AmsessionstoreMessages.DB_DJ_PARSE.get(date);
+            DEBUG.error(message.toString());
             throw new StoreException(message.toString());
         }
 
@@ -414,4 +418,3 @@ public class AMRecordDataEntry {
         return formatter.format(expDate);
     }
 }
-

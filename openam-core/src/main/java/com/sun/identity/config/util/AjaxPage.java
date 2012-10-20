@@ -99,9 +99,19 @@ public abstract class AjaxPage extends Page {
         return value;
     }
 
-    protected boolean toBoolean( String paramName ) {
-        String value = toString( paramName );
-        return ( value != null && value.toLowerCase().equals( "true" ) );
+    protected boolean toBoolean(String paramName) {
+        String value = toString(paramName);
+        if (value == null) {
+            return false;
+        }
+        if ((value.equalsIgnoreCase("on")) ||
+            (value.equalsIgnoreCase("true")) ||
+            (value.equalsIgnoreCase("yes")) ||
+            (value.equalsIgnoreCase("checked"))) {
+            return true;
+        } else {
+            return false;
+        }
     }
 
     protected int toInt( String paramName ) {

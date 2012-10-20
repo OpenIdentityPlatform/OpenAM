@@ -113,7 +113,9 @@ public class FQDNUtils {
     private Set getLowerCaseValuesFromMap(Map map) {
         Set set = new HashSet();
         for (Iterator iter = map.values().iterator(); iter.hasNext();) {
-            set.add(((String) iter.next()).toLowerCase());
+            String value = ((String) iter.next());
+            if ( (value!=null)&&(!value.isEmpty()) )
+                { set.add(value.toLowerCase()); }
         }
         return set;
     }

@@ -194,35 +194,10 @@
                                  i18nKey="a123">
                 </AttributeSchema>
                 <SubSchema name="Site" inheritance="multiple" i18nKey="site">
-                    <AttributeSchema name="iplanet-am-session-store-username"
-                                     type="single"
-                                     syntax="string"
-                                     i18nKey="a108">
-                        <DefaultValues>
-                            <Value>guest</Value>
-                        </DefaultValues>
-                    </AttributeSchema>
-                    <AttributeSchema name="iplanet-am-session-store-password"
-                                     type="single"
-                                     syntax="password"
-                                     i18nKey="a109">
-                        <DefaultValues>
-                            <Value>guest</Value>
-                        </DefaultValues>
-                    </AttributeSchema>
-                    <AttributeSchema name="iplanet-am-session-store-cpl-max-wait-time"
-                                     type="single"
-                                     syntax="number_range"
-                                     rangeStart="0" rangeEnd="2147483647"
-                                     i18nKey="a111">
-                        <DefaultValues>
-                            <Value>5000</Value>
-                        </DefaultValues>
-                    </AttributeSchema>
                     <AttributeSchema name="iplanet-am-session-sfo-enabled"
                                      type="single"
                                      syntax="boolean"
-                                     i18nKey="a121">
+                                     i18nKey="a124">
                         <BooleanValues>
                             <BooleanTrueValue i18nKey="i18nTrue">true</BooleanTrueValue>
                             <BooleanFalseValue i18nKey="i18nFalse">false</BooleanFalseValue>
@@ -231,43 +206,39 @@
                             <Value>true</Value>
                         </DefaultValues>
                     </AttributeSchema>
-                    <AttributeSchema name="iplanet-am-session-sfo-store-type"
-                                     type="single_choice"
-                                     syntax="string"
-                                     i18nKey="a124">
-                        <ChoiceValues>
-                            <ChoiceValue i18nKey="a125">embedded</ChoiceValue>
-                            <ChoiceValue i18nKey="a126">external</ChoiceValue>
-                            <ChoiceValue i18nKey="a127">plugin</ChoiceValue>
-                            <ChoiceValue i18nKey="a128">none</ChoiceValue>
-                        </ChoiceValues>
-                        <DefaultValues>
-                            <Value>embedded</Value>
-                        </DefaultValues>
-                    </AttributeSchema>
-                    <AttributeSchema name="iplanet-am-session-sfo-store-rootdn"
-                                     type="single"
-                                     syntax="dn"
-                                     i18nKey="a129">
-                        <DefaultValues>
-                            <Value>o=openam-Session</Value>
-                        </DefaultValues>
-                    </AttributeSchema>
+                    <!-- Was i18Key a125 -->
                     <AttributeSchema name="iplanet-am-session-repository-url"
                                      type="single"
-                                     syntax="url"
-                                     i18nKey="a113">
+                                     syntax="url">
                         <DefaultValues>
                             <Value></Value>
                         </DefaultValues>
                     </AttributeSchema>
-                    <AttributeSchema name="iplanet-am-session-JDBC-driver-Impl-classname"
+                    <!-- Was i18Key a126 -->
+                    <AttributeSchema name="iplanet-am-session-sfo-store-rootdn"
                                      type="single"
-                                     syntax="string">
+                                     syntax="dn">
                         <DefaultValues>
-                            <Value>com.iplanet.dpro.session.jdbc.HADBConnectionImpl</Value>
+                            <Value>o=openam-session,dc=openam,dc=forgerock,dc=org</Value>
                         </DefaultValues>
                     </AttributeSchema>
+                    <!-- Was i18Key a127 -->
+                    <AttributeSchema name="iplanet-am-session-store-username"
+                                     type="single"
+                                     syntax="dn">
+                        <DefaultValues>
+                            <Value>cn=Directory Manager</Value>
+                        </DefaultValues>
+                    </AttributeSchema>
+                    <!-- Was i18Key a128 -->
+                    <AttributeSchema name="iplanet-am-session-store-password"
+                                     type="single"
+                                     syntax="password">
+                        <DefaultValues>
+                            <Value>password</Value>
+                        </DefaultValues>
+                    </AttributeSchema>
+                    <!-- Was i18Key a129 -->
                     <AttributeSchema name="iplanet-am-session-min-pool-size"
                                      type="single"
                                      syntax="number_range"
@@ -276,12 +247,38 @@
                             <Value>8</Value>
                         </DefaultValues>
                     </AttributeSchema>
+                    <!-- Was i18Key a130 -->
                     <AttributeSchema name="iplanet-am-session-max-pool-size"
                                      type="single"
                                      syntax="number_range"
                                      rangeStart="1" rangeEnd="100">
                         <DefaultValues>
                             <Value>32</Value>
+                        </DefaultValues>
+                    </AttributeSchema>
+                    <!-- Was i18Key a131 -->
+                    <AttributeSchema name="iplanet-am-session-store-cpl-max-wait-time"
+                                     type="single"
+                                     syntax="number_range"
+                                     rangeStart="0" rangeEnd="2147483647">
+                        <DefaultValues>
+                            <Value>5000</Value>
+                        </DefaultValues>
+                    </AttributeSchema>
+                    <!-- These properties are deprecated as of 10.1.0 -->
+                    <AttributeSchema name="iplanet-am-session-JDBC-driver-Impl-classname"
+                                     type="single"
+                                     syntax="string">
+                        <DefaultValues>
+                            <Value>com.iplanet.dpro.session.jdbc.HADBConnectionImpl</Value>
+                        </DefaultValues>
+                    </AttributeSchema>
+                    <!-- Was i18Key a113 -->
+                    <AttributeSchema name="iplanet-am-session-jdbc-url"
+                                     type="single"
+                                     syntax="string">
+                        <DefaultValues>
+                            <Value></Value>
                         </DefaultValues>
                     </AttributeSchema>
                 </SubSchema>
