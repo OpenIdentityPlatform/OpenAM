@@ -1707,7 +1707,7 @@
     <term>Subjects Result Time to Live</term>
     <listitem>
      <para>Maximum minutes OpenAM caches a subject result for evaluating
-     policy requests</para>
+     policy requests.</para>
 
      <para><command>ssoadm</command> attribute:
      <literal>iplanet-am-policy-config-subjects-result-ttl</literal></para>
@@ -3232,11 +3232,93 @@
    Advanced tab for Default Server Settings.</para>
 
    <varlistentry>
-    <term><literal>com.iplanet.am.cookie.timeToLive</literal></term>
+    <term><literal>com.iplanet.am.cookie.c66Encode</literal></term>
     <listitem>
-     <para><literal>iplanetDirectoryPro</literal> cookie lifetime, in seconds</para>
+     <para>Properly URL encode session tokens.</para>
+     <para>Default: <literal>true</literal></para>
     </listitem>
    </varlistentry>
+
+   <varlistentry>
+    <term><literal>com.iplanet.am.cookie.timeToLive</literal></term>
+    <listitem>
+     <para><literal>iplanetDirectoryPro</literal> cookie lifetime if
+     persistent, in hours</para>
+     <para>Default: 24</para>
+    </listitem>
+   </varlistentry>
+
+   <varlistentry>
+    <term><literal>com.iplanet.am.daemons</literal></term>
+    <listitem>
+     <para>Modules for which to open daemons at OpenAM startup.</para>
+     <para>Default: <literal>securid</literal></para>
+    </listitem>
+   </varlistentry>
+
+   <varlistentry>
+    <term><literal>com.iplanet.am.directory.ssl.enabled</literal></term>
+    <listitem>
+     <para>Whether to connect to the configuration directory server over
+     LDAPS.</para>
+     <para>Default: <literal>false</literal></para>
+    </listitem>
+   </varlistentry>
+
+   <varlistentry>
+    <term><literal>com.iplanet.am.installdir</literal></term>
+    <listitem>
+     <para>OpenAM Configuration and log file location.</para>
+     <para>Default: <literal>~/openam/<replaceable>server-uri</replaceable></literal>,
+     such as <literal>~/openam/openam</literal></para>
+    </listitem>
+   </varlistentry>
+
+   <varlistentry>
+    <term><literal>com.iplanet.am.jssproxy.checkSubjectAltName</literal></term>
+    <listitem>
+     <para>When using JSS, check whether the name values in the
+     <literal>SubjectAltName</literal> certificate match the server FQDN.</para>
+     <para>Default: <literal>false</literal></para>
+    </listitem>
+   </varlistentry>
+
+   <varlistentry>
+    <term><literal>com.iplanet.am.jssproxy.resolveIPAddress</literal></term>
+    <listitem>
+     <para>When using JSS, check that the IP address of the server resolves
+     to the host name.</para>
+     <para>Default: <literal>false</literal></para>
+    </listitem>
+   </varlistentry>
+
+   <varlistentry>
+    <term><literal>com.iplanet.am.jssproxy.SSLTrustHostList</literal></term>
+    <listitem>
+     <para>When using JSS, comma-separated list of server FQDNs to trust if
+     they match the certificate CN, even if the domain name is not
+     correct.</para>
+        </listitem>
+   </varlistentry>
+
+   <varlistentry>
+    <term><literal>com.iplanet.am.jssproxy.trustAllServerCerts</literal></term>
+    <listitem>
+     <para>When using JSS, set to <literal>true</literal> to trust whatever
+     certificate is presented without checking.</para>
+     <para>Default: <literal>true</literal></para>
+    </listitem>
+   </varlistentry>
+
+   <varlistentry>
+    <term><literal>com.iplanet.am.lbcookie.name</literal></term>
+    <listitem>
+     <para>Used with sticky load balancers that can inspect the cookie
+     value.</para>
+     <para>Default: <literal>amlbcookie</literal></para>
+    </listitem>
+   </varlistentry>
+
    <varlistentry>
     <term><literal>com.iplanet.am.lbcookie.value</literal></term>
     <listitem>
@@ -3246,13 +3328,87 @@
      <para>Default: 01</para>
     </listitem>
    </varlistentry>
+
+   <varlistentry>
+    <term><literal>com.iplanet.am.pcookie.name</literal></term>
+    <listitem>
+     <para>Peristent cookie name.</para>
+     <para>Default: <literal>DProPCookie</literal></para>
+    </listitem>
+   </varlistentry>
+
+   <varlistentry>
+    <term><literal>com.iplanet.am.profile.host</literal></term>
+    <listitem>
+     <para>Not used</para>
+     <para>Default: <replaceable>server-host</replaceable>, such as
+     <literal>openam.example.com</literal></para>
+    </listitem>
+   </varlistentry>
+
+   <varlistentry>
+    <term><literal>com.iplanet.am.profile.port</literal></term>
+    <listitem>
+     <para>Not used</para>
+     <para>Default: <replaceable>server-port</replaceable>, such as 8080 or
+     8443</para>
+    </listitem>
+   </varlistentry>
+
+   <varlistentry>
+    <term><literal>com.iplanet.am.session.agentSessionIdleTime</literal></term>
+    <listitem>
+     <para>Time in minutes after which a policy agent session expires.</para>
+     <para>Default: 0, meaning never time out. Range is 0-30 (minutes).</para>
+    </listitem>
+   </varlistentry>
+
+   <varlistentry>
+    <term><literal>com.iplanet.am.session.client.polling.enable</literal></term>
+    <listitem>
+     <para>Whether client applications such as policy agents poll for
+     configuration changes. If <literal>false</literal>, then OpenAM notifies
+     clients about changes.</para>
+     <para>Default: false</para>
+    </listitem>
+   </varlistentry>
+
+   <varlistentry>
+    <term><literal>com.iplanet.am.session.client.polling.period</literal></term>
+    <listitem>
+     <para>If client applications poll for changes, number of seconds between
+     polls.</para>
+     <para>Default: 180</para>
+    </listitem>
+   </varlistentry>
+
+   <varlistentry>
+    <term><literal>com.iplanet.am.session.httpSession.enabled</literal></term>
+    <listitem>
+     <para>Create an <literal>HttpSession</literal> for users on successful
+     authentication.</para>
+     <para>Default: <literal>true</literal></para>
+    </listitem>
+   </varlistentry>
+
    <varlistentry>
     <term><literal>com.iplanet.security.SSLSocketFactoryImpl</literal></term>
     <listitem>
-     <para>SSL socket factory implementation used by OpenAM</para>
-     <para>Default: <literal>com.sun.identity.shared.ldap.factory.JSSESocketFactory</literal></para>
+     <para>SSL socket factory implementation used by OpenAM.</para>
+     <para>Default: <literal>com.sun.identity.shared.ldap.factory.JSSESocketFactory</literal>,
+     uses a pure Java provider</para>
     </listitem>
    </varlistentry>
+
+   <varlistentry>
+    <term><literal>com.iplanet.services.cdc.invalidGotoStrings</literal>;</term>
+    <listitem>
+     <para>Strings that OpenAM rejects as values in <literal>goto</literal>
+     query string parameters.</para>
+     <para>Default: <literal>&lt;,&gt;javascript:,javascript%3a,%3c,%3e</literal></para>
+    </listitem>
+   </varlistentry>
+
    <varlistentry>
     <term><literal>com.sun.embedded.replicationport</literal></term>
     <listitem>
@@ -3260,6 +3416,7 @@
      <para>Default: 8989</para>
     </listitem>
    </varlistentry>
+
    <varlistentry>
     <term><literal>com.sun.embedded.sync.servers</literal></term>
     <listitem>
@@ -3267,77 +3424,412 @@
      <para>Default: <literal>on</literal></para>
     </listitem>
    </varlistentry>
+
+   <varlistentry>
+    <term><literal>com.sun.identity.am.cookie.check</literal></term>
+    <listitem>
+     <para>Whether to check for cookie support in the user agent, and if not to
+     return an error.</para>
+     <para>Default: <literal>false</literal></para>
+    </listitem>
+   </varlistentry>
+
+   <varlistentry>
+    <term><literal>com.sun.identity.appendSessionCookieInURL</literal></term>
+    <listitem>
+     <para>Whether to append the session cookie to URL for a zero page
+     session.</para>
+     <para>Default: <literal>true</literal></para>
+    </listitem>
+   </varlistentry>
+
+   <varlistentry>
+    <term><literal>com.sun.identity.auth.cookieName</literal></term>
+    <listitem>
+     <para>Cookie used by the OpenAM authentication service to handle the
+     authentication process.</para>
+     <para>Default: <literal>AMAuthCookie</literal></para>
+    </listitem>
+   </varlistentry>
+
+   <varlistentry>
+    <term><literal>com.sun.identity.authentication.mutiple.tabs.used</literal></term>
+    <listitem>
+     <para>Whether to allow users to open many browser tabs to the login page
+     at the same time without encountering an error.</para>
+     <para>Default: <literal>false</literal></para>
+    </listitem>
+   </varlistentry>
+
+   <varlistentry>
+    <term><literal>com.sun.identity.authentication.setCookieToAllDomains</literal></term>
+    <listitem>
+     <para>Whether to allow multiple cookie domains.</para>
+     <para>Default: <literal>true</literal></para>
+    </listitem>
+   </varlistentry>
+
+   <varlistentry>
+    <term><literal>com.sun.identity.authentication.special.users</literal></term>
+    <listitem>
+     <para>List of special users always authenticated against the local
+     directory server.</para>
+     <para>Default: <literal>cn=dsameuser,ou=DSAME Users,<?eval
+     ${defaultRootSuffix}?>|cn=amService-UrlAccessAgent,ou=DSAME Users,<?eval
+     ${defaultRootSuffix}?></literal></para>
+    </listitem>
+   </varlistentry>
+
+   <varlistentry>
+    <term><literal>com.sun.identity.authentication.super.user</literal></term>
+    <listitem>
+     <para>OpenAM privileged administrator user.</para>
+     <para>Default: <literal>uid=amAdmin,ou=People,<?eval
+     ${defaultRootSuffix}?></literal></para>
+    </listitem>
+   </varlistentry>
+
+   <varlistentry>
+    <term><literal>com.sun.identity.authentication.uniqueCookieName</literal></term>
+    <listitem>
+     <para>When cookie hijacking protection is configured, name of the cookie
+     holding the URL to the OpenAM server that authenticated the user.</para>
+     <para>Default: <literal>sunIdentityServerAuthNServer</literal></para>
+    </listitem>
+   </varlistentry>
+
+   <varlistentry>
+    <term><literal>com.sun.identity.client.notification.url</literal></term>
+    <listitem>
+     <para>Notification service endpoint for clients such as policy agents.</para>
+     <para>Default: <literal><replaceable>server-protocol</replaceable
+     >://<replaceable>server-host</replaceable>:<replaceable
+     >server-port</replaceable>/<replaceable>server-uri</replaceable
+     >/notificationservice</literal>, such as <literal
+     >https://openam.example.com:8443/openam/notificationservice</literal></para>
+    </listitem>
+   </varlistentry>
+
    <varlistentry>
     <term><literal>com.sun.identity.common.systemtimerpool.size</literal></term>
     <listitem>
+     <para>Number of threads in the shared system timer pool used to schedule
+     operations such as session timeout.</para>
      <para>Default: 3</para>
     </listitem>
    </varlistentry>
+
    <varlistentry>
     <term><literal>com.sun.identity.cookie.httponly</literal></term>
     <listitem>
-     <para>When set to <literal>true</literal>, mark cookies as
-     <literal>HTTPOnly</literal> to prevent scripts and third-party programs
-     from accessing the cookies.</para>
+     <para>When set to <literal>true</literal>, mark cookies as HTTPOnly to
+     prevent scripts and third-party programs from accessing the cookies.</para>
      <para>Default: <literal>false</literal></para>
     </listitem>
    </varlistentry>
+
+   <varlistentry>
+    <term><literal>com.sun.identity.enableUniqueSSOTokenCookie</literal></term>
+    <listitem>
+     <para>If <literal>true</literal>, then OpenAM is using protection against
+     cookie hijacking.</para>
+     <para>Default: <literal>false</literal></para>
+    </listitem>
+   </varlistentry>
+
+   <varlistentry>
+    <term><literal>com.sun.identity.jss.donotInstallAtHighestPriority</literal></term>
+    <listitem>
+     <para>Whether JSS should take priority over other providers.</para>
+     <para>Default: <literal>true</literal></para>
+    </listitem>
+   </varlistentry>
+
+   <varlistentry>
+    <term><literal>com.sun.identity.monitoring</literal></term>
+    <listitem>
+     <para>Whether monitoring is active for OpenAM.</para>
+     <para>Default: <literal>off</literal></para>
+    </listitem>
+   </varlistentry>
+
+   <varlistentry>
+    <term><literal>com.sun.identity.monitoring.local.conn.server.url</literal></term>
+    <listitem>
+     <para>URL for local connection to the monitoring service.</para>
+     <para>Default: <literal>service:jmx:rmi://</literal></para>
+    </listitem>
+   </varlistentry>
+
+   <varlistentry>
+    <term><literal>com.sun.identity.password.deploymentDescriptor</literal></term>
+    <listitem>
+     <para>Internal property used by OpenAM.</para>
+     <para>Default: <replaceable>server-uri</replaceable>, such as
+     <literal>openam</literal></para>
+    </listitem>
+   </varlistentry>
+
+   <varlistentry>
+    <term><literal>com.sun.identity.policy.Policy.policy_evaluation_weights</literal></term>
+    <listitem>
+     <para>Weights of the cost of evaluating policy subjects, rules, and
+     conditions. Evaluation is in order of heaviest weight to lightest weight.</para>
+     <para>Default: <literal>10:10:10</literal>, meaning evaluation of rules,
+     then conditions, then subjects</para>
+    </listitem>
+   </varlistentry>
+
+   <varlistentry>
+    <term><literal>com.sun.identity.policy.resultsCacheMaxSize</literal></term>
+    <listitem>
+     <para>Maximum number of policy decisions OpenAM caches.</para>
+     <para>Default: 10000</para>
+    </listitem>
+   </varlistentry>
+
+   <varlistentry>
+    <term><literal>com.sun.identity.security.checkcaller</literal></term>
+    <listitem>
+     <para>Whether to perform a Java security permissions check for OpenAM.</para>
+     <para>Default: <literal>false</literal></para>
+    </listitem>
+   </varlistentry>
+
+   <varlistentry>
+    <term><literal>com.sun.identity.sm.cache.ttl</literal></term>
+    <listitem>
+     <para>When service configuration caching time-to-live is enabled, this
+     sets the time to live in minutes.</para>
+     <para>Default: 30</para>
+    </listitem>
+   </varlistentry>
+
+   <varlistentry>
+    <term><literal>com.sun.identity.sm.cache.ttl.enable</literal></term>
+    <listitem>
+     <para>If service configuration caching is enabled, whether to enable a
+     time-to-live for cached configuration.</para>
+     <para>Default: <literal>false</literal></para>
+    </listitem>
+   </varlistentry>
+
+   <varlistentry>
+    <term><literal>com.sun.identity.sm.flatfile.root_dir</literal></term>
+    <listitem>
+     <para>File system directory to hold file-based representation of OpenAM
+     configuration.</para>
+     <para>Default: <literal>~/openam/<replaceable>server-uri</replaceable
+     >/sms</literal> such as <literal>~/openam/openam/sms</literal></para>
+    </listitem>
+   </varlistentry>
+
    <varlistentry>
     <term><literal>com.sun.identity.sm.sms_object_class_name</literal></term>
     <listitem>
+     <para>Class used to read and write OpenAM service configuration entries
+     in the directory.</para>
      <para>Default: <literal>com.sun.identity.sm.ldap.SMSEmbeddedLdapObject</literal></para>
     </listitem>
    </varlistentry>
+
+   <varlistentry>
+    <term><literal>com.sun.identity.url.readTimeout</literal></term>
+    <listitem>
+     <para>Used to set the read timeout in milliseconds for HTTP and HTTPS
+     connections to other servers.</para>
+     <para>Default: 30000</para>
+    </listitem>
+   </varlistentry>
+
+   <varlistentry>
+    <term><literal>com.sun.identity.urlchecker.dorequest</literal></term>
+    <listitem>
+     <para>Allows the OpenAM ClusterStateService to work with HTTPS
+     endpoints.</para>
+     <para>Default: <literal>true</literal></para>
+    </listitem>
+   </varlistentry>
+
    <varlistentry>
     <term><literal>com.sun.identity.urlconnection.useCache</literal></term>
     <listitem>
+     <para>Whether to cache documents for HTTP and HTTPS connections to other
+     servers.</para>
      <para>Default: <literal>false</literal></para>
     </listitem>
    </varlistentry>
+
+   <varlistentry>
+    <term><literal>com.sun.identity.webcontainer</literal></term>
+    <listitem>
+     <para>Name of the web container to correctly set character encoding, if
+     necessary.</para>
+     <para>Default: <literal>WEB_CONTAINER</literal></para>
+    </listitem>
+   </varlistentry>
+
    <varlistentry>
     <term><literal>console.privileged.users</literal></term>
     <listitem>
-     <para>Used to assigned privileged console access to particular users.</para>
-     <para>Set to a <literal>|</literal> separated list of users' Universal
-     IDs, such as
-     <literal>console.privileged.users=uid=demo,ou=user,o=openam|uid=demo2,ou=user,o=openam</literal>.</para>
+     <para>Used to assigned privileged console access to particular users. Set
+     to a <literal>|</literal> separated list of users' Universal IDs, such as
+     <literal>console.privileged.users=uid=demo,ou=user,<?eval
+     ${defaultRootSuffix}?>|uid=demo2,ou=user,<?eval
+     ${defaultRootSuffix}?></literal>.</para>
+        </listitem>
+   </varlistentry>
+
+   <varlistentry>
+    <term><literal>openam.auth.destroy_session_after_upgrade</literal></term>
+    <listitem>
+     <para>Where to destroy the old session after a session is successfully
+     upgraded.</para>
+     <para>Default: <literal>true</literal></para>
     </listitem>
    </varlistentry>
+
+   <varlistentry>
+    <term><literal>openam.auth.distAuthCookieName</literal></term>
+    <listitem>
+     <para>Cookie used by the OpenAM distributed authentication service to
+     handle the authentication process.</para>
+     <para>Default: <literal>AMDistAuthCookie</literal></para>
+    </listitem>
+   </varlistentry>
+
+   <varlistentry>
+    <term><literal>openam.auth.session_property_upgrader</literal></term>
+    <listitem>
+     <para>Class that controls which session properties are copied during
+     session upgrade, where default is to copy all properties to the upgraded
+     session.</para>
+     <para>Default: <literal>org.forgerock.openam.authentication.service.DefaultSessionPropertyUpgrader</literal></para>
+    </listitem>
+   </varlistentry>
+
+   <varlistentry>
+    <term><literal>openam.authentication.ignore_goto_during_logout</literal></term>
+    <listitem>
+     <para>Whether to ignore the <literal>goto</literal> query string parameter
+     on logout, instead displaying the logout page.</para>
+     <para>Default: <literal>false</literal></para>
+    </listitem>
+   </varlistentry>
+
+   <varlistentry>
+    <term><literal>openam.cdm.default.charset</literal></term>
+    <listitem>
+     <para>Character set used for globalization.</para>
+     <para>Default: <literal>UTF-8</literal></para>
+    </listitem>
+   </varlistentry>
+
+   <varlistentry>
+    <term><literal>openam.forbidden.to.copy.headers</literal></term>
+    <listitem>
+     <para>Comma-separated list of HTTP headers not to copy when the distributed
+     authentication server forwards a request to another distributed
+     authentication server.</para>
+     <para>Default: <literal>connection</literal></para>
+    </listitem>
+   </varlistentry>
+
+   <varlistentry>
+    <term><literal>openam.forbidden.to.copy.request.headers</literal></term>
+    <listitem>
+     <para>Comma-separated list of HTTP headers not to copy when the distributed
+     authentication server forwards a request to another distributed
+     authentication server.</para>
+     <para>Default: <literal>connection</literal></para>
+    </listitem>
+   </varlistentry>
+
+   <varlistentry>
+    <term><literal>openam.retained.http.headers</literal></term>
+    <listitem>
+     <para>Comma-separated list of HTTP headers to copy to the forwarded
+     request when the distributed authentication server forwards a request to
+     another distributed authentication server. Usually requests are forwarded
+     when the user has an <literal>AMAuthCookie</literal> from a different
+     distributed authentication server.</para>
+     <para>Default: <literal>X-DSAMEVersion</literal></para>
+    </listitem>
+   </varlistentry>
+
+   <varlistentry>
+    <term><literal>openam.retained.http.request.headers</literal></term>
+    <listitem>
+     <para>Comma-separated list of HTTP headers to copy to the forwarded request
+     when the distributed authentication server forwards a request to another
+     distributed authentication server. Usually requests are forwarded when the
+     user has an <literal>AMAuthCookie</literal> from a different distributed
+     authentication server.</para>
+     <para>Default: <literal>X-DSAMEVersion</literal></para>
+    </listitem>
+   </varlistentry>
+
    <varlistentry>
     <term><literal>openam.session.allow_persist_am_cookie</literal></term>
     <listitem>
      <para>If <literal>true</literal> users can extend the lifetime of the
      <literal>iplanetDirectoryPro</literal> cookie to
      <literal>com.iplanet.am.cookie.timeToLive</literal> on a per-session
-     basis, by using the query string
+     basis, by using the query string parameter
      <literal>openam.session.persist_am_cookie=Yes</literal>.</para>
     </listitem>
    </varlistentry>
+
+   <varlistentry>
+    <term><literal>openam.session.case.sensitive.uuid</literal></term>
+    <listitem>
+     <para>Whether universal user IDs are considered case sensitive when
+     matching them.</para>
+     <para>Default: <literal>false</literal></para>
+    </listitem>
+   </varlistentry>
+
    <varlistentry>
     <term><literal>openam.session.persist_am_cookie</literal></term>
     <listitem>
      <para>If <literal>true</literal> extend the lifetime of the
      <literal>iplanetDirectoryPro</literal> cookie to
      <literal>com.iplanet.am.cookie.timeToLive</literal>.</para>
+     <para>Default: false</para>
     </listitem>
    </varlistentry>
+
    <varlistentry>
     <term><literal>opensso.protocol.handler.pkgs</literal></term>
     <listitem>
-     <para>TODO</para>
+     <para>If the web application containers sets 
+     <literal>java.protocol.handler.pkgs</literal>, then set this property to
+     <literal>com.sun.identity.protocol</literal>.</para>
     </listitem>
    </varlistentry>
+
    <varlistentry>
     <term><literal>org.forgerock.embedded.dsadminport</literal></term>
     <listitem>
+     <para>Administration port for embedded OpenDJ directory server.</para>
      <para>Default: 4444</para>
     </listitem>
    </varlistentry>
+
+   <varlistentry>
+    <term><literal>securidHelper.ports</literal></term>
+    <listitem>
+     <para>Port on which SecurID daemon listens.</para>
+     <para>Default: 58943</para>
+    </listitem>
+   </varlistentry>
+
    <varlistentry>
     <term><literal>ssoadm.disabled</literal></term>
     <listitem>
-     <para>Set to <literal>true</literal> to enable
+     <para>Set to <literal>false</literal> to enable
      <filename>ssoadm.jsp</filename>.</para>
+     <para>Default: <literal>true</literal></para>
     </listitem>
    </varlistentry>
   </variablelist>
