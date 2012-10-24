@@ -104,6 +104,22 @@
    <listitem>
     <para>Users can configure the NetworkMonitor (<link 
      xlink:href="https://bugster.forgerock.org/jira/browse/OPENAM-265" xlink:show="new">OPENAM-265</link>).</para>
-  </listitem>
+   </listitem>
+   <listitem>
+    <para>You can now prevent OpenAM from caching subject evaluations for
+    policy decisions (part of the fix for <link xlink:show="new"
+    xlink:href="https://bugster.forgerock.org/jira/browse/OPENAM-24"
+    >OPENAM-24</link>).</para>
+    <para>In most cases you do not need to turn off caching, as OpenAM now
+    clears cache when group membership changes. Before turning off caching in
+    production, first test the setting to ensure that the performance impact is
+    acceptable for your deployment.</para>
+    <para>To turn off caching, set Access Control &gt; <replaceable
+    >Realm Name</replaceable> &gt; Services &gt; Policy Configuration &gt;
+    Subjects Result Time to Live to 0. The equivalent
+    <command>ssoadm</command> property for the
+    <literal>iPlanetAMPolicyConfigService</literal> is
+    <literal>iplanet-am-policy-config-subjects-result-ttl</literal>.</para>
+   </listitem>
  </itemizedlist>
 </chapter>

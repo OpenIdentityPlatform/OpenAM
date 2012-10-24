@@ -1707,7 +1707,9 @@
     <term>Subjects Result Time to Live</term>
     <listitem>
      <para>Maximum minutes OpenAM caches a subject result for evaluating
-     policy requests.</para>
+     policy requests. A value of 0 prevents OpenAM from caching subject
+     evaluations for policy decisions.</para>
+     <para>Default: 10</para>
 
      <para><command>ssoadm</command> attribute:
      <literal>iplanet-am-policy-config-subjects-result-ttl</literal></para>
