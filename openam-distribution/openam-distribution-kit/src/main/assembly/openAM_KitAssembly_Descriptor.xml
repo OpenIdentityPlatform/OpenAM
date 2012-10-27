@@ -3,7 +3,7 @@
 <!--
 * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
 *
-* Copyright (c) 2011 ForgeRock AS. All Rights Reserved
+* Copyright (c) 2011-2012 ForgeRock Inc. All Rights Reserved
 *
 * The contents of this file are subject to the terms
 * of the Common Development and Distribution License
@@ -40,11 +40,14 @@
             <!-- Include fully packaged Modules -->
             <includes>
                 <include>org.forgerock.openam:openam-server:war</include>
+                <include>org.forgerock.openam:openam-clientsdk:jar</include>
+                <include>org.forgerock.openam:openam-distauth:war</include>
                 <include>org.forgerock.openam:openam-distribution-amadmsetup:jar</include>
                 <include>org.forgerock.openam:openam-distribution-library:zip</include>
                 <include>org.forgerock.openam:openam-distribution-fedlet-unconfigured:zip</include>
                 <include>org.forgerock.openam:openam-distribution-ssoadmintools:zip</include>
                 <include>org.forgerock.openam:openam-distribution-ssoconfiguratortools:zip</include>
+                <include>org.forgerock.openam:openam-distribution-diagnostics</include>
             </includes>
         </dependencySet>
     </dependencySets>

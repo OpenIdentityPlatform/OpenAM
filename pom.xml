@@ -204,6 +204,10 @@
         <!-- OpenAM OAuth2 Token Service -->
         <!--<module>openam-oauth2</module>-->
 
+        <module>openam-common-auth-ui</module>
+
+        <module>openam-server-auth-ui</module>
+
         <!-- OpenAM Server -->
         <module>openam-server</module>
 
