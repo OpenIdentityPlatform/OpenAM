@@ -1,31 +1,30 @@
 <?xml version="1.0" encoding="UTF-8"?>
+<!--
+* DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
+*
+* Copyright (c) 2011-2012 ForgeRock Inc. All Rights Reserved
+*
+* The contents of this file are subject to the terms
+* of the Common Development and Distribution License
+* (the License). You may not use this file except in
+* compliance with the License.
+*
+* You can obtain a copy of the License at
+* http://forgerock.org/license/CDDLv1.0.html
+* See the License for the specific language governing
+* permission and limitations under the License.
+*
+* When distributing Covered Code, include this CDDL
+* Header Notice in each file and include the License file
+* at http://forgerock.org/license/CDDLv1.0.html
+* If applicable, add the following below the CDDL Header,
+* with the fields enclosed by brackets [] replaced by
+* your own identifying information:
+* "Portions Copyrighted [year] [name of copyright owner]"
+*
+-->
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
     <modelVersion>4.0.0</modelVersion>
-    
-<!--
- * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
- *
- * Copyright (c) 2011 ForgeRock AS. All Rights Reserved
- *
- * The contents of this file are subject to the terms
- * of the Common Development and Distribution License
- * (the License). You may not use this file except in
- * compliance with the License.
- *
- * You can obtain a copy of the License at
- * http://forgerock.org/license/CDDLv1.0.html
- * See the License for the specific language governing
- * permission and limitations under the License.
- *
- * When distributing Covered Code, include this CDDL
- * Header Notice in each file and include the License file
- * at http://forgerock.org/license/CDDLv1.0.html
- * If applicable, add the following below the CDDL Header,
- * with the fields enclosed by brackets [] replaced by
- * your own identifying information:
- * "Portions Copyrighted [year] [name of copyright owner]"
- *
- -->
 
     <!-- Parent Project -->
     <parent>
@@ -36,152 +35,470 @@
 
     <!-- Component Definition -->
     <name>OpenAM Client SDK</name>
-    <description>OpenAM Java Client SDK
-    </description>
+    <description>OpenAM Java Client SDK</description>
     <artifactId>openam-clientsdk</artifactId>
     <version>10.1.0-SNAPSHOT</version>
     <packaging>jar</packaging>
-    <organization>
-        <name>ForgeRock</name>
-        <url>http://www.forgerock.com</url>
-    </organization>
 
     <!-- Build -->
     <build>
-        <plugins>
-
-            <plugin>
-                <inherited>true</inherited>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-compiler-plugin</artifactId>
-                <configuration>
-                    <source>${java.source.version}</source>
-                    <target>${java.target.version}</target>
-                    <encoding>UTF-8</encoding>
-                </configuration>
-            </plugin>
-
-            <!-- Surefire Tests -->
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-surefire-plugin</artifactId>
-                <configuration>
-                    <systemPropertyVariables>
-                        <templateLoaderPath>${notification.template.path}</templateLoaderPath>
-                    </systemPropertyVariables>
-                    <excludes>
-                        <exclude>**/IT_*</exclude>
-                   </excludes>
-                </configuration>
-            </plugin>
-            
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-jar-plugin</artifactId>
-                <configuration>
-                    <archive>
-                        <index>true</index>
-                        <manifest>
-                            <addClasspath>true</addClasspath>
-                            <classpathPrefix>lib/</classpathPrefix>
-                        </manifest>
-                        <manifestEntries>
-                            <Specification-Title>OpenAM Java CLient SDK</Specification-Title>
-                            <Specification-Version>${project.version} - ${maven.build.timestamp}</Specification-Version>
-                            <Specification-Vendor>ForgeRock</Specification-Vendor>
-                            <Implementation-Title>OpenAM Java Client SDK</Implementation-Title>
-                            <Implementation-Version>${project.version} - ${maven.build.timestamp}</Implementation-Version>
-                            <Implementation-Vendor>ForgeRock</Implementation-Vendor>
-                            <Built-By>${user.name}</Built-By>
-                            <Build-Jdk>${java.version}</Build-Jdk>
-                            <Build-Time>${maven.build.timestamp}</Build-Time>
-                            <Version>${project.version}</Version>
-                            <Create-On>${maven.build.timestamp}</Create-On>
-                            <SVN-Revision>R${svn-revision.revision}</SVN-Revision>
-                            <!-- TODO Add License to Manifest -->
-                            <License></License>
-                        </manifestEntries>
-                    </archive>
-                </configuration>
-            </plugin>
-
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-javadoc-plugin</artifactId>
-                <configuration>
-                    <skip>true</skip>
-                </configuration>
-            </plugin>
-
-        </plugins>
-    
         <resources>
             <resource>
-                <filtering>false</filtering>
-                <directory>src/main/resources</directory>
+                <directory>${project.build.directory}/generated-resources</directory>
                 <includes>
-                    <include>**/*</include>
-                </includes>
-                <excludes>
-                    <exclude>version_information.txt</exclude>
-                </excludes>
-            </resource>
-            <resource>
-                <filtering>true</filtering>
-                <directory>src/main/resources</directory>
-                <includes>
-                    <include>version_information.txt</include>
+                    <include>amAuth.properties</include>
+                    <include>amAuthContext.properties</include>
+                    <include>amIdRepo.properties</include>
+                    <include>amNaming.properties</include>
+                    <include>amPolicy.properties</include>
+                    <include>amProfile.properties</include>
+                    <include>amSDK.properties</include>
+                    <include>amSSOProvider.properties</include>
+                    <include>amSecurity.properties</include>
+                    <include>amSession.properties</include>
+                    <include>amUtilMsgs.properties</include>
+                    <include>debugconfig.properties</include>
+                    <include>famSTS.properties</include>
+                    <include>fmConfigurationService.properties</include>
+                    <include>fmLibertySecurity.properties</include>
+                    <include>fmSessionProvider.properties</include>
+                    <include>fmWSSProvider.properties</include>
+                    <include>fmWSSecurity.properties</include>
+                    <include>libAuthnSvc.properties</include>
+                    <include>libBinarySecurityToken.properties</include>
+                    <include>libConfigurationManager.properties</include>
+                    <include>libDSTService.properties</include>
+                    <include>libDisco.properties</include>
+                    <include>libEncryption.properties</include>
+                    <include>libIDFF.properties</include>
+                    <include>libIDFFMeta.properties</include>
+                    <include>libInteraction.properties</include>
+                    <include>libLibertySecurity.properties</include>
+                    <include>libPersonalProfile.properties</include>
+                    <include>libSAML.properties</include>
+                    <include>libSAML2.properties</include>
+                    <include>libSAML2Meta.properties</include>
+                    <include>libSOAPBinding.properties</include>
+                    <include>libSessionProvider.properties</include>
+                    <include>libXACML.properties</include>
+                    <include>serverAttributeMap.properties</include>
+                    <include>META-INF/**</include>
                 </includes>
             </resource>
         </resources>
-        <testResources>
-            <testResource>
-                <filtering>false</filtering>
-                <directory>src/test/resources</directory>
-                <includes>
-                    <include>**/*</include>
-                </includes>
-            </testResource>
-        </testResources>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.portals.jetspeed-2</groupId>
+                <artifactId>jetspeed-unpack-maven-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <phase>generate-resources</phase>
+                        <goals>
+                            <goal>unpack</goal>
+                        </goals>
+                    </execution>
+                </executions>
+                <dependencies>
+                    <dependency>
+                        <groupId>org.forgerock.openam</groupId>
+                        <artifactId>openam-server</artifactId>
+                        <version>${project.version}</version>
+                        <type>war</type>
+                    </dependency>
+                </dependencies>
+                <configuration>
+                    <unpack>
+                        <artifact>org.forgerock.openam:openam-server:war</artifact>
+                        <resources>
+                            <resource>
+                                <path>WEB-INF/classes</path>
+                                <include>*.properties</include>
+                                <flat>true</flat>
+                                <destination>generated-resources</destination>
+                            </resource>
+                            <resource>
+                                <path>META-INF/services</path>
+                                <include>com.sun.xml.ws.api.pipe.TransportPipeFactory</include>
+                                <destination>generated-resources/META-INF/services</destination>
+                            </resource>
+                        </resources>
+                    </unpack>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-shade-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>shade</goal>
+                        </goals>
+                    </execution>
+                </executions>
+                <configuration>
+                    <!--
+                    Anything you can find here is just a replication attempt of the ant ClientSDK build system.
+                    In future versions of OpenAM we need to enhance this generation process by simply separating
+                    remote/local implementations in a much cleaner way
+                    -->
+                    <artifactSet>
+                        <includes>
+                            <include>org.forgerock.openam:openam-core</include>
+                            <include>org.forgerock.openam:openam-shared</include>
+                            <include>org.forgerock.openam:openam-dtd-schema</include>
+                            <include>org.forgerock.openam:openam-jaxrpc-schema</include>
+                            <include>org.forgerock.openam:openam-liberty-schema</include>
+                            <include>org.forgerock.openam:openam-saml2-schema</include>
+                            <include>org.forgerock.openam:openam-federation-library</include>
+                            <include>org.forgerock.openam:OpenFM</include>
+                            <include>org.json:json</include>
+                        </includes>
+                    </artifactSet>
+                    <filters>
+                        <filter>
+                            <artifact>org.forgerock.openam:openam-core</artifact>
+                            <includes>
+                                <include>com/iplanet/am/sdk/**</include>
+                                <include>com/iplanet/am/util/**</include>
+                                <include>com/iplanet/dpro/session/service/InternalSession*</include>
+                                <include>com/iplanet/dpro/session/service/SessionService*</include>
+                                <include>com/iplanet/dpro/session/share/**</include>
+                                <include>com/iplanet/dpro/session/*</include>
+                                <!-- TODO is JMQSessionRepository required here? -->
+                                <include>com/iplanet/services/**</include>
+                                <include>com/iplanet/sso/**</include>
+                                <include>com/iplanet/ums/Guid*</include>
+                                <include>com/iplanet/ums/IUMSConstants*</include>
+                                <include>com/iplanet/ums/SearchControl*</include>
+                                <include>com/iplanet/ums/SortKey*</include>
+                                <include>com/iplanet/ums/validation/BooleanValidator*</include>
+                                <include>com/iplanet/ums/validation/DNValidator*</include>
+                                <include>com/iplanet/ums/validation/FloatValidator*</include>
+                                <include>com/iplanet/ums/validation/IValidator*</include>
+                                <include>com/iplanet/ums/validation/MailAddressValidator*</include>
+                                <include>com/iplanet/ums/validation/NumberValidator*</include>
+                                <include>com/iplanet/ums/validation/URLValidator*</include>
+                                <include>com/sun/identity/authentication/*</include>
+                                <include>com/sun/identity/authentication/client/**</include>
+                                <include>com/sun/identity/authentication/internal/AuthSSOProvider*</include>
+                                <include>com/sun/identity/authentication/internal/AuthSSOToken*</include>
+                                <include>com/sun/identity/authentication/internal/InvalidAuthContextException*</include>
+                                <!-- TODO do we really need all the authentication module's principals here? -->
+                                <include>com/sun/identity/authentication/service/AMAuthErrorCode*</include>
+                                <include>com/sun/identity/authentication/service/AuthException*</include>
+                                <include>com/sun/identity/authentication/service/ConfiguredAuthServices*</include>
+                                <include>com/sun/identity/authentication/service/ConfiguredIdentityTypes*</include>
+                                <include>com/sun/identity/authentication/service/SSOTokenPrincipal*</include>
+                                <include>com/sun/identity/authentication/share/**</include>
+                                <include>com/sun/identity/authentication/spi/AuthLoginException*</include>
+                                <include>com/sun/identity/authentication/spi/AuthenticationException*</include>
+                                <include>com/sun/identity/authentication/spi/DSAMECallbackInterface*</include>
+                                <include>com/sun/identity/authentication/spi/HttpCallback*</include>
+                                <include>com/sun/identity/authentication/spi/InvalidPasswordException*</include>
+                                <include>com/sun/identity/authentication/spi/PagePropertiesCallback*</include>
+                                <include>com/sun/identity/authentication/spi/RedirectCallback*</include>
+                                <include>com/sun/identity/authentication/spi/X509CertificateCallback*</include>
+                                <include>com/sun/identity/authentication/util/ISAuthConstants*</include>
+                                <include>com/sun/identity/common/admin/DisplayOptionsUtils*</include>
+                                <include>com/sun/identity/common/configuration/Configuration*</include>
+                                <include>com/sun/identity/common/configuration/ServerConfiguration*</include>
+                                <include>com/sun/identity/common/configuration/SiteConfiguration*</include>
+                                <include>com/sun/identity/common/configuration/UnknownPropertyNameException*</include>
+                                <include>com/sun/identity/common/AttributeStruct*</include>
+                                <include>com/sun/identity/common/CaseInsensitiveHash*</include>
+                                <include>com/sun/identity/common/CaseInsensitiveKey*</include>
+                                <include>com/sun/identity/common/ChainedException*</include>
+                                <include>com/sun/identity/common/DNUtils*</include>
+                                <include>com/sun/identity/common/DateUtils*</include>
+                                <include>com/sun/identity/common/DebugPropertiesObserver*</include>
+                                <include>com/sun/identity/common/FQDNUtils*</include>
+                                <include>com/sun/identity/common/ISLocaleContext*</include>
+                                <include>com/sun/identity/common/L10NMessage*</include>
+                                <include>com/sun/identity/common/LDAPConnPoolUtils*</include>
+                                <include>com/sun/identity/common/LDAPConnectionPool*</include>
+                                <include>com/sun/identity/common/PropertiesFinder*</include>
+                                <include>com/sun/identity/common/ReaderWriterLock*</include>
+                                <include>com/sun/identity/common/RequestUtils*</include>
+                                <include>com/sun/identity/common/ResourceLookup*</include>
+                                <include>com/sun/identity/common/SearchResults*</include>
+                                <include>com/sun/identity/common/SystemConfigurationException*</include>
+                                <include>com/sun/identity/common/SystemConfigurationUtil*</include>
+                                <include>com/sun/identity/common/SystemProperties*</include>
+                                <include>com/sun/identity/configuration/SystemProperties*</include>
+                                <include>com/sun/identity/delegation/DelegationException*</include>
+                                <include>com/sun/identity/entity/*</include>
+                                <include>com/sun/identity/idm/*</include>
+                                <include>com/sun/identity/idm/common/**</include>
+                                <include>com/sun/identity/idm/remote/**</include>
+                                <include>com/sun/identity/jaxrpc/**</include>
+                                <include>com/sun/identity/log/AMLogException*</include>
+                                <include>com/sun/identity/log/ILogRecord*</include>
+                                <include>com/sun/identity/log/LogConstants*</include>
+                                <include>com/sun/identity/log/LogManager*</include>
+                                <include>com/sun/identity/log/LogManagerUtil*</include>
+                                <include>com/sun/identity/log/LogRecord*</include>
+                                <include>com/sun/identity/log/Logger*</include>
+                                <include>com/sun/identity/log/handlers/LoggingThread*</include>
+                                <include>com/sun/identity/log/handlers/RemoteFormatter*</include>
+                                <include>com/sun/identity/log/handlers/RemoteHandler*</include>
+                                <include>com/sun/identity/log/messageid/**</include>
+                                <include>com/sun/identity/log/s1is/LogConfigReader*</include>
+                                <include>com/sun/identity/log/spi/Debug*</include>
+                                <include>com/sun/identity/log/spi/IDebug*</include>
+                                <include>com/sun/identity/log/spi/ISDebug*</include>
+                                <include>com/sun/identity/monitoring/MonitoringUtil*</include>
+                                <include>com/sun/identity/monitoring/SsoServerIdRepoSvcImpl*</include>
+                                <include>com/sun/identity/policy/**</include>
+                                <include>com/sun/identity/protocol/**</include>
+                                <include>com/sun/identity/security/AMSecurityPropertiesException*</include>
+                                <include>com/sun/identity/security/AdminTokenAction*</include>
+                                <include>com/sun/identity/security/AppSSOTokenProvider*</include>
+                                <include>com/sun/identity/security/ServerInstanceAction*</include>
+                                <include>com/sun/identity/security/SystemAppTokenProvider*</include>
+                                <include>com/sun/identity/session/util/RestrictedTokenAction*</include>
+                                <include>com/sun/identity/session/util/RestrictedTokenContext*</include>
+                                <include>com/sun/identity/session/util/SessionUtils*</include>
+                                <include>com/sun/identity/sm/*</include>
+                                <include>com/sun/identity/sm/jaxrpc/**</include>
+                                <include>com/sun/identity/util/**</include>
+                                <include>org/forgerock/openam/authentication/service/protocol/**</include>
+                                <include>org/forgerock/openam/services/cdm/**</include>
+                            </includes>
+                            <excludes>
+                                <exclude>com/iplanet/am/sdk/ldap/**</exclude>
+                                <exclude>com/iplanet/am/sdk/remote/DirectoryManager*</exclude>
+                                <exclude>com/iplanet/am/util/AMGenerateServerID*</exclude>
+                                <exclude>com/iplanet/am/util/AMSendMail*</exclude>
+                                <exclude>com/iplanet/am/util/AMUserNamePasswordAuthenticator*</exclude>
+                                <exclude>com/iplanet/am/util/CLILogin*</exclude>
+                                <exclude>com/iplanet/am/util/CharsetMapping*</exclude>
+                                <exclude>com/iplanet/am/util/IPSServerSocket*</exclude>
+                                <exclude>com/iplanet/am/util/PrintUtils*</exclude>
+                                <exclude>com/iplanet/am/util/SSLSocketFactoryManager*</exclude>
+                                <exclude>com/iplanet/am/util/Token*</exclude>
+                                <exclude>com/iplanet/am/util/UnicodeInputStreamReader*</exclude>
+                                <exclude>com/iplanet/am/util/UpdateDNSAlias*</exclude>
+                                <exclude>com/iplanet/am/util/getEncoding*</exclude>
+                                <exclude>com/iplanet/services/comm/server/PLL*</exclude>
+                                <exclude>com/iplanet/services/comm/server/NotificationSender*</exclude>
+                                <exclude>com/iplanet/services/ldap/aci/**</exclude>
+                                <exclude>com/iplanet/services/ldap/event/Request*</exclude>
+                                <exclude>com/iplanet/services/naming/service/**</exclude>
+                                <exclude>com/iplanet/services/util/internal/**</exclude>
+                                <exclude>com/iplanet/services/util/Hash*</exclude>
+                                <exclude>com/iplanet/services/util/ThreadPool*</exclude>
+                                <exclude>com/iplanet/services/util/XMLUtils*</exclude>
+                                <exclude>com/sun/identity/common/ReaderWriterLock$Test*</exclude>
+                                <exclude>com/sun/identity/entity/EntityObjectImpl*</exclude>
+                                <exclude>com/sun/identity/idm/AgentMigration71*</exclude>
+                                <exclude>com/sun/identity/log/LoggerProvider*</exclude>
+                                <exclude>com/sun/identity/policy/jaas/**</exclude>
+                                <exclude>com/sun/identity/policy/remote/PolicyRequestHandler*</exclude>
+                                <exclude>com/sun/identity/policy/util/**</exclude>
+                                <exclude>com/sun/identity/sm/jaxrpc/SMSJAXRPCObjectImpl*</exclude>
+                            </excludes>
+                        </filter>
+                        <filter>
+                            <artifact>org.forgerock.openam:openam-shared</artifact>
+                            <includes>
+                                <include>**/**</include>
+                            </includes>
+                            <excludes>
+                                <exclude>com/sun/identity/shared/test/**</exclude>
+                            </excludes>
+                        </filter>
+                        <filter>
+                            <artifact>org.forgerock.openam:openam-jaxrpc-schema</artifact>
+                            <includes>
+                                <include>com/iplanet/sso/**</include>
+                                <include>com/sun/identity/liberty/ws/security/**</include>
+                                <include>com/sun/identity/saml/**</include>
+                                <include>com/sun/identity/sm/*</include>
+                            </includes>
+                            <excludes>
+                                <exclude>com/sun/identity/liberty/ws/security/SecurityTokenException_SOAPBuilder*</exclude>
+                            </excludes>
+                        </filter>
+                        <filter>
+                            <artifact>org.forgerock.openam:OpenFM</artifact>
+                            <includes>
+                                <include>com/sun/identity/classloader/**</include>
+                                <include>com/sun/identity/configuration/FedSystemProperties*</include>
+                                <include>com/sun/identity/liberty/ws/soapbinding/WebServiceAuthenticatorImpl*</include>
+                                <include>com/sun/identity/log/messageid/**</include>
+                                <include>com/sun/identity/plugin/configuration/impl/**</include>
+                                <include>com/sun/identity/plugin/log/impl/LogProvider*</include>
+                                <include>com/sun/identity/plugin/session/impl/**</include>
+                                <include>com/sun/identity/saml/plugins/**</include>
+                                <include>com/sun/identity/saml/xmlsig/**</include>
+                                <include>com/sun/identity/setup/InsertWebXMLContent*</include>
+                                <include>com/sun/identity/setup/ParseInputData*</include>
+                                <include>com/sun/identity/setup/SwapClientConfig*</include>
+                                <include>com/sun/identity/wss/logging/**</include>
+                                <include>com/sun/identity/wss/provider/**</include>
+                                <include>com/sun/identity/wss/security/**</include>
+                                <include>com/sun/identity/wss/sts/config/STSRemoteConfig*</include>
+                                <include>com/sun/identity/wss/sts/spi/FAMTransportPipeFactory*</include>
+                                <include>com/sun/identity/wss/sts/*</include>
+                                <include>com/sun/identity/wss/trust/**</include>
+                                <include>com/sun/identity/wss/xmlenc/**</include>
+                                <include>com/sun/identity/wss/xmlsig/**</include>
+                            </includes>
+                            <excludes>
+                                <exclude>com/sun/identity/wss/sts/FAMSTSImpl*</exclude>
+                                <exclude>com/sun/identity/wss/sts/STSContextListener*</exclude>
+                                <exclude>com/sun/identity/wss/sts/SecurityTokenService*</exclude>
+                            </excludes>
+                        </filter>
+                        <filter>
+                            <artifact>org.forgerock.openam:openam-federation-library</artifact>
+                            <includes>
+                                <include>com/sun/identity/common/SystemConfiguration*</include>
+                                <include>com/sun/identity/configuration/FedLibSystemProperties*</include>
+                                <include>com/sun/identity/cot/*</include>
+                                <include>com/sun/identity/federation/common/FSException*</include>
+                                <include>com/sun/identity/federation/common/FSUtils*</include>
+                                <include>com/sun/identity/federation/common/IFSConstants*</include>
+                                <include>com/sun/identity/federation/common/LogUtil*</include>
+                                <include>com/sun/identity/federation/message/**</include>
+                                <include>com/sun/identity/federation/meta/**</include>
+                                <include>com/sun/identity/federation/services/util/FSServiceUtils*</include>
+                                <include>com/sun/identity/liberty/ws/authnsvc/**</include>
+                                <include>com/sun/identity/liberty/ws/common/**</include>
+                                <include>com/sun/identity/liberty/ws/disco/**</include>
+                                <include>com/sun/identity/liberty/ws/dst/**</include>
+                                <include>com/sun/identity/liberty/ws/idpp/plugin/IDPPResourceIDMapper*</include>
+                                <include>com/sun/identity/liberty/ws/interaction/**</include>
+                                <include>com/sun/identity/liberty/ws/interfaces/**</include>
+                                <include>com/sun/identity/liberty/ws/security/**</include>
+                                <include>com/sun/identity/liberty/ws/soapbinding/**</include>
+                                <include>com/sun/identity/plugin/configuration/*</include>
+                                <include>com/sun/identity/plugin/datastore/DataStoreProvider*</include>
+                                <include>com/sun/identity/plugin/log/*</include>
+                                <include>com/sun/identity/plugin/session/*</include>
+                                <include>com/sun/identity/sae/api/**</include>
+                                <include>com/sun/identity/saml/AssertionManagerClient*</include>
+                                <include>com/sun/identity/saml/AssertionManagerIF*</include>
+                                <include>com/sun/identity/saml/SAMLClient*</include>
+                                <include>com/sun/identity/saml/assertion/**</include>
+                                <include>com/sun/identity/saml/common/**</include>
+                                <include>com/sun/identity/saml/plugins/**</include>
+                                <include>com/sun/identity/saml/protocol/**</include>
+                                <include>com/sun/identity/saml/xmlsig/**</include>
+                                <include>com/sun/identity/saml2/assertion/**</include>
+                                <include>com/sun/identity/saml2/common/NameIDInfo*</include>
+                                <include>com/sun/identity/saml2/common/NewBoolean*</include>
+                                <include>com/sun/identity/saml2/common/SAML2Constants*</include>
+                                <include>com/sun/identity/saml2/common/SAML2Exception*</include>
+                                <include>com/sun/identity/saml2/common/SAML2InvalidNameIDPolicyException*</include>
+                                <include>com/sun/identity/saml2/common/SAML2SDKUtils*</include>
+                                <include>com/sun/identity/saml2/key/**</include>
+                                <include>com/sun/identity/saml2/logging/**</include>
+                                <include>com/sun/identity/saml2/meta/**</include>
+                                <include>com/sun/identity/saml2/protocol/**</include>
+                                <include>com/sun/identity/saml2/soapbinding/QueryClient*</include>
+                                <include>com/sun/identity/saml2/xmlenc/**</include>
+                                <include>com/sun/identity/saml2/xmlsig/**</include>
+                                <include>com/sun/identity/wsfederation/client/**</include>
+                                <include>com/sun/identity/wsfederation/common/WSFederationException*</include>
+                                <include>com/sun/identity/wsfederation/meta/WSFederationMetaException*</include>
+                                <include>com/sun/identity/xacml/**</include>
+                                <include>com/sun/identity/xmlenc/**</include>
+                                <include>com/sun/liberty/**</include>
+                            </includes>
+                            <excludes>
+                                <exclude>com/sun/identity/federation/message/common/Extension*</exclude>
+                                <exclude>com/sun/identity/federation/meta/IDFFCOTUtils*</exclude>
+                                <exclude>com/sun/identity/liberty/ws/authnsvc/mechanism/**</exclude>
+                                <exclude>com/sun/identity/liberty/ws/disco/plugins/**</exclude>
+                                <exclude>com/sun/identity/liberty/ws/dst/service/**</exclude>
+                                <exclude>com/sun/identity/liberty/ws/security/SecurityTokenManagerServlet*</exclude>
+                                <exclude>com/sun/identity/plugin/datastore/DataStoreProviderManager*</exclude>
+                                <exclude>com/sun/identity/saml2/assertion/impl/AssertionIDRefImpl*</exclude>
+                                <exclude>com/sun/identity/saml2/assertion/impl/NameIDImplWithoutSPNameQualifier*</exclude>
+                                <exclude>com/sun/identity/saml2/protocol/impl/NameIDMappingRequestImpl*</exclude>
+                                <exclude>com/sun/identity/saml2/protocol/impl/NameIDMappingResponseImpl*</exclude>
+                                <exclude>com/sun/identity/saml2/protocol/impl/SubjectQueryAbstractImpl*</exclude>
+                            </excludes>
+                        </filter>
+                        <filter>
+                            <artifact>org.forgerock.openam:openam-liberty-schema</artifact>
+                            <includes>
+                                <include>**/**</include>
+                            </includes>
+                            <excludes>
+                                <exclude>com/sun/identity/liberty/ws/common/jaxb/xmlsec/**</exclude>
+                            </excludes>
+                        </filter>
+                        <filter>
+                            <artifact>org.forgerock.openam:openam-saml2-schema</artifact>
+                            <includes>
+                                <include>**/**</include>
+                            </includes>
+                        </filter>
+                        <filter>
+                            <artifact>org.forgerock.openam:openam-dtd-schema</artifact>
+                            <includes>
+                                <include>com/sun/identity/log/messageid/amLogMessage.dtd</include>
+                            </includes>
+                        </filter>
+                        <filter>
+                            <artifact>org.json:json</artifact>
+                            <includes>
+                                <include>**/**</include>
+                            </includes>
+                        </filter>
+                        <filter>
+                            <artifact>*:*</artifact>
+                            <excludes>
+                                <exclude>META-INF/*.MF</exclude>
+                                <exclude>META-INF/*.SF</exclude>
+                                <exclude>META-INF/*.DSA</exclude>
+                                <exclude>META-INF/*.RSA</exclude>
+                            </excludes>
+                        </filter>
+                    </filters>
+                    <transformers>
+                        <transformer implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
+                            <manifestEntries>
+                                <Specification-Title>OpenAM Java CLient SDK</Specification-Title>
+                                <Specification-Version>${project.version} - ${maven.build.timestamp}</Specification-Version>
+                                <Specification-Vendor>ForgeRock</Specification-Vendor>
+                                <Implementation-Title>OpenAM Java Client SDK</Implementation-Title>
+                                <Implementation-Version>${project.version} - ${maven.build.timestamp}</Implementation-Version>
+                                <Implementation-Vendor>ForgeRock</Implementation-Vendor>
+                                <Built-By>${user.name}</Built-By>
+                                <Build-Jdk>${java.version}</Build-Jdk>
+                                <Build-Time>${maven.build.timestamp}</Build-Time>
+                                <Version>${project.version}</Version>
+                                <Create-On>${maven.build.timestamp}</Create-On>
+                                <SVN-Revision>R${svn-revision.revision}</SVN-Revision>
+                                <!-- TODO Add License to Manifest -->
+                            </manifestEntries>
+                        </transformer>
+                    </transformers>
+                    <!--createSourcesJar>true</createSourcesJar-->
+                </configuration>
+            </plugin>
+        </plugins>
     </build>
 
-    
     <dependencies>
-
         <dependency>
             <groupId>org.forgerock.openam</groupId>
-            <artifactId>openam-shared</artifactId>
-            <version>10.1.0-SNAPSHOT</version>
+            <artifactId>openam-jaxrpc-schema</artifactId>
+            <version>${project.version}</version>
         </dependency>
-
         <dependency>
             <groupId>org.forgerock.openam</groupId>
-            <artifactId>openam-core</artifactId>
-            <version>10.1.0-SNAPSHOT</version>
+            <artifactId>openam-dtd-schema</artifactId>
+            <version>${project.version}</version>
         </dependency>
-
         <dependency>
             <groupId>org.forgerock.openam</groupId>
-            <artifactId>openam-oauth</artifactId>
-            <version>10.1.0-SNAPSHOT</version>
+            <artifactId>OpenFM</artifactId>
+            <version>${project.version}</version>
         </dependency>
-
-
-        <dependency>
-            <groupId>javax.xml.ws</groupId>
-            <artifactId>jaxws-api</artifactId>
-        </dependency>
-
-        <dependency>
-            <groupId>com.sun.xml.ws</groupId>
-            <artifactId>jaxws-rt</artifactId>
-        </dependency>
-
-        <dependency>
-            <groupId>com.sun.jersey</groupId>
-            <artifactId>jersey-bundle</artifactId>
-        </dependency>
-		
     </dependencies>
-    
 </project>
