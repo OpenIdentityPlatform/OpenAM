@@ -27,7 +27,8 @@
  */
 
 /*
- * Portions Copyrighted [2011] [ForgeRock AS]
+ * Portions Copyrighted 2011 ForgeRock Inc
+ * Portions Copyrighted 2012 Open Source Solution Technology Corporation
  */
 package com.sun.identity.policy.plugins;
 
@@ -41,6 +42,7 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.StringTokenizer;
 import java.util.HashSet;
+import java.util.ResourceBundle;
 import java.security.AccessController;
 
 import com.sun.identity.policy.interfaces.Condition;
@@ -58,6 +60,7 @@ import com.sun.identity.authentication.config.AMAuthenticationManager;
 import com.sun.identity.authentication.config.AMAuthenticationInstance;
 import com.sun.identity.authentication.config.AMConfigurationException;
 import com.sun.identity.shared.debug.Debug;
+import com.sun.identity.shared.locale.AMResourceBundleCache;
 import com.sun.identity.security.AdminTokenAction;
 
 
@@ -130,7 +133,8 @@ public class ResourceEnvIPCondition implements Condition {
      public String getDisplayName(String property, Locale locale) 
        throws PolicyException
      {
-         return ResBundleUtils.getString(property);
+         ResourceBundle rb = AMResourceBundleCache.getInstance().getResBundle(ResBundleUtils.rbName, locale);
+         return com.sun.identity.shared.locale.Locale.getString(rb, property);
      }
  
      /**
