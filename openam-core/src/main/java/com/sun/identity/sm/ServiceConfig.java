@@ -27,7 +27,8 @@
  */
 
 /*
- * Portions Copyrighted [2011] [ForgeRock AS]
+ * Portions Copyrighted 2011 ForgeRock Inc
+ * Portions Copyrighted 2012 Open Source Solution Technology Corporation
  */
 package com.sun.identity.sm;
 
@@ -171,6 +172,24 @@ public class ServiceConfig {
         String[] lUris = { sb.append(luri).toString() };
         SMSEntry e = sc.getSMSEntry();
         e.setAttribute(SMSEntry.ATTR_LABELED_URI, lUris);
+        saveSMSEntry(e);
+    }
+
+    /**
+     * delete the labeled uri to the service configuration.
+     * 
+     * @param luri the labeled uri to be assigned to the configuration
+     * @throws SMSException
+     *             if there is an error occurred while performing the operation
+     * @throws SSOException
+     *             if the user's single sign-on is invalid or expired
+     */
+    public void deleteLabeledUri(String luri) throws SSOException, SMSException {
+        validateServiceConfigImpl();
+        String[] lUris = { luri };
+        SMSEntry e = sc.getSMSEntry();
+        sc.setLabeledUri(null);
+        e.deleteAttribute(SMSEntry.ATTR_LABELED_URI, lUris);
         saveSMSEntry(e);
     }
 

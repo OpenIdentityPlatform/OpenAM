@@ -32,6 +32,7 @@ package com.sun.identity.common.configuration;
 
 import com.iplanet.sso.SSOException;
 import com.iplanet.sso.SSOToken;
+import com.sun.identity.common.CaseInsensitiveHashMap;
 import com.sun.identity.idm.AMIdentity;
 import com.sun.identity.idm.AMIdentityRepository;
 import com.sun.identity.idm.IdConstants;
@@ -1585,7 +1586,7 @@ public class AgentConfiguration {
     ) throws SMSException, SSOException, IdRepoException {
         Set attributeSchemas = getAttributesSchemaNames(group);
         Map groupProperties = group.getAttributes();
-        Map map = new HashMap();
+        Map map = new CaseInsensitiveHashMap();
         map.putAll(groupProperties);
         map.putAll(agent.getAttributes());
         agent.setAttributes(correctAttributeNames(map, attributeSchemas));

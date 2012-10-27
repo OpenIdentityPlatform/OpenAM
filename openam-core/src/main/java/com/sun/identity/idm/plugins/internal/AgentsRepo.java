@@ -28,6 +28,7 @@
 
 /*
  * Portions Copyrighted 2012 ForgeRock Inc
+ * Portions Copyrighted 2012 Open Source Solution Technology Corporation
  */
 package com.sun.identity.idm.plugins.internal;
 
@@ -347,7 +348,7 @@ public class AgentsRepo extends IdRepo implements ServiceListener {
                         String agent = (String) it.next();
                         memberCfg = getOrgConfig(token).getSubConfig(agent);
                         if (memberCfg !=null) {
-                             memberCfg.setLabeledUri("");
+                             memberCfg.deleteLabeledUri(name);
                         }
                     }
                     agentGroupConfig.removeSubConfig(name);
@@ -818,18 +819,8 @@ public class AgentsRepo extends IdRepo implements ServiceListener {
                              aCfg.setLabeledUri(name);
                              break;
                          case REMOVEMEMBER:
-                             /* NOTE: 
-                              * set "  "(empty string) instead of "" to avoid 
-                              * this LDAPException(21)
-                              * When attempting to modify entry
-                              * to replace the set of values for attribute 
-                              * labeledURI, value "" was found to be invalid 
-                              * according to the associated syntax:  The 
-                              * operation attempted to assign a zero-length 
-                              * value to an attribute with the directory 
-                              * string syntax.
-                              */
-                             aCfg.setLabeledUri("");
+                             aCfg.deleteLabeledUri(name);
+                             break;
                          }
                      }
                  }
