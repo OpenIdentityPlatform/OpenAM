@@ -124,6 +124,9 @@ public class IdentityServicesHandler extends HttpServlet {
      */
     protected void service(HttpServletRequest request,
         HttpServletResponse response) throws ServletException, IOException {
+        //set headers before executing the method, so they are set even if exception is being thrown
+        response.addHeader("Cache-Control", "no-store, no-cache, must-revalidate, max-age=0");
+        response.addHeader("Pragma", "no-cache");
         IdentityServicesImpl security = this.factory.newInstance();
         SecurityMethod.execute(security, request, response);
         
