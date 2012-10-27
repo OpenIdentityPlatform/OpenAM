@@ -75,6 +75,7 @@ public class JdbcSimpleUserDao implements DaoInterface {
     String jdbcDbUser; //for JDBC style connections
     String jdbcDbPassword; //for JDBC style connections
     private static Debug debug;
+    private boolean isMySQL = false;
     
     //used to identity this datasource by IdRepo layer code
     String databaseURL = null;
@@ -165,6 +166,8 @@ public class JdbcSimpleUserDao implements DaoInterface {
                         + (dbmd==null ? "Not Available" : dbmd.getURL() ));
             }
             databaseURL = (dbmd==null ? null : dbmd.getURL() );
+            isMySQL = isMySQL(databaseURL);
+            
         } catch (Exception ex) {
             String msg = "JdbcSimpleUserDao.getInstance:"
                         + " Not able to connect the datasource and get the meta"
@@ -257,6 +260,7 @@ public class JdbcSimpleUserDao implements DaoInterface {
         if (membershipDataBaseTableName != null) {            
             membershipTableName = membershipDataBaseTableName.trim();
         }
+        isMySQL = isMySQL(jdbcDriverDbUrl);
         
         try {
             Class.forName(jdbcDriver);
@@ -365,7 +369,11 @@ public class JdbcSimpleUserDao implements DaoInterface {
         for(int position=1; attrs.hasNext(); position++) {
             String attr = attrs.next();
             positionMap.put(position, attr);
-            updateUserStmt = updateUserStmt + SPACE + attr;   
+            if (isMySQL) {
+                updateUserStmt = updateUserStmt + SPACE + "`" + attr + "`";
+            } else {
+                updateUserStmt = updateUserStmt + SPACE + attr;
+            }
             updateUserStmt = updateUserStmt + SPACE + "= ?";
             if(attrs.hasNext()) {
                 updateUserStmt = updateUserStmt + COMMA;
@@ -530,7 +538,11 @@ public class JdbcSimpleUserDao implements DaoInterface {
         for(int position=1; attrs.hasNext(); position++) {
             String attr = attrs.next();
             positionMap_2.put(position, attr);
-            createUserStmt = createUserStmt + attr;               
+            if (isMySQL) {
+                createUserStmt = createUserStmt + "`" + attr + "`";
+            } else {
+                createUserStmt = createUserStmt + attr;
+            }
             if(attrs.hasNext()) {
                 createUserStmt = createUserStmt + COMMA;
             }
@@ -669,7 +681,11 @@ public class JdbcSimpleUserDao implements DaoInterface {
         for(int i = 0; i< positionMap.size(); i++){
             String attr = positionMap.get(i);
             if (attr != null && (attr.length() != 0)) {
-                selectUserStmt = selectUserStmt + attr;               
+                if (isMySQL) {
+                    selectUserStmt = selectUserStmt + "`" + attr + "`";
+                } else {
+                    selectUserStmt = selectUserStmt + attr;
+                }
                 if(i < (positionMap.size()-1) ) {
                     selectUserStmt = selectUserStmt + COMMA + SPACE;
                 }
@@ -1133,5 +1149,19 @@ public class JdbcSimpleUserDao implements DaoInterface {
             }
         }
     }
-    
+
+    // return true if a parameter url includes "mysql"
+    private boolean isMySQL(String url) {
+        if (url != null && url.toLowerCase().indexOf("oracle") != -1) {
+            return false;
+        } else if (url != null && url.toLowerCase().indexOf("mysql") != -1) {
+            return true;
+        } else {
+            if (debug.warningEnabled()) {
+                debug.warning(
+                        "JdbcSimpleUserDao.isMySQL: Unknown jdbc driver url:" + url);
+            }
+            return false;
+        }
+    }
 }
