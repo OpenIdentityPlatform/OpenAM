@@ -25,6 +25,10 @@
    $Id: propertySCPolicyResourceComparator.xml,v 1.2 2008/06/25 05:45:15 qcheng Exp $
 
 -->
+<!--
+    Portions Copyrighted 2012 ForgeRock Inc
+    Portions Copyrighted 2012 Open Source Solution Technology Corporation
+-->
 
 <!DOCTYPE propertysheet SYSTEM "propertysheet.dtd">
 
@@ -37,6 +41,7 @@
             <attribute name="localizeDisplayFieldValue" value="false" />
 	    <attribute name="size" value="75" />
 	</cc>
+        <fieldhelp name="help-serviceType" defaultValue="policy.service.resource.comparator.service.type.help" />
     </property>
     <property>
 	<label name="lblClazz" defaultValue="policy.service.resource.comparator.clazz" labelFor="clazz" />
@@ -45,6 +50,7 @@
             <attribute name="localizeDisplayFieldValue" value="false" />
 	    <attribute name="size" value="100" />
 	</cc>
+        <fieldhelp name="help-clazz" defaultValue="policy.service.resource.comparator.clazz.help" />
     </property>
     <property>
 	<label name="lblDelimiter" defaultValue="policy.service.resource.comparator.delimiter" labelFor="delimiter" />
@@ -52,6 +58,7 @@
 	    <attribute name="autoSubmit" value="false" />
             <attribute name="localizeDisplayFieldValue" value="false" />
         </cc>
+        <fieldhelp name="help-delimiter" defaultValue="policy.service.resource.comparator.delimiter.help" />
     </property>
     <property>
 	<label name="lblWildcard" defaultValue="policy.service.resource.comparator.wildcard" labelFor="wildcard" />
