@@ -24,5 +24,5 @@
 <!DOCTYPE ModuleProperties PUBLIC "=//iPlanet//Authentication Module Properties XML Interface 1.0 DTD//EN"
 	"jar://com/sun/identity/authentication/Auth_Module_Properties.dtd">
 <ModuleProperties moduleName="Adaptive" version="1.0" >
-    <Callbacks length="0" order="1" timeout="120" header="This server uses Adaptive Authentication" />
+    <Callbacks length="0" order="1" timeout="120" header="このサーバーはアダプティブ認証を使用します" />
 </ModuleProperties>

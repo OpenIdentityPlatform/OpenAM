@@ -40,11 +40,11 @@
     </Callbacks>
 
   <Callbacks length="1" order="3" timeout="300" 
-  header="Please change your password" template="OAuthPwd.jsp">
+  header="パスワードを変更してください。" template="OAuthPwd.jsp">
   </Callbacks>
 
   <Callbacks length="1" order="4" timeout="300"
-  header="Please change your password" template="OAuthActivate.jsp">
+  header="パスワードを変更してください。" template="OAuthActivate.jsp">
   </Callbacks>
 
 </ModuleProperties>

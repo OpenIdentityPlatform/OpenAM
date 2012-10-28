@@ -67,6 +67,6 @@
     </Callbacks>
     <Callbacks length="0" order="3" timeout="120" header="パスワードが期限切れになりました。パスワードをリセットするには、サービスデスクにお問い合わせください。" error="true"  />
     <Callbacks length="0" order="4" timeout="120" template="user_inactive.jsp" error="true"/>
-    <Callbacks length="0" order="5" timeout="120" header=" Your account is locked. Please contact service desk to unlock your account" error="true" />
+    <Callbacks length="0" order="5" timeout="120" header=" アカウントがロックされています。ロックを解除したい場合は、サービスデスクへお問い合わせください。" error="true" />
 
 </ModuleProperties>

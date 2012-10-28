@@ -44,30 +44,29 @@
             <Prompt> パスワード:  </Prompt>
         </PasswordCallback>
     </Callbacks>
-
-    <Callbacks length="4" order="2" timeout="120" header="Change Password&lt;BR&gt;&lt;/BR&gt;#REPLACE#&lt;BR&gt;&lt;/BR&gt;" >
+    <Callbacks length="4" order="2" timeout="120" header="パスワードの変更&lt;BR&gt;&lt;/BR&gt;#REPLACE#&lt;BR&gt;&lt;/BR&gt;" >
         <PasswordCallback echoPassword="false" >
-            <Prompt>Old Password </Prompt>
+            <Prompt>古いパスワード </Prompt>
         </PasswordCallback>
         <PasswordCallback echoPassword="false" >
-            <Prompt> New Password </Prompt>
+            <Prompt> 新しいパスワード </Prompt>
         </PasswordCallback>
         <PasswordCallback echoPassword="false" >
-            <Prompt> Confirm Password </Prompt>
+            <Prompt> パスワードの確認 </Prompt>
         </PasswordCallback>
         <ConfirmationCallback>
             <OptionValues>
                 <OptionValue>
-                    <Value> Submit </Value>
+                    <Value> 送信 </Value>
                 </OptionValue>
                 <OptionValue>
-                    <Value> Cancel </Value>
+                    <Value> 取消し </Value>
                 </OptionValue>
             </OptionValues>
         </ConfirmationCallback>
     </Callbacks>
-    <Callbacks length="0" order="3" timeout="120" header=" Your password has expired. Please contact service desk to reset your password" error="true" />
+    <Callbacks length="0" order="3" timeout="120" header="パスワードが期限切れになりました。パスワードをリセットするには、サービスデスクにお問い合わせください。" error="true"  />
     <Callbacks length="0" order="4" timeout="120" template="user_inactive.jsp" error="true"/>
-    <Callbacks length="0" order="5" timeout="120" header=" Your account is locked. Please contact service desk to unlock your account" error="true" />
+    <Callbacks length="0" order="5" timeout="120" header=" アカウントがロックされています。ロックを解除したい場合は、サービスデスクへお問い合わせください。" error="true" />
 
 </ModuleProperties>
