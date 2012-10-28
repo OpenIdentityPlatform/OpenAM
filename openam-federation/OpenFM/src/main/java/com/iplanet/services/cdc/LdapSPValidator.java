@@ -27,7 +27,8 @@
  */
 
 /*
- * Portions Copyrighted 2011 ForgeRock AS
+ * Portions Copyrighted 2011 ForgeRock Inc
+ * Portions Copyrighted 2012 Open Source Solution Technology Corporation
  */
 
 package com.iplanet.services.cdc;
@@ -134,7 +135,7 @@ public class LdapSPValidator implements SPValidator {
         if (realmName != null) {
            int idx = realmName.indexOf(REALM_NAME_ATTR);
            if (idx != -1) {
-               realm = realmName.substring(idx+REALM_NAME_ATTR.length()+1);
+               realm = realmName.substring(idx+REALM_NAME_ATTR.length());
            }
         }
         
