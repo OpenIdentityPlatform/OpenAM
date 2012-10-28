@@ -186,10 +186,9 @@ public class ServiceConfig {
      */
     public void deleteLabeledUri(String luri) throws SSOException, SMSException {
         validateServiceConfigImpl();
-        String[] lUris = { luri };
         SMSEntry e = sc.getSMSEntry();
         sc.setLabeledUri(null);
-        e.deleteAttribute(SMSEntry.ATTR_LABELED_URI, lUris);
+        e.removeAttribute(SMSEntry.ATTR_LABELED_URI, luri);
         saveSMSEntry(e);
     }
 
