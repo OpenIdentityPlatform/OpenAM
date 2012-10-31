@@ -3208,15 +3208,21 @@ public class AuthClientUtils {
         String ipAddrHeader = getClientIPAddressHeader();
         if ((ipAddrHeader != null) && (ipAddrHeader.length() != 0)) {
             result = request.getHeader(ipAddrHeader);
-            String[] ips = result.split(",");
-            result = ips[0].trim();
+            if (result != null) {
+                String[] ips = result.split(",");
+                result = ips[0].trim();
+            }
         }
         if ((result == null) || (result.length() == 0)) {
             result = request.getRemoteAddr();
-        }
-        if (utilDebug.messageEnabled()) {
-            utilDebug.message("AuthClientUtils.getClientIPAddress : header=["
-                + ipAddrHeader + "], result=[" + result + "]"); 
+            if (utilDebug.messageEnabled()) {
+                utilDebug.message("AuthClientUtils.getClientIPAddress : remoteAddr=[" + result + "]");
+            }
+        } else {
+            if (utilDebug.messageEnabled()) {
+                utilDebug.message("AuthClientUtils.getClientIPAddress : header=["
+                    + ipAddrHeader + "], result=[" + result + "]");
+            }
         }
         return result;
     }

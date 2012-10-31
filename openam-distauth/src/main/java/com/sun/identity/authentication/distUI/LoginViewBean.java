@@ -434,6 +434,7 @@ extends com.sun.identity.authentication.UI.AuthViewBeanBase {
             rb =  rbCache.getResBundle(bundleName, locale);
             if(ac != null){
                 ac.setLocale(locale);
+                ac.setClientHostName(AuthClientUtils.getClientIPAddress(request));
             }
             
             if ((errorTemplate==null)||(errorTemplate.length() == 0)) {            
