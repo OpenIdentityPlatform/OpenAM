@@ -706,8 +706,6 @@ $ java -server -Xmx1024m -XX:MaxPermSize=256m -jar start.jar</screen>
     <term><literal>Generic JVM arguments</literal></term>
     <listitem>
      <para>-DamCryptoDescriptor.provider=IBMJCE</para>
-    </listitem>
-    <listitem>
      <para>-DamKeyGenDescriptor.provider=IBMJCE</para>
     </listitem>
    </varlistentry>
