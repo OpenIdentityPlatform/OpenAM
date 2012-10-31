@@ -25,8 +25,8 @@
  * $Id: PWResetQuestionModel.java,v 1.2 2008/06/25 05:43:42 qcheng Exp $
  */
 
-/*
- * Portions Copyrighted [2011] [ForgeRock AS]
+/**
+ * Portions Copyrighted 2011-2012 ForgeRock Inc
  */
 package com.sun.identity.password.ui.model;
 
@@ -113,4 +113,12 @@ public interface PWResetQuestionModel extends PWResetModel
      * @return localized string for the question
      */
     public String getLocalizedStrForQuestion(String question);
+
+    /**
+     * Returns the maximum number of question that can be display in
+     * the reset password page.
+     *
+     * @return maximum number of question which can be in reset password page
+     */
+    public int getMaxNumQuestions(String realmName);
 }

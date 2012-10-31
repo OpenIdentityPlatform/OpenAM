@@ -26,8 +26,8 @@
  *
  */
 
-/*
- * Portions Copyrighted [2011] [ForgeRock AS]
+/**
+ * Portions Copyrighted 2011-2012 ForgeRock Inc
  */
 package com.sun.identity.password.ui;
 
@@ -41,7 +41,6 @@ import com.iplanet.jato.view.event.DisplayEvent;
 import com.iplanet.jato.view.html.HiddenField;
 import com.iplanet.jato.view.html.StaticTextField;
 import com.iplanet.jato.view.html.TextField;
-import com.sun.identity.console.user.model.UMUserPasswordResetOptionsModelImpl;
 import com.sun.identity.password.ui.model.PWResetQuestionModel;
 import com.sun.identity.sm.DNMapper;
 import java.util.ArrayList;
@@ -181,8 +180,7 @@ public class PWResetQuestionTiledView extends RequestHandlingTiledViewBase
      */
     public void populateQuestionsList(String userDN, String orgDN) {
         PWResetQuestionModel model = getModel();
-        int maxQuestions = new UMUserPasswordResetOptionsModelImpl().
-                     getMaxNumQuestions(DNMapper.orgNameToRealmName(orgDN));
+        int maxQuestions = model.getMaxNumQuestions(DNMapper.orgNameToRealmName(orgDN));
         Map secretMap = model.getSecretQuestions(userDN, orgDN);
         if (secretMap != null && !secretMap.isEmpty()) {
             if (maxQuestions >=0 && maxQuestions < secretMap.size())  {

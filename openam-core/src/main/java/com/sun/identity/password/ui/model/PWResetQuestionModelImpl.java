@@ -133,6 +133,17 @@ public class PWResetQuestionModelImpl extends PWResetModelImpl
         "passwordExpirationTime";
 
     /**
+     * Name of password reset max number of questions
+     */
+    private static final String PW_RESET_MAX_NUM_OF_QUESTIONS =
+        "iplanet-am-password-reset-max-num-of-questions";
+
+    /**
+     * Password Reset Service Name.
+     */
+    String PW_RESET_SERVICE = "iPlanetAMPasswordResetService";
+
+    /**
      * Name of default question selected constant
      */
     private static final int DEFAULT_QUESTION_ON = 1;
@@ -706,5 +717,32 @@ public class PWResetQuestionModelImpl extends PWResetModelImpl
             debug.error(
                 "PWResetQuestionModelImpl.setUserPasswordChangedEntry", e);
         }
-    }   
+    }
+
+    /**
+     * Returns the maximum number of question that can be display in
+     * the reset password page.
+     *
+     * @return maximum number of question which can be in reset password page
+     */
+    public int getMaxNumQuestions(String realmName) {
+        int maxNum = 1;
+        try {
+            Set<String> set = getAttributeValues(realmName, PW_RESET_MAX_NUM_OF_QUESTIONS);
+
+            if (set != null && !set.isEmpty()) {
+                String value = set.iterator().next();
+                try {
+                    maxNum = Integer.parseInt(value);
+                } catch (NumberFormatException e) {
+                    debug.warning(
+                            "PWResetQuestionModelImpl.getMaxNumQuestions", e);
+                }
+            }
+        } catch (Exception ex) {
+            debug.error("PWResetQuestionModelImpl.getMaxNumQuestions", ex);
+        }
+
+        return maxNum;
+    }
 }
