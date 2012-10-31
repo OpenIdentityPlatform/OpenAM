@@ -1,0 +1,604 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <!--
+    * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
+    *
+    * Copyright (c) 2011-2012 ForgeRock Inc. All Rights Reserved
+    *
+    * The contents of this file are subject to the terms
+    * of the Common Development and Distribution License
+    * (the License). You may not use this file except in
+    * compliance with the License.
+    *
+    * You can obtain a copy of the License at
+    * http://forgerock.org/license/CDDLv1.0.html
+    * See the License for the specific language governing
+    * permission and limitations under the License.
+    *
+    * When distributing Covered Code, include this CDDL
+    * Header Notice in each file and include the License file
+    * at http://forgerock.org/license/CDDLv1.0.html
+    * If applicable, add the following below the CDDL Header,
+    * with the fields enclosed by brackets [] replaced by
+    * your own identifying information:
+    * "Portions Copyrighted [year] [name of copyright owner]"
+    *
+    -->
+
+    <!-- Parent Project -->
+    <parent>
+        <groupId>org.forgerock.openam</groupId>
+        <artifactId>openam</artifactId>
+        <version>10.1.0-SNAPSHOT</version>
+    </parent>
+
+    <!-- Component Definition -->
+    <name>OpenAM Server Only</name>
+    <description>OpenAM Server Only Component</description>
+    <artifactId>openam-server-only</artifactId>
+    <version>10.1.0-SNAPSHOT</version>
+    <packaging>war</packaging>
+    <organization>
+        <name>ForgeRock</name>
+        <url>http://www.forgerock.com</url>
+    </organization>
+
+    <!-- Build -->
+    <build>
+
+        <plugins>
+            <!-- Pre-Packaging step for WAR elements. -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-antrun-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>war-pre-packaging</id>
+                        <phase>validate</phase>
+                        <configuration>
+                            <target>
+
+                                <property name="openam.version" value="${project.version}"/>
+
+                                <property name="openam.temp.target" value="${project.build.directory}/openam_TEMP"/>
+
+                                <property name="build.class.path" refid="maven.compile.classpath"/>
+                                <property name="project.basedir" value="./"/>
+
+                                <property name="server.resources" value="${project.basedir}/src/main/resources"/>
+
+                                <property name="amserver.target.resources.dir"
+                                          value="${project.build.directory}/classes"/>
+
+                                <property name="amserver.resources.i18n.dir" value="${server.resources}/locale"/>
+
+                                <property name="library.resources.i18n.dir"
+                                          value="${server.resources}/federation-locale"/>
+
+                                <property name="openfm.resources.i18n.dir" value="${server.resources}/openfm-locale"/>
+
+                                <property name="core.xml.dir"
+                                          value="${project.basedir}/../openam-core/src/main/resources/xml"/>
+
+                                <property name="library.xml.dir"
+                                          value="${project.basedir}/../openam-federation/openam-federation-library/src/main/resources/xml"/>
+
+                                <property name="federation.xml.dir"
+                                          value="${project.basedir}/../openam-federation/OpenFM/src/main/resources/xml"/>
+
+                                <ant antfile="${project.basedir}/openam-server-prepare-war.xml">
+                                    <target name="openam-server-prepare-war"/>
+                                </ant>
+                            </target>
+                        </configuration>
+                        <goals>
+                            <goal>run</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-resources-plugin</artifactId>
+            </plugin>
+
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-dependency-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>unpack</id>
+                        <phase>validate</phase>
+                        <goals>
+                            <goal>unpack</goal>
+                        </goals>
+                        <configuration>
+                            <artifactItems>
+                                <artifactItem>
+                                    <groupId>org.forgerock.openam</groupId>
+                                    <artifactId>openam-jaxrpc-schema</artifactId>
+                                    <version>10.1.0-SNAPSHOT</version>
+                                    <type>jar</type>
+                                    <overWrite>false</overWrite>
+                                    <outputDirectory>${project.build.directory}/unpacked</outputDirectory>
+                                    <includes>jaxrpc/IdentityManagementServices.wsdl</includes>
+                                </artifactItem>
+                            </artifactItems>
+
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-war-plugin</artifactId>
+                <configuration>
+                    <packagingExcludes>
+                        WEB-INF/lib/ant-contrib-1.0b3.jar,
+                        WEB-INF/lib/jersey-core-1.1.5.2.jar,
+                        WEB-INF/lib/jaxb-api-1.0.6.jar,
+                        WEB-INF/lib/jaxb-impl-1.0.6.jar,
+                        WEB-INF/lib/jaxb-libs-1.0.6.jar,
+                        WEB-INF/lib/jaxb-xjc-1.0.6.jar,
+                        WEB-INF/lib/jdom-2.0.1.jar,
+                        WEB-INF/lib/jaxp-api-1.4.2.jar,
+                        WEB-INF/lib/jaxws-api-2.2.8.jar,
+                        WEB-INF/lib/jaxws-rt-2.2.7-promoted-b73.jar,
+                        WEB-INF/lib/stax-api-1.0-2.jar,
+                        WEB-INF/lib/webservices-api-2.1-b16.jar
+                    </packagingExcludes>
+                    <archive>
+                        <manifestEntries>
+                            <Specification-Title>OpenAM Server</Specification-Title>
+                            <Specification-Version>${project.version} - ${maven.build.timestamp}</Specification-Version>
+                            <Specification-Vendor>ForgeRock</Specification-Vendor>
+                            <Implementation-Title>OpenAM Server</Implementation-Title>
+                            <Implementation-Version>${project.version} - ${maven.build.timestamp}
+                            </Implementation-Version>
+                            <Implementation-Vendor>ForgeRock</Implementation-Vendor>
+                            <Build-Time>${maven.build.timestamp}</Build-Time>
+                        </manifestEntries>
+                    </archive>
+                    <nonFilteredFileExtensions>
+                        <!-- Exclude any binary files based upon File Types. -->
+                        <nonFilteredFileExtension>bin</nonFilteredFileExtension>
+                        <nonFilteredFileExtension>bkf</nonFilteredFileExtension>
+                        <nonFilteredFileExtension>bmp</nonFilteredFileExtension>
+                        <nonFilteredFileExtension>bz2</nonFilteredFileExtension>
+                        <nonFilteredFileExtension>deb</nonFilteredFileExtension>
+                        <nonFilteredFileExtension>dll</nonFilteredFileExtension>
+                        <nonFilteredFileExtension>dmg</nonFilteredFileExtension>
+                        <nonFilteredFileExtension>ear</nonFilteredFileExtension>
+                        <nonFilteredFileExtension>exe</nonFilteredFileExtension>
+                        <nonFilteredFileExtension>gif</nonFilteredFileExtension>
+                        <nonFilteredFileExtension>gz</nonFilteredFileExtension>
+                        <nonFilteredFileExtension>gzip</nonFilteredFileExtension>
+                        <nonFilteredFileExtension>jar</nonFilteredFileExtension>
+                        <nonFilteredFileExtension>jks</nonFilteredFileExtension>
+                        <nonFilteredFileExtension>jpg</nonFilteredFileExtension>
+                        <nonFilteredFileExtension>jpeg</nonFilteredFileExtension>
+                        <nonFilteredFileExtension>lz</nonFilteredFileExtension>
+                        <nonFilteredFileExtension>png</nonFilteredFileExtension>
+                        <nonFilteredFileExtension>pdf</nonFilteredFileExtension>
+                        <nonFilteredFileExtension>rar</nonFilteredFileExtension>
+                        <nonFilteredFileExtension>rpm</nonFilteredFileExtension>
+                        <nonFilteredFileExtension>tar</nonFilteredFileExtension>
+                        <nonFilteredFileExtension>tgz</nonFilteredFileExtension>
+                        <nonFilteredFileExtension>war</nonFilteredFileExtension>
+                        <nonFilteredFileExtension>zip</nonFilteredFileExtension>
+                        <nonFilteredFileExtension>7z</nonFilteredFileExtension>
+                        <!-- See: http://en.wikipedia.org/wiki/List_of_file_formats -->
+                    </nonFilteredFileExtensions>
+                    <webResources>
+                        <webResource>
+                            <directory>${basedir}/src/main/webapp</directory>
+                            <includes>
+                                <include>**/**</include>
+                            </includes>
+                            <excludes>
+                                <exclude>META-INF</exclude>
+                                <exclude>WEB-INF</exclude>
+                            </excludes>
+                            <targetPath></targetPath>
+                            <filtering>true</filtering>
+                        </webResource>
+                        <webResource>
+                            <directory>${project.basedir}/src/main/webapp/META-INF</directory>
+                            <includes>
+                                <include>**/**</include>
+                            </includes>
+                            <targetPath>META-INF</targetPath>
+                            <filtering>true</filtering>
+                        </webResource>
+                        <webResource>
+                            <directory>${project.basedir}/src/main/webapp/WEB-INF</directory>
+                            <includes>
+                                <include>**/**</include>
+                            </includes>
+                            <targetPath>WEB-INF</targetPath>
+                            <filtering>true</filtering>
+                        </webResource>
+                        <webResource>
+                            <directory>
+                                ${project.basedir}/../openam-federation/openam-federation-library/src/main/resources/xml
+                            </directory>
+                            <includes>
+                                <include>*.xsl</include>
+                                <include>*.xml</include>
+                            </includes>
+                            <excludes>
+                                <exclude>web.xml</exclude>
+                            </excludes>
+                            <targetPath>WEB-INF/classes</targetPath>
+                            <filtering>false</filtering>
+                        </webResource>
+                        <webResource>
+                            <directory>${project.basedir}/../openam-federation/OpenFM/src/main/wsdl</directory>
+                            <includes>
+                                <include>*.wsdl</include>
+                                <include>*.xsd</include>
+                            </includes>
+                            <targetPath>WEB-INF/wsdl</targetPath>
+                            <filtering>false</filtering>
+                        </webResource>
+                        <webResource>
+                            <directory>${project.basedir}/../openam-schema/openam-idsvcs-schema/src/main/resources/xml
+                            </directory>
+                            <includes>
+                                <include>*.wsdl</include>
+                            </includes>
+                            <targetPath>WEB-INF/wsdl</targetPath>
+                            <filtering>false</filtering>
+                        </webResource>
+
+                        <webResource>
+                            <directory>${project.build.directory}/unpacked/jaxrpc
+                            </directory>
+                            <includes>
+                                <include>IdentityManagementServices.wsdl</include>
+                            </includes>
+                            <targetPath>WEB-INF/wsdl</targetPath>
+                            <filtering>true</filtering>
+                        </webResource>
+
+                        <webResource>
+                            <directory>${project.basedir}/../openam-federation/OpenFM/src/main/resources/xml/wss
+                            </directory>
+                            <includes>
+                                <include>sun-jaxws.xml</include>
+                            </includes>
+                            <targetPath>WEB-INF</targetPath>
+                            <filtering>false</filtering>
+                        </webResource>
+                        <webResource>
+                            <!-- This pickup the remaining moved elements build from the
+                                 "openam-server-prepare-war"
+                                 step from a Temp Area -->
+                            <directory>${project.build.directory}/openam_TEMP
+                            </directory>
+                            <includes>
+                                <include>**/**</include>
+                            </includes>
+                            <targetPath></targetPath>
+                            <filtering>false</filtering>
+                        </webResource>
+                        <webResource>
+                            <directory>${project.basedir}/../openam-session-ha/openam-session-ha-core/src/main/resources/ldif
+                            </directory>
+                            <includes>
+                                <!-- The xx-...ldif Files get moved into Place when installing OpenDJ. -->
+                                <include>98-amsessiondb.ldif</include>
+                            </includes>
+                            <targetPath>WEB-INF/template/ldif/sfha</targetPath>
+                            <filtering>false</filtering>
+                        </webResource>
+                    </webResources>
+                </configuration>
+
+            </plugin>
+
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-javadoc-plugin</artifactId>
+                <configuration>
+                    <skip>true</skip>
+                </configuration>
+            </plugin>
+
+        </plugins>
+
+        <resources>
+            <resource>
+                <filtering>true</filtering>
+                <directory>src/main/resources</directory>
+                <includes>
+                    <include>**/*</include>
+                </includes>
+                <excludes>
+                    <exclude>config/**</exclude>
+                    <exclude>locale/**</exclude>
+                    <exclude>federation-locale/**</exclude>
+                    <exclude>openfm-locale/**</exclude>
+                    <exclude>services/**</exclude>
+                    <exclude>UI/**</exclude>
+                    <exclude>*.conf</exclude>
+                </excludes>
+            </resource>
+
+        </resources>
+
+        <testResources>
+            <testResource>
+                <filtering>true</filtering>
+                <directory>src/test/resources</directory>
+                <includes>
+                    <include>**/*</include>
+                </includes>
+            </testResource>
+        </testResources>
+
+
+    </build>
+
+
+    <dependencies>
+
+        <dependency>
+            <groupId>org.forgerock.openam</groupId>
+            <artifactId>openam-installtools</artifactId>
+            <version>10.1.0-SNAPSHOT</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.forgerock.openam</groupId>
+            <artifactId>openam-core</artifactId>
+            <version>10.1.0-SNAPSHOT</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.forgerock.openam</groupId>
+            <artifactId>openam-server-auth-ui</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.forgerock.openam</groupId>
+            <artifactId>openam-federation-library</artifactId>
+            <version>10.1.0-SNAPSHOT</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.forgerock.openam</groupId>
+            <artifactId>OpenFM</artifactId>
+            <version>10.1.0-SNAPSHOT</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.forgerock.openam</groupId>
+            <artifactId>openam-oauth</artifactId>
+            <version>10.1.0-SNAPSHOT</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.forgerock.openam</groupId>
+            <artifactId>openam-dtd-schema</artifactId>
+            <version>10.1.0-SNAPSHOT</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.forgerock.openam</groupId>
+            <artifactId>openam-jaxrpc-schema</artifactId>
+            <version>10.1.0-SNAPSHOT</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.forgerock.openam</groupId>
+            <artifactId>openam-saml2-schema</artifactId>
+            <version>10.1.0-SNAPSHOT</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.forgerock.openam</groupId>
+            <artifactId>openam-session-ha-core</artifactId>
+            <version>10.1.0-SNAPSHOT</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.forgerock.openam</groupId>
+            <artifactId>openam-rest</artifactId>
+            <version>10.1.0-SNAPSHOT</version>
+        </dependency>
+
+        <!--dependency>
+            <groupId>org.forgerock.openam</groupId>
+            <artifactId>openam-forgerock-rest</artifactId>
+            <version>10.1.0-SNAPSHOT</version>
+        </dependency-->
+
+        <!-- Include all Authentication Modules -->
+        <dependency>
+            <groupId>org.forgerock.openam</groupId>
+            <artifactId>openam-auth-ad</artifactId>
+            <version>10.1.0-SNAPSHOT</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.forgerock.openam</groupId>
+            <artifactId>openam-auth-anonymous</artifactId>
+            <version>10.1.0-SNAPSHOT</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.forgerock.openam</groupId>
+            <artifactId>openam-auth-adaptive</artifactId>
+            <version>10.1.0-SNAPSHOT</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.forgerock.openam</groupId>
+            <artifactId>openam-auth-application</artifactId>
+            <version>10.1.0-SNAPSHOT</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.forgerock.openam</groupId>
+            <artifactId>openam-auth-cert</artifactId>
+            <version>10.1.0-SNAPSHOT</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.forgerock.openam</groupId>
+            <artifactId>openam-auth-datastore</artifactId>
+            <version>10.1.0-SNAPSHOT</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.forgerock.openam</groupId>
+            <artifactId>openam-auth-hotp</artifactId>
+            <version>10.1.0-SNAPSHOT</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.forgerock.openam</groupId>
+            <artifactId>openam-auth-httpbasic</artifactId>
+            <version>10.1.0-SNAPSHOT</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.forgerock.openam</groupId>
+            <artifactId>openam-auth-jdbc</artifactId>
+            <version>10.1.0-SNAPSHOT</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.forgerock.openam</groupId>
+            <artifactId>openam-auth-ldap</artifactId>
+            <version>10.1.0-SNAPSHOT</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.forgerock.openam</groupId>
+            <artifactId>openam-auth-membership</artifactId>
+            <version>10.1.0-SNAPSHOT</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.forgerock.openam</groupId>
+            <artifactId>openam-auth-msisdn</artifactId>
+            <version>10.1.0-SNAPSHOT</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.forgerock.openam</groupId>
+            <artifactId>openam-auth-nt</artifactId>
+            <version>10.1.0-SNAPSHOT</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.forgerock.openam</groupId>
+            <artifactId>openam-auth-oath</artifactId>
+            <version>10.1.0-SNAPSHOT</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.forgerock.openam</groupId>
+            <artifactId>openam-auth-oauth2</artifactId>
+            <version>10.1.0-SNAPSHOT</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.forgerock.openam</groupId>
+            <artifactId>openam-auth-radius</artifactId>
+            <version>10.1.0-SNAPSHOT</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.forgerock.openam</groupId>
+            <artifactId>openam-auth-safeword</artifactId>
+            <version>10.1.0-SNAPSHOT</version>
+        </dependency>
+
+        <dependency>
+            <artifactId>openam-auth-securid</artifactId>
+            <groupId>org.forgerock.openam</groupId>
+            <version>10.1.0-SNAPSHOT</version>
+        </dependency>
+
+        <dependency>
+            <artifactId>openam-auth-windowsdesktopsso</artifactId>
+            <groupId>org.forgerock.openam</groupId>
+            <version>10.1.0-SNAPSHOT</version>
+        </dependency>
+
+        <dependency>
+            <artifactId>json-resource</artifactId>
+            <groupId>org.forgerock.commons</groupId>
+            <version>2.0.0-SNAPSHOT</version>
+        </dependency>
+
+        <dependency>
+            <artifactId>json-resource-servlet</artifactId>
+            <groupId>org.forgerock.commons</groupId>
+            <version>2.0.0-SNAPSHOT</version>
+        </dependency>
+
+
+        <!-- Oauth2 dependencies -->
+	<!--
+        <dependency>
+            <groupId>org.forgerock.openam</groupId>
+            <artifactId>openam-oauth2-restlet-extension</artifactId>
+            <version>10.1.0-SNAPSHOT</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.forgerock.openam</groupId>
+            <artifactId>openam-oauth2-openam-extension</artifactId>
+            <version>10.1.0-SNAPSHOT</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.forgerock.openam</groupId>
+            <artifactId>openam-oauth2-core-token-service</artifactId>
+            <version>10.1.0-SNAPSHOT</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.forgerock.openam</groupId>
+            <artifactId>openam-oauth2-main</artifactId>
+            <version>10.1.0-SNAPSHOT</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.freemarker</groupId>
+            <artifactId>freemarker</artifactId>
+            <version>2.3.19</version>
+        </dependency>
+	-->
+        <!-- XML -->
+        <!-- Xerces-J Required for fedlet -->
+        <dependency>
+            <groupId>xerces-J</groupId>
+            <artifactId>xercesImpl</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>xerces-J</groupId>
+            <artifactId>xml-apis</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>xerces-J</groupId>
+            <artifactId>xml-resolver</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>xerces-J</groupId>
+            <artifactId>xml-serializer</artifactId>
+        </dependency>
+
+    </dependencies>
+
+</project>

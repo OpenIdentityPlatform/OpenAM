@@ -15,32 +15,32 @@
             <outputDirectory></outputDirectory>
         </file>
         <file>
-            <source>${project.basedir}/../../openam-server/src/main/webapp/WEB-INF/fedlet/README.unconfigured</source>
+            <source>${project.basedir}/../../openam-server-only/src/main/webapp/WEB-INF/fedlet/README.unconfigured</source>
             <outputDirectory></outputDirectory>
             <destName>README</destName>
         </file>
         <file>
-            <source>${project.basedir}/../../openam-server/src/main/resources/FederationConfig.properties</source>
+            <source>${project.basedir}/../../openam-server-only/src/main/resources/FederationConfig.properties</source>
             <outputDirectory>conf</outputDirectory>
             <destName>FederationConfig.properties</destName>
         </file>
         <file>
-            <source>${project.basedir}/../../openam-server/src/main/webapp/WEB-INF/fedlet/fedlet.cot-template</source>
+            <source>${project.basedir}/../../openam-server-only/src/main/webapp/WEB-INF/fedlet/fedlet.cot-template</source>
             <outputDirectory>conf</outputDirectory>
             <destName>fedlet.cot-template</destName>
         </file>
         <file>
-            <source>${project.basedir}/../../openam-server/src/main/webapp/WEB-INF/fedlet/idp-extended.xml-template</source>
+            <source>${project.basedir}/../../openam-server-only/src/main/webapp/WEB-INF/fedlet/idp-extended.xml-template</source>
             <outputDirectory>conf</outputDirectory>
             <destName>idp-extended.xml-template</destName>
         </file>
         <file>
-            <source>${project.basedir}/../../openam-server/src/main/webapp/WEB-INF/fedlet/sp-extended.xml-template</source>
+            <source>${project.basedir}/../../openam-server-only/src/main/webapp/WEB-INF/fedlet/sp-extended.xml-template</source>
             <outputDirectory>conf</outputDirectory>
             <destName>sp-extended.xml-template</destName>
         </file>
         <file>
-            <source>${project.basedir}/../../openam-server/src/main/webapp/WEB-INF/fedlet/sp.xml-template</source>
+            <source>${project.basedir}/../../openam-server-only/src/main/webapp/WEB-INF/fedlet/sp.xml-template</source>
             <outputDirectory>conf</outputDirectory>
             <destName>sp.xml-template</destName>
         </file>

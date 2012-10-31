@@ -124,7 +124,31 @@
         </dependency>
         <dependency>
             <groupId>org.forgerock.openam</groupId>
+            <artifactId>openam-server-only</artifactId>
+            <version>10.1.0-SNAPSHOT</version>
+            <type>war</type>
+        </dependency>
+        <dependency>
+            <groupId>org.forgerock.openam</groupId>
+            <artifactId>openam-distauth</artifactId>
+            <version>10.1.0-SNAPSHOT</version>
+            <type>war</type>
+        </dependency>
+        <dependency>
+            <groupId>org.forgerock.openam</groupId>
             <artifactId>openam-distribution-amadmsetup</artifactId>
+            <version>10.1.0-SNAPSHOT</version>
+            <type>jar</type>
+        </dependency>
+        <dependency>
+            <groupId>org.forgerock.openam</groupId>
+            <artifactId>openam-distribution-diagnostics</artifactId>
+            <version>10.1.0-SNAPSHOT</version>
+            <type>zip</type>
+        </dependency>
+        <dependency>
+            <groupId>org.forgerock.openam</groupId>
+            <artifactId>openam-clientsdk</artifactId>
             <version>10.1.0-SNAPSHOT</version>
             <type>jar</type>
         </dependency>

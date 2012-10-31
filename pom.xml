@@ -186,6 +186,8 @@
         <!-- Commenting out until it gets stable -->
         <!-- <module>openam-forgerock-rest</module> -->
 
+        <module>openam-console</module>
+
         <!-- OpenAM Core Module -->
         <module>openam-core</module>
 
@@ -208,6 +210,7 @@
 
         <module>openam-server-auth-ui</module>
 
+        <module>openam-server-only</module>
         <!-- OpenAM Server -->
         <module>openam-server</module>
 

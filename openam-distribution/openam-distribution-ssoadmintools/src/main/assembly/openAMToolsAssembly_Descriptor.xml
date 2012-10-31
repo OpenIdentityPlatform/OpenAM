@@ -72,7 +72,7 @@
         </fileSet>
         <fileSet>
             <outputDirectory>classes</outputDirectory>
-            <directory>${project.basedir}/../../openam-server/src/main/webapp/WEB-INF/template/ldif/odsee</directory>
+            <directory>${project.basedir}/../../openam-server-only/src/main/webapp/WEB-INF/template/ldif/odsee</directory>
             <includes>
                 <include>odsee_config_index.ldif</include>
                 <include>odsee_config_schema.ldif</include>
@@ -90,14 +90,14 @@
 
         <fileSet>
             <outputDirectory>resources</outputDirectory>
-            <directory>${project.basedir}/../../openam-server/src/main/webapp/WEB-INF</directory>
+            <directory>${project.basedir}/../../openam-server-only/src/main/webapp/WEB-INF</directory>
             <includes>
                 <include>*.properties</include>
             </includes>
         </fileSet>
         <fileSet>
             <outputDirectory>resources</outputDirectory>
-            <directory>${project.basedir}/../../openam-server/src/main/webapp/WEB-INF/classes</directory>
+            <directory>${project.basedir}/../../openam-server-only/src/main/webapp/WEB-INF/classes</directory>
             <includes>
                 <include>*.properties</include>
             </includes>
@@ -105,21 +105,21 @@
 
         <fileSet>
             <outputDirectory>resources</outputDirectory>
-            <directory>${project.basedir}/../../openam-server/src/main/resources/config</directory>
+            <directory>${project.basedir}/../../openam-server-only/src/main/resources/config</directory>
             <includes>
                 <include>*.properties</include>
             </includes>
         </fileSet>
         <fileSet>
             <outputDirectory>resources</outputDirectory>
-            <directory>${project.basedir}/../../openam-server/src/main/resources/console</directory>
+            <directory>${project.basedir}/../../openam-server-only/src/main/resources/console</directory>
             <includes>
                 <include>*.properties</include>
             </includes>
         </fileSet>
         <fileSet>
             <outputDirectory>resources</outputDirectory>
-            <directory>${project.basedir}/../../openam-server/src/main/resources/tools</directory>
+            <directory>${project.basedir}/../../openam-server-only/src/main/resources/tools</directory>
             <includes>
                 <include>*.properties</include>
             </includes>

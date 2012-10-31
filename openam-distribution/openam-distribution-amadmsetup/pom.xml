@@ -98,56 +98,56 @@
                                 <filter token="VERSION" value="${version.set}"/>
 
                                 <copy todir="${project.build.directory}/classes/com/sun/identity/tools/bundles" filtering="true">
-                                    <fileset dir="${project.basedir}/../../openam-server/src/main/resources/locale">
+                                    <fileset dir="${project.basedir}/../../openam-server-only/src/main/resources/locale">
                                         <include name="amadmtoolssetup.properties"/>
                                     </fileset>
                                     <globmapper from="*.properties" to="*_en.properties"/>
                                 </copy>
 
                                 <copy todir="${project.build.directory}/classes/com/sun/identity/tools/bundles" filtering="true">
-                                    <fileset dir="${project.basedir}/../../openam-server/src/main/resources/locale">
+                                    <fileset dir="${project.basedir}/../../openam-server-only/src/main/resources/locale">
                                         <include name="amadmtoolssetup.properties"/>
                                     </fileset>
                                 </copy>
 
                                 <copy todir="${project.build.directory}/classes/com/sun/identity/tools/bundles" filtering="true">
-                                    <fileset dir="${project.basedir}/../../openam-server/src/main/resources/locale/de_DE">
+                                    <fileset dir="${project.basedir}/../../openam-server-only/src/main/resources/locale/de_DE">
                                         <include name="amadmtoolssetup_de.properties"/>
                                     </fileset>
                                 </copy>
 
                                 <copy todir="${project.build.directory}/classes/com/sun/identity/tools/bundles" filtering="true">
-                                    <fileset dir="${project.basedir}/../../openam-server/src/main/resources/locale/es_ES">
+                                    <fileset dir="${project.basedir}/../../openam-server-only/src/main/resources/locale/es_ES">
                                         <include name="amadmtoolssetup_es.properties"/>
                                     </fileset>
                                 </copy>
 
                                 <copy todir="${project.build.directory}/classes/com/sun/identity/tools/bundles" filtering="true">
-                                    <fileset dir="${project.basedir}/../../openam-server/src/main/resources/locale/fr_FR">
+                                    <fileset dir="${project.basedir}/../../openam-server-only/src/main/resources/locale/fr_FR">
                                         <include name="amadmtoolssetup_fr.properties"/>
                                     </fileset>
                                 </copy>
 
                                 <copy todir="${project.build.directory}/classes/com/sun/identity/tools/bundles" filtering="true">
-                                    <fileset dir="${project.basedir}/../../openam-server/src/main/resources/locale/ja_JP">
+                                    <fileset dir="${project.basedir}/../../openam-server-only/src/main/resources/locale/ja_JP">
                                         <include name="amadmtoolssetup_ja.properties"/>
                                     </fileset>
                                 </copy>
 
                                 <copy todir="${project.build.directory}/classes/com/sun/identity/tools/bundles" filtering="true">
-                                    <fileset dir="${project.basedir}/../../openam-server/src/main/resources/locale/ko_KR">
+                                    <fileset dir="${project.basedir}/../../openam-server-only/src/main/resources/locale/ko_KR">
                                         <include name="amadmtoolssetup_ko.properties"/>
                                     </fileset>
                                 </copy>
 
                                 <copy todir="${project.build.directory}/classes/com/sun/identity/tools/bundles" filtering="true">
-                                    <fileset dir="${project.basedir}/../../openam-server/src/main/resources/locale/zh_CN">
+                                    <fileset dir="${project.basedir}/../../openam-server-only/src/main/resources/locale/zh_CN">
                                         <include name="amadmtoolssetup_zh.properties"/>
                                     </fileset>
                                 </copy>
 
                                 <copy todir="${project.build.directory}/classes/com/sun/identity/tools/bundles" filtering="true">
-                                    <fileset dir="${project.basedir}/../../openam-server/src/main/resources/locale/zh_TW">
+                                    <fileset dir="${project.basedir}/../../openam-server-only/src/main/resources/locale/zh_TW">
                                         <include name="amadmtoolssetup_zh_TW.properties"/>
                                     </fileset>
                                 </copy>

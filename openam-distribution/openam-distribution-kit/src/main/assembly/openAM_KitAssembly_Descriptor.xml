@@ -40,6 +40,7 @@
             <!-- Include fully packaged Modules -->
             <includes>
                 <include>org.forgerock.openam:openam-server:war</include>
+                <include>org.forgerock.openam:openam-server-only:war</include>
                 <include>org.forgerock.openam:openam-clientsdk:jar</include>
                 <include>org.forgerock.openam:openam-distauth:war</include>
                 <include>org.forgerock.openam:openam-distribution-amadmsetup:jar</include>
