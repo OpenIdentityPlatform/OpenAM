@@ -219,6 +219,7 @@
 
         <!-- Java Client SDK Artifacts -->
         <module>openam-clientsdk</module>
+        <module>openam-distauth</module>
 
         <!-- Documentation -->
         <!-- <module>openam-documentation</module> -->
