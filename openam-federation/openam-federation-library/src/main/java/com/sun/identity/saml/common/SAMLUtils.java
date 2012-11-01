@@ -26,7 +26,9 @@
  *
  */
 
-
+/**
+ * Portions Copyrighted 2012 ForgeRock Inc
+ */
 package com.sun.identity.saml.common;
 
 import java.util.Collections;
@@ -112,7 +114,6 @@ import com.sun.identity.plugin.session.SessionProvider;
 import com.sun.identity.federation.common.FSUtils;
 
 import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
 import java.io.ByteArrayInputStream;
 import com.sun.org.apache.xml.internal.security.c14n.Canonicalizer;
 //import com.sun.org.apache.xml.internal.security.Init;
@@ -1727,11 +1728,8 @@ public class SAMLUtils  extends SAMLUtilsCommon {
               Canonicalizer c14n = Canonicalizer.getInstance(
                   "http://www.w3.org/TR/2001/REC-xml-c14n-20010315");
               byte outputBytes[] = c14n.canonicalizeSubtree(node);
-              DocumentBuilderFactory dfactory =
-                  DocumentBuilderFactory.newInstance();
-              dfactory.setNamespaceAware(true);
               DocumentBuilder documentBuilder = 
-                 dfactory.newDocumentBuilder();              
+                 XMLUtils.getSafeDocumentBuilder(false);
               Document doc = documentBuilder.parse(
                   new ByteArrayInputStream(outputBytes));
               Element result = doc.getDocumentElement();

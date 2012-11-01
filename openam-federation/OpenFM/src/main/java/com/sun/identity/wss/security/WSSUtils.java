@@ -25,7 +25,9 @@
  * $Id: WSSUtils.java,v 1.23 2010/01/23 00:20:26 mrudul_uchil Exp $
  *
  */
-
+/**
+ * Portions Copyrighted 2012 ForgeRock Inc
+ */
 package com.sun.identity.wss.security;
 
 import java.io.ByteArrayInputStream;
@@ -111,7 +113,6 @@ import com.sun.org.apache.xml.internal.security.encryption.XMLCipher;
 import com.sun.org.apache.xml.internal.security.keys.KeyInfo;
 import com.sun.identity.wss.provider.ProviderConfig;
 import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
 import com.sun.org.apache.xml.internal.security.c14n.Canonicalizer;
 
 /**
@@ -1132,10 +1133,7 @@ public class WSSUtils {
             Canonicalizer c14n = Canonicalizer.getInstance(
                 "http://www.w3.org/2001/10/xml-exc-c14n#");
             byte outputBytes[] = c14n.canonicalizeSubtree(node);
-            DocumentBuilderFactory dfactory =
-                DocumentBuilderFactory.newInstance();
-            dfactory.setNamespaceAware(true);
-            DocumentBuilder documentBuilder = dfactory.newDocumentBuilder();
+            DocumentBuilder documentBuilder = XMLUtils.getSafeDocumentBuilder(false);
             Document doc = documentBuilder.parse(
                 new ByteArrayInputStream(outputBytes));
             Element result = doc.getDocumentElement();

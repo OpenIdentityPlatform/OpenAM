@@ -25,46 +25,27 @@
  * $Id: CreateXmlTree.java,v 1.3 2008/06/25 05:41:41 qcheng Exp $
  *
  */
-
 /**
- * Portions Copyrighted [2011] [ForgeRock AS]
+ * Portions Copyrighted 2012 ForgeRock Inc
  */
 package com.iplanet.services.util;
 
+import com.sun.identity.shared.xml.XMLUtils;
 import java.util.Enumeration;
-
 import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
-
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
-import com.sun.identity.shared.debug.Debug;
-
 public class CreateXmlTree {
-
-    private static DocumentBuilderFactory factory;
-
-    private static DocumentBuilder db = null;
-
-    static {
-        Debug debug = Debug.getInstance("amXML");
-        factory = DocumentBuilderFactory.newInstance();
-        try {
-            db = factory.newDocumentBuilder();
-        } catch (ParserConfigurationException pce) {
-            debug.error("XML Parser Configuration Error:", pce);
-        }
-    }
 
     /**
      * creates a single xml node and appends that node to the input xml
      * construct.
      */
     public static void createSingleNode(String key, String val, 
-            StringBuffer xml) 
-    {
+            StringBuffer xml) throws ParserConfigurationException {
+        DocumentBuilder db = XMLUtils.getSafeDocumentBuilder(false);
         Document doc = db.newDocument();
         Element item = doc.createElement(key);
         item.appendChild(doc.createTextNode(val));
@@ -74,11 +55,12 @@ public class CreateXmlTree {
     /**
      * creates a single xml node and return that node.
      */
-    public static String createSingleNode(String key, String val) {
+    public static String createSingleNode(String key, String val) throws ParserConfigurationException {
+        DocumentBuilder db = XMLUtils.getSafeDocumentBuilder(false);
         Document doc = db.newDocument();
         Element item = doc.createElement(key);
         item.appendChild(doc.createTextNode(val));
-        return (item.toString());
+        return item.toString();
     }
 
     /**
@@ -86,7 +68,7 @@ public class CreateXmlTree {
      * construct.
      */
     public static void createMultiNodes(String key, Enumeration e,
-            StringBuffer xml) {
+            StringBuffer xml) throws ParserConfigurationException {
         while (e.hasMoreElements()) {
             createSingleNode(key, (String) e.nextElement(), xml);
         }
@@ -98,7 +80,7 @@ public class CreateXmlTree {
      */
 
     public static String parseAttValue(String s) {
-        if ((s == null) || (s.equals(""))) {
+        if ((s == null) || (s.isEmpty())) {
             return s;
         }
         char dquote = '\"';

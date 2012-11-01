@@ -25,13 +25,16 @@
  * $Id: SOAPClient.java,v 1.18 2009/11/19 18:17:28 bhavnab Exp $
  *
  */
-
+/**
+ * Portions Copyrighted 2012 ForgeRock Inc
+ */
 package com.sun.identity.shared.jaxrpc;
 
 import com.sun.identity.common.HttpURLConnectionManager;
 import com.sun.identity.shared.debug.Debug;
 import com.sun.identity.shared.datastruct.OrderedSet;
 import com.sun.identity.shared.encode.Base64;
+import com.sun.identity.shared.xml.XMLUtils;
 import java.lang.reflect.Constructor;
 import java.io.BufferedReader;
 import java.io.ByteArrayInputStream;
@@ -46,7 +49,6 @@ import java.net.URL;
 import java.rmi.RemoteException;
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.TreeSet;
 import java.util.Iterator;
 import java.util.LinkedList;
@@ -54,7 +56,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import javax.xml.parsers.ParserConfigurationException;
-import javax.xml.parsers.SAXParserFactory;
+import javax.xml.parsers.SAXParser;
 import org.xml.sax.Attributes;
 import org.xml.sax.ErrorHandler;
 import org.xml.sax.InputSource;
@@ -330,14 +332,13 @@ public class SOAPClient {
         SOAPContentHandler handler = new SOAPContentHandler(
             response.isException());
         try {
-            SAXParserFactory saxFactory = SAXParserFactory.newInstance();
-            saxFactory.setNamespaceAware(true);
+            SAXParser saxParser;
             if (debug.warningEnabled()) {
-                saxFactory.setValidating(true);
+                saxParser = XMLUtils.getSafeSAXParser(true);
             } else {
-                saxFactory.setValidating(false);
+                saxParser = XMLUtils.getSafeSAXParser(false);
             }
-            XMLReader parser = saxFactory.newSAXParser().getXMLReader();
+            XMLReader parser = saxParser.getXMLReader();
             parser.setContentHandler(handler);
             parser.setErrorHandler(new SOAPErrorHandler());
 
@@ -481,16 +482,14 @@ public class SOAPClient {
             return (Collections.EMPTY_MAP);
         }
         // Add prefix and suffix to the xmlMap
-        StringBuffer sb = new StringBuffer(200);
+        StringBuilder sb = new StringBuilder(200);
         sb.append(DECODE_HEADER);
         sb.append(xmlMap);
         sb.append(DECODE_FOOTER);
         SOAPContentHandler handler = new SOAPContentHandler(false);
         try {
-            SAXParserFactory saxFactory = SAXParserFactory.newInstance();
-            saxFactory.setNamespaceAware(true);
-            saxFactory.setValidating(false);
-            XMLReader parser = saxFactory.newSAXParser().getXMLReader();
+            SAXParser saxParser = XMLUtils.getSafeSAXParser(false);
+            XMLReader parser = saxParser.getXMLReader();
             parser.setContentHandler(handler);
             parser.setErrorHandler(new SOAPErrorHandler());
             parser.parse(new InputSource(new ByteArrayInputStream(sb.toString()

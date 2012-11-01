@@ -25,9 +25,8 @@
  * $Id: SOAPClient.java,v 1.9 2008/09/03 07:06:30 lakshman_abburi Exp $
  *
  */
-
-/*
- * Portions Copyrighted [2011] [ForgeRock AS]
+/**
+ * Portions Copyrighted 2011-2012 ForgeRock Inc
  */
 package com.sun.identity.jaxrpc;
 
@@ -52,7 +51,6 @@ import java.util.Map;
 import java.util.Set;
 
 import javax.xml.parsers.ParserConfigurationException;
-import javax.xml.parsers.SAXParserFactory;
 
 import org.xml.sax.Attributes;
 import org.xml.sax.ErrorHandler;
@@ -72,8 +70,10 @@ import com.sun.identity.shared.Constants;
 import com.sun.identity.shared.datastruct.OrderedSet;
 import com.sun.identity.shared.debug.Debug;
 import com.sun.identity.shared.encode.Base64;
+import com.sun.identity.shared.xml.XMLUtils;
 import com.sun.identity.sm.SMSException;
 import com.sun.identity.sm.SMSSchema;
+import javax.xml.parsers.SAXParser;
 
 /**
  * The class <code>SOAPClient</code> provides methods for SOAP and JAXRPC
@@ -311,14 +311,13 @@ public class SOAPClient {
         // Decode the output. Parse the document using SAX
         SOAPContentHandler handler = new SOAPContentHandler();
         try {
-            SAXParserFactory saxFactory = SAXParserFactory.newInstance();
-            saxFactory.setNamespaceAware(true);
+            SAXParser saxParser;
             if (debug.warningEnabled()) {
-                saxFactory.setValidating(true);
+                saxParser = XMLUtils.getSafeSAXParser(true);
             } else {
-                saxFactory.setValidating(false);
+                saxParser = XMLUtils.getSafeSAXParser(false);
             }
-            XMLReader parser = saxFactory.newSAXParser().getXMLReader();
+            XMLReader parser = saxParser.getXMLReader();
             parser.setContentHandler(handler);
             parser.setErrorHandler(new SOAPErrorHandler());
             parser.parse(new InputSource(in_buf));
@@ -466,10 +465,8 @@ public class SOAPClient {
         sb.append(DECODE_FOOTER);
         SOAPContentHandler handler = new SOAPContentHandler();
         try {
-            SAXParserFactory saxFactory = SAXParserFactory.newInstance();
-            saxFactory.setNamespaceAware(true);
-            saxFactory.setValidating(false);
-            XMLReader parser = saxFactory.newSAXParser().getXMLReader();
+            SAXParser saxParser = XMLUtils.getSafeSAXParser(false);
+            XMLReader parser = saxParser.getXMLReader();
             parser.setContentHandler(handler);
             parser.setErrorHandler(new SOAPErrorHandler());
             parser.parse(new InputSource(new ByteArrayInputStream(sb.toString()

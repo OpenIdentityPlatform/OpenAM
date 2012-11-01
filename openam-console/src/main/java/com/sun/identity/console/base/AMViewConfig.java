@@ -25,7 +25,9 @@
  * $Id: AMViewConfig.java,v 1.9 2008/06/25 05:42:48 qcheng Exp $
  *
  */
-
+/**
+ * Portions Copyrighted 2012 ForgeRock Inc
+ */
 package com.sun.identity.console.base;
 
 import com.iplanet.jato.view.html.OptionList;
@@ -40,6 +42,7 @@ import com.sun.identity.console.base.model.AMModelBase;
 import com.sun.identity.console.base.model.AccessControlModel;
 import com.sun.identity.console.base.model.AccessControlModelImpl;
 import com.sun.identity.console.idm.EntitiesViewBean;
+import com.sun.identity.shared.xml.XMLUtils;
 import com.sun.web.ui.model.CCTabsModel;
 import com.sun.web.ui.model.CCNavNode;
 import java.io.InputStream;
@@ -56,7 +59,6 @@ import java.util.Set;
 import java.util.StringTokenizer;
 import javax.servlet.http.HttpServletRequest;
 import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 import org.w3c.dom.Document;
 import org.w3c.dom.NamedNodeMap;
@@ -675,13 +677,7 @@ public void setTabViews(int parentID, List items) {
             fileName);
 
         try {
-            DocumentBuilderFactory dbFactory =
-                DocumentBuilderFactory.newInstance();
-            dbFactory.setValidating(false);
-            dbFactory.setNamespaceAware(false);
-
-            DocumentBuilder documentBuilder = dbFactory.newDocumentBuilder();
-            documentBuilder.setEntityResolver(new DefaultHandler());
+            DocumentBuilder documentBuilder = XMLUtils.getSafeDocumentBuilder(false);
             document = documentBuilder.parse(is);
         } catch (UnsupportedEncodingException e) {
             AMModelBase.debug.error("AMViewConfig.parseDocument", e);

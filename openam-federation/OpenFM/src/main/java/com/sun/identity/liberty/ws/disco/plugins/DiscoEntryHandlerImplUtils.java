@@ -25,6 +25,9 @@
  * $Id: DiscoEntryHandlerImplUtils.java,v 1.4 2008/06/25 05:49:56 qcheng Exp $
  *
  */
+/**
+ * Portions Copyrighted 2012 ForgeRock Inc
+ */
 package com.sun.identity.liberty.ws.disco.plugins;
 
 import java.io.StringReader;
@@ -62,6 +65,8 @@ import com.sun.identity.plugin.datastore.DataStoreProvider;
 import com.sun.identity.saml.common.SAMLUtils;
 import com.sun.identity.idm.AMIdentity;
 import com.sun.identity.liberty.ws.interfaces.ResourceIDMapper;
+import com.sun.identity.shared.xml.XMLUtils;
+import org.xml.sax.InputSource;
 
 public class DiscoEntryHandlerImplUtils {
 
@@ -98,7 +103,7 @@ public class DiscoEntryHandlerImplUtils {
             try {
                 entry = (DiscoEntryElement)
                     DiscoUtils.getDiscoUnmarshaller().unmarshal(
-                        new StreamSource(new StringReader(entryStr)));
+                        XMLUtils.createSAXSource(new InputSource(new StringReader(entryStr))));
                 entryID = entry.getResourceOffering().getEntryID();
                 if ((entryID == null) || (entryID.length() == 0)) {
                     entryID = SAMLUtils.generateID();
@@ -441,7 +446,7 @@ public class DiscoEntryHandlerImplUtils {
             try {
                 entry = (DiscoEntryElement)
                          DiscoUtils.getDiscoUnmarshaller().unmarshal(
-                        new StreamSource(new StringReader(entryStr)));
+                        XMLUtils.createSAXSource(new InputSource(new StringReader(entryStr))));
                 resOff = entry.getResourceOffering();
                 entryID = resOff.getEntryID();
                 if(entryID == null) {

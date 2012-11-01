@@ -25,16 +25,18 @@
  * $Id: Test.java,v 1.2 2008/06/25 05:53:06 qcheng Exp $
  *
  */
-
+/**
+ * Portions Copyrighted 2012 ForgeRock Inc
+ */
 package com.sun.identity.shared.test.tools;
 
+import com.sun.identity.shared.xml.XMLUtils;
 import java.io.File;
 import java.io.IOException;
 import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.List;
 import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -155,11 +157,7 @@ public class Test {
     private void parseXML(File f)
         throws ParserConfigurationException, SAXException, IOException
     {
-        DocumentBuilderFactory factory =  DocumentBuilderFactory.newInstance();
-        factory.setValidating(false);
-        factory.setNamespaceAware(false);
-
-        DocumentBuilder  builder = factory.newDocumentBuilder();
+        DocumentBuilder builder = XMLUtils.getSafeDocumentBuilder(false);
         Document doc =  builder.parse(f);
 
         Element topElement = doc.getDocumentElement();

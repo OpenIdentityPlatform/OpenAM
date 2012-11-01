@@ -30,7 +30,9 @@
  *
  * @author bina
  */
-
+/**
+ * Portions Copyrighted 2012 ForgeRock Inc
+ */
 package com.sun.identity.federation.meta;
 
 import com.sun.identity.federation.common.IFSConstants;
@@ -43,6 +45,7 @@ import com.sun.identity.shared.debug.Debug;
 import com.sun.identity.liberty.ws.meta.jaxb.EntityDescriptorElement;
 import com.sun.identity.liberty.ws.meta.jaxb.IDPDescriptorType;
 import com.sun.identity.liberty.ws.meta.jaxb.SPDescriptorType;
+import com.sun.identity.shared.xml.XMLUtils;
 import java.io.StringReader;
 import java.io.StringWriter;
 
@@ -57,10 +60,8 @@ import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
 import javax.xml.bind.Unmarshaller;
-
-import javax.xml.transform.stream.StreamSource;
-
 import org.w3c.dom.Node;
+import org.xml.sax.InputSource;
 
 /**
  * This class contains utility methods to process
@@ -158,6 +159,8 @@ public class IDFFMetaUtils {
     public static Object convertNodeToJAXB(Node node)
     throws JAXBException {
         Unmarshaller u = jaxbContext.createUnmarshaller();
+        //no need to get SAXSource, since the node is already created by using
+        //a secure XML parser
         return u.unmarshal(node);
     }
     
@@ -172,7 +175,7 @@ public class IDFFMetaUtils {
     public static Object convertStringToJAXB(String str)
     throws JAXBException {
         Unmarshaller u = jaxbContext.createUnmarshaller();
-        return u.unmarshal(new StreamSource(new StringReader(str)));
+        return u.unmarshal(XMLUtils.createSAXSource(new InputSource(new StringReader(str))));
     }
     
     /**

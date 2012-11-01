@@ -25,7 +25,9 @@
  * $Id: ToolRegistry.java,v 1.2 2009/07/24 22:13:53 ak138937 Exp $
  *
  */
-
+/**
+ * Portions Copyrighted 2012 ForgeRock Inc
+ */
 package com.sun.identity.diagnostic.base.core.service;
 
 import java.net.URL;
@@ -41,6 +43,8 @@ import javax.xml.bind.Unmarshaller;
 import com.sun.identity.diagnostic.base.core.common.ToolConstants;
 import com.sun.identity.diagnostic.base.core.jaxbgen.*;
 import com.sun.identity.shared.debug.Debug;
+import com.sun.identity.shared.xml.XMLUtils;
+import org.xml.sax.InputSource;
 
 /**
  * This class represents the registry where all the services
@@ -101,7 +105,8 @@ public class ToolRegistry {
                 manifestUrl = serviceLocations.get(manifestLocation);
                 // Load the service manifest.
                 s = (com.sun.identity.diagnostic.base.core.jaxbgen.ServiceType)
-                    u.unmarshal(manifestUrl);
+                    u.unmarshal(XMLUtils.createSAXSource(
+                        new InputSource(manifestUrl.toExternalForm())));
                 ServiceDescriptor sd = createServiceDescriptor(
                     manifestLocation, manifestUrl, s);
                 registeredServices.put(sd.getId().toLowerCase(), sd);

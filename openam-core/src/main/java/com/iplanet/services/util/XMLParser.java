@@ -25,9 +25,8 @@
  * $Id: XMLParser.java,v 1.4 2008/06/25 05:41:41 qcheng Exp $
  *
  */
-
 /**
- * Portions Copyrighted [2011] [ForgeRock AS]
+ * Portions Copyrighted 2012 ForgeRock Inc
  */
 package com.iplanet.services.util;
 
@@ -39,11 +38,8 @@ import java.io.UnsupportedEncodingException;
 import java.util.Hashtable;
 import java.util.Map;
 import java.util.Vector;
-
 import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
-
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.NamedNodeMap;
@@ -170,11 +166,9 @@ public class XMLParser {
      */
     public Object parse(InputStream xmlin) throws XMLException {
 
-        DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
-
         DocumentBuilder db = null;
         try {
-            db = dbf.newDocumentBuilder();
+            db = XMLUtils.getSafeDocumentBuilder(false);
         } catch (ParserConfigurationException e) {
             throw new XMLException("DBG:Got ParserConfigurationException:"
                     + e.toString());

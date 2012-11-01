@@ -49,7 +49,6 @@ import javax.security.auth.callback.TextInputCallback;
 import javax.security.auth.callback.TextOutputCallback;
 import javax.servlet.ServletContext;
 import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
 
 import org.w3c.dom.Attr;
 import org.w3c.dom.Document;
@@ -57,9 +56,9 @@ import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
 
 import com.sun.identity.shared.debug.Debug;
-import com.sun.identity.shared.xml.XMLHandler;
 import com.sun.identity.authentication.service.AuthD;
 import com.sun.identity.authentication.share.AuthXMLTags;
+import com.sun.identity.shared.xml.XMLUtils;
 
 class AMModuleProperties {
     private String moduleName;
@@ -81,12 +80,7 @@ class AMModuleProperties {
     ) throws AuthLoginException { 
         InputStream in = null;
         try {
-            DocumentBuilderFactory factory =
-            DocumentBuilderFactory.newInstance();
-            factory.setValidating(false);
-            factory.setNamespaceAware(true);
-            DocumentBuilder builder = factory.newDocumentBuilder();
-            builder.setEntityResolver(new XMLHandler());
+            DocumentBuilder builder = XMLUtils.getSafeDocumentBuilder(false);
             if (servletContext != null) {
                 in = servletContext.getResourceAsStream(fileName);
             }

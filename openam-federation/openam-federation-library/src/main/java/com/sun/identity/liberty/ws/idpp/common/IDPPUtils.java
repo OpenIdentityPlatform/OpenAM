@@ -26,7 +26,9 @@
  *
  */
 
-
+/**
+ * Portions Copyrighted 2012 ForgeRock Inc
+ */
 package com.sun.identity.liberty.ws.idpp.common;
 
 import java.util.ResourceBundle;
@@ -54,12 +56,13 @@ import com.sun.identity.plugin.datastore.DataStoreProvider;
 import com.sun.identity.plugin.datastore.DataStoreProviderException;
 import com.sun.identity.plugin.datastore.DataStoreProviderManager;
 import com.sun.identity.saml.common.SAMLUtils;
+import com.sun.identity.shared.xml.XMLUtils;
 import javax.xml.bind.JAXBException;
-import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.bind.Marshaller;
 import javax.xml.bind.Unmarshaller;
 import javax.xml.bind.JAXBContext;
+import javax.xml.parsers.ParserConfigurationException;
 
 /**
  * Class <code>IDPPUtils</code> is utility class used by IDPP service
@@ -77,23 +80,15 @@ public class IDPPUtils {
     private static final String idppPrefix = "pp";
     private static HashMap idppElementTypes = new HashMap();
     public static HashMap idppIDSMap = new HashMap();
-    private static DocumentBuilderFactory dbf = null;
-    private static DocumentBuilder documentBuilder = null;
-    private static Marshaller marshaller = null;
-    private static Unmarshaller unmarshaller = null;
     private static DataStoreProvider userProvider = null;
+    private static JAXBContext jaxbContext;
 
     static {
         try {
-            dbf = DocumentBuilderFactory.newInstance();
-            dbf.setNamespaceAware(true);
-            documentBuilder = dbf.newDocumentBuilder();
-            JAXBContext jc = JAXBContext.newInstance(
+            jaxbContext = JAXBContext.newInstance(
                 IDPPConstants.IDPP_JAXB_PKG + ":" + 
                 IDPPConstants.IDPP_PLUGIN_JAXB_PKG + ":" +
                 IDPPConstants.XMLSIG_JAXB_PKG);
-            marshaller = jc.createMarshaller();
-            unmarshaller = jc.createUnmarshaller();
             getIDPPElementsMap();
             userProvider = DataStoreProviderManager.getInstance().
                 getDataStoreProvider(IDPP);
@@ -392,16 +387,16 @@ public class IDPPUtils {
       * Gets the marshaller
       * @return Marshaller JAXB Marshaller Object.
       */
-     public static Marshaller getMarshaller() {
-         return marshaller;
+     public static Marshaller getMarshaller() throws JAXBException {
+         return jaxbContext.createMarshaller();
      }
 
      /**
       * Get the unmarshaller object.
       * @return Unmarshaller JAXB unmarshaller object.
       */
-     public static Unmarshaller getUnmarshaller() {
-         return unmarshaller;
+     public static Unmarshaller getUnmarshaller() throws JAXBException {
+         return jaxbContext.createUnmarshaller();
      }
 
      /**
@@ -409,7 +404,12 @@ public class IDPPUtils {
       * @return DocumentBuilder dom document builder
       */
      public static DocumentBuilder getDocumentBuilder() {
-        return documentBuilder;
+        try {
+            return XMLUtils.getSafeDocumentBuilder(false);
+        } catch (ParserConfigurationException pce) {
+            debug.error("Unable to initialize Document Builder", pce);
+        }
+        return null;
      }
 
      /**

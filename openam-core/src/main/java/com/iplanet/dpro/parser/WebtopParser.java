@@ -25,19 +25,28 @@
  * $Id: WebtopParser.java,v 1.3 2008/06/25 05:41:29 qcheng Exp $
  *
  */
-
 /**
- * Portions Copyrighted [2011] [ForgeRock AS]
+ * Portions Copyrighted 2012 ForgeRock Inc
  */
 package com.iplanet.dpro.parser;
 
 
-import java.io.*;
-import java.util.*;
-
-import javax.xml.parsers.*;
-import org.xml.sax.*;
-import org.w3c.dom.*;
+import com.sun.identity.shared.xml.XMLUtils;
+import java.io.ByteArrayInputStream;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.UnsupportedEncodingException;
+import java.util.Hashtable;
+import java.util.Vector;
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.ParserConfigurationException;
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+import org.w3c.dom.NamedNodeMap;
+import org.w3c.dom.Node;
+import org.xml.sax.SAXException;
+import org.xml.sax.SAXParseException;
 
 /**
  * XMLParser provides a way for applications to handle a hook into
@@ -171,11 +180,9 @@ public class WebtopParser {
     public Object parse(InputStream xmlin)
         throws Exception
     {
-        DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
-
         DocumentBuilder db = null;
         try {
-            db = dbf.newDocumentBuilder();
+            db = XMLUtils.getSafeDocumentBuilder(false);
         } catch (ParserConfigurationException e) {
             throw new Exception("DBG:Got ParserConfigurationException:" +
                 e.toString());

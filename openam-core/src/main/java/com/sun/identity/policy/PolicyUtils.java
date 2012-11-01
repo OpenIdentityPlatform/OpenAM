@@ -25,9 +25,8 @@
  * $Id: PolicyUtils.java,v 1.16 2010/01/13 03:01:15 dillidorai Exp $
  *
  */
-
-/*
- * Portions Copyrighted [2011] [ForgeRock AS]
+/**
+ * Portions Copyrighted 2011-2012 ForgeRock Inc
  */
 package com.sun.identity.policy;
 
@@ -37,7 +36,6 @@ import com.iplanet.am.sdk.AMOrganization;
 import com.iplanet.am.sdk.AMStoreConnection;
 import com.iplanet.am.util.SystemProperties;
 import com.sun.identity.shared.debug.Debug;
-import com.sun.identity.shared.xml.XMLHandler;
 import com.sun.identity.shared.xml.XMLUtils;
 import com.iplanet.services.ldap.DSConfigMgr;
 import com.iplanet.services.ldap.LDAPServiceException;
@@ -67,7 +65,6 @@ import java.util.StringTokenizer;
 import java.util.TreeMap;
 import java.util.Vector;
 import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 import com.sun.identity.shared.ldap.LDAPDN;
 import com.sun.identity.shared.ldap.util.DN;
@@ -1106,14 +1103,8 @@ public class PolicyUtils {
     public static void createOrReplacePolicies(PolicyManager pm, InputStream xmlPolicies, boolean replace)
         throws PolicyException, SSOException {
         try {
-            DocumentBuilderFactory factory =
-                DocumentBuilderFactory.newInstance();
-            factory.setValidating(true);
-            factory.setNamespaceAware(true);
-            
-            DocumentBuilder builder = factory.newDocumentBuilder();
+            DocumentBuilder builder = XMLUtils.getSafeDocumentBuilder(true);
             builder.setErrorHandler(new ValidationErrorHandler());
-            builder.setEntityResolver(new XMLHandler());
             Element topElement =builder.parse(xmlPolicies).getDocumentElement();
             NodeList childElements = topElement.getChildNodes();
             int len = childElements.getLength();

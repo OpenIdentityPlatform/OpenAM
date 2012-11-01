@@ -26,10 +26,9 @@
  *
  */
 
- /*
- * Portions Copyrighted [2010] [ForgeRock AS]
+/**
+ * Portions Copyrighted 2010-2012 ForgeRock Inc
  */
-
 package com.sun.identity.saml2.meta;
 
 import java.io.InputStream;
@@ -74,6 +73,7 @@ import com.sun.identity.saml2.jaxb.metadata.XACMLAuthzDecisionQueryDescriptorEle
 import com.sun.identity.saml2.jaxb.metadataextquery.AttributeQueryDescriptorElement;
 import com.sun.identity.saml2.jaxb.metadataattr.EntityAttributesType;
 import com.sun.identity.saml2.jaxb.metadataattr.EntityAttributesElement;
+import org.xml.sax.InputSource;
 // import com.sun.identity.saml2.jaxb.metadataattr.ObjectFactory;
 
 /**
@@ -146,7 +146,7 @@ public final class SAML2MetaUtils {
         throws JAXBException {
 
        Unmarshaller u = jaxbContext.createUnmarshaller();
-       return u.unmarshal(new StreamSource(new StringReader(str)));
+       return u.unmarshal(XMLUtils.createSAXSource(new InputSource(new StringReader(str))));
     }
 
     /**
@@ -160,7 +160,7 @@ public final class SAML2MetaUtils {
         throws JAXBException {
 
        Unmarshaller u = jaxbContext.createUnmarshaller();
-       return u.unmarshal(is);
+       return u.unmarshal(XMLUtils.createSAXSource(new InputSource(is)));
     }
 
     /**
@@ -174,6 +174,8 @@ public final class SAML2MetaUtils {
         throws JAXBException {
 
        Unmarshaller u = jaxbContext.createUnmarshaller();
+       //no need to get SAXSource, since the node is already created by using
+       //a secure XML parser
        return u.unmarshal(node);
     }
 

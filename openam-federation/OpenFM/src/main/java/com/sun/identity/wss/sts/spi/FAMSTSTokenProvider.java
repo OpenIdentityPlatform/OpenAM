@@ -25,7 +25,9 @@
  * $Id: FAMSTSTokenProvider.java,v 1.18 2010/01/15 18:54:35 mrudul_uchil Exp $
  *
  */
-
+/**
+ * Portions Copyrighted 2012 ForgeRock Inc
+ */
 package com.sun.identity.wss.sts.spi;
 
 import com.sun.xml.ws.api.security.trust.STSAttributeProvider;
@@ -53,7 +55,6 @@ import java.security.cert.X509Certificate;
 import javax.security.auth.Subject;
 import java.util.UUID;
 import javax.xml.namespace.QName;
-import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -423,11 +424,9 @@ public class FAMSTSTokenProvider implements STSTokenProvider {
                     LogStringsMessages.WST_0034_UNABLE_GET_CLIENT_CERT(), ex);
             }
         }
-        final DocumentBuilderFactory docFactory = 
-            DocumentBuilderFactory.newInstance();
         Document doc = null;
         try{
-            doc = docFactory.newDocumentBuilder().newDocument();
+            doc = XMLUtils.getSafeDocumentBuilder(false).newDocument();
         }catch(ParserConfigurationException ex){
             STSUtils.debug.error("FAMSTSTokenProvider.createKeyInfo : " + 
                 "ERROR_CREATING_DOCFACTORY : ", ex);

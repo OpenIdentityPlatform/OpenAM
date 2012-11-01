@@ -26,8 +26,8 @@
  *
  */
 
-/*
- * Portions Copyrighted [2011] [ForgeRock AS]
+/**
+ * Portions Copyrighted 2011-2012 ForgeRock Inc
  */
 package com.sun.identity.log.messageid;
 
@@ -36,10 +36,10 @@ package com.sun.identity.log.messageid;
  * methods to generate XML for documenting log message.
  */
 
-import com.sun.identity.shared.xml.Resource;
 import com.sun.identity.log.LogConstants;
 import com.sun.identity.log.LogRecord;
 import com.sun.identity.log.spi.Debug;
+import com.sun.identity.shared.xml.XMLUtils;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Hashtable;
@@ -48,7 +48,6 @@ import java.util.Map;
 import java.io.InputStream;
 import java.io.IOException;
 import java.io.StringReader;
-import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.ParserConfigurationException;
 import org.w3c.dom.Document;
@@ -58,7 +57,6 @@ import org.xml.sax.ErrorHandler;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 import org.xml.sax.SAXParseException;
-import org.xml.sax.helpers.DefaultHandler;
 
 public class LogMessageProviderBase
     implements LogMessageProvider
@@ -205,14 +203,10 @@ public class LogMessageProviderBase
     private Document getXMLDoc()
         throws IOException {
         Document xmlDoc = null;
-        DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
-        factory.setValidating(true);
-        factory.setNamespaceAware(true);
 
         try {
-            DocumentBuilder builder = factory.newDocumentBuilder();
+            DocumentBuilder builder = XMLUtils.getSafeDocumentBuilder(true);
             builder.setErrorHandler(new ValidationErrorHandler());
-            builder.setEntityResolver(new XMLHandler());
             InputStream is = getClass().getClassLoader().getResourceAsStream(
                 xmlDefinitionFilename);
 
@@ -258,20 +252,6 @@ public class LogMessageProviderBase
                 "\n" + e.getMessage() +
                 "\nLine Number in XML file : " + e.getLineNumber() +
                 "\nColumn Number in XML file : " + e.getColumnNumber());
-        }
-    }
-
-    class XMLHandler extends DefaultHandler {
-        public InputSource resolveEntity(String aPublicID, String aSystemID) {
-            InputSource source = null;
-            String sysid = aSystemID.trim();
-                                                                               
-            if( sysid.toLowerCase().startsWith("jar://") ) {
-                String dtdname = sysid.substring(5);
-                String dtdValue = Resource.read(dtdname).trim();
-                source = new InputSource(new StringReader(dtdValue));
-            }
-            return source;
         }
     }
 }

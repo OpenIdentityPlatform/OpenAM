@@ -55,7 +55,6 @@ import java.util.Map;
 import java.util.Set;
 import java.util.StringTokenizer;
 import javax.security.auth.login.AppConfigurationEntry;
-import javax.xml.parsers.DocumentBuilderFactory;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -66,7 +65,6 @@ import org.w3c.dom.NodeList;
  */
 public class AMAuthConfigUtils {
     private static Debug debug = Debug.getInstance("amAuthConfig");
-    private static DocumentBuilderFactory factory = null;
 
     protected static final String SERVICE_NAME = "iPlanetAMAuthConfiguration";
     protected static final String NAMED_CONFIGURATION = "Configurations";

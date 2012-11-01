@@ -25,8 +25,9 @@
  * $Id: WSFederationMetaUtils.java,v 1.5 2009/10/28 23:58:59 exu Exp $
  *
  */
-
-
+/**
+ * Portions Copyrighted 2012 ForgeRock Inc
+ */
 package com.sun.identity.wsfederation.meta;
 
 import com.sun.identity.wsfederation.jaxb.entityconfig.AttributeType;
@@ -47,14 +48,15 @@ import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
 import javax.xml.bind.Unmarshaller;
-import javax.xml.transform.stream.StreamSource;
 
 import org.w3c.dom.Node;
 
 import com.sun.identity.shared.debug.Debug;
 import com.sun.identity.shared.locale.Locale;
+import com.sun.identity.shared.xml.XMLUtils;
 import com.sun.identity.wsfederation.common.WSFederationConstants;
 import com.sun.identity.wsfederation.jaxb.entityconfig.AttributeElement;
+import org.xml.sax.InputSource;
 
 /**
  * The <code>WSFederationMetaUtils</code> provides metadata related utility
@@ -127,7 +129,7 @@ public final class WSFederationMetaUtils {
         throws JAXBException {
 
        Unmarshaller u = jaxbContext.createUnmarshaller();
-       return u.unmarshal(new StreamSource(new StringReader(str)));
+       return u.unmarshal(XMLUtils.createSAXSource(new InputSource(new StringReader(str))));
     }
 
     /**
@@ -141,7 +143,7 @@ public final class WSFederationMetaUtils {
         throws JAXBException {
 
        Unmarshaller u = jaxbContext.createUnmarshaller();
-       return u.unmarshal(is);
+       return u.unmarshal(XMLUtils.createSAXSource(new InputSource(is)));
     }
 
     /**
@@ -155,6 +157,8 @@ public final class WSFederationMetaUtils {
         throws JAXBException {
 
        Unmarshaller u = jaxbContext.createUnmarshaller();
+       //no need to get SAXSource, since the node is already created by using
+       //a secure XML parser
        return u.unmarshal(node);
     }
 

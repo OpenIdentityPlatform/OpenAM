@@ -24,8 +24,8 @@
  *
  * $Id: XACMLPrivilegeUtils.java,v 1.4 2010/01/10 06:39:42 dillidorai Exp $
  */
-/*
- * Portions Copyrighted [2011] [ForgeRock AS]
+/**
+ * Portions Copyrighted 2011-2012 ForgeRock Inc
  */
 package com.sun.identity.entitlement.xacml3;
 
@@ -58,6 +58,7 @@ import com.sun.identity.entitlement.xacml3.core.VariableDefinition;
 import com.sun.identity.entitlement.xacml3.core.Version;
 
 import com.sun.identity.shared.JSONUtils;
+import com.sun.identity.shared.xml.XMLUtils;
 
 import java.io.InputStream;
 import java.io.StringWriter;
@@ -78,6 +79,7 @@ import javax.xml.namespace.QName;
 
 import org.json.JSONException;
 import org.json.JSONObject;
+import org.xml.sax.InputSource;
 
 /**
  * Class with utility methods to map from
@@ -1244,7 +1246,7 @@ public class XACMLPrivilegeUtils {
                     XACMLConstants.XACML3_CORE_PKG);
                 
         Unmarshaller um = jc.createUnmarshaller();
-        JAXBElement je = (JAXBElement)um.unmarshal(stream);
+        JAXBElement je = (JAXBElement)um.unmarshal(XMLUtils.createSAXSource(new InputSource(stream)));
         PolicySet ps = (PolicySet)je.getValue();
         return ps;
     }

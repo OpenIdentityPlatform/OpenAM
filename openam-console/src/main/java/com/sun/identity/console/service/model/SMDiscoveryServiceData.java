@@ -25,7 +25,9 @@
  * $Id: SMDiscoveryServiceData.java,v 1.3 2008/06/25 05:49:46 qcheng Exp $
  *
  */
-
+/**
+ * Portions Copyrighted 2012 ForgeRock Inc
+ */
 package com.sun.identity.console.service.model;
 
 import com.sun.identity.console.base.model.AMConsoleException;
@@ -46,6 +48,7 @@ import com.sun.identity.liberty.ws.disco.plugins.jaxb.DiscoEntryElement;
 import com.sun.identity.liberty.ws.soapbinding.Utils;
 import com.sun.identity.shared.datastruct.OrderedSet;
 import com.sun.identity.shared.debug.Debug;
+import com.sun.identity.shared.xml.XMLUtils;
 import java.io.Serializable;
 import java.io.StringReader;
 import java.util.ArrayList;
@@ -58,7 +61,7 @@ import java.util.Set;
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Unmarshaller;
-import javax.xml.transform.stream.StreamSource;
+import org.xml.sax.InputSource;
 
 /* - NEED NOT LOG - */
 
@@ -310,7 +313,7 @@ public class SMDiscoveryServiceData implements Serializable
                     SMDiscoEntryData smDisco = new SMDiscoEntryData();
                     smDisco.discoStr = str;
                     DiscoEntryElement entry = (DiscoEntryElement)u.unmarshal(
-                        new StreamSource(new StringReader(str)));
+                            XMLUtils.createSAXSource(new InputSource(new StringReader(str))));
                     setDiscoEntryData(entry, smDisco);
                     smEntry.addResourceData(smDisco);
                 }

@@ -25,7 +25,9 @@
  * $Id: DelegationConfig.java,v 1.2 2008/06/25 05:42:53 qcheng Exp $
  *
  */
-
+/**
+ * Portions Copyrighted 2012 ForgeRock Inc
+ */
 package com.sun.identity.console.delegation.model;
 
 import com.iplanet.sso.SSOException;
@@ -37,6 +39,7 @@ import com.sun.identity.console.base.model.AMAuthUtils;
 import com.sun.identity.console.base.model.AMModel;
 import com.sun.identity.console.base.model.AMModelBase;
 import com.sun.identity.delegation.DelegationException;
+import com.sun.identity.shared.xml.XMLUtils;
 import java.io.InputStream;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
@@ -45,14 +48,12 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 import org.w3c.dom.Document;
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
-import org.xml.sax.helpers.DefaultHandler;
 import javax.servlet.http.HttpServletRequest;
 
 /* - NEED NOT LOG - */
@@ -82,13 +83,7 @@ public class DelegationConfig {
             fileName);
 
         try {
-            DocumentBuilderFactory dbFactory =
-                DocumentBuilderFactory.newInstance();
-            dbFactory.setValidating(false);
-            dbFactory.setNamespaceAware(false);
-
-            DocumentBuilder documentBuilder = dbFactory.newDocumentBuilder();
-            documentBuilder.setEntityResolver(new DefaultHandler());
+            DocumentBuilder documentBuilder = XMLUtils.getSafeDocumentBuilder(false);
             document = documentBuilder.parse(is);
         } catch (UnsupportedEncodingException e) {
             AMModelBase.debug.error("DelegationConfig.parseDocument", e);

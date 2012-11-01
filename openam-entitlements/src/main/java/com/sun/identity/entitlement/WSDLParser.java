@@ -24,17 +24,18 @@
  *
  * $Id: WSDLParser.java,v 1.1 2009/08/19 05:40:34 veiming Exp $
  */
-
+/**
+ * Portions Copyrighted 2012 ForgeRock Inc
+ */
 package com.sun.identity.entitlement;
 
-import com.sun.identity.shared.xml.XMLHandler;
+import com.sun.identity.shared.xml.XMLUtils;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.HashSet;
 import java.util.Set;
 import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -117,13 +118,9 @@ public class WSDLParser {
 
     private DocumentBuilder getDocumentBuilder()
         throws EntitlementException {
-        DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
-        factory.setValidating(false);
-        factory.setNamespaceAware(true);
         try {
-            DocumentBuilder builder = factory.newDocumentBuilder();
+            DocumentBuilder builder = XMLUtils.getSafeDocumentBuilder(false);
             builder.setErrorHandler(new ValidationErrorHandler());
-            builder.setEntityResolver(new XMLHandler());
             return builder;
         } catch (ParserConfigurationException ex) {
             throw new EntitlementException(7, ex);

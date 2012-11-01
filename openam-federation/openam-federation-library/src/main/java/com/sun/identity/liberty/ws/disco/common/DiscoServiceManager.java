@@ -26,7 +26,9 @@
  *
  */
 
-
+/**
+ * Portions Copyrighted 2012 ForgeRock Inc
+ */
 package com.sun.identity.liberty.ws.disco.common;
 
 import java.io.StringReader;
@@ -55,6 +57,8 @@ import com.sun.identity.plugin.configuration.ConfigurationManager;
 import com.sun.identity.shared.Constants;
 import com.sun.identity.shared.datastruct.CollectionHelper;
 import com.sun.identity.shared.debug.Debug;
+import com.sun.identity.shared.xml.XMLUtils;
+import org.xml.sax.InputSource;
 
 
 /**
@@ -285,7 +289,7 @@ public class DiscoServiceManager implements ConfigurationListener {
             try {
                 Unmarshaller u = jc.createUnmarshaller();
                 bootDiscoEntry = (DiscoEntryElement) u.unmarshal(
-                        new StreamSource(new StringReader(bootDiscoEntryStr)));
+                        XMLUtils.createSAXSource(new InputSource(new StringReader(bootDiscoEntryStr))));
             } catch (Exception e) {
                 debug.error("DiscoServiceManager.setValues: "
                         + "Exception when creating Disco Resource Offering:",e);

@@ -25,7 +25,9 @@
  * $Id: WSPRedirectHandlerServlet.java,v 1.6 2008/08/06 17:28:10 exu Exp $
  *
  */
-
+/**
+ * Portions Copyrighted 2012 ForgeRock Inc
+ */
 package com.sun.identity.liberty.ws.interaction;
 
 import com.sun.identity.common.HttpURLConnectionManager;
@@ -34,6 +36,7 @@ import com.sun.identity.liberty.ws.common.LogUtil;
 import com.sun.identity.liberty.ws.interaction.jaxb.InquiryElement;
 import com.sun.identity.liberty.ws.interaction.jaxb.InteractionResponseElement;
 import com.sun.identity.liberty.ws.interaction.jaxb.ParameterType;
+import com.sun.identity.shared.xml.XMLUtils;
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
 import java.io.File;
@@ -62,7 +65,6 @@ import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
 import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerFactory;
@@ -118,12 +120,10 @@ public class WSPRedirectHandlerServlet extends HttpServlet {
                 .getWMLStyleSheetLocation();
 
         try {
-            DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
-            dbf.setNamespaceAware(true);
-            DocumentBuilder db = dbf.newDocumentBuilder();
+            DocumentBuilder db = XMLUtils.getSafeDocumentBuilder(false);
             Document doc = db.parse(new File(htmlStyleSheetLocation));
             htmlStyleSource = new DOMSource(doc);
-            db = dbf.newDocumentBuilder();
+            db = XMLUtils.getSafeDocumentBuilder(false);
             doc = db.parse(new File(wmlStyleSheetLocation));
             wmlStyleSource = new DOMSource(doc);
         } catch (ParserConfigurationException pce) {
@@ -424,9 +424,7 @@ public class WSPRedirectHandlerServlet extends HttpServlet {
                     JAXBContext.newInstance(
                     "com.sun.identity.liberty.ws.interaction.jaxb");
             Marshaller marshaller = jaxbContext.createMarshaller();
-            DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
-            dbf.setNamespaceAware(true);
-            DocumentBuilder db = dbf.newDocumentBuilder();
+            DocumentBuilder db = XMLUtils.getSafeDocumentBuilder(false);
             Document doc = db.newDocument();
             marshaller.marshal(inquiryElement, doc);
 

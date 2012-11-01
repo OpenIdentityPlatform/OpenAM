@@ -25,9 +25,12 @@
  * $Id: XMLHandler.java,v 1.2 2008/06/25 05:53:08 qcheng Exp $
  *
  */
-
+/**
+ * Portions Copyrighted 2012 ForgeRock Inc
+ */
 package com.sun.identity.shared.xml;
 
+import java.io.InputStream;
 import java.io.StringReader;
 import org.xml.sax.InputSource;
 import org.xml.sax.helpers.DefaultHandler;
@@ -43,14 +46,19 @@ import org.xml.sax.helpers.DefaultHandler;
 public class XMLHandler extends DefaultHandler {
 
     public InputSource resolveEntity(String aPublicID, String aSystemID) {
-
         String sysid = aSystemID.trim();
 
         if (sysid.toLowerCase().startsWith("jar://")) {
             String dtdname = sysid.substring(5);
-            String dtdValue = Resource.read(dtdname).trim();
-            return new InputSource(new StringReader(dtdValue));
+            InputStream is = getClass().getResourceAsStream(dtdname);
+            if (is != null) {
+                return new InputSource(is);
+            }
         }
-        return null;
+
+        //make sure that we do NOT return null here, as xerces would
+        //fall back to the default entity resolver and try to resolve the
+        //entity with that
+        return new InputSource(new StringReader(""));
     }
 }

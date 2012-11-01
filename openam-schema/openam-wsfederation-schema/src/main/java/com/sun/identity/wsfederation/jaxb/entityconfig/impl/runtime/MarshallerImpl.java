@@ -21,7 +21,6 @@ import javax.xml.bind.MarshalException;
 import javax.xml.bind.PropertyException;
 import javax.xml.bind.helpers.AbstractMarshallerImpl;
 import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.Result;
 import javax.xml.transform.dom.DOMResult;
@@ -46,6 +45,7 @@ import com.sun.xml.bind.marshaller.NioEscapeHandler;
 import com.sun.xml.bind.marshaller.SAX2DOMEx;
 import com.sun.xml.bind.marshaller.SchemaLocationFilter;
 import com.sun.xml.bind.marshaller.XMLWriter;
+import com.sun.identity.shared.xml.XMLUtils;
 
 /**
  * Implementation of {@link Marshaller} interface for JAXB RI.
@@ -98,9 +98,7 @@ public class MarshallerImpl extends AbstractMarshallerImpl
 
             if (node == null) {
                 try {
-                    DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
-                    dbf.setNamespaceAware(true);
-                    DocumentBuilder db = dbf.newDocumentBuilder();
+                    DocumentBuilder db = XMLUtils.getSafeDocumentBuilder(false);
                     Document doc = db.newDocument();
                     ((DOMResult) result).setNode(doc);
                     write(so, new SAX2DOMEx(doc));

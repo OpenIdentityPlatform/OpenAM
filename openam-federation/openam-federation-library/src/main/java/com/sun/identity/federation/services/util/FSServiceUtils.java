@@ -25,8 +25,9 @@
  * $Id: FSServiceUtils.java,v 1.11 2008/11/10 22:56:59 veiming Exp $
  *
  */
-
-
+/**
+ * Portions Copyrighted 2012 ForgeRock Inc
+ */
 package com.sun.identity.federation.services.util;
 
 import java.io.ByteArrayInputStream;
@@ -50,7 +51,6 @@ import java.util.StringTokenizer;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.soap.MessageFactory;
 import javax.xml.soap.MimeHeaders;
 import javax.xml.soap.SOAPMessage;
@@ -86,6 +86,8 @@ import com.sun.identity.plugin.session.SessionProvider;
 import com.sun.identity.shared.Constants;
 import com.sun.identity.shared.encode.URLEncDec;
 import com.sun.identity.shared.search.FileLookup;
+import com.sun.identity.shared.xml.XMLUtils;
+import javax.xml.XMLConstants;
 
 /**
  * Util class to provide methods to manage ID-FF service.
@@ -425,9 +427,7 @@ public class FSServiceUtils {
                 FSUtils.debug.message("FSSU.createSOAPDOM, Intermediate xml: "
                     + xml);
             }
-            DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
-            dbf.setNamespaceAware(true);
-            DocumentBuilder db = dbf.newDocumentBuilder ();
+            DocumentBuilder db = XMLUtils.getSafeDocumentBuilder(false);
             Document doc = db.parse(new ByteArrayInputStream(xml.getBytes()));
             return doc;
         } catch (Exception e) {

@@ -27,22 +27,18 @@
  */
 
 /*
- * Portions Copyrighted [2010-2011] [ForgeRock AS]
+ * Portions Copyrighted 2010-2012 ForgeRock Inc
  */
-
 package com.sun.identity.sm;
 
 import com.iplanet.ums.IUMSConstants;
-import com.sun.identity.shared.xml.XMLHandler;
 import com.sun.identity.shared.xml.XMLUtils;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Iterator;
 import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
-import javax.xml.parsers.FactoryConfigurationError;
 import org.w3c.dom.Document;
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
@@ -91,7 +87,6 @@ public class SMSSchema {
     private String serviceName;
 
     private String version;
-    private static Class docBuildFactoryClass = null;
 
 
     /**
@@ -383,62 +378,9 @@ public class SMSSchema {
     public static Document getXMLDocument(InputStream in, boolean validation)
             throws SchemaException, SMSException {
 
-        DocumentBuilderFactory factory = null;
         try {
-            factory = DocumentBuilderFactory.newInstance();
-        } catch (FactoryConfigurationError fce) {
-            if (docBuildFactoryClass == null) {
-                if (SMSEntry.debug.warningEnabled()) {
-                    SMSEntry.debug.warning("SMSSchema:getXMLDocument():"+
-                        "DocumentBuilderFactory class not found,"+
-                        "so getting the instance of :"+
-                        "com.sun.org.apache.xerces.internal.jaxp."+
-                        "DocumentBuilderFactoryImpl with new context "+
-                        "classloader");
-                }
-                try {
-                /* This explicit loading of context classloader is because of
-                   the JAXP issue. The FactoryFinder code always uses a custom
-                   classloader and does not delegate to the new classloader,
-                   in this case our AM classloader for this
-                   DocumentBuilderFactory class.
-                */
-                    docBuildFactoryClass = Class.forName(
-          "com.sun.org.apache.xerces.internal.jaxp.DocumentBuilderFactoryImpl");
-                } catch (ClassNotFoundException cfe) {
-                    if (SMSEntry.debug.warningEnabled()) {
-                        SMSEntry.debug.warning("SMSSchema:getXMLDocument():"+
-                            "com.sun.org.apache.xerces.internal.jaxp."+
-                                "DocumentBuilderFactory class not found");
-                    }
-                    throw new SMSException(cfe, "sms-init-no-class-found");
-                }
-            }
-            try {
-                factory = (DocumentBuilderFactory)
-                    docBuildFactoryClass.newInstance();
-            } catch (Exception e) {
-                if (SMSEntry.debug.warningEnabled()) {
-                    SMSEntry.debug.warning("SMSSchema: "+
-                        "error in instantiation of :" +
-                            "com.sun.org.apache.xerces.internal.jaxp."+
-                            "DocumentBuilderFactory: Message: " +
-                            e.getMessage());
-                }
-                throw new SMSException(e, "sms-instantiation-failed");
-            }
-        } catch (Exception e) {
-            if (SMSEntry.debug.warningEnabled()) {
-                SMSEntry.debug.warning("SMSSchema: error in instantiation of" +
-                   "DocumentBuilderFactory: Message: " + e.getMessage());
-            }
-            throw new SMSException(e, "sms-instantiation-failed");
-        }
-        try {
-            factory.setValidating(validation);
-            DocumentBuilder builder = factory.newDocumentBuilder();
+            DocumentBuilder builder = XMLUtils.getSafeDocumentBuilder(validation);
             builder.setErrorHandler(new SMSErrorHandler());
-            builder.setEntityResolver(new XMLHandler());
             Document doc = builder.parse(in);
             return (doc);
         } catch (SAXParseException pe) {
@@ -447,15 +389,15 @@ public class SMSSchema {
             throw (new SchemaException(IUMSConstants.UMS_BUNDLE_NAME,
                     IUMSConstants.SMS_SMSSchema_parser_error, params));
         } catch (SAXException sax) {
-            Object params[] = { sax.toString()};
+            Object params[] = { sax.toString() };
             throw (new SchemaException(IUMSConstants.UMS_BUNDLE_NAME,
                     IUMSConstants.SMS_SMSSchema_exception_message, params));
         } catch (ParserConfigurationException pc) {
-            Object params[] = { pc.toString()};
+            Object params[] = { pc.toString() };
             throw (new SchemaException(IUMSConstants.UMS_BUNDLE_NAME,
                     IUMSConstants.SMS_SMSSchema_invalid_xml_document, params));
         } catch (IOException ioe) {
-            Object params[] = { ioe.toString()};
+            Object params[] = { ioe.toString() };
             throw (new SchemaException(IUMSConstants.UMS_BUNDLE_NAME,
                     IUMSConstants.SMS_SMSSchema_invalid_input_stream, params));
         }

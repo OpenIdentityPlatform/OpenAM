@@ -25,12 +25,12 @@
  * $Id: LogMessagesFormatter.java,v 1.2 2008/06/25 05:44:12 qcheng Exp $
  *
  */
-
-/*
- * Portions Copyrighted [2011] [ForgeRock AS]
+/**
+ * Portions Copyrighted 2011-2012 ForgeRock Inc
  */
 package com.sun.identity.tools.logdoc;
 
+import com.sun.identity.shared.xml.XMLUtils;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.ByteArrayInputStream;
@@ -44,7 +44,6 @@ import java.util.List;
 import java.util.TreeSet;
 import java.util.Set;
 import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -129,8 +128,7 @@ public class LogMessagesFormatter {
 
         try {
             bis = new ByteArrayInputStream(xml.getBytes());
-            DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
-            DocumentBuilder db = dbf.newDocumentBuilder();
+            DocumentBuilder db = XMLUtils.getSafeDocumentBuilder(false);
             Document dom = db.parse(bis);
 
             Element rootElm = dom.getDocumentElement();

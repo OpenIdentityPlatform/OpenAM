@@ -25,11 +25,9 @@
  * $Id: XMLUtils.java,v 1.15 2009/10/19 18:19:20 asyhuang Exp $
  *
  */
-
-/*
- * Portions Copyrighted 2011 ForgeRock AS
+/**
+ * Portions Copyrighted 2011-2012 ForgeRock Inc
  */
-
 package com.sun.identity.shared.xml;
 
 import com.sun.identity.shared.Constants;
@@ -37,11 +35,14 @@ import com.sun.identity.shared.configuration.SystemPropertiesManager;
 import com.sun.identity.shared.datastruct.OrderedSet;
 import com.sun.identity.shared.debug.Debug;
 import com.sun.identity.shared.encode.Base64;
+import com.sun.org.apache.xerces.internal.parsers.DOMParser;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.Reader;
 import java.io.UnsupportedEncodingException;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -52,13 +53,19 @@ import java.util.Map;
 import java.util.Set;
 import java.util.regex.Pattern;
 import java.util.regex.Matcher;
+import javax.xml.XMLConstants;
+import javax.xml.bind.JAXBException;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.parsers.SAXParser;
+import javax.xml.parsers.SAXParserFactory;
 import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
+import javax.xml.transform.sax.SAXSource;
 import javax.xml.transform.stream.StreamResult;
+import javax.xml.transform.stream.StreamSource;
 import org.w3c.dom.Attr;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -67,6 +74,7 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.w3c.dom.Text;
 import org.xml.sax.ErrorHandler;
+import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 import org.xml.sax.SAXParseException;
 
@@ -151,33 +159,23 @@ public class XMLUtils {
      *         Returns null if there are any parser errores.
      */
     public static Document toDOMDocument(InputStream is, Debug debug) {
-        /*
-         * Constructing a DocumentBuilderFactory for every call is less
-         * expensive than a synchronizing a single instance of the factory and
-         * obtaining the builder
-         */
-        DocumentBuilderFactory dbFactory = null;
+        DocumentBuilder documentBuilder = null;
         try {
             // Assign new debug object
-            dbFactory = DocumentBuilderFactory.newInstance();
-            dbFactory.setValidating(validating);
-            dbFactory.setNamespaceAware(true);
-        } catch (Exception e) {
+            documentBuilder = getSafeDocumentBuilder(validating);
+        } catch (ParserConfigurationException pe) {
             if (debug != null) {
-                debug.error("XMLUtils.DocumentBuilder init failed", e);
+                debug.error("XMLUtils.DocumentBuilder init failed", pe);
             }
         }
 
         try {
-            DocumentBuilder documentBuilder = dbFactory.newDocumentBuilder();
-
             if (documentBuilder == null) {
                 if (debug != null) {
                     debug.error("XMLUtils.toDOM : null builder instance");
                 }
                 return null;
             }
-            documentBuilder.setEntityResolver(new XMLHandler());
             if (debug != null && debug.warningEnabled()) {
                 documentBuilder.setErrorHandler(new ValidationErrorHandler(
                         debug));
@@ -341,33 +339,27 @@ public class XMLUtils {
      *                if an error occurs while constructing a new document
      */
     public static Document newDocument() throws ParserConfigurationException {
-        DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
-        dbFactory.setNamespaceAware(true);
-        dbFactory.setValidating(validating);
-        return dbFactory.newDocumentBuilder().newDocument();
+        return getSafeDocumentBuilder(validating).newDocument();
     }
 
     public static Document getXMLDocument(InputStream in) throws Exception {
         try {
-            DocumentBuilderFactory factory = DocumentBuilderFactory
-                    .newInstance();
-            factory.setValidating(validating);
-            DocumentBuilder builder = factory.newDocumentBuilder();
+            DocumentBuilder builder = getSafeDocumentBuilder(validating);
             Document doc = builder.parse(in);
-            return (doc);
+            return doc;
         } catch (SAXParseException pe) {
             String msg = "\n" + pe.getMessage() + "\n";
             Object params[] = { new Integer(pe.getLineNumber()) };
-            throw (new Exception(msg + "XMLUtils.parser_error" + params));
+            throw new Exception(msg + "XMLUtils.parser_error" + params);
         } catch (SAXException sax) {
-            Object params[] = { new String(sax.getMessage()) };
-            throw (new Exception("XMLUtils.exception_message" + params));
+            Object params[] = { sax.getMessage()};
+            throw new Exception("XMLUtils.exception_message" + params);
         } catch (ParserConfigurationException pc) {
-            Object params[] = { new String(pc.getMessage()) };
-            throw (new Exception("XMLUtils.invalid_xml_document" + params));
+            Object params[] = { pc.getMessage()};
+            throw new Exception("XMLUtils.invalid_xml_document" + params);
         } catch (IOException ioe) {
-            Object params[] = { new String(ioe.getMessage()) };
-            throw (new Exception("XMLUtils.invalid_input_stream" + params));
+            Object params[] = { ioe.getMessage()};
+            throw new Exception("XMLUtils.invalid_input_stream" + params);
         }
     }
 
@@ -878,6 +870,73 @@ public class XMLUtils {
             return st.substring(0, index);
         }
         return st;
+    }
+
+    /**
+     * Provides a secure DocumentBuilder implementation, which is protected against
+     * different types of entity expansion attacks and makes sure that only locally
+     * available DTDs can be referenced within the XML document.
+     * @param validating Whether the returned DocumentBuilder should validate input.
+     * @return A secure DocumentBuilder instance.
+     * @throws ParserConfigurationException In case xerces does not support one
+     * of the required features.
+     */
+    public static DocumentBuilder getSafeDocumentBuilder(boolean validating) throws ParserConfigurationException {
+        DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
+        dbf.setValidating(validating);
+        dbf.setNamespaceAware(true);
+        dbf.setXIncludeAware(false);
+        dbf.setFeature("http://xml.org/sax/features/external-general-entities", false);
+        dbf.setFeature("http://xml.org/sax/features/external-parameter-entities", false);
+        dbf.setFeature(XMLConstants.FEATURE_SECURE_PROCESSING, true);
+        DocumentBuilder db = dbf.newDocumentBuilder();
+        db.setEntityResolver(new XMLHandler());
+        return db;
+    }
+
+    /**
+     * Provides a secure SAXParser instance, which is protected against different
+     * types of entity expension, DoS attacks and makes sure that only locally
+     * available DTDs can be referenced within the XML document.
+     * @param validating Whether the returned DocumentBuilder should validate input.
+     * @return A secure SAXParser instance.
+     * @throws ParserConfigurationException In case Xerces does not support one of
+     * the required features.
+     * @throws SAXException In case Xerces does not support one of the required
+     * features.
+     */
+    public static SAXParser getSafeSAXParser(boolean validating) throws ParserConfigurationException, SAXException {
+        SAXParserFactory saxFactory = SAXParserFactory.newInstance();
+        saxFactory.setValidating(validating);
+        saxFactory.setNamespaceAware(true);
+        saxFactory.setXIncludeAware(false);
+        saxFactory.setFeature("http://xml.org/sax/features/external-general-entities", false);
+        saxFactory.setFeature("http://xml.org/sax/features/external-parameter-entities", false);
+        saxFactory.setFeature(XMLConstants.FEATURE_SECURE_PROCESSING, true);
+        SAXParser sp = saxFactory.newSAXParser();
+        sp.getXMLReader().setEntityResolver(new XMLHandler());
+        return sp;
+    }
+
+    /**
+     * Creates a SAXSource instance based on the incoming InputSource, which
+     * later on can be safely used by JAXB unmarshalling. The SAXSource will be
+     * protected against different types of entity expansion, DoS attacks and
+     * makes sure that only locally available DTDs can be referenced within the
+     * XML document.
+     * @param source The InputSource to be unmarshalled by JAXB
+     * @return A safe SAXSource instance
+     * @throws JAXBException In case an error occurs while creating the SAXSource
+     */
+    public static SAXSource createSAXSource(InputSource source) throws JAXBException{
+        try {
+            SAXParser saxParser = getSafeSAXParser(false);
+            return new SAXSource(saxParser.getXMLReader(), source);
+        } catch (Exception ex) {
+            //Let's convert the exception to a JAXBException, so the unmarshalling
+            //codes can handle the failure.
+            throw new JAXBException("Unable to create SAXSource", ex);
+        }
     }
 
     private static String ATTR_VALUE_PAIR_NODE = "AttributeValuePair";
