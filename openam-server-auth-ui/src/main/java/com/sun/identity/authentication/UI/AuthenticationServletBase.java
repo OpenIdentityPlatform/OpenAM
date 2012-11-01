@@ -118,7 +118,6 @@ static Debug exDebug = Debug.getInstance("amAuthExceptionViewBean");
                 , e);
         }
         vb.forwardTo(requestContext);
-        throw new CompleteRequestException();
     }
 
     @Override

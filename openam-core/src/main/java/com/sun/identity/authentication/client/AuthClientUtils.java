@@ -101,6 +101,7 @@ import com.sun.identity.common.FQDNUtils;
 import com.sun.identity.common.HttpURLConnectionManager;
 import com.sun.identity.common.RequestUtils;
 import com.sun.identity.common.ISLocaleContext;
+import com.sun.identity.policy.PolicyException;
 
 import com.sun.identity.shared.debug.Debug;
 import com.sun.identity.shared.encode.CookieUtils;
@@ -114,6 +115,7 @@ import com.sun.identity.sm.SMSEntry;
 import com.sun.identity.policy.PolicyUtils;
 import com.sun.identity.policy.plugins.AuthSchemeCondition;
 import com.sun.identity.shared.encode.Base64;
+import java.io.UnsupportedEncodingException;
 import java.util.Arrays;
 
 public class AuthClientUtils {
@@ -1505,6 +1507,7 @@ public class AuthClientUtils {
      * and determines the organization DN based on
      * query parameters.
      * The organization DN is determined based on
+     * the policy advice OR
      * the query parameters "org" OR "domain" OR
      * the server host name. For backward compatibility
      * the orgname will be determined from requestURI
@@ -1516,7 +1519,9 @@ public class AuthClientUtils {
      *    domain component
      * 3  Org path- check if the orgName passed is a path (eg."/suborg1")
      * 4. URL - check if the orgName passed is a DNS alias (URL).
-     * 5. If no orgDN is found null is returned.
+     * 5. Policy Advice will be checked for realm advice, or realm component in
+     *    the advice
+     * 6. If no orgDN is found null is returned.
      *
      * @param request HTTP Servlet Request object.
      * @param requestHash Query Hashtable.
@@ -1525,8 +1530,14 @@ public class AuthClientUtils {
     public static String getDomainNameByRequest(
         HttpServletRequest request,
         Hashtable requestHash) {
+
         boolean noQueryParam=false;
+        String realm = getRealmFromPolicyAdvice(requestHash);
         String orgParam = getOrgParam(requestHash);
+        if (realm != null) {
+            //Policy Advice has precedence over GET parameter
+            orgParam = realm;
+        }
 
         if (utilDebug.messageEnabled()) {
             utilDebug.message("orgParam is.. :" + orgParam);
@@ -2070,7 +2081,14 @@ public class AuthClientUtils {
         }
         String filePath = getFilePath(getClientType(request));
         String fileRoot = getFileRoot();
-        String orgDN = getDomainNameByRequest(request, parseRequestParameters(request));
+        String orgDN;
+        try {
+            orgDN = getDomainNameByRequest(request, parseRequestParameters(request));
+        } catch (Exception ex) {
+            //in case we are unable to determine the realm from the incoming
+            //requests, let's fallback to top level realm
+            orgDN = getOrganizationDN("/", false, request);
+        }
         String orgFilePath = getOrgFilePath(orgDN);
 
         String templateFile = null;
@@ -2299,8 +2317,17 @@ public class AuthClientUtils {
         return (CookieUtils.getCookieValueFromReq(req,getAuthCookieName()));
     }
 
+    /**
+     * @deprecated use {@link #getDomainNameByRequest(
+     * javax.servlet.http.HttpServletRequest, java.util.Hashtable)} instead.
+     */
     public static String getDomainNameByRequest(Hashtable requestHash) {
+        String realm = getRealmFromPolicyAdvice(requestHash);
         String orgParam = getOrgParam(requestHash);
+        if (realm != null) {
+            //Policy Advice has precedence over GET parameter
+            orgParam = realm;
+        }
         if (utilDebug.messageEnabled()) {
             utilDebug.message("orgParam is.. :" + orgParam);
         }
@@ -2316,8 +2343,78 @@ public class AuthClientUtils {
         if (utilDebug.messageEnabled()) {
             utilDebug.message("orgDN is " + orgDN);
         }
-        return (orgDN);
+        return orgDN;
     }          
+
+    /**
+     * Parses the policy condition advice and checks for realm advices
+     * @param requestHash Request parameters
+     * @return realm defined in the policy advice, if defined - or nullđ
+     * @throws IllegalArgumentException if more than one realm is defined within
+     * the advice
+     * @see com.sun.identity.authentication.util.AMAuthUtils
+     */
+    private static String getRealmFromPolicyAdvice(Hashtable<String, String> requestHash) {
+        String advice = requestHash.get(COMPOSITE_ADVICE);
+        if (advice == null) {
+            return null;
+        }
+
+        try {
+            String decodedXml = URLDecoder.decode(advice, "UTF-8");
+            return getRealmFromPolicyAdvice(decodedXml);
+        } catch (UnsupportedEncodingException uee) {
+            utilDebug.error("Unable to URLdecode condition advice using UTF-8");
+        }
+        return null;
+    }
+
+    /**
+     * Parses the policy condition advice and checks for realm advices
+     * @param advice The policy advice XML
+     * @return realm defined in the policy advice, if defined - or nullđ
+     * @throws IllegalArgumentException if more than one realm is defined within
+     * the advice
+     * @see com.sun.identity.authentication.util.AMAuthUtils
+     */
+    public static String getRealmFromPolicyAdvice(String advice) {
+        String realm = null;
+        try {
+            Map<String, Set<String>> adviceMap = PolicyUtils.parseAdvicesXML(advice);
+            if (adviceMap != null) {
+                for (Map.Entry<String, Set<String>> entry : adviceMap.entrySet()) {
+                    String key = entry.getKey();
+                    Set<String> value = entry.getValue();
+                    for (String adv : value) {
+                        String tmpRealm = null;
+                        if (key.equals(AuthSchemeCondition.AUTHENTICATE_TO_REALM_CONDITION_ADVICE)) {
+                            tmpRealm = adv;
+                        } else {
+                            //AMAuthUtils is not present at DAS, so let's parse
+                            //the advice manually
+                            int idx = adv.indexOf(':');
+                            if (idx != -1) {
+                                tmpRealm = adv.substring(0, idx);
+                            }
+                        }
+                        if (realm == null) {
+                            realm = tmpRealm;
+                        } else if (tmpRealm != null && !realm.equalsIgnoreCase(tmpRealm)) {
+                            //NB: this method is also used when the engine wants
+                            //to show the error page from the correct realm, hence
+                            //this will fail twice, resulting in a generic error
+                            //page
+                            throw new IllegalArgumentException("More than one realm defined in the Policy Advice");
+                        }
+                    }
+                }
+            }
+        } catch (PolicyException pe) {
+            utilDebug.error("Unable to parse policy condition advices", pe);
+        }
+
+        return realm;
+    }
 
     // Check whether the request is coming to the server who created the
     // original Auth request or session

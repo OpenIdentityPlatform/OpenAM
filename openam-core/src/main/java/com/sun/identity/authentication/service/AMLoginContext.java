@@ -1776,10 +1776,7 @@ public class AMLoginContext {
                 if (!isTokenValid) {
                     debug.message("No existing valid session");
                     Hashtable requestHash = loginState.getRequestParamHash();
-                    String orgParam = AuthUtils.getOrgParam(requestHash);
-                    String queryOrg = AuthUtils.getQueryOrgName(hreq, orgParam);
-                    String newOrgDN = DNUtils.normalizeDN(
-                            AuthUtils.getOrganizationDN(queryOrg,true,hreq));
+                    String newOrgDN = AuthUtils.getDomainNameByRequest(hreq, requestHash);
                     if (debug.messageEnabled()){
                         debug.message("orgDN from existing auth context: " +
                         orgDN + ", orgDN from query string: " + newOrgDN);

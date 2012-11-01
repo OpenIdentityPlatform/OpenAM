@@ -919,7 +919,14 @@ public class AuthUtils extends AuthClientUtils {
         String locale = ad.getPlatformLocale();
         String filePath = getFilePath(getClientType(request));
         String fileRoot = getFileRoot();
-        String orgDN = getDomainNameByRequest(request, parseRequestParameters(request));
+        String orgDN;
+        try {
+            orgDN = getDomainNameByRequest(request, parseRequestParameters(request));
+        } catch (Exception ex) {
+            //in case we are unable to determine the realm from the incoming
+            //requests, let's fallback to top level realm
+            orgDN = getOrganizationDN("/", false, request);
+        }
         String orgFilePath = getOrgFilePath(orgDN);
         String templateFile = null;
         try {

@@ -27,7 +27,7 @@
  */
 
 /*
- * Portions Copyrighted [2010] [ForgeRock AS]
+ * Portions Copyrighted 2010-2012 ForgeRock Inc
  */
 
 package com.sun.identity.authentication.server;
@@ -185,6 +185,22 @@ public class AuthXMLRequestParser {
                     debug.message("found login node !!");
                     String orgName =
                         parseNodeAttributes(loginNode,"orgName");
+
+                    //Let's set the request type to Login by default
+                    authXMLRequest.setRequestType(AuthXMLRequest.Login);
+                    //this method can change the default requesttype to
+                    //LoginIndex type if indexname/indextype was supplied in the
+                    //request
+                    parseLoginNodeElements(loginNode, authXMLRequest);
+                    AuthContext.IndexType indexType = authXMLRequest.getIndexType();
+                    String indexTypeParam = convertIndexType(indexType);
+                    String indexName = authXMLRequest.getIndexName();
+                    if (indexType == AuthContext.IndexType.COMPOSITE_ADVICE) {
+                        //realm name from policy advice has precedence over
+                        //the orgName attribute
+                        orgName = AuthUtils.getRealmFromPolicyAdvice(indexName);
+                    }
+
                     AuthContextLocal authContext = null;
                     if (orgName != null) {
                         authXMLRequest.setOrgName(orgName);
@@ -209,11 +225,6 @@ public class AuthXMLRequestParser {
                         }
                     }
                     boolean forceAuthBool = Boolean.parseBoolean(forceAuth);  
-                    authXMLRequest.setRequestType(AuthXMLRequest.Login);
-                    parseLoginNodeElements(loginNode,authXMLRequest);
-                    AuthContext.IndexType indexType = authXMLRequest.
-                        getIndexType();
-                    String indexTypeParam = convertIndexType(indexType);
                     authContext =
                         AuthUtils.getAuthContext(orgName,authIdentifier,false,
                             servletReq, indexTypeParam,

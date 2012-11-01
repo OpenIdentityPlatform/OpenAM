@@ -1666,12 +1666,9 @@ public class LoginViewBean extends AuthViewBeanBase {
         try {
             // always make sure the orgName is the same
             String orgName = ssot.getProperty("Organization");
-            String orgParam = AuthUtils.getOrgParam(reqDataHash);
-            String queryOrg = AuthUtils.getQueryOrgName(request,orgParam);
-            String newOrgName = AuthUtils.getOrganizationDN(queryOrg,true,request);
+            String newOrgName = AuthUtils.getDomainNameByRequest(request, reqDataHash);
             if (loginDebug.messageEnabled()) {
                 loginDebug.message("original org is : " + orgName);
-                loginDebug.message("query org is : " + queryOrg);
                 loginDebug.message("new org is : " + newOrgName);
             }
             
@@ -1951,29 +1948,30 @@ public class LoginViewBean extends AuthViewBeanBase {
             if (authErrorCode != null) {
                 errorCode = authErrorCode;
                 ErrorMessage = l10nE.getL10NMessage(
-                    com.sun.identity.shared.locale.Locale.getLocale(
+                        com.sun.identity.shared.locale.Locale.getLocale(
                         AuthUtils.getLocale(ac)));
+            } else {
+                if (ac != null) {
+                    ErrorMessage = ac.getErrorMessage();
+                    errorCode = ac.getErrorCode();
+                }
             }
         }
-        
+
+        if (errorCode == null || errorCode.isEmpty()) {
+            //if error code is still null, let's set it to AUTH_ERROR, so the
+            //template lookup will succeed
+            errorCode = AMAuthErrorCode.AUTH_ERROR;
+            ErrorMessage = AuthUtils.getErrorMessage(errorCode);
+        }
         if (ac != null) {
             errorTemplate = ac.getErrorTemplate();
         } else {
             errorTemplate = AuthUtils.getErrorTemplate(errorCode);
         }
         
-        if (authErrorCode == null) {
-            if (ac != null) {
-                ErrorMessage = ac.getErrorMessage();
-                errorCode = ac.getErrorCode();
-            } else {
-                ErrorMessage = AuthUtils.getErrorMessage(errorCode);
-            }
-        }
-
         // handle InternalSession timeout
-        if (errorCode != null && loginURL != null && errorCode.equals("110")
-                && (loginURL.equals(Constants.EMPTY))) {
+        if (loginURL != null && errorCode.equals("110") && loginURL.isEmpty()) {
             setDisplayFieldValue(LOGIN_URL, AuthUtils.constructLoginURL(request));
         }
         
