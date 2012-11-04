@@ -26,6 +26,10 @@
 
 --%>
 
+<%--
+   Portions Copyrighted 2012 ForgeRock Inc
+--%>
+
 <%@ page info="CreateRemoteIDP" language="java" %>
 <%@taglib uri="/WEB-INF/jato.tld" prefix="jato" %>
 <%@taglib uri="/WEB-INF/cc.tld" prefix="cc" %>
@@ -76,14 +80,10 @@
     function metaOptionSelect(radio) {
         if (radio.value == 'url') {
             frm.elements['CreateRemoteIDP.tfMetadataFileURL'].style.display = '';
-            document.getElementById('metadataurlhelp').style.display = '';
             frm.elements['CreateRemoteIDP.btnMetadata'].style.display = 'none';
-            document.getElementById('metadatafilename').style.display = 'none';
         } else {
             frm.elements['CreateRemoteIDP.tfMetadataFileURL'].style.display = 'none';
-            document.getElementById('metadataurlhelp').style.display = 'none';
             frm.elements['CreateRemoteIDP.btnMetadata'].style.display = '';
-            document.getElementById('metadatafilename').style.display = '';
         }
     }
 
