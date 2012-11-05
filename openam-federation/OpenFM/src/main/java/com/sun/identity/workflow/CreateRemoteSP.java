@@ -25,6 +25,10 @@
  * $Id: CreateRemoteSP.java,v 1.9 2009/04/09 06:53:43 asyhuang Exp $
  *
  */
+
+ /*
+ * Portions Copyrighted 2012 ForgeRock Inc
+ */
 package com.sun.identity.workflow;
 
 import com.sun.identity.cot.COTException;
@@ -37,7 +41,6 @@ import com.sun.identity.saml2.jaxb.metadata.EntityDescriptorElement;
 import com.sun.identity.saml2.meta.SAML2MetaException;
 import com.sun.identity.saml2.meta.SAML2MetaManager;
 import com.sun.identity.saml2.meta.SAML2MetaUtils;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -58,6 +61,7 @@ public class CreateRemoteSP
      * @param locale Locale of the request.
      * @param params Map of creation parameters.
      */
+    @Override
     public String execute(Locale locale, Map params)
             throws WorkflowException {
         validateParameters(params);
@@ -70,8 +74,8 @@ public class CreateRemoteSP
         if (!attrMapping.isEmpty()) {
             try {
                 EntityDescriptorElement e =
-                        ImportSAML2MetaData.getEntityDescriptorElement(metadata);
-                String eId = e.getEntityID();                                           
+                        SAML2MetaUtils.getEntityDescriptorElement(metadata);
+                String eId = e.getEntityID();
                 extendedMeta =
                         createExtendedDataTemplate(
                         eId, false);
@@ -134,19 +138,19 @@ public class CreateRemoteSP
     }
 
     private String createExtendedDataTemplate(
-            String entityID,          
+            String entityID,
             boolean hosted) {
 
-        StringBuffer buff = new StringBuffer();
+        StringBuilder buff = new StringBuilder();
         String strHosted = (hosted) ? "1" : "0";
-        buff.append(
-                "<EntityConfig xmlns=\"urn:sun:fm:SAML:2.0:entityconfig\"\n" +
-                "    xmlns:fm=\"urn:sun:fm:SAML:2.0:entityconfig\"\n" +
-                "    hosted=\"" + strHosted + "\"\n" +
-                "    entityID=\"" + entityID + "\">\n\n" +
-                "    <SPSSOConfig>\n" +
-                "    </SPSSOConfig>\n" +
-                "</EntityConfig>\n");
+        buff.append("<EntityConfig xmlns=\"urn:sun:fm:SAML:2.0:entityconfig\"\n");
+        buff.append("    xmlns:fm=\"urn:sun:fm:SAML:2.0:entityconfig\"\n");
+        buff.append("    hosted=\"").append(strHosted).append("\"\n");
+        buff.append("    entityID=\"").append(entityID).append("\">\n\n");
+        buff.append("    <SPSSOConfig>\n");
+        buff.append("    </SPSSOConfig>\n");
+        buff.append("</EntityConfig>\n");
+
         return buff.toString();
     }
 }

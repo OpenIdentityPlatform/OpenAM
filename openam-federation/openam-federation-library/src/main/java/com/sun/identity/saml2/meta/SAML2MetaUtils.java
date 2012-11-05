@@ -47,7 +47,6 @@ import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
 import javax.xml.bind.Unmarshaller;
-import javax.xml.transform.stream.StreamSource;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
@@ -63,16 +62,12 @@ import com.sun.identity.saml2.jaxb.entityconfig.BaseConfigType;
 import com.sun.identity.saml2.jaxb.entityconfig.IDPSSOConfigElement;
 import com.sun.identity.saml2.jaxb.entityconfig.SPSSOConfigElement;
 import com.sun.identity.saml2.jaxb.entityconfig.EntityConfigElement;
-import com.sun.identity.saml2.jaxb.metadata.EntityDescriptorElement;
-import com.sun.identity.saml2.jaxb.metadata.AttributeAuthorityDescriptorElement;
-import com.sun.identity.saml2.jaxb.metadata.AuthnAuthorityDescriptorElement;
-import com.sun.identity.saml2.jaxb.metadata.IDPSSODescriptorElement;
-import com.sun.identity.saml2.jaxb.metadata.SPSSODescriptorElement;
-import com.sun.identity.saml2.jaxb.metadata.XACMLPDPDescriptorElement;
-import com.sun.identity.saml2.jaxb.metadata.XACMLAuthzDecisionQueryDescriptorElement;
+import com.sun.identity.saml2.jaxb.metadata.*;
 import com.sun.identity.saml2.jaxb.metadataextquery.AttributeQueryDescriptorElement;
-import com.sun.identity.saml2.jaxb.metadataattr.EntityAttributesType;
-import com.sun.identity.saml2.jaxb.metadataattr.EntityAttributesElement;
+import java.util.*;
+import org.w3c.dom.Element;
+import org.w3c.dom.NodeList;
+
 import org.xml.sax.InputSource;
 // import com.sun.identity.saml2.jaxb.metadataattr.ObjectFactory;
 
@@ -114,7 +109,7 @@ public final class SAML2MetaUtils {
                 jaxbPackages = JAXB_PACKAGES;
             }
             if (debug.messageEnabled()) {
-                debug.message("SAML2MetaUtils.static: " + 
+                debug.message("SAML2MetaUtils.static: " +
                     "jaxbPackages = " + jaxbPackages);
             }
             jaxbContext = JAXBContext.newInstance(jaxbPackages);
@@ -297,18 +292,18 @@ public final class SAML2MetaUtils {
      * Returns first policy decision point descriptor in an entity descriptor.
      *
      * @param eDescriptor The entity descriptor.
-     * @return policy decision point descriptor or null if it is not found. 
+     * @return policy decision point descriptor or null if it is not found.
      */
     public static XACMLPDPDescriptorElement getPolicyDecisionPointDescriptor(
         EntityDescriptorElement eDescriptor)
     {
         XACMLPDPDescriptorElement descriptor = null;
-        
+
         if (eDescriptor != null) {
-            List list = 
+            List list =
             eDescriptor.getRoleDescriptorOrIDPSSODescriptorOrSPSSODescriptor();
-            
-            for (Iterator i = list.iterator(); 
+
+            for (Iterator i = list.iterator();
                 i.hasNext() && (descriptor == null);
             ) {
                 Object obj = i.next();
@@ -323,23 +318,23 @@ public final class SAML2MetaUtils {
 
 
     /**
-     * Returns first policy enforcement point descriptor in an entity 
+     * Returns first policy enforcement point descriptor in an entity
      * descriptor.
      *
      * @param eDescriptor The entity descriptor.
-     * @return policy enforcement point descriptor or null if it is not found. 
+     * @return policy enforcement point descriptor or null if it is not found.
      */
-    public static XACMLAuthzDecisionQueryDescriptorElement 
+    public static XACMLAuthzDecisionQueryDescriptorElement
         getPolicyEnforcementPointDescriptor(
         EntityDescriptorElement eDescriptor)
     {
         XACMLAuthzDecisionQueryDescriptorElement descriptor = null;
-        
+
         if (eDescriptor != null) {
-            List list = 
+            List list =
             eDescriptor.getRoleDescriptorOrIDPSSODescriptorOrSPSSODescriptor();
-            
-            for (Iterator i = list.iterator(); 
+
+            for (Iterator i = list.iterator();
                 i.hasNext() && (descriptor == null);
             ) {
                 Object obj = i.next();
@@ -351,13 +346,13 @@ public final class SAML2MetaUtils {
 
         return descriptor;
     }
-    
+
     /**
      * Returns first service provider's SSO descriptor in an entity
      * descriptor.
      * @param eDescriptor The entity descriptor.
      * @return <code>SPSSODescriptorElement</code> for the entity or null if
-     *         not found. 
+     *         not found.
      */
     public static SPSSODescriptorElement getSPSSODescriptor(
         EntityDescriptorElement eDescriptor)
@@ -384,7 +379,7 @@ public final class SAML2MetaUtils {
      * descriptor.
      * @param eDescriptor The entity descriptor.
      * @return <code>IDPSSODescriptorElement</code> for the entity or null if
-     *         not found. 
+     *         not found.
      */
     public static IDPSSODescriptorElement getIDPSSODescriptor(
         EntityDescriptorElement eDescriptor)
@@ -404,13 +399,13 @@ public final class SAML2MetaUtils {
 
         return null;
     }
-    
+
     /**
      * Returns attribute authority descriptor in an entity descriptor.
      *
      * @param eDescriptor The entity descriptor.
      * @return an <code>AttributeAuthorityDescriptorElement</code> object for
-     *     the entity or null if not found. 
+     *     the entity or null if not found.
      */
     public static AttributeAuthorityDescriptorElement
         getAttributeAuthorityDescriptor(EntityDescriptorElement eDescriptor)
@@ -437,7 +432,7 @@ public final class SAML2MetaUtils {
      *
      * @param eDescriptor The entity descriptor.
      * @return an <code>AttributeQueryDescriptorElement</code> object for
-     *     the entity or null if not found. 
+     *     the entity or null if not found.
      */
     public static AttributeQueryDescriptorElement
         getAttributeQueryDescriptor(EntityDescriptorElement eDescriptor)
@@ -464,7 +459,7 @@ public final class SAML2MetaUtils {
      *
      * @param eDescriptor The entity descriptor.
      * @return an <code>AuthnAuthorityDescriptorElement</code> object for
-     *     the entity or null if not found. 
+     *     the entity or null if not found.
      */
     public static AuthnAuthorityDescriptorElement
         getAuthnAuthorityDescriptor(EntityDescriptorElement eDescriptor)
@@ -487,8 +482,8 @@ public final class SAML2MetaUtils {
     }
 
     /**
-     * Get the first value of set by given key searching in the given map. 
-     * return null if <code>attrMap</code> is null or <code>key</code> 
+     * Get the first value of set by given key searching in the given map.
+     * return null if <code>attrMap</code> is null or <code>key</code>
      * is null.
      *
      * @param attrMap Map of which set is to be added.
@@ -508,7 +503,7 @@ public final class SAML2MetaUtils {
 
         return retValue;
     }
-    
+
      /**
      * Adds a set of a given value to a map. Set will not be added if
      * <code>attrMap</code> is null or <code>value</code> is null or
@@ -520,15 +515,15 @@ public final class SAML2MetaUtils {
      */
     public static void fillEntriesInSet(Map attrMap, String key, String value) {
         if ((key != null) && (value != null) && (attrMap != null)) {
-            Set valueSet = new HashSet(); 
+            Set valueSet = new HashSet();
             valueSet.add(value);
             attrMap.put(key, valueSet);
         }
     }
-    
+
     /**
      * Returns first service provider's SSO configuration in an entity.
-     * @param eConfig <code>EntityConfigElement</code> of the entity to 
+     * @param eConfig <code>EntityConfigElement</code> of the entity to
      * be retrieved.
      * @return <code>SPSSOConfigElement</code> for the entity or null if not
      *         found.
@@ -556,7 +551,7 @@ public final class SAML2MetaUtils {
 
     /**
      * Returns first identity provider's SSO configuration in an entity
-     * @param eConfig <code>EntityConfigElement</code> of the entity to 
+     * @param eConfig <code>EntityConfigElement</code> of the entity to
      * be retrieved.
      * @return <code>IDPSSOConfigElement</code> for the entity or null if not
      *         found.
@@ -616,6 +611,187 @@ public final class SAML2MetaUtils {
 	} catch (JAXBException e) {
             throw new SAML2MetaException(e.getMessage());
 	}
+    }
+
+    /**
+     *
+     * @param metadata A string representing an EntityDescriptorElement XML document
+     * @return EntityDescriptorElement an EntityDescriptorElement from the passed metadata
+     * @throws SAML2MetaException If there was a problem with the parsed metadata
+     * @throws JAXBException If there was a problem parsing the metadata
+     */
+    public static EntityDescriptorElement getEntityDescriptorElement(String metadata)
+        throws SAML2MetaException, JAXBException {
+
+        Document doc = XMLUtils.toDOMDocument(metadata, debug);
+
+        if (doc == null) {
+            throw new SAML2MetaException("Null document");
+        }
+
+        Element docElem = doc.getDocumentElement();
+
+        if ((!SAML2MetaConstants.ENTITY_DESCRIPTOR.equals(docElem.getLocalName())) ||
+            (!SAML2MetaConstants.NS_METADATA.equals(docElem.getNamespaceURI()))) {
+            throw new SAML2MetaException("Invalid  descriptor");
+        }
+
+        Object element = preProcessSAML2Document(doc);
+
+        return (element instanceof EntityDescriptorElement) ?
+            (EntityDescriptorElement)element : null;
+    }
+
+    /**
+     * For the given XML metadata document representing either a SAML2 EntityDescriptorElement or EntitiesDescriptorElement,
+     * return a list of entityId's for all the Entities created. Carries out a signature validation of the document as
+     * part of the import process.
+     * @param metaManager An instance of the SAML2MetaManager, used to do the actual create.
+     * @param realm The realm to create the Entities in
+     * @param doc The XML document that represents either an EntityDescriptorElement or EntitiesDescriptorElement
+     * @return A list of all entityId's imported or an empty list if no Entities were imported.
+     * @throws SAML2MetaException for any issues as a result of trying to create the Entities.
+     * @throws JAXBException for any issues converting the document into a JAXB document.
+     */
+    public static List<String> importSAML2Document(SAML2MetaManager metaManager,
+            String realm, Document doc) throws SAML2MetaException, JAXBException {
+
+        List<String> result = new ArrayList<String>(1);
+
+        Object element = preProcessSAML2Document(doc);
+
+        if (element instanceof EntityDescriptorElement) {
+            String entityId = importSAML2Entity(metaManager, realm,
+                    (EntityDescriptorElement)element);
+            if (entityId != null) {
+                result.add(entityId);
+            }
+        } else if (element instanceof EntitiesDescriptorElement) {
+            result = importSAML2Entites(metaManager, realm,
+                    (EntitiesDescriptorElement)element);
+        }
+
+        if (debug.messageEnabled()) {
+            debug.message("SAML2MetaUtils.importSAML2Document: " +
+                "Created " + result + " entities");
+        }
+
+        return result;
+    }
+
+    private static Object preProcessSAML2Document(Document doc) throws SAML2MetaException, JAXBException {
+
+        SAML2MetaSecurityUtils.verifySignature(doc);
+        workaroundAbstractRoleDescriptor(doc);
+
+        Object obj = convertNodeToJAXB(doc);
+
+        // Remove any Extensions elements as these are currently not supported.
+        obj = workaroundJAXBBug(obj);
+
+        return obj;
+    }
+
+    private static List<String> importSAML2Entites(SAML2MetaManager metaManager, String realm,
+            EntitiesDescriptorElement descriptor) throws SAML2MetaException {
+
+        List<String> result = new ArrayList<String>();
+
+        List descriptors = descriptor.getEntityDescriptorOrEntitiesDescriptor();
+        if (descriptors != null && !descriptors.isEmpty()) {
+            Iterator entities = descriptors.iterator();
+            while (entities.hasNext()) {
+                Object o = entities.next();
+                if (o instanceof EntityDescriptorElement) {
+                    String entityId = importSAML2Entity(metaManager, realm,
+                            (EntityDescriptorElement) o);
+                    if (entityId != null) {
+                        result.add(entityId);
+                    }
+                }
+            }
+        }
+
+        return result;
+    }
+
+    private static String importSAML2Entity(SAML2MetaManager metaManager, String realm,
+            EntityDescriptorElement descriptor) throws SAML2MetaException {
+
+        String result = null;
+
+        List roles = descriptor.getRoleDescriptorOrIDPSSODescriptorOrSPSSODescriptor();
+        Iterator it = roles.iterator();
+        while (it.hasNext()) {
+            RoleDescriptorType role = (RoleDescriptorType)it.next();
+            List protocols = role.getProtocolSupportEnumeration();
+            if (!protocols.contains(SAML2Constants.PROTOCOL_NAMESPACE)) {
+                if (debug.messageEnabled()) {
+                    debug.message("SAML2MetaUtils.importSAML2Entity: "
+                        + "Removing non-SAML2 role from entity "
+                        + descriptor.getEntityID());
+                }
+                it.remove();
+            }
+        }
+
+        if (roles.size() > 0) {
+            metaManager.createEntityDescriptor(realm, descriptor);
+            result = descriptor.getEntityID();
+        }
+
+        return result;
+    }
+    
+    private static Object workaroundJAXBBug(Object obj) throws JAXBException {
+
+        String metadata = convertJAXBToString(obj);
+        String replaced = metadata.replaceAll("<(.*:)?Extensions/>", "");
+        if (metadata.equalsIgnoreCase(replaced)) {
+            return obj;
+        } else {
+            return convertStringToJAXB(replaced);
+        }
+    }
+
+   private static void workaroundAbstractRoleDescriptor(Document doc) {
+
+        NodeList nl = doc.getDocumentElement().getElementsByTagNameNS(
+            SAML2MetaConstants.NS_METADATA,SAML2MetaConstants.ROLE_DESCRIPTOR);
+        int length = nl.getLength();
+        if (length == 0) {
+            return;
+        }
+
+        for (int i = 0; i < length; i++) {
+            Element child = (Element)nl.item(i);
+            String type = child.getAttributeNS(SAML2Constants.NS_XSI, "type");
+            if (type != null) {
+                if ((type.equals(
+                    SAML2MetaConstants.ATTRIBUTE_QUERY_DESCRIPTOR_TYPE)) ||
+                    (type.endsWith(":" +
+                    SAML2MetaConstants.ATTRIBUTE_QUERY_DESCRIPTOR_TYPE))) {
+
+                    String newTag = type.substring(0, type.length() - 4);
+
+                    String xmlstr = XMLUtils.print(child);
+                    int index = xmlstr.indexOf(
+                        SAML2MetaConstants.ROLE_DESCRIPTOR);
+                    xmlstr = "<" + newTag + xmlstr.substring(index +
+                        SAML2MetaConstants.ROLE_DESCRIPTOR.length());
+                    if (!xmlstr.endsWith("/>")) {
+                        index = xmlstr.lastIndexOf("</");
+                        xmlstr = xmlstr.substring(0, index) + "</" + newTag +
+                            ">";
+                    }
+
+                    Document tmpDoc = XMLUtils.toDOMDocument(xmlstr, debug);
+                    Node newChild =
+                        doc.importNode(tmpDoc.getDocumentElement(), true);
+                    child.getParentNode().replaceChild(newChild, child);
+                }
+            }
+        }
     }
 
     private static String workaroundAbstractRoleDescriptor(String xmlstr) {

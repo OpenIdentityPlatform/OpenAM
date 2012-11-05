@@ -25,11 +25,14 @@
  * $Id: ConfigureSalesForceApps.java,v 1.2 2009/08/06 18:06:17 babysunil Exp $
  *
  */
+
+/**
+ * Portions Copyrighted 2012 ForgeRock Inc
+ */
 package com.sun.identity.workflow;
 
 import com.sun.identity.cot.COTException;
 import com.sun.identity.saml2.common.SAML2Constants;
-import com.sun.identity.saml2.jaxb.entityconfig.AttributeElement;
 import com.sun.identity.saml2.jaxb.entityconfig.AttributeType;
 import com.sun.identity.saml2.jaxb.entityconfig.EntityConfigElement;
 import com.sun.identity.saml2.jaxb.entityconfig.ObjectFactory;
@@ -37,6 +40,7 @@ import com.sun.identity.saml2.jaxb.entityconfig.SPSSOConfigElement;
 import com.sun.identity.saml2.jaxb.metadata.EntityDescriptorElement;
 import com.sun.identity.saml2.meta.SAML2MetaException;
 import com.sun.identity.saml2.meta.SAML2MetaManager;
+import com.sun.identity.saml2.meta.SAML2MetaUtils;
 import java.text.MessageFormat;
 import java.util.HashMap;
 import java.util.List;
@@ -50,9 +54,23 @@ import javax.xml.bind.JAXBException;
 public class ConfigureSalesForceApps
         extends Task {
 
+    private static final String
+            METADATA = "<EntityDescriptor entityID=\"https://saml.salesfor" +
+                "ce.com\" xmlns=\"urn:oasis:names:tc:SAML:2.0:metadata\"><SP" +
+                "SSODescriptor AuthnRequestsSigned=\"false\" WantAssertionsSi" +
+                "gned=\"false\" protocolSupportEnumeration=\"urn:oasis:name" +
+                "s:tc:SAML:2.0:protocol\"> <NameIDFormat>urn:oasis:names:t" +
+                "c:SAML:1.1:nameid-format:unspecified</NameIDFormat><NameIDF" +
+                "ormat>urn:oasis:names:tc:SAML:2.0:nameid-format:transient</N" +
+                "ameIDFormat> <AssertionConsumerService index=\"1\" Bindin" +
+                "g=\"urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST\" Locati" +
+                "on=\"https://login.salesforce.com\"/></SPSSODescript" +
+                "or></EntityDescriptor>";
+
     public ConfigureSalesForceApps() {
     }
 
+    @Override
     public String execute(Locale locale, Map params)
             throws WorkflowException {
         String entityId = getString(params, ParameterKeys.P_IDP);
@@ -74,21 +92,10 @@ public class ConfigureSalesForceApps
     private void updateSPMeta(String realm, String cot, List attrMapping)
             throws WorkflowException {
 
-        String metadata = "<EntityDescriptor entityID=\"https://saml.salesfor" +
-                "ce.com\" xmlns=\"urn:oasis:names:tc:SAML:2.0:metadata\"><SP" +
-                "SSODescriptor AuthnRequestsSigned=\"false\" WantAssertionsSi" +
-                "gned=\"false\" protocolSupportEnumeration=\"urn:oasis:name" +
-                "s:tc:SAML:2.0:protocol\"> <NameIDFormat>urn:oasis:names:t" +
-                "c:SAML:1.1:nameid-format:unspecified</NameIDFormat><NameIDF" +
-                "ormat>urn:oasis:names:tc:SAML:2.0:nameid-format:transient</N" +
-                "ameIDFormat> <AssertionConsumerService index=\"1\" Bindin" +
-                "g=\"urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST\" Locati" +
-                "on=\"https://login.salesforce.com\"/></SPSSODescript" +
-                "or></EntityDescriptor>";
         String extendedMeta = null;
         try {
             EntityDescriptorElement e =
-                    ImportSAML2MetaData.getEntityDescriptorElement(metadata);
+                SAML2MetaUtils.getEntityDescriptorElement(METADATA);
             String eId = e.getEntityID();
             String metaAlias = generateMetaAliasForSP(realm);
             Map map = new HashMap();
@@ -102,7 +109,7 @@ public class ConfigureSalesForceApps
             throw new WorkflowException(ex.getMessage());
         }
         String[] results = ImportSAML2MetaData.importData(
-                realm, metadata, extendedMeta);
+                realm, METADATA, extendedMeta);
         String entityId = results[1];
         if ((cot != null) && (cot.length() > 0)) {
             try {
@@ -142,16 +149,16 @@ public class ConfigureSalesForceApps
             String entityID,
             boolean hosted) {
 
-        StringBuffer buff = new StringBuffer();
+        StringBuilder buff = new StringBuilder();
         String strHosted = (hosted) ? "1" : "0";
-        buff.append(
-                "<EntityConfig xmlns=\"urn:sun:fm:SAML:2.0:entityconfig\"\n" +
-                "    xmlns:fm=\"urn:sun:fm:SAML:2.0:entityconfig\"\n" +
-                "    hosted=\"" + strHosted + "\"\n" +
-                "    entityID=\"" + entityID + "\">\n\n" +
-                "    <SPSSOConfig>\n" +
-                "    </SPSSOConfig>\n" +
-                "</EntityConfig>\n");
+        buff.append("<EntityConfig xmlns=\"urn:sun:fm:SAML:2.0:entityconfig\"\n");
+        buff.append("    xmlns:fm=\"urn:sun:fm:SAML:2.0:entityconfig\"\n");
+        buff.append("    hosted=\"").append(strHosted).append("\"\n");
+        buff.append("    entityID=\"").append(entityID).append("\">\n\n");
+        buff.append("    <SPSSOConfig>\n");
+        buff.append("    </SPSSOConfig>\n");
+        buff.append("</EntityConfig>\n");
+
         return buff.toString();
     }
 }

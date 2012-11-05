@@ -26,6 +26,9 @@
  *
  */
 
+ /*
+ * Portions Copyrighted 2012 ForgeRock Inc
+ */
 package com.sun.identity.federation.cli;
 
 import com.sun.identity.shared.debug.Debug;
@@ -40,17 +43,13 @@ import com.sun.identity.federation.meta.IDFFMetaException;
 import com.sun.identity.federation.meta.IDFFMetaManager;
 import com.sun.identity.federation.meta.IDFFMetaUtils;
 import com.sun.identity.saml2.jaxb.entityconfig.EntityConfigElement;
-import com.sun.identity.saml2.jaxb.metadata.EntityDescriptorElement;
 import com.sun.identity.cot.CircleOfTrustManager;
 import com.sun.identity.cot.COTException;
 import com.sun.identity.federation.jaxb.entityconfig.IDPDescriptorConfigElement;
 import com.sun.identity.federation.jaxb.entityconfig.SPDescriptorConfigElement;
-import com.sun.identity.saml2.common.SAML2Constants;
 import com.sun.identity.saml2.jaxb.entityconfig.BaseConfigType;
-import com.sun.identity.saml2.meta.SAML2MetaConstants;
 import com.sun.identity.saml2.meta.SAML2MetaException;
 import com.sun.identity.saml2.meta.SAML2MetaManager;
-import com.sun.identity.saml2.meta.SAML2MetaSecurityUtils;
 import com.sun.identity.saml2.meta.SAML2MetaUtils;
 import com.sun.identity.wsfederation.common.WSFederationConstants;
 import com.sun.identity.wsfederation.meta.WSFederationMetaManager;
@@ -67,9 +66,6 @@ import java.util.List;
 import java.util.logging.Level;
 import javax.xml.bind.JAXBException;
 import org.w3c.dom.Document;
-import org.w3c.dom.Element;
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
 
 /**
  * Import Meta Data.
@@ -89,11 +85,11 @@ public class ImportMetaData extends AuthenticatedCommand {
      * @throws CLIException if unable to process this request.
      */
     @Override
-    public void handleRequest(RequestContext rc) 
+    public void handleRequest(RequestContext rc)
         throws CLIException {
         super.handleRequest(rc);
         ldapLogin();
-        
+
         realm = getStringOptionValue(FedCLIConstants.ARGUMENT_REALM, "/");
         metadata = getStringOptionValue(FedCLIConstants.ARGUMENT_METADATA);
         extendedData = getStringOptionValue(
@@ -114,9 +110,9 @@ public class ImportMetaData extends AuthenticatedCommand {
                 getResourceString("import-entity-exception-no-datafile"),
                 ExitCodes.REQUEST_CANNOT_BE_PROCESSED);
         }
-        
+
         validateCOT();
-        
+
         CommandManager mgr = getCommandManager();
         String url = mgr.getWebEnabledURL();
         webAccess = (url != null) && (url.length() > 0);
@@ -147,9 +143,9 @@ public class ImportMetaData extends AuthenticatedCommand {
             throw e;
         }
     }
-    
-        
-    private void validateCOT() 
+
+
+    private void validateCOT()
         throws CLIException {
         if ((cot != null) && (cot.length() > 0))  {
             try {
@@ -179,9 +175,8 @@ public class ImportMetaData extends AuthenticatedCommand {
         throws CLIException {
         try {
             SAML2MetaManager metaManager = new SAML2MetaManager(ssoToken);
-            String entityID = null;
             EntityConfigElement configElt = null;
-            
+
             if (extendedData != null) {
                 configElt = geEntityConfigElement();
                 /*
@@ -199,17 +194,18 @@ public class ImportMetaData extends AuthenticatedCommand {
                     }
                 }
             }
-            
-            EntityDescriptorElement descriptor = null;
+
+            List<String> entityIds = null;
+            // Load the metadata if it has been provided
             if (metadata != null) {
-                descriptor = getSAML2EntityDescriptorElement(metaManager);
-                if (descriptor != null) {
-                    entityID = descriptor.getEntityID();
-                }
+                entityIds = importSAML2Metadata(metaManager);
             }
-            
-            metaManager.createEntity(realm, descriptor, configElt);
-            if (descriptor != null) {
+            // Load the extended metadata if it has been provided
+            if (configElt != null) {
+                metaManager.createEntityConfig(realm, configElt);
+            }
+
+            if (entityIds != null) {
                 String out = (webAccess) ? "web" : metadata;
                 Object[] objs = { out };
                 getOutputWriter().printlnMessage(MessageFormat.format(
@@ -223,12 +219,14 @@ public class ImportMetaData extends AuthenticatedCommand {
             }
 
             if ((cot != null) && (cot.length() > 0) &&
-                (entityID != null) && (entityID.length() > 0)) {
+                (entityIds != null) && (!entityIds.isEmpty())) {
                 CircleOfTrustManager cotManager = new CircleOfTrustManager(
                     ssoToken);
-                if (!cotManager.isInCircleOfTrust(realm, cot, spec, entityID)) {
-                    cotManager.addCircleOfTrustMember(
-                        realm, cot, spec, entityID);
+                for (String entityID : entityIds) {
+                    if (!cotManager.isInCircleOfTrust(realm, cot, spec, entityID)) {
+                        cotManager.addCircleOfTrustMember(
+                            realm, cot, spec, entityID);
+                    }
                 }
             }
         } catch (COTException e) {
@@ -239,7 +237,7 @@ public class ImportMetaData extends AuthenticatedCommand {
                 ExitCodes.REQUEST_CANNOT_BE_PROCESSED);
         }
     }
-    
+
     private void handleIDFFRequest(RequestContext rc)
         throws CLIException {
         try {
@@ -247,16 +245,16 @@ public class ImportMetaData extends AuthenticatedCommand {
             String entityID = null;
             com.sun.identity.federation.jaxb.entityconfig.EntityConfigElement
                 configElt = null;
-            
+
             if (extendedData != null) {
                 configElt = getIDFFEntityConfigElement();
-                
+
                 /*
                  * see note at the end of this class for how we decide
                  * the realm value
                  */
                 if ((configElt != null) && configElt.isHosted()) {
-                    IDPDescriptorConfigElement idpConfig = 
+                    IDPDescriptorConfigElement idpConfig =
                         IDFFMetaUtils.getIDPDescriptorConfig(configElt);
                     if (idpConfig != null) {
                         realm = SAML2MetaUtils.getRealmByMetaAlias(
@@ -271,7 +269,7 @@ public class ImportMetaData extends AuthenticatedCommand {
                     }
                 }
             }
-            
+
             if (metadata != null) {
                 entityID = importIDFFMetaData(realm, metaManager);
             }
@@ -305,9 +303,9 @@ public class ImportMetaData extends AuthenticatedCommand {
         throws CLIException {
         try {
             String federationID = null;
-            com.sun.identity.wsfederation.jaxb.entityconfig.FederationConfigElement 
+            com.sun.identity.wsfederation.jaxb.entityconfig.FederationConfigElement
                 configElt = null;
-            
+
             if (extendedData != null) {
                 configElt = getWSFedEntityConfigElement();
                 /*
@@ -318,8 +316,8 @@ public class ImportMetaData extends AuthenticatedCommand {
                     List config = configElt.
                        getIDPSSOConfigOrSPSSOConfig();
                     if (!config.isEmpty()) {
-                        com.sun.identity.wsfederation.jaxb.entityconfig.BaseConfigType 
-                            bConfig = 
+                        com.sun.identity.wsfederation.jaxb.entityconfig.BaseConfigType
+                            bConfig =
                             (com.sun.identity.wsfederation.jaxb.entityconfig.BaseConfigType)
                             config.iterator().next();
                         realm = WSFederationMetaUtils.getRealmByMetaAlias(
@@ -327,16 +325,16 @@ public class ImportMetaData extends AuthenticatedCommand {
                     }
                 }
             }
-            
+
             WSFederationMetaManager metaManager = new WSFederationMetaManager(
                 ssoToken);
             if (metadata != null) {
                 federationID = importWSFedMetaData();
             }
-            
+
             if (configElt != null) {
                 metaManager.createEntityConfig(realm, configElt);
-                
+
                 String out = (webAccess) ? "web" : extendedData;
                 Object[] objs = { out };
                 getOutputWriter().printlnMessage(MessageFormat.format(
@@ -347,10 +345,10 @@ public class ImportMetaData extends AuthenticatedCommand {
                 (federationID != null)) {
                 CircleOfTrustManager cotManager = new CircleOfTrustManager(
                     ssoToken);
-                if (!cotManager.isInCircleOfTrust(realm, cot, spec, 
+                if (!cotManager.isInCircleOfTrust(realm, cot, spec,
                     federationID)
                 ) {
-                    cotManager.addCircleOfTrustMember(realm, cot, spec, 
+                    cotManager.addCircleOfTrustMember(realm, cot, spec,
                         federationID);
                 }
             }
@@ -362,20 +360,21 @@ public class ImportMetaData extends AuthenticatedCommand {
                 ExitCodes.REQUEST_CANNOT_BE_PROCESSED);
         }
     }
-    
-    private EntityDescriptorElement getSAML2EntityDescriptorElement(
+
+    private List<String> importSAML2Metadata(
         SAML2MetaManager metaManager)
-        throws SAML2MetaException, CLIException
-    {
+        throws SAML2MetaException, CLIException {
+
+        List<String> result = null;
+
         InputStream is = null;
         String out = (webAccess) ? "web" : metadata;
         Object[] objs = { out };
-        
+
         try {
-            Object obj;
             Document doc;
             Debug debug = CommandManager.getDebugger();
-            
+
             if (webAccess) {
                 doc = XMLUtils.toDOMDocument(metadata, debug);
             } else {
@@ -389,28 +388,17 @@ public class ImportMetaData extends AuthenticatedCommand {
                     "import-entity-exception-invalid-descriptor-file"),
                     objs), ExitCodes.REQUEST_CANNOT_BE_PROCESSED);
             }
-            Element docElem = doc.getDocumentElement();
-            if ((!SAML2MetaConstants.ENTITY_DESCRIPTOR.equals(
-                docElem.getLocalName())) ||
-                (!SAML2MetaConstants.NS_METADATA.equals(
-                docElem.getNamespaceURI()))) {
+
+            result = SAML2MetaUtils.importSAML2Document(metaManager, realm, doc);
+
+            if (result.isEmpty()) {
                 throw new CLIException(MessageFormat.format(
                     getResourceString(
                     "import-entity-exception-invalid-descriptor-file"),
                     objs), ExitCodes.REQUEST_CANNOT_BE_PROCESSED);
             }
-            SAML2MetaSecurityUtils.verifySignature(doc);
-            workaroundAbstractRoleDescriptor(doc);
-            if (debug.messageEnabled()) {
-                debug.message("ImportMetaData.getSAML2EntityDescriptorElement: "
-                    + "modified metadata = " + XMLUtils.print(doc));
-            }
-            obj = SAML2MetaUtils.convertNodeToJAXB(doc);
 
-            if (obj instanceof EntityDescriptorElement) {
-                return (EntityDescriptorElement)obj;
-            }
-            return null;
+            return result;
         } catch (FileNotFoundException e) {
             throw new CLIException(MessageFormat.format(
                 getResourceString("file-not-found"), objs),
@@ -445,14 +433,14 @@ public class ImportMetaData extends AuthenticatedCommand {
         String out = (webAccess) ? "web" : metadata;
         Object[] objs = { out };
         String entityID = null;
-        
+
         try {
             Object obj;
             if (webAccess) {
                 obj = IDFFMetaUtils.convertStringToJAXB(metadata);
             } else {
                 is = new FileInputStream(metadata);
-                Document doc = XMLUtils.toDOMDocument(is, 
+                Document doc = XMLUtils.toDOMDocument(is,
                     CommandManager.getDebugger());
                 obj = IDFFMetaUtils.convertNodeToJAXB(doc);
             }
@@ -498,7 +486,7 @@ public class ImportMetaData extends AuthenticatedCommand {
             }
         }
     }
-   
+
     private String importWSFedMetaData()
         throws WSFederationMetaException, CLIException
     {
@@ -506,13 +494,13 @@ public class ImportMetaData extends AuthenticatedCommand {
         String out = (webAccess) ? "web" : metadata;
         Object[] objs = { out };
         String federationID = null;
-        
+
         try {
             Object obj;
             Document doc;
             if (webAccess) {
                 obj = WSFederationMetaUtils.convertStringToJAXB(metadata);
-                doc = XMLUtils.toDOMDocument(metadata, 
+                doc = XMLUtils.toDOMDocument(metadata,
                     CommandManager.getDebugger());
             } else {
                 is = new FileInputStream(metadata);
@@ -527,7 +515,7 @@ public class ImportMetaData extends AuthenticatedCommand {
             }
 
             if (obj instanceof com.sun.identity.wsfederation.jaxb.wsfederation.FederationElement) {
-                com.sun.identity.wsfederation.jaxb.wsfederation.FederationElement 
+                com.sun.identity.wsfederation.jaxb.wsfederation.FederationElement
                 federation =
                 (com.sun.identity.wsfederation.jaxb.wsfederation.FederationElement)obj;
                 federationID = federation.getFederationID();
@@ -569,7 +557,7 @@ public class ImportMetaData extends AuthenticatedCommand {
             }
         }
     }
-    
+
     private EntityConfigElement geEntityConfigElement()
         throws SAML2MetaException, CLIException {
         String out = (webAccess) ? "web" : extendedData;
@@ -629,7 +617,7 @@ public class ImportMetaData extends AuthenticatedCommand {
                     getFileContent(extendedData));
             }
 
-            return (obj instanceof 
+            return (obj instanceof
             com.sun.identity.federation.jaxb.entityconfig.EntityConfigElement) ?
              (com.sun.identity.federation.jaxb.entityconfig.EntityConfigElement)
                 obj : null;
@@ -651,8 +639,8 @@ public class ImportMetaData extends AuthenticatedCommand {
                 ExitCodes.REQUEST_CANNOT_BE_PROCESSED);
         }
     }
-    
-    private com.sun.identity.wsfederation.jaxb.entityconfig.FederationConfigElement 
+
+    private com.sun.identity.wsfederation.jaxb.entityconfig.FederationConfigElement
         getWSFedEntityConfigElement()
         throws WSFederationMetaException, CLIException {
         String out = (webAccess) ? "web" : extendedData;
@@ -668,9 +656,9 @@ public class ImportMetaData extends AuthenticatedCommand {
                 obj = WSFederationMetaUtils.convertInputStreamToJAXB(is);
             }
 
-            return (obj instanceof 
+            return (obj instanceof
                 com.sun.identity.wsfederation.jaxb.entityconfig.FederationConfigElement) ?
-                (com.sun.identity.wsfederation.jaxb.entityconfig.FederationConfigElement)obj : 
+                (com.sun.identity.wsfederation.jaxb.entityconfig.FederationConfigElement)obj :
                 null;
         } catch (FileNotFoundException e) {
             throw new CLIException(MessageFormat.format(
@@ -716,48 +704,6 @@ public class ImportMetaData extends AuthenticatedCommand {
             }
         }
         return buff.toString();
-    }
-
-    public static void workaroundAbstractRoleDescriptor(
-        Document doc) {
-
-        NodeList nl = doc.getDocumentElement().getElementsByTagNameNS(
-            SAML2MetaConstants.NS_METADATA,SAML2MetaConstants.ROLE_DESCRIPTOR);
-        int length = nl.getLength();
-        if (length == 0) {
-            return;
-        }
-
-        for(int i = 0; i < length; i++) {
-            Element child = (Element)nl.item(i);
-            String type = child.getAttributeNS(SAML2Constants.NS_XSI, "type");
-            if (type != null) {
-                if ((type.equals(
-                    SAML2MetaConstants.ATTRIBUTE_QUERY_DESCRIPTOR_TYPE)) ||
-                    (type.endsWith(":" +
-                    SAML2MetaConstants.ATTRIBUTE_QUERY_DESCRIPTOR_TYPE))) {
-
-                    String newTag = type.substring(0, type.length() - 4);
-
-                    String xmlstr = XMLUtils.print(child);
-                    int index = xmlstr.indexOf(
-                        SAML2MetaConstants.ROLE_DESCRIPTOR);
-                    xmlstr = "<" + newTag + xmlstr.substring(index +
-                        SAML2MetaConstants.ROLE_DESCRIPTOR.length());
-                    if (!xmlstr.endsWith("/>")) {
-                        index = xmlstr.lastIndexOf("</");
-                        xmlstr = xmlstr.substring(0, index) + "</" + newTag +
-                            ">";
-                    }
-
-                    Document tmpDoc = XMLUtils.toDOMDocument(xmlstr,
-                        CommandManager.getDebugger());
-                    Node newChild =
-                        doc.importNode(tmpDoc.getDocumentElement(), true);
-                    child.getParentNode().replaceChild(newChild, child);
-                }
-            }
-        }                
     }
 }
 

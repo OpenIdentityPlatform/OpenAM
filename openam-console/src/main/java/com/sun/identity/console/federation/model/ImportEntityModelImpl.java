@@ -26,6 +26,9 @@
  *
  */
 
+ /**
+ * Portions Copyrighted 2012 ForgeRock Inc
+ */
 package com.sun.identity.console.federation.model;
 
 import com.sun.identity.console.base.model.AMModelBase;
@@ -38,17 +41,13 @@ import com.sun.identity.federation.meta.IDFFMetaUtils;
 import com.sun.identity.saml2.common.SAML2Constants;
 import com.sun.identity.saml2.jaxb.entityconfig.BaseConfigType;
 import com.sun.identity.saml2.jaxb.entityconfig.EntityConfigElement;
-import com.sun.identity.saml2.jaxb.metadata.EntityDescriptorElement;
 import com.sun.identity.saml2.meta.SAML2MetaException;
 import com.sun.identity.saml2.meta.SAML2MetaManager;
-import com.sun.identity.saml2.meta.SAML2MetaSecurityUtils;
 import com.sun.identity.saml2.meta.SAML2MetaUtils;
 import com.sun.identity.shared.xml.XMLUtils;
 import com.sun.identity.workflow.WorkflowException;
 import java.util.List;
 import java.util.Map;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javax.xml.bind.JAXBException;
 import javax.servlet.http.HttpServletRequest;
 import org.w3c.dom.Document;
@@ -56,8 +55,8 @@ import org.w3c.dom.Document;
 import com.sun.identity.wsfederation.meta.WSFederationMetaManager;
 import com.sun.identity.wsfederation.meta.WSFederationMetaException;
 import com.sun.identity.wsfederation.meta.WSFederationMetaUtils;
-import com.sun.identity.federation.cli.ImportMetaData;
 import com.sun.identity.workflow.Task;
+
 /**
  * This class provides import entity provider related functionality. Currently
  * the supported types are SAMLv2, IDFF, and WSFederation.
@@ -89,6 +88,7 @@ public class ImportEntityModelImpl extends AMModelBase
      *
      * @throws AMConsoleException if unable to process this request.
      */
+    @Override
     public void importEntity(Map requestData) 
         throws AMConsoleException 
     {   
@@ -215,21 +215,11 @@ public class ImportEntityModelImpl extends AMModelBase
     }
             
     private void importSAML2MetaData(SAML2MetaManager metaManager, String realm)
-        throws SAML2MetaException, AMConsoleException
-    {        
+        throws SAML2MetaException, AMConsoleException {
+
         try {
             Document doc = XMLUtils.toDOMDocument(standardMetaData, debug);
-            ImportMetaData importmetadata = new ImportMetaData();
-                   importmetadata.workaroundAbstractRoleDescriptor(doc);
-            Object obj = SAML2MetaUtils.convertNodeToJAXB(doc); 
-
-            if (obj instanceof EntityDescriptorElement) {
-                EntityDescriptorElement descriptor =
-                    (EntityDescriptorElement)obj;
-             
-                SAML2MetaSecurityUtils.verifySignature(doc);
-                metaManager.createEntityDescriptor(realm, descriptor);             
-            }
+            SAML2MetaUtils.importSAML2Document(metaManager, realm, doc);
         } catch (JAXBException e) {
             debug.warning("ImportEntityModel.importSAML2MetaData", e);
             throw new AMConsoleException(e.getMessage());
