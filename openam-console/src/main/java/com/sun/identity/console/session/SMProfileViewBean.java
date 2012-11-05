@@ -28,7 +28,6 @@
 
 package com.sun.identity.console.session;
 
-import com.iplanet.dpro.session.service.AMSessionRepository;
 import com.iplanet.jato.model.ModelControlException;
 import com.iplanet.jato.view.View;
 import com.iplanet.jato.view.event.ChildDisplayEvent;
@@ -45,6 +44,7 @@ import com.sun.identity.console.session.model.SMProfileModel;
 import com.sun.identity.console.session.model.SMProfileModelImpl;
 import com.sun.identity.console.session.model.SMSessionCache;
 import com.sun.identity.console.session.model.SMSessionData;
+import com.sun.identity.coretoken.interfaces.AMSessionRepository;
 import com.sun.identity.shared.configuration.SystemPropertiesManager;
 import com.sun.web.ui.model.CCActionTableModel;
 import com.sun.web.ui.model.CCNavNodeInterface;
