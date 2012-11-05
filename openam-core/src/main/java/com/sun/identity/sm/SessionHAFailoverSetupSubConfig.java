@@ -29,7 +29,7 @@
 package com.sun.identity.sm;
 
 import com.iplanet.dpro.session.exceptions.StoreException;
-import com.iplanet.dpro.session.service.AMSessionRepository;
+import com.sun.identity.coretoken.interfaces.AMSessionRepository;
 import com.iplanet.sso.SSOException;
 import com.iplanet.sso.SSOToken;
 import com.sun.identity.shared.Constants;
@@ -128,7 +128,7 @@ public class SessionHAFailoverSetupSubConfig implements Constants {
                                                                        String serviceName, Map values)
             throws StoreException, IllegalStateException {
         if (thisCreateServiceSubConfigHasBeenUsed)
-        { throw new IllegalStateException(""); }
+            { throw new IllegalStateException("Illegal State Exception encountered, unable to allow Creation."); }
         return createServiceSubConfig(adminToken, siteName, DEFAULT_SITE_SERVICE_ID, serviceName, values);
     }
 
@@ -163,16 +163,21 @@ public class SessionHAFailoverSetupSubConfig implements Constants {
             // Create the Session HA Failover Indicator Setting for the Specified Site and
             // Add the Sub Configuration Entry.
             serviceConfig.addSubConfig(siteName, serviceID, 0, values);
-            // TODO Neither of these attempts below of poking cache work. Fix.
+
             // Tell our view Cache to update with the new Value!
             serviceConfigManagerImpl.objectChanged("ou"+EQUALS+siteName+COMMA+baseDN, ServiceListener.ADDED);
-            // Attempt to Force it!
-            serviceConfigManagerImpl.allObjectsChanged();
+            // TODO This attempt above of poking cache should work, but does not.  Fix!!!
+
             // Assume Success, if we hit here.
             successful = true;
+        } catch (ServiceAlreadyExistsException smsException) {
+                // Does Entry Already Exists?
+                // Yes, in which case, assume we were successful.
+                successful = true;
         } catch (SMSException smsException) {
             throw new StoreException("Unable to Dynamically Add the Session HA SF Property for DN:["
-                    + baseDN + "], SMSException: " + smsException.getMessage(), smsException);
+                    + baseDN + "], SMSErrorCode: " + smsException.getExceptionCode()
+                    +  "], SMSException: " + smsException.getMessage(), smsException);
         } catch (SSOException ssoException) {
             throw new StoreException("Unable to Dynamically Add the Session HA SF Property for DN:["
                     + baseDN + "], SSO Exception: " + ssoException.getMessage(), ssoException);

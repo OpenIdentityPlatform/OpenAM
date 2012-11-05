@@ -33,7 +33,7 @@
 package com.sun.identity.setup;
 
 import com.iplanet.am.util.AdminUtils;
-import com.iplanet.dpro.session.service.AMSessionRepository;
+import com.sun.identity.coretoken.interfaces.AMSessionRepository;
 import com.iplanet.services.ldap.DSConfigMgr;
 import com.iplanet.services.naming.WebtopNaming;
 import com.iplanet.services.util.Crypt;

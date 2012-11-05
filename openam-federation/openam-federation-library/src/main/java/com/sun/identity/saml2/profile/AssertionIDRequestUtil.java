@@ -37,40 +37,31 @@ import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.security.PrivateKey;
-import java.security.PublicKey;
 import java.security.cert.X509Certificate;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.xml.soap.SOAPException;
 import javax.xml.soap.SOAPMessage;
 import org.w3c.dom.Element;
 
-import com.sun.identity.plugin.session.SessionException;
-import com.sun.identity.plugin.session.SessionManager;
 import com.sun.identity.saml.xmlsig.KeyProvider;
 import com.sun.identity.saml.common.SAMLUtils;
 import com.sun.identity.saml2.assertion.Assertion;
 import com.sun.identity.saml2.assertion.AssertionFactory;
 import com.sun.identity.saml2.assertion.AssertionIDRef;
-import com.sun.identity.saml2.assertion.Attribute;
-import com.sun.identity.saml2.assertion.AttributeStatement;
-import com.sun.identity.saml2.assertion.Conditions;
 import com.sun.identity.saml2.assertion.Issuer;
-import com.sun.identity.saml2.assertion.NameID;
 import com.sun.identity.saml2.common.SAML2Constants;
 import com.sun.identity.saml2.common.SAML2Exception;
-import com.sun.identity.saml2.common.SAML2Repository;
+import com.sun.identity.saml2.common.SAML2RepositoryFactory;
 import com.sun.identity.saml2.common.SAML2Utils;
 import com.sun.identity.saml2.jaxb.entityconfig.BaseConfigType;
 import com.sun.identity.saml2.jaxb.metadata.AttributeAuthorityDescriptorElement;
 import com.sun.identity.saml2.jaxb.metadata.AssertionIDRequestServiceElement;
-import com.sun.identity.saml2.jaxb.metadata.AttributeServiceElement;
 import com.sun.identity.saml2.jaxb.metadata.AuthnAuthorityDescriptorElement;
 import com.sun.identity.saml2.jaxb.metadata.IDPSSODescriptorElement;
 import com.sun.identity.saml2.jaxb.metadata.RoleDescriptorType;
@@ -78,9 +69,7 @@ import com.sun.identity.saml2.jaxb.metadata.SPSSODescriptorElement;
 import com.sun.identity.saml2.key.KeyUtil;
 import com.sun.identity.saml2.meta.SAML2MetaException;
 import com.sun.identity.saml2.meta.SAML2MetaManager;
-import com.sun.identity.saml2.meta.SAML2MetaUtils;
 import com.sun.identity.saml2.plugins.AssertionIDRequestMapper;
-import com.sun.identity.saml2.plugins.DefaultAssertionIDRequestMapper;
 import com.sun.identity.saml2.protocol.AssertionIDRequest;
 import com.sun.identity.saml2.protocol.ProtocolFactory;
 import com.sun.identity.saml2.protocol.Response;
@@ -444,7 +433,7 @@ public class AssertionIDRequestUtil {
                         "reading assertion from DB. ID = " + assertionID);
                 }
                 String assertionStr =
-                    (String)SAML2Repository.getInstance().retrieve(assertionID);
+                    (String) SAML2RepositoryFactory.getInstance().retrieve(assertionID);
                 if (assertionStr != null) {
                     assertion = AssertionFactory.getInstance().createAssertion(
                         assertionStr);

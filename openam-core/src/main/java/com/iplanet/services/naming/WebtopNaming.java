@@ -753,7 +753,7 @@ public class WebtopNaming {
             if (namingTable != null) {
                 server = getValueFromTable(namingTable, serverID);
             }
-            if ( (namingTable != null) && (server == null) ) {
+            if (server == null) {
                 getNamingProfile(true);
                 server = getValueFromTable(namingTable, serverID);
             }

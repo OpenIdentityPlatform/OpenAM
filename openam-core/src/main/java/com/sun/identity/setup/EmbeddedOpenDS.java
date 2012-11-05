@@ -99,7 +99,7 @@ public class EmbeddedOpenDS {
      * List of Schema to be copied and applied during installation.
      */
     private static final String[] additionalSchemaToBeApplied = {
-            "/WEB-INF/template/ldif/sfha/98-amsessiondb.ldif"
+            "/WEB-INF/template/ldif/sfha/cts-add-schema.ldif"
     };
 
     /**

@@ -21,7 +21,7 @@ import com.iplanet.services.naming.WebtopNaming;
 import com.sun.identity.common.GeneralTaskRunnable;
 import com.sun.identity.common.SystemTimer;
 import com.sun.identity.ha.FAMPersisterManager;
-import org.forgerock.openam.session.model.FAMRecord;
+import com.sun.identity.sm.model.FAMRecord;
 import com.sun.identity.ha.FAMRecordPersister;
 import com.sun.identity.session.util.SessionUtils;
 import com.sun.identity.shared.Constants;
@@ -45,6 +45,7 @@ import java.util.UUID;
  *
  * @author Jonathan Scudder
  */
+@Deprecated
 public class JMQTokenRepo extends GeneralTaskRunnable implements JsonResource {
 
     final static Debug debug = Debug.getInstance("CTS");

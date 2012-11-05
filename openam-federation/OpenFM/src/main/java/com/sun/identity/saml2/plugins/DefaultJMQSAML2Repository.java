@@ -33,6 +33,7 @@ import com.sun.identity.common.SystemTimer;
 import com.sun.identity.common.GeneralTaskRunnable;
 
 import com.iplanet.dpro.session.SessionException;
+import com.sun.identity.coretoken.interfaces.AMTokenSAML2Repository;
 import com.sun.identity.shared.configuration.SystemPropertiesManager;
 
 import com.iplanet.dpro.session.service.SessionService;
@@ -47,7 +48,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Vector;
 import javax.jms.IllegalStateException;
-import org.forgerock.openam.session.model.FAMRecord;
+import com.sun.identity.sm.model.FAMRecord;
 import com.sun.identity.ha.FAMRecordPersister;
 import com.sun.identity.ha.FAMPersisterManager;
 import com.sun.identity.saml2.common.SAML2Utils;
@@ -57,8 +58,9 @@ import com.sun.identity.saml2.common.SAML2Utils;
  * This class is used in SAML2 failover mode to store/recover serialized
  * state of Assertion/Response object
  */
+@Deprecated
 public class DefaultJMQSAML2Repository extends GeneralTaskRunnable
-    implements JMQSAML2Repository {
+    implements AMTokenSAML2Repository {
 
     /* Operations */
     static public final String READ = "READ";
@@ -170,7 +172,7 @@ public class DefaultJMQSAML2Repository extends GeneralTaskRunnable
 
    /**
     *
-    * Constructs new JMQSAML2Repository
+    * Constructs new AMTokenSAML2Repository
     * @exception Exception when cannot create a new SAML2 repository
     *
     */
@@ -246,7 +248,7 @@ public class DefaultJMQSAML2Repository extends GeneralTaskRunnable
             }
             return null;
         } catch (Exception e) {
-            debug.message("JMQSAML2Repository.retrieve(): failed retrieving "
+            debug.message("AMTokenSAML2Repository.retrieve(): failed retrieving "
                     + "SAML2 object", e);
             return null;
         }
@@ -292,7 +294,7 @@ public class DefaultJMQSAML2Repository extends GeneralTaskRunnable
             }
             return null;
         } catch (Exception e) {
-            debug.message("JMQSAML2Repository.retrieve(): failed retrieving "
+            debug.message("AMTokenSAML2Repository.retrieve(): failed retrieving "
                     + "SAML2 object", e);
             return null;
         }
@@ -318,7 +320,7 @@ public class DefaultJMQSAML2Repository extends GeneralTaskRunnable
                 debug.message(DB_ERROR_MSG, e);
             }
         } catch (Exception e) {
-            debug.error("JMQSAML2Repository.delete(): failed deleting "
+            debug.error("AMTokenSAML2Repository.delete(): failed deleting "
                     + "SAML2 object", e);
         }
     }
@@ -345,7 +347,7 @@ public class DefaultJMQSAML2Repository extends GeneralTaskRunnable
                 debug.message(DB_ERROR_MSG, e);
             }
         } catch (Exception e) {
-            debug.error("JMQSAML2Repository.deleteExpired(): failed "
+            debug.error("AMTokenSAML2Repository.deleteExpired(): failed "
                     + "deleting Expired saml2 object", e);
         }
     }
@@ -378,7 +380,7 @@ public class DefaultJMQSAML2Repository extends GeneralTaskRunnable
                 debug.message(DB_ERROR_MSG, e);
             }
         } catch (Exception e) {
-            debug.error("JMQSAML2Repository.save(): failed "
+            debug.error("AMTokenSAML2Repository.save(): failed "
                     + "to save SAML2 object", e);
         }
     }
@@ -469,7 +471,7 @@ public class DefaultJMQSAML2Repository extends GeneralTaskRunnable
                 logDBStatus();
             }
         } catch (Exception e) {
-            debug.error("JMQSAML2Repository.run(): Exception in thread",
+            debug.error("AMTokenSAML2Repository.run(): Exception in thread",
                     e);
         }
 

@@ -45,7 +45,7 @@ import com.sun.identity.plugin.session.SessionException;
 import com.sun.identity.saml2.assertion.NameID;
 import com.sun.identity.saml2.common.SAML2Constants;
 import com.sun.identity.saml2.common.SAML2Exception;
-import com.sun.identity.saml2.common.SAML2Repository;
+import com.sun.identity.saml2.common.SAML2RepositoryFactory;
 import com.sun.identity.saml2.common.SAML2Utils;
 import com.sun.identity.saml2.jaxb.entityconfig.BaseConfigType;
 import com.sun.identity.saml2.jaxb.entityconfig.SPSSOConfigElement;
@@ -245,7 +245,7 @@ public class IDPSessionListener
             }
 
             if (SAML2Utils.isSAML2FailOverEnabled()) {
-                SAML2Repository.getInstance().delete(sessionIndex);   
+                SAML2RepositoryFactory.getInstance().delete(sessionIndex);
             }       
             if (SAML2Utils.debug.messageEnabled()) {
                 SAML2Utils.debug.message(

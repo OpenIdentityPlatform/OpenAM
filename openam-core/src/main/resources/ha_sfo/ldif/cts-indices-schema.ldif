@@ -1,0 +1,41 @@
+#
+# DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
+#
+# Copyright (c) 2011-2012 ForgeRock AS. All Rights Reserved
+#
+# The contents of this file are subject to the terms
+# of the Common Development and Distribution License
+# (the License). You may not use this file except in
+# compliance with the License.
+#
+# You can obtain a copy of the License at
+# http://forgerock.org/license/CDDLv1.0.html
+# See the License for the specific language governing
+# permission and limitations under the License.
+#
+# When distributing Covered Code, include this CDDL
+# Header Notice in each file and include the License file
+# at http://forgerock.org/license/CDDLv1.0.html
+# If applicable, add the following below the CDDL Header,
+# with the fields enclosed by brackets [] replaced by
+# your own identifying information:
+# "Portions Copyrighted [year] [name of copyright owner]"
+#
+
+dn: ds-cfg-attribute=pkey,cn=Index,ds-cfg-backend-id=@DB_NAME@,cn=Backends,cn=config
+objectClass: top
+objectClass: ds-cfg-local-db-index
+ds-cfg-attribute: pkey
+ds-cfg-index-type: equality
+
+dn: ds-cfg-attribute=skey,cn=Index,ds-cfg-backend-id=@DB_NAME@,cn=Backends,cn=config
+objectClass: top
+objectClass: ds-cfg-local-db-index
+ds-cfg-attribute: skey
+ds-cfg-index-type: equality
+
+dn: ds-cfg-attribute=expirationDate,cn=Index,ds-cfg-backend-id=@DB_NAME@,cn=Backends,cn=config
+objectClass: top
+objectClass: ds-cfg-local-db-index
+ds-cfg-attribute: expirationDate
+ds-cfg-index-type: equality

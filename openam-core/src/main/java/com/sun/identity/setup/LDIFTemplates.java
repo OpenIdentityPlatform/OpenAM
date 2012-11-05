@@ -31,8 +31,10 @@
 package com.sun.identity.setup;
 
 import com.sun.identity.shared.debug.Debug;
+
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -47,26 +49,27 @@ public class LDIFTemplates {
 
     static {
         templates = new ArrayList();
-	    templates.add("ad/ad_user_schema.ldif");
+        templates.add("ad/ad_user_schema.ldif");
         templates.add("adam/adam_user_schema.ldif");
-	    templates.add("opendj/opendj_config_schema.ldif");
-	    templates.add("opendj/opendj_user_schema.ldif");
-	    templates.add("opendj/opendj_embinit.ldif");
-	    templates.add("opendj/opendj_userinit.ldif");
-	    templates.add("opendj/opendj_user_index.ldif");
-	    templates.add("opendj/opendj_plugin.ldif");
-	    templates.add("opendj/opendj_remove_user_schema.ldif");
-	    templates.add("odsee/odsee_config_schema.ldif");
-	    templates.add("odsee/odsee_config_index.ldif");
-	    templates.add("odsee/odsee_user_index.ldif");
-	    templates.add("odsee/odsee_user_schema.ldif");
-	    templates.add("odsee/odsee_plugin.ldif");
-	    templates.add("odsee/odsee_userinit.ldif");
-	    templates.add("odsee/amsdk_plugin/amsdk_init_template.ldif");
-	    templates.add("odsee/amsdk_plugin/amsdk_sunone_schema2.ldif");
-	    templates.add("tivoli/tivoli_user_schema.ldif");
-        templates.add("sfha/amsessiondb_container.ldif");
-        templates.add("sfha/opendj_amsessiondb_index.ldif");
+        templates.add("opendj/opendj_config_schema.ldif");
+        templates.add("opendj/opendj_user_schema.ldif");
+        templates.add("opendj/opendj_embinit.ldif");
+        templates.add("opendj/opendj_userinit.ldif");
+        templates.add("opendj/opendj_user_index.ldif");
+        templates.add("opendj/opendj_plugin.ldif");
+        templates.add("opendj/opendj_remove_user_schema.ldif");
+        templates.add("odsee/odsee_config_schema.ldif");
+        templates.add("odsee/odsee_config_index.ldif");
+        templates.add("odsee/odsee_user_index.ldif");
+        templates.add("odsee/odsee_user_schema.ldif");
+        templates.add("odsee/odsee_plugin.ldif");
+        templates.add("odsee/odsee_userinit.ldif");
+        templates.add("odsee/amsdk_plugin/amsdk_init_template.ldif");
+        templates.add("odsee/amsdk_plugin/amsdk_sunone_schema2.ldif");
+        templates.add("tivoli/tivoli_user_schema.ldif");
+        templates.add("sfha/cts-add-schema.ldif");
+        templates.add("sfha/cts-container.ldif");
+        templates.add("sfha/cts-indices-schema.ldif");
     }
 
     private LDIFTemplates() {
@@ -83,22 +86,25 @@ public class LDIFTemplates {
                 AMSetupServlet.writeToFile(newFile, content);
             } catch (IOException e) {
                 Debug.getInstance(SetupConstants.DEBUG_NAME).error(
-                    "LDIFTemplates.copy", e);
+                        "LDIFTemplates.copy", e);
             }
         }
     }
 
     private static String getContent(
-        String templateName,
-        ServletContext servletCtx
+            String templateName,
+            ServletContext servletCtx
     ) {
         InputStreamReader fin = null;
         StringBuilder sbuf = new StringBuilder();
 
         try {
-            fin = new InputStreamReader(
-                AMSetupServlet.getResourceAsStream(servletCtx,
-                "/WEB-INF/template/ldif/" + templateName));
+            InputStream inputStream = AMSetupServlet.getResourceAsStream(servletCtx,
+                    "/WEB-INF/template/ldif/" + templateName);
+            if (inputStream == null) {
+                return null;
+            }
+            fin = new InputStreamReader(inputStream);
             char[] cbuf = new char[1024];
             int len;
             while ((len = fin.read(cbuf)) > 0) {
@@ -106,7 +112,7 @@ public class LDIFTemplates {
             }
         } catch (IOException e) {
             Debug.getInstance(SetupConstants.DEBUG_NAME).error(
-                "LDIFTemplates.getContent", e);
+                    "LDIFTemplates.getContent", e);
         } finally {
             if (fin != null) {
                 try {

@@ -36,25 +36,21 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
 import java.security.PrivateKey;
-import java.security.PublicKey;
 import java.security.cert.X509Certificate;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.xml.soap.SOAPException;
 import javax.xml.soap.SOAPMessage;
+
+import com.sun.identity.saml2.common.SAML2RepositoryFactory;
 import org.w3c.dom.Element;
 
-import com.sun.identity.plugin.session.SessionException;
-import com.sun.identity.plugin.session.SessionManager;
-import com.sun.identity.plugin.session.SessionProvider;
 import com.sun.identity.saml.xmlsig.KeyProvider;
 import com.sun.identity.saml2.assertion.Assertion;
 import com.sun.identity.saml2.assertion.AssertionFactory;
 import com.sun.identity.saml2.assertion.AuthnContext;
 import com.sun.identity.saml2.assertion.AuthnStatement;
-import com.sun.identity.saml2.assertion.Conditions;
 import com.sun.identity.saml2.assertion.EncryptedAssertion;
 import com.sun.identity.saml2.assertion.EncryptedID;
 import com.sun.identity.saml2.assertion.Issuer;
@@ -62,15 +58,11 @@ import com.sun.identity.saml2.assertion.NameID;
 import com.sun.identity.saml2.assertion.Subject;
 import com.sun.identity.saml2.common.SAML2Constants;
 import com.sun.identity.saml2.common.SAML2Exception;
-import com.sun.identity.saml2.common.SAML2Repository;
 import com.sun.identity.saml2.common.SAML2Utils;
 import com.sun.identity.saml2.jaxb.entityconfig.AuthnAuthorityConfigElement;
 import com.sun.identity.saml2.jaxb.metadata.AuthnAuthorityDescriptorElement;
 import com.sun.identity.saml2.jaxb.metadata.AuthnQueryServiceElement;
 import com.sun.identity.saml2.jaxb.metadata.SPSSODescriptorElement;
-import com.sun.identity.saml2.jaxb.metadataattr.EntityAttributesType;
-import com.sun.identity.saml2.jaxb.metadataattr.EntityAttributesElement;
-import com.sun.identity.saml2.jaxb.metadataattr.ObjectFactory;
 import com.sun.identity.saml2.key.KeyUtil;
 import com.sun.identity.saml2.meta.SAML2MetaException;
 import com.sun.identity.saml2.meta.SAML2MetaManager;
@@ -248,7 +240,7 @@ public class AuthnQueryUtil {
                 SAML2Utils.debug.message("AuthnQueryUtil.processAuthnQuery: " +
                     "getting user assertions from DB. user = " + cacheKey);
             }
-            List list = SAML2Repository.getInstance().retrieveWithSecondaryKey(
+            List list = SAML2RepositoryFactory.getInstance().retrieveWithSecondaryKey(
                 cacheKey);
             if ((list != null) && (!list.isEmpty())) {
                 assertions = new ArrayList();

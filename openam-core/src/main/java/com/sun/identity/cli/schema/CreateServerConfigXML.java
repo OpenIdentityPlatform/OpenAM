@@ -31,7 +31,6 @@
  */
 package com.sun.identity.cli.schema;
 
-import com.iplanet.dpro.session.service.AMSessionRepository;
 import com.iplanet.sso.SSOToken;
 import com.sun.identity.cli.AccessManagerConstants;
 import com.sun.identity.cli.AuthenticatedCommand;
@@ -52,7 +51,6 @@ import java.util.Iterator;
 import java.util.List;
 
 import com.sun.identity.shared.Constants;
-import com.sun.identity.shared.configuration.SystemPropertiesManager;
 import com.sun.identity.shared.ldap.LDAPDN;
 import com.sun.identity.shared.ldap.util.DN;
 import com.sun.identity.shared.ldap.util.RDN;

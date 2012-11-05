@@ -39,6 +39,7 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
 
+import com.sun.identity.coretoken.interfaces.AMSessionRepository;
 import com.sun.identity.shared.debug.Debug;
 import com.iplanet.dpro.session.Session;
 import com.iplanet.dpro.session.SessionException;

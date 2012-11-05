@@ -78,7 +78,7 @@ import javax.xml.soap.SOAPException;
 import com.sun.identity.plugin.session.SessionManager;
 import com.sun.identity.plugin.session.SessionProvider;
 import com.sun.identity.plugin.session.SessionException;
-import com.sun.identity.saml2.common.SAML2Repository;
+import com.sun.identity.saml2.common.SAML2RepositoryFactory;
 import com.sun.identity.saml2.protocol.IDPList;
 import org.w3c.dom.Element;
 
@@ -284,7 +284,7 @@ public class IDPProxyUtil {
         if (SAML2Utils.isSAML2FailOverEnabled()) {
             // sessionExpireTime is counted in seconds
             long sessionExpireTime = System.currentTimeMillis() / 1000 + SPCache.interval;                    
-            SAML2Repository.getInstance().save(requestID, 
+            SAML2RepositoryFactory.getInstance().save(requestID,
                     new AuthnRequestInfoCopy(reqInfo), sessionExpireTime, null);
             if (SAML2Utils.debug.messageEnabled()) {
                 SAML2Utils.debug.message(classMethod + " SAVE AuthnRequestInfoCopy for requestID " + requestID);

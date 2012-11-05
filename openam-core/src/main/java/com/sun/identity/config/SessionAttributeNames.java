@@ -66,7 +66,7 @@ public interface SessionAttributeNames {
     static final  String USER_STORE_LOGIN_PWD = "userStoreLoginPassword";
     static final  String USER_STORE_TYPE = "userStoreType";
 
-    static final  String LB_SITE_NAME = "wizardLoadBalancerSiteName";
-    static final  String LB_PRIMARY_URL = "wizardLoadBalancerURL";
-    static final  String LB_SESSION_HA_SFO = "wizardLoadBalancerSessionHASFO";
+    static final  String LB_SITE_NAME = "loadBalancerSiteName";
+    static final  String LB_PRIMARY_URL = "loadBalancerURL";
+    static final  String LB_SESSION_HA_SFO = "loadBalancerSessionHASFO";
 }

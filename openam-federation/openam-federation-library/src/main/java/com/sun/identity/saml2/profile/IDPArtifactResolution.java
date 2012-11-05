@@ -62,7 +62,7 @@ import com.sun.identity.saml2.assertion.AssertionFactory;
 import com.sun.identity.saml2.assertion.Issuer;
 import com.sun.identity.saml2.common.SAML2Constants;
 import com.sun.identity.saml2.common.SAML2Exception;
-import com.sun.identity.saml2.common.SAML2Repository;
+import com.sun.identity.saml2.common.SAML2RepositoryFactory;
 import com.sun.identity.saml2.common.SAML2Utils;
 import com.sun.identity.saml2.jaxb.metadata.SPSSODescriptorElement;
 import com.sun.identity.saml2.key.KeyUtil;
@@ -423,7 +423,7 @@ public class IDPArtifactResolution {
                     if (SAML2Utils.debug.messageEnabled()) {
                         SAML2Utils.debug.message("Artifact=" + artStr);
                     }
-                    String tmp = (String) SAML2Repository.getInstance()
+                    String tmp = (String) SAML2RepositoryFactory.getInstance()
                             .retrieve(artStr);
                     res = ProtocolFactory.getInstance().createResponse(tmp);
                 } catch (SAML2Exception e) {
@@ -444,7 +444,7 @@ public class IDPArtifactResolution {
         // Remove Response from persistent DB
         try {
             if (saml2FailoverEnabled) {
-                SAML2Repository.getInstance().delete(artStr);
+                SAML2RepositoryFactory.getInstance().delete(artStr);
             }
         } catch (SAML2Exception e) {
             SAML2Utils.debug.error(classMethod + "Error deleting the SAML object from the repository", e);

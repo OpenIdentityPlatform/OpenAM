@@ -261,11 +261,6 @@
 
         <dependency>
             <groupId>org.forgerock.openam</groupId>
-            <artifactId>openam-session-ha-core</artifactId>
-        </dependency>
-
-        <dependency>
-            <groupId>org.forgerock.openam</groupId>
             <artifactId>openam-rest</artifactId>
         </dependency>
 

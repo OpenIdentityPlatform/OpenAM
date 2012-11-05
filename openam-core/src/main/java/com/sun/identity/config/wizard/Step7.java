@@ -152,7 +152,7 @@ public class Step7 extends AjaxPage {
         } else {
             tmp = DISABLED;
         }
-        add("loadBalancerSessionHASFO", tmp);
+        add(SessionAttributeNames.LB_SESSION_HA_SFO, tmp);
 
         // Initialize our Parent Object.
         super.onInit();

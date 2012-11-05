@@ -32,6 +32,7 @@
 
 package com.sun.identity.saml2.profile;
 
+import com.sun.identity.saml2.common.*;
 import com.sun.identity.shared.encode.URLEncDec;
 import com.sun.identity.shared.DateUtils;
 import com.sun.identity.shared.xml.XMLUtils;
@@ -59,14 +60,7 @@ import com.sun.identity.saml2.assertion.NameID;
 import com.sun.identity.saml2.assertion.Subject;
 import com.sun.identity.saml2.assertion.SubjectConfirmation;
 import com.sun.identity.saml2.assertion.SubjectConfirmationData;
-import com.sun.identity.saml2.common.AccountUtils;
-import com.sun.identity.saml2.common.NameIDInfo;
-import com.sun.identity.saml2.common.NewBoolean;
-import com.sun.identity.saml2.common.SAML2Constants;
-import com.sun.identity.saml2.common.SAML2Exception;
-import com.sun.identity.saml2.common.SAML2InvalidNameIDPolicyException;
-import com.sun.identity.saml2.common.SAML2Utils;
-import com.sun.identity.saml2.common.SAML2Repository;
+import com.sun.identity.saml2.common.SAML2RepositoryFactory;
 import com.sun.identity.saml2.ecp.ECPFactory;
 import com.sun.identity.saml2.ecp.ECPResponse;
 import com.sun.identity.saml2.idpdiscovery.IDPDiscoveryConstants;
@@ -823,7 +817,7 @@ public class IDPSSOUtil {
                     (SAML2Utils.isSAML2FailOverEnabled())) {
                 // Read from DataBase
                 IDPSessionCopy idpSessionCopy = (IDPSessionCopy)
-                    SAML2Repository.getInstance().retrieve(sessionIndex);
+                    SAML2RepositoryFactory.getInstance().retrieve(sessionIndex);
                 // Copy back to IDPSession
                 if (idpSessionCopy != null) {
                     idpSession = new IDPSession(idpSessionCopy);
@@ -963,7 +957,7 @@ public class IDPSSOUtil {
 
             IDPCache.assertionByIDCache.put(assertionID, assertion);
             if (SAML2Utils.isSAML2FailOverEnabled()) {
-                SAML2Repository.getInstance().save(assertionID,
+                SAML2RepositoryFactory.getInstance().save(assertionID,
                     assertion.toXMLString(true, true),
                     conditions.getNotOnOrAfter().getTime() / 1000,
                     cacheKey);
@@ -979,7 +973,7 @@ public class IDPSSOUtil {
             long sessionExpireTime = System.currentTimeMillis() / 1000 +
                  (sessionProvider.getTimeLeft(session));
             if (SAML2Utils.isSAML2FailOverEnabled()) {
-                SAML2Repository.getInstance().save(sessionIndex,
+                SAML2RepositoryFactory.getInstance().save(sessionIndex,
                     new IDPSessionCopy(idpSession), sessionExpireTime, null);
             }
             if (SAML2Utils.debug.messageEnabled()) {
@@ -2113,7 +2107,7 @@ public class IDPSSOUtil {
             if (SAML2Utils.isSAML2FailOverEnabled()) {
                 long expireTime = getValidTimeofResponse(
                     realm, idpEntityID,res);
-                SAML2Repository.getInstance().save(
+                SAML2RepositoryFactory.getInstance().save(
                     artStr,res.toXMLString(true,true),expireTime / 1000,
                     null);
                 if (SAML2Utils.debug.messageEnabled()) {

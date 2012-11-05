@@ -53,6 +53,7 @@ import javax.xml.soap.SOAPConnection;
 import javax.xml.soap.SOAPException;
 import javax.xml.soap.SOAPMessage;
 
+import com.sun.identity.saml2.common.*;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import com.sun.identity.common.SystemConfigurationUtil;
@@ -74,14 +75,7 @@ import com.sun.identity.saml2.assertion.NameID;
 import com.sun.identity.saml2.assertion.EncryptedID;
 import com.sun.identity.saml2.assertion.EncryptedAttribute;
 
-import com.sun.identity.saml2.common.AccountUtils;
-import com.sun.identity.saml2.common.NameIDInfo;
-import com.sun.identity.saml2.common.NameIDInfoKey;
-import com.sun.identity.saml2.common.SAML2Constants;
-import com.sun.identity.saml2.common.SAML2Exception;
-import com.sun.identity.saml2.common.SAML2SDKUtils;
-import com.sun.identity.saml2.common.SAML2Utils;
-import com.sun.identity.saml2.common.SAML2Repository;
+import com.sun.identity.saml2.common.SAML2RepositoryFactory;
 import com.sun.identity.saml2.ecp.ECPFactory;
 import com.sun.identity.saml2.ecp.ECPRelayState;
 import com.sun.identity.saml2.jaxb.entityconfig.IDPSSOConfigElement;
@@ -1453,7 +1447,7 @@ public class SPACSUtils {
             SPCache.assertionByIDCache.put(assertionID, SAML2Constants.ONETIME);
             try {
                 if (SAML2Utils.isSAML2FailOverEnabled()) {
-                    SAML2Repository.getInstance().save(assertionID,
+                    SAML2RepositoryFactory.getInstance().save(assertionID,
                     SAML2Constants.ONETIME, 
                     ((Long) smap.get(SAML2Constants.NOTONORAFTER)).longValue(),
                     null);
@@ -1807,7 +1801,7 @@ public class SPACSUtils {
                     // Try and retrieve the value from the SAML2 repository
                     // The key is this way to make it unique compared to when
                     // the same key is used to store a copy of the AuthnRequestInfo
-                    String relayState = (String)SAML2Repository.getInstance().retrieve(relayStateID + relayStateID);
+                    String relayState = (String) SAML2RepositoryFactory.getInstance().retrieve(relayStateID + relayStateID);
                     if (relayState != null) {
                         // Get back the relayState
                         relayStateUrl = relayState;

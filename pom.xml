@@ -165,6 +165,9 @@
     <modules>
 
         <!-- OpenAM Shared - Common Module -->
+        <module>openam-locale</module>
+
+        <!-- OpenAM Shared - Common Module -->
         <module>openam-shared</module>
 
         <!-- OpenAM Entitlement Module -->
@@ -182,7 +185,7 @@
         <!-- OpenAM REST - CORE Module -->
         <module>openam-rest</module>
 
-        <!-- OpenAM Forgerock REST - CORE Module -->
+        <!-- OpenAM ForgeRock REST - CORE Module -->
         <!-- Commenting out until it gets stable -->
         <!-- <module>openam-forgerock-rest</module> -->
 
@@ -193,9 +196,6 @@
 
         <!-- OpenAM Common Test Suite -->
         <module>openam-test</module>
-
-        <!-- OpenAM Session High-Availability FailOver Module -->
-        <module>openam-session-ha</module>
 
         <!-- OpenAM Federation Modules -->
         <module>openam-federation</module>
@@ -211,11 +211,9 @@
         <module>openam-server-auth-ui</module>
 
         <module>openam-server-only</module>
+
         <!-- OpenAM Server -->
         <module>openam-server</module>
-
-        <!-- OpenAM Standalone Container Environment -->
-        <module>openam-server-engine</module>
 
         <!-- Tools Artifacts -->
         <module>openam-tools</module>

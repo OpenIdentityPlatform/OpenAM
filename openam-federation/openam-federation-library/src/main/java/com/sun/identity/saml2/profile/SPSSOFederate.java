@@ -37,17 +37,13 @@ import com.sun.identity.liberty.ws.paos.PAOSConstants;
 import com.sun.identity.liberty.ws.paos.PAOSHeader;
 import com.sun.identity.liberty.ws.paos.PAOSRequest;
 import com.sun.identity.federation.common.FSUtils;
-import com.sun.identity.saml.common.SAMLConstants;
 import com.sun.identity.saml.common.SAMLUtils;
 import com.sun.identity.saml.xmlsig.KeyProvider;
 import com.sun.identity.saml2.assertion.AssertionFactory;
 import com.sun.identity.saml2.assertion.Issuer;
+import com.sun.identity.saml2.common.*;
 import com.sun.identity.saml2.logging.LogUtil;
-import com.sun.identity.saml2.common.SAML2Constants;
-import com.sun.identity.saml2.common.SAML2Exception;
-import com.sun.identity.saml2.common.SAML2Utils;
-import com.sun.identity.saml2.common.QuerySignatureUtil;
-import com.sun.identity.saml2.common.SAML2Repository;
+import com.sun.identity.saml2.common.SAML2RepositoryFactory;
 import com.sun.identity.saml2.ecp.ECPFactory;
 import com.sun.identity.saml2.ecp.ECPRelayState;
 import com.sun.identity.saml2.ecp.ECPRequest;
@@ -86,7 +82,6 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.ArrayList;
 import java.util.Map;
-import java.util.StringTokenizer;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.xml.soap.SOAPException;
@@ -368,7 +363,7 @@ public class SPSSOFederate {
             if (SAML2Utils.isSAML2FailOverEnabled()) {
                 // sessionExpireTime is counted in seconds
                 long sessionExpireTime = System.currentTimeMillis() / 1000 + SPCache.interval;                    
-                SAML2Repository.getInstance().save(authnRequest.getID(), new AuthnRequestInfoCopy(reqInfo), sessionExpireTime, null);
+                SAML2RepositoryFactory.getInstance().save(authnRequest.getID(), new AuthnRequestInfoCopy(reqInfo), sessionExpireTime, null);
                 if (SAML2Utils.debug.messageEnabled()) {
                     SAML2Utils.debug.message("SPSSOFederate.initiateAuthnRequest:"
                             + " SAVE AuthnRequestInfoCopy for requestID " + authnRequest.getID());
@@ -615,7 +610,7 @@ public class SPSSOFederate {
             if (SAML2Utils.isSAML2FailOverEnabled()) {
                 // sessionExpireTime is counted in seconds
                 long sessionExpireTime = System.currentTimeMillis() / 1000 + SPCache.interval;                    
-                SAML2Repository.getInstance().save(authnRequest.getID(), 
+                SAML2RepositoryFactory.getInstance().save(authnRequest.getID(),
                         new AuthnRequestInfoCopy(reqInfo), sessionExpireTime, null);
                 if (SAML2Utils.debug.messageEnabled()) {
                     SAML2Utils.debug.message("SPSSOFederate.initiateECPRequest:"
@@ -1053,7 +1048,7 @@ public class SPSSOFederate {
             try {
                 // Need to make the key unique due to the requestID also being used to
                 // store a copy of the AuthnRequestInfo
-                SAML2Repository.getInstance().save(requestID + requestID, relayState, sessionExpireTime, null);
+                SAML2RepositoryFactory.getInstance().save(requestID + requestID, relayState, sessionExpireTime, null);
             } catch (SAML2Exception ex) {
                 if (SAML2Utils.debug.messageEnabled()) {
                     SAML2Utils.debug.message("SPSSOFederate.getRelayStateID: Unable to SAVE relayState for requestID "

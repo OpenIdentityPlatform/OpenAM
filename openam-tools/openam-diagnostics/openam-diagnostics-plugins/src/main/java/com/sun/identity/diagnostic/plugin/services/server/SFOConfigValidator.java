@@ -35,7 +35,7 @@ import java.util.Set;
 import java.util.StringTokenizer;
 
 import com.iplanet.am.util.SystemProperties;
-import com.iplanet.dpro.session.service.AMSessionRepository;
+import com.sun.identity.coretoken.interfaces.AMSessionRepository;
 import com.iplanet.services.naming.WebtopNaming;
 import com.iplanet.sso.SSOToken;
 import com.sun.identity.common.configuration.ServerConfiguration;
