@@ -288,11 +288,12 @@
                             <filtering>false</filtering>
                         </webResource>
                         <webResource>
-                            <directory>${project.basedir}/../openam-session-ha/openam-session-ha-core/src/main/resources/ldif
+                            <directory>${project.basedir}/../openam-core/src/main/resources/ha_sfo/ldif
                             </directory>
                             <includes>
-                                <!-- The xx-...ldif Files get moved into Place when installing OpenDJ. -->
-                                <include>98-amsessiondb.ldif</include>
+                                <!-- These Files get moved into Place when installing OpenDJ. -->
+                                <include>cts-add-schema.ldif</include>
+                                <include>cts-delete-schema.ldif</include>
                             </includes>
                             <targetPath>WEB-INF/template/ldif/sfha</targetPath>
                             <filtering>false</filtering>
