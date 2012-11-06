@@ -26,8 +26,8 @@
  *
  */
 
-/*
- * Portions Copyrighted 2011-2012 ForgeRock AS
+/**
+ * Portions Copyrighted 2011-2012 ForgeRock Inc
  */
 
 package com.sun.identity.authentication.modules.ldap;
@@ -153,7 +153,7 @@ public class LDAPAuthUtils {
     String [] attrs = null;
     private static Debug debug2 = Debug.getInstance("amAuthLDAP");
     private static String AD_PASSWORD_EXPIRED = "data 532";
-    private static String AD_ACCOUNT_DISABLED = "data 553";
+    private static String AD_ACCOUNT_DISABLED = "data 533";
     private static String AD_ACCOUNT_EXPIRED = "data 701";
     private static String AD_PASSWORD_RESET = "data 773";
     private static String AD_ACCOUNT_LOCKED = "data 775";
