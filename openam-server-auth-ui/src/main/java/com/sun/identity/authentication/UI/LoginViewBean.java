@@ -26,10 +26,9 @@
  *
  */
 
-/*
- * Portions Copyrighted 2010-2011 ForgeRock AS
+/**
+ * Portions Copyrighted 2010-2012 ForgeRock Inc
  */
-
 package com.sun.identity.authentication.UI;
 
 //import com.iplanet.am.util.AMURLEncDec;
@@ -546,7 +545,6 @@ public class LoginViewBean extends AuthViewBeanBase {
             // forward check for liberty federation, if the redirect_url
             // is the federation post login servlet, use forward instead
             boolean doForward = AuthUtils.isForwardSuccess(ac,request);
-            Cookie appendCookie = AuthUtils.getCookieString(ac, null);
 
             if (AuthUtils.isGenericHTMLClient(client_type) || doForward) {
                 try {
@@ -604,6 +602,7 @@ public class LoginViewBean extends AuthViewBeanBase {
                         }
                     }
                     
+                    Cookie appendCookie = AuthUtils.getCookieString(ac, null);
                     clearGlobals();
                     if (doForward) {
                         loginDebug.message("LoginViewBean.forwardRequest=true");
@@ -611,7 +610,11 @@ public class LoginViewBean extends AuthViewBeanBase {
                             loginDebug.message("LoginViewBean.forwardTo():" +
                             "Forward URL before appending cookie is " + 
                             redirect_url); 
-                        }                 
+                        }
+                        //since this is a request FORWARD, we MUST add the session id to the URL, otherwise federation
+                        //would not have any knowledge about the freshly created session ID - this can be especially
+                        //a problem, when upgrading session: old session ID cookie is still present in the request
+                        //but the new isn't.
                         if(redirect_url.indexOf("?") == -1){
                             redirect_url = redirect_url + "?" + 
                             appendCookie.getName() + "=" + 
