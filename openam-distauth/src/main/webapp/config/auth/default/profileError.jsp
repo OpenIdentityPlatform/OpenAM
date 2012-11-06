@@ -72,7 +72,7 @@
                                 <fieldset>
                                     <div class="row">
                                         <input name="Login.ButtonLogin" type="hidden"/>
-                                        <input name="Continue" type="submit" class="button primary" onclick="LoginSubmit('<jato:text name="cmdContinue" />')" value="<jato:text name="lblContinue" />" />
+                                        <input name="Continue" type="submit" class="button primary" onclick="LoginSubmit('<jato:text name="cmdContinue" />'); return false;" value="<jato:text name="lblContinue" />" />
                                     </div>
                                 </fieldset>
                             </auth:form>

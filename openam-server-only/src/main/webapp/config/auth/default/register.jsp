@@ -197,15 +197,15 @@
                                     <jato:content name="hasButton">
                                         <div class="row">
                                             <jato:tiledView name="tiledButtons" type="com.sun.identity.authentication.UI.ButtonTiledView">
-                                                <input name="Login.Submit" type="button" onclick="LoginSubmit('<jato:text name="txtButton" />')" class="<jato:text name="txtClass" />" value="<jato:text name="txtButton" />" />
+                                                <input name="Login.Submit" type="button" onclick="LoginSubmit('<jato:text name="txtButton" />'); return false;" class="<jato:text name="txtClass" />" value="<jato:text name="txtButton" />" />
                                             </jato:tiledView>
-                                            <input name="Login.Submit" type="button" onclick="resetForms()" class="button" value="<jato:text name="lblReset" />" />
+                                            <input name="Login.Submit" type="button" onclick="resetForms(); return false;" class="button" value="<jato:text name="lblReset" />" />
                                         </div>
                                     </jato:content>
                                     <jato:content name="hasNoButton">
                                         <div class="row">
-                                            <input name="Login.Submit" type="button" onclick="LoginSubmit('<jato:text name="cmdSubmit" />')" class="button primary" value="<jato:text name="lblSubmit" />" />
-                                            <input name="Login.Submit" type="button" onclick="resetForms()" class="button" value="<jato:text name="lblReset" />" />
+                                            <input name="Login.Submit" type="button" onclick="LoginSubmit('<jato:text name="cmdSubmit" />'); return false;" class="button primary" value="<jato:text name="lblSubmit" />" />
+                                            <input name="Login.Submit" type="button" onclick="resetForms(); return false;" class="button" value="<jato:text name="lblReset" />" />
                                         </div>
                                     </jato:content>
                                 </fieldset>

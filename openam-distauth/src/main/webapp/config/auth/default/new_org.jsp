@@ -82,7 +82,7 @@
                                         <div class="row">
                                             <input name="IDButton" type="hidden"/>
                                             <jato:tiledView name="tiledButtons" type="com.sun.identity.authentication.UI.ButtonTiledView">
-                                                <input name="Login.Submit" type="button" class="<jato:text name="txtClass" />" onclick="LoginSubmit('<jato:text name="txtButton" />')" value="<jato:text name="txtButton" />" />
+                                                <input name="Login.Submit" type="button" class="<jato:text name="txtClass" />" onclick="LoginSubmit('<jato:text name="txtButton" />'); return false;" value="<jato:text name="txtButton" />" />
                                             </jato:tiledView>
                                         </div>
                                     </jato:content>

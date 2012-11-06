@@ -197,7 +197,7 @@
                                             <div class="row">
                                                 <jato:tiledView name="tiledButtons"
                                                                 type="com.sun.identity.authentication.UI.ButtonTiledView">
-                                                    <input name="Login.Submit" type="button" onclick="LoginSubmit('<jato:text name="txtButton" />')" class="button" value="<jato:text name="txtButton" />" />
+                                                    <input name="Login.Submit" type="button" onclick="LoginSubmit('<jato:text name="txtButton" />'); return false;" class="button" value="<jato:text name="txtButton" />" />
 
                                                 </jato:tiledView>
                                             </div>
@@ -216,8 +216,8 @@
                                         </jato:content>
                                         <jato:content name="hasNoButton">
                                             <div class="row">
-                                                <input name="Login.Submit" type="submit" onclick="LoginSubmit('<jato:text name="cmdSubmit" />')" class="button primary" value="<jato:text name="lblSubmit" />" />
-                                                <input name="Login.Submit" type="submit" onclick="LoginSubmit('<jato:text name="cmdNewUser" />')" class="button" value="<jato:text name="lblNewUser" />" />
+                                                <input name="Login.Submit" type="submit" onclick="LoginSubmit('<jato:text name="cmdSubmit" />'); return false;" class="button primary" value="<jato:text name="lblSubmit" />" />
+                                                <input name="Login.Submit" type="submit" onclick="LoginSubmit('<jato:text name="cmdNewUser" />'); return false;" class="button" value="<jato:text name="lblNewUser" />" />
                                             </div>
                                         </jato:content>
                                     </fieldset>

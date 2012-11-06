@@ -140,7 +140,7 @@
                                 <div class="row"><label for="<%= activation %>"><%=activationLabel%></label><input class="textbox" type="text" id="<%= activation %>" name="<%= activation %>"/></div>
                                 <div class="row">
                                     <input type="submit" class="button primary" value="<%= submitValue %>" name="<%= submitButton %>"/>
-                                    <input type="button" class="button" value="<%= cancelValue %>" name="<%= submitButton %>" onclick="adios()"/>
+                                    <input type="button" class="button" value="<%= cancelValue %>" name="<%= submitButton %>" onclick="adios(); return false;"/>
                                 </div>
                             </fieldset>
                         </form> 

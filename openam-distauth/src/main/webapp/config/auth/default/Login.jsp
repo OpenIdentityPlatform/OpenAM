@@ -178,7 +178,7 @@
                                                 <div class="row">
                                                     <jato:tiledView name="tiledButtons"
                                                                     type="com.sun.identity.authentication.UI.ButtonTiledView">
-                                                        <input name="Login.Submit" type="button" onclick="LoginSubmit('<jato:text name="txtButton" />')" class="button" value="<jato:text name="txtButton" />" />
+                                                        <input name="Login.Submit" type="button" onclick="LoginSubmit('<jato:text name="txtButton" />'); return false;" class="button" value="<jato:text name="txtButton" />" />
 
                                                     </jato:tiledView>
                                                 </div>
@@ -197,7 +197,7 @@
                                             </jato:content>
                                             <jato:content name="hasNoButton">
                                                 <div class="row">
-                                                    <input name="Login.Submit" type="submit" onclick="LoginSubmit('<jato:text name="lblSubmit" />')" class="button primary" value="<jato:text name="lblSubmit" />" />
+                                                    <input name="Login.Submit" type="submit" onclick="LoginSubmit('<jato:text name="lblSubmit" />'); return false;" class="button primary" value="<jato:text name="lblSubmit" />" />
                                                 </div>
                                             </jato:content>
                                         </fieldset>

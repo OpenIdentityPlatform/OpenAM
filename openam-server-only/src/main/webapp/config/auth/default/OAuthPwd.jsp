@@ -248,7 +248,7 @@ resizable=yes,scrollbars=yes,toolbar=yes,menubar=no,location=no,directories=no,s
                                 </div>
                                 <div class="row">
                                     <input type="submit" class="button primary" value="<%= submitValue %>" name="<%= button1 %>"/>
-                                    <input type="button" class="button" value="<%= cancelValue %>" name="<%= button1 %>" onclick="adios()"/>
+                                    <input type="button" class="button" value="<%= cancelValue %>" name="<%= button1 %>" onclick="adios(); return false;"/>
                                 </div>
                             </fieldset>
                         </form> 
