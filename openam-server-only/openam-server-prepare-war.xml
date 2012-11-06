@@ -56,22 +56,23 @@
                 <include name="opendj.zip"/>
             </fileset>
         </copy>
-
+ 
         <mkdir dir="${openam.temp.target}/WEB-INF/template/ldif/sfha"/>
-        <copy file="${project.basedir}/../openam-session-ha/openam-session-ha-core/src/main/resources/ldif/amsessiondb_container.ldif.template"
-              tofile="${openam.temp.target}/WEB-INF/template/ldif/sfha/amsessiondb_container.ldif"
+        <copy file="${project.basedir}/../openam-core/src/main/resources/ha_sfo/ldif/cts-container.ldif.template"
+              tofile="${openam.temp.target}/WEB-INF/template/ldif/sfha/cts-container.ldif"
               filtering="false"/>
 
-        <mkdir dir="${openam.temp.target}/WEB-INF/template/ldif/sfha"/>
-        <copy file="${project.basedir}/../openam-session-ha/openam-session-ha-core/src/main/resources/ldif/opendj_amsessiondb_index.ldif"
-              tofile="${openam.temp.target}/WEB-INF/template/ldif/sfha/opendj_amsessiondb_index.ldif"
+        <copy file="${project.basedir}/../openam-core/src/main/resources/ha_sfo/ldif/cts-indices-schema.ldif"
+              tofile="${openam.temp.target}/WEB-INF/template/ldif/sfha/cts-indices-schema.ldif"
               filtering="false"/>
 
-        <copy todir="${openam.temp.target}/WEB-INF/template/opendj" filtering="false">
-            <fileset dir="${project.basedir}/binary">
-                <include name="opendj.zip"/>
-            </fileset>
-        </copy>
+        <copy file="${project.basedir}/../openam-core/src/main/resources/ha_sfo/ldif/cts-add-schema.ldif"
+              tofile="${openam.temp.target}/WEB-INF/template/ldif/sfha/cts-add-schema.ldif"
+              filtering="false"/>
+
+        <copy file="${project.basedir}/../openam-core/src/main/resources/ha_sfo/ldif/cts-delete-schema.ldif"
+              tofile="${openam.temp.target}/WEB-INF/template/ldif/sfha/cts-delete-schema.ldif"
+              filtering="false"/>
 
         <mkdir dir="${openam.temp.target}/WEB-INF/template/sms"/>
         <copy todir="${openam.temp.target}/WEB-INF/template/sms" filtering="true">
