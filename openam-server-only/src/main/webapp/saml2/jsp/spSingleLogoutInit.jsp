@@ -25,9 +25,9 @@
    $Id: spSingleLogoutInit.jsp,v 1.13 2009/10/15 00:01:11 exu Exp $
 
 --%>
-
-
-
+<%--
+   Portions Copyrighted 2012 ForgeRock Inc
+--%>
 
 <%@ page import="com.sun.identity.shared.debug.Debug" %>
 <%@ page import="com.sun.identity.plugin.session.SessionManager" %>
@@ -44,6 +44,8 @@
 <%@ page import="com.sun.identity.saml2.profile.SPSingleLogout" %>
 <%@ page import="java.util.HashMap" %>
 <%@ page import="java.util.List" %>
+<%@ page import="org.owasp.esapi.ESAPI" %>
+
 
 <%--
     spSingleLogoutInit.jsp
@@ -80,8 +82,11 @@
 
     try {
         String RelayState = request.getParameter(SAML2Constants.RELAY_STATE);
-        if ((RelayState == null) || (RelayState.length() == 0)) {
+        if (RelayState == null || RelayState.isEmpty()) {
             RelayState = request.getParameter(SAML2Constants.GOTO);
+        }
+        if (!ESAPI.validator().isValidInput("RelayState", RelayState, "HTTPURI", 1024, true)) {
+            RelayState = null;
         }
 
         String metaAlias = null;
@@ -100,8 +105,15 @@
         SAML2MetaManager manager = new SAML2MetaManager();
         if (!SPCache.isFedlet) {
             if (ssoToken == null) {
-                SAMLUtils.sendError(request, response, response.SC_BAD_REQUEST,
-                    "nullSSOToken",SAML2Utils.bundle.getString("nullSSOToken"));
+                //There is no local session, so we can't perform the logout on the IdP,
+                //let's just return with HTTP 200
+                if (RelayState != null && !RelayState.isEmpty()) {
+                    response.sendRedirect(RelayState);
+                } else {
+                    %>
+                        <jsp:forward page="/saml2/jsp/default.jsp?message=spSloSuccess"/>
+                    <%
+                }
                 return;
             }
             String[] values = SessionManager.getProvider().
@@ -225,7 +237,7 @@
         paramsMap.put("Destination", request.getParameter("Destination"));
         paramsMap.put("Consent", request.getParameter("Consent"));
         paramsMap.put("Extension", request.getParameter("Extension"));
-        if ((RelayState == null) || (RelayState.equals(""))) {
+        if (RelayState == null || RelayState.isEmpty()) {
             RelayState = SAML2Utils.getAttributeValueFromSSOConfig(
                 realm, spEntityID, SAML2Constants.SP_ROLE,
                 SAML2Constants.DEFAULT_RELAY_STATE);
@@ -239,7 +251,7 @@
             binding,paramsMap);
         
         if (binding.equalsIgnoreCase(SAML2Constants.SOAP)) {
-            if (RelayState != null && (!RelayState.equals(""))) {
+            if (RelayState != null && !RelayState.isEmpty()) {
                 response.sendRedirect(RelayState);
             } else {
                 %>
