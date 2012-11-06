@@ -25,16 +25,19 @@
 
 package org.forgerock.openam.upgrade;
 
+import com.iplanet.am.util.SystemProperties;
+import com.iplanet.services.ldap.DSConfigMgr;
+import com.iplanet.services.ldap.LDAPServiceException;
+import com.iplanet.services.ldap.Server;
+import com.iplanet.services.ldap.ServerGroup;
+import com.sun.identity.setup.EmbeddedOpenDS;
 import com.sun.identity.setup.IHttpServletRequest;
 import com.sun.identity.setup.SetupConstants;
-import java.io.BufferedReader;
-import java.io.FileReader;
-import java.io.IOException;
+import com.sun.identity.shared.Constants;
+import com.sun.identity.sm.SMSEntry;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Locale;
 import java.util.Map;
-import java.util.Set;
 
 /**
  *
@@ -43,59 +46,38 @@ import java.util.Set;
 public class UpgradeHttpServletRequest implements IHttpServletRequest {
     protected Locale locale;
     protected Map<String, String> parameters;
-    protected String contextPath;
     
     public UpgradeHttpServletRequest(String baseDir) 
     throws UpgradeException {
         parameters = new HashMap<String, String>();
-        
-        try {
-            initialize(baseDir);
-        } catch (IOException ioe) {
-            UpgradeUtils.debug.error("Unable to initialize UpgradeHttpServletRequest", ioe);
-            throw new UpgradeException("Unable to initialize UpgradeHttpServletRequest" + ioe.getMessage());
-        }
+        initialize(baseDir);
     }
     
     private void initialize(String baseDir)
-    throws IOException {
-        Set<String> file = new HashSet<String>();
-        BufferedReader fileIn = 
-                new BufferedReader(new FileReader(baseDir + SetupConstants.CONFIG_PARAM_FILE));
-        String input;
-        
-        try {
-            while ((input = fileIn.readLine()) != null) {
-                file.add(input);
-            }
-        } finally {
-            fileIn.close();
-        }
-        
-        for (String line : file) {
-            if (line.indexOf('=') == -1) {
-                continue;
-            }
-            
-            String attributeName = line.substring(0, line.indexOf('='));
-            String value = line.substring(line.indexOf('=') + 1);
-            
-            if (attributeName.equals("locale")) {
-                locale = new Locale(value);
-            }
-            
-            if (attributeName.equals(SetupConstants.CONFIG_VAR_SERVER_URI)) {
-                contextPath = getContextPath(value);
-            }
-            
-            parameters.put(attributeName, value);
-        }
-        //If a given instance was added to an existing deployment, then .configParam
-        //will not contain URLAccessAgent's password, so this hack makes sure
-        //that the password and confirmation is always present, this way
-        //ServicesDefaultValues#validatePassword will always succeed
+    throws UpgradeException {
+        parameters.put(SetupConstants.CONFIG_VAR_DATA_STORE,
+                EmbeddedOpenDS.isStarted() ? SetupConstants.SMS_EMBED_DATASTORE : SetupConstants.SMS_DS_DATASTORE);
+        parameters.put(SetupConstants.CONFIG_VAR_BASE_DIR, baseDir);
+        parameters.put(SetupConstants.CONFIG_VAR_SERVER_URI, getContextPath());
+        parameters.put(SetupConstants.CONFIG_VAR_SERVER_URL, getServerURL());
+        //workaround for ServicesDefaultValues#validatePassword
+        parameters.put(SetupConstants.CONFIG_VAR_DS_MGR_PWD, "********");
+        parameters.put(SetupConstants.CONFIG_VAR_ADMIN_PWD, "********");
+        parameters.put(SetupConstants.CONFIG_VAR_CONFIRM_ADMIN_PWD, "********");
         parameters.put(SetupConstants.CONFIG_VAR_AMLDAPUSERPASSWD, "********!");
         parameters.put(SetupConstants.CONFIG_VAR_AMLDAPUSERPASSWD_CONFIRM, "********!");
+        parameters.put(SetupConstants.CONFIG_VAR_SERVER_HOST, SystemProperties.get(Constants.AM_SERVER_HOST));
+        try {
+            ServerGroup sg = DSConfigMgr.getDSConfigMgr().getServerGroup("sms");
+            Server server = (Server) sg.getServersList().iterator().next();
+            parameters.put(SetupConstants.CONFIG_VAR_DIRECTORY_SERVER_HOST, server.getServerName());
+            parameters.put(SetupConstants.CONFIG_VAR_DIRECTORY_SERVER_PORT, Integer.toString(server.getPort()));
+            parameters.put(SetupConstants.CONFIG_VAR_DIRECTORY_SERVER_SSL, server.getConnectionType().toString());
+        } catch (LDAPServiceException ldapse) {
+            UpgradeUtils.debug.error("Unable to get SMS LDAP configuration!");
+            throw new UpgradeException(ldapse);
+        }
+        parameters.put(SetupConstants.CONFIG_VAR_ROOT_SUFFIX, SMSEntry.getRootSuffix());
     }
     
     public Locale getLocale() {
@@ -106,35 +88,20 @@ public class UpgradeHttpServletRequest implements IHttpServletRequest {
         parameters.put(parameterName, (String) parameterValue);
     }
 
-    public Map getParameterMap() {
-        return parameters;
+    @Override
+    public String getContextPath() {
+        return SystemProperties.get(Constants.AM_SERVICES_DEPLOYMENT_DESCRIPTOR);
     }
 
-    public String getContextPath() {
-        return contextPath;
+    public Map getParameterMap() {
+        return parameters;
     }
 
     public String getHeader(String key) {
         throw new UnsupportedOperationException("Not supported yet.");
     }
-    
-    /**
-     * In OpenAM prior to 10, the .configParam file set the SERVER_URI property
-     * like this:
-     * 
-     * SERVER_URI=/openam/config/wizard/wizard.htm
-     * 
-     * This method ensures the correct result of /openam is always returned
-     * regardless of the file.
-     * 
-     * @param uri The entry from the .configParam file
-     * @return The SERVER_URI; typically /openam
-     */
-    protected String getContextPath(String uri) {
-        if (uri.indexOf('/') == uri.lastIndexOf('/')) {
-            return uri;
-        } else {
-            return uri.substring(0, uri.indexOf('/', 1));
-        }
+
+    private String getServerURL() {
+        return SystemProperties.get(Constants.AM_SERVER_PROTOCOL) + "://" + SystemProperties.get(Constants.AM_SERVER_HOST) + ":" + SystemProperties.get(Constants.AM_SERVER_PORT) + getContextPath();
     }
 }
