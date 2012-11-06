@@ -876,8 +876,6 @@
                 <version>1.1.5.2</version>
             </dependency>
 
-            <!-- TODO opendj-ldap-sdk-3.0.0-M2 -->
-
             <!-- TODO publicsuffix -->
 
             <dependency>
@@ -974,7 +972,7 @@
             <dependency>
                 <groupId>org.forgerock.opendj</groupId>
                 <artifactId>opendj-ldap-sdk</artifactId>
-                <version>3.0.0-M2</version>
+                <version>3.0.0-OPENAMp3</version>
             </dependency>
 
             <!-- Legacy External Libraries for OpenAM -->
