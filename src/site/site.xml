@@ -50,8 +50,8 @@
    <item name="Downloads" href="http://forgerock.org/openam.html" />
    <item name="FAQ" href="faq.html" />
    <item name="Mailing Lists" href="mail-lists.html" />
-   <item name="Support" href="http://forgerock.com/subscriptions.html" />
-   <item name="Partners" href="http://forgerock.com/partners.html" />
+   <item name="Support" href="http://forgerock.com/what-we-offer/subscriptions/" />
+   <item name="Partners" href="http://forgerock.com/partners/" />
    <item name="Wiki" href="https://wikis.forgerock.org/confluence/display/OPENAM/Home" />
   </menu>
   
