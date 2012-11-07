@@ -50,21 +50,6 @@
     <!-- Build -->
     <build>
         <plugins>
-
-            <!-- Surefire Tests -->
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-surefire-plugin</artifactId>
-                <configuration>
-                    <systemPropertyVariables>
-                        <templateLoaderPath>${notification.template.path}</templateLoaderPath>
-                    </systemPropertyVariables>
-                    <excludes>
-                        <exclude>**/IT_*</exclude>
-                    </excludes>
-                </configuration>
-            </plugin>
-
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-jar-plugin</artifactId>
@@ -95,14 +80,6 @@
                     </archive>
                 </configuration>
             </plugin>
-            <!-- TODO remove when installtools is migrated to Maven -->
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-javadoc-plugin</artifactId>
-                <configuration>
-                    <skip>true</skip>
-                </configuration>
-            </plugin>
         </plugins>
 
         <resources>
@@ -124,26 +101,6 @@
                 </includes>
             </resource>
         </resources>
-        <testResources>
-            <testResource>
-                <filtering>false</filtering>
-                <directory>src/test/resources</directory>
-                <includes>
-                    <include>**/*</include>
-                </includes>
-            </testResource>
-        </testResources>
     </build>
-
-
-    <dependencies>
-        <dependency>
-            <groupId>org.forgerock.openam</groupId>
-            <artifactId>openam-core</artifactId>
-            <version>10.1.0-SNAPSHOT</version>
-        </dependency>
-
-    </dependencies>
-
 </project>
 
