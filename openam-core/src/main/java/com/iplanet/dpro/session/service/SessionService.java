@@ -27,8 +27,9 @@
  */
 
 /*
- * Portions Copyrighted 2010-2012 ForgeRock AS
+ * Portions Copyrighted 2010-2012 ForgeRock Inc
  */
+
 package com.iplanet.dpro.session.service;
 
 import com.iplanet.am.util.SystemProperties;
@@ -1202,15 +1203,21 @@ public class SessionService {
      */
     private void addInternalSessionListener(InternalSession session, String url,
                                             SessionID sid) {
-
         if (session != null) {
             if (!sid.equals(session.getID())
                     && session.getRestrictionForToken(sid) == null) {
                 throw new IllegalArgumentException("Session id mismatch");
             }
 
-            Map urls = session.getSessionEventURLs();
-            urls.put(url, sid);
+            Map<String, Set<SessionID>> urls = session.getSessionEventURLs();
+            Set<SessionID> sids = urls.get(url);
+
+            if (sids == null) {
+                sids = new HashSet<SessionID>();
+            }
+
+            sids.add(sid);
+            urls.put(url, sids);
             session.updateForFailover();
         }
     }
@@ -2436,7 +2443,7 @@ public class SessionService {
          */
         boolean sendToLocal() {
             boolean remoteURLExists = false;
-            Map urls = session.getSessionEventURLs();
+            Map<String, Set<SessionID>> urls = session.getSessionEventURLs();   
             // CHECK THE GLOBAL URLS FIRST
             if (!sessionService.sessionEventURLs.isEmpty()) {
                 Enumeration aenum = sessionService.sessionEventURLs.elements();
@@ -2469,31 +2476,27 @@ public class SessionService {
             // CHECK THE INDVIDUAL URL LIST
             if (!urls.isEmpty()) {
                 synchronized (urls) {
-
-                    Iterator iter = urls.entrySet().iterator();
-                    while (iter.hasNext()) {
-                        Map.Entry entry = (Map.Entry) iter.next();
-                        String url = (String) entry.getKey();
+                    for (Map.Entry<String, Set<SessionID>> entry : urls.entrySet()) {
                         // ONLY SEND ONCE TO ONE LOCATION
+                        String url = entry.getKey();
+
                         try {
                             URL parsedUrl = new URL(url);
+
                             if (sessionService.isLocalSessionService(parsedUrl)) {
-                                SessionID sid = (SessionID) entry.getValue();
-                                SessionInfo info = makeSessionInfo(session, sid);
-                                SessionNotification sn = new SessionNotification(
-                                        info, eventType, System
-                                        .currentTimeMillis());
-                                SessionNotificationHandler.handler
-                                        .processNotification(sn);
+                                for (SessionID sid : entry.getValue()) {
+                                    SessionInfo info = makeSessionInfo(session, sid);
+                                    SessionNotification sn = new SessionNotification(
+                                            info, eventType, System.currentTimeMillis());
+                                    SessionNotificationHandler.handler.processNotification(sn);
+                                }
                             } else {
                                 remoteURLExists = true;
                             }
-
                         } catch (Exception e) {
                             sessionService.sessionDebug.error(
-                                    "Local Individual notification to " + url, e);
+                                "Local Individual notification to " + url, e);
                         }
-
                     }
                 }
             }
@@ -2504,7 +2507,7 @@ public class SessionService {
          * Thread which sends the Session Notification.
          */
         public void run() {
-            Map urls = session.getSessionEventURLs();
+            Map<String, Set<SessionID>> urls = session.getSessionEventURLs();
             if (!sessionService.sessionEventURLs.isEmpty()) {
 
                 SessionNotification snGlobal = new SessionNotification(session
@@ -2536,28 +2539,27 @@ public class SessionService {
             // CHECK THE INDIVIDUAL URLS LIST
             if (!urls.isEmpty()) {
                 synchronized (urls) {
-                    Iterator iter = urls.entrySet().iterator();
-                    while (iter.hasNext()) {
-                        Map.Entry entry = (Map.Entry) iter.next();
+                    for (Map.Entry<String, Set<SessionID>> entry: urls.entrySet()) {
                         String url = (String) entry.getKey();
                         // ONLY SEND ONCE TO ONE LOCATION
+
                         try {
                             URL parsedUrl = new URL(url);
+
                             if (!sessionService.isLocalSessionService(parsedUrl)) {
-                                SessionID sid = (SessionID) entry.getValue();
-                                SessionInfo info = makeSessionInfo(session, sid);
-                                SessionNotification sn = new SessionNotification(
+                                for (SessionID sid : entry.getValue()) {
+                                    SessionInfo info = makeSessionInfo(session, sid);
+                                    SessionNotification sn = new SessionNotification(
                                         info, eventType, System.currentTimeMillis());
-                                Notification not = new Notification(sn
-                                        .toXMLString());
-                                NotificationSet set = new NotificationSet(
-                                        SESSION_SERVICE);
-                                set.addNotification(not);
-                                PLLServer.send(parsedUrl, set);
+                                    Notification not = new Notification(sn.toXMLString());
+                                    NotificationSet set = new NotificationSet(SESSION_SERVICE);
+                                    set.addNotification(not);
+                                    PLLServer.send(parsedUrl, set);
+                                }
                             }
                         } catch (Exception e) {
                             sessionService.sessionDebug.error(
-                                    "Remote Individual notification to " + url, e);
+                                "Remote Individual notification to " + url, e);
                         }
                     }
                 }

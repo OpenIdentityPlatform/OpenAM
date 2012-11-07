@@ -26,9 +26,10 @@
  *
  */
 
-/**
- * Portions Copyrighted [2011] [ForgeRock AS]
+/*
+ * Portions Copyrighted 2011-2012 ForgeRock Inc
  */
+
 package com.iplanet.dpro.session.service;
 
 import com.iplanet.am.util.SystemProperties;
@@ -329,10 +330,12 @@ public class InternalSession implements TaskRunnable, Serializable {
     /*
      * The URL map for session events of THIS session only : SESSION_CREATION,
      * IDLE_TIMEOUT, MAX_TIMEOUT, LOGOUT, REACTIVATION, DESTROY. Each URL in the
-     * map is associated with token id (master or restricted) which should be
-     * used in notification
+     * map is associated with a set of token ids (master and potentially all of
+     * the restricted token ids associated with the master) that will be used in 
+     * notification
      */
-    private Map sessionEventURLs = Collections.synchronizedMap(new HashMap());
+    private Map<String, Set<SessionID>> sessionEventURLs =
+        Collections.synchronizedMap(new HashMap<String, Set<SessionID>>());
 
     /**
      * Creates a new InternalSession with the invalid state 
@@ -1268,10 +1271,11 @@ public class InternalSession implements TaskRunnable, Serializable {
     }
 
     /**
-     * Returns the URL of the Session events
+     * Returns the URL of the Session events and the associated master and
+     * restricted token ids
      * @return Map of session event URLs
      */
-    Map getSessionEventURLs() {
+    Map<String, Set<SessionID>> getSessionEventURLs() {
         return sessionEventURLs;
     }
 
