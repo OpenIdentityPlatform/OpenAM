@@ -27,7 +27,7 @@
  */
 
 /*
- * Portions Copyrighted 2010-2012 ForgeRock AS
+ * Portions Copyrighted 2010-2012 ForgeRock Inc
  */
 
 package com.sun.identity.authentication.spi;
@@ -36,6 +36,7 @@ import java.io.IOException;
 import java.security.Principal;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -69,6 +70,7 @@ import com.iplanet.dpro.session.service.SessionCount;
 import com.iplanet.dpro.session.service.SessionConstraint;
 import com.iplanet.sso.SSOException;
 import com.iplanet.sso.SSOToken;
+import com.iplanet.sso.SSOTokenManager;
 import com.sun.identity.authentication.service.AMAuthErrorCode;
 import com.sun.identity.authentication.service.AuthD;
 import com.sun.identity.authentication.service.AuthException;
@@ -2603,6 +2605,16 @@ public abstract class AMLoginModule implements LoginModule {
 
     }
 
+    /**
+     * Returns true if the user identified by the supplied username has reached
+     * their session quota.<br>
+     * <i>NB</i>The existing session count is exclusive of any session created
+     * as part of the running authentication process
+     *
+     * @param userName the username of the user who's sessio quota will be checked
+     * @return true if the user session quota is reached, false otherwise
+     * @supported.api
+     */
     public boolean isSessionQuotaReached(String userName) {
         int sessionCount = -1;
         int sessionQuota = -1;
@@ -2666,4 +2678,53 @@ public abstract class AMLoginModule implements LoginModule {
 
         return quota;
    }
+
+
+    /**
+     * Returns the set of SSOTokens for a specified user
+     *
+     * @param userName
+     * @return The set of SSOTokens for the users current sessions, returns null
+     * on error
+     * @supported.api
+     */
+    public Set<SSOToken> getUserSessions(String userName) {
+        Set<SSOToken> sessions = new HashSet<SSOToken>();
+
+        if (userName == null || userName.equals(Constants.EMPTY)) {
+            debug.error("AMLoginModule.getUserSessions :: called with null username");
+            return null;
+        }
+
+        try {
+            // Get the universal ID
+            AMIdentity amIdUser = ad.getIdentity(IdType.USER, userName,
+                    loginState.getOrgDN());
+
+            String univId = IdUtils.getUniversalId(amIdUser);
+
+            if (univId != null) {
+                Map<String, String> currentSessions = SessionCount.getAllSessionsByUUID(univId);
+                SSOTokenManager manager = SSOTokenManager.getInstance();
+
+                for (String tokenID : currentSessions.keySet()) {
+                    sessions.add(manager.createSSOToken(tokenID));
+                }
+
+                if (debug.messageEnabled()) {
+                    debug.message("AMLoginModule.getUserSessions :: univId= "
+                            + univId + " - found sessions =  " + sessions);
+                }
+            } else {
+                debug.error("AMLoginModule.getUserSessions :: "
+                        + "univId is null , amIdUser is " + amIdUser);
+                return null;
+            }
+        } catch (Exception ex) {
+            debug.error("AMLoginModule.getUserSessions::  "
+                    + "Exception : ", ex);
+        }
+
+        return sessions;
+    }
 }
