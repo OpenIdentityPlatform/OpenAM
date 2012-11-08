@@ -1755,12 +1755,11 @@ public class LoginViewBean extends AuthViewBeanBase {
         } else {
             Iterator iter = cookieDomainSet.iterator();
             int cookieTimeToLive = 0;
-            if (loginDebug.messageEnabled()) {
-                if (isCookieTimeToLiveEnabled()) {
-                    cookieTimeToLive = getCookieTimeToLive();
-                    if (cookieTimeToLive > 0 && ac.getStatus() == AuthContext.Status.SUCCESS) {
-                        loginDebug.message("LoginViewBean.setCookie():"
-                                + "would set cookie maxAge=" + cookieTimeToLive);
+            if (isCookieTimeToLiveEnabled()) {
+                cookieTimeToLive = getCookieTimeToLive();
+                if (cookieTimeToLive > 0 && ac.getStatus() == AuthContext.Status.SUCCESS) {
+                    if (loginDebug.messageEnabled()) {
+                        loginDebug.message("LoginViewBean.setCookie(): would set cookie maxAge=" + cookieTimeToLive);
                     }
                 }
             }
