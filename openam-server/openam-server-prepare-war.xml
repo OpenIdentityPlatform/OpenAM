@@ -1,0 +1,404 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!--
+* DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
+*
+* Copyright (c) 2011 ForgeRock AS. All Rights Reserved
+*
+* The contents of this file are subject to the terms
+* of the Common Development and Distribution License
+* (the License). You may not use this file except in
+* compliance with the License.
+*
+* You can obtain a copy of the License at
+* http://forgerock.org/license/CDDLv1.0.html
+* See the License for the specific language governing
+* permission and limitations under the License.
+*
+* When distributing Covered Code, include this CDDL
+* Header Notice in each file and include the License file
+* at http://forgerock.org/license/CDDLv1.0.html
+* If applicable, add the following below the CDDL Header,
+* with the fields enclosed by brackets [] replaced by
+* your own identifying information:
+* "Portions Copyrighted [year] [name of copyright owner]"
+*
+-->
+
+<!-- Parent Project -->
+<project name="openam-server-war-preparation" default="openam_server-prepare-war">
+
+    <description>OpenAM Server Prepare WAR ANT Script</description>
+    <target name="openam-server-prepare-war">
+
+
+        <tstamp>
+            <format property="war.time.stamp" pattern="yyyy-MMMM-dd HH:mm" locale="en,UK"/>
+        </tstamp>
+        <property name="version.set" value="${openam.version}"/>
+
+        <filter token="DATESTAMP" value="${war.time.stamp}"/>
+        <filter token="VERSION" value="${version.set}"/>
+
+        <mkdir dir="${openam.temp.target}"/>
+
+        <mkdir dir="${project.build.directory}/classes"/>
+
+        <mkdir dir="${project.build.directory}/openam"/>
+
+        <copy file="${project.basedir}/../version.template"
+              tofile="${openam.temp.target}/version"
+              filtering="true"/>
+
+        <mkdir dir="${openam.temp.target}/WEB-INF/template/opendj"/>
+        <copy todir="${openam.temp.target}/WEB-INF/template/opendj" filtering="false">
+            <fileset dir="${project.basedir}/binary">
+                <include name="opendj.zip"/>
+            </fileset>
+        </copy>
+
+        <mkdir dir="${openam.temp.target}/WEB-INF/template/ldif/oauth2"/>
+        <copy file="${project.basedir}/../openam-oauth2/openam-oauth2-core-token-service/src/main/resources/oauth2_container.ldif.template"
+              tofile="${openam.temp.target}/WEB-INF/template/ldif/oauth2/oauth2_container.ldif"
+              filtering="false"/>
+
+        <mkdir dir="${openam.temp.target}/WEB-INF/template/ldif/sfha"/>
+        <copy file="${project.basedir}/../openam-session-ha/openam-session-ha-core/src/main/resources/ldif/amsessiondb_container.ldif.template"
+              tofile="${openam.temp.target}/WEB-INF/template/ldif/sfha/amsessiondb_container.ldif"
+              filtering="false"/>
+
+        <mkdir dir="${openam.temp.target}/WEB-INF/template/ldif/sfha"/>
+        <copy file="${project.basedir}/../openam-session-ha/openam-session-ha-core/src/main/resources/ldif/opendj_amsessiondb_index.ldif"
+              tofile="${openam.temp.target}/WEB-INF/template/ldif/sfha/opendj_amsessiondb_index.ldif"
+              filtering="false"/>
+
+        <copy todir="${openam.temp.target}/WEB-INF/template/opendj" filtering="false">
+            <fileset dir="${project.basedir}/binary">
+                <include name="opendj.zip"/>
+            </fileset>
+        </copy>
+
+        <mkdir dir="${openam.temp.target}/WEB-INF/template/sms"/>
+        <copy todir="${openam.temp.target}/WEB-INF/template/sms" filtering="true">
+            <fileset dir="${project.basedir}/../openam-core/src/main/resources/xml">
+                <include name="serverconfig.xml"/>
+            </fileset>
+        </copy>
+
+        <mkdir dir="${openam.temp.target}/images"/>
+        <copy todir="${openam.temp.target}/images" filtering="false">
+            <fileset dir="${project.basedir}/../openam-core/src/main/resources/lockhart/images">
+                <include name="button/**"/>
+                <include name="*.*"/>
+            </fileset>
+        </copy>
+
+        <mkdir dir="${openam.temp.target}/css"/>
+        <copy todir="${openam.temp.target}/css" filtering="false">
+            <fileset dir="${project.basedir}/../openam-core/src/main/resources/lockhart/css">
+                <include name="**/**"/>
+            </fileset>
+        </copy>
+
+        <copy todir="${amserver.target.resources.dir}" flatten="true" filtering="true">
+            <fileset dir="${amserver.resources.i18n.dir}">
+                <include name="**/*.properties"/>
+                <exclude name="Services.properties"/>
+                <exclude name="ums.properties"/>
+                <exclude name="sso.properties"/>
+                <exclude name="SMS.properties"/>
+                <exclude name="authentication_util.properties"/>
+            </fileset>
+        </copy>
+
+        <copy todir="${amserver.target.resources.dir}" filtering="true">
+            <fileset dir="${amserver.resources.i18n.dir}">
+                <include name="*.properties"/>
+                <exclude name="Services.properties"/>
+                <exclude name="ums.properties"/>
+                <exclude name="sso.properties"/>
+                <exclude name="SMS.properties"/>
+                <exclude name="authentication_util.properties"/>
+            </fileset>
+            <globmapper from="*.properties" to="*_en.properties"/>
+        </copy>
+
+        <mkdir dir="${openam.temp.target}/config/federation/default_en"/>
+        <copy todir="${openam.temp.target}/config/federation/default_en" filtering="true">
+            <fileset dir="${project.basedir}/src/main/webapp/config/federation/default">
+                <include name="**/**"/>
+            </fileset>
+        </copy>
+
+        <mkdir dir="${openam.temp.target}/WEB-INF/classes"/>
+        <copy todir="${openam.temp.target}/WEB-INF/classes" filtering="true">
+            <fileset dir="${project.basedir}/../openam-federation/OpenFM/src/main/resources">
+                <include name="FederationManagerCLI.properties"/>
+            </fileset>
+            <globmapper from="*.properties" to="*_en.properties"/>
+        </copy>
+
+        <copy todir="${openam.temp.target}/WEB-INF/classes" filtering="true">
+            <fileset dir="${project.basedir}/../openam-federation/OpenFM/src/main/resources">
+                <include name="FederationManagerCLI.properties"/>
+            </fileset>
+        </copy>
+
+        <!-- Align in fedlet -->
+        <mkdir dir="${openam.temp.target}/WEB-INF/fedlet/AG/com/sun/identity/fedlet/ag"/>
+        <copy todir="${openam.temp.target}/WEB-INF/fedlet/AG/com/sun/identity/fedlet/ag/"
+              filtering="false">
+            <fileset
+                    dir="${project.basedir}/../openam-federation/openam-federation-library/target/classes/com/sun/identity/fedlet/ag">
+                <include name="UserData.class"/>
+                <include name="AssertionGen.class"/>
+                <include name="MetaDataParser.class"/>
+            </fileset>
+        </copy>
+
+        <copy todir="${openam.temp.target}/WEB-INF/fedlet" filtering="false">
+            <fileset dir="src/main/resources">
+                <include name="FederationConfig.properties"/>
+            </fileset>
+        </copy>
+
+        <!-- Align in auth -->
+        <mkdir dir="${openam.temp.target}/config/auth"/>
+        <copy todir="${openam.temp.target}/config/auth" flatten="true">
+            <fileset dir="src/main/webapp/config/auth/default" includes="*.*"/>
+            <globmapper from="*.properties" to="*_en.properties"/>
+        </copy>
+        <copy todir="${openam.temp.target}/config/auth/default_en" flatten="true">
+            <fileset dir="src/main/webapp/config/auth/default" includes="*.*"/>
+        </copy>
+        <copy todir="${openam.temp.target}/config/auth/default_de" flatten="true">
+            <fileset dir="src/main/webapp/config/auth/default_de" includes="*.*"/>
+        </copy>
+        <copy todir="${openam.temp.target}/config/auth/default_es" flatten="true">
+            <fileset dir="src/main/webapp/config/auth/default_es" includes="*.*"/>
+        </copy>
+        <copy todir="${openam.temp.target}/config/auth/default_fr" flatten="true">
+            <fileset dir="src/main/webapp/config/auth/default_fr" includes="*.*"/>
+        </copy>
+        <copy todir="${openam.temp.target}/config/auth/default_ja" flatten="true">
+            <fileset dir="src/main/webapp/config/auth/default_ja" includes="*.*"/>
+        </copy>
+        <copy todir="${openam.temp.target}/config/auth/default_ko" flatten="true">
+            <fileset dir="src/main/webapp/config/auth/default_ko" includes="*.*"/>
+        </copy>
+        <copy todir="${openam.temp.target}/config/auth/default_zh" flatten="true">
+            <fileset dir="src/main/webapp/config/auth/default_zh_CN" includes="*.*"/>
+        </copy>
+        <copy todir="${openam.temp.target}/config/auth/default_zh_CN" flatten="true">
+            <fileset dir="src/main/webapp/config/auth/default_zh_CN" includes="*.*"/>
+        </copy>
+        <copy todir="${openam.temp.target}/config/auth/default_zh_TW" flatten="true">
+            <fileset dir="src/main/webapp/config/auth/default_zh_TW" includes="*.*"/>
+        </copy>
+        <copy todir="${openam.temp.target}/config/auth/default" flatten="true">
+            <fileset dir="src/main/webapp/config/auth/default" includes="*.*"/>
+        </copy>
+
+        <copy todir="${openam.temp.target}/config/auth/default_de" overwrite="false">
+            <fileset dir="src/main/webapp/config/auth/default" includes="*.*"/>
+        </copy>
+        <copy todir="${openam.temp.target}/config/auth/default_es" overwrite="false">
+            <fileset dir="src/main/webapp/config/auth/default" includes="*.*"/>
+        </copy>
+        <copy todir="${openam.temp.target}/config/auth/default_fr" overwrite="false">
+            <fileset dir="src/main/webapp/config/auth/default" includes="*.*"/>
+        </copy>
+        <copy todir="${openam.temp.target}/config/auth/default_ja" overwrite="false">
+            <fileset dir="src/main/webapp/config/auth/default" includes="*.*"/>
+        </copy>
+        <copy todir="${openam.temp.target}/config/auth/default_ko" overwrite="false">
+            <fileset dir="src/main/webapp/config/auth/default" includes="*.*"/>
+        </copy>
+        <copy todir="${openam.temp.target}/config/auth/default_zh" overwrite="false">
+            <fileset dir="src/main/webapp/config/auth/default" includes="*.*"/>
+        </copy>
+        <copy todir="${openam.temp.target}/config/auth/default_zh_CN" overwrite="false">
+            <fileset dir="src/main/webapp/config/auth/default" includes="*.*"/>
+        </copy>
+        <copy todir="${openam.temp.target}/config/auth/default_zh_TW" overwrite="false">
+            <fileset dir="src/main/webapp/config/auth/default" includes="*.*"/>
+        </copy>
+
+        <copy todir="${openam.temp.target}/config/auth">
+            <fileset dir="src/main/webapp/config/auth" includes="index.html"/>
+        </copy>
+
+        <copy todir="${openam.temp.target}/config/auth/default" filtering="false" overwrite="false">
+            <fileset
+                    dir="${project.basedir}/../openam-federation/OpenFM/src/main/resources/xml/auth-module">
+                <include name="*.*"/>
+            </fileset>
+        </copy>
+
+        <copy todir="${openam.temp.target}/config/auth/default_en" filtering="false"
+              overwrite="false">
+            <fileset
+                    dir="${project.basedir}/../openam-federation/OpenFM/src/main/resources/xml/auth-module">
+                <include name="*.*"/>
+            </fileset>
+        </copy>
+
+        <copy todir="${openam.temp.target}/config/auth/default_de" filtering="false"
+              overwrite="false">
+            <fileset
+                    dir="${project.basedir}/../openam-federation/OpenFM/src/main/resources/xml/auth-module">
+                <include name="*.*"/>
+            </fileset>
+        </copy>
+
+        <copy todir="${openam.temp.target}/config/auth/default_es" filtering="false"
+              overwrite="false">
+            <fileset
+                    dir="${project.basedir}/../openam-federation/OpenFM/src/main/resources/xml/auth-module">
+                <include name="*.*"/>
+            </fileset>
+        </copy>
+
+        <copy todir="${openam.temp.target}/config/auth/default_fr" filtering="false"
+              overwrite="false">
+            <fileset
+                    dir="${project.basedir}/../openam-federation/OpenFM/src/main/resources/xml/auth-module">
+                <include name="*.*"/>
+            </fileset>
+        </copy>
+
+        <copy todir="${openam.temp.target}/config/auth/default_ja" filtering="false"
+              overwrite="false">
+            <fileset
+                    dir="${project.basedir}/../openam-federation/OpenFM/src/main/resources/xml/auth-module">
+                <include name="*.*"/>
+            </fileset>
+        </copy>
+
+        <copy todir="${openam.temp.target}/config/auth/default_ko" filtering="false"
+              overwrite="false">
+            <fileset
+                    dir="${project.basedir}/../openam-federation/OpenFM/src/main/resources/xml/auth-module">
+                <include name="*.*"/>
+            </fileset>
+        </copy>
+
+        <copy todir="${openam.temp.target}/config/auth/default_zh" filtering="false"
+              overwrite="false">
+            <fileset
+                    dir="${project.basedir}/../openam-federation/OpenFM/src/main/resources/xml/auth-module">
+                <include name="*.*"/>
+            </fileset>
+        </copy>
+
+        <copy todir="${openam.temp.target}/config/auth/default_zh_CN" filtering="false"
+              overwrite="false">
+            <fileset
+                    dir="${project.basedir}/../openam-federation/OpenFM/src/main/resources/xml/auth-module">
+                <include name="*.*"/>
+            </fileset>
+        </copy>
+
+        <copy todir="${openam.temp.target}/config/auth/default_zh_TW" filtering="false"
+              overwrite="false">
+            <fileset
+                    dir="${project.basedir}/../openam-federation/OpenFM/src/main/resources/xml/auth-module">
+                <include name="*.*"/>
+            </fileset>
+        </copy>
+
+        <concat destfile="${amserver.target.resources.dir}/amSDK.properties">
+            <fileset dir="${amserver.resources.i18n.dir}">
+                <include name="Services.properties"/>
+                <include name="DSConfig.properties"/>
+                <include name="ums.properties"/>
+                <include name="sso.properties"/>
+                <include name="SMS.properties"/>
+                <include name="authentication_util.properties"/>
+            </fileset>
+        </concat>
+
+        <java classname="com.sun.identity.tools.nightly.MergeSDKProperties"
+              fork="true" failOnError="true" classpath="${build.class.path}">
+            <arg value="${amserver.resources.i18n.dir}"/>
+            <arg value="${amserver.target.resources.dir}"/>
+        </java>
+
+        <copy file="${amserver.target.resources.dir}/amSDK.properties"
+              tofile="${amserver.target.resources.dir}/amSDK_en.properties"/>
+
+
+        <!-- Align the Console Definitions for WAR Inclusion. -->
+        <copy todir="${project.build.directory}/classes" overwrite="false">
+            <fileset dir="${server.resources}/console">
+                <include name="*.properties"/>
+            </fileset>
+        </copy>
+
+        <!-- Align the Service Definitions for WAR Inclusion. -->
+        <copy todir="${project.build.directory}/classes" overwrite="false">
+            <fileset dir="${server.resources}/services">
+                <include name="*.*"/>
+            </fileset>
+        </copy>
+
+        <!-- Align the Config Definitions for WAR Inclusion. -->
+        <copy todir="${project.build.directory}/classes" overwrite="true" filtering="true">
+            <fileset dir="${server.resources}/config">
+                <include name="*.htm"/>
+                <include name="*.properties"/>
+                <include name="license.txt"/>
+            </fileset>
+        </copy>
+        <copy todir="${project.build.directory}/classes" overwrite="false" filtering="true">
+            <fileset dir="${project.basedir}/src/main/webapp/WEB-INF/template/sms">
+                <include name="*.*"/>
+            </fileset>
+        </copy>
+
+
+        <!-- Align in Federation Elements -->
+        <copy todir="${amserver.target.resources.dir}" flatten="true">
+            <fileset dir="${library.resources.i18n.dir}" includes="**/*.properties"/>
+            <fileset dir="${openfm.resources.i18n.dir}" includes="**/*.properties"/>
+        </copy>
+
+        <copy todir="${amserver.target.resources.dir}" flatten="true">
+            <fileset dir="${library.resources.i18n.dir}" includes="*.properties"/>
+            <fileset dir="${openfm.resources.i18n.dir}" includes="*.properties"/>
+            <globmapper from="*.properties" to="*_en.properties"/>
+        </copy>
+
+
+        <!-- Remaining Bits -->
+        <copy todir="${openam.temp.target}/config" overwrite="true" filtering="true">
+            <fileset dir="${server.resources}/config">
+                <include name="*.htm"/>
+            </fileset>
+        </copy>
+
+        <mkdir dir="${openam.temp.target}/js"/>
+        <copy todir="${openam.temp.target}/js" overwrite="true">
+            <fileset dir="src/main/webapp/com_sun_web_ui/js">
+                <include name="browserVersion.js"/>
+            </fileset>
+        </copy>
+
+        <mkdir dir="${openam.temp.target}/WEB-INF/classes/META-INF/services"/>
+        <copy todir="${openam.temp.target}/WEB-INF/classes/META-INF/services" overwrite="true">
+            <fileset dir="src/main/webapp/META-INF/services">
+                <include name="com.sun.xml.ws.api.security.trust.STSAttributeProvider"/>
+                <include name="com.sun.xml.ws.api.security.trust.STSAuthorizationProvider"/>
+                <include name="com.sun.xml.ws.api.security.trust.STSTokenProvider"/>
+                <include name="com.sun.xml.ws.api.security.trust.config.STSConfiguration"/>
+                <include
+                        name="com.sun.xml.ws.api.security.trust.config.STSConfigurationProvider"/>
+                <include name="com.sun.xml.ws.assembler.ServerPipelineHook"/>
+            </fileset>
+        </copy>
+
+
+
+    </target>
+
+</project>

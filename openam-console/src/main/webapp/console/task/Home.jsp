@@ -152,6 +152,28 @@
                     </td></tr>
 
                     <tr>
+                        <td valign="top" colspan=3><span class="TskPgeSbHdr"><cc:text name="txtSelectionOAuth2" defaultValue="page.title.common.tasks.section.OAuth2" bundleID="amConsole" /></span></td>
+                    </tr>
+
+                    <tr><td class="TskPgeBckgrTd">
+                        <table width="100%" border="0" cellspacing="0" cellpadding="0">
+                            <tr><td colspan=3 style="background-color:#FFFFFF"><span class="TskPgeHdr"><cc:text name="txtSectionOAuth2" defaultValue="page.title.common.tasks.section.desc.OAuth2" bundleID="amConsole" /></span></td>
+                            </tr>
+                        </table>
+                    </td></tr>
+
+                    <tr><td class="TskPgeBckgrTd">
+                        <table width="100%" border="0" cellspacing="0" cellpadding="0">
+                            <tr>
+                                <td width="2%" valign="bottom" class="TskPgeTskLftTd"><img alt="spacer" id="gif6" src="../console/images/tasks/spacer.gif" width="12" height="8" /></td>
+                                <td width="100%;" class="TskPgeTskCntrTd"><a href="../task/ConfigureOAuth2" class="TskPgeTxtBg" onmouseover="this.className='TskPgeTxtBgOvr'" onfocus="this.className='TskPgeTxtBgOvr'" onmouseout="this.className='TskPgeTxtBg'" onblur="this.className='TskPgeTxtBg'"><span class="TskPgeTskLftBtm"></span><span class="TskPgeTskLftTp"></span><span class="TskPgeTskRghtBtm"></span><span class="TskPgeTskRghtTp"></span><span class="TskPgeTskRghtBrdr"></span><span class="TskPgeTskPdng"><cc:text name="txtConfigureOAuth2" defaultValue="commontask.label.configure.oauth2" bundleID="amConsole" /></span></a></td>
+                                <td width="3%" class="TskPgeTskRghtTd" align="right" valign="top"><a href="#" onclick="test(6); event.cancelBubble = true; return false;"  onmouseover="hoverImg(6); event.cancelBubble = true;" onmouseout="outImg(6); event.cancelBubble = true;" onfocus="hoverImg(6); event.cancelBubble = true;" onblur="outImg(6); event.cancelBubble = true;" id="i6"><img alt="samlv2 validate" src="../console/images/tasks/rightToggle.gif" width="29" height="21" border="0" id="togImg6" /></a></td>
+                            </tr>
+                        </table>
+                    </td></tr>
+
+
+                    <tr>
                         <td valign="top" colspan=3><span class="TskPgeSbHdr"><cc:text name="txtSectionCreateFedlet" defaultValue="page.title.common.tasks.section.createFedlet" bundleID="amConsole" /></span></td>
                     </tr>
 

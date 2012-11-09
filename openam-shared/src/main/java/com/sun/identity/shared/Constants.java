@@ -1204,6 +1204,11 @@ public interface Constants {
     static final String DEFAULT_SESSION_HA_ROOT_SUFFIX = "o=openam-session";
 
     /**
+     * Default Session SFO/HA Root DN
+     */
+    static final String DEFAULT_OAUTH2_ROOT_SUFFIX = "o=openam-oauth2";
+
+    /**
      * Default Session SFO/HA Store Type.
      */
     static final String DEFAULT_SESSION_HA_STORE_TYPE = "none";

@@ -144,7 +144,7 @@ public class PLLClient {
         OutputStream out = null;
         BufferedReader in = null;
         try {
-            if ((SiteMonitor.keepMonitoring == true) && 
+            if ((SiteMonitor.keepMonitoring == true) &&
                 !SiteMonitor.isAvailable(url)) {
                 debug.error("Site " + url.toString() + " is down.");
                 throw new SendRequestException("Site is down.");

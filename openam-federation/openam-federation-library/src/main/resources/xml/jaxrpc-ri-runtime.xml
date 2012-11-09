@@ -1,3 +1,5 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<endpoints xmlns='http://java.sun.com/xml/ns/jax-rpc/ri/runtime' version='1.0'>
 <!--
    DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
   
@@ -69,4 +71,6 @@
     service='LibertyManagerService'
     port='LibertyManagerIFPort'
     urlpattern='/jaxrpc/LibertyManagerIF'/>
+
+</endpoints>
 

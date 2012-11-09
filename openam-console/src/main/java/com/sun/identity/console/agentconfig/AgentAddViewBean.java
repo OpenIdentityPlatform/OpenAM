@@ -46,6 +46,7 @@ import com.sun.web.ui.view.alert.CCAlert;
 import com.sun.web.ui.view.html.CCTextField;
 import com.sun.web.ui.view.pagetitle.CCPageTitle;
 import javax.servlet.http.HttpServletRequest;
+import java.text.MessageFormat;
 
 /**
  * View Bean to create new agent.
@@ -150,6 +151,11 @@ public class AgentAddViewBean
        if ((value == null) || value.equals("")){
            setDisplayFieldValue(RADIO_CHOICE, AgentsViewBean.PROP_CENTRAL);
        }
+       
+       AgentsModel model = (AgentsModel) getModel();
+       String agentType = getAgentType();
+       Object[] param = {model.getLocalizedString("agenttype." + agentType)};
+       ptModel.setPageTitleText(MessageFormat.format(model.getLocalizedString("page.title.agents.create"), param));
     } 
 
     /**

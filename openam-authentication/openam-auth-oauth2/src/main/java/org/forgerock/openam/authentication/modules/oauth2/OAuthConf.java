@@ -227,7 +227,8 @@ public class OAuthConf {
             return authServiceUrl
                     + param(PARAM_SCOPE, URLEncoder.encode(scope,"UTF-8"))
                     + param(PARAM_REDIRECT_URI,
-                    OAuthUtil.encodeUriToRedirect(originalUrl));
+                    OAuthUtil.encodeUriToRedirect(originalUrl))
+                    + param("response_type", URLEncoder.encode("code","UTF-8"));
         } catch (UnsupportedEncodingException ex) {
             OAuthUtil.debugError("OAuthConf.getAuthServiceUrl: problems while encoding "
                     + "the scope", ex);
@@ -258,7 +259,8 @@ public class OAuthConf {
                     OAuthUtil.encodeUriToRedirect(authServiceURL))
                     + param(PARAM_SCOPE, URLEncoder.encode(scope,"UTF-8"))
                     + param(PARAM_CLIENT_SECRET, clientSecret)
-                    + param(PARAM_CODE, URLEncoder.encode(code, "UTF-8"));
+                    + param(PARAM_CODE, URLEncoder.encode(code, "UTF-8"))
+                    + param("grant_type", URLEncoder.encode("authorization_code", "UTF-8"));
         } catch (UnsupportedEncodingException ex) {
             OAuthUtil.debugError("OAuthConf.getTokenServiceUrl: problems while encoding "
                     + "the scope", ex);

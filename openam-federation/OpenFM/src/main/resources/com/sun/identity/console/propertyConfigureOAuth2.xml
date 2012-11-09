@@ -1,0 +1,101 @@
+<!DOCTYPE propertysheet SYSTEM "propertysheet.dtd">
+<!--
+/*
+ * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
+ *
+ * Copyright © 2012 ForgeRock Inc. All rights reserved.
+ *
+ * The contents of this file are subject to the terms
+ * of the Common Development and Distribution License
+ * (the License). You may not use this file except in
+ * compliance with the License.
+ *
+ * You can obtain a copy of the License at
+ * http://forgerock.org/license/CDDLv1.0.html
+ * See the License for the specific language governing
+ * permission and limitations under the License.
+ *
+ * When distributing Covered Code, include this CDDL
+ * Header Notice in each file and include the License file
+ * at http://forgerock.org/license/CDDLv1.0.html
+ * If applicable, add the following below the CDDL Header,
+ * with the fields enclosed by brackets [] replaced by
+ * your own identifying information:
+ * "Portions Copyrighted [2012] [ForgeRock Inc]"
+ */
+-->
+<propertysheet>
+    <section name="question" defaultValue="blank.header">
+        <property required="true">
+            <label name="lblRealm" defaultValue="create.fedlet.label.realm" labelFor="tfRealm" />
+            <cc name="tfRealm" tagclass="com.sun.web.ui.taglib.html.CCTextFieldTag" />
+        </property>
+    </section>
+    <section name="question" defaultValue="configure.oauth2.section.serv">
+        <property required="true">
+            <label name="lblServiceRefreshLifetime" defaultValue="configure.oauth2.label.service.refreshLifetime" labelFor="choiceRefreshLifetime" />
+            <cc name="choiceRefreshLifetime" tagclass="com.sun.web.ui.taglib.html.CCTextFieldTag" >
+                <attribute name="defaultValue" value="60" />
+            </cc>
+            <fieldhelp name="helpChoiceRefreshLifetime" defaultValue="configure.oauth2.label.service.refreshLifetime.help" />
+        </property>
+        <property required="true">
+            <label name="lblServiceCodeLifetime" defaultValue="configure.oauth2.label.service.codeLifetime" labelFor="choiceCodeLifetime" />
+            <cc name="choiceCodeLifetime" tagclass="com.sun.web.ui.taglib.html.CCTextFieldTag" >
+                <attribute name="defaultValue" value="60" />
+            </cc>
+            <fieldhelp name="helpChoiceCodeLifetime" defaultValue="configure.oauth2.label.service.codeLifetime.help" />
+        </property>
+        <property required="true">
+            <label name="lblServiceTokenLifetime" defaultValue="configure.oauth2.label.service.tokenLifetime" labelFor="choiceTokenLifetime" />
+            <cc name="choiceTokenLifetime" tagclass="com.sun.web.ui.taglib.html.CCTextFieldTag" >
+                <attribute name="defaultValue" value="60" />
+            </cc>
+            <fieldhelp name="helpChoiceTokenLifetime" defaultValue="configure.oauth2.label.service.tokenLifetime.help" />
+        </property>
+        <property required="true">
+            <label name="lblServiceRefreshToken" defaultValue="configure.oauth2.label.service.refreshToken" labelFor="choiceRefreshToken" />
+            <cc name="choiceRefreshToken" tagclass="com.sun.web.ui.taglib.html.CCCheckBoxTag" />
+            <fieldhelp name="helpChoiceRefreshToken" defaultValue="configure.oauth2.label.service.refreshToken.help" />
+        </property>
+        <property required="true">
+            <label name="lblServiceScopeImpl" defaultValue="configure.oauth2.label.service.scopeImpl" labelFor="choiceScopeImpl" />
+            <cc name="choiceScopeImpl" tagclass="com.sun.web.ui.taglib.html.CCTextFieldTag" >
+                <attribute name="defaultValue" value="org.forgerock.openam.oauth2.provider.impl.ScopeImpl" />
+            </cc>
+            <fieldhelp name="helpChoiceScopeImpl" defaultValue="configure.oauth2.label.service.scopeImpl.help" />
+        </property>
+    </section>
+
+    <section name="question3" defaultValue="configure.oauth2.section.policy">
+        <property>
+            <fieldhelp name="helpQuestion3" defaultValue="configure.oauth2.section.policy.help" />
+        </property>
+        <property required="true">
+            <label name="lblPolicyName" defaultValue="configure.oauth2.label.policy.policyName" labelFor="choicePolicyName" />
+            <cc name="choicePolicyName" tagclass="com.sun.web.ui.taglib.html.CCTextFieldTag" />
+            <fieldhelp name="helpChoicePolicyName" defaultValue="configure.oauth2.label.policy.policyName.help" />
+        </property>
+        <property required="true">
+            <label name="lblPolicyRuleName" defaultValue="configure.oauth2.label.policy.policyRuleName" labelFor="choicePolicyRuleName" />
+            <cc name="choicePolicyRuleName" tagclass="com.sun.web.ui.taglib.html.CCTextFieldTag" />
+            <fieldhelp name="helpChoicePolicyRuleName" defaultValue="configure.oauth2.label.policy.policyRuleName.help" />
+        </property>
+        <property required="true">
+            <label name="lblPolicySubjectName" defaultValue="configure.oauth2.label.policy.policySubjectName" labelFor="choicePolicySubjectName" />
+            <cc name="choicePolicySubjectName" tagclass="com.sun.web.ui.taglib.html.CCTextFieldTag" />
+            <fieldhelp name="helpChoicePolicySubjectName" defaultValue="configure.oauth2.label.policy.policySubjectName.help" />
+        </property>
+        <property required="true">
+            <label name="lblPolicyURL" defaultValue="configure.oauth2.label.policy.policyURL" labelFor="choicePolicyURL" />
+            <cc name="choicePolicyURL" tagclass="com.sun.web.ui.taglib.html.CCTextFieldTag" />
+            <fieldhelp name="helpChoicePolicyURL" defaultValue="configure.oauth2.label.policy.policyURL.help" />
+        </property>
+    </section>
+
+    <section name="question2" defaultValue="configure.oauth2.section.registerClient">
+    <property>
+        <fieldhelp name="helpQuestion2" defaultValue="configure.oauth2.section.registerClient.help" />
+    </property>
+    </section>
+</propertysheet>

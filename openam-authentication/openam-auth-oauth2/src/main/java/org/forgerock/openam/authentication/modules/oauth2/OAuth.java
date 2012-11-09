@@ -97,7 +97,14 @@ public class OAuth extends AMLoginModule {
                     + "an interactive module");
             return ISAuthConstants.LOGIN_IGNORE;
         }
-        
+
+        // We are being redirected back from an OAuth 2 Identity Provider
+        String code = request.getParameter(PARAM_CODE);
+        if (code != null) {
+            OAuthUtil.debugMessage("OAuth.process(): GOT CODE: " + code);
+            state = GET_OAUTH_TOKEN_STATE;
+        }
+
         switch (state) {
             case ISAuthConstants.LOGIN_START: {
                 serverName = request.getServerName();
@@ -155,7 +162,7 @@ public class OAuth extends AMLoginModule {
 
             case GET_OAUTH_TOKEN_STATE: {
                 // We are being redirected back from an OAuth 2 Identity Provider
-                String code = request.getParameter(PARAM_CODE);
+                code = request.getParameter(PARAM_CODE);
                 if (code == null || code.isEmpty()) {
                         OAuthUtil.debugMessage("OAuth.process(): LOGIN_IGNORE");
                         return ISAuthConstants.LOGIN_START;

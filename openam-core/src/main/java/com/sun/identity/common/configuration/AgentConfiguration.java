@@ -70,6 +70,7 @@ public class AgentConfiguration {
 
     public final static String AGENT_TYPE_J2EE = "J2EEAgent";
     public final static String AGENT_TYPE_WEB = "WebAgent";
+    public final static String AGENT_TYPE_OAUTH2 = "OAuth2Client";
     public final static String AGENT_TYPE_2_DOT_2_AGENT = "2.2_Agent";
     public final static String AGENT_TYPE_AGENT_AUTHENTICATOR = "SharedAgent";
     public final static String ATTR_NAME_PWD = "userpassword";
@@ -634,6 +635,10 @@ public class AgentConfiguration {
     }
 
     private static String tagswap(Map map, String value) {
+        if (value == null || value.isEmpty()) {
+            return value;
+        }
+
         for (Iterator i = map.keySet().iterator(); i.hasNext(); ) {
             String k = (String)i.next();
             value = value.replaceAll("@" + k + "@", (String)map.get(k));

@@ -38,7 +38,111 @@
     <Service name="AgentService" version="1.0">
         <Schema i18nFileName="agentService" revisionNumber="10">
             <Organization>
-                <SubSchema name="WebAgent" inheritance="multiple">
+              
+	      <SubSchema name="OAuth2Client" inheritance="multiple">
+                   <AttributeSchema
+                            name="userpassword"
+                            type="single"
+                            syntax="password"
+                            validator="RequiredValueValidator"
+                            i18nKey="a700">
+                       <DefaultValues>
+                           <Value>&#x00A0;</Value>
+                       </DefaultValues>
+                   </AttributeSchema>
+                   <AttributeSchema name="com.forgerock.openam.oauth2provider.clientType"
+                                     type="single_choice"
+                                     syntax="string"
+                                     validator="RequiredValueValidator"
+                                     i18nKey="a701">
+                       <ChoiceValues>
+                           <ChoiceValue i18nKey="a702">Confidential</ChoiceValue>
+                           <ChoiceValue i18nKey="a703">Public</ChoiceValue>
+                       </ChoiceValues>
+                       <DefaultValues>
+                           <Value>Confidential</Value>
+                       </DefaultValues>
+                   </AttributeSchema>
+                   <!--
+                    <AttributeSchema name="com.forgerock.openam.oauth2provider.tokenType"
+                                     type="single_choice"
+                                     syntax="string"
+                                     validator="RequiredValueValidator"
+                                     i18nKey="a709">
+                        <ChoiceValues>
+                            <ChoiceValue i18nKey="a710">Bearer</ChoiceValue>
+                            <ChoiceValue i18nKey="a711">MAC</ChoiceValue>
+                            <ChoiceValue i18nKey="a712">SAML 2.0</ChoiceValue>
+                        </ChoiceValues>
+                        <DefaultValues>
+                            <Value>Bearer</Value>
+                        </DefaultValues>
+                    </AttributeSchema>
+                    <AttributeSchema name="com.forgerock.openam.oauth2provider.autoGrant"
+                                     type="single"
+                                     syntax="boolean"
+                                     i18nKey="a713">
+                        <BooleanValues>
+                            <BooleanTrueValue i18nKey="i18nTrue">true</BooleanTrueValue>
+                            <BooleanFalseValue i18nKey="i18nFalse">false</BooleanFalseValue>
+                        </BooleanValues>
+                        <DefaultValues>
+                            <Value>false</Value>
+                        </DefaultValues>
+                    </AttributeSchema>
+                    -->
+                   <AttributeSchema name="com.forgerock.openam.oauth2provider.redirectionURIs"
+                                     type="list"
+                                     syntax="string"
+                                     i18nKey="a704">
+                       <DefaultValues>
+                           <Value>10</Value>
+                       </DefaultValues>
+                   </AttributeSchema>
+                   <AttributeSchema name="com.forgerock.openam.oauth2provider.scopes"
+                                     type="list"
+                                     syntax="string"
+                                     i18nKey="a705">
+                       <DefaultValues>
+                       </DefaultValues>
+                   </AttributeSchema>
+                   <AttributeSchema name="com.forgerock.openam.oauth2provider.defaultScopes"
+                                     type="list"
+                                     syntax="string"
+                                     i18nKey="a708">
+                       <DefaultValues>
+                       </DefaultValues>
+                   </AttributeSchema>
+                   <AttributeSchema name="com.forgerock.openam.oauth2provider.name"
+                                     type="list"
+                                     syntax="string"
+                                     i18nKey="a706">
+                       <DefaultValues>
+                       </DefaultValues>
+                   </AttributeSchema>
+                   <AttributeSchema name="com.forgerock.openam.oauth2provider.description"
+                                     type="list"
+                                     syntax="string"
+                                     i18nKey="a707">
+                       <DefaultValues>
+                       </DefaultValues>
+                   </AttributeSchema>
+                   <AttributeSchema name="sunIdentityServerDeviceStatus"
+                                     type="single_choice"
+                                     syntax="string"
+                                     validator="RequiredValueValidator"
+                                     i18nKey="a101">
+                       <ChoiceValues>
+                           <ChoiceValue i18nKey="a102">Active</ChoiceValue>
+                           <ChoiceValue i18nKey="a103">Inactive</ChoiceValue>
+                       </ChoiceValues>
+                       <DefaultValues>
+                           <Value>Active</Value>
+                       </DefaultValues>
+                   </AttributeSchema>
+               </SubSchema>
+
+	      <SubSchema name="WebAgent" inheritance="multiple">
                     <AttributeSchema
                         name="userpassword"
                         type="single"

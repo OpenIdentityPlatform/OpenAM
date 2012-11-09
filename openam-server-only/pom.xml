@@ -298,6 +298,16 @@
                             <targetPath>WEB-INF/template/ldif/sfha</targetPath>
                             <filtering>false</filtering>
                         </webResource>
+			<webResource>
+                            <directory>${project.basedir}/../openam-oauth2/openam-oauth2-core-token-service/src/main/resources
+                            </directory>
+                            <includes>
+                                <!-- These Files get moved into Place when installing OpenDJ. -->
+                                <include>99-oauth2attributes.ldif</include>
+                            </includes>
+                            <targetPath>WEB-INF/template/ldif/oauth2</targetPath>
+                            <filtering>false</filtering>
+                        </webResource>
                     </webResources>
                 </configuration>
 
@@ -550,7 +560,6 @@
 
 
         <!-- Oauth2 dependencies -->
-	<!--
         <dependency>
             <groupId>org.forgerock.openam</groupId>
             <artifactId>openam-oauth2-restlet-extension</artifactId>
@@ -576,11 +585,23 @@
         </dependency>
 
         <dependency>
+            <groupId>org.forgerock.openam</groupId>
+            <artifactId>openam-oauth2-common</artifactId>
+            <version>10.1.0-SNAPSHOT</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.forgerock.openam</groupId>
+            <artifactId>openam-oauth2-rest</artifactId>
+            <version>10.1.0-SNAPSHOT</version>
+        </dependency>
+
+        <dependency>
             <groupId>org.freemarker</groupId>
             <artifactId>freemarker</artifactId>
             <version>2.3.19</version>
         </dependency>
-	-->
+
         <!-- XML -->
         <!-- Xerces-J Required for fedlet -->
         <dependency>
