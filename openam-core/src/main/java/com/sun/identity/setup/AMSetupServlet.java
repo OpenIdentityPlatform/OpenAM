@@ -931,10 +931,6 @@ public class AMSetupServlet extends HttpServlet {
             // gotten from template.
             }
 
-            ServiceConfigManager scm = new ServiceConfigManager(
-                Constants.SVC_NAME_PLATFORM, (SSOToken) 
-                AccessController.doPrivileged(AdminTokenAction.getInstance()));
-            scm.addListener(ConfigurationObserver.getInstance());
         }
         SetupProgress.reportEnd("emb.done", null);
     }

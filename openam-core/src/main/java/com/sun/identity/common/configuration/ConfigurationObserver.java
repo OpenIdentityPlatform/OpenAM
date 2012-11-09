@@ -25,7 +25,9 @@
  * $Id: ConfigurationObserver.java,v 1.5 2008/06/25 05:42:27 qcheng Exp $
  *
  */
-
+/**
+ * Portions Copyrighted 2012 ForgeRock Inc
+ */
 package com.sun.identity.common.configuration;
 
 import com.iplanet.am.util.SystemProperties;
@@ -59,6 +61,12 @@ public class ConfigurationObserver implements ServiceListener {
     private static boolean hasRegisteredListeners;
     
     private ConfigurationObserver() {
+        //always add PlatformService to the "monitored" services list, as this class makes sure that the
+        //PlatformService related changes are properly propagated to different components that are involved with
+        //server configuration in any way
+        //TODO: remove this hack, and create a listener explicitely made for PlatformService changes, and/or
+        //review serverAttributeMap.properties altogether
+        migratedServiceNames.add(Constants.SVC_NAME_PLATFORM);
         createAttributeMapping();
     }
     
