@@ -24,5 +24,5 @@
 <!DOCTYPE ModuleProperties PUBLIC "=//iPlanet//Authentication Module Properties XML Interface 1.0 DTD//EN"
 	"jar://com/sun/identity/authentication/Auth_Module_Properties.dtd">
 <ModuleProperties moduleName="Adaptive" version="1.0" >
-    <Callbacks length="0" order="1" timeout="120" header="‚±‚ÌƒT[ƒo[‚ÍƒAƒ_ƒvƒeƒBƒu”FØ‚ðŽg—p‚µ‚Ü‚·" />
+    <Callbacks length="0" order="1" timeout="120" header="ã“ã®ã‚µãƒ¼ãƒãƒ¼ã¯ã‚¢ãƒ€ãƒ—ãƒ†ã‚£ãƒ–èªè¨¼ã‚’ä½¿ç”¨ã—ã¾ã™" />
 </ModuleProperties>
