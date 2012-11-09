@@ -34,15 +34,11 @@
     </parent>
 
     <!-- Component Definition -->
-    <name>OpenAM Install Tools</name>
-    <description>OpenAM Install Tool Components</description>
-    <artifactId>openam-installtools</artifactId>
+    <name>OpenAM Install Tools Launcher</name>
+    <description>OpenAM Install Tools Launcher</description>
+    <artifactId>openam-installtools-launcher</artifactId>
     <version>10.1.0-SNAPSHOT</version>
     <packaging>jar</packaging>
-    <organization>
-        <name>ForgeRock</name>
-        <url>http://www.forgerock.com</url>
-    </organization>
 
     <!-- Build -->
     <build>
@@ -58,10 +54,10 @@
                             <classpathPrefix>lib/</classpathPrefix>
                         </manifest>
                         <manifestEntries>
-                            <Specification-Title>OpenAM Install Tools</Specification-Title>
+                            <Specification-Title>OpenAM Install Tools Launcher</Specification-Title>
                             <Specification-Version>${project.version} - ${maven.build.timestamp}</Specification-Version>
                             <Specification-Vendor>ForgeRock</Specification-Vendor>
-                            <Implementation-Title>OpenAM Install Tools</Implementation-Title>
+                            <Implementation-Title>OpenAM Install Tools Launcher</Implementation-Title>
                             <Implementation-Version>${project.version} - ${maven.build.timestamp}
                             </Implementation-Version>
                             <Implementation-Vendor>ForgeRock</Implementation-Vendor>
@@ -99,12 +95,5 @@
             </resource>
         </resources>
     </build>
-    <dependencies>
-        <dependency>
-            <groupId>org.forgerock.openam</groupId>
-            <artifactId>openam-installtools-launcher</artifactId>
-            <version>${project.version}</version>
-        </dependency>
-    </dependencies>
 </project>
 

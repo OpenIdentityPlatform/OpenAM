@@ -47,6 +47,7 @@
     <!-- Child Modules -->
     <modules>
         <module>openam-installtools</module>
+        <module>openam-installtools-launcher</module>
         <module>openam-diagnostics</module>
     </modules>
 </project>
