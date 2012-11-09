@@ -354,6 +354,7 @@
                         <filter>
                             <artifact>org.forgerock.openam:openam-federation-library</artifact>
                             <includes>
+                                <include>com/sun/identity/common/ServerOrSiteEntry*</include>
                                 <include>com/sun/identity/common/SystemConfiguration*</include>
                                 <include>com/sun/identity/configuration/FedLibSystemProperties*</include>
                                 <include>com/sun/identity/cot/*</include>
