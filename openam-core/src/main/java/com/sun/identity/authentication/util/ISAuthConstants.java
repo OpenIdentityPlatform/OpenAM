@@ -27,7 +27,7 @@
  */
 
 /*
- * Portions Copyrighted [2010] [ForgeRock AS]
+ * Portions Copyrighted 2010-2012 ForgeRock Inc
  */
 
 package com.sun.identity.authentication.util;
@@ -185,6 +185,11 @@ public interface ISAuthConstants {
      * Application Module Name
      */
     public static final String APPLICATION_MODULE = "Application";
+
+    /**
+     * FederationModule Name
+     */
+    public static final String FEDERATION_MODULE = "Federation";
 
     /**
      * SAML Module Name

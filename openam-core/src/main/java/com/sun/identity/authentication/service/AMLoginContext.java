@@ -27,7 +27,7 @@
  */
 
 /**
- * Portions Copyrighted 2011-2012 ForgeRock AS
+ * Portions Copyrighted 2011-2012 ForgeRock Inc
  */
 package com.sun.identity.authentication.service;
 
@@ -37,7 +37,10 @@ import com.iplanet.sso.SSOTokenManager;
 import com.sun.identity.authentication.AuthContext;
 import com.sun.identity.authentication.config.AMAuthConfigUtils;
 import com.sun.identity.authentication.config.AMAuthLevelManager;
+import com.sun.identity.authentication.config.AMAuthenticationInstance;
+import com.sun.identity.authentication.config.AMAuthenticationManager;
 import com.sun.identity.authentication.config.AMConfiguration;
+import com.sun.identity.authentication.config.AMConfigurationException;
 import com.sun.identity.authentication.server.AuthContextLocal;
 import com.sun.identity.authentication.spi.AuthLoginException;
 import com.sun.identity.authentication.spi.InvalidPasswordException;
@@ -67,6 +70,8 @@ import javax.servlet.http.HttpServletRequest;
 import com.sun.identity.monitoring.Agent;
 import com.sun.identity.monitoring.MonitoringUtil;
 import com.sun.identity.monitoring.SsoServerAuthSvcImpl;
+import com.sun.identity.security.AdminTokenAction;
+import java.security.AccessController;
 
 /**
  * <code>AMLoginContext</code> class is the core layer in the authentication 
@@ -256,16 +261,30 @@ public class AMLoginContext {
             return;
         }
         parseLoginParams(loginParamsMap);
-        if ((indexType == AuthContext.IndexType.MODULE_INSTANCE) &&
-        (!loginState.getEnableModuleBasedAuth()) && (!indexName.equals
-        (ISAuthConstants.APPLICATION_MODULE))) {
-            debug.error("Error: Module Based Auth is not allowed");
-            st.setStatus(LoginStatus.AUTH_FAILED);
-            loginState.setErrorCode(
-                AMAuthErrorCode.MODULE_BASED_AUTH_NOT_ALLOWED);
-            setErrorMsgAndTemplate();
-            throw new AuthLoginException(bundleName,
-                AMAuthErrorCode.MODULE_BASED_AUTH_NOT_ALLOWED, null);
+
+        String moduleClassName = null;
+        if (indexType == AuthContext.IndexType.MODULE_INSTANCE
+                && !loginState.getEnableModuleBasedAuth() && !indexName.equals(
+                ISAuthConstants.APPLICATION_MODULE)) {
+            try {
+                AMAuthenticationManager authManager = new AMAuthenticationManager(
+                        AccessController.doPrivileged(AdminTokenAction.getInstance()), orgDN);
+                AMAuthenticationInstance authInstance =
+                        authManager.getAuthenticationInstance(indexName);
+                moduleClassName = authInstance.getType();
+            } catch (AMConfigurationException amce) {
+                debug.warning("AMLoginContext.executeLogin(): Unable to get authentication config", amce);
+            }
+            if (moduleClassName != null && !moduleClassName.equalsIgnoreCase(
+                    ISAuthConstants.FEDERATION_MODULE)) {
+                debug.error("Error: Module Based Auth is not allowed");
+                st.setStatus(LoginStatus.AUTH_FAILED);
+                loginState.setErrorCode(
+                        AMAuthErrorCode.MODULE_BASED_AUTH_NOT_ALLOWED);
+                setErrorMsgAndTemplate();
+                throw new AuthLoginException(bundleName,
+                        AMAuthErrorCode.MODULE_BASED_AUTH_NOT_ALLOWED, null);
+            }
         }
 
         
