@@ -2478,6 +2478,10 @@
     <secondary>OAuth 2.0</secondary>
    </indexterm>
    
+   <note>
+   The default settings are for Facebook.
+   </note>
+   
    <para><command>ssoadm</command> service name:
    <literal>sunAMAuthOAuthService</literal></para>
    
@@ -2485,8 +2489,9 @@
     <varlistentry>
      <term>Client ID</term>
      <listitem>
-      <para>OAuth <literal>client_id</literal> as described in section 2.1 of
-      the Internet-Draft.</para>
+      <para>OAuth <literal>client_id</literal> as described in section 2.2 of 
+      <link xlink:href="http://tools.ietf.org/html/rfc6749"><citetitle>The OAuth 2.0 Authorization 
+      Framework</citetitle></link>.</para>
       <para><command>ssoadm</command> attribute:
       <literal>iplanet-am-auth-oauth-client-id</literal></para>
      </listitem>
@@ -2494,8 +2499,9 @@
     <varlistentry>
      <term>Client Secret</term>
      <listitem>
-      <para>OAuth <literal>client_secret</literal> as described in section 2.1
-      of the Internet-Draft.</para>
+      <para>OAuth <literal>client_secret</literal> as described in section 2.3 of 
+      <link xlink:href="http://tools.ietf.org/html/rfc6749"><citetitle>The OAuth 2.0 Authorization 
+      Framework</citetitle></link>.</para>
       <para><command>ssoadm</command> attribute:
       <literal>iplanet-am-auth-oauth-client-secret</literal></para>
      </listitem>
@@ -2503,7 +2509,8 @@
     <varlistentry>
      <term>Authentication Endpoint URL</term>
      <listitem>
-      <para>URL to the end point handling OAuth authentication.</para>
+      <para>URL to the end point handling OAuth authentication. The default value
+      is <literal>https://www.facebook.com/dialog/oauth</literal>.</para>
       <para><command>ssoadm</command> attribute:
       <literal>iplanet-am-auth-oauth-auth-service</literal></para>
      </listitem>
@@ -2512,7 +2519,8 @@
      <term>Access Token Endpoint URL</term>
      <listitem>
       <para>URL to the end point handling access tokens as described in section
-      3.2 of the Internet-Draft.</para>
+      3.2 of the Internet-Draft. The default value is 
+      <literal>https://graph.facebook.com/oauth/access_token</literal>.</para>
       <para><command>ssoadm</command> attribute:
       <literal>iplanet-am-auth-oauth-token-service</literal></para>
      </listitem>
@@ -2521,7 +2529,8 @@
      <term>User Profile Service URL</term>
      <listitem>
       <para>User profile URL that returns profile information in JSON
-      format.</para>
+      format. The default value is 
+      <literal>https://graph.facebook.com/me</literal>.</para>
       <para><command>ssoadm</command> attribute:
       <literal>iplanet-am-auth-oauth-user-profile-service</literal></para>
      </listitem>
@@ -2530,7 +2539,7 @@
      <term>Scope</term>
      <listitem>
       <para>Comma separated list of user profile attributes that the application
-      requires.</para>
+      requires. The default value is <literal>email,read_stream</literal>.</para>
       <para><command>ssoadm</command> attribute:
       <literal>iplanet-am-auth-oauth-scope</literal></para>
      </listitem>
@@ -2539,7 +2548,7 @@
      <term>Proxy URL</term>
      <listitem>
       <para>URL to the <filename>oauthproxy.jsp</filename> file, by default
-      part of OpenAM.</para>
+      part of OpenAM. </para>
       <para><command>ssoadm</command> attribute:
       <literal>iplanet-am-auth-oauth-sso-proxy-url</literal></para>
      </listitem>
@@ -2547,8 +2556,8 @@
     <varlistentry>
      <term>Account Mapper</term>
      <listitem>
-      <para>Class implementing account mapping. Default:
-      <literal>org.forgerock.openam.authentication.modules.oauth2.DefaultAccountMapper</literal></para>
+      <para>Class implementing account mapping. The default value is 
+      <literal>org.forgerock.openam.authentication.modules.oauth2.DefaultAccountMapper</literal>.</para>
       <para><command>ssoadm</command> attribute:
       <literal>org-forgerock-auth-oauth-account-mapper</literal></para>
      </listitem>
@@ -2558,7 +2567,8 @@
      <listitem>
       <para>Map of OAuth Provider user account attributes used to find the
       local profile of the authenticated user, with values in the form
-      <literal><replaceable>provider-attr</replaceable>=<replaceable>local-attr</replaceable></literal>.</para>
+      <literal><replaceable>provider-attr</replaceable>=<replaceable>local-attr</replaceable></literal>.
+      Default values <literal>email=mail</literal> and <literal> id=facebook-id</literal>.</para>
       <para><command>ssoadm</command> attribute:
       <literal>org-forgerock-auth-oauth-account-mapper-configuration</literal></para>
      </listitem>
@@ -2585,7 +2595,8 @@
     <varlistentry>
      <term>Save attributes in the session</term>
      <listitem>
-      <para>When enabled, add the mapped attributes to the session saved.</para>
+      <para>When enabled, add the mapped attributes to the session saved. The default mode is
+      <literal>Enabled</literal>.</para>
       <para><command>ssoadm</command> attribute:
       <literal>org-forgerock-auth-oauth-save-attributes-to-session-flag</literal></para>
      </listitem>
@@ -2606,7 +2617,7 @@
      <listitem>
       <para>When enabled, if the user profile does not exist, optionally
       retrieve a password and activation code from the user, and then create
-      the profile.</para>
+      the profile.  The default mode is <literal>Enabled</literal>.</para>
       <para><command>ssoadm</command> attribute:
       <literal>org-forgerock-auth-oauth-createaccount-flag</literal></para>
      </listitem>
@@ -2616,7 +2627,7 @@
      <listitem>
       <para>When enabled, the user sets a password, receives an activation code
       by email. The user must correctly set both in order for the account to
-      be created.</para>
+      be created.  The default mode is <literal>Enabled</literal>.</para>
       <para><command>ssoadm</command> attribute:
       <literal>org-forgerock-auth-oauth-prompt-password-flag</literal></para>
      </listitem>
@@ -2634,7 +2645,8 @@
     <varlistentry>
      <term>Anonymous User</term>
      <listitem>
-      <para>Specifies an anonymous user that exists in the current realm.</para>
+      <para>Specifies an anonymous user that exists in the current realm. The default is
+      <literal>anonymous</literal>.</para>
       <para><command>ssoadm</command> attribute:
       <literal>org-forgerock-auth-oauth-anonymous-user</literal></para>
      </listitem>
@@ -2659,7 +2671,7 @@
      </listitem>
     </varlistentry>
     <varlistentry>
-     <term>SMTP Gateway Implementation class</term>
+     <term>Mail Server Gateway implementation class</term>
      <listitem>
       <para>Class to interact with the mail server. Default:
       <literal>org.forgerock. openam.authentication.modules.oauth2.DefaultEmailGatewayImpl</literal></para>
@@ -2670,7 +2682,7 @@
     <varlistentry>
      <term>SMTP host</term>
      <listitem>
-      <para>Host name of the mail server.</para>
+      <para>Host name of the mail server. The default is <literal>localhost</literal>.</para>
       <para><command>ssoadm</command> attribute:
       <literal>org-forgerock-auth-oauth-smtp-hostname</literal></para>
      </listitem>
@@ -2678,7 +2690,7 @@
     <varlistentry>
      <term>SMTP port</term>
      <listitem>
-      <para>SMTP port number for the mail server.</para>
+      <para>SMTP port number for the mail server.  The default value is <literal>25</literal>.</para>
       <para><command>ssoadm</command> attribute:
       <literal>org-forgerock-auth-oauth-smtp-port</literal></para>
      </listitem>
@@ -2714,7 +2726,7 @@
      <term>SMTP From address</term>
      <listitem>
       <para>Specifies the message sender address, such as
-      <literal>no-reply@example.com</literal>.</para>
+      <literal>no-reply@example.com</literal>. The default value is <literal>info@forgerock.com</literal>.</para>
       <para><command>ssoadm</command> attribute:
       <literal>org-forgerock-auth-oauth-smtp-email-from</literal></para>
      </listitem>
@@ -2727,7 +2739,163 @@
      </listitem>
     </varlistentry>
    </variablelist>
+   
+     <para><!--TO DO Each site that participates in OAuth 2.0 has information specific to their endpoints
+  that you can add to the <link xlink:href="admin-guide#chap-oauth2"
+   xlink:role="http://docbook.org/xlink/role/olink">Authorization Module</link> 
+   PLEASE POINT THE LINK TO THE SPECIFIC SECTION FOR SETUP. -->The following tables show the largest current
+   OAuth 2.0 provides. Facebook is the default setting, but just in case, it is also included.
+   Please keep in mind these are not required field, but default settings for the different
+   large providers. Fields not listed here are generally up to the user, like scope and attribute mapping.</para> 
+
+    <table xml:id="oauth2-openam" pgwide="1">
+     <title>Endpoint URLs for OpenAM</title>
+     <tgroup cols="2">
+      <thead>
+       <row>
+        <entry>OpenAM Field</entry>
+        <entry>Details</entry>
+       </row>
+      </thead>
+      <tbody>
+       <row>
+        <entry>Authentication Endpoint URL</entry>
+        <entry>Dependent on the domain name used. For <literal>openam.example.com:18080</literal>
+        enter <literal>https://openam.example.com:8080/openam/oauth2/authorize</literal>.</entry>
+       </row>
+       <row>
+        <entry>Access Token Endpoint URL</entry>
+        <entry>Dependent on the domain name used. For <literal>openam.example.com:18080</literal>
+        enter <literal>https://openam.example.com:8080/openam/oauth2/access_token</literal>.</entry>
+       </row>
+       <row>
+        <entry>User Profile Service URL</entry>
+        <entry>Dependent on the domain name used. For <literal>openam.example.com:18080</literal>
+        enter <literal>https://openam.example.com:8080/openam/oauth2/tokeninfo</literal>.</entry>
+       </row>
+      </tbody>
+     </tgroup>
+    </table>   
+
+
+    <table xml:id="oauth2-facebook" pgwide="1">
+     <title>Endpoint URLs for Facebook</title>
+     <tgroup cols="2">
+      <thead>
+       <row>
+        <entry>OpenAM Field</entry>
+        <entry>Details</entry>
+       </row>
+      </thead>
+      <tbody>
+       <row>
+        <entry>Authentication Endpoint URL</entry>
+        <entry>https://www.facebook.com/dialog/oauth</entry>
+       </row>
+       <row>
+        <entry>Access Token Endpoint URL</entry>
+        <entry>https://graph.facebook.com/oauth/access_token</entry>
+       </row>
+       <row>
+        <entry>User Profile Service URL</entry>
+        <entry>https://graph.facebook.com/me</entry>
+       </row>
+      </tbody>
+     </tgroup>
+    </table>   
+
+
+    <table xml:id="oauth2-google" pgwide="1">
+     <title>Endpoint URLs for Google</title>
+     <tgroup cols="2">
+      <thead>
+       <row>
+        <entry>OpenAM Field</entry>
+        <entry>Details</entry>
+       </row>
+      </thead>
+      <tbody>
+       <row>
+        <entry>Authentication Endpoint URL</entry>
+        <entry>https://accounts.google.com/o/oauth2/auth?response_type=code</entry>
+       </row>
+       <row>
+        <entry>Access Token Endpoint URL</entry>
+        <entry>https://accounts.google.com/o/oauth2/token?grant_type=authorization_code</entry>
+       </row>
+       <row>
+        <entry>User Profile Service URL</entry>
+        <entry>https://www.googleapis.com/oauth2/v1/userinfo</entry>
+       </row>
+      </tbody>
+     </tgroup>
+    </table>   
+
+    <table xml:id="oauth2-msn" pgwide="1">
+     <title>Endpoint URLs for MSN</title>
+     <tgroup cols="2">
+      <thead>
+       <row>
+        <entry>OpenAM Field</entry>
+        <entry>Details</entry>
+       </row>
+      </thead>
+      <tbody>
+       <row>
+        <entry>Authentication Endpoint URL</entry>
+        <entry>https://oauth.live.com/authorize?response_type=code</entry>
+       </row>
+       <row>
+        <entry>Access Token Endpoint URL</entry>
+        <entry>https://oauth.live.com/token?grant_type=authorization_code</entry>
+       </row>
+       <row>
+        <entry>User Profile Service URL</entry>
+        <entry>https://apis.live.net/v5.0/me</entry>
+       </row>
+      </tbody>
+     </tgroup>
+    </table>   
+    
+<!-- Waiting for User Profile Service URL info from Twitter
+  <table xml:id="oauth2-twitter" pgwide="1">
+     <title>Endpoint URLs for Twitter</title>
+     <tgroup cols="2">
+      <thead>
+       <row>
+        <entry>OpenAM Field</entry>
+        <entry>Details</entry>
+       </row>
+      </thead>
+      <tbody>
+       <row>
+        <entry>Authentication Endpoint URL</entry>
+        <entry>https://api.twitter.com/oauth/authenticate</entry>
+       </row>
+       <row>
+        <entry>Access Token Endpoint URL</entry>
+        <entry>https://api.twitter.com/oauth/request_token</entry>
+       </row>
+       <row>
+        <entry>User Profile Service URL</entry>
+        <entry>STILL NEED</entry>
+       </row>
+      </tbody>
+     </tgroup>
+    </table>   
+-->
+
   </section>
+ 
+ <!-- TO DO  
+ <section xml:id="oauth2-recommendations">
+  <title>Recommendations</title>
+
+  <para>This sections provides some recommendations to help you make decisions about your
+  OAuth 2.0 setup and maintenance.</para>
+
+  </section>
+  -->
   
   <section xml:id="radius-module-conf-hints">
    <title>Hints For the RADIUS Authentication Module</title>
