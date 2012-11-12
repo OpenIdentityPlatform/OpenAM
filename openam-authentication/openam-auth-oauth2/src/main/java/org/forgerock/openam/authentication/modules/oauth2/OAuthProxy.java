@@ -56,11 +56,6 @@ public class OAuthProxy  {
         }
 
         Map<String, String> params = req.getParameterMap();
-        //if (params.size() != 1) {
-        //    OAuthUtil.debugError("OAuthProxy.toPostForm: More or less "
-        //            + "than 1 parameters in the request");
-        //    return getError("Request not valid");
-        //}
         
         if (!params.keySet().contains(PARAM_CODE)
                 && !params.keySet().contains(PARAM_ACTIVATION)) {
