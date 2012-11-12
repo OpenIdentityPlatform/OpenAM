@@ -231,7 +231,7 @@ $ which java
 SUMMARY OF YOUR RESPONSES
 -----------------------------------------------
 Tomcat Server Config Directory : /path/to/tomcat/conf
-<?eval ${oldProjectName}?> server URL : http://openam.example.com:8080/openam
+OpenAM server URL : http://openam.example.com:8080/openam
 $CATALINA_HOME environment variable : /path/to/tomcat
 Tomcat global web.xml filter install : true
 Agent URL : http://www.example.com:8080/agentapp

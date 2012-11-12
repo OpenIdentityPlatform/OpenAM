@@ -227,7 +227,7 @@ Startup script location :
 /path/to/domain/mydomain/bin/startWebLogic.sh
 WebLogic Server instance name : AdminServer
 WebLogic home directory : /path/to/wlserver
-<?eval ${oldProjectName}?> server URL : http://openam.example.com:8080/openam
+OpenAM server URL : http://openam.example.com:8080/openam
 Agent URL : http://www.example.com:7001/agentapp
 Agent Profile name : WebLogic Agent
 Agent Profile Password file name : /tmp/pwd.txt
@@ -308,7 +308,7 @@ Install log file location:
    </step>
    <step>
     <para>Restart the WebLogic server.</para>
-    <para>First you must get get the environment settings from the script
+    <para>First you must get the environment settings from the script
     installed with the policy agent, then run the startup script.</para>
     <screen>$ . ./domain/mydomain/bin/setAgentEnv_AdminServer.sh 
 $ ./domain/mydomain/bin/startWebLogic.sh</screen>
@@ -396,6 +396,56 @@ $ ./domain/mydomain/bin/startWebLogic.sh</screen>
   to create a response file for scripted installation. Then install silently
   using <command>agentadmin --install --useResponse
   <replaceable>response-file</replaceable></command>.</para>
+ </section>
+ 
+ <section xml:id="post-weblogic-agent-installation">
+  <title>Post Installation of WebLogic Policy Agent</title>
+  
+  <para>After installing WebLogic, some configuration is required before
+  the policy agent will work.</para>
+  <procedure xml:id="configure-weblogic-agent">
+   <title>To Configure the WebLogic Policy Agent</title>
+   <para>WebLogic is unique in that it requires additional configuration
+   after the installation is complete.</para>
+   <step>
+    <para>Go to the WebLogic Server Administratotion Console and login.</para>
+   </step>
+   <step>
+    <para>Click <literal>Security realms</literal>.</para>
+   </step>  
+   <step>
+    <para>Click the name of the realm to use for OpenAM.</para>
+   </step>  
+   <step>
+    <para>Click <literal>Providers</literal> > <literal>Authentication</literal>.</para>
+   </step>  
+   <step>
+    <para>Click <literal>Lock &amp; Edit</literal> > <literal>New</literal>.</para>
+   </step>  
+   <step>
+    <para>Enter the desired type in <literal>Type as AgentAuthenticator</literal>,
+    provide a name, and click <literal>OK</literal>.</para>
+   </step>  
+   <step>
+    <para>Click on the name of the agent authenticator you just created.</para>
+   </step>  
+   <step>
+    <para>Use <literal>OPTIONAL</literal> for the control flag and save.</para>
+   </step>
+   <step>
+    <para>Click on <literal>Providers</literal> to display the Authentication
+    Providers Table.</para>
+   </step>
+   <step>
+    <para>Click on <literal>Default Authenticator</literal>, use <literal>OPTIONAL</literal>
+    for the control flag, and save.</para>
+   </step>
+   <step>
+    <para>Activate the changes once the default authenticator is done saving.</para>
+    <para>You will need to restart the WebLogic Server to implement the changes.</para>
+   </step>
+  
+  </procedure>
  </section>
  
  <section xml:id="uninstall-weblogic-agent">

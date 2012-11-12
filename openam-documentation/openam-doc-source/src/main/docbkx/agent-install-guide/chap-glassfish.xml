@@ -228,7 +228,7 @@ SUMMARY OF YOUR RESPONSES
 Application Server Config Directory :
 /path/to/glassfish/glassfish/domains/domain1/config
 Application Server Instance name : server
-<?eval ${oldProjectName}?> server URL : http://openam.example.com:8080/openam
+OpenAM server URL : http://openam.example.com:8080/openam
 Agent URL : http://www.example.com:8080/agentapp
 Agent Profile name : GlassFish Agent
 Agent Profile Password file name : /tmp/pwd.txt

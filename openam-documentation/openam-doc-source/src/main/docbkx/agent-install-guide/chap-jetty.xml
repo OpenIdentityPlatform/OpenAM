@@ -67,8 +67,9 @@ $ which java
   posted on the download page.</para>
   
   <note>
-   <para>Examples in this chapter show Jetty accessed remotely. In order to
-   access Jetty remotely, you might have to change the test filter settings in
+   <para>Command line examples in this chapter show Jetty accessed remotely. If 
+   you are following the examples and have issues accessing Jetty remotely,
+    you might have to change the test filter settings in
    <filename>/path/to/jetty/webapps/test/WEB-INF/web.xml</filename>.</para>
    <programlisting language="xml">&lt;filter&gt;
  &lt;filter-name&gt;TestFilter&lt;/filter-name&gt;
@@ -237,7 +238,7 @@ $ which java
 SUMMARY OF YOUR RESPONSES
 -----------------------------------------------
 Jetty Server Config Directory : /path/to/jetty/etc
-<?eval ${oldProjectName}?> server URL : http://openam.example.com:8080/openam
+OpenAM server URL : http://openam.example.com:8080/openam
 Jetty installation directory. : /path/to/jetty
 Agent URL : http://www.example.com:8080/agentapp
 Agent Profile name : Jetty Agent

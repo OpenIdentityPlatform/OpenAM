@@ -230,7 +230,7 @@ Instance Config Directory :
 
 Instance Server name : server1 
 WebSphere Install Root Directory : /path/to/WebSphere/AppServer 
-<?eval ${oldProjectName}?> server URL : http://openam.example.com:8080/openam 
+OpenAM server URL : http://openam.example.com:8080/openam 
 Agent URL : http://www.example.com:9080/agentapp 
 Agent Profile name : WebSphere Agent 
 Agent Profile Password file name : /tmp/pwd.txt

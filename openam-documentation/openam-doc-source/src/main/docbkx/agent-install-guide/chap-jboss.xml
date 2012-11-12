@@ -226,7 +226,7 @@ SUMMARY OF YOUR RESPONSES
 -----------------------------------------------
 JBoss Server Config Directory : /path/to/jboss/server/default/conf
 JBoss Server Home Directory : /path/to/jboss
-<?eval ${oldProjectName}?> server URL : http://openam.example.com:8080/openam
+OpenAM server URL : http://openam.example.com:8080/openam
 Agent URL : http://www.example.com:8080/agentapp
 Agent Profile name : JBoss Agent
 Agent Profile Password file name : /tmp/pwd.txt
