@@ -2479,7 +2479,7 @@
    </indexterm>
    
    <note>
-   The default settings are for Facebook.
+    <para>The default settings are for Facebook.</para>
    </note>
    
    <para><command>ssoadm</command> service name:
