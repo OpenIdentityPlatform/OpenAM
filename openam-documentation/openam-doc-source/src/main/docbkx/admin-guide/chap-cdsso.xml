@@ -116,8 +116,9 @@
    <para>Set the list of URLs for CDSSO Trusted ID Provider to the Cross Domain
    Controller Servlet URLs of the OpenAM servers the agent accesses, such
    <literal>http://openam.example.com:8080/openam/cdcservlet</literal>.</para>
-   <para>Even if the agent accesses OpenAM through a load balancer, use the
-   OpenAM server URLs here.</para>
+   <para>This list should include one CDC Servlet URL for every OpenAM server
+   the agent might access. You do not need to include site or load balancer
+   URLs.</para>
   </step>
   <step performance="optional">
    <para>To protect the SSO token from network snooping, you can select CDSSO
