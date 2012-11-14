@@ -38,12 +38,6 @@
   <title>New in Web Policy Agents <?eval ${webAgentsDocTargetVersion}?></title>
 
   <itemizedlist>
-
-   <listitem>
-    <para>The Java EE agent goto URL can now be modified (<link
-    xlink:href="https://bugster.forgerock.org/jira/browse/OPENAM-1299"
-    xlink:show="new">OPENAM-1299</link>).</para>
-   </listitem>
    <listitem>
     <para>Web policy agents can perform URL validation during the bootstrap
     phase when you set the
@@ -51,26 +45,23 @@
     (<link xlink:href="https://bugster.forgerock.org/jira/browse/OPENAM-1270"
     xlink:show="new">OPENAM-1270</link>).</para>
    </listitem>
-   <listitem>
-    <para>Policy agent now allows you to set the Login URL based on the incoming FQDN (<link
-    xlink:href="https://bugster.forgerock.org/jira/browse/OPENAM-1265"
-    xlink:show="new">OPENAM-1265</link>).</para>
-   </listitem>
+<!--
    <listitem>
     <para>Web policy agents now support failover across multiple naming URLs
     (<link xlink:href="https://bugster.forgerock.org/jira/browse/OPENAM-1258"
     xlink:show="new">OPENAM-1258</link>).</para>
    </listitem>
+-->
    <listitem>
-    <para>Policy agent now allows you to configure the naming of the URL validation net-connect timeout (<link
+    <para>Web policy agents now allow you to configure the naming of the URL
+    validation net-connect timeout (<link
     xlink:href="https://bugster.forgerock.org/jira/browse/OPENAM-1257"
     xlink:show="new">OPENAM-1257</link>).</para>
    </listitem>
    <listitem>
-    <para>Policy agents now support IPv6 for notenforced IP addresses
-    (<link
-   xlink:href="https://bugster.forgerock.org/jira/browse/OPENAM-1256"
-   xlink:show="new">OPENAM-1256</link>).</para>
+    <para>Web policy agents now support IPv6 for notenforced IP addresses
+    (<link xlink:href="https://bugster.forgerock.org/jira/browse/OPENAM-1256"
+    xlink:show="new">OPENAM-1256</link>).</para>
    </listitem>
    <listitem>
     <para>A web policy agent is now available for Apache HTTPD Server 2.4 (<link
@@ -78,7 +69,7 @@
     xlink:show="new">OPENAM-1195</link>).</para>
    </listitem>
    <listitem>
-    <para>Web policy policy agents now let you enable and disable Cache-Control
+    <para>Web policy agents now let you enable and disable Cache-Control
     headers for unauthenticated sessions (<link
     xlink:href="https://bugster.forgerock.org/jira/browse/OPENAM-1087"
     xlink:show="new">OPENAM-1087</link>).</para>
@@ -108,12 +99,6 @@
     xlink:href="https://bugster.forgerock.org/jira/browse/OPENAM-804"
     xlink:show="new">OPENAM-804</link>).</para>
    </listitem>
-   <listitem>
-    <para>Policy agent file names now include the version number
-    (<link
-   xlink:href="https://bugster.forgerock.org/jira/browse/OPENAM-337"
-   xlink:show="new">OPENAM-337</link>).</para>
-   </listitem>
   </itemizedlist>
  </section>
 
@@ -122,10 +107,9 @@
 
   <itemizedlist>
    <listitem>
-    <para>The auto-submitting form in <filename>FormLoginContent.txt</filename>
-    now parses as valid XML (<link
-   xlink:href="https://bugster.forgerock.org/jira/browse/OPENAM-674"
-   xlink:show="new">OPENAM-674</link>).</para>
+    <para>The Java EE agent goto URL can now be modified (<link
+    xlink:href="https://bugster.forgerock.org/jira/browse/OPENAM-1299"
+    xlink:show="new">OPENAM-1299</link>).</para>
    </listitem>
    <listitem>
     <para>The Apache Tomcat policy agent now supports Tomcat 7 as well (<link
@@ -133,10 +117,16 @@
     xlink:show="new">OPENAM-1273</link>).</para>
    </listitem>
    <listitem>
-    <para>Policy agent file names now include the version number
-    (<link
-   xlink:href="https://bugster.forgerock.org/jira/browse/OPENAM-337"
-   xlink:show="new">OPENAM-337</link>).</para>
+    <para>Java EE policy agents can now conditionally redirect users based on
+    the incoming request URL (<link
+    xlink:href="https://bugster.forgerock.org/jira/browse/OPENAM-1265"
+    xlink:show="new">OPENAM-1265</link>).</para>
+   </listitem>
+   <listitem>
+    <para>The auto-submitting form in <filename>FormLoginContent.txt</filename>
+    now parses as valid XML (<link
+    xlink:href="https://bugster.forgerock.org/jira/browse/OPENAM-674"
+    xlink:show="new">OPENAM-674</link>).</para>
    </listitem>
   </itemizedlist>
  </section>
