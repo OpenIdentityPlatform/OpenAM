@@ -143,9 +143,24 @@ public interface AMAdminConstants {
     String OPTIONAL_ATTRIBUTE = "optional";
 
     /**
+     * End User display attribute value in any attribute.
+     */
+    String DISPLAY_ATTRIBUTE = "display";
+
+    /**
+     * End User display attribute value READ ONLY in any attribute.
+     */
+    String DISPLAY_READONLY_ATTRIBUTE = "displayRO";
+
+    /**
      * Administrator display attribute value in any attribute.
      */
     String ADMIN_DISPLAY_ATTRIBUTE = "adminDisplay";
+
+    /**
+     * Administrator display attribute value READ ONLYin any attribute.
+     */
+    String ADMIN_DISPLAY_READONLY_ATTRIBUTE = "adminDisplayRO";
 
     /**
      * Literal false string.

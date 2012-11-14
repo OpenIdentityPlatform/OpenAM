@@ -100,6 +100,7 @@ public class EntitiesModelImpl
     private static RequiredValueValidator reqValidator =
         new RequiredValueValidator();
     private Map requiredAttributeNames = new HashMap();
+    private Set readOnlyAttributeNames = new HashSet();
 
     private String type = null;
     private boolean isServicesSupported = true;
@@ -344,8 +345,7 @@ public class EntitiesModelImpl
                         builder.setAllAttributeReadOnly(true);
                     }
                 }
-
-                xml = builder.getXML();
+                xml = builder.getXML(readOnlyAttributeNames,true);
             }
         } catch (AMConsoleException e) {
             debug.warning("EntitiesModelImpl.getPropertyXMLString", e); 
@@ -470,25 +470,30 @@ public class EntitiesModelImpl
                 attributeSchemas = Collections.EMPTY_SET;
             }
 
-            if (bCreate) {
-                for (Iterator i = attributeSchemas.iterator(); i.hasNext();) {
-                    AttributeSchema as = (AttributeSchema)i.next();
-                    Set any = AMAdminUtils.getDelimitedValues(as.getAny(), "|");
-                    if (!any.contains(AMAdminConstants.REQUIRED_ATTRIBUTE) &&
-                        !any.contains(AMAdminConstants.OPTIONAL_ATTRIBUTE)) {
-                        i.remove();
-                    }
-                }
-            }
+            // Clean up the Attribute Schema
 
-            if (endUser) {
-                for (Iterator i = attributeSchemas.iterator(); i.hasNext();) {
-                    AttributeSchema as = (AttributeSchema)i.next();
-                    Set any = AMAdminUtils.getDelimitedValues(as.getAny(), "|");
-                    if (any.contains(AMAdminConstants.ADMIN_DISPLAY_ATTRIBUTE)){
-                        i.remove();
-                    }
+            for (Iterator i = attributeSchemas.iterator(); i.hasNext();) {
+                AttributeSchema as = (AttributeSchema)i.next();
+                Set any = AMAdminUtils.getDelimitedValues(as.getAny(), "|");
+
+                if (bCreate &&
+                      ((!any.contains(AMAdminConstants.REQUIRED_ATTRIBUTE)) &&
+                       (!any.contains(AMAdminConstants.OPTIONAL_ATTRIBUTE)))) {
+                    i.remove();
+                    continue;
                 }
+                if ((endUser && any.contains(AMAdminConstants.ADMIN_DISPLAY_ATTRIBUTE)) ||
+                    (endUser && any.contains(AMAdminConstants.ADMIN_DISPLAY_READONLY_ATTRIBUTE))) {
+                    i.remove();
+                    continue;
+                }
+                if (endUser && any.contains(AMAdminConstants.DISPLAY_READONLY_ATTRIBUTE)) {
+                    readOnlyAttributeNames.add(as.getName());
+                }
+                if (any.contains(AMAdminConstants.ADMIN_DISPLAY_READONLY_ATTRIBUTE)) {
+                    readOnlyAttributeNames.add(as.getName());
+                }
+
             }
 
             // get the attributes to display in create and profile pages
@@ -499,7 +504,11 @@ public class EntitiesModelImpl
                 // beforeDisplay called to remove naming attr in create page
                 beforeDisplay(idType, attributeSchemas);
             } else {
-                String[] show = {"display", "adminDisplay" };
+                String[] show = {
+                        AMAdminConstants.ADMIN_DISPLAY_ATTRIBUTE,
+                        AMAdminConstants.ADMIN_DISPLAY_READONLY_ATTRIBUTE,
+                        AMAdminConstants.DISPLAY_ATTRIBUTE,
+                        AMAdminConstants.DISPLAY_READONLY_ATTRIBUTE };
                 if (!bAgentType) {
                     PropertyXMLBuilder.filterAttributes(attributeSchemas, show);
                 } else {

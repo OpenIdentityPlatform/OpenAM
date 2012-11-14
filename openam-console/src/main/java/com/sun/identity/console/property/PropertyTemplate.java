@@ -72,6 +72,8 @@ public interface PropertyTemplate {
     String ANY_REQUIRED = "required";
     String ANY_DISPLAY = "display";
     String ANY_ADMIN_DISPLAY = "adminDisplay";
+    String ANY_DISPLAYRO = "displayRO";
+    String ANY_ADMIN_DISPLAYRO = "adminDisplayRO";
     String DATE_MARKER_NAME = "dateMarker";
                                                                                 
     String PWD_CONFIRM_SUFFIX = "_confirm";

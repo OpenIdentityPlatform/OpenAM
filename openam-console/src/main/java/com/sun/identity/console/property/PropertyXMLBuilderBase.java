@@ -195,7 +195,9 @@ public abstract class PropertyXMLBuilderBase
                                                                                 
             if (!hasAnyAttribute(any, ANY_REQUIRED) &&
                 !hasAnyAttribute(any, ANY_DISPLAY) &&
-                !hasAnyAttribute(any, ANY_ADMIN_DISPLAY)
+                !hasAnyAttribute(any, ANY_ADMIN_DISPLAY) &&
+                !hasAnyAttribute(any, ANY_DISPLAYRO) &&
+                !hasAnyAttribute(any, ANY_ADMIN_DISPLAYRO)
             ) {
                 iter.remove();
             } else if (getTagClassName(as) == null) {
