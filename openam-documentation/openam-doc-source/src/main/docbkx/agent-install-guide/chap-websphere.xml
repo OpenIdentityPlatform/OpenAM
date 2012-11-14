@@ -62,6 +62,8 @@
 $ which java
 /usr/bin/java</screen>
 
+  <para>If you are using IBM Java, see <xref linkend="install-with-ibm-jvm" />.</para>
+
   <para>Download the WebSphere policy agent from the
   <link xlink:href="http://forgerock.org/openam.html">download page</link>.
   Also verify the checksum of the file you download against the checksum
@@ -127,6 +129,40 @@ $ which java
     </listitem>
    </varlistentry>
   </variablelist>
+
+  <procedure xml:id="install-with-ibm-jvm">
+   <title>To Install With IBM Java</title>
+
+   <para>The WebSphere policy agent runs with IBM Java. In order to install
+   the policy agent using IBM Java on platforms other than AIX, you must first
+   change the <command>agentadmin</command> script to use IBMJCE.</para>
+
+   <step>
+    <para>Open the file, <filename>bin/agentadmin</filename>
+    (<filename>bin/agentadmin.bat</filename> on Windows), for editing.</para>
+   </step>
+   <step>
+    <para>Edit the line specifying <literal>AGENT_OPTS</literal> on platforms
+    other than AIX.</para>
+    <literallayout class="monospaced"
+    >AGENT_OPTS="-DamKeyGenDescriptor.provider=IBMJCE \
+ -DamCryptoDescriptor.provider=IBMJCE -DamRandomGenProvider=IBMJCE"</literallayout>
+   </step>
+   <step>
+    <para>Edit the last line to include the IBMJCE settings before the
+    classpath is set.</para>
+    <literallayout class="monospaced"
+    >$JAVA_VM \
+ -DamCryptoDescriptor.provider=IBMJCE -DamKeyGenDescriptor.provider=IBMJCE \
+ -classpath "$AGENT_CLASSPATH" $AGENT_OPTS \
+ com.sun.identity.install.tools.launch.AdminToolLauncher $*</literallayout>
+   </step>
+   <step>
+    <para>Save your work.</para>
+    <para>You can now install the WebSphere policy agent with IBM Java as
+    described in <xref linkend="install-websphere-agent" />.</para>
+   </step>
+  </procedure>
  </section>
  
  <section xml:id="install-websphere-agent">
