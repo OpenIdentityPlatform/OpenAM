@@ -188,6 +188,8 @@
         <!-- OpenAM ForgeRock REST - CORE Module -->
         <module>openam-forgerock-rest</module>
 
+        <module>openam-plugins</module>
+
         <module>openam-console</module>
 
         <!-- OpenAM Core Module -->
