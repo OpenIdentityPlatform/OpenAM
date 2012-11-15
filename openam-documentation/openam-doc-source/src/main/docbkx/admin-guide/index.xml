@@ -70,6 +70,7 @@
  <xinclude:include href='chap-monitoring.xml' />
  <xinclude:include href='chap-tuning.xml' />
  <xinclude:include href='chap-change-hosts.xml' />
+ <xinclude:include href='chap-securing.xml' />
  <xinclude:include href='chap-troubleshooting.xml' />
 
  <xinclude:include href="glossary.xml" />
