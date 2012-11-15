@@ -596,7 +596,7 @@ public class AccessManager {
         webSupport="true",
         mandatoryOptions={
             "servicename|s|s|Name of service.",
-            "schematype|t|s|Type of schema."},
+            "schematype|t|s|Type of schema. One of dynamic, global, or organization (meaning realm)."},
         optionAliases={},
         macro="authentication",
         optionalOptions={
