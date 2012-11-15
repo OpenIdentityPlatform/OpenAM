@@ -11,11 +11,9 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2012 ForgeRock AS.
+ * Copyright 2012 ForgeRock Inc.
  */
 package org.forgerock.openam.forgerockrest;
-
-import static org.forgerock.json.resource.Context.newRootContext;
 
 import java.lang.String;
 import java.util.Arrays;
@@ -28,27 +26,24 @@ import javax.servlet.ServletContext;
 import org.forgerock.json.fluent.JsonValue;
 import org.forgerock.json.resource.Connection;
 import org.forgerock.json.resource.ConnectionFactory;
-import org.forgerock.json.resource.Connections;
 import org.forgerock.json.resource.CreateRequest;
 import org.forgerock.json.resource.Requests;
-import org.forgerock.json.resource.exception.ResourceException;
-import org.forgerock.json.resource.provider.RequestHandler;
-import org.forgerock.json.resource.provider.Router;
-import org.forgerock.json.resource.provider.UriTemplateRoutingStrategy;
-
+import org.forgerock.json.resource.ResourceException;
+import org.forgerock.json.resource.RequestHandler;
+import org.forgerock.json.resource.Router;
 
 
 /**
  * A simple {@code Map} based collection resource provider.
  */
-public final class TestDispatcher  {
+public final class TestDispatcher {
 
 
     private TestDispatcher() {
 
     }
 
-    static public void initDispatcher(UriTemplateRoutingStrategy routes) {
-       // routes.register("/test",new TestResource());                // Just a simply READ to make sure dispatching works
+    static public void initDispatcher(Router router) {
+        //router.addRoute(EQUALS, "/test", new TestResource());// Just a simply READ to make sure dispatching works
     }
 }

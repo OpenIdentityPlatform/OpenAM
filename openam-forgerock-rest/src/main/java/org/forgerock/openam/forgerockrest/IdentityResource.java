@@ -11,55 +11,32 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2012 ForgeRock AS.
+ * Copyright 2012 ForgeRock Inc.
  */
 package org.forgerock.openam.forgerockrest;
 
 import java.lang.Exception;
+import java.lang.Object;
 import java.lang.String;
-import java.util.LinkedHashMap;
-import java.util.Map;
-import java.util.Set;
-import java.util.List;
-import java.util.ArrayList;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.atomic.AtomicLong;
+import java.util.*;
 
+
+import com.iplanet.am.util.SystemProperties;
+import com.sun.identity.idm.AMIdentity;
+import com.sun.identity.idm.IdRepoException;
+import com.sun.identity.idsvcs.*;
 import org.forgerock.json.fluent.JsonValue;
 import org.forgerock.json.fluent.JsonValueException;
-import org.forgerock.json.resource.ActionRequest;
-import org.forgerock.json.resource.Context;
-import org.forgerock.json.resource.CreateRequest;
-import org.forgerock.json.resource.DeleteRequest;
-import org.forgerock.json.resource.PatchRequest;
-import org.forgerock.json.resource.QueryRequest;
-import org.forgerock.json.resource.QueryResult;
-import org.forgerock.json.resource.QueryResultHandler;
-import org.forgerock.json.resource.ReadRequest;
-import org.forgerock.json.resource.Resource;
-import org.forgerock.json.resource.ResultHandler;
-import org.forgerock.json.resource.UpdateRequest;
-import org.forgerock.json.resource.exception.BadRequestException;
-import org.forgerock.json.resource.exception.ConflictException;
-import org.forgerock.json.resource.exception.InternalServerErrorException;
-import org.forgerock.json.resource.exception.NotFoundException;
-import org.forgerock.json.resource.exception.NotSupportedException;
-import org.forgerock.json.resource.exception.ResourceException;
-import org.forgerock.json.resource.provider.CollectionResourceProvider;
+import org.forgerock.json.resource.*;
 
 import com.iplanet.sso.SSOToken;
 import com.iplanet.sso.SSOException;
 import com.iplanet.sso.SSOTokenManager;
-import java.security.AccessController;
 
-import com.sun.identity.security.AdminTokenAction;
-import com.sun.identity.shared.debug.Debug;
-import com.sun.identity.idm.AMIdentity;
 import com.sun.identity.idsvcs.opensso.IdentityServicesImpl;
-import com.sun.identity.idsvcs.Token;
 
-import com.sun.identity.idsvcs.IdentityDetails;
-import com.sun.identity.idsvcs.Attribute;
+import org.forgerock.json.resource.servlet.HttpContext;
+
 
 /**
  * A simple {@code Map} based collection resource provider.
@@ -67,55 +44,52 @@ import com.sun.identity.idsvcs.Attribute;
 public final class IdentityResource implements CollectionResourceProvider {
     // TODO: filters, sorting, paged results.
 
-    /*
-     * Throughout this example backend we take care not to invoke result
-     * handlers while holding locks since result handlers may perform blocking
-     * IO operations.
-     */
 
-    private final AtomicLong nextResourceId = new AtomicLong();
-    private final Map<String, Resource> resources = new ConcurrentHashMap<String, Resource>();
-    private final Object writeLock = new Object();
+    private final List<Attribute> idSvcsAttrList = new ArrayList();
+    private String realm = null;
+    private String userType = null;
 
-    private final List<Attribute> iDSvcsAttrList = new ArrayList();
-    private  String realm = null;
 
     /**
-     * Creates a new empty backend.
+     * Creates a backend
      */
-    public IdentityResource() {
-        // No implementation required.
-    }
-    public IdentityResource(String userType,String realm) {
-        String[] userval = {userType} ;
-        String[] realmval = {realm} ;
+    public IdentityResource(String userType, String realm) {
+        String[] userval = {userType};
+        String[] realmval = {realm};
         this.realm = realm;
-        iDSvcsAttrList.add(new Attribute("objecttype",userval)) ;
-        iDSvcsAttrList.add(new Attribute("realm",realmval)) ;
+        this.userType = userType;
+        idSvcsAttrList.add(new Attribute("objecttype", userval));
+        idSvcsAttrList.add(new Attribute("realm", realmval));
     }
 
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public void actionCollection(final Context context, final ActionRequest request,
-                                 final ResultHandler<JsonValue> handler) {
+    private void idFromSession(final ServerContext context, final ActionRequest request,
+                               final ResultHandler<JsonValue> handler) {
+
+        //This allows a lookup of a user stored to a particular with only session given
+        JsonValue result = new JsonValue(new LinkedHashMap<String, Object>(1));
+
+        Token admin = new Token();
+        admin.setId(getCookieFromServerContext(context));
+        SSOToken ssotok = null;
+        AMIdentity amIdentity = null;
+
         try {
-            if (request.getActionId().equals("clear")) {
-                final int size;
-                synchronized (writeLock) {
-                    size = resources.size();
-                    resources.clear();
-                }
-                final JsonValue result = new JsonValue(new LinkedHashMap<String, Object>(1));
-                result.put("cleared", size);
-                handler.handleResult(result);
-            } else {
-                throw new NotSupportedException("Unrecognized action ID '" + request.getActionId()
-                        + "'. Supported action IDs: clear");
-            }
-        } catch (final ResourceException e) {
-            handler.handleError(e);
+            SSOTokenManager mgr = SSOTokenManager.getInstance();
+            ssotok = mgr.createSSOToken(getCookieFromServerContext(context));
+            amIdentity = new AMIdentity(ssotok);
+
+            //build resource
+            result.put("id", amIdentity.getName());
+            result.put("realm", com.sun.identity.sm.DNMapper.orgNameToRealmName(amIdentity.getRealm()));
+            result.put("dn", amIdentity.getUniversalId());
+            handler.handleResult(result);
+
+        } catch (SSOException e) {
+            RestDispatcher.debug.error("IdentityResource.idFromSession() :: Cannot retrieve SSO Token: " + e);
+            handler.handleError(new ForbiddenException("SSO Token cannot be retrieved.", e));
+        } catch (IdRepoException ex) {
+            RestDispatcher.debug.error("IdentityResource.idFromSession() :: Cannot retrieve user from IdRepo" + ex);
+            handler.handleError(new ForbiddenException("Cannot retrieve id from session.", ex));
         }
     }
 
@@ -123,7 +97,27 @@ public final class IdentityResource implements CollectionResourceProvider {
      * {@inheritDoc}
      */
     @Override
-    public void actionInstance(final Context context, final String resourceId, final ActionRequest request,
+    public void actionCollection(final ServerContext context, final ActionRequest request,
+                                 final ResultHandler<JsonValue> handler) {
+
+        final String action = request.getActionId();
+
+        if (action.equalsIgnoreCase("idFromSession")) {
+            idFromSession(context, request, handler);
+        } else { //for now this is the only case coming in, so fail if otherwise
+            final ResourceException e =
+                    new NotSupportedException("Actions are not supported for resource instances");
+            handler.handleError(e);
+        }
+
+
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void actionInstance(final ServerContext context, final String resourceId, final ActionRequest request,
                                final ResultHandler<JsonValue> handler) {
         final ResourceException e =
                 new NotSupportedException("Actions are not supported for resource instances");
@@ -134,78 +128,230 @@ public final class IdentityResource implements CollectionResourceProvider {
      * {@inheritDoc}
      */
     @Override
-    public void createInstance(final Context context, final CreateRequest request,
+    public void createInstance(final ServerContext context, final CreateRequest request,
                                final ResultHandler<Resource> handler) {
-        final JsonValue value = request.getContent();
-        final String id = request.getResourceName();
-        final String rev = "0";
+        //anyone can create an account add
+        Token admin = new Token();
+        admin.setId(getCookieFromServerContext(context));
+
+        final JsonValue jVal = request.getContent();
+        IdentityDetails dtls = null, identity = null;
+        Resource resource = null;
+        IdentityServicesImpl idsvc = null;
+        String resourceId = null;
+
         try {
-            final Resource resource;
-            while (true) {
-                final String eid =
-                        id != null ? id : String.valueOf(nextResourceId.getAndIncrement());
-                final Resource tmp = new Resource(eid, rev, value);
-                synchronized (writeLock) {
-                    final Resource existingResource = resources.put(eid, tmp);
-                    if (existingResource != null) {
-                        if (id != null) {
-                            // Already exists - put the existing resource back.
-                            resources.put(id, existingResource);
-                            throw new ConflictException("The resource with ID '" + id
-                                    + "' could not be created because "
-                                    + "there is already another resource with the same ID");
-                        } else {
-                            // Retry with next available resource ID.
-                        }
+            idsvc = new IdentityServicesImpl();
+            identity = jsonValueToIdentityDetails(jVal);
+            resourceId = identity.getName();
+
+            //Create the resource
+            CreateResponse success = idsvc.create(identity, admin);
+            //Read created resource
+            dtls = idsvc.read(identity.getName(), idSvcsAttrList, admin);
+
+            resource = new Resource(identity.getName(), "0", identityDetailsToJsonValue(dtls));
+            handler.handleResult(resource);
+        } catch (final ObjectNotFound notFound) {
+            RestDispatcher.debug.error("IdentityResource.createInstance() :: Cannot READ " +
+                    resourceId + ": Resource cannot be found." + notFound);
+            handler.handleError(new NotFoundException("Resource not found.", notFound));
+        } catch (final DuplicateObject duplicateObject) {
+            RestDispatcher.debug.error("IdentityResource.createInstance() :: Cannot CREATE " +
+                    resourceId + ": Resource already exists!" + duplicateObject);
+            handler.handleError(new NotFoundException("Resource already exists", duplicateObject));
+        } catch (final TokenExpired tokenExpired) {
+            RestDispatcher.debug.error("IdentityResource.createInstance() :: Cannot CREATE " +
+                    resourceId + ":" + tokenExpired);
+            handler.handleError(new ForbiddenException("Token is expired", tokenExpired));
+        } catch (final NeedMoreCredentials needMoreCredentials) {
+            RestDispatcher.debug.error("IdentityResource.createInstance() :: Cannot CREATE " +
+                    needMoreCredentials);
+            handler.handleError(new ForbiddenException("Token is not authorized", needMoreCredentials));
+        } catch (final Exception exception) {
+            RestDispatcher.debug.error("IdentityResource.createInstance() :: Cannot CREATE! " +
+                    exception);
+            handler.handleError(new NotFoundException(exception.getMessage(), exception));
+        }
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void deleteInstance(final ServerContext context, final String resourceId, final DeleteRequest request,
+                               final ResultHandler<Resource> handler) {
+        Token admin = new Token();
+        admin.setId(getCookieFromServerContext(context));
+
+        JsonValue result = null;
+        Resource resource = null;
+        IdentityDetails dtls = null;
+        IdentityServicesImpl idsvc = null;
+
+        try {
+            result = new JsonValue(new LinkedHashMap<String, Object>(1));
+            idsvc = new IdentityServicesImpl();
+
+            //read to see if resource is available to user
+            dtls = idsvc.read(resourceId, idSvcsAttrList, admin);
+
+            //delete the resource
+            DeleteResponse success = idsvc.delete(dtls, admin);
+
+            result.put("success", "true");
+            resource = new Resource(resourceId, "0", result);
+            handler.handleResult(resource);
+
+        } catch (final NeedMoreCredentials ex) {
+            RestDispatcher.debug.error("IdentityResource.deleteInstance() :: Cannot DELETE " +
+                    resourceId + ": User does not have enough privileges.");
+            handler.handleError(new ForbiddenException(resourceId, ex));
+        } catch (final ObjectNotFound notFound) {
+            RestDispatcher.debug.error("IdentityResource.deleteInstance() :: Cannot DELETE " +
+                    resourceId + ":" + notFound);
+            handler.handleError(new NotFoundException("Resource cannot be found.", notFound));
+        } catch (final TokenExpired tokenExpired) {
+            RestDispatcher.debug.error("IdentityResource.deleteInstance() :: Cannot DELETE " +
+                    resourceId + ":" + tokenExpired);
+            handler.handleError(new ForbiddenException("Token is expired", tokenExpired));
+        } catch (final GeneralFailure generalFailure) {
+            RestDispatcher.debug.error("IdentityResource.deleteInstance() :: Cannot DELETE " +
+                    generalFailure.getMessage());
+            handler.handleError(new BadRequestException("Cannot complete request", generalFailure));
+        } catch (final Exception exception) {
+            RestDispatcher.debug.error("IdentityResource.deleteInstance() :: Cannot DELETE! " +
+                    exception.getMessage());
+            result.put("success", "false");
+            resource = new Resource(resourceId, "0", result);
+            handler.handleResult(resource);
+        }
+    }
+
+    /**
+     * Returns TokenID from headers
+     *
+     * @param context ServerContext which contains the headers.
+     * @return String with TokenID
+     */
+    private String getCookieFromServerContext(ServerContext context) {
+        List<String> cookies = null;
+        String cookieName = null;
+        HttpContext header = null;
+        try {
+            cookieName = SystemProperties.get("com.iplanet.am.cookie.name");
+            if (cookieName == null || cookieName.isEmpty()) {
+                RestDispatcher.debug.error("IdentityResource.getCookieFromServerContext() :: " +
+                        "Cannot retrieve SystemProperty : com.iplanet.am.cookie.name");
+                return null;
+            }
+            header = context.asContext(HttpContext.class);
+            if (header == null) {
+                RestDispatcher.debug.error("IdentityResource.getCookieFromServerContext() :: " +
+                        "Cannot retrieve ServerContext as HttpContext");
+                return null;
+            }
+            //get the cookie from header directly   as the name of com.iplanet.am.cookie.am
+            cookies = header.getHeaders().get(cookieName.toLowerCase());
+            if (cookies != null && !cookies.isEmpty()) {
+                for (String s : cookies) {
+                    if (s == null || s.isEmpty()) {
+                        return null;
                     } else {
-                        // Add succeeded.
-                        addIdAndRevision(tmp);
-                        resource = tmp;
-                        break;
+                        return s;
+                    }
+                }
+            } else {  //get cookie from header parameter called cookie
+                cookies = header.getHeaders().get("cookie");
+                if (cookies != null && !cookies.isEmpty()) {
+                    for (String cookie : cookies) {
+                        String cookieNames[] = cookie.split(";"); //Split parameter up
+                        for (String c : cookieNames) {
+                            if (c.contains(cookieName)) { //if com.iplanet.am.cookie.name exists in cookie param
+                                String amCookie = c.replace(cookieName + "=", "").trim();
+                                return amCookie; //return com.iplanet.am.cookie.name value
+                            }
+                        }
                     }
                 }
             }
-            handler.handleResult(resource);
-        } catch (final ResourceException e) {
-            handler.handleError(e);
+        } catch (Exception e) {
+            RestDispatcher.debug.error("IdentityResource.getCookieFromServerContext() :: " +
+                    "Cannot get cookie from ServerContext!" + e);
         }
+        return null;
     }
 
     /**
-     * {@inheritDoc}
+     * Returns a JsonValue containing appropriate identity details
+     *
+     * @param details The IdentityDetails of a Resource
+     * @return The JsonValue Object
      */
-    @Override
-    public void deleteInstance(final Context context, final String resourceId, final DeleteRequest request,
-                               final ResultHandler<Resource> handler) {
-        //final String id = request.getResourceId();
-        final String id = request.getResourceName();
-        final String rev = request.getRevision();
+    private JsonValue identityDetailsToJsonValue(IdentityDetails details) {
+        JsonValue result = new JsonValue(new LinkedHashMap<String, Object>(1));
         try {
-            final Resource resource;
-            synchronized (writeLock) {
-                resource = resources.remove(id);
-                if (resource == null) {
-                    throw new NotFoundException("The resource with ID '" + id
-                            + " could not be deleted because it does not exist");
-                } else if (rev != null && !resource.getRevision().equals(rev)) {
-                    // Mismatch - put the resource back.
-                    resources.put(id, resource);
-                    throw new ConflictException("The resource with ID '" + id
-                            + "' could not be deleted because "
-                            + "it does not have the required version");
-                }
+            result.put("name", details.getName());
+            result.put("realm", details.getRealm());
+            Attribute[] attrs = details.getAttributes();
+
+            for (Attribute aix : attrs) {
+                result.put(aix.getName(), aix.getValues());
             }
-            handler.handleResult(resource);
-        } catch (final ResourceException e) {
-            handler.handleError(e);
+            return result;
+        } catch (final Exception e) {
+            throw new JsonValueException(result);
         }
+    }
+
+    /**
+     * Returns an IdenityDetails from a JsonValue
+     *
+     * @param jVal The JsonValue Object to be converted
+     * @return The IdentityDetails object
+     */
+    private IdentityDetails jsonValueToIdentityDetails(JsonValue jVal) {
+
+        IdentityDetails identity = new IdentityDetails();
+        List<Attribute> identityAttrList = new ArrayList();
+
+        try {
+            identity.setType(userType); //set type ex. user
+            identity.setRealm(realm); //set realm
+            identity.setName(jVal.get("name").asString());//set name from JsonValue object
+
+            try {
+                for (String s : jVal.keys()) {
+                    JsonValue childValue = jVal.get(s);
+                    if (childValue.isString()) {
+                        String[] tArray = {childValue.asString()};
+                        identityAttrList.add(new Attribute(s, tArray));
+                    } else if (childValue.isList()) {
+                        ArrayList<String> tList = (ArrayList<String>) childValue.getObject();
+                        String[] tArray = tList.toArray(new String[tList.size()]);
+                        identityAttrList.add(new Attribute(s, tArray));
+                    }
+                }
+            } catch (Exception e) {
+                RestDispatcher.debug.error("IdentityResource.jsonValueToIdentityDetails() :: " +
+                        "Cannot Traverse JsonValue" + e);
+            }
+            Attribute[] attr = identityAttrList.toArray(new Attribute[identityAttrList.size()]);
+            identity.setAttributes(attr);
+
+        } catch (final Exception e) {
+            RestDispatcher.debug.error("IdentityResource.jsonValueToIdentityDetails() ::" +
+                    " Cannot convert JsonValue to IdentityDetials." + e);
+            //deal with better exceptions
+        }
+        return identity;
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    public void patchInstance(final Context context, final String resourceId, final PatchRequest request,
+    public void patchInstance(final ServerContext context, final String resourceId, final PatchRequest request,
                               final ResultHandler<Resource> handler) {
         final ResourceException e = new NotSupportedException("Patch operations are not supported");
         handler.handleError(e);
@@ -215,24 +361,31 @@ public final class IdentityResource implements CollectionResourceProvider {
      * {@inheritDoc}
      */
     @Override
-    public void queryCollection(final Context context, final QueryRequest request,
+    public void queryCollection(final ServerContext context, final QueryRequest request,
                                 final QueryResultHandler handler) {
 
-        SSOToken adminToken = (SSOToken) AccessController.doPrivileged(
-                AdminTokenAction. getInstance());
-        Token ret = new Token();
-        ret.setId(adminToken.getTokenID().toString());
-        try {
+        Token admin = new Token();
+        admin.setId(getCookieFromServerContext(context));
 
+
+        String queryFilter = null;
+
+        try {
+            //This will only return 1 user..
+            //getQueryFilter() is not implemented yet..returns dummy false value
+            queryFilter = request.getQueryId();
+            if (queryFilter == null || queryFilter.isEmpty()) {
+                queryFilter = "*";
+            }
             IdentityServicesImpl id = new IdentityServicesImpl();
-            List<String> users = id.search( "*", iDSvcsAttrList, ret );
+            List<String> users = id.search(queryFilter, idSvcsAttrList, admin);
 
             for (final String user : users) {
                 JsonValue val = new JsonValue(user);
-                Resource resource = new Resource("0","0",val)  ;
+                Resource resource = new Resource(user, "0", val);
                 handler.handleResource(resource);
             }
-        } catch (Exception ex)             {
+        } catch (Exception ex) {
 
         }
 
@@ -243,45 +396,42 @@ public final class IdentityResource implements CollectionResourceProvider {
      * {@inheritDoc}
      */
     @Override
-    public void readInstance(final Context context, final String resourceId, final ReadRequest request,
+    public void readInstance(final ServerContext context, final String resourceId, final ReadRequest request,
                              final ResultHandler<Resource> handler) {
-        //final String id = request.getResourceId();
-        final String id = request.getResourceName();
-        SSOToken adminToken = (SSOToken) AccessController.doPrivileged(
-                AdminTokenAction. getInstance());
-        Token admin = new Token();
-        admin.setId(adminToken.getTokenID().toString());
 
-        SSOToken adminToken = (SSOToken) AccessController.doPrivileged(
-                AdminTokenAction. getInstance());
         Token admin = new Token();
-        admin.setId(adminToken.getTokenID().toString());
+        admin.setId(getCookieFromServerContext(context));
+
+        IdentityServicesImpl idsvc = null;
+        IdentityDetails dtls = null;
+        Resource resource = null;
 
         try {
-
-            JsonValue result = new JsonValue(new LinkedHashMap<String, Object>(1));
-
-
-            IdentityServicesImpl idsvc = new IdentityServicesImpl();
-            IdentityDetails dtls = idsvc.read(id, iDSvcsAttrList, admin);
-
-            if (dtls == null) {
-                throw new NotFoundException("The resource with ID '" + id
-                        + " could not be read because it does not exist");
-            }
-            result.put("name", dtls.getName());
-            result.put("realm", dtls.getRealm());
-            Attribute[] attrs = dtls.getAttributes();
-
-            for (Attribute aix : attrs) {
-                result.put(aix.getName(), aix.getValues());
-            }
-            Resource resource = new Resource("0", "0", result);
-
+            idsvc = new IdentityServicesImpl();
+            dtls = idsvc.read(resourceId, idSvcsAttrList, admin);
+            resource = new Resource(resourceId, "0", identityDetailsToJsonValue(dtls));
             handler.handleResult(resource);
-        } catch (final ResourceException e) {
-            handler.handleError(e);
-        } catch (final Exception e) {
+        } catch (final NeedMoreCredentials needMoreCredentials) {
+            RestDispatcher.debug.error("IdentityResource.readInstance() :: Cannot READ " +
+                    resourceId + ":" + needMoreCredentials);
+            handler.handleError(new ForbiddenException("User does not have enough privileges.", needMoreCredentials));
+        } catch (final ObjectNotFound objectNotFound) {
+            RestDispatcher.debug.error("IdentityResource.readInstance() :: Cannot READ " +
+                    resourceId + ":" + objectNotFound);
+            handler.handleError(new NotFoundException("Resource cannot be found.", objectNotFound));
+        } catch (final TokenExpired tokenExpired) {
+            RestDispatcher.debug.error("IdentityResource.readInstance() :: Cannot READ " +
+                    resourceId + ":" + tokenExpired);
+            handler.handleError(new ForbiddenException("Token is expired", tokenExpired));
+        } catch (final GeneralFailure generalFailure) {
+            RestDispatcher.debug.error("IdentityResource.readInstance() :: Cannot READ " +
+                    generalFailure);
+            handler.handleError(new BadRequestException("Cannot complete request", generalFailure));
+        } catch (final Exception exception) {
+            RestDispatcher.debug.error("IdentityResource.readInstance() :: Cannot READ! " +
+                    exception);
+            handler.handleError(new NotFoundException(exception.getMessage(), exception));
+
         }
     }
 
@@ -289,58 +439,69 @@ public final class IdentityResource implements CollectionResourceProvider {
      * {@inheritDoc}
      */
     @Override
-    public void updateInstance(final Context context, final String resourceId, final UpdateRequest request,
+    public void updateInstance(final ServerContext context, final String resourceId, final UpdateRequest request,
                                final ResultHandler<Resource> handler) {
-        final String id = request.getResourceName();
+
+        Token admin = new Token();
+        admin.setId(getCookieFromServerContext(context));
+
+        final JsonValue jVal = request.getNewContent();
         final String rev = request.getRevision();
+
+        IdentityDetails dtls = null, newDtls = null;
+        IdentityServicesImpl idsvc = null;
+        Resource resource = null;
+
         try {
-            final Resource resource;
-            synchronized (writeLock) {
-                final Resource existingResource = resources.get(id);
-                if (existingResource == null) {
-                    throw new NotFoundException("The resource with ID '" + id
-                            + " could not be updated because it does not exist");
-                } else if (rev != null && !existingResource.getRevision().equals(rev)) {
-                    throw new ConflictException("The resource with ID '" + id
-                            + "' could not be updated because "
-                            + "it does not have the required version");
-                } else {
-                    final String newRev = getNextRevision(existingResource.getRevision());
-                    resource = new Resource(id, newRev, request.getNewContent());
-                    addIdAndRevision(resource);
-                    resources.put(id, resource);
-                }
-            }
+            idsvc = new IdentityServicesImpl();
+            dtls = idsvc.read(resourceId, idSvcsAttrList, admin);//Retrieve details about user to be updated
+            //Continue modifying the identity if read success
+
+            newDtls = jsonValueToIdentityDetails(jVal);
+            newDtls.setName(resourceId);
+            //update resource with new details
+            UpdateResponse message = idsvc.update(newDtls, admin);
+            //read updated identity back to client
+            IdentityDetails checkIdent = idsvc.read(dtls.getName(), idSvcsAttrList, admin);
+            //handle updated resource
+            resource = new Resource(resourceId, "0", identityDetailsToJsonValue(checkIdent));
             handler.handleResult(resource);
-        } catch (final ResourceException e) {
-            handler.handleError(e);
-        }
-    }
+        } catch (final ObjectNotFound o) {
+            //Create Resource
+            try {
+                dtls = jsonValueToIdentityDetails(jVal);
+                dtls.setName(resourceId);
 
-    /*
-     * Add the ID and revision to the JSON content so that they are included
-     * with subsequent responses. We shouldn't really update the passed in
-     * content in case it is shared by other components, but we'll do it here
-     * anyway for simplicity.
-     */
-    private void addIdAndRevision(final Resource resource) throws ResourceException {
-        final JsonValue content = resource.getContent();
-        try {
-            content.asMap().put("_id",resource.getResourceName());
-            content.asMap().put("_rev", resource.getRevision());
-        } catch (final JsonValueException e) {
-            throw new BadRequestException(
-                    "The request could not be processed because the provided "
-                            + "content is not a JSON object");
-        }
-    }
-
-    private String getNextRevision(final String rev) throws ResourceException {
-        try {
-            return String.valueOf(Integer.parseInt(rev) + 1);
-        } catch (final NumberFormatException e) {
-            throw new InternalServerErrorException("Malformed revision number '" + rev
-                    + "' encountered while updating a resource");
+                //create resource because it does not exist
+                CreateResponse success = idsvc.create(dtls, admin);
+                //check created identity
+                IdentityDetails checkIdent = idsvc.read(dtls.getName(), idSvcsAttrList, admin);
+                //Send client back resource created response
+                resource = new Resource(resourceId, "0", identityDetailsToJsonValue(checkIdent));
+                handler.handleResult(resource);
+            } catch (final TokenExpired tokenExpired) {
+                RestDispatcher.debug.error("IdentityResource.updateInstance() :: Cannot CREATE " +
+                        resourceId + ":" + tokenExpired);
+                handler.handleError(new ForbiddenException("Token is expired", tokenExpired));
+            } catch (final Exception e) {
+                RestDispatcher.debug.error("IdentityResource.updateInstance() :: Cannot UPDATE! " + e);
+            }
+        } catch (final NeedMoreCredentials needMoreCredentials) {
+            RestDispatcher.debug.error("IdentityResource.updateInstance() :: Cannot UPDATE " +
+                    resourceId + ":" + needMoreCredentials);
+            handler.handleError(new ForbiddenException("Token is not authorized", needMoreCredentials));
+        } catch (final TokenExpired tokenExpired) {
+            RestDispatcher.debug.error("IdentityResource.updateInstance() :: Cannot UPDATE " +
+                    resourceId + ":" + tokenExpired);
+            handler.handleError(new ForbiddenException("Token is expired", tokenExpired));
+        } catch (final GeneralFailure generalFailure) {
+            RestDispatcher.debug.error("IdentityResource.updateInstance() :: Cannot UPDATE " +
+                    generalFailure);
+            handler.handleError(new BadRequestException("Cannot complete request", generalFailure));
+        } catch (final Exception exception) {
+            RestDispatcher.debug.error("IdentityResource.updateInstance() :: Cannot UPDATE! " +
+                    exception);
+            handler.handleError(new NotFoundException(exception.getMessage(), exception));
         }
     }
 

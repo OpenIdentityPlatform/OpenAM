@@ -11,7 +11,7 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2012 ForgeRock AS.
+ * Copyright 2012 ForgeRock Inc.
  */
 package org.forgerock.openam.forgerockrest;
 
@@ -25,10 +25,11 @@ import java.util.ArrayList;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicLong;
 
+import com.sun.org.apache.xml.internal.security.utils.resolver.ResourceResolverException;
 import org.forgerock.json.fluent.JsonValue;
 import org.forgerock.json.fluent.JsonValueException;
 import org.forgerock.json.resource.ActionRequest;
-import org.forgerock.json.resource.Context;
+import org.forgerock.json.resource.ServerContext;
 import org.forgerock.json.resource.CreateRequest;
 import org.forgerock.json.resource.DeleteRequest;
 import org.forgerock.json.resource.PatchRequest;
@@ -37,19 +38,21 @@ import org.forgerock.json.resource.QueryResult;
 import org.forgerock.json.resource.QueryResultHandler;
 import org.forgerock.json.resource.ReadRequest;
 import org.forgerock.json.resource.Resource;
+import org.forgerock.json.resource.Resources;
 import org.forgerock.json.resource.ResultHandler;
 import org.forgerock.json.resource.UpdateRequest;
-import org.forgerock.json.resource.exception.BadRequestException;
-import org.forgerock.json.resource.exception.ConflictException;
-import org.forgerock.json.resource.exception.InternalServerErrorException;
-import org.forgerock.json.resource.exception.NotFoundException;
-import org.forgerock.json.resource.exception.NotSupportedException;
-import org.forgerock.json.resource.exception.ResourceException;
-import org.forgerock.json.resource.provider.CollectionResourceProvider;
+import org.forgerock.json.resource.BadRequestException;
+import org.forgerock.json.resource.ConflictException;
+import org.forgerock.json.resource.InternalServerErrorException;
+import org.forgerock.json.resource.NotFoundException;
+import org.forgerock.json.resource.NotSupportedException;
+import org.forgerock.json.resource.ResourceException;
+import org.forgerock.json.resource.CollectionResourceProvider;
 
 import com.iplanet.sso.SSOToken;
 import com.iplanet.sso.SSOException;
 import com.iplanet.sso.SSOTokenManager;
+
 import java.security.AccessController;
 
 import com.sun.identity.security.AdminTokenAction;
@@ -83,6 +86,7 @@ public final class RealmResource implements CollectionResourceProvider {
         // No implementation required.
         this.subRealms = null;
     }
+
     public RealmResource(Set subRealms) {
         this.subRealms = subRealms;
     }
@@ -91,7 +95,7 @@ public final class RealmResource implements CollectionResourceProvider {
      * {@inheritDoc}
      */
     @Override
-    public void actionCollection(final Context context, final ActionRequest request,
+    public void actionCollection(final ServerContext context, final ActionRequest request,
                                  final ResultHandler<JsonValue> handler) {
         final ResourceException e =
                 new NotSupportedException("Actions are not supported for resource instances");
@@ -102,7 +106,7 @@ public final class RealmResource implements CollectionResourceProvider {
      * {@inheritDoc}
      */
     @Override
-    public void actionInstance(final Context context, final ActionRequest request,
+    public void actionInstance(final ServerContext context, final String resourceId, final ActionRequest request,
                                final ResultHandler<JsonValue> handler) {
         final ResourceException e =
                 new NotSupportedException("Actions are not supported for resource Realms");
@@ -113,7 +117,7 @@ public final class RealmResource implements CollectionResourceProvider {
      * {@inheritDoc}
      */
     @Override
-    public void createInstance(final Context context, final CreateRequest request,
+    public void createInstance(final ServerContext context, final CreateRequest request,
                                final ResultHandler<Resource> handler) {
         final ResourceException e =
                 new NotSupportedException("Create is not supported for resource Realms");
@@ -124,7 +128,7 @@ public final class RealmResource implements CollectionResourceProvider {
      * {@inheritDoc}
      */
     @Override
-    public void deleteInstance(final Context context, final DeleteRequest request,
+    public void deleteInstance(final ServerContext context, final String resourceId, final DeleteRequest request,
                                final ResultHandler<Resource> handler) {
         final ResourceException e =
                 new NotSupportedException("Delete is not supported for resource Realms");
@@ -135,7 +139,7 @@ public final class RealmResource implements CollectionResourceProvider {
      * {@inheritDoc}
      */
     @Override
-    public void patchInstance(final Context context, final PatchRequest request,
+    public void patchInstance(final ServerContext context, final String resourceId, final PatchRequest request,
                               final ResultHandler<Resource> handler) {
         final ResourceException e = new NotSupportedException("Patch operations are not supported for resource Realms");
         handler.handleError(e);
@@ -145,13 +149,13 @@ public final class RealmResource implements CollectionResourceProvider {
      * {@inheritDoc}
      */
     @Override
-    public void queryCollection(final Context context, final QueryRequest request,
+    public void queryCollection(final ServerContext context, final QueryRequest request,
                                 final QueryResultHandler handler) {
 
-        for (Object theRealm : subRealms ) {
+        for (Object theRealm : subRealms) {
             String realm = (String) theRealm;
             JsonValue val = new JsonValue(realm);
-            Resource resource = new Resource("0","0",val)  ;
+            Resource resource = new Resource("0", "0", val);
             handler.handleResource(resource);
         }
         handler.handleResult(new QueryResult());
@@ -161,35 +165,37 @@ public final class RealmResource implements CollectionResourceProvider {
      * {@inheritDoc}
      */
     @Override
-    public void readInstance(final Context context, final ReadRequest request,
-                             final ResultHandler<Resource> handler) {
-        final String id = request.getResourceId();
-
-        for (Object theRealm : subRealms ) {
+    public void readInstance(final ServerContext context, final String resourceId,
+                             final ReadRequest request, final ResultHandler<Resource> handler) {
+        JsonValue val = null;
+        for (Object theRealm : subRealms) {
             String realm = (String) theRealm;
-            JsonValue val = new JsonValue(realm);
-            Resource resource = new Resource("0","0",val)  ;
-            handler.handleResource(resource);
+            if (realm.equalsIgnoreCase(resourceId)) {
+                val = new JsonValue(realm);
+            }
         }
-        handler.handleResult(new QueryResult());
+        if (val != null) {
+            Resource resource = new Resource("0", "0", val);
+            handler.handleResult(resource);
+        }
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    public void updateInstance(final Context context, final UpdateRequest request,
-                               final ResultHandler<Resource> handler) {
+    public void updateInstance(final ServerContext context, final String resourceId,
+                               final UpdateRequest request, final ResultHandler<Resource> handler) {
         final ResourceException e = new NotSupportedException("Update operations are not supported for resource Realms");
         handler.handleError(e);
     }
 
     /*
-     * Add the ID and revision to the JSON content so that they are included
-     * with subsequent responses. We shouldn't really update the passed in
-     * content in case it is shared by other components, but we'll do it here
-     * anyway for simplicity.
-     */
+    * Add the ID and revision to the JSON content so that they are included
+    * with subsequent responses. We shouldn't really update the passed in
+    * content in case it is shared by other components, but we'll do it here
+    * anyway for simplicity.
+    */
     private void addIdAndRevision(final Resource resource) throws ResourceException {
         final JsonValue content = resource.getContent();
         try {

@@ -11,11 +11,10 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2012 ForgeRock AS.
+ * Copyright 2012 ForgeRock Inc.
  */
 package org.forgerock.openam.forgerockrest;
 
-import static org.forgerock.json.resource.Context.newRootContext;
 
 import java.lang.Exception;
 import java.lang.String;
@@ -30,20 +29,21 @@ import javax.servlet.ServletContext;
 import org.forgerock.json.fluent.JsonValue;
 import org.forgerock.json.resource.Connection;
 import org.forgerock.json.resource.ConnectionFactory;
-import org.forgerock.json.resource.Connections;
 import org.forgerock.json.resource.CreateRequest;
 import org.forgerock.json.resource.Requests;
-import org.forgerock.json.resource.exception.ResourceException;
-import org.forgerock.json.resource.provider.RequestHandler;
-import org.forgerock.json.resource.provider.Router;
-import org.forgerock.json.resource.provider.UriTemplateRoutingStrategy;
+import org.forgerock.json.resource.ResourceException;
+import org.forgerock.json.resource.RequestHandler;
+import org.forgerock.json.resource.Router;
+
+import static org.forgerock.json.resource.RoutingMode.EQUALS;
 
 import com.iplanet.sso.SSOToken;
 import com.iplanet.sso.SSOException;
 import com.iplanet.sso.SSOTokenManager;
-import java.security.AccessController;
-import com.sun.identity.security.AdminTokenAction;
 
+import java.security.AccessController;
+
+import com.sun.identity.security.AdminTokenAction;
 
 
 import com.sun.identity.sm.OrganizationConfigManager;
@@ -51,42 +51,43 @@ import com.sun.identity.sm.OrganizationConfigManager;
 /**
  * A simple {@code Map} based collection resource provider.
  */
-public final class RealmDispatcher  {
+public final class RealmDispatcher {
 
 
     private RealmDispatcher() {
 
     }
 
-    static private void initRealmEndpoints(OrganizationConfigManager ocm, UriTemplateRoutingStrategy routes) {
+    static private void initRealmEndpoints(OrganizationConfigManager ocm, Router router) {
 
         try {
-            SSOToken adminToken = (SSOToken) AccessController.doPrivileged(
-                    AdminTokenAction.getInstance());
+            SSOToken adminToken = (SSOToken) AccessController.doPrivileged(AdminTokenAction.getInstance());
             String rName = ocm.getOrganizationName();
             if (rName.length() > 1) rName = rName + "/";
 
-            routes.register(rName + "users", new IdentityResource("user", rName));                // Just a simply READ to make sure dispatching works
-            routes.register(rName + "agents", new IdentityResource("agent", rName));              // Just a simply READ to make sure dispatching works
-            routes.register(rName + "groups", new IdentityResource("group", rName));              // Just a simply READ to make sure dispatching works
-            Set subOrgs = ocm.getSubOrganizationNames();
-            routes.register(rName + "realms", new RealmResource(subOrgs));
 
+            router.addRoute(EQUALS, rName + "users", new IdentityResource("user", rName));
+            router.addRoute(EQUALS, rName + "agents", new IdentityResource("agent", rName));
+            router.addRoute(EQUALS, rName + "groups", new IdentityResource("group", rName));
+
+            Set subOrgs = ocm.getSubOrganizationNames();           //grab subrealms
+            router.addRoute(EQUALS, "/realms", new RealmResource(subOrgs));
+            //Recursively calls on each realm registring users agents groups for each subrealm
             for (Object theRealm : subOrgs) {
                 String realm = rName + (String) theRealm;
-                initRealmEndpoints(new OrganizationConfigManager(adminToken, realm), routes);
+                initRealmEndpoints(new OrganizationConfigManager(adminToken, realm), router);
             }
         } catch (Exception e) {
 
         }
     }
 
-    static public void initDispatcher(UriTemplateRoutingStrategy routes) {
+    static public void initDispatcher(Router router) {
         try {
-        SSOToken adminToken = (SSOToken) AccessController.doPrivileged(
-                AdminTokenAction. getInstance());
-        OrganizationConfigManager ocm = new OrganizationConfigManager(adminToken,"/");
-        initRealmEndpoints(ocm, routes);
+            SSOToken adminToken = (SSOToken) AccessController.doPrivileged(
+                    AdminTokenAction.getInstance());
+            OrganizationConfigManager ocm = new OrganizationConfigManager(adminToken, "/");
+            initRealmEndpoints(ocm, router);
         } catch (Exception e) {
 
         }

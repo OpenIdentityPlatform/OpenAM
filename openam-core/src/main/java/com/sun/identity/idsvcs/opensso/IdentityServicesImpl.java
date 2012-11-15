@@ -124,7 +124,7 @@ public class IdentityServicesImpl
     private static Pattern RESOURCE_PATTERN =
         Pattern.compile("service://(.+?)/\\?(resource=)?(.+)",
         Pattern.CASE_INSENSITIVE);
-    
+
     /**
      * Attempt to authenticate using simple user/password credentials.
      * @param username Subject's user name.
@@ -142,7 +142,7 @@ public class IdentityServicesImpl
         throws UserNotFound, InvalidPassword, NeedMoreCredentials,
         InvalidCredentials, OrgInactive, UserInactive, AccountExpired,
         UserLocked, GeneralFailure, MaximumSessionReached, RemoteException {
-        
+
 
         assert username != null && password != null;
         Token ret = null;
@@ -151,7 +151,7 @@ public class IdentityServicesImpl
             String realm = null;
             AuthContext.IndexType authIndexType = null;
             String authIndexValue = null;
-            
+
             if (uri != null) {
                 StringTokenizer st = new StringTokenizer(uri, "&");
                 while (st.hasMoreTokens()) {
@@ -164,10 +164,10 @@ public class IdentityServicesImpl
                             realm = v;
                         } else if (k.equals("module") &&
                             (authIndexType == null)) {
-                            authIndexType = 
+                            authIndexType =
                                 AuthContext.IndexType.MODULE_INSTANCE;
                             authIndexValue = v;
-                        } else if (k.equals("service") && 
+                        } else if (k.equals("service") &&
                             (authIndexType == null)) {
                             authIndexType = AuthContext.IndexType.SERVICE;
                             authIndexValue = v;
@@ -178,7 +178,7 @@ public class IdentityServicesImpl
             if (realm == null) {
                 realm = "/";
             }
-            
+
             AuthContext lc = new AuthContext(realm);
             if (authIndexType != null) {
                 lc.login(authIndexType, authIndexValue);
@@ -207,17 +207,17 @@ public class IdentityServicesImpl
                 }
                 lc.submitRequirements(callbacks);
             }
-            
+
             // Without this property defined the default will be false which is 
             // backwards compatable.
-            boolean useGenericAuthenticationException = 
+            boolean useGenericAuthenticationException =
                     Boolean.parseBoolean(SystemProperties.get(
                     Constants.GENERIC_SOAP_REST_AUTHENTICATION_EXCEPTION, "false"));
-            
+
             if (debug.messageEnabled() && useGenericAuthenticationException) {
                 debug.message("IdentityServicesImpl:authenticate returning an InvalidCredentials exception for invalid passwords.");
             }
-            
+
             // validate the password..
             if (lc.getStatus() != AuthContext.Status.SUCCESS) {
                 String ec = lc.getErrorCode();
@@ -316,7 +316,7 @@ public class IdentityServicesImpl
     public boolean authorize(String uri, String action, Token subject)
         throws NeedMoreCredentials, TokenExpired, GeneralFailure,
         RemoteException {
-        
+
         boolean isAllowed = false;
         // Check policy
         try {
@@ -497,19 +497,19 @@ public class IdentityServicesImpl
             } else {
                 userAttributes = userIdentity.getAttributes();
             }
-            String name = null; 
-            Iterator it= null; 
-            Set value = null; 
+            String name = null;
+            Iterator it= null;
+            Set value = null;
             if (userAttributes != null && sessionAttributes != null) {
                 for (it = sessionAttributes.keySet().iterator();
                     it.hasNext();) {
                     name = (String) it.next();
                     value = (Set) sessionAttributes.get(name);
                     if (userAttributes.keySet().contains(name)) {
-                       ((Set) userAttributes.get(name)).addAll(value); 
+                       ((Set) userAttributes.get(name)).addAll(value);
                     } else {
-                        userAttributes.put(name,value); 
-                    }    
+                        userAttributes.put(name,value);
+                    }
                 }
             } else if (sessionAttributes != null) {
                 userAttributes = sessionAttributes;
@@ -535,7 +535,7 @@ public class IdentityServicesImpl
                     }
                     String[] v = new String[valueList.size()];
                     attribute.setValues((String[]) valueList.toArray(v));
-                    attributes.add(attribute); 
+                    attributes.add(attribute);
                 }
                 Attribute[] a = new Attribute[attributes.size()];
                 details.setAttributes((Attribute[]) attributes.toArray(a));
@@ -659,10 +659,10 @@ public class IdentityServicesImpl
 
         return rv;
     }
-    
+
     private List<String> getNames(
         String realm,
-        IdType idType, 
+        IdType idType,
         List<AMIdentity> objList
     ) throws SSOException, IdRepoException {
         List<String> names = new ArrayList<String>();
@@ -735,11 +735,11 @@ public class IdentityServicesImpl
     public CreateResponse create(IdentityDetails identity, Token admin)
         throws NeedMoreCredentials, DuplicateObject,
         TokenExpired, GeneralFailure {
-        
+
         // Verify valid information is provided
         assert (identity != null);
         assert (admin != null);
-        
+
         // Obtain identity details & verify
         String idName = identity.getName();
         String idType = identity.getType();
@@ -769,7 +769,7 @@ public class IdentityServicesImpl
             // Obtain creation attributes
             Map<String, Set> idAttrs = attributesToMap(
                 identity.getAttributes());
-            
+
             // Create the identity, special case of Agents to merge
             // and validate the attributes
             AMIdentity amIdentity = null;
@@ -831,7 +831,7 @@ public class IdentityServicesImpl
             } else {
                 // Create other identites like User, Group, Role, etc.
                 amIdentity = repo.createIdentity(objectIdType, idName, idAttrs);
-                
+
                 // Process roles, groups & memberships
                 if (objectIdType.equals(IdType.USER)) {
                     ListWrapper roles = identity.getRoleList();
@@ -841,7 +841,7 @@ public class IdentityServicesImpl
                             IdOperation.EDIT)) {
                             // TODO: localize message
                             throw new UnsupportedOperationException(
-                                "Unsupported: " + "Type: " + IdType.ROLE + 
+                                "Unsupported: " + "Type: " + IdType.ROLE +
                                 " Operation: EDIT");
                         }
 
@@ -864,7 +864,7 @@ public class IdentityServicesImpl
                             IdOperation.EDIT)) {
                             // TODO: localize message
                             throw new UnsupportedOperationException(
-                                "Unsupported: " + "Type: " + IdType.GROUP + 
+                                "Unsupported: " + "Type: " + IdType.GROUP +
                                 " Operation: EDIT");
                         }
 
@@ -950,7 +950,7 @@ public class IdentityServicesImpl
      * @throws AccessDenied if reading of attributes for the user is disallowed.
      */
     public IdentityDetails read(String name, Attribute[] attributes, Token admin)
-        throws NeedMoreCredentials, ObjectNotFound, TokenExpired, 
+        throws NeedMoreCredentials, ObjectNotFound, TokenExpired,
         GeneralFailure, AccessDenied
     {
         List attrList = null;
@@ -964,7 +964,7 @@ public class IdentityServicesImpl
     }
 
     public IdentityDetails read(String name, List attributes, Token admin)
-        throws NeedMoreCredentials, ObjectNotFound, TokenExpired, 
+        throws NeedMoreCredentials, ObjectNotFound, TokenExpired,
         GeneralFailure, AccessDenied
     {
         IdentityDetails rv = null;
@@ -1013,14 +1013,15 @@ public class IdentityServicesImpl
         try {
             AMIdentity amIdentity = getAMIdentity(admin, identityType, name,
                                                   repoRealm);
-            if (isSpecialUser(amIdentity)) {
-                throw new AccessDenied(
-                    "Cannot retrieve attributes for this user.");
-            }
 
             if (!identityExists(amIdentity)) {
                 debug.error("IdentityServicesImpl:read identity not found");
                 throw new ObjectNotFound(name);
+            }
+
+            if (isSpecialUser(amIdentity)) {
+                throw new AccessDenied(
+                        "Cannot retrieve attributes for this user.");
             }
 
             rv = convertToIdentityDetails(amIdentity, attrsToGet);
@@ -1056,7 +1057,7 @@ public class IdentityServicesImpl
      * @throws AccessDenied if reading of attributes for the user is disallowed
      */
     public UpdateResponse update(IdentityDetails identity, Token admin)
-        throws NeedMoreCredentials, ObjectNotFound, TokenExpired, 
+        throws NeedMoreCredentials, ObjectNotFound, TokenExpired,
         GeneralFailure, AccessDenied
     {
         String idName = identity.getName();
@@ -1206,7 +1207,7 @@ public class IdentityServicesImpl
      * @throws GeneralFailure on other errors.
      */
     public DeleteResponse delete(IdentityDetails identity, Token admin)
-        throws NeedMoreCredentials, ObjectNotFound, TokenExpired, 
+        throws NeedMoreCredentials, ObjectNotFound, TokenExpired,
         GeneralFailure, AccessDenied
     {
         if (identity == null) {
@@ -1823,7 +1824,7 @@ public class IdentityServicesImpl
 
         return rv;
     }
-    
+
     private SSOToken getSSOToken(Token admin) throws TokenExpired {
         SSOToken token = null;
         try {
@@ -1838,7 +1839,7 @@ public class IdentityServicesImpl
         }
         return (token);
     }
-    
+
     private Map<String, Set> attributesToMap(List attrs) {
         if (attrs != null) {
             Attribute[] attributes = new Attribute[attrs.size()];
@@ -1847,7 +1848,7 @@ public class IdentityServicesImpl
         }
         return (Collections.EMPTY_MAP);
     }
-    
+
     private Map<String, Set> attributesToMap(Attribute[] attrs) {
         Map<String, Set> idAttrs = new CaseInsensitiveHashMap();
         if (attrs != null) {
@@ -1907,6 +1908,6 @@ public class IdentityServicesImpl
         }
         cookies[0] = ssoTokenCookie;
         return (cookies);
-        
+
     }
 }
