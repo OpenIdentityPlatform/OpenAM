@@ -26,14 +26,17 @@
  *
  */
 
+/**
+ * Portions Copyrighted 2012 ForgeRock Inc
+ */
 package com.sun.identity.cli;
 
 import com.sun.identity.cli.annotation.DefinitionClassInfo;
 import com.sun.identity.cli.annotation.Macro;
 import com.sun.identity.cli.annotation.SubCommandInfo;
-import com.sun.identity.cli.tools.CLIDefinitionGenerator;
 import java.lang.reflect.Field;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
@@ -106,11 +109,11 @@ public abstract class CLIDefinitionBase implements IDefinition {
                         ExitCodes.INCORRECT_DEFINITION_CLASS);
                 }
  
-                List<String> mandatoryOptions = CLIDefinitionGenerator.toList(
+                List<String> mandatoryOptions = toList(
                     info.mandatoryOptions());
-                List<String> optionalOptions = CLIDefinitionGenerator.toList(
+                List<String> optionalOptions = toList(
                     info.optionalOptions());
-                List<String> optionAliases = CLIDefinitionGenerator.toList(
+                List<String> optionAliases = toList(
                     info.optionAliases());
 
                 if ((info.macro() != null) && (info.macro().length() > 0)) {
@@ -118,11 +121,11 @@ public abstract class CLIDefinitionBase implements IDefinition {
                         Field fldMarco = clazz.getDeclaredField(info.macro());
                         Macro macroInfo =(Macro)fldMarco.getAnnotation(
                             Macro.class);
-                        CLIDefinitionGenerator.appendToList(mandatoryOptions,
+                        appendToList(mandatoryOptions,
                             macroInfo.mandatoryOptions());
-                        CLIDefinitionGenerator.appendToList(optionalOptions,
+                        appendToList(optionalOptions,
                             macroInfo.optionalOptions());
-                        CLIDefinitionGenerator.appendToList(optionAliases,
+                        appendToList(optionAliases,
                             macroInfo.optionAliases());
                     } catch (NoSuchFieldException e) {
                         throw new CLIException(e,
@@ -186,5 +189,31 @@ public abstract class CLIDefinitionBase implements IDefinition {
             }
         }
         return result;
+    }
+
+    /**
+     * Returns a list of string by adding string in an array to it.
+     *
+     * @param array Array of String.
+     * @return a list of string.
+     */
+    private List<String> toList(String[] array) {
+        List<String> ret = new ArrayList<String>();
+        if (array != null && array.length > 0) {
+            ret.addAll(Arrays.asList(array));
+        }
+        return ret;
+    }
+
+    /**
+     * Adds string in an array to a list.
+     *
+     * @param list List of string where new string are to be added.
+     * @param array Array of String.
+     */
+    private void appendToList(List<String> list, String[] array) {
+        if (array != null && array.length > 0) {
+            list.addAll(Arrays.asList(array));
+        }
     }
 }

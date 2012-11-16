@@ -27,7 +27,7 @@
  */
 
 /*
- * Portions Copyrighted 2011 ForgeRock AS
+ * Portions Copyrighted 2011-2012 ForgeRock Inc
  */
 package com.sun.identity.common;
 
@@ -37,7 +37,6 @@ import com.iplanet.sso.SSOToken;
 import com.sun.identity.authentication.config.AMAuthenticationInstance;
 import com.sun.identity.authentication.config.AMAuthenticationManager;
 import com.sun.identity.authentication.config.AMConfigurationException;
-import com.sun.identity.cli.CLIConstants;
 import com.sun.identity.common.configuration.AgentConfiguration;
 import com.sun.identity.common.configuration.SiteConfiguration;
 import com.sun.identity.idm.AMIdentity;
@@ -50,6 +49,7 @@ import com.sun.identity.monitoring.Agent;
 import com.sun.identity.monitoring.SSOServerRealmInfo;
 import com.sun.identity.monitoring.SSOServerMonConfig;
 import com.sun.identity.security.AdminTokenAction;
+import com.sun.identity.shared.Constants;
 import com.sun.identity.shared.datastruct.CollectionHelper;
 import com.sun.identity.shared.debug.Debug;
 import com.sun.identity.sm.OrganizationConfigManager;
@@ -824,7 +824,7 @@ public class ConfigMonitoring {
         Set attrs = null;
         try {
             attrv = aid.getAttributes();
-            attrs = (Set)attrv.get(CLIConstants.ATTR_NAME_AGENT_TYPE);
+            attrs = (Set)attrv.get(Constants.ATTR_NAME_AGENT_TYPE);
         } catch (IdRepoException e) {
             debug.error(classMethod + "idrepo error getting attrs");
             return;
@@ -960,7 +960,7 @@ public class ConfigMonitoring {
          *  have to get the agenttype before knowing which
          *  attributes we really want, so try to get them all
          */
-        attrsToGet.add(CLIConstants.ATTR_NAME_AGENT_TYPE);
+        attrsToGet.add(Constants.ATTR_NAME_AGENT_TYPE);
         attrsToGet.add("com.sun.identity.agents.config.agenturi.prefix");
         attrsToGet.add("com.sun.identity.agents.config.login.url");
         attrsToGet.add("wspendpoint");
@@ -987,7 +987,7 @@ public class ConfigMonitoring {
          *  have/need one value
          */
         String atype =
-            getValFromSet (attrv, CLIConstants.ATTR_NAME_AGENT_TYPE);
+            getValFromSet (attrv, Constants.ATTR_NAME_AGENT_TYPE);
         attrsToGet = new HashSet();
 
         /*
@@ -1024,7 +1024,7 @@ public class ConfigMonitoring {
 
         Map attrMap = new HashMap(); // attributes for this agent
         Map agtMap = new HashMap(); // realm -> agents/attrMap
-        attrMap.put(CLIConstants.ATTR_NAME_AGENT_TYPE, atype);
+        attrMap.put(Constants.ATTR_NAME_AGENT_TYPE, atype);
 
         sb.append("agent type = ").append(atype).append("\n");
         if (attrsToGet.size() > 0) {

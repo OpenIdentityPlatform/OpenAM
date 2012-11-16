@@ -26,11 +26,13 @@
  *
  */
 
+/**
+ * Portions Copyrighted 2012 ForgeRock Inc
+ */
 package com.sun.identity.console.agentconfig.model;
 
 import com.iplanet.sso.SSOException;
 import com.iplanet.sso.SSOToken;
-import com.sun.identity.cli.CLIConstants;
 import com.sun.identity.common.configuration.AgentConfiguration;
 import com.sun.identity.common.configuration.ConfigurationException;
 import com.sun.identity.console.base.model.AMAdminUtils;
@@ -45,6 +47,7 @@ import com.sun.identity.idm.IdSearchResults;
 import com.sun.identity.idm.IdSearchControl;
 import com.sun.identity.idm.IdType;
 import com.sun.identity.idm.IdUtils;
+import com.sun.identity.shared.Constants;
 import com.sun.identity.shared.locale.Locale;
 import com.sun.identity.sm.AttributeSchema;
 import com.sun.identity.sm.SMSException;
@@ -245,7 +248,7 @@ public class AgentsModelImpl
         throws AMConsoleException {
         try {
             Map attrValues = amid.getAttributes();
-            Set set = (Set) attrValues.get(CLIConstants.ATTR_NAME_AGENT_TYPE);
+            Set set = (Set) attrValues.get(Constants.ATTR_NAME_AGENT_TYPE);
             return ((set != null) && !set.isEmpty()) ? 
                 (String) set.iterator().next() : "";
         } catch (IdRepoException ex) {

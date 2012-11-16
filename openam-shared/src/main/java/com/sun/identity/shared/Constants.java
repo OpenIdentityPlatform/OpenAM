@@ -1213,6 +1213,7 @@ public interface Constants {
      */
     static final String DEFAULT_SESSION_HA_STORE_TYPE = "none";
 
+    public static final String ATTR_NAME_AGENT_TYPE = "AgentType";
     /**
      * Additional Directory Constants
      */

@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
     <!--
@@ -26,6 +27,7 @@
     * "Portions Copyrighted [year] [name of copyright owner]"
     *
     -->
+
     <!-- Parent Project -->
     <parent>
         <groupId>org.forgerock.openam</groupId>
@@ -34,21 +36,14 @@
     </parent>
 
     <!-- Component Definition -->
-    <name>OpenAM Tools</name>
-    <description>OpenAM Tool Components</description>
-    <artifactId>openam-tools</artifactId>
+    <name>OpenAM CLI Base</name>
+    <description>OpenAM Command Line Interface</description>
+    <artifactId>openam-cli</artifactId>
     <packaging>pom</packaging>
-    <organization>
-        <name>ForgeRock</name>
-        <url>http://www.forgerock.com</url>
-    </organization>
 
-    <!-- Child Modules -->
     <modules>
-        <module>build-helper-plugin</module>
-        <module>openam-installtools</module>
-        <module>openam-installtools-launcher</module>
-        <module>openam-diagnostics</module>
+        <module>openam-cli-definitions</module>
+        <module>openam-cli-impl</module>
     </modules>
 </project>
 

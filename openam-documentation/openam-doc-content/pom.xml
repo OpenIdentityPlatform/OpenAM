@@ -45,25 +45,6 @@
     <build>
         <plugins>
             <plugin>
-                <groupId>org.codehaus.mojo</groupId>
-                <artifactId>build-helper-maven-plugin</artifactId>
-                <version>1.7</version>
-                <executions>
-                    <execution>
-                        <id>add-source</id>
-                        <phase>generate-sources</phase>
-                        <goals>
-                            <goal>add-source</goal>
-                        </goals>
-                        <configuration>
-                            <sources>
-                                <source>../../openam-core/src/main/java/com/sun/identity/cli/annotation</source>
-                            </sources>
-                        </configuration>
-                    </execution>
-                </executions>
-            </plugin>
-            <plugin>
                 <groupId>org.bsc.maven</groupId>
                 <artifactId>maven-processor-plugin</artifactId>
                 <version>2.0.5</version>
@@ -78,10 +59,9 @@
                         <configuration>
                             <sourceDirectory>../../</sourceDirectory>
                             <includes>
-                                <include>openam-core/src/main/java/com/sun/identity/cli/definition/AccessManager.java
-                                </include>
+                                <include>openam-cli/openam-cli-definitions/src/main/java/com/sun/identity/cli/definition/AccessManager.java</include>
                                 <include>
-                                    openam-federation/OpenFM/src/main/java/com/sun/identity/federation/cli/definition/FederationManager.java
+                                    openam-cli/openam-cli-definitions/src/main/java/com/sun/identity/federation/cli/definition/FederationManager.java
                                 </include>
                             </includes>
                             <processors>
@@ -117,8 +97,8 @@
     <dependencies>
         <dependency>
             <groupId>org.forgerock.openam</groupId>
-            <artifactId>openam-core</artifactId>
-            <version>10.1.0-SNAPSHOT</version>
+            <artifactId>openam-cli-definitions</artifactId>
+            <version>${project.version}</version>
         </dependency>
     </dependencies>
 

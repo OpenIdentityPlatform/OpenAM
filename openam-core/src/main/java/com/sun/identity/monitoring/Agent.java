@@ -27,7 +27,7 @@
  */
 
 /*
- * Portions Copyrighted 2011 ForgeRock AS
+ * Portions Copyrighted 2011-2012 ForgeRock Inc
  */
 package com.sun.identity.monitoring;
 
@@ -62,7 +62,6 @@ import com.iplanet.am.util.SystemProperties;
 import com.iplanet.services.ldap.DSConfigMgr;
 import com.iplanet.services.ldap.Server;
 import com.iplanet.services.ldap.ServerGroup;
-import com.sun.identity.cli.CLIConstants;
 import com.sun.identity.shared.Constants;
 import com.sun.identity.shared.debug.Debug;
 import com.sun.identity.sm.DNMapper;
@@ -1591,7 +1590,7 @@ public class Agent {
         for (Map.Entry<String, Map<String, String>> entry : agtAttrs.entrySet()) {
             String agtname = entry.getKey();
             Map<String, String> hm = entry.getValue();;
-            String atype = hm.get(CLIConstants.ATTR_NAME_AGENT_TYPE);
+            String atype = hm.get(Constants.ATTR_NAME_AGENT_TYPE);
             String grpmem = hm.get("groupmembership");
 
             //  group and agent name can't have ":" in it, or jdmk gags
@@ -1974,7 +1973,7 @@ public class Agent {
         for (Map.Entry<String, Map<String, String>> entry : agtAttrs.entrySet()) {
             String agtname = entry.getKey();
             Map<String, String> hm = entry.getValue();
-            String atype = hm.get(CLIConstants.ATTR_NAME_AGENT_TYPE);
+            String atype = hm.get(Constants.ATTR_NAME_AGENT_TYPE);
 
             if (debug.messageEnabled()) {
                 sb.append("  agent group name = ").append(agtname).
