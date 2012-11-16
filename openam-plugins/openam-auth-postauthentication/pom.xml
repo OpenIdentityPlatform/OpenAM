@@ -38,7 +38,7 @@
     <name>OpenAm PostAuthN plugins</name>
     <description>OpenAM Post AuthN Plugin
     </description>
-    <artifactId>openam-auth-postAuthN</artifactId>
+    <artifactId>openam-auth-postauthentication</artifactId>
     <version>10.1.0-SNAPSHOT</version>
     <packaging>jar</packaging>
     <organization>
