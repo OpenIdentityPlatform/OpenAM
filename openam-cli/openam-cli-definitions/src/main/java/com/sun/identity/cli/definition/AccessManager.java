@@ -26,8 +26,8 @@
  *
  */
 
-/*
- * Portions Copyrighted 2010-2011 ForgeRock AS
+/**
+ * Portions Copyrighted 2010-2012 ForgeRock Inc
  */
 package com.sun.identity.cli.definition;
 
@@ -976,6 +976,22 @@ public class AccessManager {
             "delete-sub-configuration-succeed=Sub Configuration {1} was deleted.",
             "delete-sub-configuration-to-realm-succeed=Sub Configuration {1} was deleted from realm {0}"})
     private String delete_sub_cfg;
+
+    @SubCommandInfo(
+        implClassName="org.forgerock.openam.cli.schema.GetSubConfiguration",
+        description="Get sub configuration.",
+        webSupport="true",
+        mandatoryOptions={
+            "servicename|s|s|Name of service.",
+            "subconfigname|g|s|Name of sub configuration."},
+        optionAliases={},
+        macro="authentication",
+        optionalOptions={
+            "realm|e|s|Name of realm (Sub Configuration shall be added to global configuration if this option is not provided)."},
+        resourceStrings={
+            "get-sub-configuration-succeed=Sub Configuration, {0} was retrieved.",
+            "get-sub-configuration-to-realm-succeed=Sub Configuration, {1} was retrieved in realm {0}"})
+    private String get_sub_cfg;
 
     @SubCommandInfo(
         implClassName="com.sun.identity.cli.schema.ModifySubConfiguration",

@@ -27,7 +27,7 @@
 -->
 
 <!--
-    Portions Copyrighted 2010-2011 ForgeRock AS
+    Portions Copyrighted 2010-2012 ForgeRock Inc
 -->
 
 <!DOCTYPE logmessages
@@ -2211,6 +2211,45 @@
             <item>Look under debug file for more information.</item>
         </actions>
     </logmessage>
+    <logmessage name="ATTEMPT_GET_SUB_CONFIGURATION" id="2383"
+        loglevel="LL_INFO"
+        description="Attempt to retrieve sub configuration.">
+        <datainfo>
+            <item>name of sub configuration</item>
+            <item>name of service</item>
+        </datainfo>
+        <triggers>
+            <item>Execute get sub configuration Commandline interface.</item>
+        </triggers>
+        <actions />
+    </logmessage>
+    <logmessage name="SUCCEED_GET_SUB_CONFIGURATION" id="2384"
+        loglevel="LL_INFO"
+        description="Sub configuration is retrieved.">
+        <datainfo>
+            <item>name of sub configuration</item>
+            <item>name of service</item>
+        </datainfo>
+        <triggers>
+            <item>Execute get sub configuration Commandline interface.</item>
+        </triggers>
+        <actions />
+    </logmessage>
+    <logmessage name="FAILED_GET_SUB_CONFIGURATION" id="2385"
+        loglevel="LL_INFO"
+        description="Unable to retrieve sub configuration.">
+        <datainfo>
+            <item>name of sub configuration</item>
+            <item>name of service</item>
+            <item>error message</item>
+        </datainfo>
+        <triggers>
+            <item>Execute get sub configuration Commandline interface.</item>
+        </triggers>
+        <actions>
+            <item>Look under debug file for more information.</item>
+        </actions>
+    </logmessage>
 
     <logmessage name="ATTEMPT_MODIFY_SUB_CONFIGURATION_IN_REALM" id="2390"
         loglevel="LL_INFO"
@@ -2249,6 +2288,48 @@
         </datainfo>
         <triggers>
             <item>Execute modify sub configuration Commandline interface.</item>
+        </triggers>
+        <actions>
+            <item>Look under debug file for more information.</item>
+        </actions>
+    </logmessage>
+    <logmessage name="ATTEMPT_GET_SUB_CONFIGURATION_IN_REALM" id="2393"
+        loglevel="LL_INFO"
+        description="Attempt to retrieve sub configuration in realm.">
+        <datainfo>
+            <item>name of realm</item>
+            <item>name of sub configuration</item>
+            <item>name of service</item>
+        </datainfo>
+        <triggers>
+            <item>Execute get sub configuration Commandline interface.</item>
+        </triggers>
+        <actions />
+    </logmessage>
+    <logmessage name="SUCCEED_GET_SUB_CONFIGURATION_IN_REALM" id="2394"
+        loglevel="LL_INFO"
+        description="Sub configuration is retrieved.">
+        <datainfo>
+            <item>name of realm</item>
+            <item>name of sub configuration</item>
+            <item>name of service</item>
+        </datainfo>
+        <triggers>
+            <item>Execute get sub configuration Commandline interface.</item>
+        </triggers>
+        <actions />
+    </logmessage>
+    <logmessage name="FAILED_GET_SUB_CONFIGURATION_IN_REALM" id="2395"
+        loglevel="LL_INFO"
+        description="Unable to retrieve sub configuration in realm.">
+        <datainfo>
+            <item>name of realm</item>
+            <item>name of sub configuration</item>
+            <item>name of service</item>
+            <item>error message</item>
+        </datainfo>
+        <triggers>
+            <item>Execute get sub configuration Commandline interface.</item>
         </triggers>
         <actions>
             <item>Look under debug file for more information.</item>
