@@ -218,7 +218,7 @@ public final class IdentityResource implements CollectionResourceProvider {
         } catch (final GeneralFailure generalFailure) {
             RestDispatcher.debug.error("IdentityResource.deleteInstance() :: Cannot DELETE " +
                     generalFailure.getMessage());
-            handler.handleError(new BadRequestException("Cannot complete request", generalFailure));
+            handler.handleError(new BadRequestException(generalFailure.getMessage(), generalFailure));
         } catch (final Exception exception) {
             RestDispatcher.debug.error("IdentityResource.deleteInstance() :: Cannot DELETE! " +
                     exception.getMessage());
@@ -426,7 +426,7 @@ public final class IdentityResource implements CollectionResourceProvider {
         } catch (final GeneralFailure generalFailure) {
             RestDispatcher.debug.error("IdentityResource.readInstance() :: Cannot READ " +
                     generalFailure);
-            handler.handleError(new BadRequestException("Cannot complete request", generalFailure));
+            handler.handleError(new BadRequestException(generalFailure.getMessage(), generalFailure));
         } catch (final Exception exception) {
             RestDispatcher.debug.error("IdentityResource.readInstance() :: Cannot READ! " +
                     exception);
@@ -497,8 +497,8 @@ public final class IdentityResource implements CollectionResourceProvider {
         } catch (final GeneralFailure generalFailure) {
             RestDispatcher.debug.error("IdentityResource.updateInstance() :: Cannot UPDATE " +
                     generalFailure);
-            handler.handleError(new BadRequestException("Cannot complete request", generalFailure));
-        } catch (final Exception exception) {
+            handler.handleError(new BadRequestException(generalFailure.getMessage(), generalFailure));
+        }  catch (final Exception exception) {
             RestDispatcher.debug.error("IdentityResource.updateInstance() :: Cannot UPDATE! " +
                     exception);
             handler.handleError(new NotFoundException(exception.getMessage(), exception));
