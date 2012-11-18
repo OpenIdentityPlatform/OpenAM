@@ -44,7 +44,7 @@ import com.sun.identity.console.session.model.SMProfileModel;
 import com.sun.identity.console.session.model.SMProfileModelImpl;
 import com.sun.identity.console.session.model.SMSessionCache;
 import com.sun.identity.console.session.model.SMSessionData;
-import com.sun.identity.coretoken.interfaces.AMSessionRepository;
+import com.sun.identity.coretoken.interfaces.AMTokenRepository;
 import com.sun.identity.shared.configuration.SystemPropertiesManager;
 import com.sun.web.ui.model.CCActionTableModel;
 import com.sun.web.ui.model.CCNavNodeInterface;
@@ -229,8 +229,8 @@ public class SMProfileViewBean
             addSessionsTab(model,1);
             // Disable, if SFO (not the Airport) HA is enabled and the Type is specified as well.
             // Both the SFO is Enabled and Repository Type has been Specified for view of HA Tabs.
-            if ( (!SystemPropertiesManager.get(AMSessionRepository.IS_SFO_ENABLED, "false").equalsIgnoreCase("true")) &&
-                 (SystemPropertiesManager.get(AMSessionRepository.SYS_PROPERTY_SESSION_HA_REPOSITORY_TYPE, "None").equalsIgnoreCase("None")) )
+            if ( (!SystemPropertiesManager.get(AMTokenRepository.IS_SFO_ENABLED, "false").equalsIgnoreCase("true")) &&
+                 (SystemPropertiesManager.get(AMTokenRepository.SYS_PROPERTY_SESSION_HA_REPOSITORY_TYPE, "None").equalsIgnoreCase("None")) )
             {
                 removeSessionsTab();
             }

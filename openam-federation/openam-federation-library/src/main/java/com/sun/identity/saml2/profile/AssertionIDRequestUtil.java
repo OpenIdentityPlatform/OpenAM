@@ -47,6 +47,8 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.xml.soap.SOAPException;
 import javax.xml.soap.SOAPMessage;
+
+import com.iplanet.dpro.session.exceptions.StoreException;
 import org.w3c.dom.Element;
 
 import com.sun.identity.saml.xmlsig.KeyProvider;
@@ -432,8 +434,15 @@ public class AssertionIDRequestUtil {
                         "processAssertionIDRequest: " +
                         "reading assertion from DB. ID = " + assertionID);
                 }
-                String assertionStr =
-                    (String) SAML2RepositoryFactory.getInstance().retrieve(assertionID);
+                String assertionStr = null;
+                try {
+                    assertionStr =
+                    (String) SAML2RepositoryFactory.getInstance().retrieveSAML2Token(assertionID);
+                } catch(StoreException se) {
+                    SAML2Utils.debug.error("AssertionIDRequestUtil." +
+                            "processAssertionIDRequest: " +
+                            "reading assertion from Repository. ID = " + assertionID + ", Operation has Failed!",se);
+                }
                 if (assertionStr != null) {
                     assertion = AssertionFactory.getInstance().createAssertion(
                         assertionStr);

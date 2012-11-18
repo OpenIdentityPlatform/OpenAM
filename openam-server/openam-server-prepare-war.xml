@@ -57,20 +57,9 @@
             </fileset>
         </copy>
 
+        <!-- Included in CTS Container LDIF Template.
         <mkdir dir="${openam.temp.target}/WEB-INF/template/ldif/oauth2"/>
-        <copy file="${project.basedir}/../openam-oauth2/openam-oauth2-core-token-service/src/main/resources/oauth2_container.ldif.template"
-              tofile="${openam.temp.target}/WEB-INF/template/ldif/oauth2/oauth2_container.ldif"
-              filtering="false"/>
-
-        <mkdir dir="${openam.temp.target}/WEB-INF/template/ldif/sfha"/>
-        <copy file="${project.basedir}/../openam-session-ha/openam-session-ha-core/src/main/resources/ldif/amsessiondb_container.ldif.template"
-              tofile="${openam.temp.target}/WEB-INF/template/ldif/sfha/amsessiondb_container.ldif"
-              filtering="false"/>
-
-        <mkdir dir="${openam.temp.target}/WEB-INF/template/ldif/sfha"/>
-        <copy file="${project.basedir}/../openam-session-ha/openam-session-ha-core/src/main/resources/ldif/opendj_amsessiondb_index.ldif"
-              tofile="${openam.temp.target}/WEB-INF/template/ldif/sfha/opendj_amsessiondb_index.ldif"
-              filtering="false"/>
+         -->
 
         <copy todir="${openam.temp.target}/WEB-INF/template/opendj" filtering="false">
             <fileset dir="${project.basedir}/binary">

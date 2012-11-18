@@ -32,6 +32,7 @@ package com.sun.identity.ha.jmqdb.client;
 import java.io.*;
 import java.util.*;
 
+@Deprecated
 public class FAMSFOPassword {
 
     private static final String RESOURCE_BUNDLE = "amSessionDB";

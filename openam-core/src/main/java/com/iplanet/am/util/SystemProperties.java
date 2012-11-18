@@ -31,7 +31,7 @@
  */
 package com.iplanet.am.util;
 
-import com.sun.identity.coretoken.interfaces.AMSessionRepository;
+import com.sun.identity.coretoken.interfaces.AMTokenRepository;
 import com.iplanet.sso.SSOToken;
 import com.sun.identity.common.configuration.ServerConfiguration;
 import com.sun.identity.security.AdminTokenAction;
@@ -144,9 +144,9 @@ public class SystemProperties {
         mapTagswap.put("%SERVER_PROTO%", Constants.AM_SERVER_PROTOCOL);
         mapTagswap.put("%BASE_DIR%", CONFIG_PATH);
         mapTagswap.put("%SESSION_ROOT_SUFFIX%",
-                AMSessionRepository.SYS_PROPERTY_SESSION_HA_REPOSITORY_ROOT_SUFFIX);
+                AMTokenRepository.SYS_PROPERTY_SESSION_HA_REPOSITORY_ROOT_SUFFIX);
         mapTagswap.put("%SESSION_STORE_TYPE%",
-                AMSessionRepository.SYS_PROPERTY_SESSION_HA_REPOSITORY_TYPE);
+                AMTokenRepository.SYS_PROPERTY_SESSION_HA_REPOSITORY_TYPE);
 
         try {
             // Initialize properties

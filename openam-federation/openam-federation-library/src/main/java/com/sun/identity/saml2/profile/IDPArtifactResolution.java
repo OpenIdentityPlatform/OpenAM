@@ -53,6 +53,7 @@ import javax.xml.soap.SOAPConnection;
 import javax.xml.soap.SOAPException;
 import javax.xml.soap.SOAPMessage;
 
+import com.iplanet.dpro.session.exceptions.StoreException;
 import org.w3c.dom.Element;
 
 import com.sun.identity.common.SystemConfigurationUtil;
@@ -424,10 +425,15 @@ public class IDPArtifactResolution {
                         SAML2Utils.debug.message("Artifact=" + artStr);
                     }
                     String tmp = (String) SAML2RepositoryFactory.getInstance()
-                            .retrieve(artStr);
+                            .retrieveSAML2Token(artStr);
                     res = ProtocolFactory.getInstance().createResponse(tmp);
                 } catch (SAML2Exception e) {
-                    SAML2Utils.debug.error(classMethod + "DB ERROR!!!", e);
+                    SAML2Utils.debug.error(classMethod + " DB ERROR!!!", e);
+                    return SAML2Utils.createSOAPFault(
+                            SAML2Constants.CLIENT_FAULT,
+                            "UnableToFindResponseInRepo", null);
+                } catch (StoreException se) {
+                    SAML2Utils.debug.error(classMethod + " CTS Repository ERROR!!!", se);
                     return SAML2Utils.createSOAPFault(
                             SAML2Constants.CLIENT_FAULT,
                             "UnableToFindResponseInRepo", null);
@@ -444,11 +450,13 @@ public class IDPArtifactResolution {
         // Remove Response from persistent DB
         try {
             if (saml2FailoverEnabled) {
-                SAML2RepositoryFactory.getInstance().delete(artStr);
+                SAML2RepositoryFactory.getInstance().deleteSAML2Token(artStr);
             }
         } catch (SAML2Exception e) {
-            SAML2Utils.debug.error(classMethod + "Error deleting the SAML object from the repository", e);
-        } 
+            SAML2Utils.debug.error(classMethod + " Error deleting the SAML object from the repository", e);
+        } catch (StoreException e) {
+            SAML2Utils.debug.error(classMethod + " Error deleting the SAML object from the CTS Repository", e);
+        }
 
         Map props = new HashMap();
         String nameIDString = SAML2Utils.getNameIDStringFromResponse(res);

@@ -39,7 +39,7 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
 
-import com.sun.identity.coretoken.interfaces.AMSessionRepository;
+import com.sun.identity.coretoken.interfaces.AMTokenRepository;
 import com.sun.identity.shared.debug.Debug;
 import com.iplanet.dpro.session.Session;
 import com.iplanet.dpro.session.SessionException;
@@ -262,7 +262,7 @@ public class SessionCount {
 
     private static Map getSessionsFromRepository(String uuid) throws Exception {
 
-        AMSessionRepository repo = SessionService.getSessionService()
+        AMTokenRepository repo = SessionService.getSessionService()
                 .getRepository();
         Map sessions = null;
         try {

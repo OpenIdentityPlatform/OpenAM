@@ -28,7 +28,7 @@ import java.util.Set;
 import org.codehaus.jackson.annotate.JsonIgnore;
 import org.codehaus.jackson.annotate.JsonIgnoreProperties;
 import org.codehaus.jackson.annotate.JsonProperty;
-import org.forgerock.openam.oauth2.OAuth2Constants;
+import com.sun.identity.shared.OAuth2Constants;
 
 /**
  * Implements the common methods and attributes of all standard OAuth 2 tokens

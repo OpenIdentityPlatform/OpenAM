@@ -227,7 +227,7 @@ public class DefaultJMQSAML2Repository extends GeneralTaskRunnable
     * @param samlKey primary key 
     * @return SAML2 object, if failed, return null. 
     */
-   public Object retrieve(String samlKey) {
+   public Object retrieveSAML2Token(String samlKey) {
         if (!isDatabaseUp) {
             return null;
         }
@@ -261,7 +261,7 @@ public class DefaultJMQSAML2Repository extends GeneralTaskRunnable
     * @param secKey Secondary Key 
     * @return SAML2 object, if failed, return null. 
     */
-   public List retrieveWithSecondaryKey(String secKey) {
+   public List retrieveSAML2TokenWithSecondaryKey(String secKey) {
         if (!isDatabaseUp) {
             return null;
         }
@@ -304,7 +304,7 @@ public class DefaultJMQSAML2Repository extends GeneralTaskRunnable
     * Deletes the SAML2 object by given primary key from the repository
     * @param samlKey primary key 
     */
-   public void delete(String samlKey)  {
+   public void deleteSAML2Token(String samlKey)  {
         if (!isDatabaseUp) {
             return;
         }
@@ -329,7 +329,7 @@ public class DefaultJMQSAML2Repository extends GeneralTaskRunnable
      * Deletes expired SAML2 object from the repository
      * @exception Exception When Unable to delete the expired SAML2 object
      */
-    public void deleteExpired()  {
+    public void deleteExpiredSAML2Tokens()  {
         if (!isDatabaseUp) {
             return;
         }
@@ -359,7 +359,7 @@ public class DefaultJMQSAML2Repository extends GeneralTaskRunnable
     * @param expirationTime expiration time 
     * @param secKey Secondary Key 
     */
-    public void save(String samlKey, Object samlObj, long expirationTime,
+    public void saveSAML2Token(String samlKey, Object samlObj, long expirationTime,
         String secKey) {
 
         if (!isDatabaseUp) {
@@ -457,7 +457,7 @@ public class DefaultJMQSAML2Repository extends GeneralTaskRunnable
              * thread runs based on the runPeriod.
              */
             if (SAML2Utils.isSAML2FailOverEnabled() && (cleanUpValue <= 0)) {
-                deleteExpired();
+                deleteExpiredSAML2Tokens();
                 cleanUpValue = cleanUpPeriod;
             }
             cleanUpValue = cleanUpValue - runPeriod;

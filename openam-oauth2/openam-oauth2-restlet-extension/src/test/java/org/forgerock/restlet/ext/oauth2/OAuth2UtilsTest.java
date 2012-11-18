@@ -29,7 +29,7 @@ import static org.testng.Assert.assertNotNull;
 import java.io.InputStream;
 import java.util.Map;
 
-import org.forgerock.openam.oauth2.OAuth2Constants;
+import com.sun.identity.shared.OAuth2Constants;
 import org.forgerock.openam.oauth2.utils.OAuth2Utils;
 import org.restlet.Request;
 import org.restlet.data.Form;

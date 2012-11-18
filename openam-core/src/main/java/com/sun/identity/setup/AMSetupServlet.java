@@ -33,7 +33,7 @@
 package com.sun.identity.setup;
 
 import com.iplanet.am.util.AdminUtils;
-import com.sun.identity.coretoken.interfaces.AMSessionRepository;
+import com.sun.identity.coretoken.interfaces.AMTokenRepository;
 import com.iplanet.services.ldap.DSConfigMgr;
 import com.iplanet.services.naming.WebtopNaming;
 import com.iplanet.services.util.Crypt;
@@ -710,7 +710,7 @@ public class AMSetupServlet extends HttpServlet {
                         Map values = new HashMap(1);
                         Set innerValues = new HashSet(1);
                         innerValues.add(isSessionHASFOEnabled.toString());
-                        values.put(AMSessionRepository.IS_SFO_ENABLED, innerValues);
+                        values.put(AMTokenRepository.IS_SFO_ENABLED, innerValues);
                         SessionHAFailoverSetupSubConfig.getInstance().
                                 createSessionHAFOSubConfigEntry(adminToken, site,
                                         SessionHAFailoverSetupSubConfig.AM_SESSION_SERVICE, values);

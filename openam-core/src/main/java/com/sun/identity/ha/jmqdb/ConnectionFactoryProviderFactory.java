@@ -36,6 +36,7 @@ import com.sun.identity.ha.FAMRecordUtils;
  * identify an implementation of <code>ConnectionFactoryProvider</code>
  * interface at runtime.
  */
+@Deprecated
 public class ConnectionFactoryProviderFactory {
 
     /**

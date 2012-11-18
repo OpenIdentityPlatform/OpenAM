@@ -29,7 +29,7 @@ import com.sun.identity.authentication.AuthContext;
 import com.sun.identity.authentication.spi.AuthLoginException;
 import com.sun.identity.idm.*;
 import com.sun.identity.security.AdminTokenAction;
-import org.forgerock.openam.oauth2.OAuth2Constants;
+import com.sun.identity.shared.OAuth2Constants;
 import org.forgerock.openam.oauth2.model.impl.ClientApplicationImpl;
 import org.forgerock.openam.oauth2.exceptions.OAuthProblemException;
 import org.forgerock.openam.oauth2.model.ClientApplication;

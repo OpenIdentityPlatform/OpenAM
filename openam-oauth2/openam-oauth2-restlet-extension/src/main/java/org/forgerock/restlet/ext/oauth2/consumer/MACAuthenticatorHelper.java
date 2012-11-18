@@ -28,7 +28,7 @@ import java.io.UnsupportedEncodingException;
 import java.util.StringTokenizer;
 import java.util.logging.Level;
 
-import org.forgerock.openam.oauth2.OAuth2Constants;
+import com.sun.identity.shared.OAuth2Constants;
 import org.restlet.Request;
 import org.restlet.data.ChallengeResponse;
 import org.restlet.data.ChallengeScheme;

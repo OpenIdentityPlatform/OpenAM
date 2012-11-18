@@ -24,7 +24,7 @@
 
 package org.forgerock.restlet.ext.oauth2.flow;
 
-import org.forgerock.openam.oauth2.OAuth2Constants;
+import com.sun.identity.shared.OAuth2Constants;
 
 /**
  * Implements a SAML 2.0 Flow. This is an Extension grant.

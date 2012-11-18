@@ -1,47 +1,38 @@
-/**
+/*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright (c) 2008 Sun Microsystems, Inc. All Rights Reserved.
+ * Copyright (c) 2012 ForgeRock US Inc. All Rights Reserved
  *
- * The contents of this file are subject to the terms
- * of the Common Development and Distribution License
- * (the License). You may not use this file except in
- * compliance with the License.
+ * The contents of this file are subject to the terms of the Common Development and
+ * Distribution License (the License). You may not use this file except in compliance with the
+ * License.
  *
- * You can obtain a copy of the License at
- * https://opensso.dev.java.net/public/CDDLv1.0.html or
- * opensso/legal/CDDLv1.0.txt
- * See the License for the specific language governing
- * permission and limitations under the License.
+ * You can obtain a copy of the License at legal/CDDLv1.0.txt. See the License for the
+ * specific language governing permission and limitations under the License.
  *
- * When distributing Covered Code, include this CDDL
- * Header Notice in each file and include the License file
- * at opensso/legal/CDDLv1.0.txt.
- * If applicable, add the following below the CDDL Header,
- * with the fields enclosed by brackets [] replaced by
- * your own identifying information:
- * "Portions Copyrighted [year] [name of copyright owner]"
+ * When distributing Covered Software, include this CDDL Header Notice in each file and include
+ * the License file at legal/CDDLv1.0.txt. If applicable, add the following below the CDDL
+ * Header, with the fields enclosed by brackets [] replaced by your own identifying
+ * information:
  *
- * $Id: SAML2RepositoryFactory.java,v 1.1 2008/07/22 18:08:20 weisun2 Exp $
- */ 
-
+ * "Portions copyright [year] [name of copyright owner]".
+ *
+ */
 package com.sun.identity.saml2.common;
 
 import com.sun.identity.common.SystemConfigurationUtil;
 import com.sun.identity.coretoken.interfaces.AMTokenSAML2Repository;
 
 /**
+ *
  * <code>SAML2RepositoryFactory</code> represents the saml2 repository,
- * default repository is <code>DefaultJMQSAML2Repository</code>
+ * default repository is <code>CTSPersistentSAML2Store</code>.
+ *
  */
 public class SAML2RepositoryFactory {
 
     private static final String DEFAULT_REPOSITORY_CLASS =
         "com.sun.identity.saml2.common.CTSPersistentSAML2Store";
-
-    @Deprecated
-    private static final String DEFAULT_JMQ_REPOSITORY_CLASS =
-        "com.sun.identity.saml2.plugins.DefaultJMQSAML2Repository"; 
         
     private static final String REPOSITORY_CLASS_PROPERTY =
         "com.sun.identity.saml2.plugins.SAML2RepositoryImpl";
@@ -50,10 +41,15 @@ public class SAML2RepositoryFactory {
         SystemConfigurationUtil.getProperty(
         REPOSITORY_CLASS_PROPERTY, DEFAULT_REPOSITORY_CLASS);
 
+    // TODO -- Pull in 10.1.0.
+    @Deprecated
+    private static final String DEPRECATED_JMQ_REPOSITORY_CLASS =
+            "com.sun.identity.saml2.plugins.DefaultJMQSAML2Repository";
+
     /**
      * Cached Instance Reference to our SAML2 Token Repository
      */
-    private static AMTokenSAML2Repository saml2Repository = null;
+    private static volatile AMTokenSAML2Repository saml2Repository = null;
 
     static {
         try {

@@ -32,7 +32,7 @@ import org.forgerock.json.resource.ResourceException;
 import org.forgerock.json.resource.CollectionResourceProvider;
 import org.forgerock.json.resource.servlet.HttpContext;
 import org.forgerock.openam.ext.cts.CoreTokenService;
-import org.forgerock.openam.oauth2.OAuth2Constants;
+import com.sun.identity.shared.OAuth2Constants;
 import org.forgerock.openam.oauth2.exceptions.OAuthProblemException;
 import org.restlet.data.Status;
 

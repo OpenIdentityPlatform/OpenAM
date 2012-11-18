@@ -38,9 +38,10 @@ import com.iplanet.dpro.session.exceptions.StoreException;
 import com.sun.identity.common.GeneralTaskRunnable;
 import com.sun.identity.common.SystemTimer;
 import com.iplanet.am.util.SystemProperties;
-import com.sun.identity.coretoken.interfaces.AMSessionRepository;
+import com.sun.identity.coretoken.interfaces.AMTokenRepository;
 import com.iplanet.dpro.session.service.InternalSession;
 import com.iplanet.dpro.session.service.SessionService;
+import com.sun.identity.coretoken.interfaces.AMTokenSAML2Repository;
 import com.sun.identity.session.util.SessionUtils;
 import com.sun.identity.shared.debug.Debug;
 
@@ -61,7 +62,7 @@ import com.sun.identity.shared.Constants;
  */
 @Deprecated
 public class JMQSessionRepository extends GeneralTaskRunnable implements
-    AMSessionRepository {
+        AMTokenRepository, AMTokenSAML2Repository {
 
     /**
      * Singleton Definition.
@@ -495,45 +496,106 @@ public class JMQSessionRepository extends GeneralTaskRunnable implements
 
     }
 
-    //@Override
+    // *****************************************************************
+    //
+    // All methods below this comment are stubbed out for resolution
+    // of our implementations for consistency.  This whole class will
+    // be removed for 10.1.0.
+    //
+    // *****************************************************************
+
+   @Override
     public DBStatistics getDBStatistics() {
         // TODO
         return null;
     }
 
-    //@Override
+   @Override
     public void delete(String id) throws StoreException, NotFoundException {
         // TODO
     }
 
-    //@Override
+   @Override
     public void deleteExpired(Calendar expDate) throws StoreException {
         // TODO
     }
 
-    //@Override
+   @Override
     public void write(AMRootEntity amRootEntity) throws StoreException {
         // TODO
     }
 
-    //@Override
+   @Override
     public AMRootEntity read(String id) throws StoreException, NotFoundException {
         return null;  // TODO
     }
 
-    //@Override
+   @Override
     public Set<String> readWithSecKey(String id) throws StoreException, NotFoundException {
         return null;  // TODO
     }
 
-    //@Override
+   @Override
     public void shutdown() {
         // TODO
     }
 
-    //@Override
+   @Override
     public Map<String, Long> getRecordCount(String id) throws StoreException {
         return null;  // TODO
     }
 
+    /**
+     * Retrives existing SAML2 object from persistent datastore
+     *
+     * @param samlKey primary key
+     * @return SAML2 object, if failed, return null.
+     */
+    @Override
+    public Object retrieveSAML2Token(String samlKey) {
+        return null;  // TODO
+    }
+
+    /**
+     * Retrives a list of existing SAML2 object from persistent datastore with
+     * secodaryKey
+     *
+     * @param secKey Secondary Key
+     * @return SAML2 object, if failed, return null.
+     */
+    @Override
+    public List retrieveSAML2TokenWithSecondaryKey(String secKey) {
+        return null;  // TODO
+    }
+
+    /**
+     * Deletes the SAML2 object by given primary key from the repository
+     *
+     * @param samlKey primary key
+     */
+    @Override
+    public void deleteSAML2Token(String samlKey) {
+        // TODO
+    }
+
+    /**
+     * Deletes expired SAML2 object from the repository
+     */
+    @Override
+    public void deleteExpiredSAML2Tokens() {
+        // TODO
+    }
+
+    /**
+     * Saves SAML2 data into the SAML2 Repository
+     *
+     * @param samlKey        primary key
+     * @param samlObj        saml object such as Response, IDPSession
+     * @param expirationTime expiration time
+     * @param secKey         Secondary Key
+     */
+    @Override
+    public void saveSAML2Token(String samlKey, Object samlObj, long expirationTime, String secKey) {
+        // TODO
+    }
 }

@@ -1,76 +1,82 @@
-/**
+/*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright (c) 2008 Sun Microsystems Inc. All Rights Reserved
+ * Copyright (c) 2012 ForgeRock US Inc. All Rights Reserved
  *
- * The contents of this file are subject to the terms
- * of the Common Development and Distribution License
- * (the License). You may not use this file except in
- * compliance with the License.
+ * The contents of this file are subject to the terms of the Common Development and
+ * Distribution License (the License). You may not use this file except in compliance with the
+ * License.
  *
- * You can obtain a copy of the License at
- * https://opensso.dev.java.net/public/CDDLv1.0.html or
- * opensso/legal/CDDLv1.0.txt
- * See the License for the specific language governing
- * permission and limitations under the License.
+ * You can obtain a copy of the License at legal/CDDLv1.0.txt. See the License for the
+ * specific language governing permission and limitations under the License.
  *
- * When distributing Covered Code, include this CDDL
- * Header Notice in each file and include the License file
- * at opensso/legal/CDDLv1.0.txt.
- * If applicable, add the following below the CDDL Header,
- * with the fields enclosed by brackets [] replaced by
- * your own identifying information:
- * "Portions Copyrighted [year] [name of copyright owner]"
+ * When distributing Covered Software, include this CDDL Header Notice in each file and include
+ * the License file at legal/CDDLv1.0.txt. If applicable, add the following below the CDDL
+ * Header, with the fields enclosed by brackets [] replaced by your own identifying
+ * information:
  *
- * $Id: DefaultJMQSAML2Repository.java,v 1.5 2008/08/01 22:23:47 hengming Exp $
+ * "Portions copyright [year] [name of copyright owner]".
  *
  */
-
 package com.sun.identity.saml2.common;
 
-import com.iplanet.dpro.session.Session;
 import com.iplanet.dpro.session.SessionException;
+import com.iplanet.dpro.session.exceptions.StoreException;
 import com.iplanet.dpro.session.service.SessionService;
 import com.iplanet.dpro.session.share.SessionBundle;
 import com.iplanet.services.naming.WebtopNaming;
 import com.sun.identity.common.GeneralTaskRunnable;
 import com.sun.identity.common.SystemTimer;
 import com.sun.identity.coretoken.interfaces.AMTokenSAML2Repository;
-import com.sun.identity.ha.FAMPersisterManager;
-import com.sun.identity.ha.FAMRecordPersister;
-import com.sun.identity.saml2.common.SAML2Utils;
 import com.sun.identity.session.util.SessionUtils;
 import com.sun.identity.shared.Constants;
 import com.sun.identity.shared.configuration.SystemPropertiesManager;
 import com.sun.identity.shared.debug.Debug;
+import com.sun.identity.sm.model.AMRecord;
 import com.sun.identity.sm.model.FAMRecord;
+import org.forgerock.openam.session.model.AMRootEntity;
 
-import javax.jms.IllegalStateException;
 import java.util.*;
 
 
 /**
- * This class is used in SAML2 failover mode to store/recover serialized
- * state of Assertion/Response object
+ * This class is used in SAML2  mode to store/recover serialized
+ * state of Assertion/Response object.
+ *
+ * This class acts as a proxy to perform distinct SAML2
+ * operations and allow the CTSPersistentStore implementation
+ * to handle the actual CRUD for Tokens.
+ *
  */
 public class CTSPersistentSAML2Store extends GeneralTaskRunnable
     implements AMTokenSAML2Repository {
 
-    /* Operations */
-    static public final String READ = "READ";
+    /**
+     * This Instances Server ID.
+     */
+    private static String serverId;
 
-    static public final String WRITE = "WRITE";
+    /**
+     * Indicator for Persistence Store.
+     */
+    private static boolean isDatabaseUp = false;
+    private static boolean lastLoggedDBStatusIsUp = false;
 
-    static public final String DELETE = "DELETE";
+    /**
+     * Provides a Reference the AMTokenSAML2Repository Implementation Class for our
+     * persistence operations.
+     *
+     * This instance is this classes Singleton.
+     */
+    private static volatile AMTokenSAML2Repository instance = null;
 
-    static public final String DELETEBYDATE = "DELETEBYDATE";
-
-
-    // Private data members
-    String serverId;
-
-    /* Config data */
-    private static boolean isDatabaseUp = true;
+    /**
+     * OpenAM CTS Repository.
+     *
+     * This instance actually brings in the implementation for all CRUD
+     * Operations.
+     */
+    private static volatile AMTokenSAML2Repository amTokenSAML2Repository = null;
 
     /**
      * grace period before expired session records are removed from the
@@ -82,10 +88,10 @@ public class CTSPersistentSAML2Store extends GeneralTaskRunnable
         "com.sun.identity.session.repository.cleanupGracePeriod";
 
     private static final String BRIEF_DB_ERROR_MSG =
-        "SAML2 failover service is not functional due to DB unavailability.";
+        "SAML2 failover service is not functional due to Token Persistent Store unavailability.";
 
     private static final String DB_ERROR_MSG =
-        "SAML2 database is not available at this moment."
+        "SAML2 Token Persistent Store is not available at this moment."
             + "Please check with the system administrator " +
                     "for appropriate actions";
 
@@ -94,8 +100,6 @@ public class CTSPersistentSAML2Store extends GeneralTaskRunnable
 
     private static final String LOG_MSG_DB_UNAVAILABLE =
         "SESSION_DATABASE_UNAVAILABLE";
-
-    private static boolean lastLoggedDBStatusIsUp = true;
 
     /**
      * Time period between two successive runs of repository cleanup thread
@@ -128,6 +132,9 @@ public class CTSPersistentSAML2Store extends GeneralTaskRunnable
     static Debug debug = Debug.getInstance("amToken");
     private String SAML2="saml2";
 
+    /**
+     * Static Initialization Stanza.
+     */
     static {
         try {
             gracePeriod = Integer.parseInt(SystemPropertiesManager.get(
@@ -157,21 +164,24 @@ public class CTSPersistentSAML2Store extends GeneralTaskRunnable
         runPeriod = (cleanUpPeriod <= healthCheckPeriod) ? cleanUpPeriod
                 : healthCheckPeriod;
         cleanUpValue = cleanUpPeriod;
-    }
 
-    // Message queues
-    // One REQUEST queue/topic is suffcient
-    // Multiple RESPONSE queues/topics may be necessary
-    public FAMRecordPersister pSession = null;
+        // Instantiate the Singleton Instance.
+        try {
+            instance = new CTSPersistentSAML2Store();
+        } catch(Exception e) {
+            debug.error("Unable to Instantiate "+CTSPersistentSAML2Store.class.getName()+" for SAML2 Persistence",e);
+        }
+
+    }
 
    /**
     *
-    * Constructs new AMTokenSAML2Repository
+    * Constructs new CTSPersistentSAML2Store
     * @exception Exception when cannot create a new SAML2 repository
     *
     */
-   public CTSPersistentSAML2Store() throws Exception {
-
+   private CTSPersistentSAML2Store() throws Exception {
+        // Obtain OpenAM Instance Configuration Properties.
         String thisSessionServerProtocol = SystemPropertiesManager
                 .get(Constants.AM_SERVER_PROTOCOL);
         String thisSessionServer = SystemPropertiesManager
@@ -187,26 +197,31 @@ public class CTSPersistentSAML2Store extends GeneralTaskRunnable
             throw new SessionException(SessionBundle.rbName,
                     "propertyMustBeSet", null);
         }
-
+        // Obtain our Server ID for this OpenAM Instance.
         serverId = WebtopNaming.getServerID(thisSessionServerProtocol,
                 thisSessionServer, thisSessionServerPortAsString,
                 thisSessionURI);
+        // Initialize our Persistence Layer.
         initPersistSession();   
-
+        // Schedule our Runnable Background Thread Task. @see run() method for associated Task.
         SystemTimer.getTimer().schedule(this, new Date((
             System.currentTimeMillis() / 1000) * 1000));
     }
 
     /**
      *
-     * Initialize new FAMRecord persister
+     * Initialize the Reference to our CTS Persistent Store.
      */
     private void initPersistSession() {
         try {
-            pSession = FAMPersisterManager.getInstance().
-                getFAMRecordPersister();
-
-            isDatabaseUp = true;
+            // Obtain our AM Token Repository Instance to provide the Backend CRUD for Tokens.
+            amTokenSAML2Repository = CTSPersistentSAML2StoreFactory.getInstance();
+            if (amTokenSAML2Repository != null) {
+                isDatabaseUp = true;
+            } else {
+                // This Throw will be caught below.
+                throw new Exception("Unable to acquire AMTokenSAML2Repository Implementation Reference from Factory!");
+            }
         } catch (Exception e) {
             isDatabaseUp = false;
             debug.error(BRIEF_DB_ERROR_MSG);
@@ -217,24 +232,33 @@ public class CTSPersistentSAML2Store extends GeneralTaskRunnable
 
     }
 
-   /**
-    * Retrives existing SAML2 object from persistent datastore
-    * @param samlKey primary key 
-    * @return SAML2 object, if failed, return null. 
-    */
-   public Object retrieve(String samlKey) {
+    /**
+     * Provide Service Instance Access to our Singleton
+     *
+     * @return AMTokenSAML2Repository Singleton Instance.
+     */
+    public static AMTokenSAML2Repository getInstance() {
+        return instance;
+    }
+
+    /**
+     * Retrives existing SAML2 object from persistent Repository.
+     *
+     * @param samlKey primary key
+     * @return Object - SAML2 unMarshaled Object, if failed, return null.
+     */
+   public Object retrieveSAML2Token(String samlKey) {
         if (!isDatabaseUp) {
             return null;
         }
         try {
-            FAMRecord famRec = new FAMRecord (
-                SAML2, FAMRecord.READ, samlKey, 0, null, 0, null, null);
-           
-            FAMRecord retRec = pSession.send(famRec);
-            byte[] blob = retRec.getSerializedInternalSessionBlob();
-            Object retObj = SessionUtils.decode(blob);
-            return retObj;
-        } catch (IllegalStateException e) {
+            // Retrieve the SAML2 Token from the Repository using the SAML2 Primary Key.
+            AMRecord amRecord = (AMRecord) amTokenSAML2Repository.retrieveSAML2Token(samlKey);
+            // Obtain the Serialized Internal Session to unMarshal the SAML2 Object.
+            byte[] blob = amRecord.getSerializedInternalSessionBlob();
+            Object unMarshaledObject = SessionUtils.decode(blob);
+            return unMarshaledObject;
+        } catch (StoreException e) {
             isDatabaseUp = false;
             logDBStatus();
             debug.error(BRIEF_DB_ERROR_MSG, e);
@@ -243,7 +267,7 @@ public class CTSPersistentSAML2Store extends GeneralTaskRunnable
             }
             return null;
         } catch (Exception e) {
-            debug.message("AMTokenSAML2Repository.retrieve(): failed retrieving "
+            debug.message("AMTokenSAML2Repository.retrieveSAML2Token(): failed retrieving "
                     + "SAML2 object", e);
             return null;
         }
@@ -256,16 +280,18 @@ public class CTSPersistentSAML2Store extends GeneralTaskRunnable
     * @param secKey Secondary Key 
     * @return SAML2 object, if failed, return null. 
     */
-   public List retrieveWithSecondaryKey(String secKey) {
+   public List<Object> retrieveSAML2TokenWithSecondaryKey(String secKey) {
         if (!isDatabaseUp) {
             return null;
         }
         try {
-            FAMRecord famRec = new FAMRecord(SAML2,
-                FAMRecord.READ_WITH_SEC_KEY, null, 0, secKey, 0, null, null);
-           
-            FAMRecord retRec = pSession.send(famRec);
-            Map map = retRec.getExtraStringAttributes();
+            // Retrieve the SAML2 Token from the Repository using the SAML2 Primary Key.
+            List<Object> results = amTokenSAML2Repository.retrieveSAML2TokenWithSecondaryKey(secKey);
+            if ( (results == null) || (results.size() <= 0) )
+                { return null; }
+            FAMRecord famRecord = (FAMRecord) results.get(0);
+            // Obtain the Additional Attributes and UnMarshal.
+            Map map = famRecord.getExtraStringAttributes();
             if ((map != null) && (!map.isEmpty())) {
                 Vector blobs = (Vector)map.values().iterator().next();
 
@@ -280,7 +306,7 @@ public class CTSPersistentSAML2Store extends GeneralTaskRunnable
                 }
             }
             return null;
-        } catch (IllegalStateException e) {
+        } catch (StoreException e) {
             isDatabaseUp = false;
             logDBStatus();
             debug.error(BRIEF_DB_ERROR_MSG, e);
@@ -289,7 +315,7 @@ public class CTSPersistentSAML2Store extends GeneralTaskRunnable
             }
             return null;
         } catch (Exception e) {
-            debug.message("AMTokenSAML2Repository.retrieve(): failed retrieving "
+            debug.message("AMTokenSAML2Repository.retrieveSAML2TokenWithSecondaryKey(): failed retrieving "
                     + "SAML2 object", e);
             return null;
         }
@@ -299,50 +325,42 @@ public class CTSPersistentSAML2Store extends GeneralTaskRunnable
     * Deletes the SAML2 object by given primary key from the repository
     * @param samlKey primary key 
     */
-   public void delete(String samlKey)  {
+   public void deleteSAML2Token(String samlKey)  {
         if (!isDatabaseUp) {
             return;
         }
         try {
-            FAMRecord famRec = new FAMRecord (
-                SAML2, FAMRecord.DELETE, samlKey, 0, null, 0, null, null);
-            FAMRecord retRec = pSession.send(famRec);
-        } catch (IllegalStateException e) {
+            amTokenSAML2Repository.deleteSAML2Token(samlKey);
+        } catch (Exception e) {
             isDatabaseUp = false;
             logDBStatus();
             debug.error(BRIEF_DB_ERROR_MSG, e);
             if (debug.messageEnabled()) {
                 debug.message(DB_ERROR_MSG, e);
             }
-        } catch (Exception e) {
-            debug.error("AMTokenSAML2Repository.delete(): failed deleting "
+            debug.error("AMTokenSAML2Repository.deleteSAML2Token(): failed deleting "
                     + "SAML2 object", e);
         }
     }
 
     /**
      * Deletes expired SAML2 object from the repository
-     * @exception Exception When Unable to delete the expired SAML2 object
+     * @exception Exception When Unable to delete the expired SAML2 objects
      */
-    public void deleteExpired()  {
+    public void deleteExpiredSAML2Tokens()  {
         if (!isDatabaseUp) {
             return;
         }
         try {
-            long date = System.currentTimeMillis() / 1000;     
-            FAMRecord famRec = new FAMRecord (
-                 SAML2, FAMRecord.DELETEBYDATE, null,
-                 date, null, 0, null, null);
-            FAMRecord retRec = pSession.send(famRec);
-        } catch (IllegalStateException e) {
+            amTokenSAML2Repository.deleteExpiredSAML2Tokens();
+        } catch (Exception e) {
             isDatabaseUp = false;
             logDBStatus();
             debug.error(BRIEF_DB_ERROR_MSG, e);
             if (debug.messageEnabled()) {
                 debug.message(DB_ERROR_MSG, e);
             }
-        } catch (Exception e) {
-            debug.error("AMTokenSAML2Repository.deleteExpired(): failed "
+            debug.error("AMTokenSAML2Repository.deleteExpiredSAML2Tokens(): failed "
                     + "deleting Expired saml2 object", e);
         }
     }
@@ -354,28 +372,24 @@ public class CTSPersistentSAML2Store extends GeneralTaskRunnable
     * @param expirationTime expiration time 
     * @param secKey Secondary Key 
     */
-    public void save(String samlKey, Object samlObj, long expirationTime,
+    public void saveSAML2Token(String samlKey, Object samlObj, long expirationTime,
         String secKey) {
-
+        // Is our Token Repository Available?
         if (!isDatabaseUp) {
             return;
         }
-
+        // Save the SAML2 Token.
         try {
-            byte[] blob = SessionUtils.encode(samlObj);
-            FAMRecord famRec = new FAMRecord (
-                SAML2, FAMRecord.WRITE, samlKey, expirationTime, secKey,
-                0, null, blob);
-            FAMRecord retRec = pSession.send(famRec); 
-        } catch (IllegalStateException e) {
+            // Perform the Save of the Token to the Token Repository.
+            amTokenSAML2Repository.saveSAML2Token(samlKey, samlObj, expirationTime, secKey);
+        } catch (Exception e) {
             isDatabaseUp = false;
             logDBStatus();
             debug.error(BRIEF_DB_ERROR_MSG, e);
             if (debug.messageEnabled()) {
                 debug.message(DB_ERROR_MSG, e);
             }
-        } catch (Exception e) {
-            debug.error("AMTokenSAML2Repository.save(): failed "
+            debug.error("AMTokenSAML2Repository.saveSAML2Token(): failed "
                     + "to save SAML2 object", e);
         }
     }
@@ -416,18 +430,40 @@ public class CTSPersistentSAML2Store extends GeneralTaskRunnable
         }
     }
 
+    /**
+     * Return Service Run Period.
+     *
+     * @return long current run period.
+     */
     public long getRunPeriod() {
         return runPeriod;
     }
-    
+
+    /**
+     * Service Method.
+     *
+     * @param obj
+     * @return
+     */
     public boolean addElement(Object obj) {
         return false;
     }
-    
+
+    /**
+     * Service Method.
+     *
+     * @param obj
+     * @return
+     */
     public boolean removeElement(Object obj) {
         return false;
     }
-    
+
+    /**
+     * Service Method.
+     *
+     * @return
+     */
     public boolean isEmpty() {
         return true;
     }
@@ -440,7 +476,7 @@ public class CTSPersistentSAML2Store extends GeneralTaskRunnable
      * healthCheckPeriod.
      */
      public void run() {
-        String classMethod="DefaultJMQSAML2Repository.run: "; 
+        String classMethod="CTSPersistentSAML2Store.run: ";
         try {
 
             if (debug.messageEnabled()) {
@@ -452,7 +488,7 @@ public class CTSPersistentSAML2Store extends GeneralTaskRunnable
              * thread runs based on the runPeriod.
              */
             if (SAML2Utils.isSAML2FailOverEnabled() && (cleanUpValue <= 0)) {
-                deleteExpired();
+                deleteExpiredSAML2Tokens();
                 cleanUpValue = cleanUpPeriod;
             }
             cleanUpValue = cleanUpValue - runPeriod;
@@ -466,11 +502,12 @@ public class CTSPersistentSAML2Store extends GeneralTaskRunnable
                 logDBStatus();
             }
         } catch (Exception e) {
-            debug.error("AMTokenSAML2Repository.run(): Exception in thread",
+            debug.error("CTSPersistentSAML2Store.run(): Exception in thread",
                     e);
         }
 
     }
+
 
 
 }

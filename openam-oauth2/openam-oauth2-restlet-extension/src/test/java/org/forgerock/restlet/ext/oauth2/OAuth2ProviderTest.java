@@ -26,7 +26,7 @@ package org.forgerock.restlet.ext.oauth2;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertNotNull;
 
-import org.forgerock.openam.oauth2.OAuth2Constants;
+import com.sun.identity.shared.OAuth2Constants;
 import org.forgerock.restlet.ext.oauth2.internal.OAuth2Component;
 import org.forgerock.openam.oauth2.provider.OAuth2Provider;
 import org.forgerock.restlet.ext.oauth2.provider.OAuth2RealmRouter;

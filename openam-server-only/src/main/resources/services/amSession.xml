@@ -214,6 +214,16 @@
                             <Value></Value>
                         </DefaultValues>
                     </AttributeSchema>
+                    <!-- New as of 10.1.0 -->
+                    <AttributeSchema name="forgerock-openam-session-expired-search-limit"
+                                     type="single"
+                                     syntax="number_range"
+                                     rangeStart="0" rangeEnd="2147483647">
+                        <DefaultValues>
+                            <Value>250</Value>
+                        </DefaultValues>
+                    </AttributeSchema>
+                    <!-- This property is deprecated as of 10.1.0 -->
                     <!-- Was i18Key a126 -->
                     <AttributeSchema name="iplanet-am-session-sfo-store-rootdn"
                                      type="single"
@@ -222,6 +232,7 @@
                             <Value>o=openam-session,dc=openam,dc=forgerock,dc=org</Value>
                         </DefaultValues>
                     </AttributeSchema>
+                    <!-- This property is deprecated as of 10.1.0 -->
                     <!-- Was i18Key a127 -->
                     <AttributeSchema name="iplanet-am-session-store-username"
                                      type="single"
@@ -230,6 +241,7 @@
                             <Value>cn=Directory Manager</Value>
                         </DefaultValues>
                     </AttributeSchema>
+                    <!-- This property is deprecated as of 10.1.0 -->
                     <!-- Was i18Key a128 -->
                     <AttributeSchema name="iplanet-am-session-store-password"
                                      type="single"
@@ -238,6 +250,7 @@
                             <Value>password</Value>
                         </DefaultValues>
                     </AttributeSchema>
+                    <!-- This property is deprecated as of 10.1.0 -->
                     <!-- Was i18Key a129 -->
                     <AttributeSchema name="iplanet-am-session-min-pool-size"
                                      type="single"
@@ -247,6 +260,7 @@
                             <Value>8</Value>
                         </DefaultValues>
                     </AttributeSchema>
+                    <!-- This property is deprecated as of 10.1.0 -->
                     <!-- Was i18Key a130 -->
                     <AttributeSchema name="iplanet-am-session-max-pool-size"
                                      type="single"
@@ -256,6 +270,7 @@
                             <Value>32</Value>
                         </DefaultValues>
                     </AttributeSchema>
+                    <!-- This property is deprecated as of 10.1.0 -->
                     <!-- Was i18Key a131 -->
                     <AttributeSchema name="iplanet-am-session-store-cpl-max-wait-time"
                                      type="single"
@@ -265,7 +280,7 @@
                             <Value>5000</Value>
                         </DefaultValues>
                     </AttributeSchema>
-                    <!-- These properties are deprecated as of 10.1.0 -->
+                    <!-- This property is deprecated as of 10.1.0 -->
                     <AttributeSchema name="iplanet-am-session-JDBC-driver-Impl-classname"
                                      type="single"
                                      syntax="string">
@@ -274,6 +289,7 @@
                         </DefaultValues>
                     </AttributeSchema>
                     <!-- Was i18Key a113 -->
+                    <!-- This property is deprecated as of 10.1.0 -->
                     <AttributeSchema name="iplanet-am-session-jdbc-url"
                                      type="single"
                                      syntax="string">

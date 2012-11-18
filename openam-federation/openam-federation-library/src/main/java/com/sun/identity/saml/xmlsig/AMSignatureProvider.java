@@ -1525,7 +1525,7 @@ public class AMSignatureProvider implements SignatureProvider {
 
     /**
      * Get the PublicKey embedded in the Security Token profile
-     * @param Document the docement to be verified
+     * @param doc the document to be verified
      * @return a PublicKey
      */
     private PublicKey getWSSTokenProfilePublicKey(Document doc) {

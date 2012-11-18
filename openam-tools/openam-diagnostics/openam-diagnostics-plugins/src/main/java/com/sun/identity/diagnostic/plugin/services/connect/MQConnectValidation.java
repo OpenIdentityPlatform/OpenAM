@@ -35,7 +35,7 @@ import java.util.StringTokenizer;
 import javax.jms.*;
 
 import com.iplanet.am.util.SystemProperties;
-import com.sun.identity.coretoken.interfaces.AMSessionRepository;
+import com.sun.identity.coretoken.interfaces.AMTokenRepository;
 import com.iplanet.services.naming.WebtopNaming;
 import com.iplanet.sso.SSOToken;
 import com.sun.identity.common.configuration.ServerConfiguration;
@@ -128,7 +128,7 @@ public class MQConnectValidation extends ServiceBase implements
                 Map sessionAttrs = subConfig.getAttributes();
                 boolean sfoEnabled = Boolean.valueOf(
                     CollectionHelper.getMapAttr(
-                    sessionAttrs, AMSessionRepository.IS_SFO_ENABLED, "false")
+                    sessionAttrs, AMTokenRepository.IS_SFO_ENABLED, "false")
                     ).booleanValue();
                 if (sfoEnabled) {
                     isSessionFailoverEnabled = true;

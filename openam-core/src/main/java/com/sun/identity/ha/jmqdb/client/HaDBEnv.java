@@ -37,6 +37,7 @@ import com.sleepycat.je.EnvironmentConfig;
 import com.sleepycat.persist.EntityStore;
 import com.sleepycat.persist.StoreConfig;
 
+@Deprecated
 public class HaDBEnv {
 
     private Environment sessionEnv;

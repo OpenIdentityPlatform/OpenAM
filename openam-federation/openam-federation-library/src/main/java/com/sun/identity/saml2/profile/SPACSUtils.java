@@ -53,6 +53,7 @@ import javax.xml.soap.SOAPConnection;
 import javax.xml.soap.SOAPException;
 import javax.xml.soap.SOAPMessage;
 
+import com.iplanet.dpro.session.exceptions.StoreException;
 import com.sun.identity.saml2.common.*;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -1447,11 +1448,13 @@ public class SPACSUtils {
             SPCache.assertionByIDCache.put(assertionID, SAML2Constants.ONETIME);
             try {
                 if (SAML2Utils.isSAML2FailOverEnabled()) {
-                    SAML2RepositoryFactory.getInstance().save(assertionID,
+                    SAML2RepositoryFactory.getInstance().saveSAML2Token(assertionID,
                     SAML2Constants.ONETIME, 
                     ((Long) smap.get(SAML2Constants.NOTONORAFTER)).longValue(),
                     null);
                 }
+            } catch (StoreException se) {
+                SAML2Utils.debug.error(classMethod + "DB error!", se);
             } catch (SAML2Exception e) {
                 SAML2Utils.debug.error(classMethod + "DB error!", e); 
             }
@@ -1801,7 +1804,7 @@ public class SPACSUtils {
                     // Try and retrieve the value from the SAML2 repository
                     // The key is this way to make it unique compared to when
                     // the same key is used to store a copy of the AuthnRequestInfo
-                    String relayState = (String) SAML2RepositoryFactory.getInstance().retrieve(relayStateID + relayStateID);
+                    String relayState = (String) SAML2RepositoryFactory.getInstance().retrieveSAML2Token(relayStateID + relayStateID);
                     if (relayState != null) {
                         // Get back the relayState
                         relayStateUrl = relayState;
@@ -1810,6 +1813,9 @@ public class SPACSUtils {
                                 + " retrieved from SAML2 repository for relayStateID: " + relayStateID);
                         }
                     }
+                } catch (StoreException se) {
+                    SAML2Utils.debug.error("SPACUtils.getRelayState: Unable to retrieve relayState for relayStateID "
+                            + relayStateID, se);
                 } catch (SAML2Exception ex) {                    
                     SAML2Utils.debug.error("SPACUtils.getRelayState: Unable to retrieve relayState for relayStateID "
                             + relayStateID, ex);                    

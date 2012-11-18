@@ -61,7 +61,7 @@ import com.sun.identity.common.ShutdownListener;
 import com.sun.identity.common.ShutdownManager;
 import com.sun.identity.common.configuration.ServerConfiguration;
 import com.sun.identity.common.configuration.SiteConfiguration;
-import com.sun.identity.coretoken.interfaces.AMSessionRepository;
+import com.sun.identity.coretoken.interfaces.AMTokenRepository;
 import com.sun.identity.idm.AMIdentity;
 import com.sun.identity.idm.IdRepoException;
 import com.sun.identity.idm.IdSearchResults;
@@ -156,7 +156,7 @@ public class SessionService {
     /**
      * AM Session Repository for Session Persistence.
      */
-    private static volatile AMSessionRepository amSessionRepository = null;
+    private static volatile AMTokenRepository amTokenRepository = null;
     /**
      * AM Session Repository Type, always
      * Default to Embedded until we initialize.
@@ -169,17 +169,20 @@ public class SessionService {
      */
     static SSOTokenManager ssoManager = null;
 
+    /**
+     * Globals
+     */
     public static Debug sessionDebug = null;
 
     public static int maxSessions = 10000;
+
+    public static Stats stats;
 
     private static int numberOfActiveSessions = 0;
 
     private static String dsameAdminDN = null;
 
     private static String dsameAdminPassword = null;
-
-    public static Stats stats;
 
     private static SessionMaxStats maxSessionStats;
 
@@ -250,33 +253,8 @@ public class SessionService {
     private static final String TOP_LEVEL_ADMIN_ROLE =
             "Top-level Admin Role";
 
-    private static final String SESSION_EXTERNAL_STORE_USERNAME =
-            "iplanet-am-session-store-username";
-
-    private static final String SESSION_EXTERNAL_STORE_PASSWORD =
-            "iplanet-am-session-store-password";
-
-    private static final String CONNECT_MAX_WAIT_TIME =
-            "iplanet-am-session-store-cpl-max-wait-time";
-
-    @Deprecated
-    private static final String JDBC_DRIVER_CLASS =
-            "iplanet-am-session-JDBC-driver-Impl-classname";
-
-    private static final String SESSION_EXTERNAL_REPOSITORY_URL =
-            "iplanet-am-session-repository-url";
-
     private static final String SESSION_REPOSITORY_TYPE =
             "iplanet-am-session-sfo-store-type";
-
-    private static final String SESSION_EXTERNAL_REPOSITORY_ROOTDN =
-            "iplanet-am-session-sfo-store-rootdn";
-
-    private static final String EXTERNAL_MIN_POOL_SIZE =
-            "iplanet-am-session-min-pool-size";
-
-    private static final String EXTERNAL_MAX_POOL_SIZE =
-            "iplanet-am-session-max-pool-size";
 
     // constants for permissions
     private static final String PERMISSION_READ = "READ";
@@ -289,20 +267,11 @@ public class SessionService {
 
     private static HashMap clusterMemberMap = new HashMap();
 
-    private static int connectionMaxWaitTime = 5000; // in milli-second
-
-    @Deprecated
-    private static String jdbcDriverClass = null;
+    private static int connectionMaxWaitTime = 5000; // in milli-seconds
 
     private static String sessionExternalRepositoryURL = null;
 
-    private static String sessionExternalRepositoryRootDN = null;
-
-    private static int externalMinPoolSize = 8;
-
-    private static int externalMaxPoolSize = 32;
-
-    private static int maxWaitTimeForConstraint = 6000; // in milli-second
+    private static int maxWaitTimeForConstraint = 6000; // in milli-seconds
 
     private static boolean isPropertyNotificationEnabled = false;
 
@@ -391,7 +360,7 @@ public class SessionService {
     // but we default this to Disabled or Off for Now.
     private static boolean isSessionFailoverEnabled = Boolean.valueOf(
             SystemProperties.get(
-                    AMSessionRepository.IS_SFO_ENABLED,
+                    AMTokenRepository.IS_SFO_ENABLED,
                     "false")).booleanValue();
 
     // Must be True to permit Session Failover HA to be available.
@@ -2113,20 +2082,20 @@ public class SessionService {
      *
      * @return reference to session repository
      */
-    protected static AMSessionRepository getRepository() {
+    protected static AMTokenRepository getRepository() {
         if (!getUseInternalRequestRouting()) {
             sessionDebug.warning("Not Using Internal Request Routing, unable to provide Session Storage!");
             return null;
         }
-        if (amSessionRepository == null) {
+        if (amTokenRepository == null) {
             try {   // Obtain our AM Session Repository Instance to provide Session HA and Failover.
-                amSessionRepository = SessionRepositoryFactory.getInstance();
+                amTokenRepository = AMTokenRepositoryFactory.getInstance();
             } catch (Exception e) {
                 sessionDebug
                         .error("Failed to initialize CTS BackEnd Repository", e);
             }
         }
-        return amSessionRepository;
+        return amTokenRepository;
     }
 
     /**
@@ -2233,7 +2202,7 @@ public class SessionService {
                 Map sessionAttrs = subConfig.getAttributes();
                 boolean sfoEnabled = Boolean.valueOf(
                         CollectionHelper.getMapAttr(
-                                sessionAttrs, AMSessionRepository.IS_SFO_ENABLED, "false")
+                                sessionAttrs, AMTokenRepository.IS_SFO_ENABLED, "false")
                 ).booleanValue();
                 // Currently, we are not allowing to default to Session Failover HA,
                 // even with a single server to enable session persistence.
@@ -2267,13 +2236,13 @@ public class SessionService {
                     initializationClusterService();
 
                     // ************************************************************************
-                    // Now Bootstrap AMSessionRepository Implementation, if one was specified.
-                    if (amSessionRepository == null) {
+                    // Now Bootstrap AMTokenRepository Implementation, if one was specified.
+                    if (amTokenRepository == null) {
                         // Instantiate our Session Repository Implementation.
                         // Allows Static Elements to Initialize.
-                        amSessionRepository = getRepository();
-                        sessionDebug.message("amSessionRepository Implementation: " +
-                                ((amSessionRepository == null) ? "None" : amSessionRepository.getClass().getSimpleName()));
+                        amTokenRepository = getRepository();
+                        sessionDebug.message("amTokenRepository Implementation: " +
+                                ((amTokenRepository == null) ? "None" : amTokenRepository.getClass().getSimpleName()));
                     }
                 } // End of sfoEnabled check.
             } // End of Sub-Configuration Existence check.
@@ -3611,32 +3580,10 @@ public class SessionService {
     }
 
     /**
-     * @return Returns the jdbcDriverClass.
-     */
-    @Deprecated
-    public static String getJdbcDriverClass() {
-        return jdbcDriverClass;
-    }
-
-    /**
      * @return Returns the sessionExternalRepositoryURL.
      */
     public static String getSessionExternalRepositoryURL() {
         return sessionExternalRepositoryURL;
-    }
-
-    /**
-     * @return Returns the externalMaxPoolSize.
-     */
-    public static int getExternalMaxPoolSize() {
-        return externalMaxPoolSize;
-    }
-
-    /**
-     * @return Returns the externalMinPoolSize.
-     */
-    public static int getExternalMinPoolSize() {
-        return externalMinPoolSize;
     }
 
     /**

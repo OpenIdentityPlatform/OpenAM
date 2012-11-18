@@ -22,12 +22,39 @@
 # "Portions Copyrighted [year] [name of copyright owner]"
 #
 
-dn: o=openam-session,@SM_CONFIG_ROOT_SUFFIX@
-objectClass: organization
+dn: ou=tokens,@SM_CONFIG_ROOT_SUFFIX@
+objectClass: organizationalUnit
 objectClass: top
-o: openam-session
-aci: (target="ldap:///o=openam-session,@SM_CONFIG_ROOT_SUFFIX@")(targetattr = "*")(version 3.0; acl "OpenAM deny anonymous access"; deny (all) userdn = "ldap:///anyone";)
+ou: tokens
+aci: (target="ldap:///ou=tokens,@SM_CONFIG_ROOT_SUFFIX@")(targetattr = "*")(version 3.0; acl "OpenAM deny anonymous access"; deny (all) userdn = "ldap:///anyone";)
 
-dn: ou=famrecords,o=openam-session,@SM_CONFIG_ROOT_SUFFIX@
+dn: ou=openam-session,ou=tokens,@SM_CONFIG_ROOT_SUFFIX@
+objectClass: organizationalUnit
+objectClass: top
+ou: openam-session
+aci: (target="ldap:///ou=openam-session,ou=tokens,@SM_CONFIG_ROOT_SUFFIX@")(targetattr = "*")(version 3.0; acl "OpenAM deny anonymous access"; deny (all) userdn = "ldap:///anyone";)
+
+dn: ou=famrecords,ou=openam-session,ou=tokens,@SM_CONFIG_ROOT_SUFFIX@
 ou: famrecords
 objectClass: organizationalUnit
+
+dn: ou=openam-saml2,ou=tokens,@SM_CONFIG_ROOT_SUFFIX@
+objectClass: organizationalUnit
+objectClass: top
+ou: openam-saml2
+aci: (target="ldap:///ou=openam-saml2,ou=tokens,@SM_CONFIG_ROOT_SUFFIX@")(targetattr = "*")(version 3.0; acl "OpenAM deny anonymous access"; deny (all) userdn = "ldap:///anyone";)
+
+dn: ou=famrecords,ou=openam-saml2,ou=tokens,@SM_CONFIG_ROOT_SUFFIX@
+ou: famrecords
+objectClass: organizationalUnit
+
+dn: ou=openam-oauth2,ou=tokens,@SM_CONFIG_ROOT_SUFFIX@
+objectClass: organizationalUnit
+objectClass: top
+ou: openam-oauth2
+aci: (target="ldap:///ou=openam-oauth2,ou=tokens,@SM_CONFIG_ROOT_SUFFIX@")(targetattr = "*")(version 3.0; acl "OpenAM deny anonymous access"; deny (all) userdn = "ldap:///anyone";)
+
+dn: ou=oauth2tokens,ou=openam-oauth2,ou=tokens,@SM_CONFIG_ROOT_SUFFIX@
+objectClass: organizationalUnit
+ou: oauth2tokens
+

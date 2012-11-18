@@ -43,6 +43,7 @@ import javax.servlet.http.HttpServletResponse;
 import javax.xml.soap.SOAPException;
 import javax.xml.soap.SOAPMessage;
 
+import com.iplanet.dpro.session.exceptions.StoreException;
 import com.sun.identity.saml2.common.SAML2RepositoryFactory;
 import org.w3c.dom.Element;
 
@@ -240,8 +241,13 @@ public class AuthnQueryUtil {
                 SAML2Utils.debug.message("AuthnQueryUtil.processAuthnQuery: " +
                     "getting user assertions from DB. user = " + cacheKey);
             }
-            List list = SAML2RepositoryFactory.getInstance().retrieveWithSecondaryKey(
-                cacheKey);
+            List list = null;
+            try {
+                   SAML2RepositoryFactory.getInstance().retrieveSAML2TokenWithSecondaryKey(cacheKey);
+            } catch(StoreException se) {
+                SAML2Utils.debug.error("AuthnQueryUtil.processAuthnQuery: " +
+                        "Unable to obtain user assertions from CTS Repository. user = " + cacheKey+", "+se.getMessage(),se);
+            }
             if ((list != null) && (!list.isEmpty())) {
                 assertions = new ArrayList();
                 for(Iterator iter = list.iterator(); iter.hasNext(); ) {

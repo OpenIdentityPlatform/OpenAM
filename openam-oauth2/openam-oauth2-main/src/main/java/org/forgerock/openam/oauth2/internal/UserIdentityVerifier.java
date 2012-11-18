@@ -25,7 +25,7 @@
 package org.forgerock.openam.oauth2.internal;
 
 import com.iplanet.sso.SSOTokenManager;
-import org.forgerock.openam.oauth2.OAuth2Constants;
+import com.sun.identity.shared.OAuth2Constants;
 import org.forgerock.openam.oauth2.utils.OAuth2Utils;
 import org.forgerock.restlet.ext.openam.OpenAMParameters;
 import org.forgerock.restlet.ext.openam.OpenAMUser;

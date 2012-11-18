@@ -38,6 +38,7 @@ import javax.jms.TopicConnectionFactory;
  * implementation of this interface is located at runtime via the factory method
  * in <code>ConnectionFactoryProviderFactory</code>.
  */
+@Deprecated
 public interface ConnectionFactoryProvider {
 
     /**

@@ -39,6 +39,7 @@ import com.sun.identity.shared.configuration.SystemPropertiesManager;
 /**
  * FAMPersisterFactory
  */
+@Deprecated
 public class FAMPersisterManager {
     private static FAMRecordPersister recordPesister = null; 
     private static FAMPersisterManager instance = null;

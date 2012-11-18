@@ -31,6 +31,7 @@ import com.sleepycat.persist.model.Entity;
 /**
  * Assertion Record stores Assertion related data.
  */
+@Deprecated
 @Entity
 public class AssertionRecord extends BaseRecord {
 }

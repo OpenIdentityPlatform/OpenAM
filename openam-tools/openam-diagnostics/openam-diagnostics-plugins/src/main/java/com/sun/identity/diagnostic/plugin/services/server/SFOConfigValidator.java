@@ -35,7 +35,7 @@ import java.util.Set;
 import java.util.StringTokenizer;
 
 import com.iplanet.am.util.SystemProperties;
-import com.sun.identity.coretoken.interfaces.AMSessionRepository;
+import com.sun.identity.coretoken.interfaces.AMTokenRepository;
 import com.iplanet.services.naming.WebtopNaming;
 import com.iplanet.sso.SSOToken;
 import com.sun.identity.common.configuration.ServerConfiguration;
@@ -117,7 +117,7 @@ public class SFOConfigValidator extends ServerConfigBase {
                 Map sessionAttrs = subConfig.getAttributes();
                 boolean sfoEnabled = Boolean.valueOf(
                     CollectionHelper.getMapAttr(
-                    sessionAttrs, AMSessionRepository.IS_SFO_ENABLED, "false")
+                    sessionAttrs, AMTokenRepository.IS_SFO_ENABLED, "false")
                     ).booleanValue();
                 if (sfoEnabled) {
                     isSessionFailoverEnabled = true;

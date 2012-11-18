@@ -1,5 +1,4 @@
-/**
- * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
+/* DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
  * Copyright (c) 2005 Sun Microsystems Inc. All Rights Reserved
  *
@@ -45,17 +44,17 @@ import org.forgerock.openam.session.model.AMRootEntity;
 import org.forgerock.openam.session.model.DBStatistics;
 
 /**
- * The <code>AMSessionRepository</code> interface provides methods to
+ * The <code>AMTokenRepository</code> interface provides methods to
  * <code>retrieve</code> , <code>save</code> , <code>delete</code> the session
  * from the session repository.
  *
  * @see <code>CTSPersistentStore</code>
+ *
  */
-public interface AMSessionRepository {
+public interface AMTokenRepository {
 
     static final String DEBUG_NAME = "amSessionRepository";
 
-    // TODO This property Name Value should probably change.
     static final String CTS_REPOSITORY_CLASS_PROPERTY =
             "com.sun.am.session.SessionRepositoryImpl";
 
@@ -70,6 +69,9 @@ public interface AMSessionRepository {
 
     static final String SYS_PROPERTY_SESSION_HA_REPOSITORY_TYPE =
             "iplanet-am-session-sfo-store-type";
+
+    static final String SYS_PROPERTY_TOKEN_ROOT_SUFFIX =
+            "iplanet-am-config-token-root-suffix";
 
     static final String CLEANUP_GRACE_PERIOD =
             "com.sun.identity.session.repository.cleanupGracePeriod";
@@ -206,5 +208,8 @@ public interface AMSessionRepository {
      * @return DBStatistics
      */
     public DBStatistics getDBStatistics();
+
+
+
 
 }

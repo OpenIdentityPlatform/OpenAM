@@ -69,6 +69,7 @@ import com.sun.messaging.ConnectionFactory;
 import com.sleepycat.persist.PrimaryIndex;
 import com.sleepycat.persist.SecondaryIndex;
 
+@Deprecated
 public class FAMHaDB implements Runnable {
     
     static FAMHaDB dbs;

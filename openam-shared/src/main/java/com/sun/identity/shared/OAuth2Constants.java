@@ -22,7 +22,7 @@
  * "Portions Copyrighted [2012] [ForgeRock Inc]"
  */
 
-package org.forgerock.openam.oauth2;
+package com.sun.identity.shared;
 
 /**
  * TODO Finish this class with all constants TODO refactor to clean up what is

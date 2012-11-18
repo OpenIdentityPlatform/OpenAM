@@ -24,7 +24,7 @@
 
 package org.forgerock.restlet.ext.oauth2.flow;
 
-import org.forgerock.openam.oauth2.OAuth2Constants;
+import com.sun.identity.shared.OAuth2Constants;
 import org.forgerock.openam.oauth2.exceptions.OAuthProblemException;
 import org.restlet.data.Status;
 import org.restlet.representation.Representation;

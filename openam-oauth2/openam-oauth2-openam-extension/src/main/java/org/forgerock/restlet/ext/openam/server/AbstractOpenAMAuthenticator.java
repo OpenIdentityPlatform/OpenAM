@@ -24,7 +24,7 @@
 
 package org.forgerock.restlet.ext.openam.server;
 
-import org.forgerock.openam.oauth2.OAuth2Constants;
+import com.sun.identity.shared.OAuth2Constants;
 import org.forgerock.restlet.ext.openam.OpenAMParameters;
 import org.forgerock.restlet.ext.openam.OpenAMUser;
 import org.forgerock.openam.oauth2.utils.OAuth2Utils;

@@ -1,7 +1,7 @@
 /**
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright (c) 2008 Sun Microsystems Inc. All Rights Reserved
+ * Copyright (c) 2008 Sun Microsystems, Inc. All Rights Reserved.
  *
  * The contents of this file are subject to the terms
  * of the Common Development and Distribution License
@@ -22,46 +22,57 @@
  * your own identifying information:
  * "Portions Copyrighted [year] [name of copyright owner]"
  *
- * $Id: AMTokenSAML2Repository.java,v 1.3 2008/08/01 22:15:00 hengming Exp $
- *
+ * $Id: SAML2RepositoryFactory.java,v 1.1 2008/07/22 18:08:20 weisun2 Exp $
+ */
+
+/**
+ * Portions Copyrighted 2010-2012 ForgeRock Inc
  */
 
 package com.sun.identity.coretoken.interfaces;
 
+import com.iplanet.dpro.session.exceptions.StoreException;
+import com.sun.identity.sm.model.AMRecord;
+
 import java.util.List;
 
 /**
- * This class is used in SAML2 failover mode to store/recover serialized
- * state of IDPSession/Response object.
+ *
+ * This class is used in SAML2 Token Persistence to store/recover serialized
+ * state of IDPSession/Response objects.
+ *
  */
 public interface AMTokenSAML2Repository {
 
-   /**
-    * Retrives existing SAML2 object from persistent datastore
-    * @param samlKey primary key 
-    * @return SAML2 object, if failed, return null. 
-    */
-   public Object retrieve(String samlKey);
+    static final String SYS_PROPERTY_TOKEN_SAML2_REPOSITORY_ROOT_SUFFIX =
+            "iplanet-am-token-saml2-root-suffix";
 
    /**
-    * Retrives a list of existing SAML2 object from persistent datastore with
-    * secodaryKey
+    * Retrives existing SAML2 object from persistent Repository.
+    *
+    * @param samlKey primary key 
+    * @return Object - SAML2 unMarshaled Object, if failed, return null.
+    */
+   public Object retrieveSAML2Token(String samlKey) throws StoreException;
+
+   /**
+    * Retrieves a list of existing SAML2 object from persistent Repository with the Secondary Key.
     *
     * @param secKey Secondary Key 
-    * @return SAML2 object, if failed, return null. 
+    * @return List<Object> - List of SAML2 unMarshaled Objects, if failed, return null.
     */
-   public List retrieveWithSecondaryKey(String secKey);
+   public List<Object> retrieveSAML2TokenWithSecondaryKey(String secKey) throws StoreException;
 
    /**
     * Deletes the SAML2 object by given primary key from the repository
     * @param samlKey primary key 
     */
-   public void delete(String samlKey);
+   public void deleteSAML2Token(String samlKey) throws StoreException;
 
     /**
      * Deletes expired SAML2 object from the repository
      */
-    public void deleteExpired();
+    public void deleteExpiredSAML2Tokens() throws StoreException;
 
    /**
     * Saves SAML2 data into the SAML2 Repository
@@ -70,6 +81,6 @@ public interface AMTokenSAML2Repository {
     * @param expirationTime expiration time 
     * @param secKey Secondary Key 
     */
-    public void save(String samlKey, Object samlObj, long expirationTime,
-        String secKey);
+    public void saveSAML2Token(String samlKey, Object samlObj, long expirationTime,
+        String secKey) throws StoreException;
 }

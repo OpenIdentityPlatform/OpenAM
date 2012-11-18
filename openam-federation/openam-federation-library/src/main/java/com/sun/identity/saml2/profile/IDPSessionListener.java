@@ -35,6 +35,7 @@ import java.util.Map;
 import java.util.HashMap;
 import java.util.logging.Level;
 
+import com.iplanet.dpro.session.exceptions.StoreException;
 import com.sun.identity.plugin.monitoring.FedMonAgent;
 import com.sun.identity.plugin.monitoring.FedMonSAML2Svc;
 import com.sun.identity.plugin.monitoring.MonitorManager;
@@ -245,8 +246,8 @@ public class IDPSessionListener
             }
 
             if (SAML2Utils.isSAML2FailOverEnabled()) {
-                SAML2RepositoryFactory.getInstance().delete(sessionIndex);
-            }       
+                SAML2RepositoryFactory.getInstance().deleteSAML2Token(sessionIndex);
+            }
             if (SAML2Utils.debug.messageEnabled()) {
                 SAML2Utils.debug.message(
                    classMethod +
@@ -270,6 +271,9 @@ public class IDPSessionListener
                 SAML2Utils.debug.warning(
                         classMethod + "SAML2 Repository error.", samle);
             }
+        } catch (StoreException se) {
+             SAML2Utils.debug.error(
+                        classMethod + "SAML2 Repository error, "+se.getMessage(), se);
         }
     }
 

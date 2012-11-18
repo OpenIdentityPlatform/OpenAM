@@ -31,13 +31,12 @@
 package com.sun.identity.sm.ldap;
 
 import com.sun.identity.common.CaseInsensitiveHashMap;
+import com.sun.identity.shared.ldap.LDAPAttribute;
+import com.sun.identity.shared.ldap.LDAPAttributeSet;
 import com.sun.identity.sm.SMSDataEntry;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+
+import java.util.*;
+
 import org.opends.server.types.Attribute;
 import org.opends.server.types.AttributeValue;
 import org.opends.server.types.SearchResultEntry;
@@ -116,6 +115,23 @@ public class EmbeddedSearchResultIterator implements Iterator {
                   answer.put(attr.getName(), strValues);
                  }
              }
+        }
+        return (answer);
+    }
+
+    static Map convertLDAPAttributeSetToMap(LDAPAttributeSet set) {
+        Map answer = null;
+        if ((set != null) && !(set.size() == 0)) {
+            for (Enumeration enumeration = set.getAttributes(); enumeration.hasMoreElements();) {
+                LDAPAttribute attr = (LDAPAttribute) enumeration.nextElement();
+                if (attr != null) {
+                    Set strValues = new HashSet<String>(Arrays.asList(attr.getStringValueArray()));
+                    if (answer == null) {
+                        answer = new CaseInsensitiveHashMap(10);
+                    }
+                    answer.put(attr.getName(), strValues);
+                }
+            }
         }
         return (answer);
     }

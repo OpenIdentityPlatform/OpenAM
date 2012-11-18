@@ -31,6 +31,7 @@ import com.sleepycat.persist.model.Entity;
 /** 
  * Session Record stores Session related data. 
  */
+@Deprecated
 @Entity
 public class SessionRecord extends BaseRecord {
 }

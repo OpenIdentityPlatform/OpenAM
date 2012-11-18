@@ -35,6 +35,7 @@ import com.sun.identity.shared.locale.Locale;
  * implementation.
  *
  */
+@Deprecated
 public class FAMRecordUtils {
     // The deugging instance
     public static Debug debug = Debug.getInstance("amHa");

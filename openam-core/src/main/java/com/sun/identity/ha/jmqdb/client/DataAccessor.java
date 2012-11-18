@@ -42,6 +42,7 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 
+@Deprecated
 public class DataAccessor {
     public DataAccessor(EntityStore store, String initFile)
         throws DatabaseException, ClassNotFoundException,IOException {

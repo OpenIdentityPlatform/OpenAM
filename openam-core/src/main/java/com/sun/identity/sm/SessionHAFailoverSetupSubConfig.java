@@ -29,7 +29,7 @@
 package com.sun.identity.sm;
 
 import com.iplanet.dpro.session.exceptions.StoreException;
-import com.sun.identity.coretoken.interfaces.AMSessionRepository;
+import com.sun.identity.coretoken.interfaces.AMTokenRepository;
 import com.iplanet.sso.SSOException;
 import com.iplanet.sso.SSOToken;
 import com.sun.identity.shared.Constants;
@@ -82,7 +82,7 @@ public class SessionHAFailoverSetupSubConfig implements Constants {
      * Define Session DN Constants
      */
     private static final String SM_CONFIG_ROOT_DN =
-            SystemPropertiesManager.get(AMSessionRepository.SYS_PROPERTY_SM_CONFIG_ROOT_SUFFIX,
+            SystemPropertiesManager.get(AMTokenRepository.SYS_PROPERTY_SM_CONFIG_ROOT_SUFFIX,
                     Constants.DEFAULT_ROOT_SUFFIX);
 
     private static final String SERVICES_BASE_ROOT_DN =

@@ -33,6 +33,8 @@
 package com.sun.identity.saml2.profile;
 
 import java.util.logging.Level;
+
+import com.iplanet.dpro.session.exceptions.StoreException;
 import com.sun.identity.saml2.logging.LogUtil;
 import com.sun.identity.shared.debug.Debug;
 import com.sun.identity.shared.datastruct.OrderedSet;
@@ -282,12 +284,16 @@ public class IDPProxyUtil {
             SPCache.requestHash.put(requestID, reqInfo);
         }
         if (SAML2Utils.isSAML2FailOverEnabled()) {
+            try {
             // sessionExpireTime is counted in seconds
             long sessionExpireTime = System.currentTimeMillis() / 1000 + SPCache.interval;                    
-            SAML2RepositoryFactory.getInstance().save(requestID,
+            SAML2RepositoryFactory.getInstance().saveSAML2Token(requestID,
                     new AuthnRequestInfoCopy(reqInfo), sessionExpireTime, null);
             if (SAML2Utils.debug.messageEnabled()) {
                 SAML2Utils.debug.message(classMethod + " SAVE AuthnRequestInfoCopy for requestID " + requestID);
+            }
+            } catch(StoreException se) {
+                SAML2Utils.debug.error(classMethod + " SAVE AuthnRequestInfoCopy for requestID " + requestID + ", has failed!",se);
             }
         }        
     }
@@ -504,7 +510,7 @@ public class IDPProxyUtil {
      * @param response HttpServletResponse
      * @param requestID request ID 
      * @param idpMetaAlias meta Alias 
-     * @param newSession Session object 
+     * @param newSess Session object
      * @exception SAML2Exception for any SAML2 failure.
      */
     private static void sendProxyResponse(

@@ -40,6 +40,7 @@ import javax.crypto.spec.PBEParameterSpec;
 import javax.crypto.spec.PBEKeySpec;
 import javax.crypto.NoSuchPaddingException;
 
+@Deprecated
 public class CryptUtil {
 
     static final String DEFAULT_PBE_PWD =

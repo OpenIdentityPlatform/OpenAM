@@ -14,11 +14,11 @@
  * information: "Portions Copyrighted [2012] [ForgeRock Inc]".
  *
  */
-package org.forgerock.openam.ext.cts.model;
+package com.sun.identity.sm.model;
 
 import com.sun.identity.shared.Constants;
 import org.forgerock.json.fluent.JsonValue;
-import org.forgerock.openam.oauth2.OAuth2Constants;
+import com.sun.identity.shared.OAuth2Constants;
 import org.opends.server.protocols.ldap.LDAPAttribute;
 import org.opends.server.types.RawAttribute;
 

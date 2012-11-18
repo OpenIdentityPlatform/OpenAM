@@ -82,6 +82,7 @@ import javax.xml.soap.SOAPException;
 import javax.xml.soap.SOAPFault;
 import javax.xml.soap.SOAPMessage;
 
+import com.iplanet.dpro.session.exceptions.StoreException;
 import com.sun.identity.saml2.plugins.*;
 import com.sun.identity.saml2.profile.*;
 import org.forgerock.openam.utils.IOUtils;
@@ -324,8 +325,14 @@ public class SAML2Utils extends SAML2SDKUtils {
             if (reqInfo == null) {
                 if (SAML2Utils.isSAML2FailOverEnabled()) {
                     // Attempt to read AuthnRequestInfoCopy from SAML2 repository
-                    AuthnRequestInfoCopy reqInfoCopy = 
-                            (AuthnRequestInfoCopy) SAML2RepositoryFactory.getInstance().retrieve(inRespToResp);
+                    AuthnRequestInfoCopy reqInfoCopy = null;
+                    try {
+                         reqInfoCopy =
+                            (AuthnRequestInfoCopy) SAML2RepositoryFactory.getInstance().retrieveSAML2Token(inRespToResp);
+                    } catch(StoreException se) {
+                        debug.error(method + "AuthnRequestInfoCopy"
+                                + " unable to retrieve from SAML2 repository for inResponseTo: " + inRespToResp);
+                    }
                     if (reqInfoCopy != null) {
                         // Get back the AuthnRequestInfo
                         reqInfo = reqInfoCopy.getAuthnRequestInfo(httpRequest, httpResponse);
@@ -612,7 +619,7 @@ public class SAML2Utils extends SAML2SDKUtils {
                
                 if ((!foundAssertion) && SAML2Utils.isSAML2FailOverEnabled()) {
                     try {
-                        if ((SAML2RepositoryFactory.getInstance().retrieve(assertionID)) != null) {
+                        if ((SAML2RepositoryFactory.getInstance().retrieveSAML2Token(assertionID)) != null) {
                             foundAssertion = true; 
                         }    
                     } catch(Exception ae) {

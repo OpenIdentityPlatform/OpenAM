@@ -70,7 +70,8 @@ public class LDIFTemplates {
         templates.add("sfha/cts-add-schema.ldif");
         templates.add("sfha/cts-container.ldif");
         templates.add("sfha/cts-indices-schema.ldif");
-        templates.add("oauth2/oauth2_container.ldif");
+        // templates.add("oauth2/oauth2_container.ldif"); // Not needed, since the container is created in the CTS ldif.
+        templates.add("oauth2/99-oauth2attributes.ldif");
     }
 
     private LDIFTemplates() {

@@ -22,6 +22,10 @@
 # "Portions Copyrighted [2012] [ForgeRock Inc]"
 #
 
+# ****************************************************
+# This is included in the cts-container.ldif.template
+# ****************************************************
+
 dn: o=openam-oauth2,@SM_CONFIG_ROOT_SUFFIX@
 objectClass: organization
 objectClass: top

@@ -1199,14 +1199,24 @@ public interface Constants {
     static final String DEFAULT_ROOT_SUFFIX = "dc=openam,dc=forgerock,dc=org";
 
     /**
-     * Default Session SFO/HA Root DN
+     * Default Token Root Context, this will be used to create a Secondary Suffix during installation.
      */
-    static final String DEFAULT_SESSION_HA_ROOT_SUFFIX = "o=openam-session";
+    static final String DEFAULT_TOKEN_ROOT_SUFFIX = "ou=tokens";
 
     /**
      * Default Session SFO/HA Root DN
      */
-    static final String DEFAULT_OAUTH2_ROOT_SUFFIX = "o=openam-oauth2";
+    static final String DEFAULT_SESSION_HA_ROOT_SUFFIX = "ou=openam-session";
+
+    /**
+     * Default SAML2 Root Suffix
+     */
+    static final String DEFAULT_SAML2_HA_ROOT_SUFFIX = "ou=openam-saml2";
+
+    /**
+     * Default SAML2 Root Suffix
+     */
+    static final String DEFAULT_OAUTH2_HA_ROOT_SUFFIX = "ou=openam-oauth2";
 
     /**
      * Default Session SFO/HA Store Type.

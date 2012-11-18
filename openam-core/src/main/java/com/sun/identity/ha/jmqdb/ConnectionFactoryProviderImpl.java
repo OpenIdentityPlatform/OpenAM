@@ -37,6 +37,7 @@ import com.sun.identity.ha.FAMRecordUtils;
  * implementation for ConnectionFactoryProvider using sun specifig 
  * configuration
  */
+@Deprecated
 public class ConnectionFactoryProviderImpl implements ConnectionFactoryProvider {
 
     public com.sun.messaging.TopicConnectionFactory tFactory;

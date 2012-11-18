@@ -65,6 +65,7 @@ import com.sun.identity.common.ShutdownManager;
  * asynchronously delivered messages. It also sends FAMRecord,  
  * processes return message and reformat it to FAMRecord. 
  */
+@Deprecated
 public class FAMRecordJMQPersister implements FAMRecordPersister,
     MessageListener { 
      

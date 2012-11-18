@@ -106,7 +106,7 @@ public interface ClientApplication {
      * <p/>
      * If "auto_grant" is true then the server does not require the Resource
      * Owner's approval unless the request has the
-     * {@link org.forgerock.openam.oauth2.OAuth2Constants.Custom#APPROVAL_PROMPT}
+     * {@link com.sun.identity.shared.OAuth2Constants.Custom#APPROVAL_PROMPT}
      * property and the value is null.
      * <p/>
      * This function is not part of the OAuth2 specification
