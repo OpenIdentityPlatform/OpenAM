@@ -134,7 +134,7 @@
         </dependency>
 
         <dependency>
-            <groupId>com.sun.xml.rpc</groupId>
+            <groupId>external</groupId>
             <artifactId>jaxrpc-impl</artifactId>
         </dependency>
 

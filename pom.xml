@@ -690,10 +690,9 @@
             </dependency>
 
             <dependency>
-                <groupId>com.sun.xml.rpc</groupId>
+                <groupId>external</groupId>
                 <artifactId>jaxrpc-impl</artifactId>
-                <version>1.1.3_01</version>
-                <!-- Originally ? -->
+                <version>1.1.3_01-041406</version>
             </dependency>
 
             <dependency>

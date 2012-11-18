@@ -6,7 +6,7 @@
     <!--
     * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
     *
-    * Copyright (c) 2011 ForgeRock AS. All Rights Reserved
+    * Copyright (c) 2011-2012 ForgeRock Inc. All Rights Reserved
     *
     * The contents of this file are subject to the terms
     * of the Common Development and Distribution License
@@ -40,7 +40,6 @@
     <description>OpenAM JAXRPC Schema Components
     </description>
     <artifactId>openam-jaxrpc-schema</artifactId>
-    <version>10.1.0-SNAPSHOT</version>
     <packaging>jar</packaging>
     <organization>
         <name>ForgeRock</name>
@@ -88,30 +87,6 @@
                         </goals>
                     </execution>
                 </executions>
-                <dependencies>
-                    <dependency>
-                        <groupId>org.forgerock.openam</groupId>
-                        <artifactId>openam-idsvcs-schema</artifactId>
-                        <version>10.1.0-SNAPSHOT</version>
-                    </dependency>
-                    <dependency>
-                        <groupId>org.forgerock.openam</groupId>
-                        <artifactId>openam-core</artifactId>
-                        <version>10.1.0-SNAPSHOT</version>
-                    </dependency>
-                    <dependency>
-                        <groupId>com.sun.xml.rpc</groupId>
-                        <artifactId>jaxrpc-impl</artifactId>
-                        <version>1.1.3_01</version>
-                        <!-- Originally ? -->
-                    </dependency>
-                    <dependency>
-                        <groupId>javax.activation</groupId>
-                        <artifactId>activation</artifactId>
-                        <version>1.1.1</version>
-                    </dependency>
-                </dependencies>
-
             </plugin>
 
             <plugin>
@@ -199,19 +174,13 @@
         </dependency>
 
         <dependency>
-            <groupId>com.sun.xml.rpc</groupId>
+            <groupId>external</groupId>
             <artifactId>jaxrpc-impl</artifactId>
         </dependency>
 
         <dependency>
             <groupId>external</groupId>
             <artifactId>webservices-api</artifactId>
-        </dependency>
-
-        <dependency>
-            <groupId>org.forgerock.openam</groupId>
-            <artifactId>openam-federation-library</artifactId>
-            <version>10.1.0-SNAPSHOT</version>
         </dependency>
 
     </dependencies>

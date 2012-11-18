@@ -40,7 +40,6 @@
     <description>OpenAM Schemata Components
     </description>
     <artifactId>openam-schema</artifactId>
-    <version>10.1.0-SNAPSHOT</version>
     <packaging>pom</packaging>
     <organization>
         <name>ForgeRock</name>
