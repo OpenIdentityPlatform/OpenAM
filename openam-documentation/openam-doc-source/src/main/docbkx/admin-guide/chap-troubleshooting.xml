@@ -201,8 +201,8 @@ MODIFY operation successful for DN CN=schema</screen>
     <answer>
      <para>When you have session failover configured for a site, OpenAM servers
      run health checks against other servers in the same site. By default, the
-     health checks are run every 10 milliseconds with a timeout of 10
-     milliseconds.</para>
+     health checks are run every second (1000 milliseconds) with a timeout of 1
+     second (1000 milliseconds).</para>
 
      <para>If there is network latency between servers in a site, for example
      if you are running your servers in virtual machines, the default settings

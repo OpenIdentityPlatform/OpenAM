@@ -3456,7 +3456,7 @@
     <listitem>
      <para>Socket imeout in milliseconds for health checks of other servers in
      the same site.</para>
-     <para>Default: 10</para>
+     <para>Default: 1000</para>
     </listitem>
    </varlistentry>
 
