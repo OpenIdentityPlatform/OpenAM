@@ -189,6 +189,52 @@ Processing MODIFY request for CN=schema
 MODIFY operation successful for DN CN=schema</screen>
     </answer>
    </qandaentry>
+
+   <qandaentry xml:id="openam-sfo-time-wait">
+    <question>
+     <para>I have session failover configured for an OpenAM site. I see many
+     connections in <literal>TIME_WAIT</literal> state, and the connections
+     seem to be used only for communication between OpenAM servers in that
+     site. What should I set to have fewer connections in
+     <literal>TIME_WAIT</literal>?</para>
+    </question>
+    <answer>
+     <para>When you have session failover configured for a site, OpenAM servers
+     run health checks against other servers in the same site. By default, the
+     health checks are run every 10 milliseconds with a timeout of 10
+     milliseconds.</para>
+
+     <para>If there is network latency between servers in a site, for example
+     if you are running your servers in virtual machines, the default settings
+     might not be right for your deployment. In that case, consider changing the
+     following advanced server properties.</para>
+     <itemizedlist>
+      <listitem>
+       <para>By lengthening
+       <literal>com.iplanet.am.session.failover.cluster.stateCheck.timeout</literal>
+       and
+       <literal>com.iplanet.am.session.failover.cluster.stateCheck.period</literal>
+       to something longer than the default, you can work around issues with
+       network latency.</para>
+      </listitem>
+      <listitem>
+       <para>By setting <literal>com.sun.identity.urlchecker.dorequest</literal>
+       to <literal>true</literal> or <literal>false</literal>, you can change
+       whether OpenAM performs an HTTP GET request or only checks the Socket
+       connection of <literal>com.sun.identity.urlchecker.targeturl</literal>
+       as a health check.</para>
+      </listitem>
+     </itemizedlist>
+
+     <para>To set advanced properties, either use the OpenAM console page under
+     Configuration &gt; Servers and Sites &gt; Default Server Settings &gt;
+     Advanced, or set the properties using the
+     <command>ssoadm update-server-cfg</command> command as in the following
+     example, which updates the default server configuration:</para>
+     <screen>$ ./ssoadm update-server-cfg -s default -u amadmin -f /tmp/pwd.txt
+ -a com.iplanet.am.session.failover.cluster.stateCheck.timeout=2000</screen>
+    </answer>
+   </qandaentry>
   </qandadiv>
  </qandaset>
 </chapter>

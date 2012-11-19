@@ -3443,6 +3443,24 @@
    </varlistentry>
 
    <varlistentry>
+    <term><literal>com.iplanet.am.session.failover.cluster.stateCheck.period</literal></term>
+    <listitem>
+     <para>Time in milliseconds between health checks of other servers in the
+     same site.</para>
+     <para>Default: 1000</para>
+    </listitem>
+   </varlistentry>
+
+   <varlistentry>
+    <term><literal>com.iplanet.am.session.failover.cluster.stateCheck.timeout</literal></term>
+    <listitem>
+     <para>Socket imeout in milliseconds for health checks of other servers in
+     the same site.</para>
+     <para>Default: 10</para>
+    </listitem>
+   </varlistentry>
+
+   <varlistentry>
     <term><literal>com.iplanet.am.session.httpSession.enabled</literal></term>
     <listitem>
      <para>Create an <literal>HttpSession</literal> for users on successful
@@ -3645,6 +3663,33 @@
     <listitem>
      <para>Maximum number of policy decisions OpenAM caches.</para>
      <para>Default: 10000</para>
+    </listitem>
+   </varlistentry>
+
+   <varlistentry>
+    <term><literal>com.sun.identity.urlchecker.dorequest</literal></term>
+    <listitem>
+     <para>Whether to perform an HTTP GET on
+     <literal>com.sun.identity.urlchecker.targeturl</literal> as a health
+     check against another server in the same site. If
+     <literal>false</literal>, then OpenAM only checks the Socket connection,
+     and does not perform an HTTP GET.</para>
+     <para>If each OpenAM server runs behind a reverse proxy, then setting
+     this property to <literal>true</literal> means the health check actually
+     runs against the OpenAM instance, rather than checking only the Socket
+     to the reverse proxy.</para>
+     <para>Default: <literal>false</literal></para>
+    </listitem>
+   </varlistentry>
+
+   <varlistentry>
+    <term><literal>com.sun.identity.urlchecker.targeturl</literal></term>
+    <listitem>
+     <para>URL to monitor when
+     <literal>com.sun.identity.urlchecker.dorequest</literal> is set to
+     <literal>true</literal>.</para>
+     <para>Default: URL to the <literal>/openam/namingservice</literal> endpoint
+     on the remote server</para>
     </listitem>
    </varlistentry>
 
