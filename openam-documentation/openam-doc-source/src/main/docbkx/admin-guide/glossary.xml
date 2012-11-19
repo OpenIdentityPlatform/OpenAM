@@ -112,6 +112,16 @@
  </glossentry>
 
  <glossentry>
+  <glossterm>Authorization Server</glossterm>
+  <glossdef>
+   <para>In OAuth 2.0, issues access tokens to the client after authenticating
+   a resource owner and confirming that the owner authorizes the client to
+   access the protected resource. OpenAM can play this role in the OAuth 2.0
+   authorization framework.</para>
+  </glossdef>
+ </glossentry>
+
+ <glossentry>
   <glossterm>Auto-federation</glossterm>
   <glossdef>
    <para>Arrangement to federate a principal's identity automatically based
@@ -135,6 +145,15 @@
    <para>Group of providers, including at least one identity provider, who
    have agreed to trust each other to participate in a SAML 2.0 provider
    federation</para>
+  </glossdef>
+ </glossentry>
+
+ <glossentry>
+  <glossterm>Client</glossterm>
+  <glossdef>
+   <para>In OAuth 2.0, requests protected web resources on behalf of the
+   resource owner given the owner's authorization. OpenAM can play this role
+   in the OAuth 2.0 authorization framework.</para>
   </glossdef>
  </glossentry>
 
@@ -352,6 +371,22 @@
   <glossdef>
    <para>Something a principal can access over the network such as a web
    page</para>
+  </glossdef>
+ </glossentry>
+
+ <glossentry>
+  <glossterm>Resource owner</glossterm>
+  <glossdef>
+   <para>In OAuth 2.0, entity who can authorize access to protected web
+   resources, such as an end user</para>
+  </glossdef>
+ </glossentry>
+
+ <glossentry>
+  <glossterm>Resource server</glossterm>
+  <glossdef>
+   <para>In OAuth 2.0, server hosting protected web resources, capable of
+   handling access tokens to respond to requests for such resources</para>
   </glossdef>
  </glossentry>
 

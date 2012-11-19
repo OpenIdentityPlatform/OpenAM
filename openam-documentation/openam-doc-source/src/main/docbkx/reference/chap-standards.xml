@@ -41,10 +41,14 @@
    <listitem>
     <indexterm>
      <primary>Supported standards</primary>
-     <secondary>OAuth</secondary>
+     <secondary>OAuth 2.0</secondary>
     </indexterm>
-    <para>Simple authorization for web applications, desktop applications,
-    mobile phones, and living room devices.</para>
+    <para><link xlink:show="new" xlink:href="http://tools.ietf.org/html/rfc6749"
+    >The OAuth 2.0 Authorization Framework</link>, in which OpenAM can play the
+    roles of authorization server and of client.</para>
+    <para><link xlink:show="new" xlink:href="http://tools.ietf.org/html/rfc6750"
+    >The OAuth 2.0 Authorization Framework: Bearer Token Usage</link>, in which
+    OpenAM plays the role of authorization server.</para>
    </listitem>
   </varlistentry>
   <varlistentry xml:id="rest">

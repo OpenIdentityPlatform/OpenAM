@@ -2477,7 +2477,10 @@
     <primary>Authentication</primary>
     <secondary>OAuth 2.0</secondary>
    </indexterm>
-   
+   <indexterm>
+    <primary>OAuth 2.0</primary>
+   </indexterm>
+
    <note>
     <para>The default settings are for Facebook.</para>
    </note>

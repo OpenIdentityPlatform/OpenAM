@@ -36,6 +36,17 @@
 
  <itemizedlist>
   <title>Major New Features</title>
+
+   <listitem>
+    <para>OpenAM now provides much richer support for OAuth 2.0. In addition
+    to playing the role of client and resource server, OpenAM can now also
+    play the role of OAuth 2.0 authorization server. See <link
+    xlink:href="admin-guide#chap-oauth2"
+    xlink:role="http://docbook.org/xlink/role/olink"><citetitle>Managing OAuth
+    2.0 Authorization</citetitle></link> for explanations, instructions,
+    and examples.</para>
+   </listitem>
+
    <listitem>
     <para>IBM<superscript>®</superscript> WebSphere<superscript>®</superscript> 8.0 is now a supported
     platform for OpenAM 10.1.0. 

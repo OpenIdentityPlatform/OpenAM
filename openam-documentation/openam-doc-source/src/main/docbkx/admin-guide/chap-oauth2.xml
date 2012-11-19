@@ -1,0 +1,758 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  ! CCPL HEADER START
+  !
+  ! This work is licensed under the Creative Commons
+  ! Attribution-NonCommercial-NoDerivs 3.0 Unported License.
+  ! To view a copy of this license, visit
+  ! http://creativecommons.org/licenses/by-nc-nd/3.0/
+  ! or send a letter to Creative Commons, 444 Castro Street,
+  ! Suite 900, Mountain View, California, 94041, USA.
+  !
+  ! You can also obtain a copy of the license at
+  ! src/main/resources/legal-notices/CC-BY-NC-ND.txt.
+  ! See the License for the specific language governing permissions
+  ! and limitations under the License.
+  !
+  ! If applicable, add the following below this CCPL HEADER, with the fields
+  ! enclosed by brackets "[]" replaced with your own identifying information:
+  !      Portions Copyright [yyyy] [name of copyright owner]
+  !
+  ! CCPL HEADER END
+  !
+  !      Copyright 2012 ForgeRock AS
+  !    
+-->
+<chapter xml:id='chap-oauth2'
+ xmlns='http://docbook.org/ns/docbook'
+ version='5.0' xml:lang='en'
+ xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance'
+ xsi:schemaLocation='http://docbook.org/ns/docbook http://docbook.org/xml/5.0/xsd/docbook.xsd'
+ xmlns:xlink='http://www.w3.org/1999/xlink'
+ xmlns:xinclude='http://www.w3.org/2001/XInclude'>
+ <title>Managing OAuth 2.0 Authorization</title>
+ <indexterm>
+  <primary>Authorization</primary>
+  <secondary>Configuring</secondary>
+ </indexterm>
+ <indexterm>
+  <primary>OAuth 2.0</primary>
+ </indexterm>
+
+ <para>This chapter covers OpenAM support for the OAuth 2.0 authorization
+ framework. The chapter begins by showing where OpenAM fits into the OAuth 2.0
+ authorization framework, and then shows how to configure the
+ functionality.</para>
+
+ <section xml:id="about-oauth2-support">
+  <title>About OAuth 2.0 Support in OpenAM</title>
+
+  <para>RFC 6749, <link xlink:href="http://tools.ietf.org/html/rfc6749"
+  xlink:show="new"><citetitle>The OAuth 2.0 Authorization Framework</citetitle></link>
+  provides a standard way for <firstterm>resource owners</firstterm> to grant
+  <firstterm>client</firstterm> applications access to the owners' web-based
+  resources. The canonical example involves a user (resource owner) granting
+  access to a printing service (client) to print photos that the user has
+  stored on a photo-sharing server.</para>
+
+  <para>The section describes how OpenAM supports the OAuth 2.0 authorization
+  framework in terms of the roles that OpenAM plays.<footnote><para>Read
+  <link xlink:show="new" xlink:href="http://tools.ietf.org/html/rfc6749"
+  >RFC 6749</link> to understand the authorization framework itself.</para>
+  </footnote> The following sequence diagram indicates the primary roles
+  OpenAM can play in the OAuth 2.0 protocol flow.</para>
+
+  <mediaobject xml:id="figure-oauth2-flow">
+   <alt>OpenAM in OAuth 2.0 protocol flow</alt>
+   <imageobject>
+    <imagedata fileref="images/oauth2-flow.png" format="PNG"/>
+   </imageobject>
+   <textobject><para>OpenAM can function as the authorization server and also
+   as the client.</para></textobject>
+  </mediaobject>
+
+  <section xml:id="openam-oauth2-authz-server">
+   <title>OpenAM as OAuth 2.0 Authentication Server</title>
+
+   <para>OpenAM can function as an OAuth 2.0 <firstterm>authorization
+   server</firstterm>. In this role, OpenAM authenticates resource owners and
+   obtains their authorization in order to return access tokens to
+   clients.</para>
+
+   <para>When using OpenAM as authorization server, you register clients with
+   OpenAM by using OAuth 2.0 policy agent profiles. OpenAM supports both
+   confidential and public clients.</para>
+
+   <para>OpenAM supports the four main grants for obtaining authorization
+   described in RFC 6749: the authorization code grant, the implicit grant,
+   the resource owner password credentials grant, and the client credentials
+   grant.</para>
+
+   <para>The authorization code grant starts with the client, such as a
+   web-based service, redirecting the resource owner's user-agent to the OpenAM
+   authorization service. After authenticating the resource owner again
+   obtaining the resource owner's authorization, OpenAM redirects the resource
+   owner's user-agent back to the client with an authorization code that the
+   client uses to request the access token. The following sequence diagram
+   outlines a successful process from initial client redirection through to the
+   client accessing the protected resource.</para>
+
+   <mediaobject xml:id="figure-oauth2-authz">
+    <alt>OpenAM in OAuth 2.0 Authorization Code Grant process</alt>
+    <imageobject>
+     <imagedata fileref="images/oauth2-authz.png" format="PNG"/>
+    </imageobject>
+    <textobject><para>OpenAM supports the authorization code
+    grant.</para></textobject>
+   </mediaobject>
+
+   <para>The implicit grant is designed for clients implemented to run inside
+   the resource-owner user agent. Instead of providing an authorization code
+   that the client must use to retrieve an access token, OpenAM returns the
+   access token directly in the fragment portion of the redirect URI. The
+   following sequence diagram outlines the successful process.</para>
+
+   <mediaobject xml:id="figure-oauth2-implicit">
+    <alt>OpenAM in OAuth 2.0 Implicit Grant process</alt>
+    <imageobject>
+     <imagedata fileref="images/oauth2-implicit.png" format="PNG"/>
+    </imageobject>
+    <textobject><para>OpenAM supports the implicit grant.</para></textobject>
+   </mediaobject>
+
+   <para>The resource owner password credentials grant lets the client use the
+   resource owner's user name and password to get an access token directly.
+   Although this grant might seem to conflict with an original OAuth goal of
+   not having to share resource owner credentials with the client, it can
+   makes sense in a secure context where other authorization grant types are
+   not available, such as a client that is part of a device operating system
+   using the resource owner credentials once and thereafter using refresh tokens
+   to continue accessing resources. The following sequence diagram shows the
+   successful process.</para>
+
+   <mediaobject xml:id="figure-oauth2-ropc">
+    <alt>OpenAM in OAuth 2.0 Resource Owner Password Credentials Grant process</alt>
+    <imageobject>
+     <imagedata fileref="images/oauth2-ropc.png" format="PNG"/>
+    </imageobject>
+    <textobject><para>OpenAM supports the resource owner password credentials
+    grant.</para></textobject>
+   </mediaobject>
+
+   <para>The client credentials grant uses client credentials as an
+   authorization grant. This grant makes sense when the client is also the
+   resource owner, for example. The following sequence diagram shows the
+   successful process.</para>
+
+   <mediaobject xml:id="figure-oauth2-client-cred">
+    <alt>OpenAM in OAuth 2.0 Client Credentials Grant process</alt>
+    <imageobject>
+     <imagedata fileref="images/oauth2-client-cred.png" format="PNG"/>
+    </imageobject>
+    <textobject><para>OpenAM supports the client credentials
+    grant.</para></textobject>
+   </mediaobject>
+
+   <para>See RFC 6749 for details on the authorization grant process, and
+   for details on how clients should make authorization requests and handle
+   authorization responses.</para>
+
+   <variablelist>
+    <title>OpenAM OAuth 2.0 Endpoints</title>
+    <para>In addition to the standard authorization and token endpoints
+    described in RFC 6749, OpenAM also exposes a token information endpoint
+    for resource servers to get information about access tokens so they can
+    determine how to respond to requests for protected resources. OpenAM as
+    authorization server exposes the following endpoints for clients and
+    resource servers.</para>
+    <!-- TODO: Link to REST API reference when that documentation becomes available. -->
+
+    <varlistentry>
+     <term><literal>/oauth2/authorize</literal></term>
+     <listitem>
+      <para>Authorization endpoint defined in RFC 6749, used to obtain an
+      authorization grant from the resource owner</para>
+      <para>Example: <literal>https://openam.example.com:8443/openam/oauth2/authorize</literal></para>
+     </listitem>
+    </varlistentry>
+    <varlistentry>
+     <term><literal>/oauth2/access_token</literal></term>
+     <listitem>
+      <para>Token endpoint defined in RFC 6749, used to obtain an access token
+      from the authorization server</para>
+      <para>Example: <literal>https://openam.example.com:8443/openam/oauth2/access_token</literal></para>
+     </listitem>
+    </varlistentry>
+    <varlistentry>
+     <term><literal>/oauth2/tokeninfo</literal></term>
+     <listitem>
+      <para>Endpoint not defined in RFC 6749, used to validate tokens, and to
+      retrieve information such as scopes</para>
+      <para>Given an access token, a resource server authenticated with OpenAM
+      can perform an HTTP GET on <literal
+      >/oauth2/tokeninfo?access_token=<replaceable>token-id</replaceable></literal>
+      to retrieve a JSON object indicating <literal>token_type</literal>,
+      <literal>expires_in</literal>, <literal>scope</literal>, and the
+      <literal>access_token</literal> ID.</para>
+      <para>Example: <literal>https://openam.example.com:8443/openam/oauth2/tokeninfo</literal></para>
+     </listitem>
+    </varlistentry>
+   </variablelist>
+  </section>
+
+  <section xml:id="openam-oauth2-client">
+   <title>OpenAM as OAuth 2.0 Client &amp; Resource Server Solution</title>
+
+   <para>OpenAM can function as an OAuth 2.0 client for installations where the
+   web resources are protected by OpenAM. To configure OpenAM as an OAuth 2.0
+   client, you set up an OpenAM OAuth 2.0 authentication module instance, and
+   then integrate the authentication module into your authentication chains as
+   necessary.</para>
+
+   <para>When OpenAM functions as an OAuth 2.0 client, OpenAM provides an
+   OpenAM SSO session after successfully authenticating the resource owner and
+   obtaining authorization. This means the client can then access resources
+   protected by policy agents. In this respect the OpenAM OAuth 2.0 client is
+   just like any other authentication module, one that relies on an OAuth 2.0
+   authorization server to authenticate the resource owner and obtain
+   authorization. The following sequence diagram shows how the client gains
+   access to protected resources in the scenario where OpenAM functions as both
+   authorization server and client for example.</para>
+
+   <mediaobject xml:id="figure-oauth2-openam-client">
+    <alt>OpenAM as OAuth 2.0 client and authorization server</alt>
+    <imageobject>
+     <imagedata fileref="images/oauth2-openam-client.png" format="PNG"/>
+    </imageobject>
+    <textobject><para>OpenAM as client works as an authentication module where
+    authentication and authorization is handled by the authorization server,
+    and on success an SSO session is created, so that OpenAM access management
+    can happen as it normally does.</para></textobject>
+   </mediaobject>
+
+   <para>As the OAuth 2.0 client functionality is implemented as an OpenAM
+   authentication module, you do not need to deploy your own resource server
+   implementation when using OpenAM as an OAuth 2.0 client. Instead, use policy
+   agents or OpenIG to protect resources.</para>
+
+   <para>To configure OpenAM as an OAuth 2.0 client, see <link
+   xlink:href="admin-guide#oauth2-module-conf-hints"
+   xlink:role="http://docbook.org/xlink/role/olink"><citetitle>Hints For the
+   OAuth 2.0 Authentication Module</citetitle></link>.</para>
+  </section>
+
+  <section xml:id="oauth2-byo-client">
+   <title>Using Your Own Client &amp; Resource Server</title>
+
+   <para>OpenAM returns bearer tokens as described in RFC 6750, <link
+   xlink:show="new" xlink:href="http://tools.ietf.org/html/rfc6750"
+   ><citetitle>The OAuth 2.0 Authorization Framework: Bearer Token
+   Usage</citetitle></link>. Notice in the following example JSON response to
+   an access token request that OpenAM returns a refresh token with the access
+   token. The client can use the refresh token to get a new access token as
+   described in RFC 6749.</para>
+
+   <programlisting language="javascript">{
+  "expires_in": 59997,
+  "token_type": "Bearer",
+  "refresh_token": "721edb43-f0d0-4c77-a793-53f6e81cf10c",
+  "access_token": "6929b6e9-d8b1-4528-8aff-8e8c693f61e2"
+}</programlisting>
+
+   <para>Notice that the <literal>expires_in</literal> lifetime is expressed
+   in milliseconds. In RFC 6749 the unit for <literal>expires_in</literal>
+   is seconds. OpenAM uses milliseconds for additional precision.</para>
+
+   <para>In addition to implementing your client, the resource server must also
+   implement the logic for handling access tokens. The resource server can use
+   the <literal>/oauth2/tokeninfo</literal> endpoint to determine whether the
+   access token is still valid, and to retrieve the scopes associated with the
+   access token.</para>
+
+   <para>The default OpenAM implementation of OAuth 2.0 scopes assumes that the
+   space-separated (%20 when URL encoded) list of scopes in an access token
+   request correspond to names of attributes in the resource owner's
+   profile.</para>
+
+   <para>To take a concrete example, consider an access token request where
+   <literal>scope=mail%20cn</literal> and where the resource owner is the
+   default OpenAM demo user. (The demo user has no email address by default, but
+   you can add one, such as <literal>demo@example.com</literal> to the demo
+   user's profile.) When the resource server performs an HTTP GET on the token
+   information endpoint, <literal>/oauth2/tokeninfo?access_token=<replaceable
+   >token-id</replaceable></literal>, OpenAM populates the
+   <literal>mail</literal> and <literal>cn</literal> scopes with the email
+   address (<literal>demo@example.com</literal>) and common name
+   (<literal>demo</literal>) from the demo user's profile. The result is a
+   something like the following token information response.</para>
+
+   <programlisting language="javascript">{
+  "mail": "demo@example.com",
+  "cn": "demo",
+  "token_type": "Bearer",
+  "expires_in": 48793,
+  "access_token": "6929b6e9-d8b1-4528-8aff-8e8c693f61e2"
+}</programlisting>
+
+   <para>OpenAM is designed to allow you to plug in your own scopes
+   implementation if the default implementation does not do what your
+   deployment requires.</para>
+   <!-- TODO: Link to dev guide on customizing the scopes implementation. -->
+  </section>
+ </section>
+
+ <section xml:id="configure-oauth2-authz">
+  <title>Configuring the OAuth 2.0 Authorization Service</title>
+
+  <para>You configure the OAuth 2.0 authorization service for a particular
+  realm, starting from the Common Tasks page of the OpenAM console. This
+  process also protects the authorization endpoint using a standard
+  policy.</para>
+
+  <procedure xml:id="common-task-oauth2-authz">
+   <title>To Set Up the OAuth 2.0 Authorization Service</title>
+
+   <para>Follow these steps.</para>
+
+   <step>
+    <para>In the OpenAM console, select Common Tasks &gt; Configure
+    OAuth2.</para>
+   </step>
+   <step>
+    <para>On the Configure OAuth2 page, enter the Realm for the authorization
+    service.</para>
+   </step>
+   <step performance="optional">
+    <para>If necessary, adjust the lifetimes for authorization codes
+    (10 minutes is the recommended setting in RFC 6749), access tokens, and
+    refresh tokens.</para>
+   </step>
+   <step performance="optional">
+    <para>Select Issue Refresh Tokens unless you do not want the authorization
+    service to supply a refresh token when returning an access token.</para>
+   </step>
+   <step performance="optional">
+    <para>If you want to use the default scope implementation, whereby
+    scopes are taken to be resource owner profile attribute names, then
+    keep the default setting.</para>
+    <para>If you have a custom scope implementation, put it on the OpenAM
+    classpath, and provide the class name as Scope Implementation Class.</para>
+   </step>
+   <step>
+    <para>Let OpenAM set up a policy to protect the authorization endpoint
+    by entering a policy name, rule name, and subject name that remind you
+    what the policy is for, and by entering the endpoint.</para>
+    <para>The endpoint is the URL where you deployed OpenAM, plus the URI
+    <literal>/oauth2/authorize</literal>. For example,
+    <literal>https://openam.example.com:8443/openam/oauth2/authorize</literal>.</para>
+    <para>The policy then appears in the list of policies for the realm.</para>
+   </step>
+   <step>
+    <para>Click Create to complete the process.</para>
+   </step>
+  </procedure>
+
+  <para>You can adjust the authorization server configuration after you create
+  it in the OpenAM console under Access Control &gt; <replaceable>Realm
+  Name</replaceable> &gt; Services &gt; OAuth2 Provider.</para>
+
+  <para>You can adjust global defaults in the OpenAM console under Configuration
+  &gt; Global &gt; OAuth2 Provider.</para>
+ </section>
+
+ <section xml:id="register-oauth2-client">
+  <title>Registering OAuth 2.0 Clients With the Authorization Service</title>
+
+  <para>You register an OAuth 2.0 client with the OpenAM OAuth 2.0 authorization
+  service by creating and configuring an OAuth 2.0 Client agent profile.</para>
+
+  <para>At minimum you must have the client identifier and client password
+  in order to register your OAuth 2.0 client.</para>
+
+  <procedure xml:id="create-oauth2-client-profile">
+   <title>To Create an OAuth 2.0 Client Agent Profile</title>
+
+   <step>
+    <para>Use either of these two facilities.</para>
+    <stepalternatives>
+     <step>
+      <para>In the OpenAM console, access the client registration endpoint
+      at <literal>/oauth2/registerClient.jsp</literal>.</para>
+      <para>The full URL depends on where you deployed OpenAM. For example,
+      <literal>https://openam.example.com:8443/openam/oauth2/registerClient.jsp</literal>.</para>
+      <para>The Register a Client page lets you quickly create and configure
+      an OAuth 2.0 client in a simple web page without inline help.</para>
+     </step>
+     <step>
+      <para>In the OpenAM console under Access Control &gt; <replaceable>Realm
+      Name</replaceable> &gt; Agents &gt; OAuth 2.0 Client &gt; Agent, click
+      New..., then provide the client identifier and client password, and
+      finally click create to create the profile.</para>
+      <para>This page requires that you perform additional configuration
+      separately.</para>
+     </step>
+    </stepalternatives>
+   </step>
+  </procedure>
+
+  <procedure xml:id="configure-oauth2-client-profile">
+   <title>To Configure an OAuth 2.0 Client Agent Profile</title>
+
+   <para>After initially registering or creating a client agent profile as
+   necessary.</para>
+
+   <step>
+    <para>In the OpenAM console, browse to Access Control &gt;
+    <replaceable>Realm Name</replaceable> &gt; Agents &gt; OAuth 2.0 Client
+    &gt; Agent &gt; <replaceable>Client Name</replaceable> to open the Edit
+    <replaceable>Client Name</replaceable> page.</para>
+   </step>
+   <step>
+    <para>Adjust the configuration as needed using the inline help for hints,
+    and also the documentation section <link
+    xlink:href="admin-guide#configure-oauth2-client"
+    xlink:role="http://docbook.org/xlink/role/olink"><citetitle>Configuring
+    OAuth 2.0 Clients</citetitle></link>.</para>
+
+    <para>An important decision to make at this point is whether your client
+    is a confidential client or a public client. This depends on whether your
+    client can keep its credentials confidential, or whether its credentials
+    can be exposed to the resource owner or other parties. If your client is a
+    web-based application running on a server, such as the OpenAM OAuth 2.0
+    client, then you can keep its credentials confidential. If your client is
+    a user-agent based client, such as a JavaScript client running in a browser,
+    or a native application installed on a device used by the resource owner,
+    then yours is a public client.</para>
+   </step>
+   <step>
+    <para>When finished, Save your work.</para>
+   </step>
+  </procedure>
+ </section>
+
+ <section xml:id="oauth2-client-plus-authz">
+  <title>Configuring OpenAM as Authorization Server &amp; Client</title>
+
+  <para>This section takes a high-level look at how to set up OpenAM both as an
+  OAuth 2.0 authorization server and also as a client in order to protect
+  resources by using a policy agent. The high-level steps are as follows.</para>
+
+  <orderedlist>
+   <listitem>
+    <para>Set up a policy agent or OpenIG to protect your web resources,
+    including the policy used to protect the resources.</para>
+    <para>Make sure you can access the resources using an authentication module
+    that you already know before working with OAuth 2.0.</para>
+   </listitem>
+   <listitem>
+    <para>Configure OpenAM's OAuth 2.0 authorization service as described
+    in <xref linkend="configure-oauth2-authz" />.</para>
+   </listitem>
+   <listitem>
+    <para>Configure an OpenAM OAuth 2.0 authentication module instance using
+    the <link xlink:href="admin-guide#oauth2-module-conf-hints"
+    xlink:role="http://docbook.org/xlink/role/olink"><citetitle>Hints For the
+    OAuth 2.0 Authentication Module</citetitle></link> with the OpenAM
+    authorization service endpoints.</para>
+   </listitem>
+   <listitem>
+    <para>Register the OAuth 2.0 authentication module as an OAuth 2.0
+    confidential client as described in <xref
+    linkend="register-oauth2-client" />.</para>
+   </listitem>
+   <listitem>
+    <para>Logout and access the protected resources to see the process in
+    action.</para>
+   </listitem>
+  </orderedlist>
+
+  <example xml:id="protect-web-site-with-oauth2"><?dbfo keep-together="auto"?>
+   <title>Web Site Protected With OAuth 2.0</title>
+
+   <para>This example pulls everything together (except security
+   considerations), using OpenAM as an OAuth 2.0 authorization server,
+   OAuth 2.0 client, and "resource server" by protecting web resources with
+   a policy agent.</para>
+
+   <para>This example uses two hosts, <literal>oauth2.example.com</literal>
+   where OpenAM is deployed at
+   <literal>http://oauth2.example.com:8080/openam</literal>, and
+   <literal>www.example.com</literal> where the resources to protect are
+   deployed in Apache Tomcat at
+   <literal>http://www.example.com:8080/examples</literal>.</para>
+
+   <orderedlist>
+    <listitem>
+     <para>Set up an OpenAM policy agent and policy in the top-level realm,
+     <literal>/</literal>, to protect resources. So far this is standard
+     OpenAM, unrelated to OAuth 2.0.</para>
+
+     <para>See the <link xlink:href="agent-install-guide#agent-install-guide"
+     xlink:role="http://docbook.org/xlink/role/olink"><citetitle>OpenAM Policy
+     Agent <?eval ${agentsDocTargetVersion}?> Installation Guide</citetitle></link>
+     for instructions on installing a policy agent. This example relies on the
+     Apache Tomcat Java EE policy agent, configured to protect resources in
+     Apache Tomcat at <literal>http://www.example.com:8080/</literal>.</para>
+
+     <para>The policies for this example protect the Apache Tomcat examples
+     under <literal>http://www.example.com:8080/examples/</literal>, allowing
+     GET and POST operations by all authenticated users. For more information
+     on creating policies, see <link
+     xlink:href="admin-guide#configure-authz-policy"
+     xlink:role="http://docbook.org/xlink/role/olink"><citetitle>Configuring
+     Policies</citetitle></link>.</para>
+
+     <para>After setting up the policy agent and the policy, you can make sure
+     everything is working by attempting to access a protected resource, in this
+     case <literal>http://www.example.com:8080/examples/</literal>. The policy
+     agent should redirect you to OpenAM to authenticate with the default
+     authentication module, where you can login as user <literal>demo</literal>
+     password <literal>changeit</literal>. After successful authentication,
+     OpenAM redirects your browser back to the protected resource and the
+     policy agent lets you get the protected resource, in this case the Tomcat
+     examples top page.</para>
+
+     <mediaobject xml:id="figure-oauth2-examples">
+      <alt>Successfully accessing the Apache Tomcat examples</alt>
+      <imageobject>
+       <imagedata fileref="images/oauth2-examples.png" format="PNG"/>
+      </imageobject>
+      <textobject><para>If your policy agent and policy are set up correctly,
+      you should get HTTP 200 and the Apache Tomcat examples page.</para></textobject>
+     </mediaobject>
+    </listitem>
+
+    <listitem>
+     <para>Configure OpenAM's OAuth 2.0 authorization service as described
+     in <xref linkend="configure-oauth2-authz" />.</para>
+
+     <para>The authorization endpoint to protect in this example is at
+     <literal>http://oauth2.example.com:8080/openam/oauth2/authorize</literal>.</para>
+    </listitem>
+
+    <listitem>
+     <para>Configure an OpenAM OAuth 2.0 authentication module instance for
+     the top-level realm.</para>
+
+     <para>Under Access Control &gt; / (Top-Level Realm) &gt; Authentication
+     &gt; Module Instances, click New. Name the module
+     <literal>OAuth2</literal>, and select the OAuth 2.0 type, then click
+     OK to save your work.</para>
+
+     <para>Then click Authentication &gt; Module Instances &gt; OAuth2 to open
+     the OAuth 2.0 client configuration page. This page offers numerous options.
+     The key settings for this example are the following.</para>
+     <variablelist>
+      <varlistentry>
+       <term>Client Id</term>
+       <listitem>
+        <para>This is the client identifier used to register your client with
+        OpenAM's authorization server, and then used when your client must
+        authenticate to OpenAM.</para>
+        <para>Set this to <literal>myClientID</literal> for this example.</para>
+       </listitem>
+      </varlistentry>
+      <varlistentry>
+       <term>Client Secret</term>
+       <listitem>
+        <para>This is the client password used to register your client with
+        OpenAM's authorization server, and then used when your client must
+        authenticate to OpenAM.</para>
+        <para>Set this to <literal>password</literal> for this example. Make
+        sure you use strong passwords when you actually deploy OAuth 2.0.</para>
+       </listitem>
+      </varlistentry>
+      <varlistentry>
+       <term>Authentication Endpoint URL</term>
+       <listitem>
+        <para>In this example,
+        <literal>http://oauth2.example.com:8080/openam/oauth2/authorize</literal>.</para>
+       </listitem>
+      </varlistentry>
+      <varlistentry>
+       <term>Access Token Endpoint URL</term>
+       <listitem>
+        <para>In this example,
+        <literal>http://oauth2.example.com:8080/openam/oauth2/access_token</literal>.</para>
+       </listitem>
+      </varlistentry>
+      <varlistentry>
+       <term>User Profile Service URL</term>
+       <listitem>
+        <para>In this example,
+        <literal>http://oauth2.example.com:8080/openam/oauth2/tokeninfo</literal>.</para>
+       </listitem>
+      </varlistentry>
+      <varlistentry>
+       <term>Scope</term>
+       <listitem>
+        <para>In this example, <literal>cn</literal>.</para>
+        <para>The demo user has common name <literal>demo</literal> by default,
+        so by setting this to <literal>cn</literal> (Common Name), OpenAM
+        can get the value of the attribute without the need to create
+        additional subjects, or to update existing subjects.</para>
+       </listitem>
+      </varlistentry>
+      <varlistentry>
+       <term>Account Mapper Configuration</term>
+       <listitem>
+        <para>In this example, <literal>cn=cn</literal>.</para>
+       </listitem>
+      </varlistentry>
+      <varlistentry>
+       <term>Account Mapper Configuration</term>
+       <listitem>
+        <para>In this example, <literal>cn=cn</literal>.</para>
+       </listitem>
+      </varlistentry>
+      <varlistentry>
+       <term>Account Mapper Configuration</term>
+       <listitem>
+        <para>In this example, <literal>cn=cn</literal>.</para>
+       </listitem>
+      </varlistentry>
+      <varlistentry>
+       <term>Create account if it does not exist</term>
+       <listitem>
+        <para>In this example, disable this functionality.</para>
+        <para>OpenAM can create local accounts based on the account information
+        returned by the authorization server. For this example, map all users
+        to the anonymous account to keep it simple.</para>
+       </listitem>
+      </varlistentry>
+      <varlistentry>
+       <term>Map to anonymous user</term>
+       <listitem>
+        <para>In this example, enable this functionality.</para>
+       </listitem>
+      </varlistentry>
+     </variablelist>
+    </listitem>
+
+    <listitem>
+     <para>Register the OAuth 2.0 authentication module as an OAuth 2.0
+     confidential client as described in <xref
+     linkend="register-oauth2-client" />.</para>
+
+     <para>Under Access Control &gt; / (Top-Level Realm) &gt; Agents &gt;
+     OAuth 2.0 Client &gt; Agents &gt; <literal>myClientID</literal>, adjust
+     the following settings.</para>
+
+     <variablelist>
+      <varlistentry>
+       <term>Client type</term>
+       <listitem>
+        <para>In this example, <literal>confidential</literal>. OpenAM protects
+        its credentials as an OAuth 2.0 client.</para>
+       </listitem>
+      </varlistentry>
+
+      <varlistentry>
+       <term>Redirection URIs</term>
+       <listitem>
+        <para>In this example,
+        <literal>http://oauth2.example.com:8080/openam/oauth2c/OAuthProxy.jsp</literal>.</para>
+       </listitem>
+      </varlistentry>
+
+      <varlistentry>
+       <term>Scopes</term>
+       <listitem>
+        <para>In this example, <literal>cn</literal>.</para>
+       </listitem>
+      </varlistentry>
+     </variablelist>
+    </listitem>
+
+    <listitem>
+     <para>Before you try it out, you must make the following additional
+     change to the configuration.</para>
+
+     <para>Your OpenAM OAuth 2.0 client authentication module is not part
+     of the default chain, and therefore OpenAM does not call it unless
+     you specifically request the OAuth 2.0 client authentication
+     module.</para>
+
+     <para>To cause the policy agent to request your OAuth 2.0 client
+     authentication module explicitly, browse in OpenAM console to your
+     <emphasis>policy agent profile configuration</emphasis>, in this case
+     Access Control &gt; / (Top-Level Realm) &gt; Agents &gt; J2EE &gt;
+     Agents &gt; <literal>Tomcat</literal> &gt; OpenAM Services &gt; OpenAM
+     Login URL, and add
+     <literal>http://oauth2.example.com:8080/openam/UI/Login?module=OAuth2</literal>,
+     moving it to the top of the list.</para>
+
+     <para>Save your work.</para>
+
+     <para>This ensures that the policy agent directs the resource owner
+     to OpenAM with the instruction to authenticate using the
+     <literal>OAuth2</literal> authentication module.</para>
+    </listitem>
+
+    <listitem>
+     <para>Try it out.</para>
+
+     <para>First make sure you are logged out of OpenAM, for example by
+     browsing to the logout URL, in this case
+     <literal>http://oauth2.example.com:8080/openam/UI/Logout</literal>.</para>
+
+     <para>Next attempt to access the protected resource, in this case
+     <literal>http://www.example.com:8080/examples/</literal>.</para>
+
+     <para>If everything is set up properly, the policy agent redirects your
+     browser to the login page of OpenAM with <literal>module=OAuth2</literal>
+     among other query string parameters. After you authenticate, for example
+     as user <literal>demo</literal>, password <literal>changeit</literal>,
+     OpenAM presents you with an authorization decision page.</para>
+
+     <!-- TODO: Something besides plain, generic vanilla would be nice. -->
+     <mediaobject xml:id="figure-oauth2-authz-page">
+      <alt>OpenAM presenting authorization decision page to resource owner</alt>
+      <imageobject>
+       <imagedata fileref="images/oauth2-authz-page.png" format="PNG"/>
+      </imageobject>
+      <textobject><para>Upon successful authentication, the resource owner must
+      make a decision to authorize the client to access the protected
+      resource.</para></textobject>
+     </mediaobject>
+
+     <para>When you click Allow, the authorization service creates an SSO
+     session, and redirects the client back to the resource, thus allowing
+     the client to access the protected resource.</para>
+
+     <mediaobject xml:id="figure-oauth2-examples-again">
+      <alt>Successfully accessing the Apache Tomcat examples</alt>
+      <imageobject>
+       <imagedata fileref="images/oauth2-examples.png" format="PNG"/>
+      </imageobject>
+      <textobject><para>If everything is set up correctly, you should end up
+      with HTTP 200 and the Apache Tomcat examples page.</para></textobject>
+     </mediaobject>
+    </listitem>
+   </orderedlist>
+  </example>
+ </section>
+
+ <section xml:id="oauth2-security-considerations">
+  <title>Security Considerations</title>
+
+  <para>OAuth 2.0 messages involve credentials and access tokens that allow
+  the bearer to retrieve protected resources. Therefore, do not let an attacker
+  capture requests or responses. Protect the messages going across the
+  network.</para>
+
+  <para>RFC 6749 includes a number of <link xlink:show="new"
+  xlink:href="http://tools.ietf.org/html/rfc6749#section-10">Security
+  Considerations</link>, and also requires Transport Layer Security (TLS)
+  to protect sensitive messages. Make sure you read the section covering
+  <citetitle>Security Considerations</citetitle>, and that you can implement
+  them in your deployment.</para>
+
+  <para>Also, especially when deploying a mix of other clients and resource
+  servers, take into account the points covered in the Internet-Draft, <link
+  xlink:href="http://tools.ietf.org/html/draft-ietf-oauth-v2-threatmodel"
+  xlink:show="new"><citetitle>OAuth 2.0 Threat Model and Security
+  Considerations</citetitle></link>, before putting your service into
+  production.</para>
+ </section>
+</chapter>

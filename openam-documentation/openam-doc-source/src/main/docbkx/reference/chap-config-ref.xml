@@ -1359,6 +1359,64 @@
    </varlistentry>
   </variablelist>
 
+  <variablelist xml:id="oauth2-provider-configuration">
+   <title>OAuth2 Provider Configuration</title>
+
+   <para><command>ssoadm</command> service name:
+   <literal>OAuth2Provider</literal></para>
+
+   <varlistentry>
+    <term>Authorization Code Lifetime</term>
+    <listitem>
+     <para>Lifetime of OAuth 2.0 authorization code in seconds.</para>
+
+     <para><command>ssoadm</command> attribute:
+     <literal>forgerock-oauth2-provider-authorization-code-lifetime</literal></para>
+    </listitem>
+   </varlistentry>
+
+   <varlistentry>
+    <term>Refresh Token Lifetime</term>
+    <listitem>
+     <para>Lifetime of OAuth 2.0 refresh token in seconds.</para>
+
+     <para><command>ssoadm</command> attribute:
+     <literal>forgerock-oauth2-provider-refresh-token-lifetime</literal></para>
+    </listitem>
+   </varlistentry>
+
+   <varlistentry>
+    <term>Access Token Lifetime</term>
+    <listitem>
+     <para>Lifetime of OAuth 2.0 access token in seconds.</para>
+
+     <para><command>ssoadm</command> attribute:
+     <literal>forgerock-oauth2-provider-access-token-lifetime</literal></para>
+    </listitem>
+   </varlistentry>
+
+   <varlistentry>
+    <term>Issue Refresh Tokens</term>
+    <listitem>
+     <para>Whether to issue a refresh token when returning an access
+     token.</para>
+
+     <para><command>ssoadm</command> attribute:
+     <literal>forgerock-oauth2-provider-issue-refresh-token</literal></para>
+    </listitem>
+   </varlistentry>
+
+   <varlistentry>
+    <term>Scope Implementation Class</term>
+    <listitem>
+     <para>Name of class on OpenAM classpath implementing scopes.</para>
+
+     <para><command>ssoadm</command> attribute:
+     <literal>forgerock-oauth2-provider-scope-implementation-class</literal></para>
+    </listitem>
+   </varlistentry>
+  </variablelist>
+
   <variablelist xml:id="password-reset-configuration">
    <title>Password Reset</title>
 

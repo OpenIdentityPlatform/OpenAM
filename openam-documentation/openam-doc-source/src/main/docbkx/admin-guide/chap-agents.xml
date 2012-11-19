@@ -133,6 +133,13 @@
     </listitem>
    </varlistentry>
    <varlistentry>
+    <term>OAuth 2.0 Client Agent</term>
+    <listitem>
+     <para>OAuth 2.0 clients are registered using this type of policy agent
+     profile.</para>
+    </listitem>
+   </varlistentry>
+   <varlistentry>
     <term>Agent Authenticator</term>
     <listitem>
      <para>The agent authenticator can read agent profiles by connecting
@@ -4060,7 +4067,121 @@ com.sun.identity.agents.config.cdsso.cookie.domain[1]=.example.net</literallayou
     </varlistentry>
   </variablelist>
  </section>
- 
+
+ <section xml:id="configure-oauth2-client">
+  <title>Configuring OAuth 2.0 Clients</title>
+  <indexterm>
+   <primary>Policy agents</primary>
+   <secondary>Configuring</secondary>
+  </indexterm>
+
+  <para>When you want to register an OAuth 2.0 client with OpenAM as the
+  OAuth 2.0 authorization server, create an OAuth 2.0 Client agent profile.
+  After creating the agent profile, you can further configure the properties
+  in the OpenAM console under Access Control &gt; <replaceable>Realm
+  Name</replaceable> &gt; Agents &gt; OAuth 2.0 Client &gt; <replaceable>Client
+  Name</replaceable>.</para>
+
+  <variablelist>
+   <varlistentry>
+    <term>Group</term>
+    <listitem>
+     <para>Set this if you have configured an OAuth 2.0 Client agent
+     group.</para>
+    </listitem>
+   </varlistentry>
+
+   <varlistentry>
+    <term>Status</term>
+    <listitem>
+     <para>Whether the client profile is active for use.</para>
+    </listitem>
+   </varlistentry>
+
+   <varlistentry>
+    <term>Client password</term>
+    <listitem>
+     <para>The client password as described by RFC 6749 in the section,
+     <link xlink:href="http://tools.ietf.org/html/rfc6749#section-2.3.1"
+     xlink:show="new">Client Password</link>.</para>
+    </listitem>
+   </varlistentry>
+
+   <varlistentry>
+    <term>Client type</term>
+    <listitem>
+     <para>Confidential clients can maintain confidentiality of their
+     credentials. Public clients cannot.</para>
+     <para>A web application running on a server where its credentials are
+     protected is an example of a confidential client.</para>
+     <para>A JavaScript client running in a browser is an example of a public
+     client.</para>
+    </listitem>
+   </varlistentry>
+
+   <varlistentry>
+    <term>Redirection URIs</term>
+    <listitem>
+     <para>Specify client redirection endpoint URIs as described by RFC 6749
+     in the section, <link xlink:show="new"
+     xlink:href="http://tools.ietf.org/html/rfc6749#section-3.1.2">Redirection
+     Endpoint</link>. OpenAM's OAuth 2.0 authorization service redirects the
+     the resource owner's user-agent back to this endpoint during the
+     authorization code grant process. If your client has more than one
+     redirection URI, then it must specify the redirection URI to use in
+     the authorization request.</para>
+    </listitem>
+   </varlistentry>
+
+   <varlistentry>
+    <term>Scopes</term>
+    <listitem>
+     <para>Specify scopes in <literal><replaceable>scope</replaceable></literal>
+     or <literal><replaceable>scope</replaceable>|<replaceable
+     >locale</replaceable>|<replaceable>localized
+     description</replaceable></literal> format. These scopes are to be
+     presented to the resource owner when the resource owner is asked to
+     authorize client access to protected resources.</para>
+    </listitem>
+   </varlistentry>
+
+   <varlistentry>
+    <term>Display name</term>
+    <listitem>
+     <para>Specify a client name to display to the resource owner
+     when the resource owner is asked to authorize client access to protected
+     resources. Valid formats include <literal><replaceable
+     >name</replaceable></literal> or <literal><replaceable
+     >locale</replaceable>|<replaceable>localized
+     name</replaceable></literal>.</para>
+    </listitem>
+   </varlistentry>
+
+   <varlistentry>
+    <term>Display description</term>
+    <listitem>
+     <para>Specify a client description to display to the resource owner
+     when the resource owner is asked to authorize client access to protected
+     resources. Valid formats include <literal><replaceable
+     >description</replaceable></literal> or <literal><replaceable
+     >locale</replaceable>|<replaceable>localized
+     description</replaceable></literal>.</para>
+    </listitem>
+   </varlistentry>
+
+   <varlistentry>
+    <term>Default Scope(s)</term>
+    <listitem>
+     <para>Specify scopes in <literal><replaceable>scope</replaceable></literal>
+     or <literal><replaceable>scope</replaceable>|<replaceable
+     >locale</replaceable>|<replaceable>localized
+     description</replaceable></literal> format. These scopes are set
+     automatically when tokens are issued.</para>
+    </listitem>
+   </varlistentry>
+  </variablelist>
+ </section>
+
  <section xml:id="configure-agent-auth">
   <title>Configuring Agent Authenticators</title>
   <indexterm>
