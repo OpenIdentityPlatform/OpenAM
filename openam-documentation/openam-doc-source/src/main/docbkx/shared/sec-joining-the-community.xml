@@ -40,7 +40,10 @@
  documentation, there is a mailing list which can be found at
  <link xlink:href='https://lists.forgerock.org/mailman/listinfo/openam'
  xlink:show="new">https://lists.forgerock.org/mailman/listinfo/openam</link>
- where you are likely to find an answer.</para>
+ where you are likely to find an answer. You can also make suggestions 
+ regarding updates at the documentation mailing list 
+ (<link xlink:href='https://lists.forgerock.org/mailman/listinfo/docs'
+ xlink:show="new">https://lists.forgerock.org/mailman/listinfo/docs</link>).</para>
 
  <para>The Wiki has information on how to check out OpenAM source code.
  There is also a mailing list for OpenAM development which can be found at

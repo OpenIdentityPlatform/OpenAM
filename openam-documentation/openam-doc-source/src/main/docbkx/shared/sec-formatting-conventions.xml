@@ -35,7 +35,7 @@
  <filename>filenames</filename>, <command>commands</command>, and
  <literal>literal values</literal>.</para>
 
- <screen>$ echo Terminal sessions are formatted with lines folded for easier reading.
+ <screen>$ echo Command line sessions are formatted with lines folded for easier reading.
  In HTML documents click the [-] image for a flat, copy-paste version. Click
  the [+] image for an expanded, line-wrapped version. &gt; /dev/null</screen>
 
