@@ -32,6 +32,15 @@
  <title>OpenAM Glossary</title>
 
  <glossentry>
+  <glossterm>Agent administrator</glossterm>
+  <glossdef>
+   <para>User having privileges only to read and write policy agent profile
+   configuration information, typically created to delegate policy agent
+   profile creation to the user installing a policy agent</para>
+  </glossdef>
+ </glossentry>
+
+ <glossentry>
   <glossterm>Authentication</glossterm>
   <glossdef>
    <para>The act of confirming the identity of a principal</para>

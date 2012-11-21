@@ -132,7 +132,7 @@ $ which java
   
   <procedure xml:id="create-apache20-agent-profile">
    <title>To Create the Apache 2.0 Web Agent Profile</title>
-   
+
    <para>Regardless of whether you store configurations centrally in OpenAM 
    or locally with your agents, the agent requires a profile so that it can
    connect to and communicate with OpenAM.</para>
@@ -323,7 +323,7 @@ Install log file location:
     no errors occurred on startup.</para>
     <screen>$ tail /path/to/web_agents/apache_agent/Agent_001/logs/debug/amAgent 
 2011-09-09 17:01:37.179    -1 14516:94c6e58 all: ==============...=====
-2011-09-09 17:01:37.179    -1 14516:94c6e58 all: Version: 3.0-04
+2011-09-09 17:01:37.179    -1 14516:94c6e58 all: Version: ...
 2011-09-09 17:01:37.179    -1 14516:94c6e58 all: 
 2011-09-09 17:01:37.179    -1 14516:94c6e58 all: Build Date: ...
 2011-09-09 17:01:37.179    -1 14516:94c6e58 all: Build Machine: ..forgerock.com
@@ -352,6 +352,20 @@ Install log file location:
   to create a response file for scripted installation. Then install silently
   using <command>./agentadmin --install --useResponse
   <replaceable>response-file</replaceable></command>.</para>
+
+  <para>With <command>./agentadmin --custom-install</command>, you can opt to
+  create the policy agent profile during installation. The OpenAM administrator
+  must first create an agent administrator user, as described in <link
+  xlink:href="admin-guide#delegate-agent-profile-creation"
+  xlink:role="http://docbook.org/xlink/role/olink"><citetitle>Delegating Agent
+  Profile Creation</citetitle></link>, and provide you with the agent
+  administrator user name and password. Before running the
+  <command>./agentadmin --custom-install</command> command, put the password
+  alone in a read-only file only the user installing can access, as for the
+  agent password. When the <command>agentadmin</command> command prompts you to
+  create the profile during installation, enter <literal>true</literal>, and
+  then respond to the <command>agentadmin</command> prompts for the agent
+  administrator user name and password file.</para>
  </section>
  
  <section xml:id="uninstall-apache20-agent">

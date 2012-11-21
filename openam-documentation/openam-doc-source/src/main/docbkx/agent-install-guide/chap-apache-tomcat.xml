@@ -357,7 +357,7 @@ INFO: Server startup in 810 ms</screen>
     the agent did start up.</para>
     <screen>$ tail -n 7 /path/to/j2ee_agents/tomcat_v6_agent/Agent_001/logs/debug/debug.out
 =======================================
-Version: 3.0.4
+Version: ...
 Revision: 3111
 Build Date: 20120915
 Build Machine: builds.forgerock.org

@@ -333,7 +333,7 @@ Install log file location:
     no errors occurred on startup.</para>
     <screen>$ tail /path/to/web_agents/apache24_agent/Agent_001/logs/debug/amAgent
 2012-09-14 12:48:55.613      -1 18991:85fdd48 all: ==============...=====
-2012-09-14 12:48:55.614      -1 18991:85fdd48 all: Version: 3.0-04 ER 5
+2012-09-14 12:48:55.614      -1 18991:85fdd48 all: Version: ...
 2012-09-14 12:48:55.614      -1 18991:85fdd48 all: Revision: ...
 2012-09-14 12:48:55.614      -1 18991:85fdd48 all: Build Date: ...
 2012-09-14 12:48:55.614      -1 18991:85fdd48 all: Build Machine: ...
@@ -362,6 +362,20 @@ Install log file location:
   to create a response file for scripted installation. Then install silently
   using <command>./agentadmin --install --useResponse
   <replaceable>response-file</replaceable></command>.</para>
+
+  <para>With <command>./agentadmin --custom-install</command>, you can opt to
+  create the policy agent profile during installation. The OpenAM administrator
+  must first create an agent administrator user, as described in <link
+  xlink:href="admin-guide#delegate-agent-profile-creation"
+  xlink:role="http://docbook.org/xlink/role/olink"><citetitle>Delegating Agent
+  Profile Creation</citetitle></link>, and provide you with the agent
+  administrator user name and password. Before running the
+  <command>./agentadmin --custom-install</command> command, put the password
+  alone in a read-only file only the user installing can access, as for the
+  agent password. When the <command>agentadmin</command> command prompts you to
+  create the profile during installation, enter <literal>true</literal>, and
+  then respond to the <command>agentadmin</command> prompts for the agent
+  administrator user name and password file.</para>
  </section>
 
  <section xml:id="uninstall-apache24-agent">

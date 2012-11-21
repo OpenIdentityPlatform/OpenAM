@@ -152,6 +152,11 @@
  
  <section xml:id="create-agent-profiles">
   <title>Creating Agent Profiles</title>
+  <indexterm>
+   <primary>Policy agents</primary>
+   <secondary>Creating profiles</secondary>
+  </indexterm>
+
   <para>This section concerns creating agent profiles, and creating groups
   that let agents inherit settings when you have many agents with nearly
   the same profile settings.</para>
@@ -216,7 +221,70 @@
    </step>
   </procedure>
  </section>
- 
+
+ <section xml:id="delegate-agent-profile-creation">
+  <title>Delegating Agent Profile Creation</title>
+  <indexterm>
+   <primary>Policy agents</primary>
+   <secondary>Creating profiles</secondary>
+  </indexterm>
+
+  <para>If you want to create policy agent profiles when installing policy
+  agents, then you need the credentials of an OpenAM user who can read and
+  write agent profiles.</para>
+
+  <para>You can use the OpenAM administrator account when creating policy agent
+  profiles. If however you delegate policy agent installation, then you might
+  not want to share OpenAM administrator credentials with everyone who
+  installs policy agents.</para>
+
+  <procedure xml:id="create-agent-administrators">
+   <para>Follow these steps to create <firstterm>agent administrator</firstterm>
+   users for a realm.</para>
+
+   <step>
+    <para>In OpenAM console, browse to Access Control &gt; <replaceable>Realm
+    Name</replaceable> &gt; Subjects.</para>
+   </step>
+
+   <step>
+    <para>Under Group click New... and create a group for agent
+    administrators.</para>
+   </step>
+
+   <step>
+    <para>Switch to the Privileges tab for the realm, and click the name of the
+    group you created.</para>
+   </step>
+
+   <step>
+    <para>Select "Read and write access to all configured Agents," and then
+    Save your work.</para>
+   </step>
+
+   <step>
+    <para>Return to the Subjects tab, and under User create as many agent
+    administrator users as needed.</para>
+   </step>
+
+   <step>
+    <para>For each agent administrator user, edit the user profile.</para>
+    <para>Under the Group tab of the user profile, add the user to agent
+    profile administrator group, and then Save your work.</para>
+   </step>
+
+   <step>
+    <para>Provide each system administrator who installs policy agents with
+    their agent administrator credentials.</para>
+    <para>When installing the policy agent with the
+    <option>--custom-install</option> option, the system administrator can
+    choose the option to create the profile during installation, and then
+    provide the agent administrator user name and the path to a read-only
+    file containing the agent administrator password.</para>
+   </step>
+  </procedure>
+ </section>
+
  <section xml:id="configure-web-policy-agent">
   <title>Configuring Web Policy Agents</title>
   <indexterm>
