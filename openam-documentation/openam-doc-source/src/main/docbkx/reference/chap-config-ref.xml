@@ -3531,7 +3531,7 @@
    </varlistentry>
 
    <varlistentry>
-    <term><literal>com.sun.identity.authentication.mutiple.tabs.used</literal></term>
+    <term><literal>com.sun.identity.authentication.multiple.tabs.used</literal></term>
     <listitem>
      <para>Whether to allow users to open many browser tabs to the login page
      at the same time without encountering an error.</para>
