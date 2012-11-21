@@ -37,6 +37,7 @@ import com.iplanet.dpro.session.DNOrIPAddressListTokenRestriction;
 import com.iplanet.dpro.session.TokenRestriction;
 import com.iplanet.sso.SSOException;
 import com.iplanet.sso.SSOToken;
+import com.sun.identity.common.SystemConfigurationUtil;
 import com.sun.identity.federation.message.FSAuthnRequest;
 import com.sun.identity.idm.AMIdentity;
 import com.sun.identity.idm.AMIdentityRepository;
@@ -48,6 +49,7 @@ import com.sun.identity.idm.IdSearchResults;
 import com.sun.identity.idm.IdType;
 import com.sun.identity.idm.IdUtils;
 import com.sun.identity.security.AdminTokenAction;
+import com.sun.identity.shared.Constants;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLDecoder;
@@ -59,6 +61,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import org.forgerock.openam.dpro.session.NoOpTokenRestriction;
 
 
 public class LdapSPValidator implements SPValidator {
@@ -222,8 +225,11 @@ public class LdapSPValidator implements SPValidator {
                     rootPrefix + " is: " + agentDN + " " + hostnames);
             }
 
-            return new DNOrIPAddressListTokenRestriction(agentDN.toString(),
-                    hostnames);
+            if (!Boolean.valueOf(SystemConfigurationUtil.getProperty(Constants.IS_ENABLE_UNIQUE_COOKIE))) {
+                return new NoOpTokenRestriction();
+            } else {
+                return new DNOrIPAddressListTokenRestriction(agentDN.toString(), hostnames);
+            }
        } catch (Exception ex) {
             CDCServlet.debug.error(
                     "Invalid Agent: Could not get agent for the realm", ex);
