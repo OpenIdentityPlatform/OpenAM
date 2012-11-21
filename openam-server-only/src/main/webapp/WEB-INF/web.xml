@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <web-app version="2.4" xmlns="http://java.sun.com/xml/ns/j2ee" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://java.sun.com/xml/ns/j2ee http://java.sun.com/xml/ns/j2ee/web-app_2_4.xsd">
-    <display-name>OpenSSO Services</display-name>
+    <display-name>OpenAM Services</display-name>
     <distributable/>
 
     <context-param>
@@ -126,10 +126,6 @@
     <servlet>
         <servlet-name>SMSServlet</servlet-name>
         <servlet-class>com.sun.identity.sm.SMServlet</servlet-class>
-    </servlet>
-    <servlet>
-        <servlet-name>WebCLI</servlet-name>
-        <servlet-class>com.sun.identity.cli.WebCLI</servlet-class>
     </servlet>
     <servlet>
         <servlet-name>PWResetServlet</servlet-name>
@@ -554,10 +550,6 @@
     <servlet-mapping>
         <servlet-name>jaxrpc</servlet-name>
         <url-pattern>/jaxrpc/*</url-pattern>
-    </servlet-mapping>
-    <servlet-mapping>
-        <servlet-name>WebCLI</servlet-name>
-        <url-pattern>/webcli</url-pattern>
     </servlet-mapping>
     <servlet-mapping>
         <servlet-name>SMSServlet</servlet-name>
