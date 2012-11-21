@@ -38,6 +38,17 @@
   <title>Major Changes to Existing Functionality</title>
 
   <itemizedlist>
+
+   <listitem>
+    <!-- Fix for OPENAM-1827 -->
+    <para>The internal representation of session objects has changed.</para>
+    <para>If you use session failover and depend on OpenMQ rather than the
+    new implementation, you must ensure that OpenMQ is cleared as part of the
+    upgrade to OpenAM <?eval ${serverDocTargetVersion}?>. To clear OpenMQ, run
+    <command>amsfo stop</command> and then run <command>amsfo
+    start</command>.</para>
+   </listitem>
+
    <listitem>
     <itemizedlist>
      <para>The following web policy agents are compatible with OpenAM
