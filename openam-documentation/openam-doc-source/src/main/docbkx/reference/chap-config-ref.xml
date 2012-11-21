@@ -3531,6 +3531,20 @@
    </varlistentry>
 
    <varlistentry>
+    <term><literal>com.sun.identity.authentication.client.ipAddressHeader</literal></term>
+    <listitem>
+     <para>Set the name of the HTTP header that OpenAM can examine to learn the
+     client IP address when requests go through a proxy or load balancer. (When
+     requests go through an HTTP proxy or load balancer, checking the IP address
+     on the request alone returns the address of the proxy or load balancer
+     rather than that of the client.) OpenAM must be able to trust the proxy or
+     load balancer to set the client IP address correctly in the header
+     specified.</para>
+     <para>Example: <literal>com.sun.identity.authentication.client.ipAddressHeader=X-Forwarded-For</literal></para>
+    </listitem>
+   </varlistentry>
+
+   <varlistentry>
     <term><literal>com.sun.identity.authentication.multiple.tabs.used</literal></term>
     <listitem>
      <para>Whether to allow users to open many browser tabs to the login page
