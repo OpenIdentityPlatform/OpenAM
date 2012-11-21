@@ -34,21 +34,127 @@
  <para>This chapter covers software and hardware prerequisites for installing
  and running OpenAM Policy Agents.</para>
 
- <para>TODO: Import the relevant information from
- https://wikis.forgerock.org/confluence/display/openam/OpenAM+Policy+Agents+3.0.4+supported
- modulo changes in particular for test plans.</para>
+ <para>If you have a special request to support a combination not listed here,
+ contact ForgeRock at <link xlink:href="mailto:info@forgerock.com"
+ >info@forgerock.com</link>.</para>
 
- <para>All agents except Microsoft IIS web agents require Java for installation.
- ForgeRock has tested this release of OpenAM primarily with Oracle Java SE JDK,
- and recommends the most recent release of Java 6 to ensure you have the latest
- security fixes.</para>
+ <section xml:id="java-requirements">
+  <title>Java Requirements</title>
 
- <para>Apache web agents require Apache Portable Runtime 1.3.x or later. You
- can check your installation by running <command>httpd -v</command>. On some
- systems, the packaged version of Apache HTTPD uses earlier versions of APR
- that are not compatible with the current web agents.</para>
+  <para>All policy agents except Microsoft IIS web agents require Java for
+  installation. Java EE policy agents run in a container using Java 6 or later.
+  ForgeRock recommends the most recent release of Java 6 or later to ensure
+  you have the latest security fixes.</para>
 
- <para>Before installing web policy agents on Solaris 10, make sure you have
- applied the latest shared library patch for C++, at least 119963-16 on SPARC,
- or 119964-12 on x86.</para>
+  <para>ForgeRock has tested this release with Oracle Java SE JDK.</para>
+ </section>
+
+ <section xml:id="browser-requirements">
+  <title>Browsers Tested</title>
+
+  <itemizedlist>
+   <para>ForgeRock has tested this policy agent release with the following web
+   browsers.</para>
+   <listitem><para>Chrome release 16 and later</para></listitem>
+   <listitem><para>Firefox 3.6 and later</para></listitem>
+   <listitem><para>Internet Explorer 7 and later</para></listitem>
+  </itemizedlist>
+ </section>
+
+ <section xml:id="web-server-requirements">
+  <title>Web Server Requirements</title>
+
+  <itemizedlist>
+   <para>Web policy agents support the following web servers.</para>
+
+   <listitem>
+    <para>Apache HTTP Server 2.0, 2.2, 2.4</para>
+   </listitem>
+   <listitem>
+    <para>Microsoft IIS 6, 7</para>
+   </listitem>
+<!-- Pending doc and testing
+   <listitem>
+    <para>Nginx 1.???</para>
+   </listitem>
+ -->
+   <listitem>
+    <para>Sun Proxy Server 4.0 (deprecated)</para>
+   </listitem>
+   <listitem>
+    <para>Sun Web Server 7.0 (deprecated)</para>
+   </listitem>
+  </itemizedlist>
+ </section>
+
+ <section xml:id="web-container-requirements">
+  <title>Web Application Container Requirements</title>
+
+  <itemizedlist>
+   <para>Java EE policy agents support the following Java EE application
+   containers.</para>
+
+   <listitem>
+    <para>Apache Tomcat 6, 7</para>
+   </listitem>
+   <listitem>
+    <para>GlassFish v2, v3</para>
+   </listitem>
+   <listitem>
+    <para>IBM WebSphere Application Server 6.1, 7, 8.5</para>
+   </listitem>
+   <listitem>
+    <para>JBoss Enterprise Application Platform 5</para>
+    <para>JBoss Application Server 7.1</para>
+   </listitem>
+   <listitem>
+    <para>Jetty 7</para>
+   </listitem>
+   <listitem>
+    <para>Oracle WebLogic Server 10g or later</para>
+   </listitem>
+  </itemizedlist>
+ </section>
+
+ <section xml:id="platform-requirements">
+  <title>Platform Requirements</title>
+
+  <para>Apache HTTP web policy agents have been tested on Linux 2.6 or later,
+  and on Oracle Solaris 10 or later. Apache HTTP web policy agents require
+  Apache Portable Runtime 1.3.x or later. You can check your installation by
+  running <command>httpd -v</command>. On some systems, the packaged version of
+  Apache HTTP server uses earlier versions of APR that are not compatible with
+  the current policy web agents.</para>
+
+  <para>The Microsoft IIS 6 web policy agent has been tested on Windows Server
+  2003.</para>
+
+  <para>The Microsoft IIS 7 web policy agent has been tested on Windows Server
+  2008R2.</para>
+
+  <para>Before installing web policy agents on Solaris 10, make sure you have
+  applied the latest shared library patch for C++, at least 119963-16 on SPARC,
+  or 119964-12 on x86.</para>
+
+
+  <para>Apache Tomcat Java EE policy agents have been tested on Linux 2.6 or
+  later, and on Microsoft Windows Server 2008R2.</para>
+
+  <para>GlassFish Java EE policy agents have been tested on Oracle Solaris 10
+  or later.</para>
+
+  <para>Other Java EE policy agents have been tested on Linux 2.6 or
+  later.</para>
+
+  <para>Testing has focused on 64-bit operating systems.</para>
+ </section>
+
+ <section xml:id="hardware-requirements">
+  <title>Hardware Requirements</title>
+
+  <para>You can deploy OpenAM policy agents on any hardware supported for the
+  combination of software required.</para>
+
+  <para>ForgeRock has tested this release on x86 and x64 based systems.</para>
+ </section>
 </chapter>

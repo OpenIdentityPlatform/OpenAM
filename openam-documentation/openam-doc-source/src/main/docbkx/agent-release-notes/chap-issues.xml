@@ -55,6 +55,7 @@
     xlink:show="new">OPENAM-XXXX</link>: DSCP</para>
    </listitem>  -->
 
+<!--
    <listitem>
     <para><link
     xlink:href="https://bugster.forgerock.org/jira/browse/OPENAM-1498"
@@ -65,6 +66,7 @@
     xlink:href="https://bugster.forgerock.org/jira/browse/OPENAM-1497"
     xlink:show="new">OPENAM-1497</link>: Varnish PA sets wrong http 302 header</para>
    </listitem>
+-->
    <listitem>
     <para><link
     xlink:href="https://bugster.forgerock.org/jira/browse/OPENAM-1448"
@@ -111,11 +113,6 @@
     <para><link
     xlink:href="https://bugster.forgerock.org/jira/browse/OPENAM-1339"
     xlink:show="new">OPENAM-1339</link>: Empty audit log message for windows policy agents</para>
-   </listitem>
-   <listitem>
-    <para><link
-    xlink:href="https://bugster.forgerock.org/jira/browse/OPENAM-1337"
-    xlink:show="new">OPENAM-1337</link>: LDAPv3Repo (debug) logging does not show variable values</para>
    </listitem>
    <listitem>
     <para><link

@@ -72,7 +72,9 @@
 
    <itemizedlist>
     <listitem>
-     <para>TODO</para>
+     <para>Web policy agent support for Sun Proxy Server and Sun Web Server
+     is deprecated. Support for these web servers is likely to be removed in a
+     future release.</para>
     </listitem>
    </itemizedlist>
   </section>
