@@ -2803,9 +2803,13 @@
         <entry>User Profile Service URL</entry>
         <entry>https://graph.facebook.com/me</entry>
        </row>
+       <row>
+        <entry>OAuth 2.0 Provider logout service</entry>
+        <entry>http://www.facebook.com/logout.php</entry>
+       </row>
       </tbody>
      </tgroup>
-    </table>   
+    </table>
 
 
     <table xml:id="oauth2-google" pgwide="1">
@@ -2820,19 +2824,23 @@
       <tbody>
        <row>
         <entry>Authentication Endpoint URL</entry>
-        <entry>https://accounts.google.com/o/oauth2/auth?response_type=code</entry>
+        <entry>https://accounts.google.com/o/oauth2/auth</entry>
        </row>
        <row>
         <entry>Access Token Endpoint URL</entry>
-        <entry>https://accounts.google.com/o/oauth2/token?grant_type=authorization_code</entry>
+        <entry>https://accounts.google.com/o/oauth2/token</entry>
        </row>
        <row>
         <entry>User Profile Service URL</entry>
         <entry>https://www.googleapis.com/oauth2/v1/userinfo</entry>
        </row>
+       <row>
+        <entry>OAuth 2.0 Provider logout service</entry>
+        <entry>https://mail.google.com/mail/?logout</entry>
+       </row>
       </tbody>
      </tgroup>
-    </table>   
+    </table>
 
     <table xml:id="oauth2-msn" pgwide="1">
      <title>Endpoint URLs for MSN</title>
@@ -2846,19 +2854,23 @@
       <tbody>
        <row>
         <entry>Authentication Endpoint URL</entry>
-        <entry>https://oauth.live.com/authorize?response_type=code</entry>
+        <entry>https://oauth.live.com/authorize</entry>
        </row>
        <row>
         <entry>Access Token Endpoint URL</entry>
-        <entry>https://oauth.live.com/token?grant_type=authorization_code</entry>
+        <entry>https://oauth.live.com/token</entry>
        </row>
        <row>
         <entry>User Profile Service URL</entry>
         <entry>https://apis.live.net/v5.0/me</entry>
        </row>
+       <row>
+        <entry>OAuth 2.0 Provider logout service</entry>
+        <entry>http://oauth.live.com/logout</entry>
+       </row>
       </tbody>
      </tgroup>
-    </table>   
+    </table>
     
 <!-- Waiting for User Profile Service URL info from Twitter
   <table xml:id="oauth2-twitter" pgwide="1">
@@ -2883,23 +2895,16 @@
         <entry>User Profile Service URL</entry>
         <entry>STILL NEED</entry>
        </row>
+       <row>
+        <entry>OAuth 2.0 Provider logout service</entry>
+        <entry>TODO</entry>
+       </row>
       </tbody>
      </tgroup>
     </table>   
 -->
-
   </section>
- 
- <!-- TO DO  
- <section xml:id="oauth2-recommendations">
-  <title>Recommendations</title>
 
-  <para>This sections provides some recommendations to help you make decisions about your
-  OAuth 2.0 setup and maintenance.</para>
-
-  </section>
-  -->
-  
   <section xml:id="radius-module-conf-hints">
    <title>Hints For the RADIUS Authentication Module</title>
    <para>The Remote Authentication Dial-In User Service (RADIUS) module lets
