@@ -1,11 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
-    <modelVersion>4.0.0</modelVersion>
-    
 <!--
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright (c) 2011 ForgeRock AS. All Rights Reserved
+ * Copyright (c) 2011-2012 ForgeRock Inc. All Rights Reserved
  *
  * The contents of this file are subject to the terms
  * of the Common Development and Distribution License
@@ -26,6 +23,8 @@
  * "Portions Copyrighted [year] [name of copyright owner]"
  *
  -->
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+    <modelVersion>4.0.0</modelVersion>
 
     <!-- Parent Project -->
     <parent>
@@ -36,40 +35,13 @@
 
     <!-- Component Definition -->
     <name>OpenAM MIB Schema</name>
-    <description>OpenAM MIB Schema Components
-    </description>
+    <description>OpenAM MIB Schema Components</description>
     <artifactId>openam-mib-schema</artifactId>
-    <version>10.1.0-SNAPSHOT</version>
     <packaging>jar</packaging>
-    <organization>
-        <name>ForgeRock</name>
-        <url>http://www.forgerock.com</url>
-    </organization>
 
     <!-- Build -->
     <build>
         <plugins>
-
-            <!-- Establish our generated-sources Directory for Compile Inclusion. -->
-            <plugin>
-                <groupId>org.codehaus.mojo</groupId>
-                <artifactId>build-helper-maven-plugin</artifactId>
-                <executions>
-                    <execution>
-                        <id>add-source</id>
-                        <phase>generate-sources</phase>
-                        <goals>
-                            <goal>add-source</goal>
-                        </goals>
-                        <configuration>
-                            <sources>
-                                <source>${project.build.directory}/generated-sources/mib</source>
-                            </sources>
-                        </configuration>
-                    </execution>
-                </executions>
-            </plugin>
-
             <!-- Generate MIB Source Files to prepare for Compilation -->
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
@@ -80,20 +52,28 @@
                         <phase>generate-sources</phase>
                         <configuration>
                             <target>
-                                <property name="compile_classpath" refid="maven.compile.classpath"/>
+                                <property name="compile_classpath" refid="maven.plugin.classpath"/>
 
                                 <mkdir dir="${project.build.directory}/generated-sources/mib/com/sun/identity/monitoring" />
                                 <java classname="com.sun.jdmk.tools.MibGen" fork="true"
                                       classpath="${compile_classpath}">
-                                    <arg line="-X:use-display-hint -d &quot;${project.build.directory}/generated-sources/mib/com/sun/identity/monitoring&quot; -mc -desc -tp com.sun.identity.monitoring &quot;${basedir}/src/main/resources/mib/SUN-OPENSSO-SERVER.mib&quot; &quot;${basedir}/src/main/resources/mib/mib_core.txt&quot;"/>
+                                    <arg line="-X:use-display-hint -d &quot;${project.build.directory}/generated-sources/mib/com/sun/identity/monitoring&quot; -mc -desc -tp com.sun.identity.monitoring &quot;${basedir}/src/main/resources/mib/SUN-OPENSSO-SERVER.mib&quot; &quot;${basedir}/src/main/resources/mib/mib_core.txt&quot;" />
                                 </java>
                             </target>
+                            <sourceRoot>${project.build.directory}/generated-sources/mib</sourceRoot>
                         </configuration>
                         <goals>
                             <goal>run</goal>
                         </goals>
                     </execution>
                 </executions>
+                <dependencies>
+                    <dependency>
+                        <groupId>external</groupId>
+                        <artifactId>jdmktk</artifactId>
+                        <version>2007-01-10</version>
+                    </dependency>
+                </dependencies>
             </plugin>
 
             <plugin>
@@ -139,24 +119,16 @@
     </build>
 
     <dependencies>
-    	<dependency>
-	   	    <groupId>org.forgerock.openam</groupId>
-        	<artifactId>openam-shared</artifactId>
-            <version>10.1.0-SNAPSHOT</version>
-        </dependency>
-
         <dependency>
-            <groupId>external</groupId>
-            <artifactId>jdmktk</artifactId>
-            <scope>compile</scope>
+            <groupId>org.forgerock.openam</groupId>
+            <artifactId>openam-shared</artifactId>
+            <version>${project.version}</version>
         </dependency>
 
         <dependency>
             <groupId>external</groupId>
             <artifactId>jdmkrt</artifactId>
         </dependency>
-
     </dependencies>
-    
 </project>
 
