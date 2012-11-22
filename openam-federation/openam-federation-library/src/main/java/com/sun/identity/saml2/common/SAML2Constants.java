@@ -1582,6 +1582,8 @@ public interface SAML2Constants {
      */
     public static final String OUTPUT_DATA = "OUTPUT_DATA";
 
+    public static final String RESPONSE_CODE = "RESPONSE_CODE";
+
     /**
      * Flag to Indicate that we do not want to write the Federation info
      * in the SP local User Data Store. This flag is set in the local SP

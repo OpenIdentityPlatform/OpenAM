@@ -100,6 +100,7 @@ import com.sun.identity.saml2.plugins.SAML2IdentityProviderAdapter;
 
 import java.io.IOException;
 import java.io.OutputStream;
+import java.io.PrintWriter;
 import java.util.logging.Level;
 import java.util.ArrayList;
 import java.util.Date;
@@ -368,6 +369,54 @@ public class IDPSSOUtil {
 
         String affiliationID = request.getParameter(
                 SAML2Constants.AFFILIATION_ID);
+
+        //check first if there is already an existing sessionindex associated with this SSOToken, if there is, then
+        //we need to redirect the request internally to the holder of the idpsession.
+        //The remoteServiceURL will be null if there is no sessionindex for this SSOToken, or there is, but it's
+        //local. If the remoteServiceURL is not null, we can start to send the request to the original server.
+        String remoteServiceURL = SAML2Utils.getRemoteServiceURL(getSessionIndex(session));
+        if (remoteServiceURL != null) {
+            remoteServiceURL += SAML2Utils.removeDeployUri(request.getRequestURI()) + "?" + request.getQueryString();
+            if (SAML2Utils.debug.messageEnabled()) {
+                SAML2Utils.debug.message("SessionIndex for this SSOToken is not local, forwarding the request to: "
+                        + remoteServiceURL);
+            }
+            String redirectUrl = null;
+            String outputData = null;
+            String responseCode = null;
+            HashMap<String, String> remoteRequestData =
+                    SAML2Utils.sendRequestToOrigServer(request, response, remoteServiceURL);
+            if (remoteRequestData != null && !remoteRequestData.isEmpty()) {
+                redirectUrl = remoteRequestData.get(SAML2Constants.AM_REDIRECT_URL);
+                outputData = remoteRequestData.get(SAML2Constants.OUTPUT_DATA);
+                responseCode = remoteRequestData.get(SAML2Constants.RESPONSE_CODE);
+            }
+
+            try {
+                if (redirectUrl != null && !redirectUrl.isEmpty()) {
+                    response.sendRedirect(redirectUrl);
+                } else {
+                    if (responseCode != null) {
+                        response.setStatus(Integer.valueOf(responseCode));
+                    }
+                    // no redirect, perhaps an error page, return the content
+                    if (outputData != null && !outputData.isEmpty()) {
+                        SAML2Utils.debug.message("Printing the forwarded response");
+                        response.setContentType("text/html; charset=UTF-8");
+                        PrintWriter pw = response.getWriter();
+                        pw.println(outputData);
+                        return;
+                    }
+                }
+            } catch (IOException ioe) {
+                if (SAML2Utils.debug.messageEnabled()) {
+                    SAML2Utils.debug.message("IDPSSOUtil.sendResponseToACS() error in Request Routing", ioe);
+                }
+            }
+            return;
+        }
+        //end of request proxy
+
         // generate a response for the authn request
         Response res = getResponse(session, authnReq, spEntityID, idpEntityID,
                 idpMetaAlias, realm, nameIDFormat, acsURL, affiliationID,

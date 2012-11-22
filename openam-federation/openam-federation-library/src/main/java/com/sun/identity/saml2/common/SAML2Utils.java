@@ -4615,35 +4615,30 @@ public class SAML2Utils extends SAML2SDKUtils {
                 debug.message(classMethod + "Follow redirect : " + HttpURLConnection.getFollowRedirects());
             }
 
-            // Check response code
-            if (conn.getResponseCode() == HttpURLConnection.HTTP_OK) {
-                // Input from Original servlet...
-                StringBuffer in_buf = new StringBuffer();
-                BufferedReader in = new BufferedReader(
-                    new InputStreamReader(conn.getInputStream(), "UTF-8"));
-                int len;
-                char[] buf = new char[1024];
+            // Input from Original servlet...
+            StringBuilder in_buf = new StringBuilder();
+            BufferedReader in = new BufferedReader(new InputStreamReader(conn.getInputStream(), "UTF-8"));
+            int len;
+            char[] buf = new char[1024];
 
-                while ((len = in.read(buf,0,buf.length)) != -1) {
-                    in_buf.append(buf,0,len);
-                }
-
-                String in_string = in_buf.toString();
-
-                if (debug.messageEnabled()) {
-                    debug.message(classMethod + "Received response data : " + in_string);
-                }
-
-                origRequestData.put(SAML2Constants.OUTPUT_DATA, in_string);
-            } else {
-                debug.message(classMethod + "Response code NOT OK");
+            while ((len = in.read(buf, 0, buf.length)) != -1) {
+                in_buf.append(buf, 0, len);
             }
+
+            String in_string = in_buf.toString();
+
+            if (debug.messageEnabled()) {
+                debug.message(classMethod + "Received response data : " + in_string);
+            }
+
+            origRequestData.put(SAML2Constants.OUTPUT_DATA, in_string);
 
             String redirect_url = conn.getHeaderField(LOCATION);
 
             if (redirect_url != null) {
                 origRequestData.put(SAML2Constants.AM_REDIRECT_URL, redirect_url);
             }
+            origRequestData.put(SAML2Constants.RESPONSE_CODE, Integer.toString(conn.getResponseCode()));
 
             // retrieves cookies from the response
             Map headers = conn.getHeaderFields();
@@ -4654,7 +4649,7 @@ public class SAML2Utils extends SAML2SDKUtils {
             }
         } 
         
-        return (origRequestData);
+        return origRequestData;
     }
 
     // parses the cookies from the response header and adds them in
