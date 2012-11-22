@@ -60,6 +60,8 @@ import com.sun.identity.saml2.protocol.AuthnRequest;
 import com.sun.identity.saml2.protocol.NameIDPolicy;
 import com.sun.identity.saml2.protocol.ProtocolFactory;
 import com.sun.identity.saml2.protocol.Response;
+import com.sun.identity.shared.Constants;
+import com.sun.identity.shared.configuration.SystemPropertiesManager;
 import com.sun.identity.shared.encode.Base64;
 import com.sun.identity.shared.encode.URLEncDec;
 import com.sun.identity.shared.xml.XMLUtils;
@@ -1293,7 +1295,7 @@ public class IDPSSOFederate {
         }
         newURL.append(URLEncDec.encode(gotoURL.
                 append("?ReqID=").append(reqID).toString()));
-        
+
         if (SAML2Utils.debug.messageEnabled()) {
             SAML2Utils.debug.message(classMethod +
                 "New URL for authentication: " + newURL.toString());
@@ -1302,7 +1304,8 @@ public class IDPSSOFederate {
         // do forward if we are in the same container ,
         // else redirection
         if (forward) {
-
+            newURL.append('&').append(SystemPropertiesManager.get(Constants.AM_AUTH_COOKIE_NAME, "AMAuthCookie"));
+            newURL.append('=');
             SAML2Utils.debug.message("forward to " + newURL.toString());
             try {
                 request.getRequestDispatcher(newURL.toString()).

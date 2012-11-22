@@ -764,12 +764,11 @@ public class AuthClientUtils {
      */
     private static SessionID getSidFromCookie(HttpServletRequest request) {
         SessionID sessionID = null;
-        String authCookieName = getAuthCookieName();
-        String sidValue =
-            CookieUtils.getCookieValueFromReq(request,authCookieName);
+        //Let's check the URL first in case this is a forwarded request from Federation. URL should have precedence
+        //over the actual cookie value, so this way a new federated auth can always start with a clear auth session.
+        String sidValue = SessionEncodeURL.getSidFromURL(request, getAuthCookieName());
         if (sidValue == null) {
-            sidValue =
-                SessionEncodeURL.getSidFromURL(request,authCookieName);
+            sidValue = CookieUtils.getCookieValueFromReq(request, getAuthCookieName());
         }
         if (sidValue != null) {
             sessionID = new SessionID(sidValue);
