@@ -170,6 +170,7 @@ public interface SAMLv2Model
         "wantArtifactResolveSigned";
     public static final String AUTH_URL =
         "AuthUrl";
+    public static final String RP_URL = "RpUrl";
     public static final String APP_LOGOUT_URL = "appLogoutUrl";
     public static final String ASSERTION_CACHE_ENABLED =
         "assertionCacheEnabled";

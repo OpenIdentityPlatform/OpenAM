@@ -27,7 +27,7 @@
  */
 
 /*
- * Portions Copyrighted [2010] [ForgeRock AS]
+ * Portions Copyrighted 2010-2012 ForgeRock Inc
  */
 
 package com.sun.identity.saml2.common;
@@ -187,7 +187,13 @@ public interface SAML2Constants {
      * String to represent the authentication service url
      */
     public String AUTH_URL = "AuthUrl";
- 
+
+    /**
+     * Used when the SAML endpoints are RP'd to a non-server/site URL, typically
+     * to DAS
+     */
+    public String RP_URL = "RpUrl";
+
     /**
      * Strings represent primitive top-level StatusCode values 
      */

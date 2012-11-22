@@ -135,6 +135,7 @@ public class SAMLv2ModelImpl extends EntityModelImpl implements SAMLv2Model {
         extendedMetaIdpMap.put(BOOT_STRAP_ENABLED, Collections.EMPTY_SET);
         extendedMetaIdpMap.put(ARTIF_RESOLVE_SIGN, Collections.EMPTY_SET);
         extendedMetaIdpMap.put(AUTH_URL, Collections.EMPTY_SET);
+        extendedMetaIdpMap.put(RP_URL, Collections.EMPTY_SET);
         extendedMetaIdpMap.put(APP_LOGOUT_URL, Collections.EMPTY_SET);
         extendedMetaIdpMap.put(ASSERTION_CACHE_ENABLED,
                 Collections.EMPTY_SET);
@@ -277,6 +278,7 @@ public class SAMLv2ModelImpl extends EntityModelImpl implements SAMLv2Model {
         extendedAPMetaIdpMap.put(IDP_AUTO_FED_ATTR, Collections.EMPTY_SET);
         extendedAPMetaIdpMap.put(IDP_ACCT_MAPPER, Collections.EMPTY_SET);
         extendedAPMetaIdpMap.put(AUTH_URL, Collections.EMPTY_SET);
+        extendedAPMetaIdpMap.put(RP_URL, Collections.EMPTY_SET);
         extendedAPMetaIdpMap.put(APP_LOGOUT_URL, Collections.EMPTY_SET);
     }
     

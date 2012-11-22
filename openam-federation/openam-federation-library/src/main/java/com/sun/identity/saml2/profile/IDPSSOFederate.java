@@ -30,14 +30,16 @@
 
 package com.sun.identity.saml2.profile;
 
+import com.sun.identity.federation.common.FSUtils;
 import com.sun.identity.multiprotocol.MultiProtocolUtils;
 import com.sun.identity.multiprotocol.SingleLogoutManager;
 import com.sun.identity.plugin.monitoring.FedMonAgent;
 import com.sun.identity.plugin.monitoring.FedMonSAML2Svc;
 import com.sun.identity.plugin.monitoring.MonitorManager;
+import com.sun.identity.plugin.session.SessionException;
 import com.sun.identity.plugin.session.SessionManager;
 import com.sun.identity.plugin.session.SessionProvider;
-import com.sun.identity.plugin.session.SessionException;
+import com.sun.identity.saml.common.SAMLUtils;
 import com.sun.identity.saml2.assertion.AuthnContext;
 import com.sun.identity.saml2.common.QuerySignatureUtil;
 import com.sun.identity.saml2.common.SAML2Constants;
@@ -45,33 +47,34 @@ import com.sun.identity.saml2.common.SAML2Exception;
 import com.sun.identity.saml2.common.SAML2Utils;
 import com.sun.identity.saml2.jaxb.metadata.IDPSSODescriptorElement;
 import com.sun.identity.saml2.jaxb.metadata.SPSSODescriptorElement;
-import com.sun.identity.saml2.logging.LogUtil;
 import com.sun.identity.saml2.key.KeyUtil;
+import com.sun.identity.saml2.logging.LogUtil;
 import com.sun.identity.saml2.meta.SAML2MetaException;
 import com.sun.identity.saml2.meta.SAML2MetaManager;
 import com.sun.identity.saml2.meta.SAML2MetaUtils;
 import com.sun.identity.saml2.plugins.IDPAuthnContextInfo;
 import com.sun.identity.saml2.plugins.IDPAuthnContextMapper;
 import com.sun.identity.saml2.plugins.IDPECPSessionMapper;
+import com.sun.identity.saml2.plugins.SAML2IdentityProviderAdapter;
 import com.sun.identity.saml2.protocol.AuthnRequest;
 import com.sun.identity.saml2.protocol.NameIDPolicy;
 import com.sun.identity.saml2.protocol.ProtocolFactory;
 import com.sun.identity.saml2.protocol.Response;
-import com.sun.identity.saml.common.SAMLUtils;
 import com.sun.identity.shared.encode.Base64;
 import com.sun.identity.shared.encode.URLEncDec;
 import com.sun.identity.shared.xml.XMLUtils;
 import java.io.ByteArrayInputStream;
-import java.io.InputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.OutputStream;
 import java.security.cert.X509Certificate;
-import java.util.logging.Level;
-import java.util.Iterator;
-import java.util.Set;
-import java.util.Map;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.logging.Level;
+import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.xml.soap.MimeHeaders;
@@ -79,9 +82,6 @@ import javax.xml.soap.SOAPException;
 import javax.xml.soap.SOAPMessage;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
-import javax.servlet.ServletException;
-import com.sun.identity.federation.common.FSUtils;
-import com.sun.identity.saml2.plugins.SAML2IdentityProviderAdapter;
 
 /**
  * This class handles the federation and/or single sign on request
@@ -1281,8 +1281,15 @@ public class IDPSSOFederate {
         if(forward){
             gotoURL = new StringBuffer(getRelativePath(request.getRequestURI(),
                    request.getContextPath()));
-        }else{
-            gotoURL = request.getRequestURL();
+        } else {
+            String rpUrl = IDPSSOUtil.getAttributeValueFromIDPSSOConfig(
+                    realm, idpEntityID, SAML2Constants.RP_URL);
+            if (rpUrl != null && !rpUrl.isEmpty()) {
+                gotoURL = new StringBuffer(rpUrl);
+                gotoURL.append(getRelativePath(request.getRequestURI(), request.getContextPath()));
+            } else {
+                gotoURL = request.getRequestURL();
+            }
         }
         newURL.append(URLEncDec.encode(gotoURL.
                 append("?ReqID=").append(reqID).toString()));
