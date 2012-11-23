@@ -2742,14 +2742,15 @@
      </listitem>
     </varlistentry>
    </variablelist>
-   
-     <para><!--TO DO Each site that participates in OAuth 2.0 has information specific to their endpoints
-  that you can add to the <link xlink:href="admin-guide#chap-oauth2"
-   xlink:role="http://docbook.org/xlink/role/olink">Authorization Module</link> 
-   PLEASE POINT THE LINK TO THE SPECIFIC SECTION FOR SETUP. -->The following tables show the largest current
-   OAuth 2.0 provides. Facebook is the default setting, but just in case, it is also included.
-   Please keep in mind these are not required field, but default settings for the different
-   large providers. Fields not listed here are generally up to the user, like scope and attribute mapping.</para> 
+
+    <para>The following tables show endpoint URLs for OpenAM when <link
+    xlink:href="admin-guide#chap-oauth2"
+    xlink:role="http://docbook.org/xlink/role/olink">configured as an
+    OAuth 2.0 provider</link>, and also URLs for large OAuth 2.0 providers.
+    The default endpoints are for Facebook as the OAuth 2.0 provider.</para>
+
+    <para>In addition to the endpoint URLs you can set other fields, like scope
+    and attribute mapping, depending on the provider you use.</para>
 
     <table xml:id="oauth2-openam" pgwide="1">
      <title>Endpoint URLs for OpenAM</title>
