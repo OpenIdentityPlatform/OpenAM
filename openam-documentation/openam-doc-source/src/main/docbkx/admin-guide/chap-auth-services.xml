@@ -2763,23 +2763,28 @@
       <tbody>
        <row>
         <entry>Authentication Endpoint URL</entry>
-        <entry>Dependent on the domain name used. For <literal>openam.example.com:18080</literal>
-        enter <literal>https://openam.example.com:8080/openam/oauth2/authorize</literal>.</entry>
+        <entry>
+         <para><literal>/oauth2/authorize</literal> under the deployment URL.</para>
+         <para>Example: <literal
+         >https://openam.example.com:8443/openam/oauth2/authorize</literal>.</para></entry>
        </row>
        <row>
         <entry>Access Token Endpoint URL</entry>
-        <entry>Dependent on the domain name used. For <literal>openam.example.com:18080</literal>
-        enter <literal>https://openam.example.com:8080/openam/oauth2/access_token</literal>.</entry>
+        <entry>
+         <para><literal>/oauth2/access_token</literal> under the deployment URL.</para>
+         <para>Example: <literal
+         >https://openam.example.com:8443/openam/oauth2/access_token</literal>.</para></entry>
        </row>
        <row>
         <entry>User Profile Service URL</entry>
-        <entry>Dependent on the domain name used. For <literal>openam.example.com:18080</literal>
-        enter <literal>https://openam.example.com:8080/openam/oauth2/tokeninfo</literal>.</entry>
+        <entry>
+         <para><literal>/oauth2/tokeninfo</literal> under the deployment URL.</para>
+         <para>Example: <literal
+         >https://openam.example.com:8443/openam/oauth2/tokeninfo</literal>.</para></entry>
        </row>
       </tbody>
      </tgroup>
-    </table>   
-
+    </table>
 
     <table xml:id="oauth2-facebook" pgwide="1">
      <title>Endpoint URLs for Facebook</title>
