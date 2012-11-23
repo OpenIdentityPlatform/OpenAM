@@ -2469,10 +2469,9 @@
   <section xml:id="oauth2-module-conf-hints">
    <title>Hints For the OAuth 2.0 Authentication Module</title>
    <para>The OAuth 2.0 authentication module lets OpenAM authenticate clients
-   of OAuth resource servers. References in this section are to the
-   Internet-Draft <link
-   xlink:href="http://tools.ietf.org/html/draft-ietf-oauth-v2-22">The OAuth 2.0
-   Authorization Protocol</link>.</para>
+   of OAuth resource servers. References in this section are to RFC 6749, <link
+   xlink:href="http://tools.ietf.org/html/rfc6749" xlink:show="new">The OAuth
+   2.0 Authorization Framework</link>.</para>
    <indexterm>
     <primary>Authentication</primary>
     <secondary>OAuth 2.0</secondary>
@@ -2492,9 +2491,9 @@
     <varlistentry>
      <term>Client ID</term>
      <listitem>
-      <para>OAuth <literal>client_id</literal> as described in section 2.2 of 
-      <link xlink:href="http://tools.ietf.org/html/rfc6749"><citetitle>The OAuth 2.0 Authorization 
-      Framework</citetitle></link>.</para>
+      <para>OAuth <literal>client_id</literal> as described in
+      <link xlink:href="http://tools.ietf.org/html/rfc6749#section-2.2"
+      xlink:show="new">section 2.2 of RFC 6749</link>.</para>
       <para><command>ssoadm</command> attribute:
       <literal>iplanet-am-auth-oauth-client-id</literal></para>
      </listitem>
@@ -2502,9 +2501,9 @@
     <varlistentry>
      <term>Client Secret</term>
      <listitem>
-      <para>OAuth <literal>client_secret</literal> as described in section 2.3 of 
-      <link xlink:href="http://tools.ietf.org/html/rfc6749"><citetitle>The OAuth 2.0 Authorization 
-      Framework</citetitle></link>.</para>
+      <para>OAuth <literal>client_secret</literal> as described in
+      <link xlink:href="http://tools.ietf.org/html/rfc6749#section-2.3"
+      xlink:show="new">section 2.3 of RFC 6749</link>.</para>
       <para><command>ssoadm</command> attribute:
       <literal>iplanet-am-auth-oauth-client-secret</literal></para>
      </listitem>
@@ -2512,8 +2511,10 @@
     <varlistentry>
      <term>Authentication Endpoint URL</term>
      <listitem>
-      <para>URL to the end point handling OAuth authentication. The default value
-      is <literal>https://www.facebook.com/dialog/oauth</literal>.</para>
+      <para>URL to the end point handling OAuth authentication as described in
+      <link xlink:href="http://tools.ietf.org/html/rfc6749#section-3.1"
+      xlink:show="new">section 3.1 of RFC 6749</link>. The default value is
+      <literal>https://www.facebook.com/dialog/oauth</literal>.</para>
       <para><command>ssoadm</command> attribute:
       <literal>iplanet-am-auth-oauth-auth-service</literal></para>
      </listitem>
@@ -2521,8 +2522,9 @@
     <varlistentry>
      <term>Access Token Endpoint URL</term>
      <listitem>
-      <para>URL to the end point handling access tokens as described in section
-      3.2 of the Internet-Draft. The default value is 
+      <para>URL to the end point handling access tokens as described in
+      <link xlink:href="http://tools.ietf.org/html/rfc6749#section-3.2"
+      xlink:show="new">section 3.2 of RFC 6749</link>. The default value is
       <literal>https://graph.facebook.com/oauth/access_token</literal>.</para>
       <para><command>ssoadm</command> attribute:
       <literal>iplanet-am-auth-oauth-token-service</literal></para>
@@ -2532,7 +2534,7 @@
      <term>User Profile Service URL</term>
      <listitem>
       <para>User profile URL that returns profile information in JSON
-      format. The default value is 
+      format. The default value is
       <literal>https://graph.facebook.com/me</literal>.</para>
       <para><command>ssoadm</command> attribute:
       <literal>iplanet-am-auth-oauth-user-profile-service</literal></para>
@@ -2550,8 +2552,8 @@
     <varlistentry>
      <term>Proxy URL</term>
      <listitem>
-      <para>URL to the <filename>oauthproxy.jsp</filename> file, by default
-      part of OpenAM. </para>
+      <para>URL to the <filename>/oauth2c/OAuthProxy.jsp</filename> file,
+      part of OpenAM.</para>
       <para><command>ssoadm</command> attribute:
       <literal>iplanet-am-auth-oauth-sso-proxy-url</literal></para>
      </listitem>
@@ -2559,7 +2561,7 @@
     <varlistentry>
      <term>Account Mapper</term>
      <listitem>
-      <para>Class implementing account mapping. The default value is 
+      <para>Class implementing account mapping. The default value is
       <literal>org.forgerock.openam.authentication.modules.oauth2.DefaultAccountMapper</literal>.</para>
       <para><command>ssoadm</command> attribute:
       <literal>org-forgerock-auth-oauth-account-mapper</literal></para>
@@ -2598,8 +2600,8 @@
     <varlistentry>
      <term>Save attributes in the session</term>
      <listitem>
-      <para>When enabled, add the mapped attributes to the session saved. The default mode is
-      <literal>Enabled</literal>.</para>
+      <para>When enabled, add the mapped attributes to the session saved. The
+      default mode is <literal>Enabled</literal>.</para>
       <para><command>ssoadm</command> attribute:
       <literal>org-forgerock-auth-oauth-save-attributes-to-session-flag</literal></para>
      </listitem>
@@ -2648,8 +2650,8 @@
     <varlistentry>
      <term>Anonymous User</term>
      <listitem>
-      <para>Specifies an anonymous user that exists in the current realm. The default is
-      <literal>anonymous</literal>.</para>
+      <para>Specifies an anonymous user that exists in the current realm. The
+      default is <literal>anonymous</literal>.</para>
       <para><command>ssoadm</command> attribute:
       <literal>org-forgerock-auth-oauth-anonymous-user</literal></para>
      </listitem>
@@ -2685,7 +2687,8 @@
     <varlistentry>
      <term>SMTP host</term>
      <listitem>
-      <para>Host name of the mail server. The default is <literal>localhost</literal>.</para>
+      <para>Host name of the mail server. The default is
+      <literal>localhost</literal>.</para>
       <para><command>ssoadm</command> attribute:
       <literal>org-forgerock-auth-oauth-smtp-hostname</literal></para>
      </listitem>
@@ -2693,7 +2696,8 @@
     <varlistentry>
      <term>SMTP port</term>
      <listitem>
-      <para>SMTP port number for the mail server.  The default value is <literal>25</literal>.</para>
+      <para>SMTP port number for the mail server. The default value is
+      <literal>25</literal>.</para>
       <para><command>ssoadm</command> attribute:
       <literal>org-forgerock-auth-oauth-smtp-port</literal></para>
      </listitem>
@@ -2729,7 +2733,8 @@
      <term>SMTP From address</term>
      <listitem>
       <para>Specifies the message sender address, such as
-      <literal>no-reply@example.com</literal>. The default value is <literal>info@forgerock.com</literal>.</para>
+      <literal>no-reply@example.com</literal>. The default value is
+      <literal>info@forgerock.com</literal>.</para>
       <para><command>ssoadm</command> attribute:
       <literal>org-forgerock-auth-oauth-smtp-email-from</literal></para>
      </listitem>
