@@ -43,7 +43,6 @@
                 <include>org.forgerock.openam:openam-server-only:war</include>
                 <include>org.forgerock.openam:openam-clientsdk:jar</include>
                 <include>org.forgerock.openam:openam-distauth:war</include>
-                <include>org.forgerock.openam:openam-distribution-amadmsetup:jar</include>
                 <include>org.forgerock.openam:openam-distribution-library:zip</include>
                 <include>org.forgerock.openam:openam-distribution-fedlet-unconfigured:zip</include>
                 <include>org.forgerock.openam:openam-distribution-ssoadmintools:zip</include>
