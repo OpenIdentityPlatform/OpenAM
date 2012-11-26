@@ -72,7 +72,7 @@
   </mediaobject>
 
   <section xml:id="openam-oauth2-authz-server">
-   <title>OpenAM as OAuth 2.0 Authentication Server</title>
+   <title>OpenAM as OAuth 2.0 Authorization Server</title>
 
    <para>OpenAM can function as an OAuth 2.0 <firstterm>authorization
    server</firstterm>. In this role, OpenAM authenticates resource owners and
