@@ -26,6 +26,10 @@
     $Id: HOTP.xml,v 1.1 2009/03/24 23:52:13 pluo Exp $
 
 -->
+<!--
+    Portions Copyrighted 2012 ForgeRock Inc
+    Portions Copyrighted 2012 Nomura Research Institute, Ltd
+-->
 
 <!DOCTYPE ModuleProperties PUBLIC "=//iPlanet//Authentication Module Properties XML Interface 1.0 DTD//EN"
         "jar://com/sun/identity/authentication/Auth_Module_Properties.dtd">
@@ -33,7 +37,7 @@
 
 <ModuleProperties moduleName="HOTP" version="1.0" >
     <Callbacks length="0" order="1" timeout="120" header="#WILL NOT BE SHOWN#" />
-    <Callbacks length="2" order="2" timeout="120" header="This server uses OATH OTP authentication" >
+    <Callbacks length="2" order="2" timeout="120" header="This server uses HOTP authentication" >
         <PasswordCallback echoPassword="false" >
             <Prompt> Enter OTP Code: </Prompt>
         </PasswordCallback>
