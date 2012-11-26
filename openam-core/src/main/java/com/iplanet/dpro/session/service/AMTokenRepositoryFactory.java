@@ -22,8 +22,8 @@ package com.iplanet.dpro.session.service;
 
 import com.iplanet.am.util.SystemProperties;
 import com.sun.identity.coretoken.interfaces.AMTokenRepository;
-import com.sun.identity.sm.ldap.CTSPersistentStore;
-import com.sun.identity.sm.mq.JMQSessionRepository;
+import com.sun.identity.sm.ldap.CTSPersistentStoreInjector;
+import com.sun.identity.sm.mq.JMQSessionRepositoryInjector;
 
 /**
  * <code>AMTokenRepositoryFactory</code> provides a default
@@ -37,20 +37,21 @@ import com.sun.identity.sm.mq.JMQSessionRepository;
  */
 
 class AMTokenRepositoryFactory {
-
+    /**
+     * Our Injector Classes for our Instance.
+     */
+    private static final CTSPersistentStoreInjector ctsPersistentStoreInjector = new CTSPersistentStoreInjector();
+    private static final JMQSessionRepositoryInjector jmqSessionRepositoryInjector = new JMQSessionRepositoryInjector();
     /**
      * Global Definitions.
      */
     private static final String DEFAULT_CTS_REPOSITORY_CLASS_NAME =
-            CTSPersistentStore.class.getName();
+            ctsPersistentStoreInjector.getInstanceClassName();
 
     private static final String CTS_REPOSITORY_CLASS_NAME = SystemProperties.get(
             AMTokenRepository.CTS_REPOSITORY_CLASS_PROPERTY, DEFAULT_CTS_REPOSITORY_CLASS_NAME);
 
-    /**
-     * Singleton instance of AM Session Repository or CTS.
-     */
-    private static AMTokenRepository amTokenRepository = null;
+    private static AMTokenRepository amTokenRepository;
 
     /**
      * Private, do not allow instantiation.
@@ -68,10 +69,10 @@ class AMTokenRepositoryFactory {
     protected static AMTokenRepository getInstance()
             throws Exception {
         if (amTokenRepository == null) {
-            if (CTS_REPOSITORY_CLASS_NAME.equals(CTSPersistentStore.class.getName())) {
-                amTokenRepository = CTSPersistentStore.getInstance();
-            } else if (CTS_REPOSITORY_CLASS_NAME.equals(JMQSessionRepository.class.getName())) {
-                amTokenRepository = JMQSessionRepository.getInstance();
+            if (CTS_REPOSITORY_CLASS_NAME.equals(ctsPersistentStoreInjector.getInstanceClassName())) {
+                amTokenRepository = (AMTokenRepository) ctsPersistentStoreInjector.getInstance();
+            } else if (CTS_REPOSITORY_CLASS_NAME.equals(jmqSessionRepositoryInjector.getInstanceClassName())) {
+                amTokenRepository = (AMTokenRepository) jmqSessionRepositoryInjector.getInstance();
             } else {
                 throw new IllegalAccessException("Unable to instantiate the CTS Persistent Store as Implementation Class:["+
                         CTS_REPOSITORY_CLASS_NAME+"], is unknown to OpenAM!");

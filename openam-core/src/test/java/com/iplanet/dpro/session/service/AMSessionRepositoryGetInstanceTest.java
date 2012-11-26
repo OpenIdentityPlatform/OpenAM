@@ -31,7 +31,7 @@ package com.iplanet.dpro.session.service;
 
 import com.iplanet.am.util.SystemProperties;
 import com.sun.identity.coretoken.interfaces.AMTokenRepository;
-import com.sun.identity.sm.ldap.CTSPersistentStore;
+import com.sun.identity.sm.ldap.CTSPersistentStoreInjector;
 import org.junit.Ignore;
 import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeClass;
@@ -64,7 +64,7 @@ public class AMSessionRepositoryGetInstanceTest {
         SystemProperties systemProperties = new SystemProperties();
         AMTokenRepository amTokenRepository = AMTokenRepositoryFactory.getInstance();
         assertNotNull(amTokenRepository);
-        assertEquals(CTSPersistentStore.class.getName(), amTokenRepository.getClass().getName());
+        assertEquals(new CTSPersistentStoreInjector().getInstanceClassName(), amTokenRepository.getClass().getName());
     }
 
 

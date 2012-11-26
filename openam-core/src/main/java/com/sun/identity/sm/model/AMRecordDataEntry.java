@@ -44,7 +44,7 @@ import com.iplanet.dpro.session.service.SessionService;
 import com.sun.identity.shared.Constants;
 import com.sun.identity.shared.debug.Debug;
 
-import com.sun.identity.sm.ldap.CTSPersistentStore;
+import com.sun.identity.sm.ldap.CTSPersistentStoreInjector;
 import org.apache.commons.codec.binary.Base64;
 import org.forgerock.i18n.LocalizableMessage;
 import com.iplanet.dpro.session.exceptions.StoreException;
@@ -97,7 +97,7 @@ public class AMRecordDataEntry {
     private static void initialize() {
         List<String> valueList = new ArrayList<String>();
         valueList.add(Constants.TOP);
-        valueList.add(CTSPersistentStore.FR_FAMRECORD);
+        valueList.add(CTSPersistentStoreInjector.FR_FAMRECORD);
         LDAPAttribute ldapAttr = new LDAPAttribute(Constants.OBJECTCLASS, valueList);
         objectClasses = new ArrayList<LDAPAttribute>();
         objectClasses.add(ldapAttr);

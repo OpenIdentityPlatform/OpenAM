@@ -16,34 +16,19 @@
  */
 package org.forgerock.openam.ext.cts.repo;
 
-import com.iplanet.dpro.session.exceptions.StoreException;
-import com.sun.identity.common.GeneralTaskRunnable;
-import com.sun.identity.common.SystemTimer;
-import com.sun.identity.coretoken.interfaces.AMTokenRepository;
 import com.sun.identity.coretoken.interfaces.OAuth2TokenRepository;
-import com.sun.identity.shared.Constants;
-import com.sun.identity.shared.configuration.SystemPropertiesManager;
 import com.sun.identity.shared.debug.Debug;
-import com.sun.identity.sm.ldap.CTSPersistentStore;
+import com.sun.identity.sm.ldap.CTSPersistentStoreInjector;
 import org.forgerock.json.fluent.JsonValue;
 import org.forgerock.json.fluent.JsonValueException;
 import org.forgerock.json.resource.JsonResource;
 import org.forgerock.json.resource.JsonResourceException;
 import org.forgerock.json.resource.SimpleJsonResource;
-import com.sun.identity.sm.model.TokenDataEntry;
-import com.sun.identity.shared.OAuth2Constants;
 import org.forgerock.openam.oauth2.utils.OAuth2Utils;
-import org.forgerock.openam.session.ha.amsessionstore.store.opendj.EmbeddedSearchResultIterator;
-import org.opends.server.core.AddOperation;
-import org.opends.server.core.DeleteOperation;
-import org.opends.server.protocols.internal.InternalClientConnection;
-import org.opends.server.protocols.internal.InternalSearchOperation;
-import org.opends.server.types.*;
+import org.forgerock.openam.shared.service.OpenAMService;
 import org.restlet.Request;
 
-import java.util.*;
-
-public class OpenDJTokenRepo implements JsonResource {
+public class OpenDJTokenRepo implements JsonResource, OpenAMService {
 
 
     final static Debug debug = Debug.getInstance("CTS");
@@ -56,11 +41,29 @@ public class OpenDJTokenRepo implements JsonResource {
      */
     public OpenDJTokenRepo() throws Exception {
 
-        try {
-            cts = CTSPersistentStore.getInstance();
-        } catch (StoreException e){
-            throw new JsonResourceException(JsonResourceException.UNAVAILABLE, "Core Token Service is Unavailable");
-        }
+            CTSPersistentStoreInjector ctsPersistentStoreInjector = new CTSPersistentStoreInjector();
+            cts = (OAuth2TokenRepository) ctsPersistentStoreInjector.getInstance();
+            if (cts == null) {
+                throw new JsonResourceException(JsonResourceException.UNAVAILABLE, "Core Token Service is Unavailable");
+            }
+    }
+
+    /**
+     * Obtain the Associated Implementation Instance currently available at runtime.
+     *
+     * @return OpenAMService - Obtain Instance of OpenAM Service Implementation.
+     */
+    public OpenAMService getInstance() {
+        return this;
+    }
+
+    /**
+     * Obtain the Instance Class Name of the implementing Service class.
+     *
+     * @return
+     */
+    public String getInstanceClassName() {
+        return OpenDJTokenRepo.class.getName();
     }
 
     /**
