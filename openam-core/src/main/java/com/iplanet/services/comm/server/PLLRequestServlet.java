@@ -25,7 +25,9 @@
  * $Id: PLLRequestServlet.java,v 1.9 2009/02/12 17:24:13 bina Exp $
  *
  */
-
+/**
+ * Portions Copyrighted 2012 ForgeRock, Inc.
+ */
 package com.iplanet.services.comm.server;
 
 import com.iplanet.am.util.SystemProperties;
@@ -132,6 +134,7 @@ public class PLLRequestServlet extends HttpServlet {
         }
          
 	String responseXML = handleRequest(set, req, res);
+        res.setContentLength(responseXML.getBytes("UTF-8").length);
         OutputStreamWriter out = new OutputStreamWriter(res.getOutputStream(),
                 "UTF-8");
         try {
