@@ -425,7 +425,7 @@ public class IdentityServicesImpl
         UserDetails details = new UserDetails();
         try {
             SSOToken ssoToken = getSSOToken(subject);
-            if (refresh) {
+            if (refresh != null && refresh) {
                 SSOTokenManager.getInstance().refreshSession(ssoToken);
             }
             Map<String, Set<String>> sessionAttributes = new HashMap<String, Set<String>>();
