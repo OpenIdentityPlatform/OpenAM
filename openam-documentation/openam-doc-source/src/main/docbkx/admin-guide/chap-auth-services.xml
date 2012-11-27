@@ -2622,7 +2622,14 @@
      <listitem>
       <para>When enabled, if the user profile does not exist, optionally
       retrieve a password and activation code from the user, and then create
-      the profile.  The default mode is <literal>Enabled</literal>.</para>
+      the profile. The default mode is <literal>Enabled</literal>.</para>
+
+      <para>When the OAuth 2.0 client is configured to create new accounts,
+      the SMTP settings must also be valid. As part of account creation,
+      the OAuth 2.0 client authentication module sends the resource owner
+      an email with an account activation code. To send the mail, OpenAM
+      uses the SMTP settings you provide here in the OAuth 2.0 client
+      configuration.</para>
       <para><command>ssoadm</command> attribute:
       <literal>org-forgerock-auth-oauth-createaccount-flag</literal></para>
      </listitem>
