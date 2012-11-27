@@ -132,15 +132,7 @@
             <groupId>org.forgerock</groupId>
             <artifactId>openam-core</artifactId>
         </dependency>
-        <dependency>
-            <groupId>org.forgerock</groupId>
-            <artifactId>openam-session-ha-common</artifactId>
-        </dependency>
 
-        <dependency>
-            <groupId>org.forgerock</groupId>
-            <artifactId>openam-session-ha-core</artifactId>
-        </dependency>
         <dependency>
             <groupId>org.restlet.jse</groupId>
             <artifactId>org.restlet</artifactId>

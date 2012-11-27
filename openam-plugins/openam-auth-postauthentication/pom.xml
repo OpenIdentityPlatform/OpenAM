@@ -35,7 +35,7 @@
     </parent>
 
     <!-- Component Definition -->
-    <name>OpenAm PostAuthN plugins</name>
+    <name>OpenAM PostAuthN plugins</name>
     <description>OpenAM Post AuthN Plugin
     </description>
     <artifactId>openam-auth-postauthentication</artifactId>
