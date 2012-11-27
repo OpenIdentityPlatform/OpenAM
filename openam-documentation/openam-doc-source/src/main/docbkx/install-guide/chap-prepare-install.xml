@@ -212,11 +212,6 @@ esac
     to enable it to use federated access management</para></listitem>
    </varlistentry>
    <varlistentry>
-    <term><filename><?eval ${libraryZipFile}?></filename></term>
-    <listitem><para>The .zip file that contains OpenAM libraries for
-    Ant builds</para></listitem>
-   </varlistentry>
-   <varlistentry>
     <term><filename><?eval ${ssoadminZipFile}?></filename></term>
     <listitem><para>The .zip file that contains tools to manage OpenAM from 
     the command line</para></listitem>
