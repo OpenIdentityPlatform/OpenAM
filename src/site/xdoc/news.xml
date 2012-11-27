@@ -33,6 +33,16 @@
  </properties>
  <body>
   <section name="New Releases">
+   <p>November 23, 2012. OpenAM 9.5.5 has been released and is available from
+   the <a href="http://forgerock.org/openam.html">download page</a>. This
+   maintenance release resolves a number of issues, including security issues
+   within OpenAM. Read the <a
+   href="https://wikis.forgerock.org/confluence/display/openam/OpenAM+9.5.5+Release+Notes"
+   >Release Notes</a>, which are posted on the ForgeRock Wiki. You can also
+   review the <a
+   href="http://lists.forgerock.org/pipermail/openam/2012-November/009314.html"
+   >release announcement</a> in the OpenAM users mail archive.</p>
+
    <p>April 16, 2012. OpenAM 10.0.0 is now available from the <a
    href="http://forgerock.org/openam.html">download page</a>. This major release
    of OpenAM brings many new features, enhancement, and fixes. The final <a
