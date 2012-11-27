@@ -312,11 +312,319 @@ $ curl "https://openam.example.com:8080/openam/identity/log?
    <primary>User data</primary>
    <secondary>REST access</secondary>
   </indexterm>
-  <para>This section shows how you create, read (search), update, and delete
-  identities using the RESTful API.</para>
-  
+  <para>This section shows how you create, read, update, and delete identities
+  using the RESTful APIs.</para>
+
+  <itemizedlist>
+   <para>OpenAM has two REST APIs for managing identities.</para>
+
+   <listitem>
+    <para>Under the <literal>/json/users</literal> endpoint, you find the
+    newer JSON-based API.</para>
+    <para>Examples in this section show authentication using the API described
+    in <xref linkend="rest-api-auth" />. For browser-based clients, you
+    can rely on OpenAM cookies rather than construct the header in your
+    application.</para>
+
+    <itemizedlist>
+     <para>The following sections cover this JSON-based API.</para>
+     <listitem><para><xref linkend="rest-api-create" /></para></listitem>
+     <listitem><para><xref linkend="rest-api-read" /></para></listitem>
+     <listitem><para><xref linkend="rest-api-update" /></para></listitem>
+     <listitem><para><xref linkend="rest-api-delete" /></para></listitem>
+    </itemizedlist>
+   </listitem>
+
+   <listitem>
+    <para>Under the <literal>/identity</literal> endpoint, you find the
+    backwards-compatible, legacy API.</para>
+
+    <itemizedlist>
+     <para>The following sections cover this backwards-compatible API.</para>
+     <listitem><para><xref linkend="rest-api-create-legacy" /></para></listitem>
+     <listitem><para><xref linkend="rest-api-read-legacy" /></para></listitem>
+     <listitem><para><xref linkend="rest-api-update-legacy" /></para></listitem>
+     <listitem><para><xref linkend="rest-api-delete-legacy" /></para></listitem>
+    </itemizedlist>
+   </listitem>
+  </itemizedlist>
+
   <section xml:id="rest-api-create">
    <title>Creating Identities</title>
+
+   <para>OpenAM lets administrators create a user profile by making an HTTP
+   POST of the JSON representation of the profile to
+   <literal>/json/users/?_action=create</literal>, as shown in the following
+   example.</para>
+
+   <screen>$ curl "http://desktop.example.com:8080/openam/identity/authenticate
+ ?username=amadmin&amp;password=password"
+token.id=AQIC5w...2NzEz*
+$ curl --request POST --header "iplanetDirectoryPro: AQIC5w...2NzEz*"
+ --header "Content-Type: application/json"
+ --data '{ "name": "bjensen", "userpassword": "secret12",
+           "mail": "bjensen@example.com" }'
+ http://desktop.example.com:8080/openam/json/users/?_action=create
+{
+    "name": "bjensen",
+    "realm": "/",
+    "uid": [
+        "bjensen"
+    ],
+    "mail": [
+        "bjensen@example.com"
+    ],
+    "sn": [
+        "bjensen"
+    ],
+    "userpassword": [
+        "{SSHA}0pXpKLPRKCGY7g3YqZygJmKMW6IC2BLJimmlwg=="
+    ],
+    "cn": [
+        "bjensen"
+    ],
+    "inetuserstatus": [
+        "Active"
+    ],
+    "dn": [
+        "uid=bjensen,ou=people,dc=openam,dc=forgerock,dc=org"
+    ],
+    "objectclass": [
+        "person",
+        "sunIdentityServerLibertyPPService",
+        "sunFederationManagerDataStore",
+        "inetorgperson",
+        "iPlanetPreferences",
+        "iplanet-am-auth-configuration-service",
+        "organizationalperson",
+        "sunFMSAML2NameIdentifier",
+        "inetuser",
+        "iplanet-am-managed-person",
+        "sunAMAuthAccountLockout",
+        "iplanet-am-user-service",
+        "top"
+    ],
+    "universalid": [
+        "id=bjensen,ou=user,dc=openam,dc=forgerock,dc=org"
+    ]
+}</screen>
+
+   <para>Alternatively, administrators can create user profiles with specific
+   user IDs by doing an HTTP PUT of the JSON representation of the changes to
+   <literal>/json/users/<replaceable>user-id</replaceable></literal>, as
+   shown in the following example.</para>
+
+   <screen>$ curl "http://desktop.example.com:8080/openam/identity/authenticate
+ ?username=amadmin&amp;password=password"
+token.id=AQIC5w...2NzEz*
+$ curl --request PUT --header "iplanetDirectoryPro: AQIC5w...2NzEz*"
+ --header "Content-Type: application/json"
+ --data '{ "userpassword": "secret12", "mail": "bjensen@example.com" }'
+ http://desktop.example.com:8080/openam/json/users/bjensen
+{
+    "name": "bjensen",
+    "realm": "/",
+    "uid": [
+        "bjensen"
+    ],
+    "mail": [
+        "bjensen@example.com"
+    ],
+    "sn": [
+        "bjensen"
+    ],
+    "userpassword": [
+        "{SSHA}e4DJoxvYVW/nsp62XJf29ZADE16YQgrxK+XuKA=="
+    ],
+    "cn": [
+        "bjensen"
+    ],
+    "inetuserstatus": [
+        "Active"
+    ],
+    "dn": [
+        "uid=bjensen,ou=people,dc=openam,dc=forgerock,dc=org"
+    ],
+    "objectclass": [
+        "person",
+        "sunIdentityServerLibertyPPService",
+        "sunFederationManagerDataStore",
+        "inetorgperson",
+        "iPlanetPreferences",
+        "iplanet-am-auth-configuration-service",
+        "organizationalperson",
+        "sunFMSAML2NameIdentifier",
+        "inetuser",
+        "iplanet-am-managed-person",
+        "sunAMAuthAccountLockout",
+        "iplanet-am-user-service",
+        "top"
+    ],
+    "universalid": [
+        "id=bjensen,ou=user,dc=openam,dc=forgerock,dc=org"
+    ]
+}</screen>
+
+   <para>As shown in the examples, OpenAM returns the JSON representation of
+   the profile on successful creation. On failure, OpenAM returns a JSON
+   representation of the error including the
+   <link xlink:href="http://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html"
+   xlink:show="new">HTTP status code</link>.</para>
+  </section>
+
+  <section xml:id="rest-api-read">
+   <title>Reading Identities</title>
+
+   <para>OpenAM lets users read their own profiles, and lets administrators read
+   other user's profiles by requesting an HTTP GET on
+   <literal>/json/users/<replaceable>user-id</replaceable></literal>, as shown
+   in the following example.</para>
+
+   <screen>$ curl "http://desktop.example.com:8080/openam/identity/authenticate
+ ?username=amadmin&amp;password=password"
+token.id=AQIC5w...2NzEz*
+$ curl --header "iplanetDirectoryPro: AQIC5w...2NzEz*"
+ http://desktop.example.com:8080/openam/json/users/demo
+{
+    "name": "demo",
+    "realm": "/",
+    "uid": [
+        "demo"
+    ],
+    "sn": [
+        "demo"
+    ],
+    "userpassword": [
+        "{SSHA}S14oR2gusLWtiDkAS4twj63slXNNaMKpwrOWdw=="
+    ],
+    "cn": [
+        "demo"
+    ],
+    "inetuserstatus": [
+        "Active"
+    ],
+    "dn": [
+        "uid=demo,ou=people,dc=openam,dc=forgerock,dc=org"
+    ],
+    "objectclass": [
+        "person",
+        "sunIdentityServerLibertyPPService",
+        "sunFederationManagerDataStore",
+        "inetorgperson",
+        "iPlanetPreferences",
+        "iplanet-am-auth-configuration-service",
+        "organizationalperson",
+        "sunFMSAML2NameIdentifier",
+        "inetuser",
+        "iplanet-am-managed-person",
+        "sunAMAuthAccountLockout",
+        "iplanet-am-user-service",
+        "top"
+    ],
+    "universalid": [
+        "id=demo,ou=user,dc=openam,dc=forgerock,dc=org"
+    ]
+}</screen>
+
+   <para>As shown in the example, OpenAM returns the JSON representation of the
+   profile on success. On failure, OpenAM returns a JSON representation of the
+   error including the
+   <link xlink:href="http://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html"
+   xlink:show="new">HTTP status code</link>.</para>
+  </section>
+
+  <section xml:id="rest-api-update">
+   <title>Updating Identities</title>
+
+   <para>OpenAM lets users update their own profiles, and lets administrators
+   update other user's profiles. To update an identity, do an HTTP PUT of the
+   JSON representation of the changes to
+   <literal>/json/users/<replaceable>user-id</replaceable></literal>.</para>
+
+   <para>The following example shows how users can update their own
+   profiles.</para>
+
+   <screen>$ curl "http://desktop.example.com:8080/openam/identity/authenticate
+ ?username=demo&amp;password=changeit"
+token.id=AQIC5...Y3MTAx*
+$ curl --request PUT --header "iplanetDirectoryPro: AQIC5...Y3MTAx*"
+ --header "Content-Type: application/json"
+ --data '{ "mail": "demo@example.com" }'
+ http://desktop.example.com:8080/openam/json/users/demo
+{
+    "name": "demo",
+    "realm": "/",
+    "uid": [
+        "demo"
+    ],
+    "mail": [
+        "demo@example.com"
+    ],
+    "sn": [
+        "demo"
+    ],
+    "userpassword": [
+        "{SSHA}S14oR2gusLWtiDkAS4twj63slXNNaMKpwrOWdw=="
+    ],
+    "cn": [
+        "demo"
+    ],
+    "inetuserstatus": [
+        "Active"
+    ],
+    "dn": [
+        "uid=demo,ou=people,dc=openam,dc=forgerock,dc=org"
+    ],
+    "objectclass": [
+        "person",
+        "sunIdentityServerLibertyPPService",
+        "sunFederationManagerDataStore",
+        "inetorgperson",
+        "iPlanetPreferences",
+        "iplanet-am-auth-configuration-service",
+        "organizationalperson",
+        "sunFMSAML2NameIdentifier",
+        "inetuser",
+        "iplanet-am-managed-person",
+        "sunAMAuthAccountLockout",
+        "iplanet-am-user-service",
+        "top"
+    ],
+    "universalid": [
+        "id=demo,ou=user,dc=openam,dc=forgerock,dc=org"
+    ]
+}</screen>
+
+   <para>As shown in the example, OpenAM returns the JSON representation of the
+   profile on success. On failure, OpenAM returns a JSON representation of the
+   error including the
+   <link xlink:href="http://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html"
+   xlink:show="new">HTTP status code</link>.</para>
+  </section>
+
+  <section xml:id="rest-api-delete">
+   <title>Deleting Identities</title>
+
+   <para>OpenAM lets administrators delete a user profile by making an HTTP
+   DELETE call to
+   <literal>/json/users/<replaceable>user-id</replaceable></literal>, as shown
+   in the following example.</para>
+
+   <screen>$ curl "http://desktop.example.com:8080/openam/identity/authenticate
+ ?username=amadmin&amp;password=password"
+token.id=AQIC5w...2NzEz*
+$ curl --request DELETE --header "iplanetDirectoryPro: AQIC5w...2NzEz*"
+ http://desktop.example.com:8080/openam/json/users/bjensen
+{"success":"true"}</screen>
+
+   <para>On success, OpenAM returns a JSON object indicating success. On
+   failure, OpenAM returns a JSON representation of the error including the
+   <link xlink:href="http://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html"
+   xlink:show="new">HTTP status code</link>.</para>
+  </section>
+
+  <section xml:id="rest-api-create-legacy">
+   <title>Creating Identities (Legacy API)</title>
    
    <para>OpenAM lets you create user profiles, and also create web and J2EE
    policy agent profiles. When you create an entry, you must provide the
@@ -378,8 +686,8 @@ $ curl "https://openam.example.com:8080/openam/identity/create?
  &amp;identity_type=user"</screen>
   </section>
   
-  <section xml:id="rest-api-read">
-   <title>Reading &amp; Searching for Identities</title>
+  <section xml:id="rest-api-read-legacy">
+   <title>Reading &amp; Searching for Identities (Legacy API)</title>
    
    <para>Reading is similar to attribute retrieval, as described in
    <xref linkend="rest-api-tokens" />, but obtained using the token of
@@ -474,8 +782,8 @@ identitydetails.attribute.value=id=testuser,ou=user,o=openam</screen>
 string=bjensen</screen>
   </section>
   
-  <section xml:id="rest-api-update">
-   <title>Updating Identities</title>
+  <section xml:id="rest-api-update-legacy">
+   <title>Updating Identities (Legacy API)</title>
    
    <para>You can update an identity with the same parameters used to create
    identities, provided the token corresponds to a user with access to
@@ -490,8 +798,8 @@ string=bjensen</screen>
  &amp;identity_type=user"</screen>
   </section>
   
-  <section xml:id="rest-api-delete">
-   <title>Deleting Identities</title>
+  <section xml:id="rest-api-delete-legacy">
+   <title>Deleting Identities (Legacy API)</title>
    
    <para>You can also delete an identity.</para>
    
