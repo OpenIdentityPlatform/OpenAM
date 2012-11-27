@@ -175,6 +175,7 @@ esac
   find links to stable releases, nightly builds for testing, previous
   releases, and also OpenAM policy agent releases.</para>
   
+  <!-- This may need to be updated. The nightly does not include the src file. -->
   <para>For each release of the OpenAM core services, you can download the
   entire package as a .zip archive, only the OpenAM .war file, only the
   administrative tools as a .zip archive, or only the OpenAM source code
@@ -182,64 +183,57 @@ esac
 
   <para>After you download the .zip archive, unzip it to access the
   content:</para>
-  <screen>$ cd ~/Downloads ; unzip openam_<?eval ${serverDocTargetVersion}?>.zip</screen>
+  <screen>$ cd ~/Downloads ; unzip <?eval ${coreDirectoryFile}?>.zip</screen>
 
   <variablelist>
    <para>When you unzip the archive of the entire package, you get a
-   <filename>~/Downloads/opensso/</filename> directory including a README, a
-   set of license files, and the following directories. See the <link
+   <filename>~/Downloads/<?eval ${coreDirectoryFile}?>/</filename> directory including 
+    the following files. See the <link
    xlink:href="reference#chap-file-layout"
     xlink:role="http://docbook.org/xlink/role/olink"><citetitle>File
     Layout</citetitle> reference</link> for details.</para>
    <varlistentry>
-    <term><filename>deployable-war/</filename></term>
-    <listitem><para>The deployable .war file as well as the tools and files
-    required to create any specialized .war files you deploy.</para></listitem>
+    <term><filename><?eval ${clientsdkJarFile}?></filename></term>
+    <listitem><para>The OpenAM Java client SDK library</para></listitem>
    </varlistentry>
    <varlistentry>
-    <term><filename>docs/</filename></term>
-    <listitem><para>Javadoc API specifications for the public APIs exposed by
-    OpenAM</para></listitem>
+    <term><filename><?eval ${distauthWarFile}?></filename></term>
+    <listitem><para>The deployable .war file for distributed authentication</para></listitem>
    </varlistentry>
    <varlistentry>
-    <term><filename>fedlet/</filename></term>
-    <listitem><para>The lightweight service provider implementations that you
-    can embed in your Java EE or ASP.NET application to enable it to use
-    federated access management</para></listitem>
+    <term><filename><?eval ${diagnosticsZipFile}?></filename></term>
+    <listitem><para>The .zip file with the diagnostic tools to help troubleshoot 
+    deployment issue.</para></listitem>
    </varlistentry>
    <varlistentry>
-    <term><filename>integrations/</filename></term>
-    <listitem><para>Resources for integrating OpenAM with third-party access
-    and identity management software</para></listitem>
+    <term><filename><?eval ${fedletZipFile}?></filename></term>
+    <listitem><para>The .zip that contains the lightweight service provider
+    implementations that you can embed in your Java EE or ASP.NET applications
+    to enable it to use federated access management</para></listitem>
    </varlistentry>
    <varlistentry>
-    <term><filename>ldif/</filename></term>
-    <listitem><para>Schema and index definitions for use with external
-    LDAP identity repositories</para></listitem>
+    <term><filename><?eval ${libraryZipFile}?></filename></term>
+    <listitem><para>The .zip file that contains OpenAM libraries for
+    Ant builds</para></listitem>
    </varlistentry>
    <varlistentry>
-    <term><filename>libraries/</filename></term>
-    <listitem><para>Client SDK and policy agent libraries</para></listitem>
+    <term><filename><?eval ${ssoadminZipFile}?></filename></term>
+    <listitem><para>The .zip file that contains tools to manage OpenAM from 
+    the command line</para></listitem>
    </varlistentry>
    <varlistentry>
-    <term><filename>patches/</filename></term>
-    <listitem><para>Location for patches to apply to OpenAM</para></listitem>
+    <term><filename><?eval ${ssoconfigZipFile}?></filename></term>
+    <listitem><para>The .zip file that contains tools to configure OpenAM from 
+    the command line</para></listitem>
    </varlistentry>
    <varlistentry>
-    <term><filename>samples/</filename></term>
-    <listitem><para>Sample source files demonstrating how to use the OpenAM
-    client SDK</para></listitem>
+    <term><filename><?eval ${coreWarFile}?></filename></term>
+    <listitem><para>The deployable .war file</para></listitem>
    </varlistentry>
    <varlistentry>
-    <term><filename>tools/</filename></term>
-    <listitem><para>OpenAM tools for managing SSO, configuring deployed
-    .war files, patching deployed .war files, managing sessions, and diagnosing
-    deployment issues</para></listitem>
-   </varlistentry>
-   <varlistentry>
-    <term><filename>xml/</filename></term>
-    <listitem><para>OpenAM service and default delegation policy configuration
-    files</para></listitem>
+    <term><filename><?eval ${serveronlyWarFile}?></filename></term>
+    <listitem><para>The deployable .war file when you want to deploy OpenAM
+    server without the OpenAM console</para></listitem>
    </varlistentry>
   </variablelist>
  </section>
@@ -328,7 +322,7 @@ esac
 
   <screen>$ mkdir openam
 $ cd openam
-$ jar -xf ~/Downloads/opensso/deployable-war/opensso.war
+$ jar -xf ~/Downloads/<?eval ${coreDirectoryFile}?>/<?eval ${coreWarFile}?>
 $ vi WEB-INF/classes/bootstrap.properties
 $ grep ^config WEB-INF/classes/bootstrap.properties
 configuration.dir=/home/jboss-user/openam</screen>
@@ -393,7 +387,7 @@ $ cat WEB-INF/jboss-web.xml</screen>
 
   <screen>$ mkdir openam
 $ cd openam
-$ jar -xf ~/Downloads/opensso/deployable-war/opensso.war
+$ jar -xf ~/Downloads/<?eval ${coreDirectoryFile}?>/<?eval ${coreWarFile}?>
 $ vi WEB-INF/classes/bootstrap.properties
 $ grep ^config WEB-INF/classes/bootstrap.properties
 configuration.dir=/home/jboss-user/openam
