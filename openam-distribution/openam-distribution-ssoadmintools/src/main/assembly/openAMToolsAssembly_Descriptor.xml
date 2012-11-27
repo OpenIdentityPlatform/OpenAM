@@ -126,6 +126,14 @@
                 <include>*.properties</include>
             </includes>
         </fileSet>
+        <!-- for create-agent command -->
+        <fileSet>
+            <outputDirectory>resources</outputDirectory>
+            <directory>${project.basedir}/../../openam-server-only/src/main/resources/</directory>
+            <includes>
+                <include>agentlocaleprop.properties</include>
+            </includes>
+        </fileSet>
 
         <fileSet>
             <outputDirectory>template/unix/bin</outputDirectory>
