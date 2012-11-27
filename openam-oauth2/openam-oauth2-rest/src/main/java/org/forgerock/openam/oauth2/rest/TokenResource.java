@@ -22,7 +22,10 @@ import com.iplanet.sso.SSOToken;
 import com.iplanet.sso.SSOTokenManager;
 import com.sun.identity.idm.AMIdentity;
 import com.sun.identity.idm.IdRepoException;
+import com.sun.identity.idm.IdType;
 import com.sun.identity.idm.IdUtils;
+import com.sun.identity.security.AdminTokenAction;
+import com.sun.identity.shared.Constants;
 import org.forgerock.openam.ext.cts.repo.OpenDJTokenRepo;
 import org.forgerock.json.fluent.JsonValue;
 import org.forgerock.json.resource.*;
@@ -36,6 +39,7 @@ import com.sun.identity.shared.OAuth2Constants;
 import org.forgerock.openam.oauth2.exceptions.OAuthProblemException;
 import org.restlet.data.Status;
 
+import java.security.AccessController;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -44,6 +48,16 @@ import java.util.Set;
 public class TokenResource implements CollectionResourceProvider {
 
     private JsonResource repository;
+
+    private static SSOToken token = (SSOToken) AccessController.doPrivileged(AdminTokenAction.getInstance());
+    private static String adminUser = SystemProperties.get(Constants.AUTHENTICATION_SUPER_USER);
+    private static AMIdentity adminUserId = null;
+    static {
+        if (adminUser != null) {
+            adminUserId = new AMIdentity(token,
+                    adminUser, IdType.USER, "/", null);
+        }
+    }
 
     public TokenResource() {
         try {
@@ -80,7 +94,7 @@ public class TokenResource implements CollectionResourceProvider {
     public void deleteInstance(ServerContext context, String resourceId, DeleteRequest request,
                                ResultHandler<Resource> handler){
         //only admin can delete
-        String uid = null;
+        AMIdentity uid = null;
         try {
             uid = getUid(context);
 
@@ -96,14 +110,14 @@ public class TokenResource implements CollectionResourceProvider {
                     PermanentException ex = new PermanentException(404, "Not Found", null);
                     handler.handleError(ex);
                 }
-                if (usernameSet.iterator().next().equalsIgnoreCase(uid) || uid.equalsIgnoreCase("amadmin")){
+                if (uid.getName().equalsIgnoreCase(usernameSet.iterator().next()) || uid.equals(adminUserId)){
                     response = accessor.delete(resourceId, "1");
                 } else {
                     PermanentException ex = new PermanentException(401, "Unauthorized", null);
                     handler.handleError(ex);
                 }
             } catch (JsonResourceException e) {
-                throw ResourceException.getException(ResourceException.UNAVAILABLE, "Can't delete token in CTS", null, e);
+                throw ResourceException.getException(e.getCode(), e.getReason(), null, e);
             }
             Map< String, String> responseVal = new HashMap< String, String>();
             responseVal.put("success", "true");
@@ -139,10 +153,10 @@ public class TokenResource implements CollectionResourceProvider {
                 String id = queryRequest.getQueryId();
 
                 //get uid of submitter
-                String uid = null;
+                AMIdentity uid = null;
                 try {
                     uid = getUid(context);
-                    query.put("username", uid);
+                    query.put("username", uid.getName());
                 } catch (Exception e){
                     PermanentException ex = new PermanentException(401, "Unauthorized" ,e);
                     handler.handleError(ex);
@@ -156,7 +170,7 @@ public class TokenResource implements CollectionResourceProvider {
                         if (!params[0].equalsIgnoreCase("username")){
                             query.put(params[0], params[1]);
                         } else {
-                            if (uid != null && uid.equalsIgnoreCase("amadmin")){
+                            if (uid != null && (uid.equals(adminUserId) || uid.getName().equalsIgnoreCase(params[1]))){
                                 query.put(params[0], params[1]);
                             }
                         }
@@ -193,7 +207,7 @@ public class TokenResource implements CollectionResourceProvider {
     public void readInstance(ServerContext context, String resourceId, ReadRequest request,
                              ResultHandler<Resource> handler){
 
-        String uid = null;
+        AMIdentity uid = null;
         String username = null;
         try {
             uid = getUid(context);
@@ -214,7 +228,7 @@ public class TokenResource implements CollectionResourceProvider {
             } catch (JsonResourceException e) {
                 throw ResourceException.getException(ResourceException.NOT_FOUND, "Not found in CTS", "CTS", e);
             }
-            if (uid.equalsIgnoreCase("amadmin") || username.equalsIgnoreCase(uid)){
+            if (uid.equals(adminUserId) || username.equalsIgnoreCase(uid.getName())){
                 resource = new Resource(OAuth2Constants.Params.ID, "1", response);
                 handler.handleResult(resource);
             } else {
@@ -285,12 +299,11 @@ public class TokenResource implements CollectionResourceProvider {
         return null;
     }
 
-    private String getUid(ServerContext context) throws SSOException, IdRepoException{
+    private AMIdentity getUid(ServerContext context) throws SSOException, IdRepoException{
         String cookie = getCookieFromServerContext(context);
         SSOTokenManager mgr = SSOTokenManager.getInstance();
         SSOToken token = mgr.createSSOToken(cookie);
-        AMIdentity id = IdUtils.getIdentity(token);
-        return id.getName();
+        return IdUtils.getIdentity(token);
     }
 
 

@@ -40,7 +40,16 @@ import java.util.*;
 
 public class ClientResource  implements CollectionResourceProvider {
 
-    SSOToken token = (SSOToken) AccessController.doPrivileged(AdminTokenAction.getInstance());
+    private static SSOToken token = (SSOToken) AccessController.doPrivileged(AdminTokenAction.getInstance());
+
+    private static String adminUser = SystemProperties.get(Constants.AUTHENTICATION_SUPER_USER);
+    private static AMIdentity adminUserId = null;
+    static {
+        if (adminUser != null) {
+            adminUserId = new AMIdentity(token,
+                    adminUser, IdType.USER, "/", null);
+        }
+    }
 
     public ClientResource() {
     }
@@ -136,8 +145,7 @@ public class ClientResource  implements CollectionResourceProvider {
         Map< String, String> responseVal =new HashMap< String, String>();
         String uid;
         try {
-            uid = getUid(context);
-            if (!uid.equalsIgnoreCase("amadmin")){
+            if (!(getUid(context).equals(adminUserId))){
                 throw new PermanentException(401, "Unauthorized", null);
             }
             AMIdentityRepository repo = new AMIdentityRepository(token , realm);
@@ -183,8 +191,7 @@ public class ClientResource  implements CollectionResourceProvider {
         JsonValue response = null;
         String uid;
         try {
-            uid = getUid(context);
-            if (!uid.equalsIgnoreCase("amadmin")){
+            if (!(getUid(context).equals(adminUserId))){
                 throw new PermanentException(401, "Unauthorized", null);
             }
             AMIdentityRepository repo = new AMIdentityRepository(token , null);
@@ -347,11 +354,11 @@ public class ClientResource  implements CollectionResourceProvider {
         return null;
     }
 
-    private String getUid(ServerContext context) throws SSOException, IdRepoException{
+    private AMIdentity getUid(ServerContext context) throws SSOException, IdRepoException{
         String cookie = getCookieFromServerContext(context);
         SSOTokenManager mgr = SSOTokenManager.getInstance();
         SSOToken token = mgr.createSSOToken(cookie);
-        AMIdentity id = IdUtils.getIdentity(token);
-        return id.getName();
+        return IdUtils.getIdentity(token);
+
     }
 }
