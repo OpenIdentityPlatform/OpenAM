@@ -34,7 +34,7 @@ public class RestTokenDispathcer {
         try {
             final Router router = new Router();
             router.addRoute(EQUALS, "/token/", new TokenResource());
-            router.addRoute(EQUALS, "/client/{client_id}", new ClientResource());
+            router.addRoute(EQUALS, "/client/", new ClientResource());
             final ConnectionFactory factory = Resources.newInternalConnectionFactory(router);
             return factory;
         } catch (final Exception e) {

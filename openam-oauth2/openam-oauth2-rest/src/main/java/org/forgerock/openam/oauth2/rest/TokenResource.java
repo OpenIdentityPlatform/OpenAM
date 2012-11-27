@@ -96,10 +96,10 @@ public class TokenResource implements CollectionResourceProvider {
                     PermanentException ex = new PermanentException(404, "Not Found", null);
                     handler.handleError(ex);
                 }
-                if (usernameSet.iterator().next().equals(uid) || uid.equals("amadmin")){
+                if (usernameSet.iterator().next().equalsIgnoreCase(uid) || uid.equalsIgnoreCase("amadmin")){
                     response = accessor.delete(resourceId, "1");
                 } else {
-                    PermanentException ex = new PermanentException(402, "Unauthorized", null);
+                    PermanentException ex = new PermanentException(401, "Unauthorized", null);
                     handler.handleError(ex);
                 }
             } catch (JsonResourceException e) {
@@ -113,9 +113,9 @@ public class TokenResource implements CollectionResourceProvider {
         } catch (ResourceException e){
             handler.handleError(e);
         } catch (SSOException e){
-            handler.handleError(new PermanentException(402, "Unauthorized" ,e));
+            handler.handleError(new PermanentException(401, "Unauthorized" ,e));
         } catch (IdRepoException e){
-            handler.handleError(new PermanentException(402, "Unauthorized" ,e));
+            handler.handleError(new PermanentException(401, "Unauthorized" ,e));
         }
     }
 
@@ -144,7 +144,7 @@ public class TokenResource implements CollectionResourceProvider {
                     uid = getUid(context);
                     query.put("username", uid);
                 } catch (Exception e){
-                    PermanentException ex = new PermanentException(402, "Unauthorized" ,e);
+                    PermanentException ex = new PermanentException(401, "Unauthorized" ,e);
                     handler.handleError(ex);
                 }
 
@@ -176,10 +176,12 @@ public class TokenResource implements CollectionResourceProvider {
             Set<HashMap<String,Set<String>>> list = (Set<HashMap<String,Set<String>>>) value.getObject();
             Resource res = null;
             JsonValue val = null;
-            for (HashMap<String,Set<String>> entry : list){
-                val = new JsonValue(entry);
-                res = new Resource("result", "1", val);
-                handler.handleResource(res);
+            if (list != null && !list.isEmpty() ){
+                for (HashMap<String,Set<String>> entry : list){
+                    val = new JsonValue(entry);
+                    res = new Resource("result", "1", val);
+                    handler.handleResource(res);
+                }
             }
             handler.handleResult(new QueryResult());
         } catch (ResourceException e){
@@ -212,18 +214,18 @@ public class TokenResource implements CollectionResourceProvider {
             } catch (JsonResourceException e) {
                 throw ResourceException.getException(ResourceException.NOT_FOUND, "Not found in CTS", "CTS", e);
             }
-            if (uid.equals("amadmin") || username.equals(uid)){
+            if (uid.equalsIgnoreCase("amadmin") || username.equalsIgnoreCase(uid)){
                 resource = new Resource(OAuth2Constants.Params.ID, "1", response);
                 handler.handleResult(resource);
             } else {
-                throw new PermanentException(402, "Unauthorized" ,null);
+                throw new PermanentException(401, "Unauthorized" ,null);
             }
         } catch (ResourceException e){
             handler.handleError(e);
         } catch (SSOException e){
-            handler.handleError(new PermanentException(402, "Unauthorized" ,e));
+            handler.handleError(new PermanentException(401, "Unauthorized" ,e));
         } catch (IdRepoException e){
-            handler.handleError(new PermanentException(402, "Unauthorized" ,e));
+            handler.handleError(new PermanentException(401, "Unauthorized" ,e));
         }
     }
 

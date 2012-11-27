@@ -23,6 +23,8 @@ import com.iplanet.sso.SSOToken;
 import com.iplanet.sso.SSOTokenManager;
 import com.sun.identity.idm.*;
 import com.sun.identity.security.AdminTokenAction;
+import com.sun.identity.shared.Constants;
+import com.sun.identity.shared.OAuth2Constants;
 import org.forgerock.json.fluent.JsonValue;
 import org.forgerock.json.resource.*;
 
@@ -62,21 +64,81 @@ public class ClientResource  implements CollectionResourceProvider {
     public void createInstance(ServerContext context, CreateRequest createRequest, ResultHandler<Resource> handler){
 
         Map<String, ArrayList<String>> client = (Map<String, ArrayList<String>>) createRequest.getContent().getObject();
-        String realm = client.remove("realm").iterator().next();
-        String id = client.remove("id").iterator().next();
+        String realm = null;
+        if (client == null || client.isEmpty()){
+            ResourceException e =
+                    new PermanentException(ResourceException.BAD_REQUEST, "Missing client definition", null);
+            handler.handleError(e);
+        }
+        //check for id
+        String id = createRequest.getNewResourceId();
+        if (client.containsKey("client_id")){
+            ArrayList<String> idList = client.remove("client_id");
+            if (idList != null && !idList.isEmpty()){
+                id = (String) idList.iterator().next();
+            }
+        }
+        if (id == null || id.isEmpty()){
+            ResourceException e =
+                    new PermanentException(ResourceException.BAD_REQUEST, "Missing client id", null);
+            handler.handleError(e);
+        }
+
+        //get realm
+        if (client.containsKey("realm")){
+            ArrayList<String> realmList = client.remove("realm");
+            if (realmList != null && !realmList.isEmpty()){
+                realm = (String) realmList.iterator().next();
+            }
+        }
+
+        //check for required parameters
+        if (client.containsKey("userpassword")){
+            if (client.get("userpassword").iterator().next().isEmpty()){
+                ResourceException e =
+                        new PermanentException(ResourceException.BAD_REQUEST, "Missing userpassword", null);
+                handler.handleError(e);
+            }
+        } else {
+            ResourceException e =
+                    new PermanentException(ResourceException.BAD_REQUEST, "Missing userpassword", null);
+            handler.handleError(e);
+        }
+        if (client.containsKey("com.forgerock.openam.oauth2provider.clientType")){
+            String type = client.get("com.forgerock.openam.oauth2provider.clientType").iterator().next();
+            if (type.equals("Confidential") || type.equals("Public")){
+                //do nothing
+            } else {
+                ResourceException e =
+                        new PermanentException(ResourceException.BAD_REQUEST, "Missing client type", null);
+                handler.handleError(e);
+            }
+        } else {
+            ResourceException e =
+                    new PermanentException(ResourceException.BAD_REQUEST, "Missing client type", null);
+            handler.handleError(e);
+        }
 
         Map<String, Set<String>> attrs = new HashMap<String, Set<String>>();
         for (Map.Entry mapEntry : client.entrySet()){
             attrs.put((String)mapEntry.getKey(), new HashSet<String>((ArrayList)mapEntry.getValue()));
         }
 
+        Set<String> temp = new HashSet<String>();
+        temp.add("OAuth2Client");
+        attrs.put("AgentType", temp);
+
+        temp = new HashSet<String>();
+        temp.add("Active");
+        attrs.put("sunIdentityServerDeviceStatus", temp);
+
         JsonValue response = null;
         Map< String, String> responseVal =new HashMap< String, String>();
         String uid;
         try {
             uid = getUid(context);
-            if (!uid.equals("amadmin")){
-                throw new PermanentException(402, "Unauthorized", null);
+            if (!uid.equalsIgnoreCase("amadmin")){
+                throw new PermanentException(401, "Unauthorized", null);
             }
             AMIdentityRepository repo = new AMIdentityRepository(token , realm);
             repo.createIdentity(IdType.AGENTONLY, id, attrs);
@@ -93,22 +155,22 @@ public class ClientResource  implements CollectionResourceProvider {
         } catch(IdRepoException e){
             responseVal.put("success", "false");
             if (OAuth2Utils.logStatus) {
-                String[] obs = {"FAILED_DELETE_CLIENT", responseVal.toString()};
-                OAuth2Utils.logErrorMessage("FAILED_DELETE_CLIENT", obs, null);
+                String[] obs = {"FAILED_CREATE_CLIENT", responseVal.toString()};
+                OAuth2Utils.logErrorMessage("FAILED_CREATE_CLIENT", obs, null);
             }
             handler.handleError(new InternalServerErrorException("Unable to create client"));
         } catch (SSOException e){
             responseVal.put("success", "false");
             if (OAuth2Utils.logStatus) {
-                String[] obs = {"FAILED_DELETE_CLIENT", responseVal.toString()};
-                OAuth2Utils.logErrorMessage("FAILED_DELETE_CLIENT", obs, null);
+                String[] obs = {"FAILED_CREATE_CLIENT", responseVal.toString()};
+                OAuth2Utils.logErrorMessage("FAILED_CREATE_CLIENT", obs, null);
             }
             handler.handleError(new InternalServerErrorException("Unable to create client"));
         } catch (PermanentException e){
             responseVal.put("success", "false");
             if (OAuth2Utils.logStatus) {
-                String[] obs = {"FAILED_DELETE_CLIENT", responseVal.toString()};
-                OAuth2Utils.logErrorMessage("FAILED_DELETE_CLIENT", obs, null);
+                String[] obs = {"FAILED_CREATE_CLIENT", responseVal.toString()};
+                OAuth2Utils.logErrorMessage("FAILED_CREATE_CLIENT", obs, null);
             }
             handler.handleError(e);
         }
@@ -122,8 +184,8 @@ public class ClientResource  implements CollectionResourceProvider {
         String uid;
         try {
             uid = getUid(context);
-            if (!uid.equals("amadmin")){
-                throw new PermanentException(402, "Unauthorized", null);
+            if (!uid.equalsIgnoreCase("amadmin")){
+                throw new PermanentException(401, "Unauthorized", null);
             }
             AMIdentityRepository repo = new AMIdentityRepository(token , null);
             Set<AMIdentity> ids = new HashSet<AMIdentity>();
