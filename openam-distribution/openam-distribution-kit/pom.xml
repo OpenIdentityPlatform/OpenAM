@@ -154,12 +154,6 @@
         </dependency>
         <dependency>
             <groupId>org.forgerock.openam</groupId>
-            <artifactId>openam-distribution-library</artifactId>
-            <version>10.1.0-SNAPSHOT</version>
-            <type>zip</type>
-        </dependency>
-        <dependency>
-            <groupId>org.forgerock.openam</groupId>
             <artifactId>openam-distribution-fedlet-unconfigured</artifactId>
             <version>10.1.0-SNAPSHOT</version>
             <type>zip</type>

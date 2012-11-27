@@ -51,7 +51,6 @@
     <!-- Distribution Modules to produce all Ancillary Artifacts -->
     <modules>
         <module>openam-distribution-amadmsetup</module>
-        <module>openam-distribution-library</module>
         <module>openam-distribution-fedlet-unconfigured</module>
         <module>openam-distribution-ssoadmintools</module>
         <module>openam-distribution-ssoconfiguratortools</module>
