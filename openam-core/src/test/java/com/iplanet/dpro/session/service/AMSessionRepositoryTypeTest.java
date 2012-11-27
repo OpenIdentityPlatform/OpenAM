@@ -29,7 +29,7 @@
 
 package com.iplanet.dpro.session.service;
 
-import com.sun.identity.sm.ldap.CTSPersistentStoreInjector;
+import com.sun.identity.sm.ldap.CTSPersistentStore;
 import org.forgerock.openam.shared.session.ha.amsessionstore.AMSessionRepositoryType;
 import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeClass;
@@ -94,7 +94,7 @@ public class AMSessionRepositoryTypeTest {
     public void testGetAMSessionRepositoryTypeImplementationClass() throws Exception {
 
         assertEquals(AMSessionRepositoryType.CONFIG.amSessionRepositoryImplementationClassName(),
-                new CTSPersistentStoreInjector().getInstanceClassName());
+                CTSPersistentStore.class.getName());
 
     }
 

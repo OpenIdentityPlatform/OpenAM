@@ -39,6 +39,7 @@ import com.iplanet.dpro.session.exceptions.NotFoundException;
 import com.iplanet.dpro.session.exceptions.StoreException;
 
 import com.iplanet.dpro.session.service.InternalSession;
+import com.sun.identity.shared.debug.Debug;
 import org.forgerock.openam.session.model.AMRootEntity;
 import org.forgerock.openam.session.model.DBStatistics;
 

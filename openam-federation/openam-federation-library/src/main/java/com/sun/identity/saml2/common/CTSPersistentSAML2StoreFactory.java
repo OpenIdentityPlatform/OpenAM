@@ -18,25 +18,31 @@
  * "Portions copyright [year] [name of copyright owner]".
  *
  */
-package com.iplanet.dpro.session.service;
+package com.sun.identity.saml2.common;
 
 import com.iplanet.am.util.SystemProperties;
 import com.sun.identity.coretoken.interfaces.AMTokenRepository;
+import com.sun.identity.coretoken.interfaces.AMTokenSAML2Repository;
 import com.sun.identity.sm.ldap.CTSPersistentStore;
 import com.sun.identity.sm.mq.JMQSessionRepository;
 
 /**
- * <code>AMTokenRepositoryFactory</code> provides a default
- * factory for obtaining our Core Token services BackEnd Repository.
+ * This class is sort of duplicated to keep package level
+ * access restrictions still in play.
  *
- * ** This is a Package Protected class **
+ * So we can not access the AMTokenRepositoryFactory directory since
+ * it is a package level protected class.
  *
- * ** This class is sort of duplicated in:
- * com.sun.identity.saml2.common.AMTokenRepositoryFactoryAccessor
+ * We duplicate the necessary factory pattern here to allow
+ * our CTSPersistentSAML2Store class to access the BackEnd
+ * implementation of the CTS Repository.
  *
+ * And we only have Access to the Implementation for the
+ * AMTokenSAML2Repository Interface within the CTSPersistentStore class.
+ *
+ * @author jeff.schenk@forgerock.com
  */
-
-class AMTokenRepositoryFactory {
+class CTSPersistentSAML2StoreFactory {
 
     /**
      * Global Definitions.
@@ -50,34 +56,35 @@ class AMTokenRepositoryFactory {
     /**
      * Singleton instance of AM Session Repository or CTS.
      */
-    private static AMTokenRepository amTokenRepository = null;
+    private static volatile AMTokenSAML2Repository amTokenSAML2Repository = null;
 
     /**
-     * Private, do not allow instantiation.
+     * Singleton, do not allow Instantiation.
      */
-    private AMTokenRepositoryFactory() {
+    private CTSPersistentSAML2StoreFactory() {
     }
 
     /**
      * Common Get Instance method to obtain access to
      * Service Methods.
      *
-     * @return AMTokenRepository Singleton Instance.
+     * @return AMTokenSAML2Repository Singleton Instance.
      * @throws Exception
      */
-    protected static AMTokenRepository getInstance()
+    protected static AMTokenSAML2Repository getInstance()
             throws Exception {
-        if (amTokenRepository == null) {
+        if (amTokenSAML2Repository == null) {
             if (CTS_REPOSITORY_CLASS_NAME.equals(CTSPersistentStore.class.getName())) {
-                amTokenRepository = CTSPersistentStore.getInstance();
+                amTokenSAML2Repository = (AMTokenSAML2Repository) CTSPersistentStore.getInstance();
             } else if (CTS_REPOSITORY_CLASS_NAME.equals(JMQSessionRepository.class.getName())) {
-                amTokenRepository = JMQSessionRepository.getInstance();
+                amTokenSAML2Repository =  JMQSessionRepository.getInstance();
             } else {
-                throw new IllegalAccessException("Unable to instantiate the CTS Persistent Store as Implementation Class:["+
+                throw new IllegalAccessException("Unable to instantiate the SAML2 CTS Persistent Store as Implementation Class:["+
                         CTS_REPOSITORY_CLASS_NAME+"], is unknown to OpenAM!");
             }
         }
-        return amTokenRepository;
+        return amTokenSAML2Repository;
     }
 
 }
+

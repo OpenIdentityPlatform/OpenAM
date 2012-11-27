@@ -58,7 +58,6 @@ import org.forgerock.json.resource.JsonResourceException;
 import org.forgerock.openam.session.model.AMRootEntity;
 import org.forgerock.openam.session.model.DBStatistics;
 
-import org.forgerock.openam.shared.service.OpenAMService;
 import org.forgerock.openam.utils.TimeDuration;
 import org.opends.server.protocols.ldap.LDAPModification;
 import org.opends.server.types.*;
@@ -78,12 +77,14 @@ import org.opends.server.types.*;
  * @author jason.lemay@forgerock.com
  *
  */
-class CTSPersistentStore extends GeneralTaskRunnable
-        implements OpenAMService, AMTokenRepository, AMTokenSAML2Repository, OAuth2TokenRepository {
+public class CTSPersistentStore extends GeneralTaskRunnable
+        implements AMTokenRepository, AMTokenSAML2Repository, OAuth2TokenRepository {
 
     /**
      * Globals Constants, so not to pollute entire product.
      */
+    public static final String FR_FAMRECORD = "frFamRecord";
+
     private static final String PKEY_NAMING_ATTR = "pKey";
 
     private static final String FORMATTED_EXPIRATION_DATE_NAME = "formattedExpirationDate";
@@ -194,7 +195,7 @@ class CTSPersistentStore extends GeneralTaskRunnable
      * Session Expiration Filter.
      */
     private final static String TOKEN_EXPIRATION_FILTER_TEMPLATE =
-            "(&(" + OBJECTCLASS + Constants.EQUALS + CTSPersistentStoreInjector.FR_FAMRECORD +
+            "(&(" + OBJECTCLASS + Constants.EQUALS + FR_FAMRECORD +
                     ")" + EXPDATE_FILTER_PRE + "{"+FORMATTED_EXPIRATION_DATE_NAME+"}" + EXPDATE_FILTER_POST + ")";
 
 
@@ -391,25 +392,17 @@ class CTSPersistentStore extends GeneralTaskRunnable
     /**
      * Private restricted to preserve Singleton Instantiation.
      */
-    protected CTSPersistentStore() {
+    private CTSPersistentStore() {
     }
 
     /**
      * Provide Service Instance Access to our Singleton
      *
      * @return CTSPersistentStore Singleton Instance.
+     * @throws StoreException
      */
-    public CTSPersistentStore getInstance() {
+    public static CTSPersistentStore getInstance() throws StoreException {
         return instance;
-    }
-
-    /**
-     * Provide Service Instance Access to our Singleton
-     *
-     * @return CTSPersistentStore Singleton Instance.
-     */
-    public String getInstanceClassName() {
-        return CTSPersistentStore.class.getName();
     }
 
     /**
