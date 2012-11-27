@@ -1354,7 +1354,7 @@
                             <outputDirectory>${project.build.directory}/site/apidocs</outputDirectory>
                             <finalName>openam-${project.version}-public</finalName>
                             <subpackages>
-                                com.iplanet.am.sdk:com.sun.identity.saml2:com.iplanet.am.sdk:com.iplanet.sso:com.sun.identity.log:com.sun.identity.policy:com.sun.identity.authentication:com.sun.identity.idm:com.sun.identity.sm:com.sun.identity.federation:com.sun.identity.liberty.ws:com.sun.identity.plugin:com.sun.identity.saml:com.sun.identity.saml2:com.sun.identity.sae:com.sun.identity.wsfederation:com.sun.identity.xacml:com.sun.liberty:com.sun.identity.wss.provider:com.sun.identity.wss.security:com.sun.identity.wss.sts:org.forgerock.openam
+                                com.iplanet.am.sdk:com.sun.identity.shared:com.sun.identity.saml2:com.iplanet.am.sdk:com.iplanet.sso:com.sun.identity.log:com.sun.identity.policy:com.sun.identity.authentication:com.sun.identity.idm:com.sun.identity.sm:com.sun.identity.federation:com.sun.identity.liberty.ws:com.sun.identity.plugin:com.sun.identity.saml:com.sun.identity.saml2:com.sun.identity.sae:com.sun.identity.wsfederation:com.sun.identity.xacml:com.sun.liberty:com.sun.identity.wss.provider:com.sun.identity.wss.security:com.sun.identity.wss.sts:org.forgerock.openam
                             </subpackages>
                             <doclet>com.sun.identity.tools.javadocs.SupportedAPIDoclet</doclet>
                             <docletArtifact>
