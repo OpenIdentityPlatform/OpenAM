@@ -55,7 +55,7 @@ public interface Scope {
 
     /**
      * ScopeRequestedForRefreshToken is called when the client tries to refresh an Access Token. The scope returned MUST
-     * not contain a scope not originally grated to the original Access Token.
+     * not contain a scope not originally granted to the original Access Token.
      * @param requestedScopes The set of scopes requested
      * @param availableScopes The set of scopes given to the original Access Token
      * @param allScopes All the available scopes for the client
@@ -69,7 +69,7 @@ public interface Scope {
 
     /**
      * This method is called on the /tokeninfo endpoint. The purpose of this function is to evaluate scope and return
-     * to the client some information on the scope evaluation if nessesary.
+     * to the client some information on the scope evaluation if necessary.
      * @param token An AccessToken that contains all the information about the token
      * @return returns a map of data to be added to the token json object that will be returned to the client,
      *          can be null if no information needs to be returned.
