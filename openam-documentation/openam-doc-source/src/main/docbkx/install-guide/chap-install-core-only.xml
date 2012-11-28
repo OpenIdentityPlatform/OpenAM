@@ -39,35 +39,29 @@
  <para>You can deploy OpenAM core services without including the console if
  you install the console elsewhere, or if you plan to perform all
  configuration using <command>ssoadm</command> for example.</para>
- 
- <procedure xml:id="create-headless-file">
-  <title>To Create the Core Services <filename>.war</filename> File</title>
-  
-  <step>
-   <para>Unpack the <filename>opensso.war</filename> file into a temporary
-   directory.</para>
-   <screen>$ mkdir -p /tmp/headless ; cd /tmp/headless
-$ jar xf ~/Downloads/opensso/deployable-war/opensso.war</screen>
-  </step>
-  <step>
-   <para>Create the <filename>headless.war</filename> file.</para>
-   <screen>$ cd ~/Downloads/opensso/deployable-war
-$ sh createwar.sh -s /tmp/headless --type noconsole -w headless.war</screen>
-  </step>
- </procedure>
- 
+
  <procedure xml:id="deploy-headless-on-tomcat">
   <title>To Deploy the Core Services On Tomcat</title>
   
   <step>
-   <para>Put the <filename>headless.war</filename> you created in the Tomcat
-   <filename>webapps/</filename> directory.</para>
-   <screen>$ mv headless.war /path/to/tomcat/webapps/</screen>
+   <para>Deploy the <filename><?eval ${serveronlyWarFile}?></filename> file 
+    on your container.</para>
+
+   <para>For example, copy the file to deploy on Apache Tomcat.</para>
+   <screen>$ cp ~/Downloads/<?eval ${coreDirectoryFile}?>/
+   <?eval ${serveronlyWarFile}?> 
+    /path/to/tomcat/webapps/headless.war</screen>
+    <note>
+     <para>By adding <filename>headless.war</filename> to the end of the path, 
+      the name of the <filename>.war</filename> file will be changed from
+      <filename><?eval ${serveronlyWarFile}?></filename> to
+      <filename>headless.war</filename> to make deployment easier.</para>
+    </note>
   </step>
   <step>
    <para>Browse to the console application, for example
-   <literal>http://host.example.com:8080/headless/</literal>, and configure
-   OpenAM core services as if you were deploying with a full version.</para>
+    <literal>http://host.example.com:8080/headless/</literal>, and configure
+    OpenAM core services as if you were deploying with a full version.</para>
   </step>
   <step>
    <para>Restrict permissions to the
