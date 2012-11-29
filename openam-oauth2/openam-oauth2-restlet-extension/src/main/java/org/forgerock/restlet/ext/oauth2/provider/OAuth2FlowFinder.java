@@ -132,41 +132,35 @@ public class OAuth2FlowFinder extends Finder {
                 targetClass = flowServerResources.get(type);
                 if (targetClass == null) {
                     if (OAuth2Constants.EndpointType.AUTHORIZATION_ENDPOINT.equals(endpointType)) {
-                        /*targetClass =
-                                OAuthProblemException.OAuthError.UNSUPPORTED_RESPONSE_TYPE.handle(
-                                        request, "Type is not supported: " + type).pushException();
-                        */
+                        targetClass = ErrorServerResource.class;
+
                         OAuth2Utils.DEBUG.error("OAuth2FlowFinder::Unsupported response type: Type is not supported: "
                                 + type);
                         OAuthProblemException.OAuthError.UNSUPPORTED_RESPONSE_TYPE.handle(
-                                request, "Type is not supported: " + type);
+                                request, "Type is not supported: " + type).pushException();
                     } else {
-                        /*targetClass =
-                                OAuthProblemException.OAuthError.UNSUPPORTED_GRANT_TYPE.handle(
-                                        request, "Type is not supported: " + type).pushException();
-                        */
+                        targetClass = ErrorServerResource.class;
+
                         OAuth2Utils.DEBUG.error("OAuth2FlowFinder::Unsupported response type: Type is not supported: "
                                 + type);
-                        OAuthProblemException.OAuthError.UNSUPPORTED_RESPONSE_TYPE.handle(
-                                request, "Type is not supported: " + type);
+                        OAuthProblemException.OAuthError.UNSUPPORTED_GRANT_TYPE.handle(
+                                request, "Type is not supported: " + type).pushException();
                     }
                 }
             } else {
-                /*
-                targetClass =
-                        OAuthProblemException.OAuthError.NOT_FOUND.handle(request,
-                                "Type is not set").pushException();
-                */
+                targetClass = ErrorServerResource.class;
+
                 OAuth2Utils.DEBUG.error("OAuth2FlowFinder::Unsupported response type: Type is not supported: " + type);
-                OAuthProblemException.OAuthError.UNSUPPORTED_RESPONSE_TYPE.handle(
-                        request, "Type is not supported: " + type);
+                OAuthProblemException.OAuthError.NOT_FOUND.handle(
+                        request, "Type is not set").pushException();
             }
         } else {
-            /*
-            targetClass =
-                    OAuthProblemException.OAuthError.NOT_FOUND.handle(request, "Type is not set")
+
+            targetClass = ErrorServerResource.class;
+
+            OAuthProblemException.OAuthError.NOT_FOUND.handle(request, "Type is not set")
                             .pushException();
-            */
+
         }
         return targetClass;
     }
