@@ -966,6 +966,7 @@
                             <Value>sunFederationManagerDataStore</Value>
                             <Value>sunIdentityServerLibertyPPService</Value>
                             <Value>sunFMSAML2NameIdentifier</Value>
+                            <Value>forgerock-am-dashboard-service</Value>
                         </DefaultValues>
                     </AttributeSchema>
 
@@ -1058,6 +1059,7 @@
                             <Value>sunIdentityServerPPEmergencyContact</Value>
                             <Value>sun-fm-saml2-nameid-infokey</Value>
                             <Value>sun-fm-saml2-nameid-info</Value>
+                            <Value>assignedDashboard</Value>
                         </DefaultValues>
                     </AttributeSchema>
 
@@ -1654,6 +1656,7 @@
                             <Value>sunFederationManagerDataStore</Value>
                             <Value>sunIdentityServerLibertyPPService</Value>
                             <Value>sunFMSAML2NameIdentifier</Value>
+                            <Value>forgerock-am-dashboard-service</Value>
                         </DefaultValues>
                     </AttributeSchema>
 
@@ -1745,6 +1748,7 @@
                             <Value>sunIdentityServerPPEmergencyContact</Value>
                             <Value>sun-fm-saml2-nameid-infokey</Value>
                             <Value>sun-fm-saml2-nameid-info</Value>
+                            <Value>assignedDashboard</Value>
                         </DefaultValues>
                     </AttributeSchema>
 
@@ -2205,6 +2209,7 @@
                             <Value>sunFederationManagerDataStore</Value>
                             <Value>sunIdentityServerLibertyPPService</Value>
                             <Value>sunFMSAML2NameIdentifier</Value>
+                            <Value>forgerock-am-dashboard-service</Value>
                         </DefaultValues>
                     </AttributeSchema>
 
@@ -2296,6 +2301,7 @@
                             <Value>sunIdentityServerPPEmergencyContact</Value>
                             <Value>sun-fm-saml2-nameid-infokey</Value>
                             <Value>sun-fm-saml2-nameid-info</Value>
+                            <Value>assignedDashboard</Value>
                         </DefaultValues>
                     </AttributeSchema>
 
@@ -2844,6 +2850,7 @@
                             <Value>sunIdentityServerPPEmergencyContact</Value>
                             <Value>sun-fm-saml2-nameid-infokey</Value>
                             <Value>sun-fm-saml2-nameid-info</Value>
+                            <Value>assignedDashboard</Value>
                         </DefaultValues>
                     </AttributeSchema>
 
@@ -3313,6 +3320,7 @@
                             <Value>sunFMSAML2NameIdentifier</Value>
                             <Value>top</Value>
                             <Value>user</Value>
+                            <Value>forgerock-am-dashboard-service</Value>
                         </DefaultValues>
                     </AttributeSchema>
 
@@ -3401,6 +3409,7 @@
                             <Value>sunIdentityServerPPEmergencyContact</Value>
                             <Value>sun-fm-saml2-nameid-infokey</Value>
                             <Value>sun-fm-saml2-nameid-info</Value>
+                            <Value>assignedDashboard</Value>
                         </DefaultValues>
                     </AttributeSchema>
 

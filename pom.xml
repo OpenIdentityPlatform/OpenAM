@@ -231,6 +231,8 @@
 
         <!-- Final Packaging Distribution Kit -->
         <module>openam-distribution</module>
+        <!-- Final Packaging Distribution Kit -->
+        <module>openam-dashboard</module>
 
     </modules>
 

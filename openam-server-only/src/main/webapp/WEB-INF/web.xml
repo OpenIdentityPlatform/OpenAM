@@ -950,7 +950,8 @@
         <param-name>rootContexts</param-name>
         <param-value>
             org.forgerock.openam.forgerockrest.RealmDispatcher,
-            org.forgerock.openam.forgerockrest.TestDispatcher
+            org.forgerock.openam.forgerockrest.TestDispatcher,
+            org.forgerock.openam.dashboard.DashboardDispatcher
         </param-value>
     </init-param>
     </servlet>
