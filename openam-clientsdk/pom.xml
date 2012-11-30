@@ -264,6 +264,7 @@
                                 <include>com/sun/identity/util/**</include>
                                 <include>org/forgerock/openam/authentication/service/protocol/**</include>
                                 <include>org/forgerock/openam/services/cdm/**</include>
+                                <include>org/forgerock/openam/validation/ResponseValidationFilter*</include>
                             </includes>
                             <excludes>
                                 <exclude>com/iplanet/am/sdk/ldap/**</exclude>

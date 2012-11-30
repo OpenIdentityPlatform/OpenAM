@@ -46,10 +46,18 @@
         <filter-name>distAuthConfiguratorFilter</filter-name>
         <filter-class>com.sun.identity.distauth.setup.DistAuthConfiguratorFilter</filter-class>
     </filter>
+    <filter>
+        <filter-name>ResponseValidationFilter</filter-name>
+        <filter-class>org.forgerock.openam.validation.ResponseValidationFilter</filter-class>
+    </filter>
     <filter-mapping>
         <filter-name>distAuthConfiguratorFilter</filter-name>
         <url-pattern>/*</url-pattern>
-    </filter-mapping>    
+    </filter-mapping>
+    <filter-mapping>
+        <filter-name>ResponseValidationFilter</filter-name>
+        <url-pattern>/*</url-pattern>
+    </filter-mapping>
 
     <listener>
         <listener-class>com.sun.identity.common.ShutdownServletContextListener</listener-class>
