@@ -48,9 +48,9 @@ public final class Dashboard {
 
                 for (String s1 : (Set<String>) attrs.keySet()) {
                     List<String> sList = new ArrayList((Set<String>) (attrs.get(s1)));
-                    app.put(s1.toLowerCase(), sList);
+                    app.put(s1, sList);
                 }
-                result.put(s, app);
+                result.put(s.toLowerCase(), app);
             }
 
         } catch (SSOException ex) {
