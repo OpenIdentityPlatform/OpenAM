@@ -52,34 +52,34 @@
                     <AttributeSchema name="dashboardClassName"
                                      type="single"
                                      syntax="string"
-                                     i18nKey="Dashboard Class Name"/>
+                                     i18nKey="A101"/>
                     <AttributeSchema name="dashboardName"
                                      type="single"
                                      syntax="string"
-                                     i18nKey="Dashboard Name"/>
+                                     i18nKey="A102"/>
                     <AttributeSchema name="dashboardDisplayName"
                                      type="single"
                                      syntax="string"
-                                     i18nKey="Dashboard Display Name"/>
+                                     i18nKey="A103"/>
                     <AttributeSchema name="dashboardIcon"
                                      type="single"
                                      syntax="string"
-                                     i18nKey="dashboard Icon"/>
+                                     i18nKey="A104"/>
                     <AttributeSchema name="dashboardLogin"
                                      type="single"
                                      syntax="string"
-                                     i18nKey="Dashboard Login"/>
+                                     i18nKey="A105"/>
                     <AttributeSchema name="ICFIdentifier"
                                      type="single"
                                      syntax="string"
-                                     i18nKey="ICF Identifier"/>
+                                     i18nKey="A106"/>
                 </SubSchema>
             </Global>
             <Organization>
                 <AttributeSchema name="assignedDashboard"
                                  type="list"
                                  syntax="string"
-                                 i18nKey="Available Dashboard Apps">
+                                 i18nKey="A107">
                     <DefaultValues>
                         <Value></Value>
                     </DefaultValues>
@@ -89,7 +89,7 @@
                 <AttributeSchema name="assignedDashboard"
                                  type="list"
                                  syntax="string"
-                                 i18nKey="Assigned Dashboard">
+                                 i18nKey="A108">
                     <DefaultValues>
                         <Value></Value>
                     </DefaultValues>
