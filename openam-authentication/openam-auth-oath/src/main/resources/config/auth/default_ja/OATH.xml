@@ -28,17 +28,17 @@
         "jar://com/sun/identity/authentication/Auth_Module_Properties.dtd">
 
 
-<ModuleProperties moduleName="OATH" version="1.0" >
-    <Callbacks length="2" order="1" timeout="120" header="このサーバーは OATH 認証を使用します" >
+<ModuleProperties moduleName="OATH" version="1.0">
+    <Callbacks length="2" order="1" timeout="120" header="このサーバーは OATH 認証を使用します">
         <PasswordCallback>
-            <Prompt> ワンタイムパスワード: </Prompt>
+            <Prompt>ワンタイムパスワード:</Prompt>
         </PasswordCallback>
         <ConfirmationCallback>
-          <OptionValues>
-            <OptionValue>
-              <Value> OTP コードを送信 </Value>
-            </OptionValue>
-          </OptionValues>
+            <OptionValues>
+                <OptionValue>
+                    <Value>OTP コードを送信</Value>
+                </OptionValue>
+            </OptionValues>
         </ConfirmationCallback>
     </Callbacks>
 </ModuleProperties>
