@@ -29,6 +29,7 @@
 
 package com.sun.identity.sm.model;
 
+import java.io.UnsupportedEncodingException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -45,7 +46,9 @@ import com.sun.identity.shared.Constants;
 import com.sun.identity.shared.debug.Debug;
 
 import com.sun.identity.sm.ldap.CTSPersistentStore;
+import org.apache.commons.codec.DecoderException;
 import org.apache.commons.codec.binary.Base64;
+import org.apache.commons.codec.binary.Hex;
 import org.forgerock.i18n.LocalizableMessage;
 import com.iplanet.dpro.session.exceptions.StoreException;
 import org.forgerock.openam.session.ha.i18n.AmsessionstoreMessages;
@@ -118,7 +121,12 @@ public class AMRecordDataEntry {
     }
 
     /**
-     * Constructs an instance.
+     * Constructs an instance obtained from the Directory Store
+     * and UnMarshal as required.
+     *
+     * ** For SAML2 Keys, Primary and Secondary, these need to
+     * be decoded from Hexadecimal to their Native String Values,
+     * which can be Base64 Encoded Data handled upstream.
      *
      * @param dn              Distinguished name.
      * @param attributeValues attribute values.
@@ -152,10 +160,10 @@ public class AMRecordDataEntry {
             }
         }
 
-        if (attributeValues.get(PRI_KEY) != null) {
-            Set<String> values = attributeValues.get(PRI_KEY);
+        if (attributeValues.get(SERVICE) != null) {
+            Set<String> values = attributeValues.get(SERVICE);
             for (String value : values) {
-                record.setPrimaryKey(value);
+                record.setService(value);
             }
         }
 
@@ -166,18 +174,26 @@ public class AMRecordDataEntry {
             }
         }
 
-        if (attributeValues.get(SERVICE) != null) {
-            Set<String> values = attributeValues.get(SERVICE);
+        if (attributeValues.get(PRI_KEY) != null) {
+            Set<String> values = attributeValues.get(PRI_KEY);
             for (String value : values) {
-                record.setService(value);
-            }
+                if (record.getService().equalsIgnoreCase(CTSPersistentStore.SAML2)) {
+                    record.setPrimaryKey(decodeKey(value));
+                } else {
+                    record.setPrimaryKey(value);
+                }
+            } // End of For Each Loop.
         }
 
         if (attributeValues.get(SEC_KEY) != null) {
             Set<String> values = attributeValues.get(SEC_KEY);
             for (String value : values) {
-                record.setSecondaryKey(value);
-            }
+                if (record.getService().equalsIgnoreCase(CTSPersistentStore.SAML2)) {
+                    record.setSecondaryKey(decodeKey(value));
+                } else {
+                    record.setSecondaryKey(value);
+                }
+            } // End of For Each Loop.
         }
 
         if (op != null) {
@@ -235,6 +251,17 @@ public class AMRecordDataEntry {
         }
     }
 
+    /**
+     * Provides a Marshaling Functionality from a Java POJO
+     * to an LDAP Capable and ready Object. Basically, setting up the
+     * Object to be serialized to the Directory Store.
+     *
+     * ** For SAML2 Objects their respective Keys, Primary
+     * and Secondary have already been encoded by our @see CTSPersistentStore.
+     *
+     * @param record
+     * @throws StoreException
+     */
     public AMRecordDataEntry(AMRootEntity record)
             throws StoreException {
         this.record = record;
@@ -312,6 +339,13 @@ public class AMRecordDataEntry {
         return record;
     }
 
+    /**
+     * Private Helper Method for Multivalued Attributes.
+     *
+     * @param attr
+     * @param values
+     * @return Set<String>
+     */
     private Set<String> formatMultiValuedAttr(String attr, Map<String, String> values) {
         Set<String> attrValues = new HashSet<String>();
 
@@ -426,4 +460,40 @@ public class AMRecordDataEntry {
         Date expDate = new Date(date.longValue() * 1000L);
         return formatter.format(expDate);
     }
+
+    /**
+     * Helper Method to Encode our Primary Key, to be accepted by LDAP.
+     *
+     * @param primaryKey
+     * @return String - Hexadecimal Encoded String.
+     */
+    public static String encodeKey(final String primaryKey) {
+        if ((primaryKey == null) || (primaryKey.isEmpty())) {
+            return null;
+        }
+        try {
+            return Hex.encodeHexString(primaryKey.getBytes("UTF-8"));
+        } catch (UnsupportedEncodingException uee) {
+            DEBUG.error("Unsupported Encoding for Key, " + uee.getMessage() + ", returning null.", uee);
+        }
+        return null;
+    }
+
+    /**
+     *  Helper Method to Decode our Primary Key.
+     *
+     * @param hexadecimalEncodedPrimaryKey
+     * @return String - Returned as Original Decoded Key.
+     */
+    public static String decodeKey(final String hexadecimalEncodedPrimaryKey) {
+        if ( (hexadecimalEncodedPrimaryKey == null) || (hexadecimalEncodedPrimaryKey.isEmpty()) )
+        { return null; }
+        try {
+            return new String(Hex.decodeHex(hexadecimalEncodedPrimaryKey.toCharArray()));
+        } catch (DecoderException de) {
+            DEBUG.error("Decoding Exception for Key, " + de.getMessage() + ", returning null.", de);
+        }
+        return null;
+    }
+
 }

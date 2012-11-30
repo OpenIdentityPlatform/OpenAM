@@ -61,7 +61,7 @@ public class TokenResource implements CollectionResourceProvider {
 
     public TokenResource() {
         try {
-            repository = new CoreTokenService(new OpenDJTokenRepo());
+            repository = new CoreTokenService(OpenDJTokenRepo.getInstance());
         } catch (Exception e) {
             throw new OAuthProblemException(Status.SERVER_ERROR_SERVICE_UNAVAILABLE.getCode(),
                     "Service unavailable", "Could not create underlying storage", null);

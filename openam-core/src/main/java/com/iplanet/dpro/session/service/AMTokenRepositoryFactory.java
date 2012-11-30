@@ -23,7 +23,6 @@ package com.iplanet.dpro.session.service;
 import com.iplanet.am.util.SystemProperties;
 import com.sun.identity.coretoken.interfaces.AMTokenRepository;
 import com.sun.identity.sm.ldap.CTSPersistentStore;
-import com.sun.identity.sm.mq.JMQSessionRepository;
 
 /**
  * <code>AMTokenRepositoryFactory</code> provides a default
@@ -48,12 +47,12 @@ class AMTokenRepositoryFactory {
             AMTokenRepository.CTS_REPOSITORY_CLASS_PROPERTY, DEFAULT_CTS_REPOSITORY_CLASS_NAME);
 
     /**
-     * Singleton instance of AM Session Repository or CTS.
+     * Singleton instance of AM Session Repository aka CTS.
      */
-    private static AMTokenRepository amTokenRepository = null;
+    private static volatile AMTokenRepository amTokenRepository = null;
 
     /**
-     * Private, do not allow instantiation.
+     * Prevent Instantiation and only use as a functional static class.
      */
     private AMTokenRepositoryFactory() {
     }
@@ -65,13 +64,13 @@ class AMTokenRepositoryFactory {
      * @return AMTokenRepository Singleton Instance.
      * @throws Exception
      */
-    protected static AMTokenRepository getInstance()
+    public static AMTokenRepository getInstance()
             throws Exception {
         if (amTokenRepository == null) {
             if (CTS_REPOSITORY_CLASS_NAME.equals(CTSPersistentStore.class.getName())) {
                 amTokenRepository = CTSPersistentStore.getInstance();
-            } else if (CTS_REPOSITORY_CLASS_NAME.equals(JMQSessionRepository.class.getName())) {
-                amTokenRepository = JMQSessionRepository.getInstance();
+            } else if (CTS_REPOSITORY_CLASS_NAME.equals(com.sun.identity.sm.mq.JMQSessionRepository.class.getName())) {
+                amTokenRepository = com.sun.identity.sm.mq.JMQSessionRepository.getInstance();
             } else {
                 throw new IllegalAccessException("Unable to instantiate the CTS Persistent Store as Implementation Class:["+
                         CTS_REPOSITORY_CLASS_NAME+"], is unknown to OpenAM!");

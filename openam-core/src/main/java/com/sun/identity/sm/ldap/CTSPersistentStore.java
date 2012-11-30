@@ -78,13 +78,16 @@ import org.opends.server.types.*;
  *
  */
 public class CTSPersistentStore extends GeneralTaskRunnable
-        implements AMTokenRepository, AMTokenSAML2Repository, OAuth2TokenRepository {
+        implements  AMTokenRepository, AMTokenSAML2Repository, OAuth2TokenRepository {
 
     /**
-     * Globals Constants, so not to pollute entire product.
+     * Globals public Constants, so not to pollute entire product.
      */
     public static final String FR_FAMRECORD = "frFamRecord";
 
+    /**
+     * Globals private Constants, so not to pollute entire product.
+     */
     private static final String PKEY_NAMING_ATTR = "pKey";
 
     private static final String FORMATTED_EXPIRATION_DATE_NAME = "formattedExpirationDate";
@@ -185,7 +188,7 @@ public class CTSPersistentStore extends GeneralTaskRunnable
      */
     private static final String SESSION_FAILOVER_HA_BASE_DN =
             FAMRECORDS_NAMING+Constants.COMMA+
-            TOKEN_SESSION_HA_ROOT_SUFFIX + Constants.COMMA + TOKEN_ROOT;
+                    TOKEN_SESSION_HA_ROOT_SUFFIX + Constants.COMMA + TOKEN_ROOT;
 
     private static final String SESSION_FAILOVER_HA_ELEMENT_DN_TEMPLATE =
             PKEY_NAMING_ATTR + Constants.EQUALS + "{"+PKEY_NAMING_ATTR+"}" + Constants.COMMA +
@@ -195,7 +198,7 @@ public class CTSPersistentStore extends GeneralTaskRunnable
      * Session Expiration Filter.
      */
     private final static String TOKEN_EXPIRATION_FILTER_TEMPLATE =
-            "(&(" + OBJECTCLASS + Constants.EQUALS + FR_FAMRECORD +
+            "(&(" + OBJECTCLASS + Constants.EQUALS + CTSPersistentStore.FR_FAMRECORD +
                     ")" + EXPDATE_FILTER_PRE + "{"+FORMATTED_EXPIRATION_DATE_NAME+"}" + EXPDATE_FILTER_POST + ")";
 
 
@@ -204,7 +207,7 @@ public class CTSPersistentStore extends GeneralTaskRunnable
      */
     private static final String SAML2_HA_BASE_DN =
             FAMRECORDS_NAMING+Constants.COMMA+
-            TOKEN_SAML2_HA_ROOT_SUFFIX + Constants.COMMA + TOKEN_ROOT;
+                    TOKEN_SAML2_HA_ROOT_SUFFIX + Constants.COMMA + TOKEN_ROOT;
 
     private static final String TOKEN_SAML2_HA_ELEMENT_DN_TEMPLATE =
             PKEY_NAMING_ATTR + Constants.EQUALS + "{"+SAML2_KEY_NAME+"}" + Constants.COMMA +
@@ -215,7 +218,7 @@ public class CTSPersistentStore extends GeneralTaskRunnable
      */
     private static final String OAUTH2_HA_BASE_DN =
             OAUTH2TOKENS_NAMING+Constants.COMMA+
-            TOKEN_OAUTH2_HA_ROOT_SUFFIX + Constants.COMMA + TOKEN_ROOT;
+                    TOKEN_OAUTH2_HA_ROOT_SUFFIX + Constants.COMMA + TOKEN_ROOT;
 
     private static final String TOKEN_OAUTH2_HA_ELEMENT_DN_TEMPLATE =
             OAuth2Constants.Params.ID + Constants.EQUALS + "{"+OAUTH2_KEY_NAME+"}" + Constants.COMMA + OAUTH2_HA_BASE_DN;
@@ -399,9 +402,8 @@ public class CTSPersistentStore extends GeneralTaskRunnable
      * Provide Service Instance Access to our Singleton
      *
      * @return CTSPersistentStore Singleton Instance.
-     * @throws StoreException
      */
-    public static CTSPersistentStore getInstance() throws StoreException {
+    public static final CTSPersistentStore getInstance() {
         return instance;
     }
 
@@ -445,7 +447,7 @@ public class CTSPersistentStore extends GeneralTaskRunnable
     /**
      * Perform Service Shutdown.
      */
-     @Override
+    @Override
     public void shutdown() {
         internalShutdown();
         DEBUG.warning(DB_AM_SHUT.get().toString());
@@ -564,9 +566,6 @@ public class CTSPersistentStore extends GeneralTaskRunnable
                     type, FAMRecord.WRITE, key, expirationTime, uuid,
                     is.getState(), sid.toString(), serializedInternalSession);
             // Construct the Entry's DN and Persist Record
-
-
-
             writeImmediate(famRec, getFormattedString(SESSION_FAILOVER_HA_ELEMENT_DN_TEMPLATE, PKEY_NAMING_ATTR, famRec.getPrimaryKey()));
         } catch (Exception e) {
             DEBUG.error(messageTag + "Failed to Save Session", e);
@@ -1133,7 +1132,7 @@ public class CTSPersistentStore extends GeneralTaskRunnable
             // return result
             return result;
         } catch (LDAPException ldapException) {
-             lastLDAPException = ldapException;
+            lastLDAPException = ldapException;
             // Not Found  No Such Object
             if (ldapException.getLDAPResultCode() == LDAPException.NO_SUCH_OBJECT) {
                 // This can be due to the session has expired and removed from the store.
@@ -1269,6 +1268,7 @@ public class CTSPersistentStore extends GeneralTaskRunnable
     // ***************************************************************************************************
     //
     // AMTokenSAML2Repository Implementation Methods.
+    //
     // These methods are called directly from the CTSPersistentSAML2Store, if that is the configured and
     // desired implementation.
     //
@@ -1289,7 +1289,7 @@ public class CTSPersistentStore extends GeneralTaskRunnable
             return null;
         }
         // Establish our DN
-        String baseDN = getFormattedString(TOKEN_SAML2_HA_ELEMENT_DN_TEMPLATE, SAML2_KEY_NAME, samlKey);
+        String baseDN = getFormattedString(TOKEN_SAML2_HA_ELEMENT_DN_TEMPLATE, SAML2_KEY_NAME, AMRecordDataEntry.encodeKey(samlKey));
         // Initialize LDAP Objects
         LDAPConnection ldapConnection = null;
         LDAPSearchResults searchResults = null;
@@ -1349,7 +1349,7 @@ public class CTSPersistentStore extends GeneralTaskRunnable
             return null;
         }
         StringBuilder filter = new StringBuilder();
-        filter.append(SKEY_FILTER_PRE).append(secKey).append(SKEY_FILTER_POST);
+        filter.append(SKEY_FILTER_PRE).append(AMRecordDataEntry.encodeKey(secKey)).append(SKEY_FILTER_POST);
         if (DEBUG.messageEnabled()) {
             DEBUG.message(messageTag + "Attempting Read of BaseDN:[" + SAML2_HA_BASE_DN + "]");
         }
@@ -1419,24 +1419,22 @@ public class CTSPersistentStore extends GeneralTaskRunnable
         if ((samlKey == null) || (samlKey.isEmpty())) {
             DEBUG.error(messageTag + "Unable to Persist SAML2 Token Object, as Primary SAML2 Key was not provided!");
             return;
-        } else if ((secKey == null) || (secKey.isEmpty())) {
-            DEBUG.error(messageTag + "Unable to Persist SAML2 Token Object, as Secondary SAML2 Key was not provided!");
-            return;
         } else if (samlObj == null) {
-            DEBUG.error(messageTag + "Unable to Persist SAML2 Token Object, as Object was not provided!");
+            DEBUG.error(messageTag + "Unable to Persist SAML2 Token Object, as Object was not provided or null!");
             return;
         }
-        // Marshal our Object and establish a FAMRecord for this Token Instance.
+        // Now Marshal our Object and establish a FAMRecord for this Token Instance.
         try {
             byte[] serializedInternalSession = SessionUtils.encode(samlObj);
             // Create a FAMRecord Object to wrap our SAML2 Object.
             FAMRecord famRec = new FAMRecord(
-                    SAML2, FAMRecord.WRITE, samlKey, expirationTime, secKey,
+                    SAML2, FAMRecord.WRITE, AMRecordDataEntry.encodeKey(samlKey), expirationTime,
+                    ((secKey==null) ? secKey: AMRecordDataEntry.encodeKey(secKey)),
                     1, null, serializedInternalSession);
             // Construct the Entry's DN and Persist Record
-            writeImmediate(famRec, getFormattedString(TOKEN_SAML2_HA_ELEMENT_DN_TEMPLATE, PKEY_NAMING_ATTR, famRec.getPrimaryKey()));
+            writeImmediate(famRec, getFormattedString(TOKEN_SAML2_HA_ELEMENT_DN_TEMPLATE, SAML2_KEY_NAME, famRec.getPrimaryKey()));
         } catch (Exception e) {
-            DEBUG.error("Failed to Save Session", e);
+            DEBUG.error("Failed to Save SAML2 Token", e);
         }
     }
 
@@ -1446,6 +1444,16 @@ public class CTSPersistentStore extends GeneralTaskRunnable
      * @param samlKey primary key
      */
     public void deleteSAML2Token(String samlKey) throws StoreException {
+        deleteSAML2Token(samlKey, true);
+    }
+
+    /**
+     * Deletes the SAML2 object by given primary key from the repository
+     *
+     * @param samlKey primary key
+     * @param encodePrimaryKey
+     */
+    private void deleteSAML2Token(String samlKey, boolean  encodePrimaryKey) throws StoreException {
         final String messageTag = "CTSPersistenceStore.deleteSAML2Token: ";
         // Arguments Valid?
         if ((samlKey == null) || (samlKey.isEmpty())) {
@@ -1455,7 +1463,8 @@ public class CTSPersistentStore extends GeneralTaskRunnable
         // Initialize.
         LDAPConnection ldapConnection = null;
         LDAPException lastLDAPException = null;
-        String baseDN = getFormattedString(TOKEN_SAML2_HA_ELEMENT_DN_TEMPLATE, PKEY_NAMING_ATTR, samlKey);
+        String baseDN = getFormattedString(TOKEN_SAML2_HA_ELEMENT_DN_TEMPLATE, SAML2_KEY_NAME,
+                ((encodePrimaryKey)?AMRecordDataEntry.encodeKey(samlKey):samlKey) );
         try {
             // Obtain a Connection.
             ldapConnection = getDirectoryConnection();
@@ -1533,7 +1542,7 @@ public class CTSPersistentStore extends GeneralTaskRunnable
                 }
                 // Obtain the primary Key and perform the Deletion.
                 String[] values = primaryKeyAttribute.getStringValueArray();
-                deleteSAML2Token(values[0]);
+                deleteSAML2Token(values[0],false); // Do not to encode, as our Primary Key is already encoded from Store.
                 objectsDeleted++;
             } // End of while loop.
         } catch (LDAPException ldapException) {
@@ -1572,7 +1581,6 @@ public class CTSPersistentStore extends GeneralTaskRunnable
                 DEBUG.error(messageTag + "Number of Expired SAML2 Artifacts Deleted:[" + objectsDeleted + "], Duration:[" + timeDuration.getDurationToString() + "]");
             }
         }
-
 
     }
 
@@ -1723,12 +1731,12 @@ public class CTSPersistentStore extends GeneralTaskRunnable
         // detected something missing...
         int validatedSuccessfully=0;
         for(String ctsTopLevelDN : validationResultMap.keySet()) {
-          if (validationResultMap.get(ctsTopLevelDN).booleanValue()) {
-              validatedSuccessfully++;
-          } else {
-              final LocalizableMessage message = DB_ENT_NOT_P.get(ctsTopLevelDN);
-              DEBUG.message("CTSPersistenceStore.validateCTSPersistenceStore: " + message.toString());
-          }
+            if (validationResultMap.get(ctsTopLevelDN).booleanValue()) {
+                validatedSuccessfully++;
+            } else {
+                final LocalizableMessage message = DB_ENT_NOT_P.get(ctsTopLevelDN);
+                DEBUG.message("CTSPersistenceStore.validateCTSPersistenceStore: " + message.toString());
+            }
         } // End of KeySet for each loop...
         // Determine if we are good to go or not....
         return (containersToBeValidated.length == validatedSuccessfully);

@@ -61,8 +61,7 @@ import com.sun.identity.shared.Constants;
  * state of InternalSession object
  */
 @Deprecated
-public class JMQSessionRepository extends GeneralTaskRunnable implements
-        AMTokenRepository, AMTokenSAML2Repository {
+public class JMQSessionRepository extends GeneralTaskRunnable implements AMTokenRepository, AMTokenSAML2Repository {
 
     /**
      * Singleton Definition.
@@ -179,24 +178,20 @@ public class JMQSessionRepository extends GeneralTaskRunnable implements
     /**
      * Provide Service Instance Access to our Singleton
      *
-     * @return CTSPersistentStore Singleton Instance.
-     * @throws com.iplanet.dpro.session.exceptions.StoreException
+     * @return JMQSessionRepository Singleton Instance.
      *
      */
-    public static JMQSessionRepository getInstance() throws StoreException {
+    public static final JMQSessionRepository getInstance() {
         initPersistSession();
         SystemTimer.getTimer().schedule(instance, new Date((
                 System.currentTimeMillis() / 1000) * 1000));
         return instance;
     }
 
-    /**
-    *
+   /**
     * Constructs new JMQSessionRepository
-    * @exception Exception when cannot create a new Session repository
-    *
     */
-   private JMQSessionRepository() throws Exception {
+   private JMQSessionRepository() {
    }
 
     /**

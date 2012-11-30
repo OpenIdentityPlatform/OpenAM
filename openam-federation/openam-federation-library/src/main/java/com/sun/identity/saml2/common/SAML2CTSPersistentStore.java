@@ -24,6 +24,7 @@ import com.iplanet.dpro.session.SessionException;
 import com.iplanet.dpro.session.exceptions.StoreException;
 import com.iplanet.dpro.session.service.SessionService;
 import com.iplanet.dpro.session.share.SessionBundle;
+import com.iplanet.services.naming.ServerEntryNotFoundException;
 import com.iplanet.services.naming.WebtopNaming;
 import com.sun.identity.common.GeneralTaskRunnable;
 import com.sun.identity.common.SystemTimer;
@@ -32,9 +33,9 @@ import com.sun.identity.session.util.SessionUtils;
 import com.sun.identity.shared.Constants;
 import com.sun.identity.shared.configuration.SystemPropertiesManager;
 import com.sun.identity.shared.debug.Debug;
+import com.sun.identity.sm.ldap.CTSPersistentStore;
 import com.sun.identity.sm.model.AMRecord;
 import com.sun.identity.sm.model.FAMRecord;
-import org.forgerock.openam.session.model.AMRootEntity;
 
 import java.util.*;
 
@@ -43,12 +44,12 @@ import java.util.*;
  * This class is used in SAML2  mode to store/recover serialized
  * state of Assertion/Response object.
  *
- * This class acts as a proxy to perform distinct SAML2
+ * This class acts as a Proxy to perform distinct SAML2
  * operations and allow the CTSPersistentStore implementation
  * to handle the actual CRUD for Tokens.
  *
  */
-public class CTSPersistentSAML2Store extends GeneralTaskRunnable
+public class SAML2CTSPersistentStore extends GeneralTaskRunnable
     implements AMTokenSAML2Repository {
 
     /**
@@ -68,13 +69,13 @@ public class CTSPersistentSAML2Store extends GeneralTaskRunnable
      *
      * This instance is this classes Singleton.
      */
-    private static volatile AMTokenSAML2Repository instance = null;
+    private static volatile AMTokenSAML2Repository instance = new SAML2CTSPersistentStore();
 
     /**
      * OpenAM CTS Repository.
      *
      * This instance actually brings in the implementation for all CRUD
-     * Operations.
+     * Operations and main implementation.  @see CTSPersistentStore.
      */
     private static volatile AMTokenSAML2Repository amTokenSAML2Repository = null;
 
@@ -167,20 +168,26 @@ public class CTSPersistentSAML2Store extends GeneralTaskRunnable
 
         // Instantiate the Singleton Instance.
         try {
-            instance = new CTSPersistentSAML2Store();
+            initialize();
         } catch(Exception e) {
-            debug.error("Unable to Instantiate "+CTSPersistentSAML2Store.class.getName()+" for SAML2 Persistence",e);
+            debug.error("Unable to Instantiate "+SAML2CTSPersistentStore.class.getName()+" for SAML2 Persistence",e);
         }
 
     }
 
+    /**
+     * Package Protected from instantiation.
+     */
+    private SAML2CTSPersistentStore() {
+    }
+
    /**
     *
-    * Constructs new CTSPersistentSAML2Store
+    * Constructs new SAML2CTSPersistentStore
     * @exception Exception when cannot create a new SAML2 repository
     *
     */
-   private CTSPersistentSAML2Store() throws Exception {
+   private static void initialize() throws SessionException {
         // Obtain OpenAM Instance Configuration Properties.
         String thisSessionServerProtocol = SystemPropertiesManager
                 .get(Constants.AM_SERVER_PROTOCOL);
@@ -197,14 +204,18 @@ public class CTSPersistentSAML2Store extends GeneralTaskRunnable
             throw new SessionException(SessionBundle.rbName,
                     "propertyMustBeSet", null);
         }
+       try {
         // Obtain our Server ID for this OpenAM Instance.
         serverId = WebtopNaming.getServerID(thisSessionServerProtocol,
                 thisSessionServer, thisSessionServerPortAsString,
                 thisSessionURI);
+       } catch (ServerEntryNotFoundException serverNotFoundException) {
+           throw new SessionException("WebTopNaming Exception: "+serverNotFoundException.getMessage());
+       }
         // Initialize our Persistence Layer.
         initPersistSession();   
         // Schedule our Runnable Background Thread Task. @see run() method for associated Task.
-        SystemTimer.getTimer().schedule(this, new Date((
+        SystemTimer.getTimer().schedule((SAML2CTSPersistentStore) instance, new Date((
             System.currentTimeMillis() / 1000) * 1000));
     }
 
@@ -212,10 +223,10 @@ public class CTSPersistentSAML2Store extends GeneralTaskRunnable
      *
      * Initialize the Reference to our CTS Persistent Store.
      */
-    private void initPersistSession() {
+    private static void initPersistSession() {
         try {
             // Obtain our AM Token Repository Instance to provide the Backend CRUD for Tokens.
-            amTokenSAML2Repository = CTSPersistentSAML2StoreFactory.getInstance();
+            amTokenSAML2Repository = CTSPersistentStore.getInstance();
             if (amTokenSAML2Repository != null) {
                 isDatabaseUp = true;
             } else {
@@ -476,7 +487,7 @@ public class CTSPersistentSAML2Store extends GeneralTaskRunnable
      * healthCheckPeriod.
      */
      public void run() {
-        String classMethod="CTSPersistentSAML2Store.run: ";
+        String classMethod="SAML2CTSPersistentStore.run: ";
         try {
 
             if (debug.messageEnabled()) {
@@ -502,12 +513,10 @@ public class CTSPersistentSAML2Store extends GeneralTaskRunnable
                 logDBStatus();
             }
         } catch (Exception e) {
-            debug.error("CTSPersistentSAML2Store.run(): Exception in thread",
+            debug.error("SAML2CTSPersistentStore.run(): Exception in thread",
                     e);
         }
 
     }
-
-
 
 }

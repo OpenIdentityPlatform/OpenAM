@@ -94,7 +94,7 @@ public class AMSessionRepositoryTypeTest {
     public void testGetAMSessionRepositoryTypeImplementationClass() throws Exception {
 
         assertEquals(AMSessionRepositoryType.CONFIG.amSessionRepositoryImplementationClassName(),
-                CTSPersistentStore.class.getName());
+                CTSPersistentStore.getInstance().getClass().getName());
 
     }
 

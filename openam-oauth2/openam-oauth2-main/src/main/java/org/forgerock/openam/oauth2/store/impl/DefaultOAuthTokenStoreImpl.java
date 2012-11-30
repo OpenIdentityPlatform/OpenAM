@@ -74,7 +74,7 @@ public class DefaultOAuthTokenStoreImpl implements OAuth2TokenStore {
      */
     public DefaultOAuthTokenStoreImpl() {
         try {
-            repository = new CoreTokenService(new OpenDJTokenRepo());
+            repository = new CoreTokenService(OpenDJTokenRepo.getInstance());
         } catch (Exception e) {
             // TODO: legacy code throws Exception, look to refactor
             throw new OAuthProblemException(Status.SERVER_ERROR_SERVICE_UNAVAILABLE.getCode(),
