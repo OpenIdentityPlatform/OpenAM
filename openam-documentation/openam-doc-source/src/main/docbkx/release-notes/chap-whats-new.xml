@@ -95,6 +95,12 @@
 
  <itemizedlist>
   <title>Additional New Features</title>
+
+  <listitem>
+   <!-- AME-219 and CR-889 -->
+   <para>OpenAM now provides an account expiration post authentication plugin to
+   set an account expiration date on successful login.</para>
+  </listitem>
   <listitem>
     <para>The REST authenticate command now has a client parameter (<link
     xlink:href="https://bugster.forgerock.org/jira/browse/OPENAM-1048"

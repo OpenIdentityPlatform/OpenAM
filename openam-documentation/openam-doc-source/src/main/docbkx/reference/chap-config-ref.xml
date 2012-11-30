@@ -3936,6 +3936,15 @@
    </varlistentry>
 
    <varlistentry>
+    <term><literal>org.forgerock.openam.authentication.accountExpire.days</literal></term>
+    <listitem>
+     <para>Days until account expiration set after successful authentication
+     by the account expiration post authentication plugin.</para>
+     <para>Default: 30</para>
+    </listitem>
+   </varlistentry>
+
+   <varlistentry>
     <term><literal>securidHelper.ports</literal></term>
     <listitem>
      <para>Port on which SecurID daemon listens.</para>

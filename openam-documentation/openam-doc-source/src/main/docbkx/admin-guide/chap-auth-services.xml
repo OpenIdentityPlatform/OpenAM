@@ -3385,7 +3385,89 @@
    </step>
   </procedure>
  </section>
- 
+
+ <section xml:id="authn-post-auth-plugins">
+  <title>Post Authentication Plugins</title>
+  <indexterm>
+   <primary>Post authentication plugins</primary>
+  </indexterm>
+
+  <para>Post authentication plugins include custom processing at the end of the
+  authentication process, immediately before the subject is authenticated.
+  Common uses of post authentication plugins include setting cookies and
+  session variables. Post authentication plugins are often used in conjunction
+  with policy agents. The post authentication plugin sets custom session
+  properties, and then the policy agent injects the custom properties into the
+  request header to the protected application.</para>
+
+  <para>In the OpenAM console, you add post authentication plugins to an
+  authentication chain by adding their class names to the Post Authentication
+  Processing Class list under Access Control &gt; <replaceable>Realm
+  Name</replaceable> &gt; Authentication &gt; Authentication Chaining &gt;
+  <replaceable>Auth Chain Name</replaceable>.</para>
+
+  <variablelist>
+   <title>Standard Post Authentication Plugins</title>
+
+   <para>OpenAM provides some post authentication plugins as part of the
+   standard product delivery.</para>
+
+   <varlistentry>
+    <term>Class name: <literal>org.forgerock.openam.authentication.modules.adaptive.Adaptive</literal></term>
+    <listitem>
+     <para>The adaptive authentication plugin serves to save cookies and profile
+     attributes after successful authentication.</para>
+
+     <para>Add it to your authentication chains that use the adaptive
+     authentication module configured to save cookies and profile
+     attributes.</para>
+    </listitem>
+   </varlistentry>
+
+   <!-- OPENAM-1861: Document OAuth2 Post Authentication plugin -->
+   <varlistentry>
+    <term>Class name: <literal>org.forgerock.openam.authentication.modules.oauth2.OAuth2PostAuthnPlugin</literal></term>
+    <listitem>
+     <para>The OAuth 2.0 post authentication plugin builds a global logout URL
+     used by <filename>/oauth2c/OAuthLogout.jsp</filename> after successful
+     OAuth 2.0 client authentication. This logs the resource owner out
+     with the OAuth 2.0 provider when logging out of OpenAM.</para>
+
+     <para>Before using this plugin, configure the OAuth 2.0 authentication
+     module with the correct OAuth 2.0 Provider logout service URL, and set
+     the Logout options to Log out or Prompt. This plugin cannot succeed unless
+     those parameters are correctly set.</para>
+
+     <para>Sometimes OAuth 2.0 providers change their endpoints, including
+     their logout URLs. When using a provider like Facebook, Google, or MSN
+     make sure you are aware when they change their endpoint locations so that
+     you can change your client configuration accordingly.</para>
+     <para></para>
+    </listitem>
+   </varlistentry>
+
+   <!-- OPENAM-1860: Document post authentication plugin account expiration -->
+   <varlistentry>
+    <term>Class name: <literal>org.forgerock.openam.authentication.plugins.AccountExpirePlugin</literal></term>
+    <listitem>
+     <para>The account expiration post authentication plugin sets an account
+     expiration date after successful authentication. OpenAM uses this to
+     prevent expired accounts from being used to authenticate.</para>
+
+     <para>The default of 30 days can be changed using the advanced OpenAM
+     server property,
+     <literal>org.forgerock.openam.authentication.accountExpire.days</literal>.</para>
+    </listitem>
+   </varlistentry>
+  </variablelist>
+
+  <para>If necessary, you can also write your own custom post authentication
+  plugin as described in the <citetitle>Developer's Guide</citetitle> chapter
+  on <link xlink:href="dev-guide#chap-post-auth"
+  xlink:role="http://docbook.org/xlink/role/olink"><citetitle>Creating a Post
+  Authentication Plugin</citetitle></link>.</para>
+ </section>
+
  <section xml:id="authn-from-browser">
   <title>Authenticating To OpenAM</title>
   
