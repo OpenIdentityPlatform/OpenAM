@@ -60,8 +60,8 @@
 
  <toc />
 
- <xinclude:include href='chap-whats-new.xml' />
- <xinclude:include href='chap-before-you-install.xml' />
- <xinclude:include href='chap-compatibility.xml' />
- <xinclude:include href='chap-issues.xml' />
+ <xinclude:include href='chap-web-agents.xml' />
+ <xinclude:include href='chap-javaee-agents.xml' />
+ <xinclude:include href="chap-feedback.xml" />
+ <xinclude:include href="chap-support.xml" />
 </book>

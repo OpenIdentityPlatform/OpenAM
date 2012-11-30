@@ -1,0 +1,216 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  ! CCPL HEADER START
+  !
+  ! This work is licensed under the Creative Commons
+  ! Attribution-NonCommercial-NoDerivs 3.0 Unported License.
+  ! To view a copy of this license, visit
+  ! http://creativecommons.org/licenses/by-nc-nd/3.0/
+  ! or send a letter to Creative Commons, 444 Castro Street,
+  ! Suite 900, Mountain View, California, 94041, USA.
+  !
+  ! You can also obtain a copy of the license at
+  ! trunk/opendj3/legal-notices/CC-BY-NC-ND.txt.
+  ! See the License for the specific language governing permissions
+  ! and limitations under the License.
+  !
+  ! If applicable, add the following below this CCPL HEADER, with the fields
+  ! enclosed by brackets "[]" replaced with your own identifying information:
+  !      Portions Copyright [yyyy] [name of copyright owner]
+  !
+  ! CCPL HEADER END
+  !
+  !      Copyright 2012 ForgeRock AS
+  !    
+-->
+<chapter xml:id='chap-javaee-agents'
+ xmlns='http://docbook.org/ns/docbook' version='5.0' xml:lang='en'
+ xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance'
+ xsi:schemaLocation='http://docbook.org/ns/docbook http://docbook.org/xml/5.0/xsd/docbook.xsd'
+ xmlns:xlink='http://www.w3.org/1999/xlink'
+ xmlns:xinclude='http://www.w3.org/2001/XInclude'>
+ <title>Java EE Policy Agents <?eval ${agentsDocTargetVersion}?></title>
+
+ <para>This chapter concerns OpenAM Java EE policy agents. Java EE policy
+ agents run in web application containers and protect Java EE
+ applications.</para>
+
+ <section xml:id="what-new-javaee-agents">
+  <title>New in JavaEE Policy Agents <?eval ${javaEEAgentsDocTargetVersion}?></title>
+
+  <itemizedlist>
+   <listitem>
+    <para>The Java EE agent goto URL can now be modified (<link
+    xlink:href="https://bugster.forgerock.org/jira/browse/OPENAM-1299"
+    xlink:show="new">OPENAM-1299</link>).</para>
+   </listitem>
+   <listitem>
+    <para>The Apache Tomcat policy agent now supports Tomcat 7 as well (<link
+    xlink:href="https://bugster.forgerock.org/jira/browse/OPENAM-1273"
+    xlink:show="new">OPENAM-1273</link>).</para>
+   </listitem>
+   <listitem>
+    <para>Java EE policy agents can now conditionally redirect users based on
+    the incoming request URL (<link
+    xlink:href="https://bugster.forgerock.org/jira/browse/OPENAM-1265"
+    xlink:show="new">OPENAM-1265</link>).</para>
+   </listitem>
+   <listitem>
+    <para>The auto-submitting form in <filename>FormLoginContent.txt</filename>
+    now parses as valid XML (<link
+    xlink:href="https://bugster.forgerock.org/jira/browse/OPENAM-674"
+    xlink:show="new">OPENAM-674</link>).</para>
+   </listitem>
+  </itemizedlist>
+ </section>
+
+ <section xml:id="before-you-start-javaee-agents">
+ <title>Before You Install OpenAM Java EE Policy Agents</title>
+
+  <para>This section covers software and hardware prerequisites for installing
+  and running OpenAM Java EE Policy Agents.</para>
+
+  <para>If you have a special request to support a combination not listed here,
+  contact ForgeRock at <link xlink:href="mailto:info@forgerock.com"
+  >info@forgerock.com</link>.</para>
+
+  <section xml:id="java-requirements-javaee-agents">
+   <title>Java EE Agents Java Requirements</title>
+
+   <para>All policy agents except Microsoft IIS web agents require Java for
+   installation. Java EE policy agents run in a container using Java 6 or later.
+   ForgeRock recommends the most recent release of Java 6 or later to ensure
+   you have the latest security fixes.</para>
+
+   <para>ForgeRock has tested this release with Oracle Java SE JDK.</para>
+  </section>
+
+  <section xml:id="browser-requirements-javaee-agents">
+   <title>Java EE Agents Browsers Tested</title>
+
+   <itemizedlist>
+    <para>ForgeRock has tested this policy agent release with the following web
+    browsers.</para>
+    <listitem><para>Chrome release 16 and later</para></listitem>
+    <listitem><para>Firefox 3.6 and later</para></listitem>
+    <listitem><para>Internet Explorer 7 and later</para></listitem>
+   </itemizedlist>
+  </section>
+
+  <section xml:id="web-container-requirements-javaee-agents">
+   <title>Web Application Container Requirements</title>
+
+   <itemizedlist>
+    <para>Java EE policy agents support the following Java EE application
+    containers.</para>
+
+    <listitem>
+     <para>Apache Tomcat 6, 7</para>
+    </listitem>
+    <listitem>
+     <para>GlassFish v2, v3</para>
+    </listitem>
+    <listitem>
+     <para>IBM WebSphere Application Server 6.1, 7, 8.5</para>
+    </listitem>
+    <listitem>
+     <para>JBoss Enterprise Application Platform 5</para>
+     <para>JBoss Application Server 7.1</para>
+    </listitem>
+    <listitem>
+     <para>Jetty 7</para>
+    </listitem>
+    <listitem>
+     <para>Oracle WebLogic Server 10g or later</para>
+    </listitem>
+   </itemizedlist>
+  </section>
+
+  <section xml:id="platform-requirements-javaee-agents">
+   <title>Java EE Agents Platform Requirements</title>
+
+   <para>Apache Tomcat Java EE policy agents have been tested on Linux 2.6 or
+   later, and on Microsoft Windows Server 2008R2.</para>
+
+   <para>GlassFish Java EE policy agents have been tested on Oracle Solaris 10
+   or later.</para>
+
+   <para>Other Java EE policy agents have been tested on Linux 2.6 or
+   later.</para>
+
+   <para>Testing has focused on 64-bit operating systems.</para>
+  </section>
+
+  <section xml:id="hardware-requirements-javaee-agents">
+   <title>Java EE Agents Hardware Requirements</title>
+
+   <para>You can deploy OpenAM Java EE policy agents on any hardware supported
+   for the combination of software required.</para>
+
+    <para>ForgeRock has tested this release on x86 and x64 based systems.</para>
+  </section>
+ </section>
+
+ <section xml:id="javaee-agent-compatibility">
+  <title>Java EE Policy Agent Compatibility</title>
+
+  <para>This section concerns OpenAM Java EE Policy Agents
+  <?eval ${javaEEAgentsDocTargetVersion}?>.</para>
+
+  <section xml:id="javaee-agent-major-changes">
+   <title>Major Changes to Java EE Policy Agent Functionality</title>
+
+   <para>TODO</para>
+  </section>
+
+  <section xml:id="javaee-agent-deprecated">
+   <title>Deprecated Functionality</title>
+   <para>The following functionality is deprecated in OpenAM Java EE Policy
+   Agents <?eval ${javaEEAgentsDocTargetVersion}?>, and is likely to be removed
+   in a future release.</para>
+
+   <itemizedlist>
+    <listitem>
+     <para>TODO</para>
+    </listitem>
+   </itemizedlist>
+  </section>
+
+  <section xml:id="javaee-agent-removed">
+   <title>Removed Functionality</title>
+   <para>No functionality has been removed in OpenAM Java EE Policy Agents
+   <?eval ${javaEEAgentsDocTargetVersion}?>.</para>
+  </section>
+ </section>
+
+ <section xml:id="javaee-agent-issues">
+  <title>Java EE Policy Agents Fixes, Limitations, &amp; Known Issues</title>
+
+  <para>OpenAM Java EE policy agent issues are tracked at <link xlink:show="new"
+  xlink:href="https://bugster.forgerock.org/jira/browse/OPENAM"
+  >https://bugster.forgerock.org/jira/browse/OPENAM</link>.</para>
+
+  <section xml:id="javaee-agent-fixes">
+   <title>Bugs Fixed In This Release</title>
+
+   <para>The following bugs were fixed in this release.</para>
+
+   <para>TODO</para>
+  </section>
+
+  <section xml:id="javaee-agent-limitations">
+   <title>Limitations</title>
+
+   <para>Not all features of OpenAM Java EE policy agents work with IPv6.</para>
+  </section>
+
+  <section xml:id="javaee-agent-known-issues">
+   <title>Known Issues At Release Time</title>
+
+   <para>The following known issues remained open at the time this release
+   became available.</para>
+
+   <para>TODO</para>
+  </section>
+ </section>
+</chapter>
