@@ -1914,9 +1914,9 @@ public class SessionService {
         }
         // Initialize Our Cluster State Service
         // Ensure we place our Server in Member Map.
-        clusterMemberMap.put(sessionServerID, sessionServiceID.toExternalForm());
+        clusterMemberMap.put(thisSessionServerID, thisSessionServiceURL.toExternalForm());
         // Instantiate the State Service.
-        clusterStateService = new ClusterStateService(this,sessionServerID, timeout, period, clusterMemberMap);
+        clusterStateService = new ClusterStateService(this, thisSessionServerID, timeout, period, clusterMemberMap);
         // Show our State Server Info Map
         if (sessionDebug.messageEnabled())
             { sessionDebug.message("SessionService's ClusterStateService Initialized Successfully, "+
