@@ -697,7 +697,7 @@ $ curl "https://openam.example.com:8080/openam/identity/create?
    <screen>$ curl "https://openam.example.com:8080/openam/identity/read?
  admin=AQIC5wM2LY4SfcxSYA8eG-vrNHb_W7nG8XkfAGyRyuaebDY.*AAJTSQACMDE.*
  &amp;name=testuser
- &amp;attributes_names_realm
+ &amp;attributes_names=realm
  &amp;attributes_values_realm=%2F"
 identitydetails.name=testuser
 identitydetails.type=user
@@ -777,7 +777,7 @@ identitydetails.attribute.value=id=testuser,ou=user,o=openam</screen>
  &amp;attributes_values_sn=Jensen
  &amp;attributes_names=mail
  &amp;attributes_values_mail=bjensen*
- &amp;attributes_names_realm
+ &amp;attributes_names=realm
  &amp;attributes_values_realm=%2F"
 string=bjensen</screen>
   </section>
