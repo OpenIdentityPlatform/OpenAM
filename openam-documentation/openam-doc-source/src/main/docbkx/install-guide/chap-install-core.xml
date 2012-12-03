@@ -223,10 +223,11 @@
   subset of the fully qualified hostname as the cookie domain. In the example
   <literal>.example.com</literal> the cookie domain is set to .example.com.</para>
   <note>
-  The configuration settings are saved to the <literal>$HOME</literal> of the
-  user running the web application container. If you would like the configuration
-  files stored somewhere else, such as <literal>/opt/openam</literal>, you will
-  need to run the Custom Configuration.
+  <para>The configuration settings are saved to the <literal>$HOME</literal> of
+  the user running the web application container. If you would like the
+  configuration files stored somewhere else, such as
+  <filename>/opt/openam</filename>, you will need to run the Custom
+  Configuration.</para>
   </note>
   <step>
    <para>In the initial configuration screen, click
@@ -531,11 +532,11 @@ Using CLASSPATH:
   <step>
    <para>Enter the same password entered during the first instance configuration
    for the OpenAM Administrator, <literal>amadmin</literal>.</para>
-   <note> 
-   If you make a mistake at any time during the configuration, click on the 
-   <literal>Previous</literal> button and the OpenAM Configurator will return
-   to the previous screen. When you click <literal>Next</literal>, the original 
-   default values will appear.
+   <note>
+   <para>If you make a mistake at any time during the configuration, click on
+   the <literal>Previous</literal> button and the OpenAM Configurator will
+   return to the previous screen. When you click <literal>Next</literal>, the
+   original default values will appear.</para>
    </note>
   </step>
   <step>
