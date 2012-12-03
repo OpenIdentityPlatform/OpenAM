@@ -34,8 +34,9 @@
  <indexterm>
   <primary>Installing</primary>
   <secondary>Session failover</secondary>
+  <secondary>Load Balancer</secondary>
  </indexterm>
- <para>This chapter covers setting up session failover when using multiple
+ <para>This chapter covers setting up session failover (SFO) when using multiple
  instances of OpenAM in a site configuration for high availability. The basic
  idea followed here is that you configure load balancing to be sticky, based
  on the value of an OpenAM cookie, <literal>amlbcookie</literal>, different
@@ -43,7 +44,7 @@
  balancer fails client requests over to another OpenAM server. The other OpenAM
  server must then fail over the user session associated with the client.</para>
  
- <para>Session failover uses a highly available data store for OpenAM
+ <para>SFO uses a highly available data store for OpenAM
  session data, shared by OpenAM servers in a site configuration. When the
  OpenAM server where a user authenticated goes down, other OpenAM servers can
  read the user session information from the highly available store, so the
@@ -51,22 +52,53 @@
  becomes available again, it can also read session information from the
  store, and carry on serving users with active sessions.</para>
  
+ <para><link xlink:href="install-guide#additional-instance-config"
+     xlink:role="http://docbook.org/xlink/role/olink"><citetitle>
+     Configuring an Additional Instance</citetitle></link>
+     provides the steps to configure each instance of OpenAM.
+     The following procedure describes how to configure an OpenAM
+     server to use a load balancer for the first instance if it was not
+     part of the initial configuration.</para>
+
  <note>
-  <para>Session failover is supported within a site or data center with a
-  shared local area network. Session failover is not supported across sites
-  and data centers linked by wide area networks (WAN). Latency over the WAN
-  can cause issues with the underlying message queue, and therefore prevents
-  reliable session failover.</para>
+  <para>Following an upgrade to OpenAM 10.1.0 XPress release, all users will
+  need to login again because OpenAM no longer uses Open Message Queue or 
+  Berkeley DB Java Edition for SFO. </para>
  </note>
  
- <procedure xml:id="before-you-start-site-failover">
-  <title>Before You Start</title>
+ <note>
+  <para>SFO is supported within a site or data center with a
+  shared local area network. SFO is not supported across sites
+  and data centers linked by wide area networks (WAN).</para>
+ </note>
+ 
+  <procedure xml:id="first-instance-load-balancer">
+  <title>Configure First OpenAM Instance Behind a Load Balancer</title>
   
-  <para>Before you set up session failover, first configure OpenAM in a site
-  configuration with a load balancer as the entry point to the site. The most
-  expedient way to configure the site is to set it up during initial OpenAM
-  configuration, where OpenAM can manage and replicate server configuration
-  for availability. If you did not set up the site during initial configuration,
+  <para>Before you set up SFO, first configure OpenAM in a site
+  configuration with a load balancer as the entry point to the site. However, 
+  you may already have a working instance before realizing that multiple 
+  instances are necessary. The following steps walk you through setting
+  up the load balancer for the first instance.</para>
+  
+  <step>
+   <para>In the OpenAM console for the first instance of the site, select
+   <literal> Configuration &gt; Servers and Sites</literal> and click on
+   the first server under <literal>Servers</literal>.</para>
+  </step>
+  <step>
+   <para>Under site <literal>Site</literal> click on <literal>Parent 
+   Site</literal> and select the load balancer.</para>
+  </step>
+  <step>
+   <para>Click on <literal>Save</literal>.</para>
+  </step>
+ </procedure>
+
+ <procedure xml:id="before-you-start-site-failover">
+  <title>Setting a Load Balancer on Existing Configurations</title>
+  
+  <para>If you did not set up the site during initial configuration,
   then follow all the steps below.</para>
   
   <step>
@@ -112,11 +144,12 @@
   </step>
  </procedure>
  
+ <!--
  <procedure xml:id="prepare-site-session-data-service">
   <title>To Prepare the Session Data Service</title>
   
   <para>The session data service relies on Open Message Queue and Berkeley DB
-  Java Edition. You set up the session failover service in a site cluster to
+  Java Edition. You set up the SFO service in a site cluster to
   serve as the highly available session data store.</para>
   
   <step>
@@ -124,7 +157,7 @@
    on at least two, and generally not more than four, servers where you run
    OpenAM.<footnote><para>You install more than one instance of the session
    tools in case an instance crashes and must fail over to another instance. At
-   the same time, session failover requires that messages be sent across the
+   the same time, SFO requires that messages be sent across the
    network from one instance to another to stay in sync in case of failover. If
    you install too many instances, however, then the increase in network
    traffic for synchronization can impair performance.</para></footnote></para>
@@ -160,15 +193,15 @@ Are you sure you want to update user guest? (y/n)[n] y
 User guest successfully updated.</screen>
   </step>
   <step>
-   <para>Add a user for the session failover service.</para>
+   <para>Add a user for the SFO service.</para>
    <screen>$ ./imqusermgr add -u openamuser -g admin -p secret12 -i aminstance
 User repository for broker instance: aminstance
 User openamuser successfully added.</screen>
   </step>
   <step>
-   <para>Create a password file for the session failover service.</para>
+   <para>Create a password file for the SFO service.</para>
    <screen>$ cd ../../../sfoscripts/bin/
-$ ./amsfopassword --encrypt secret12 --passwordfile /home/user/openam/mqpwd.txt
+$ ./amsfopassword -encrypt secret12 -passwordfile /home/user/openam/mqpwd.txt
 os.name=Linux
 SUCCESSFUL</screen>
   </step>
@@ -183,18 +216,18 @@ SUCCESSFUL</screen>
 [05/Mar/2012:08:35:23 CET] [B1048]: Shutdown of broker complete.</screen>
   </step>
   <step>
-   <para>Configure the session failover service for the site.</para>
+   <para>Configure the SFO service for the site.</para>
    <para>For each session tools installation, edit the
    <filename>/home/user/openam/sfoscripts/config/lib/amsfo.conf</filename>
    configuration file to change at least the <literal>USER_NAME</literal>,
    <literal>CLUSTER_LIST</literal>, and <literal>PASSWORDFILE</literal>
    parameters.</para>
    <para><literal>USER_NAME</literal> should match the user you created for the
-   session failover service.</para>
+   SFO service.</para>
    <screen>USER_NAME=openamuser</screen>
    <para><literal>CLUSTER_LIST</literal> specifies the <literal><replaceable
    >host</replaceable>:<replaceable>port</replaceable></literal> combinations
-   for all the session failover services you configure for the site.</para>
+   for all the SFO services you configure for the site.</para>
    <screen>CLUSTER_LIST=openam.example.com:7777,openam2.example.com:7777</screen>
    <para><literal>PASSWORDFILE</literal> specifies the path to the password
    file you created.</para>
@@ -205,9 +238,9 @@ SUCCESSFUL</screen>
  </procedure>
  
  <procedure xml:id="enable-site-session-failover">
-  <title>To Enable Session Failover</title>
+  <title>To Enable SFO</title>
   
-  <para>Enabling session failover at this point involves configuring OpenAM to
+  <para>Enabling SFO at this point involves configuring OpenAM to
   use the session data store, and then starting services. Examples in this
   procedure show OpenAM running in Apache Tomcat.</para>
   
@@ -248,21 +281,21 @@ Successfully started.</screen>
    <screen>$ tail -f /path/to/tomcat/logs/catalina.out
 ...
 INFO: Server startup in 26047 ms</screen>
-   <para>After OpenAM has started, you can test session failover.</para>
-   <!-- TODO: Cover how to troubleshoot when things go wrong, either here
-   or in the Admin Guide troubleshooting chapter. -->
+   <para>After OpenAM has started, you can test SFO.</para>
+   TODO: Cover how to troubleshoot when things go wrong, either here
+   or in the Admin Guide troubleshooting chapter.
   </step>
- </procedure>
+ </procedure> -->
 
 <!--  <section xml:id="global-session-failover">
-  <title>Global Session Failover</title>
-  <para>OpenAM includes a new, multi-site session failover mechanism based on
+  <title>Global SFO</title>
+  <para>OpenAM includes a new, multi-site SFO mechanism based on
   OpenDJ.</para>
  </section>
  
  <section xml:id="site-based-session-failover">
-  <title>Site Based Session Failover</title>
-  <para>OpenAM also provides the site-based session failover service available
+  <title>Site Based SFO</title>
+  <para>OpenAM also provides the site-based SFO service available
   in earlier versions.</para>
  </section> -->
 </chapter>
