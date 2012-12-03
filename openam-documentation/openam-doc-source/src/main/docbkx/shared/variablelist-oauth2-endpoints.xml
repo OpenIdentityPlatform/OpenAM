@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  ! CCPL HEADER START
+  !
+  ! This work is licensed under the Creative Commons
+  ! Attribution-NonCommercial-NoDerivs 3.0 Unported License.
+  ! To view a copy of this license, visit
+  ! http://creativecommons.org/licenses/by-nc-nd/3.0/
+  ! or send a letter to Creative Commons, 444 Castro Street,
+  ! Suite 900, Mountain View, California, 94041, USA.
+  !
+  ! You can also obtain a copy of the license at
+  ! src/main/resources/legal-notices/CC-BY-NC-ND.txt.
+  ! See the License for the specific language governing permissions
+  ! and limitations under the License.
+  !
+  ! If applicable, add the following below this CCPL HEADER, with the fields
+  ! enclosed by brackets "[]" replaced with your own identifying information:
+  !      Portions Copyright [yyyy] [name of copyright owner]
+  !
+  ! CCPL HEADER END
+  !
+  !      Copyright 2011-2012 ForgeRock AS
+  !    
+-->
+<variablelist
+ xmlns='http://docbook.org/ns/docbook' version='5.0' xml:lang='en'
+ xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance'
+ xsi:schemaLocation='http://docbook.org/ns/docbook http://docbook.org/xml/5.0/xsd/docbook.xsd'
+ xmlns:xlink='http://www.w3.org/1999/xlink'
+ xmlns:xinclude='http://www.w3.org/2001/XInclude'>
+ <title>OpenAM OAuth 2.0 Endpoints</title>
+ <para>In addition to the standard authorization and token endpoints
+ described in RFC 6749, OpenAM also exposes a token information endpoint
+ for resource servers to get information about access tokens so they can
+ determine how to respond to requests for protected resources. OpenAM as
+ authorization server exposes the following endpoints for clients and
+ resource servers.</para>
+
+ <varlistentry>
+  <term><literal>/oauth2/authorize</literal></term>
+  <listitem>
+   <para>Authorization endpoint defined in RFC 6749, used to obtain an
+   authorization grant from the resource owner</para>
+   <para>Example: <literal>https://openam.example.com:8443/openam/oauth2/authorize</literal></para>
+  </listitem>
+ </varlistentry>
+ <varlistentry>
+  <term><literal>/oauth2/access_token</literal></term>
+  <listitem>
+   <para>Token endpoint defined in RFC 6749, used to obtain an access token
+   from the authorization server</para>
+   <para>Example: <literal>https://openam.example.com:8443/openam/oauth2/access_token</literal></para>
+  </listitem>
+ </varlistentry>
+ <varlistentry>
+  <term><literal>/oauth2/tokeninfo</literal></term>
+  <listitem>
+   <para>Endpoint not defined in RFC 6749, used to validate tokens, and to
+   retrieve information such as scopes</para>
+   <para>Given an access token, a resource server can perform an HTTP GET on
+   <literal>/oauth2/tokeninfo?access_token=<replaceable>token-id</replaceable></literal>
+   to retrieve a JSON object indicating <literal>token_type</literal>,
+   <literal>expires_in</literal>, <literal>scope</literal>, and the
+   <literal>access_token</literal> ID.</para>
+   <para>Example: <literal>https://openam.example.com:8443/openam/oauth2/tokeninfo</literal></para>
+  </listitem>
+ </varlistentry>
+</variablelist>
