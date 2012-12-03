@@ -40,18 +40,18 @@
  services including the OpenAM console.</para>
  
  <para>To manage access to resources on other servers, you can use either
- <link xlink:href="http://openig.forgerock.org/" xlink:show="new"
- >OpenIG</link> or the OpenAM policy agents. OpenIG is a high-performance
- reverse proxy server with specialized session management and credential replay
- functionality. It can function as a standards-based policy enforcement point.
- Policy agents provide policy enforcement on supported web servers and Java EE
- containers, and are tightly integrated with OpenAM. See the <link
- xlink:href="http://openam.forgerock.org/doc/agent-install-guide/index.html"
+ OpenIG or one of the OpenAM policy agents. 
+ <link xlink:href="http://openig.forgerock.org/" xlink:show="new">OpenIG</link>
+ is a high-performance reverse proxy server with specialized session management
+ and credential replay functionality. It can function as a standards-based 
+ policy enforcement point. Policy agents provide policy enforcement on supported
+ web servers and Java EE containers, and are tightly integrated with OpenAM. 
+ See the <link xlink:href="http://openam.forgerock.org/doc/agent-install-guide/index.html"
  xlink:show="new"><citetitle>Policy Agent Installation Guide</citetitle></link>
  for instructions on installing OpenAM agents in supported web servers and
  Java EE application containers.</para>
 
- <para>The <filename>deployable-war/opensso.war</filename> file contains all
+ <para>The <filename>openam.war</filename> file contains all
  OpenAM server components and samples. How you deploy the .war file depends
  on your web application container.</para>
 
@@ -76,6 +76,12 @@
      linkend="configure-openam-custom" /></entry>
     </row>
     <row>
+     <entry>Install additional instance of OpenAM</entry>
+     <entry><xref linkend="deploy-openam" />, 
+     <xref linkend="configure-openam-custom" />,  and
+     <xref linkend="additional-instance-config" /></entry>
+    </row>
+    <row>
      <entry>Erase the configuration and start over</entry>
      <entry><xref linkend="delete-config-start-over" /></entry>
     </row>
@@ -85,6 +91,12 @@
      xlink:href="install-guide#install-openam-config-tools"
      xlink:role="http://docbook.org/xlink/role/olink"><citetitle>To Set Up
      Configuration Tools</citetitle></link></entry>
+    </row>
+    <row>
+     <entry>Set up high availability in a site configuration</entry>
+     <entry><xref linkend="deploy-openam" /> with either 
+     <xref linkend="configure-openam-custom" /> or 
+     <xref linkend="additional-instance-config" /></entry>
     </row>
     <row>
      <entry>Upgrade OpenAM</entry>
@@ -120,12 +132,6 @@
      the OpenAM End User Pages</citetitle></link></entry>
     </row>
     <row>
-     <entry>Set up high availability in a site configuration</entry>
-     <entry><link xlink:href="install-guide#chap-session-failover"
-     xlink:role="http://docbook.org/xlink/role/olink"><citetitle>Setting Up
-     OpenAM Session Failover</citetitle></link></entry>
-    </row>
-    <row>
      <entry>Uninstall OpenAM</entry>
      <entry><link xlink:href="install-guide#chap-uninstall"
      xlink:role="http://docbook.org/xlink/role/olink"><citetitle>Removing
@@ -135,9 +141,39 @@
   </tgroup>
  </table>
 
+ <para>Select the <filename>.war</filename> file based  on the type of
+  deployment you need, as defined in the following table.</para>
+
+ <table xml:id="which-war-to-deploy" pgwide="1">
+  <title>Determine Which War File to Deploy</title>
+  <tgroup cols="2">
+   <thead>
+    <row>
+     <entry>If you want to...</entry>
+     <entry>Use...</entry>
+    </row>
+   </thead>
+   <tbody>
+    <row>
+     <entry>Install core OpenAM and the console</entry>
+     <entry><filename><?eval ${coreWarFile}?></filename></entry>
+    </row>
+    <row>
+     <entry>Install OpenAM with distributed authentication</entry>
+     <entry><filename><?eval ${distauthWarFile}?></filename></entry>
+    </row>
+    <row>
+     <entry>Install OpenAM with no console</entry>
+     <entry><filename><?eval ${serveronlyWarFile}?></filename></entry>
+    </row>
+   </tbody>
+  </tgroup>
+ </table>
+
+
  <procedure xml:id="deploy-openam">
    <title>To Deploy OpenAM</title>
-  <para>The <filename>deployable-war/opensso.war</filename> file contains all
+  <para>The <filename><?eval ${coreWarFile}?></filename> file contains all
   OpenAM server components and samples. How you deploy the .war file depends
   on your web application container.</para>
 
@@ -145,7 +181,14 @@
    <para>Deploy the .war file on your container.</para>
 
    <para>For example, copy the file to deploy on Apache Tomcat.</para>
-   <screen>$ cp deployable-war/opensso.war /path/to/tomcat/webapps/openam.war</screen>
+   <screen>$ cp <?eval ${coreDirectoryFile}?>/<?eval ${coreWarFile}?> 
+    /path/to/tomcat/webapps/openam.war</screen>
+    <note>
+     <para>By adding <filename>openam.war</filename> to the end of the path, 
+      the name of the <filename>.war</filename> file will be changed from
+      <filename><?eval ${serveronlyWarFile}?></filename> to
+      <filename>openam.war</filename> to make deployment easier.</para>
+    </note>
   </step>
   <step>
    <para>Check that you see the initial configuration screen in your browser at
@@ -154,8 +197,11 @@
     <para>You should NOT use localhost domain for accessing OpenAM, not even
     for testing purposes, because OpenAM strongly relies on browser cookies.
     Also the chosen domain name should contain at least 2 '.' (dot)
-    characters, like <literal>openam.example.com</literal>.
-    </para>
+    characters, like <literal>openam.example.com</literal>. This gives your instance
+    a domain, <literal>example</literal>, and a subdomain, <literal>openam</literal>. 
+    Sub-domains provide an extra layer of organization for different department or 
+    types of users or clients. It also provides a level of control over your top-
+    level domain that you would not have if you used .com or .org.</para>
    </note>
    <mediaobject xml:id="figure-openam-start">
     <alt>Initial OpenAM configuration screen</alt>
@@ -174,7 +220,14 @@
   embedded OpenDJ instance on default ports (if the ports are already in use,
   OpenAM will look for a free port) as both configuration store and identity
   store. The install will create a standalone OpenAM instance using the
-  subset of the fully qualified hostname as the cookie domain.</para>
+  subset of the fully qualified hostname as the cookie domain. In the example
+  <literal>.example.com</literal> the cookie domain is set to .example.com.</para>
+  <note>
+  The configuration settings are saved to the <literal>$HOME</literal> of the
+  user running the web application container. If you would like the configuration
+  files stored somewhere else, such as <literal>/opt/openam</literal>, you will
+  need to run the Custom Configuration.
+  </note>
   <step>
    <para>In the initial configuration screen, click
    Create Default Configuration under Default Configuration.</para>
@@ -230,7 +283,7 @@ Using CLASSPATH:
    <para>Delete OpenAM configuration files, by default under the
    <filename>$HOME</filename> of the user running the web application
    container.</para>
-   <screen>$ rm -rf $HOME/openam $HOME/.openssocfg</screen>
+   <screen>$ rm -rf $HOME/openam $HOME/.openamcfg</screen>
    <note>
     <para>When using the internal OpenAM configuration store, this step
     deletes the embedded directory server and all of its contents. You should
@@ -303,7 +356,7 @@ Using CLASSPATH:
     <varlistentry>
      <term>Cookie Domain</term>
      <listitem>
-      <para>Starts with a dot, <literal>.</literal></para>
+      <para>Starts with a dot (<literal>.</literal>).</para>
      </listitem>
     </varlistentry>
     <varlistentry>
@@ -329,7 +382,9 @@ Using CLASSPATH:
    The embedded directory can be configured separately to replicate data
    for high availability if necessary.</para>
    <para>You can also add this OpenAM installation to an existing deployment,
-   providing the URL to reach an existing OpenAM instance.</para>
+   providing the URL to reach an existing OpenAM instance. 
+   <xref linkend="additional-instance-config" /> provides information
+   on setting up an additional instance of OpenAM.</para>
    <para>Alternatively, if you already manage an OpenDJ or DSEE deployment,
    you can choose to store OpenAM configuration data in your existing
    directory service. You must, however, create the suffix to store
@@ -407,7 +462,16 @@ Using CLASSPATH:
   <step>
    <para>In the Site Configuration screen, you can set up OpenAM as part of
    a site where the load is balanced across multiple OpenAM servers.</para>
-   <para>For your first OpenAM installation, accept the defaults.</para>
+   
+   <para>For your first OpenAM installation, you can accept the defaults. 
+   If you have a load balancer, you can enable session high availability 
+   persistence. This will store sessions in case of a server failure, so 
+   that when the server is restored, users will be returned to their sessions 
+   without having to login again. If you would like to enable session 
+   high availability persistence or if you plan to setup additional instances, 
+   enter the Site Name, Load Balancer URL, and click the 
+   <literal>Enable Session HA Persistence and Failover</literal>. 
+   </para>
    <mediaobject xml:id="figure-openam-conf-site">
     <alt>OpenAM site configuration</alt>
     <imageobject>
@@ -416,6 +480,9 @@ Using CLASSPATH:
     <textobject><para>Accept the defaults unless you load balance across
     multiple OpenAM servers.</para></textobject>
    </mediaobject>
+   <para>If you plan to set up an additional instance but are not ready yet, you do  
+   not have to set it up now. The site configuration can be set up during configuration 
+   of your additional instances.</para>
   </step>
   <step>
    <para>In the Agent Information screen, provide a password having at least
@@ -447,4 +514,87 @@ Using CLASSPATH:
    $HOME corresponds to the user who runs the web container).</para>
   </step>
  </procedure>
+ 
+   <procedure xml:id="additional-instance-config">
+  <title>Configuring an Additional Instance</title>
+  
+  <para>When an additional OpenAM instance is necessary (usually for <link
+     xlink:href="install-guide#install-openam-session-failover"
+     xlink:role="http://docbook.org/xlink/role/olink"><citetitle>Session
+     Failover</citetitle></link> [SFO]), it is configured separately from the 
+     first instance.</para>
+  
+  <step>
+   <para>In the initial configuration screen, click Create New Configuration under 
+   Custom Configuration.</para>
+  </step>
+  <step>
+   <para>Enter the same password entered during the first instance configuration
+   for the OpenAM Administrator, <literal>amadmin</literal>.</para>
+   <note> 
+   If you make a mistake at any time during the configuration, click on the 
+   <literal>Previous</literal> button and the OpenAM Configurator will return
+   to the previous screen. When you click <literal>Next</literal>, the original 
+   default values will appear.
+   </note>
+  </step>
+  <step>
+   <para>Make sure the server settings are valid for your configuration.</para>
+   <para>If you make changes to the default values, an x mark or a check mark
+   will indicate if the added value is acceptable. For example, you cannot add 
+   additional instances under the same configuration directory as the first 
+   instance. </para>
+   <mediaobject xml:id="figure-openam-conf2-amadmin">
+    <alt>OpenAM amadmin password</alt>
+    <imageobject>
+     <imagedata fileref="images/openam-conf2-amadmin.png" format="PNG" />
+    </imageobject>
+    <textobject><para>The OpenAM Administrator has the same username
+    <literal>amadmin</literal> for the additional instance.</para></textobject>
+   </mediaobject>
+  </step>
+  <step>
+   <para>Click on <literal>Add to Existing Deployment?</literal>. Enter the 
+   Server URL of the first instance, for example 
+   <literal>http://openam.example.com:18080/openam</literal>. You should be able to 
+   accept the default settings once your Server URL has been verified.</para>                  
+   <mediaobject xml:id="figure-openam-conf2-data-store">
+    <alt>OpenAM additional instance</alt>
+    <imageobject>
+     <imagedata fileref="images/openam-conf2-data-store.png" format="PNG" />
+    </imageobject>
+    <textobject><para>The configuration data store settings for each
+    additional instance.</para></textobject>
+   </mediaobject>
+  </step>
+  <step>
+   <para>Select <literal>Yes</literal> to add the load balancer with each additional 
+    instance. It is alright if you did not add the load balancer with the first instance.
+    The <link xlink:href="install-guide#install-openam-session-failover"
+    xlink:role="http://docbook.org/xlink/role/olink"><citetitle>SFO</citetitle></link>
+    chapter describes how to add the load balancer to the first instance.</para>
+   <para>Enter the <literal>Site Name</literal>, for example <literal>openamlb</literal>,
+   and the <literal>Load Balancer URL</literal>. </para>
+   <mediaobject xml:id="figure-openam-conf2-site">
+    <alt>OpenAM additional site configuration</alt>
+    <imageobject>
+     <imagedata fileref="images/openam-conf2-site.png" format="PNG" />
+    </imageobject>
+    <textobject><para>Enter load balancer information and enable SFO.</para></textobject>
+   </mediaobject>
+  </step>
+  <step>
+   <para>Verify the Configurator Summary Details.</para>
+  </step>
+  <step>
+   <para>When the configuration completes, click <literal>Proceed to Login</literal>, 
+   and then login as OpenAM administrator.</para>
+  </step>
+  
+ </procedure>
+
+  <para>Now when an end user logs into a server on a load balancer, they will have
+  a persistent session, even if the first server the user logs into fails.
+  </para>
+ 
 </chapter>
