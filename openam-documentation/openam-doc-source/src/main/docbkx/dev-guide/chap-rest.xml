@@ -20,7 +20,7 @@
   !
   ! CCPL HEADER END
   !
-  !      Copyright 2011 ForgeRock AS
+  !      Copyright 2011-2012 ForgeRock AS
   !    
 -->
 <chapter xml:id='chap-rest'
@@ -41,14 +41,31 @@
   <para>OpenAM offers a RESTful API for these access and identity management
   operations:</para>
   <itemizedlist>
-   <listitem><para>Authentication (login)</para></listitem>
-   <listitem><para>Logout</para></listitem>
-   <listitem><para>Token attribute retrieval</para></listitem>
-   <listitem><para>Token validation</para></listitem>
-   <listitem><para>Authorization</para></listitem>
-   <listitem><para>Logging</para></listitem>
-   <listitem><para>Identity management (creating, reading, updating, deleting
-   identities)</para></listitem>
+   <listitem>
+    <para><link linkend="rest-api-auth">Authentication</link> (login)</para>
+   </listitem>
+   <listitem>
+    <para><link linkend="rest-api-auth">Logout</link></para>
+   </listitem>
+   <listitem>
+    <para><link linkend="rest-api-tokens">Token attribute retrieval</link></para>
+   </listitem>
+   <listitem>
+    <para><link linkend="rest-api-tokens">Token validation</link></para>
+   </listitem>
+   <listitem>
+    <para><link linkend="rest-api-authz">Authorization</link></para>
+   </listitem>
+   <listitem>
+    <para><link linkend="rest-api-oauth2">OAuth 2.0 Authorization</link></para>
+   </listitem>
+   <listitem>
+    <para><link linkend="rest-api-logging">Logging</link></para>
+   </listitem>
+   <listitem>
+    <para><link linkend="rest-api-crud">Identity management</link> (creating,
+    reading, updating, deleting identities)</para>
+   </listitem>
   </itemizedlist>
   
   <para>To call the API, access URLs under <literal>identity/</literal> where
@@ -270,7 +287,427 @@ boolean=true</screen>
    </listitem>
   </itemizedlist>
  </section>
- 
+
+ <section xml:id="rest-api-oauth2">
+  <title>OAuth 2.0 Authorization</title>
+  <indexterm>
+   <primary>OAuth 2.0</primary>
+   <secondary>REST API</secondary>
+  </indexterm>
+
+  <itemizedlist>
+   <para>OpenAM exposes the following REST endpoints for different OAuth 2.0
+   purposes.</para>
+
+   <listitem>
+    <para>Endpoints for <link linkend="rest-api-oauth2-client-endpoints">OAuth
+    2.0 clients and resource servers</link>, mostly defined in RFC 6749,
+    <link xlink:href="http://tools.ietf.org/html/rfc6749" xlink:show="new"
+    ><citetitle>The OAuth 2.0 Authorization Framework</citetitle></link>, with
+    an additional <literal>tokeninfo</literal> endpoint useful to resource
+    servers.</para>
+   </listitem>
+
+   <listitem>
+    <para>An endpoint for <link linkend="rest-api-oauth2-token-admin-endpoint"
+    >OAuth 2.0 token administration</link>. This is specific to OpenAM.</para>
+   </listitem>
+
+   <listitem>
+    <para>An endpoint for <link linkend="rest-api-oauth2-client-admin-endpoint"
+    >OAuth 2.0 client administration</link>. This is specific to OpenAM.</para>
+   </listitem>
+  </itemizedlist>
+
+  <para>When accessing the APIs, browser-based REST clients can rely on OpenAM
+  to handle the session as usual. First authenticate with OpenAM. Then perform
+  the operations in the browser session.</para>
+
+  <para>Clients not running in a browser can authenticate as described in
+  <xref linkend="rest-api-auth" />, whereby OpenAM returns a
+  <literal>token.id</literal> value. Clients pass the
+  <literal>token.id</literal> value in a header named after the
+  authentication cookie, by default <literal>iplanetDirectoryPro</literal>.</para>
+
+  <section xml:id="rest-api-oauth2-client-endpoints">
+   <title>OAuth 2.0 Client &amp; Resource Server Endpoints</title>
+
+   <para>As described in the <citetitle>Administration Guide</citetitle> chapter
+   on <link xlink:href="admin-guide#chap-oauth2"
+   xlink:role="http://docbook.org/xlink/role/olink"><citetitle>Managing OAuth
+   2.0 Authorization</citetitle></link>, OpenAM exposes REST endpoints for
+   making calls to OpenAM acting as an authorization server.</para>
+
+   <xinclude:include href="../shared/variablelist-oauth2-endpoints.xml" />
+
+   <para>The <literal>/oauth2/authorize</literal>, and
+   <literal>/oauth2/access_token</literal> endpoints function as described
+   in RFC 6749, though access token <literal>expires_in</literal> lifetimes are
+   expressed in milliseconds rather than seconds.</para>
+
+   <para>The <literal>/oauth2/authorize</literal> endpoint is protected by the
+   policy created during OAuth 2.0 authorization server configuration, which
+   grants all authenticated users access.</para>
+
+   <para>The <literal>/oauth2/tokeninfo</literal> endpoint takes an HTTP GET
+   on <literal>/oauth2/tokeninfo?access_token=<replaceable
+   >token-id</replaceable></literal>, and returns information about the
+   token.</para>
+
+   <para>Resource servers &#8212; or any party having the token ID &#8212; can
+   get token information through this endpoint without authenticating. This
+   means any application or user can validate the token without having to be
+   registered with OpenAM.</para>
+
+   <para>The following example shows OpenAM issuing an access token, and
+   then returning token information.</para>
+
+   <screen>$ curl -d "grant_type=client_credentials&amp;username=demo
+ &amp;password=changeit&amp;client_id=myClientID&amp;client_secret=password"
+ http://openam.example.com:8080/openam/oauth2/access_token
+{
+    "expires_in": 599963,
+    "token_type": "Bearer",
+    "access_token": "6d748edd-6b41-42e0-a2aa-0f7566ed4b84"
+}
+$ curl http://openam.example.com:8080/openam/oauth2/tokeninfo
+ ?access_token=6d748edd-6b41-42e0-a2aa-0f7566ed4b84
+{
+    "token_type": "Bearer",
+    "expires_in": 450429,
+    "access_token": "6d748edd-6b41-42e0-a2aa-0f7566ed4b84"
+}</screen>
+
+   <para>The resource server making decisions about whether the token is valid
+   can thus use the <literal>/oauth2/tokeninfo</literal> endpoint to retrieve
+   expiration information about the token. Depending on the scopes
+   implementation, the JSON response about the token can also contain scope
+   information. As described in the <citetitle>Administration Guide</citetitle>,
+   the default scopes implementation in OpenAM considers scopes to be names of
+   attributes in the resource owner's user profile. The JSON response contains
+   the values for those attributes from the user's profile, as in the following
+   example, with scopes set to <literal>mail</literal> and
+   <literal>cn</literal>.</para>
+
+   <programlisting language="javascript">{
+  "mail": "demo@example.com",
+  "cn": "demo",
+  "token_type": "Bearer",
+  "expires_in": 48793,
+  "access_token": "6929b6e9-d8b1-4528-8aff-8e8c693f61e2"
+}</programlisting>
+  </section>
+
+  <section xml:id="rest-api-oauth2-token-admin-endpoint">
+   <title>OAuth 2.0 Token Administration Endpoint</title>
+
+   <para>The OpenAM-specific OAuth 2.0 token administration endpoint lets
+   administrators, read, list, and delete OAuth 2.0 tokens. OAuth 2.0 clients
+   can also manage their own tokens.</para>
+
+   <para>OpenAM exposes this endpoint at <literal>/frrest/oauth2/token</literal>,
+   such as
+   <literal>https://openam.example.com:8443/openam/frrest/oauth2/token</literal>.</para>
+
+   <note>
+    <para>This endpoint location is likely to change in the future.</para>
+   </note>
+
+   <para>To get a token, perform an HTTP GET on
+   <literal>/frrest/oauth2/token/<replaceable>token-id</replaceable></literal>,
+   as in the following example.</para>
+
+   <screen>$ curl "http://openam.example.com:8080/openam/identity/authenticate
+ ?username=amadmin&amp;password=password"
+token.id=AQIC5wM...3MTYxOA..*
+$ curl -d "grant_type=client_credentials&amp;username=demo&amp;password=changeit
+ &amp;client_id=myClientID&amp;client_secret=password"
+ http://openam.example.com:8080/openam/oauth2/access_token
+{
+  "expires_in": 599991,
+  "token_type": "Bearer",
+  "access_token": "3f8cac17-2367-43e2-822a-ef78496c6ecd"
+}
+$ curl -d "grant_type=client_credentials&amp;username=demo&amp;password=changeit
+ &amp;client_id=myClientID&amp;client_secret=password"
+ http://openam.example.com:8080/openam/oauth2/access_token
+{
+  "expires_in": 599996,
+  "token_type": "Bearer",
+  "access_token": "4beef879-22b0-47b2-b6fa-d457e4cec10c"
+}
+$ curl --header "iplanetDirectoryPro: AQIC5wM...3MTYxOA..*"
+ http://openam.example.com:8080/openam/frrest/oauth2/token/
+ 3f8cac17-2367-43e2-822a-ef78496c6ecd
+{
+  "expiry_time": [
+    "1354016221776"
+  ],
+  "type": [
+    "access_token"
+  ],
+  "username": [
+    "myClientID"
+  ],
+  "realm": [
+    "/"
+  ],
+  "id": [
+    "3f8cac17-2367-43e2-822a-ef78496c6ecd"
+  ]
+}</screen>
+
+   <para>To list tokens, perform an HTTP GET on
+   <literal>/frrest/oauth2/token/?_query_id=<replaceable>conditions</replaceable></literal>,
+   where <replaceable>conditions</replaceable> is a comma-separated list of
+   <literal><replaceable>field</replaceable>=<replaceable>value</replaceable></literal>
+   conditions. The <replaceable>field</replaceable>s are taken from the fields
+   returned in the token object through this endpoint.</para>
+
+   <variablelist>
+    <varlistentry>
+     <term><literal>"expiry_time"</literal></term>
+     <listitem>
+      <para>Token expiration time in milliseconds since 00:00:00 UTC, January 1,
+      1970.</para>
+     </listitem>
+    </varlistentry>
+
+    <varlistentry>
+     <term><literal>"type"</literal></term>
+     <listitem>
+      <para>Either <literal>"access_token"</literal> or
+      <literal>"refresh_token"</literal>.</para>
+     </listitem>
+    </varlistentry>
+
+    <varlistentry>
+     <term><literal>"username"</literal></term>
+     <listitem>
+      <para>OAuth 2.0 client to whom the token was issued.</para>
+     </listitem>
+    </varlistentry>
+
+    <varlistentry>
+     <term><literal>"realm"</literal></term>
+     <listitem>
+      <para>The realm for which the token was issued.</para>
+     </listitem>
+    </varlistentry>
+
+    <varlistentry>
+     <term><literal>"id"</literal></term>
+     <listitem>
+      <para>Unique ID of the token.</para>
+     </listitem>
+    </varlistentry>
+   </variablelist>
+
+   <para>The following example shows a search for current access tokens that
+   were issued to <literal>myClientID</literal>.</para>
+
+   <screen>$ curl --header "iplanetDirectoryPro: AQIC5wM...3MTYxOA..*"
+ "http://openam.example.com:8080/openam/frrest/oauth2/token/
+ ?_queryID=username%3DmyClientID%2Ctype%3Daccess_token"
+{
+  "result": [
+    {
+      "type": [
+        "access_token"
+      ],
+      "id": [
+        "4beef879-22b0-47b2-b6fa-d457e4cec10c"
+      ],
+      "username": [
+        "myClientID"
+      ],
+      "realm": [
+        "/"
+      ],
+      "expiry_time": [
+        "1354016226388"
+      ]
+    },
+    {
+      "expiry_time": [
+        "1354016221776"
+      ],
+      "type": [
+        "access_token"
+      ],
+      "username": [
+        "myClientID"
+      ],
+      "realm": [
+        "/"
+      ],
+      "id": [
+        "3f8cac17-2367-43e2-822a-ef78496c6ecd"
+      ]
+    }
+  ],
+  "pagedResultsCookie": null,
+  "remainingPagedResults": -1
+}</screen>
+
+   <para>To delete a token, perform an HTTP DELETE on
+   <literal>/frrest/oauth2/token/<replaceable>token-id</replaceable></literal>,
+   as in the following example.</para>
+
+   <screen>$ curl -d "grant_type=client_credentials&amp;username=demo&amp;password=changeit
+ &amp;client_id=myClientID&amp;client_secret=password"
+ http://openam.example.com:8080/openam/oauth2/access_token
+{
+  "expires_in": 599996,
+  "token_type": "Bearer",
+  "access_token": "2f80e278-2e22-483f-b4be-656c7bd18680"
+}
+$ curl --request DELETE --header "iplanetDirectoryPro: AQIC5wM...3MTYxOA..*"
+http://openam.example.com:8080/openam/frrest/oauth2/token/
+ 2f80e278-2e22-483f-b4be-656c7bd18680
+{"success":"true"}</screen>
+  </section>
+
+  <section xml:id="rest-api-oauth2-client-admin-endpoint">
+   <title>OAuth 2.0 Client Administration Endpoint</title>
+
+   <para>The OAuth 2.0 administration endpoint lets OpenAM administrators and
+   agent administrators create (that is, register) and delete OAuth 2.0
+   clients.</para>
+
+   <para>OpenAM exposes this endpoint at <literal>/frrest/oauth2/client</literal>,
+   such as
+   <literal>https://openam.example.com:8443/openam/frrest/oauth2/client</literal>.</para>
+
+   <note>
+    <para>This endpoint location is likely to change in the future.</para>
+   </note>
+
+   <para>To create an OAuth 2.0 client, perform an HTTP POST to
+   <literal>/frrest/oauth2/client/?_action=create</literal>
+   with a JSON object fully specifying the client, as in the following
+   example.</para>
+
+   <screen>$ curl "http://openam.example.com:8080/openam/identity/authenticate
+ ?username=amadmin&amp;password=password"
+token.id=AQIC5wM...3MTYxOA..*
+$ curl --request POST --header "iplanetDirectoryPro: AQIC5wM...3MTYxOA..*"
+ --header "Content-Type: application/json"
+ --data '{"client_id":["testClient"],
+          "realm":["/"]
+          "userpassword":["secret12"],
+          "com.forgerock.openam.oauth2provider.clientType":["Confidential"],
+          "com.forgerock.openam.oauth2provider.redirectionURIs":
+            ["www.client.com","www.example.com"],
+          "com.forgerock.openam.oauth2provider.scopes":["cn","sn"],
+          "com.forgerock.openam.oauth2provider.defaultScopes":["cn"],
+          "com.forgerock.openam.oauth2provider.name":["My Test Client"],
+          "com.forgerock.openam.oauth2provider.description":["OAuth 2.0 Client"]
+         }'
+ http://openam.example.com:8080/openam/frrest/oauth2/client/?_action=create
+ {"success":"true"}</screen>
+
+   <variablelist>
+    <para>When creating an OAuth 2.0 client, use the following fields in your
+    JSON object.</para>
+
+    <varlistentry>
+     <term><literal>"client_id"</literal></term>
+     <listitem>
+      <para>(Required) This field takes an array containing the client
+      identifier as defined in RFC 6749.</para>
+     </listitem>
+    </varlistentry>
+
+    <varlistentry>
+     <term><literal>"realm"</literal></term>
+     <listitem>
+      <para>(Required) This field takes an array containing the OpenAM realm
+      in which to create the client as defined in RFC 6749.</para>
+     </listitem>
+    </varlistentry>
+
+    <varlistentry>
+     <term><literal>"userpassword"</literal></term>
+     <listitem>
+      <para>(Required) This field takes an array containing the client
+      secret as defined in RFC 6749.</para>
+     </listitem>
+    </varlistentry>
+
+    <varlistentry>
+     <term><literal>"com.forgerock.openam.oauth2provider.clientType"</literal></term>
+     <listitem>
+      <para>(Required) This field takes an array containing the client
+      type, either <literal>"Confidential"</literal> or
+      <literal>"Public"</literal> as defined in RFC 6749.</para>
+     </listitem>
+    </varlistentry>
+
+    <varlistentry>
+     <term><literal>"com.forgerock.openam.oauth2provider.redirectionURIs"</literal></term>
+     <listitem>
+      <para>(Optional for confidential clients) This field takes an array of
+      client redirection endpoints as defined in RFC 6749.</para>
+     </listitem>
+    </varlistentry>
+
+    <varlistentry>
+     <term><literal>"com.forgerock.openam.oauth2provider.scopes"</literal></term>
+     <listitem>
+      <para>(Optional) This field takes an array of scopes as defined in RFC
+      6749. The default scopes implementation takes scopes to be names of
+      attributes in the resource owner profile.</para>
+      <para>Specify localized scopes in <literal><replaceable
+      >scope</replaceable>|<replaceable>locale</replaceable>|<replaceable
+      >localized description</replaceable></literal> format.</para>
+     </listitem>
+    </varlistentry>
+
+    <varlistentry>
+     <term><literal>"com.forgerock.openam.oauth2provider.defaultScopes"</literal></term>
+     <listitem>
+      <para>(Optional) This field takes an array of default scopes set
+      automatically when tokens are issued.</para>
+     </listitem>
+    </varlistentry>
+
+    <varlistentry>
+     <term><literal>"com.forgerock.openam.oauth2provider.name"</literal></term>
+     <listitem>
+      <para>(Optional) This field takes an array containing the client name to
+      display to the resource owner when the resource owner must authorize
+      client access to protected resources.</para>
+      <para>Specify localized names in <literal><replaceable
+      >locale</replaceable>|<replaceable>localized name</replaceable></literal>
+      format.</para>
+     </listitem>
+    </varlistentry>
+
+    <varlistentry>
+     <term><literal>"com.forgerock.openam.oauth2provider.description"</literal></term>
+     <listitem>
+      <para>(Optional) This field takes an array containing the description to
+      display to the resource owner when the resource owner must authorize
+      client access to protected resources.</para>
+      <para>Specify localized descriptions in <literal><replaceable
+      >locale</replaceable>|<replaceable>localized description</replaceable></literal>
+      format.</para>
+     </listitem>
+    </varlistentry>
+   </variablelist>
+
+   <para>To delete an OAuth 2.0 client, perform an HTTP DELETE on
+   <literal>/frrest/oauth2/client/<replaceable>client-id</replaceable></literal>,
+   as in the following example.</para>
+
+   <screen>$ curl --request DELETE
+ --header "iplanetDirectoryPro: AQIC5wM...3MTYxOA..*"
+ http://openam.example.com:8080/openam/frrest/oauth2/client/testClient
+{"success":"true"}</screen>
+  </section>
+ </section>
+
  <section xml:id="rest-api-logging">
   <title>Logging</title>
   

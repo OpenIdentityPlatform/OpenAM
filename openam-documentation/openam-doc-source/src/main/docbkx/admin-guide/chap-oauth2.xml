@@ -48,7 +48,7 @@
   <title>About OAuth 2.0 Support in OpenAM</title>
 
   <para>RFC 6749, <link xlink:href="http://tools.ietf.org/html/rfc6749"
-  xlink:show="new"><citetitle>The OAuth 2.0 Authorization Framework</citetitle></link>
+  xlink:show="new"><citetitle>The OAuth 2.0 Authorization Framework</citetitle></link>,
   provides a standard way for <firstterm>resource owners</firstterm> to grant
   <firstterm>client</firstterm> applications access to the owners' web-based
   resources. The canonical example involves a user (resource owner) granting
@@ -157,47 +157,12 @@
    for details on how clients should make authorization requests and handle
    authorization responses.</para>
 
-   <variablelist>
-    <title>OpenAM OAuth 2.0 Endpoints</title>
-    <para>In addition to the standard authorization and token endpoints
-    described in RFC 6749, OpenAM also exposes a token information endpoint
-    for resource servers to get information about access tokens so they can
-    determine how to respond to requests for protected resources. OpenAM as
-    authorization server exposes the following endpoints for clients and
-    resource servers.</para>
-    <!-- TODO: Link to REST API reference when that documentation becomes available. -->
+   <xinclude:include href="../shared/variablelist-oauth2-endpoints.xml" />
 
-    <varlistentry>
-     <term><literal>/oauth2/authorize</literal></term>
-     <listitem>
-      <para>Authorization endpoint defined in RFC 6749, used to obtain an
-      authorization grant from the resource owner</para>
-      <para>Example: <literal>https://openam.example.com:8443/openam/oauth2/authorize</literal></para>
-     </listitem>
-    </varlistentry>
-    <varlistentry>
-     <term><literal>/oauth2/access_token</literal></term>
-     <listitem>
-      <para>Token endpoint defined in RFC 6749, used to obtain an access token
-      from the authorization server</para>
-      <para>Example: <literal>https://openam.example.com:8443/openam/oauth2/access_token</literal></para>
-     </listitem>
-    </varlistentry>
-    <varlistentry>
-     <term><literal>/oauth2/tokeninfo</literal></term>
-     <listitem>
-      <para>Endpoint not defined in RFC 6749, used to validate tokens, and to
-      retrieve information such as scopes</para>
-      <para>Given an access token, a resource server authenticated with OpenAM
-      can perform an HTTP GET on <literal
-      >/oauth2/tokeninfo?access_token=<replaceable>token-id</replaceable></literal>
-      to retrieve a JSON object indicating <literal>token_type</literal>,
-      <literal>expires_in</literal>, <literal>scope</literal>, and the
-      <literal>access_token</literal> ID.</para>
-      <para>Example: <literal>https://openam.example.com:8443/openam/oauth2/tokeninfo</literal></para>
-     </listitem>
-    </varlistentry>
-   </variablelist>
+   <para>For examples, see the <citetitle>Developer's Guide</citetitle> section,
+   <link xlink:href="dev-guide#rest-api-oauth2"
+   xlink:role="http://docbook.org/xlink/role/olink"><citetitle>OAuth 2.0
+   Authorization</citetitle></link>.</para>
   </section>
 
   <section xml:id="openam-oauth2-client">
