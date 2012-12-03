@@ -277,8 +277,8 @@
         document.getElementById("password").style.display = display;
         
         if (display == "none") {
-            document.getElementById("configStoreSSL").disabled = false;
-            document.getElementById("configStoreHost").disabled = false;
+            document.getElementById("configStoreSSL").disabled = true;
+            document.getElementById("configStoreHost").disabled = true;
             if ( document.getElementById("configStoreHost").value == "" )
             {
               document.getElementById("configStoreHost").value = "localhost";
