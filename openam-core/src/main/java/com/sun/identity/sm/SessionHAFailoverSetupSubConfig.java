@@ -34,6 +34,7 @@ import com.iplanet.sso.SSOException;
 import com.iplanet.sso.SSOToken;
 import com.sun.identity.shared.Constants;
 import com.sun.identity.shared.configuration.SystemPropertiesManager;
+import com.sun.identity.shared.debug.Debug;
 
 import java.util.Map;
 
@@ -53,6 +54,11 @@ import java.util.Map;
  * @author jeff.schenk@forgerock.com
  */
 public class SessionHAFailoverSetupSubConfig implements Constants {
+
+    /**
+     * Static section to retrieve the debug object.
+     */
+    private static Debug DEBUG;
 
     /**
      * Define usage constants after install.
@@ -103,6 +109,8 @@ public class SessionHAFailoverSetupSubConfig implements Constants {
      * Default locked down constructor.
      */
     private SessionHAFailoverSetupSubConfig() {
+        // Obtain the Debug instance.
+        DEBUG = Debug.getInstance("Session");
     }
 
     /**
@@ -141,25 +149,48 @@ public class SessionHAFailoverSetupSubConfig implements Constants {
      */
     private static synchronized boolean createServiceSubConfig(SSOToken adminToken, String siteName, String serviceID,
                                                                String serviceName, Map values) throws StoreException {
-        boolean successful;
         String baseDN = SITE_SESSION_FAILOVER_HA_SERVICES_BASE_DN_TEMPLATE.
                 replace("%1", serviceName);
         try {
             // Construct ServiceConfigManagerImpl
             ServiceConfigManagerImpl serviceConfigManagerImpl = ServiceConfigManagerImpl.
                     getInstance(adminToken, serviceName, "1.0");
+            if (serviceConfigManagerImpl == null) {
+                DEBUG.error("Unable to dynamically create Site Sub-Service Configuration Element, due to unable to obtain a ServiceConfigManagerImpl");
+                return false;
+            }
             ServiceConfigManager serviceConfigManager = new ServiceConfigManager(serviceName, adminToken);
+            if (serviceConfigManager == null) {
+                DEBUG.error("Unable to dynamically create Site Sub-Service Configuration Element, due to unable to obtain a ServiceConfigManager");
+                return false;
+            }
             // Obtain reference to Service Schema Manager.
             ServiceSchemaManagerImpl serviceSchemaManager =
                     ServiceSchemaManagerImpl.getInstance(adminToken, serviceName, "1.0");
+            if (serviceSchemaManager == null) {
+                DEBUG.error("Unable to dynamically create Site Sub-Service Configuration Element, due to unable to obtain a ServiceSchemaManager");
+                return false;
+            }
             // Obtain reference to Service Schema.
             ServiceSchemaImpl serviceSchema = serviceSchemaManager.getSchema(SchemaType.GLOBAL);
+            if (serviceSchema == null) {
+                DEBUG.error("Unable to dynamically create Site Sub-Service Configuration Element, due to unable to obtain a ServiceSchemaImpl");
+                return false;
+            }
             // Obtain the Service Configuration Implementation.
             ServiceConfigImpl serviceConfigImpl = ServiceConfigImpl.getInstance(adminToken,
                     serviceConfigManagerImpl, serviceSchema, baseDN,
                     SM_CONFIG_ROOT_DN, "default", "//" + siteName, true);
+            if (serviceConfigImpl == null) {
+                DEBUG.error("Unable to dynamically create Site Sub-Service Configuration Element, due to unable to obtain a ServiceConfigImpl");
+                return false;
+            }
             // Now Finally access the service Config where we can add the Sub-Configuration Element.
             ServiceConfig serviceConfig = new ServiceConfig(serviceConfigManager, serviceConfigImpl);
+            if (serviceConfig == null) {
+                DEBUG.error("Unable to dynamically create Site Sub-Service Configuration Element, due to unable to obtain a ServiceConfig");
+                return false;
+            }
             // Create the Session HA Failover Indicator Setting for the Specified Site and
             // Add the Sub Configuration Entry.
             serviceConfig.addSubConfig(siteName, serviceID, 0, values);
@@ -169,11 +200,13 @@ public class SessionHAFailoverSetupSubConfig implements Constants {
             // TODO This attempt above of poking cache should work, but does not.  Fix!!!
 
             // Assume Success, if we hit here.
-            successful = true;
+            thisCreateServiceSubConfigHasBeenUsed = true;
+            return true;
         } catch (ServiceAlreadyExistsException smsException) {
                 // Does Entry Already Exists?
                 // Yes, in which case, assume we were successful.
-                successful = true;
+                thisCreateServiceSubConfigHasBeenUsed = true;
+                return true;
         } catch (SMSException smsException) {
             throw new StoreException("Unable to Dynamically Add the Session HA SF Property for DN:["
                     + baseDN + "], SMSErrorCode: " + smsException.getExceptionCode()
@@ -182,10 +215,6 @@ public class SessionHAFailoverSetupSubConfig implements Constants {
             throw new StoreException("Unable to Dynamically Add the Session HA SF Property for DN:["
                     + baseDN + "], SSO Exception: " + ssoException.getMessage(), ssoException);
         }
-        // Set if we can allow this to be used again or not.
-        thisCreateServiceSubConfigHasBeenUsed = successful;
-        // return our indicator.
-        return successful;
     }
 
 }

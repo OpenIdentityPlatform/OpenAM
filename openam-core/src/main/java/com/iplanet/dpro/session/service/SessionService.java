@@ -1830,16 +1830,15 @@ public class SessionService {
              * will point to the load balancer address
              */
 
-            /*
-             * Initialize global session parameters. do not move this method to
-             * any other place.
-             */
-
-            postInit();
-
             /**
              * Provide "this" Instance Variables available for either
              * single instance or a site enabled instance.
+             *
+             * ** Special note the "this" instance or self Globals,
+             * must be initialized prior to the PostInit() phase,
+             * otherwise Null Pointer Exceptions will occur when
+             * referencing these variables during postInit.
+             *
              */
                 thisSessionServerProtocol = SystemProperties
                         .get(Constants.AM_SERVER_PROTOCOL);
@@ -1872,6 +1871,14 @@ public class SessionService {
                 thisSessionServiceURL = Session.getSessionServiceURL(
                         thisSessionServerProtocol, thisSessionServer,
                         thisSessionServerPortAsString, thisSessionURI);
+
+            /*
+            * Initialize global session parameters. do not move this method to
+            * any other place.
+            */
+            postInit();
+
+
         } catch (Exception ex) {
             sessionDebug.error(
                     "SessionService.SessionService(): Initialization Failed",
