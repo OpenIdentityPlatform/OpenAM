@@ -111,7 +111,7 @@
      <para>GlassFish v2, v3</para>
     </listitem>
     <listitem>
-     <para>IBM WebSphere Application Server 6.1, 7, 8.5</para>
+     <para>IBM WebSphere Application Server 6.1, 7, 8, 8.5</para>
     </listitem>
     <listitem>
      <para>JBoss Enterprise Application Platform 5</para>
@@ -160,20 +160,27 @@
   <section xml:id="javaee-agent-major-changes">
    <title>Major Changes to Java EE Policy Agent Functionality</title>
 
-   <para>TODO</para>
+   <para>No major changes affecting compatibility have been made to the OpenAM
+   Java EE Policy Agents in this release.</para>
   </section>
 
   <section xml:id="javaee-agent-deprecated">
    <title>Deprecated Functionality</title>
+   <para>No functionality has been deprecated in this release.</para>
+
+<!-- Keep the wording here for use in a future release:
+
    <para>The following functionality is deprecated in OpenAM Java EE Policy
    Agents <?eval ${javaEEAgentsDocTargetVersion}?>, and is likely to be removed
    in a future release.</para>
 
    <itemizedlist>
     <listitem>
-     <para>TODO</para>
+     <para>Functionality, description...</para>
     </listitem>
    </itemizedlist>
+
+-->
   </section>
 
   <section xml:id="javaee-agent-removed">
@@ -195,7 +202,26 @@
 
    <para>The following bugs were fixed in this release.</para>
 
-   <para>TODO</para>
+  <!-- List generated using http://bugster.forgerock.org/jira/rest/api/2/search?jql=project+%3D+OPENAM+AND+resolution+%3D+Fixed+AND+fixVersion+in+%28%22Agents-3.0.5%22%2C+%22Agents-3.1.0-Xpress%22%29+AND+component+%3D+%22j2ee+agents%22+AND+type+%3D+Bug&startAt=0&maxResults=500&fields=summary-->
+  <itemizedlist>
+   <listitem><para><link xlink:href="https://bugster.forgerock.org/jira/browse/OPENAM-1840" xlink:show="new">OPENAM-1840</link>: PA has incorrect version</para></listitem>
+   <listitem><para><link xlink:href="https://bugster.forgerock.org/jira/browse/OPENAM-1832" xlink:show="new">OPENAM-1832</link>: Installer for J2EE tomcat doesn't work, missing "opensso-installtools-launcher.jar" in lib</para></listitem>
+   <listitem><para><link xlink:href="https://bugster.forgerock.org/jira/browse/OPENAM-1828" xlink:show="new">OPENAM-1828</link>: Custom installation for Jetty doesn't work</para></listitem>
+   <listitem><para><link xlink:href="https://bugster.forgerock.org/jira/browse/OPENAM-1820" xlink:show="new">OPENAM-1820</link>: Script for the environment settings for WebLogic on the Windows works wrong and contains old information.</para></listitem>
+   <listitem><para><link xlink:href="https://bugster.forgerock.org/jira/browse/OPENAM-1775" xlink:show="new">OPENAM-1775</link>: Java EE agent should not encapsulate exceptions coming out of applications</para></listitem>
+   <listitem><para><link xlink:href="https://bugster.forgerock.org/jira/browse/OPENAM-1752" xlink:show="new">OPENAM-1752</link>: J2EE installer shows "OpenSSO Policy Agent"</para></listitem>
+   <listitem><para><link xlink:href="https://bugster.forgerock.org/jira/browse/OPENAM-1751" xlink:show="new">OPENAM-1751</link>: J2EE Agent installation crashes with IBM Java (WebSphere 8.5)</para></listitem>
+   <listitem><para><link xlink:href="https://bugster.forgerock.org/jira/browse/OPENAM-1357" xlink:show="new">OPENAM-1357</link>: WebSphere Policy Agent authentication issue for syncNode script when OpenAM authentication chain updated to not use Datastore as first module.</para></listitem>
+   <listitem><para><link xlink:href="https://bugster.forgerock.org/jira/browse/OPENAM-1313" xlink:show="new">OPENAM-1313</link>: Tomcat login flow broken with CDSSO</para></listitem>
+   <listitem><para><link xlink:href="https://bugster.forgerock.org/jira/browse/OPENAM-1220" xlink:show="new">OPENAM-1220</link>: Invalid date header -1 with Java agents</para></listitem>
+   <listitem><para><link xlink:href="https://bugster.forgerock.org/jira/browse/OPENAM-741" xlink:show="new">OPENAM-741</link>: The ConfigDirValidator uses the wrong filename in the debug message when logging details of the Tomcat v6 configuration files.</para></listitem>
+   <listitem><para><link xlink:href="https://bugster.forgerock.org/jira/browse/OPENAM-665" xlink:show="new">OPENAM-665</link>: Uninstallation of agent on Glassfish 3 does cleanly reset security-service element correctly.</para></listitem>
+   <listitem><para><link xlink:href="https://bugster.forgerock.org/jira/browse/OPENAM-650" xlink:show="new">OPENAM-650</link>: When setting the Policy Agent property com.sun.identity.agents.config.httpsession.binding to true, the HTTP session is not invalidated when the user has changed.</para></listitem>
+   <listitem><para><link xlink:href="https://bugster.forgerock.org/jira/browse/OPENAM-589" xlink:show="new">OPENAM-589</link>: Tomcat J2ee Agent installation fails if server.xml includes configuration for 'CombinedRealm'</para></listitem>
+   <listitem><para><link xlink:href="https://bugster.forgerock.org/jira/browse/OPENAM-431" xlink:show="new">OPENAM-431</link>: J2EE Agents README.txt include URL to non-existing ex-Sun documentation</para></listitem>
+   <listitem><para><link xlink:href="https://bugster.forgerock.org/jira/browse/OPENAM-276" xlink:show="new">OPENAM-276</link>: Agent logout throws 403 after logout if cookie encoding is enabled</para></listitem>
+   <listitem><para><link xlink:href="https://bugster.forgerock.org/jira/browse/OPENAM-212" xlink:show="new">OPENAM-212</link>: RemoteUser still setted after logout when accessing not enforced URL</para></listitem>
+  </itemizedlist>
   </section>
 
   <section xml:id="javaee-agent-limitations">
@@ -210,7 +236,23 @@
    <para>The following known issues remained open at the time this release
    became available.</para>
 
-   <para>TODO</para>
+  <!-- List generated using http://bugster.forgerock.org/jira/rest/api/2/search?jql=project+%3D+OPENAM+AND+resolution+%3D+Unresolved+AND+component+%3D+%22j2ee+agents%22+AND+priority+not+in+%28Minor%2C+Trivial%29+AND+type+%3D+Bug&startAt=0&maxResults=500&fields=summary-->
+  <itemizedlist>
+   <listitem><para><link xlink:href="https://bugster.forgerock.org/jira/browse/OPENAM-1849" xlink:show="new">OPENAM-1849</link>: J2EE profile attribute mapper can not handle identities with special chars in univeral id</para></listitem>
+   <listitem><para><link xlink:href="https://bugster.forgerock.org/jira/browse/OPENAM-1628" xlink:show="new">OPENAM-1628</link>: J2EE PA version output is wrong</para></listitem>
+   <listitem><para><link xlink:href="https://bugster.forgerock.org/jira/browse/OPENAM-1435" xlink:show="new">OPENAM-1435</link>: J2EEAgent installer requests to accept license</para></listitem>
+   <listitem><para><link xlink:href="https://bugster.forgerock.org/jira/browse/OPENAM-1279" xlink:show="new">OPENAM-1279</link>: Policy Agent fail-over error when the first naming service host is unavailable</para></listitem>
+   <listitem><para><link xlink:href="https://bugster.forgerock.org/jira/browse/OPENAM-1206" xlink:show="new">OPENAM-1206</link>: J2EE agent silent install isn't silent</para></listitem>
+   <listitem><para><link xlink:href="https://bugster.forgerock.org/jira/browse/OPENAM-1186" xlink:show="new">OPENAM-1186</link>: J2EE agent will not connect to Openam with a Site Profile on it.</para></listitem>
+   <listitem><para><link xlink:href="https://bugster.forgerock.org/jira/browse/OPENAM-1154" xlink:show="new">OPENAM-1154</link>: Sun Appserver J2EE Agent custom-install for additional instances on the same server fails</para></listitem>
+   <listitem><para><link xlink:href="https://bugster.forgerock.org/jira/browse/OPENAM-1117" xlink:show="new">OPENAM-1117</link>: WebtopNaming.getServerId() fails for sfo enabled environment (no MQs running)</para></listitem>
+   <listitem><para><link xlink:href="https://bugster.forgerock.org/jira/browse/OPENAM-1106" xlink:show="new">OPENAM-1106</link>: Null messages in the error log</para></listitem>
+   <listitem><para><link xlink:href="https://bugster.forgerock.org/jira/browse/OPENAM-868" xlink:show="new">OPENAM-868</link>: J2EE Agent stripps of servlet context if it's processing request for JSF application(apache trinidad)</para></listitem>
+   <listitem><para><link xlink:href="https://bugster.forgerock.org/jira/browse/OPENAM-605" xlink:show="new">OPENAM-605</link>: Tomcat J2ee Agent initilization fails on Windows 2003</para></listitem>
+   <listitem><para><link xlink:href="https://bugster.forgerock.org/jira/browse/OPENAM-277" xlink:show="new">OPENAM-277</link>: JBoss agent does not recognise login URL correctly</para></listitem>
+   <listitem><para><link xlink:href="https://bugster.forgerock.org/jira/browse/OPENAM-211" xlink:show="new">OPENAM-211</link>: J2EE agents are unable to work, if the container was started prior to OpenAM</para></listitem>
+   <listitem><para><link xlink:href="https://bugster.forgerock.org/jira/browse/OPENAM-117" xlink:show="new">OPENAM-117</link>: Providing multiple "AM_SERVER_URL" in the Agent User Response File for failover</para></listitem>
+  </itemizedlist>
   </section>
  </section>
 </chapter>

@@ -87,10 +87,22 @@
     xlink:show="new">OPENAM-936</link>).</para>
    </listitem>
    <listitem>
+    <para>Web policy agents now let you configure whether to URL encode the
+    session cookie sent with the LARES POST using the boolean property
+    <literal>com.forgerock.agents.cdsso.cookie.urlencode</literal> (<link
+    xlink:href="https://bugster.forgerock.org/jira/browse/OPENAM-915"
+    xlink:show="new">OPENAM-915</link>).</para>
+   </listitem>
+   <listitem>
     <para>Web policy agents can now conditionally redirect users based on the
     incoming request URL (<link
     xlink:href="https://bugster.forgerock.org/jira/browse/OPENAM-849"
     xlink:show="new">OPENAM-849</link>).</para>
+   </listitem>
+   <listitem>
+    <para>Web policy agents now support the Expires attribute on cookies (<link
+    xlink:href="https://bugster.forgerock.org/jira/browse/OPENAM-815"
+    xlink:show="new">OPENAM-815</link>).</para>
    </listitem>
    <listitem>
     <para>Web policy agents can now mark persistent cookies as HTTPOnly, to
@@ -98,6 +110,13 @@
     (<link
     xlink:href="https://bugster.forgerock.org/jira/browse/OPENAM-804"
     xlink:show="new">OPENAM-804</link>).</para>
+   </listitem>
+   <listitem>
+    <para>The IIS 7 web policy agents now has support for HTTP Basic
+    authentication and password replay, thereby better supporting Microsoft
+    OWA and SharePoint (<link
+    xlink:href="https://bugster.forgerock.org/jira/browse/OPENAM-773"
+    xlink:show="new">OPENAM-773</link>).</para>
    </listitem>
   </itemizedlist>
  </section>
@@ -258,7 +277,56 @@
 
    <para>The following issues were fixed in this release.</para>
 
-   <para>TODO</para>
+  <!-- List generated using http://bugster.forgerock.org/jira/rest/api/2/search?jql=project+%3D+OPENAM+AND+resolution+%3D+Fixed+AND+fixVersion+in+%28%22Agents-3.0.5%22%2C+%22Agents-3.1.0-Xpress%22%29+AND+component+%3D+%22web+agents%22+AND+type+%3D+Bug&startAt=0&maxResults=500&fields=summary-->
+  <itemizedlist>
+   <listitem><para><link xlink:href="https://bugster.forgerock.org/jira/browse/OPENAM-1840" xlink:show="new">OPENAM-1840</link>: PA has incorrect version</para></listitem>
+   <listitem><para><link xlink:href="https://bugster.forgerock.org/jira/browse/OPENAM-1838" xlink:show="new">OPENAM-1838</link>: IIS7 policy agent might crash when HOST header is not available</para></listitem>
+   <listitem><para><link xlink:href="https://bugster.forgerock.org/jira/browse/OPENAM-1724" xlink:show="new">OPENAM-1724</link>: IIS7 policy agent might crash in Log::vlog() on failed bootstrap</para></listitem>
+   <listitem><para><link xlink:href="https://bugster.forgerock.org/jira/browse/OPENAM-1706" xlink:show="new">OPENAM-1706</link>: com.forgerock.agents.ext.url.validation.disable other then 2 causes login failure for agent profiles</para></listitem>
+   <listitem><para><link xlink:href="https://bugster.forgerock.org/jira/browse/OPENAM-1699" xlink:show="new">OPENAM-1699</link>: Default behaviour for URL validation changed from 'enabled' to 'disabled'</para></listitem>
+   <listitem><para><link xlink:href="https://bugster.forgerock.org/jira/browse/OPENAM-1691" xlink:show="new">OPENAM-1691</link>: Varnish PA rejects the request when client IP cannot be resolved</para></listitem>
+   <listitem><para><link xlink:href="https://bugster.forgerock.org/jira/browse/OPENAM-1673" xlink:show="new">OPENAM-1673</link>: IIS6 policy agent crash on IIS application pool restart</para></listitem>
+   <listitem><para><link xlink:href="https://bugster.forgerock.org/jira/browse/OPENAM-1645" xlink:show="new">OPENAM-1645</link>: Varnish PA will fail if agent configuration/bootstrap file is removed after installation</para></listitem>
+   <listitem><para><link xlink:href="https://bugster.forgerock.org/jira/browse/OPENAM-1568" xlink:show="new">OPENAM-1568</link>: Apache Policy Agent on Windows crash inside NSS/NSPR cleanup </para></listitem>
+   <listitem><para><link xlink:href="https://bugster.forgerock.org/jira/browse/OPENAM-1542" xlink:show="new">OPENAM-1542</link>: Varnish policy agent fails to set sticky session mode cookie </para></listitem>
+   <listitem><para><link xlink:href="https://bugster.forgerock.org/jira/browse/OPENAM-1541" xlink:show="new">OPENAM-1541</link>: Policy Agents need to be consistent in HTTP response codes when post data preservation cache entry is expired (or not available)</para></listitem>
+   <listitem><para><link xlink:href="https://bugster.forgerock.org/jira/browse/OPENAM-1524" xlink:show="new">OPENAM-1524</link>: Error messages on amAgent debug logs</para></listitem>
+   <listitem><para><link xlink:href="https://bugster.forgerock.org/jira/browse/OPENAM-1523" xlink:show="new">OPENAM-1523</link>: Policy Agent fails to locate OpenAM server cookie value</para></listitem>
+   <listitem><para><link xlink:href="https://bugster.forgerock.org/jira/browse/OPENAM-1510" xlink:show="new">OPENAM-1510</link>: Policy Agent may crash with remote audit log enabled</para></listitem>
+   <listitem><para><link xlink:href="https://bugster.forgerock.org/jira/browse/OPENAM-1499" xlink:show="new">OPENAM-1499</link>: Varnish PA corrupts post data buffer</para></listitem>
+   <listitem><para><link xlink:href="https://bugster.forgerock.org/jira/browse/OPENAM-1498" xlink:show="new">OPENAM-1498</link>: Varnish PA crash on invalid bootstrap properties</para></listitem>
+   <listitem><para><link xlink:href="https://bugster.forgerock.org/jira/browse/OPENAM-1497" xlink:show="new">OPENAM-1497</link>: Varnish PA sets wrong http 302 header</para></listitem>
+   <listitem><para><link xlink:href="https://bugster.forgerock.org/jira/browse/OPENAM-1448" xlink:show="new">OPENAM-1448</link>: IIS6 policy agent returns http 415 error when used with SOAP web-services and custom headers</para></listitem>
+   <listitem><para><link xlink:href="https://bugster.forgerock.org/jira/browse/OPENAM-1420" xlink:show="new">OPENAM-1420</link>: http HEAD request gets transformed into GET</para></listitem>
+   <listitem><para><link xlink:href="https://bugster.forgerock.org/jira/browse/OPENAM-1379" xlink:show="new">OPENAM-1379</link>: openAM IIS 7 webagent bug</para></listitem>
+   <listitem><para><link xlink:href="https://bugster.forgerock.org/jira/browse/OPENAM-1344" xlink:show="new">OPENAM-1344</link>: Wrong library being loaded by apache 2.4 policy agent</para></listitem>
+   <listitem><para><link xlink:href="https://bugster.forgerock.org/jira/browse/OPENAM-1339" xlink:show="new">OPENAM-1339</link>: Empty audit log message for windows policy agents</para></listitem>
+   <listitem><para><link xlink:href="https://bugster.forgerock.org/jira/browse/OPENAM-1271" xlink:show="new">OPENAM-1271</link>: webagent namingUrl validation fails if datastore auth module is not configured within auth-chain of agent realm</para></listitem>
+   <listitem><para><link xlink:href="https://bugster.forgerock.org/jira/browse/OPENAM-1267" xlink:show="new">OPENAM-1267</link>: WebAgent installer shows 'OpenSSO Policy Agent' at welcome screen</para></listitem>
+   <listitem><para><link xlink:href="https://bugster.forgerock.org/jira/browse/OPENAM-1264" xlink:show="new">OPENAM-1264</link>: OpenAM Web Agent crashes while cleaning Agent Config</para></listitem>
+   <listitem><para><link xlink:href="https://bugster.forgerock.org/jira/browse/OPENAM-1208" xlink:show="new">OPENAM-1208</link>: IIS6 policy agent stucks in a loop on a session refresh advice</para></listitem>
+   <listitem><para><link xlink:href="https://bugster.forgerock.org/jira/browse/OPENAM-1190" xlink:show="new">OPENAM-1190</link>: IIS6 policy agent erroneously overwrites http headers</para></listitem>
+   <listitem><para><link xlink:href="https://bugster.forgerock.org/jira/browse/OPENAM-1179" xlink:show="new">OPENAM-1179</link>: Web Agents not working on Solaris 11 x86</para></listitem>
+   <listitem><para><link xlink:href="https://bugster.forgerock.org/jira/browse/OPENAM-1178" xlink:show="new">OPENAM-1178</link>: IIS6 policy agent does not set proper status code on 403/500 responses in IIS6 log</para></listitem>
+   <listitem><para><link xlink:href="https://bugster.forgerock.org/jira/browse/OPENAM-1176" xlink:show="new">OPENAM-1176</link>: memory leaks in libamsdk</para></listitem>
+   <listitem><para><link xlink:href="https://bugster.forgerock.org/jira/browse/OPENAM-1166" xlink:show="new">OPENAM-1166</link>: IIS6 policy agent does not set Content-Type on redirect</para></listitem>
+   <listitem><para><link xlink:href="https://bugster.forgerock.org/jira/browse/OPENAM-1159" xlink:show="new">OPENAM-1159</link>: IIS7 policy agent crash on unresolvable naming service hostname</para></listitem>
+   <listitem><para><link xlink:href="https://bugster.forgerock.org/jira/browse/OPENAM-1118" xlink:show="new">OPENAM-1118</link>: Policy agent on Linux core dumps on disabled or invalid notifications </para></listitem>
+   <listitem><para><link xlink:href="https://bugster.forgerock.org/jira/browse/OPENAM-1099" xlink:show="new">OPENAM-1099</link>: IIS7 policy agent crash on empty LARES response</para></listitem>
+   <listitem><para><link xlink:href="https://bugster.forgerock.org/jira/browse/OPENAM-1088" xlink:show="new">OPENAM-1088</link>: Web Agent for Apache 2.2 Doesn't properly set cookies on server request.</para></listitem>
+   <listitem><para><link xlink:href="https://bugster.forgerock.org/jira/browse/OPENAM-1076" xlink:show="new">OPENAM-1076</link>: Agent C-SDK on windows</para></listitem>
+   <listitem><para><link xlink:href="https://bugster.forgerock.org/jira/browse/OPENAM-1015" xlink:show="new">OPENAM-1015</link>: "Invalid pointer" in agent's cleanup_properties() </para></listitem>
+   <listitem><para><link xlink:href="https://bugster.forgerock.org/jira/browse/OPENAM-1011" xlink:show="new">OPENAM-1011</link>: IIS7 agent unneeded logging fills up agent log file</para></listitem>
+   <listitem><para><link xlink:href="https://bugster.forgerock.org/jira/browse/OPENAM-845" xlink:show="new">OPENAM-845</link>: Semicolon (;) appended to HTTP_HEADER values in IIS7 agent after implementing fix for OPENAM-437</para></listitem>
+   <listitem><para><link xlink:href="https://bugster.forgerock.org/jira/browse/OPENAM-835" xlink:show="new">OPENAM-835</link>: When using logout.cookie.reset for Web Agents, the leading dot of the domain names is ignored</para></listitem>
+   <listitem><para><link xlink:href="https://bugster.forgerock.org/jira/browse/OPENAM-762" xlink:show="new">OPENAM-762</link>: Protecting more than one website with IIS Web Agent</para></listitem>
+   <listitem><para><link xlink:href="https://bugster.forgerock.org/jira/browse/OPENAM-745" xlink:show="new">OPENAM-745</link>: IIS 7.x web agent, try to release memory for certdbpasswd twice.</para></listitem>
+   <listitem><para><link xlink:href="https://bugster.forgerock.org/jira/browse/OPENAM-693" xlink:show="new">OPENAM-693</link>: PA should not SIGSEGV if the agent configuration is invalid</para></listitem>
+   <listitem><para><link xlink:href="https://bugster.forgerock.org/jira/browse/OPENAM-690" xlink:show="new">OPENAM-690</link>: Unprotected IIS Websites Stopped Working</para></listitem>
+   <listitem><para><link xlink:href="https://bugster.forgerock.org/jira/browse/OPENAM-672" xlink:show="new">OPENAM-672</link>: IIS crashes with WebAgent</para></listitem>
+   <listitem><para><link xlink:href="https://bugster.forgerock.org/jira/browse/OPENAM-618" xlink:show="new">OPENAM-618</link>: Agent for multi-process servers fails if OpenAM is running in SSL mode with NSPR error -8023</para></listitem>
+   <listitem><para><link xlink:href="https://bugster.forgerock.org/jira/browse/OPENAM-617" xlink:show="new">OPENAM-617</link>: Invalid properties in the agent profile causes the PA to SIGSEGV</para></listitem>
+  </itemizedlist>
   </section>
 
   <section xml:id="web-agent-limitations">
@@ -273,7 +341,32 @@
    <para>The following known issues remained open at the time this release
    became available.</para>
 
-   <para>TODO</para>
+  <!-- List generated using http://bugster.forgerock.org/jira/rest/api/2/search?jql=project+%3D+OPENAM+AND+resolution+%3D+Unresolved+AND+component+%3D+%22web+agents%22+AND+priority+not+in+%28Minor%2C+Trivial%29+AND+type+%3D+Bug&startAt=0&maxResults=500&fields=summary-->
+  <itemizedlist>
+   <listitem><para><link xlink:href="https://bugster.forgerock.org/jira/browse/OPENAM-1927" xlink:show="new">OPENAM-1927</link>: Silent Installation doesn't works for Apache2.4/Suse11</para></listitem>
+   <listitem><para><link xlink:href="https://bugster.forgerock.org/jira/browse/OPENAM-1889" xlink:show="new">OPENAM-1889</link>: Wrong password in combination with naming service failover causes internal error on OpenAM</para></listitem>
+   <listitem><para><link xlink:href="https://bugster.forgerock.org/jira/browse/OPENAM-1810" xlink:show="new">OPENAM-1810</link>: Content-Length header causes multi-second delays in Apache Web Agent</para></listitem>
+   <listitem><para><link xlink:href="https://bugster.forgerock.org/jira/browse/OPENAM-1725" xlink:show="new">OPENAM-1725</link>: Agent C-SDK on Linux</para></listitem>
+   <listitem><para><link xlink:href="https://bugster.forgerock.org/jira/browse/OPENAM-1698" xlink:show="new">OPENAM-1698</link>: 'Secure Cookie mode' does not work for URL policy agents in CDSSO mode</para></listitem>
+   <listitem><para><link xlink:href="https://bugster.forgerock.org/jira/browse/OPENAM-1653" xlink:show="new">OPENAM-1653</link>: Apache 2.0 Web Agent - Crashes on Solaris</para></listitem>
+   <listitem><para><link xlink:href="https://bugster.forgerock.org/jira/browse/OPENAM-1536" xlink:show="new">OPENAM-1536</link>: IIS 7 Agent failing on occasional policy decisions</para></listitem>
+   <listitem><para><link xlink:href="https://bugster.forgerock.org/jira/browse/OPENAM-1521" xlink:show="new">OPENAM-1521</link>: Cookie Hijacking Prevention does not work properly under FireFox</para></listitem>
+   <listitem><para><link xlink:href="https://bugster.forgerock.org/jira/browse/OPENAM-1520" xlink:show="new">OPENAM-1520</link>: Apache 2.2 WPA 3.0.4.5 causes Apache to hang</para></listitem>
+   <listitem><para><link xlink:href="https://bugster.forgerock.org/jira/browse/OPENAM-1503" xlink:show="new">OPENAM-1503</link>: Cookies configured in OpenAM not reset after logout</para></listitem>
+   <listitem><para><link xlink:href="https://bugster.forgerock.org/jira/browse/OPENAM-1472" xlink:show="new">OPENAM-1472</link>: Cookie not reset at logout</para></listitem>
+   <listitem><para><link xlink:href="https://bugster.forgerock.org/jira/browse/OPENAM-1345" xlink:show="new">OPENAM-1345</link>: Looking for a web agent which works on a REDHAT5.8</para></listitem>
+   <listitem><para><link xlink:href="https://bugster.forgerock.org/jira/browse/OPENAM-1312" xlink:show="new">OPENAM-1312</link>: All the cookies, headers are getting removed from the request in the middle of the request processing for the application after using IIS web agent.</para></listitem>
+   <listitem><para><link xlink:href="https://bugster.forgerock.org/jira/browse/OPENAM-1305" xlink:show="new">OPENAM-1305</link>: IIS Web policy agent do not record Request URI in local and remote access logs (Data/request URI "Not Available")</para></listitem>
+   <listitem><para><link xlink:href="https://bugster.forgerock.org/jira/browse/OPENAM-1101" xlink:show="new">OPENAM-1101</link>: Potential Security Issue</para></listitem>
+   <listitem><para><link xlink:href="https://bugster.forgerock.org/jira/browse/OPENAM-889" xlink:show="new">OPENAM-889</link>: Agent should recover if the admin session gets invalid</para></listitem>
+   <listitem><para><link xlink:href="https://bugster.forgerock.org/jira/browse/OPENAM-869" xlink:show="new">OPENAM-869</link>: Apache 2.0 problem with 3.0.2 agent</para></listitem>
+   <listitem><para><link xlink:href="https://bugster.forgerock.org/jira/browse/OPENAM-834" xlink:show="new">OPENAM-834</link>: logout url functionality not working as expected</para></listitem>
+   <listitem><para><link xlink:href="https://bugster.forgerock.org/jira/browse/OPENAM-404" xlink:show="new">OPENAM-404</link>: Policy agent should remove duplicate response headers</para></listitem>
+   <listitem><para><link xlink:href="https://bugster.forgerock.org/jira/browse/OPENAM-402" xlink:show="new">OPENAM-402</link>: agent locks down Apache httpd process if agent auth fails</para></listitem>
+   <listitem><para><link xlink:href="https://bugster.forgerock.org/jira/browse/OPENAM-329" xlink:show="new">OPENAM-329</link>: Apache 2.2 stop responding when debug log rotation is enabled in Policy Agent</para></listitem>
+   <listitem><para><link xlink:href="https://bugster.forgerock.org/jira/browse/OPENAM-324" xlink:show="new">OPENAM-324</link>: Agent profile not found unless 'Read and write access to all configured Agents' is selected</para></listitem>
+   <listitem><para><link xlink:href="https://bugster.forgerock.org/jira/browse/OPENAM-308" xlink:show="new">OPENAM-308</link>: IIS6 Policy Web Agent doesn't support multiple sites correctly</para></listitem>
+  </itemizedlist>
   </section>
  </section>
 </chapter>
