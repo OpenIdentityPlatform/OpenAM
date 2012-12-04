@@ -20,7 +20,7 @@
   !
   ! CCPL HEADER END
   !
-  !      Copyright 2011 ForgeRock AS
+  !      Copyright 2011-2012 ForgeRock AS
   !    
 -->
 <chapter xml:id='chap-feedback'
@@ -50,9 +50,28 @@
    its impact on your operation</para>
   </listitem>
   <listitem>
-   <para>Machine type, operating system version, web container and version,
-   Java version, and OpenAM release version, including any patches or other
-   software that might be affecting the problem</para>
+   <itemizedlist>
+    <para>Description of the environment, including the following
+    information:</para>
+    <listitem>
+     <para>Machine type</para>
+    </listitem>
+    <listitem>
+     <para>Operating system and version</para>
+    </listitem>
+    <listitem>
+     <para>Web server or container and version</para>
+    </listitem>
+    <listitem>
+     <para>Java version</para>
+    </listitem>
+    <listitem>
+     <para>OpenAM version</para>
+    </listitem>
+    <listitem>
+     <para>Any patches or other software that might be affecting the problem</para>
+    </listitem>
+   </itemizedlist>
   </listitem>
   <listitem>
    <para>Steps to reproduce the problem</para>

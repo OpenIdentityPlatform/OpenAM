@@ -61,11 +61,9 @@
    <listitem>
     <para>GlassFish v2</para>
    </listitem>
-<!-- Commenting out WebSphere given OPENAM-1250
    <listitem>
-    <para>IBM WebSphere 7.x</para>
+    <para>IBM WebSphere 8, 8.5</para>
    </listitem>
--->
    <listitem>
     <para>JBoss Enterprise Application Platform 4.x, 5.x</para>
     <para>JBoss Application Server 7.x</para>
@@ -91,7 +89,7 @@
    <para>This release of OpenAM works with the following configuration data
    stores.</para>
    <listitem>
-    <para>Embedded (using ForgeRock OpenDJ 2.4.5 for the data store)</para>
+    <para>Embedded (using ForgeRock OpenDJ for the data store)</para>
     <para>When using the embedded configuration store, you must deploy OpenAM
     on a local file system and not on an NFS-mounted file system.</para>
    </listitem>
