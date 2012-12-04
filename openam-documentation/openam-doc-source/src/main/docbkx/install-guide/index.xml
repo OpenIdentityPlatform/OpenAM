@@ -62,7 +62,9 @@
  <!-- Fix for OpenAM-1020
  <xinclude:include href='chap-install-console-only.xml' />
  -->
+ <!-- Fix for AME-232
  <xinclude:include href='chap-install-core-only.xml' />
+ -->
  <xinclude:include href='chap-install-das.xml' />
  <xinclude:include href='chap-install-samples.xml' />
  <xinclude:include href='chap-custom-ui.xml' />

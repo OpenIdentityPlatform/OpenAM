@@ -36,8 +36,13 @@
   <primary>Installing</primary>
   <secondary>Full install</secondary>
  </indexterm>
+ <indexterm>
+  <primary>Installing</primary>
+  <secondary>No console</secondary>
+ </indexterm>
  <para>This chapter covers tasks required for a full install of OpenAM core
- services including the OpenAM console.</para>
+ services including the OpenAM console and installation of only the core
+ services.</para>
  
  <para>To manage access to resources on other servers, you can use either
  OpenIG or one of the OpenAM policy agents. 
@@ -597,5 +602,40 @@ Using CLASSPATH:
   <para>Now when an end user logs into a server on a load balancer, they will have
   a persistent session, even if the first server the user logs into fails.
   </para>
+
+ <procedure xml:id="deploy-coreonly-on-tomcat">
+  <title>To Deploy the Core Services On Tomcat</title>
+  
+ <para>You can deploy OpenAM core services without including the console if
+ you install the console elsewhere, or if you plan to perform all
+ configuration using <command>ssoadm</command> for example.</para>
+
+  <step>
+   <para>Deploy the <filename><?eval ${serveronlyWarFile}?></filename> file 
+    on your container.</para>
+
+   <para>For example, copy the file to deploy on Apache Tomcat.</para>
+   <screen>$ cp ~/Downloads/<?eval ${coreDirectoryFile}?>/
+   <?eval ${serveronlyWarFile}?> 
+    /path/to/tomcat/webapps/coreonly.war</screen>
+    <note>
+     <para>By adding <filename>coreonly.war</filename> to the end of the path, 
+      the name of the <filename>.war</filename> file will be changed from
+      <filename><?eval ${serveronlyWarFile}?></filename> to
+      <filename>coreonly.war</filename> so the deployment URI will be
+      <literal>/coreonly</literal>.</para>
+    </note>
+  </step>
+  <step>
+   <para>Browse to the console application, for example
+    <literal>http://host.example.com:8080/coreonly/</literal>, and configure
+    OpenAM core services as if you were deploying with a full version.</para>
+  </step>
+  <step>
+   <para>Restrict permissions to the
+   <filename>$HOME/coreonly</filename> configuration directory, where
+   $HOME corresponds to the user who runs the web container.</para>
+  </step>
+ </procedure>
  
 </chapter>
