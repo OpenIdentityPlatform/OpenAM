@@ -77,10 +77,15 @@ Using CLASSPATH:       /path/to/tomcat/bin/bootstrap.jar:
      <para>The hidden file that points to the configuration directory.</para>
      <para>For example, if you are using Apache Tomcat as the web container,
      this file could be
+     <filename>$HOME/.openamcfg/AMConfig_path_to_tomcat_webapps_openam_</filename>
+     OR
      <filename>$HOME/.openssocfg/AMConfig_path_to_tomcat_webapps_openam_</filename>.</para>
     </listitem>
    </itemizedlist>
+   <screen>$ rm -rf $HOME/openam $HOME/.openamcfg</screen>
+   OR
    <screen>$ rm -rf $HOME/openam $HOME/.openssocfg</screen>
+
    <note>
     <para>At this point, you can restart the web container and configure
     OpenAM anew if you only want to start over with a clean configuration
