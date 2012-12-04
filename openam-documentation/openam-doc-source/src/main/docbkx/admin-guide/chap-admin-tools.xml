@@ -192,15 +192,17 @@
   </itemizedlist>
   <para>In such cases you can work around the problem by adding an option
   such as the following to the <command>java</command> command in the
-  tool's script. (This all belongs on one line with no spaces in the
-  script.)</para>
+  tool's script. The option sets a comma-separated list of key-value pairs,
+  where the key is the load balancer URL and the value is the server URL.
+  (This all belongs on one line with no spaces in the script.)</para>
   <programlisting language="none">
 -D"com.iplanet.am.naming.map.site.to.server=https://lb.example.com:443/openam=
-http://server1.example.com:8080/openam=http://server2.example.com:8080/openam"</programlisting>
+http://server1.example.com:8080/openam,https://lb.example.com:443/openam=
+http://server2.example.com:8080/openam"</programlisting>
   <para>In the above example the load balancer is on the <literal>lb</literal>
   host, <literal>https://lb.example.com:443/openam</literal> is the site name,
-  and the additional OpenAM servers in the site follow with
-  <literal>=</literal> as the separator character.</para>
+  and the OpenAM servers in the site are on <literal>server1</literal> and
+  <literal>server2</literal>.</para>
  </section>
 
  <section xml:id="openam-ssoadm-jsp-overview">
