@@ -117,8 +117,8 @@
    </listitem>
   </varlistentry>
   <varlistentry xml:id="ws-federation">
-   <term><link
-   xlink:href="http://www.ibm.com/developerworks/library/specification/ws-fed/"
+   <term><link xlink:show="new"
+   xlink:href="http://en.wikipedia.org/wiki/WS-Federation"
    >Web Services Federation Language (WS-Federation)</link></term>
    <listitem>
     <indexterm>

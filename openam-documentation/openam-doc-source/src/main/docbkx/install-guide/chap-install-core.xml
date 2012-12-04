@@ -520,10 +520,10 @@ Using CLASSPATH:
   <title>Configuring an Additional Instance</title>
   
   <para>When an additional OpenAM instance is necessary (usually for <link
-     xlink:href="install-guide#install-openam-session-failover"
-     xlink:role="http://docbook.org/xlink/role/olink"><citetitle>Session
-     Failover</citetitle></link> [SFO]), it is configured separately from the 
-     first instance.</para>
+     xlink:href="install-guide#chap-session-failover"
+     xlink:role="http://docbook.org/xlink/role/olink"><citetitle>Setting Up
+     OpenAM Session Failover</citetitle></link> [SFO]), it is configured
+     separately from the first instance.</para>
   
   <step>
    <para>In the initial configuration screen, click Create New Configuration under 
@@ -571,7 +571,7 @@ Using CLASSPATH:
   <step>
    <para>Select <literal>Yes</literal> to add the load balancer with each additional 
     instance. It is alright if you did not add the load balancer with the first instance.
-    The <link xlink:href="install-guide#install-openam-session-failover"
+    The <link xlink:href="install-guide#chap-session-failover"
     xlink:role="http://docbook.org/xlink/role/olink"><citetitle>SFO</citetitle></link>
     chapter describes how to add the load balancer to the first instance.</para>
    <para>Enter the <literal>Site Name</literal>, for example <literal>openamlb</literal>,
