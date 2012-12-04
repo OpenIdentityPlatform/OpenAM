@@ -53,6 +53,7 @@
    <item name="Support" href="http://forgerock.com/what-we-offer/subscriptions/" />
    <item name="Partners" href="http://forgerock.com/partners/" />
    <item name="Wiki" href="https://wikis.forgerock.org/confluence/display/OPENAM/Home" />
+   <item name="Security Advisories" href="http://forgerock.org/security_advisory.html" />
   </menu>
   
   <menu name="Released Documentation">
