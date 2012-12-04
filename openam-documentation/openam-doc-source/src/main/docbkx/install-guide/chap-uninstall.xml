@@ -83,7 +83,7 @@ Using CLASSPATH:       /path/to/tomcat/bin/bootstrap.jar:
     </listitem>
    </itemizedlist>
    <screen>$ rm -rf $HOME/openam $HOME/.openamcfg</screen>
-   OR
+   <para>or</para>
    <screen>$ rm -rf $HOME/openam $HOME/.openssocfg</screen>
 
    <note>

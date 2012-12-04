@@ -34,6 +34,9 @@
  <indexterm>
   <primary>Installing</primary>
   <secondary>Session failover</secondary>
+ </indexterm>
+ <indexterm>
+  <primary>Installing</primary>
   <secondary>Load Balancer</secondary>
  </indexterm>
  <para>This chapter covers setting up session failover (SFO) when using multiple
