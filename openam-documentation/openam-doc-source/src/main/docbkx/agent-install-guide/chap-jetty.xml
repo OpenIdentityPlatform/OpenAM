@@ -37,7 +37,7 @@
   <section xml:id="before-jetty-agent-install">
   <title>Before You Install</title>
   
-  <para>Make sure OpenAM is installed, running, that you can contact OpenAM
+  <para>Make sure OpenAM is installed and running, and that you can contact OpenAM
   from the system running the policy agent. Next, create a profile for your
   policy agent as described in the <citetitle>Administration Guide</citetitle>
   section on <link xlink:href="admin-guide#create-agent-profiles"
@@ -322,7 +322,9 @@ Install log file location:
    <step>
     <para>To protect a web application, you must add the following filter
     to the application's <filename>web.xml</filename> configuration,
-    following the opening &lt;web-app&gt; tag.</para>
+    following the opening &lt;web-app&gt; tag. The file for the sample 
+    application delivered with the agent is 
+    <filename>/path/to/j2ee_agents/jetty_v61_agent/sampleapp/etc/web.xml</filename>.</para>
     <programlisting language="xml"> &lt;filter&gt;
   &lt;filter-name&gt;Agent&lt;/filter-name&gt;
   &lt;display-name&gt;Agent&lt;/display-name&gt;
