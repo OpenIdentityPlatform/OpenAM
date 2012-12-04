@@ -162,7 +162,7 @@ Service Configuration was imported.</screen>
   </step>
   <step>
    <para>If you are changing the location or deployment descriptor, change the
-   name of the file in the <filename>/home/user/.openssocfg</filename> folder,
+   name of the file in the <filename>/home/user/.openamcfg</filename> folder,
    such as <filename>AMConfig_path_to_tomcat_webapps_openam_</filename>
    to match the new location and deployment descriptor.</para>
    <para>Also edit the path name in the file to match the change you made when

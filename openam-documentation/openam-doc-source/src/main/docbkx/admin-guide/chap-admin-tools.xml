@@ -32,7 +32,8 @@
  <title>Administration Interfaces &amp; Tools</title>
 
  <para>This chapter provides a brief introduction to the web-based OpenAM
- console. It also lists and describes each CLI administration tool.</para>
+ console. It also lists and describes each command line interface (CLI)
+ administration tool.</para>
  
  <section xml:id="openam-console-overview">
   <title>OpenAM Web-Based Console</title>
@@ -59,10 +60,10 @@
   administrative operations. Therefore, when you login as
   <literal>amadmin</literal>, you see the complete OpenAM console. In the
   background, OpenAM has set a cookie in your browser that lasts until the
-  session expires, you logout, or you close your browser<footnote>
+  session expires, you logout, or you close your browser.<footnote>
   <para>Technically speaking, persistent cookies can remain valid when you
   close your browser. This section reflects OpenAM default behavior before
-  you configure additional functionality.</para></footnote>.</para>
+  you configure additional functionality.</para></footnote></para>
   
   <para>When you login to the OpenAM console as an end user, a user without
   any access to perform administrative operations, then instead of the OpenAM
@@ -117,28 +118,27 @@
     <listitem>
      <para>This tool lets you change OpenAM Administrator passwords, and
      display encrypted password values.</para>
-     <para>Install this from <filename>tools/ssoAdminTools.zip</filename>.</para>
+     <para>Install this from the <filename><?eval ${ssoadminZipFile}?></filename>.</para>
     </listitem>
    </varlistentry>
    <varlistentry>
     <term><command>amverifyarchive</command></term>
     <listitem>
      <para>This tool checks log archives for tampering.</para>
-     <para>Install this from <filename>tools/ssoAdminTools.zip</filename>.</para>
+     <para>Install this from <filename><?eval ${ssoadminZipFile}?></filename>.</para>
     </listitem>
    </varlistentry>
    <varlistentry>
-    <term><command>configurator.jar</command></term>
+    <term><command><?eval ${configJarFile}?></command></term>
     <listitem>
      <para>This executable .jar file lets you perform silent installation,
      configuring a deployed OpenAM server by applying settings from a
-     configuration file, as in <command>java -jar configurator.jar -f
-     config.file</command>. The .jar is provided with a sample configuration
-     file.</para>
-     <para>The <replaceable>config.file</replaceable>, based on the
-     <filename>sampleconfiguration</filename> file provided with the tool,
-     must be adapted for your environment.</para>
-     <para>Install this from <filename>tools/ssoConfiguratorTools.zip</filename>.</para>
+     configuration file, using the <command>java -jar configurator.jar -f
+     config.file</command>. The <filename>.jar</filename>
+     is provided with a sample configuration file.</para>
+     <para>The <replaceable>config.file</replaceable>, based on the <filename>sampleconfiguration</filename> 
+     file provided with the tool, must be adapted for your environment.</para>
+     <para>Install this from <filename><?eval ${ssoconfigZipFile}?></filename>.</para>
     </listitem>
    </varlistentry>
    <varlistentry>
@@ -153,7 +153,7 @@
      <filename>ssoadm.jsp</filename> page in your browser after activating it
      when you installed OpenAM, for example
      <literal>http://openam.example.com:8080/openam/ssoadm.jsp</literal>.</para>
-     <para>Install this from <filename>tools/ssoAdminTools.zip</filename>.</para>
+     <para>Install this from <filename><?eval ${ssoadminZipFile}?></filename>.</para>
      <para>To translate settings applied in OpenAM console to service attributes
      for use with <command>ssoadm</command>, login to the OpenAM console
      as <literal>amadmin</literal> and access the services page, such as
@@ -167,7 +167,7 @@
      also be run in command-line mode. The tool helps you check configuration
      settings and verify configuration integrity, test connectivity, and
      generate test reports.</para>
-     <para>Install this from <filename>tools/ssoDiagnosticTools.zip</filename>.</para>
+     <para>Install this from <filename><?eval ${diagnosticsZipFile}?></filename>.</para>
     </listitem>
    </varlistentry>
   </variablelist>

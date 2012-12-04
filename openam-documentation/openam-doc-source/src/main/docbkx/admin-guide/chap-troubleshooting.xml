@@ -63,14 +63,14 @@ mark      1739     1  0 14:47...</screen>
      The user running the web container where you install OpenAM must
      be able to read from and write in this directory.</para>
      <para>If you cannot change the permissions to the user's home directory,
-     you can, as a workaround, unpack <filename>opensso.war</filename>, set the
-     <literal>configuration.dir</literal> property in the
+     you can, as a workaround, unpack <filename><?eval ${coreWarFile}?></filename>, 
+     set the <literal>configuration.dir</literal> property in the
      <filename>WEB-INF/classes/bootstrap.properties</filename> to a directory
-     with appropriate permissions, and repack <filename>opensso.war</filename>
+     with appropriate permissions, and repack <filename>openam.war</filename>
      with the adjusted file before deploying that.</para>
-     <screen>$ cd ~/Downloads/opensso/deployable-war/
+     <screen>$ cd ~/Downloads/<?eval ${coreDirectoryFile}?>/<?eval ${coreWarFile}?>
 $ mkdir unpacked ; cd unpacked
-$ jar xf ../opensso.war
+$ jar xf ../<?eval ${coreWarFile}?>
 $ vi WEB-INF/classes/bootstrap.properties 
 $ grep ^config WEB-INF/classes/bootstrap.properties 
 configuration.dir=/my/readwrite/config/dir
@@ -129,14 +129,14 @@ PING openam-ter (192.168.56.2) 56(84) bytes of data.
      again. Who deleted my configuration?</para>
     </question>
     <answer>
-     <para>OpenAM uses a file in <filename>$HOME/.openssocfg/</filename> to
+     <para>OpenAM uses a file in <filename>$HOME/.openamcfg/</filename> to
      bootstrap and find its configuration. The file is named after the path
      to OpenAM and contains the path to the configuration. The following
      example shows what the file looks like for OpenAM deployed in Apache
      Tomcat under <filename>/path/to/tomcat/webapps/openam</filename>, and
      running as user <literal>amuser</literal> with <literal>$HOME</literal>
      <filename>/home/amuser</filename>.</para>
-     <screen>$ cat .openssocfg/AMConfig_path_to_tomcat_webapps_openam_ 
+     <screen>$ cat .openamcfg/AMConfig_path_to_tomcat_webapps_openam_ 
 /home/amuser/openam</screen>
      <para>If OpenAM cannot find its configuration, then it displays the
      configuration screen.</para>
