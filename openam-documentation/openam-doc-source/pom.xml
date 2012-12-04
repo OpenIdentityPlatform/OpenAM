@@ -120,9 +120,10 @@
         <diagnosticsZipFile><![CDATA[openam-distribution-diagnostics-${serverDocTargetVersion}-SNAPSHOT.zip]]></diagnosticsZipFile>
         <fedletZipFile><![CDATA[openam-distribution-fedlet-unconfigured-${serverDocTargetVersion}-SNAPSHOT.zip]]></fedletZipFile>
         <libraryZipFile><![CDATA[openam-distribution-library-${serverDocTargetVersion}-SNAPSHOT.zip]]></libraryZipFile>
-        <ssoadminZipFile><![CDATA[openam-distribution-ssoadmintools-${serverDocTargetVersion}-SNAPSHOT.zip]]>-10.1.0-SNAPSHOT.zip</ssoadminZipFile>
-        <ssoconfigZipFile><![CDATA[openam-distribution-ssodonfiguratortools-${serverDocTargetVersion}-SNAPSHOT.zip]]></ssoconfigZipFile>
+        <ssoadminZipFile><![CDATA[openam-distribution-ssoadmintools-${serverDocTargetVersion}]]>-SNAPSHOT.zip</ssoadminZipFile>
+        <ssoconfigZipFile><![CDATA[openam-distribution-ssoconfiguratortools-${serverDocTargetVersion}-SNAPSHOT.zip]]></ssoconfigZipFile>
         <serveronlyWarFile><![CDATA[openam-server-only-${serverDocTargetVersion}-SNAPSHOT.war]]></serveronlyWarFile>
+        <configJarFile><![CDATA[openam-distribution-configurator-${serverDocTargetVersion}-SNAPSHOT.jar]]></configJarFile>
         
 
         <site-out>${project.build.outputDirectory}/site</site-out>
