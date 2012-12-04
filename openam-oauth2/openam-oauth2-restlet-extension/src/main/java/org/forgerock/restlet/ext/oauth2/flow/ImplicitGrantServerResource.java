@@ -81,8 +81,29 @@ public class ImplicitGrantServerResource extends AbstractFlow {
         String scope_before =
                 OAuth2Utils
                         .getRequestParameter(getRequest(), OAuth2Constants.Params.SCOPE, String.class);
+
         // Validate the granted scope
-        Set<String> checkedScope = executeAccessTokenScopePlugin(scope_before);
+        Set<String> checkedScope = executeAuthorizationPageScopePlugin(scope_before);
+
+        return getPage("authorize.ftl", getDataModel(checkedScope));
+    }
+
+    @Post("form:json")
+    public Representation represent(Representation entity) {
+        resourceOwner = getAuthenticatedResourceOwner();
+        client = validateRemoteClient();
+        sessionClient =
+                client.getClientInstance(OAuth2Utils.getRequestParameter(getRequest(),
+                        OAuth2Constants.Params.REDIRECT_URI, String.class));
+        String scope_after =
+            OAuth2Utils
+                .getRequestParameter(getRequest(), OAuth2Constants.Params.SCOPE, String.class);
+
+        String state =
+                OAuth2Utils
+                        .getRequestParameter(getRequest(), OAuth2Constants.Params.STATE, String.class);
+
+        Set<String> checkedScope = executeAccessTokenScopePlugin(scope_after);
 
         AccessToken token = createAccessToken(checkedScope);
         Form tokenForm = tokenToForm(token.convertToMap());
