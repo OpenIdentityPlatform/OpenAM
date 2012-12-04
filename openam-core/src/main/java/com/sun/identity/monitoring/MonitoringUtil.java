@@ -73,7 +73,7 @@ public class MonitoringUtil {
         "PrivilegeEvaluatorMonitorCombineResults"
         };
 
-    public static String HTTP_AUTH_FILE = "opensso_mon_auth";
+    public static String HTTP_AUTH_FILE = "openam_mon_auth";
 
     private static Debug debug = Debug.getInstance("amMonitoring");
 

@@ -85,7 +85,7 @@
                     syntax="string"
                     i18nKey="a1021">
                     <DefaultValues>
-                        <Value>%BASE_DIR%/%SERVER_URI%/opensso_mon_auth</Value>
+                        <Value>%BASE_DIR%/%SERVER_URI%/openam_mon_auth</Value>
                     </DefaultValues>
                 </AttributeSchema>
                 <AttributeSchema name="iplanet-am-monitoring-rmi-port"

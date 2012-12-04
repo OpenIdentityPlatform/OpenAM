@@ -2425,7 +2425,7 @@ public class AMSetupServlet extends HttpServlet {
          *  directory exists, and then create the monitoring auth file
          *  there.
          */
-        String monAuthFile = basedir + "/" + deployuri + "/opensso_mon_auth";
+        String monAuthFile = basedir + "/" + deployuri + "/openam_mon_auth";
         String encpwd =
             (String)AccessController.doPrivileged(new EncodeAction("changeit"));
 
