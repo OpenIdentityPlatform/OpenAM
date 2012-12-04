@@ -87,15 +87,15 @@ public class ClientAuthenticationFilter extends Authenticator {
             try {
                 client = getVerifier().verify(request, response);
                 request.getClientInfo().setUser(new OAuth2Client(client));
+                result = true;
             } catch (OAuthProblemException e) {
                 if (null != client_id) {
                     Collection<ChallengeScheme> scheme =
                             getVerifier().getRequiredAuthenticationScheme(client_id);
                     // Todo Rechellenge the client
                 }
-                // TODO doError
+                throw e;
             }
-            result = true;
         } else {
             OAuth2Utils.DEBUG.warning("ClientAuthenticationFilter::Authentication failed. No verifier provided.");
             response.setStatus(Status.SERVER_ERROR_INTERNAL,

@@ -67,7 +67,6 @@ public class ClientVerifierImpl implements ClientVerifier{
     public ClientApplication verify(Request request, Response response){
         String clientId = null;
         String clientSecret = null;
-
         if (OAuth2Utils.DEBUG.messageEnabled()){
             OAuth2Utils.DEBUG.message("ClientVerifierImpl::Verifying client application");
         }
@@ -85,16 +84,16 @@ public class ClientVerifierImpl implements ClientVerifier{
             if (clientSecret != null){
                 client = verify(clientId, clientSecret);
             } else {
-                client = findClient(clientId);
+                throw OAuthProblemException.OAuthError.INVALID_CLIENT.handle(request);
             }
         }
         if (OAuth2Utils.logStatus) {
             if (client == null){
                 String[] obs = {"FAILED_AUTHENTICATE_CLIENT", clientId};
-                OAuth2Utils.logAccessMessage("CREATED_CLIENT", obs, OAuth2Utils.getSSOToken(request));
+                OAuth2Utils.logErrorMessage("FAILED_AUTHENTICATE_CLIENT", obs, OAuth2Utils.getSSOToken(request));
             } else {
                 String[] obs2 = {"AUTHENTICATED_CLIENT", client.getClientId()};
-                OAuth2Utils.logAccessMessage("CREATED_CLIENT", obs2, OAuth2Utils.getSSOToken(request));
+                OAuth2Utils.logAccessMessage("AUTHENTICATED_CLIENT", obs2, OAuth2Utils.getSSOToken(request));
             }
         }
         return client;
@@ -115,12 +114,13 @@ public class ClientVerifierImpl implements ClientVerifier{
             if (ret == null){
                 OAuth2Utils.DEBUG.error("ClientVerifierImpl::Unable to verify client password: " +
                         clientSecret);
-                throw OAuthProblemException.OAuthError.UNAUTHORIZED_CLIENT.handle(null, "Unauthorized client");
+                throw OAuthProblemException.OAuthError.INVALID_CLIENT.handle(null, "Invalid client");
+            } else {
+                user = new ClientApplicationImpl(ret);
             }
-            user = new ClientApplicationImpl(ret);
         } catch (Exception e){
             OAuth2Utils.DEBUG.error("ClientVerifierImpl::Unable to verify client", e);
-            throw OAuthProblemException.OAuthError.UNAUTHORIZED_CLIENT.handle(null, "Unauthorized client");
+            throw OAuthProblemException.OAuthError.INVALID_CLIENT.handle(null, "Invalid client");
         }
         return user;
     }
@@ -170,6 +170,8 @@ public class ClientVerifierImpl implements ClientVerifier{
                     // because the system is likely down..
                     throw new ResourceException(Status.SERVER_ERROR_INTERNAL, e);
                 }
+            } else {
+                throw new ResourceException(Status.CLIENT_ERROR_UNAUTHORIZED);
             }
         } catch (AuthLoginException le) {
             OAuth2Utils.DEBUG.error("ClientVerifierImpl::authContext AuthException", le);

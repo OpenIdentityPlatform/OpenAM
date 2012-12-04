@@ -71,9 +71,7 @@ public class UserIdentityVerifier extends AbstractIdentityVerifier<OpenAMUser> {
      * @return The user identifier.
      */
     protected String getIdentifier(Request request, Response response) {
-        if (null != request.getChallengeResponse()){
-            return request.getChallengeResponse().getIdentifier();
-        } else if (null != OAuth2Utils.getRequestParameter(request, OAuth2Constants.Params.USERNAME, String.class)){
+        if (null != OAuth2Utils.getRequestParameter(request, OAuth2Constants.Params.USERNAME, String.class)){
             return OAuth2Utils.getRequestParameter(request, OAuth2Constants.Params.USERNAME, String.class);
         } else {
             return null;
@@ -90,9 +88,7 @@ public class UserIdentityVerifier extends AbstractIdentityVerifier<OpenAMUser> {
      * @return The secret provided by the user.
      */
     protected char[] getSecret(Request request, Response response) {
-        if (null != request.getChallengeResponse()){
-            return request.getChallengeResponse().getSecret();
-        } else if (null != OAuth2Utils.getRequestParameter(request, OAuth2Constants.Params.PASSWORD, String.class)){
+        if (null != OAuth2Utils.getRequestParameter(request, OAuth2Constants.Params.PASSWORD, String.class)){
             return OAuth2Utils.getRequestParameter(request, OAuth2Constants.Params.PASSWORD, String.class).toCharArray();
         } else {
             return null;
@@ -128,10 +124,10 @@ public class UserIdentityVerifier extends AbstractIdentityVerifier<OpenAMUser> {
             SSOTokenManager mgr = SSOTokenManager.getInstance();
             token = mgr.createSSOToken(httpRequest);
         } catch (Exception e){
-            OAuth2Utils.DEBUG.error("UserIdentityVerifier:: No SSO Token in request", e);
+            OAuth2Utils.DEBUG.warning("UserIdentityVerifier:: No SSO Token in request", e);
         }
         if (token == null){
-            return super.authenticate(username, password);
+            return authenticate(username, password);
         } else {
             try {
                 return new OpenAMUser(token.getProperty("UserId"), token);

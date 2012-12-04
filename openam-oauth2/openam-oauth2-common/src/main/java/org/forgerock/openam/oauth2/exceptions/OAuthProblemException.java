@@ -82,13 +82,13 @@ public class OAuthProblemException extends ResourceException {
         INVALID_CLIENT(
                 OAuth2Constants.Error.INVALID_CLIENT,
                 "The client identifier provided is invalid, the client failed to authenticate, the client did not include its credentials, provided multiple client credentials, or used unsupported credentials type.",
-                "", 401),
+                "", 400),
         UNKNOWN_ERROR(
                 OAuth2Constants.Error.UNKNOWN_ERROR,
                 "The authenticated client is not authorized to use the access grant type provided.",
                 "", 403),
         INVALID_GRANT(OAuth2Constants.Error.INVALID_GRANT,
-                "The provided access grant is invalid, expired, or revoked.", "", 403),
+                "The provided access grant is invalid, expired, or revoked.", "", 400),
         UNSUPPORTED_GRANT_TYPE(
                 OAuth2Constants.Error.UNSUPPORTED_GRANT_TYPE,
                 "The provided access grant is invalid, expired, or revoked (e.g. invalid assertion, expired authorization token, bad end-user password credentials, or mismatching authorization code and redirection URI).",
