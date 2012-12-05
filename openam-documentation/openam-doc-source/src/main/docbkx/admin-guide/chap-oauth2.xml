@@ -218,15 +218,11 @@
    described in RFC 6749.</para>
 
    <programlisting language="javascript">{
-  "expires_in": 59997,
+  "expires_in": 599,
   "token_type": "Bearer",
   "refresh_token": "721edb43-f0d0-4c77-a793-53f6e81cf10c",
   "access_token": "6929b6e9-d8b1-4528-8aff-8e8c693f61e2"
 }</programlisting>
-
-   <para>Notice that the <literal>expires_in</literal> lifetime is expressed
-   in milliseconds. In RFC 6749 the unit for <literal>expires_in</literal>
-   is seconds. OpenAM uses milliseconds for additional precision.</para>
 
    <para>In addition to implementing your client, the resource server must also
    implement the logic for handling access tokens. The resource server can use
@@ -255,7 +251,7 @@
   "mail": "demo@example.com",
   "cn": "demo",
   "token_type": "Bearer",
-  "expires_in": 48793,
+  "expires_in": 487,
   "access_token": "6929b6e9-d8b1-4528-8aff-8e8c693f61e2"
 }</programlisting>
 

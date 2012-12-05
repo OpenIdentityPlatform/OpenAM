@@ -342,8 +342,7 @@ boolean=true</screen>
 
    <para>The <literal>/oauth2/authorize</literal>, and
    <literal>/oauth2/access_token</literal> endpoints function as described
-   in RFC 6749, though access token <literal>expires_in</literal> lifetimes are
-   expressed in milliseconds rather than seconds.</para>
+   in RFC 6749.</para>
 
    <para>The <literal>/oauth2/authorize</literal> endpoint is protected by the
    policy created during OAuth 2.0 authorization server configuration, which
@@ -366,7 +365,7 @@ boolean=true</screen>
  &amp;password=changeit&amp;client_id=myClientID&amp;client_secret=password"
  http://openam.example.com:8080/openam/oauth2/access_token
 {
-    "expires_in": 599963,
+    "expires_in": 599,
     "token_type": "Bearer",
     "access_token": "6d748edd-6b41-42e0-a2aa-0f7566ed4b84"
 }
@@ -374,7 +373,7 @@ $ curl http://openam.example.com:8080/openam/oauth2/tokeninfo
  ?access_token=6d748edd-6b41-42e0-a2aa-0f7566ed4b84
 {
     "token_type": "Bearer",
-    "expires_in": 450429,
+    "expires_in": 450,
     "access_token": "6d748edd-6b41-42e0-a2aa-0f7566ed4b84"
 }</screen>
 
@@ -393,7 +392,7 @@ $ curl http://openam.example.com:8080/openam/oauth2/tokeninfo
   "mail": "demo@example.com",
   "cn": "demo",
   "token_type": "Bearer",
-  "expires_in": 48793,
+  "expires_in": 487,
   "access_token": "6929b6e9-d8b1-4528-8aff-8e8c693f61e2"
 }</programlisting>
   </section>
@@ -424,7 +423,7 @@ $ curl -d "grant_type=client_credentials&amp;username=demo&amp;password=changeit
  &amp;client_id=myClientID&amp;client_secret=password"
  http://openam.example.com:8080/openam/oauth2/access_token
 {
-  "expires_in": 599991,
+  "expires_in": 599,
   "token_type": "Bearer",
   "access_token": "3f8cac17-2367-43e2-822a-ef78496c6ecd"
 }
@@ -432,7 +431,7 @@ $ curl -d "grant_type=client_credentials&amp;username=demo&amp;password=changeit
  &amp;client_id=myClientID&amp;client_secret=password"
  http://openam.example.com:8080/openam/oauth2/access_token
 {
-  "expires_in": 599996,
+  "expires_in": 599,
   "token_type": "Bearer",
   "access_token": "4beef879-22b0-47b2-b6fa-d457e4cec10c"
 }
@@ -558,7 +557,7 @@ $ curl --header "iplanetDirectoryPro: AQIC5wM...3MTYxOA..*"
  &amp;client_id=myClientID&amp;client_secret=password"
  http://openam.example.com:8080/openam/oauth2/access_token
 {
-  "expires_in": 599996,
+  "expires_in": 599,
   "token_type": "Bearer",
   "access_token": "2f80e278-2e22-483f-b4be-656c7bd18680"
 }
