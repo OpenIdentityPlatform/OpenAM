@@ -578,16 +578,19 @@ public class OATH extends AMLoginModule {
                 long localTime = time;
                 localTime /= totpTimeStep;
 
-                //check if we are in the time window to prevent 2 
+                boolean sameWindow = false;
+
+                //check if we are in the time window to prevent 2
                 //logins within the window using the same OTP
+
                 if (lastLoginTime >= (localTime - totpStepsInWindow) &&
                         lastLoginTime <= (localTime + totpStepsInWindow)) {
                     if (debug.messageEnabled()) {
                         debug.message("OATH" +
-                                ".checkOTP() : " +
-                                "Cant login 2 times in the same TOTP window");
+                             ".checkOTP() : " +
+                             "Logging in in the same TOTP window");
                     }
-                    return false;
+                    sameWindow = true;
                 }
 
                 String passLenStr = Integer.toString(passLen);
@@ -613,10 +616,16 @@ public class OATH extends AMLoginModule {
                     }
 
                     //check time step before current time
-                    otpGen = TOTPAlgorithm.generateTOTP(secretKey,
-                            Long.toHexString(time2),
-                            passLenStr);
-                    if (otpGen.equals(otp)) {
+
+                    otpGen = TOTPAlgorithm.generateTOTP(secretKey, 
+                                                        Long.toHexString(time2), 
+                                                        passLenStr);
+                    if (otpGen.equals(otp) && sameWindow){
+                        debug.error("OATH" +
+                                ".checkOTP() : " +
+                                "Loging in in the same window with a OTP that is older than the current times OTP");
+                        return false;
+                    } else if(otpGen.equals(otp) && !sameWindow)  {
                         setLoginTime(id, time2);
                         return true;
                     }
