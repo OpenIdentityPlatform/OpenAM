@@ -560,6 +560,12 @@ public class CTSPersistentStore extends GeneralTaskRunnable
             }
             byte[] serializedInternalSession = SessionUtils.encode(is);
             long expirationTime = is.getExpirationTime() + gracePeriod;
+            if ( (is.getUUID() == null) || (is.getUUID().isEmpty()) ) {
+                 // In the case of an inactivated Session, we may not have a
+                 // uuid, so perform a set to establish and initialize the
+                 // InternalSession UUID.
+                is.setUUID();
+            }
             String uuid = caseSensitiveUUID ? is.getUUID() : is.getUUID().toLowerCase();
             // Create a FAMRecord Object to wrap our Serialized Internal Session
             FAMRecord famRec = new FAMRecord(
