@@ -50,5 +50,19 @@
             </includes>
         </dependencySet>
     </dependencySets>
+    <fileSets>
+        <fileSet>
+            <outputDirectory>legal</outputDirectory>
+            <directory>../../legal</directory>
+        </fileSet>
+        <fileSet>
+            <outputDirectory>license</outputDirectory>
+            <directory>../../license</directory>
+        </fileSet>
+        <fileSet>
+            <outputDirectory>ldif</outputDirectory>
+            <directory>../../openam-federation/OpenFM/src/main/ldif</directory>
+        </fileSet>
+    </fileSets>
 
 </assembly>
