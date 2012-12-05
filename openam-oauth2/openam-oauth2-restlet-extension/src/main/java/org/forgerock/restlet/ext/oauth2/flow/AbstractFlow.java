@@ -221,9 +221,11 @@ public abstract class AbstractFlow extends ServerResource {
                             OAuth2Utils.ParameterLocation.HTTP_QUERY.getRedirector(getContext(),
                                     exception);
 
-                    //do not use the redirect if it is uri_mismatch
+                    //do not use the redirect if it is uri_mismatch or if missing client id
                     if (null != dispatcher &&
-                        !(exception.getError().equalsIgnoreCase(OAuth2Constants.Error.REDIRECT_URI_MISMATCH))) {
+                        !(exception.getError().equalsIgnoreCase(OAuth2Constants.Error.REDIRECT_URI_MISMATCH)) &&
+                        !(exception.getError().equalsIgnoreCase(OAuth2Constants.Error.INVALID_REQUEST) &&
+                          exception.getDescription().contains(OAuth2Constants.Params.CLIENT_ID))) {
                         dispatcher.handle(getRequest(), getResponse());
                     } else {
                         // TODO Introduce new method
@@ -238,9 +240,11 @@ public abstract class AbstractFlow extends ServerResource {
                             OAuth2Utils.ParameterLocation.HTTP_FRAGMENT.getRedirector(getContext(),
                                     exception);
 
-                    //do not use the redirect if it is uri_mismatch
+                    //do not use the redirect if it is uri_mismatch or if missing client id
                     if (null != dispatcher &&
-                        !(exception.getError().equalsIgnoreCase(OAuth2Constants.Error.REDIRECT_URI_MISMATCH))) {
+                            !(exception.getError().equalsIgnoreCase(OAuth2Constants.Error.REDIRECT_URI_MISMATCH)) &&
+                            !(exception.getError().equalsIgnoreCase(OAuth2Constants.Error.INVALID_REQUEST) &&
+                              exception.getDescription().contains(OAuth2Constants.Params.CLIENT_ID))) {
                         dispatcher.handle(getRequest(), getResponse());
                     } else {
                         // TODO Introduce new method
@@ -254,9 +258,11 @@ public abstract class AbstractFlow extends ServerResource {
                     Redirector dispatcher =
                             OAuth2Utils.ParameterLocation.HTTP_QUERY.getRedirector(getContext(), exception);
 
-                    //do not use the redirect if it is uri_mismatch
+                    //do not use the redirect if it is uri_mismatch or if missing client id
                     if (null != dispatcher &&
-                        !(exception.getError().equalsIgnoreCase(OAuth2Constants.Error.REDIRECT_URI_MISMATCH))) {
+                            !(exception.getError().equalsIgnoreCase(OAuth2Constants.Error.REDIRECT_URI_MISMATCH)) &&
+                            !(exception.getError().equalsIgnoreCase(OAuth2Constants.Error.INVALID_REQUEST) &&
+                              exception.getDescription().contains(OAuth2Constants.Params.CLIENT_ID))) {
                         dispatcher.handle(getRequest(), getResponse());
                     } else {
                         // TODO Introduce new method
