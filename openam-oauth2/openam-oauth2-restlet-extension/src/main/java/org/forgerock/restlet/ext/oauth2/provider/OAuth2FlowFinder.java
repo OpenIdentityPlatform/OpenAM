@@ -151,14 +151,14 @@ public class OAuth2FlowFinder extends Finder {
                 targetClass = ErrorServerResource.class;
 
                 OAuth2Utils.DEBUG.error("OAuth2FlowFinder::Unsupported response type: Type is not supported: " + type);
-                OAuthProblemException.OAuthError.NOT_FOUND.handle(
+                OAuthProblemException.OAuthError.INVALID_REQUEST.handle(
                         request, "Type is not set").pushException();
             }
         } else {
 
             targetClass = ErrorServerResource.class;
 
-            OAuthProblemException.OAuthError.NOT_FOUND.handle(request, "Type is not set")
+            OAuthProblemException.OAuthError.INVALID_REQUEST.handle(request, "Type is not set")
                             .pushException();
 
         }
