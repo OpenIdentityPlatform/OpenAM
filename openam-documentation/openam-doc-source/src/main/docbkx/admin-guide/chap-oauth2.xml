@@ -257,8 +257,9 @@
 
    <para>OpenAM is designed to allow you to plug in your own scopes
    implementation if the default implementation does not do what your
-   deployment requires.</para>
-   <!-- TODO: Link to dev guide on customizing the scopes implementation. -->
+   deployment requires. See <link xlink:href="dev-guide#chap-oauth2-scopes"
+   xlink:role="http://docbook.org/xlink/role/olink"><citetitle>Customizing
+   OAuth 2.0 Scope Handling</citetitle></link> for an example.</para>
   </section>
  </section>
 

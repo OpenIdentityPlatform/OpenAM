@@ -77,9 +77,6 @@
  <xinclude:include href='chap-ws-federation.xml' />
   -->
  <xinclude:include href="chap-sae.xml" />
- <!-- Nothing to do but configure an OAuth auth module per client
- <xinclude:include href='chap-oauth.xml' />
- -->
  <!-- OpenID is currently an extension on trunk.
  <xinclude:include href='chap-openid.xml' />
  -->
@@ -87,6 +84,7 @@
 
  <xinclude:include href='chap-extending.xml' />
  <xinclude:include href='chap-custom-attr.xml' />
+ <xinclude:include href='chap-oauth2-scopes.xml' />
  <xinclude:include href='chap-auth-spi.xml' />
  <xinclude:include href='chap-post-auth.xml' />
  <xinclude:include href='chap-policy-spi.xml' />

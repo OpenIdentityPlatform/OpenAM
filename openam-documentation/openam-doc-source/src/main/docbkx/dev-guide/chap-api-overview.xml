@@ -20,7 +20,7 @@
   !
   ! CCPL HEADER END
   !
-  !      Copyright 2011 ForgeRock AS
+  !      Copyright 2011-2012 ForgeRock AS
   !    
 -->
 <chapter xml:id='chap-api-overview'
@@ -96,6 +96,11 @@
   <itemizedlist>
    <para>Some examples of the plugins you can write follow in the list below.
    This guide demonstrates how to implement such plugins.</para>
+   <listitem>
+    <para>Custom OAuth 2.0 scopes plugins define how OpenAM playing the role
+    of authorization server handles scopes, including what token information to
+    return regarding scopes set when authorization was granted.</para>
+   </listitem>
    <listitem>
     <para>Custom authentication plugins let OpenAM authenticate users against
     a new authentication service or an authentication service specific to your
