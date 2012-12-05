@@ -318,7 +318,7 @@ Install log file location:
     manually for each protected application's <filename>web.xml</filename>
     configuration, following the opening &lt;web-app&gt; tag. The file for  
     the sample application delivered with the agent is 
-    <filename>/path/to/j2ee_agents/appserver_v6_agent/sampleapp/etc/web.xml</filename>.</para>
+    <filename>/path/to/j2ee_agents/tomcat_v6_agent/sampleapp/etc/web.xml</filename>.</para>
     <programlisting language="xml"> &lt;filter&gt;
   &lt;filter-name&gt;Agent&lt;/filter-name&gt;
   &lt;display-name&gt;Agent&lt;/display-name&gt;
