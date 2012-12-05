@@ -245,9 +245,11 @@ public abstract class AbstractFlow extends ServerResource {
                     }
                     break;
                 } else if (this instanceof ErrorServerResource) {
-                    Redirector dispatcher = null;// OAuth2Utils.ParameterLocation.HTTP_FRAGMENT.getRedirector(getContext(),
-                                                 // exception);
-                    if (null != dispatcher) {
+                    Redirector dispatcher =
+                            OAuth2Utils.ParameterLocation.HTTP_QUERY.getRedirector(getContext(), exception);
+
+                    //do not use the redirect if it is uri_mismatch
+                    if (null != dispatcher || !(exception.getError().equalsIgnoreCase(OAuth2Constants.Error.REDIRECT_URI_MISMATCH))) {
                         dispatcher.handle(getRequest(), getResponse());
                     } else {
                         // TODO Introduce new method

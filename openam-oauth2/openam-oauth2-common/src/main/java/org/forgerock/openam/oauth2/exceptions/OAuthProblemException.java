@@ -92,8 +92,10 @@ public class OAuthProblemException extends ResourceException {
         UNSUPPORTED_GRANT_TYPE(
                 OAuth2Constants.Error.UNSUPPORTED_GRANT_TYPE,
                 "The provided access grant is invalid, expired, or revoked (e.g. invalid assertion, expired authorization token, bad end-user password credentials, or mismatching authorization code and redirection URI).",
-                "", 400), INVALID_CODE(OAuth2Constants.Error.INVALID_CODE, "The code provided is invalid.",
-                ""), REDIRECT_URI_MISMATCH(OAuth2Constants.Error.REDIRECT_URI_MISMATCH,
+                "", 400),
+        INVALID_CODE(OAuth2Constants.Error.INVALID_CODE, "The code provided is invalid.",
+                ""),
+        REDIRECT_URI_MISMATCH(OAuth2Constants.Error.REDIRECT_URI_MISMATCH,
                 "The redirection URI provided does not match a pre-registered value.", ""),
         UNSUPPORTED_AUTH_TYPE(OAuth2Constants.Error.UNSUPPORTED_AUTH_TYPE,
                 "The requested authentication type is not supported by the authorization server.",
