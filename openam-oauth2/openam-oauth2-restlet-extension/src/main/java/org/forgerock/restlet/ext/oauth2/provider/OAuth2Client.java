@@ -83,6 +83,9 @@ public class OAuth2Client extends User {
         if (OAuth2Utils.isBlank(redirectionURI)) {
             if (getClient().getRedirectionURIs().isEmpty()) {
                 // Redirect URI is not registered and not in the request
+                OAuth2Utils.DEBUG.error("OAuth2Client::Missing parameter: redirect_uri");
+                throw OAuthProblemException.OAuthError.INVALID_REQUEST.handle(null,
+                        "Missing parameter: redirect_uri");
             } else if (getClient().getRedirectionURIs().size() == 1) {
                 return new SessionClientImpl(getClient().getClientId(), getClient()
                         .getRedirectionURIs().iterator().next().toString());
@@ -102,7 +105,6 @@ public class OAuth2Client extends User {
             throw OAuthProblemException.OAuthError.REDIRECT_URI_MISMATCH.handle(null).redirectUri(
                     request);
         }
-        return null;
     }
 
     public class SessionClientImpl implements SessionClient {

@@ -220,7 +220,10 @@ public abstract class AbstractFlow extends ServerResource {
                     Redirector dispatcher =
                             OAuth2Utils.ParameterLocation.HTTP_QUERY.getRedirector(getContext(),
                                     exception);
-                    if (null != dispatcher) {
+
+                    //do not use the redirect if it is uri_mismatch
+                    if (null != dispatcher &&
+                        !(exception.getError().equalsIgnoreCase(OAuth2Constants.Error.REDIRECT_URI_MISMATCH))) {
                         dispatcher.handle(getRequest(), getResponse());
                     } else {
                         // TODO Introduce new method
@@ -234,7 +237,10 @@ public abstract class AbstractFlow extends ServerResource {
                     Redirector dispatcher =
                             OAuth2Utils.ParameterLocation.HTTP_FRAGMENT.getRedirector(getContext(),
                                     exception);
-                    if (null != dispatcher) {
+
+                    //do not use the redirect if it is uri_mismatch
+                    if (null != dispatcher &&
+                        !(exception.getError().equalsIgnoreCase(OAuth2Constants.Error.REDIRECT_URI_MISMATCH))) {
                         dispatcher.handle(getRequest(), getResponse());
                     } else {
                         // TODO Introduce new method
@@ -249,7 +255,8 @@ public abstract class AbstractFlow extends ServerResource {
                             OAuth2Utils.ParameterLocation.HTTP_QUERY.getRedirector(getContext(), exception);
 
                     //do not use the redirect if it is uri_mismatch
-                    if (null != dispatcher || !(exception.getError().equalsIgnoreCase(OAuth2Constants.Error.REDIRECT_URI_MISMATCH))) {
+                    if (null != dispatcher &&
+                        !(exception.getError().equalsIgnoreCase(OAuth2Constants.Error.REDIRECT_URI_MISMATCH))) {
                         dispatcher.handle(getRequest(), getResponse());
                     } else {
                         // TODO Introduce new method
