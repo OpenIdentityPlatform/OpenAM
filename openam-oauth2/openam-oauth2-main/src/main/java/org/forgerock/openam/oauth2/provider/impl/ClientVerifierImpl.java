@@ -65,27 +65,30 @@ public class ClientVerifierImpl implements ClientVerifier{
      */
     @Override
     public ClientApplication verify(Request request, Response response){
-        String clientId = null;
-        String clientSecret = null;
         if (OAuth2Utils.DEBUG.messageEnabled()){
             OAuth2Utils.DEBUG.message("ClientVerifierImpl::Verifying client application");
         }
+
+        String clientId = null;
+        String clientSecret = null;
+
+        clientSecret =
+                OAuth2Utils.getRequestParameter(request, OAuth2Constants.Params.CLIENT_SECRET,
+                        String.class);
+        clientId =
+                OAuth2Utils.getRequestParameter(request, OAuth2Constants.Params.CLIENT_ID,
+                        String.class);
+
         ClientApplication client = null;
         realm = OAuth2Utils.getRealm(request);
-        if (request.getChallengeResponse() != null) {
+        if (request.getChallengeResponse() != null && clientId != null){
+            throw OAuthProblemException.OAuthError.INVALID_REQUEST.handle(request);
+        } else if (request.getChallengeResponse() != null) {
             client = verify(request.getChallengeResponse());
-        } else {
-            clientSecret =
-                    OAuth2Utils.getRequestParameter(request, OAuth2Constants.Params.CLIENT_SECRET,
-                            String.class);
-            clientId =
-                    OAuth2Utils.getRequestParameter(request, OAuth2Constants.Params.CLIENT_ID,
-                            String.class);
-            if (clientSecret != null){
+        } else if (clientSecret != null && clientId != null) {
                 client = verify(clientId, clientSecret);
-            } else {
-                throw OAuthProblemException.OAuthError.INVALID_CLIENT.handle(request);
-            }
+        } else {
+            throw OAuthProblemException.OAuthError.INVALID_CLIENT.handle(request);
         }
         if (OAuth2Utils.logStatus) {
             if (client == null){
