@@ -81,6 +81,11 @@
    encrypted.</para>
    
    <screen>$ cat openam/openam/openam_mon_auth
+demo AQICMBCKlwx6G3vzK3TYYRbtTpNYAagVIPNP</screen>
+
+   <para>Or </para>
+   
+   <screen>$ cat openam/openam/opensso_mon_auth
 demo AQICvSe+tXEg8TUUT8ekzHb8IRzVSvm1Lc2u</screen>
    
    <para>You can encrypt a new password using the <command>ampassword</command>
