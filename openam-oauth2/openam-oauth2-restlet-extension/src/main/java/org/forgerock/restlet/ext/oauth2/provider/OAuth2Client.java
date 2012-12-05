@@ -96,6 +96,16 @@ public class OAuth2Client extends User {
             }
         } else {
             URI request = URI.create(redirectionURI);
+            if (request.getFragment() != null){
+                OAuth2Utils.DEBUG.error("OAuth2Client:: Redirect URI cannot contain a fragment");
+                throw OAuthProblemException.OAuthError.REDIRECT_URI_MISMATCH.handle(null).redirectUri(
+                        request);
+            }
+            if (!request.isAbsolute()){
+                OAuth2Utils.DEBUG.error("OAuth2Client:: Redirect URI must be absolute");
+                throw OAuthProblemException.OAuthError.REDIRECT_URI_MISMATCH.handle(null).redirectUri(
+                        request);
+            }
             for (URI uri : getClient().getRedirectionURIs()) {
                 if (uri.equals(request)) {
                     return new SessionClientImpl(getClient().getClientId(), uri.toString());
