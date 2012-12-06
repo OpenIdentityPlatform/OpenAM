@@ -24,6 +24,7 @@ import org.forgerock.json.fluent.JsonValueException;
 import org.forgerock.json.resource.JsonResource;
 import org.forgerock.json.resource.JsonResourceException;
 import org.forgerock.json.resource.SimpleJsonResource;
+import org.forgerock.openam.oauth2.exceptions.OAuthProblemException;
 import org.forgerock.openam.oauth2.utils.OAuth2Utils;
 import org.restlet.Request;
 
@@ -118,10 +119,11 @@ public class OpenDJTokenRepo implements JsonResource {
                 //onException(e1); // give handler opportunity to throw its own exception
                 throw e1;
             } catch (Exception e2) {
-                if (e2 instanceof JsonResourceException) { // no rethrowing necessary
-                    throw (JsonResourceException) e2;
+                OAuth2Utils.DEBUG.error("OpenDJTokenRepo.handle(): ", e2);
+                if (e2 instanceof OAuthProblemException) { // no rethrowing necessary
+                    throw (OAuthProblemException) e2;
                 } else { // need to rethrow as resource exception
-                    throw new JsonResourceException(JsonResourceException.INTERNAL_ERROR, e2);
+                    throw OAuthProblemException.OAuthError.INVALID_REQUEST.handle(Request.getCurrent());
                 }
             }
         }

@@ -48,6 +48,7 @@ import org.forgerock.openam.oauth2.model.impl.SessionClientImpl;
 import org.forgerock.openam.oauth2.exceptions.OAuthProblemException;
 import org.forgerock.openam.oauth2.provider.OAuth2TokenStore;
 import org.forgerock.openam.oauth2.utils.OAuth2Utils;
+import org.restlet.Request;
 import org.restlet.data.Status;
 
 /**
@@ -513,8 +514,7 @@ public class DefaultOAuthTokenStoreImpl implements OAuth2TokenStore {
             response = accessor.read(id);
         } catch (JsonResourceException e) {
             OAuth2Utils.DEBUG.error("DefaultOAuthTokenStoreImpl::Unable to read refresh token", e);
-            throw new OAuthProblemException(Status.SERVER_ERROR_INTERNAL.getCode(),
-                    "Internal error", "Could not read token from CTS: " + e.getMessage(), null);
+            throw OAuthProblemException.OAuthError.INVALID_REQUEST.handle(Request.getCurrent());
         }
 
         if (response == null) {
@@ -541,8 +541,7 @@ public class DefaultOAuthTokenStoreImpl implements OAuth2TokenStore {
             response = accessor.delete(id, null);
         } catch (JsonResourceException e) {
             OAuth2Utils.DEBUG.error("DefaultOAuthTokenStoreImpl::Unable to delete refresh token", e);
-            throw new OAuthProblemException(Status.SERVER_ERROR_INTERNAL.getCode(),
-                    "Internal error", "Could not delete token from CTS: " + e.getMessage(), null);
+            throw OAuthProblemException.OAuthError.INVALID_REQUEST.handle(Request.getCurrent());
         }
 
     }

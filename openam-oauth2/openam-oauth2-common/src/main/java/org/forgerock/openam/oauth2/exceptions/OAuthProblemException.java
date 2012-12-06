@@ -49,7 +49,7 @@ public class OAuthProblemException extends ResourceException {
         INVALID_REQUEST(
                 OAuth2Constants.Error.INVALID_REQUEST,
                 "The request is missing a required parameter, includes an invalid parameter value, or is otherwise malformed.",
-                ""),
+                "", 400),
         UNAUTHORIZED_CLIENT(OAuth2Constants.Error.UNAUTHORIZED_CLIENT,
                 "The client is not authorized to request an authorization code using this method.",
                 ""),
