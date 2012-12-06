@@ -79,8 +79,13 @@ public class RefreshTokenServerResource extends AbstractFlow {
                     OAuth2Utils
                             .getRequestParameter(getRequest(), OAuth2Constants.Params.SCOPE, String.class);
 
+            Set<String> granted_after = null;
             // Get the granted scope
-            Set<String> granted_after = new TreeSet<String>(refreshToken.getScope());
+            if (null != refreshToken.getScope()){
+                granted_after = new TreeSet<String>(refreshToken.getScope());
+            } else {
+                granted_after = new TreeSet<String>();
+            }
 
             // Validate the granted scope
             Set<String> checkedScope = executeRefreshTokenScopePlugin(scope_before, granted_after);

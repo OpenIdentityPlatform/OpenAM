@@ -155,7 +155,9 @@ public class OAuth2Utils {
             SSOTokenManager mgr = SSOTokenManager.getInstance();
             return mgr.createSSOToken(req);
         } catch (Exception e){
-            OAuth2Utils.DEBUG.error("OAuth2Utils::Unable to get sso token: ", e);
+            if (OAuth2Utils.DEBUG.messageEnabled()){
+                OAuth2Utils.DEBUG.message("OAuth2Utils::Unable to get sso token: ", e);
+            }
         }
         return null;
     }
