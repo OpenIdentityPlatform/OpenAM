@@ -85,7 +85,7 @@ fi
 
 CLASSPATH=""
 CLASSPATH="lib/openam-distribution-amadmsetup-10.1.0-SNAPSHOT.jar"
-CLASSPATH="${CLASSPATH}:lib/opendj-server-2.4.6-SNAPSHOT.jar"
+CLASSPATH="${CLASSPATH}:lib/opendj-server-2.4.6.jar"
 CLASSPATH="${CLASSPATH}:lib/json-20090211.jar"
 CLASSPATH="${CLASSPATH}:lib/xalan-2.7.1.jar"
 CLASSPATH="${CLASSPATH}:lib/xercesImpl-2.10.0.jar"

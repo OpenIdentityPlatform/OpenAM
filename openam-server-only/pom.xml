@@ -561,13 +561,13 @@
         <dependency>
             <artifactId>json-resource</artifactId>
             <groupId>org.forgerock.commons</groupId>
-            <version>2.0.0-SNAPSHOT</version>
+            <version>${forgerock.json.version}</version>
         </dependency>
 
         <dependency>
             <artifactId>json-resource-servlet</artifactId>
             <groupId>org.forgerock.commons</groupId>
-            <version>2.0.0-SNAPSHOT</version>
+            <version>${forgerock.json.version}</version>
         </dependency>
 
 

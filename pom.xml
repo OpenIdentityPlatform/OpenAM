@@ -124,8 +124,10 @@
         <openam.properties>openam.properties</openam.properties>
 
         <!-- Version Properties -->
-        <opendj.server.version>2.4.6-SNAPSHOT</opendj.server.version>
-        <opendj.api.version>3.0.0-OPENAMp3</opendj.api.version>
+        <opendj.server.version>2.4.6</opendj.server.version>
+        <opendj.sdk.version>3.0.0-OPENAMp3</opendj.sdk.version>
+
+        <forgerock.json.version>2.0.0-Xpress2</forgerock.json.version>
 
         <restlet.version>2.1-RC4</restlet.version>
         <xercesj.version>2.11.0</xercesj.version>
@@ -979,7 +981,7 @@
             <dependency>
                 <groupId>org.forgerock.opendj</groupId>
                 <artifactId>opendj-ldap-sdk</artifactId>
-                <version>${opendj.api.version}</version>
+                <version>${opendj.sdk.version}</version>
             </dependency>
             <!-- OpenDJ Server - 2.4.6 -->
             <dependency>

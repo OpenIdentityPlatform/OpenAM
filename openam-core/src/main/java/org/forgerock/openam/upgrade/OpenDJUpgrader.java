@@ -192,7 +192,7 @@ public final class OpenDJUpgrader {
         unpackZipFile();
 
         // Copy remaining JAR files.
-        copyFileFromWAR("lib/opendj-server-2.4.6-SNAPSHOT.jar");           // Was OpenDJ.jar before Maven Support.
+        copyFileFromWAR("lib/opendj-server-2.4.6.jar");           // Was OpenDJ.jar before Maven Support.
         copyFileFromWAR("lib/sleepycat-je-2011-04-07.jar");            // Was je.jar before Maven Support.
         copyFileFromWAR("lib/mail-1.4.5.jar");                 // Was mail.jar before Maven Support.
 
