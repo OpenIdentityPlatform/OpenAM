@@ -197,7 +197,7 @@
                     <AttributeSchema name="iplanet-am-session-sfo-enabled"
                                      type="single"
                                      syntax="boolean"
-                                     i18nKey="a124">
+                                     i18nKey="a121">
                         <BooleanValues>
                             <BooleanTrueValue i18nKey="i18nTrue">true</BooleanTrueValue>
                             <BooleanFalseValue i18nKey="i18nFalse">false</BooleanFalseValue>
@@ -206,37 +206,11 @@
                             <Value>true</Value>
                         </DefaultValues>
                     </AttributeSchema>
-                    <!-- Was i18Key a125 -->
-                    <AttributeSchema name="iplanet-am-session-repository-url"
-                                     type="single"
-                                     syntax="url">
-                        <DefaultValues>
-                            <Value></Value>
-                        </DefaultValues>
-                    </AttributeSchema>
-                    <!-- New as of 10.1.0 -->
-                    <AttributeSchema name="forgerock-openam-session-expired-search-limit"
-                                     type="single"
-                                     syntax="number_range"
-                                     rangeStart="0" rangeEnd="2147483647">
-                        <DefaultValues>
-                            <Value>250</Value>
-                        </DefaultValues>
-                    </AttributeSchema>
-                    <!-- This property is deprecated as of 10.1.0 -->
-                    <!-- Was i18Key a126 -->
-                    <AttributeSchema name="iplanet-am-session-sfo-store-rootdn"
-                                     type="single"
-                                     syntax="dn">
-                        <DefaultValues>
-                            <Value>o=openam-session,dc=openam,dc=forgerock,dc=org</Value>
-                        </DefaultValues>
-                    </AttributeSchema>
                     <!-- This property is deprecated as of 10.1.0 -->
                     <!-- Was i18Key a127 -->
                     <AttributeSchema name="iplanet-am-session-store-username"
                                      type="single"
-                                     syntax="dn">
+                                     syntax="string">
                         <DefaultValues>
                             <Value>cn=Directory Manager</Value>
                         </DefaultValues>

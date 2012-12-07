@@ -64,7 +64,7 @@ CLASSPATH="$CLASSPATH:lib/openam-core-${project.version}.jar"
 CLASSPATH="$CLASSPATH:lib/openam-shared-${project.version}.jar"
 CLASSPATH="$CLASSPATH:lib/jaxb-api-1.0.6.jar"
 CLASSPATH="$CLASSPATH:lib/jaxb-impl-1.0.6.jar"
-CLASSPATH="$CLASSPATH:lib/OpenDJ-2012-20-02.jar"
+CLASSPATH="$CLASSPATH:lib/opendj-server-${opendj.server.version}.jar"
 CLASSPATH="$CLASSPATH:lib/xsdlib-20060615.jar"
 CLASSPATH="$CLASSPATH:lib/webservices-rt-2009-29-07.jar"
 
