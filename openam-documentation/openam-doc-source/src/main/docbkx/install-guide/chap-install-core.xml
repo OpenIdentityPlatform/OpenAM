@@ -111,9 +111,8 @@
     </row>
     <row>
      <entry>Install OpenAM with no console</entry>
-     <entry><link xlink:href="install-guide#chap-install-core-only"
-     xlink:role="http://docbook.org/xlink/role/olink"><citetitle>Installing
-     OpenAM Core Only</citetitle></link></entry>
+     <entry><xref linkend="which-war-to-deploy" />, then
+     <xref linkend="deploy-openam" /></entry>
     </row>
     <row>
      <entry>Install <command>ssoadm</command> and other tools</entry>

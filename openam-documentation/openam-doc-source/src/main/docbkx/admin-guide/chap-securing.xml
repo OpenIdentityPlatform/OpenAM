@@ -103,9 +103,9 @@
     <para>Do not deploy OpenAM console on Internet-facing servers.</para>
     <para>Limit the number of endpoints exposed to the Internet.</para>
     <para>To achieve this, deploy only the core server on Internet-facing
-    servers. See <link xlink:href="install-guide#chap-install-core-only"
-    xlink:role="http://docbook.org/xlink/role/olink"><citetitle>Installing
-    OpenAM Core Only</citetitle></link>.</para>
+    servers. See <link xlink:href="install-guide#which-war-to-deploy"
+    xlink:role="http://docbook.org/xlink/role/olink"><citetitle>Determine Which
+    War File to Deploy</citetitle></link>.</para>
     <para>Even better, further limit what is exposed by deploying only the
     distributed authentication user interface on Internet-facing servers. See
     <link xlink:href="install-guide#chap-install-das"
