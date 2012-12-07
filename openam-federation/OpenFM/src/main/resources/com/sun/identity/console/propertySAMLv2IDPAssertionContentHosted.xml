@@ -331,17 +331,5 @@
             <fieldhelp name="helpassertioncache" defaultValue="samlv2.idpac.help.assertioncache" />
         </property>
     </section>
-    <section name="bootstrap" defaultValue="samlv2idp.provider.section.title.bootstrap" >  
-        <property>
-            <label name="lblIDPdiscoveryBootstrappingEnabled"
-                   defaultValue="samlv2idp.attribute.label.idpdiscoveryBootstrappingEnabled"
-                   labelFor="discoveryBootstrappingEnabled" />
-            <cc name="discoveryBootstrappingEnabled" 
-                tagclass="com.sun.web.ui.taglib.html.CCCheckBoxTag" >
-                <attribute name="label" value="label.Enable" />
-            </cc>
-            <fieldhelp name="helpIDPdiscoveryBootstrappingEnabled" defaultValue="samlv2.idpac.help.IDPdiscoveryBootstrappingEnabled" />
-        </property>
-    </section> 
-    
+
 </propertysheet>

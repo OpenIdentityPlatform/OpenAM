@@ -57,47 +57,6 @@
              permissions="iPlanetAMProviderConfigService"
              accesslevel="globalConfig"/>
 
-        <tab id="3" viewbean="none"
-             url="none"
-             label="tab.webservices.label"
-             tooltip="tab.webservices.tooltip"
-             status="tab.webservices.tooltip"
-             controller="com.sun.identity.console.controller.FedTabController"
-             permissions="sunIdentityServerLibertyPPService,sunIdentityServerDiscoveryService,sunIdentityServerSOAPBinding,sunIdentityServerAuthnService">
-
-            <tab id="31" viewbean="com.sun.identity.console.webservices.WSPersonalProfileServiceViewBean"
-                 url="../webservices/WSPersonalProfileService"
-                 label="tab.webservices.personalprofile.label"
-                 tooltip="tab.webservices.personalprofile.tooltip"
-                 status="tab.webservices.personalprofile.status"
-                 permissions="sunIdentityServerLibertyPPService"
-                 accesslevel="globalconfig"/>
-
-            <tab id="32" viewbean="com.sun.identity.console.service.SMDiscoveryServiceViewBean"
-                 url="../service/SMDiscoveryService"
-                 label="tab.webservices.discoveryservice.label"
-                 tooltip="tab.webservices.discoveryservice.tooltip"
-                 status="tab.webservices.discoveryservice.status"
-                 permissions="sunIdentityServerDiscoveryService"
-                 accesslevel="globalconfig"/>
-
-            <tab id="33" viewbean="com.sun.identity.console.service.SCSOAPBindingViewBean"
-                 url="../service/SCSOAPBinding"
-                 label="tab.webservices.soapbidingservice.label"
-                 tooltip="tab.webservices.soapbidingservice.tooltip"
-                 status="tab.webservices.soapbidingservice.status"
-                 permissions="sunIdentityServerSOAPBinding"
-                 accesslevel="globalconfig"/>
-
-            <tab id="34" viewbean="com.sun.identity.console.webservices.WSAuthNServicesViewBean"
-                 url="../webservices/WSAuthNServices"
-                 label="tab.webservices.authentication.label"
-                 tooltip="tab.webservices.authentication.tooltip"
-                 status="tab.webservices.authentication.status"
-                 permissions="sunIdentityServerAuthnService"
-                 accesslevel="globalconfig"/>
-        </tab>
-
         <tab id="4"
              viewbean="com.sun.identity.console.service.SCConfigAuthViewBean"
              url="none"
