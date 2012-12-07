@@ -88,10 +88,10 @@ IF "%5" == "-p" SET path_AMConfig=%~6
 IF "%5" == "--path" SET path_AMConfig=%~6
 
 
-: lib/amserver.jar;lib/amadm_setup.jar;lib/opensso-sharedlib.jar;lib/OpenDJ.jar;resources
+: lib/amserver.jar;lib/amadm_setup.jar;lib/opensso-sharedlib.jar;lib/opendj-server.jar;resources
 set CLASSPATH="@CONFIG_DIR@"
 set CLASSPATH="%CLASSPATH%;lib/openam-distribution-amadmsetup-10.1.0-SNAPSHOT.jar"
-set CLASSPATH="%CLASSPATH%;lib/OpenDJ-2012-20-02.jar"
+set CLASSPATH="%CLASSPATH%;lib/opendj-server.jar"
 set CLASSPATH="%CLASSPATH%;lib/mail-1.4.5.jar"
 set CLASSPATH="%CLASSPATH%;lib/j2ee-2007-18-10.jar"
 set CLASSPATH="%CLASSPATH%;lib/webservices-api-2009-14-01.jar"
