@@ -24,10 +24,12 @@
 
 package org.forgerock.restlet.ext.oauth2.flow;
 
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
 import com.sun.identity.shared.OAuth2Constants;
+import org.forgerock.json.fluent.JsonValue;
 import org.forgerock.openam.oauth2.utils.OAuth2Utils;
 import org.forgerock.openam.oauth2.exceptions.OAuthProblemException;
 import org.forgerock.openam.oauth2.model.AccessToken;
@@ -193,7 +195,8 @@ public class AuthorizationCodeServerResource extends AbstractFlow {
             throw OAuthProblemException.OAuthError.INVALID_REQUEST.handle(getRequest(),
                     "Authorization code doesn't exist.");
         } else if (code.isTokenIssued()) {
-            // TODO Used code 2 times needs to invalidate all tokens associated with this code
+            invalidateTokens(code_p);
+            getTokenStore().deleteAuthorizationCode(code_p);
             OAuth2Utils.DEBUG.error("AuthorizationCodeServerResource::Authorization code has been used");
             throw OAuthProblemException.OAuthError.INVALID_REQUEST.handle(getRequest(),
                     "Authorization code has been used.");
@@ -203,9 +206,10 @@ public class AuthorizationCodeServerResource extends AbstractFlow {
                 throw OAuthProblemException.OAuthError.INVALID_CODE.handle(getRequest(),
                         "Authorization code expired.");
             }
-            // TODO validate redirect URI and ClientID
+
             if (!code.getClient().equals(sessionClient)) {
                 // Throw redirect_uri mismatch
+                //throw OAuthProblemException.OAuthError.REDIRECT_URI_MISMATCH.handle(getRequest());
             }
 
             // Generate Token
@@ -213,6 +217,7 @@ public class AuthorizationCodeServerResource extends AbstractFlow {
 
             //set access token issued
             code.setIssued(true);
+            getTokenStore().updateAuthorizationCode(code_p, code);
             Map<String, Object> response = token.convertToMap();
             if (checkIfRefreshTokenIsRequired(getRequest())){
                 response.put(OAuth2Constants.Params.REFRESH_TOKEN, token.getRefreshToken());
@@ -273,7 +278,8 @@ public class AuthorizationCodeServerResource extends AbstractFlow {
         return getTokenStore().createRefreshToken(code.getScope(),
                                                     OAuth2Utils.getRealm(getRequest()),
                                                     code.getUserID(),
-                                                    sessionClient.getClientId());
+                                                    sessionClient.getClientId(),
+                                                    code);
     }
 
     /**
@@ -302,5 +308,38 @@ public class AuthorizationCodeServerResource extends AbstractFlow {
             formPost = new Form(entity);
         }
         return formPost;
+    }
+
+    private void invalidateTokens(String id){
+
+        JsonValue token = getTokenStore().queryForToken(id);
+
+        Set<HashMap<String,Set<String>>> list = (Set<HashMap<String,Set<String>>>) token.getObject();
+
+        if (list != null && !list.isEmpty() ){
+            for (HashMap<String,Set<String>> entry : list){
+                if (entry.get("id") != null && !entry.get("id").isEmpty()){
+                    String entryID = entry.get("id").iterator().next();
+                    invalidateTokens(entry.get("id").iterator().next());
+                    String type = null;
+                    if (entry.get("type") != null){
+                        type = entry.get("type").iterator().next();
+                    }
+                    deleteToken(type, entryID);
+                }
+            }
+        }
+    }
+
+    private void deleteToken(String type, String id){
+        if (type.equalsIgnoreCase(OAuth2Constants.Token.OAUTH_ACCESS_TOKEN)){
+            getTokenStore().deleteAccessToken(id);
+        } else if (type.equalsIgnoreCase(OAuth2Constants.Token.OAUTH_REFRESH_TOKEN)){
+            getTokenStore().deleteRefreshToken(id);
+        } else if (type.equalsIgnoreCase(OAuth2Constants.Params.CODE)){
+            getTokenStore().deleteAuthorizationCode(id);
+        } else {
+            //shouldnt ever happen
+        }
     }
 }

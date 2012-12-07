@@ -25,6 +25,7 @@ package org.forgerock.openam.oauth2.provider;
 
 import java.util.Set;
 
+import org.forgerock.json.fluent.JsonValue;
 import org.forgerock.openam.oauth2.exceptions.OAuthProblemException;
 import org.forgerock.openam.oauth2.model.AccessToken;
 import org.forgerock.openam.oauth2.model.AuthorizationCode;
@@ -54,6 +55,16 @@ public interface OAuth2TokenStore {
      */
     AuthorizationCode createAuthorizationCode(Set<String> scopes, String realm, String uuid,
             SessionClient client) throws OAuthProblemException;
+
+    /**
+     * Updates an authorization code.
+     *
+     * @param code the code to update
+     * @return Generated authorization code
+     * @throws OAuthProblemException
+     *
+     */
+    public void updateAuthorizationCode(String id, AuthorizationCode code) throws OAuthProblemException;
 
     /**
      * Retrieves an authorization code from store.
@@ -229,7 +240,7 @@ public interface OAuth2TokenStore {
      * @throws OAuthProblemException
      * 
      */
-    RefreshToken createRefreshToken(Set<String> scopes, String realm, String uuid, String clientId)
+    RefreshToken createRefreshToken(Set<String> scopes, String realm, String uuid, String clientId, AuthorizationCode parent)
             throws OAuthProblemException;
 
     /**
@@ -254,5 +265,7 @@ public interface OAuth2TokenStore {
      * 
      */
     void deleteRefreshToken(String id) throws OAuthProblemException;
+
+    public JsonValue queryForToken(String id) throws OAuthProblemException;
 
 }

@@ -25,6 +25,7 @@
 package org.forgerock.openam.oauth2.store.impl;
 
 import java.security.AccessController;
+import java.util.HashMap;
 import java.util.Set;
 import java.util.Map;
 import java.util.UUID;
@@ -41,6 +42,7 @@ import org.forgerock.json.resource.JsonResourceException;
 import org.forgerock.openam.ext.cts.CoreTokenService;
 import org.forgerock.openam.ext.cts.repo.OpenDJTokenRepo;
 import com.sun.identity.shared.OAuth2Constants;
+import org.forgerock.openam.oauth2.model.AuthorizationCode;
 import org.forgerock.openam.oauth2.model.impl.AccessTokenImpl;
 import org.forgerock.openam.oauth2.model.impl.AuthorizationCodeImpl;
 import org.forgerock.openam.oauth2.model.impl.RefreshTokenImpl;
@@ -137,6 +139,35 @@ public class DefaultOAuthTokenStoreImpl implements OAuth2TokenStore {
         }
 
         return code;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public void updateAuthorizationCode(String id, AuthorizationCode code) throws OAuthProblemException{
+        deleteAuthorizationCode(id);
+        JsonValue response = null;
+
+        // Store in CTS
+        JsonResourceAccessor accessor =
+                new JsonResourceAccessor(repository, JsonResourceContext.newRootContext());
+
+        AuthorizationCodeImpl code2 =
+                new AuthorizationCodeImpl(id, code.getUserID(), code.getClient(), code.getRealm(),
+                    code.getScope(), code.isTokenIssued(), code.getExpireTime());
+        try {
+            response = accessor.create(id, code2);
+        } catch (JsonResourceException e) {
+            OAuth2Utils.DEBUG.error("DefaultOAuthTokenStoreImpl::Unable to create authorization code", e);
+            throw new OAuthProblemException(Status.SERVER_ERROR_INTERNAL.getCode(),
+                    "Internal error", "Could not create token in CTS", null);
+        }
+
+        if (response == null) {
+            OAuth2Utils.DEBUG.error("DefaultOAuthTokenStoreImpl::Unable to create authorization code");
+            throw new OAuthProblemException(Status.SERVER_ERROR_INTERNAL.getCode(),
+                    "Internal error", "Could not create token in CTS", null);
+        }
     }
 
     /**
@@ -464,7 +495,7 @@ public class DefaultOAuthTokenStoreImpl implements OAuth2TokenStore {
      */
     @Override
     public org.forgerock.openam.oauth2.model.RefreshToken createRefreshToken(Set<String> scope, String realm, String uuid,
-            String clientId) {
+            String clientId, AuthorizationCode parent) {
         if (OAuth2Utils.DEBUG.messageEnabled()){
             OAuth2Utils.DEBUG.message("DefaultOAuthTokenStoreImpl::Create refresh token");
         }
@@ -473,9 +504,14 @@ public class DefaultOAuthTokenStoreImpl implements OAuth2TokenStore {
 
         String id = UUID.randomUUID().toString();
         long expireTime = REFRESH_TOKEN_LIFETIME;
-
-        RefreshTokenImpl refreshToken =
-                new RefreshTokenImpl(id, null, uuid, new SessionClientImpl(clientId, null), realm, scope, expireTime);
+        RefreshTokenImpl refreshToken = null;
+        if (parent != null){
+            refreshToken =
+                new RefreshTokenImpl(id, parent.getToken(), uuid, new SessionClientImpl(clientId, null), realm, scope, expireTime);
+        } else {
+            refreshToken =
+                    new RefreshTokenImpl(id, null, uuid, new SessionClientImpl(clientId, null), realm, scope, expireTime);
+        }
 
         // Create in CTS
         JsonResourceAccessor accessor =
@@ -544,6 +580,35 @@ public class DefaultOAuthTokenStoreImpl implements OAuth2TokenStore {
             throw OAuthProblemException.OAuthError.INVALID_REQUEST.handle(Request.getCurrent());
         }
 
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public JsonValue queryForToken(String id) throws OAuthProblemException{
+        JsonValue response = null;
+
+        // Delete the code
+        JsonResourceAccessor accessor =
+                new JsonResourceAccessor(repository, JsonResourceContext.newRootContext());
+
+        //construct the filter
+        Map query = new HashMap<String,String>();
+        query.put("parent", id);
+        JsonValue queryFilter = new JsonValue(new HashMap<String, HashMap<String, String>>());
+        if (query != null){
+            queryFilter.put("filter", query);
+        }
+
+        try {
+            response = accessor.query(id, queryFilter);
+        } catch (JsonResourceException e) {
+            OAuth2Utils.DEBUG.error("DefaultOAuthTokenStoreImpl::Unable to delete refresh token", e);
+            throw OAuthProblemException.OAuthError.INVALID_REQUEST.handle(Request.getCurrent());
+        }
+
+        return response;
     }
 
 }

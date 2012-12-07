@@ -221,7 +221,7 @@ public class AbstractFlowTest {
                         realm.getTokenStore().createRefreshToken(
                                 (Set<String>) invocation.getArguments()[1],
                                 authorizationCode.getRealm(), authorizationCode.getUserID(),
-                                authorizationCode.getClient().getClientId());
+                                authorizationCode.getClient().getClientId(), null);
 
                 Map<String, Object> tokenMap = new HashMap<String, Object>();
                 tokenMap.put(OAuth2Constants.Params.ACCESS_TOKEN, token);
@@ -264,7 +264,7 @@ public class AbstractFlowTest {
         // Mock createRefreshToken
         when(
                 realm.getTokenStore().createRefreshToken(anySet(), anyString(), anyString(),
-                        anyString())).then(new Answer<RefreshToken>() {
+                        anyString(), any(AuthorizationCode.class))).then(new Answer<RefreshToken>() {
             @Override
             public RefreshToken answer(InvocationOnMock invocation) throws Throwable {
                 RefreshToken token = mock(RefreshToken.class);

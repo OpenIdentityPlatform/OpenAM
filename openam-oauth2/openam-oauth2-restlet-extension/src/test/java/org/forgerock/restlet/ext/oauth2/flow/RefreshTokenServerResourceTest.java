@@ -59,7 +59,7 @@ public class RefreshTokenServerResourceTest extends AbstractFlowTest {
 
         RefreshToken refreshToken =
                 realm.getTokenStore().createRefreshToken(OAuth2Utils.split("read write", null),
-                        "test", "admin", "cid");
+                        "test", "admin", "cid", null);
 
         Form parameters = new Form();
         parameters.add(OAuth2Constants.Params.GRANT_TYPE, OAuth2Constants.Params.REFRESH_TOKEN);
@@ -92,7 +92,7 @@ public class RefreshTokenServerResourceTest extends AbstractFlowTest {
         assertNotNull(auth2Proxy);
         RefreshToken refreshToken =
                 realm.getTokenStore().createRefreshToken(OAuth2Utils.split("read write", null),
-                        "test", "admin", "cid");
+                        "test", "admin", "cid", null);
         BearerToken token = auth2Proxy.flowRefreshToken(refreshToken.getToken());
         assertNotNull(token);
     }

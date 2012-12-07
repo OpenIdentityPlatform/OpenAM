@@ -131,6 +131,6 @@ public class PasswordServerResource extends AbstractFlow {
     protected RefreshToken createRefreshToken(Set<String> checkedScope) {
         return getTokenStore().createRefreshToken(checkedScope,
                 OAuth2Utils.getRealm(getRequest()), resourceOwner.getIdentifier(),
-                client.getClient().getClientId());
+                client.getClient().getClientId(), null);
     }
 }
