@@ -86,10 +86,10 @@ public class ClientVerifierImpl implements ClientVerifier{
             throw OAuthProblemException.OAuthError.INVALID_REQUEST.handle(request);
         } else if (request.getChallengeResponse() != null) {
             client = verify(request.getChallengeResponse());
-        } else if (clientSecret != null && clientId != null) {
+        } else if (clientSecret != null && clientId != null && !clientId.isEmpty()) {
                 client = verify(clientId, clientSecret);
         } else {
-            throw OAuthProblemException.OAuthError.INVALID_CLIENT.handle(request);
+            throw OAuthProblemException.OAuthError.INVALID_REQUEST.handle(request);
         }
         if (OAuth2Utils.logStatus) {
             if (client == null){
