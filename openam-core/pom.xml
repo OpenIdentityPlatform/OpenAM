@@ -174,10 +174,9 @@
 
         <!-- LDAP APIs -->
         <dependency>
-            <groupId>external</groupId>
-            <artifactId>OpenDJ</artifactId>
+                <groupId>org.forgerock.opendj</groupId>
+                <artifactId>opendj-server</artifactId>
         </dependency>
-
         <dependency>
             <groupId>org.forgerock.opendj</groupId>
             <artifactId>opendj-ldap-sdk</artifactId>

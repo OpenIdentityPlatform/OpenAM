@@ -298,7 +298,7 @@
                             <targetPath>WEB-INF/template/ldif/sfha</targetPath>
                             <filtering>false</filtering>
                         </webResource>
-			<webResource>
+			            <webResource>
                             <directory>${project.basedir}/../openam-oauth2/openam-oauth2-core-token-service/src/main/resources
                             </directory>
                             <includes>

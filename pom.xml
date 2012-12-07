@@ -52,7 +52,7 @@
     <parent>
         <groupId>org.forgerock</groupId>
         <artifactId>forgerock-parent</artifactId>
-        <version>1.1.0-SNAPSHOT</version>
+        <version>1.1.0</version>
     </parent>
 
     <!-- Component Definition -->
@@ -124,6 +124,9 @@
         <openam.properties>openam.properties</openam.properties>
 
         <!-- Version Properties -->
+        <opendj.server.version>2.4.6-SNAPSHOT</opendj.server.version>
+        <opendj.api.version>3.0.0-OPENAMp3</opendj.api.version>
+
         <restlet.version>2.1-RC4</restlet.version>
         <xercesj.version>2.11.0</xercesj.version>
 
@@ -881,8 +884,6 @@
                 <version>1.1.5.2</version>
             </dependency>
 
-            <!-- TODO publicsuffix -->
-
             <dependency>
                 <groupId>relaxngDatatype</groupId>
                 <artifactId>relaxngDatatype</artifactId>
@@ -974,10 +975,17 @@
                 <!-- Originally ? -->
             </dependency>
 
+            <!-- OpenDJ API -->
             <dependency>
                 <groupId>org.forgerock.opendj</groupId>
                 <artifactId>opendj-ldap-sdk</artifactId>
-                <version>3.0.0-OPENAMp3</version>
+                <version>${opendj.api.version}</version>
+            </dependency>
+            <!-- OpenDJ Server - 2.4.6 -->
+            <dependency>
+                <groupId>org.forgerock.opendj</groupId>
+                <artifactId>opendj-server</artifactId>
+                <version>${opendj.server.version}</version>
             </dependency>
 
             <!-- Legacy External Libraries for OpenAM -->
@@ -1033,11 +1041,6 @@
                 <groupId>external</groupId>
                 <artifactId>jss4</artifactId>
                 <version>2007-08-11</version>
-            </dependency>
-            <dependency>
-                <groupId>external</groupId>
-                <artifactId>OpenDJ</artifactId>
-                <version>2012-20-02</version>
             </dependency>
             <dependency>
                 <groupId>external</groupId>
