@@ -79,4 +79,14 @@ public interface ClientVerifier {
      */
     public Collection<ChallengeScheme> getRequiredAuthenticationScheme(String client_id);
 
+
+    /**
+     * Find the client given a clientId.
+     * @param clientId the client id to find
+     * @param request the request that wants the client
+     * @return
+     * @throws OAuthProblemException
+     */
+    public ClientApplication findClient(String clientId, Request request) throws OAuthProblemException;
+
 }

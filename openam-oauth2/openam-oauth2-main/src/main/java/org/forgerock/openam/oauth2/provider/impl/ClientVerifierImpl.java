@@ -193,14 +193,18 @@ public class ClientVerifierImpl implements ClientVerifier{
         return null;
     }
 
-    private ClientApplication findClient(String clientId){
+    public ClientApplication findClient(String clientId, Request request){
+
+        if (clientId == null || clientId.isEmpty()){
+            throw OAuthProblemException.OAuthError.INVALID_REQUEST.handle(request);
+        }
 
         ClientApplication user = null;
         try {
             AMIdentity id = getIdentity(clientId);
             user = new ClientApplicationImpl(id);
         } catch (Exception e){
-            return user;
+            throw OAuthProblemException.OAuthError.INVALID_CLIENT.handle(request);
         }
         return user;
     }

@@ -379,23 +379,28 @@ public abstract class AbstractFlow extends ServerResource {
      */
     protected OAuth2Client validateRemoteClient() {
         switch (endpointType) {
-        case AUTHORIZATION_ENDPOINT: {
-            String client_id =
-                    OAuth2Utils.getRequestParameter(getRequest(), OAuth2Constants.Params.CLIENT_ID,
-                            String.class);
-            ClientApplication client = getClientVerifier().verify(getRequest(), getResponse());
-            if (null != client) {
-                return new OAuth2Client(client);
-            } else {
-                /*
-                 * unauthorized_client The client is not authorized to request
-                 * an authorization code using this method.
-                 */
-                OAuth2Utils.DEBUG.error("AbstractFlow::Unauthorized client accessing authorize endpoint");
-                throw OAuthProblemException.OAuthError.INVALID_CLIENT.handle(getRequest());
+            case AUTHORIZATION_ENDPOINT: {
+                String client_id =
+                        OAuth2Utils.getRequestParameter(getRequest(), OAuth2Constants.Params.CLIENT_ID,
+                                String.class);
+                ClientApplication client = null;
+                if (this instanceof ImplicitGrantServerResource){
+                    client = getClientVerifier().findClient(client_id, getRequest());
+                } else {
+                    client = getClientVerifier().verify(getRequest(), getResponse());
+                }
+                if (null != client) {
+                    return new OAuth2Client(client);
+                } else {
+                    /*
+                    * unauthorized_client The client is not authorized to request
+                    * an authorization code using this method.
+                    */
+                    OAuth2Utils.DEBUG.error("AbstractFlow::Unauthorized client accessing authorize endpoint");
+                    throw OAuthProblemException.OAuthError.INVALID_CLIENT.handle(getRequest());
+                }
             }
-        }
-        case TOKEN_ENDPOINT: {
+            case TOKEN_ENDPOINT: {
             return getAuthenticatedClient();
         }
         default: {
