@@ -46,14 +46,7 @@ import java.nio.channels.FileChannel;
 import java.nio.channels.ReadableByteChannel;
 import java.nio.channels.WritableByteChannel;
 import java.security.NoSuchAlgorithmException;
-import java.util.ArrayList;
-import java.util.Enumeration;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.StringTokenizer;
+import java.util.*;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 
@@ -233,7 +226,7 @@ public class EmbeddedOpenDS {
                 "mail-1.4.5.jar"                        // Was mail.jar before Maven Support.
         };
         String[] NewOpendsJarFiles = {                 // We use this table to rename the files
-                "opendj-server-2.4.6-SNAPSHOT.jar",    // Since OpenDJ seems to need je.jar by name
+                "opendj-server.jar",                   // Since OpenDJ seems to need je.jar by name
                 "je.jar",
                 "mail-1.4.5.jar"
         };
@@ -1513,6 +1506,8 @@ public class EmbeddedOpenDS {
 
         File configLdif = new File(odsRoot + OPENDS_UPGRADE_DIR);
 
+        File buildInfo = new File(odsRoot + "/" + "config" + "/" + SetupConstants.OPENDJ_BUILDINFO);
+
         if (configLdif.exists() && configLdif.isDirectory()) {
             String[] configFile = configLdif.list(new FilenameFilter() {
                 //@Override -- Not Allowed Here.
@@ -1524,16 +1519,23 @@ public class EmbeddedOpenDS {
             if (configFile.length != 0) {
                 version = configFile[0].substring(configFile[0].lastIndexOf('.') + 1);
             } else {
-                debug.error("Unable to determine OpenDS version");
+                debug.error("Unable to determine OpenDJ version");
             }
+        } else if (buildInfo.exists() && buildInfo.canRead() && buildInfo.isFile()) {
+              String buildInfoVersionText = getOpenDJBuildInfo(buildInfo);
+              if ( (buildInfoVersionText != null) && (!buildInfoVersionText.isEmpty()) ) {
+                  version = buildInfoVersionText.trim();
+              } else {
+                  debug.error("Unable to determine OpenDJ version");
+              }
         } else {
             if (debug.warningEnabled()) {
-                debug.warning("Unable to determine OpenDS version; could be pre-config");
+                debug.warning("Unable to determine OpenDJ version; could be pre-config");
             }
         }
 
         if (debug.messageEnabled()) {
-            debug.message("Found OpenDS version: " + version);
+            debug.message("Found OpenDJ version: " + version);
         }
 
         return version;
@@ -1568,5 +1570,18 @@ public class EmbeddedOpenDS {
                     .get(SetupConstants.CONFIG_VAR_SERVER_HOST);
         }
         return dirHost;
+    }
+
+    // Helper Method to return the first line of the OpenDJ buildInfo file.
+    private static String getOpenDJBuildInfo(File buildInfo) {
+        try {
+            Scanner scan = new Scanner(buildInfo);
+            while (scan.hasNextLine()) {
+                return scan.nextLine();
+            }
+        } catch (FileNotFoundException e) {
+            // Simply Ignore this Exception and Allow UpStream to Handle Null.
+        }
+        return null;
     }
 }

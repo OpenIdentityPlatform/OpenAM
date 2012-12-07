@@ -246,6 +246,8 @@ public interface SetupConstants {
      * <code>OpenDS</code>.
      */
     static final String SMS_OPENDS_DATASTORE = "opends";
+
+    static final String OPENDJ_BUILDINFO = "buildinfo";
     
     /**
      * Type of Data store used for storing the configuration files.
