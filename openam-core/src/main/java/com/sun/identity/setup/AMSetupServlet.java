@@ -2426,17 +2426,11 @@ public class AMSetupServlet extends HttpServlet {
          *  there.
          */
         String monAuthFile = basedir + "/" + deployuri + "/openam_mon_auth";
-        String legacy_monAuthFileName = basedir + "/" + deployuri + "/opensso_mon_auth";
         String encpwd =
             (String)AccessController.doPrivileged(new EncodeAction("changeit"));
         try {
-            File legacy_monFile = new File(legacy_monAuthFileName);
             File mFileSave = new File(monAuthFile + "~");
             File monFile = new File(monAuthFile);
-            // Check for Legacy File
-            if (legacy_monFile.exists()) {
-                legacy_monFile.renameTo(monFile);
-            }
             // Check for Existing File
             if (monFile.exists()) {
                 monFile.renameTo(mFileSave);

@@ -46,6 +46,8 @@ import com.sun.jdmk.comm.AuthInfo;
 import com.sun.jdmk.comm.HtmlAdaptorServer;
 import com.sun.management.comm.SnmpAdaptorServer;
 import com.sun.management.snmp.SnmpStatusException;
+
+import java.io.File;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.text.SimpleDateFormat;
@@ -390,6 +392,17 @@ public class Agent {
         String classMethod = "Agent.startAgent:";
         // OpenSSO server port comes from WebtopNaming.siteAndServerInfo
         String serverPort = agentSvrInfo.serverPort;
+
+        // Check for Legacy MonAuthFile.
+        if ( (monAuthFilePath != null) && (monAuthFilePath.endsWith("opensso_mon_auth")) )
+        {
+            // Perform a rename of the old filename to the latest naming.
+            File monAuthFile = new File(monAuthFilePath);
+            File newMonAuthFile = new File(monAuthFile.getParentFile()+"/"+"openam_mon_auth");
+            if (monAuthFile.renameTo(newMonAuthFile)) {
+                monAuthFilePath = newMonAuthFile.getAbsolutePath();
+            }
+        }
 
         /*
          *  there are a lot of exception checks in this method, as
