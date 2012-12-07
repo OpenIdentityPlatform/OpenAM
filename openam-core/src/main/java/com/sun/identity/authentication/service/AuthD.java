@@ -26,8 +26,8 @@
  *
  */
 
-/*
- * Portions Copyrighted 2010-2011 ForgeRock AS
+/**
+ * Portions Copyrighted 2010-2012 ForgeRock, Inc.
  */
 package com.sun.identity.authentication.service;
 
@@ -1451,12 +1451,6 @@ public class AuthD  {
             Map attrs = svcConfig.getAttributes();	 
             validGotoUrlDomains = (Set)attrs.get(	 
                     ISAuthConstants.AUTH_GOTO_DOMAINS);	 
-            if (validGotoUrlDomains != null && !validGotoUrlDomains.isEmpty()) {	 
-                attrs = orgConfigMgr.getAttributes(	 
-                        ISAuthConstants.IDREPO_SVC_NAME);	 
-                validGotoUrlDomains.addAll(	 
-                        (Set)attrs.get("sunOrganizationAliases")); 
-	        }       	 
             if (debug.messageEnabled()) {	 
                 debug.message("AuthD.getValidGotoUrlDomains(): " +	 
                         validGotoUrlDomains);	 
