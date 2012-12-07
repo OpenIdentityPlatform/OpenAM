@@ -39,7 +39,7 @@ import com.sun.identity.cli.annotation.ResourceStrings;
 
 public class AccessManager {
     @DefinitionClassInfo(
-        productName="OpenSSO",
+        productName="OpenAM",
         logName="amadm",
         resourceBundle="AccessManagerCLI")
     private String product;
@@ -1933,22 +1933,22 @@ public class AccessManager {
         description="Create a new agent configuration.",
         webSupport="true",
         mandatoryOptions={
-            "serverurl|s|s|Server URL. e.g. http://www.example.com:58080/opensso. This option is valid for J2EEAgent and WebAgent.",
-            "agenturl|g|s|Agent URL. e.g. http://www.agent.com:8080/agent. WebAgent does not take URL with path. e.g. http://www.agent.com:8080. This option is valid for J2EEAgent and WebAgent.",
             "realm|e|s|Name of realm.",
             "agentname|b|s|Name of agent.",
-            "agenttype|t|s|Type of agent. e.g. J2EEAgent, WebAgent"
+            "agenttype|t|s|Type of agent. Possible values: J2EEAgent, WebAgent, WSCAgent, WSPAgent, STSAgent, DiscoveryAgent, 2.2_Agent, SharedAgent, OAuth2Client"
             },
         optionAliases={},
         macro="authentication",
         optionalOptions={
+            "serverurl|s|s|Server URL. e.g. http://www.example.com:58080/openam. This option is valid for J2EEAgent and WebAgent.",
+            "agenturl|g|s|Agent URL. e.g. http://www.agent.com:8080/agent. WebAgent does not take URL with path. e.g. http://www.agent.com:8080. This option is valid for J2EEAgent and WebAgent.",
             "attributevalues|a|m|Properties e.g. sunIdentityServerDeviceKeyValue=https://agent.example.com:443/",
             "datafile|D|s|Name of file that contains properties."},
         resourceStrings={
             "server-url-missing=Server URL is needed.",
             "agent-url-missing=Agent URL is needed.",
-            "does-not-support-server-url=Server URL was supported for J2EEAgent and WebAgent only.",
-            "does-not-support-agent-url=Agent URL was supported for J2EEAgent and WebAgent only.",
+            "does-not-support-server-url=Server URL is only supported for J2EEAgent and WebAgent.",
+            "does-not-support-agent-url=Agent URL is only supported for J2EEAgent and WebAgent.",
             "server-url-invalid=Server URL is invalid.",
             "agent-url-invalid=Agent URL is invalid.",
             "does-not-support-agent-creation={0} did not support agent creation.",

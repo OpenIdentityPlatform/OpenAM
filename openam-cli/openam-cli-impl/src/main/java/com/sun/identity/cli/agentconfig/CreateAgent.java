@@ -27,7 +27,7 @@
  */
 
 /*
- * Portions Copyrighted [2011] [ForgeRock AS]
+ * Portions Copyrighted 2011-2012 ForgeRock, Inc.
  */
 package com.sun.identity.cli.agentconfig;
 
@@ -111,18 +111,14 @@ public class CreateAgent extends AuthenticatedCommand {
                     getResourceString("does-not-support-agent-url"),
                     ExitCodes.REQUEST_CANNOT_BE_PROCESSED);
             }
+        } else {
+            if (serverURL == null) {
+                throw new CLIException(getResourceString("server-url-missing"), ExitCodes.REQUEST_CANNOT_BE_PROCESSED);
+            } else if (agentURL == null) {
+                throw new CLIException(getResourceString("agent-url-missing"), ExitCodes.REQUEST_CANNOT_BE_PROCESSED);
+            }
         }
 
-        if ((serverURL == null) && (agentURL != null)) {
-            throw new CLIException(
-                getResourceString("server-url-missing"),
-                ExitCodes.REQUEST_CANNOT_BE_PROCESSED);
-        }
-        if ((serverURL != null) && (agentURL == null)) {
-            throw new CLIException(
-                getResourceString("agent-url-missing"),
-                ExitCodes.REQUEST_CANNOT_BE_PROCESSED);
-        }
 
         boolean hasPassword = false;
         for (Iterator i = attributeValues.keySet().iterator();
