@@ -130,13 +130,21 @@
    <para>Add the domains involved in CDSSO in the CDSSO Domain List.</para>
   </step>
   <step>
+   <para>If necessary, update the Agent Root URL for CDSSO list on the Global
+   tab page.</para>
+   <para>If the policy agent is on a server with virtual host names, add the
+   virtual host URLs to the list.</para>
+   <para>If the policy agent is behind a load balancer, add the load balancer
+   URL to the list.</para>
+  </step>
+  <step>
    <para>Save your work.</para>
   </step>
  </procedure>
 
  <procedure xml:id="enable-cdsso-web-agent">
   <title>To Enable CDSSO For a Web Policy Agent</title>
-  
+
   <step>
    <para>In the OpenAM console, browse to Access Control &gt;
    <replaceable>Realm Name</replaceable> &gt; Agents &gt; Web &gt;
@@ -155,6 +163,14 @@
   </step>
   <step>
    <para>Add the domains involved in CDSSO in the Cookies Domain List.</para>
+  </step>
+  <step>
+   <para>If necessary, update the Agent Root URL for CDSSO list on the Global
+   tab page.</para>
+   <para>If the policy agent is on a server with virtual host names, add the
+   virtual host URLs to the list.</para>
+   <para>If the policy agent is behind a load balancer, add the load balancer
+   URL to the list.</para>
   </step>
   <step>
    <para>Save your work.</para>

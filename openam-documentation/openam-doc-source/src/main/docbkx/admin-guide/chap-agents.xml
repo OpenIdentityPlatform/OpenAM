@@ -418,6 +418,11 @@
       system where the agent resides, and <replaceable>port</replaceable>
       represents the port number on which the agent is installed.
       The slash following the port number is required.</para>
+
+      <para>If your agent system also has virtual host names, add URLs with
+      the virtual host names to this list as well. OpenAM checks that
+      <literal>goto</literal> URLs match one of the agent root URLs for
+      CDSSO.</para>
      </listitem>
     </varlistentry>
    </variablelist>
@@ -1706,6 +1711,11 @@ com.sun.identity.agents.config.cdsso.cookie.domain[1]=.example.net</literallayou
       system where the agent resides, and <replaceable>port</replaceable>
       represents the port number on which the agent is installed.
       The slash following the port number is required.</para>
+
+      <para>If your agent system also has virtual host names, add URLs with
+      the virtual host names to this list as well. OpenAM checks that
+      <literal>goto</literal> URLs match one of the agent root URLs for
+      CDSSO.</para>
      </listitem>
     </varlistentry>
    </variablelist>
@@ -4333,6 +4343,11 @@ com.sun.identity.agents.config.cdsso.cookie.domain[1]=.example.net</literallayou
      system where the agent resides, and <replaceable>port</replaceable>
      represents the port number on which the agent is installed.
      The slash following the port number is required.</para>
+
+     <para>If your agent system also has virtual host names, add URLs with
+     the virtual host names to this list as well. OpenAM checks that
+     <literal>goto</literal> URLs match one of the agent root URLs for
+     CDSSO.</para>
     </listitem>
    </varlistentry>
   </variablelist>
