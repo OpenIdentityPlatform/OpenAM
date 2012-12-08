@@ -1,7 +1,7 @@
 /**
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright (c) 2011-2012 ForgeRock AS. All Rights Reserved
+ * Copyright (c) 2011-2012 ForgeRock, Inc. All Rights Reserved
  *
  * The contents of this file are subject to the terms
  * of the Common Development and Distribution License
@@ -63,6 +63,21 @@ public class SessionServiceHelper extends AbstractUpgradeHelper {
             "iplanet-am-session-constraint-handler";
     private static final String SESSION_CONSTRAINT_HANDLER_OLD_ATTR =
             "iplanet-am-session-constraint-resulting-behavior";
+    private static final String SFO_USER_ATTR = "iplanet-am-session-store-username";
+    private static final String SFO_PWD_ATTR = "iplanet-am-session-store-password";
+    private static final String SFO_CPL_MAX_WAIT_TIME_ATTR = "iplanet-am-session-store-cpl-max-wait-time";
+    private static final String SFO_JDBC_URL_ATTR = "iplanet-am-session-jdbc-url";
+
+    static {
+        initialize();
+    }
+
+    private static void initialize() {
+        attributes.add(SFO_USER_ATTR);
+        attributes.add(SFO_PWD_ATTR);
+        attributes.add(SFO_CPL_MAX_WAIT_TIME_ATTR);
+        attributes.add(SFO_JDBC_URL_ATTR);
+    }
 
     @Override
     public AttributeSchemaImpl addNewAttribute(Set<AttributeSchemaImpl> existingAttrs, AttributeSchemaImpl newAttr)

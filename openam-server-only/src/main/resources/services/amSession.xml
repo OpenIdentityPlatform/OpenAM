@@ -212,7 +212,7 @@
                                      type="single"
                                      syntax="string">
                         <DefaultValues>
-                            <Value>cn=Directory Manager</Value>
+                            <Value>guest</Value>
                         </DefaultValues>
                     </AttributeSchema>
                     <!-- This property is deprecated as of 10.1.0 -->
@@ -221,7 +221,7 @@
                                      type="single"
                                      syntax="password">
                         <DefaultValues>
-                            <Value>password</Value>
+                            <Value>guest</Value>
                         </DefaultValues>
                     </AttributeSchema>
                     <!-- This property is deprecated as of 10.1.0 -->
