@@ -27,7 +27,7 @@
  */
 
 /**
- * Portions Copyrighted 2012 ForgeRock AS
+ * Portions Copyrighted 2012 ForgeRock, Inc.
  */
 package com.sun.identity.authentication.distUI;
 
@@ -111,7 +111,6 @@ public class AuthenticationServletBase extends ApplicationServletBase {
             viewBeanManager.getViewBean(
             com.sun.identity.authentication.distUI.AuthExceptionViewBean.class);
         vb.forwardTo(requestContext);
-        throw new CompleteRequestException();
     }
 
     @Override

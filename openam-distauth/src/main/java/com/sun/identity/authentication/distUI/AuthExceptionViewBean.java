@@ -26,8 +26,9 @@
  *
  */
 
-
-
+/**
+ * Portions Copyrighted 2012 ForgeRock, Inc.
+ */
 package com.sun.identity.authentication.distUI;
 
 import com.iplanet.dpro.session.SessionID;
@@ -44,6 +45,7 @@ import com.sun.identity.common.ISLocaleContext;
 import com.sun.identity.shared.debug.Debug;
 import com.sun.identity.shared.locale.L10NMessage;
 import com.sun.identity.authentication.client.AuthClientUtils;
+import java.io.File;
 import java.io.IOException;
 import java.util.Iterator;
 import java.util.ResourceBundle;
@@ -100,12 +102,7 @@ public class AuthExceptionViewBean extends
         response.setHeader("Expires", "0");
         
         try {
-            if (session.isNew()) {
-                exDebug.message("New Request");
-                ISLocaleContext localeContext = new ISLocaleContext();
-                localeContext.setLocale(request);
-                locale = localeContext.getLocale();
-            } else {
+            if (!session.isNew()) {
                 exDebug.message("Existing request");
                 locale = (java.util.Locale) session.getAttribute("Locale");
                 ac = (AuthContext) session.getAttribute("AuthContext");
@@ -113,6 +110,11 @@ public class AuthExceptionViewBean extends
                 indexType =
                     AuthClientUtils.getIndexType((String) session.getAttribute("IndexType"));
                 indexName = (String) session.getAttribute("IndexName");
+            }
+            if (locale == null) {
+                ISLocaleContext localeContext = new ISLocaleContext();
+                localeContext.setLocale(request);
+                locale = localeContext.getLocale();
             }
             
             if (exDebug.messageEnabled()) {
@@ -127,16 +129,8 @@ public class AuthExceptionViewBean extends
                 ResultVal = e.getMessage();
             }
         }
-        if (ac == null) {
-            try {
-                if (exDebug.messageEnabled()) {
-                    exDebug.message("Goto Login URL : " + LOGINURL);
-                }
-                response.sendRedirect(LOGINURL);
-            } catch (Exception e) {}
-        } else {
-            super.forwardTo(requestContext);
-        }
+
+        super.forwardTo(requestContext);
     }
     
     /**
@@ -146,9 +140,9 @@ public class AuthExceptionViewBean extends
      */
     public String getDisplayURL() {
         exDebug.message("In getDisplayURL()");
-        
+
         // I18N get resource bundle
-        rb = (ResourceBundle)  rbCache.getResBundle("amAuthUI", locale);
+    rb = (ResourceBundle)  rbCache.getResBundle("amAuthUI", locale);
         if (rb == null) {
             return AuthClientUtils.getFileName("Exception.jsp",locale.toString(),orgName,
             request,servletContext,indexType,indexName);
@@ -198,11 +192,11 @@ public class AuthExceptionViewBean extends
         throws ModelControlException {
         SessionID sessionID = AuthClientUtils.getSessionIDFromRequest(request);
         try {
+            setPageEncoding(request,response);
             String cookieDomain = null;
             Set cookieDomainSet = 
                     AuthClientUtils.getCookieDomainsForReq(request);
             Cookie cookie;
-            setPageEncoding(request,response);
 
             // No cookie domain specified in profile
             if (cookieDomainSet.isEmpty()) {
@@ -217,19 +211,11 @@ public class AuthExceptionViewBean extends
                 }
             }
             AuthClientUtils.clearlbCookie(request, response);
-            ResultVal = rb.getString("uncaught_exception");
-            
-        }catch (Exception e) {
-            e.printStackTrace();
-            if (exDebug.messageEnabled()) {
-                exDebug.message(
-                    "error in getting Exception : " + e.getMessage());
-            }
-            
-            ResultVal = rb.getString("uncaught_exception") + " : " +
-                e.getMessage();
+            ResultVal = rb.getString("internal.auth.error");
+        } catch (Exception e) {
+            exDebug.error("Error occurred while trying to display the Internal error page: ", e);
+            ResultVal = rb.getString("internal.auth.error");
         }
-        
     }
     
     /**

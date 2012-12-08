@@ -1812,22 +1812,33 @@ extends com.sun.identity.authentication.UI.AuthViewBeanBase {
                 ErrorMessage = l10nE.getL10NMessage(locale);
             }
         }
-        
+
+        if (authErrorCode == null) {
+            // if error code can not be got from exception,
+            // then get error code and message from auth context
+            if (ac != null) {
+                ErrorMessage = ac.getErrorMessage();
+                errorCode = ac.getErrorCode();
+            }
+        }
+
+        if (errorCode == null || errorCode.isEmpty()) {
+            //if error code is still null, let's set it to AUTH_ERROR, so the
+            //template lookup will succeed
+            errorCode = AMAuthErrorCode.AUTH_ERROR;
+        }
+        if (ErrorMessage == null || ErrorMessage.isEmpty()) {
+            // if error message is still null,
+            // then get error message by using error code
+            ErrorMessage = AuthClientUtils.getErrorMessage(errorCode);
+        }
+
         if (ac != null) {
             errorTemplate = ac.getErrorTemplate();
         } else {
             errorTemplate = AuthClientUtils.getErrorTemplate(errorCode);
         }
-        
-        if (authErrorCode == null) {
-            if (ac != null) {
-                ErrorMessage = ac.getErrorMessage();
-                errorCode = ac.getErrorCode();
-            } else {
-                ErrorMessage = AuthClientUtils.getErrorMessage(errorCode);
-            }
-        }
-        
+
         if (loginDebug.messageEnabled()) {
             loginDebug.message("Error Message = " + ErrorMessage);
             loginDebug.message("Error Template = " + errorTemplate);

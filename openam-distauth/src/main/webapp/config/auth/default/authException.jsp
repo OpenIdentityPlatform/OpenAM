@@ -64,6 +64,7 @@
                                                                    defaultValue='' fireDisplayEvents='true' escape='false'/>
                                     </jato:content>
                                 </h3>
+                                <p><auth:resBundle bundleName="amAuthUI" resourceKey="contactadmin" /></p>
                                 <jato:content name="ContentHrefException">
                                     <p><auth:href name="urlLogin" fireDisplayEvents='true'><jato:text name="txtGotoLoginAfterFail" /></auth:href></p>
                                 </jato:content>
