@@ -1143,68 +1143,6 @@
    </varlistentry>
   </variablelist>
 
-  <variablelist xml:id="liberty-id-wsf-security-service-configuration">
-   <title>Liberty ID-WSF Security Service</title>
-
-   <para><command>ssoadm</command> service name:
-   <literal>sunFAMLibertySecurityService</literal></para>
-
-   <varlistentry>
-    <term>Security Attribute Plugin Class</term>
-    <listitem>
-     <para>Implements the
-     <literal>com.sun.identity.liberty.ws.security.SecurityAttributePlugin</literal>
-     interface</para>
-
-     <para><command>ssoadm</command> attribute:
-     <literal>SecurityAttributePluginClass</literal></para>
-    </listitem>
-   </varlistentry>
-
-   <varlistentry>
-    <term>KeyInfo type</term>
-    <listitem>
-     <para>Specifies the data type for the KeyInfo block. Either
-     <literal>certificate</literal> or <literal>public_key</literal>.</para>
-
-     <para><command>ssoadm</command> attribute:
-     <literal>KeyInfoType</literal></para>
-    </listitem>
-   </varlistentry>
-
-   <varlistentry>
-    <term>Security Token Provider Class</term>
-    <listitem>
-     <para><command>ssoadm</command> attribute:
-     <literal>TokenProviderClass</literal></para>
-    </listitem>
-   </varlistentry>
-
-   <varlistentry>
-    <term>Default WSC certificate alias</term>
-    <listitem>
-     <para><command>ssoadm</command> attribute:
-     <literal>WSCCertAlias</literal></para>
-    </listitem>
-   </varlistentry>
-
-   <varlistentry>
-    <term>Trusted Authority signing certificate alias</term>
-    <listitem>
-     <para><command>ssoadm</command> attribute:
-     <literal>TrustedAuthorityCertAlias</literal></para>
-    </listitem>
-   </varlistentry>
-
-   <varlistentry>
-    <term>Trusted CA signing certificate alias</term>
-    <listitem>
-     <para><command>ssoadm</command> attribute:
-     <literal>TrustedCACertAliases</literal></para>
-    </listitem>
-   </varlistentry>
-  </variablelist>
-
   <variablelist xml:id="liberty-interaction-service-configuration">
    <title>Liberty Interaction Service</title>
 
