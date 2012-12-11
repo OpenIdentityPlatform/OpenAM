@@ -35,25 +35,28 @@
  provides the following additional features.</para>
 
  <important>
-  <para>This Xpress release is a milestone release from the main development
-  branch of the product. It precedes the full enterprise release, and contains
-  selected key features (as well as all current fixed issues).</para>
+  <para>OpenAM <?eval ${serverDocTargetVersion}?> Xpress is a milestone release
+  from the main development branch of the product. The Xpress release contains
+  selected key features and all current fixed issues. An Xpress release
+  undergoes important functional testing but not the complete testing cycle
+  that is done for a full Enterprise release.</para>
 
-  <para>This Xpress release has undergone functional testing, but not been
-  passed the complete battery of tests that ForgeRock performs for a full
-  enterprise release.</para>
+  <para>Xpress releases are supported through ForgeRock subscriptions and are
+  upgradeable to the Enterprise version, which has long term support.</para>
 
-  <para>You can purchase a ForgeRock support subscription for this Xpress
-  release. However, there is no long-term support for Xpress releases. Instead,
-  you must upgrade to the final enterprise release for full long-term
-  support.</para>
+  <para>The goal of an Xpress release is to enable you to start build phases
+  earlier, with the most recent features, instead of having to wait for the
+  Enterprise release date. Fixes to issues that are discovered in an Xpress
+  release are delivered as patches to ForgeRock customers, and are guaranteed
+  to be delivered in the Enterprise release that follows. Xpress releases are
+  supported for a grace period after the Enterprise version has been
+  released.</para>
 
-  <para>An Xpress release allows you to begin the proof-of-concept and build
-  phases earlier with the most recent features, instead of waiting for the
-  enterprise release, yet still get support and fixes from ForgeRock. Fixes to
-  issues discovered on Xpress releases are done by engineering directly in the
-  open source project repository, and thus guaranteed to be delivered in the
-  enterprise release that follow.</para>
+  <para>With the exception of these Release Notes, the official documentation
+  for this release is still in progress, and is accessible at
+  <link xlink:href="http://openam.forgerock.org/docs.html" xlink:show="new"
+  >http://openam.forgerock.org/docs.html</link>. The complete, validated
+  documentation set will be available with the Enterprise release.</para>
  </important>
 
  <itemizedlist>
