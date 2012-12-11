@@ -186,9 +186,9 @@ esac
   <screen>$ cd ~/Downloads ; unzip <?eval ${coreDirectoryFile}?>.zip</screen>
 
   <variablelist>
-   <para>When you unzip the archive of the entire package, you get a
-   <filename>~/Downloads/<?eval ${coreDirectoryFile}?>/</filename> directory including 
-    the following files. See the <link
+   <para>When you unzip the archive of the entire package, you get ldif, license, and 
+   legal files in addition to the <filename>~/Downloads/<?eval ${coreDirectoryFile}?>/</filename> 
+   directory including the following files. See the <link
    xlink:href="reference#chap-file-layout"
     xlink:role="http://docbook.org/xlink/role/olink"><citetitle>File
     Layout</citetitle> reference</link> for details.</para>
@@ -317,7 +317,8 @@ esac
 
   <screen>$ mkdir openam
 $ cd openam
-$ jar -xf ~/Downloads/<?eval ${coreDirectoryFile}?>/<?eval ${coreWarFile}?>
+$ jar -xf ~/Downloads/<?eval ${coreDirectoryFile}?>/
+  <?eval ${coreWarFile}?>
 $ vi WEB-INF/classes/bootstrap.properties
 $ grep ^config WEB-INF/classes/bootstrap.properties
 configuration.dir=/home/jboss-user/openam</screen>
@@ -382,7 +383,8 @@ $ cat WEB-INF/jboss-web.xml</screen>
 
   <screen>$ mkdir openam
 $ cd openam
-$ jar -xf ~/Downloads/<?eval ${coreDirectoryFile}?>/<?eval ${coreWarFile}?>
+$ jar -xf ~/Downloads/<?eval ${coreDirectoryFile}?>/
+  <?eval ${coreWarFile}?>
 $ vi WEB-INF/classes/bootstrap.properties
 $ grep ^config WEB-INF/classes/bootstrap.properties
 configuration.dir=/home/jboss-user/openam

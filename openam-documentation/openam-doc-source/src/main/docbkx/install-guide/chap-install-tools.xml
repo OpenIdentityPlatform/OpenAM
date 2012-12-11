@@ -35,46 +35,30 @@
   <primary>Installing</primary>
   <secondary>Tools (ssoadm, etc.)</secondary>
  </indexterm>
- <para>OpenAM tools are found in the <filename>tools/</filename> directory
- where you unpacked the archive of the entire package, such as
- <filename>~/Downloads/opensso/tools/</filename>.</para>
+ <para>OpenAM tools are found in three <filename>.zip</filename> files where you 
+  unpacked the archive of the entire package, such as 
+  <filename>~/Downloads/<?eval ${coreDirectoryFile}?></filename>.</para>
  <variablelist>
   <varlistentry>
-   <term><filename>README</filename></term>
-   <listitem>
-    <para>Quick description of the tools .zip files. Each tools .zip also
-    includes a specific README.</para>
-   </listitem>
-  </varlistentry>
-  <varlistentry>
-   <term><filename>tools/ssoAdminTools.zip</filename></term>
+   <term><filename><?eval ${ssoadminZipFile}?></filename></term>
    <listitem>
     <para>Administration tools: <command>ampassword</command>,
     <command>ssoadm</command> and <command>amverifyarchive</command></para>
    </listitem>
   </varlistentry>
   <varlistentry>
-   <term><filename>tools/ssoConfiguratorTools.zip</filename></term>
+   <term><filename><?eval ${ssoconfigZipFile}?></filename></term>
    <listitem>
-    <para>Tools for command line installation, upgrade, and
-    initial configuration</para>
+    <para>Tool to check for command line installation, upgrade, and initial
+    configuration, as well as serving as a command line alternative to using
+    the GUI configuration wizard </para>
    </listitem>
   </varlistentry>
   <varlistentry>
-   <term><filename>tools/ssoDiagnosticTools.zip</filename></term>
+   <term><filename><?eval ${diagnosticsZipFile}?></filename></term>
    <listitem>
     <para>Tool to check for problems with your deployment and
     configuration</para>
-   </listitem>
-  </varlistentry>
-  <varlistentry>
-   <term><filename>tools/ssoSessionTools.zip</filename></term>
-   <listitem>
-    <para>Session failover utilities. Installation for these tools is
-    described in the chapter on <link
-    xlink:href="install-guide#chap-session-failover"
-    xlink:role="http://docbook.org/xlink/role/olink"><citetitle>Setting Up
-    OpenAM Session Failover</citetitle>.</link></para>
    </listitem>
   </varlistentry>
  </variablelist>
@@ -94,7 +78,8 @@
   <step>
    <para>Unpack the tools from where you unzipped OpenAM.</para>
    <screen>$ cd /path/to/openam-tools/admin
-$ unzip ~/Downloads/opensso/tools/ssoAdminTools.zip
+$ unzip ~/Downloads/<?eval ${coreDirectoryFile}?>/
+  <?eval ${ssoadminZipFile}?>
 ...
   inflating: template/windows/bin/amverifyarchive.bat.template
   inflating: template/windows/bin/ssoadm.bat.template</screen>
@@ -112,8 +97,9 @@ The scripts are properly setup under directory:
  /path/to/openam-tools/admin/openam
 Debug directory is /path/to/openam-tools/admin/debug.
 Log directory is /path/to/openam-tools/admin/log.
-The version of this tools.zip is: (2011-July-11 00:05)
-The version of your server instance is: (2011-July-11 00:05)</screen>
+The version of this tools.zip is: <?eval ${serverDocTargetVersion}?>-XPRESS (2012-December-09 02:58)
+The version of your server instance is: OpenAM <?eval ${serverDocTargetVersion}?>-XPRESS 
+ (2012-December-09 02:48)</screen>
    <para>After setup, the tools are located under a directory named after the
    instance of OpenAM.</para>
    <screen>$ ls openam/bin/
@@ -192,13 +178,15 @@ http://openam.example.com:8080/openam</screen>
   <step>
    <para>Unpack the tools from where you unzipped OpenAM.</para>
    <screen>$ cd /path/to/openam-tools/config
-$ unzip ~/Downloads/opensso/tools/ssoConfiguratorTools.zip 
-Archive:  ~/Downloads/opensso/tools/ssoConfiguratorTools.zip
-  inflating: README.setup
-  inflating: configurator.jar
-  inflating: sampleconfiguration
-  inflating: sampleupgrade
-  inflating: upgrade.jar</screen>
+$ unzip ~/Downloads/<?eval ${coreDirectoryFile}?>/
+  <?eval ${ssoadminZipFile}?>
+Archive:  ~/Downloads//<?eval ${coreDirectoryFile}?>/
+  <?eval ${ssoadminZipFile}?>
+  inflating: ssoadm.template
+  inflating: ssoadm.bat.template
+  inflating: ampassword.template
+  inflating: ampassword.bat.template
+  inflating: amverifyarchive.template</screen>
    <para>Set up configuration files based on the
    <filename>sampleconfiguration</filename> example, and then apply the
    configuration to a deployed OpenAM .war file using the following
@@ -228,7 +216,8 @@ Archive:  ~/Downloads/opensso/tools/ssoConfiguratorTools.zip
   <step>
    <para>Unpack the tools from where you unzipped OpenAM.</para>
    <screen>$ cd /path/to/openam-tools/diagnostic
-$ unzip ~/Downloads/opensso/tools/ssoDiagnosticTools.zip
+$ unzip ~/Downloads/<?eval ${coreDirectoryFile}?>/
+  <?eval ${ssoadminZipFile}?>
 ...
   inflating: services/webcontainer/service.xml
   inflating: ssodtool.bat

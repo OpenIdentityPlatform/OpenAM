@@ -53,10 +53,7 @@
    Name</replaceable> &gt; General.</para>
   </listitem>
   <listitem>
-   <para>Create the .war file for the DAS using OpenAM software.</para>
-  </listitem>
-  <listitem>
-   <para>Deploy the DAS .war file into your web application container.</para>
+   <para>Deploy the <?eval ${distauthWarFile}?> file into your web application container.</para>
    <para>How you deploy the DAS .war file depends on your web application
    container. The procedure in this section shows how to deploy on
    Apache Tomcat.</para>
@@ -70,29 +67,14 @@
   </listitem>
  </orderedlist>
  
- <procedure xml:id="create-distributed-auth-file">
-  <title>To Create the DAS <filename>.war</filename> File</title>
-  
-  <step>
-   <para>Unpack the <filename>opensso.war</filename> file into a temporary
-   directory.</para>
-   <screen>$ mkdir -p /tmp/das ; cd /tmp/das
-$ jar xf ~/Downloads/opensso/deployable-war/opensso.war</screen>
-  </step>
-  <step>
-   <para>Create the <filename>das.war</filename> file.</para>
-   <screen>$ cd ~/Downloads/opensso/deployable-war
-$ sh createwar.sh --staging /tmp/das --type distauth --warfile das.war</screen>
-  </step>
- </procedure>
- 
  <procedure xml:id="deploy-distributed-auth-on-tomcat">
   <title>To Deploy the DAS on Tomcat</title>
  
   <step>
-   <para>Put the <filename>das.war</filename> you created in the Tomcat
+   <para>Copy the <filename><?eval ${distauthWarFile}?></filename> file into the 
    <filename>webapps/</filename> directory.</para>
-   <screen>$ mv das.war /path/to/tomcat/webapps/</screen>
+   <screen>cp ~/Downloads/<?eval ${coreDirectoryFile}?>/
+    <?eval ${distauthWarFile}?> /path/to/tomcat/webapps</screen>
   </step>
   <step>
    <para>Check that you see the initial DAS configuration screen
