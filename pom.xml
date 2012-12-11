@@ -1608,6 +1608,7 @@
                 <artifactId>maven-release-plugin</artifactId>
                 <configuration>
                     <autoVersionSubmodules>true</autoVersionSubmodules>
+                    <updateBranchVersions>true</updateBranchVersions>
                 </configuration>
             </plugin>
 
