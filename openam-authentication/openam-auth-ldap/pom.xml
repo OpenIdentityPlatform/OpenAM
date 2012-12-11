@@ -37,15 +37,9 @@
 
     <!-- Component Definition -->
     <name>OpenAM Auth LDAP</name>
-    <description>OpenAM Authentication LDAP
-    </description>
+    <description>OpenAM Authentication LDAP</description>
     <artifactId>openam-auth-ldap</artifactId>
-    <version>10.1.0-SNAPSHOT</version>
     <packaging>jar</packaging>
-    <organization>
-        <name>ForgeRock</name>
-        <url>http://www.forgerock.com</url>
-    </organization>
 
     <!-- Build -->
     <build>
@@ -142,12 +136,10 @@
         <dependency>
             <groupId>org.forgerock.openam</groupId>
             <artifactId>openam-shared</artifactId>
-            <version>10.1.0-SNAPSHOT</version>
         </dependency>
         <dependency>
             <groupId>org.forgerock.openam</groupId>
             <artifactId>openam-core</artifactId>
-            <version>10.1.0-SNAPSHOT</version>
         </dependency>
         <dependency>
             <groupId>org.forgerock.opendj</groupId>

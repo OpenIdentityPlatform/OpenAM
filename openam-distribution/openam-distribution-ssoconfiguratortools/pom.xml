@@ -40,13 +40,7 @@
     <description>OpenAM Distribution SSO Configurator Tools Kit.
     </description>
     <artifactId>openam-distribution-ssoconfiguratortools</artifactId>
-    <version>10.1.0-SNAPSHOT</version>
     <packaging>pom</packaging>
-    <organization>
-        <name>ForgeRock</name>
-        <url>http://www.forgerock.com</url>
-    </organization>
-
 
     <!-- Build -->
     <build>
@@ -67,7 +61,7 @@
                                 <artifactItem>
                                     <groupId>org.forgerock.openam</groupId>
                                     <artifactId>openam-core</artifactId>
-                                    <version>10.1.0-SNAPSHOT</version>
+                                    <version>${project.version}</version>
                                     <type>jar</type>
                                     <overWrite>false</overWrite>
                                     <outputDirectory>${project.build.directory}/unpacked_1</outputDirectory>
@@ -88,7 +82,7 @@
                                 <artifactItem>
                                     <groupId>org.forgerock.openam</groupId>
                                     <artifactId>openam-core</artifactId>
-                                    <version>10.1.0-SNAPSHOT</version>
+                                    <version>${project.version}</version>
                                     <type>jar</type>
                                     <overWrite>false</overWrite>
                                     <outputDirectory>${project.build.directory}/unpacked_2</outputDirectory>

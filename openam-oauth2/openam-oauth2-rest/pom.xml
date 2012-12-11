@@ -37,7 +37,6 @@
 
     <groupId>org.forgerock.openam</groupId>
     <artifactId>openam-oauth2-rest</artifactId>
-    <version>10.1.0-SNAPSHOT</version>
     <packaging>jar</packaging>
 
     <name>OpenAM OAuth2 Rest</name>
@@ -77,12 +76,10 @@
         <dependency>
             <groupId>org.forgerock.openam</groupId>
             <artifactId>openam-oauth2-core-token-service</artifactId>
-            <version>10.1.0-SNAPSHOT</version>
         </dependency>
         <dependency>
             <groupId>org.forgerock.openam</groupId>
             <artifactId>openam-oauth2-common</artifactId>
-            <version>10.1.0-SNAPSHOT</version>
         </dependency>
         <!-- Commons -->
         <!--

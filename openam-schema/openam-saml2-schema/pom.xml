@@ -39,12 +39,7 @@
     <description>OpenAM Schemata Components 
     </description>
     <artifactId>openam-saml2-schema</artifactId>
-    <version>10.1.0-SNAPSHOT</version>
     <packaging>jar</packaging>
-    <organization>
-        <name>ForgeRock</name>
-        <url>http://www.forgerock.com</url>
-    </organization>
 
     <!-- Build -->
     <build>

@@ -26,7 +26,7 @@
 : $Id: amverifyarchive.bat,v 1.16 2009/07/06 22:01:16 hvijay Exp $
 :
 
-: Portions Copyrighted 2011 ForgeRock AS
+: Portions Copyrighted 2011-2012 ForgeRock, Inc.
 
 set TOOLS_HOME="@TOOLS_HOME@"
 
@@ -39,7 +39,7 @@ goto WHILE
 :WEND
 
 set CLASSPATH="@CONFIG_DIR@"
-set CLASSPATH="%CLASSPATH%;lib/openam-distribution-amadmsetup-10.1.0-SNAPSHOT.jar"
+set CLASSPATH="%CLASSPATH%;lib/openam-distribution-amadmsetup-${project.version}.jar"
 set CLASSPATH="%CLASSPATH%;lib/opendj-server-2.4.6.jar"
 set CLASSPATH="%CLASSPATH%;lib/mail-1.4.5.jar"
 set CLASSPATH="%CLASSPATH%;lib/j2ee-2007-18-10.jar"
@@ -51,10 +51,10 @@ set CLASSPATH="%CLASSPATH%;lib/xalan-2.7.1.jar"
 set CLASSPATH="%CLASSPATH%;lib/xercesImpl-2.10.0.jar"
 set CLASSPATH="%CLASSPATH%;lib/xml-apis-1.4.01.jar"
 set CLASSPATH="%CLASSPATH%;lib/xmlsec-1.3.0.jar"
-set CLASSPATH="%CLASSPATH%;lib/openam-core-10.1.0-SNAPSHOT.jar"
-set CLASSPATH="%CLASSPATH%;lib/openam-shared-10.1.0-SNAPSHOT.jar"
-set CLASSPATH="%CLASSPATH%;lib/openam-dtd-schema-10.1.0-SNAPSHOT.jar"
-set CLASSPATH="%CLASSPATH%;lib/openam-rest-10.1.0-SNAPSHOT.jar"
+set CLASSPATH="%CLASSPATH%;lib/openam-core-${project.version}.jar"
+set CLASSPATH="%CLASSPATH%;lib/openam-shared-${project.version}.jar"
+set CLASSPATH="%CLASSPATH%;lib/openam-dtd-schema-${project.version}.jar"
+set CLASSPATH="%CLASSPATH%;lib/openam-rest-${project.version}.jar"
 
 "@JAVA_HOME@/bin/java.exe" -Xms64m -Xmx256m -classpath %CLASSPATH% -D"bootstrap.dir=@CONFIG_DIR@" -D"java.version.current=java.vm.version" -D"java.version.expected=1.4+"  -D"am.version.current=com.iplanet.am.version" -D"am.version.expected=@AM_VERSION@" -D"amconfig=AMConfig" -D"max_conn_pool=10" -D"min_conn_pool=1" -D"s1is.java.util.logging.config.class=com.sun.identity.log.s1is.LogConfigReader" -D"com.iplanet.services.configpath=@CONFIG_DIR@" -D"com.sun.identity.configFilePath=@CONFIG_DIR@" -D"com.iplanet.coreservices.configpath=@CONFIG_DIR@"  -D"LOG_COMPATMODE=Off" -D"com.iplanet.am.logstatus=INACTIVE" -D"com.iplanet.am.serverMode=false" com.sun.identity.log.cli.ISArchiveVerify %PARAMS%
 endlocal

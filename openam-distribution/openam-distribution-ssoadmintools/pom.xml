@@ -40,12 +40,7 @@
     <description>OpenAM Distribution SSO Admin Tools Kit.
     </description>
     <artifactId>openam-distribution-ssoadmintools</artifactId>
-    <version>10.1.0-SNAPSHOT</version>
     <packaging>pom</packaging>
-    <organization>
-        <name>ForgeRock</name>
-        <url>http://www.forgerock.com</url>
-    </organization>
 
     <!-- Build -->
     <build>
@@ -211,7 +206,6 @@
         <dependency>
             <groupId>org.forgerock.openam</groupId>
             <artifactId>openam-distribution-amadmsetup</artifactId>
-            <version>10.1.0-SNAPSHOT</version>
         </dependency>
 
         <dependency>
@@ -232,13 +226,11 @@
         <dependency>
             <groupId>org.forgerock.openam</groupId>
             <artifactId>openam-cli-definitions</artifactId>
-            <version>${project.version}</version>
         </dependency>
 
         <dependency>
             <groupId>org.forgerock.openam</groupId>
             <artifactId>openam-cli-impl</artifactId>
-            <version>${project.version}</version>
         </dependency>
 
         <dependency>

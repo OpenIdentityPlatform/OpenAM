@@ -35,7 +35,6 @@
 
     <groupId>org.forgerock.openam</groupId>
     <artifactId>openam-oauth2-core-token-service</artifactId>
-    <version>10.1.0-SNAPSHOT</version>
     <name>OpenAM OAuth2 Core Token Service</name>
     <properties>
         <maven.compiler.target>1.6</maven.compiler.target>
@@ -48,25 +47,21 @@
         <dependency>
             <groupId>org.forgerock.openam</groupId>
             <artifactId>openam-shared</artifactId>
-            <version>10.1.0-SNAPSHOT</version>
         </dependency>
 
         <dependency>
             <groupId>org.forgerock.openam</groupId>
             <artifactId>openam-oauth2-common</artifactId>
-            <version>10.1.0-SNAPSHOT</version>
         </dependency>
 
         <!-- OpenAM -->
         <dependency>
             <groupId>org.forgerock.openam</groupId>
             <artifactId>openam-core</artifactId>
-            <version>10.1.0-SNAPSHOT</version>
         </dependency>
         <dependency>
             <groupId>org.forgerock.openam</groupId>
             <artifactId>openam-rest</artifactId>
-            <version>10.1.0-SNAPSHOT</version>
         </dependency>
         <dependency>
             <groupId>org.forgerock.commons</groupId>
@@ -83,7 +78,6 @@
         <dependency>
             <groupId>org.forgerock.openam</groupId>
             <artifactId>openam-idsvcs-schema</artifactId>
-            <version>10.1.0-SNAPSHOT</version>
         </dependency>
 
         <!-- Commons -->

@@ -34,12 +34,10 @@
         <version>10.1.0-SNAPSHOT</version>
     </parent>
 
-
     <name>OpenAM Generated Documentation Content</name>
     <inceptionYear>2011</inceptionYear>
     <groupId>org.forgerock.openam</groupId>
     <artifactId>openam-doc-content</artifactId>
-    <version>10.1.0-SNAPSHOT</version>
     <packaging>jar</packaging>
     <description>Tools for creating/generating the core documentation.</description>
     <build>

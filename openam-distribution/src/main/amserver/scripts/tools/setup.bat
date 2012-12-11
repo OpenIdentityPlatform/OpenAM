@@ -90,7 +90,7 @@ IF "%5" == "--path" SET path_AMConfig=%~6
 
 : lib/amserver.jar;lib/amadm_setup.jar;lib/opensso-sharedlib.jar;lib/opendj-server.jar;resources
 set CLASSPATH="@CONFIG_DIR@"
-set CLASSPATH="%CLASSPATH%;lib/openam-distribution-amadmsetup-10.1.0-SNAPSHOT.jar"
+set CLASSPATH="%CLASSPATH%;lib/openam-distribution-amadmsetup-${project.version}.jar"
 set CLASSPATH="%CLASSPATH%;lib/opendj-server-2.4.6.jar"
 set CLASSPATH="%CLASSPATH%;lib/mail-1.4.5.jar"
 set CLASSPATH="%CLASSPATH%;lib/j2ee-2007-18-10.jar"
@@ -102,10 +102,10 @@ set CLASSPATH="%CLASSPATH%;lib/xalan-2.7.1.jar"
 set CLASSPATH="%CLASSPATH%;lib/xercesImpl-2.10.0.jar"
 set CLASSPATH="%CLASSPATH%;lib/xml-apis-1.4.01.jar"
 set CLASSPATH="%CLASSPATH%;lib/xmlsec-1.3.0.jar"
-set CLASSPATH="%CLASSPATH%;lib/openam-core-10.1.0-SNAPSHOT.jar"
-set CLASSPATH="%CLASSPATH%;lib/openam-shared-10.1.0-SNAPSHOT.jar"
-set CLASSPATH="%CLASSPATH%;lib/openam-dtd-schema-10.1.0-SNAPSHOT.jar"
-set CLASSPATH="%CLASSPATH%;lib/openam-rest-10.1.0-SNAPSHOT.jar"
+set CLASSPATH="%CLASSPATH%;lib/openam-core-${project.version}.jar"
+set CLASSPATH="%CLASSPATH%;lib/openam-shared-${project.version}.jar"
+set CLASSPATH="%CLASSPATH%;lib/openam-dtd-schema-${project.version}.jar"
+set CLASSPATH="%CLASSPATH%;lib/openam-rest-${project.version}.jar"
 set CLASSPATH="%CLASSPATH%;resources"
 
 "%JAVA_HOME%/bin/java.exe" -D"load.config=yes" -D"help.print=%help_print%" -D"path.AMConfig=%path_AMConfig%" -D"path.log=%path_log%" -D"path.debug=%path_debug%" -cp "%CLASSPATH%" com.sun.identity.tools.bundles.Main

@@ -37,7 +37,6 @@
     <name>OpenAM Client SDK</name>
     <description>OpenAM Java Client SDK</description>
     <artifactId>openam-clientsdk</artifactId>
-    <version>10.1.0-SNAPSHOT</version>
     <packaging>jar</packaging>
 
     <!-- Build -->

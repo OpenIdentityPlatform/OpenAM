@@ -36,15 +36,9 @@
 
     <!-- Component Definition -->
     <name>OpenAM Rest</name>
-    <description>OpenAM REST Services
-    </description>
+    <description>OpenAM REST Services</description>
     <artifactId>openam-rest</artifactId>
-    <version>10.1.0-SNAPSHOT</version>
     <packaging>jar</packaging>
-    <organization>
-        <name>ForgeRock</name>
-        <url>http://www.forgerock.com</url>
-    </organization>
 
     <!-- Build -->
     <build>
@@ -140,20 +134,16 @@
         <dependency>
             <groupId>org.forgerock.openam</groupId>
             <artifactId>openam-shared</artifactId>
-            <version>10.1.0-SNAPSHOT</version>
-            <!-- This Version -->
         </dependency>
 
         <dependency>
             <groupId>org.forgerock.openam</groupId>
             <artifactId>openam-entitlements</artifactId>
-            <version>10.1.0-SNAPSHOT</version>
         </dependency>
 
         <dependency>
             <groupId>org.forgerock.openam</groupId>
             <artifactId>openam-coretoken</artifactId>
-            <version>10.1.0-SNAPSHOT</version>
         </dependency>
 
         <dependency>

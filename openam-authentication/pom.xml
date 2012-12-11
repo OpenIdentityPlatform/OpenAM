@@ -40,12 +40,7 @@
     <description>OpenAM Authentication Components
     </description>
     <artifactId>openam-authentication</artifactId>
-    <version>10.1.0-SNAPSHOT</version>
     <packaging>pom</packaging>
-    <organization>
-        <name>ForgeRock</name>
-        <url>http://www.forgerock.com</url>
-    </organization>
 
     <!-- Child Modules -->
     <modules>
@@ -75,12 +70,10 @@
         <dependency>
             <groupId>org.forgerock.openam</groupId>
             <artifactId>openam-shared</artifactId>
-            <version>10.1.0-SNAPSHOT</version>
         </dependency>
         <dependency>
             <groupId>org.forgerock.openam</groupId>
             <artifactId>openam-core</artifactId>
-            <version>10.1.0-SNAPSHOT</version>
         </dependency>
     </dependencies>
 

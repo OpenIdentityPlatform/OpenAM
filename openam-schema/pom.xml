@@ -37,14 +37,9 @@
 
     <!-- Component Definition -->
     <name>OpenAM Schemata</name>
-    <description>OpenAM Schemata Components
-    </description>
+    <description>OpenAM Schemata Components</description>
     <artifactId>openam-schema</artifactId>
     <packaging>pom</packaging>
-    <organization>
-        <name>ForgeRock</name>
-        <url>http://www.forgerock.com</url>
-    </organization>
 
     <!-- Child Modules -->
     <modules>
@@ -63,7 +58,6 @@
         <dependency>
             <groupId>org.forgerock.openam</groupId>
             <artifactId>openam-shared</artifactId>
-            <version>10.1.0-SNAPSHOT</version>
         </dependency>
     </dependencies>
 

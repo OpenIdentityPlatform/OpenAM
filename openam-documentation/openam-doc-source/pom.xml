@@ -38,7 +38,6 @@
     <!-- Documentation Module -->
     <groupId>org.forgerock.openam</groupId>
     <artifactId>openam-doc-source</artifactId>
-    <version>10.1.0-SNAPSHOT</version>
 
     <name>OpenAM Core Documentation Sources</name>
 
@@ -301,7 +300,6 @@
         <dependency>
             <groupId>org.forgerock.openam</groupId>
             <artifactId>openam-doc-content</artifactId>
-            <version>10.1.0-SNAPSHOT</version>
         </dependency>
     </dependencies>
 

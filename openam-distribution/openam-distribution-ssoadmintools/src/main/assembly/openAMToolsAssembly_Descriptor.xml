@@ -71,6 +71,7 @@
                 <include>setup.bat</include>
             </includes>
             <fileMode>0755</fileMode>
+            <filtered>true</filtered>
         </fileSet>
         <fileSet>
             <outputDirectory>classes</outputDirectory>
@@ -155,33 +156,39 @@
             <source>${project.basedir}/../../openam-federation/OpenFM/src/main/scripts/bin/ssoadm</source>
             <outputDirectory>template/unix/bin</outputDirectory>
             <destName>ssoadm.template</destName>
+            <filtered>true</filtered>
         </file>
         <file>
             <source>${project.basedir}/../../openam-federation/OpenFM/src/main/scripts/bin/ssoadm.bat</source>
             <outputDirectory>template/windows/bin</outputDirectory>
             <destName>ssoadm.bat.template</destName>
+            <filtered>true</filtered>
         </file>
 
         <file>
             <source>${project.basedir}/../src/main/amserver/scripts/bin/ampassword</source>
             <outputDirectory>template/unix/bin</outputDirectory>
             <destName>ampassword.template</destName>
+            <filtered>true</filtered>
         </file>
         <file>
             <source>${project.basedir}/../src/main/amserver/scripts/bin/ampassword.bat</source>
             <outputDirectory>template/windows/bin</outputDirectory>
             <destName>ampassword.bat.template</destName>
+            <filtered>true</filtered>
         </file>
 
         <file>
             <source>${project.basedir}/../src/main/amserver/scripts/log/amverifyarchive</source>
             <outputDirectory>template/unix/bin</outputDirectory>
             <destName>amverifyarchive.template</destName>
+            <filtered>true</filtered>
         </file>
         <file>
             <source>${project.basedir}/../src/main/amserver/scripts/log/amverifyarchive.bat</source>
             <outputDirectory>template/windows/bin</outputDirectory>
             <destName>amverifyarchive.bat.template</destName>
+            <filtered>true</filtered>
         </file>
 
     </files>

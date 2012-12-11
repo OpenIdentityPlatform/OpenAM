@@ -38,10 +38,6 @@
     <description>OpenAM Tool Components</description>
     <artifactId>openam-tools</artifactId>
     <packaging>pom</packaging>
-    <organization>
-        <name>ForgeRock</name>
-        <url>http://www.forgerock.com</url>
-    </organization>
 
     <!-- Child Modules -->
     <modules>

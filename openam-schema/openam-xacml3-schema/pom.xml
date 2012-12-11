@@ -39,12 +39,7 @@
     <description>OpenAM XACML3 Schemata  
     </description>
     <artifactId>openam-xacml3-schema</artifactId>
-    <version>10.1.0-SNAPSHOT</version>
     <packaging>jar</packaging>
-    <organization>
-        <name>ForgeRock</name>
-        <url>http://www.forgerock.com</url>
-    </organization>
 
     <!-- Build -->
     <build>
@@ -146,9 +141,8 @@
     
     <dependencies>
     	<dependency>
-	   	    <groupId>org.forgerock.openam</groupId>
-        	<artifactId>openam-shared</artifactId>
-            <version>10.1.0-SNAPSHOT</version>
+            <groupId>org.forgerock.openam</groupId>
+            <artifactId>openam-shared</artifactId>
         </dependency>
 
         <dependency>

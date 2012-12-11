@@ -37,7 +37,6 @@
     <name>OpenAM Install Tools Launcher</name>
     <description>OpenAM Install Tools Launcher</description>
     <artifactId>openam-installtools-launcher</artifactId>
-    <version>10.1.0-SNAPSHOT</version>
     <packaging>jar</packaging>
 
     <!-- Build -->

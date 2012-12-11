@@ -40,12 +40,7 @@
     <description>OpenAM Distribution Kit, containing all distributable artifacts.
     </description>
     <artifactId>openam-distribution-kit</artifactId>
-    <version>10.1.0-SNAPSHOT</version>
     <packaging>pom</packaging>
-    <organization>
-        <name>ForgeRock</name>
-        <url>http://www.forgerock.com</url>
-    </organization>
 
     <!-- Build -->
     <build>
@@ -119,55 +114,46 @@
         <dependency>
             <groupId>org.forgerock.openam</groupId>
             <artifactId>openam-server</artifactId>
-            <version>10.1.0-SNAPSHOT</version>
             <type>war</type>
         </dependency>
         <dependency>
             <groupId>org.forgerock.openam</groupId>
             <artifactId>openam-server-only</artifactId>
-            <version>10.1.0-SNAPSHOT</version>
             <type>war</type>
         </dependency>
         <dependency>
             <groupId>org.forgerock.openam</groupId>
             <artifactId>openam-distauth</artifactId>
-            <version>10.1.0-SNAPSHOT</version>
             <type>war</type>
         </dependency>
         <dependency>
             <groupId>org.forgerock.openam</groupId>
             <artifactId>openam-distribution-amadmsetup</artifactId>
-            <version>10.1.0-SNAPSHOT</version>
             <type>jar</type>
         </dependency>
         <dependency>
             <groupId>org.forgerock.openam</groupId>
             <artifactId>openam-distribution-diagnostics</artifactId>
-            <version>10.1.0-SNAPSHOT</version>
             <type>zip</type>
         </dependency>
         <dependency>
             <groupId>org.forgerock.openam</groupId>
             <artifactId>openam-clientsdk</artifactId>
-            <version>10.1.0-SNAPSHOT</version>
             <type>jar</type>
         </dependency>
         <dependency>
             <groupId>org.forgerock.openam</groupId>
             <artifactId>openam-distribution-fedlet-unconfigured</artifactId>
-            <version>10.1.0-SNAPSHOT</version>
             <type>zip</type>
         </dependency>
         <dependency>
             <groupId>org.forgerock.openam</groupId>
             <artifactId>openam-distribution-ssoadmintools</artifactId>
-            <version>10.1.0-SNAPSHOT</version>
             <type>zip</type>
         </dependency>
         <dependency>
             <groupId>org.forgerock.openam</groupId>
             <artifactId>openam-distribution-ssoconfiguratortools</artifactId>
-            <version>10.1.0-SNAPSHOT</version>
             <type>zip</type>
         </dependency>
 

@@ -37,12 +37,7 @@
     <name>OpenAM Install Tools</name>
     <description>OpenAM Install Tool Components</description>
     <artifactId>openam-installtools</artifactId>
-    <version>10.1.0-SNAPSHOT</version>
     <packaging>jar</packaging>
-    <organization>
-        <name>ForgeRock</name>
-        <url>http://www.forgerock.com</url>
-    </organization>
 
     <!-- Build -->
     <build>

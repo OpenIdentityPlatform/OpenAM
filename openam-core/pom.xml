@@ -40,12 +40,7 @@
     <description>OpenAM Core Components
     </description>
     <artifactId>openam-core</artifactId>
-    <version>10.1.0-SNAPSHOT</version>
     <packaging>jar</packaging>
-    <organization>
-        <name>ForgeRock</name>
-        <url>http://www.forgerock.com</url>
-    </organization>
 
     <!-- Build -->
     <build>
@@ -125,51 +120,34 @@
         <dependency>
             <groupId>org.forgerock.openam</groupId>
             <artifactId>openam-locale</artifactId>
-            <version>10.1.0-SNAPSHOT</version>
-            <!-- This Version -->
         </dependency>
         <dependency>
             <groupId>org.forgerock.openam</groupId>
             <artifactId>openam-shared</artifactId>
-            <version>10.1.0-SNAPSHOT</version>
-            <!-- This Version -->
         </dependency>
         <dependency>
             <groupId>org.forgerock.openam</groupId>
             <artifactId>openam-entitlements</artifactId>
-            <version>10.1.0-SNAPSHOT</version>
-            <!-- This Version -->
         </dependency>
         <dependency>
             <groupId>org.forgerock.openam</groupId>
             <artifactId>openam-coretoken</artifactId>
-            <version>10.1.0-SNAPSHOT</version>
-            <!-- This Version -->
         </dependency>
         <dependency>
             <groupId>org.forgerock.openam</groupId>
             <artifactId>openam-rest</artifactId>
-            <version>10.1.0-SNAPSHOT</version>
-            <!-- This Version -->
         </dependency>
         <dependency>
             <groupId>org.forgerock.openam</groupId>
             <artifactId>openam-idsvcs-schema</artifactId>
-            <version>10.1.0-SNAPSHOT</version>
-
-            <!-- This Version -->
         </dependency>
         <dependency>
             <groupId>org.forgerock.openam</groupId>
             <artifactId>openam-mib-schema</artifactId>
-            <version>10.1.0-SNAPSHOT</version>
-            <!-- This Version -->
         </dependency>
         <dependency>
             <groupId>org.forgerock.openam</groupId>
             <artifactId>openam-xacml3-schema</artifactId>
-            <version>10.1.0-SNAPSHOT</version>
-            <!-- This Version -->
         </dependency>
 
         <!-- LDAP APIs -->

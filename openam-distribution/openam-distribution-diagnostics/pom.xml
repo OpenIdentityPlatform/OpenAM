@@ -39,12 +39,7 @@
     <name>OpenAM Distribution Diagnostics</name>
     <description>OpenAM Distribution Diagnostics</description>
     <artifactId>openam-distribution-diagnostics</artifactId>
-    <version>10.1.0-SNAPSHOT</version>
     <packaging>pom</packaging>
-    <organization>
-        <name>ForgeRock</name>
-        <url>http://www.forgerock.com</url>
-    </organization>
 
     <!-- Build -->
     <build>

@@ -37,16 +37,9 @@
 
     <!-- Component Definition -->
     <name>OpenAM Federation</name>
-    <description>OpenAM Federation
-    </description>
+    <description>OpenAM Federation</description>
     <artifactId>openam-federation</artifactId>
-    <version>10.1.0-SNAPSHOT</version>
     <packaging>pom</packaging>
-    <organization>
-        <name>ForgeRock</name>
-        <url>http://www.forgerock.com</url>
-    </organization>
-
 
     <!-- Sub-Parent Project Projects -->
     <properties>
