@@ -58,7 +58,7 @@
     <name>OpenAM Project</name>
     <groupId>org.forgerock.openam</groupId>
     <artifactId>openam</artifactId>
-    <version>10.1.0-SNAPSHOT</version>
+    <version>10.1.0-Xpress-SNAPSHOT</version>
     <packaging>pom</packaging>
 
     <description>OpenAM</description>
@@ -517,9 +517,9 @@
 
     <!-- Source Control -->
     <scm>
-        <connection>scm:svn:https://svn.forgerock.org/openam/trunk/</connection>
-        <developerConnection>scm:svn:https://svn.forgerock.org/openam/trunk/</developerConnection>
-      <url>http://sources.forgerock.org/browse/commons/forgerock-parent/trunk/openam</url>
+        <connection>scm:svn:https://svn.forgerock.org/openam/branches/10.1.0-Xpress</connection>
+        <developerConnection>scm:svn:https://svn.forgerock.org/openam/branches/10.1.0-Xpress</developerConnection>
+      <url>http://sources.forgerock.org/browse/commons/forgerock-parent/branches/10.1.0-Xpress</url>
   </scm>
 
     <!-- Dependency Management -->
