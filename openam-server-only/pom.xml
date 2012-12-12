@@ -196,14 +196,6 @@
                             <filtering>true</filtering>
                         </webResource>
                         <webResource>
-                            <directory>${project.basedir}/src/main/webapp/META-INF</directory>
-                            <includes>
-                                <include>**/**</include>
-                            </includes>
-                            <targetPath>META-INF</targetPath>
-                            <filtering>true</filtering>
-                        </webResource>
-                        <webResource>
                             <directory>${project.basedir}/src/main/webapp/WEB-INF</directory>
                             <includes>
                                 <include>**/**</include>
