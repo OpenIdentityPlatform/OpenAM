@@ -30,7 +30,7 @@
     <parent>
         <groupId>org.forgerock.openam</groupId>
         <artifactId>openam-schema</artifactId>
-        <version>10.1.0-SNAPSHOT</version>
+        <version>10.1.0-Xpress-SNAPSHOT</version>
     </parent>
 
     <!-- Component Definition -->
@@ -52,11 +52,10 @@
                         <phase>generate-sources</phase>
                         <configuration>
                             <target>
-                                <property name="compile_classpath" refid="maven.plugin.classpath"/>
+                                <property name="compile_classpath" refid="maven.plugin.classpath" />
 
                                 <mkdir dir="${project.build.directory}/generated-sources/mib/com/sun/identity/monitoring" />
-                                <java classname="com.sun.jdmk.tools.MibGen" fork="true"
-                                      classpath="${compile_classpath}">
+                                <java classname="com.sun.jdmk.tools.MibGen" fork="true" classpath="${compile_classpath}">
                                     <arg line="-X:use-display-hint -d &quot;${project.build.directory}/generated-sources/mib/com/sun/identity/monitoring&quot; -mc -desc -tp com.sun.identity.monitoring &quot;${basedir}/src/main/resources/mib/SUN-OPENSSO-SERVER.mib&quot; &quot;${basedir}/src/main/resources/mib/mib_core.txt&quot;" />
                                 </java>
                             </target>
@@ -100,7 +99,7 @@
                             <Create-On>${maven.build.timestamp}</Create-On>
                             <SVN-Revision>R${svn-revision.revision}</SVN-Revision>
                             <!-- TODO Add License to Manifest -->
-                            <License></License>
+                            <License />
                         </manifestEntries>
                     </archive>
                 </configuration>

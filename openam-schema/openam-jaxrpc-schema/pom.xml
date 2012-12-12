@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
     <!--
@@ -32,7 +31,7 @@
     <parent>
         <groupId>org.forgerock.openam</groupId>
         <artifactId>openam-schema</artifactId>
-        <version>10.1.0-SNAPSHOT</version>
+        <version>10.1.0-Xpress-SNAPSHOT</version>
     </parent>
 
     <!-- Component Definition -->
@@ -57,12 +56,11 @@
                         <phase>generate-sources</phase>
                         <configuration>
                             <target name="jaxrpc">
-                                <property name="build.class.path" refid="maven.compile.classpath"/>
+                                <property name="build.class.path" refid="maven.compile.classpath" />
 
                                 <mkdir dir="${project.build.directory}/classes" />
 
-                                <java classname="com.sun.xml.rpc.tools.wscompile.Main" fork="true"
-                                      classpath="${build.class.path}">
+                                <java classname="com.sun.xml.rpc.tools.wscompile.Main" fork="true" classpath="${build.class.path}">
                                     <arg value="-g" />
                                     <arg value="-gen:server" />
                                     <arg value="-d" />
@@ -70,8 +68,7 @@
                                     <arg value="${project.basedir}/src/main/resources/xml/jaxrpc/config.xml" />
                                 </java>
 
-                                <move file="${project.build.directory}/classes/IdentityManagementServices.wsdl"
-                                      tofile="${project.build.directory}/classes/jaxrpc/IdentityManagementServices.wsdl" />
+                                <move file="${project.build.directory}/classes/IdentityManagementServices.wsdl" tofile="${project.build.directory}/classes/jaxrpc/IdentityManagementServices.wsdl" />
 
                                 <!-- Clean-up duplicate generated WSDL and Classes -->
                                 <delete file="${project.basedir}/IdentityManagementServices.wsdl" />
@@ -111,7 +108,7 @@
                             <Create-On>${maven.build.timestamp}</Create-On>
                             <SVN-Revision>R${svn-revision.revision}</SVN-Revision>
                             <!-- TODO Add License to Manifest -->
-                            <License></License>
+                            <License />
                         </manifestEntries>
                     </archive>
                 </configuration>

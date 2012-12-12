@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
     <!--
@@ -32,7 +31,7 @@
     <parent>
         <groupId>org.forgerock.openam</groupId>
         <artifactId>openam-distribution</artifactId>
-        <version>10.1.0-SNAPSHOT</version>
+        <version>10.1.0-Xpress-SNAPSHOT</version>
     </parent>
 
     <!-- Component Definition -->
@@ -79,22 +78,19 @@
                         <configuration>
                             <target>
 
-                                <property name="distribution.target.dir"
-                                          value="${project.build.directory}"/>
+                                <property name="distribution.target.dir" value="${project.build.directory}" />
 
                                 <tstamp>
-                                    <format property="time.stamp" pattern="yyyyMMdd"/>
+                                    <format property="time.stamp" pattern="yyyyMMdd" />
                                 </tstamp>
-                                <property name="zipname.set" value="nightly_${time.stamp}"/>
+                                <property name="zipname.set" value="nightly_${time.stamp}" />
 
                                 <filter token="ZIPNAME" value="${zipname.set}" />
                                 <filter token="BUILD_DATE" value="${time.stamp}" />
                                 <filter token="BUILD_VERSION" value="${project.version}" />
 
-                                <copy file="../../src/main/jenkins/openam_link.js.template"
-                                      tofile="${distribution.target.dir}/openam_link.js" filtering="true"/>
-                                <copy file="../../src/main/jenkins/build_date.js.template"
-                                      tofile="${distribution.target.dir}/build_date.js" filtering="true"/>
+                                <copy file="../../src/main/jenkins/openam_link.js.template" tofile="${distribution.target.dir}/openam_link.js" filtering="true" />
+                                <copy file="../../src/main/jenkins/build_date.js.template" tofile="${distribution.target.dir}/build_date.js" filtering="true" />
 
                             </target>
                         </configuration>

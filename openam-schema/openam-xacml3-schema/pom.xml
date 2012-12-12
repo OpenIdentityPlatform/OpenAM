@@ -31,7 +31,7 @@
     <parent>
         <groupId>org.forgerock.openam</groupId>
         <artifactId>openam-schema</artifactId>
-        <version>10.1.0-SNAPSHOT</version>
+        <version>10.1.0-Xpress-SNAPSHOT</version>
     </parent>
 
     <!-- Component Definition -->
@@ -100,7 +100,7 @@
                             <Version>${project.version}</Version>
                             <Create-On>${maven.build.timestamp}</Create-On>
                             <SVN-Revision>R${svn-revision.revision}</SVN-Revision>
-                            <License></License>
+                            <License />
                         </manifestEntries>
                     </archive>
                 </configuration>

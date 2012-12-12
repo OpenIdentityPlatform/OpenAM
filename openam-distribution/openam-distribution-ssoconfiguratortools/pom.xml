@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
     <!--
@@ -32,7 +31,7 @@
     <parent>
         <groupId>org.forgerock.openam</groupId>
         <artifactId>openam-distribution</artifactId>
-        <version>10.1.0-SNAPSHOT</version>
+        <version>10.1.0-Xpress-SNAPSHOT</version>
     </parent>
 
     <!-- Component Definition -->
@@ -106,66 +105,66 @@
                         <configuration>
                             <target>
                                 <tstamp>
-                                    <format property="war.time.stamp" pattern="yyyy-MMMM-dd HH:mm" locale="en,UK"/>
+                                    <format property="war.time.stamp" pattern="yyyy-MMMM-dd HH:mm" locale="en,UK" />
                                 </tstamp>
-                                <property name="version.set" value="${project.version}"/>
+                                <property name="version.set" value="${project.version}" />
 
-                                <filter token="DATESTAMP" value="${war.time.stamp}"/>
-                                <filter token="VERSION" value="${version.set}"/>
+                                <filter token="DATESTAMP" value="${war.time.stamp}" />
+                                <filter token="VERSION" value="${version.set}" />
 
                                 <!-- OpenSSOConfiguration Properties -->
                                 <copy todir="${project.build.directory}/unpacked_1" filtering="true">
                                     <fileset dir="${project.basedir}/../../openam-server-only/src/main/resources/locale">
-                                        <include name="OpenSSOConfigurator.properties"/>
+                                        <include name="OpenSSOConfigurator.properties" />
                                     </fileset>
-                                    <globmapper from="*.properties" to="*_en.properties"/>
+                                    <globmapper from="*.properties" to="*_en.properties" />
                                 </copy>
 
                                 <copy todir="${project.build.directory}/unpacked_1" filtering="true">
                                     <fileset dir="${project.basedir}/../../openam-server-only/src/main/resources/locale">
-                                        <include name="OpenSSOConfigurator.properties"/>
+                                        <include name="OpenSSOConfigurator.properties" />
                                     </fileset>
                                 </copy>
 
                                 <copy todir="${project.build.directory}/unpacked_1" filtering="true">
                                     <fileset dir="${project.basedir}/../../openam-server-only/src/main/resources/locale/de_DE">
-                                        <include name="OpenSSOConfigurator_de.properties"/>
+                                        <include name="OpenSSOConfigurator_de.properties" />
                                     </fileset>
                                 </copy>
 
                                 <copy todir="${project.build.directory}/unpacked_1" filtering="true">
                                     <fileset dir="${project.basedir}/../../openam-server-only/src/main/resources/locale/es_ES">
-                                        <include name="OpenSSOConfigurator_es.properties"/>
+                                        <include name="OpenSSOConfigurator_es.properties" />
                                     </fileset>
                                 </copy>
 
                                 <copy todir="${project.build.directory}/unpacked_1" filtering="true">
                                     <fileset dir="${project.basedir}/../../openam-server-only/src/main/resources/locale/fr_FR">
-                                        <include name="OpenSSOConfigurator_fr.properties"/>
+                                        <include name="OpenSSOConfigurator_fr.properties" />
                                     </fileset>
                                 </copy>
 
                                 <copy todir="${project.build.directory}/unpacked_1" filtering="true">
                                     <fileset dir="${project.basedir}/../../openam-server-only/src/main/resources/locale/ja_JP">
-                                        <include name="OpenSSOConfigurator_ja.properties"/>
+                                        <include name="OpenSSOConfigurator_ja.properties" />
                                     </fileset>
                                 </copy>
 
                                 <copy todir="${project.build.directory}/unpacked_1" filtering="true">
                                     <fileset dir="${project.basedir}/../../openam-server-only/src/main/resources/locale/ko_KR">
-                                        <include name="OpenSSOConfigurator_ko.properties"/>
+                                        <include name="OpenSSOConfigurator_ko.properties" />
                                     </fileset>
                                 </copy>
 
                                 <copy todir="${project.build.directory}/unpacked_1" filtering="true">
                                     <fileset dir="${project.basedir}/../../openam-server-only/src/main/resources/locale/zh_CN">
-                                        <include name="OpenSSOConfigurator_zh.properties"/>
+                                        <include name="OpenSSOConfigurator_zh.properties" />
                                     </fileset>
                                 </copy>
 
                                 <copy todir="${project.build.directory}/unpacked_1" filtering="true">
                                     <fileset dir="${project.basedir}/../../openam-server-only/src/main/resources/locale/zh_TW">
-                                        <include name="OpenSSOConfigurator_zh_TW.properties"/>
+                                        <include name="OpenSSOConfigurator_zh_TW.properties" />
                                     </fileset>
                                 </copy>
 
@@ -173,32 +172,32 @@
                                 <!-- OpenSSOConfiguration Properties-->
                                 <copy todir="${project.build.directory}/unpacked_2" filtering="true">
                                     <fileset dir="${project.basedir}/../../openam-server-only/src/main/resources/locale">
-                                        <include name="OpenAMUpgrade.properties"/>
+                                        <include name="OpenAMUpgrade.properties" />
                                     </fileset>
-                                    <globmapper from="*.properties" to="*_en.properties"/>
+                                    <globmapper from="*.properties" to="*_en.properties" />
                                 </copy>
 
                                 <copy todir="${project.build.directory}/unpacked_2" filtering="true">
                                     <fileset dir="${project.basedir}/../../openam-server-only/src/main/resources/locale">
-                                        <include name="OpenAMUpgrade.properties"/>
+                                        <include name="OpenAMUpgrade.properties" />
                                     </fileset>
                                 </copy>
 
                                 <copy todir="${project.build.directory}/unpacked_2" filtering="true">
                                     <fileset dir="${project.basedir}/../../openam-server-only/src/main/resources/locale/de_DE">
-                                        <include name="OpenAMUpgrade_de.properties"/>
+                                        <include name="OpenAMUpgrade_de.properties" />
                                     </fileset>
                                 </copy>
 
                                 <copy todir="${project.build.directory}/unpacked_2" filtering="true">
                                     <fileset dir="${project.basedir}/../../openam-server-only/src/main/resources/locale/es_ES">
-                                        <include name="OpenAMUpgrade_es.properties"/>
+                                        <include name="OpenAMUpgrade_es.properties" />
                                     </fileset>
                                 </copy>
 
                                 <copy todir="${project.build.directory}/unpacked_2" filtering="true">
                                     <fileset dir="${project.basedir}/../../openam-server-only/src/main/resources/locale/fr_FR">
-                                        <include name="OpenAMUpgrade_fr.properties"/>
+                                        <include name="OpenAMUpgrade_fr.properties" />
                                     </fileset>
                                 </copy>
 
@@ -250,7 +249,7 @@
                                     <Create-On>${maven.build.timestamp}</Create-On>
                                     <SVN-Revision>R${svn-revision.revision}</SVN-Revision>
                                     <!-- TODO Add License to Manifest -->
-                                    <License></License>
+                                    <License />
                                 </manifestEntries>
                             </archive>
                         </configuration>
@@ -290,7 +289,7 @@
                                     <Create-On>${maven.build.timestamp}</Create-On>
                                     <SVN-Revision>R${svn-revision.revision}</SVN-Revision>
                                     <!-- TODO Add License to Manifest -->
-                                    <License></License>
+                                    <License />
                                 </manifestEntries>
                             </archive>
                         </configuration>

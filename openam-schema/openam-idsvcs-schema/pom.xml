@@ -23,15 +23,14 @@
 * "Portions Copyrighted [year] [name of copyright owner]"
 *
 -->
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
     <!-- Parent Project -->
     <parent>
         <groupId>org.forgerock.openam</groupId>
         <artifactId>openam-schema</artifactId>
-        <version>10.1.0-SNAPSHOT</version>
+        <version>10.1.0-Xpress-SNAPSHOT</version>
     </parent>
 
     <!-- Component Definition -->
@@ -56,18 +55,16 @@
                         <configuration>
                             <failOnError>true</failOnError>
                             <target name="idsvcs">
-                                <property name="build.class.path" refid="maven.compile.classpath"/>
+                                <property name="build.class.path" refid="maven.compile.classpath" />
 
-                                <copy file="${project.basedir}/src/main/resources/xml/IdentityServices.wsdl"
-                                      tofile="${project.build.directory}/classes/IdentityServices.wsdl"/>
+                                <copy file="${project.basedir}/src/main/resources/xml/IdentityServices.wsdl" tofile="${project.build.directory}/classes/IdentityServices.wsdl" />
 
-                                <java classname="com.sun.xml.rpc.tools.wscompile.Main" fork="true"
-                                      classpath="${build.class.path}" failonerror="true">
-                                    <arg value="-g"/>
-                                    <arg value="-gen:server"/>
-                                    <arg value="-d"/>
-                                    <arg value="${project.build.directory}/classes"/>
-                                    <arg value="${project.basedir}/src/main/resources/xml/IdentityServicesConfig.xml"/>
+                                <java classname="com.sun.xml.rpc.tools.wscompile.Main" fork="true" classpath="${build.class.path}" failonerror="true">
+                                    <arg value="-g" />
+                                    <arg value="-gen:server" />
+                                    <arg value="-d" />
+                                    <arg value="${project.build.directory}/classes" />
+                                    <arg value="${project.basedir}/src/main/resources/xml/IdentityServicesConfig.xml" />
                                 </java>
                             </target>
                         </configuration>
@@ -103,7 +100,7 @@
                             <Create-On>${maven.build.timestamp}</Create-On>
                             <SVN-Revision>R${svn-revision.revision}</SVN-Revision>
                             <!-- TODO Add License to Manifest -->
-                            <License></License>
+                            <License />
                         </manifestEntries>
                     </archive>
                 </configuration>

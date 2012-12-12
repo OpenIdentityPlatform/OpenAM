@@ -23,16 +23,14 @@
   !      Copyright 2011-2012 ForgeRock Inc
   !    
 -->
-<project xmlns="http://maven.apache.org/POM/4.0.0"
-         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
     <!-- Parent Project -->
     <parent>
         <groupId>org.forgerock.openam</groupId>
         <artifactId>openam-documentation</artifactId>
-        <version>10.1.0-SNAPSHOT</version>
+        <version>10.1.0-Xpress-SNAPSHOT</version>
     </parent>
 
     <!-- Documentation Module -->
@@ -75,9 +73,9 @@
 
     <!-- Source Control -->
     <scm>
-        <url>https://svn.forgerock.org/openam/trunk/openam/</url>
-        <connection>scm:svn:https://svn.forgerock.org/openam/trunk/openam/</connection>
-        <developerConnection>scm:svn:https://svn.forgerock.org/openam/trunk/openam/</developerConnection>
+        <url>https://svn.forgerock.org/openam/branches/10.1.0-Xpress/trunk/openam</url>
+        <connection>scm:svn:https://svn.forgerock.org/openam/branches/10.1.0-Xpress/trunk/openam</connection>
+        <developerConnection>scm:svn:https://svn.forgerock.org/openam/branches/10.1.0-Xpress/trunk/openam</developerConnection>
         <tag>HEAD</tag>
     </scm>
 
@@ -251,12 +249,11 @@
                         <configuration>
                             <target>
                                 <concat destfile="${project.build.directory}/generated-resources/chap-log-messages.xml">
-                                    <header file="${basedir}/src/main/docbkx/reference/log-messages-preface.header"/>
-                                    <fileset dir="${project.build.directory}/generated-resources/xml/xslt"
-                                             includes="**/*.xml">
+                                    <header file="${basedir}/src/main/docbkx/reference/log-messages-preface.header" />
+                                    <fileset dir="${project.build.directory}/generated-resources/xml/xslt" includes="**/*.xml">
 
                                     </fileset>
-                                    <footer file="${basedir}/src/main/docbkx/reference/log-messages-preface.footer"/>
+                                    <footer file="${basedir}/src/main/docbkx/reference/log-messages-preface.footer" />
                                 </concat>
                             </target>
                         </configuration>

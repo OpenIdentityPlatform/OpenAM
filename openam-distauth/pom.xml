@@ -23,15 +23,14 @@
 * "Portions Copyrighted [year] [name of copyright owner]"
 *
 -->
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
     <!-- Parent Project -->
     <parent>
         <groupId>org.forgerock.openam</groupId>
         <artifactId>openam</artifactId>
-        <version>10.1.0-SNAPSHOT</version>
+        <version>10.1.0-Xpress-SNAPSHOT</version>
     </parent>
 
     <!-- Component Definition -->
@@ -79,7 +78,7 @@
                                 <destination>generated-resources</destination>
                             </resource>
                             <resource>
-                                <path></path>
+                                <path />
                                 <include>css/**,images/**,js/auth.js,js/browserVersion.js</include>
                                 <flat>false</flat>
                                 <destination>generated-resources/resources</destination>
@@ -163,7 +162,7 @@
                                 <include>**/**</include>
                                 <include>jato.tld</include>
                             </includes>
-                            <targetPath></targetPath>
+                            <targetPath />
                         </resource>
                     </webResources>
                 </configuration>
