@@ -30,7 +30,7 @@
     <parent>
         <groupId>org.forgerock.openam</groupId>
         <artifactId>openam</artifactId>
-        <version>10.1.0-Xpress-SNAPSHOT</version>
+        <version>10.1.0-SNAPSHOT</version>
     </parent>
 
     <!-- Documentation Module -->
