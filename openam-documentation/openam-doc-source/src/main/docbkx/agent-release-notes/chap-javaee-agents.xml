@@ -253,6 +253,15 @@
    <title>Limitations</title>
 
    <para>Not all features of OpenAM Java EE policy agents work with IPv6.</para>
+
+   <!-- For OPENAM-1991 TODO: Remove when this is fixed after 3.1.0-Xpress -->
+   <para>Apache Tomcat can fail to shut down properly when the Java EE policy
+   agent for Tomcat is deployed. To work around this limitation, add the
+   following to your Tomcat configuration in the <literal>&lt;Server port="8005"
+   shutdown="SHUTDOWN"&gt;</literal> section.</para>
+   <literallayout class="monospaced"
+   >&lt;Listener
+ className="org.forgerock.agents.tomcat.v6.TomcatLifeCycleListener" /&gt;</literallayout>
   </section>
 
   <section xml:id="javaee-agent-known-issues">
