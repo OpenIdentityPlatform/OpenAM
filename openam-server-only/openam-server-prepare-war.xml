@@ -355,21 +355,6 @@
             </fileset>
         </copy>
 
-        <mkdir dir="${openam.temp.target}/WEB-INF/classes/META-INF/services"/>
-        <copy todir="${openam.temp.target}/WEB-INF/classes/META-INF/services" overwrite="true">
-            <fileset dir="src/main/webapp/META-INF/services">
-                <include name="com.sun.xml.ws.api.security.trust.STSAttributeProvider"/>
-                <include name="com.sun.xml.ws.api.security.trust.STSAuthorizationProvider"/>
-                <include name="com.sun.xml.ws.api.security.trust.STSTokenProvider"/>
-                <include name="com.sun.xml.ws.api.security.trust.config.STSConfiguration"/>
-                <include
-                        name="com.sun.xml.ws.api.security.trust.config.STSConfigurationProvider"/>
-                <include name="com.sun.xml.ws.assembler.ServerPipelineHook"/>
-            </fileset>
-        </copy>
-
-
-
     </target>
 
 </project>
