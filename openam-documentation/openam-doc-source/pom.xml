@@ -30,7 +30,7 @@
     <parent>
         <groupId>org.forgerock.openam</groupId>
         <artifactId>openam-documentation</artifactId>
-        <version>10.1.0-Xpress-SNAPSHOT</version>
+        <version>10.1.0-SNAPSHOT</version>
     </parent>
 
     <!-- Documentation Module -->
@@ -73,10 +73,9 @@
 
     <!-- Source Control -->
     <scm>
-        <url>https://svn.forgerock.org/openam/branches/10.1.0-Xpress/trunk/openam</url>
-        <connection>scm:svn:https://svn.forgerock.org/openam/branches/10.1.0-Xpress/trunk/openam</connection>
-        <developerConnection>scm:svn:https://svn.forgerock.org/openam/branches/10.1.0-Xpress/trunk/openam</developerConnection>
-        <tag>HEAD</tag>
+        <url>https://svn.forgerock.org/openam/trunk/openam/</url>
+        <connection>scm:svn:https://svn.forgerock.org/openam/trunk/openam/</connection>
+        <developerConnection>scm:svn:https://svn.forgerock.org/openam/trunk/openam/</developerConnection>
     </scm>
 
     <issueManagement>
