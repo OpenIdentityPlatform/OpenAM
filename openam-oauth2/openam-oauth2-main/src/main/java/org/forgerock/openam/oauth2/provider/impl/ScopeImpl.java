@@ -108,7 +108,7 @@ public class ScopeImpl implements Scope {
             } catch (Exception e){
                 OAuth2Utils.DEBUG.error("Unable to get user identity", e);
             }
-            if (id != null){
+            if (id != null && scopes != null){
                 for (String scope : scopes){
                     try {
                         Set<String> mail = id.getAttribute(scope);

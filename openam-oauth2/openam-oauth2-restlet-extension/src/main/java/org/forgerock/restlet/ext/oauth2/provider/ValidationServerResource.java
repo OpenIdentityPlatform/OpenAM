@@ -145,14 +145,10 @@ public class ValidationServerResource extends ServerResource implements
                     OAuth2Utils.DEBUG.error("ValidationServerResource::Unable to read token from token store for id: " + token);
                     error = OAuthProblemException.OAuthError.INVALID_TOKEN.handle(getRequest());
                 } else {
-                    try {
                     String pluginClass = getPluginClass(t.getRealm());
                     //instantiate plugin class
                     scopeClass = (Scope) Class.forName(pluginClass).newInstance();
-                    } catch (Exception e){
-                        error = OAuthProblemException.OAuthError.SERVER_ERROR.handle(getRequest());
-                        OAuth2Utils.DEBUG.error("ValidationServerResource::Unable to instantiate scope class");
-                    }
+
                     //call plugin class init
                     if (OAuth2Utils.DEBUG.messageEnabled()){
                         OAuth2Utils.DEBUG.message("ValidationServerResource::In Validator resource - got token = " + t);
@@ -170,6 +166,7 @@ public class ValidationServerResource extends ServerResource implements
                         response.putAll(scopeEvaluation);
                     }
 
+
                 }
 
             }
@@ -179,7 +176,7 @@ public class ValidationServerResource extends ServerResource implements
         } catch (Exception e){
             OAuth2Utils.DEBUG.error("ValidationServerResource::Error occurred during validate", e);
             error = OAuthProblemException.OAuthError.SERVER_ERROR.handle(getRequest(),
-                    "Missing scope plugin class");
+                    e.getMessage());
         }
 
         if (error != null) {
