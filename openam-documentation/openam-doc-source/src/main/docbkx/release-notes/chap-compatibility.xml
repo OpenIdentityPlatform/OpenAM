@@ -65,10 +65,11 @@
     <para>The internal representation of session objects has changed.</para>
 
     <para>If you use session failover and depend on OpenMQ rather than the
-    new implementation, you must ensure that OpenMQ is cleared as part of the
-    upgrade to OpenAM <?eval ${serverDocTargetVersion}?>. To clear OpenMQ, run
-    <command>amsfo stop</command> and then run <command>amsfo
-    start</command>.</para>
+    new implementation, you must ensure that the session failover database is
+    cleared as part of the upgrade to OpenAM <?eval ${serverDocTargetVersion}?>.
+    To clear the session failover database, run <command>amsfo stop</command>
+    and then run <command>amsfo start</command>. The session failover database
+    must be restarted before starting the updated OpenAM.</para>
    </listitem>
 
    <listitem>
