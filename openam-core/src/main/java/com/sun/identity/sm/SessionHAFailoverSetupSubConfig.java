@@ -1,7 +1,7 @@
 /**
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright (c) 2012 ForgeRock AS Inc. All Rights Reserved
+ * Copyright (c) 2012 ForgeRock Inc. All Rights Reserved
  *
  * The contents of this file are subject to the terms
  * of the Common Development and Distribution License
@@ -23,19 +23,19 @@
  * your own identifying information:
  * "Portions Copyrighted [year] [name of copyright owner]"
  *
- * Portions Copyrighted [2010] [ForgeRock AS]
+ * Portions Copyrighted [2012] [ForgeRock Inc]
  *
  */
 package com.sun.identity.sm;
 
 import com.iplanet.dpro.session.exceptions.StoreException;
-import com.sun.identity.coretoken.interfaces.AMTokenRepository;
 import com.iplanet.sso.SSOException;
 import com.iplanet.sso.SSOToken;
 import com.sun.identity.shared.Constants;
-import com.sun.identity.shared.configuration.SystemPropertiesManager;
 import com.sun.identity.shared.debug.Debug;
+import com.sun.identity.tools.objects.MapFormat;
 
+import java.util.HashMap;
 import java.util.Map;
 
 /**
@@ -87,13 +87,14 @@ public class SessionHAFailoverSetupSubConfig implements Constants {
     /**
      * Define Session DN Constants
      */
-    private static final String SM_CONFIG_ROOT_DN =
-            SystemPropertiesManager.get(AMTokenRepository.SYS_PROPERTY_SM_CONFIG_ROOT_SUFFIX,
-                    Constants.DEFAULT_ROOT_SUFFIX);
+    // Our default Top Level Root Suffix.
+    // This is resolved during Initialization process.
+    private static final String BASE_ROOT_DN_NAME = "BASE_ROOT";
+    private static String BASE_ROOT_DN;
 
     private static final String SERVICES_BASE_ROOT_DN =
             "ou" + Constants.EQUALS + "services" + Constants.COMMA +
-                    SM_CONFIG_ROOT_DN;
+                    "{"+ BASE_ROOT_DN_NAME +"}";
 
     // Example of Depicted DN:
     //dn: ou=default,ou=GlobalConfig,ou=1.0,ou=iPlanetAMSessionService,
@@ -102,7 +103,7 @@ public class SessionHAFailoverSetupSubConfig implements Constants {
             "ou" + Constants.EQUALS + "default" + Constants.COMMA +
                     "ou" + Constants.EQUALS + "GlobalConfig" + Constants.COMMA +
                     "ou" + Constants.EQUALS + "1.0" + Constants.COMMA +
-                    "ou" + Constants.EQUALS + "%1" + Constants.COMMA +
+                    "ou" + Constants.EQUALS + "{SERVICE_NAME}" + Constants.COMMA +
                     SERVICES_BASE_ROOT_DN;
 
     /**
@@ -149,8 +150,14 @@ public class SessionHAFailoverSetupSubConfig implements Constants {
      */
     private static synchronized boolean createServiceSubConfig(SSOToken adminToken, String siteName, String serviceID,
                                                                String serviceName, Map values) throws StoreException {
-        String baseDN = SITE_SESSION_FAILOVER_HA_SERVICES_BASE_DN_TEMPLATE.
-                replace("%1", serviceName);
+        // Establish our Base Root DN Definition.
+        BASE_ROOT_DN = SMSEntry.getRootSuffix();
+        if ( (BASE_ROOT_DN == null) || (BASE_ROOT_DN.isEmpty()) ) {
+            return false;
+        }
+        // Construct our DN for the Entry.
+        String baseDN = getFormattedDNString(SITE_SESSION_FAILOVER_HA_SERVICES_BASE_DN_TEMPLATE,
+                "SERVICE_NAME", serviceName);
         try {
             // Construct ServiceConfigManagerImpl
             ServiceConfigManagerImpl serviceConfigManagerImpl = ServiceConfigManagerImpl.
@@ -180,7 +187,7 @@ public class SessionHAFailoverSetupSubConfig implements Constants {
             // Obtain the Service Configuration Implementation.
             ServiceConfigImpl serviceConfigImpl = ServiceConfigImpl.getInstance(adminToken,
                     serviceConfigManagerImpl, serviceSchema, baseDN,
-                    SM_CONFIG_ROOT_DN, "default", "//" + siteName, true);
+                    BASE_ROOT_DN, "default", "//" + siteName, true);
             if (serviceConfigImpl == null) {
                 DEBUG.error("Unable to dynamically create Site Sub-Service Configuration Element, due to unable to obtain a ServiceConfigImpl");
                 return false;
@@ -213,8 +220,25 @@ public class SessionHAFailoverSetupSubConfig implements Constants {
                     +  "], SMSException: " + smsException.getMessage(), smsException);
         } catch (SSOException ssoException) {
             throw new StoreException("Unable to Dynamically Add the Session HA SF Property for DN:["
-                    + baseDN + "], SSO Exception: " + ssoException.getMessage(), ssoException);
+                    + baseDN + "], OpenAM Exception: " + ssoException.getMessage(), ssoException);
         }
+    }
+
+    /**
+     * Helper method to correctly format a String with a name,value pair.
+     * This uses the include Open Source @see MapFormat Source.
+     *
+     * @param template
+     * @param name - Can be Null.
+     * @param value
+     * @return String of Formatted Template with DN Names resolved.
+     */
+    private static String getFormattedDNString(String template, String name, String value) {
+        Map<String,String> map = new HashMap<String,String>();
+        map.put(BASE_ROOT_DN_NAME, BASE_ROOT_DN); // Always Resolve our Base Root DN with any Template.
+        if ( (name != null) && (!name.isEmpty()) )
+            { map.put(name,value); }
+        return MapFormat.format(template, map);
     }
 
 }
