@@ -301,16 +301,12 @@
     classpath, and provide the class name as Scope Implementation Class.</para>
    </step>
    <step>
-    <para>Let OpenAM set up a policy to protect the authorization endpoint
-    by entering a policy name, rule name, and subject name that remind you
-    what the policy is for, and by entering the endpoint.</para>
-    <para>The endpoint is the URL where you deployed OpenAM, plus the URI
-    <literal>/oauth2/authorize</literal>. For example,
-    <literal>https://openam.example.com:8443/openam/oauth2/authorize</literal>.</para>
-    <para>The policy then appears in the list of policies for the realm.</para>
-   </step>
-   <step>
     <para>Click Create to complete the process.</para>
+
+    <para>In addition to setting up an OAuth 2.0 authorization server for the
+    realm, OpenAM sets up a policy to protect the authorization endpoint.
+    The policy appears in the list of policies for the realm. Its name is
+    <literal>OAuth2ProviderPolicy</literal>.</para>
    </step>
   </procedure>
 
