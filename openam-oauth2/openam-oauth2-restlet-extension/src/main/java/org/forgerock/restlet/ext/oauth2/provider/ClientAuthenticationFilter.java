@@ -23,7 +23,11 @@
  */
 package org.forgerock.restlet.ext.oauth2.provider;
 
+import java.io.*;
+import java.nio.channels.ReadableByteChannel;
+import java.nio.channels.WritableByteChannel;
 import java.util.Collection;
+import java.util.Map;
 
 import com.sun.identity.shared.OAuth2Constants;
 import org.forgerock.openam.oauth2.provider.ClientVerifier;
@@ -34,7 +38,10 @@ import org.restlet.Context;
 import org.restlet.Request;
 import org.restlet.Response;
 import org.restlet.data.ChallengeScheme;
+import org.restlet.data.MediaType;
 import org.restlet.data.Status;
+import org.restlet.ext.jackson.JacksonRepresentation;
+import org.restlet.representation.Representation;
 import org.restlet.security.Authenticator;
 
 /**
@@ -94,6 +101,7 @@ public class ClientAuthenticationFilter extends Authenticator {
                             getVerifier().getRequiredAuthenticationScheme(client_id);
                     // Todo Rechellenge the client
                 }
+                response.setEntity(new JacksonRepresentation<Map>(e.getErrorMessage()));
                 throw e;
             }
         } else {
