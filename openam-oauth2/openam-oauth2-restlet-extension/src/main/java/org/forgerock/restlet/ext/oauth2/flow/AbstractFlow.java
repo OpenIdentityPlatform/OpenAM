@@ -384,11 +384,7 @@ public abstract class AbstractFlow extends ServerResource {
                         OAuth2Utils.getRequestParameter(getRequest(), OAuth2Constants.Params.CLIENT_ID,
                                 String.class);
                 ClientApplication client = null;
-                if (this instanceof ImplicitGrantServerResource){
-                    client = getClientVerifier().findClient(client_id, getRequest());
-                } else {
-                    client = getClientVerifier().verify(getRequest(), getResponse());
-                }
+                client = getClientVerifier().findClient(client_id, getRequest());
                 if (null != client) {
                     return new OAuth2Client(client);
                 } else {
