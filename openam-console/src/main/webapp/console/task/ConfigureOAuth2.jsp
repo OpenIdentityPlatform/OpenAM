@@ -116,20 +116,12 @@ function getData(){
    var atl = frm.elements['ConfigureOAuth2.choiceTokenLifetime'].value;
    var irt = frm.elements['ConfigureOAuth2.choiceRefreshToken'].value;
    var sic = frm.elements['ConfigureOAuth2.choiceScopeImpl'].value;
-   var pn = frm.elements['ConfigureOAuth2.choicePolicyName'].value;
-   var rn = frm.elements['ConfigureOAuth2.choicePolicyRuleName'].value;
-   var sn = frm.elements['ConfigureOAuth2.choicePolicySubjectName'].value;
-   var policyURL = frm.elements['ConfigureOAuth2.choicePolicyURL'].value;
    return "&realm=" + escapeEx(realm) +
            "&rtl=" + escapeEx(rtl) +
            "&acl=" + escapeEx(acl) +
            "&atl=" + escapeEx(atl) +
            "&irt=" + escapeEx(irt) +
-           "&sic=" + escapeEx(sic) +
-           "&pn=" + escapeEx(pn) +
-           "&rn=" + escapeEx(rn) +
-           "&sn=" + escapeEx(sn) +
-           "&policyURL=" + escapeEx(policyURL);
+           "&sic=" + escapeEx(sic);
 }
  
 function submitPage() {

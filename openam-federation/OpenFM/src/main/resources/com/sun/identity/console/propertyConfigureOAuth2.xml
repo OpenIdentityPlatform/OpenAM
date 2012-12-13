@@ -71,26 +71,6 @@
         <property>
             <fieldhelp name="helpQuestion3" defaultValue="configure.oauth2.section.policy.help" />
         </property>
-        <property required="true">
-            <label name="lblPolicyName" defaultValue="configure.oauth2.label.policy.policyName" labelFor="choicePolicyName" />
-            <cc name="choicePolicyName" tagclass="com.sun.web.ui.taglib.html.CCTextFieldTag" />
-            <fieldhelp name="helpChoicePolicyName" defaultValue="configure.oauth2.label.policy.policyName.help" />
-        </property>
-        <property required="true">
-            <label name="lblPolicyRuleName" defaultValue="configure.oauth2.label.policy.policyRuleName" labelFor="choicePolicyRuleName" />
-            <cc name="choicePolicyRuleName" tagclass="com.sun.web.ui.taglib.html.CCTextFieldTag" />
-            <fieldhelp name="helpChoicePolicyRuleName" defaultValue="configure.oauth2.label.policy.policyRuleName.help" />
-        </property>
-        <property required="true">
-            <label name="lblPolicySubjectName" defaultValue="configure.oauth2.label.policy.policySubjectName" labelFor="choicePolicySubjectName" />
-            <cc name="choicePolicySubjectName" tagclass="com.sun.web.ui.taglib.html.CCTextFieldTag" />
-            <fieldhelp name="helpChoicePolicySubjectName" defaultValue="configure.oauth2.label.policy.policySubjectName.help" />
-        </property>
-        <property required="true">
-            <label name="lblPolicyURL" defaultValue="configure.oauth2.label.policy.policyURL" labelFor="choicePolicyURL" />
-            <cc name="choicePolicyURL" tagclass="com.sun.web.ui.taglib.html.CCTextFieldTag" />
-            <fieldhelp name="helpChoicePolicyURL" defaultValue="configure.oauth2.label.policy.policyURL.help" />
-        </property>
     </section>
 
     <section name="question2" defaultValue="configure.oauth2.section.registerClient">
