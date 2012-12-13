@@ -76,6 +76,12 @@ class AMTokenRepositoryFactory {
                         CTS_REPOSITORY_CLASS_NAME+"], is unknown to OpenAM!");
             }
         }
+        // Check if we have gone null during initialization due to offending processing exceptions during instantiation phase.
+        if (amTokenRepository == null) {
+            throw new IllegalAccessError("Unable to instantiate the CTS Persistent Store as Implementation Class:["+
+                    CTS_REPOSITORY_CLASS_NAME+"], failed during Initialization.");
+        }
+        // return the implementation.
         return amTokenRepository;
     }
 

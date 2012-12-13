@@ -42,6 +42,7 @@ import com.sun.identity.shared.debug.Debug;
 import com.sun.identity.shared.ldap.*;
 
 import com.sun.identity.shared.ldap.LDAPException;
+import com.sun.identity.sm.SMSEntry;
 import com.sun.identity.sm.model.*;
 
 import com.sun.identity.tools.objects.MapFormat;
@@ -155,9 +156,10 @@ public class CTSPersistentStore extends GeneralTaskRunnable
     /**
      * Define Global DN and Container Constants
      */
-    // Our default for SM_CONFIG_ROOT_SUFFIX = dc=openam,dc=forgerock,dc=org
-    private static final String SM_CONFIG_ROOT_SUFFIX =
-            SystemPropertiesManager.get(SYS_PROPERTY_SM_CONFIG_ROOT_SUFFIX, Constants.DEFAULT_ROOT_SUFFIX);
+    // Our default Top Level Root Suffix.
+    // This is resolved during Initialization process.
+    private static final String BASE_ROOT_DN_NAME = "BASE_ROOT";
+    private static String BASE_ROOT_DN;
 
     // Our default for TOKEN_ROOT_SUFFIX = ou=tokens
     private static final String TOKEN_ROOT_SUFFIX =
@@ -165,8 +167,8 @@ public class CTSPersistentStore extends GeneralTaskRunnable
                     Constants.DEFAULT_TOKEN_ROOT_SUFFIX);
 
     //  Our default for TOKEN_ROOT = ou=tokens,dc=openam,dc=forgerock,dc=org
-    private static final String TOKEN_ROOT =  TOKEN_ROOT_SUFFIX +
-            Constants.COMMA + SM_CONFIG_ROOT_SUFFIX;
+    private static final String TOKEN_ROOT = TOKEN_ROOT_SUFFIX +
+            Constants.COMMA + "{"+ BASE_ROOT_DN_NAME +"}";
 
     // Our default for TOKEN_SESSION_HA_ROOT_SUFFIX = ou=openam-session
     private static final String TOKEN_SESSION_HA_ROOT_SUFFIX =
@@ -222,19 +224,6 @@ public class CTSPersistentStore extends GeneralTaskRunnable
 
     private static final String TOKEN_OAUTH2_HA_ELEMENT_DN_TEMPLATE =
             OAuth2Constants.Params.ID + Constants.EQUALS + "{"+OAUTH2_KEY_NAME+"}" + Constants.COMMA + OAUTH2_HA_BASE_DN;
-
-    /**
-     * Define all our Top Level DN for Validation.
-     * This DIT hierarchy must exist for this component to operate.
-     *
-     * The Squence of these should be in DIT order.
-     */
-    private static final String[] containersToBeValidated = {
-            SM_CONFIG_ROOT_SUFFIX,
-            SESSION_FAILOVER_HA_BASE_DN,
-            SAML2_HA_BASE_DN,
-            OAUTH2_HA_BASE_DN
-    };
 
     /**
      * Return Attribute Constructs
@@ -420,12 +409,11 @@ public class CTSPersistentStore extends GeneralTaskRunnable
         // *******************************
         // Set up Shutdown Thread Hook.
         Runtime.getRuntime().addShutdownHook(new Thread() {
-            @Override
             public void run() {
                 internalShutdown();
             }
         });
-        // **********************************************************************************************
+        // *************************************************************
         // Obtain our Directory Connection and ensure we can access our
         // Internal Directory Connection or use an External Source as
         // per configuration.
@@ -447,7 +435,6 @@ public class CTSPersistentStore extends GeneralTaskRunnable
     /**
      * Perform Service Shutdown.
      */
-    @Override
     public void shutdown() {
         internalShutdown();
         DEBUG.warning(DB_AM_SHUT.get().toString());
@@ -465,27 +452,37 @@ public class CTSPersistentStore extends GeneralTaskRunnable
      * Service Thread Run Process Loop.
      */
     @SuppressWarnings("SleepWhileInLoop")
-    @Override
     public void run() {
         synchronized (LOCK) {
             while (!shutdown) {
                 try {
                     // Delete any expired Sessions up to now.
                     deleteExpired(Calendar.getInstance());
+                    if (shutdown) {
+                        break; }
                     // Delete any expired SAML2 Artifacts
                     deleteExpiredSAML2Tokens();
+                    if (shutdown) {
+                        break; }
                     // Delete expired OAuth2 tokens
                     oauth2DeleteExpired();
+                    if (shutdown) {
+                        break; }
                     // Process any Deferred Operations
                     processDeferredAMSessionRepositoryOperations();
+                    if (shutdown) {
+                        break; }
                     // Wait for next tick or interrupt.
                     LOCK.wait(SLEEP_INTERVAL);
                 } catch (InterruptedException ie) {
-                    DEBUG.warning(DB_THD_INT.get().toString(), ie);
+                    // very important, when Exception thrown, Interrupt is actually cleared.
+                    // Need to ensure all child loop iterations get killed.
+                    Thread.currentThread().interrupt();
+                    break;
                 } catch (StoreException se) {
                     DEBUG.warning(DB_STR_EX.get().toString(), se);
                 } catch (JsonResourceException e){
-                    DEBUG.error(DB_STR_EX.get().toString(), e);
+                    DEBUG.warning(DB_STR_EX.get().toString(), e);
                 }
             }
         }
@@ -497,7 +494,6 @@ public class CTSPersistentStore extends GeneralTaskRunnable
      * @param obj
      * @return
      */
-    @Override
     public boolean addElement(Object obj) {
         return false;
     }
@@ -508,7 +504,6 @@ public class CTSPersistentStore extends GeneralTaskRunnable
      * @param obj
      * @return
      */
-    @Override
     public boolean removeElement(Object obj) {
         return false;
     }
@@ -518,7 +513,6 @@ public class CTSPersistentStore extends GeneralTaskRunnable
      *
      * @return
      */
-    @Override
     public boolean isEmpty() {
         return true;
     }
@@ -533,7 +527,6 @@ public class CTSPersistentStore extends GeneralTaskRunnable
      * @param is reference to <code>InternalSession</code> object being saved.
      * @throws Exception if anything goes wrong.
      */
-    @Override
     public void save(InternalSession is) throws Exception {
         if (is == null) {
             return;
@@ -572,7 +565,7 @@ public class CTSPersistentStore extends GeneralTaskRunnable
                     type, FAMRecord.WRITE, key, expirationTime, uuid,
                     is.getState(), sid.toString(), serializedInternalSession);
             // Construct the Entry's DN and Persist Record
-            writeImmediate(famRec, getFormattedString(SESSION_FAILOVER_HA_ELEMENT_DN_TEMPLATE, PKEY_NAMING_ATTR, famRec.getPrimaryKey()));
+            writeImmediate(famRec, getFormattedDNString(SESSION_FAILOVER_HA_ELEMENT_DN_TEMPLATE, PKEY_NAMING_ATTR, famRec.getPrimaryKey()));
         } catch (Exception e) {
             DEBUG.error(messageTag + "Failed to Save Session", e);
         }
@@ -585,14 +578,13 @@ public class CTSPersistentStore extends GeneralTaskRunnable
      * @throws com.iplanet.dpro.session.exceptions.StoreException
      *
      */
-    @Override
     public void write(AMRootEntity amRootEntity) throws StoreException {
         if (amRootEntity == null) {
             return;
         }
         // Construct our Entity's DN and Write this AM Root Entity Object now.
         writeImmediate(amRootEntity,
-                getFormattedString(SESSION_FAILOVER_HA_ELEMENT_DN_TEMPLATE, PKEY_NAMING_ATTR,
+                getFormattedDNString(SESSION_FAILOVER_HA_ELEMENT_DN_TEMPLATE, PKEY_NAMING_ATTR,
                         amRootEntity.getPrimaryKey()));
     }
 
@@ -611,12 +603,12 @@ public class CTSPersistentStore extends GeneralTaskRunnable
             // Assume we are Adding the Entry.
             storeImmediate(amRootEntity, baseDN);
             // Log Action
-            logAMRootEntity(amRootEntity, "CTSPersistenceStore.storeImmediate: \nBaseDN:[" + baseDN.toString() + "] ");
+            logAMRootEntity(amRootEntity, "CTSPersistenceStore.storeImmediate: \nBaseDN:[" + getFormattedDNString(baseDN, null, null).toString() + "] ");
         } catch (EntryAlreadyExistsException entryAlreadyExistsException) {
             // Update / Modify existing Entry.
             updateImmediate(amRootEntity, baseDN);
             // Log Action
-            logAMRootEntity(amRootEntity, "CTSPersistenceStore.updateImmediate: \nBaseDN:[" + baseDN.toString() + "] ");
+            logAMRootEntity(amRootEntity, "CTSPersistenceStore.updateImmediate: \nBaseDN:[" + getFormattedDNString(baseDN, null, null).toString() + "] ");
         }
     }
 
@@ -654,24 +646,24 @@ public class CTSPersistentStore extends GeneralTaskRunnable
                 ldapAttributeSet.add(ldapAttribute);
             }
             // Add the new Directory Entry.
-            LDAPEntry ldapEntry = new LDAPEntry(baseDN, ldapAttributeSet);
+            LDAPEntry ldapEntry = new LDAPEntry(getFormattedDNString(baseDN, null, null), ldapAttributeSet);
             ldapConnection.add(ldapEntry);
             if (DEBUG.messageEnabled()) {
-                final LocalizableMessage message = DB_SVR_CREATE.get(baseDN);
+                final LocalizableMessage message = DB_SVR_CREATE.get(getFormattedDNString(baseDN, null, null));
                 DEBUG.message(messageTag + message.toString());
             }
         } catch (LDAPException ldapException) {
             lastLDAPException = ldapException;
             if (ldapException.getLDAPResultCode() == LDAPException.ENTRY_ALREADY_EXISTS) {
-                final LocalizableMessage message = DB_SVR_CRE_FAIL.get(baseDN);
+                final LocalizableMessage message = DB_SVR_CRE_FAIL.get(getFormattedDNString(baseDN, null, null));
                 DEBUG.warning(messageTag + message.toString());
                 throw new EntryAlreadyExistsException(message.toString());
             } else if (ldapException.getLDAPResultCode() == LDAPException.OBJECT_CLASS_VIOLATION) {
                 // This usually indicates schema has not been applied to the Directory Information Base (DIB) Instance.
-                final LocalizableMessage message = OBJECTCLASS_VIOLATION.get(baseDN);
+                final LocalizableMessage message = OBJECTCLASS_VIOLATION.get(getFormattedDNString(baseDN, null, null));
                 DEBUG.warning(messageTag + message.toString());
             } else {
-                final LocalizableMessage message = DB_SVR_CRE_FAIL2.get(baseDN, Integer.toString(ldapException.getLDAPResultCode()));
+                final LocalizableMessage message = DB_SVR_CRE_FAIL2.get(getFormattedDNString(baseDN, null, null), Integer.toString(ldapException.getLDAPResultCode()));
                 DEBUG.warning(message.toString());
                 throw new StoreException(messageTag + message.toString(), ldapException);
             }
@@ -714,24 +706,24 @@ public class CTSPersistentStore extends GeneralTaskRunnable
                 } // End of Inner For Each Attribute Iteration.
             } // End of Inner For Each Modification Iteration.
             // Now Perform the Modification of the Object.
-            ldapConnection.modify(baseDN, ldapModificationSet);
+            ldapConnection.modify(getFormattedDNString(baseDN, null, null), ldapModificationSet);
             if (DEBUG.messageEnabled()) {
-                final LocalizableMessage message = DB_SVR_MOD.get(baseDN);
+                final LocalizableMessage message = DB_SVR_MOD.get(getFormattedDNString(baseDN, null, null));
                 DEBUG.message(message.toString());
             }
         } catch (LDAPException ldapException) {
             lastLDAPException = ldapException;
             // Not Found  No Such Object
             if (ldapException.getLDAPResultCode() == LDAPException.NO_SUCH_OBJECT) {
-                final LocalizableMessage message = DB_ENT_NOT_P.get(baseDN);
+                final LocalizableMessage message = DB_ENT_NOT_P.get(getFormattedDNString(baseDN, null, null));
                 DEBUG.warning(message.toString());
             } else if (ldapException.getLDAPResultCode() == LDAPException.OBJECT_CLASS_VIOLATION) {
                 // This usually indicates schema has not been applied to the Directory Information Base (DIB) Instance.
-                final LocalizableMessage message = OBJECTCLASS_VIOLATION.get(baseDN);
+                final LocalizableMessage message = OBJECTCLASS_VIOLATION.get(getFormattedDNString(baseDN, null, null));
                 DEBUG.warning(message.toString());
             } else {
                 // Other Issue Detected.
-                final LocalizableMessage message = DB_SVR_MOD_FAIL.get(baseDN, ldapException.errorCodeToString());
+                final LocalizableMessage message = DB_SVR_MOD_FAIL.get(getFormattedDNString(baseDN, null, null), ldapException.errorCodeToString());
                 DEBUG.warning(message.toString());
                 throw new StoreException(message.toString());
             }
@@ -773,7 +765,6 @@ public class CTSPersistentStore extends GeneralTaskRunnable
      * @throws com.iplanet.dpro.session.exceptions.NotFoundException
      *
      */
-    @Override
     public void delete(String id) throws StoreException, NotFoundException {
         deleteImmediate(id);
     }
@@ -784,7 +775,6 @@ public class CTSPersistentStore extends GeneralTaskRunnable
      * @param sid session ID.
      * @throws Exception if anything goes wrong.
      */
-    @Override
     public void delete(SessionID sid) throws Exception {
         deleteImmediate(sid);
     }
@@ -814,7 +804,7 @@ public class CTSPersistentStore extends GeneralTaskRunnable
         String messageTag = "CTSPersistenceStore.deleteImmediate: ";
         LDAPConnection ldapConnection = null;
         LDAPException lastLDAPException = null;
-        String baseDN = getFormattedString(SESSION_FAILOVER_HA_ELEMENT_DN_TEMPLATE, PKEY_NAMING_ATTR, id);
+        String baseDN = getFormattedDNString(SESSION_FAILOVER_HA_ELEMENT_DN_TEMPLATE, PKEY_NAMING_ATTR, id);
         try {
             // Obtain a Connection.
             ldapConnection = getDirectoryConnection();
@@ -845,7 +835,6 @@ public class CTSPersistentStore extends GeneralTaskRunnable
      *
      * @throws Exception
      */
-    @Override
     public void deleteExpired() throws Exception {
         deleteExpired(Calendar.getInstance());
     }
@@ -878,7 +867,7 @@ public class CTSPersistentStore extends GeneralTaskRunnable
         timeDuration.start();
         try {
             // Initialize Filter.
-            String filter = getFormattedString(TOKEN_EXPIRATION_FILTER_TEMPLATE,
+            String filter = getFormattedDNString(TOKEN_EXPIRATION_FILTER_TEMPLATE,
                     FORMATTED_EXPIRATION_DATE_NAME, formattedExpirationDate);
             if (DEBUG.messageEnabled()) {
                 DEBUG.error(messageTag + "Searching Expired Sessions Older than:["
@@ -891,7 +880,7 @@ public class CTSPersistentStore extends GeneralTaskRunnable
             LDAPSearchConstraints ldapSearchConstraints = new LDAPSearchConstraints();
             ldapSearchConstraints.setMaxResults(EXPIRED_SESSION_SEARCH_LIMIT);
             // Perform Search
-            LDAPSearchResults searchResults = ldapConnection.search(SESSION_FAILOVER_HA_BASE_DN,
+            LDAPSearchResults searchResults = ldapConnection.search(getFormattedDNString(SESSION_FAILOVER_HA_BASE_DN, null, null),
                     LDAPv2.SCOPE_SUB, filter.toString(), returnAttrs_PKEY_ONLY_ARRAY, false, ldapSearchConstraints);
             // Anything Found?
             if ((searchResults == null) || (!searchResults.hasMoreElements())) {
@@ -899,6 +888,10 @@ public class CTSPersistentStore extends GeneralTaskRunnable
             }
             // Iterate over results and delete each entry.
             while (searchResults.hasMoreElements()) {
+                // Check if in Shutdown Mode.
+                if (shutdown) {
+                    break;
+                }
                 LDAPEntry ldapEntry = searchResults.next();
                 if (ldapEntry == null) {
                     continue;
@@ -929,15 +922,13 @@ public class CTSPersistentStore extends GeneralTaskRunnable
                 return;
             } else {
                 // Some other type of Error has occurred...
-                final LocalizableMessage message = DB_ENT_ACC_FAIL.get(SESSION_FAILOVER_HA_BASE_DN, ldapException.errorCodeToString());
+                final LocalizableMessage message = DB_ENT_ACC_FAIL.get(getFormattedDNString(SESSION_FAILOVER_HA_BASE_DN, null, null), ldapException.errorCodeToString());
                 DEBUG.error(messageTag + message.toString(), ldapException);
                 throw new StoreException(messageTag + message.toString(), ldapException);
             }
         } catch (Exception ex) {
             // Are we in Shutdown Mode?
             if (!shutdown) {
-                DEBUG.error(DB_ENT_EXP_FAIL.get().toString(), ex);
-            } else {
                 DEBUG.error(DB_ENT_EXP_FAIL.get().toString(), ex);
             }
         } finally {
@@ -959,7 +950,6 @@ public class CTSPersistentStore extends GeneralTaskRunnable
      * @return InternalSession
      * @throws Exception
      */
-    @Override
     public InternalSession retrieve(SessionID sid) throws Exception {
         String messageTag = "CTSPersistenceStore.retrieve: ";
         try {
@@ -1002,7 +992,6 @@ public class CTSPersistentStore extends GeneralTaskRunnable
      * @throws Exception if there is any problem with accessing the session
      *                   repository.
      */
-    @Override
     public Map<String, String> getSessionsByUUID(String uuid) throws SessionException {
         try {
             AMRecord amRecord = (AMRecord) this.read(uuid);
@@ -1023,14 +1012,13 @@ public class CTSPersistentStore extends GeneralTaskRunnable
      * @throws NotFoundException
      * @throws StoreException
      */
-    @Override
     public AMRootEntity read(String id)
             throws NotFoundException, StoreException {
         if ((id == null) || (id.isEmpty())) {
             return null;
         }
         // Establish our DN
-        String baseDN = getFormattedString(SESSION_FAILOVER_HA_ELEMENT_DN_TEMPLATE, PKEY_NAMING_ATTR, id);
+        String baseDN = getFormattedDNString(SESSION_FAILOVER_HA_ELEMENT_DN_TEMPLATE, PKEY_NAMING_ATTR, id);
         // Initialize LDAP Objects
         LDAPConnection ldapConnection = null;
         LDAPSearchResults searchResults = null;
@@ -1084,7 +1072,6 @@ public class CTSPersistentStore extends GeneralTaskRunnable
      * @throws StoreException
      * @throws NotFoundException
      */
-    @Override
     public Set<String> readWithSecKey(String id)
             throws StoreException, NotFoundException {
         if ((id == null) || (id.isEmpty())) {
@@ -1094,7 +1081,7 @@ public class CTSPersistentStore extends GeneralTaskRunnable
         filter.append(SKEY_FILTER_PRE).append(id).append(SKEY_FILTER_POST);
         String messageTag = "CTSPersistenceStore.readWithSecKey: ";
         if (DEBUG.messageEnabled()) {
-            DEBUG.message(messageTag + "Attempting Read of BaseDN:[" + SESSION_FAILOVER_HA_BASE_DN + "]");
+            DEBUG.message(messageTag + "Attempting Read of BaseDN:[" + getFormattedDNString(SESSION_FAILOVER_HA_BASE_DN, null, null) + "]");
         }
         // Initialize LDAP Objects
         LDAPConnection ldapConnection = null;
@@ -1108,7 +1095,7 @@ public class CTSPersistentStore extends GeneralTaskRunnable
             LDAPSearchConstraints ldapSearchConstraints = new LDAPSearchConstraints();
             ldapSearchConstraints.setMaxResults(0);
             // Perform the Search.
-            searchResults = ldapConnection.search(SESSION_FAILOVER_HA_BASE_DN,
+            searchResults = ldapConnection.search(getFormattedDNString(SESSION_FAILOVER_HA_BASE_DN, null, null),
                     LDAPv2.SCOPE_ONE, filter.toString(), returnAttrs_ARRAY, false, ldapSearchConstraints);
             // Anything Found?
             if ((searchResults == null) || (!searchResults.hasMoreElements())) {
@@ -1165,7 +1152,6 @@ public class CTSPersistentStore extends GeneralTaskRunnable
      * @return Map<String, Long>
      * @throws StoreException
      */
-    @Override
     public Map<String, Long> getRecordCount(String id)
             throws StoreException {
         if ((id == null) || (id.isEmpty())) {
@@ -1186,7 +1172,7 @@ public class CTSPersistentStore extends GeneralTaskRunnable
             LDAPSearchConstraints ldapSearchConstraints = new LDAPSearchConstraints();
             ldapSearchConstraints.setMaxResults(0);
             // Perform the Search.
-            searchResults = ldapConnection.search(SESSION_FAILOVER_HA_BASE_DN,
+            searchResults = ldapConnection.search(getFormattedDNString(SESSION_FAILOVER_HA_BASE_DN, null, null),
                     LDAPv2.SCOPE_ONE, filter.toString(), returnAttrs_ARRAY, false, ldapSearchConstraints);
             // Anything Found?
             if ((searchResults == null) || (!searchResults.hasMoreElements())) {
@@ -1232,11 +1218,11 @@ public class CTSPersistentStore extends GeneralTaskRunnable
         } catch (LDAPException ldapException) {
             lastLDAPException = ldapException;
             if (ldapException.getLDAPResultCode() == LDAPException.NO_SUCH_OBJECT) {
-                final LocalizableMessage message = DB_ENT_NOT_P.get(SESSION_FAILOVER_HA_BASE_DN);
+                final LocalizableMessage message = DB_ENT_NOT_P.get(getFormattedDNString(SESSION_FAILOVER_HA_BASE_DN, null, null));
                 DEBUG.message(messageTag + message.toString());
                 return null;
             } else {
-                final LocalizableMessage message = DB_ENT_ACC_FAIL.get(SESSION_FAILOVER_HA_BASE_DN,
+                final LocalizableMessage message = DB_ENT_ACC_FAIL.get(getFormattedDNString(SESSION_FAILOVER_HA_BASE_DN, null, null),
                         ldapException.errorCodeToString());
                 DEBUG.warning(messageTag + message.toString());
                 throw new StoreException(messageTag + message.toString());
@@ -1254,7 +1240,6 @@ public class CTSPersistentStore extends GeneralTaskRunnable
      *
      * @return
      */
-    @Override
     public DBStatistics getDBStatistics() {
         DBStatistics stats = DBStatistics.getInstance();
         // TODO Build out proper Statistics.
@@ -1266,7 +1251,6 @@ public class CTSPersistentStore extends GeneralTaskRunnable
      *
      * @return long current run period.
      */
-    @Override
     public long getRunPeriod() {
         return runPeriod;
     }
@@ -1295,7 +1279,7 @@ public class CTSPersistentStore extends GeneralTaskRunnable
             return null;
         }
         // Establish our DN
-        String baseDN = getFormattedString(TOKEN_SAML2_HA_ELEMENT_DN_TEMPLATE, SAML2_KEY_NAME, AMRecordDataEntry.encodeKey(samlKey));
+        String baseDN = getFormattedDNString(TOKEN_SAML2_HA_ELEMENT_DN_TEMPLATE, SAML2_KEY_NAME, AMRecordDataEntry.encodeKey(samlKey));
         // Initialize LDAP Objects
         LDAPConnection ldapConnection = null;
         LDAPSearchResults searchResults = null;
@@ -1357,7 +1341,7 @@ public class CTSPersistentStore extends GeneralTaskRunnable
         StringBuilder filter = new StringBuilder();
         filter.append(SKEY_FILTER_PRE).append(AMRecordDataEntry.encodeKey(secKey)).append(SKEY_FILTER_POST);
         if (DEBUG.messageEnabled()) {
-            DEBUG.message(messageTag + "Attempting Read of BaseDN:[" + SAML2_HA_BASE_DN + "]");
+            DEBUG.message(messageTag + "Attempting Read of BaseDN:[" + getFormattedDNString(SAML2_HA_BASE_DN, null, null) + "]");
         }
         // Initialize LDAP Objects
         LDAPConnection ldapConnection = null;
@@ -1371,7 +1355,7 @@ public class CTSPersistentStore extends GeneralTaskRunnable
             LDAPSearchConstraints ldapSearchConstraints = new LDAPSearchConstraints();
             ldapSearchConstraints.setMaxResults(0);
             // Perform the Search.
-            searchResults = ldapConnection.search(SESSION_FAILOVER_HA_BASE_DN,
+            searchResults = ldapConnection.search(getFormattedDNString(SAML2_HA_BASE_DN, null, null),
                     LDAPv2.SCOPE_ONE, filter.toString(), returnAttrs_ARRAY, false, ldapSearchConstraints);
             // Anything Found?
             if ((searchResults == null) || (!searchResults.hasMoreElements())) {
@@ -1438,7 +1422,7 @@ public class CTSPersistentStore extends GeneralTaskRunnable
                     ((secKey==null) ? secKey: AMRecordDataEntry.encodeKey(secKey)),
                     1, null, serializedInternalSession);
             // Construct the Entry's DN and Persist Record
-            writeImmediate(famRec, getFormattedString(TOKEN_SAML2_HA_ELEMENT_DN_TEMPLATE, SAML2_KEY_NAME, famRec.getPrimaryKey()));
+            writeImmediate(famRec, getFormattedDNString(TOKEN_SAML2_HA_ELEMENT_DN_TEMPLATE, SAML2_KEY_NAME, famRec.getPrimaryKey()));
         } catch (Exception e) {
             DEBUG.error("Failed to Save SAML2 Token", e);
         }
@@ -1469,8 +1453,8 @@ public class CTSPersistentStore extends GeneralTaskRunnable
         // Initialize.
         LDAPConnection ldapConnection = null;
         LDAPException lastLDAPException = null;
-        String baseDN = getFormattedString(TOKEN_SAML2_HA_ELEMENT_DN_TEMPLATE, SAML2_KEY_NAME,
-                ((encodePrimaryKey)?AMRecordDataEntry.encodeKey(samlKey):samlKey) );
+        String baseDN = getFormattedDNString(TOKEN_SAML2_HA_ELEMENT_DN_TEMPLATE, SAML2_KEY_NAME,
+                ((encodePrimaryKey) ? AMRecordDataEntry.encodeKey(samlKey) : samlKey));
         try {
             // Obtain a Connection.
             ldapConnection = getDirectoryConnection();
@@ -1516,7 +1500,7 @@ public class CTSPersistentStore extends GeneralTaskRunnable
         timeDuration.start();
         try {
             // Initialize Filter.
-            String filter = getFormattedString(TOKEN_EXPIRATION_FILTER_TEMPLATE, FORMATTED_EXPIRATION_DATE_NAME, formattedExpirationDate);
+            String filter = getFormattedDNString(TOKEN_EXPIRATION_FILTER_TEMPLATE, FORMATTED_EXPIRATION_DATE_NAME, formattedExpirationDate);
             if (DEBUG.messageEnabled()) {
                 DEBUG.error(messageTag + "Searching Expired Sessions Older than:["
                         + formattedExpirationDate + "]");
@@ -1528,7 +1512,7 @@ public class CTSPersistentStore extends GeneralTaskRunnable
             LDAPSearchConstraints ldapSearchConstraints = new LDAPSearchConstraints();
             ldapSearchConstraints.setMaxResults(EXPIRED_SESSION_SEARCH_LIMIT);
             // Perform Search
-            LDAPSearchResults searchResults = ldapConnection.search(SAML2_HA_BASE_DN,
+            LDAPSearchResults searchResults = ldapConnection.search(getFormattedDNString(SAML2_HA_BASE_DN, null, null),
                     LDAPv2.SCOPE_SUB, filter.toString(), returnAttrs_PKEY_ONLY_ARRAY, false, ldapSearchConstraints);
             // Anything Found?
             if ((searchResults == null) || (!searchResults.hasMoreElements())) {
@@ -1536,6 +1520,10 @@ public class CTSPersistentStore extends GeneralTaskRunnable
             }
             // Iterate over results and delete each entry.
             while (searchResults.hasMoreElements()) {
+                // Check if in Shutdown Mode.
+                if (shutdown) {
+                    break;
+                }
                 LDAPEntry ldapEntry = searchResults.next();
                 if (ldapEntry == null) {
                     continue;
@@ -1566,15 +1554,13 @@ public class CTSPersistentStore extends GeneralTaskRunnable
                 return;
             } else {
                 // Some other type of Error has occurred...
-                final LocalizableMessage message = DB_ENT_ACC_FAIL.get(SAML2_HA_BASE_DN, ldapException.errorCodeToString());
+                final LocalizableMessage message = DB_ENT_ACC_FAIL.get(getFormattedDNString(SAML2_HA_BASE_DN, null, null), ldapException.errorCodeToString());
                 DEBUG.error(messageTag + message.toString(), ldapException);
                 throw new StoreException(messageTag + message.toString(), ldapException);
             }
         } catch (Exception ex) {
             // Are we in Shutdown Mode?
             if (!shutdown) {
-                DEBUG.error(DB_ENT_EXP_FAIL.get().toString(), ex);
-            } else {
                 DEBUG.error(DB_ENT_EXP_FAIL.get().toString(), ex);
             }
         } finally {
@@ -1607,6 +1593,10 @@ public class CTSPersistentStore extends GeneralTaskRunnable
         for (AMSessionRepositoryDeferredOperation amSessionRepositoryDeferredOperation :
                 amSessionRepositoryDeferredOperationConcurrentLinkedQueue) {
             count++;
+            // Check if in Shutdown Mode.
+            if (shutdown) {
+                break;
+            }
 
             // TODO -- Build out Implementation to invoke Session Repository Events.
             // TODO -- Add Statistics Gathering for Post to Admin Statistics View.
@@ -1680,27 +1670,24 @@ public class CTSPersistentStore extends GeneralTaskRunnable
      */
     private synchronized static void prepareCTSPersistenceStore() throws StoreException {
         String messageTag = "CTSPersistenceStore.prepareCTSPersistenceStore: ";
-        DEBUG.message(messageTag + "Attempting to Prepare BackEnd Persistence Store for Session Services.");
+        DEBUG.message(messageTag + "Attempting to Prepare BackEnd Persistence Store for CTS Services.");
         try {
             CTSDataLayer = CTSDataLayer.getSharedSMDataLayerAccessor();
             if (CTSDataLayer == null) {
-                throw new StoreException("Unable to obtain BackEnd Persistence Store for Session Services.");
+                throw new StoreException("Unable to obtain BackEnd Persistence Store for CTS Services.");
             }
         } catch (Exception e) {
             DEBUG.error("Exception Occurred during attempt to access shared SM Data Layer!", e);
             throw new StoreException(e);
         }
-        // Now Exercise and Validate the
-        // LDAP Connection from the Pool and perform a Read of our DIT Container to verify setup.
-        if (!validateCTSPersistenceStore()) {
-            String message = "Validation of BackEnd Persistent Store was unsuccessful!\n" +
-                    "Please Verify DIT Structure in OpenAM Configuration Directory.";
-            DEBUG.error(messageTag + message);
-            throw new StoreException(messageTag + message);
+        // Obtain our Root DN to use as out Base DN.
+        BASE_ROOT_DN = SMSEntry.getRootSuffix();
+        if ( (BASE_ROOT_DN == null) || (BASE_ROOT_DN.isEmpty()) ) {
+            throw new StoreException("Unable to obtain Base Root DN from SMSEntry.getRootSuffix() method call!");
         }
         // Show Informational Message.
         if (DEBUG.messageEnabled()) {
-            DEBUG.message(messageTag + "Successfully Prepared BackEnd Persistence Store for Session Services.");
+            DEBUG.message(messageTag + "Successfully Prepared BackEnd Persistent Store for CTS Services.");
         }
     }
 
@@ -1721,70 +1708,6 @@ public class CTSPersistentStore extends GeneralTaskRunnable
     }
 
     /**
-     * Private Helper Method to perform Validation of our LDAP Connection and
-     * the existence of our DIT hierarchy which this component requires.
-     *
-     * @return boolean - indicates if validation was successful or not.
-     * @throws StoreException - Exception thrown if Error condition exists.
-     */
-    private static boolean validateCTSPersistenceStore() throws StoreException {
-        // Iterate over our Token DIT Structure to Verify.
-        Map<String, Boolean> validationResultMap = new HashMap<String, Boolean>(containersToBeValidated.length);
-        for(String ctsTopLevelDN : containersToBeValidated) {
-            validationResultMap.put(ctsTopLevelDN, instance.doesDNExist(ctsTopLevelDN));
-        }
-        // Now Iterate over the Validation Result Map to supply information, especially if we have
-        // detected something missing...
-        int validatedSuccessfully=0;
-        for(String ctsTopLevelDN : validationResultMap.keySet()) {
-            if (validationResultMap.get(ctsTopLevelDN).booleanValue()) {
-                validatedSuccessfully++;
-            } else {
-                final LocalizableMessage message = DB_ENT_NOT_P.get(ctsTopLevelDN);
-                DEBUG.message("CTSPersistenceStore.validateCTSPersistenceStore: " + message.toString());
-            }
-        } // End of KeySet for each loop...
-        // Determine if we are good to go or not....
-        return (containersToBeValidated.length == validatedSuccessfully);
-    }
-
-    /**
-     * Private Helper method, Does DN Exist?
-     *
-     * @param dn - To be Check for Existence.
-     * @return boolean - indicator, "True" if DN has been Found, otherwise "False".
-     */
-    private boolean doesDNExist(final String dn) throws StoreException {
-        LDAPConnection ldapConnection = null;
-        LDAPException lastLDAPException = null;
-        try {
-            // Obtain a Connection.
-            ldapConnection = getDirectoryConnection();
-            // Perform the Search.
-            LDAPSearchResults searchResults = ldapConnection.search(dn,
-                    LDAPv2.SCOPE_BASE, ANY_OBJECTCLASS_FILTER, returnAttrs_DN_ONLY_ARRAY, false, new LDAPSearchConstraints());
-            if ((searchResults == null) || (!searchResults.hasMoreElements())) {
-                return false;
-            }
-            return true;
-        } catch (LDAPException ldapException) {
-            lastLDAPException = ldapException;
-            if (ldapException.getLDAPResultCode() == LDAPException.NO_SUCH_OBJECT) {
-                return false;
-            }
-            DEBUG.error("CTSPersistenceStore.doesDNExist:Exception Occurred, Unable to Perform method," +
-                    " Directory Error Code: " + ldapException.errorCodeToString() +
-                    " Directory Exception: " + ldapException.errorCodeToString(), ldapException);
-            return false;
-        } finally {
-            if (ldapConnection != null) {
-                // Release the Connection.
-                CTSDataLayer.releaseConnection(ldapConnection, lastLDAPException);
-            }
-        }
-    }
-
-    /**
      * Private helper method to properly format the Expiration Date
      * for a proper LDAP Date Attribute Query.
      *
@@ -1796,30 +1719,19 @@ public class CTSPersistentStore extends GeneralTaskRunnable
     }
 
     /**
-     * Simple Helper Method to convert a Time represented as a Long in
-     * Milliseconds to a Calendar object.
-     *
-     * @param expirationDate
-     * @return Calendar Object set to Expiration Date.
-     */
-    private static Calendar getFormattedExpirationDate(long expirationDate) {
-        Calendar expirationDateOnCalendar = Calendar.getInstance();
-        expirationDateOnCalendar.setTimeInMillis(expirationDate);
-        return expirationDateOnCalendar;
-    }
-
-    /**
      * Helper method to correctly format a String with a name,value pair.
      * This uses the include Open Source @see MapFormat Source.
      *
      * @param template
-     * @param name
+     * @param name - Can be Null.
      * @param value
-     * @return String of Formatted Template
+     * @return String of Formatted Template with DN Names resolved.
      */
-    private static String getFormattedString(String template, String name, String value) {
+    private static String getFormattedDNString(String template, String name, String value) {
         Map<String,String> map = new HashMap<String,String>();
-        map.put(name,value);
+        map.put(BASE_ROOT_DN_NAME, BASE_ROOT_DN); // Always Resolve our Base Root DN with any Template.
+        if ( (name != null) && (!name.isEmpty()) )
+            { map.put(name,value); }
         return MapFormat.format(template, map);
     }
 
@@ -1844,7 +1756,7 @@ public class CTSPersistentStore extends GeneralTaskRunnable
         List<RawAttribute> attrList = token.getAttrList();
         attrList.addAll(token.getObjectClasses());
 
-        String dn = getFormattedString(TOKEN_OAUTH2_HA_ELEMENT_DN_TEMPLATE, OAUTH2_KEY_NAME, token.getDN());
+        String dn = getFormattedDNString(TOKEN_OAUTH2_HA_ELEMENT_DN_TEMPLATE, OAUTH2_KEY_NAME, token.getDN());
 
         LDAPAttributeSet ldapAttributeSet = new LDAPAttributeSet();
         // Obtain a Connection.
@@ -1906,7 +1818,7 @@ public class CTSPersistentStore extends GeneralTaskRunnable
         }
         // Establish our DN
         String dn = request.get("id").required().asString();
-        String baseDN = getFormattedString(TOKEN_OAUTH2_HA_ELEMENT_DN_TEMPLATE, OAUTH2_KEY_NAME, dn);
+        String baseDN = getFormattedDNString(TOKEN_OAUTH2_HA_ELEMENT_DN_TEMPLATE, OAUTH2_KEY_NAME, dn);
         // Initialize LDAP Objects
         LDAPConnection ldapConnection = null;
         LDAPSearchResults searchResults = null;
@@ -1971,7 +1883,7 @@ public class CTSPersistentStore extends GeneralTaskRunnable
         }
 
         String id = request.get("id").required().asString();
-        String dn = getFormattedString(TOKEN_OAUTH2_HA_ELEMENT_DN_TEMPLATE, OAUTH2_KEY_NAME, id);
+        String dn = getFormattedDNString(TOKEN_OAUTH2_HA_ELEMENT_DN_TEMPLATE, OAUTH2_KEY_NAME, id);
 
         String messageTag = "CTSPersistenceStore.oauth2Delete: ";
         LDAPConnection ldapConnection = null;
@@ -2028,7 +1940,7 @@ public class CTSPersistentStore extends GeneralTaskRunnable
             filter.append(")");
         }
         StringBuilder baseDN = new StringBuilder();
-        baseDN.append(OAUTH2_HA_BASE_DN);
+        baseDN.append(getFormattedDNString(OAUTH2_HA_BASE_DN, null, null));
 
         String messageTag = "CTSPersistenceStore.oauth2Query: ";
         LDAPConnection ldapConnection = null;
@@ -2050,6 +1962,10 @@ public class CTSPersistentStore extends GeneralTaskRunnable
             }
             // Iterate over results and delete each entry.
             while (searchResults.hasMoreElements()) {
+                // Check if in Shutdown Mode.
+                if (shutdown) {
+                    break;
+                }
                 LDAPEntry ldapEntry = searchResults.next();
                 if (ldapEntry == null) {
                     continue;
@@ -2074,15 +1990,13 @@ public class CTSPersistentStore extends GeneralTaskRunnable
                 throw new JsonResourceException(JsonResourceException.INTERNAL_ERROR);
             } else {
                 // Some other type of Error has occurred...
-                final LocalizableMessage message = DB_ENT_ACC_FAIL.get(OAUTH2_HA_BASE_DN, ldapException.errorCodeToString());
+                final LocalizableMessage message = DB_ENT_ACC_FAIL.get(getFormattedDNString(OAUTH2_HA_BASE_DN, null, null), ldapException.errorCodeToString());
                 DEBUG.error(messageTag + message.toString(), ldapException);
                 throw new JsonResourceException(JsonResourceException.INTERNAL_ERROR, messageTag + message.toString(), ldapException);
             }
         } catch (Exception ex) {
             // Are we in Shutdown Mode?
             if (!shutdown) {
-                DEBUG.error(DB_ENT_EXP_FAIL.get().toString(), ex);
-            } else {
                 DEBUG.error(DB_ENT_EXP_FAIL.get().toString(), ex);
             }
         } finally {
@@ -2100,7 +2014,7 @@ public class CTSPersistentStore extends GeneralTaskRunnable
         StringBuilder baseDN = new StringBuilder();
         StringBuilder filter = new StringBuilder();
         filter.append(EXPDATE_FILTER_PRE_OAUTH).append(System.currentTimeMillis()).append(EXPDATE_FILTER_POST_OAUTH);
-        baseDN.append(OAUTH2_HA_BASE_DN);
+        baseDN.append(getFormattedDNString(OAUTH2_HA_BASE_DN, null, null));
 
         String messageTag = "CTSPersistenceStore.oauth2DeleteExpired: ";
         LDAPConnection ldapConnection = null;
@@ -2153,7 +2067,7 @@ public class CTSPersistentStore extends GeneralTaskRunnable
                 return;
             } else {
                 // Some other type of Error has occurred...
-                final LocalizableMessage message = DB_ENT_ACC_FAIL.get(OAUTH2_HA_BASE_DN, ldapException.errorCodeToString());
+                final LocalizableMessage message = DB_ENT_ACC_FAIL.get(getFormattedDNString(OAUTH2_HA_BASE_DN, null, null), ldapException.errorCodeToString());
                 DEBUG.error(messageTag + message.toString(), ldapException);
                 throw new JsonResourceException(JsonResourceException.INTERNAL_ERROR, messageTag + message.toString(), ldapException);
             }
@@ -2191,7 +2105,7 @@ public class CTSPersistentStore extends GeneralTaskRunnable
         String messageTag = "CTSPersistenceStore.oauth2Delete: ";
         LDAPConnection ldapConnection = null;
         LDAPException lastLDAPException = null;
-        String baseDN = getFormattedString(TOKEN_OAUTH2_HA_ELEMENT_DN_TEMPLATE, OAUTH2_KEY_NAME, id);
+        String baseDN = getFormattedDNString(TOKEN_OAUTH2_HA_ELEMENT_DN_TEMPLATE, OAUTH2_KEY_NAME, id);
         try {
             // Obtain a Connection.
             ldapConnection = getDirectoryConnection();
