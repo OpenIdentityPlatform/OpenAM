@@ -1,0 +1,9 @@
+SUNWprivate_1.0 {
+	global:
+		FilterInit;
+		HttpFilterProc;
+		TerminateFilter;
+
+	local:
+		*;
+};

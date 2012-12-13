@@ -1,0 +1,87 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!--
+   DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
+  
+   Copyright (c) 2009 Sun Microsystems Inc. All Rights Reserved
+  
+   The contents of this file are subject to the terms
+   of the Common Development and Distribution License
+   (the License). You may not use this file except in
+   compliance with the License.
+
+   You can obtain a copy of the License at
+   https://opensso.dev.java.net/public/CDDLv1.0.html or
+   opensso/legal/CDDLv1.0.txt
+   See the License for the specific language governing
+   permission and limitations under the License.
+
+   When distributing Covered Code, include this CDDL
+   Header Notice in each file and include the License file
+   at opensso/legal/CDDLv1.0.txt.
+   If applicable, add the following below the CDDL Header,
+   with the fields enclosed by brackets [] replaced by
+   your own identifying information:
+   "Portions Copyrighted [year] [name of copyright owner]"
+
+   $Id: popup.xhtml,v 1.14 2009/06/04 11:49:24 veiming Exp $
+
+-->
+
+<ui:composition
+    xmlns="http://www.w3.org/1999/xhtml"
+    xmlns:ui="http://java.sun.com/jsf/facelets"
+    xmlns:o="http://opensso.dev.java.net"
+    xmlns:f="http://java.sun.com/jsf/core"
+    xmlns:ice="http://www.icesoft.com/icefaces/component">
+
+    <ice:panelPopup
+        styleClass="popup-#{type == null ? 'info' : type}#{width != null ? ' width-' : ''}#{width != null ? width : ''}"
+        draggable="false"
+        autoCentre="#{autoCentre == null ? 'true' : autoCentre}"
+        modal="#{modal == null ? 'true' : modal}"
+        positionOnLoadOnly="true"
+        visible="#{visible == null ? 'true' : visible}">
+        <f:facet name="header">
+            <ice:panelGrid
+                width="100%"
+                cellpadding="0"
+                cellspacing="0"
+                columns="3"
+                columnClasses="icon,title,close">
+                <ice:graphicImage
+                    value="../image/#{type == null ? 'info' : type}.png" />
+                <ice:outputText
+                    value="#{title}"/>
+                <ice:panelGroup
+                    styleClass="float-right"
+                    rendered="#{handler != null}">
+                    <ice:commandButton
+                        type="button"
+                        image="../image/close.gif"
+                        immediate="#{closeImmediate == null ? 'true' : closeImmediate}"
+                        actionListener="#{handler[closeListenerMethod]}"
+                        style="cursor: pointer;">
+                        <ui:insert name="attributes"/>
+                    </ice:commandButton>
+                </ice:panelGroup>
+                <ice:panelGroup
+                    styleClass="float-right"
+                    rendered="#{handler == null}">
+                    <ice:commandButton
+                        type="button"
+                        image="../image/close.gif"
+                        immediate="true"
+                        style="cursor: pointer;">
+                        <ui:insert name="attributes"/>
+                    </ice:commandButton>
+                </ice:panelGroup>
+            </ice:panelGrid>
+        </f:facet>
+        <f:facet name="body">
+            <ice:panelGroup
+                styleClass="body">
+                <ui:insert name="body"/>
+            </ice:panelGroup>
+        </f:facet>
+    </ice:panelPopup>
+</ui:composition>

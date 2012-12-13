@@ -1,0 +1,77 @@
+<?php
+/* The contents of this file are subject to the terms
+ * of the Common Development and Distribution License
+ * (the License). You may not use this file except in
+ * compliance with the License.
+ *
+ * You can obtain a copy of the License at
+ * https://opensso.dev.java.net/public/CDDLv1.0.html or
+ * opensso/legal/CDDLv1.0.txt
+ * See the License for the specific language governing
+ * permission and limitations under the License.
+ *
+ * When distributing Covered Code, include this CDDL
+ * Header Notice in each file and include the License file
+ * at opensso/legal/CDDLv1.0.txt.
+ * If applicable, add the following below the CDDL Header,
+ * with the fields enclosed by brackets [] replaced by
+ * your own identifying information:
+ * "Portions Copyrighted [year] [name of copyright owner]"
+ *
+ * $Id  $
+ *
+ * Copyright 2006 Sun Microsystems Inc. All Rights Reserved
+ */
+ 
+$LIGHTBULB_CONFIG = array (
+	'basedir' 				=> '/home/as/erlang/feide/openssophp/',
+	'baseurl'				=> 'https://feide.erlang.no/openssophp/',
+	
+ 	'spi-sessionhandling' 	=> 'phpsession',
+ 	'spi-namemapping' 		=> 'database',
+ 	
+ 	'userdatabase'			=> array (
+ 		'username'			=> 'openssodemo',
+ 		'password'			=> '8s732j',
+ 		'host'				=> 'localhost',
+ 		'database'			=> 'openssodemo'
+ 	),
+ 	
+	/* Configuration for the authmemcookie session handler. */
+	'authmemcookie'       => array (
+		/* The list of memcache servers. This is a string of
+		 * host:port-pairs, separated by ','. The port number is
+		 * optional if the server runs on the default port (11211).
+		 * Example: 'localhost,remote_a:22122,remote_b'
+		 */
+
+		'memcache_servers'    => '127.0.0.1:11211',
+
+		/* The name of the cookie. Should match the
+		 * Auth_memCookie_CookieName configuration parameter for
+		 * Auth MemCookie. The default value for
+		 * Auth_memCookie_CookieName is 'AuthMemCookie'.
+ 		 */
+		
+		'cookie_name'         => 'AuthMemCookie',
+
+		/* The path the cookie is valid under.
+		 * This path must include both the OpenSSO PHP installation, and
+		 * the pages protected by Auth MemCookie.
+		 */
+		
+		'cookie_path'         => '/',
+
+		/* The domain the cookie is valid for. Use an empty string for
+		 * the default value.
+		 */
+		
+		'cookie_domain'       => '',
+	),
+
+	'defaultLandingPage'	=> 'https://feide.erlang.no/example-andreas/test.php'
+);
+ 
+ 
+ 
+?>

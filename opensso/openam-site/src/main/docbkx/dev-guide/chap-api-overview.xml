@@ -1,0 +1,124 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  ! CCPL HEADER START
+  !
+  ! This work is licensed under the Creative Commons
+  ! Attribution-NonCommercial-NoDerivs 3.0 Unported License.
+  ! To view a copy of this license, visit
+  ! http://creativecommons.org/licenses/by-nc-nd/3.0/
+  ! or send a letter to Creative Commons, 444 Castro Street,
+  ! Suite 900, Mountain View, California, 94041, USA.
+  !
+  ! You can also obtain a copy of the license at
+  ! src/main/resources/legal-notices/CC-BY-NC-ND.txt.
+  ! See the License for the specific language governing permissions
+  ! and limitations under the License.
+  !
+  ! If applicable, add the following below this CCPL HEADER, with the fields
+  ! enclosed by brackets "[]" replaced with your own identifying information:
+  !      Portions Copyright [yyyy] [name of copyright owner]
+  !
+  ! CCPL HEADER END
+  !
+  !      Copyright 2011 ForgeRock AS
+  !    
+-->
+<chapter xml:id='chap-api-overview'
+ xmlns='http://docbook.org/ns/docbook'
+ version='5.0' xml:lang='en'
+ xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance'
+ xsi:schemaLocation='http://docbook.org/ns/docbook http://docbook.org/xml/5.0/xsd/docbook.xsd'
+ xmlns:xlink='http://www.w3.org/1999/xlink'
+ xmlns:xinclude='http://www.w3.org/2001/XInclude'>
+ <title>OpenAM APIs and Protocols</title>
+
+ <para>Although policy agents and standards support make it possible for
+ applications to use OpenAM for access management without changing your
+ code, some deployments require tighter integration, or direct use of
+ supported protocols and OpenAM APIs.</para>
+
+ <para>OpenAM supports a range of protocols and APIs that allow you not
+ only to define specifically how access is managed in your client
+ applications, but also to extend OpenAM capabilities to meet even
+ those deployment requirements not yet covered in OpenAM.</para>
+
+ <para>This short chapter presents an overview of the APIs and protocols that
+ OpenAM supports.</para>
+
+ <mediaobject xml:id="figure-openam-apis-overview"><?dbfo pgwide="1"?>
+  <alt>High-level view of OpenAM APIs and SPIs</alt>
+  <imageobject>
+   <imagedata fileref="images/openam-apis-overview.png" format="PNG" />
+  </imageobject>
+  <textobject>
+   <para>OpenAM APIs and SPIs are shown in this diagram in orange, and
+   briefly described in the following sections.</para>
+  </textobject>
+ </mediaobject>
+
+ <para>This guide primarily covers the OpenAM client APIs and SPIs, with
+ emphasis on the Java APIs.</para>
+
+ <section xml:id="openam-apis">
+  <title>OpenAM APIs</title>
+
+  <para>OpenAM provides client application programming interfaces for a variety
+  of needs.</para>
+  <itemizedlist>
+   <listitem>
+    <para>The OpenAM Java APIs provided through the OpenAM Java SDK let your
+    Java and Java EE applications call on OpenAM for authentication, and
+    authorization in both OpenAM and federated environments.</para>
+    <para>Detailed reference information is provided in the <link
+    xlink:href="http://openam.forgerock.org/doc/public-api/index.html"
+    ><citetitle>OpenAM Java SDK API Specification</citetitle></link>.</para>
+
+   </listitem>
+   <listitem>
+    <para>The C SDK also provides APIs for native applications, such as new
+    web server policy agents. The C SDK is delivered with OpenAM for Linux,
+    Solaris, and Windows platforms.</para>
+   </listitem>
+   <listitem>
+    <para>OpenAM exposes a RESTful API that can return JSON or XML over HTTP,
+    allowing you to access authentication, authorization, and identity
+    services from your web applications using REST clients in the language of
+    your choice.</para>
+   </listitem>
+  </itemizedlist>
+ </section>
+
+ <section xml:id="openam-spis">
+  <title>OpenAM SPIs</title>
+
+  <para>OpenAM provides Java based service provider interfaces to let you
+  extend services for the requirements of your particular deployment.</para>
+  <itemizedlist>
+   <para>Some examples of the plugins you can write follow in the list below.
+   This guide demonstrates how to implement such plugins.</para>
+   <listitem>
+    <para>Custom authentication plugins let OpenAM authenticate users against
+    a new authentication service or an authentication service specific to your
+    deployment</para>
+   </listitem>
+   <listitem>
+    <para>Post authentication plugins perform additional processing at the end
+    of the authentication process, but before the subject is authenticated.
+    Post authentication plugins can for example store information about the
+    authentication in the user's profile, or call another system for audit
+    logging purposes.</para>
+   </listitem>
+   <listitem>
+    <para>Policy evaluation plugins implement new policy conditions, send
+    attributes from the user profile as part of a policy response, extend the
+    definition of the subjects to whom the policy applies, or customize how
+    policy management is delegated.</para>
+   </listitem>
+   <listitem>
+    <para>Identity repository plugins let OpenAM employ a new or custom user
+    data store, other than a directory server or JDBC-accessible
+    database.</para>
+   </listitem>
+  </itemizedlist>
+ </section>
+</chapter>

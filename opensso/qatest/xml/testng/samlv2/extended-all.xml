@@ -1,0 +1,12 @@
+    <parameter name="groupName" value="@mode@"/>
+    <test name="AssertionQueryTest">
+        <parameter name="groupName" value="@mode@"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.samlv2.SAMLv2AssertionQueryTests"/>
+        </classes>
+    </test>

@@ -1,0 +1,45 @@
+<!--
+   DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
+  
+   Copyright (c) 2006 Sun Microsystems Inc. All Rights Reserved
+  
+   The contents of this file are subject to the terms
+   of the Common Development and Distribution License
+   (the License). You may not use this file except in
+   compliance with the License.
+                                                                                
+   You can obtain a copy of the License at
+   https://opensso.dev.java.net/public/CDDLv1.0.html or
+   opensso/legal/CDDLv1.0.txt
+   See the License for the specific language governing
+   permission and limitations under the License.
+                                                                                
+   When distributing Covered Code, include this CDDL
+   Header Notice in each file and include the License file
+   at opensso/legal/CDDLv1.0.txt.
+   If applicable, add the following below the CDDL Header,
+   with the fields enclosed by brackets [] replaced by
+   your own identifying information:
+   "Portions Copyrighted [year] [name of copyright owner]"
+                                                                                
+   $Id: sampleAuthnRequest.xml,v 1.2 2008/06/25 05:48:18 qcheng Exp $
+                                                                                
+-->
+<AuthnRequest 
+    xmlns="urn:liberty:iff:2003-08"  
+    xmlns:samlp="urn:oasis:names:tc:SAML:1.0:protocol" 
+    RequestID="sf6c67965655f180efd38a553f6e0156d16916d22"  
+    MajorVersion="1"  
+    MinorVersion="2"  
+    IssueInstant="2006-05-30T22:32:20Z">
+    <samlp:RespondWith>AuthenticationStatement</samlp:RespondWith>
+    <ProviderID>http://moonriver.red.iplanet.com</ProviderID>
+    <NameIDPolicy>none</NameIDPolicy>
+    <ForceAuthn>false</ForceAuthn>
+    <IsPassive>false</IsPassive>
+    <ProtocolProfile>http://projectliberty.org/profiles/brws-art</ProtocolProfile>
+    <RequestAuthnContext>
+        <AuthnContextClassRef>http://www.projectliberty.org/schemas/authctx/classes/Password</AuthnContextClassRef>
+        <AuthnContextComparison>minimum</AuthnContextComparison>
+    </RequestAuthnContext>
+    <RelayState>http://moonriver.red.iplanet.com:58080/sp1/index.jsp</RelayState>

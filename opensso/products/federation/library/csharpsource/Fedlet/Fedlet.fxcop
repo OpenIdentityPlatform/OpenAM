@@ -1,0 +1,730 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FxCopProject Version="1.36" Name="Fedlet FxCop Project">
+ <ProjectOptions>
+  <SharedProject>True</SharedProject>
+  <Stylesheet Apply="False">c:\program files\microsoft fxcop 1.36\Xml\FxCopReport.xsl</Stylesheet>
+  <SaveMessages>
+   <Project Status="Active, Excluded" NewOnly="False" />
+   <Report Status="Active" NewOnly="False" />
+  </SaveMessages>
+  <ProjectFile Compress="True" DefaultTargetCheck="True" DefaultRuleCheck="True" SaveByRuleGroup="" Deterministic="True" />
+  <EnableMultithreadedLoad>True</EnableMultithreadedLoad>
+  <EnableMultithreadedAnalysis>True</EnableMultithreadedAnalysis>
+  <SourceLookup>True</SourceLookup>
+  <AnalysisExceptionsThreshold>10</AnalysisExceptionsThreshold>
+  <RuleExceptionsThreshold>1</RuleExceptionsThreshold>
+  <Spelling Locale="en-US" />
+  <OverrideRuleVisibilities>False</OverrideRuleVisibilities>
+  <CustomDictionaries SearchFxCopDir="True" SearchUserProfile="True" SearchProjectDir="True" />
+  <SearchGlobalAssemblyCache>False</SearchGlobalAssemblyCache>
+  <DeadlockDetectionTimeout>120</DeadlockDetectionTimeout>
+  <IgnoreGeneratedCode>False</IgnoreGeneratedCode>
+ </ProjectOptions>
+ <Targets>
+  <AssemblyReferenceDirectories>
+   <Directory>$(ProjectDir)/Fedlet/bin/Release/</Directory>
+  </AssemblyReferenceDirectories>
+  <Target Name="$(ProjectDir)/Fedlet/bin/Debug/Fedlet.dll" Analyze="True" AnalyzeAllChildren="True" />
+ </Targets>
+ <Rules>
+  <RuleFiles>
+   <RuleFile Name="$(FxCopDir)\Rules\DesignRules.dll" Enabled="True" AllRulesEnabled="True" />
+   <RuleFile Name="$(FxCopDir)\Rules\GlobalizationRules.dll" Enabled="True" AllRulesEnabled="True" />
+   <RuleFile Name="$(FxCopDir)\Rules\InteroperabilityRules.dll" Enabled="True" AllRulesEnabled="True" />
+   <RuleFile Name="$(FxCopDir)\Rules\MobilityRules.dll" Enabled="True" AllRulesEnabled="True" />
+   <RuleFile Name="$(FxCopDir)\Rules\NamingRules.dll" Enabled="True" AllRulesEnabled="True" />
+   <RuleFile Name="$(FxCopDir)\Rules\PerformanceRules.dll" Enabled="True" AllRulesEnabled="True" />
+   <RuleFile Name="$(FxCopDir)\Rules\PortabilityRules.dll" Enabled="True" AllRulesEnabled="True" />
+   <RuleFile Name="$(FxCopDir)\Rules\SecurityRules.dll" Enabled="True" AllRulesEnabled="True" />
+   <RuleFile Name="$(FxCopDir)\Rules\UsageRules.dll" Enabled="True" AllRulesEnabled="True" />
+  </RuleFiles>
+  <Groups />
+  <Settings />
+ </Rules>
+ <FxCopReport Version="1.36">
+  <Namespaces>
+   <Namespace Name="Sun.Identity.Common">
+    <Messages>
+     <Message TypeName="AvoidNamespacesWithFewTypes" Category="Microsoft.Design" CheckId="CA1020" Status="Excluded" Created="2009-06-05 21:02:13Z">
+      <Issue>
+       <Item>Sun.Identity.Common</Item>
+      </Issue>
+      <Notes>
+       <User Name="ggennaro">
+        <Note Id="4" />
+       </User>
+      </Notes>
+     </Message>
+    </Messages>
+   </Namespace>
+  </Namespaces>
+  <Targets>
+   <Target Name="$(ProjectDir)/Fedlet/bin/Debug/Fedlet.dll">
+    <Modules>
+     <Module Name="fedlet.dll">
+      <Namespaces>
+       <Namespace Name="Sun.Identity.Saml2">
+        <Types>
+         <Type Name="IdentityProvider">
+          <Members>
+           <Member Name="#GetSingleLogoutServiceLocation(System.String)">
+            <Messages>
+             <Message Id="Logout" TypeName="UsePreferredTerms" Category="Microsoft.Naming" CheckId="CA1726" Status="Excluded" Created="2009-10-30 15:17:19Z">
+              <Issue Name="Member">
+               <Item>Logout</Item>
+               <Item>'IdentityProvider.GetSingleLogoutServiceLocation(string)'</Item>
+               <Item>LogOff</Item>
+              </Issue>
+              <Notes>
+               <User Name="ggennaro">
+                <Note Id="7" />
+               </User>
+              </Notes>
+             </Message>
+            </Messages>
+           </Member>
+           <Member Name="#GetSingleLogoutServiceResponseLocation(System.String)">
+            <Messages>
+             <Message Id="Logout" TypeName="UsePreferredTerms" Category="Microsoft.Naming" CheckId="CA1726" Status="Excluded" Created="2009-10-30 15:17:19Z">
+              <Issue Name="Member">
+               <Item>Logout</Item>
+               <Item>'IdentityProvider.GetSingleLogoutServiceResponseLocation(string)'</Item>
+               <Item>LogOff</Item>
+              </Issue>
+              <Notes>
+               <User Name="ggennaro">
+                <Note Id="7" />
+               </User>
+              </Notes>
+             </Message>
+            </Messages>
+           </Member>
+           <Member Name="#GetSingleSignOnServiceLocation(System.String)">
+            <Messages>
+             <Message Id="SignOn" TypeName="UsePreferredTerms" Category="Microsoft.Naming" CheckId="CA1726" Status="Excluded" Created="2009-05-22 23:07:47Z">
+              <Issue Name="Member">
+               <Item>SignOn</Item>
+               <Item>'IdentityProvider.GetSingleSignOnServiceLocation(string)'</Item>
+               <Item>SignIn</Item>
+              </Issue>
+              <Notes>
+               <User Name="ggennaro">
+                <Note Id="0" />
+               </User>
+              </Notes>
+             </Message>
+            </Messages>
+           </Member>
+           <Member Name="#SingleLogOutServiceLocations">
+            <Messages>
+             <Message Id="LogOut" TypeName="UsePreferredTerms" Category="Microsoft.Naming" CheckId="CA1726" Status="Excluded" Created="2009-10-30 15:17:19Z">
+              <Issue Name="Member">
+               <Item>LogOut</Item>
+               <Item>'IdentityProvider.SingleLogOutServiceLocations'</Item>
+               <Item>LogOff</Item>
+              </Issue>
+              <Notes>
+               <User Name="ggennaro">
+                <Note Id="7" />
+               </User>
+              </Notes>
+             </Message>
+            </Messages>
+           </Member>
+           <Member Name="#SingleSignOnServiceLocations">
+            <Messages>
+             <Message Id="SignOn" TypeName="UsePreferredTerms" Category="Microsoft.Naming" CheckId="CA1726" Status="Excluded" Created="2009-03-26 17:15:30Z">
+              <Issue Name="Member">
+               <Item>SignOn</Item>
+               <Item>'IdentityProvider.SingleSignOnServiceLocations'</Item>
+               <Item>SignIn</Item>
+              </Issue>
+              <Notes>
+               <User Name="ggennaro">
+                <Note Id="1" />
+               </User>
+              </Notes>
+             </Message>
+            </Messages>
+           </Member>
+           <Member Name="#WantLogoutRequestSigned">
+            <Messages>
+             <Message Id="Logout" TypeName="UsePreferredTerms" Category="Microsoft.Naming" CheckId="CA1726" Status="Excluded" Created="2010-01-13 18:45:47Z">
+              <Issue Name="Member">
+               <Item>Logout</Item>
+               <Item>'IdentityProvider.WantLogoutRequestSigned'</Item>
+               <Item>LogOff</Item>
+              </Issue>
+              <Notes>
+               <User Name="ggennaro">
+                <Note Id="8" />
+               </User>
+              </Notes>
+             </Message>
+            </Messages>
+           </Member>
+           <Member Name="#WantLogoutResponseSigned">
+            <Messages>
+             <Message Id="Logout" TypeName="UsePreferredTerms" Category="Microsoft.Naming" CheckId="CA1726" Status="Excluded" Created="2010-01-13 18:45:47Z">
+              <Issue Name="Member">
+               <Item>Logout</Item>
+               <Item>'IdentityProvider.WantLogoutResponseSigned'</Item>
+               <Item>LogOff</Item>
+              </Issue>
+              <Notes>
+               <User Name="ggennaro">
+                <Note Id="16" />
+               </User>
+              </Notes>
+             </Message>
+            </Messages>
+           </Member>
+          </Members>
+         </Type>
+         <Type Name="LogoutRequest">
+          <Messages>
+           <Message Id="Logout" TypeName="UsePreferredTerms" Category="Microsoft.Naming" CheckId="CA1726" Status="Excluded" Created="2009-10-30 15:17:19Z">
+            <Issue Name="Type">
+             <Item>Logout</Item>
+             <Item>'LogoutRequest'</Item>
+             <Item>LogOff</Item>
+            </Issue>
+            <Notes>
+             <User Name="ggennaro">
+              <Note Id="21" />
+             </User>
+            </Notes>
+           </Message>
+          </Messages>
+         </Type>
+         <Type Name="LogoutRequestCache">
+          <Messages>
+           <Message Id="Logout" TypeName="UsePreferredTerms" Category="Microsoft.Naming" CheckId="CA1726" Status="Excluded" Created="2009-11-03 17:32:07Z">
+            <Issue Name="Type">
+             <Item>Logout</Item>
+             <Item>'LogoutRequestCache'</Item>
+             <Item>LogOff</Item>
+            </Issue>
+            <Notes>
+             <User Name="ggennaro">
+              <Note Id="10" />
+             </User>
+            </Notes>
+           </Message>
+          </Messages>
+         </Type>
+         <Type Name="LogoutResponse">
+          <Messages>
+           <Message Id="Logout" TypeName="UsePreferredTerms" Category="Microsoft.Naming" CheckId="CA1726" Status="Excluded" Created="2009-10-30 15:17:19Z">
+            <Issue Name="Type">
+             <Item>Logout</Item>
+             <Item>'LogoutResponse'</Item>
+             <Item>LogOff</Item>
+            </Issue>
+            <Notes>
+             <User Name="ggennaro">
+              <Note Id="5" />
+             </User>
+            </Notes>
+           </Message>
+          </Messages>
+          <Members>
+           <Member Name="#.ctor(Sun.Identity.Saml2.IdentityProvider,Sun.Identity.Saml2.ServiceProvider,Sun.Identity.Saml2.LogoutRequest,System.Collections.Specialized.NameValueCollection)">
+            <Messages>
+             <Message Id="logout" TypeName="UsePreferredTerms" Category="Microsoft.Naming" CheckId="CA1726" Status="Excluded" Created="2009-10-30 15:17:19Z">
+              <Issue Name="MemberParameter">
+               <Item>'LogoutResponse.LogoutResponse(IdentityProvider, ServiceProvider, LogoutRequest, NameValueCollection)'</Item>
+               <Item>logout</Item>
+               <Item>'logoutRequest'</Item>
+               <Item>logOff</Item>
+              </Issue>
+              <Notes>
+               <User Name="ggennaro">
+                <Note Id="7" />
+               </User>
+              </Notes>
+             </Message>
+            </Messages>
+           </Member>
+          </Members>
+         </Type>
+         <Type Name="Saml2Utils">
+          <Members>
+           <Member Name="#CompressConvertToBase64UrlEncode(System.Xml.XPath.IXPathNavigable)">
+            <Messages>
+             <Message TypeName="UriReturnValuesShouldNotBeStrings" Category="Microsoft.Design" CheckId="CA1055" Status="Excluded" Created="2009-05-06 23:16:19Z">
+              <Issue>
+               <Item>'Saml2Utils.CompressConvertToBase64UrlEncode(IXPathNavigable)'</Item>
+              </Issue>
+              <Notes>
+               <User Name="ggennaro">
+                <Note Id="3" />
+               </User>
+              </Notes>
+             </Message>
+            </Messages>
+           </Member>
+           <Member Name="#UrlDecodeConvertFromBase64Decompress(System.String)">
+            <Messages>
+             <Message TypeName="UriReturnValuesShouldNotBeStrings" Category="Microsoft.Design" CheckId="CA1055" Status="Excluded" Created="2009-05-06 23:16:19Z">
+              <Issue>
+               <Item>'Saml2Utils.UrlDecodeConvertFromBase64Decompress(string)'</Item>
+              </Issue>
+              <Notes>
+               <User Name="ggennaro">
+                <Note Id="2" />
+               </User>
+              </Notes>
+             </Message>
+            </Messages>
+           </Member>
+          </Members>
+         </Type>
+         <Type Name="ServiceProvider">
+          <Members>
+           <Member Name="#WantLogoutRequestSigned">
+            <Messages>
+             <Message Id="Logout" TypeName="UsePreferredTerms" Category="Microsoft.Naming" CheckId="CA1726" Status="Excluded" Created="2009-11-09 16:45:55Z">
+              <Issue Name="Member">
+               <Item>Logout</Item>
+               <Item>'ServiceProvider.WantLogoutRequestSigned'</Item>
+               <Item>LogOff</Item>
+              </Issue>
+              <Notes>
+               <User Name="ggennaro">
+                <Note Id="6" />
+               </User>
+              </Notes>
+             </Message>
+            </Messages>
+           </Member>
+           <Member Name="#WantLogoutResponseSigned">
+            <Messages>
+             <Message Id="Logout" TypeName="UsePreferredTerms" Category="Microsoft.Naming" CheckId="CA1726" Status="Excluded" Created="2009-11-09 16:45:55Z">
+              <Issue Name="Member">
+               <Item>Logout</Item>
+               <Item>'ServiceProvider.WantLogoutResponseSigned'</Item>
+               <Item>LogOff</Item>
+              </Issue>
+              <Notes>
+               <User Name="ggennaro">
+                <Note Id="22" />
+               </User>
+              </Notes>
+             </Message>
+            </Messages>
+           </Member>
+          </Members>
+         </Type>
+         <Type Name="ServiceProviderUtility">
+          <Members>
+           <Member Name="#GetLogoutRequest(System.Web.HttpContext)">
+            <Messages>
+             <Message Id="Logout" TypeName="UsePreferredTerms" Category="Microsoft.Naming" CheckId="CA1726" Status="Excluded" Created="2009-10-30 15:17:19Z">
+              <Issue Name="Member">
+               <Item>Logout</Item>
+               <Item>'ServiceProviderUtility.GetLogoutRequest(HttpContext)'</Item>
+               <Item>LogOff</Item>
+              </Issue>
+              <Notes>
+               <User Name="ggennaro">
+                <Note Id="7" />
+               </User>
+              </Notes>
+             </Message>
+            </Messages>
+           </Member>
+           <Member Name="#GetLogoutRequestPostHtml(Sun.Identity.Saml2.LogoutRequest,System.String,System.Collections.Specialized.NameValueCollection)">
+            <Messages>
+             <Message Id="Logout" TypeName="UsePreferredTerms" Category="Microsoft.Naming" CheckId="CA1726" Status="Excluded" Created="2009-11-03 23:49:38Z">
+              <Issue Name="Member">
+               <Item>Logout</Item>
+               <Item>'ServiceProviderUtility.GetLogoutRequestPostHtml(LogoutRequest, string, NameValueCollection)'</Item>
+               <Item>LogOff</Item>
+              </Issue>
+              <Notes>
+               <User Name="ggennaro">
+                <Note Id="11" />
+                <Note Id="12" />
+               </User>
+              </Notes>
+             </Message>
+             <Message Id="logout" TypeName="UsePreferredTerms" Category="Microsoft.Naming" CheckId="CA1726" Status="Excluded" Created="2009-11-03 23:49:38Z">
+              <Issue Name="MemberParameter">
+               <Item>'ServiceProviderUtility.GetLogoutRequestPostHtml(LogoutRequest, string, NameValueCollection)'</Item>
+               <Item>logout</Item>
+               <Item>'logoutRequest'</Item>
+               <Item>logOff</Item>
+              </Issue>
+              <Notes>
+               <User Name="ggennaro">
+                <Note Id="13" />
+               </User>
+              </Notes>
+             </Message>
+            </Messages>
+           </Member>
+           <Member Name="#GetLogoutRequestRedirectLocation(Sun.Identity.Saml2.LogoutRequest,System.String,System.Collections.Specialized.NameValueCollection)">
+            <Messages>
+             <Message Id="Logout" TypeName="UsePreferredTerms" Category="Microsoft.Naming" CheckId="CA1726" Status="Excluded" Created="2009-11-03 23:49:38Z">
+              <Issue Name="Member">
+               <Item>Logout</Item>
+               <Item>'ServiceProviderUtility.GetLogoutRequestRedirectLocation(LogoutRequest, string, NameValueCollection)'</Item>
+               <Item>LogOff</Item>
+              </Issue>
+              <Notes>
+               <User Name="ggennaro">
+                <Note Id="19" />
+               </User>
+              </Notes>
+             </Message>
+             <Message Id="logout" TypeName="UsePreferredTerms" Category="Microsoft.Naming" CheckId="CA1726" Status="Excluded" Created="2009-11-03 23:49:38Z">
+              <Issue Name="MemberParameter">
+               <Item>'ServiceProviderUtility.GetLogoutRequestRedirectLocation(LogoutRequest, string, NameValueCollection)'</Item>
+               <Item>logout</Item>
+               <Item>'logoutRequest'</Item>
+               <Item>logOff</Item>
+              </Issue>
+              <Notes>
+               <User Name="ggennaro">
+                <Note Id="20" />
+               </User>
+              </Notes>
+             </Message>
+            </Messages>
+           </Member>
+           <Member Name="#GetLogoutResponse(System.Web.HttpContext)">
+            <Messages>
+             <Message Id="Logout" TypeName="UsePreferredTerms" Category="Microsoft.Naming" CheckId="CA1726" Status="Excluded" Created="2009-10-30 15:17:19Z">
+              <Issue Name="Member">
+               <Item>Logout</Item>
+               <Item>'ServiceProviderUtility.GetLogoutResponse(HttpContext)'</Item>
+               <Item>LogOff</Item>
+              </Issue>
+              <Notes>
+               <User Name="ggennaro">
+                <Note Id="7" />
+               </User>
+              </Notes>
+             </Message>
+            </Messages>
+           </Member>
+           <Member Name="#GetLogoutResponsePostHtml(Sun.Identity.Saml2.LogoutResponse,System.String,System.Collections.Specialized.NameValueCollection)">
+            <Messages>
+             <Message Id="Logout" TypeName="UsePreferredTerms" Category="Microsoft.Naming" CheckId="CA1726" Status="Excluded" Created="2009-11-03 23:49:38Z">
+              <Issue Name="Member">
+               <Item>Logout</Item>
+               <Item>'ServiceProviderUtility.GetLogoutResponsePostHtml(LogoutResponse, string, NameValueCollection)'</Item>
+               <Item>LogOff</Item>
+              </Issue>
+              <Notes>
+               <User Name="ggennaro">
+                <Note Id="17" />
+               </User>
+              </Notes>
+             </Message>
+             <Message Id="logout" TypeName="UsePreferredTerms" Category="Microsoft.Naming" CheckId="CA1726" Status="Excluded" Created="2009-11-03 23:49:38Z">
+              <Issue Name="MemberParameter">
+               <Item>'ServiceProviderUtility.GetLogoutResponsePostHtml(LogoutResponse, string, NameValueCollection)'</Item>
+               <Item>logout</Item>
+               <Item>'logoutResponse'</Item>
+               <Item>logOff</Item>
+              </Issue>
+              <Notes>
+               <User Name="ggennaro">
+                <Note Id="18" />
+               </User>
+              </Notes>
+             </Message>
+            </Messages>
+           </Member>
+           <Member Name="#GetLogoutResponseRedirectLocation(Sun.Identity.Saml2.LogoutResponse,System.String,System.Collections.Specialized.NameValueCollection)">
+            <Messages>
+             <Message Id="Logout" TypeName="UsePreferredTerms" Category="Microsoft.Naming" CheckId="CA1726" Status="Excluded" Created="2009-11-03 23:49:38Z">
+              <Issue Name="Member">
+               <Item>Logout</Item>
+               <Item>'ServiceProviderUtility.GetLogoutResponseRedirectLocation(LogoutResponse, string, NameValueCollection)'</Item>
+               <Item>LogOff</Item>
+              </Issue>
+              <Notes>
+               <User Name="ggennaro">
+                <Note Id="14" />
+               </User>
+              </Notes>
+             </Message>
+             <Message Id="logout" TypeName="UsePreferredTerms" Category="Microsoft.Naming" CheckId="CA1726" Status="Excluded" Created="2009-11-03 23:49:38Z">
+              <Issue Name="MemberParameter">
+               <Item>'ServiceProviderUtility.GetLogoutResponseRedirectLocation(LogoutResponse, string, NameValueCollection)'</Item>
+               <Item>logout</Item>
+               <Item>'logoutResponse'</Item>
+               <Item>logOff</Item>
+              </Issue>
+              <Notes>
+               <User Name="ggennaro">
+                <Note Id="15" />
+               </User>
+              </Notes>
+             </Message>
+            </Messages>
+           </Member>
+           <Member Name="#SendLogoutRequest(System.Web.HttpContext,System.String,System.Collections.Specialized.NameValueCollection)">
+            <Messages>
+             <Message Id="Logout" TypeName="UsePreferredTerms" Category="Microsoft.Naming" CheckId="CA1726" Status="Excluded" Created="2009-10-30 15:17:19Z">
+              <Issue Name="Member">
+               <Item>Logout</Item>
+               <Item>'ServiceProviderUtility.SendLogoutRequest(HttpContext, string, NameValueCollection)'</Item>
+               <Item>LogOff</Item>
+              </Issue>
+              <Notes>
+               <User Name="ggennaro">
+                <Note Id="7" />
+               </User>
+              </Notes>
+             </Message>
+            </Messages>
+           </Member>
+           <Member Name="#SendLogoutResponse(System.Web.HttpContext,Sun.Identity.Saml2.LogoutRequest)">
+            <Messages>
+             <Message Id="Logout" TypeName="UsePreferredTerms" Category="Microsoft.Naming" CheckId="CA1726" Status="Excluded" Created="2009-10-30 15:17:19Z">
+              <Issue Name="Member">
+               <Item>Logout</Item>
+               <Item>'ServiceProviderUtility.SendLogoutResponse(HttpContext, LogoutRequest)'</Item>
+               <Item>LogOff</Item>
+              </Issue>
+              <Notes>
+               <User Name="ggennaro">
+                <Note Id="7" />
+               </User>
+              </Notes>
+             </Message>
+             <Message Id="logout" TypeName="UsePreferredTerms" Category="Microsoft.Naming" CheckId="CA1726" Status="Excluded" Created="2009-10-30 15:17:19Z">
+              <Issue Name="MemberParameter">
+               <Item>'ServiceProviderUtility.SendLogoutResponse(HttpContext, LogoutRequest)'</Item>
+               <Item>logout</Item>
+               <Item>'logoutRequest'</Item>
+               <Item>logOff</Item>
+              </Issue>
+              <Notes>
+               <User Name="ggennaro">
+                <Note Id="7" />
+               </User>
+              </Notes>
+             </Message>
+            </Messages>
+           </Member>
+           <Member Name="#SendSoapLogoutRequest(Sun.Identity.Saml2.LogoutRequest,System.String)">
+            <Messages>
+             <Message Id="Logout" TypeName="UsePreferredTerms" Category="Microsoft.Naming" CheckId="CA1726" Status="Excluded" Created="2009-10-30 15:17:19Z">
+              <Issue Name="Member">
+               <Item>Logout</Item>
+               <Item>'ServiceProviderUtility.SendSoapLogoutRequest(LogoutRequest, string)'</Item>
+               <Item>LogOff</Item>
+              </Issue>
+              <Notes>
+               <User Name="ggennaro">
+                <Note Id="7" />
+               </User>
+              </Notes>
+             </Message>
+             <Message Id="logout" TypeName="UsePreferredTerms" Category="Microsoft.Naming" CheckId="CA1726" Status="Excluded" Created="2009-10-30 15:17:19Z">
+              <Issue Name="MemberParameter">
+               <Item>'ServiceProviderUtility.SendSoapLogoutRequest(LogoutRequest, string)'</Item>
+               <Item>logout</Item>
+               <Item>'logoutRequest'</Item>
+               <Item>logOff</Item>
+              </Issue>
+              <Notes>
+               <User Name="ggennaro">
+                <Note Id="7" />
+               </User>
+              </Notes>
+             </Message>
+            </Messages>
+           </Member>
+           <Member Name="#SendSoapLogoutResponse(System.Web.HttpContext,Sun.Identity.Saml2.LogoutRequest)">
+            <Messages>
+             <Message Id="Logout" TypeName="UsePreferredTerms" Category="Microsoft.Naming" CheckId="CA1726" Status="Excluded" Created="2009-10-30 15:17:19Z">
+              <Issue Name="Member">
+               <Item>Logout</Item>
+               <Item>'ServiceProviderUtility.SendSoapLogoutResponse(HttpContext, LogoutRequest)'</Item>
+               <Item>LogOff</Item>
+              </Issue>
+              <Notes>
+               <User Name="ggennaro">
+                <Note Id="7" />
+               </User>
+              </Notes>
+             </Message>
+             <Message Id="logout" TypeName="UsePreferredTerms" Category="Microsoft.Naming" CheckId="CA1726" Status="Excluded" Created="2009-10-30 15:17:19Z">
+              <Issue Name="MemberParameter">
+               <Item>'ServiceProviderUtility.SendSoapLogoutResponse(HttpContext, LogoutRequest)'</Item>
+               <Item>logout</Item>
+               <Item>'logoutRequest'</Item>
+               <Item>logOff</Item>
+              </Issue>
+              <Notes>
+               <User Name="ggennaro">
+                <Note Id="7" />
+               </User>
+              </Notes>
+             </Message>
+            </Messages>
+           </Member>
+           <Member Name="#Validate(Sun.Identity.Saml2.LogoutResponse,System.Collections.ICollection)">
+            <Messages>
+             <Message Id="logout" TypeName="UsePreferredTerms" Category="Microsoft.Naming" CheckId="CA1726" Status="Excluded" Created="2009-11-03 17:32:07Z">
+              <Issue Name="MemberParameter">
+               <Item>'ServiceProviderUtility.Validate(LogoutResponse, ICollection)'</Item>
+               <Item>logout</Item>
+               <Item>'logoutRequests'</Item>
+               <Item>logOff</Item>
+              </Issue>
+              <Issue Name="MemberParameter">
+               <Item>'ServiceProviderUtility.Validate(LogoutResponse, ICollection)'</Item>
+               <Item>logout</Item>
+               <Item>'logoutResponse'</Item>
+               <Item>logOff</Item>
+              </Issue>
+              <Notes>
+               <User Name="ggennaro">
+                <Note Id="9" />
+               </User>
+              </Notes>
+             </Message>
+            </Messages>
+           </Member>
+           <Member Name="#ValidateForPost(Sun.Identity.Saml2.LogoutRequest)">
+            <Messages>
+             <Message Id="logout" TypeName="UsePreferredTerms" Category="Microsoft.Naming" CheckId="CA1726" Status="Excluded" Created="2009-11-09 16:45:55Z">
+              <Issue Name="MemberParameter">
+               <Item>'ServiceProviderUtility.ValidateForPost(LogoutRequest)'</Item>
+               <Item>logout</Item>
+               <Item>'logoutRequest'</Item>
+               <Item>logOff</Item>
+              </Issue>
+              <Notes>
+               <User Name="ggennaro">
+                <Note Id="25" />
+               </User>
+              </Notes>
+             </Message>
+            </Messages>
+           </Member>
+           <Member Name="#ValidateForPost(Sun.Identity.Saml2.LogoutResponse,System.Collections.ICollection)">
+            <Messages>
+             <Message Id="logout" TypeName="UsePreferredTerms" Category="Microsoft.Naming" CheckId="CA1726" Status="Excluded" Created="2009-11-09 16:45:55Z">
+              <Issue Name="MemberParameter">
+               <Item>'ServiceProviderUtility.ValidateForPost(LogoutResponse, ICollection)'</Item>
+               <Item>logout</Item>
+               <Item>'logoutRequests'</Item>
+               <Item>logOff</Item>
+              </Issue>
+              <Issue Name="MemberParameter">
+               <Item>'ServiceProviderUtility.ValidateForPost(LogoutResponse, ICollection)'</Item>
+               <Item>logout</Item>
+               <Item>'logoutResponse'</Item>
+               <Item>logOff</Item>
+              </Issue>
+              <Notes>
+               <User Name="ggennaro">
+                <Note Id="24" />
+               </User>
+              </Notes>
+             </Message>
+            </Messages>
+           </Member>
+           <Member Name="#ValidateForRedirect(Sun.Identity.Saml2.LogoutRequest,System.String)">
+            <Messages>
+             <Message Id="logout" TypeName="UsePreferredTerms" Category="Microsoft.Naming" CheckId="CA1726" Status="Excluded" Created="2009-11-09 16:45:55Z">
+              <Issue Name="MemberParameter">
+               <Item>'ServiceProviderUtility.ValidateForRedirect(LogoutRequest, string)'</Item>
+               <Item>logout</Item>
+               <Item>'logoutRequest'</Item>
+               <Item>logOff</Item>
+              </Issue>
+              <Notes>
+               <User Name="ggennaro">
+                <Note Id="23" />
+               </User>
+              </Notes>
+             </Message>
+            </Messages>
+           </Member>
+           <Member Name="#ValidateForRedirect(Sun.Identity.Saml2.LogoutResponse,System.Collections.ICollection,System.String)">
+            <Messages>
+             <Message Id="logout" TypeName="UsePreferredTerms" Category="Microsoft.Naming" CheckId="CA1726" Status="Excluded" Created="2009-11-09 16:45:55Z">
+              <Issue Name="MemberParameter">
+               <Item>'ServiceProviderUtility.ValidateForRedirect(LogoutResponse, ICollection, string)'</Item>
+               <Item>logout</Item>
+               <Item>'logoutRequests'</Item>
+               <Item>logOff</Item>
+              </Issue>
+              <Issue Name="MemberParameter">
+               <Item>'ServiceProviderUtility.ValidateForRedirect(LogoutResponse, ICollection, string)'</Item>
+               <Item>logout</Item>
+               <Item>'logoutResponse'</Item>
+               <Item>logOff</Item>
+              </Issue>
+              <Notes>
+               <User Name="ggennaro">
+                <Note Id="26" />
+               </User>
+              </Notes>
+             </Message>
+            </Messages>
+           </Member>
+          </Members>
+         </Type>
+        </Types>
+       </Namespace>
+      </Namespaces>
+     </Module>
+    </Modules>
+   </Target>
+  </Targets>
+  <Notes>
+   <User Name="ggennaro">
+    <Note Id="0" Modified="2009-05-22 23:14:31Z">SignOn is a preferred term in the OpenSSO community.</Note>
+    <Note Id="1" Modified="2009-03-26 17:16:05Z">Method maps to XSD definition SingleSignOnService for idp metadata.</Note>
+    <Note Id="2" Modified="2009-05-06 23:16:25Z">Exclusion needed since SAML Artifacts are the exception to this rule.</Note>
+    <Note Id="3" Modified="2009-05-06 23:16:28Z">Exclusion needed since SAML Artifacts are the exception to this rule.</Note>
+    <Note Id="4" Modified="2009-06-09 18:37:45Z">FedletLogger isn't really part of the SAML2 specification so will be excluded for now from the FxCop rules engine.</Note>
+    <Note Id="5" Modified="2009-10-30 15:19:58Z">Logout is a preferred term in the OpenSSO community.</Note>
+    <Note Id="6" Modified="2009-11-09 16:46:33Z">Logout is a preferred term in the OpenSSO community.</Note>
+    <Note Id="7" Modified="2009-10-30 15:22:30Z">Logout is a preferred term in the OpenSSO community.</Note>
+    <Note Id="8" Modified="2010-01-13 18:46:42Z">Logout is used and acceptable in the SAML specification.</Note>
+    <Note Id="9" Modified="2009-11-03 17:32:54Z">Logout is a preferred term in the OpenSSO community.</Note>
+    <Note Id="10" Modified="2009-11-03 17:32:59Z">Logout is a preferred term in the OpenSSO community.</Note>
+    <Note Id="11" Modified="2009-11-03 23:52:00Z">Logout is a preferred term in the OpenSSO community.</Note>
+    <Note Id="12" Modified="2009-11-03 23:52:03Z">Logout is a preferred term in the OpenSSO community.</Note>
+    <Note Id="13" Modified="2009-11-03 23:52:13Z">Logout is a preferred term in the OpenSSO community.</Note>
+    <Note Id="14" Modified="2009-11-03 23:52:18Z">Logout is a preferred term in the OpenSSO community.</Note>
+    <Note Id="15" Modified="2009-11-03 23:52:23Z">Logout is a preferred term in the OpenSSO community.</Note>
+    <Note Id="16" Modified="2010-01-13 18:46:47Z">Logout is used and acceptable in the SAML specification.</Note>
+    <Note Id="17" Modified="2009-11-03 23:52:39Z">Logout is a preferred term in the OpenSSO community.</Note>
+    <Note Id="18" Modified="2009-11-03 23:52:44Z">Logout is a preferred term in the OpenSSO community.</Note>
+    <Note Id="19" Modified="2009-11-03 23:52:48Z">Logout is a preferred term in the OpenSSO community.</Note>
+    <Note Id="20" Modified="2009-11-03 23:52:52Z">Logout is a preferred term in the OpenSSO community.</Note>
+    <Note Id="21" Modified="2009-11-09 16:46:22Z">Logout is a preferred term in the OpenSSO community.</Note>
+    <Note Id="22" Modified="2009-11-09 16:46:42Z">Logout is a preferred term in the OpenSSO community.</Note>
+    <Note Id="23" Modified="2009-11-09 16:58:46Z">Logout is a preferred term in the OpenSSO community.</Note>
+    <Note Id="24" Modified="2009-11-09 16:58:59Z">Logout is a preferred term in the OpenSSO community.</Note>
+    <Note Id="25" Modified="2009-11-09 16:59:05Z">Logout is a preferred term in the OpenSSO community.</Note>
+    <Note Id="26" Modified="2009-11-09 16:59:10Z">Logout is a preferred term in the OpenSSO community.</Note>
+   </User>
+  </Notes>
+  <Rules>
+   <Rule TypeName="AvoidNamespacesWithFewTypes" Category="Microsoft.Design" CheckId="CA1020">
+    <Resolution Name="Default">Consider merging the types defined in '{0}' with another namespace.</Resolution>
+   </Rule>
+   <Rule TypeName="UriReturnValuesShouldNotBeStrings" Category="Microsoft.Design" CheckId="CA1055">
+    <Resolution Name="Default">Change the return type of {0} from string to System.Uri.</Resolution>
+   </Rule>
+   <Rule TypeName="UsePreferredTerms" Category="Microsoft.Naming" CheckId="CA1726">
+    <Resolution Name="Member">Replace the term '{0}' in member name {1} with the preferred alternate '{2}'.</Resolution>
+    <Resolution Name="MemberParameter">In member {0}, replace the term '{1}' in parameter name {2} with the preferred alternate '{3}'.</Resolution>
+    <Resolution Name="Type">Replace the term '{0}' in type name {1} with the preferred alternate '{2}'.</Resolution>
+   </Rule>
+  </Rules>
+ </FxCopReport>
+</FxCopProject>

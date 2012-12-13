@@ -1,0 +1,294 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!--
+   DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
+  
+   Copyright (c) 2007 Sun Microsystems Inc. All Rights Reserved
+  
+   The contents of this file are subject to the terms
+   of the Common Development and Distribution License
+   (the License). You may not use this file except in
+   compliance with the License.
+
+   You can obtain a copy of the License at
+   https://opensso.dev.java.net/public/CDDLv1.0.html or
+   opensso/legal/CDDLv1.0.txt
+   See the License for the specific language governing
+   permission and limitations under the License.
+
+   When distributing Covered Code, include this CDDL
+   Header Notice in each file and include the License file
+   at opensso/legal/CDDLv1.0.txt.
+   If applicable, add the following below the CDDL Header,
+   with the fields enclosed by brackets [] replaced by
+   your own identifying information:
+   "Portions Copyrighted [year] [name of copyright owner]"
+
+   $Id: build-tools.xml,v 1.28 2010/01/11 17:34:32 veiming Exp $
+
+-->
+<!--
+   Portions Copyrighted 2010-2011 ForgeRock AS
+-->
+
+<project name="amadm" default="createZipFile" basedir=".">
+    <description>OpenWebSingle Sign-On: Tools.zip Creation</description>
+    <fail message="*** nightly build may be built from top level only ***">
+      <condition>
+            <or>
+                <not><isset property="amserver.warbase.dir"/></not>
+            </or>
+      </condition>
+    </fail>
+    <property file="${amserver.res.dir}/tools/amadm.properties"/>
+    <property name="amadm.unix.scripts.dir"
+        value="${amserver.basedir}/scripts/bin"/>
+    <property name="amadm.unix.scripts.log.dir"
+        value="${amserver.basedir}/scripts/log"/>
+    <property name="amadm.windows.scripts.dir"
+        value="${amserver.basedir}/scripts/bin"/>
+    <property name="amadm.windows.scripts.log.dir"
+        value="${amserver.basedir}/scripts/log"/>
+    <property name="amadm.tools.dir" value="${amserver.built.dir}/tools"/>
+    <property name="amadm.res.dir" value="${amadm.tools.dir}/resources"/>
+    <property name="amadm.classes.dir" value="${amadm.tools.dir}/classes"/>
+    <property name="amadm.lib.dir" value="${amadm.tools.dir}/lib"/>
+    <property name="amadm.template.dir" value="${amadm.tools.dir}/template"/>
+    <property name="amadm.windows.dir" value="${amadm.template.dir}/windows"/>
+    <property name="amadm.windows.bin.dir" value="${amadm.windows.dir}/bin"/>
+    <property name="amadm.unix.dir" value="${amadm.template.dir}/unix"/>
+    <property name="amadm.unix.bin.dir" value="${amadm.unix.dir}/bin"/>
+    <property name="amadm.classes.dir" value="${amadm.tools.dir}/classes"/>
+    <property name="amadm.package.dir"
+        value="${amadm.classes.dir}/${amadm.package.path}"/>
+    <property name="amadm.tools.scripts.dir"
+        value="${amserver.script.dir}/tools"/>
+    <property name="manifest.built.dir" value="${amserver.built.dir}/manifest"/>
+    <property name="manifest.classes.dir" value="${manifest.built.dir}/classes"/>
+    <property name="manifest.package.dir"
+        value="${manifest.classes.dir}/${manifest.package.path}"/>    
+    <property name="patch.built.dir" value="${amserver.built.dir}/patch"/>
+    <property name="patch.classes.dir" value="${patch.built.dir}/classes"/>
+    <property name="patch.package.dir"
+        value="${patch.classes.dir}/${patch.package.path}"/>    
+    
+    <target name="prepareBuild">
+        <mkdir dir="${amadm.res.dir}"/>
+        <mkdir dir="${amadm.classes.dir}"/>
+        <mkdir dir="${amadm.lib.dir}"/>
+        <mkdir dir="${amadm.template.dir}"/>
+        <mkdir dir="${amadm.windows.dir}"/>
+        <mkdir dir="${amadm.windows.bin.dir}"/>
+        <mkdir dir="${amadm.unix.dir}"/>
+        <mkdir dir="${amadm.unix.bin.dir}"/>
+        <mkdir dir="${amadm.classes.dir}"/>
+        <mkdir dir="${amadm.package.dir}"/>
+        <mkdir dir="${manifest.classes.dir}"/>
+        <mkdir dir="${manifest.package.dir}"/>        
+        <mkdir dir="${patch.classes.dir}"/>
+        <mkdir dir="${patch.package.dir}"/>        
+    </target>
+    <target name="makeJar" depends="prepareBuild">
+        <copy todir="${amadm.package.dir}"
+            overwrite="yes" encoding="UTF-8">
+            <fileset dir="${amserver.built.dir}/classes/${amadm.package.path}"
+                includes="*"/>
+        </copy>
+     
+        <filter token="DATESTAMP" value="${war.time.stamp}"/>        
+        <filter token="VERSION" value="${version.set}" />            
+                
+        <copy todir="${amadm.package.dir}"
+            overwrite="yes" filtering="true">
+            <fileset dir="${amserver.res.i18n.dir}"
+                includes="amadmtoolssetup.properties"/>
+        </copy>
+        <copy tofile="${amadm.package.dir}/amadmtoolssetup_en.properties"
+            overwrite="yes" filtering="true">
+            <fileset dir="${amserver.res.i18n.dir}"
+                includes="amadmtoolssetup.properties"/>
+        </copy>
+        <copy todir="${amadm.package.dir}"
+            overwrite="yes" filtering="true">
+            <fileset dir="${amserver.res.i18n.dir}/de_DE"
+                includes="amadmtoolssetup_de.properties"/>
+        </copy>
+        <copy todir="${amadm.package.dir}"
+            overwrite="yes" filtering="true">
+            <fileset dir="${amserver.res.i18n.dir}/es_ES"
+                includes="amadmtoolssetup_es.properties"/>
+        </copy>
+        <copy todir="${amadm.package.dir}"
+            overwrite="yes" filtering="true">
+            <fileset dir="${amserver.res.i18n.dir}/fr_FR"
+                includes="amadmtoolssetup_fr.properties"/>
+        </copy>
+        <copy todir="${amadm.package.dir}"
+            overwrite="yes" filtering="true">
+            <fileset dir="${amserver.res.i18n.dir}/ja_JP"
+                includes="amadmtoolssetup_ja.properties"/>
+        </copy>
+        <copy todir="${amadm.package.dir}"
+            overwrite="yes" filtering="true">
+            <fileset dir="${amserver.res.i18n.dir}/ko_KR"
+                includes="amadmtoolssetup_ko.properties"/>
+        </copy>
+        <copy todir="${amadm.package.dir}"
+            overwrite="yes" filtering="true">
+            <fileset dir="${amserver.res.i18n.dir}/ko_KR"
+                includes="amadmtoolssetup_ko.properties"/>
+        </copy>
+        <copy todir="${amadm.package.dir}"
+            overwrite="yes" filtering="true">
+            <fileset dir="${amserver.res.i18n.dir}/zh_CN"
+                includes="amadmtoolssetup_zh.properties"/>
+        </copy>
+        <copy todir="${amadm.package.dir}"
+            overwrite="yes" filtering="true">
+            <fileset dir="${amserver.res.i18n.dir}/zh_TW"
+                includes="amadmtoolssetup_zh_TW.properties"/>
+        </copy>
+
+        <jar destfile="${amadm.lib.dir}/amadm_setup.jar"
+            basedir="${amadm.classes.dir}">
+            <manifest>
+                <attribute name="Main-Class"
+                    value="com.sun.identity.tools.bundles.Main"/>
+            </manifest>
+        </jar>
+    </target>
+    <target name="makePatchJar" depends="prepareBuild">
+            <copy todir="${patch.package.dir}"
+                overwrite="yes" encoding="UTF-8">
+                <fileset dir="${amserver.built.dir}/classes/${patch.package.path}"
+                    includes="**/*"/>
+            </copy>
+            <jar destfile="${amadm.lib.dir}/ssopatch.jar"
+                basedir="${patch.classes.dir}">
+                <manifest>
+                    <attribute name="Main-Class"
+                        value="com.sun.identity.tools.patch.Patch"/>
+                </manifest>
+            </jar>
+    </target>        
+    <target name="makeManifestJar" depends="prepareBuild">
+            <copy todir="${manifest.package.dir}"
+                overwrite="yes" encoding="UTF-8">
+                <fileset dir="${amserver.built.dir}/classes/${manifest.package.path}"
+                    includes="**/*"/>
+            </copy>
+            <jar destfile="${amadm.lib.dir}/ssomanifest.jar"
+                basedir="${manifest.classes.dir}">
+                <manifest>
+                    <attribute name="Main-Class"
+                        value="com.sun.identity.tools.manifest.Manifest"/>
+                </manifest>
+            </jar>
+    </target>
+
+    <target name="copyNeededFiles" depends="makeJar,makeManifestJar,makePatchJar">
+        <copy todir="${amadm.lib.dir}"
+            overwrite="yes" flatten="yes" encoding="UTF-8">
+            <fileset dir="${extlib.dir}"
+                includes="${ssoadm.required-jars}"/>
+            <fileset dir="${sharedlib.dist.dir}"
+                includes="opensso-sharedlib.jar"/>
+            <fileset dir="${amserver.dist.dir}"
+                includes="amserver.jar"/>
+        </copy>
+        <copy todir="${amadm.res.dir}"
+            overwrite="yes" encoding="UTF-8">
+            <fileset dir="${amserver.built.res.dir}" includes="*.properties"
+                excludes="AMConfig.properties" />
+        </copy>
+        <copy todir="${amadm.classes.dir}" overwrite="yes">
+            <fileset dir="${amserver.warbase.dir}/ldif/sunds" 
+                includes="sunds_config_schema.ldif, sunds_config_index.ldif" />
+        </copy>
+        <copy todir="${amadm.tools.dir}" overwrite="yes" flatten="yes"
+            encoding="UTF-8">
+            <fileset dir="${products.license.dir}" includes="*.txt"/>
+            <fileset dir="${amadm.tools.scripts.dir}"
+                includes="setup, setup.bat, README.setup"/>
+        </copy>
+        <copy todir="${amadm.tools.dir}" overwrite="yes" flatten="yes"
+            encoding="UTF-8">
+            <fileset dir="${amserver.script.bin.dir}"
+                includes="ssopatch, ssopatch.bat, README.patch"/>
+        </copy>
+        <copy todir="${amadm.tools.dir}/patch" overwrite="yes" flatten="yes"
+            encoding="UTF-8">
+            <fileset dir="${amserver.script.dir}/patch"
+                includes="*"/>
+            </copy>
+        <copy todir="${amadm.windows.bin.dir}"
+            overwrite="yes" flatten="yes" encoding="UTF-8">
+            <fileset dir="${amadm.windows.scripts.dir}"
+                includes="${amadm.windows.ampassword.bat.file}"/>
+            <fileset dir="${amadm.windows.scripts.log.dir}"
+                includes="${amadm.windows.amverifyarchive.bat.file}"/>
+            <mapper type="glob" from="*" to="*.template"/>
+        </copy>
+        <copy todir="${amadm.unix.bin.dir}"
+              overwrite="yes" flatten="yes" encoding="UTF-8">
+            <fileset dir="${amadm.unix.scripts.dir}"
+                includes="${amadm.unix.ampassword.file}"/>
+            <fileset dir="${amadm.unix.scripts.log.dir}"
+                includes="${amadm.unix.amverifyarchive.file}"/>
+            <mapper type="glob" from="*" to="*.template"/>
+        </copy>
+        <antcall target="legacy-files" />
+    </target>
+
+    <target name="legacy-files" if ="legacy">
+        <copy todir="${amadm.res.dir}">
+            <fileset dir="${legacy.base.dir}/resources/locale" includes="*.properties" />
+        </copy>
+        <copy todir="${amadm.windows.bin.dir}">
+            <fileset dir="${legacy.base.dir}/scripts/bin" includes="amadmin.bat" />
+            <mapper type="glob" from="*" to="*.template"/>
+        </copy>
+        <copy todir="${amadm.unix.bin.dir}">
+            <fileset dir="${legacy.base.dir}/scripts/bin" includes="amadmin" />
+            <mapper type="glob" from="*" to="*.template"/>
+        </copy>
+    </target>
+    <target name="createZipFile" depends="createPatchZip">
+        <zip destfile="${amserver.dist.dir}/amAdminTools.zip"
+            whenempty="create">
+            <zipfileset dir="${amadm.tools.dir}"
+                filemode="755">
+                <include name="setup"/>
+                <include name="setup.bat"/>
+                <include name="*.txt"/>
+                <include name="README.setup"/>
+            </zipfileset>
+            <zipfileset dir="${amadm.tools.dir}" filemode="755">
+                <exclude name="lib/ssopatch.jar" />
+                <exclude name="lib/ssomanifest.jar" />
+                <exclude name="resources/ssoPatch**/*" />                
+                <include name="lib/**/*"/>               
+                <include name="classes/*.ldif"/>
+                <include name="resources/**/*"/>
+                <include name="template/**/*"/>
+            </zipfileset>
+        </zip>
+        <checksum file="${amserver.dist.dir}/amAdminTools.zip"
+            algorithm="SHA" fileext=".sha" />
+    </target>
+    <target name="createPatchZip" depends="copyNeededFiles">
+        <zip destfile="${amserver.dist.dir}/ssoPatchTools.zip"
+            whenempty="create">
+            <zipfileset dir="${amadm.tools.dir}" filemode="755">
+                <include name="lib/ssopatch.jar"/>
+                <include name="lib/ssomanifest.jar"/>
+                <include name="lib/amadm_setup.jar"/>                
+                <include name="resources/ssoPatch*"/>
+                <include name="ssopatch"/>
+                <include name="ssopatch.bat" />
+                <include name="README.patch" />
+                <include name="patch/*" />
+            </zipfileset>
+        </zip>    
+     </target>
+</project>

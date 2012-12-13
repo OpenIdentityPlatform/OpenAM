@@ -1,0 +1,94 @@
+<!--
+   DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
+  
+   Copyright (c) 2007 Sun Microsystems Inc. All Rights Reserved
+  
+   The contents of this file are subject to the terms
+   of the Common Development and Distribution License
+   (the License). You may not use this file except in
+   compliance with the License.
+
+   You can obtain a copy of the License at
+   https://opensso.dev.java.net/public/CDDLv1.0.html or
+   opensso/legal/CDDLv1.0.txt
+   See the License for the specific language governing
+   permission and limitations under the License.
+
+   When distributing Covered Code, include this CDDL
+   Header Notice in each file and include the License file
+   at opensso/legal/CDDLv1.0.txt.
+   If applicable, add the following below the CDDL Header,
+   with the fields enclosed by brackets [] replaced by
+   your own identifying information:
+   "Portions Copyrighted [year] [name of copyright owner]"
+
+   $Id: propertyPMConditionAuthScheme.xml,v 1.3 2008/06/25 05:45:12 qcheng Exp $
+
+-->
+<!DOCTYPE propertysheet SYSTEM "propertysheet.dtd">
+
+<propertysheet>
+    <section name="dummy" defaultValue="blank.header" >
+    <subsection name="dummy1" 
+        defaultValue="policy.condition.attribute.label.authscheme">
+        <property required="true">
+            <label name="lblName" defaultValue="policy.condition.attribute.label.name" labelFor="tfConditionName" />
+            <cc name="tfConditionName" tagclass="com.sun.web.ui.taglib.html.CCTextFieldTag">
+                <attribute name="size" value="50" />
+                <attribute name="autoSubmit" value="false" />
+                <attribute name="localizeDisplayFieldValue" value="false" />
+            </cc>
+            <cc name="conditionTypeName" tagclass="com.sun.web.ui.taglib.html.CCHiddenTag" />
+            <cc name="tfConditionTypeName" tagclass="com.sun.web.ui.taglib.html.CCHiddenTag" />
+            <cc name="tfRealmName" tagclass="com.sun.web.ui.taglib.html.CCHiddenTag" />
+        </property>
+        <property required="true">
+        <label name="lblAuthScheme" defaultValue="policy.condition.attribute.label.authscheme" labelFor="AuthScheme" />
+        <cc name="AuthScheme" tagclass="com.sun.web.ui.taglib.html.CCSelectableListTag">
+            <attribute name="multiple" value="true" />
+            <attribute name="size" value="8" />
+        </cc>
+        <cc name="breakTag" tagclass="com.sun.web.ui.taglib.html.CCStaticTextFieldTag">
+            <attribute name="defaultValue" value="&lt;br>" />
+            <attribute name="escape" value="false" />
+        </cc>
+        <cc name="breakTag" tagclass="com.sun.web.ui.taglib.html.CCStaticTextFieldTag">
+            <attribute name="defaultValue" value="&lt;br>" />
+            <attribute name="escape" value="false" />
+        </cc>
+        <cc name="btnAdd" tagclass="com.sun.web.ui.taglib.html.CCButtonTag">
+            <attribute name="defaultValue" value="button.add" />
+            <attribute name="OnClick" value="openSelectWindow(); return false;" />
+        </cc>
+        <cc name="btnDelete" tagclass="com.sun.web.ui.taglib.html.CCButtonTag">
+            <attribute name="defaultValue" value="button.delete" />
+            <attribute name="OnClick" value="deleteSelected(); return false;" />
+        </cc>
+        </property>
+    </subsection>
+    
+    <subsection name="dummy2" defaultValue="policy.condition.section.app">
+        <property>
+            <label name="lblApplicationName"
+                defaultValue="policy.condition.attribute.label.appname"
+                labelFor="ApplicationName" />
+            <cc name="ApplicationName"
+                tagclass="com.sun.web.ui.taglib.html.CCTextFieldTag">
+                <attribute name="size" value="30" />
+            </cc>
+        </property>
+
+        <property>
+            <label name="lblApplicationIdleTimeout"
+                defaultValue="policy.condition.attribute.label.apptimeout"
+                labelFor="ApplicationIdleTimeout" />
+            <cc name="ApplicationIdleTimeout"
+                tagclass="com.sun.web.ui.taglib.html.CCTextFieldTag">
+                <attribute name="size" value="5" />
+            </cc>
+            <fieldhelp name="timeoutHelp"
+                defaultValue="policy.condition.attribute.timeout.help" />
+        </property>
+    </subsection>
+    </section>
+</propertysheet>

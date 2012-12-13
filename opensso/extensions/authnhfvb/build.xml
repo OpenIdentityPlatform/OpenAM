@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+   The contents of this file are subject to the terms
+   of the Common Development and Distribution License
+   (the License). You may not use this file except in
+   compliance with the License.
+
+   You can obtain a copy of the License at
+   https://opensso.dev.java.net/public/CDDLv1.0.html or
+   opensso/legal/CDDLv1.0.txt
+   See the License for the specific language governing
+   permission and limitations under the License.
+
+   When distributing Covered Code, include this CDDL
+   Header Notice in each file and include the License file
+   at opensso/legal/CDDLv1.0.txt.
+   If applicable, add the following below the CDDL Header,
+   with the fields enclosed by brackets [] replaced by
+   your own identifying information:
+   "Portions Copyrighted [year] [name of copyright owner]"
+
+   Copyright 2008 Sun Microsystems Inc. All Rights Reserved
+-->
+
+<project name="HitachiFvAuth" default="all" basedir=".">
+    <description>Builds Hitachi Finger Vein Auth Module</description>
+    <property file="./build.properties"/>
+    <condition property="wsimport-script-suffix" value=".bat">
+        <os family="windows"/>
+    </condition>
+    <condition property="wsimport-script-suffix" value="">
+        <not>
+           <os family="windows"/>
+        </not>
+    </condition>
+    <path id="build.class.path">
+      <pathelement location="build/classes"/>
+      <fileset dir="${appserver.home}/lib">
+          <include name="**/*.jar"/>
+      </fileset>
+      <fileset dir="${opensso.lib}">
+          <include name="**/*.jar"/>
+      </fileset>
+    </path>
+    <target name="-pre-compile">
+        <mkdir dir="build/classes/Hitachi"/>
+        <exec executable="${appserver.home}/bin/wsimport${wsimport-script-suffix}">
+            <arg line="-verbose -extension -d build/classes/Hitachi ${authserver.url}"/>
+        </exec>
+    </target>
+    <target name="compile" depends="-pre-compile">
+        <mkdir dir="build/classes/Sun"/>
+       <javac fork="true" destdir="build/classes/Sun" srcdir="source">
+           <classpath refid="build.class.path" />
+       </javac>
+    </target>
+    <target name ="jar" depends="compile">
+      <mkdir dir="dist"/>
+      <jar destfile="dist/hitachi-fvauth.jar"  basedir="build/classes/Hitachi"/>
+      <jar destfile="dist/am-fvauth.jar"  basedir="build/classes/Sun"/>
+    </target>
+    <target name="all">
+        <antcall target="jar" />
+    </target>
+</project>

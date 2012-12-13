@@ -1,0 +1,132 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+   DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
+  
+   Copyright (c) 2006 Sun Microsystems Inc. All Rights Reserved
+  
+   The contents of this file are subject to the terms
+   of the Common Development and Distribution License
+   (the License). You may not use this file except in
+   compliance with the License.
+
+   You can obtain a copy of the License at
+   https://opensso.dev.java.net/public/CDDLv1.0.html or
+   opensso/legal/CDDLv1.0.txt
+   See the License for the specific language governing
+   permission and limitations under the License.
+
+   When distributing Covered Code, include this CDDL
+   Header Notice in each file and include the License file
+   at opensso/legal/CDDLv1.0.txt.
+   If applicable, add the following below the CDDL Header,
+   with the fields enclosed by brackets [] replaced by
+   your own identifying information:
+   "Portions Copyrighted [year] [name of copyright owner]"
+
+   $Id: lib-svc-dst.xsd,v 1.2 2008/06/25 05:48:41 qcheng Exp $
+
+-->
+
+
+<xs:schema xmlns:disco="urn:liberty:disco:2003-08" xmlns:xs="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified" attributeFormDefault="unqualified">
+    <xs:include schemaLocation="lib-arch-iwsf-utility.xsd"/>
+    <xs:import namespace="urn:liberty:disco:2003-08" schemaLocation="lib-arch-disco-svc.xsd"/>
+    <xs:annotation>
+        <xs:documentation>
+The source code in this XSD file was excerpted verbatim from:
+
+Liberty ID-WSF Data Services Template Specification
+Version 1.0
+12th November 2003
+
+Copyright (c) 2003 Liberty Alliance participants, see
+http://www.projectliberty.org/specs/idwsf_copyrights.html
+
+        </xs:documentation>
+    </xs:annotation>
+    <xs:element name="ResourceID" type="disco:ResourceIDType"/>
+    <xs:element name="EncryptedResourceID" type="disco:EncryptedResourceIDType"/>
+    <xs:group name="ResourceIDGroup">
+        <xs:choice>
+            <xs:element ref="ResourceID"/>
+            <xs:element ref="EncryptedResourceID"/>
+        </xs:choice>
+    </xs:group>
+    <!-- Querying Data -->
+    <xs:element name="Query" type="QueryType"/>
+    <xs:complexType name="QueryType">
+        <xs:sequence>
+            <xs:group ref="ResourceIDGroup" minOccurs="0"/>
+            <xs:element name="QueryItem" maxOccurs="unbounded">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element name="Select" type="SelectType"/>
+                    </xs:sequence>
+                    <xs:attribute name="id" type="xs:ID"/>
+                    <xs:attribute name="includeCommonAttributes" type="xs:boolean" default="0"/>
+                    <xs:attribute name="itemID" type="IDType"/>
+                    <xs:attribute name="changedSince" type="xs:dateTime"/>
+                </xs:complexType>
+            </xs:element>
+            <xs:element ref="Extension" minOccurs="0" maxOccurs="unbounded"/>
+        </xs:sequence>
+        <xs:attribute name="id" type="xs:ID"/>
+        <xs:attribute name="itemID" type="IDType"/>
+    </xs:complexType>
+    <xs:element name="QueryResponse" type="QueryResponseType"/>
+    <xs:complexType name="QueryResponseType">
+        <xs:sequence>
+            <xs:element ref="Status"/>
+            <xs:element name="Data" minOccurs="0" maxOccurs="unbounded">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:any minOccurs="0" maxOccurs="unbounded"/>
+                    </xs:sequence>
+                    <xs:attribute name="id" type="xs:ID"/>
+                    <xs:attribute name="itemIDRef" type="IDReferenceType"/>
+                </xs:complexType>
+            </xs:element>
+            <xs:element ref="Extension" minOccurs="0" maxOccurs="unbounded"/>
+        </xs:sequence>
+        <xs:attribute name="id" type="xs:ID"/>
+        <xs:attribute name="itemIDRef" type="IDReferenceType"/>
+        <xs:attribute name="timeStamp" type="xs:dateTime"/>
+    </xs:complexType>
+    <!-- Modifying Data -->
+    <xs:element name="Modify" type="ModifyType"/>
+    <xs:complexType name="ModifyType">
+        <xs:sequence>
+            <xs:group ref="ResourceIDGroup" minOccurs="0"/>
+            <xs:element name="Modification" maxOccurs="unbounded">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element name="Select" type="SelectType"/>
+                        <xs:element name="NewData" minOccurs="0">
+                            <xs:complexType>
+                                <xs:sequence>
+                                    <xs:any minOccurs="0" maxOccurs="unbounded"/>
+                                </xs:sequence>
+                            </xs:complexType>
+                        </xs:element>
+                    </xs:sequence>
+                    <xs:attribute name="id" type="xs:ID"/>
+                    <xs:attribute name="notChangedSince" type="xs:dateTime"/>
+                    <xs:attribute name="overrideAllowed" type="xs:boolean" default="0"/>
+                </xs:complexType>
+            </xs:element>
+            <xs:element ref="Extension" minOccurs="0" maxOccurs="unbounded"/>
+        </xs:sequence>
+        <xs:attribute name="id" type="xs:ID"/>
+        <xs:attribute name="itemID" type="IDType"/>
+    </xs:complexType>
+    <xs:element name="ModifyResponse" type="ResponseType"/>
+    <xs:complexType name="ResponseType">
+        <xs:sequence>
+            <xs:element ref="Status"/>
+            <xs:element ref="Extension" minOccurs="0" maxOccurs="unbounded"/>
+        </xs:sequence>
+        <xs:attribute name="id" type="xs:ID"/>
+        <xs:attribute name="itemIDRef" type="IDReferenceType"/>
+        <xs:attribute name="timeStamp" type="xs:dateTime"/>
+    </xs:complexType>
+</xs:schema>

@@ -1,0 +1,352 @@
+      <test name="CSDK_sso_testcase1">
+        <parameter name="testIdx" value="1"/>
+        <parameter name="createUser" value="true"/>
+        <parameter name="restore" value="false"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>       
+            <class name="com.sun.identity.qatest.csdk.CSDKSSOTest"/>
+        </classes>
+    </test>
+    <test name="CSDK_sso_testcase2">
+        <parameter name="testIdx" value="2"/>
+        <parameter name="createUser" value="false"/>
+        <parameter name="restore" value="false"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.csdk.CSDKSSOTest"/>
+        </classes>
+    </test>
+    <test name="CSDK_sso_testcase3">
+        <parameter name="testIdx" value="3"/>
+        <parameter name="createUser" value="false"/>
+        <parameter name="restore" value="false"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.csdk.CSDKSSOTest"/>
+        </classes>
+    </test>
+    <test name="CSDK_sso_testcase4">
+        <parameter name="testIdx" value="4"/>
+        <parameter name="createUser" value="false"/>
+        <parameter name="restore" value="false"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.csdk.CSDKSSOTest"/>
+        </classes>
+    </test>
+    <test name="CSDK_sso_testcase5">
+        <parameter name="testIdx" value="5"/>
+        <parameter name="createUser" value="false"/>
+        <parameter name="restore" value="false"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.csdk.CSDKSSOTest"/>
+        </classes>
+    </test>
+    <test name="CSDK_sso_testcase6">
+        <parameter name="testIdx" value="6"/>
+        <parameter name="createUser" value="false"/>
+        <parameter name="restore" value="false"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.csdk.CSDKSSOTest"/>
+        </classes>
+    </test>
+    <test name="CSDK_sso_testcase7">
+        <parameter name="testIdx" value="7"/>
+        <parameter name="createUser" value="false"/>
+        <parameter name="restore" value="false"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.csdk.CSDKSSOTest"/>
+        </classes>
+    </test>
+    <test name="CSDK_sso_testcase8">
+        <parameter name="testIdx" value="8"/>
+        <parameter name="createUser" value="false"/>
+        <parameter name="restore" value="false"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.csdk.CSDKSSOTest"/>
+        </classes>
+    </test>
+    <test name="CSDK_sso_testcase9">
+        <parameter name="testIdx" value="9"/>
+        <parameter name="createUser" value="false"/>
+        <parameter name="restore" value="false"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.csdk.CSDKSSOTest"/>
+        </classes>
+    </test>
+    <test name="CSDK_sso_testcase10">
+        <parameter name="testIdx" value="10"/>
+        <parameter name="createUser" value="false"/>
+        <parameter name="restore" value="false"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.csdk.CSDKSSOTest"/>
+        </classes>
+    </test>
+    <test name="CSDK_sso_testcase11">
+        <parameter name="testIdx" value="11"/>
+        <parameter name="createUser" value="false"/>
+        <parameter name="restore" value="false"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.csdk.CSDKSSOTest"/>
+        </classes>
+    </test>
+    <test name="CSDK_sso_testcase12">
+        <parameter name="testIdx" value="12"/>
+        <parameter name="createUser" value="false"/>
+        <parameter name="restore" value="false"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.csdk.CSDKSSOTest"/>
+        </classes>
+    </test>
+    <test name="CSDK_sso_testcase13">
+        <parameter name="testIdx" value="13"/>
+        <parameter name="createUser" value="false"/>
+        <parameter name="restore" value="false"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.csdk.CSDKSSOTest"/>
+        </classes>
+    </test>
+    <test name="CSDK_sso_testcase14">
+        <parameter name="testIdx" value="14"/>
+        <parameter name="createUser" value="false"/>
+        <parameter name="restore" value="false"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.csdk.CSDKSSOTest"/>
+        </classes>
+    </test>
+    <test name="CSDK_sso_testcase15">
+        <parameter name="testIdx" value="15"/>
+        <parameter name="createUser" value="false"/>
+        <parameter name="restore" value="false"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.csdk.CSDKSSOTest"/>
+        </classes>
+    </test>
+    <test name="CSDK_sso_testcase16">
+        <parameter name="testIdx" value="16"/>
+        <parameter name="createUser" value="false"/>
+        <parameter name="restore" value="false"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.csdk.CSDKSSOTest"/>
+        </classes>
+    </test>
+    <test name="CSDK_sso_testcase17">
+        <parameter name="testIdx" value="17"/>
+        <parameter name="createUser" value="false"/>
+        <parameter name="restore" value="false"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.csdk.CSDKSSOTest"/>
+        </classes>
+    </test>
+    <test name="CSDK_sso_testcase18">
+        <parameter name="testIdx" value="18"/>
+        <parameter name="createUser" value="false"/>
+        <parameter name="restore" value="false"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.csdk.CSDKSSOTest"/>
+        </classes>
+    </test>
+    <test name="CSDK_sso_testcase19">
+        <parameter name="testIdx" value="19"/>
+        <parameter name="createUser" value="false"/>
+        <parameter name="restore" value="false"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.csdk.CSDKSSOTest"/>
+        </classes>
+    </test>
+    <test name="CSDK_sso_testcase20">
+        <parameter name="testIdx" value="20"/>
+        <parameter name="createUser" value="false"/>
+        <parameter name="restore" value="false"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.csdk.CSDKSSOTest"/>
+        </classes>
+    </test>
+    <test name="CSDK_sso_testcase21">
+        <parameter name="testIdx" value="21"/>
+        <parameter name="createUser" value="false"/>
+        <parameter name="restore" value="false"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.csdk.CSDKSSOTest"/>
+        </classes>
+    </test>
+    <test name="CSDK_sso_testcase22">
+        <parameter name="testIdx" value="22"/>
+        <parameter name="createUser" value="false"/>
+        <parameter name="restore" value="false"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.csdk.CSDKSSOTest"/>
+        </classes>
+    </test>
+    <test name="CSDK_sso_testcase23">
+        <parameter name="testIdx" value="23"/>
+        <parameter name="createUser" value="false"/>
+        <parameter name="restore" value="false"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.csdk.CSDKSSOTest"/>
+        </classes>
+    </test>
+    <test name="CSDK_sso_testcase24">
+        <parameter name="testIdx" value="24"/>
+        <parameter name="createUser" value="false"/>
+        <parameter name="restore" value="false"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.csdk.CSDKSSOTest"/>
+        </classes>
+    </test>
+    <test name="CSDK_sso_testcase25">
+        <parameter name="testIdx" value="25"/>
+        <parameter name="createUser" value="false"/>
+        <parameter name="restore" value="false"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.csdk.CSDKSSOTest"/>
+        </classes>
+    </test>
+    <test name="CSDK_sso_testcase26">
+        <parameter name="testIdx" value="26"/>
+        <parameter name="createUser" value="false"/>
+        <parameter name="restore" value="false"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.csdk.CSDKSSOTest"/>
+        </classes>
+    </test>
+    <test name="CSDK_sso_testcase27">
+        <parameter name="testIdx" value="27"/>
+        <parameter name="createUser" value="false"/>
+        <parameter name="restore" value="true"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.csdk.CSDKSSOTest"/>
+        </classes>
+    </test> 
+   

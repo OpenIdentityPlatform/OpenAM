@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  ! CCPL HEADER START
+  !
+  ! This work is licensed under the Creative Commons
+  ! Attribution-NonCommercial-NoDerivs 3.0 Unported License.
+  ! To view a copy of this license, visit
+  ! http://creativecommons.org/licenses/by-nc-nd/3.0/
+  ! or send a letter to Creative Commons, 444 Castro Street,
+  ! Suite 900, Mountain View, California, 94041, USA.
+  !
+  ! You can also obtain a copy of the license at
+  ! src/main/resources/legal-notices/CC-BY-NC-ND.txt.
+  ! See the License for the specific language governing permissions
+  ! and limitations under the License.
+  !
+  ! If applicable, add the following below this CCPL HEADER, with the fields
+  ! enclosed by brackets "[]" replaced with your own identifying information:
+  !      Portions Copyright [yyyy] [name of copyright owner]
+  !
+  ! CCPL HEADER END
+  !
+  !      Copyright 2011-2012 ForgeRock AS
+  !    
+-->
+<chapter xml:id='chap-before-you-install'
+ xmlns='http://docbook.org/ns/docbook' version='5.0' xml:lang='en'
+ xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance'
+ xsi:schemaLocation='http://docbook.org/ns/docbook http://docbook.org/xml/5.0/xsd/docbook.xsd'
+ xmlns:xlink='http://www.w3.org/1999/xlink'
+ xmlns:xinclude='http://www.w3.org/2001/XInclude'>
+ <title>Before You Install OpenAM Policy Agents</title>
+
+ <para>This chapter covers software and hardware prerequisites for installing
+ and running OpenAM Policy Agents.</para>
+
+ <para>TODO: Import the relevant information from
+ https://wikis.forgerock.org/confluence/display/openam/OpenAM+Policy+Agents+3.0.4+supported
+ modulo changes in particular for test plans.</para>
+
+ <para>Apache web agents require Apache Portable Runtime 1.3.x or later. You
+ can check your installation by running <command>httpd -v</command>. On some
+ systems, the packaged version of Apache HTTPD uses earlier versions of APR
+ that are not compatible with the current web agents.</para>
+
+ <para>Before installing web policy agents on Solaris 10, make sure you have
+ applied the latest shared library patch for C++, at least 119963-16 on SPARC,
+ or 119964-12 on x86.</para>
+</chapter>

@@ -1,0 +1,126 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!--
+   DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
+
+   Copyright (c) 2009 Sun Microsystems Inc. All Rights Reserved
+
+   The contents of this file are subject to the terms
+   of the Common Development and Distribution License
+   (the License). You may not use this file except in
+   compliance with the License.
+
+   You can obtain a copy of the License at
+   https://opensso.dev.java.net/public/CDDLv1.0.html or
+   opensso/legal/CDDLv1.0.txt
+   See the License for the specific language governing
+   permission and limitations under the License.
+
+   When distributing Covered Code, include this CDDL
+   Header Notice in each file and include the License file
+   at opensso/legal/CDDLv1.0.txt.
+   If applicable, add the following below the CDDL Header,
+   with the fields enclosed by brackets [] replaced by
+   your own identifying information:
+   "Portions Copyrighted [year] [name of copyright owner]"
+
+   $Id: realm-select-popup.xhtml,v 1.7 2009/07/24 23:55:38 farble1670 Exp $
+
+-->
+
+<span
+    xmlns="http://www.w3.org/1999/xhtml"
+    xmlns:ui="http://java.sun.com/jsf/facelets"
+    xmlns:f="http://java.sun.com/jsf/core"
+    xmlns:ice="http://www.icesoft.com/icefaces/component"
+    xmlns:o="http://opensso.dev.java.net">
+
+    <o:popup
+        width="300"
+        type="warning"
+        handler="#{booleanActionsHandler}"
+        modal="true"
+        title="#{resources['realm-select-popup.title']}"
+        visible="#{realmsBean.realmSelectPopupVisible}"
+        closeListenerMethod="realmSelectPopupCancelListener">
+        <ui:define name="body">
+            <ice:panelGroup
+                styleClass="realm-select-popup">
+                <ice:panelGroup
+                    style="text-align: left; padding-bottom: 10px">
+                    <ice:outputFormat
+                        escape="false"
+                        value="Your current realm is: "/>
+                </ice:panelGroup>
+                <ice:panelGroup
+                    style="text-align: left; padding-bottom: 10px">
+                    <ice:outputLabel
+                        value="#{realmsBean.realmBean.title}"/>
+                </ice:panelGroup>
+                <ice:panelGroup
+                    style="text-align: left; padding-bottom: 20px">
+                    <ice:outputFormat
+                        escape="false"
+                        value="#{resources['realm-select-popup.warning']}"/>
+                </ice:panelGroup>
+                <ice:panelGroup
+                    style="text-align: left; padding-bottom: 20px">
+                    <ice:selectOneRadio
+                        value="#{realmsBean.realmChange}">
+                        <f:selectItem
+                            itemValue="true"
+                            itemLabel="Yes"/>
+                        <f:selectItem
+                            itemValue="false"
+                            itemLabel="No"/>
+                    </ice:selectOneRadio>
+                </ice:panelGroup>
+                <ice:panelGroup
+                    visible="#{realmsBean.realmChange}">
+                    <ice:panelGroup
+                        style="text-align: left; padding-bottom: 20px">
+                        <ice:outputFormat
+                            escape="false"
+                            value="#{resources['realm-select-popup.info']}"/>
+                    </ice:panelGroup>
+                    <ice:panelGrid
+                        columns="2"
+                        styleClass="realm-select-popup-realm-table">
+                        <ice:graphicImage
+                            value="../image/search.png"/>
+                        <ice:inputText
+                            style="width: 100%"
+                            onkeyup="submitNow(this)"
+                            value="#{realmsBean.realmSelectPopupFilter}"/>
+                        <ice:panelGroup/>
+                        <ice:selectOneListbox
+                            style="width: 100%"
+                            size="10"
+                            immediate="true"
+                            partialSubmit="false"
+                            value="#{realmsBean.realmSelectPopupRealmBean}"
+                            converter="realmBeanConverter">
+                            <f:selectItems
+                                value="#{realmsBean.realmBeanItems}"/>
+                        </ice:selectOneListbox>
+                    </ice:panelGrid>
+                </ice:panelGroup>
+                <ice:panelGrid
+                    style="padding-top: 10px"
+                    styleClass="button-group"
+                    columns="2">
+                    <o:button
+                        type="cancel"
+                        handler="#{realmsHandler}"
+                        listenerMethod="realmSelectPopupCancelListener"/>
+                    <ice:panelGroup
+                        visible="#{realmsBean.realmChange}">
+                        <o:button
+                            type="ok"
+                            handler="#{realmsHandler}"
+                            listenerMethod="realmSelectPopupOkListener"/>
+                    </ice:panelGroup>
+                </ice:panelGrid>
+            </ice:panelGroup>
+        </ui:define>
+    </o:popup>
+</span>

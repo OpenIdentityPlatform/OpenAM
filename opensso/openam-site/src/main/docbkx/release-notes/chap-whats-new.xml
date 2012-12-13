@@ -1,0 +1,314 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  ! CCPL HEADER START
+  !
+  ! This work is licensed under the Creative Commons
+  ! Attribution-NonCommercial-NoDerivs 3.0 Unported License.
+  ! To view a copy of this license, visit
+  ! http://creativecommons.org/licenses/by-nc-nd/3.0/
+  ! or send a letter to Creative Commons, 444 Castro Street,
+  ! Suite 900, Mountain View, California, 94041, USA.
+  !
+  ! You can also obtain a copy of the license at
+  ! src/main/resources/legal-notices/CC-BY-NC-ND.txt.
+  ! See the License for the specific language governing permissions
+  ! and limitations under the License.
+  !
+  ! If applicable, add the following below this CCPL HEADER, with the fields
+  ! enclosed by brackets "[]" replaced with your own identifying information:
+  !      Portions Copyright [yyyy] [name of copyright owner]
+  !
+  ! CCPL HEADER END
+  !
+  !      Copyright 2011-2012 ForgeRock AS
+  !    
+-->
+<chapter xml:id='chap-whats-new'
+ xmlns='http://docbook.org/ns/docbook' version='5.0' xml:lang='en'
+ xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance'
+ xsi:schemaLocation='http://docbook.org/ns/docbook http://docbook.org/xml/5.0/xsd/docbook.xsd'
+ xmlns:xlink='http://www.w3.org/1999/xlink'
+ xmlns:xinclude='http://www.w3.org/2001/XInclude'>
+ <title>What's New in OpenAM <?eval ${serverDocTargetVersion}?></title>
+
+ <para>OpenAM <?eval ${serverDocTargetVersion}?> fixes a number of issues, and
+ provides the following additional features.</para>
+
+ <itemizedlist>
+  <title>Major New Features</title>
+  <listitem>
+   <para>OpenIG, the ForgeRock <link xlink:href="http://openig.forgerock.org/"
+   >Identity Gateway</link>, is a high-performance reverse proxy server with
+   specialized session management and credential replay functionality. OpenIG
+   integrates well with OpenAM, and there is no need to modify the target
+   application or the container in which it runs.</para>
+   <para>OpenIG also includes the Federation Gateway, which enables federation
+   capabilities for applications that cannot be modified to use the Fedlet and
+   SAML 2.0.</para>
+  </listitem>
+<!--   <listitem>
+   <para>OpenAM now supports YubiKey authentication. The YubiKey simplifies
+   the process of logging in with a One Time Password token as it does not
+   require the user to re-type long pass codes from a display device into the
+   login field of the computer. The YubiKey is inserted in the USB-port of any
+   computer and the OTP is generated and automatically entered with a simple
+   touch of a button on the YubiKey, and without the need of any client
+   software or drivers.</para>
+  </listitem> -->
+  <listitem>
+   <!-- OPENAM-??? -->
+   <para>OpenAM now uses OpenDJ 2.4.5 as the embedded data store
+   (OPENAM-960).</para>
+   <para>OpenAM now also uses the OpenDJ LDAP SDK.<footnote><para>The Java EE
+   deployment container in which OpenAM runs can potentially expose leaks in
+   OpenDJ LDAP SDK (OPENDJ-388).</para></footnote></para>
+  </listitem>
+  <listitem>
+   <para>OpenAM now provides JSON output through the identity services REST
+   interface (OPENAM-940).</para>
+  </listitem>
+  <!-- TODO: reword this when the extension is integrated. -->
+<!--   <listitem>
+   <para>A new session failover mechanism introduces a replacement for
+   the existing implementation that relies on Message Queue and Berkeley DB
+   with a highly scalable, pure Java implementation.</para>
+  </listitem> -->
+  <listitem>
+   <para>OpenAM now supports adaptive risk authentication (OPENAM-846). You
+   configure the adaptive risk authentication module to assess risks, and then
+   you add the module into an authentication chain. The module determines
+   whether to require further authentication processing based on assessment of
+   the risk involved during authentication. Adaptive risk authentication lets
+   you require more from users when they login from an unfamiliar location,
+   from a new device, after a long period during which the account remained
+   idle, and so forth.</para>
+  </listitem>
+  <listitem>
+   <para>OpenAM supports a new SAML 2.0 IdP Adapter plug-in for additional
+   flexibility. The adapter lets the system handle situations that arise when
+   the identity provider needs to perform additional processing before
+   releasing the assertion, or when interaction with the user is needed before
+   releasing it. The IdP Adapter class implementing the plugin can be
+   configured through the console (OPENAM-700).</para>
+  </listitem>
+  <listitem>
+   <para>OpenAM now provides an OAuth 2.0 Client authentication module
+   (OPENAM-679).</para>
+  </listitem>
+  <listitem>
+   <para>Multiple improvements in the OpenAM upgrade process streamline the
+   move to the new version (OPENAM-626).</para>
+  </listitem>
+  <listitem>
+   <para>OpenAM now supports interoperability with LDAP servers that implement
+   the (Behera) Internet-Draft, <link
+   xlink:href="http://tools.ietf.org/html/draft-behera-ldap-password-policy-09"
+   >Password Policy for LDAP Directories</link> (OPENAM-613).</para>
+  </listitem>
+ </itemizedlist>
+
+ <itemizedlist>
+  <title>Additional New Features</title>
+  <listitem>
+   <para>Setup wizards make it easier to use OpenDJ as the identity
+   repository.</para>
+  </listitem>
+  <listitem>
+   <para>OpenAM now allows you to differentiate Login UI buttons using CSS
+   (OPENAM-977).</para>
+  </listitem>
+  <listitem>
+   <para>OpenAM now allows authentication modules to be installed as a single
+   .jar file (OPENAM-916).</para>
+  </listitem>
+  <listitem>
+   <para>OpenAM has improved console configuration for handling services such
+   as Authentication Core Settings and Identity Repositories (OPENAM-887).</para>
+  </listitem>
+  <listitem>
+   <para>The <command>ssoadm</command> command now provides subcommands to
+   manage entitlement application types: <command>create-appl-type</command>,
+   <command>delete-appl-types</command>, <command>list-appl-types</command>
+   (OPENAM-872).</para>
+  </listitem>
+  <listitem>
+   <para>OpenAM console now includes many more helpful hints and built-in
+   documentation (OPENAM-805).</para>
+  </listitem>
+  <listitem>
+   <para>OpenAM now lets you fetch maximum session time, time remaining, and
+   idle time when querying attributes over the REST interface
+   (OPENAM-801).</para>
+  </listitem>
+  <listitem>
+   <para>OpenAM now supports a <literal>refresh</literal> parameter to reset
+   session idle time to 0 when querying attributes over the REST interface
+   (OPENAM-800).</para>
+  </listitem>
+  <listitem>
+   <para>OpenAM now supports time zone policy settings using the RFC 822
+   format, +/-0000 (OPENAM-791).</para>
+  </listitem>
+  <listitem>
+   <para>OpenAM session service now lets you set the maximum session time,
+   maximum idle time, and maximum caching time when assigning service to
+   the user through the console (OPENAM-785).</para>
+  </listitem>
+  <listitem>
+   <para>OpenAM now returns a load balancer cookie, if configured, to an
+   authentication request over the REST interface (OPENAM-766).</para>
+  </listitem>
+  <listitem>
+   <para>OpenAM ClusterStateService now works with HTTPS endpoints
+   (OPENAM-759). When using HTTPS endpoints, set
+   <literal>com.sun.identity.urlchecker.dorequest=false</literal>.</para>
+  </listitem>
+  <listitem>
+   <para>OpenAM now bundles <filename>click-nodeps.jar</filename>
+   (OPENAM-646).</para>
+  </listitem>
+  <listitem>
+   <para>OpenAM now provides additional statistics related to session failover
+   (OPENAM-641).</para>
+  </listitem>
+  <listitem>
+   <para>The OpenAM <command>amsfo</command> script now starts the session
+   database only after the message queue is up and running (OPENAM-624).</para>
+  </listitem>
+  <listitem>
+   <para>OpenAM .NET fedlets now support encrypted assertions
+   (OPENAM-604).</para>
+  </listitem>
+  <listitem>
+   <para>The Administration Tools setup script now has better default
+   settings (OPENAM-577).</para>
+  </listitem>
+  <listitem>
+   <para>The OpenAM console configuration wizard now suggests better values
+   for cookie domains (OPENAM-576).</para>
+  </listitem>
+  <listitem>
+   <para>OpenAM .jar files now contain standard MANIFEST entries
+   (OPENAM-570).</para>
+  </listitem>
+  <listitem>
+   <para>The <command>ssoadm</command> can now decode an encrypted password
+   stored in the password file (OPENAM-569).</para>
+  </listitem>
+  <listitem>
+   <para>You can now configure the HOTP authentication module email from
+   address using OpenAM console (OPENAM-513).</para>
+  </listitem>
+  <listitem>
+   <para>The OpenAM console page <filename>Debug.jsp</filename> (such as
+   <literal>http://openam.example.com:8080/openam/Debug.jsp</literal>) now
+   can set the log level for any debug instance (OPENAM-511). See the
+   Debug instances drop-down list at the top of the page.</para>
+  </listitem>
+  <listitem>
+   <para>OpenAM now provides a property,
+   <literal>openam.authentication.ignore_goto_during_logout</literal>, to
+   set whether to ignore logout <literal>goto</literal> URLs, and instead
+   display the Logout page (OPENAM-494).</para>
+  </listitem>
+  <listitem>
+   <para>OpenAM now provides support for multiple failover servers in the 
+   RADIUS authentication module (OPENAM-477).</para>
+  </listitem>
+  <listitem>
+   <para>OpenAM now provides a mechanism to control which session properties
+   are copied during session upgrade (OPENAM-462).</para>
+  </listitem>
+  <listitem>
+   <para>OpenAM now provides session timeout notification (OPENAM-457).
+   The improvement implements a hook for timeout into the session service on
+   the server side. It listens for timeouts on all sessions.</para>
+  </listitem>
+  <listitem>
+   <para>The OpenAM authentication service now can map HTTP headers
+   when forwarding requests (OPENAM-453). This applies both to the distributed
+   and centralized authentication services. See configuration properties
+   <literal>openam.retained.http.headers</literal> and
+   <literal>openam.forbidden.to.copy.headers</literal>.</para>
+  </listitem>
+  <listitem>
+   <para>The OpenAM session service now lets you extend quota exhaustion
+   actions with a plugin (OPENAM-433).</para>
+   <para>To add a new plugin, update the
+   <filename>amSession.properties</filename> files with the appropriate
+   internationalization keys, and place your plugin class either in
+   <filename>WEB-INF/classes</filename> or <filename>WEB-INF/lib</filename>
+   where you deployed OpenAM. Next, add your implementation using the
+   <command>ssoadm</command> command.</para>
+   <screen>$ ssoadm
+ set-attr-choicevals
+ --servicename iPlanetAMSessionService
+ --schematype Global
+ --attributename iplanet-am-session-constraint-handler
+ --adminid amadmin
+ --password-file .pass
+ --add
+ --choicevalues mykey=demo.Clazz</screen>
+   <para>Here, <replaceable>mykey</replaceable> is the internationalization
+   key you added to <filename>amSession.properties</filename> files, and
+   <replaceable>demo.Clazz</replaceable> is the fully qualified class name
+   for your plugin class.</para>
+   <para>You can remove the plugin using the <command>ssoadm
+   remove-attr-choicevals</command> command, and list quota exhaustion
+   actions using the <command>ssoadm get-attr-choicevals</command>
+   command.</para>
+  </listitem>
+  <listitem>
+   <!-- Fix for OPENAM-795: Document the new monitorable values -->
+   <para>OpenAM now tracks monitoring information for LDAP connection pools
+   (OPENAM-410). OpenAM monitoring exposes the minimum size of the pool, the
+   maximum size of the pool, the high water mark of the pool, the current size
+   of the pool, the number of connections retrieved, the number of connections
+   created, and the number of connections destroyed.</para>
+  </listitem>
+  <listitem>
+   <para>OpenAM Windows Desktop SSO now provides a mechanism to fail attempted
+   authentication when Kerberos-authenticated user has no profile in the OpenAM
+   data store (OPENAM-403).</para>
+  </listitem>
+  <listitem>
+   <para>OpenAM now handles Active Directory password expiration responses
+   properly (OPENAM-258).</para>
+  </listitem>
+  <listitem>
+   <para>OpenAM password reset now uses realm aliases to find realms for
+   end users, eliminating the need to add a realm parameter to the URL
+   (OPENAM-192).</para>
+  </listitem>
+  <listitem>
+   <para>OpenAM now allows time-based rotation, and also file name prefixes and
+   suffixes for regular and debug logs. (OPENAM-41, OPENAM-42)</para>
+  </listitem>
+  <listitem>
+   <!-- Fix for OpenAM-796: Document the login progressbar template functionality -->
+   <para>For cross domain single sign on and SAML 2.0 authentication, users
+   were presented with a blank login page during authentication, in fact a
+   page containing forms with hidden fields used to process authentication.
+   OpenAM now provides templates so you can show users something besides
+   than blank pages, such as for example a page with an animated .gif progress
+   bar (OPENAM-9).</para>
+   <para>For cross domain single sign on, edit a copy of the file
+   <filename>config/federation/default/cdclogin.jsp</filename> where you
+   unpacked the OpenAM web application (for example
+   <filename>/path/to/tomcat/webapps/openam/config/federation/default/cdclogin.jsp</filename>).
+   You can change the presentation as appropriate for your deployment. Make
+   sure you retain the form and JavaScript to ensure requests are processed
+   properly. Then replace
+   <filename>config/federation/default/cdclogin.jsp</filename> with your
+   version.</para>
+   <para>For SAML 2.0, modify the templates
+   <link xlink:href="http://sources.forgerock.org/browse/openam/trunk/opensso/products/federation/library/resources/saml2login.template?r=HEAD"><filename>saml2login.template</filename></link>
+   and
+   <link xlink:href="http://sources.forgerock.org/browse/openam/trunk/opensso/products/federation/library/resources/saml2loginwithrelay.template?r=HEAD"><filename>saml2loginwithrelay.template</filename></link>
+   to change the presentation, retaining the form and JavaScript. Then copy
+   your templates under the <filename>WEB-INF/classes/</filename> directory
+   where you unpacked the OpenAM web application (for example
+   <filename>/path/to/tomcat/webapps/openam/WEB-INF/classes/</filename>).</para>
+  </listitem>
+ </itemizedlist>
+</chapter>

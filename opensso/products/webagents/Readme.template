@@ -1,0 +1,69 @@
+Patch-ID# 
+
+Keywords: 
+
+Synopsis: 
+
+Date:
+
+Solaris Release: 
+
+SunOS Release: 
+
+Unbundled Product: Policy Agent
+
+Unbundled Release: 3.0-01
+
+Xref:
+
+Topic: Policy Agent
+
+Relevant Architectures: all
+
+BugId's fixed with this patch: 
+
+Changes incorporated in this version: 
+
+Patches accumulated and obsoleted by this patch:
+
+Patches which conflict with this patch:
+
+Patches required with this patch:
+
+Obsoleted by:
+
+Files included with this patch:
+
+Problem Description:
+
+Bugs fixed in 3.0-01
+--------------------
+
+
+Patch Installation Instructions:
+----------------------------------
+
+1. Download and untar the patch bits to a temporary location.
+2. This will contain Agent bits for the specific container, packaged as separate bundles,
+   one for each Operating system/supported platform.
+3. These bundles are full Agent installation bits.
+4. For detailed installation and configuration instructions for a specific Agent/platform,
+   refer to release notes
+   http://docs.sun.com/app/docs/doc/819-2796/adtaa?a=view
+
+Special installation Instructions:
+Note:
+
+Following bug-fixes have corresponding new properties added to AMAgent.properties file.
+Please review the AMAgent.properties file as well as the 2.2-0x release notes thoroughly
+to learn how to set these properties and understand their purpose.
+
+6676032 - property com.sun.am.use_redirect_for_advice
+6725383 - property com.sun.am.policy.agents.config.use.sunwmethod
+6768406 - property com.sun.am.policy.agents.config.policy_number_of_tries
+6608463 - property com.sun.am.policy.agents.config.policy_clock_skew
+
+More information on these unique features and all product documentation can
+be accessed at the following URL:
+
+ http://docs.sun.com/app/docs/coll/1322.1 

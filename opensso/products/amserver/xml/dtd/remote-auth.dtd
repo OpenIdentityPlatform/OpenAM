@@ -1,0 +1,471 @@
+<!--
+   DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
+  
+    Copyright (c) 2006 Sun Microsystems Inc. All Rights Reserved
+  
+    The contents of this file are subject to the terms
+    of the Common Development and Distribution License
+    (the License). You may not use this file except in
+    compliance with the License.
+
+    You can obtain a copy of the License at
+    https://opensso.dev.java.net/public/CDDLv1.0.html or
+    opensso/legal/CDDLv1.0.txt
+    See the License for the specific language governing
+    permission and limitations under the License.
+
+    When distributing Covered Code, include this CDDL
+    Header Notice in each file and include the License file
+    at opensso/legal/CDDLv1.0.txt.
+    If applicable, add the following below the CDDL Header,
+    with the fields enclosed by brackets [] replaced by
+    your own identifying information:
+    "Portions Copyrighted [year] [name of copyright owner]"
+
+    $Id: remote-auth.dtd,v 1.9 2009/06/19 17:52:39 ericow Exp $
+
+-->
+
+ 
+  
+<!-- This DTD defines the data structure that will be used by
+     authentication component's remote interface. Provides definitions
+     to initiate, collect credentials and perform authentication
+
+     Unique Declaration name for DOCTYPE tag:
+
+     "Authentication Remote XML Interface 1.0 DTD"
+-->
+
+<!-- AuthContext is the root element for remote authentication xml interface.
+     It contains Request and Response sub-elements to be used by client
+     and server respectively.
+-->
+<!ELEMENT        AuthContext        ( Request | Response ) >
+<!ATTLIST         AuthContext
+        version                NMTOKEN         "1.0"
+>
+
+<!-- Request element will be used by client to initialize and
+pass user credentials to the authentication server. The element 
+NewAuthContext is to create a new AuthContext object.The response
+is LoginStatus indicating that authentication is in progress and 
+an authIdentifier representing the session id for this request is
+returned. The element QueryInformation is used to query information 
+such as organizations, authentication mechanisms. The response 
+to a QueryInformation Request will be QueryResult or Exception. 
+The element Login is used to start a new authentication session. 
+The response to Login Request will be either GetRequirements or 
+LoginStatus or Exception.  SubmitCredentials is used to send 
+the requested (check Response) credentials back to the server.
+The response to SubmitCredentials request will be either 
+GetRequirements, LoginStatus or an Exception.  The attribute 
+"authIdentifier" is a unique random number that must
+be set by client provided by the server for each authentication session.
+The server uses this random number to keep track of the authentication
+session. However when the client sends a Login element the value for
+"authIdentifier" must be 0 to denote initialization of a new session.
+
+The table belows shows the Request and the possible Responses for
+each Request:
+
+Table 1:
+
+Request                 Response
+----------------------------------------------------------------------
+NewAuthContext                LoginStatus or Exception
+QueryInformation        QueryResult or Exception
+Login                   GetRequirements or LoginStatus or Exception
+SubmitRequirements      GetRequirements or LoginStatus or Exception
+Logout                  LoginStatus or Exception
+Abort                        LoginStatus or Exception
+-->
+
+
+<!ELEMENT       Request        (AppSSOToken?, ( NewAuthContext |
+                               QueryInformation | Login | SubmitRequirements |
+                               Logout | Abort)) >
+<!ATTLIST       Request
+        authIdentifier          NMTOKEN         #REQUIRED
+>
+
+<!-- Response element will be used by the authentication server
+to request the client to gather user credentials, inform the
+client on success or failure of the login, or errors if any. The
+attribute "authIdentifier" returns a unique random number that
+must be used by the client to respond to this message. 
+Please see Table 1 in the Request Element .
+-->
+<!ELEMENT        Response        ( QueryResult | GetRequirements |
+                                LoginStatus | Exception ) >
+<!ATTLIST        Response
+        authIdentifier                NMTOKEN                #REQUIRED
+>
+
+<!-- QueryInformation will be used by the client to get
+information about authentication module instances supported 
+by the server for an organization. 
+The attribute moduleInstanceNames identifies that the
+requested information is a moduleInstance. 
+The attribute orgName identifies the organization name from 
+which the client will query information.
+-->
+<!ELEMENT        QueryInformation        ( EMPTY ) >
+<!ATTLIST        QueryInformation
+        requestedInformation        (moduleInstanceNames) #REQUIRED
+        orgName                 CDATA  #IMPLIED
+>
+
+<!-- QueryResult will be used by server to send requested
+query information by the client. The attribute requestedInformation
+identifies the type of information returned, this could be
+either moduleInstanceName -->
+<!ELEMENT        QueryResult        ( Value* ) >
+<!ATTLIST        QueryResult
+            requestedInformation        (moduleInstanceNames) #REQUIRED
+>
+
+<!-- AppSSOToken element is used to pass Application SSO Token .
+-->
+<!ELEMENT     AppSSOToken ( #PCDATA ) >
+
+<!-- NewAuthContext element is used to create a new AuthContext 
+for a request and a session id associated with the AuthContext
+created. The orgName is the OpenSSO organization 
+name which client belongs to and will authenticate against.
+-->
+
+<!ELEMENT         NewAuthContext (EMPTY) >
+<!ATTLIST        NewAuthContext        
+        orgName         CDATA        #REQUIRED
+>
+
+<!-- Login element will be used by the client to initialize
+a authentication session with the service. It will have an EMPTY 
+element or can have IndexTypeNamePair. 
+
+The IndexTypeNamePair element can be used to specify the index type and
+index value based on which authentication will be done.
+The Params element can be used to pass in default values for NameCallback
+and PasswordCallback in the order that these callbacks are processed.
+The attribute orgName identifies the organization name to 
+which the client will authenticate.
+-->
+<!ELEMENT        Login        (IndexTypeNamePair?,  Params?, Environment?)>
+<!ATTLIST        Login        
+        orgName         CDATA        #IMPLIED
+        hostName        CDATA        #IMPLIED
+        forceAuth       CDATA        #IMPLIED
+>
+
+<!-- SubmitRequirements element is used by the client to submit the
+credentials gathered by it, either by displaying the information
+to the user or otherwise. -->
+<!ELEMENT        SubmitRequirements        ( Callbacks ) >
+
+<!-- GetRequirements element is used by the server to request
+credentials to be gathered by the client. -->
+<!ELEMENT        GetRequirements                ( Callbacks ) >
+
+<!-- LoginStatus element is used by the server to indicate the
+success , failed or completion of the authentication process. 
+If the login status is successful the element 
+Subject will be present with the principal names and 
+the attribute "ssoToken" will have the SSO token, status
+will be set to in_progress when new AuthContext is created, 
+to "success" on a successful login, "failed",
+on a failed login and "completed" when user logs out. The
+successURL attribute represents the URL to be redirected
+to on successful authentication and failureURL represents
+the URL to redirect to on a failed authentication.
+ -->
+<!ELEMENT        LoginStatus        ( EMPTY | Subject | Exception ) >
+<!ATTLIST        LoginStatus
+        status                ( in_progress | success | failed | completed) "success"
+        ssoToken        NMTOKEN                        #IMPLIED
+        successURL        CDATA                        #IMPLIED
+        failureURL        CDATA                        #IMPLIED
+>
+
+<!-- Logout element is used by the client to indicate that user
+ wants to logout. On a logout request the server will end the
+ user's session. 
+>
+<!ELEMENT         Logout ( EMPTY )>
+
+<!-- Abort element is used by the client to indicate that user
+ wants to end the login process . On an abort request the server 
+ will end the user's session. 
+>
+<!ELEMENT       Abort ( EMPTY )>
+
+<!-- Exception element is used by the server to inform the client
+about an exception that occured during the login process. The attribute
+"message" is the exception message, "tokenId" is the user id for which
+authentication failed, "errorCode" is the error message code , "templateName" 
+is the name of the template which needs to be used for this error.
+-->
+<!ELEMENT        Exception        ( EMPTY ) >
+<!ATTLIST        Exception
+        message                CDATA                #IMPLIED
+        tokenId                CDATA                #IMPLIED
+        errorCode        CDATA                #IMPLIED
+        templateName    CDATA           #IMPLIED
+>
+
+<!-- IndexTypeNamePair identifies the index used to validate
+     the client. For e.g if the indexType is a moduleInstance then
+     server will verify if the user has access to the requested 
+     moduleInstance. The indexType can be role,
+     moduleInstance, authLevel ,user or service/application.
+     IndexName is the value associated with the indexType.
+ -->
+<!ELEMENT IndexTypeNamePair  (IndexName)>
+<!ATTLIST IndexTypeNamePair 
+           indexType (authLevel | role | user | moduleInstance | service 
+                                            | compositeAdvice ) "authLevel"
+>
+
+<!-- Params identifies the login credentials mapped to the 
+     callbacks. e.g. if the login module has callbacks of NameCallback 
+     and PasswordCallback, the Params should contain the values of the
+     2 callbacks seperated by "|", in the same order as the callbacks 
+     are processed. sample: "user1|password1".
+ -->
+<!ELEMENT Params  (#CDATA)>
+
+<!-- Environment identifies a collection of one or more environment
+     name and values pairs. 
+ -->
+<!ELEMENT Environment  (EnvValue+)>
+
+<!-- EnvValue identifies one environment name and values pair. 
+     The EnvValue contains the name and values seperated by "|".
+     sample: "name1|value1|value2".
+ -->
+<!ELEMENT EnvValue  (#CDATA)>
+
+<!-- Index Name identifies the value of  the IndexType specified
+     in the IndexType Element -->
+<!ELEMENT IndexName (#PCDATA)>
+
+<!-- Subject element identifes a collection of one ore more
+principal (or user) names. -->
+<!ELEMENT        Subject                (#PCDATA)> 
+
+<!-- Callbacks element is used to request and transfer user credentials
+between the client and the server. The server constructs the
+callback objects which contains the information to be collected by
+the client program. The client program collects the credentials
+(by prompting the user) and returns the callback objects with the
+required data. -->
+<!ELEMENT        Callbacks        (NameCallback | PasswordCallback |
+                                ChoiceCallback | ConfirmationCallback |
+                                TextInputCallback | TextOutputCallback |
+                                LanguageCallback | PagePropertiesCallback |
+                                SAMLCallback | X509CertificateCallback |
+                                HttpCallback | CustomCallback)+ >
+<!ATTLIST        Callbacks
+        length                NMTOKEN                #REQUIRED
+>
+
+<!-- NameCallback element is used to obtain user (or service) user name.
+The element Prompt will be used the server to set the prompt to be used
+by the client to get the name. And the client will use the element
+Value to return the name (user name) provided by the user.DefaultValue
+is the default value for the name -->
+<!ELEMENT        NameCallback        ( Prompt, DefaultValue?,Value? ) >
+
+<!-- PasswordCallback element is used to obtain the password from
+the user. The server sets the Prompt element along with the attribute
+"echoPassword" if the password can be echoed by the client. The
+client returns the user entered password in the Value element. -->
+<!ELEMENT        PasswordCallback        ( Prompt, Value? ) >
+<!ATTLIST        PasswordCallback
+        echoPassword        ( true | false )        "false"  
+>
+
+<!-- ChoiceCallback element is used by the authentication server
+to request the user to choose from the choice values. The 
+multipleSelectionsAllowed attribute specifies if multiple 
+selections are allowed for choice values
+-->
+<!ELEMENT        ChoiceCallback                ( Prompt, ChoiceValues,
+                                        SelectedValues? ) >
+<!ATTLIST        ChoiceCallback
+                multipleSelectionsAllowed (true | false) "false"
+>
+
+<!-- ConfirmationCallback element is used by the server to
+request a confirmation from the user. Attribute "messageType" specifies
+the type of message , "optionType" specifies the confirmation type.
+Element OptionValues specifies user defined options, OptionValue specifies
+the default option -->
+<!ELEMENT        ConfirmationCallback        ( Prompt?, OptionValues?,SelectedValue?,DefaultOptionValue) >
+<!ATTLIST        ConfirmationCallback
+        messageType        (information | warning | error)        "error" 
+        optionType        (ok_cancel | yes_no 
+                         | yes_no_cancel | unspecified ) "yes_no" 
+>
+
+<!-- TextInputCallback element is used to get text information
+from the user. -->
+<!ELEMENT        TextInputCallback        ( Prompt, DefaultValue? ,Value? ) >
+
+<!-- TextOutputCallback element is used to display text information
+to the user. -->
+<!ELEMENT        TextOutputCallback        ( Value ) >
+<!ATTLIST        TextOutputCallback
+        messageType        ( information | warning | error )        "error" 
+>
+
+<!-- LanguageCallback element will be used by the server to
+obtain the locale information (e.g en_US) from the user. -->
+<!ELEMENT        LanguageCallback        (Locale) >
+
+<!-- CustomCallback element will be used to define user-defined
+     Callbacks.The className attribute specifies the Callback name.
+     The AttributeValuePair provides the parameters required for
+     the Callback.  -->
+<!ELEMENT CustomCallback (AttributeValuePair*)>
+<!ATTLIST CustomCallback className        NMTOKEN        #REQUIRED >
+
+<!-- PageProperties element contains all UI related attributes such
+     as template name , errorState to indicate whether a template is
+     an error page, page header, image name , page timeout value,name
+     of module.
+>
+<!ELEMENT    PagePropertiesCallback (ModuleName,HeaderValue,ImageName,
+                                     PageTimeOutValue,TemplateName,PageState) >
+<!ATTLIST    PagePropertiesCallback 
+                isErrorState        (true | false) "false"
+> 
+
+<!-- ModuleName element is the name of the module. -->
+<!ELEMENT       ModuleName ( #PCDATA ) >
+
+<!-- HeaderValue  element is the header to be displayed. -->
+<!ELEMENT       HeaderValue ( #PCDATA ) >
+
+<!-- ImageName element is the image to be displayed. -->
+<!ELEMENT       ImageName ( #PCDATA ) >
+
+<!-- PageTimeOutValue is the time out value in seconds. -->
+<!ELEMENT       PageTimeOutValue ( #PCDATA ) >
+
+<!-- TemplateName is the name of the template to be rendered. -->
+<!ELEMENT       TemplateName ( #PCDATA ) >
+
+<!-- PageState is the state value of the current page. -->
+<!ELEMENT       PageState ( #PCDATA ) >
+
+<!-- SAMLCallback element is used by the server to
+request SAML credentials information from the user. 
+Attribute "credentialType" specifies the type of credential where
+choices are either web artifact or saml post response.
+Element ArtifactValue specifies the array of web artifact values, 
+ResponseValue specifies the saml post response value. -->
+<!ELEMENT        SAMLCallback        (Prompt, ArtifactValue?, ResponseValue?) >
+<!ATTLIST        SAMLCallback
+        credentialType        (artifact | response)        "artifact"        
+        checkSignResponse  ( true | false )        "false"  
+>
+
+<!-- ArtifactValue element will be used by the client to return a web artifact
+value provided by the user (or service) back to the server. -->
+<!ELEMENT        ArtifactValue                ( OptionValue+ ) >
+
+<!-- ResponseValue element will be used by the client to return a saml post 
+response value provided by the user (or service) back to the server. -->
+<!ELEMENT        ResponseValue                ( #PCDATA ) >
+
+
+<!-- AttributeValue element contains the Attribute and Value(s) for
+     a Callback parameter. 
+-->
+<!ELEMENT AttributeValuePair (Attribute,Value*)>
+
+<!-- Attribute defines the Callback parameter. The name attribute
+     specifies the Callback parameter. The values for the parameter
+     will be specified using the Value Element. 
+ -->
+<!ELEMENT Attribute EMPTY>
+<!ATTLIST Attribute name NMTOKEN #REQUIRED >
+
+<!-- Prompt element will be used by the server to request the
+client to display the prompt. -->
+<!ELEMENT        Prompt                ( #PCDATA ) >
+
+<!-- Locale element will be the locale to be used. The attribute
+     language represents the language code, attribute country is
+     the country code and attribute variant is the variant code. 
+-->
+<!ELEMENT Locale                (EMPTY) >
+<!ATTLIST Locale
+        language        CDATA                        #IMPLIED
+        country                CDATA                   #IMPLIED
+        variant                CDATA                   #IMPLIED
+>
+
+<!-- ChoiceValues element provides a list of choice values -->
+<!ELEMENT        ChoiceValues        ( ChoiceValue+ ) >
+
+<!-- OptionValues element provides a list of user defined option values -->
+<!ELEMENT        OptionValues ( OptionValue+ ) >
+
+<!-- ChoiceValue element provides a single choice value.
+The attribute "isDefault" specifies if the value has to be
+selected by default when displayed. -->
+<!ELEMENT        ChoiceValue        ( Value ) >
+<!ATTLIST        ChoiceValue
+        isDefault        ( yes | no )        "no"
+>
+
+<!-- SelectedValue element provides the value selected by the user .
+-->
+<!ELEMENT       SelectedValue          ( Value* ) >
+
+<!-- SelectedValues element provides a list of values
+selected by the user . 
+specifies if multiple selections are allowed for choice values
+-->
+<!ELEMENT        SelectedValues                ( Value+ ) >
+
+<!-- OptionValue element provides a single user defined option value.
+<!ELEMENT        OptionValue ( Value ) >
+
+<!-- DefaultOptionValue element is the default option value.
+     The default value depends on whether user defined values
+     or predefined values are used in the callback. If user
+     defined values are used then the default value will an
+     index in the option values else it will one of the
+     predefined option value -->
+<!ELEMENT        DefaultOptionValue ( Value ) >
+
+<!-- DefaultValue element is the default value -->
+
+<!ELEMENT       DefaultValue ( Value ) >
+
+<!-- Value element will be used by the client to return a value
+provided by the user (or service) back to the server. -->
+<!ELEMENT        Value                ( #PCDATA ) >
+
+<!-- HttpCallback element is used by the authentication module with Http
+     protocol based handshaking negotiation. -->
+<!ELEMENT       HttpCallback    ( HttpHeader, Negotiation, HttpErrorCode,
+                                  HttpToken ) >
+
+<!-- HttpHeader element is used in HttpCallback -->
+<!ELEMENT       HttpHeader      ( #PCDATA ) >
+
+<!-- Negotiation element is used in HttpCallback to set the negotiation header
+     in HttpServletResponse -->
+<!ELEMENT       Negotiation     ( #PCDATA ) >
+
+<!-- Code element is used in HttpCallback to set the error code in negotiation
+     response -->
+<!ELEMENT       HttpErrorCode   ( #PCDATA ) >
+
+<!-- HttpToken element is used in HttpCallback to set the authorization token
+     provided by the user back to the server. -->
+<!ELEMENT       HttpErrorCode   ( #PCDATA ) >

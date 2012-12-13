@@ -1,0 +1,81 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!--
+   DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
+  
+   Copyright (c) 2009 Sun Microsystems Inc. All Rights Reserved
+  
+   The contents of this file are subject to the terms
+   of the Common Development and Distribution License
+   (the License). You may not use this file except in
+   compliance with the License.
+
+   You can obtain a copy of the License at
+   https://opensso.dev.java.net/public/CDDLv1.0.html or
+   opensso/legal/CDDLv1.0.txt
+   See the License for the specific language governing
+   permission and limitations under the License.
+
+   When distributing Covered Code, include this CDDL
+   Header Notice in each file and include the License file
+   at opensso/legal/CDDLv1.0.txt.
+   If applicable, add the following below the CDDL Header,
+   with the fields enclosed by brackets [] replaced by
+   your own identifying information:
+   "Portions Copyrighted [year] [name of copyright owner]"
+
+   $Id: subjectpanel.xhtml,v 1.8 2009/06/04 11:49:24 veiming Exp $
+
+-->
+
+<ui:composition
+    xmlns:ui="http://java.sun.com/jsf/facelets"
+    xmlns:ice="http://www.icesoft.com/icefaces/component"
+    xmlns:c="http://java.sun.com/jstl/core"
+    xmlns:o="http://opensso.dev.java.net"
+    xmlns:f="http://java.sun.com/jsf/core">
+
+    <f:subview>
+        <ice:panelGroup
+            styleClass="condition-panel"
+            rendered="#{viewSubject != null}">
+            <o:multipanel
+                collapsible="true"
+                removeable="#{true}"
+                visible="#{viewSubject.panelVisible}"
+                expanded="#{viewSubject.panelExpanded}"
+                bean="#{viewSubject}"
+                handler="#{policySubjectsHandler}">
+                <ui:define name="panel-title">
+                    <ice:panelGroup
+                        panelTooltip="titleTooltip">
+                        <ice:panelGrid columns="2">
+                            <ice:graphicImage
+                                style="padding-right: 2px"
+                                value="#{viewSubject.subjectType.subjectIconUri}"/>
+                            <ice:outputText
+                                style="font-weight: bold"
+                                value="#{o:truncate(viewSubject.toString,40)}"/>
+                        </ice:panelGrid>
+                    </ice:panelGroup>
+                    <o:tooltip
+                        tooltipId="titleTooltip"
+                        title="#{viewSubject.title}">
+                        <ui:define name="body">
+                            <pre>
+                            <ice:outputText
+                                value="#{viewSubject.toFormattedString}"/>
+                            </pre>
+                        </ui:define>
+                    </o:tooltip>
+
+                </ui:define>
+                <ui:define name="panel-body">
+                    <ui:include
+                        src="/admin/facelet/template/subject-template-includer.xhtml">
+                        <ui:param name="viewSubject" value="#{viewSubject}"/>
+                    </ui:include>
+                </ui:define>
+            </o:multipanel>
+        </ice:panelGroup>
+    </f:subview>
+</ui:composition>

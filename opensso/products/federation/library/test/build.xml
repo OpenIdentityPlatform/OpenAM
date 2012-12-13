@@ -1,0 +1,131 @@
+<!--
+   DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
+  
+   Copyright (c) 2006 Sun Microsystems Inc. All Rights Reserved
+  
+   The contents of this file are subject to the terms
+   of the Common Development and Distribution License
+   (the License). You may not use this file except in
+   compliance with the License.
+
+   You can obtain a copy of the License at
+   https://opensso.dev.java.net/public/CDDLv1.0.html or
+   opensso/legal/CDDLv1.0.txt
+   See the License for the specific language governing
+   permission and limitations under the License.
+
+   When distributing Covered Code, include this CDDL
+   Header Notice in each file and include the License file
+   at opensso/legal/CDDLv1.0.txt.
+   If applicable, add the following below the CDDL Header,
+   with the fields enclosed by brackets [] replaced by
+   your own identifying information:
+   "Portions Copyrighted [year] [name of copyright owner]"
+
+   $Id: build.xml,v 1.10 2009/08/19 05:40:42 veiming Exp $
+
+-->
+<!--
+   "Portions Copyrighted [2011] [ForgeRock AS]"
+-->
+
+<project name="openfedlib" default="all">
+                
+    <description>Open Federation Library - test</description>
+
+    <!-- enforce invocation via top level build only -->
+    <fail message="*** war may be built from top level only ***">
+        <condition>
+            <or>
+                <not><isset property="library.unittest.dir"/></not>
+            </or>
+        </condition>
+    </fail>
+
+    <property name="test.package.dir" location="${library.built.dir}/test/package"/>
+    <property name="test.classes.dir" location="${library.built.dir}/test/classes"/>
+
+    <target name="build" depends="preparebuild">
+        <javac destdir="${test.classes.dir}" source="${target.jdk.set}" target="${target.jdk.set}"
+               debug="on" debuglevel="lines,vars,source">
+            <compilerarg value="-Xlint:unchecked"/>
+            <compilerarg value="-Xlint:deprecation"/>
+            <src path="${library.unittest.dir}/source"/>
+            <classpath refid="build.class.path"/>
+        </javac>
+    </target>
+
+    <target name="all" depends="build">
+        <delete dir="${test.package.dir}" />
+        <mkdir dir="${test.package.dir}/mock" />
+        <mkdir dir="${test.package.dir}/classes" />
+        <mkdir dir="${test.package.dir}/test/classes" />
+        <mkdir dir="${test.package.dir}/lib" />
+
+	<tstamp>
+            <format property="touch.time" pattern="yyyy-MMMM-d hh:mm"/>
+	</tstamp>
+
+        <echo file="${test.package.dir}/.manifest"
+              message="version=${library.version}, ${touch.time}" />
+
+        <copy file="${products.license.dir}/license.txt"
+            todir="${test.package.dir}" />
+
+        <copy todir="${test.package.dir}/mock">
+            <fileset dir="${library.unittest.dir}/mock" />
+        </copy>
+
+        <copy todir="${test.package.dir}/classes">
+            <fileset dir="${library.classes.dir}" />
+            <fileset dir="${library.res.dir}" includes="*.properties" />
+            <fileset dir="${library.res.i18n.dir}" includes="*.properties" />
+        </copy>
+
+        <copy todir="${test.package.dir}/test/classes">
+            <fileset dir="${test.classes.dir}" />
+        </copy>
+
+        <copy todir="${test.package.dir}/lib">
+            <fileset dir="${extlib.dir}" includes="jaxb-api.jar, jaxb-impl.jar,
+jaxb-libs.jar, jaxb-xjc.jar, jaxrpc-api.jar, jaxrpc-impl.jar, jaxrpc-spi.jar, j2ee.jar, mail.jar, relaxngDatatype.jar, saaj-api.jar, saaj-impl.jar, testng-5.9-jdk15.jar, webservices-rt.jar, xsdlib.jar"/>
+            <fileset dir="${library.extlib.dir}" />
+        </copy>
+
+        <copy todir="${test.package.dir}">
+            <fileset dir="${library.unittest.dir}/xml/ant">
+                <include name="*.xml" />
+            </fileset>
+        </copy>
+
+        <copy file="${library.unittest.dir}/README"
+            tofile="${test.package.dir}/README" />
+
+        <copy todir="${test.package.dir}/testng">
+            <fileset dir="${library.unittest.dir}/xml/testng" />
+        </copy>
+
+        <copy todir="${test.package.dir}/template">
+            <fileset dir="${library.unittest.dir}/www/template" />
+            <fileset dir="${library.unittest.dir}/www/css" />
+        </copy>
+
+        <zip destfile="${fedlibrary.dist.dir}/openfed-library-test.zip"
+            basedir="${test.package.dir}" /> 
+
+        <checksum file="${fedlibrary.dist.dir}/openfed-library-test.zip"
+            algorithm="SHA" fileext=".sha" />
+    </target>
+
+    <target name="preparebuild">
+        <mkdir dir="${test.package.dir}"/>
+        <mkdir dir="${fedlibrary.dist.dir}"/>
+        <mkdir dir="${test.classes.dir}"/>
+    </target>
+
+    <target name="clean">
+        <delete dir="${test.classes.dir}"/>
+        <delete dir="${test.package.dir}"/>
+        <delete dir="${fedlibrary.dist.dir}"/>
+    </target>
+</project>
