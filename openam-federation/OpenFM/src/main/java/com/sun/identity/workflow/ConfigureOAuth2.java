@@ -23,10 +23,13 @@
  */
 package com.sun.identity.workflow;
 
+import com.iplanet.am.util.SystemProperties;
 import com.iplanet.sso.SSOToken;
 import com.sun.identity.policy.*;
 import com.sun.identity.policy.interfaces.Subject;
 import com.sun.identity.security.AdminTokenAction;
+import com.sun.identity.shared.Constants;
+import com.sun.identity.shared.configuration.SystemPropertiesManager;
 import com.sun.identity.sm.ServiceConfigManager;
 
 import java.security.AccessController;
@@ -52,10 +55,19 @@ public class ConfigureOAuth2 extends Task {
     private static final String SIC = "sic";
 
     //policy params
-    private static final String PN = "pn";
-    private static final String RN = "rn";
-    private static final String SN = "sn";
-    private static final String POLICY_URL = "policyURL";
+    private static final String POLICY_NAME = "OAuth2ProviderPolicy";
+    private static final String RULE_NAME = "OAuth2ProviderRule";
+    private static final String SUBJECT_NAME = "OAuth2ProviderSubject";
+    private static final String OAUTH2_AUTHORIZE_ENDPOINT = "/oauth2/authorize*";
+    private static final String PROTOCOL = SystemPropertiesManager.get(
+            Constants.AM_SERVER_PROTOCOL);
+    private static final String HOST = SystemPropertiesManager.get(Constants.AM_SERVER_HOST);
+    private static final String PORT = SystemPropertiesManager.get(Constants.AM_SERVER_PORT);
+    private static final String DEPLOYMENT_URI = SystemPropertiesManager.get(
+            Constants.AM_SERVICES_DEPLOYMENT_DESCRIPTOR);
+    private static final String hostUrl = PROTOCOL + "://" + HOST + ":" + PORT + DEPLOYMENT_URI;
+    private static final String POLICY_URL = hostUrl + OAUTH2_AUTHORIZE_ENDPOINT;
+    private static final String ROOT_REALM = "/";
 
     public ConfigureOAuth2(){
 
@@ -93,30 +105,31 @@ public class ConfigureOAuth2 extends Task {
         //create service
         SSOToken token = null;
         try {
-            token = (SSOToken) AccessController
-                    .doPrivileged(AdminTokenAction.getInstance());
+            token = (SSOToken) AccessController.doPrivileged(AdminTokenAction.getInstance());
             ServiceConfigManager sm = new ServiceConfigManager(SERVICE_NAME,token);
             sm.createOrganizationConfig(realm,attrValues);
         } catch (Exception e){
             throw new WorkflowException("ConfigureOAuth2.execute() : Unable to create Service");
         }
 
-        if (realm.equalsIgnoreCase("/")){
-            //get policy paramaters
-            String policyName = getString(params, PN);
-            String ruleName = getString(params, RN);
-            String subjectName = getString(params, SN);
-            String policyURL = getString(params, POLICY_URL);
-
-            //add asterisk to cover the url having parameters
-            if (!policyURL.endsWith("*")){
-                policyURL = policyURL.concat("*");
+        //check if policy exists
+        PolicyManager mgr = null;
+        boolean createPolicy = false;
+        try {
+            mgr = new PolicyManager(token, ROOT_REALM);
+            if (mgr.getPolicy(POLICY_NAME) == null){
+                createPolicy = true;
             }
+        } catch (Exception e){
+            //throw new WorkflowException("ConfigureOAuth2.execute() : Unable check for policy");
+            createPolicy = true;
+        }
 
+        if (createPolicy){
             //build the policy
             Policy policy = null;
             try {
-                policy = new Policy(policyName);
+                policy = new Policy(POLICY_NAME);
             } catch (Exception e){
                 throw new WorkflowException("ConfigureOAuth2.execute() : Unable create policy");
             }
@@ -132,25 +145,25 @@ public class ConfigureOAuth2 extends Task {
             Subject sub = null;
 
             try {
-                policyURLRule = new Rule(ruleName,
-                    "iPlanetAMWebAgentService",
-                    policyURL,
-                    actions);
-                PolicyManager pm = new PolicyManager(token, realm);
+                policyURLRule = new Rule(RULE_NAME,
+                        "iPlanetAMWebAgentService",
+                        POLICY_URL,
+                        actions);
+                PolicyManager pm = new PolicyManager(token, ROOT_REALM);
                 SubjectTypeManager stm = pm.getSubjectTypeManager();
                 sub = stm.getSubject("AuthenticatedUsers");
             } catch (Exception e){
                 throw new WorkflowException("ConfigureOAuth2.execute() : Unable to get Subject");
             }
             try {
-                policy.addSubject(subjectName, sub);
+                policy.addSubject(SUBJECT_NAME, sub);
                 policy.addRule(policyURLRule);
             } catch (Exception e){
                 throw new WorkflowException("ConfigureOAuth2.execute() : Unable add subject and rule to policy");
             }
-            PolicyManager mgr = null;
+            mgr = null;
             try {
-                mgr = new PolicyManager(token, realm);
+                mgr = new PolicyManager(token, ROOT_REALM);
                 mgr.addPolicy(policy);
             } catch (Exception e){
                 throw new WorkflowException("ConfigureOAuth2.execute() : Unable to add policy");
