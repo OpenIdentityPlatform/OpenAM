@@ -22,7 +22,7 @@
  * "Portions Copyrighted [year] [name of copyright owner]"
  */
 
-/*global $, define, _ */
+/*global $, define, _, console */
 
 /**
  * @author yaromin
@@ -46,7 +46,7 @@ define("UserDelegate", [
             serviceUrl: constants.host + "/"+ constants.context + "/identity/authenticate?" + $.param({username: uid, password: password}),
             url: "",
             dataType: "text",
-            type: "GET",
+            type: "POST",
             success: _.bind(function (data) {
                 var token = "";
                 if(!data.length || !data.match(/^token\.id=/)) {
@@ -73,7 +73,7 @@ define("UserDelegate", [
             type: "GET", 
             headers: {"Cache-Control": "no-cache"}, // needed to prevent reads from getting cached
             success: function(user) {
-                var user_cleaned = {},i;
+                var user_cleaned = {},i=0;
                 for (i in user) {
                     if (_.isArray(user[i])) {
                         user_cleaned[i] = user[i].join(",");
@@ -84,7 +84,7 @@ define("UserDelegate", [
                 if (!user_cleaned.roles) {
                     user_cleaned.roles = "authenticated";
                 } else {
-                    user_cleaned.roles += ",authenticated"
+                    user_cleaned.roles += ",authenticated";
                 }
                 
                 successCallback(user_cleaned);

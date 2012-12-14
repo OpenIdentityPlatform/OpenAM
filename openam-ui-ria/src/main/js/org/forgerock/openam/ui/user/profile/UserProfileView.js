@@ -22,7 +22,7 @@
  * "Portions Copyrighted [year] [name of copyright owner]"
  */
 
-/*global define, $, form2js, _, js2form, document */
+/*global define, $, form2js, _, js2form, document, console */
 
 /**
  * @author mbilski
@@ -65,8 +65,6 @@ define("org/forgerock/openam/ui/user/profile/UserProfileView", [
         
         render: function(args, callback) {
             this.parentRender(function() {
-                var self = this;
-
                 validatorsManager.bindValidators(this.$el);
                     
                 this.reloadData();
@@ -75,13 +73,11 @@ define("org/forgerock/openam/ui/user/profile/UserProfileView", [
                     callback();
                 }
                 
-                
-                
             });            
         },
         
         reloadData: function() {
-            js2form(document.getElementById(this.$el.attr("id")), conf.loggedUser);
+            js2form(document.getElementById(this.$el.find("#UserProfileForm").attr("id")), conf.loggedUser);
             this.$el.find("input[type=submit]").val($.t("common.form.update"));
             validatorsManager.validateAllFields(this.$el);
         }

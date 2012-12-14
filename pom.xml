@@ -757,6 +757,15 @@
                 <version>${project.version}</version>
             </dependency>
 
+            <!-- New RIA Client UI -->
+            <dependency>
+                <groupId>org.forgerock.openam</groupId>
+                <artifactId>openam-ui-ria</artifactId>
+                <version>${project.version}</version>
+                <classifier>www</classifier>
+                <type>zip</type>
+            </dependency>
+
             <!-- CLI components -->
             <dependency>
                 <groupId>org.forgerock.openam</groupId>

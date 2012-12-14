@@ -22,7 +22,7 @@
  * "Portions Copyrighted [year] [name of copyright owner]"
  */
 
-/*global define, $, _, ContentFlow */
+/*global define, $, _, ContentFlow, form2js */
 
 /**
  * @author mbilski
@@ -61,7 +61,7 @@ define("org/forgerock/openam/ui/user/profile/ChangeSecurityDataDialog", [
             event.preventDefault();
             
             if(validatorsManager.formValidated(this.$el.find("#passwordChange"))) {            
-                data = form2js("content", '.', false);data 
+                data = form2js("content", '.', false);
                 $.extend(data, form2js("passwordChange", '.', false));
                 data._id = data.name;
                 data.userpassword = data.password;
@@ -102,9 +102,7 @@ define("org/forgerock/openam/ui/user/profile/ChangeSecurityDataDialog", [
         },
         
         reloadData: function() {
-            var user = conf.loggedUser, self = this;
             this.$el.find("input[name=_id]").val(conf.loggedUser.name);
-
         }
     }); 
     
