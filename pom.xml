@@ -175,9 +175,6 @@
         <module>openam-locale</module>
 
         <!-- OpenAM Shared - Common Module -->
-        <module>openam-ui-ria</module>
-
-        <!-- OpenAM Shared - Common Module -->
         <module>openam-shared</module>
 
         <!-- OpenAM Entitlement Module -->

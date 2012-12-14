@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
     <!--
@@ -56,36 +55,31 @@
                         <configuration>
                             <target>
 
-                                <property name="openam.version" value="${project.version}"/>
+                                <property name="openam.version" value="${project.version}" />
 
-                                <property name="openam.temp.target" value="${project.build.directory}/openam_TEMP"/>
+                                <property name="openam.temp.target" value="${project.build.directory}/openam_TEMP" />
 
-                                <property name="build.class.path" refid="maven.compile.classpath"/>
-                                <property name="project.basedir" value="./"/>
+                                <property name="build.class.path" refid="maven.compile.classpath" />
+                                <property name="project.basedir" value="./" />
 
-                                <property name="server.resources" value="${project.basedir}/src/main/resources"/>
+                                <property name="server.resources" value="${project.basedir}/src/main/resources" />
 
-                                <property name="amserver.target.resources.dir"
-                                          value="${project.build.directory}/classes"/>
+                                <property name="amserver.target.resources.dir" value="${project.build.directory}/classes" />
 
-                                <property name="amserver.resources.i18n.dir" value="${server.resources}/locale"/>
+                                <property name="amserver.resources.i18n.dir" value="${server.resources}/locale" />
 
-                                <property name="library.resources.i18n.dir"
-                                          value="${server.resources}/federation-locale"/>
+                                <property name="library.resources.i18n.dir" value="${server.resources}/federation-locale" />
 
-                                <property name="openfm.resources.i18n.dir" value="${server.resources}/openfm-locale"/>
+                                <property name="openfm.resources.i18n.dir" value="${server.resources}/openfm-locale" />
 
-                                <property name="core.xml.dir"
-                                          value="${project.basedir}/../openam-core/src/main/resources/xml"/>
+                                <property name="core.xml.dir" value="${project.basedir}/../openam-core/src/main/resources/xml" />
 
-                                <property name="library.xml.dir"
-                                          value="${project.basedir}/../openam-federation/openam-federation-library/src/main/resources/xml"/>
+                                <property name="library.xml.dir" value="${project.basedir}/../openam-federation/openam-federation-library/src/main/resources/xml" />
 
-                                <property name="federation.xml.dir"
-                                          value="${project.basedir}/../openam-federation/OpenFM/src/main/resources/xml"/>
+                                <property name="federation.xml.dir" value="${project.basedir}/../openam-federation/OpenFM/src/main/resources/xml" />
 
                                 <ant antfile="${project.basedir}/openam-server-prepare-war.xml">
-                                    <target name="openam-server-prepare-war"/>
+                                    <target name="openam-server-prepare-war" />
                                 </ant>
                             </target>
                         </configuration>
@@ -121,16 +115,8 @@
                                     <outputDirectory>${project.build.directory}/unpacked</outputDirectory>
                                     <includes>jaxrpc/IdentityManagementServices.wsdl</includes>
                                 </artifactItem>
-                                <artifactItem>
-                                    <groupId>org.forgerock.openam</groupId>
-                                    <artifactId>openam-ui-ria</artifactId>
-                                    <classifier>www</classifier>
-                                    <type>zip</type>
-                                    <overWrite>false</overWrite>
-                                    <outputDirectory>${project.build.directory}/XUI</outputDirectory>
-                                    <includes>**/*</includes>
-                                </artifactItem>
                             </artifactItems>
+
                         </configuration>
                     </execution>
                 </executions>
@@ -198,14 +184,6 @@
                     </nonFilteredFileExtensions>
                     <webResources>
                         <webResource>
-                            <directory>${project.build.directory}/XUI/openam-ui-ria/</directory>
-                            <includes>
-                                <include>**/**</include>
-                            </includes>
-                            <targetPath>XUI</targetPath>
-                            <filtering>true</filtering>
-                        </webResource>
-                        <webResource>
                             <directory>${basedir}/src/main/webapp</directory>
                             <includes>
                                 <include>**/**</include>
@@ -214,7 +192,7 @@
                                 <exclude>META-INF</exclude>
                                 <exclude>WEB-INF</exclude>
                             </excludes>
-                            <targetPath/>
+                            <targetPath />
                             <filtering>true</filtering>
                         </webResource>
                         <webResource>
@@ -286,7 +264,7 @@
                             <includes>
                                 <include>**/**</include>
                             </includes>
-                            <targetPath/>
+                            <targetPath />
                             <filtering>false</filtering>
                         </webResource>
                         <webResource>
@@ -300,9 +278,8 @@
                             <targetPath>WEB-INF/template/ldif/sfha</targetPath>
                             <filtering>false</filtering>
                         </webResource>
-                        <webResource>
-                            <directory>
-                                ${project.basedir}/../openam-oauth2/openam-oauth2-core-token-service/src/main/resources
+			            <webResource>
+                            <directory>${project.basedir}/../openam-oauth2/openam-oauth2-core-token-service/src/main/resources
                             </directory>
                             <includes>
                                 <!-- These Files get moved into Place when installing OpenDJ. -->
@@ -361,13 +338,6 @@
 
 
     <dependencies>
-        <dependency>
-            <groupId>org.forgerock.openam</groupId>
-            <artifactId>openam-ui-ria</artifactId>
-            <version>${project.version}</version>
-            <classifier>www</classifier>
-            <type>zip</type>
-        </dependency>
 
         <dependency>
             <groupId>org.forgerock.openam</groupId>
