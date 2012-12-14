@@ -344,17 +344,27 @@ Install log file location:
     <screen>$ chmod +x $JBOSS_HOME/bin/setAgentClasspathdefault.sh</screen>
    </step>
    <step>
-    <para>Edit the <filename>JBOSS_HOME/bin/run.sh</filename> script
-    to set the classpath needed for the agent, by adding the lines
-    <emphasis role="strong">as shown</emphasis> here.</para>
+    <para>Open the <filename>JBOSS_HOME/bin/run.sh</filename> script for
+    editing, and locate the following code block.</para>
+
     <programlisting language="shell">if [ "x$JBOSS_CLASSPATH" = "x" ]; then
     JBOSS_CLASSPATH="$JBOSS_BOOT_CLASSPATH"
 else
     JBOSS_CLASSPATH="$JBOSS_CLASSPATH:$JBOSS_BOOT_CLASSPATH"
 fi
-<emphasis role="strong">if [-r "setAgentClasspathdefault.sh" ]; then
+if [ "x$JAVAC_JAR_FILE" != "x" ]; then
+    JBOSS_CLASSPATH="$JBOSS_CLASSPATH:$JAVAC_JAR_FILE"
+fi</programlisting>
+   </step>
+   <step>
+    <para>Edit the <filename>JBOSS_HOME/bin/run.sh</filename> script
+    to set the classpath needed for the agent, by adding these lines after
+    the code block you located in the previous step.</para>
+
+    <programlisting language="shell">if [ -r "setAgentClasspathdefault.sh" ]; then
     . $JBOSS_HOME/bin/setAgentClasspathdefault.sh
-fi</emphasis></programlisting>
+fi</programlisting>
+
    </step>
    <step>
     <para>Start the JBoss server where you installed the agent.</para>
