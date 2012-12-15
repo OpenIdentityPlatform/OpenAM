@@ -469,10 +469,7 @@ public abstract class AbstractFlow extends ServerResource {
             }
         }
 
-        if (locale == null){
-            return defaultName;
-        }
-        return null;
+        return defaultName;
     }
 
     private List<String> getScopeDescriptionsForLocale(Set<String> scopes,
