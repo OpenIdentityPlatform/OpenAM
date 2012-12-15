@@ -162,7 +162,7 @@ define("UserDelegate", [
             headers: headers
         });
 
-    }
+    };
     
     return obj;
 });
