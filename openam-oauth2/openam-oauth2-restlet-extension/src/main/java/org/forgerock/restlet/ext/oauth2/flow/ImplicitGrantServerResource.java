@@ -28,6 +28,7 @@ import java.util.Map;
 import java.util.Set;
 
 import com.sun.identity.shared.OAuth2Constants;
+import org.forgerock.openam.oauth2.exceptions.OAuthProblemException;
 import org.forgerock.openam.oauth2.utils.OAuth2Utils;
 import org.forgerock.openam.oauth2.model.AccessToken;
 import org.restlet.data.Form;
@@ -95,39 +96,49 @@ public class ImplicitGrantServerResource extends AbstractFlow {
         sessionClient =
                 client.getClientInstance(OAuth2Utils.getRequestParameter(getRequest(),
                         OAuth2Constants.Params.REDIRECT_URI, String.class));
-        String scope_after =
-            OAuth2Utils
-                .getRequestParameter(getRequest(), OAuth2Constants.Params.SCOPE, String.class);
 
-        String state =
+        String decision = OAuth2Utils.getRequestParameter(getRequest(), OAuth2Constants.Custom.DECISION,
+                String.class);
+
+        if (OAuth2Constants.Custom.ALLOW.equalsIgnoreCase(decision)) {
+            String scope_after =
                 OAuth2Utils
-                        .getRequestParameter(getRequest(), OAuth2Constants.Params.STATE, String.class);
+                    .getRequestParameter(getRequest(), OAuth2Constants.Params.SCOPE, String.class);
 
-        Set<String> checkedScope = executeAccessTokenScopePlugin(scope_after);
+            String state =
+                    OAuth2Utils
+                            .getRequestParameter(getRequest(), OAuth2Constants.Params.STATE, String.class);
 
-        AccessToken token = createAccessToken(checkedScope);
-        Form tokenForm = tokenToForm(token.convertToMap());
+            Set<String> checkedScope = executeAccessTokenScopePlugin(scope_after);
 
-        /*
-         * scope OPTIONAL, if identical to the scope requested by the
-         * client, otherwise REQUIRED. The scope of the access token as
-         * described by Section 3.3.
-         */
-        if (isScopeChanged()) {
-            tokenForm.add(OAuth2Constants.Params.SCOPE, OAuth2Utils.join(checkedScope, OAuth2Utils
-                    .getScopeDelimiter(getContext())));
+            AccessToken token = createAccessToken(checkedScope);
+            Form tokenForm = tokenToForm(token.convertToMap());
+
+            /*
+             * scope OPTIONAL, if identical to the scope requested by the
+             * client, otherwise REQUIRED. The scope of the access token as
+             * described by Section 3.3.
+             */
+            if (isScopeChanged()) {
+                tokenForm.add(OAuth2Constants.Params.SCOPE, OAuth2Utils.join(checkedScope, OAuth2Utils
+                        .getScopeDelimiter(getContext())));
+            }
+            if (null != state) {
+                tokenForm.add(OAuth2Constants.Params.STATE, state);
+            }
+
+            Reference redirectReference = new Reference(sessionClient.getRedirectUri());
+            redirectReference.setFragment(tokenForm.getQueryString());
+
+            Redirector dispatcher =
+                    new Redirector(getContext(), redirectReference.toString(),
+                            Redirector.MODE_CLIENT_FOUND);
+            dispatcher.handle(getRequest(), getResponse());
+        } else {
+            OAuth2Utils.DEBUG.warning("ImplicitGrantServerResource::Resource Owner did not authorize the request");
+            throw OAuthProblemException.OAuthError.ACCESS_DENIED.handle(getRequest(),
+                    "Resource Owner did not authorize the request");
         }
-        if (null != state) {
-            tokenForm.add(OAuth2Constants.Params.STATE, state);
-        }
-
-        Reference redirectReference = new Reference(sessionClient.getRedirectUri());
-        redirectReference.setFragment(tokenForm.getQueryString());
-
-        Redirector dispatcher =
-                new Redirector(getContext(), redirectReference.toString(),
-                        Redirector.MODE_CLIENT_FOUND);
-        dispatcher.handle(getRequest(), getResponse());
         return getResponseEntity();
     }
 
