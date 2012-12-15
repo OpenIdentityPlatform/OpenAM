@@ -225,7 +225,8 @@ public abstract class AbstractFlow extends ServerResource {
                     if (null != dispatcher &&
                         !(exception.getError().equalsIgnoreCase(OAuth2Constants.Error.REDIRECT_URI_MISMATCH)) &&
                         !(exception.getError().equalsIgnoreCase(OAuth2Constants.Error.INVALID_REQUEST) &&
-                          exception.getDescription().contains(OAuth2Constants.Params.CLIENT_ID))) {
+                          exception.getDescription().contains(OAuth2Constants.Params.CLIENT_ID)) &&
+                        !(exception.getError().equalsIgnoreCase(OAuth2Constants.Error.INVALID_CLIENT))) {
                         dispatcher.handle(getRequest(), getResponse());
                     } else {
                         // TODO Introduce new method
@@ -244,7 +245,8 @@ public abstract class AbstractFlow extends ServerResource {
                     if (null != dispatcher &&
                             !(exception.getError().equalsIgnoreCase(OAuth2Constants.Error.REDIRECT_URI_MISMATCH)) &&
                             !(exception.getError().equalsIgnoreCase(OAuth2Constants.Error.INVALID_REQUEST) &&
-                              exception.getDescription().contains(OAuth2Constants.Params.CLIENT_ID))) {
+                              exception.getDescription().contains(OAuth2Constants.Params.CLIENT_ID))  &&
+                            !(exception.getError().equalsIgnoreCase(OAuth2Constants.Error.INVALID_CLIENT))) {
                         dispatcher.handle(getRequest(), getResponse());
                     } else {
                         // TODO Introduce new method
@@ -262,7 +264,8 @@ public abstract class AbstractFlow extends ServerResource {
                     if (null != dispatcher &&
                             !(exception.getError().equalsIgnoreCase(OAuth2Constants.Error.REDIRECT_URI_MISMATCH)) &&
                             !(exception.getError().equalsIgnoreCase(OAuth2Constants.Error.INVALID_REQUEST) &&
-                              exception.getDescription().contains(OAuth2Constants.Params.CLIENT_ID))) {
+                              exception.getDescription().contains(OAuth2Constants.Params.CLIENT_ID))  &&
+                            !(exception.getError().equalsIgnoreCase(OAuth2Constants.Error.INVALID_CLIENT))) {
                         dispatcher.handle(getRequest(), getResponse());
                     } else {
                         // TODO Introduce new method
