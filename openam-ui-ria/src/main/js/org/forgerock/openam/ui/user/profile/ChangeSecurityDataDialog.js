@@ -63,9 +63,8 @@ define("org/forgerock/openam/ui/user/profile/ChangeSecurityDataDialog", [
             if(validatorsManager.formValidated(this.$el.find("#passwordChange"))) {            
                 data = form2js("content", '.', false);
                 $.extend(data, form2js("passwordChange", '.', false));
-                data._id = data.name;
                 data.userpassword = data.password;
-                this.delegate.updateEntity(data, _.bind(function() {
+                this.delegate.updateUser(data.name, data, _.bind(function() {
                     eventManager.sendEvent(constants.EVENT_DISPLAY_MESSAGE_REQUEST, "securityDataChanged");
                     this.close();
                 }, this));

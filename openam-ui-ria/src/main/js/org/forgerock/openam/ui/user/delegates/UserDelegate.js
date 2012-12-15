@@ -136,7 +136,7 @@ define("UserDelegate", [
             type: "GET",
             success: function () { 
                 console.debug("Successfully logged out");
-                cookieHelper.deleteCookie("iPlanetDirectoryPro", "", _.last(document.domain.split('.'), 2).join('.'));
+                cookieHelper.deleteCookie("iPlanetDirectoryPro", "", document.domain);
             },
             error: function () {
                 console.debug("Error during logging out");
@@ -144,6 +144,26 @@ define("UserDelegate", [
         });
     };
 
+    
+    obj.updateUser = function(user, objectParam, successCallback, errorCallback) {
+        var headers = {};
+        
+        if(objectParam._rev) {
+            headers["If-Match"] = '"' + objectParam._rev + '"';
+        } else {
+            headers["If-Match"] = '"' + "*" + '"';
+        }
+
+        this.serviceCall({url: "/" +user,
+            type: "PUT",
+            success: successCallback, 
+            error: errorCallback, 
+            data: JSON.stringify(_.pick(objectParam, ["givenname","sn","mail","postaladdress","telephonenumber","userpassword"])),
+            headers: headers
+        });
+
+    }
+    
     return obj;
 });
 
