@@ -41,10 +41,11 @@ define("UserDelegate", [
      * Starting session. Sending username and password to authenticate and returns user's id.
      */
     obj.login = function(uid, password, successCallback, errorCallback, errorsHandlers) {
-
+        
         obj.serviceCall({
-            serviceUrl: constants.host + "/"+ constants.context + "/identity/authenticate?" + $.param({username: uid, password: password}),
+            serviceUrl: constants.host + "/"+ constants.context + "/identity/authenticate",
             url: "",
+            data: $.param({username: uid, password: password}),
             dataType: "text",
             type: "POST",
             success: _.bind(function (data) {
@@ -55,8 +56,16 @@ define("UserDelegate", [
                     }
                 } else {
                     token = data.split("=")[1].replace("\n", "");
-                    cookieHelper.setCookie("iPlanetDirectoryPro", token, "", "/", constants.host); // the name of this cookie should probably be in the config as well 
-                    this.getProfile(successCallback, errorCallback, errorsHandlers);    
+                    obj.serviceCall({
+                        serviceUrl: constants.host + "/"+ constants.context + "/identity/json/getcookienamefortoken",
+                        url: "",
+                        success: _.bind(function (data) {
+                            cookieHelper.setCookie(data.string, token, "", "/", document.domain);
+                            this.getProfile(successCallback, errorCallback, errorsHandlers);    
+                        }, this),
+                        error: errorCallback
+                    });
+
                 }
             }, this),
             error: function () { 
