@@ -46,7 +46,7 @@
         <form action="${target!'.'}" method="post">
             <h4>The following private info is requested</h4>
         <#if display_scope??>
-            <#list display_scope as r><input type="checkbox" name="scope" value="${r}" checked/>
+            <#list display_scope as r>
                 <b>${r}</b><br/>
             </#list>
         </#if>
@@ -54,7 +54,7 @@
             <#if grantedScopes?has_content>
                 <hr/>
                 <h4>Previously approved scopes</h4>
-                <#list grantedScopes as g><input type="checkbox" name="scope" value="${g}" checked/>
+                <#list grantedScopes as g>
                     <b>${g}</b><br/>
                 </#list>
             </#if>
