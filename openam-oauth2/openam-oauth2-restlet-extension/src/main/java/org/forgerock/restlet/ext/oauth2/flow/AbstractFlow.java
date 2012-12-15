@@ -478,7 +478,7 @@ public abstract class AbstractFlow extends ServerResource {
     private List<String> getScopeDescriptionsForLocale(Set<String> scopes,
                                                        Set<String>scopesWithDescriptions,
                                                        String locale){
-        final String DELIMITER = "|";
+        final String DELIMITER = "\\|";
         List<String> list = new LinkedList<String>();
         for (String scope: scopes){
             for (String scopeDescription : scopesWithDescriptions){
@@ -492,15 +492,15 @@ public abstract class AbstractFlow extends ServerResource {
                         list.add(parts[1]);
                     } else if (parts.length == 3){
                         //locale and description
-                        if (parts[2].equalsIgnoreCase(locale)){
-                            list.add(parts[3]);
+                        if (parts[1].equalsIgnoreCase(locale)){
+                            list.add(parts[2]);
                         } else {
                             //not the right locale
                             continue;
                         }
 
                     } else {
-                        OAuth2Utils.DEBUG.warning("Scope was input into the client settings in the wrong format");
+                        OAuth2Utils.DEBUG.warning("Scope was input into the client settings in the wrong format for scope: " + scopeDescription);
                         continue;
                     }
 
