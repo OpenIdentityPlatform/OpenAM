@@ -78,7 +78,8 @@ public class UpgradeProgress {
 
     public static void closeOutputStream() {
         try {
-            writer.close();
+            if (writer != null)
+                { writer.close(); }
         } catch (IOException ex) {
             //ignore
         }
