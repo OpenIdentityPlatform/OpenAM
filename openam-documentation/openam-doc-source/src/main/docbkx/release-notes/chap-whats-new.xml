@@ -31,7 +31,7 @@
  xmlns:xinclude='http://www.w3.org/2001/XInclude'>
  <title>What's New in OpenAM <?eval ${serverDocTargetVersion}?></title>
 
- <para>OpenAM <?eval ${currentMajorVersion}?> fixes a number of issues, and
+ <para>OpenAM <?eval ${serverDocTargetVersion}?> fixes a number of issues, and
  provides the following additional features.</para>
 
  <important>
