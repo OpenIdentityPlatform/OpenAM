@@ -544,8 +544,8 @@ public class ServicesDefaultValues {
      */
     public static String tagSwap(String orig, boolean bXML) {
         Map map = instance.defValues;
-        for (Iterator i = map.keySet().iterator(); i.hasNext(); ) {
-            String key = (String)i.next();
+        for (Object okey : map.keySet().toArray() ) {
+            String key = (String)okey;
             String value = (String)map.get(key);
             if (value != null) {
                 value = value.replaceAll("[$]", "\\\\\\$");

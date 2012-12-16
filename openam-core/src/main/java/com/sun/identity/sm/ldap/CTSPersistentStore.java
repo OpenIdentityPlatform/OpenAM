@@ -76,10 +76,9 @@ import org.opends.server.types.*;
  * @author steve
  * @author jeff.schenk@forgerock.com
  * @author jason.lemay@forgerock.com
- *
  */
 public class CTSPersistentStore extends GeneralTaskRunnable
-        implements  AMTokenRepository, AMTokenSAML2Repository, OAuth2TokenRepository {
+        implements AMTokenRepository, AMTokenSAML2Repository, OAuth2TokenRepository {
 
     /**
      * Globals public Constants, so not to pollute entire product.
@@ -128,6 +127,8 @@ public class CTSPersistentStore extends GeneralTaskRunnable
      * Service Globals
      */
     private static volatile boolean shutdown = false;
+    private static volatile boolean ditVerified = false;
+    private static volatile int attemptsToVerifyDIT = 0;
     private static Thread storeThread;
 
     private static final int SLEEP_INTERVAL = 60 * 1000;
@@ -148,7 +149,7 @@ public class CTSPersistentStore extends GeneralTaskRunnable
     static public final String OAUTH2 = "oauth2";
 
     private static final String FAMRECORDS_NAMING = "ou=famrecords";
-    private static final String OAUTH2TOKENS_NAMING = "ou="+OAUTH2+"tokens";
+    private static final String OAUTH2TOKENS_NAMING = "ou=" + OAUTH2 + "tokens";
 
     private static boolean caseSensitiveUUID =
             SystemProperties.getAsBoolean(com.sun.identity.shared.Constants.CASE_SENSITIVE_UUID);
@@ -168,7 +169,7 @@ public class CTSPersistentStore extends GeneralTaskRunnable
 
     //  Our default for TOKEN_ROOT = ou=tokens,dc=openam,dc=forgerock,dc=org
     private static final String TOKEN_ROOT = TOKEN_ROOT_SUFFIX +
-            Constants.COMMA + "{"+ BASE_ROOT_DN_NAME +"}";
+            Constants.COMMA + "{" + BASE_ROOT_DN_NAME + "}";
 
     // Our default for TOKEN_SESSION_HA_ROOT_SUFFIX = ou=openam-session
     private static final String TOKEN_SESSION_HA_ROOT_SUFFIX =
@@ -189,11 +190,11 @@ public class CTSPersistentStore extends GeneralTaskRunnable
      * Define Session DN Constants
      */
     private static final String SESSION_FAILOVER_HA_BASE_DN =
-            FAMRECORDS_NAMING+Constants.COMMA+
+            FAMRECORDS_NAMING + Constants.COMMA +
                     TOKEN_SESSION_HA_ROOT_SUFFIX + Constants.COMMA + TOKEN_ROOT;
 
     private static final String SESSION_FAILOVER_HA_ELEMENT_DN_TEMPLATE =
-            PKEY_NAMING_ATTR + Constants.EQUALS + "{"+PKEY_NAMING_ATTR+"}" + Constants.COMMA +
+            PKEY_NAMING_ATTR + Constants.EQUALS + "{" + PKEY_NAMING_ATTR + "}" + Constants.COMMA +
                     SESSION_FAILOVER_HA_BASE_DN;
 
     /**
@@ -201,29 +202,29 @@ public class CTSPersistentStore extends GeneralTaskRunnable
      */
     private final static String TOKEN_EXPIRATION_FILTER_TEMPLATE =
             "(&(" + OBJECTCLASS + Constants.EQUALS + CTSPersistentStore.FR_FAMRECORD +
-                    ")" + EXPDATE_FILTER_PRE + "{"+FORMATTED_EXPIRATION_DATE_NAME+"}" + EXPDATE_FILTER_POST + ")";
+                    ")" + EXPDATE_FILTER_PRE + "{" + FORMATTED_EXPIRATION_DATE_NAME + "}" + EXPDATE_FILTER_POST + ")";
 
 
     /**
      * Define SAML2 DN Constants
      */
     private static final String SAML2_HA_BASE_DN =
-            FAMRECORDS_NAMING+Constants.COMMA+
+            FAMRECORDS_NAMING + Constants.COMMA +
                     TOKEN_SAML2_HA_ROOT_SUFFIX + Constants.COMMA + TOKEN_ROOT;
 
     private static final String TOKEN_SAML2_HA_ELEMENT_DN_TEMPLATE =
-            PKEY_NAMING_ATTR + Constants.EQUALS + "{"+SAML2_KEY_NAME+"}" + Constants.COMMA +
+            PKEY_NAMING_ATTR + Constants.EQUALS + "{" + SAML2_KEY_NAME + "}" + Constants.COMMA +
                     SAML2_HA_BASE_DN;
 
     /**
      * Define OAUTH2 DN Constants
      */
     private static final String OAUTH2_HA_BASE_DN =
-            OAUTH2TOKENS_NAMING+Constants.COMMA+
+            OAUTH2TOKENS_NAMING + Constants.COMMA +
                     TOKEN_OAUTH2_HA_ROOT_SUFFIX + Constants.COMMA + TOKEN_ROOT;
 
     private static final String TOKEN_OAUTH2_HA_ELEMENT_DN_TEMPLATE =
-            OAuth2Constants.Params.ID + Constants.EQUALS + "{"+OAUTH2_KEY_NAME+"}" + Constants.COMMA + OAUTH2_HA_BASE_DN;
+            OAuth2Constants.Params.ID + Constants.EQUALS + "{" + OAUTH2_KEY_NAME + "}" + Constants.COMMA + OAUTH2_HA_BASE_DN;
 
     /**
      * Return Attribute Constructs
@@ -393,6 +394,33 @@ public class CTSPersistentStore extends GeneralTaskRunnable
      * @return CTSPersistentStore Singleton Instance.
      */
     public static final CTSPersistentStore getInstance() {
+        synchronized (instance) {
+            if (!ditVerified) {
+                try {
+                    if (attemptsToVerifyDIT > 3) {
+                        // limit the number of Attempts that can possible be performed.
+                        return null;
+                    }
+                    attemptsToVerifyDIT++;
+                    CTSDataUtils ctsDataUtils = new CTSDataUtils(instance);
+                    if (!ctsDataUtils.isDITValid()) {
+                        DEBUG.warning("Existing CTS DIT Structure is not valid, attempting automatic upgrade of Directory.");
+                        if (ctsDataUtils.upgradeDIT()) {
+                            DEBUG.warning("CTS DIT Upgrade was Successful.");
+                        } else {
+                            DEBUG.error("CTS DIT Upgrade was not Successful, CTS persistence will be ignored until DIT fixed.");
+                            return null;
+                        }
+                    } // End of If Upgrade Check.
+                    // Set our Flag that our DIT Structure and schema has been verified and allow normal operations.
+                    ditVerified = true;
+                } catch (StoreException se) {
+                    DEBUG.error("Exception occurred verifying the CTS DIT Structure and Schemata, Please Verify Directory Configuration.", se);
+                    return null;
+                }
+            } // End of ditVerified if Check.
+        } // End of synchronized block.
+        // Return Instance.
         return instance;
     }
 
@@ -459,19 +487,23 @@ public class CTSPersistentStore extends GeneralTaskRunnable
                     // Delete any expired Sessions up to now.
                     deleteExpired(Calendar.getInstance());
                     if (shutdown) {
-                        break; }
+                        break;
+                    }
                     // Delete any expired SAML2 Artifacts
                     deleteExpiredSAML2Tokens();
                     if (shutdown) {
-                        break; }
+                        break;
+                    }
                     // Delete expired OAuth2 tokens
                     oauth2DeleteExpired();
                     if (shutdown) {
-                        break; }
+                        break;
+                    }
                     // Process any Deferred Operations
                     processDeferredAMSessionRepositoryOperations();
                     if (shutdown) {
-                        break; }
+                        break;
+                    }
                     // Wait for next tick or interrupt.
                     LOCK.wait(SLEEP_INTERVAL);
                 } catch (InterruptedException ie) {
@@ -481,7 +513,7 @@ public class CTSPersistentStore extends GeneralTaskRunnable
                     break;
                 } catch (StoreException se) {
                     DEBUG.warning(DB_STR_EX.get().toString(), se);
-                } catch (JsonResourceException e){
+                } catch (JsonResourceException e) {
                     DEBUG.warning(DB_STR_EX.get().toString(), e);
                 }
             }
@@ -553,10 +585,10 @@ public class CTSPersistentStore extends GeneralTaskRunnable
             }
             byte[] serializedInternalSession = SessionUtils.encode(is);
             long expirationTime = is.getExpirationTime() + gracePeriod;
-            if ( (is.getUUID() == null) || (is.getUUID().isEmpty()) ) {
-                 // In the case of an inactivated Session, we may not have a
-                 // uuid, so perform a set to establish and initialize the
-                 // InternalSession UUID.
+            if ((is.getUUID() == null) || (is.getUUID().isEmpty())) {
+                // In the case of an inactivated Session, we may not have a
+                // uuid, so perform a set to establish and initialize the
+                // InternalSession UUID.
                 is.setUUID();
             }
             String uuid = caseSensitiveUUID ? is.getUUID() : is.getUUID().toLowerCase();
@@ -1274,7 +1306,7 @@ public class CTSPersistentStore extends GeneralTaskRunnable
         // Initialize.
         final String messageTag = "CTSPersistenceStore.retrieveSAML2Token: ";
         // Arguments Valid?
-        if ( (samlKey == null) || (samlKey.isEmpty()) ) {
+        if ((samlKey == null) || (samlKey.isEmpty())) {
             DEBUG.error(messageTag + "Unable to Retrieve SAML2 Token Object, as Primary SAML2 Key was not provided!");
             return null;
         }
@@ -1334,7 +1366,7 @@ public class CTSPersistentStore extends GeneralTaskRunnable
         // Initialize.
         final String messageTag = "CTSPersistenceStore.retrieveSAML2TokenWithSecondaryKey: ";
         // Arguments Valid?
-        if ( (secKey == null) || (secKey.isEmpty()) ) {
+        if ((secKey == null) || (secKey.isEmpty())) {
             DEBUG.error(messageTag + "Unable to Retrieve SAML2 Token Object, as Secondary SAML2 Key was not provided!");
             return null;
         }
@@ -1419,7 +1451,7 @@ public class CTSPersistentStore extends GeneralTaskRunnable
             // Create a FAMRecord Object to wrap our SAML2 Object.
             FAMRecord famRec = new FAMRecord(
                     SAML2, FAMRecord.WRITE, AMRecordDataEntry.encodeKey(samlKey), expirationTime,
-                    ((secKey==null) ? secKey: AMRecordDataEntry.encodeKey(secKey)),
+                    ((secKey == null) ? secKey : AMRecordDataEntry.encodeKey(secKey)),
                     1, null, serializedInternalSession);
             // Construct the Entry's DN and Persist Record
             writeImmediate(famRec, getFormattedDNString(TOKEN_SAML2_HA_ELEMENT_DN_TEMPLATE, SAML2_KEY_NAME, famRec.getPrimaryKey()));
@@ -1440,10 +1472,10 @@ public class CTSPersistentStore extends GeneralTaskRunnable
     /**
      * Deletes the SAML2 object by given primary key from the repository
      *
-     * @param samlKey primary key
+     * @param samlKey          primary key
      * @param encodePrimaryKey
      */
-    private void deleteSAML2Token(String samlKey, boolean  encodePrimaryKey) throws StoreException {
+    private void deleteSAML2Token(String samlKey, boolean encodePrimaryKey) throws StoreException {
         final String messageTag = "CTSPersistenceStore.deleteSAML2Token: ";
         // Arguments Valid?
         if ((samlKey == null) || (samlKey.isEmpty())) {
@@ -1536,7 +1568,7 @@ public class CTSPersistentStore extends GeneralTaskRunnable
                 }
                 // Obtain the primary Key and perform the Deletion.
                 String[] values = primaryKeyAttribute.getStringValueArray();
-                deleteSAML2Token(values[0],false); // Do not to encode, as our Primary Key is already encoded from Store.
+                deleteSAML2Token(values[0], false); // Do not to encode, as our Primary Key is already encoded from Store.
                 objectsDeleted++;
             } // End of while loop.
         } catch (LDAPException ldapException) {
@@ -1682,7 +1714,7 @@ public class CTSPersistentStore extends GeneralTaskRunnable
         }
         // Obtain our Root DN to use as out Base DN.
         BASE_ROOT_DN = SMSEntry.getRootSuffix();
-        if ( (BASE_ROOT_DN == null) || (BASE_ROOT_DN.isEmpty()) ) {
+        if ((BASE_ROOT_DN == null) || (BASE_ROOT_DN.isEmpty())) {
             throw new StoreException("Unable to obtain Base Root DN from SMSEntry.getRootSuffix() method call!");
         }
         // Show Informational Message.
@@ -1692,19 +1724,32 @@ public class CTSPersistentStore extends GeneralTaskRunnable
     }
 
     /**
-     * Private Common Helper Method to Obtain an LDAP Connection
+     * Protected Common Helper Method to Obtain an LDAP Connection
      * from the SMDataLayer Pool.
      *
      * @return LDAPConnection - Obtained Directory Connection from Pool.
      * @throws StoreException
      */
-    private LDAPConnection getDirectoryConnection() throws StoreException {
+    protected LDAPConnection getDirectoryConnection() throws StoreException {
         LDAPConnection ldapConnection = CTSDataLayer.getConnection();
         if (ldapConnection == null) {
             throw new StoreException("CTSPersistenceStore.prepareCTSPersistenceStore: Unable to Obtain Directory Connection!");
         }
         // Return Obtain Connection from Pool.
         return ldapConnection;
+    }
+
+    /**
+     * Protected Common Helper Method for external parallel layer components @see CTSDataUtils
+     *
+     * @param ldapConnection
+     * @throws StoreException
+     */
+    protected void releaseDirectoryConnection(LDAPConnection ldapConnection, LDAPException lastLDAPException) throws StoreException {
+        if (ldapConnection != null) {
+            // Release the Connection.
+            CTSDataLayer.releaseConnection(ldapConnection, lastLDAPException);
+        }
     }
 
     /**
@@ -1723,15 +1768,16 @@ public class CTSPersistentStore extends GeneralTaskRunnable
      * This uses the include Open Source @see MapFormat Source.
      *
      * @param template
-     * @param name - Can be Null.
+     * @param name     - Can be Null.
      * @param value
      * @return String of Formatted Template with DN Names resolved.
      */
     private static String getFormattedDNString(String template, String name, String value) {
-        Map<String,String> map = new HashMap<String,String>();
+        Map<String, String> map = new HashMap<String, String>();
         map.put(BASE_ROOT_DN_NAME, BASE_ROOT_DN); // Always Resolve our Base Root DN with any Template.
-        if ( (name != null) && (!name.isEmpty()) )
-            { map.put(name,value); }
+        if ((name != null) && (!name.isEmpty())) {
+            map.put(name, value);
+        }
         return MapFormat.format(template, map);
     }
 
@@ -1796,7 +1842,7 @@ public class CTSPersistentStore extends GeneralTaskRunnable
                 DEBUG.warning(message.toString());
                 throw new JsonResourceException(JsonResourceException.INTERNAL_ERROR, messageTag + message.toString(), ldapException);
             }
-        } catch(StoreException e){
+        } catch (StoreException e) {
             throw new JsonResourceException(JsonResourceException.UNAVAILABLE, e.getMessage(), e);
         } finally {
             if (ldapConnection != null) {
@@ -1811,7 +1857,7 @@ public class CTSPersistentStore extends GeneralTaskRunnable
     /**
      * {@inheritDoc}
      */
-    public JsonValue oauth2Read(JsonValue request) throws JsonResourceException{
+    public JsonValue oauth2Read(JsonValue request) throws JsonResourceException {
 
         if ((request == null) || (request.size() == 0)) {
             return null;
@@ -1857,7 +1903,7 @@ public class CTSPersistentStore extends GeneralTaskRunnable
             final LocalizableMessage message = DB_ENT_ACC_FAIL.get(baseDN, ldapException.errorCodeToString());
             DEBUG.error(messageTag + message.toString());
             throw new JsonResourceException(JsonResourceException.INTERNAL_ERROR, messageTag + message.toString(), ldapException);
-        } catch(StoreException e){
+        } catch (StoreException e) {
             throw new JsonResourceException(JsonResourceException.UNAVAILABLE, e.getMessage(), e);
         } finally {
             if (ldapConnection != null) {
@@ -1870,14 +1916,14 @@ public class CTSPersistentStore extends GeneralTaskRunnable
     /**
      * {@inheritDoc}
      */
-    public JsonValue oauth2Update(JsonValue request) throws JsonResourceException{
+    public JsonValue oauth2Update(JsonValue request) throws JsonResourceException {
         return oauth2Create(request);
     }
 
     /**
      * {@inheritDoc}
      */
-    public JsonValue oauth2Delete(JsonValue request) throws JsonResourceException{
+    public JsonValue oauth2Delete(JsonValue request) throws JsonResourceException {
         if ((request == null) || (request.size() == 0)) {
             return null;
         }
@@ -1905,7 +1951,7 @@ public class CTSPersistentStore extends GeneralTaskRunnable
                 final LocalizableMessage message = DB_ENT_DEL_FAIL.get(dn, ldapException.errorCodeToString());
                 DEBUG.error(messageTag + message.toString());
             }
-        } catch(StoreException e){
+        } catch (StoreException e) {
             throw new JsonResourceException(JsonResourceException.UNAVAILABLE, e.getMessage(), e);
         } finally {
             if (ldapConnection != null) {
@@ -1920,20 +1966,20 @@ public class CTSPersistentStore extends GeneralTaskRunnable
     /**
      * {@inheritDoc}
      */
-    public JsonValue oauth2Query(JsonValue request) throws JsonResourceException{
+    public JsonValue oauth2Query(JsonValue request) throws JsonResourceException {
         if ((request == null) || (request.size() == 0)) {
             return null;
         }
 
-        Map<String, Object> filters = (Map<String, Object>)request.get("params").required().asMap().get("filter");
+        Map<String, Object> filters = (Map<String, Object>) request.get("params").required().asMap().get("filter");
         Set<Map<String, Set<String>>> tokens = new HashSet<Map<String, Set<String>>>();
         StringBuilder filter;
-        if (filters == null){
+        if (filters == null) {
             filter = null;
         } else {
             filter = new StringBuilder();
             filter.append("(&");
-            for(String key: filters.keySet()){
+            for (String key : filters.keySet()) {
                 filter.append("(").append(key).append(Constants.EQUALS)
                         .append(filters.get(key).toString()).append(")");
             }
@@ -2009,7 +2055,7 @@ public class CTSPersistentStore extends GeneralTaskRunnable
         return new JsonValue(tokens);
     }
 
-    public void oauth2DeleteExpired() throws JsonResourceException{
+    public void oauth2DeleteExpired() throws JsonResourceException {
 
         StringBuilder baseDN = new StringBuilder();
         StringBuilder filter = new StringBuilder();
@@ -2096,7 +2142,7 @@ public class CTSPersistentStore extends GeneralTaskRunnable
     /**
      * {@inheritDoc}
      */
-    public void oauth2Delete(String id) throws JsonResourceException{
+    public void oauth2Delete(String id) throws JsonResourceException {
 
         if ((id == null) || (id.isEmpty())) {
             return;
@@ -2123,7 +2169,7 @@ public class CTSPersistentStore extends GeneralTaskRunnable
                 final LocalizableMessage message = DB_ENT_DEL_FAIL.get(baseDN, ldapException.errorCodeToString());
                 DEBUG.error(messageTag + message.toString());
             }
-        } catch(StoreException e){
+        } catch (StoreException e) {
             throw new JsonResourceException(JsonResourceException.UNAVAILABLE, e.getMessage(), e);
         } finally {
             if (ldapConnection != null) {
@@ -2139,20 +2185,65 @@ public class CTSPersistentStore extends GeneralTaskRunnable
      *
      * @param results<String, Set<String>>
      */
-    private void addUnderScoresToParams(Map<String, Set<String>> results){
+    private void addUnderScoresToParams(Map<String, Set<String>> results) {
         //need to add the _ back into expiry_time, client_id, redirect_uri
         //and remove objectClass(by product of LDAP)
-        for (String key : results.keySet()){
-            if (key.equalsIgnoreCase("expirytime")){
+        for (String key : results.keySet()) {
+            if (key.equalsIgnoreCase("expirytime")) {
                 results.put(OAuth2Constants.StoredToken.EXPIRY_TIME, results.remove(key));
-            } else if (key.equalsIgnoreCase("clientid")){
+            } else if (key.equalsIgnoreCase("clientid")) {
                 results.put(OAuth2Constants.Params.CLIENT_ID, results.remove(key));
-            } else if (key.equalsIgnoreCase("redirecturi")){
+            } else if (key.equalsIgnoreCase("redirecturi")) {
                 results.put(OAuth2Constants.Params.REDIRECT_URI, results.remove(key));
-            } else if (key.equalsIgnoreCase("objectClass")){
+            } else if (key.equalsIgnoreCase("objectClass")) {
                 results.remove(key);
             }
         }
     }
 
+    // ***********************************************
+    // Protected Helper Methods for protected access
+    // to our private and runtime resolvable properties.
+    // ***********************************************
+
+
+    protected static String getAnyObjectclassFilter() {
+        return ANY_OBJECTCLASS_FILTER;
+    }
+
+    protected static String getBASE_ROOT_DN() {
+        return getFormattedDNString(BASE_ROOT_DN, null, null);
+    }
+
+    protected static String getTokenRoot() {
+        return getFormattedDNString(TOKEN_ROOT, null, null);
+    }
+
+    protected static String getTokenSessionHaRootDn() {
+        return getFormattedDNString(TOKEN_SESSION_HA_ROOT_SUFFIX+","+TOKEN_ROOT, null, null);
+    }
+
+    protected static String getTokenSaml2HaRootDn() {
+        return getFormattedDNString(TOKEN_SAML2_HA_ROOT_SUFFIX+","+TOKEN_ROOT, null, null);
+    }
+
+    protected static String getTokenOauth2HaRootDn() {
+        return getFormattedDNString(TOKEN_OAUTH2_HA_ROOT_SUFFIX+","+TOKEN_ROOT, null, null);
+    }
+
+    protected static String getSessionFailoverHaBaseDn() {
+        return getFormattedDNString(SESSION_FAILOVER_HA_BASE_DN, null, null);
+    }
+
+    protected static String getSaml2HaBaseDn() {
+        return getFormattedDNString(SAML2_HA_BASE_DN, null, null);
+    }
+
+    protected static String getOauth2HaBaseDn() {
+        return getFormattedDNString(OAUTH2_HA_BASE_DN, null, null);
+    }
+
+    protected static String[] getReturnAttrs_DN_ONLY_ARRAY() {
+        return returnAttrs_DN_ONLY_ARRAY;
+    }
 }
