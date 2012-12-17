@@ -1623,7 +1623,8 @@
                 <configuration>
                     <autoVersionSubmodules>true</autoVersionSubmodules>
                     <updateBranchVersions>true</updateBranchVersions>
-                    <arguments>-DskipTests=true</arguments>
+                    <remoteTagging>false</remoteTagging>
+                    <arguments>-DskipTests=true -Pforgerock-release -Prelease</arguments>
                 </configuration>
             </plugin>
 
