@@ -71,18 +71,6 @@
    </listitem>
 
    <listitem>
-    <!-- Fix for OPENAM-1827 -->
-    <para>The internal representation of session objects has changed.</para>
-
-    <para>If you use session failover and depend on OpenMQ rather than the
-    new implementation, you must ensure that the session failover database is
-    cleared as part of the upgrade to OpenAM <?eval ${serverDocTargetVersion}?>.
-    To clear the session failover database, run <command>amsfo stop</command>
-    and then run <command>amsfo start</command>. The session failover database
-    must be restarted before starting the updated OpenAM.</para>
-   </listitem>
-
-   <listitem>
     <!-- Fix for OpenAM-413 -->
     <para>Prior to OpenAM 9.5.2, trailing slashes (<literal>/</literal>) were
     ignored when matching resource names in policy evaluation. Therefore,
@@ -151,11 +139,10 @@
   release.</para>
 
   <itemizedlist>
+
    <listitem>
-    <!-- TODO: Update and move to "removed" section after Xpress -->
-    <para>For OpenAM XPress, you can continue to use the previous session
-    failover implementation. Support for the previous session failover
-    implementation will be removed after the Xpress release.</para>
+    <para>With the implementation of OAuth 2.0 in this release, OAuth 1.0 has been 
+    deprecated. OAuth 1.0 support was originally provided in OpenAM 9.</para>
    </listitem>
 
    <listitem>
@@ -163,12 +150,7 @@
     using the OpenDJ LDAP SDK instead. This affects all classes in
     <literal>com.sun.identity.shared.ldap.*</literal> packages.</para>
    </listitem>
-   <listitem>
-    <!-- Fix for OpenAM-837 -->
-    <para>Support for Liberty Identity Web Services Framework (ID-WSF) is
-    deprecated. The functionality is likely to be removed in a future
-    release.</para>
-   </listitem>
+
    <listitem>
     <para>OpenAM currently uses Sun Java System Application Framework (JATO).
     JATO is deprecated and is likely to be replaced in a future release.</para>
@@ -179,10 +161,13 @@
  <section xml:id="removed">
   <title>Removed Functionality</title>
 
-  <para>With the implementation of OAuth 2.0 in this release, OAuth 1.0 is
-  no longer supported. OAuth 1.0 support was originally provided in OpenAM
-  9.</para>
+  <para>For OpenAM <?eval ${serverDocTargetVersion}?> XPress, the use of the previous 
+  session failover implementation has been removed.</para>
 
+  <!-- Fix for OpenAM-837 -->
+  <para>Support for Liberty Identity Web Services Framework (ID-WSF) has been 
+  removed.</para>
+  
   <para>With the updated session failover, SAML 2 and session persistence have
   changed. The methods used prior to OpenAM 10.1.0 are no longer available.</para>
 
