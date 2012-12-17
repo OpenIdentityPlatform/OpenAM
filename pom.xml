@@ -1852,7 +1852,11 @@
 
         <pluginManagement>
             <plugins>
-
+                <plugin>
+                    <groupId>org.forgerock.commons</groupId>
+                    <artifactId>i18n-maven-plugin</artifactId>
+                    <version>1.4.0</version>
+                </plugin>
                 <plugin>
                     <groupId>org.codehaus.mojo</groupId>
                     <artifactId>properties-maven-plugin</artifactId>
