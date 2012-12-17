@@ -59,14 +59,6 @@ public class ConfigureOAuth2 extends Task {
     private static final String RULE_NAME = "OAuth2ProviderRule";
     private static final String SUBJECT_NAME = "OAuth2ProviderSubject";
     private static final String OAUTH2_AUTHORIZE_ENDPOINT = "/oauth2/authorize*";
-    private static final String PROTOCOL = SystemPropertiesManager.get(
-            Constants.AM_SERVER_PROTOCOL);
-    private static final String HOST = SystemPropertiesManager.get(Constants.AM_SERVER_HOST);
-    private static final String PORT = SystemPropertiesManager.get(Constants.AM_SERVER_PORT);
-    private static final String DEPLOYMENT_URI = SystemPropertiesManager.get(
-            Constants.AM_SERVICES_DEPLOYMENT_DESCRIPTOR);
-    private static final String hostUrl = PROTOCOL + "://" + HOST + ":" + PORT + DEPLOYMENT_URI;
-    private static final String POLICY_URL = hostUrl + OAUTH2_AUTHORIZE_ENDPOINT;
     private static final String ROOT_REALM = "/";
 
     public ConfigureOAuth2(){
@@ -112,6 +104,9 @@ public class ConfigureOAuth2 extends Task {
             throw new WorkflowException("ConfigureOAuth2.execute() : Unable to create Service");
         }
 
+        //get policy url
+        String policyURL = getRequestURL(params) + OAUTH2_AUTHORIZE_ENDPOINT;
+
         //check if policy exists
         PolicyManager mgr = null;
         boolean createPolicy = false;
@@ -121,7 +116,6 @@ public class ConfigureOAuth2 extends Task {
                 createPolicy = true;
             }
         } catch (Exception e){
-            //throw new WorkflowException("ConfigureOAuth2.execute() : Unable check for policy");
             createPolicy = true;
         }
 
@@ -147,7 +141,7 @@ public class ConfigureOAuth2 extends Task {
             try {
                 policyURLRule = new Rule(RULE_NAME,
                         "iPlanetAMWebAgentService",
-                        POLICY_URL,
+                        policyURL,
                         actions);
                 PolicyManager pm = new PolicyManager(token, ROOT_REALM);
                 SubjectTypeManager stm = pm.getSubjectTypeManager();
@@ -169,6 +163,8 @@ public class ConfigureOAuth2 extends Task {
                 throw new WorkflowException("ConfigureOAuth2.execute() : Unable to add policy");
             }
         }
-        return "Successful Configure for Realm: " + realm;
+        return "Sucessfully configured OAuth2 for realm: " + realm +
+                "<br> A policy was created for the authorization end point. The policy" +
+                " name is: " + POLICY_NAME;
     }
 }
