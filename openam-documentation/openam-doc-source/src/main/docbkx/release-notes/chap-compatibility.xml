@@ -39,6 +39,7 @@
 
   <itemizedlist>
 
+<!-- Not in XPress
   <listitem>
    <para>The advanced server property used to set the HTTP header name, 
    <literal>com.sun.identity.authentication.client.ipAddressHeader </literal>,
@@ -47,7 +48,7 @@
    xlink:href="https://bugster.forgerock.org/jira/browse/OPENAM-1879"
    xlink:show="new">OPENAM-1879</link>).</para>
   </listitem>
-
+-->
    <listitem>
     <para>Legacy naming conventions have been changed to conform to the
     current product name, OpenAM.</para>
