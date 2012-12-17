@@ -24,8 +24,6 @@
 
 package org.forgerock.restlet.ext.openam.server;
 
-import com.iplanet.services.naming.WebtopNaming;
-import com.sun.identity.federation.common.FSUtils;
 import com.sun.identity.shared.OAuth2Constants;
 import org.forgerock.restlet.ext.openam.OpenAMParameters;
 import org.forgerock.restlet.ext.openam.OpenAMUser;
@@ -36,7 +34,6 @@ import org.restlet.Response;
 import org.restlet.data.Reference;
 import org.restlet.data.Status;
 import org.restlet.ext.servlet.ServletUtils;
-import org.restlet.ext.servlet.internal.ServletCall;
 import org.restlet.resource.ResourceException;
 import org.restlet.routing.Redirector;
 import org.restlet.security.Authenticator;
@@ -193,6 +190,7 @@ public abstract class AbstractOpenAMAuthenticator extends Authenticator {
         } else if (null != serviceName && !serviceName.isEmpty()) {
             amserver.addQueryParameter(OAuth2Constants.Custom.SERVICE, serviceName);
         }
+        //TODO investigate more options for the LOGIN servlett
 
         amserver.addQueryParameter(OAuth2Constants.Custom.GOTO, request.getResourceRef().toString());
 
@@ -219,6 +217,7 @@ public abstract class AbstractOpenAMAuthenticator extends Authenticator {
         return sb.toString();
     }
 
+    /* TODO will be used when forward is implemented
     private static StringBuffer getAppliRootUrl(HttpServletRequest request) {
         StringBuffer result = new StringBuffer();
         String scheme = request.getScheme();             // http
@@ -234,4 +233,5 @@ public abstract class AbstractOpenAMAuthenticator extends Authenticator {
     private static String getRelativePath(String absUrl, String appliRootUrl) {
         return absUrl.substring(appliRootUrl.length(), absUrl.length());
     }
+    */
 }

@@ -92,11 +92,6 @@
             <groupId>org.forgerock.openam</groupId>
             <artifactId>openam-oauth2-restlet-extension</artifactId>
         </dependency>
-
-        <dependency>
-            <groupId>org.forgerock.openam</groupId>
-            <artifactId>openam-federation-library</artifactId>
-        </dependency>
         
 	<!-- OpenAM -->        
 	<dependency>
