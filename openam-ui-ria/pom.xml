@@ -37,7 +37,7 @@
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <forgerock-ui.version>1.0.0-SNAPSHOT</forgerock-ui.version>
+        <forgerock-ui.version>1.0.1-SNAPSHOT</forgerock-ui.version>
 
     </properties>
 

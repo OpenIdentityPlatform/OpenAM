@@ -53,9 +53,8 @@ define("org/forgerock/openam/ui/user/profile/UserProfileView", [
             
             if(validatorsManager.formValidated(this.$el)) {
                 data = form2js(this.$el.attr("id"), '.', false);
-                data._id = data.name;
-                this.delegate.updateEntity(data, _.bind(function() {
-                    conf.loggedUser = data;
+                this.delegate.updateUser(data.name, data, _.bind(function() {
+                    $.extend(conf.loggedUser, data);
                     eventManager.sendEvent(constants.EVENT_DISPLAY_MESSAGE_REQUEST, "profileUpdateSuccessful");
                 }, this));
             } else {
