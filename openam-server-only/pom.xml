@@ -115,15 +115,6 @@
                                     <outputDirectory>${project.build.directory}/unpacked</outputDirectory>
                                     <includes>jaxrpc/IdentityManagementServices.wsdl</includes>
                                 </artifactItem>
-                                <artifactItem>
-                                    <groupId>org.forgerock.openam</groupId>
-                                    <artifactId>openam-ui-ria</artifactId>
-                                    <classifier>www</classifier>
-                                    <type>zip</type>
-                                    <overWrite>false</overWrite>
-                                    <outputDirectory>${project.build.directory}/XUI</outputDirectory>
-                                    <includes>**/*</includes>
-                                </artifactItem>
                             </artifactItems>
                         </configuration>
                     </execution>
@@ -192,14 +183,6 @@
                         <!-- See: http://en.wikipedia.org/wiki/List_of_file_formats -->
                     </nonFilteredFileExtensions>
                     <webResources>
-                        <webResource>
-                            <directory>${project.build.directory}/XUI/XUI/</directory>
-                            <includes>
-                                <include>**/**</include>
-                            </includes>
-                            <targetPath>XUI</targetPath>
-                            <filtering>true</filtering>
-                        </webResource>
                         <webResource>
                             <directory>${basedir}/src/main/webapp</directory>
                             <includes>
@@ -362,14 +345,6 @@
 
 
     <dependencies>
-        <dependency>
-            <groupId>org.forgerock.openam</groupId>
-            <artifactId>openam-ui-ria</artifactId>
-            <version>${project.version}</version>
-            <classifier>www</classifier>
-            <type>zip</type>
-        </dependency>
-
         <dependency>
             <groupId>org.forgerock.openam</groupId>
             <artifactId>openam-installtools</artifactId>
