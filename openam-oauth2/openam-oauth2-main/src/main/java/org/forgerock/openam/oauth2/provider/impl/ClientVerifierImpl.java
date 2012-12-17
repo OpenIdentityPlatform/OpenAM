@@ -58,8 +58,6 @@ import javax.security.auth.callback.PasswordCallback;
  */
 public class ClientVerifierImpl implements ClientVerifier{
 
-    private String realm = null;
-
     /**
      * {@inheritDoc}
      */
@@ -80,14 +78,14 @@ public class ClientVerifierImpl implements ClientVerifier{
                         String.class);
 
         ClientApplication client = null;
-        realm = OAuth2Utils.getRealm(request);
+        String realm = OAuth2Utils.getRealm(request);
         if (request.getChallengeResponse() != null && clientId != null){
             OAuth2Utils.DEBUG.error("ClientVerifierImpl::Client (" + clientId + ") using multiple authentication methods");
             throw OAuthProblemException.OAuthError.INVALID_REQUEST.handle(request);
         } else if (request.getChallengeResponse() != null) {
-            client = verify(request.getChallengeResponse());
+            client = verify(request.getChallengeResponse(), realm);
         } else if (clientSecret != null && clientId != null && !clientId.isEmpty()) {
-                client = verify(clientId, clientSecret);
+                client = verify(clientId, clientSecret, realm);
         } else {
             throw OAuthProblemException.OAuthError.INVALID_REQUEST.handle(request);
         }
@@ -103,18 +101,18 @@ public class ClientVerifierImpl implements ClientVerifier{
         return client;
     }
 
-    private ClientApplication verify(ChallengeResponse challengeResponse)
+    private ClientApplication verify(ChallengeResponse challengeResponse, String realm)
             throws OAuthProblemException{
         String clientId = challengeResponse.getIdentifier();
         String clientSecret = String.valueOf(challengeResponse.getSecret());
-        return verify(clientId, clientSecret);
+        return verify(clientId, clientSecret, realm);
     }
 
-    private ClientApplication verify(String clientId, String clientSecret)
+    private ClientApplication verify(String clientId, String clientSecret, String realm)
             throws OAuthProblemException{
         ClientApplication user = null;
         try {
-            AMIdentity ret = authenticate(clientId, clientSecret.toCharArray());
+            AMIdentity ret = authenticate(clientId, clientSecret.toCharArray(), realm);
             if (ret == null){
                 OAuth2Utils.DEBUG.error("ClientVerifierImpl::Unable to verify client password: " +
                         clientSecret);
@@ -129,7 +127,7 @@ public class ClientVerifierImpl implements ClientVerifier{
         return user;
     }
 
-    private AMIdentity authenticate(String username, char[] password) {
+    private AMIdentity authenticate(String username, char[] password, String realm) {
 
         AMIdentity ret = null;
         try {
@@ -198,10 +196,10 @@ public class ClientVerifierImpl implements ClientVerifier{
         if (clientId == null || clientId.isEmpty()){
             throw OAuthProblemException.OAuthError.INVALID_REQUEST.handle(request);
         }
-
+        String realm = OAuth2Utils.getRealm(request);
         ClientApplication user = null;
         try {
-            AMIdentity id = getIdentity(clientId);
+            AMIdentity id = getIdentity(clientId, realm);
             user = new ClientApplicationImpl(id);
         } catch (Exception e){
             throw OAuthProblemException.OAuthError.INVALID_CLIENT.handle(request);
@@ -209,7 +207,7 @@ public class ClientVerifierImpl implements ClientVerifier{
         return user;
     }
 
-    private AMIdentity getIdentity(String uName) throws OAuthProblemException {
+    private AMIdentity getIdentity(String uName, String realm) throws OAuthProblemException {
         SSOToken token = (SSOToken) AccessController.doPrivileged(AdminTokenAction.getInstance());
         AMIdentity theID = null;
 
