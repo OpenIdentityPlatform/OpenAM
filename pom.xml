@@ -1678,6 +1678,7 @@
                         <nonFilteredFileExtension>gif</nonFilteredFileExtension>
                         <nonFilteredFileExtension>gz</nonFilteredFileExtension>
                         <nonFilteredFileExtension>gzip</nonFilteredFileExtension>
+                        <nonFilteredFileExtension>ico</nonFilteredFileExtension>
                         <nonFilteredFileExtension>jar</nonFilteredFileExtension>
                         <nonFilteredFileExtension>jks</nonFilteredFileExtension>
                         <nonFilteredFileExtension>jpg</nonFilteredFileExtension>
