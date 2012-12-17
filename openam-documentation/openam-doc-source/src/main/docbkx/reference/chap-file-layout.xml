@@ -36,10 +36,17 @@
  <para>This chapter describes files installed with OpenAM.</para>
  
  <variablelist>
-  <para>When you unzip your download of
-  <filename><?eval ${coreDirectoryFile}?>.zip</filename>, you get a 
-  <filename>~/Downloads/<?eval ${coreDirectoryFile}?></filename> directory including a ldif, 
-  license, and legal folders, as well as the following directories.</para>
+  <para>Before you unzip your download of
+  <filename><?eval ${coreDirectoryFile}?>.zip</filename>, you need to create a 
+  folder to store all of the files in the archive.</para>
+  
+  <screen>$ cd ~/Downloads
+$ mkdir openam ; cd openam
+$ unzip ~/Downloads/<?eval ${coreDirectoryFile}?>.zip</screen>
+
+  <para>Once you unzip the <filename><?eval ${coreDirectoryFile}?>.zip</filename>,
+  you will have ldif, license, and legal directories in addition to the following 
+  files.</para>
   
    <varlistentry>
     <term><filename><?eval ${clientsdkJarFile}?></filename></term>
@@ -79,6 +86,8 @@
     <listitem><para>The deployable .war file when you want to deploy OpenAM
     server without the OpenAM console</para></listitem>
    </varlistentry>
+
+<!-- Not currently in the file structure
   <varlistentry>
    <term><filename>upgrade</filename></term>
    <listitem><para>Content for upgrading from legacy versions of Sun
@@ -89,6 +98,7 @@
    <listitem><para>OpenAM service and default delegation policy configuration
    files</para></listitem>
   </varlistentry>
+-->
  </variablelist>
 </chapter>
 
