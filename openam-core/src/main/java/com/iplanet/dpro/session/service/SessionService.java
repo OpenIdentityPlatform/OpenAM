@@ -134,7 +134,6 @@ import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 
 import org.forgerock.openam.session.service.SessionTimeoutHandler;
-import org.forgerock.openam.shared.session.ha.amsessionstore.AMSessionRepositoryType;
 
 /**
  * This class represents a Session Service
@@ -157,12 +156,6 @@ public class SessionService {
      * AM Session Repository for Session Persistence.
      */
     private static volatile AMTokenRepository amTokenRepository = null;
-    /**
-     * AM Session Repository Type, always
-     * Default to Embedded until we initialize.
-     */
-    private static AMSessionRepositoryType amSessionRepositoryType =
-            AMSessionRepositoryType.CONFIG;
 
     /**
      * SSO Token Manager Instance Reference.
@@ -2222,13 +2215,6 @@ public class SessionService {
 
                     useInternalRequestRouting = true;
 
-                    // *********************************************************
-                    // Check for Type of Backend Persistent Store.
-                    // *********************************************************
-                    String amSessionRepositoryStringType = CollectionHelper.getMapAttr(
-                            sessionAttrs, SESSION_REPOSITORY_TYPE, AMSessionRepositoryType.NONE.name());
-                    amSessionRepositoryType
-                            = AMSessionRepositoryType.valueOf(amSessionRepositoryStringType.toUpperCase());
                     // Obtain Site Ids
                     Set<String> serverIDs = WebtopNaming.getSiteNodes(sessionServerID);
                     if ((serverIDs == null) || (serverIDs.isEmpty())) {
