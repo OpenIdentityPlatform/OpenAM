@@ -139,10 +139,19 @@ public class AccessTokenImpl extends TokenImpl implements AccessToken {
         tokenMap.put(OAuth2Constants.Params.ACCESS_TOKEN, getToken());
         tokenMap.put(OAuth2Constants.Params.TOKEN_TYPE, OAuth2Constants.Bearer.BEARER);
         tokenMap.put(OAuth2Constants.Params.EXPIRES_IN, getExpireTime());
-        tokenMap.put(OAuth2Constants.Params.USERNAME, getUserID());
+        return tokenMap;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public Map<String, Object> getTokenInfo() {
+        Map<String, Object> tokenMap = new HashMap<String, Object>();
+        tokenMap.put(OAuth2Constants.Params.ACCESS_TOKEN, getToken());
+        tokenMap.put(OAuth2Constants.Params.TOKEN_TYPE, OAuth2Constants.Bearer.BEARER);
+        tokenMap.put(OAuth2Constants.Params.EXPIRES_IN, getExpireTime());
         tokenMap.put(OAuth2Constants.Params.REALM, getRealm());
-        tokenMap.put(OAuth2Constants.Params.REDIRECT_URI, getClient().getRedirectUri());
-        tokenMap.put(OAuth2Constants.Params.CLIENT_ID, getClient().getClientId());
         tokenMap.put(OAuth2Constants.Params.SCOPE, getScope());
         return tokenMap;
     }

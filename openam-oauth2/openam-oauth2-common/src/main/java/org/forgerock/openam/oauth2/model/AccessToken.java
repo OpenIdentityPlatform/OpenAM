@@ -55,4 +55,10 @@ public interface AccessToken extends Token {
      * @return new Map representation of this AccessToken
      */
     public Map<String, Object> convertToMap();
+
+    /**
+     * Gets information about the token for the tokeninfo end point
+     * @return
+     */
+    public Map<String, Object> getTokenInfo();
 }
