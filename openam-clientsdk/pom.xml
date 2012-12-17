@@ -479,7 +479,7 @@
                             </manifestEntries>
                         </transformer>
                     </transformers>
-                    <!--createSourcesJar>true</createSourcesJar-->
+                    <createSourcesJar>${generate.clientsdk.sources}</createSourcesJar>
                 </configuration>
             </plugin>
         </plugins>
