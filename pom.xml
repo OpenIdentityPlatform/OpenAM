@@ -115,6 +115,8 @@
 
         <!-- JavaDoc Setting Properties -->
         <javadoc.options>-J-Xms2g -J-Xmx2g -J-XX:MaxPermSize=512m</javadoc.options>
+        <!-- Shade plugin setting for ClientSDK build -->
+        <generate.clientsdk.sources>false</generate.clientsdk.sources>
 
         <!-- Project Encoding -->
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -163,6 +165,18 @@
                     <systemPath>${toolsjar}</systemPath>
                 </dependency>
             </dependencies>
+        </profile>
+        <profile>
+            <id>release</id>
+            <activation>
+                <property>
+                    <name>performRelease</name>
+                    <value>true</value>
+                </property>
+            </activation>
+            <properties>
+                <generate.clientsdk.sources>true</generate.clientsdk.sources>
+            </properties>
         </profile>
 
     </profiles>
@@ -1686,7 +1700,6 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-javadoc-plugin</artifactId>
-                <version>2.8.1</version>
                 <inherited>true</inherited>
                 <configuration>
                     <charset>utf-8</charset>
@@ -1732,16 +1745,8 @@
                     <excludeResources>false</excludeResources>
                     <useDefaultExcludes>true</useDefaultExcludes>
                     <useDefaultManifestFile>true</useDefaultManifestFile>
+                    <skipSource>true</skipSource>
                 </configuration>
-                <executions>
-                    <execution>
-                        <id>attach-sources</id>
-                        <phase>site</phase>
-                        <goals>
-                            <goal>jar-no-fork</goal>
-                        </goals>
-                    </execution>
-                </executions>
             </plugin>
 
             <plugin>
@@ -1917,13 +1922,13 @@
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-javadoc-plugin</artifactId>
-                    <version>2.8.1</version>
+                    <version>2.9</version>
                     <inherited>true</inherited>
                 </plugin>
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-source-plugin</artifactId>
-                    <version>2.1.2</version>
+                    <version>2.2.1</version>
                     <inherited>true</inherited>
                 </plugin>
                 <plugin>
