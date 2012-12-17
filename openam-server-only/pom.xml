@@ -174,6 +174,7 @@
                         <nonFilteredFileExtension>gif</nonFilteredFileExtension>
                         <nonFilteredFileExtension>gz</nonFilteredFileExtension>
                         <nonFilteredFileExtension>gzip</nonFilteredFileExtension>
+                        <nonFilteredFileExtension>ico</nonFilteredFileExtension>
                         <nonFilteredFileExtension>jar</nonFilteredFileExtension>
                         <nonFilteredFileExtension>jks</nonFilteredFileExtension>
                         <nonFilteredFileExtension>jpg</nonFilteredFileExtension>
@@ -207,9 +208,18 @@
                             <excludes>
                                 <exclude>META-INF</exclude>
                                 <exclude>WEB-INF</exclude>
+                                <exclude>com_sun_web_ui/images</exclude>
                             </excludes>
                             <targetPath/>
                             <filtering>true</filtering>
+                        </webResource>
+                        <webResource>
+                            <directory>${basedir}/src/main/webapp/com_sun_web_ui/images</directory>
+                            <includes>
+                                <include>**/**</include>
+                            </includes>
+                            <targetPath>com_sun_web_ui/images</targetPath>
+                            <filtering>false</filtering>
                         </webResource>
                         <webResource>
                             <directory>${project.basedir}/src/main/webapp/WEB-INF</directory>
@@ -251,7 +261,6 @@
                             <targetPath>WEB-INF/wsdl</targetPath>
                             <filtering>false</filtering>
                         </webResource>
-
                         <webResource>
                             <directory>${project.build.directory}/unpacked/jaxrpc
                             </directory>
@@ -261,7 +270,6 @@
                             <targetPath>WEB-INF/wsdl</targetPath>
                             <filtering>true</filtering>
                         </webResource>
-
                         <webResource>
                             <directory>${project.basedir}/../openam-federation/OpenFM/src/main/resources/xml/wss
                             </directory>
