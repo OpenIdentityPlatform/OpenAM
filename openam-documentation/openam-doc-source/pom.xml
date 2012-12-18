@@ -103,11 +103,11 @@
         </license>
     </licenses>
     <properties>
-        <serverDocTargetVersion>10.1.0</serverDocTargetVersion>
+        <serverDocTargetVersion>10.1.0-Xpress</serverDocTargetVersion>
         <serverProjectVersion>10.1.0-Xpress</serverProjectVersion>
-        <agentsDocTargetVersion>3.1.0</agentsDocTargetVersion>
-        <webAgentsDocTargetVersion>3.1.0</webAgentsDocTargetVersion>
-        <javaEEAgentsDocTargetVersion>3.1.0</javaEEAgentsDocTargetVersion>
+        <agentsDocTargetVersion>3.1.0-Xpress</agentsDocTargetVersion>
+        <webAgentsDocTargetVersion>${agentsDocTargetVersion}</webAgentsDocTargetVersion>
+        <javaEEAgentsDocTargetVersion>${agentsDocTargetVersion}</javaEEAgentsDocTargetVersion>
         <agentsBootstrapFile>OpenSSOAgentBootstrap.properties</agentsBootstrapFile>
         <agentsConfigurationFile>OpenSSOAgentConfiguration.properties</agentsConfigurationFile>
         <coreDirectoryFile><![CDATA[openam-distribution-kit-${serverProjectVersion}]]></coreDirectoryFile>

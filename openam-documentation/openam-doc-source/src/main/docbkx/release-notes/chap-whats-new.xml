@@ -35,7 +35,7 @@
  provides the following additional features.</para>
 
  <important>
-  <para>OpenAM <?eval ${serverDocTargetVersion}?> Xpress is a milestone release
+  <para>OpenAM <?eval ${serverDocTargetVersion}?> is a milestone release
   from the main development branch of the product. The Xpress release contains
   selected key features and all current fixed issues. An Xpress release
   undergoes important functional testing but not the complete testing cycle
@@ -79,9 +79,10 @@
    xlink:show="new">OPENAM-625</link>). OpenAM 10.0.1 and earlier required the
    use of Open Message Queue and Berkeley DB Java Edition, which increased the
    complexity and amount of time required to get session failover working.
-   OpenAM now writes session data to the configuration data store instead of a
-   message queue. This implementation also can be used to make sessions persist
-   across restart for single OpenAM servers.</para>
+   OpenAM now writes session data to the configuration data store instead.
+   This implementation also can be used to make sessions persist across restart
+   for single OpenAM servers. The current implementation requires that you use
+   OpenDJ for the configuration data store.</para>
   </listitem>
 
   <listitem>
@@ -164,12 +165,14 @@
    xlink:show="new">OPENAM-1470</link>).</para>
   </listitem>
 
+  <!-- Unresolved for Xpress
   <listitem>
    <para>The OATH authentication module now implements resynchronization
    for TOTP (<link
    xlink:href="https://bugster.forgerock.org/jira/browse/OPENAM-1462"
    xlink:show="new">OPENAM-1462</link>).</para>
   </listitem>
+  -->
 
   <listitem>
    <para>OpenAM now better supports using a reverse proxy for federation
