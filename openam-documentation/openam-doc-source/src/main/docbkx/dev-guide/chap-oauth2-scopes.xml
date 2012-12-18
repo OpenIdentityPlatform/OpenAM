@@ -186,7 +186,7 @@ public class CustomScope implements Scope {
   <para>As the plugin imports at least
   <literal>org.forgerock.openam.oauth2.model.AccessToken</literal>
   and <literal>org.forgerock.openam.oauth2.provider.Scope</literal>, add
-  <filename>openam-oauth2-common-<?eval ${project.version}?>.jar</filename> to
+  <filename>openam-oauth2-common-<?eval ${serverProjectVersion}?>.jar</filename> to
   the classpath.</para>
 
   <para>After compiling, put it in a .jar file that you can deploy with
@@ -194,7 +194,7 @@ public class CustomScope implements Scope {
 
   <screen>$ mkdir classes
 $ javac -d classes
- -cp /path/to/.../openam/WEB-INF/lib/openam-oauth2-common-<?eval ${project.version}?>.jar
+ -cp /path/to/.../openam/WEB-INF/lib/openam-oauth2-common-<?eval ${serverProjectVersion}?>.jar
  CustomScope.java
 $ cd classes/
 $ jar cf ../CustomScope.jar</screen>
