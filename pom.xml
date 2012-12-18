@@ -1737,7 +1737,6 @@
                     <excludeResources>false</excludeResources>
                     <useDefaultExcludes>true</useDefaultExcludes>
                     <useDefaultManifestFile>true</useDefaultManifestFile>
-                    <skipSource>true</skipSource>
                 </configuration>
             </plugin>
 
