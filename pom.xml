@@ -513,9 +513,9 @@
     <!-- For Deployment to ForgeRock Maven Repository -->
     <distributionManagement>
         <repository>
-            <id>maven.forgerock.org</id>
+            <id>forgerock-staging</id>
             <name>maven.forgerock.org-releases</name>
-            <url>http://maven.forgerock.org/repo/openam-releases</url>
+            <url>http://maven.forgerock.org/repo/releases</url>
         </repository>
         <snapshotRepository>
             <id>maven.forgerock.org</id>
