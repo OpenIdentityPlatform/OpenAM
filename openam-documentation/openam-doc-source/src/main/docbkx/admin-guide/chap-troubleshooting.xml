@@ -68,7 +68,7 @@ mark      1739     1  0 14:47...</screen>
      <filename>WEB-INF/classes/bootstrap.properties</filename> to a directory
      with appropriate permissions, and repack <filename>openam.war</filename>
      with the adjusted file before deploying that.</para>
-     <screen>$ cd ~/Downloads/<?eval ${coreDirectoryFile}?>/<?eval ${coreWarFile}?>
+     <screen>$ cd ~/Downloads/openam/<?eval ${coreWarFile}?>
 $ mkdir unpacked ; cd unpacked
 $ jar xf ../<?eval ${coreWarFile}?>
 $ vi WEB-INF/classes/bootstrap.properties 
