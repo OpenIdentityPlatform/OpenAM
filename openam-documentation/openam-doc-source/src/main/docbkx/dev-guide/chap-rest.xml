@@ -70,12 +70,12 @@
   
   <para>To call the API, access URLs under <literal>identity/</literal> where
   OpenAM is deployed, such as
-  <literal>https://openam.example.com:8080/openam/identity/</literal>.</para>
+  <literal>https://openam.example.com:8443/openam/identity/</literal>.</para>
   
   <para>You can select the output format returned by specifying
   <literal>json/</literal> or <literal>xml/</literal> in the URL after
   <literal>identity/</literal>. For example, to return JSON, specify
-  <literal>https://openam.example.com:8080/openam/identity/json/</literal>.</para>
+  <literal>https://openam.example.com:8443/openam/identity/json/</literal>.</para>
   
   <para>For the examples in this chapter, OpenAM has c66Encode for cookies
   activated. The encoding ensures that OpenAM tokens need not be percent
@@ -109,7 +109,7 @@
   <para>Simple authentication with a user name and password returns a
   token.</para>
   
-  <screen>$ curl "https://openam.example.com:8080/openam/identity/authenticate?
+  <screen>$ curl "https://openam.example.com:8443/openam/identity/authenticate?
  username=bjensen
  &amp;password=hifalutin"
 token.id=AQIC5wM2LY4SfcxvdvHOXjtC_eWSs2RB54tgvgK8SuYi7aQ.*AAJTSQACMDE.*</screen>
@@ -118,7 +118,7 @@ token.id=AQIC5wM2LY4SfcxvdvHOXjtC_eWSs2RB54tgvgK8SuYi7aQ.*AAJTSQACMDE.*</screen>
   <literal>/UI/Login</literal>, you provide a percent encoded string of the
   parameters as the value of the <literal>uri</literal> parameter.</para>
   
-  <screen>$ curl "https://openam.example.com:8080/openam/identity/authenticate?
+  <screen>$ curl "https://openam.example.com:8443/openam/identity/authenticate?
  username=bjensen
  &amp;password=hifalutin
  &amp;uri=realm=%2F%26module=DataStore"
@@ -126,7 +126,7 @@ token.id=AQIC5wM2LY4SfcxvdvHOXjtC_eWSs2RB54tgvgK8SuYi7aQ.*AAJTSQACMDE.*</screen>
   
   <para>You log out using the token to end the user session.</para>
   
-  <screen>$ curl "https://openam.example.com:8080/openam/identity/logout?
+  <screen>$ curl "https://openam.example.com:8443/openam/identity/logout?
  subjectid=AQIC5wM2LY4SfcxvdvHOXjtC_eWSs2RB54tgvgK8SuYi7aQ.*AAJTSQACMDE.*"</screen>
  </section>
  
@@ -134,14 +134,14 @@ token.id=AQIC5wM2LY4SfcxvdvHOXjtC_eWSs2RB54tgvgK8SuYi7aQ.*AAJTSQACMDE.*</screen>
   <title>Token Validation &amp; Attribute Retrieval</title>
   <para>You check whether a token is valid as follows.</para>
   
-  <screen>$ curl "https://openam.example.com:8080/openam/identity/isTokenValid?
+  <screen>$ curl "https://openam.example.com:8443/openam/identity/isTokenValid?
  tokenid=AQIC5wM2LY4SfcxuxIP0VnP2lVjs7ypEM6VDx6srk56CN1Q.*AAJTSQACMDE.*"
 boolean=true</screen>
   
   <para>An invalid token returns a <errorcode>401</errorcode> and an error
   page.</para>
   
-  <screen>$ curl "https://openam.example.com:8080/openam/identity/isTokenValid?
+  <screen>$ curl "https://openam.example.com:8443/openam/identity/isTokenValid?
  tokenid=INVALID"
  &lt;html&gt;...HTTP Status 401...&lt;/html&gt;</screen>
   
@@ -153,7 +153,7 @@ boolean=true</screen>
    <primary>User data</primary>
    <secondary>REST access</secondary>
   </indexterm>
-  <screen>$ curl "https://openam.example.com:8080/openam/identity/attributes?
+  <screen>$ curl "https://openam.example.com:8443/openam/identity/attributes?
  subjectid=AQIC5wM2LY4SfcxuxIP0VnP2lVjs7ypEM6VDx6srk56CN1Q.*AAJTSQACMDE.*"
 userdetails.token.id=
  AQIC5wM2LY4SfcxuxIP0VnP2lVjs7ypEM6VDx6srk56CN1Q.*AAJTSQACMDE.*
@@ -185,7 +185,7 @@ userdetails.attribute.value=top</screen>
   
   <para>You can specify attributes to limit what you retrieve.</para>
   
-  <screen>$ curl "https://openam.example.com:8080/openam/identity/attributes?
+  <screen>$ curl "https://openam.example.com:8443/openam/identity/attributes?
  subjectid=AQIC5wM2LY4SfcxuxIP0VnP2lVjs7ypEM6VDx6srk56CN1Q.*AAJTSQACMDE.*
  &amp;attributenames=mail
  &amp;attributenames=uid"
@@ -200,7 +200,7 @@ userdetails.attribute.value=bjensen@example.com</screen>
   the idle time to 0, by adding the boolean parameter
   <literal>refresh=true</literal> to the query string.</para>
   
-  <screen>$ curl "https://openam.example.com:8080/openam/identity/attributes?
+  <screen>$ curl "https://openam.example.com:8443/openam/identity/attributes?
  subjectid=AQIC5wM2LY4SfcxuxIP0VnP2lVjs7ypEM6VDx6srk56CN1Q.*AAJTSQACMDE.*
  &amp;attributenames=cn
  &amp;refresh=true"
@@ -222,7 +222,7 @@ userdetails.attribute.value=Barbara Jensen</screen>
   protected resource based on a valid token. Of course, you must percent
   encode the resource URI.</para>
   
-  <screen>$ curl "https://openam.example.com:8080/openam/identity/authorize?
+  <screen>$ curl "https://openam.example.com:8443/openam/identity/authorize?
  uri=http%3A%2F%2Fwww.example.com%3A8080%2Fexamples%2Findex.html
  &amp;subjectid=AQIC5wM2LY4SfcxuxIP0VnP2lVjs7ypEM6VDx6srk56CN1Q.*AAJTSQACMDE.*"
 boolean=true</screen>
@@ -361,20 +361,30 @@ boolean=true</screen>
    <para>The following example shows OpenAM issuing an access token, and
    then returning token information.</para>
 
-   <screen>$ curl -d "grant_type=client_credentials&amp;username=demo
- &amp;password=changeit&amp;client_id=myClientID&amp;client_secret=password"
- http://openam.example.com:8080/openam/oauth2/access_token
+   <screen>$ curl
+ --request POST
+ --user "myClientID:password"
+ --data "grant_type=password&amp;username=demo&amp;password=changeit&amp;scope=cn%20mail"
+ https://openam.example.com:8443/openam/oauth2/access_token
 {
     "expires_in": 599,
     "token_type": "Bearer",
-    "access_token": "6d748edd-6b41-42e0-a2aa-0f7566ed4b84"
+    "refresh_token": "f6dcf133-f00b-4943-a8d4-ee939fc1bf29",
+    "access_token": "f9063e26-3a29-41ec-86de-1d0d68aa85e9"
 }
-$ curl http://openam.example.com:8080/openam/oauth2/tokeninfo
- ?access_token=6d748edd-6b41-42e0-a2aa-0f7566ed4b84
+$ curl https://openam.example.com:8443/openam/oauth2/tokeninfo
+ ?access_token=f9063e26-3a29-41ec-86de-1d0d68aa85e9
 {
+    "mail": "demo@example.com",
+    "scope": [
+        "mail",
+        "cn"
+    ],
+    "cn": "demo",
+    "realm": "/",
     "token_type": "Bearer",
-    "expires_in": 450,
-    "access_token": "6d748edd-6b41-42e0-a2aa-0f7566ed4b84"
+    "expires_in": 577,
+    "access_token": "f9063e26-3a29-41ec-86de-1d0d68aa85e9"
 }</screen>
 
    <para>The resource server making decisions about whether the token is valid
@@ -383,18 +393,10 @@ $ curl http://openam.example.com:8080/openam/oauth2/tokeninfo
    implementation, the JSON response about the token can also contain scope
    information. As described in the <citetitle>Administration Guide</citetitle>,
    the default scopes implementation in OpenAM considers scopes to be names of
-   attributes in the resource owner's user profile. The JSON response contains
-   the values for those attributes from the user's profile, as in the following
-   example, with scopes set to <literal>mail</literal> and
+   attributes in the resource owner's user profile. Notice that the JSON
+   response contains the values for those attributes from the user's profile,
+   as in the preceding example, with scopes set to <literal>mail</literal> and
    <literal>cn</literal>.</para>
-
-   <programlisting language="javascript">{
-  "mail": "demo@example.com",
-  "cn": "demo",
-  "token_type": "Bearer",
-  "expires_in": 487,
-  "access_token": "6929b6e9-d8b1-4528-8aff-8e8c693f61e2"
-}</programlisting>
   </section>
 
   <section xml:id="rest-api-oauth2-token-admin-endpoint">
@@ -416,44 +418,49 @@ $ curl http://openam.example.com:8080/openam/oauth2/tokeninfo
    <literal>/frrest/oauth2/token/<replaceable>token-id</replaceable></literal>,
    as in the following example.</para>
 
-   <screen>$ curl "http://openam.example.com:8080/openam/identity/authenticate
- ?username=amadmin&amp;password=password"
-token.id=AQIC5wM...3MTYxOA..*
-$ curl -d "grant_type=client_credentials&amp;username=demo&amp;password=changeit
- &amp;client_id=myClientID&amp;client_secret=password"
- http://openam.example.com:8080/openam/oauth2/access_token
+   <screen>$ curl "https://openam.example.com:8443/openam/identity/authenticate?
+ username=amadmin&amp;password=password"
+token.id=AQIC5wM2LY4Sfcxs...EwNDU2NjE0*
+$ curl
+ --request POST
+ --user "myClientID:password"
+ --data "grant_type=password&amp;username=demo&amp;password=changeit&amp;scope=cn%20mail"
+ https://openam.example.com:8443/openam/oauth2/access_token
 {
-  "expires_in": 599,
-  "token_type": "Bearer",
-  "access_token": "3f8cac17-2367-43e2-822a-ef78496c6ecd"
+    "expires_in": 599,
+    "token_type": "Bearer",
+    "refresh_token": "f838e7d4-7e84-4743-af7c-9a9c42c2969e",
+    "access_token": "9c6a48fc-44b1-4a0c-b4f0-672fba468b0f"
 }
-$ curl -d "grant_type=client_credentials&amp;username=demo&amp;password=changeit
- &amp;client_id=myClientID&amp;client_secret=password"
- http://openam.example.com:8080/openam/oauth2/access_token
+$ curl
+ --header "iplanetDirectoryPro: AQIC5wM2LY4Sfcxs...EwNDU2NjE0*"
+ https://openam.example.com:8443/openam/frrest/oauth2/token/9c6a48fc...fba468b0f
 {
-  "expires_in": 599,
-  "token_type": "Bearer",
-  "access_token": "4beef879-22b0-47b2-b6fa-d457e4cec10c"
-}
-$ curl --header "iplanetDirectoryPro: AQIC5wM...3MTYxOA..*"
- http://openam.example.com:8080/openam/frrest/oauth2/token/
- 3f8cac17-2367-43e2-822a-ef78496c6ecd
-{
-  "expiry_time": [
-    "1354016221776"
-  ],
-  "type": [
-    "access_token"
-  ],
-  "username": [
-    "myClientID"
-  ],
-  "realm": [
-    "/"
-  ],
-  "id": [
-    "3f8cac17-2367-43e2-822a-ef78496c6ecd"
-  ]
+    "scope": [
+        "mail",
+        "cn"
+    ],
+    "type": [
+        "access_token"
+    ],
+    "username": [
+        "demo"
+    ],
+    "realm": [
+        "/"
+    ],
+    "id": [
+        "9c6a48fc-44b1-4a0c-b4f0-672fba468b0f"
+    ],
+    "parent": [
+        "f838e7d4-7e84-4743-af7c-9a9c42c2969e"
+    ],
+    "expiry_time": [
+        "1355741494888"
+    ],
+    "client_id": [
+        "myClientID"
+    ]
 }</screen>
 
    <para>To list tokens, perform an HTTP GET on
@@ -505,66 +512,80 @@ $ curl --header "iplanetDirectoryPro: AQIC5wM...3MTYxOA..*"
    <para>The following example shows a search for current access tokens that
    were issued to <literal>myClientID</literal>.</para>
 
-   <screen>$ curl --header "iplanetDirectoryPro: AQIC5wM...3MTYxOA..*"
- "http://openam.example.com:8080/openam/frrest/oauth2/token/
- ?_queryID=username%3DmyClientID%2Ctype%3Daccess_token"
+   <screen>$ curl
+ --header "iplanetDirectoryPro: AQIC5wM2LY4Sfcxs...EwNDU2NjE0*"
+ https://openam.example.com:8443/openam/frrest/oauth2/token/?_queryID
+ =username%3DmyClientID%2Ctype%3Daccess_token
 {
-  "result": [
-    {
-      "type": [
-        "access_token"
-      ],
-      "id": [
-        "4beef879-22b0-47b2-b6fa-d457e4cec10c"
-      ],
-      "username": [
-        "myClientID"
-      ],
-      "realm": [
-        "/"
-      ],
-      "expiry_time": [
-        "1354016226388"
-      ]
-    },
-    {
-      "expiry_time": [
-        "1354016221776"
-      ],
-      "type": [
-        "access_token"
-      ],
-      "username": [
-        "myClientID"
-      ],
-      "realm": [
-        "/"
-      ],
-      "id": [
-        "3f8cac17-2367-43e2-822a-ef78496c6ecd"
-      ]
-    }
-  ],
-  "pagedResultsCookie": null,
-  "remainingPagedResults": -1
+    "result": [
+        {
+            "scope": [
+                "mail",
+                "cn"
+            ],
+            "id": [
+                "1b836369-4fcf-4fb2-b819-ee4b1314d4f1"
+            ],
+            "type": [
+                "access_token"
+            ],
+            "username": [
+                "myClientID"
+            ],
+            "realm": [
+                "/"
+            ],
+            "expiry_time": [
+                "1355741986154"
+            ]
+        },
+        {
+            "scope": [
+                "mail",
+                "cn"
+            ],
+            "type": [
+                "access_token"
+            ],
+            "username": [
+                "myClientID"
+            ],
+            "realm": [
+                "/"
+            ],
+            "id": [
+                "5f1763fc-37ae-4698-9e84-d301d49e1f7e"
+            ],
+            "expiry_time": [
+                "1355741982091"
+            ]
+        }
+    ],
+    "pagedResultsCookie": null,
+    "remainingPagedResults": -1
 }</screen>
 
    <para>To delete a token, perform an HTTP DELETE on
    <literal>/frrest/oauth2/token/<replaceable>token-id</replaceable></literal>,
    as in the following example.</para>
 
-   <screen>$ curl -d "grant_type=client_credentials&amp;username=demo&amp;password=changeit
- &amp;client_id=myClientID&amp;client_secret=password"
- http://openam.example.com:8080/openam/oauth2/access_token
+   <screen>$ curl
+ --request POST
+ --data "grant_type=client_credentials&amp;username=demo&amp;password=changeit
+ &amp;client_id=myClientID&amp;client_secret=password&amp;scope=cn%20mail"
+ https://openam.example.com:8443/openam/oauth2/access_token
 {
-  "expires_in": 599,
-  "token_type": "Bearer",
-  "access_token": "2f80e278-2e22-483f-b4be-656c7bd18680"
+    "expires_in": 599,
+    "token_type": "Bearer",
+    "access_token": "867aaab2-61d7-4b78-9b80-4f9098034540"
 }
-$ curl --request DELETE --header "iplanetDirectoryPro: AQIC5wM...3MTYxOA..*"
-http://openam.example.com:8080/openam/frrest/oauth2/token/
- 2f80e278-2e22-483f-b4be-656c7bd18680
-{"success":"true"}</screen>
+$ curl
+ --request DELETE
+ --header "iplanetDirectoryPro: AQIC5wM2LY4Sfcxs...EwNDU2NjE0*"
+ https://openam.example.com:8443/openam/frrest/oauth2/token/867aaab2..098034540
+{
+    "success": "true"
+}</screen>
   </section>
 
   <section xml:id="rest-api-oauth2-client-admin-endpoint">
@@ -587,7 +608,7 @@ http://openam.example.com:8080/openam/frrest/oauth2/token/
    with a JSON object fully specifying the client, as in the following
    example.</para>
 
-   <screen>$ curl "http://openam.example.com:8080/openam/identity/authenticate
+   <screen>$ curl "https://openam.example.com:8443/openam/identity/authenticate
  ?username=amadmin&amp;password=password"
 token.id=AQIC5wM...3MTYxOA..*
 $ curl --request POST --header "iplanetDirectoryPro: AQIC5wM...3MTYxOA..*"
@@ -702,7 +723,7 @@ $ curl --request POST --header "iplanetDirectoryPro: AQIC5wM...3MTYxOA..*"
 
    <screen>$ curl --request DELETE
  --header "iplanetDirectoryPro: AQIC5wM...3MTYxOA..*"
- http://openam.example.com:8080/openam/frrest/oauth2/client/testClient
+ https://openam.example.com:8443/openam/frrest/oauth2/client/testClient
 {"success":"true"}</screen>
   </section>
  </section>
@@ -713,11 +734,11 @@ $ curl --request POST --header "iplanetDirectoryPro: AQIC5wM...3MTYxOA..*"
   <para>You can send OpenAM messages to log, specifying the message content
   and the log file in which to write your message.</para>
   
-  <screen>$ curl "https://openam.example.com:8080/openam/identity/authenticate?
+  <screen>$ curl "https://openam.example.com:8443/openam/identity/authenticate?
  username=amadmin
  &amp;password=password"
 token.id=AQIC5wM2LY4SfcwyCZkk-1JXzx6q1EzgagabHfBjMidb5jI.*AAJTSQACMDE.*
-$ curl "https://openam.example.com:8080/openam/identity/log?
+$ curl "https://openam.example.com:8443/openam/identity/log?
  appid=AQIC5wM2LY4SfcwyCZkk-1JXzx6q1EzgagabHfBjMidb5jI.*AAJTSQACMDE.*
  &amp;subjectid=AQIC5wM2LY4SfcxuxIP0VnP2lVjs7ypEM6VDx6srk56CN1Q.*AAJTSQACMDE.*
  &amp;logname=rest.access
@@ -793,14 +814,14 @@ $ curl "https://openam.example.com:8080/openam/identity/log?
    <literal>/json/users/?_action=create</literal>, as shown in the following
    example.</para>
 
-   <screen>$ curl "http://desktop.example.com:8080/openam/identity/authenticate
+   <screen>$ curl "https://openam.example.com:8443/openam/identity/authenticate
  ?username=amadmin&amp;password=password"
 token.id=AQIC5w...2NzEz*
 $ curl --request POST --header "iplanetDirectoryPro: AQIC5w...2NzEz*"
  --header "Content-Type: application/json"
  --data '{ "name": "bjensen", "userpassword": "secret12",
            "mail": "bjensen@example.com" }'
- http://desktop.example.com:8080/openam/json/users/?_action=create
+ https://openam.example.com:8443/openam/json/users/?_action=create
 {
     "name": "bjensen",
     "realm": "/",
@@ -850,13 +871,13 @@ $ curl --request POST --header "iplanetDirectoryPro: AQIC5w...2NzEz*"
    <literal>/json/users/<replaceable>user-id</replaceable></literal>, as
    shown in the following example.</para>
 
-   <screen>$ curl "http://desktop.example.com:8080/openam/identity/authenticate
+   <screen>$ curl "https://openam.example.com:8443/openam/identity/authenticate
  ?username=amadmin&amp;password=password"
 token.id=AQIC5w...2NzEz*
 $ curl --request PUT --header "iplanetDirectoryPro: AQIC5w...2NzEz*"
  --header "Content-Type: application/json"
  --data '{ "userpassword": "secret12", "mail": "bjensen@example.com" }'
- http://desktop.example.com:8080/openam/json/users/bjensen
+ https://openam.example.com:8443/openam/json/users/bjensen
 {
     "name": "bjensen",
     "realm": "/",
@@ -916,11 +937,11 @@ $ curl --request PUT --header "iplanetDirectoryPro: AQIC5w...2NzEz*"
    <literal>/json/users/<replaceable>user-id</replaceable></literal>, as shown
    in the following example.</para>
 
-   <screen>$ curl "http://desktop.example.com:8080/openam/identity/authenticate
+   <screen>$ curl "https://openam.example.com:8443/openam/identity/authenticate
  ?username=amadmin&amp;password=password"
 token.id=AQIC5w...2NzEz*
 $ curl --header "iplanetDirectoryPro: AQIC5w...2NzEz*"
- http://desktop.example.com:8080/openam/json/users/demo
+ https://openam.example.com:8443/openam/json/users/demo
 {
     "name": "demo",
     "realm": "/",
@@ -980,13 +1001,13 @@ $ curl --header "iplanetDirectoryPro: AQIC5w...2NzEz*"
    <para>The following example shows how users can update their own
    profiles.</para>
 
-   <screen>$ curl "http://desktop.example.com:8080/openam/identity/authenticate
+   <screen>$ curl "https://openam.example.com:8443/openam/identity/authenticate
  ?username=demo&amp;password=changeit"
 token.id=AQIC5...Y3MTAx*
 $ curl --request PUT --header "iplanetDirectoryPro: AQIC5...Y3MTAx*"
  --header "Content-Type: application/json"
  --data '{ "mail": "demo@example.com" }'
- http://desktop.example.com:8080/openam/json/users/demo
+ https://openam.example.com:8443/openam/json/users/demo
 {
     "name": "demo",
     "realm": "/",
@@ -1046,11 +1067,11 @@ $ curl --request PUT --header "iplanetDirectoryPro: AQIC5...Y3MTAx*"
    <literal>/json/users/<replaceable>user-id</replaceable></literal>, as shown
    in the following example.</para>
 
-   <screen>$ curl "http://desktop.example.com:8080/openam/identity/authenticate
+   <screen>$ curl "https://openam.example.com:8443/openam/identity/authenticate
  ?username=amadmin&amp;password=password"
 token.id=AQIC5w...2NzEz*
 $ curl --request DELETE --header "iplanetDirectoryPro: AQIC5w...2NzEz*"
- http://desktop.example.com:8080/openam/json/users/bjensen
+ https://openam.example.com:8443/openam/json/users/bjensen
 {"success":"true"}</screen>
 
    <para>On success, OpenAM returns a JSON object indicating success. On
@@ -1105,11 +1126,11 @@ $ curl --request DELETE --header "iplanetDirectoryPro: AQIC5w...2NzEz*"
     </varlistentry>
    </variablelist>
    
-   <screen>$ curl "https://openam.example.com:8080/openam/identity/authenticate?
+   <screen>$ curl "https://openam.example.com:8443/openam/identity/authenticate?
  username=amadmin
  &amp;password=password"
 token.id=AQIC5wM2LY4SfcxSYA8eG-vrNHb_W7nG8XkfAGyRyuaebDY.*AAJTSQACMDE.*
-$ curl "https://openam.example.com:8080/openam/identity/create?
+$ curl "https://openam.example.com:8443/openam/identity/create?
  admin=AQIC5wM2LY4SfcxSYA8eG-vrNHb_W7nG8XkfAGyRyuaebDY.*AAJTSQACMDE.*
  &amp;identity_name=testuser
  &amp;identity_attribute_names=cn
@@ -1130,7 +1151,7 @@ $ curl "https://openam.example.com:8080/openam/identity/create?
    a user with permissions to perform the search, as shown in the following
    example.</para>
    
-   <screen>$ curl "https://openam.example.com:8080/openam/identity/read?
+   <screen>$ curl "https://openam.example.com:8443/openam/identity/read?
  admin=AQIC5wM2LY4SfcxSYA8eG-vrNHb_W7nG8XkfAGyRyuaebDY.*AAJTSQACMDE.*
  &amp;name=testuser
  &amp;attributes_names=realm
@@ -1207,7 +1228,7 @@ identitydetails.attribute.value=id=testuser,ou=user,o=openam</screen>
     </varlistentry>
    </variablelist>
    
-   <screen>$ curl "https://openam.example.com:8080/openam/identity/search?
+   <screen>$ curl "https://openam.example.com:8443/openam/identity/search?
  admin=AQIC5wM2LY4SfcxSYA8eG-vrNHb_W7nG8XkfAGyRyuaebDY.*AAJTSQACMDE.*
  &amp;attributes_names=sn
  &amp;attributes_values_sn=Jensen
@@ -1225,7 +1246,7 @@ string=bjensen</screen>
    identities, provided the token corresponds to a user with access to
    update the identity.</para>
    
-   <screen>$ curl "https://openam.example.com:8080/openam/identity/update?
+   <screen>$ curl "https://openam.example.com:8443/openam/identity/update?
  admin=AQIC5wM2LY4SfcxSYA8eG-vrNHb_W7nG8XkfAGyRyuaebDY.*AAJTSQACMDE.*
  &amp;identity_name=testuser
  &amp;identity_attribute_names=mail
@@ -1239,7 +1260,7 @@ string=bjensen</screen>
    
    <para>You can also delete an identity.</para>
    
-   <screen>$ curl "https://openam.example.com:8080/openam/identity/delete?
+   <screen>$ curl "https://openam.example.com:8443/openam/identity/delete?
  admin=AQIC5wM2LY4SfcxSYA8eG-vrNHb_W7nG8XkfAGyRyuaebDY.*AAJTSQACMDE.*
  &amp;identity_name=testuser
  &amp;identity_realm=%2F

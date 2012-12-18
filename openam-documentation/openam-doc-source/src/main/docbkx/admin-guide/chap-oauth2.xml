@@ -218,10 +218,10 @@
    described in RFC 6749.</para>
 
    <programlisting language="javascript">{
-  "expires_in": 599,
-  "token_type": "Bearer",
-  "refresh_token": "721edb43-f0d0-4c77-a793-53f6e81cf10c",
-  "access_token": "6929b6e9-d8b1-4528-8aff-8e8c693f61e2"
+    "expires_in": 599,
+    "token_type": "Bearer",
+    "refresh_token": "f6dcf133-f00b-4943-a8d4-ee939fc1bf29",
+    "access_token": "f9063e26-3a29-41ec-86de-1d0d68aa85e9"
 }</programlisting>
 
    <para>In addition to implementing your client, the resource server must also
@@ -248,11 +248,16 @@
    something like the following token information response.</para>
 
    <programlisting language="javascript">{
-  "mail": "demo@example.com",
-  "cn": "demo",
-  "token_type": "Bearer",
-  "expires_in": 487,
-  "access_token": "6929b6e9-d8b1-4528-8aff-8e8c693f61e2"
+    "mail": "demo@example.com",
+    "scope": [
+        "mail",
+        "cn"
+    ],
+    "cn": "demo",
+    "realm": "/",
+    "token_type": "Bearer",
+    "expires_in": 577,
+    "access_token": "f9063e26-3a29-41ec-86de-1d0d68aa85e9"
 }</programlisting>
 
    <para>OpenAM is designed to allow you to plug in your own scopes
