@@ -39,16 +39,24 @@
 
   <itemizedlist>
 
-<!-- Not in XPress
-  <listitem>
-   <para>The advanced server property used to set the HTTP header name, 
-   <literal>com.sun.identity.authentication.client.ipAddressHeader </literal>,
-   has replaced the legacy OpenSSO property 
-   <literal>com.sun.identity.session.httpClientIPHeader</literal> (<link
-   xlink:href="https://bugster.forgerock.org/jira/browse/OPENAM-1879"
-   xlink:show="new">OPENAM-1879</link>).</para>
-  </listitem>
--->
+   <!-- OPENAM-2051: Document the OpenAM suffix configuration changes -->
+   <listitem>
+    <para>When you create a new OpenAM custom configuration that uses an
+    external LDAP directory server for the configuration data store, you must
+    use a root suffix DN with at least two domain components, such as
+    <literal>dc=example,dc=com</literal>.</para>
+   </listitem>
+
+   <!-- Not in XPress
+     <listitem>
+      <para>The advanced server property used to set the HTTP header name,
+      <literal>com.sun.identity.authentication.client.ipAddressHeader </literal>,
+      has replaced the legacy OpenSSO property
+      <literal>com.sun.identity.session.httpClientIPHeader</literal> (<link
+      xlink:href="https://bugster.forgerock.org/jira/browse/OPENAM-1879"
+      xlink:show="new">OPENAM-1879</link>).</para>
+     </listitem>
+   -->
    <listitem>
     <para>Legacy naming conventions have been changed to conform to the
     current product name, OpenAM.</para>
