@@ -248,9 +248,7 @@
    <listitem><para><link xlink:href="https://bugster.forgerock.org/jira/browse/OPENAM-1563" xlink:show="new">OPENAM-1563</link>: Servers and Sites pages may display password in clear text</para></listitem>
    <listitem><para><link xlink:href="https://bugster.forgerock.org/jira/browse/OPENAM-1538" xlink:show="new">OPENAM-1538</link>: Fail to restore OpenAM Configuration when there is '&amp;' in ldapfilter policy conditions</para></listitem>
    <listitem><para><link xlink:href="https://bugster.forgerock.org/jira/browse/OPENAM-1526" xlink:show="new">OPENAM-1526</link>: ssoadm does not provide a mean to delete sessions</para></listitem>
-<!-- Not in XPress
-   <listitem><para><link xlink:href="https://bugster.forgerock.org/jira/browse/OPENAM-1517" xlink:show="new">OPENAM-1517</link>: Inconsistency in getting Client IP</para></listitem> 
-   -->
+   <listitem><para><link xlink:href="https://bugster.forgerock.org/jira/browse/OPENAM-1517" xlink:show="new">OPENAM-1517</link>: Inconsistency in getting Client IP</para></listitem>
    <listitem><para><link xlink:href="https://bugster.forgerock.org/jira/browse/OPENAM-1512" xlink:show="new">OPENAM-1512</link>: LDAPConnectionPool is not re-initialized correctly if failover server is down</para></listitem>
    <listitem><para><link xlink:href="https://bugster.forgerock.org/jira/browse/OPENAM-1505" xlink:show="new">OPENAM-1505</link>: LogoutViewBean does not use request information for finding the correct template</para></listitem>
    <listitem><para><link xlink:href="https://bugster.forgerock.org/jira/browse/OPENAM-1500" xlink:show="new">OPENAM-1500</link>: Prompt user for old password in Administration service is not working in realm</para></listitem>
