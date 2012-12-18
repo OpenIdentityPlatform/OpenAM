@@ -152,6 +152,11 @@
    </listitem>
   </itemizedlist>
 
+  <!-- For OPENAM-2049 TODO: Remove when OPENAM-2050 is fixed after 10.1.0-Xpress -->
+  <para>When using the OAuth 2 authentication module with the OAuth2 OpenAM provider
+  the Proxy URL configuration parameter must be entered into the authentication 
+  module settings URL encoded. This applies to only the OAuth2 provider for OpenAM.</para>
+
   <!-- For OPENAM-1919 TODO: Remove when this is fixed after 10.1.0-Xpress -->
   <para>Creating a user by sending an HTTP POST of the JSON representation of
   the user to <literal>/json/users/?_action=create</literal> is not supported
