@@ -3468,6 +3468,7 @@
     </listitem>
    </varlistentry>
 
+<!-- Put back when OPENAM-1517 Resolved
    <varlistentry>
     <term><literal>com.sun.identity.authentication.client.ipAddressHeader</literal></term>
     <listitem>
@@ -3481,6 +3482,7 @@
      <para>Example: <literal>com.sun.identity.authentication.client.ipAddressHeader=X-Forwarded-For</literal></para>
     </listitem>
    </varlistentry>
+-->
 
    <varlistentry>
     <term><literal>com.sun.identity.authentication.multiple.tabs.used</literal></term>
