@@ -73,7 +73,7 @@
   <step>
    <para>Copy the <filename><?eval ${distauthWarFile}?></filename> file into the 
    <filename>webapps/</filename> directory.</para>
-   <screen>cp ~/Downloads/<?eval ${coreDirectoryFile}?>/
+   <screen>cp ~/Downloads/openam/
     <?eval ${distauthWarFile}?> /path/to/tomcat/webapps</screen>
   </step>
   <step>

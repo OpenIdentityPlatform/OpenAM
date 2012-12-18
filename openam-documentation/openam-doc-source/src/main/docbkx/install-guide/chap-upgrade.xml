@@ -104,8 +104,8 @@ $ mv openam openam-orig ; mv openam.war openam.war.orig</screen>
   </step>
   <step>
    <para>Deploy the new OpenAM in place of the old.</para>
-   <screen>$ cp /path/to/new/OpenAM/<?eval ${coreDirectoryFile}?>/
-    <?eval ${coreWarFile}?>  openam.war</screen>
+   <screen>$ cp /path/to/new/OpenAM/openam/<?eval ${coreWarFile}?>
+    openam.war</screen>
   </step>
   <step>
    <para>If your container caches OpenAM files, clear out the cache.</para>

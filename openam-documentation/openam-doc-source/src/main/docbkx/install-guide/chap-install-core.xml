@@ -185,7 +185,7 @@
    <para>Deploy the .war file on your container.</para>
 
    <para>For example, copy the file to deploy on Apache Tomcat.</para>
-   <screen>$ cp <?eval ${coreDirectoryFile}?>/<?eval ${coreWarFile}?> 
+   <screen>$ cp openam/<?eval ${coreWarFile}?> 
     /path/to/tomcat/webapps/openam.war</screen>
     <note>
      <para>By adding <filename>openam.war</filename> to the end of the path, 
@@ -614,8 +614,7 @@ Using CLASSPATH:
     on your container.</para>
 
    <para>For example, copy the file to deploy on Apache Tomcat.</para>
-   <screen>$ cp ~/Downloads/<?eval ${coreDirectoryFile}?>/
-   <?eval ${serveronlyWarFile}?> 
+   <screen>$ cp ~/Downloads/openam/<?eval ${serveronlyWarFile}?> 
     /path/to/tomcat/webapps/coreonly.war</screen>
     <note>
      <para>By adding <filename>coreonly.war</filename> to the end of the path, 

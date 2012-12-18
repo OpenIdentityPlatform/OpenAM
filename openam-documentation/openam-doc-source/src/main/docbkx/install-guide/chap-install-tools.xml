@@ -37,7 +37,7 @@
  </indexterm>
  <para>OpenAM tools are found in three <filename>.zip</filename> files where you 
   unpacked the archive of the entire package, such as 
-  <filename>~/Downloads/<?eval ${coreDirectoryFile}?></filename>.</para>
+  <filename>~/Downloads/openam</filename>.</para>
  <variablelist>
   <varlistentry>
    <term><filename><?eval ${ssoadminZipFile}?></filename></term>
@@ -78,7 +78,7 @@
   <step>
    <para>Unpack the tools from where you unzipped OpenAM.</para>
    <screen>$ cd /path/to/openam-tools/admin
-$ unzip ~/Downloads/<?eval ${coreDirectoryFile}?>/
+$ unzip ~/Downloads/openam/
   <?eval ${ssoadminZipFile}?>
 ...
   inflating: template/windows/bin/amverifyarchive.bat.template
@@ -178,10 +178,9 @@ http://openam.example.com:8080/openam</screen>
   <step>
    <para>Unpack the tools from where you unzipped OpenAM.</para>
    <screen>$ cd /path/to/openam-tools/config
-$ unzip ~/Downloads/<?eval ${coreDirectoryFile}?>/
+$ unzip ~/Downloads/openam/
   <?eval ${ssoadminZipFile}?>
-Archive:  ~/Downloads//<?eval ${coreDirectoryFile}?>/
-  <?eval ${ssoadminZipFile}?>
+Archive:  ~/Downloads/openam/<?eval ${ssoadminZipFile}?>
   inflating: ssoadm.template
   inflating: ssoadm.bat.template
   inflating: ampassword.template
@@ -216,8 +215,7 @@ Archive:  ~/Downloads//<?eval ${coreDirectoryFile}?>/
   <step>
    <para>Unpack the tools from where you unzipped OpenAM.</para>
    <screen>$ cd /path/to/openam-tools/diagnostic
-$ unzip ~/Downloads/<?eval ${coreDirectoryFile}?>/
-  <?eval ${ssoadminZipFile}?>
+$ unzip ~/Downloads/openam/<?eval ${ssoadminZipFile}?>
 ...
   inflating: services/webcontainer/service.xml
   inflating: ssodtool.bat

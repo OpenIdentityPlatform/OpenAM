@@ -67,7 +67,7 @@
   your changes, and redeploy that file to check your work.</para>
   <para>For production deployment you must package your changes in a custom
   OpenAM deployable .war file. To create a deployable .war, unpack the
-  OpenAM .war file from <filename>~/Downloads/<?eval ${coreDirectoryFile}?></filename>
+  OpenAM .war file from <filename>~/Downloads/openam</filename>
   into a staging directory, apply your changes in the staging directory, and
   use the <command>jar</command> command  to prepare the deployable .war.</para>
  </tip>
