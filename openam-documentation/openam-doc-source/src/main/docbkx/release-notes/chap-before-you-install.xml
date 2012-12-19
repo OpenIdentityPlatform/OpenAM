@@ -68,9 +68,11 @@
     <para>JBoss Enterprise Application Platform 4.x, 5.x</para>
     <para>JBoss Application Server 7.x</para>
    </listitem>
+<!--
    <listitem>
     <para>Jetty 7</para>
    </listitem>
+-->
    <listitem>
     <para>Oracle WebLogic Server 11g</para>
     <para>Oracle WebLogic Server 12c</para>
