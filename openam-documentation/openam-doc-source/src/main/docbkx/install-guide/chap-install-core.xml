@@ -396,6 +396,16 @@ Using CLASSPATH:
    configuration data on the directory server before you configure
    OpenAM. OpenAM does not create the suffix when you use an external
    configuration store.</para>
+
+   <note>
+    <para>When you create a new OpenAM custom configuration that uses an
+    external LDAP directory server for the configuration data store, you must
+    use a root suffix DN with at least two domain components, such as
+    <literal>dc=example,dc=com</literal>. The root suffix must be dc. You will
+    not be able to move to the next configuration screen if both of these conditions
+    are not met./para>
+   </note>
+
   </step>
   <step>
    <para>In the User Store screen, you configure where OpenAM looks for
