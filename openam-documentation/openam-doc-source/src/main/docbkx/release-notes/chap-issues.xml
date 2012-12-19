@@ -210,8 +210,11 @@
   <para>The following important known issues remained open at the time
   release <?eval ${serverDocTargetVersion}?> became available.</para>
 
-  <!-- List generated at 12:14:56 20121218 using http://bugster.forgerock.org/jira/rest/api/2/search?jql=project+%3D+OPENAM+AND+resolution+%3D+Unresolved+AND+type+%3D+Bug+AND+component+not+in+%28documentation%2C+%22j2ee+agents%22%2C+%22web+agents%22%2C+%22web+services+security+agents%22%29+and+priority+not+in+%28Minor%2C+Trivial%29&startAt=0&maxResults=500&fields=summary-->
+  <!-- List generated at 17:39:23 20121219 using http://bugster.forgerock.org/jira/rest/api/2/search?jql=project+%3D+OPENAM+AND+resolution+%3D+Unresolved+AND+type+%3D+Bug+AND+component+not+in+%28documentation%2C+%22j2ee+agents%22%2C+%22web+agents%22%2C+%22web+services+security+agents%22%29+and+priority+not+in+%28Minor%2C+Trivial%29&startAt=0&maxResults=500&fields=summary-->
   <itemizedlist>
+   <listitem><para><link xlink:href="https://bugster.forgerock.org/jira/browse/OPENAM-2059" xlink:show="new">OPENAM-2059</link>: ssoadm export-svc-cfg throws NullPointerExecption if no SubConfiguration exists for a given service</para></listitem>
+   <listitem><para><link xlink:href="https://bugster.forgerock.org/jira/browse/OPENAM-2056" xlink:show="new">OPENAM-2056</link>: OAuth2 Authorization Code Grant – use of expired authorization code should return error=invalid_grant</para></listitem>
+   <listitem><para><link xlink:href="https://bugster.forgerock.org/jira/browse/OPENAM-2053" xlink:show="new">OPENAM-2053</link>: Log Number of History files count is ignored when log rotation is based on time</para></listitem>
    <listitem><para><link xlink:href="https://bugster.forgerock.org/jira/browse/OPENAM-2050" xlink:show="new">OPENAM-2050</link>: URL Encoding the Redirect URI for the OAuth2 provider for OpenAM</para></listitem>
    <listitem><para><link xlink:href="https://bugster.forgerock.org/jira/browse/OPENAM-2026" xlink:show="new">OPENAM-2026</link>: Agent installer should validate agent password using the Application auth module</para></listitem>
    <listitem><para><link xlink:href="https://bugster.forgerock.org/jira/browse/OPENAM-2023" xlink:show="new">OPENAM-2023</link>: Federation Connectivity Test fails with Account termination is not working </para></listitem>
