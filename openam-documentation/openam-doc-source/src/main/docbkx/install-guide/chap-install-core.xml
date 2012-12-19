@@ -403,7 +403,7 @@ Using CLASSPATH:
     use a root suffix DN with at least two domain components, such as
     <literal>dc=example,dc=com</literal>. The root suffix must be dc. You will
     not be able to move to the next configuration screen if both of these conditions
-    are not met./para>
+    are not met.</para>
    </note>
 
   </step>
