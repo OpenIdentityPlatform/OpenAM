@@ -109,15 +109,17 @@ $ rm -rf openam.war openam/</screen>
    <para>If you cannot find the original .zip, search for files named
    <filename>openam-*.zip</filename>.</para>
    <screen>$ find . -name "openam-*.zip"
-./Downloads/<?eval ${coreDirectoryFile}?>
-$ rm ./Downloads/<?eval ${coreDirectoryFile}?></screen>
+./Downloads/openam
+$ rm ./Downloads/openam</screen>
 
+<!-- Since the wrapper is setup by the user, this step may not be necessary.
    <para>If you cannot find the unpacked version, you might search for the
-   directory named <filename><?eval ${coreDirectoryFile}?></filename>.</para>
+   directory named <filename>openam</filename>.</para>
    <screen>$ locate <?eval ${coreDirectoryFile}?>/
 ~/Downloads/<?eval ${coreDirectoryFile}?>/
 ...
 $ rm -rf ~/Downloads/<?eval ${coreDirectoryFile}?>/</screen>
+-->
   </step>
  </procedure>
 </chapter>
