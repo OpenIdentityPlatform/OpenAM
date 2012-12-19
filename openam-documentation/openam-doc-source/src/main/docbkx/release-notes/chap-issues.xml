@@ -74,7 +74,7 @@
   <!-- TODO: Remove this when fixed after 10.1.0-Xpress -->
   <itemizedlist>
    <para>Some items present in earlier releases of OpenAM are not included in
-    the new OpenAM distribution.</para>
+    the new OpenAM distribution for this Xpress release.</para>
 
    <listitem>
     <para>Client SDK and policy agent libraries are not delivered in this
