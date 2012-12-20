@@ -210,8 +210,12 @@
   <para>The following important known issues remained open at the time
   release <?eval ${serverDocTargetVersion}?> became available.</para>
 
-  <!-- List generated at 17:39:23 20121219 using http://bugster.forgerock.org/jira/rest/api/2/search?jql=project+%3D+OPENAM+AND+resolution+%3D+Unresolved+AND+type+%3D+Bug+AND+component+not+in+%28documentation%2C+%22j2ee+agents%22%2C+%22web+agents%22%2C+%22web+services+security+agents%22%29+and+priority+not+in+%28Minor%2C+Trivial%29&startAt=0&maxResults=500&fields=summary-->
+  <!-- List generated at 20:18:41 20121220 using http://bugster.forgerock.org/jira/rest/api/2/search?jql=project+%3D+OPENAM+AND+resolution+%3D+Unresolved+AND+type+%3D+Bug+AND+component+not+in+%28documentation%2C+%22j2ee+agents%22%2C+%22web+agents%22%2C+%22web+services+security+agents%22%29+and+priority+not+in+%28Minor%2C+Trivial%29&startAt=0&maxResults=500&fields=summary-->
   <itemizedlist>
+   <listitem><para><link xlink:href="https://bugster.forgerock.org/jira/browse/OPENAM-2068" xlink:show="new">OPENAM-2068</link>: ssoadm create-policies fails with NPE in sub-realm</para></listitem>
+   <listitem><para><link xlink:href="https://bugster.forgerock.org/jira/browse/OPENAM-2067" xlink:show="new">OPENAM-2067</link>: ssoadm create-policies fails with NoClassDefFoundError in root realm</para></listitem>
+   <listitem><para><link xlink:href="https://bugster.forgerock.org/jira/browse/OPENAM-2065" xlink:show="new">OPENAM-2065</link>: Missing sfo attributes to provision entries to external ODSEE as a session store</para></listitem>
+   <listitem><para><link xlink:href="https://bugster.forgerock.org/jira/browse/OPENAM-2064" xlink:show="new">OPENAM-2064</link>: Missing forgerock-am-dashboard-service attribute to provision new Subject to ODSEE external store</para></listitem>
    <listitem><para><link xlink:href="https://bugster.forgerock.org/jira/browse/OPENAM-2059" xlink:show="new">OPENAM-2059</link>: ssoadm export-svc-cfg throws NullPointerExecption if no SubConfiguration exists for a given service</para></listitem>
    <listitem><para><link xlink:href="https://bugster.forgerock.org/jira/browse/OPENAM-2056" xlink:show="new">OPENAM-2056</link>: OAuth2 Authorization Code Grant – use of expired authorization code should return error=invalid_grant</para></listitem>
    <listitem><para><link xlink:href="https://bugster.forgerock.org/jira/browse/OPENAM-2053" xlink:show="new">OPENAM-2053</link>: Log Number of History files count is ignored when log rotation is based on time</para></listitem>
@@ -239,6 +243,7 @@
    <listitem><para><link xlink:href="https://bugster.forgerock.org/jira/browse/OPENAM-1903" xlink:show="new">OPENAM-1903</link>: Unhandled ServerEntryNotFoundException in LoginViewBean</para></listitem>
    <listitem><para><link xlink:href="https://bugster.forgerock.org/jira/browse/OPENAM-1892" xlink:show="new">OPENAM-1892</link>: Only Accept certificate for authentication if KeyUsage is correct</para></listitem>
    <listitem><para><link xlink:href="https://bugster.forgerock.org/jira/browse/OPENAM-1888" xlink:show="new">OPENAM-1888</link>: Common REST returning HTTP-400 Bad Request for Permission Denied</para></listitem>
+   <listitem><para><link xlink:href="https://bugster.forgerock.org/jira/browse/OPENAM-1887" xlink:show="new">OPENAM-1887</link>: OAuth2 Authorization Code Grant – bad client_id parameter should display error page, not cause redirect</para></listitem>
    <listitem><para><link xlink:href="https://bugster.forgerock.org/jira/browse/OPENAM-1886" xlink:show="new">OPENAM-1886</link>: Session invalidated on OpenAM server is not deleted from SFO datastore</para></listitem>
    <listitem><para><link xlink:href="https://bugster.forgerock.org/jira/browse/OPENAM-1878" xlink:show="new">OPENAM-1878</link>: ssoadm update-server-cfg reports success and error simultaneously</para></listitem>
    <listitem><para><link xlink:href="https://bugster.forgerock.org/jira/browse/OPENAM-1852" xlink:show="new">OPENAM-1852</link>: Oauth2 auth-module can not be used with DistAuth</para></listitem>
