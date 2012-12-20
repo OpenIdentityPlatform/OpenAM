@@ -27,7 +27,7 @@
  */
 
 /*
- * Portions Copyrighted 2011 ForgeRock AS
+ * Portions Copyrighted 2011-2012 ForgeRock, Inc.
  */
 
 package org.forgerock.openam.upgrade;
@@ -172,6 +172,7 @@ public class UpgradeUtils {
 
     static SSOToken ssoToken;
     public static Debug debug = Debug.getInstance("amUpgrade");
+    private static boolean loggedVersionDebugMessage = false;
     private static String dsHostName;
     private static int dsPort;
     private static String bindDN = null;
@@ -297,9 +298,11 @@ public class UpgradeUtils {
             return false;
         }
 
-        if (debug.messageEnabled()) {
+        if (debug.messageEnabled() && !loggedVersionDebugMessage) {
             debug.message("Current version: " + currentVersionDate);
             debug.message("War version: " + warVersionDate);
+            // Just log once to avoid creating a large debug log file when in message mode.
+            loggedVersionDebugMessage = true;
         }
         boolean isBefore = currentVersionDate.before(warVersionDate);
         if (isBefore) {
