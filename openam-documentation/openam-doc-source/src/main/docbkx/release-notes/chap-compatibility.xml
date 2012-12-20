@@ -139,14 +139,23 @@
  <section xml:id="removed">
   <title>Removed Functionality</title>
 
-  <para>For OpenAM <?eval ${serverDocTargetVersion}?> XPress, the use of the previous 
-  session failover implementation has been removed.</para>
+  <itemizedlist>
+   <listitem>
+    <para>For OpenAM <?eval ${serverDocTargetVersion}?>, the use of the
+    previous session failover implementation has been removed.</para>
+   </listitem>
 
-  <!-- Fix for OpenAM-837 -->
-  <para>Support for Liberty Identity Web Services Framework (ID-WSF) has been 
-  removed.</para>
-  
-  <para>With the updated session failover, SAML 2 and session persistence have
-  changed. The methods used prior to OpenAM 10.1.0 are no longer available.</para>
+   <listitem>
+    <para>With the updated session failover, SAML 2 and session persistence have
+    changed. The methods used prior to OpenAM 10.1.0 are no longer
+    available.</para>
+   </listitem>
+
+   <listitem>
+    <!-- Fix for OpenAM-837 -->
+    <para>Support for Liberty Identity Web Services Framework (ID-WSF) has been
+    removed.</para>
+   </listitem>
+  </itemizedlist>
  </section>
 </chapter>

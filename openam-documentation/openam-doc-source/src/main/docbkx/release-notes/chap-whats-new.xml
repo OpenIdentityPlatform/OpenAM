@@ -110,15 +110,15 @@
   </listitem>
 
   <listitem>
-   <para>OpenAM now supports Open Authentication (<link
-   xlink:href="https://bugster.forgerock.org/jira/browse/OPENAM-727"
+   <para>OpenAM now supports <link xlink:show="new"
+   xlink:href="http://www.openauthentication.org/">Open Authentication</link>
+   (<link xlink:href="https://bugster.forgerock.org/jira/browse/OPENAM-727"
    xlink:show="new">OPENAM-727</link>). The module provides the user with a
    one-time password based either on a HMAC one-time password or a time-based
    one-time password. OATH lets you determine which type of one-time password
    is best for your users when they need to login with a password generating
-   device. Devices can range from a smartphone or a dedicated device, such as
-   YubiKey. It uses the the standard that allows authentication to occur from
-   a single protocol.</para>
+   device. Devices can range from a smartphone to a dedicated device, such as
+   YubiKey or any other OATH compliant device.</para>
 
    <para>With OATH, OpenAM now supports YubiKey<superscript>®</superscript>
    authentication. The YubiKey simplifies the process of logging in with a One
@@ -140,7 +140,7 @@
   </listitem>
 
   <listitem>
-   <para>The OATH minimum key length is now configurable (<link
+   <para>The OATH minimum key length is configurable (<link
    xlink:href="https://bugster.forgerock.org/jira/browse/OPENAM-1765"
    xlink:show="new">OPENAM-1765</link>).</para>
   </listitem>
