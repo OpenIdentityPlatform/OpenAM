@@ -66,6 +66,10 @@
               tofile="${openam.temp.target}/WEB-INF/template/ldif/sfha/cts-indices-schema.ldif"
               filtering="false"/>
 
+        <copy file="${project.basedir}/../openam-core/src/main/resources/ha_sfo/ldif/odsee-cts-indices-schema.ldif"
+              tofile="${openam.temp.target}/WEB-INF/template/ldif/sfha/odsee-cts-indices-schema.ldif"
+              filtering="false"/>
+
         <copy file="${project.basedir}/../openam-core/src/main/resources/ha_sfo/ldif/cts-add-schema.ldif"
               tofile="${openam.temp.target}/WEB-INF/template/ldif/sfha/cts-add-schema.ldif"
               filtering="false"/>
