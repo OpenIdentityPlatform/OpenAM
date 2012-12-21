@@ -178,13 +178,13 @@ PING openam-ter (192.168.56.2) 56(84) bytes of data.
      finished box if you want OpenAM to add the schema to OpenDJ. The box is
      not selected by default.</para>
      <para>The full version of OpenAM includes directory server schema in the
-     <filename>~/Downloads/opensso/ldif/</filename> directory. To add the schema
+     <filename>~/Downloads/openam/ldif/</filename> directory. To add the schema
      to OpenDJ afterwards, you can try the following command.</para>
      <screen>$ /path/to/OpenDJ/bin/ldapmodify
  --port 1389
  --bindDN "cn=Directory Manager"
  --bindPassword password
- --filename ~/Downloads/opensso/ldif/fam_sds_schema.ldif
+ --filename ~/Downloads/openam/ldif/fam_sds_schema.ldif
 Processing MODIFY request for CN=schema
 MODIFY operation successful for DN CN=schema</screen>
     </answer>
