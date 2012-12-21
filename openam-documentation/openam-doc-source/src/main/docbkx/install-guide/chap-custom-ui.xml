@@ -177,10 +177,7 @@ $ cp -r default_fr/* openam_fr/services/ventes/html</screen>
      <para>When you set up the OpenAM to store its configuration in a directory
      server, you provide the distinguished name of the configuration suffix,
      by default <literal><?eval ${defaultRootSuffix}?></literal>, therefore, the
-     relative distinguished name attribute value is <literal>opensso</literal>.
-     If instead you set the configuration suffix to be
-     <literal>o=openam</literal>, the RDN value is
-     <literal>openam</literal>.</para>
+     relative distinguished name attribute value is <literal>openam</literal>.</para>
     </listitem>
    </varlistentry>
    <varlistentry>
