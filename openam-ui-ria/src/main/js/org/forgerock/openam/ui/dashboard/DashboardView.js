@@ -41,15 +41,8 @@ define("org/forgerock/openam/ui/dashboard/DashboardView", [
         render: function() {
             
             DashboardDelegate.getMyApplications(_.bind(function (apps) {
-                
-                var sortedApps = _.map(_.sortBy(_.keys(apps), function (key){ return key; }), function (key) { 
-                    var app = {}; 
-                    app.id = key; 
-                    _.each(apps[key], function (v,k) { app[k] = v[0]; });
-                    return app; 
-                });
                 this.data = {};
-                this.data.apps = sortedApps;
+                this.data.apps = apps;
                 this.parentRender(_.bind(function () {
                     if (this.data.apps.length === 0) {
                         this.$el.find("#appsList").text($.t("openam.apps.noneFound"));

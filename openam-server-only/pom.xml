@@ -193,7 +193,7 @@
                     </nonFilteredFileExtensions>
                     <webResources>
                         <webResource>
-                            <directory>${project.build.directory}/XUI/XUI/</directory>
+                            <directory>${project.build.directory}/XUI/</directory>
                             <includes>
                                 <include>**/**</include>
                             </includes>

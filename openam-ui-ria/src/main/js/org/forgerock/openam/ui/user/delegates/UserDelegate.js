@@ -60,7 +60,7 @@ define("UserDelegate", [
                         serviceUrl: constants.host + "/"+ constants.context + "/identity/json/getcookienamefortoken",
                         url: "",
                         success: _.bind(function (data) {
-                            cookieHelper.setCookie(data.string, token, "", "/", document.domain);
+                            cookieHelper.setCookie(data.string, token, "", "/", document.domain.split(".").splice(1).join("."));
                             this.getProfile(successCallback, errorCallback, errorsHandlers);    
                         }, this),
                         error: errorCallback
@@ -128,20 +128,29 @@ define("UserDelegate", [
     };
 
     obj.logout = function() {
-
+        
         obj.serviceCall({
-            serviceUrl: constants.host + "/"+ constants.context + "/identity/logout?" + $.param({subjectid: cookieHelper.getCookie('iPlanetDirectoryPro')}),
+            serviceUrl: constants.host + "/"+ constants.context + "/identity/json/getcookienamefortoken",
             url: "",
-            dataType: "text",
-            type: "GET",
-            success: function () { 
-                console.debug("Successfully logged out");
-                cookieHelper.deleteCookie("iPlanetDirectoryPro", "", document.domain);
-            },
-            error: function () {
-                console.debug("Error during logging out");
-            }
+            success: _.bind(function (cookieName) {
+
+                obj.serviceCall({
+                    serviceUrl: constants.host + "/"+ constants.context + "/identity/logout?" + $.param({subjectid: cookieHelper.getCookie(cookieName.string)}),
+                    url: "",
+                    dataType: "text",
+                    type: "GET",
+                    success: function () { 
+                        console.debug("Successfully logged out");
+                        cookieHelper.deleteCookie(cookieName.string, "/", document.domain.split(".").splice(1).join("."));
+                    },
+                    error: function () {
+                        console.debug("Error during logging out");
+                    }
+                });
+        
+            }, this)
         });
+
     };
 
     

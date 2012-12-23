@@ -25,7 +25,7 @@
 /*global $, define, _ */
 
 /**
- * @author jdabrowski
+ * @author jfeasel
  */
 define("org/forgerock/openam/ui/dashboard/DashboardDelegate", [
     "org/forgerock/commons/ui/common/util/Constants",
@@ -36,13 +36,27 @@ define("org/forgerock/openam/ui/dashboard/DashboardDelegate", [
 
     var obj = new AbstractDelegate(constants.host + "/"+ constants.context + "/json/dashboard");
 
+    obj.sortApps = function (apps) {
+
+        var sortedApps = _.map(_.sortBy(_.keys(apps), function (key){ return key; }), function (key) { 
+            var app = {}; 
+            app.id = key; 
+            _.each(apps[key], function (v,k) { app[k] = v[0]; });
+            return app; 
+        });
+
+        return sortedApps;
+    };
+
     obj.getMyApplications = function (callback) {
 
         obj.serviceCall({
             url: "/assigned",
             headers: {"Cache-Control": "no-cache"},
             type: "GET",
-            success: callback
+            success: function (apps) {
+                callback(this.sortApps(apps));
+            }
         });
         
     };
@@ -53,7 +67,9 @@ define("org/forgerock/openam/ui/dashboard/DashboardDelegate", [
             url: "/available",
             headers: {"Cache-Control": "no-cache"},
             type: "GET",
-            success: callback
+            success: function (apps) {
+                callback(this.sortApps(apps));
+            }
         });
 
     };

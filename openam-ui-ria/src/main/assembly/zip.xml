@@ -35,11 +35,11 @@
     <fileSets>
         <fileSet>
             <directory>${basedir}/target/classes</directory>
-            <outputDirectory>/XUI</outputDirectory>
+            <outputDirectory>.</outputDirectory>
         </fileSet>
         <fileSet>
             <directory>${basedir}/target/dependency</directory>
-            <outputDirectory>/XUI</outputDirectory>
+            <outputDirectory>.</outputDirectory>
         </fileSet>
     </fileSets>
 </assembly>
