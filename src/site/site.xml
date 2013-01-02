@@ -20,7 +20,7 @@
   !
   ! CCPL HEADER END
   !
-  !      Copyright 2011-2012 ForgeRock AS
+  !      Copyright 2011-2013 ForgeRock AS
   !    
 -->
 <project name="${project.name} Project"
@@ -31,7 +31,7 @@
  <skin>
   <groupId>org.forgerock.commons</groupId>
   <artifactId>forgerock-community-skin</artifactId>
-  <version>1.0.0-SNAPSHOT</version>
+  <version>1.0.0</version>
  </skin>
  <publishDate position="right" format="yyyy.MM.dd" />
  <version position="right" />
