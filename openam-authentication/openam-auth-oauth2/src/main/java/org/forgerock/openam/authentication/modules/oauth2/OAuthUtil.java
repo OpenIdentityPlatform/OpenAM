@@ -26,14 +26,9 @@
 
 package org.forgerock.openam.authentication.modules.oauth2;
 
-import com.sun.identity.authentication.spi.AuthLoginException;
 import javax.servlet.http.HttpServletRequest;
-
 import com.sun.identity.shared.debug.Debug;
-
 import java.io.UnsupportedEncodingException;
-import java.net.URI;
-import java.net.URISyntaxException;
 import java.net.URLEncoder;
 import java.util.Map;
 import java.util.ResourceBundle;
@@ -74,43 +69,6 @@ public class OAuthUtil  {
         return cookie;
     }    
     
-    public static String encodeUriToRedirect(String originalUrl) throws 
-            AuthLoginException {
-        try {
-            String query = "";
-            URI url_URL;
-            url_URL = new URI(originalUrl);
-            query = url_URL.getQuery();
-            if (query != null && query.length() != 0) {
-                StringBuilder encodedQueryValues = new StringBuilder();
-                String[] paramsArray = query.split("\\&");
-                int countParams = paramsArray.length;
-                for (int i = 0; i < countParams; i++) {
-                    String[] parts = paramsArray[i].split("=");
-                    encodedQueryValues.append(parts[0]).append("=").
-                            append(URLEncoder.encode(parts[1],"UTF-8"));
-                    if (i < countParams - 1) {
-                        encodedQueryValues.append("&");
-                    }
-                    debugMessage("OAuthUtil.encodeUriToRedirect: "
-                            + "encodedQueryValues=" + encodedQueryValues);
-                }
-
-                originalUrl = url_URL.getScheme() + "://" + url_URL.getHost()
-                        + url_URL.getPath() + "?" + encodedQueryValues;
-                debugMessage("OAuthUtil.encodeUriToRedirect: Redirect URL: " + 
-                        originalUrl);
-                originalUrl = URLEncoder.encode(originalUrl,"UTF-8");
-            }
-        } catch (URISyntaxException ex) {
-            debugError("OAuthUtil.encodeUriToRedirect: URI manipulation", ex);
-        } catch (UnsupportedEncodingException ex) {
-            debugError("OAuthUtil.encodeUriToRedirect: Problem encoding the "
-                    + "originalUrl" + originalUrl, ex);
-            throw new AuthLoginException("Problem encoding the originalUrl");
-        }   
-        return originalUrl;
-    }
     
     public static String getParamValue(String query, String param) {
 
@@ -210,4 +168,17 @@ public class OAuthUtil  {
             debug.error(message);
         }
     }
+    
+    public static String oAuthEncode(String toEncode) throws UnsupportedEncodingException {
+        if (toEncode != null && !toEncode.isEmpty()) {
+            return URLEncoder.encode(toEncode, "UTF-8").
+                    replace("+", "%20").
+                    replace("*", "%2A").
+                    replace("%7E", "~");
+
+        } else {
+            return "";
+        }
+    }
+            
 }
