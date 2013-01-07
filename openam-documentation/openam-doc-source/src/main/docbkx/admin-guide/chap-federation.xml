@@ -177,8 +177,8 @@
     <para>Export the XML-based metadata from your provider to share
     with other providers in your circle of trust.</para>
     <screen>$ curl -o metadata.xml
- http://idp.example.com:8080/openam/saml2/jsp/exportmetadata.jsp?entityid=
- http://idp.example.com:8080/openam&amp;realm=/<replaceable>realm-name</replaceable></screen>
+ http://idp.example:8080/openam/saml2/jsp/exportmetadata.jsp?entityid=
+ http://idp.example:8080/openam&amp;realm=/<replaceable>realm-name</replaceable></screen>
     <para>When you have configured only the top-level realm,
     <literal>/</literal>, you can omit the query string.</para>
     <para>Alternatively, provide the URL, to other providers so they can load
@@ -219,8 +219,8 @@
     <para>Export the XML-based metadata from your provider to share
     with other providers in your circle of trust.</para>
     <screen>$ curl -o metadata.xml
- http://sp.example.com:8080/openam/saml2/jsp/exportmetadata.jsp?entityid=
- http://sp.example.com:8080/openam&amp;realm=/<replaceable>realm-name</replaceable></screen>
+ http://sp.example:8080/openam/saml2/jsp/exportmetadata.jsp?entityid=
+ http://sp.example:8080/openam&amp;realm=/<replaceable>realm-name</replaceable></screen>
     <para>When you have configured only the top-level realm,
     <literal>/</literal>, you can omit the query string.</para>
     <para>Alternatively, provide the URL, to other providers so they can load
@@ -330,12 +330,12 @@
    purpose as a separate web application.</para>
 
    <para>Browsers only send cookies for the originating domain. Therefore
-   when a browser accesses the service provider in the <literal>sp.com</literal>
+   when a browser accesses the service provider in the <literal>sp.example</literal>
    domain, the service provider has no way of knowing whether the user has
-   perhaps already authenticated at <literal>this-idp.com</literal> or at
-   <literal>that-idp.com</literal>. The providers therefore host an identity
+   perhaps already authenticated at <literal>this-idp.example</literal> or at
+   <literal>that-idp.example</literal>. The providers therefore host an identity
    provider discovery service in a common domain, such as
-   <literal>disco.com</literal>, and use that service to discover where
+   <literal>disco.example</literal>, and use that service to discover where
    the user logged in. The identity provider discover service essentially
    writes and reads cookies from the common domain. The providers configure
    their circle of trust to use the identity provider discovery service
@@ -400,9 +400,9 @@ WAR file was created.</screen>
     <step>
      <para>Access the configuration screen through your browser.</para>
      <para>In this example, Apache Tomcat listens for HTTP requests on
-     <literal>idp.disco.com:8080</literal>, and Tomcat has unpacked the
+     <literal>idp.disco.example:8080</literal>, and Tomcat has unpacked the
      application under <literal>/disco</literal>, so the URL is
-     <literal>http://idp.disco.com:8080/disco</literal>, which redirects to
+     <literal>http://idp.disco.example:8080/disco</literal>, which redirects to
      <filename>Configurator.jsp</filename>.</para>
     </step>
    </procedure>
@@ -453,7 +453,7 @@ WAR file was created.</screen>
        <listitem>
         <para>The cookie domain is the common cookie domain used in your circle
         of trust for identity provider discovery, in this case
-        <literal>.disco.com</literal>.</para>
+        <literal>.disco.example</literal>.</para>
        </listitem>
       </varlistentry>
       <varlistentry>
@@ -506,9 +506,9 @@ WAR file was created.</screen>
      discovery service endpoints, and Save your work.</para>
 
      <para>In this example, the writer URL is
-     <literal>http://idp.disco.com:8080/disco/saml2writer</literal>, and the
+     <literal>http://idp.disco.example:8080/disco/saml2writer</literal>, and the
      reader URL is
-     <literal>http://idp.disco.com:8080/disco/saml2reader</literal>.</para>
+     <literal>http://idp.disco.example:8080/disco/saml2reader</literal>.</para>
     </step>
 
     <step>
@@ -539,22 +539,22 @@ WAR file was created.</screen>
      to use the identity provider discovery service.</para>
 
      <para>The URL to the service provider metadata is something like
-     <literal>http://www.sp.com:8080/openam/saml2/jsp/exportmetadata.jsp</literal>.</para>
+     <literal>http://www.sp.example:8080/openam/saml2/jsp/exportmetadata.jsp</literal>.</para>
     </step>
 
     <step>
      <para>Obtain metadata for each identity provider.</para>
 
-     <screen>$ ssh www.this-idp.com
+     <screen>$ ssh www.this-idp.example
 $ cd /path/to/openam-tools/admin/openam/bin
-$ ./ssoadm create-metadata-templ -y "http://www.this-idp.com:8080/openam"
+$ ./ssoadm create-metadata-templ -y "http://www.this-idp.example:8080/openam"
  -u amadmin -f /tmp/pwd.txt -i /idp -m this-standard.xml -x this-extended.xml
 Hosted entity configuration was written to this-extended.xml.
 Hosted entity descriptor was written to this-standard.xml.
 
-$ ssh www.that-idp.com
+$ ssh www.that-idp.example
 $ cd /path/to/openam-tools/admin/openam/bin
-$ ./ssoadm create-metadata-templ -y "http://www.that-idp.com:8080/openam"
+$ ./ssoadm create-metadata-templ -y "http://www.that-idp.example:8080/openam"
  -u amadmin -f /tmp/pwd.txt -i /idp -m that-standard.xml -x that-extended.xml
 
 Hosted entity configuration was written to that-extended.xml.
@@ -569,7 +569,7 @@ Hosted entity descriptor was written to that-standard.xml.</screen>
      <para>On the service provider, add the identity providers to the circle of
      trust using the identity provider metadata.</para>
 
-     <screen>$ ssh www.sp.com
+     <screen>$ ssh www.sp.example
 $ cd /path/to/openam-tools/admin/openam/bin
 $ ./ssoadm import-entity -t discocot -m ~/Downloads/this-standard.xml
  -x ~/Downloads/this-extended.xml -u amadmin -f /tmp/pwd.txt
@@ -615,7 +615,7 @@ CookieWriterServlet.doGetPost: Cookie value is
 CookieWriterServlet.doGetPost: Preferred Cookie Name _saml_idp
 08/08/2012 11:43:38:343 AM CEST: Thread[http-bio-8080-exec-4,5,main]
 CookieWriterServlet.doGetPost: Redirect to
- http://www.that-idp.com:8080/openam/SSORedirect/metaAlias/idp?resInfoID=
+ http://www.that-idp.example:8080/openam/SSORedirect/metaAlias/idp?resInfoID=
  s28bc4db004f1365d78d07d69846c54a3c850fe801
 08/08/2012 11:43:46:957 AM CEST: Thread[http-bio-8080-exec-4,5,main]
 CookieWriterServlet.doGetPost: Preferred Cookie Name is _saml_idp
@@ -631,7 +631,7 @@ CookieWriterServlet.doGetPost: Cookie value is
 CookieWriterServlet.doGetPost: Preferred Cookie Name _saml_idp
 08/08/2012 11:43:46:957 AM CEST: Thread[http-bio-8080-exec-4,5,main]
 CookieWriterServlet.doGetPost: Redirect to
- http://www.that-idp.com:8080/openam/SSORedirect/metaAlias/idp?resInfoID=
+ http://www.that-idp.example:8080/openam/SSORedirect/metaAlias/idp?resInfoID=
  s2ce9c465cf39c96f31e1dcf009cf9943695d82901</screen>
     </step>
    </procedure>
@@ -1436,7 +1436,7 @@ CookieWriterServlet.doGetPost: Redirect to
      <para>Liberty Identity Federation Framework service that writes identity
      provider entity identifiers to Common Domain cookies after successful
      authentication, used in identity provider discovery. Example:
-     <literal>http://disco.example.com:8080/openam/idffwriter</literal>.</para>
+     <literal>http://disco.example:8080/openam/idffwriter</literal>.</para>
     </listitem>
    </varlistentry>
    <varlistentry>
@@ -1445,7 +1445,7 @@ CookieWriterServlet.doGetPost: Redirect to
      <para>Liberty Identity Federation Framework service that reads identity
      provider entity identifiers from Common Domain cookies, used in identity
      provider discovery. Example:
-     <literal>http://disco.example.com:8080/openam/transfer</literal>.</para>
+     <literal>http://disco.example:8080/openam/transfer</literal>.</para>
     </listitem>
    </varlistentry>
    <varlistentry>
@@ -1454,7 +1454,7 @@ CookieWriterServlet.doGetPost: Redirect to
      <para>SAML 2.0 service that writes identity provider entity identifiers
      to Common Domain cookies after successful authentication, used in identity
      provider discovery. Example:
-     <literal>http://disco.example.com:8080/openam/saml2writer</literal>.</para>
+     <literal>http://disco.example:8080/openam/saml2writer</literal>.</para>
     </listitem>
    </varlistentry>
    <varlistentry>
@@ -1462,7 +1462,7 @@ CookieWriterServlet.doGetPost: Redirect to
     <listitem>
      <para>SAML 2.0 service that reads identity provider entity identifiers
      from Common Domain cookies, used in identity provider discovery. Example:
-     <literal>http://disco.example.com:8080/openam/saml2reader</literal>.</para>
+     <literal>http://disco.example:8080/openam/saml2reader</literal>.</para>
     </listitem>
    </varlistentry>
    <varlistentry>
@@ -1523,8 +1523,8 @@ CookieWriterServlet.doGetPost: Redirect to
      to the endpoint <literal>spssoinit</literal> under the
      context root.</para>
      <para>Examples:
-     <literal>http://www.sp.com:8080/openam/saml2/jsp/spSSOInit.jsp</literal>,
-     <literal>http://www.sp.com:8080/openam/spssoinit</literal></para>
+     <literal>http://www.sp.example:8080/openam/saml2/jsp/spSSOInit.jsp</literal>,
+     <literal>http://www.sp.example:8080/openam/spssoinit</literal></para>
     </listitem>
    </varlistentry>
 
@@ -1536,8 +1536,8 @@ CookieWriterServlet.doGetPost: Redirect to
      the endpoint <literal>idpssoinit</literal> under the
      context root.</para>
      <para>Examples:
-     <literal>http://www.idp.com:8080/openam/saml2/jsp/idpSSOInit.jsp</literal>,
-     <literal>http://www.idp.com:8080/openam/idpssoinit</literal></para>
+     <literal>http://www.idp.example:8080/openam/saml2/jsp/idpSSOInit.jsp</literal>,
+     <literal>http://www.idp.example:8080/openam/idpssoinit</literal></para>
     </listitem>
    </varlistentry>
 
@@ -1547,7 +1547,7 @@ CookieWriterServlet.doGetPost: Redirect to
      <para>Used to initiate SLO from the service provider side, so call this
      on the service provider not the identity provider.</para>
      <para>Example:
-     <literal>http://www.sp.com:8080/sp/saml2/jsp/spSingleLogoutInit.jsp</literal></para>
+     <literal>http://www.sp.example:8080/sp/saml2/jsp/spSingleLogoutInit.jsp</literal></para>
     </listitem>
    </varlistentry>
 
@@ -1557,7 +1557,7 @@ CookieWriterServlet.doGetPost: Redirect to
      <para>Used to initiate SLO from the identity provider side, so call this
      on the identity provider not the service provider.</para>
      <para>Example:
-     <literal>http://www.idp.com:8080/idp/saml2/jsp/idpSingleLogoutInit.jsp</literal></para>
+     <literal>http://www.idp.example:8080/idp/saml2/jsp/idpSingleLogoutInit.jsp</literal></para>
     </listitem>
    </varlistentry>
   </variablelist>
@@ -1586,8 +1586,8 @@ CookieWriterServlet.doGetPost: Redirect to
     <listitem>
      <para>(Required) Use this parameter to indicate the remote service
      provider. Make sure you URL encode the value. For example, specify
-     <literal>spEntityID=http://www.sp.com:8080/openam</literal> as
-     <literal>spEntityID=http%3A%2F%2Fwww.sp.com%3A8080%2Fopenam</literal>.</para>
+     <literal>spEntityID=http://www.sp.example:8080/openam</literal> as
+     <literal>spEntityID=http%3A%2F%2Fwww.sp.example%3A8080%2Fopenam</literal>.</para>
     </listitem>
    </varlistentry>
 
@@ -1650,8 +1650,8 @@ CookieWriterServlet.doGetPost: Redirect to
     <listitem>
      <para>(Required) Use this parameter to indicate the remote identity
      provider. Make sure you URL encode the value. For example, specify
-     <literal>idpEntityID=http://www.idp.com:8080/openam</literal> as
-     <literal>idpEntityID=http%3A%2F%2Fwww.idp.com%3A8080%2Fopenam</literal>.</para>
+     <literal>idpEntityID=http://www.idp.example:8080/openam</literal> as
+     <literal>idpEntityID=http%3A%2F%2Fwww.idp.example%3A8080%2Fopenam</literal>.</para>
     </listitem>
    </varlistentry>
 
@@ -1935,8 +1935,8 @@ CookieWriterServlet.doGetPost: Redirect to
      identity provider. If the <literal>binding</literal> is not set, then
      OpenAM uses this parameter to find the default binding. Make sure you URL
      encode the value. For example, specify
-     <literal>idpEntityID=http://www.sp.com:8080/openam</literal> as
-     <literal>idpEntityID=http%3A%2F%2Fwww.idp.com%3A8080%2Fopenam</literal>.</para>
+     <literal>idpEntityID=http://www.sp.example:8080/openam</literal> as
+     <literal>idpEntityID=http%3A%2F%2Fwww.idp.example%3A8080%2Fopenam</literal>.</para>
     </listitem>
    </varlistentry>
 
@@ -2018,16 +2018,16 @@ CookieWriterServlet.doGetPost: Redirect to
    to show you the query string parameters.</para>
 
    <programlisting language="none"
-   >http://www.sp.com:8080/openam/saml2/jsp/spSSOInit.jsp?metaAlias=/sp
-&amp;idpEntityID=http%3A%2F%2Fwww.idp.com%3A8080%2Fopenam
-&amp;RelayState=http%3A%2F%2Fwww.sp.com%3A8080%2Fopenam%2Fidm%2FEndUser</programlisting>
+   >http://www.sp.example:8080/openam/saml2/jsp/spSSOInit.jsp?metaAlias=/sp
+&amp;idpEntityID=http%3A%2F%2Fwww.idp.example%3A8080%2Fopenam
+&amp;RelayState=http%3A%2F%2Fwww.sp.example%3A8080%2Fopenam%2Fidm%2FEndUser</programlisting>
 
    <para>The following URL initiates SLO from the service provider side,
    leaving the user at <literal>http://openam.forgerock.org</literal>.</para>
 
    <programlisting language="none"
-   >http://www.sp.com:8080/sp/saml2/jsp/spSingleLogoutInit.jsp?metaAlias=/sp
-&amp;idpEntityID=http%3A%2F%2Fdesktop.example.com%3A8080%2Fopenam
+   >http://www.sp.example:8080/sp/saml2/jsp/spSingleLogoutInit.jsp?metaAlias=/sp
+&amp;idpEntityID=http%3A%2F%2Fdesktop.example.example%3A8080%2Fopenam
 &amp;RelayState=http%3A%2F%2Fopenam.forgerock.org</programlisting>
   </example>
  </section>
@@ -2081,7 +2081,7 @@ CookieWriterServlet.doGetPost: Redirect to
   <variablelist>
    <para>The endpoint for the ECP to contact on the OpenAM service provider is
    <literal>/SPECP</literal> as in
-   <literal>http://www.sp.com:8080/openam/SPECP</literal>. The ECP provides
+   <literal>http://www.sp.example:8080/openam/SPECP</literal>. The ECP provides
    two query string parameters to identify the service provider and to specify
    the URL of the resource to access.</para>
 
@@ -2106,7 +2106,7 @@ CookieWriterServlet.doGetPost: Redirect to
   <para>For example, the URL to access the service provider and finally
   the resource at <literal>http://openam.forgerock.org/index.html</literal>
   could be
-  <literal>http://www.sp.com:8080/openam/SPECP?metaAlias=/sp&amp;RelayState=http%3A%2F%2Fopenam.forgerock.org%2Findex.html</literal>.</para>
+  <literal>http://www.sp.example:8080/openam/SPECP?metaAlias=/sp&amp;RelayState=http%3A%2F%2Fopenam.forgerock.org%2Findex.html</literal>.</para>
  </section>
 
  <section xml:id="federation-linking-accounts">
@@ -2142,15 +2142,15 @@ CookieWriterServlet.doGetPost: Redirect to
    initiating single sign on.</para>
 
    <para>The examples below work in an environment where the identity provider
-   is <literal>www.idp.com</literal> and the service provider is
-   <literal>www.sp.com</literal>. Both providers have deployed OpenAM on port
+   is <literal>www.idp.example</literal> and the service provider is
+   <literal>www.sp.example</literal>. Both providers have deployed OpenAM on port
    8080 under deployment URI <literal>/openam</literal>.</para>
 
    <para>To initiate single sign on from the service provider, access the
    following URL with at least the query parameters shown.</para>
    <literallayout class="monospaced"
-   >http://www.sp.com:8080/openam/saml2/jsp/spSSOInit.jsp?
- idpEntityID=http%3A%2F%2Fwww.idp.com%3A8080%2Fopenam
+   >http://www.sp.example:8080/openam/saml2/jsp/spSSOInit.jsp?
+ idpEntityID=http%3A%2F%2Fwww.idp.example%3A8080%2Fopenam
  &amp;metaAlias=/sp
  &amp;NameIDFormat=urn:oasis:names:tc:SAML:2.0:nameid-format:transient</literallayout>
    <para>For a complete list of query parameters, see <xref
@@ -2159,8 +2159,8 @@ CookieWriterServlet.doGetPost: Redirect to
    <para>To initiate single sign on from the identity provider, access the
    following URL with at least the query parameters shown.</para>
    <literallayout class="monospaced"
-   >http://www.idp.com:8080/openam/saml2/jsp/idpSSOInit.jsp?
- spEntityID=http%3A%2F%2Fwww.sp.com%3A8080%2Fopenam
+   >http://www.idp.example:8080/openam/saml2/jsp/idpSSOInit.jsp?
+ spEntityID=http%3A%2F%2Fwww.sp.example%3A8080%2Fopenam
  &amp;metaAlias=/idp
  &amp;NameIDFormat=urn:oasis:names:tc:SAML:2.0:nameid-format:transient</literallayout>
    <para>For a complete list of query parameters, see <xref
@@ -2181,15 +2181,15 @@ CookieWriterServlet.doGetPost: Redirect to
    otherwise unrelated accounts.</para>
 
    <para>The examples below work in an environment where the identity provider
-   is <literal>www.idp.com</literal> and the service provider is
-   <literal>www.sp.com</literal>. Both providers have deployed OpenAM on port
+   is <literal>www.idp.example</literal> and the service provider is
+   <literal>www.sp.example</literal>. Both providers have deployed OpenAM on port
    8080 under deployment URI <literal>/openam</literal>.</para>
 
    <para>To initiate single sign on from the service provider, access the
    following URL with at least the query parameters shown.</para>
    <literallayout class="monospaced"
-   >http://www.sp.com:8080/openam/saml2/jsp/spSSOInit.jsp?
- idpEntityID=http%3A%2F%2Fwww.idp.com%3A8080%2Fopenam
+   >http://www.sp.example:8080/openam/saml2/jsp/spSSOInit.jsp?
+ idpEntityID=http%3A%2F%2Fwww.idp.example%3A8080%2Fopenam
  &amp;metaAlias=/sp
  &amp;NameIDFormat=urn:oasis:names:tc:SAML:2.0:nameid-format:persistent</literallayout>
    <para>For a complete list of query parameters, see <xref
@@ -2198,8 +2198,8 @@ CookieWriterServlet.doGetPost: Redirect to
    <para>To initiate single sign on from the identity provider, access the
    following URL with at least the query parameters shown.</para>
    <literallayout class="monospaced"
-   >http://www.idp.com:8080/openam/saml2/jsp/idpSSOInit.jsp?
- spEntityID=http%3A%2F%2Fwww.sp.com%3A8080%2Fopenam
+   >http://www.idp.example:8080/openam/saml2/jsp/idpSSOInit.jsp?
+ spEntityID=http%3A%2F%2Fwww.sp.example%3A8080%2Fopenam
  &amp;metaAlias=/idp
  &amp;NameIDFormat=urn:oasis:names:tc:SAML:2.0:nameid-format:persistent</literallayout>
    <para>For a complete list of query parameters, see <xref
@@ -2229,7 +2229,7 @@ CookieWriterServlet.doGetPost: Redirect to
 
    <para>For example, if the user's entry in the directory shows
    <literal>sun-fm-saml2-nameid-infokey:
-   http://www.idp.com:8080/openam|http://www.sp.com:8080/openam|
+   http://www.idp.example:8080/openam|http://www.sp.example:8080/openam|
    XyfFEsr6Vixbnt0BSqIglLFMGjR2</literal>, then the name identifier is
    <literal>XyfFEsr6Vixbnt0BSqIglLFMGjR2</literal>.</para>
 
@@ -2237,8 +2237,8 @@ CookieWriterServlet.doGetPost: Redirect to
    service provider as in the following example.</para>
 
    <literallayout class="monospaced"
-   >http://www.sp.com:8080/openam/saml2/jsp/spMNIRequestInit.jsp?
- idpEntityID=http%3A%2F%2Fwww.idp.com%3A8080%2Fopenam
+   >http://www.sp.example:8080/openam/saml2/jsp/spMNIRequestInit.jsp?
+ idpEntityID=http%3A%2F%2Fwww.idp.example%3A8080%2Fopenam
  &amp;metaAlias=/sp
  &amp;requestType=NewID
  &amp;IDPProvidedID=XyfFEsr6Vixbnt0BSqIglLFMGjR2</literallayout>
@@ -2247,8 +2247,8 @@ CookieWriterServlet.doGetPost: Redirect to
    as in the following example.</para>
 
    <literallayout class="monospaced"
-   >http://www.idp.com:8080/openam/saml2/jsp/idpMNIRequestInit.jsp?
- spEntityID=http%3A%2F%2Fwww.sp.com%3A8080%2Fopenam
+   >http://www.idp.example:8080/openam/saml2/jsp/idpMNIRequestInit.jsp?
+ spEntityID=http%3A%2F%2Fwww.sp.example%3A8080%2Fopenam
  &amp;metaAlias=/idp
  &amp;requestType=NewID
  &amp;SPProvidedID=XyfFEsr6Vixbnt0BSqIglLFMGjR2</literallayout>
@@ -2261,8 +2261,8 @@ CookieWriterServlet.doGetPost: Redirect to
      <listitem>
       <para>(Required) Use this parameter to indicate the remote service
       provider. Make sure you URL encode the value. For example, specify
-      <literal>spEntityID=http://www.sp.com:8080/openam</literal> as
-      <literal>spEntityID=http%3A%2F%2Fwww.sp.com%3A8080%2Fopenam</literal>.</para>
+      <literal>spEntityID=http://www.sp.example:8080/openam</literal> as
+      <literal>spEntityID=http%3A%2F%2Fwww.sp.example%3A8080%2Fopenam</literal>.</para>
      </listitem>
     </varlistentry>
 
@@ -2324,8 +2324,8 @@ CookieWriterServlet.doGetPost: Redirect to
      <listitem>
       <para>(Required) Use this parameter to indicate the remote identity
       provider. Make sure you URL encode the value. For example, specify
-      <literal>idpEntityID=http://www.idp.com:8080/openam</literal> as
-      <literal>idpEntityID=http%3A%2F%2Fwww.idp.com%3A8080%2Fopenam</literal>.</para>
+      <literal>idpEntityID=http://www.idp.example:8080/openam</literal> as
+      <literal>idpEntityID=http%3A%2F%2Fwww.idp.example%3A8080%2Fopenam</literal>.</para>
      </listitem>
     </varlistentry>
 
@@ -2390,16 +2390,16 @@ CookieWriterServlet.doGetPost: Redirect to
    linkend="persistent-federation" />.</para>
 
    <para>The examples below work in an environment where the identity provider
-   is <literal>www.idp.com</literal> and the service provider is
-   <literal>www.sp.com</literal>. Both providers have deployed OpenAM on port
+   is <literal>www.idp.example</literal> and the service provider is
+   <literal>www.sp.example</literal>. Both providers have deployed OpenAM on port
    8080 under deployment URI <literal>/openam</literal>.</para>
 
    <para>To initiate the process of terminating account federation from the
    service provider, access the following URL with at least the query
    parameters shown.</para>
    <literallayout class="monospaced"
-   >http://www.sp.com:8080/openam/saml2/jsp/spMNIRequestInit.jsp?
- idpEntityID=http%3A%2F%2Fwww.idp.com%3A8080%2Fopenam
+   >http://www.sp.example:8080/openam/saml2/jsp/spMNIRequestInit.jsp?
+ idpEntityID=http%3A%2F%2Fwww.idp.example%3A8080%2Fopenam
  &amp;metaAlias=/sp
  &amp;requestType=Terminate</literallayout>
 
@@ -2407,8 +2407,8 @@ CookieWriterServlet.doGetPost: Redirect to
    identity provider, access the following URL with at least the query
    parameters shown.</para>
    <literallayout class="monospaced"
-   >http://www.idp.com:8080/openam/saml2/jsp/idpMNIRequestInit.jsp?
- spEntityID=http%3A%2F%2Fwww.sp.com%3A8080%2Fopenam
+   >http://www.idp.example:8080/openam/saml2/jsp/idpMNIRequestInit.jsp?
+ spEntityID=http%3A%2F%2Fwww.sp.example%3A8080%2Fopenam
  &amp;metaAlias=/idp
  &amp;requestType=Terminate</literallayout>
  </section>
@@ -2529,12 +2529,12 @@ CookieWriterServlet.doGetPost: Redirect to
      appropriate query parameters. The following is an example URL for service
      provider initiated SSO.</para>
      <literallayout class="monospaced"
-     >http://www.sp.com:8080/openam/saml2/jsp/spSSOInit.jsp?
- idpEntityID=http%3A%2F%2Fwww.idp.com%3A8080%2Fopenam
+     >http://www.sp.example:8080/openam/saml2/jsp/spSSOInit.jsp?
+ idpEntityID=http%3A%2F%2Fwww.idp.example%3A8080%2Fopenam
  &amp;metaAlias=/sp</literallayout>
 
      <para>On success, check <literal
-     >http://www.sp.com:8080/openam/idm/EndUser</literal> to see the new user
+     >http://www.sp.example:8080/openam/idm/EndUser</literal> to see the new user
      account.</para>
     </step>
    </procedure>
@@ -2558,7 +2558,7 @@ CookieWriterServlet.doGetPost: Redirect to
 
    <para>To understand the relationships between accounts, consider an example
    where the identity provider is at <literal>idp.example.org</literal> and the
-   service provider is at <literal>sp.example.com</literal>. A demo user
+   service provider is at <literal>sp.example</literal>. A demo user
    account has the Universal ID,
    <literal>id=demo,ou=user,dc=example,dc=org</literal>, on the identity
    provider. That maps to the Universal ID,
@@ -2648,13 +2648,13 @@ Bulk Federation for this host was completed.</screen>
   or <filename>spSSOInit.jsp</filename> for example, add
   <literal>binding=HTTP-Artifact</literal> to the list of query parameters.
   The following example works in an environment where the identity provider is
-  <literal>www.idp.com</literal> and the service provider is
-  <literal>www.sp.com</literal>. Both providers have deployed OpenAM on port
+  <literal>www.idp.example</literal> and the service provider is
+  <literal>www.sp.example</literal>. Both providers have deployed OpenAM on port
   8080 under deployment URI <literal>/openam</literal>.</para>
 
   <literallayout class="monospaced"
-  >http://www.sp.com:8080/openam/saml2/jsp/spSSOInit.jsp?
-   idpEntityID=http%3A%2F%2Fwww.idp.com%3A8080%2Fopenam
+  >http://www.sp.example:8080/openam/saml2/jsp/spSSOInit.jsp?
+   idpEntityID=http%3A%2F%2Fwww.idp.example%3A8080%2Fopenam
    &amp;metaAlias=/sp
    &amp;binding=HTTP-Artifact</literallayout>
  </section>
