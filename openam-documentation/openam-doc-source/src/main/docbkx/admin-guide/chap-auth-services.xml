@@ -3452,7 +3452,6 @@
      their logout URLs. When using a provider like Facebook, Google, or MSN
      make sure you are aware when they change their endpoint locations so that
      you can change your client configuration accordingly.</para>
-     <para></para>
     </listitem>
    </varlistentry>
 
