@@ -20,7 +20,7 @@
   !
   ! CCPL HEADER END
   !
-  !      Copyright 2011-2012 ForgeRock AS
+  !      Copyright 2011-2013 ForgeRock AS
   !    
 -->
 <chapter xml:id='chap-auth-services'
@@ -2099,6 +2099,16 @@
       the Internet-Draft, <link
       xlink:href="http://tools.ietf.org/html/draft-behera-ldap-password-policy-09"
       >Password Policy for LDAP Directories</link>.</para>
+
+      <para>Support for this Internet-Draft is limited to the LDAP
+      authentication module. Other components of OpenAM, such as the password
+      change functionality in the <literal>/idm/EndUser</literal> page, do
+      not support the Internet-Draft. In general, outside of the LDAP
+      authentication module, OpenAM binds to the directory server as an
+      administrator, such as Directory Manager. When OpenAM binds to the
+      directory server as an administrator rather than as an end user, many
+      features of the Internet-Draft password policies do not apply.</para>
+
       <para><command>ssoadm</command> attribute:
       <literal>iplanet-am-auth-ldap-behera-password-policy-enabled</literal></para>
      </listitem>
