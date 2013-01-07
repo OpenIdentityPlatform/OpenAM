@@ -20,7 +20,7 @@
   !
   ! CCPL HEADER END
   !
-  !      Copyright 2011 ForgeRock AS
+  !      Copyright 2011, 2013 ForgeRock AS
   !    
 -->
 <chapter xml:id='chap-policy-spi'
@@ -101,17 +101,17 @@
   with OpenAM.</para>
    <variablelist>
     <varlistentry>
-     <term><filename>amserver.jar</filename></term>
+     <term><filename>openam-core-<?eval ${serverDocTargetVersion}?>.jar</filename></term>
      <listitem>
       <para>When you deploy OpenAM, the file is
-      <filename><replaceable>war-file-name</replaceable>/WEB-INF/lib/amserver.jar</filename>.</para>
+      <filename><replaceable>war-file-name</replaceable>/WEB-INF/lib/openam-core-<?eval ${serverDocTargetVersion}?>.jar</filename>.</para>
      </listitem>
     </varlistentry>
     <varlistentry>
-     <term><filename>opensso-sharedlib.jar</filename></term>
+     <term><filename>openam-shared-<?eval ${serverDocTargetVersion}?>.jar</filename></term>
      <listitem>
       <para>When you deploy OpenAM, the file is
-      <filename><replaceable>war-file-name</replaceable>/WEB-INF/lib/opensso-sharedlib.jar</filename>.</para>
+      <filename><replaceable>war-file-name</replaceable>/WEB-INF/lib/openam-shared-<?eval ${serverDocTargetVersion}?>.jar</filename>.</para>
      </listitem>
     </varlistentry>
    </variablelist>
@@ -119,8 +119,8 @@
   <screen>$ cd /path/to/tomcat/webapps/openam/
 $ mkdir classes
 $ javac -d classes
- -classpath /path/to/tomcat/webapps/openam/WEB-INF/lib/amserver.jar:
-  /path/to/tomcat/webapps/openam/WEB-INF/lib/opensso-sharedlib.jar
+ -classpath /path/to/tomcat/webapps/openam/WEB-INF/lib/openam-core-<?eval ${serverDocTargetVersion}?>.jar:
+  /path/to/tomcat/webapps/openam/WEB-INF/lib/openam-shared-<?eval ${serverDocTargetVersion}?>.jar
   source/com/sun/identity/samples/policy/Sample*.java
 $ cd classes/
 $ jar cf ../policy-plugins.jar .</screen>
@@ -210,7 +210,7 @@ Using CATALINA_TMPDIR: /path/to/tomcat/temp
 Using JRE_HOME:        /path/to/jdk1.6/jre
 Using CLASSPATH:       /path/to/tomcat/bin/bootstrap.jar:
  /path/to/tomcat/bin/tomcat-juli.jar
-[mark@openam-ter bin]$ /etc/init.d/tomcat start
+$ /etc/init.d/tomcat start
 Password: 
 Using CATALINA_BASE:   /path/to/tomcat
 Using CATALINA_HOME:   /path/to/tomcat
