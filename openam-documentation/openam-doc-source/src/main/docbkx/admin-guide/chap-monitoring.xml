@@ -20,7 +20,7 @@
   !
   ! CCPL HEADER END
   !
-  !      Copyright 2011-2012 ForgeRock AS
+  !      Copyright 2011-2013 ForgeRock AS
   !    
 -->
 <chapter xml:id='chap-monitoring'
@@ -107,9 +107,11 @@ demo AQICvSe+tXEg8TUUT8ekzHb8IRzVSvm1Lc2u</screen>
     <primary>Monitoring</primary>
     <secondary>JMX</secondary>
    </indexterm>
-   <para>You can configure OpenAM to allow you to listen on port 9999 for JMX
-   monitoring. Either use the console, or use the <command>ssoadm</command>
-   command.</para>
+   <para>You can configure OpenAM to allow you to listen for Java Management
+   eXtension (JMX) clients, by default on port 9999. Either use the OpenAM
+   console page under Configuration &gt; System &gt; Monitoring and make sure
+   both Monitoring Status and Monitoring RMI interface status are both set to
+   Enabled, or use the <command>ssoadm</command> command.</para>
 
    <screen>$ ssoadm
  set-attr-defs
@@ -117,12 +119,22 @@ demo AQICvSe+tXEg8TUUT8ekzHb8IRzVSvm1Lc2u</screen>
  --schematype Global
  --adminid amadmin
  --password-file /tmp/pwd.txt
- --attributevalues iplanet-am-monitoring-rmi-enabled=true</screen>
+ --attributevalues iplanet-am-monitoring-enabled=true
+ iplanet-am-monitoring-rmi-enabled=true</screen>
 
-   <para>You can then use <command>jconsole</command> or other JMX-enabled
-   tools to browse the MBeans. You can also browse the MBeans by connecting
-   to your web application container, and browsing to the OpenAM MBeans.</para>
-   
+   <para>A number of tools support JMX, including <command>jvisualvm</command>
+   and <command>jconsole</command>. When you use <command>jconsole</command>
+   to browse OpenAM MBeans for example, the default URL for the OpenAM running
+   on the local system is
+   <literal>service:jmx:rmi:///jndi/rmi://localhost:9999/server</literal>.</para>
+
+   <screen>$ jconsole service:jmx:rmi:///jndi/rmi://localhost:9999/server &amp;</screen>
+
+   <para>You can also browse the MBeans by connecting to your web application
+   container, and browsing to the OpenAM MBeans. By default, JMX monitoring for
+   your container is likely to be accessible only locally, using the process
+   ID.</para>
+
    <mediaobject xml:id="figure-jconsole-to-openam">
     <alt>Jconsole browsing OpenAM MBeans</alt>
     <imageobject>
@@ -130,6 +142,11 @@ demo AQICvSe+tXEg8TUUT8ekzHb8IRzVSvm1Lc2u</screen>
     </imageobject>
     <textobject><para>You can monitor OpenAM over JMX.</para></textobject>
    </mediaobject>
+
+   <para>Also see <link xlink:show="new"
+   xlink:href="http://docs.oracle.com/javase/1.5.0/docs/guide/management/agent.html"
+   >Monitoring and Management Using JMX</link> for instructions on how to
+   connect remotely, how to use SSL, and so forth.</para>
   </section>
   
   <section xml:id="monitoring-snmp">
