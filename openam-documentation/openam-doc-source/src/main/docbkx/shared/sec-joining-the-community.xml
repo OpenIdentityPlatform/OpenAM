@@ -20,7 +20,7 @@
   !
   ! CCPL HEADER END
   !
-  !      Copyright 2011-2012 ForgeRock AS
+  !      Copyright 2011-2013 ForgeRock AS
   !
 -->
  <section xml:id="joining-the-community"
@@ -46,9 +46,9 @@
  xlink:show="new">https://lists.forgerock.org/mailman/listinfo/docs</link>).</para>
 
  <para>The Wiki has information on how to check out OpenAM source code.
- There is also a mailing list for OpenAM development which can be found at
+ There is also a mailing list for OpenAM development that can be found at
  <link xlink:href='https://lists.forgerock.org/mailman/listinfo/openam-dev'
- xlink:show="new">https://lists.forgerock.org/mailman/listinfo/openam-dev</link>
+ xlink:show="new">https://lists.forgerock.org/mailman/listinfo/openam-dev</link>.
  Should you want to contribute a patch, test, or feature, or want to author
  part of the core documentation, first have a look on the ForgeRock site
  at <link xlink:href='http://www.forgerock.org/get_involved.html'
