@@ -28,42 +28,10 @@ import java.util.concurrent.atomic.AtomicLong;
 import com.sun.org.apache.xml.internal.security.utils.resolver.ResourceResolverException;
 import org.forgerock.json.fluent.JsonValue;
 import org.forgerock.json.fluent.JsonValueException;
-import org.forgerock.json.resource.ActionRequest;
-import org.forgerock.json.resource.ServerContext;
-import org.forgerock.json.resource.CreateRequest;
-import org.forgerock.json.resource.DeleteRequest;
-import org.forgerock.json.resource.PatchRequest;
-import org.forgerock.json.resource.QueryRequest;
-import org.forgerock.json.resource.QueryResult;
-import org.forgerock.json.resource.QueryResultHandler;
-import org.forgerock.json.resource.ReadRequest;
-import org.forgerock.json.resource.Resource;
-import org.forgerock.json.resource.Resources;
-import org.forgerock.json.resource.ResultHandler;
-import org.forgerock.json.resource.UpdateRequest;
-import org.forgerock.json.resource.BadRequestException;
-import org.forgerock.json.resource.ConflictException;
-import org.forgerock.json.resource.InternalServerErrorException;
-import org.forgerock.json.resource.NotFoundException;
-import org.forgerock.json.resource.NotSupportedException;
-import org.forgerock.json.resource.ResourceException;
-import org.forgerock.json.resource.CollectionResourceProvider;
+import org.forgerock.json.resource.*;
 
-import com.iplanet.sso.SSOToken;
-import com.iplanet.sso.SSOException;
-import com.iplanet.sso.SSOTokenManager;
 
-import java.security.AccessController;
-
-import com.sun.identity.security.AdminTokenAction;
-import com.sun.identity.shared.debug.Debug;
-import com.sun.identity.idm.AMIdentity;
-import com.sun.identity.idsvcs.opensso.IdentityServicesImpl;
-import com.sun.identity.idsvcs.Token;
-
-import com.sun.identity.idsvcs.IdentityDetails;
-import com.sun.identity.idsvcs.Attribute;
-import com.sun.identity.sm.OrganizationConfigManager;
+import static org.forgerock.openam.forgerockrest.RestUtils.hasPermission;
 
 /**
  * A simple {@code Map} based collection resource provider.
@@ -151,14 +119,18 @@ public final class RealmResource implements CollectionResourceProvider {
     @Override
     public void queryCollection(final ServerContext context, final QueryRequest request,
                                 final QueryResultHandler handler) {
-
-        for (Object theRealm : subRealms) {
-            String realm = (String) theRealm;
-            JsonValue val = new JsonValue(realm);
-            Resource resource = new Resource("0", "0", val);
-            handler.handleResource(resource);
+        if (hasPermission(context)) { //check to make sure admin
+            for (Object theRealm : subRealms) {
+                String realm = (String) theRealm;
+                JsonValue val = new JsonValue(realm);
+                Resource resource = new Resource("0", "0", val);
+                handler.handleResource(resource);
+            }
+            handler.handleResult(new QueryResult());
+        } else {
+            handler.handleError(new PermanentException(401, "Unauthorized", null));
         }
-        handler.handleResult(new QueryResult());
+
     }
 
     /**
@@ -168,15 +140,19 @@ public final class RealmResource implements CollectionResourceProvider {
     public void readInstance(final ServerContext context, final String resourceId,
                              final ReadRequest request, final ResultHandler<Resource> handler) {
         JsonValue val = null;
-        for (Object theRealm : subRealms) {
-            String realm = (String) theRealm;
-            if (realm.equalsIgnoreCase(resourceId)) {
-                val = new JsonValue(realm);
+        if (hasPermission(context)) { //check to make sure admin
+            for (Object theRealm : subRealms) {
+                String realm = (String) theRealm;
+                if (realm.equalsIgnoreCase(resourceId)) {
+                    val = new JsonValue(realm);
+                }
             }
-        }
-        if (val != null) {
-            Resource resource = new Resource("0", "0", val);
-            handler.handleResult(resource);
+            if (val != null) {
+                Resource resource = new Resource("0", "0", val);
+                handler.handleResult(resource);
+            }
+        } else {
+            handler.handleError(new PermanentException(401, "Unauthorized", null));
         }
     }
 
