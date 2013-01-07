@@ -79,7 +79,7 @@ public class LogManager extends java.util.logging.LogManager {
      * A list to maintain strong references to all loggers that are added,
      * workaround for the file handle issue in OPENAM-184.
      */
-    private static Hashtable loggersTable = new Hashtable();
+    private static Hashtable loggersTable;
 
 
     /**
@@ -127,6 +127,10 @@ public class LogManager extends java.util.logging.LogManager {
         }
         boolean addSuccess = super.addLogger(logger);
 
+        // OPENAM-1110, loggersTable may not get initialized immediately, since we extend.
+        if (loggersTable == null) {
+            loggersTable = new Hashtable();
+        }
         // Workaround for OPENAM-184, maintains strong reference to the loggers until this class is collected
         // The Hashtable will never be used to retrieve loggers, only to keep then  strongly referenced
         loggersTable.put(name, logger);

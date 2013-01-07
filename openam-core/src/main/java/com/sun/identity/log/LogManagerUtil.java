@@ -96,6 +96,10 @@ public class LogManagerUtil {
      * @return LogManager object.
      */
     public static com.sun.identity.log.LogManager getLogManager() {
+        // OPENAM-1110
+        if (lmgr == null) {
+            lmgr = new com.sun.identity.log.LogManager();
+        }
         return lmgr;
     }
 
