@@ -102,8 +102,7 @@
   <section xml:id="java-requirements-javaee-agents">
    <title>Java EE Agents Java Requirements</title>
 
-   <para>All policy agents except Microsoft IIS web agents require Java for
-   installation. Java EE policy agents run in a container using Java 6 or later.
+   <para>Java EE policy agents run in a container using Java 6 or later.
    ForgeRock recommends the most recent release of Java 6 or later to ensure
    you have the latest security fixes.</para>
 
