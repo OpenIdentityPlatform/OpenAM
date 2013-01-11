@@ -25,7 +25,7 @@
  */
 
 /*
- * Portions Copyrighted 2010-2012 ForgeRock Inc
+ * Portions Copyrighted 2010-2013 ForgeRock Inc
  */
 
 package com.sun.identity.saml2.common;
@@ -1268,42 +1268,35 @@ public class SAML2Utils extends SAML2SDKUtils {
         // Decompress the bytes
         Inflater inflater = new Inflater(true);
         inflater.setInput(input);
-        int resultLen = 2048; 
+        int bufferLength = 2048;
         try {
             if ((bufferLen != null) && (!bufferLen.equals(""))) {
-                resultLen = Integer.parseInt(bufferLen);
-            }   
+                bufferLength = Integer.parseInt(bufferLen);
+            }
         } catch (NumberFormatException nfe) {
             debug.error("Unable to parse buffer length.", nfe);
         }
-        byte[] result = new byte[resultLen]; 
-        int resultLength = 0;
+        byte[] result = new byte[bufferLength];
+        int readBytes = 0;
+        StringBuilder sb = new StringBuilder(300);
         try {
-            resultLength = inflater.inflate(result);
+            while (!inflater.finished()) {
+                readBytes = inflater.inflate(result);
+                sb.append(new String(result, 0, readBytes, "UTF-8"));
+            }
         } catch (DataFormatException dfe) {
-            debug.error(classMethod+
-                    "cannot inflate SAMLRequest: ",
-                    dfe);
+            debug.error(classMethod + "cannot inflate SAMLRequest: ", dfe);
+            return null;
+        } catch (UnsupportedEncodingException uee) {
+            debug.error(classMethod + "cannot convert byte array to string.", uee);
             return null;
         }
         inflater.end();
-        
-        // Decode the bytes into a String
-        String outputString = null;
-        try {
-            outputString = new
-                    String(result, 0, resultLength, "UTF-8");
-        } catch (UnsupportedEncodingException uee) {
-            debug.error(classMethod+
-                    "cannot convert byte array to string.",
-                    uee);
-            return null;
-        }
+
         if (debug.messageEnabled()) {
-            debug.message(classMethod+
-                    "Return value: \n"+outputString);
+            debug.message(classMethod + "Return value: \n" + sb.toString());
         }
-        return outputString;
+        return sb.toString();
     }
     
     /**
