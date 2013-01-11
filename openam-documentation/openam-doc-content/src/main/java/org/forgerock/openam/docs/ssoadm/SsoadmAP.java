@@ -1,7 +1,7 @@
 /**
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright (c) 2011-2012 ForgeRock Inc. All Rights Reserved
+ * Copyright (c) 2011-2013 ForgeRock Inc. All Rights Reserved
  *
  * The contents of this file are subject to the terms
  * of the Common Development and Distribution License
@@ -28,8 +28,8 @@ import com.sun.identity.cli.annotation.Macro;
 import com.sun.identity.cli.annotation.SubCommandInfo;
 import java.io.BufferedReader;
 import java.io.File;
-import java.io.FileReader;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.util.Arrays;
 import java.util.Collection;
@@ -87,19 +87,16 @@ public class SsoadmAP extends AbstractProcessor {
      * with - substituted for _.
      */
     @Override
-    public boolean process(Set<? extends TypeElement> annotations,
-                           RoundEnvironment roundEnv) {
+    public boolean process(Set<? extends TypeElement> annotations, RoundEnvironment roundEnv) {
         // Push Macro content into macros for use evaluating SubCommandInfos.
         for (Element e : roundEnv.getElementsAnnotatedWith(Macro.class)) {
             String name = e.getSimpleName().toString().replaceAll("_", "-");
-            //System.out.println("Found @Macro: " + name);
             macros.put(name, e.getAnnotation(Macro.class));
         }
 
         // Push formatted SubCommandInfo content into the sorted set.
         for (Element e : roundEnv.getElementsAnnotatedWith(SubCommandInfo.class)) {
             String name = e.getSimpleName().toString().replaceAll("_", "-");
-            //System.out.println("Found @SubCommandInfo: " + name);
             SubCommandInfo info = e.getAnnotation(SubCommandInfo.class);
 
             String description = info.description();
@@ -116,25 +113,24 @@ public class SsoadmAP extends AbstractProcessor {
                 optional.addAll(Arrays.asList(macro.optionalOptions()));
             }
 
-            subcommands.add(SubCommandXML.parseSubCommandInfo(
-                    name, description, mandatory, optional));
+            subcommands.add(SubCommandXML.parseSubCommandInfo(name, description, mandatory, optional));
         }
 
-        StringBuilder content = readFile("openam-documentation/openam-doc-source/src/main/docbkx/reference/man-ssoadm-1.header");
+        StringBuilder content = readFileFromClassPath("/man-ssoadm-1.header");
         for (String subCommand : subcommands) {
             content.append(subCommand);
         }
-        content.append(readFile("openam-documentation/openam-doc-source/src/main/docbkx/reference/man-ssoadm-1.footer"));
-        writeFile("openam-documentation/openam-doc-content/target/generated-resources/man-ssoadm-1.xml", content.toString());
+        content.append(readFileFromClassPath("/man-ssoadm-1.footer"));
+        writeFile(processingEnv.getOptions().get("outputFile"), content.toString());
 
         return true;
     }
 
-    private static StringBuilder readFile(String path) {
+    private static StringBuilder readFileFromClassPath(String path) {
         BufferedReader br = null;
         StringBuilder sb = new StringBuilder();
         try {
-            br = new BufferedReader(new FileReader(path));
+            br = new BufferedReader(new InputStreamReader(SsoadmAP.class.getResourceAsStream(path)));
             String line;
             while ((line = br.readLine()) != null) {
                 sb.append(line).append('\n');

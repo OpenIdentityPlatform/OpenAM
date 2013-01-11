@@ -20,7 +20,7 @@
   !
   ! CCPL HEADER END
   !
-  !      Copyright 2011-2012 ForgeRock Inc
+  !      Copyright 2011-2013 ForgeRock Inc
   !    
 -->
 <book xml:id='reference'
@@ -67,7 +67,7 @@
   <xinclude:include href='man-ampassword-1.xml' />
   <xinclude:include href='man-amverifyarchive-1.xml' />
   <xinclude:include href='man-configurator-jar-1.xml' />
-  <xinclude:include href='../../../../../openam-doc-content/target/generated-resources/man-ssoadm-1.xml' />
+  <xinclude:include href='../../../../target/generated-resources/man-ssoadm-1.xml' />
  </reference>
 
  <xinclude:include href="chap-config-ref.xml" />

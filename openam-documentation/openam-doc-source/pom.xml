@@ -20,7 +20,7 @@
   !
   ! CCPL HEADER END
   !
-  !      Copyright 2011-2012 ForgeRock Inc
+  !      Copyright 2011-2013 ForgeRock Inc
   !    
 -->
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
@@ -142,6 +142,29 @@
         <plugins>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-dependency-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>unpack</goal>
+                        </goals>
+                        <phase>pre-site</phase>
+                        <configuration>
+                            <artifactItems>
+                                <artifactItem>
+                                    <groupId>org.forgerock.openam</groupId>
+                                    <artifactId>openam-doc-content</artifactId>
+                                    <version>${project.version}</version>
+                                    <outputDirectory>${project.build.directory}/generated-resources</outputDirectory>
+                                    <includes>man-ssoadm-1.xml</includes>
+                                </artifactItem>
+                            </artifactItems>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-javadoc-plugin</artifactId>
                 <configuration>
                     <skip>true</skip>
@@ -150,10 +173,9 @@
             <plugin>
                 <groupId>org.codehaus.mojo</groupId>
                 <artifactId>xml-maven-plugin</artifactId>
-                <version>1.0</version>
                 <executions>
                     <execution>
-                        <phase>generate-resources</phase>
+                        <phase>pre-site</phase>
                         <goals>
                             <goal>transform</goal>
                         </goals>
@@ -241,7 +263,7 @@
                 <executions>
                     <execution>
                         <id>generate-log-message-ref</id>
-                        <phase>generate-resources</phase>
+                        <phase>pre-site</phase>
                         <inherited>false</inherited>
                         <goals>
                             <goal>run</goal>

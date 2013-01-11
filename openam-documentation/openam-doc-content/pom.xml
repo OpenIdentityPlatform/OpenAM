@@ -20,7 +20,7 @@
   !
   ! CCPL HEADER END
   !
-  !      Copyright 2011 ForgeRock AS
+  !      Copyright 2011-2013 ForgeRock, Inc.
   !    
 -->
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
@@ -43,8 +43,6 @@
             <plugin>
                 <groupId>org.bsc.maven</groupId>
                 <artifactId>maven-processor-plugin</artifactId>
-                <version>2.0.5</version>
-                <inherited>false</inherited>
                 <executions>
                     <execution>
                         <id>process</id>
@@ -56,13 +54,14 @@
                             <sourceDirectory>../../</sourceDirectory>
                             <includes>
                                 <include>openam-cli/openam-cli-definitions/src/main/java/com/sun/identity/cli/definition/AccessManager.java</include>
-                                <include>
-                                    openam-cli/openam-cli-definitions/src/main/java/com/sun/identity/federation/cli/definition/FederationManager.java
-                                </include>
+                                <include>openam-cli/openam-cli-definitions/src/main/java/com/sun/identity/federation/cli/definition/FederationManager.java</include>
                             </includes>
                             <processors>
                                 <processor>org.forgerock.openam.docs.ssoadm.SsoadmAP</processor>
                             </processors>
+                            <options>
+                                <outputFile>openam-documentation/openam-doc-content/target/classes/man-ssoadm-1.xml</outputFile>
+                            </options>
                         </configuration>
                     </execution>
                 </executions>
@@ -70,33 +69,18 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-site-plugin</artifactId>
-                <version>3.0</version>
                 <configuration>
                     <skip>true</skip>
                     <skipDeploy>true</skipDeploy>
                 </configuration>
             </plugin>
         </plugins>
-
-        <resources>
-            <resource>
-                <filtering>false</filtering>
-                <directory>target/generated-resources</directory>
-                <includes>
-                    <include>**/*</include>
-                </includes>
-            </resource>
-        </resources>
-
     </build>
 
     <dependencies>
         <dependency>
             <groupId>org.forgerock.openam</groupId>
             <artifactId>openam-cli-definitions</artifactId>
-            <version>${project.version}</version>
         </dependency>
     </dependencies>
-
-
 </project>
