@@ -25,9 +25,8 @@
  * $Id: ReplayPasswd.java,v 1.6 2009/11/04 22:50:35 manish_rustagi Exp $
  *
  */
-
-/*
- * Portions Copyrighted 2011 ForgeRock AS
+/**
+ * Portions Copyrighted 2011-2013 ForgeRock, Inc.
  */
 package com.sun.identity.authentication.spi;
 
@@ -136,9 +135,10 @@ public class ReplayPasswd implements AMPostAuthProcessInterface {
             Cipher cipher = Cipher.getInstance(CIPHER_INSTANCE_NAME);
             cipher.init(Cipher.ENCRYPT_MODE, keySpec);
 
-            byte[] data = new byte[16];
-            System.arraycopy(userpasswd.getBytes(),0,data,0,
-                             userpasswd.length());
+            //The array size must be a multiply of 8 (DES block size)
+            int length = userpasswd.length() + (8 - userpasswd.length() % 8);
+            byte[] data = new byte[length];
+            System.arraycopy(userpasswd.getBytes(), 0, data, 0, userpasswd.length());
             byte[] ciphertext = cipher.doFinal(data);
 			
             String encodedpasswd = Base64.encode(ciphertext);
