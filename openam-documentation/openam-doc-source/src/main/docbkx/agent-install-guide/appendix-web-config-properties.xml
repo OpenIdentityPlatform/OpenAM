@@ -20,7 +20,7 @@
   !
   ! CCPL HEADER END
   !
-  !      Copyright 2012 ForgeRock AS
+  !      Copyright 2012-2013 ForgeRock AS
   !    
 -->
 <appendix xml:id='appendix-web-config-properties'
@@ -919,11 +919,11 @@ token=value;Domain=subdomain.domain.com</literal></para>
      values so the agent can properly redirect users and the agents receive
      cookies belonging to the domain.</para>
      <para>To map <literal>myserver</literal> to
-     <literal>myserver.mydomain.com</literal>, enter
+     <literal>myserver.mydomain.example</literal>, enter
      <literal>myserver</literal> in the Map Key field, and enter
-     <literal>myserver.mydomain.com</literal> in the Corresponding Map Value
+     <literal>myserver.mydomain.example</literal> in the Corresponding Map Value
      field. This corresponds to
-     <literal>com.sun.identity.agents.config.fqdn.mapping[myserver]= myserver.mydomain.com</literal>.</para>
+     <literal>com.sun.identity.agents.config.fqdn.mapping[myserver]= myserver.mydomain.example</literal>.</para>
      <para>Invalid FQDN values can cause the web server to become unusable
      or render resources inaccessible.</para>
      <para>For centralized configurations this property is configured under

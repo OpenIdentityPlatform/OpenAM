@@ -20,7 +20,7 @@
   !
   ! CCPL HEADER END
   !
-  !      Copyright 2011-2012 ForgeRock AS
+  !      Copyright 2011-2013 ForgeRock AS
   !    
 -->
 <chapter xml:id='chap-troubleshooting'
@@ -70,7 +70,7 @@
 
     <programlisting language="plain"
     >&lt;VirtualHost *:8080&gt;
-ServerName www.localhost.net:8080</programlisting>
+ServerName www.localhost.example:8080</programlisting>
    </answer>
   </qandaentry>
 

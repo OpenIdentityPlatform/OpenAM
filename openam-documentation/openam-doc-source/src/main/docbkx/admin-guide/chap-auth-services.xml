@@ -1642,7 +1642,7 @@
    and Telephone Number attributes from the user profile to the HOTP module.
    For the HOTP module to use either attribute, the Email Address must contain
    a valid email address, or the Telephone Number must contain a valid
-   SMS telephone number such as <literal>18285551212@txt.att.net</literal>.</para>
+   SMS telephone number.</para>
    <para>You can set the HOTP module to automatically generate a password when
    users begin logging into the system. You can also setup a mobile phone, 
    mobile carrier, and email attributes for tighter controls over where 
