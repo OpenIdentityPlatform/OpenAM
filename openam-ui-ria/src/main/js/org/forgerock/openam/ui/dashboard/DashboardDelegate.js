@@ -54,9 +54,9 @@ define("org/forgerock/openam/ui/dashboard/DashboardDelegate", [
             url: "/assigned",
             headers: {"Cache-Control": "no-cache"},
             type: "GET",
-            success: function (apps) {
+            success: _.bind(function (apps) {
                 callback(this.sortApps(apps));
-            }
+            }, this)
         });
         
     };
@@ -67,9 +67,9 @@ define("org/forgerock/openam/ui/dashboard/DashboardDelegate", [
             url: "/available",
             headers: {"Cache-Control": "no-cache"},
             type: "GET",
-            success: function (apps) {
+            success:  _.bind(function (apps) {
                 callback(this.sortApps(apps));
-            }
+            }, this)
         });
 
     };
