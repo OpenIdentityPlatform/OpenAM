@@ -27,7 +27,7 @@
  */
 
 /*
- * Portions Copyrighted [2011] [ForgeRock AS]
+ * Portions Copyright 2011-2013 ForgeRock, Inc.
  */
 package com.sun.identity.policy;
 
