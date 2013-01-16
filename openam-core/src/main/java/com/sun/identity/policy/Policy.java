@@ -367,6 +367,9 @@ public class Policy implements Cloneable {
      * Gets the name of the policy.
      *
      * @return name of the policy
+     *
+     * @supported.api
+     *
      */
     public String getName() {
         return (policyName);
