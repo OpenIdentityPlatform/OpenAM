@@ -76,6 +76,7 @@
                <version>1.0.1</version>
                <configuration>
                    <disallowInsecureCharsInRegExp>false</disallowInsecureCharsInRegExp>
+                   <assumeConsoleAlertEtc>true</assumeConsoleAlertEtc>
                    <excludes>
                        <exclude>**/libs/*.js</exclude>
                        <exclude>**/*Test.js</exclude>

@@ -22,6 +22,9 @@
  * "Portions Copyrighted [year] [name of copyright owner]"
  */
 
+/**
+ * "Portions Copyrighted 2011-2013 ForgeRock Inc"
+ */
 /*global define*/
 
 /**
@@ -53,6 +56,12 @@ define("config/routes/AMRoutesConfig", [
             view: "org/forgerock/openam/ui/dashboard/DashboardView",
             role: "authenticated",
             url: "dashboard/",
+            forceUpdate: true
+        },
+        "oauth2Tokens": {
+            view: "org/forgerock/openam/ui/user/oauth2/TokensView",
+            role: "authenticated",
+            url: "oauth2/tokens",
             forceUpdate: true
         }
 

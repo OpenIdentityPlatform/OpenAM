@@ -126,6 +126,25 @@ define("config/AppConfiguration", [
                                 {"validators":"config/validators/CommonValidators"}
                        ]
                    } 
+               },
+               {
+                    moduleClass: "org/forgerock/commons/ui/common/components/Navigation",
+                    configuration: {
+                        links: {
+                            "user" : {
+                                "urls": {
+                                    "dashboard": {
+                                        "url": "#dashboard/",
+                                        "name": "config.AppConfiguration.Navigation.links.dashboard"
+                                    },
+                                    "oauth2": {
+                                        "url": "#oauth2/tokens",
+                                        "name": "config.AppConfiguration.Navigation.links.oauthtokens"
+                                    }
+                                }
+                            }
+                        }
+                    }
                }
                ],
                loggerLevel: 'debug'

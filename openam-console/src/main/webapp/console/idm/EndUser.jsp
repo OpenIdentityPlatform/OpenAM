@@ -62,6 +62,8 @@
 
 <cc:propertysheet name="propertyAttributes" bundleID="amConsole" showJumpLinks="false"/>
 
+<a href="../XUI/#oauth2/tokens">OAuth 2.0 Token Management</a>
+
 </cc:form>
 
 </cc:header>
