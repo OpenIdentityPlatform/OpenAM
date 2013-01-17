@@ -154,4 +154,13 @@
         </resources>
     </build>
 
+    <dependencies>
+
+        <dependency>
+            <groupId>com.sun.xml.bind</groupId>
+            <artifactId>jaxb-libs</artifactId>
+        </dependency>
+
+    </dependencies>
+
 </project>
