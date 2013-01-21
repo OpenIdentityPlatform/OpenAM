@@ -857,7 +857,7 @@ public class LDAPv3Repo extends IdRepo {
      * 
      * @see com.iplanet.am.sdk.IdRepo#initialize(java.util.Map)
      */
-    public void initialize(Map configParams) {
+    public void initialize(Map configParams) throws IdRepoException {
         if (debug.messageEnabled()) {
             debug.message("LDAPv3Repo: Initializing configuration()");
         }
@@ -1058,6 +1058,9 @@ public class LDAPv3Repo extends IdRepo {
         }
 
         initConnectionPool(configParams);
+        
+        // check if connection pool is initialized properly
+        checkConnPool(); 
 
         if (debug.messageEnabled()) {
             debug.message("    userObjClassSet: " + userObjClassSet);

@@ -1085,7 +1085,7 @@ public class AgentsRepo extends IdRepo implements ServiceListener {
      * 
      * @see com.sun.identity.idm.IdRepo#initialize(java.util.Map)
      */
-    public void initialize(Map configParams) {
+    public void initialize(Map configParams) throws IdRepoException {
         super.initialize(configParams);
         // Initialize with the realm name
         Set realms = (Set) configParams.get("agentsRepoRealmName");

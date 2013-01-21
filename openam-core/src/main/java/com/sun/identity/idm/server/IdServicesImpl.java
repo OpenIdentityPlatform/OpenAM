@@ -263,6 +263,14 @@ public class IdServicesImpl implements IdServices {
                    "IdRepo plugins for the org: " + orgName);
            }
            return (false);
+       } catch (IdRepoException ex) {
+           // Debug the message and return false
+           if (getDebug().messageEnabled()) {
+               getDebug().message(
+                   "IdServicesImpl.authenticate: " + "Error obtaining " +
+                   "IdRepo plugins for the org: " + orgName);
+           }
+           return (false);
        }
        
        // Check for internal user. If internal user, use SpecialRepo only

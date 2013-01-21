@@ -551,7 +551,7 @@ public class AMSDKRepo extends IdRepo {
      * 
      * @see com.sun.identity.idm.IdRepo#initialize(java.util.Map)
      */
-    public void initialize(Map configParams) {
+    public void initialize(Map configParams) throws IdRepoException {
 
         super.initialize(configParams);
         if (debug.messageEnabled()) {

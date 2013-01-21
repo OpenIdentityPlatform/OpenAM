@@ -865,7 +865,7 @@ public class SpecialRepo extends IdRepo implements ServiceListener {
      * @see com.sun.identity.idm.IdRepo#initialize(java.util.Map)
      */
     @Override
-    public void initialize(Map configParams) {
+    public void initialize(Map configParams) throws IdRepoException {
         super.initialize(configParams);
     }
 

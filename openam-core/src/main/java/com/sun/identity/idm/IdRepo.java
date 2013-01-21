@@ -67,8 +67,9 @@ public abstract class IdRepo {
      * Initialization paramters as configred for a given plugin.
      * 
      * @param configParams
+     * @throws IdRepoException 
      */
-    public void initialize(Map configParams) {
+    public void initialize(Map configParams) throws IdRepoException {
         configMap = Collections.unmodifiableMap(configParams);
     }
 

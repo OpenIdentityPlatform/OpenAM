@@ -183,7 +183,7 @@ public class FilesRepo extends IdRepo {
      * 
      * @see com.sun.identity.idm.IdRepo#initialize(java.util.Map)
      */
-    public void initialize(Map configParams) {
+    public void initialize(Map configParams) throws IdRepoException {
         super.initialize(configParams);
         // Get the directory to store the identity information
         Set set = (Set) configParams.get(DIRECTORY);
