@@ -389,6 +389,12 @@ public class AuthXMLHandler implements RequestHandler {
         }
         
         AuthContext.Status loginStatus = AuthContext.Status.IN_PROGRESS;
+        HttpServletRequest clientRequest = authXMLRequest.getClientRequest();
+        loginState.setHttpServletRequest(clientRequest);
+        loginState.setHttpServletResponse(authXMLRequest.getClientResponse());
+        if (clientRequest != null) {
+            loginState.setParamHash(AuthUtils.parseRequestParameters(clientRequest));
+        }
         switch (requestType) {
             case AuthXMLRequest.NewAuthContext:
                 try {
@@ -418,12 +424,6 @@ public class AuthXMLHandler implements RequestHandler {
                         clientHost = servletRequest.getRemoteAddr();
                     }
                     loginState.setClient(clientHost);
-                    HttpServletRequest clientRequest = authXMLRequest.getClientRequest();
-                    loginState.setHttpServletRequest(clientRequest);
-                    loginState.setHttpServletResponse(authXMLRequest.getClientResponse());
-                    if (clientRequest != null) {
-                        loginState.setParamHash(AuthUtils.parseRequestParameters(clientRequest));
-                    }
                     authContext.login();
                     //setServletRequest(servletRequest,authContext);
                     processRequirements(xml, authContext,authResponse, params,
@@ -465,8 +465,6 @@ public class AuthXMLHandler implements RequestHandler {
                         clientHost = servletRequest.getRemoteAddr();
                     }
                     loginState.setClient(clientHost);
-                    loginState.setHttpServletRequest(authXMLRequest.getClientRequest());
-                    loginState.setHttpServletResponse(authXMLRequest.getClientResponse());
                     String locale = authXMLRequest.getLocale();
                     if (locale != null && locale.length() > 0) {
                         if (debug.messageEnabled()) {
@@ -509,8 +507,6 @@ public class AuthXMLHandler implements RequestHandler {
                     //setServletRequest(servletRequest,authContext);
                     Callback[] submittedCallbacks =
                     authXMLRequest.getSubmittedCallbacks();
-                    loginState.setHttpServletRequest(authXMLRequest.getClientRequest());
-                    loginState.setHttpServletResponse(authXMLRequest.getClientResponse());
                     authContext.submitRequirements(submittedCallbacks);
                     Callback[] reqdCallbacks = null;
                     if (authContext.hasMoreRequirements()) {
