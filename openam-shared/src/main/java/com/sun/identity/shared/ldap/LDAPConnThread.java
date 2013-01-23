@@ -19,6 +19,9 @@
  *
  * Contributor(s): 
  */
+/**
+ * Portions Copyrighted 2013 ForgeRock, Inc.
+ */
 package com.sun.identity.shared.ldap;
 
 import java.util.*;
@@ -59,6 +62,7 @@ class LDAPConnThread implements Runnable {
      */
     private final static int MAXMSGID = Integer.MAX_VALUE;
     private final static int BACKLOG_CHKCNT = 50;
+    private static final String NOTICE_OF_DISCONNECTION_OID = "1.3.6.1.4.1.1466.20036";
 
     /**
      * Internal variables
@@ -685,10 +689,17 @@ class LDAPConnThread implements Runnable {
      * associated with the LDAP msgId.
      * @param msg New message from LDAP server
      */
-    private void processResponse (LDAPMessage msg, int size) {       
-        Integer messageID = new Integer (msg.getMessageID());        
-        LDAPMessageQueue l = (LDAPMessageQueue)m_requests.get (messageID);        
-        if (l == null) {            
+    private void processResponse (LDAPMessage msg, int size) {
+        Integer messageID = new Integer (msg.getMessageID());
+        LDAPMessageQueue l = (LDAPMessageQueue)m_requests.get (messageID);
+        if (l == null) {
+            //Handling incoming unsolicited response
+            if (messageID == 0 && msg.getMessageType() == LDAPMessage.LDAP_EXTENDED_RESPONSE_MESSAGE) {
+                LDAPExtendedResponse resp = (LDAPExtendedResponse) msg;
+                if (resp.getID().equals(NOTICE_OF_DISCONNECTION_OID)) {
+                    networkError(new LDAPException(resp.getErrorMessage()), LDAPException.CONNECT_ERROR);
+                }
+            }
             return; /* nobody is waiting for this response (!) */
         }
 
@@ -879,14 +890,24 @@ class LDAPConnThread implements Runnable {
      * Handles network errors.  Basically shuts down the whole connection.
      * @param e The exception which was caught while trying to read from
      * input stream.
+     * This method by default returns with LDAP 80 SERVER_DOWN error.
      */
     private synchronized void networkError (Exception e) {
+        networkError(e, LDAPException.SERVER_DOWN);
+    }
+
+    /**
+     * Handles network errors.  Basically shuts down the whole connection.
+     * @param e The exception which was caught while trying to read from
+     * @param resultCode The resultcode that should be returned to the client code
+     * input stream.
+     */
+    private synchronized void networkError (Exception e, int resultCode) {
 
         if (m_thread == null) {
             return;
         }
         m_thread = null; // No more request processing
-        cleanUp(new LDAPException("Server or network error",
-                                  LDAPException.SERVER_DOWN));
+        cleanUp(new LDAPException("Server or network error", resultCode));
     }
 }
