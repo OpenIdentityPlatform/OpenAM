@@ -25,7 +25,9 @@
  * $Id: AddPrivileges.java,v 1.9 2009/12/23 21:36:21 veiming Exp $
  *
  */
-
+/**
+ * Portions Copyrighted 2013 ForgeRock, Inc.
+ */
 package com.sun.identity.cli.idrepo;
 
 
@@ -54,6 +56,9 @@ import java.util.logging.Level;
  * This command adds privileges to an identity.
  */
 public class AddPrivileges extends IdentityCommand {
+
+    private static final String ALL_AUTHENTICATED_USERS = "All Authenticated Users";
+
     /**
      * Services a Commandline Request.
      *
@@ -80,14 +85,15 @@ public class AddPrivileges extends IdentityCommand {
             DelegationManager mgr = new DelegationManager(
                 adminSSOToken, realm);
             Set privilegeObjects = mgr.getPrivileges();
-
-            AMIdentity amid = new AMIdentity(
-                adminSSOToken, idName, idType, realm, null); 
-            if (!amid.isExists())  {
-                Object[] p = {idName, type};
-                throw new CLIException(MessageFormat.format(
-                    getResourceString("idrepo-add-privileges-do-not-exist"),
-                    p), ExitCodes.REQUEST_CANNOT_BE_PROCESSED);
+            AMIdentity amid = new AMIdentity(adminSSOToken, idName, idType, realm, null);
+            if (!(idType.equals(IdType.ROLE) && idName.equalsIgnoreCase(ALL_AUTHENTICATED_USERS) )) {
+                //do not check the existense of all authenticated users role as it would fail
+                if (!amid.isExists()) {
+                    Object[] p = {idName, type};
+                    throw new CLIException(MessageFormat.format(
+                            getResourceString("idrepo-add-privileges-do-not-exist"), p),
+                            ExitCodes.REQUEST_CANNOT_BE_PROCESSED);
+                }
             }
             String uid = amid.getUniversalId();
 

@@ -27,7 +27,7 @@
  */
 
 /**
- * Portions Copyrighted 2010-2012 ForgeRock Inc
+ * Portions Copyrighted 2010-2013 ForgeRock Inc
  */
 package com.sun.identity.cli.definition;
 
@@ -1450,7 +1450,8 @@ public class AccessManager {
 
     @SubCommandInfo(
         implClassName="com.sun.identity.cli.idrepo.AddPrivileges",
-        description="Add privileges to an identity",
+        description="Add privileges to an identity. To add a privilege to all authenticated users, use the "
+            + "\"All Authenticated Users\" idname with \"role\" idtype.",
         webSupport="true",
         mandatoryOptions={
             "realm|e|s|Name of realm.",
