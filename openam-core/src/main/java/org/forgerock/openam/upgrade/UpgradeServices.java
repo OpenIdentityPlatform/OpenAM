@@ -1,7 +1,7 @@
 /**
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright (c) 2011 ForgeRock AS. All Rights Reserved
+ * Copyright (c) 2011-2013 ForgeRock, Inc. All Rights Reserved
  *
  * The contents of this file are subject to the terms
  * of the Common Development and Distribution License
@@ -311,7 +311,6 @@ public class UpgradeServices {
         
         // need to reinitialize the tag swap property map with original install params
         IHttpServletRequest requestFromFile = new UpgradeHttpServletRequest(basedir);
-        String dsPwd = getDSPwd(basedir);
         
         try {
             Properties foo = ServerConfiguration.getServerInstance(adminToken, WebtopNaming.getLocalServer());
@@ -321,7 +320,7 @@ public class UpgradeServices {
             boolean embedded = dbOption.equals(SetupConstants.SMS_EMBED_DATASTORE);
             
             if (!embedded) {
-                requestFromFile.addParameter(SetupConstants.CONFIG_VAR_DS_MGR_PWD, dsPwd);
+                setUserAndPassword(requestFromFile, basedir);
             }
         } catch (Exception ex) {
             debug.error("Unable to initialise services defaults", ex);
@@ -581,28 +580,16 @@ public class UpgradeServices {
         return password;
     }
     
-    private String getDSPwd(String basedir)
-    throws UpgradeException {
-        String password = null;
-        BootstrapData bootStrap = null;
-        
+    private void setUserAndPassword(IHttpServletRequest requestFromFile, String basedir) throws UpgradeException {
         try {
-            bootStrap = new BootstrapData(basedir);
+            BootstrapData bootStrap = new BootstrapData(basedir);
+            Map<String, String> data = bootStrap.getDataAsMap(0);
+            requestFromFile.addParameter(SetupConstants.CONFIG_VAR_DS_MGR_DN, data.get(BootstrapData.DS_MGR));
+            requestFromFile.addParameter(SetupConstants.CONFIG_VAR_DS_MGR_PWD,
+                    JCECrypt.decode(data.get(BootstrapData.DS_PWD)));
         } catch (IOException ioe) {
-            debug.error("Unable to load bootstrap file", ioe);
+            debug.error("Unable to load directory user/password from bootstrap file", ioe);
             throw new UpgradeException("Unable to load bootstrap file: " + ioe.getMessage());
         }
-        
-        String data = (String) bootStrap.getData().get(0);
-        
-        if (data == null) {
-            debug.error("Bootstrap file is invalid");
-            throw new UpgradeException("Bootstrap file is invalid");
-        }
-        
-        String encDSPwd = data.substring(data.indexOf(BootstrapData.DS_PWD), data.indexOf('&', data.indexOf(BootstrapData.DS_PWD)));
-        password = JCECrypt.decode(URLEncDec.decode(encDSPwd.substring(BootstrapData.DS_PWD.length() + 1)));
-        
-        return password;
     }
 }
