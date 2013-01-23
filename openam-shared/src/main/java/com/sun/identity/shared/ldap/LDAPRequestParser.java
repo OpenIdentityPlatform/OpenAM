@@ -24,6 +24,9 @@
  *
  * $Id: LDAPRequestParser.java,v 1.1 2009/11/20 23:52:58 ww203982 Exp $
  */
+/**
+ * Portions Copyrighted 2013 ForgeRock Inc
+ */
 package com.sun.identity.shared.ldap;
 
 import com.sun.identity.shared.ldap.ber.stream.BERElement;
@@ -399,7 +402,7 @@ public class LDAPRequestParser {
     public static LDAPSearchRequest parseReadRequest(String dn, String[] attrs,
         int timeLimit, int deref, int sizeLimit) {
         return parseSearchRequest(dn, LDAPConnection.SCOPE_BASE,
-            "(|(objectclass=*)(objectclass=ldapsubentry))", attrs, false,
+            "(objectclass=*)", attrs, false,
             timeLimit, deref, sizeLimit);
     }
 

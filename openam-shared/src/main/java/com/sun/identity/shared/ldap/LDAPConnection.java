@@ -19,6 +19,9 @@
  *
  * Contributor(s): 
  */
+/**
+ * Portions Copyrighted 2013 ForgeRock Inc
+ */
 package com.sun.identity.shared.ldap;
 
 import java.util.*;
@@ -2243,7 +2246,7 @@ public class LDAPConnection
         LDAPSearchConstraints cons) throws LDAPException {
         LDAPSearchResults results =
             search (DN, SCOPE_BASE,
-                    "(|(objectclass=*)(objectclass=ldapsubentry))",
+                    "(objectclass=*)",
                     attrs, false, cons);
         if (results == null) {
             return null;

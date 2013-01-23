@@ -27,7 +27,7 @@
  */
 
 /*
- * Portions Copyrighted 2011-2012 ForgeRock, Inc.
+ * Portions Copyrighted 2011-2013 ForgeRock, Inc.
  */
 
 package org.forgerock.openam.upgrade;
@@ -197,8 +197,6 @@ public class UpgradeUtils {
     static String PRINCIPAL = "Principal";
     static String REALM_MODE = "realmMode";
     static String SERVER_DEFAULTS_FILE = "serverdefaults.properties";
-    static String AUTH_CONFIG_SEARCH_FILTER =
-            "(&(objectclass=LDAPsubentry) (cn=iplanetamauthconfiguration))";
     static String serverNameURL = null;
     final static String COS_TEMPL_FILTER = "objectclass=costemplate";
     final static String DELEGATION_SERVICE = "sunAMDelegationService";

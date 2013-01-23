@@ -25,7 +25,7 @@
 * $Id: SMSEmbeddedLdapObject.java,v 1.3 2009/10/28 04:24:27 hengming Exp $
 */
 /*
- * Portions Copyrighted [2011] [ForgeRock AS]
+ * Portions Copyrighted 2011-2013 ForgeRock, Inc.
  */
 package com.sun.identity.sm.ldap;
 
@@ -214,7 +214,7 @@ public class SMSEmbeddedLdapObject extends SMSObjectDB
         try {
             InternalSearchOperation iso = icConn.processSearch(dn,
                 SearchScope.BASE_OBJECT, DereferencePolicy.NEVER_DEREF_ALIASES,
-                0, 0, false, "(|(objectclass=*)(objectclass=ldapsubentry))",
+                0, 0, false, "(objectclass=*)",
                 smsAttributes);
             ResultCode resultCode = iso.getResultCode();
 
@@ -643,7 +643,7 @@ public class SMSEmbeddedLdapObject extends SMSObjectDB
         try {
             InternalSearchOperation iso = icConn.processSearch(dn,
                 SearchScope.BASE_OBJECT, DereferencePolicy.NEVER_DEREF_ALIASES,
-                0, 0, false, "(|(objectclass=*)(objectclass=ldapsubentry))",
+                0, 0, false, "(objectclass=*)",
                 null);
 
             ResultCode resultCode = iso.getResultCode();
