@@ -27,7 +27,7 @@
  */
 
 /*
- * Portions Copyrighted [2011] [ForgeRock AS]
+ * Portions Copyrighted [2011-2013] [ForgeRock AS]
  */
 package com.sun.identity.entitlement.opensso;
 
@@ -77,11 +77,11 @@ import java.util.concurrent.locks.ReentrantReadWriteLock;
  * objects used as keys must implement the <code>hashCode</code> 
  * method and the <code>equals</code> method. <p>
  *
- * An instance of <code>Cache</code> has two parameters that affect its
- * performance: <i>capacity</i> and <i>load factor</i>.  The
- * <i>capacity</i> is the number of <i>buckets</i> in the hash table, and the
- * <i>capacity</i> is simply the capacity at the time the hash table
- * is created.  Note that the hash table is <i>open</i>: in the case a "hash
+ * An instance of <code>Cache</code> has three parameters that affect its
+ * performance: <i>initial capacity</i>, <i>maximum size</i> and <i>load factor</i>.
+ * The <i>maximum capacity</i> is the maximum number of <i>buckets</i> in the hash
+ * table, and the <i>initial capacity</i> is simply the capacity at the time the
+ * hash table is created.  Note that the hash table is <i>open</i>: in the case a "hash
  * collision", a single bucket stores multiple entries, which must be searched
  * sequentially.  The <i>load factor</i> is a measure of how full the hash
  * table is allowed to get before its capacity is automatically increased.
@@ -127,9 +127,6 @@ import java.util.concurrent.locks.ReentrantReadWriteLock;
  * @since JDK1.0
  */
 public class Cache extends Dictionary implements Map, java.io.Serializable {
-
-    // Default Cache size.
-    private final static int DEFAULT_CACHE_SIZE = 10000;
 
     /**
      * The hash table data.
@@ -189,32 +186,40 @@ public class Cache extends Dictionary implements Map, java.io.Serializable {
      * specified load factor.
      *
      * @param name Name of cache.
-     * @param capacity
+     * @param initCapacity
      *            the capacity of the Cache.
+     * @param maxSize
+     *              the maximum size of the cache.
      * @param loadFactor
      *            the load factor of the Cache.
      * @exception IllegalArgumentException
      *                if the capacity is less than zero, or if the load factor
      *                is nonpositive.
      */
-    public Cache(String name, int capacity, float loadFactor) {
-        if (capacity < 0) {
-            throw new IllegalArgumentException("Illegal Capacity: " + capacity);
+    public Cache(String name, int initCapacity, int maxSize, float loadFactor) {
+        if (initCapacity < 0) {
+            throw new IllegalArgumentException("Illegal Capacity: " + initCapacity);
+        }
+        if (maxSize < 0) {
+            throw new IllegalArgumentException("Illegal maximum size: " + maxSize);
         }
         if (loadFactor <= 0) {
             throw new IllegalArgumentException("Illegal Load: " + loadFactor);
         }
 
-        if (capacity == 0) {
-            capacity = 1;
+        if (initCapacity == 0) {
+            initCapacity = 1;
+        }
+        if (maxSize == 0) {
+            maxSize = 1;
         }
 
         this.name = name;
         this.loadFactor = loadFactor;
-        table = new Entry[capacity];
-        threshold = (int) (capacity * loadFactor);
+        this.maxSize = maxSize;
 
-        maxSize = capacity;
+        table = new Entry[initCapacity];
+        threshold = (int) (initCapacity * loadFactor);
         lruTracker = new LRUList();
     }
 
@@ -223,26 +228,15 @@ public class Cache extends Dictionary implements Map, java.io.Serializable {
      * load factor, which is <tt>0.75</tt>.
      *
      * @param name Name of cache.
-     * @param capacity
-     *            the capacity of the Cache.
+     * @param initCapacity
+     *            the initial capacity of the Cache.
+     * @param maxSize
+     *              the maximum size of the cache.
      * @exception IllegalArgumentException
      *                if the capacity is less than zero.
      */
-    public Cache(String name, int capacity) {
-        this(name, capacity, 0.75f);
-        maxSize = capacity;
-        lruTracker = new LRUList();
-    }
-
-    /**
-     * Constructs a new, empty Cache with a default capacity and load factor,
-     * which is <tt>0.75</tt>.
-     */
-    public Cache(String name) {
-        // Obtain the cache size
-        this(name, DEFAULT_CACHE_SIZE, 0.75f);
-        maxSize = DEFAULT_CACHE_SIZE;
-        lruTracker = new LRUList();
+    public Cache(String name, int initCapacity, int maxSize) {
+        this(name, initCapacity, maxSize, 0.75f);
     }
 
     // required for serializable
@@ -425,17 +419,25 @@ public class Cache extends Dictionary implements Map, java.io.Serializable {
      * Increases the capacity of and internally reorganizes this Cache, in order
      * to accommodate and access its entries more efficiently. This method is
      * called automatically when the number of keys in the Cache exceeds this
-     * Cache's capacity and load factor.
+     * Cache's capacity and load factor. It ensures the new capacity does not
+     * exceed the maximum size.
      */
     protected void rehash() {
         int oldCapacity = table.length;
         Entry oldMap[] = table;
 
         int newCapacity = oldCapacity * 2 + 1;
+
+        if (newCapacity > maxSize) {
+            newCapacity = maxSize;
+            threshold = newCapacity;
+        } else {
+            threshold = (int) (newCapacity * loadFactor);
+        }
+
         Entry newMap[] = new Entry[newCapacity];
 
         modCount++;
-        threshold = (int) (newCapacity * loadFactor);
         table = newMap;
         for (int i = oldCapacity; i-- > 0;) {
             for (Entry old = oldMap[i]; old != null;) {

@@ -23,6 +23,8 @@
  * "Portions Copyrighted [year] [name of copyright owner]"
  *
  * $Id: IndexCache.java,v 1.3 2009/12/12 00:03:13 veiming Exp $
+ *
+ * Portions copyright 2013 ForgeRock, Inc.
  */
 package com.sun.identity.entitlement.opensso;
 
@@ -45,6 +47,7 @@ public class IndexCache {
     private static final int CACHE_BUCKET_LIMIT = 25;
 
     private int size = 1000000;
+    private int initCapacity;
     private Cache subjectIndexCache;
     private Cache hostIndexCache;
     private Cache pathIndexCache;
@@ -58,6 +61,7 @@ public class IndexCache {
      */
     public IndexCache(int size) {
         this.size = size;
+        initCapacity = (int) (size * 0.01d);
         clearCaches();
     }
 
@@ -139,10 +143,10 @@ public class IndexCache {
     private synchronized void clearCaches() {
         rwlock.writeLock().lock();
         try {
-            subjectIndexCache = new Cache(SUBJECT_ID, size);
-            hostIndexCache = new Cache(HOST_ID, size);
-            pathIndexCache = new Cache(PATH_ID, size);
-            parentPathIndexCache = new Cache(PARENTPATH_ID, size);
+            subjectIndexCache = new Cache(SUBJECT_ID, initCapacity, size);
+            hostIndexCache = new Cache(HOST_ID, initCapacity, size);
+            pathIndexCache = new Cache(PATH_ID, initCapacity, size);
+            parentPathIndexCache = new Cache(PARENTPATH_ID, initCapacity, size);
         } finally {
             rwlock.writeLock().unlock();
         }

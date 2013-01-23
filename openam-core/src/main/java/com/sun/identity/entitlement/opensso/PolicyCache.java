@@ -23,6 +23,8 @@
  * "Portions Copyrighted [year] [name of copyright owner]"
  *
  * $Id: PolicyCache.java,v 1.3 2009/12/12 00:03:13 veiming Exp $
+ *
+ * Portions copyright 2013 ForgeRock, Inc.
  */
 
 package com.sun.identity.entitlement.opensso;
@@ -43,7 +45,8 @@ class PolicyCache {
     private ReadWriteLock rwlock = new ReentrantReadWriteLock();
 
     PolicyCache(String name, int size) {
-        cache = new Cache(name, size);
+        int initCapacity = (int) (size * 0.01d);
+        cache = new Cache(name, initCapacity, size);
         countByRealm = new HashMap<String, Integer>();
     }
 
