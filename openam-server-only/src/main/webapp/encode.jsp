@@ -26,7 +26,7 @@
 --%>
 
 <%--
-   Portions Copyrighted 2010 ForgeRock AS
+   Portions Copyrighted 2010-2013 ForgeRock, Inc.
 --%>
 
 <%@page contentType="text/html; charset=UTF-8" %> 
@@ -91,7 +91,7 @@
                 out.println(
                    "<form name=\"frm\" action=\"encode.jsp\" method=\"post\">");
                 out.println(rb.getString("prompt-pwd"));
-                out.println("<input type=\"text\" name=\"password\" />");
+                out.println("<input type=\"text\" name=\"password\" autocomplete=\"off\" />");
                 out.println("<input type=\"submit\" value=\"" +
 			rb.getString("btn-encode") + "\" />");
                 out.println("</form>");
