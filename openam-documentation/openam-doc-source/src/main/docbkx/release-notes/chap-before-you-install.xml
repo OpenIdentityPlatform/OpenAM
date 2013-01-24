@@ -20,7 +20,7 @@
   !
   ! CCPL HEADER END
   !
-  !      Copyright 2011-2012 ForgeRock AS
+  !      Copyright 2011-2013 ForgeRock AS
   !    
 -->
 <chapter xml:id='chap-before-you-install'
@@ -29,12 +29,10 @@
  xsi:schemaLocation='http://docbook.org/ns/docbook http://docbook.org/xml/5.0/xsd/docbook.xsd'
  xmlns:xlink='http://www.w3.org/1999/xlink'
  xmlns:xinclude='http://www.w3.org/2001/XInclude'>
- <title>Before You Install OpenAM Software</title>
+ <title>Before You Install OpenAM <?eval ${serverDocTargetVersion}?> Software</title>
 
  <para>This chapter covers software and hardware prerequisites for installing
- and running OpenAM software. If you have a special request to support a
- component or combination not listed here, contact ForgeRock at <link
- xlink:href="mailto:info@forgerock.com">info@forgerock.com</link>.</para>
+ and running OpenAM software.</para>
  
  <section xml:id="java-requirements">
   <title>Java Requirements</title>
@@ -74,8 +72,8 @@
    </listitem>
 -->
    <listitem>
-    <para>Oracle WebLogic Server 11g</para>
-    <para>Oracle WebLogic Server 12c</para>
+    <para>Oracle WebLogic Server 11g (10.3.5)</para>
+    <para>Oracle WebLogic Server 12c (12.1.1)</para>
    </listitem>
   </itemizedlist>
 
@@ -97,12 +95,14 @@
    </listitem>
    <listitem>
     <para>External ForgeRock OpenDJ data store</para>
+    <para>ForgeRock recommends updating to the latest stable release.</para>
    </listitem>
    <listitem>
-    <para>External Sun OpenDS data store</para>
+    <para>External Sun OpenDS data store, version 2 or later</para>
    </listitem>
    <listitem>
-    <para>External Oracle Directory Server Enterprise Edition data store</para>
+    <para>External Oracle Directory Server Enterprise Edition data store,
+    version 6.3 or later</para>
    </listitem>
   </itemizedlist>
 
@@ -113,22 +113,24 @@
     <para>ForgeRock OpenDJ</para>
    </listitem>
    <listitem>
-    <para>Microsoft Active Directory</para>
+    <para>Microsoft Active Directory (tested by ForgeRock on Windows Server
+    2008 R2)</para>
    </listitem>
    <listitem>
+    <!-- TODO: Version pending test results -->
     <para>IBM Tivoli Directory Server</para>
    </listitem>
    <listitem>
-    <para>OpenDS</para>
+    <para>OpenDS, version 2 or later</para>
    </listitem>
    <listitem>
-    <para>Oracle Directory Server Enterprise Edition</para>
+    <para>Oracle Directory Server Enterprise Edition, version 6.3 or later</para>
    </listitem>
   </itemizedlist>
 
-  <para>OpenAM also works with OpenLDAP and other LDAPv3 compliant directory
-  servers. Some features of OpenAM depend on features supported by your
-  directory service, such as the following:</para>
+  <para>OpenAM also works with other LDAPv3 compliant directory servers. Some
+  features of OpenAM depend on features supported by your directory service,
+  such as the following:</para>
   <itemizedlist>
    <listitem>
     <para>Extensible LDAP schema, required to extend the schema for OpenAM.
@@ -147,13 +149,13 @@
    <listitem>
     <para>The Behera Internet-Draft <link xlink:show="new"
     xlink:href="http://tools.ietf.org/html/draft-behera-ldap-password-policy-09"
-    >Password Policy for LDAP Directories</link> (for OpenAM password reset,
-    for example)</para>
+    >Password Policy for LDAP Directories</link> (in the context of the LDAP
+    authentication module only)</para>
    </listitem>
   </itemizedlist>
-  <para>If you plan to deploy with OpenLDAP or other LDAPv3 directory for
-  user data, make sure you test your solution before you deploy to ensure
-  all OpenAM features that you use work as expected.</para>
+  <para>If you plan to deploy with OpenLDAP or other LDAPv3 directory for user
+  data, make sure you test your solution before you deploy to ensure all OpenAM
+  features that you use work as expected.</para>
  </section>
 
  <section xml:id="browsers-tested">
@@ -201,8 +203,23 @@
   <para>You can deploy OpenAM on any hardware supported for the combination of
   software required. Deploying OpenAM requires a minimum of 1 GB free RAM over
   and above the RAM used by all other software on the system.</para>
-  
+
+  <para>Minimum requirements are enough to start and to evaluate OpenAM.
+  Recommended hardware resources depend on your specific deployment
+  requirements. For more information, see the <citetitle>Administration
+  Guide</citetitle> chapter on <link xlink:href="admin-guide#chap-tuning"
+  xlink:role="http://docbook.org/xlink/role/olink"><citetitle>Tuning
+  OpenAM</citetitle></link>.</para>
+
   <para>ForgeRock has tested this release of OpenAM primarily on x86 and x64
   based systems.</para>
+ </section>
+
+ <section xml:id="special-requests">
+  <title>Special Requests</title>
+
+  <para><emphasis role="strong">If you have a special request regarding support
+  for a component or combination not listed here, contact ForgeRock at <link
+  xlink:href="mailto:info@forgerock.com">info@forgerock.com</link>.</emphasis></para>
  </section>
 </chapter>

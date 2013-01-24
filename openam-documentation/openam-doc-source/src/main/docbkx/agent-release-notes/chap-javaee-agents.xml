@@ -20,7 +20,7 @@
   !
   ! CCPL HEADER END
   !
-  !      Copyright 2012 ForgeRock AS
+  !      Copyright 2012-2013 ForgeRock AS
   !    
 -->
 <chapter xml:id='chap-javaee-agents'
@@ -139,7 +139,7 @@
     </listitem>
     <listitem>
      <para>JBoss Enterprise Application Platform 5</para>
-     <para>JBoss Application Server 7.1</para>
+     <!-- Pending OPENAM-1735: <para>JBoss Application Server 7.1</para>-->
     </listitem>
     <listitem>
      <para>Jetty 7</para>
@@ -154,7 +154,7 @@
    <title>Java EE Agents Platform Requirements</title>
 
    <para>Apache Tomcat Java EE policy agents have been tested on Linux 2.6 or
-   later, and on Microsoft Windows Server 2008R2.</para>
+   later, and on Microsoft Windows Server 2008 R2.</para>
 
    <para>GlassFish Java EE policy agents have been tested on Oracle Solaris 10
    or later.</para>
