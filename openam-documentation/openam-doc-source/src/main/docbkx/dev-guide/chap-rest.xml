@@ -20,7 +20,7 @@
   !
   ! CCPL HEADER END
   !
-  !      Copyright 2011-2012 ForgeRock AS
+  !      Copyright 2011-2013 ForgeRock AS
   !    
 -->
 <chapter xml:id='chap-rest'
@@ -403,11 +403,18 @@ $ curl https://openam.example.com:8443/openam/oauth2/tokeninfo
    <title>OAuth 2.0 Token Administration Endpoint</title>
 
    <para>The OpenAM-specific OAuth 2.0 token administration endpoint lets
-   administrators, read, list, and delete OAuth 2.0 tokens. OAuth 2.0 clients
+   administrators read, list, and delete OAuth 2.0 tokens. OAuth 2.0 clients
    can also manage their own tokens.</para>
 
-   <para>OpenAM exposes this endpoint at <literal>/frrest/oauth2/token</literal>,
-   such as
+   <para>Resource owners can manage OAuth 2.0 tokens that they authorized by
+   using the web-based OAuth 2 Token Manager. See the <citetitle>Administration
+   Guide</citetitle> section on <link
+   xlink:href="admin-guide#oauth2-manage-tokens"
+   xlink:role="http://docbook.org/xlink/role/olink"
+   ><citetitle>Managing OAuth 2.0 Tokens</citetitle></link> for details.</para>
+
+   <para>OpenAM exposes the token administration endpoint at
+   <literal>/frrest/oauth2/token</literal>, such as
    <literal>https://openam.example.com:8443/openam/frrest/oauth2/token</literal>.</para>
 
    <note>

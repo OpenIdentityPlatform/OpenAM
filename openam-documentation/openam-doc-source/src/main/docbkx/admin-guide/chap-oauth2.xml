@@ -393,6 +393,42 @@
   </procedure>
  </section>
 
+ <section xml:id="oauth2-manage-tokens">
+  <title>Managing OAuth 2.0 Tokens</title>
+
+  <para>OpenAM exposes a RESTful API that lets administrators read, list, and
+  delete OAuth 2.0 tokens. OAuth 2.0 clients can also manage their own tokens.
+  See the <citetitle>Developer's Guide</citetitle> section on the <link
+  xlink:href="dev-guide#rest-api-oauth2-token-admin-endpoint"
+  xlink:role="http://docbook.org/xlink/role/olink"><citetitle>OAuth 2.0 Token
+  Administration Endpoint</citetitle></link> for details.</para>
+
+  <para>OpenAM also lets resource owners browse and delete OAuth 2.0 tokens
+  that they authorized. Resource owners can do this from the OAuth 2 Token
+  Manager page.</para>
+
+  <para>To access the page, login to OpenAM at <literal>/XUI</literal>, such as
+  <literal>https://openam.example.com:8443/openam/XUI/</literal>, as the
+  resource owner. Then click the OAuth 2 Token Manager link at the top of the
+  page.</para>
+
+  <para>For example, the following screen shows the demo user (user name:
+  <literal>demo</literal>, password: <literal>changeit</literal>) browsing
+  access tokens on OAuth 2 Token Manager page, after the OAuth 2.0 client with
+  identifier <literal>myClientID</literal> has been granted tokens by using the
+  Resource Owner Password Credentials Grant as shown in the
+  <citetitle>Developer's Guide</citetitle>.</para>
+
+  <mediaobject xml:id="figure-oauth2-tokens-gui">
+   <alt>Managing OAuth 2.0 tokens as a resource owner</alt>
+   <imageobject>
+    <imagedata fileref="images/oauth2-tokens-gui.png" format="PNG" />
+   </imageobject>
+   <textobject><para>The resource owner can browse and delete tokens issued to
+   clients.</para></textobject>
+  </mediaobject>
+ </section>
+
  <section xml:id="oauth2-client-plus-authz">
   <title>Configuring OpenAM as Authorization Server &amp; Client</title>
 
