@@ -39,6 +39,9 @@
     <description>OpenAM Federation</description>
     <artifactId>OpenFM</artifactId>
     <packaging>jar</packaging>
+    <properties>
+        <skipTests>true</skipTests>
+    </properties>
 
     <!-- Build -->
     <build>
