@@ -26,8 +26,14 @@
  *
  */
 
+/*
+ * Portions Copyrighted 2013 ForgeRock, Inc.
+ */
+
 package com.sun.identity.entitlement;
 
+import com.sun.identity.common.ShutdownListener;
+import com.sun.identity.common.ShutdownManager;
 import com.sun.identity.entitlement.interfaces.IThreadPool;
 
 /**
@@ -37,15 +43,32 @@ public class EntitlementThreadPool implements IThreadPool {
     private ThreadPool thrdPool;
 
     public EntitlementThreadPool(int size) {
+
         thrdPool = new ThreadPool("entitlementThreadPool", size);
+        ShutdownManager shutdownMan = ShutdownManager.getInstance();
+        if (shutdownMan.acquireValidLock()) {
+            try {
+                shutdownMan.addShutdownListener(new ShutdownListener() {
+                    public void shutdown() {
+                        thrdPool.shutdown();
+                        thrdPool = null;
+                    }
+                });
+            } finally {
+                shutdownMan.releaseLockAndNotify();
+            }
+        }
     }
 
 
     public void submit(Runnable task) {
-        try {
-            thrdPool.run(task);
-        } catch (ThreadPoolException e) {
-            PrivilegeManager.debug.error("EntitlementThreadPool.submit", e);
+
+        if (thrdPool != null) {
+            try {
+                thrdPool.run(task);
+            } catch (ThreadPoolException e) {
+                PrivilegeManager.debug.error("EntitlementThreadPool.submit", e);
+            }
         }
     }
 }

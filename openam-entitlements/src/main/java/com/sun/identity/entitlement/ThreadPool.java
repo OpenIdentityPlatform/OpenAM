@@ -25,6 +25,11 @@
  * $Id: ThreadPool.java,v 1.1 2009/08/19 05:40:34 veiming Exp $
  *
  */
+
+/*
+ * Portions Copyrighted 2013 ForgeRock, Inc.
+ */
+
 package com.sun.identity.entitlement;
 
 import java.util.LinkedList;
@@ -56,6 +61,7 @@ public class ThreadPool {
     private WorkerThread[] threads;
     private Lock lock = new ReentrantLock();
     private Condition hasTasks = lock.newCondition();
+    private volatile boolean shutdownThePool;
 
     /**
      * Constructs a thread pool with given parameters.
@@ -75,13 +81,11 @@ public class ThreadPool {
     }
 
     /**
-     * Create thread for the pool.
-     *
-     * @param threadsToCreate number of threads of the pool after creation
+     * Create threads for the pool.
      */
     private synchronized  void createThreads() {
         for (int i = 0; i < poolSize; i++) {
-            WorkerThread t = new WorkerThread(poolName, this);
+            WorkerThread t = new WorkerThread(poolName + i, this);
             t.setDaemon(true);
             t.start();
             threads[i] = t;
@@ -105,8 +109,29 @@ public class ThreadPool {
         }
     }
 
+    /**
+     * Shuts down the ThreadPool.
+     */
+    public void shutdown() {
+
+        if (!shutdownThePool) {
+            shutdownThePool = true;
+            for (WorkerThread thread : threads) {
+                thread.terminate();
+            }
+            lock.lock();
+            try {
+                // Signal all the threads in the await state to continue
+                hasTasks.signalAll();
+            } finally {
+                lock.unlock();
+            }
+        }
+    }
+
     private class WorkerThread extends Thread {
         private ThreadPool pool;
+        private volatile boolean shouldTerminate;
 
         public WorkerThread(String name, ThreadPool pool) {
             setName(name);
@@ -118,7 +143,12 @@ public class ThreadPool {
          */
         @Override
         public void run() {
-            while (true) {
+
+            if (PrivilegeManager.debug.messageEnabled()) {
+                PrivilegeManager.debug.message("WorkerThread.run started for " + getName());
+            }
+
+            while (!shouldTerminate) {
                 Runnable task = null;
                 try {
                     pool.lock.lock();
@@ -129,13 +159,25 @@ public class ThreadPool {
                     }
                 } catch (InterruptedException ex) {
                     PrivilegeManager.debug.error("WorkerThread.run", ex);
+                    shouldTerminate = true;
                 } finally {
                     pool.lock.unlock();
                 }
-                if (task != null) {
+                if (!shouldTerminate && task != null) {
                     task.run();
                 }
             }
+
+            if (PrivilegeManager.debug.messageEnabled()) {
+                PrivilegeManager.debug.message("WorkerThread.run finished for " + getName());
+            }
+        }
+
+        /**
+         * Signal that we should stop running
+         */
+        public void terminate() {
+            shouldTerminate = true;
         }
     }
 }
