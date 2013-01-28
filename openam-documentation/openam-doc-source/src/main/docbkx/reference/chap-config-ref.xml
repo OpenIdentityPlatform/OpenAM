@@ -20,7 +20,7 @@
   !
   ! CCPL HEADER END
   !
-  !      Copyright 2012 ForgeRock AS
+  !      Copyright 2012-2013 ForgeRock AS
   !    
 -->
 <chapter xml:id='chap-config-ref'
@@ -1765,7 +1765,7 @@
    <varlistentry>
     <term>Attribute name for Name ID information</term>
     <listitem>
-     <para>User entry attribute to store name identitier information</para>
+     <para>User entry attribute to store name identifier information</para>
 
      <para><command>ssoadm</command> attribute:
      <literal>NameIDInfoAttribute</literal></para>
@@ -1775,7 +1775,7 @@
    <varlistentry>
     <term>Attribute name for NAME ID information key</term>
     <listitem>
-     <para>User entry attribute to store the name identitier key</para>
+     <para>User entry attribute to store the name identifier key</para>
 
      <para><command>ssoadm</command> attribute:
      <literal>NameIDInfoKeyAttribute</literal></para>
@@ -1795,7 +1795,7 @@
    <varlistentry>
     <term>Cookie type for IDP Discovery Service</term>
     <listitem>
-     <para>Indicates whether to use PERISTENT or SESSION cookies</para>
+     <para>Indicates whether to use PERSISTENT or SESSION cookies</para>
 
      <para><command>ssoadm</command> attribute:
      <literal>IDPDiscoveryCookieType</literal></para>
@@ -2014,7 +2014,7 @@
    <varlistentry>
     <term>Is Request Signature Verified</term>
     <listitem>
-     <para>If yes, then OpenAM verifies signatures on imcoming requests.</para>
+     <para>If yes, then OpenAM verifies signatures on incoming requests.</para>
 
      <para><command>ssoadm</command> attribute:
      <literal>isRequestSign</literal></para>
@@ -2377,7 +2377,7 @@
    <varlistentry>
     <term>Session Timeout Handler implementations</term>
     <listitem>
-     <para>Lists plugin classes implementingi session timeout handlers</para>
+     <para>Lists plugin classes implementing session timeout handlers</para>
 
      <para><command>ssoadm</command> attribute:
      <literal>openam-session-timeout-handler-list</literal></para>
@@ -2402,7 +2402,7 @@
      the user to authenticate again</para>
 
      <para><command>ssoadm</command> attribute:
-     <literal></literal></para>
+     <literal>iplanet-am-session-max-idle-time</literal></para>
     </listitem>
    </varlistentry>
 
@@ -2527,7 +2527,7 @@
    <varlistentry>
     <term>Notification URL</term>
     <listitem>
-     <para>The notification service entpoint.</para>
+     <para>The notification service endpoint.</para>
 
      <para>property:
      <literal>com.sun.identity.client.notification.url</literal></para>
@@ -2629,7 +2629,6 @@
     <listitem>
      <para>Default class used to handle encryption</para>
      <para>Default: <literal>com.iplanet.services.util.JCEEncryption</literal></para>
-     <para></para>
 
      <para>property:
      <literal>com.iplanet.security.encryptor</literal></para>
@@ -2839,7 +2838,7 @@
    <varlistentry>
     <term>OCSP: Check Enabled</term>
     <listitem>
-     <para>If yes, then OpenAM runs Online Certificate Status Protocol (OSCP)
+     <para>If yes, then OpenAM runs Online Certificate Status Protocol (OCSP)
      checks.</para>
      <para>Default: Yes</para>
 
@@ -2851,7 +2850,7 @@
    <varlistentry>
     <term>Responder URL</term>
     <listitem>
-     <para>URL for OSCP responder</para>
+     <para>URL for OCSP responder</para>
      <para>Not set by default</para>
 
      <para>property:
@@ -2862,7 +2861,7 @@
    <varlistentry>
     <term>Certificate Nickname</term>
     <listitem>
-     <para>Nickname for OSCP responder certificate</para>
+     <para>Nickname for OCSP responder certificate</para>
      <para>Not set by default</para>
 
      <para>property:
@@ -3330,7 +3329,7 @@
    <varlistentry>
     <term><literal>com.iplanet.am.pcookie.name</literal></term>
     <listitem>
-     <para>Peristent cookie name.</para>
+     <para>Persistent cookie name.</para>
      <para>Default: <literal>DProPCookie</literal></para>
     </listitem>
    </varlistentry>
@@ -3392,7 +3391,7 @@
    <varlistentry>
     <term><literal>com.iplanet.am.session.failover.cluster.stateCheck.timeout</literal></term>
     <listitem>
-     <para>Socket imeout in milliseconds for health checks of other servers in
+     <para>Socket timeout in milliseconds for health checks of other servers in
      the same site.</para>
      <para>Default: 1000</para>
     </listitem>
@@ -3617,6 +3616,17 @@
     <listitem>
      <para>Maximum number of policy decisions OpenAM caches.</para>
      <para>Default: 10000</para>
+    </listitem>
+   </varlistentry>
+
+   <varlistentry>
+    <term><literal>com.sun.identity.server.fqdnMap</literal></term>
+    <listitem>
+     <para>Enables virtual hosts, partial hostname and IP address. Maps invalid
+     or virtual name keys to valid FQDN values for proper redirection.</para>
+     <para>To map <literal>myserver</literal> to
+     <literal>myserver.example.com</literal>, set
+     <literal>com.sun.identity.server.fqdnMap[myserver]=myserver.example.com</literal>.</para>
     </listitem>
    </varlistentry>
 
