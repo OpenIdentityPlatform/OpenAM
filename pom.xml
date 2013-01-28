@@ -219,9 +219,6 @@
         <!-- OpenAM CLI Module -->
         <module>openam-cli</module>
 
-        <!-- OpenAM Common Test Suite -->
-        <!--module>openam-test</module-->
-
         <!-- OpenAM Federation Modules -->
         <module>openam-federation</module>
 
