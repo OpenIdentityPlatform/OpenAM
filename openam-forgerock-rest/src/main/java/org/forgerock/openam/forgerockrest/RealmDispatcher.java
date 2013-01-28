@@ -50,7 +50,7 @@ public final class RealmDispatcher {
             router.addRoute(EQUALS, rName + "groups", new IdentityResource("group", rName));
 
             Set subOrgs = ocm.getSubOrganizationNames();           //grab subrealms
-            router.addRoute(EQUALS, "/realms", new RealmResource(subOrgs));
+            router.addRoute(EQUALS, rName + "realms", new RealmResource(subOrgs));
             //Recursively calls on each realm registring users agents groups for each subrealm
             for (Object theRealm : subOrgs) {
                 String realm = rName + (String) theRealm;

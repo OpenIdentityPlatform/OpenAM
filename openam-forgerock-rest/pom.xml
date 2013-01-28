@@ -24,7 +24,8 @@
   ~ "Portions Copyrighted [year] [name of copyright owner]"
   -->
 
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <parent>
         <groupId>org.forgerock.openam</groupId>
@@ -45,8 +46,16 @@
         <restlet.version>2.1-RC4</restlet.version>
     </properties>
 
-        <build>
-            <plugins>
+    <build>
+        <plugins>
+            <!--Skipping Tests for Now -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-surefire-plugin</artifactId>
+                <configuration>
+                    <skip>true</skip>
+                </configuration>
+            </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-jar-plugin</artifactId>
@@ -72,70 +81,75 @@
                             <Create-On>${maven.build.timestamp}</Create-On>
                             <SVN-Revision>R${svn-revision.revision}</SVN-Revision>
                             <!-- TODO Add License to Manifest -->
-                            <License />
+                            <License/>
                         </manifestEntries>
                     </archive>
                 </configuration>
             </plugin>
-            </plugins>
-        </build>
+        </plugins>
+    </build>
 
-        <dependencies>
+    <dependencies>
 
-            <!-- Java EE -->
-            <dependency>
-                <groupId>javax.servlet</groupId>
-                <artifactId>servlet-api</artifactId>
-                <scope>provided</scope>
-            </dependency>
+        <!-- Java EE -->
+        <dependency>
+            <groupId>javax.servlet</groupId>
+            <artifactId>servlet-api</artifactId>
+            <scope>provided</scope>
+        </dependency>
 
-            <!-- OpenAM Shared -->
-            <dependency>
-                <groupId>org.forgerock.openam</groupId>
-                <artifactId>openam-shared</artifactId>
-            </dependency>
-            <!-- OpenAM core -->
-            <dependency>
-                <groupId>org.forgerock.openam</groupId>
-                <artifactId>openam-core</artifactId>
-            </dependency>
+        <!-- OpenAM-CLI -->
+        <dependency>
+            <groupId>org.forgerock.openam</groupId>
+            <artifactId>openam-cli-impl</artifactId>
+        </dependency>
+        <!-- OpenAM Shared -->
+        <dependency>
+            <groupId>org.forgerock.openam</groupId>
+            <artifactId>openam-shared</artifactId>
+        </dependency>
+        <!-- OpenAM core -->
+        <dependency>
+            <groupId>org.forgerock.openam</groupId>
+            <artifactId>openam-core</artifactId>
+        </dependency>
 
-            <!-- Commons -->
-            <dependency>
-                <groupId>org.forgerock.commons</groupId>
-                <artifactId>json-resource</artifactId>
-            </dependency>
-            <dependency>
-                <groupId>org.forgerock.commons</groupId>
-                <artifactId>json-resource-servlet</artifactId>
-            </dependency>
-            <dependency>
-                <groupId>org.forgerock.commons</groupId>
-                <artifactId>json-patch</artifactId>
-            </dependency>
+        <!-- Commons -->
+        <dependency>
+            <groupId>org.forgerock.commons</groupId>
+            <artifactId>json-resource</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.forgerock.commons</groupId>
+            <artifactId>json-resource-servlet</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.forgerock.commons</groupId>
+            <artifactId>json-patch</artifactId>
+        </dependency>
 
-            <dependency>
-                <groupId>javax.ws.rs</groupId>
-                <artifactId>jsr311-api</artifactId>
-            </dependency>
+        <dependency>
+            <groupId>javax.ws.rs</groupId>
+            <artifactId>jsr311-api</artifactId>
+        </dependency>
 
-            <!-- Test Dependencies -->
-            <dependency>
-                <groupId>org.easytesting</groupId>
-                <artifactId>fest-assert</artifactId>
-                <scope>test</scope>
-            </dependency>
-            <dependency>
-                <groupId>org.testng</groupId>
-                <artifactId>testng</artifactId>
-                <scope>test</scope>
-            </dependency>
-            <dependency>
-                <groupId>org.mockito</groupId>
-                <artifactId>mockito-all</artifactId>
-                <scope>test</scope>
-            </dependency>
+        <!-- Test Dependencies -->
+        <dependency>
+            <groupId>org.easytesting</groupId>
+            <artifactId>fest-assert</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.testng</groupId>
+            <artifactId>testng</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.mockito</groupId>
+            <artifactId>mockito-all</artifactId>
+            <scope>test</scope>
+        </dependency>
 
-        </dependencies>
+    </dependencies>
 
 </project>
