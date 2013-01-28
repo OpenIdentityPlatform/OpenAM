@@ -11,23 +11,21 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2012 ForgeRock Inc.
+ * Copyright 2012-2013 ForgeRock Inc.
  */
 package org.forgerock.openam.forgerockrest;
 
 import com.sun.identity.shared.debug.Debug;
-
-import java.lang.String;
-import javax.servlet.ServletException;
-import javax.servlet.ServletConfig;
-import java.lang.reflect.Method;
-
 import org.forgerock.json.resource.ConnectionFactory;
+import org.forgerock.json.resource.RequestHandler;
 import org.forgerock.json.resource.ResourceException;
 import org.forgerock.json.resource.Resources;
-import org.forgerock.json.resource.RequestHandler;
 import org.forgerock.json.resource.Router;
 import org.forgerock.json.resource.ServiceUnavailableException;
+
+import javax.servlet.ServletConfig;
+import javax.servlet.ServletException;
+import java.lang.reflect.Method;
 
 /**
  * A simple {@code Map} based collection resource provider.
