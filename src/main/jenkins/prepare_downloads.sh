@@ -3,7 +3,7 @@
 # Script used within Jenkins Build Process for OpenAM
 # Prepare Artifacts for versioning on Download Site.
 #
-OPENAM_VERSION="10.1.0-SNAPSHOT";
+OPENAM_VERSION="10.2.0-SNAPSHOT";
 mv "$WORKSPACE"/openam-server/target/openam-server-${OPENAM_VERSION}.war \
     "$WORKSPACE"/openam-server/target/openam-server-${OPENAM_VERSION}_`date "+%Y%m%d"`.war
 
