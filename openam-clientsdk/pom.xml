@@ -80,7 +80,6 @@
                     <include>libSOAPBinding.properties</include>
                     <include>libSessionProvider.properties</include>
                     <include>libXACML.properties</include>
-                    <include>serverAttributeMap.properties</include>
                     <include>META-INF/**</include>
                 </includes>
             </resource>
@@ -158,6 +157,7 @@
                         <filter>
                             <artifact>org.forgerock.openam:openam-core</artifact>
                             <includes>
+                                <include>serverAttributeMap.properties</include>
                                 <include>com/iplanet/am/sdk/**</include>
                                 <include>com/iplanet/am/util/**</include>
                                 <include>com/iplanet/dpro/session/service/InternalSession*</include>

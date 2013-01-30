@@ -15,13 +15,15 @@
  */
 package org.forgerock.openam.forgerockrest.session;
 
-import org.forgerock.json.resource.ResultHandler;
+import org.forgerock.json.resource.QueryRequest;
+import org.forgerock.json.resource.QueryResultHandler;
 import org.forgerock.openam.forgerockrest.session.query.SessionQueryManager;
 import org.testng.annotations.Test;
 
 import java.util.Arrays;
 import java.util.List;
 
+import static org.mockito.BDDMockito.given;
 import static org.mockito.BDDMockito.mock;
 import static org.mockito.Mockito.*;
 
@@ -36,14 +38,16 @@ public class SessionResourceTest {
         String weasel = "weasel";
 
         SessionQueryManager mockManager = mock(SessionQueryManager.class);
-        ResultHandler mockHandler = mock(ResultHandler.class);
+        QueryRequest request = mock(QueryRequest.class);
+        given(request.getQueryId()).willReturn(SessionResource.KEYWORD_ALL);
+        QueryResultHandler handler = mock(QueryResultHandler.class);
 
         SessionResource resource = spy(new SessionResource(mockManager));
         List<String> list = Arrays.asList(new String[]{badger, weasel});
         doReturn(list).when(resource).getAllServerIds();
 
         // When
-        resource.readInstance(null, SessionResource.KEYWORD_ALL, null, mockHandler);
+        resource.queryCollection(null, request, handler);
 
         // Then
         List<String> result = Arrays.asList(new String[]{badger, weasel});
@@ -56,12 +60,14 @@ public class SessionResourceTest {
         String badger = "badger";
 
         SessionQueryManager mockManager = mock(SessionQueryManager.class);
-        ResultHandler mockHandler = mock(ResultHandler.class);
+        QueryResultHandler mockHandler = mock(QueryResultHandler.class);
+        QueryRequest request = mock(QueryRequest.class);
+        given(request.getQueryId()).willReturn(badger);
 
         SessionResource resource = spy(new SessionResource(mockManager));
 
         // When
-        resource.readInstance(null, badger, null, mockHandler);
+        resource.queryCollection(null, request, mockHandler);
 
         // Then
         verify(resource, times(0)).getAllServerIds();

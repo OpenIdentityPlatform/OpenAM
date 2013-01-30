@@ -88,10 +88,6 @@
     </fileSets>
     <files>
         <file>
-            <source>${project.basedir}/../../openam-server-only/src/main/resources/config/serverAttributeMap.properties</source>
-            <outputDirectory>resources</outputDirectory>
-        </file>
-        <file>
             <source>${project.basedir}/../../openam-server-only/src/main/resources/config/validserverconfig.properties</source>
             <outputDirectory>resources</outputDirectory>
         </file>

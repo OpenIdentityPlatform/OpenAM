@@ -161,7 +161,7 @@
                     <configuration>
                         <webResources>
                             <webResource>
-                            <directory>${project.basedir}/../../openam-server-only/src/main/resources/config
+                            <directory>${project.basedir}/../../openam-core/src/main/resources
                             </directory>
                             <includes>
                                 <include>serverAttributeMap.properties</include>
