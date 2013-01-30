@@ -20,7 +20,7 @@
   !
   ! CCPL HEADER END
   !
-  !      Copyright 2011-2013 ForgeRock AS
+  !      Copyright 2011-2013 ForgeRock, Inc.
   !    
 -->
 <chapter xml:id='chap-rest'
@@ -143,7 +143,7 @@ boolean=true</screen>
   
   <screen>$ curl "https://openam.example.com:8443/openam/identity/isTokenValid?
  tokenid=INVALID"
- &lt;html&gt;...HTTP Status 401...&lt;/html&gt;</screen>
+ boolean=false</screen>
   
   <para>With a valid token, you can retrieve attributes about the subject.
   OpenAM returns a series of <replaceable>name</replaceable>,
