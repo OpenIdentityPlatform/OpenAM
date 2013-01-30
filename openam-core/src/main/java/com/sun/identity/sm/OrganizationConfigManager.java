@@ -27,7 +27,7 @@
  */
 
 /*
- * Portions Copyrighted [2011] [ForgeRock AS]
+ * Portions Copyrighted 2011-2013 ForgeRock Inc
  */
 package com.sun.identity.sm;
 
@@ -49,6 +49,8 @@ import com.iplanet.ums.IUMSConstants;
 import com.sun.identity.authentication.util.ISAuthConstants;
 import com.sun.identity.common.CaseInsensitiveHashSet;
 import com.sun.identity.idm.IdConstants;
+import com.sun.identity.idm.IdRepoException;
+import com.sun.identity.idm.plugins.internal.AgentsRepo;
 import com.sun.identity.shared.Constants;
 
 /**
@@ -345,6 +347,21 @@ public class OrganizationConfigManager {
             }
         }
 
+        if (realmEnabled) {
+            AgentsRepo agentsRepo = new AgentsRepo();
+            HashMap config = new HashMap(1);
+            HashSet realmName = new HashSet(1);
+            realmName.add(subOrgName);
+            config.put("agentsRepoRealmName", realmName);
+            try {
+                agentsRepo.initialize(config);
+                agentsRepo.createAgentGroupConfig(token);
+            } catch (IdRepoException ide) {
+            	SMSEntry.debug.error("OrganizationConfigManager::"+
+                        "createSubOrganization:", ide);
+            }
+        }
+        		
         // If in realm mode and not in legacy mode, default services needs
         // to be added.
         if (realmEnabled && !coexistMode) {

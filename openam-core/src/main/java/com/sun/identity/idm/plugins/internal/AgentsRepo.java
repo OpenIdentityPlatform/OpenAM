@@ -27,7 +27,7 @@
  */
 
 /*
- * Portions Copyrighted 2012 ForgeRock Inc
+ * Portions Copyrighted 2012-2013 ForgeRock Inc
  * Portions Copyrighted 2012 Open Source Solution Technology Corporation
  */
 package com.sun.identity.idm.plugins.internal;
@@ -276,6 +276,9 @@ public class AgentsRepo extends IdRepo implements ServiceListener {
                 }
             } else if (type.equals(IdType.AGENTGROUP)) {
                 ServiceConfig agentGroupConfig = getAgentGroupConfig(token);
+                if (agentGroupConfig==null) {
+                	agentGroupConfig = createAgentGroupConfig(token);
+                }
                 if (!agentGroupConfig.getSubConfigNames().
                     contains(agentName)) {
                     agentGroupConfig.addSubConfig(agentName, agentType, 0, 
@@ -334,6 +337,12 @@ public class AgentsRepo extends IdRepo implements ServiceListener {
                 }
             } else if (type.equals(IdType.AGENTGROUP)) {
                 ServiceConfig agentGroupConfig = getAgentGroupConfig(token);
+                if (agentGroupConfig==null) {
+                	// Agent not found, throw an exception
+                    Object args[] = { name, type.getName() };
+                    throw (new IdRepoException(IdRepoBundle.BUNDLE_NAME,
+                            "223", args));
+                }
                 aCfg = agentGroupConfig.getSubConfig(name);
                 if (aCfg != null) {
                     // AgentGroup deletion should clear the group memberships
@@ -1024,6 +1033,11 @@ public class AgentsRepo extends IdRepo implements ServiceListener {
                 aCfg = orgConfig.getSubConfig(name);
             } else if (type.equals(IdType.AGENTGROUP)) {
                 ServiceConfig agentGroupConfig = getAgentGroupConfig(token);
+                if (agentGroupConfig == null) {
+                	Object args[] = { NAME, IdOperation.READ.getName() };
+                    throw new IdRepoUnsupportedOpException(IdRepoBundle.BUNDLE_NAME,
+                        "305", args);
+                }
                 aCfg = agentGroupConfig.getSubConfig(name);
             } else {
                 Object args[] = { NAME, IdOperation.READ.getName() };
@@ -1478,19 +1492,6 @@ public class AgentsRepo extends IdRepo implements ServiceListener {
             debug.message("AgentsRepo.getAgentGroupConfig(): called. ");
         }
         try {
-            if (agentGroupConfigCache == null) {
-                if (scm == null) {
-                    scm = new ServiceConfigManager(token, agentserviceName, 
-                        version);
-                }
-                String agentGroupDN = constructDN(agentGroupNode, 
-                    instancesNode, realmName, version, agentserviceName);
-                ServiceConfig orgConfig = getOrgConfig(token);
-                if (orgConfig != null) {
-                    orgConfig.checkAndCreateGroup(agentGroupDN, 
-                        agentGroupNode);
-                }
-            }
             // Always get from ServiceConfigManager which checks the cache
             // and returns latest values stored in cache.
             agentGroupConfigCache = 
@@ -1506,6 +1507,43 @@ public class AgentsRepo extends IdRepo implements ServiceListener {
             if (debug.warningEnabled()) {
                 debug.warning("AgentsRepo.getAgentGroupConfig: "
                     + "Unable to get Agent Group Config due to " +
+                    ssoe.getMessage());
+            }
+        }
+        return (agentGroupConfigCache);
+    }
+    
+    public ServiceConfig createAgentGroupConfig(SSOToken token) {
+    	if (debug.messageEnabled()) {
+            debug.message("createAgentGroupConfig(): called. ");
+        }
+        try {
+            if (scm == null) {
+                scm = new ServiceConfigManager(token, agentserviceName, 
+                    version);
+            }
+            String agentGroupDN = constructDN(agentGroupNode, 
+                instancesNode, realmName, version, agentserviceName);
+            ServiceConfig orgConfig = getOrgConfig(token);
+            if (orgConfig != null) {
+                orgConfig.checkAndCreateGroup(agentGroupDN, 
+                    agentGroupNode);
+            }
+            // Always get from ServiceConfigManager which checks the cache
+            // and returns latest values stored in cache.
+            agentGroupConfigCache = 
+                scm.getOrganizationConfig(realmName, agentGroupNode);
+                        
+        } catch (SMSException smse) {
+            if (debug.warningEnabled()) {
+                debug.warning("createAgentGroupConfig: "
+                    + "Unable to create Agent Group Config due to " +
+                    smse.getMessage());
+            }
+        } catch (SSOException ssoe) {
+            if (debug.warningEnabled()) {
+                debug.warning("createAgentGroupConfig: "
+                    + "Unable to create Agent Group Config due to " +
                     ssoe.getMessage());
             }
         }
