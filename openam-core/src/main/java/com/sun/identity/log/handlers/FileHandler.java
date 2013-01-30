@@ -26,7 +26,7 @@
  *
  */
 /*
- * Portions Copyrighted 2011-2012 ForgeRock Inc
+ * Portions Copyrighted 2011-2013 ForgeRock Inc
  */
 package com.sun.identity.log.handlers;
 
@@ -310,19 +310,21 @@ public class FileHandler extends java.util.logging.Handler {
 
     private void openFiles(String fileName) throws IOException {
         if (rotatingBySize) {
-            // making sure that we have correct count and maxFileSize
-            if (count < 0) {
-                Debug.error(fileName
-                        + ":FileHandler: no. of history files negative " + count);
-                count = 0;
-            }
+            // make sure that we have a valid maxFileSize
             if (maxFileSize < 0) {
                 Debug.error(fileName
                         + ":FileHandler: maxFileSize cannot be negative");
                 maxFileSize = 0;
             }
-            files = new File[count + 1]; // count is the number of history files
-            for (int i = 0; i < count + 1; i++) {
+        }
+        // make sure that we have a valid history count
+        if (count < 0) {
+            Debug.error(fileName
+                    + ":FileHandler: no. of history files negative " + count);
+            count = 0;
+        }
+        files = new File[count + 1]; // count is the number of history files
+        for (int i = 0; i < count + 1; i++) {
                 if (i != 0) {
                     files[i] = new File(fileName + "-" + i);
                 } else {
@@ -330,11 +332,6 @@ public class FileHandler extends java.util.logging.Handler {
                 }
             }
             open(files[0], true);
-        } else {
-            files = new File[1];
-            files[0] = new File(fileName);
-            open(files[0], true);
-        }
     }
 
     /** 
@@ -442,7 +439,7 @@ public class FileHandler extends java.util.logging.Handler {
                 writer.flush();
             } catch (Exception ex) {
                 Debug.error(fileName +
-                        ":FileHandler: Couldnot Flush Output", ex);
+                        ":FileHandler: Could not Flush Output", ex);
             }
         }
     }
@@ -603,7 +600,7 @@ public class FileHandler extends java.util.logging.Handler {
             //
             //  delete file<n>; file<n-1> becomes file<n>; and so on.
             //
-            for (int i = count - 2; i >= 0; i--) {
+            for (int i = count - 1; i >= 0; i--) {
                 File f1 = files[i];
                 File f2 = files[i + 1];
                 if (f1.exists()) {
@@ -626,37 +623,44 @@ public class FileHandler extends java.util.logging.Handler {
                     }
                 }
             }
-            try {
-                open(files[0], false);
-            } catch (IOException ix) {
-                Debug.error(fileName + ":FileHandler: error opening file" + ix);
-            }
         } else {
-            String oldFileName = wrapFilename(this.fileName);
-            String newFileName = location + oldFileName;
-            File f1 = new File(newFileName);
+            // remember when we last rotated
+            lastRotation = System.currentTimeMillis();
+            // Delete the oldest file if it exists
+            if (files[count].exists()) {
+                try {
+                    files[count].delete();
+                } catch (SecurityException secex) {
+                    Debug.error(fileName
+                            + ":FileHandler: could not delete file. msg = "
+                            + secex.getMessage());
+                }
+            }
+            // Move each file up a slot and then replace 0th one with new file
+            for (int i = count - 1; i >= 0; i--) {
+                files[i + 1] = files[i];
+            }
+            // generate a new timestamp based filename
+            String wrappedFilename = wrapFilename(this.fileName);
+            File newLogFile = new File(location, wrappedFilename);
 
-            if (f1.exists()) {
-                Debug.error(fileName
+            if (newLogFile.exists()) {
+                Debug.error(newLogFile.getName()
                         + ":FileHandler: could not rotate file. msg = "
                         + "file already exists!");
             } else {
                 // swap across to the new file
-                files[0] = f1;
-
-                try {
-                    open(files[0], false);
-                } catch (IOException ix) {
-                    Debug.error(fileName + ":FileHandler: error opening file" + ix);
-                }
-
-                // remember when we rotated last
-                lastRotation = System.currentTimeMillis();
-                if (Debug.messageEnabled()) {
-                    Debug.message(fileName
-                            + ":FileHandler: rotate to file " + f1.getName());
-                }
+                files[0] = newLogFile;
             }
+        }
+        if (Debug.messageEnabled()) {
+            Debug.message(fileName
+                    + ":FileHandler: rotate to file " + files[0].getName());
+        }
+        try {
+            open(files[0], false);
+        } catch (IOException ix) {
+            Debug.error(fileName + ":FileHandler: error opening file" + ix);
         }
     }
 
