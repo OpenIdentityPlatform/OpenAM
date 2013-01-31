@@ -27,7 +27,7 @@
  */
 
 /**
- * Portions Copyrighted 2012 ForgeRock Inc
+ * Portions Copyrighted 2012-2013 ForgeRock Inc
  */
 package com.sun.identity.idm.plugins.internal;
 
@@ -58,7 +58,9 @@ import com.sun.identity.authentication.spi.AuthLoginException;
 import com.sun.identity.authentication.util.ISAuthConstants;
 import com.sun.identity.common.CaseInsensitiveHashMap;
 import com.sun.identity.common.CaseInsensitiveHashSet;
+import com.sun.identity.common.DNUtils;
 import com.sun.identity.common.configuration.ServerConfiguration;
+import com.sun.identity.idm.AMIdentity;
 import com.sun.identity.idm.IdConstants;
 import com.sun.identity.idm.IdOperation;
 import com.sun.identity.idm.IdRepo;
@@ -74,7 +76,6 @@ import com.sun.identity.security.AdminTokenAction;
 import com.sun.identity.shared.Constants;
 import com.sun.identity.shared.debug.Debug;
 import com.sun.identity.shared.encode.Hash;
-import com.sun.identity.shared.ldap.util.DN;
 import com.sun.identity.sm.SMSEntry;
 import com.sun.identity.sm.SMSException;
 import com.sun.identity.sm.SchemaType;
@@ -82,7 +83,6 @@ import com.sun.identity.sm.ServiceConfig;
 import com.sun.identity.sm.ServiceConfigManager;
 import com.sun.identity.sm.ServiceListener;
 import com.sun.identity.sm.ServiceSchemaManager;
-import java.security.Principal;
 
 public class SpecialRepo extends IdRepo implements ServiceListener {
 
@@ -645,7 +645,7 @@ public class SpecialRepo extends IdRepo implements ServiceListener {
         if (isSpecialUser(type, name)) {
             boolean isUrlAccessAgent = isUrlAccessAgent(type, name);
             String urlAccessAgentCryptPwd = null;
-            if (isUrlAccessAgent && !isAmAdminUser(token)) {
+            if (!isAmAdminUser(token)) {
                 Object args[] = { name };
                 throw new IdRepoException(IdRepoBundle.BUNDLE_NAME, "231",
                     args);
@@ -933,14 +933,15 @@ public class SpecialRepo extends IdRepo implements ServiceListener {
     }
 
     private boolean isAmAdminUser(SSOToken token) throws SSOException {
-        Principal p = token.getPrincipal();
-        String principalName = p.getName();
-        if (DN.isDN(principalName)) {
-            String dsameuserDN = "id=amadmin,ou=user," +
-                SMSEntry.getRootSuffix();
-            DN principalDN = new DN(principalName);
-            DN dsameuser = new DN(dsameuserDN);
-            return principalDN.equals(dsameuser);
+        String adminUserDN = DNUtils.normalizeDN(SystemProperties.get(Constants.AUTHENTICATION_SUPER_USER));
+        try {
+            AMIdentity adminIdentity = new AMIdentity(token, adminUserDN, IdType.USER, "/", null);
+            AMIdentity userIdentity = new AMIdentity(token);
+            if (adminIdentity.equals(userIdentity)) {
+                return true;
+            }
+        } catch (Exception ex) {
+            debug.warning("Unable to create user identity object", ex);
         }
 
         return false;
