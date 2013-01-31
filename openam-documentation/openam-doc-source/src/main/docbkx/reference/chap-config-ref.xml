@@ -265,7 +265,13 @@
    <varlistentry>
     <term>Number of History Files</term>
     <listitem>
-     <para>Sets the number of history files for each log that OpenAM keeps.</para>
+     <para>Sets the number of history files for each log that OpenAM keeps, 
+     including time-based histories. The previously live file is moved to
+     be included in the history count, and a new log is created to serve as
+     the live log file. Any log file in the history count that goes over 
+     the number specified here will be deleted. For time-based logs, a new
+     set of logs will be created when OpenAM is started because of the time-based
+     file names that are used.</para>
 
      <para><command>ssoadm</command> attribute:
      <literal>iplanet-am-logging-num-hist-file</literal></para>
