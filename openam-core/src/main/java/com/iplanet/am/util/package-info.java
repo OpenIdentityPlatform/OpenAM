@@ -27,9 +27,12 @@
  */
 
 /**
- * Provides utility classes for use by other OpenSSO SDK and custom
- * applications accessing OpenSSO SDK.
+ * Portions Copyrighted 2013 ForgeRock, Inc.
+ */
+/**
+ * Provides utility classes for use by other OpenAM SDK and custom
+ * applications accessing OpenAM SDK.
+ *
  * @supported.api
  */
-
 package com.iplanet.am.util;

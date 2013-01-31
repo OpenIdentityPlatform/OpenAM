@@ -25,7 +25,9 @@
  * $Id: AssignableDynamicGroup.java,v 1.6 2009/01/28 05:34:50 ww203982 Exp $
  *
  */
-
+/**
+ * Portions Copyrighted 2013 ForgeRock, Inc.
+ */
 package com.iplanet.ums;
 
 import com.iplanet.services.ldap.Attr;
@@ -44,7 +46,7 @@ import com.sun.identity.shared.ldap.util.DN;
  * @supported.api
  */
 public class AssignableDynamicGroup extends DynamicGroup implements
-        IAssignableMembership, IDynamicMembership {
+        IAssignableMembership {
 
     private static I18n i18n = I18n.getInstance(IUMSConstants.UMS_PKG);
 

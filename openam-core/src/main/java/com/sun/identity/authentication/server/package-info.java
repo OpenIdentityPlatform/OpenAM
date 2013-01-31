@@ -26,13 +26,15 @@
  *
  */
 
-
-
+/**
+ * Portions Copyrighted 2013 ForgeRock, Inc.
+ */
 /**
  * This package contains the classes that represent server side  
- * functionality such as the implementation of  request for  
- * authenticating ,user  credential call backs
+ * functionality such as the implementation of request for
+ * authenticating, user credential callbacks.
  *
+ * @supported.api
  */
 package com.sun.identity.authentication.server;
 

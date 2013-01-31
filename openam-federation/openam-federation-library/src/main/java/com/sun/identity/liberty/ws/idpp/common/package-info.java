@@ -27,7 +27,11 @@
  */
 
 /**
+ * Portions Copyrighted 2013 ForgeRock, Inc.
+ */
+/**
  * Defines IDPP common.
  *
+ * @supported.api
  */
 package com.sun.identity.liberty.ws.idpp.common;

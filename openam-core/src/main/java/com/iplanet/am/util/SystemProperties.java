@@ -27,7 +27,7 @@
  */
 
 /*
- * Portions Copyrighted [2010-2011] [ForgeRock AS]
+ * Portions Copyrighted 2010-2013 ForgeRock, Inc.
  */
 package com.iplanet.am.util;
 
@@ -356,7 +356,7 @@ public class SystemProperties {
      *
      * @param key
      * @param defaultValue value if key is not found.
-     * @return
+     * @return the boolean value if the key exists; otherwise the default value
      */
     public static boolean getAsBoolean(String key, boolean defaultValue) {
         String value = get(key);
