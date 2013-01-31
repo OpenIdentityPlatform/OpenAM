@@ -27,8 +27,8 @@
  *
  */
 
-/*
- * Portions Copyrighted 2010-2012 ForgeRock AS
+/**
+ * Portions Copyrighted 2010-2013 ForgeRock, Inc.
  */
 
 package com.sun.identity.authentication.service;
@@ -132,7 +132,6 @@ public class LoginState {
     Callback[] submittedCallbackInfo;
     HashMap callbacksPerState = new HashMap();
     InternalSession session = null;
-    HttpSession hsession = null;
     HttpServletRequest servletRequest;
     HttpServletResponse servletResponse;
     String orgName;
@@ -491,14 +490,6 @@ public class LoginState {
         return session;
     }
 
-    /**
-     * Returns httpsession associated with login context
-     * @return httpsession associated with login context
-     */
-    public HttpSession getHttpSession() {
-        return hsession;
-    }
-    
     /**
      * Sets the internal session for the request.
      *
@@ -1154,35 +1145,30 @@ public class LoginState {
                 debug.message("activateSession - Token is : "+ token);
                 debug.message("activateSession - userDN is : "+ userDN);
             }
-            
+
             setSuccessLoginURL(indexType,indexName);
-            // Fix for issue 4909 
-            // Create a new session upon successful authentication 
-            // instead using old session and change state from INVALID
-            // to VALID only.  
-	    //  THIS IS A DAMBASS FIX
-      	    // IT Breaks Everything.  Revert to proir code....
-            //         SessionID oldSessId = session.getID(); 
-            //         session = ad.newSession(getOrgDN(), null); 
-            //         sid = session.getID();
-            if (AuthD.isHttpSessionUsed()) {
-		session = ad.newSession(getOrgDN(), null);
-                //save the AuthContext object in Session
-                sid = session.getID();
-		//session.setObject(ISAuthConstants.AUTH_CONTEXT_OBJ, ac);
-                if (hsession != null) {
-                    hsession.removeAttribute(
-                        ISAuthConstants.AUTH_CONTEXT_OBJ);
-                    hsession.invalidate();
-                    hsession = null;
-                }
-            } else {
-                session.removeObject(ISAuthConstants.AUTH_CONTEXT_OBJ);
-            }
+            //Fix for OPENAM-75
+            //Create a new session upon successful authentication instead using old session and change state from
+            //INVALID to VALID only.
+            SessionID oldSessId = session.getID();
+            InternalSession authSession = session;
+            //Generating a new session ID for the successfully logged in user
+            session = AuthD.newSession(getOrgDN(), null);
+            sid = session.getID();
+            session.removeObject(ISAuthConstants.AUTH_CONTEXT_OBJ);
 
             this.subject = addSSOTokenPrincipal(subject);
-            //		AuthD.getSS().destroyInternalSession(oldSessId); 
             setSessionProperties(session);
+            //copying over the session properties that were set on the authentication session onto the new session
+            Enumeration<String> authSessionProperties = authSession.getPropertyNames();
+            while (authSessionProperties.hasMoreElements()) {
+                String key = authSessionProperties.nextElement();
+                String value = authSession.getProperty(key);
+                updateSessionProperty(key, value);
+            }
+
+            //destroying the authentication session
+            AuthD.getSS().destroyInternalSession(oldSessId);
             if ((modulesInSession) && (loginContext != null)) {
                 session.setObject(ISAuthConstants.LOGIN_CONTEXT,
                 loginContext);
@@ -1655,14 +1641,6 @@ public class LoginState {
             sid = null;
             session = null;
         } 
-        if (ad.isHttpSessionUsed()) {
-            if (hsession != null) {
-                hsession.removeAttribute(ISAuthConstants.AUTH_CONTEXT_OBJ);
-                hsession.invalidate();
-                hsession = null;
-            }
-        }
-        return;
     }
     
     /**
@@ -1899,22 +1877,12 @@ public class LoginState {
     ) throws AuthException {
         debug.message("LoginState: createSession: Creating new session: ");
         SessionID sid = null;
-        if (ad.isHttpSessionUsed()) {
-            debug.message("Save authContext in HttpSession");
-            if (req != null) {
-                //creates HttpSession during authentication
-                hsession = req.getSession();                
-                sid = new SessionID(hsession.getId());
-                hsession.setAttribute(ISAuthConstants.AUTH_CONTEXT_OBJ, 
-                    authContext);
-            }
-        } else {
-            debug.message("Save authContext in InternalSession");
-            session = ad.newSession(getOrgDN(), null); 
-            //save the AuthContext object in Session            
-            sid = session.getID();
-            session.setObject(ISAuthConstants.AUTH_CONTEXT_OBJ, authContext);
-        }
+        debug.message("Save authContext in InternalSession");
+        session = AuthD.newSession(getOrgDN(), null);
+        //save the AuthContext object in Session
+        sid = session.getID();
+        session.setObject(ISAuthConstants.AUTH_CONTEXT_OBJ, authContext);
+
         this.sid = sid;
         if (debug.messageEnabled()) {
             debug.message(

@@ -27,7 +27,7 @@
  */
 
 /**
- * Portions Copyrighted 2010-2011 ForgeRock AS
+ * Portions Copyrighted 2010-2013 ForgeRock, Inc.
  */
 package com.sun.identity.authentication.service;
 
@@ -709,12 +709,8 @@ public class AuthUtils extends AuthClientUtils {
             timedOut = loginState.isTimedOut();
             
             if (!timedOut) {
-                com.iplanet.dpro.session.service.InternalSession sess =
-                    loginState.getSession();
-                if ((sess == null) && AuthD.isHttpSessionUsed()) {
-                    HttpSession hsess = loginState.getHttpSession();
-                    timedOut = (hsess == null);
-                } else if (sess != null) {
+                InternalSession sess = loginState.getSession();
+                if (sess != null) {
                     timedOut = sess.isTimedOut();
                 }
                 loginState.setTimedOut(timedOut);
@@ -1801,17 +1797,7 @@ public class AuthUtils extends AuthClientUtils {
     private static AuthContextLocal retrieveAuthContext(
     HttpServletRequest req, SessionID sid) {
         AuthContextLocal acLocal = null;        
-        if (req != null && AuthD.isHttpSessionUsed()) {
-            HttpSession hs = req.getSession(false);
-            if (hs != null) {
-                acLocal = (AuthContextLocal)hs.getAttribute(
-                    ISAuthConstants.AUTH_CONTEXT_OBJ);
-                if (utilDebug.messageEnabled() && acLocal != null) {
-                    utilDebug.message("authContext from httpsession: " 
-                        + acLocal);
-                }
-            }
-        } else if (sid != null) {
+        if (sid != null) {
             acLocal = retrieveAuthContext(sid);
         }
 

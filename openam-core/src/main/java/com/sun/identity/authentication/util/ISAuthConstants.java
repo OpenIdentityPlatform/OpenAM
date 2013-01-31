@@ -27,7 +27,7 @@
  */
 
 /*
- * Portions Copyrighted 2010-2012 ForgeRock Inc
+ * Portions Copyrighted 2010-2013 ForgeRock Inc
  */
 
 package com.sun.identity.authentication.util;
@@ -647,12 +647,6 @@ public interface ISAuthConstants {
 
     // Attribute to enable or disable module based auth
     public static final String MODULE_BASED_AUTH = "sunEnableModuleBasedAuth";
-
-    // Attribute to specify where to store Authentication state information
-    // till authentication process is completed (success or failure). This
-    // store would be either HttpSession or Internal Session.
-    public static final String SESSION_STORE = 
-        "com.sun.identity.auth.sessionStore";
 
     // Attribute to check if Remote Auth Security is enabled
     public static final String REMOTE_AUTH_APP_TOKEN_ENABLED = 

@@ -27,7 +27,7 @@
  */
 
 /**
- * Portions Copyrighted 2010-2012 ForgeRock, Inc.
+ * Portions Copyrighted 2010-2013 ForgeRock, Inc.
  */
 package com.sun.identity.authentication.service;
 
@@ -231,7 +231,6 @@ public class AuthD  {
     private long defaultSleepTime = 300; /* 5 minutes */
     
     private ServletContext servletContext;
-    private static boolean useHttpSession;
     
     static {
         String status = SystemProperties.get(Constants.AM_LOGSTATUS,
@@ -249,19 +248,10 @@ public class AuthD  {
             directoryPort = 0;
         }
         
-        // Get Session store
-        String useHttpSessionStr =
-            SystemProperties.get(ISAuthConstants.SESSION_STORE);
-        if (useHttpSessionStr != null &&
-            useHttpSessionStr.equalsIgnoreCase("HttpSession")) {
-            useHttpSession = true;
-        }
-
         debug = Debug.getInstance(BUNDLE_NAME);
         if (debug.messageEnabled()) {
             debug.message("Directory Host: "+ directoryHostName +
             "\nDirectory PORT : "+ directoryPort);
-            debug.message("Session store using " + useHttpSessionStr);
         }
     }
     
@@ -1398,14 +1388,6 @@ public class AuthD  {
      */
     public String getSuperUserName() {
         return superAdmin;
-    }
-
-    /**
-     * Return <code>true</code> if it use http session
-     * @return <code>true</code> if it use http session
-     */
-    public static boolean isHttpSessionUsed() {
-        return useHttpSession;
     }
 
     /**
