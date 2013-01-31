@@ -25,7 +25,9 @@
  * $Id: UMChangeUserPasswordModelImpl.java,v 1.3 2009/09/28 18:59:56 babysunil Exp $
  *
  */
-
+/**
+ * Portions Copyrighted 2012-2013 ForgeRock Inc
+ */
 package com.sun.identity.console.user.model;
 
 import com.iplanet.sso.SSOException;
@@ -184,4 +186,12 @@ public class UMChangeUserPasswordModelImpl
          }
      }
 
+     /**
+      * {@inheritDoc}
+      */
+     public boolean isOldPasswordRequired() {
+        Map<String, Set<String>> attrs = getConsoleAttributes();
+        Set<String> vals = attrs.get(AMAdminConstants.ATTR_USER_OLD_PASSWORD);
+        return Boolean.valueOf(vals.iterator().next());
+     }
 }

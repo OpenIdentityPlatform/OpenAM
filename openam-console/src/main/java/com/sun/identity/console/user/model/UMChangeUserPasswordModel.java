@@ -25,7 +25,9 @@
  * $Id: UMChangeUserPasswordModel.java,v 1.3 2009/09/28 18:59:55 babysunil Exp $
  *
  */
-
+/**
+ * Portions Copyrighted 2012-2013 ForgeRock Inc
+ */
 package com.sun.identity.console.user.model;
 
 import com.sun.identity.console.base.model.AMModel;
@@ -74,4 +76,15 @@ public interface UMChangeUserPasswordModel
       */
      void changePwd(String userId, String oldpwd, String newpwd)
          throws AMConsoleException;
+
+     /**
+      * Tells whether the old password is required when changing the password.
+      * This method will also consider if you have configured the admin console
+      * service in the realm and return accordingly.
+      *
+      * @return <code>true</code> if old password required setting is enabled
+      * in the realm, or there is no per-realm service and the global setting is
+      * set to enabled.
+      */
+     public boolean isOldPasswordRequired();
 }
