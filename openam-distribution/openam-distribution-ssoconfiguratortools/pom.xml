@@ -114,56 +114,56 @@
 
                                 <!-- OpenSSOConfiguration Properties -->
                                 <copy todir="${project.build.directory}/unpacked_1" filtering="true">
-                                    <fileset dir="${project.basedir}/../../openam-server-only/src/main/resources/locale">
+                                    <fileset dir="${project.basedir}/../../openam-locale/src/main/resources/locale">
                                         <include name="OpenSSOConfigurator.properties" />
                                     </fileset>
                                     <globmapper from="*.properties" to="*_en.properties" />
                                 </copy>
 
                                 <copy todir="${project.build.directory}/unpacked_1" filtering="true">
-                                    <fileset dir="${project.basedir}/../../openam-server-only/src/main/resources/locale">
+                                    <fileset dir="${project.basedir}/../../openam-locale/src/main/resources/locale">
                                         <include name="OpenSSOConfigurator.properties" />
                                     </fileset>
                                 </copy>
 
                                 <copy todir="${project.build.directory}/unpacked_1" filtering="true">
-                                    <fileset dir="${project.basedir}/../../openam-server-only/src/main/resources/locale/de_DE">
+                                    <fileset dir="${project.basedir}/../../openam-locale/src/main/resources/locale/de_DE">
                                         <include name="OpenSSOConfigurator_de.properties" />
                                     </fileset>
                                 </copy>
 
                                 <copy todir="${project.build.directory}/unpacked_1" filtering="true">
-                                    <fileset dir="${project.basedir}/../../openam-server-only/src/main/resources/locale/es_ES">
+                                    <fileset dir="${project.basedir}/../../openam-locale/src/main/resources/locale/es_ES">
                                         <include name="OpenSSOConfigurator_es.properties" />
                                     </fileset>
                                 </copy>
 
                                 <copy todir="${project.build.directory}/unpacked_1" filtering="true">
-                                    <fileset dir="${project.basedir}/../../openam-server-only/src/main/resources/locale/fr_FR">
+                                    <fileset dir="${project.basedir}/../../openam-locale/src/main/resources/locale/fr_FR">
                                         <include name="OpenSSOConfigurator_fr.properties" />
                                     </fileset>
                                 </copy>
 
                                 <copy todir="${project.build.directory}/unpacked_1" filtering="true">
-                                    <fileset dir="${project.basedir}/../../openam-server-only/src/main/resources/locale/ja_JP">
+                                    <fileset dir="${project.basedir}/../../openam-locale/src/main/resources/locale/ja_JP">
                                         <include name="OpenSSOConfigurator_ja.properties" />
                                     </fileset>
                                 </copy>
 
                                 <copy todir="${project.build.directory}/unpacked_1" filtering="true">
-                                    <fileset dir="${project.basedir}/../../openam-server-only/src/main/resources/locale/ko_KR">
+                                    <fileset dir="${project.basedir}/../../openam-locale/src/main/resources/locale/ko_KR">
                                         <include name="OpenSSOConfigurator_ko.properties" />
                                     </fileset>
                                 </copy>
 
                                 <copy todir="${project.build.directory}/unpacked_1" filtering="true">
-                                    <fileset dir="${project.basedir}/../../openam-server-only/src/main/resources/locale/zh_CN">
+                                    <fileset dir="${project.basedir}/../../openam-locale/src/main/resources/locale/zh_CN">
                                         <include name="OpenSSOConfigurator_zh.properties" />
                                     </fileset>
                                 </copy>
 
                                 <copy todir="${project.build.directory}/unpacked_1" filtering="true">
-                                    <fileset dir="${project.basedir}/../../openam-server-only/src/main/resources/locale/zh_TW">
+                                    <fileset dir="${project.basedir}/../../openam-locale/src/main/resources/locale/zh_TW">
                                         <include name="OpenSSOConfigurator_zh_TW.properties" />
                                     </fileset>
                                 </copy>
@@ -171,32 +171,32 @@
 
                                 <!-- OpenSSOConfiguration Properties-->
                                 <copy todir="${project.build.directory}/unpacked_2" filtering="true">
-                                    <fileset dir="${project.basedir}/../../openam-server-only/src/main/resources/locale">
+                                    <fileset dir="${project.basedir}/../../openam-locale/src/main/resources/locale">
                                         <include name="OpenAMUpgrade.properties" />
                                     </fileset>
                                     <globmapper from="*.properties" to="*_en.properties" />
                                 </copy>
 
                                 <copy todir="${project.build.directory}/unpacked_2" filtering="true">
-                                    <fileset dir="${project.basedir}/../../openam-server-only/src/main/resources/locale">
+                                    <fileset dir="${project.basedir}/../../openam-locale/src/main/resources/locale">
                                         <include name="OpenAMUpgrade.properties" />
                                     </fileset>
                                 </copy>
 
                                 <copy todir="${project.build.directory}/unpacked_2" filtering="true">
-                                    <fileset dir="${project.basedir}/../../openam-server-only/src/main/resources/locale/de_DE">
+                                    <fileset dir="${project.basedir}/../../openam-locale/src/main/resources/locale/de_DE">
                                         <include name="OpenAMUpgrade_de.properties" />
                                     </fileset>
                                 </copy>
 
                                 <copy todir="${project.build.directory}/unpacked_2" filtering="true">
-                                    <fileset dir="${project.basedir}/../../openam-server-only/src/main/resources/locale/es_ES">
+                                    <fileset dir="${project.basedir}/../../openam-locale/src/main/resources/locale/es_ES">
                                         <include name="OpenAMUpgrade_es.properties" />
                                     </fileset>
                                 </copy>
 
                                 <copy todir="${project.build.directory}/unpacked_2" filtering="true">
-                                    <fileset dir="${project.basedir}/../../openam-server-only/src/main/resources/locale/fr_FR">
+                                    <fileset dir="${project.basedir}/../../openam-locale/src/main/resources/locale/fr_FR">
                                         <include name="OpenAMUpgrade_fr.properties" />
                                     </fileset>
                                 </copy>

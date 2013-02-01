@@ -331,20 +331,6 @@
             </fileset>
         </copy>
 
-
-        <!-- Align in Federation Elements -->
-        <copy todir="${amserver.target.resources.dir}" flatten="true">
-            <fileset dir="${library.resources.i18n.dir}" includes="**/*.properties"/>
-            <fileset dir="${openfm.resources.i18n.dir}" includes="**/*.properties"/>
-        </copy>
-
-        <copy todir="${amserver.target.resources.dir}" flatten="true">
-            <fileset dir="${library.resources.i18n.dir}" includes="*.properties"/>
-            <fileset dir="${openfm.resources.i18n.dir}" includes="*.properties"/>
-            <globmapper from="*.properties" to="*_en.properties"/>
-        </copy>
-
-
         <!-- Remaining Bits -->
         <copy todir="${openam.temp.target}/config" overwrite="true" filtering="true">
             <fileset dir="${server.resources}/config">

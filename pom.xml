@@ -185,7 +185,7 @@
     <!-- Build order will be determined by the Maven Reactor. -->
     <modules>
 
-        <!-- OpenAM Shared - Common Module -->
+        <!-- OpenAM Locale - Common Module -->
         <module>openam-locale</module>
 
         <!-- OpenAM Shared - Common Module -->
@@ -253,6 +253,8 @@
         <module>openam-distribution</module>
         <!-- Final Packaging Distribution Kit -->
         <module>openam-dashboard</module>
+
+        <module>openam-xacml-resources</module>
 
     </modules>
 
@@ -496,6 +498,20 @@
         <pluginRepository>
             <id>maven-central-plugins</id>
             <url>http://maven.forgerock.org/repo/maven-central</url>
+            <releases>
+                <enabled>true</enabled>
+                <updatePolicy>daily</updatePolicy>
+            </releases>
+            <snapshots>
+                <enabled>true</enabled>
+                <updatePolicy>daily</updatePolicy>
+            </snapshots>
+        </pluginRepository>
+
+        <pluginRepository>
+            <id>maven-instant-ws-repo</id>
+            <name>maven-instant-ws repository</name>
+            <url>http://maven-instant-ws.googlecode.com/svn/repo/</url>
             <releases>
                 <enabled>true</enabled>
                 <updatePolicy>daily</updatePolicy>
@@ -1520,7 +1536,7 @@
                 <artifactId>freemarker</artifactId>
                 <version>2.3.19</version>
             </dependency>
-            <!-- Xerces-J Required for fedlet -->
+            <!-- Xerces-J Required for fedlet and XACML -->
             <dependency>
                 <groupId>xerces-J</groupId>
                 <artifactId>xercesImpl</artifactId>
@@ -1540,6 +1556,13 @@
                 <groupId>xerces-J</groupId>
                 <artifactId>xml-serializer</artifactId>
                 <version>${xercesj.version}</version>
+            </dependency>
+
+            <!-- Native Json Manipulation -->
+            <dependency>
+                <groupId>org.json</groupId>
+                <artifactId>json</artifactId>
+                <version>20090211</version>
             </dependency>
 
         </dependencies>

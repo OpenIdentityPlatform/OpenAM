@@ -137,6 +137,11 @@ public class JKSKeyProvider implements KeyProvider {
     private void mapPk2Cert(){
         try {
             ks = KeyStore.getInstance(keystoreType);
+            if ( (keystoreFile == null) || (keystoreFile.isEmpty()) ) {
+                SAMLUtilsCommon.debug.error("mapPk2Cert.JKSKeyProvider: KeyStore FileName is null, " +
+                        "unable to establish Mapping Public Keys to Certificates!");
+                return;
+            }
             FileInputStream fis = new FileInputStream(keystoreFile);
             ks.load(fis, keystorePass.toCharArray());
 	    // create publickey to Certificate mapping

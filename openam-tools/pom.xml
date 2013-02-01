@@ -42,6 +42,7 @@
     <!-- Child Modules -->
     <modules>
         <module>build-helper-plugin</module>
+        <module>openam-build-tools</module>
         <module>openam-installtools</module>
         <module>openam-installtools-launcher</module>
         <module>openam-diagnostics</module>

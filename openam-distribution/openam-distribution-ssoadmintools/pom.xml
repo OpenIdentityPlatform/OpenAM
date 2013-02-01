@@ -60,7 +60,8 @@
 
                                 <property name="target.resources.dir" value="${project.build.directory}/resources" />
 
-                                <property name="resources.i18n.dir" value="${project.basedir}/../../openam-server-only/src/main/resources/locale" />
+                                <property name="resources.i18n.dir"
+                                          value="${project.basedir}/../../openam-locale/src/main/resources/locale" />
 
                                 <tstamp>
                                     <format property="war.time.stamp" pattern="yyyy-MMMM-dd HH:mm" locale="en,UK" />
@@ -89,7 +90,8 @@
                                 <copy file="${target.resources.dir}/amSDK.properties" tofile="${target.resources.dir}/amSDK_en.properties" />
 
                                 <copy todir="${project.build.directory}/resources" overwrite="false" filtering="true">
-                                    <fileset dir="${project.basedir}/../../openam-server-only/src/main/resources/federation-locale">
+                                    <fileset
+                                            dir="${project.basedir}/../../openam-locale/src/main/resources/federation-locale">
                                         <include name="*.properties" />
                                         <exclude name="Services.properties" />
                                         <exclude name="ums.properties" />
@@ -100,7 +102,7 @@
                                     <globmapper from="*.properties" to="*_en.properties" />
                                 </copy>
                                 <copy todir="${project.build.directory}/resources" overwrite="false" filtering="true" flatten="yes">
-                                    <fileset dir="${project.basedir}/../../openam-server-only/src/main/resources/locale">
+                                    <fileset dir="${project.basedir}/../../openam-locale/src/main/resources/locale">
                                         <include name="*.properties" />
                                         <exclude name="Services.properties" />
                                         <exclude name="ums.properties" />
@@ -111,7 +113,8 @@
                                     <globmapper from="*.properties" to="*_en.properties" />
                                 </copy>
                                 <copy todir="${project.build.directory}/resources" overwrite="false" filtering="true" flatten="yes">
-                                    <fileset dir="${project.basedir}/../../openam-server-only/src/main/resources/openfm-locale">
+                                    <fileset
+                                            dir="${project.basedir}/../../openam-locale/src/main/resources/openfm-locale">
                                         <include name="*.properties" />
                                         <exclude name="Services.properties" />
                                         <exclude name="ums.properties" />
@@ -123,7 +126,8 @@
                                 </copy>
 
                                 <copy todir="${project.build.directory}/resources" overwrite="false" filtering="true" flatten="yes">
-                                    <fileset dir="${project.basedir}/../../openam-server-only/src/main/resources/federation-locale">
+                                    <fileset
+                                            dir="${project.basedir}/../../openam-locale/src/main/resources/federation-locale">
                                         <include name="**/*.properties" />
                                         <exclude name="Services.properties" />
                                         <exclude name="ums.properties" />
@@ -133,7 +137,7 @@
                                     </fileset>
                                 </copy>
                                 <copy todir="${project.build.directory}/resources" overwrite="false" filtering="true" flatten="yes">
-                                    <fileset dir="${project.basedir}/../../openam-server-only/src/main/resources/locale">
+                                    <fileset dir="${project.basedir}/../../openam-locale/src/main/resources/locale">
                                         <include name="**/*.properties" />
                                         <exclude name="Services.properties" />
                                         <exclude name="ums.properties" />
@@ -143,7 +147,8 @@
                                     </fileset>
                                 </copy>
                                 <copy todir="${project.build.directory}/resources" overwrite="false" filtering="true" flatten="yes">
-                                    <fileset dir="${project.basedir}/../../openam-server-only/src/main/resources/openfm-locale">
+                                    <fileset
+                                            dir="${project.basedir}/../../openam-locale/src/main/resources/openfm-locale">
                                         <include name="**/*.properties" />
                                         <exclude name="Services.properties" />
                                         <exclude name="ums.properties" />

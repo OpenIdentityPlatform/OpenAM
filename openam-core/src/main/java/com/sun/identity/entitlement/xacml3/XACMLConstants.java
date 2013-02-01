@@ -29,7 +29,7 @@ package com.sun.identity.entitlement.xacml3;
 /**
  * Interface that defines constants used by XACML classes
  */
-public final class XACMLConstants {
+public interface XACMLConstants {
 
 public static final String XACML3_CORE_PKG 
         = "com.sun.identity.entitlement.xacml3.core";

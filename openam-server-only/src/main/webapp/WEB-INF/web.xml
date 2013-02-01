@@ -20,6 +20,7 @@
         <param-value>true</param-value>
     </context-param>
 
+
     <!-- context param -->
 
     <filter>
@@ -485,7 +486,14 @@
         <load-on-startup>1</load-on-startup>
     </servlet>
 
-    <!-- servlet declaration -->
+    <servlet>
+        <description>XACML Content Handler Adapter</description>
+        <display-name>XACML Content Adapter</display-name>
+        <servlet-name>XACMLContentAdapter</servlet-name>
+        <servlet-class>org.forgerock.identity.openam.xacml.services.XacmlContentHandlerService</servlet-class>
+    </servlet>
+
+    <!-- end of servlet declarations -->
 
     <servlet-mapping>
         <servlet-name>LoginLogoutMapping</servlet-name>
@@ -885,11 +893,18 @@
         <url-pattern>/sts/mexsoap11</url-pattern>
     </servlet-mapping>
 
-    <!-- servlet mapping -->
+    <!-- OpenAM XACML Handler Service Servlet Mappings. -->
+    <servlet-mapping>
+        <servlet-name>XACMLContentAdapter</servlet-name>
+        <url-pattern>/xacml/*</url-pattern>
+    </servlet-mapping>
+
+    <!-- end of servlet mapping -->
+
 
      <!-- Servlet to Restlet adapter declaration (Mandatory) -->
    <servlet>
-       <servlet-name>RestletAdapter</servlet-name>
+       <servlet-name>OAuth2RestletAdapter</servlet-name>
        <servlet-class>org.restlet.ext.servlet.ServerServlet</servlet-class>
  
        <!-- Your application class name (Optional - For mode 3) -->
@@ -901,8 +916,15 @@
        <!-- List of supported client protocols (Optional - Only in mode 3) -->
        <init-param>
            <param-name>org.restlet.clients</param-name>
-           <param-value>RIAP CLAP FILE</param-value>
+           <param-value>RIAP CLAP</param-value>
        </init-param>
+
+       <!-- Add the Servlet context path to routes (Optional) -->
+       <init-param>
+           <param-name>org.restlet.autoWire</param-name>
+           <param-value>true</param-value>
+       </init-param>
+
    </servlet>
  
    <servlet>
@@ -933,7 +955,7 @@
         <!-- servlet declaration -->
  
    <servlet-mapping>
-       <servlet-name>RestletAdapter</servlet-name>
+       <servlet-name>OAuth2RestletAdapter</servlet-name>
        <url-pattern>/oauth2/*</url-pattern>
    </servlet-mapping>
 
@@ -960,7 +982,7 @@
         <url-pattern>/json/*</url-pattern>
     </servlet-mapping>
 
-
+    <!-- Setup favicon.ico extension type -->
     <mime-mapping>
         <extension>ico</extension>
         <mime-type>image/x-icon</mime-type>

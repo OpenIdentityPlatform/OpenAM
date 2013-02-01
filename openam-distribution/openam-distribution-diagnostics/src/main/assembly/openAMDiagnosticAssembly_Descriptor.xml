@@ -100,7 +100,7 @@
             <outputDirectory>resources</outputDirectory>
         </file>
         <file>
-            <source>${project.basedir}/../../openam-server-only/src/main/resources/locale/amUtilMsgs.properties</source>
+            <source>${project.basedir}/../../openam-locale/src/main/resources/locale/amUtilMsgs.properties</source>
             <outputDirectory>resources</outputDirectory>
         </file>
     </files>

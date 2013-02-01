@@ -64,43 +64,44 @@
                                 <filter token="VERSION" value="${version.set}" />
 
                                 <copy todir="${project.build.directory}/classes" filtering="true">
-                                    <fileset dir="${project.basedir}/../../openam-server-only/src/main/resources/openfm-locale/">
+                                    <fileset
+                                            dir="${project.basedir}/../../openam-locale/src/main/resources/openfm-locale/">
                                         <include name="deployablewar.properties" />
                                     </fileset>
                                 </copy>
                                 <copy todir="${project.build.directory}/classes" filtering="true">
-                                    <fileset dir="${project.basedir}/../../openam-server-only/src/main/resources/openfm-locale/">
+                                    <fileset dir="${project.basedir}/../../openam-locale/src/main/resources/openfm-locale/">
                                         <include name="deployablewar.properties" />
                                     </fileset>
                                     <globmapper from="*.properties" to="*_en_US.properties" />
                                 </copy>
                                 <copy todir="${project.build.directory}/classes" filtering="true">
-                                    <fileset dir="${project.basedir}/../../openam-server-only/src/main/resources/openfm-locale/de_DE">
+                                    <fileset dir="${project.basedir}/../../openam-locale/src/main/resources/openfm-locale/de_DE">
                                         <include name="deployablewar_de.properties" />
                                     </fileset>
                                 </copy>
                                 <copy todir="${project.build.directory}/classes" filtering="true">
-                                    <fileset dir="${project.basedir}/../../openam-server-only/src/main/resources/openfm-locale/es_ES">
+                                    <fileset dir="${project.basedir}/../../openam-locale/src/main/resources/openfm-locale/es_ES">
                                         <include name="deployablewar_es.properties" />
                                     </fileset>
                                 </copy>
                                 <copy todir="${project.build.directory}/classes" filtering="true">
-                                    <fileset dir="${project.basedir}/../../openam-server-only/src/main/resources/openfm-locale/fr_FR">
+                                    <fileset dir="${project.basedir}/../../openam-locale/src/main/resources/openfm-locale/fr_FR">
                                         <include name="deployablewar_fr.properties" />
                                     </fileset>
                                 </copy>
                                 <copy todir="${project.build.directory}/classes" filtering="true">
-                                    <fileset dir="${project.basedir}/../../openam-server-only/src/main/resources/openfm-locale/ja_JP">
+                                    <fileset dir="${project.basedir}/../../openam-locale/src/main/resources/openfm-locale/ja_JP">
                                         <include name="deployablewar_ja.properties" />
                                     </fileset>
                                 </copy>
                                 <copy todir="${project.build.directory}/classes" filtering="true">
-                                    <fileset dir="${project.basedir}/../../openam-server-only/src/main/resources/openfm-locale/ko_KR">
+                                    <fileset dir="${project.basedir}/../../openam-locale/src/main/resources/openfm-locale/ko_KR">
                                         <include name="deployablewar_ko.properties" />
                                     </fileset>
                                 </copy>
                                 <copy todir="${project.build.directory}/classes" filtering="true">
-                                    <fileset dir="${project.basedir}/../../openam-server-only/src/main/resources/openfm-locale/zh_TW">
+                                    <fileset dir="${project.basedir}/../../openam-locale/src/main/resources/openfm-locale/zh_TW">
                                         <include name="deployablewar_zh_TW.properties" />
                                     </fileset>
                                 </copy>
@@ -149,6 +150,10 @@
 
 
     <dependencies>
+        <dependency>
+            <groupId>org.forgerock.openam</groupId>
+            <artifactId>openam-locale</artifactId>
+        </dependency>
         <dependency>
             <groupId>org.forgerock.openam</groupId>
             <artifactId>openam-core</artifactId>

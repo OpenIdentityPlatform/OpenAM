@@ -123,7 +123,7 @@ public class XACMLAuthzDecisionQueryImpl extends RequestAbstractImpl
      *
      * @param element A <code>org.w3c.dom.Element</code> representing
      *        DOM tree for <code>XACMLAuthzDecisionQuery</code> object
-     * @exception XACML2Exception if it could not process the Element
+     * @exception SAML2Exception if it could not process the Element
      */
     public XACMLAuthzDecisionQueryImpl(Element element) throws SAML2Exception {
         parseDOMElement(element);
@@ -232,7 +232,7 @@ public class XACMLAuthzDecisionQueryImpl extends RequestAbstractImpl
      * @param returnContext <code>boolean</code> indicating the value
      * of this attribute.
      *
-     * @exception XACMLExceptioXACMLException if the object is immutable
+     * @exception XACMLException if the object is immutable
      * An object is considered <code>immutable</code> if <code>
      * makeImmutable()</code> has been invoked on it. It can
      * be determined by calling <code>isMutable</code> on the object.

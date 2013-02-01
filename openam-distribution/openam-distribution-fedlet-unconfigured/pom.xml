@@ -65,7 +65,8 @@
                                 <filter token="VERSION" value="${version.set}" />
 
                                 <copy todir="${project.build.outputDirectory}/locale/en_US" filtering="true">
-                                    <fileset dir="${project.basedir}/../../openam-server-only/src/main/resources/federation-locale">
+                                    <fileset
+                                            dir="${project.basedir}/../../openam-locale/src/main/resources/federation-locale">
                                         <include name="*.properties" />
                                         <exclude name="Services.properties" />
                                         <exclude name="ums.properties" />
@@ -76,7 +77,7 @@
                                     <globmapper from="*.properties" to="*_en.properties" />
                                 </copy>
                                 <copy todir="${project.build.outputDirectory}/locale/en_US" filtering="false">
-                                    <fileset dir="${project.basedir}/../../openam-server-only/src/main/resources/locale">
+                                    <fileset dir="${project.basedir}/../../openam-locale/src/main/resources/locale">
                                         <include name="*.properties" />
                                         <exclude name="Services.properties" />
                                         <exclude name="ums.properties" />
@@ -87,7 +88,7 @@
                                     <globmapper from="*.properties" to="*_en.properties" />
                                 </copy>
                                 <copy todir="${project.build.outputDirectory}/locale/en_US" filtering="false">
-                                    <fileset dir="${project.basedir}/../../openam-server-only/src/main/resources/openfm-locale">
+                                    <fileset dir="${project.basedir}/../../openam-locale/src/main/resources/openfm-locale">
                                         <include name="*.properties" />
                                         <exclude name="Services.properties" />
                                         <exclude name="ums.properties" />

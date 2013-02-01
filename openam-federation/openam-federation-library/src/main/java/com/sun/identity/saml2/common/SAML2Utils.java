@@ -184,8 +184,10 @@ public class SAML2Utils extends SAML2SDKUtils {
     private static final char DOUBLE_QUOTE = '"';
 
     public static SOAPConnectionFactory scf = null;
-    private static String bufferLen = (String) SAML2ConfigService.
-            getAttribute(SAML2ConfigService.SAML2_BUFFER_LENGTH);
+    private static String bufferLen = (String)
+            ( (SAML2ConfigService.getAttribute(SAML2ConfigService.SAML2_BUFFER_LENGTH) == null)
+                    ?"8192":SAML2ConfigService.
+            getAttribute(SAML2ConfigService.SAML2_BUFFER_LENGTH));
 
     // Dir server info for CRL entry
     private static boolean checkCertStatus = false;
@@ -198,9 +200,13 @@ public class SAML2Utils extends SAML2SDKUtils {
                     "Unable to obtain SOAPConnectionFactory.", se);
         }
         try {
+            if ( (server_port == null) || (server_port.isEmpty()) ) {
+                server_port = "18080";     // TODO Should be a Default Constant.
+            }
             int_server_port = Integer.parseInt(server_port);
         } catch (NumberFormatException nfe) {
             debug.error("Unable to parse port " + server_port, nfe);
+            int_server_port = 18080;      // TODO Should be a Default Constant.
         }
         
         /*

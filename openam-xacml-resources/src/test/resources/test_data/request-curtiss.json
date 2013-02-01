@@ -1,0 +1,145 @@
+{
+"Request": 
+{
+ "ReturnPolicyIdList": true,
+ "CombinedDecision": false,
+ "xmlns": "oasis:names:tc:xacml:3.0:core:schema:os",
+ 
+ "Subject":
+  {
+   "Category": "oasis:names:tc:xacml:1.0:subject-category:access-subject",
+   "Attribute": [
+    {
+      "AttributeId": "urn:oasis:names:tc:xacml:3.0:ipc:subject:organization",
+      "Value": "Curtiss",
+      "DataType": "string",
+      "IncludeInResult": true
+    },
+    {
+      "AttributeId": "urn:oasis:names:tc:xacml:3.0:ipc:subject:subject-to-organization-relationship",
+      "Value": "urn:oasis:names:tc:xacml:3.0:ipc:subject:subject-to-organization-relationship:employee",
+      "DataType": "string",
+      "IncludeInResult": true
+    },
+    {
+      "AttributeId": "urn:oasis:names:tc:xacml:3.0:ec-us:subject:nationality",
+      "Value": "US",
+      "DataType": "string",
+      "IncludeInResult": true
+    },
+    {
+      "AttributeId": "urn:oasis:names:tc:xacml:3.0:ec-us:subject:current-nationality",
+      "Value": "US",
+      "DataType": "string",
+      "IncludeInResult": true
+    },
+    {
+      "AttributeId": "urn:oasis:names:tc:xacml:3.0:ec-us:subject:location",
+      "Value": "US",
+      "DataType": "string",
+      "IncludeInResult": true
+    },
+    {
+      "AttributeId": "urn:oasis:names:tc:xacml:3.0:ec-us:subject:organization",
+      "Value": "Curtiss",
+      "DataType": "string",
+      "IncludeInResult": true
+    },
+     {
+      "AttributeId": "urn:oasis:names:tc:xacml:3.0:ec-us:subject:us-person",
+      "Value": true,
+      "DataType": "boolean",
+      "IncludeInResult": true
+    }
+   ]
+  },
+  
+  "Resource":
+  {
+   "Category": "oasis:names:tc:xacml:3.0:attribute-category:resource",
+   "Attribute": [
+   {
+     "AttributeId": "urn:oasis:names:tc:xacml:3.0:ipc:resource:proprietary",
+     "Value": true,
+     "DataType": "boolean",
+     "IncludeInResult": true
+   },
+   {
+     "AttributeId": "urn:oasis:names:tc:xacml:3.0:ipc:resource:ip-owner",
+     "Value": "Curtiss",
+     "DataType": "string",
+     "IncludeInResult": true
+   },
+   {
+     "AttributeId": "urn:oasis:names:tc:xacml:3.0:ipc:resource:work-effort",
+     "Value": "Excelsior engines",
+     "DataType": "string",
+     "IncludeInResult": true
+   },
+   {
+     "AttributeId": "urn:oasis:names:tc:xacml:3.0:ipc:resource:authorized-end-use",
+     "Value": "urn:oasis:names:tc:xacml:3.0:ipc:resource:authorized-end-use:manufacture",
+     "DataType": "string",
+     "IncludeInResult": true
+   },   
+   {
+     "AttributeId": "urn:oasis:names:tc:xacml:3.0:ec-us:resource:jurisdiction",
+     "Value": "EAR",
+     "DataType": "string",
+     "IncludeInResult": true
+   },
+   {
+     "AttributeId": "urn:oasis:names:tc:xacml:3.0:ec-us:resource:eccn",
+     "Value": "9A001",
+     "DataType": "string",
+     "IncludeInResult": true
+   },
+   {
+     "AttributeId": "urn:oasis:names:tc:xacml:3.0:ec-us:resource:authority-to-export",
+     "Value": "EAR-1",
+     "DataType": "string",
+     "IncludeInResult": true
+   },
+   {
+     "AttributeId": "urn:oasis:names:tc:xacml:3.0:ec-us:resource:effective-date",
+     "Value": "2013-01-01",
+     "DataType": "date",
+     "IncludeInResult": true
+   },
+   {
+     "AttributeId": "urn:oasis:names:tc:xacml:3.0:ec-us:resource:expiration-date",
+     "Value": 2014-12-31,
+     "DataType": "date",
+     "IncludeInResult": true
+   },
+   {
+     "AttributeId": "urn:oasis:names:tc:xacml:3.0:ec-us:resource:work-effort",
+     "Value": "Excelsior engines",
+     "DataType": "string",
+     "IncludeInResult": true
+   }
+   ]
+  },
+  
+ 
+  "Environment":
+  {
+   "Category": "oasis:names:tc:xacml:3.0:attribute-category:environment",
+   "Attribute": [
+   {
+    "AttributeId": "urn:oasis:names:tc:xacml:1.0:environment:current-dateTime",
+     "Value": "2013-01-25T00:00:00",
+     "DataType": "dateTime",
+     "IncludeInResult": true          
+   },
+   {
+    "AttributeId": "urn:oasis:names:tc:xacml:1.0:environment:current-date",
+     "Value": "2013-01-25",
+     "DataType": "current-date",
+     "IncludeInResult": true          
+   }
+   ]
+  }  
+  
+}  
+}

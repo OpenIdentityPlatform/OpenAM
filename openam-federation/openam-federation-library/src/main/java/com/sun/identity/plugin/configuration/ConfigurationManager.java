@@ -63,6 +63,9 @@ public final class ConfigurationManager {
         Object callerToken 
     ) throws ConfigurationException {
         try {
+            if (configClass == null) {
+                return null;
+            }
             ConfigurationInstance config = (ConfigurationInstance)
                 Class.forName(configClass).newInstance();
             config.init(componentName, callerToken);

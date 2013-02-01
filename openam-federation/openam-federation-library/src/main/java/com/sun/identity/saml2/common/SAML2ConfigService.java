@@ -63,7 +63,9 @@ public class SAML2ConfigService implements ConfigurationListener {
     static {
         try {
             ci = ConfigurationManager.getConfigurationInstance(CONFIG_NAME);
-            ci.addListener(new SAML2ConfigService());
+            SAML2ConfigService saml2ConfigService = new SAML2ConfigService();
+            if ( (saml2ConfigService != null) && (ci != null) )
+                { ci.addListener(saml2ConfigService); }
             setValues();
         } catch (ConfigurationException ce) {
             debug.error("SAML2ConfigService.static:", ce);

@@ -89,11 +89,16 @@ public class SystemProperties {
     }
     
     private static void initAttributeMapping() {
+        try {
         ResourceBundle rb = ResourceBundle.getBundle("serverAttributeMap");
         for (Enumeration e = rb.getKeys(); e.hasMoreElements(); ) {
             String propertyName = (String)e.nextElement();
             attributeMap.put(propertyName, new AttributeStruct(
                 rb.getString(propertyName)));
+        }
+        } catch(java.util.MissingResourceException mse) {
+            // No Resource Bundle Found, Continue.
+            // Could be in Test Mode.
         }
     }
     

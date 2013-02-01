@@ -85,7 +85,7 @@ public interface Request {
      * @param resources the one to many <code>Resource</code> elements of this 
      * object
      *
-     * @exception XACMLExceptioXACMLException if the object is immutable
+     * @exception XACMLException if the object is immutable
      * An object is considered <code>immutable</code> if <code>
      * makeImmutable()</code> has been invoked on it. It can
      * be determined by calling <code>isMutable</code> on the object.

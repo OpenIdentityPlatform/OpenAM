@@ -58,6 +58,10 @@
         <!-- OpenAM -->
         <dependency>
             <groupId>org.forgerock.openam</groupId>
+            <artifactId>openam-locale</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.forgerock.openam</groupId>
             <artifactId>openam-core</artifactId>
         </dependency>
         <dependency>
@@ -170,7 +174,7 @@
                             <filtering>false</filtering>
                         </webResource>
                             <webResource>
-                                <directory>${project.basedir}/../../openam-server-only/src/main/resources/locale
+                                <directory>${project.basedir}/../../openam-locale/src/main/resources/locale
                                 </directory>
                                 <includes>
                                     <include>*.*</include>
