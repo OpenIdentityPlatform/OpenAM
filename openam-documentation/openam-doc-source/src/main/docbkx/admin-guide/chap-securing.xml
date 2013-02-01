@@ -20,7 +20,7 @@
   !
   ! CCPL HEADER END
   !
-  !      Copyright 2012 ForgeRock AS
+  !      Copyright 2012-2013 ForgeRock AS
   !    
 -->
 <chapter xml:id='chap-securing'
@@ -259,4 +259,135 @@
    </listitem>
   </itemizedlist>
  </section>
+
+
+    <section xml:id="amadmin-changes">
+        <title>Administering the amadmin Account</title>
+
+        <para>You can make changes to the password and user name for the main OpenAM administrative account.</para>
+        <para>You can change the user name of the <literal>amadmin</literal> administrative account
+            to something more obscure, such as superroot. However, the capabilities of that alternative administrative
+            account would not be complete, due to some hard-coding of <literal>amadmin</literal> in the source files.
+            When changing the password for the main OpenAM administrative account, you must make a corresponding change
+            to the authentication datastore. That datastore could be OpenDJ. The steps you would take to change
+            the OpenAM top-level administrative password and account name are shown in the following sections.</para>
+
+        <procedure xml:id="change-amadmin-password">
+            <title>To Change the Password for the Top-Level Administrator (normally <literal>amadmin</literal>)</title>
+
+            <step>
+                <para>Login to the OpenAM console as the administrator, normally
+                    <literal>amadmin</literal>.</para>
+            </step>
+            <step>
+                <para>Under Access Control &gt; / (Top Level Realm) &gt; Subjects &gt; User, select the name of the
+                    current top-level administrative user.</para>
+            </step>
+            <step>
+                <para>In the page that appears, navigate to the Password row and click Edit.</para>
+            </step>
+            <step>
+                <para>In the window that appears, enter the desired new password in the New Password and
+                    Re-Enter Password text boxes.</para>
+            </step>
+            <step>
+                <para>Click OK to implement the change. If you want to cancel, click Close or just close the window.</para>
+            </step>
+            <step>
+                <para>You'll also need to change the password for the administrator on the directory server. If you are
+                    using OpenDJ, refer to the <link xlink:show="new"
+                    xlink:href='http://opendj.forgerock.org/doc/admin-guide/index.html#troubleshoot-reset-admin-passwords'
+                            ><citetitle>OpenDJ 2.5.0 Administration Guide</citetitle> section on Resetting Administrator
+                    Passwords</link>. If you are using a different directory server, you will have to refer to the
+                documentation for that server.</para>
+            </step>
+        </procedure>
+
+        <para>In the following steps, you will identify the new administrative user by assigning it to the <literal>
+            com.sun.identity.authentication.super.user</literal> directive. You may also need to create an
+            OpenAM account for the new administrative user. Don't forget to make sure that new administrative
+            account is configured in the corresponding directory server such as OpenDJ.
+        </para>
+
+        <procedure xml:id="change-amadmin-uid">
+            <title>To Change the Account Name for the Top-Level Administrator (normally <literal>amadmin</literal>)</title>
+
+            <step>
+                <para>Login to the OpenAM console as the administrator, normally
+                    <literal>amadmin</literal>.</para>
+            </step>
+            <step>
+                <para>Navigate to the page where you can set the properties for different classes. Select
+                    Configuration &gt; Servers and Sites &gt; <replaceable>Server Name</replaceable> &gt; Advanced.</para>
+            </step>
+            <step>
+                <para>In the Advanced Properties window that appears, click Add.</para>
+            </step>
+            <step>
+                <para>You'll see blank entries in the end of the list of Property Names and Property Values. In the
+                    empty Property Name text box, enter <literal>com.sun.identity.authentication.super.user</literal>.</para>
+            </step>
+            <step>
+                <para>In the corresponding Property Values test box, enter appropriate values for the new administrative
+                    user in LDAP Data Interchange Format (LDIF). For example, the following entry would set up an
+                    administrative user named <literal>superroot</literal>, in the organizational unit named <literal>
+                        people</literal>people, associated with the example.com domain:
+                    <literal>uid=superroot,ou=people,dc=example,dc=com</literal>.</para>
+            </step>
+            <step>
+                <para>Click Save to save the changes that you've made. </para>
+            </step>
+            <step>
+                <para>If the account doesn't already exist in OpenAM or on a connected directory server, you'll need to
+               create it. To do so, select Access Control &gt; / (Top Level Realm) &gt; Subject &gt; User &gt; New.
+               In the New User window that appears, create the new user. Make sure to enter an appropriate password
+               and make that user Active. The ID for that new user is the user name.</para>
+            </step>
+            <step>
+                <para>As noted earlier, you'll also need to make sure that the corresponding account on the directory server
+                has at least CN=Directory Manager  privileges. If you're using OpenDJ, refer to the chapter on
+                    <citetitle>Configuring Privileges &amp; Access Control</citetitle> in the
+                    <link xlink:href="http://opendj.forgerock.org/doc/admin-guide/index.html#chap-privileges-acls" xlink:show="new">
+                    <citetitle>OpenDJ Administration Guide</citetitle></link>.</para>
+            </step>
+        </procedure>
+
+        <para>If you do change the account name of the top-level administrative account, you should be aware that the
+        original <literal>amadmin</literal> account is "hard-coded" in the source code of several files, as shown below.
+            The code in these files may affect the functionality of a top-level administrative user
+            with a name other than <literal>amadmin</literal>.</para>
+
+        <para>In addition, files with "Test" in its name are rarely used as a part of OpenAM; they are included only for
+        completeness.</para>
+
+        <!-- Best guess: AMLogTest.java, FMSubjectMapperTest.java, OpenAMAuthenticatorTest.java, PrivilegeUtilsTest.java.
+         and Step3.java can be deleted from this list. -->
+
+
+        <para>One of the improvements that we plan to make to OpenAM is to eliminate these instances of hard-coding.
+        Until we make such improvements, the amadmin user would retain privileges related to the LoginState and some
+        IDM-related classes.</para>
+
+        <!-- See AME-452 for associated developer story, requesting this change. -->
+
+        <itemizedlist>
+            <listitem><para><filename>AMLogTest.java</filename></para></listitem>
+            <listitem><para><filename>AMModelBase.java</filename></para></listitem>
+            <listitem><para><filename>FMSubjectMapperTest.java</filename></para></listitem>
+            <listitem><para><filename>IdConstants.java</filename></para></listitem>
+            <listitem><para><filename>IdRepoSample.java</filename></para></listitem>
+            <listitem><para><filename>IdRepoSampleDeleteId.java</filename></para></listitem>
+            <listitem><para><filename>IdRepoSampleSearchIds.java</filename></para></listitem>
+            <listitem><para><filename>LogSample.java</filename></para></listitem>
+            <listitem><para><filename>LoginState.java</filename></para></listitem>
+            <listitem><para><filename>OpenAMAuthenticatorTest.java</filename></para></listitem>
+            <listitem><para><filename>OpenSSOApplicationPrivilegeManager.java</filename></para></listitem>
+            <listitem><para><filename>PrivilegeUtilsTest.java</filename></para></listitem>
+            <listitem><para><filename>RegisterClient.java</filename></para></listitem>
+            <listitem><para><filename>SpecialRepo.java</filename></para></listitem>
+            <listitem><para><filename>Step3.java</filename></para></listitem>
+        </itemizedlist>
+
+    </section>
+
 </chapter>
