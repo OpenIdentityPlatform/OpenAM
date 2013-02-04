@@ -27,7 +27,7 @@
  */
 
 /*
- * Portions Copyrighted 2012 ForgeRock Inc
+ * Portions Copyrighted 2012-2013 ForgeRock Inc
  * Portions Copyrighted 2012 Open Source Solution Technology Corporation
  */
 
@@ -774,7 +774,9 @@ class ServiceConfigImpl implements ServiceListener {
         for (Iterator i = serviceConfigNames.iterator(); i.hasNext(); ) {
             String scName = (String)i.next();
             ServiceConfigImpl sci = this.getSubConfig(token, scName);
-            buff.append(sci.toXML(token, SMSUtils.SUB_CONFIG, encryptObj));
+            if (null != sci) {
+                buff.append(sci.toXML(token, SMSUtils.SUB_CONFIG, encryptObj));
+            }
         }
         
         if ((orgAttributes != null) && !orgAttributes.isEmpty()) {
