@@ -19,7 +19,11 @@
  * If applicable, add the following below the CDDL Header,
  * with the fields enclosed by brackets [] replaced by
  * your own identifying information:
- * "Portions Copyrighted [2012] [ForgeRock Inc]"
+ * "Portions copyright [year] [name of copyright owner]"
+ */
+
+/**
+ * Portions copyright 2012-2013 ForgeRock Inc
  */
 
 package com.sun.identity.shared;
@@ -292,6 +296,8 @@ public class OAuth2Constants {
          * base64url
          */
         public static final String ASSERTION = "assertion";
+
+        public static final String SUBJECT_CONFIRMATION_METHOD = "urn:oasis:names:tc:SAML:2.0:cm:bearer";
     }
 
     /**

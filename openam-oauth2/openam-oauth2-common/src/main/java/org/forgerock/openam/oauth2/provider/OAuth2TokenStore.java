@@ -19,7 +19,11 @@
  * If applicable, add the following below the CDDL Header,
  * with the fields enclosed by brackets [] replaced by
  * your own identifying information:
- * "Portions Copyrighted [2012] [ForgeRock Inc]"
+ * "Portions copyright [year] [name of copyright owner]"
+ */
+
+/**
+ * Portions copyright 2012-2013 ForgeRock Inc
  */
 package org.forgerock.openam.oauth2.provider;
 
@@ -153,6 +157,26 @@ public interface OAuth2TokenStore {
      */
     AccessToken createAccessToken(String accessTokenType, Set<String> scopes, String realm,
             String uuid, SessionClient client);
+
+    /**
+     * Creates and stores an access token using the SAML2 flow where no
+     * client is identified. The resulting token will have no parent token.
+     *
+     * @param accessTokenType
+     *            MAC, Bearer or an extended access token type
+     * @param scopes
+     *            the scope(s) for which to issue the token, must be identical
+     *            to or a subset of authz code scopes
+     * @param realm
+     *            the name of the realm where this token should be created
+     * @param uuid
+     *            the user identifier (resource owner)
+     * @param client
+     *            the client id making the request
+     * @return a newly created and stored access token
+     */
+    AccessToken createAccessToken(String accessTokenType, Set<String> scopes, String realm,
+                                  String uuid, String client);
 
     /**
      * Creates and stores an access token using the resource owner password,

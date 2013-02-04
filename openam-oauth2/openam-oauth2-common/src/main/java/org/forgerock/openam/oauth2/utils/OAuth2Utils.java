@@ -22,17 +22,17 @@
  * "Portions Copyrighted [year] [name of copyright owner]"
  */
 
+/**
+ * Portions copyright 2012-2013 ForgeRock Inc
+ */
+
 package org.forgerock.openam.oauth2.utils;
 
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
+import java.net.URLDecoder;
 import java.security.AccessController;
-import java.util.Collections;
-import java.util.Iterator;
-import java.util.LinkedHashMap;
-import java.util.Map;
-import java.util.Set;
-import java.util.StringTokenizer;
-import java.util.TreeSet;
+import java.util.*;
 
 import com.iplanet.am.util.SystemProperties;
 import com.iplanet.sso.SSOToken;
@@ -664,6 +664,28 @@ public class OAuth2Utils {
         }
 
         return cleanScopes;
+    }
+
+    /**
+     * Gets the depoyment URI of the OAuth2 authorization server
+     * @param request the request to get the deployment uri of
+     * @return
+     */
+    public static String getDeploymentURL(Request request){
+        HttpServletRequest httpRequest = ServletUtils.getRequest(request);
+        String uri = httpRequest.getRequestURI();
+        String deploymentURI = uri;
+        int firstSlashIndex = uri.indexOf("/");
+        int secondSlashIndex = uri.indexOf("/", firstSlashIndex + 1);
+        if (secondSlashIndex != -1) {
+            deploymentURI = uri.substring(0, secondSlashIndex);
+        }
+        StringBuffer sb = new StringBuffer(100);
+        sb.append(httpRequest.getScheme()).append("://")
+                .append(httpRequest.getServerName()).append(":")
+                .append(httpRequest.getServerPort())
+                .append(deploymentURI);
+        return sb.toString();
     }
 
     /**

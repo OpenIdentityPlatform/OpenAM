@@ -19,7 +19,11 @@
  * If applicable, add the following below the CDDL Header,
  * with the fields enclosed by brackets [] replaced by
  * your own identifying information:
- * "Portions Copyrighted [2012] [Forgerock Inc]"
+ * "Portions copyright [year] [name of copyright owner]"
+ */
+
+/**
+ * Portions copyright 2012-2013 ForgeRock Inc
  */
 
 package org.forgerock.openam.oauth2;
@@ -92,6 +96,7 @@ public class OAuth2Application extends Application {
                         .supportPassword();
         authorizer.setNext(finder);
 
+        //TODO client authentication needs to be done in the grant code
         ClientAuthenticationFilter filter = new ClientAuthenticationFilter(childContext);
         // Try to authenticate the client The verifier MUST set
         filter.setVerifier(getClientVerifier());
@@ -101,7 +106,7 @@ public class OAuth2Application extends Application {
         finder =
                 new OAuth2FlowFinder(childContext, OAuth2Constants.EndpointType.TOKEN_ENDPOINT)
                         .supportAuthorizationCode().supportClientCredentials().supportImplicit()
-                        .supportPassword();
+                        .supportPassword().supportSAML20();
         filter.setNext(finder);
 
         // Configure context

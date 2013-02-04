@@ -19,7 +19,11 @@
  * If applicable, add the following below the CDDL Header,
  * with the fields enclosed by brackets [] replaced by
  * your own identifying information:
- * "Portions Copyrighted [2012] [ForgeRock Inc]"
+ * "Portions copyright [year] [name of copyright owner]"
+ */
+
+/**
+ * Portions copyright 2012-2013 ForgeRock Inc
  */
 package org.forgerock.restlet.ext.oauth2.provider;
 
@@ -92,9 +96,19 @@ public class ClientAuthenticationFilter extends Authenticator {
                     OAuth2Utils.getRequestParameter(request, OAuth2Constants.Params.CLIENT_ID, String.class);
             ClientApplication client;
             try {
-                client = getVerifier().verify(request, response);
-                request.getClientInfo().setUser(new OAuth2Client(client));
-                result = true;
+                //this will be removed when client authentication is moved into the grant code
+                String grantType = OAuth2Utils.getRequestParameter(request, OAuth2Constants.Params.GRANT_TYPE, String.class);
+                if (grantType != null && grantType.equalsIgnoreCase(OAuth2Constants.SAML20.GRANT_TYPE_URI)){
+                    //the assertion acts as the client authentication
+                    client = getVerifier().findClient(client_id, request);
+                    request.getClientInfo().setUser(new OAuth2Client(client));
+                    result = true;
+                } else {
+
+                    client = getVerifier().verify(request, response);
+                    request.getClientInfo().setUser(new OAuth2Client(client));
+                    result = true;
+                }
             } catch (OAuthProblemException e) {
                 if (null != client_id) {
                     Collection<ChallengeScheme> scheme =
