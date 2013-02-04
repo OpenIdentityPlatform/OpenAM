@@ -27,7 +27,7 @@
  */
 
 /*
- * Portions Copyrighted 2010-2012 ForgeRock Inc
+ * Portions Copyrighted 2010-2013 ForgeRock Inc
  */
 package com.sun.identity.authentication.client;
 
@@ -72,8 +72,6 @@ import com.iplanet.dpro.session.share.SessionEncodeURL;
 import com.sun.identity.session.util.SessionUtils;
 
 import com.iplanet.am.util.AMClientDetector;
-//import com.iplanet.am.util.AMURLEncDec;
-import com.sun.identity.shared.encode.URLEncDec;
 import com.iplanet.am.util.SystemProperties;
 import com.iplanet.dpro.session.Session;
 import com.iplanet.dpro.session.SessionException;
@@ -149,6 +147,10 @@ public class AuthClientUtils {
     // dsame version
     private static String dsameVersion =
         SystemProperties.get(Constants.AM_VERSION,DSAME_VERSION);
+
+    // If true, version header will be added to responses, default is false
+    private static final boolean isVersionHeaderEnabled =
+            SystemProperties.getAsBoolean(Constants.AM_VERSION_HEADER_ENABLED, false);
 
     /* Constants.AM_COOKIE_NAME is the AM Cookie which
      * gets set when the user has authenticated
@@ -1309,6 +1311,10 @@ public class AuthClientUtils {
 
     public static String getDSAMEVersion() {
         return (dsameVersion);
+    }
+
+    public static boolean isVersionHeaderEnabled() {
+        return isVersionHeaderEnabled;
     }
 
     /**Returns the Auth Cookie Name.

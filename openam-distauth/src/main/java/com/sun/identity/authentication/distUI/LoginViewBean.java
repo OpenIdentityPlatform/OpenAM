@@ -27,7 +27,7 @@
  */
 
 /*
- * Portions Copyrighted 2010-2012 ForgeRock Inc
+ * Portions Copyrighted 2010-2013 ForgeRock Inc
  */
 
 package com.sun.identity.authentication.distUI;
@@ -275,7 +275,9 @@ extends com.sun.identity.authentication.UI.AuthViewBeanBase {
         
         response.setHeader("Pragma", "no-cache");
         response.setHeader("Expires", "0");
-        response.setHeader("X-DSAMEVersion", AuthClientUtils.getDSAMEVersion());
+        if (AuthClientUtils.isVersionHeaderEnabled()) {
+            response.setHeader("X-DSAMEVersion", AuthClientUtils.getDSAMEVersion());
+        }
         
         // get request ( GET ) parameters for 'login' process
         reqDataHash = AuthClientUtils.parseRequestParameters(request);
