@@ -216,6 +216,10 @@ public final class IdentityResource implements CollectionResourceProvider {
             RestDispatcher.debug.error("IdentityResource.deleteInstance() :: Cannot DELETE " +
                     resourceId + ":" + tokenExpired);
             handler.handleError(new ForbiddenException("Token is expired", tokenExpired));
+        } catch (final AccessDenied accessDenied){
+            RestDispatcher.debug.error("IdentityResource.deleteInstance() :: Cannot DELETE " +
+                    resourceId + ":" + accessDenied);
+            handler.handleError(new ForbiddenException(accessDenied.getMessage(), accessDenied));
         } catch (final GeneralFailure generalFailure) {
             RestDispatcher.debug.error("IdentityResource.deleteInstance() :: Cannot DELETE " +
                     generalFailure.getMessage());
@@ -370,6 +374,10 @@ public final class IdentityResource implements CollectionResourceProvider {
             RestDispatcher.debug.error("IdentityResource.readInstance() :: Cannot READ " +
                     resourceId + ":" + tokenExpired);
             handler.handleError(new ForbiddenException("Token is expired", tokenExpired));
+        } catch (final AccessDenied accessDenied){
+            RestDispatcher.debug.error("IdentityResource.readInstance() :: Cannot READ " +
+                    resourceId + ":" + accessDenied);
+            handler.handleError(new ForbiddenException(accessDenied.getMessage(), accessDenied));
         } catch (final GeneralFailure generalFailure) {
             RestDispatcher.debug.error("IdentityResource.readInstance() :: Cannot READ " +
                     generalFailure);
@@ -441,6 +449,10 @@ public final class IdentityResource implements CollectionResourceProvider {
             RestDispatcher.debug.error("IdentityResource.updateInstance() :: Cannot UPDATE " +
                     resourceId + ":" + tokenExpired);
             handler.handleError(new ForbiddenException("Token is expired", tokenExpired));
+        } catch (final AccessDenied accessDenied){
+            RestDispatcher.debug.error("IdentityResource.updateInstance() :: Cannot UPDATE " +
+                    resourceId + ":" + accessDenied);
+            handler.handleError(new ForbiddenException(accessDenied.getMessage(), accessDenied));
         } catch (final GeneralFailure generalFailure) {
             RestDispatcher.debug.error("IdentityResource.updateInstance() :: Cannot UPDATE " +
                     generalFailure);

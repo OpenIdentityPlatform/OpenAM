@@ -1032,7 +1032,7 @@ public class IdentityServicesImpl
             }
         } catch (IdRepoException e) {
             debug.error("IdentityServicesImpl:read", e);
-            throw new GeneralFailure(e.getMessage());
+            mapIdRepoException(e);
         } catch (SSOException e) {
             debug.error("IdentityServicesImpl:read", e);
             throw new GeneralFailure(e.getMessage());
@@ -1142,6 +1142,7 @@ public class IdentityServicesImpl
                 }
 
                 if (storeNeeded) {
+                    // throws IdRepoException, SSOException
                     amIdentity.store();
                 }
             }
@@ -1183,7 +1184,7 @@ public class IdentityServicesImpl
             }
         } catch (IdRepoException ex) {
             debug.error("IdentityServicesImpl:update", ex);
-            throw new GeneralFailure(ex.getMessage());
+            mapIdRepoException(ex);
         } catch (SSOException ex) {
             debug.error("IdentityServicesImpl:update", ex);
             throw new GeneralFailure(ex.getMessage());
@@ -1192,6 +1193,27 @@ public class IdentityServicesImpl
         return new UpdateResponse();
     }
 
+    /**
+     * Maps a IdRepoException to appropriate exceptioin.
+     *
+     * @param exception IdRepoException that needs to be mapped
+     * @return boolean true if the identity object was deleted.
+     * @throws NeedMoreCredentials when more credentials are required for
+     * authorization.
+     * @throws ObjectNotFound if no subject is found that matches the input criteria.
+     * @throws TokenExpired when subject's token has expired.
+     * @throws AccessDenied when permission to preform action is denied
+     * @throws GeneralFailure on other errors.
+     */
+    private void mapIdRepoException(IdRepoException exception) throws NeedMoreCredentials,
+            ObjectNotFound, TokenExpired, GeneralFailure, AccessDenied {
+        if(exception.getErrorCode().equalsIgnoreCase("402")){
+            throw new AccessDenied(exception.getMessage());
+        } else{
+            throw new GeneralFailure(exception.getMessage());
+        } //Need to add other cases when found
+
+    }
 
     /**
      * Deletes an identity object matching input criteria.
@@ -1262,7 +1284,7 @@ public class IdentityServicesImpl
             }
         } catch (IdRepoException ex) {
             debug.error("IdentityServicesImpl:delete", ex);
-            throw new GeneralFailure(ex.getMessage());
+            mapIdRepoException(ex);
         } catch (SSOException ex) {
             debug.error("IdentityServicesImpl:delete", ex);
             throw new GeneralFailure(ex.getMessage());
