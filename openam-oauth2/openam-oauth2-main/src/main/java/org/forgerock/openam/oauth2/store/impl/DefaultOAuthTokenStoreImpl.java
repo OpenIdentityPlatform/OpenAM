@@ -19,7 +19,11 @@
  * If applicable, add the following below the CDDL Header,
  * with the fields enclosed by brackets [] replaced by
  * your own identifying information:
- * "Portions Copyrighted [2012] [Forgerock Inc]"
+ * "Portions copyright [year] [name of copyright owner]"
+ */
+
+/**
+ * Portions copyright 2012-2013 ForgeRock Inc
  */
 
 package org.forgerock.openam.oauth2.store.impl;
@@ -42,6 +46,7 @@ import org.forgerock.json.resource.JsonResourceException;
 import org.forgerock.openam.ext.cts.CoreTokenService;
 import org.forgerock.openam.ext.cts.repo.OpenDJTokenRepo;
 import com.sun.identity.shared.OAuth2Constants;
+import org.forgerock.openam.oauth2.model.AccessToken;
 import org.forgerock.openam.oauth2.model.AuthorizationCode;
 import org.forgerock.openam.oauth2.model.impl.AccessTokenImpl;
 import org.forgerock.openam.oauth2.model.impl.AuthorizationCodeImpl;
@@ -609,6 +614,44 @@ public class DefaultOAuthTokenStoreImpl implements OAuth2TokenStore {
         }
 
         return response;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public AccessToken createAccessToken(String accessTokenType, Set<String> scopes, String realm,
+                                  String uuid, String client){
+        if (OAuth2Utils.DEBUG.messageEnabled()){
+            OAuth2Utils.DEBUG.message("DefaultOAuthTokenStoreImpl::Creating access token");
+        }
+        getSettings(realm);
+        JsonValue response = null;
+
+        String id = UUID.randomUUID().toString();
+        long expireTime = ACCESS_TOKEN_LIFETIME;
+
+        AccessTokenImpl accessToken =
+                new AccessTokenImpl(id, null, uuid, new SessionClientImpl(client, null), realm, scopes, expireTime);
+
+        // Create in CTS
+        JsonResourceAccessor accessor =
+                new JsonResourceAccessor(repository, JsonResourceContext.newRootContext());
+        try {
+            response = accessor.create(id, accessToken);
+        } catch (JsonResourceException e) {
+            OAuth2Utils.DEBUG.error("DefaultOAuthTokenStoreImpl::Unable to create access token", e);
+            throw new OAuthProblemException(Status.SERVER_ERROR_INTERNAL.getCode(),
+                    "Internal error", "Could not create token in CTS: " + e.getMessage(), null);
+        }
+
+        if (response == null) {
+            OAuth2Utils.DEBUG.error("DefaultOAuthTokenStoreImpl::Unable to create access token");
+            throw new OAuthProblemException(Status.CLIENT_ERROR_NOT_FOUND.getCode(), "Not found",
+                    "Could not create token in CTS", null);
+        }
+
+        return accessToken;
     }
 
 }
