@@ -20,7 +20,7 @@
   !
   ! CCPL HEADER END
   !
-  !      Copyright 2011-2012 ForgeRock AS
+  !      Copyright 2011-2013 ForgeRock, Inc.
   !    
 -->
 <book xml:id='agent-install-guide'
@@ -36,8 +36,8 @@
    Authentication, Authorization, Entitlement and Federation software.</para>
   </abstract>
   <copyright>
-   <year>2011-2012</year>
-   <holder>ForgeRock AS</holder>
+   <year>2011-2013</year>
+   <holder>ForgeRock, Inc.</holder>
   </copyright>
   <authorgroup>
    <author>
@@ -59,7 +59,6 @@
  <toc />
  
  <xinclude:include href="preface.xml" />
-
  <xinclude:include href='chap-about-web-agents.xml' />
  <xinclude:include href='chap-apache-20.xml' />
  <xinclude:include href='chap-apache-22.xml' />
@@ -76,11 +75,10 @@
  <xinclude:include href='chap-websphere.xml' />
  <xinclude:include href='chap-weblogic.xml' />
 
- <xinclude:include href='chap-upgrade.xml' />
-
  <xinclude:include href='chap-troubleshooting.xml' />
 
  <xinclude:include href='appendix-web-config-properties.xml' />
  <xinclude:include href='appendix-jee-config-properties.xml' />
+-->
  <index />
 </book>
