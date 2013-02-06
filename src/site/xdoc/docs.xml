@@ -20,7 +20,7 @@
   !
   ! CCPL HEADER END
   !
-  !      Copyright 2011-2012 ForgeRock AS
+  !      Copyright 2011-2013 ForgeRock AS
   !    
 -->
 <document
@@ -54,7 +54,7 @@
     <a href="./openam-documentation/openam-doc-source/doc/OpenAM-Install-Guide.rtf">RTF</a></dd>
 
     <dt>OpenAM Administration Guide</dt>
-    <dd><a href="./openam-documentation/openam-doc-sourcee/doc/OpenAM-Admin-Guide.epub">EPUB</a>,
+    <dd><a href="./openam-documentation/openam-doc-source/doc/OpenAM-Admin-Guide.epub">EPUB</a>,
     <a href="./openam-documentation/openam-doc-source/doc/admin-guide/index.html">HTML (single page)</a>,
     <a href="./openam-documentation/openam-doc-source/doc/admin-guide/index/index.html">HTML (1 page/chapter)</a>,
     <a href="./openam-documentation/openam-doc-source/doc/OpenAM-Admin-Guide.pdf">PDF</a>,
@@ -65,7 +65,7 @@
     <a href="./openam-documentation/openam-doc-source/doc/dev-guide/index.html">HTML (single page)</a>,
     <a href="./openam-documentation/openam-doc-source/doc/dev-guide/index/index.html">HTML (1 page/chapter)</a>,
     <a href="./openam-documentation/openam-doc-source/doc/OpenAM-Dev-Guide.pdf">PDF</a>,
-    <a href="./openam-documentation/openam-doc-sourcee/doc/OpenAM-Dev-Guide.rtf">RTF</a></dd>
+    <a href="./openam-documentation/openam-doc-source/doc/OpenAM-Dev-Guide.rtf">RTF</a></dd>
 
     <dt>OpenAM Reference</dt>
     <dd><a href="./openam-documentation/openam-doc-source/doc/OpenAM-Reference.epub">EPUB</a>,
@@ -82,7 +82,7 @@
     <a href="./openam-documentation/openam-doc-source/doc/agent-release-notes/index.html">HTML (single page)</a>,
     <a href="./openam-documentation/openam-doc-source/doc/agent-release-notes/index/index.html">HTML (1 page/chapter)</a>,
     <a href="./openam-documentation/openam-doc-source/doc/OpenAM-Agent-Release-Notes.pdf">PDF</a>,
-    <a href="./openam-documentation/openam-doc-sourcee/doc/OpenAM-Agent-Release-Notes.rtf">RTF</a></dd>
+    <a href="./openam-documentation/openam-doc-source/doc/OpenAM-Agent-Release-Notes.rtf">RTF</a></dd>
 
     <dt>Policy Agent Installation Guide</dt>
     <dd><a href="./openam-documentation/openam-doc-source/doc/OpenAM-Agent-Install-Guide.epub">EPUB</a>,
