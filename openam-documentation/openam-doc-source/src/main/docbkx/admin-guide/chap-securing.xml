@@ -353,40 +353,13 @@
         </procedure>
 
         <para>If you do change the account name of the top-level administrative account, you should be aware that the
-        original <literal>amadmin</literal> account is "hard-coded" in the source code of several files, as shown below.
+        original <literal>amadmin</literal> account is "hard-coded" in the source code of several files.
             The code in these files may affect the functionality of a top-level administrative user
             with a name other than <literal>amadmin</literal>.</para>
-
-        <para>In addition, files with "Test" in its name are rarely used as a part of OpenAM; they are included only for
-        completeness.</para>
-
-        <!-- Best guess: AMLogTest.java, FMSubjectMapperTest.java, OpenAMAuthenticatorTest.java, PrivilegeUtilsTest.java.
-         and Step3.java can be deleted from this list. -->
-
 
         <para>One of the improvements that we plan to make to OpenAM is to eliminate these instances of hard-coding.
         Until we make such improvements, the amadmin user would retain privileges related to the LoginState and some
         IDM-related classes.</para>
-
-        <!-- See AME-452 for associated developer story, requesting this change. -->
-
-        <itemizedlist>
-            <listitem><para><filename>AMLogTest.java</filename></para></listitem>
-            <listitem><para><filename>AMModelBase.java</filename></para></listitem>
-            <listitem><para><filename>FMSubjectMapperTest.java</filename></para></listitem>
-            <listitem><para><filename>IdConstants.java</filename></para></listitem>
-            <listitem><para><filename>IdRepoSample.java</filename></para></listitem>
-            <listitem><para><filename>IdRepoSampleDeleteId.java</filename></para></listitem>
-            <listitem><para><filename>IdRepoSampleSearchIds.java</filename></para></listitem>
-            <listitem><para><filename>LogSample.java</filename></para></listitem>
-            <listitem><para><filename>LoginState.java</filename></para></listitem>
-            <listitem><para><filename>OpenAMAuthenticatorTest.java</filename></para></listitem>
-            <listitem><para><filename>OpenSSOApplicationPrivilegeManager.java</filename></para></listitem>
-            <listitem><para><filename>PrivilegeUtilsTest.java</filename></para></listitem>
-            <listitem><para><filename>RegisterClient.java</filename></para></listitem>
-            <listitem><para><filename>SpecialRepo.java</filename></para></listitem>
-            <listitem><para><filename>Step3.java</filename></para></listitem>
-        </itemizedlist>
 
     </section>
 
