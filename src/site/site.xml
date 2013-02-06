@@ -23,7 +23,7 @@
   !      Copyright 2011-2013 ForgeRock AS
   !    
 -->
-<project name="${project.name} Project"
+<project name="${project.name}"
  xmlns="http://maven.apache.org/DECORATION/1.0.1"
  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
  xsi:schemaLocation="http://maven.apache.org/DECORATION/1.0.1 http://maven.apache.org/xsd/decoration-1.0.1.xsd">
