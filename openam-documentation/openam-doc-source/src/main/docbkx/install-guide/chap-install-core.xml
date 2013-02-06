@@ -104,12 +104,6 @@
      <xref linkend="additional-instance-config" /></entry>
     </row>
     <row>
-     <entry>Upgrade OpenAM</entry>
-     <entry><link xlink:href="install-guide#chap-upgrade"
-     xlink:role="http://docbook.org/xlink/role/olink"><citetitle>Upgrading
-     OpenAM Core Services</citetitle></link></entry>
-    </row>
-    <row>
      <entry>Install OpenAM with no console</entry>
      <entry><xref linkend="which-war-to-deploy" />, then
      <xref linkend="deploy-openam" /></entry>
