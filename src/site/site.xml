@@ -20,7 +20,7 @@
   !
   ! CCPL HEADER END
   !
-  !      Copyright 2011-2013 ForgeRock AS
+  !      Copyright 2011-2013 ForgeRock, Inc.
   !    
 -->
 <project name="${project.name}"
@@ -64,6 +64,7 @@
    <item name="All Formats" href="docs.html"/>
    <item name="Release Notes" href="./openam-documentation/openam-doc-source/doc/release-notes/index.html" />
    <item name="Installation Guide" href="./openam-documentation/openam-doc-source/doc/install-guide/index.html" />
+   <item name="Update and Upgrade Guide" href="./openam-documentation/openam-doc-source/doc/upgrade-guide/index.html" />
    <item name="Admin Guide" href="./openam-documentation/openam-doc-source/doc/admin-guide/index.html" />
    <item name="Developer Guide" href="./openam-documentation/openam-doc-source/doc/dev-guide/index.html" />
    <item name="Reference" href="./openam-documentation/openam-doc-source/doc/reference/index.html" />
