@@ -20,7 +20,7 @@
   !
   ! CCPL HEADER END
   !
-  !      Copyright 2011-2013 ForgeRock AS
+  !      Copyright 2011-2013 ForgeRock, Inc.
   !    
 -->
 <chapter xml:id='chap-rest'
@@ -148,12 +148,11 @@ token.id=AQIC5wM2LY4SfcxvdvHOXjtC_eWSs2RB54tgvgK8SuYi7aQ.*AAJTSQACMDE.*</screen>
  tokenid=AQIC5wM2LY4SfcxuxIP0VnP2lVjs7ypEM6VDx6srk56CN1Q.*AAJTSQACMDE.*"
 boolean=true</screen>
   
-  <para>An invalid token returns a <errorcode>401</errorcode> and an error
-  page.</para>
+  <para>An invalid token returns <literal>boolean=false</literal>.</para>
   
   <screen>$ curl "https://openam.example.com:8443/openam/identity/isTokenValid?
  tokenid=INVALID"
- &lt;html&gt;...HTTP Status 401...&lt;/html&gt;</screen>
+boolean=false</screen>
   
   <para>With a valid token, you can retrieve attributes about the subject.
   OpenAM returns a series of <replaceable>name</replaceable>,
