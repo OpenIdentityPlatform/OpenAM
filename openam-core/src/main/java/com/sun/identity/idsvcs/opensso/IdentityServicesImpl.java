@@ -1905,7 +1905,8 @@ public class IdentityServicesImpl
             mgr.refreshSession(t);
         } catch (SSOException e) {
             // Token is not valid
-            throw (new InvalidToken(e.getMessage()));
+            debug.message("IdentityServicesImpl.isTokenValid() : " + e.getMessage());
+            return false;
         }
         return (true);
     }
