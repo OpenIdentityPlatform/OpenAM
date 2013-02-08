@@ -130,8 +130,7 @@ token.id=AQIC5wM2LY4SfcxvdvHOXjtC_eWSs2RB54tgvgK8SuYi7aQ.*AAJTSQACMDE.*</screen>
   <screen>$ curl "https://openam.example.com:8443/openam/identity/authenticate?
  username=bjensen
  &amp;password=hifalutin
- &amp;uri=realm%3D%2F
- &amp;module=DataStore
+ &amp;uri=realm%3D%2F%26module%3DDataStore
  &amp;client=192.168.1.1"
 token.id=AQIC5wM2LY4SfcxvdvHOXjtC_eWSs2RB54tgvgK8SuYi7aQ.*AAJTSQACMDE.*</screen>
   
