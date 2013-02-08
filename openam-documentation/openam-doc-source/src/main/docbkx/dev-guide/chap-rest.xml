@@ -121,16 +121,17 @@ token.id=AQIC5wM2LY4SfcxvdvHOXjtC_eWSs2RB54tgvgK8SuYi7aQ.*AAJTSQACMDE.*</screen>
   <para>If you must specify parameters as when authenticating to
   <literal>/UI/Login</literal>, you provide a percent encoded string of the
   parameters as the value of the <literal>uri</literal> parameter. The 
-  <literal>/UI/Login</literal>parameter deals with the <literal>realm</literal>, 
+  <literal>/UI/Login</literal> parameter deals with the <literal>realm</literal>,
   <literal>module</literal>, and <literal>service</literal> parameters. Setting the   
   <literal>client</literal> parameter sets the user's IP address as part of the 
-  token following successful authentication. The  default for the <literal>client</literal>
+  token following successful authentication. The default for the <literal>client</literal>
   parameter is the IP of the machine making the REST request.</para>
   
   <screen>$ curl "https://openam.example.com:8443/openam/identity/authenticate?
  username=bjensen
  &amp;password=hifalutin
- &amp;uri=realm=%2F%26module=DataStore
+ &amp;uri=realm%3D%2F
+ &amp;module=DataStore
  &amp;client=192.168.1.1"
 token.id=AQIC5wM2LY4SfcxvdvHOXjtC_eWSs2RB54tgvgK8SuYi7aQ.*AAJTSQACMDE.*</screen>
   
