@@ -2095,7 +2095,7 @@ public class AccessManager {
         optionAliases={},
         macro="authentication",
         optionalOptions={
-            "serverurl|s|s|Server URL. e.g. http://www.example.com:58080/opensso. This option is valid for J2EEAgent and WebAgent.",
+            "serverurl|s|s|Server URL. e.g. http://www.example.com:58080/openam. This option is valid for J2EEAgent and WebAgent.",
             "attributevalues|a|m|Properties e.g. homeaddress=here.",
             "datafile|D|s|Name of file that contains properties."},
         resourceStrings={

@@ -26,6 +26,9 @@
  *
  */
 
+/*
+ * Portions copyright 2013 ForgeRock, Inc.
+ */
 package com.sun.identity.federation.cli.definition;
 
 import com.sun.identity.cli.annotation.DefinitionClassInfo;
@@ -35,7 +38,7 @@ import com.sun.identity.cli.annotation.ResourceStrings;
 
 public class FederationManager {
     @DefinitionClassInfo(
-        productName="OpenSSO",
+        productName="OpenAM",
         logName="ssoadm",
         resourceBundle="FederationManagerCLI")
     private String product;
