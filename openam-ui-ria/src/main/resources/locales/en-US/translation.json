@@ -160,6 +160,7 @@
             "save" : "Save",
             "create" : "Create",
             "cancel" : "Cancel",
+            "reset" : "Reset",
             "close" : "Close",
             "logout" : "Log out",
             "register" : "Register",

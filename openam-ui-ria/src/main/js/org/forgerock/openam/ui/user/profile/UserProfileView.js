@@ -22,7 +22,7 @@
  * "Portions Copyrighted [year] [name of copyright owner]"
  */
 
-/*global define, $, form2js, _, js2form, document, console */
+/*global window, define, $, form2js, _, js2form, document, console */
 
 /**
  * @author mbilski
@@ -32,16 +32,19 @@ define("org/forgerock/openam/ui/user/profile/UserProfileView", [
     "org/forgerock/commons/ui/common/main/ValidatorsManager",
     "org/forgerock/commons/ui/common/util/UIUtils",
     "UserDelegate",
+    "org/forgerock/commons/ui/common/main/Router",
+    "org/forgerock/commons/ui/common/components/Navigation",
     "org/forgerock/commons/ui/common/main/EventManager",
     "org/forgerock/commons/ui/common/util/Constants",
     "org/forgerock/commons/ui/common/main/Configuration"
-], function(AbstractView, validatorsManager, uiUtils, userDelegate, eventManager, constants, conf) {
+], function(AbstractView, validatorsManager, uiUtils, userDelegate, router, navigation, eventManager, constants, conf) {
     var UserProfileView = AbstractView.extend({
         template: "templates/openam/UserProfileTemplate.html",
         baseTemplate: "templates/openam/DefaultBaseTemplate.html",
         delegate: userDelegate,
         events: {
-            "click input[type=submit]": "formSubmit",
+            "click input[name=saveButton]": "formSubmit",
+            "click input[name=resetButton]": "reloadData",
             "onValidate": "onValidate"
         },
         
@@ -63,6 +66,7 @@ define("org/forgerock/openam/ui/user/profile/UserProfileView", [
         },
         
         render: function(args, callback) {
+
             this.parentRender(function() {
                 validatorsManager.bindValidators(this.$el);
                     
@@ -72,12 +76,17 @@ define("org/forgerock/openam/ui/user/profile/UserProfileView", [
                     callback();
                 }
                 
+                if (!window.location.hash.match(/#([a-zA-Z\/_.@]+)/)) {
+                    window.location.hash = "profile/";
+                }
+                
             });            
         },
         
         reloadData: function() {
             js2form(document.getElementById(this.$el.find("#UserProfileForm").attr("id")), conf.loggedUser);
-            this.$el.find("input[type=submit]").val($.t("common.form.update"));
+            this.$el.find("input[name=saveButton]").val($.t("common.form.update"));
+            this.$el.find("input[name=resetButton]").val($.t("common.form.reset"));
             validatorsManager.validateAllFields(this.$el);
         }
     }); 
