@@ -131,7 +131,7 @@
         <commons.json-fluent.version>1.1.0</commons.json-fluent.version>
         <commons.json-resource.version>1.2.2</commons.json-resource.version>
         <commons.json-patch.version>1.0.0</commons.json-patch.version>
-        <forgerock.json.version>2.0.0-Xpress2</forgerock.json.version>
+        <forgerock.json.version>2.0.0-SNAPSHOT</forgerock.json.version>
 
         <restlet.version>2.1.1</restlet.version>
         <xercesj.version>2.11.0</xercesj.version>
