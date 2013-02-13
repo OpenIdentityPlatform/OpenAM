@@ -79,6 +79,6 @@
 
  <xinclude:include href='appendix-web-config-properties.xml' />
  <xinclude:include href='appendix-jee-config-properties.xml' />
--->
+
  <index />
 </book>
