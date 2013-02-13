@@ -25,7 +25,7 @@
  */
 
  /*
- * Portions Copyrighted 2010-2012 ForgeRock, Inc
+ * Portions Copyrighted 2010-2013 ForgeRock, Inc
  */
 
 package com.sun.identity.saml2.profile;
@@ -342,7 +342,8 @@ public class IDPSSOFederate {
                     spSSODescriptor = null;
                 }
 
-                if (isFromECP || idpSSODescriptor.isWantAuthnRequestsSigned()) {
+                if (isFromECP || idpSSODescriptor.isWantAuthnRequestsSigned()
+                        || (spSSODescriptor == null ? false : spSSODescriptor.isAuthnRequestsSigned())) {
                     // need to verify the query string containing authnRequest
                     if ((spEntityID == null) || 
                         (spEntityID.trim().length() == 0)) {
