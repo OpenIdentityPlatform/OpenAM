@@ -23,6 +23,10 @@
 
 --%>
 
+<%--
+   Portions Copyrighted 2013 ForgeRock Inc
+--%>
+
 <%@ page language="java"
          import="java.security.AccessController,
                  com.sun.identity.security.AdminTokenAction,
@@ -161,15 +165,9 @@
 <div class="MstDiv">
     <table class="MstTblBot" title="" border="0" cellpadding="0" cellspacing="0" width="100%">
         <tr>
-            <td class="MstTdTtl" width="99%">
-                <div class="MstDivTtl"><img name="AMConfig.configurator.ProdName" src="console/images/PrimaryProductName.png" alt="OpenSSO" border="0"/></div>
+            <td class="MstTdTtl">
+                <div class="MstDivTtl"><img name="AMConfig.configurator.ProdName" src="com_sun_web_ui/images/PrimaryProductName.png" alt="OpenAM" border="0"/></div>
             </td>
-            <td class="MstTdLogo" width="1%"><img name="AMConfig.configurator.BrandLogo" src="com_sun_web_ui/images/other/javalogo.gif" alt="Java(TM) Logo" border="0" height="55" width="31"/></td>
-        </tr>
-    </table>
-    <table class="MstTblEnd" border="0" cellpadding="0" cellspacing="0" width="100%">
-        <tr>
-            <td><img name="RMRealm.mhCommon.EndorserLogo" src="com_sun_web_ui/images/masthead/masthead-sunname.gif" alt="Sun(TM) Microsystems, Inc." align="right" border="0" height="10" width="108"/></td>
         </tr>
     </table>
 </div>
