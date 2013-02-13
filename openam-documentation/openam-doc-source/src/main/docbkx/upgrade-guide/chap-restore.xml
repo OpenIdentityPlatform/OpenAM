@@ -79,7 +79,7 @@
  <para>The following example restores OpenAM using Tomcat on an Ubuntu 
  instance.</para>
 
-  <orderedlist numberation="arabic">
+  <orderedlist numeration="arabic">
    <listitem>
     <para>Verify that the JAVA_HOME is properly set.</para>
     <screen>echo $JAVA_HOME
@@ -168,7 +168,7 @@ $ ./bin/startup.sh</screen>
   <para>The following example demonstrates how to revert the Apache 2.2
   policy agent, version 3.0.4 back to Apache 2.2, version 3.0.3.</para>
 
-  <orderedlist numberation="arabic">
+  <orderedlist numeration="arabic">
   <listitem>
    <para>Verify that the JAVA_HOME is properly set.</para>
    <screen>echo $JAVA_HOME

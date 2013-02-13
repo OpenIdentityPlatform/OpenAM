@@ -102,7 +102,7 @@
   on an Ubuntu instance. <!-- TO DO The <citetitle>Deployment Guide</citetitle> provides more 
   information for other containers and platforms.--></para>
   
-  <orderedlist numberation="arabic">
+  <orderedlist numeration="arabic">
   <listitem>
    <para>Verify that the JAVA_HOME is properly set.</para>
    <screen>echo $JAVA_HOME

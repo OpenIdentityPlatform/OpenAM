@@ -58,8 +58,10 @@
    <para>Extract the <filename>.zip</filename> for the new release over the existing 
    policy agent files, replacing the current version with the new version.</para>
   </step>
+  <step>
    <para>Backup the file system directory where the existing policy agent is
    installed.</para>
+  </step>
   <step>
    <para>When upgrading a Java EE agent, replace the deployed policy agent
    application with the new version.</para>
@@ -80,7 +82,7 @@
   <para>The following example updates the Apache 2.2 web policy agent from version 
   3.0.3 release to Apache 2.2 version 3.0.4.</para>
    
-  <orderedlist numberation="arabic">
+  <orderedlist numeration="arabic">
    <listitem>
     <para>Verify that the JAVA_HOME is properly set.</para>
     <screen>echo $JAVA_HOME

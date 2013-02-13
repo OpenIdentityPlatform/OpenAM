@@ -115,7 +115,7 @@
   <filename>.war</filename> file. Review the <citetitle>Installation Guide</citetitle> 
   to reinstall the tools following a successful update.</para>
   
-  <orderedlist numberation="arabic">
+  <orderedlist numeration="arabic">
   <listitem>
    <para>Verify that the JAVA_HOME is properly set.</para>
    <screen>echo $JAVA_HOME

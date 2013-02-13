@@ -137,7 +137,7 @@
   <para>If you have multiple instances, make sure they are all running during the 
   backup process.</para>
   
-  <orderedlist numberation="arabic">
+  <orderedlist numeration="arabic">
   <listitem>
    <para>Verify that the JAVA_HOME is properly set.</para>
    <screen>echo $JAVA_HOME
