@@ -54,13 +54,43 @@
    <para>This release of OpenAM runs in the following web application
    containers.</para>
    <listitem>
-    <para>Apache Tomcat 6.0.x, 7.0.x</para>
+    <para>Apache Tomcat 6.0.x, 7.0.x (ForgeRock's preferred web container for
+    OpenAM)</para>
    </listitem>
    <listitem>
     <para>GlassFish v2</para>
    </listitem>
    <listitem>
     <para>IBM WebSphere 8, 8.5</para>
+
+<!-- Pending final tests
+    <para>For this Xpress release, apply the following workaround to install
+    OpenAM on IBM WebSphere 8.</para>
+
+    <orderedlist>
+     <listitem>
+      <para>Edit the web archive to change the
+      <filename>configuratorTagSwap.properties</filename> file, removing
+      the trailing slash from the <literal>tagswap.files</literal>
+      property.</para>
+
+      <screen>$ cd ~/Downloads/
+$ mkdir openam &amp;&amp; cd openam
+$ jar xf ../openam-server-10.1.0-Xpress.war
+$ vi WEB-INF/classes/configuratorTagSwap.properties
+# Remove the trailing slash in the tagswap.files property.
+# This should all remain on one line in your file:
+tagswap.files=/WEB-INF/classes/AMConfig.properties
+ /WEB-INF/template/sms/serverconfig.xml /WEB-INF/classes/rsa_api.properties
+$ jar cf ../openam.war *</screen>
+     </listitem>
+
+     <listitem>
+      <para>Deploy the resulting <filename>openam.war</filename> web
+      archive.</para>
+     </listitem>
+    </orderedlist>
+-->
    </listitem>
    <listitem>
     <para>JBoss Enterprise Application Platform 4.x, 5.x</para>

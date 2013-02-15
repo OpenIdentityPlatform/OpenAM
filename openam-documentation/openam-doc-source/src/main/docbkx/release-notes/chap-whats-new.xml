@@ -20,7 +20,7 @@
   !
   ! CCPL HEADER END
   !
-  !      Copyright 2011-2012 ForgeRock AS
+  !      Copyright 2011-2013 ForgeRock AS
   !    
 -->
 <chapter xml:id='chap-whats-new'
@@ -63,7 +63,7 @@
   <title>Major New Features</title>
 
   <listitem>
-   <para>OpenAM now provides much richer support for OAuth 2.0. In addition
+   <para>OpenAM now provides further support for OAuth 2.0. In addition
    to playing the role of client and resource server, OpenAM can now also
    play the role of OAuth 2.0 authorization server. See <link
    xlink:href="admin-guide#chap-oauth2"
@@ -73,8 +73,7 @@
   </listitem>
 
   <listitem>
-   <para>Session failover and system session high-availability have been
-   modified to be simpler to implement (<link
+   <para>Session failover has been modified to be simpler to deploy (<link
    xlink:href="https://bugster.forgerock.org/jira/browse/OPENAM-625"
    xlink:show="new">OPENAM-625</link>). OpenAM 10.0.1 and earlier required the
    use of Open Message Queue and Berkeley DB Java Edition, which increased the
@@ -140,20 +139,21 @@
   </listitem>
 
   <listitem>
-   <para>The OATH minimum key length is configurable (<link
-   xlink:href="https://bugster.forgerock.org/jira/browse/OPENAM-1765"
-   xlink:show="new">OPENAM-1765</link>).</para>
+   <para>OpenAM now bundles OpenDJ 2.4.6 (<link
+   xlink:href="https://bugster.forgerock.org/jira/browse/OPENAM-1954"
+   xlink:show="new">OPENAM-1954</link>).</para>
   </listitem>
 
   <listitem>
-   <para>The AMLoginModule now lets authentication modules get a user's
-   sessions (<link
+   <para>The AMLoginModule now lets authentication modules retrieve the list of
+   current session tokens for a user (<link
    xlink:href="https://bugster.forgerock.org/jira/browse/OPENAM-1721"
    xlink:show="new">OPENAM-1721</link>).</para>
   </listitem>
 
   <listitem>
-   <para>OpenAM's IDPAdapter now provides additional hooks for customization
+   <para>OpenAM's IDPAdapter now provides additional hooks for customization.
+   This improvement introduces changes to the API that affect custom IDPAdapters
    (<link xlink:href="https://bugster.forgerock.org/jira/browse/OPENAM-1623"
    xlink:show="new">OPENAM-1623</link>).</para>
   </listitem>
@@ -175,7 +175,7 @@
   -->
 
   <listitem>
-   <para>OpenAM now better supports using a reverse proxy for federation
+   <para>OpenAM now has better support for using a reverse proxy for federation
    when DAS is also deployed (<link
    xlink:href="https://bugster.forgerock.org/jira/browse/OPENAM-1454"
    xlink:show="new">OPENAM-1454</link>).</para>
@@ -195,29 +195,17 @@
   </listitem>
 
    <listitem>
-    <para>The REST authenticate command now has a client parameter (<link
+    <para>The REST authenticate command now has a parameter to specify the
+    client IP address (<link
     xlink:href="https://bugster.forgerock.org/jira/browse/OPENAM-1048"
     xlink:show="new">OPENAM-1048</link>).</para>
   </listitem>
 
   <listitem>
-   <para>OpenAM builds are now also uploaded as Maven artifacts to the ForgeRock
-   Maven repository (<link
+   <para>OpenAM is now built with Maven. Maven artifacts continue to be uploaded
+   to the ForgeRock Maven repository (<link
    xlink:href="https://bugster.forgerock.org/jira/browse/OPENAM-739"
    xlink:show="new">OPENAM-739</link>).</para>
-  </listitem>
-
-  <listitem>
-    <para>For SAML 2.0, modify the templates
-    <link xlink:href="http://sources.forgerock.org/browse/openam/trunk/openam/openam-federation/openam-federation-library/src/main/resources/saml2login.template?r=HEAD"
-    xlink:show="new"><filename>saml2login.template</filename></link>
-    and
-    <link xlink:href="http://sources.forgerock.org/browse/openam/trunk/openam/openam-federation/openam-federation-library/src/main/resources/saml2loginwithrelay.template?r=HEAD"
-    xlink:show="new"><filename>saml2loginwithrelay.template</filename></link>
-    to change the presentation, retaining the form and JavaScript. Then copy
-    your templates under the <filename>WEB-INF/classes/</filename> directory
-    where you unpacked the OpenAM web application (for example
-    <filename>/path/to/tomcat/webapps/openam/WEB-INF/classes/</filename>).</para>
   </listitem>
 
    <listitem>

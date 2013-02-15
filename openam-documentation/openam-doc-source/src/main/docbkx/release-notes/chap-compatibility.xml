@@ -20,7 +20,7 @@
   !
   ! CCPL HEADER END
   !
-  !      Copyright 2011-2012 ForgeRock AS
+  !      Copyright 2011-2013 ForgeRock AS
   !    
 -->
 <chapter xml:id='chap-compatibility'
@@ -87,16 +87,6 @@
     and 7.1.</para>
    </listitem>
  -->
-
-   <listitem>
-    <para>Privileged console access is now disabled by default. To enable
-    privileged console access for specific users, set the
-    <literal>console.privileged.users</literal> advanced property as described
-    in the <citetitle>OpenAM Reference</citetitle> section, <link
-    xlink:href="reference#servers-advanced-configuration"
-    xlink:role="http://docbook.org/xlink/role/olink"><citetitle>Servers &gt;
-    Advanced</citetitle></link>.</para>
-   </listitem>
 
    <!-- Fix for OPENAM-1578 -->
    <listitem>
