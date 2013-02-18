@@ -306,6 +306,12 @@
         "apps" : {
             "header" : "My Applications",
             "noneFound": "You have no applications assigned to you"
+        },
+        "authentication": {
+            "input": {
+                "name": "Username",
+                "password": "Password"
+            }
         }
     },    
     "openidm" : {

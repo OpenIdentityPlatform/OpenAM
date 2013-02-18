@@ -1565,6 +1565,11 @@
                 <version>20090211</version>
             </dependency>
 
+            <dependency>
+                <groupId>com.google.inject</groupId>
+                <artifactId>guice</artifactId>
+                <version>3.0</version>
+            </dependency>
         </dependencies>
     </dependencyManagement>
 

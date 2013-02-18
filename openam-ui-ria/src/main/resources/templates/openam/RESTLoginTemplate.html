@@ -1,0 +1,26 @@
+<style>
+.container, .container-shadow {
+    width: 480px;
+}
+</style>
+
+
+<div class="column-layout" style="padding-top: 30px;">
+    <div>
+        <form action="" method="post" class="form">
+            <fieldset>
+
+                {{#each callbacks}}
+                <div class="field">
+                    <label class="short">{{t input.i18n_key}}:</label> 
+                    <input type="text" name="{{input.name}}" data-validator="required" data-validator-event="keyup" />
+                </div>
+                {{/each}}
+
+                <div class="field field-submit">
+                    <input type="submit" name="loginButton" class="button active" value="{{t "common.user.login"}}" />
+                </div>
+            </fieldset>
+        </form>
+    </div>
+</div>

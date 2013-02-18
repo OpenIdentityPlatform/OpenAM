@@ -37,44 +37,6 @@ define("UserDelegate", [
 
     var obj = new AbstractDelegate(constants.host + "/"+ constants.context + "/json/users");
 
-    /**
-     * Starting session. Sending username and password to authenticate and returns user's id.
-     */
-    obj.login = function(uid, password, successCallback, errorCallback, errorsHandlers) {
-        
-        obj.serviceCall({
-            serviceUrl: constants.host + "/"+ constants.context + "/identity/authenticate",
-            url: "",
-            data: $.param({username: uid, password: password}),
-            dataType: "text",
-            type: "POST",
-            success: _.bind(function (data) {
-                var token = "";
-                if(!data.length || !data.match(/^token\.id=/)) {
-                    if(errorCallback) {
-                        errorCallback();
-                    }
-                } else {
-                    token = data.split("=")[1].replace("\n", "");
-                    obj.serviceCall({
-                        serviceUrl: constants.host + "/"+ constants.context + "/identity/json/getcookienamefortoken",
-                        url: "",
-                        success: _.bind(function (data) {
-                            cookieHelper.setCookie(data.string, token, "", "/", document.domain.split(".").splice(1).join("."));
-                            this.getProfile(successCallback, errorCallback, errorsHandlers);    
-                        }, this),
-                        error: errorCallback
-                    });
-
-                }
-            }, this),
-            error: function () { 
-                errorCallback.apply(this, arguments); 
-            },
-            errorsHandlers: errorsHandlers
-        });
-    };
-    
     obj.getUserById = function(id, component, successCallback, errorCallback) {
 
         obj.serviceCall({
@@ -107,8 +69,7 @@ define("UserDelegate", [
      */
     obj.getProfile = function(successCallback, errorCallback, errorsHandlers) {
         obj.serviceCall({
-            serviceUrl: constants.host + "/"+ constants.context + "/json/users/?_action=idFromSession",
-            url: "",
+            url: "/?_action=idFromSession",
             data: "{}",
             type: "POST",
             success: function (data) {

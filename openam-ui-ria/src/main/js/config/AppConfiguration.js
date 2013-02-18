@@ -36,7 +36,7 @@ define("config/AppConfiguration", [
                {
                    moduleClass: "org/forgerock/commons/ui/common/main/SessionManager",
                    configuration: {
-                       loginHelperClass: "org/forgerock/commons/ui/user/login/InternalLoginHelper"
+                       loginHelperClass: "org/forgerock/openam/ui/user/login/RESTLoginHelper"
                    } 
                },
                {

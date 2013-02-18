@@ -1465,11 +1465,11 @@ public class AuthContext extends Object implements java.io.Serializable {
      *
      * @return Single-Sign-On token for the valid user after successful
      *         authentication.
-     * @throws Exception if the user is not authenticated or an error is
+     * @throws L10NMessageImpl if the user is not authenticated or an error is
      *         encountered in retrieving the user's single sign on token.
      * @supported.api
      */
-    public SSOToken getSSOToken() throws Exception {
+    public SSOToken getSSOToken() throws L10NMessageImpl {
         if (localFlag) {
             if (!acLocal.getStatus().equals(Status.SUCCESS)) {
                 throw new L10NMessageImpl(
