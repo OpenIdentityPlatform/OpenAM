@@ -157,8 +157,8 @@ public class AMKeyProvider implements KeyProvider {
         try {
             ks = KeyStore.getInstance(keystoreType);
             if ( (keystoreFile == null) || (keystoreFile.isEmpty()) ) {
-                logger.error("mapPk2Cert.JKSKeyProvider: KeyStore FileName is null, " +
-                        "unable to establish Mapping Public Keys to Certificates!");
+                logger.error("mapPk2Cert.JKSKeyProvider: KeyStore FileName is null, "
+                        + "unable to establish Mapping Public Keys to Certificates!");
                 return;
             }
             FileInputStream fis = new FileInputStream(keystoreFile);

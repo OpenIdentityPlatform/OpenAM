@@ -32,7 +32,7 @@ import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
-import static junit.framework.Assert.fail;
+import static org.junit.Assert.fail;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.anyString;
 import static org.mockito.Mockito.eq;
@@ -143,7 +143,6 @@ public class JWTBuilderTest {
     @Test (expectedExceptions = UnsupportedOperationException.class)
     public void shouldBuildSignedThenEncryptedJWT() throws SignatureException {
 
-
         //Given
         Map<String, Object> claimPairs = new HashMap<String, Object>();
         claimPairs.put("NAME2", 1);
@@ -153,6 +152,13 @@ public class JWTBuilderTest {
 
         given(signatureUtil.sign(eq(privateKey), anyString())).willReturn(signature);
 
+        //When
+        String jwt = jwtBuilder.setAlgorithm("ALGORITHM")
+                .addValuePair("NAME1", true)
+                .addValuePairs(claimPairs)
+                .sign(privateKey)
+                .encrypt()
+                .build();
 
         //When
         fail();

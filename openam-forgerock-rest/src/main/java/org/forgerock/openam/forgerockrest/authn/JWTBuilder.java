@@ -26,7 +26,6 @@ import javax.ws.rs.core.Response;
 import java.security.PrivateKey;
 import java.security.SignatureException;
 import java.security.cert.X509Certificate;
-import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
@@ -116,7 +115,7 @@ public class JWTBuilder {
      * @param valuePairs A Map of value pairs.
      * @return Thw JWTBuilder
      */
-     public JWTBuilder addValuePairs(Map<String, Object> valuePairs) {
+    public JWTBuilder addValuePairs(Map<String, Object> valuePairs) {
         if (!isModifiable()) {
             throw new JWTBuilderException("JWT has been signed. No modification allowed.");
         }
@@ -136,7 +135,7 @@ public class JWTBuilder {
             throw new JWTBuilderException("JWT has been signed already.");
         }
 
-            if (privateKey == null) {
+        if (privateKey == null) {
             throw new RestAuthException(Response.Status.INTERNAL_SERVER_ERROR,
                     "Could not perform signature with invalid private key");
         }
@@ -223,6 +222,7 @@ public class JWTBuilder {
             JSONObject header = new JSONObject()
                     .put("typ", type)
                     .put("alg", algorithm);
+
             return Base64.encode(header.toString().getBytes());
         } catch (JSONException e) {
             throw new JWTBuilderException("Unable to build JWT Header", e);
@@ -241,7 +241,6 @@ public class JWTBuilder {
 
             for (Map.Entry<String, Object> key : payload.entrySet()) {
                 body.put(key.getKey(), key.getValue());
-
             }
 
             return Base64.encode(body.toString().getBytes());

@@ -37,7 +37,6 @@ public interface RestAuthCallbackHandler<T extends Callback> extends JsonCallbac
      * successfully. In this case no callbacks will be sent back to the client, only the success or failure of the
      * authentication.
      *
-     *
      * @param headers The HttpHeaders from the request.
      * @param request The HttpServletRequest from the request.
      * @param callback The Callback to update with its required values from the headers and request.

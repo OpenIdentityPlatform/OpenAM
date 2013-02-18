@@ -41,5 +41,4 @@ public class JWTBuilderException extends RuntimeException {
     public JWTBuilderException(String errorMessage, JSONException e) {
         super(errorMessage, e);
     }
-
 }
