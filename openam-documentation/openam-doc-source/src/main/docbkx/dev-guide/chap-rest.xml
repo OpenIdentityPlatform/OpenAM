@@ -951,7 +951,8 @@ $ curl "https://openam.example.com:8443/openam/identity/log?
 
    <para>OpenAM lets administrators create a user profile by making 
    an HTTP POST of the JSON representation of the profile to
-   <literal>/json/users/?_action=create</literal>.</para>
+   <literal>/json/users/<replaceable>realm</replaceable>/?_action=create</literal>.
+   To add a user to the Top Level Realm, you do not need to specify the realm.</para>
    
    
     <para>The following example shows an administrator creating a new user. The 
@@ -1078,11 +1079,12 @@ $ curl --request PUT --header "iplanetDirectoryPro: AQIC5w...2NzEz*"
   <section xml:id="rest-api-read-identity">
    <title>Reading Identities</title>
 
-   <para>OpenAM lets users and administrators read profiles by requesting an
-   HTTP GET on <literal>/json/users/<replaceable>user-id</replaceable></literal>.
+   <para>OpenAM lets users and administrators read profiles by requesting an HTTP
+   GET on <literal>/json/<replaceable>subrealm</replaceable>/users/<replaceable>user-id</replaceable></literal>.
    This allows users and administrators to verify user data, status, and directory.
    If users or administrators see missing or incorrect information, they can write 
-   down the correct information and add it using <xref linkend="rest-api-update-identity" />.</para>
+   down the correct information and add it using <xref linkend="rest-api-update-identity" />.
+   To read a profile on the Top Level Realm, you do not need to specify the realm.</para>
    
    <para>Users can review the data associated with their accounts and administrators 
    can read other user's profiles. The following example shows an administrator 
@@ -1148,8 +1150,8 @@ $ curl --header "iplanetDirectoryPro: AQIC5w...2NzEz*"
 
    <para>OpenAM lets users update their own profiles, and lets administrators
    update other users' profiles. To update an identity do an HTTP PUT of the JSON 
-   representation of the changes to <literal>/json/users/
-   <replaceable>user-id</replaceable></literal>.</para>
+   representation of the changes to <literal>/json/<replaceable>subrealm</replaceable>/users/<replaceable>user-id</replaceable></literal>. 
+   To update a profile on the Top Level Realm, you do not need to specify the realm.</para>
 
     <para>The following example shows how users can update their own
     profiles.</para>
@@ -1160,7 +1162,7 @@ token.id=AQIC5...Y3MTAx*
 $ curl --request PUT --header "iplanetDirectoryPro: AQIC5...Y3MTAx*"
  --header "Content-Type: application/json"
  --data '{ "mail": "demo@example.com" }'
- https://openam.example.com:8443/openam/json/demo
+ https://openam.example.com:8443/openam/json/users/demo
 {
     "name": "demo",
     "realm": "/",
@@ -1217,7 +1219,8 @@ $ curl --request PUT --header "iplanetDirectoryPro: AQIC5...Y3MTAx*"
    <title>Deleting Identities</title>
 
    <para>OpenAM lets administrators delete a user profile by making an HTTP DELETE 
-   call to <literal>/json/users/<replaceable>user-id</replaceable></literal>.</para>
+   call to <literal>/json/<replaceable>subrealm</replaceable>/users/<replaceable>user-id</replaceable></literal>. 
+   To delete a user from the Top Level Realm, you do not need to specify the realm.</para>
 
     <para>The following example removes a user from the top level
     realm. Only administrators should delete users. The user id is the only 
@@ -1530,7 +1533,7 @@ $ curl --request POST --header "iplanetDirectoryPro: AQIC5w...2NzEz*"
  --header "Content-Type: application/json"
  --data '{ "realm": "testRealm" }'
  https://openam.example.com:8443/openam/json/realms/?_action=create
-{</screen>
+{"realmCreated":"/testRealm"}</screen>
 
     <para>You can also set the <literal>sunOrganizationAliases</literal> parameter,
     but it can only be assigned to one realm (usually the top level realm). Before
