@@ -103,7 +103,7 @@
         </license>
     </licenses>
     <properties>
-        <serverDocTargetVersion>10.1.0-Xpress</serverDocTargetVersion>
+        <serverDocTargetVersion>10.2.0-SNAPSHOT</serverDocTargetVersion>
         <serverProjectVersion>${serverDocTargetVersion}</serverProjectVersion>
         <agentsDocTargetVersion>3.1.0-Xpress</agentsDocTargetVersion>
         <webAgentsDocTargetVersion>${agentsDocTargetVersion}</webAgentsDocTargetVersion>
