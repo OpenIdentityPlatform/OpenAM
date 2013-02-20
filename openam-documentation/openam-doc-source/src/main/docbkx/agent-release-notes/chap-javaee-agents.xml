@@ -74,12 +74,14 @@
     xlink:href="https://bugster.forgerock.org/jira/browse/OPENAM-1273"
     xlink:show="new">OPENAM-1273</link>).</para>
    </listitem>
+<!--
    <listitem>
     <para>Java EE policy agents can now conditionally redirect users based on
     the incoming request URL (<link
     xlink:href="https://bugster.forgerock.org/jira/browse/OPENAM-1265"
     xlink:show="new">OPENAM-1265</link>).</para>
    </listitem>
+-->
    <listitem>
     <para>The auto-submitting form in <filename>FormLoginContent.txt</filename>
     now parses as valid XML (<link
@@ -135,7 +137,7 @@
      <para>GlassFish v2, v3</para>
     </listitem>
     <listitem>
-     <para>IBM WebSphere Application Server 6.1, 7, 8, 8.5</para>
+     <para>IBM WebSphere Application Server <!-- 6.1, -->7, 8, 8.5</para>
     </listitem>
     <listitem>
      <para>JBoss Enterprise Application Platform 5</para>
@@ -265,7 +267,7 @@
    xlink:href="https://bugster.forgerock.org/jira/browse/OPENAM">OpenAM issue
    tracker</link>.</para>
 
-   <!-- List generated at 16:36:23 20130215 using http://bugster.forgerock.org/jira/rest/api/2/search?jql=project+%3D+OpenAM+AND+component+%3D+"j2ee+agents"+AND+resolution+%3D+Unresolved+AND+labels+%3D+release-notes&startAt=0&maxResults=500&fields=summary-->
+   <!-- List generated at 14:51:01 20130217 using http://bugster.forgerock.org/jira/rest/api/2/search?jql=project+%3D+OpenAM+AND+component+%3D+"j2ee+agents"+AND+resolution+%3D+Unresolved+AND+labels+%3D+release-notes&startAt=0&maxResults=500&fields=summary-->
    <itemizedlist>
    <listitem><para><link xlink:href="https://bugster.forgerock.org/jira/browse/OPENAM-2188" xlink:show="new">OPENAM-2188</link>: J2EE agent doesn't work with WebSphere 6.1 32-bit</para></listitem>
    <listitem><para><link xlink:href="https://bugster.forgerock.org/jira/browse/OPENAM-1991" xlink:show="new">OPENAM-1991</link>: Tomcat doesn't shutdown properly with J2EE agent for the tomcat.</para></listitem>

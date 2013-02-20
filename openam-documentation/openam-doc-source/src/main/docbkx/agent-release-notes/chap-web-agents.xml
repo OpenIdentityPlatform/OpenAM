@@ -368,7 +368,7 @@
    xlink:href="https://bugster.forgerock.org/jira/browse/OPENAM">OpenAM issue
    tracker</link>.</para>
 
-   <!-- List generated at 16:38:40 20130215 using http://bugster.forgerock.org/jira/rest/api/2/search?jql=project+%3D+OpenAM+AND+component+%3D+"web+agents"+AND+resolution+%3D+Unresolved+AND+labels+%3D+release-notes&startAt=0&maxResults=500&fields=summary-->
+   <!-- List generated at 14:51:30 20130217 using http://bugster.forgerock.org/jira/rest/api/2/search?jql=project+%3D+OpenAM+AND+component+%3D+"web+agents"+AND+resolution+%3D+Unresolved+AND+labels+%3D+release-notes&startAt=0&maxResults=500&fields=summary-->
    <itemizedlist>
    <listitem><para><link xlink:href="https://bugster.forgerock.org/jira/browse/OPENAM-1927" xlink:show="new">OPENAM-1927</link>: Silent Installation does not work for Apache2.4/Suse11</para></listitem>
    <listitem><para><link xlink:href="https://bugster.forgerock.org/jira/browse/OPENAM-1521" xlink:show="new">OPENAM-1521</link>: Cookie Hijacking Prevention does not work properly under FireFox</para></listitem>

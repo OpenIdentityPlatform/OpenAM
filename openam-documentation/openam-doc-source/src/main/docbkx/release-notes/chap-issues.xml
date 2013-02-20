@@ -230,19 +230,23 @@
   xlink:href="https://bugster.forgerock.org/jira/browse/OPENAM">OpenAM issue
   tracker</link>.</para>
 
-  <!-- List generated at 16:35:08 20130215 using http://bugster.forgerock.org/jira/rest/api/2/search?jql=project+%3D+OpenAM+AND+component+not+in+%28"j2ee+agents"%2C+"web+agents"%29+AND+resolution+%3D+Unresolved+AND+labels+%3D+release-notes&startAt=0&maxResults=500&fields=summary-->
+  <!-- List generated at 06:12:04 20130220 using http://bugster.forgerock.org/jira/rest/api/2/search?jql=project+%3D+OpenAM+AND+%28component+not+in+%28"j2ee+agents"%2C+"web+agents"%29+OR+component+is+EMPTY%29+AND+%28resolution+%3D+Unresolved+OR+%28affectedVersion+%3D+"10.1.0-Xpress"+AND+fixVersion+%21%3D+"10.1.0-Xpress"%29%29+AND+labels+%3D+release-notes&startAt=0&maxResults=500&fields=summary-->
   <itemizedlist>
+   <listitem><para><link xlink:href="https://bugster.forgerock.org/jira/browse/OPENAM-2189" xlink:show="new">OPENAM-2189</link>: configuration failing with message ".../opt/openam is a directory"</para></listitem>
    <listitem><para><link xlink:href="https://bugster.forgerock.org/jira/browse/OPENAM-2183" xlink:show="new">OPENAM-2183</link>: Install of AM in WebLogic 12c container fails extracting OpenDJ files</para></listitem>
    <listitem><para><link xlink:href="https://bugster.forgerock.org/jira/browse/OPENAM-2168" xlink:show="new">OPENAM-2168</link>: Authentication Success Rate and Authentication Failure Rate are always 0</para></listitem>
    <listitem><para><link xlink:href="https://bugster.forgerock.org/jira/browse/OPENAM-2167" xlink:show="new">OPENAM-2167</link>: Oracle iPlanet Web Server policy agent install instructions incorrect</para></listitem>
+   <listitem><para><link xlink:href="https://bugster.forgerock.org/jira/browse/OPENAM-2154" xlink:show="new">OPENAM-2154</link>: cert-auth module does not succeed if CRL update fails</para></listitem>
    <listitem><para><link xlink:href="https://bugster.forgerock.org/jira/browse/OPENAM-2153" xlink:show="new">OPENAM-2153</link>: cert-auth module does not allow to disable CRL in-memory cache</para></listitem>
    <listitem><para><link xlink:href="https://bugster.forgerock.org/jira/browse/OPENAM-2152" xlink:show="new">OPENAM-2152</link>: cert-auth module does not allow storage of several CRLs for the same issuer</para></listitem>
    <listitem><para><link xlink:href="https://bugster.forgerock.org/jira/browse/OPENAM-2145" xlink:show="new">OPENAM-2145</link>: Memory leak in J2EE Agent 3.1.0-Xpress</para></listitem>
    <listitem><para><link xlink:href="https://bugster.forgerock.org/jira/browse/OPENAM-2137" xlink:show="new">OPENAM-2137</link>: DSConfigMgr can hide exception root causes</para></listitem>
    <listitem><para><link xlink:href="https://bugster.forgerock.org/jira/browse/OPENAM-2117" xlink:show="new">OPENAM-2117</link>: ssoadm create-agent command should not require serverurl/agenturl for web/j2ee agents</para></listitem>
+   <listitem><para><link xlink:href="https://bugster.forgerock.org/jira/browse/OPENAM-2110" xlink:show="new">OPENAM-2110</link>: Upgrade fails if external configstore is using non-default user</para></listitem>
    <listitem><para><link xlink:href="https://bugster.forgerock.org/jira/browse/OPENAM-2097" xlink:show="new">OPENAM-2097</link>: Adaptive risk module does not describe which GeoIP client is used and where to obtain the GeoIP database file</para></listitem>
    <listitem><para><link xlink:href="https://bugster.forgerock.org/jira/browse/OPENAM-2085" xlink:show="new">OPENAM-2085</link>: Policy evaluation is inconsistent when several policies have mutually exclusive conditions of certain types</para></listitem>
    <listitem><para><link xlink:href="https://bugster.forgerock.org/jira/browse/OPENAM-2064" xlink:show="new">OPENAM-2064</link>: Missing forgerock-am-dashboard-service attribute to provision new Subject to non OpenDJ external user store</para></listitem>
+   <listitem><para><link xlink:href="https://bugster.forgerock.org/jira/browse/OPENAM-2059" xlink:show="new">OPENAM-2059</link>: ssoadm export-svc-cfg throws NullPointerExecption if no SubConfiguration exists for a given service</para></listitem>
    <listitem><para><link xlink:href="https://bugster.forgerock.org/jira/browse/OPENAM-2050" xlink:show="new">OPENAM-2050</link>: URL Encoding the Redirect URI for the OAuth2 provider for OpenAM</para></listitem>
    <listitem><para><link xlink:href="https://bugster.forgerock.org/jira/browse/OPENAM-2023" xlink:show="new">OPENAM-2023</link>: Federation Connectivity Test fails with Account termination is not working </para></listitem>
    <listitem><para><link xlink:href="https://bugster.forgerock.org/jira/browse/OPENAM-1964" xlink:show="new">OPENAM-1964</link>: Performance issues when using AMIdentitySubject with groups</para></listitem>
