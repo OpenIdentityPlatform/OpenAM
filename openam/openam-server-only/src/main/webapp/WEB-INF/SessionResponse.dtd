@@ -1,0 +1,74 @@
+<!--
+   DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
+  
+   Copyright (c) 2006 Sun Microsystems Inc. All Rights Reserved
+  
+   The contents of this file are subject to the terms
+   of the Common Development and Distribution License
+   (the License). You may not use this file except in
+   compliance with the License.
+  
+   You can obtain a copy of the License at
+   https://opensso.dev.java.net/public/CDDLv1.0.html or
+   opensso/legal/CDDLv1.0.txt
+   See the License for the specific language governing
+   permission and limitations under the License.
+  
+   When distributing Covered Code, include this CDDL
+   Header Notice in each file and include the License file
+   at opensso/legal/CDDLv1.0.txt.
+   If applicable, add the following below the CDDL Header,
+   with the fields enclosed by brackets [] replaced by
+   your own identifying information:
+   "Portions Copyrighted [year] [name of copyright owner]"
+  
+   $Id: SessionResponse.dtd,v 1.2 2008/06/25 05:45:34 qcheng Exp $
+  
+-->
+
+<?xml version="1.0">
+<!DOCTYPE SessionResponse [
+<!ELEMENT SessionResponse(GetSession |
+                          GetActiveSessions |
+                          DestroySession |
+                          Logout |
+                          AddSessionListener |
+                          AddSessionListenerOnAllSessions |
+                          SetProperty |
+                          GetSessionCount)>
+<!ATTLIST SessionResponse
+    vers   CDATA #REQUIRED
+    reqid  CDATA #REQUIRED>
+<!ELEMENT GetSession (Session|Exception)>
+<!ELEMENT GetActiveSessions (SessionList|Exception)>
+<!ELEMENT DestroySession (OK|Exception)>
+<!ELEMENT Logout (OK|Exception)>
+<!ELEMENT AddSessionListener (OK|Exception)>
+<!ELEMENT AddSessionListenerOnAllSessions (OK|Exception)>
+<!ELEMENT SetProperty (OK|Exception)>
+<!ELEMENT GetSessionCount (AllSessionsGivenUUID|Exception)>
+<!ELEMENT Session (Property)*>
+<!ATTLIST Session
+    sid        CDATA #REQUIRED
+    stype      (user|application) "user"
+    cid        CDATA #REQUIRED
+    cdomain    CDATA #REQUIRED
+    maxtime    CDATA #REQUIRED
+    maxidle    CDATA #REQUIRED
+    maxcaching CDATA #REQUIRED
+    timeleft   CDATA #REQUIRED
+    timeidle   CDATA #REQUIRED   
+    state      (invalid|valid|inactive|destroyed) "invalid">
+<!ELEMENT Property>
+<!ATTLIST Property
+    name   CDATA #REQUIRED
+    value  CDATA #REQUIRED>
+<!ELEMENT SessionList (Session)*>
+<!ELEMENT SessionExpirationTimeInfo>
+<!ATTLIST SessionExpirationTimeInfo
+    sid        CDATA #REQUIRED
+    expTime    CDATA #REQUIRED>
+<!ELEMENT AllSessionsGivenUUID (SessionExpirationTimeInfo)*>
+<!ELEMENT OK (#PCDATA)>
+<!ELEMENT Exception (#PCDATA)>
+]>

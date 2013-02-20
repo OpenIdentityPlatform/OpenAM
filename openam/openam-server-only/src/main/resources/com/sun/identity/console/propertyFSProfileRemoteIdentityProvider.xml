@@ -1,0 +1,381 @@
+<!--
+   DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
+  
+   Copyright (c) 2007 Sun Microsystems Inc. All Rights Reserved
+  
+   The contents of this file are subject to the terms
+   of the Common Development and Distribution License
+   (the License). You may not use this file except in
+   compliance with the License.
+
+   You can obtain a copy of the License at
+   https://opensso.dev.java.net/public/CDDLv1.0.html or
+   opensso/legal/CDDLv1.0.txt
+   See the License for the specific language governing
+   permission and limitations under the License.
+
+   When distributing Covered Code, include this CDDL
+   Header Notice in each file and include the License file
+   at opensso/legal/CDDLv1.0.txt.
+   If applicable, add the following below the CDDL Header,
+   with the fields enclosed by brackets [] replaced by
+   your own identifying information:
+   "Portions Copyrighted [year] [name of copyright owner]"
+
+   $Id: propertyFSProfileRemoteIdentityProvider.xml,v 1.2 2008/06/25 05:45:10 qcheng Exp $
+
+-->
+
+<!DOCTYPE propertysheet SYSTEM "propertysheet.dtd">
+
+<propertysheet>
+    <section name="common" defaultValue="entityDescriptor.provider.section.title.commonAttributes" >
+    <property>
+	<label name="lblProviderType" defaultValue="entityDescriptor.provider.attribute.label.providerType" labelFor="tfProviderType" />
+	<cc name="tfProviderType" tagclass="com.sun.web.ui.taglib.html.CCStaticTextFieldTag" />
+	<cc name="tfProviderType" tagclass="com.sun.web.ui.taglib.html.CCHiddenTag" />
+    </property>
+
+    <property>
+	<label name="lblDescription" defaultValue="entityDescriptor.provider.attribute.label.description" labelFor="tfDescription" />
+	<cc name="tfDescription" tagclass="com.sun.web.ui.taglib.html.CCTextFieldTag">
+	    <attribute name="size" value="75" />
+	    <attribute name="autoSubmit" value="false" />
+            <attribute name="localizeDisplayFieldValue" value="false" />
+	</cc>
+    </property>
+
+    <property>
+	<label name="lblProtocolSupportEnum" defaultValue="entityDescriptor.provider.attribute.label.protocolSupportEnum" labelFor="txtProtocolSupportEnum" />
+	<cc name="txtProtocolSupportEnum" tagclass="com.sun.web.ui.taglib.html.CCDropDownMenuTag">
+	<option label="urn:liberty:iff:2003-08" value="urn:liberty:iff:2003-08" />
+	<option label="urn:liberty:iff:2002-12" value="urn:liberty:iff:2002-12" />
+	</cc>
+    </property>
+
+    <subsection name="elistServerNameIdentifierMappingSection" defaultValue="" >
+        <property>
+            <label name="lblServerNameIdentifierMapping" 
+                defaultValue="entityDescriptor.provider.attribute.label.serverNameIdentifierMapping" 
+                labelFor="elistServerNameIdentifierMapping" />
+            <ccgroup>
+            <property>
+            <cc name="elistServerNameIdentifierMapping" 
+                tagclass="com.sun.web.ui.taglib.editablelist.CCEditableListTag" >
+            </cc>
+            <fieldhelp name="helpServerNameIdentifierMapping" 
+                defaultValue="entityDescriptor.provider.attribute.help.serverNameIdentifierMapping" />
+            </property>
+            </ccgroup>
+            &lt;p>
+        </property>
+    </subsection>
+
+    <property>
+	<label name="lblSigningKey" defaultValue="entityDescriptor.provider.attribute.label.Signing" />
+	<ccgroup>
+	<property>
+	<label name="lblSigningKeyAlias" defaultValue="entityDescriptor.provider.attribute.label.Signing.KeyAlias" labelFor="tfSigningKeyAlias" />
+	<cc name="tfSigningKeyAlias" tagclass="com.sun.web.ui.taglib.html.CCTextFieldTag" >
+	    <attribute name="autoSubmit" value="false" />
+            <attribute name="localizeDisplayFieldValue" value="false" />
+        </cc>
+	</property>
+	</ccgroup>
+    </property>
+
+    <property>
+	<label name="txtEncryptionKey" defaultValue="entityDescriptor.provider.attribute.label.Encryption" />
+	<ccgroup>
+	<property>
+	<label name="lblEncryptionKeyAlias" defaultValue="entityDescriptor.provider.attribute.label.Encryption.KeyAlias" labelFor="tfEncryptionKeyAlias" />
+	<cc name="tfEncryptionKeyAlias" tagclass="com.sun.web.ui.taglib.html.CCTextFieldTag" >
+	    <attribute name="autoSubmit" value="false" />
+            <attribute name="localizeDisplayFieldValue" value="false" />
+        </cc>
+	</property>
+
+	<property>
+	<label name="lblEncryptionKeySize" defaultValue="entityDescriptor.provider.attribute.label.Encryption.KeySize" labelFor="tfEncryptionKeySize" />
+	<cc name="tfEncryptionKeySize" tagclass="com.sun.web.ui.taglib.html.CCTextFieldTag" >
+	    <attribute name="autoSubmit" value="false" />
+            <attribute name="localizeDisplayFieldValue" value="false" />
+        </cc>
+	<fieldhelp name="helpEncryptionKeySize" defaultValue="entityDescriptor.provider.attribute.help.Encryption.KeySize" />
+	</property>
+
+	<property>
+	<label name="lblEncryptionMethod" defaultValue="entityDescriptor.provider.attribute.label.Encryption.Method" labelFor="singleChoiceEncryptionMethod" />
+	<cc name="singleChoiceEncryptionMethod" tagclass="com.sun.web.ui.taglib.html.CCDropDownMenuTag">
+	    <option label="provider.encryptionMethod.option.none" value="" />
+	    <option label="AES" value="AES" />
+	    <option label="DESede" value="DESede" />
+	</cc>
+	<fieldhelp name="helpEncryptionMethod" defaultValue="entityDescriptor.provider.attribute.help.Encryption.Method" />
+	</property>
+	</ccgroup>
+    </property>
+
+    <property>
+	<label name="lblEnableNameIdentifierEncryption" defaultValue="entityDescriptor.provider.attribute.label.enableNameIdentifierEncryption" labelFor="cbEnableNameIdentifierEncryption" />
+	<cc name="cbEnableNameIdentifierEncryption" tagclass="com.sun.web.ui.taglib.html.CCCheckBoxTag">
+	<attribute name="label" value="label.Enable" />
+	</cc>
+    </property>
+    </section>
+
+    <section name="communicationURLs" defaultValue="entityDescriptor.provider.section.title.communicationURLs" >
+    <property>
+	<label name="lblSOAPEndpointURL" defaultValue="entityDescriptor.provider.attribute.label.SOAPEndpointURL" labelFor="tfSOAPEndpointURL" />
+	<cc name="tfSOAPEndpointURL" tagclass="com.sun.web.ui.taglib.html.CCTextFieldTag">
+	<attribute name="size" value="75" />
+	    <attribute name="autoSubmit" value="false" />
+            <attribute name="localizeDisplayFieldValue" value="false" />
+	</cc>
+	<fieldhelp name="helpSOAPEndpointURL" defaultValue="entityDescriptor.provider.attribute.help.SOAPEndpointURL" />
+    </property>
+    <property required="true">
+	<label name="lblSingleSignOnServiceURL" defaultValue="entityDescriptor.provider.attribute.label.singleSignOnServiceURL" labelFor="tfSingleSignOnServiceURL" />
+	<cc name="tfSingleSignOnServiceURL" tagclass="com.sun.web.ui.taglib.html.CCTextFieldTag">
+	<attribute name="size" value="75" />
+	    <attribute name="autoSubmit" value="false" />
+            <attribute name="localizeDisplayFieldValue" value="false" />
+	</cc>
+    </property>
+
+    <property>
+	<label name="lblSingleLogoutServiceURL" defaultValue="entityDescriptor.provider.attribute.label.singleLogoutServiceURL" labelFor="tfSingleLogoutServiceURL" />
+	<cc name="tfSingleLogoutServiceURL" tagclass="com.sun.web.ui.taglib.html.CCTextFieldTag">
+	<attribute name="size" value="75" />
+	    <attribute name="autoSubmit" value="false" />
+            <attribute name="localizeDisplayFieldValue" value="false" />
+	</cc>
+	<fieldhelp name="helpSingleLogoutServiceURL" defaultValue="entityDescriptor.provider.attribute.help.singleLogoutServiceURL" />
+    </property>
+
+    <property>
+	<label name="lblSingleLogoutReturnURL" defaultValue="entityDescriptor.provider.attribute.label.singleLogoutReturnURL" labelFor="tfSingleLogoutReturnURL" />
+	<cc name="tfSingleLogoutReturnURL" tagclass="com.sun.web.ui.taglib.html.CCTextFieldTag">
+	<attribute name="size" value="75" />
+	    <attribute name="autoSubmit" value="false" />
+            <attribute name="localizeDisplayFieldValue" value="false" />
+	</cc>
+	<fieldhelp name="helpSingleLogoutReturnURL" defaultValue="entityDescriptor.provider.attribute.help.singleLogoutReturnURL" />
+    </property>
+
+    <property>
+	<label name="lblFederationTerminationServiceURL" defaultValue="entityDescriptor.provider.attribute.label.federationTerminationServiceURL" labelFor="tfFederationTerminationServiceURL" />
+	<cc name="tfFederationTerminationServiceURL" tagclass="com.sun.web.ui.taglib.html.CCTextFieldTag">
+	<attribute name="size" value="75" />
+	    <attribute name="autoSubmit" value="false" />
+            <attribute name="localizeDisplayFieldValue" value="false" />
+	</cc>
+	<fieldhelp name="helpFederationTerminationServiceURL" defaultValue="entityDescriptor.provider.attribute.help.federationTerminationServiceURL" />
+    </property>
+
+    <property>
+	<label name="lblFederationTerminationReturnURL" defaultValue="entityDescriptor.provider.attribute.label.federationTerminationReturnURL" labelFor="tfFederationTerminationReturnURL" />
+	<cc name="tfFederationTerminationReturnURL" tagclass="com.sun.web.ui.taglib.html.CCTextFieldTag">
+	<attribute name="size" value="75" />
+	    <attribute name="autoSubmit" value="false" />
+            <attribute name="localizeDisplayFieldValue" value="false" />
+	</cc>
+	<fieldhelp name="helpFederationTerminationReturnURL" defaultValue="entityDescriptor.provider.attribute.help.federationTerminationReturnURL" />
+    </property>
+
+    <property>
+	<label name="lblNameRegistrationServiceURL" defaultValue="entityDescriptor.provider.attribute.label.nameRegistrationServiceURL" labelFor="tfNameRegistrationServiceURL" />
+	<cc name="tfNameRegistrationServiceURL" tagclass="com.sun.web.ui.taglib.html.CCTextFieldTag">
+	<attribute name="size" value="75" />
+	    <attribute name="autoSubmit" value="false" />
+            <attribute name="localizeDisplayFieldValue" value="false" />
+	</cc>
+	<fieldhelp name="helpNameRegistrationServiceURL" defaultValue="entityDescriptor.provider.attribute.help.nameRegistrationServiceURL" />
+    </property>
+
+    <property>
+	<label name="lblNameRegistrationReturnURL" defaultValue="entityDescriptor.provider.attribute.label.nameRegistrationReturnURL" labelFor="tfNameRegistrationReturnURL" />
+	<cc name="tfNameRegistrationReturnURL" tagclass="com.sun.web.ui.taglib.html.CCTextFieldTag">
+	<attribute name="size" value="75" />
+	    <attribute name="autoSubmit" value="false" />
+            <attribute name="localizeDisplayFieldValue" value="false" />
+	</cc>
+	<fieldhelp name="helpNameRegistrationReturnURL" defaultValue="entityDescriptor.provider.attribute.help.nameRegistrationReturnURL"/>
+    </property>
+    </section>
+
+    <section name="communicationProfile" defaultValue="entityDescriptor.provider.section.title.communicationProfile" >
+    <property>
+	<label name="lblFederationTerminationProfile" defaultValue="entityDescriptor.provider.attribute.label.federationTerminationProfile" labelFor="singleChoiceFederationTerminationProfile" />
+	<cc name="singleChoiceFederationTerminationProfile" tagclass="com.sun.web.ui.taglib.html.CCDropDownMenuTag" >
+	    <option label="entityDescriptor.provider.attribute.option.federation.profile.httpRedirect" value="http://projectliberty.org/profiles/fedterm-sp-http" />
+	    <option label="entityDescriptor.provider.attribute.option.federation.profile.SOAP" value="http://projectliberty.org/profiles/fedterm-sp-soap" />
+	</cc>
+	<fieldhelp name="helpFederationTerminationProfile" defaultValue="entityDescriptor.provider.attribute.help.federationTerminationProfile" />
+    </property>
+
+    <property>
+	<label name="lblSingleLogoutProfile" defaultValue="entityDescriptor.provider.attribute.label.singleLogoutProfile" labelFor="singleChoiceSingleLogoutProfile" />
+	<cc name="singleChoiceSingleLogoutProfile" tagclass="com.sun.web.ui.taglib.html.CCDropDownMenuTag" >
+	    <option label="entityDescriptor.provider.attribute.option.profile.httpRedirect" value="http://projectliberty.org/profiles/slo-sp-http" />
+	    <option label="entityDescriptor.provider.attribute.option.profile.httpGet" value="http://projectliberty.org/profiles/slo-idp-http-get" />
+	    <option label="entityDescriptor.provider.attribute.option.profile.SOAP" value="http://projectliberty.org/profiles/slo-sp-soap" />
+	</cc>
+	<fieldhelp name="helpSingleLogoutProfile" defaultValue="entityDescriptor.provider.attribute.help.singleLogoutProfile" />
+    </property>
+
+    <property>
+	<label name="lblNameRegistrationProfile" defaultValue="entityDescriptor.provider.attribute.label.nameRegistrationProfile" labelFor="singleChoiceNameRegistrationProfile" />
+	<cc name="singleChoiceNameRegistrationProfile" tagclass="com.sun.web.ui.taglib.html.CCDropDownMenuTag" >
+	    <option label="entityDescriptor.provider.attribute.option.profile.httpRedirect" value="http://projectliberty.org/profiles/rni-sp-http" />
+	    <option label="entityDescriptor.provider.attribute.option.profile.SOAP" value="http://projectliberty.org/profiles/rni-sp-soap" />
+	</cc>
+	<fieldhelp name="helpNameRegistrationProfile" defaultValue="entityDescriptor.provider.attribute.help.nameRegistrationProfile" />
+    </property>
+    <property required="true">
+	<label name="lblFederationProfile" defaultValue="entityDescriptor.provider.attribute.label.federationProfile" labelFor="singleChoiceFederationProfile" />
+	<cc name="singleChoiceFederationProfile" tagclass="com.sun.web.ui.taglib.html.CCDropDownMenuTag" >
+	    <option label="entityDescriptor.provider.attribute.option.profile.BrowserPost" value="http://projectliberty.org/profiles/brws-post" />
+	    <option label="entityDescriptor.provider.attribute.option.profile.BrowserArt" value="http://projectliberty.org/profiles/brws-art" />
+	    <option label="entityDescriptor.provider.attribute.option.profile.LECP" value="http://projectliberty.org/profiles/lecp" />
+	</cc>
+	<fieldhelp name="helpFederationProfile" defaultValue="entityDescriptor.provider.attribute.help.federationProfile" />
+    </property>
+    </section>
+
+    <section name="authenticationDomains" defaultValue="entityDescriptor.provider.section.title.authenticationDomains" >
+    <property span="true">
+	<cc name="arlistAuthenticationDomains" tagclass="com.sun.web.ui.taglib.addremove.CCAddRemoveTag" />
+	<fieldhelp name="helpAuthenticationDomains" defaultValue="entityDescriptor.provider.attribute.help.authenticationDomains" />
+    </property>
+    </section>
+
+    <section name="proxyAuthenticationConfiguration" defaultValue="entityDescriptor.provider.section.title.proxyAuthenticationConfiguration">
+    <property>
+	<label name="lblEnableProxyAuthentication" defaultValue="entityDescriptor.provider.attribute.label.enableProxyAuthentication" labelFor="cbEnableProxyAuthentication" />
+	<cc name="cbEnableProxyAuthentication" tagclass="com.sun.web.ui.taglib.html.CCCheckBoxTag">
+	<attribute name="label" value="label.Enable" />
+	</cc>
+    </property>
+
+    <subsection name="elistProxyIdentityProvidersSection" defaultValue="" >
+        <property>
+            <label name="lblProxyIdentityProviders" 
+                defaultValue="entityDescriptor.provider.attribute.label.proxyIdentityProviders" 
+                labelFor="elistProxyIdentityProviders" />
+            <ccgroup>
+            <property>
+            <cc name="elistProxyIdentityProviders" 
+                tagclass="com.sun.web.ui.taglib.editablelist.CCEditableListTag" >
+                <attribute name="name" value="list" />
+                <attribute name="listboxLabel" value="label.current.value" />
+                <attribute name="textboxLabel" value="label.new.value" />
+            </cc>
+            <fieldhelp name="helpProxyIdentityProviders" 
+                defaultValue="entityDescriptor.provider.attribute.help.proxyIdentityProviders" />
+            </property>
+            </ccgroup>
+            &lt;p>
+        </property>                                   
+    </subsection>
+
+    <property>
+        <label name="lblMaximumNumberOfProxies" defaultValue="entityDescriptor.provider.attribute.label.maximumNumberOfProxies" labelFor="tfMaximumNumberOfProxies" />
+        <cc name="tfMaximumNumberOfProxies" tagclass="com.sun.web.ui.taglib.html.CCTextFieldTag" >
+            <attribute name="autoSubmit" value="false" />
+            <attribute name="localizeDisplayFieldValue" value="false" />
+        </cc>
+        <fieldhelp name="helpMaximumNumberOfProxies" defaultValue="entityDescriptor.provider.attribute.help.maximumNumberOfProxies" />
+    </property>
+
+    <property>
+    	<label name="lblUseIntroductionCookieForProxying" defaultValue="entityDescriptor.provider.attribute.label.useIntroductionCookieForProxying" labelFor="cbUseIntroductionCookieForProxying" />
+    	<cc name="cbUseIntroductionCookieForProxying" tagclass="com.sun.web.ui.taglib.html.CCCheckBoxTag" />
+    </property>
+    </section>
+
+    <section name="Organization" defaultValue="entityDescriptor.provider.section.title.OrganizationAttributes">
+
+    <subsection name="elistOrgNamesSection" defaultValue="" >
+        <property>
+            <label name="lblOrganizationNames" 
+                defaultValue="entityDescriptor.attribute.label.organizationNames" 
+                labelFor="elistOrgNames" />
+            <ccgroup>
+            <property>
+            <cc name="elistOrgNames" 
+                tagclass="com.sun.web.ui.taglib.editablelist.CCEditableListTag" >
+                <attribute name="name" value="list" />
+                <attribute name="listboxLabel" value="label.current.value" />
+                <attribute name="textboxLabel" value="label.new.value" />
+            </cc>
+            <fieldhelp name="helpOrganizationNames" 
+                defaultValue="entityDescriptor.attribute.help.organizationNames" />
+            </property>
+            </ccgroup>
+            &lt;p>
+        </property>
+    </subsection>
+
+    <subsection name="elistOrgDisplayNamesSection" defaultValue="" >
+        <property>
+            <label name="lblOrganizationDisplayNames" 
+                defaultValue="entityDescriptor.attribute.label.organizationDisplayNames" 
+                labelFor="elistOrgDisplayNames" />
+            <ccgroup>
+            <property>
+            <cc name="elistOrgDisplayNames" 
+                tagclass="com.sun.web.ui.taglib.editablelist.CCEditableListTag" >
+                <attribute name="name" value="list" />
+                <attribute name="listboxLabel" value="label.current.value" />
+	        <attribute name="textboxLabel" value="label.new.value" />
+            </cc>
+	    <fieldhelp name="helpOrganizationDisplayNames" 
+		defaultValue="entityDescriptor.attribute.help.organizationDisplayNames" />
+            </property>
+            </ccgroup>
+            &lt;p>
+        </property>
+    </subsection>
+
+    <subsection name="elistOrgURLsSection" defaultValue="" >
+        <property>
+	    <label name="lblOrganizationURL" 
+		defaultValue="entityDescriptor.attribute.label.organizationURL" 
+		labelFor="elistOrgURLs" />
+            <ccgroup>
+            <property>
+            <cc name="elistOrgURLs" 
+                tagclass="com.sun.web.ui.taglib.editablelist.CCEditableListTag" >
+                <attribute name="name" value="list" />
+                <attribute name="listboxLabel" value="label.current.value" />
+	        <attribute name="textboxLabel" value="label.new.value" />
+            </cc>
+	    <fieldhelp name="helpOrganizationURL" 
+		defaultValue="entityDescriptor.attribute.help.organizationURL" />
+            </property>
+            </ccgroup>
+            &lt;p>
+        </property>
+    </subsection>
+    </section>
+
+    <section name="ContactPersons" defaultValue="entityDescriptor.provider.section.title.ContactPersons">
+        <property span="true">
+	    <cc name="tblContactPersons" tagclass="com.sun.web.ui.taglib.table.CCActionTableTag" >
+	    <attribute name="title" value="entityDescriptor.provider.table.title.ContactPersons" />
+	    <attribute name="empty" value="entityDescriptor.provider.table.noentry.ContactPersons" />
+	    <attribute name="showPaginationControls" value="false" />
+	    <attribute name="selectionType" value="multiple" />
+	    <attribute name="selectionJavascript" value="toggleTblButtonState('FSIdentityProviderRemoteProfile', 'FSIdentityProviderRemoteProfile.tblContactPersons', 'contactPerson', 'FSIdentityProviderRemoteProfile.tblButtonDelete', this)" />
+	    <attribute name="showAdvancedSortingIcon" value="false" />
+	    <attribute name="showLowerActions" value="false" />
+	    <attribute name="showPaginationControls" value="false" />
+	    <attribute name="showPaginationIcon" value="false" />
+	    <attribute name="showSelectionIcons" value="false" />
+	    <attribute name="showSelectionSortIcon" value="false" />
+	    <attribute name="showSortingRow" value="true" />
+	    </cc>
+	</property>
+    </section>
+</propertysheet>

@@ -1,0 +1,106 @@
+<!--
+   DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
+  
+   Copyright (c) 2008 Sun Microsystems Inc. All Rights Reserved
+  
+   The contents of this file are subject to the terms
+   of the Common Development and Distribution License
+   (the License). You may not use this file except in
+   compliance with the License.
+
+   You can obtain a copy of the License at
+   https://opensso.dev.java.net/public/CDDLv1.0.html or
+   opensso/legal/CDDLv1.0.txt
+   See the License for the specific language governing
+   permission and limitations under the License.
+
+   When distributing Covered Code, include this CDDL
+   Header Notice in each file and include the License file
+   at opensso/legal/CDDLv1.0.txt.
+   If applicable, add the following below the CDDL Header,
+   with the fields enclosed by brackets [] replaced by
+   your own identifying information:
+   "Portions Copyrighted [year] [name of copyright owner]"
+
+   $Id: propertyValidateSAML2Setup.xml,v 1.3 2008/07/24 18:16:57 veiming Exp $
+
+-->
+
+<!DOCTYPE propertysheet SYSTEM "propertysheet.dtd">
+
+<propertysheet>
+    <section name="dummy1" defaultValue="blank.header">
+    <property required="true">
+	<label name="lblRealm" defaultValue="validate.entities.realm" labelFor="tfRealm" />
+	<cc name="tfRealm" tagclass="com.sun.web.ui.taglib.html.CCDropDownMenuTag">
+            <attribute name="onChange" value="realmSelect(this);" />
+        </cc>
+        <cc name="infoRealm" tagclass="com.sun.web.ui.taglib.html.CCImageTag">
+            <attribute name="defaultValue" value="../console/images/infoicon.gif" />
+            <attribute name="title" value="click.to.see.info" />
+            <attribute name="alt" value="click.to.see.info" />
+            <attribute name="border" value="0" />
+            <attribute name="height" value="18" />
+            <attribute name="width" value="18" />
+            <attribute name="onClick" value="showHelp('ValidateSAML2Setup.infoRealm', infoRealm);" />
+        </cc>
+    </property>
+    <property required="true">
+        <label name="lblCOT" defaultValue="validate.entities.cot" labelFor="tfCOT" />
+        <cc name="tfCOT" tagclass="com.sun.web.ui.taglib.html.CCHiddenTag" />
+    </property>
+    </section>
+    <section name="cots" defaultValue="validate.entities.circle.of.trusts">
+        <property span="true">
+            <cc name="txtCOTTableDesc" tagclass="com.sun.web.ui.taglib.html.CCStaticTextFieldTag">
+                <attribute name="defaultValue" value="cot.table.desc.validate" />
+            </cc>
+            <cc name="tblcots"
+                tagclass="com.sun.web.ui.taglib.table.CCActionTableTag" >
+                <attribute name="title" value="validate.entities.circle.of.trusts.title" />
+                <attribute name="empty" value="validate.entities.circle.of.trusts.empty" />
+                <attribute name="showPaginationControls" value="false" />
+                <attribute name="selectionType" value="single" />
+                <attribute name="selectionJavascript" value="selectCOT(this)"/>
+                <attribute name="showAdvancedSortingIcon" value="false" />
+                <attribute name="showLowerActions" value="false" />
+                <attribute name="showPaginationControls" value="false" />
+                <attribute name="showPaginationIcon" value="false" />
+                <attribute name="showSelectionIcons" value="false" />
+                <attribute name="showSelectionSortIcon" value="false" />
+                <attribute name="showSortingRow" value="false" />
+            </cc>
+        </property>
+    </section>
+    <section name="entities" defaultValue="validate.entities.idp.sp">
+        <property>
+	    <label name="lblIDP" defaultValue="validate.entities.idp" labelFor="tfIDP" />
+	    <cc name="tfIDP" tagclass="com.sun.web.ui.taglib.html.CCDropDownMenuTag">
+                <attribute name="onChange" value="idpSelect(this);" />
+            </cc>
+            <cc name="infoIDP" tagclass="com.sun.web.ui.taglib.html.CCImageTag">
+                <attribute name="defaultValue" value="../console/images/infoicon.gif" />
+                <attribute name="title" value="click.to.see.info" />
+                <attribute name="alt" value="click.to.see.info" />
+                <attribute name="border" value="0" />
+                <attribute name="height" value="18" />
+                <attribute name="width" value="18" />
+                <attribute name="onClick" value="showHelp('ValidateSAML2Setup.infoIDP', infoIDP);" />
+            </cc>
+        </property>
+        <property>
+	    <label name="lblSP" defaultValue="validate.entities.sp" labelFor="tfSP" />
+	    <cc name="tfSP" tagclass="com.sun.web.ui.taglib.html.CCDropDownMenuTag">
+            </cc>
+            <cc name="infoSP" tagclass="com.sun.web.ui.taglib.html.CCImageTag">
+                <attribute name="defaultValue" value="../console/images/infoicon.gif" />
+                <attribute name="title" value="click.to.see.info" />
+                <attribute name="alt" value="click.to.see.info" />
+                <attribute name="border" value="0" />
+                <attribute name="height" value="18" />
+                <attribute name="width" value="18" />
+                <attribute name="onClick" value="showHelp('ValidateSAML2Setup.infoSP', infoSP);" />
+            </cc>
+        </property>
+    </section>
+</propertysheet>

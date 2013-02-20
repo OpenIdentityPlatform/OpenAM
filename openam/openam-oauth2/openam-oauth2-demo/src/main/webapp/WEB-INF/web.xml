@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  ~ DO NOT REMOVE COPYRIGHT NOTICES OR THIS HEADER.
+  ~
+  ~ Copyright (c) 2012 ForgeRock Inc. All rights reserved.
+  ~
+  ~ The contents of this file are subject to the terms
+  ~ of the Common Development and Distribution License
+  ~ (the License). You may not use this file except in
+  ~ compliance with the License.
+  ~
+  ~ You can obtain a copy of the License at
+  ~ http://forgerock.org/license/CDDLv1.0.html
+  ~ See the License for the specific language governing
+  ~ permission and limitations under the License.
+  ~
+  ~ When distributing Covered Code, include this CDDL
+  ~ Header Notice in each file and include the License file
+  ~ at http://forgerock.org/license/CDDLv1.0.html
+  ~ If applicable, add the following below the CDDL Header,
+  ~ with the fields enclosed by brackets [] replaced by
+  ~ your own identifying information:
+  ~ "Portions Copyrighted [year] [name of copyright owner]"
+  -->
+
+<web-app version="2.4" xmlns="http://java.sun.com/xml/ns/j2ee" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://java.sun.com/xml/ns/j2ee http://java.sun.com/xml/ns/j2ee/web-app_2_4.xsd">
+    <display-name>OpenAM OAuth2 Demo</display-name>
+    <distributable/>
+
+
+    <!--context-param>
+        <param-name>org.restlet.application</param-name>
+        <param-value>org.forgerock.openam.oauth2demo.OAuth2DemoApplication</param-value>
+    </context-param-->
+
+    <!-- context param -->
+
+    <!-- filter declaration -->
+
+    <!-- filter mapping -->
+
+    <!-- listener declaration -->
+
+    <servlet>
+        <servlet-name>RestletDemoAdapter</servlet-name>
+        <servlet-class>org.restlet.ext.servlet.ServerServlet</servlet-class>
+
+        <!-- Your application class name (Optional - For mode 3) -->
+        <init-param>
+            <param-name>org.restlet.application</param-name>
+            <param-value>org.forgerock.openam.oauth2demo.OAuth2DemoApplication</param-value>
+        </init-param>
+
+        <!-- List of supported client protocols (Optional - Only in mode 3) -->
+        <init-param>
+            <param-name>org.restlet.clients</param-name>
+            <param-value>HTTP RIAP CLAP FILE</param-value>
+        </init-param>
+    </servlet>
+
+    <!-- servlet declaration -->
+
+    <servlet-mapping>
+        <servlet-name>RestletDemoAdapter</servlet-name>
+        <url-pattern>/oauth2/*</url-pattern>
+    </servlet-mapping>
+
+
+    <!-- servlet mapping -->
+
+    <mime-mapping>
+        <extension>ico</extension>
+        <mime-type>image/x-icon</mime-type>
+    </mime-mapping>
+    <!-- This tag is for the welcome files such as index.html -->
+    <welcome-file-list>
+        <welcome-file>
+            index.html
+        </welcome-file>
+    </welcome-file-list>
+
+</web-app>

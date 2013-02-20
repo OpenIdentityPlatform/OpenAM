@@ -1,0 +1,336 @@
+#!/bin/ksh
+
+# DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
+#
+# Copyright (c) 2006 Sun Microsystems Inc. All Rights Reserved
+#
+# The contents of this file are subject to the terms
+# of the Common Development and Distribution License
+# (the License). You may not use this file except in
+# compliance with the License.
+#
+# You can obtain a copy of the License at
+# https://opensso.dev.java.net/public/CDDLv1.0.html or
+# opensso/legal/CDDLv1.0.txt
+# See the License for the specific language governing
+# permission and limitations under the License.
+#
+# When distributing Covered Code, include this CDDL
+# Header Notice in each file and include the License file
+# at opensso/legal/CDDLv1.0.txt.
+# If applicable, add the following below the CDDL Header,
+# with the fields enclosed by brackets [] replaced by
+# your own identifying information:
+# "Portions Copyrighted [year] [name of copyright owner]"
+#
+# $Id
+#
+
+#########################################################################
+#
+# This is a convenient script for federating SAMLv2 users in a bulk manner.
+#
+# The script assumes that the backend user database is LDAP compliant
+# and the OpenSSO  or the Sun Java System Federation
+# Manager as the federation SAML version 2 software provider. 
+#
+# This script expects userdn mappins file as the primary input for creating
+# federation data for the users specified in the file. The userdns must be
+# separated by "|" and must be in the order of localuser followed by a 
+# remote user. 
+# For e.g.
+#   uid=spuser,dc=iplanet,dc=com | uid=idpuser,dc=iplanet,dc=com
+#
+# This script generates unique random identifiers for each user mapping
+# and creates four different files namely:
+#     localnameidentifiers.txt, remotenameidentifiers.txt,
+#     localuserdata.ldif and remoteuserdata.ldif. 
+#
+# This will also load federation data (localuserdata.ldif file) locally.
+#
+# The remoteuserdata.ldif will also be kept locally for 
+# convenient loading using ldapmodify command if the remote provider is 
+# also an OpenSSO instance.
+#
+# If the remote provider is not an OpenSSO instance, the generated
+# files
+# localnameidentifies.txt/remotenameidentifies.txt can be exchanged to the 
+# remote party so that it can generate federation/user specific data based on
+# this input.
+# 
+#########################################################################
+
+BASE=BASEDIR/PRODUCT_DIR
+gettext=/bin/gettext
+ECHO=/bin/echo
+RM=/bin/rm
+CP=/bin/cp
+MV=/bin/mv
+OMIT='\c'
+LDAPMODIFY=/bin/ldapmodify
+GENERATE_LDIF=$BASE/saml2/lib/saml2GenerateLDIF.pl
+GENERATE_NI=$BASE/saml2/lib/saml2GenerateNI.pl
+
+pdir=`dirname $0`
+
+checkldapmodify() {
+  if [ ! -f $LDAPMODIFY ]; then
+	print "`$gettext 'ldapmodify command path is not correct.'`"
+	print "`$gettext 'please set the ldapmodify correctly..'`"
+	exit 1
+  fi
+}
+
+
+display_help() {
+   $ECHO "`$gettext 'Usage: ' `"
+   $ECHO "`$gettext '   ' `$0 [ -u | --user  ] [ -w | --passfile  ] [ -h | --host ] [ -p | --port ] [ -t | --role ] [ -l | --hostid ] [ -r | --remoteid ]  [-f | --file]"
+   $ECHO
+   $ECHO "`$gettext 'Where:'`"
+   $ECHO "`$gettext '    -f, --file`"
+   $ECHO "`$gettext '          Flat file that contains userDN mappings for `"
+   $ECHO "`$gettext '          the spusers and idpusers separated by | . `"
+   $ECHO "`$gettext '    -u, --user'`"
+   $ECHO "`$gettext '          Administrative userdn in LDAP server who has '`"
+   $ECHO "`$gettext '          write priveleges for modifying user entries '`"
+   $ECHO "`$gettext '    -w, --passfile` "
+   $ECHO "`$gettext '          Password file` "
+   $ECHO "`$gettext '    -t, --role` "
+   $ECHO "`$gettext '          Host entity role. It must be either IDP or SP` "
+   $ECHO "`$gettext '    -h, --host`"
+   $ECHO "`$gettext '          LDAP Server HostName. Assumes localhost if not present. `"
+   $ECHO "`$gettext '    -p, --port`"
+   $ECHO "`$gettext '          LDAP Server Port. Assumes localport if not present. `"
+   $ECHO "`$gettext '    -l, --hostid  `"
+   $ECHO "`$gettext '          Host Provider Entity ID`"
+   $ECHO "`$gettext '    -r, --remoteid`"
+   $ECHO "`$gettext '          Remote Provider Entity ID `"
+   $ECHO 
+   $ECHO "`$gettext 'Options:`"
+   $ECHO "`$gettext '    -H, --help`"
+   $ECHO "`$gettext '          Print Help(this message) and exit. `"
+   $ECHO "`$gettext '    -V, --version `"
+   $ECHO "`$gettext '          Prints Version `"
+}
+
+display_version() {
+   cat $pdir/../lib/version
+}
+
+get_password() {
+   while [ 1 ]
+   do
+     eval $ECHO "`$gettext 'Enter user password : ${OMIT}'`" 
+     stty -echo
+     read password
+     $ECHO
+     eval $ECHO "`$gettext 'Re-enter user password : ${OMIT}'`" 
+     stty -echo
+     read password1
+     $ECHO
+     if [ $password = $password1 ];then
+          return
+     else
+       $ECHO "\a`$gettext 'Password does not match!'`"
+     fi
+   done
+}
+
+
+
+# Main starts here.
+role=""
+user=""
+pfile=""
+file=""
+host=""
+port=""
+hostentityid=""
+remoteentityid=""
+
+if [ $# -eq 0 ]
+then
+   display_help 
+   exit 1
+fi
+
+
+while [ $# -ne 0 ]
+do
+   case "$1" in
+       "-t" | "--role")
+           if [ "$2" != "SP" ] && [ "$2" != "IDP" ]; then
+              display_help
+              exit 1
+           else
+              role=$2
+           fi 
+           shift
+           ;;
+
+       "-u" | "--user")
+          if [ "$2" = "" ]; then
+              display_help
+              exit 1
+          fi
+          user=$2
+          shift
+          ;;
+
+       "-w" | "--passfile")
+          if [ "$2" = "" ]; then
+               display_help
+               exit 1
+          fi 
+          pfile=$2
+          shift
+          ;;
+
+       "-h" | "--host")
+          if [ "$2" = "" ]; then
+               display_help
+               exit 1
+          fi 
+          host=$2
+          shift
+          ;;
+
+       "-p" | "--port")
+          if [ "$2" = "" ]; then
+               display_help
+               exit 1
+          fi 
+          port=$2
+          shift
+          ;;
+
+        "-V" | "--version")
+          display_version
+          exit 0
+          shift
+          ;;
+
+        "-l" | "--hostid")
+          if [ "$2" = "" ]; then
+               display_help
+               exit 1
+          fi 
+          hostentityid=$2
+          shift
+          ;;
+
+        "-r" | "--remoteid")
+          if [ "$2" = "" ]; then
+               display_help
+               exit 1
+          fi 
+          remoteentityid=$2
+          shift
+          ;;
+
+        "-f" | "--file")
+          if [ "$2" = "" ]; then
+               display_help
+               exit 1
+          fi 
+          file=$2
+          shift
+          ;;
+    *)
+       display_help
+       exit 1
+       ;;
+   esac
+shift
+done
+
+if [ "$pfile" = "" ]; then
+     get_password
+else
+    password=`cat $pfile`
+    if [ $? != 0 ]; then
+         exit 1
+    fi
+fi
+
+
+# Check for the non-null values
+if [ "$remoteentityid" = "" ] && [ "$hostentityid" = "" ]; then
+      display_help
+      exit 1
+fi
+
+if [ "$host" = "" ]; then
+     host="localhost" 
+fi
+
+if [ "$port" = "" ]; then
+     port="389" 
+fi
+
+if [ "$file" = "" ] && [ "$user" = "" ] && [ "$password" = "" ]; then
+      display_help
+      exit 1
+fi
+
+if [ ! -f $GENERATE_NI ] && [ ! -f $GENERATE_LDIF ]; then
+     print "\a `$gettext 'Missing saml2GenerateNI.pl and saml2GenerateLDIF.pl scripts'`"
+     exit 1
+fi
+
+checkldapmodify
+
+print "\n"
+print "`$gettext 'Generating name identifier mappings ..'`"
+print "\n"
+
+$GENERATE_NI $file
+if [ $? != 0 ]; then
+   print "\a `$gettext 'Failed in generating name identifier mappings'`"
+   exit 1
+fi
+if [ -f userdata.ldif ]; then
+        $RM userdata.ldif
+fi
+
+print "`$gettext 'Generating LDIF files ..'`"
+print "\n"
+$GENERATE_LDIF localnameidentifiers.txt $hostentityid $remoteentityid $role 
+if [ $? != 0 ]; then
+     print "\a `$gettext 'Failed in generating LOCAL LDIF files'`"
+     exit 1
+fi
+
+if [ -f userdata.ldif ]; then
+    $MV userdata.ldif localuserdata.ldif
+fi
+
+# This is for the remote party consumption. Just generate LDIF incase if the
+# remote party is an OpenSSO server can leverage this
+# generated ldif file.
+
+if [ "$role" = "SP" ]
+then
+     role="IDP"
+else
+     role="SP"
+fi
+
+$GENERATE_LDIF remotenameidentifiers.txt $remoteentityid $hostentityid $role
+if [ $? != 0 ]; then
+     print "\a `$gettext 'Failed in generating REMOTE LDIF files'`"
+     exit 1
+fi
+
+if [ -f userdata.ldif ]; then
+    $MV userdata.ldif remoteuserdata.ldif
+fi
+
+# Update user accounts locally.
+print "`$gettext 'Updating user accounts ..'`"
+print "\n"
+$LDAPMODIFY -D "$user" -w "$password" -h $host -p $port -c -f localuserdata.ldif
+if [ $? != 0 ]; then
+     print "\a `$gettext 'Failed in modifying users data'`"
+     exit 1
+fi

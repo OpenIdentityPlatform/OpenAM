@@ -1,0 +1,758 @@
+<!--
+   DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
+  
+   Copyright (c) 2007 Sun Microsystems Inc. All Rights Reserved
+  
+   The contents of this file are subject to the terms
+   of the Common Development and Distribution License
+   (the License). You may not use this file except in
+   compliance with the License.
+
+   You can obtain a copy of the License at
+   https://opensso.dev.java.net/public/CDDLv1.0.html or
+   opensso/legal/CDDLv1.0.txt
+   See the License for the specific language governing
+   permission and limitations under the License.
+
+   When distributing Covered Code, include this CDDL
+   Header Notice in each file and include the License file
+   at opensso/legal/CDDLv1.0.txt.
+   If applicable, add the following below the CDDL Header,
+   with the fields enclosed by brackets [] replaced by
+   your own identifying information:
+   "Portions Copyrighted [year] [name of copyright owner]"
+
+   $Id: WSFederationLogMessageIDs.xml,v 1.7 2008/12/12 01:51:41 superpat7 Exp $
+
+-->
+
+
+<!DOCTYPE logmessages
+    PUBLIC "OpenSSO Log Message DTD/EN"
+    "jar://com/sun/identity/log/messageid/amLogMessage.dtd"
+>
+
+<logmessages prefix="WSFederation">
+    <logmessage name="INVALID_SIGNATURE_ASSERTION" id="1"
+        loglevel="LL_INFO"
+        description="Assertion is not signed or signature is not valid.">
+        <datainfo>
+            <item>Assertion or assertion ID</item>
+            <item>Realm or organization name</item>
+            <item>Assertion issuer</item>
+        </datainfo>
+        <triggers>
+            <item>Service provider requested the Assertion to be signed but the 
+            assertion received was not; or the signature on the Assertion 
+            received was not valid.</item>
+        </triggers>
+        <actions>
+            <item>Check configuration; check debug for more detailed error 
+            message.</item>
+        </actions>
+    </logmessage>
+    <logmessage name="MISSING_CONDITIONS_NOT_ON_OR_AFTER" id="2"
+        loglevel="LL_INFO"
+        description="Assertion conditions are missing notOnOrAfter attribute.">
+        <datainfo>
+            <item>Assertion or assertion ID</item>
+        </datainfo>
+        <triggers>
+            <item>The Conditions element of the assertion is missing its 
+            notOnOrAfter attribute.</item>
+        </triggers>
+        <actions>
+            <item>Check the assertion. Contact Identity Provider if 
+            needed.</item>
+        </actions>
+    </logmessage>
+    <logmessage name="ASSERTION_EXPIRED" id="3"
+        loglevel="LL_INFO"
+        description="Assertion has expired.">
+        <datainfo>
+            <item>Assertion or assertion ID</item>
+            <item>Assertion notOnOrAfter time</item>
+            <item>Time skew in seconds</item>
+            <item>Current time</item>
+        </datainfo>
+        <triggers>
+            <item>The current time is after the assertion's notOnOrAfter time 
+            plus the time skew.</item>
+        </triggers>
+        <actions>
+            <item>Synchronize server clocks. Contact Identity Provider if 
+            needed.</item>
+        </actions>
+    </logmessage>
+    <logmessage name="MISSING_CONDITIONS_NOT_BEFORE" id="4"
+        loglevel="LL_INFO"
+        description="Assertion conditions are missing notBefore attribute.">
+        <datainfo>
+            <item>Assertion or assertion ID</item>
+        </datainfo>
+        <triggers>
+            <item>The Conditions element of the assertion is missing its 
+            notBefore attribute.</item>
+        </triggers>
+        <actions>
+            <item>Check the assertion. Contact Identity Provider if 
+            needed.</item>
+        </actions>
+    </logmessage>
+    <logmessage name="ASSERTION_NOT_YET_VALID" id="5"
+        loglevel="LL_INFO"
+        description="Assertion not yet valid.">
+        <datainfo>
+            <item>Assertion or assertion ID</item>
+            <item>Assertion notBefore time</item>
+            <item>Time skew in seconds</item>
+            <item>Current time</item>
+        </datainfo>
+        <triggers>
+            <item>The current time is before the assertion's notBefore time 
+            minus the time skew.</item>
+        </triggers>
+        <actions>
+            <item>Synchronize server clocks. Contact Identity Provider if 
+            needed.</item>
+        </actions>
+    </logmessage>
+    <logmessage name="MISSING_WRESULT" id="6"
+        loglevel="LL_INFO"
+        description="WS-Federation response is missing wresult.">
+        <datainfo>
+            <item>WS-Federation response</item>
+        </datainfo>
+        <triggers>
+            <item>The WS-Federation response is missing its wresult 
+            parameter.</item>
+        </triggers>
+        <actions>
+            <item>Check the response. Contact Identity Provider if 
+            needed.</item>
+        </actions>
+    </logmessage>
+    <logmessage name="MISSING_WCTX" id="7"
+        loglevel="LL_INFO"
+        description="WS-Federation response is missing wctx.">
+        <datainfo>
+            <item>WS-Federation response</item>
+        </datainfo>
+        <triggers>
+            <item>The WS-Federation response is missing its wctx 
+            parameter.</item>
+        </triggers>
+        <actions>
+            <item>Check the response. Contact Identity Provider if 
+            needed.</item>
+        </actions>
+    </logmessage>
+    <logmessage name="INVALID_WRESULT" id="8"
+        loglevel="LL_INFO"
+        description="WS-Federation response is invalid.">
+        <datainfo>
+            <item>WS-Federation response</item>
+        </datainfo>
+        <triggers>
+            <item>The WS-Federation response is not a valid 
+            RequestSecurityTokenResponse element.</item>
+        </triggers>
+        <actions>
+            <item>Check the response. Contact Identity Provider if 
+            needed.</item>
+        </actions>
+    </logmessage>
+    <logmessage name="CONFIG_ERROR_GET_ENTITY_CONFIG" id="9"
+        loglevel="LL_INFO"
+        description="Configuration error while getting entity config.">
+        <datainfo>
+            <item>Error message</item>
+            <item>MetaAlias</item>
+            <item>Realm or organization name</item>
+        </datainfo>
+        <triggers>
+            <item>Obtain entity config.</item>
+        </triggers>
+        <actions>
+            <item>Check debug message for detailed error.</item>
+        </actions>
+    </logmessage>
+    <logmessage name="CANT_FIND_SP_ACCOUNT_MAPPER" id="10"
+        loglevel="LL_INFO"
+        description="Can't find SP Account Mapper.">
+        <datainfo>
+            <item>Error message</item>
+            <item>Account mapper class name</item>
+        </datainfo>
+        <triggers>
+            <item>Cannot get class object for SP account mapper class.</item>
+        </triggers>
+        <actions>
+            <item>Check the configuration. Ensure that SP account mapper class 
+            name is correct and that the account mapper class is on the 
+            classpath.</item>
+        </actions>
+    </logmessage>
+    <logmessage name="CANT_CREATE_SP_ACCOUNT_MAPPER" id="11"
+        loglevel="LL_INFO"
+        description="Can't create SP Account Mapper.">
+        <datainfo>
+            <item>Error message</item>
+            <item>Account mapper class name</item>
+        </datainfo>
+        <triggers>
+            <item>Cannot create SP account mapper object.</item>
+        </triggers>
+        <actions>
+            <item>Check the configuration. Ensure that SP account mapper class 
+            name is correct and that the account mapper class is on the 
+            classpath.</item>
+        </actions>
+    </logmessage>
+    <logmessage name="CANT_CREATE_SESSION" id="12"
+        loglevel="LL_INFO"
+        description="Can't create session for user.">
+        <datainfo>
+            <item>Error message</item>
+            <item>Realm or organization name</item>
+            <item>User name</item>
+            <item>Auth level</item>
+        </datainfo>
+        <triggers>
+            <item>Cannot create session for user.</item>
+        </triggers>
+        <actions>
+            <item>Check the configuration. Ensure that SP account mapper is 
+            finding a user in the local store.</item>
+        </actions>
+    </logmessage>
+    <logmessage name="SSO_SUCCESSFUL" id="13"
+        loglevel="LL_INFO"
+        description="Single sign-on completed successfully.">
+        <datainfo>
+            <item>wctx</item>
+            <item>Assertion or assertion ID</item>
+            <item>Realm or organization name</item>
+            <item>User ID</item>
+            <item>Authentication Level</item>
+            <item>Target URL</item>
+        </datainfo>
+        <triggers>
+            <item>Successful WS-Federation RP Signin Response.</item>
+        </triggers>
+        <actions/>
+    </logmessage>
+    <logmessage name="UNTRUSTED_ISSUER" id="14"
+        loglevel="LL_INFO"
+        description="Assertion issuer is not trusted by this service provider.">
+        <datainfo>
+            <item>Assertion or assertion ID</item>
+            <item>Realm or organization name</item>
+            <item>Service provider ID</item>
+            <item>Target URL</item>
+        </datainfo>
+        <triggers>
+            <item>Cannot create session for user.</item>
+        </triggers>
+        <actions>
+            <item>Check the configuration. Ensure that SP account mapper is 
+            finding a user in the local store.</item>
+        </actions>
+    </logmessage>
+    <logmessage name="MISSING_SUBJECT" id="15"
+        loglevel="LL_INFO"
+        description="Assertion does not contain a subject element.">
+        <datainfo>
+            <item>Assertion or assertion ID</item>
+        </datainfo>
+        <triggers>
+            <item>Assertion does not contain a subject element.</item>
+        </triggers>
+        <actions>
+            <item>Check the assertion. Contact Identity Provider if 
+            needed.</item>
+        </actions>
+    </logmessage>
+    <logmessage name="GOT_FEDERATION" id="16"
+        loglevel="LL_FINE"
+        description="Federation obtained.">
+        <datainfo>
+            <item>Federation ID</item>
+            <item>Realm or organization name</item>
+        </datainfo>
+        <triggers>
+            <item>Obtain federation.</item>
+        </triggers>
+        <actions/>
+    </logmessage>
+    <logmessage name="GOT_INVALID_ENTITY_DESCRIPTOR" id="17"
+        loglevel="LL_INFO"
+        description="Obtained invalid entity descriptor.">
+        <datainfo>
+            <item>Entity ID</item>
+            <item>Realm or organization name</item>
+        </datainfo>
+        <triggers>
+            <item>Obtain entity descriptor.</item>
+        </triggers>
+        <actions>
+            <item>Delete invalid entity descriptor and import it again.</item> 
+        </actions>
+    </logmessage>
+    <logmessage name="CONFIG_ERROR_GET_ENTITY_DESCRIPTOR" id="18"
+        loglevel="LL_INFO"
+        description="Configuration error while getting entity descriptor.">
+        <datainfo>
+            <item>Error message</item>
+            <item>Entity ID</item>
+            <item>Realm or organization name</item>
+        </datainfo>
+        <triggers>
+            <item>Obtain entity descriptor.</item>
+        </triggers>
+        <actions>
+            <item>Check debug message for detailed error.</item>
+        </actions>
+    </logmessage>
+    <logmessage name="SET_ENTITY_DESCRIPTOR" id="19"
+        loglevel="LL_INFO"
+        description="Entity descriptor was set.">
+        <datainfo>
+            <item>Entity ID</item>
+            <item>Realm or organization name</item>
+        </datainfo>
+        <triggers>
+            <item>Set entity descriptor.</item>
+        </triggers>
+        <actions/>
+    </logmessage>
+    <logmessage name="CONFIG_ERROR_SET_ENTITY_DESCRIPTOR" id="20"
+        loglevel="LL_INFO"
+        description="Configuration error while setting entity descriptor.">
+        <datainfo>
+            <item>Error message</item>
+            <item>Entity ID</item>
+            <item>Realm or organization name</item>
+        </datainfo>
+        <triggers>
+            <item>Set entity descriptor.</item>
+        </triggers>
+        <actions>
+            <item>Check debug message for detailed error.</item>
+        </actions>
+    </logmessage>
+    <logmessage name="SET_INVALID_ENTITY_DESCRIPTOR" id="21"
+        loglevel="LL_INFO"
+        description="Invalid entity descriptor to set.">
+        <datainfo>
+            <item>Entity ID</item>
+            <item>Realm or organization name</item>
+        </datainfo>
+        <triggers>
+            <item>Set entity descriptor.</item>
+        </triggers>
+        <actions>
+            <item>Check entity descriptor if it follows the schema.</item>
+        </actions>
+    </logmessage>
+    <logmessage name="ENTITY_DESCRIPTOR_CREATED" id="22"
+        loglevel="LL_INFO"
+        description="Entity descriptor was created.">
+        <datainfo>
+            <item>Entity ID</item>
+            <item>Realm or organization name</item>
+        </datainfo>
+        <triggers>
+            <item>Create entity descriptor.</item>
+        </triggers>
+        <actions/>
+    </logmessage>
+    <logmessage name="CONFIG_ERROR_CREATE_ENTITY_DESCRIPTOR" id="23"
+        loglevel="LL_INFO"
+        description="Configuration error while creating entity descriptor.">
+        <datainfo>
+            <item>Error message</item>
+            <item>Entity ID</item>
+            <item>Realm or organization name</item>
+        </datainfo>
+        <triggers>
+            <item>Create entity descriptor.</item>
+        </triggers>
+        <actions>
+            <item>Check debug message for detailed error.</item>
+        </actions>
+    </logmessage>
+    <logmessage name="CREATE_INVALID_ENTITY_DESCRIPTOR" id="24"
+        loglevel="LL_INFO"
+        description="Invalid entity descriptor to create.">
+        <datainfo>
+            <item>Entity ID</item>
+            <item>Realm or organization name</item>
+        </datainfo>
+        <triggers>
+            <item>Create entity descriptor.</item>
+        </triggers>
+        <actions>
+            <item>Check entity descriptor if it follows the schema.</item>
+        </actions>
+    </logmessage>
+    <logmessage name="ENTITY_DESCRIPTOR_DELETED" id="25"
+        loglevel="LL_INFO"
+        description="Entity descriptor was deleted.">
+        <datainfo>
+            <item>Entity ID</item>
+            <item>Realm or organization name</item>
+        </datainfo>
+        <triggers>
+            <item>Delete entity descriptor.</item>
+        </triggers>
+        <actions/>
+    </logmessage>
+    <logmessage name="CONFIG_ERROR_DELETE_ENTITY_DESCRIPTOR" id="26"
+        loglevel="LL_INFO"
+        description="Configuration error while deleting entity descriptor.">
+        <datainfo>
+            <item>Error message</item>
+            <item>Entity ID</item>
+            <item>Realm or organization name</item>
+        </datainfo>
+        <triggers>
+            <item>Delete entity descriptor.</item>
+        </triggers>
+        <actions>
+            <item>Check debug message for detailed error.</item>
+        </actions>
+    </logmessage>
+    <logmessage name="GOT_ENTITY_CONFIG" id="27"
+        loglevel="LL_FINE"
+        description="Entity config obtained.">
+        <datainfo>
+            <item>Entity ID</item>
+            <item>Realm or organization name</item>
+        </datainfo>
+        <triggers>
+            <item>Obtain entity config.</item>
+        </triggers>
+        <actions/>
+    </logmessage>
+    <logmessage name="GOT_INVALID_ENTITY_CONFIG" id="28"
+        loglevel="LL_INFO"
+        description="Obtained invalid entity config.">
+        <datainfo>
+            <item>Entity ID</item>
+            <item>Realm or organization name</item>
+        </datainfo>
+        <triggers>
+            <item>Obtain entity config.</item>
+        </triggers>
+        <actions>
+            <item>Delete invalid entity config and import it again.</item> 
+        </actions>
+    </logmessage>
+    <logmessage name="CONFIG_ERROR_GET_ENTITY_CONFIG" id="29"
+        loglevel="LL_INFO"
+        description="Configuration error while getting entity config.">
+        <datainfo>
+            <item>Error message</item>
+            <item>Entity ID</item>
+            <item>Realm or organization name</item>
+        </datainfo>
+        <triggers>
+            <item>Obtain entity config.</item>
+        </triggers>
+        <actions>
+            <item>Check debug message for detailed error.</item>
+        </actions>
+    </logmessage>
+    <logmessage name="NO_ENTITY_ID_SET_ENTITY_CONFIG" id="30"
+        loglevel="LL_INFO"
+        description="No entity ID while setting entity config.">
+        <datainfo>
+            <item>Realm or organization name</item>
+        </datainfo>
+        <triggers>
+            <item>Set entity config.</item>
+        </triggers>
+        <actions>
+            <item>Set entity ID in entity config.</item>
+        </actions>
+    </logmessage>
+    <logmessage name="SET_ENTITY_CONFIG" id="31"
+        loglevel="LL_INFO"
+        description="Entity config was set.">
+        <datainfo>
+            <item>Entity ID</item>
+            <item>Realm or organization name</item>
+        </datainfo>
+        <triggers>
+            <item>Set entity config.</item>
+        </triggers>
+        <actions/>
+    </logmessage>
+    <logmessage name="CONFIG_ERROR_SET_ENTITY_CONFIG" id="32"
+        loglevel="LL_INFO"
+        description="Configuration error while setting entity config.">
+        <datainfo>
+            <item>Error message</item>
+            <item>Entity ID</item>
+            <item>Realm or organization name</item>
+        </datainfo>
+        <triggers>
+            <item>Set entity config.</item>
+        </triggers>
+        <actions>
+            <item>Check debug message for detailed error.</item>
+        </actions>
+    </logmessage>
+    <logmessage name="SET_INVALID_ENTITY_CONFIG" id="33"
+        loglevel="LL_INFO"
+        description="Invalid entity config to set.">
+        <datainfo>
+            <item>Entity ID</item>
+            <item>Realm or organization name</item>
+        </datainfo>
+        <triggers>
+            <item>Set entity config.</item>
+        </triggers>
+        <actions>
+            <item>Check entity config if it follows the schema.</item>
+        </actions>
+    </logmessage>
+    <logmessage name="NO_ENTITY_ID_CREATE_ENTITY_CONFIG" id="34"
+        loglevel="LL_INFO"
+        description="No entity ID while creating entity config.">
+        <datainfo>
+            <item>Realm or organization name</item>
+        </datainfo>
+        <triggers>
+            <item>Create entity config.</item>
+        </triggers>
+        <actions>
+            <item>Set entity ID in entity config.</item>
+        </actions>
+    </logmessage>
+    <logmessage name="NO_ENTITY_DESCRIPTOR_CREATE_ENTITY_CONFIG" id="35"
+        loglevel="LL_INFO"
+        description="Entity config doesn't exist while creating entity config.">
+        <datainfo>
+            <item>Entity ID</item>
+            <item>Realm or organization name</item>
+        </datainfo>
+        <triggers>
+            <item>Create entity config.</item>
+        </triggers>
+        <actions>
+            <item>Create entity descriptor before create entity config.</item> 
+        </actions>
+    </logmessage>
+    <logmessage name="ENTITY_CONFIG_EXISTS" id="36"
+        loglevel="LL_INFO"
+        description="Entity config exists while creating entity config.">
+        <datainfo>
+            <item>Entity ID</item>
+            <item>Realm or organization name</item>
+        </datainfo>
+        <triggers>
+            <item>Create entity config.</item>
+        </triggers>
+        <actions>
+            <item>Delete existing entity config first.</item> 
+        </actions>
+    </logmessage>
+    <logmessage name="ENTITY_CONFIG_CREATED" id="37"
+        loglevel="LL_INFO"
+        description="Entity config was created.">
+        <datainfo>
+            <item>Entity ID</item>
+            <item>Realm or organization name</item>
+        </datainfo>
+        <triggers>
+            <item>Create entity config.</item>
+        </triggers>
+        <actions/>
+    </logmessage>
+    <logmessage name="CONFIG_ERROR_CREATE_ENTITY_CONFIG" id="38"
+        loglevel="LL_INFO"
+        description="Configuration error while creating entity config.">
+        <datainfo>
+            <item>Error message</item>
+            <item>Entity ID</item>
+            <item>Realm or organization name</item>
+        </datainfo>
+        <triggers>
+            <item>Create entity config.</item>
+        </triggers>
+        <actions>
+            <item>Check debug message for detailed error.</item>
+        </actions>
+    </logmessage>
+    <logmessage name="CREATE_INVALID_ENTITY_CONFIG" id="39"
+        loglevel="LL_INFO"
+        description="Invalid entity config to create.">
+        <datainfo>
+            <item>Entity ID</item>
+            <item>Realm or organization name</item>
+        </datainfo>
+        <triggers>
+            <item>Create entity config.</item>
+        </triggers>
+        <actions>
+            <item>Check entity config if it follows the schema.</item>
+        </actions>
+    </logmessage>
+    <logmessage name="NO_ENTITY_CONFIG_DELETE_ENTITY_CONFIG" id="40"
+        loglevel="LL_INFO"
+        description="Entity config doesn't exist while deleting entity config.">
+        <datainfo>
+            <item>Entity ID</item>
+            <item>Realm or organization name</item>
+        </datainfo>
+        <triggers>
+            <item>Delete entity config.</item>
+        </triggers>
+        <actions>
+            <item>Check debug message for detailed error.</item>
+        </actions>
+    </logmessage>
+    <logmessage name="ENTITY_CONFIG_DELETED" id="41"
+        loglevel="LL_INFO"
+        description="Entity config was deleted.">
+        <datainfo>
+            <item>Entity ID</item>
+            <item>Realm or organization name</item>
+        </datainfo>
+        <triggers>
+            <item>Delete entity config.</item>
+        </triggers>
+        <actions/>
+    </logmessage>
+    <logmessage name="CONFIG_ERROR_DELETE_ENTITY_CONFIG" id="42"
+        loglevel="LL_INFO"
+        description="Configuration error while deleting entity config.">
+        <datainfo>
+            <item>Error message</item>
+            <item>Entity ID</item>
+            <item>Realm or organization name</item>
+        </datainfo>
+        <triggers>
+            <item>Delete entity config.</item>
+        </triggers>
+        <actions>
+            <item>Check debug message for detailed error.</item>
+        </actions>
+    </logmessage>
+    <logmessage name="CONFIG_ERROR_GET_ALL_HOSTED_ENTITIES" id="43"
+        loglevel="LL_INFO"
+        description="Configuration error while getting all hosted entities.">
+        <datainfo>
+            <item>Error message</item>
+            <item>Realm or organization name</item>
+        </datainfo>
+        <triggers>
+            <item>Get all hosted entities.</item>
+        </triggers>
+        <actions>
+            <item>Check debug message for detailed error.</item>
+        </actions>
+    </logmessage>
+    <logmessage name="GOT_ALL_HOSTED_ENTITIES" id="44"
+        loglevel="LL_FINE"
+        description="Obtained all hosted entities.">
+        <datainfo>
+            <item>Realm or organization name</item>
+        </datainfo>
+        <triggers>
+            <item>Get all hosted entities.</item>
+        </triggers>
+        <actions/>
+    </logmessage>
+    <logmessage name="CONFIG_ERROR_GET_ALL_REMOTE_ENTITIES" id="45"
+        loglevel="LL_INFO"
+        description="Configuration error while getting all remote entities.">
+        <datainfo>
+            <item>Error message</item>
+            <item>Realm or organization name</item>
+        </datainfo>
+        <triggers>
+            <item>Get all remote entities.</item>
+        </triggers>
+        <actions>
+            <item>Check debug message for detailed error.</item>
+        </actions>
+    </logmessage>
+    <logmessage name="GOT_ALL_REMOTE_ENTITIES" id="46"
+        loglevel="LL_FINE"
+        description="Obtained all remote entities.">
+        <datainfo>
+            <item>Error message</item>
+            <item>Realm or organization name</item>
+        </datainfo>
+        <triggers>
+            <item>Get all remote entities.</item>
+        </triggers>
+        <actions/>
+    </logmessage>
+    <logmessage name="CONFIG_ERROR_GET_ALL_ENTITIES" id="47"
+        loglevel="LL_INFO"
+        description="Configuration error while getting all entities.">
+        <datainfo>
+            <item>Error message</item>
+            <item>Realm or organization name</item>
+        </datainfo>
+        <triggers>
+            <item>Get all entities.</item>
+        </triggers>
+        <actions>
+            <item>Check debug message for detailed error.</item>
+        </actions>
+    </logmessage>
+    <logmessage name="GOT_ALL_ENTITIES" id="48"
+        loglevel="LL_FINE"
+        description="Obtained all entities.">
+        <datainfo>
+            <item>Realm or organization name</item>
+        </datainfo>
+        <triggers>
+            <item>Get all entities.</item>
+        </triggers>
+        <actions/>
+    </logmessage>
+    <logmessage name="ASSERTION_CREATED" id="49"
+        loglevel="LL_INFO"
+        description="Assertion created successfully.">
+        <datainfo>
+            <item>Assertion or assertion ID</item>
+        </datainfo>
+        <triggers>
+            <item>Creation of WS-Federation IdP Signin Response.</item>
+        </triggers>
+        <actions/>
+    </logmessage>
+    <logmessage name="NO_ACS_URL" id="50"
+        loglevel="LL_INFO"
+        description="Could not find an Assertion Consumer Service URL.">
+        <datainfo>
+            <item>Realm or organization name</item>
+            <item>Service provider ID</item>
+            <item>Reply URL</item>
+        </datainfo>
+        <triggers>
+            <item>No ACS URL in configuration.</item>
+            <item>ACS URL provided in request not found in configuration.</item>
+        </triggers>
+        <actions>
+            <item>Check configuration for service provider.</item>
+        </actions>
+    </logmessage>
+    <logmessage name="SLO_SUCCESSFUL" id="51"
+        loglevel="LL_INFO"
+        description="Single logout completed successfully.">
+        <datainfo>
+            <item>Reply URL</item>
+        </datainfo>
+        <triggers>
+            <item>Successful single logout.</item>
+        </triggers>
+        <actions/>
+    </logmessage>
+</logmessages>

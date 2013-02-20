@@ -1,0 +1,302 @@
+<!--
+   DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
+  
+   Copyright (c) 2005 Sun Microsystems Inc. All Rights Reserved
+  
+   The contents of this file are subject to the terms
+   of the Common Development and Distribution License
+   (the License). You may not use this file except in
+   compliance with the License.
+                                                                                
+   You can obtain a copy of the License at
+   https://opensso.dev.java.net/public/CDDLv1.0.html or
+   opensso/legal/CDDLv1.0.txt
+   See the License for the specific language governing
+   permission and limitations under the License.
+                                                                                
+   When distributing Covered Code, include this CDDL
+   Header Notice in each file and include the License file
+   at opensso/legal/CDDLv1.0.txt.
+   If applicable, add the following below the CDDL Header,
+   with the fields enclosed by brackets [] replaced by
+   your own identifying information:
+   "Portions Copyrighted [year] [name of copyright owner]"                                                                              
+-->
+
+<html>
+<head>
+<title>OpenAM (Login)</title>
+
+<!-- <link rel="stylesheet" href="/openam/css/styles.css" type="text/css" /> -->
+<script language="JavaScript" src="browserVersion.js"></script>
+<script language="JavaScript" src="auth.js"></script>
+
+<script type="text/javascript">
+		if (typeof console == "undefined") {
+		    this.console = {
+		    		log: function() {},
+		    		info: function() {},
+		    		debug: function() {},
+		    		warn: function() {}
+		    };
+		}
+		if (typeof JSON == "undefined") {
+		    var ss = document.createElement('script');
+		    ss.src = "js/json2/json2/1.0/json2-1.0.js";
+		    var hh = document.getElementsByTagName('head')[0];
+		    hh.appendChild(ss);
+		}
+</script>
+
+<script language="JavaScript" data-main="main.js" src="requirejs/requirejs/1.0.7/requirejs-1.0.7-min.js"></script>
+
+<script language="JavaScript">
+
+
+
+    var defaultBtn = 'Submit';
+    var elmCount = 0;
+
+    /** submit form with default command button */
+    function defaultSubmit() {
+        LoginSubmit(defaultBtn);
+    }
+
+    /**
+     * submit form with given button value
+     *
+     * @param value of button
+     */
+    function LoginSubmit(value) {
+        aggSubmit();
+        var hiddenFrm = document.forms['Login'];
+
+        if (hiddenFrm != null) {
+	    hiddenFrm.elements['IDButton'].value = value;
+            if (this.submitted) {
+                alert("The request is currently being processed");
+            }
+            else {
+                this.submitted = true;
+                hiddenFrm.submit();
+            }
+        }
+    }
+
+
+</script>
+<script type="text/javascript"><!--// Empty script so IE5.0 Windows will draw table and button borders
+//-->
+</script>
+  
+</head>
+
+<body class="LogBdy" onload="placeCursorOnFirstElm();">
+
+  <table border="0" cellpadding="0" cellspacing="0" align="center" title="">
+    <tr>
+      <td width="50%"></td>
+      <td></td>
+      <td width="50%"></td>
+    </tr>
+    <tr class="LogTopBnd" style="
+    background-repeat: repeat-x; background-position: left top;">
+      <td>&nbsp;</td>
+      <td></td>
+      <td>&nbsp;</td>
+    </tr>
+    <tr>
+      <td class="LogMidBnd" style="
+        background-repeat:repeat-x;background-position:left top;">&nbsp;</td>
+      <td class="LogCntTd" style="
+        background-repeat:no-repeat;background-position:left top;" height="435" align="center" valign="middle">
+        <table border="0" cellpadding="0" cellspacing="0" 
+        width="100%" title="">
+          <tr>
+            <td width="260"></td>
+            <td width="415" bgcolor="#ffffff" valign="top">
+              <table border="0" cellspacing="0" cellpadding="0">
+                <tr>
+                  <td colspan="2">
+                                                      
+                  </td>
+                </tr>
+
+        <!-- display authentication scheme -->
+
+        <!-- Header display -->
+        <tr>
+        <td nowrap="nowrap"></td>
+        <td><div class="logTxtSvrNam">                    
+        
+            Sign in to OpenAM
+                
+        </div></td>
+        </tr>
+        <!-- End of Header display -->      
+  
+        
+
+        
+
+        <script language="javascript">
+            elmCount++;
+        </script>
+
+        
+
+        
+
+        
+
+        <!-- end of tiledCallbacks -->
+        
+
+        <script language="javascript">
+            elmCount++;
+        </script>
+
+        
+        <!-- text box display -->
+        <tr>
+        <form name="frm1" action="blank"
+            onSubmit="defaultSubmit(); return false;" method="post">
+
+        <td nowrap="nowrap"><div class="logLbl">
+            
+            <span class="LblLev2Txt">
+            <label for="IDToken1">                
+                 User Name:                            
+            </label></span></div>
+        </td>
+        
+        <td><div class="logInp">
+            <input type="text" name="IDToken1"
+                id="IDToken1"
+                value="" class="TxtFld"></div>
+        </td>
+        </form>
+        </tr>        
+        <!-- end of textBox -->
+        
+
+        
+
+        
+
+        <!-- end of tiledCallbacks -->
+        
+
+        <script language="javascript">
+            elmCount++;
+        </script>
+
+        
+
+        
+        <!-- password display -->
+        <tr>
+        <form name="frm2" action="blank"
+            onSubmit="defaultSubmit(); return false;" method="post">
+
+        <td nowrap="nowrap"><div class="logLbl">
+            
+            <span class="LblLev2Txt">
+            <label for="IDToken2">  
+                 Password:                 
+            </label></span></div>
+        </td>
+
+        <td><div class="logInp">
+            <input type="password" name="IDToken2"
+                id="IDToken2"
+                value="" class="TxtFld"></div>
+        </td>
+        </form>
+        </tr>        
+        <!-- end of password -->
+        
+
+        
+
+        <!-- end of tiledCallbacks -->
+        
+
+        <!-- end of validContent -->
+        
+
+
+        
+
+        
+
+        
+
+        
+        <!-- Submit button -->
+
+        
+
+        
+        <tr>
+        <td></td>
+            <script language="javascript">
+                markupButton(
+                    'Log In',
+                           "javascript:LoginSubmit('Log In')");
+            </script>
+        </tr>
+        <!-- end of hasNoButton -->
+        
+
+        <!-- end of ContentButtonLogin -->
+        
+        <tr>
+            <td>&nbsp;</td>
+        </tr>
+        <tr>
+            <td></td>
+            <td>&nbsp;</td>
+        </tr>
+        </table>
+      </td>
+      <td width="45"></td>
+    </tr>
+    </table>
+    </td>
+    <td class="LogMidBnd" style="
+    background-repeat:repeat-x;background-position:left top;">&nbsp;</td>
+    </tr>
+    <tr class="LogBotBnd" style="
+    background-repeat:repeat-x;background-position:left top;">
+      <td>&nbsp;</td>
+      <td><div class="logCpy"><span class="logTxtCpy">
+        Copyright © 2010-2011 ForgeRock AS, Philip Pedersens vei 1, 1366 Lysaker, Norway. All rights reserved. Licensed for use under the Common Development and Distribution License (CDDL), see http://www.forgerock.com/license/CDDLv1.0.html for details. This software is based on the OpenSSO/OpenAM open source project and the source includes the copyright works of other authors, granted for use under the CDDL. This distribution may include other materials developed by third parties. All Copyrights and Trademarks are property of their owners.</span></div>
+      </td>
+      <td>&nbsp;</td>
+    </tr>
+  </table>
+
+
+<form   name="Login"  action="/openam/UI/Login"  method="post">
+
+<script language="javascript">
+    if (elmCount != null) {
+        for (var i = 0; i < elmCount; i++) {
+            document.write(
+                "<input name=\"IDToken" + i + "\" type=\"hidden\">");
+        }
+        document.write("<input name=\"IDButton"  + "\" type=\"hidden\">");
+    }
+</script>
+<input type="hidden" name="goto" value="">
+<input type="hidden" name="SunQueryParamsString" value="">
+<input type="hidden" name="encoded" value="false">
+<input type="hidden" name="gx_charset" value="UTF-8"></form>
+
+
+</body>
+
+
+
+</html>

@@ -1,0 +1,227 @@
+<!--
+   DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
+  
+   Copyright (c) 2006 Sun Microsystems Inc. All Rights Reserved
+  
+   The contents of this file are subject to the terms
+   of the Common Development and Distribution License
+   (the License). You may not use this file except in
+   compliance with the License.
+
+   You can obtain a copy of the License at
+   https://opensso.dev.java.net/public/CDDLv1.0.html or
+   opensso/legal/CDDLv1.0.txt
+   See the License for the specific language governing
+   permission and limitations under the License.
+
+   When distributing Covered Code, include this CDDL
+   Header Notice in each file and include the License file
+   at opensso/legal/CDDLv1.0.txt.
+   If applicable, add the following below the CDDL Header,
+   with the fields enclosed by brackets [] replaced by
+   your own identifying information:
+   "Portions Copyrighted [year] [name of copyright owner]"
+
+   $Id: build.xml,v 1.32 2009/12/23 02:02:22 leiming Exp $
+
+-->
+
+<!-- Portions Copyrighted 2010-2012 ForgeRock, Inc. -->
+
+<project name="open-source-j2ee-agents" default="usage">
+                
+    <description>OpenSSO Policy Agents for J2EE Servers</description>
+
+    <import file="../products.xml" />
+    <import file="j2eeagents.xml" />
+
+    <!-- global environment -->
+    <!-- top level directory structure -->
+    <property name="j2eeagents.src.dir" location="${j2eeagents.basedir}/agentsdk/source"/>
+   
+     <!-- agent version number appended to end of agent zip file name -->   
+    <property name="agentversion" value="3.1.0-Xpress"/>
+    
+    <!-- overridable properties -->
+    <property name="build.debug" value="on"/>
+    <property name="build.debuglevel" value="lines,vars,source"/>
+
+    <tstamp>
+        <format property="nightly.date" pattern="yyyyMMdd" offset="-1"
+            unit="day"/>
+    </tstamp>
+
+    <target name="preparebuild">
+        <mkdir dir="${j2eeagents.built.dir}"/>
+        <mkdir dir="${j2eeagents.dist.dir}"/>
+    </target>
+
+    <target name="clean_appserver_v10">
+        <property name="containername" value="appserver"/>
+        <property name="containerversion" value="v10"/>
+        <ant antfile="${j2eeagents.basedir}/build_agent.xml" target="clean" inheritRefs="true"/>
+    </target>
+
+    <target name="clean_jsr196_jsr115">
+        <property name="containername" value="jsr196"/>
+        <property name="containerversion" value="jsr115"/>
+        <ant antfile="${j2eeagents.basedir}/build_agent.xml" target="clean" inheritRefs="true"/>
+    </target>
+    
+    
+    <target name="clean_jboss_v42">
+        <property name="containername" value="jboss"/>
+        <property name="containerversion" value="v42"/>
+        <ant antfile="${j2eeagents.basedir}/build_agent.xml" target="clean" inheritRefs="true"/>
+    </target>
+    
+    <target name="clean_weblogic_v10">
+        <property name="containername" value="weblogic"/>
+        <property name="containerversion" value="v10"/>
+        <ant antfile="${j2eeagents.basedir}/build_agent.xml" target="clean" inheritRefs="true"/>
+    </target>
+    
+    <target name="clean_websphere_v61">
+        <property name="containername" value="websphere"/>
+        <property name="containerversion" value="v61"/>
+        <ant antfile="${j2eeagents.basedir}/build_agent.xml" target="clean" inheritRefs="true"/>
+    </target>
+    
+    <target name="clean_tomcat_v6">
+    	<property name="containername" value="tomcat"/>
+        <property name="containerversion" value="v6"/>
+        <ant antfile="${j2eeagents.basedir}/build_agent.xml" target="clean" inheritRefs="true"/>
+    </target>
+    
+    <target name="clean_jetty_v61">
+        <property name="containername" value="jetty"/>
+        <property name="containerversion" value="v61"/>
+        <ant antfile="${j2eeagents.basedir}/build_agent.xml" target="clean" inheritRefs="true"/>
+    </target>
+    
+    <target name="clean" depends="clean_appserver_v10, clean_jsr196_jsr115, clean_weblogic_v10, clean_websphere_v61, clean_tomcat_v6, clean_jboss_v42, clean_jetty_v61">
+        <delete dir="${j2eeagents.dist.dir}"/>
+        <delete dir="${j2eeagents.built.dir}"/>
+    </target>
+
+    <target name="all">
+        <antcall target="appserver_v10" />
+	<antcall target="jsr196_jsr115" /> 
+        <antcall target="weblogic_v10" />
+        <antcall target="websphere_v61" />
+        <antcall target="tomcat_v6" />
+        <antcall target="jboss_v42" />
+        <antcall target="jetty_v61" />
+    </target>
+
+    <target name="appserver_v10" depends="preparebuild">
+        <echo message="Dispatch to appserver_v10"/>
+        <property name="containername" value="appserver"/>
+        <property name="containerversion" value="v10"/>
+        <ant antfile="${j2eeagents.basedir}/build_agent.xml" target="all" inheritRefs="true"/>
+    </target>
+
+    <target name="jsr196_jsr115" depends="preparebuild">
+        <echo message="Dispatch to jsr196_jsr115 "/>
+        <property name="containername" value="jsr196"/>
+        <property name="containerversion" value="jsr115"/>
+        <ant antfile="${j2eeagents.basedir}/build_agent.xml" target="all" inheritRefs="true"/>
+    </target>
+
+    <target name="weblogic_v10" depends="preparebuild">
+        <echo message="Dispatch to weblogic_v10"/>
+        <property name="containername" value="weblogic"/>
+        <property name="containerversion" value="v10"/>
+        <ant antfile="${j2eeagents.basedir}/build_agent.xml" target="all" inheritRefs="true"/>
+    </target>
+    <target name="tomcat_v6" depends="preparebuild">
+        <echo message="Dispatch to tomcat_v6"/>
+        <property name="containername" value="tomcat"/>
+        <property name="containerversion" value="v6"/>
+        <ant antfile="${j2eeagents.basedir}/build_agent.xml" target="all" inheritRefs="true"/>
+    </target>
+
+    <target name="websphere_v61" depends="preparebuild">
+        <echo message="Dispatch to websphere_v61"/>
+        <property name="containername" value="websphere"/>
+        <property name="containerversion" value="v61"/>
+        <ant antfile="${j2eeagents.basedir}/build_agent.xml" target="all" inheritRefs="true"/>
+    </target>
+    
+    <target name="jboss_v42" depends="preparebuild">
+        <echo message="Dispatch to jboss_v42"/>
+        <property name="containername" value="jboss"/>
+        <property name="containerversion" value="v42"/>
+        <ant antfile="${j2eeagents.basedir}/build_agent.xml" target="all" inheritRefs="true"/>
+    </target>
+    
+    <target name="jetty_v61" depends="preparebuild">
+        <echo message="Dispatch to jetty_v61"/>
+        <property name="containername" value="jetty"/>
+        <property name="containerversion" value="v61"/>
+        <ant antfile="${j2eeagents.basedir}/build_agent.xml" target="all" inheritRefs="true"/>
+    </target>
+    
+    <target name="nightly" depends="all">
+        <filter token="BUILD_DATE" value="${nightly.date}" />
+<!--
+        <copy file="${j2eeagents.docs.dir}/nightly.html" tofile="${j2eeagents.dist.dir}/index.html" filtering="true" />
+-->
+        <copy file="${j2eeagents.basedir}/appserver/build_date.js.template" tofile="${j2eeagents.dist.dir}/appserver_v10_build_date.js" filtering="true" />
+        <copy file="${j2eeagents.basedir}/jboss/build_date.js.template" tofile="${j2eeagents.dist.dir}/jboss_v42_build_date.js" filtering="true" />
+        <copy file="${j2eeagents.basedir}/jetty/build_date.js.template" tofile="${j2eeagents.dist.dir}/jetty_v61_build_date.js" filtering="true" />
+        <copy file="${j2eeagents.basedir}/jsr196/build_date.js.template" tofile="${j2eeagents.dist.dir}/jsr196_jsr115_build_date.js" filtering="true" />
+        <copy file="${j2eeagents.basedir}/tomcat/build_date.js.template" tofile="${j2eeagents.dist.dir}/tomcat_v6_build_date.js" filtering="true" />
+        <copy file="${j2eeagents.basedir}/weblogic/build_date.js.template" tofile="${j2eeagents.dist.dir}/weblogic_v10_build_date.js" filtering="true" />
+        <copy file="${j2eeagents.basedir}/websphere/build_date.js.template" tofile="${j2eeagents.dist.dir}/websphere_v61_build_date.js" filtering="true" />
+    </target>
+
+    <target name="prenightly">
+        <copy todir="${j2eeagents.basedir}/extlib" >
+            <fileset dir="${installtools.dist.dir}">
+                <include name="opensso-installtools.jar" />
+                <include name="opensso-installtools-launcher.jar" />
+            </fileset>
+        </copy>
+        <copy todir="${j2eeagents.basedir}/extlib" >
+            <fileset dir="${fm.dist.dir}">
+                <include name="openssoclientsdk.jar" />
+            </fileset>
+        </copy>
+    </target>
+        
+    <target name="postnightly">
+        <copy todir="${prd.nightly.dist.dir}/j2eeagents">
+            <fileset dir="${j2eeagents.dist.dir}" />
+        </copy>
+    </target>
+
+    <target name="usage">
+        <echo message=" "/>
+        <echo message=" Following targets are available for J2EE Agents:"/>
+        <echo message=" "/>
+        <echo message=" all                 : builds all the J2EE agents"/>
+        <echo message=" clean               : deletes all the generated files"/>
+        <echo message=" appserver_v10       : builds the Sun Appserver 10 agent"/>
+        <echo message=" clean_appserver_v10 : deletes the generated files for appserver_v10 agent"/>
+        <echo message=" jetty_v61           : builds the Jetty v6.1 agent"/>
+        <echo message=" clean_jetty_v61     : deletes the generated files for jetty_v61 agent"/>
+        <echo message=" jsr196_jsr115       : builds the JSR196/JSR115 based Glassfish v2.1 Agent"/>
+        <echo message=" clean_jsr196_jsr115 : deletes the generated files for jsr196_jsr115 agent"/>
+        <echo message=" weblogic_v10        : builds the BEA WebLogic 10.0 agent"/>
+        <echo message=" clean_weblogic_v10  : deletes the generated files for weblogic_v10 agent"/>
+        <echo message=" tomcat_v6           : builds the Tomcat 6.0 agent"/>
+        <echo message=" clean_tomcat_v6     : deletes the generated files for tomcat_v6 agent"/>
+        <echo message=" websphere_v61       : builds the IBM Websphere 6.1 agent"/>
+        <echo message=" clean_websphere_v61 : deletes the generated files for websphere_v61 agent"/>
+        <echo message=" jboss_v42           : builds the jboss 4.2.x  agent"/>
+        <echo message=" clean_jboss_v42     : deletes the generated files for jboss_v42 4.2.x agent"/>
+        <echo message=" usage               : displays this usage message"/>
+        <echo message=" "/>
+        <echo message=" To run a target, issue the following command:"/>
+        <echo message=" "/>
+        <echo message=" ant &lt;target-name&gt;"/>
+        <echo message=" "/>
+    </target>
+
+</project>

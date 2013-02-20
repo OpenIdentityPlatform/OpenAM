@@ -1,0 +1,26 @@
+#
+# In order to build,  the deviceprint-scripts modules you need to
+# load the following artifacts.
+#
+# This is temporary until we have them laoded into a ForgeRock repository
+#
+
+#If artifacts are missing, please download it and install by invoking following commands
+
+cd /tmp
+rm require.js
+wget http://requirejs.org/docs/release/1.0.7/minified/require.js
+mvn install:install-file -Dfile=require.js -DgroupId=requirejs -Dclassifier=min -DartifactId=requirejs -Dversion=1.0.7 -Dpackaging=js
+
+rm json2.js
+wget https://raw.github.com/douglascrockford/JSON-js/master/json2.js
+mvn install:install-file -Dfile=json2.js -DgroupId=json2 -DartifactId=json2 -Dversion=1.0 -Dpackaging=js
+
+rm swfobject_2_2.zip
+rm -rf swfobject
+wget http://swfobject.googlecode.com/files/swfobject_2_2.zip
+unzip swfobject_2_2.zip
+mvn install:install-file -Dfile=swfobject/swfobject.js -DgroupId=swfobject -DartifactId=swfobject -Dclassifier=min -Dversion=2.2 -Dpackaging=js
+
+wget http://requirejs.org/docs/release/1.0.5/minified/order.js
+mvn install:install-file -Dfile=order.js -DgroupId=requirejs -DartifactId=order -Dclassifier=min -Dversion=1.0.5 -Dpackaging=js

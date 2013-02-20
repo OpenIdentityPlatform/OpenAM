@@ -1,0 +1,233 @@
+<!--
+   DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
+  
+   Copyright (c) 2007 Sun Microsystems Inc. All Rights Reserved
+  
+   The contents of this file are subject to the terms
+   of the Common Development and Distribution License
+   (the License). You may not use this file except in
+   compliance with the License.
+                                                                                                                                  
+   You can obtain a copy of the License at
+   https://opensso.dev.java.net/public/CDDLv1.0.html or
+   opensso/legal/CDDLv1.0.txt
+   See the License for the specific language governing
+   permission and limitations under the License.
+                                                                                                                                  
+   When distributing Covered Code, include this CDDL
+   Header Notice in each file and include the License file
+   at opensso/legal/CDDLv1.0.txt.
+   If applicable, add the following below the CDDL Header,
+   with the fields enclosed by brackets [] replaced by
+   your own identifying information:
+   "Portions Copyrighted [year] [name of copyright owner]"
+
+   $Id: index.html,v 1.8 2008/08/28 19:39:21 qcheng Exp $
+
+-->
+<html>
+<head>
+<title>WSC Sample</title>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
+<link rel="stylesheet" type="text/css" href="../com_sun_web_ui/css/css_ns6up.css" />
+</head>
+<body class="DefBdy">
+                                                                                
+<div class="MstDiv"><table width="100%" border="0" cellpadding="0" cellspacing="0" class="MstTblTop" title="">
+<tbody><tr>
+<td nowrap="nowrap">&nbsp;</td>
+<td nowrap="nowrap">&nbsp;</td>
+</tr></tbody></table>
+                                                                                
+<table width="100%" border="0" cellpadding="0" cellspacing="0" class="MstTblBot" title="">
+<tbody><tr>
+<td class="MstTdTtl" width="99%">
+<div class="MstDivTtl"><img name="ProdName" src="../console/images/PrimaryProductName.png" alt="" /></div></td><td class="MstTdLogo" width="1%"><img name="RMRealm.mhCommon.BrandLogo" src="../com_sun_web_ui/images/other/javalogo.gif" alt="Java(TM) Logo" border="0" height="55" width="31" /></td></tr></tbody></table>
+<table class="MstTblEnd" border="0" cellpadding="0" cellspacing="0" width="100%"><tbody><tr><td><img name="RMRealm.mhCommon.EndorserLogo" src="../com_sun_web_ui/images/masthead/masthead-sunname.gif" alt="Sun(TM) Microsystems, Inc." align="right" border="0" height="10" width="108" /></td></tr></tbody></table></div><div class="SkpMedGry1"><a name="SkipAnchor2089" id="SkipAnchor2089"></a></div>
+<div class="SkpMedGry1"><a href="#SkipAnchor4928"><img src="../com_sun_web_ui/images/other/dot.gif" alt="Jump Over Tab Navigation Area. Current Selection is: Access Control" border="0" height="1" width="1" /></a></div>
+                                                                                
+<table border="0" cellpadding="10" cellspacing="0" width="100%">
+<tr><td>
+<p>&nbsp;</p>
+&lt; <a href="../index.html">Client Sample Main Page</a>
+<p>&nbsp;</p>
+
+<h3>Introduction</h3>
+<p>
+    This explains how to deploy and run the WSC sample to query and modify
+    Liberty Discovery Service and ID-SIS Personal Profile Service.
+<br>    
+    There are five parties involved in this sample:
+<br>
+    * Liberty Service Provider (SP)
+<br>
+    * Liberty Identity Provider (IDP)
+<br>
+    * Web Service Consumer (WSC)
+<br>
+    * Liberty Discovery Service (DS)
+<br>
+    * Liberty ID-SIS Personal Profile Service (ID-SIS-PP)
+</p>
+<p>
+    Here is the general flow of the sample :
+<br>    
+    1. Complete the Liberty Single-Sign-On Process, obtain Discovery
+       Service Boot Strapping Resource Offering.
+<br>    
+    2. Register user's Resource Offering at the ID-SIS-PP instance using
+       Discovery Service Modification.
+<br>    
+    3. Send Discovery Service Lookup request, discovery service returns
+       discovery lookup response to the WSC which contains the resource
+       offering for the user's ID-SIS-PP instance.
+<br>    
+    4. Send Data Service Query to the ID-SIS-PP Instance to retrieve user
+       attributes.
+<br>    
+    5. Send Data Service Modification to the ID-SIS-PP Instance to modify
+       user attributes.
+</p>
+<h3>Setup</h3>
+
+In the following instructions we use unix path seperator '/'. For windows enviroment please change '/' to '\'.<br><br>
+1. Deploy OpenAM server WAR (openam.war) on machine A,
+   and configure the IDFF sample to run as IDP. This instance will also act as
+   DS and ID-SIS-PP role in the sample scenario.
+<br>
+2. Deploy OpenAM server WAR (openam.war) on machine B,
+   and configure the IDFF sample to run as SP. 
+<br>
+3. Create a user on IDP and a user on SP. Federate and signle sign on the users.
+<br>
+4. Deploy OpenAM client sample WAR (opensso-client-jdk14.war
+   for web container running JDK 1.4.x or opensso-client-jdk15.war for
+   web container running JDK 1.5.x) on machine C.
+<br>
+5. Click <a class="named" href="../Configurator.jsp">here</a> to configure Client SDK. If you have done it, skip to next step. Enter SP information and save.
+<br>
+6. If you changed your SP cookie name, you need to set property "com.iplanet.am.cookie.name" value to the new cookie name in "&lt;your_home_dir&gt;/OpenSSOClient/&lt;normalized_web_app_path&gt;AMConfig.properties" file, where "&lt;your_home_dir&gt;" is the home directory of the web container running user, "&lt;normalized_web_app_path&gt;" is a path string (e.g. "_opt_tomcat_webapps_openam_") by replacing the file separator (e.g. "/") with "_" in the absolute file path (e.g. "/opt/tomcat/webapps/openam/") the web application is deployed.
+<br>
+7. Click <a class="named" href="configure.jsp">here</a> to configure.
+<br>
+8. If you want to enable interaction for IDPP query and modify please see the
+   section "Enable interaction for IDPP query and modify"
+<br>
+9. If you want to enable name id encryption in session context of discovery
+   bootstrap, please see the section "Enable name id encryption in session
+   context of discovery bootstrap".
+<br>
+
+<h3>Demonstration</h3>
+After you have setup your machines, single sign on IDP and SP users then
+visit this <a class="named" href="index.jsp">link</a> to try out this sample.
+
+
+<h3 name="enc">Enable interaction for IDPP query and modify</h3>
+On IDP machine turn on IDPP policy evaluation:<br>
+1. Bring up a browser and go to "&lt;IDP protocol&gt;://&lt;IDP hostname&gt;:&lt;IDP port&gt;&lt;IDP depoly uri&gt;" and login into console as user 'amadmin'<br>
+2. Click 'Web Services' tab.<br>
+3. Click 'Personal Profile' tab.<br>
+4. Click check box 'Require Query PolicyEval'<br>
+5. Click check box 'Require Modify PolicyEval'<br>
+6. Click 'Save'.<br>
+
+<br>
+Create policy for IDPP query and modify:<br>
+1. Bring up a browser and go to "&lt;IDP protocol&gt;://&lt;IDP hostname&gt;:&lt;IDP port&gt;&lt;IDP depoly uri&gt;" and login into console as user 'amadmin'<br>
+2. Click 'Access Control' tab.<br>
+3. Click realm '/ (Top-Level Realm)'.<br>
+4. Click 'Policies' tab.<br>
+5. Click 'New Policy ...'<br>
+6. Enter any policy name in the 'Name' text field.<br>
+7. Click 'New...' under 'Rules' section.<br>
+8. Select 'Liberty Personal Profile Service (with resource name) then click 'Next'.<br>
+9. Enter any rule name in the 'Name' text field.<br>
+10. Enter '*' in the 'Resource Name' text field.<br>
+11. Click both check boxes next to action 'MODIFY' and 'QUERY' and select
+    'interactForConsent' in both drop down menus under 'Value' then click
+    'Finish'.<br>
+12. Click 'New...' under 'Subjects' section.<br>
+13. Select 'Authenticated Users' then click 'Next'.<br>
+14. Enter user name of IDP user you created before (e.g. idp) in the 'Name'
+    text field then click 'Finish'.<br>
+15. Click 'OK' to save this policy.<br>
+<br>
+<h3 name="enc">Enable name id encryption in session context of discovery bootstrap</h3>
+Set up IDP machine:<br>
+1. Bring up a browser and go to "&lt;IDP protocol&gt;://&lt;IDP hostname&gt;:&lt;IDP port&gt;&lt;IDP depoly uri&gt;" and login into console as user 'amadmin'<br>
+2. Click 'Web Services' tab.<br>
+3. Click 'Discover Service' tab.<br>
+4. Change "Provider ID" to &lt;IDP protocol&gt;://&lt;IDP hostname&gt;:&lt;IDP port&gt;&lt;IDP depoly uri&gt;.<br>
+5. Click check box "Encrypt Name Identifier in Session Context for Bootstrapping".<br>
+6. Click "Save".<br>
+7. Click "urn:liberty:disco:2003-08" under "Resource Offerings for Bootstrapping".<br>
+8. Click "edit" next to "urn:liberty:security:2003-08:null:null" under "Service Description".<br>
+9. Select "urn:liberty:security:2003-08:null:SAML" from "Available" and click "Add".<br>
+10. Select "urn:liberty:security:2003-08:null:null" from "Selected" and click "Remove".<br>
+11. Click "Save".<br>
+12. Change "Provider ID" under "Service Instance" to<br>
+ %SERVER_PROTO%://%SERVER_HOST%:%SERVER_PORT%%SERVER_URI%<br>
+13. Click check box "AuthorizeRequester" and select "urn:liberty:security:2003-08:null:SAML" under the check box.<br>
+14. Click "Save".<br>
+15. Click "Save".<br>
+16. Click "Configuration" tab.<br>
+17. Click "Global" tab.<br>
+18. Click "Liberty ID-WSF Security Service".<br>
+19. Enter "test" in "Default WSC certificate alias" and "Trusted Authority signing certificate alias" and "Trusted CA signing certificate aliases" text fields.<br>
+20. Click "Save".<br>
+21. Download or build ssoAdminTools.zip and install.<br>
+
+22. Run<br>
+ssoadm delete-entity -y &lt;IDP protocol&gt;://&lt;IDP hostname&gt;:&lt;IDP port&gt;&lt;IDP depoly uri&gt; -u amadmin -f &lt;admin password file name&gt; -c idff<br>
+
+23. Run<br>
+ssoadm delete-entity -y &lt;SP protocol&gt;://&lt;SP hostname&gt;:&lt;SP port&gt;&lt;SP depoly uri&gt; -u amadmin -f &lt;admin password file name&gt; -c idff<br>
+
+24.Run<br>
+ssoadm create-metadata-templ -u amadmin -f &lt;admin password file name&gt; -y &lt;IDP protocol&gt;://&lt;IDP hostname&gt;:&lt;IDP port&gt;&lt;IDP depoly uri&gt; -m /tmp/idpm -x /tmp/idpx -i /idp -b test -g test -c idff<br>
+25. Edit file '/tmp/idpx'<br>
+Change the value of attribute "enableNameIDEncryption" to "true"<br>
+
+26. Run<br>
+ssoadm import-entity -u amadmin -f &lt;admin password file name&gt; -m /tmp/idpm -x /tmp/idpx -t sampleidffcot -c idff<br>
+
+27. Copy '/tmp/spm' and '/tmp/spx'(generated at step 4 in section "Set up SP machine" below) from SP machine to '/tmp/spm' and '/tmp/spx' on this machine<br>
+
+28. Edit file '/tmp/spx'<br>
+Change the value of "hosted" to "0"<br>
+
+29. Run<br>
+ssoadm import-entity -u amadmin -f &lt;admin password file name&gt; -m /tmp/spm -x /tmp/spx -t sampleidffcot -c idff<br>
+<br>
+
+
+Set up SP machine:<br>
+1. Download or build ssoAdminTools.zip and install.<br>
+2. Run<br>
+ssoadm delete-entity -y &lt;IDP protocol&gt;://&lt;IDP hostname&gt;:&lt;IDP port&gt;&lt;IDP depoly uri&gt; -u amadmin -f &lt;admin password file name&gt; -c idff<br>
+
+3. Run<br>
+ssoadm delete-entity -y &lt;SP protocol&gt;://&lt;SP hostname&gt;:&lt;SP port&gt;&lt;SP depoly uri&gt; -u amadmin -f &lt;admin password file name&gt; -c idff<br>
+
+4. Run<br>
+ssoadm create-metadata-templ -u amadmin -f &lt;admin password file name&gt; -y &lt;SP protocol&gt;://&lt;SP hostname&gt;:&lt;SP port&gt;&lt;SP depoly uri&gt; -m /tmp/spm -x /tmp/spx -s /sp -a test -r test -c idff<br>
+
+5. Run<br>
+ssoadm import-entity -u amadmin -f &lt;admin password file name&gt; -m /tmp/spm -x /tmp/spx -t sampleidffcot -c idff<br>
+
+6. Copy '/tmp/idpm' and 'tmp/idpx' (generated at step 24 in section "Set up IDP machine" above) from IDP machine to '/tmp/idpm' and '/tmp/idpx' on this machine<br>
+
+7. Edit file '/tmp/idpx'<br>
+Change the value of "hosted" to "0"<br>
+
+8. Run<br>
+ssoadm import-entity -u amadmin -f &lt;admin password file name&gt; -m /tmp/idpm -x /tmp/idpx -c idff -t sampleidffcot<br>
+
+<br>
+Restart web containers on IDP and SP machines.
+
+</td></tr></table>
+
+</body>
+

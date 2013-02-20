@@ -1,0 +1,10 @@
+    <test name="AMSamples">
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.clientsamples.AMSamples"/> 
+        </classes>
+    </test> 

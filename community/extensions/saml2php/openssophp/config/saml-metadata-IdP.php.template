@@ -1,0 +1,47 @@
+<?php
+/* The contents of this file are subject to the terms
+ * of the Common Development and Distribution License
+ * (the License). You may not use this file except in
+ * compliance with the License.
+ *
+ * You can obtain a copy of the License at
+ * https://opensso.dev.java.net/public/CDDLv1.0.html or
+ * opensso/legal/CDDLv1.0.txt
+ * See the License for the specific language governing
+ * permission and limitations under the License.
+ *
+ * When distributing Covered Code, include this CDDL
+ * Header Notice in each file and include the License file
+ * at opensso/legal/CDDLv1.0.txt.
+ * If applicable, add the following below the CDDL Header,
+ * with the fields enclosed by brackets [] replaced by
+ * your own identifying information:
+ * "Portions Copyrighted [year] [name of copyright owner]"
+ *
+ * $Id: saml-metadata-IdP.php.template,v 1.2 2007/06/11 17:33:15 superpat7 Exp $
+ *
+ * Copyright 2006 Sun Microsystems Inc. All Rights Reserved
+ */
+
+    $idpMetadata = array( 
+    	"sam.feide.no" => 
+			array( "SingleSignOnUrl"=>"https://sam.feide.no/amserver/SSORedirect/metaAlias/idp",
+             "SingleLogOutUrl"=>"https://sam.feide.no/amserver/IDPSloRedirect/metaAlias/idp",
+             "certFingerprint"=>"3a:e7:d3:d3:06:ba:57:fd:7f:62:6a:4b:a8:64:b3:4a:53:d9:5d:d0" ),
+          
+        "mars.feide.no" => 
+			array( "SingleSignOnUrl"=>"https://mars.feide.no/amserver/SSORedirect/metaAlias/idp",
+             "SingleLogOutUrl"=>"https://mars.feide.no/amserver/IDPSloRedirect/metaAlias/idp",
+             "certFingerprint"=>"d8:ee:63:c8:c3:0a:9d:f2:4b:7f:c2:7b:43:4c:85:8c:62:c7:8c:69" )
+
+   		"idp.simplesign.com" =>
+			array( 
+			 "SingleSignOnBinding" => "urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST-SimpleSign",
+			 "certificate" => "-----BEGIN CERTIFICATE-----\n"
+								."MIIhjkHDEJKjbjkebjkEBKJEBKJebjkebkjEBJEBKJbejkebJKEBJKbejkbjkeBJ\n"
+								."FLEHOhohoehOEOBNFojenbjNBJOFEBNJOFEBOJbnjbJEJFBEFBJbjBJIFEBJIFBI\n"
+								."...\n"
+								."FHJKEFJEbjkebjkebRBBJKbjekbJKEBJKEBJKbfBJKEBJKEBJKbBEJKBJE==\n"
+								."-----END CERTIFICATE-----" )
+    );
+?>

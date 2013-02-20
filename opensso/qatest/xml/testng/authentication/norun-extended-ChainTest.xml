@@ -1,0 +1,25 @@
+
+    <test name="ChainTestSufficient">
+        <parameter name="testChainName" value="chain6"/>
+        <parameter name="testRealm" value="/"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.authentication.ChainTest"/>
+        </classes>
+    </test>
+    <test name="ChainTestSufficientFails">
+        <parameter name="testChainName" value="chain7"/>
+        <parameter name="testRealm" value="/"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.authentication.ChainTest"/>
+        </classes>
+    </test>

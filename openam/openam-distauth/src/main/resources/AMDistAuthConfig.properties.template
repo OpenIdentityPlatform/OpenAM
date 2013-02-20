@@ -1,0 +1,337 @@
+#
+# DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
+#
+# Copyright (c) 2006 Sun Microsystems Inc. All Rights Reserved
+#
+# The contents of this file are subject to the terms
+# of the Common Development and Distribution License
+# (the License). You may not use this file except in
+# compliance with the License.
+#
+# You can obtain a copy of the License at
+# https://opensso.dev.java.net/public/CDDLv1.0.html or
+# opensso/legal/CDDLv1.0.txt
+# See the License for the specific language governing
+# permission and limitations under the License.
+#
+# When distributing Covered Code, include this CDDL
+# Header Notice in each file and include the License file
+# at opensso/legal/CDDLv1.0.txt.
+# If applicable, add the following below the CDDL Header,
+# with the fields enclosed by brackets [] replaced by
+# your own identifying information:
+# "Portions Copyrighted [year] [name of copyright owner]"
+#
+# $Id: AMDistAuthConfig.properties.template,v 1.6 2009/08/12 17:43:03 beomsuk Exp $
+#
+#
+
+# Portions Copyrighted 2010-2011 ForgeRock AS
+
+/* The following keys are used to configure the Debug service.
+ * Possible values for the key 'level' are: off | error | warning | message. 
+ * The key 'directory' specifies the output directory where the debug files 
+ * will be created.
+ * Trailing spaces are significant.
+ * Windows: Use forward slashes "/" separate directories, not backslash "\".
+ * Windows: Spaces in the file name are allowed for Windows.
+ */
+com.iplanet.services.debug.level=@DEBUG_LEVEL@
+com.iplanet.services.debug.directory=@DEBUG_DIR@
+
+/*
+ * Server mode should be 'false'
+ */
+com.iplanet.am.serverMode=false
+
+/*
+ * Cache enable / disable properties
+ */
+com.iplanet.am.sdk.caching.enabled=false
+com.sun.identity.idm.cache.enabled=false
+com.sun.identity.sm.cache.enabled=true
+
+/*
+ * Configure remote plugin classes for configuration (SMS)
+ */
+com.sun.identity.sm.sms_object_class_name=com.sun.identity.sm.jaxrpc.SMSJAXRPCObject
+
+/*
+ * Naming URL
+ */
+com.iplanet.am.naming.url=@NAMING_URL@
+
+/*
+ * Notification URL
+ */
+com.sun.identity.client.notification.url=@NOTIFICATION_URL@
+
+/*
+ * Security Credentails to read the configuration data
+ */
+com.sun.identity.agents.app.username=@APPLICATION_USER@
+com.iplanet.am.service.password=@APPLICATION_PASSWD@
+com.iplanet.am.service.secret=@ENCODED_APPLICATION_PASSWORD@
+
+/*
+ * Encryption key that will be used to encrypt and decypt
+ * data to communicate with the server.
+ * This key is needed to decrypt passwords stored
+ * in the SMS configuration.
+ */
+am.encryption.pwd=@ENCRYPTION_KEY@
+
+/*
+ * Encryption key that will be used to encrypt and decypt
+ * data used locally within the client.
+ */
+com.sun.identity.client.encryptionKey=@ENCRYPTION_KEY_LOCAL@
+
+/*
+ * Encryption: The key "com.iplanet.security.encryptor" specifies
+ * the encrypting class implementation.
+ * Available classes are:
+ *    com.iplanet.services.util.JCEEncryption
+ *    com.iplanet.services.util.JSSEncryption
+ */
+com.iplanet.security.encryptor=com.iplanet.services.util.JCEEncryption
+
+/*
+ * Property to enable/disable the notifications for am.sdk and IdRepo Caches. 
+ * If set to "true" notifications are enabled and disabled if set to "false".
+ */
+com.sun.identity.idm.remote.notification.enabled=true
+
+/*
+ * Cache update time (in minutes) for am.sdk & IdRepo Caches
+ * if notification URL is not provided or if notifications are disabled.
+ * Note: 
+ * 1. This property is applicable only if 'com.iplanet.am.notification.url'
+ *    is not provided or if 'com.sun.identity.idm.remote.notification.enabled'
+ *    is set to 'false'.
+ * 2. If the polling time is set as 0, then polling is disabled. 
+ */
+com.iplanet.am.sdk.remote.pollingTime=1
+
+/*
+ * Property to enable/disable the notifications for service management caches.
+ * If set to "true" notifications are enabled and disabled if set to "false".
+ */
+com.sun.identity.sm.notification.enabled=true
+
+/*
+ * Cache update time (in minutes) for service configutation data,
+ * if notification URL is not provided or if notifications are disabled.
+ * Note: 
+ * 1. This property is applicable only if 'com.iplanet.am.notification.url'
+ *    is not provided or if 'com.sun.identity.sm.notification.enabled' is 
+ *    set to 'false'.
+ * 2. If the cache time is set as 0, then no cache updates will occur.
+ */
+com.sun.identity.sm.cacheTime=1
+
+/*
+ * Server protocol, host and port to be used by Client Services
+ */
+com.iplanet.am.server.protocol=@SERVER_PROTOCOL@
+com.iplanet.am.server.host=@SERVER_HOST@
+com.iplanet.am.server.port=@SERVER_PORT@
+com.iplanet.am.services.deploymentDescriptor=@DEPLOY_URI@
+
+com.iplanet.am.cookie.name=@AM_COOKIE_NAME@
+
+com.sun.identity.cdcservlet.loginurl=/UI/Login
+
+/*
+ * Session related properties.
+ */
+com.iplanet.am.session.client.polling.enable=true
+com.iplanet.am.session.client.polling.period=180
+
+/*
+ * Identify cert db directory path, prefix and password file
+ * to initialize JSS Socket Factory when Web Container is configured SSL
+ */
+com.iplanet.am.admin.cli.certdb.dir=@CONTAINER_CERTDB_DIR@
+com.iplanet.am.admin.cli.certdb.prefix=@CONTAINER_CERTDB_PREFIX@
+com.iplanet.am.admin.cli.certdb.passfile=@BASEDIR@/@PRODUCT_DIR@/config/.wtpass
+
+/*
+ * Identify property value for SSL ApprovalCallback / HostnameVerifier
+ *    If com.iplanet.services.comm is configured as protocol handler
+ *    and the checkSubjectAltName or resolveIPAddress feature is enabled, 
+ *    cert8.db and key3.db with the prefix value of 
+ *    com.iplanet.am.admin.cli.certdb.prefix will have to be created under 
+ *    the directory of com.iplanet.am.admin.cli.certdb.dir before server is 
+ *    restarted.
+ */
+com.iplanet.am.jssproxy.trustAllServerCerts=false
+com.iplanet.am.jssproxy.checkSubjectAltName=false
+com.iplanet.am.jssproxy.resolveIPAddress=false
+com.iplanet.am.jssproxy.SSLTrustHostList=false
+
+/**************************************************************
+ *              Policy Client parameters
+ **************************************************************/
+/* Policy decision log parameters. Possible values for logging.level
+ * are NONE, ALLOW, DENY, BOTH, and DECISION */
+com.sun.identity.agents.server.log.file.name=amRemotePolicyLog
+com.sun.identity.agents.logging.level=NONE
+
+/* Notification URL for updating cache */
+com.sun.identity.agents.notification.enabled=false
+com.sun.identity.agents.notification.url=@NOTIFICATION_URL@
+
+/* Cache time in minutes */
+com.sun.identity.agents.polling.interval=3
+
+/* Information to cache. Possible value are "subtree" or "self" */
+com.sun.identity.policy.client.cacheMode=subtree
+
+/* Policy client clock skew value in seconds */
+com.sun.identity.policy.client.clockSkew=10 
+
+/*
+* Explicitly disable monitoring services in the client applications.
+*/
+com.sun.identity.monitoring=off
+
+/*
+* Specify if allow to use cached data for HttpURLConnection
+*/
+com.sun.identity.urlconnection.useCache=false
+
+/*
+ * Protocol handler pkg name for HTTPS protocol.
+ * Default value is none.
+ * Available impl classes are:
+ *   com.iplanet.services.comm (uses JSS)
+ *   com.sun.identity.protocol (pure Java)
+ */
+opensso.protocol.handler.pkgs=
+
+/*
+ * This setting controls whether the AuthContext includes the HttpServletRequest
+ * and HttpServletResponse objects as serialized Java objects in the remote auth
+ * XML communications with the server. If the OpenAM server is using custom auth
+ * modules that make use of the HttpServletRequest or Response objects; the module
+ * might look for a request parameter or need to set a cookie, then set this value
+ * to true.
+ *
+ * Enabling this functionality has a minimal performance impact due to the
+ * serialization overhead.
+ */
+openam.remoteauth.include.reqres=false
+
+/*
+ * This setting controls the default logout page to which a user is redirected
+ * if no goto url is specified to the LogoutViewBean.
+ */
+openam.authentication.distUI.defaultLogoutPage=Logout.jsp
+
+/*
+ * This setting turns on persistent OpenAM session cookies, traditionally the
+ * OpenAM session cookie (iPlanetDirectoryPro) has always been a session cookie.
+ * If the OpenAM session cookie is required by other applications then the cookie
+ * must be made persistent.
+ *
+ * SECURITY NOTE: This setting should only be set to true in very specific
+ * circumstances. If OpenAM is deployed alongside Enterprise/Desktop SSO
+ * customisations then this setting can be enabled. This will cause the browser
+ * to write the value of the OpenAM session cookie to disk enabling Enterprise/
+ * Desktop SSO. Writing the session cookie to disk will also allow other
+ * applications to read the cookie. This feature should only be enabled if you
+ * are aware and accept the security implications.
+ */
+openam.session.persist_am_cookie=false
+
+/*
+ * This property controls the length of time for which the OpenAM session cookie 
+ * will be persisted if persistent cookie mode is enabled.
+ *
+ * Units: Time in hours
+ */
+com.iplanet.am.cookie.timeToLive=24
+
+/*
+ * The URL of the DAS to receive notifications.
+ */
+com.sun.identity.client.notification.url=@NOTIFICATION_URL@
+
+/*
+ * Enabled Cookie encoded (should be true when running in Tomcat)
+ */
+com.iplanet.am.cookie.c66Encode=false
+
+/*
+ * Invalid characters enforced by the CDCServlet
+ */
+com.iplanet.services.cdc.invalidGotoStrings=<,>,javascript:,javascript%3a,%3c,%3e
+
+/*
+ * Enable this setting if you want the original session _not_ to be destroyed
+ * during session upgrade. Useful if you have concurrent access to OpenAM 
+ * during the session upgrade process.
+ */
+openam.auth.destroy_session_after_upgrade=false
+
+/**
+ * When the DAS server receives an authcookie with an invalid servername, this 
+ * HTTP error should be sent to the application server, so they can show a 
+ * custom error page to the user. This errorpage should only appear if there 
+ * are multiple OpenAM installations within the same cookie domain.
+ */
+openam.untrusted.server.http.error.code=403
+
+/**
+ * Here you can list HTTP header keys, which should be retained, when the user
+ * is internally rerouted to an another DAS instance. This usually happens
+ * when the user has an AMAuthCookie from a different DAS server. The list of
+ * headernames should be separated by a comma (',') character, for example:
+ * The headers listed here will be copied into the proxied request.
+ *
+ * openam.retained.http.request.headers=X-DSAMEVersion,AM_CLIENT_TYPE
+ */
+openam.retained.http.request.headers=X-DSAMEVersion
+
+/**
+ * Here you can list HTTP header keys, which should NOT retained, when the
+ * user is internally rerouted to an another DAS instance. You should only
+ * modify this list if you're really sure about what you're doing, since
+ * copying certain headers can cause unexpected errors in your deployment.
+ * The headers listed here will NOT be copied into the proxied request.
+ *
+ * This option is here to supply deafult values for the configuration and
+ * protect from erroneus header settings.
+ */
+openam.forbidden.to.copy.request.headers=connection
+
+/**
+ * Here you can list HTTP header keys, which should be retained, when the user 
+ * is internally rerouted to an another DAS instance. This usually happens 
+ * when the user has an AMAuthCookie from a different DAS server. The list of 
+ * headernames should be separated by a comma (',') character, for example:
+ * The headers listed here will be copied from the proxied response.
+ * 
+ * openam.retained.http.headers=X-DSAMEVersion,AM_CLIENT_TYPE,Cache-Control
+ */
+openam.retained.http.headers=X-DSAMEVersion
+
+/**
+ * Here you can list HTTP header keys, which should NOT retained, when the 
+ * user is internally rerouted to an another DAS instance. You should only 
+ * modify this list if you're really sure about what you're doing, since 
+ * copying certain headers can cause unexpected errors in your deployment.
+ * The headers listed here will NOT be copied from the proxied response.
+ *
+ * This option is here to supply deafult values for the configuration and 
+ * protect from erroneus header settings.
+ */
+openam.forbidden.to.copy.headers=connection
+
+/**
+ * If this property is enabled the DAS logout screen will not redirect the 
+ * clients to the value of the 'goto' parameter in any circumstances, instead 
+ *  it will only display the Logout successful screen.
+ */
+openam.authentication.ignore_goto_during_logout=false

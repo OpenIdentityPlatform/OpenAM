@@ -1,0 +1,201 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!--
+  DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
+ 
+  Copyright (c) 2009 Sun Microsystems Inc. All Rights Reserved
+ 
+  The contents of this file are subject to the terms
+  of the Common Development and Distribution License
+  (the License). You may not use this file except in
+  compliance with the License.
+
+  You can obtain a copy of the License at
+  https://opensso.dev.java.net/public/CDDLv1.0.html or
+  opensso/legal/CDDLv1.0.txt
+  See the License for the specific language governing
+  permission and limitations under the License.
+
+  When distributing Covered Code, include this CDDL
+  Header Notice in each file and include the License file
+  at opensso/legal/CDDLv1.0.txt.
+  If applicable, add the following below the CDDL Header,
+  with the fields enclosed by brackets [] replaced by
+  your own identifying information:
+  "Portions Copyrighted [year] [name of copyright owner]"
+
+  $Id: xacml-core-v3.xjb,v 1.1 2009/08/19 05:40:41 veiming Exp $
+
+-->
+
+<!--
+Portions Copyrighted [2013] [ForgeRock US]
+-->
+
+<jaxb:bindings xmlns:jaxb="http://java.sun.com/xml/ns/jaxb"
+               xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+               version="2.0">
+  <jaxb:bindings schemaLocation="../xsd/xacml-core-v3-schema-wd-17.xsd"  node="/xsd:schema">
+    <jaxb:schemaBindings>
+      <jaxb:package name="com.sun.identity.entitlement.xacml3.core"/>
+    </jaxb:schemaBindings>
+
+<jaxb:bindings node="//xsd:complexType[@name='RequestType']">
+<jaxb:class name="Request"/>
+</jaxb:bindings>
+<jaxb:bindings node="//xsd:complexType[@name='RequestDefaultsType']">
+<jaxb:class name="RequestDefaults"/>
+</jaxb:bindings>
+<jaxb:bindings node="//xsd:complexType[@name='ResponseType']">
+<jaxb:class name="Response"/>
+</jaxb:bindings>
+<jaxb:bindings node="//xsd:complexType[@name='ContentType']">
+<jaxb:class name="Content"/>
+</jaxb:bindings>
+<jaxb:bindings node="//xsd:complexType[@name='ResultType']">
+<jaxb:class name="Result"/>
+</jaxb:bindings>
+<jaxb:bindings node="//xsd:complexType[@name='PolicyIdentifierListType']">
+<jaxb:class name="PolicyIdentifierList"/>
+</jaxb:bindings>
+<jaxb:bindings node="//xsd:complexType[@name='StatusType']">
+<jaxb:class name="Status"/>
+</jaxb:bindings>
+<jaxb:bindings node="//xsd:complexType[@name='StatusCodeType']">
+<jaxb:class name="StatusCode"/>
+</jaxb:bindings>
+<jaxb:bindings node="//xsd:complexType[@name='StatusDetailType']">
+<jaxb:class name="StatusDetail"/>
+</jaxb:bindings>
+<jaxb:bindings node="//xsd:complexType[@name='MissingAttributeDetailType']">
+<jaxb:class name="MissingAttributeDetail"/>
+</jaxb:bindings>
+<jaxb:bindings node="//xsd:complexType[@name='AttributesType']">
+<jaxb:class name="Attributes"/>
+</jaxb:bindings>
+<jaxb:bindings node="//xsd:complexType[@name='AttributeType']">
+<jaxb:class name="Attribute"/>
+</jaxb:bindings>
+<jaxb:bindings node="//xsd:complexType[@name='MultiRequestsType']">
+<jaxb:class name="MultiRequests"/>
+</jaxb:bindings>
+<jaxb:bindings node="//xsd:complexType[@name='RequestReferenceType']">
+<jaxb:class name="RequestReference"/>
+</jaxb:bindings>
+<jaxb:bindings node="//xsd:complexType[@name='AttributesReferenceType']">
+<jaxb:class name="AttributesReference"/>
+</jaxb:bindings>
+<jaxb:bindings node="//xsd:complexType[@name='ObligationsType']">
+<jaxb:class name="Obligations"/>
+</jaxb:bindings>
+<jaxb:bindings node="//xsd:complexType[@name='AssociatedAdviceType']">
+<jaxb:class name="AssociatedAdvice"/>
+</jaxb:bindings>
+<jaxb:bindings node="//xsd:complexType[@name='ObligationType']">
+<jaxb:class name="Obligation"/>
+</jaxb:bindings>
+<jaxb:bindings node="//xsd:complexType[@name='AdviceType']">
+<jaxb:class name="Advice"/>
+</jaxb:bindings>
+<jaxb:bindings node="//xsd:complexType[@name='AttributeAssignmentType']">
+<jaxb:class name="AttributeAssignment"/>
+</jaxb:bindings>
+<jaxb:bindings node="//xsd:complexType[@name='ObligationExpressionsType']">
+<jaxb:class name="ObligationExpressions"/>
+</jaxb:bindings>
+<jaxb:bindings node="//xsd:complexType[@name='AdviceExpressionsType']">
+<jaxb:class name="AdviceExpressions"/>
+</jaxb:bindings>
+<jaxb:bindings node="//xsd:complexType[@name='ObligationExpressionType']">
+<jaxb:class name="ObligationExpression"/>
+</jaxb:bindings>
+<jaxb:bindings node="//xsd:complexType[@name='AdviceExpressionType']">
+<jaxb:class name="AdviceExpression"/>
+</jaxb:bindings>
+<jaxb:bindings node="//xsd:complexType[@name='AttributeAssignmentExpressionType']">
+<jaxb:class name="AttributeAssignmentExpression"/>
+</jaxb:bindings>
+<jaxb:bindings node="//xsd:complexType[@name='PolicySetType']">
+<jaxb:class name="PolicySet"/>
+</jaxb:bindings>
+<jaxb:bindings node="//xsd:complexType[@name='PolicyIssuerType']">
+<jaxb:class name="PolicyIssuer"/>
+</jaxb:bindings>
+<jaxb:bindings node="//xsd:complexType[@name='CombinerParametersType']">
+<jaxb:class name="CombinerParameters"/>
+</jaxb:bindings>
+<jaxb:bindings node="//xsd:complexType[@name='CombinerParameterType']">
+<jaxb:class name="CombinerParameter"/>
+</jaxb:bindings>
+<jaxb:bindings node="//xsd:complexType[@name='RuleCombinerParametersType']">
+<jaxb:class name="RuleCombinerParameters"/>
+</jaxb:bindings>
+<jaxb:bindings node="//xsd:complexType[@name='PolicyCombinerParametersType']">
+<jaxb:class name="PolicyCombinerParameters"/>
+</jaxb:bindings>
+<jaxb:bindings node="//xsd:complexType[@name='PolicySetCombinerParametersType']">
+<jaxb:class name="PolicySetCombinerParameters"/>
+</jaxb:bindings>
+<jaxb:bindings node="//xsd:complexType[@name='DefaultsType']">
+<jaxb:class name="Defaults"/>
+</jaxb:bindings>
+<jaxb:bindings node="//xsd:complexType[@name='IdReferenceType']">
+<jaxb:class name="IdReference"/>
+</jaxb:bindings>
+<jaxb:bindings node="//xsd:simpleType[@name='VersionType']">
+<jaxb:class name="Version"/>
+</jaxb:bindings>
+<jaxb:bindings node="//xsd:simpleType[@name='VersionMatchType']">
+<jaxb:class name="VersionMatch"/>
+</jaxb:bindings>
+<jaxb:bindings node="//xsd:complexType[@name='PolicyType']">
+<jaxb:class name="Policy"/>
+</jaxb:bindings>
+<jaxb:bindings node="//xsd:complexType[@name='RuleType']">
+<jaxb:class name="Rule"/>
+</jaxb:bindings>
+<jaxb:bindings node="//xsd:complexType[@name='TargetType']">
+<jaxb:class name="Target"/>
+</jaxb:bindings>
+<jaxb:bindings node="//xsd:complexType[@name='AnyOfType']">
+<jaxb:class name="AnyOf"/>
+</jaxb:bindings>
+<jaxb:bindings node="//xsd:complexType[@name='AllOfType']">
+<jaxb:class name="AllOf"/>
+</jaxb:bindings>
+<jaxb:bindings node="//xsd:complexType[@name='MatchType']">
+<jaxb:class name="Match"/>
+</jaxb:bindings>
+<jaxb:bindings node="//xsd:complexType[@name='VariableDefinitionType']">
+<jaxb:class name="VariableDefinition"/>
+</jaxb:bindings>
+<jaxb:bindings node="//xsd:complexType[@name='ExpressionType']">
+<jaxb:class name="Expression"/>
+</jaxb:bindings>
+<jaxb:bindings node="//xsd:complexType[@name='VariableReferenceType']">
+<jaxb:class name="VariableReference"/>
+</jaxb:bindings>
+<jaxb:bindings node="//xsd:complexType[@name='AttributeSelectorType']">
+<jaxb:class name="AttributeSelector"/>
+</jaxb:bindings>
+<jaxb:bindings node="//xsd:complexType[@name='AttributeDesignatorType']">
+<jaxb:class name="AttributeDesignator"/>
+</jaxb:bindings>
+<jaxb:bindings node="//xsd:complexType[@name='AttributeValueType']">
+<jaxb:class name="AttributeValue"/>
+</jaxb:bindings>
+<jaxb:bindings node="//xsd:complexType[@name='FunctionType']">
+<jaxb:class name="Function"/>
+</jaxb:bindings>
+<jaxb:bindings node="//xsd:complexType[@name='ConditionType']">
+<jaxb:class name="Condition"/>
+</jaxb:bindings>
+<jaxb:bindings node="//xsd:complexType[@name='ApplyType']">
+<jaxb:class name="Apply"/>
+</jaxb:bindings>
+
+
+
+  </jaxb:bindings>
+</jaxb:bindings>
+

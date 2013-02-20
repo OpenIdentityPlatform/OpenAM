@@ -1,0 +1,1 @@
+{ "screenColorDepthPenaltyPoints":10, "screenResolutionPenaltyPoints":10, "installedPluginsPenaltyPoints":10, "installedFontsPenaltyPoints":10, "timezonePenaltyPoints":10, "locationPenaltyPoints":10, "userAgentPenaltyPoints":10, "persistentCookiePenaltyPoints":100, "ignoreVersionsInUserAgent":true }

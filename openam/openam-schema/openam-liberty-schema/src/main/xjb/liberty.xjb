@@ -1,0 +1,338 @@
+<!--
+   DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
+  
+   Copyright (c) 2006 Sun Microsystems Inc. All Rights Reserved
+  
+   The contents of this file are subject to the terms
+   of the Common Development and Distribution License
+   (the License). You may not use this file except in
+   compliance with the License.
+
+   You can obtain a copy of the License at
+   https://opensso.dev.java.net/public/CDDLv1.0.html or
+   opensso/legal/CDDLv1.0.txt
+   See the License for the specific language governing
+   permission and limitations under the License.
+
+   When distributing Covered Code, include this CDDL
+   Header Notice in each file and include the License file
+   at opensso/legal/CDDLv1.0.txt.
+   If applicable, add the following below the CDDL Header,
+   with the fields enclosed by brackets [] replaced by
+   your own identifying information:
+   "Portions Copyrighted [year] [name of copyright owner]"
+
+   $Id: binding.xjb,v 1.2 2008/06/25 05:48:39 qcheng Exp $
+
+-->
+
+<jxb:bindings version="1.0"
+               xmlns:jxb="http://java.sun.com/xml/ns/jaxb"
+               xmlns:xs="http://www.w3.org/2001/XMLSchema">
+
+
+  <jxb:bindings schemaLocation="../xsd/cs-sstc-schema-assertion-01.xsd" node="/xs:schema">
+    <jxb:schemaBindings>
+      <jxb:package name="com.sun.identity.liberty.ws.common.jaxb.assertion">
+         <jxb:javadoc>
+     <![CDATA[<body> Package level documentation for generated package com.sun.identity.liberty.ws.common.jaxb.assertion. </body>]]>
+         </jxb:javadoc>
+      </jxb:package>
+      <jxb:nameXmlTransform>
+          <jxb:elementName suffix="Element"/>
+      </jxb:nameXmlTransform>
+    </jxb:schemaBindings>
+  </jxb:bindings>
+
+
+  <jxb:bindings schemaLocation="../xsd/cs-sstc-schema-protocol-01.xsd" node="/xs:schema">
+    <jxb:schemaBindings>
+      <jxb:package name="com.sun.identity.liberty.ws.common.jaxb.protocol">
+         <jxb:javadoc>
+     <![CDATA[<body> Package level documentation for generated package com.sun.identity.liberty.ws.common.jaxb.protocol. </body>]]>
+         </jxb:javadoc>
+      </jxb:package>
+      <jxb:nameXmlTransform>
+          <jxb:elementName suffix="Element"/>
+      </jxb:nameXmlTransform>
+    </jxb:schemaBindings>
+  </jxb:bindings>
+
+  <jxb:bindings schemaLocation="../xsd/idff-entity-config-schema.xsd" node="/xs:schema">
+    <jxb:schemaBindings>
+	<jxb:package name="com.sun.identity.federation.jaxb.entityconfig">
+	 <jxb:javadoc>
+	<![CDATA[<body> Package level documentation for generated package com.sun.identity.federation.jaxb.entityconfig. </body>]]>
+	 </jxb:javadoc>
+	</jxb:package>
+	<jxb:nameXmlTransform>
+          <jxb:elementName suffix="Element"/>
+      </jxb:nameXmlTransform>
+    </jxb:schemaBindings>
+  </jxb:bindings>
+
+  <jxb:bindings schemaLocation="../xsd/lib-arch-authentication-context.xsd" node="/xs:schema">
+    <jxb:schemaBindings>
+      <jxb:package name="com.sun.identity.liberty.ws.common.jaxb.ac">
+         <jxb:javadoc>
+     <![CDATA[<body> Package level documentation for generated package com.sun.identity.liberty.ws.common.jaxb.ac. </body>]]>
+         </jxb:javadoc>
+      </jxb:package>
+      <jxb:nameXmlTransform>
+          <jxb:elementName suffix="Element"/>
+      </jxb:nameXmlTransform>
+    </jxb:schemaBindings>
+  </jxb:bindings>
+
+
+  <jxb:bindings schemaLocation="../xsd/lib-arch-disco-svc.xsd" node="/xs:schema">
+    <jxb:schemaBindings>
+      <jxb:package name="com.sun.identity.liberty.ws.disco.jaxb">
+         <jxb:javadoc>
+     <![CDATA[<body> Package level documentation for generated package com.sun.identity.liberty.ws.disco.jaxb. </body>]]>
+         </jxb:javadoc>
+      </jxb:package>
+      <jxb:nameXmlTransform>
+          <jxb:elementName suffix="Element"/>
+      </jxb:nameXmlTransform>
+    </jxb:schemaBindings>
+  </jxb:bindings>
+
+
+  <jxb:bindings schemaLocation="../xsd/liberty-idwsf-disco-svc-v1.1.xsd" node="/xs:schema">
+    <jxb:schemaBindings>
+      <jxb:package name="com.sun.identity.liberty.ws.disco.jaxb11">
+         <jxb:javadoc>
+     <![CDATA[<body> Package level documentation for generated package com.sun.identity.liberty.ws.disco.jaxb11. </body>]]>
+         </jxb:javadoc>
+      </jxb:package>
+      <jxb:nameXmlTransform>
+          <jxb:elementName suffix="Element"/>
+      </jxb:nameXmlTransform>
+    </jxb:schemaBindings>
+  </jxb:bindings>
+
+
+  <jxb:bindings schemaLocation="../xsd/lib-arch-interact-svc.xsd" node="/xs:schema">
+    <jxb:schemaBindings>
+      <jxb:package name="com.sun.identity.liberty.ws.interaction.jaxb">
+         <jxb:javadoc>
+     <![CDATA[<body> Package level documentation for generated package com.sun.identity.liberty.ws.interaction.jaxb. </body>]]>
+         </jxb:javadoc>
+      </jxb:package>
+      <jxb:nameXmlTransform>
+          <jxb:elementName suffix="Element"/>
+      </jxb:nameXmlTransform>
+    </jxb:schemaBindings>
+  </jxb:bindings>
+
+
+  <jxb:bindings schemaLocation="../xsd/lib-arch-metadata.xsd" node="/xs:schema">
+    <jxb:schemaBindings>
+      <jxb:package name="com.sun.identity.liberty.ws.meta.jaxb">
+         <jxb:javadoc>
+     <![CDATA[<body> Package level documentation for generated package com.sun.identity.liberty.ws.meta.jaxb. </body>]]>
+         </jxb:javadoc>
+      </jxb:package>
+      <jxb:nameXmlTransform>
+          <jxb:elementName suffix="Element"/>
+      </jxb:nameXmlTransform>
+    </jxb:schemaBindings>
+  </jxb:bindings>
+
+
+  <jxb:bindings schemaLocation="../xsd/lib-arch-paos.xsd" node="/xs:schema">
+    <jxb:schemaBindings>
+      <jxb:package name="com.sun.identity.liberty.ws.paos.jaxb">
+         <jxb:javadoc>
+     <![CDATA[<body> Package level documentation for generated package com.sun.identity.liberty.ws.paos.jaxb. </body>]]>
+         </jxb:javadoc>
+      </jxb:package>
+      <jxb:nameXmlTransform>
+          <jxb:elementName suffix="Element"/>
+      </jxb:nameXmlTransform>
+    </jxb:schemaBindings>
+  </jxb:bindings>
+
+
+  <jxb:bindings schemaLocation="../xsd/lib-arch-protocols-schema.xsd" node="/xs:schema">
+    <jxb:schemaBindings>
+      <jxb:package name="com.sun.identity.liberty.ws.common.jaxb.ps">
+         <jxb:javadoc>
+     <![CDATA[<body> Package level documentation for generated package com.sun.identity.liberty.ws.common.jaxb.ps. </body>]]>
+         </jxb:javadoc>
+      </jxb:package>
+      <jxb:nameXmlTransform>
+          <jxb:elementName suffix="Element"/>
+      </jxb:nameXmlTransform>
+    </jxb:schemaBindings>
+  </jxb:bindings>
+
+
+  <jxb:bindings schemaLocation="../xsd/lib-arch-security-fmwk.xsd" node="/xs:schema">
+    <jxb:schemaBindings>
+      <jxb:package name="com.sun.identity.liberty.ws.common.jaxb.security">
+         <jxb:javadoc>
+     <![CDATA[<body> Package level documentation for generated package com.sun.identity.liberty.ws.common.jaxb.security. </body>]]>
+         </jxb:javadoc>
+      </jxb:package>
+      <jxb:nameXmlTransform>
+          <jxb:elementName suffix="Element"/>
+      </jxb:nameXmlTransform>
+    </jxb:schemaBindings>
+  </jxb:bindings>
+
+
+  <jxb:bindings schemaLocation="../xsd/lib-arch-soap-binding.xsd" node="/xs:schema">
+    <jxb:schemaBindings>
+      <jxb:package name="com.sun.identity.liberty.ws.soapbinding.jaxb">
+         <jxb:javadoc>
+     <![CDATA[<body> Package level documentation for generated package com.sun.identity.liberty.ws.soapbinding.jaxb. </body>]]>
+         </jxb:javadoc>
+      </jxb:package>
+      <jxb:nameXmlTransform>
+          <jxb:elementName suffix="Element"/>
+      </jxb:nameXmlTransform>
+    </jxb:schemaBindings>
+  </jxb:bindings>
+
+
+  <jxb:bindings schemaLocation="../xsd/liberty-idwsf-soap-binding-v1.1.xsd" node="/xs:schema">
+    <jxb:schemaBindings>
+      <jxb:package name="com.sun.identity.liberty.ws.soapbinding.jaxb11">
+         <jxb:javadoc>
+     <![CDATA[<body> Package level documentation for generated package com.sun.identity.liberty.ws.soapbinding.jaxb11. </body>]]>
+         </jxb:javadoc>
+      </jxb:package>
+      <jxb:nameXmlTransform>
+          <jxb:elementName suffix="Element"/>
+      </jxb:nameXmlTransform>
+    </jxb:schemaBindings>
+  </jxb:bindings>
+
+
+  <jxb:bindings schemaLocation="../xsd/lib-id-sis-pp.xsd" node="/xs:schema">
+    <jxb:schemaBindings>
+      <jxb:package name="com.sun.identity.liberty.ws.idpp.jaxb">
+         <jxb:javadoc>
+     <![CDATA[<body> Package level documentation for generated package com.sun.identity.liberty.ws.idpp.jaxb. </body>]]>
+         </jxb:javadoc>
+      </jxb:package>
+      <jxb:nameXmlTransform>
+          <jxb:elementName suffix="Element"/>
+      </jxb:nameXmlTransform>
+    </jxb:schemaBindings>
+  </jxb:bindings>
+
+
+  <jxb:bindings schemaLocation="../xsd/secext.xsd" node="/xs:schema">
+    <jxb:schemaBindings>
+      <jxb:package name="com.sun.identity.liberty.ws.common.jaxb.secext">
+         <jxb:javadoc>
+     <![CDATA[<body> Package level documentation for generated package com.sun.identity.liberty.ws.common.jaxb.secext. </body>]]>
+         </jxb:javadoc>
+      </jxb:package>
+      <jxb:nameXmlTransform>
+          <jxb:elementName suffix="Element"/>
+      </jxb:nameXmlTransform>
+    </jxb:schemaBindings>
+  </jxb:bindings>
+
+  <jxb:bindings schemaLocation="../xsd/soap.xsd" node="/xs:schema">
+    <jxb:schemaBindings>
+      <jxb:package name="com.sun.identity.liberty.ws.common.jaxb.soap">
+         <jxb:javadoc>
+     <![CDATA[<body> Package level documentation for generated package com.sun.identity.liberty.ws.common.jaxb.soap. </body>]]>
+         </jxb:javadoc>
+      </jxb:package>
+      <jxb:nameXmlTransform>
+          <jxb:elementName suffix="Element"/>
+      </jxb:nameXmlTransform>
+    </jxb:schemaBindings>
+  </jxb:bindings>
+
+
+  <jxb:bindings schemaLocation="../xsd/utility.xsd" node="/xs:schema">
+    <jxb:schemaBindings>
+      <jxb:package name="com.sun.identity.liberty.ws.common.jaxb.utility">
+         <jxb:javadoc>
+     <![CDATA[<body> Package level documentation for generated package com.sun.identity.liberty.ws.common.jaxb.utility. </body>]]>
+         </jxb:javadoc>
+      </jxb:package>
+      <jxb:nameXmlTransform>
+          <jxb:elementName suffix="Element"/>
+      </jxb:nameXmlTransform>
+    </jxb:schemaBindings>
+  </jxb:bindings>
+
+
+  <jxb:bindings schemaLocation="../xsd/xenc-schema.xsd" node="/xs:schema">
+    <jxb:schemaBindings>
+      <jxb:package name="com.sun.identity.liberty.ws.common.jaxb.xmlenc">
+         <jxb:javadoc>
+     <![CDATA[<body> Package level documentation for generated package com.sun.identity.liberty.ws.common.jaxb.xmlenc. </body>]]>
+         </jxb:javadoc>
+      </jxb:package>
+      <jxb:nameXmlTransform>
+          <jxb:elementName suffix="Element"/>
+      </jxb:nameXmlTransform>
+    </jxb:schemaBindings>
+  </jxb:bindings>
+
+
+  <jxb:bindings schemaLocation="../xsd/xmldsig-core-schema.xsd" node="/xs:schema">
+    <jxb:schemaBindings>
+      <jxb:package name="com.sun.identity.liberty.ws.common.jaxb.xmlsig">
+         <jxb:javadoc>
+     <![CDATA[<body> Package level documentation for generated package com.sun.identity.liberty.ws.common.jaxb.xmlsig. </body>]]>
+         </jxb:javadoc>
+      </jxb:package>
+      <jxb:nameXmlTransform>
+          <jxb:elementName suffix="Element"/>
+      </jxb:nameXmlTransform>
+    </jxb:schemaBindings>
+  </jxb:bindings>
+
+
+  <jxb:bindings schemaLocation="../xsd/discoentry.xsd" node="/xs:schema">
+    <jxb:schemaBindings>
+      <jxb:package name="com.sun.identity.liberty.ws.disco.plugins.jaxb">
+         <jxb:javadoc>
+     <![CDATA[<body> Package level documentation for generated package com.sun.identity.liberty.ws.disco.plugins.jaxb. </body>]]>
+         </jxb:javadoc>
+      </jxb:package>
+      <jxb:nameXmlTransform>
+          <jxb:elementName suffix="Element"/>
+      </jxb:nameXmlTransform>
+    </jxb:schemaBindings>
+  </jxb:bindings>
+
+  <jxb:bindings schemaLocation="../xsd/ppextension.xsd" node="/xs:schema">
+    <jxb:schemaBindings>
+      <jxb:package name="com.sun.identity.liberty.ws.idpp.plugin.jaxb">
+         <jxb:javadoc>
+     <![CDATA[<body> Package level documentation for generated package com.sun.identity.liberty.ws.idpp.plugin.jaxb. </body>]]>
+         </jxb:javadoc>
+      </jxb:package>
+      <jxb:nameXmlTransform>
+          <jxb:elementName suffix="Element"/>
+      </jxb:nameXmlTransform>
+    </jxb:schemaBindings>
+  </jxb:bindings>
+
+
+  <jxb:bindings schemaLocation="../xsd/lib-idwsf-authn-svc.xsd" node="/xs:schema">
+    <jxb:schemaBindings>
+      <jxb:package name="com.sun.identity.liberty.ws.authnsvc.jaxb">
+         <jxb:javadoc>
+     <![CDATA[<body> Package level documentation for generated package com.sun.identity.liberty.ws.common.jaxb.authnsvc. </body>]]>
+         </jxb:javadoc>
+      </jxb:package>
+      <jxb:nameXmlTransform>
+          <jxb:elementName suffix="Element"/>
+      </jxb:nameXmlTransform>
+    </jxb:schemaBindings>
+  </jxb:bindings>
+
+
+</jxb:bindings>

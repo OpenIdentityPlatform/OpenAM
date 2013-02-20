@@ -1,0 +1,247 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  ! CCPL HEADER START
+  !
+  ! This work is licensed under the Creative Commons
+  ! Attribution-NonCommercial-NoDerivs 3.0 Unported License.
+  ! To view a copy of this license, visit
+  ! http://creativecommons.org/licenses/by-nc-nd/3.0/
+  ! or send a letter to Creative Commons, 444 Castro Street,
+  ! Suite 900, Mountain View, California, 94041, USA.
+  !
+  ! You can also obtain a copy of the license at
+  ! src/main/resources/legal-notices/CC-BY-NC-ND.txt.
+  ! See the License for the specific language governing permissions
+  ! and limitations under the License.
+  !
+  ! If applicable, add the following below this CCPL HEADER, with the fields
+  ! enclosed by brackets "[]" replaced with your own identifying information:
+  !      Portions Copyright [yyyy] [name of copyright owner]
+  !
+  ! CCPL HEADER END
+  !
+  !      Copyright 2011-2012 ForgeRock AS
+  !    
+-->
+<refentry xml:id='agentadmin-1'
+ xmlns='http://docbook.org/ns/docbook'
+ version='5.0' xml:lang='en'
+ xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance'
+ xsi:schemaLocation='http://docbook.org/ns/docbook http://docbook.org/xml/5.0/xsd/docbook.xsd'
+ xmlns:xlink='http://www.w3.org/1999/xlink'
+ xmlns:xinclude='http://www.w3.org/2001/XInclude'>
+ <info><copyright><year>2011-2012</year><holder>ForgeRock AS</holder></copyright></info>
+ <refmeta>
+  <refentrytitle>agentadmin</refentrytitle><manvolnum>1</manvolnum>
+  <refmiscinfo class="software">OpenAM</refmiscinfo>
+  <refmiscinfo class="version"><?eval ${serverDocTargetVersion}?></refmiscinfo>
+ </refmeta>
+ <refnamediv>
+  <refname>agentadmin</refname>
+  <refpurpose>manage OpenAM policy agent installation</refpurpose>
+ </refnamediv>
+ <refsynopsisdiv>
+  <cmdsynopsis>
+   <command>agentadmin</command>
+   <arg choice="req">options</arg>
+  </cmdsynopsis>
+ </refsynopsisdiv>
+ <refsect1>
+  <title>Description</title>
+  <para>This command manages OpenAM policy agent installations. The
+  <command>agentadmin</command> command requires a Java runtime
+  environment.</para>
+ </refsect1>
+ <refsect1>
+  <title>Options</title>
+  <para>The following options are supported.</para>
+  <variablelist>
+   <varlistentry>
+    <term><option>--install</option></term>
+    <listitem>
+     <para>Installs a new Agent instance.</para>
+     <para>Usage: <command>agentadmin --install [--useResponse | --saveResponse
+     <replaceable>file-name</replaceable>]</command></para>
+     <variablelist>
+      <varlistentry>
+       <term><option>--useResponse</option></term>
+       <listitem>
+        <para>Use this option to install in silent mode by specifying all
+        the responses in a response specified by
+        <replaceable>file-name</replaceable>. When this option is used
+        the installer runs in non-interactive mode.</para>
+       </listitem>
+      </varlistentry>
+      <varlistentry>
+       <term><option>--saveResponse</option></term>
+       <listitem>
+        <para>Use this option to save all the supplied responses to a response
+        file specified by <replaceable>file-name</replaceable>.</para>
+       </listitem>
+      </varlistentry>
+     </variablelist>
+    </listitem>
+   </varlistentry>
+   <varlistentry>
+    <term><option>--custom-install</option></term>
+    <listitem>
+     <para>Installs a new Agent instance</para>
+     <para>Usage: <command>agentadmin --custom-install [--useResponse |
+     --saveResponse <replaceable>file-name</replaceable>]</command></para>
+     <variablelist>
+      <varlistentry>
+       <term><option>--useResponse</option></term>
+       <listitem>
+        <para>Use this option to install in silent mode by specifying all the
+        responses in a response specified by
+        <replaceable>file-name</replaceable>. When this option is used the
+        installer runs in non-interactive mode.</para>
+       </listitem>
+      </varlistentry>
+      <varlistentry>
+       <term><option>--saveResponse</option></term>
+       <listitem>
+        <para>Use this option to save all the supplied responses to a response
+        file specified by <replaceable>file-name</replaceable>.</para>
+       </listitem>
+      </varlistentry>
+     </variablelist>
+    </listitem>
+   </varlistentry>
+   <varlistentry>
+    <term><option>--uninstall</option></term>
+    <listitem>
+     <para>Uninstalls an existing Agent instance.</para>
+     <para>Usage: <command>agentadmin --uninstall [--useResponse |
+     --saveResponse <replaceable>file-name</replaceable>]</command></para>
+     <variablelist>
+      <varlistentry>
+       <term><option>--useResponse</option></term>
+       <listitem>
+        <para>Use this option to install in silent mode by specifying all
+        the responses in a response specified by
+        <replaceable>file-name</replaceable>. When this option is used the
+        installer runs in non-interactive mode.</para>
+       </listitem>
+      </varlistentry>
+      <varlistentry>
+       <term><option>--saveResponse</option></term>
+       <listitem>
+        <para>Use this option to save all the supplied responses to a response
+        file specified by <replaceable>file-name</replaceable>.</para>
+       </listitem>
+      </varlistentry>
+     </variablelist>
+    </listitem>
+   </varlistentry>
+   <varlistentry>
+    <term><option>--version</option></term>
+    <listitem>
+     <para>Displays the version information.</para>
+    </listitem>
+   </varlistentry>
+   <varlistentry>
+    <term><option>--uninstallAll</option></term>
+    <listitem>
+     <para>Uninstalls all the agent instances.</para>
+    </listitem>
+   </varlistentry>
+   <varlistentry>
+    <term><option>--migrate</option></term>
+    <listitem>
+     <para>Migrate agent to newer version</para>
+    </listitem>
+   </varlistentry>
+   <varlistentry>
+    <term><option>--listAgents</option></term>
+    <listitem>
+     <para>Displays details of all the configured agents.</para>
+    </listitem>
+   </varlistentry>
+   <varlistentry>
+    <term><option>--agentInfo</option></term>
+    <listitem>
+     <para>Displays details of the agent corresponding to the specified agent
+     ID.</para>
+     <para>Usage: <command>agentadmin --agentInfo
+     <replaceable>agent-id</replaceable></command></para>
+    </listitem>
+   </varlistentry>
+   <varlistentry>
+    <term><option>--agentInfo</option></term>
+    <listitem>
+     <para>Displays details of the agent corresponding to the specified
+     <replaceable>agent-id</replaceable>.</para>
+     <para>Example: <command>agentadmin --agentInfo agent_001</command></para>
+    </listitem>
+   </varlistentry>
+   <varlistentry>
+    <term><option>--encrypt</option></term>
+    <listitem>
+     <para>Encrypts a given string.</para>
+     <para>Usage: <command>agentadmin --encrypt
+     <replaceable>agent-instance</replaceable>
+     <replaceable>password-file</replaceable></command></para>
+     <variablelist>
+      <varlistentry>
+       <term><replaceable>agent-instance</replaceable></term>
+       <listitem>
+        <para>Agent instance identifier. The encryption functionality requires
+        the use of agent instance specific encryption key present in its
+        configuration file.</para>
+       </listitem>
+      </varlistentry>
+      <varlistentry>
+       <term><replaceable>password-file</replaceable></term>
+       <listitem>
+        <para>File containing the password to encrypt.</para>
+       </listitem>
+      </varlistentry>
+     </variablelist>
+    </listitem>
+   </varlistentry>
+   <varlistentry>
+    <term><option>--getEncryptKey</option></term>
+    <listitem>
+     <para>Generates an agent encryption key.</para>
+    </listitem>
+   </varlistentry>
+  </variablelist>
+ </refsect1>
+ <refsect1>
+  <title>Examples</title>
+  <para>The following example installs an Apache HTTP Server 2.2 interactively,
+  where Apache HTTP Server has been installed under
+  <filename>/path/to/apache22</filename>.</para>
+  <screen>$ ./agentadmin --install
+...
+-----------------------------------------------
+SUMMARY OF YOUR RESPONSES
+-----------------------------------------------
+Apache Server Config Directory : /path/to/apache22/conf 
+OpenSSO server URL : http://openam.example.com:8080/openam 
+Agent URL : http://www.example.com:80
+Agent Profile name : Apache Web Agent 
+Agent Profile Password file name : /tmp/pwd.txt 
+
+...
+SUMMARY OF AGENT INSTALLATION
+-----------------------------
+Agent instance name: Agent_001
+Agent Bootstrap file location:
+/path/to/web_agents/apache22_agent/Agent_001/config/
+ OpenSSOAgentBootstrap.properties
+Agent Configuration Tag file location
+/path/to/web_agents/apache22_agent/Agent_001/config/
+ OpenSSOAgentConfiguration.properties
+Agent Audit directory location:
+/path/to/web_agents/apache22_agent/Agent_001/logs/audit
+Agent Debug directory location:
+/path/to/web_agents/apache22_agent/Agent_001/logs/debug
+
+
+Install log file location:
+/path/to/web_agents/apache22_agent/installer-logs/audit/install.log
+...</screen>
+ </refsect1>
+</refentry>

@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!--
+    Copyright (c) 2005 Sun Microsystems, Inc. All rights reserved
+    Use is subject to license terms.
+-->
+
+<!DOCTYPE ServicesConfiguration
+    PUBLIC "=//iPlanet//Service Management Services (SMS) 1.0 DTD//EN"
+    "jar://com/sun/identity/sm/sms.dtd">
+
+<ServicesConfiguration>
+    <Service name="sunAMAuthCASService" version="1.0">
+        <Schema
+            serviceHierarchy="/DSAMEConfig/authentication/sunAMAuthCASService"
+            i18nFileName="amAuthCAS"
+	    revisionNumber="30"
+            i18nKey="sun-am-auth-cas-service-description">
+
+            <Organization>
+	        <AttributeSchema name="casloginurl"
+                    type="single"
+                    syntax="string"
+                    i18nKey="a101">
+		    <DefaultValues>
+                        <Value>https://qingfeng:8443/cas/login</Value>
+		    </DefaultValues>
+                </AttributeSchema>
+	        <AttributeSchema name="casvalidationurl"
+                    type="single"
+                    syntax="string"
+                    i18nKey="a102">
+		    <DefaultValues>
+                        <Value>https://qingfeng:8443/cas/serviceValidate</Value>
+		    </DefaultValues>
+                </AttributeSchema>  
+                <AttributeSchema name="serviceurl"
+                    type="single"
+                    syntax="string"
+                    i18nKey="a103">
+		    <DefaultValues>
+                        <Value>http://qingfeng:8080/amserver/UI/Login?module=CAS&amp;goto=http://qingfeng:8080/portal/dt</Value>
+		    </DefaultValues>
+                </AttributeSchema>              
+	    </Organization>
+        </Schema>	      
+    </Service>
+</ServicesConfiguration>

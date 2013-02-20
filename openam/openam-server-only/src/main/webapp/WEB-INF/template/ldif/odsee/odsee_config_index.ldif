@@ -1,0 +1,7 @@
+dn: cn=sunxmlkeyvalue,cn=index,cn=@DB_NAME@,cn=ldbm database,cn=plugins,cn=config
+objectClass: top
+objectClass: nsIndex
+nsSystemIndex: false
+cn: sunxmlkeyvalue
+nsIndexType: eq
+nsIndexType: sub

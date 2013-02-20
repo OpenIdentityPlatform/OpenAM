@@ -1,0 +1,318 @@
+<!--
+   DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
+  
+   Copyright (c) 2007 Sun Microsystems Inc. All Rights Reserved
+  
+   The contents of this file are subject to the terms
+   of the Common Development and Distribution License
+   (the License). You may not use this file except in
+   compliance with the License.
+
+   You can obtain a copy of the License at
+   https://opensso.dev.java.net/public/CDDLv1.0.html or
+   opensso/legal/CDDLv1.0.txt
+   See the License for the specific language governing
+   permission and limitations under the License.
+
+   When distributing Covered Code, include this CDDL
+   Header Notice in each file and include the License file
+   at opensso/legal/CDDLv1.0.txt.
+   If applicable, add the following below the CDDL Header,
+   with the fields enclosed by brackets [] replaced by
+   your own identifying information:
+   "Portions Copyrighted [year] [name of copyright owner]"
+
+   $Id: policyProperties_Readonly.xml,v 1.2 2008/06/25 05:45:08 qcheng Exp $
+
+-->
+
+<!DOCTYPE propertysheet SYSTEM "propertysheet.dtd">
+
+<propertysheet>
+        
+    <section name="commonLDAP" 
+                defaultValue="policy.properties.section.title.ldap">
+        
+        <property>
+            <label name="ldapUserInformation"
+		defaultValue="ldap.user.section.label"/>
+            <ccgroup>
+                <property>
+                    <label name="ldapBaseDN"
+                        defaultValue="base.dn.label" />
+                    <cc name="iplanet-am-policy-config-ldap-base-dn" tagclass="com.sun.web.ui.taglib.html.CCStaticTextFieldTag" />
+                </property>
+                <property>
+                    <label name="userBaseDN"
+                        defaultValue="user.base.dn.label" />
+                    <cc name="iplanet-am-policy-config-ldap-users-base-dn" tagclass="com.sun.web.ui.taglib.html.CCStaticTextFieldTag" />
+                </property>
+                <property>
+                    <label name="ldapBindDN"
+                        defaultValue="bind.dn.label" />
+                    <cc name="iplanet-am-policy-config-ldap-bind-dn" tagclass="com.sun.web.ui.taglib.html.CCStaticTextFieldTag" />
+                </property>
+                <property>
+                    <label name="ldapBindPassword"
+                        defaultValue="a104" />
+                    <cc name="iplanet-am-policy-config-ldap-bind-password" tagclass="com.sun.web.ui.taglib.html.CCStaticTextFieldTag" />
+                </property>
+            </ccgroup>
+        </property>
+
+        <property>
+            <label name="ldapServerInformation"
+                defaultValue="ldap.server.section.label" />
+            <ccgroup>
+                <property>
+                    <label name="ldapServer"
+                        defaultValue="a101" />
+                    <cc name="iplanet-am-policy-config-ldap-server" tagclass="com.sun.web.ui.taglib.html.CCStaticTextFieldTag" />
+                </property>
+                <property span="true">
+                    <label name="enableSSL" 
+			defaultValue="enable.ssl.label" 
+			labelFor="iplanet-am-policy-config-ldap-ssl-enabled" />
+                    <cc name="iplanet-am-policy-config-ldap-ssl-enabled" tagclass="com.sun.web.ui.taglib.html.CCStaticTextFieldTag" />
+                </property>
+            </ccgroup>
+        </property>
+        
+        <property>
+            <label name="ldapConnectionPool"
+                defaultValue="ldap.connectionPool.section.label" />
+            <ccgroup>
+                <property>
+                    <label name="minConnectionPoolSize"
+                        defaultValue="minimum.label" />
+                    <cc name="iplanet-am-policy-config-connection_pool_min_size" tagclass="com.sun.web.ui.taglib.html.CCStaticTextFieldTag" />
+                </property>
+                <property>
+                    <label name="maxConnectionPoolSize"
+                        defaultValue="maximum.label" />
+                    <cc name="iplanet-am-policy-config-connection_pool_max_size" tagclass="com.sun.web.ui.taglib.html.CCStaticTextFieldTag" />
+                </property>
+
+            </ccgroup>
+        </property>
+                   
+        </section>
+        
+    <section name="LDAPSubject" defaultValue="policy.properties.section.title.LDAPSubjectInformation">
+                <property>
+                    <label name="selectedSubjects"
+                        defaultValue="a125" />
+                    <cc name="iplanet-am-policy-config-subjects-result-ttl" tagclass="com.sun.web.ui.taglib.html.CCStaticTextFieldTag" />
+		    <fieldhelp name="help-iplanet-am-policy-config-subjects-result-ttl" defaultValue="help.inMinutes" />
+                </property>
+
+        <property>
+            <label name="orgSearchProperties"
+                defaultValue="orgSearchProperties.section.label" />
+            <ccgroup>
+                <property>
+                    <label name="organizationSearchFilter"
+                        defaultValue="filter.label" />
+                    <cc name="iplanet-am-policy-config-ldap-organizations-search-filter" tagclass="com.sun.web.ui.taglib.html.CCStaticTextFieldTag" />
+                </property>
+                <property>
+                    <label name="organizationSearchScope" 
+                        defaultValue="scope.label" 
+                        labelFor="iplanet-am-policy-config-ldap-organizations-search-scope" />
+                    <cc name="iplanet-am-policy-config-ldap-organizations-search-scope" tagclass="com.sun.web.ui.taglib.html.CCStaticTextFieldTag" />
+                </property>
+                <property>
+                    <label name="orgsSearchAttribute"
+                        defaultValue="attribute.label" />
+                    <cc name="iplanet-am-policy-config-ldap-organizations-search-attribute" tagclass="com.sun.web.ui.taglib.html.CCStaticTextFieldTag" />
+                </property>
+            </ccgroup>
+        </property>
+        
+        <property>
+            <label name="groupSearchProperties"
+                defaultValue="groupSearchProperties.section.label" />
+            <ccgroup>
+                <property>
+                    <label name="groupSearchFilter"
+                        defaultValue="filter.label" />
+                    <cc name="iplanet-am-policy-config-ldap-groups-search-filter" tagclass="com.sun.web.ui.taglib.html.CCStaticTextFieldTag" />
+                </property>
+                <property>
+                    <label name="groupSearchScope"  
+                        defaultValue="scope.label" 
+                        labelFor="iplanet-am-policy-config-ldap-groups-search-scope" />
+                    <cc name="iplanet-am-policy-config-ldap-groups-search-scope" tagclass="com.sun.web.ui.taglib.html.CCStaticTextFieldTag" />
+                </property>
+                <property>
+                    <label name="groupsSearchAttribute"
+                        defaultValue="attribute.label" />
+                    <cc name="iplanet-am-policy-config-groups-search-attribute" tagclass="com.sun.web.ui.taglib.html.CCStaticTextFieldTag" />
+                </property>
+            </ccgroup>
+        </property>
+        
+        <property>
+            <label name="userSearchProperties"
+                defaultValue="userSearchProperties.section.label" />
+            <ccgroup>
+                <property>
+                    <label name="usersSearchFilter"
+                        defaultValue="filter.label" />
+                    <cc name="iplanet-am-policy-config-ldap-users-search-filter" tagclass="com.sun.web.ui.taglib.html.CCStaticTextFieldTag" />
+                </property>
+                <property>
+                    <label name="usersSearchScope"
+                        defaultValue="scope.label" 
+                        labelFor="iplanet-am-policy-config-ldap-users-search-scope" />
+                    <cc name="iplanet-am-policy-config-ldap-users-search-scope" tagclass="com.sun.web.ui.taglib.html.CCStaticTextFieldTag" />
+                </property>
+                <property>
+                    <label name="usersSearchAttribute"
+                        defaultValue="attribute.label" />
+                    <cc name="iplanet-am-policy-config-users-search-attribute" tagclass="com.sun.web.ui.taglib.html.CCStaticTextFieldTag" />
+                </property>
+            </ccgroup>
+        </property>
+                
+        <property>
+            <label name="roleSearchProperties"
+                defaultValue="roleSearchProperties.section.LDAP.label" />
+            <ccgroup>
+                <property>
+                    <label name="rolesSearchFilter"
+                        defaultValue="filter.label" />
+                    <cc name="iplanet-am-policy-config-ldap-roles-search-filter" tagclass="com.sun.web.ui.taglib.html.CCStaticTextFieldTag" />
+                </property>
+                <property>
+                    <label name="LDAPRolesSearchScope"
+                        defaultValue="scope.label" 
+                        labelFor="iplanet-am-policy-config-ldap-roles-search-scope"/>
+                    <cc name="iplanet-am-policy-config-ldap-roles-search-scope" tagclass="com.sun.web.ui.taglib.html.CCStaticTextFieldTag" />
+                </property>
+                <property>
+                    <label name="rolesSearchAttribute"
+                        defaultValue="attribute.label" />
+                    <cc name="iplanet-am-policy-config-roles-search-attribute" tagclass="com.sun.web.ui.taglib.html.CCStaticTextFieldTag" />
+                </property>
+            </ccgroup>
+        </property>
+        
+        <property>
+            <label name="roleSearchProperties"
+                defaultValue="roleSearchProperties.section.AM.label" />
+            <ccgroup>
+                <property>
+                    <label name="ISrolesSearchScope"
+                        defaultValue="scope.label" 
+                        labelFor="iplanet-am-policy-config-is-roles-search-scope"/>
+                    <cc name="iplanet-am-policy-config-is-roles-search-scope" tagclass="com.sun.web.ui.taglib.html.CCStaticTextFieldTag" />
+                </property>
+        
+                <property>
+                    <label name="rolesBaseDN"
+                        defaultValue="base.dn.label" />
+                    <cc name="iplanet-am-policy-config-roles-base-dn" tagclass="com.sun.web.ui.taglib.html.CCStaticTextFieldTag" />
+                </property>
+            </ccgroup>
+        </property>
+    </section>
+        
+    <section name="availableObjects" 
+	defaultValue="policy.properties.section.title.availableObjects">
+
+        <property>
+            <label name="availableObjects"
+                defaultValue="availableObjects.section.label" />
+            <ccgroup>
+                <property>
+                    <label name="selectedSubjects"
+                        defaultValue="policy.subjects.label" />
+                    <cc name="iplanet-am-policy-selected-subjects" tagclass="com.sun.web.ui.taglib.html.CCStaticTextFieldTag" />
+                </property>
+                <property>
+                    <label name="selectedConditions"
+                        defaultValue="policy.conditions.label" />
+                    <cc name="iplanet-am-policy-selected-conditions" tagclass="com.sun.web.ui.taglib.html.CCStaticTextFieldTag" />
+                </property>
+                <property>
+                    <label name="selectedReferrals"
+                        defaultValue="policy.referrals.label" />
+                    <cc name="iplanet-am-policy-selected-referrals" tagclass="com.sun.web.ui.taglib.html.CCStaticTextFieldTag" />
+                </property>
+            
+            </ccgroup>
+        </property>
+    </section>
+        
+    <section name="misc" 
+        defaultValue="policy.properties.section.title.miscellaneous">
+        
+        <property>
+            <label name="evalOnDenyDecision"
+                defaultValue="a100a" />
+            <cc name="iplanet-am-policy-config-continue-evaluation-on-deny-decision" tagclass="com.sun.web.ui.taglib.html.CCStaticTextFieldTag" />
+        </property>
+
+        <property>
+            <label name="adviceshandlebyAM"
+                defaultValue="a100d" />
+            <cc name="sun-am-policy-config-advices-handlable-by-am" tagclass="com.sun.web.ui.taglib.html.CCStaticTextFieldTag" />
+        </property>
+        
+        <property>
+            <label name="userAliasEnabled"
+                defaultValue="a150" />
+            <cc name="iplanet-am-policy-config-user-alias-enabled" tagclass="com.sun.web.ui.taglib.html.CCStaticTextFieldTag" />
+        </property>
+        
+        <property>
+            <label name="searchProperties"
+                defaultValue="searchProperties.section.label" />
+            <ccgroup>
+                <property>
+                    <label name="searchLimit"
+                        defaultValue="maximum.results.label" />
+                    <cc name="iplanet-am-policy-config-search-limit" tagclass="com.sun.web.ui.taglib.html.CCStaticTextFieldTag" />
+                </property>
+                <property>
+                    <label name="searchTimeout"
+                        defaultValue="timeout.label" />
+                    <cc name="iplanet-am-policy-config-search-timeout" tagclass="com.sun.web.ui.taglib.html.CCStaticTextFieldTag" />
+		    <fieldhelp name="help-iplanet-am-policy-config-search-timeout" defaultValue="help.inSeconds" />
+                </property>
+            </ccgroup>
+        </property>
+
+        <property span="true">
+	    <cc name="tblResourceComparator"
+		tagclass="com.sun.web.ui.taglib.table.CCActionTableTag" >
+		<attribute name="title" value="policy.service.table.resource.comparator.title" />
+		<attribute name="empty" value="policy.service.table.resource.comparator.noentries" />
+		<attribute name="showPaginationControls" value="false" />
+		<attribute name="selectionType" value="multiple" />
+		<attribute name="selectionJavascript" value="toggleTblButtonState('SCPolicy', 'SCPolicy.tblResourceComparator', 'resourceComparatorCount', 'SCPolicy.tblResourceComparatorButtonDelete', this)" />
+		<attribute name="showAdvancedSortingIcon" value="false" />
+		<attribute name="showLowerActions" value="false" />
+		<attribute name="showPaginationControls" value="false" />
+		<attribute name="showPaginationIcon" value="false" />
+		<attribute name="showSelectionIcons" value="true" />
+		<attribute name="showSelectionSortIcon" value="false" />
+		<attribute name="showSortingRow" value="true" />
+	    </cc>
+	</property>
+
+        <property>
+            <label name="selectedResponseProviders"
+                defaultValue="a200" />
+            <cc name="iplanet-am-policy-selected-responseproviders" tagclass="com.sun.web.ui.taglib.html.CCStaticTextFieldTag" />
+        </property>
+        
+        <property>
+            <label name="dynamicResponseAttributes"
+                defaultValue="a210" />
+            <cc name="iplanet-am-policy-dynamic-response-attributes" tagclass="com.sun.web.ui.taglib.html.CCStaticTextFieldTag" />
+        </property>
+        
+    </section>
+</propertysheet>

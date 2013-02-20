@@ -1,0 +1,287 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<!-- 
+   DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
+
+   Copyright (c) 2007 Sun Microsystems Inc. All Rights Reserved<
+    
+   The contents of this file are subject to the terms
+   of the Common Development and Distribution License
+   (the License). You may not use this file except in
+   compliance with the License.
+                                                                                                                                  
+   You can obtain a copy of the License at
+   https://opensso.dev.java.net/public/CDDLv1.0.html or
+   opensso/legal/CDDLv1.0.txt
+   See the License for the specific language governing
+   permission and limitations under the License.
+                                                                                                                                  
+   When distributing Covered Code, include this CDDL
+   Header Notice in each file and include the License file
+   at opensso/legal/CDDLv1.0.txt.
+   If applicable, add the following below the CDDL Header,
+   with the fields enclosed by brackets [] replaced by
+   your own identifying information:
+   "Portions Copyrighted [year] [name of copyright owner]"
+
+   $Id: index.html,v 1.15 2008/12/01 22:16:01 veiming Exp $
+
+-->
+<html>
+<head>
+  <meta http-equiv="CONTENT-TYPE" content="text/html; charset=utf-8">
+  <title>Security Token Service Client Sample</title>
+  <link rel="stylesheet" type="text/css" href="../com_sun_web_ui/css/css_ns6up.css" />
+</head>
+
+<body class="DefBdy">
+<div class="MstDiv">
+<table class="MstTblTop" title="" border="0" cellpadding="0"
+ cellspacing="0" width="100%">
+  <tbody>
+    <tr>
+      <td nowrap="nowrap">&nbsp;</td>
+      <td nowrap="nowrap">&nbsp;</td>
+    </tr>
+  </tbody>
+</table>
+<html>
+<head>
+<table class="MstTblBot" title="" border="0" cellpadding="0"
+ cellspacing="0" width="100%">
+  <tbody>
+    <tr>
+      <td class="MstTdTtl" width="99%">
+      <div class="MstDivTtl"><img name="ProdName"
+ src="../console/images/PrimaryProductName.png" alt=""></div>
+      </td>
+
+      <td class="MstTdLogo" width="1%"><img
+ name="RMRealm.mhCommon.BrandLogo"
+ src="../com_sun_web_ui/images/other/javalogo.gif" alt="Java(TM) Logo"
+ border="0" height="55" width="31"></td>
+    </tr>
+  </tbody>
+</table>
+<table class="MstTblEnd" border="0" cellpadding="0" cellspacing="0"
+ width="100%">
+  <tbody>
+    <tr>
+      <td><img name="RMRealm.mhCommon.EndorserLogo"
+ src="../com_sun_web_ui/images/masthead/masthead-sunname.gif"
+ alt="Sun(TM) Microsystems, Inc." align="right" border="0" height="10"
+ width="108"></td>
+    </tr>
+  </tbody>
+
+</table>
+</div>
+<div class="SkpMedGry1"><a name="SkipAnchor2089" id="SkipAnchor2089"></a></div>
+<div class="SkpMedGry1"><a href="#SkipAnchor4928"><img
+ src="../com_sun_web_ui/images/other/dot.gif"
+ alt="Jump Over Tab Navigation Area. Current Selection is: Access Control"
+ border="0" height="1" width="1"></a></div>
+<table border="0" cellpadding="10" cellspacing="0" width="1404">
+  <col width="1384"> <tbody>
+    <tr>
+      <td width="1384">
+      <p style="margin-bottom: 0in;">&lt; <a href="../index.html">Client
+Samples Main Page</a> </p>
+      <p style="margin-bottom: 0in;">&nbsp;</p>
+      <h3>Introduction</h3>
+      <p style="margin-bottom: 0in;">This sample demonstrates the usage
+of Security Token Service (STS) Client API for obtaining security
+tokens from a Security Token Service hosted on OpenAM
+server. STS client API makes WS-Trust request to STS service in order
+to get Security Token from STS service. The communication between STS
+client and STS service is secured using Authentication token of STS
+client. This Authentication token used in the sample is X509 token. STS
+service authenticates STS client based on its X509 authentication token
+and issues SAML 1.1 or SAML 2.0 token.</p>
+      <h3>Setup</h3>
+      <p style="margin-bottom: 0in;">STS service :</p>
+      <ol>
+        <li>
+          <p style="margin-bottom: 0in;">Deploy OpenAM war</p>
+        </li>
+        <li>
+          <p style="margin-bottom: 0in;">Configure OpenAM web
+application</p>
+        </li>
+      </ol>
+      <p style="margin-bottom: 0in;">STS client :</p>
+      <ol>
+        <li>
+          <p style="margin-bottom: 0in;">This OpenAM client web application</p>
+        </li>
+        <li>
+          <p style="margin-bottom: 0in;">This page → &lt;OpenAM client web
+application
+protocol://host:port&gt;/&lt;client-deployment-uri&gt;/sts/index.html</p>
+        </li>
+      </ol>
+      <h3>JSP pages</h3>
+      <p style="margin-bottom: 0in;">There are two sample JSP pages
+included in this STS client sample.</p>
+      <ol>
+        <li>
+          <p style="margin-bottom: 0in;">&lt;OpenAM client web application
+protocol://host:port&gt;/&lt;client-deployment-uri&gt;/sts/sts-client-user.jsp</p>
+          <p style="margin-bottom: 0in;">Accessing this page will
+redirect to
+authentication service of OpenAM server. </p>
+          <p style="margin-bottom: 0in;">Login with any existing
+OpenAM user. </p>
+          <p style="margin-bottom: 0in;">After successful user
+authentication and valid user's SSOToken, the page will redirect back
+to sts-client-user.jsp.</p>
+          <p style="margin-bottom: 0in;">sts-client-user.jsp will
+display SAML assertion obtained from OpenAM Security Token Service, in
+exchange of end user's SSOToken.</p>
+          <p style="margin-bottom: 0in;"><b>Description :</b></p>
+          <p style="margin-bottom: 0in;">There are two parties involved
+in this Sample :</p>
+          <p style="margin-bottom: 0in;">1) Security Token Service
+Client (STS client)</p>
+          <p style="margin-bottom: 0in;">2) Security Token Service (STS)</p>
+          <p style="margin-bottom: 0in;">The Security Token Service
+(STS) issues security tokens on behalf of authenticated end user. Here
+JSP page selects the default STS client profile to talk to STS service.
+Then STS client makes WS-Trust request to STS service with its X509
+certificate as the Authentication token. STS service authenticates this
+X509 certificate and issues SAML 1.1 or SAML 2.0 (this token type of
+SAML1.1 or SAML 2.0 is dictated by WSP's profile). This WS-Trust
+request also carries the end user's authenticated SSOToken as “On
+Behalf Of” token element. The owner of STS service issued SAML token
+would be the authenticated End user and its identity (name id) would be
+the End user's user identity.</p>
+        </li>
+        <li>
+          <p style="margin-bottom: 0in;">&lt;OpenAM client web application
+protocol://host:port&gt;/&lt;client-deployment-uri&gt;/sts/sts-client-wsc.jsp
+          </p>
+          <p style="margin-bottom: 0in;">Login to OpenAM
+Administration console &lt;OpenAM web application
+protocol://host:port&gt;/&lt;opensso deploy uri&gt; as “amadmin” user
+and its password.</p>
+          <p style="margin-bottom: 0in;">Go to Access Control → Default
+realm →
+Agents → Web Service Client → click “wsc” agent profile</p>
+          <p style="margin-bottom: 0in;">Select Security Mechanism as
+“STSSecurity”, STS Configuration as “SecurityTokenService” and Web
+Service End Point as “default”.</p>
+          <p style="margin-bottom: 0in;">Save changes and Logout of
+OpenAM Administration console.</p>
+          <p style="margin-bottom: 0in;">Access &lt;OpenAM client web
+application
+protocol://host:port&gt;/&lt;client-deployment-uri&gt;/sts/sts-client-wsc.jsp</p>
+          <p style="margin-bottom: 0in;">Enter web service client name
+as
+"wsc" and click "GetToken".<br>
+If successful, this will display SAML Assertion obtained from OpenAM
+Security Token Service, in exchange of WSC's token.</p>
+          <p style="margin-bottom: 0in;"><b>Description :</b></p>
+          <p style="margin-bottom: 0in;">There are four parties
+involved in this Sample :</p>
+          <p style="margin-bottom: 0in;">1) Web Services Client (WSC) </p>
+          <p style="margin-bottom: 0in;">2) Web Services Provider (WSP)
+          </p>
+          <p style="margin-bottom: 0in;">3) Security Token Service
+Client (STS client)</p>
+          <p style="margin-bottom: 0in;">4) Security Token Service (STS)</p>
+          <p style="margin-bottom: 0in;">The Security Token Service
+(STS) issues security tokens for Web Services Client (WSC) so that WSC
+could present it to the Web Services Provider (WSP) for authentication
+purposes. Here WSC selects to get security token from STS, in order to
+present that token to WSP. When WSC selects the STS issues token, it
+also selects the STS client profile required to talk to STS service.
+Then STS client makes WS-Trust request to STS service with its X509
+certificate as the Authentication token. STS service authenticates this
+X509 certificate and issues SAML 1.1 or SAML 2.0 (this token type of
+SAML1.1 or SAML 2.0 is dictated by WSP's profile). The owner of this
+SAML token would be STS client and its identity (name id) would be
+certificate subject DN of the STS client's X509 certificate.</p>
+        </li>
+      </ol>
+      <h3>NOTEs</h3>
+      <p style="margin-bottom: 0in;">1) How to change WSP's profile to
+dictate SAML 1.1 or SAML 2.0 token ?<br>
+      <br>
+      </p>
+      <div style="margin-left: 40px;">Login to OpenAM Administration
+console &lt;OpenAM web application
+protocol://host:port&gt;/&lt;opensso deploy uri&gt; as “amadmin” user
+and its password.<br>
+Go to Access Control → Default realm → Agents →
+Web Service Provider → click “wsp” agent profile<br>
+      <br>
+For SAML 2.0 token type, select Security Mechanism as <br>
+- “SAML2-HolderOfKey” if the token is to be retrieved for WSC's
+own identity (sample 2 - sts-client-wsc.jsp) <br>
+- “SAML2-SenderVouches” if the token is to be retrieved for end user's
+identity (sample 1 - sts-client-user.jsp) <br>
+      <br>
+For SAML 1.1 token type, select Security Mechanism as <br>
+- “SAML-HolderOfKey” if the token is to be retrieved for WSC's
+own identity (sample 2 - sts-client-wsc.jsp) <br>
+- “SAML-SenderVouches” if the token is to be retrieved for end user's
+identity (sample 1 - sts-client-user.jsp)<br>
+      <br>
+Save changes and Logout of OpenAM Administration console.<br>
+      <br>
+If both, SAML 2.0 and SAML 1.1 security mechanisms are selected, then
+SAML 2.0 takes the precedence.<br>
+      </div>
+      <p style="margin-bottom: 0in;">2) How to create agent profiles
+for WSC, STS client and WSP (if not created out of box) ?</p>
+      <ol start="2">
+        <p style="margin-bottom: 0in;">Login to OpenAM Administration
+console &lt;OpenAM web application
+protocol://host:port&gt;/&lt;opensso deploy uri&gt; as “amadmin” user
+and its password.</p>
+        <p style="margin-bottom: 0in;">Go to Access Control → Default
+realm → Agents → <br>
+        <br>
+        </p>
+a) Create "STS Client" profile<br>
+Select STS Client → under Agent, click "new" → select "STS Agent" -&gt;
+enter name as "SecurityTokenService" and other required
+fields → Save.<br>
+Click on above saved profile to edit → Select Security Mechanism as
+“X509Token” and "Is Request Signed" as true (checked).<br>
+Save changes.<br>
+      </ol>
+      <div style="margin-left: 40px;">b) Create "WSC" profile<br>
+Select Web Service Client → under Agent, click "new" → enter name as
+"wsc" and other required fields → Save.<br>
+Click on above saved profile to edit → Select Security Mechanism as
+“STSSecurity”, STS Configuration as “SecurityTokenService”, Web
+Service End Point as “default” and "Is Request Signed" as true
+(checked).<br>
+Save changes.<br>
+      <br>
+      </div>
+      <div style="margin-left: 40px;">c) Create "WSP" profile<br>
+Select Web Service Provider → under Agent, click "new" → enter name as
+"wsp" and other required fields → Save.<br>
+Click on above saved profile to edit → Select Security Mechanism as
+"SAML2-HolderOfKey", “SAML-HolderOfKey” and "X509Token".<br>
+Select Web
+Service End Point as “default” and "Is Request Signature Verified" as
+true (checked).<br>
+Save changes.<br>
+      </div>
+      <ol start="2">
+        <p>Logout of OpenAM Administration console.<br>
+        </p>
+        <p><br>
+        </p>
+      </ol>
+      </td>
+    </tr>
+  </tbody>
+</table>
+<p><br>
+<br>
+</p>
+</body>
+</html>

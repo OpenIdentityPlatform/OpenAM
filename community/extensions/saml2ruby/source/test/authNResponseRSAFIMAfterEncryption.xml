@@ -1,0 +1,19 @@
+<saml:Assertion xmlns:saml="urn:oasis:names:tc:SAML:2.0:assertion" xmlns:samlp="urn:oasis:names:tc:SAML:2.0:protocol" ID="d8ab769e7aff8521c6756b1d76b19433" IssueInstant="2007-08-09T23:31:00Z" Version="2.0"><saml:Issuer>http://goas-server-01:7001/glssaml2</saml:Issuer><ds:Signature xmlns:ds="http://www.w3.org/2000/09/xmldsig#">
+<ds:SignedInfo>
+<ds:CanonicalizationMethod Algorithm="http://www.w3.org/2001/10/xml-exc-c14n#"></ds:CanonicalizationMethod>
+<ds:SignatureMethod Algorithm="http://www.w3.org/2000/09/xmldsig#rsa-sha1"></ds:SignatureMethod>
+<ds:Reference URI="#d8ab769e7aff8521c6756b1d76b19433">
+<ds:Transforms>
+<ds:Transform Algorithm="http://www.w3.org/2000/09/xmldsig#enveloped-signature"></ds:Transform>
+<ds:Transform Algorithm="http://www.w3.org/2001/10/xml-exc-c14n#"></ds:Transform>
+</ds:Transforms>
+<ds:DigestMethod Algorithm="http://www.w3.org/2000/09/xmldsig#sha1"></ds:DigestMethod>
+<ds:DigestValue>aeGx4O5Df6I1WlmteUnRU2sHqgU=</ds:DigestValue>
+</ds:Reference>
+</ds:SignedInfo>
+<ds:SignatureValue>
+L+iNjbjaEDT4AHTNQ6wdi4iFdRvnDA5ESNfjbAPy32y7W7yvv/FlSji21UKaYmvu3B0I8YgeHClv
+Huw0P+gVnglBqsLQ1udXvArVkwKJ7XCOWcuU/oilH/cN0X9bTlcn9e8w+QC8o5ZtpebPyDUhJUkU
+1Ebp2H9TzAONYC75oh4=
+</ds:SignatureValue>
+</ds:Signature><saml:Subject><saml:NameID Format="urn:oasis:names:tc:SAML:2.0:nameid-format:persistent" NameQualifier="http://goas-server-01:7001/glssaml2" SPNameQualifier="https://sp.symspdemo.com:8643/sp.xml">GLSFLTBCFA01E1899C4B69B7CE3D3693AF5242</saml:NameID><saml:SubjectConfirmation Method="urn:oasis:names:tc:SAML:2.0:cm:bearer"><saml:SubjectConfirmationData InResponseTo="RHLJYDpRoD3mxmhKYBzpL" NotOnOrAfter="2007-08-09T23:41:00Z" Recipient="https://sp.symspdemo.com:8643/SP-A"></saml:SubjectConfirmationData></saml:SubjectConfirmation></saml:Subject><saml:Conditions NotBefore="2007-08-09T23:26:00Z" NotOnOrAfter="2007-08-09T23:41:00Z"><saml:AudienceRestriction><saml:Audience>https://sp.symspdemo.com:8643/sp.xml</saml:Audience></saml:AudienceRestriction></saml:Conditions><saml:AuthnStatement AuthnInstant="2007-08-09T23:31:00Z" SessionIndex="d8ab769e7aff8521c6756b1d76b19433"><saml:SubjectLocality Address="192.168.1.104" DNSName="goas-pc-04.goas.net"></saml:SubjectLocality><saml:AuthnContext><saml:AuthnContextClassRef>urn:oasis:names:tc:SAML:2.0:ac:classes:Password</saml:AuthnContextClassRef></saml:AuthnContext></saml:AuthnStatement></saml:Assertion>

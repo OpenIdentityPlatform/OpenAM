@@ -1,0 +1,111 @@
+##
+##   DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
+##
+##   Copyright (c) 2006 Sun Microsystems Inc. All Rights Reserved
+##
+##   The contents of this file are subject to the terms
+##   of the Common Development and Distribution License
+##   (the License). You may not use this file except in
+##   compliance with the License.
+##
+##   You can obtain a copy of the License at
+##   https://opensso.dev.java.net/public/CDDLv1.0.html or
+##   opensso/legal/CDDLv1.0.txt
+##   See the License for the specific language governing
+##   permission and limitations under the License.
+##
+##   When distributing Covered Code, include this CDDL
+##   Header Notice in each file and include the License file
+##   at opensso/legal/CDDLv1.0.txt.
+##   If applicable, add the following below the CDDL Header,
+##   with the fields enclosed by brackets [] replaced by
+##   your own identifying information:
+##   "Portions Copyrighted [year] [name of copyright owner]"
+##
+##   $Id: opends_remove_user_schema.ldif,v 1.3 2009/11/13 00:16:03 qcheng Exp $
+##
+##
+dn: cn=schema
+changetype: modify
+delete: objectClasses
+objectClasses: ( 2.16.840.1.113730.3.2.130 NAME 'inetuser' DESC 'Auxiliary class which has to be present in an entry for delivery of subscriber services' SUP top AUXILIARY MAY ( uid $ inetUserStatus $ inetUserHTTPURL $ userPassword $ memberof ) X-ORIGIN 'Nortel subscriber interoperability' )
+objectClasses: ( 1.3.6.1.4.1.1466.101.120.142 NAME 'iPlanetPreferences' AUXILIARY MAY ( preferredLanguage $ preferredLocale $ preferredTimeZone ) X-ORIGIN 'iPlanet' )
+objectClasses: ( 2.16.840.1.113730.3.2.175 NAME 'iplanet-am-session-service' DESC 'Session Service OC' SUP top AUXILIARY MAY ( iplanet-am-session-max-session-time $ iplanet-am-session-max-idle-time $ iplanet-am-session-max-caching-time $ iplanet-am-session-quota-limit $ iplanet-am-session-get-valid-sessions $ iplanet-am-session-destroy-sessions $ iplanet-am-session-add-session-listener-on-all-sessions $ iplanet-am-session-service-status ) X-ORIGIN 'OpenSSO' )
+objectClasses: ( 1.3.6.1.4.1.42.2.27.9.2.76 NAME 'sunFederationManagerDataStore' DESC 'FSUser provider OC' SUP top AUXILIARY MAY ( iplanet-am-user-federation-info-key $ iplanet-am-user-federation-info $ sunIdentityServerDiscoEntries) X-ORIGIN 'OpenSSO' )
+objectClasses: ( 1.3.6.1.4.1.42.2.27.9.2.127 NAME 'sunIdentityServerLibertyPPService' DESC 'sunIdentityServerLibertyPPService OC' SUP top AUXILIARY MAY ( sunIdentityServerPPCommonNameCN $ sunIdentityServerPPCommonNameAltCN $ sunIdentityServerPPCommonNameFN $ sunIdentityServerPPCommonNameSN $ sunIdentityServerPPCommonNamePT $ sunIdentityServerPPCommonNameMN $ sunIdentityServerPPInformalName $ sunIdentityServerPPLegalIdentityLegalName $ sunIdentityServerPPLegalIdentityDOB $ sunIdentityServerPPLegalIdentityMaritalStatus $ sunIdentityServerPPLegalIdentityGender $ sunIdentityServerPPLegalIdentityAltIdType $ sunIdentityServerPPLegalIdentityAltIdValue $ sunIdentityServerPPLegalIdentityVATIdType $ sunIdentityServerPPLegalIdentityVATIdValue $sunIdentityServerPPEmploymentIdentityJobTitle $ sunIdentityServerPPEmploymentIdentityOrg $ sunIdentityServerPPEmploymentIdentityAltO $ sunIdentityServerPPAddressCard $ sunIdentityServerPPMsgContact $ sunIdentityServerPPFacadeMugShot $ sunIdentityServerPPFacadeWebSite $ sunIdentityServerPPFacadeNamePronounced $ sunIdentityServerPPFacadeGreetSound $ sunIdentityServerPPFacadegreetmesound $ sunIdentityServerPPDemographicsDisplayLanguage $ sunIdentityServerPPDemographicsLanguage $ sunIdentityServerPPDemographicsBirthDay $ sunIdentityServerPPDemographicsAge $ sunIdentityServerPPDemographicsTimeZone $ sunIdentityServerPPSignKey $ sunIdentityServerPPEncryptKey $ sunIdentityServerPPEmergencyContact ) X-ORIGIN 'OpenSSO' )
+objectClasses: ( 1.3.6.1.4.1.42.2.27.9.2.148 NAME 'sunFMSAML2NameIdentifier' DESC 'SAML 2.0 name identifier objectclass' SUP top AUXILIARY MAY ( sun-fm-saml2-nameid-infokey $ sun-fm-saml2-nameid-info ) X-ORIGIN 'OpenSSO' )
+objectClasses: ( 2.16.840.1.113730.3.2.176 NAME 'iplanet-am-user-service' DESC 'User Service OC' SUP top AUXILIARY MAY ( iplanet-am-user-auth-modules $ iplanet-am-user-login-status $ iplanet-am-user-admin-start-dn $ iplanet-am-user-auth-config $ iplanet-am-user-alias-list $ iplanet-am-user-success-url $ iplanet-am-user-failure-url $ iplanet-am-user-password-reset-options $ iplanet-am-user-password-reset-question-answer $ iplanet-am-user-password-reset-force-reset $ sunIdentityMSISDNNumber ) X-ORIGIN 'OpenSSO' )
+objectClasses: ( 2.16.840.1.113730.3.2.184 NAME 'iplanet-am-managed-person' DESC 'Managed Person OC' SUP top AUXILIARY MAY ( iplanet-am-user-account-life ) X-ORIGIN 'OpenSSO' )
+objectClasses: ( 1.3.6.1.4.1.42.2.27.9.2.23 NAME 'iplanet-am-auth-configuration-service' DESC 'Authentication Configuration Service OC' SUP top AUXILIARY MAY ( iplanet-am-auth-configuration $ iplanet-am-auth-login-success-url $ iplanet-am-auth-login-failure-url $ iplanet-am-auth-post-login-process-class ) X-ORIGIN 'OpenSSO' )
+objectClasses: ( 1.3.6.1.4.1.42.2.27.9.2.118 NAME 'sunAMAuthAccountLockout' DESC 'Invalid Login Attempts Object Class' SUP top AUXILIARY MAY ( sunAMAuthInvalidAttemptsData ) X-ORIGIN 'OpenSSO' )
+-
+delete: attributeTypes
+attributeTypes: ( 1.2.840.113556.1.2.102 NAME 'memberof' DESC 'Group that the entry belongs to' SYNTAX 1.3.6.1.4.1.1466.115.121.1.12 X-ORIGIN 'iPlanet Delegated Administrator' )
+attributeTypes: ( 2.16.840.1.113730.3.1.692 NAME 'inetUserStatus' DESC '"active", "inactive", or "deleted" status of a user' EQUALITY caseIgnoreMatch SINGLE-VALUE SYNTAX 1.3.6.1.4.1.1466.115.121.1.15 X-ORIGIN 'Nortel subscriber interoperability' )
+attributeTypes: ( 2.16.840.1.113730.3.1.693 NAME 'inetUserHttpURL' DESC 'A users Web addresses' SYNTAX 1.3.6.1.4.1.1466.115.121.1.26 X-ORIGIN 'Nortel subscriber interoperability' )
+attributeTypes: ( 1.3.6.1.4.1.1466.101.120.42 NAME 'preferredLocale' DESC 'preferred locale for a person' EQUALITY caseIgnoreMatch SUBSTR caseIgnoreSubstringsMatch SYNTAX 1.3.6.1.4.1.1466.115.121.1.15 SINGLE-VALUE X-ORIGIN 'iPlanet' )
+attributeTypes: ( 1.3.6.1.4.1.1466.101.120.43 NAME 'preferredTimeZone' DESC 'preferred time zone for a person' EQUALITY caseIgnoreMatch SUBSTR caseIgnoreSubstringsMatch SYNTAX 1.3.6.1.4.1.1466.115.121.1.15 SINGLE-VALUE X-ORIGIN 'iPlanet' )
+attributeTypes: ( 2.16.840.1.113730.3.1.1053 NAME 'iplanet-am-session-service-status' DESC 'Session Service Status' SYNTAX 1.3.6.1.4.1.1466.115.121.1.15 X-ORIGIN 'OpenSSO' )
+attributeTypes: ( 2.16.840.1.113730.3.1.1065 NAME 'iplanet-am-session-max-session-time' DESC 'Max Service Time' SYNTAX 1.3.6.1.4.1.1466.115.121.1.15 X-ORIGIN 'OpenSSO' )
+attributeTypes: ( 2.16.840.1.113730.3.1.1066 NAME 'iplanet-am-session-max-idle-time' DESC 'Max Session Idle Time' SYNTAX 1.3.6.1.4.1.1466.115.121.1.15 X-ORIGIN 'OpenSSO' )
+attributeTypes: ( 2.16.840.1.113730.3.1.1067 NAME 'iplanet-am-session-max-caching-time' DESC 'Max Session Caching Time' SYNTAX 1.3.6.1.4.1.1466.115.121.1.15 X-ORIGIN 'OpenSSO' )
+attributeTypes: ( 1.3.6.1.4.1.42.2.27.9.1.752 NAME 'iplanet-am-session-quota-limit' DESC 'Session Quota Constraints' SYNTAX 1.3.6.1.4.1.1466.115.121.1.15 X-ORIGIN 'OpenSSO' )
+attributeTypes: ( 2.16.840.1.113730.3.1.1068 NAME 'iplanet-am-session-get-valid-sessions' DESC 'Get Valid Sessions' SYNTAX 1.3.6.1.4.1.1466.115.121.1.15 X-ORIGIN 'OpenSSO' )
+attributeTypes: ( 2.16.840.1.113730.3.1.1069 NAME 'iplanet-am-session-destroy-sessions' DESC 'Destroy Session' SYNTAX 1.3.6.1.4.1.1466.115.121.1.15 X-ORIGIN 'OpenSSO' )
+attributeTypes: ( 2.16.840.1.113730.3.1.1070 NAME 'iplanet-am-session-add-session-listener-on-all-sessions' DESC 'Add Session Listener on All Sessions' SYNTAX 1.3.6.1.4.1.1466.115.121.1.15 X-ORIGIN 'OpenSSO' )
+attributeTypes: ( 2.16.840.1.113730.3.1.1071 NAME 'iplanet-am-user-auth-modules' DESC 'User Auth Modules' SYNTAX 1.3.6.1.4.1.1466.115.121.1.15 X-ORIGIN 'OpenSSO' )
+attributeTypes: ( 2.16.840.1.113730.3.1.1072 NAME 'iplanet-am-user-admin-start-dn' DESC 'Starting DN for Admin User' SYNTAX 1.3.6.1.4.1.1466.115.121.1.15 X-ORIGIN 'OpenSSO' )
+attributeTypes: ( 2.16.840.1.113730.3.1.1073 NAME 'iplanet-am-user-service-status' DESC 'User Service Status' SYNTAX 1.3.6.1.4.1.1466.115.121.1.15 X-ORIGIN 'OpenSSO' )
+attributeTypes: ( 2.16.840.1.113730.3.1.1074 NAME 'iplanet-am-user-login-status' DESC 'User Login Status' SYNTAX 1.3.6.1.4.1.1466.115.121.1.15 X-ORIGIN 'OpenSSO' )
+attributeTypes: ( 2.16.840.1.113730.3.1.976 NAME 'iplanet-am-user-account-life' DESC 'User Account Life' SYNTAX 1.3.6.1.4.1.1466.115.121.1.15 X-ORIGIN 'OpenSSO' )
+attributeTypes: ( 1.3.6.1.4.1.42.2.27.9.1.58 NAME 'iplanet-am-user-auth-config' DESC 'User Authentication Configuration' SYNTAX 1.3.6.1.4.1.1466.115.121.1.15 X-ORIGIN 'OpenSSO' )
+attributeTypes: ( 1.3.6.1.4.1.42.2.27.9.1.59 NAME 'iplanet-am-user-alias-list' DESC 'User Alias Names List' SYNTAX 1.3.6.1.4.1.1466.115.121.1.15 X-ORIGIN 'OpenSSO' )
+attributeTypes: ( 1.3.6.1.4.1.42.2.27.9.1.62 NAME 'iplanet-am-auth-configuration' DESC 'Authentication Configuration' SYNTAX 1.3.6.1.4.1.1466.115.121.1.15 X-ORIGIN 'OpenSSO' )
+attributeTypes: ( 1.3.6.1.4.1.42.2.27.9.1.63 NAME 'iplanet-am-auth-login-success-url' DESC 'Redirection URL After Successful Login' SYNTAX 1.3.6.1.4.1.1466.115.121.1.15 X-ORIGIN 'OpenSSO' )
+attributeTypes: ( 1.3.6.1.4.1.42.2.27.9.1.64 NAME 'iplanet-am-auth-login-failure-url' DESC 'Redirection URL for Failed User Authentication' SYNTAX 1.3.6.1.4.1.1466.115.121.1.15 X-ORIGIN 'OpenSSO' )
+attributeTypes: ( 1.3.6.1.4.1.42.2.27.9.1.65 NAME 'iplanet-am-auth-post-login-process-class' DESC 'Class Name for Post Authentication Processing' SYNTAX 1.3.6.1.4.1.1466.115.121.1.15 X-ORIGIN 'OpenSSO' )
+attributeTypes: ( 1.3.6.1.4.1.42.2.27.9.1.793 NAME 'sunAMAuthInvalidAttemptsData' DESC 'XML data for Invalid Login Attempts' SYNTAX 1.3.6.1.4.1.1466.115.121.1.15 X-ORIGIN 'OpenSSO' )
+attributeTypes: ( 1.3.6.1.4.1.42.2.27.9.1.71 NAME 'iplanet-am-user-success-url' DESC 'Redirection URL for Successful User Authentication' SYNTAX 1.3.6.1.4.1.1466.115.121.1.15 X-ORIGIN 'OpenSSO' )
+attributeTypes: ( 1.3.6.1.4.1.42.2.27.9.1.72 NAME 'iplanet-am-user-failure-url' DESC 'Redirection URL for Failed User Authentication' SYNTAX 1.3.6.1.4.1.1466.115.121.1.15 X-ORIGIN 'OpenSSO' )
+attributeTypes: ( 1.3.6.1.4.1.42.2.27.9.1.589 NAME 'iplanet-am-user-password-reset-options' DESC 'Password Reset Options' SYNTAX 1.3.6.1.4.1.1466.115.121.1.15 X-ORIGIN 'OpenSSO' )
+attributeTypes: ( 1.3.6.1.4.1.42.2.27.9.1.590 NAME 'iplanet-am-user-password-reset-question-answer' DESC 'Password Reset User Question Answer' SYNTAX 1.3.6.1.4.1.1466.115.121.1.15 X-ORIGIN 'OpenSSO' )
+attributeTypes: ( 1.3.6.1.4.1.42.2.27.9.1.591 NAME 'iplanet-am-user-password-reset-force-reset' DESC 'Password Reset Force Reset password' SYNTAX 1.3.6.1.4.1.1466.115.121.1.15 X-ORIGIN 'OpenSSO' )
+attributeTypes: ( 1.3.6.1.4.1.42.2.27.9.1.823 NAME 'sunIdentityMSISDNNumber' DESC 'User MSISDN Number' SYNTAX 1.3.6.1.4.1.1466.115.121.1.15 X-ORIGIN 'OpenSSO' )
+attributeTypes: ( 1.3.6.1.4.1.42.2.27.9.1.73 NAME 'iplanet-am-user-federation-info-key' DESC 'User Federation Information Key' SYNTAX 1.3.6.1.4.1.1466.115.121.1.15 X-ORIGIN 'OpenSSO' )
+attributeTypes: ( 1.3.6.1.4.1.42.2.27.9.1.74 NAME 'iplanet-am-user-federation-info' DESC 'User Federation Information' SYNTAX 1.3.6.1.4.1.1466.115.121.1.15 X-ORIGIN 'OpenSSO' )
+attributeTypes: ( 1.3.6.1.4.1.42.2.27.9.1.821 NAME 'sunIdentityServerDiscoEntries' DESC 'User DiscoEntries' SYNTAX 1.3.6.1.4.1.1466.115.121.1.15 X-ORIGIN 'OpenSSO' )
+attributeTypes: ( 1.3.6.1.4.1.42.2.27.9.1.825 NAME 'sunIdentityServerPPCommonNameCN' DESC 'Liberty PP CommonName CN' SYNTAX 1.3.6.1.4.1.1466.115.121.1.15 X-ORIGIN 'OpenSSO' )
+attributeTypes: ( 1.3.6.1.4.1.42.2.27.9.1.826 NAME 'sunIdentityServerPPCommonNameFN' DESC 'Liberty PP CommonName FN' SYNTAX 1.3.6.1.4.1.1466.115.121.1.15 X-ORIGIN 'OpenSSO' )
+attributeTypes: ( 1.3.6.1.4.1.42.2.27.9.1.827 NAME 'sunIdentityServerPPCommonNameSN' DESC 'Liberty PP CommonName SN' SYNTAX 1.3.6.1.4.1.1466.115.121.1.15 X-ORIGIN 'OpenSSO' )
+attributeTypes: ( 1.3.6.1.4.1.42.2.27.9.1.828 NAME 'sunIdentityServerPPCommonNameMN' DESC 'Liberty PP CommonName MN' SYNTAX 1.3.6.1.4.1.1466.115.121.1.15 X-ORIGIN 'OpenSSO' )
+attributeTypes: ( 1.3.6.1.4.1.42.2.27.9.1.829 NAME 'sunIdentityServerPPCommonNameAltCN' DESC 'Liberty PP CommonName Alt CN' SYNTAX 1.3.6.1.4.1.1466.115.121.1.15 X-ORIGIN 'OpenSSO' )
+attributeTypes: ( 1.3.6.1.4.1.42.2.27.9.1.830 NAME 'sunIdentityServerPPCommonNamePT' DESC 'Liberty PP CommonName PersonalTitle' SYNTAX 1.3.6.1.4.1.1466.115.121.1.15 X-ORIGIN 'OpenSSO' )
+attributeTypes: ( 1.3.6.1.4.1.42.2.27.9.1.831 NAME 'sunIdentityServerPPInformalName' DESC 'Liberty PP InformalName' SYNTAX 1.3.6.1.4.1.1466.115.121.1.15 X-ORIGIN 'OpenSSO' )
+attributeTypes: ( 1.3.6.1.4.1.42.2.27.9.1.832 NAME 'sunIdentityServerPPLegalIdentityLegalName' DESC 'Liberty PP LegalName' SYNTAX 1.3.6.1.4.1.1466.115.121.1.15 X-ORIGIN 'OpenSSO' )
+attributeTypes: ( 1.3.6.1.4.1.42.2.27.9.1.833 NAME 'sunIdentityServerPPLegalIdentityDOB' DESC 'Liberty PP Date of Birth' SYNTAX 1.3.6.1.4.1.1466.115.121.1.15 X-ORIGIN 'OpenSSO' )
+attributeTypes: ( 1.3.6.1.4.1.42.2.27.9.1.834 NAME 'sunIdentityServerPPLegalIdentityMaritalStatus' DESC 'Liberty PP Marital Status' SYNTAX 1.3.6.1.4.1.1466.115.121.1.15 X-ORIGIN 'OpenSSO' )
+attributeTypes: ( 1.3.6.1.4.1.42.2.27.9.1.835 NAME 'sunIdentityServerPPLegalIdentityGender' DESC 'Liberty PP Gender' SYNTAX 1.3.6.1.4.1.1466.115.121.1.15 X-ORIGIN 'OpenSSO' )
+attributeTypes: ( 1.3.6.1.4.1.42.2.27.9.1.836 NAME 'sunIdentityServerPPLegalIdentityAltIdType' DESC 'Liberty PP AltID Type' SYNTAX 1.3.6.1.4.1.1466.115.121.1.15 X-ORIGIN 'OpenSSO' )
+attributeTypes: ( 1.3.6.1.4.1.42.2.27.9.1.837 NAME 'sunIdentityServerPPLegalIdentityAltIdValue' DESC 'Liberty PP AltID Type' SYNTAX 1.3.6.1.4.1.1466.115.121.1.15 X-ORIGIN 'OpenSSO' )
+attributeTypes: ( 1.3.6.1.4.1.42.2.27.9.1.838 NAME 'sunIdentityServerPPLegalIdentityVATIdType' DESC 'Liberty PP IDType' SYNTAX 1.3.6.1.4.1.1466.115.121.1.15 X-ORIGIN 'OpenSSO' )
+attributeTypes: ( 1.3.6.1.4.1.42.2.27.9.1.839 NAME 'sunIdentityServerPPLegalIdentityVATIdValue' DESC 'Liberty PP IDValue' SYNTAX 1.3.6.1.4.1.1466.115.121.1.15 X-ORIGIN 'OpenSSO' )
+attributeTypes: ( 1.3.6.1.4.1.42.2.27.9.1.840 NAME 'sunIdentityServerPPEmploymentIdentityJobTitle' DESC 'Liberty PP JobTitle' SYNTAX 1.3.6.1.4.1.1466.115.121.1.15 X-ORIGIN 'OpenSSO' )
+attributeTypes: ( 1.3.6.1.4.1.42.2.27.9.1.841 NAME 'sunIdentityServerPPEmploymentIdentityOrg' DESC 'Liberty PP Org' SYNTAX 1.3.6.1.4.1.1466.115.121.1.15 X-ORIGIN 'OpenSSO' )
+attributeTypes: ( 1.3.6.1.4.1.42.2.27.9.1.842 NAME 'sunIdentityServerPPEmploymentIdentityAltO' DESC 'Liberty PP Alt Orgs' SYNTAX 1.3.6.1.4.1.1466.115.121.1.15 X-ORIGIN 'OpenSSO' )
+attributeTypes: ( 1.3.6.1.4.1.42.2.27.9.1.848 NAME 'sunIdentityServerPPAddressCard' DESC 'Liberty PP AddressCard' SYNTAX 1.3.6.1.4.1.1466.115.121.1.15 X-ORIGIN 'OpenSSO' )
+attributeTypes: ( 1.3.6.1.4.1.42.2.27.9.1.849 NAME 'sunIdentityServerPPMsgContact' DESC 'Liberty PP MsgContact' SYNTAX 1.3.6.1.4.1.1466.115.121.1.15 X-ORIGIN 'OpenSSO' )
+attributeTypes: ( 1.3.6.1.4.1.42.2.27.9.1.850 NAME 'sunIdentityServerPPFacadeMugShot' DESC 'Liberty PP FacadeMugShot' SYNTAX 1.3.6.1.4.1.1466.115.121.1.15 X-ORIGIN 'OpenSSO' )
+attributeTypes: ( 1.3.6.1.4.1.42.2.27.9.1.851 NAME 'sunIdentityServerPPFacadeWebSite' DESC 'Liberty PP FacadeWebSite' SYNTAX 1.3.6.1.4.1.1466.115.121.1.15 X-ORIGIN 'OpenSSO' )
+attributeTypes: ( 1.3.6.1.4.1.42.2.27.9.1.852 NAME 'sunIdentityServerPPFacadeNamePronounced' DESC 'Liberty PP FacadeNamePronounced' SYNTAX 1.3.6.1.4.1.1466.115.121.1.15 X-ORIGIN 'OpenSSO' )
+attributeTypes: ( 1.3.6.1.4.1.42.2.27.9.1.853 NAME 'sunIdentityServerPPFacadeGreetSound' DESC 'Liberty PP FacadeGreetSound' SYNTAX 1.3.6.1.4.1.1466.115.121.1.15 X-ORIGIN 'OpenSSO' )
+attributeTypes: ( 1.3.6.1.4.1.42.2.27.9.1.854 NAME 'sunIdentityServerPPFacadegreetmesound' DESC 'Liberty PP FacadeMeGreetSound' SYNTAX 1.3.6.1.4.1.1466.115.121.1.15 X-ORIGIN 'OpenSSO' )
+attributeTypes: ( 1.3.6.1.4.1.42.2.27.9.1.855 NAME 'sunIdentityServerPPDemographicsDisplayLanguage' DESC 'Liberty PP DemographicsDisplayLanguage' SYNTAX 1.3.6.1.4.1.1466.115.121.1.15 X-ORIGIN 'OpenSSO' )
+attributeTypes: ( 1.3.6.1.4.1.42.2.27.9.1.856 NAME 'sunIdentityServerPPDemographicsLanguage' DESC 'Liberty PP DemographicsLanguage' SYNTAX 1.3.6.1.4.1.1466.115.121.1.15 X-ORIGIN 'OpenSSO' )
+attributeTypes: ( 1.3.6.1.4.1.42.2.27.9.1.857 NAME 'sunIdentityServerPPDemographicsAge' DESC 'Liberty PP DemographicsAge' SYNTAX 1.3.6.1.4.1.1466.115.121.1.15 X-ORIGIN 'OpenSSO' )
+attributeTypes: ( 1.3.6.1.4.1.42.2.27.9.1.858 NAME 'sunIdentityServerPPDemographicsBirthDay' DESC 'Liberty PP DemographicsBirthDay' SYNTAX 1.3.6.1.4.1.1466.115.121.1.15 X-ORIGIN 'OpenSSO' )
+attributeTypes: ( 1.3.6.1.4.1.42.2.27.9.1.859 NAME 'sunIdentityServerPPDemographicsTimeZone' DESC 'Liberty PP DemographicsTimeZone' SYNTAX 1.3.6.1.4.1.1466.115.121.1.15 X-ORIGIN 'OpenSSO' )
+attributeTypes: ( 1.3.6.1.4.1.42.2.27.9.1.860 NAME 'sunIdentityServerPPSignKey' DESC 'Liberty PP SignKey' SYNTAX 1.3.6.1.4.1.1466.115.121.1.15 X-ORIGIN 'OpenSSO' )
+attributeTypes: ( 1.3.6.1.4.1.42.2.27.9.1.861 NAME 'sunIdentityServerPPEncryptKey' DESC 'Liberty PP EncryPTKey' SYNTAX 1.3.6.1.4.1.1466.115.121.1.15 X-ORIGIN 'OpenSSO' )
+attributeTypes: ( 1.3.6.1.4.1.42.2.27.9.1.862 NAME 'sunIdentityServerPPEmergencyContact' DESC 'Liberty PP EmergencyContact' SYNTAX 1.3.6.1.4.1.1466.115.121.1.15 X-ORIGIN 'OpenSSO' )
+attributeTypes: ( 1.3.6.1.4.1.42.2.27.9.1.989 NAME 'sun-fm-saml2-nameid-infokey' DESC 'SAML 2.0 Name Identifier Information Key' SYNTAX 1.3.6.1.4.1.1466.115.121.1.15 X-ORIGIN 'OpenSSO' )
+attributeTypes: ( 1.3.6.1.4.1.42.2.27.9.1.990 NAME 'sun-fm-saml2-nameid-info' DESC 'SAML 2.0 Name Identifier Information' SYNTAX 1.3.6.1.4.1.1466.115.121.1.15 X-ORIGIN 'OpenSSO' )

@@ -1,0 +1,512 @@
+<!--
+   DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
+  
+   Copyright (c) 2007 Sun Microsystems Inc. All Rights Reserved
+  
+   The contents of this file are subject to the terms
+   of the Common Development and Distribution License
+   (the License). You may not use this file except in
+   compliance with the License.
+
+   You can obtain a copy of the License at
+   https://opensso.dev.java.net/public/CDDLv1.0.html or
+   opensso/legal/CDDLv1.0.txt
+   See the License for the specific language governing
+   permission and limitations under the License.
+
+   When distributing Covered Code, include this CDDL
+   Header Notice in each file and include the License file
+   at opensso/legal/CDDLv1.0.txt.
+   If applicable, add the following below the CDDL Header,
+   with the fields enclosed by brackets [] replaced by
+   your own identifying information:
+   "Portions Copyrighted [year] [name of copyright owner]"
+
+   $Id: propertySecurityTokenService.xml,v 1.7 2009/12/23 00:20:59 babysunil Exp $
+
+-->
+
+<!DOCTYPE propertysheet SYSTEM "propertysheet.dtd">
+
+<propertysheet>
+    <section name="TokenIssuanceAttrubutes" defaultValue="web.services.security.token.token.issuance.attributes.section.title">
+        <property>
+            <label name="lblstsIssuer"
+                   defaultValue="web.services.security.token.stsIssuer" 
+                   labelFor="stsIssuer"/>
+            <cc name="stsIssuer"
+                tagclass="com.sun.web.ui.taglib.html.CCTextFieldTag">
+                <attribute name="size" value="75"/>
+                <attribute name="autoSubmit" value="false"/>
+            </cc>
+        </property>
+        <property>
+            <label name="lblstsEndPoint"
+                   defaultValue="web.services.security.token.stsEndPoint" 
+                   labelFor="stsEndPoint"/>
+            <cc name="stsEndPoint"
+                tagclass="com.sun.web.ui.taglib.html.CCTextFieldTag">
+                <attribute name="size" value="75"/>
+                <attribute name="autoSubmit" value="false"/>
+            </cc>
+        </property>
+        <property>
+            <label name="lblstsLifetime"
+                   defaultValue="web.services.security.token.stsLifetime" 
+                   labelFor="stsLifetime"/>
+            <cc name="stsLifetime"
+                tagclass="com.sun.web.ui.taglib.html.CCTextFieldTag">
+                <attribute name="size" value="75"/>
+                <attribute name="autoSubmit" value="false"/>
+            </cc>
+            <fieldhelp name="helpstsLifetime" defaultValue="web.services.security.token.stsLifetime.inline.help" />
+        </property>
+        <property>
+            <label name="lblstsCertAlias"
+                   defaultValue="web.services.security.token.stsCertAlias" 
+                   labelFor="stsCertAlias"/>
+            <cc name="stsCertAlias"
+                tagclass="com.sun.web.ui.taglib.html.CCTextFieldTag">
+                <attribute name="size" value="75"/>
+                <attribute name="autoSubmit" value="false"/>
+            </cc>
+            <fieldhelp name="helpstsCertAlias" defaultValue="web.services.security.token.stsCertAlias.inline.help" />
+        </property>
+        <property>
+            <label name="lblcom.sun.identity.wss.sts.clientusertoken"
+                   defaultValue="web.services.security.token.clientusertoken" 
+                   labelFor="com.sun.identity.wss.sts.clientusertoken"/>
+            <cc name="com.sun.identity.wss.sts.clientusertoken"
+                tagclass="com.sun.web.ui.taglib.html.CCTextFieldTag">
+                <attribute name="size" value="75"/>
+                <attribute name="autoSubmit" value="false"/>
+            </cc>
+        </property>
+    </section>
+    
+    <section name="Security" defaultValue="web.services.security.token.security.section.title">
+        <property >
+            <label name="lblSecurityMech" defaultValue="web.services.security.token.Security.Mechanism" labelFor="SecurityMech" />
+            <cc name="SecurityMech" tagclass="com.sun.web.ui.taglib.html.CCHiddenTag">
+            </cc>
+        </property>
+        <property >
+            <cc name="__DYN_GUI_MULTIPLE_LIST_CHECKBOX_SecurityMech_urn:sun:wss:security:null:Anonymous"
+                tagclass="com.sun.web.ui.taglib.html.CCCheckBoxTag">
+                <attribute name="label" value="Anonymous" />
+            </cc>
+        </property >
+        <property >
+            <cc name="__DYN_GUI_MULTIPLE_LIST_CHECKBOX_SecurityMech_urn:sun:wss:security:null:KerberosToken"
+                tagclass="com.sun.web.ui.taglib.html.CCCheckBoxTag">
+                <attribute name="label" value="KerberosToken" />
+            </cc>
+            
+        </property >
+        <property >
+            <cc name="__DYN_GUI_MULTIPLE_LIST_CHECKBOX_SecurityMech_urn:liberty:security:2005-02:null:Bearer"
+                tagclass="com.sun.web.ui.taglib.html.CCCheckBoxTag">
+                <attribute name="label" value="LibertyBearerToken" />
+            </cc>
+        </property >
+        <property >
+            <cc name="__DYN_GUI_MULTIPLE_LIST_CHECKBOX_SecurityMech_urn:liberty:security:2005-02:null:SAML"
+                tagclass="com.sun.web.ui.taglib.html.CCCheckBoxTag">
+                <attribute name="label" value="LibertySAMLToken" />
+            </cc>
+        </property >
+        <property >
+            <cc name="__DYN_GUI_MULTIPLE_LIST_CHECKBOX_SecurityMech_urn:liberty:security:2005-02:null:X509"
+                tagclass="com.sun.web.ui.taglib.html.CCCheckBoxTag">
+                <attribute name="label" value="LibertyX509Token" />
+            </cc>
+        </property >
+        <property >
+            <cc name="__DYN_GUI_MULTIPLE_LIST_CHECKBOX_SecurityMech_urn:sun:wss:security:null:SAMLToken-HK"
+                tagclass="com.sun.web.ui.taglib.html.CCCheckBoxTag">
+                <attribute name="label" value="SAML-HolderOfKey" />
+            </cc>
+        </property >
+        <property >
+            <cc name="__DYN_GUI_MULTIPLE_LIST_CHECKBOX_SecurityMech_urn:sun:wss:security:null:SAMLToken-SV"
+                tagclass="com.sun.web.ui.taglib.html.CCCheckBoxTag">
+                <attribute name="label" value="SAML-SenderVouches" />
+            </cc>
+        </property >
+        <property >
+            <cc name="__DYN_GUI_MULTIPLE_LIST_CHECKBOX_SecurityMech_urn:sun:wss:security:null:SAML2Token-HK"
+                tagclass="com.sun.web.ui.taglib.html.CCCheckBoxTag">
+                <attribute name="label" value="SAML2-HolderOfKey" />
+            </cc>
+        </property >
+        <property >
+            <cc name="__DYN_GUI_MULTIPLE_LIST_CHECKBOX_SecurityMech_urn:sun:wss:security:null:SAML2Token-SV"
+                tagclass="com.sun.web.ui.taglib.html.CCCheckBoxTag">
+                <attribute name="label" value="SAML2-SenderVouches" />
+            </cc>
+        </property >
+        <property >
+            <cc name="__DYN_GUI_MULTIPLE_LIST_CHECKBOX_SecurityMech_urn:sun:wss:security:null:UserNameToken"
+                tagclass="com.sun.web.ui.taglib.html.CCCheckBoxTag">
+                <attribute name="label" value="UserNameToken" />
+            </cc>
+        </property >
+        <property >
+            <cc name="__DYN_GUI_MULTIPLE_LIST_CHECKBOX_SecurityMech_urn:sun:wss:security:null:UserNameToken-Plain"
+                tagclass="com.sun.web.ui.taglib.html.CCCheckBoxTag">
+                <attribute name="label" value="UserNameToken-Plain" />
+            </cc>
+        </property >
+        <property >
+            <cc name="__DYN_GUI_MULTIPLE_LIST_CHECKBOX_SecurityMech_urn:sun:wss:security:null:X509Token"
+                tagclass="com.sun.web.ui.taglib.html.CCCheckBoxTag">
+                <attribute name="label" value="X509Token" />
+            </cc>
+        </property >
+        <property>
+            <label name="lblAuthenticationChain"
+                   defaultValue="web.services.security.token.authenticationchain" 
+                   labelFor="AuthenticationChain"/>
+            <cc name="AuthenticationChain"
+                tagclass="com.sun.web.ui.taglib.html.CCSelectableListTag">            
+            </cc>
+        </property>
+        <property>
+            <label name="lblUserCredential"
+                   defaultValue="web.services.security.token.user.credential.table.title" 
+                   labelFor="UserCredential"/>
+            <cc name="UserCredential"
+                tagclass="com.sun.web.ui.taglib.html.CCTextFieldTag">
+                <attribute name="size" value="75"/>
+                <attribute name="autoSubmit" value="false"/>
+            </cc>
+        </property>
+        <property>
+           <label name="lbldetectmessagereplay"
+            defaultValue="web.services.security.token.detect.message.replay"
+            labelFor="DetectMessageReplay" />
+           <cc name="DetectMessageReplay"
+            tagclass="com.sun.web.ui.taglib.html.CCCheckBoxTag">
+               <attribute name="label" value="label.Yes" />
+           </cc>
+       </property>
+       <property>
+           <label name="lbldetectusertokenreplay"
+            defaultValue="web.services.security.token.detect.user.token.replay"
+            labelFor="DetectUserTokenReplay" />
+           <cc name="DetectUserTokenReplay"
+            tagclass="com.sun.web.ui.taglib.html.CCCheckBoxTag">
+               <attribute name="label" value="label.Yes" />
+           </cc>
+       </property> 
+    </section>
+    
+    <section name="SingingAndEncryption" defaultValue="web.services.security.token.singing.and.encryption.section.title">
+        <subsection name="Signing" defaultValue="web.services.security.token.singing.and.encryption.subsection.title.singing" >
+            <property>
+                <label name="lblisRequestSign"
+                   defaultValue="web.services.security.token.isRequestSign" 
+                   labelFor="isRequestSign"/>
+                <cc name="isRequestSign"
+                tagclass="com.sun.web.ui.taglib.html.CCCheckBoxTag">
+                    <attribute name="label" value="label.Yes" />
+                </cc>
+            </property>
+            <property>
+                <label name="lblisResponseSign"
+                   defaultValue="web.services.security.token.isResponseSign"
+                   labelFor="isResponseSign"/>
+                <cc name="isResponseSign"
+                tagclass="com.sun.web.ui.taglib.html.CCCheckBoxTag">
+                    <attribute name="label" value="label.Yes" />
+                    <attribute name="extraHtml" value="onClick='enableSigningElements();'" />
+                </cc>
+            </property>
+             <property>
+                <ccgroup>
+                    <property>
+                        <cc name="Body" tagclass="com.sun.web.ui.taglib.html.CCCheckBoxTag">
+                            <attribute name="label" value="web.services.security.token.Body" />
+                        </cc>
+                    </property>
+                    <property>
+                        <cc name="SecurityToken" tagclass="com.sun.web.ui.taglib.html.CCCheckBoxTag">
+                            <attribute name="label" value="web.services.security.token.SecurityToken" />
+                        </cc>
+                    </property>
+                    <property>
+                        <cc name="Timestamp" tagclass="com.sun.web.ui.taglib.html.CCCheckBoxTag">
+                            <attribute name="label" value="web.services.security.token.Timestamp" />
+                        </cc>
+                    </property>
+                    <property>
+                        <cc name="To" tagclass="com.sun.web.ui.taglib.html.CCCheckBoxTag">
+                            <attribute name="label" value="web.services.security.token.To" />
+                        </cc>
+                    </property>
+                    <property>
+                        <cc name="From" tagclass="com.sun.web.ui.taglib.html.CCCheckBoxTag">
+                            <attribute name="label" value="web.services.security.token.From" />
+                        </cc>
+                    </property>
+                    <property>
+                        <cc name="ReplyTo" tagclass="com.sun.web.ui.taglib.html.CCCheckBoxTag">
+                            <attribute name="label" value="web.services.security.token.ReplyTo" />
+                        </cc>
+                    </property>
+                    <property>
+                        <cc name="Action" tagclass="com.sun.web.ui.taglib.html.CCCheckBoxTag">
+                            <attribute name="label" value="web.services.security.token.Action" />
+                        </cc>
+                    </property>
+                    <property>
+                        <cc name="MessageID" tagclass="com.sun.web.ui.taglib.html.CCCheckBoxTag">
+                            <attribute name="label" value="web.services.security.token.MessageID" />
+                        </cc>
+                    </property>
+                </ccgroup>
+            </property>
+            <property>
+                <label name="lblsigningRefType"
+                   defaultValue="web.services.security.token.signingRefType" 
+                   labelFor="signingRefType"/>
+                <cc name="signingRefType"
+                tagclass="com.sun.web.ui.taglib.html.CCDropDownMenuTag" >
+                    <option label="Direct Reference" value="DirectReference" />
+                    <option label="Key IdentifierRef" value="KeyIdentifierRef" />
+                    <option label="X509 Issuer Serial Reference" value="X509IssuerSerialRef" />
+                </cc>
+            </property>
+        </subsection>
+        <subsection  name="Encryption"  defaultValue="web.services.security.token.singing.and.encryption.subsection.title.encryption" >
+             <property>
+                <label name="lblisrequestencrypted"
+            defaultValue="global.configuration.sts.is.request.decrypted"
+            labelFor="isRequestEncryptionEnabled" />
+                <cc name="isRequestEncryptedEnabled"
+            tagclass="com.sun.web.ui.taglib.html.CCCheckBoxTag">
+                    <attribute name="label" value="label.Yes" />
+                    <attribute name="extraHtml" value="onClick='enableRequestEncryptionOptions();'" />
+                </cc>
+            </property>
+            <property>
+                <ccgroup>
+                    <property>
+                        <label name="lblisRequestEncrypt"
+            defaultValue="web.services.security.token.isRequestEncrypt"
+            labelFor="isRequestEncrypt" />
+                        <cc name="isRequestEncrypt"
+            tagclass="com.sun.web.ui.taglib.html.CCCheckBoxTag">
+                            <attribute name="label" value="label.Yes" />
+                        </cc>
+                    </property>
+                    <property>
+                        <label name="lblisRequestHeaderEncrypt"
+            defaultValue="web.services.security.token.isRequestHeaderEncrypt"
+            labelFor="isRequestHeaderEncrypt" />
+                        <cc name="isRequestHeaderEncrypt"
+            tagclass="com.sun.web.ui.taglib.html.CCCheckBoxTag">
+                            <attribute name="label" value="label.Yes" />
+                        </cc>
+                    </property>
+                </ccgroup>
+            </property>    
+            <property>
+                <label name="lblisResponseEncrypt"
+                   defaultValue="web.services.security.token.isResponseEncrypt"
+                   labelFor="isResponseEncrypt"/>
+                <cc name="isResponseEncrypt"
+                tagclass="com.sun.web.ui.taglib.html.CCCheckBoxTag">
+                    <attribute name="label" value="label.Yes" />
+                </cc>
+            </property>
+            <property>
+                <label name="lblEncryptionAlgorithm"
+                   defaultValue="web.services.security.token.EncryptionAlgorithm" 
+                   labelFor="EncryptionAlgorithm"/>
+                <cc name="EncryptionAlgorithm"
+                tagclass="com.sun.web.ui.taglib.html.CCDropDownMenuTag" >
+                    <option label="3DES" value="DESede" />
+                    <option label="AES" value="AES" />
+                </cc>
+            </property>
+            <property>
+                <label name="lblEncryptionStrength"
+                   defaultValue="web.services.security.token.EncryptionStrength" 
+                   labelFor="EncryptionStrength"/>
+                <cc name="EncryptionStrength"
+                tagclass="com.sun.web.ui.taglib.html.CCDropDownMenuTag" >                
+                    <option label="0" value="0" />
+                    <option label="112" value="112" />
+                    <option label="128" value="128" />
+                    <option label="168" value="168" />
+                    <option label="192" value="192" />
+                    <option label="256" value="256" />
+                </cc>
+                <fieldhelp name="helpEncryptionStrength" defaultValue="web.services.security.token.EncryptionStrength.inline.help" />
+            </property>
+        </subsection>
+    </section>
+    <section name="KeyStore" defaultValue="web.services.security.token.keyStore.section.title">
+        <property>
+            <label name="lblprivateKeyAlias"
+                   defaultValue="web.services.security.token.privateKeyAlias"
+                   labelFor="privateKeyAlias"/>
+            <cc name="privateKeyAlias"
+                tagclass="com.sun.web.ui.taglib.html.CCTextFieldTag">
+                <attribute name="size" value="75"/>
+                <attribute name="autoSubmit" value="false"/>
+            </cc>
+            <fieldhelp name="helpprivateKeyAlias" defaultValue="web.services.security.token.privateKeyAlias.inline.help" />
+        </property>
+        <property>
+            <label name="lblprivateKeyType"
+                   defaultValue="web.services.security.token.privateKeyType"
+                   labelFor="privateKeyType"/>
+            <cc name="privateKeyType"
+                tagclass="com.sun.web.ui.taglib.html.CCTextFieldTag">
+                <attribute name="size" value="75"/>
+                <attribute name="autoSubmit" value="false"/>
+            </cc>
+        </property>
+        <property>
+            <label name="lblpublicKeyAlias"
+                   defaultValue="web.services.security.token.publicKeyAlias"
+                   labelFor="publicKeyAlias"/>
+            <cc name="publicKeyAlias"
+                tagclass="com.sun.web.ui.taglib.html.CCTextFieldTag">
+                <attribute name="size" value="75"/>
+                <attribute name="autoSubmit" value="false"/>
+            </cc>
+            <fieldhelp name="helppublicKeyAlias" defaultValue="web.services.security.token.publicKeyAlias.inline.help" />
+        </property>
+    </section>
+    <section name="Kerberos Configuration" defaultValue="web.services.security.token.kerberos.configuration.section.title">
+        <property>
+            <label name="lblKerberosDomainServer"
+                   defaultValue="web.services.security.token.KerberosDomainServer" 
+                   labelFor="KerberosDomainServer"/>
+            <cc name="KerberosDomainServer"
+                tagclass="com.sun.web.ui.taglib.html.CCTextFieldTag">
+                <attribute name="size" value="75"/>
+                <attribute name="autoSubmit" value="false"/>
+            </cc>
+        </property>
+        <property>
+            <label name="lblKerberosDomain"
+                   defaultValue="web.services.security.token.KerberosDomain" 
+                   labelFor="KerberosDomain"/>
+            <cc name="KerberosDomain"
+                tagclass="com.sun.web.ui.taglib.html.CCTextFieldTag">
+                <attribute name="size" value="75"/>
+                <attribute name="autoSubmit" value="false"/>
+            </cc>
+        </property>
+        <property>
+            <label name="lblKerberosServicePrincipal"
+                   defaultValue="web.services.security.token.KerberosServicePrincipal" 
+                   labelFor="KerberosServicePrincipal"/>
+            <cc name="KerberosServicePrincipal"
+                tagclass="com.sun.web.ui.taglib.html.CCTextFieldTag">
+                <attribute name="size" value="75"/>
+                <attribute name="autoSubmit" value="false"/>
+            </cc>
+        </property>
+        <property>
+            <label name="lblKerberosKeyTabFile"
+                   defaultValue="web.services.security.token.KerberosKeyTabFile" 
+                   labelFor="KerberosKeyTabFile"/>
+            <cc name="KerberosKeyTabFile"
+                tagclass="com.sun.web.ui.taglib.html.CCTextFieldTag">
+                <attribute name="size" value="75"/>
+                <attribute name="autoSubmit" value="false"/>
+            </cc>
+        </property>
+        <property>
+            <label name="lblisVerifyKrbSignature"
+                   defaultValue="web.services.security.token.isVerifyKrbSignature" 
+                   labelFor="isVerifyKrbSignature"/>
+            <cc name="isVerifyKrbSignature"
+                tagclass="com.sun.web.ui.taglib.html.CCCheckBoxTag">
+                <attribute name="label" value="label.Yes" />
+            </cc>
+            <fieldhelp name="helpisVerifyKrbSignature" defaultValue="web.services.security.token.isVerifyKrbSignature.inline.help" />
+        </property>
+    </section>
+    
+    <section name="STSSAMLConfiguration" defaultValue="web.services.security.token.SAMLConfiguration.section.title">
+        <property span="true">
+            <label name="STSSAMLConfigurationHelpMessage"
+                   defaultValue="web.services.security.token.SAMLConfiguration.section.title.inline.help"
+                   labelFor="STSSAMLConfiguration" />
+        </property>
+        <property>
+            <label name="lblSAMLAttributeMapping"
+                   defaultValue="web.services.security.token.SAMLAttributeMapping" 
+                   labelFor="SAMLAttributeMapping"/>
+            <cc name="SAMLAttributeMapping"
+                tagclass="com.sun.web.ui.taglib.editablelist.CCEditableListTag">
+                <attribute name="name" value="list" />
+                <attribute name="listboxLabel" value="label.current.value" />
+                <attribute name="textboxLabel" value="label.new.value" />
+            </cc>
+            <fieldhelp name="helpSAMLAttributeMapping" defaultValue="web.services.security.token.SAMLAttributeMapping.inline.help" />
+        </property>
+        <property>
+            <label name="lblNameIDMapper"
+                   defaultValue="web.services.security.token.NameIDMapper" 
+                   labelFor="NameIDMapper"/>
+            <cc name="NameIDMapper"
+                tagclass="com.sun.web.ui.taglib.html.CCTextFieldTag">
+                <attribute name="size" value="75"/>
+                <attribute name="autoSubmit" value="false"/>
+            </cc>
+            <fieldhelp name="helpNameIDMapper" defaultValue="web.services.security.token.NameIDMapper.inline.help" />
+        </property>
+        <property>
+            <label name="lblincludeMemberships"
+                   defaultValue="web.services.security.token.includeMemberships" 
+                   labelFor="includeMemberships"/>
+            <cc name="includeMemberships"
+                tagclass="com.sun.web.ui.taglib.html.CCCheckBoxTag">
+                <attribute name="label" value="label.Yes" />
+            </cc>
+            <fieldhelp name="helpincludeMemberships" defaultValue="web.services.security.token.includeMemberships.inline.help" />
+        </property>
+        <property>
+            <label name="lblAttributeNamespace"
+                   defaultValue="web.services.security.token.attribute.namespace" 
+                   labelFor="AttributeNamespace"/>
+            <cc name="AttributeNamespace"
+                tagclass="com.sun.web.ui.taglib.html.CCTextFieldTag">
+                <attribute name="size" value="75"/>
+                <attribute name="autoSubmit" value="false"/>
+            </cc>
+            <fieldhelp name="helpAttributeNamespace" defaultValue="web.services.security.token.attribute.namespace.inline.help" />
+        </property>
+    </section>
+    <section  name="TokenValidationAttributes" defaultValue="web.services.security.token.token.validation.attributes.section.title">
+        <property>
+            <label name="lbltrustedIssuers"
+                   defaultValue="web.services.security.token.trustedIssuers" 
+                   labelFor="trustedIssuers"/>
+            <cc name="trustedIssuers"
+                tagclass="com.sun.web.ui.taglib.editablelist.CCEditableListTag">
+                <attribute name="name" value="list" />
+                <attribute name="listboxLabel" value="label.current.value" />
+                <attribute name="textboxLabel" value="label.new.value" />
+            </cc>
+        </property>
+        <property>
+            <label name="lbltrustedIPAddresses"
+                   defaultValue="web.services.security.token.trustedIPAddresses" 
+                   labelFor="trustedIPAddresses"/>
+            <cc name="trustedIPAddresses"
+                tagclass="com.sun.web.ui.taglib.editablelist.CCEditableListTag">
+                <attribute name="name" value="list" />
+                <attribute name="listboxLabel" value="label.current.value" />
+                <attribute name="textboxLabel" value="label.new.value" />
+            </cc>
+        </property>
+    </section>
+</propertysheet>

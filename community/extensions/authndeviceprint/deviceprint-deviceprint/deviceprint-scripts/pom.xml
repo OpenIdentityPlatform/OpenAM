@@ -1,0 +1,219 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  The contents of this file are subject to the terms of the Common Development and
+  Distribution License (the License). You may not use this file except in compliance with the
+  License.
+
+  You can obtain a copy of the License at legal/CDDLv1.0.txt. See the License for the
+  specific language governing permission and limitations under the License.
+
+  When distributing Covered Software, include this CDDL Header Notice in each file and include
+  the License file at legal/CDDLv1.0.txt. If applicable, add the following below the CDDL
+  Header, with the fields enclosed by brackets [] replaced by your own identifying
+  information: "Portions Copyrighted [year] [name of copyright owner]".
+
+  Copyright © 2011 ForgeRock AS. All rights reserved.
+-->
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+	<parent>
+        <groupId>org.forgerock.extensions.authndeviceprint</groupId>
+        <artifactId>extensions-deviceprint-deviceprint-parent</artifactId>
+        <version>10.0.0-EA</version>
+    </parent>
+
+    <name>Device print module scripts</name>
+    <artifactId>deviceprint-scripts</artifactId>
+
+	<packaging>js</packaging>
+	
+	<description>
+	A set of JS collectors to gather user device print.
+	</description>	
+
+	<properties>
+		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+	</properties>
+
+
+    <dependencies>
+		<dependency>
+			<groupId>requirejs</groupId>
+			<artifactId>requirejs</artifactId>
+            <version>1.0.7</version>
+			<type>js</type>
+			<classifier>min</classifier>
+		</dependency>
+		<dependency>
+			<groupId>requirejs</groupId>
+			<artifactId>order</artifactId>
+            <version>1.0.5</version>
+			<type>js</type>
+			<classifier>min</classifier>
+		</dependency>
+		<dependency>
+			<groupId>org.codehaus.mojo</groupId>
+			<artifactId>jquery-amd</artifactId>
+            <version>1.7.1-SNAPSHOT</version>
+			<type>js</type>
+		</dependency>
+		<dependency>
+			<groupId>swfobject</groupId>
+			<artifactId>swfobject</artifactId>
+            <version>2.2</version>
+			<classifier>min</classifier>
+			<type>js</type>
+		</dependency>
+		<dependency>
+			<groupId>json2</groupId>
+			<artifactId>json2</artifactId>
+            <version>1.0</version>
+			<type>js</type>
+		</dependency>
+		<dependency>
+			<groupId>junit</groupId>
+			<artifactId>junit</artifactId>
+            <version>4.10</version>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.codehaus.jstestrunner</groupId>
+			<artifactId>jstestrunner-junit</artifactId>
+            <version>1.0.1</version>
+			<scope>test</scope>
+		</dependency>
+        <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+            <version>4.10</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>rhino</groupId>
+            <artifactId>js</artifactId>
+            <version>1.7R2</version>
+        </dependency>
+    </dependencies>
+
+	<build>
+		<resources>
+			<resource>
+				<directory>${basedir}/src/main/js</directory>
+			</resource>
+			<resource>
+				<directory>${basedir}/src/main/resources</directory>
+			</resource>
+		</resources>
+		<testResources>
+			<testResource>
+				<directory>${basedir}/src/test/js</directory>
+			</testResource>
+			<testResource>
+				<directory>${basedir}/src/test/resources</directory>
+			</testResource>
+		</testResources>
+		<extensions>
+			<extension>
+				<groupId>org.codehaus.mojo</groupId>
+				<artifactId>javascript-maven-plugin</artifactId>
+				<version>2.0.0-SNAPSHOT</version>
+			</extension>
+		</extensions>
+
+		<plugins>
+			<plugin>
+				<groupId>org.codehaus.mojo</groupId>
+				<artifactId>jslint-maven-plugin</artifactId>
+				<version>1.0.1</version>
+				<configuration>
+					<assumeConsoleAlertEtc>true</assumeConsoleAlertEtc>
+					<strictWhiteSpace>false</strictWhiteSpace>
+					<excludes>
+						<exclude>**/libs/*.js</exclude>
+						<exclude>**/*Test.js</exclude>
+						<exclude>**/EvercookieCollector.js</exclude>
+					</excludes>
+				</configuration>
+			</plugin>
+			<plugin>
+				<groupId>org.codehaus.mojo</groupId>
+				<artifactId>webminifier-maven-plugin</artifactId>
+				<version>1.0.1-SNAPSHOT</version>
+				<configuration>
+					<splitDependencies>false</splitDependencies>
+				</configuration>
+				<executions>
+					<execution>
+						<id>default-minify-js</id>
+						<phase>none</phase>
+						<goals>
+							<goal>minify-js</goal>
+						</goals>
+					</execution>
+				</executions>
+			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-surefire-plugin</artifactId>
+				<version>2.12</version>
+				<configuration>
+					<skipTests>true</skipTests>
+				</configuration>
+		      </plugin>
+		</plugins>
+
+	</build>
+
+	<profiles>
+		<profile>
+			<id>Optimize UI</id>
+			<activation>
+				<property>
+					<name>!without.ui.optimization</name>
+				</property>
+			</activation>
+			<build>
+				<plugins>
+					<plugin>
+						<groupId>org.apache.maven.plugins</groupId>
+						<artifactId>maven-antrun-plugin</artifactId>
+						<version>1.7</version>
+						<executions>
+							<execution>
+								<id>js/css optimization</id>
+								<phase>prepare-package</phase>
+
+								<configuration>
+									<target name="optimize">
+										<echo message="Running optimize." />
+
+										<property name="requirejs.dir" value="${basedir}/src/main/requirejs" />
+
+										<java classname="org.mozilla.javascript.tools.shell.Main"
+											failonerror="true">
+											<classpath>
+                                                <pathelement location="~/.m2/repository/rhino/js/1.7R2/js-1.7R2.jar" />
+												<pathelement location="${requirejs.dir}/js.jar" />
+												<pathelement location="${requirejs.dir}/compiler.jar" />
+											</classpath>
+											<arg value="${requirejs.dir}/r.js" />
+											<arg value="-o" />
+											<arg value="${requirejs.dir}/app.build.js" />
+										</java>
+
+
+										<copy file="${basedir}/target/minified/js/main.js" tofile="${basedir}/target/min/classes/1-min.js" />
+									</target>
+								</configuration>
+								<goals>
+									<goal>run</goal>
+								</goals>
+							</execution>
+						</executions>
+					</plugin>
+				</plugins>
+			</build>
+		</profile>
+	</profiles>
+</project>

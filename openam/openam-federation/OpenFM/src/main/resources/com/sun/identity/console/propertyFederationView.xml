@@ -1,0 +1,109 @@
+<!--
+   DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
+  
+   Copyright (c) 2007 Sun Microsystems Inc. All Rights Reserved
+  
+   The contents of this file are subject to the terms
+   of the Common Development and Distribution License
+   (the License). You may not use this file except in
+   compliance with the License.
+
+   You can obtain a copy of the License at
+   https://opensso.dev.java.net/public/CDDLv1.0.html or
+   opensso/legal/CDDLv1.0.txt
+   See the License for the specific language governing
+   permission and limitations under the License.
+
+   When distributing Covered Code, include this CDDL
+   Header Notice in each file and include the License file
+   at opensso/legal/CDDLv1.0.txt.
+   If applicable, add the following below the CDDL Header,
+   with the fields enclosed by brackets [] replaced by
+   your own identifying information:
+   "Portions Copyrighted [year] [name of copyright owner]"
+
+   $Id: propertyFederationView.xml,v 1.5 2008/11/06 05:32:04 veiming Exp $
+
+-->
+<!DOCTYPE propertysheet SYSTEM "propertysheet.dtd">
+
+<propertysheet>
+    <section name="coreProperties" 
+             defaultValue="cot.configuration.section" >            
+        <subsection name="dummy" defaultValue="" >
+            <property span="true">
+                <label name="cotDescription" 
+                       defaultValue="cot.table.help.message" />
+            </property>
+        </subsection>                          
+        <subsection name="circleOfTrust" defaultValue="">
+            <property span="true">
+                <cc name="cotTable" 
+                    tagclass="com.sun.web.ui.taglib.table.CCActionTableTag" >
+                    <attribute name="title" value="cot.table.title" />
+                    <attribute name="empty" value="cot.empty.table.message" />
+                    <attribute name="showPaginationControls" value="false" />
+                    <attribute name="selectionType" value="multiple" />
+                    <attribute name="selectionJavascript" value="toggleTblButtonState('Federation', 'Federation.cotTable', 'tblButton', 'Federation.deleteCOTButton', this)"/>
+                    <attribute name="showAdvancedSortingIcon" value="false" />
+                    <attribute name="showLowerActions" value="false" />
+                    <attribute name="showPaginationControls" value="false" />
+                    <attribute name="showPaginationIcon" value="false" />
+                    <attribute name="showSelectionIcons" value="true" />
+                    <attribute name="showSelectionSortIcon" value="false" />
+                    <attribute name="showSortingRow" value="false" />
+                </cc>
+            </property>
+        </subsection>
+        <subsection name="entityProviders" defaultValue="" >
+            <property span="true">
+                <cc name="entityTable" 
+                    tagclass="com.sun.web.ui.taglib.table.CCActionTableTag" >
+                    <attribute name="title" value="entity.table.title" />
+                    <attribute name="empty" value="entity.empty.table.message" />
+                    <attribute name="showPaginationControls" value="false" />
+                    <attribute name="selectionType" value="multiple" />
+                    <attribute name="selectionJavascript" value="toggleTblButtonState('Federation', 'Federation.entityTable', 'tblButton', 'Federation.deleteEntityButton', this)"/>
+                    <attribute name="showAdvancedSortingIcon" value="false" />
+                    <attribute name="showLowerActions" value="false" />
+                    <attribute name="showPaginationControls" value="false" />
+                    <attribute name="showPaginationIcon" value="false" />
+                    <attribute name="showSelectionIcons" value="true" />
+                    <attribute name="showSelectionSortIcon" value="false" />
+                    <attribute name="showSortingRow" value="false" />
+                </cc>
+            </property>
+        </subsection>  
+    </section>
+    <section name="samlProperties" defaultValue="saml1x.configuration.section" >
+        <property span="true">
+            <label name="samlHelpMessage" 
+                   defaultValue="saml.table.help.message" 
+                   labelFor="samlTable" />
+        </property>
+        <property span="true">
+            <cc name="localSiteProperties" 
+                tagclass="com.sun.web.ui.taglib.html.CCButtonTag" >
+                <attribute name="defaultValue"
+                           value="saml.locale.site.button"/>
+            </cc>
+        </property>
+        <property span="true">
+            <cc name="samlTable" 
+                tagclass="com.sun.web.ui.taglib.table.CCActionTableTag" >
+                <attribute name="title" value="saml.table.title" />
+                <attribute name="empty" value="saml.empty.table.message" />
+                <attribute name="showPaginationControls" value="false" />
+                <attribute name="selectionType" value="multiple" />
+                <attribute name="selectionJavascript" value="toggleTblButtonState('Federation', 'Federation.samlTable', 'tblButton', 'Federation.deleteTPButton', this)"/>
+                <attribute name="showAdvancedSortingIcon" value="false" />
+                <attribute name="showLowerActions" value="false" />
+                <attribute name="showPaginationControls" value="false" />
+                <attribute name="showPaginationIcon" value="false" />
+                <attribute name="showSelectionIcons" value="true" />
+                <attribute name="showSelectionSortIcon" value="false" />
+                <attribute name="showSortingRow" value="false" />
+            </cc>
+        </property>
+    </section>                
+</propertysheet>

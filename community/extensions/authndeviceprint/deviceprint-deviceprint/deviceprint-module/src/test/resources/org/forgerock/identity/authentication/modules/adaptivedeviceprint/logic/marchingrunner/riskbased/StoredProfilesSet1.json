@@ -1,0 +1,18 @@
+[
+	{
+		"uuid":1,
+		"name":"a",
+		"createDate":"2012-04-07T17:00:00.000+0000",
+		"lastSelectedDate":"2012-04-07T17:00:00.000+0000",
+		"selectionCounter":1,
+		"devicePrint": {"screenWidth": 1920,"screenHeight": 1080,"screenColorDepth": 24,"longitude": 17.038538,"latitude": 51.107885,"timezone": -120,"installedPlugins": "internal-remoting-viewer;libppGoogleNaClPluginChrome.so", "userAgent": "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/535.11 (KHTML, like Gecko) Chrome/17.0.963.79 Safari/535.11", "persistentCookie": "asdfa123123123123", "installedFonts": "somefonts"}
+	},
+	{
+		"uuid":2,
+		"name":null,
+		"createDate":"2012-05-07T17:00:00.000+0000",
+		"lastSelectedDate":"2012-05-07T17:00:00.000+0000",
+		"selectionCounter":2,
+		"devicePrint": {"screenWidth": 1920,"screenHeight": 1080,"screenColorDepth": 24,"longitude": 17.038538,"latitude": 51.107885,"timezone": -120,"installedPlugins": "internal-remoting-viewer;libppGoogleNaClPluginChrome.so", "userAgent": "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/535.11 (KHTML, like Gecko) Chrome/17.0.963.79 Safari/535.11", "persistentCookie": "asdfa123123123123", "installedFonts": "somefonts"}
+	}
+]

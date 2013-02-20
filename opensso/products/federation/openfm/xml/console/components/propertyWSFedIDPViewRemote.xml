@@ -1,0 +1,137 @@
+<!--
+   DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
+  
+   Copyright (c) 2007 Sun Microsystems Inc. All Rights Reserved
+  
+   The contents of this file are subject to the terms
+   of the Common Development and Distribution License
+   (the License). You may not use this file except in
+   compliance with the License.
+
+   You can obtain a copy of the License at
+   https://opensso.dev.java.net/public/CDDLv1.0.html or
+   opensso/legal/CDDLv1.0.txt
+   See the License for the specific language governing
+   permission and limitations under the License.
+
+   When distributing Covered Code, include this CDDL
+   Header Notice in each file and include the License file
+   at opensso/legal/CDDLv1.0.txt.
+   If applicable, add the following below the CDDL Header,
+   with the fields enclosed by brackets [] replaced by
+   your own identifying information:
+   "Portions Copyrighted [year] [name of copyright owner]"
+
+   $Id: propertyWSFedIDPViewRemote.xml,v 1.7 2008/08/30 01:22:38 babysunil Exp $
+
+-->
+
+<!DOCTYPE propertysheet SYSTEM "propertysheet.dtd">
+
+<propertysheet>
+        <section name="claimtype" defaultValue="wsfedidp.provider.section.title.claimtypes">  
+            <property>
+                <label name="lblClaimTypeOfferd"
+                       defaultValue=
+                       "wsfedidp.attribute.label.idpclaimTypeOffered"
+                       labelFor="claimTypeOffered" />
+                <cc name="claimTypeOffered" 
+                    tagclass="com.sun.web.ui.taglib.html.CCDropDownMenuTag" >
+                    <attribute name="onChange" value="switchView1('actionMenu')" />
+                    <option label="wsfed.idp.label1" value="UPN" />
+                    <option label="wsfed.idp.label2" value="Email Address" />
+                    <option label="wsfed.idp.label3" value="Common Name" />
+                </cc>
+            </property>
+        </section>
+        
+        <section name="nameidDomain" defaultValue="wsfedidp.provider.section.title.nameidDomain">
+            <property>
+                <label name="lblNameIDAttribute"
+                       defaultValue=
+                       "wsfedidp.attribute.label.idpnameIDAttribute"
+                       labelFor="nameIdAttribute" />
+                <cc name="nameIdAttribute" 
+                    tagclass="com.sun.web.ui.taglib.html.CCTextFieldTag" >
+                    <attribute name="size" value="25" />
+                    <attribute name="autoSubmit" value="false" />
+                    <attribute name="localizeDisplayFieldValue" value="false" />
+                </cc>
+                <fieldhelp name="helpIDPNameIDAttribute" defaultValue="wsfed.provider.section.title.help.spNameIDAttribute" />
+            </property>
+            
+            <property>
+                <label name="lblIDPnameIncludesDomain"
+                       defaultValue="wsfed.attribute.label.idpnameincludesDomain"
+                       labelFor="nameIncludesDomain" />
+                <cc name="nameIncludesDomain" 
+                    tagclass="com.sun.web.ui.taglib.html.CCCheckBoxTag" >
+                    <attribute name="onClick" value="disableSome(this);" />
+                </cc>
+                <fieldhelp name="helpIDPnameIncludesDomain" defaultValue="wsfed.provider.section.title.help.spnameIncludesDomain" />
+            </property>
+            
+            <property>
+                <label name="lbldomainAttribute"
+                       defaultValue=
+                       "wsfedidp.attribute.label.idpdomainAttribute"
+                       labelFor="domainAttribute" />
+                <cc name="domainAttribute" 
+                    tagclass="com.sun.web.ui.taglib.html.CCTextFieldTag" >
+                    <attribute name="size" value="75" />
+                    <attribute name="autoSubmit" value="false" />
+                    <attribute name="localizeDisplayFieldValue" value="false" />
+                </cc>
+                <fieldhelp name="helpIDPdomainAttribute" defaultValue="wsfed.provider.section.title.help.spdomainAttribute" />
+            </property>                       
+        </section>        
+        
+        <section name="attrMap" defaultValue="wsfedidp.provider.section.title.attrMapper">  
+        <property>
+            <label name="lblIdpAttributeMapper"
+               defaultValue="wsfedidp.attribute.label.idpAttributeMapper"
+                   labelFor="idpAttributeMapper" />
+            <cc name="idpAttributeMapper" 
+                tagclass="com.sun.web.ui.taglib.html.CCTextFieldTag" >
+                <attribute name="size" value="75" />
+                <attribute name="autoSubmit" value="false" />
+                <attribute name="localizeDisplayFieldValue" value="false" />
+            </cc>
+        </property>        
+        <property>
+            <label name="lblIDPAttributeMap"
+               defaultValue="wsfedidp.attribute.label.idpattributeMap"
+                   labelFor="attributeMap" />
+            <ccgroup>
+                <property>
+                    <cc name="attributeMap" 
+                    tagclass=
+                        "com.sun.web.ui.taglib.editablelist.CCEditableListTag" >
+                        <attribute name="name" value="list" />
+                        <attribute name="listboxLabel" 
+                                   value="label.current.value" />
+                        <attribute name="textboxLabel"
+                                   value="label.new.value" />
+                    </cc>
+                    <fieldhelp name="helpIDPAttributeMap" defaultValue="wsfed.provider.section.title.help.idpattributeMap" />
+                </property>
+            </ccgroup>
+        </property> 
+    </section>
+     <section name="assertime" defaultValue="wsfedidp.provider.section.title.asserefftime">  
+            <property>
+                <label name="lblIDPAssertionEffectiveTime"
+                       defaultValue=
+                       "wsfedidp.attribute.label.idpassertionEffectiveTime"
+                       labelFor="assertionEffectiveTime" />
+                <cc name="assertionEffectiveTime" 
+                    tagclass="com.sun.web.ui.taglib.html.CCTextFieldTag" >
+                    <attribute name="size" value="5" />
+                    <attribute name="autoSubmit" value="false" />
+                    <attribute name="localizeDisplayFieldValue" value="false" />
+                </cc>
+                <fieldhelp name="helpIDPAssertionEffectiveTime" defaultValue="wsfed.provider.section.title.help.idpassertionEffectiveTime" />
+            </property> 
+    </section>
+</propertysheet>
+

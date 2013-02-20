@@ -1,0 +1,187 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+
+<!--
+   The contents of this file are subject to the terms
+   of the Common Development and Distribution License
+   (the License). You may not use this file except in
+   compliance with the License.
+
+   You can obtain a copy of the License at
+   https://opensso.dev.java.net/public/CDDLv1.0.html or
+   opensso/legal/CDDLv1.0.txt
+   See the License for the specific language governing
+   permission and limitations under the License.
+
+   When distributing Covered Code, include this CDDL
+   Header Notice in each file and include the License file
+   at opensso/legal/CDDLv1.0.txt.
+   If applicable, add the following below the CDDL Header,
+   with the fields enclosed by brackets [] replaced by
+   your own identifying information:
+   "Portions Copyrighted [year] [name of copyright owner]"
+
+   $Id: policyevaluationtest_dnscondition.xml,v 1.1 
+   2007/25/04 20:27:30 arunav Exp $
+
+   Copyright 2007 Sun Microsystems Inc. All Rights Reserved
+-->
+
+<!DOCTYPE Policies
+PUBLIC "-//Sun Java System Access Manager 7.1 2006Q3 Admin CLI DTD//EN"
+"jar://com/sun/identity/policy/policyAdmin.dtd"
+>
+<Policies>
+    <Policy name="policyevaluationtest_dnscondition0" 
+    description=" Policy Evaluation test dns name * in begin"
+    referralPolicy="false" >
+        <Rule name="rule1">
+            <ServiceName name="iPlanetAMWebAgentService" />
+            <ResourceName name="http://www.yahooDNSNAMEred.com:80/public" />
+            <AttributeValuePair>
+                <Attribute name="GET" />
+                <Value>allow</Value>
+            </AttributeValuePair>
+            <AttributeValuePair>
+                <Attribute name="POST" />
+                <Value>allow</Value>
+            </AttributeValuePair>
+        </Rule>        
+        <Subjects name="Subjects1" description="">
+            <Subject name="user user1" type="AMIdentitySubject" 
+            includeType="inclusive">
+                <AttributeValuePair><Attribute name="Values"/>
+                <Value>id=dnsuser0,ou=user,SM_SUFFIX</Value>
+                </AttributeValuePair>
+            </Subject>
+        </Subjects>        
+        <Conditions name="Conditions1" description="">
+            <Condition name="ip_condition1" type="IPCondition">
+                <AttributeValuePair><Attribute name="DnsName"/>
+                <Value>*.red.iplanet.com</Value>
+                </AttributeValuePair>
+            </Condition>
+            
+            <Condition name="condition2" type="AuthSchemeCondition">
+                <AttributeValuePair><Attribute name="AuthScheme"/>
+                <Value>ldap</Value>
+                </AttributeValuePair>
+            </Condition>            
+        </Conditions>        
+    </Policy>    
+    
+    <Policy name="policyevaluationtest_dnscondition1" 
+    description=" Policy Evaluation test with sun * com" 
+    referralPolicy="false" >
+        <Rule name="rule1">
+            <ServiceName name="iPlanetAMWebAgentService" />
+            <ResourceName name="http://www.yahooDNSNAMESun.com:80/public" />
+            <AttributeValuePair>
+                <Attribute name="GET" />
+                <Value>allow</Value>
+            </AttributeValuePair>
+            <AttributeValuePair>
+                <Attribute name="POST" />
+                <Value>allow</Value>
+            </AttributeValuePair>
+        </Rule>
+        <Subjects name="Subjects1" description="">
+            <Subject name="user user1" type="AMIdentitySubject" 
+            includeType="inclusive">
+                <AttributeValuePair><Attribute name="Values"/>
+                <Value>id=dnsuser1,ou=user,SM_SUFFIX</Value>
+                </AttributeValuePair>
+            </Subject>
+        </Subjects>
+        
+        <Conditions name="Conditions1" description="">
+            <Condition name="dns_condition1" type="IPCondition">
+                <AttributeValuePair><Attribute name="DnsName"/>
+                <Value>*.sun.com</Value>
+                </AttributeValuePair>
+            </Condition>
+            <Condition name="condition2" type="AuthSchemeCondition">
+                <AttributeValuePair><Attribute name="AuthScheme"/>
+                <Value>ldap</Value>
+                </AttributeValuePair>
+            </Condition>
+            
+        </Conditions>
+        
+    </Policy>
+    
+    <Policy name="policyevaluationtest_dnscondition2" 
+    description=" Policy Evaluation test with *.org" referralPolicy= "false" >
+        <Rule name="rule1">
+            <ServiceName name="iPlanetAMWebAgentService" />
+            <ResourceName name="http://www.yahoo.org:80/public" />
+            <AttributeValuePair>
+                <Attribute name="GET" />
+                <Value>allow</Value>
+            </AttributeValuePair>
+            <AttributeValuePair>
+                <Attribute name="POST" />
+                <Value>allow</Value>
+            </AttributeValuePair>
+        </Rule>
+        <Subjects name="Subjects1" description="">
+            <Subject name="user user1" type="AMIdentitySubject" 
+            includeType="inclusive">
+                <AttributeValuePair><Attribute name="Values"/>
+                <Value>id=dnsuser2,ou=user,SM_SUFFIX</Value>
+                </AttributeValuePair>
+            </Subject>
+        </Subjects>
+        <Conditions name="Conditions1" description="">
+            <Condition name="dns_condition1" type="IPCondition">
+                <AttributeValuePair><Attribute name="DnsName"/>
+                <Value>*.org</Value>
+                </AttributeValuePair>
+            </Condition>
+            <Condition name="condition2" type="AuthSchemeCondition">
+                <AttributeValuePair><Attribute name="AuthScheme"/>
+                <Value>ldap</Value>
+                </AttributeValuePair>
+            </Condition>
+        </Conditions>
+        
+    </Policy>
+    
+    <Policy name="policyevaluationtest_dnscondition3"  
+    description="Policy Evaluation test with explicit deny for *.net" 
+    referralPolicy="false" >
+        <Rule name="rule1">
+            <ServiceName name="iPlanetAMWebAgentService" />
+            <ResourceName name="http://www.yahooportal.com:80/public" />
+            <AttributeValuePair>
+                <Attribute name="GET" />
+                <Value>deny</Value>
+            </AttributeValuePair>
+            <AttributeValuePair>
+                <Attribute name="POST" />
+                <Value>deny</Value>
+            </AttributeValuePair>
+        </Rule>
+        <Subjects name="Subjects1" description="">
+            <Subject name="user user1" type="AMIdentitySubject" 
+            includeType="inclusive">
+                <AttributeValuePair><Attribute name="Values"/>
+                <Value>id=dnsuser3,ou=user,SM_SUFFIX</Value>
+                </AttributeValuePair>
+            </Subject>
+        </Subjects>
+        
+        <Conditions name="Conditions1" description="">
+            <Condition name="dns_condition1" type="IPCondition">
+                <AttributeValuePair><Attribute name="DnsName"/>
+                <Value>*.net</Value>
+                </AttributeValuePair>
+            </Condition>
+            <Condition name="condition2" type="AuthSchemeCondition">
+                <AttributeValuePair><Attribute name="AuthScheme"/>
+                <Value>ldap</Value>
+                </AttributeValuePair>
+            </Condition>
+        </Conditions>
+  </Policy>
+  
+</Policies>

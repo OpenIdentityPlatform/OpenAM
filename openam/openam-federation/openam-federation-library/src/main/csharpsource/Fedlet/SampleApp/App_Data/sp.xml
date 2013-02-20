@@ -1,0 +1,10 @@
+<EntityDescriptor entityID="http://sp.example.com/SampleApp" xmlns="urn:oasis:names:tc:SAML:2.0:metadata">
+    <SPSSODescriptor AuthnRequestsSigned="false" WantAssertionsSigned="false" protocolSupportEnumeration="urn:oasis:names:tc:SAML:2.0:protocol">
+        <SingleLogoutService Binding="urn:oasis:names:tc:SAML:2.0:bindings:HTTP-Redirect" Location="http://sp.example.com/SampleApp/logout.aspx" ResponseLocation="http://sp.example.com/SampleApp/logout.aspx"/>
+        <SingleLogoutService Binding="urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST" Location="http://sp.example.com/SampleApp/logout.aspx" ResponseLocation="http://sp.example.com/SampleApp/logout.aspx"/>
+        <SingleLogoutService Binding="urn:oasis:names:tc:SAML:2.0:bindings:SOAP" Location="http://sp.example.com/SampleApp/logout.aspx"/>
+        <NameIDFormat>urn:oasis:names:tc:SAML:2.0:nameid-format:transient</NameIDFormat>
+        <AssertionConsumerService isDefault="true" index="0" Binding="urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST" Location="http://sp.example.com/SampleApp/fedletapplication.aspx"/>
+        <AssertionConsumerService index="1" Binding="urn:oasis:names:tc:SAML:2.0:bindings:HTTP-Artifact" Location="http://sp.example.com/SampleApp/fedletapplication.aspx"/>
+    </SPSSODescriptor>
+</EntityDescriptor>

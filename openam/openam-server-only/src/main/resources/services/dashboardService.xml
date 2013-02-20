@@ -1,0 +1,188 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!--
+   DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
+
+   Copyright (c) 2012 ForgeRock Inc. All Rights Reserved
+
+   The contents of this file are subject to the terms
+   of the Common Development and Distribution License
+   (the License). You may not use this file except in
+   compliance with the License.
+
+   You can obtain a copy of the License at
+   https://opensso.dev.java.net/public/CDDLv1.0.html or
+   opensso/legal/CDDLv1.0.txt
+   See the License for the specific language governing
+   permission and limitations under the License.
+
+   When distributing Covered Code, include this CDDL
+   Header Notice in each file and include the License file
+   at opensso/legal/CDDLv1.0.txt.
+   If applicable, add the following below the CDDL Header,
+   with the fields enclosed by brackets [] replaced by
+   your own identifying information:
+   "Portions Copyrighted [year] [name of copyright owner]"
+
+       dashboard.xml,    2012/11/16 10:00:00 GuruAllan $
+
+-->
+
+
+<!DOCTYPE ServicesConfiguration
+        PUBLIC "=//iPlanet//Service Management Services (SMS) 1.0 DTD//EN"
+        "jar://com/sun/identity/sm/sms.dtd">
+
+<ServicesConfiguration>
+    <Service name="dashboardService" version="1.0">
+        <Schema serviceHierarchy="/DSAMEConfig/dashboardService"
+                i18nFileName="dashboard" revisionNumber="1"
+                i18nKey="forgerock-am-dashboard-service-description">
+            <Global>
+                <AttributeSchema name="serviceObjectClasses"
+                                 type="list"
+                                 syntax="string"
+                                 i18nKey="">
+                    <DefaultValues>
+                        <Value>forgerock-am-dashboard-service</Value>
+                    </DefaultValues>
+                </AttributeSchema>
+
+                <SubSchema name="dashboardApp" inheritance="multiple">
+                    <AttributeSchema name="dashboardClassName"
+                                     type="single"
+                                     syntax="string"
+                                     i18nKey="A101"/>
+                    <AttributeSchema name="dashboardName"
+                                     type="single"
+                                     syntax="string"
+                                     i18nKey="A102"/>
+                    <AttributeSchema name="dashboardDisplayName"
+                                     type="single"
+                                     syntax="string"
+                                     i18nKey="A103"/>
+                    <AttributeSchema name="dashboardIcon"
+                                     type="single"
+                                     syntax="string"
+                                     i18nKey="A104"/>
+                    <AttributeSchema name="dashboardLogin"
+                                     type="single"
+                                     syntax="string"
+                                     i18nKey="A105"/>
+                    <AttributeSchema name="ICFIdentifier"
+                                     type="single"
+                                     syntax="string"
+                                     i18nKey="A106"/>
+                </SubSchema>
+            </Global>
+            <Organization>
+                <AttributeSchema name="assignedDashboard"
+                                 type="list"
+                                 syntax="string"
+                                 i18nKey="A107">
+                    <DefaultValues>
+                        <Value></Value>
+                    </DefaultValues>
+                </AttributeSchema>
+            </Organization>
+            <User>
+                <AttributeSchema name="assignedDashboard"
+                                 type="list"
+                                 syntax="string"
+                                 i18nKey="A108">
+                    <DefaultValues>
+                        <Value></Value>
+                    </DefaultValues>
+                </AttributeSchema>
+            </User>
+        </Schema>
+        <Configuration>
+            <GlobalConfiguration>
+                <SubConfiguration name="SalesForce"
+                                  id="dashboardApp">
+                    <AttributeValuePair>
+                        <Attribute name="dashboardClassName"/>
+                        <Value>SAML2ApplicationClass</Value>
+                    </AttributeValuePair>
+                    <AttributeValuePair>
+                        <Attribute name="dashboardName"/>
+                        <Value>SalesForce</Value>
+                    </AttributeValuePair>
+                    <AttributeValuePair>
+                        <Attribute name="dashboardDisplayName"/>
+                        <Value>Salesforce</Value>
+                    </AttributeValuePair>
+                    <AttributeValuePair>
+                        <Attribute name="dashboardIcon"/>
+                        <Value>salesforce.gif</Value>
+                    </AttributeValuePair>
+                    <AttributeValuePair>
+                        <Attribute name="dashboardLogin"/>
+                        <Value>http://www.salesforce.com</Value>
+                    </AttributeValuePair>
+                    <AttributeValuePair>
+                        <Attribute name="ICFIdentifier"/>
+                        <Value>idm magic 12</Value>
+                    </AttributeValuePair>
+                </SubConfiguration>
+
+                <SubConfiguration name="Google"
+                                  id="dashboardApp">
+                    <AttributeValuePair>
+                        <Attribute name="dashboardClassName"/>
+                        <Value>SAML2ApplicationClass</Value>
+                    </AttributeValuePair>
+                    <AttributeValuePair>
+                        <Attribute name="dashboardName"/>
+                        <Value>Google</Value>
+                    </AttributeValuePair>
+                    <AttributeValuePair>
+                        <Attribute name="dashboardDisplayName"/>
+                        <Value>Google</Value>
+                    </AttributeValuePair>
+                    <AttributeValuePair>
+                        <Attribute name="dashboardIcon"/>
+                        <Value>Google.gif</Value>
+                    </AttributeValuePair>
+                    <AttributeValuePair>
+                        <Attribute name="dashboardLogin"/>
+                        <Value>http://www.google.com</Value>
+                    </AttributeValuePair>
+                    <AttributeValuePair>
+                        <Attribute name="ICFIdentifier"/>
+                        <Value>idm magic 34</Value>
+                    </AttributeValuePair>
+                </SubConfiguration>
+
+                <SubConfiguration name="ZenDesk"
+                                  id="dashboardApp">
+                    <AttributeValuePair>
+                        <Attribute name="dashboardClassName"/>
+                        <Value>SAML2ApplicationClass</Value>
+                    </AttributeValuePair>
+                    <AttributeValuePair>
+                        <Attribute name="dashboardName"/>
+                        <Value>ZenDesk</Value>
+                    </AttributeValuePair>
+                    <AttributeValuePair>
+                        <Attribute name="dashboardDisplayName"/>
+                        <Value>ZenDesk</Value>
+                    </AttributeValuePair>
+                    <AttributeValuePair>
+                        <Attribute name="dashboardIcon"/>
+                        <Value>ZenDesk.gif</Value>
+                    </AttributeValuePair>
+                    <AttributeValuePair>
+                        <Attribute name="dashboardLogin"/>
+                        <Value>http://www.ZenDesk.com</Value>
+                    </AttributeValuePair>
+                    <AttributeValuePair>
+                        <Attribute name="ICFIdentifier"/>
+                        <Value>idm magic 56</Value>
+                    </AttributeValuePair>
+                </SubConfiguration>
+            </GlobalConfiguration>
+        </Configuration>
+    </Service>
+</ServicesConfiguration>
+

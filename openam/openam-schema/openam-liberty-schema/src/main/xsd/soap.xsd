@@ -1,0 +1,149 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!--
+   DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
+  
+   Copyright (c) 2006 Sun Microsystems Inc. All Rights Reserved
+  
+   The contents of this file are subject to the terms
+   of the Common Development and Distribution License
+   (the License). You may not use this file except in
+   compliance with the License.
+
+   You can obtain a copy of the License at
+   https://opensso.dev.java.net/public/CDDLv1.0.html or
+   opensso/legal/CDDLv1.0.txt
+   See the License for the specific language governing
+   permission and limitations under the License.
+
+   When distributing Covered Code, include this CDDL
+   Header Notice in each file and include the License file
+   at opensso/legal/CDDLv1.0.txt.
+   If applicable, add the following below the CDDL Header,
+   with the fields enclosed by brackets [] replaced by
+   your own identifying information:
+   "Portions Copyrighted [year] [name of copyright owner]"
+
+   $Id: soap.xsd,v 1.2 2008/06/25 05:48:42 qcheng Exp $
+
+-->
+
+
+
+<!-- Schema for the SOAP/1.1 envelope
+
+     This schema has been produced using W3C's SOAP Version 1.2 schema
+     found at:
+
+     http://www.w3.org/2001/06/soap-envelope
+
+     Copyright 2001 Martin Gudgin, Developmentor.
+
+     Changes made are the following:
+     - reverted namespace to http://schemas.xmlsoap.org/soap/envelope/
+     - reverted mustUnderstand to only allow 0 and 1 as lexical values
+	 - made encodingStyle a global attribute 20020825
+
+	 Further changes:
+
+	 - removed default value from mustUnderstand attribute declaration - 20030314
+
+     Original copyright:
+
+     Copyright 2001 W3C (Massachusetts Institute of Technology,
+     Institut National de Recherche en Informatique et en Automatique,
+     Keio University). All Rights Reserved.
+     http://www.w3.org/Consortium/Legal/
+
+     This document is governed by the W3C Software License [1] as
+     described in the FAQ [2].
+
+     [1] http://www.w3.org/Consortium/Legal/copyright-software-19980720
+     [2] http://www.w3.org/Consortium/Legal/IPR-FAQ-20000620.html#DTD
+-->
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema"
+           xmlns:tns="http://schemas.xmlsoap.org/soap/envelope/"
+           xmlns:jxb="http://java.sun.com/xml/ns/jaxb"
+           targetNamespace="http://schemas.xmlsoap.org/soap/envelope/"
+           jxb:version="1.0" >
+
+  <!-- Envelope, header and body -->
+  <xs:element name="Envelope" type="tns:EnvelopeType" />
+  <xs:complexType name="EnvelopeType" >
+    <xs:sequence>
+      <xs:element ref="tns:Header" minOccurs="0" />
+      <xs:element ref="tns:Body" minOccurs="1" />
+      <xs:any namespace="##other" minOccurs="0" maxOccurs="unbounded" processContents="lax" />
+    </xs:sequence>
+    <xs:anyAttribute namespace="##other" processContents="lax" />
+  </xs:complexType>
+
+  <xs:element name="Header" type="tns:HeaderType" />
+  <xs:complexType name="HeaderType" >
+    <xs:sequence>
+      <xs:any namespace="##other" minOccurs="0" maxOccurs="unbounded" processContents="lax" />
+    </xs:sequence>
+    <xs:anyAttribute namespace="##other" processContents="lax" />
+  </xs:complexType>
+
+  <xs:element name="Body" type="tns:BodyType" />
+  <xs:complexType name="BodyType" >
+    <xs:sequence>
+      <xs:any namespace="##any" minOccurs="0" maxOccurs="unbounded" processContents="lax" />
+    </xs:sequence>
+    <xs:anyAttribute namespace="##any" processContents="lax" >
+	  <xs:annotation>
+	    <xs:documentation>
+		  Prose in the spec does not specify that attributes are allowed on the Body element
+		</xs:documentation>
+	  </xs:annotation>
+	</xs:anyAttribute>
+  </xs:complexType>
+
+
+  <!-- Global Attributes.  The following attributes are intended to be usable via qualified attribute names on any complex type referencing them.  -->
+  <xs:attribute name="mustUnderstand" >
+     <xs:simpleType>
+     <xs:restriction base='xs:boolean'>
+	   <xs:pattern value='0|1' />
+	 </xs:restriction>
+   </xs:simpleType>
+  </xs:attribute>
+  <xs:attribute name="actor" type="xs:anyURI" />
+
+  <xs:simpleType name="encodingStyle" >
+    <xs:annotation>
+	  <xs:documentation>
+	    'encodingStyle' indicates any canonicalization conventions followed in the contents of the containing element.  For example, the value 'http://schemas.xmlsoap.org/soap/encoding/' indicates the pattern described in SOAP specification
+	  </xs:documentation>
+	</xs:annotation>
+    <xs:list itemType="xs:anyURI" />
+  </xs:simpleType>
+
+  <xs:attribute name="encodingStyle" type="tns:encodingStyle" />
+  <xs:attributeGroup name="encodingStyle" >
+    <xs:attribute ref="tns:encodingStyle" />
+  </xs:attributeGroup>
+
+  <xs:element name="Fault" type="tns:FaultType" />
+  <xs:complexType name="FaultType" final="extension" >
+    <xs:annotation>
+	  <xs:documentation>
+	    Fault reporting structure
+	  </xs:documentation>
+	</xs:annotation>
+    <xs:sequence>
+      <xs:element name="faultcode" type="xs:QName" />
+      <xs:element name="faultstring" type="xs:string" />
+      <xs:element name="faultactor" type="xs:anyURI" minOccurs="0" />
+      <xs:element name="detail" type="tns:detail" minOccurs="0" />
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="detail">
+    <xs:sequence>
+      <xs:any namespace="##any" minOccurs="0" maxOccurs="unbounded" processContents="lax" />
+    </xs:sequence>
+    <xs:anyAttribute namespace="##any" processContents="lax" />
+  </xs:complexType>
+
+</xs:schema>

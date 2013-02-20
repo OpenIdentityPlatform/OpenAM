@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xacml3:Policy xmlns:xacml3="urn:oasis:names:tc:xacml:3.0:core:schema:wd-17" PolicyId="http://axiomatics.com/alfa/identifier/infosharing.BH_Consent_Directive" RuleCombiningAlgId="urn:oasis:names:tc:xacml:3.0:rule-combining-algorithm:deny-overrides" Version="1.0" xmlns="urn:oasis:names:tc:xacml:3.0:core:schema:wd-17" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="urn:oasis:names:tc:xacml:3.0:core:schema:wd-17 xacml-core-v3-schema-wd-17.xsd">
+	<xacml3:Description/>
+	<xacml3:PolicyDefaults>
+		<xacml3:XPathVersion>http://www.w3.org/TR/1999/REC-xpath-19991116</xacml3:XPathVersion>
+	</xacml3:PolicyDefaults>
+	<xacml3:Target/>
+	<xacml3:Rule Effect="Deny" RuleId="http://axiomatics.com/alfa/identifier/infosharing.BH_Consent_Directive.Qualify_Requestor">
+		<xacml3:Description>XACML 3.0 rendition of the Behavioral Health Patient Consent Directive
+        conformant with 42 CFR Part 2, Part 2 ?2.31</xacml3:Description>
+		<xacml3:Target/>
+		<xacml3:Condition>
+			<xacml3:Apply FunctionId="urn:oasis:names:tc:xacml:1.0:function:and">
+				<xacml3:Apply FunctionId="urn:oasis:names:tc:xacml:1.0:function:integer-greater-than">
+					<xacml3:Apply FunctionId="urn:oasis:names:tc:xacml:1.0:function:string-bag-size">
+						<xacml3:AttributeDesignator AttributeId="urn:oasis:names:tc:xspa:1.0:resource:patient:allowed-organizations" DataType="http://www.w3.org/2001/XMLSchema#string" Category="urn:oasis:names:tc:xacml:3.0:attribute-category:resource" MustBePresent="false"/>
+					</xacml3:Apply>
+					<xacml3:AttributeValue DataType="http://www.w3.org/2001/XMLSchema#integer">0</xacml3:AttributeValue>
+				</xacml3:Apply>
+				<xacml3:Apply FunctionId="urn:oasis:names:tc:xacml:1.0:function:boolean-equal">
+					<xacml3:Apply FunctionId="urn:oasis:names:tc:xacml:1.0:function:string-subset">
+						<xacml3:AttributeDesignator AttributeId="urn:oasis:names:tc:xspa:1.0:subject:organization" DataType="http://www.w3.org/2001/XMLSchema#string" Category="urn:oasis:names:tc:xacml:1.0:subject-category:access-subject" MustBePresent="false"/>
+						<xacml3:AttributeDesignator AttributeId="urn:oasis:names:tc:xspa:1.0:resource:patient:allowed-organizations" DataType="http://www.w3.org/2001/XMLSchema#string" Category="urn:oasis:names:tc:xacml:3.0:attribute-category:resource" MustBePresent="false"/>
+					</xacml3:Apply>
+					<xacml3:AttributeValue DataType="http://www.w3.org/2001/XMLSchema#boolean">false</xacml3:AttributeValue>
+				</xacml3:Apply>
+			</xacml3:Apply>
+		</xacml3:Condition>
+	</xacml3:Rule>
+	<xacml3:Rule Effect="Permit" RuleId="http://axiomatics.com/alfa/identifier/infosharing.BH_Consent_Directive.Match_Purpose">
+		<xacml3:Description/>
+		<xacml3:Target/>
+		<xacml3:Condition>
+			<xacml3:Apply FunctionId="urn:oasis:names:tc:xacml:1.0:function:and">
+				<xacml3:Apply FunctionId="urn:oasis:names:tc:xacml:1.0:function:integer-greater-than">
+					<xacml3:Apply FunctionId="urn:oasis:names:tc:xacml:1.0:function:string-bag-size">
+						<xacml3:AttributeDesignator AttributeId="urn:oasis:names:tc:xacml:2.0:resource:purpose" DataType="http://www.w3.org/2001/XMLSchema#string" Category="urn:oasis:names:tc:xacml:3.0:attribute-category:resource" MustBePresent="false"/>
+					</xacml3:Apply>
+					<xacml3:AttributeValue DataType="http://www.w3.org/2001/XMLSchema#integer">0</xacml3:AttributeValue>
+				</xacml3:Apply>
+				<xacml3:Apply FunctionId="urn:oasis:names:tc:xacml:1.0:function:any-of-any">
+					<xacml3:Function FunctionId="urn:oasis:names:tc:xacml:1.0:function:string-equal"/>
+					<xacml3:AttributeDesignator AttributeId="urn:oasis:names:tc:xacml:2.0:resource:purpose" DataType="http://www.w3.org/2001/XMLSchema#string" Category="urn:oasis:names:tc:xacml:3.0:attribute-category:resource" MustBePresent="false"/>
+					<xacml3:AttributeDesignator AttributeId="urn:oasis:names:tc:xacml:2.0:action:purpose" DataType="http://www.w3.org/2001/XMLSchema#string" Category="urn:oasis:names:tc:xacml:3.0:attribute-category:action" MustBePresent="false"/>
+				</xacml3:Apply>
+			</xacml3:Apply>
+		</xacml3:Condition>
+	</xacml3:Rule>
+	<xacml3:Rule Effect="Permit" RuleId="http://axiomatics.com/alfa/identifier/infosharing.BH_Consent_Directive.Check_Expiration">
+		<xacml3:Description/>
+		<xacml3:Target/>
+		<xacml3:Condition>
+			<xacml3:Apply FunctionId="urn:oasis:names:tc:xacml:1.0:function:and">
+				<xacml3:Apply FunctionId="urn:oasis:names:tc:xacml:1.0:function:integer-greater-than">
+					<xacml3:Apply FunctionId="urn:oasis:names:tc:xacml:1.0:function:date-bag-size">
+						<xacml3:AttributeDesignator AttributeId="urn:oasis:names:tc:xacml:1.0:environment:current-date" DataType="http://www.w3.org/2001/XMLSchema#date" Category="urn:oasis:names:tc:xacml:3.0:attribute-category:environment" MustBePresent="false"/>
+					</xacml3:Apply>
+					<xacml3:AttributeValue DataType="http://www.w3.org/2001/XMLSchema#integer">0</xacml3:AttributeValue>
+				</xacml3:Apply>
+				<xacml3:Apply FunctionId="urn:oasis:names:tc:xacml:1.0:function:any-of-any">
+					<xacml3:Function FunctionId="urn:oasis:names:tc:xacml:1.0:function:date-less-than"/>
+					<xacml3:AttributeDesignator AttributeId="urn:oasis:names:tc:xacml:1.0:environment:current-date" DataType="http://www.w3.org/2001/XMLSchema#date" Category="urn:oasis:names:tc:xacml:3.0:attribute-category:environment" MustBePresent="false"/>
+					<xacml3:AttributeDesignator AttributeId="" DataType="http://www.w3.org/2001/XMLSchema#date" Category="urn:oasis:names:tc:xacml:3.0:attribute-category:resource" MustBePresent="false"/>
+				</xacml3:Apply>
+			</xacml3:Apply>
+		</xacml3:Condition>
+	</xacml3:Rule>
+</xacml3:Policy>
+

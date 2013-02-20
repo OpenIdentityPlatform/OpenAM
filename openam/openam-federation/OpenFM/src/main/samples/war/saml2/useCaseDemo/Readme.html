@@ -1,0 +1,259 @@
+<!--
+   DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
+  
+   Copyright (c) 2006 Sun Microsystems Inc. All Rights Reserved
+  
+   The contents of this file are subject to the terms
+   of the Common Development and Distribution License
+   (the License). You may not use this file except in
+   compliance with the License.
+
+
+   You can obtain a copy of the License at
+   https://opensso.dev.java.net/public/CDDLv1.0.html or
+   opensso/legal/CDDLv1.0.txt
+   See the License for the specific language governing
+   permission and limitations under the License.
+
+
+   When distributing Covered Code, include this CDDL
+   Header Notice in each file and include the License file
+   at opensso/legal/CDDLv1.0.txt.
+   If applicable, add the following below the CDDL Header,
+   with the fields enclosed by brackets [] replaced by
+   your own identifying information:
+   "Portions Copyrighted [year] [name of copyright owner]"
+
+   $Id: Readme.html,v 1.7 2009/08/01 00:21:52 sean_brydon Exp $
+
+-->
+
+<html>
+<head>
+<title>Setting up SAMLv2 sample useCaseDemo</title>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
+<link rel="stylesheet" type="text/css" href="../../../com_sun_web_ui/css/css_ns6up.css" />
+</head>
+<body class="DefBdy">
+
+<div class="MstDiv"><table width="100%" border="0" cellpadding="0" cellspacing="0" class="MstTblTop" title="">
+<tbody><tr>
+<td nowrap="nowrap">&nbsp;</td>
+<td nowrap="nowrap">&nbsp;</td>
+</tr></tbody></table>
+
+<table width="100%" border="0" cellpadding="0" cellspacing="0" class="MstTblBot" title="">
+<tbody><tr>
+<td class="MstTdTtl" width="99%">
+<div class="MstDivTtl"><img name="ProdName" src="../../../console/images/PrimaryProductName.png" alt="" /></div></td><td class="MstTdLogo" width="1%"><img name="RMRealm.mhCommon.BrandLogo" src="../../../com_sun_web_ui/images/other/javalogo.gif" alt="Java(TM) Logo" border="0" height="55" width="31" /></td></tr></tbody></table>
+<table class="MstTblEnd" border="0" cellpadding="0" cellspacing="0" width="100%"><tbody><tr><td><img name="RMRealm.mhCommon.EndorserLogo" src="../../../com_sun_web_ui/images/masthead/masthead-sunname.gif" alt="Sun(TM) Microsystems, Inc." align="right" border="0" height="10" width="108" /></td></tr></tbody></table></div><div class="SkpMedGry1"><a name="SkipAnchor2089" id="SkipAnchor2089"></a></div>
+<div class="SkpMedGry1"><a href="#SkipAnchor4928"><img src="../../../com_sun_web_ui/images/other/dot.gif" alt="Jump Over Tab Navigation Area. Current Selection is: Access Control" border="0" height="1" width="1" /></a></div>
+
+<body>
+<h1 style="text-align: center;">SAMLv2 sample useCaseDemo</h1>
+<h2>Introduction</h2>
+<br>
+<p>
+This sample illustrates the following use cases in&nbsp; a
+circle
+of trust having one Identity Provider(IDP, title shown as <span
+ style="font-weight: bold;">GreatAir</span> in sample pages,) and one
+Service
+Provider(SP, title shown as <span style="font-weight: bold;">BestCars</span>
+in sample pages).<br>
+<br>
+<ul>
+  <li>IDP initiated Single Sign On<br>
+  </li>
+  <li>SP initiated Single Sign On<br>
+  </li>
+  <li>IDP initiated Single Log out</li>
+  <li>SP initiated Single Log out</li>
+  <li>IDP initiated Federation</li>
+  <li>SP initiated Federation</li>
+  <li>IDP initiated Federation Termination</li>
+  <li>SP initiated Federation Termination</li>
+</ul>
+<br>
+
+<h2>Trying sample use cases</h2>
+<br>
+This document assumes OpenAM SAMLv2 Identity Provider is configured&nbsp; at
+http://idp-host:idp-port/idp-deploy-uri
+and Service Provider is configured at&nbsp;
+http://sp-host:sp-port/sp-deploy-uri.
+Please correct the URLs used in the following text to reflect
+your&nbsp;
+installation URLs.&nbsp; 
+<br>
+<br>
+<h3>IDP initiated SSO and SLO</h3>
+<br>
+<ul>
+  <li>Point your browser at
+<a class="named" href="home.jsp">http://idp-host:idp-port/idp-deploy-uri/samples/saml2/useCaseDemo/home.jsp</a>
+(useCaseDemo home page at IDP).</li>
+  <li>Click on link&nbsp; " Reserve Car with our associate,
+BestCars".&nbsp; You would be prompted by IDP to login.</li>
+  <li>Login to IDP using  the following credentials :
+  <ol>
+   User Name : demo<br>
+   Password : changeit</br>
+  </ol>
+  </li>
+  <li>On successful login at IDP, IDP would initiate Single Sign On and
+redirect
+you to SP.</li>
+  <li>SP would prompt you to login locally if you have&nbsp; not yet
+federated
+accounts at IDP and SP.</li>
+  <li>If prompted for login at SP use the following credentials :
+  <ol>
+   User Name : demo<br>
+   Password : changeit</br>
+  </ol>
+  </li>
+  <li>SP would then automatically log you in based on the Assertion
+from
+IDP and you would be shown a protected application page by SP.&nbsp;
+This completes IDP initiated Single Sign On and Federation.</li>
+  <li>Click on&nbsp; the link&nbsp; "BestCars(SP: &lt;sp1&gt;)
+Home".&nbsp; You would be taken to
+http://sp-host:sp-port/sp-deploy-uri/samples/saml2/useCaseDemo/home.jsp&nbsp;
+(useCaseDemo&nbsp; home page at SP). You would see links allowing you
+to
+Logout,&nbsp; Defederate and a link to take you to home page of
+useCaseDemo
+at IDP.</li>
+  <li>Click on the link&nbsp; " GreatAir(IDP: idp1) Sample Home"</li>
+  <li>Your browser would show useCaseDemo sample home page at IDP.</li>
+  <li>Click on "SAMLv2 Logout" link. IDP&nbsp; would&nbsp; initiate a Single
+Log
+Out&nbsp; and&nbsp; log you out of SP and IDP.&nbsp;&nbsp; You could
+verify
+that you are logged out by visiting useCaseDemo sample page at IDP and
+SP.
+The pages would show you "Login" links.</li>
+</ul>
+<br>
+<h3>SP initiated SSO and SLO</h3>
+<br>
+<ul>
+  <li>Point your browser at
+<a class="named" href="home.jsp">http://sp-host:sp-port/sp-deploy-uri/samples/saml2/useCaseDemo/home.jsp</a>
+&nbsp;
+(useCaseDemo&nbsp; home page at SP).</li>
+  <li>Click on link&nbsp; "Reserve Car with us". The link&nbsp; is for
+a&nbsp;
+protected application&nbsp; page that requires SAMLv2 authentication. SP would
+initiate a Single Sing On Request. </li>
+  <li>IDP would prompt you to authenticate.</li>
+  <li>SP would prompt you to login locally if you have&nbsp; not yet
+federated
+accounts at IDP and SP.</li>
+  <li>SP would then automatically log you in based on the Assertion
+from
+IDP and you would be shown the protected application page by SP.</li>
+  <li>This completes SP initiated Single Sign On and Federation.</li>
+  <li>Click on&nbsp; the link&nbsp; "BestCars(SP: &lt;sp1&gt;)
+Home".&nbsp; You would be taken to
+http://sp-host:sp-port/sp-deploy-uri/samples/saml2/useCaseDemo/home.jsp&nbsp;
+(useCaseDemo&nbsp; home page at SP).</li>
+  <li>You would see links allowing you to Logout,&nbsp; Defederate and
+a
+link to take you to home page of useCaseDemo at IDP.</li>
+  <li>Click on "SAMLv2 Logout" link. SP&nbsp; would&nbsp; initiate a Single
+Log
+Out&nbsp; and&nbsp; log you out SP and IDP.&nbsp;&nbsp; You could
+verify
+that you are logged out by visiting useCaseDemo home page at IDP and
+SP.
+The pages would show you "Login" links.</li>
+</ul>
+<br>
+<h3>IDP Initiated Federation and Defederation</h3>
+<br>
+<ul>
+  <li>Point your browser at
+<a class="named" href="home.jsp">http://idp-host:idp-port/idp-deploy-uri/samples/saml2/useCaseDemo/home.jsp</a>
+(useCaseDemo&nbsp; home page at IDP).</li>
+  <li>Click on the link "Local Login". IDP would prompt you for local login.
+On&nbsp;
+completion of login, IDP would show you useCaseDemo home page at IDP.<br>
+  </li>
+  <li>If you have already federated with SP, the page would show the
+link.
+"Terminate Federation with BestCars". Click on the link.</li>
+  <li>IDP would initiate a defederate request. On&nbsp; completion of
+    defederation, you would be shown the useCaseDemo sample home page at
+    IDP. You would be shown a link " Federate with BestCars".
+  </li>
+  <li>You can verify that you are really defederated by visiting useCaseDemo
+  home page at SP. Click on&nbsp; the link&nbsp; 
+  "BestCars(SP: &lt;sp1&gt;) Home".&nbsp; You would be taken to
+http://sp-host:sp-port/sp-deploy-uri/samples/saml2/useCaseDemo/home.jsp&nbsp;
+(useCaseDemo&nbsp; home page at SP).
+  </li>
+  <li>
+   Click the link "Local Login" of the SP gome page and login as the user demo 
+   again. Note, make sure you click the local login link and not the SAMLv2 
+   login link. If you click the SAMLv2 login link it would cause you to 
+   federate so you could not verify your previous defederation. 
+   Now that you are locally logged in to the SP, the SP should would show you 
+   the link to Federate with GreatAir.
+  </li>
+  <li>Click the "Local Logout" link on the SP home page. This does a local 
+  logout at the SP and not a SAMLv2 Single Log Out.
+  </li>  
+  <li>Now go back to the IDP home page. Point your browser at
+<a class="named" href="home.jsp">http://idp-host:idp-port/idp-deploy-uri/samples/saml2/useCaseDemo/home.jsp</a>
+(useCaseDemo&nbsp; home page at IDP).</li>
+  <li>Click on&nbsp; link " Federate with BestCars"</li>
+  <li>IDP would initiate Single Sign On and Federate request. On
+completion of federation, you would be shown useCaseDemo sample home page at IDP
+again. You would be shown a link&nbsp; " Terminate Federation with BestCars".
+You can verify that you are really federated by visiting useCaseDemo&nbsp;
+home page at SP. SP&nbsp;&nbsp; would show you the Terminate Federation with
+GreatAir.</li>
+  <li>Click the "SAMLv2 Logout" link. On completion of Single Sign Out,
+ the useCaseDemo sample home page would be shown again.</li>
+</ul>
+<h3>SP Initiated Federation and Defederation</h3>
+<ul>
+  <li>Point your browser at
+<a class="named" href="home.jsp">http://sp-host:sp-port/sp-deploy-uri/samples/saml2/useCaseDemo/home.jsp</a>
+(useCaseDemo sample home page at SP).</li>
+  <li>Click on the link&nbsp; " SAMLv2 Login through IDP, secure service provided by GreatAir"
+  </li>
+  <li>SP would initiate Single Sign On. On completion of Single Sign
+On,&nbsp;
+useCaseDemo sample home page would be shown again at SP.<br>
+  </li>
+  <li>Click on the link " Terminate Federation with GreatAir".&nbsp;
+SP
+would initiate a defederate request. On&nbsp; completion of
+defederation, you would be shown the useCaseDemo sample home page at
+SP. You would be shown
+a link " Federate with GreatAir".&nbsp; You can verify that you are
+really
+defederated by visiting useCaseDemo sample home page at IDP. IDP&nbsp;
+would
+show you Federate with BestCars.</li>
+  <li>Point your browser at
+<a class="named" href="home.jsp">http://sp-host:sp-port/sp-deploy-uri/samples/saml2/useCaseDemo/home.jsp</a>
+(useCaseDemo&nbsp; home page at SP).</li>
+  <li>Click on the link "Federate with GreatAir".</li>
+  <li>SP would initiate Single Sign On and Federate request. On
+completion
+of federation, you would be shown useCaseDemo sample home page at SP
+again.
+You would be shown a link&nbsp; " Terminate Federation with GreatAir".
+You
+can verify that you are really federated by visiting useCaseDemo&nbsp;
+home
+page at IDP. IDP&nbsp;&nbsp; would show you Terminate Federation with
+BestCars.</li>
+</ul>
+<br>
+</body>
+</html>

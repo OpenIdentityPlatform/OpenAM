@@ -1,0 +1,2 @@
+org.forgerock.restlet.ext.oauth2.consumer.BearerAuthenticatorHelper
+org.forgerock.restlet.ext.oauth2.consumer.MACAuthenticatorHelper

@@ -1,0 +1,93 @@
+Version 0.3.6.2
+January 3 2011
+================================================================
+
+* Let Pie charts support tooltips.
+
+* Add an 'orientation' option to data_from_table() that takes
+  'auto', 'rows' or 'cols'.
+
+* Add options to data_from_table() to exclude certain rows or
+  columns, based on title or DOM class.
+
+* Provide an event handler interface for when the user clicks
+  on tooltips.
+
+* Add a set_background() method to configure the background
+  without changing the whole theme.
+
+* Fix axis data-range bug in SideBar, respecting the minimum
+  value if set by the user.
+
+* Apply bar_spacing correctly to SideBar graphs.
+
+
+Version 0.3.6.1
+July 25 2010
+================================================================
+
+* Allow Mini.* to have their legends rendered on the right hand
+  side using the legend_position option.
+
+* Fix bugs with drawing full circles in pie and line graphs.
+
+* Stop colours being repeated prematurely.
+
+
+Version 0.3.6
+September 14 2009
+================================================================
+
+* Tooltips are now available on line and bar graphs. Thanks
+  to CrimsonJet, makers of Appstatz.com, for sponsoring this
+  feature's development.
+
+* New graph type ported from Gruff: Bluff.Dot.
+
+* New options available: title_margin, legend_margin, dot_radius,
+  line_width, bar_spacing, hide_labels_less_than.
+
+* JS.Class updated to 2.1.
+
+* Improved handling of data labels; values are truncated to
+  a few significant decimal places and formatted with thousand
+  delimiters.
+
+* TableReader handles non-numeric/empty cells more elegantly.
+
+* Fixes text rendering bugs relating to font weighting and
+  automatic size detection.
+
+* Allows plotting to proceed if all data is zero.
+
+
+Version 0.3.4.2
+October 27 2008
+================================================================
+
+* Fixes bug caused in normalization methods triggered by zero
+  values given to Base#data().
+
+
+Version 0.3.4.1
+October 1 2008
+================================================================
+
+* Upgrades JS.Class to 2.0.2.
+
+* Text nodes are now rendered inside a div that wraps the canvas
+  instead of just inside the <body> element. This improves
+  behaviour with respect to page zooming and relative positioning.
+
+* Fixes bugs in label rounding and zero-value handling.
+
+
+Version 0.3.4
+September 15 2008
+================================================================
+
+* Initial release, based on Gruff 0.3.4. Includes AccumulatorBar,
+  Area, Bar, Line, Net, Pie, SideBar, SideStackedBar, Spider,
+  StackedArea, StackedBar, Mini.Bar, Mini.Pie and Mini.SideBar,
+  plus ability to pull data from HTML tables.
+

@@ -1,0 +1,8 @@
+LIBRARY amiis6auth
+
+DESCRIPTION 'ISAPI Authentication Filter for IIS6 Agent  '
+
+EXPORTS
+    HttpFilterProc
+    GetFilterVersion
+    
