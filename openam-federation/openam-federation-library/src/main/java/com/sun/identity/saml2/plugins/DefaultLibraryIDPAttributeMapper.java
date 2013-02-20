@@ -25,6 +25,10 @@
  * $Id: DefaultLibraryIDPAttributeMapper.java,v 1.3 2009/11/30 21:11:08 exu Exp $
  */
 
+/**
+ * Portions Copyrighted 2013 ForgeRock, Inc.
+ */
+
 package com.sun.identity.saml2.plugins;
 
 import java.util.List;
@@ -52,9 +56,44 @@ import com.sun.identity.saml2.assertion.Attribute;
  * in the hosted IDP configuration and construct the SAML
  * <code>Attribute</code> objects. If the mapped values are not present in
  * the data store, this will try to read from the Single sign-on token.
+ * <p>
+ * Supports attribute mappings defined as:
+ *
+ * [NameFormatURI|]SAML ATTRIBUTE NAME=["]LOCAL NAME["]
+ *
+ * where [] elements are optional.
+ *
+ * Using "" (double quotes) around the LOCAL NAME will turn it into a static value.
+ * <p>
+ * Examples:
+ * <p>
+ * <code>
+ * email=mail
+ * </code>
+ * will map the local attribute called mail onto a SAML attribute called email.
+ * <p>
+ * <code>
+ * urn:oasis:names:tc:SAML:2.0:attrname-format:uri|urn:mace:dir:attribute-def:cn=cn
+ * </code>
+ * will map the local attribute called cn onto a SAML attribute called
+ * urn:mace:dir:attribute-def:cn with a name format of urn:oasis:names:tc:SAML:2.0:attrname-format:uri
+ * <p>
+ * <code>
+ * partnerID="staticPartnerIDValue"
+ * </code>
+ * will add a static SAML attribute called partnerID with a value of staticPartnerIDValue
+ * <p>
+ * <code>
+ * urn:oasis:names:tc:SAML:2.0:attrname-format:uri|nameID="staticNameIDValue"
+ * </code>
+ * will add a static SAML attribute called nameID with a value of staticNameIDValue
+ * with a name format of urn:oasis:names:tc:SAML:2.0:attrname-format:uri
+ *
  */
 public class DefaultLibraryIDPAttributeMapper extends DefaultAttributeMapper 
     implements IDPAttributeMapper {
+
+    private static final String STATIC_QUOTE = "\"";
 
     /**
      * Constructor
@@ -143,7 +182,7 @@ public class DefaultLibraryIDPAttributeMapper extends DefaultAttributeMapper
                 String localAttribute = (String)configMap.get(samlAttribute);
                 String nameFormat = null;
                 // if samlAttribute has format nameFormat|samlAttribute
-                StringTokenizer tokenizer = 
+                StringTokenizer tokenizer =
                     new StringTokenizer(samlAttribute, "|");
                 if (tokenizer.countTokens() > 1) {
                     nameFormat = tokenizer.nextToken();
@@ -151,17 +190,32 @@ public class DefaultLibraryIDPAttributeMapper extends DefaultAttributeMapper
                 }
                 String[] localAttributeValues = null;
                 if ((valueMap != null) && (!valueMap.isEmpty())) {
-                    Set values = (Set)valueMap.get(localAttribute); 
-                    if ((values == null) || (values.isEmpty())) {
+                    if (localAttribute.startsWith(STATIC_QUOTE) && localAttribute.endsWith(STATIC_QUOTE)) {
+                        // Treat the localAttribute as a static value
+                        // The localAttribute is enclosed in quotes so remove them before using it as the value
+                        localAttribute = localAttribute.substring(STATIC_QUOTE.length(),
+                                localAttribute.length() - STATIC_QUOTE.length());
+                        // The localAttribute becomes the static value
+                        localAttributeValues = new String[]{localAttribute};
                         if (debug.messageEnabled()) {
                             debug.message("DefaultLibraryIDPAttributeMapper." +
-                                "getAttribute: user profile does not have " +
-                                "value for " + localAttribute +
-                                " but is going to check ssotoken:");
+                                    "getAttribute: adding static " +
+                                    "value " + localAttribute +
+                                    " for attribute named " + samlAttribute);
                         }
                     } else {
-                        localAttributeValues = (String[])values.toArray(
-                            new String[values.size()]);
+                        Set values = (Set)valueMap.get(localAttribute);
+                        if ((values == null) || (values.isEmpty())) {
+                            if (debug.messageEnabled()) {
+                                debug.message("DefaultLibraryIDPAttributeMapper." +
+                                    "getAttribute: user profile does not have " +
+                                    "value for " + localAttribute +
+                                    " but is going to check ssotoken:");
+                            }
+                        } else {
+                            localAttributeValues = (String[])values.toArray(
+                                new String[values.size()]);
+                        }
                     }
                 } 
                 if (localAttributeValues == null) {
