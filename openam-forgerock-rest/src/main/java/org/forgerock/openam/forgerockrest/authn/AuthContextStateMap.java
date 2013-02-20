@@ -16,12 +16,19 @@
 
 package org.forgerock.openam.forgerockrest.authn;
 
+import com.iplanet.dpro.session.Session;
+import com.iplanet.dpro.session.SessionEvent;
+import com.iplanet.dpro.session.SessionException;
+import com.iplanet.dpro.session.SessionID;
+import com.iplanet.dpro.session.SessionListener;
 import com.sun.identity.authentication.AuthContext;
+import org.forgerock.openam.forgerockrest.authn.exceptions.RestAuthException;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
+import javax.ws.rs.core.Response;
+import java.util.HashMap;
 import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * A persistent store for AuthContext instance that are being used in multi-step authentication requests.
@@ -32,9 +39,10 @@ import java.util.concurrent.ConcurrentHashMap;
  * The AuthContext map should regularly cleared of old authentication requests which are no longer valid.
  */
 @Singleton
-public class AuthContextStateMap {
+public class AuthContextStateMap implements SessionListener {
 
-    private Map<String, AuthContext> authContexts = new ConcurrentHashMap<String, AuthContext>();
+    private Map<String, AuthContext> authContexts = new HashMap<String, AuthContext>();
+    private Map<String, String> sessionIdAuthIdMap = new HashMap<String, String>();
 
     /**
      * Singleton approach by using a static inner class.
@@ -67,8 +75,34 @@ public class AuthContextStateMap {
      * @param authId The identifier which is to be used to store the AuthContext for the login request.
      * @param authContext The AuthContext instance for the login process.
      */
-    public void addAuthContext(String authId, AuthContext authContext) {
+    public synchronized void addAuthContext(String authId, AuthContext authContext) {
         authContexts.put(authId, authContext);
+        String authContextId = authContext.getAuthIdentifier();
+        sessionIdAuthIdMap.put(authContextId, authId);
+        try {
+            Session.getSession(new SessionID(authContextId)).addSessionListener(this, true);
+        } catch (SessionException e) {
+            throw new RestAuthException(Response.Status.INTERNAL_SERVER_ERROR, "Could not add SessionListener to "
+                    + "AuthContext Session", e);
+        }
+    }
+
+    /**
+     * When the Internal Session gets destroyed, idle timeout or max timeout occurs then the associated AuthContext
+     * will be removed from the Map.
+     *
+     * @param evt The session event object.
+     */
+    @Override
+    public synchronized void sessionChanged(SessionEvent evt) {
+        switch (evt.getType()) {
+            case SessionEvent.DESTROY:
+            case SessionEvent.IDLE_TIMEOUT:
+            case SessionEvent.MAX_TIMEOUT: {
+                String authId = sessionIdAuthIdMap.remove(evt.getSession().getID().toString());
+                authContexts.remove(authId);
+            }
+        }
     }
 
     /**
@@ -77,7 +111,7 @@ public class AuthContextStateMap {
      * @param authId The identifier which was used to store the AuthContext for the login request.
      * @return The AuthContext.
      */
-    public AuthContext getAuthContext(String authId) {
+    public synchronized AuthContext getAuthContext(String authId) {
         return authContexts.get(authId);
     }
 }

@@ -27,7 +27,7 @@
  */
 
 /*
- * Portions Copyrighted 2010-2012 ForgeRock Inc
+ * Portions Copyrighted 2010-2013 ForgeRock Inc
  */
 
 package com.iplanet.dpro.session;
@@ -282,7 +282,7 @@ public class Session extends GeneralTaskRunnable {
     /**
      * The session table indexed by Session ID objects.
      */
-    private static Hashtable sessionTable = new Hashtable();
+    private static Hashtable<SessionID, Session> sessionTable = new Hashtable<SessionID, Session>();
 
     /**
      * The session service URL table indexed by server address contained in the
@@ -1064,15 +1064,27 @@ public class Session extends GeneralTaskRunnable {
      * @param listener Session Listener object.
      * @exception SessionException if the session state is not valid.
      */
-    public void addSessionListener(SessionListener listener)
-    throws SessionException {
-        if (sessionState != Session.VALID) {
-            throw new SessionException(SessionBundle.rbName,
-                    "invalidSessionState", null);
-        }
-        
-        sessionEventListeners.add(listener);
+    public void addSessionListener(SessionListener listener) throws SessionException {
+        addSessionListener(listener, false);
     }
+
+    /**
+     * Adds a session listener for session change events.
+     *
+     * @param listener Session Listener object.
+     * @param force whether to ignore whether a Session is in the Invalid state. If false will throw an exception if
+     *              the Session is Invalid.
+     * @exception SessionException if the session state is not valid.
+     */
+    public void addSessionListener(SessionListener listener, boolean force) throws SessionException {
+
+        if (!force && sessionState != Session.VALID) {
+        throw new SessionException(SessionBundle.rbName,
+                "invalidSessionState", null);
+    }
+
+    sessionEventListeners.add(listener);
+}
 
     /**
      * Returns a session based on a Session ID object.
@@ -1085,12 +1097,28 @@ public class Session extends GeneralTaskRunnable {
      *         communication with session service.
      */
     public static Session getSession(SessionID sid) throws SessionException {
-        if (sid.toString() == null || sid.toString().length() == 0) {
+        return getSession(sid, false);
+    }
+
+    /**
+     * Returns a Session based on a Session ID object.
+     *
+     * @param sessionID The Session Id.
+     * @param allowInvalidSessions Whether to allow invalid Sessions to be returned.
+     * @return A Session object.
+     * @throws SessionException If the Session ID object does not contain a
+     *         valid session string, or the session string was valid before
+     *         but has been destroyed, or there was an error during
+     *         communication with session service.
+     */
+    public static Session getSession(SessionID sessionID, boolean allowInvalidSessions) throws SessionException {
+
+        if (sessionID.toString() == null || sessionID.toString().length() == 0) {
             throw new SessionException(SessionBundle.rbName,
                     "invalidSessionID", null);
         }
 
-        Session session = (Session) sessionTable.get(sid);
+        Session session = sessionTable.get(sessionID);
         if (session != null) {
             TokenRestriction restriction = session.getRestriction();
                     /*
@@ -1100,18 +1128,16 @@ public class Session extends GeneralTaskRunnable {
                      * from this agent token id. Now, the restriction context
                      * required for session creation is null, so we added it
                      * to get the agent session created.*/
-            
+
             try {
                 if (isServerMode()) {
-                    if ((restriction != null) 
-                        && !restriction.isSatisfied(
+                    if ((restriction != null)
+                            && !restriction.isSatisfied(
                             RestrictedTokenContext.getCurrent())) {
                         throw new SessionException(SessionBundle.rbName,
-                                        "restrictionViolation", null);
+                                "restrictionViolation", null);
                     }
                 }
-            } catch (SessionException se) {
-                throw se;
             } catch (Exception e) {
                 throw new SessionException(e);
             }
@@ -1120,11 +1146,15 @@ public class Session extends GeneralTaskRunnable {
             }
             return session;
         }
-        session = new Session(sid);
-        session.refresh(true);
+
+        session = new Session(sessionID);
+
+        if (!allowInvalidSessions) {
+            session.refresh(true);
+        }
         session.context = RestrictedTokenContext.getCurrent();
 
-        sessionTable.put(sid, session);
+        sessionTable.put(sessionID, session);
         if (!isPollingEnabled()) {
             session.addInternalSessionListener();
         }
