@@ -20,7 +20,7 @@
   !
   ! CCPL HEADER END
   !
-  !      Copyright 2011 ForgeRock AS
+  !      Copyright 2011-2013 ForgeRock, Inc
   !    
 -->
 <chapter xml:id='chap-tuning'
@@ -326,7 +326,7 @@
      <row>
       <entry><para><literal>-XX:PermSize</literal> &amp;
       <literal>-XX:MaxPermSize</literal></para></entry>
-      <entry><para>Set both to 96m</para></entry>
+      <entry><para>Set both to 256m</para></entry>
       <entry><para>Controls the size of the permanent generation in the
       JVM</para></entry>
      </row>
