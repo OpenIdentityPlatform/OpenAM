@@ -456,7 +456,7 @@ public class ContextFactory {
      * @return a new instance of <code>XACMLAuthzDecisionQuery</code>.
      * @throws XACMLException if error occurs while processing the
      *                <code>Element</code>.
-     * @throws SAMLL2Exception if not able to create the base saml
+     * @throws SAML2Exception if not able to create the base saml
      * <code>RequestAbstract</code>
      * 
      */
@@ -480,7 +480,7 @@ public class ContextFactory {
      * <code>XACMLAuthzDecisionQuery</code>.
      * @return a new instance of <code>XACMLAuthzDecisionQuery</code>.
      * @throws XACMLException if error occurs while processing the XML string.
-     * @throws SAMLL2Exception if not able to create the base saml
+     * @throws SAML2Exception if not able to create the base saml
      * <code>RequestAbstract</code>
      * 
      */

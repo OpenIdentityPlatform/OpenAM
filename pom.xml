@@ -408,7 +408,6 @@
             </releases>
             <snapshots>
                 <enabled>true</enabled>
-                <updatePolicy>daily</updatePolicy>
             </snapshots>
         </repository>
 
@@ -419,11 +418,9 @@
             <url>http://maven.forgerock.org/repo/openam-dependencies</url>
             <releases>
                 <enabled>true</enabled>
-                <updatePolicy>daily</updatePolicy>
             </releases>
             <snapshots>
                 <enabled>true</enabled>
-                <updatePolicy>daily</updatePolicy>
             </snapshots>
         </repository>
 
@@ -434,7 +431,6 @@
             <url>http://maven.forgerock.org/repo/openam-releases</url>
             <releases>
                 <enabled>true</enabled>
-                <updatePolicy>daily</updatePolicy>
             </releases>
             <snapshots>
                 <enabled>false</enabled>
@@ -450,7 +446,6 @@
             </releases>
             <snapshots>
                 <enabled>true</enabled>
-                <updatePolicy>daily</updatePolicy>
             </snapshots>
         </repository>
 
@@ -459,11 +454,9 @@
             <url>http://maven.forgerock.org/repo/maven-central</url>
             <releases>
                 <enabled>true</enabled>
-                <updatePolicy>daily</updatePolicy>
             </releases>
             <snapshots>
                 <enabled>true</enabled>
-                <updatePolicy>daily</updatePolicy>
             </snapshots>
         </repository>
 
@@ -500,11 +493,9 @@
             <url>http://maven.forgerock.org/repo/maven-central</url>
             <releases>
                 <enabled>true</enabled>
-                <updatePolicy>daily</updatePolicy>
             </releases>
             <snapshots>
                 <enabled>true</enabled>
-                <updatePolicy>daily</updatePolicy>
             </snapshots>
         </pluginRepository>
 
@@ -514,11 +505,9 @@
             <url>http://maven-instant-ws.googlecode.com/svn/repo/</url>
             <releases>
                 <enabled>true</enabled>
-                <updatePolicy>daily</updatePolicy>
             </releases>
             <snapshots>
                 <enabled>true</enabled>
-                <updatePolicy>daily</updatePolicy>
             </snapshots>
         </pluginRepository>
 
@@ -1076,13 +1065,6 @@
             </dependency>
 
             <dependency>
-                <groupId>org.json</groupId>
-                <artifactId>json</artifactId>
-                <version>20090211</version>
-                <!-- Originally ? -->
-            </dependency>
-
-            <dependency>
                 <groupId>com.iplanet.jato</groupId>
                 <artifactId>jato</artifactId>
                 <version>2005-05-04</version>
@@ -1423,6 +1405,28 @@
                 <groupId>external</groupId>
                 <artifactId>webservices-api</artifactId>
                 <version>2009-14-01</version>
+            </dependency>
+
+            <!-- Preferred JSON Data Binding API -->
+            <dependency>
+                <groupId>com.fasterxml.jackson.core</groupId>
+                <artifactId>jackson-annotations</artifactId>
+                <version>2.1.2</version>
+            </dependency>
+            <dependency>
+                <groupId>com.fasterxml.jackson.core</groupId>
+                <artifactId>jackson-core</artifactId>
+                <version>2.1.2</version>
+            </dependency>
+            <dependency>
+                <groupId>com.fasterxml.jackson.core</groupId>
+                <artifactId>jackson-databind</artifactId>
+                <version>2.1.2</version>
+            </dependency>
+            <dependency>
+                <groupId>com.fasterxml.jackson.dataformat</groupId>
+                <artifactId>jackson-dataformat-xml</artifactId>
+                <version>2.1.1</version>
             </dependency>
 
             <!-- Session HA Module Dependencies-->

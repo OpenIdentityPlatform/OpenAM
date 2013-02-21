@@ -6,7 +6,7 @@
 	elementFormDefault="qualified" attributeFormDefault="unqualified">
 
 	<xs:import namespace="http://www.w3.org/XML/1998/namespace"
-		schemaLocation="./xml.xsd"/>
+		schemaLocation="xml.xsd"/>
 
 	<xs:element name="Request" type="xacml:RequestType"/>
 	<xs:complexType name="RequestType">

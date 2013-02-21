@@ -499,7 +499,7 @@
         <description>XACML Content Handler Adapter</description>
         <display-name>XACML Content Adapter</display-name>
         <servlet-name>XACMLContentAdapter</servlet-name>
-        <servlet-class>org.forgerock.identity.openam.xacml.services.XacmlContentHandlerService</servlet-class>
+        <servlet-class>org.forgerock.identity.openam.xacml.v3.services.XacmlContentHandlerService</servlet-class>
     </servlet>
 
     <!-- end of servlet declarations -->
