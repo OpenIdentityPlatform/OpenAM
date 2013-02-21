@@ -148,6 +148,11 @@
             <groupId>org.json</groupId>
             <artifactId>json</artifactId>
         </dependency>
+
+        <dependency>
+            <groupId>org.forgerock.commons</groupId>
+            <artifactId>forgerock-util</artifactId>
+        </dependency>
 		
     </dependencies>
     

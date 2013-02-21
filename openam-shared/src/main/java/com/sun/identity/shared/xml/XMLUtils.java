@@ -26,7 +26,7 @@
  *
  */
 /**
- * Portions Copyrighted 2011-2012 ForgeRock Inc
+ * Portions Copyrighted 2011-2013 ForgeRock Inc
  */
 package com.sun.identity.shared.xml;
 
@@ -66,6 +66,8 @@ import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.sax.SAXSource;
 import javax.xml.transform.stream.StreamResult;
 import javax.xml.transform.stream.StreamSource;
+
+import org.forgerock.util.xml.XMLHandler;
 import org.w3c.dom.Attr;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -882,16 +884,7 @@ public class XMLUtils {
      * of the required features.
      */
     public static DocumentBuilder getSafeDocumentBuilder(boolean validating) throws ParserConfigurationException {
-        DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
-        dbf.setValidating(validating);
-        dbf.setNamespaceAware(true);
-        dbf.setXIncludeAware(false);
-        dbf.setFeature("http://xml.org/sax/features/external-general-entities", false);
-        dbf.setFeature("http://xml.org/sax/features/external-parameter-entities", false);
-        dbf.setFeature(XMLConstants.FEATURE_SECURE_PROCESSING, true);
-        DocumentBuilder db = dbf.newDocumentBuilder();
-        db.setEntityResolver(new XMLHandler());
-        return db;
+        return org.forgerock.util.xml.XMLUtils.getSafeDocumentBuilder(validating);
     }
 
     /**
@@ -906,16 +899,7 @@ public class XMLUtils {
      * features.
      */
     public static SAXParser getSafeSAXParser(boolean validating) throws ParserConfigurationException, SAXException {
-        SAXParserFactory saxFactory = SAXParserFactory.newInstance();
-        saxFactory.setValidating(validating);
-        saxFactory.setNamespaceAware(true);
-        saxFactory.setXIncludeAware(false);
-        saxFactory.setFeature("http://xml.org/sax/features/external-general-entities", false);
-        saxFactory.setFeature("http://xml.org/sax/features/external-parameter-entities", false);
-        saxFactory.setFeature(XMLConstants.FEATURE_SECURE_PROCESSING, true);
-        SAXParser sp = saxFactory.newSAXParser();
-        sp.getXMLReader().setEntityResolver(new XMLHandler());
-        return sp;
+        return org.forgerock.util.xml.XMLUtils.getSafeSAXParser(validating);
     }
 
     /**
