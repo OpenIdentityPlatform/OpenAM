@@ -74,14 +74,12 @@
     xlink:href="https://bugster.forgerock.org/jira/browse/OPENAM-1273"
     xlink:show="new">OPENAM-1273</link>).</para>
    </listitem>
-<!--
    <listitem>
     <para>Java EE policy agents can now conditionally redirect users based on
     the incoming request URL (<link
     xlink:href="https://bugster.forgerock.org/jira/browse/OPENAM-1265"
     xlink:show="new">OPENAM-1265</link>).</para>
    </listitem>
--->
    <listitem>
     <para>The auto-submitting form in <filename>FormLoginContent.txt</filename>
     now parses as valid XML (<link
