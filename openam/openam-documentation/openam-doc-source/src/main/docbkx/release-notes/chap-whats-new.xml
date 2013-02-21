@@ -53,10 +53,10 @@
   released.</para>
 
   <para>With the exception of these Release Notes, the official documentation
-  for this release is still in progress, and is accessible at
+  for this release is still in progress, and updates are accessible at
   <link xlink:href="http://openam.forgerock.org/docs.html" xlink:show="new"
   >http://openam.forgerock.org/docs.html</link>. The complete, validated
-  documentation set will be available with the Enterprise release.</para>
+  documentation set will be provided for the Enterprise release.</para>
  </important>
 
  <itemizedlist>

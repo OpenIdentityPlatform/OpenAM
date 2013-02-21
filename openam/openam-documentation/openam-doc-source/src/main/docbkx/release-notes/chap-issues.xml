@@ -176,7 +176,7 @@
 
    <listitem>
     <para>Javadoc is no longer delivered with the distribution, but is
-    <link xlink:href="http://openam.forgerock.org/apidocs/"
+    <link xlink:href="http://docs.forgerock.org/en/openam/10.1.0/apidocs/"
           xlink:show="new">available online</link>.</para>
    </listitem>
   </itemizedlist>

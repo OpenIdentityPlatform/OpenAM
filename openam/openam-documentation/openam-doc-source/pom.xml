@@ -103,14 +103,14 @@
         </license>
     </licenses>
     <properties>
-        <serverDocTargetVersion>10.1.0-Xpress</serverDocTargetVersion>
-        <serverProjectVersion>${serverDocTargetVersion}</serverProjectVersion>
-        <agentsDocTargetVersion>3.1.0-Xpress</agentsDocTargetVersion>
+        <serverDocTargetVersion>10.1.0</serverDocTargetVersion>
+        <serverProjectVersion>${serverDocTargetVersion}-Xpress</serverProjectVersion>
+        <agentsDocTargetVersion>3.1.0</agentsDocTargetVersion>
         <webAgentsDocTargetVersion>${agentsDocTargetVersion}</webAgentsDocTargetVersion>
         <javaEEAgentsDocTargetVersion>${agentsDocTargetVersion}</javaEEAgentsDocTargetVersion>
         <agentsBootstrapFile>OpenSSOAgentBootstrap.properties</agentsBootstrapFile>
         <agentsConfigurationFile>OpenSSOAgentConfiguration.properties</agentsConfigurationFile>
-        <coreDirectoryFile><![CDATA[openam-distribution-kit-${serverProjectVersion}]]></coreDirectoryFile>
+        <coreDirectoryFile>openam_10.1.0.zip</coreDirectoryFile>
         <coreWarFile><![CDATA[openam-server-${serverProjectVersion}.war]]></coreWarFile>
         <clientsdkJarFile><![CDATA[openam-clientsdk-${serverProjectVersion}.jar]]></clientsdkJarFile>
         <distauthWarFile><![CDATA[openam-distauth-${serverProjectVersion}.war]]></distauthWarFile>

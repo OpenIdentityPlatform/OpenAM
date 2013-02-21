@@ -20,7 +20,7 @@
   !
   ! CCPL HEADER END
   !
-  !      Copyright 2012 ForgeRock AS
+  !      Copyright 2012-2013 ForgeRock AS
   !    
 -->
 <chapter xml:id='chap-prepare-install'
@@ -169,20 +169,20 @@ esac
   <indexterm>
    <primary>Downloading OpenAM</primary>
   </indexterm>
-  <para>Download OpenAM releases from <link xlink:show="new"
+  <para>Download stable OpenAM and policy agent releases from <link
+  xlink:show="new" xlink:href="http://forgerock.com/openam-downloads/"
+  >http://forgerock.com/openam-downloads/</link>.<footnote><para>You can also
+  download nightly builds from <link xlink:show="new"
   xlink:href="http://forgerock.org/openam.html"
-  >http://forgerock.org/openam.html</link>. At the download location you
-  find links to stable releases, nightly builds for testing, previous
-  releases, and also OpenAM policy agent releases.</para>
+  >http://forgerock.org/openam.html</link>.</para></footnote></para>
   
-  <!-- This may need to be updated. The nightly does not include the src file. -->
-  <para>For each release of the OpenAM core services, you can download the
-  entire package as a .zip archive, only the OpenAM .war file, only the
-  administrative tools as a .zip archive, or only the OpenAM source code
-  used to build the release.</para>
+  <para>For this release of OpenAM core services, you can download the
+  entire package as a .zip archive, only the OpenAM .war file, only
+  administrative tools, or only the configurator tool.</para>
 
-  <para>After you download the .zip archive, create a new openam folder, and unzip 
-  the .zip archive to access the content:</para>
+  <para>After you download the .zip archive, create a new
+  <filename>openam</filename> folder, and unzip the archive to access the
+  content:</para>
   <screen>$ cd ~/Downloads
 $ mkdir openam ; cd openam
 $ unzip ~/Downloads/<?eval ${coreDirectoryFile}?>.zip</screen>

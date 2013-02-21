@@ -20,7 +20,7 @@
   !
   ! CCPL HEADER END
   !
-  !      Copyright 2011-2012 ForgeRock AS
+  !      Copyright 2011-2013 ForgeRock AS
   !    
 -->
 <chapter xml:id='chap-jdk'
@@ -35,6 +35,9 @@
   <primary>Installing</primary>
   <secondary>Java SDK</secondary>
  </indexterm>
+
+ <important><para>This samples mentioned in this chapter are not available in the current release.</para></important>
+
  <para>This chapter introduces OpenAM Java SDK. OpenAM Java SDK is delivered
  in the <filename>samples/opensso-client.zip</filename> where you unpacked
  the full version of OpenAM, such as

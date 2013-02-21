@@ -20,7 +20,7 @@
   !
   ! CCPL HEADER END
   !
-  !      Copyright 2012 ForgeRock AS
+  !      Copyright 2012-2013 ForgeRock AS
   !    
 -->
 <chapter xml:id='chap-sae'
@@ -34,6 +34,8 @@
  <indexterm>
   <primary>Secure Attribute Exchange (SAE)</primary>
  </indexterm>
+
+ <important><para>This samples mentioned in this chapter are not available in the current release.</para></important>
 
  <para>Most deployments can rely on OpenAM to handle authentication and provide
  identity assertions. Not only does OpenAM support a wide variety of

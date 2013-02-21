@@ -20,7 +20,7 @@
   !
   ! CCPL HEADER END
   !
-  !      Copyright 2011 ForgeRock AS
+  !      Copyright 2011-2013 ForgeRock AS
   !    
 -->
 <chapter xml:id='chap-policy-decisions'
@@ -35,6 +35,9 @@
   <primary>Policy</primary>
   <secondary>Java API</secondary>
  </indexterm>
+
+ <important><para>This samples mentioned in this chapter are not available in the current release.</para></important>
+
  <para>This chapter shows how to request policy decision by using OpenAM Java
  SDK. The chapter focuses on the sample client,
  <filename>PolicyEvaluationSample.java</filename>, which demonstrates making a

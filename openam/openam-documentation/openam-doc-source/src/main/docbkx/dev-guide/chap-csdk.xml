@@ -20,7 +20,7 @@
   !
   ! CCPL HEADER END
   !
-  !      Copyright 2011-2012 ForgeRock AS
+  !      Copyright 2011-2013 ForgeRock AS
   !    
 -->
 <chapter xml:id='chap-csdk'
@@ -35,6 +35,9 @@
   <primary>Installing</primary>
   <secondary>C SDK</secondary>
  </indexterm>
+
+ <important><para>This samples mentioned in this chapter are not available in the current release.</para></important>
+
  <para>This chapter introduces OpenAM C SDK. OpenAM C SDK is delivered for
  selected platforms in
  <filename>libraries/native/agent-csdk/agent-csdk.zip</filename> where you
