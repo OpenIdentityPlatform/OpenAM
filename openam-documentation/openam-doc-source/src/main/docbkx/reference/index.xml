@@ -36,7 +36,7 @@
    Authentication, Authorization, Entitlement and Federation software.</para>
   </abstract>
   <copyright>
-   <year>2011-2012</year>
+   <year>2011-2013</year>
    <holder>ForgeRock AS</holder>
   </copyright>
   <authorgroup>
@@ -49,6 +49,7 @@
   <xinclude:include href="../legal.xml" />
   <date><?dbtimestamp format="B d, Y"?></date>
   <pubdate>Publication date: <?dbtimestamp format="B d, Y"?></pubdate>
+  <releaseinfo><?eval ${softwareReleaseDate}?></releaseinfo>
  </info>
 
  <toc />
