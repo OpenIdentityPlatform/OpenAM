@@ -305,7 +305,7 @@ Install log file location:
     <para>Set up ownership of the log directory. The default is to run as a 
     webservd user instead of root. To post its logs, the agent needs permission to 
     add the files to the directory.</para>
-    <screen>chown -R webservd:weservd /opt/web_agents/sjsws_agent/Agent_<replaceable>number</replaceable>/logs</screen>
+    <screen>chown -R webservd:webservd /opt/web_agents/sjsws_agent/Agent_<replaceable>number</replaceable>/logs</screen>
    </step>
    <step>
     <para>Restart the Sun Web Server instance where you installed the
