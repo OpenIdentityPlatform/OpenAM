@@ -20,7 +20,7 @@
   !
   ! CCPL HEADER END
   !
-  !      Copyright 2011-2012 ForgeRock AS
+  !      Copyright 2011-2013 ForgeRock, Inc
   !    
 -->
 <chapter xml:id='chap-sun-websvr'
@@ -302,6 +302,12 @@ Install log file location:
        to properly identify itself to the OpenAM server. </para>
    </step>
    <step>
+    <para>Set up ownership of the log directory. The default is to run as a 
+    webservd user instead of root. To post its logs, the agent needs permission to 
+    add the files to the directory.</para>
+    <screen>chown -R webservd:weservd /opt/web_agents/sjsws_agent/Agent_<replaceable>number</replaceable>/logs</screen>
+   </step>
+   <step>
     <para>Restart the Sun Web Server instance where you installed the
     agent.</para>
    </step>
@@ -314,8 +320,65 @@ Install log file location:
     <literallayout><emphasis role="strong">Forbidden</emphasis>
 
 Your client is not allowed to access the requested object.</literallayout>
+    <para>If it appears the protection is inadequate, complete one of the 
+    following steps.</para>
    </step>
+
+      <note>
+       <para>A potential cause for the protection failing is updates to the 
+       <filename>server.xml</filename> file for the <literal>object-file</literal>
+       property. A <literal>object-file</literal> property refers to the 
+       <literal>obj.conf</literal> file created during the web server installation.
+       Multiple servers create their own <literal>obj.conf</literal> files, which can
+       cause problems with protection. Also, admin changes can update the
+       <literal>obj.conf</literal> file. For more information, checkout the <link 
+       xlink:show="new" xlink:href="http://docs.oracle.com/cd/E19146-01/821-1827/abvag/index.html">
+       <citetitle>Syntax and Use of obj.conf</citetitle></link>.</para>
+      </note>
+
+    <stepalternatives>
+     <step>
+      <para>This step removes the <filename>obj.conf</filename> file if it is 
+      not needed.</para>
+      <para>Open the <filename>server.xml</filename> and remove the <literal>object-file</literal>
+      property. The web server will use the default <filename>obj.conf</filename>
+      configuration.</para>
+      <note>
+       <para>Do not change the original file.</para>
+      </note>
+      <screen>$ vi /path/to/webserver7/config/server.xml
+ &lt;virtual-server&gt;
+  &lt;name&gt;virtual.example.com&lt;/name&gt;
+  &lt;http-listener-name&gt;http-listener-1&lt;/http-listenername&gt;
+  &lt;host&gt;virtual.example.com&lt;/host&gt;
+  -  &lt;object-file&gt;virtual.example.com-obj.conf&lt;/object-file&gt;
+  &lt;document-root&gt;/path/to/webserver7/htdocs&lt;/document-root&gt;
+  &lt;name&gt;virtual.example.com&lt;/name&gt;
+ &lt;/virtual-server&gt;</screen>
+ 
+     </step>
+     <step>
+      <para>This step updates the <filename>obj.conf</filename> file if it 
+      is needed.</para>
+      <para>Open the <filename>server.xml</filename> and manually update the 
+      <literal>object-file</literal> property to validate the location of
+      the <filename>obj.conf</filename> file.</para>
+      <note>
+       <para>Do not change the original file.</para>
+      </note>
+      <screen>$ vi /path/to/webserver7/config/server.xml
+ &lt;Object path="*/dummypost/sunpostpreserve*"&gt;
+ Service type=text/* method=(GET) fn=append_post_data
+ &lt;/Object&gt;
+ &lt;Object path="*/UpdateAgentCacheServlet*"&gt;
+ Service type=text/* method=(POST) fn=process_notification
+ &lt;/Object&gt;</screen>
+     </step>
+    </stepalternatives>
+    <step>Save the file and restart the Sun Web Server</step>
   </procedure>
+
+
  </section>
  
  <section xml:id="custom-sjsws-agent-installation">
