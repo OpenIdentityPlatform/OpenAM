@@ -54,7 +54,7 @@
    <item name="Wiki" href="https://wikis.forgerock.org/confluence/display/OPENAM/Home" />
    <item name="Builds" href="http://forgerock.org/openam.html" />
    <item name="Archives" href="http://forgerock.org/openam-archive.html" />
-   <item name="Enterprise Downloads" href="http://forgerock.com/openam-downloads/"/>
+   <item name="Enterprise Downloads" href="http://www.forgerock.com/download-stack/"/>
   </menu>
   
   <menu name="Released Documentation">
