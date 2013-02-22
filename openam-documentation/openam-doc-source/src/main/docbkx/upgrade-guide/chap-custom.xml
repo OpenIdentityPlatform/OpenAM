@@ -52,8 +52,9 @@
   </step>
 
   <step>
-   <para>Download the update file from the <link xlink:href="http://forgerock.org/openam.html"
-   ><citetitle>OpenAM Download Page</citetitle></link>. You can either download the 
+   <para>Download the upgrade file from the <link 
+   xlink:show="new" xlink:href="http://forgerock.com/openam-downloads/"
+   ><citetitle>Enterprise Downloads page</citetitle></link>. You can either download the 
    <filename>.zip</filename> or the <filename>.war</filename> files. If you use the 
    tools or some of the other components provided in the <filename>.zip</filename>, 
    you may want to download it.</para>
@@ -108,8 +109,8 @@
 
  <example xml:id="custom-example">
  <?dbfo keep-together="auto"?>
-  <title>Customize An OpenAM 10.1.0 Xpress Deployment</title>
-  <para>The following example updates OpenAM 10.0.0 to OpenAM 10.1.0 Xpress 
+  <title>Customize An OpenAM 10.1.0 Deployment</title>
+  <para>The following example updates OpenAM 10.0.0 to OpenAM 10.1.0  
   on an Ubuntu instance. <!-- TO DO The <citetitle>Deployment Guide</citetitle> provides more 
   information for other containers and platforms.--> The example only addresses the 
   <filename>.war</filename> file. Review the <citetitle>Installation Guide</citetitle> 
@@ -131,16 +132,17 @@ $ jar xvf /path/to/tomcat/webapps/openam.war</screen>
   </listitem>
 
   <listitem>
-   <para>Download the OpenAM 10.1.0 Xpress <filename>.war</filename> from the 
-   <link xlink:href="http://forgerock.org/openam.html">OpenAM Download Page</link>.</para>
+   <para>Download the OpenAM 10.1.0 <filename>.war</filename> from the 
+  <link xlink:show="new" xlink:href="http://forgerock.com/openam-downloads/"
+  ><citetitle>Enterprise Downloads</citetitle></link> page.</para>
   </listitem>
 
   <listitem>
-   <para>Create a new directory to expand the OpenAM 10.1.0 Xpress <filename>.war</filename> 
+   <para>Create a new directory to expand the OpenAM 10.1.0 <filename>.war</filename> 
    file.</para>
    <screen>$ cd /path/to/expanded-openam-war
 $ mkdir update-war ; cd update-war
-$ jar xvf ~/Downloads/openam-server-10.1.0-Xpress.war</screen>
+$ jar xvf ~/Downloads/openam-server-10.1.0.war</screen>
   </listitem>
 
   <listitem>

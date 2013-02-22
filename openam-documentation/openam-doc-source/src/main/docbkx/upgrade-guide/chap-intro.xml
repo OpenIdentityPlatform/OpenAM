@@ -106,8 +106,8 @@
   if a release is an upgrade, an update, or a patch. The version number has three 
   parts to help you identify which type of update you are considering.</para>
   
-  <para>To better understand the numbering, we will look at the OpenAM release
-  when this guide was first published, OpenAM 10.1.0 Xpress. Each of the numbers tells
+  <para>To better understand the numbering, we will look at the latest OpenAM release
+  available when this guide was first published, OpenAM 10.1.0. Each of the numbers tells
   you something about the release.</para>
   
   <para>The first part of the version number (10.x.x) is the major version of 
@@ -117,9 +117,12 @@
   <para>The second part of the version number (x.1.x) is the minor version of
    the release. If your instance is OpenAM 10.0.X, then you have missed some
    changes, usually new functionality, enhancement, and bug fixes. Check out 
-   the Release Notes for the OpenAM version you are considering. All Release Notes
-   are published on the <link xlink:href="http://forgerock.org/openam.html">
-   <citetitle>OpenAM Downloads page</citetitle></link>.</para>
+   the Release Notes for the OpenAM version you are considering. Links to 
+   release notes for archived versions are available on the 
+   <link xlink:hrf="http://forgerock.org/openam-archive.html" xlink:show="new">
+   <citetitle>Archives page</citetitle></link>. Links to release notes for versions 
+   10.0.0 and later are available on the <link xlink:hrf="http://docs.forgerock.org/en/openam.html" xlink:show="new">
+   <citetitle>OpenAM Access Management Documentation page</citetitle></link>.</para>
    
   <para>The third part of the version number (x.x.0) indicates the version 
   is a patch. These are designed to fix issues and provide very minor

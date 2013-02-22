@@ -58,7 +58,7 @@
 
 <!--
  <note>
-  <para>Following an update to OpenAM 10.1.0 Xpress, all users will
+  <para>Following an update to OpenAM 10.1.0, all users will
   need to login again because OpenAM no longer uses Open Message Queue or 
   Berkeley DB Java Edition for session failover. </para>
  </note>

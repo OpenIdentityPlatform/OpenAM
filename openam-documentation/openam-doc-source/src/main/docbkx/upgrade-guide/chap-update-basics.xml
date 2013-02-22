@@ -52,7 +52,7 @@
 
 <!--
  <note>
-  <para>Following an update to OpenAM 10.1.0 Xpress, all users will
+  <para>Following an update to OpenAM 10.1.0, all users will
   need to login again because OpenAM no longer uses Open Message Queue or 
   Berkeley DB Java Edition for session failover. </para>
  </note>
@@ -124,8 +124,8 @@
 
  <example xml:id="udpate-example">
  <?dbfo keep-together="auto"?>
-  <title>Updating to OpenAM 10.1.0 Xpress</title>
-  <para>The following example updates OpenAM 10.0.0 to OpenAM 10.1.0 Xpress on an 
+  <title>Updating to OpenAM 10.1.0</title>
+  <para>The following example updates OpenAM 10.0.0 to OpenAM 10.1.0 on an 
   Ubuntu instance using Apache Tomcat. <!-- TO DO The <citetitle>Deployment Guide</citetitle> provides more 
   information for other containers and platforms.--> The example only addresses the 
   <filename>.war</filename> file. Review the <citetitle>Installation Guide</citetitle> 
