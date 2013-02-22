@@ -37,7 +37,6 @@ define("org/forgerock/openam/ui/dashboard/DashboardView", [
     
     var Dashboard = AbstractView.extend({
         template: "templates/openam/DashboardTemplate.html",
-        baseTemplate: "templates/openam/DefaultBaseTemplate.html",
         render: function() {
             
             DashboardDelegate.getMyApplications(_.bind(function (apps) {

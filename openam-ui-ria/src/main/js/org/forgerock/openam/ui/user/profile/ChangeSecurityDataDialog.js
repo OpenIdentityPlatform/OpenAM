@@ -39,7 +39,6 @@ define("org/forgerock/openam/ui/user/profile/ChangeSecurityDataDialog", [
 ], function(Dialog, validatorsManager, conf, userDelegate, uiUtils, eventManager, constants, securityQuestionDelegate) {
     var ChangeSecurityDataDialog = Dialog.extend({    
         contentTemplate: "templates/openam/ChangeSecurityDataDialogTemplate.html",
-        baseTemplate: "templates/openam/DefaultBaseTemplate.html",
         
         data: {         
             width: 800,
