@@ -164,6 +164,13 @@ public class DefaultLibraryIDPAttributeMapper extends DefaultAttributeMapper
 
             if (!isDynamicalOrIgnoredProfile(realm)) {
                 try {
+                    // Remove any static attributes before querying the datastore
+                    for (Iterator i = localAttributes.iterator(); i.hasNext();) {
+                        String localAttribute = (String)i.next();
+                        if (isStaticAttributeValue(localAttribute)) {
+                            i.remove();
+                        }
+                    }
                     valueMap = dsProvider.getAttributes(
                         SessionManager.getProvider().getPrincipalName(session),
                         localAttributes); 
@@ -190,7 +197,7 @@ public class DefaultLibraryIDPAttributeMapper extends DefaultAttributeMapper
                 }
                 String[] localAttributeValues = null;
                 if ((valueMap != null) && (!valueMap.isEmpty())) {
-                    if (localAttribute.startsWith(STATIC_QUOTE) && localAttribute.endsWith(STATIC_QUOTE)) {
+                    if (isStaticAttributeValue(localAttribute)) {
                         // Treat the localAttribute as a static value
                         // The localAttribute is enclosed in quotes so remove them before using it as the value
                         localAttribute = localAttribute.substring(STATIC_QUOTE.length(),
@@ -313,5 +320,9 @@ public class DefaultLibraryIDPAttributeMapper extends DefaultAttributeMapper
      */
     protected boolean isDynamicalOrIgnoredProfile(String realm) {
         return true;
+    }
+
+    private boolean isStaticAttributeValue(String attribute) {
+        return attribute.startsWith(STATIC_QUOTE) && attribute.endsWith(STATIC_QUOTE);
     }
 }
