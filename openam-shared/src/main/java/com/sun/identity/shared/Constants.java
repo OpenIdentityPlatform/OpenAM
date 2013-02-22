@@ -27,7 +27,7 @@
  */
 
 /*
- * Portions Copyrighted 2010-2013 ForgeRock Inc
+ * Portions Copyrighted 2010-2013 ForgeRock, Inc.
  */
 
 package com.sun.identity.shared;
@@ -475,13 +475,6 @@ public interface Constants {
      * token usage</code> is enabled.
      */
     static final String TRUSTED_SOURCE_LIST = "com.sun.am.session.trustedSourceList";
-
-    /**
-     * Property string to Identify the Http Header which returns the Client IP
-     * address when running in loadbalancer configuration.
-     */
-    static final String HTTP_CLIENT_IP_HEADER =
-            "com.sun.identity.session.httpClientIPHeader";
 
     /**
      * Property string to ensure more stringent (security-wise) check If enabled

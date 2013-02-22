@@ -26,13 +26,16 @@
  *
  */
 
+/*
+ * Portions Copyrighted 2013 ForgeRock, Inc.
+ */
 
 package com.sun.identity.saml.servlet;
 
 import com.sun.identity.common.SystemConfigurationUtil;
 import com.sun.identity.shared.xml.XMLUtils;
-
 import com.sun.identity.shared.encode.Base64;
+import org.forgerock.openam.utils.ClientUtils;
 
 import com.sun.identity.saml.AssertionManager;
 
@@ -200,7 +203,7 @@ public class SAMLSOAPReceiver extends HttpServlet {
              }
         }    
 
-        String remoteAddr = req.getRemoteAddr();
+        String remoteAddr = ClientUtils.getClientIPAddress(req);
         Set partnerSourceID = null;
         if ((partnerSourceID = checkCaller(req, resp)) != null) {
             if (SAMLUtils.debug.messageEnabled()) {
@@ -367,7 +370,7 @@ public class SAMLSOAPReceiver extends HttpServlet {
         List contents = new ArrayList();
         String message = null;
         Status status;
-        String remoteAddr = servletReq.getRemoteAddr();
+        String remoteAddr = ClientUtils.getClientIPAddress(servletReq);
         String recipient= remoteAddr;
         String invalidRespPrefix = SAMLUtils.bundle.getString(
             "invalidRequestLogMessage")+" "+remoteAddr+": ";
@@ -1148,7 +1151,7 @@ public class SAMLSOAPReceiver extends HttpServlet {
         HttpServletResponse resp) throws ServletException {
         String certOrIP = null;
         Set partnerSourceID = null;
-        String remoteAddr = req.getRemoteAddr();
+        String remoteAddr = ClientUtils.getClientIPAddress(req);
         if (SAMLUtils.debug.messageEnabled()) {
             SAMLUtils.debug.message("caller's IP:"+remoteAddr);
         }

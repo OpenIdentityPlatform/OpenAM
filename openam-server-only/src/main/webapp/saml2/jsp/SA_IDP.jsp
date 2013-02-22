@@ -26,6 +26,10 @@
 
 --%>
 
+<%--
+   Portions Copyrighted 2013 ForgeRock, Inc.
+--%>
+
 <%@ page language="java" 
 import="java.util.*,
 java.io.*,
@@ -45,7 +49,8 @@ com.sun.identity.saml2.logging.LogUtil,
 com.sun.identity.saml2.meta.SAML2MetaManager,
 com.sun.identity.saml2.meta.SAML2MetaUtils,
 com.sun.identity.saml2.meta.SAML2MetaException,
-com.sun.identity.shared.debug.Debug"
+com.sun.identity.shared.debug.Debug,
+org.forgerock.openam.utils.ClientUtils"
 %>
 
 <%-- functions --%>
@@ -108,7 +113,7 @@ com.sun.identity.shared.debug.Debug"
     String appBase = gotoUrl.substring(0, pathIndex+1);
     gotoUrl = gotoUrl.substring(pathIndex, gotoUrl.length());
     String errorUrl = appBase+"saml2/jsp/saeerror.jsp";
-    String ipaddr = request.getRemoteAddr();
+    String ipaddr = ClientUtils.getClientIPAddress(request);
     String userid = null;
     Object token = null;
     SessionProvider provider = null;

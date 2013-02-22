@@ -27,7 +27,7 @@
  */
 
 /*
- * Portions Copyrighted 2010-2012 ForgeRock Inc
+ * Portions Copyrighted 2010-2013 ForgeRock, Inc.
  */
 
 package com.sun.identity.saml2.profile;
@@ -107,6 +107,8 @@ import com.sun.identity.plugin.monitoring.MonitorManager;
 import com.sun.identity.plugin.session.SessionException;
 import com.sun.identity.plugin.session.SessionManager;
 import com.sun.identity.plugin.session.SessionProvider;
+
+import org.forgerock.openam.utils.ClientUtils;
 
 import java.security.PrivateKey;
 
@@ -1301,7 +1303,7 @@ public class SPACSUtils {
         sessionInfoMap.put(SessionProvider.PRINCIPAL_NAME, userName);
         // set client info. always use client IP address to prevent
         // reverse host lookup
-        String clientAddr = request.getRemoteAddr();
+        String clientAddr = ClientUtils.getClientIPAddress(request);
         sessionInfoMap.put(SessionProvider.HOST, clientAddr);
         sessionInfoMap.put(SessionProvider.HOST_NAME, clientAddr);
         sessionInfoMap.put(SessionProvider.AUTH_LEVEL, 

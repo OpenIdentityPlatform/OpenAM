@@ -75,6 +75,7 @@ import com.sun.identity.session.util.SessionUtils;
 import com.sun.identity.shared.Constants;
 import com.sun.identity.shared.datastruct.CollectionHelper;
 import com.sun.identity.shared.debug.Debug;
+import org.forgerock.openam.utils.ClientUtils;
 import com.sun.identity.sm.OrganizationConfigManager;
 import com.sun.identity.sm.SMSEntry;
 import com.sun.identity.sm.ServiceConfig;
@@ -103,7 +104,6 @@ import javax.security.auth.callback.NameCallback;
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpSession;
 import com.sun.identity.shared.ldap.util.DN;
 import com.sun.identity.shared.ldap.util.RDN;
 import com.sun.identity.security.AdminTokenAction;
@@ -1036,7 +1036,7 @@ public class LoginState {
             }
             if (cli == null || cli.length() == 0) {
                 if (servletRequest != null) {
-                    clientHost = AuthUtils.getClientIPAddress(servletRequest);
+                    clientHost = ClientUtils.getClientIPAddress(servletRequest);
                 } else {
                     InetAddress localHost = InetAddress.getLocalHost();
                     clientHost = localHost.getHostAddress();
@@ -1044,7 +1044,7 @@ public class LoginState {
             }
         } catch (Exception e) {
             if (messageEnabled) {
-                debug.message("Error getting clienty Type " , e);
+                debug.message("Error getting client Type " , e);
             }
         }
         

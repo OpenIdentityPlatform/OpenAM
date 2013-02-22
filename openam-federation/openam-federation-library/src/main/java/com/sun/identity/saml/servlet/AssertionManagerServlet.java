@@ -26,14 +26,17 @@
  *
  */
 
+/*
+ * Portions Copyrighted 2013 ForgeRock, Inc.
+ */
 
-package com.sun.identity.saml.servlet; 
+package com.sun.identity.saml.servlet;
+
+import org.forgerock.openam.utils.ClientUtils;
 
 import com.sun.identity.saml.common.SAMLUtils;
 
 import com.sun.xml.rpc.server.http.JAXRPCServlet;
-
-import java.io.IOException;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -65,24 +68,28 @@ public class AssertionManagerServlet extends JAXRPCServlet {
      * @param response the <code>HttpServletResponse</code> object.
      * @throws ServletException if there is an error.
      */
+    @Override
     public void doPost(HttpServletRequest request, HttpServletResponse response)
         throws ServletException {
+
+        String clientIP = ClientUtils.getClientIPAddress(request);
+
         if (SAMLSOAPReceiver.checkCaller(request, response) != null) {
             if (SAMLUtils.debug.messageEnabled()) {
                 SAMLUtils.debug.message(DEBUG_SUCCESS_MSG +
-                    request.getRemoteAddr());
+                    clientIP);
             }
             // Call JAXRPC servlet's doPost
             super.doPost(request, response);
         } else {
             // its not trusted site
-            String errMsg = DEBUG_FAILED_MSG + request.getRemoteAddr();
+            String errMsg = DEBUG_FAILED_MSG + clientIP;
             SAMLUtils.debug.error(errMsg);
             SAMLUtils.sendError(request, response, 
                     HttpServletResponse.SC_FORBIDDEN,
                     "untrustedSite",
                     SAMLUtils.bundle.getString("untrustedSite")
-                    + request.getRemoteAddr());
+                    + clientIP);
         }
     }
 }

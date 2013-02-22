@@ -26,12 +26,14 @@
  *
  */
 
+/*
+ * Portions Copyrighted 2013 ForgeRock, Inc.
+ */
 
 package com.sun.identity.liberty.ws.security;
 
-import java.io.IOException;
-
 import com.sun.identity.federation.common.FSUtils;
+import org.forgerock.openam.utils.ClientUtils;
 
 import com.sun.xml.rpc.server.http.JAXRPCServlet;
 
@@ -62,11 +64,12 @@ public class SecurityTokenManagerServlet extends JAXRPCServlet {
      * @param response the <code>HttpServletResponse</code> object.
      * @throws ServletException if there is an error.
      */
+    @Override
     public void doPost(HttpServletRequest request, HttpServletResponse response)
     throws ServletException {
         if (SecurityTokenManager.debug.messageEnabled()) {
             SecurityTokenManager.debug.message(DEBUG_SUCCESS_MSG +
-            request.getRemoteAddr());
+            ClientUtils.getClientIPAddress(request));
         }
 
         FSUtils.checkHTTPRequestLength(request);

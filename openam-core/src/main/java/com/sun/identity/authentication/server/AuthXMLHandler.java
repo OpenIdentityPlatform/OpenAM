@@ -27,7 +27,7 @@
  */
 
 /**
- * Portions Copyrighted 2010-2012 ForgeRock AS
+ * Portions Copyrighted 2010-2013 ForgeRock, Inc.
  */
 package com.sun.identity.authentication.server;
 
@@ -47,12 +47,10 @@ import com.iplanet.sso.SSOTokenManager;
 
 import com.sun.identity.authentication.AuthContext;
 import com.sun.identity.authentication.client.AuthClientUtils;
-import com.sun.identity.authentication.service.AuthD;
 import com.sun.identity.authentication.service.AMAuthErrorCode;
 import com.sun.identity.authentication.service.AuthException;
 import com.sun.identity.authentication.service.AuthUtils;
 import com.sun.identity.authentication.service.LoginState;
-import com.sun.identity.authentication.spi.AMPostAuthProcessInterface;
 import com.sun.identity.authentication.spi.X509CertificateCallback;
 import com.sun.identity.authentication.share.AuthXMLTags;
 import com.sun.identity.authentication.spi.AuthLoginException;
@@ -62,6 +60,7 @@ import com.sun.identity.shared.Constants;
 import com.sun.identity.shared.debug.Debug;
 import com.sun.identity.shared.locale.AMResourceBundleCache;
 import com.sun.identity.shared.locale.L10NMessage;
+import org.forgerock.openam.utils.ClientUtils;
 
 import java.net.URL;
 import java.security.cert.X509Certificate;
@@ -69,7 +68,6 @@ import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -421,7 +419,7 @@ public class AuthXMLHandler implements RequestHandler {
                         }
                     }
                     if ((clientHost == null) && (servletRequest != null)) {
-                        clientHost = servletRequest.getRemoteAddr();
+                        clientHost = ClientUtils.getClientIPAddress(servletRequest);
                     }
                     loginState.setClient(clientHost);
                     authContext.login();
@@ -457,12 +455,12 @@ public class AuthXMLHandler implements RequestHandler {
                     if (security) {
                         clientHost = authXMLRequest.getHostName();
                         if (messageEnabled) {
-		            debug.message("Client Host from Request = " + 
+		                    debug.message("Client Host from Request = " +
                                 clientHost);
                         }
                     }
                     if ((clientHost == null)  && (servletRequest != null)) {
-                        clientHost = servletRequest.getRemoteAddr();
+                        clientHost = ClientUtils.getClientIPAddress(servletRequest);
                     }
                     loginState.setClient(clientHost);
                     String locale = authXMLRequest.getLocale();

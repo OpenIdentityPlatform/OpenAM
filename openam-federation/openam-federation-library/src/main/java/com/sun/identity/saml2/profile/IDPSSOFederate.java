@@ -25,7 +25,7 @@
  */
 
  /*
- * Portions Copyrighted 2010-2013 ForgeRock, Inc
+ * Portions Copyrighted 2010-2013 ForgeRock, Inc.
  */
 
 package com.sun.identity.saml2.profile;
@@ -65,6 +65,8 @@ import com.sun.identity.shared.configuration.SystemPropertiesManager;
 import com.sun.identity.shared.encode.Base64;
 import com.sun.identity.shared.encode.URLEncDec;
 import com.sun.identity.shared.xml.XMLUtils;
+import org.forgerock.openam.utils.ClientUtils;
+
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -922,8 +924,8 @@ public class IDPSSOFederate {
                             + " does not correspond to that of the IdP");
                     String sessionRealm = sessionProvider.getProperty(session, 
                             SAML2Constants.ORGANIZATION)[0];
-                    String IPAddress = request.getRemoteAddr();
-                    String authnReqString = "";;
+                    String IPAddress = ClientUtils.getClientIPAddress(request);
+                    String authnReqString = "";
                     try {
                         authnReqString = authnReq.toXMLString();
                     } catch (SAML2Exception ex) {

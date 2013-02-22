@@ -22,6 +22,10 @@
  * "Portions Copyrighted [year] [name of copyright owner]"
  *
  */
+
+/*
+ * Portions Copyrighted 2013 ForgeRock, Inc.
+ */
 package org.forgerock.openam.authentication.modules.adaptive;
 
 import com.iplanet.dpro.session.service.InternalSession;
@@ -29,7 +33,6 @@ import com.iplanet.sso.SSOException;
 import com.iplanet.sso.SSOToken;
 import com.iplanet.sso.SSOTokenManager;
 import com.maxmind.geoip.LookupService;
-import com.sun.identity.authentication.client.AuthClientUtils;
 import com.sun.identity.authentication.service.AuthUtils;
 import com.sun.identity.authentication.spi.AMLoginModule;
 import com.sun.identity.authentication.spi.AMPostAuthProcessInterface;
@@ -50,6 +53,7 @@ import com.sun.identity.shared.Constants;
 import com.sun.identity.shared.datastruct.CollectionHelper;
 import com.sun.identity.shared.debug.Debug;
 import com.sun.identity.shared.encode.Hash;
+import org.forgerock.openam.utils.ClientUtils;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
@@ -251,7 +255,7 @@ public class Adaptive extends AMLoginModule implements AMPostAuthProcessInterfac
         debug.message(ADAPTIVE + ": Login Attempt User = " + userName);
 
         amAuthIdentity = getIdentity(userName);
-        clientIP = AuthClientUtils.getClientIPAddress(getHttpServletRequest());
+        clientIP = ClientUtils.getClientIPAddress(getHttpServletRequest());
 
         if (amAuthIdentity == null) {
             debug.message(ADAPTIVE + ": amAuthIdentity NULL : " + userName);
@@ -759,7 +763,6 @@ public class Adaptive extends AMLoginModule implements AMPostAuthProcessInterfac
         return theID;
     }
 
-    @Override
     public void onLoginSuccess(Map requestParamsMap, HttpServletRequest request,
             HttpServletResponse response, SSOToken token)
             throws AuthenticationException {
@@ -831,12 +834,10 @@ public class Adaptive extends AMLoginModule implements AMPostAuthProcessInterfac
         }
     }
 
-    @Override
     public void onLoginFailure(Map requestParamsMap, HttpServletRequest request,
             HttpServletResponse response) throws AuthenticationException {
     }
 
-    @Override
     public void onLogout(HttpServletRequest request,
             HttpServletResponse response, SSOToken token)
             throws AuthenticationException {

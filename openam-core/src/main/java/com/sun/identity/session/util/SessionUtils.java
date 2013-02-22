@@ -26,6 +26,9 @@
  *
  */
 
+/*
+ * Portions Copyrighted 2013 ForgeRock, Inc.
+ */
 package com.sun.identity.session.util;
 
 import java.io.ByteArrayInputStream;
@@ -87,7 +90,7 @@ public class SessionUtils {
 
     /** The HTTPClient IPHeader */
      private static final String httpClientIPHeader = SystemProperties.get(
-            Constants.HTTP_CLIENT_IP_HEADER, "proxy-ip");
+            Constants.CLIENT_IP_ADDR_HEADER, "proxy-ip");
 
     /** The SESSION_ENCRYPTION to check if this is encrypted session */
       private static final boolean SESSION_ENCRYPTION = Boolean.valueOf(

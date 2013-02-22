@@ -27,7 +27,7 @@
  */
 
 /**
- * Portions Copyrighted 2012 ForgeRock AS
+ * Portions Copyrighted 2013 ForgeRock, Inc.
  */
 package com.iplanet.sso.providers.dpro;
 
@@ -40,8 +40,8 @@ import com.iplanet.sso.SSOProvider;
 import com.iplanet.sso.SSOToken;
 import com.iplanet.sso.SSOTokenID;
 import com.sun.identity.common.SearchResults;
-import com.sun.identity.shared.Constants;
 import com.sun.identity.shared.debug.Debug;
+import org.forgerock.openam.utils.ClientUtils;
 import java.net.InetAddress;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -99,7 +99,7 @@ public final class SSOProviderImpl implements SSOProvider {
                     session.setCookieMode(cookieMode);
                 }
             }
-            if (checkIP && !isIPValid(session, getClientIPAddress(request))) {
+            if (checkIP && !isIPValid(session, ClientUtils.getClientIPAddress(request))) {
                 throw new Exception(SSOProviderBundle.getString("invalidIP"));
             }
             SSOToken ssoToken = new SSOTokenImpl(session);
@@ -396,26 +396,5 @@ public final class SSOProviderImpl implements SSOProvider {
             throw new SSOException(e);
         }
         return results;
-    }
-
-    /**
-     * @see com.sun.identity.authentication.client.AuthClientUtils#getClientIPAddress(javax.servlet.http.HttpServletRequest)
-     */
-    private String getClientIPAddress(HttpServletRequest request) {
-        String result = null;
-        String ipAddrHeader = SystemProperties.get(Constants.CLIENT_IP_ADDR_HEADER);
-        if ((ipAddrHeader != null) && (ipAddrHeader.length() != 0)) {
-            result = request.getHeader(ipAddrHeader);
-            String[] ips = result.split(",");
-            result = ips[0].trim();
-        }
-        if ((result == null) || (result.length() == 0)) {
-            result = request.getRemoteAddr();
-        }
-        if (debug.messageEnabled()) {
-            debug.message("SSOProviderImpl.getClientIPAddress : header=["
-                + ipAddrHeader + "], result=[" + result + "]");
-        }
-        return result;
     }
 }

@@ -26,18 +26,18 @@
  *
  */
 
+/*
+ * Portions Copyrighted 2013 ForgeRock, Inc.
+ */
 
 package com.sun.identity.liberty.ws.soapbinding; 
 
 import java.io.IOException;
 
 import java.util.List;
-import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.logging.Level;
 
 import java.security.cert.X509Certificate;
-import java.security.cert.Certificate;
 
 import javax.servlet.ServletConfig;
 import javax.servlet.ServletException;
@@ -55,12 +55,11 @@ import javax.xml.soap.SOAPException;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
-import org.w3c.dom.Node;
 
 import com.sun.identity.liberty.ws.security.SecurityUtils;
-import com.sun.identity.liberty.ws.common.wsse.WSSEConstants;
 import com.sun.identity.liberty.ws.common.LogUtil;
 import com.sun.identity.saml.common.SAMLUtils;
+import org.forgerock.openam.utils.ClientUtils;
 
 /**
  * The <code>SOAPReceiver</code> class defines a SOAP Receiver which supports
@@ -86,6 +85,7 @@ public class SOAPReceiver extends HttpServlet {
       * @param config the <code>ServletConfig</code>.
       * @throws ServletException if there is any error.
       */ 
+     @Override
      public void init(ServletConfig config) throws ServletException {
          super.init(config);
          try {
@@ -108,6 +108,7 @@ public class SOAPReceiver extends HttpServlet {
      * @throws ServletException if an servlet error occurs while processing
      *                          the request
      */
+     @Override
      public void doPost(HttpServletRequest request,HttpServletResponse response)
                         throws IOException, ServletException {
          try {
@@ -153,7 +154,7 @@ public class SOAPReceiver extends HttpServlet {
             soapAction = request.getRequestURI();
         }
 
-	String remoteAddr = request.getRemoteAddr();
+	String remoteAddr = ClientUtils.getClientIPAddress(request);
 
         X509Certificate[] allCerts = (X509Certificate[]) 
             request.getAttribute("javax.servlet.request.X509Certificate");

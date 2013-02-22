@@ -26,11 +26,13 @@
  *
  */
 
+/*
+ * Portions Copyrighted 2013 ForgeRock, Inc.
+ */
+
 package com.sun.identity.federation.services.fednsso;
 
 import com.sun.identity.federation.services.FSAssertionManager;
-import com.sun.identity.federation.services.FSSession;
-import com.sun.identity.federation.services.FSSessionManager;
 import com.sun.identity.federation.services.util.FSServiceUtils;
 import com.sun.identity.federation.message.FSResponse;
 import com.sun.identity.federation.message.FSSAMLRequest;
@@ -42,21 +44,15 @@ import com.sun.identity.federation.common.IFSConstants;
 import com.sun.identity.federation.common.LogUtil;
 import com.sun.identity.federation.jaxb.entityconfig.BaseConfigType;
 import com.sun.identity.federation.key.KeyUtil;
-import com.sun.identity.federation.meta.IDFFMetaException;
-import com.sun.identity.federation.meta.IDFFMetaManager;
-import com.sun.identity.federation.meta.IDFFMetaUtils;
 import com.sun.identity.liberty.ws.meta.jaxb.SPDescriptorType;
-import com.sun.identity.liberty.ws.meta.jaxb.IDPDescriptorType;
 import com.sun.identity.plugin.session.SessionException;
 import com.sun.identity.plugin.session.SessionManager;
-import com.sun.identity.plugin.session.SessionProvider;
 import com.sun.identity.saml.xmlsig.XMLSignatureManager;
 import com.sun.identity.saml.assertion.Assertion;
 import com.sun.identity.saml.assertion.NameIdentifier;
 import com.sun.identity.saml.assertion.Conditions;
 import com.sun.identity.saml.assertion.AudienceRestrictionCondition;
 import com.sun.identity.saml.protocol.StatusCode;
-import com.sun.identity.saml.protocol.Response;
 import com.sun.identity.saml.protocol.Request;
 import com.sun.identity.saml.protocol.Status;
 import com.sun.identity.saml.protocol.AssertionArtifact;
@@ -65,6 +61,7 @@ import com.sun.identity.saml.common.SAMLResponderException;
 import com.sun.identity.saml.common.SAMLUtils;
 
 import com.sun.identity.shared.encode.URLEncDec;
+import org.forgerock.openam.utils.ClientUtils;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -156,6 +153,7 @@ public class FSSSOBrowserArtifactProfileHandler extends FSSSOAndFedHandler {
      * @param bPostAuthn <code>true</code> indicates it's post authentication;
      *  <code>false</code> indicates it's pre authentication.
      */
+    @Override
     public void processAuthnRequest(
         FSAuthnRequest authnRequest, 
         boolean bPostAuthn)
@@ -171,7 +169,6 @@ public class FSSSOBrowserArtifactProfileHandler extends FSSSOAndFedHandler {
                             + "processAuthnRequest: AuthnRequest Processing"
                             + "successful");
                     }
-                    return;
                 } else {
                     if (FSUtils.debug.warningEnabled()) {
                         FSUtils.debug.warning(
@@ -187,7 +184,6 @@ public class FSSSOBrowserArtifactProfileHandler extends FSSSOAndFedHandler {
                         data,
                         ssoToken);
                     sendSAMLArtifacts(null);
-                    return;
                 }
             } else {
                 boolean authnRequestSigned = 
@@ -233,7 +229,6 @@ public class FSSSOBrowserArtifactProfileHandler extends FSSSOAndFedHandler {
                             + "processAuthnRequest: AuthnRequest Processing "
                             + " successful");
                     }
-                    return;
                 } else {
                     if (FSUtils.debug.warningEnabled()) {
                         FSUtils.debug.warning(
@@ -249,14 +244,12 @@ public class FSSSOBrowserArtifactProfileHandler extends FSSSOAndFedHandler {
                         data,
                         ssoToken);
                     sendSAMLArtifacts(null);
-                    return;
                 }
             }
         } catch(Exception e){
             FSUtils.debug.error("FSSSOBrowserArtifactProfileHandler."
                 + "processAuthnRequest: Exception Occured: ", e);
             sendSAMLArtifacts(null);
-            return;
         }
     }
     
@@ -265,6 +258,7 @@ public class FSSSOBrowserArtifactProfileHandler extends FSSSOAndFedHandler {
      * @param samlRequest <code>FSSAMLRequest</code> object
      * @return <code>FSResponse</code> object
      */
+    @Override
     public FSResponse processSAMLRequest(FSSAMLRequest samlRequest) {
         FSUtils.debug.message(
             "FSSSOBrowserArtifactProfileHandler.processSAMLRequest: Called");
@@ -290,9 +284,8 @@ public class FSSSOBrowserArtifactProfileHandler extends FSSSOAndFedHandler {
         String message = null;
         int length;
         Status status;
-        String remoteAddr;
         
-        remoteAddr = request.getRemoteAddr();
+        String remoteAddr = ClientUtils.getClientIPAddress(request);
         String respPrefix = 
             FSUtils.bundle.getString("responseLogMessage") + " " + remoteAddr;
         
@@ -800,6 +793,7 @@ public class FSSSOBrowserArtifactProfileHandler extends FSSSOAndFedHandler {
      * Generates artifact and sends it to <code>SP</code>.
      * @return <code>true</code> always.
      */
+    @Override
     protected boolean doSingleSignOn(
         Object ssoToken,
         String inResponseTo,
@@ -875,7 +869,7 @@ public class FSSSOBrowserArtifactProfileHandler extends FSSSOAndFedHandler {
         try {
             String targetURL = FSServiceUtils.getAssertionConsumerServiceURL(
                 spDescriptor, authnRequest.getAssertionConsumerServiceID());
-            StringBuffer sb = new StringBuffer(1000);
+            StringBuilder sb = new StringBuilder(1000);
             if (artis == null || artis.isEmpty()){
                 if (FSUtils.debug.messageEnabled()) {
                     FSUtils.debug.message("FSSSOBrowserArtifactProfileHandler."
@@ -899,7 +893,7 @@ public class FSSSOBrowserArtifactProfileHandler extends FSSSOAndFedHandler {
                       .append("&");
                 }
             }
-            StringBuffer tmp = new StringBuffer(1000);
+            StringBuilder tmp = new StringBuilder(1000);
             if (targetURL.indexOf('?') == -1){
                 tmp.append(targetURL).append("?");
             } else {
@@ -926,7 +920,6 @@ public class FSSSOBrowserArtifactProfileHandler extends FSSSOAndFedHandler {
         } catch(Exception ex){
             FSUtils.debug.error("FSSSOBrowserArtifactProfileHandler."
                 + "sendSAMLArtifacts: ", ex);
-            return;
         }
     }
 

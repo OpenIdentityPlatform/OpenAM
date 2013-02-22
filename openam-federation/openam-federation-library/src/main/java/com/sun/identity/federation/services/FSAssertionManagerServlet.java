@@ -26,6 +26,10 @@
  *
  */
 
+/*
+ * Portions Copyrighted 2013 ForgeRock, Inc.
+ */
+
 package com.sun.identity.federation.services;
 
 import javax.servlet.ServletException;
@@ -33,11 +37,12 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import com.sun.identity.federation.common.FSUtils;
 import com.sun.xml.rpc.server.http.JAXRPCServlet;
+import org.forgerock.openam.utils.ClientUtils;
 
 /**
  * The class provides remote interfaces for the <code>AssertionManager</code>
  * class using JAX-RPC. Since JAX-RPC does not provide a mechanism to
- * obtainin <code>HttpServletRequest</code> and <code>HttpServletResponse
+ * obtain a <code>HttpServletRequest</code> and <code>HttpServletResponse
  * </code>, it is currently extending Sun's implementation of <code>
  * JAXRPCServlet</code>.
  * This classes uses the same security mechanism used by <code>SAMLSOAPReceiver
@@ -50,13 +55,14 @@ public class FSAssertionManagerServlet extends JAXRPCServlet {
      * checking.
      * @param request <code>HttpServletRequest</code> object
      * @param response <code>HttpServletResponse</code> object
-     * @exception ServletException if error occurrs.
+     * @exception ServletException if error occurs.
      */
+    @Override
     public void doPost(HttpServletRequest request, HttpServletResponse response)
         throws ServletException 
     {
         if (FSUtils.debug.messageEnabled()) {
-            FSUtils.debug.message(DEBUG_SUCCESS_MSG + request.getRemoteAddr());
+            FSUtils.debug.message(DEBUG_SUCCESS_MSG + ClientUtils.getClientIPAddress(request));
         }
 
         FSUtils.checkHTTPRequestLength(request);

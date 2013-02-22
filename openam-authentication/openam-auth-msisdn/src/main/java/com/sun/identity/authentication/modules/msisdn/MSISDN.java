@@ -26,7 +26,9 @@
  *
  */
 
-
+/*
+ * Portions Copyrighted 2013 ForgeRock, Inc.
+ */
 package com.sun.identity.authentication.modules.msisdn;
 
 
@@ -34,6 +36,7 @@ import com.sun.identity.shared.datastruct.CollectionHelper;
 import com.sun.identity.authentication.spi.AMLoginModule;
 import com.sun.identity.authentication.spi.AuthLoginException;
 import com.sun.identity.authentication.util.ISAuthConstants;
+import org.forgerock.openam.utils.ClientUtils;
 
 import java.security.Principal;
 import java.util.Iterator;
@@ -183,7 +186,7 @@ public class MSISDN extends AMLoginModule {
         String msisdnNumber = null;
         
         if (req != null) {
-            gateway = req.getRemoteAddr();
+            gateway = ClientUtils.getClientIPAddress(req);
             msisdnNumber = getMSISDNNumberFromRequest(req);
         } else {
             debug.message("Null request calling sendCallback"); 

@@ -27,7 +27,7 @@
  */
 
 /*
- * Portions Copyrighted 2010-2013 ForgeRock Inc
+ * Portions Copyrighted 2010-2013 ForgeRock, Inc.
  */
 package com.sun.identity.authentication.client;
 
@@ -105,6 +105,7 @@ import com.sun.identity.shared.debug.Debug;
 import com.sun.identity.shared.encode.CookieUtils;
 import com.sun.identity.shared.encode.URLEncDec;
 import com.sun.identity.shared.locale.Locale;
+import org.forgerock.openam.utils.ClientUtils;
 import com.sun.identity.sm.ServiceSchemaManager;
 import com.sun.identity.sm.ServiceSchema;
 import com.sun.identity.sm.SMSException;
@@ -3259,7 +3260,7 @@ public class AuthClientUtils {
     public static Map getEnvMap(HttpServletRequest request) {
         Map envParameters = new HashMap();
         // add all query parameters
-        String strIP = getClientIPAddress(request);
+        String strIP = ClientUtils.getClientIPAddress(request);
         if (strIP != null) {
             Set ipSet = new HashSet(1);
             ipSet.add((String) strIP);
@@ -3297,49 +3298,6 @@ public class AuthClientUtils {
         }
         return envParameters;
     }
-
-    /**
-     * Returns client IP address. The method checks the special HTTP header
-     * first (handles Load Balancer case), then checks the remote address.
-     * 
-     * @param request HttpServletRequest object
-     * @return client IP address.
-     */
-    public static String getClientIPAddress(HttpServletRequest request) {
-        String result = null;
-        String ipAddrHeader = getClientIPAddressHeader();
-        if ((ipAddrHeader != null) && (ipAddrHeader.length() != 0)) {
-            result = request.getHeader(ipAddrHeader);
-            if (result != null) {
-                String[] ips = result.split(",");
-                result = ips[0].trim();
-            }
-        }
-        if ((result == null) || (result.length() == 0)) {
-            result = request.getRemoteAddr();
-            if (utilDebug.messageEnabled()) {
-                utilDebug.message("AuthClientUtils.getClientIPAddress : remoteAddr=[" + result + "]");
-            }
-        } else {
-            if (utilDebug.messageEnabled()) {
-                utilDebug.message("AuthClientUtils.getClientIPAddress : header=["
-                    + ipAddrHeader + "], result=[" + result + "]");
-            }
-        }
-        return result;
-    }
-
-    /**
-     * Returns the HTTP header property name which contains the client IP 
-     * address. This is used in the Load Balancer case, the 
-     * HttpServletRequest.getRemoteAddr() retruns the LoadBalancer IP address
-     * in stead of the user agent's (e.g. browser) IP address. There is a 
-     * feature in most LoadBalancer which can forward user agent's IP address 
-     * as value of a HTTP header property.
-     */
-    private static String getClientIPAddressHeader() {
-        return SystemProperties.get(Constants.CLIENT_IP_ADDR_HEADER);
-    }    
    
     /**
      * Returns unescaped text. This method replaces "&#124;" with "|".

@@ -26,6 +26,10 @@
 
 --%>
 
+<%--
+   Portions Copyrighted 2013 ForgeRock, Inc.
+--%>
+
 <%@ page language="java" 
 import="java.util.*,
 java.io.*,
@@ -43,7 +47,8 @@ com.sun.identity.saml2.meta.SAML2MetaManager,
 com.sun.identity.saml2.meta.SAML2MetaException,
 com.sun.identity.saml2.meta.SAML2MetaUtils,
 com.sun.identity.sae.api.SecureAttrs,
-com.sun.identity.sae.api.Utils"
+com.sun.identity.sae.api.Utils,
+org.forgerock.openam.utils.ClientUtils"
 %>
 
 <%
@@ -57,7 +62,7 @@ com.sun.identity.sae.api.Utils"
     String gotoUrl = request.getRequestURL().toString();
     String appBase = gotoUrl.substring(0, gotoUrl.lastIndexOf(servletPath)+1);
     String errorUrl = appBase+"saml2/jsp/saeerror.jsp";
-    String ipaddr = request.getRemoteAddr();
+    String ipaddr = ClientUtils.getClientIPAddress(request);
     String userid = null;
 
     // This FM-SP's entity ID
