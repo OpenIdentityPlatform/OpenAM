@@ -36,9 +36,8 @@ define("org/forgerock/openam/ui/user/profile/UserProfileView", [
     "org/forgerock/commons/ui/common/components/Navigation",
     "org/forgerock/commons/ui/common/main/EventManager",
     "org/forgerock/commons/ui/common/util/Constants",
-    "org/forgerock/commons/ui/common/main/Configuration",
-    "org/forgerock/commons/ui/common/main/Router"
-], function(AbstractView, validatorsManager, uiUtils, userDelegate, router, navigation, eventManager, constants, conf, router) {
+    "org/forgerock/commons/ui/common/main/Configuration"
+], function(AbstractView, validatorsManager, uiUtils, userDelegate, router, navigation, eventManager, constants, conf) {
     var UserProfileView = AbstractView.extend({
         template: "templates/openam/UserProfileTemplate.html",
         delegate: userDelegate,
