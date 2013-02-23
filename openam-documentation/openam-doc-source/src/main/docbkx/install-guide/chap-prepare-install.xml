@@ -20,7 +20,7 @@
   !
   ! CCPL HEADER END
   !
-  !      Copyright 2012 ForgeRock AS
+  !      Copyright 2011-2013 ForgeRock, Inc.
   !    
 -->
 <chapter xml:id='chap-prepare-install'
@@ -169,30 +169,51 @@ esac
   <indexterm>
    <primary>Downloading OpenAM</primary>
   </indexterm>
-  <para>Download OpenAM releases from <link xlink:show="new"
-  xlink:href="http://forgerock.org/openam.html"
-  >http://forgerock.org/openam.html</link>. At the download location you
-  find links to stable releases, nightly builds for testing, previous
-  releases, and also OpenAM policy agent releases.</para>
+  <para>Download OpenAM releases from one of the following locations:</para>
   
-  <!-- This may need to be updated. The nightly does not include the src file. -->
+   <itemizedlist>
+    <listitem>
+     <para><link xlink:show="new" xlink:href="http://forgerock.com/openam-downloads/"
+     ><citetitle>Enterprise Downloads</citetitle></link> has the latest stable version of OpenAM, including
+     a <filename>.zip</filename> file with all of the OpenAM components, the
+     <filename>.war</filename> file, OpenAM tools, the configurator, policy
+     agents, OpenIG, and documentation. Please review the <link xlink:show="new" 
+     xlink:href="http://forgerock.com/software-license-and-subscription-agreement/"
+     >Software License and Subscription Agreement</link> before using OpenAM in 
+     production.</para>
+    </listitem>
+    <listitem>
+     <para><link xlink:show="new" xlink:href="http://forgerock.org/openam.html"
+     ><citetitle>Builds</citetitle></link> has the nightly build, including a <filename>.zip</filename> 
+     file with all of the OpenAM components, the <filename>.war</filename> file, 
+     OpenAM tools, the configurator, policy agents, and the .NET Fedlet. Be
+     aware that this is the working version of the trunk and should not be 
+     used in a production environment.</para>
+    </listitem>
+    <listitem>
+     <para><link xlink:show="new" xlink:href="http://forgerock.org/openam-archive.html"
+     ><citetitle>Archives</citetitle></link> has all versions of OpenAM, from 9.5.1 to 10.0.1. It includes
+     the <filename>.zip</filename> file with all of the OpenAM components, the 
+     <filename>.war</filename> file, OpenAM tools, the configurator, policy agents, 
+     the WSS policy agents, and the .NET Fedlet for all previous releases.</para>
+    </listitem>
+   </itemizedlist>
+         
   <para>For each release of the OpenAM core services, you can download the
-  entire package as a .zip archive, only the OpenAM .war file, only the
-  administrative tools as a .zip archive, or only the OpenAM source code
-  used to build the release.</para>
+  entire package as a <filename>.zip</filename> file, only the OpenAM 
+  <filename>.war</filename> file, or only the administrative tools as a 
+  <filename>.zip</filename> archive. The Archives also have only the 
+  OpenAM source code used to build the release.</para>
 
-  <para>After you download the .zip archive, create a new openam folder, and unzip 
-  the .zip archive to access the content:</para>
+  <para>After you download the <filename>.zip</filename> file, create a new 
+  openam folder, and unzip the <filename>.zip</filename> file to access the content:</para>
   <screen>$ cd ~/Downloads
 $ mkdir openam ; cd openam
 $ unzip ~/Downloads/<?eval ${coreDirectoryFile}?>.zip</screen>
 
   <variablelist>
    <para>When you unzip the archive of the entire package, you get ldif, license, and 
-   legal directories in addition to the following files. See the <link
-   xlink:href="reference#chap-file-layout"
-    xlink:role="http://docbook.org/xlink/role/olink"><citetitle>File
-    Layout</citetitle> reference</link> for details.</para>
+   legal directories in addition to the following files.</para>
    <varlistentry>
     <term><filename><?eval ${clientsdkJarFile}?></filename></term>
     <listitem><para>The OpenAM Java client SDK library</para></listitem>
