@@ -49,7 +49,7 @@ $ unzip ~/Downloads/opensso/samples/opensso-client.zip</screen>
  sample command-line and web-based client applications.</para>
  <variablelist>
   <varlistentry>
-   <term><filename>src/</filename></term>
+   <term><filename>sdk/</filename></term>
    <listitem>
     <para>This directory contains the SDK and client sample commands.</para>
     <itemizedlist>
@@ -68,7 +68,7 @@ $ unzip ~/Downloads/opensso/samples/opensso-client.zip</screen>
       to run the samples on UNIX, Linux, and Windows systems</para>
      </listitem>
      <listitem>
-      <para><filename>sources/</filename>: sample code</para>
+      <para><filename>source/</filename>: sample code</para>
      </listitem>
     </itemizedlist>
    </listitem>
