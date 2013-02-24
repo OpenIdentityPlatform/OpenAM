@@ -3875,6 +3875,18 @@
    </varlistentry>
 
    <varlistentry>
+    <term><literal>openam.session.useLocalSessionsInMultiServerMode</literal></term>
+    <listitem>
+     <para>This property is for use in multi-server deployments where session
+     failover is not available. If <literal>true</literal>, calculate session
+     quotas per server. In other words, if the session quota is 5 sessions and
+     users can access up to 4 servers, they can have a maximum of 20 (5 * 4)
+     sessions.</para>
+     <para>Default: <literal>false</literal></para>
+    </listitem>
+   </varlistentry>
+
+   <varlistentry>
     <term><literal>opensso.protocol.handler.pkgs</literal></term>
     <listitem>
      <para>If the web application containers sets 

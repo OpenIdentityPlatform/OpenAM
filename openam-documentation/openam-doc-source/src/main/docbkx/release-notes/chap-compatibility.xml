@@ -146,6 +146,13 @@
     <para>Support for Liberty Identity Web Services Framework (ID-WSF) has been
     removed.</para>
    </listitem>
+
+   <listitem>
+    <para>The advanced server property,
+    <literal>openam.session.destroy_all_sessions</literal>, has been replaced
+    by the built-in Global Session Service setting,
+    <literal>DESTROY_OLD_SESSIONS</literal>.</para>
+   </listitem>
   </itemizedlist>
  </section>
 </chapter>

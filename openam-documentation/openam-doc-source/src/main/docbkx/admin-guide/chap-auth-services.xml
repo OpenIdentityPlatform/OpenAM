@@ -144,7 +144,14 @@
   later in this guide, you can use <firstterm>realms</firstterm> to organize
   which authentication process applies for different applications or different
   domains, perhaps managed by different people.</para>
-  
+
+  <para>When a user successfully authenticates, OpenAM creates a session, which
+  allows OpenAM to manage that user's access to resources. In some deployments
+  you need to limit how many active sessions a user can have at a given time.
+  For example, you might want to prevent a user from using more than two devices
+  at once. See <xref linkend="configure-session-quotas" /> for
+  instructions.</para>
+
   <para>OpenAM leaves the authentication process flexible so that you can adapt
   how it works to your situation. Although at first the number of choices
   can seem daunting, now that you understand the basic process, you begin to
@@ -3729,4 +3736,139 @@
   Control &gt; <replaceable>Realm Name</replaceable> &gt; Subjects &gt; User,
   set the user's User Status to Active, and click Save.</para>
  </section>
+
+ <section xml:id="configure-session-quotas">
+  <title>Configuring Session Quotas</title>
+  <indexterm>
+   <primary>Session quotas</primary>
+  </indexterm>
+
+  <para>OpenAM lets you limit the number of active sessions for a user by
+  setting session quotas. You also configure session quota exhaustion actions
+  so that when a user goes beyond the session quota, OpenAM takes the
+  appropriate action.</para>
+
+  <important>
+   <para>To enforce session quotas across multiple servers in a site, configure
+   session failover as described in the <citetitle>Installation Guide</citetitle>
+   chapter, <link xlink:href="install-guide#chap-session-failover"
+   xlink:role="http://docbook.org/xlink/role/olink"><citetitle>Setting Up OpenAM
+   Session Failover</citetitle></link>.</para>
+  </important>
+
+  <procedure xml:id="session-quotas-and-exhaustion-actions">
+   <title>To Configure Session Quotas &amp; Exhaustion Actions</title>
+
+   <!-- This is based on Peter Major's work. See his blog entry on the subject:
+        http://blogs.forgerock.org/petermajor/2013/01/session-quota-basics/ -->
+
+  <para>The session quota applies to all sessions opened for the same
+  user (as represented by the user's universal identifier).</para>
+
+  <step>
+   <para>Log in to OpenAM Console as administrator, and then browse to
+   Configuration &gt; Global &gt; Session.</para>
+  </step>
+
+  <step>
+   <para>Set Enable Quota Constraints to <literal>ON</literal>.</para>
+  </step>
+
+  <step>
+   <para>Set Resulting behavior if session quota exhausted.</para>
+
+   <variablelist>
+    <para>The following settings are available by default.</para>
+
+    <varlistentry>
+     <term><literal>DENY_ACCESS</literal></term>
+     <listitem>
+      <para>Deny access, preventing the user from creating an additional
+      session.</para>
+     </listitem>
+    </varlistentry>
+
+    <varlistentry>
+     <term><literal>DESTROY_NEXT_EXPIRING</literal></term>
+     <listitem>
+      <para>Remove the next session to expire, and create a new session for
+      the user. The next session to expire is the session with the minimum
+      time left until expiration.</para>
+
+      <para>This is the default setting.</para>
+     </listitem>
+    </varlistentry>
+
+    <varlistentry>
+     <term><literal>DESTROY_OLDEST_SESSION</literal></term>
+     <listitem>
+      <para>Remove the oldest session, and create a new session for the
+      user.</para>
+     </listitem>
+    </varlistentry>
+
+    <varlistentry>
+     <term><literal>DESTROY_OLD_SESSIONS</literal></term>
+     <listitem>
+      <para>Remove all existing sessions, and create a new session for the
+      user.</para>
+     </listitem>
+    </varlistentry>
+   </variablelist>
+
+   <para>If none of these session quota exhaustion actions fit your deployment,
+   you can implement a custom session quota exhaustion action. See the
+   <citetitle>Developer's Guide</citetitle> chapter on <link
+   xlink:href="dev-guide#chap-custom-quota-exhaustion-action"
+   xlink:role="http://docbook.org/xlink/role/olink"><citetitle>Customizing
+   Session Quota Exhaustion Actions</citetitle></link> for an example.</para>
+  </step>
+
+  <step>
+   <para>Set Active User Sessions to the session quota.</para>
+   <para>The default is 5 sessions.</para>
+  </step>
+
+  <step>
+   <para>Save your work.</para>
+  </step>
+
+  <step performance="optional">
+   <para>If you have multiple servers but session failover is not configured,
+   configure multi-server mode as described below.</para>
+
+   <itemizedlist>
+    <listitem>
+     <para>If you have only a single OpenAM server, skip this step. OpenAM
+     enforces the session quota you set for the server.</para>
+    </listitem>
+
+    <listitem>
+     <para>If you have multiple servers with session failover configured, then
+     also skip this step. In this case OpenAM uses the session store to enforce
+     session quotas globally across your deployment. In other words when the
+     Set Active User Sessions is 5, a user can have a maximum of 5 active
+     sessions.</para>
+    </listitem>
+
+    <listitem>
+     <para>If you have multiple OpenAM servers but session failover is not
+     configured, configure multi-server mode for session quotas. Browse to
+     Configuration &gt; Servers and Sites &gt; Default Server Settings or
+     Configuration &gt; Servers and Sites &gt; <replaceable>Server
+     Name</replaceable>, and then use the Advanced tab page to set the
+     following advanced server property.</para>
+
+     <literallayout>openam.session.useLocalSessionsInMultiServerMode = true</literallayout>
+
+     <para>When you set this property to <literal>true</literal> for your OpenAM
+     servers, users can potentially reach the session quota for each individual
+     server before all session quotas are exhausted. In other words if you have
+     4 OpenAM servers and Set Active User Sessions is 5, then the user can have
+     a maximum of 20 (5 * 4) sessions.</para>
+    </listitem>
+   </itemizedlist>
+  </step>
+ </procedure>
+</section>
 </chapter>

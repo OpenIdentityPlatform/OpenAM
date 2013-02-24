@@ -20,7 +20,7 @@
   !
   ! CCPL HEADER END
   !
-  !      Copyright 2011-2012 ForgeRock AS
+  !      Copyright 2011-2013 ForgeRock AS
   !    
 -->
 <book xml:id='dev-guide'
@@ -37,7 +37,7 @@
    Federation software.</para>
   </abstract>
   <copyright>
-   <year>2011-2012</year>
+   <year>2011-2013</year>
    <holder>ForgeRock AS</holder>
   </copyright>
   <authorgroup>
@@ -46,10 +46,16 @@
      <firstname>Mark</firstname><surname>Craig</surname>
     </personname>
    </author>
+   <author>
+    <personname>
+     <firstname>Péter</firstname><surname>Major</surname>
+    </personname>
+   </author>
   </authorgroup>
   <xinclude:include href="../legal.xml" />
   <date><?dbtimestamp format="B d, Y"?></date>
   <pubdate>Publication date: <?dbtimestamp format="B d, Y"?></pubdate>
+  <releaseinfo><?eval ${softwareReleaseDate}?></releaseinfo>
  </info>
 
  <toc />
@@ -86,6 +92,7 @@
  <xinclude:include href='chap-custom-attr.xml' />
  <xinclude:include href='chap-oauth2-scopes.xml' />
  <xinclude:include href='chap-auth-spi.xml' />
+ <xinclude:include href='chap-custom-quota-exhaustion-action.xml' />
  <xinclude:include href='chap-post-auth.xml' />
  <xinclude:include href='chap-policy-spi.xml' />
  <xinclude:include href='chap-identity-repo-spi.xml' />
