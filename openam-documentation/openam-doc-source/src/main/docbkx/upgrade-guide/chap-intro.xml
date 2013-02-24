@@ -119,10 +119,10 @@
    changes, usually new functionality, enhancement, and bug fixes. Check out 
    the Release Notes for the OpenAM version you are considering. Links to 
    release notes for archived versions are available on the 
-   <link xlink:hrf="http://forgerock.org/openam-archive.html" xlink:show="new">
-   <citetitle>Archives page</citetitle></link>. Links to release notes for versions 
-   10.0.0 and later are available on the <link xlink:hrf="http://docs.forgerock.org/en/openam.html" xlink:show="new">
-   <citetitle>OpenAM Access Management Documentation page</citetitle></link>.</para>
+   <link xlink:show="new" xlink:href="http://forgerock.org/openam-archive.html"
+     ><citetitle>Archives page</citetitle></link>. Links to release notes for versions 
+   10.0.0 and later are available on the <link xlink:show="new" xlink:href="http://forgerock.com/openam-downloads/"
+     ><citetitle>Enterprise Downloads page</citetitle></link>.</para>
    
   <para>The third part of the version number (x.x.0) indicates the version 
   is a patch. These are designed to fix issues and provide very minor
