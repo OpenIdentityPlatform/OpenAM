@@ -29,7 +29,7 @@ import com.sun.identity.shared.OAuth2Constants;
 import org.forgerock.openam.oauth2.utils.OAuth2Utils;
 import org.forgerock.restlet.ext.openam.OpenAMParameters;
 import org.forgerock.restlet.ext.openam.OpenAMUser;
-
+import org.forgerock.openam.oauth2.utils.OAuth2Utils;
 import com.iplanet.sso.SSOToken;
 import com.sun.identity.authentication.AuthContext;
 import org.restlet.Request;
@@ -47,12 +47,9 @@ public class UserIdentityVerifier extends AbstractIdentityVerifier<OpenAMUser> {
     /**
      * Constructor.
      * <p/>
-     * 
-     * @param parameters
-     *            OpenAM boot properties
+     *
      */
-    public UserIdentityVerifier(OpenAMParameters parameters) {
-        super(parameters);
+    public UserIdentityVerifier() {
     }
 
     @Override
@@ -127,7 +124,7 @@ public class UserIdentityVerifier extends AbstractIdentityVerifier<OpenAMUser> {
             OAuth2Utils.DEBUG.warning("UserIdentityVerifier:: No SSO Token in request", e);
         }
         if (token == null){
-            return authenticate(username, password);
+            return authenticate(username, password, OAuth2Utils.getRealm(request));
         } else {
             try {
                 return new OpenAMUser(token.getProperty("UserId"), token);

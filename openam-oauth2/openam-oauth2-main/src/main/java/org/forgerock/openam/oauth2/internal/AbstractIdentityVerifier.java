@@ -48,27 +48,17 @@ import com.sun.identity.authentication.spi.AuthLoginException;
  */
 public abstract class AbstractIdentityVerifier<T extends User> extends SecretVerifier {
 
-    private String realm;
-    private AuthContext.IndexType authIndexType;
-    private String authIndexValue = null;
-
     /**
      * Constructor.
      * <p/>
-     * 
-     * @param parameters
-     *            OpenAM boot properties
+     *
      */
-    public AbstractIdentityVerifier(OpenAMParameters parameters) {
-        // authIndexType = AuthContext.IndexType.SERVICE;
-        authIndexType = AuthContext.IndexType.MODULE_INSTANCE;
-        authIndexValue = parameters.getLoginIndexName();
-        realm = parameters.getOrgName();
+    public AbstractIdentityVerifier() {
     }
 
     @Override
     public int verify(final String identifier, char[] secret) {
-        T user = authenticate(identifier, secret);
+        T user = authenticate(identifier, secret, "/");
         if (null != user) {
             return RESULT_VALID;
         }
@@ -114,7 +104,7 @@ public abstract class AbstractIdentityVerifier<T extends User> extends SecretVer
             result = RESULT_MISSING;
         } else {
             // result = verify(identifier, secret);
-            T user = authenticate(identifier, secret);
+            T user = authenticate(identifier, secret, OAuth2Utils.getRealm(request));
             if (null != user) {
                 result = RESULT_VALID;
                 request.getClientInfo().setUser(user);
@@ -131,18 +121,16 @@ public abstract class AbstractIdentityVerifier<T extends User> extends SecretVer
      *            Subject's user name.
      * @param password
      *            Subject's password
+     * @param realm
+     *            Realm to search for subject
      * @return Subject's token if authenticated.
      */
-    public T authenticate(String username, char[] password) {
+    public T authenticate(String username, char[] password, String realm) {
 
         T ret = null;
         try {
             AuthContext lc = new AuthContext(realm);
-            if (authIndexType != null) {
-                lc.login(authIndexType, authIndexValue);
-            } else {
-                lc.login();
-            }
+            lc.login();
             while (lc.hasMoreRequirements()) {
                 Callback[] callbacks = lc.getRequirements();
                 ArrayList missing = new ArrayList();
