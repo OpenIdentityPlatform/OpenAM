@@ -396,276 +396,126 @@ $ cat WEB-INF/jboss-web.xml</screen>
  <section xml:id="prepare-jboss-7">
   <title>Preparing OpenAM &amp; JBoss 7</title>
 
-  <para>OpenAM must be able to store its configuration between restarts. If
-  you plan to deploy OpenAM as a single archive file, then unpack the .war,
-  edit <filename>WEB-INF/classes/bootstrap.properties</filename> to set the
-  <literal>configuration.dir</literal> property to the location where OpenAM
-  has write access to store its configuration, and then repack the .war.</para>
+    <para>JBoss 7 requires some preparation prior to deploying OpenAM. The following
+    instructions provide guidance for both standalone and domain deployments.
+    OpenAM must be able to store its configuration between restarts.</para>
 
-  <screen>$ mkdir openam
-$ cd openam
-$ jar -xf ~/Downloads/openam/<?eval ${coreWarFile}?>
-$ vi WEB-INF/classes/bootstrap.properties
-$ grep ^config WEB-INF/classes/bootstrap.properties
-configuration.dir=/home/jboss-user/openam
-$ jar -cf ../openam.war *</screen>
+   <procedure>
+    <title>Preparing JBoss 7</title>
 
-  <procedure>
-   <title>Preparing JBoss 7</title>
+    <step>
+     <para>Stop JBoss.</para>
+    </step>
 
-   <step>
-    <para>Stop JBoss.</para>
-   </step>
+    <step>
+     <para>Add the Sun x509 security module path to the JBoss 7
+     configuration (<literal>sun/security/x509</literal>).</para>
+     <para>The following example uses JBoss 7.1.1.</para>
+     <screen>$ vi /path/to/jboss7/modules/sun/jdk/main/module.xml
+ &lt;path name="com/sun/security/auth"/&gt;
+ &lt;path name="com/sun/security/auth/module"/&gt;
+ + &lt;path name ="sun/security/x509"/&gt;</screen>
+    </step>
 
-   <step>
-    <para>Add the Sun x509 security module path to the JBoss 7
-    configuration.</para>
-    <para>The following example uses JBoss 7.1.1.</para>
-    <screen>$ cp /path/to/jboss7/modules/sun/jdk/main/module.xml
- /path/to/jboss7/modules/sun/jdk/main/module.orig
-$ vi /path/to/jboss7/modules/sun/jdk/main/module.xml
-$ diff -c /path/to/jboss7/modules/sun/jdk/main/module.orig
- /path/to/jboss7/modules/sun/jdk/main/module.xml
-*** /path/to/jboss7/modules/sun/jdk/main/module.orig     ...
---- /path/to/jboss7/modules/sun/jdk/main/module.xml     ...
-***************
-*** 38,43 ****
---- 38,44 ----
-&lt;path name=&quot;com/sun/security/auth&quot;/&gt;
-&lt;path name=&quot;com/sun/security/auth/login&quot;/&gt;
-&lt;path name=&quot;com/sun/security/auth/module&quot;/&gt;
-+                 &lt;path name=&quot;sun/security/x509&quot;/&gt;
-&lt;path name=&quot;sun/misc&quot;/&gt;
-&lt;path name=&quot;sun/io&quot;/&gt;
-&lt;path name=&quot;sun/nio&quot;/&gt;</screen>
-   </step>
+    <step>
+     <para>Disable modules that conflict with OpenAM REST libraries. All jaxrs 
+     references need to be removed from the configuration.</para>
+     
+     <note>
+      <para>For JBoss 7.1.0 Final, in addition to removing the following references,
+      remove all <literal>org.jboss.as.webservices</literal> references. You will need
+      to remove the extension and all related subsystem tags.</para>
+     </note>
 
-   <step>
-    <para>Disable modules that conflict with OpenAM.</para>
-    <stepalternatives>
-     <step>
-      <para>The following example uses JBoss 7.1.1 standalone.</para>
-      <screen>$ cp /path/to/jboss7/standalone/configuration/standalone.xml
- /path/to/jboss7/standalone/configuration/standalone.orig
-$ vi /path/to/jboss7/standalone/configuration/standalone.xml
-$ diff -c /path/to/jboss7/standalone/configuration/standalone.orig
- /path/to/jboss7/standalone/configuration/standalone.xml
-*** /path/to/jboss7/standalone/configuration/standalone.orig     ...
---- /path/to/jboss7/standalone/configuration/standalone.xml     ...
-***************
-*** 9,15 ****
-&lt;extension module=&quot;org.jboss.as.deployment-scanner&quot;/&gt;
-&lt;extension module=&quot;org.jboss.as.ee&quot;/&gt;
-&lt;extension module=&quot;org.jboss.as.ejb3&quot;/&gt;
--         &lt;extension module=&quot;org.jboss.as.jaxrs&quot;/&gt;
-&lt;extension module=&quot;org.jboss.as.jdr&quot;/&gt;
-&lt;extension module=&quot;org.jboss.as.jmx&quot;/&gt;
-&lt;extension module=&quot;org.jboss.as.jpa&quot;/&gt;
---- 9,14 ----
-***************
-*** 24,30 ****
-&lt;extension module=&quot;org.jboss.as.threads&quot;/&gt;
-&lt;extension module=&quot;org.jboss.as.transactions&quot;/&gt;
-&lt;extension module=&quot;org.jboss.as.web&quot;/&gt;
--         &lt;extension module=&quot;org.jboss.as.webservices&quot;/&gt;
-&lt;extension module=&quot;org.jboss.as.weld&quot;/&gt;
-&lt;/extensions&gt;
-
---- 23,28 ----
-***************
-*** 163,169 ****
-&lt;/local-cache&gt;
-&lt;/cache-container&gt;
-&lt;/subsystem&gt;
--         &lt;subsystem xmlns=&quot;urn:jboss:domain:jaxrs:1.0&quot;/&gt;
-&lt;subsystem xmlns=&quot;urn:jboss:domain:jca:1.1&quot;&gt;
-&lt;archive-validation enabled=&quot;true&quot; fail-on-error=&quot;true&quot;
-  fail-on-warn=&quot;false&quot;/&gt;
-&lt;bean-validation enabled=&quot;true&quot;/&gt;
---- 161,166 ----
-***************
-*** 262,277 ****
-&lt;alias name=&quot;example.com&quot;/&gt;
-&lt;/virtual-server&gt;
-&lt;/subsystem&gt;
--         &lt;subsystem xmlns=&quot;urn:jboss:domain:webservices:1.1&quot;&gt;
--             &lt;modify-wsdl-address&gt;true&lt;/modify-wsdl-address&gt;
--             &lt;wsdl-host&gt;${jboss.bind.address:127.0.0.1}&lt;/wsdl-host&gt;
--             &lt;endpoint-config name=&quot;Standard-Endpoint-Config&quot;/&gt;
--             &lt;endpoint-config name=&quot;Recording-Endpoint-Config&quot;&gt;
--                 &lt;pre-handler-chain name=&quot;recording-handlers&quot;
-                       protocol-bindings=&quot;##SOAP11_HTTP ##SOAP11_HTTP_MTOM
-                         ##SOAP12_HTTP ##SOAP12_HTTP_MTOM&quot;&gt;
--                     &lt;handler name=&quot;RecordingHandler&quot;/&gt;
--                 &lt;/pre-handler-chain&gt;
--             &lt;/endpoint-config&gt;
--         &lt;/subsystem&gt;
-&lt;subsystem xmlns=&quot;urn:jboss:domain:weld:1.0&quot;/&gt;
-&lt;/profile&gt;
-
---- 259,264 ----</screen>
-     </step>
+     <stepalternatives>
+      <step>
+       <para>The following example uses JBoss 7.1.1 standalone. Remember to
+       remove all subsystems and extension tags associated with <literal>urn:jboss:domain:jaxrs:1.0</literal>.</para>
+       <screen>$ vi /path/to/jboss7/standalone/configuration/standalone.xml
+ &lt;extension module="org.jboss.as.ejb3"/&gt;
+-  &lt;extension module="org.jboss.as.jaxrs"/&gt;
+....
+-  &lt;subsystem xmlns="urn:jboss:domain:jaxrs:1.0"/&gt;
+ &lt;subsystem xmlns="urn:jboss:domain:jca:1.1"&gt;</screen>
+     </step> 
      <step>
       <para>The following example uses JBoss 7.1.1 for a managed domain.</para>
-      <screen>$ cp /path/to/jboss7/domain/configuration/domain.xml
- /path/to/jboss7/domain/configuration/domain.orig
-$ vi /path/to/jboss7/domain/configuration/domain.xml
-$ diff -c /path/to/jboss7/domain/configuration/domain.orig
- /path/to/jboss7/domain/configuration/domain.xml
-*** /path/to/jboss7/domain/configuration/domain.orig     ...
---- /path/to/jboss7/domain/configuration/domain.xml     ...
-***************
-*** 11,17 ****
-&lt;extension module=&quot;org.jboss.as.ejb3&quot;/&gt;
-&lt;extension module=&quot;org.jboss.as.jacorb&quot;/&gt;
-&lt;extension module=&quot;org.jboss.as.jaxr&quot;/&gt;
--         &lt;extension module=&quot;org.jboss.as.jaxrs&quot;/&gt;
-&lt;extension module=&quot;org.jboss.as.jdr&quot;/&gt;
-&lt;extension module=&quot;org.jboss.as.jmx&quot;/&gt;
-&lt;extension module=&quot;org.jboss.as.jpa&quot;/&gt;
---- 11,16 ----
-***************
-*** 29,35 ****
-&lt;extension module=&quot;org.jboss.as.threads&quot;/&gt;
-&lt;extension module=&quot;org.jboss.as.transactions&quot;/&gt;
-&lt;extension module=&quot;org.jboss.as.web&quot;/&gt;
--         &lt;extension module=&quot;org.jboss.as.webservices&quot;/&gt;
-&lt;extension module=&quot;org.jboss.as.weld&quot;/&gt;
-&lt;/extensions&gt;
-&lt;system-properties&gt;
---- 28,33 ----
-***************
-*** 146,152 ****
-&lt;/local-cache&gt;
-&lt;/cache-container&gt;
-&lt;/subsystem&gt;
--             &lt;subsystem xmlns=&quot;urn:jboss:domain:jaxrs:1.0&quot;/&gt;
-&lt;subsystem xmlns=&quot;urn:jboss:domain:jca:1.1&quot;&gt;
-&lt;archive-validation enabled=&quot;true&quot; fail-on-error=&quot;true&quot;
-  fail-on-warn=&quot;false&quot;/&gt;
-&lt;bean-validation enabled=&quot;true&quot;/&gt;
---- 144,149 ----
-***************
-*** 246,261 ****
-&lt;alias name=&quot;example.com&quot;/&gt;
-&lt;/virtual-server&gt;
-&lt;/subsystem&gt;
--             &lt;subsystem xmlns=&quot;urn:jboss:domain:webservices:1.1&quot;&gt;
--                 &lt;modify-wsdl-address&gt;true&lt;/modify-wsdl-address&gt;
--                 &lt;wsdl-host&gt;${jboss.bind.address:127.0.0.1}&lt;/wsdl-host&gt;
--                 &lt;endpoint-config name=&quot;Standard-Endpoint-Config&quot;/&gt;
--                 &lt;endpoint-config name=&quot;Recording-Endpoint-Config&quot;&gt;
--                     &lt;pre-handler-chain name=&quot;recording-handlers&quot;
-                        protocol-bindings=&quot;##SOAP11_HTTP ##SOAP11_HTTP_MTOM
-                          ##SOAP12_HTTP ##SOAP12_HTTP_MTOM&quot;&gt;
--                         &lt;handler name=&quot;RecordingHandler&quot;/&gt;
--                     &lt;/pre-handler-chain&gt;
--                 &lt;/endpoint-config&gt;
--             &lt;/subsystem&gt;
-&lt;subsystem xmlns=&quot;urn:jboss:domain:weld:1.0&quot;/&gt;
-&lt;/profile&gt;
-&lt;profile name=&quot;ha&quot;&gt;
---- 243,248 ----
-***************
-*** 544,559 ****
-&lt;alias name=&quot;example.com&quot;/&gt;
-&lt;/virtual-server&gt;
-&lt;/subsystem&gt;
--             &lt;subsystem xmlns=&quot;urn:jboss:domain:webservices:1.1&quot;&gt;
--                 &lt;modify-wsdl-address&gt;true&lt;/modify-wsdl-address&gt;
--                 &lt;wsdl-host&gt;${jboss.bind.address:127.0.0.1}&lt;/wsdl-host&gt;
--                 &lt;endpoint-config name=&quot;Standard-Endpoint-Config&quot;/&gt;
--                 &lt;endpoint-config name=&quot;Recording-Endpoint-Config&quot;&gt;
--                     &lt;pre-handler-chain name=&quot;recording-handlers&quot;
-                        protocol-bindings=&quot;##SOAP11_HTTP ##SOAP11_HTTP_MTOM
-                          ##SOAP12_HTTP ##SOAP12_HTTP_MTOM&quot;&gt;
--                         &lt;handler name=&quot;RecordingHandler&quot;/&gt;
--                     &lt;/pre-handler-chain&gt;
--                 &lt;/endpoint-config&gt;
--             &lt;/subsystem&gt;
-&lt;subsystem xmlns=&quot;urn:jboss:domain:weld:1.0&quot;/&gt;
-&lt;/profile&gt;
-&lt;profile name=&quot;full&quot;&gt;
---- 531,536 ----
-***************
-*** 859,874 ****
-&lt;alias name=&quot;example.com&quot;/&gt;
-&lt;/virtual-server&gt;
-&lt;/subsystem&gt;
--             &lt;subsystem xmlns=&quot;urn:jboss:domain:webservices:1.1&quot;&gt;
--                 &lt;modify-wsdl-address&gt;true&lt;/modify-wsdl-address&gt;
--                 &lt;wsdl-host&gt;${jboss.bind.address:127.0.0.1}&lt;/wsdl-host&gt;
--                 &lt;endpoint-config name=&quot;Standard-Endpoint-Config&quot;/&gt;
--                 &lt;endpoint-config name=&quot;Recording-Endpoint-Config&quot;&gt;
--                     &lt;pre-handler-chain name=&quot;recording-handlers&quot;
-                        protocol-bindings=&quot;##SOAP11_HTTP ##SOAP11_HTTP_MTOM
-                          ##SOAP12_HTTP ##SOAP12_HTTP_MTOM&quot;&gt;
--                         &lt;handler name=&quot;RecordingHandler&quot;/&gt;
--                     &lt;/pre-handler-chain&gt;
--                 &lt;/endpoint-config&gt;
--             &lt;/subsystem&gt;
-&lt;subsystem xmlns=&quot;urn:jboss:domain:weld:1.0&quot;/&gt;
-&lt;/profile&gt;
-&lt;profile name=&quot;full-ha&quot;&gt;
---- 836,841 ----
-***************
-*** 1275,1290 ****
-&lt;alias name=&quot;example.com&quot;/&gt;
-&lt;/virtual-server&gt;
-&lt;/subsystem&gt;
--             &lt;subsystem xmlns=&quot;urn:jboss:domain:webservices:1.1&quot;&gt;
--                 &lt;modify-wsdl-address&gt;true&lt;/modify-wsdl-address&gt;
--                 &lt;wsdl-host&gt;${jboss.bind.address:127.0.0.1}&lt;/wsdl-host&gt;
--                 &lt;endpoint-config name=&quot;Standard-Endpoint-Config&quot;/&gt;
--                 &lt;endpoint-config name=&quot;Recording-Endpoint-Config&quot;&gt;
--                     &lt;pre-handler-chain name=&quot;recording-handlers&quot;
-                        protocol-bindings=&quot;##SOAP11_HTTP ##SOAP11_HTTP_MTOM
-                          ##SOAP12_HTTP ##SOAP12_HTTP_MTOM&quot;&gt;
--                         &lt;handler name=&quot;RecordingHandler&quot;/&gt;
--                     &lt;/pre-handler-chain&gt;
--                 &lt;/endpoint-config&gt;
--             &lt;/subsystem&gt;
-&lt;subsystem xmlns=&quot;urn:jboss:domain:weld:1.0&quot;/&gt;
-&lt;/profile&gt;
-&lt;/profiles&gt;
---- 1242,1247 ----</screen>
-     </step>
-    </stepalternatives>
+      <screen>$ cp /path/to/jboss7/domain/configuration/
+ $vi domain.xml
+ &lt;extension module="org.jboss.as.ejb3"/&gt;
+-  &lt;extension module="org.jboss.as.jaxrs"/&gt;
+....
+-  &lt;subsystem xmlns="urn:jboss:domain:jaxrs:1.0"/&gt;
+ &lt;subsystem xmlns="urn:jboss:domain:jca:1.1"&gt;</screen>
+      </step>
+     </stepalternatives>
+    </step>
+
+    <step>
+     <para>Update the <filename>openam.war</filename> before deploying OpenAM.</para>
+     <para>JBoss will deploy applications from different temporary directories 
+     every time you restart the server, forcing you to reconfigure OpenAM. Updating 
+     or expanding the <filename>openam.war</filename> will anchor the configuration.</para>
+
+      <orderedlist numeration="arabic">
+        <listitem>
+         <para>Create a temporary directory and expand the <filename>openam.war</filename>.</para>
+         <screen> $ cd /temp
+ $ mkdir openamtemp ; cd openamtemp
+ $ jar xvf ~/Downloads/<?eval ${coreWarFile}?></screen>
+        </listitem>
+        <listitem>
+         <para>Update the <literal># configuration.dir=</literal> line in the 
+         <filename>bootstrap.properties</filename> file so that it appears as follows, 
+         and save the change.</para>
+         <screen>$ vi WEB-INF/classes/bootstrap.properties
+  # This property should also be used when the system user that 
+  # is running the web/application server process does not have
+  # a home directory. i.e. System.getProperty("user.home") returns
+  # null.
+  
+  configuration.dir=$HOME/openamJboss</screen>
+        </listitem>
+        <listitem>
+         <para>Rebuild the <filename>openam.war</filename> file.</para>
+         <screen>$ jar cvf ../openam.war *</screen>
+        </listitem>
+        </orderedlist>
    </step>
    <step>
-    <para>Before you deploy OpenAM, update these JVM options.</para>
-
-    <variablelist>
-     <varlistentry>
-      <term><literal>-Dorg.apache.tomcat.util.http.ServerCookie.ALWAYS_ADD_EXPIRES=true</literal></term>
-      <listitem>
-       <para>Make sure that headers include the <literal>Expires</literal>
-       attribute rather than only <literal>Max-Age</literal>, as some versions
-       of Internet Explorer do not support <literal>Max-Age</literal>.</para>
-      </listitem>
-     </varlistentry>
-     <varlistentry>
-      <term><literal>-server</literal></term>
-      <listitem>
-       <para>Use <literal>-server</literal> rather than
-       <literal>-client</literal>.</para>
-      </listitem>
-     </varlistentry>
-     <varlistentry>
-      <term><literal>-XX:MaxPermSize=256m</literal></term>
-      <listitem>
-       <para>Set the permanent generation size to 256 MB.</para>
-      </listitem>
-     </varlistentry>
-     <varlistentry>
-      <term><literal>-Xmx1024m</literal></term>
-      <listitem>
-       <para>Make sure OpenAM has at least 1 GB heap.</para>
-      </listitem>
-     </varlistentry>
-    </variablelist>
-   </step>
-  </procedure>
+    <para>Set the following JVM options before deploying the <filename>openam.war</filename>
+    file.</para>
+     <variablelist>
+      <varlistentry>
+       <term><literal>-Dorg.apache.tomcat.util.http.ServerCookie.ALWAYS_ADD_EXPIRES=true</literal></term>
+       <listitem>
+        <para>Make sure that headers include the <literal>Expires</literal>
+        attribute rather than only <literal>Max-Age</literal>, as some versions
+        of Internet Explorer do not support <literal>Max-Age</literal>.</para>
+       </listitem>
+      </varlistentry>
+      <varlistentry>
+       <term><literal>-server</literal></term>
+       <listitem>
+        <para>Use <literal>-server</literal> rather than
+        <literal>-client</literal>.</para>
+       </listitem>
+      </varlistentry>
+      <varlistentry>
+       <term><literal>-XX:MaxPermSize=256m</literal></term>
+       <listitem>
+        <para>Set the permanent generation size to 256 MB.</para>
+       </listitem>
+      </varlistentry>
+      <varlistentry>
+       <term><literal>-Xmx1024m</literal></term>
+       <listitem>
+        <para>Make sure OpenAM has at least 1 GB heap.</para>
+       </listitem>
+      </varlistentry>
+     </variablelist>
+    </step> 
+   </procedure>
  </section>
 
  <section xml:id="prepare-jetty-7">
