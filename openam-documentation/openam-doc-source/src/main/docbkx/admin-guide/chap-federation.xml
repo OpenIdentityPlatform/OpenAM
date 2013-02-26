@@ -20,7 +20,7 @@
   !
   ! CCPL HEADER END
   !
-  !      Copyright 2011-2012 ForgeRock AS
+  !      Copyright 2011-2013 ForgeRock AS
   !    
 -->
 <chapter xml:id='chap-federation'
@@ -1485,6 +1485,102 @@ CookieWriterServlet.doGetPost: Redirect to
     </listitem>
    </varlistentry>
   </variablelist>
+ </section>
+
+ <section xml:id="google-apps-as-sp">
+  <title>Configuring Google Apps as a Remote Service Provider</title>
+  <indexterm><primary>Google Apps</primary></indexterm>
+  <indexterm>
+   <primary>Federation</primary>
+   <secondary>Configuring</secondary>
+  </indexterm>
+
+  <para>OpenAM can serve as the identity provider when you use <link
+  xlink:show="new" xlink:href="http://www.google.com/apps/">Google
+  Apps</link> as a service provider, allowing users to have single sign-on
+  with their Google Apps account.</para>
+
+  <para>In order to use this service, you must have a Google Apps account for
+  at least one of your domains, such as <literal>example.com</literal>.</para>
+
+  <procedure xml:id="integrate-google-apps">
+   <title>To Integrate With Google Apps</title>
+
+   <step>
+    <para>If you have not yet done so, set up OpenAM as described in
+    <xref linkend="create-hosted-idp" />, using a signing certificate
+    that is needed by Google Apps.</para>
+
+    <para>See the procedure <link xlink:href="admin-guide#change-signing-key"
+    xlink:role="http://docbook.org/xlink/role/olink"><citetitle>To Change the
+    Signing Key for Federation</citetitle></link> for details regarding the
+    signing certificate.</para>
+   </step>
+
+   <step>
+    <para>On the OpenAM console Common Tasks page, click Configure Google
+    Apps.</para>
+   </step>
+
+   <step>
+    <para>On the first Configure Google Apps for Single Sign-On page, add your
+    domain name(s) such as <literal>example.com</literal> to the list, and then
+    click Create.</para>
+   </step>
+
+   <step>
+    <para>On the second Configure Google Apps for Single Sign-On page, save
+    the OpenAM verification certificate to a text file, such as
+    <filename>OpenAM.pem</filename>.</para>
+   </step>
+
+   <step>
+    <para>Follow the instructions under To Enable Access to the Google Apps API
+    before clicking Finish.</para>
+
+    <substeps>
+     <step>
+      <para>Access the Google Apps administration page for the first of your
+      domains in a new browser tab or window.</para>
+     </step>
+
+     <step>
+      <para>Login as Google Apps administrator.</para>
+     </step>
+
+     <step>
+      <para>Select Enable Single Sign-On.</para>
+     </step>
+
+     <step>
+      <para>Copy the URLs from the OpenAM page into the Google Apps setup
+      screen.</para>
+     </step>
+
+     <step>
+      <para>Upload the certificate file you saved such as
+      <filename>OpenAM.pem</filename> as the Google Apps Verification
+      Certificate.</para>
+     </step>
+
+     <step>
+      <para>Select Use a domain specific issuer.</para>
+     </step>
+
+     <step>
+      <para>Save changes in Google Apps setup.</para>
+     </step>
+
+     <step>
+      <para>Repeat the steps above for each domain you have configured.</para>
+     </step>
+
+     <step>
+      <para>Click Finish to complete the process.</para>
+     </step>
+    </substeps>
+   </step>
+  </procedure>
  </section>
 
  <section xml:id="using-saml2-sso-slo">
