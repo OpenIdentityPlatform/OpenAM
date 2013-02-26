@@ -113,9 +113,8 @@
   <para>Simple authentication with a user name and password returns a
   token.</para>
   
-  <screen>$ curl "https://openam.example.com:8443/openam/identity/authenticate?
- username=bjensen
- &amp;password=hifalutin"
+  <screen>$ curl --request POST --data "username=bjensen&amp;password=hifalutin" 
+ https://openam.example.com:8443/openam/identity/authenticate
 token.id=AQIC5wM2LY4SfcxvdvHOXjtC_eWSs2RB54tgvgK8SuYi7aQ.*AAJTSQACMDE.*</screen>
   
   <para>If you must specify parameters as when authenticating to
@@ -127,31 +126,33 @@ token.id=AQIC5wM2LY4SfcxvdvHOXjtC_eWSs2RB54tgvgK8SuYi7aQ.*AAJTSQACMDE.*</screen>
   token following successful authentication. The default for the <literal>client</literal>
   parameter is the IP of the machine making the REST request.</para>
   
-  <screen>$ curl "https://openam.example.com:8443/openam/identity/authenticate?
- username=bjensen
+  <screen>$ curl --request POST --data "username=bjensen
  &amp;password=hifalutin
  &amp;uri=realm%3D%2F%26module%3DDataStore
  &amp;client=192.168.1.1"
+ https://openam.example.com:8443/openam/identity/authenticate
+
 token.id=AQIC5wM2LY4SfcxvdvHOXjtC_eWSs2RB54tgvgK8SuYi7aQ.*AAJTSQACMDE.*</screen>
   
   <para>You log out using the token to end the user session.</para>
   
-  <screen>$ curl "https://openam.example.com:8443/openam/identity/logout?
- subjectid=AQIC5wM2LY4SfcxvdvHOXjtC_eWSs2RB54tgvgK8SuYi7aQ.*AAJTSQACMDE.*"</screen>
+  <screen>$ curl --request POST --data "subjectid=AQIC5w...*AAJTSQACMDE.*"
+ https://openam.example.com:8443/openam/identity/logout
+ </screen>
  </section>
  
  <section xml:id="rest-api-tokens">
   <title>Token Validation &amp; Attribute Retrieval</title>
   <para>You check whether a token is valid as follows.</para>
-  
-  <screen>$ curl "https://openam.example.com:8443/openam/identity/isTokenValid?
- tokenid=AQIC5wM2LY4SfcxuxIP0VnP2lVjs7ypEM6VDx6srk56CN1Q.*AAJTSQACMDE.*"
+
+  <screen>$ curl --request POST --data "tokenid=AQIC5w...*AAJTSQACMDE.*" 
+  https://openam.example.com:8443/openam/identity/isTokenValid
 boolean=true</screen>
   
   <para>An invalid token returns <literal>boolean=false</literal>.</para>
   
-  <screen>$ curl "https://openam.example.com:8443/openam/identity/isTokenValid?
- tokenid=INVALID"
+  <screen>$ curl --request POST --data "tokenid=INVALID" 
+  https://openam.example.com:8443/openam/identity/isTokenValid
 boolean=false</screen>
   
   <para>With a valid token, you can retrieve attributes about the subject.
@@ -162,8 +163,8 @@ boolean=false</screen>
    <primary>User data</primary>
    <secondary>REST access</secondary>
   </indexterm>
-  <screen>$ curl "https://openam.example.com:8443/openam/identity/attributes?
- subjectid=AQIC5wM2LY4SfcxuxIP0VnP2lVjs7ypEM6VDx6srk56CN1Q.*AAJTSQACMDE.*"
+  <screen>$ curl --request POST --data "subjectid=AQIC5w...*AAJTSQACMDE.*" 
+  https://openam.example.com:8443/openam/identity/attributes
 userdetails.token.id=
  AQIC5wM2LY4SfcxuxIP0VnP2lVjs7ypEM6VDx6srk56CN1Q.*AAJTSQACMDE.*
 userdetails.attribute.name=uid
@@ -435,7 +436,7 @@ $ curl https://openam.example.com:8443/openam/oauth2/tokeninfo
    as in the following example.</para>
 
    <screen>$ curl "https://openam.example.com:8443/openam/identity/authenticate?
- username=amadmin&amp;password=password"
+username=amadmin&amp;password=password"
 token.id=AQIC5wM2LY4Sfcxs...EwNDU2NjE0*
 $ curl
  --request POST
@@ -624,8 +625,8 @@ $ curl
    with a JSON object fully specifying the client, as in the following
    example.</para>
 
-   <screen>$ curl "https://openam.example.com:8443/openam/identity/authenticate
- ?username=amadmin&amp;password=password"
+   <screen>$ curl --request POST --data "username=amadmin&amp;password=password"
+ https://openam.example.com:8443/openam/identity/authenticate
 token.id=AQIC5wM...3MTYxOA..*
 $ curl --request POST --header "iplanetDirectoryPro: AQIC5wM...3MTYxOA..*"
  --header "Content-Type: application/json"
@@ -750,9 +751,8 @@ $ curl --request POST --header "iplanetDirectoryPro: AQIC5wM...3MTYxOA..*"
   <para>You can send OpenAM messages to log, specifying the message content
   and the log file in which to write your message.</para>
   
-  <screen>$ curl "https://openam.example.com:8443/openam/identity/authenticate?
- username=amadmin
- &amp;password=password"
+  <screen>$ curl --request POST --data "username=amadmin&amp;password=password"
+  https://openam.example.com:8443/openam/identity/authenticate
 token.id=AQIC5wM2LY4SfcwyCZkk-1JXzx6q1EzgagabHfBjMidb5jI.*AAJTSQACMDE.*
 $ curl "https://openam.example.com:8443/openam/identity/log?
  appid=AQIC5wM2LY4SfcwyCZkk-1JXzx6q1EzgagabHfBjMidb5jI.*AAJTSQACMDE.*
@@ -961,8 +961,8 @@ $ curl "https://openam.example.com:8443/openam/identity/log?
     you make for <literal>name</literal> defaults to both the user id and the
     user's last name.</para>
 
-    <screen>$ curl "https://openam.example.com:8443/openam/identity/authenticate
- ?username=amadmin&amp;password=password"
+    <screen>$ curl --request POST --data "username=amadmin&amp;password=password"
+ https://openam.example.com:8443/openam/identity/authenticate
 token.id=AQIC5w...2NzEz*
 $ curl --request POST --header "iplanetDirectoryPro: AQIC5w...2NzEz*"
  --header "Content-Type: application/json"
@@ -1018,8 +1018,8 @@ $ curl --request POST --header "iplanetDirectoryPro: AQIC5w...2NzEz*"
     <literal>/json/users/<replaceable>user-id</replaceable></literal>, as
     shown in the following example.</para>
 
-    <screen>$ curl "https://openam.example.com:8443/openam/identity/authenticate
- ?username=amadmin&amp;password=password"
+    <screen>$ curl --request POST --data "username=amadmin&amp;password=password"
+ https://openam.example.com:8443/openam/identity/authenticate
 token.id=AQIC5w...2NzEz*
 $ curl --request PUT --header "iplanetDirectoryPro: AQIC5w...2NzEz*"
  --header "Content-Type: application/json"
@@ -1091,8 +1091,8 @@ $ curl --request PUT --header "iplanetDirectoryPro: AQIC5w...2NzEz*"
    accessing user data. Users can view their information by changing
    <literal>username=amadmin</literal> to <literal><replaceable>user-id</replaceable></literal>.</para>
 
-    <screen>$ curl "https://openam.example.com:8443/openam/identity/authenticate
- ?username=amadmin&amp;password=password"
+    <screen>$ curl --request POST --data "username=amadmin&amp;password=password" 
+ https://openam.example.com:8443/openam/identity/authenticate
 token.id=AQIC5w...2NzEz*
 $ curl --header "iplanetDirectoryPro: AQIC5w...2NzEz*"
  https://openam.example.com:8443/openam/json/users/demo
@@ -1156,8 +1156,8 @@ $ curl --header "iplanetDirectoryPro: AQIC5w...2NzEz*"
     <para>The following example shows how users can update their own
     profiles.</para>
 
-    <screen>$ curl "https://openam.example.com:8443/openam/identity/authenticate
- ?username=demo&amp;password=changeit"
+    <screen>$ curl --request POST --data "username=demo&amp;password=changeit" 
+ https://openam.example.com:8443/openam/identity/authenticate
 token.id=AQIC5...Y3MTAx*
 $ curl --request PUT --header "iplanetDirectoryPro: AQIC5...Y3MTAx*"
  --header "Content-Type: application/json"
@@ -1226,8 +1226,8 @@ $ curl --request PUT --header "iplanetDirectoryPro: AQIC5...Y3MTAx*"
     realm. Only administrators should delete users. The user id is the only 
     field required to delete a user.</para>
 
-    <screen>$ curl "https://openam.example.com:8443/openam/identity/authenticate
- ?username=amadmin&amp;password=password"
+    <screen>$ curl --request POST --data "username=amadmin&amp;password=password"
+ https://openam.example.com:8443/openam/identity/authenticate
 token.id=AQIC5w...2NzEz*
 $ curl --request DELETE --header "iplanetDirectoryPro: AQIC5w...2NzEz*"
  https://openam.example.com:8443/openam/json/users/bjensen
@@ -1286,9 +1286,8 @@ $ curl --request DELETE --header "iplanetDirectoryPro: AQIC5w...2NzEz*"
     </varlistentry>
    </variablelist>
    
-   <screen>$ curl "https://openam.example.com:8443/openam/identity/authenticate?
- username=amadmin
- &amp;password=password"
+    <screen>$ curl --request POST --data "username=amadmin&amp;password=password"
+ https://openam.example.com:8443/openam/identity/authenticate
 token.id=AQIC5wM2LY4SfcxSYA8eG-vrNHb_W7nG8XkfAGyRyuaebDY.*AAJTSQACMDE.*
 $ curl "https://openam.example.com:8443/openam/identity/create?
  admin=AQIC5wM2LY4SfcxSYA8eG-vrNHb_W7nG8XkfAGyRyuaebDY.*AAJTSQACMDE.*
@@ -1526,8 +1525,8 @@ string=bjensen</screen>
     the following example. The only required field is <literal>realm</literal>, 
     but the realm will not be active if the status is not set.</para>
    
-     <screen>$ curl "https://openam.example.com:8443/openam/identity/authenticate
- ?username=amadmin&amp;password=password"
+     <screen>$ curl --request POST --data "username=amadmin&amp;password=password"
+ https://openam.example.com:8443/openam/identity/authenticate
 token.id=AQIC5w...2NzEz*
 $ curl --request POST --header "iplanetDirectoryPro: AQIC5w...2NzEz*"
  --header "Content-Type: application/json"
@@ -1545,8 +1544,8 @@ $ curl --request POST --header "iplanetDirectoryPro: AQIC5w...2NzEz*"
     <literal>/json/realms/<replaceable>realm-id</replaceable></literal>, as
     shown in the following example.</para>
    
-     <screen>$ curl "https://openam.example.com:8443/openam/identity/authenticate
- ?username=amadmin&amp;password=password"
+     <screen>$ curl --request POST --data "username=amadmin&amp;password=password"
+ https://openam.example.com:8443/openam/identity/authenticate
 token.id=AQIC5w...2NzEz*
 $ curl --request PUT --header "iplanetDirectoryPro: AQIC5w...2NzEz*"
  --header "Content-Type: application/json"
@@ -1571,13 +1570,13 @@ $ curl --request PUT --header "iplanetDirectoryPro: AQIC5w...2NzEz*"
    information (such as Active status) or incorrect information, they can write 
    down the correct information and add it using <xref linkend="rest-api-update-realm" /></para>
    
-    <para>The following example shows an administrator reciving information about
+    <para>The following example shows an administrator receiving information about
     the <literal>testRealm</literal>.</para>
 
-    <screen>$ curl "https://openam.example.com:8443/openam/identity/authenticate
- ?username=amadmin&amp;password=password"
-token.id=AQIC5w...2NzEz*
-$ curl --header "iplanetDirectoryPro: AQIC5w...2NzEz*"
+    <screen>$ curl --request POST --data "username=amadmin&amp;password=password"
+ https://openam.example.com:8443/openam/identity/authenticate
+ token.id=AQIC5w...2NzEz*
+ $ curl --header "iplanetDirectoryPro: AQIC5w...2NzEz*"
  https://openam.example.com:8443/openam/json/realms/testRealm
 {
     "serviceNames":[
@@ -1612,10 +1611,10 @@ $ curl --header "iplanetDirectoryPro: AQIC5w...2NzEz*"
 
     <para>The following example shows how to update a realm.</para>
    
-    <screen>$ curl "https://openam.example.com:8443/openam/identity/authenticate
- ?username=amadmin&amp;password=password"
-token.id=AQIC5...Y3MTAx*
-$ curl --request PUT --header "iplanetDirectoryPro: AQIC5...Y3MTAx*"
+     <screen>$ curl --request POST --data "username=amadmin&amp;password=password"
+ https://openam.example.com:8443/openam/identity/authenticate
+ token.id=AQIC5...Y3MTAx*
+ $ curl --request PUT --header "iplanetDirectoryPro: AQIC5...Y3MTAx*"
  --header "Content-Type: application/json"
  --data '{ "sunOrganizationStatus": "Active" }'
  https://openam.example.com:8443/openam/json/realms/testRealm</screen>
@@ -1640,12 +1639,12 @@ $ curl --request PUT --header "iplanetDirectoryPro: AQIC5...Y3MTAx*"
     before deleting it. Once a realm is deleted, the only way to restore it is 
     to return to a backed up deployment of OpenAM.</para>
 
-    <screen>$ curl "https://openam.example.com:8443/openam/identity/authenticate
- ?username=amadmin&amp;password=password"
-token.id=AQIC5w...2NzEz*
-$ curl --request DELETE --header "iplanetDirectoryPro: AQIC5w...2NzEz*"
+    <screen>$ curl --request POST --data "username=amadmin&amp;password=password"
+ https://openam.example.com:8443/openam/identity/authenticate
+ token.id=AQIC5w...2NzEz*
+ $ curl --request DELETE --header "iplanetDirectoryPro: AQIC5w...2NzEz*"
  https://openam.example.com:8443/openam/json/realms/testRealm
-{"success":"true"}</screen>
+ {"success":"true"}</screen>
 
     <para>On success, OpenAM returns a JSON object indicating success. On
     failure, OpenAM returns a JSON representation of the error including the
