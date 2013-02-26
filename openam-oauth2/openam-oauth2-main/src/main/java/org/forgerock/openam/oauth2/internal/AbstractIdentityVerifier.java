@@ -1,7 +1,7 @@
 /*
  * DO NOT REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright (c) 2012 ForgeRock Inc. All rights reserved.
+ * Copyright (c) 2012-2013 ForgeRock Inc. All rights reserved.
  *
  * The contents of this file are subject to the terms
  * of the Common Development and Distribution License
@@ -19,7 +19,7 @@
  * If applicable, add the following below the CDDL Header,
  * with the fields enclosed by brackets [] replaced by
  * your own identifying information:
- * "Portions Copyrighted [2012] [ForgeRock Inc]"
+ * "Portions Copyrighted [year] [name of copyright owner]"
  */
 
 package org.forgerock.openam.oauth2.internal;
@@ -56,12 +56,9 @@ public abstract class AbstractIdentityVerifier<T extends User> extends SecretVer
     public AbstractIdentityVerifier() {
     }
 
+    // Must be implemented because it is abstract, currently not used.
     @Override
     public int verify(final String identifier, char[] secret) {
-        T user = authenticate(identifier, secret, "/");
-        if (null != user) {
-            return RESULT_VALID;
-        }
         return RESULT_INVALID;
     }
 
