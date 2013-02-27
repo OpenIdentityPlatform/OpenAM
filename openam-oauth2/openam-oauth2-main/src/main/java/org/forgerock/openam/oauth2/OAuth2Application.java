@@ -135,7 +135,7 @@ public class OAuth2Application extends Application {
      *              A new UserVerifier
      */
     public Verifier getUserVerifier() {
-        return new UserIdentityVerifier(new OpenAMParameters());
+        return new UserIdentityVerifier();
     }
 
     /**
