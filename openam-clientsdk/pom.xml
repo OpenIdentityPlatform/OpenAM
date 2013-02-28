@@ -142,6 +142,7 @@
                     -->
                     <artifactSet>
                         <includes>
+                            <include>org.forgerock.commons:forgerock-util</include>
                             <include>org.forgerock.openam:openam-core</include>
                             <include>org.forgerock.openam:openam-shared</include>
                             <include>org.forgerock.openam:openam-dtd-schema</include>
