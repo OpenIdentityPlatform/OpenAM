@@ -26,29 +26,26 @@
  *
  */
 /**
- * Portions Copyrighted 2011-2012 ForgeRock AS
+ * Portions Copyrighted 2011-2013 ForgeRock, Inc.
  */
 package com.iplanet.dpro.session.service;
 
 import java.util.Map;
 
 /**
- * Interface to define the resulting behavior if the session quota is
- * exhausted.
+ * Interface to define the resulting behavior when the session quota is exhausted.
  *
  * @supported.all.api
  */
 public interface QuotaExhaustionAction {
 
     /**
-     * Check if the session quota for a given user has been exhausted and
-     * perform necessary actions in such as case.
+     * Performs an action, when the session quota is exhausted. The action implementation should destroy at least one
+     * session (either by destroying an old session, or rejecting the new one) in order to adhere the session quota.
      *
      * @param is the to-be-actived InternalSession
-     * @param existingSessions all existing sessions belonging to the same uuid
-     *          (Map:sid-&gt;expiration_time)
-     * @return true if the session activation request should be rejected, false
-     *         otherwise
+     * @param existingSessions all existing sessions belonging to the same uuid (Map:sid-&gt;expiration_time)
+     * @return <code>true</code> if the session activation request should be rejected, <code>false</code> otherwise
      */
     public boolean action(InternalSession is, Map<String, Long> existingSessions);
 }
