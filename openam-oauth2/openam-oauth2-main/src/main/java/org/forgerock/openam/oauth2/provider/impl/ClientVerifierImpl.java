@@ -1,7 +1,7 @@
 /*
  * DO NOT REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright (c) 2012 ForgeRock Inc. All rights reserved.
+ * Copyright (c) 2012-2013 ForgeRock Inc. All rights reserved.
  *
  * The contents of this file are subject to the terms
  * of the Common Development and Distribution License
@@ -19,7 +19,7 @@
  * If applicable, add the following below the CDDL Header,
  * with the fields enclosed by brackets [] replaced by
  * your own identifying information:
- * "Portions Copyrighted [2012] [Forgerock Inc]"
+ * "Portions Copyrighted [year] [name of copyright owner]"
  */
 
 package org.forgerock.openam.oauth2.provider.impl;
@@ -132,7 +132,7 @@ public class ClientVerifierImpl implements ClientVerifier{
         AMIdentity ret = null;
         try {
             AuthContext lc = new AuthContext(realm);
-            lc.login();
+            lc.login(AuthContext.IndexType.MODULE_INSTANCE, "Application");
             while (lc.hasMoreRequirements()) {
                 Callback[] callbacks = lc.getRequirements();
                 ArrayList missing = new ArrayList();
