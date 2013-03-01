@@ -82,6 +82,10 @@
    This implementation also can be used to make sessions persist across restart
    for single OpenAM servers. The current implementation requires that you use
    OpenDJ for the configuration data store.</para>
+
+   <para>This new implementation is designed to operate on a local site network.
+   Cross-site session failover and session failover across wide area networks
+   (WANs) are not supported.</para>
   </listitem>
 
   <listitem>
