@@ -20,7 +20,7 @@
   !
   ! CCPL HEADER END
   !
-  !      Copyright 2011 ForgeRock AS
+  !      Copyright 2011-2013 ForgeRock, Inc.
   !    
 -->
 <chapter xml:id='chap-auth-spi'
@@ -28,8 +28,7 @@
  version='5.0' xml:lang='en'
  xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance'
  xsi:schemaLocation='http://docbook.org/ns/docbook http://docbook.org/xml/5.0/xsd/docbook.xsd'
- xmlns:xlink='http://www.w3.org/1999/xlink'
- xmlns:xinclude='http://www.w3.org/2001/XInclude'>
+ xmlns:xlink='http://www.w3.org/1999/xlink'>
  <title>Customizing Authentication Modules</title>
  <indexterm>
   <primary>Authentication</primary>
@@ -37,7 +36,8 @@
  </indexterm>
 
  <!-- Mostly purloined from Steve Ferris's work on the OpenAM wiki at
- https://wikis.forgerock.org/confluence/display/openam/Write+a+custom+authentication+module -->
+ https://wikis.forgerock.org/confluence/display/openam/Write+a+custom+authentication+module
+ Revised per FR402, Lab on Custom Authentication Modules. mjang, Feb 22, 2013. -->
 
  <para>This chapter shows how to customize authentication with a sample custom
  authentication module. For deployments with particular requirements not met by
@@ -132,7 +132,7 @@
    <title>Full Callbacks File</title>
    
    <para>This example shows a full callbacks file with dynamic text and error
-   handling. Use this as your <filename>SimpleAuth.xml</filename> file.</para>
+   handling. Use this as your <filename>SampleAuth.xml</filename> file.</para>
    
    <programlisting language="xml">&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?&gt;
 &lt;!DOCTYPE ModuleProperties PUBLIC
@@ -212,7 +212,7 @@ public Principal getPrincipal()</programlisting>
   you can store information specific to the authentication process in the
   instance.</para>
   
-  <para>The implementation, <filename>SimpleAuth.java</filename>, is shown
+  <para>The implementation, <filename>SampleAuth.java</filename>, is shown
   below.</para>
   
   <programlisting language="java">/**
@@ -406,7 +406,7 @@ public class SampleAuth extends AMLoginModule
  <section xml:id="principal-sample-auth-module">
   <title>The Sample Auth Principal</title>
   
-  <para>The implementation, <filename>SimpleAuthPrincipal.java</filename>, is
+  <para>The implementation, <filename>SampleAuthPrincipal.java</filename>, is
   shown below.</para>
   
   <programlisting language="java">/**
@@ -688,57 +688,76 @@ sampleauth-error-2=Error 2 occured during the authentication</programlisting>
  <section xml:id="build-config-sample-auth-module">
   <title>Building &amp; Installing the Sample Auth Module</title>
   
-  <para>Once you have the files for the sample authentication module, build
-  the module, and then install the module into OpenAM.</para>
+  <para>Once you have the files for the sample authentication module, prepare the web archive, copy the sample
+  authentication module files in the directories specified, rebuild the web archive,
+      and then set up the module into OpenAM.</para>
   
   <section xml:id="building-sample-auth-module">
    <title>Building the Module</title>
-   
-   <para>The sample authentication module code relies on three .jar files, two
-   of which are deployed with OpenAM, and the third which is provided by your
-   web application container.</para>
-   <variablelist>
-    <varlistentry>
-     <term><filename>amserver.jar</filename></term>
-     <listitem>
-      <para>When you deploy OpenAM, the file is
-      <filename><replaceable>war-file-name</replaceable>/WEB-INF/lib/amserver.jar</filename>.</para>
-     </listitem>
-    </varlistentry>
-    <varlistentry>
-     <term><filename>opensso-sharedlib.jar</filename></term>
-     <listitem>
-      <para>When you deploy OpenAM, the file is
-      <filename><replaceable>war-file-name</replaceable>/WEB-INF/lib/opensso-sharedlib.jar</filename>.</para>
-     </listitem>
-    </varlistentry>
-    <varlistentry>
-     <term><filename>servlet-api.jar</filename></term>
-     <listitem>
-      <para>This .jar provides the Java EE Servlet API.</para>
-      <para>If you use Apache Tomcat as your web application container, the file
-      is <filename>/path/to/tomcat/lib/servlet-api.jar</filename>.</para>
-     </listitem>
-    </varlistentry>
-   </variablelist>
-   
-   <para>Put these libraries for example in a <filename>lib/</filename>
-   directory, and then put them on your CLASSPATH to compile the custom
-   authentication authentication module classes.</para>
-   <screen>$ mkdir classes
-$ javac -d classes -cp lib/servlet-api.jar:lib/amserver.jar:
- lib/opensso-sharedlib.jar src/com/forgerock/openam/examples/SampleAuth*.java</screen>
-  
-   <para>Add the resulting classes to a new <filename>sampleauth.jar</filename>
-   file.</para>
-   <screen>$ cd classes/
-$ jar cf ../sampleauth.jar .</screen>
+
+      <para>The sample authentication module code relies on three .jar files, two of which are deployed with OpenAM,
+          and the third which is provided by your web application container. The names of OpenAM .jar files may vary, as
+          they may include release version numbers. If you are testing the nightly release, the file may include the
+      word SNAPSHOT in the name.</para>
+
+      <variablelist>
+
+         <varlistentry>
+           <term><filename>openam-core.jar</filename></term>
+             <listitem>
+                 <para>When you deploy OpenAM, the file is
+                   <filename><replaceable>war-file-name</replaceable>/WEB-INF/lib/openam-core.jar</filename>.</para>
+             </listitem>
+         </varlistentry>
+
+          <varlistentry>
+            <term><filename>openam-shared.jar</filename></term>
+              <listitem>
+                  <para>When you deploy OpenAM, the file is
+                  <filename><replaceable>war-file-name</replaceable>/WEB-INF/lib/openam-shared.jar</filename>.</para>
+               </listitem>
+          </varlistentry>
+
+          <varlistentry>
+              <term><filename>servlet-api.jar</filename></term>
+              <listitem>
+                  <para>This .jar file provides the Java EE Servlet API. If you use Apache Tomcat as your web
+                      application container, you can find this file in <filename>/path/to/tomcat/lib/servlet-api.jar
+                      </filename>.</para>
+              </listitem>
+          </varlistentry>
+
+      </variablelist>
+
+          <para>In the following commands, you'll create a classes directory. You can then process the .java files
+              into .classes You can cite the full path to each of these .jar files. The following commands present just
+          one example; substitute for the directory paths shown as appropriate. (You may need to run these commands as
+          the administrative user.)</para>
+
+          <screen>$ mkdir classes
+          $ javac -d classes -cp lib/servlet-api.jar:
+          /var/lib/tomcat6/webapps/openam/WEB-INF/lib/openam-core-10.2.0-SNAPSHOT.jar:
+          /var/lib/tomcat6/webapps/openam/WEB-INF/lib/openam-shared-10.2.0-SNAPSHOT.jar
+          /home/user/SampleAuth*.java
+          </screen>
+
+          <para>You can then find the compiled .class files in the classes/com/forgerock/openam/examples subdirectory.
+              You also need to copy the other files created (amAuthSampleAuth.xml, amAuthSampleAuth.properties, and
+              SampleAuth.xml) to the classes subdirectory.
+          You can then collect all of these files in a new .jar archive. The following command sets up that
+          archive in a file named <literal>sampleauth.jar</literal>.</para>
+
+          <screen>
+              $ cd classes/
+              $ jar cf /home/user/sampleauth.jar .
+          </screen>
+
   </section>
   
   <section xml:id="installing-sample-auth-module">
    <title>Installing the Module</title>
    
-   <para>Installing the sample authentication module consists of putting the
+   <para>Installing the sample authentication module consists of putting the configured
    .jar and other files in the right places, registering the module with OpenAM,
    and then restarting the web application or the web application
    container.</para>
@@ -747,23 +766,7 @@ $ jar cf ../sampleauth.jar .</screen>
    <filename><replaceable>war-file-name</replaceable>/WEB-INF/lib/</filename>
    where OpenAM is deployed.</para>
    <screen>$ cp sampleauth.jar /path/to/tomcat/webapps/openam/WEB-INF/lib/</screen>
-   
-   <para>Copy the <filename>amAuthSampleAuth.properties</filename> file to
-   <filename><replaceable>war-file-name</replaceable>/WEB-INF/classes/</filename>
-   where OpenAM is deployed.</para>
-   <screen>$ cp amAuthSampleAuth.properties /path/to/tomcat/webapps/openam/WEB-INF/classes/</screen>
-   
-   <para>Copy the <filename>amAuthSampleAuth.xml</filename> service definition
-   file to
-   <filename><replaceable>war-file-name</replaceable>/WEB-INF/classes/</filename>
-   where OpenAM is deployed.</para>
-   <screen>$ cp amAuthSampleAuth.xml /path/to/tomcat/webapps/openam/WEB-INF/classes/</screen>
-   
-   <para>Copy the <filename>SimpleAuth.xml</filename> callbacks file to
-   <filename><replaceable>war-file-name</replaceable>/config/auth/default/</filename>
-   where OpenAM is deployed.</para>
-   <screen>$ cp SampleAuth.xml /path/to/tomcat/webapps/openam/config/auth/default/</screen>
-   
+
    <para>Register the module with OpenAM using the <command>ssoadm</command>
    command.</para>
    <screen>$ ssoadm
@@ -786,7 +789,8 @@ Authentication module was registered.</screen>
   reference</link> a full list of Authentication Service Management
   subcommands.</para>
    
-   <para>Restart OpenAM, or the web applications container where it runs.</para>
+   <para>Restart the web applications container associated with your OpenAM installation. The following commands
+   are based on the generic Tomcat container:</para>
    <screen>$ /path/to/tomcat/bin/shutdown.sh
 $ /path/to/tomcat/bin/startup.sh
 $ tail -1 /path/to/tomcat/logs/catalina.out
@@ -804,7 +808,7 @@ INFO: Server startup in 32746 ms</screen>
   Authentication Module.</para>
   
   <para>After creating the module, click the name in the Module Instances
-  list, and configure as appropriate.</para>
+  list, and configure as appropriate. Click Back To Authentication when complete.</para>
   
   <mediaobject xml:id="figure-sampleauth-conf">
    <alt>SampleAuth module configuration</alt>
@@ -815,25 +819,14 @@ INFO: Server startup in 32746 ms</screen>
    properties.</para></textobject>
   </mediaobject>
   
-  <para>Add your module to the top of the default authentication chain
-  so that OpenAM considers the module sufficient to login. Also, under
-  All Core Settings... for the realm, set User Profile creation to Dynamic
-  so that successful login results</para>
+  <para>Under the authentication tab, scroll down to the Authentication Chaining window. Create a new Authentication
+      chain (if one doesn't already exist). Configure the module with an Instance that corresponds to the module
+      that you just created. Set the acceptance criteria to Required. Click Save, and then click
+      Back to Authentication.</para>
   
-  <para>Now that your module is configured, logout of OpenAM console, to
-  return to the login page.</para>
-  
-  <mediaobject xml:id="figure-sampleauth-test">
-   <alt>SampleAuth module testing</alt>
-   <imageobject>
-    <imagedata fileref="images/sampleauth-test.png" format="PNG"/>
-   </imageobject>
-   <textobject><para>For testing your module, try the values in the
-   SimpleAuth class.</para></textobject>
-  </mediaobject>
-  
-  <para>You can try different combinations as seen in
-  <filename>SimpleAuth.java</filename>. Unless you create a
+  <para>Now that your module is configured, logout of OpenAM console, to return to the login page.</para>
+
+  <para>Unless you create a
   <literal>test</literal> subject with a user profile in OpenAM or set User
   Profile creation to Dynamic for the login realm, successful login results
   in an "User has no profile in this organization" error. This is because
