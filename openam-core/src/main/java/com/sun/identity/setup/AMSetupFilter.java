@@ -32,6 +32,8 @@
 
 package com.sun.identity.setup;
 
+import com.sun.identity.common.configuration.ConfigurationException;
+import com.sun.identity.shared.Constants;
 import java.io.File;
 import java.io.IOException;
 import javax.servlet.Filter;
@@ -95,25 +97,34 @@ public final class AMSetupFilter implements Filter {
                     filterChain.doFilter(httpRequest, httpResponse);
                 }
             } else {
-                if (isPassthrough() && validateStream(httpRequest)) {
-                    filterChain.doFilter(httpRequest, httpResponse);
-                } else {        
-                    String incomingURL = httpRequest.getRequestURI();
-                    if (incomingURL.endsWith("configurator")) {
-                        filterChain.doFilter(httpRequest, httpResponse);  
+                if (AMSetupServlet.getBootStrapFile() != null) {
+                    String redirectUrl = System.getProperty(Constants.CONFIG_STORE_DOWN_REDIRECT_URL);
+                    if (redirectUrl != null && redirectUrl.length() > 0) {
+                        httpResponse.sendRedirect(redirectUrl);
                     } else {
-                        String url = httpRequest.getScheme() + "://" +
-                            httpRequest.getServerName() + ":" +
-                            httpRequest.getServerPort() +
-                            httpRequest.getContextPath();
-                        if ((new File(System.getProperty("user.home"))).canWrite()){
-                            url += SETUPURI;
+                        throw new ConfigurationException("configstore.down", null);
+                    }
+                } else {
+                    if (isPassthrough() && validateStream(httpRequest)) {
+                        filterChain.doFilter(httpRequest, httpResponse);
+                    } else {        
+                        String incomingURL = httpRequest.getRequestURI();
+                        if (incomingURL.endsWith("configurator")) {
+                            filterChain.doFilter(httpRequest, httpResponse);  
                         } else {
-                            url += NOWRITE_PERMISSION;
-                        }
-                        httpResponse.sendRedirect(url);
-                        markPassthrough();
-                    }    
+                            String url = httpRequest.getScheme() + "://" +
+                                httpRequest.getServerName() + ":" +
+                                httpRequest.getServerPort() +
+                                httpRequest.getContextPath();
+                            if ((new File(System.getProperty("user.home"))).canWrite()){
+                                url += SETUPURI;
+                            } else {
+                                url += NOWRITE_PERMISSION;
+                            }
+                            httpResponse.sendRedirect(url);
+                            markPassthrough();
+                        }    
+                    }
                 }
             }
         } catch(Exception ex) {

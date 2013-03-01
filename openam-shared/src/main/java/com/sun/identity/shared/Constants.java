@@ -1235,4 +1235,11 @@ public interface Constants {
      */
     public static final String REMOTE_SESSION_CACHE_DURATION =
         "openam.remote.session.cache.duration";
+
+    /**
+     * AMSetupFilter will redirect to this external URL in case the configuration store
+     * is not available but the bootstrap file exists
+     */
+    public static final String CONFIG_STORE_DOWN_REDIRECT_URL =
+        "openam.configstore.down.redirect.url";
 }

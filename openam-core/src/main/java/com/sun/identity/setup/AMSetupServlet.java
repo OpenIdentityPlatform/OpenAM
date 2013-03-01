@@ -1285,7 +1285,7 @@ public class AMSetupServlet extends HttpServlet {
                 BufferedReader brdr = new BufferedReader(frdr);
                 bootstrap = brdr.readLine() + "/bootstrap";
             } catch (IOException e) {
-                throw new ConfiguratorException(e.getMessage());
+                //ignore
             } finally {
                 if (frdr != null) {
                     try {
