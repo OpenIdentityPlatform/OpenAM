@@ -45,6 +45,7 @@ import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import org.forgerock.openam.upgrade.UpgradeUtils;
 
 /**
  * This filter brings administrator to a configuration page
@@ -97,7 +98,7 @@ public final class AMSetupFilter implements Filter {
                     filterChain.doFilter(httpRequest, httpResponse);
                 }
             } else {
-                if (AMSetupServlet.getBootStrapFile() != null) {
+                if (AMSetupServlet.getBootStrapFile() != null && !UpgradeUtils.isVersionNewer()) {
                     String redirectUrl = System.getProperty(Constants.CONFIG_STORE_DOWN_REDIRECT_URL);
                     if (redirectUrl != null && redirectUrl.length() > 0) {
                         httpResponse.sendRedirect(redirectUrl);
