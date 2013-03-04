@@ -13,6 +13,7 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  */
+
 package org.forgerock.openam.forgerockrest;
 
 import org.forgerock.json.resource.CollectionResourceProvider;
@@ -30,24 +31,51 @@ import org.forgerock.json.resource.UpdateRequest;
  */
 public abstract class ReadOnlyResource implements CollectionResourceProvider  {
 
+    /**
+     * Creates a NotSupportedException for a given operation type.
+     *
+     * @param type The type of operation which is not supported.
+     * @return A NotSupportedException.
+     */
     private NotSupportedException generateException(String type) {
         return new NotSupportedException(type + " are not supported for this Resource");
     }
 
-    public void createInstance(ServerContext ctx, CreateRequest request, ResultHandler<Resource> handler) {
+    /**
+     * Will throw an exception as Creates are not allowed for a Read Only Resource.
+     *
+     * {@inheritDoc}
+     */
+    public final void createInstance(ServerContext ctx, CreateRequest request, ResultHandler<Resource> handler) {
         handler.handleError(generateException("Creates"));
     }
 
-    public void deleteInstance(ServerContext ctx, String resId, DeleteRequest request,
+    /**
+     * Will throw an exception as Deletes are not allowed for a Read Only Resource.
+     *
+     * {@inheritDoc}
+     */
+    public final void deleteInstance(ServerContext ctx, String resId, DeleteRequest request,
                                ResultHandler<Resource> handler) {
         handler.handleError(generateException("Deletes"));
     }
 
-    public void patchInstance(ServerContext ctx, String resId, PatchRequest request, ResultHandler<Resource> handler) {
+    /**
+     * Will throw an exception as Patches are not allowed for a Read Only Resource.
+     *
+     * {@inheritDoc}
+     */
+    public final void patchInstance(ServerContext ctx, String resId, PatchRequest request,
+                               ResultHandler<Resource> handler) {
         handler.handleError(generateException("Patches"));
     }
 
-    public void updateInstance(ServerContext ctx, String resId, UpdateRequest request,
+    /**
+     * Will throw an exception as Updates are not allowed for a Read Only Resource.
+     *
+     * {@inheritDoc}
+     */
+    public final void updateInstance(ServerContext ctx, String resId, UpdateRequest request,
                                ResultHandler<Resource> handler) {
         handler.handleError(generateException("Updates"));
     }
