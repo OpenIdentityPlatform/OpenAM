@@ -1583,6 +1583,218 @@ CookieWriterServlet.doGetPost: Redirect to
   </procedure>
  </section>
 
+ <section xml:id="salesforce-as-sp">
+  <title>Configuring Salesforce CRM as a Remote Service Provider</title>
+  <indexterm><primary>Salesforce CRM</primary></indexterm>
+  <indexterm>
+   <primary>Federation</primary>
+   <secondary>Configuring</secondary>
+  </indexterm>
+
+  <para>OpenAM can serve as the identity provider when you use <link
+  xlink:show="new" xlink:href="http://www.salesforce.com/">Salesforce CRM</link>
+  as a service provider, allowing users to have single sign-on with their
+  Salesforce CRM account.</para>
+
+  <para>In order to use this service, you must have Salesforce CRM accounts
+  for your organization.</para>
+
+  <procedure xml:id="integrate-salesforce">
+   <title>To Integrate With Salesforce CRM</title>
+
+   <step>
+    <para>If you have not yet done so, set up OpenAM as described in
+    <xref linkend="create-hosted-idp" />, using a signing certificate
+    that is needed by Salesforce CRM.</para>
+
+    <para>See the procedure <link xlink:href="admin-guide#change-signing-key"
+    xlink:role="http://docbook.org/xlink/role/olink"><citetitle>To Change the
+    Signing Key for Federation</citetitle></link> for details regarding the
+    signing certificate.</para>
+   </step>
+
+   <step>
+    <para>On the OpenAM console Common Tasks page, click Configure Salesforce
+    CRM.</para>
+   </step>
+
+   <step>
+    <para>On the first Salesforce CRM Single Sign-On Configuration page,
+    configure attribute mapping to associate the appropriate attribute
+    from Salesforce CRM with the user profile attribute on your IDP.</para>
+
+    <para>For example, add a mapping for <literal>IDPEmail</literal> to
+    <literal>mail</literal>, and then click Create. In any case, make sure
+    the attribute mapper is sending the correct attribute to be used for
+    the federated identity.</para>
+   </step>
+
+   <step>
+    <para>On the second Salesforce CRM Single Sign-On Configuration page, follow
+    the instructions below before clicking Finish.</para>
+
+    <substeps>
+     <step>
+      <para>In a new browser tab or window, login to <link xlink:show="new"
+      xlink:href="https://login.salesforce.com/">Salesforce CRM</link> with
+      your administrator credentials.</para>
+
+      <para>Create an administrator account if none exists, yet.</para>
+     </step>
+
+     <step>
+      <para>If your users go directly to Salesforce to access services, then
+      their single sign-on is SP-initiated from the Salesforce side. Salesforce
+      provides a "My Domain" feature to facilitate SP-initiated single sign-on
+      for desktop and device users.</para>
+
+      <para>When you have completed configuring Salesforce as a service
+      provider, users can then browse to your domain at Salesforce, such as
+      <literal>https://openam.my.salesforce.com</literal>, and be redirected to
+      OpenAM to authenticate before being redirected to Salesforce.</para>
+
+      <substeps>
+       <step>
+        <para>Select Administration Setup &gt; Company Profile &gt; My
+        Domain.</para>
+       </step>
+
+       <step>
+        <para>Choose the domain name, and then register the domain.</para>
+       </step>
+
+       <step>
+        <para>Wait until the domain is ready for testing to proceed.</para>
+       </step>
+      </substeps>
+     </step>
+
+     <step>
+      <para>In Salesforce CRM, browse to Setup &gt; Administration Setup &gt;
+      Single Sign-On Settings &gt; Security Controls, and then click Edit for
+      Single Sign-On Settings.</para>
+     </step>
+
+     <step>
+      <para>Select SAML Enabled.</para>
+     </step>
+
+     <step>
+      <para>Set the SAML Version to 2.0.</para>
+     </step>
+
+     <step>
+      <para>Copy the issuer name from the OpenAM page to the Issuer field on the
+      Salesforce CRM page.</para>
+     </step>
+
+     <step>
+      <para>Save the OpenAM verification certificate to a text file, such as
+      <filename>OpenAM.pem</filename>.</para>
+     </step>
+
+     <step>
+      <para>Upload the certificate file as Identity Provider Certificate on the
+      Salesforce CRM page.</para>
+     </step>
+
+     <step>
+      <para>For SAML User ID Type in Salesforce CRM, choose Assertion contains
+      the Federation ID from the User object.</para>
+     </step>
+
+     <step>
+      <para>For SAML User Location in Salesforce CRM, choose User ID is in an
+      Attribute element.</para>
+     </step>
+
+     <step>
+      <para>Copy the attribute name such as <literal>IDPEmail</literal> from
+      the OpenAM page to the Attribute Name field on the Salesforce CRM
+      page.</para>
+     </step>
+
+     <step>
+      <para>Leave the NameID Format field empty.</para>
+     </step>
+
+     <step>
+      <para>Select the Entity ID corresponding to the "My Domain" that you set
+      up.</para>
+     </step>
+
+     <step>
+      <para>Save your work in Salesforce CRM.</para>
+     </step>
+
+     <step>
+      <para>Salesforce CRM displays a Salesforce Login URL.</para>
+
+      <para>Copy the Salesforce Login URL to the field provided on the OpenAM
+      page.</para>
+     </step>
+
+     <step>
+      <para>Salesforce CRM displays a Salesforce.com Single Logout URL.</para>
+
+      <para>If you want to perform Global Logout when a user logs out of
+      Salesforce, edit this form to include the OpenAM Logout URL here.</para>
+
+      <para>If you do not want to OpenAM to end the user's session when they
+      log out of Salesforce, edit this for to leave this blank.</para>
+     </step>
+
+     <step><!-- Pending OPENAM-1232: Enhance Salesforce workflow -->
+      <para>Click Download Metadata to download the Salesforce CRM SP
+      metadata.</para>
+
+      <para>After you complete the configuration, you must import the
+      SP metadata you download in this step.</para>
+     </step>
+
+     <step>
+      <para>In Salesforce CRM, browse to Administration Setup &gt; Manage Users,
+      and then click Users.</para>
+     </step>
+
+     <step>
+      <para>Add users as necessary, making sure the attribute chosen as the
+      Federation ID matches the local attribute you mapped to the remote
+      attribute in the previous page in OpenAM.</para>
+     </step>
+
+     <step>
+      <para>Click Finish to complete the process.</para>
+     </step>
+    </substeps>
+   </step>
+
+   <step>
+    <para>After you finish, import the metadata for Salesforce CRM as SP.</para>
+
+    <substeps>
+     <step>
+      <para>Browse in OpenAM console to the Federation tab.</para>
+     </step>
+
+     <step>
+      <para>If the remote SP entity for Salesforce CRM is already in the Entity
+      Providers list, delete the existing configuration.</para>
+     </step>
+
+     <step>
+      <para>Click Import Entity..., and then use the Import Entity Provider
+      page to import the Salesforce CRM metadata.</para>
+     </step>
+    </substeps>
+
+    <para>At this point, when a user browses to the Salesforce domain you set
+    up, they should be redirected to OpenAM for authentication. Upon successful
+    authentication, they should be logged in to Salesforce.</para>
+   </step>
+  </procedure>
+ </section>
+
  <section xml:id="using-saml2-sso-slo">
   <title>Using SAML 2.0 Single Sign-On &amp; Single Logout</title>
 
