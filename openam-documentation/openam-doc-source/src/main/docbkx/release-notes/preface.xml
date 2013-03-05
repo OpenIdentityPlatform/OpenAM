@@ -1,0 +1,136 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  ! CCPL HEADER START
+  !
+  ! This work is licensed under the Creative Commons
+  ! Attribution-NonCommercial-NoDerivs 3.0 Unported License.
+  ! To view a copy of this license, visit
+  ! http://creativecommons.org/licenses/by-nc-nd/3.0/
+  ! or send a letter to Creative Commons, 444 Castro Street,
+  ! Suite 900, Mountain View, California, 94041, USA.
+  !
+  ! You can also obtain a copy of the license at
+  ! src/main/resources/legal-notices/CC-BY-NC-ND.txt.
+  ! See the License for the specific language governing permissions
+  ! and limitations under the License.
+  !
+  ! If applicable, add the following below this CCPL HEADER, with the fields
+  ! enclosed by brackets "[]" replaced with your own identifying information:
+  !      Portions Copyright [yyyy] [name of copyright owner]
+  !
+  ! CCPL HEADER END
+  !
+  !      Copyright 2011-2013 ForgeRock, Inc.
+  !    
+-->
+<preface xml:id='preface'
+ xmlns='http://docbook.org/ns/docbook' version='5.0' xml:lang='en'
+ xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance'
+ xsi:schemaLocation='http://docbook.org/ns/docbook http://docbook.org/xml/5.0/xsd/docbook.xsd'
+ xmlns:xlink='http://www.w3.org/1999/xlink'
+ xmlns:xinclude='http://www.w3.org/2001/XInclude'>
+ <title>Preface</title>
+ 
+ <para>This guide is designed to help customers configure OpenAM in detail.
+</para>
+
+ <section>
+  <title>Who Should Use this Guide</title>
+  
+  <para>This guide is for anyone who needs to deploy OpenAM in a production 
+  environment.
+  </para>
+
+<!-- Need lots more -->
+   
+  <itemizedlist>
+   <para>This guide is organized as follows:</para>
+  
+   <listitem>
+    <para><link xlink:href="deployment-guide#chap-intro"
+     xlink:role="http://docbook.org/xlink/role/olink">
+     <citetitle>The Deployment Guide</citetitle></link>  
+     defines 
+     </para>
+   </listitem>
+
+<!-- revise for deployment guide chapters 
+
+   <listitem>
+    <para><link xlink:href="upgrade-guide#chap-custom"
+     xlink:role="http://docbook.org/xlink/role/olink"><citetitle>Customizing 
+     An OpenAM Deployment</citetitle></link> gives the universal instructions 
+     for customizing OpenAM for your deployment.</para>
+   </listitem>
+
+   <listitem>
+    <para><link xlink:href="upgrade-guide#chap-patches"
+     xlink:role="http://docbook.org/xlink/role/olink">
+     <citetitle>Applying a Patch</citetitle></link> provides basic information on 
+     patches and how to apply them to your OpenAM instance.</para>
+   </listitem>
+
+   <listitem>
+    <para><link xlink:href="upgrade-guide#chap-update-basics"
+     xlink:role="http://docbook.org/xlink/role/olink">
+     <citetitle>Updating An OpenAM Deployment</citetitle></link> includes the procedure
+     to update your OpenAM instance and an example to illustrate the procedure.</para>
+   </listitem>
+   
+   <listitem>
+    <para><link xlink:href="upgrade-guide#chap-upgrade-basics"
+     xlink:role="http://docbook.org/xlink/role/olink">
+     <citetitle>Upgrading An OpenAM Deployment</citetitle></link> includes the procedure
+     to upgrade your OpenAM instance and an example to illustrate the procedure.
+     without downtime</para>
+   </listitem>
+      
+   <listitem>
+    <para><link xlink:href="upgrade-guide#chap-legacy"
+     xlink:role="http://docbook.org/xlink/role/olink">
+     <citetitle>Upgrading Legacy OpenAM Deployments</citetitle></link> describes 
+     legacy deployments of OpenAM and procedures on how to upgrade to a more 
+     current version.</para>
+   </listitem>
+
+   <listitem>
+    <para><link xlink:href="upgrade-guide#chap-update-agents"
+     xlink:role="http://docbook.org/xlink/role/olink">
+     <citetitle>Updating Policy Agents</citetitle></link> includes the procedure
+     to update policy agents and an example of updating the Apache 2.2 web agent.</para>
+   </listitem>
+
+   <listitem>
+    <para><link xlink:href="upgrade-guide#chap-restore"
+     xlink:role="http://docbook.org/xlink/role/olink">
+     <citetitle>Restoring An OpenAM Deployment</citetitle></link> provides the
+     procedure to redeploy an earlier version of your OpenAM instance. This
+     chapter provides instructions for rolling back OpenAM core and 
+     configuration store, but it does not cover information for instances
+     that have a dependency on an external replicated directory server.
+     Restoration of earlier policy agents is included in the chapter.</para>
+   </listitem>
+-->
+
+<!--   <listitem>
+    <para>The <link xlink:href="upgrade-guide#chap-update-glossary"
+     xlink:role="http://docbook.org/xlink/role/olink">
+     <citetitle></para>
+   </listitem>
+-->
+-->
+
+  </itemizedlist>
+   
+  <para>You do not need to be an OpenAM wizard to learn something from
+  this guide, though a background in access management and maintaining
+  web application software can help. You do need some background in
+  managing services on your operating systems and in your application
+  servers. You can nevertheless get started with this guide, and then
+  learn more as you go.</para>
+ </section>
+
+ <xinclude:include href="../shared/sec-formatting-conventions.xml" />
+ <xinclude:include href="../shared/sec-accessing-doc-online.xml" />
+ <xinclude:include href="../shared/sec-joining-the-community.xml" />
+</preface>

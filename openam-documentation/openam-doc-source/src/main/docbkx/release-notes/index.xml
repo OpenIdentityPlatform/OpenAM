@@ -30,11 +30,10 @@
  xmlns:xlink='http://www.w3.org/1999/xlink'
  xmlns:xinclude='http://www.w3.org/2001/XInclude'>
  <info>
-  <title>OpenAM <?eval ${serverDocTargetVersion}?> Release Notes</title>
+  <title>OpenAM <?eval ${serverDocTargetVersion}?> Deployment Guide</title>
   <abstract>
-   <para>Notes covering OpenAM prerequisites, fixes, known issues. OpenAM
-   provides open source Authentication, Authorization, Entitlement and
-   Federation software.</para>
+   <para>Best practice recommendations associated with the deployment of OpenAM.
+   </para>
   </abstract>
   <copyright>
    <year>2011-2013</year>
@@ -44,6 +43,11 @@
    <author>
     <personname>
      <firstname>Mark</firstname><surname>Craig</surname>
+    </personname>
+   </author>
+   <author>
+    <personname>
+     <firstname>Mike</firstname><surname>Jang</surname>
     </personname>
    </author>
    <author>
@@ -60,10 +64,13 @@
 
  <toc />
 
- <xinclude:include href='chap-whats-new.xml' />
- <xinclude:include href='chap-before-you-install.xml' />
- <xinclude:include href='chap-compatibility.xml' />
- <xinclude:include href='chap-issues.xml' />
- <xinclude:include href="chap-feedback.xml" />
- <xinclude:include href="chap-support.xml" />
+ <xinclude:include href='chap-introduction.xml' />
+ <xinclude:include href='chap-deployment-planning.xml' />
+ <xinclude:include href='chap-hardware-requirements.xml' />
+ <xinclude:include href='chap-basic-server-security.xml' />
+ <xinclude:include href="chap-identify-what-features-to-use.xml" />
+ <xinclude:include href="chap-designing-architecture.xml" />
+ <xinclude:include href="chap-scalability.xml" />
+ <xinclude:include href="chap-testing.xml" />
+ <xinclude:include href="chap-migration.xml" />
 </book>
