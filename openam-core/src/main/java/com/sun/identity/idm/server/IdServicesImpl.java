@@ -2770,7 +2770,7 @@ public class IdServicesImpl implements IdServices {
            if (!de.isAllowed(token, dp, envMap)) {
                Object[] args = { op.getName(), token.getPrincipal().getName() 
                        };
-               throw new IdRepoException(IdRepoBundle.BUNDLE_NAME, "402", 
+               throw new IdRepoException(IdRepoBundle.BUNDLE_NAME, "402",
                        args);
            }
            return true;

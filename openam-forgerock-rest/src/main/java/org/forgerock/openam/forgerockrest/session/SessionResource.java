@@ -17,7 +17,6 @@ package org.forgerock.openam.forgerockrest.session;
 
 import com.iplanet.dpro.session.share.SessionInfo;
 import com.iplanet.services.naming.WebtopNaming;
-import com.sun.identity.sm.OrganizationConfigManager;
 import edu.emory.mathcs.backport.java.util.Arrays;
 import org.forgerock.json.fluent.JsonValue;
 import org.forgerock.json.resource.ActionRequest;
@@ -32,8 +31,6 @@ import org.forgerock.json.resource.QueryResultHandler;
 import org.forgerock.json.resource.ReadRequest;
 import org.forgerock.json.resource.Resource;
 import org.forgerock.json.resource.ResultHandler;
-import org.forgerock.json.resource.Router;
-import org.forgerock.json.resource.RoutingMode;
 import org.forgerock.json.resource.ServerContext;
 import org.forgerock.json.resource.UpdateRequest;
 import org.forgerock.openam.forgerockrest.session.query.SessionQueryFactory;
@@ -70,24 +67,19 @@ public class SessionResource implements CollectionResourceProvider {
 
     private SessionQueryManager queryManager;
 
-    public SessionResource(SessionQueryManager queryManager) {
-        this.queryManager = queryManager;
+    /**
+     * Default constructor instantiates the SessionResource.
+     */
+    public SessionResource() {
+        this(new SessionQueryManager(new SessionQueryFactory()));
     }
 
     /**
-     * Applies the routing to the Router that this class supports.
-     *
-     * @param ocm Configuration required for organisation name.
-     * @param router Router to apply changes to.
+     * Dependency Injection constructor allowing the SessionResource dependency to be provided.
+     * @param sessionQueryManager No null.
      */
-    public static void applyRouting(OrganizationConfigManager ocm, Router router) {
-        String orgName = ocm.getOrganizationName();
-        if (!orgName.endsWith("/")) {
-            orgName += "/";
-        }
-
-        SessionQueryManager sessionQueryManager = new SessionQueryManager(new SessionQueryFactory());
-        router.addRoute(RoutingMode.STARTS_WITH, orgName + "sessions", new SessionResource(sessionQueryManager));
+    public SessionResource(SessionQueryManager sessionQueryManager) {
+        this.queryManager = sessionQueryManager;
     }
 
     /**

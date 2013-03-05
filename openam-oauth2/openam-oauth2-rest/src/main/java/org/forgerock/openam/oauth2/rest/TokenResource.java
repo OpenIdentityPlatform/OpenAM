@@ -117,7 +117,7 @@ public class TokenResource implements CollectionResourceProvider {
                     handler.handleError(ex);
                 }
             } catch (JsonResourceException e) {
-                throw ResourceException.getException(e.getCode(), e.getReason(), null, e);
+                throw new ServiceUnavailableException(e.getMessage(),e);
             }
             Map< String, String> responseVal = new HashMap< String, String>();
             responseVal.put("success", "true");
@@ -183,7 +183,7 @@ public class TokenResource implements CollectionResourceProvider {
                 }
                 response = accessor.query("1", queryFilter);
             } catch (JsonResourceException e) {
-                throw ResourceException.getException(ResourceException.UNAVAILABLE, "Can't query CTS", null, e);
+                throw new ServiceUnavailableException(e.getMessage(),e);
             }
             resource = new Resource("result", "1", response);
             JsonValue value = resource.getContent();
@@ -226,7 +226,7 @@ public class TokenResource implements CollectionResourceProvider {
                 username = usernameSet.iterator().next();
 
             } catch (JsonResourceException e) {
-                throw ResourceException.getException(ResourceException.NOT_FOUND, "Not found in CTS", "CTS", e);
+                throw new ServiceUnavailableException(e.getMessage(),e);
             }
             if (uid.equals(adminUserId) || username.equalsIgnoreCase(uid.getName())){
                 resource = new Resource(OAuth2Constants.Params.ID, "1", response);

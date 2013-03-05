@@ -132,7 +132,7 @@
         <commons.json-fluent.version>1.1.0</commons.json-fluent.version>
         <commons.json-resource.version>1.2.2</commons.json-resource.version>
         <commons.json-patch.version>1.0.0</commons.json-patch.version>
-        <forgerock.json.version>2.0.0-Xpress2</forgerock.json.version>
+        <forgerock.json.version>2.0.0-SNAPSHOT</forgerock.json.version>
 
         <restlet.version>2.1.1</restlet.version>
         <xercesj.version>2.11.0</xercesj.version>
@@ -232,7 +232,7 @@
         <module>openam-common-auth-ui</module>
 
         <module>openam-server-auth-ui</module>
-        
+
         <module>openam-ui-ria</module>
 
         <module>openam-server-only</module>
@@ -538,8 +538,8 @@
     <scm>
         <connection>scm:svn:https://svn.forgerock.org/openam/trunk/</connection>
         <developerConnection>scm:svn:https://svn.forgerock.org/openam/trunk/</developerConnection>
-      <url>http://sources.forgerock.org/browse/commons/forgerock-parent/trunk/openam</url>
-  </scm>
+        <url>http://sources.forgerock.org/browse/commons/forgerock-parent/trunk/openam</url>
+    </scm>
 
     <!-- Dependency Management -->
     <dependencyManagement>
@@ -802,7 +802,7 @@
                 <artifactId>openam-doc-content</artifactId>
                 <version>${project.version}</version>
             </dependency>
-            
+
 
             <!-- Distribution dependencies -->
             <dependency>
@@ -1250,7 +1250,7 @@
                 <groupId>javax.servlet</groupId>
                 <artifactId>servlet-api</artifactId>
                 <version>2.5</version>
-                <scope>provided</scope> 
+                <scope>provided</scope>
             </dependency>
             <dependency>
                 <groupId>javax.servlet.jsp</groupId>
@@ -1288,12 +1288,12 @@
                 <groupId>xalan</groupId>
                 <artifactId>xalan</artifactId>
                 <version>2.7.1</version>
-                 <exclusions>
-                     <exclusion>
-                         <groupId>xml-apis</groupId>
-                         <artifactId>xml-apis</artifactId>
-                     </exclusion>
-                 </exclusions>
+                <exclusions>
+                    <exclusion>
+                        <groupId>xml-apis</groupId>
+                        <artifactId>xml-apis</artifactId>
+                    </exclusion>
+                </exclusions>
             </dependency>
 
             <dependency>

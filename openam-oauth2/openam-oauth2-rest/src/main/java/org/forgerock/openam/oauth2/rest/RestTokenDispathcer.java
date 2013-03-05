@@ -33,8 +33,8 @@ public class RestTokenDispathcer {
     public static ConnectionFactory getConnectionFactory() throws ServletException {
         try {
             final Router router = new Router();
-            router.addRoute(EQUALS, "/token/", new TokenResource());
-            router.addRoute(EQUALS, "/client/", new ClientResource());
+            router.addRoute("/token/", new TokenResource());
+            router.addRoute("/client/", new ClientResource());
             final ConnectionFactory factory = Resources.newInternalConnectionFactory(router);
             return factory;
         } catch (final Exception e) {

@@ -63,12 +63,17 @@ public final class IdentityResource implements CollectionResourceProvider {
         idSvcsAttrList.add(new Attribute("realm", realmval));
     }
 
+    /**
+     * Gets the user id from the session provided in the server context
+     *
+     * @param context Current Server Context
+     * @param request Request from client to retrieve id
+     * @param handler Result handler
+     */
     private void idFromSession(final ServerContext context, final ActionRequest request,
                                final ResultHandler<JsonValue> handler) {
 
-        //This allows a lookup of a user stored to a particular with only session given
         JsonValue result = new JsonValue(new LinkedHashMap<String, Object>(1));
-
         Token admin = new Token();
         admin.setId(getCookieFromServerContext(context));
         SSOToken ssotok = null;
@@ -79,7 +84,7 @@ public final class IdentityResource implements CollectionResourceProvider {
             ssotok = mgr.createSSOToken(getCookieFromServerContext(context));
             amIdentity = new AMIdentity(ssotok);
 
-            //build resource
+            // build resource
             result.put("id", amIdentity.getName());
             result.put("realm", com.sun.identity.sm.DNMapper.orgNameToRealmName(amIdentity.getRealm()));
             result.put("dn", amIdentity.getUniversalId());
@@ -105,7 +110,7 @@ public final class IdentityResource implements CollectionResourceProvider {
 
         if (action.equalsIgnoreCase("idFromSession")) {
             idFromSession(context, request, handler);
-        } else { //for now this is the only case coming in, so fail if otherwise
+        } else { // for now this is the only case coming in, so fail if otherwise
             final ResourceException e =
                     new NotSupportedException("Actions are not supported for resource instances");
             handler.handleError(e);
@@ -131,7 +136,7 @@ public final class IdentityResource implements CollectionResourceProvider {
     @Override
     public void createInstance(final ServerContext context, final CreateRequest request,
                                final ResultHandler<Resource> handler) {
-        //anyone can create an account add
+        // anyone can create an account add
         Token admin = new Token();
         admin.setId(getCookieFromServerContext(context));
 
@@ -146,9 +151,9 @@ public final class IdentityResource implements CollectionResourceProvider {
             identity = jsonValueToIdentityDetails(jVal);
             resourceId = identity.getName();
 
-            //Create the resource
+            // Create the resource
             CreateResponse success = idsvc.create(identity, admin);
-            //Read created resource
+            // Read created resource
             dtls = idsvc.read(identity.getName(), idSvcsAttrList, admin);
 
             resource = new Resource(identity.getName(), "0", identityDetailsToJsonValue(dtls));
@@ -194,10 +199,10 @@ public final class IdentityResource implements CollectionResourceProvider {
             result = new JsonValue(new LinkedHashMap<String, Object>(1));
             idsvc = new IdentityServicesImpl();
 
-            //read to see if resource is available to user
+            // read to see if resource is available to user
             dtls = idsvc.read(resourceId, idSvcsAttrList, admin);
 
-            //delete the resource
+            // delete the resource
             DeleteResponse success = idsvc.delete(dtls, admin);
 
             result.put("success", "true");
@@ -216,7 +221,7 @@ public final class IdentityResource implements CollectionResourceProvider {
             RestDispatcher.debug.error("IdentityResource.deleteInstance() :: Cannot DELETE " +
                     resourceId + ":" + tokenExpired);
             handler.handleError(new ForbiddenException("Token is expired", tokenExpired));
-        } catch (final AccessDenied accessDenied){
+        } catch (final AccessDenied accessDenied) {
             RestDispatcher.debug.error("IdentityResource.deleteInstance() :: Cannot DELETE " +
                     resourceId + ":" + accessDenied);
             handler.handleError(new ForbiddenException(accessDenied.getMessage(), accessDenied));
@@ -322,8 +327,8 @@ public final class IdentityResource implements CollectionResourceProvider {
         String queryFilter = null;
 
         try {
-            //This will only return 1 user..
-            //getQueryFilter() is not implemented yet..returns dummy false value
+            // This will only return 1 user..
+            // getQueryFilter() is not implemented yet..returns dummy false value
             queryFilter = request.getQueryId();
             if (queryFilter == null || queryFilter.isEmpty()) {
                 queryFilter = "*";
@@ -374,7 +379,7 @@ public final class IdentityResource implements CollectionResourceProvider {
             RestDispatcher.debug.error("IdentityResource.readInstance() :: Cannot READ " +
                     resourceId + ":" + tokenExpired);
             handler.handleError(new ForbiddenException("Token is expired", tokenExpired));
-        } catch (final AccessDenied accessDenied){
+        } catch (final AccessDenied accessDenied) {
             RestDispatcher.debug.error("IdentityResource.readInstance() :: Cannot READ " +
                     resourceId + ":" + accessDenied);
             handler.handleError(new ForbiddenException(accessDenied.getMessage(), accessDenied));
@@ -410,28 +415,28 @@ public final class IdentityResource implements CollectionResourceProvider {
         try {
             idsvc = new IdentityServicesImpl();
             dtls = idsvc.read(resourceId, idSvcsAttrList, admin);//Retrieve details about user to be updated
-            //Continue modifying the identity if read success
+            // Continue modifying the identity if read success
 
             newDtls = jsonValueToIdentityDetails(jVal);
             newDtls.setName(resourceId);
-            //update resource with new details
+            // update resource with new details
             UpdateResponse message = idsvc.update(newDtls, admin);
-            //read updated identity back to client
+            // read updated identity back to client
             IdentityDetails checkIdent = idsvc.read(dtls.getName(), idSvcsAttrList, admin);
-            //handle updated resource
+            // handle updated resource
             resource = new Resource(resourceId, "0", identityDetailsToJsonValue(checkIdent));
             handler.handleResult(resource);
         } catch (final ObjectNotFound o) {
-            //Create Resource
+            // Create Resource
             try {
                 dtls = jsonValueToIdentityDetails(jVal);
                 dtls.setName(resourceId);
 
-                //create resource because it does not exist
+                // create resource because it does not exist
                 CreateResponse success = idsvc.create(dtls, admin);
-                //check created identity
+                // check created identity
                 IdentityDetails checkIdent = idsvc.read(dtls.getName(), idSvcsAttrList, admin);
-                //Send client back resource created response
+                // Send client back resource created response
                 resource = new Resource(resourceId, "0", identityDetailsToJsonValue(checkIdent));
                 handler.handleResult(resource);
             } catch (final TokenExpired tokenExpired) {
@@ -449,7 +454,7 @@ public final class IdentityResource implements CollectionResourceProvider {
             RestDispatcher.debug.error("IdentityResource.updateInstance() :: Cannot UPDATE " +
                     resourceId + ":" + tokenExpired);
             handler.handleError(new ForbiddenException("Token is expired", tokenExpired));
-        } catch (final AccessDenied accessDenied){
+        } catch (final AccessDenied accessDenied) {
             RestDispatcher.debug.error("IdentityResource.updateInstance() :: Cannot UPDATE " +
                     resourceId + ":" + accessDenied);
             handler.handleError(new ForbiddenException(accessDenied.getMessage(), accessDenied));
@@ -457,7 +462,7 @@ public final class IdentityResource implements CollectionResourceProvider {
             RestDispatcher.debug.error("IdentityResource.updateInstance() :: Cannot UPDATE " +
                     generalFailure);
             handler.handleError(new BadRequestException(generalFailure.getMessage(), generalFailure));
-        }  catch (final Exception exception) {
+        } catch (final Exception exception) {
             RestDispatcher.debug.error("IdentityResource.updateInstance() :: Cannot UPDATE! " +
                     exception);
             handler.handleError(new NotFoundException(exception.getMessage(), exception));
