@@ -228,11 +228,5 @@
     <literal>iPlanetAMPolicyConfigService</literal> is
     <literal>iplanet-am-policy-config-subjects-result-ttl</literal>.</para>
    </listitem>
-
-   <listitem>
-         <para>OpenAM now able to support a view of all sessions in a multi-server configuration, at the SDK level.
-             That view is now exposed as a REST interface.</para>
-   </listitem>
-
  </itemizedlist>
 </chapter>
