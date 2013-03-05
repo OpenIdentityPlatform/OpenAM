@@ -1,0 +1,211 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  ! CCPL HEADER START
+  !
+  ! This work is licensed under the Creative Commons
+  ! Attribution-NonCommercial-NoDerivs 3.0 Unported License.
+  ! To view a copy of this license, visit
+  ! http://creativecommons.org/licenses/by-nc-nd/3.0/
+  ! or send a letter to Creative Commons, 444 Castro Street,
+  ! Suite 900, Mountain View, California, 94041, USA.
+  !
+  ! You can also obtain a copy of the license at
+  ! src/main/resources/legal-notices/CC-BY-NC-ND.txt.
+  ! See the License for the specific language governing permissions
+  ! and limitations under the License.
+  !
+  ! If applicable, add the following below this CCPL HEADER, with the fields
+  ! enclosed by brackets "[]" replaced with your own identifying information:
+  !      Portions Copyright [yyyy] [name of copyright owner]
+  !
+  ! CCPL HEADER END
+  !
+  !      Copyright 2011-2013 ForgeRock AS
+  !    
+-->
+<chapter xml:id='chap-scalability'
+ xmlns='http://docbook.org/ns/docbook'
+ version='5.0' xml:lang='en'
+ xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance'
+ xsi:schemaLocation='http://docbook.org/ns/docbook http://docbook.org/xml/5.0/xsd/docbook.xsd'
+ xmlns:xlink='http://www.w3.org/1999/xlink'>
+    <title>Scaling OpenAM</title>
+    <indexterm><primary>Scalability</primary></indexterm>
+    <para>This chapter provides basic guidance for the capacity of a standard OpenAM deployment, and what you can
+        do to scale OpenAM. The default configuration for OpenAM can handle enterprise-level loads. With the right
+        hardware, you can set up OpenAM to scale for three different parameters: number of simultaneous sessions, transactions
+        per second (also known as throughput), and number of policies.</para>
+
+    <para>The scalability of OpenAM builds on the following chapter from the Administration Guide:
+        <link xlink:href="admin-guide#chap-tuning" xlink:role="http://docbook.org/xlink/role/olink">
+            <citetitle>Tuning OpenAM</citetitle></link>. It assumes you have followed related recommendations in
+            <link xlink:show="new"
+            xlink:href='https://wikis.forgerock.org/confluence/display/openam/OpenAM+Performance+Tuning+Guide'>
+            <citetitle>ForgeRock Wiki</citetitle></link>.</para>
+
+    <para>Scalability is an outgrowth of capacity planning. You are using OpenAM presumably to administer authorizations,
+        entitlements, and so on for one or more websites.</para>
+
+    <para> In general, a single system with a dual-core CPU and 3GB of RAM can handle 100,000 "normal"
+        simultaneous sessions. Of course, that number varies with the number of users, failover requirements, session
+        loads, and more. You can read about the effect of such parameters in this chapter.</para>
+
+    <para>To review, a session is a dialog
+        between a client and a server. In the context of OpenAM, a session involves communications at the application
+        layer, normally using the HTTP or HTTPS protocols. Despite the name, sessions are generally not associated with
+        the Session layer of the OSI model of networking.</para>
+
+<section xml:id="scalability-assumptions-openam-server">
+    <title>OpenAM Scalability Assumptions</title>
+
+    <para>A session lasts as long as an end-user client is connected to a website where authorizations are administered
+        with the help of OpenAM. In fact, due to caching, it lasts a little longer. That additional time depends on how
+        polling is configured from the OpenAM server.</para>
+
+    <para>The aforementioned 100,000 sessions on a 3GB dual-core system is based on a number of assumptions</para>
+
+    <itemizedlist>
+
+        <listitem>
+            <para>The default session lifetime is based on a maximum session time of 120 minutes, and a maximum idle time
+                of 30 minutes. As noted in the reference guide, that corresponds to the time that a session can remain
+                active and idle, respectively, before OpenAM requires a user to log in again. While you can change those
+                parameters in the OpenAM console in the Configuration &gt; Global &gt; Session menu, you should expect
+                an increase in either parameter to negatively affect session capacity.</para>
+        </listitem>
+
+        <listitem>
+            <para>The 3GB includes 1GB set aside for the operating system (OS). For some 64-bit operating systems, 1GB may
+                not be enough for this purpose, even if you have set up that system to run an absolute minimum of
+                services.</para>
+        </listitem>
+
+        <listitem>
+            <para>At least 2GB is set aside as a maximum Java Virtual Machine (JVM) heap size. Our observations suggest
+                that load from each individual session may vary between 15kB to 50kB. A 3GB heap size would support 100,000
+                sessions at an average load of 20kB per session.</para>
+        </listitem>
+
+        <listitem>
+            <para>The default heap size for a J2EE container such as Tomcat may be as low as 1GB. That may not be
+                sufficient for many production configurations. To optimize the settings for Tomcat, see the
+                aforementioned Tuning OpenAM Chapter in the Administrative Guide. As noted in that chapter,
+                while you may be tempted to increase the heap size for more sessions, "smaller heaps are easier to
+                manage."
+            </para>
+        </listitem>
+
+        <listitem>
+            <para>With the Java Platform Enterprise Edition web containers required for OpenAM, you can use a tool like
+                <literal>jconsole</literal> to monitor
+                the number of active sessions. Several online blogs are available that detail the changes required to the
+                Tomcat server.xml file. Once properly configured, you should be able to use <literal>jconsole</literal>,
+                available from most JDK development packages, to measure the number of currently active sessions. For
+                instructions on how to set up <literal>jconsole</literal> as a Java Management eXtension (JMX) client,
+                see the chapter on <link xlink:href="admin-guide#chap-monitoring"
+                                         xlink:role="http://docbook.org/xlink/role/olink">
+                    <citetitle>Monitoring OpenAM Services in the Administration Guide
+                    </citetitle></link>.</para>
+        </listitem>
+
+        <listitem>
+            <para>If you need to increase the capacity of your OpenAM system, you can do so with multiple systems with
+                hardware configured in a similar fashion, located behind appropriate load balancers. However, it is
+                possible to increase throughput by dedicating more CPUs and RAM memory to each OpenAM system.</para>
+        </listitem>
+
+        <listitem>
+            <para>Scalability depends in part on how the web container such as Tomcat, the web server such as Apache,
+                and the directory server such as OpenDJ are configured. If you've followed the guidance described in
+                this chapter and still are not getting the performance that you desire, examine the defaults configured
+                for both the web container and the web server. Some basic guidance on tuning such services is available
+                in the aforementioned Tuning OpenAM chapter of the Administration Guide.
+            </para>
+        </listitem>
+
+    </itemizedlist>
+
+</section>
+
+    <section xml:id="configuration-scalability-openam-server">
+    <title>OpenAM Scalability Configuration Discussion</title>
+
+    <para>Most administrators will want at least two OpenAM systems to support Session Failover (SFO). For the
+given 3GB heap size, two OpenAM systems in that configuration should be able to handle over 100,000 sessions.
+However, to avoid dropping connections during a SFO situation, the second OpenAM system should not be
+counted for the purpose of calculating session capacity. However, you could certainly add more OpenAM
+systems to increase the capacity of your network. If you disable caching for those additional servers,
+the increase in session capacity should have a more linear relationship with number of servers.</para>
+
+<note>Be aware, when you include multiple OpenAM systems behind a load balancer, your group of OpenAM servers will
+be able to handle
+more sessions. However, that increase is not additive. In a network with multiple OpenAM servers, a user session may
+be cached, reducing overall available memory. As a result, if you double the number of identically configured OpenAM
+servers on a network, the total capacity of the network will increase, but by less than 100%.</note>
+
+        <!-- would like to find some good conservative number -->
+
+<para>For administrators who are less familiar with Java, basic operations are handled in a Java Virtual Machine
+(JVM). As described in the aforementioned Tuning OpenAM chapter of the Administration Guide, you can allocate a
+certain amount of memory to the JVM in a heap. Once used, such memory is "recycled" by a device known as a
+    garbage collector.
+</para>
+
+<para>The default configuration of a J2EE container such as Tomcat may not be configured with sufficient memory
+for heap size or garbage collection. The Installation Guide chapter on
+    <link xlink:href="install-guide#chap-prepare-install" xlink:role="http://docbook.org/xlink/role/olink">
+    <citetitle>Preparing for Installation</citetitle></link> includes guidance on how to configure Tomcat with
+    additional memory for heap size and garbage collection.</para>
+
+    </section>
+
+<section xml:id="hardware-scalability-openam-server">
+<title>OpenAM Scalability Hardware Issues</title>
+
+<para>In general, OpenAM-related hardware issues are based on the RAM and the number of CPUs allocated to
+    each system. If you do need more than 100,000 simultaneous sessions, we recommend that you configure
+    multiple OpenAM servers, beyond those you might configure for SFO. However, network capacity
+    issues are possible, especially when different OpenAM servers in a
+    network are connected over long distances via a WAN such as the Internet.</para>
+
+<!-- Per Gary Williams in the Support Chat room, 2/5/13, "we don't test SFO over WAN". From the reaction,
+there may be a request coming for such testing. -->
+
+</section>
+
+<section xml:id="session-scalability-openam-server">
+<title>OpenAM Server Session Scalability</title>
+
+<para>The Tuning OpenAM chapter of the Administrative guide recommends a 3GB JVM heap size for servers in
+    production and suggests that is a practical limit for session capacity on a single OpenAM server. In other
+    words, if you want to increase the session capacity of your system beyond 100,000, you will generally want to
+    add more servers, beyond what is needed for SFO.</para>
+
+</section>
+
+<section xml:id="rules-scalability-openam-server">
+<title>OpenAM Rules Scalability</title>
+
+<para>As one might expect, transactions per second (TPS, also known as throughput) varies inversely with the
+    number of rules applied to a realm. The numbers of rules that are applied may be a small subset of the number
+    of rules that may be configured. The searches required to identify applicable rules can also affect TPS.</para>
+
+<!-- Based on info collected by Andy Forrest in AME-670 -->
+
+</section>
+
+<section xml:id="throughput-scalability-openam-server">
+<title>OpenAM Server Throughput Scalability</title>
+
+<para>Tests that we've observed suggests that throughput can be increased with additional hardware. Additional
+    CPUs and more RAM (included in larger JVM heap sizes) can increase throughput.</para>
+
+<!--based on info from Visa tests described by Allan. -->
+<para>This chapter has provided rudimentary guidance on OpenAM scalability. We expect to update this chapter
+    as our understanding of user experience with different OpenAM configurations improves.</para>
+
+</section>
+
+
+        </chapter>
+
