@@ -45,6 +45,16 @@
      <firstname>Mark</firstname><surname>Craig</surname>
     </personname>
    </author>
+   <author>
+    <personname>
+     <firstname>Vanessa</firstname><surname>Richie</surname>
+    </personname>
+   </author>
+   <author>
+    <personname>
+     <firstname>Mike</firstname><surname>Jang</surname>
+    </personname>
+   </author>
   </authorgroup>
   <xinclude:include href="../legal.xml" />
   <date><?dbtimestamp format="B d, Y"?></date>
@@ -76,7 +86,6 @@
  <xinclude:include href='chap-error-messages.xml' />
  <xinclude:include href='chap-ports-used.xml' />
  <xinclude:include href='chap-l10n.xml' />
- <xinclude:include href='chap-file-layout.xml' />
  <xinclude:include href='chap-standards.xml' />
  <xinclude:include href='chap-endpoints.xml' />
 

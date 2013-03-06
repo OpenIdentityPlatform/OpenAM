@@ -3278,7 +3278,7 @@ to a runtime exception with messages that I think suggest that it needed to be c
                         <link xlink:href="admin-guide#chap-oauth2#register-oauth2-client"
                               xlink:role="http://docbook.org/xlink/role/olink">
                             <citetitle>Defining Authentication Services</citetitle></link>.
-                        .</para>
+                        </para>
                 </listitem>
             </varlistentry>
 
