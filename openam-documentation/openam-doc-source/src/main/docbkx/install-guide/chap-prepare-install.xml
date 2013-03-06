@@ -278,8 +278,8 @@ CATALINA_HOME="/path/to/tomcat"
 export CATALINA_HOME
 JAVA_HOME=/path/to/jdk1.6
 export JAVA_HOME
-JAVA_OPTS="-Xmx1024m -XX:MaxPermSize=256m"
-export JAVA_OPTS
+CATALINA_OPTS="-Xmx1024m -XX:MaxPermSize=256m"
+export CATALINA_OPTS
 
 case "${1}" in
 start)
