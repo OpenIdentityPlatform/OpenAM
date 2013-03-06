@@ -48,7 +48,7 @@ Install:
  Install the demo client.
     1. Put the war file located in openam-oauth2/openam-oauth2-demo/target in tomcats webapps directory.
     2. Edit the WEB-INF/lib/classes/AMConfig.properties file.
-        a. Change all the URLs to your domain name and tomcat port for your authorizaiton server.
+        a. Change all the URLs to your domain name and tomcat port for your authorization server.
         b. Set org.forgerock.openam.oauth2.client_id and org.forgerock.openam.oauth2.client_secret to the OAuth 2.0
            Client created when setting up the authorization server.
         c. Set org.forgerock.openam.oauth2.endpoint.redirection=<url of a redirection end point>
