@@ -132,7 +132,14 @@ public final class RestDispatcher {
         factory = Resources.newInternalConnectionFactory(new RequestHandler() {
             public void handleAction(ServerContext serverContext, ActionRequest actionRequest,
                                      ResultHandler<JsonValue> jsonValueResultHandler) {
-                jsonValueResultHandler.handleResult(new JsonValue(new HashMap<String, Object>()));
+                try {
+                    Map parsedDetails = getRequestDetails(actionRequest.getResourceName());
+                    final RequestHandler rootRealm = realm(parsedDetails, actionRequest.getResourceName());
+                    rootRealm.handleAction(serverContext, actionRequest, jsonValueResultHandler);
+                } catch (NotFoundException nfe) {
+                    // URL not valid request
+                    jsonValueResultHandler.handleError(nfe);
+                }
             }
 
             public void handleCreate(ServerContext serverContext, CreateRequest createRequest,
