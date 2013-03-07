@@ -109,13 +109,13 @@ public class OAuth2Saml2GrantSPAdapter extends SAML2ServiceProviderAdapter {
             }
             sb.append("\" method=\"post\">");
             sb.append("<input type=\"hidden\" name=\"grant_type\" value=\"");
-            sb.append(URLEncoder.encode(OAuth2Constants.SAML20.GRANT_TYPE_URI, "UTF-8"));
+            sb.append(OAuth2Constants.SAML20.GRANT_TYPE_URI);
             sb.append("\">");
             sb.append("<input type=\"hidden\" name=\"assertion\" value=\"");
-            sb.append(URLEncoder.encode(Base64.encode(assertion.toXMLString(false,false).getBytes("UTF-8")), "UTF-8"));
+            sb.append(Base64.encode(assertion.toXMLString(false,false).getBytes("UTF-8")));
             sb.append("\">");
             sb.append("<input type=\"hidden\" name=\"client_id\" value=\"");
-            sb.append(URLEncoder.encode(hostedEntityID,"UTF-8"));
+            sb.append(hostedEntityID);
             sb.append("\">");
             sb.append("</form>");
             sb.append("<script language=\"Javascript\">");
