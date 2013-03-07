@@ -52,10 +52,8 @@
  somewhere else on your system. Unless you install from native packages,
  you create this location before you install.</para>
 
- <programlisting language='java'>class Test
-{
-    public static void main(String [] args)
-    {
+ <programlisting language='java'>class Test {
+    public static void main(String [] args)  {
         System.out.println("This is a program listing.");
     }
 }</programlisting>
