@@ -320,8 +320,9 @@
     xlink:show="new" xlink:href="https://bugster.forgerock.org/jira/browse/OPENAM"
     >OpenAM issue tracker</link>.</para>
 
-    <!-- List generated at 16:38:13 20130215 using http://bugster.forgerock.org/jira/rest/api/2/search?jql=project+%3D+OpenAM+AND+component+%3D+"web+agents"+AND+fixVersion+in+%28"Agents-3.0.5"%2C+"Agents-3.1.0-Xpress"%29+AND+resolution+%3D+Fixed+AND+labels+%3D+release-notes&startAt=0&maxResults=500&fields=summary-->
+    <!-- List generated at 08:56:57 20130307 using http://bugster.forgerock.org/jira/rest/api/2/search?jql=project+%3D+OpenAM+AND+component+%3D+"web+agents"+AND+fixVersion+%3D+"Agents-3.1.0-Xpress"+AND+resolution+%3D+Fixed+AND+labels+%3D+release-notes&startAt=0&maxResults=500&fields=summary-->
     <itemizedlist>
+   <listitem><para><link xlink:href="https://bugster.forgerock.org/jira/browse/OPENAM-2182" xlink:show="new">OPENAM-2182</link>: Apache PA will crash when Post Data Preservation is enabled and POST data is empty</para></listitem>
    <listitem><para><link xlink:href="https://bugster.forgerock.org/jira/browse/OPENAM-2135" xlink:show="new">OPENAM-2135</link>: IIS and SJSWS policy agents should not require Host header as per HTTP/1.0 specification</para></listitem>
    <listitem><para><link xlink:href="https://bugster.forgerock.org/jira/browse/OPENAM-2125" xlink:show="new">OPENAM-2125</link>: IIS7 policy agent might crash reading POST data</para></listitem>
    <listitem><para><link xlink:href="https://bugster.forgerock.org/jira/browse/OPENAM-1838" xlink:show="new">OPENAM-1838</link>: IIS7 policy agent might crash when HOST header is not available</para></listitem>

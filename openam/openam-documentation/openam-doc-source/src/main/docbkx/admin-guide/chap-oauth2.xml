@@ -393,6 +393,7 @@
   </procedure>
  </section>
 
+<!--
  <section xml:id="oauth2-manage-tokens">
   <title>Managing OAuth 2.0 Tokens</title>
 
@@ -428,6 +429,7 @@
    clients.</para></textobject>
   </mediaobject>
  </section>
+-->
 
  <section xml:id="oauth2-client-plus-authz">
   <title>Configuring OpenAM as Authorization Server &amp; Client</title>
