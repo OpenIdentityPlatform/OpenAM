@@ -22,10 +22,8 @@ import com.iplanet.sso.SSOTokenManager;
 import org.forgerock.json.fluent.JsonValue;
 import org.forgerock.json.fluent.JsonValueException;
 import org.forgerock.json.resource.*;
-import org.forgerock.json.resource.servlet.HttpContext;
 
 import java.util.HashMap;
-import java.util.List;
 
 /**
  * A simple {@code Map} based collection resource provider.
@@ -109,7 +107,7 @@ public final class DashboardResource implements CollectionResourceProvider {
                              final ResultHandler<Resource> handler) {
         try {
             SSOTokenManager mgr = SSOTokenManager.getInstance();
-            SSOToken token = mgr.createSSOToken(getCookieFromServerContext(context));
+            SSOToken token = mgr.createSSOToken(ServerContextHelper.getCookieFromServerContext(context));
 
             JsonValue val = new JsonValue(new HashMap<String, Object>());
             if (resourceId.equals("defined")) {
@@ -166,49 +164,4 @@ public final class DashboardResource implements CollectionResourceProvider {
                     + "' encountered while updating a resource");
         }
     }
-
-
-    private String getCookieFromServerContext(ServerContext context) {
-        List<String> cookies = null;
-        String cookieName = null;
-        HttpContext header = null;
-        try {
-            cookieName = SystemProperties.get("com.iplanet.am.cookie.name");
-            if (cookieName == null || cookieName.isEmpty()) {
-                return null;
-            }
-            header = context.asContext(HttpContext.class);
-            if (header == null) {
-                return null;
-            }
-            //get the cookie from header directly   as the name of com.iplanet.am.cookie.am
-            cookies = header.getHeaders().get(cookieName.toLowerCase());
-            if (cookies != null && !cookies.isEmpty()) {
-                for (String s : cookies) {
-                    if (s == null || s.isEmpty()) {
-                        return null;
-                    } else {
-                        return s;
-                    }
-                }
-            } else {  //get cookie from header parameter called cookie
-                cookies = header.getHeaders().get("cookie");
-                if (cookies != null && !cookies.isEmpty()) {
-                    for (String cookie : cookies) {
-                        String cookieNames[] = cookie.split(";"); //Split parameter up
-                        for (String c : cookieNames) {
-                            if (c.contains(cookieName)) { //if com.iplanet.am.cookie.name exists in cookie param
-                                String amCookie = c.replace(cookieName + "=", "").trim();
-                                return amCookie; //return com.iplanet.am.cookie.name value
-                            }
-                        }
-                    }
-                }
-            }
-        } catch (Exception e) {
-        }
-        return null;
-    }
-
-
 }

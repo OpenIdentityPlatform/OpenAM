@@ -33,6 +33,7 @@
 package com.sun.identity.authentication.UI;
 
 //import com.iplanet.am.util.AMURLEncDec;
+import com.sun.identity.authentication.share.RedirectCallbackHandler;
 import com.sun.identity.shared.encode.URLEncDec;
 import com.iplanet.am.util.SystemProperties;
 import com.iplanet.dpro.session.service.InternalSession;
@@ -1150,57 +1151,8 @@ public class LoginViewBean extends AuthViewBeanBase {
             onePageLogin = true;
             processLoginDisplay();
         } else {
-            if (loginDebug.messageEnabled()){
-                loginDebug.message("Redirect to external web site...");
-                loginDebug.message(
-                "RedirectUrl : " + rc.getRedirectUrl() +
-                ", RedirectMethod : " + rc.getMethod() +
-                ", RedirectData : " + rc.getRedirectData());
-            }            
-                        
-	    forward = false;
-            
-            String qString = 
-                AuthUtils.getQueryStrFromParameters(rc.getRedirectData());
-            
-            String requestURL = request.getRequestURL().toString();
-            String requestURI = request.getRequestURI();
-            int index = requestURL.indexOf(requestURI);
-            String redirectBackServerCookieValue = null;
-            if (index != -1) {
-                redirectBackServerCookieValue = requestURL.substring(0, index) 
-                    + loginURL;
-            }
-            // Create Cookie
-            try {
-                AuthUtils.setRedirectBackServerCookie(
-                    rc.getRedirectBackUrlCookieName(), 
-                    redirectBackServerCookieValue, 
-                    request, response);
-            } catch (Exception e) {
-                if (loginDebug.messageEnabled()){
-                    loginDebug.message("Cound not set RedirectBackUrlCookie!" 
-                        + e.toString());
-                }
-            }
-                 
-            StringBuilder redirectUrl = new StringBuilder(rc.getRedirectUrl());
-            if (qString != null && qString.length() != 0) {
-                redirectUrl.append(qString);
-            }
-            
-            String rUrl = redirectUrl.toString();
-            if (rUrl.startsWith("/UI/Login")) {
-                if (loginDebug.messageEnabled()) {
-                    loginDebug.message("LoginViewBean.processRedirectCallback :"
-                        + " redirect URL " + rUrl 
-                        + ", serviceuri=" + serviceUri);
-                }
-                // prepend deployment URI
-                response.sendRedirect(serviceUri + rUrl); 
-            } else {
-                response.sendRedirect(rUrl);
-            }
+            forward = false;
+            redirectCallbackHandler.handleRedirectCallback(request, response, rc, loginURL);
         }
     } 
     
@@ -2391,6 +2343,7 @@ public class LoginViewBean extends AuthViewBeanBase {
     HttpServletResponse response;
     Cookie cookie;
     static Debug loginDebug = Debug.getInstance("amLoginViewBean");
+    private final RedirectCallbackHandler redirectCallbackHandler = new RedirectCallbackHandler();
     String client_type = "";
     String orgName = "";
     String indexName = "";

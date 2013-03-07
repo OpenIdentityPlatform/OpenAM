@@ -16,6 +16,9 @@
 
 package org.forgerock.openam.forgerockrest.authn;
 
+import org.forgerock.openam.forgerockrest.authn.callbackhandlers.RestAuthCallbackHandler;
+import org.forgerock.openam.forgerockrest.authn.callbackhandlers.RestAuthNameCallbackHandler;
+import org.forgerock.openam.forgerockrest.authn.callbackhandlers.RestAuthPasswordCallbackHandler;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 

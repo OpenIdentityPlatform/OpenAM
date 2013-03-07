@@ -49,6 +49,7 @@ import com.sun.identity.authentication.UI.ButtonTiledView;
 import com.sun.identity.authentication.UI.CallBackTiledView;
 import com.sun.identity.authentication.client.AuthClientUtils;
 import com.sun.identity.authentication.service.AMAuthErrorCode;
+import com.sun.identity.authentication.share.RedirectCallbackHandler;
 import com.sun.identity.authentication.spi.AuthLoginException;
 import com.sun.identity.authentication.spi.HttpCallback;
 import com.sun.identity.authentication.spi.PagePropertiesCallback;
@@ -1547,53 +1548,8 @@ extends com.sun.identity.authentication.UI.AuthViewBeanBase {
 
     // Process 'RedirectCallback' initiated by Authentication module
     private void processRedirectCallback(RedirectCallback rc) throws Exception {
-        if (loginDebug.messageEnabled()) {
-            loginDebug.message("Redirect to external web site...");
-            loginDebug.message("RedirectUrl : " + rc.getRedirectUrl() +
-                    ", RedirectMethod : " + rc.getMethod() +
-                    ", RedirectData : " + rc.getRedirectData());
-        }            
         forward = false;
-        
-        String requestURL = request.getRequestURL().toString();
-        String requestURI = request.getRequestURI();
-        int index = requestURL.indexOf(requestURI);
-        String redirectBackServerCookieValue = null;
-        if (index != -1) {
-            redirectBackServerCookieValue = requestURL.substring(0, index)
-                    + loginURL;
-        }
-
-        try {
-            AuthClientUtils.setRedirectBackServerCookie(
-                    rc.getRedirectBackUrlCookieName(), 
-                    redirectBackServerCookieValue, request, response);
-        } catch (Exception e) {
-            if (loginDebug.messageEnabled()){
-                loginDebug.message("Cound not set RedirectBackUrlCookie!" 
-                        + e.toString());
-            }
-        }
-
-        String qString = AuthClientUtils.getQueryStrFromParameters(
-                rc.getRedirectData());
-        StringBuilder redirectUrl = new StringBuilder(rc.getRedirectUrl());
-        if (qString != null && qString.length() != 0) {
-            redirectUrl.append(qString);
-        }
-
-        String rUrl = redirectUrl.toString();
-        if (rUrl.startsWith("/UI/Login")) {
-            if (loginDebug.messageEnabled()) {
-                loginDebug.message("LoginViewBean.processRedirectCallback :"
-                    + " distauth redirect URL " + rUrl 
-                    + ", serviceuri=" + serviceUri);
-            }
-            // prepend deployment URI
-            response.sendRedirect(serviceUri + rUrl); 
-        } else {
-            response.sendRedirect(rUrl);
-        }
+        redirectCallbackHandler.handleRedirectCallback(request, response, rc, loginURL);
     }
 
     // Method to check if this is Session Upgrade
@@ -2245,6 +2201,7 @@ extends com.sun.identity.authentication.UI.AuthViewBeanBase {
     ServletContext servletContext;
     Cookie cookie;
     static Debug loginDebug = Debug.getInstance("amLoginViewBean");
+    private final RedirectCallbackHandler redirectCallbackHandler = new RedirectCallbackHandler();
     String client_type = "";
     String orgName = "";
     String orgQueryName = "";

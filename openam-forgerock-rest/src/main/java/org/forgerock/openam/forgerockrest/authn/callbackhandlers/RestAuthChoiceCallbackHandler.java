@@ -14,7 +14,7 @@
  * Copyright 2013 ForgeRock Inc.
  */
 
-package org.forgerock.openam.forgerockrest.authn;
+package org.forgerock.openam.forgerockrest.authn.callbackhandlers;
 
 import com.sun.identity.shared.debug.Debug;
 import org.forgerock.openam.forgerockrest.authn.exceptions.RestAuthException;
@@ -22,21 +22,42 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import javax.security.auth.callback.NameCallback;
+import javax.security.auth.callback.ChoiceCallback;
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.Response;
 import java.text.MessageFormat;
 
 /**
- * Defines methods to update a NameCallback from the headers and request of a Rest call and methods to convert a
+ * Defines methods to update a ChoiceCallback from the headers and request of a Rest call and methods to convert a
  * Callback to and from a JSON representation.
  */
-public class RestAuthNameCallbackHandler implements RestAuthCallbackHandler<NameCallback> {
+public class RestAuthChoiceCallbackHandler implements RestAuthCallbackHandler<ChoiceCallback> {
 
     private static final Debug logger = Debug.getInstance("amIdentityServices");
 
-    private static final String CALLBACK_NAME = "NameCallback";
+    private static final String CALLBACK_NAME = "ChoiceCallback";
+
+    /**
+     * Checks the request for the presence of a parameter name "choices", if present and not an empty string then
+     * sets this on the Callback and returns true. Otherwise does nothing and returns false.
+     *
+     * {@inheritDoc}
+     */
+    public boolean updateCallbackFromRequest(HttpHeaders headers, HttpServletRequest request,
+            HttpServletResponse response, ChoiceCallback callback) {
+
+        String choiceString = request.getParameter("choices");
+
+        if (choiceString == null || "".equals(choiceString)) {
+            logger.message("choices not set in request.");
+            return false;
+        }
+
+        callback.setSelectedIndex(Integer.parseInt(choiceString));
+        return true;
+    }
 
     /**
      * {@inheritDoc}
@@ -46,31 +67,14 @@ public class RestAuthNameCallbackHandler implements RestAuthCallbackHandler<Name
     }
 
     /**
-     * Checks the request for the presence of a parameter name "username", if present and not an empty string then
-     * sets this on the Callback and returns true. Otherwise does nothing and returns false.
-     *
      * {@inheritDoc}
      */
-    public boolean updateCallbackFromRequest(HttpHeaders headers, HttpServletRequest request, NameCallback callback) {
-
-        String username = request.getParameter("username");
-
-        if (username == null || "".equals(username)) {
-            logger.message("username not set in request.");
-            return false;
-        }
-
-        callback.setName(username);
-        return true;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public JSONObject convertToJson(NameCallback callback) throws JSONException {
+    public JSONObject convertToJson(ChoiceCallback callback) throws JSONException {
 
         String prompt = callback.getPrompt();
-        String name = callback.getName();
+        String[] choices = callback.getChoices();
+        int defaultChoice = callback.getDefaultChoice();
+        int[] selectedIndexes = callback.getSelectedIndexes();
 
         JSONObject jsonCallback = new JSONObject();
         jsonCallback.put("type", CALLBACK_NAME);
@@ -79,7 +83,23 @@ public class RestAuthNameCallbackHandler implements RestAuthCallbackHandler<Name
 
         JSONObject outputField = new JSONObject();
         outputField.put("name", "prompt");
-        outputField.put("value", prompt == null ? "" : prompt);
+        outputField.put("value", prompt);
+
+        output.put(outputField);
+
+        JSONArray choicesJsonArray = new JSONArray();
+        for (String choice : choices) {
+            choicesJsonArray.put(choice);
+        }
+        outputField = new JSONObject();
+        outputField.put("name", "choices");
+        outputField.put("value", choicesJsonArray);
+
+        output.put(outputField);
+
+        outputField = new JSONObject();
+        outputField.put("name", "defaultChoice");
+        outputField.put("value", defaultChoice);
 
         output.put(outputField);
 
@@ -88,20 +108,21 @@ public class RestAuthNameCallbackHandler implements RestAuthCallbackHandler<Name
         JSONArray input = new JSONArray();
 
         JSONObject inputField = new JSONObject();
-        inputField.put("name", "name");
-        inputField.put("value", name == null ? "" : name);
+        inputField.put("name", "selectedIndex");
+        inputField.put("value", (selectedIndexes == null || selectedIndexes.length == 0) ? "" : selectedIndexes[0]);
 
         input.put(inputField);
 
         jsonCallback.put("input", input);
 
         return jsonCallback;
+
     }
 
     /**
      * {@inheritDoc}
      */
-    public NameCallback convertFromJson(NameCallback callback, JSONObject jsonCallback) throws JSONException {
+    public ChoiceCallback convertFromJson(ChoiceCallback callback, JSONObject jsonCallback) throws JSONException {
 
         String type = jsonCallback.getString("type");
         if (!CALLBACK_NAME.equalsIgnoreCase(type)) {
@@ -117,10 +138,12 @@ public class RestAuthNameCallbackHandler implements RestAuthCallbackHandler<Name
             JSONObject inputField = input.getJSONObject(i);
 
             String name = inputField.getString("name");
-            String value = inputField.getString("value");
 
-            if ("name".equalsIgnoreCase(name)) {
-                callback.setName(value);
+            if ("selectedIndexes".equalsIgnoreCase(name)) {
+
+                int selectedIndex = Integer.parseInt(inputField.getJSONArray("value").getString(0));
+
+                callback.setSelectedIndex(selectedIndex);
             }
         }
 

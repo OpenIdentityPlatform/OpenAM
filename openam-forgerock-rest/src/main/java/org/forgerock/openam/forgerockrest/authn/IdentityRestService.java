@@ -17,6 +17,7 @@
 package org.forgerock.openam.forgerockrest.authn;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
@@ -25,6 +26,7 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.HttpHeaders;
+import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
 /**
@@ -56,10 +58,13 @@ public class IdentityRestService {
     }
 
     /**
-     * Handles the initial RESTful call from clients to authenticate. Using the query parameters from the URL the
+     * Handles the initial GET RESTful call from clients to authenticate. Using the query parameters from the URL the
      * method starts the login process and either returns an SSOToken on successful authentication or a number of
      * Callbacks needing to be completed before authentication can proceed or an exception if any problems occurred
      * whilst trying to authenticate.
+     *
+     * Is to be used to initiate the authentication process but NOT for zero-page login. For providing all the
+     * required information for a zero-page login see the authenticate method for POST http requests.
      *
      * @param headers The HttpHeaders of the RESTful call.
      * @param request The HttpServletRequest of the RESTful call.
@@ -72,12 +77,43 @@ public class IdentityRestService {
      */
     @GET
     @Path("authenticate")
-    @Produces("application/json")
+    @Produces(MediaType.APPLICATION_JSON)
     public Response authenticate(@Context HttpHeaders headers, @Context HttpServletRequest request,
-            @QueryParam("authIndexType") String authIndexType, @QueryParam("authIndex") String authIndexValue,
-            @QueryParam("realm") String realm) {
+            @Context HttpServletResponse response, @QueryParam("authIndexType") String authIndexType,
+            @QueryParam("authIndex") String authIndexValue, @QueryParam("realm") String realm) {
 
-        return restAuthenticationHandler.authenticate(headers, request, realm, authIndexType, authIndexValue);
+        return restAuthenticationHandler.authenticate(headers, request, response, realm, authIndexType,
+                authIndexValue, HttpMethod.GET);
+    }
+
+    /**
+     * Handles the initial POST RESTful call from clients to authenticate. Using the query parameters from the URL the
+     * method starts the login process and either returns an SSOToken on successful authentication or a number of
+     * Callbacks needing to be completed before authentication can proceed or an exception if any problems occurred
+     * whilst trying to authenticate.
+     *
+     * Can be used to either initiate the authentication process or a zero-page login where all the required
+     * information is provided in the POST request.
+     *
+     * @param headers The HttpHeaders of the RESTful call.
+     * @param request The HttpServletRequest of the RESTful call.
+     * @param authIndexType The authentication index type from the url parameters.
+     * @param authIndexValue The authentication index value from the url parameters.
+     * @return A response to be sent back to the client. The response will contain either a JSON object containing the
+     * SSOToken id from a successful authentication, a JSON object containing a number of Callbacks for the client to
+     * complete and return or a JSON object containing an exception message.
+     */
+    @POST
+    @Path("authenticate")
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response authenticate(@Context HttpHeaders headers, @Context HttpServletRequest request,
+             @Context HttpServletResponse response, @QueryParam("authIndexType") String authIndexType,
+             @QueryParam("authIndex") String authIndexValue) {
+
+        String realm = request.getParameter("realm");
+
+        return restAuthenticationHandler.authenticate(headers, request, response, realm, authIndexType,
+                authIndexValue, HttpMethod.POST);
     }
 
     /**
@@ -99,7 +135,8 @@ public class IdentityRestService {
     @Consumes("application/json")
     @Produces("application/json")
     public Response submitAuthRequirements(@Context HttpHeaders headers, @Context HttpServletRequest request,
-            String msgBody) {
-        return restAuthenticationHandler.processAuthenticationRequirements(headers, request, msgBody);
+            @Context HttpServletResponse response, String msgBody) {
+        return restAuthenticationHandler.processAuthenticationRequirements(headers, request, response, msgBody,
+                HttpMethod.POST);
     }
 }

@@ -14,46 +14,49 @@
  * Copyright 2013 ForgeRock Inc.
  */
 
-package org.forgerock.openam.forgerockrest.authn;
+package org.forgerock.openam.forgerockrest.authn.callbackhandlers;
 
+import com.sun.identity.authentication.spi.HttpCallback;
 import com.sun.identity.shared.debug.Debug;
 import org.forgerock.openam.forgerockrest.authn.exceptions.RestAuthException;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import javax.security.auth.callback.PasswordCallback;
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.Response;
 import java.text.MessageFormat;
 
 /**
- * Defines methods to update a PasswordCallback from the headers and request of a Rest call and methods to convert a
+ * Defines methods to update a HttpCallback from the headers and request of a Rest call and methods to convert a
  * Callback to and from a JSON representation.
  */
-public class RestAuthPasswordCallbackHandler implements RestAuthCallbackHandler<PasswordCallback> {
+public class RestAuthHttpCallbackHandler implements RestAuthCallbackHandler<HttpCallback> {
 
     private static final Debug logger = Debug.getInstance("amIdentityServices");
 
-    private static final String CALLBACK_NAME = "PasswordCallback";
+    private static final String CALLBACK_NAME = "HttpCallback";
 
     /**
-     * Checks the request for the presence of a parameter name "password", if present and not an empty string then
-     * sets this on the Callback and returns true. Otherwise does nothing and returns false.
+     * Checks the request for the presence of a header with the Authorization Header as define in the HttpCallBack,
+     * if present and not an empty string then sets this on the Callback and returns true. Otherwise does nothing and
+     * returns false.
      *
      * {@inheritDoc}
      */
-    public boolean updateCallbackFromRequest(HttpHeaders headers, HttpServletRequest request, PasswordCallback callback) {
+    public boolean updateCallbackFromRequest(HttpHeaders headers, HttpServletRequest request,
+            HttpServletResponse response,  HttpCallback callback) {
 
-        String password = request.getParameter("password");
+        String httpAuthorization = request.getHeader(callback.getAuthorizationHeader());
 
-        if (password == null || "".equals(password)) {
-            logger.message("password not set in request.");
+        if (httpAuthorization == null || "".equals(httpAuthorization)) {
+            logger.message("httpAuthorization not set in request.");
             return false;
         }
 
-        callback.setPassword(password.toCharArray());
+        callback.setAuthorization(httpAuthorization);
         return true;
     }
 
@@ -67,10 +70,13 @@ public class RestAuthPasswordCallbackHandler implements RestAuthCallbackHandler<
     /**
      * {@inheritDoc}
      */
-    public JSONObject convertToJson(PasswordCallback callback) throws JSONException {
+    public JSONObject convertToJson(HttpCallback callback) throws JSONException {
 
-        String prompt = callback.getPrompt();
-        char[] password = callback.getPassword();
+        String authorizationHeader = callback.getAuthorizationHeader();
+        int negotiationCode = callback.getNegotiationCode();
+        String negotiationHeaderName = callback.getNegotiationHeaderName();
+        String negotiationHeaderValue = callback.getNegotiationHeaderValue();
+        String authorization = callback.getAuthorization();
 
         JSONObject jsonCallback = new JSONObject();
         jsonCallback.put("type", CALLBACK_NAME);
@@ -78,8 +84,26 @@ public class RestAuthPasswordCallbackHandler implements RestAuthCallbackHandler<
         JSONArray output = new JSONArray();
 
         JSONObject outputField = new JSONObject();
-        outputField.put("name", "prompt");
-        outputField.put("value", prompt == null ? "" : prompt);
+        outputField.put("name", "authorizationHeader");
+        outputField.put("value", authorizationHeader);
+
+        output.put(outputField);
+
+        outputField = new JSONObject();
+        outputField.put("name", "negotiationCode");
+        outputField.put("value", negotiationCode);
+
+        output.put(outputField);
+
+        outputField = new JSONObject();
+        outputField.put("name", "negotiationHeaderName");
+        outputField.put("value", negotiationHeaderName == null ? "" : negotiationHeaderName);
+
+        output.put(outputField);
+
+        outputField = new JSONObject();
+        outputField.put("name", "negotiationHeaderValue");
+        outputField.put("value", negotiationHeaderValue == null ? "" : negotiationHeaderValue);
 
         output.put(outputField);
 
@@ -88,20 +112,21 @@ public class RestAuthPasswordCallbackHandler implements RestAuthCallbackHandler<
         JSONArray input = new JSONArray();
 
         JSONObject inputField = new JSONObject();
-        inputField.put("name", "password");
-        inputField.put("value", password == null ? "" : new String(password));
+        inputField.put("name", "authorization");
+        inputField.put("value", authorization == null ? "" : authorization);
 
         input.put(inputField);
 
         jsonCallback.put("input", input);
 
         return jsonCallback;
+
     }
 
     /**
      * {@inheritDoc}
      */
-    public PasswordCallback convertFromJson(PasswordCallback callback, JSONObject jsonCallback) throws JSONException {
+    public HttpCallback convertFromJson(HttpCallback callback, JSONObject jsonCallback) throws JSONException {
 
         String type = jsonCallback.getString("type");
         if (!CALLBACK_NAME.equalsIgnoreCase(type)) {
@@ -119,8 +144,8 @@ public class RestAuthPasswordCallbackHandler implements RestAuthCallbackHandler<
             String name = inputField.getString("name");
             String value = inputField.getString("value");
 
-            if ("password".equalsIgnoreCase(name)) {
-                callback.setPassword(value.toCharArray());
+            if ("authorization".equalsIgnoreCase(name)) {
+                callback.setAuthorization(value);
             }
         }
 

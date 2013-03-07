@@ -16,6 +16,7 @@
 
 package org.forgerock.openam.forgerockrest.authn;
 
+import org.forgerock.openam.forgerockrest.authn.callbackhandlers.RestAuthCallbackHandler;
 import org.forgerock.openam.forgerockrest.authn.exceptions.RestAuthException;
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -26,6 +27,7 @@ import org.testng.annotations.Test;
 
 import javax.security.auth.callback.Callback;
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import javax.ws.rs.core.HttpHeaders;
 
 import static org.mockito.BDDMockito.given;
@@ -55,6 +57,7 @@ public class RestAuthCallbackHandlerManagerTest {
         //Given
         HttpHeaders headers = mock(HttpHeaders.class);
         HttpServletRequest request = mock(HttpServletRequest.class);
+        HttpServletResponse response = mock(HttpServletResponse.class);
         Callback callback1 = mock(Callback.class);
         Callback callback2 = mock(Callback.class);
         Callback[] callbacks = new Callback[]{callback1, callback2};
@@ -67,17 +70,20 @@ public class RestAuthCallbackHandlerManagerTest {
                     Matchers.<Class<? extends Callback>>anyObject()))
                 .willReturn(restAuthCallbackHandler1)
                 .willReturn(restAuthCallbackHandler1).willReturn(restAuthCallbackHandler2);
-        given(restAuthCallbackHandler1.updateCallbackFromRequest(headers, request, callback1)).willReturn(false);
-        given(restAuthCallbackHandler2.updateCallbackFromRequest(headers, request, callback2)).willReturn(false);
+        given(restAuthCallbackHandler1.updateCallbackFromRequest(headers, request, response,
+                callback1)).willReturn(false);
+        given(restAuthCallbackHandler2.updateCallbackFromRequest(headers, request, response,
+                callback2)).willReturn(false);
         given(restAuthCallbackHandler1.convertToJson(callback1)).willReturn(jsonCallback1);
         given(restAuthCallbackHandler2.convertToJson(callback2)).willReturn(jsonCallback2);
 
         //When
-        JSONArray jsonCallbacks = restAuthCallbackHandlerManager.handleCallbacks(headers, request, callbacks);
+        JSONArray jsonCallbacks = restAuthCallbackHandlerManager.handleCallbacks(headers, request, response,
+                callbacks, HttpMethod.POST);
 
         //Then
-        verify(restAuthCallbackHandler1).updateCallbackFromRequest(headers, request, callback1);
-        verify(restAuthCallbackHandler2, never()).updateCallbackFromRequest(headers, request, callback2);
+        verify(restAuthCallbackHandler1).updateCallbackFromRequest(headers, request, response, callback1);
+        verify(restAuthCallbackHandler2, never()).updateCallbackFromRequest(headers, request, response, callback2);
         verify(restAuthCallbackHandler1).convertToJson(callback1);
         verify(restAuthCallbackHandler2).convertToJson(callback2);
         assertEquals(jsonCallbacks.length(), 2);
@@ -91,6 +97,7 @@ public class RestAuthCallbackHandlerManagerTest {
         //Given
         HttpHeaders headers = mock(HttpHeaders.class);
         HttpServletRequest request = mock(HttpServletRequest.class);
+        HttpServletResponse response = mock(HttpServletResponse.class);
         Callback callback1 = mock(Callback.class);
         Callback callback2 = mock(Callback.class);
         Callback[] callbacks = new Callback[]{callback1, callback2};
@@ -99,15 +106,18 @@ public class RestAuthCallbackHandlerManagerTest {
 
         given(restAuthCallbackHandlerFactory.getRestAuthCallbackHandler(Matchers.<Class<? extends Callback>>anyObject())).willReturn(
                 restAuthCallbackHandler1).willReturn(restAuthCallbackHandler2);
-        given(restAuthCallbackHandler1.updateCallbackFromRequest(headers, request, callback1)).willReturn(true);
-        given(restAuthCallbackHandler2.updateCallbackFromRequest(headers, request, callback2)).willReturn(true);
+        given(restAuthCallbackHandler1.updateCallbackFromRequest(headers, request, response,
+                callback1)).willReturn(true);
+        given(restAuthCallbackHandler2.updateCallbackFromRequest(headers, request, response,
+                callback2)).willReturn(true);
 
         //When
-        JSONArray jsonCallbacks = restAuthCallbackHandlerManager.handleCallbacks(headers, request, callbacks);
+        JSONArray jsonCallbacks = restAuthCallbackHandlerManager.handleCallbacks(headers, request, response,
+                callbacks, HttpMethod.POST);
 
         //Then
-        verify(restAuthCallbackHandler1).updateCallbackFromRequest(headers, request, callback1);
-        verify(restAuthCallbackHandler2).updateCallbackFromRequest(headers, request, callback2);
+        verify(restAuthCallbackHandler1).updateCallbackFromRequest(headers, request, response, callback1);
+        verify(restAuthCallbackHandler2).updateCallbackFromRequest(headers, request, response, callback2);
         verify(restAuthCallbackHandler1, never()).convertToJson(callback1);
         verify(restAuthCallbackHandler2, never()).convertToJson(callback2);
         assertEquals(jsonCallbacks.length(), 0);
@@ -119,6 +129,7 @@ public class RestAuthCallbackHandlerManagerTest {
         //Given
         HttpHeaders headers = mock(HttpHeaders.class);
         HttpServletRequest request = mock(HttpServletRequest.class);
+        HttpServletResponse response = mock(HttpServletResponse.class);
         Callback callback1 = mock(Callback.class);
         Callback callback2 = mock(Callback.class);
         Callback[] callbacks = new Callback[]{callback1, callback2};
@@ -131,17 +142,20 @@ public class RestAuthCallbackHandlerManagerTest {
                     Matchers.<Class<? extends Callback>>anyObject()))
                 .willReturn(restAuthCallbackHandler1).willReturn(restAuthCallbackHandler2)
                 .willReturn(restAuthCallbackHandler1).willReturn(restAuthCallbackHandler2);
-        given(restAuthCallbackHandler1.updateCallbackFromRequest(headers, request, callback1)).willReturn(true);
-        given(restAuthCallbackHandler2.updateCallbackFromRequest(headers, request, callback2)).willReturn(false);
+        given(restAuthCallbackHandler1.updateCallbackFromRequest(headers, request, response,
+                callback1)).willReturn(true);
+        given(restAuthCallbackHandler2.updateCallbackFromRequest(headers, request, response,
+                callback2)).willReturn(false);
         given(restAuthCallbackHandler1.convertToJson(callback1)).willReturn(jsonCallback1);
         given(restAuthCallbackHandler2.convertToJson(callback2)).willReturn(jsonCallback2);
 
         //When
-        JSONArray jsonCallbacks = restAuthCallbackHandlerManager.handleCallbacks(headers, request, callbacks);
+        JSONArray jsonCallbacks = restAuthCallbackHandlerManager.handleCallbacks(headers, request, response,
+                callbacks, HttpMethod.POST);
 
         //Then
-        verify(restAuthCallbackHandler1).updateCallbackFromRequest(headers, request, callback1);
-        verify(restAuthCallbackHandler2).updateCallbackFromRequest(headers, request, callback2);
+        verify(restAuthCallbackHandler1).updateCallbackFromRequest(headers, request, response, callback1);
+        verify(restAuthCallbackHandler2).updateCallbackFromRequest(headers, request, response, callback2);
         verify(restAuthCallbackHandler1).convertToJson(callback1);
         verify(restAuthCallbackHandler2).convertToJson(callback2);
         assertEquals(jsonCallbacks.length(), 2);

@@ -31,6 +31,7 @@ import org.json.JSONObject;
 import javax.inject.Inject;
 import javax.security.auth.callback.Callback;
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
@@ -85,12 +86,13 @@ public class RestAuthenticationHandler {
      * @param realm The realm to authenticate in from the url parameters.
      * @param authIndexType The authentication index type from the url parameters.
      * @param authIndexValue The authentication index value from the url parameters.
+     * @param httpMethod The Http Method used to initiate this request.
      * @return A response to be sent back to the client. The response will contain either a JSON object containing the
      * SSOToken id from a successful authentication, a JSON object containing a number of Callbacks for the client to
      * complete and return or a JSON object containing an exception message.
      */
-    public Response authenticate(HttpHeaders headers, HttpServletRequest request, String realm,
-            String authIndexType, String authIndexValue) {
+    public Response authenticate(HttpHeaders headers, HttpServletRequest request, HttpServletResponse response,
+            String realm, String authIndexType, String authIndexValue, HttpMethod httpMethod) {
 
         AuthContext.IndexType indexType = getAuthIndexType(authIndexType);
 
@@ -103,12 +105,13 @@ public class RestAuthenticationHandler {
             AuthContext authContext = createAuthContext(realm);
 
             if (indexType != null) {
-                authContext.login(indexType, authIndexValue);
+                authContext.login(indexType, authIndexValue, null, request, response);
             } else {
                 authContext.login();
             }
 
-            JSONObject jsonResponseObject = processAuthContextRequirements(headers, request,  authContext);
+            JSONObject jsonResponseObject = processAuthContextRequirements(headers, request, response, authContext,
+                    httpMethod);
 
             responseBuilder = Response.status(Response.Status.OK);
             responseBuilder.type(MediaType.APPLICATION_JSON_TYPE);
@@ -170,14 +173,16 @@ public class RestAuthenticationHandler {
      * @param headers The HttpHeaders of the RESTful call.
      * @param request The HttpServletRequest of the RESTful call.
      * @param authContext The AuthContext for the authentication process.
+     * @param httpMethod The Http Method used to initiate this request.
      * @return A JSON object of either an array of Callbacks to be returned to the client or the SSOToken id.
      * @throws SignatureException If there is a problem signing the authId JWT.
      * @throws JSONException If there is a syntax problem when creating the JSON object.
      * @throws L10NMessageImpl If there is a problem getting the SSOToken from the AuthContext.
      */
     private JSONObject processAuthContextRequirements(HttpHeaders headers, HttpServletRequest request,
-            AuthContext authContext) throws SignatureException, JSONException, L10NMessageImpl {
-        return processAuthContextRequirements(headers, request, authContext, null);
+            HttpServletResponse response, AuthContext authContext, HttpMethod httpMethod) throws SignatureException,
+            JSONException, L10NMessageImpl {
+        return processAuthContextRequirements(headers, request, response, authContext, null, httpMethod);
     }
 
     /**
@@ -229,13 +234,15 @@ public class RestAuthenticationHandler {
      * @param request The HttpServletRequest of the RESTful call.
      * @param authContext The AuthContext for the authentication process.
      * @param authId The authId JWT to store the AuthContext. Null if the the AuthContext has not been stored before.
+     * @param httpMethod The Http Method used to initiate this request.
      * @return A JSON object of either an array of Callbacks to be returned to the client or the SSOToken id.
      * @throws SignatureException If there is a problem signing the authId JWT.
      * @throws JSONException If there is a syntax problem when creating the JSON object.
      * @throws L10NMessageImpl If there is a problem getting the SSOToken from the AuthContext.
      */
     private JSONObject processAuthContextRequirements(HttpHeaders headers, HttpServletRequest request,
-            AuthContext authContext, String authId) throws SignatureException, JSONException, L10NMessageImpl {
+            HttpServletResponse response, AuthContext authContext, String authId,
+            HttpMethod httpMethod) throws SignatureException, JSONException, L10NMessageImpl {
 
         JSONObject jsonResponseObject = new JSONObject();
 
@@ -243,7 +250,8 @@ public class RestAuthenticationHandler {
 
             Callback[] callbacks = authContext.getRequirements();
 
-            JSONArray jsonCallbacks = restAuthCallbackHandlerManager.handleCallbacks(headers, request, callbacks);
+            JSONArray jsonCallbacks = restAuthCallbackHandlerManager.handleCallbacks(headers, request, response,
+                    callbacks, httpMethod);
 
             if (jsonCallbacks.length() > 0) {
                 //callbacks to send back
@@ -260,7 +268,7 @@ public class RestAuthenticationHandler {
             } else {
                 // handled callbacks internally
                 authContext.submitRequirements(callbacks);
-                return processAuthContextRequirements(headers, request, authContext, authId);
+                return processAuthContextRequirements(headers, request, response, authContext, authId, httpMethod);
             }
 
         } else {
@@ -377,11 +385,13 @@ public class RestAuthenticationHandler {
      * @param headers The HttpHeaders of the RESTful call.
      * @param request The HttpServletRequest of the RESTful call.
      * @param msgBody The POST body of the RESTful call.
+     * @param httpMethod The Http Method used to initiate this request.
      * @return A response to be sent back to the client. The response will contain either a JSON object containing the
      * SSOToken id from a successful authentication, a JSON object containing a number of Callbacks for the client to
      * complete and return or a JSON object containing an exception message.
      */
-    public Response processAuthenticationRequirements(HttpHeaders headers, HttpServletRequest request, String msgBody) {
+    public Response processAuthenticationRequirements(HttpHeaders headers, HttpServletRequest request,
+            HttpServletResponse response, String msgBody, HttpMethod httpMethod) {
 
         Response.ResponseBuilder responseBuilder;
         try {
@@ -407,7 +417,8 @@ public class RestAuthenticationHandler {
 
             authContext.submitRequirements(responseCallbacks);
 
-            JSONObject jsonResponseObject = processAuthContextRequirements(headers, request, authContext, authId);
+            JSONObject jsonResponseObject = processAuthContextRequirements(headers, request, response, authContext,
+                    authId, httpMethod);
 
             responseBuilder = Response.status(Response.Status.OK);
             responseBuilder.type(MediaType.APPLICATION_JSON_TYPE);

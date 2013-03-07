@@ -17,12 +17,17 @@ package org.forgerock.openam.forgerockrest.session;
 
 import com.iplanet.dpro.session.share.SessionInfo;
 import com.iplanet.services.naming.WebtopNaming;
-import edu.emory.mathcs.backport.java.util.Arrays;
+import com.iplanet.sso.SSOException;
+import com.iplanet.sso.SSOToken;
+import com.iplanet.sso.SSOTokenManager;
+import com.sun.identity.authentication.service.AuthUtils;
 import org.forgerock.json.fluent.JsonValue;
 import org.forgerock.json.resource.ActionRequest;
+import org.forgerock.json.resource.BadRequestException;
 import org.forgerock.json.resource.CollectionResourceProvider;
 import org.forgerock.json.resource.CreateRequest;
 import org.forgerock.json.resource.DeleteRequest;
+import org.forgerock.json.resource.InternalServerErrorException;
 import org.forgerock.json.resource.NotSupportedException;
 import org.forgerock.json.resource.PatchRequest;
 import org.forgerock.json.resource.QueryRequest;
@@ -33,9 +38,11 @@ import org.forgerock.json.resource.Resource;
 import org.forgerock.json.resource.ResultHandler;
 import org.forgerock.json.resource.ServerContext;
 import org.forgerock.json.resource.UpdateRequest;
+import org.forgerock.openam.dashboard.ServerContextHelper;
 import org.forgerock.openam.forgerockrest.session.query.SessionQueryFactory;
 import org.forgerock.openam.forgerockrest.session.query.SessionQueryManager;
 
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
@@ -103,19 +110,86 @@ public class SessionResource implements CollectionResourceProvider {
      * @param handler {@inheritDoc}
      */
     public void actionCollection(ServerContext context, ActionRequest request, ResultHandler<JsonValue> handler) {
+
+        String id = request.getActionId();
+
+        if ("logout".equalsIgnoreCase(id)) {
+
+            String tokenId = ServerContextHelper.getCookieFromServerContext(context);
+
+            if (tokenId == null) {
+                handler.handleError(new BadRequestException("iPlanetDirectoryCookie not set on request"));
+            }
+
+            try {
+                JsonValue jsonValue = logout(tokenId);
+                handler.handleResult(jsonValue);
+            } catch (InternalServerErrorException e) {
+                handler.handleError(e);
+            }
+            return;
+        }
+
         handler.handleError(new NotSupportedException("Not implemented for this Resource"));
     }
 
-
     /**
-     * Currently unimplemented.
+     * Logout action to handle the invalidating of Tokens.
      *
      * @param context {@inheritDoc}
      * @param request {@inheritDoc}
      * @param handler {@inheritDoc}
      */
-    public void actionInstance(ServerContext context, String resourceId, ActionRequest request, ResultHandler<JsonValue> handler) {
-        handler.handleError(new NotSupportedException("Not implemented for this Resource"));
+    public void actionInstance(ServerContext context, String resourceId, ActionRequest request,
+            ResultHandler<JsonValue> handler) {
+
+        String id = request.getActionId();
+
+        if ("logout".equalsIgnoreCase(id)) {
+            try {
+                JsonValue jsonValue = logout(resourceId);
+                handler.handleResult(jsonValue);
+            } catch (InternalServerErrorException e) {
+                handler.handleError(e);
+            }
+            return;
+        }
+
+        handler.handleError(new NotSupportedException(id + ", not implemented for this Resource"));
+    }
+
+    /**
+     * Logs out a user.
+     *
+     * @param tokenId The id of the Token to invalidate
+     * @throws InternalServerErrorException If the tokenId is invalid or could not be used to logout.
+     */
+    private JsonValue logout(String tokenId) throws InternalServerErrorException {
+
+        SSOToken ssoToken;
+        try {
+            if (tokenId == null) {
+                throw new InternalServerErrorException("Invalid Token Id");
+            }
+            SSOTokenManager mgr = SSOTokenManager.getInstance();
+            ssoToken = mgr.createSSOToken(tokenId);
+        } catch (SSOException ex) {
+            Map<String, Object> map = new HashMap<String, Object>();
+            map.put("result", "Token has expired");
+            return new JsonValue(map);
+        }
+
+        if (ssoToken != null) {
+            try {
+                AuthUtils.logout(ssoToken.getTokenID().toString(), null, null);
+            } catch (SSOException e) {
+                throw new InternalServerErrorException("Error logging out", e);
+            }
+        }
+
+        Map<String, Object> map = new HashMap<String, Object>();
+        map.put("result", "Successfully logged out");
+        return new JsonValue(map);
     }
 
     /**

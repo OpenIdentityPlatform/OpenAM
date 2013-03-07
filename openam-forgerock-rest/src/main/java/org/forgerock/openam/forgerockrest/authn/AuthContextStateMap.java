@@ -80,7 +80,7 @@ public class AuthContextStateMap implements SessionListener {
         String authContextId = authContext.getAuthIdentifier();
         sessionIdAuthIdMap.put(authContextId, authId);
         try {
-            Session.getSession(new SessionID(authContextId)).addSessionListener(this, true);
+            Session.getSession(new SessionID(authContextId), true).addSessionListener(this, true);
         } catch (SessionException e) {
             throw new RestAuthException(Response.Status.INTERNAL_SERVER_ERROR, "Could not add SessionListener to "
                     + "AuthContext Session", e);

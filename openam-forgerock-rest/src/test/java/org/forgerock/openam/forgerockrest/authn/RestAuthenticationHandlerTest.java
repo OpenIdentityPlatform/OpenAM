@@ -22,7 +22,6 @@ import com.sun.identity.authentication.AuthContext;
 import com.sun.identity.authentication.service.AMAuthErrorCode;
 import com.sun.identity.authentication.spi.AuthLoginException;
 import com.sun.identity.shared.locale.L10NMessageImpl;
-import org.forgerock.openam.forgerockrest.authn.exceptions.RestAuthException;
 import org.forgerock.openam.utils.AMKeyProvider;
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -33,6 +32,7 @@ import org.testng.annotations.Test;
 
 import javax.security.auth.callback.Callback;
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.MultivaluedMap;
@@ -51,7 +51,6 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertTrue;
-import static org.testng.Assert.fail;
 
 public class RestAuthenticationHandlerTest {
 
@@ -91,6 +90,7 @@ public class RestAuthenticationHandlerTest {
         //Given
         HttpHeaders headers = mock(HttpHeaders.class);
         HttpServletRequest request = mock(HttpServletRequest.class);
+        HttpServletResponse httpResponse = mock(HttpServletResponse.class);
         SSOToken ssoToken = mock(SSOToken.class);
         SSOTokenID ssoTokenID = mock(SSOTokenID.class);
 
@@ -101,7 +101,8 @@ public class RestAuthenticationHandlerTest {
         given(ssoTokenID.toString()).willReturn("SSO_TOKEN_ID");
 
         //When
-        Response response = restAuthenticationHandler.authenticate(headers, request, null, null, null);
+        Response response = restAuthenticationHandler.authenticate(headers, request, httpResponse, null, null, null,
+                HttpMethod.GET);
 
         //Then
         verify(authContext).login();
@@ -126,6 +127,7 @@ public class RestAuthenticationHandlerTest {
         //Given
         HttpHeaders headers = mock(HttpHeaders.class);
         HttpServletRequest request = mock(HttpServletRequest.class);
+        HttpServletResponse httpResponse = mock(HttpServletResponse.class);
         SSOToken ssoToken = mock(SSOToken.class);
         SSOTokenID ssoTokenID = mock(SSOTokenID.class);
 
@@ -136,7 +138,8 @@ public class RestAuthenticationHandlerTest {
         given(ssoTokenID.toString()).willReturn("SSO_TOKEN_ID");
 
         //When
-        Response response = restAuthenticationHandler.authenticate(headers, request, "REALM", null, null);
+        Response response = restAuthenticationHandler.authenticate(headers, request, httpResponse, "REALM", null,
+                null, HttpMethod.GET);
 
         //Then
         verify(authContext).login();
@@ -160,6 +163,7 @@ public class RestAuthenticationHandlerTest {
         //Given
         HttpHeaders headers = mock(HttpHeaders.class);
         HttpServletRequest request = mock(HttpServletRequest.class);
+        HttpServletResponse httpResponse = mock(HttpServletResponse.class);
         SSOToken ssoToken = mock(SSOToken.class);
         SSOTokenID ssoTokenID = mock(SSOTokenID.class);
 
@@ -170,11 +174,12 @@ public class RestAuthenticationHandlerTest {
         given(ssoTokenID.toString()).willReturn("SSO_TOKEN_ID");
 
         //When
-        Response response = restAuthenticationHandler.authenticate(headers, request, null, indexTypeString, indexTypeValue);
+        Response response = restAuthenticationHandler.authenticate(headers, request, httpResponse, null,
+                indexTypeString, indexTypeValue, HttpMethod.GET);
 
         //Then
         verify(authContext, never()).login();
-        verify(authContext).login(indexType, indexTypeValue);
+        verify(authContext).login(indexType, indexTypeValue, null, request, httpResponse);
 
         String entity = (String) response.getEntity();
         JSONObject responseJson = new JSONObject(entity);
@@ -211,6 +216,7 @@ public class RestAuthenticationHandlerTest {
         //Given
         HttpHeaders headers = mock(HttpHeaders.class);
         HttpServletRequest request = mock(HttpServletRequest.class);
+        HttpServletResponse httpResponse = mock(HttpServletResponse.class);
         SSOToken ssoToken = mock(SSOToken.class);
         SSOTokenID ssoTokenID = mock(SSOTokenID.class);
         Callback[] callbacks = new Callback[0];
@@ -218,7 +224,8 @@ public class RestAuthenticationHandlerTest {
 
         given(authContext.hasMoreRequirements()).willReturn(true).willReturn(false);
         given(authContext.getRequirements()).willReturn(callbacks);
-        given(restAuthCallbackHandlerManager.handleCallbacks(headers, request, callbacks)).willReturn(jsonCallbacks);
+        given(restAuthCallbackHandlerManager.handleCallbacks(headers, request, httpResponse,
+                callbacks, HttpMethod.GET)).willReturn(jsonCallbacks);
         given(jsonCallbacks.length()).willReturn(0);
         given(authContext.getStatus()).willReturn(AuthContext.Status.SUCCESS);
         given(authContext.getSSOToken()).willReturn(ssoToken);
@@ -226,7 +233,8 @@ public class RestAuthenticationHandlerTest {
         given(ssoTokenID.toString()).willReturn("SSO_TOKEN_ID");
 
         //When
-        Response response = restAuthenticationHandler.authenticate(headers, request, null, null, null);
+        Response response = restAuthenticationHandler.authenticate(headers, request, httpResponse, null, null, null,
+                HttpMethod.GET);
 
         //Then
         verify(authContext).login();
@@ -252,6 +260,7 @@ public class RestAuthenticationHandlerTest {
         //Given
         HttpHeaders headers = mock(HttpHeaders.class);
         HttpServletRequest request = mock(HttpServletRequest.class);
+        HttpServletResponse httpResponse = mock(HttpServletResponse.class);
         SSOToken ssoToken = mock(SSOToken.class);
         SSOTokenID ssoTokenID = mock(SSOTokenID.class);
         Callback[] callbacks = new Callback[0];
@@ -261,7 +270,8 @@ public class RestAuthenticationHandlerTest {
 
         given(authContext.hasMoreRequirements()).willReturn(true);
         given(authContext.getRequirements()).willReturn(callbacks);
-        given(restAuthCallbackHandlerManager.handleCallbacks(headers, request, callbacks)).willReturn(jsonCallbacks);
+        given(restAuthCallbackHandlerManager.handleCallbacks(headers, request, httpResponse, callbacks,
+                HttpMethod.GET)).willReturn(jsonCallbacks);
         given(jsonCallbacks.length()).willReturn(2);
         given(jsonCallbacks.toString()).willReturn("[CALLBACK1,CALLBACK2]");
         given(amKeyProvider.getPrivateKey(anyString())).willReturn(privateKey);
@@ -277,7 +287,8 @@ public class RestAuthenticationHandlerTest {
         given(systemPropertiesManagerWrapper.get("org.forgerock.keystore.alias")).willReturn("KEYSTORE_ALIAS");
 
         //When
-        Response response = restAuthenticationHandler.authenticate(headers, request, null, null, null);
+        Response response = restAuthenticationHandler.authenticate(headers, request, httpResponse, null, null, null,
+                HttpMethod.GET);
 
         //Then
         verify(authContext).login();
@@ -305,6 +316,7 @@ public class RestAuthenticationHandlerTest {
         //Given
         HttpHeaders headers = mock(HttpHeaders.class);
         HttpServletRequest request = mock(HttpServletRequest.class);
+        HttpServletResponse httpResponse = mock(HttpServletResponse.class);
 
         given(authContext.hasMoreRequirements()).willReturn(false);
         given(authContext.getStatus()).willReturn(AuthContext.Status.FAILED);
@@ -312,7 +324,8 @@ public class RestAuthenticationHandlerTest {
         given(authContext.getErrorMessage()).willReturn("ERROR_MESSAGE");
 
         //When
-        Response response = restAuthenticationHandler.authenticate(headers, request, null, null, null);
+        Response response = restAuthenticationHandler.authenticate(headers, request, httpResponse, null, null, null,
+                HttpMethod.GET);
 
         //Then
         verify(authContext).login();
@@ -337,6 +350,7 @@ public class RestAuthenticationHandlerTest {
         //Given
         HttpHeaders headers = mock(HttpHeaders.class);
         HttpServletRequest request = mock(HttpServletRequest.class);
+        HttpServletResponse httpResponse = mock(HttpServletResponse.class);
         L10NMessageImpl l10NMessageException = mock(L10NMessageImpl.class);
 
         given(authContext.hasMoreRequirements()).willReturn(false);
@@ -345,7 +359,8 @@ public class RestAuthenticationHandlerTest {
         when(authContext.getSSOToken()).thenThrow(l10NMessageException);
 
         //When
-        Response response = restAuthenticationHandler.authenticate(headers, request, null, null, null);
+        Response response = restAuthenticationHandler.authenticate(headers, request, httpResponse, null, null, null,
+                HttpMethod.GET);
 
         //Then
         verify(authContext).login();
@@ -369,6 +384,7 @@ public class RestAuthenticationHandlerTest {
         //Given
         HttpHeaders headers = mock(HttpHeaders.class);
         HttpServletRequest request = mock(HttpServletRequest.class);
+        HttpServletResponse httpResponse = mock(HttpServletResponse.class);
         AuthLoginException authLoginException = mock(AuthLoginException.class);
 
         given(authContext.hasMoreRequirements()).willReturn(false);
@@ -377,7 +393,8 @@ public class RestAuthenticationHandlerTest {
         doThrow(authLoginException).when(authContext).login();
 
         //When
-        Response response = restAuthenticationHandler.authenticate(headers, request, null, null, null);
+        Response response = restAuthenticationHandler.authenticate(headers, request, httpResponse, null, null, null,
+                HttpMethod.GET);
 
         //Then
         verify(authContext).login();
@@ -401,6 +418,7 @@ public class RestAuthenticationHandlerTest {
         //Given
         HttpHeaders headers = mock(HttpHeaders.class);
         HttpServletRequest request = mock(HttpServletRequest.class);
+        HttpServletResponse httpResponse = mock(HttpServletResponse.class);
         String messageBody = "{authId : \"AUTH_ID\", callbacks : [{type : \"CALLBACK1\"," +
                 "output : [{name : \"prompt\",value : \"Enter Callback1:\"}]," +
                 "input : [{key : \"cbk1\",value : \"\"}]}," +
@@ -433,7 +451,8 @@ public class RestAuthenticationHandlerTest {
         given(ssoTokenID.toString()).willReturn("SSO_TOKEN_ID");
 
         //When
-        Response response = restAuthenticationHandler.processAuthenticationRequirements(headers, request, messageBody);
+        Response response = restAuthenticationHandler.processAuthenticationRequirements(headers, request, httpResponse,
+                messageBody, HttpMethod.GET);
 
         //Then
         verify(jwtBuilder).verify("AUTH_ID", certificate);

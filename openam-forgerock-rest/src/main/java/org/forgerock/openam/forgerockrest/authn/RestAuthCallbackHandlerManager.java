@@ -17,6 +17,7 @@
 package org.forgerock.openam.forgerockrest.authn;
 
 import com.sun.identity.shared.debug.Debug;
+import org.forgerock.openam.forgerockrest.authn.callbackhandlers.RestAuthCallbackHandler;
 import org.forgerock.openam.forgerockrest.authn.exceptions.RestAuthException;
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -25,6 +26,7 @@ import org.json.JSONObject;
 import javax.inject.Inject;
 import javax.security.auth.callback.Callback;
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.Response;
 
@@ -54,16 +56,21 @@ public class RestAuthCallbackHandlerManager {
      * @param headers The HttpHeaders from the request.
      * @param request The HttpServletRequest from the request.
      * @param callbacks The Callbacks to handle.
+     * @param httpMethod The Http Method used to initiate this request.
      * @return A JSONArray of Callbacks or empty if the Callbacks have been updated from the headers and request.
      */
-    public JSONArray handleCallbacks(HttpHeaders headers, HttpServletRequest request, Callback[] callbacks)
-            throws JSONException {
+    public JSONArray handleCallbacks(HttpHeaders headers, HttpServletRequest request,
+            HttpServletResponse response, Callback[] callbacks, HttpMethod httpMethod) throws JSONException {
 
         JSONArray jsonCallbacks = new JSONArray();
 
-        // check if can be completed by headers and/or request
-        // if so then attempt it and response true if successful
-        boolean handledInternally = handleCallbacksInternally(headers, request, callbacks);
+        boolean handledInternally = false;
+        // Only try to handle Callbacks internally if the request was made by a Http POST.
+        if (HttpMethod.POST.equals(httpMethod)) {
+            // check if can be completed by headers and/or request
+            // if so then attempt it and response true if successful
+            handledInternally = handleCallbacksInternally(headers, request, response, callbacks);
+        }
 
         // else or on false convert callback into json
         if (!handledInternally) {
@@ -91,14 +98,15 @@ public class RestAuthCallbackHandlerManager {
      * @param callbacks The Callbacks to update with their required values from the headers and request.
      * @return Whether or not the Callbacks were successfully updated.
      */
-    private boolean handleCallbacksInternally(HttpHeaders headers, HttpServletRequest request, Callback[] callbacks) {
+    private boolean handleCallbacksInternally(HttpHeaders headers, HttpServletRequest request,
+            HttpServletResponse response, Callback[] callbacks) {
 
         for (Callback callback : callbacks) {
 
             RestAuthCallbackHandler restAuthCallbackHandler =
                     restAuthCallbackHandlerFactory.getRestAuthCallbackHandler(callback.getClass());
 
-            if (!restAuthCallbackHandler.updateCallbackFromRequest(headers, request, callback)) {
+            if (!restAuthCallbackHandler.updateCallbackFromRequest(headers, request, response, callback)) {
                 return false;
             }
         }

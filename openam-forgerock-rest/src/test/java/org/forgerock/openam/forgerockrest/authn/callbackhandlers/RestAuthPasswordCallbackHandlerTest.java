@@ -14,9 +14,11 @@
  * Copyright 2013 ForgeRock Inc.
  */
 
-package org.forgerock.openam.forgerockrest.authn;
+package org.forgerock.openam.forgerockrest.authn.callbackhandlers;
 
 import junit.framework.Assert;
+import org.forgerock.openam.forgerockrest.authn.callbackhandlers.RestAuthCallbackHandler;
+import org.forgerock.openam.forgerockrest.authn.callbackhandlers.RestAuthPasswordCallbackHandler;
 import org.forgerock.openam.forgerockrest.authn.exceptions.RestAuthException;
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -27,6 +29,7 @@ import org.testng.annotations.Test;
 
 import javax.security.auth.callback.PasswordCallback;
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import javax.ws.rs.core.HttpHeaders;
 
 import static junit.framework.Assert.assertNotNull;
@@ -64,12 +67,13 @@ public class RestAuthPasswordCallbackHandlerTest {
         //Given
         HttpHeaders headers = mock(HttpHeaders.class);
         HttpServletRequest request = mock(HttpServletRequest.class);
+        HttpServletResponse response = mock(HttpServletResponse.class);
         PasswordCallback passwordCallback = mock(PasswordCallback.class);
 
         given(request.getParameter("password")).willReturn("PASSWORD");
 
         //When
-        boolean updated = restAuthPasswordCallbackHandler.updateCallbackFromRequest(headers, request,
+        boolean updated = restAuthPasswordCallbackHandler.updateCallbackFromRequest(headers, request, response,
                 passwordCallback);
 
         //Then
@@ -83,12 +87,13 @@ public class RestAuthPasswordCallbackHandlerTest {
         //Given
         HttpHeaders headers = mock(HttpHeaders.class);
         HttpServletRequest request = mock(HttpServletRequest.class);
+        HttpServletResponse response = mock(HttpServletResponse.class);
         PasswordCallback passwordCallback = mock(PasswordCallback.class);
 
         given(request.getParameter("password")).willReturn(null);
 
         //When
-        boolean updated = restAuthPasswordCallbackHandler.updateCallbackFromRequest(headers, request,
+        boolean updated = restAuthPasswordCallbackHandler.updateCallbackFromRequest(headers, request, response,
                 passwordCallback);
 
         //Then
@@ -102,12 +107,13 @@ public class RestAuthPasswordCallbackHandlerTest {
         //Given
         HttpHeaders headers = mock(HttpHeaders.class);
         HttpServletRequest request = mock(HttpServletRequest.class);
+        HttpServletResponse response = mock(HttpServletResponse.class);
         PasswordCallback passwordCallback = mock(PasswordCallback.class);
 
         given(request.getParameter("password")).willReturn("");
 
         //When
-        boolean updated = restAuthPasswordCallbackHandler.updateCallbackFromRequest(headers, request,
+        boolean updated = restAuthPasswordCallbackHandler.updateCallbackFromRequest(headers, request, response,
                 passwordCallback);
 
         //Then

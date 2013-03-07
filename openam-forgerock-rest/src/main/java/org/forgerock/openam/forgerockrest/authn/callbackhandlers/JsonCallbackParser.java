@@ -13,7 +13,7 @@
  *
  * Copyright 2013 ForgeRock Inc.
  */
-package org.forgerock.openam.forgerockrest.authn;
+package org.forgerock.openam.forgerockrest.authn.callbackhandlers;
 
 import org.json.JSONException;
 import org.json.JSONObject;

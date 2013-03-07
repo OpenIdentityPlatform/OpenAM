@@ -14,10 +14,11 @@
  * Copyright 2013 ForgeRock Inc.
  */
 
-package org.forgerock.openam.forgerockrest.authn;
+package org.forgerock.openam.forgerockrest.authn.callbackhandlers;
 
 import javax.security.auth.callback.Callback;
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import javax.ws.rs.core.HttpHeaders;
 
 /**
@@ -39,8 +40,10 @@ public interface RestAuthCallbackHandler<T extends Callback> extends JsonCallbac
      *
      * @param headers The HttpHeaders from the request.
      * @param request The HttpServletRequest from the request.
+     * @param response The HttpServletResponse for the request.
      * @param callback The Callback to update with its required values from the headers and request.
      * @return Whether or not the Callback was successfully updated.
      */
-    boolean updateCallbackFromRequest(HttpHeaders headers, HttpServletRequest request, T callback);
+    boolean updateCallbackFromRequest(HttpHeaders headers, HttpServletRequest request, HttpServletResponse response,
+            T callback);
 }
