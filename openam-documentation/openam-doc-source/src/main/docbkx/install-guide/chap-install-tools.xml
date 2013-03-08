@@ -20,7 +20,7 @@
   !
   ! CCPL HEADER END
   !
-  !      Copyright 2011-2012 ForgeRock AS
+  !      Copyright 2011-2013 ForgeRock AS
   !    
 -->
 <chapter xml:id='chap-install-tools'
@@ -97,9 +97,8 @@ The scripts are properly setup under directory:
  /path/to/openam-tools/admin/openam
 Debug directory is /path/to/openam-tools/admin/debug.
 Log directory is /path/to/openam-tools/admin/log.
-The version of this tools.zip is: <?eval ${serverDocTargetVersion}?>-XPRESS (2012-December-09 02:58)
-The version of your server instance is: OpenAM <?eval ${serverDocTargetVersion}?>-XPRESS 
- (2012-December-09 02:48)</screen>
+The version of this tools.zip is: <replaceable>version and date</replaceable>
+The version of your server instance is: OpenAM <replaceable>version and date</replaceable></screen>
    <para>After setup, the tools are located under a directory named after the
    instance of OpenAM.</para>
    <screen>$ ls openam/bin/
