@@ -67,7 +67,7 @@
   <title>To Set Up Administration Tools</title>
 
   <step>
-   <para>Make sure OpenAM is installed on the system before proceeding.</para>
+   <para>Make sure OpenAM is installed and running before proceeding.</para>
   </step>
   <step>
    <para>Make sure the <literal>JAVA_HOME</literal> environment variable
@@ -139,26 +139,45 @@ http://openam.example.com:8080/openam</screen>
    >-D"javax.net.ssl.trustStore=/path/to/tomcat/conf/keystore.jks"
  -D"javax.net.ssl.trustStorePassword=changeit"</literallayout>
   </step>
-  <step performance="optional">
+
+  <step>
    <para>If you have deployed OpenAM in a site configuration, edit the
    <command>ssoadm</command> (<command>ssoadm.bat</command> on Windows) script
-   to map the site name to servers.</para>
-   <para>You add a <literal>com.iplanet.am.naming.map.site.to.server</literal>
-   property to the <command>java</command> command in the script.</para>
+   to map the site URL to the OpenAM server URL.</para>
+
+   <para>To do this, set a
+   <literal>com.iplanet.am.naming.map.site.to.server</literal> system property
+   option of the <command>java</command> command in the script. The option
+   takes the following form.</para>
+
+   <literallayout class="monospaced"
+   >-D"com.iplanet.am.naming.map.site.to.server=<replaceable>lb-url</replaceable>=<replaceable>openam-url</replaceable>[,
+ <replaceable>other-lb-url</replaceable>=<replaceable>openam-url</replaceable> ...]"</literallayout>
+
+   <para>The property maps each <replaceable>lb-url</replaceable> key to an
+   <replaceable>openam-url</replaceable> value, where
+   <replaceable>lb-url</replaceable> is the URL to a site load balancer and
+   <replaceable>openam-url</replaceable> is the URL to the OpenAM server against
+   which you set up the <command>ssoadm</command> command.</para>
+
+   <para>The <command>ssoadm</command> command is dependent on the OpenAM server
+   against which you set it up, so always map site load balancer URLs to that
+   server's <replaceable>openam-url</replaceable>.</para>
+
+   <para>For example, if your site is behind
+   <literal>https://lb.example.com:443/openam</literal>, and the OpenAM server
+   against which you set up the <command>ssoadm</command> is at
+   <literal>http://openam.example.com:8080/openam</literal>, then add the
+   following property to the <command>java</command> command (all on one line
+   without spaces).</para>
+
    <literallayout class="monospaced">-D"com.iplanet.am.naming.map.site.to.server=
-   <replaceable>lb-url</replaceable>=<replaceable>openam-url</replaceable>[,<replaceable
-   >lb-url</replaceable>=<replaceable>openam-url</replaceable> ...]"</literallayout>
-   <para>Notice that the mapping is a comma separated list of server URLs,
-   <replaceable>openam-url</replaceable>, in the site with the load balancer
-   URL, <replaceable>lb-url</replaceable>. For example, if your site is behind
-   <literal>https://lb.example.com:443/openam</literal>, and the OpenAM servers
-   are at <literal>http://openam1.example.com:8080/openam</literal> and
-   <literal>http://openam2.example.com:8080/openam</literal>, then you add
-   the following property to the <command>java</command> command (without
-   line breaks).</para>
-   <literallayout class="monospaced">-D"com.iplanet.am.naming.map.site.to.server=
-   https://lb.example.com:443/openam=http://openam1.example.com:8080/openam,
-   https://lb.example.com:443/openam=http://openam2.example.com:8080/openam"</literallayout>
+ https://lb.example.com:443/openam=http://openam.example.com:8080/openam"</literallayout>
+
+   <para>Repeat this step for each OpenAM server in your site configuration.
+   You can install all your instances of <command>ssoadm</command> on the same
+   host, but in each case the command should manage only one OpenAM
+   server.</para>
   </step>
  </procedure>
 
