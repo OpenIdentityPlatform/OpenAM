@@ -74,6 +74,9 @@ public class AdminPasswordAction implements PrivilegedAction {
      * @see java.security.PrivilegedAction#run()
      */
     public Object run() {
+        if (AdminUtils.getAdminPassword()==null) {
+            return null;
+        }
         return new String(AdminUtils.getAdminPassword());
     }
 
