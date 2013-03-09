@@ -106,7 +106,7 @@
         <serverDocTargetVersion>10.2.0</serverDocTargetVersion>
         <agentsDocTargetVersion>3.2.0</agentsDocTargetVersion>
         <webAgentsDocTargetVersion>${agentsDocTargetVersion}</webAgentsDocTargetVersion>
-        <javaEEAgentsDocTargetVersion>${project.version}</javaEEAgentsDocTargetVersion>
+        <javaEEAgentsDocTargetVersion>${agentsDocTargetVersion}</javaEEAgentsDocTargetVersion>
         <agentsBootstrapFile>OpenSSOAgentBootstrap.properties</agentsBootstrapFile>
         <agentsConfigurationFile>OpenSSOAgentConfiguration.properties</agentsConfigurationFile>
         <coreDirectoryFile><![CDATA[openam-distribution-kit-${project.version}]]></coreDirectoryFile>
