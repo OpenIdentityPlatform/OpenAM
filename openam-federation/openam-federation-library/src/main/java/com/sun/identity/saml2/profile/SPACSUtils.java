@@ -2059,16 +2059,20 @@ public class SPACSUtils {
         }
         String metaAlias = SAML2MetaUtils.getMetaAliasByUri(requestURL);
         if ((metaAlias ==  null) || (metaAlias.length() == 0)) {
-            // pick the first available one
-            List spMetaAliases =
-                    metaManager.getAllHostedServiceProviderMetaAliases("/");
-            if ((spMetaAliases != null) && !spMetaAliases.isEmpty()) {
-                // get first one
-                metaAlias = (String) spMetaAliases.get(0);
-            }
-            if ((metaAlias ==  null) || (metaAlias.length() == 0)) {
-                throw new ServletException(
-                        SAML2SDKUtils.bundle.getString("nullSPEntityID"));
+            // Check in case metaAlias has been supplied as a parameter
+            metaAlias = request.getParameter(SAML2MetaManager.NAME_META_ALIAS_IN_URI);
+            if (metaAlias == null || metaAlias.length() == 0) {
+                // pick the first available one
+                List spMetaAliases =
+                        metaManager.getAllHostedServiceProviderMetaAliases("/");
+                if ((spMetaAliases != null) && !spMetaAliases.isEmpty()) {
+                    // get first one
+                    metaAlias = (String) spMetaAliases.get(0);
+                }
+                if ((metaAlias ==  null) || (metaAlias.length() == 0)) {
+                    throw new ServletException(
+                            SAML2SDKUtils.bundle.getString("nullSPEntityID"));
+                }
             }
         }
         String hostEntityId = null;
