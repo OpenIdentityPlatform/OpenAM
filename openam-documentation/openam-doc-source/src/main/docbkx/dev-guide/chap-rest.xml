@@ -407,6 +407,25 @@ $ curl https://openam.example.com:8443/openam/oauth2/tokeninfo
    response contains the values for those attributes from the user's profile,
    as in the preceding example, with scopes set to <literal>mail</literal> and
    <literal>cn</literal>.</para>
+
+   <para>Both the <literal>/oauth2/authorize</literal> and
+   <literal>/oauth2/access_token</literal> endpoints can take additional
+   parameters. In particular you must specify the realm using the
+   <literal>realm=<replaceable>realm-name</replaceable></literal> parameter if
+   the OpenAM OAuth 2.0 provider is configured for a subrealm rather than /
+   (Top-Level Realm). For example, if the OAuth 2.0 provider is configured
+   for the <literal>/customers</literal> realm, then use
+   <literal>/oauth2/authorize?realm=/customers</literal> and
+   <literal>/oauth2/access_token?realm=/customers</literal>.</para>
+
+   <para>The <literal>/oauth2/authorize</literal> endpoint can also take
+   <literal>module</literal> and <literal>service</literal> parameters. Use
+   either as described in <link xlink:href="admin-guide#authn-from-browser"
+   xlink:role="http://docbook.org/xlink/role/olink"><citetitle>Authenticating
+   To OpenAM</citetitle></link>, where <literal>module</literal> specifies the
+   authentication module instance to use or <literal>service</literal>
+   specifies the authentication chain to use when authenticating the resource
+   owner.</para>
   </section>
 
   <section xml:id="rest-api-oauth2-token-admin-endpoint">

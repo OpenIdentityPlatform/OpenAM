@@ -2794,14 +2794,39 @@
        <row>
         <entry>Authentication Endpoint URL</entry>
         <entry>
-         <para><literal>/oauth2/authorize</literal> under the deployment URL.</para>
+         <para><literal>/oauth2/authorize</literal> under the deployment
+          URL.<footnote xml:id="oauth2-realms-footnote">
+           <para>This OpenAM endpoint can take additional parameters. In
+           particular you must specify the realm if the OpenAM OAuth 2.0
+           provider is configured for a subrealm rather than / (Top-Level
+           Realm).</para>
+
+           <para>For example, if the OAuth 2.0 provider is configured for the
+           realm <literal>/customers</literal>, then the authentication endpoint
+           URL is as follows:
+           <literal>https://openam.example.com:8443/openam/oauth2/authorize?realm=/customers</literal></para>
+
+           <para>The <literal>/oauth2/authorize</literal> endpoint can also take
+           <literal>module</literal> and <literal>service</literal> parameters.
+           Use either as described in <link
+           xlink:href="admin-guide#authn-from-browser"
+           xlink:role="http://docbook.org/xlink/role/olink"><citetitle
+           >Authenticating To OpenAM</citetitle></link>, where
+           <literal>module</literal> specifies the authentication module
+           instance to use or <literal>service</literal> specifies the
+           authentication chain to use when authenticating the resource
+           owner.</para>
+          </footnote>
+         </para>
          <para>Example: <literal
-         >https://openam.example.com:8443/openam/oauth2/authorize</literal>.</para></entry>
+         >https://openam.example.com:8443/openam/oauth2/authorize</literal>.</para>
+       </entry>
        </row>
        <row>
         <entry>Access Token Endpoint URL</entry>
         <entry>
-         <para><literal>/oauth2/access_token</literal> under the deployment URL.</para>
+         <para><literal>/oauth2/access_token</literal> under the deployment
+          URL.<footnoteref linkend="oauth2-realms-footnote" /></para>
          <para>Example: <literal
          >https://openam.example.com:8443/openam/oauth2/access_token</literal>.</para></entry>
        </row>
