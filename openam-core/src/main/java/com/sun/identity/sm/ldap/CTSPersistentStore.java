@@ -1,7 +1,7 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright (c) 2012 ForgeRock US Inc. All Rights Reserved
+ * Copyright (c) 2012-2013 ForgeRock US Inc. All Rights Reserved
  *
  * The contents of this file are subject to the terms of the Common Development and
  * Distribution License (the License). You may not use this file except in compliance with the
@@ -1980,7 +1980,7 @@ public class CTSPersistentStore extends GeneralTaskRunnable
             filter = new StringBuilder();
             filter.append("(&");
             for (String key : filters.keySet()) {
-                filter.append("(").append(key).append(Constants.EQUALS)
+                filter.append("(").append(key.replace("_", "")).append(Constants.EQUALS)
                         .append(filters.get(key).toString()).append(")");
             }
             filter.append(")");
