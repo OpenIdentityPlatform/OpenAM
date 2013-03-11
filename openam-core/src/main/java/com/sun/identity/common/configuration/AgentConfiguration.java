@@ -24,7 +24,10 @@
  *
  * $Id: AgentConfiguration.java,v 1.52 2010/01/07 18:07:39 veiming Exp $
  *
- * Portions Copyrighted 2012 ForgeRock AS
+ */
+
+/*
+ * Portions Copyrighted 2012-2013 ForgeRock, Inc.
  * Portions Copyrighted 2012 Open Source Solution Technology Corporation
  */
 
@@ -227,7 +230,7 @@ public class AgentConfiguration {
      * @param realm Name of realm where agent group is going to reside.
      * @param agentGroupName Name of agent group.
      * @param agentType Type of agent group.
-     * @param values Map of attribute name to its values.
+     * @param attrValues Map of attribute name to its values.
      * @throws IdRepoException if there are Id Repository related errors.
      * @throws SSOException if the Single Sign On token is invalid or has
      *         expired.
@@ -400,7 +403,7 @@ public class AgentConfiguration {
      * @param realm Name of realm where agent is going to reside.
      * @param agentName Name of agent.
      * @param agentType Type of agent.
-     * @param values Map of attribute name to its values.
+     * @param attrValues Map of attribute name to its values.
      * @param serverURL Server URL.
      * @param agentURL Agent URL.
      * @throws IdRepoException if there are Id Repository related errors.
@@ -529,6 +532,36 @@ public class AgentConfiguration {
             Object[] param = { Integer.toString(port) };
             throw new ConfigurationException(
                     "agent.root.url.port.out.of.range", param);
+        }
+    }
+
+    /**
+     * For the given map of user supplied attributeValues, use the keys to find duplicate default
+     * values and remove them from the finalAttributes which will end up being used to create the
+     * actual agent configuration.<br>
+     * For example:
+     * <pre>
+     * com.sun.identity.agents.config.notenforced.url=[[0]=] from defaults is transformed into
+     * com.sun.identity.agents.config.notenforced.url[0]= which then clashes with any supplied values like
+     * com.sun.identity.agents.config.notenforced.url[0]=[*.gif]
+     * </pre>
+     * @param attributeValues a map of values supplied when configuring the agent
+     * @param finalAttributes a map of values that will be used to create the agent configuration.
+     */
+    public static void removeDefaultDuplicates(Map<String, Set<String>> attributeValues, Map<String, Set<String>> finalAttributes) {
+
+        // This is only looking for keys in the form of propertyname[n] where n is usually a value starting from 0
+        for (String attributeKey : attributeValues.keySet()) {
+            if (attributeKey != null && attributeKey.length() > 0 && attributeKey.endsWith("]")) {
+                // Remove the characters contained in the "[n]" before using the key to check for a duplicate.
+                int endIndex = attributeKey.lastIndexOf("[");
+                if (endIndex != -1) {
+                    attributeKey = attributeKey.substring(0, endIndex);
+                    if (finalAttributes.containsKey(attributeKey)) {
+                        finalAttributes.remove(attributeKey);
+                    }
+                }
+            }
         }
     }
 

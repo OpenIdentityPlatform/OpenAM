@@ -27,8 +27,9 @@
  */
 
 /*
- * Portions Copyrighted 2011-2012 ForgeRock, Inc.
+ * Portions Copyrighted 2011-2013 ForgeRock, Inc.
  */
+
 package com.sun.identity.cli.agentconfig;
 
 import com.iplanet.sso.SSOToken;
@@ -180,6 +181,12 @@ public class CreateAgent extends AuthenticatedCommand {
                     map.putAll(attributeValues);
                     AgentConfiguration.tagswapAttributeValues(map, agentType,
                         fqdnServerURL, fqdnAgentURL);
+
+                    // Remove any default values that have not been replaced by values
+                    // supplied when calling create agent. These are in the form of
+                    // propertyname[n] where n is a value starting from 0
+                    AgentConfiguration.removeDefaultDuplicates(attributeValues, map);
+
                     AgentConfiguration.createAgent(adminSSOToken, realm,
                         agentName, agentType, map);
                 } else {
