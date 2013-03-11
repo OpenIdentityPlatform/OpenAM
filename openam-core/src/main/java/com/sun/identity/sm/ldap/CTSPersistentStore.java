@@ -495,7 +495,9 @@ public class CTSPersistentStore extends GeneralTaskRunnable
                         break;
                     }
                     // Delete expired OAuth2 tokens
-                    oauth2DeleteExpired();
+                    StringBuilder filter = new StringBuilder();
+                    filter.append(EXPDATE_FILTER_PRE_OAUTH).append(System.currentTimeMillis()).append(EXPDATE_FILTER_POST_OAUTH);
+                    oauth2DeleteWithFilter(filter.toString());
                     if (shutdown) {
                         break;
                     }
@@ -2055,11 +2057,12 @@ public class CTSPersistentStore extends GeneralTaskRunnable
         return new JsonValue(tokens);
     }
 
-    public void oauth2DeleteExpired() throws JsonResourceException {
+    /**
+     * {@inheritDoc}
+     */
+    public void oauth2DeleteWithFilter(String filter) throws JsonResourceException {
 
         StringBuilder baseDN = new StringBuilder();
-        StringBuilder filter = new StringBuilder();
-        filter.append(EXPDATE_FILTER_PRE_OAUTH).append(System.currentTimeMillis()).append(EXPDATE_FILTER_POST_OAUTH);
         baseDN.append(getFormattedDNString(OAUTH2_HA_BASE_DN, null, null));
 
         String messageTag = "CTSPersistenceStore.oauth2DeleteExpired: ";
@@ -2138,6 +2141,7 @@ public class CTSPersistentStore extends GeneralTaskRunnable
 
         return;
     }
+
 
     /**
      * {@inheritDoc}

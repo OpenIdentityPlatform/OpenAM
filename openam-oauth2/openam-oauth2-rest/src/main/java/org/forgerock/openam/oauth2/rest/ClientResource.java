@@ -1,18 +1,25 @@
 /*
- * Copyright (c) 2012 ForgeRock AS. All rights reserved.
+ * DO NOT REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * The contents of this file are subject to the terms of the Common Development and
- * Distribution License (the License). You may not use this file except in compliance with the
- * License.
+ * Copyright (c) 2012-2013 ForgeRock Inc. All rights reserved.
  *
- * You can obtain a copy of the License at legal/CDDLv1.0.txt. See the License for the
- * specific language governing permission and limitations under the License.
+ * The contents of this file are subject to the terms
+ * of the Common Development and Distribution License
+ * (the License). You may not use this file except in
+ * compliance with the License.
  *
- * When distributing Covered Software, include this CDDL Header Notice in each file and include
- * the License file at legal/CDDLv1.0.txt. If applicable, add the following below the CDDL
- * Header, with the fields enclosed by brackets [] replaced by your own identifying
- * information: "Portions Copyrighted [2012] [ForgeRock Inc]".
+ * You can obtain a copy of the License at
+ * http://forgerock.org/license/CDDLv1.0.html
+ * See the License for the specific language governing
+ * permission and limitations under the License.
  *
+ * When distributing Covered Code, include this CDDL
+ * Header Notice in each file and include the License file
+ * at http://forgerock.org/license/CDDLv1.0.html
+ * If applicable, add the following below the CDDL Header,
+ * with the fields enclosed by brackets [] replaced by
+ * your own identifying information:
+ * "Portions Copyrighted [year] [name of copyright owner]"
  */
 
 package org.forgerock.openam.oauth2.rest;
@@ -21,10 +28,12 @@ import com.iplanet.am.util.SystemProperties;
 import com.iplanet.sso.SSOException;
 import com.iplanet.sso.SSOToken;
 import com.iplanet.sso.SSOTokenManager;
+import com.sun.identity.coretoken.interfaces.OAuth2TokenRepository;
 import com.sun.identity.idm.*;
 import com.sun.identity.security.AdminTokenAction;
 import com.sun.identity.shared.Constants;
 import com.sun.identity.shared.OAuth2Constants;
+import com.sun.identity.sm.ldap.CTSPersistentStore;
 import org.forgerock.json.fluent.JsonValue;
 import org.forgerock.json.resource.*;
 
@@ -194,10 +203,25 @@ public class ClientResource  implements CollectionResourceProvider {
             if (!(getUid(context).equals(adminUserId))){
                 throw new PermanentException(401, "Unauthorized", null);
             }
+            //Delete the client_id
             AMIdentityRepository repo = new AMIdentityRepository(token , null);
             Set<AMIdentity> ids = new HashSet<AMIdentity>();
             ids.add(getIdentity(resourceId, null));
             repo.deleteIdentities(ids);
+
+            //delete the tokens associated with that client_id
+            OAuth2TokenRepository tokens = CTSPersistentStore.getInstance();
+            StringBuilder sb = new StringBuilder();
+            sb.append("(").append(OAuth2Constants.Params.CLIENTID).append("=").append(resourceId).append(")");
+            try {
+                tokens.oauth2DeleteWithFilter(sb.toString());
+            } catch (Exception e){
+                if (OAuth2Utils.logStatus) {
+                    String[] obs = {"FAILED_DELETE_CLIENT", responseVal.toString()};
+                    OAuth2Utils.logErrorMessage("FAILED_DELETE_CLIENT", obs, null);
+                }
+                handler.handleError(new InternalServerErrorException("Unable to delete client"));
+            }
             responseVal.put("success", "true");
 
             response = new JsonValue(responseVal);
@@ -214,21 +238,21 @@ public class ClientResource  implements CollectionResourceProvider {
                 String[] obs = {"FAILED_DELETE_CLIENT", responseVal.toString()};
                 OAuth2Utils.logErrorMessage("FAILED_DELETE_CLIENT", obs, null);
             }
-            handler.handleError(new InternalServerErrorException("Unable to create client"));
+            handler.handleError(new InternalServerErrorException("Unable to delete client"));
         } catch (SSOException e){
             responseVal.put("success", "false");
             if (OAuth2Utils.logStatus) {
                 String[] obs = {"FAILED_DELETE_CLIENT", responseVal.toString()};
                 OAuth2Utils.logErrorMessage("FAILED_DELETE_CLIENT", obs, null);
             }
-            handler.handleError(new InternalServerErrorException("Unable to create client"));
+            handler.handleError(new InternalServerErrorException("Unable to delete client"));
         } catch (InternalServerErrorException e){
             responseVal.put("success", "false");
             if (OAuth2Utils.logStatus) {
                 String[] obs = {"FAILED_DELETE_CLIENT", responseVal.toString()};
                 OAuth2Utils.logErrorMessage("FAILED_DELETE_CLIENT", obs, null);
             }
-            handler.handleError(new InternalServerErrorException("Unable to create client"));
+            handler.handleError(new InternalServerErrorException("Unable to delete client"));
         } catch (PermanentException e){
             responseVal.put("success", "false");
             if (OAuth2Utils.logStatus) {
