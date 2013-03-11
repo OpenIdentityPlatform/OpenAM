@@ -20,7 +20,7 @@
   !
   ! CCPL HEADER END
   !
-  !      Copyright 2011-2012 ForgeRock AS
+  !      Copyright 2011-2013 ForgeRock AS
   !    
 -->
 <variablelist
@@ -29,7 +29,6 @@
  xsi:schemaLocation='http://docbook.org/ns/docbook http://docbook.org/xml/5.0/xsd/docbook.xsd'
  xmlns:xlink='http://www.w3.org/1999/xlink'
  xmlns:xinclude='http://www.w3.org/2001/XInclude'>
- <title>OpenAM OAuth 2.0 Endpoints</title>
  <para>In addition to the standard authorization and token endpoints
  described in RFC 6749, OpenAM also exposes a token information endpoint
  for resource servers to get information about access tokens so they can

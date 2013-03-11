@@ -20,7 +20,7 @@
   !
   ! CCPL HEADER END
   !
-  !      Copyright 2012 ForgeRock AS
+  !      Copyright 2012-2013 ForgeRock AS
   !    
 -->
 <chapter xml:id='chap-oauth2'
@@ -86,83 +86,175 @@
    <para>OpenAM supports the four main grants for obtaining authorization
    described in RFC 6749: the authorization code grant, the implicit grant,
    the resource owner password credentials grant, and the client credentials
-   grant.</para>
-
-   <para>The authorization code grant starts with the client, such as a
-   web-based service, redirecting the resource owner's user-agent to the OpenAM
-   authorization service. After authenticating the resource owner again
-   obtaining the resource owner's authorization, OpenAM redirects the resource
-   owner's user-agent back to the client with an authorization code that the
-   client uses to request the access token. The following sequence diagram
-   outlines a successful process from initial client redirection through to the
-   client accessing the protected resource.</para>
-
-   <mediaobject xml:id="figure-oauth2-authz">
-    <alt>OpenAM in OAuth 2.0 Authorization Code Grant process</alt>
-    <imageobject>
-     <imagedata fileref="images/oauth2-authz.png" format="PNG"/>
-    </imageobject>
-    <textobject><para>OpenAM supports the authorization code
-    grant.</para></textobject>
-   </mediaobject>
-
-   <para>The implicit grant is designed for clients implemented to run inside
-   the resource-owner user agent. Instead of providing an authorization code
-   that the client must use to retrieve an access token, OpenAM returns the
-   access token directly in the fragment portion of the redirect URI. The
-   following sequence diagram outlines the successful process.</para>
-
-   <mediaobject xml:id="figure-oauth2-implicit">
-    <alt>OpenAM in OAuth 2.0 Implicit Grant process</alt>
-    <imageobject>
-     <imagedata fileref="images/oauth2-implicit.png" format="PNG"/>
-    </imageobject>
-    <textobject><para>OpenAM supports the implicit grant.</para></textobject>
-   </mediaobject>
-
-   <para>The resource owner password credentials grant lets the client use the
-   resource owner's user name and password to get an access token directly.
-   Although this grant might seem to conflict with an original OAuth goal of
-   not having to share resource owner credentials with the client, it can
-   makes sense in a secure context where other authorization grant types are
-   not available, such as a client that is part of a device operating system
-   using the resource owner credentials once and thereafter using refresh tokens
-   to continue accessing resources. The following sequence diagram shows the
-   successful process.</para>
-
-   <mediaobject xml:id="figure-oauth2-ropc">
-    <alt>OpenAM in OAuth 2.0 Resource Owner Password Credentials Grant process</alt>
-    <imageobject>
-     <imagedata fileref="images/oauth2-ropc.png" format="PNG"/>
-    </imageobject>
-    <textobject><para>OpenAM supports the resource owner password credentials
-    grant.</para></textobject>
-   </mediaobject>
-
-   <para>The client credentials grant uses client credentials as an
-   authorization grant. This grant makes sense when the client is also the
-   resource owner, for example. The following sequence diagram shows the
-   successful process.</para>
-
-   <mediaobject xml:id="figure-oauth2-client-cred">
-    <alt>OpenAM in OAuth 2.0 Client Credentials Grant process</alt>
-    <imageobject>
-     <imagedata fileref="images/oauth2-client-cred.png" format="PNG"/>
-    </imageobject>
-    <textobject><para>OpenAM supports the client credentials
-    grant.</para></textobject>
-   </mediaobject>
-
-   <para>See RFC 6749 for details on the authorization grant process, and
+   grant. See RFC 6749 for details on the authorization grant process, and
    for details on how clients should make authorization requests and handle
-   authorization responses.</para>
+   authorization responses. OpenAM also supports the <link xlink:show="new"
+   xlink:href="http://tools.ietf.org/html/draft-ietf-oauth-saml2-bearer"
+   ><citetitle>SAML 2.0 Bearer Assertion Profiles for OAuth 2.0</citetitle></link>,
+   described in the Internet-Draft.</para>
 
-   <xinclude:include href="../shared/variablelist-oauth2-endpoints.xml" />
+   <section xml:id="oauth2-authz">
+    <title>OAuth 2.0 Authorization Grant</title>
+    <para>The authorization code grant starts with the client, such as a
+    web-based service, redirecting the resource owner's user-agent to the OpenAM
+    authorization service. After authenticating the resource owner again
+    obtaining the resource owner's authorization, OpenAM redirects the resource
+    owner's user-agent back to the client with an authorization code that the
+    client uses to request the access token. The following sequence diagram
+    outlines a successful process from initial client redirection through to the
+    client accessing the protected resource.</para>
 
-   <para>For examples, see the <citetitle>Developer's Guide</citetitle> section,
-   <link xlink:href="dev-guide#rest-api-oauth2"
-   xlink:role="http://docbook.org/xlink/role/olink"><citetitle>OAuth 2.0
-   Authorization</citetitle></link>.</para>
+    <mediaobject xml:id="figure-oauth2-authz">
+     <alt>OpenAM in OAuth 2.0 Authorization Code Grant process</alt>
+     <imageobject>
+      <imagedata fileref="images/oauth2-authz.png" format="PNG"/>
+     </imageobject>
+     <textobject><para>OpenAM supports the authorization code
+     grant.</para></textobject>
+    </mediaobject>
+   </section>
+
+   <section xml:id="oauth2-implicit">
+    <title>OAuth 2.0 Implicit Grant</title>
+    <para>The implicit grant is designed for clients implemented to run inside
+    the resource-owner user agent. Instead of providing an authorization code
+    that the client must use to retrieve an access token, OpenAM returns the
+    access token directly in the fragment portion of the redirect URI. The
+    following sequence diagram outlines the successful process.</para>
+
+    <mediaobject xml:id="figure-oauth2-implicit">
+     <alt>OpenAM in OAuth 2.0 Implicit Grant process</alt>
+     <imageobject>
+      <imagedata fileref="images/oauth2-implicit.png" format="PNG"/>
+     </imageobject>
+     <textobject><para>OpenAM supports the implicit grant.</para></textobject>
+    </mediaobject>
+   </section>
+
+   <section xml:id="oauth2-ropc">
+    <title>OAuth 2.0 Resource Owner Password Credentials Grant</title>
+    <para>The resource owner password credentials grant lets the client use the
+    resource owner's user name and password to get an access token directly.
+    Although this grant might seem to conflict with an original OAuth goal of
+    not having to share resource owner credentials with the client, it can
+    makes sense in a secure context where other authorization grant types are
+    not available, such as a client that is part of a device operating system
+    using the resource owner credentials once and thereafter using refresh tokens
+    to continue accessing resources. The following sequence diagram shows the
+    successful process.</para>
+
+    <mediaobject xml:id="figure-oauth2-ropc">
+     <alt>OpenAM in OAuth 2.0 Resource Owner Password Credentials Grant process</alt>
+     <imageobject>
+      <imagedata fileref="images/oauth2-ropc.png" format="PNG"/>
+     </imageobject>
+     <textobject><para>OpenAM supports the resource owner password credentials
+     grant.</para></textobject>
+    </mediaobject>
+   </section>
+
+   <section xml:id="oauth2-client-cred">
+    <title>OAuth 2.0 Client Credentials Grant</title>
+    <para>The client credentials grant uses client credentials as an
+    authorization grant. This grant makes sense when the client is also the
+    resource owner, for example. The following sequence diagram shows the
+    successful process.</para>
+
+    <mediaobject xml:id="figure-oauth2-client-cred">
+     <alt>OpenAM in OAuth 2.0 Client Credentials Grant process</alt>
+     <imageobject>
+      <imagedata fileref="images/oauth2-client-cred.png" format="PNG"/>
+     </imageobject>
+     <textobject><para>OpenAM supports the client credentials
+     grant.</para></textobject>
+    </mediaobject>
+   </section>
+
+   <section xml:id="oauth2-saml2-bearer">
+    <title>SAML 2.0 Bearer Assertion Profiles</title>
+    <indexterm>
+     <primary>Federation</primary>
+     <secondary>OAuth 2.0</secondary>
+    </indexterm>
+
+    <para>The Internet-Draft, <link xlink:show="new"
+    xlink:href="http://tools.ietf.org/html/draft-ietf-oauth-saml2-bearer"
+    ><citetitle>SAML 2.0 Bearer Assertion Profiles for OAuth 2.0</citetitle></link>,
+    describes a means to use SAML 2.0 assertions to request access tokens and
+    to authenticate OAuth 2.0 clients.</para>
+
+    <para>At present OpenAM implements the profile to request access
+    tokens.</para><!-- Pending AME-710 -->
+
+    <para>In both profiles, the issuer must sign the assertion. The client
+    communicates the assertion over a channel protected with transport
+    layer security, by performing an HTTP POST to the OpenAM's access token
+    endpoint. OpenAM as OAuth 2.0 authorization server uses the issuer ID to
+    validate the signature on the assertion.</para>
+
+    <para>In the profile to request an access token, the OAuth 2.0 client
+    bears a SAML 2.0 assertion that was issued to the resource owner on
+    successful authentication. A valid assertion in this case is equivalent
+    to an authorization grant by the resource owner to the client. OAuth 2.0
+    clients must make it clear to the resource owner that by authenticating to
+    the identity provider who issues the assertion, they are granting the client
+    permission to access the protected resources.</para>
+
+    <mediaobject xml:id="figure-oauth2-saml2-bearer">
+     <alt>SAML 2.0 Bearer Assertion Authorization Grant</alt>
+     <imageobject>
+      <imagedata fileref="images/oauth2-saml2-bearer.png" format="PNG"/>
+     </imageobject>
+     <textobject><para>OpenAM supports SAML 2.0 Bearer Assertion Profiles, for
+     example to use an assertion to request an access token.</para></textobject>
+    </mediaobject>
+
+    <para>The HTTP POST to OpenAM to request an access token looks something
+    like this:</para>
+
+    <programlisting language="http">POST /openam/oauth2/access_token HTTP/1.1
+    Host: openam.example.com
+    Content-Type: application/x-www-form-urlencoded
+
+    grant_type=urn%3Aietf%3Aparams%3Aoauth%3Agrant-type%3Asaml2-bearer&amp;
+    assertion=PHNhbWxwOl...[base64url encoded assertion]...ZT4&amp;
+    client_id=[ID registered with OpenAM]</programlisting>
+
+    <!-- Pending AME-710
+    <para>In the profile to authenticate the client, the SAML 2.0 assertion
+    replaces the client password.</para>
+
+    <para>The HTTP POST to OpenAM to authenticate the client looks something
+    like this during an access token request given an authorization code:</para>
+
+    <programlisting language="http">POST /openam/oauth2/access_token HTTP/1.1
+    Host: openam.example.com
+    Content-Type: application/x-www-form-urlencoded
+
+    grant_type=authorization_code&amp;
+    code=[encoded authorization code]&amp;
+    client_assertion_type=urn%3Aietf%3Aparams%3Aoauth
+     %3Aclient-assertion-type%3Asaml2-bearer&amp;
+    client_assertion=PHNhbWxwOl...[base64url encoded assertion]...ZT4&amp;
+    client_id=[ID registered with OpenAM]</programlisting>
+    -->
+
+    <para>If OpenAM is already a SAML 2.0 service provider, you can configure
+    OpenAM as OAuth 2.0 authorization server as well, and set an adapter class
+    name in the service provider configuration that lets OpenAM POST the
+    assertion from the service provider to the authorization server. See
+    <xref linkend="oauth2-sp-and-authz" /> for details.</para>
+   </section>
+
+   <section xml:id="oauth2-endpoints">
+    <title>OpenAM OAuth 2.0 Endpoints</title>
+    <xinclude:include href="../shared/variablelist-oauth2-endpoints.xml" />
+
+    <para>For examples, see the <citetitle>Developer's Guide</citetitle> section,
+    <link xlink:href="dev-guide#rest-api-oauth2"
+    xlink:role="http://docbook.org/xlink/role/olink"><citetitle>OAuth 2.0
+    Authorization</citetitle></link>.</para>
+   </section>
   </section>
 
   <section xml:id="openam-oauth2-client">
@@ -757,6 +849,245 @@
     </listitem>
    </orderedlist>
   </example>
+ </section>
+
+ <section xml:id="oauth2-sp-and-authz">
+  <title>Configuring OpenAM as Both SAML 2.0 Service Provider &amp; OAuth 2.0
+  Authorization Server</title>
+
+  <para>As described in <xref linkend="oauth2-saml2-bearer" />, OpenAM as
+  OAuth 2.0 authorization server can handle the profile where a SAML 2.0
+  assertion borne by the client functions as an authorization grant to get
+  an access token. This lets a client get an access token when a resource owner
+  completes SAML 2.0 Web Single Sign-On.</para>
+
+  <para>You can configure OpenAM as both SAML 2.0 service provider and OAuth
+  2.0 authorization server, using an built-in adapter class to POST assertions
+  returned to the service provider to the access token endpoint of the
+  authorization server. This allows clients to send a resource owner to the
+  identity provider for SAML 2.0 web SSO, get an assertion at the service
+  provider, and retrieve an access token from the authorization server. In other
+  words, once this scenario is configured, the client must only direct the
+  resource owner to start web SSO as described in <link
+  xlink:href="admin-guide#using-saml2-sso-slo"
+  xlink:role="http://docbook.org/xlink/role/olink"><citetitle>Using SAML 2.0
+  Single Sign-On &amp; Single Logout</citetitle></link>, and then retrieve the
+  access token on success or handle the error condition on failure.</para>
+
+  <procedure xml:id="configure-oauth2-sp-and-authz">
+   <title>To Get an Access Token From SAML 2.0 Web SSO</title>
+
+   <itemizedlist>
+    <para>For this scenario to work, the following conditions must be met.</para>
+
+    <listitem>
+     <para>The client must make the resource owner understand that by
+     authenticating to the SAML 2.0 identity provider the resource owner grants
+     the client access to the protected resources. OpenAM does not present the
+     resource owner with an authorization decision.</para>
+    </listitem>
+
+    <listitem>
+     <para>The SAML 2.0 identity provider issuing the assertion must sign the
+     assertion, and must correctly handle the name ID for the subject.</para>
+    </listitem>
+
+    <listitem>
+     <para>OpenAM as relying party must request that assertions are signed, must
+     verify the signatures on assertions, must correctly handle name IDs
+     from the issuer, and must use the built-in
+     <literal>org.forgerock.restlet.ext.oauth2.flow.OAuth2Saml2GrantSPAdapter</literal>
+     adapter class in the service provider configuration to POST assertions
+     to the OAuth 2.0 authorization service.</para>
+    </listitem>
+
+    <listitem>
+     <para>The OAuth 2.0 authorization service and SAML 2.0 service provider
+     must be configured together on the same OpenAM server.</para>
+    </listitem>
+
+    <listitem>
+     <para>An OAuth 2.0 client configuration on OpenAM with the same name as
+     the service provider entity ID must be set up on OpenAM.</para>
+    </listitem>
+
+    <listitem>
+     <para>The OAuth 2.0 client initiating the process must be able to consume
+     the access token and to handle errors if necessary.</para>
+    </listitem>
+   </itemizedlist>
+
+   <para>Follow these steps. The test configuration hints in this procedure let
+   you prepare configuration to test with the demo user created in OpenAM by
+   default.</para>
+
+   <step>
+    <para>Make sure the SAML 2.0 identity provider signs assertions and that
+    name IDs are correctly configured to map resource owner accounts.</para>
+
+    <para>When configuring OpenAM as a hosted identity provider follow these
+    steps.</para>
+
+    <substeps>
+     <step>
+      <para>Make sure the Signing Key is properly configured on setup.</para>
+
+      <para>For a test configuration, select the <literal>test</literal>
+      certificate shown in the Common Tasks &gt; Create Hosted Service Provider
+      wizard.</para>
+     </step>
+
+     <step>
+      <para>Make sure name IDs are properly configured.</para>
+
+      <para>For a test configuration, in the OpenAM console under Federation
+      &gt; Entity Providers &gt; <replaceable>IDP name</replaceable> &gt;
+      NameID Value Map, add
+      <literal>urn:oasis:names:tc:SAML:1.1:nameid-format:unspecified=cn</literal>
+      and then Save your work.</para>
+     </step>
+    </substeps>
+
+    <para>For more detail on configuring OpenAM as a SAML 2.0 identity provider,
+    see <link xlink:href="admin-guide#configure-idp"
+    xlink:role="http://docbook.org/xlink/role/olink"><citetitle>Configuring
+    Identity Providers</citetitle></link>.</para>
+   </step>
+
+   <step>
+    <para>Configure OpenAM as service provider.</para>
+
+    <substeps>
+     <step>
+      <para>Set up a hosted service provider in OpenAM console under
+      Common Tasks &gt; Create Hosted Service Provider, keeping track of
+      the name, such as <literal>https://www.sp.example:8443/openam</literal>,
+      and selecting Use default attribute mapping from Identity Provider.</para>
+
+      <para>For details on configuring OpenAM as a SAML 2.0 service provider,
+      see <link xlink:href="admin-guide#configure-sp"
+      xlink:role="http://docbook.org/xlink/role/olink"><citetitle>Configuring
+      Service Providers</citetitle></link>.</para>
+     </step>
+
+     <step>
+      <para>Under Federation &gt; Entity Providers &gt; <replaceable>SP
+      name</replaceable> &gt; Assertion Content &gt; Request/Response Signing,
+      check Assertions Signed.</para>
+     </step>
+
+     <step>
+      <para>For a test configuration, in Federation &gt; Entity Providers &gt;
+      <replaceable>SP name</replaceable> &gt; Assertion Content &gt; NameID
+      Format List, remove all but
+      <literal>urn:oasis:names:tc:SAML:1.1:nameid-format:unspecified</literal>,
+      and then Save your work.</para>
+     </step>
+
+     <step>
+      <para>In Federation &gt; Entity Providers &gt; <replaceable>SP
+      name</replaceable> &gt; Assertion Processing &gt; Adapter, add
+      <literal>org.forgerock.restlet.ext.oauth2.flow.OAuth2Saml2GrantSPAdapter</literal>,
+      and then Save your work.</para>
+
+      <para>This is the adapter class that POSTs the SAML 2.0 assertion to
+      the OAuth 2.0 access token endpoint.</para>
+     </step>
+
+     <step>
+      <para>Use the wizard under Common Tasks &gt; Register Remote Identity
+      Provider to import the identity provider metadata.</para>
+     </step>
+    </substeps>
+   </step>
+
+   <step>
+    <para>Make sure the identity provider imports the metadata for your
+    service provider.</para>
+
+    <para>If your service provider is at
+    <literal>https://www.sp.example:8443/openam</literal>, then the metadata
+    can be accessed at
+    <literal>https://www.sp.example:8443/openam/saml2/jsp/exportmetadata.jsp</literal>.</para>
+   </step>
+
+   <step>
+    <para>On the service provider OpenAM server, set up the OAuth 2.0
+    authorization server as described in
+    <xref linkend="configure-oauth2-authz" />.</para>
+
+    <para>For a test configuration, set the realm to <literal>/</literal>, and
+    accept the defaults.</para>
+   </step>
+
+   <step>
+    <para>On the service provider and authorization server OpenAM server, set
+    up an OAuth 2.0 client profile with the same name as the service
+    provider under Access Control &gt; <replaceable>realm</replaceable> &gt;
+    Agents &gt; OAuth 2.0 Client &gt; New...</para>
+
+    <para>For example, if the service provider name is
+    <literal>https://www.sp.example:8443/openam</literal>, then that is also
+    the name of the OAuth 2.0 client profile.</para>
+
+    <para>You can make additional changes to the client profile if necessary.
+    See <xref linkend="register-oauth2-client" /> for details.</para>
+   </step>
+
+   <step>
+    <para>Test your configuration.</para>
+
+    <substeps>
+     <step>
+      <para>Logout of all OpenAM servers.</para>
+     </step>
+
+     <step>
+      <para>Initiate SAML 2.0 Web SSO.</para>
+
+      <para>For example, if your identity provider is at
+      <literal>https://www.idp.example:8443/openam</literal> with meta alias
+      <literal>/idp</literal> and your service provider is at
+      <literal>https://www.sp.example:8443/openam</literal>, then browse to the
+      following URL (without line breaks or spaces).</para>
+
+      <programlisting language="none"
+      >http://www.idp.example:8443/openam/saml2/jsp/idpSSOInit.jsp
+ ?metaAlias=/idp&amp;spEntityID=http://www.sp.example:8443/openam</programlisting>
+
+      <para>For other configurations, see <link
+      xlink:href="admin-guide#using-saml2-sso-slo"
+      xlink:role="http://docbook.org/xlink/role/olink"><citetitle>Using SAML 2.0
+      Single Sign-On &amp; Single Logout</citetitle></link>.</para>
+     </step>
+
+     <step>
+      <para>Login to the identity provider.</para>
+
+      <para>For OpenAM, login with user name <literal>demo</literal> and
+      password <literal>changeit</literal>.</para>
+     </step>
+
+     <step>
+      <para>Login to the service provider.</para>
+
+      <para>For OpenAM, login with user name <literal>demo</literal> and
+      password <literal>changeit</literal>.</para>
+     </step>
+
+     <step>
+      <para>See the resulting access token on successful login.</para>
+
+      <para>The result looks something like this, all on one line.</para>
+      <programlisting language="javascript">{
+    "expires_in": 59,
+    "token_type": "Bearer",
+    "access_token": "f0f731e0-6013-47e3-9c07-da598157a85f"
+}</programlisting>
+     </step>
+    </substeps>
+   </step>
+  </procedure>
  </section>
 
  <section xml:id="oauth2-security-considerations">

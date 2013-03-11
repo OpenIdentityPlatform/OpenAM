@@ -20,7 +20,7 @@
   !
   ! CCPL HEADER END
   !
-  !      Copyright 2011 ForgeRock AS
+  !      Copyright 2011-2013 ForgeRock AS
   !    
 -->
 <chapter xml:id='chap-standards'
@@ -49,6 +49,11 @@
     <para><link xlink:show="new" xlink:href="http://tools.ietf.org/html/rfc6750"
     >The OAuth 2.0 Authorization Framework: Bearer Token Usage</link>, in which
     OpenAM plays the role of authorization server.</para>
+    <para><link xlink:show="new" xlink:href="http://tools.ietf.org/html/draft-ietf-oauth-assertions"
+    >Assertion Framework for OAuth 2.0</link>, which is an Internet-Draft.</para>
+    <para><link xlink:show="new" xlink:href="http://tools.ietf.org/html/draft-ietf-oauth-saml2-bearer"
+    >SAML 2.0 Bearer Assertion Profiles for OAuth 2.0</link>, which is an
+    Internet-Draft.</para>
    </listitem>
   </varlistentry>
   <varlistentry xml:id="rest">
