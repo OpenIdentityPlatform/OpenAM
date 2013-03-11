@@ -26,7 +26,7 @@
 
 --%>
 
-<%-- Portions Copyrighted [2010] [ForgeRock AS] --%>
+<%-- Portions Copyrighted 2010-2013 ForgeRock Inc --%>
 
 <%@ page
 import="com.iplanet.am.util.SystemProperties,
@@ -72,7 +72,7 @@ import="com.iplanet.am.util.SystemProperties,
    }
    
    AuthContext lc = new AuthContext("/");
-   lc.login();
+   lc.login(AuthContext.IndexType.SERVICE, "adminconsoleservice");
     while (lc.hasMoreRequirements()) {
         Callback[] callbacks = lc.getRequirements();
         ArrayList missing = new ArrayList();
