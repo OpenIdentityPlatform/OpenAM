@@ -1,7 +1,7 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright © 2012 ForgeRock Inc. All rights reserved.
+ * Copyright © 2012-2013 ForgeRock Inc. All rights reserved.
  *
  * The contents of this file are subject to the terms
  * of the Common Development and Distribution License
@@ -20,8 +20,7 @@
  * with the fields enclosed by brackets [] replaced by
  * your own identifying information:
  * "Portions Copyrighted [year] [name of copyright owner]"
- *
- * "Portions Copyrighted 2012 ForgeRock Inc"
+
  */
 
 package com.sun.identity.coretoken.interfaces;
@@ -77,7 +76,12 @@ public interface OAuth2TokenRepository {
      */
     public JsonValue oauth2Query(JsonValue request) throws JsonResourceException;
 
-    public void oauth2DeleteExpired() throws JsonResourceException;
+    /**
+     * Deletes a set of tokens given an ldap filter to delete on.
+     * @param filter the filter to delete the tokens on.
+     * @throws JsonResourceException
+     */
+    public void oauth2DeleteWithFilter(String filter) throws JsonResourceException;
 
     /**
      * Delete a single token
