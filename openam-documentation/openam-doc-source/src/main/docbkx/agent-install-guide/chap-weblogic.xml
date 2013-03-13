@@ -307,11 +307,27 @@ Install log file location:
        to properly identify itself to the OpenAM server. </para>
    </step>
    <step>
+    <para>Edit the <filename>startWebLogic.sh</filename> script to set the sourcing
+    needed for the agent, by adding these lines after the code block shown.</para>
+    <screen>$ vi /path/to/startWebLogic.sh
+ # Any changes to this script may be lost when adding extensions to this configuration.
+ DOMAIN_HOME="/opt/Oracle/Middlewar/user_projects/domains/base_domain"
+ + . ./setAgentEnv_AdminServer.sh
+ ${DOMAIN_HOME}/bin/startWebLogic.sh $*</screen>
+
+    <note>
+     <para>If the sourcing is not properly set, the following message appears.</para>
+     <screen>&lt;Error&gt; &lt;HTTP&gt; &lt;cent.example.com&gt; 
+ &lt;AdminServer&gt; &lt;[STANDBY] ExecuteThread: '5' for queue: 'weblogic.kernel.Default 
+ (self-tuning)'&gt; &lt;&lt;WLS Kernel&gt;&gt; &lt;&gt;&lt;&gt; &lt;&gt; &lt;1360800613441&gt; 
+ &lt;BEA-101165&gt; &lt;Could not load user defined filter in web.xml: 
+ ServletContext@1761850405[app:agentapp module:agentapp.war path:null 
+ spec-version:null] com.sun.identity.agents.filter.AmAgentFilter.
+ java.lang.ClassNotFoundException: com.sun.identity.agents.filter.AmAgentFilter</screen>
+    </note>    
+   </step>
+   <step>
     <para>Restart the WebLogic server.</para>
-    <para>First you must get the environment settings from the script
-    installed with the policy agent, then run the startup script.</para>
-    <screen>$ . ./domain/mydomain/bin/setAgentEnv_AdminServer.sh 
-$ ./domain/mydomain/bin/startWebLogic.sh</screen>
    </step>
    <!-- Fix for OpenAM-945: Document WebLogic install process change -->
    <step>
