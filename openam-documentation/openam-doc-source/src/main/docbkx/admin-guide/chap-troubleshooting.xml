@@ -20,7 +20,7 @@
   !
   ! CCPL HEADER END
   !
-  !      Copyright 2011-2012 ForgeRock AS
+  !      Copyright 2011-2013 ForgeRock AS
   !    
 -->
 <chapter xml:id='chap-troubleshooting'
@@ -161,6 +161,26 @@ PING openam-ter (192.168.56.2) 56(84) bytes of data.
      value <literal>false</literal>.</para>
     </answer>
    </qandaentry>
+
+   <qandaentry xml:id="ssoadm-slow-on-vm">
+    <question>
+     <para>The <command>ssoadm</command> command is very, very slow on my
+     virtual machine (VMWare, VirtualBox, etc.). How can I speed it up?</para>
+    </question>
+
+    <answer>
+     <para>Virtual machine random devices do not always produce enough random
+     data. The <command>ssoadm</command> command can hang while reading random
+     data from the virtual machine's random device, with the result that you
+     can wait a minute or more for a single command to finish.</para>
+
+     <para>To work around this limitation on virtual machines, make sure you
+     install something that generates enough random data, such as a <link
+     xlink:show="new" xlink:href="http://www.vanheusden.com/te/">timer entropy
+     daemon</link>.</para>
+    </answer>
+   </qandaentry>
+
    <qandaentry xml:id="opendj-missing-schema">
     <question>
      <para>I added OpenDJ as a data store, and now I cannot add a user. OpenAM
