@@ -20,7 +20,7 @@
   !
   ! CCPL HEADER END
   !
-  !      Copyright 2011-2012 ForgeRock AS
+  !      Copyright 2011-2013 ForgeRock, Inc.
   !    
 -->
 <chapter xml:id='chap-msiis-7'
@@ -526,16 +526,16 @@ Key ==> sxVoaDRAN0o=</screen>
     <para>To set the encrypted password in the AUTH_PASSWORD header, in the
     OpenAM console under Access Control &gt;
     <replaceable>realm-name</replaceable> &gt; Agents &gt; Web &gt;
-    <replaceable>agent-name</replaceable> &gt; Advanced &gt; Microsoft IIS
-    Server, select Show Password in HTTP Header, and then Save your work.</para>
+    <replaceable>agent-name</replaceable> &gt; Advanced &gt; Custom Properties, 
+    add <literal>com.sun.identity.agents.config.iis.password.header=true</literal>.</para>
    </step>
 
    <step>
     <para>To have the agent perform Windows logon (for user token
     impersonation), in the OpenAM console under Access Control &gt;
     <replaceable>realm-name</replaceable> &gt; Agents &gt; Web &gt;
-    <replaceable>agent-name</replaceable> &gt; Advanced &gt; Microsoft IIS
-    Server, select Logon and Impersonation, and then Save your work.</para>
+    <replaceable>agent-name</replaceable> &gt; Advanced &gt; Custom Properties, 
+    add <literal>com.sun.identity.agents.config.iis.logonuser=true</literal>.</para>
    </step>
 
    <step>
