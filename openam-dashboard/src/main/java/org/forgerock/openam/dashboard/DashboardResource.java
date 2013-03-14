@@ -122,8 +122,7 @@ public final class DashboardResource implements CollectionResourceProvider {
             Resource resource = new Resource("0", String.valueOf(System.currentTimeMillis() ), val);
             handler.handleResult(resource);
         } catch (SSOException ex) {
-            final ResourceException e = new NotSupportedException("SSOToken Error");
-            handler.handleError(e);
+            handler.handleError(new PermanentException(401, "Unauthorized", null));
         }
 
     }

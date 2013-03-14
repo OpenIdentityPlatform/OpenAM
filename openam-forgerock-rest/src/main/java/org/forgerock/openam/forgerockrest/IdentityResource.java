@@ -169,7 +169,7 @@ public final class IdentityResource implements CollectionResourceProvider {
         } catch (final TokenExpired tokenExpired) {
             RestDispatcher.debug.error("IdentityResource.createInstance() :: Cannot CREATE " +
                     resourceId + ":" + tokenExpired);
-            handler.handleError(new ForbiddenException("Token is expired", tokenExpired));
+            handler.handleError(new PermanentException(401, "Unauthorized", null));
         } catch (final NeedMoreCredentials needMoreCredentials) {
             RestDispatcher.debug.error("IdentityResource.createInstance() :: Cannot CREATE " +
                     needMoreCredentials);
@@ -220,7 +220,7 @@ public final class IdentityResource implements CollectionResourceProvider {
         } catch (final TokenExpired tokenExpired) {
             RestDispatcher.debug.error("IdentityResource.deleteInstance() :: Cannot DELETE " +
                     resourceId + ":" + tokenExpired);
-            handler.handleError(new ForbiddenException("Token is expired", tokenExpired));
+            handler.handleError(new PermanentException(401, "Unauthorized", null));
         } catch (final AccessDenied accessDenied) {
             RestDispatcher.debug.error("IdentityResource.deleteInstance() :: Cannot DELETE " +
                     resourceId + ":" + accessDenied);
@@ -378,7 +378,7 @@ public final class IdentityResource implements CollectionResourceProvider {
         } catch (final TokenExpired tokenExpired) {
             RestDispatcher.debug.error("IdentityResource.readInstance() :: Cannot READ " +
                     resourceId + ":" + tokenExpired);
-            handler.handleError(new ForbiddenException("Token is expired", tokenExpired));
+            handler.handleError(new PermanentException(401, "Unauthorized", null));
         } catch (final AccessDenied accessDenied) {
             RestDispatcher.debug.error("IdentityResource.readInstance() :: Cannot READ " +
                     resourceId + ":" + accessDenied);
@@ -442,7 +442,7 @@ public final class IdentityResource implements CollectionResourceProvider {
             } catch (final TokenExpired tokenExpired) {
                 RestDispatcher.debug.error("IdentityResource.updateInstance() :: Cannot CREATE " +
                         resourceId + ":" + tokenExpired);
-                handler.handleError(new ForbiddenException("Token is expired", tokenExpired));
+                handler.handleError(new PermanentException(401, "Unauthorized", null));
             } catch (final Exception e) {
                 RestDispatcher.debug.error("IdentityResource.updateInstance() :: Cannot UPDATE! " + e);
             }
@@ -453,7 +453,7 @@ public final class IdentityResource implements CollectionResourceProvider {
         } catch (final TokenExpired tokenExpired) {
             RestDispatcher.debug.error("IdentityResource.updateInstance() :: Cannot UPDATE " +
                     resourceId + ":" + tokenExpired);
-            handler.handleError(new ForbiddenException("Token is expired", tokenExpired));
+            handler.handleError(new PermanentException(401, "Unauthorized", null));
         } catch (final AccessDenied accessDenied) {
             RestDispatcher.debug.error("IdentityResource.updateInstance() :: Cannot UPDATE " +
                     resourceId + ":" + accessDenied);
