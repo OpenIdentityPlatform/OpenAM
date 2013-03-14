@@ -1,7 +1,7 @@
 /*
  * DO NOT REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright (c) 2012 ForgeRock Inc. All rights reserved.
+ * Copyright (c) 2012-2013 ForgeRock Inc. All rights reserved.
  *
  * The contents of this file are subject to the terms
  * of the Common Development and Distribution License
@@ -19,14 +19,19 @@
  * If applicable, add the following below the CDDL Header,
  * with the fields enclosed by brackets [] replaced by
  * your own identifying information:
- * "Portions Copyrighted [2012] [Forgerock Inc]"
+ * "Portions copyright [year] [name of copyright owner]"
  */
 
 package org.forgerock.openam.oauth2.provider.impl;
 
 import com.iplanet.sso.SSOToken;
 import com.sun.identity.idm.*;
+import com.sun.identity.idm.server.IdServicesProviderImpl;
+import com.sun.identity.idsvcs.*;
 import com.sun.identity.security.AdminTokenAction;
+import com.sun.identity.shared.OAuth2Constants;
+import com.sun.identity.sm.ServiceConfig;
+import com.sun.identity.sm.ServiceConfigManager;
 import org.forgerock.openam.oauth2.exceptions.OAuthProblemException;
 import org.forgerock.openam.oauth2.model.AccessToken;
 import org.forgerock.openam.oauth2.provider.Scope;
@@ -104,7 +109,9 @@ public class ScopeImpl implements Scope {
         if (resourceOwner != null){
             AMIdentity id = null;
             try {
-            id = getIdentity(resourceOwner, token.getRealm());
+            Set<String> authAttributes = getAuthenticationAttributesForService(token.getRealm());
+            id = getIdentity(resourceOwner, token.getRealm(), authAttributes);
+
             } catch (Exception e){
                 OAuth2Utils.DEBUG.error("Unable to get user identity", e);
             }
@@ -125,7 +132,7 @@ public class ScopeImpl implements Scope {
         return map;
     }
 
-    private AMIdentity getIdentity(String uName, String realm) throws OAuthProblemException {
+    private AMIdentity getIdentity(String uName, String realm, Set<String> authAttributes) throws OAuthProblemException {
         SSOToken token = (SSOToken) AccessController.doPrivileged(AdminTokenAction.getInstance());
         AMIdentity theID = null;
 
@@ -140,14 +147,22 @@ public class ScopeImpl implements Scope {
             idsc.setMaxResults(0);
             IdSearchResults searchResults =
                     amIdRepo.searchIdentities(IdType.USER, uName, idsc);
-            if (searchResults != null) {
+            if (searchResults != null && !searchResults.getResultAttributes().isEmpty()) {
                 results = searchResults.getSearchResults();
+            } else {
+                Map<String, Set<String>> avPairs = toAvPairMap(authAttributes, uName);
+                idsc.setSearchModifiers(IdSearchOpModifier.OR, avPairs);
+                searchResults =
+                        amIdRepo.searchIdentities(IdType.USER, "*", idsc);
+                if (searchResults != null) {
+                    results = searchResults.getSearchResults();
+                }
             }
 
             if (results == null || results.size() != 1) {
+                OAuth2Utils.DEBUG.error("ScopeImpl.getIdentity()::No user profile or more than one profile found.");
                 throw OAuthProblemException.OAuthError.UNAUTHORIZED_CLIENT.handle(null,
                         "Not able to get client from OpenAM");
-
             }
 
             theID = results.iterator().next();
@@ -161,6 +176,41 @@ public class ScopeImpl implements Scope {
         } catch (Exception e){
             OAuth2Utils.DEBUG.error("ClientVerifierImpl::Unable to get client AMIdentity: ", e);
             throw OAuthProblemException.OAuthError.UNAUTHORIZED_CLIENT.handle(null, "Not able to get client from OpenAM");
+        }
+    }
+
+    private Map toAvPairMap(Set names, String token) {
+        if (token == null) {
+            return Collections.EMPTY_MAP;
+        }
+        Map map = new HashMap();
+        Set set = new HashSet();
+        set.add(token);
+        if (names == null || names.isEmpty()) {
+            return map;
+        }
+        Iterator it = names.iterator();
+        while (it.hasNext()) {
+            map.put((String) it.next(), set);
+        }
+        return map;
+    }
+
+    private Set<String> getAuthenticationAttributesForService(String realm){
+        if (realm == null){
+            //default realm
+            realm = "/";
+        }
+        try {
+            SSOToken token = (SSOToken) AccessController.doPrivileged(AdminTokenAction.getInstance());
+            ServiceConfigManager mgr = new ServiceConfigManager(token, OAuth2Constants.OAuth2ProviderService.NAME, OAuth2Constants.OAuth2ProviderService.VERSION);
+            ServiceConfig scm = mgr.getOrganizationConfig(realm, null);
+            Map<String, Set<String>> attrs = scm.getAttributes();
+            return attrs.get(OAuth2Constants.OAuth2ProviderService.AUTHENITCATION_ATTRIBUTES);
+        } catch (Exception e) {
+            OAuth2Utils.DEBUG.error("ScopeImpl::Unable to read service settings", e);
+            throw OAuthProblemException.OAuthError.SERVER_ERROR.handle(null,
+                    "Unable to read service settings");
         }
     }
 
