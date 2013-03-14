@@ -86,44 +86,6 @@
         </resources>
         <plugins>
             <plugin>
-                <groupId>org.apache.portals.jetspeed-2</groupId>
-                <artifactId>jetspeed-unpack-maven-plugin</artifactId>
-                <executions>
-                    <execution>
-                        <phase>generate-resources</phase>
-                        <goals>
-                            <goal>unpack</goal>
-                        </goals>
-                    </execution>
-                </executions>
-                <dependencies>
-                    <dependency>
-                        <groupId>org.forgerock.openam</groupId>
-                        <artifactId>openam-server</artifactId>
-                        <version>${project.version}</version>
-                        <type>war</type>
-                    </dependency>
-                </dependencies>
-                <configuration>
-                    <unpack>
-                        <artifact>org.forgerock.openam:openam-server:war</artifact>
-                        <resources>
-                            <resource>
-                                <path>WEB-INF/classes</path>
-                                <include>*.properties</include>
-                                <flat>true</flat>
-                                <destination>generated-resources</destination>
-                            </resource>
-                            <resource>
-                                <path>META-INF/services</path>
-                                <include>com.sun.xml.ws.api.pipe.TransportPipeFactory</include>
-                                <destination>generated-resources/META-INF/services</destination>
-                            </resource>
-                        </resources>
-                    </unpack>
-                </configuration>
-            </plugin>
-            <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-shade-plugin</artifactId>
                 <executions>
@@ -144,6 +106,7 @@
                         <includes>
                             <include>org.forgerock.commons:forgerock-util</include>
                             <include>org.forgerock.openam:openam-core</include>
+                            <include>org.forgerock.openam:openam-locale</include>
                             <include>org.forgerock.openam:openam-shared</include>
                             <include>org.forgerock.openam:openam-dtd-schema</include>
                             <include>org.forgerock.openam:openam-jaxrpc-schema</include>
@@ -324,6 +287,7 @@
                         <filter>
                             <artifact>org.forgerock.openam:OpenFM</artifact>
                             <includes>
+                                <include>META-INF/services/com.sun.xml.ws.api.pipe.TransportPipeFactory</include>
                                 <include>com/sun/identity/classloader/**</include>
                                 <include>com/sun/identity/configuration/FedSystemProperties*</include>
                                 <include>com/sun/identity/liberty/ws/soapbinding/WebServiceAuthenticatorImpl*</include>
@@ -446,6 +410,46 @@
                             </includes>
                         </filter>
                         <filter>
+                            <artifact>org.forgerock.openam:openam-locale</artifact>
+                            <includes>
+                                <include>amAuth.properties</include>
+                                <include>amAuthContext.properties</include>
+                                <include>amIdRepo.properties</include>
+                                <include>amNaming.properties</include>
+                                <include>amPolicy.properties</include>
+                                <include>amProfile.properties</include>
+                                <include>amSDK.properties</include>
+                                <include>amSSOProvider.properties</include>
+                                <include>amSecurity.properties</include>
+                                <include>amSession.properties</include>
+                                <include>amUtilMsgs.properties</include>
+                                <include>debugconfig.properties</include>
+                                <include>famSTS.properties</include>
+                                <include>fmConfigurationService.properties</include>
+                                <include>fmLibertySecurity.properties</include>
+                                <include>fmSessionProvider.properties</include>
+                                <include>fmWSSProvider.properties</include>
+                                <include>fmWSSecurity.properties</include>
+                                <include>libAuthnSvc.properties</include>
+                                <include>libBinarySecurityToken.properties</include>
+                                <include>libConfigurationManager.properties</include>
+                                <include>libDSTService.properties</include>
+                                <include>libDisco.properties</include>
+                                <include>libEncryption.properties</include>
+                                <include>libIDFF.properties</include>
+                                <include>libIDFFMeta.properties</include>
+                                <include>libInteraction.properties</include>
+                                <include>libLibertySecurity.properties</include>
+                                <include>libPersonalProfile.properties</include>
+                                <include>libSAML.properties</include>
+                                <include>libSAML2.properties</include>
+                                <include>libSAML2Meta.properties</include>
+                                <include>libSOAPBinding.properties</include>
+                                <include>libSessionProvider.properties</include>
+                                <include>libXACML.properties</include>
+                           </includes>
+                        </filter>
+                        <filter>
                             <artifact>org.json:json</artifact>
                             <includes>
                                 <include>**/**</include>
@@ -491,17 +495,18 @@
         <dependency>
             <groupId>org.forgerock.openam</groupId>
             <artifactId>openam-jaxrpc-schema</artifactId>
-            <version>${project.version}</version>
         </dependency>
         <dependency>
             <groupId>org.forgerock.openam</groupId>
             <artifactId>openam-dtd-schema</artifactId>
-            <version>${project.version}</version>
         </dependency>
         <dependency>
             <groupId>org.forgerock.openam</groupId>
             <artifactId>OpenFM</artifactId>
-            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.forgerock.openam</groupId>
+            <artifactId>openam-locale</artifactId>
         </dependency>
     </dependencies>
 </project>

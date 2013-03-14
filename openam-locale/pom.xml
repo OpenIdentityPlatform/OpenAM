@@ -106,6 +106,29 @@
                                                 <exclude name="SMS.properties"/>
                                                 <exclude name="authentication_util.properties"/>
                                             </fileset>
+                                </copy>
+                                <copy todir="${locale.target.resources.dir}" flatten="true">
+                                    <fileset dir="${locale.resources.i18n.dir}" includes="*.properties">
+                                                <exclude name="Services.properties"/>
+                                                <exclude name="ums.properties"/>
+                                                <exclude name="sso.properties"/>
+                                                <exclude name="SMS.properties"/>
+                                                <exclude name="authentication_util.properties"/>
+                                            </fileset>
+                                    <fileset dir="${library.resources.i18n.dir}" includes="*.properties">
+                                                <exclude name="Services.properties"/>
+                                                <exclude name="ums.properties"/>
+                                                <exclude name="sso.properties"/>
+                                                <exclude name="SMS.properties"/>
+                                                <exclude name="authentication_util.properties"/>
+                                            </fileset>
+                                    <fileset dir="${openfm.resources.i18n.dir}" includes="*.properties">
+                                                <exclude name="Services.properties"/>
+                                                <exclude name="ums.properties"/>
+                                                <exclude name="sso.properties"/>
+                                                <exclude name="SMS.properties"/>
+                                                <exclude name="authentication_util.properties"/>
+                                            </fileset>
                                     <globmapper from="*.properties" to="*_en.properties"/>
                                 </copy>
 
