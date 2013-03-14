@@ -26,7 +26,9 @@
  *
  */
 
-
+/**
+ * Portions Copyrighted 2013 ForgeRock, Inc.
+ */
 package com.sun.identity.saml2.plugins;
 
 import java.security.PrivateKey;
@@ -38,10 +40,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Iterator;
 
-import com.sun.identity.shared.datastruct.CollectionHelper;
 import com.sun.identity.plugin.datastore.DataStoreProviderException;
-import com.sun.identity.plugin.datastore.DataStoreProvider;
-import com.sun.identity.plugin.datastore.DataStoreProviderManager;
 
 import com.sun.identity.saml2.assertion.Attribute;
 import com.sun.identity.saml2.assertion.AttributeStatement;
@@ -52,11 +51,7 @@ import com.sun.identity.saml2.assertion.NameID;
 import com.sun.identity.saml2.common.SAML2Exception;
 import com.sun.identity.saml2.common.SAML2Constants;
 import com.sun.identity.saml2.common.SAML2Utils;
-import com.sun.identity.saml2.common.NameIDInfoKey;
 import com.sun.identity.saml2.key.KeyUtil;
-import com.sun.identity.saml2.meta.SAML2MetaException;
-import com.sun.identity.saml2.meta.SAML2MetaUtils;
-import com.sun.identity.saml2.jaxb.entityconfig.SPSSOConfigElement;
 
 /**
  * This class <code>DefaultLibrarySPAccountMapper</code> is the default 
@@ -168,14 +163,11 @@ public class DefaultLibrarySPAccountMapper extends DefaultAccountMapper
         }
 
         // Check if this is an auto federation case.
-        userID = getAutoFedUser(realm, hostEntityID, assertion);
+        userID = getAutoFedUser(realm, hostEntityID, assertion, nameID.getValue());
         if ((userID != null) && (userID.length() != 0)) {
             return userID;
         } else {
-            // check if we need to use value of Name ID as SP user account
-            String useNameID = getAttribute(realm, hostEntityID, 
-                SAML2Constants.USE_NAMEID_AS_SP_USERID);
-            if ((useNameID != null) && useNameID.equalsIgnoreCase("true")) {
+            if (useNameIDAsSPUserID(realm, hostEntityID) && ! isAutoFedEnabled(realm, hostEntityID)) {
                 if (debug.messageEnabled()) {
                      debug.message("DefaultLibrarySPAccountMapper.getIdentity:"
                          + " use NameID value as userID: " + nameID.getValue());
@@ -201,6 +193,14 @@ public class DefaultLibrarySPAccountMapper extends DefaultAccountMapper
                  SAML2Constants.TRANSIENT_FED_USER);
     }
 
+    private boolean useNameIDAsSPUserID(String realm, String entityID) {
+        return Boolean.valueOf(getAttribute(realm, entityID, SAML2Constants.USE_NAMEID_AS_SP_USERID));
+    }
+
+    private boolean isAutoFedEnabled(String realm, String entityID) {
+        return Boolean.valueOf(getAttribute(realm, entityID, SAML2Constants.AUTO_FED_ENABLED));
+    }
+
     /**
      * Returns user for the auto federate attribute.
      *
@@ -212,11 +212,11 @@ public class DefaultLibrarySPAccountMapper extends DefaultAccountMapper
      *         null if the statement does not have the auto federation 
      *         attribute.
      */ 
-    protected String getAutoFedUser(String realm, 
-           String entityID, Assertion assertion) throws SAML2Exception {
+    protected String getAutoFedUser(String realm, String entityID, Assertion assertion, String decryptedNameID)
+            throws SAML2Exception {
 
-        List attributeStatements = assertion.getAttributeStatements();
-        if(attributeStatements == null || attributeStatements.size() == 0) {
+        List<AttributeStatement> attributeStatements = assertion.getAttributeStatements();
+        if(attributeStatements == null || attributeStatements.isEmpty()) {
            if(debug.messageEnabled()) { 
               debug.message("DefaultLibrarySPAccountMapper.getAutoFedUser: " +
               "Assertion does not have attribute statements.");
@@ -224,15 +224,11 @@ public class DefaultLibrarySPAccountMapper extends DefaultAccountMapper
            return null;
         }
 
-        String autoFedEnable = getAttribute(realm, 
-               entityID, SAML2Constants.AUTO_FED_ENABLED);
-
-        if(autoFedEnable == null || autoFedEnable.equals("false")) {
-           if(debug.messageEnabled()) { 
-              debug.message("DefaultLibrarySPAccountMapper.getAutoFedUser: " +
-              "Auto federation is disabled.");
-           }
-           return null;
+        if (!isAutoFedEnabled(realm, entityID)) {
+            if (debug.messageEnabled()) {
+                debug.message("DefaultLibrarySPAccountMapper.getAutoFedUser: Auto federation is disabled.");
+            }
+            return null;
         }
        
         String autoFedAttribute = getAttribute(realm, entityID,
@@ -246,27 +242,29 @@ public class DefaultLibrarySPAccountMapper extends DefaultAccountMapper
            return null;
         }
         
-        Set autoFedAttributeValue = null;
-        Iterator iter = attributeStatements.iterator();
-
-        while(iter.hasNext()) {
-
-           AttributeStatement statement = (AttributeStatement)iter.next();
-           autoFedAttributeValue = 
-              getAttribute(statement, autoFedAttribute, realm, entityID);
-           if(autoFedAttributeValue != null && 
-              !autoFedAttributeValue.isEmpty()) {
-              break;
-           }
+        Set<String> autoFedAttributeValue = null;
+        for (AttributeStatement statement : attributeStatements) {
+            autoFedAttributeValue = getAttribute(statement, autoFedAttribute, realm, entityID);
+            if (autoFedAttributeValue != null && !autoFedAttributeValue.isEmpty()) {
+                break;
+            }
         }
 
-        if(autoFedAttributeValue == null ||
-           autoFedAttributeValue.isEmpty()) {
-           if(debug.messageEnabled()) {
-              debug.message("DefaultLibrarySPAccountMapper.getAutoFedUser: " +
-              "Auto federation attribute is not specified in the assertion.");
-           }
-           return null;
+        if (autoFedAttributeValue == null || autoFedAttributeValue.isEmpty()) {
+            if (debug.messageEnabled()) {
+                debug.message("DefaultLibrarySPAccountMapper.getAutoFedUser: Auto federation attribute is not specified "
+                        + "as an attribute.");
+            }
+            if (!useNameIDAsSPUserID(realm, entityID)) {
+                return null;
+            } else {
+                if (debug.messageEnabled()) {
+                    debug.message("DefaultLibrarySPAccountMapper.getAutoFedUser: Trying now to autofederate with nameID, "
+                            + "nameID =" + decryptedNameID);
+                }
+                autoFedAttributeValue = new HashSet<String>(1);
+                autoFedAttributeValue.add(decryptedNameID);
+            }
         }
 
         DefaultSPAttributeMapper attributeMapper = 
