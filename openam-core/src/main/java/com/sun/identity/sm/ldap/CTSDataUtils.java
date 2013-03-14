@@ -1,7 +1,7 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright (c) 2012 ForgeRock US Inc. All Rights Reserved
+ * Copyright (c) 2012-2013 ForgeRock Inc. All Rights Reserved
  *
  * The contents of this file are subject to the terms of the Common Development and
  * Distribution License (the License). You may not use this file except in compliance with the
@@ -24,19 +24,18 @@ package com.sun.identity.sm.ldap;
 import com.iplanet.dpro.session.exceptions.StoreException;
 import com.iplanet.dpro.session.service.SessionService;
 import com.sun.identity.common.LDAPUtils;
+import com.sun.identity.setup.AMSetupServlet;
 import com.sun.identity.setup.SetupConstants;
 import com.sun.identity.shared.debug.Debug;
 import com.sun.identity.shared.ldap.*;
 import com.sun.identity.shared.ldap.util.LDIF;
-import com.sun.identity.shared.ldap.util.LDIFRecord;
-import org.forgerock.i18n.LocalizableMessage;
-
-import static org.forgerock.openam.session.ha.i18n.AmsessionstoreMessages.*;
-
-import java.io.*;
+import java.io.ByteArrayInputStream;
+import java.io.DataInputStream;
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Scanner;
+import org.forgerock.i18n.LocalizableMessage;
+import static org.forgerock.openam.session.ha.i18n.AmsessionstoreMessages.*;
 
 /**
  * Public class to provide Additional Data Utilities for the CTS Directory Store
@@ -45,10 +44,6 @@ import java.util.Scanner;
  * @author jeff.schenk@forgerock.com
  */
 class CTSDataUtils {
-    /**
-     * Application File Path Global.
-     */
-    private File WEB_APPLICATION_PATH = null;
     private static final String WEB_INF = "/WEB-INF";
     /**
      * Debug Logging
@@ -79,23 +74,21 @@ class CTSDataUtils {
         this.ctsPersistentStore = ctsPersistentStore;
         CONTAINERS_TO_BE_VALIDATED = new String[8];
         CONTAINERS_TO_BE_VALIDATED[0] =
-                ctsPersistentStore.getBASE_ROOT_DN();
+                CTSPersistentStore.getBASE_ROOT_DN();
         CONTAINERS_TO_BE_VALIDATED[1] =
-                ctsPersistentStore.getTokenRoot();
+                CTSPersistentStore.getTokenRoot();
         CONTAINERS_TO_BE_VALIDATED[2] =
-                ctsPersistentStore.getTokenSessionHaRootDn();
+                CTSPersistentStore.getTokenSessionHaRootDn();
         CONTAINERS_TO_BE_VALIDATED[3] =
-                ctsPersistentStore.getTokenSaml2HaRootDn();
+                CTSPersistentStore.getTokenSaml2HaRootDn();
         CONTAINERS_TO_BE_VALIDATED[4] =
-                ctsPersistentStore.getTokenOauth2HaRootDn();
+                CTSPersistentStore.getTokenOauth2HaRootDn();
         CONTAINERS_TO_BE_VALIDATED[5] =
-                ctsPersistentStore.getSessionFailoverHaBaseDn();
+                CTSPersistentStore.getSessionFailoverHaBaseDn();
         CONTAINERS_TO_BE_VALIDATED[6] =
-                ctsPersistentStore.getSaml2HaBaseDn();
+                CTSPersistentStore.getSaml2HaBaseDn();
         CONTAINERS_TO_BE_VALIDATED[7] =
-                ctsPersistentStore.getOauth2HaBaseDn();
-        // Obtain our True Application Path.
-        obtainWebApplicationPath();
+                CTSPersistentStore.getOauth2HaBaseDn();
     }
 
     /**
@@ -170,28 +163,22 @@ class CTSDataUtils {
             // For upgrading DIT from a pre-10.1.0-Xpress State.
             // Perform LDIF processing
             for (String ldifFilename : UPGRADE_LDIF_SCHEMA_FILENAMES) {
-                if (!loadLDIF(ldapConnection, WEB_APPLICATION_PATH.getAbsolutePath() + ldifFilename)) {
-                    DEBUG.error("Unable to perform Load of LDIF Schema Filename:[" + WEB_APPLICATION_PATH.getAbsolutePath() + ldifFilename + "]");
+                if (!loadLDIF(ldapConnection, AMSetupServlet.getRealPath(ldifFilename))) {
+                    DEBUG.error("Unable to perform Load of LDIF Schema Filename:[" + AMSetupServlet.getRealPath(ldifFilename) + "]");
                 } else {
-                    DEBUG.message("Load of LDIF Schema Filename:[" + WEB_APPLICATION_PATH.getAbsolutePath() + ldifFilename + "], was successful.");
+                    DEBUG.message("Load of LDIF Schema Filename:[" + AMSetupServlet.getRealPath(ldifFilename) + "], was successful.");
                 }
             } // end of for each iteration over LDIF File to be run against our current CTS Backend.
             // *************************************************
             // For upgrading DIT from a pre-10.1.0-Xpress State.
             // Perform LDIF processing for any Files which require Tag Swapping
             for (String ldifFilename : UPGRADE_LDIF_DIT_FILENAMES) {
-                StringBuffer sb = new StringBuffer();
                 try {
-                    File ldifFile = new File(WEB_APPLICATION_PATH.getAbsolutePath() + ldifFilename);
-                    Scanner scanner =
-                            new Scanner(ldifFile).useDelimiter("\\Z"); // Scan/Consume file until EoF.
-                    sb.append(scanner.next());
-                    scanner.close();
+                    StringBuffer sb = AMSetupServlet.readFile(ldifFilename);
                     // Feed our LDIF to Tag Swapped Data as Input to update DIT.
                     // Right now only one element needs to be Tagged Swapped.
-                    String fileContents = sb.toString().replaceAll("@"+SetupConstants.SM_CONFIG_ROOT_SUFFIX+"@", ctsPersistentStore.getBASE_ROOT_DN());
-                    DataInputStream dataInputStream = new DataInputStream(new BufferedInputStream(
-                            new ByteArrayInputStream(fileContents.getBytes())));
+                    String fileContents = sb.toString().replace("@"+SetupConstants.SM_CONFIG_ROOT_SUFFIX+"@", CTSPersistentStore.getBASE_ROOT_DN());
+                    DataInputStream dataInputStream = new DataInputStream(new ByteArrayInputStream(fileContents.getBytes()));
                     LDIF ldif = new LDIF(dataInputStream);
                     // Load the LDIF.
                     LDAPUtils.createSchemaFromLDIF(ldif, ldapConnection);
@@ -251,7 +238,7 @@ class CTSDataUtils {
             ldapConnection = ctsPersistentStore.getDirectoryConnection();
             // Perform the Search.
             LDAPSearchResults searchResults = ldapConnection.search(dn,
-                    LDAPv2.SCOPE_BASE, ctsPersistentStore.getAnyObjectclassFilter(), ctsPersistentStore.getReturnAttrs_DN_ONLY_ARRAY(), false, new LDAPSearchConstraints());
+                    LDAPv2.SCOPE_BASE, CTSPersistentStore.getAnyObjectclassFilter(), CTSPersistentStore.getReturnAttrs_DN_ONLY_ARRAY(), false, new LDAPSearchConstraints());
             if ((searchResults == null) || (!searchResults.hasMoreElements())) {
                 return false;
             }
@@ -272,23 +259,4 @@ class CTSDataUtils {
             }
         }
     }
-
-    /**
-     * Private helper method to obtain the true path of our WEB Application Directory.
-     * This will allow us to locate various Files during upgrading processing.
-     */
-    private void obtainWebApplicationPath() {
-        File myClass = new File(getClass().getProtectionDomain().getCodeSource().getLocation().getFile());
-        // Peel Off the suffix .../WEB-INF/lib/<core jar filename>
-        while (myClass != null) {
-            myClass = myClass.getParentFile();
-            if (!myClass.getAbsolutePath().contains(WEB_INF)) {
-                break;
-            }
-        } // end of while loop
-        // *************************************************
-        // Set our Global Variable for File resolution.
-        WEB_APPLICATION_PATH = new File(myClass.getAbsolutePath().replaceAll("%20", " "));
-    }
-
 }

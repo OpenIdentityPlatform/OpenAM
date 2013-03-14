@@ -27,7 +27,7 @@
  */
 
 /*
- * Portions Copyrighted 2010-2012 ForgeRock Inc
+ * Portions Copyrighted 2010-2013 ForgeRock Inc
  */
 
 package com.sun.identity.setup;
@@ -1372,7 +1372,11 @@ public class AMSetupServlet extends HttpServlet {
             throw new ConfiguratorException("Servlet Context is null");
         }
     }
-    
+
+    public static String getRealPath(String path) {
+        return servletCtx.getRealPath(path);
+    }
+
     public static String getNormalizedRealPath(ServletContext servletCtx) {
         String path = null;
         if (servletCtx != null) {
@@ -1572,7 +1576,7 @@ public class AMSetupServlet extends HttpServlet {
         return mapFileNameToContent;
     }
     
-    private static StringBuffer readFile(String file) 
+    public static StringBuffer readFile(String file)
         throws IOException {
         InputStreamReader fin = null;
         StringBuffer sbuf = new StringBuffer();
