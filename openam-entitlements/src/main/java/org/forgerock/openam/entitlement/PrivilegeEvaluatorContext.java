@@ -1,7 +1,7 @@
 /**
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright (c) 2010 ForgeRock AS. All Rights Reserved
+ * Copyright (c) 2010-2013 ForgeRock, Inc. All Rights Reserved
  *
  * The contents of this file are subject to the terms
  * of the Common Development and Distribution License
@@ -25,6 +25,7 @@
 
 package org.forgerock.openam.entitlement;
 
+import com.sun.identity.entitlement.ConditionDecision;
 import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
@@ -41,6 +42,11 @@ public class PrivilegeEvaluatorContext implements Serializable {
     private String resourceName;
     private String applicationName;
     private Map<String, Object> attributes = new HashMap(2);
+    /**
+     * An entitlement condition decision cache, where the condition decisions are cached based on the condition's JSON
+     * representation.
+     */
+    private Map<String, ConditionDecision> conditionDecisionCache = new HashMap<String, ConditionDecision>();
     private static ThreadLocal <PrivilegeEvaluatorContext> currentCtx = new ThreadLocal();
 
     /**
@@ -119,5 +125,14 @@ public class PrivilegeEvaluatorContext implements Serializable {
      */
     public Object getAttribute(String key) {
         return attributes.get(key);
+    }
+
+    /**
+     * Return the condition decision cache.
+     *
+     * @return the condition decision cache.
+     */
+    public Map<String, ConditionDecision> getConditionDecisionCache() {
+        return conditionDecisionCache;
     }
 }

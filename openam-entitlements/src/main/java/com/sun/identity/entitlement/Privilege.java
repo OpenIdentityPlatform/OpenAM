@@ -26,7 +26,7 @@
  */
 
 /*
- * Portions Copyrighted [2010] [ForgeRock AS]
+ * Portions Copyrighted 2010-2013 ForgeRock, Inc.
  */
 
 package com.sun.identity.entitlement;
@@ -39,6 +39,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import javax.security.auth.Subject;
+import org.forgerock.openam.entitlement.CachingEntitlementCondition;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -443,14 +444,14 @@ public abstract class Privilege implements IPrivilege {
         if (!jo.has("eCondition")) {
             return null;
         }
-        
+
         JSONObject sbj = jo.getJSONObject("eCondition");
         try {
             Class clazz = Class.forName(sbj.getString("className"));
             EntitlementCondition eCondition = (EntitlementCondition)
                 clazz.newInstance();
             eCondition.setState(sbj.getString("state"));
-            return eCondition;
+            return new CachingEntitlementCondition(eCondition);
         } catch (InstantiationException ex) {
             PrivilegeManager.debug.error("Privilege.getECondition", ex);
         } catch (IllegalAccessException ex) {
