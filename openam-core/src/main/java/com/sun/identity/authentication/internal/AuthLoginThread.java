@@ -26,6 +26,9 @@
  *
  */
 
+/**
+ * Portions Copyrighted 2013 ForgeRock, Inc.
+ */
 package com.sun.identity.authentication.internal;
 
 import java.io.IOException;
@@ -63,13 +66,11 @@ public class AuthLoginThread extends Thread implements CallbackHandler {
         try {
             loginContext.loginContext.login();
             loginContext.setLoginStatus(AuthContext.AUTH_SUCCESS);
-            AuthContext.authDebug.message("AuthLoginThread::run() "
-                    + "successful login");
+            AuthContext.authDebug.message("AuthLoginThread::run() successful login");
         } catch (LoginException le) {
             loginContext.setLoginStatus(AuthContext.AUTH_FAILED);
             loginContext.loginException = le;
-            AuthContext.authDebug.message("AuthLoginThread::run() "
-                    + "exception during login; " + le);
+            AuthContext.authDebug.message("AuthLoginThread::run() exception during login; " + le);
         }
     }
 
@@ -81,8 +82,7 @@ public class AuthLoginThread extends Thread implements CallbackHandler {
      * AuthContext</code>
      * and sends it to the plug-ins.
      */
-    public void handle(Callback[] callback) throws IOException,
-            UnsupportedCallbackException {
+    public void handle(Callback[] callback) throws IOException, UnsupportedCallbackException {
         AuthContext.authDebug.message("AuthLoginThread::handle()");
 
         // Clear the previously submitted information
@@ -94,8 +94,7 @@ public class AuthLoginThread extends Thread implements CallbackHandler {
             // wake up threads waiting for this variable
             this.notify();
         }
-        AuthContext.authDebug.message("AuthLoginThread::handle() "
-                + "sent notify to wake up sleeping threads");
+        AuthContext.authDebug.message("AuthLoginThread::handle() sent notify to wake up sleeping threads");
 
         // check if the requested information is ready
         while (loginContext.submittedInformation == null) {
@@ -115,8 +114,7 @@ public class AuthLoginThread extends Thread implements CallbackHandler {
         }
 
         // Update the shared state and return the requested information
-        loginContext.loginContext
-                .updateSharedState(loginContext.submittedInformation);
+        loginContext.loginContext.updateSharedState(loginContext.submittedInformation);
         callback = loginContext.submittedInformation;
     }
 }
