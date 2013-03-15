@@ -46,7 +46,7 @@ import javax.security.auth.login.LoginException;
  */
 public class AuthLoginThread extends Thread implements CallbackHandler {
 
-    private AuthContext loginContext;
+    private AuthContext authContext;
 
     /**
      * Constructor for this class. Since it is protected, only classes in this
@@ -54,7 +54,7 @@ public class AuthLoginThread extends Thread implements CallbackHandler {
      */
     protected AuthLoginThread(AuthContext ctx) {
         AuthContext.authDebug.message("AuthLoginThread::Constructor");
-        loginContext = ctx;
+        authContext = ctx;
     }
 
     /**
@@ -64,12 +64,12 @@ public class AuthLoginThread extends Thread implements CallbackHandler {
     public void run() {
         AuthContext.authDebug.message("AuthLoginThread::run()");
         try {
-            loginContext.loginContext.login();
-            loginContext.setLoginStatus(AuthContext.AUTH_SUCCESS);
+            authContext.loginContext.login();
+            authContext.setLoginStatus(AuthContext.AUTH_SUCCESS);
             AuthContext.authDebug.message("AuthLoginThread::run() successful login");
         } catch (LoginException le) {
-            loginContext.setLoginStatus(AuthContext.AUTH_FAILED);
-            loginContext.loginException = le;
+            authContext.setLoginStatus(AuthContext.AUTH_FAILED);
+            authContext.loginException = le;
             AuthContext.authDebug.message("AuthLoginThread::run() exception during login; " + le);
         }
     }
@@ -86,24 +86,24 @@ public class AuthLoginThread extends Thread implements CallbackHandler {
         AuthContext.authDebug.message("AuthLoginThread::handle()");
 
         // Clear the previously submitted information
-        loginContext.submittedInformation = null;
+        authContext.submittedInformation = null;
 
         // Set the required information variable
         synchronized (this) {
-            loginContext.informationRequired = callback;
+            authContext.informationRequired = callback;
             // wake up threads waiting for this variable
             this.notify();
         }
         AuthContext.authDebug.message("AuthLoginThread::handle() sent notify to wake up sleeping threads");
 
         // check if the requested information is ready
-        while (loginContext.submittedInformation == null) {
+        while (authContext.submittedInformation == null) {
             // wait for the variable to be set
             try {
                 AuthContext.authDebug.message("AuthLoginThread::handle() "
                         + "waiting for Callbacks to be submitted");
                 synchronized (this) {
-                    if (loginContext.submittedInformation == null)
+                    if (authContext.submittedInformation == null)
                         this.wait();
                 }
                 AuthContext.authDebug.message("AuthLoginThread::handle() "
@@ -114,7 +114,7 @@ public class AuthLoginThread extends Thread implements CallbackHandler {
         }
 
         // Update the shared state and return the requested information
-        loginContext.loginContext.updateSharedState(loginContext.submittedInformation);
-        callback = loginContext.submittedInformation;
+        authContext.loginContext.updateSharedState(authContext.submittedInformation);
+        callback = authContext.submittedInformation;
     }
 }
