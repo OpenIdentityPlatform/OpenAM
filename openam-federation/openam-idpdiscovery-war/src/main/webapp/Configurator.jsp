@@ -26,7 +26,7 @@
 
 --%>
 <%--
-   Portions Copyrighted 2012 ForgeRock Inc
+   Portions Copyrighted 2012-2013 ForgeRock Inc
    Portions Copyrighted 2012 Open Source Solution Technology Corporation
 --%>
 
@@ -48,7 +48,7 @@ java.util.Properties"
 <%
     String configFile = System.getProperty("user.home") +
         File.separator + "libIDPDiscoveryConfig.properties";
-    String configTemplate = "/WEB-INF/classes/libIDPDiscoveryConfig.properties";
+    String configTemplate = "/libIDPDiscoveryConfig.properties";
     String errorMsg = null;
     boolean configured = false;
     String debugDir = null;
@@ -97,8 +97,7 @@ java.util.Properties"
                 props.setProperty("HTTP_ONLY_COOKIE", httpOnlyCookie);
                 try {
                     IDPDiscoveryWARConfigurator configurator = 
-                        new IDPDiscoveryWARConfigurator(
-                            getServletConfig().getServletContext());
+                        new IDPDiscoveryWARConfigurator();
                     configurator.createIDPDiscoveryConfig(configFile, 
                         configTemplate, props);
                     configurator.setIDPDiscoveryConfig(configFile);

@@ -25,14 +25,14 @@
  * $Id: IDPDiscoveryWARConfigurator.java,v 1.4 2008/08/19 19:11:14 veiming Exp $
  *
  */
-
+/**
+ * Portions Copyrighted 2013 ForgeRock, Inc.
+ */
 package com.sun.identity.saml2.idpdiscovery;
 
-import com.sun.identity.security.EncodeAction;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.FileInputStream;
-import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -40,22 +40,12 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.Iterator;
 import java.util.Properties;
-import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
 
 /**
  * This class is used to setup the OpenSSO IDP Discovery WAR.
  */
 public class IDPDiscoveryWARConfigurator {
-
-    ServletContext servletContext;
-
-    /**
-     * Constructor
-     */
-    public IDPDiscoveryWARConfigurator(ServletContext context) {
-        servletContext = context; 
-    }
 
     /**
      * Creates libIDPDiscoveryConfig.properties file
@@ -78,15 +68,13 @@ public class IDPDiscoveryWARConfigurator {
         out.close();
     }
 
-    private String getFileContent(String fileName)
-        throws IOException
-    {
-        InputStream in = servletContext.getResourceAsStream(fileName);
+    private String getFileContent(String fileName) throws IOException {
+        InputStream in = getClass().getResourceAsStream(fileName);
         if (in == null) {
             throw new IOException("Unable to open " + fileName);
         }
         BufferedReader reader = new BufferedReader(new InputStreamReader(in));
-        StringBuffer buff = new StringBuffer();
+        StringBuilder buff = new StringBuilder();
         String line = reader.readLine();
 
         while (line != null) {

@@ -50,6 +50,8 @@
     <modules>
         <!-- OpenAM Federation Modules -->
         <module>openam-federation-library</module>
+        <module>openam-idpdiscovery</module>
+        <module>openam-idpdiscovery-war</module>
         <module>OpenFM</module>
     </modules>
 

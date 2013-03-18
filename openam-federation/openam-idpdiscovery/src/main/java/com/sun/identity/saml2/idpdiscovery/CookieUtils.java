@@ -26,8 +26,9 @@
  *
  */
 
-
-
+/**
+ * Portions Copyrighted 2013 ForgeRock, Inc.
+ */
 package com.sun.identity.saml2.idpdiscovery;
 
 import java.io.IOException;
@@ -72,25 +73,9 @@ public class CookieUtils {
     public static final String BUNDLE_NAME = "libIDPDiscovery";
     // The resource bundle for IDP Discovery implementation.
     public static ResourceBundle bundle = Locale.getInstallResourceBundle(BUNDLE_NAME);
-    // Boolean to indicate if this is an IDP Discovery only WAR
-    private static boolean idpDiscoveryOnlyWar = false; 
     // error processing URL, read from system property
     private static String errorUrl = System.getProperty(
         IDPDiscoveryConstants.ERROR_URL_PARAM_NAME);
-    static {
-        try {
-            Class.forName("com.sun.identity.saml2.common.SAML2ConfigService",
-                false, Thread.currentThread().getContextClassLoader());
-        } catch (ClassNotFoundException cnfe) {
-            debug.message("CookieUtils.init: This is an IDP discovery WAR only",
-                cnfe);
-            idpDiscoveryOnlyWar = true;
-        }
-        if (debug.messageEnabled()) {
-            debug.message("CookieUtils.init : idpDiscoveryOnlyWar=" + 
-                idpDiscoveryOnlyWar);
-        }
-    }
 
     /**
      * Gets property value of "com.iplanet.am.cookie.secure"
@@ -350,58 +335,51 @@ public class CookieUtils {
     public static void sendError(HttpServletRequest request,
         HttpServletResponse response, int httpStatusCode,
         String errorCode, String errorMsg) {
-        if (!idpDiscoveryOnlyWar) {
-            // hosted with server, use server method
-            com.sun.identity.saml.common.SAMLUtils.sendError(
-                request, response, httpStatusCode, errorCode, errorMsg);
+        if ((errorUrl == null) || (errorUrl.length() == 0)) {
+            // no error processing URL set, use sendError
+            try {
+                response.sendError(httpStatusCode, errorMsg);
+            } catch (IOException ioe) {
+                debug.error("CookieUtils.sendError", ioe);
+            }
         } else {
-            // IDP discovery only WAR
-            if ((errorUrl == null) || (errorUrl.length() == 0)) {
-                // no error processing URL set, use sendError
-                try {
-                    response.sendError(httpStatusCode, errorMsg);
-                } catch (IOException ioe) {
-                    debug.error("CookieUtils.sendError", ioe);
-                }
-            } else {
-                // construct final URL
-                String jointString = "?";
-                if (errorUrl.indexOf("?") != -1) {
-                    jointString = "&";
-                } 
-                String newUrl = errorUrl.trim() + jointString 
-                    + "errorcode=" + errorCode + "&" 
+            // construct final URL
+            String jointString = "?";
+            if (errorUrl.indexOf("?") != -1) {
+                jointString = "&";
+            }
+            String newUrl = errorUrl.trim() + jointString
+                    + "errorcode=" + errorCode + "&"
                     + "httpstatuscode=" + httpStatusCode + "&"
                     + "errormessage=" + URLEncDec.encode(errorMsg);
-                if (debug.messageEnabled()) {
-                    debug.message("CookieUtils.sendError: final redirectionURL="
+            if (debug.messageEnabled()) {
+                debug.message("CookieUtils.sendError: final redirectionURL="
                         + newUrl);
+            }
+            String tmp = errorUrl.toLowerCase();
+            if (tmp.startsWith("http://") || tmp.startsWith("https://")) {
+                // send redirect
+                try {
+                    response.sendRedirect(newUrl);
+                } catch (IOException e) {
+                    debug.error("CookieUtils.sendError: Exception "
+                            + "occured while trying to redirect to resource:"
+                            + newUrl, e);
                 }
-                String tmp = errorUrl.toLowerCase();
-                if (tmp.startsWith("http://") || tmp.startsWith("https://")) {
-                    // send redirect
-                    try {
-                        response.sendRedirect(newUrl) ;
-                    } catch (IOException e) {
-                        debug.error("CookieUtils.sendError: Exception "
-                            + "occured while trying to redirect to resource:" 
-                            + newUrl , e);
-                    }
-                } else {
-                    // use forward
-                    try {
-                        RequestDispatcher dispatcher =
+            } else {
+                // use forward
+                try {
+                    RequestDispatcher dispatcher =
                             request.getRequestDispatcher(newUrl);
-                        dispatcher.forward(request, response);
-                    } catch (ServletException e) {
-                        debug.error("CookieUtils.sendError: Exception "
-                            + "occured while trying to forward to resource:" 
-                            + newUrl , e);
-                    } catch (IOException e) {
-                        debug.error("CookieUtils.sendError: Exception "
-                            + "occured while trying to forward to resource:" 
-                            + newUrl , e);
-                    }
+                    dispatcher.forward(request, response);
+                } catch (ServletException e) {
+                    debug.error("CookieUtils.sendError: Exception "
+                            + "occured while trying to forward to resource:"
+                            + newUrl, e);
+                } catch (IOException e) {
+                    debug.error("CookieUtils.sendError: Exception "
+                            + "occured while trying to forward to resource:"
+                            + newUrl, e);
                 }
             }
         }

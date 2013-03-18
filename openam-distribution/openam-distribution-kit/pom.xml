@@ -159,11 +159,14 @@
         </dependency>
         <dependency>
             <groupId>org.forgerock.openam</groupId>
+            <artifactId>openam-idpdiscovery-war</artifactId>
+            <type>war</type>
+        </dependency>
+        <dependency>
+            <groupId>org.forgerock.openam</groupId>
             <artifactId>openam-distribution-ssoconfiguratortools</artifactId>
             <type>zip</type>
         </dependency>
-
     </dependencies>
-
 </project>
 
