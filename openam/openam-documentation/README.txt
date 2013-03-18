@@ -6,6 +6,11 @@ the changes here reflect the published updates.
 
 Changes since the original tag:
 
+For Mar 18
+
+openam-doc-source/src/main/docbkx/release-notes/chap-before-you-install.xml
+    Fix for OPENAM-2282
+
 For Mar 07
 
 openam-doc-source/src/main/docbkx/release-notes/chap-whats-new.xml
