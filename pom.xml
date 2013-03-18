@@ -257,6 +257,7 @@
 
         <module>openam-xacml-resources</module>
 
+        <module>openam-examples</module>
     </modules>
 
     <!-- Developers -->
@@ -687,6 +688,18 @@
                 <groupId>org.forgerock.openam</groupId>
                 <artifactId>OpenFM</artifactId>
                 <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.forgerock.openam</groupId>
+                <artifactId>openam-example-clientsdk-cli</artifactId>
+                <version>${project.version}</version>
+                <type>zip</type>
+            </dependency>
+            <dependency>
+                <groupId>org.forgerock.openam</groupId>
+                <artifactId>openam-example-clientsdk-war</artifactId>
+                <version>${project.version}</version>
+                <type>war</type>
             </dependency>
             <dependency>
                 <groupId>org.forgerock.openam</groupId>
