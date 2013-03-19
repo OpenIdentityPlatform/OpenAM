@@ -10,6 +10,7 @@
     <!-- Library Dependency -->
     <dependencySets>
         <dependencySet>
+            <outputFileNameMapping>${artifact.artifactId}-${artifact.baseVersion}.${artifact.extension}</outputFileNameMapping>
             <outputDirectory>lib</outputDirectory>
             <includes>
                 <include>org.forgerock.openam:openam-shared</include>
@@ -28,6 +29,7 @@
                 <include>org.forgerock.openam:openam-wsfederation-schema</include>
                 <include>org.forgerock.openam:openam-distribution-amadmsetup</include>
                 <include>org.forgerock.opendj:opendj-server</include>
+                <include>org.forgerock.commons:forgerock-util</include>
                 <include>javax.xml:jaxrpc-api</include>
                 <include>external:jaxrpc-impl</include>
                 <include>com.sun.xml.rpc:jaxrpc-spi</include>

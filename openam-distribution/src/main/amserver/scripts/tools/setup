@@ -25,6 +25,8 @@
 # $Id: setup,v 1.11 2009/01/28 05:34:46 ww203982 Exp $
 #
 
+# Portions Copyrighted 2010-2013 ForgeRock, Inc.
+
 if [ -z "$JAVA_HOME" ]; then
   echo "Please define JAVA_HOME environment variable before running this program"
   echo "setup program will use the JVM defined in JAVA_HOME for all the CLI tools"
@@ -86,6 +88,7 @@ fi
 CLASSPATH=""
 CLASSPATH="lib/openam-distribution-amadmsetup-${project.version}.jar"
 CLASSPATH="$CLASSPATH:lib/opendj-server-2.4.6.jar"
+CLASSPATH="$CLASSPATH:lib/forgerock-util-${commons.forgerock-util.version}.jar"
 CLASSPATH="$CLASSPATH:lib/json-20090211.jar"
 CLASSPATH="$CLASSPATH:lib/xalan-2.7.1.jar"
 CLASSPATH="$CLASSPATH:lib/xercesImpl-2.10.0.jar"

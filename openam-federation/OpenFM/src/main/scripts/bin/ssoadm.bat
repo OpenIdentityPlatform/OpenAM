@@ -26,7 +26,7 @@
 : $Id: ssoadm.bat,v 1.19 2010/01/28 00:49:05 bigfatrat Exp $
 :
 
-: Portions Copyrighted 2010-2012 ForgeRock, Inc.
+: Portions Copyrighted 2010-2013 ForgeRock, Inc.
 
 setlocal
 
@@ -39,6 +39,7 @@ set ORIG_CLASSPATH=%CLASSPATH%
 
 set CLASSPATH="@CONFIG_DIR@"
 set CLASSPATH="%CLASSPATH%;%TOOLS_HOME%/classes;%TOOLS_HOME%/resources"
+set CLASSPATH="%CLASSPATH%;%TOOLS_HOME%/lib/forgerock-util-${commons.forgerock-util.version}.jar"
 set CLASSPATH="%CLASSPATH%;%TOOLS_HOME%/lib/openam-distribution-amadmsetup-${project.version}.jar"
 set CLASSPATH="%CLASSPATH%;%TOOLS_HOME%/lib/opendj-server-2.4.6.jar"
 set CLASSPATH="%CLASSPATH%;%TOOLS_HOME%/lib/mail-1.4.5.jar"

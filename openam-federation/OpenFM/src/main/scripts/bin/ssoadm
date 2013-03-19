@@ -25,7 +25,7 @@
 # $Id: ssoadm,v 1.20 2010/01/28 00:49:05 bigfatrat Exp $
 #
 
-# Portions Copyrighted 2010-2012 ForgeRock, Inc.
+# Portions Copyrighted 2010-2013 ForgeRock, Inc.
 
 if [ -z "$JAVA_HOME" ] ; then
         JAVA_HOME="@JAVA_HOME@"
@@ -36,6 +36,7 @@ EXT_CLASSPATH=$CLASSPATH
 
 CLASSPATH="@CONFIG_DIR@"
 CLASSPATH="$CLASSPATH:$TOOLS_HOME/classes:$TOOLS_HOME/resources"
+CLASSPATH="$CLASSPATH:$TOOLS_HOME/lib/forgerock-util-${commons.forgerock-util.version}.jar"
 CLASSPATH="$CLASSPATH:$TOOLS_HOME/lib/openam-distribution-amadmsetup-${project.version}.jar"
 CLASSPATH="$CLASSPATH:$TOOLS_HOME/lib/opendj-server-2.4.6.jar"
 CLASSPATH="$CLASSPATH:$TOOLS_HOME/lib/mail-1.4.5.jar"

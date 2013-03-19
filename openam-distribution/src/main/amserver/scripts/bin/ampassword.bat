@@ -26,7 +26,7 @@
 : $Id: ampassword.bat,v 1.18 2009/01/28 05:34:45 ww203982 Exp $
 :
 
-: Portions Copyrighted 2010-2012 ForgeRock, Inc.
+: Portions Copyrighted 2010-2013 ForgeRock, Inc.
 
 set TOOLS_HOME="@TOOLS_HOME@"
 
@@ -39,6 +39,7 @@ goto WHILE
 :WEND
 
 set CLASSPATH="@CONFIG_DIR@"
+set CLASSPATH="%CLASSPATH%;lib/forgerock-util-${commons.forgerock-util.version}.jar"
 set CLASSPATH="%CLASSPATH%;lib/openam-distribution-amadmsetup-${project.version}.jar"
 set CLASSPATH="%CLASSPATH%;lib/opendj-server-2.4.6.jar"
 set CLASSPATH="%CLASSPATH%;lib/mail-1.4.5.jar"
