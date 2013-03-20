@@ -1,24 +1,23 @@
 /*
- * The contents of this file are subject to the terms of the Common Development and
- * Distribution License (the License). You may not use this file except in compliance with the
- * License.
- *
- * You can obtain a copy of the License at legal/CDDLv1.0.txt. See the License for the
- * specific language governing permission and limitations under the License.
- *
- * When distributing Covered Software, include this CDDL Header Notice in each file and include
- * the License file at legal/CDDLv1.0.txt. If applicable, add the following below the CDDL
- * Header, with the fields enclosed by brackets [] replaced by your own identifying
- * information: "Portions copyright [year] [name of copyright owner]".
- *
- * Copyright 2013 ForgeRock Inc.
- */
+* The contents of this file are subject to the terms of the Common Development and
+* Distribution License (the License). You may not use this file except in compliance with the
+* License.
+*
+* You can obtain a copy of the License at legal/CDDLv1.0.txt. See the License for the
+* specific language governing permission and limitations under the License.
+*
+* When distributing Covered Software, include this CDDL Header Notice in each file and include
+* the License file at legal/CDDLv1.0.txt. If applicable, add the following below the CDDL
+* Header, with the fields enclosed by brackets [] replaced by your own identifying
+* information: "Portions copyright [year] [name of copyright owner]".
+*
+* Copyright 2013 ForgeRock Inc.
+*/
 
 package org.forgerock.openam.forgerockrest.authn.callbackhandlers;
 
 import junit.framework.Assert;
-import org.forgerock.openam.forgerockrest.authn.callbackhandlers.RestAuthCallbackHandler;
-import org.forgerock.openam.forgerockrest.authn.callbackhandlers.RestAuthNameCallbackHandler;
+import org.forgerock.openam.forgerockrest.authn.HttpMethod;
 import org.forgerock.openam.forgerockrest.authn.exceptions.RestAuthException;
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -64,19 +63,20 @@ public class RestAuthNameCallbackHandlerTest {
     }
 
     @Test
-    public void shouldUpdateCallbackFromRequest() {
+    public void shouldUpdateCallbackFromRequest() throws RestAuthCallbackHandlerResponseException {
 
         //Given
         HttpHeaders headers = mock(HttpHeaders.class);
         HttpServletRequest request = mock(HttpServletRequest.class);
         HttpServletResponse response = mock(HttpServletResponse.class);
+        JSONObject jsonPostBody = mock(JSONObject.class);
         NameCallback nameCallback = mock(NameCallback.class);
 
         given(request.getParameter("username")).willReturn("USERNAME");
 
         //When
         boolean updated = restAuthNameCallbackHandler.updateCallbackFromRequest(headers, request, response,
-                nameCallback);
+                jsonPostBody, nameCallback, HttpMethod.POST);
 
         //Then
         verify(nameCallback).setName("USERNAME");
@@ -84,19 +84,21 @@ public class RestAuthNameCallbackHandlerTest {
     }
 
     @Test
-    public void shouldFailToUpdateCallbackFromRequestWhenUsernameIsNull() {
+    public void shouldFailToUpdateCallbackFromRequestWhenUsernameIsNull()
+            throws RestAuthCallbackHandlerResponseException {
 
         //Given
         HttpHeaders headers = mock(HttpHeaders.class);
         HttpServletRequest request = mock(HttpServletRequest.class);
         HttpServletResponse response = mock(HttpServletResponse.class);
+        JSONObject jsonPostBody = mock(JSONObject.class);
         NameCallback nameCallback = mock(NameCallback.class);
 
         given(request.getParameter("username")).willReturn(null);
 
         //When
         boolean updated = restAuthNameCallbackHandler.updateCallbackFromRequest(headers, request, response,
-                nameCallback);
+                jsonPostBody, nameCallback, HttpMethod.POST);
 
         //Then
         verify(nameCallback, never()).setName(anyString());
@@ -104,23 +106,43 @@ public class RestAuthNameCallbackHandlerTest {
     }
 
     @Test
-    public void shouldFailToUpdateCallbackFromRequestWhenPasswordIsEmptyString() {
+    public void shouldFailToUpdateCallbackFromRequestWhenPasswordIsEmptyString()
+            throws RestAuthCallbackHandlerResponseException {
 
         //Given
         HttpHeaders headers = mock(HttpHeaders.class);
         HttpServletRequest request = mock(HttpServletRequest.class);
         HttpServletResponse response = mock(HttpServletResponse.class);
+        JSONObject jsonPostBody = mock(JSONObject.class);
         NameCallback nameCallback = mock(NameCallback.class);
 
         given(request.getParameter("username")).willReturn("");
 
         //When
         boolean updated = restAuthNameCallbackHandler.updateCallbackFromRequest(headers, request, response,
-                nameCallback);
+                jsonPostBody, nameCallback, HttpMethod.POST);
 
         //Then
         verify(nameCallback, never()).setName(anyString());
         assertFalse(updated);
+    }
+
+    @Test
+    public void shouldHandleCallback() throws JSONException {
+
+        //Given
+        HttpHeaders headers = mock(HttpHeaders.class);
+        HttpServletRequest request = mock(HttpServletRequest.class);
+        HttpServletResponse response = mock(HttpServletResponse.class);
+        JSONObject jsonPostBody = mock(JSONObject.class);
+        NameCallback originalNameCallback = mock(NameCallback.class);
+
+        //When
+        NameCallback nameCallback = restAuthNameCallbackHandler.handle(headers, request, response,
+                jsonPostBody, originalNameCallback);
+
+        //Then
+        assertEquals(originalNameCallback, nameCallback);
     }
 
     @Test
@@ -130,17 +152,15 @@ public class RestAuthNameCallbackHandlerTest {
         NameCallback nameCallback = new NameCallback("Enter username:");
 
         //When
-        JSONObject jsonObject = restAuthNameCallbackHandler.convertToJson(nameCallback);
+        JSONObject jsonObject = restAuthNameCallbackHandler.convertToJson(nameCallback, 1);
 
         //Then
         assertEquals("NameCallback", jsonObject.getString("type"));
         assertNotNull(jsonObject.getJSONArray("output"));
         Assert.assertEquals(1, jsonObject.getJSONArray("output").length());
-        Assert.assertEquals("prompt", jsonObject.getJSONArray("output").getJSONObject(0).getString("name"));
         Assert.assertEquals("Enter username:", jsonObject.getJSONArray("output").getJSONObject(0).getString("value"));
         assertNotNull(jsonObject.getJSONArray("input"));
         Assert.assertEquals(1, jsonObject.getJSONArray("input").length());
-        Assert.assertEquals("name", jsonObject.getJSONArray("input").getJSONObject(0).getString("name"));
         Assert.assertEquals("", jsonObject.getJSONArray("input").getJSONObject(0).getString("value"));
     }
 
@@ -152,11 +172,9 @@ public class RestAuthNameCallbackHandlerTest {
         JSONObject jsonNameCallback = new JSONObject()
                 .put("input", new JSONArray().put(
                         new JSONObject()
-                                .put("name", "name")
                                 .put("value", "USERNAME")))
                 .put("output", new JSONArray().put(
                         new JSONObject()
-                                .put("name", "prompt")
                                 .put("value", "Enter username:")))
                 .put("type", "NameCallback");
 
@@ -178,11 +196,9 @@ public class RestAuthNameCallbackHandlerTest {
         JSONObject jsonNameCallback = new JSONObject()
                 .put("input", new JSONArray().put(
                         new JSONObject()
-                                .put("name", "name")
                                 .put("value", "USERNAME")))
                 .put("output", new JSONArray().put(
                         new JSONObject()
-                                .put("name", "prompt")
                                 .put("value", "Enter username:")))
                 .put("type", "PasswordCallback");
 
@@ -201,11 +217,9 @@ public class RestAuthNameCallbackHandlerTest {
         JSONObject jsonNameCallback = new JSONObject()
                 .put("input", new JSONArray().put(
                         new JSONObject()
-                                .put("name", "name")
                                 .put("value", "USERNAME")))
                 .put("output", new JSONArray().put(
                         new JSONObject()
-                                .put("name", "prompt")
                                 .put("value", "Enter username:")))
                 .put("type", "namecallback");
 

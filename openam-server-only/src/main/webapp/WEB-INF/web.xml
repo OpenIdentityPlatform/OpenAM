@@ -600,7 +600,7 @@
 
     <servlet-mapping>
         <servlet-name>rest-auth</servlet-name>
-        <url-pattern>/rest/auth/*</url-pattern>
+        <url-pattern>/json/auth/*</url-pattern>
     </servlet-mapping>
 
     <servlet-mapping>

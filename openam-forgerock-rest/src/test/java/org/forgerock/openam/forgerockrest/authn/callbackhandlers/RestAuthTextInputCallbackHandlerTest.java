@@ -1,21 +1,22 @@
 /*
- * The contents of this file are subject to the terms of the Common Development and
- * Distribution License (the License). You may not use this file except in compliance with the
- * License.
- *
- * You can obtain a copy of the License at legal/CDDLv1.0.txt. See the License for the
- * specific language governing permission and limitations under the License.
- *
- * When distributing Covered Software, include this CDDL Header Notice in each file and include
- * the License file at legal/CDDLv1.0.txt. If applicable, add the following below the CDDL
- * Header, with the fields enclosed by brackets [] replaced by your own identifying
- * information: "Portions copyright [year] [name of copyright owner]".
- *
- * Copyright 2013 ForgeRock Inc.
- */
+* The contents of this file are subject to the terms of the Common Development and
+* Distribution License (the License). You may not use this file except in compliance with the
+* License.
+*
+* You can obtain a copy of the License at legal/CDDLv1.0.txt. See the License for the
+* specific language governing permission and limitations under the License.
+*
+* When distributing Covered Software, include this CDDL Header Notice in each file and include
+* the License file at legal/CDDLv1.0.txt. If applicable, add the following below the CDDL
+* Header, with the fields enclosed by brackets [] replaced by your own identifying
+* information: "Portions copyright [year] [name of copyright owner]".
+*
+* Copyright 2013 ForgeRock Inc.
+*/
 
 package org.forgerock.openam.forgerockrest.authn.callbackhandlers;
 
+import org.forgerock.openam.forgerockrest.authn.HttpMethod;
 import org.forgerock.openam.forgerockrest.authn.exceptions.RestAuthException;
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -61,19 +62,20 @@ public class RestAuthTextInputCallbackHandlerTest {
     }
 
     @Test
-    public void shouldUpdateCallbackFromRequest() {
+    public void shouldUpdateCallbackFromRequest() throws RestAuthCallbackHandlerResponseException {
 
         //Given
         HttpHeaders headers = mock(HttpHeaders.class);
         HttpServletRequest request = mock(HttpServletRequest.class);
         HttpServletResponse response = mock(HttpServletResponse.class);
+        JSONObject jsonPostBody = mock(JSONObject.class);
         TextInputCallback textInputCallback = mock(TextInputCallback.class);
 
         given(request.getParameter("text")).willReturn("TEXT");
 
         //When
         boolean updated = restAuthTextInputCallbackHandler.updateCallbackFromRequest(headers, request, response,
-                textInputCallback);
+                jsonPostBody, textInputCallback, HttpMethod.POST);
 
         //Then
         verify(textInputCallback).setText("TEXT");
@@ -81,19 +83,21 @@ public class RestAuthTextInputCallbackHandlerTest {
     }
 
     @Test
-    public void shouldFailToUpdateCallbackFromRequestWhenUsernameIsNull() {
+    public void shouldFailToUpdateCallbackFromRequestWhenUsernameIsNull()
+            throws RestAuthCallbackHandlerResponseException {
 
         //Given
         HttpHeaders headers = mock(HttpHeaders.class);
         HttpServletRequest request = mock(HttpServletRequest.class);
         HttpServletResponse response = mock(HttpServletResponse.class);
+        JSONObject jsonPostBody = mock(JSONObject.class);
         TextInputCallback textInputCallback = mock(TextInputCallback.class);
 
         given(request.getParameter("text")).willReturn(null);
 
         //When
         boolean updated = restAuthTextInputCallbackHandler.updateCallbackFromRequest(headers, request, response,
-                textInputCallback);
+                jsonPostBody, textInputCallback, HttpMethod.POST);
 
         //Then
         verify(textInputCallback, never()).setText(anyString());
@@ -101,23 +105,43 @@ public class RestAuthTextInputCallbackHandlerTest {
     }
 
     @Test
-    public void shouldFailToUpdateCallbackFromRequestWhenPasswordIsEmptyString() {
+    public void shouldFailToUpdateCallbackFromRequestWhenPasswordIsEmptyString()
+            throws RestAuthCallbackHandlerResponseException {
 
         //Given
         HttpHeaders headers = mock(HttpHeaders.class);
         HttpServletRequest request = mock(HttpServletRequest.class);
         HttpServletResponse response = mock(HttpServletResponse.class);
+        JSONObject jsonPostBody = mock(JSONObject.class);
         TextInputCallback textInputCallback = mock(TextInputCallback.class);
 
         given(request.getParameter("text")).willReturn("");
 
         //When
         boolean updated = restAuthTextInputCallbackHandler.updateCallbackFromRequest(headers, request, response,
-                textInputCallback);
+                jsonPostBody, textInputCallback, HttpMethod.POST);
 
         //Then
         verify(textInputCallback, never()).setText(anyString());
         assertFalse(updated);
+    }
+
+    @Test
+    public void shouldHandleCallback() throws JSONException {
+
+        //Given
+        HttpHeaders headers = mock(HttpHeaders.class);
+        HttpServletRequest request = mock(HttpServletRequest.class);
+        HttpServletResponse response = mock(HttpServletResponse.class);
+        JSONObject jsonPostBody = mock(JSONObject.class);
+        TextInputCallback originalTextInputCallback = mock(TextInputCallback.class);
+
+        //When
+        TextInputCallback textInputCallback = restAuthTextInputCallbackHandler.handle(headers, request, response,
+                jsonPostBody, originalTextInputCallback);
+
+        //Then
+        assertEquals(originalTextInputCallback, textInputCallback);
     }
 
     @Test
@@ -127,19 +151,16 @@ public class RestAuthTextInputCallbackHandlerTest {
         TextInputCallback textInputCallback = new TextInputCallback("Enter text:", "DEFAULT_VALUE");
 
         //When
-        JSONObject jsonObject = restAuthTextInputCallbackHandler.convertToJson(textInputCallback);
+        JSONObject jsonObject = restAuthTextInputCallbackHandler.convertToJson(textInputCallback, 1);
 
         //Then
         assertEquals("TextInputCallback", jsonObject.getString("type"));
         assertNotNull(jsonObject.getJSONArray("output"));
         assertEquals(2, jsonObject.getJSONArray("output").length());
-        assertEquals("prompt", jsonObject.getJSONArray("output").getJSONObject(0).getString("name"));
         assertEquals("Enter text:", jsonObject.getJSONArray("output").getJSONObject(0).getString("value"));
-        assertEquals("defaultText", jsonObject.getJSONArray("output").getJSONObject(1).getString("name"));
         assertEquals("DEFAULT_VALUE", jsonObject.getJSONArray("output").getJSONObject(1).getString("value"));
         assertNotNull(jsonObject.getJSONArray("input"));
         assertEquals(1, jsonObject.getJSONArray("input").length());
-        assertEquals("text", jsonObject.getJSONArray("input").getJSONObject(0).getString("name"));
         assertEquals("", jsonObject.getJSONArray("input").getJSONObject(0).getString("value"));
     }
 
@@ -151,14 +172,11 @@ public class RestAuthTextInputCallbackHandlerTest {
         JSONObject jsonTextInputCallback = new JSONObject()
                 .put("input", new JSONArray()
                         .put(new JSONObject()
-                                .put("name", "text")
                                 .put("value", "TEXT_VALUE")))
                 .put("output", new JSONArray()
                         .put(new JSONObject()
-                                .put("name", "prompt")
                                 .put("value", "Enter text:"))
                         .put(new JSONObject()
-                                .put("name", "defaultText")
                                 .put("value", "DEFAULT_VALUE")))
                 .put("type", "TextInputCallback");
 
@@ -181,14 +199,11 @@ public class RestAuthTextInputCallbackHandlerTest {
         JSONObject jsonTextInputCallback = new JSONObject()
                 .put("input", new JSONArray()
                         .put(new JSONObject()
-                                .put("name", "text")
                                 .put("value", "TEXT_VALUE")))
                 .put("output", new JSONArray()
                         .put(new JSONObject()
-                                .put("name", "prompt")
                                 .put("value", "Enter text:"))
                         .put(new JSONObject()
-                                .put("name", "defaultText")
                                 .put("value", "DEFAULT_VALUE")))
                 .put("type", "PasswordCallback");
 
@@ -207,14 +222,11 @@ public class RestAuthTextInputCallbackHandlerTest {
         JSONObject jsonTextInputCallback = new JSONObject()
                 .put("input", new JSONArray()
                         .put(new JSONObject()
-                                .put("name", "text")
                                 .put("value", "TEXT_VALUE")))
                 .put("output", new JSONArray()
                         .put(new JSONObject()
-                                .put("name", "prompt")
                                 .put("value", "Enter text:"))
                         .put(new JSONObject()
-                                .put("name", "defaultText")
                                 .put("value", "DEFAULT_VALUE")))
                 .put("type", "tExtinpuTcallback");
 

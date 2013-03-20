@@ -62,16 +62,15 @@ public class SignatureUtil {
      * Signs a String using the given private key. Uses the algorithm from the private key to perform the signature.
      *
      * @param privateKey The private key to use to sign the String.
+     * @param algorithm The algorithm to use in the signing.
      * @param message The String to sign.
      * @return The byte array of the signature.
      * @throws SignatureException If there is a problem when performing the signature.
      */
-    public byte[] sign(PrivateKey privateKey, String message) throws SignatureException {
-
-        String algorithm = privateKey.getAlgorithm();
+    public byte[] sign(PrivateKey privateKey, String algorithm, String message) throws SignatureException {
 
         try {
-            Signature signature = Signature.getInstance("MD5withRSA");//TODO
+            Signature signature = Signature.getInstance(algorithm);
 
             signature.initSign(privateKey);
 
@@ -97,14 +96,15 @@ public class SignatureUtil {
      * verification of the signature.
      *
      * @param certificate The X509Certificate to use to verify the signature.
+     * @param algorithm The algorithm to use in the signing.
      * @param message The String that was signed.
      * @param signatureData The byte array of the signature.
      * @return Whether or not the signature is valid for the String that was signed.
      * @throws SignatureException If there is a problem when verifying the signature.
      */
-    public boolean verify(X509Certificate certificate, String message, byte[] signatureData) throws
+    public boolean verify(X509Certificate certificate, String algorithm, String message, byte[] signatureData) throws
             SignatureException {
-        return verify(certificate.getPublicKey(), message, signatureData);
+        return verify(certificate.getPublicKey(), algorithm, message, signatureData);
     }
 
     /**
@@ -112,17 +112,16 @@ public class SignatureUtil {
      * verification of the signature.
      *
      * @param publicKey The public key to use to verify the signature.
+     * @param algorithm The algorithm to use in the signing.
      * @param message The String that was signed.
      * @param signatureData The byte array of the signature.
      * @return Whether or not the signature is valid for the String that was signed.
      * @throws SignatureException If there is a problem when verifying the signature.
      */
-    public boolean verify(PublicKey publicKey, String message, byte[] signatureData) throws SignatureException {
-
-        String algorithm = publicKey.getAlgorithm();
+    public boolean verify(PublicKey publicKey,  String algorithm, String message, byte[] signatureData) throws SignatureException {
 
         try {
-            Signature signature = Signature.getInstance("MD5withRSA");//TODO
+            Signature signature = Signature.getInstance(algorithm);
 
             signature.initVerify(publicKey);
 

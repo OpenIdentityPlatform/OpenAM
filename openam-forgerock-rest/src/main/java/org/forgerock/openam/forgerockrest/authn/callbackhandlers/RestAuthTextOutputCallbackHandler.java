@@ -17,7 +17,6 @@
 package org.forgerock.openam.forgerockrest.authn.callbackhandlers;
 
 import com.sun.identity.shared.debug.Debug;
-import org.forgerock.openam.forgerockrest.authn.exceptions.RestAuthException;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -26,15 +25,12 @@ import javax.security.auth.callback.TextOutputCallback;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.ws.rs.core.HttpHeaders;
-import javax.ws.rs.core.Response;
-import java.text.MessageFormat;
 
 /**
  * Defines methods to convert a TextOutputCallback to a JSON representation.
  */
-public class RestAuthTextOutputCallbackHandler implements RestAuthCallbackHandler<TextOutputCallback> {
-
-    private static final Debug logger = Debug.getInstance("amIdentityServices");
+public class RestAuthTextOutputCallbackHandler extends AbstractRestAuthCallbackHandler<TextOutputCallback>
+        implements RestAuthCallbackHandler<TextOutputCallback> {
 
     private static final String CALLBACK_NAME = "TextOutputCallback";
 
@@ -44,9 +40,18 @@ public class RestAuthTextOutputCallbackHandler implements RestAuthCallbackHandle
      *
      * {@inheritDoc}
      */
-    public boolean updateCallbackFromRequest(HttpHeaders headers, HttpServletRequest request,
-            HttpServletResponse response, TextOutputCallback callback) {
+    boolean doUpdateCallbackFromRequest(HttpHeaders headers, HttpServletRequest request, HttpServletResponse response,
+            JSONObject postBody, TextOutputCallback callback) throws RestAuthCallbackHandlerResponseException {
+
         return false;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public TextOutputCallback handle(HttpHeaders headers, HttpServletRequest request, HttpServletResponse response,
+            JSONObject postBody, TextOutputCallback originalCallback) throws JSONException {
+        return originalCallback;
     }
 
     /**
@@ -59,7 +64,7 @@ public class RestAuthTextOutputCallbackHandler implements RestAuthCallbackHandle
     /**
      * {@inheritDoc}
      */
-    public JSONObject convertToJson(TextOutputCallback callback) throws JSONException {
+    public JSONObject convertToJson(TextOutputCallback callback, int index) throws JSONException {
 
         String message = callback.getMessage();
         int messageType = callback.getMessageType();
@@ -68,19 +73,8 @@ public class RestAuthTextOutputCallbackHandler implements RestAuthCallbackHandle
         jsonCallback.put("type", CALLBACK_NAME);
 
         JSONArray output = new JSONArray();
-
-        JSONObject outputField = new JSONObject();
-        outputField.put("name", "message");
-        outputField.put("value", message);
-
-        output.put(outputField);
-
-        outputField = new JSONObject();
-        outputField.put("name", "messageType");
-        outputField.put("value", messageType);
-
-        output.put(outputField);
-
+        output.put(createOutputField("message", message));
+        output.put(createOutputField("messageType", messageType));
         jsonCallback.put("output", output);
 
         return jsonCallback;
@@ -92,12 +86,7 @@ public class RestAuthTextOutputCallbackHandler implements RestAuthCallbackHandle
     public TextOutputCallback convertFromJson(TextOutputCallback callback, JSONObject jsonCallback)
             throws JSONException {
 
-        String type = jsonCallback.getString("type");
-        if (!CALLBACK_NAME.equalsIgnoreCase(type)) {
-            logger.message(MessageFormat.format("Method called with invalid callback, {0}.", type));
-            throw new RestAuthException(Response.Status.BAD_REQUEST,
-                    MessageFormat.format("Invalid Callback, {0}, for handler", type));
-        }
+        validateCallbackType(CALLBACK_NAME, jsonCallback);
 
         // Nothing to do here as TextOutputCallback is purely used to send information to the client.
 

@@ -16,6 +16,10 @@
 
 package org.forgerock.openam.forgerockrest.authn.callbackhandlers;
 
+import org.forgerock.openam.forgerockrest.authn.HttpMethod;
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import javax.security.auth.callback.Callback;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -41,9 +45,30 @@ public interface RestAuthCallbackHandler<T extends Callback> extends JsonCallbac
      * @param headers The HttpHeaders from the request.
      * @param request The HttpServletRequest from the request.
      * @param response The HttpServletResponse for the request.
+     * @param postBody The POST body from the request.
      * @param callback The Callback to update with its required values from the headers and request.
+     * @param httpMethod The HTTP method of the request.
      * @return Whether or not the Callback was successfully updated.
+     * @throws RestAuthCallbackHandlerResponseException
      */
     boolean updateCallbackFromRequest(HttpHeaders headers, HttpServletRequest request, HttpServletResponse response,
-            T callback);
+            JSONObject postBody, T callback, HttpMethod httpMethod) throws
+            RestAuthCallbackHandlerResponseException;
+
+    /**
+     * Handles the processing of the JSON given in the request and updates the Callback objects from it.
+     *
+     * This is for special circumstances where the JSON from the request does not contain a "callback" attribute,
+     * where the <code>handleJsonCallbacks()</code> method should be used.
+     *
+     * @param headers The HttpHeaders from the request.
+     * @param request The HttpServletRequest from the request.
+     * @param response The HttpServletResponse for the request.
+     * @param postBody The POST body from the request.
+     * @param originalCallback The original Callbacks to update.
+     * @return The updated originalCallbacks.
+     * @throws JSONException If there is a problem with reading the jsonRequestObject.
+     */
+    T handle(HttpHeaders headers, HttpServletRequest request, HttpServletResponse response,
+                JSONObject postBody, T originalCallback) throws JSONException;
 }

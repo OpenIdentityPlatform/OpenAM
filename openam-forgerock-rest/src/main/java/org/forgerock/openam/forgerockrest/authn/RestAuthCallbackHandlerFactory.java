@@ -51,7 +51,7 @@ import java.text.MessageFormat;
  */
 public class RestAuthCallbackHandlerFactory {
 
-    private static final Debug logger = Debug.getInstance("amIdentityServices");
+    private static final Debug DEBUG = Debug.getInstance("amIdentityServices");
 
     /**
      * Singleton approach by using a static inner class.
@@ -107,7 +107,7 @@ public class RestAuthCallbackHandlerFactory {
             return new RestAuthX509CallbackHandler();
         }
 
-        logger.error(MessageFormat.format("Unsupported Callback, {0}", callbackClass.getSimpleName()));
+        DEBUG.error(MessageFormat.format("Unsupported Callback, {0}", callbackClass.getSimpleName()));
         throw new RestAuthException(Response.Status.INTERNAL_SERVER_ERROR,
                 MessageFormat.format("Unsupported Callback, {0}", callbackClass.getSimpleName()));
     }

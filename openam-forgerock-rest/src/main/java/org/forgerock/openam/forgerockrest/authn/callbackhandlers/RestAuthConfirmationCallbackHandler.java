@@ -17,7 +17,6 @@
 package org.forgerock.openam.forgerockrest.authn.callbackhandlers;
 
 import com.sun.identity.shared.debug.Debug;
-import org.forgerock.openam.forgerockrest.authn.exceptions.RestAuthException;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -26,16 +25,15 @@ import javax.security.auth.callback.ConfirmationCallback;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.ws.rs.core.HttpHeaders;
-import javax.ws.rs.core.Response;
-import java.text.MessageFormat;
 
 /**
  * Defines methods to update a ConfirmationCallback from the headers and request of a Rest call and methods to convert a
  * Callback to and from a JSON representation.
  */
-public class RestAuthConfirmationCallbackHandler implements RestAuthCallbackHandler<ConfirmationCallback> {
+public class RestAuthConfirmationCallbackHandler extends AbstractRestAuthCallbackHandler<ConfirmationCallback>
+        implements RestAuthCallbackHandler<ConfirmationCallback> {
 
-    private static final Debug logger = Debug.getInstance("amIdentityServices");
+    private static final Debug DEBUG = Debug.getInstance("amIdentityServices");
 
     private static final String CALLBACK_NAME = "ConfirmationCallback";
 
@@ -45,18 +43,26 @@ public class RestAuthConfirmationCallbackHandler implements RestAuthCallbackHand
      *
      * {@inheritDoc}
      */
-    public boolean updateCallbackFromRequest(HttpHeaders headers, HttpServletRequest request,
-            HttpServletResponse response, ConfirmationCallback callback) {
+    boolean doUpdateCallbackFromRequest(HttpHeaders headers, HttpServletRequest request, HttpServletResponse response,
+            JSONObject postBody, ConfirmationCallback callback) throws RestAuthCallbackHandlerResponseException {
 
         String selectedIndex = request.getParameter("selectedIndex");
 
         if (selectedIndex == null || "".equals(selectedIndex)) {
-            logger.message("selectedIndex not set in request.");
+            DEBUG.message("selectedIndex not set in request.");
             return false;
         }
 
         callback.setSelectedIndex(Integer.parseInt(selectedIndex));
         return true;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public ConfirmationCallback handle(HttpHeaders headers, HttpServletRequest request, HttpServletResponse response,
+            JSONObject postBody, ConfirmationCallback originalCallback) throws JSONException {
+        return originalCallback;
     }
 
     /**
@@ -69,7 +75,7 @@ public class RestAuthConfirmationCallbackHandler implements RestAuthCallbackHand
     /**
      * {@inheritDoc}
      */
-    public JSONObject convertToJson(ConfirmationCallback callback) throws JSONException {
+    public JSONObject convertToJson(ConfirmationCallback callback, int index) throws JSONException {
 
         String prompt = callback.getPrompt();
         int messageType = callback.getMessageType();
@@ -82,55 +88,23 @@ public class RestAuthConfirmationCallbackHandler implements RestAuthCallbackHand
         jsonCallback.put("type", CALLBACK_NAME);
 
         JSONArray output = new JSONArray();
-
-        JSONObject outputField = new JSONObject();
-        outputField.put("name", "prompt");
-        outputField.put("value", prompt);
-
-        output.put(outputField);
-
-        outputField = new JSONObject();
-        outputField.put("name", "messageType");
-        outputField.put("value", messageType);
-
-        output.put(outputField);
+        output.put(createOutputField("prompt", prompt));
+        output.put(createOutputField("messageType", messageType));
 
         JSONArray optionsJsonArray = new JSONArray();
         for (String option : options) {
             optionsJsonArray.put(option);
         }
-        outputField = new JSONObject();
-        outputField.put("name", "options");
-        outputField.put("value", optionsJsonArray);
-
-        output.put(outputField);
-
-        outputField = new JSONObject();
-        outputField.put("name", "optionType");
-        outputField.put("value", optionType);
-
-        output.put(outputField);
-
-        outputField = new JSONObject();
-        outputField.put("name", "defaultOption");
-        outputField.put("value", defaultOption);
-
-        output.put(outputField);
-
+        output.put(createOutputField("options", optionsJsonArray));
+        output.put(createOutputField("optionType", optionType));
+        output.put(createOutputField("defaultOption", defaultOption));
         jsonCallback.put("output", output);
 
         JSONArray input = new JSONArray();
-
-        JSONObject inputField = new JSONObject();
-        inputField.put("name", "selectedIndex");
-        inputField.put("value", selectedIndex);
-
-        input.put(inputField);
-
+        input.put(createInputField("IDToken" + index, selectedIndex));
         jsonCallback.put("input", input);
 
         return jsonCallback;
-
     }
 
     /**
@@ -139,26 +113,17 @@ public class RestAuthConfirmationCallbackHandler implements RestAuthCallbackHand
     public ConfirmationCallback convertFromJson(ConfirmationCallback callback, JSONObject jsonCallback)
             throws JSONException {
 
-        String type = jsonCallback.getString("type");
-        if (!CALLBACK_NAME.equalsIgnoreCase(type)) {
-            logger.message(MessageFormat.format("Method called with invalid callback, {0}.", type));
-            throw new RestAuthException(Response.Status.BAD_REQUEST,
-                    MessageFormat.format("Invalid Callback, {0}, for handler", type));
-        }
+        validateCallbackType(CALLBACK_NAME, jsonCallback);
 
         JSONArray input = jsonCallback.getJSONArray("input");
 
-        for (int i = 0; i < input.length(); i++) {
-
-            JSONObject inputField = input.getJSONObject(i);
-
-            String name = inputField.getString("name");
-            String value = inputField.getString("value");
-
-            if ("selectedIndex".equalsIgnoreCase(name)) {
-                callback.setSelectedIndex(Integer.parseInt(value));
-            }
+        if (input.length() != 1) {
+            throw new JSONException("JSON Callback does not include a input field");
         }
+
+        JSONObject inputField = input.getJSONObject(0);
+        String value = inputField.getString("value");
+        callback.setSelectedIndex(Integer.parseInt(value));
 
         return callback;
     }

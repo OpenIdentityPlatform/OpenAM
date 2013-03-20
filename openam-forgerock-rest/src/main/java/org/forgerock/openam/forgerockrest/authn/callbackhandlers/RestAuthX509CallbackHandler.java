@@ -18,7 +18,9 @@ package org.forgerock.openam.forgerockrest.authn.callbackhandlers;
 
 import com.sun.identity.authentication.spi.X509CertificateCallback;
 import com.sun.identity.shared.debug.Debug;
+import org.forgerock.openam.forgerockrest.authn.HttpMethod;
 import org.forgerock.openam.forgerockrest.authn.exceptions.RestAuthException;
+import org.json.JSONException;
 import org.json.JSONObject;
 
 import javax.servlet.http.HttpServletRequest;
@@ -31,9 +33,8 @@ import java.security.cert.X509Certificate;
  * Defines methods to update a X509CertificateCallback from the headers and request of a Rest call and methods to
  * convert a Callback to and from a JSON representation.
  */
-public class RestAuthX509CallbackHandler implements RestAuthCallbackHandler<X509CertificateCallback> {
-
-    private static final Debug logger = Debug.getInstance("amIdentityServices");
+public class RestAuthX509CallbackHandler extends AbstractRestAuthCallbackHandler<X509CertificateCallback>
+        implements RestAuthCallbackHandler<X509CertificateCallback> {
 
     private static final String CALLBACK_NAME = "X509CertificateCallback";
 
@@ -45,7 +46,8 @@ public class RestAuthX509CallbackHandler implements RestAuthCallbackHandler<X509
      * {@inheritDoc}
      */
     public boolean updateCallbackFromRequest(HttpHeaders headers, HttpServletRequest request,
-            HttpServletResponse response, X509CertificateCallback callback) {
+            HttpServletResponse response, JSONObject postBody, X509CertificateCallback callback,
+            HttpMethod httpMethod) {
 
         X509Certificate[] certificates = (X509Certificate[]) request.getAttribute(
                 "javax.servlet.request.X509Certificate");
@@ -55,6 +57,25 @@ public class RestAuthX509CallbackHandler implements RestAuthCallbackHandler<X509
         }
 
         return true;
+    }
+
+    /**
+     * This method will never be called as the <code>updateCallbackFromRequest</code> method from
+     * <code>AbstractRestAuthCallbackHandler</code> has been overridden.
+     *
+     * {@inheritDoc}
+     */
+    boolean doUpdateCallbackFromRequest(HttpHeaders headers, HttpServletRequest request, HttpServletResponse response,
+            JSONObject postBody, X509CertificateCallback callback) throws RestAuthCallbackHandlerResponseException {
+        return false;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public X509CertificateCallback handle(HttpHeaders headers, HttpServletRequest request, HttpServletResponse response,
+            JSONObject postBody, X509CertificateCallback originalCallback) throws JSONException {
+        return originalCallback;
     }
 
     /**
@@ -70,7 +91,7 @@ public class RestAuthX509CallbackHandler implements RestAuthCallbackHandler<X509
      *
      * {@inheritDoc}
      */
-    public JSONObject convertToJson(X509CertificateCallback callback) {
+    public JSONObject convertToJson(X509CertificateCallback callback, int index) {
         throw new RestAuthException(Response.Status.BAD_REQUEST, new UnsupportedOperationException(
                 "X509Certificate must be specified in the initial request. Cannot be converted into a JSON "
                         + "representation."));

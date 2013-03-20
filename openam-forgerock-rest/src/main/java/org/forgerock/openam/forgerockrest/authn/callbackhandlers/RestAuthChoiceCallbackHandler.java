@@ -17,7 +17,6 @@
 package org.forgerock.openam.forgerockrest.authn.callbackhandlers;
 
 import com.sun.identity.shared.debug.Debug;
-import org.forgerock.openam.forgerockrest.authn.exceptions.RestAuthException;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -26,16 +25,15 @@ import javax.security.auth.callback.ChoiceCallback;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.ws.rs.core.HttpHeaders;
-import javax.ws.rs.core.Response;
-import java.text.MessageFormat;
 
 /**
  * Defines methods to update a ChoiceCallback from the headers and request of a Rest call and methods to convert a
  * Callback to and from a JSON representation.
  */
-public class RestAuthChoiceCallbackHandler implements RestAuthCallbackHandler<ChoiceCallback> {
+public class RestAuthChoiceCallbackHandler extends AbstractRestAuthCallbackHandler<ChoiceCallback>
+        implements RestAuthCallbackHandler<ChoiceCallback> {
 
-    private static final Debug logger = Debug.getInstance("amIdentityServices");
+    private static final Debug DEBUG = Debug.getInstance("amIdentityServices");
 
     private static final String CALLBACK_NAME = "ChoiceCallback";
 
@@ -45,18 +43,26 @@ public class RestAuthChoiceCallbackHandler implements RestAuthCallbackHandler<Ch
      *
      * {@inheritDoc}
      */
-    public boolean updateCallbackFromRequest(HttpHeaders headers, HttpServletRequest request,
-            HttpServletResponse response, ChoiceCallback callback) {
+    boolean doUpdateCallbackFromRequest(HttpHeaders headers, HttpServletRequest request, HttpServletResponse response,
+            JSONObject postBody, ChoiceCallback callback) throws RestAuthCallbackHandlerResponseException {
 
         String choiceString = request.getParameter("choices");
 
         if (choiceString == null || "".equals(choiceString)) {
-            logger.message("choices not set in request.");
+            DEBUG.message("choices not set in request.");
             return false;
         }
 
         callback.setSelectedIndex(Integer.parseInt(choiceString));
         return true;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public ChoiceCallback handle(HttpHeaders headers, HttpServletRequest request, HttpServletResponse response,
+            JSONObject postBody, ChoiceCallback originalCallback) throws JSONException {
+        return originalCallback;
     }
 
     /**
@@ -69,50 +75,35 @@ public class RestAuthChoiceCallbackHandler implements RestAuthCallbackHandler<Ch
     /**
      * {@inheritDoc}
      */
-    public JSONObject convertToJson(ChoiceCallback callback) throws JSONException {
+    public JSONObject convertToJson(ChoiceCallback callback, int index) throws JSONException {
 
         String prompt = callback.getPrompt();
         String[] choices = callback.getChoices();
         int defaultChoice = callback.getDefaultChoice();
         int[] selectedIndexes = callback.getSelectedIndexes();
+        int selectedIndex = 0;
+        if (selectedIndexes != null) {
+            selectedIndex = selectedIndexes[0];
+        }
 
-        JSONObject jsonCallback = new JSONObject();
+                JSONObject jsonCallback = new JSONObject();
         jsonCallback.put("type", CALLBACK_NAME);
 
         JSONArray output = new JSONArray();
 
-        JSONObject outputField = new JSONObject();
-        outputField.put("name", "prompt");
-        outputField.put("value", prompt);
-
-        output.put(outputField);
+        output.put(createOutputField("prompt", prompt));
 
         JSONArray choicesJsonArray = new JSONArray();
         for (String choice : choices) {
             choicesJsonArray.put(choice);
         }
-        outputField = new JSONObject();
-        outputField.put("name", "choices");
-        outputField.put("value", choicesJsonArray);
-
-        output.put(outputField);
-
-        outputField = new JSONObject();
-        outputField.put("name", "defaultChoice");
-        outputField.put("value", defaultChoice);
-
-        output.put(outputField);
+        output.put(createOutputField("choices", choicesJsonArray));
+        output.put(createOutputField("defaultChoice", defaultChoice));
 
         jsonCallback.put("output", output);
 
         JSONArray input = new JSONArray();
-
-        JSONObject inputField = new JSONObject();
-        inputField.put("name", "selectedIndex");
-        inputField.put("value", (selectedIndexes == null || selectedIndexes.length == 0) ? "" : selectedIndexes[0]);
-
-        input.put(inputField);
-
+        input.put(createInputField("IDToken" + index, selectedIndex));
         jsonCallback.put("input", input);
 
         return jsonCallback;
@@ -124,28 +115,17 @@ public class RestAuthChoiceCallbackHandler implements RestAuthCallbackHandler<Ch
      */
     public ChoiceCallback convertFromJson(ChoiceCallback callback, JSONObject jsonCallback) throws JSONException {
 
-        String type = jsonCallback.getString("type");
-        if (!CALLBACK_NAME.equalsIgnoreCase(type)) {
-            logger.message(MessageFormat.format("Method called with invalid callback, {0}.", type));
-            throw new RestAuthException(Response.Status.BAD_REQUEST,
-                    MessageFormat.format("Invalid Callback, {0}, for handler", type));
-        }
+        validateCallbackType(CALLBACK_NAME, jsonCallback);
 
         JSONArray input = jsonCallback.getJSONArray("input");
 
-        for (int i = 0; i < input.length(); i++) {
-
-            JSONObject inputField = input.getJSONObject(i);
-
-            String name = inputField.getString("name");
-
-            if ("selectedIndexes".equalsIgnoreCase(name)) {
-
-                int selectedIndex = Integer.parseInt(inputField.getJSONArray("value").getString(0));
-
-                callback.setSelectedIndex(selectedIndex);
-            }
+        if (input.length() != 1) {
+            throw new JSONException("JSON Callback does not include a input field");
         }
+
+        JSONObject inputField = input.getJSONObject(0);
+        int selectedIndex = inputField.getInt("value");
+        callback.setSelectedIndex(selectedIndex);
 
         return callback;
     }

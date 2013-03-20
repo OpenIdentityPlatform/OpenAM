@@ -45,6 +45,7 @@ import com.iplanet.sso.SSOTokenManager;
 import com.sun.identity.authentication.client.AuthClientUtils;
 import com.sun.identity.authentication.service.AMAuthErrorCode;
 import com.sun.identity.authentication.service.AuthException;
+import com.sun.identity.authentication.service.LoginState;
 import com.sun.identity.authentication.share.AuthXMLTags;
 import com.sun.identity.authentication.share.AuthXMLUtils;
 import com.sun.identity.authentication.spi.AuthLoginException;
@@ -68,6 +69,7 @@ import java.util.Collections;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.ResourceBundle;
@@ -380,6 +382,19 @@ public class AuthContext extends Object implements java.io.Serializable {
      */
     public void login() throws AuthLoginException {
         login(null, null, null, false, null, null, null);
+    }
+
+    /**
+     * Starts the login process for the given <code>AuthContext</code> object.
+     *
+     * @param request The HttpServletRequest that was sent to start the authentication process.
+     * @param response The corresponding HttpServletResponse for the HttpServletRequest.
+     * @throws AuthLoginException If an error occurred during login.
+     *
+     * @supported.api
+     */
+    public void login(HttpServletRequest request, HttpServletResponse response) throws AuthLoginException {
+        login(null, null, null, null, request, response);
     }
     
     /**
@@ -741,6 +756,19 @@ public class AuthContext extends Object implements java.io.Serializable {
                     acLocal = com.sun.identity.authentication.service.AuthUtils.
                         getAuthContext(organizationName, ssoTokenID, false, 
                             null, null, null, forceAuth);
+                }
+                LoginState loginState = acLocal.getLoginState();
+                /*
+                 * Set both the HttpRequest and HttpResponse on the login state so they are accessible by the Auth
+                 * Modules.
+                 */
+                if (request != null) {
+                    loginState.setHttpServletRequest(request);
+                    Hashtable hashtable = AuthClientUtils.parseRequestParameters(request);
+                    loginState.setParamHash(hashtable);
+                }
+                if (response != null) {
+                    loginState.setHttpServletResponse(response);
                 }
                 acLocal.login(indexType, indexName, pCookie, envMap, locale);
             } catch (AuthException e) {

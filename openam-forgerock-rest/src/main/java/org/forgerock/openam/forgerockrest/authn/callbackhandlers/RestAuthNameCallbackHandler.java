@@ -17,7 +17,6 @@
 package org.forgerock.openam.forgerockrest.authn.callbackhandlers;
 
 import com.sun.identity.shared.debug.Debug;
-import org.forgerock.openam.forgerockrest.authn.exceptions.RestAuthException;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -26,16 +25,15 @@ import javax.security.auth.callback.NameCallback;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.ws.rs.core.HttpHeaders;
-import javax.ws.rs.core.Response;
-import java.text.MessageFormat;
 
 /**
  * Defines methods to update a NameCallback from the headers and request of a Rest call and methods to convert a
  * Callback to and from a JSON representation.
  */
-public class RestAuthNameCallbackHandler implements RestAuthCallbackHandler<NameCallback> {
+public class RestAuthNameCallbackHandler extends AbstractRestAuthCallbackHandler<NameCallback>
+        implements RestAuthCallbackHandler<NameCallback> {
 
-    private static final Debug logger = Debug.getInstance("amIdentityServices");
+    private static final Debug DEBUG = Debug.getInstance("amIdentityServices");
 
     private static final String CALLBACK_NAME = "NameCallback";
 
@@ -52,13 +50,13 @@ public class RestAuthNameCallbackHandler implements RestAuthCallbackHandler<Name
      *
      * {@inheritDoc}
      */
-    public boolean updateCallbackFromRequest(HttpHeaders headers, HttpServletRequest request,
-            HttpServletResponse response, NameCallback callback) {
+    boolean doUpdateCallbackFromRequest(HttpHeaders headers, HttpServletRequest request, HttpServletResponse response,
+            JSONObject postBody, NameCallback callback) throws RestAuthCallbackHandlerResponseException {
 
         String username = request.getParameter("username");
 
         if (username == null || "".equals(username)) {
-            logger.message("username not set in request.");
+            DEBUG.message("username not set in request.");
             return false;
         }
 
@@ -69,7 +67,15 @@ public class RestAuthNameCallbackHandler implements RestAuthCallbackHandler<Name
     /**
      * {@inheritDoc}
      */
-    public JSONObject convertToJson(NameCallback callback) throws JSONException {
+    public NameCallback handle(HttpHeaders headers, HttpServletRequest request, HttpServletResponse response,
+            JSONObject postBody, NameCallback originalCallback) throws JSONException {
+        return originalCallback;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public JSONObject convertToJson(NameCallback callback, int index) throws JSONException {
 
         String prompt = callback.getPrompt();
         String name = callback.getName();
@@ -78,23 +84,11 @@ public class RestAuthNameCallbackHandler implements RestAuthCallbackHandler<Name
         jsonCallback.put("type", CALLBACK_NAME);
 
         JSONArray output = new JSONArray();
-
-        JSONObject outputField = new JSONObject();
-        outputField.put("name", "prompt");
-        outputField.put("value", prompt == null ? "" : prompt);
-
-        output.put(outputField);
-
+        output.put(createOutputField("prompt", prompt));
         jsonCallback.put("output", output);
 
         JSONArray input = new JSONArray();
-
-        JSONObject inputField = new JSONObject();
-        inputField.put("name", "name");
-        inputField.put("value", name == null ? "" : name);
-
-        input.put(inputField);
-
+        input.put(createInputField("IDToken" + index, name));
         jsonCallback.put("input", input);
 
         return jsonCallback;
@@ -105,26 +99,17 @@ public class RestAuthNameCallbackHandler implements RestAuthCallbackHandler<Name
      */
     public NameCallback convertFromJson(NameCallback callback, JSONObject jsonCallback) throws JSONException {
 
-        String type = jsonCallback.getString("type");
-        if (!CALLBACK_NAME.equalsIgnoreCase(type)) {
-            logger.message(MessageFormat.format("Method called with invalid callback, {0}.", type));
-            throw new RestAuthException(Response.Status.BAD_REQUEST,
-                    MessageFormat.format("Invalid Callback, {0}, for handler", type));
-        }
+        validateCallbackType(CALLBACK_NAME, jsonCallback);
 
         JSONArray input = jsonCallback.getJSONArray("input");
 
-        for (int i = 0; i < input.length(); i++) {
-
-            JSONObject inputField = input.getJSONObject(i);
-
-            String name = inputField.getString("name");
-            String value = inputField.getString("value");
-
-            if ("name".equalsIgnoreCase(name)) {
-                callback.setName(value);
-            }
+        if (input.length() != 1) {
+            throw new JSONException("JSON Callback does not include a input field");
         }
+
+        JSONObject inputField = input.getJSONObject(0);
+        String value = inputField.getString("value");
+        callback.setName(value);
 
         return callback;
     }

@@ -20,6 +20,7 @@ import com.sun.identity.authentication.client.AuthClientUtils;
 import com.sun.identity.authentication.share.RedirectCallbackHandler;
 import com.sun.identity.authentication.spi.RedirectCallback;
 import com.sun.identity.shared.debug.Debug;
+import org.forgerock.openam.forgerockrest.authn.HttpMethod;
 import org.forgerock.openam.forgerockrest.authn.exceptions.RestAuthException;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -33,9 +34,10 @@ import java.io.IOException;
 /**
  * Defines methods to handle a RedirectCallback.
  */
-public class RestAuthRedirectCallbackHandler implements RestAuthCallbackHandler<RedirectCallback> {
+public class RestAuthRedirectCallbackHandler extends AbstractRestAuthCallbackHandler<RedirectCallback>
+        implements RestAuthCallbackHandler<RedirectCallback> {
 
-    private static final Debug logger = Debug.getInstance("amIdentityServices");
+    private static final Debug DEBUG = Debug.getInstance("amIdentityServices");
 
     private static final String CALLBACK_NAME = "RedirectCallback";
 
@@ -51,7 +53,7 @@ public class RestAuthRedirectCallbackHandler implements RestAuthCallbackHandler<
      * {@inheritDoc}
      */
     public boolean updateCallbackFromRequest(HttpHeaders headers, HttpServletRequest request,
-            HttpServletResponse response, RedirectCallback callback) {
+            HttpServletResponse response, JSONObject postBody, RedirectCallback callback, HttpMethod httpMethod) {
 
         try {
             String contextPath = request.getContextPath();
@@ -62,12 +64,31 @@ public class RestAuthRedirectCallbackHandler implements RestAuthCallbackHandler<
             redirectCallbackHandler.handleRedirectCallback(request, response, callback,
                     AuthClientUtils.getServiceURI() + returnUrl);
         } catch (IOException e) {
-            logger.error("Failed to redirect to " + callback.getRedirectUrl());
+            DEBUG.error("Failed to redirect to " + callback.getRedirectUrl());
             throw new RestAuthException(Response.Status.INTERNAL_SERVER_ERROR, "Failed to redirect to "
                     + callback.getRedirectUrl());
         }
 
         return true;
+    }
+
+    /**
+     * This method will never be called as the <code>updateCallbackFromRequest</code> method from
+     * <code>AbstractRestAuthCallbackHandler</code> has been overridden.
+     *
+     * {@inheritDoc}
+     */
+    boolean doUpdateCallbackFromRequest(HttpHeaders headers, HttpServletRequest request, HttpServletResponse response,
+            JSONObject postBody, RedirectCallback callback) throws RestAuthCallbackHandlerResponseException {
+        return false;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public RedirectCallback handle(HttpHeaders headers, HttpServletRequest request, HttpServletResponse response,
+            JSONObject postBody, RedirectCallback originalCallback) throws JSONException {
+        return originalCallback;
     }
 
     /**
@@ -83,7 +104,7 @@ public class RestAuthRedirectCallbackHandler implements RestAuthCallbackHandler<
      *
      * {@inheritDoc}
      */
-    public JSONObject convertToJson(RedirectCallback callback) throws JSONException {
+    public JSONObject convertToJson(RedirectCallback callback, int index) throws JSONException {
         throw new RestAuthException(Response.Status.INTERNAL_SERVER_ERROR, new UnsupportedOperationException(
                 "RedirectCallbacks cannot be converted to JSON"));
     }

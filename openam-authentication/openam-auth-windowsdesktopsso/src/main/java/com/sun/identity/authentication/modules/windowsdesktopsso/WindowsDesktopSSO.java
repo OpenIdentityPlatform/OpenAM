@@ -27,7 +27,7 @@
  */
 
 /**
- * Portions Copyrighted 2011 ForgeRock AS
+ * Portions Copyrighted 2011-2013 ForgeRock, Inc
  */
 
 package com.sun.identity.authentication.modules.windowsdesktopsso;
@@ -145,6 +145,11 @@ public class WindowsDesktopSSO extends AMLoginModule {
     public int process(Callback[] callbacks, int state) 
             throws AuthLoginException {
         int result = ISAuthConstants.LOGIN_IGNORE;
+
+        // Check to see if the Rest Auth Endpoint has signified that IWA has failed.
+        if (hasWDSSOFailed(getHttpServletRequest())) {
+            return ISAuthConstants.LOGIN_IGNORE;
+        }
 
         if ( !getConfigParams() ) {
             initWindowsDesktopSSOAuth(options);
@@ -364,6 +369,15 @@ public class WindowsDesktopSSO extends AMLoginModule {
             (byte)0x86, (byte)0xf7, (byte)0x12, (byte)0x01, (byte)0x02,
             (byte)0x02 };
 
+    /**
+     * Checks the request for an attribute "iwa-failed".
+     *
+     * @param request THe HttpServletRequest.
+     * @return If the attribute is present and set to true true is returned otherwise false is returned.
+     */
+    private boolean hasWDSSOFailed(HttpServletRequest request) {
+        return Boolean.valueOf((String) request.getAttribute("iwa-failed"));
+    }
 
     private byte[] getSPNEGOTokenFromHTTPRequest(HttpServletRequest req) {
         byte[] spnegoToken = null;

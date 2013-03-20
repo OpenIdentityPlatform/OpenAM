@@ -18,11 +18,15 @@ package org.forgerock.openam.forgerockrest.authn;
 
 import com.sun.identity.authentication.AuthContext;
 import com.sun.identity.authentication.spi.AuthLoginException;
+import com.sun.identity.authentication.spi.PagePropertiesCallback;
 import com.sun.identity.shared.debug.Debug;
 import com.sun.identity.shared.locale.L10NMessageImpl;
-import org.forgerock.openam.forgerockrest.authn.exceptions.JWTBuilderException;
+import org.forgerock.openam.forgerockrest.authn.callbackhandlers.RestAuthCallbackHandlerResponseException;
 import org.forgerock.openam.forgerockrest.authn.exceptions.RestAuthErrorCodeException;
 import org.forgerock.openam.forgerockrest.authn.exceptions.RestAuthException;
+import org.forgerock.openam.forgerockrest.jwt.JwsAlgorithm;
+import org.forgerock.openam.forgerockrest.jwt.JwtBuilder;
+import org.forgerock.openam.forgerockrest.jwt.SignedJwt;
 import org.forgerock.openam.utils.AMKeyProvider;
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -40,13 +44,15 @@ import java.security.PrivateKey;
 import java.security.SecureRandom;
 import java.security.SignatureException;
 import java.security.cert.X509Certificate;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * Handles the initial authenticate and subsequent callback submit RESTful calls.
  */
 public class RestAuthenticationHandler {
 
-    private static final Debug logger = Debug.getInstance("amIdentityServices");
+    private static final Debug DEBUG = Debug.getInstance("amIdentityServices");
 
     private static final SecureRandom RANDOM = new SecureRandom();
     private static final String KEYSTORE_ALIAS = "org.forgerock.keystore.alias";
@@ -54,7 +60,7 @@ public class RestAuthenticationHandler {
     private final AuthContextStateMap authContextStateMap;
     private final AMKeyProvider amKeyProvider;
     private final RestAuthCallbackHandlerManager restAuthCallbackHandlerManager;
-    private final JWTBuilderFactory jwtBuilderFactory;
+    private final JwtBuilder jwtBuilder;
     private final SystemPropertiesManagerWrapper systemPropertiesManager;
 
     /**
@@ -63,16 +69,16 @@ public class RestAuthenticationHandler {
      * @param authContextStateMap An instance of the AuthContextStateMap.
      * @param amKeyProvider An instance of the AMKeyProvider.
      * @param restAuthCallbackHandlerManager An instance of the RestAuthCallbackHandlerManager.
-     * @param jwtBuilderFactory An instance of the JWTBuilderFactory.
+     * @param jwtBuilder An instance of the JwtBuilder.
      */
     @Inject
     public RestAuthenticationHandler(AuthContextStateMap authContextStateMap, AMKeyProvider amKeyProvider,
-            RestAuthCallbackHandlerManager restAuthCallbackHandlerManager, JWTBuilderFactory jwtBuilderFactory,
+            RestAuthCallbackHandlerManager restAuthCallbackHandlerManager, JwtBuilder jwtBuilder,
             SystemPropertiesManagerWrapper systemPropertiesManager) {
         this.authContextStateMap = authContextStateMap;
         this.amKeyProvider = amKeyProvider;
         this.restAuthCallbackHandlerManager = restAuthCallbackHandlerManager;
-        this.jwtBuilderFactory = jwtBuilderFactory;
+        this.jwtBuilder = jwtBuilder;
         this.systemPropertiesManager = systemPropertiesManager;
     }
 
@@ -102,42 +108,67 @@ public class RestAuthenticationHandler {
 
         Response.ResponseBuilder responseBuilder;
         try {
-            AuthContext authContext = createAuthContext(realm);
-
-            if (indexType != null) {
-                authContext.login(indexType, authIndexValue, null, request, response);
-            } else {
-                authContext.login();
-            }
+            AuthContext authContext = startAuthenticationProcess(realm, indexType, authIndexValue, request, response);
 
             JSONObject jsonResponseObject = processAuthContextRequirements(headers, request, response, authContext,
-                    httpMethod);
+                    indexType, authIndexValue, httpMethod);
 
             responseBuilder = Response.status(Response.Status.OK);
+            responseBuilder.header("Cache-control", "no-cache");
             responseBuilder.type(MediaType.APPLICATION_JSON_TYPE);
             responseBuilder.entity(jsonResponseObject.toString());
 
         } catch (RestAuthException e) {
-            logger.error(e.getMessage());
+            DEBUG.error(e.getMessage());
             return e.getResponse();
-        } catch (JWTBuilderException e) {
-            logger.error(e.getMessage());
-            return new RestAuthException(Response.Status.INTERNAL_SERVER_ERROR, e).getResponse();
         } catch (L10NMessageImpl e) {
-            logger.error(e.getMessage(), e);
+            DEBUG.error(e.getMessage(), e);
             return new RestAuthException(Response.Status.UNAUTHORIZED, e).getResponse();
         } catch (JSONException e) {
-            logger.error(e.getMessage(), e);
+            DEBUG.error(e.getMessage(), e);
             return new RestAuthException(Response.Status.BAD_REQUEST, e).getResponse();
         } catch (SignatureException e) {
-            logger.error(e.getMessage(), e);
+            DEBUG.error(e.getMessage(), e);
             return new RestAuthException(Response.Status.INTERNAL_SERVER_ERROR, e).getResponse();
         } catch (AuthLoginException e) {
-            logger.error(e.getMessage(), e);
+            DEBUG.error(e.getMessage(), e);
             return new RestAuthException(Response.Status.UNAUTHORIZED, e).getResponse();
+        } catch (RestAuthCallbackHandlerResponseException e) {
+            // Construct a Response object from the exception.
+            responseBuilder = Response.status(e.getResponseStatus());
+            responseBuilder.type(MediaType.APPLICATION_JSON_TYPE);
+            for (String key : e.getResponseHeaders().keySet()) {
+                responseBuilder.header(key, e.getResponseHeaders().get(key));
+            }
+            responseBuilder.entity(e.getJsonResponse().toString());
         }
 
         return responseBuilder.build();
+    }
+
+    /**
+     * Starts the authentication process by creating the AuthContext and calling login() on it.
+     *
+     * @param realm The realm.
+     * @param indexType The IndexType.
+     * @param authIndexValue The IndexType value.
+     * @param request The HttpServletRequest.
+     * @param response The HttpServletResponse.
+     * @return The AuthContext.
+     * @throws AuthLoginException If a problem occurred when creating the AuthContext or calling the login() method.
+     */
+    private AuthContext startAuthenticationProcess(String realm, AuthContext.IndexType indexType,
+            String authIndexValue, HttpServletRequest request, HttpServletResponse response) throws
+            AuthLoginException {
+
+        AuthContext authContext = createAuthContext(realm);
+
+        if (indexType != null) {
+            authContext.login(indexType, authIndexValue, null, request, response);
+        } else {
+            authContext.login(request, response);
+        }
+        return authContext;
     }
 
     /**
@@ -159,7 +190,7 @@ public class RestAuthenticationHandler {
             return authIndex.getIndexType();
 
         } catch (IllegalArgumentException e) {
-            logger.message("Unknown Authentication Index Type, " + authIndexType);
+            DEBUG.message("Unknown Authentication Index Type, " + authIndexType);
             throw new RestAuthException(Response.Status.INTERNAL_SERVER_ERROR, "Unknown Authentication Index Type, "
                     + authIndexType);
         }
@@ -172,17 +203,23 @@ public class RestAuthenticationHandler {
      *
      * @param headers The HttpHeaders of the RESTful call.
      * @param request The HttpServletRequest of the RESTful call.
+     * @param response The HttpServletResponse of the RESTful call.
      * @param authContext The AuthContext for the authentication process.
+     * @param indexType The authentication index type from the url parameters.
+     * @param authIndexValue The authentication index value from the url parameters.
      * @param httpMethod The Http Method used to initiate this request.
      * @return A JSON object of either an array of Callbacks to be returned to the client or the SSOToken id.
      * @throws SignatureException If there is a problem signing the authId JWT.
      * @throws JSONException If there is a syntax problem when creating the JSON object.
      * @throws L10NMessageImpl If there is a problem getting the SSOToken from the AuthContext.
+     * @throws RestAuthCallbackHandlerResponseException If one of the CallbackHandlers has its own response to be sent.
      */
     private JSONObject processAuthContextRequirements(HttpHeaders headers, HttpServletRequest request,
-            HttpServletResponse response, AuthContext authContext, HttpMethod httpMethod) throws SignatureException,
-            JSONException, L10NMessageImpl {
-        return processAuthContextRequirements(headers, request, response, authContext, null, httpMethod);
+            HttpServletResponse response, AuthContext authContext, AuthContext.IndexType indexType,
+            String authIndexValue, HttpMethod httpMethod) throws SignatureException, JSONException, L10NMessageImpl,
+            RestAuthCallbackHandlerResponseException {
+        return processAuthContextRequirements(headers, request, response, null, authContext, null, indexType,
+                authIndexValue, httpMethod);
     }
 
     /**
@@ -232,17 +269,22 @@ public class RestAuthenticationHandler {
      *
      * @param headers The HttpHeaders of the RESTful call.
      * @param request The HttpServletRequest of the RESTful call.
+     * @param response The HttpServletResponse of the RESTful call.
      * @param authContext The AuthContext for the authentication process.
      * @param authId The authId JWT to store the AuthContext. Null if the the AuthContext has not been stored before.
+     * @param indexType The authentication index type from the url parameters.
+     * @param authIndexValue The authentication index value from the url parameters.
      * @param httpMethod The Http Method used to initiate this request.
      * @return A JSON object of either an array of Callbacks to be returned to the client or the SSOToken id.
      * @throws SignatureException If there is a problem signing the authId JWT.
      * @throws JSONException If there is a syntax problem when creating the JSON object.
      * @throws L10NMessageImpl If there is a problem getting the SSOToken from the AuthContext.
+     * @throws RestAuthCallbackHandlerResponseException If one of the CallbackHandlers has its own response to be sent.
      */
     private JSONObject processAuthContextRequirements(HttpHeaders headers, HttpServletRequest request,
-            HttpServletResponse response, AuthContext authContext, String authId,
-            HttpMethod httpMethod) throws SignatureException, JSONException, L10NMessageImpl {
+            HttpServletResponse response, JSONObject postBody, AuthContext authContext, String authId, AuthContext.IndexType indexType,
+            String authIndexValue, HttpMethod httpMethod) throws SignatureException, JSONException, L10NMessageImpl,
+            RestAuthCallbackHandlerResponseException {
 
         JSONObject jsonResponseObject = new JSONObject();
 
@@ -250,17 +292,34 @@ public class RestAuthenticationHandler {
 
             Callback[] callbacks = authContext.getRequirements();
 
-            JSONArray jsonCallbacks = restAuthCallbackHandlerManager.handleCallbacks(headers, request, response,
-                    callbacks, httpMethod);
+            PagePropertiesCallback pagePropertiesCallback = getPagePropertiesCallback(authContext);
+
+            JSONArray jsonCallbacks = null;
+            try {
+                jsonCallbacks = restAuthCallbackHandlerManager.handleCallbacks(headers, request, response,
+                        postBody, callbacks, httpMethod);
+            } catch (RestAuthCallbackHandlerResponseException e) {
+                // Include the authId in the JSON response.
+                if (authId == null) {
+                    authId = createAuthId(indexType, authIndexValue, authContext);
+                }
+                e.getJsonResponse().put("authId", authId);
+                e.getResponseHeaders().put("Cache-control", "no-cache");
+                throw e;
+            }
 
             if (jsonCallbacks.length() > 0) {
                 //callbacks to send back
                 if (authId == null) {
-                    authId = generateAuthId();
-                    authContextStateMap.addAuthContext(authId, authContext);
+                    authId = createAuthId(indexType, authIndexValue, authContext);
                 }
                 jsonResponseObject.put("authId", authId);
-
+                if (pagePropertiesCallback != null) {
+                    jsonResponseObject.put("template", pagePropertiesCallback.getTemplateName());
+                    String moduleName = pagePropertiesCallback.getModuleName();
+                    String state = pagePropertiesCallback.getPageState();
+                    jsonResponseObject.put("stage", moduleName + state);
+                }
                 jsonResponseObject.put("callbacks", jsonCallbacks);
 
                 return jsonResponseObject;
@@ -268,13 +327,53 @@ public class RestAuthenticationHandler {
             } else {
                 // handled callbacks internally
                 authContext.submitRequirements(callbacks);
-                return processAuthContextRequirements(headers, request, response, authContext, authId, httpMethod);
+                return processAuthContextRequirements(headers, request, response, postBody, authContext, authId,
+                        indexType, authIndexValue, httpMethod);
             }
 
         } else {
             // no more reqs so check auth status
             return handleAuthenticationComplete(authContext);
         }
+    }
+
+    /**
+     * Creates the authId JWT.
+     *
+     * @param indexType The IndexType which will be included in the payload of the JWT.
+     * @param authIndexValue The IndexType value which wil be included in the payload of the JWT.
+     * @param authContext The AuthContext.
+     * @return The authId JWT.
+     * @throws SignatureException If there is a problem signing the JWT.
+     */
+    private String createAuthId(AuthContext.IndexType indexType, String authIndexValue, AuthContext authContext)
+            throws SignatureException {
+        Map<String, Object> jwtValues = new HashMap<String, Object>();
+        jwtValues.put("authIndexType", indexType);
+        jwtValues.put("authIndexValue", authIndexValue);
+        String authId = generateAuthId(jwtValues);
+        authContextStateMap.addAuthContext(authId, authContext);
+        return authId;
+    }
+
+    /**
+     * Gets the PagePropertiesCallback from the Authentication Modules Callback array.
+     *
+     * @param authContext The AuthContext for this Authentication request.
+     * @return The PagePropertiesCallback or null if none exists.
+     */
+    private PagePropertiesCallback getPagePropertiesCallback(AuthContext authContext) {
+
+        PagePropertiesCallback pagePropertiesCallback = null;
+
+        for (Callback callback : authContext.getRequirements(true)) {
+            if (callback instanceof PagePropertiesCallback) {
+                pagePropertiesCallback = (PagePropertiesCallback) callback;
+                break;
+            }
+        }
+
+        return pagePropertiesCallback;
     }
 
     /**
@@ -304,11 +403,16 @@ public class RestAuthenticationHandler {
      *     <li>OpenAM sends SSOToken to client</li>
      * </ol>
      *
+     * @param jwtValues A Map of key value pairs to be included in the JWT payload.
      * @return A JWT as an unique id that will never be generated again, to be used to store AuthContexts between
-     * requests.
+     *          requests.
      * @throws SignatureException If there is a problem signing the JWT.
      */
-    private String generateAuthId() throws SignatureException {
+    private String generateAuthId(Map<String, Object> jwtValues) throws SignatureException {
+
+        if (jwtValues == null) {
+            jwtValues = new HashMap<String, Object>();
+        }
 
         String keyStoreAlias = systemPropertiesManager.get(KEYSTORE_ALIAS);
 
@@ -321,10 +425,11 @@ public class RestAuthenticationHandler {
 
         String otk = new BigInteger(130, RANDOM).toString(32);
 
-        String jwt = jwtBuilderFactory.getJWTBuilder()
-                .setAlgorithm("HS256")
-                .addValuePair("otk", otk)
-                .sign(privateKey)
+        String jwt = jwtBuilder.jwt()
+                .header("alg", "HS256")
+                .content("otk", otk)
+                .content(jwtValues)
+                .sign(JwsAlgorithm.HS256, privateKey)
                 .build();
 
         return jwt;
@@ -339,9 +444,13 @@ public class RestAuthenticationHandler {
      */
     private void verifyAuthId(String authId) throws SignatureException {
 
+        PrivateKey privateKey = amKeyProvider.getPrivateKey(systemPropertiesManager.get(KEYSTORE_ALIAS));
         X509Certificate certificate = amKeyProvider.getX509Certificate(systemPropertiesManager.get(KEYSTORE_ALIAS));
 
-        jwtBuilderFactory.getJWTBuilder().verify(authId, certificate);
+        boolean verified = ((SignedJwt) jwtBuilder.recontructJwt(authId)).verify(privateKey, certificate);
+        if (!verified) {
+            throw new SignatureException("AuthId JWT Signature not valid");
+        }
     }
 
     /**
@@ -361,11 +470,11 @@ public class RestAuthenticationHandler {
         AuthContext.Status authStatus = authContext.getStatus();
 
         if (AuthContext.Status.SUCCESS.equals(authStatus)) {
-            logger.message("Authentication succeeded");
+            DEBUG.message("Authentication succeeded");
             String tokenId = authContext.getSSOToken().getTokenID().toString();
             jsonResponseObject.put("tokenId", tokenId);
         } else {
-            logger.message("Authentication failed");
+            DEBUG.message("Authentication failed");
             String errorCode = authContext.getErrorCode();
             String errorMessage = authContext.getErrorMessage();
 
@@ -384,63 +493,124 @@ public class RestAuthenticationHandler {
      *
      * @param headers The HttpHeaders of the RESTful call.
      * @param request The HttpServletRequest of the RESTful call.
-     * @param msgBody The POST body of the RESTful call.
+     * @param response The HttpServletResponse of the RESTful call.
+     * @param postBody The POST body of the RESTful call.
      * @param httpMethod The Http Method used to initiate this request.
      * @return A response to be sent back to the client. The response will contain either a JSON object containing the
      * SSOToken id from a successful authentication, a JSON object containing a number of Callbacks for the client to
      * complete and return or a JSON object containing an exception message.
      */
     public Response processAuthenticationRequirements(HttpHeaders headers, HttpServletRequest request,
-            HttpServletResponse response, String msgBody, HttpMethod httpMethod) {
+            HttpServletResponse response, String postBody, HttpMethod httpMethod) {
 
         Response.ResponseBuilder responseBuilder;
         try {
-            JSONObject jsonRequestObject = new JSONObject(msgBody);
+            JSONObject jsonRequestObject = new JSONObject(postBody);
 
             String authId = jsonRequestObject.getString("authId");
             verifyAuthId(authId);
 
             AuthContext authContext = authContextStateMap.getAuthContext(authId);
 
-            // Check that the authId JWT was valid and found the AuthContext and that the AuthContext is still
-            // in progress
-            if (authContext == null || !AuthContext.Status.IN_PROGRESS.equals(authContext.getStatus())) {
+            if (authContext == null) {
+                //try to re-create authcontext - need to be careful as could fail if have already submitted callbacks
+                SignedJwt jwt = (SignedJwt) jwtBuilder.recontructJwt(authId);
+                String realm = jwt.getJwt().getContent("realm", String.class);
+                String authIndexType = jwt.getJwt().getContent("authIndexType", String.class);
+                AuthContext.IndexType indexType = getAuthIndexType(authIndexType);
+                String authIndexValue = jwt.getJwt().getContent("authIndexValue", String.class);
+                authContext = startAuthenticationProcess(realm, indexType, authIndexValue, request, response);
+            }
+
+            // Check that the AuthContext is still in progress
+            if (!AuthContext.Status.IN_PROGRESS.equals(authContext.getStatus())) {
                 throw new RestAuthException(Response.Status.UNAUTHORIZED, "Authentication Process not valid");
             }
 
             Callback[] originalCallbacks = authContext.getRequirements();
 
-            JSONArray jsonCallbacks = jsonRequestObject.getJSONArray("callbacks");
-
-            Callback[] responseCallbacks = restAuthCallbackHandlerManager.handleJsonCallbacks(originalCallbacks,
-                    jsonCallbacks);
+            Callback[] responseCallbacks = handleCallbacks(headers, request, response, originalCallbacks,
+                    jsonRequestObject);
 
             authContext.submitRequirements(responseCallbacks);
 
-            JSONObject jsonResponseObject = processAuthContextRequirements(headers, request, response, authContext,
-                    authId, httpMethod);
+            JSONObject jsonResponseObject = processAuthContextRequirements(headers, request, response,
+                    jsonRequestObject, authContext, authId, null, null, httpMethod);
 
             responseBuilder = Response.status(Response.Status.OK);
+            responseBuilder.header("Cache-control", "no-cache");
             responseBuilder.type(MediaType.APPLICATION_JSON_TYPE);
             responseBuilder.entity(jsonResponseObject.toString());
 
         } catch (RestAuthException e) {
-            logger.error(e.getMessage());
+            DEBUG.error(e.getMessage());
             return e.getResponse();
-        } catch (JWTBuilderException e) {
-            logger.error(e.getMessage());
-            return new RestAuthException(Response.Status.INTERNAL_SERVER_ERROR, e).getResponse();
         } catch (L10NMessageImpl e) {
-            logger.error(e.getMessage(), e);
+            DEBUG.error(e.getMessage(), e);
             return new RestAuthException(Response.Status.UNAUTHORIZED, e).getResponse();
         } catch (JSONException e) {
-            logger.error(e.getMessage(), e);
+            DEBUG.error(e.getMessage(), e);
             return new RestAuthException(Response.Status.BAD_REQUEST, e).getResponse();
         } catch (SignatureException e) {
-            logger.error(e.getMessage(), e);
+            DEBUG.error(e.getMessage(), e);
             return new RestAuthException(Response.Status.INTERNAL_SERVER_ERROR, e).getResponse();
+        } catch (AuthLoginException e) {
+            DEBUG.error(e.getMessage(), e);
+            return new RestAuthException(Response.Status.UNAUTHORIZED, e).getResponse();
+        } catch (RestAuthCallbackHandlerResponseException e) {
+            // Construct a Response object from the exception.
+            responseBuilder = Response.status(e.getResponseStatus());
+            responseBuilder.type(MediaType.APPLICATION_JSON_TYPE);
+            for (String key : e.getResponseHeaders().keySet()) {
+                responseBuilder.header(key, e.getResponseHeaders().get(key));
+            }
+            responseBuilder.entity(e.getJsonResponse().toString());
         }
 
         return responseBuilder.build();
+    }
+
+    /**
+     * Will update the Callbacks from the request and JSON object from the POST body.
+     *
+     * @param headers The Headers from the request.
+     * @param request The HttpServletRequest.
+     * @param response The HttpSerlvetResponse.
+     * @param originalCallbacks The orignal callbacks from the AuthContext.
+     * @param jsonRequestObject The JSON object from the request body.
+     * @return The updated original callbacks.
+     * @throws JSONException If there is a problem parsing the JSON object.
+     */
+    private Callback[] handleCallbacks(HttpHeaders headers, HttpServletRequest request,
+            HttpServletResponse response, Callback[] originalCallbacks, JSONObject jsonRequestObject)
+            throws JSONException {
+
+        Callback[] responseCallbacks;
+        if (isJsonAttributePresent(jsonRequestObject, "callbacks")) {
+            JSONArray jsonCallbacks = jsonRequestObject.getJSONArray("callbacks");
+
+            responseCallbacks = restAuthCallbackHandlerManager.handleJsonCallbacks(originalCallbacks, jsonCallbacks);
+        } else {
+            responseCallbacks = restAuthCallbackHandlerManager.handleResponseCallbacks(headers, request, response,
+                    originalCallbacks, jsonRequestObject);
+        }
+
+        return responseCallbacks;
+    }
+
+    /**
+     * Checks to see if the given JSON object has the specified attribute name.
+     *
+     * @param jsonObject The JSON object.
+     * @param attributeName The attribute name to check the presence of.
+     * @return If the JSON object contains the attribute name.
+     */
+    private boolean isJsonAttributePresent(JSONObject jsonObject, String attributeName) {
+        try {
+            jsonObject.get(attributeName);
+        } catch (JSONException e) {
+            return false;
+        }
+        return true;
     }
 }

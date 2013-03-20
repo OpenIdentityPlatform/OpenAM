@@ -66,9 +66,10 @@ public interface JsonCallbackParser<T extends Callback> {
      * Input fields detail information that need to be complete before the callbacks is submitted.
      *
      * @param callback The Callback to convert to JSON.
+     * @param index the position of this callback in the returned structure.
      * @return The JSON representation of the Callback.
      */
-    JSONObject convertToJson(T callback) throws JSONException;
+    JSONObject convertToJson(T callback, int index) throws JSONException;
 
     /**
      * Converts the JSONObject into a Callback, setting the values set in the JSONObject onto the given Callback.

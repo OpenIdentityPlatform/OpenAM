@@ -1,24 +1,23 @@
 /*
- * The contents of this file are subject to the terms of the Common Development and
- * Distribution License (the License). You may not use this file except in compliance with the
- * License.
- *
- * You can obtain a copy of the License at legal/CDDLv1.0.txt. See the License for the
- * specific language governing permission and limitations under the License.
- *
- * When distributing Covered Software, include this CDDL Header Notice in each file and include
- * the License file at legal/CDDLv1.0.txt. If applicable, add the following below the CDDL
- * Header, with the fields enclosed by brackets [] replaced by your own identifying
- * information: "Portions copyright [year] [name of copyright owner]".
- *
- * Copyright 2013 ForgeRock Inc.
- */
+* The contents of this file are subject to the terms of the Common Development and
+* Distribution License (the License). You may not use this file except in compliance with the
+* License.
+*
+* You can obtain a copy of the License at legal/CDDLv1.0.txt. See the License for the
+* specific language governing permission and limitations under the License.
+*
+* When distributing Covered Software, include this CDDL Header Notice in each file and include
+* the License file at legal/CDDLv1.0.txt. If applicable, add the following below the CDDL
+* Header, with the fields enclosed by brackets [] replaced by your own identifying
+* information: "Portions copyright [year] [name of copyright owner]".
+*
+* Copyright 2013 ForgeRock Inc.
+*/
 
 package org.forgerock.openam.forgerockrest.authn.callbackhandlers;
 
 import junit.framework.Assert;
-import org.forgerock.openam.forgerockrest.authn.callbackhandlers.RestAuthCallbackHandler;
-import org.forgerock.openam.forgerockrest.authn.callbackhandlers.RestAuthPasswordCallbackHandler;
+import org.forgerock.openam.forgerockrest.authn.HttpMethod;
 import org.forgerock.openam.forgerockrest.authn.exceptions.RestAuthException;
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -37,8 +36,10 @@ import static junit.framework.Assert.fail;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
-import static org.mockito.Mockito.*;
-import static org.mockito.BDDMockito.*;
+import static org.mockito.BDDMockito.given;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.verify;
 
 public class RestAuthPasswordCallbackHandlerTest {
 
@@ -62,19 +63,20 @@ public class RestAuthPasswordCallbackHandlerTest {
     }
 
     @Test
-    public void shouldUpdateCallbackFromRequest() {
+    public void shouldUpdateCallbackFromRequest() throws RestAuthCallbackHandlerResponseException {
 
         //Given
         HttpHeaders headers = mock(HttpHeaders.class);
         HttpServletRequest request = mock(HttpServletRequest.class);
         HttpServletResponse response = mock(HttpServletResponse.class);
+        JSONObject jsonPostBody = mock(JSONObject.class);
         PasswordCallback passwordCallback = mock(PasswordCallback.class);
 
         given(request.getParameter("password")).willReturn("PASSWORD");
 
         //When
         boolean updated = restAuthPasswordCallbackHandler.updateCallbackFromRequest(headers, request, response,
-                passwordCallback);
+                jsonPostBody, passwordCallback, HttpMethod.POST);
 
         //Then
         verify(passwordCallback).setPassword("PASSWORD".toCharArray());
@@ -82,19 +84,21 @@ public class RestAuthPasswordCallbackHandlerTest {
     }
 
     @Test
-    public void shouldFailToUpdateCallbackFromRequestWhenPasswordIsNull() {
+    public void shouldFailToUpdateCallbackFromRequestWhenPasswordIsNull()
+            throws RestAuthCallbackHandlerResponseException {
 
         //Given
         HttpHeaders headers = mock(HttpHeaders.class);
         HttpServletRequest request = mock(HttpServletRequest.class);
         HttpServletResponse response = mock(HttpServletResponse.class);
+        JSONObject jsonPostBody = mock(JSONObject.class);
         PasswordCallback passwordCallback = mock(PasswordCallback.class);
 
         given(request.getParameter("password")).willReturn(null);
 
         //When
         boolean updated = restAuthPasswordCallbackHandler.updateCallbackFromRequest(headers, request, response,
-                passwordCallback);
+                jsonPostBody, passwordCallback, HttpMethod.POST);
 
         //Then
         verify(passwordCallback, never()).setPassword(Matchers.<char[]>anyObject());
@@ -102,23 +106,43 @@ public class RestAuthPasswordCallbackHandlerTest {
     }
 
     @Test
-    public void shouldFailToUpdateCallbackFromRequestWhenPasswordIsEmptyString() {
+    public void shouldFailToUpdateCallbackFromRequestWhenPasswordIsEmptyString()
+            throws RestAuthCallbackHandlerResponseException {
 
         //Given
         HttpHeaders headers = mock(HttpHeaders.class);
         HttpServletRequest request = mock(HttpServletRequest.class);
         HttpServletResponse response = mock(HttpServletResponse.class);
+        JSONObject jsonPostBody = mock(JSONObject.class);
         PasswordCallback passwordCallback = mock(PasswordCallback.class);
 
         given(request.getParameter("password")).willReturn("");
 
         //When
         boolean updated = restAuthPasswordCallbackHandler.updateCallbackFromRequest(headers, request, response,
-                passwordCallback);
+                jsonPostBody, passwordCallback, HttpMethod.POST);
 
         //Then
         verify(passwordCallback, never()).setPassword(Matchers.<char[]>anyObject());
         assertFalse(updated);
+    }
+
+    @Test
+    public void shouldHandleCallback() throws JSONException {
+
+        //Given
+        HttpHeaders headers = mock(HttpHeaders.class);
+        HttpServletRequest request = mock(HttpServletRequest.class);
+        HttpServletResponse response = mock(HttpServletResponse.class);
+        JSONObject jsonPostBody = mock(JSONObject.class);
+        PasswordCallback originalPasswordCallback = mock(PasswordCallback.class);
+
+        //When
+        PasswordCallback passwordCallback = restAuthPasswordCallbackHandler.handle(headers, request, response,
+                jsonPostBody, originalPasswordCallback);
+
+        //Then
+        assertEquals(originalPasswordCallback, passwordCallback);
     }
 
     @Test
@@ -128,17 +152,15 @@ public class RestAuthPasswordCallbackHandlerTest {
         PasswordCallback passwordCallback = new PasswordCallback("Enter password:", false);
 
         //When
-        JSONObject jsonObject = restAuthPasswordCallbackHandler.convertToJson(passwordCallback);
+        JSONObject jsonObject = restAuthPasswordCallbackHandler.convertToJson(passwordCallback, 1);
 
         //Then
         assertEquals("PasswordCallback", jsonObject.getString("type"));
         assertNotNull(jsonObject.getJSONArray("output"));
         Assert.assertEquals(1, jsonObject.getJSONArray("output").length());
-        Assert.assertEquals("prompt", jsonObject.getJSONArray("output").getJSONObject(0).getString("name"));
         Assert.assertEquals("Enter password:", jsonObject.getJSONArray("output").getJSONObject(0).getString("value"));
         assertNotNull(jsonObject.getJSONArray("input"));
         Assert.assertEquals(1, jsonObject.getJSONArray("input").length());
-        Assert.assertEquals("password", jsonObject.getJSONArray("input").getJSONObject(0).getString("name"));
         Assert.assertEquals("", jsonObject.getJSONArray("input").getJSONObject(0).getString("value"));
     }
 
@@ -150,11 +172,9 @@ public class RestAuthPasswordCallbackHandlerTest {
         JSONObject jsonPasswordCallback = new JSONObject()
                 .put("input", new JSONArray().put(
                         new JSONObject()
-                                .put("name", "password")
                                 .put("value", "PASSWORD")))
                 .put("output", new JSONArray().put(
                         new JSONObject()
-                                .put("name", "prompt")
                                 .put("value", "Enter password:")))
                 .put("type", "PasswordCallback");
 
@@ -176,11 +196,9 @@ public class RestAuthPasswordCallbackHandlerTest {
         JSONObject jsonPasswordCallback = new JSONObject()
                 .put("input", new JSONArray().put(
                         new JSONObject()
-                                .put("name", "password")
                                 .put("value", "PASSWORD")))
                 .put("output", new JSONArray().put(
                         new JSONObject()
-                                .put("name", "prompt")
                                 .put("value", "Enter password:")))
                 .put("type", "NameCallback");
 
@@ -199,11 +217,9 @@ public class RestAuthPasswordCallbackHandlerTest {
         JSONObject jsonPasswordCallback = new JSONObject()
                 .put("input", new JSONArray().put(
                         new JSONObject()
-                                .put("name", "password")
                                 .put("value", "PASSWORD")))
                 .put("output", new JSONArray().put(
                         new JSONObject()
-                                .put("name", "prompt")
                                 .put("value", "Enter password:")))
                 .put("type", "passwordcallback");
 

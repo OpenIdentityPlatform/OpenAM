@@ -1,21 +1,22 @@
 /*
- * The contents of this file are subject to the terms of the Common Development and
- * Distribution License (the License). You may not use this file except in compliance with the
- * License.
- *
- * You can obtain a copy of the License at legal/CDDLv1.0.txt. See the License for the
- * specific language governing permission and limitations under the License.
- *
- * When distributing Covered Software, include this CDDL Header Notice in each file and include
- * the License file at legal/CDDLv1.0.txt. If applicable, add the following below the CDDL
- * Header, with the fields enclosed by brackets [] replaced by your own identifying
- * information: "Portions copyright [year] [name of copyright owner]".
- *
- * Copyright 2013 ForgeRock Inc.
- */
+* The contents of this file are subject to the terms of the Common Development and
+* Distribution License (the License). You may not use this file except in compliance with the
+* License.
+*
+* You can obtain a copy of the License at legal/CDDLv1.0.txt. See the License for the
+* specific language governing permission and limitations under the License.
+*
+* When distributing Covered Software, include this CDDL Header Notice in each file and include
+* the License file at legal/CDDLv1.0.txt. If applicable, add the following below the CDDL
+* Header, with the fields enclosed by brackets [] replaced by your own identifying
+* information: "Portions copyright [year] [name of copyright owner]".
+*
+* Copyright 2013 ForgeRock Inc.
+*/
 
 package org.forgerock.openam.forgerockrest.authn.callbackhandlers;
 
+import org.forgerock.openam.forgerockrest.authn.HttpMethod;
 import org.forgerock.openam.forgerockrest.authn.exceptions.RestAuthException;
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -32,13 +33,8 @@ import javax.ws.rs.core.HttpHeaders;
 import static junit.framework.Assert.assertNotNull;
 import static junit.framework.Assert.fail;
 import static org.mockito.BDDMockito.given;
-import static org.mockito.Matchers.eq;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.never;
-import static org.mockito.Mockito.verify;
-import static org.testng.Assert.assertEquals;
-import static org.testng.Assert.assertFalse;
-import static org.testng.Assert.assertTrue;
+import static org.mockito.Mockito.*;
+import static org.testng.Assert.*;
 
 public class RestAuthChoiceCallbackHandlerTest {
 
@@ -62,19 +58,20 @@ public class RestAuthChoiceCallbackHandlerTest {
     }
 
     @Test
-    public void shouldUpdateCallbackFromRequest() {
+    public void shouldUpdateCallbackFromRequest() throws RestAuthCallbackHandlerResponseException {
 
         //Given
         HttpHeaders headers = mock(HttpHeaders.class);
         HttpServletRequest request = mock(HttpServletRequest.class);
         HttpServletResponse response = mock(HttpServletResponse.class);
+        JSONObject jsonPostBody = mock(JSONObject.class);
         ChoiceCallback choiceCallback = mock(ChoiceCallback.class);
 
         given(request.getParameter("choices")).willReturn("63");
 
         //When
         boolean updated = restAuthChoiceCallbackHandler.updateCallbackFromRequest(headers, request, response,
-                choiceCallback);
+                jsonPostBody, choiceCallback, HttpMethod.POST);
 
         //Then
         verify(choiceCallback).setSelectedIndex(63);
@@ -82,19 +79,21 @@ public class RestAuthChoiceCallbackHandlerTest {
     }
 
     @Test
-    public void shouldFailToUpdateCallbackFromRequestWhenChoicesIsNull() {
+    public void shouldFailToUpdateCallbackFromRequestWhenChoicesIsNull()
+            throws RestAuthCallbackHandlerResponseException {
 
         //Given
         HttpHeaders headers = mock(HttpHeaders.class);
         HttpServletRequest request = mock(HttpServletRequest.class);
         HttpServletResponse response = mock(HttpServletResponse.class);
+        JSONObject jsonPostBody = mock(JSONObject.class);
         ChoiceCallback choiceCallback = mock(ChoiceCallback.class);
 
         given(request.getParameter("choices")).willReturn(null);
 
         //When
         boolean updated = restAuthChoiceCallbackHandler.updateCallbackFromRequest(headers, request, response,
-                choiceCallback);
+                jsonPostBody, choiceCallback, HttpMethod.POST);
 
         //Then
         verify(choiceCallback, never()).setSelectedIndexes(Matchers.<int[]>anyObject());
@@ -102,23 +101,43 @@ public class RestAuthChoiceCallbackHandlerTest {
     }
 
     @Test
-    public void shouldFailToUpdateCallbackFromRequestWhenChoicesIsEmptyString() {
+    public void shouldFailToUpdateCallbackFromRequestWhenChoicesIsEmptyString()
+            throws RestAuthCallbackHandlerResponseException {
 
         //Given
         HttpHeaders headers = mock(HttpHeaders.class);
         HttpServletRequest request = mock(HttpServletRequest.class);
         HttpServletResponse response = mock(HttpServletResponse.class);
+        JSONObject jsonPostBody = mock(JSONObject.class);
         ChoiceCallback choiceCallback = mock(ChoiceCallback.class);
 
         given(request.getParameter("choices")).willReturn("");
 
         //When
         boolean updated = restAuthChoiceCallbackHandler.updateCallbackFromRequest(headers, request, response,
-                choiceCallback);
+                jsonPostBody, choiceCallback, HttpMethod.POST);
 
         //Then
         verify(choiceCallback, never()).setSelectedIndexes(Matchers.<int[]>anyObject());
         assertFalse(updated);
+    }
+
+    @Test
+    public void shouldHandleCallback() throws JSONException {
+
+        //Given
+        HttpHeaders headers = mock(HttpHeaders.class);
+        HttpServletRequest request = mock(HttpServletRequest.class);
+        HttpServletResponse response = mock(HttpServletResponse.class);
+        JSONObject jsonPostBody = mock(JSONObject.class);
+        ChoiceCallback originalChoiceCallback = mock(ChoiceCallback.class);
+
+        //When
+        ChoiceCallback choiceCallback = restAuthChoiceCallbackHandler.handle(headers, request, response, jsonPostBody,
+                originalChoiceCallback);
+
+        //Then
+        assertEquals(originalChoiceCallback, choiceCallback);
     }
 
     @Test
@@ -129,27 +148,23 @@ public class RestAuthChoiceCallbackHandlerTest {
                 false);
 
         //When
-        JSONObject jsonObject = restAuthChoiceCallbackHandler.convertToJson(choiceCallback);
+        JSONObject jsonObject = restAuthChoiceCallbackHandler.convertToJson(choiceCallback, 1);
 
         //Then
         assertEquals("ChoiceCallback", jsonObject.getString("type"));
 
         assertNotNull(jsonObject.getJSONArray("output"));
         assertEquals(3, jsonObject.getJSONArray("output").length());
-        assertEquals("prompt", jsonObject.getJSONArray("output").getJSONObject(0).getString("name"));
         assertEquals("Select choice:", jsonObject.getJSONArray("output").getJSONObject(0).getString("value"));
-        assertEquals("choices", jsonObject.getJSONArray("output").getJSONObject(1).getString("name"));
         assertEquals("1", jsonObject.getJSONArray("output").getJSONObject(1).getJSONArray("value").get(0));
         assertEquals("34", jsonObject.getJSONArray("output").getJSONObject(1).getJSONArray("value").get(1));
         assertEquals("66", jsonObject.getJSONArray("output").getJSONObject(1).getJSONArray("value").get(2));
         assertEquals("93", jsonObject.getJSONArray("output").getJSONObject(1).getJSONArray("value").get(3));
-        assertEquals("defaultChoice", jsonObject.getJSONArray("output").getJSONObject(2).getString("name"));
         assertEquals(0, jsonObject.getJSONArray("output").getJSONObject(2).getInt("value"));
 
         assertNotNull(jsonObject.getJSONArray("input"));
         assertEquals(1, jsonObject.getJSONArray("input").length());
-        assertEquals("selectedIndex", jsonObject.getJSONArray("input").getJSONObject(0).getString("name"));
-        assertEquals("", jsonObject.getJSONArray("input").getJSONObject(0).getString("value"));
+        assertEquals(0, jsonObject.getJSONArray("input").getJSONObject(0).getInt("value"));
     }
 
     @Test
@@ -161,27 +176,23 @@ public class RestAuthChoiceCallbackHandlerTest {
         choiceCallback.setSelectedIndex(1);
 
         //When
-        JSONObject jsonObject = restAuthChoiceCallbackHandler.convertToJson(choiceCallback);
+        JSONObject jsonObject = restAuthChoiceCallbackHandler.convertToJson(choiceCallback, 1);
 
         //Then
         assertEquals("ChoiceCallback", jsonObject.getString("type"));
 
         assertNotNull(jsonObject.getJSONArray("output"));
         assertEquals(3, jsonObject.getJSONArray("output").length());
-        assertEquals("prompt", jsonObject.getJSONArray("output").getJSONObject(0).getString("name"));
         assertEquals("Select choice:", jsonObject.getJSONArray("output").getJSONObject(0).getString("value"));
-        assertEquals("choices", jsonObject.getJSONArray("output").getJSONObject(1).getString("name"));
         assertEquals("1", jsonObject.getJSONArray("output").getJSONObject(1).getJSONArray("value").get(0));
         assertEquals("34", jsonObject.getJSONArray("output").getJSONObject(1).getJSONArray("value").get(1));
         assertEquals("66", jsonObject.getJSONArray("output").getJSONObject(1).getJSONArray("value").get(2));
         assertEquals("93", jsonObject.getJSONArray("output").getJSONObject(1).getJSONArray("value").get(3));
-        assertEquals("defaultChoice", jsonObject.getJSONArray("output").getJSONObject(2).getString("name"));
         assertEquals(0, jsonObject.getJSONArray("output").getJSONObject(2).getInt("value"));
 
         assertNotNull(jsonObject.getJSONArray("input"));
         assertEquals(1, jsonObject.getJSONArray("input").length());
-        assertEquals("selectedIndex", jsonObject.getJSONArray("input").getJSONObject(0).getString("name"));
-        assertEquals("1", jsonObject.getJSONArray("input").getJSONObject(0).getString("value"));
+        assertEquals(1, jsonObject.getJSONArray("input").getJSONObject(0).getInt("value"));
     }
 
     @Test
@@ -193,17 +204,13 @@ public class RestAuthChoiceCallbackHandlerTest {
         JSONObject jsonNameCallback = new JSONObject()
                 .put("input", new JSONArray()
                         .put(new JSONObject()
-                                .put("name", "selectedIndexes")
-                                .put("value", new JSONArray().put("1"))))
+                                .put("value", 1)))
                 .put("output", new JSONArray()
                         .put(new JSONObject()
-                                .put("name", "prompt")
                                 .put("value", "Select choice:"))
                         .put(new JSONObject()
-                                .put("name", "choices")
                                 .put("value", new JSONArray().put("1").put("34").put("66").put("93")))
                         .put(new JSONObject()
-                                .put("name", "defaultChoice")
                                 .put("value", "0")))
                 .put("type", "ChoiceCallback");
 
@@ -228,17 +235,13 @@ public class RestAuthChoiceCallbackHandlerTest {
         JSONObject jsonNameCallback = new JSONObject()
                 .put("input", new JSONArray()
                         .put(new JSONObject()
-                                .put("name", "selectedIndexes")
-                                .put("value", new JSONArray().put("1"))))
+                                .put("value", 1)))
                 .put("output", new JSONArray()
                         .put(new JSONObject()
-                                .put("name", "prompt")
                                 .put("value", "Select choice:"))
                         .put(new JSONObject()
-                                .put("name", "choices")
                                 .put("value", new JSONArray().put("1").put("34").put("66").put("93")))
                         .put(new JSONObject()
-                                .put("name", "defaultChoice")
                                 .put("value", "0")))
                 .put("type", "PasswordCallback");
 
@@ -258,17 +261,13 @@ public class RestAuthChoiceCallbackHandlerTest {
         JSONObject jsonNameCallback = new JSONObject()
                 .put("input", new JSONArray()
                         .put(new JSONObject()
-                                .put("name", "selectedIndexes")
-                                .put("value", new JSONArray().put("1"))))
+                                .put("value", 1)))
                 .put("output", new JSONArray()
                         .put(new JSONObject()
-                                .put("name", "prompt")
                                 .put("value", "Select choice:"))
                         .put(new JSONObject()
-                                .put("name", "choices")
                                 .put("value", new JSONArray().put("1").put("34").put("66").put("93")))
                         .put(new JSONObject()
-                                .put("name", "defaultChoice")
                                 .put("value", "0")))
                 .put("type", "choicecallback");
 
