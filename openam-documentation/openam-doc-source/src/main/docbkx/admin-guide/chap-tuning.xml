@@ -318,11 +318,11 @@
       <entry><para>-</para></entry>
       <entry><para>Ensures the server JVM is used</para></entry>
      </row>
-     <row>
+<!--     <row>
       <entry><para><literal>-Xss</literal></para></entry>
       <entry><para>132k</para></entry>
       <entry><para>The stack size for each thread</para></entry>
-     </row>
+     </row> -->
      <row>
       <entry><para><literal>-XX:PermSize</literal> &amp;
       <literal>-XX:MaxPermSize</literal></para></entry>
