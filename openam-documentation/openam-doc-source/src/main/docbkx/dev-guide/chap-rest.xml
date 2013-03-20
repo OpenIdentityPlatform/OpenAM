@@ -70,6 +70,9 @@
     <para><link linkend="rest-api-crud-realm">Realm management</link> (creating,
     reading, updating, deleting realms)</para>
    </listitem>
+   <listitem>
+    <para><link linkend="rest-dashboard">Displaying Dashboard Applications</link></para>
+   </listitem>
   </itemizedlist>
   
   <para>To call the API, access URLs under <literal>identity/</literal> where
@@ -1671,7 +1674,189 @@ $ curl --request PUT --header "iplanetDirectoryPro: AQIC5w...2NzEz*"
     xlink:show="new">HTTP status code</link>.</para>
    
    </section>
-  
+
  </section>
- 
+
+ <section xml:id="rest-dashboard">
+  <title>Displaying Dashboard Applications</title>
+  <indexterm><primary>Dashboard services</primary></indexterm>
+  
+    <para>OpenAm lets administrators configure online applications to display
+    applications on user Dashboards. You can used exposed REST API to display
+    information about the online applications.</para>
+    
+    <variablelist>
+     <varlistentry>
+      <term><literal>/dashboard/assigned</literal></term>
+      <listitem>
+       <para>This endpoint retrieves the list of applications assigned to the 
+       authenticated user.</para>
+      <screen>$ curl --request POST --data "username=amadmin&amp;password=password"
+ https://openam.example.com:8443/openam/identity/authenticate
+token.id=AQIC5w...2NzEz*
+$ curl --header "iplanetDirectoryPro: AQIC5w...2NzEz*"
+ https://openam.example.com:8443/openam/json/dashboard/assigned
+{
+  "google": {
+      "dashboardIcon": [
+          "Google.gif"
+      ],
+      "dashboardName": [
+          "Google"
+      ],
+      "dashboardLogin": [
+          "http://www.google.com"
+      ],
+      "ICFIdentifier": [
+          ""
+      ],
+      "dashboardDisplayName": [
+          "Google"
+      ],
+      "dashboardClassName": [
+          "SAML2ApplicationClass"
+      ]
+   }
+}</screen>
+      </listitem>
+     </varlistentry>
+
+     <varlistentry>
+      <term><literal>/dashboard/available</literal></term>
+      <listitem>
+       <para>This endpoint retrieves the list of applications available in the
+       authenticated user's realm. The example is based on two of the default 
+       Dashboard applications: Google and Salesforce.</para>
+      <screen>$ curl --request POST --data "username=amadmin&amp;password=password"
+ https://openam.example.com:8443/openam/identity/authenticate
+token.id=AQIC5w...2NzEz*
+$ curl --header "iplanetDirectoryPro: AQIC5w...2NzEz*"
+ https://openam.example.com:8443/openam/json/dashboard/available
+{
+  "google": {
+      "dashboardIcon": [
+          "Google.gif"
+      ],
+      "dashboardName": [
+          "Google"
+      ],
+      "dashboardLogin": [
+          "http://www.google.com"
+      ],
+      "ICFIdentifier": [
+          ""
+      ],
+      "dashboardDisplayName": [
+          "Google"
+      ],
+      "dashboardClassName": [
+          "SAML2ApplicationClass"
+      ]
+  }
+  "salesforce": {
+      "dashboardIcon": [
+          "salesforce.gif"
+      ],
+      "dashboardName": [
+          "Salesforce"
+      ],
+      "dashboardLogin": [
+          "http://salesforce.com"
+      ],
+      "ICFIdentifier": [
+          ""
+      ],
+      "dashboardDisplayName": [
+          "Salesforce"
+      ],
+      "dashboardClassName": [
+          "SAML2ApplicationClass"
+      ]
+  }
+}</screen>
+      </listitem>
+     </varlistentry>
+
+     <varlistentry>
+      <term><literal>/dashboard/defined</literal></term>
+      <listitem>
+       <para>This endpoint retrieves the list of all applications available defined
+       for the OpenAM Dashboard service. The example is based on the three default 
+       Dashboard applications: Google, Salesforce, and Zendesk.</para>
+      <screen>$ curl --request POST --data "username=amadmin&amp;password=password"
+ https://openam.example.com:8443/openam/identity/authenticate
+token.id=AQIC5w...2NzEz*
+$ curl --header "iplanetDirectoryPro: AQIC5w...2NzEz*"
+ https://openam.example.com:8443/openam/json/dashboard/available
+{
+  "google": {
+      "dashboardIcon": [
+          "Google.gif"
+      ],
+      "dashboardName": [
+          "Google"
+      ],
+      "dashboardLogin": [
+          "http://www.google.com"
+      ],
+      "ICFIdentifier": [
+          ""
+      ],
+      "dashboardDisplayName": [
+          "Google"
+      ],
+      "dashboardClassName": [
+          "SAML2ApplicationClass"
+      ]
+  }
+  "salesforce": {
+      "dashboardIcon": [
+          "salesforce.gif"
+      ],
+      "dashboardName": [
+          "Salesforce"
+      ],
+      "dashboardLogin": [
+          "http://salesforce.com"
+      ],
+      "ICFIdentifier": [
+          ""
+      ],
+      "dashboardDisplayName": [
+          "Salesforce"
+      ],
+      "dashboardClassName": [
+          "SAML2ApplicationClass"
+      ]
+  }
+  "zendesk": {
+      "dashboardIcon": [
+          "Zendesk.gif"
+      ],
+      "dashboardName": [
+          "Zendesk"
+      ],
+      "dashboardLogin": [
+          "http://Zendesk.com"
+      ],
+      "ICFIdentifier": [
+          ""
+      ],
+      "dashboardDisplayName": [
+          "Zendesk"
+      ],
+      "dashboardClassName": [
+          "SAML2ApplicationClass"
+      ]
+  }
+}</screen>
+      </listitem>
+     </varlistentry>
+
+    </variablelist>
+    
+    <para>If your application runs in a user-agent such as a browser, you can
+    rely on OpenAM to handle authentication.</para>
+   
+  </section> 
 </chapter>
