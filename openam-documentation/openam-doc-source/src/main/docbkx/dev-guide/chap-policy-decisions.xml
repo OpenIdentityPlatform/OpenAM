@@ -20,7 +20,7 @@
   !
   ! CCPL HEADER END
   !
-  !      Copyright 2011 ForgeRock AS
+  !      Copyright 2011-2013 ForgeRock AS
   !    
 -->
 <chapter xml:id='chap-policy-decisions'
@@ -35,10 +35,12 @@
   <primary>Policy</primary>
   <secondary>Java API</secondary>
  </indexterm>
+
  <para>This chapter shows how to request policy decision by using OpenAM Java
  SDK. The chapter focuses on the sample client,
- <filename>PolicyEvaluationSample.java</filename>, which demonstrates making a
- request to OpenAM for a policy decision about access to a web resource.</para>
+ <filename>source/samples/policy/PolicyEvaluationSample.java</filename>, which
+ demonstrates making a request to OpenAM for a policy decision about access to
+ a web resource.</para>
 
  <para>OpenAM centralizes policy administration, policy evaluation, and policy
  decision making so that your applications do not have to do so. In many
@@ -178,7 +180,8 @@ public class PolicyEvaluationSample {
  file, <filename>resources/policyEvaluationSample.properties</filename>, to
  indicate the user credentials, resource to access, and HTTP method to
  use. You can use a resource that might not exist for the purposes of this
- example.</para>
+ example, but you will need to set up a policy for that resource to get
+ meaningful results.</para>
 
  <programlisting language="java">user.name=demo
 user.password=changeit
@@ -197,7 +200,7 @@ action.name=GET</programlisting>
  from OpenAM using the script,
  <filename>scripts/run-policy-evaluation-sample.sh</filename>.</para>
 
- <screen>$ scripts/run-policy-evaluation-sample.sh
+ <screen>$ sh scripts/run-policy-evaluation-sample.sh
 Using properties file:policyEvaluationSample
 sample properties:
 user.password:changeit
@@ -207,12 +210,10 @@ resource.name:http://www.example.com:80/banner.html
 action.name:GET
 ------------------------------------------------------------------------------:
 Entering getSSOToken():userName=demo,password=changeit
-TokenID:AQIC5wM2LY4Sfcwu-JzDtYKCaxP-DxROXYd73zLlDt3fCh4.*AAJTSQACMDE.*
+TokenID:AQIC5wM2LY4Sfcx3aQGFRKu5-r1a-Vfyjb...5ODM4NDY0MzE0ODYzODQ1*
 returning from getSSOToken()
-Entering getPolicyDecision():
- resourceName=http://www.example.com:80/banner.html,
- serviceName=iPlanetAMWebAgentService,
- actionName=GET
+Entering getPolicyDecision():resourceName=http://www.example.com:80/banner.html,
+ serviceName=iPlanetAMWebAgentService,actionName=GET
 policyDecision:&lt;PolicyDecision&gt;
 &lt;ResponseAttributes&gt;
 &lt;/ResponseAttributes&gt;

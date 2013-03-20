@@ -20,7 +20,7 @@
   !
   ! CCPL HEADER END
   !
-  !      Copyright 2011 ForgeRock AS
+  !      Copyright 2011-2013 ForgeRock AS
   !    
 -->
 <chapter xml:id='chap-session'
@@ -30,20 +30,21 @@
  xsi:schemaLocation='http://docbook.org/ns/docbook http://docbook.org/xml/5.0/xsd/docbook.xsd'
  xmlns:xlink='http://www.w3.org/1999/xlink'
  xmlns:xinclude='http://www.w3.org/2001/XInclude'>
- <title>Handling Single Sign On Using OpenAM Java SDK</title>
+ <title>Handling Single Sign-On Using OpenAM Java SDK</title>
  <indexterm>
   <primary>Session tokens</primary>
   <secondary>Java API</secondary>
  </indexterm>
- <para>This chapter looks at handling session tokens with the OpenAM Java SDK
- using the sample client <filename>SSOTokenSample.java</filename>.</para>
+ <para>This chapter looks at handling session tokens with the OpenAM Java SDK.
+ The class shown in this chapter is
+ <literal>com.sun.identity.samples.sso.SSOTokenSample</literal>.</para>
 
- <para>When a user authenticates successfully, OpenAM sets up a single sign on
- session for the user. The session is associated with an SSO token that holds
- information about the authentication, and also about the user's environment
- and session. OpenAM disposes of the session when the authentication context
- <literal>logout()</literal> method is called, or when a session timeout is
- reached. At that point the SSO token is no longer valid.</para>
+ <para>When a user authenticates successfully, OpenAM sets up a single sign-on
+ (SSO) session for the user. The session is associated with an SSO token that
+ holds information about the authentication, and also about the user's
+ environment and session. OpenAM deletes the session when the authentication
+ context <literal>logout()</literal> method is called, or when a session timeout
+ is reached. At that point the SSO token is no longer valid.</para>
 
  <para>When your application has an <literal>AuthContext</literal> after
  successful authentication, you can retrieve the SSO token from the context.
@@ -158,20 +159,23 @@ public class SSOTokenSample {
 
  <para>Before you run the script that calls the sample, authenticate to OpenAM
  in order to have OpenAM generate the SSO token ID. To see the SSO token ID,
- you can either authenticate on the command line using the RESTful
- <literal>authenticate</literal> command, or alternatively run the
+ use the RESTful <literal>authenticate</literal> command as shown in the
+ following example, or alternatively run the
  <literal>SSOTokenSampleServlet</literal> web-based sample.</para>
 
- <screen>$ <userinput>scripts/SSOTokenSample.sh</userinput>
-Enter SSOToken ID:
- <userinput>AQIC5wM2LY4Sfcxsdru55RwePLUIbY8xTjeHf3Xnw6hphOE.*AAJTSQACMDE.*</userinput>
-SSOToken host name: 192.168.56.1
-SSOToken Principal name:
- id=bjensen,ou=user,o=realm,ou=services,<?eval ${defaultRootSuffix}?>
+ <screen>$ curl
+ --request POST
+ --data "username=demo&amp;password=changeit"
+ http://openam.example.com:8080/openam/identity/authenticate
+token.id=AQIC5wM2LY4Sfcyy10grl...AlNLABQtNjI4OTkyNTUxNTc4MDQ3NzEzOQ..*
+$ sh scripts/SSOTokenSample.sh
+Enter SSOToken ID: AQIC5wM2LY4Sfcyy10grl...AlNLABQtNjI4OTkyNTUxNTc4MDQ3NzEzOQ..*
+SSOToken host name: 172.16.203.239
+SSOToken Principal name: id=demo,ou=user,dc=openam,dc=forgerock,dc=org
 Authentication type used: DataStore
-IPAddress of the host: 192.168.56.1
+IPAddress of the host: 172.16.203.239
 SSO Token validation test Succeeded.
-Token ID: AQIC5wM2LY4Sfcxsdru55RwePLUIbY8xTjeHf3Xnw6hphOE.*AAJTSQACMDE.*
+Token ID: AQIC5wM2LY4Sfcyy10grl...AlNLABQtNjI4OTkyNTUxNTc4MDQ3NzEzOQ..*
 Property: TimeZone: PST
 Property: County: SantaClara</screen>
 
@@ -248,8 +252,8 @@ Property: County: SantaClara</screen>
   <para>The above configuration to access the notification service also applies
   for other types of listeners, such as <literal>ServiceListener</literal>, and
   <literal>IdEventListener</literal> implementations. See the <link
-  xlink:href="http://openam.forgerock.org/apidocs/index.html"
-  ><citetitle>OpenAM Java SDK API Specification</citetitle></link> for details
+  xlink:href="http://openam.forgerock.org/apidocs/" xlink:show="new"
+  ><citetitle>OpenAM Public API JavaDoc</citetitle></link> for details
   on the available listener interfaces.</para>
  </section>
 </chapter>

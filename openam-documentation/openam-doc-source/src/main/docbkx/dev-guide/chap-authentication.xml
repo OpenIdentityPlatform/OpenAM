@@ -20,7 +20,7 @@
   !
   ! CCPL HEADER END
   !
-  !      Copyright 2011 ForgeRock AS
+  !      Copyright 2011-2013 ForgeRock AS
   !    
 -->
 <chapter xml:id='chap-authentication'
@@ -39,7 +39,9 @@
  <para>This chapter looks at authentication with the OpenAM Java SDK and at the
  sample client, <filename>Login.java</filename>, which demonstrates
  authenticating to OpenAM from a client application, provided a realm, user
- name, and password.</para>
+ name, and password. This is the sample you ran to test installation of the
+ command-line SDK samples. The class shown in this chapter is
+ <literal>com.sun.identity.samples.authentication.Login</literal>.</para>
  
  <orderedlist>
   <para>With OpenAM, your client application performs the following steps
@@ -84,9 +86,8 @@
  callbacks for choices, confirmations, locales, names, passwords, text input,
  and text output.</para>
  
- <para>See the <link
- xlink:href="http://openam.forgerock.org/apidocs/index.html"
- ><citetitle>OpenAM Java SDK API Specification</citetitle></link> for
+ <para>See the <link xlink:href="http://openam.forgerock.org/apidocs/"
+ xlink:show="new"><citetitle>OpenAM Public API JavaDoc</citetitle></link> for
  reference.</para>
  
  <para>As the sample client gets the realm (called organization in the sample),
@@ -291,9 +292,4 @@ public class Login {
         System.exit(0);
     }
 }</programlisting>
- 
- <para>For instructions on building the sample clients, see the chapter <link
- xlink:href="dev-guide#chap-jdk"
- xlink:role="http://docbook.org/xlink/role/olink"><citetitle>Using the OpenAM
- Java SDK</citetitle></link>.</para>
 </chapter>

@@ -153,6 +153,17 @@
     by the built-in Global Session Service setting,
     <literal>DESTROY_OLD_SESSIONS</literal>.</para>
    </listitem>
+
+   <listitem>
+    <para>Resources for integrating OpenAM with third-party access and identity
+    management software are not delivered with the distribution.</para>
+   </listitem>
+
+   <listitem>
+    <para>Javadoc for the client SDK is no longer delivered with the
+    distribution, but instead is <link xlink:show="new"
+    xlink:href="http://openam.forgerock.org/apidocs/">available online</link>.</para>
+   </listitem>
   </itemizedlist>
  </section>
 </chapter>
