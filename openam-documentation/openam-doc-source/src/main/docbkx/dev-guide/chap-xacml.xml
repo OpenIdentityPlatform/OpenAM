@@ -20,7 +20,7 @@
   !
   ! CCPL HEADER END
   !
-  !      Copyright 2011 ForgeRock AS
+  !      Copyright 2011-2013 ForgeRock AS
   !    
 -->
 <chapter xml:id='chap-xacml'
@@ -33,7 +33,8 @@
  <title>Requesting a XACML Policy Decision Using OpenAM Java SDK</title>
 
  <para>This chapter shows how to request a XACML policy decision with OpenAM
- Java SDK, using the sample client, <filename>XACMLClientSample.java</filename>.
+ Java SDK, using the sample client,
+ <filename>source/samples/xacml/XACMLClientSample.java</filename>.
  The sample client relies on an OpenAM server acting as a policy decision point
  and another OpenAM server acting as a policy enforcement point.</para>
  
@@ -212,7 +213,7 @@ public class XACMLClientSample {
         //set Action in Request
         request.setAction(action);
 
-        //Enviornment, our PDP does not use environment now
+        //Environment, our PDP does not use environment now
         Environment environment = ContextFactory.getInstance()
             .createEnvironment();
         request.setEnvironment(environment);
@@ -237,19 +238,19 @@ public class XACMLClientSample {
 
  <para>Before running the sample client, you must set up the configuration as
  described in the comments at the outset of the
- <filename>scripts/run-xacml-client-sample.sh</filename> script. The client
- accesses an OpenAM server acting as the policy enforcement point, configured
- in a circle of trust with the OpenAM server acting as the policy decision
- point. When you setup the sample clients, you pointed them to an OpenAM
- server, which functions in this example as the policy enforcement point.
- Therefore, set up another OpenAM server to act as the policy decision point.
- The user profile and policy is stored on the OpenAM server acting as the
- policy decision point.</para>
+ <filename>scripts/run-xacml-client-sample.sh</filename> script.</para>
 
- <para>Also set up the configuration for sample client. The relevant lines
- from <filename>resources/xacmlClientSample.properties</filename> follow.</para>
+ <itemizedlist>
+  <listitem>
+   <para>Edit <filename>resources/xacmlClientSample.properties</filename>
+   and <filename>resources/policyEvaluationSample.properties</filename>
+   to set up the configuration for the sample client.</para>
 
- <programlisting language="java">pdp.entityId=xacmlPdpEntity
+   <para>The relevant settings from
+   <filename>resources/xacmlClientSample.properties</filename> are the
+   following.</para>
+
+   <programlisting language="ini">pdp.entityId=xacmlPdpEntity
 pep.entityId=xacmlPepEntity
 subject.id=id=demo,ou=user,<?eval ${defaultRootSuffix}?>
 subject.id.datatype=urn:oasis:names:tc:xacml:1.0:data-type:x500Name
@@ -261,28 +262,60 @@ resource.servicename.datatype=http://www.w3.org/2001/XMLSchema#string
 action.id=GET
 action.id.datatype=http://www.w3.org/2001/XMLSchema#string</programlisting>
 
- <para>What follows here is described in the comments of the script. In OpenAM
- console on the policy decision point OpenAM server, browse to Configuration
- &gt; Global &gt; SAMLv2 SOAP Binding, and configure a new request handler with
- Key <literal>/xacmlPdp</literal> and Class
- <literal>com.sun.identity.xacml.plugins.XACMLAuthzDecisionQueryHandler</literal>.</para>
+   <para>The relevant settings from
+   <filename>resources/policyEvaluationSample.properties</filename> are the
+   following.</para>
 
- <para>On the policy enforcement point OpenAM server, set up the circle of
- trust, and then create and import the metadata.</para>
+   <programlisting language="ini">user.name=demo
+user.password=changeit
+service.name=iPlanetAMWebAgentService
+resource.name=http://www.example.com:80/banner.html
+action.name=GET</programlisting>
+  </listitem>
 
- <screen>$ ssoadm
+  <listitem>
+   <para>The client accesses an OpenAM server acting as the policy enforcement
+    point, configured in a circle of trust with the OpenAM server acting as the
+    policy decision point. When you set up the sample clients, you pointed them
+    to an OpenAM server. For this example, configure that server to function
+    as a policy enforcement point and also as a policy decision point.</para>
+
+    <orderedlist>
+     <listitem>
+      <para>In OpenAM console, browse to Configuration &gt; Global &gt; SAMLv2
+      SOAP Binding, and configure a new request handler with Key
+      <literal>/xacmlPdpEntity</literal> and Class
+      <literal>com.sun.identity.xacml.plugins.XACMLAuthzDecisionQueryHandler</literal>.</para>
+     </listitem>
+
+     <listitem>
+      <para>Set up the circle of trust, and then create and import the metadata
+      for the policy enforcement point and the policy decision point. In the
+      following simplified example, both the policy enforcement point and policy
+      decision point are hosted on the same OpenAM server. You could also set
+      up the policy enforcement point and policy decision point on separate
+      servers, as long as the circles of trust on both servers each include both
+      the policy enforcement point and the policy decision point. You can
+      set up the trust relationship between the two entities either by using
+      the <command>ssoadm</command> command as shown below, or by using the
+      <literal>ssoadm.jsp</literal> page, which you can activate as described in
+      <link xlink:href="admin-guide#openam-ssoadm-jsp-overview" xlink:show="new"
+      xlink:role="http://docbook.org/xlink/role/olink"><citetitle>OpenAM
+      ssoadm.jsp</citetitle></link>.</para>
+
+      <screen>$ ssoadm
  create-cot
  --adminid amadmin
  --password-file /tmp/pwd.txt
- --cot xacml-cot
+ --cot cot
 
-Circle of trust, xacml-cot was created.
+Circle of trust, cot was created.
 $ ssoadm
  create-metadata-templ
  --adminid amadmin
  --password-file /tmp/pwd.txt
  --entityid xacmlPepEntity
- --xacmlpep /xacmlPep
+ --xacmlpep /xacmlPepEntity
  --meta-data-file xacmlPep.xml
  --extended-data-file xacmlPep-extended.xml
 
@@ -292,29 +325,18 @@ $ ssoadm
  import-entity
  --adminid amadmin
  --password-file /tmp/pwd.txt
- --cot xacml-cot
+ --cot cot
  --meta-data-file xacmlPep.xml
  --extended-data-file xacmlPep-extended.xml
 
 Import file, xacmlPep.xml.
-Import file, xacmlPep-extended.xml.</screen>
-
- <para>On the policy decision point OpenAM server, set up the circle of trust,
- and then create and import the metadata.</para>
-
- <screen>$ ssoadm
- create-cot
- --adminid amadmin
- --password-file /tmp/pwd.txt
- --cot xacml-cot
-
-Circle of trust, xacml-cot was created.
+Import file, xacmlPep-extended.xml.
 $ ssoadm
  create-metadata-templ
  --adminid amadmin
  --password-file /tmp/pwd.txt
  --entityid xacmlPdpEntity
- --xacmlpep /xacmlPdp
+ --xacmlpep /xacmlPdpEntity
  --meta-data-file xacmlPdp.xml
  --extended-data-file xacmlPdp-extended.xml
 
@@ -324,61 +346,45 @@ $ ssoadm
  import-entity
  --adminid amadmin
  --password-file /tmp/pwd.txt
- --cot xacml-cot
+ --cot cot
  --meta-data-file xacmlPdp.xml
  --extended-data-file xacmlPdp-extended.xml
 
 Import file, xacmlPdp.xml.
 Import file, xacmlPdp-extended.xml.</screen>
+     </listitem>
+    </orderedlist>
+  </listitem>
 
- <para>On the policy enforcement point OpenAM server, import the metadata
- from the policy decision point OpenAM server.</para>
+  <listitem>
+   <para>Create a policy that allows
+   authenticated users to perform an HTTP <literal>GET</literal> on the sample
+   <literal>resource.id</literal> URL you configured, such as
+   <literal>http://www.example.com:80/banner.html</literal>.</para>
 
- <screen>$ ssoadm
- import-entity
- --adminid amadmin
- --password-file /tmp/pwd.txt
- --cot xacml-cot
- --meta-data-file xacmlPdp.xml
- --extended-data-file xacmlPdp-extended.xml
+   <para>See <link xlink:href="admin-guide#configure-authz-policy"
+   xlink:show="new" xlink:role="http://docbook.org/xlink/role/olink"
+   ><citetitle>Configuring Policies</citetitle></link> for details.</para>
+  </listitem>
+ </itemizedlist>
 
-Import file, xacmlPdp.xml.
-Import file, xacmlPdp-extended.xml.</screen>
+ <para>After you have configured OpenAM and the properties files, run the
+ sample client script, and observe the XACML request and response.</para>
 
- <para>On the policy decision point OpenAM server, import the metadata from
- the policy enforcement point server. Also create an entitlement that allows
- authenticated users to perform an HTTP <literal>GET</literal> on the sample
- <literal>resource.id</literal> URL you configured, such as
- <literal>http://www.example.com:80/banner.html</literal>.</para>
-
- <screen>$ ssoadm
- import-entity
- --adminid amadmin
- --password-file /tmp/pwd.txt
- --cot xacml-cot
- --meta-data-file xacmlPep.xml
- --extended-data-file xacmlPep-extended.xml
-
-Import file, xacmlPep.xml.
-Import file, xacmlPep-extended.xml.</screen>
-
- <para>Run the sample client script.</para>
-
- <screen>$ scripts/run-xacml-client-sample.sh 
+ <screen width="83">$ sh scripts/run-xacml-client-sample.sh
 Using properties file:xacmlClientSample
 sample properties:
+subject.id.datatype:urn:oasis:names:tc:xacml:1.0:data-type:x500Name
+pdp.entityId:xacmlPdpEntity
 resource.servicename.datatype:http://www.w3.org/2001/XMLSchema#string
 resource.id:http://www.example.com:80/banner.html
+resource.servicename:iPlanetAMWebAgentService
 action.id.datatype:http://www.w3.org/2001/XMLSchema#string
 resource.id.datatype:http://www.w3.org/2001/XMLSchema#string
 action.id:GET
-subject.id:id=demo,ou=user,<?eval ${defaultRootSuffix}?>
-------------------------------------------------------------------------------:
-subject.id.datatype:urn:oasis:names:tc:xacml:1.0:data-type:x500Name
-pdp.entityId:xacmlPdpEntity
-resource.servicename:iPlanetAMWebAgentService
 subject.category:urn:oasis:names:tc:xacml:1.0:subject-category:access-subject
 pep.entityId:xacmlPepEntity
+subject.id:id=demo,ou=user,dc=openam,dc=forgerock,dc=org
 
 testProcessRequest():xacmlRequest:
 
@@ -386,27 +392,31 @@ testProcessRequest():xacmlRequest:
  xmlns:xacml-context=&quot;urn:oasis:names:tc:xacml:2.0:context:schema:os&quot;
  xmlns:xsi=&quot;http://www.w3.org/2001/XMLSchema-instance&quot;
  xsi:schemaLocation=&quot;urn:oasis:names:tc:xacml:2.0:context:schema:os
- http://docs.oasis-open.org/xacml/
- access_control-xacml-2.0-context-schema-os.xsd&quot;&gt;
+  http://docs.oasis-open.org/xacml/access_control-xacml-2.0-context-schema-os.xsd&quot;&gt;
 &lt;Subject SubjectCategory=
  &quot;urn:oasis:names:tc:xacml:1.0:subject-category:access-subject&quot;&gt;
-&lt;Attribute AttributeId=&quot;urn:oasis:names:tc:xacml:1.0:subject:subject-id&quot;
+&lt;Attribute
+ AttributeId=&quot;urn:oasis:names:tc:xacml:1.0:subject:subject-id&quot;
  DataType=&quot;urn:oasis:names:tc:xacml:1.0:data-type:x500Name&quot; &gt;
-&lt;AttributeValue&gt;id=demo,ou=user,<?eval ${defaultRootSuffix}?>&lt;/AttributeValue&gt;
+&lt;AttributeValue
+ &gt;id=demo,ou=user,<?eval ${defaultRootSuffix}?>&lt;/AttributeValue&gt;
 &lt;/Attribute&gt;
 &lt;/Subject&gt;
 &lt;xacml-context:Resource&gt;
-&lt;Attribute AttributeId=&quot;ResourceId&quot;
+&lt;Attribute
+ AttributeId=&quot;ResourceId&quot;
  DataType=&quot;http://www.w3.org/2001/XMLSchema#string&quot; &gt;
 &lt;AttributeValue&gt;http://www.example.com:80/banner.html&lt;/AttributeValue&gt;
 &lt;/Attribute&gt;
-&lt;Attribute AttributeId=&quot;urn:sun:names:xacml:2.0:resource:target-service&quot;
- DataType=&quot;http://www.w3.org/2001/XMLSchema#string&quot; &gt;
+&lt;Attribute
+  AttributeId=&quot;urn:sun:names:xacml:2.0:resource:target-service&quot;
+  DataType=&quot;http://www.w3.org/2001/XMLSchema#string&quot; &gt;
 &lt;AttributeValue&gt;iPlanetAMWebAgentService&lt;/AttributeValue&gt;
 &lt;/Attribute&gt;
 &lt;/xacml-context:Resource&gt;
 &lt;xacml-context:Action&gt;
-&lt;Attribute AttributeId=&quot;urn:oasis:names:tc:xacml:1.0:action:action-id&quot;
+&lt;Attribute
+ AttributeId=&quot;urn:oasis:names:tc:xacml:1.0:action:action-id&quot;
  DataType=&quot;http://www.w3.org/2001/XMLSchema#string&quot; &gt;
 &lt;AttributeValue&gt;GET&lt;/AttributeValue&gt;
 &lt;/Attribute&gt;
@@ -414,12 +424,20 @@ testProcessRequest():xacmlRequest:
 &lt;xacml-context:Environment&gt;&lt;/xacml-context:Environment&gt;
 &lt;/xacml-context:Request&gt;
 
-Exception in thread &quot;main&quot; com.sun.identity.saml2.common.SAML2Exception
- at com.sun.identity.saml2.soapbinding.QueryClient.processXACMLQuery(QueryClient.java:255)
- at com.sun.identity.xacml.client.XACMLRequestProcessor.processRequest(XACMLRequestProcessor.java:120)
- at samples.xacml.XACMLClientSample.testProcessRequest(XACMLClientSample.java:112)
- at samples.xacml.XACMLClientSample.runSample(XACMLClientSample.java:76)
- at samples.xacml.XACMLClientSample.main(XACMLClientSample.java:65)
- 
- TODO: Figure out is wrong with the setup.</screen>
+testProcessRequest():xacmlResponse:
+&lt;xacml-context:Response
+ xmlns:xacml-context=&quot;urn:oasis:names:tc:xacml:2.0:context:schema:os&quot; &gt;
+&lt;xacml-context:Result ResourceId=&quot;http://www.example.com:80/banner.html&quot;&gt;
+&lt;xacml-context:Decision&gt;Permit&lt;/xacml-context:Decision&gt;
+&lt;xacml-context:Status&gt;
+&lt;xacml-context:StatusCode
+ Value=&quot;urn:oasis:names:tc:xacml:1.0:status:ok&quot;&gt;
+&lt;/xacml-context:StatusCode&gt;
+&lt;xacml-context:StatusMessage&gt;ok&lt;/xacml-context:StatusMessage&gt;
+&lt;xacml-context:StatusDetail
+ xmlns:xacml-context=&quot;urn:oasis:names:tc:xacml:2.0:context:schema:cd:04&quot;&gt;
+&lt;xacml-context:StatusDetail/&gt;&lt;/xacml-context:StatusDetail&gt;
+&lt;/xacml-context:Status&gt;
+&lt;/xacml-context:Result&gt;
+&lt;/xacml-context:Response&gt;</screen>
 </chapter>
