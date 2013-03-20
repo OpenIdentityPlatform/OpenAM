@@ -20,7 +20,7 @@
   !
   ! CCPL HEADER END
   !
-  !      Copyright 2012-2013 ForgeRock AS
+  !      Copyright 2012-2013 ForgeRock, Inc.
   !    
 -->
 <chapter xml:id='chap-config-ref'
@@ -1081,6 +1081,83 @@
     </listitem>
    </varlistentry>
   </variablelist>
+
+
+
+  <variablelist xml:id="dashboard-configuration">
+   <title>Dashboard Configuration</title>
+   
+   <para><command>ssoadm</command> service name:
+   <literal>dashboardService</literal></para>
+
+   <varlistentry>
+    <term>Dashboard Class Name</term>
+    <listitem>
+     <para>Identifies how to access the application, for example 
+     <literal>SAML2ApplicationClass</literal> for a SAML 2.0 application</para>
+     
+     <para><command>ssoadm</command> attribute:
+     <literal>dashboardClassName</literal></para>
+    </listitem>
+   </varlistentry>
+   
+   <varlistentry>
+    <term>Dashboard Name</term>
+    <listitem>
+     <para>The application name as it will appear to the administrator for 
+     configuring the dashboard</para>
+     
+     <para><command>ssoadm</command> attribute:
+     <literal>dashboardName</literal></para>
+    </listitem>
+   </varlistentry>
+   
+   
+   <varlistentry>
+    <term>Dashboard Display Name</term>
+    <listitem>
+     <para>The application name that displays on the dashboard client</para>
+     
+     <para><command>ssoadm</command> attribute:
+     <literal>dashboardDisplayName</literal></para>
+    </listitem>
+   </varlistentry>
+   
+   <varlistentry>
+    <term>Dashboard Icon</term>
+    <listitem>
+     <para>The icon name that will be displayed on the dashboard client
+     identifying the application</para>
+     
+     <para><command>ssoadm</command> attribute:
+     <literal>dashboardIcon</literal></para>
+    </listitem>
+   </varlistentry>
+   
+   <varlistentry>
+    <term>Dashboard Login</term>
+    <listitem>
+     <para>The URL that takes the user to the application</para>
+     
+     <para><command>ssoadm</command> attribute:
+     <literal>dashboardLogin</literal></para>
+    </listitem>
+   </varlistentry>
+      
+   <varlistentry>
+    <term>Available Dashboard Apps</term>
+    <listitem>
+     <para>List of application dashboard names available by default for
+     realms with the Dashboard configured</para>
+          
+     <para><command>ssoadm</command> attribute:
+     <literal>assignedDashboard</literal></para>
+    </listitem>
+   </varlistentry>
+
+  </variablelist>
+
+
 
   <variablelist xml:id="liberty-id-ff-service-configuration">
    <title>Liberty ID-FF Service Configuration</title>
