@@ -59,6 +59,7 @@ import javax.servlet.ServletException;
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import org.owasp.esapi.ESAPI;
 
 /**
  *
@@ -135,7 +136,7 @@ extends com.sun.identity.authentication.distUI.AuthenticationServletBase {
                     
                     try{
                         PrintWriter out = response.getWriter();
-                        out.print("<h1>" + authCookieValue +
+                        out.print("<h1>" + ESAPI.encoder().encodeForHTML(authCookieValue) +
                        	" is not the trusted server</h1>");
                     } catch(IOException ioe) {
                         if (debug.messageEnabled()) {

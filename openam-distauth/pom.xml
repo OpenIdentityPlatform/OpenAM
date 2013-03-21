@@ -2,7 +2,7 @@
 <!--
 * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
 *
-* Copyright (c) 2012 ForgeRock Inc. All Rights Reserved
+* Copyright (c) 2012-2013 ForgeRock Inc. All Rights Reserved
 *
 * The contents of this file are subject to the terms
 * of the Common Development and Distribution License
@@ -197,6 +197,11 @@
         <dependency>
             <groupId>com.iplanet.jato</groupId>
             <artifactId>jato</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>external</groupId>
+            <artifactId>esapiport</artifactId>
+            <version>2009-26-07</version>
         </dependency>
     </dependencies>
 </project>
