@@ -10,6 +10,13 @@
                 <fieldset>
     
                     {{#each reqs.callbacks}}
+                    
+                    {{#if isSubmit}}
+                    <div class="field field-checkbox">
+                        <label><input type="checkbox" name="loginRemember" />{{t "templates.user.LoginTemplate.loginRemember"}}</label>
+                    </div>
+                    {{/if}}
+                    
                     <div class="field {{#if isSubmit}}field-submit{{/if}}">
                         {{callbackRender}}
                     </div>

@@ -36,8 +36,15 @@ define("config/routes/AMRoutesConfig", [
     var obj = {
         "login" : {
             view: "org/forgerock/openam/ui/user/login/RESTLoginView",
-            url: "login/"
-        },                           
+            url: /login([^\&]*)(&.+)?/,
+            pattern: "login??",
+            defaults: ["/"],
+            forceUpdate: true
+        },
+        "loginDialog" : {
+            dialog: "org/forgerock/openam/ui/user/login/RESTLoginDialog",
+            url: "loginDialog/"
+        },
         "": {
             view: "org/forgerock/openam/ui/user/profile/UserProfileView",
             role: "authenticated",

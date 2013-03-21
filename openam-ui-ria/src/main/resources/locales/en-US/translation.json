@@ -17,6 +17,7 @@
                 "userNameUpdated" : "Username has been modified succesfully.",
                 "afterRegistration" : "User has been registered successfully",
                 "loggedIn" : "You have been successfully logged in.",
+                "loginTimeout" : "Login processed timed out. Restarting...",
                 "errorFetchingData" : "Error fetching user data",
                 "loggedOut" : "You have been logged out.",
                 "siteIdentificationChanged" : "Site identification image has been changed",
@@ -311,7 +312,9 @@
             "input": {
                 "name": "Username",
                 "password": "Password"
-            }
+            },
+            "unavailable": "Unable to login to OpenAM"
+            
         }
     },    
     "openidm" : {

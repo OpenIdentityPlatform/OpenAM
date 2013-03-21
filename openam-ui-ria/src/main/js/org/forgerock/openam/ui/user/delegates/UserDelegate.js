@@ -35,12 +35,12 @@ define("UserDelegate", [
     "org/forgerock/commons/ui/common/util/CookieHelper"
 ], function(constants, AbstractDelegate, configuration, eventManager, cookieHelper) {
 
-    var obj = new AbstractDelegate(constants.host + "/"+ constants.context + "/json/users");
+    var obj = new AbstractDelegate(constants.host + "/"+ constants.context + "/json");
 
-    obj.getUserById = function(id, component, successCallback, errorCallback) {
+    obj.getUserById = function(id, realm, successCallback, errorCallback) {
 
         obj.serviceCall({
-            url: "/" + id, 
+            url: realm + "/users/" + id, 
             type: "GET", 
             headers: {"Cache-Control": "no-cache"}, // needed to prevent reads from getting cached
             success: function(user) {
@@ -69,53 +69,18 @@ define("UserDelegate", [
      */
     obj.getProfile = function(successCallback, errorCallback, errorsHandlers) {
         obj.serviceCall({
-            url: "/?_action=idFromSession",
+            url: "/users/?_action=idFromSession",
             data: "{}",
             type: "POST",
             success: function (data) {
-                successCallback({userid: {id : data.id, component: data.realm}, username: data.dn});
+                successCallback({userid: {id : data.id, realm: data.realm}, username: data.dn});
             },
             error: errorCallback,
             errorsHandlers: errorsHandlers
         });
     };
     
-    obj.getForUserID = function(uid, successCallback, errorCallback) {
-        obj.serviceCall({
-            url: "/" + uid, 
-            success: successCallback,
-            error: errorCallback
-        });
-    };
-
-    obj.logout = function() {
-        
-        obj.serviceCall({
-            serviceUrl: constants.host + "/"+ constants.context + "/identity/json/getcookienamefortoken",
-            url: "",
-            success: _.bind(function (cookieName) {
-
-                obj.serviceCall({
-                    serviceUrl: constants.host + "/"+ constants.context + "/identity/logout?" + $.param({subjectid: cookieHelper.getCookie(cookieName.string)}),
-                    url: "",
-                    dataType: "text",
-                    type: "GET",
-                    success: function () { 
-                        console.debug("Successfully logged out");
-                        cookieHelper.deleteCookie(cookieName.string, "/", document.domain.split(".").splice(1).join("."));
-                    },
-                    error: function () {
-                        console.debug("Error during logging out");
-                    }
-                });
-        
-            }, this)
-        });
-
-    };
-
-    
-    obj.updateUser = function(user, objectParam, successCallback, errorCallback) {
+    obj.updateUser = function(user, realm, objectParam, successCallback, errorCallback) {
         var headers = {};
         
         if(objectParam._rev) {
@@ -124,7 +89,7 @@ define("UserDelegate", [
             headers["If-Match"] = '"' + "*" + '"';
         }
 
-        this.serviceCall({url: "/" +user,
+        this.serviceCall({url: realm + "/users/" +user,
             type: "PUT",
             success: successCallback, 
             error: errorCallback, 

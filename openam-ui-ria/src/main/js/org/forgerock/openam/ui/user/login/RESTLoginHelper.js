@@ -29,8 +29,9 @@ define("org/forgerock/openam/ui/user/login/RESTLoginHelper", [
     "UserDelegate",
     "org/forgerock/commons/ui/common/main/ViewManager",
     "org/forgerock/commons/ui/common/main/AbstractConfigurationAware",
+    "org/forgerock/commons/ui/common/main/Router",
     "org/forgerock/commons/ui/common/main/Configuration"
-], function (authNDelegate, userDelegate, viewManager, AbstractConfigurationAware, conf) {
+], function (authNDelegate, userDelegate, viewManager, AbstractConfigurationAware, router, conf) {
     var obj = new AbstractConfigurationAware();
 
     obj.login = function(params, successCallback, errorCallback) {
@@ -41,37 +42,52 @@ define("org/forgerock/openam/ui/user/login/RESTLoginHelper", [
             var populatedRequirements = _.clone(requirements);
             
             _.each(requirements.callbacks, function (obj, i) {
-                if (params.hasOwnProperty(obj.input[0].name)) {
-                    populatedRequirements.callbacks[i].input[0].value = params[obj.input[0].name];
+                if (params.hasOwnProperty("callback_" + i)) {
+                    populatedRequirements.callbacks[i].input[0].value = params["callback_" + i];
                 }
             });
             
             authNDelegate
                 .submitRequirements(populatedRequirements)
-                .done(function (result) {
+                .then(function (result) {
                         if (result.hasOwnProperty("tokenId")) {
                             obj.getLoggedUser(successCallback, errorCallback);
+                            authNDelegate.resetProcess();
                         } else if (result.hasOwnProperty("authId")) {
                             // re-render login form for next set of required inputs
                             viewManager.refresh();
                         }
-                    })
-                .fail(errorCallback);
+                    },
+                    function (failedStage) {
+                        if (failedStage > 1) {
+                            // re-render login form, sending back to the start of the process.
+                            viewManager.refresh();
+                        }
+                        errorCallback();
+                    });
         
         });
     };
 
     obj.logout = function() {
-        userDelegate.logout();
+        authNDelegate.logout();
     };
     
     obj.getLoggedUser = function(successCallback, errorCallback) {
         try{
             userDelegate.getProfile(function(user) {
-                conf.globalData.userComponent = user.userid.component;
+                conf.globalData.auth.realm = user.userid.realm;
                 
-                userDelegate.getUserById(user.userid.id, user.userid.component, successCallback, errorCallback);
+                // keep track of the current realm as a future default value, following logout:
+                router.configuration.routes.login.defaults = [user.userid.realm];
+                
+                userDelegate.getUserById(user.userid.id, user.userid.realm, successCallback, errorCallback);
             }, function() {
+
+                if (!conf.globalData.auth.realm) {
+                    conf.globalData.auth.realm = router.configuration.routes.login.defaults[0];
+                }
+
                 errorCallback();
             }, {"serverError": {status: "503"}, "unauthorized": {status: "401"}});
         } catch(e) {

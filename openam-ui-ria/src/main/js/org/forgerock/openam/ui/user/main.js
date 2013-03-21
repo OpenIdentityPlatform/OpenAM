@@ -31,5 +31,6 @@ define("org/forgerock/openam/ui/user/main", [
     "./delegates/TokenDelegate",
     "./login/AuthNDelegate",
     "./login/RESTLoginHelper",
-    "./login/RESTLoginView"
+    "./login/RESTLoginView",
+    "./login/RESTLoginDialog"
 ]);
