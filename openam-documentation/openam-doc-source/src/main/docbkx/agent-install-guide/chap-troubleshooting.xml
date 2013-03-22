@@ -41,7 +41,7 @@
    <para>This section offers solutions to common problems when installing 
    OpenAM policy agents.</para>
   
-  <qandaentry>
+  <qandaentry xml:id="web-agent-error-page">
    <question>
     <para>How can I configure a custom error page to be returned by the web
     policy agent on HTTP 403 Forbidden or HTTP 500 Internal Server Error for
