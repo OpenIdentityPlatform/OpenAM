@@ -99,4 +99,31 @@
    <para><filename>um/</filename>: User Profile sample</para>
   </listitem>
  </itemizedlist>
+
+ <itemizedlist xml:id="jdk-shutdown-hooks">
+   <title>Registering Your Java SDK Client to Shut Down Gracefully</title>
+
+   <para>When writing a client using the OpenAM Java SDK, make sure you register
+   hooks to make sure the application can be shut down gracefully. How you
+   register for shutdown depends on the type of application.</para>
+
+  <listitem>
+   <para>For Java EE applications, make sure the OpenAM client SDK shuts down
+   successfully by including the following context listener in your
+   application's <filename>web.xml</filename> file.</para>
+
+   <programlisting language="xml">&lt;listener&gt;
+ &lt;listener-class&gt;
+  com.sun.identity.common.ShutdownServletContextListener
+ &lt;/listener-class&gt;
+&lt;/listener&gt;</programlisting>
+  </listitem>
+
+  <listitem>
+   <para>For standalone applications, set the following JVM property.</para>
+
+   <literallayout class="monospaced"
+   >-Dopenam.runtime.shutdown.hook.enabled=true</literallayout>
+  </listitem>
+ </itemizedlist>
 </chapter>
