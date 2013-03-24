@@ -163,6 +163,15 @@
         <servlet-name>entitlementmonitor</servlet-name>
         <servlet-class>com.sun.identity.entitlement.util.NetworkMonitor</servlet-class>
     </servlet>
+
+    <!-- JAX-RS -->
+    <!-- Java defines REST support via the Java Specification Request 311 (JSR). 
+         This specificiation is called JAX-RS (The Java API for RESTful Web Services). 
+         JAX-RS uses annotations to define the REST relevance of Java classes.
+
+         Jersey is the reference implementation for this specification. 
+         Jersey contains basically a REST server and a REST client. 
+         The core client can be used provides a library to communicate with the server.
     <servlet>
         <servlet-name>ws</servlet-name>
         <servlet-class>com.sun.jersey.spi.container.servlet.ServletContainer</servlet-class>
@@ -495,13 +504,6 @@
         <load-on-startup>1</load-on-startup>
     </servlet>
 
-    <servlet>
-        <description>XACML Content Handler Adapter</description>
-        <display-name>XACML Content Adapter</display-name>
-        <servlet-name>XACMLContentAdapter</servlet-name>
-        <servlet-class>org.forgerock.identity.openam.xacml.v3.services.XacmlContentHandlerService</servlet-class>
-    </servlet>
-
     <!-- end of servlet declarations -->
 
     <servlet-mapping>
@@ -593,6 +595,8 @@
         <servlet-name>entitlementmonitor</servlet-name>
         <url-pattern>/entitlementmonitor/*</url-pattern>
     </servlet-mapping>
+
+    <!-- JAX-RS End-Points -->
     <servlet-mapping>
         <servlet-name>ws</servlet-name>
         <url-pattern>/ws/*</url-pattern>
@@ -905,12 +909,6 @@
     <servlet-mapping>
         <servlet-name>sts</servlet-name>
         <url-pattern>/sts/mexsoap11</url-pattern>
-    </servlet-mapping>
-
-    <!-- OpenAM XACML Handler Service Servlet Mappings. -->
-    <servlet-mapping>
-        <servlet-name>XACMLContentAdapter</servlet-name>
-        <url-pattern>/xacml/*</url-pattern>
     </servlet-mapping>
 
     <!-- end of servlet mapping -->
