@@ -172,6 +172,7 @@
          Jersey is the reference implementation for this specification. 
          Jersey contains basically a REST server and a REST client. 
          The core client can be used provides a library to communicate with the server.
+    -->
     <servlet>
         <servlet-name>ws</servlet-name>
         <servlet-class>com.sun.jersey.spi.container.servlet.ServletContainer</servlet-class>
