@@ -401,14 +401,17 @@
      </listitem>
     </varlistentry>
     <varlistentry>
-     <term>Adaptive Threshold</term>
+     <term>Risk Threshold</term>
      <listitem>
       <para>Risk threshold score. If the sum of the Scores is greater than the
-      threshold, the Adaptive Risk module returns failure.</para>
+      threshold, the Adaptive Risk module returns failure. Default: 1</para>
       <para><command>ssoadm</command> attribute:
       <literal>openam-auth-adaptive-auth-threshold</literal></para>
      </listitem>
     </varlistentry>
+   </variablelist>
+   <variablelist>
+    <title>Failed Authentications</title>
     <varlistentry>
      <term>Failed Authentication Check</term>
      <listitem>
@@ -425,7 +428,7 @@
      <term>Score</term>
      <listitem>
       <para>Value to add to the total score if the user fails the Failed
-      Authentication Check.</para>
+      Authentication Check. Default: 1</para>
       <para><command>ssoadm</command> attribute:
       <literal>openam-auth-adaptive-failure-score</literal></para>
      </listitem>
@@ -468,7 +471,7 @@
      <term>Score</term>
      <listitem>
       <para>Value to add to the total score if the user fails the IP Range
-      Check.</para>
+      Check. Default: 1</para>
       <para><command>ssoadm</command> attribute:
       <literal>openam-auth-adaptive-ip-range-score</literal></para>
      </listitem>
@@ -496,7 +499,7 @@
      </listitem>
     </varlistentry>
     <varlistentry>
-     <term>Count to Save</term>
+     <term>History Size</term>
      <listitem>
       <para>Specifies how many IP address values to retain on the profile
       attribute you specify. Default: 5</para>
@@ -526,7 +529,7 @@
      <term>Score</term>
      <listitem>
       <para>Value to add to the total score if the user fails the IP History
-      Check.</para>
+      Check. Default: 1</para>
       <para><command>ssoadm</command> attribute:
       <literal>openam-auth-adaptive-ip-history-score</literal></para>
      </listitem>
@@ -584,7 +587,7 @@
      <term>Score</term>
      <listitem>
       <para>Value to add to the total score if user passes the Cookie Value
-      Check.</para>
+      Check. Default: 1</para>
       <para><command>ssoadm</command> attribute:
       <literal>openam-auth-adaptive-known-cookie-score</literal></para>
      </listitem>
@@ -634,7 +637,7 @@
      <term>Score</term>
      <listitem>
       <para>Value to add to the total score if the user fails the Device
-      Registration Cookie Check.</para>
+      Registration Cookie Check. Default: 1</para>
       <para><command>ssoadm</command> attribute:
       <literal>openam-auth-adaptive-device-cookie-score</literal></para>
      </listitem>
@@ -695,7 +698,7 @@
      <term>Score</term>
      <listitem>
       <para>Value to add to the total score if the user fails the Time Since
-      Last Login Check.</para>
+      Last Login Check. Default: 1</para>
       <para><command>ssoadm</command> attribute:
       <literal>openam-auth-adaptive-time-since-last-login-score</literal></para>
      </listitem>
@@ -744,7 +747,7 @@
      <term>Score</term>
      <listitem>
       <para>Value to add to the total score if the user fails the Profile Risk
-      Attribute Check.</para>
+      Attribute Check. Default: 1</para>
       <para><command>ssoadm</command> attribute:
       <literal>openam-auth-adaptive-risk-attribute-score</literal></para>
      </listitem>
@@ -765,7 +768,7 @@
      <term>Geolocation Country Code Check</term>
      <listitem>
       <para>When enabled, check whether the client IP address location matches
-      a country specified in the Valid Country Codes list.</para>
+      a country specified in the Valid Country Codes list. The </para>
       <para><command>ssoadm</command> attribute:
       <literal>forgerock-am-auth-adaptive-geo-location-check</literal></para>
      </listitem>
@@ -774,8 +777,11 @@
      <term>Geolocation Database location</term>
      <listitem>
       <para>Path to GeoIP data file used to convert IP addresses to
-      country locations. Use the binary .dat file format, rather than
-      .csv.</para>
+      country locations. The geolocation database is not packaged with OpenAM. 
+      You can downloaded the GeoIP Country database from  <link
+      xlink:href="http://www.maxmind.com/en/country">MaxMind</link>. Use the binary 
+      .dat file format, rather than .csv. You can use the GeoLite Country database
+      for testing.</para>
       <para><command>ssoadm</command> attribute:
       <literal>openam-auth-adaptive-geo-location-database</literal></para>
      </listitem>
@@ -783,17 +789,17 @@
     <varlistentry>
      <term>Valid Country Codes</term>
      <listitem>
-      <para>Specifies the list of country codes to match.</para>
-      <para><command>ssoadm</command> attribute:
-      <literal>openam-auth-adaptive-geo-location-values</literal>. Use
+      <para>Specifies the list of country codes to match. Use
       <literal>|</literal> to separate multiple values.</para>
+      <para><command>ssoadm</command> attribute:
+      <literal>openam-auth-adaptive-geo-location-values</literal>.</para>
      </listitem>
     </varlistentry>
     <varlistentry>
      <term>Score</term>
      <listitem>
       <para>Value to add to the total score if the user fails the Geolocation
-      Country Code Check.</para>
+      Country Code Check. Default: 1</para>
       <para><command>ssoadm</command> attribute:
       <literal>openam-auth-adaptive-geo-location-score</literal></para>
      </listitem>
@@ -841,7 +847,7 @@
      <term>Score</term>
      <listitem>
       <para>Value to add to the total score if the user fails the Request
-      Header Check.</para>
+      Header Check. Default: 1</para>
       <para><command>ssoadm</command> attribute:
       <literal>openam-auth-adaptive-req-header-score</literal></para>
      </listitem>
