@@ -20,7 +20,7 @@
   !
   ! CCPL HEADER END
   !
-  !      Copyright 2011-2013 ForgeRock AS
+  !      Copyright 2011-2013 ForgeRock, Inc.
   !    
 -->
 <chapter xml:id='chap-whats-new'
@@ -36,6 +36,16 @@
 
  <itemizedlist>
   <title>Major New Features</title>
+
+  <listitem>
+   <para>Users and realms can be created, read, edited, and deleted using an 
+   HTTP POST of the JSON representation. See <link
+   xlink:href="dev-guide#rest-api-crud-identity"
+   xlink:role="http://docbook.org/xlink/role/olink"><citetitle>Identity Management</citetitle></link>
+   and <link xlink:href="dev-guide#rest-api-crud-realm"
+   xlink:role="http://docbook.org/xlink/role/olink"><citetitle>Realm Management</citetitle>
+   </link> for explanations, instructions, and examples.</para>
+  </listitem>
 
   <listitem>
    <para>OpenAM now provides further support for OAuth 2.0. In addition

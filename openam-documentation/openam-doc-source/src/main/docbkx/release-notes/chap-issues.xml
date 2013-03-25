@@ -20,7 +20,7 @@
   !
   ! CCPL HEADER END
   !
-  !      Copyright 2011-2013 ForgeRock AS
+  !      Copyright 2011-2013 ForgeRock, Inc.
   !    
 -->
 <chapter xml:id='chap-issues'
@@ -50,16 +50,6 @@
 
  <section xml:id="limitations">
   <title>Limitations</title>
-
-  <!-- For OPENAM-1919 TODO: Remove when this is fixed after 10.1.0-Xpress -->
-  <para>Creating a user by sending an HTTP POST of the JSON representation of
-  the user to <literal>/json/users/?_action=create</literal> is not supported
-  in this Xpress release.</para>
-
-  <!-- For OPENAM-1920 TODO: Remove when this is fixed after 10.1.0-Xpress -->
-  <para>Deleting a user by sending an HTTP DELETE to
-  <literal>/json/users/<replaceable>user-id</replaceable></literal> is not
-  supported in this Xpress release.</para>
 
   <!-- For OPENAM-1906 TODO: Remove when this is fixed after 10.1.0-Xpress -->
   <para>If you create a new realm, you must restart OpenAM before using the
