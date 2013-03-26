@@ -106,7 +106,7 @@ public final class IdentityResource implements CollectionResourceProvider {
     public void actionCollection(final ServerContext context, final ActionRequest request,
                                  final ResultHandler<JsonValue> handler) {
 
-        final String action = request.getActionId();
+        final String action = request.getAction();
 
         if (action.equalsIgnoreCase("idFromSession")) {
             idFromSession(context, request, handler);

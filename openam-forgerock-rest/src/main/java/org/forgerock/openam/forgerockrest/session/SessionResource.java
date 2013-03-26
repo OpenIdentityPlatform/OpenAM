@@ -111,7 +111,7 @@ public class SessionResource implements CollectionResourceProvider {
      */
     public void actionCollection(ServerContext context, ActionRequest request, ResultHandler<JsonValue> handler) {
 
-        String id = request.getActionId();
+        String id = request.getAction();
 
         if ("logout".equalsIgnoreCase(id)) {
 
@@ -143,7 +143,7 @@ public class SessionResource implements CollectionResourceProvider {
     public void actionInstance(ServerContext context, String resourceId, ActionRequest request,
             ResultHandler<JsonValue> handler) {
 
-        String id = request.getActionId();
+        String id = request.getAction();
 
         if ("logout".equalsIgnoreCase(id)) {
             try {
