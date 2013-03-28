@@ -140,8 +140,15 @@
     <para>The IIS 7 web policy agents now has support for HTTP Basic
     authentication and password replay, thereby better supporting Microsoft
     OWA and SharePoint (<link
-    xlink:href="https://bugster.forgerock.org/jira/browse/OPENAM-773"
-    xlink:show="new">OPENAM-773</link>).</para>
+     xlink:href="https://bugster.forgerock.org/jira/browse/OPENAM-773"
+     xlink:show="new">OPENAM-773</link>).</para>
+   </listitem>
+   <listitem>
+    <para>Web policy agents now allow use of regular expressions in Not
+    Enforced URLs (<link
+    xlink:href="https://bugster.forgerock.org/jira/browse/OPENAM-772"
+    xlink:show="new">OPENAM-772</link>). In addition, regular expressions are
+    supported for logout URLs and for rejecting access to invalid URLs.</para>
    </listitem>
   </itemizedlist>
  </section>

@@ -641,6 +641,20 @@
       <para>Property: <literal>com.sun.identity.agents.config.ignore.path.info.for.not.enforced.list</literal></para>
      </listitem>
     </varlistentry>
+
+    <varlistentry>
+     <term>Enable Regular Expressions for Not Enforced URLs (Not yet in OpenAM console)</term>
+     <listitem>
+      <para>Enable use of <link xlink:href="http://www.pcre.org/pcre.txt"
+      xlink:show="new">Perl-compatible regular expressions</link> in
+      Not Enforced URL settings by using the following property under Advanced
+      &gt; Custom Properties in the agent profile.</para>
+
+      <literallayout class="monospaced"
+      >com.forgerock.agents.notenforced.url.regex.enable=true</literallayout>
+     </listitem>
+    </varlistentry>
+
     <varlistentry>
      <term>Not Enforced URLs</term>
      <listitem>
@@ -668,6 +682,22 @@
       name. Therefore <literal>http://www.example.com/images//</literal> and
       <literal>http://www.example.com/images</literal> are equivalent.</para>
       <para>Property: <literal>com.sun.identity.agents.config.notenforced.url</literal></para>
+
+      <para>If you enabled use of <link xlink:href="http://www.pcre.org/pcre.txt"
+      xlink:show="new">Perl-compatible regular expressions</link> to match
+      Not Enforced URLs, then all your settings must be done using regular
+      expressions. (Do not mix settings; use either the mechanism
+      described above or Perl-compatible regular expressions, but not both.)</para>
+
+      <para>The following example shows settings where no authentication is
+      required for URLs whose path ends <literal>/publicA</literal> or
+      <literal>/publicB</literal> (with or without query string parameters),
+      and no authentication is required to access .png, .jpg, .gif, .js, or .css
+      files under URLs that do not contain <literal>/protectedA/</literal>
+      or <literal>/protectedB/</literal>.</para>
+
+      <literallayout class="monospaced">.*/(PublicServletA|PublicServletB)(\?.*|$)
+^(?!.*(/protectedA/|/protectedB/)).*\.(png|jpg|gif|js|css)(\?.*|$)</literallayout>
      </listitem>
     </varlistentry>
     <varlistentry>
@@ -1060,6 +1090,21 @@ com.sun.identity.agents.config.cdsso.cookie.domain[1]=.example.net</literallayou
       <para>Property: <literal>com.sun.identity.agents.config.logout.url</literal></para>
      </listitem>
     </varlistentry>
+
+    <varlistentry>
+     <term>Enable Logout URL Redirect (Not yet in OpenAM console)</term>
+     <listitem>
+      <para>Logout URL redirect is enabled by default.</para>
+
+      <para>When this is disabled, instead of redirecting the user-agent, the
+      policy agent performs session logout in the background and then continues
+      processing access to the current URL. Disable this using Advanced &gt;
+      Custom Properties in the agent profile.</para>
+
+      <literallayout class="monospaced"
+      >com.forgerock.agents.config.logout.redirect.disable=true</literallayout>
+     </listitem>
+    </varlistentry>
    </variablelist>
    
    <variablelist xml:id="web-agent-agent-logout-url-properties">
@@ -1075,6 +1120,26 @@ com.sun.identity.agents.config.cdsso.cookie.domain[1]=.example.net</literallayou
       <para>Property: <literal>com.sun.identity.agents.config.agent.logout.url</literal></para>
      </listitem>
     </varlistentry>
+
+    <varlistentry>
+     <term>Agent Logout URL Regular Expression (Not yet in OpenAM console)</term>
+     <listitem>
+      <para><link xlink:href="http://www.pcre.org/pcre.txt" xlink:show="new"
+      >Perl-compatible regular expression</link> that matches logout URLs.
+      Set this using Advanced &gt; Custom Properties in the agent profile.</para>
+
+      <para>For example, to match URLs with <literal>protectedA</literal> or
+      <literal>protectedB</literal> in the path and <literal>op=logout</literal>
+      in the query string, use the following setting.</para>
+
+      <programlisting language="ini">com.forgerock.agents.agent.logout.url.regex= \
+   .*(/protectedA\?|/protectedB\?/).*(\&amp;op=logout\&amp;)(.*|$)</programlisting>
+
+      <para>When you use this property, the agent ignores the settings for
+      Logout URL List.</para>
+     </listitem>
+    </varlistentry>
+
     <varlistentry>
      <term>Logout Cookies List for Reset</term>
      <listitem>
@@ -1270,6 +1335,27 @@ com.sun.identity.agents.config.cdsso.cookie.domain[1]=.example.net</literallayou
      <listitem>
       <para>When enabled, do not send a preferred naming URL in the naming request.</para>
       <para>Property: <literal>com.sun.identity.agents.config.ignore.preferred.naming.url</literal></para>
+     </listitem>
+    </varlistentry>
+   </variablelist>
+
+   <variablelist xml:id="web-agent-invalid-url-properties">
+    <title>Invalid URL properties (Not yet in OpenAM console)</title>
+    <varlistentry>
+     <term>Invalid URL Regular Expression</term>
+     <listitem>
+      <para>Use a <link xlink:href="http://www.pcre.org/" xlink:show="new"
+      >Perl-compatible regular expression</link> to filter out invalid
+      request URLs. The policy agent reject requests to invalid URLs
+      with HTTP 403 Forbidden status without further processing. Use Advanced
+      &gt; Custom Properties to set this in the agent profile.</para>
+
+      <para>For example, to filter out URLs containing the symbols in the list
+      ./, /., /, ., ,\, %00-%1f, %7f-%ff, %25, %2B, %2C, %7E, .info, use the
+      following setting.</para>
+
+      <programlisting language="ini" width="84">com.forgerock.agents.agent.invalid.url.regex= \
+ ^((?!(|/\.|\./||*|\.info|%25|%2B|%2C|%[0-1][0-9a-fA-F]|%[7-9a-fA-F][0-9a-fA-F])).)$</programlisting>
      </listitem>
     </varlistentry>
    </variablelist>

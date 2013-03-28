@@ -349,6 +349,41 @@
   the properties are set in OpenAM.</para>
 
   <variablelist>
+   <varlistentry>
+    <term><literal>com.forgerock.agents.agent.invalid.url.regex</literal></term>
+    <listitem>
+     <para>Set this property to a <link xlink:href="http://www.pcre.org/"
+     xlink:show="new">Perl-compatible regular expression</link> to filter out
+     invalid request URLs. The policy agent reject requests to invalid URLs
+     with HTTP 403 Forbidden status without further processing.</para>
+
+     <para>For example, to filter out URLs containing the symbols in the list
+     ./, /., /, ., ,\, %00-%1f, %7f-%ff, %25, %2B, %2C, %7E, .info, use the
+     following setting.</para>
+
+     <programlisting language="ini" width="84">com.forgerock.agents.agent.invalid.url.regex= \
+ ^((?!(|/\.|\./||*|\.info|%25|%2B|%2C|%[0-1][0-9a-fA-F]|%[7-9a-fA-F][0-9a-fA-F])).)$</programlisting>
+    </listitem>
+   </varlistentry>
+
+   <varlistentry>
+    <term><literal>com.forgerock.agents.agent.logout.url.regex</literal></term>
+    <listitem>
+     <para>Set this property to a <link
+     xlink:href="http://www.pcre.org/pcre.txt" xlink:show="new">Perl-compatible
+     regular expression</link> that matches logout URLs.</para>
+
+     <para>For example, to match URLs with <literal>protectedA</literal> or
+     <literal>protectedB</literal> in the path and <literal>op=logout</literal>
+     in the query string, use the following setting.</para>
+
+     <programlisting language="ini">com.forgerock.agents.agent.logout.url.regex= \
+  .*(/protectedA\?|/protectedB\?/).*(\&amp;op=logout\&amp;)(.*|$)</programlisting>
+
+     <para>When you use this property, the agent ignores the settings for
+     <literal>com.sun.identity.agents.config.agent.logout.url</literal>.</para>
+    </listitem>
+   </varlistentry>
 
    <varlistentry>
     <term><literal>com.forgerock.agents.cache_control_header.enable</literal></term>
@@ -397,6 +432,17 @@
      <literal>com.forgerock.agents.conditional.login.url[1]=
      login.example.com|http://openam3.example.com/openam/UI/Login,
      http://openam4.example.com/openam/UI/Login</literal></para>
+    </listitem>
+   </varlistentry>
+
+   <varlistentry>
+    <term><literal>com.forgerock.agents.config.logout.redirect.disable</literal></term>
+    <listitem>
+     <para>Set this property to <literal>true</literal> to prevent the policy
+     agent from redirecting to the logout URL when that logout URL matches one
+     of the logout URL settings. Instead of redirecting the user-agent, the
+     policy agent performs session logout in the background and then continues
+     processing access to the current URL.</para>
     </listitem>
    </varlistentry>
 
@@ -463,6 +509,17 @@
      <para>Next, use the prefix you set when you define load balancer URI
      rules. This ensures that clients end up being redirected to the policy
      agent that preserved the POST data.</para>
+    </listitem>
+   </varlistentry>
+
+   <varlistentry>
+    <term><literal>com.forgerock.agents.notenforced.url.regex.enable</literal></term>
+    <listitem>
+     <para>Set this property to <literal>true</literal> to enable use of regular
+     expressions in Not Enforced URL settings.</para>
+     <para>Not Enforced URL settings are configured using the property,
+     <literal>com.sun.identity.agents.config.notenforced.url</literal></para>
+     <para>Default: <literal>false</literal></para>
     </listitem>
    </varlistentry>
 
@@ -1230,6 +1287,27 @@ token=value;Domain=subdomain.domain.com</literal></para>
      Access Control &gt; <replaceable>Realm Name</replaceable> &gt; Agents &gt;
      Web &gt; <replaceable>Agent Name</replaceable> &gt; Application &gt;
      Not Enforced URLs.</para>
+
+     <para>If you set
+     <literal>com.forgerock.agents.notenforced.url.regex.enable=true</literal>,
+     then you can use <link xlink:href="http://www.pcre.org/pcre.txt"
+     xlink:show="new">Perl-compatible regular expressions</link> to match
+     Not Enforced URLs instead. (Do not mix settings; use either the mechanism
+     described above or Perl-compatible regular expressions, but not both.)</para>
+
+     <para>The following example shows settings where no authentication is
+     required for URLs whose path ends <literal>/publicA</literal> or
+     <literal>/publicB</literal> (with or without query string parameters),
+     and no authentication is required to access .png, .jpg, .gif, .js, or .css
+     files under URLs that do not contain <literal>/protectedA/</literal>
+     or <literal>/protectedB/</literal>.</para>
+
+     <programlisting language="ini"
+     >com.forgerock.agents.notenforced.url.regex.enable=true
+com.sun.identity.agents.config.notenforced.url[0]= \
+ .*/(PublicServletA|PublicServletB)(\?.*|$)
+com.sun.identity.agents.config.notenforced.url[1]= \
+ ^(?!.*(/protectedA/|/protectedB/)).*\.(png|jpg|gif|js|css)(\?.*|$)</programlisting>
     </listitem>
    </varlistentry>
    <varlistentry>
