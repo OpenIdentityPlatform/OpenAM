@@ -23,9 +23,8 @@
  * "Portions Copyrighted [year] [name of copyright owner]"
  *
  * $Id: OpenSSOIndexStore.java,v 1.13 2010/01/25 23:48:15 veiming Exp $
- */
-/*
- * Portions Copyrighted [2011] [ForgeRock AS]
+ *
+ * Portions copyright 2011-2013 ForgeRock, Inc.
  */
 package com.sun.identity.entitlement.opensso;
 
@@ -596,13 +595,24 @@ public class OpenSSOIndexStore extends PrivilegeIndexStore {
 
         String searchFilters = getSearchFilter(filters, boolAnd);
         String ldapFilters = "(&" +
-            getResourceSearchFilter(appNameToResources) + searchFilters + ")";
+            getResourceSearchFilter(appNameToResources, realm) + searchFilters + ")";
 
         return dataStore.search(adminSubject, realm, ldapFilters,
             numOfEntries * (2), sortResults, ascendingOrder);
     }
 
-    private String getResourceSearchFilter(Map<String, Set<String>> map) 
+    /**
+     * Constructs the directory search filter.
+     *
+     * @param map
+     *      Map of applications.
+     * @param realm
+     *      The realm for which the search filter is to be applied.
+     * @return The search filter.
+     * @throws EntitlementException
+     *      Should an underlying error occur during entitlement processing.
+     */
+    private String getResourceSearchFilter(Map<String, Set<String>> map, String realm) 
         throws EntitlementException {
         StringBuilder buff = new StringBuilder();
 
@@ -612,7 +622,7 @@ public class OpenSSOIndexStore extends PrivilegeIndexStore {
             if (appl != null) {
                 for (String res : map.get(applName)) {
                     ResourceSearchIndexes idx =
-                        appl.getResourceSearchIndex(res);
+                        appl.getResourceSearchIndex(res, realm);
                     buff.append(DataStore.getFilter(idx, null, true));
                 }
             }

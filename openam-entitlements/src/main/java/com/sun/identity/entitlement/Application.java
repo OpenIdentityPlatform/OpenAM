@@ -23,8 +23,9 @@
  * "Portions Copyrighted [year] [name of copyright owner]"
  *
  * $Id: Application.java,v 1.7 2010/01/08 22:20:47 veiming Exp $
+ *
+ * Portions copyright 2013 ForgeRock, Inc.
  */
-
 package com.sun.identity.entitlement;
 
 import com.sun.identity.entitlement.interfaces.ISaveIndex;
@@ -385,13 +386,15 @@ public class Application implements Cloneable {
      * Returns search indexes for a given resource.
      *
      * @param resource resource to generate the indexes.
+     * @param realm Current realm to be searched.
      * @return search indexes.
+     * @throws EntitlementException When an error occurs in the entitlements framework.
      */
     public ResourceSearchIndexes getResourceSearchIndex(
-            String resource) {
+            String resource, String realm) throws EntitlementException {
         return (searchIndex == null) ?
-            applicationType.getResourceSearchIndex(resource) :
-            searchIndexInstance.getIndexes(resource);
+            applicationType.getResourceSearchIndex(resource, realm) :
+            searchIndexInstance.getIndexes(resource, realm);
     }
 
     /**

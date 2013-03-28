@@ -23,13 +23,15 @@
  * "Portions Copyrighted [year] [name of copyright owner]"
  *
  * $Id: RelaxedURL.java,v 1.2 2009/10/20 18:46:16 veiming Exp $
+ *
+ * Portions copyright 2013 ForgeRock, Inc.
  */
-
 package com.sun.identity.entitlement.util;
 
 import java.net.MalformedURLException;
 
 public class RelaxedURL {
+
     private static final String PROTOCOL_HTTPS = "https";
     private static final String PROTOCOL_HTTP = "http";
 
@@ -125,4 +127,23 @@ public class RelaxedURL {
         return query;
     }
 
+    @Override
+    public String toString() {
+        StringBuilder builder = new StringBuilder();
+        builder.append(protocol);
+        builder.append("://");
+        builder.append(hostname);
+        builder.append(':');
+        builder.append(port);
+        builder.append(path);
+
+        if (!query.isEmpty()) {
+            builder.append('?');
+            builder.append(query);
+        }
+
+        return builder.toString();
+    }
+
 }
+

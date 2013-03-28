@@ -23,10 +23,8 @@
  * "Portions Copyrighted [year] [name of copyright owner]"
  *
  * $Id: PrivilegeEvaluator.java,v 1.2 2009/10/07 06:36:40 veiming Exp $
- */
-
-/*
- * Portions Copyrighted 2010-2011 ForgeRock AS
+ *
+ * Portions copyright 2010-2013 ForgeRock, Inc.
  */
 package com.sun.identity.entitlement;
 
@@ -258,7 +256,7 @@ class PrivilegeEvaluator {
         init(adminSubject, subject, realm, applicationName,
             resourceName, null, envParameters, recursive);        
         long start = PRIVILEGE_EVAL_MONITOR_RES_INDEX.start();
-        indexes = getApplication().getResourceSearchIndex(resourceName);
+        indexes = getApplication().getResourceSearchIndex(resourceName, realm);
         PRIVILEGE_EVAL_MONITOR_RES_INDEX.end(start);
         return evaluate(realm);
     }

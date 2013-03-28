@@ -23,12 +23,9 @@
  * "Portions Copyrighted [year] [name of copyright owner]"
  *
  * $Id: ResourceNameSplitter.java,v 1.2 2009/08/28 06:16:31 veiming Exp $
+ *
+ * Portions copyright 2011-2013 ForgeRock, Inc.
  */
-
-/*
- * Portions Copyrighted 2011 ForgeRock AS
- */
-
 package com.sun.identity.entitlement.util;
 
 import com.sun.identity.entitlement.ResourceSearchIndexes;
@@ -56,9 +53,10 @@ public class ResourceNameSplitter implements ISearchIndex {
      * used to search for policies.
      * 
      * @param resName Resource name.
+     * @param realm Current realm to be searched.
      * @return the different components on a resource.
      */
-    public ResourceSearchIndexes getIndexes(String resName) {
+    public ResourceSearchIndexes getIndexes(String resName, String realm) {
         try {
             RelaxedURL url = new RelaxedURL(resName);
             Set<String> hostIndexes = splitHost(url);

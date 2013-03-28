@@ -23,6 +23,8 @@
  * "Portions Copyrighted [year] [name of copyright owner]"
  *
  * $Id: ApplicationType.java,v 1.1 2009/08/19 05:40:32 veiming Exp $
+ *
+ * Portions copyright 2013 ForgeRock, Inc.
  */
 package com.sun.identity.entitlement;
 
@@ -163,10 +165,12 @@ public final class ApplicationType {
      * Returns search indexes for a give resource name.
      *
      * @param resource Resource for generating the indexes.
+     * @param realm Current realm to be searched.
      * @return search indexes for a give resource name.
+     * @throws EntitlementException When an error occurs in the entitlements framework.
      */
-    public ResourceSearchIndexes getResourceSearchIndex(String resource) {
-        return searchIndexInstance.getIndexes(resource);
+    public ResourceSearchIndexes getResourceSearchIndex(String resource, String realm) throws EntitlementException {
+        return searchIndexInstance.getIndexes(resource, realm);
     }
 
     /**

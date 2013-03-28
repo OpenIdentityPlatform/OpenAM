@@ -23,10 +23,12 @@
  * "Portions Copyrighted [year] [name of copyright owner]"
  *
  * $Id: ISearchIndex.java,v 1.1 2009/08/19 05:40:34 veiming Exp $
+ *
+ * Portions copyright 2013 ForgeRock, Inc.
  */
-
 package com.sun.identity.entitlement.interfaces;
 
+import com.sun.identity.entitlement.EntitlementException;
 import com.sun.identity.entitlement.ResourceSearchIndexes;
 
 /**
@@ -38,7 +40,9 @@ public interface ISearchIndex {
      * Returns search indexes for a given resource.
      *
      * @param resource Resource for generating the indexes.
+     * @param realm Current realm to be searched.
      * @return search indexes for a given resource.
+     * @throws EntitlementException When an error occurs in the entitlements framework.
      */
-    ResourceSearchIndexes getIndexes(String resource);
+    ResourceSearchIndexes getIndexes(String resource, String realm) throws EntitlementException;
 }

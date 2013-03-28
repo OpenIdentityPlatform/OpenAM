@@ -23,12 +23,9 @@
  * "Portions Copyrighted [year] [name of copyright owner]"
  *
  * $Id: Entitlement.java,v 1.7 2010/01/25 23:48:14 veiming Exp $
+ *
+ * Portions copyright 2010-2013 ForgeRock, Inc.
  */
-
-/*
- * Portions Copyrighted [2010] [ForgeRock AS]
- */
-
 package com.sun.identity.entitlement;
 
 import com.sun.identity.entitlement.interfaces.ResourceName;
@@ -778,7 +775,7 @@ public class Entitlement {
             adminSubject, realm).getApplicationType();
 
         for (String r : resourceNames) {
-            ResourceSearchIndexes rsi = applType.getResourceSearchIndex(r);
+            ResourceSearchIndexes rsi = applType.getResourceSearchIndex(r, realm);
             if (result == null) {
                 result = rsi;
             } else {

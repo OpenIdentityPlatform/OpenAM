@@ -23,8 +23,9 @@
  * "Portions Copyrighted [year] [name of copyright owner]"
  *
  * $Id: DelegationResourceNameSplitter.java,v 1.2 2009/11/19 00:08:51 veiming Exp $
+ *
+ * Portions copyright 2013 ForgeRock, Inc.
  */
-
 package com.sun.identity.entitlement.opensso;
 
 import com.sun.identity.entitlement.ResourceSearchIndexes;
@@ -41,10 +42,10 @@ public class DelegationResourceNameSplitter extends
         Pattern.compile("(sms://)(.*?)(/.*)");
 
     @Override
-    public ResourceSearchIndexes getIndexes(String resource) {
+    public ResourceSearchIndexes getIndexes(String resource, String realm) {
         Matcher match = PATTERN.matcher(resource);
         if (!match.matches()) {
-            return super.getIndexes(resource);
+            return super.getIndexes(resource, realm);
         }
 
         String rootSuffix = SMSEntry.getRootSuffix();
@@ -61,7 +62,7 @@ public class DelegationResourceNameSplitter extends
             DN rootDN = new DN(rootSuffix);
 
             if (rootDN.equals(new DN(dn))) {
-                return super.getIndexes(resource);
+                return super.getIndexes(resource, realm);
             } else {
                 ResourceSearchIndexes indexes = null;
                 String[] comp = LDAPDN.explodeDN(dn, false);
@@ -78,18 +79,18 @@ public class DelegationResourceNameSplitter extends
                         start = rootDN.equals(new DN(buff.toString()));
                         if (start) {
                             indexes = super.getIndexes(
-                                prefix + buff.toString() + suffix);
+                                prefix + buff.toString() + suffix, realm);
                         }
                     } else {
                         ResourceSearchIndexes idx = super.getIndexes(
-                            prefix + buff.toString() + suffix);
+                            prefix + buff.toString() + suffix, realm);
                         indexes.addAll(idx);
                     }
                 }
                 return indexes;
             }
         } else {
-            return super.getIndexes(resource);
+            return super.getIndexes(resource, realm);
         }
     }
 }

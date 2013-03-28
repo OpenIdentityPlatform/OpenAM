@@ -23,8 +23,9 @@
  * "Portions Copyrighted [year] [name of copyright owner]"
  *
  * $Id: ResourceNameSplitTest.java,v 1.1 2009/08/19 05:41:02 veiming Exp $
+ *
+ * Portions copyright 2013 ForgeRock, Inc.
  */
-
 package com.sun.identity.entitlement.util;
 
 import com.sun.identity.entitlement.ResourceSearchIndexes;
@@ -49,7 +50,7 @@ public class ResourceNameSplitTest {
         Map<String, Set<String>> map = parseResource("resourceNameSplitHost");
         for (String k : map.keySet()) {
             Set<String> set = map.get(k);
-            ResourceSearchIndexes comp = splitter.getIndexes(k);
+            ResourceSearchIndexes comp = splitter.getIndexes(k, null);
             Set<String> results = comp.getHostIndexes();
             if (!results.equals(set)) {
                 String msg = "ResourceNameSplitTest.testHost: " + k + 
@@ -70,7 +71,7 @@ public class ResourceNameSplitTest {
         for (String k : map.keySet()) {
             Set<String> set = map.get(k);
             
-            ResourceSearchIndexes comp = splitter.getIndexes(k);
+            ResourceSearchIndexes comp = splitter.getIndexes(k, null);
             Set<String> results = comp.getPathIndexes();
             if (!results.equals(set)) {
                 String msg = "ResourceNameSplitTest.testPath: " + k + 

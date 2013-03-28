@@ -29,7 +29,7 @@
 -->
 
 <!--
-    Portions Copyrighted 2011 ForgeRock AS
+    Portions copyright 2011-2013 ForgeRock, Inc.
 -->
 
 <!DOCTYPE ServicesConfiguration
@@ -293,11 +293,11 @@
                         </AttributeValuePair>
                         <AttributeValuePair>
                             <Attribute name="searchIndexImpl" />
-                            <Value>com.sun.identity.entitlement.util.ResourceNameSplitter</Value>
+                            <Value>org.forgerock.openam.entitlement.indextree.TreeSearchIndex</Value>
                         </AttributeValuePair>
                         <AttributeValuePair>
                             <Attribute name="saveIndexImpl" />
-                            <Value>com.sun.identity.entitlement.util.ResourceNameIndexGenerator</Value>
+                            <Value>org.forgerock.openam.entitlement.indextree.TreeSaveIndex</Value>
                         </AttributeValuePair>
                         <AttributeValuePair>
                             <Attribute name="resourceComparator" />
