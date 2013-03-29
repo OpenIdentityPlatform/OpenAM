@@ -2338,6 +2338,42 @@ CookieWriterServlet.doGetPost: Redirect to
 &amp;idpEntityID=http%3A%2F%2Fdesktop.example.example%3A8080%2Fopenam
 &amp;RelayState=http%3A%2F%2Fopenam.forgerock.org</programlisting>
   </example>
+
+  <procedure xml:id="show-saml2-sso-login-progress">
+   <title>To Indicate Progress During SSO</title>
+
+   <para>During SSO log in, OpenAM presents users with a self-submitting form
+   when access has been validated. This page is otherwise blank. If you want to
+   present users with something to indicate that the operation is in progress,
+   then customize the necessary templates.</para>
+
+   <step>
+    <para>Modify the templates to add a clue that SSO is in progress, such as
+    an image.</para>
+
+    <para>Edit the templates found in OpenAM sources, <link xlink:show="new"
+    xlink:href="http://sources.forgerock.org/browse/openam/trunk/openam/openam-federation/openam-federation-library/src/main/resources/saml2login.template?r=HEAD"
+    ><filename>saml2login.template</filename></link> and <link xlink:show="new"
+    xlink:href="http://sources.forgerock.org/browse/openam/trunk/openam/openam-federation/openam-federation-library/src/main/resources/saml2loginwithrelay.template?r=HEAD"
+    ><filename>saml2loginwithrelay.template</filename></link>.</para>
+
+    <para>When you add an image or other presentation element, make sure that
+    you retain the form and JavaScript as is. Also, as the files are templates,
+    what you add must be static HTML.</para>
+   </step>
+
+   <step>
+    <para>Unpack <?eval ${coreWarFile}?>, and add your modified template files
+    under <filename>WEB-INF/classes/</filename> where you unpacked the .war.</para>
+
+    <para>Also include any images you reference in the page.</para>
+   </step>
+
+   <step>
+    <para>Pack up your custom version of OpenAM, and then deploy it in your
+    web container.</para>
+   </step>
+  </procedure>
  </section>
 
  <section xml:id="saml2-ecp-config">
