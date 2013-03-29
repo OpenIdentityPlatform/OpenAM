@@ -711,8 +711,9 @@
     <varlistentry>
      <term>Fetch Attributes for Not Enforced URLs</term>
      <listitem>
-      <para>When enabled, the agent fetches profile attributes for not
-      enforced URLs by doing policy evaluation.</para>
+      <para>When enabled, the agent fetches profile, response, and session
+      attributes that are mapped by doing policy evaluation, and forwards
+      these attributes to not enforced URLs.</para>
       <para>Property: <literal>com.sun.identity.agents.config.notenforced.url.attributes.enable</literal></para>
      </listitem>
     </varlistentry>

@@ -1238,8 +1238,10 @@ token=value;Domain=subdomain.domain.com</literal></para>
    <varlistentry>
     <term><literal>com.sun.identity.agents.config.notenforced.url.attributes.enable</literal></term>
     <listitem>
-     <para>When enabled, the agent fetches profile attributes for not
-     enforced URLs by doing policy evaluation.</para>
+     <para>When set to <literal>true</literal>, the agent fetches profile,
+     response, and session attributes that are mapped by doing policy
+     evaluation, and forwards these attributes to non-protected URLs.</para>
+
      <para>For centralized configurations this property is configured under
      Access Control &gt; <replaceable>Realm Name</replaceable> &gt; Agents &gt;
      Web &gt; <replaceable>Agent Name</replaceable> &gt; Application &gt;
