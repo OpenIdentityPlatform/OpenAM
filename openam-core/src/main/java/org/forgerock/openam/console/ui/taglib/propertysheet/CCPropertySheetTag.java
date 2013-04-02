@@ -241,10 +241,10 @@ public class CCPropertySheetTag extends com.sun.web.ui.taglib.propertysheet.CCPr
             String helpUrl = getFromBundle(bundle, urlKey);
             if (helpUrl == null) {
                 //There is no Help URL so only render the HelpText
-                return MessageFormat.format(HELP_TEMPLATE, uniqueID++, getFromBundle(bundle, key), helpTxt, "");
+                return MessageFormat.format(HELP_TEMPLATE, String.valueOf(uniqueID++), getFromBundle(bundle, key), helpTxt, "");
             } else {
                 //Let's render everything
-                return MessageFormat.format(HELP_TEMPLATE, uniqueID++, getFromBundle(bundle, key), helpTxt, MessageFormat.format(URL_TEMPLATE, helpUrl));
+                return MessageFormat.format(HELP_TEMPLATE, String.valueOf(uniqueID++), getFromBundle(bundle, key), helpTxt, MessageFormat.format(URL_TEMPLATE, helpUrl));
             }
         }
     }
