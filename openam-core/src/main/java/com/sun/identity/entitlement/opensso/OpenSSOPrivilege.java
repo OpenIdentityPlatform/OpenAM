@@ -26,7 +26,8 @@
  */
 
 /*
- * Portions Copyrighted [2010] [ForgeRock AS]
+ * Portions Copyrighted 2010 ForgeRock Inc
+ * Portions Copyrighted 2013 Nomura Research Institute, Ltd
  */
 
 package com.sun.identity.entitlement.opensso;
@@ -102,7 +103,8 @@ public class OpenSSOPrivilege extends Privilege {
                                 }
                             });
         } catch (Exception ex) {
-            // exception
+            PrivilegeManager.debug.error("OpenSSOPrivilege.evaluate", ex);
+            results = new ArrayList<Entitlement>(0);
         }
         
         return results;
