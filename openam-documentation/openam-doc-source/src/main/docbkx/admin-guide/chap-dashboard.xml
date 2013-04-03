@@ -38,7 +38,7 @@
  
  <para>This chapter shows how to configure the OpenAM <firstterm>Dashboard</firstterm>.</para>
 
- <section xml:id="About the Dashboard">
+ <section xml:id="about-the-dashboard">
   <title>About the Dashboard Service</title>
   
    <para>The Dashboard service provides the end user with an interface to access
