@@ -15,6 +15,8 @@
  */
 package org.forgerock.openam.forgerockrest.authn.callbackhandlers;
 
+import org.forgerock.json.fluent.JsonException;
+import org.forgerock.json.fluent.JsonValue;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -69,7 +71,7 @@ public interface JsonCallbackParser<T extends Callback> {
      * @param index the position of this callback in the returned structure.
      * @return The JSON representation of the Callback.
      */
-    JSONObject convertToJson(T callback, int index) throws JSONException;
+    JsonValue convertToJson(T callback, int index);
 
     /**
      * Converts the JSONObject into a Callback, setting the values set in the JSONObject onto the given Callback.
@@ -80,6 +82,7 @@ public interface JsonCallbackParser<T extends Callback> {
      * @param callback The Callback to set values from the JSONObject onto.
      * @param jsonObject The JSON representation of the Callback.
      * @return The same Callback as in the parameters with the required values set.
+     * @throws JsonException
      */
-    T convertFromJson(T callback, JSONObject jsonObject) throws JSONException;
+    T convertFromJson(T callback, JsonValue jsonObject) throws JsonException;
 }

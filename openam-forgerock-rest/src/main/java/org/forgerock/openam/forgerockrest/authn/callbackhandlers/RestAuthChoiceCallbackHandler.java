@@ -17,9 +17,9 @@
 package org.forgerock.openam.forgerockrest.authn.callbackhandlers;
 
 import com.sun.identity.shared.debug.Debug;
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
+import org.forgerock.json.fluent.JsonException;
+import org.forgerock.json.fluent.JsonValue;
+import org.forgerock.openam.utils.JsonValueBuilder;
 
 import javax.security.auth.callback.ChoiceCallback;
 import javax.servlet.http.HttpServletRequest;
@@ -44,7 +44,7 @@ public class RestAuthChoiceCallbackHandler extends AbstractRestAuthCallbackHandl
      * {@inheritDoc}
      */
     boolean doUpdateCallbackFromRequest(HttpHeaders headers, HttpServletRequest request, HttpServletResponse response,
-            JSONObject postBody, ChoiceCallback callback) throws RestAuthCallbackHandlerResponseException {
+            JsonValue postBody, ChoiceCallback callback) throws RestAuthCallbackHandlerResponseException {
 
         String choiceString = request.getParameter("choices");
 
@@ -61,7 +61,7 @@ public class RestAuthChoiceCallbackHandler extends AbstractRestAuthCallbackHandl
      * {@inheritDoc}
      */
     public ChoiceCallback handle(HttpHeaders headers, HttpServletRequest request, HttpServletResponse response,
-            JSONObject postBody, ChoiceCallback originalCallback) throws JSONException {
+            JsonValue postBody, ChoiceCallback originalCallback) {
         return originalCallback;
     }
 
@@ -75,7 +75,7 @@ public class RestAuthChoiceCallbackHandler extends AbstractRestAuthCallbackHandl
     /**
      * {@inheritDoc}
      */
-    public JSONObject convertToJson(ChoiceCallback callback, int index) throws JSONException {
+    public JsonValue convertToJson(ChoiceCallback callback, int index) {
 
         String prompt = callback.getPrompt();
         String[] choices = callback.getChoices();
@@ -86,45 +86,35 @@ public class RestAuthChoiceCallbackHandler extends AbstractRestAuthCallbackHandl
             selectedIndex = selectedIndexes[0];
         }
 
-                JSONObject jsonCallback = new JSONObject();
-        jsonCallback.put("type", CALLBACK_NAME);
+        JsonValue jsonValue = JsonValueBuilder.jsonValue()
+                .put("type", CALLBACK_NAME)
+                .array("output")
+                    .add(createOutputField("prompt", prompt))
+                    .add(createOutputField("choices", choices))
+                    .addLast(createOutputField("defaultChoice", defaultChoice))
+                .array("input")
+                    .addLast(createInputField(index, selectedIndex))
+                .build();
 
-        JSONArray output = new JSONArray();
-
-        output.put(createOutputField("prompt", prompt));
-
-        JSONArray choicesJsonArray = new JSONArray();
-        for (String choice : choices) {
-            choicesJsonArray.put(choice);
-        }
-        output.put(createOutputField("choices", choicesJsonArray));
-        output.put(createOutputField("defaultChoice", defaultChoice));
-
-        jsonCallback.put("output", output);
-
-        JSONArray input = new JSONArray();
-        input.put(createInputField("IDToken" + index, selectedIndex));
-        jsonCallback.put("input", input);
-
-        return jsonCallback;
+        return jsonValue;
 
     }
 
     /**
      * {@inheritDoc}
      */
-    public ChoiceCallback convertFromJson(ChoiceCallback callback, JSONObject jsonCallback) throws JSONException {
+    public ChoiceCallback convertFromJson(ChoiceCallback callback, JsonValue jsonCallback) {
 
         validateCallbackType(CALLBACK_NAME, jsonCallback);
 
-        JSONArray input = jsonCallback.getJSONArray("input");
+        JsonValue input = jsonCallback.get("input");
 
-        if (input.length() != 1) {
-            throw new JSONException("JSON Callback does not include a input field");
+        if (input.size() != 1) {
+            throw new JsonException("JSON Callback does not include a input field");
         }
 
-        JSONObject inputField = input.getJSONObject(0);
-        int selectedIndex = inputField.getInt("value");
+        JsonValue inputField = input.get(0);
+        int selectedIndex = inputField.get("value").asInteger();
         callback.setSelectedIndex(selectedIndex);
 
         return callback;

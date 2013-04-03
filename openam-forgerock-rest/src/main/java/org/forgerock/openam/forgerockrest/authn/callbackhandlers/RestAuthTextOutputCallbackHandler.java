@@ -16,10 +16,8 @@
 
 package org.forgerock.openam.forgerockrest.authn.callbackhandlers;
 
-import com.sun.identity.shared.debug.Debug;
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
+import org.forgerock.json.fluent.JsonValue;
+import org.forgerock.openam.utils.JsonValueBuilder;
 
 import javax.security.auth.callback.TextOutputCallback;
 import javax.servlet.http.HttpServletRequest;
@@ -41,8 +39,7 @@ public class RestAuthTextOutputCallbackHandler extends AbstractRestAuthCallbackH
      * {@inheritDoc}
      */
     boolean doUpdateCallbackFromRequest(HttpHeaders headers, HttpServletRequest request, HttpServletResponse response,
-            JSONObject postBody, TextOutputCallback callback) throws RestAuthCallbackHandlerResponseException {
-
+            JsonValue postBody, TextOutputCallback callback) throws RestAuthCallbackHandlerResponseException {
         return false;
     }
 
@@ -50,7 +47,7 @@ public class RestAuthTextOutputCallbackHandler extends AbstractRestAuthCallbackH
      * {@inheritDoc}
      */
     public TextOutputCallback handle(HttpHeaders headers, HttpServletRequest request, HttpServletResponse response,
-            JSONObject postBody, TextOutputCallback originalCallback) throws JSONException {
+            JsonValue postBody, TextOutputCallback originalCallback) {
         return originalCallback;
     }
 
@@ -64,27 +61,25 @@ public class RestAuthTextOutputCallbackHandler extends AbstractRestAuthCallbackH
     /**
      * {@inheritDoc}
      */
-    public JSONObject convertToJson(TextOutputCallback callback, int index) throws JSONException {
+    public JsonValue convertToJson(TextOutputCallback callback, int index) {
 
         String message = callback.getMessage();
         int messageType = callback.getMessageType();
 
-        JSONObject jsonCallback = new JSONObject();
-        jsonCallback.put("type", CALLBACK_NAME);
+        JsonValue jsonValue = JsonValueBuilder.jsonValue()
+                .put("type", CALLBACK_NAME)
+                .array("output")
+                    .add(createOutputField("message", message))
+                    .addLast(createOutputField("messageType", messageType))
+                .build();
 
-        JSONArray output = new JSONArray();
-        output.put(createOutputField("message", message));
-        output.put(createOutputField("messageType", messageType));
-        jsonCallback.put("output", output);
-
-        return jsonCallback;
+        return jsonValue;
     }
 
     /**
      * {@inheritDoc}
      */
-    public TextOutputCallback convertFromJson(TextOutputCallback callback, JSONObject jsonCallback)
-            throws JSONException {
+    public TextOutputCallback convertFromJson(TextOutputCallback callback, JsonValue jsonCallback) {
 
         validateCallbackType(CALLBACK_NAME, jsonCallback);
 

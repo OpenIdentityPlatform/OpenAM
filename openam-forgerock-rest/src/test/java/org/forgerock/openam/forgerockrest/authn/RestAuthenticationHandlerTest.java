@@ -23,13 +23,16 @@ import com.sun.identity.authentication.service.AMAuthErrorCode;
 import com.sun.identity.authentication.spi.AuthLoginException;
 import com.sun.identity.authentication.spi.PagePropertiesCallback;
 import com.sun.identity.shared.locale.L10NMessageImpl;
+import com.sun.identity.sm.ServiceConfig;
+import com.sun.identity.sm.ServiceConfigManager;
+import org.forgerock.json.fluent.JsonValue;
 import org.forgerock.openam.forgerockrest.authn.callbackhandlers.RestAuthCallbackHandlerResponseException;
 import org.forgerock.openam.forgerockrest.jwt.JwsAlgorithm;
 import org.forgerock.openam.forgerockrest.jwt.JwtBuilder;
 import org.forgerock.openam.forgerockrest.jwt.PlaintextJwt;
 import org.forgerock.openam.forgerockrest.jwt.SignedJwt;
 import org.forgerock.openam.utils.AMKeyProvider;
-import org.json.JSONArray;
+import org.forgerock.openam.utils.JsonValueBuilder;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.mockito.Matchers;
@@ -43,19 +46,19 @@ import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.Response;
+import java.io.IOException;
 import java.security.PrivateKey;
 import java.security.SignatureException;
 import java.security.cert.X509Certificate;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import static org.mockito.BDDMockito.given;
-import static org.mockito.Mockito.anyString;
-import static org.mockito.Mockito.doThrow;
-import static org.mockito.Mockito.eq;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.never;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertTrue;
 
@@ -68,7 +71,8 @@ public class RestAuthenticationHandlerTest {
     private AMKeyProvider amKeyProvider;
     private RestAuthCallbackHandlerManager restAuthCallbackHandlerManager;
     private JwtBuilder jwtBuilder;
-    private SystemPropertiesManagerWrapper systemPropertiesManagerWrapper;
+    private ServiceConfigManager serviceConfigManager;
+    private SSOToken ssoToken;
 
     @BeforeMethod
     public void setUp() {
@@ -78,14 +82,36 @@ public class RestAuthenticationHandlerTest {
         amKeyProvider = mock(AMKeyProvider.class);
         restAuthCallbackHandlerManager = mock(RestAuthCallbackHandlerManager.class);
         jwtBuilder = mock(JwtBuilder.class);
-        systemPropertiesManagerWrapper = mock(SystemPropertiesManagerWrapper.class);
+        serviceConfigManager = mock(ServiceConfigManager.class);
+        ssoToken = mock(SSOToken.class);
 
         restAuthenticationHandler = new RestAuthenticationHandler(authContextStateMap, amKeyProvider,
-                restAuthCallbackHandlerManager, jwtBuilder, systemPropertiesManagerWrapper) {
+                restAuthCallbackHandlerManager, jwtBuilder) {
             @Override
             protected AuthContext createAuthContext(String realm) throws AuthLoginException {
                 given(authContext.getOrganizationName()).willReturn(realm);
                 return authContext;
+            }
+
+            @Override
+            protected ServiceConfigManager getServiceConfigManager(String serviceName, SSOToken token) {
+                ServiceConfig serviceConfig = mock(ServiceConfig.class);
+                Map<String, Set<String>> attributes = new HashMap<String, Set<String>>();
+                Set<String> values = new HashSet<String>();
+                values.add("test");
+                attributes.put("iplanet-am-auth-jwt-signing-key-alias", values);
+                try {
+                    given(serviceConfigManager.getOrganizationConfig(anyString(), anyString())).willReturn(serviceConfig);
+                    given(serviceConfig.getAttributes()).willReturn(attributes);
+                } catch (Exception e) {
+                    throw new RuntimeException(e);
+                }
+                return serviceConfigManager;
+            }
+
+            @Override
+            protected SSOToken getAdminToken() {
+                return ssoToken;
             }
         };
     }
@@ -230,14 +256,14 @@ public class RestAuthenticationHandlerTest {
         Callback[] allCallbacks = new Callback[1];
         PagePropertiesCallback pagePropertiesCallback = mock(PagePropertiesCallback.class);
         allCallbacks[0] = pagePropertiesCallback;
-        JSONArray jsonCallbacks = mock(JSONArray.class);
+        JsonValue jsonCallbacks = mock(JsonValue.class);
 
         given(authContext.hasMoreRequirements()).willReturn(true).willReturn(false);
         given(authContext.getRequirements()).willReturn(callbacks);
         given(authContext.getRequirements(true)).willReturn(allCallbacks);
         given(restAuthCallbackHandlerManager.handleCallbacks(headers, request, httpResponse, null,
                 callbacks, HttpMethod.GET)).willReturn(jsonCallbacks);
-        given(jsonCallbacks.length()).willReturn(0);
+        given(jsonCallbacks.size()).willReturn(0);
         given(authContext.getStatus()).willReturn(AuthContext.Status.SUCCESS);
         given(authContext.getSSOToken()).willReturn(ssoToken);
         given(ssoToken.getTokenID()).willReturn(ssoTokenID);
@@ -266,7 +292,7 @@ public class RestAuthenticationHandlerTest {
 
     @Test
     public void shouldAuthenticateSuccessfullyRequirementsExternally() throws AuthLoginException, L10NMessageImpl,
-            JSONException, SignatureException, RestAuthCallbackHandlerResponseException {
+            JSONException, SignatureException, RestAuthCallbackHandlerResponseException, IOException {
 
         //Given
         HttpHeaders headers = mock(HttpHeaders.class);
@@ -278,7 +304,10 @@ public class RestAuthenticationHandlerTest {
         Callback[] allCallbacks = new Callback[1];
         PagePropertiesCallback pagePropertiesCallback = mock(PagePropertiesCallback.class);
         allCallbacks[0] = pagePropertiesCallback;
-        JSONArray jsonCallbacks = mock(JSONArray.class);
+        List<String> jsonCallbacksList = new ArrayList<String>();
+        jsonCallbacksList.add("CALLBACK1");
+        jsonCallbacksList.add("CALLBACK2");
+        JsonValue jsonCallbacks = new JsonValue(jsonCallbacksList);
         PrivateKey privateKey = mock(PrivateKey.class);
         PlaintextJwt plaintextJwt = mock(PlaintextJwt.class);
         SignedJwt signedJwt = mock(SignedJwt.class);
@@ -288,8 +317,8 @@ public class RestAuthenticationHandlerTest {
         given(authContext.getRequirements(true)).willReturn(allCallbacks);
         given(restAuthCallbackHandlerManager.handleCallbacks(headers, request, httpResponse, null,
                 callbacks, HttpMethod.GET)).willReturn(jsonCallbacks);
-        given(jsonCallbacks.length()).willReturn(2);
-        given(jsonCallbacks.toString()).willReturn("[CALLBACK1,CALLBACK2]");
+//        given(jsonCallbacks.size()).willReturn(2);
+//        given(jsonCallbacks.toString()).willReturn("[CALLBACK1,CALLBACK2]");
         given(amKeyProvider.getPrivateKey(anyString())).willReturn(privateKey);
         given(jwtBuilder.jwt()).willReturn(plaintextJwt);
         given(plaintextJwt.header(anyString(), anyString())).willReturn(plaintextJwt);
@@ -301,7 +330,6 @@ public class RestAuthenticationHandlerTest {
         given(authContext.getSSOToken()).willReturn(ssoToken);
         given(ssoToken.getTokenID()).willReturn(ssoTokenID);
         given(ssoTokenID.toString()).willReturn("SSO_TOKEN_ID");
-        given(systemPropertiesManagerWrapper.get("org.forgerock.keystore.alias")).willReturn("KEYSTORE_ALIAS");
 
         //When
         Response response = restAuthenticationHandler.authenticate(headers, request, httpResponse, null, null, null,
@@ -314,13 +342,14 @@ public class RestAuthenticationHandlerTest {
         verify(authContextStateMap).addAuthContext("JWT_STRING", authContext);
 
         String entity = (String) response.getEntity();
-        JSONObject responseJson = new JSONObject(entity);
+        JsonValue responseJson = JsonValueBuilder.toJsonValue(entity);
         MultivaluedMap<String,Object> metadata = response.getMetadata();
-        JSONArray responseCallbacks = responseJson.getJSONArray("callbacks");
+        JsonValue responseCallbacks = responseJson.get("callbacks");
 
         assertEquals(response.getStatus(), 200);
-        assertEquals(responseJson.get("authId"), "JWT_STRING");
-        assertEquals(responseCallbacks.toString(), "[\"CALLBACK1\",\"CALLBACK2\"]");
+        assertEquals(responseJson.get("authId").asString(), "JWT_STRING");
+        assertEquals(responseCallbacks.get(0).asString(), "CALLBACK1");
+        assertEquals(responseCallbacks.get(1).asString(), "CALLBACK2");
         assertTrue(metadata.containsKey("Content-Type"));
         assertEquals(metadata.get("Content-Type").size(), 1);
         assertEquals(metadata.get("Content-Type").get(0), MediaType.APPLICATION_JSON_TYPE);
@@ -438,12 +467,45 @@ public class RestAuthenticationHandlerTest {
         HttpHeaders headers = mock(HttpHeaders.class);
         HttpServletRequest request = mock(HttpServletRequest.class);
         HttpServletResponse httpResponse = mock(HttpServletResponse.class);
-        String messageBody = "{authId : \"AUTH_ID\", callbacks : [{type : \"CALLBACK1\"," +
-                "output : [{name : \"prompt\",value : \"Enter Callback1:\"}]," +
-                "input : [{key : \"cbk1\",value : \"\"}]}," +
-                "{type : \"PasswordCallback\"," +
-                "output : [{name : \"prompt\",value : \"Enter Callback2:\"}]," +
-                "input : [{key : \"cbk2\",value : \"\"}]}]}";
+        JsonValue jv = JsonValueBuilder.jsonValue()
+                .put("authId", "AUTH_ID")
+                .array("callbacks")
+                    .add(JsonValueBuilder.jsonValue()
+                            .put("type", "CALLBACK1")
+                            .array("output")
+                                .addLast(JsonValueBuilder.jsonValue()
+                                        .put("name", "prompt")
+                                        .put("value", "Enter Callback1:")
+                                        .build())
+                            .array("input")
+                                .addLast(JsonValueBuilder.jsonValue()
+                                        .put("key", "cbk1")
+                                        .put("value", "")
+                                        .build())
+                            .build())
+                    .addLast(JsonValueBuilder.jsonValue()
+                            .put("type", "PasswordCallback")
+                            .array("output")
+                                .addLast(JsonValueBuilder.jsonValue()
+                                        .put("name", "prompt")
+                                        .put("value", "Enter Callback2:")
+                                        .build())
+                            .array("input")
+                                .addLast(JsonValueBuilder.jsonValue()
+                                        .put("key", "cbk2")
+                                        .put("value", "")
+                                        .build())
+                            .build())
+                .build();
+
+          String messageBody = jv.toString();
+
+//        String messageBody = "{authId : \"AUTH_ID\", callbacks : [{type : \"CALLBACK1\"," +
+//                "output : [{name : \"prompt\",value : \"Enter Callback1:\"}]," +
+//                "input : [{key : \"cbk1\",value : \"\"}]}," +
+//                "{type : \"PasswordCallback\"," +
+//                "output : [{name : \"prompt\",value : \"Enter Callback2:\"}]," +
+//                "input : [{key : \"cbk2\",value : \"\"}]}]}";
         PrivateKey privateKey = mock(PrivateKey.class);
         X509Certificate certificate = mock(X509Certificate.class);
         SignedJwt signedJwt = mock(SignedJwt.class);
@@ -461,7 +523,7 @@ public class RestAuthenticationHandlerTest {
         given(signedJwt.verify(privateKey, certificate)).willReturn(true);
         given(authContext.getRequirements()).willReturn(callbacks);
         given(restAuthCallbackHandlerManager.handleJsonCallbacks(
-                eq(callbacks), Matchers.<JSONArray>anyObject())).willReturn(responseCallbacks);
+                eq(callbacks), Matchers.<JsonValue>anyObject())).willReturn(responseCallbacks);
         given(authContext.hasMoreRequirements()).willReturn(false);
 
         given(authContext.hasMoreRequirements()).willReturn(false);

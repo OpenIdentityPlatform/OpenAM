@@ -17,10 +17,12 @@
 package org.forgerock.openam.forgerockrest.authn.callbackhandlers;
 
 import com.sun.identity.shared.debug.Debug;
+import org.forgerock.json.fluent.JsonValue;
 import org.forgerock.openam.forgerockrest.authn.HttpMethod;
 import org.forgerock.openam.forgerockrest.authn.exceptions.RestAuthException;
-import org.json.JSONException;
-import org.json.JSONObject;
+import org.forgerock.openam.utils.JsonArray;
+import org.forgerock.openam.utils.JsonObject;
+import org.forgerock.openam.utils.JsonValueBuilder;
 
 import javax.security.auth.callback.Callback;
 import javax.servlet.http.HttpServletRequest;
@@ -43,7 +45,7 @@ public abstract class AbstractRestAuthCallbackHandler<T extends Callback> {
      * {@inheritDoc}
      */
     public boolean updateCallbackFromRequest(HttpHeaders headers, HttpServletRequest request,
-            HttpServletResponse response, JSONObject postBody, T callback, HttpMethod httpMethod)
+            HttpServletResponse response, JsonValue postBody, T callback, HttpMethod httpMethod)
             throws RestAuthCallbackHandlerResponseException {
 
         // If HttMethod is GET then by default callbacks should not be handled internally/
@@ -72,43 +74,99 @@ public abstract class AbstractRestAuthCallbackHandler<T extends Callback> {
      * @throws RestAuthCallbackHandlerResponseException If one of the CallbackHandlers has its own response to be sent.
      */
     abstract boolean doUpdateCallbackFromRequest(HttpHeaders headers, HttpServletRequest request,
-            HttpServletResponse response, JSONObject postBody, T callback)
+            HttpServletResponse response, JsonValue postBody, T callback)
             throws RestAuthCallbackHandlerResponseException;
 
     /**
      * Creates a JSON input field for a callback.
      *
+     * @param index The index of the input field.
      * @param value The value of the field.
      * @return The JSON field object.
-     * @throws JSONException If there is a problem creating the JSON object.
      */
-    final JSONObject createInputField(String name, Object value) throws JSONException {
+    final JsonValue createInputField(int index, Object value) {
+        return createJsonField("IDToken" + index, value);
+    }
+
+    /**
+     * Creates a JSON input field for a callback.
+     *
+     * @param index The index of the input field.
+     * @param values The array value of the field.
+     * @return The JSON field object.
+     */
+    final JsonValue createInputField(int index, Object[] values) {
+        return createJsonField("IDToken" + index, values);
+    }
+
+    /**
+     * Creates a JSON input field for a callback.
+     *
+     * @param index The index of the input field.
+     * @param postString A String to append to the name of the field.
+     * @param value The value of the field.
+     * @return The JSON field object.
+     */
+    final JsonValue createInputField(int index, String postString, Object value) {
+        return createJsonField("IDToken" + index + postString, value);
+    }
+
+    /**
+     * Creates a JSON output field for a callback.
+     *
+     * @param name The name of the output field.
+     * @param value The value of the field.
+     * @return The JSON field object.
+     */
+    final JsonValue createOutputField(String name, Object value) {
         return createJsonField(name, value);
     }
 
     /**
      * Creates a JSON output field for a callback.
      *
-     * @param value The value of the field.
+     * @param name The name of the output field.
+     * @param values The array value of the field.
      * @return The JSON field object.
-     * @throws JSONException If there is a problem creating the JSON object.
      */
-    final JSONObject createOutputField(String name, Object value) throws JSONException {
-        return createJsonField(name, value);
+    final JsonValue createOutputField(String name, Object[] values) {
+        return createJsonField(name, values);
     }
 
     /**
      * Creates a JSON field for a callback.
      *
+     * @param name The name of the field.
      * @param value The value of the field.
      * @return The JSON field object.
-     * @throws JSONException If there is a problem creating the JSON object.
      */
-    final JSONObject createJsonField(String name, Object value) throws JSONException {
-        JSONObject field = new JSONObject();
-        field.put("name", name == null ? "" : name);
-        field.put("value", value == null ? "" : value);
-        return field;
+    final JsonValue createJsonField(String name, Object value) {
+        return JsonValueBuilder.jsonValue()
+                .put("name", name == null ? "" : name)
+                .put("value", value == null ? "" : value)
+                .build();
+    }
+
+    /**
+     * Creates a JSON field for a callback.
+     *
+     * @param name The name of the field.
+     * @param values The array value of the field.
+     * @return The JSON field object.
+     */
+    final JsonValue createJsonField(String name, Object[] values) {
+        JsonArray jsonArray = JsonValueBuilder.jsonValue()
+                .put("name", name == null ? "" : name)
+                .array("value");
+
+        if (values != null) {
+            for (Object value : values) {
+                jsonArray.add(value);
+            }
+        }
+        JsonObject jsonObject = jsonArray.build();
+
+        return jsonObject.build();
     }
 
     /**
@@ -116,10 +174,9 @@ public abstract class AbstractRestAuthCallbackHandler<T extends Callback> {
      *
      * @param callbackName The required name of the callback.
      * @param jsonCallback The JSON callback object.
-     * @throws JSONException If there is a problem getting the type of the JSON callback.
      */
-    final void validateCallbackType(String callbackName, JSONObject jsonCallback) throws JSONException {
-        String type = jsonCallback.getString("type");
+    final void validateCallbackType(String callbackName, JsonValue jsonCallback) {
+        String type = jsonCallback.get("type").asString();
         if (!callbackName.equalsIgnoreCase(type)) {
             DEBUG.message(MessageFormat.format("Method called with invalid callback, {0}.", type));
             throw new RestAuthException(Response.Status.BAD_REQUEST,
@@ -134,10 +191,8 @@ public abstract class AbstractRestAuthCallbackHandler<T extends Callback> {
      * @param attributeName The attribute name to check the presence of.
      * @return If the JSON object contains the attribute name.
      */
-    boolean isJsonAttributePresent(JSONObject jsonObject, String attributeName) {
-        try {
-            jsonObject.get(attributeName);
-        } catch (JSONException e) {
+    boolean isJsonAttributePresent(JsonValue jsonObject, String attributeName) {
+        if (jsonObject.get(attributeName).isNull()) {
             return false;
         }
         return true;

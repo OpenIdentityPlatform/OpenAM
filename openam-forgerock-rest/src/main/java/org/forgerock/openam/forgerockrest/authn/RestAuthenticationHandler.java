@@ -16,11 +16,19 @@
 
 package org.forgerock.openam.forgerockrest.authn;
 
+import com.iplanet.sso.SSOException;
+import com.iplanet.sso.SSOToken;
 import com.sun.identity.authentication.AuthContext;
 import com.sun.identity.authentication.spi.AuthLoginException;
 import com.sun.identity.authentication.spi.PagePropertiesCallback;
+import com.sun.identity.security.AdminTokenAction;
 import com.sun.identity.shared.debug.Debug;
 import com.sun.identity.shared.locale.L10NMessageImpl;
+import com.sun.identity.sm.SMSException;
+import com.sun.identity.sm.ServiceConfig;
+import com.sun.identity.sm.ServiceConfigManager;
+import org.forgerock.json.fluent.JsonException;
+import org.forgerock.json.fluent.JsonValue;
 import org.forgerock.openam.forgerockrest.authn.callbackhandlers.RestAuthCallbackHandlerResponseException;
 import org.forgerock.openam.forgerockrest.authn.exceptions.RestAuthErrorCodeException;
 import org.forgerock.openam.forgerockrest.authn.exceptions.RestAuthException;
@@ -28,9 +36,8 @@ import org.forgerock.openam.forgerockrest.jwt.JwsAlgorithm;
 import org.forgerock.openam.forgerockrest.jwt.JwtBuilder;
 import org.forgerock.openam.forgerockrest.jwt.SignedJwt;
 import org.forgerock.openam.utils.AMKeyProvider;
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
+import org.forgerock.openam.utils.JsonObject;
+import org.forgerock.openam.utils.JsonValueBuilder;
 
 import javax.inject.Inject;
 import javax.security.auth.callback.Callback;
@@ -40,12 +47,14 @@ import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import java.math.BigInteger;
+import java.security.AccessController;
 import java.security.PrivateKey;
 import java.security.SecureRandom;
 import java.security.SignatureException;
 import java.security.cert.X509Certificate;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
 
 /**
  * Handles the initial authenticate and subsequent callback submit RESTful calls.
@@ -55,13 +64,12 @@ public class RestAuthenticationHandler {
     private static final Debug DEBUG = Debug.getInstance("amIdentityServices");
 
     private static final SecureRandom RANDOM = new SecureRandom();
-    private static final String KEYSTORE_ALIAS = "org.forgerock.keystore.alias";
+    private static final String AUTH_SERVICE_NAME = "iPlanetAMAuthService";
 
     private final AuthContextStateMap authContextStateMap;
     private final AMKeyProvider amKeyProvider;
     private final RestAuthCallbackHandlerManager restAuthCallbackHandlerManager;
     private final JwtBuilder jwtBuilder;
-    private final SystemPropertiesManagerWrapper systemPropertiesManager;
 
     /**
      * Constructs an instance of the RestAuthenticationHandler.
@@ -73,13 +81,11 @@ public class RestAuthenticationHandler {
      */
     @Inject
     public RestAuthenticationHandler(AuthContextStateMap authContextStateMap, AMKeyProvider amKeyProvider,
-            RestAuthCallbackHandlerManager restAuthCallbackHandlerManager, JwtBuilder jwtBuilder,
-            SystemPropertiesManagerWrapper systemPropertiesManager) {
+            RestAuthCallbackHandlerManager restAuthCallbackHandlerManager, JwtBuilder jwtBuilder) {
         this.authContextStateMap = authContextStateMap;
         this.amKeyProvider = amKeyProvider;
         this.restAuthCallbackHandlerManager = restAuthCallbackHandlerManager;
         this.jwtBuilder = jwtBuilder;
-        this.systemPropertiesManager = systemPropertiesManager;
     }
 
     /**
@@ -110,7 +116,7 @@ public class RestAuthenticationHandler {
         try {
             AuthContext authContext = startAuthenticationProcess(realm, indexType, authIndexValue, request, response);
 
-            JSONObject jsonResponseObject = processAuthContextRequirements(headers, request, response, authContext,
+            JsonValue jsonResponseObject = processAuthContextRequirements(headers, request, response, authContext,
                     indexType, authIndexValue, httpMethod);
 
             responseBuilder = Response.status(Response.Status.OK);
@@ -124,9 +130,9 @@ public class RestAuthenticationHandler {
         } catch (L10NMessageImpl e) {
             DEBUG.error(e.getMessage(), e);
             return new RestAuthException(Response.Status.UNAUTHORIZED, e).getResponse();
-        } catch (JSONException e) {
+        } catch (JsonException e)  {
             DEBUG.error(e.getMessage(), e);
-            return new RestAuthException(Response.Status.BAD_REQUEST, e).getResponse();
+            return new RestAuthException(Response.Status.INTERNAL_SERVER_ERROR, e).getResponse();
         } catch (SignatureException e) {
             DEBUG.error(e.getMessage(), e);
             return new RestAuthException(Response.Status.INTERNAL_SERVER_ERROR, e).getResponse();
@@ -210,13 +216,12 @@ public class RestAuthenticationHandler {
      * @param httpMethod The Http Method used to initiate this request.
      * @return A JSON object of either an array of Callbacks to be returned to the client or the SSOToken id.
      * @throws SignatureException If there is a problem signing the authId JWT.
-     * @throws JSONException If there is a syntax problem when creating the JSON object.
      * @throws L10NMessageImpl If there is a problem getting the SSOToken from the AuthContext.
      * @throws RestAuthCallbackHandlerResponseException If one of the CallbackHandlers has its own response to be sent.
      */
-    private JSONObject processAuthContextRequirements(HttpHeaders headers, HttpServletRequest request,
+    private JsonValue processAuthContextRequirements(HttpHeaders headers, HttpServletRequest request,
             HttpServletResponse response, AuthContext authContext, AuthContext.IndexType indexType,
-            String authIndexValue, HttpMethod httpMethod) throws SignatureException, JSONException, L10NMessageImpl,
+            String authIndexValue, HttpMethod httpMethod) throws SignatureException, L10NMessageImpl,
             RestAuthCallbackHandlerResponseException {
         return processAuthContextRequirements(headers, request, response, null, authContext, null, indexType,
                 authIndexValue, httpMethod);
@@ -270,6 +275,7 @@ public class RestAuthenticationHandler {
      * @param headers The HttpHeaders of the RESTful call.
      * @param request The HttpServletRequest of the RESTful call.
      * @param response The HttpServletResponse of the RESTful call.
+     * @param postBody The body of the POST request or null if request was a GET.
      * @param authContext The AuthContext for the authentication process.
      * @param authId The authId JWT to store the AuthContext. Null if the the AuthContext has not been stored before.
      * @param indexType The authentication index type from the url parameters.
@@ -277,16 +283,15 @@ public class RestAuthenticationHandler {
      * @param httpMethod The Http Method used to initiate this request.
      * @return A JSON object of either an array of Callbacks to be returned to the client or the SSOToken id.
      * @throws SignatureException If there is a problem signing the authId JWT.
-     * @throws JSONException If there is a syntax problem when creating the JSON object.
      * @throws L10NMessageImpl If there is a problem getting the SSOToken from the AuthContext.
      * @throws RestAuthCallbackHandlerResponseException If one of the CallbackHandlers has its own response to be sent.
      */
-    private JSONObject processAuthContextRequirements(HttpHeaders headers, HttpServletRequest request,
-            HttpServletResponse response, JSONObject postBody, AuthContext authContext, String authId, AuthContext.IndexType indexType,
-            String authIndexValue, HttpMethod httpMethod) throws SignatureException, JSONException, L10NMessageImpl,
-            RestAuthCallbackHandlerResponseException {
+    private JsonValue processAuthContextRequirements(HttpHeaders headers, HttpServletRequest request,
+            HttpServletResponse response, JsonValue postBody, AuthContext authContext, String authId,
+            AuthContext.IndexType indexType, String authIndexValue, HttpMethod httpMethod) throws SignatureException,
+            L10NMessageImpl, RestAuthCallbackHandlerResponseException {
 
-        JSONObject jsonResponseObject = new JSONObject();
+        JsonObject jsonResponseObject = JsonValueBuilder.jsonValue();
 
         if (authContext.hasMoreRequirements()) {
 
@@ -294,7 +299,7 @@ public class RestAuthenticationHandler {
 
             PagePropertiesCallback pagePropertiesCallback = getPagePropertiesCallback(authContext);
 
-            JSONArray jsonCallbacks = null;
+            JsonValue jsonCallbacks;
             try {
                 jsonCallbacks = restAuthCallbackHandlerManager.handleCallbacks(headers, request, response,
                         postBody, callbacks, httpMethod);
@@ -308,7 +313,7 @@ public class RestAuthenticationHandler {
                 throw e;
             }
 
-            if (jsonCallbacks.length() > 0) {
+            if (jsonCallbacks.size() > 0) {
                 //callbacks to send back
                 if (authId == null) {
                     authId = createAuthId(indexType, authIndexValue, authContext);
@@ -322,7 +327,7 @@ public class RestAuthenticationHandler {
                 }
                 jsonResponseObject.put("callbacks", jsonCallbacks);
 
-                return jsonResponseObject;
+                return jsonResponseObject.build();
 
             } else {
                 // handled callbacks internally
@@ -348,12 +353,72 @@ public class RestAuthenticationHandler {
      */
     private String createAuthId(AuthContext.IndexType indexType, String authIndexValue, AuthContext authContext)
             throws SignatureException {
+
+        String keyAlias = getKeystoreAlias(authContext.getOrganizationName());
+
         Map<String, Object> jwtValues = new HashMap<String, Object>();
         jwtValues.put("authIndexType", indexType);
         jwtValues.put("authIndexValue", authIndexValue);
-        String authId = generateAuthId(jwtValues);
+        String authId = generateAuthId(keyAlias, jwtValues);
         authContextStateMap.addAuthContext(authId, authContext);
         return authId;
+    }
+
+    /**
+     * Gets the ServiceConfigManager for the given service name.
+     *
+     * @param serviceName The service name to get the ServiceConfigManager for.
+     * @param token A valid SSOToken.
+     * @return A ServiceConfigManager.
+     */
+    protected ServiceConfigManager getServiceConfigManager(String serviceName, SSOToken token) {
+        try {
+            return new ServiceConfigManager(serviceName, token);
+        } catch (SMSException e) {
+            throw new RestAuthException(Response.Status.INTERNAL_SERVER_ERROR, e);
+        } catch (SSOException e) {
+            throw new RestAuthException(Response.Status.INTERNAL_SERVER_ERROR, e);
+        }
+    }
+
+    /**
+     * Gets a Admin SSOToken for the system (amadmin).
+     *
+     * @return A SSOToken.
+     */
+    protected SSOToken getAdminToken() {
+        return AccessController.doPrivileged(AdminTokenAction.getInstance());
+    }
+
+    /**
+     * Gets the key alias for the JWT signing from the realm properties.
+     *
+     * @param orgName The organisation name.
+     * @return The alias for the public/private keys, or null if not set.
+     */
+    private String getKeystoreAlias(String orgName) {
+
+        SSOToken token = getAdminToken();
+
+        String keyAlias = null;
+        try {
+            ServiceConfigManager scm = getServiceConfigManager(AUTH_SERVICE_NAME, token);
+
+            ServiceConfig orgConfig = scm.getOrganizationConfig(orgName, null);
+            Set<String> values = (Set<String>) orgConfig.getAttributes().get("iplanet-am-auth-jwt-signing-key-alias");
+            for (String value : values) {
+                if (value != null && !"".equals(value)) {
+                    keyAlias = value;
+                    break;
+                }
+            }
+        } catch (SMSException e) {
+            throw new RestAuthException(Response.Status.INTERNAL_SERVER_ERROR, e);
+        } catch (SSOException e) {
+            throw new RestAuthException(Response.Status.INTERNAL_SERVER_ERROR, e);
+        }
+
+        return keyAlias;
     }
 
     /**
@@ -403,18 +468,19 @@ public class RestAuthenticationHandler {
      *     <li>OpenAM sends SSOToken to client</li>
      * </ol>
      *
+     * @param keyAlias The alias for the public/private keys
      * @param jwtValues A Map of key value pairs to be included in the JWT payload.
      * @return A JWT as an unique id that will never be generated again, to be used to store AuthContexts between
      *          requests.
      * @throws SignatureException If there is a problem signing the JWT.
      */
-    private String generateAuthId(Map<String, Object> jwtValues) throws SignatureException {
+    private String generateAuthId(String keyAlias, Map<String, Object> jwtValues) throws SignatureException {
 
         if (jwtValues == null) {
             jwtValues = new HashMap<String, Object>();
         }
 
-        String keyStoreAlias = systemPropertiesManager.get(KEYSTORE_ALIAS);
+        String keyStoreAlias = keyAlias;//systemPropertiesManager.get(KEYSTORE_ALIAS);
 
         if (keyStoreAlias == null) {
             throw new RestAuthException(Response.Status.INTERNAL_SERVER_ERROR,
@@ -438,14 +504,15 @@ public class RestAuthenticationHandler {
     /**
      * Verifies that the authId JWT's signature is valid.
      *
+     * @param keyAlias The alias for the public/private keys
      * @param authId The JWT used to store AuthContexts between requests.
      * @throws SignatureException If there is a problem verifying the signature of the JWT or the signature is not
      * valid.
      */
-    private void verifyAuthId(String authId) throws SignatureException {
+    private void verifyAuthId(String keyAlias, String authId) throws SignatureException {
 
-        PrivateKey privateKey = amKeyProvider.getPrivateKey(systemPropertiesManager.get(KEYSTORE_ALIAS));
-        X509Certificate certificate = amKeyProvider.getX509Certificate(systemPropertiesManager.get(KEYSTORE_ALIAS));
+        PrivateKey privateKey = amKeyProvider.getPrivateKey(keyAlias);
+        X509Certificate certificate = amKeyProvider.getX509Certificate(keyAlias);
 
         boolean verified = ((SignedJwt) jwtBuilder.recontructJwt(authId)).verify(privateKey, certificate);
         if (!verified) {
@@ -461,11 +528,10 @@ public class RestAuthenticationHandler {
      * @param authContext The AuthContext for the authentication process.
      * @return A JSON object with the SSOToken id.
      * @throws L10NMessageImpl If there is a problem getting the SSOToken from the AuthContext.
-     * @throws JSONException If there is a syntax error when setting the SSOToken id in the JSON object.
      */
-    private JSONObject handleAuthenticationComplete(AuthContext authContext) throws L10NMessageImpl, JSONException {
+    private JsonValue handleAuthenticationComplete(AuthContext authContext) throws L10NMessageImpl {
 
-        JSONObject jsonResponseObject = new JSONObject();
+        JsonObject jsonResponseObject = JsonValueBuilder.jsonValue();
 
         AuthContext.Status authStatus = authContext.getStatus();
 
@@ -473,6 +539,8 @@ public class RestAuthenticationHandler {
             DEBUG.message("Authentication succeeded");
             String tokenId = authContext.getSSOToken().getTokenID().toString();
             jsonResponseObject.put("tokenId", tokenId);
+
+            return jsonResponseObject.build();
         } else {
             DEBUG.message("Authentication failed");
             String errorCode = authContext.getErrorCode();
@@ -480,8 +548,6 @@ public class RestAuthenticationHandler {
 
             throw new RestAuthErrorCodeException(errorCode, errorMessage);
         }
-
-        return jsonResponseObject;
     }
 
     /**
@@ -505,10 +571,9 @@ public class RestAuthenticationHandler {
 
         Response.ResponseBuilder responseBuilder;
         try {
-            JSONObject jsonRequestObject = new JSONObject(postBody);
+            JsonValue jsonRequestObject = JsonValueBuilder.toJsonValue(postBody);
 
-            String authId = jsonRequestObject.getString("authId");
-            verifyAuthId(authId);
+            String authId = jsonRequestObject.get("authId").asString();
 
             AuthContext authContext = authContextStateMap.getAuthContext(authId);
 
@@ -522,6 +587,9 @@ public class RestAuthenticationHandler {
                 authContext = startAuthenticationProcess(realm, indexType, authIndexValue, request, response);
             }
 
+            String keyAlias = getKeystoreAlias(authContext.getOrganizationName());
+            verifyAuthId(keyAlias, authId);
+
             // Check that the AuthContext is still in progress
             if (!AuthContext.Status.IN_PROGRESS.equals(authContext.getStatus())) {
                 throw new RestAuthException(Response.Status.UNAUTHORIZED, "Authentication Process not valid");
@@ -534,7 +602,7 @@ public class RestAuthenticationHandler {
 
             authContext.submitRequirements(responseCallbacks);
 
-            JSONObject jsonResponseObject = processAuthContextRequirements(headers, request, response,
+            JsonValue jsonResponseObject = processAuthContextRequirements(headers, request, response,
                     jsonRequestObject, authContext, authId, null, null, httpMethod);
 
             responseBuilder = Response.status(Response.Status.OK);
@@ -548,9 +616,9 @@ public class RestAuthenticationHandler {
         } catch (L10NMessageImpl e) {
             DEBUG.error(e.getMessage(), e);
             return new RestAuthException(Response.Status.UNAUTHORIZED, e).getResponse();
-        } catch (JSONException e) {
+        } catch (JsonException e)  {
             DEBUG.error(e.getMessage(), e);
-            return new RestAuthException(Response.Status.BAD_REQUEST, e).getResponse();
+            return new RestAuthException(Response.Status.INTERNAL_SERVER_ERROR, e).getResponse();
         } catch (SignatureException e) {
             DEBUG.error(e.getMessage(), e);
             return new RestAuthException(Response.Status.INTERNAL_SERVER_ERROR, e).getResponse();
@@ -579,15 +647,13 @@ public class RestAuthenticationHandler {
      * @param originalCallbacks The orignal callbacks from the AuthContext.
      * @param jsonRequestObject The JSON object from the request body.
      * @return The updated original callbacks.
-     * @throws JSONException If there is a problem parsing the JSON object.
      */
     private Callback[] handleCallbacks(HttpHeaders headers, HttpServletRequest request,
-            HttpServletResponse response, Callback[] originalCallbacks, JSONObject jsonRequestObject)
-            throws JSONException {
+            HttpServletResponse response, Callback[] originalCallbacks, JsonValue jsonRequestObject) {
 
         Callback[] responseCallbacks;
         if (isJsonAttributePresent(jsonRequestObject, "callbacks")) {
-            JSONArray jsonCallbacks = jsonRequestObject.getJSONArray("callbacks");
+            JsonValue jsonCallbacks = jsonRequestObject.get("callbacks");
 
             responseCallbacks = restAuthCallbackHandlerManager.handleJsonCallbacks(originalCallbacks, jsonCallbacks);
         } else {
@@ -605,10 +671,8 @@ public class RestAuthenticationHandler {
      * @param attributeName The attribute name to check the presence of.
      * @return If the JSON object contains the attribute name.
      */
-    private boolean isJsonAttributePresent(JSONObject jsonObject, String attributeName) {
-        try {
-            jsonObject.get(attributeName);
-        } catch (JSONException e) {
+    private boolean isJsonAttributePresent(JsonValue jsonObject, String attributeName) {
+        if (jsonObject.get(attributeName).isNull()) {
             return false;
         }
         return true;

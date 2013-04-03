@@ -16,11 +16,10 @@
 
 package org.forgerock.openam.forgerockrest.authn.callbackhandlers;
 
+import org.forgerock.json.fluent.JsonValue;
 import org.forgerock.openam.forgerockrest.authn.HttpMethod;
 import org.forgerock.openam.forgerockrest.authn.exceptions.RestAuthException;
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
+import org.forgerock.openam.utils.JsonValueBuilder;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
@@ -68,7 +67,7 @@ public class RestAuthTextInputCallbackHandlerTest {
         HttpHeaders headers = mock(HttpHeaders.class);
         HttpServletRequest request = mock(HttpServletRequest.class);
         HttpServletResponse response = mock(HttpServletResponse.class);
-        JSONObject jsonPostBody = mock(JSONObject.class);
+        JsonValue jsonPostBody = mock(JsonValue.class);
         TextInputCallback textInputCallback = mock(TextInputCallback.class);
 
         given(request.getParameter("text")).willReturn("TEXT");
@@ -90,7 +89,7 @@ public class RestAuthTextInputCallbackHandlerTest {
         HttpHeaders headers = mock(HttpHeaders.class);
         HttpServletRequest request = mock(HttpServletRequest.class);
         HttpServletResponse response = mock(HttpServletResponse.class);
-        JSONObject jsonPostBody = mock(JSONObject.class);
+        JsonValue jsonPostBody = mock(JsonValue.class);
         TextInputCallback textInputCallback = mock(TextInputCallback.class);
 
         given(request.getParameter("text")).willReturn(null);
@@ -112,7 +111,7 @@ public class RestAuthTextInputCallbackHandlerTest {
         HttpHeaders headers = mock(HttpHeaders.class);
         HttpServletRequest request = mock(HttpServletRequest.class);
         HttpServletResponse response = mock(HttpServletResponse.class);
-        JSONObject jsonPostBody = mock(JSONObject.class);
+        JsonValue jsonPostBody = mock(JsonValue.class);
         TextInputCallback textInputCallback = mock(TextInputCallback.class);
 
         given(request.getParameter("text")).willReturn("");
@@ -127,13 +126,13 @@ public class RestAuthTextInputCallbackHandlerTest {
     }
 
     @Test
-    public void shouldHandleCallback() throws JSONException {
+    public void shouldHandleCallback() {
 
         //Given
         HttpHeaders headers = mock(HttpHeaders.class);
         HttpServletRequest request = mock(HttpServletRequest.class);
         HttpServletResponse response = mock(HttpServletResponse.class);
-        JSONObject jsonPostBody = mock(JSONObject.class);
+        JsonValue jsonPostBody = mock(JsonValue.class);
         TextInputCallback originalTextInputCallback = mock(TextInputCallback.class);
 
         //When
@@ -145,40 +144,38 @@ public class RestAuthTextInputCallbackHandlerTest {
     }
 
     @Test
-    public void shouldConvertToJson() throws JSONException {
+    public void shouldConvertToJson() {
 
         //Given
         TextInputCallback textInputCallback = new TextInputCallback("Enter text:", "DEFAULT_VALUE");
 
         //When
-        JSONObject jsonObject = restAuthTextInputCallbackHandler.convertToJson(textInputCallback, 1);
+        JsonValue jsonObject = restAuthTextInputCallbackHandler.convertToJson(textInputCallback, 1);
 
         //Then
-        assertEquals("TextInputCallback", jsonObject.getString("type"));
-        assertNotNull(jsonObject.getJSONArray("output"));
-        assertEquals(2, jsonObject.getJSONArray("output").length());
-        assertEquals("Enter text:", jsonObject.getJSONArray("output").getJSONObject(0).getString("value"));
-        assertEquals("DEFAULT_VALUE", jsonObject.getJSONArray("output").getJSONObject(1).getString("value"));
-        assertNotNull(jsonObject.getJSONArray("input"));
-        assertEquals(1, jsonObject.getJSONArray("input").length());
-        assertEquals("", jsonObject.getJSONArray("input").getJSONObject(0).getString("value"));
+        assertEquals("TextInputCallback", jsonObject.get("type").asString());
+        assertNotNull(jsonObject.get("output"));
+        assertEquals(2, jsonObject.get("output").size());
+        assertEquals("Enter text:", jsonObject.get("output").get(0).get("value").asString());
+        assertEquals("DEFAULT_VALUE", jsonObject.get("output").get(1).get("value").asString());
+        assertNotNull(jsonObject.get("input"));
+        assertEquals(1, jsonObject.get("input").size());
+        assertEquals("", jsonObject.get("input").get(0).get("value").asString());
     }
 
     @Test
-    public void shouldConvertFromJson() throws JSONException {
+    public void shouldConvertFromJson() {
 
         //Given
         TextInputCallback textInputCallback = new TextInputCallback("Enter text:", "DEFAULT_VALUE");
-        JSONObject jsonTextInputCallback = new JSONObject()
-                .put("input", new JSONArray()
-                        .put(new JSONObject()
-                                .put("value", "TEXT_VALUE")))
-                .put("output", new JSONArray()
-                        .put(new JSONObject()
-                                .put("value", "Enter text:"))
-                        .put(new JSONObject()
-                                .put("value", "DEFAULT_VALUE")))
-                .put("type", "TextInputCallback");
+        JsonValue jsonTextInputCallback = JsonValueBuilder.jsonValue()
+                .array("input")
+                    .addLast(JsonValueBuilder.jsonValue().put("value", "TEXT_VALUE").build())
+                .array("output")
+                    .add(JsonValueBuilder.jsonValue().put("value", "Enter text:").build())
+                    .addLast(JsonValueBuilder.jsonValue().put("value", "DEFAULT_VALUE").build())
+                .put("type", "TextInputCallback")
+                .build();
 
         //When
         TextInputCallback convertedTextInputCallback = restAuthTextInputCallbackHandler.convertFromJson(
@@ -192,20 +189,18 @@ public class RestAuthTextInputCallbackHandlerTest {
     }
 
     @Test (expectedExceptions = RestAuthException.class)
-    public void shouldFailToConvertFromJsonWithInvalidType() throws JSONException {
+    public void shouldFailToConvertFromJsonWithInvalidType() {
 
         //Given
         TextInputCallback textInputCallback = new TextInputCallback("Enter text:", "DEFAULT_VALUE");
-        JSONObject jsonTextInputCallback = new JSONObject()
-                .put("input", new JSONArray()
-                        .put(new JSONObject()
-                                .put("value", "TEXT_VALUE")))
-                .put("output", new JSONArray()
-                        .put(new JSONObject()
-                                .put("value", "Enter text:"))
-                        .put(new JSONObject()
-                                .put("value", "DEFAULT_VALUE")))
-                .put("type", "PasswordCallback");
+        JsonValue jsonTextInputCallback = JsonValueBuilder.jsonValue()
+                .array("input")
+                    .addLast(JsonValueBuilder.jsonValue().put("value", "TEXT_VALUE").build())
+                .array("output")
+                    .add(JsonValueBuilder.jsonValue().put("value", "Enter text:").build())
+                    .addLast(JsonValueBuilder.jsonValue().put("value", "DEFAULT_VALUE").build())
+                .put("type", "PasswordCallback")
+                .build();
 
         //When
         restAuthTextInputCallbackHandler.convertFromJson(textInputCallback, jsonTextInputCallback);
@@ -215,20 +210,18 @@ public class RestAuthTextInputCallbackHandlerTest {
     }
 
     @Test
-    public void shouldNotFailToConvertFromJsonWithTypeLowerCase() throws JSONException {
+    public void shouldNotFailToConvertFromJsonWithTypeLowerCase() {
 
         //Given
         TextInputCallback textInputCallback = new TextInputCallback("Enter text:", "DEFAULT_VALUE");
-        JSONObject jsonTextInputCallback = new JSONObject()
-                .put("input", new JSONArray()
-                        .put(new JSONObject()
-                                .put("value", "TEXT_VALUE")))
-                .put("output", new JSONArray()
-                        .put(new JSONObject()
-                                .put("value", "Enter text:"))
-                        .put(new JSONObject()
-                                .put("value", "DEFAULT_VALUE")))
-                .put("type", "tExtinpuTcallback");
+        JsonValue jsonTextInputCallback = JsonValueBuilder.jsonValue()
+                .array("input")
+                    .addLast(JsonValueBuilder.jsonValue().put("value", "TEXT_VALUE").build())
+                .array("output")
+                    .add(JsonValueBuilder.jsonValue().put("value", "Enter text:").build())
+                    .addLast(JsonValueBuilder.jsonValue().put("value", "DEFAULT_VALUE").build())
+                .put("type", "tExtinpuTcallback")
+                .build();
 
         //When
         TextInputCallback convertedTextInputCallback = restAuthTextInputCallbackHandler.convertFromJson(

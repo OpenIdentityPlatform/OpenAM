@@ -148,7 +148,15 @@
                         <Value>[Empty]</Value>
                     </DefaultValues>
                 </AttributeSchema>
-                <AttributeSchema name="iplanet-am-auth-default-role" 
+                <AttributeSchema name="iplanet-am-auth-jwt-signing-key-alias"
+                        type="single"
+                        syntax="string"
+                        i18nKey="a151">
+                    <DefaultValues>
+                        <Value>test</Value>
+                    </DefaultValues>
+                </AttributeSchema>
+                <AttributeSchema name="iplanet-am-auth-default-role"
                     type="list"
                     syntax="string" 
                     i18nKey="a105">

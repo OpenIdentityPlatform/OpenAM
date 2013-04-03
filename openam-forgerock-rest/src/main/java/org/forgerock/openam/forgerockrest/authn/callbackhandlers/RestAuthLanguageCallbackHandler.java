@@ -17,9 +17,10 @@
 package org.forgerock.openam.forgerockrest.authn.callbackhandlers;
 
 import com.sun.identity.shared.debug.Debug;
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
+import org.forgerock.json.fluent.JsonException;
+import org.forgerock.json.fluent.JsonValue;
+import org.forgerock.openam.utils.JsonObject;
+import org.forgerock.openam.utils.JsonValueBuilder;
 
 import javax.security.auth.callback.LanguageCallback;
 import javax.servlet.http.HttpServletRequest;
@@ -45,7 +46,7 @@ public class RestAuthLanguageCallbackHandler extends AbstractRestAuthCallbackHan
      * {@inheritDoc}
      */
     boolean doUpdateCallbackFromRequest(HttpHeaders headers, HttpServletRequest request, HttpServletResponse response,
-            JSONObject postBody, LanguageCallback callback) throws RestAuthCallbackHandlerResponseException {
+            JsonValue postBody, LanguageCallback callback) throws RestAuthCallbackHandlerResponseException {
 
         String localeLanguage = request.getParameter("localeLanguage");
         String localeCountry = request.getParameter("localeCountry");
@@ -63,7 +64,7 @@ public class RestAuthLanguageCallbackHandler extends AbstractRestAuthCallbackHan
      * {@inheritDoc}
      */
     public LanguageCallback handle(HttpHeaders headers, HttpServletRequest request, HttpServletResponse response,
-            JSONObject postBody, LanguageCallback originalCallback) throws JSONException {
+            JsonValue postBody, LanguageCallback originalCallback) {
         return originalCallback;
     }
 
@@ -96,44 +97,43 @@ public class RestAuthLanguageCallbackHandler extends AbstractRestAuthCallbackHan
     /**
      * {@inheritDoc}
      */
-    public JSONObject convertToJson(LanguageCallback callback, int index) throws JSONException {
+    public JsonValue convertToJson(LanguageCallback callback, int index) {
 
         Locale locale = callback.getLocale();
 
-        JSONObject jsonCallback = new JSONObject();
-        jsonCallback.put("type", CALLBACK_NAME);
+        JsonObject jsonObject = JsonValueBuilder.jsonValue()
+                .put("type", CALLBACK_NAME);
 
         if (locale != null) {
-            JSONArray input = new JSONArray();
-            input.put(createInputField("IDToken" + index + "Language", locale.getLanguage()));
-            input.put(createInputField("IDToken" + index + "Country", locale.getCountry()));
-            jsonCallback.put("input", input);
+                jsonObject.array("input")
+                        .add(createInputField(index, "Language", locale.getLanguage()))
+                        .addLast(createInputField(index, "Country", locale.getCountry()));
         }
 
-        return jsonCallback;
+        return jsonObject.build();
     }
 
     /**
      * {@inheritDoc}
      */
-    public LanguageCallback convertFromJson(LanguageCallback callback, JSONObject jsonCallback) throws JSONException {
+    public LanguageCallback convertFromJson(LanguageCallback callback, JsonValue jsonCallback) {
 
         validateCallbackType(CALLBACK_NAME, jsonCallback);
 
-        JSONArray input = jsonCallback.getJSONArray("input");
+        JsonValue input = jsonCallback.get("input");
 
-        if (input.length() != 2) {
-            throw new JSONException("JSON Callback does not include the required input fields");
+        if (input.size() != 2) {
+            throw new JsonException("JSON Callback does not include the required input fields");
         }
 
         String language = null;
         String country = null;
 
-        for (int i = 0; i < input.length(); i++) {
+        for (int i = 0; i < input.size(); i++) {
 
-            JSONObject inputField = input.getJSONObject(i);
+            JsonValue inputField = input.get(i);
 
-            String value = inputField.getString("value");
+            String value = inputField.get("value").asString();
 
             if (i == 0) {
                 language = value;

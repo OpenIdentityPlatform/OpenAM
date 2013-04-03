@@ -16,8 +16,8 @@
 
 package org.forgerock.openam.forgerockrest.authn.exceptions;
 
-import org.json.JSONException;
-import org.json.JSONObject;
+import org.forgerock.json.fluent.JsonValue;
+import org.forgerock.openam.utils.JsonValueBuilder;
 
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
@@ -72,14 +72,11 @@ public class RestAuthException extends RuntimeException {
 
         Response.ResponseBuilder responseBuilder = Response.status(responseStatus);
 
-        try {
-            JSONObject jsonObject = new JSONObject();
-            jsonObject.put("errorMessage", getLocalizedMessage());
-            responseBuilder.type(MediaType.APPLICATION_JSON_TYPE);
-            responseBuilder.entity(jsonObject.toString());
-        } catch (JSONException e) {
-            responseBuilder.entity("{\"errorMessage\" : \"Authentication Failed\"}");
-        }
+        JsonValue jsonValue = JsonValueBuilder.jsonValue()
+                .put("errorMessage", getLocalizedMessage())
+                .build();
+        responseBuilder.type(MediaType.APPLICATION_JSON_TYPE);
+        responseBuilder.entity(jsonValue.toString());
 
         return responseBuilder.build();
     }

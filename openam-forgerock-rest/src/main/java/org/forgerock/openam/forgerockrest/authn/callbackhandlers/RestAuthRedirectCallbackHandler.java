@@ -20,10 +20,9 @@ import com.sun.identity.authentication.client.AuthClientUtils;
 import com.sun.identity.authentication.share.RedirectCallbackHandler;
 import com.sun.identity.authentication.spi.RedirectCallback;
 import com.sun.identity.shared.debug.Debug;
+import org.forgerock.json.fluent.JsonValue;
 import org.forgerock.openam.forgerockrest.authn.HttpMethod;
 import org.forgerock.openam.forgerockrest.authn.exceptions.RestAuthException;
-import org.json.JSONException;
-import org.json.JSONObject;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -53,7 +52,7 @@ public class RestAuthRedirectCallbackHandler extends AbstractRestAuthCallbackHan
      * {@inheritDoc}
      */
     public boolean updateCallbackFromRequest(HttpHeaders headers, HttpServletRequest request,
-            HttpServletResponse response, JSONObject postBody, RedirectCallback callback, HttpMethod httpMethod) {
+            HttpServletResponse response, JsonValue postBody, RedirectCallback callback, HttpMethod httpMethod) {
 
         try {
             String contextPath = request.getContextPath();
@@ -79,7 +78,7 @@ public class RestAuthRedirectCallbackHandler extends AbstractRestAuthCallbackHan
      * {@inheritDoc}
      */
     boolean doUpdateCallbackFromRequest(HttpHeaders headers, HttpServletRequest request, HttpServletResponse response,
-            JSONObject postBody, RedirectCallback callback) throws RestAuthCallbackHandlerResponseException {
+            JsonValue postBody, RedirectCallback callback) throws RestAuthCallbackHandlerResponseException {
         return false;
     }
 
@@ -87,7 +86,7 @@ public class RestAuthRedirectCallbackHandler extends AbstractRestAuthCallbackHan
      * {@inheritDoc}
      */
     public RedirectCallback handle(HttpHeaders headers, HttpServletRequest request, HttpServletResponse response,
-            JSONObject postBody, RedirectCallback originalCallback) throws JSONException {
+            JsonValue postBody, RedirectCallback originalCallback) {
         return originalCallback;
     }
 
@@ -104,7 +103,7 @@ public class RestAuthRedirectCallbackHandler extends AbstractRestAuthCallbackHan
      *
      * {@inheritDoc}
      */
-    public JSONObject convertToJson(RedirectCallback callback, int index) throws JSONException {
+    public JsonValue convertToJson(RedirectCallback callback, int index) {
         throw new RestAuthException(Response.Status.INTERNAL_SERVER_ERROR, new UnsupportedOperationException(
                 "RedirectCallbacks cannot be converted to JSON"));
     }
@@ -115,7 +114,7 @@ public class RestAuthRedirectCallbackHandler extends AbstractRestAuthCallbackHan
      *
      * {@inheritDoc}
      */
-    public RedirectCallback convertFromJson(RedirectCallback callback, JSONObject jsonCallback) throws JSONException {
+    public RedirectCallback convertFromJson(RedirectCallback callback, JsonValue jsonCallback) {
         throw new RestAuthException(Response.Status.INTERNAL_SERVER_ERROR, new UnsupportedOperationException(
                 "RedirectCallbacks cannot be converted from JSON"));
     }

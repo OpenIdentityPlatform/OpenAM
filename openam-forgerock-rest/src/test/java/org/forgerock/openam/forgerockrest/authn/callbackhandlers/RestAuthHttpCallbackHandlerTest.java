@@ -17,10 +17,9 @@
 package org.forgerock.openam.forgerockrest.authn.callbackhandlers;
 
 import com.sun.identity.authentication.spi.HttpCallback;
+import org.forgerock.json.fluent.JsonValue;
 import org.forgerock.openam.forgerockrest.authn.HttpMethod;
 import org.forgerock.openam.forgerockrest.authn.exceptions.RestAuthException;
-import org.json.JSONException;
-import org.json.JSONObject;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
@@ -28,6 +27,10 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.Response;
+
+import java.util.HashMap;
+import java.util.LinkedHashMap;
+import java.util.Map;
 
 import static junit.framework.Assert.fail;
 import static org.mockito.BDDMockito.given;
@@ -65,7 +68,7 @@ public class RestAuthHttpCallbackHandlerTest {
         HttpHeaders headers = mock(HttpHeaders.class);
         HttpServletRequest request = mock(HttpServletRequest.class);
         HttpServletResponse response = mock(HttpServletResponse.class);
-        JSONObject jsonPostBody = mock(JSONObject.class);
+        JsonValue jsonPostBody = mock(JsonValue.class);
         HttpCallback httpCallback = mock(HttpCallback.class);
 
         given(httpCallback.getAuthorizationHeader()).willReturn("AUTHORIZATION");
@@ -82,13 +85,13 @@ public class RestAuthHttpCallbackHandlerTest {
 
     @Test
     public void shouldFailToUpdateCallbackFromRequestWhenHttpAuthorizationIsNull()
-            throws RestAuthCallbackHandlerResponseException, JSONException {
+            throws RestAuthCallbackHandlerResponseException {
 
         //Given
         HttpHeaders headers = mock(HttpHeaders.class);
         HttpServletRequest request = mock(HttpServletRequest.class);
         HttpServletResponse response = mock(HttpServletResponse.class);
-        JSONObject jsonPostBody = mock(JSONObject.class);
+        JsonValue jsonPostBody = mock(JsonValue.class);
         HttpCallback httpCallback = mock(HttpCallback.class);
 
         given(request.getParameter("httpAuthorization")).willReturn(null);
@@ -110,19 +113,19 @@ public class RestAuthHttpCallbackHandlerTest {
         assertEquals(exception.getResponseHeaders().size(), 1);
         assertTrue(exception.getResponseHeaders().containsKey("WWW-Authenticate"));
         assertTrue(exception.getResponseHeaders().containsValue("Negotiate"));
-        assertEquals(exception.getJsonResponse().getBoolean("failure"), true);
-        assertEquals(exception.getJsonResponse().getString("reason"), "iwa-failed");
+        assertEquals(exception.getJsonResponse().get("failure").asBoolean(), (Boolean)true);
+        assertEquals(exception.getJsonResponse().get("reason").asString(), "iwa-failed");
     }
 
     @Test
     public void shouldFailToUpdateCallbackFromRequestWhenHttpAuthorizationIsEmptyString()
-            throws RestAuthCallbackHandlerResponseException, JSONException {
+            throws RestAuthCallbackHandlerResponseException {
 
         //Given
         HttpHeaders headers = mock(HttpHeaders.class);
         HttpServletRequest request = mock(HttpServletRequest.class);
         HttpServletResponse response = mock(HttpServletResponse.class);
-        JSONObject jsonPostBody = mock(JSONObject.class);
+        JsonValue jsonPostBody = mock(JsonValue.class);
         HttpCallback httpCallback = mock(HttpCallback.class);
 
         given(request.getParameter("httpAuthorization")).willReturn("");
@@ -144,21 +147,21 @@ public class RestAuthHttpCallbackHandlerTest {
         assertEquals(exception.getResponseHeaders().size(), 1);
         assertTrue(exception.getResponseHeaders().containsKey("WWW-Authenticate"));
         assertTrue(exception.getResponseHeaders().containsValue("Negotiate"));
-        assertEquals(exception.getJsonResponse().getBoolean("failure"), true);
-        assertEquals(exception.getJsonResponse().getString("reason"), "iwa-failed");
+        assertEquals(exception.getJsonResponse().get("failure").asBoolean(), (Boolean)true);
+        assertEquals(exception.getJsonResponse().get("reason").asString(), "iwa-failed");
     }
 
     @Test
-    public void shouldHandleCallbackAndSetIWAFailedIfReasonInPostBody() throws JSONException {
+    public void shouldHandleCallbackAndSetIWAFailedIfReasonInPostBody() {
 
         //Given
         HttpHeaders headers = mock(HttpHeaders.class);
         HttpServletRequest request = mock(HttpServletRequest.class);
         HttpServletResponse response = mock(HttpServletResponse.class);
-        JSONObject jsonPostBody = new JSONObject();
         HttpCallback originalHttpCallback = mock(HttpCallback.class);
-
-        jsonPostBody.put("reason", "iwa-failed");
+        Map<String, String> postBodyMap = new LinkedHashMap<String, String>();
+        postBodyMap.put("reason", "iwa-failed");
+        JsonValue jsonPostBody = new JsonValue(postBodyMap);
 
         //When
         HttpCallback httpCallback = restAuthHttpCallbackHandler.handle(headers, request, response, jsonPostBody,
@@ -170,13 +173,13 @@ public class RestAuthHttpCallbackHandlerTest {
     }
 
     @Test
-    public void shouldHandleCallbackWhereIWASuccessful() throws JSONException {
+    public void shouldHandleCallbackWhereIWASuccessful() {
 
         //Given
         HttpHeaders headers = mock(HttpHeaders.class);
         HttpServletRequest request = mock(HttpServletRequest.class);
         HttpServletResponse response = mock(HttpServletResponse.class);
-        JSONObject jsonPostBody = new JSONObject();
+        JsonValue jsonPostBody = new JsonValue(new HashMap<String, String>());
         HttpCallback originalHttpCallback = mock(HttpCallback.class);
 
         //When
@@ -189,7 +192,7 @@ public class RestAuthHttpCallbackHandlerTest {
     }
 
     @Test (expectedExceptions = RestAuthException.class)
-    public void shouldFailConvertToJson() throws JSONException {
+    public void shouldFailConvertToJson() {
 
         //Given
 
@@ -201,7 +204,7 @@ public class RestAuthHttpCallbackHandlerTest {
     }
 
     @Test (expectedExceptions = RestAuthException.class)
-    public void shouldFailToConvertFromJson() throws JSONException {
+    public void shouldFailToConvertFromJson() {
 
         //Given
 

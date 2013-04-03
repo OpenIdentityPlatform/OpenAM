@@ -17,11 +17,10 @@
 package org.forgerock.openam.forgerockrest.authn.callbackhandlers;
 
 import junit.framework.Assert;
+import org.forgerock.json.fluent.JsonValue;
 import org.forgerock.openam.forgerockrest.authn.HttpMethod;
 import org.forgerock.openam.forgerockrest.authn.exceptions.RestAuthException;
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
+import org.forgerock.openam.utils.JsonValueBuilder;
 import org.mockito.Matchers;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
@@ -69,7 +68,7 @@ public class RestAuthPasswordCallbackHandlerTest {
         HttpHeaders headers = mock(HttpHeaders.class);
         HttpServletRequest request = mock(HttpServletRequest.class);
         HttpServletResponse response = mock(HttpServletResponse.class);
-        JSONObject jsonPostBody = mock(JSONObject.class);
+        JsonValue jsonPostBody = mock(JsonValue.class);
         PasswordCallback passwordCallback = mock(PasswordCallback.class);
 
         given(request.getParameter("password")).willReturn("PASSWORD");
@@ -91,7 +90,7 @@ public class RestAuthPasswordCallbackHandlerTest {
         HttpHeaders headers = mock(HttpHeaders.class);
         HttpServletRequest request = mock(HttpServletRequest.class);
         HttpServletResponse response = mock(HttpServletResponse.class);
-        JSONObject jsonPostBody = mock(JSONObject.class);
+        JsonValue jsonPostBody = mock(JsonValue.class);
         PasswordCallback passwordCallback = mock(PasswordCallback.class);
 
         given(request.getParameter("password")).willReturn(null);
@@ -113,7 +112,7 @@ public class RestAuthPasswordCallbackHandlerTest {
         HttpHeaders headers = mock(HttpHeaders.class);
         HttpServletRequest request = mock(HttpServletRequest.class);
         HttpServletResponse response = mock(HttpServletResponse.class);
-        JSONObject jsonPostBody = mock(JSONObject.class);
+        JsonValue jsonPostBody = mock(JsonValue.class);
         PasswordCallback passwordCallback = mock(PasswordCallback.class);
 
         given(request.getParameter("password")).willReturn("");
@@ -128,13 +127,13 @@ public class RestAuthPasswordCallbackHandlerTest {
     }
 
     @Test
-    public void shouldHandleCallback() throws JSONException {
+    public void shouldHandleCallback() {
 
         //Given
         HttpHeaders headers = mock(HttpHeaders.class);
         HttpServletRequest request = mock(HttpServletRequest.class);
         HttpServletResponse response = mock(HttpServletResponse.class);
-        JSONObject jsonPostBody = mock(JSONObject.class);
+        JsonValue jsonPostBody = mock(JsonValue.class);
         PasswordCallback originalPasswordCallback = mock(PasswordCallback.class);
 
         //When
@@ -146,37 +145,36 @@ public class RestAuthPasswordCallbackHandlerTest {
     }
 
     @Test
-    public void shouldConvertToJson() throws JSONException {
+    public void shouldConvertToJson() {
 
         //Given
         PasswordCallback passwordCallback = new PasswordCallback("Enter password:", false);
 
         //When
-        JSONObject jsonObject = restAuthPasswordCallbackHandler.convertToJson(passwordCallback, 1);
+        JsonValue jsonObject = restAuthPasswordCallbackHandler.convertToJson(passwordCallback, 1);
 
         //Then
-        assertEquals("PasswordCallback", jsonObject.getString("type"));
-        assertNotNull(jsonObject.getJSONArray("output"));
-        Assert.assertEquals(1, jsonObject.getJSONArray("output").length());
-        Assert.assertEquals("Enter password:", jsonObject.getJSONArray("output").getJSONObject(0).getString("value"));
-        assertNotNull(jsonObject.getJSONArray("input"));
-        Assert.assertEquals(1, jsonObject.getJSONArray("input").length());
-        Assert.assertEquals("", jsonObject.getJSONArray("input").getJSONObject(0).getString("value"));
+        assertEquals("PasswordCallback", jsonObject.get("type").asString());
+        assertNotNull(jsonObject.get("output"));
+        Assert.assertEquals(1, jsonObject.get("output").size());
+        Assert.assertEquals("Enter password:", jsonObject.get("output").get(0).get("value").asString());
+        assertNotNull(jsonObject.get("input"));
+        Assert.assertEquals(1, jsonObject.get("input").size());
+        Assert.assertEquals("", jsonObject.get("input").get(0).get("value").asString());
     }
 
     @Test
-    public void shouldConvertFromJson() throws JSONException {
+    public void shouldConvertFromJson() {
 
         //Given
         PasswordCallback passwordCallback = new PasswordCallback("Enter password:", false);
-        JSONObject jsonPasswordCallback = new JSONObject()
-                .put("input", new JSONArray().put(
-                        new JSONObject()
-                                .put("value", "PASSWORD")))
-                .put("output", new JSONArray().put(
-                        new JSONObject()
-                                .put("value", "Enter password:")))
-                .put("type", "PasswordCallback");
+        JsonValue jsonPasswordCallback = JsonValueBuilder.jsonValue()
+                .array("input")
+                    .addLast(JsonValueBuilder.jsonValue().put("value", "PASSWORD").build())
+                .array("output")
+                    .addLast(JsonValueBuilder.jsonValue().put("value", "Enter password:").build())
+                .put("type", "PasswordCallback")
+                .build();
 
         //When
         PasswordCallback convertedPasswordCallback = restAuthPasswordCallbackHandler.convertFromJson(passwordCallback,
@@ -189,18 +187,17 @@ public class RestAuthPasswordCallbackHandlerTest {
     }
 
     @Test (expectedExceptions = RestAuthException.class)
-    public void shouldFailToConvertFromJsonWithInvalidType() throws JSONException {
+    public void shouldFailToConvertFromJsonWithInvalidType() {
 
         //Given
         PasswordCallback passwordCallback = new PasswordCallback("Enter password:", false);
-        JSONObject jsonPasswordCallback = new JSONObject()
-                .put("input", new JSONArray().put(
-                        new JSONObject()
-                                .put("value", "PASSWORD")))
-                .put("output", new JSONArray().put(
-                        new JSONObject()
-                                .put("value", "Enter password:")))
-                .put("type", "NameCallback");
+        JsonValue jsonPasswordCallback = JsonValueBuilder.jsonValue()
+                .array("input")
+                    .addLast(JsonValueBuilder.jsonValue().put("value", "PASSWORD").build())
+                .array("output")
+                    .addLast(JsonValueBuilder.jsonValue().put("value", "Enter password:").build())
+                .put("type", "NameCallback")
+                .build();
 
         //When
         restAuthPasswordCallbackHandler.convertFromJson(passwordCallback, jsonPasswordCallback);
@@ -210,18 +207,17 @@ public class RestAuthPasswordCallbackHandlerTest {
     }
 
     @Test
-    public void shouldNotFailToConvertFromJsonWithTypeLowerCase() throws JSONException {
+    public void shouldNotFailToConvertFromJsonWithTypeLowerCase() {
 
         //Given
         PasswordCallback passwordCallback = new PasswordCallback("Enter password:", false);
-        JSONObject jsonPasswordCallback = new JSONObject()
-                .put("input", new JSONArray().put(
-                        new JSONObject()
-                                .put("value", "PASSWORD")))
-                .put("output", new JSONArray().put(
-                        new JSONObject()
-                                .put("value", "Enter password:")))
-                .put("type", "passwordcallback");
+        JsonValue jsonPasswordCallback = JsonValueBuilder.jsonValue()
+                .array("input")
+                    .addLast(JsonValueBuilder.jsonValue().put("value", "PASSWORD").build())
+                .array("output")
+                    .addLast(JsonValueBuilder.jsonValue().put("value", "Enter password:").build())
+                .put("type", "passwordcallback")
+                .build();
 
         //When
         PasswordCallback convertedPasswordCallback = restAuthPasswordCallbackHandler.convertFromJson(passwordCallback,

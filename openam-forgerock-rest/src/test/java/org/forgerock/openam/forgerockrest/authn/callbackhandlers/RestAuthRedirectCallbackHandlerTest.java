@@ -18,9 +18,8 @@ package org.forgerock.openam.forgerockrest.authn.callbackhandlers;
 
 import com.sun.identity.authentication.share.RedirectCallbackHandler;
 import com.sun.identity.authentication.spi.RedirectCallback;
+import org.forgerock.json.fluent.JsonValue;
 import org.forgerock.openam.forgerockrest.authn.exceptions.RestAuthException;
-import org.json.JSONException;
-import org.json.JSONObject;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
@@ -59,13 +58,13 @@ public class RestAuthRedirectCallbackHandlerTest {
     }
 
     @Test
-    public void shouldHandleCallback() throws JSONException {
+    public void shouldHandleCallback() {
 
         //Given
         HttpHeaders headers = mock(HttpHeaders.class);
         HttpServletRequest request = mock(HttpServletRequest.class);
         HttpServletResponse response = mock(HttpServletResponse.class);
-        JSONObject jsonPostBody = mock(JSONObject.class);
+        JsonValue jsonPostBody = mock(JsonValue.class);
         RedirectCallback originalRedirectCallback = mock(RedirectCallback.class);
 
         //When
@@ -77,7 +76,7 @@ public class RestAuthRedirectCallbackHandlerTest {
     }
 
     @Test (expectedExceptions = RestAuthException.class)
-    public void shouldFailConvertToJson() throws JSONException {
+    public void shouldFailConvertToJson() {
 
         //Given
 
@@ -89,7 +88,7 @@ public class RestAuthRedirectCallbackHandlerTest {
     }
 
     @Test (expectedExceptions = RestAuthException.class)
-    public void shouldFailToConvertFromJson() throws JSONException {
+    public void shouldFailToConvertFromJson() {
 
         //Given
 

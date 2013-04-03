@@ -16,7 +16,7 @@
 
 package org.forgerock.openam.forgerockrest.authn.callbackhandlers;
 
-import org.json.JSONObject;
+import org.forgerock.json.fluent.JsonValue;
 
 import javax.ws.rs.core.Response;
 import java.util.Map;
@@ -28,7 +28,7 @@ public class RestAuthCallbackHandlerResponseException extends Exception {
 
     private Response.StatusType responseStatus;
     private Map<String, String> responseHeaders;
-    private JSONObject jsonResponse;
+    private JsonValue jsonResponse;
 
     /**
      * Constructs a RestAuthCallbackHandlerResponseException.
@@ -38,7 +38,7 @@ public class RestAuthCallbackHandlerResponseException extends Exception {
      * @param jsonResponse The JSON object for the response body.
      */
     public RestAuthCallbackHandlerResponseException(Response.StatusType responseStatus,
-            Map<String, String> responseHeaders, JSONObject jsonResponse) {
+            Map<String, String> responseHeaders, JsonValue jsonResponse) {
         this.responseStatus = responseStatus;
         this.responseHeaders = responseHeaders;
         this.jsonResponse = jsonResponse;
@@ -67,7 +67,7 @@ public class RestAuthCallbackHandlerResponseException extends Exception {
      *
      * @return The response JSON body.
      */
-    public JSONObject getJsonResponse() {
+    public JsonValue getJsonResponse() {
         return jsonResponse;
     }
 }

@@ -18,10 +18,10 @@ package org.forgerock.openam.forgerockrest.authn.callbackhandlers;
 
 import com.sun.identity.authentication.spi.HttpCallback;
 import com.sun.identity.shared.debug.Debug;
+import org.forgerock.json.fluent.JsonValue;
 import org.forgerock.openam.forgerockrest.authn.HttpMethod;
 import org.forgerock.openam.forgerockrest.authn.exceptions.RestAuthException;
-import org.json.JSONException;
-import org.json.JSONObject;
+import org.forgerock.openam.utils.JsonValueBuilder;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -51,7 +51,7 @@ public class RestAuthHttpCallbackHandler extends AbstractRestAuthCallbackHandler
      * {@inheritDoc}
      */
     public boolean updateCallbackFromRequest(HttpHeaders headers, HttpServletRequest request,
-            HttpServletResponse response, JSONObject postBody, HttpCallback callback, HttpMethod httpMethod) throws
+            HttpServletResponse response, JsonValue postBody, HttpCallback callback, HttpMethod httpMethod) throws
             RestAuthCallbackHandlerResponseException {
 
         String httpAuthorization = request.getHeader(callback.getAuthorizationHeader());
@@ -59,18 +59,14 @@ public class RestAuthHttpCallbackHandler extends AbstractRestAuthCallbackHandler
         if (httpAuthorization == null || "".equals(httpAuthorization)) {
             DEBUG.message("Authorization Header not set in request.");
 
-            try {
-                JSONObject jsonResponse = new JSONObject();
-                jsonResponse.put("failure", true);
-                jsonResponse.put("reason", IWA_FAILED);
-                Map<String, String> responseHeaders = new HashMap<String, String>();
-                responseHeaders.put("WWW-Authenticate", "Negotiate");
-                throw new RestAuthCallbackHandlerResponseException(Response.Status.UNAUTHORIZED,
-                        responseHeaders, jsonResponse);
-            } catch (JSONException e) {
-                throw new RestAuthException(Response.Status.INTERNAL_SERVER_ERROR,
-                        "Could not generate IWA response");
-            }
+            JsonValue jsonValue = JsonValueBuilder.jsonValue()
+                    .put("failure", true)
+                    .put("reason", IWA_FAILED)
+                    .build();
+            Map<String, String> responseHeaders = new HashMap<String, String>();
+            responseHeaders.put("WWW-Authenticate", "Negotiate");
+            throw new RestAuthCallbackHandlerResponseException(Response.Status.UNAUTHORIZED,
+                    responseHeaders, jsonValue);
         }
 
         callback.setAuthorization(httpAuthorization);
@@ -84,7 +80,7 @@ public class RestAuthHttpCallbackHandler extends AbstractRestAuthCallbackHandler
      * {@inheritDoc}
      */
     boolean doUpdateCallbackFromRequest(HttpHeaders headers, HttpServletRequest request, HttpServletResponse response,
-            JSONObject postBody, HttpCallback callback) throws RestAuthCallbackHandlerResponseException {
+            JsonValue postBody, HttpCallback callback) throws RestAuthCallbackHandlerResponseException {
         return false;
     }
 
@@ -92,8 +88,8 @@ public class RestAuthHttpCallbackHandler extends AbstractRestAuthCallbackHandler
      * {@inheritDoc}
      */
     public HttpCallback handle(HttpHeaders headers, HttpServletRequest request, HttpServletResponse response,
-            JSONObject postBody, HttpCallback originalCallback) throws JSONException {
-        if (isJsonAttributePresent(postBody, "reason") && postBody.getString("reason").equals(IWA_FAILED)) {
+            JsonValue postBody, HttpCallback originalCallback) {
+        if (isJsonAttributePresent(postBody, "reason") && postBody.get("reason").asString().equals(IWA_FAILED)) {
             request.setAttribute(IWA_FAILED, true);
         }
         return originalCallback;
@@ -109,7 +105,7 @@ public class RestAuthHttpCallbackHandler extends AbstractRestAuthCallbackHandler
     /**
      * {@inheritDoc}
      */
-    public JSONObject convertToJson(HttpCallback callback, int index) {
+    public JsonValue convertToJson(HttpCallback callback, int index) {
         throw new RestAuthException(Response.Status.BAD_REQUEST, new UnsupportedOperationException(
                 "HttpCallback Authorization Header must be specified in the initial request. Cannot be converted into"
                         + " a JSON representation."));
@@ -118,7 +114,7 @@ public class RestAuthHttpCallbackHandler extends AbstractRestAuthCallbackHandler
     /**
      * {@inheritDoc}
      */
-    public HttpCallback convertFromJson(HttpCallback callback, JSONObject jsonCallback) {
+    public HttpCallback convertFromJson(HttpCallback callback, JsonValue jsonCallback) {
         throw new RestAuthException(Response.Status.BAD_REQUEST, new UnsupportedOperationException(
                 "HttpCallback Authorization Header must be specified in the initial request. Cannot be converted from"
                         + " a JSON representation."));

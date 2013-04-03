@@ -62,6 +62,15 @@
             <fieldhelp name="help-iplanet-am-auth-admin-auth-module" defaultValue="a104.help" />
         </property>
 
+        <property>
+            <label name="jwtSigningKeyAlias"
+                   defaultValue="a151"
+                   labelFor="iplanet-am-auth-jwt-signing-key-alias" />
+            <cc name="iplanet-am-auth-jwt-signing-key-alias"
+                tagclass="com.sun.web.ui.taglib.html.CCTextFieldTag" />
+            <fieldhelp name="help-iplanet-am-auth-jwt-signing-key-alias" defaultValue="a151.help" />
+        </property>
+
         <subsection name="successURL" defaultValue="" >
             <property>
                 <label name="successURL" 

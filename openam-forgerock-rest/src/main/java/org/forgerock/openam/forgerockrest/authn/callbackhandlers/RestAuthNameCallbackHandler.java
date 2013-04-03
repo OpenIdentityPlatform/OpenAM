@@ -17,9 +17,9 @@
 package org.forgerock.openam.forgerockrest.authn.callbackhandlers;
 
 import com.sun.identity.shared.debug.Debug;
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
+import org.forgerock.json.fluent.JsonException;
+import org.forgerock.json.fluent.JsonValue;
+import org.forgerock.openam.utils.JsonValueBuilder;
 
 import javax.security.auth.callback.NameCallback;
 import javax.servlet.http.HttpServletRequest;
@@ -51,7 +51,7 @@ public class RestAuthNameCallbackHandler extends AbstractRestAuthCallbackHandler
      * {@inheritDoc}
      */
     boolean doUpdateCallbackFromRequest(HttpHeaders headers, HttpServletRequest request, HttpServletResponse response,
-            JSONObject postBody, NameCallback callback) throws RestAuthCallbackHandlerResponseException {
+            JsonValue postBody, NameCallback callback) throws RestAuthCallbackHandlerResponseException {
 
         String username = request.getParameter("username");
 
@@ -68,47 +68,44 @@ public class RestAuthNameCallbackHandler extends AbstractRestAuthCallbackHandler
      * {@inheritDoc}
      */
     public NameCallback handle(HttpHeaders headers, HttpServletRequest request, HttpServletResponse response,
-            JSONObject postBody, NameCallback originalCallback) throws JSONException {
+            JsonValue postBody, NameCallback originalCallback) {
         return originalCallback;
     }
 
     /**
      * {@inheritDoc}
      */
-    public JSONObject convertToJson(NameCallback callback, int index) throws JSONException {
+    public JsonValue convertToJson(NameCallback callback, int index) {
 
         String prompt = callback.getPrompt();
         String name = callback.getName();
 
-        JSONObject jsonCallback = new JSONObject();
-        jsonCallback.put("type", CALLBACK_NAME);
+        JsonValue jsonValue = JsonValueBuilder.jsonValue()
+                .put("type", CALLBACK_NAME)
+                .array("output")
+                    .addLast(createOutputField("prompt", prompt))
+                .array("input")
+                    .addLast(createInputField(index, name))
+                .build();
 
-        JSONArray output = new JSONArray();
-        output.put(createOutputField("prompt", prompt));
-        jsonCallback.put("output", output);
-
-        JSONArray input = new JSONArray();
-        input.put(createInputField("IDToken" + index, name));
-        jsonCallback.put("input", input);
-
-        return jsonCallback;
+        return jsonValue;
     }
 
     /**
      * {@inheritDoc}
      */
-    public NameCallback convertFromJson(NameCallback callback, JSONObject jsonCallback) throws JSONException {
+    public NameCallback convertFromJson(NameCallback callback, JsonValue jsonCallback) {
 
         validateCallbackType(CALLBACK_NAME, jsonCallback);
 
-        JSONArray input = jsonCallback.getJSONArray("input");
+        JsonValue input = jsonCallback.get("input");
 
-        if (input.length() != 1) {
-            throw new JSONException("JSON Callback does not include a input field");
+        if (input.size() != 1) {
+            throw new JsonException("JSON Callback does not include a input field");
         }
 
-        JSONObject inputField = input.getJSONObject(0);
-        String value = inputField.getString("value");
+        JsonValue inputField = input.get(0);
+        String value = inputField.get("value").asString();
         callback.setName(value);
 
         return callback;

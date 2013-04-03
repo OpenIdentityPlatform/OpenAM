@@ -17,10 +17,9 @@
 package org.forgerock.openam.forgerockrest.authn.callbackhandlers;
 
 import com.sun.identity.authentication.spi.X509CertificateCallback;
+import org.forgerock.json.fluent.JsonValue;
 import org.forgerock.openam.forgerockrest.authn.HttpMethod;
 import org.forgerock.openam.forgerockrest.authn.exceptions.RestAuthException;
-import org.json.JSONException;
-import org.json.JSONObject;
 import org.mockito.Matchers;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
@@ -66,7 +65,7 @@ public class RestAuthX509CallbackHandlerTest {
         HttpHeaders headers = mock(HttpHeaders.class);
         HttpServletRequest request = mock(HttpServletRequest.class);
         HttpServletResponse response = mock(HttpServletResponse.class);
-        JSONObject jsonPostBody = mock(JSONObject.class);
+        JsonValue jsonPostBody = mock(JsonValue.class);
         X509CertificateCallback x509CertificateCallback = mock(X509CertificateCallback.class);
         X509Certificate x509Certificate = mock(X509Certificate.class);
         X509Certificate[] x509Certificates = new X509Certificate[]{x509Certificate};
@@ -90,7 +89,7 @@ public class RestAuthX509CallbackHandlerTest {
         HttpHeaders headers = mock(HttpHeaders.class);
         HttpServletRequest request = mock(HttpServletRequest.class);
         HttpServletResponse response = mock(HttpServletResponse.class);
-        JSONObject jsonPostBody = mock(JSONObject.class);
+        JsonValue jsonPostBody = mock(JsonValue.class);
         X509CertificateCallback x509CertificateCallback = mock(X509CertificateCallback.class);
         X509Certificate x509Certificate = mock(X509Certificate.class);
         X509Certificate x509Certificate2 = mock(X509Certificate.class);
@@ -115,7 +114,7 @@ public class RestAuthX509CallbackHandlerTest {
         HttpHeaders headers = mock(HttpHeaders.class);
         HttpServletRequest request = mock(HttpServletRequest.class);
         HttpServletResponse response = mock(HttpServletResponse.class);
-        JSONObject jsonPostBody = mock(JSONObject.class);
+        JsonValue jsonPostBody = mock(JsonValue.class);
         X509CertificateCallback x509CertificateCallback = mock(X509CertificateCallback.class);
         X509Certificate[] x509Certificates = new X509Certificate[]{};
 
@@ -131,13 +130,13 @@ public class RestAuthX509CallbackHandlerTest {
     }
 
     @Test
-    public void shouldHandleCallback() throws JSONException {
+    public void shouldHandleCallback() {
 
         //Given
         HttpHeaders headers = mock(HttpHeaders.class);
         HttpServletRequest request = mock(HttpServletRequest.class);
         HttpServletResponse response = mock(HttpServletResponse.class);
-        JSONObject jsonPostBody = mock(JSONObject.class);
+        JsonValue jsonPostBody = mock(JsonValue.class);
         X509CertificateCallback originalX509CertificateCallback = mock(X509CertificateCallback.class);
 
         //When
@@ -149,7 +148,7 @@ public class RestAuthX509CallbackHandlerTest {
     }
 
     @Test (expectedExceptions = RestAuthException.class)
-    public void shouldFailConvertToJson() throws JSONException {
+    public void shouldFailConvertToJson() {
 
         //Given
 
@@ -161,7 +160,7 @@ public class RestAuthX509CallbackHandlerTest {
     }
 
     @Test (expectedExceptions = RestAuthException.class)
-    public void shouldFailToConvertFromJson() throws JSONException {
+    public void shouldFailToConvertFromJson() {
 
         //Given
 

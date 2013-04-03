@@ -16,9 +16,9 @@
 
 package org.forgerock.openam.forgerockrest.authn.callbackhandlers;
 
+import org.forgerock.json.fluent.JsonValue;
 import org.forgerock.openam.forgerockrest.authn.exceptions.RestAuthException;
 import org.json.JSONException;
-import org.json.JSONObject;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
@@ -26,6 +26,9 @@ import javax.security.auth.callback.Callback;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.ws.rs.core.HttpHeaders;
+
+import java.util.LinkedHashMap;
+import java.util.Map;
 
 import static org.testng.Assert.assertEquals;
 
@@ -44,7 +47,7 @@ public class AbstractRestAuthCallbackHandlerTest {
         abstractRestAuthCallbackHandler = new AbstractRestAuthCallbackHandler<Callback>() {
             @Override
             boolean doUpdateCallbackFromRequest(HttpHeaders headers, HttpServletRequest request,
-                    HttpServletResponse response, JSONObject postBody, Callback callback)
+                    HttpServletResponse response, JsonValue postBody, Callback callback)
                     throws RestAuthCallbackHandlerResponseException {
                 return false;
             }
@@ -52,17 +55,18 @@ public class AbstractRestAuthCallbackHandlerTest {
     }
 
     @Test
-    public void shouldCreateJsonField() throws JSONException {
+    public void shouldCreateJsonField() {
 
         //Given
         String name = "NAME";
         String value = "VALUE";
 
         //When
-        JSONObject jsonObject = abstractRestAuthCallbackHandler.createJsonField(name, value);
+        JsonValue jsonObject = abstractRestAuthCallbackHandler.createJsonField(name, value);
 
         //Then
-        assertEquals(jsonObject.getString("value"), "VALUE");
+        assertEquals(jsonObject.get("name").asString(), "NAME");
+        assertEquals(jsonObject.get("value").asString(), "VALUE");
     }
 
     @Test
@@ -73,24 +77,73 @@ public class AbstractRestAuthCallbackHandlerTest {
         String value = null;
 
         //When
-        JSONObject jsonObject = abstractRestAuthCallbackHandler.createJsonField(name, value);
+        JsonValue jsonObject = abstractRestAuthCallbackHandler.createJsonField(name, value);
 
         //Then
-        assertEquals(jsonObject.getString("value"), "");
+        assertEquals(jsonObject.get("name").asString(), "NAME");
+        assertEquals(jsonObject.get("value").asString(), "");
+    }
+
+    @Test
+    public void shouldCreateJsonFieldWithObjectArray() {
+
+        //Given
+        String name = "NAME";
+        String[] values = new String[]{"VALUE1", "VALUE2", "VALUE3"};
+
+        //When
+        JsonValue jsonObject = abstractRestAuthCallbackHandler.createJsonField(name, values);
+
+        //Then
+        assertEquals(jsonObject.get("name").asString(), "NAME");
+        assertEquals(jsonObject.get("value").get(0).asString(), "VALUE1");
+        assertEquals(jsonObject.get("value").get(1).asString(), "VALUE2");
+        assertEquals(jsonObject.get("value").get(2).asString(), "VALUE3");
+    }
+
+    @Test
+    public void shouldCreateJsonFieldWithNullObjectArray() {
+
+        //Given
+        String name = "NAME";
+        String[] values = null;
+
+        //When
+        JsonValue jsonObject = abstractRestAuthCallbackHandler.createJsonField(name, values);
+
+        //Then
+        assertEquals(jsonObject.get("name").asString(), "NAME");
+        assertEquals(jsonObject.get("value").size(), 0);
     }
 
     @Test
     public void shouldCreateJsonInputField() throws JSONException {
 
         //Given
-        String name = "NAME";
         String value = "VALUE";
 
         //When
-        JSONObject jsonObject = abstractRestAuthCallbackHandler.createInputField(name, value);
+        JsonValue jsonObject = abstractRestAuthCallbackHandler.createInputField(0, value);
 
         //Then
-        assertEquals(jsonObject.getString("value"), "VALUE");
+        assertEquals(jsonObject.get("name").asString(), "IDToken0");
+        assertEquals(jsonObject.get("value").asString(), "VALUE");
+    }
+
+    @Test
+    public void shouldCreateJsonInputFieldWithObjectArray() throws JSONException {
+
+        //Given
+        String[] values = new String[]{"VALUE1", "VALUE2", "VALUE3"};
+
+        //When
+        JsonValue jsonObject = abstractRestAuthCallbackHandler.createInputField(0, values);
+
+        //Then
+        assertEquals(jsonObject.get("name").asString(), "IDToken0");
+        assertEquals(jsonObject.get("value").get(0).asString(), "VALUE1");
+        assertEquals(jsonObject.get("value").get(1).asString(), "VALUE2");
+        assertEquals(jsonObject.get("value").get(2).asString(), "VALUE3");
     }
 
     @Test
@@ -101,10 +154,28 @@ public class AbstractRestAuthCallbackHandlerTest {
         String value = "VALUE";
 
         //When
-        JSONObject jsonObject = abstractRestAuthCallbackHandler.createOutputField(name, value);
+        JsonValue jsonObject = abstractRestAuthCallbackHandler.createOutputField(name, value);
 
         //Then
-        assertEquals(jsonObject.getString("value"), "VALUE");
+        assertEquals(jsonObject.get("name").asString(), "NAME");
+        assertEquals(jsonObject.get("value").asString(), "VALUE");
+    }
+
+    @Test
+    public void shouldCreateJsonOutputFieldWithObjectArray() throws JSONException {
+
+        //Given
+        String name = "NAME";
+        String[] values = new String[]{"VALUE1", "VALUE2", "VALUE3"};
+
+        //When
+        JsonValue jsonObject = abstractRestAuthCallbackHandler.createOutputField(name, values);
+
+        //Then
+        assertEquals(jsonObject.get("name").asString(), "NAME");
+        assertEquals(jsonObject.get("value").get(0).asString(), "VALUE1");
+        assertEquals(jsonObject.get("value").get(1).asString(), "VALUE2");
+        assertEquals(jsonObject.get("value").get(2).asString(), "VALUE3");
     }
 
     @Test
@@ -112,9 +183,11 @@ public class AbstractRestAuthCallbackHandlerTest {
 
         //Given
         String callbackName = "CALLBACK_NAME";
-        JSONObject jsonCallback = mock(JSONObject.class);
+        JsonValue jsonCallback = mock(JsonValue.class);
+        JsonValue typeJson = mock(JsonValue.class);
 
-        given(jsonCallback.getString("type")).willReturn("CALLBACK_NAME");
+        given(jsonCallback.get("type")).willReturn(typeJson);
+        given(typeJson.asString()).willReturn("CALLBACK_NAME");
 
         //When
         abstractRestAuthCallbackHandler.validateCallbackType(callbackName, jsonCallback);
@@ -128,9 +201,11 @@ public class AbstractRestAuthCallbackHandlerTest {
 
         //Given
         String callbackName = "CALLBACK_NAME";
-        JSONObject jsonCallback = mock(JSONObject.class);
+        JsonValue jsonCallback = mock(JsonValue.class);
+        JsonValue typeJson = mock(JsonValue.class);
 
-        given(jsonCallback.getString("type")).willReturn("CALLBACK_NAME_NOT");
+        given(jsonCallback.get("type")).willReturn(typeJson);
+        given(typeJson.asString()).willReturn("CALLBACK_NAME_NOT");
 
         //When
         abstractRestAuthCallbackHandler.validateCallbackType(callbackName, jsonCallback);
@@ -144,8 +219,9 @@ public class AbstractRestAuthCallbackHandlerTest {
 
         //Given
         String attributeName = "ATTRIBUTE_NAME";
-        JSONObject jsonObject = new JSONObject();
-        jsonObject.put("ATTRIBUTE_NAME", "VALUE");
+        Map<String, String> map = new LinkedHashMap<String, String>();
+        map.put("ATTRIBUTE_NAME", "VALUE");
+        JsonValue jsonObject = new JsonValue(map);
 
         //When
         boolean isAttributePresent = abstractRestAuthCallbackHandler.isJsonAttributePresent(jsonObject, attributeName);
@@ -159,8 +235,9 @@ public class AbstractRestAuthCallbackHandlerTest {
 
         //Given
         String attributeName = "ATTRIBUTE_NAME";
-        JSONObject jsonObject = new JSONObject();
-        jsonObject.put("OTHER_ATTRIBUTE_NAME", "VALUE");
+        Map<String, String> map = new LinkedHashMap<String, String>();
+        map.put("OTHER_ATTRIBUTE_NAME", "VALUE");
+        JsonValue jsonObject = new JsonValue(map);
 
         //When
         boolean isAttributePresent = abstractRestAuthCallbackHandler.isJsonAttributePresent(jsonObject, attributeName);

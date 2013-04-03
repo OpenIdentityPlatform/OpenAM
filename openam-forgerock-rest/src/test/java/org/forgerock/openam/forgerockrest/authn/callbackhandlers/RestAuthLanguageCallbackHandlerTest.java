@@ -16,11 +16,10 @@
 
 package org.forgerock.openam.forgerockrest.authn.callbackhandlers;
 
+import org.forgerock.json.fluent.JsonValue;
 import org.forgerock.openam.forgerockrest.authn.HttpMethod;
 import org.forgerock.openam.forgerockrest.authn.exceptions.RestAuthException;
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
+import org.forgerock.openam.utils.JsonValueBuilder;
 import org.mockito.Matchers;
 import org.testng.Assert;
 import org.testng.annotations.BeforeClass;
@@ -71,7 +70,7 @@ public class RestAuthLanguageCallbackHandlerTest {
         HttpHeaders headers = mock(HttpHeaders.class);
         HttpServletRequest request = mock(HttpServletRequest.class);
         HttpServletResponse response = mock(HttpServletResponse.class);
-        JSONObject jsonPostBody = mock(JSONObject.class);
+        JsonValue jsonPostBody = mock(JsonValue.class);
         LanguageCallback languageCallback = mock(LanguageCallback.class);
 
         given(request.getParameter("localeLanguage")).willReturn("LANGUAGE");
@@ -94,7 +93,7 @@ public class RestAuthLanguageCallbackHandlerTest {
         HttpHeaders headers = mock(HttpHeaders.class);
         HttpServletRequest request = mock(HttpServletRequest.class);
         HttpServletResponse response = mock(HttpServletResponse.class);
-        JSONObject jsonPostBody = mock(JSONObject.class);
+        JsonValue jsonPostBody = mock(JsonValue.class);
         LanguageCallback languageCallback = mock(LanguageCallback.class);
 
         given(request.getParameter("localeLanguage")).willReturn("LANGUAGE");
@@ -117,7 +116,7 @@ public class RestAuthLanguageCallbackHandlerTest {
         HttpHeaders headers = mock(HttpHeaders.class);
         HttpServletRequest request = mock(HttpServletRequest.class);
         HttpServletResponse response = mock(HttpServletResponse.class);
-        JSONObject jsonPostBody = mock(JSONObject.class);
+        JsonValue jsonPostBody = mock(JsonValue.class);
         LanguageCallback languageCallback = mock(LanguageCallback.class);
 
         given(request.getParameter("localeLanguage")).willReturn("LANGUAGE");
@@ -140,7 +139,7 @@ public class RestAuthLanguageCallbackHandlerTest {
         HttpHeaders headers = mock(HttpHeaders.class);
         HttpServletRequest request = mock(HttpServletRequest.class);
         HttpServletResponse response = mock(HttpServletResponse.class);
-        JSONObject jsonPostBody = mock(JSONObject.class);
+        JsonValue jsonPostBody = mock(JsonValue.class);
         LanguageCallback languageCallback = mock(LanguageCallback.class);
 
         given(request.getParameter("localeLanguage")).willReturn(null);
@@ -162,7 +161,7 @@ public class RestAuthLanguageCallbackHandlerTest {
         HttpHeaders headers = mock(HttpHeaders.class);
         HttpServletRequest request = mock(HttpServletRequest.class);
         HttpServletResponse response = mock(HttpServletResponse.class);
-        JSONObject jsonPostBody = mock(JSONObject.class);
+        JsonValue jsonPostBody = mock(JsonValue.class);
         LanguageCallback languageCallback = mock(LanguageCallback.class);
 
         given(request.getParameter("localeLanguage")).willReturn("");
@@ -177,27 +176,27 @@ public class RestAuthLanguageCallbackHandlerTest {
     }
 
     @Test
-    public void shouldConvertToJsonWhenLocaleNotSet() throws JSONException {
+    public void shouldConvertToJsonWhenLocaleNotSet() {
 
         //Given
         LanguageCallback languageCallback = new LanguageCallback();
 
         //When
-        JSONObject jsonObject = restAuthLanguageCallbackHandler.convertToJson(languageCallback, 1);
+        JsonValue jsonObject = restAuthLanguageCallbackHandler.convertToJson(languageCallback, 1);
 
         //Then
-        assertEquals(1, jsonObject.length());
-        assertEquals("LanguageCallback", jsonObject.getString("type"));
+        assertEquals(1, jsonObject.size());
+        assertEquals("LanguageCallback", jsonObject.get("type").asString());
     }
 
     @Test
-    public void shouldHandleCallback() throws JSONException {
+    public void shouldHandleCallback() {
 
         //Given
         HttpHeaders headers = mock(HttpHeaders.class);
         HttpServletRequest request = mock(HttpServletRequest.class);
         HttpServletResponse response = mock(HttpServletResponse.class);
-        JSONObject jsonPostBody = mock(JSONObject.class);
+        JsonValue jsonPostBody = mock(JsonValue.class);
         LanguageCallback originalLanguageCallback = mock(LanguageCallback.class);
 
         //When
@@ -209,36 +208,35 @@ public class RestAuthLanguageCallbackHandlerTest {
     }
 
     @Test
-    public void shouldConvertToJson() throws JSONException {
+    public void shouldConvertToJson() {
 
         //Given
         LanguageCallback languageCallback = new LanguageCallback();
         languageCallback.setLocale(new Locale("LANGUAGE", "COUNTRY"));
 
         //When
-        JSONObject jsonObject = restAuthLanguageCallbackHandler.convertToJson(languageCallback, 1);
+        JsonValue jsonObject = restAuthLanguageCallbackHandler.convertToJson(languageCallback, 1);
 
         //Then
-        assertEquals(2, jsonObject.length());
-        assertEquals("LanguageCallback", jsonObject.getString("type"));
-        assertNotNull(jsonObject.getJSONArray("input"));
-        assertEquals(2, jsonObject.getJSONArray("input").length());
-        assertEquals("language", jsonObject.getJSONArray("input").getJSONObject(0).getString("value"));
-        assertEquals("COUNTRY", jsonObject.getJSONArray("input").getJSONObject(1).getString("value"));
+        assertEquals(2, jsonObject.size());
+        assertEquals("LanguageCallback", jsonObject.get("type").asString());
+        assertNotNull(jsonObject.get("input"));
+        assertEquals(2, jsonObject.get("input").size());
+        assertEquals("language", jsonObject.get("input").get(0).get("value").asString());
+        assertEquals("COUNTRY", jsonObject.get("input").get(1).get("value").asString());
     }
 
     @Test
-    public void shouldConvertFromJson() throws JSONException {
+    public void shouldConvertFromJson() {
 
         //Given
         LanguageCallback languageCallback = new LanguageCallback();
-        JSONObject jsonLanguageCallback = new JSONObject()
-                .put("input", new JSONArray()
-                        .put(new JSONObject()
-                                .put("value", "language"))
-                        .put(new JSONObject()
-                                .put("value", "COUNTRY")))
-                .put("type", "LanguageCallback");
+        JsonValue jsonLanguageCallback = JsonValueBuilder.jsonValue()
+                .array("input")
+                    .add(JsonValueBuilder.jsonValue().put("value", "language").build())
+                    .addLast(JsonValueBuilder.jsonValue().put("value", "COUNTRY").build())
+                .put("type", "LanguageCallback")
+                .build();
 
         //When
         LanguageCallback convertedLanguageCallback = restAuthLanguageCallbackHandler.convertFromJson(
@@ -252,17 +250,16 @@ public class RestAuthLanguageCallbackHandlerTest {
     }
 
     @Test (expectedExceptions = RestAuthException.class)
-    public void shouldFailToConvertFromJsonWithInvalidType() throws JSONException {
+    public void shouldFailToConvertFromJsonWithInvalidType() {
 
         //Given
         LanguageCallback languageCallback = new LanguageCallback();
-        JSONObject jsonLanguageCallback = new JSONObject()
-                .put("input", new JSONArray()
-                        .put(new JSONObject()
-                                .put("value", "language"))
-                        .put(new JSONObject()
-                                .put("value", "COUNTRY")))
-                .put("type", "PasswordCallback");
+        JsonValue jsonLanguageCallback = JsonValueBuilder.jsonValue()
+                .array("input")
+                    .add(JsonValueBuilder.jsonValue().put("value", "language").build())
+                    .addLast(JsonValueBuilder.jsonValue().put("value", "COUNTRY").build())
+                .put("type", "PasswordCallback")
+                .build();
 
         //When
         restAuthLanguageCallbackHandler.convertFromJson(languageCallback, jsonLanguageCallback);
@@ -272,17 +269,16 @@ public class RestAuthLanguageCallbackHandlerTest {
     }
 
     @Test
-    public void shouldNotFailToConvertFromJsonWithTypeLowerCase() throws JSONException {
+    public void shouldNotFailToConvertFromJsonWithTypeLowerCase() {
 
         //Given
         LanguageCallback languageCallback = new LanguageCallback();
-        JSONObject jsonLanguageCallback = new JSONObject()
-                .put("input", new JSONArray()
-                        .put(new JSONObject()
-                                .put("value", "lAngUage"))
-                        .put(new JSONObject()
-                                .put("value", "COuntRY")))
-                .put("type", "lanGuagecalLback");
+        JsonValue jsonLanguageCallback = JsonValueBuilder.jsonValue()
+                .array("input")
+                    .add(JsonValueBuilder.jsonValue().put("value", "lAngUage").build())
+                    .addLast(JsonValueBuilder.jsonValue().put("value", "COuntRY").build())
+                .put("type", "lanGuagecalLback")
+                .build();
 
         //When
         LanguageCallback convertedLanguageCallback = restAuthLanguageCallbackHandler.convertFromJson(
