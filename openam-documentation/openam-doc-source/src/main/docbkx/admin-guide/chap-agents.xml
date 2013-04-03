@@ -506,8 +506,8 @@
      <term>Agent Debug File Size</term>
      <listitem>
       <para>Debug file size in bytes beyond which the log file is rotated. The
-      minimum is 3000 bytes, and lower values are reset to 3000 bytes. Default:
-      10 MB.</para>
+      minimum is 1048576 bytes (1 MB), and lower values are reset to 1 MB.
+      OpenAM console sets a default of 10 MB.</para>
       <para>Property: <literal>com.sun.identity.agents.config.debug.file.size</literal></para>
      </listitem>
     </varlistentry>

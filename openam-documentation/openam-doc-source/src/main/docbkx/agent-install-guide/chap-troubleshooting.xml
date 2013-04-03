@@ -138,5 +138,30 @@ ServerName www.localhost.example:8080</programlisting>
     With IBM Java</citetitle></link>.</para>
    </answer>
   </qandaentry>
+
+  <qandaentry xml:id="web-agent-cannot-rotate-logs">
+   <question>
+    <para>My web server and web policy agent are installed as root, and the
+    agent cannot rotate logs. I am seeing this error.</para>
+
+    <literallayout class="monospaced">Could not rotate log file ... (error: 13)</literallayout>
+
+    <para>What should I do?</para>
+   </question>
+
+   <answer>
+    <para>First, avoid installing the web server (and therefore also the web
+    policy agent) as root, but instead create a web server user and install
+    as that user.</para>
+
+    <para>If however you cannot avoid installing the web server and policy agent
+    as root, the you must give all users read and write permissions to the
+    <filename>logs/</filename> and <filename>logs/debug</filename> directories
+    under the agent instance directory (
+    <filename>/path/to/web_agents/<replaceable>type</replaceable>/Agent_<replaceable>number</replaceable>/logs/</filename>).
+    Otherwise the web policy agent fails to rotate log files with the error
+    you observed.</para>
+   </answer>
+  </qandaentry>
  </qandaset>
 </chapter>

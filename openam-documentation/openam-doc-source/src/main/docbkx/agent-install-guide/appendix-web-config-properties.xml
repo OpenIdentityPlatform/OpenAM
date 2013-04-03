@@ -789,8 +789,9 @@ token=value;Domain=subdomain.domain.com</literal></para>
     <term><literal>com.sun.identity.agents.config.debug.file.size</literal></term>
     <listitem>
      <para>Debug file size in bytes beyond which the log file is rotated. The
-     minimum is 3000 bytes, and lower values are reset to 3000 bytes. Default:
-     10 MB.</para>
+     minimum is 1048576 bytes (1 MB), and lower values are reset to 1 MB.
+     OpenAM console sets a default of 10 MB when it is used to configure the
+     agent.</para>
      <para>For centralized configurations this property is configured under
      Access Control &gt; <replaceable>Realm Name</replaceable> &gt; Agents &gt;
      Web &gt; <replaceable>Agent Name</replaceable> &gt; Global &gt; Agent
