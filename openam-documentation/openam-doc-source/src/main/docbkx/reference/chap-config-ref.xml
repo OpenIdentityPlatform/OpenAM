@@ -1436,6 +1436,18 @@
      <literal>forgerock-oauth2-provider-scope-implementation-class</literal></para>
     </listitem>
    </varlistentry>
+
+   <varlistentry>
+    <term>User Profile Attribute(s) the Resource Owner is Authenticated On</term>
+    <listitem>
+     <para>Names of profile attributes that resource owners use to log in.
+     The default is <literal>uid</literal>, and you can add others such as
+     <literal>mail</literal>.</para>
+
+     <para><command>ssoadm</command> attribute:
+     <literal>forgerock-oauth2-provider-authentication-attributes</literal></para>
+    </listitem>
+   </varlistentry>
   </variablelist>
 
   <variablelist xml:id="password-reset-configuration">

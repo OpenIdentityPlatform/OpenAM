@@ -405,10 +405,21 @@
     The policy appears in the list of policies for the realm. Its name is
     <literal>OAuth2ProviderPolicy</literal>.</para>
    </step>
+
+   <step performance="optional">
+    <para>If resource owners log in with a user name that is not their user ID,
+    but instead their mail address or some other profile attribute, then add the
+    profile attribute name to the list that can be used for authentication.</para>
+
+    <para>To make the change, browse to Access Control &gt; <replaceable>Realm
+    Name</replaceable> &gt; Services &gt; OAuth2 Provider, add the profile
+    attributes to the list titled User Profile Attribute(s) the Resource Owner
+    is Authenticated On, and then Save your work.</para>
+   </step>
   </procedure>
 
-  <para>You can adjust the authorization server configuration after you create
-  it in the OpenAM console under Access Control &gt; <replaceable>Realm
+  <para>You can further adjust the authorization server configuration after you
+  create it in the OpenAM console under Access Control &gt; <replaceable>Realm
   Name</replaceable> &gt; Services &gt; OAuth2 Provider.</para>
 
   <para>You can adjust global defaults in the OpenAM console under Configuration
