@@ -192,7 +192,7 @@
         <!-- OpenAM Shared - Common Module -->
         <module>openam-shared</module>
 
-        <!-- OpenAM Entitlement Module -->
+        <!-- OpenAM Entitlement Module (XACML 3)-->
         <module>openam-entitlements</module>
 
         <!-- OpenAM Authentication Modules -->
@@ -254,8 +254,6 @@
         <module>openam-distribution</module>
         <!-- Final Packaging Distribution Kit -->
         <module>openam-dashboard</module>
-
-        <module>openam-xacml-resources</module>
 
         <module>openam-examples</module>
     </modules>
