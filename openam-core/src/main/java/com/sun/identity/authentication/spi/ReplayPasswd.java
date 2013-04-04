@@ -108,12 +108,17 @@ public class ReplayPasswd implements AMPostAuthProcessInterface {
      * @param response HttpServlet response
      * @param ssoToken user's session
      * @throws AuthenticationException if there is an error while setting
-     * the session paswword property
+     * the session password property
      */
     public void onLoginSuccess(Map requestParamsMap,
         HttpServletRequest request,
         HttpServletResponse response,
         SSOToken ssoToken) throws AuthenticationException {
+
+        if (request == null) {
+            debug.message("ReplayPasswd.onLoginSuccess: request is not available, password is not saved.");
+            return;
+        }
 
         if (debug.messageEnabled()) {
             debug.message("ReplayPasswd.onLoginSuccess called: Req:" + 
