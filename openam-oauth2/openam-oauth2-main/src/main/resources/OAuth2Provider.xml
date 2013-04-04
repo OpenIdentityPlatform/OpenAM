@@ -5,7 +5,7 @@
 <!--
    DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
 
-   Copyright (c) 2011-2013 ForgeRock AS. All Rights Reserved
+   Copyright (c) 2011-2013 ForgeRock Inc. All Rights Reserved
 
    The contents of this file are subject to the terms
    of the Common Development and Distribution License
@@ -92,10 +92,9 @@
                         name="forgerock-oauth2-provider-authentication-attributes"
                         type="list"
                         syntax="string"
-                        uitype="unorderedlist"
                         i18nKey="a105">
                     <DefaultValues>
-                        <Value>[0]=uid</Value>
+                        <Value>uid</Value>
                     </DefaultValues>
                 </AttributeSchema>
 
@@ -159,10 +158,9 @@
                             name="forgerock-oauth2-provider-authentication-attributes"
                             type="list"
                             syntax="string"
-                            uitype="unorderedlist"
                             i18nKey="a105">
                         <DefaultValues>
-                            <Value>[0]=uid</Value>
+                            <Value>uid</Value>
                         </DefaultValues>
                     </AttributeSchema>
 
