@@ -27,7 +27,7 @@
  */
 
 /*
- * Portions Copyrighted 2010-2011 ForgeRock AS
+ * Portions Copyrighted 2010-2013 ForgeRock, Inc.
  */
 
 package com.sun.identity.idm.plugins.ldapv3;
@@ -580,8 +580,10 @@ public class LDAPv3EventService implements Runnable {
                                 "LDAPv3EventService.run(): Waiting for " +
                                 "response" + " randomID=" + randomID);
                     }
-                    synchronized (this) {
-                        if (_requestList.isEmpty()) {
+                    //In order to prevent deadlock with LDAPv3EventServicePolling, we need to access first
+                    //_requestList, and then synchronize on this
+                    if (_requestList.isEmpty()) {
+                        synchronized (this) {
                             wait();
                         }
                     }
