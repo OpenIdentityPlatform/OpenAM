@@ -1,0 +1,318 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  ! CCPL HEADER START
+  !
+  ! This work is licensed under the Creative Commons
+  ! Attribution-NonCommercial-NoDerivs 3.0 Unported License.
+  ! To view a copy of this license, visit
+  ! http://creativecommons.org/licenses/by-nc-nd/3.0/
+  ! or send a letter to Creative Commons, 444 Castro Street,
+  ! Suite 900, Mountain View, California, 94041, USA.
+  !
+  ! You can also obtain a copy of the license at
+  ! src/main/resources/legal-notices/CC-BY-NC-ND.txt.
+  ! See the License for the specific language governing permissions
+  ! and limitations under the License.
+  !
+  ! If applicable, add the following below this CCPL HEADER, with the fields
+  ! enclosed by brackets "[]" replaced with your own identifying information:
+  !      Portions Copyright [yyyy] [name of copyright owner]
+  !
+  ! CCPL HEADER END
+  !
+  !      Copyright 2011-2013 ForgeRock, Inc.
+  !    
+-->
+<chapter xml:id='chap-sso'
+ xmlns='http://docbook.org/ns/docbook'
+ version='5.0' xml:lang='en'
+ xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance'
+ xsi:schemaLocation='http://docbook.org/ns/docbook http://docbook.org/xml/5.0/xsd/docbook.xsd'
+ xmlns:xlink='http://www.w3.org/1999/xlink'
+ xmlns:xinclude='http://www.w3.org/2001/XInclude'>
+ <title>Configuring Single Sign-On within One Domain</title>
+
+
+    <!-- Given the nature of this chapter, I've set this up , esp the description of Peter's diagram,
+more for newbies, mj -->
+
+    <para>This chapter describes the configuration of <firstterm>Single Sign-On</firstterm> (SSO) services for
+        multiple resources on one domain. To understand how SSO works, you need to understand some key elements of the
+        HTTP cookie, as described in RFC 6525, <link xlink:show="new" xlink:href="http://tools.ietf.org/html/rfc6265">
+        HTTP State Management Mechanism</link>.</para>
+
+    <indexterm><primary>Single Sign-On (SSO)</primary></indexterm>
+
+    <para>With SSO a user can access multiple independent services from a single session.</para>
+
+    <!-- Since I was clearly having trouble with definitions, I think the contrast helps (and I consulted other sources,
+    -->
+
+    <section xml:id="sso-cookies">
+        <title>The Basics of the HTTP Cookie</title>
+
+        <para>Within an HTTP cookie, you can store a single custom
+        <literal><replaceable>name</replaceable>=<replaceable>value</replaceable></literal> pair, such as
+        <literal><replaceable>sessionid</replaceable>=<replaceable>value</replaceable></literal>
+        Other custom names within a cookie are shown in the list that follows:</para>
+
+        <variablelist>
+
+            <varlistentry>
+                <term>Domain</term>
+                <listitem>
+                    <para>Normally set to the domain from where the cookie was issued. To work with multiple subdomains,
+                    the <varname>Domain</varname> should be set to a URL like
+                    <varname>Domain</varname><literal>=example.net</literal>. This is also known as the cookie domain,
+                    as defined in the
+                    <link xlink:href="reference#chap-config-ref" xlink:role="http://docbook.org/xlink/role/olink">
+                    <citetitle>Configuration Reference</citetitle></link> chapter of the Reference document.
+                    A cookie domain set to <literal>example.net</literal> will work for subdomains such as
+                    <literal>app1.example.net</literal> and <literal>service1.example.net</literal>.
+                    </para>
+                </listitem>
+            </varlistentry>
+
+            <varlistentry>
+                <term>Path</term>
+                <listitem>
+                    <para>The directory in the URL to which the cookie applies. If the <varname>Path</varname>
+                    <literal>=/openam</literal>, the cookie applies to the <filename>/openam</filename> subdirectory of
+                    the FQDN, and lower level directories, including <filename>openam/UI</filename> and
+                    <filename>openam/UI/Login</filename>.</para>
+                </listitem>
+            </varlistentry>
+
+            <varlistentry>
+                <term>Secure</term>
+                <listitem>
+                    <para>If the <varname>Secure</varname> name is included, the cookie can be transferred only over
+                    HTTPS. When a request is made over HTTP, the cookie is not made available to the application.</para>
+                </listitem>
+            </varlistentry>
+
+            <varlistentry>
+                <term>HttpOnly</term>
+                <listitem>
+                    <para>When the <varname>HttpOnly</varname> name is included, that cookie will not be accessible
+                    through JavaScript. According to
+                    <link xlink:show="new" xlink:href="http://tools.ietf.org/html/rfc6265#section-4.1.2.6">RFC 6265</link>,
+                    the noted flag "instructs the user agent to omit the cookie when providing access to cookies via
+                    'non-HTTP' APIs (such as a web browser API that exposes cookies to scripts)".</para>
+                </listitem>
+            </varlistentry>
+
+            <varlistentry>
+                <term>Expires</term>
+                <listitem>
+                    <para>The lifetime of a cookie can be limited, with an <varname>Expires</varname> name configured
+                        with a time, based on UTC (GMT).</para>
+                </listitem>
+            </varlistentry>
+
+        </variablelist>
+
+        <note>
+            <para>Be careful. Do not take a shortcut with a top-level domain. Web browser clients today are designed to
+            ignore cookies set to top-level domains including <literal>com</literal>, <literal>net</literal>, and
+            <literal>co.uk</literal>. In addition, a cookie with a value like <varname>Domain</varname>=
+            <literal>app1.example.net</literal> will not work for similar subdomains such as
+            <literal>app2.example.net</literal>.</para>
+        </note>
+
+    </section>
+
+    <!-- From Peter's citation of
+http://stackoverflow.com/questions/794243/internet-explorer-ignores-cookies-on-some-domains-cannot-read-or-set-cookies
+    -->
+
+<section xml:id="sso-process">
+<title>Cookies and the SSO Session Process</title>
+
+    <para>OpenAM uses cookies to track user sessions. The diagram shown next illustrates how OpenAM assigns and tracks
+    cookies.</para>
+
+    <itemizedlist>
+        <para>In the diagram:</para>
+        <listitem>
+            <para>The domain shown in the description is <literal>example.net</literal></para>
+        </listitem>
+        <listitem>
+            <para>The protected resource application can be found on <literal>app.example.net</literal></para>
+        </listitem>
+        <listitem>
+            <para>The OpenAM server is located on <literal>sso.example.net</literal>.</para>
+        </listitem>
+    </itemizedlist>
+
+<mediaobject xml:id="figure-sso-web-sequence">
+    <alt>SSO with Policy Agent</alt>
+    <imageobject>
+        <imagedata fileref="images/ssov3.png" format="PNG"/>
+    </imageobject>
+    <textobject>
+        <para>The sequence diagram illustrates events associated with SSO.</para>
+    </textobject>
+</mediaobject>
+
+<!-- Peter confirmed that he created the ssov2.png diagram in his FR work, so I can use it here.
+
+HELP: I do not know how to "properly" resize the .png file; the default is wider than the page.
+my attempts to change the size of the image have led to an unacceptable loss in resolution.
+
+Now changed to ssov3.png, after modifying to specs listed in
+ http://marginnotes2.wordpress.com/2011/04/02/png-density-with-mogrify/ with the help of GIMP.
+-->
+
+    <para>A client points his browser to a protected resource application. An agent on the
+    application checks the client browser cookies for the presence of a session ID, a component of
+    an SSO Token. If such a Session ID exists and is valid, the agent requests validation  (see arrow 8).</para>
+
+    <para>If no valid session ID currently exists, the agent redirects the client to OpenAM for authentication (AuthN).
+    The client is then sent to OpenAM for AuthN. If the client submits valid credentials, the AuthN service
+    creates a session cookie. The SSO Token and configured domain name is embedded in that cookie. OpenAM issues an HTTP
+    redirect to send the client browser back to the protected resource.</para>
+
+    <para>The agent then verifies the validity of the session with the OpenAM session service, before granting access.
+    </para>
+
+</section>
+
+<section xml:id="sso-problems">
+<title>Potential Problems</title>
+
+<para>In general, problems with SSO relate to some sort of mismatch of domain names. For example, a cookie that is
+    configured on a third-level domain such as <literal>sso.example.net</literal> will not work with an application on a
+    similar domain such as <literal>app.example.net</literal>. Even if the Session ID is valid, the application will not
+    receive the SSO Token. The request is then redirected to OpenAM. The client gets an SSO Token configured with the
+    same third-level domain, and the cycle continues. Other issues that may lead to similar problems are shown here.
+</para>
+
+<itemizedlist>
+
+    <listitem>
+        <para>When a cookie domain does not match a domain for the protected application</para>
+        <para>Assume the application is configured on a domain named <literal>example.org</literal>. That application
+        will not receive an SSO Token configured on the <literal>example.net</literal> domain.</para>
+    </listitem>
+
+    <listitem>
+        <para>When a third-level domain is used for the SSO Token</para>
+        <para>If an SSO Token is configured on <literal>sso.example.net</literal>, an application on
+        <literal>app.example.net</literal> does not receive the corresponding cookie. In this case, the solution is to
+        configure the SSO Token on <literal>example.net</literal>.</para>
+    </listitem>
+
+    <listitem>
+        <para>When the <varname>Secure</varname> flag is used with a regular HTTP application</para>
+        <para>If you need encrypted communications for an application protected by OpenAM, use the
+        <varname>Secure</varname> flag and make sure the application is accessible over HTTPS.</para>
+    </listitem>
+
+    <listitem>
+        <para>When the path listed in the cookie does not match the path for the application</para>
+        <para>Perhaps the cookie is configured with an <filename>/opensso</filename> path; that won't match an
+        application that might be configured with an <filename>/openam</filename> path. In that case, the application
+        will not receive the cookie.</para>
+    </listitem>
+
+    <listitem>
+        <para>When an inappropriate name is used for the cookie domain</para>
+        <para>As noted earlier, client browsers are configured to ignore first-level domains such as
+        <literal>com</literal> and <literal>net</literal> as well as functional equivalents such as
+        <literal>co.uk</literal> and <literal>co.jp</literal>.</para>
+    </listitem>
+
+    <listitem>
+        <para>When working with different browsers</para>
+        <para>The <literal><replaceable>name</replaceable></literal>=<literal><replaceable>value</replaceable></literal>
+        pairs described earlier may not apply to all browsers. The requirements for an HTTP cookie sent to an IE
+        browser may differ from the requirements for other standard browsers such as Firefox and Chrome. Based on
+        anecdotal reports, IE does not recognize domain names that start with a number. In addition, IE reportedly
+        refuses cookies that include the underscore (_) character in the FQDN.</para>
+    </listitem>
+
+</itemizedlist>
+
+</section>
+
+    <!-- set up separate section for procedure -->
+<section xml:id="configure-sso-one-domain">
+    <title>Configure SSO on One Domain</title>
+
+    <para>Now that you have read about the SSO process, you should be able to set it up on a server configured with
+        OpenAM and a web service protected by an OpenAM agent. The following procedure assumes that you know how to
+        configure OpenAM, the Apache Web server, and associated OpenAM Apache agent.</para>
+
+    <procedure xml:id="sso-one-domain-procedure">
+        <title>Configure SSO on One Domain</title>
+
+        <step>
+            <para>Install OpenAM as described in the <link xlink:href="install-guide"
+                xlink:role="http://docbook.org/xlink/role/olink"><citetitle>OpenAM Installation Guide</citetitle>
+                </link>. This procedure uses a Server URL of <literal>http://openam.example.net:8080/openam</literal>.
+            </para>
+        </step>
+
+        <step>
+            <para>Install the appropriate policy agent, as described in the <link xlink:href="agent-install-guide"
+                xlink:role="http://docbook.org/xlink/role/olink"><citetitle>OpenAM Policy Agent Installation Guide
+                </citetitle></link>. This procedure uses an agent URL of <literal>http://app.example.net:80</literal>,
+                and an agent name of <literal>webagent1</literal>.</para>
+        </step>
+
+        <step>
+            <para>Make sure that both URLs are configured with IP addresses, as described in the chapter on
+            <link xlink:href="install-guide#chap-install-core" xlink:role="http://docbook.org/xlink/role/olink">
+            <citetitle>Installing OpenAM Core Services</citetitle></link>.</para>
+        </step>
+
+        <step>
+            <para>Return to the OpenAM server on <literal>http://openam.example.net:8080/openam</literal>. Log in as
+                the administrative user, normally <literal>amadmin</literal>. To activate and configure the agent,
+                follow the procedure described in the
+                <link xlink:href="agent-install-guide" xlink:role="http://docbook.org/xlink/role/olink">
+                <citetitle>OpenAM Policy Agent Installation Guide</citetitle></link>.</para>
+        </step>
+
+        <step>
+            <para>Now you can configure SSO Only mode. In the OpenAM console, click Access Control &gt;
+                <replaceable>Realm Name</replaceable> &gt; Agents &gt; <replaceable>webagent1</replaceable>. Scroll down
+                to SSO Only Mode and activate the Enabled box.</para>
+        </step>
+
+        <step>
+            <para>Save your changes.</para>
+        </step>
+
+        <step>
+            <para>Make sure you have configured the SSO domain, in this case, <literal>example.net</literal>. Click
+            Configuration &gt; System &gt; Platform. Make sure <literal>example.net</literal> (or your chosen domain)
+            is selected as a cookie domain.</para>
+        </step>
+
+        <step>
+            <para>Save your changes.</para>
+        </step>
+
+        <step>
+            <para>Restart the web server. The agent should be active. You should now be able to log out of the OpenAM
+            server.</para>
+        </step>
+
+        <step>
+            <para>Verify the agent URL, in this case, <literal>http://app.example.net</literal>. The OpenAM
+            web agent should now redirect requests to the OpenAM server.</para>
+        </step>
+
+    </procedure>
+
+    <para>If you want to configure OpenAM and an application on two different cookie domains, such as <literal>example.org
+    </literal> and <literal>example.net</literal>, you will need to set up Cross-Domain SSO (CDSSO). For more
+        information, see the chapter on
+        <link xlink:href="admin-guide#chap-cdsso" xlink:role="http://docbook.org/xlink/role/olink">
+            <citetitle>Configuring Cross-Domain Single Sign On</citetitle></link>.</para>
+
+    </section>
+
+</chapter>
