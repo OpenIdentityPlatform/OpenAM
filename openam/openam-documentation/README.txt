@@ -6,12 +6,17 @@ the changes here reflect the published updates.
 
 Changes since the original tag:
 
-For Mar 18
+For Apr 4, 2013
+
+openam-doc-source/src/main/docbkx/agent-release-notes/chap-web-agents.xml
+    Fix for OPENAM-2338
+
+For Mar 18, 2013
 
 openam-doc-source/src/main/docbkx/release-notes/chap-before-you-install.xml
     Fix for OPENAM-2282
 
-For Mar 07
+For Mar 07, 2013
 
 openam-doc-source/src/main/docbkx/release-notes/chap-whats-new.xml
     Mentioned SFO is for local networks, not cross-site nor over WANs
@@ -24,7 +29,7 @@ openam-doc-source/src/main/docbkx/dev-guide/chap-rest.xml
     Fix for OPENAM-2223
     Fix for OPENAM-2228
 
-For Feb 21
+For Feb 21, 2013
 
 openam-doc-source/pom.xml
     Changed versions for docs to 10.1.0 and 3.1.0

@@ -320,10 +320,10 @@
     xlink:show="new" xlink:href="https://bugster.forgerock.org/jira/browse/OPENAM"
     >OpenAM issue tracker</link>.</para>
 
-    <!-- List generated at 08:56:57 20130307 using http://bugster.forgerock.org/jira/rest/api/2/search?jql=project+%3D+OpenAM+AND+component+%3D+"web+agents"+AND+fixVersion+%3D+"Agents-3.1.0-Xpress"+AND+resolution+%3D+Fixed+AND+labels+%3D+release-notes&startAt=0&maxResults=500&fields=summary-->
+    <!-- List originally generated at 08:56:57 20130307 using http://bugster.forgerock.org/jira/rest/api/2/search?jql=project+%3D+OpenAM+AND+component+%3D+"web+agents"+AND+fixVersion+%3D+"Agents-3.1.0-Xpress"+AND+resolution+%3D+Fixed+AND+labels+%3D+release-notes&startAt=0&maxResults=500&fields=summary
+          Updated manually to fix OPENAM-2338. -->
     <itemizedlist>
    <listitem><para><link xlink:href="https://bugster.forgerock.org/jira/browse/OPENAM-2182" xlink:show="new">OPENAM-2182</link>: Apache PA will crash when Post Data Preservation is enabled and POST data is empty</para></listitem>
-   <listitem><para><link xlink:href="https://bugster.forgerock.org/jira/browse/OPENAM-2135" xlink:show="new">OPENAM-2135</link>: IIS and SJSWS policy agents should not require Host header as per HTTP/1.0 specification</para></listitem>
    <listitem><para><link xlink:href="https://bugster.forgerock.org/jira/browse/OPENAM-2125" xlink:show="new">OPENAM-2125</link>: IIS7 policy agent might crash reading POST data</para></listitem>
    <listitem><para><link xlink:href="https://bugster.forgerock.org/jira/browse/OPENAM-1838" xlink:show="new">OPENAM-1838</link>: IIS7 policy agent might crash when HOST header is not available</para></listitem>
    <listitem><para><link xlink:href="https://bugster.forgerock.org/jira/browse/OPENAM-1673" xlink:show="new">OPENAM-1673</link>: IIS6 policy agent crash on IIS application pool restart</para></listitem>
@@ -369,8 +369,10 @@
    xlink:href="https://bugster.forgerock.org/jira/browse/OPENAM">OpenAM issue
    tracker</link>.</para>
 
-   <!-- List generated at 14:51:30 20130217 using http://bugster.forgerock.org/jira/rest/api/2/search?jql=project+%3D+OpenAM+AND+component+%3D+"web+agents"+AND+resolution+%3D+Unresolved+AND+labels+%3D+release-notes&startAt=0&maxResults=500&fields=summary-->
+   <!-- List originally generated at 14:51:30 20130217 using http://bugster.forgerock.org/jira/rest/api/2/search?jql=project+%3D+OpenAM+AND+component+%3D+"web+agents"+AND+resolution+%3D+Unresolved+AND+labels+%3D+release-notes&startAt=0&maxResults=500&fields=summary
+        Updated manually to fix OPENAM-2338 -->
    <itemizedlist>
+   <listitem><para><link xlink:href="https://bugster.forgerock.org/jira/browse/OPENAM-2135" xlink:show="new">OPENAM-2135</link>: IIS and SJSWS policy agents should not require Host header as per HTTP/1.0 specification</para></listitem>
    <listitem><para><link xlink:href="https://bugster.forgerock.org/jira/browse/OPENAM-1927" xlink:show="new">OPENAM-1927</link>: Silent Installation does not work for Apache2.4/Suse11</para></listitem>
    <listitem><para><link xlink:href="https://bugster.forgerock.org/jira/browse/OPENAM-1521" xlink:show="new">OPENAM-1521</link>: Cookie Hijacking Prevention does not work properly under FireFox</para></listitem>
    <listitem><para><link xlink:href="https://bugster.forgerock.org/jira/browse/OPENAM-1520" xlink:show="new">OPENAM-1520</link>: Apache 2.2 WPA 3.0.4.5 causes Apache to hang</para></listitem>
