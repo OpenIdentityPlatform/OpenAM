@@ -20,7 +20,7 @@
   !
   ! CCPL HEADER END
   !
-  !      Copyright 2011 ForgeRock AS
+  !      Copyright 2011-2013 ForgeRock AS
   !    
 -->
 <chapter xml:id='chap-identity-repo-spi'
@@ -299,9 +299,9 @@ public void setActiveStatus(
  <section xml:id="idrepo-plugin-deployment">
   <title>Identity Repository Plugin Deployment</title>
 
-  <para>Your IdRepo plugin must link to <filename>amserver.jar</filename>,
+  <para>Your IdRepo plugin must link to <filename><?eval ${coreLibrary}?></filename>,
   which when you deploy OpenAM is
-  <filename><replaceable>war-file-name</replaceable>/WEB-INF/lib/amserver.jar</filename>.</para>
+  <filename><replaceable>war-file-name</replaceable>/WEB-INF/lib/<?eval ${coreLibrary}?></filename>.</para>
   
   <para>You can either package your plugin as a .jar, and then add it to
   <filename><replaceable>war-file-name</replaceable>/WEB-INF/lib/</filename>,
