@@ -56,9 +56,12 @@
   
   <para>The OpenAM policy framework lets you build plugins to extend subjects,
   conditions, and response providers for policies, and also extend referrals
-  for policy delegation. When you deploy OpenAM, you find Java code for sample
-  policy evaluation plugins under
-  <filename><replaceable>war-file-name</replaceable>/source/com/sun/identity/samples/policy</filename>.</para>
+  for policy delegation. You can find Java code for sample
+  policy evaluation plugins in the <link xlink:show="new"
+  xlink:href="http://sources.forgerock.org/browse/~br=trunk/openam/trunk/openam/openam-distribution/src/main/amserver/samples/server/source/com/sun/identity/samples/policy"
+  >OpenAM project source code</link>. Download the sample Java class
+  files into a suitable location, such as
+  <filename>~/Downloads/com/sun/identity/samples/policy/</filename>.</para>
   
   <variablelist>
    <varlistentry>
@@ -101,17 +104,17 @@
   with OpenAM.</para>
    <variablelist>
     <varlistentry>
-     <term><filename>openam-core-<?eval ${serverDocTargetVersion}?>.jar</filename></term>
+     <term><filename><?eval ${coreLibrary}?></filename></term>
      <listitem>
       <para>When you deploy OpenAM, the file is
-      <filename><replaceable>war-file-name</replaceable>/WEB-INF/lib/openam-core-<?eval ${serverDocTargetVersion}?>.jar</filename>.</para>
+      <filename><replaceable>war-file-name</replaceable>/WEB-INF/lib/<?eval ${coreLibrary}?></filename>.</para>
      </listitem>
     </varlistentry>
     <varlistentry>
-     <term><filename>openam-shared-<?eval ${serverDocTargetVersion}?>.jar</filename></term>
+     <term><filename><?eval ${sharedLibrary}?></filename></term>
      <listitem>
       <para>When you deploy OpenAM, the file is
-      <filename><replaceable>war-file-name</replaceable>/WEB-INF/lib/openam-shared-<?eval ${serverDocTargetVersion}?>.jar</filename>.</para>
+      <filename><replaceable>war-file-name</replaceable>/WEB-INF/lib/<?eval ${sharedLibrary}?></filename>.</para>
      </listitem>
     </varlistentry>
    </variablelist>
@@ -119,9 +122,9 @@
   <screen>$ cd /path/to/tomcat/webapps/openam/
 $ mkdir classes
 $ javac -d classes
- -classpath /path/to/tomcat/webapps/openam/WEB-INF/lib/openam-core-<?eval ${serverDocTargetVersion}?>.jar:
-  /path/to/tomcat/webapps/openam/WEB-INF/lib/openam-shared-<?eval ${serverDocTargetVersion}?>.jar
-  source/com/sun/identity/samples/policy/Sample*.java
+ -classpath /path/to/tomcat/webapps/openam/WEB-INF/lib/<?eval ${coreLibrary}?>.jar:
+  /path/to/tomcat/webapps/openam/WEB-INF/lib/<?eval ${sharedLibrary}?>
+  ~/Downloads/com/sun/identity/samples/policy/Sample*.java
 $ cd classes/
 $ jar cf ../policy-plugins.jar .</screen>
   
