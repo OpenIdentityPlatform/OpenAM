@@ -71,7 +71,6 @@
  <xinclude:include href='chap-install-core.xml' />
  <xinclude:include href='chap-install-tools.xml' />
  <xinclude:include href='chap-install-das.xml' />
- <xinclude:include href='chap-install-samples.xml' />
  <xinclude:include href='chap-custom-ui.xml' />
  <xinclude:include href='chap-session-failover.xml' />
  <xinclude:include href='chap-uninstall.xml' />

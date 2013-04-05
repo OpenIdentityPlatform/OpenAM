@@ -31,99 +31,263 @@
  xmlns:xlink='http://www.w3.org/1999/xlink'
  xmlns:xinclude='http://www.w3.org/2001/XInclude'>
  <title>Using the OpenAM Java SDK</title>
- <indexterm>
-  <primary>Installing</primary>
-  <secondary>Java SDK</secondary>
- </indexterm>
 
  <para>This chapter introduces OpenAM Java SDK. OpenAM Java SDK is delivered
  with the full version of OpenAM,
- <filename><?eval ${coreDirectoryFile}?></filename>. For instructions on
- installing the OpenAM Java SDK, see <link
- xlink:href="install-guide#chap-install-samples"
- xlink:role="http://docbook.org/xlink/role/olink"><citetitle>Installing OpenAM
- Client SDK Samples</citetitle></link>.</para>
- 
- <itemizedlist>
-  <para>After installing the Java SDK command line samples, you see the
-  following content.</para>
+ <filename><?eval ${coreDirectoryFile}?></filename>.</para>
 
-  <listitem>
-   <para><filename>lib/</filename>: SDK and other libraries</para>
-  </listitem>
-  <listitem>
-   <para><filename>resources/</filename>: properties configuration files for
-   the SDK and samples</para>
-  </listitem>
-  <listitem>
-   <para><filename>scripts/</filename>: scripts to run the samples</para>
-  </listitem>
-  <listitem>
-   <para><filename>source/</filename>: sample code</para>
-  </listitem>
- </itemizedlist>
+ <section xml:id="install-jdk-samples">
+  <title>Installing OpenAM Client SDK Samples</title>
+  <indexterm>
+   <primary>Installing</primary>
+   <secondary>Java SDK samples</secondary>
+  </indexterm>
 
- <para>After deploying the Java SDK web application archive, you find the
- following content where the .war file was unpacked.</para>
+  <para>The full OpenAM download,
+  <filename><?eval ${coreDirectoryFile}?></filename>, contains the Java Client
+  SDK library, <filename><?eval ${clientsdkJarFile}?></filename>, as well as
+  samples for use on the command line in
+  <filename><?eval ${clientSDKExamplesCliFile}?></filename>, and samples in a
+  web application, <filename><?eval ${clientSDKExamplesWarFile}?></filename>.
+  The <link xlink:href="http://openam.forgerock.org/apidocs/index.html"
+  xlink:show="new"><citetitle>OpenAM Public API JavaDoc</citetitle></link>
+  provides a reference to the public APIs.</para>
 
- <itemizedlist>
-  <listitem>
-   <para><filename>META-INF/</filename>: build information</para>
-  </listitem>
-  <listitem>
-   <para><filename>WEB-INF/</filename>: sample classes and libraries</para>
-  </listitem>
-  <listitem>
-   <para><filename>console/</filename>: images for sample UI</para>
-  </listitem>
-  <listitem>
-   <para><filename>index.html</filename>: sample home page</para>
-  </listitem>
-  <listitem>
-   <para><filename>keystore.jks</filename>: OpenAM test certificate, alias:
-   <literal>test</literal>, key store password: <literal>changeit</literal></para>
-  </listitem>
-  <listitem>
-   <para><filename>policy/</filename>: Policy Evaluator Client Sample page</para>
-  </listitem>
-  <listitem>
-   <para><filename>saml2/</filename>: Secure Attribute Exchange example</para>
-  </listitem>
-  <listitem>
-   <para><filename>sample.css</filename>: sample styles</para>
-  </listitem>
-  <listitem>
-   <para><filename>sm/</filename>: Service Configuration sample</para>
-  </listitem>
-  <listitem>
-   <para><filename>um/</filename>: User Profile sample</para>
-  </listitem>
- </itemizedlist>
+  <procedure xml:id="deploy-client-sdk-war">
+   <title>To Deploy the Sample Web Application</title>
 
- <itemizedlist xml:id="jdk-shutdown-hooks">
-   <title>Registering Your Java SDK Client to Shut Down Gracefully</title>
+   <para>The sample web application deploys in your container to show you
+   the client SDK samples in action.</para>
 
-   <para>When writing a client using the OpenAM Java SDK, make sure you register
-   hooks to make sure the application can be shut down gracefully. How you
-   register for shutdown depends on the type of application.</para>
+   <step>
+    <para>Deploy the .war in your Java web application container such as
+    Apache Tomcat or JBoss.</para>
+    <screen>$ cp <?eval ${clientSDKExamplesWarFile}?> /path/to/tomcat/webapps/client.war</screen>
+   </step>
 
-  <listitem>
-   <para>For Java EE applications, make sure the OpenAM client SDK shuts down
-   successfully by including the following context listener in your
-   application's <filename>web.xml</filename> file.</para>
+   <step>
+    <para>Browse to the location where you deployed the client, and configure
+    the application to access OpenAM using the application user name,
+    <literal>UrlAccessAgent</literal>, and password configured when you set up
+    OpenAM.</para>
 
-   <programlisting language="xml">&lt;listener&gt;
+    <mediaobject xml:id="figure-config-client-sdk-war">
+     <alt>Sample web app configuration screen</alt>
+     <imageobject>
+      <imagedata fileref="images/config-client-sdk-war.png" format="PNG" />
+     </imageobject>
+     <textobject><para>The sample web application configuration screen lets you
+     configure access to OpenAM.</para></textobject>
+    </mediaobject>
+
+    <variablelist>
+     <para>Use the following hints to complete the configuration.</para>
+     <varlistentry>
+      <term>Server Protocol</term>
+      <listitem>
+       <para>Protocol to access OpenAM (<literal>http</literal> or
+       <literal>https</literal>)</para>
+      </listitem>
+     </varlistentry>
+     <varlistentry>
+      <term>Server Host</term>
+      <listitem>
+       <para>Fully qualified domain name for OpenAM, such as
+       <literal>openam.example.com</literal></para>
+      </listitem>
+     </varlistentry>
+     <varlistentry>
+      <term>Server Port</term>
+      <listitem>
+       <para>OpenAM port number such as 8080 or 8443</para>
+      </listitem>
+     </varlistentry>
+     <varlistentry>
+      <term>Server Deployment URI</term>
+      <listitem>
+       <para>URI entry point to OpenAM such as <literal>/openam</literal></para>
+      </listitem>
+     </varlistentry>
+     <varlistentry>
+      <term>Debug directory</term>
+      <listitem>
+       <para>Where to write the debug messages for the client samples</para>
+      </listitem>
+     </varlistentry>
+     <varlistentry>
+      <term>Application user name</term>
+      <listitem>
+       <para>An user agent configured to access OpenAM, such as
+       <literal>UrlAccessAgent</literal> set up when OpenAM was installed</para>
+      </listitem>
+     </varlistentry>
+     <varlistentry>
+      <term>Application user password</term>
+      <listitem>
+       <para>The user agent password</para>
+      </listitem>
+     </varlistentry>
+    </variablelist>
+
+    <para>The sample client writes configuration information under
+    <filename>$HOME/OpenAMClient/</filename>, where $HOME is that of the user
+    running the web application container.</para>
+   </step>
+
+   <step>
+    <para>Verify that you have properly configured the sample web application.</para>
+
+    <substeps>
+     <step>
+      <para>In another browser tab page of the same browser instance, login to
+      OpenAM as the OpenAM Administrator, <literal>amadmin</literal>.</para>
+      <para>This signs you into OpenAM, storing the cookie in your browser.</para>
+     </step>
+
+     <step>
+      <para>On the Samples tab page, click the link under Single Sign On Token
+      Verification Servlet.</para>
+
+      <para>If the sample web application is properly configured, you should
+      see something like the following text in your browser.</para>
+
+      <programlisting language="none">SSOToken host name: 127.0.0.1
+SSOToken Principal name: id=amadmin,ou=user,dc=openam,dc=forgerock,dc=org
+Authentication type used: DataStore
+IPAddress of the host: 127.0.0.1
+SSO Token validation test succeeded
+The token id is AQIC5...CMDEAAlNLABQtODY0Mjc5MDUwNDQzOTA2MzYxNg..*
+...
+User Attributes: {... givenName=[amAdmin], ...roles=[Top-level Admin Role], ...}</programlisting>
+     </step>
+    </substeps>
+   </step>
+  </procedure>
+
+  <procedure xml:id="build-cli-samples">
+   <title>To Build the Command-Line Sample Applications</title>
+
+   <para>Follow these steps to set up the command-line examples.</para>
+
+   <step>
+    <para>Unpack the sample applications and related libraries.</para>
+
+    <screen>$ mkdir sdk &amp;&amp; cd sdk
+$ unzip ~/Downloads/<?eval ${clientSDKExamplesCliFile}?></screen>
+   </step>
+
+   <step>
+    <para>Configure the samples to access OpenAM.</para>
+    <screen>$ sh scripts/setup.sh
+Debug directory (make sure this directory exists): /Users/me/openam/openam/debug
+Application user (e.g. URLAccessAgent) password: secret12
+Protocol of the server: http
+Host name of the server: openam.example.com
+Port of the server: 8080
+Server's deployment URI: openam
+Naming URL (hit enter to accept default value,
+ http://openam.example.com:8080/openam/namingservice):
+$</screen>
+   </step>
+
+   <step>
+    <para>Verify that you have properly configured the samples.</para>
+    <screen>$ sh scripts/Login.sh
+Realm (e.g. /): /
+Login module name (e.g. DataStore or LDAP): DataStore
+Login locale (e.g. en_US or fr_FR): fr_FR
+DataStore: Obtained login context
+Nom d'utilisateur :demo
+Mot de passe :changeit
+Login succeeded.
+Logged Out!!</screen>
+   </step>
+  </procedure>
+ </section>
+
+ <section xml:id="about-jdk">
+  <title>About the OpenAM Java SDK</title>
+  <itemizedlist>
+   <para>After installing the Java SDK command line samples, you see the
+   following content.</para>
+
+   <listitem>
+    <para><filename>lib/</filename>: SDK and other libraries</para>
+   </listitem>
+   <listitem>
+    <para><filename>resources/</filename>: properties configuration files for
+    the SDK and samples</para>
+   </listitem>
+   <listitem>
+    <para><filename>scripts/</filename>: scripts to run the samples</para>
+   </listitem>
+   <listitem>
+    <para><filename>source/</filename>: sample code</para>
+   </listitem>
+  </itemizedlist>
+
+  <para>After deploying the Java SDK web application archive, you find the
+  following content where the .war file was unpacked.</para>
+
+  <itemizedlist>
+   <listitem>
+    <para><filename>META-INF/</filename>: build information</para>
+   </listitem>
+   <listitem>
+    <para><filename>WEB-INF/</filename>: sample classes and libraries</para>
+   </listitem>
+   <listitem>
+    <para><filename>console/</filename>: images for sample UI</para>
+   </listitem>
+   <listitem>
+    <para><filename>index.html</filename>: sample home page</para>
+   </listitem>
+   <listitem>
+    <para><filename>keystore.jks</filename>: OpenAM test certificate, alias:
+    <literal>test</literal>, key store password: <literal>changeit</literal></para>
+   </listitem>
+   <listitem>
+    <para><filename>policy/</filename>: Policy Evaluator Client Sample page</para>
+   </listitem>
+   <listitem>
+    <para><filename>saml2/</filename>: Secure Attribute Exchange example</para>
+   </listitem>
+   <listitem>
+    <para><filename>sample.css</filename>: sample styles</para>
+   </listitem>
+   <listitem>
+    <para><filename>sm/</filename>: Service Configuration sample</para>
+   </listitem>
+   <listitem>
+    <para><filename>um/</filename>: User Profile sample</para>
+   </listitem>
+  </itemizedlist>
+
+  <itemizedlist xml:id="jdk-shutdown-hooks">
+    <title>Registering Your Java SDK Client to Shut Down Gracefully</title>
+
+    <para>When writing a client using the OpenAM Java SDK, make sure you register
+    hooks to make sure the application can be shut down gracefully. How you
+    register for shutdown depends on the type of application.</para>
+
+   <listitem>
+    <para>For Java EE applications, make sure the OpenAM client SDK shuts down
+    successfully by including the following context listener in your
+    application's <filename>web.xml</filename> file.</para>
+
+    <programlisting language="xml">&lt;listener&gt;
  &lt;listener-class&gt;
   com.sun.identity.common.ShutdownServletContextListener
  &lt;/listener-class&gt;
 &lt;/listener&gt;</programlisting>
-  </listitem>
+   </listitem>
 
-  <listitem>
-   <para>For standalone applications, set the following JVM property.</para>
+   <listitem>
+    <para>For standalone applications, set the following JVM property.</para>
 
-   <literallayout class="monospaced"
-   >-Dopenam.runtime.shutdown.hook.enabled=true</literallayout>
-  </listitem>
- </itemizedlist>
+    <literallayout class="monospaced"
+    >-Dopenam.runtime.shutdown.hook.enabled=true</literallayout>
+   </listitem>
+  </itemizedlist>
+ </section>
 </chapter>

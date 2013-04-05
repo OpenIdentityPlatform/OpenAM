@@ -20,7 +20,7 @@
   !
   ! CCPL HEADER END
   !
-  !      Copyright 2012 ForgeRock AS
+  !      Copyright 2012-2013 ForgeRock AS
   !    
 -->
 <chapter xml:id='chap-sae'
@@ -100,7 +100,7 @@
   service provider, connecting the two in a circle of trust called
   <literal>samplesaml2cot</literal>. Configure both the hosted providers and
   also the remote providers as described in <link
-  xlink:href="admin-guide#set-up-federation"
+  xlink:href="admin-guide#set-up-federation"  xlink:show="new"
   xlink:role="http://docbook.org/xlink/role/olink"><citetitle>Setting Up SAML
   2.0 SSO</citetitle></link>. This chapter assumes you set up the hosted
   identity provider at <literal>http://idp.example.com:8080/openam</literal>
@@ -111,7 +111,7 @@
   on functioning SAML 2.0 communications between the providers.</para>
 
   <para>Set up the sample web application as described in <link
-  xlink:href="install-guide#chap-install-samples"
+  xlink:href="dev-guide#install-jdk-samples" xlink:show="new"
   xlink:role="http://docbook.org/xlink/role/olink"><citetitle>Installing OpenAM
   Client SDK Samples</citetitle></link>, both on the identity provider side
   and also on the service provider side. The SAE samples are found under
