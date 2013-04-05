@@ -1582,6 +1582,17 @@ com.sun.identity.agents.config.notenforced.url[1]= \
      Password Key.</para>
     </listitem>
    </varlistentry>
+
+   <varlistentry>
+    <term><literal>com.sun.identity.agents.config.repository.location</literal></term>
+    <listitem>
+     <para>Whether the agent's configuration is managed centrally through OpenAM
+     (<literal>centralized</literal>) or locally in the policy agent
+     configuration file (<literal>local</literal>).</para>
+     <para>Default: <literal>centralized</literal></para>
+    </listitem>
+   </varlistentry>
+
    <varlistentry>
     <term><literal>com.sun.identity.agents.config.response.attribute.fetch.mode</literal></term>
     <listitem>

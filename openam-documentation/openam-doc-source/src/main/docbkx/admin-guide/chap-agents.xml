@@ -352,6 +352,9 @@
      <listitem>
       <para>Indicates agent's configuration located either on agent's host or
       centrally on OpenAM server.</para>
+      <para>If you change this to a local configuration, you can no longer
+      manage the policy agent configuration through OpenAM console.</para>
+      <para>Property: <literal>com.sun.identity.agents.config.repository.location</literal></para>
      </listitem>
     </varlistentry>
     <varlistentry>
@@ -1769,6 +1772,9 @@ com.sun.identity.agents.config.cdsso.cookie.domain[1]=.example.net</literallayou
      <listitem>
       <para>Indicates agent's configuration located either on agent's host or
       centrally on OpenAM server.</para>
+      <para>If you change this to a local configuration, you can no longer
+      manage the policy agent configuration through OpenAM console.</para>
+      <para>Property: <literal>com.sun.identity.agents.config.repository.location</literal></para>
      </listitem>
     </varlistentry>
     <varlistentry>
