@@ -83,7 +83,55 @@
     custom error page for instance.</para>
    </answer>
   </qandaentry>
-  
+
+  <qandaentry xml:id="cannot-install-over-https">
+   <question>
+    <para>I am trying to install a policy agent, connecting to OpenAM over
+    HTTPS, and seeing the following error.</para>
+
+    <screen>OpenAM server URL: https://openam.example.com:8443/openam
+
+WARNING: Unable to connect to OpenAM server URL. Please specify the
+correct OpenAM server URL by hitting the Back button (&lt;) or if the OpenAM
+server URL is not started and you want to start it later, please proceed with
+the installation.
+If OpenAM server is SSL enabled and the root CA certificate for the OpenAM
+server certificate has been not imported into installer JVMs key store (see
+installer-logs/debug/Agent.log for detailed exception), import the root
+CA certificate and restart the installer; or continue installation without
+verifying OpenAM server URL.</screen>
+
+    <para>What should I do?</para>
+   </question>
+
+   <answer>
+    <para>The Java platform includes certificates from many Certificate
+    Authorities (CAs). If however you run your own CA, or you use self-signed
+    certificates for HTTPS on the container where you run OpenAM, then the
+    <command>agentadmin</command> command cannot trust the certificate
+    presented during connection to OpenAM, and so cannot complete installation
+    correctly.</para>
+
+    <para>After setting up the container where you run OpenAM to use HTTPS,
+    get the certificate to trust in a certificate file. The certificate you
+    want is the that of the CA who signed the container certificate, or the
+    certificate itself if the container certificate is self-signed.</para>
+
+    <para>Copy the certificate file to the system where you plan to install the
+    policy agent. Import the certificate into a trust store that you will use
+    during policy agent installation. If you import the certificate into the
+    default trust store for the Java platform, then the
+    <command>agentadmin</command> command can recognize it without additional
+    configuration.</para>
+
+    <para>Export and import of self-signed certificates is demonstrated in the
+    <citetitle>Administration Guide</citetitle> chapter on <link
+    xlink:show="new" xlink:href="admin-guide#chap-certs-keystores"
+    xlink:role="http://docbook.org/xlink/role/olink"><citetitle>Managing
+    Certificates</citetitle></link>.</para>
+   </answer>
+  </qandaentry>
+
   <qandaentry xml:id="debug-file-and-SELinux">
    <question>
     <para>I am trying to install the policy agent on SELinux and I am getting error messages
