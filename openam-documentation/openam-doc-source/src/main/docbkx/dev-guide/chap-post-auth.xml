@@ -20,7 +20,7 @@
   !
   ! CCPL HEADER END
   !
-  !      Copyright 2011 ForgeRock AS
+  !      Copyright 2011-2013 ForgeRock AS
   !    
 -->
 <chapter xml:id='chap-post-auth'
@@ -160,17 +160,17 @@ public class SamplePAP implements AMPostAuthProcessInterface
   web application container.</para>
   <variablelist>
    <varlistentry>
-    <term><filename>amserver.jar</filename></term>
+    <term><filename><?eval ${coreLibrary}?></filename></term>
     <listitem>
      <para>When you deploy OpenAM, the file is
-     <filename><replaceable>war-file-name</replaceable>/WEB-INF/lib/amserver.jar</filename>.</para>
+     <filename><replaceable>war-file-name</replaceable>/WEB-INF/lib/<?eval ${coreLibrary}?></filename>.</para>
     </listitem>
    </varlistentry>
    <varlistentry>
-    <term><filename>opensso-sharedlib.jar</filename></term>
+    <term><filename><?eval ${sharedLibrary}?></filename></term>
     <listitem>
      <para>When you deploy OpenAM, the file is
-     <filename><replaceable>war-file-name</replaceable>/WEB-INF/lib/opensso-sharedlib.jar</filename>.</para>
+     <filename><replaceable>war-file-name</replaceable>/WEB-INF/lib/<?eval ${sharedLibrary}?></filename>.</para>
     </listitem>
    </varlistentry>
    <varlistentry>
@@ -191,8 +191,8 @@ public class SamplePAP implements AMPostAuthProcessInterface
 $ mkdir ../classes
 $ javac
  -d ../classes
- -classpath /path/to/tomcat/webapps/openam/WEB-INF/lib/amserver.jar:
- /path/to/tomcat/webapps/openam/WEB-INF/lib/opensso-sharedlib.jar:
+ -classpath /path/to/tomcat/webapps/openam/WEB-INF/lib/<?eval ${coreLibrary}?>:
+ /path/to/tomcat/webapps/openam/WEB-INF/lib/<?eval ${sharedLibrary}?>:
  /path/to/tomcat/lib/servlet-api.jar
  com/forgerock/openam/examples/SamplePAP.java</screen>
   
