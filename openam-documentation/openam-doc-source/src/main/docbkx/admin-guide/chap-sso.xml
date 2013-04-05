@@ -171,7 +171,7 @@ Now changed to ssov3.png, after modifying to specs listed in
     <para>If no valid session ID currently exists, the agent redirects the client to OpenAM for authentication (AuthN).
     The client is then sent to OpenAM for AuthN. If the client submits valid credentials, the AuthN service
     creates a session cookie. The SSO Token and configured domain name is embedded in that cookie. OpenAM issues an HTTP
-    redirect to send the client browser back to the protected resource.</para>
+    redirect to send the client browser back to the protected resource. (The SSO Token is actually a Java Object.)</para>
 
     <para>The agent then verifies the validity of the session with the OpenAM session service, before granting access.
     </para>
@@ -184,8 +184,9 @@ Now changed to ssov3.png, after modifying to specs listed in
 <para>In general, problems with SSO relate to some sort of mismatch of domain names. For example, a cookie that is
     configured on a third-level domain such as <literal>sso.example.net</literal> will not work with an application on a
     similar domain such as <literal>app.example.net</literal>. Even if the Session ID is valid, the application will not
-    receive the SSO Token. The request is then redirected to OpenAM. The client gets an SSO Token configured with the
-    same third-level domain, and the cycle continues. Other issues that may lead to similar problems are shown here.
+    receive the SSO Token. The request is then redirected to OpenAM. The client gets what appears as a SSO Token in the
+    diagram, which is actually a valid SSO tracking cookie that redirects immediated, and the cycle continues.
+    Other issues that may lead to similar problems are shown here.
 </para>
 
 <itemizedlist>
@@ -211,8 +212,8 @@ Now changed to ssov3.png, after modifying to specs listed in
 
     <listitem>
         <para>When the path listed in the cookie does not match the path for the application</para>
-        <para>Perhaps the cookie is configured with an <filename>/opensso</filename> path; that won't match an
-        application that might be configured with an <filename>/openam</filename> path. In that case, the application
+        <para>Perhaps the cookie is configured with an <filename>/helloworld</filename> path; that won't match an
+        application that might be configured with an <filename>/hellomars</filename> path. In that case, the application
         will not receive the cookie.</para>
     </listitem>
 
