@@ -51,12 +51,6 @@
  <section xml:id="limitations">
   <title>Limitations</title>
 
-  <!-- For OPENAM-1906 TODO: Remove when this is fixed after 10.1.0-Xpress -->
-  <para>If you create a new realm, you must restart OpenAM before using the
-  new identity management REST API to manage identities under the new realm.
-  When you try to access users in the new realm before restarting OpenAM,
-  OpenAM returns HTTP 404 Not found errors, even for users who exist.</para>
-
   <!-- For OPENAM-1886 TODO: Remove when this is fixed after 10.1.0-Xpress -->
   <para>When session failover is configured to use external OpenDJ directory
   servers, OpenAM must access those directory servers through an LDAP load
