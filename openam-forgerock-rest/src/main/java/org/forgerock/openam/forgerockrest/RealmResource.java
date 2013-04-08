@@ -117,16 +117,17 @@ public final class RealmResource implements CollectionResourceProvider {
         Resource resource = null;
         String parentRealm = null;
         String childRealm = null;
-
-        if (!hasPermission(context)) {
-            handler.handleError(new PermanentException(401, "Unauthorized", null));
-        }
-
-        final JsonValue jVal = request.getContent();
-        // get the realm
-        String realm = jVal.get("realm").asString();
+        String realm = null;
 
         try {
+            if (!hasPermission(context)) {
+                throw new PermanentException(401, "Unauthorized", null);
+            }
+
+            final JsonValue jVal = request.getContent();
+            // get the realm
+            realm = jVal.get("realm").asString();
+
             if (realm == null || realm.isEmpty()) {
                 handler.handleError(new BadRequestException("No realm name provided."));
             } else if (!realm.startsWith("/")) {
@@ -180,6 +181,11 @@ public final class RealmResource implements CollectionResourceProvider {
             } catch (Exception e) {
                 handler.handleError(new BadRequestException(e.getMessage(), e));
             }
+        } catch (PermanentException pe) {
+            RestDispatcher.debug.error("RealmResource.createInstance()" + "Cannot CREATE "
+                    + realm + ":" + pe);
+            // Cannot recover from this exception
+            handler.handleError(pe);
         } catch (Exception e) {
             RestDispatcher.debug.error("RealmResource.createInstance()" + realm + ":" + e);
             handler.handleError(new BadRequestException(e.getMessage(), e));
@@ -233,18 +239,21 @@ public final class RealmResource implements CollectionResourceProvider {
     public void deleteInstance(final ServerContext context, final String resourceId,
                                final DeleteRequest request, final ResultHandler<Resource> handler) {
 
-        if (!hasPermission(context)) {
-            handler.handleError(new PermanentException(401, "Unauthorized", null));
-        }
         boolean recursive = false;
         Resource resource = null;
         String holdResourceId = resourceId;
-        if (holdResourceId != null && !holdResourceId.startsWith("/")) {
-            holdResourceId = "/" + holdResourceId;
-        }
+
         try {
-            String fqRealmPath = realmPath + holdResourceId;
-            OrganizationConfigManager ocm = new OrganizationConfigManager(getSSOToken(), fqRealmPath);
+            if (!hasPermission(context)) {
+                throw new PermanentException(401, "Unauthorized", null);
+            }
+            if (holdResourceId != null && !holdResourceId.startsWith("/")) {
+                holdResourceId = "/" + holdResourceId;
+            }
+            if (!realmPath.equalsIgnoreCase("/")) {
+                holdResourceId = realmPath + holdResourceId;
+            }
+            OrganizationConfigManager ocm = new OrganizationConfigManager(getSSOToken(), holdResourceId);
             ocm.deleteSubOrganization(null, recursive);
             // handle resource
             resource = new Resource(resourceId, "0", createJsonMessage("success", "true"));
@@ -277,6 +286,11 @@ public final class RealmResource implements CollectionResourceProvider {
             } catch (Exception e) {
                 handler.handleError(new BadRequestException(e.getMessage(), e));
             }
+        }  catch (PermanentException pe) {
+            RestDispatcher.debug.error("RealmResource.deleteInstance()" + "Cannot DELETE "
+                    + resourceId + ":" + pe);
+            // Cannot recover from this exception
+            handler.handleError(pe);
         }
 
     }
@@ -318,19 +332,20 @@ public final class RealmResource implements CollectionResourceProvider {
     public void readInstance(final ServerContext context, final String resourceId,
                              final ReadRequest request, final ResultHandler<Resource> handler) {
 
-        if (!hasPermission(context)) {
-            handler.handleError(new PermanentException(401, "Unauthorized", null));
-        }
-
         Resource resource = null;
         JsonValue jval = null;
         String holdResourceId = resourceId;
-        if (holdResourceId != null && !holdResourceId.startsWith("/")) {
-            holdResourceId = "/" + holdResourceId;
-        }
-        holdResourceId = realmPath + holdResourceId;
-        try {
 
+        try {
+            if (!hasPermission(context)) {
+                throw new PermanentException(401, "Unauthorized", null);
+            }
+            if (holdResourceId != null && !holdResourceId.startsWith("/")) {
+                holdResourceId = "/" + holdResourceId;
+            }
+            if (!realmPath.equalsIgnoreCase("/")) {
+                holdResourceId = realmPath + holdResourceId;
+            }
             OrganizationConfigManager ocm = new OrganizationConfigManager(getSSOToken(), holdResourceId);
             // get associated services for this realm , include mandatory service names.
             Set serviceNames = ocm.getAssignedServices();
@@ -338,6 +353,11 @@ public final class RealmResource implements CollectionResourceProvider {
             resource = new Resource(resourceId, "0", jval);
             handler.handleResult(resource);
 
+        } catch (PermanentException pe) {
+            RestDispatcher.debug.error("RealmResource.readInstance()" + "Cannot READ "
+                    + resourceId + ":" + pe);
+            // Cannot recover from this exception
+            handler.handleError(pe);
         } catch (SMSException smse) {
             try {
                 configureErrorMessage(smse);
@@ -543,25 +563,25 @@ public final class RealmResource implements CollectionResourceProvider {
     @Override
     public void updateInstance(final ServerContext context, final String resourceId,
                                final UpdateRequest request, final ResultHandler<Resource> handler) {
-        // check to make sure superuser
-        if (!hasPermission(context)) {
-            handler.handleError(new PermanentException(401, "Unauthorized", null));
-        }
 
         final JsonValue realmDetails = request.getNewContent();
         Resource resource = null;
         String realm = null;
         OrganizationConfigManager ocm = null;
         OrganizationConfigManager realmCreatedOcm = null;
-        realm = resourceId;
-        if (realm != null && !realm.startsWith("/")) {
-            realm = "/" + realm;
-        }
-        if (!realmPath.equalsIgnoreCase("/")) {
-            realm = realmPath + realm;
-        }
 
         try {
+            if (!hasPermission(context)) {
+                throw new PermanentException(401, "Unauthorized", null);
+            }
+
+            realm = resourceId;
+            if (realm != null && !realm.startsWith("/")) {
+                realm = "/" + realm;
+            }
+            if (!realmPath.equalsIgnoreCase("/")) {
+                realm = realmPath + realm;
+            }
             // The initial attempt to UPDATE a realm,
             // if the realm does not exist it must be created
             ocm = new OrganizationConfigManager(getSSOToken(), realm);
@@ -654,6 +674,11 @@ public final class RealmResource implements CollectionResourceProvider {
                         + resourceId + ":" + ex);
                 handler.handleError(new NotFoundException("Cannot update realm.", ex));
             }
+        }catch (PermanentException pe) {
+            RestDispatcher.debug.error("RealmResource.updateInstance()" + "Cannot UPDATE "
+                    + resourceId + ":" + pe);
+            // Cannot recover from this exception
+            handler.handleError(pe);
         } catch (Exception ex) {
             RestDispatcher.debug.error("RealmResource.updateInstance()" + "Cannot UPDATE "
                     + resourceId + ":" + ex);
