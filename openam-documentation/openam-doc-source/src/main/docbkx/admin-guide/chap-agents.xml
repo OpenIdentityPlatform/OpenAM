@@ -389,7 +389,7 @@
       <para>The default value is
       <literal><replaceable>agent-root-URL</replaceable>/amagent</literal>.</para>
       <para>Property: <literal>com.sun.identity.agents.config.agenturi.prefix</literal></para>
-      <para>Hot swap: no</para>
+      <para>Hot swap: yes</para>
      </listitem>
     </varlistentry>
     <varlistentry>
