@@ -126,7 +126,7 @@
 
         <!-- Version Properties -->
         <opendj.server.version>2.4.6</opendj.server.version>
-        <opendj.sdk.version>3.0.0-OPENAMp3</opendj.sdk.version>
+        <opendj.sdk.version>3.0.0-SNAPSHOT</opendj.sdk.version>
 
         <commons.forgerock-util.version>1.1.0-SNAPSHOT</commons.forgerock-util.version>
         <commons.json-fluent.version>1.1.0</commons.json-fluent.version>

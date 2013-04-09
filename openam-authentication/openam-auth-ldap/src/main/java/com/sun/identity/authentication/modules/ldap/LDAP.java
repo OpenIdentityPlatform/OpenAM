@@ -27,7 +27,7 @@
  */
 
 /*
- * Portions Copyrighted 2010-2012 ForgeRock AS
+ * Portions Copyrighted 2010-2013 ForgeRock, Inc.
  */
 
 package com.sun.identity.authentication.modules.ldap;
@@ -1092,10 +1092,6 @@ public class LDAP extends AMLoginModule {
                                     }
                                 }
                             } catch (ErrorResultException ere) {
-                                if (debug.messageEnabled()) {
-                                    debug.message("Server is not running: " + key);
-                                }
-                            } catch (InterruptedException ie) {
                                 if (debug.messageEnabled()) {
                                     debug.message("Server is not running: " + key);
                                 }

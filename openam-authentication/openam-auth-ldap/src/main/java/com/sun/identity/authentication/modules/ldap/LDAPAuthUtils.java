@@ -27,7 +27,7 @@
  */
 
 /**
- * Portions Copyrighted 2011-2012 ForgeRock Inc
+ * Portions Copyrighted 2011-2013 ForgeRock Inc
  */
 
 package com.sun.identity.authentication.modules.ldap;
@@ -514,19 +514,7 @@ public class LDAPAuthUtils {
             ldapSSL, authDN, authPassword, false, trustAll);
         }
         
-        Connection conn = null;
-        
-        try {
-            conn = cPool.getConnection();
-        } catch (InterruptedException ie) {
-            if (debug2.warningEnabled()) {
-                debug2.warning("Unable to get connection from pool", ie);
-            }
-            
-            throw new LDAPUtilException(ie);
-        }
-        
-        return conn;
+        return cPool.getConnection();
     }
     
     /**
@@ -541,18 +529,7 @@ public class LDAPAuthUtils {
              ldapSSL, authDN, authPassword, true, trustAll);
         }
         
-        Connection conn = null;
-                
-        try {
-            conn = acPool.getConnection();
-        } catch (InterruptedException ie) {
-            if (debug2.warningEnabled()) {
-                debug2.warning("Unable to get admin connection from pool", ie);
-            }
-            
-            throw new LDAPUtilException(ie);
-        }
-        return conn;
+        return acPool.getConnection();
     }
      
     /**
@@ -719,9 +696,6 @@ public class LDAPAuthUtils {
             if (debug.warningEnabled()) {
                 debug.warning("Cannot update : ", ere);
             }
-        } catch (InterruptedException ie) {
-            debug.error("Unable to change password", ie);
-            throw new LDAPUtilException(ie);
         } finally {
             if (modConn != null) {
                 modConn.close();
@@ -968,9 +942,6 @@ public class LDAPAuthUtils {
         } catch (SearchResultReferenceIOException srrio) {
             debug.error("Unable to complete search for user: " + userId, srrio);
             throw new LDAPUtilException(srrio);
-        } catch (InterruptedIOException iio) {
-            debug.error("Unable to complete search for user: " + userId, iio);
-            throw new LDAPUtilException(iio);
         } catch (ErrorResultException ere) {
             if (debug.warningEnabled()) {
                 debug.warning("Search for User error: ", ere);
@@ -1157,12 +1128,6 @@ public class LDAPAuthUtils {
                 
                 throw new LDAPUtilException("FAuth", (Object[]) null);
             }
-        } catch (InterruptedException ie) {
-            if (debug.warningEnabled()) {
-                debug.warning("Cannot authenticate to " + serverHost, ie);
-            }
-
-            throw new LDAPUtilException("FAuth", (Object[]) null);            
         }   
     }
     
@@ -1696,10 +1661,6 @@ public class LDAPAuthUtils {
             conn = factory.getConnection();
             running = conn.isValid();
         } catch (ErrorResultException ere) {
-            if (debug.messageEnabled()) {
-                debug.message("Primary Server is not running");
-            }
-        } catch (InterruptedException ie) {
             if (debug.messageEnabled()) {
                 debug.message("Primary Server is not running");
             }
