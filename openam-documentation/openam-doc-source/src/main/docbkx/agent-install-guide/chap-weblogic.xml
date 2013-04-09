@@ -306,15 +306,28 @@ Install log file location:
        the / to the path to your policy agent profile. This allows the policy agent
        to properly identify itself to the OpenAM server. </para>
    </step>
-   <step>
-    <para>Edit the <filename>startWebLogic.sh</filename> script to set the sourcing
-    needed for the agent, by adding these lines after the code block shown.</para>
-    <screen>$ vi /path/to/startWebLogic.sh
- # Any changes to this script may be lost when adding extensions to this configuration.
- DOMAIN_HOME="/opt/Oracle/Middlewar/user_projects/domains/base_domain"
- + . ./setAgentEnv_AdminServer.sh
- ${DOMAIN_HOME}/bin/startWebLogic.sh $*</screen>
 
+   <step>
+    <para>The agent requires sourcing before it will work properly. There are two 
+    ways to source.</para>
+    <stepalternatives>
+     <step>
+      <para>Manually source the file containing the policy agent environment settings for 
+      WebLogic before starting the application server. </para>
+      <screen>. /path/to/setAgentEnv_AdminServer.sh</screen>
+     </step>
+     <step>
+      <para>Or edit the <filename>startWebLogic.sh</filename> script to set the sourcing
+      needed for the agent, by adding these lines after the code block shown. Add the
+      setAgentEnv_AdminServer.sh line to the following location in the file. The drawback 
+      to this approach is that it could be overwritten, as noted in the file.</para>
+      <screen>$ vi /path/to/startWebLogic.sh
+ # Any changes to this script may be lost when adding extensions to this configuration.
+ DOMAIN_HOME="/opt/Oracle/Middleware/user_projects/domains/base_domain"
+  . ./path/to/setAgentEnv_AdminServer.sh
+ ${DOMAIN_HOME}/bin/startWebLogic.sh $*</screen>
+     </step>
+    </stepalternatives>
     <note>
      <para>If the sourcing is not properly set, the following message appears.</para>
      <screen>&lt;Error&gt; &lt;HTTP&gt; &lt;cent.example.com&gt; 
@@ -324,7 +337,7 @@ Install log file location:
  ServletContext@1761850405[app:agentapp module:agentapp.war path:null 
  spec-version:null] com.sun.identity.agents.filter.AmAgentFilter.
  java.lang.ClassNotFoundException: com.sun.identity.agents.filter.AmAgentFilter</screen>
-    </note>    
+     </note>    
    </step>
    <step>
     <para>Restart the WebLogic server.</para>
