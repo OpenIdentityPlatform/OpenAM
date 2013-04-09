@@ -1317,7 +1317,7 @@ com.sun.identity.agents.config.cdsso.cookie.domain[1]=.example.net</literallayou
     <varlistentry>
      <term>URL Comparison Case Sensitivity Check</term>
      <listitem>
-      <para>When enabled, enforce case sensitivity in both policy and
+      <para>When enabled, enforces case insensitivity in both policy and
       not enforced URL evaluation.</para>
       <para>Property: <literal>com.sun.identity.agents.config.url.comparison.case.ignore</literal></para>
      </listitem>

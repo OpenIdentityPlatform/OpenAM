@@ -1689,7 +1689,7 @@ com.sun.identity.agents.config.notenforced.url[1]= \
    <varlistentry>
     <term><literal>com.sun.identity.agents.config.url.comparison.case.ignore</literal></term>
     <listitem>
-     <para>When enabled, enforce case sensitivity in both policy and
+     <para>When enabled, enforces case insensitivity in both policy and
      not enforced URL evaluation.</para>
      <para>For centralized configurations this property is configured under
      Access Control &gt; <replaceable>Realm Name</replaceable> &gt; Agents &gt;
