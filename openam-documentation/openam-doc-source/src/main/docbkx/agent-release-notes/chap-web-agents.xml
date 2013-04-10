@@ -49,19 +49,56 @@
    </listitem>
 
    <listitem>
-    <para>Web policy agents can perform URL validation during the bootstrap
-    phase when you set the
-    <literal>com.forgerock.agents.ext.url.validation.disable</literal> property
-    (<link xlink:href="https://bugster.forgerock.org/jira/browse/OPENAM-1270"
-    xlink:show="new">OPENAM-1270</link>).</para>
+    <variablelist>
+     <para>Web policy agents can perform naming URL validation during the
+     bootstrap phase, and can fail over from one OpenAM service to another
+     (<link xlink:href="https://bugster.forgerock.org/jira/browse/OPENAM-1258"
+     xlink:show="new">OPENAM-1258</link>). Configure these capabilities by
+     using the following bootstrap properties.</para>
+
+     <varlistentry>
+      <term><literal>com.forgerock.agents.ext.url.validation.default.url.set</literal></term>
+      <listitem>
+       <para>Indicates order of service URLs for failover</para>
+      </listitem>
+     </varlistentry>
+
+     <varlistentry>
+      <term><literal>com.forgerock.agents.ext.url.validation.level</literal></term>
+      <listitem>
+       <para>Controls the extent of naming URL validation</para>
+      </listitem>
+     </varlistentry>
+
+     <varlistentry>
+      <term><literal>com.forgerock.agents.ext.url.validation.ping.interval</literal></term>
+      <listitem>
+       <para>Sets seconds between validation requests against the naming URL</para>
+      </listitem>
+     </varlistentry>
+
+     <varlistentry>
+      <term><literal>com.forgerock.agents.ext.url.validation.ping.miss.count</literal></term>
+      <listitem>
+       <para>Sets threshold of validation failures after which to fail over</para>
+      </listitem>
+     </varlistentry>
+
+     <varlistentry>
+      <term><literal>com.forgerock.agents.ext.url.validation.ping.ok.count</literal></term>
+      <listitem>
+       <para>Sets threshold of validation successes after which to fail back to
+       the first URL in the <literal>default.url.set</literal> list</para>
+      </listitem>
+     </varlistentry>
+    </variablelist>
+
+    <para>See <link
+    xlink:href="agent-install-guide#web-bootstrap-configuration-properties"
+    xlink:role="http://docbook.org/xlink/role/olink"><citetitle>Bootstrap
+    Configuration Properties</citetitle></link> for details.</para>
    </listitem>
-<!--
-   <listitem>
-    <para>Web policy agents now support failover across multiple naming URLs
-    (<link xlink:href="https://bugster.forgerock.org/jira/browse/OPENAM-1258"
-    xlink:show="new">OPENAM-1258</link>).</para>
-   </listitem>
--->
+
    <listitem>
     <para>Web policy agents now allow you to configure the naming of the URL
     validation net-connect timeout (<link
