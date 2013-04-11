@@ -90,7 +90,9 @@
    
    <para>To change LDAP data store settings, browse to Access Control &gt;
    <replaceable>Realm Name</replaceable> &gt; Data Stores &gt;
-   <replaceable>Data Store Name</replaceable> in the OpenAM console.</para>
+   <replaceable>Data Store Name</replaceable> in the OpenAM console.
+   Each data store has its own connection pool and therefore each data store
+   needs its own tuning.</para>
    
    <table xml:id="tuning-ldap-data-store-settings" pgwide="1">
     <title>LDAP Data Store Settings</title>
@@ -109,16 +111,47 @@
       <row>
        <entry>LDAP Connection Pool Minimum Size</entry>
        <entry>1</entry>
-       <entry><para>The minimum LDAP connection pool size; a good tuning value
-       for this property is 10.</para></entry>
+       <entry>
+        <para>The minimum LDAP connection pool size; a good tuning value
+        for this property is 10.</para>
+        <para>(<literal>sun-idrepo-ldapv3-config-connection_pool_min_size</literal>)</para>
+       </entry>
       </row>
       <row>
        <entry>LDAP Connection Pool Maximum Size</entry>
        <entry>10</entry>
-       <entry><para>The maximum LDAP connection pool size; a high tuning value
-       for this property is 65, though you might well be able to reduce this
-       for your deployment. Ensure your LDAP server can cope with the maximum
-       number of clients across all the OpenAM servers.</para></entry>
+       <entry>
+        <para>The maximum LDAP connection pool size; a high tuning value
+        for this property is 65, though you might well be able to reduce this
+        for your deployment. Ensure your LDAP server can cope with the maximum
+        number of clients across all the OpenAM servers.</para>
+        <para>(<literal>sun-idrepo-ldapv3-config-connection_pool_max_size</literal>)</para>
+       </entry>
+      </row>
+      <row>
+       <entry>Caching</entry>
+       <entry>False</entry>
+       <entry>
+        <para>Turn on the caching feature in the LDAP data store.</para>
+        <para>(<literal>sun-idrepo-ldapv3-config-cache-enabled</literal>)</para>
+       </entry>
+      </row>
+      <row>
+       <entry>Maximum Age of Cached Items</entry>
+       <entry>600</entry>
+       <entry>
+        <para>This is 10 minutes and does not normally need tuning.</para>
+        <para>(<literal>sun-idrepo-ldapv3-config-cache-ttl</literal>)</para>
+       </entry>
+      </row>
+      <row>
+       <entry>Maximum Size of the Cache</entry>
+       <entry>10240</entry>
+       <entry>
+        <para>This is 10k and is very small for a cache. A 1 MB cache (1048576)
+        is a better starting point.</para>
+        <para>(<literal>sun-idrepo-ldapv3-config-cache-size</literal>)</para>
+       </entry>
       </row>
      </tbody>
     </tgroup>
@@ -128,8 +161,8 @@
    browse to Configuration &gt; Authentication &gt; Core in the OpenAM
    console.</para>
    
-   <table xml:id="tuning-ldap-connection-pool-settings" pgwide="1">
-    <title>LDAP Data Store Settings</title>
+   <table xml:id="tuning-ldap-authentication-module-settings" pgwide="1">
+    <title>LDAP Authentication Module Setting</title>
     <tgroup cols="3">
      <colspec colnum="1" colwidth="2*"/>
      <colspec colnum="2" colwidth="1*"/>
@@ -145,33 +178,18 @@
       <row>
        <entry>Default LDAP Connection Pool Size</entry>
        <entry>1:10</entry>
-       <entry><para>The minimum and maximum LDAP connection pool used by the
-       LDAP authentication module. This should be tuned to 10:65 for
-       production.</para></entry>
-      </row>
-      <row>
-       <entry>Caching</entry>
-       <entry>False</entry>
-       <entry><para>Turn on the caching feature in the LDAP data
-       store.</para></entry>
-      </row>
-      <row>
-       <entry>Maximum Age of Cached Items</entry>
-       <entry>600</entry>
-       <entry><para>This is 10 minutes and does not normally need
-       tuning.</para></entry>
-      </row>
-      <row>
-       <entry>Maximum Size of the Cache</entry>
-       <entry>10240</entry>
-       <entry><para>This is 10k and is very small for a cache. A 1 MB cache
-       (1048576) is a better starting point.</para></entry>
+       <entry>
+        <para>The minimum and maximum LDAP connection pool used by the
+        LDAP authentication module. This should be tuned to 10:65 for
+        production.</para>
+        <para>(<literal>iplanet-am-auth-ldap-connection-pool-default-size</literal>)</para>
+       </entry>
       </row>
      </tbody>
     </tgroup>
    </table>
   </section>
-  
+
   <section xml:id="tuning-notification-settings">
    <title>Notification Settings</title>
    
@@ -181,7 +199,7 @@
    SDK.</para>
    
    <table xml:id="tuning-sms-notifications" pgwide="1">
-    <title>SMS Notification Settings</title>
+    <title>SMS Notification Setting</title>
     <tgroup cols="3">
      <colspec colnum="1" colwidth="2*"/>
      <colspec colnum="2" colwidth="1*"/>
@@ -197,9 +215,12 @@
       <row>
        <entry>Notification Pool Size</entry>
        <entry>10</entry>
-       <entry><para>This is the size of the thread pool used to send
-       notifications. In production this value should be fine unless lots of
-       clients are registering for SMS notifications.</para></entry>
+       <entry>
+        <para>This is the size of the thread pool used to send notifications.
+        In production this value should be fine unless lots of
+        clients are registering for SMS notifications.</para>
+        <para>(<literal>com.sun.identity.sm.notification.threadpool.size</literal>)</para>
+       </entry>
       </row>
      </tbody>
     </tgroup>
@@ -208,7 +229,6 @@
    <para>The session service has its own thread pool to send notifications.
    This is configured under Configuration &gt; Servers and Sites &gt; Default
    Server Settings &gt; Session.</para>
-   
    
    <table xml:id="tuning-session-service-notifications" pgwide="1">
     <title>Session Service Notification Settings</title>
@@ -227,15 +247,21 @@
       <row>
        <entry>Notification Pool Size</entry>
        <entry>10</entry>
-       <entry><para>This is the size of the thread pool used to send
-       notifications. In production this should be around 25-30.</para></entry>
+       <entry>
+        <para>This is the size of the thread pool used to send notifications.
+        In production this should be around 25-30.</para>
+        <para>(<literal>com.iplanet.am.notification.threadpool.size</literal>)</para>
+       </entry>
       </row>
       <row>
        <entry>Notification Thread Pool Threshold</entry>
        <entry>5000</entry>
-       <entry><para>This is the maximum number of notifications in the queue
-       waiting to be sent. The default value should be fine in the majority of
-       installations.</para></entry>
+       <entry>
+        <para>This is the maximum number of notifications in the queue waiting
+        to be sent. The default value should be fine in the majority of
+        installations.</para>
+        <para>(<literal>com.iplanet.am.notification.threadpool.threshold</literal>)</para>
+       </entry>
       </row>
      </tbody>
     </tgroup>
@@ -266,16 +292,21 @@
       <row>
        <entry>Maximum Sessions</entry>
        <entry>5000</entry>
-       <entry><para>In production this value can safely be set into the
-       100,000's. The maximum session limit is really controlled by the
-       maximum size of the JVM heap which must be tuned appropriately to match
-       the expected number of concurrent sessions.</para></entry>
+       <entry>
+        <para>In production this value can safely be set into the 100,000s.
+        The maximum session limit is really controlled by the maximum size of
+        the JVM heap which must be tuned appropriately to match the expected
+        number of concurrent sessions.</para>
+        <para>(<literal>com.iplanet.am.session.maxSessions</literal>)</para>
+       </entry>
       </row>
       <row>
        <entry>Sessions Purge Delay</entry>
        <entry>0</entry>
-       <entry><para>This should be zero to ensure sessions are purged
-       immediately.</para></entry>
+       <entry>
+        <para>This should be zero to ensure sessions are purged immediately.</para>
+        <para>(<literal>com.iplanet.am.session.purgedelay</literal>)</para>
+       </entry>
       </row>
      </tbody>
     </tgroup>
