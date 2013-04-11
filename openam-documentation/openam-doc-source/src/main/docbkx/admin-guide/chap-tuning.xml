@@ -452,4 +452,327 @@
    </tgroup>
   </table>
  </section>
+
+ <section xml:id="caching">
+  <title>Caching in OpenAM</title>
+  <indexterm><primary>Caching</primary></indexterm>
+
+  <para>OpenAM caches data to avoid having to query user and configuration
+  data stores each time it needs the information. By default, OpenAM makes use
+  of LDAP persistent search to receive notification of changes to cached data.
+  For this reason, caching works best when data are stored in a directory
+  server that supports LDAP persistent search.</para>
+
+  <para>OpenAM has two kinds of cache on the server side that you can configure,
+  one for configuration data and the other for user data. Generally use the
+  default settings for configuration data cache. This section mainly covers the
+  configuration choices you have for caching user data.</para>
+
+  <para>OpenAM server has two levels of user data caching. The global user data
+  cache is dirtied by LDAP persistent search. When the global user data cache is
+  enabled (as it is by default), the individual data store caches are not useful
+  because all requests for data go through the global cache. The individual data
+  store caches are therefore only useful when the global user data cache is
+  disabled.</para>
+
+  <para>The following diagram depicts the two kinds of cache, and also the
+  two levels of user data caching.</para>
+
+  <mediaobject xml:id="figure-openam-caches">
+   <alt>Caches in OpenAM server</alt>
+   <imageobject>
+    <imagedata fileref="images/openam-caches.png" format="PNG" />
+   </imageobject>
+   <textobject><para>OpenAM server caches user data and configuration data
+   separately.</para></textobject>
+  </mediaobject>
+
+  <para>The rest of this section concerns mainly settings for global user data
+  cache and for SDK clients. For a look at data store cache settings, see
+  <xref linkend="tuning-ldap-data-store-settings" />.</para>
+
+  <section xml:id="caching-server-settings">
+   <title>Overall Server Cache Settings</title>
+
+   <para>By default OpenAM has caching enabled both for configuration data and
+   also for user data. This setting is governed by the server property
+   <literal>com.iplanet.am.sdk.caching.enabled</literal>, which by default is
+   <literal>true</literal>. When you set this advanced property to
+   <literal>false</literal>, then you can enable caching independently for
+   configuration data and for user data.</para>
+
+   <procedure xml:id="turn-off-global-user-data-caching">
+    <title>To Turn Off Global User Data Caching</title>
+
+    <para><emphasis role="strong">Disabling caching can have a severe negative
+    impact on performance. This is because, when caching is disabled, OpenAM
+    must query a data store each time it needs data.</emphasis></para>
+
+    <para>If, however, you have at least one user data store that does not
+    support LDAP persistent search, such as a relational database or an LDAP
+    directory server that does not support persistent search, then you must
+    disable the <emphasis>global</emphasis> cache for user data. Otherwise user
+    data caches cannot stay in sync with changes to user data entries.</para>
+
+    <step>
+     <para>In the OpenAM console, browse to Configuration &gt; Servers and Sites
+     &gt; <replaceable>Server Name</replaceable> &gt; Advanced.</para>
+    </step>
+
+    <step>
+     <para>Set <literal>com.iplanet.am.sdk.caching.enabled</literal> to
+     <literal>false</literal> to disable caching overall.</para>
+    </step>
+
+    <step>
+     <para>Set <literal>com.sun.identity.sm.cache.enabled</literal> to
+     <literal>true</literal> to enable configuration data caching.</para>
+
+     <para>All supported configuration data stores support LDAP persistent
+     search, so it is safe to enable configuration data caching.</para>
+
+     <para>You must explicitly set this property to <literal>true</literal>,
+     because setting <literal>com.iplanet.am.sdk.caching.enabled</literal> to
+     <literal>false</literal> in the previous step disables both user and
+     configuration data caching.</para>
+    </step>
+
+    <step>
+     <para>Save your work.</para>
+    </step>
+   </procedure>
+
+   <procedure xml:id="change-max-cache-size">
+    <title>To Change the Maximum Size of Global User Data Cache</title>
+
+    <para>With a large user data store and active user base, the number of user
+    entries in cache can grow large.</para>
+
+    <step>
+     <para>In the OpenAM console, browse to Configuration &gt; Servers and Sites
+     &gt; Default Server Settings &gt; SDK.</para>
+    </step>
+
+    <step>
+     <para>Change the value of SDK Caching Max. Size, and then Save your
+     work.</para>
+
+     <para>There is no corresponding setting for configuration data, as the
+     number of configuration entries in a large deployment is not likely to
+     grow nearly as large as the number of user entries.</para>
+    </step>
+   </procedure>
+  </section>
+
+  <section xml:id="java-ee-policy-agent-and-sdk-caching">
+   <title>Caching Properties For Java EE Policy Agents &amp; SDK Clients</title>
+
+   <para>Policy agents and other OpenAM SDK clients can also cache user data,
+   using most of the same properties as OpenAM server as described in
+   <xref linkend="table-cache-properties" /> . Clients however can receive
+   updates by notification from OpenAM or, if notification fails, by
+   polling OpenAM for changes.</para>
+
+   <procedure xml:id="notify-sdk-cache-updates">
+    <title>To Enable Notification &amp; Polling For Client Cache Updates</title>
+
+    <para>This procedure describes how to enable change notification and polling
+    for policy agent user data cache updates. When configuring a custom OpenAM
+    SDK client using a .properties file, use the same properties as for the
+    policy agent configuration.</para>
+
+    <step>
+     <para>In OpenAM console, browse to Access Control &gt; <replaceable>Realm
+     Name</replaceable> &gt; Agents &gt; <replaceable>Agent Type</replaceable>
+     &gt; <replaceable>Agent Name</replaceable> to view and edit the policy
+     agent profile.</para>
+    </step>
+
+    <step>
+     <para>On the Global tab page, check that the Agent Notification URL is
+     set.</para>
+
+     <para>When notification is enabled, the agent registers a notification
+     listener with OpenAM for this URL.</para>
+
+     <para>The corresponding property is
+     <literal>com.sun.identity.client.notification.url</literal>.</para>
+    </step>
+
+    <step>
+     <para>On the OpenAM Services tab, check that Enable Notification of User
+     Data Caches is enabled.</para>
+
+     <para>The corresponding property is
+     <literal>com.sun.identity.idm.remote.notification.enabled</literal>.</para>
+    </step>
+
+    <step>
+     <para>On the OpenAM Services tab, check that User Data Cache Polling Time
+     is set.</para>
+
+     <para>This ensures that if notifications fail for some reason, the policy
+     agent polls OpenAM for changes.</para>
+
+     <para>The corresponding property is
+     <literal>com.iplanet.am.sdk.remote.pollingTime</literal>.</para>
+    </step>
+
+    <step>
+     <para>For any changes you make, Save your work.</para>
+
+     <para>You must restart the policy agent for the changes to take
+     effect.</para>
+    </step>
+   </procedure>
+  </section>
+
+  <section xml:id="caching-properties">
+   <title>Cache Settings</title>
+
+   <para>The table below provides a quick reference, primarily for user data
+   cache settings.</para>
+
+   <para>Notice that many properties for configuration data cache have
+   <literal>sm</literal> (for Service Management) in their names, whereas those
+   for user data have <literal>idm</literal> (for Identity Management) in their
+   names.</para>
+
+   <table xml:id="table-cache-properties" pgwide="1">
+    <title>OpenAM Cache Properties</title>
+    <tgroup cols="4">
+     <colspec colnum="1" colwidth="3*"/>
+     <colspec colnum="2" colwidth="3*"/>
+     <colspec colnum="3" colwidth="1*"/>
+     <colspec colnum="4" colwidth="1*"/>
+     <thead>
+      <row>
+       <entry>Property</entry>
+       <entry>Description</entry>
+       <entry>Default</entry>
+       <entry>Applies To</entry>
+      </row>
+     </thead>
+     <tbody>
+      <row>
+       <entry><para><literal>com.iplanet.am.sdk.cache.maxSize</literal></para></entry>
+       <entry><para>Maximum number of user entries cached</para></entry>
+       <entry><para>10000</para></entry>
+       <entry><para>Server &amp; SDK</para></entry>
+      </row>
+
+      <row>
+       <entry><para><literal>com.iplanet.am.sdk.caching.enabled</literal></para></entry>
+       <entry>
+        <para>Whether to enable caching for both configuration data and also
+        for user data.</para>
+
+        <para>If <literal>true</literal>, this setting overrides
+        <literal>com.sun.identity.idm.cache.enabled</literal> and
+        <literal>com.sun.identity.sm.cache.enabled</literal>.</para>
+
+        <para>If <literal>false</literal>, you can enable caching independently
+        for configuration data and for user data using the aforementioned
+        properties.</para>
+       </entry>
+       <entry><para><literal>true</literal></para></entry>
+       <entry><para>Server &amp; SDK</para></entry>
+      </row>
+
+      <row>
+       <entry><para><literal>com.iplanet.am.sdk.remote.pollingTime</literal></para></entry>
+       <entry>
+        <para>How often in minutes the SDK client such as a policy agent should
+        poll OpenAM for modified user data entries.</para>
+
+        <para>The SDK also uses this value to determine the age of the oldest
+        changes requested. The oldest changes requested are 2 minutes older than
+        this setting. In other words, by default the SDK polls for entries
+        changed in the last 3 minutes.</para>
+
+        <para>Set this to 0 or a negative integer to disable polling.</para>
+       </entry>
+       <entry><para>1 (minute)</para></entry>
+       <entry><para>SDK</para></entry>
+      </row>
+
+      <row>
+       <entry><para><literal>com.sun.am.event.notification.expire.time</literal></para></entry>
+       <entry>
+        <para>How long OpenAM stores a given change to a cached entry, so that
+        clients polling for changes do not miss the change.</para>
+       </entry>
+       <entry><para>30 (minutes)</para></entry>
+       <entry><para>Server only</para></entry>
+      </row>
+
+      <row>
+       <entry><para><literal>com.sun.identity.idm.cache.enabled</literal></para></entry>
+       <entry>
+        <para>If <literal>com.iplanet.am.sdk.caching.enabled</literal> is
+        <literal>true</literal>, this property is ignored.</para>
+
+        <para>Otherwise, set this to <literal>true</literal> to enable caching
+        of user data.</para>
+       </entry>
+       <entry><para><literal>false</literal></para></entry>
+       <entry><para>Server &amp; SDK</para></entry>
+      </row>
+
+      <row>
+       <entry><para><literal>com.sun.identity.idm.cache.entry.default.expire.time</literal></para></entry>
+       <entry>
+        <para>How many minutes to store a user data entry in the global user
+        data cache</para>
+       </entry>
+       <entry><para>30 (minutes)</para></entry>
+       <entry><para>Server &amp; SDK</para></entry>
+      </row>
+
+      <row>
+       <entry><para><literal>com.sun.identity.idm.cache.entry.expire.enabled</literal></para></entry>
+       <entry>
+        <para>Whether user data entries in the global user data cache should
+        expire over time</para>
+       </entry>
+       <entry><para><literal>false</literal></para></entry>
+       <entry><para>Server &amp; SDK</para></entry>
+      </row>
+
+      <row>
+       <entry><para><literal>com.sun.identity.idm.remote.notification.enabled</literal></para></entry>
+       <entry>
+        <para>Whether the SDK client such as a policy agent should register
+        a notification listener for user data changes with the OpenAM
+        server.</para>
+
+        <para>The SDK client uses the URL specified by
+        <literal>com.sun.identity.client.notification.url</literal> to register
+        the listener so that OpenAM knows where to send notifications.</para>
+
+        <para>If notifications cannot be enabled for some reason, then the SDK
+        client falls back to polling for changes.</para>
+       </entry>
+       <entry><para><literal>true</literal></para></entry>
+       <entry><para>SDK</para></entry>
+      </row>
+
+      <row>
+       <entry><para><literal>com.sun.identity.sm.cache.enabled</literal></para></entry>
+       <entry>
+        <para>If <literal>com.iplanet.am.sdk.caching.enabled</literal> is
+        <literal>true</literal>, this property is ignored.</para>
+
+        <para>Otherwise, set this to <literal>true</literal> to enable caching
+        of configuration data. It is recommended that you always set this to
+        <literal>true</literal>.</para>
+       </entry>
+       <entry><para><literal>false</literal></para></entry>
+       <entry><para>Server &amp; SDK</para></entry>
+      </row>
+     </tbody>
+    </tgroup>
+   </table>
+  </section>
+ </section>
 </chapter>
