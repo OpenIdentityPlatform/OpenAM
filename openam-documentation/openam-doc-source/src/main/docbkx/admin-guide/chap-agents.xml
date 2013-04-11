@@ -639,6 +639,9 @@
       from accessing <literal>http://host/index.html</literal> by requesting
       <literal>http://host/index.html/hack.gif</literal> when the not enforced
       list includes <literal>http://host/*.gif</literal>.</para>
+
+      <note><para>This setting is not supported by the Varnish Cache agent.</para></note>
+
       <para>For a more generally applicable setting, see
       <xref linkend="web-agent-ignore-path-info-properties" />.</para>
       <para>Property: <literal>com.sun.identity.agents.config.ignore.path.info.for.not.enforced.list</literal></para>
@@ -1385,6 +1388,9 @@ com.sun.identity.agents.config.cdsso.cookie.domain[1]=.example.net</literallayou
       Not Enforced List check, and URL policy evaluation. This is designed
       to prevent a user from accessing a URI by appending the matching pattern
       in the policy or not enforced list.</para>
+
+      <note><para>This setting is not supported by the Varnish Cache agent.</para></note>
+
       <para>For example, if the not enforced list includes
       <literal>http://host/*.gif</literal>, then stripping path info from the
       request URI prevents access to <literal>http://host/index.html</literal>

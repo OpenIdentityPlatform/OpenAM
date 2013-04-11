@@ -457,9 +457,10 @@
      302 redirect after the LARES POST. By default, the policy agent does an
      HTTP redirect after processing the LARES POST message. Default:
      <literal>false</literal>.</para>
-     <para>This property applies only to Apache HTTPD 2.2 and 2.4, Lotus Domino,
-     and Varnish Cache policy agents. Other policy agents do not redirect
-     after processing the LARES POST message.</para>
+
+     <para>This property applies only to Apache HTTPD 2.2 and 2.4 policy agents.
+     Other policy agents do not redirect after processing the LARES POST
+     message.</para>
     </listitem>
    </varlistentry>
 
@@ -1064,6 +1065,9 @@ token=value;Domain=subdomain.domain.com</literal></para>
      Not Enforced List check, and URL policy evaluation. This is designed
      to prevent a user from accessing a URI by appending the matching pattern
      in the policy or not enforced list.</para>
+
+     <note><para>This property is not supported by the Varnish Cache agent.</para></note>
+
      <para>For example, if the not enforced list includes
      <literal>http://host/*.gif</literal>, then stripping path info from the
      request URI prevents access to <literal>http://host/index.html</literal>
@@ -1099,6 +1103,9 @@ token=value;Domain=subdomain.domain.com</literal></para>
      from accessing <literal>http://host/index.html</literal> by requesting
      <literal>http://host/index.html/hack.gif</literal> when the not enforced
      list includes <literal>http://host/*.gif</literal>.</para>
+
+     <note><para>This property is not supported by the Varnish Cache agent.</para></note>
+
      <para>For centralized configurations this property is configured under
      Access Control &gt; <replaceable>Realm Name</replaceable> &gt; Agents &gt;
      Web &gt; <replaceable>Agent Name</replaceable> &gt; Application &gt;
