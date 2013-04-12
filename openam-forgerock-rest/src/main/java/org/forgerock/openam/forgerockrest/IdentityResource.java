@@ -11,7 +11,7 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2012 ForgeRock Inc.
+ * Copyright 2012-2013 ForgeRock Inc.
  */
 package org.forgerock.openam.forgerockrest;
 
@@ -445,6 +445,7 @@ public final class IdentityResource implements CollectionResourceProvider {
                 handler.handleError(new PermanentException(401, "Unauthorized", null));
             } catch (final Exception e) {
                 RestDispatcher.debug.error("IdentityResource.updateInstance() :: Cannot UPDATE! " + e);
+                handler.handleError(new BadRequestException(e.getMessage(), e));
             }
         } catch (final NeedMoreCredentials needMoreCredentials) {
             RestDispatcher.debug.error("IdentityResource.updateInstance() :: Cannot UPDATE " +
