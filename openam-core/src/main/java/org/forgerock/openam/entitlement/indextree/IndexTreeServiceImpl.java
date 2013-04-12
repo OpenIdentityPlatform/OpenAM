@@ -55,12 +55,15 @@ public class IndexTreeServiceImpl implements IndexTreeService {
     private final Map<String, IndexRuleTree> indexTreeCache;
     private final PrivilegedAction<SSOToken> adminAction;
     private final ServiceManagementDAO smDAO;
+    private final DNWrapper dnMapper;
 
     @Inject
-    public IndexTreeServiceImpl(PrivilegedAction<SSOToken> adminTokenAction, ServiceManagementDAO smDAO) {
+    public IndexTreeServiceImpl(PrivilegedAction<SSOToken> adminTokenAction,
+                                ServiceManagementDAO smDAO, DNWrapper dnMapper) {
         indexTreeCache = new HashMap<String, IndexRuleTree>();
         this.adminAction = adminTokenAction;
         this.smDAO = smDAO;
+        this.dnMapper = dnMapper;
     }
 
     @Override
@@ -111,7 +114,7 @@ public class IndexTreeServiceImpl implements IndexTreeService {
      *             When an error occurs reading policy data.
      */
     private void loadTreeIntoCache(String realm) throws EntitlementException {
-        String baseDN = String.format(REALM_DN_TEMPLATE, DNMapper.orgNameToDN(realm));
+        String baseDN = String.format(REALM_DN_TEMPLATE, dnMapper.orgNameToDN(realm));
         SSOToken token = AccessController.doPrivileged(adminAction);
 
         if (smDAO.checkIfEntryExists(baseDN, token)) {
@@ -143,6 +146,22 @@ public class IndexTreeServiceImpl implements IndexTreeService {
                 LOGGER.message(String.format("Index rule tree created for '%s'.", realm));
             }
         }
+    }
+
+    /**
+     * Wrapper class to remove coupling to DNMapper static methods.
+     *
+     * Until DNMapper is refactored, this class can be used to assist with DI.
+     */
+    public static class DNWrapper {
+
+        /**
+         * @see DNMapper#orgNameToDN(String)
+         */
+        public String orgNameToDN(String orgName) {
+            return DNMapper.orgNameToDN(orgName);
+        }
+
     }
 
 }

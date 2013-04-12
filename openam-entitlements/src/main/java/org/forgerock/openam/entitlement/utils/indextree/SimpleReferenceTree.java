@@ -15,23 +15,25 @@
  */
 package org.forgerock.openam.entitlement.utils.indextree;
 
+import org.forgerock.openam.entitlement.utils.indextree.nodecontext.MapSearchContext;
+import org.forgerock.openam.entitlement.utils.indextree.nodecontext.SearchContext;
+import org.forgerock.openam.entitlement.utils.indextree.nodefactory.BasicTreeNodeFactory;
+import org.forgerock.openam.entitlement.utils.indextree.nodefactory.TreeNodeFactory;
+import org.forgerock.openam.entitlement.utils.indextree.treenodes.TreeNode;
+
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import org.forgerock.openam.entitlement.utils.indextree.nodefactory.BasicTreeNodeFactory;
-import org.forgerock.openam.entitlement.utils.indextree.nodefactory.TreeNodeFactory;
-import org.forgerock.openam.entitlement.utils.indextree.treenodes.TreeNode;
-
 /**
  * This implementation makes use of simple tree node references to help improve tree navigation performance and to keep
  * the memory footprint to a minimal. It does this by using tree nodes that contain basic references to its position in
  * the tree as opposed to using {@link List} for instance.
- * 
+ * <p/>
  * It makes use of a factory for the node creation so that the behavior of resource evaluation can be adapted.
- *
+ * <p/>
  * A search against the tree makes a single traversal down the tree and across the passed resource string. Each
  * character of the passed resource is evaluated against nodes at the corresponding position within the tree. A
  * node that has interest in the current resource character elects itself as a candidate. Each subsequent character of
@@ -39,7 +41,7 @@ import org.forgerock.openam.entitlement.utils.indextree.treenodes.TreeNode;
  * traversed a collection of elected tree nodes would have been populated, where these nodes have an exact match against
  * the resource or by part match by use of wildcards. The tree path of these nodes represents an index rule and if such
  * a node is an end point, represents an index rule initially added to the tree.
- * 
+ *
  * @author apforrest
  */
 public class SimpleReferenceTree implements IndexRuleTree {
@@ -115,9 +117,12 @@ public class SimpleReferenceTree implements IndexRuleTree {
         // Start with the root node as the candidate.
         candidates.add(root);
 
+        // Create a new search context for the current search.
+        SearchContext context = new MapSearchContext();
+
         for (int i = 0; i < searchTerm.length && !candidates.isEmpty(); i++) {
             // For each character of the search term.
-            searchTree(searchTerm[i], candidates);
+            searchTree(searchTerm[i], candidates, context);
         }
 
         Set<String> results = new HashSet<String>();
@@ -133,27 +138,29 @@ public class SimpleReferenceTree implements IndexRuleTree {
 
     /**
      * Evaluate previous candidates for reelection and their children for first election.
-     * 
+     *
      * @param searchTerm
-     *            Current search character.
+     *         Current search character.
      * @param candidates
-     *            Elected candidates as potential matches.
+     *         Elected candidates as potential matches.
+     * @param context
+     *         The shared search context.
      */
-    private void searchTree(char searchTerm, List<TreeNode> candidates) {
+    private void searchTree(char searchTerm, List<TreeNode> candidates, SearchContext context) {
         // Every candidate has to be reelected.
         List<TreeNode> previousCandidates = new ArrayList<TreeNode>(candidates);
         candidates.clear();
 
         for (TreeNode previousCandidate : previousCandidates) {
 
-            if (previousCandidate.isWildcard() && previousCandidate.hasInterestIn(searchTerm)) {
+            if (previousCandidate.isWildcard() && previousCandidate.hasInterestIn(searchTerm, context)) {
                 // Reelect previous candidate.
                 candidates.add(previousCandidate);
             }
 
             if (previousCandidate.hasChild()) {
                 // Evaluate previous candidates children.
-                evaluateChildren(searchTerm, previousCandidate.getChild(), candidates);
+                evaluateChildren(searchTerm, previousCandidate.getChild(), candidates, context);
             }
 
         }
@@ -161,24 +168,26 @@ public class SimpleReferenceTree implements IndexRuleTree {
 
     /**
      * Evaluate each child tree node against the given value.
-     * 
+     *
      * @param searchTerm
-     *            Current search character.
+     *         Current search character.
      * @param child
-     *            Current tree node position.
+     *         Current tree node position.
      * @param candidates
-     *            Elected candidates as potential matches.
+     *         Elected candidates as potential matches.
+     * @param context
+     *         The shared search context.
      */
-    private void evaluateChildren(char searchTerm, TreeNode child, List<TreeNode> candidates) {
+    private void evaluateChildren(char searchTerm, TreeNode child, List<TreeNode> candidates, SearchContext context) {
         while (child != null) {
-            
-            if (child.hasInterestIn(searchTerm)) {
+
+            if (child.hasInterestIn(searchTerm, context)) {
                 // Elect child as a candidate.
                 candidates.add(child);
 
                 if (child.isWildcard() && child.hasChild()) {
                     // This scenario handles zero or more characters.
-                    evaluateChildren(searchTerm, child.getChild(), candidates);
+                    evaluateChildren(searchTerm, child.getChild(), candidates, context);
                 }
             }
 

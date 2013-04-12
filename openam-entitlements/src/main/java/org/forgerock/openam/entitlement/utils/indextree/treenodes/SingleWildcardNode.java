@@ -15,8 +15,12 @@
  */
 package org.forgerock.openam.entitlement.utils.indextree.treenodes;
 
+import org.forgerock.openam.entitlement.utils.indextree.nodecontext.ContextKey;
+import org.forgerock.openam.entitlement.utils.indextree.nodecontext.SearchContext;
+
 /**
- * Wildcard tree node that will match any character except for '/' and '?' where this tree node is an end point.
+ * Wildcard tree node that will match any character except for '#' and '?',
+ * and any character where the previous character was a '/'.
  *  
  * @author apforrest
  */
@@ -35,16 +39,24 @@ public class SingleWildcardNode extends BasicTreeNode {
 	}
 
 	@Override
-	public boolean hasInterestIn(char value) {
-		if (value == '/') {
-			return false;
-		}
+	public boolean hasInterestIn(char value, SearchContext context) {
+        if (context.has(ContextKey.LEVEL_REACHED)) {
+            // Next URL level reached, so no longer interested.
+            context.remove(ContextKey.LEVEL_REACHED);
+            return false;
+        }
 
-		if (value == '?' && isEndPoint()) {
-			return false;
-		}
+        if (value == '/') {
+            // Make a note that the end of a URL level has been reached.
+            context.add(ContextKey.LEVEL_REACHED, Boolean.TRUE);
+            return true;
+        }
 
-		return true;
-	}
+        if (value == '?' || value == '#') {
+            return false;
+        }
+
+        return true;
+    }
 
 }

@@ -35,7 +35,9 @@ public abstract class BasicTreeNode implements TreeNode {
 
     @Override
     public void removeEndPoint() {
-        endPointCount--;
+        if (endPointCount > 0) {
+            endPointCount--;
+        }
     }
 
     @Override
@@ -150,7 +152,7 @@ public abstract class BasicTreeNode implements TreeNode {
 
         if (child != null) {
             // Add the child references
-            view.append(child);
+            view.append(child.toString(includeEndPoint));
         }
 
         if (sibling != null) {
@@ -159,7 +161,7 @@ public abstract class BasicTreeNode implements TreeNode {
             for (int i = 0, l = depth(); i < l; i++) {
                 view.append(' ');
             }
-            view.append(sibling);
+            view.append(sibling.toString(includeEndPoint));
         }
 
         return view.toString();

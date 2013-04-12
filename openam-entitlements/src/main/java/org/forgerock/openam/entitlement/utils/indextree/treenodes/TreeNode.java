@@ -15,6 +15,8 @@
  */
 package org.forgerock.openam.entitlement.utils.indextree.treenodes;
 
+import org.forgerock.openam.entitlement.utils.indextree.nodecontext.SearchContext;
+
 /**
  * A representation of a node with a tree structure.
  * <p/>
@@ -41,9 +43,11 @@ public interface TreeNode {
      *
      * @param value
      *         The passed character.
+     * @param context
+     *         The shared search context.
      * @return Whether there is interest in the passed character..
      */
-    public boolean hasInterestIn(char value);
+    public boolean hasInterestIn(char value, SearchContext context);
 
     /**
      * @return The absolute path of the tree node.

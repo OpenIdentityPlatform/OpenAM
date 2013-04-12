@@ -15,8 +15,10 @@
  */
 package org.forgerock.openam.entitlement.utils.indextree.treenodes;
 
+import org.forgerock.openam.entitlement.utils.indextree.nodecontext.SearchContext;
+
 /**
- * Wildcard tree node that will match any character except for '?' where this tree node is an end point.
+ * Wildcard tree node that will match any character except for '?' and '#'.
  *  
  * @author apforrest
  */
@@ -35,8 +37,8 @@ public class MultiWildcardNode extends BasicTreeNode {
     }
 
     @Override
-    public boolean hasInterestIn(char value) {
-        if (value == '?' && isEndPoint()) {
+    public boolean hasInterestIn(char value, SearchContext context) {
+        if (value == '?' || value == '#') {
             return false;
         }
 

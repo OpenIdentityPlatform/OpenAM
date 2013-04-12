@@ -15,31 +15,31 @@
  */
 package org.forgerock.openam.entitlement.utils.indextree.treenodes;
 
+import org.forgerock.openam.entitlement.utils.indextree.nodecontext.MapSearchContext;
 import org.forgerock.openam.entitlement.utils.indextree.nodecontext.SearchContext;
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 
 /**
- * Provides the default implementation of a tree node.
- * 
- * Matches a value that is equal to the tree node value.
- * 
- * @author apforrest
+ * Unit test for DefaultTreeNode.
+ *
+ * @author andrew.forrest@forgerock.com
  */
-public class DefaultTreeNode extends BasicTreeNode {
+public class DefaultTreeNodeTest {
 
-	private final char nodeValue;
+    @Test
+    public void verifyDefaultNodeCharacteristics() {
+        TreeNode defaultTreeNode = new DefaultTreeNode('a');
+        assertFalse(defaultTreeNode.isRoot());
+        assertFalse(defaultTreeNode.isWildcard());
+        assertEquals('a', defaultTreeNode.getNodeValue());
 
-	public DefaultTreeNode(char nodeValue) {
-		this.nodeValue = nodeValue;
-	}
-
-	@Override
-	public char getNodeValue() {
-		return nodeValue;
-	}
-
-	@Override
-	public boolean hasInterestIn(char value, SearchContext context) {
-		return nodeValue == value;
-	}
+        SearchContext context = new MapSearchContext();
+        assertTrue(defaultTreeNode.hasInterestIn('a', context));
+        assertFalse(defaultTreeNode.hasInterestIn('b', context));
+    }
 
 }

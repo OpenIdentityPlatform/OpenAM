@@ -15,10 +15,6 @@
  */
 package org.forgerock.openam.entitlement.indextree;
 
-import java.security.PrivilegedAction;
-
-import javax.inject.Singleton;
-
 import com.google.inject.AbstractModule;
 import com.google.inject.Provider;
 import com.google.inject.TypeLiteral;
@@ -26,10 +22,14 @@ import com.iplanet.sso.SSOToken;
 import com.sun.identity.security.AdminTokenAction;
 import com.sun.identity.sm.ServiceManagementDAO;
 import com.sun.identity.sm.ServiceManagementDAOWrapper;
+import org.forgerock.openam.entitlement.indextree.IndexTreeServiceImpl.DNWrapper;
+
+import javax.inject.Singleton;
+import java.security.PrivilegedAction;
 
 /**
  * Provides object wiring through the use of DI for entitlements.
- * 
+ *
  * @author apforrest
  */
 public class EntitlementGuiceModule extends AbstractModule {
@@ -46,6 +46,7 @@ public class EntitlementGuiceModule extends AbstractModule {
     protected void configure() {
         bind(ADMIN_TOKEN_TYPE).toProvider(ADMIN_TOKEN_PROVIDER).in(Singleton.class);
         bind(ServiceManagementDAO.class).to(ServiceManagementDAOWrapper.class).in(Singleton.class);
+        bind(DNWrapper.class).in(Singleton.class);
         bind(IndexTreeService.class).to(IndexTreeServiceImpl.class).in(Singleton.class);
     }
 
