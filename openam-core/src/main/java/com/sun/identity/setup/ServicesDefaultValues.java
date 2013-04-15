@@ -47,6 +47,7 @@ import java.util.Set;
 import java.util.StringTokenizer;
 import com.sun.identity.shared.ldap.LDAPDN;
 import com.sun.identity.shared.ldap.util.DN;
+import org.forgerock.openam.network.ValidateIPaddress;
 
 /**
  * This class holds the default values of service schema.
@@ -56,7 +57,8 @@ public class ServicesDefaultValues {
     private static Set preappendSlash = new HashSet();
     private static Set trimSlash = new HashSet();
     private Map defValues = new HashMap();
-    
+    private static ValidateIPaddress ipValidator = new ValidateIPaddress();
+
     static {
         preappendSlash.add(SetupConstants.CONFIG_VAR_PRODUCT_NAME);
         preappendSlash.add(SetupConstants.CONFIG_VAR_OLD_CONSOLE_URI);
@@ -68,7 +70,7 @@ public class ServicesDefaultValues {
 
     private ServicesDefaultValues() {
         ResourceBundle bundle = ResourceBundle.getBundle(
-            "serviceDefaultValues");
+                "serviceDefaultValues");
         Enumeration e = bundle.getKeys();
         while (e.hasMoreElements()) {
             String key = (String)e.nextElement();
@@ -88,7 +90,7 @@ public class ServicesDefaultValues {
         Locale locale = (Locale)request.getLocale();
         Map map = instance.defValues;
         map.putAll(request.getParameterMap());
-        
+
         String base = (String)map.get(
             SetupConstants.CONFIG_VAR_BASE_DIR);
         base = base.replace('\\', '/');
@@ -98,13 +100,13 @@ public class ServicesDefaultValues {
             throw new ConfiguratorException("configurator.encryptkey",
                 null, locale);
         }
-        
+
         // this set the encryption password for crypt class.
         // otherwises password in serverconfig.xml will be incorrect
         String ekey = ((String)map.get(
             SetupConstants.CONFIG_VAR_ENCRYPTION_KEY));
         SystemProperties.initializeProperties("am.encryption.pwd", ekey);
-        
+
         validatePassword(locale);
         if (!isServiceURLValid()) {
             throw new ConfiguratorException("configurator.invalidhostname",
@@ -113,22 +115,22 @@ public class ServicesDefaultValues {
 
         String cookieDomain = (String)map.get(
             SetupConstants.CONFIG_VAR_COOKIE_DOMAIN);
-        if (!isCookieDomainValid(cookieDomain)) { 
-            throw new ConfiguratorException("configurator.invalidcookiedomain", 
-                null, locale); 
+        if (!isCookieDomainValid(cookieDomain)) {
+            throw new ConfiguratorException("configurator.invalidcookiedomain",
+                null, locale);
         }
 
         setDeployURI(request.getContextPath(), map);
 
         String hostname = (String)map.get(
             SetupConstants.CONFIG_VAR_SERVER_HOST);
-        map.put(SetupConstants.CONFIG_VAR_COOKIE_DOMAIN, 
+        map.put(SetupConstants.CONFIG_VAR_COOKIE_DOMAIN,
             getCookieDomain(cookieDomain, hostname));
         setPlatformLocale();
-        
+
         String dbOption = (String)map.get(SetupConstants.CONFIG_VAR_DATA_STORE);
         boolean embedded = dbOption.equals(SetupConstants.SMS_EMBED_DATASTORE);
-        
+
         AMSetupDSConfig dsConfig = AMSetupDSConfig.getInstance();
         dsConfig.setDSValues();
 
@@ -161,7 +163,7 @@ public class ServicesDefaultValues {
         String umRootSuffix = null;
         boolean bUseExtUMDS = (userRepo != null) && !userRepo.isEmpty();
         if (bUseExtUMDS) {
-            map.put(SetupConstants.UM_DS_DIRMGRDN, 
+            map.put(SetupConstants.UM_DS_DIRMGRDN,
                 UserIdRepo.getBindDN(userRepo));
             map.put(SetupConstants.UM_DS_DIRMGRPASSWD,
                 UserIdRepo.getBindPassword(userRepo));
@@ -175,7 +177,7 @@ public class ServicesDefaultValues {
             umRootSuffix =(String)userRepo.get(
                 SetupConstants.USER_STORE_ROOT_SUFFIX);
         } else {
-            map.put(SetupConstants.UM_DS_DIRMGRDN, 
+            map.put(SetupConstants.UM_DS_DIRMGRDN,
                 map.get(SetupConstants.CONFIG_VAR_DS_MGR_DN));
             map.put(SetupConstants.UM_DS_DIRMGRPASSWD,
                 map.get(SetupConstants.CONFIG_VAR_DS_MGR_PWD));
@@ -201,7 +203,7 @@ public class ServicesDefaultValues {
         String locale = (String)map.get(
             SetupConstants.CONFIG_VAR_PLATFORM_LOCALE);
         if (locale == null) {
-            map.put(SetupConstants.CONFIG_VAR_PLATFORM_LOCALE, 
+            map.put(SetupConstants.CONFIG_VAR_PLATFORM_LOCALE,
                 SetupConstants.DEFAULT_PLATFORM_LOCALE);
         }
     }
@@ -249,7 +251,7 @@ public class ServicesDefaultValues {
                     map.put(SetupConstants.CONFIG_VAR_SERVER_HOST, hostName);
                     map.put(SetupConstants.CONFIG_VAR_SERVER_PROTO, protocol);
                     map.put(SetupConstants.CONFIG_VAR_SERVER_PORT, port);
-                    map.put(SetupConstants.CONFIG_VAR_SERVER_URL, 
+                    map.put(SetupConstants.CONFIG_VAR_SERVER_URL,
                         protocol + "://" + hostName + ":" + port);
                 } else {
                     valid = false;
@@ -321,8 +323,8 @@ public class ServicesDefaultValues {
     ) {
         int idx = hostname.lastIndexOf(".");
         if ((idx == -1) || (idx == (hostname.length() -1)) ||
-            isIPAddress(hostname)
-        ) {
+                ipValidator.isValidIP(hostname)
+                ) {
             cookieDomain = "";
         } else if ((cookieDomain == null) || (cookieDomain.length() == 0)) {
             // try to determine the cookie domain if it is not set
@@ -337,29 +339,6 @@ public class ServicesDefaultValues {
     }
 
     /**
-     * Validates if the hostname is IP address.
-     *
-     * @param hostname is the user specified hostname.
-     * @return <code>true</code> if hostname is an IP Address.
-     */
-    private static boolean isIPAddress(String hostname) {
-        StringTokenizer st = new StringTokenizer(hostname, ".");
-        boolean isIPAddr = (st.countTokens() == 4);
-        if (isIPAddr) {
-            while (st.hasMoreTokens()) {
-                String token = st.nextToken();
-                try {
-                    int node = Integer.parseInt(token);
-                    isIPAddr = (node >= 0) && (node < 256);
-                } catch (NumberFormatException e) {
-                    isIPAddr = false;
-                }
-            }
-        }
-        return isIPAddr;
-    }
-
-    /**
      * Validates the encryption key.
      *
      * @return <code>true</code> if ecryption key is valid.
@@ -367,7 +346,7 @@ public class ServicesDefaultValues {
     private static boolean isEncryptionKeyValid() {
         Map map = instance.defValues;
         String ekey = ((String)map.get(
-            SetupConstants.CONFIG_VAR_ENCRYPTION_KEY));
+                SetupConstants.CONFIG_VAR_ENCRYPTION_KEY));
         if (ekey == null) {
             ekey = AMSetupServlet.getRandomString().trim();
             map.put(SetupConstants.CONFIG_VAR_ENCRYPTION_KEY, ekey);
@@ -395,19 +374,19 @@ public class ServicesDefaultValues {
 
         String urlAccessAgentPwd = (String)map.get(
             SetupConstants.CONFIG_VAR_AMLDAPUSERPASSWD);
-            
+
         if (urlAccessAgentPwd != null) {
             urlAccessAgentPwd.trim();
-        
+
             String urlAccessAgentPwdConfirm = ((String)map.get(
                 SetupConstants.CONFIG_VAR_AMLDAPUSERPASSWD_CONFIRM)).trim();
             validateURLAccessAgentPassword(adminPwd, urlAccessAgentPwd,
-                urlAccessAgentPwdConfirm, locale);        
+                urlAccessAgentPwdConfirm, locale);
             map.remove(SetupConstants.CONFIG_VAR_AMLDAPUSERPASSWD_CONFIRM);
         }
-        
+
         String dbOption = (String)map.get(SetupConstants.CONFIG_VAR_DATA_STORE);
-        boolean embedded = 
+        boolean embedded =
               dbOption.equals(SetupConstants.SMS_EMBED_DATASTORE);
         boolean dbSunDS = false;
         boolean dbMsAD  = false;
@@ -417,11 +396,11 @@ public class ServicesDefaultValues {
             dbSunDS = dbOption.equals(SetupConstants.SMS_DS_DATASTORE);
             dbMsAD  = dbOption.equals(SetupConstants.SMS_AD_DATASTORE);
         }
-        
+
         if (dbSunDS || dbMsAD) {
             String dsMgrPwd = ((String)map.get(
                 SetupConstants.CONFIG_VAR_DS_MGR_PWD)).trim();
-            
+
             if (embedded) {
                 if (dsMgrPwd.length() == 0) {
                     map.put(SetupConstants.CONFIG_VAR_DS_MGR_PWD, adminPwd);
@@ -436,16 +415,16 @@ public class ServicesDefaultValues {
 
         String ldapUserPwd = (String)map.get(SetupConstants.LDAP_USER_PWD);
         if (ldapUserPwd != null) {
-            ldapUserPwd.trim();        
-            map.put(SetupConstants.ENCRYPTED_LDAP_USER_PWD, 
+            ldapUserPwd.trim();
+            map.put(SetupConstants.ENCRYPTED_LDAP_USER_PWD,
                 (String)Crypt.encrypt(ldapUserPwd));
-            map.put(SetupConstants.HASH_LDAP_USER_PWD, 
+            map.put(SetupConstants.HASH_LDAP_USER_PWD,
                 (String)Hash.hash(ldapUserPwd));
         }
-                       
-        map.put(SetupConstants.SSHA512_LDAP_USERPWD, 
+
+        map.put(SetupConstants.SSHA512_LDAP_USERPWD,
             (String)EmbeddedOpenDS.hash(adminPwd));
-        
+
         String encryptAdminPwd = Crypt.encrypt(adminPwd);
         map.put(SetupConstants.ENCRYPTED_ADMIN_PWD, encryptAdminPwd);
         map.put(SetupConstants.ENCRYPTED_AD_ADMIN_PWD, encryptAdminPwd);
@@ -462,8 +441,8 @@ public class ServicesDefaultValues {
      * @return <code>true</code> if password is valid.
      */
     private static boolean isPasswordValid(
-        String pwd, 
-        String cPwd, 
+        String pwd,
+        String cPwd,
         Locale locale
     ) {
         if ((pwd != null) && (pwd.length() > 7)) {
@@ -510,7 +489,7 @@ public class ServicesDefaultValues {
     public static Map getDefaultValues() {
         return instance.defValues;
     }
-    
+
     /**
      * Set the deploy URI.
      *
@@ -523,7 +502,7 @@ public class ServicesDefaultValues {
         map.put(SetupConstants.CONFIG_VAR_CONSOLE_URI, deployURI);
         map.put(SetupConstants.CONFIG_VAR_SERVER_URI, deployURI);
     }
-    
+
     /**
      * Returns the tag swapped string.
      *
@@ -557,7 +536,7 @@ public class ServicesDefaultValues {
                     orig = orig.replaceAll("/@" + key + "@", value);
 
                     if (trimSlash.contains(key)) {
-                        orig = orig.replaceAll("@" + key + "@", 
+                        orig = orig.replaceAll("@" + key + "@",
                             value.substring(1));
                     }
                 } else if (key.equals(SetupConstants.CONFIG_VAR_ROOT_SUFFIX)) {
@@ -567,7 +546,7 @@ public class ServicesDefaultValues {
                         tmp ;
                     orig = orig.replaceAll(
                         "@" + SetupConstants.SM_ROOT_SUFFIX_HAT + "@", tmp);
-                    
+
                     String rfced = (new DN(value)).toRFCString();
                     tmp = (bXML) ? XMLUtils.escapeSpecialCharacters(rfced) :
                         rfced;

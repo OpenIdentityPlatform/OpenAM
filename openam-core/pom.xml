@@ -148,7 +148,12 @@
             <groupId>org.forgerock.openam</groupId>
             <artifactId>openam-xacml3-schema</artifactId>
         </dependency>
-
+        <!-- IPv6 -->
+        <dependency>
+            <groupId>com.googlecode.java-ipv6</groupId>
+            <artifactId>java-ipv6</artifactId>
+            <version>0.10</version>
+        </dependency>
         <!-- LDAP APIs -->
         <dependency>
                 <groupId>org.forgerock.opendj</groupId>

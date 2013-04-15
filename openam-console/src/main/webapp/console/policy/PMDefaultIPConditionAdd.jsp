@@ -32,37 +32,75 @@
 <%@taglib uri="/WEB-INF/jato.tld" prefix="jato" %>
 <%@taglib uri="/WEB-INF/cc.tld" prefix="cc" %>
 <jato:useViewBean
-    className="com.sun.identity.console.policy.PMDefaultIPConditionAddViewBean"
-    fireChildDisplayEvents="true" >
+        className="com.sun.identity.console.policy.PMDefaultIPConditionAddViewBean"
+        fireChildDisplayEvents="true" >
 
-<cc:i18nbundle baseName="amConsole" id="amConsole"
-    locale="<%=((com.sun.identity.console.base.AMViewBeanBase)viewBean).getUserLocale()%>"/>
+    <cc:i18nbundle baseName="amConsole" id="amConsole"
+                   locale="<%=((com.sun.identity.console.base.AMViewBeanBase)viewBean).getUserLocale()%>"/>
 
-<cc:header name="hdrCommon" pageTitle="webconsole.title" bundleID="amConsole" copyrightYear="2004" fireDisplayEvents="true">
+    <cc:header name="hdrCommon" pageTitle="webconsole.title" bundleID="amConsole" copyrightYear="2004" fireDisplayEvents="true">
 
-<cc:form name="PMDefaultIPConditionAdd" method="post" defaultCommandChild="/btnFilter">
-<script language="javascript">
-    function confirmLogout() {
-        return confirm("<cc:text name="txtLogout" defaultValue="masthead.logoutMessage" bundleID="amConsole"/>");
-    }
-</script>
-<cc:primarymasthead name="mhCommon" bundleID="amConsole"  logoutOnClick="return confirmLogout();" locale="<%=((com.sun.identity.console.base.AMViewBeanBase)viewBean).getUserLocale()%>"/>
-<cc:breadcrumbs name="breadCrumb" bundleID="amConsole" />
+        <cc:form name="PMDefaultIPConditionAdd" method="post" defaultCommandChild="/btnFilter">
+            <script language="javascript">
+                function confirmLogout() {
+                    return confirm("<cc:text name="txtLogout" defaultValue="masthead.logoutMessage" bundleID="amConsole"/>");
+                }
 
-<table border="0" cellpadding="10" cellspacing="0" width="100%">
-    <tr>
-	<td>
-	<cc:alertinline name="ialertCommon" bundleID="amConsole" />
-	</td>
-    </tr>
-</table>
+                function toggleIPs() {
+                    var container = document.getElementById('field_1'),
+                            rows = container.getElementsByTagName('tr'),
+                            on = [(this.options.selectedIndex*2)+1, (this.options.selectedIndex*2)+2],
+                            i, j, inputForRow, isOn;
 
-<%-- PAGE CONTENT --------------------------------------------------------- --%>
-<cc:pagetitle name="pgtitleTwoBtns" bundleID="amConsole" pageTitleText="page.title.policy.condition.create" showPageTitleSeparator="true" viewMenuLabel="" pageTitleHelpMessage="" showPageButtonsTop="true" showPageButtonsBottom="false" />
+                    for (i=1;i<rows.length;i++) {
+                        isOn = on.indexOf(i) !== -1;
+                        rows[i].style.display = isOn ? 'table-row' : 'none';
+                        inputForRow = rows[i].getElementsByTagName("input");
+                        for (j=0;j<inputForRow.length;j++) {
+                            if (isOn) {
+                                inputForRow[j].removeAttribute("disabled");
+                            } else {
+                                inputForRow[j].setAttribute("disabled", true);
+                            }
+                        }
+                        inputForRow = rows[i].getElementsByTagName("select");
+                        for (j=0;j<inputForRow.length;j++) {
+                            if (isOn) {
+                                inputForRow[j].removeAttribute("disabled");
+                            } else {
+                                inputForRow[j].setAttribute("disabled", true);
+                            }
+                        }
+                    }
+                }
 
-<cc:propertysheet name="propertyAttributes" bundleID="amConsole" showJumpLinks="false"/>
+                document.body.onload = function () {
+                    var fields = document.getElementsByClassName("ConFldSetDiv");
+                    for (i=0;i<fields.length;i++) {
+                        fields[i].setAttribute("id", "field_" + i);
+                    }
+                    document.getElementById("psLbl2").setAttribute("onChange", "toggleIPs.call(this)");
+                    toggleIPs.call(document.getElementById("psLbl2"));
+                }
 
-</cc:form>
+            </script>
+            <cc:primarymasthead name="mhCommon" bundleID="amConsole"  logoutOnClick="return confirmLogout();" locale="<%=((com.sun.identity.console.base.AMViewBeanBase)viewBean).getUserLocale()%>"/>
+            <cc:breadcrumbs name="breadCrumb" bundleID="amConsole" />
 
-</cc:header>
+            <table border="0" cellpadding="10" cellspacing="0" width="100%">
+                <tr>
+                    <td>
+                        <cc:alertinline name="ialertCommon" bundleID="amConsole" />
+                    </td>
+                </tr>
+            </table>
+
+            <%-- PAGE CONTENT --------------------------------------------------------- --%>
+            <cc:pagetitle name="pgtitleTwoBtns" bundleID="amConsole" pageTitleText="page.title.policy.condition.create" showPageTitleSeparator="true" viewMenuLabel="" pageTitleHelpMessage="" showPageButtonsTop="true" showPageButtonsBottom="false" />
+
+            <cc:propertysheet name="propertyAttributes" bundleID="amConsole" showJumpLinks="false"/>
+
+        </cc:form>
+
+    </cc:header>
 </jato:useViewBean>
