@@ -67,6 +67,7 @@
  <xinclude:include href='chap-msiis-6.xml' />
  <xinclude:include href='chap-msiis-7.xml' />
  <xinclude:include href='chap-sun-websvr.xml' />
+ <xinclude:include href='chap-varnish.xml' />
 
  <xinclude:include href='chap-about-jee-agents.xml' />
  <xinclude:include href='chap-apache-tomcat.xml' />
