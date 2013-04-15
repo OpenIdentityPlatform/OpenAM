@@ -26,6 +26,9 @@
  *
  */
 
+/**
+ * Portions Copyrighted 2013 ForgeRock, Inc.
+ */
 package com.sun.identity.idm;
 
 import java.util.Collections;
@@ -388,8 +391,8 @@ public abstract class IdRepo {
             throws IdRepoException, SSOException;
 
     /**
-     * Returns members of an identity. Applicable if identity is a
-     * group or a role.
+     * Returns the memberships of an identity. For example, returns the groups or roles that a user belongs to. The
+     * list retrieved here for a user MUST be consistent with member queries against the corresponding groups.
      *
      * @param token
      *     Single sign on token of identity performing the task.

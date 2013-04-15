@@ -27,7 +27,7 @@
  */
 
 /*
- * Portions Copyrighted [2011] [ForgeRock AS]
+ * Portions Copyrighted 2011-2013 ForgeRock, Inc.
  */
 package com.sun.identity.idm;
 
@@ -1051,6 +1051,12 @@ public final class AMIdentity {
         IdRepoException idException = null;
         IdServices idServices = IdServicesFactory.getDataStoreServices();
         try {
+            //This method should always retrieve all the membership information a user could possibly have (either
+            //through the user when memberOf attribute is defined, or through the group using uniquemember attribute),
+            //hence there is no need to try to look up the group and query its members to see if this given identity
+            //is in that list.
+            //Generally speaking, this should be the case for every IdRepo implementation -> when we ask for the user
+            //memberships, we should always get all of them for the sake of consistency.
             Set members = idServices.getMemberships(token, getType(),
                     getName(), identity.getType(), orgName, getDN());
             if (members != null && members.contains(identity)) {
@@ -1108,40 +1114,6 @@ public final class AMIdentity {
         } catch (IdRepoException ide) {
             // Save the exception to be used later
             idException = ide;
-        }
-
-        if (!ismember && identity.getType().equals(IdType.GROUP)) {
-            // In the case of groups it is possible that user identity would not
-            // membership information. Hence check against the groups
-            // For groups use get memebers on the group identity
-            try {
-                Set members = idServices.getMembers(token, identity.getType(),
-                        identity.getName(), identity.orgName, getType(),
-                        identity.getDN());
-                if (members != null && members.contains(this)) {
-                    ismember = true;
-                } else if (members != null) {
-                    // Check for fully qualified names or
-                    // if AM SDK DNs for these identities match
-                    String dn = getDN();
-                    Iterator it = members.iterator();
-                    while (it.hasNext()) {
-                        AMIdentity id = (AMIdentity) it.next();
-                        if (equals(id)) {
-                            ismember = true;
-                            break;
-                        } else if (dn != null) {
-                            String mdn = id.getDN();
-                            if ((mdn != null) && mdn.equalsIgnoreCase(dn)) {
-                                ismember = true;
-                                break;
-                            }
-                        }
-                    }
-                }
-            } catch (Throwable t) {
-                // Ignore the exception
-            }
         }
 
         if (idException != null) {
