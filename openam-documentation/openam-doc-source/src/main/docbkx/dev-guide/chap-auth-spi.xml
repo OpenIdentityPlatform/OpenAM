@@ -36,8 +36,7 @@
  </indexterm>
 
  <!-- Mostly purloined from Steve Ferris's work on the OpenAM wiki at
- https://wikis.forgerock.org/confluence/display/openam/Write+a+custom+authentication+module
- Revised per FR402, Lab on Custom Authentication Modules. mjang, Feb 22, 2013. -->
+ https://wikis.forgerock.org/confluence/display/openam/Write+a+custom+authentication+module -->
 
  <para>This chapter shows how to customize authentication with a sample custom
  authentication module. For deployments with particular requirements not met by
@@ -95,12 +94,6 @@
   needed to process the authentication. The document type for a callback XML
   file is described in
   <filename><replaceable>war-file-name</replaceable>/WEB-INF/Auth_Module_Properties.dtd</filename>.</para>
-  
-  <tip>
-   <para>Callback files for built-in modules are under
-   <filename><replaceable>war-file-name</replaceable>/config/auth/default/</filename>;
-   extension modules are stored in the OpenAM source tree.</para>
-  </tip>
   
   <example xml:id="simplified-callbacks-file">
    <title>Simplified Callbacks File</title>
