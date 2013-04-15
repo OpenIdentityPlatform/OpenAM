@@ -309,7 +309,7 @@ I. Signing
 
       a) The Attribute Query needs to be signed. Please follow the links
          below on creating a key store and using the certificate.
-         http://openam.forgerock.org/doc/admin-guide/index.html#changing-signing-key
+         http://openam.forgerock.org/doc/admin-guide/index.html#change-signing-key
          http://openam.forgerock.org/doc/dev-guide/index.html#fedlet-signing-encryption
 	 
 	 Add the certificate to the "RoleDescriptor" element as shown below
@@ -369,7 +369,7 @@ II. Signing and Encryption
 
       a) The Attribute Query needs to be signed. Please follow the links
          below on creating a key store and using the certificate.
-         http://openam.forgerock.org/doc/admin-guide/index.html#changing-signing-key
+         http://openam.forgerock.org/doc/admin-guide/index.html#change-signing-key
          http://openam.forgerock.org/doc/dev-guide/index.html#fedlet-signing-encryption
 	 
 	 Add the certificate to the "RoleDescriptor" element as shown below
@@ -517,7 +517,7 @@ II. Signing
 
    a) On the Fedlet Side, please follow the links
       below on creating a key store and using the certificate.
-      http://openam.forgerock.org/doc/admin-guide/index.html#changing-signing-key
+      http://openam.forgerock.org/doc/admin-guide/index.html#change-signing-key
       http://openam.forgerock.org/doc/dev-guide/index.html#fedlet-signing-encryption
 	 
 	 Add the certificate to the "XACMLAuthzDecisionQueryDescriptor" 

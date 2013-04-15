@@ -370,7 +370,7 @@ Portions Copyright 2012 ForgeRock AS
       e) Update the .NET Fedlet's metadata (sp.xml) to include the key
          descriptor for the signing key. Please follow the links
          below on creating a key store and using the certificate.
-         http://openam.forgerock.org/doc/admin-guide/index.html#changing-signing-key
+         http://openam.forgerock.org/doc/admin-guide/index.html#change-signing-key
          http://openam.forgerock.org/doc/dev-guide/index.html#fedlet-signing-encryption
 
          For the Windows environment, use the Certificates Snap-in for the
