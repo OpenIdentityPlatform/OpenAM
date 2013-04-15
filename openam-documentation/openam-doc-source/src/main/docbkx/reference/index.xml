@@ -37,7 +37,7 @@
   </abstract>
   <copyright>
    <year>2011-2013</year>
-   <holder>ForgeRock AS</holder>
+   <holder>ForgeRock, Inc.</holder>
   </copyright>
   <authorgroup>
    <author>
@@ -75,10 +75,11 @@
  <reference>
   <title>OpenAM Command Line Tools</title>
   <xinclude:include href='man-agentadmin-1.xml' />
+  <xinclude:include href='man-agentadmin-varnish.xml' />
   <xinclude:include href='man-ampassword-1.xml' />
   <xinclude:include href='man-amverifyarchive-1.xml' />
   <xinclude:include href='man-configurator-jar-1.xml' />
-  <xinclude:include href='../../../../target/generated-resources/man-ssoadm-1.xml' />
+  <xinclude:include href='../../../../target/generated-resources/man-ssoadm-1.xml' /> 
  </reference>
 
  <xinclude:include href="chap-config-ref.xml" />
