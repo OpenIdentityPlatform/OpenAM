@@ -81,6 +81,20 @@ public class AMKeyProvider implements KeyProvider {
                 keyStoreTypePropName, privateKeyPassFilePropName);
         mapPk2Cert();
     }
+    /**
+     * Constructor
+     * Already resolved is simply to give a different signature
+     */
+    public AMKeyProvider( boolean alreadyResolved,
+            String keyStoreFile,String keyStorePass,
+            String keyStoreType, String privateKeyPass) {
+        this.keystoreFile = keyStoreFile;
+        this.keystoreType = keyStoreType;
+        this.keystorePass = keyStorePass;
+        this.privateKeyPass = privateKeyPass;
+
+        mapPk2Cert();
+    }
 
     private void initialize(String keyStoreFilePropName, String keyStorePassFilePropName,
             String keyStoreTypePropName, String privateKeyPassFilePropName) {
@@ -166,6 +180,10 @@ public class AMKeyProvider implements KeyProvider {
             // create publickey to Certificate mapping
             for(Enumeration e=ks.aliases();e.hasMoreElements();) {
                 String alias = (String) e.nextElement ();
+                // if this is not a Private or public Key,  then continue.
+                if (ks.entryInstanceOf( alias, KeyStore.SecretKeyEntry.class)){
+                    continue;
+                }
                 Certificate cert = getCertificate(alias);
                 PublicKey pk = getPublicKey(alias);
                 String key =
