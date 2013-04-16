@@ -20,7 +20,7 @@
   !
   ! CCPL HEADER END
   !
-  !      Copyright 2011-2013 ForgeRock AS
+  !      Copyright 2011-2013 ForgeRock, Inc.
   !    
 -->
 <chapter xml:id='chap-federation'
@@ -177,8 +177,8 @@
     <para>Export the XML-based metadata from your provider to share
     with other providers in your circle of trust.</para>
     <screen>$ curl -o metadata.xml
- http://idp.example:8080/openam/saml2/jsp/exportmetadata.jsp?entityid=
- http://idp.example:8080/openam&amp;realm=/<replaceable>realm-name</replaceable></screen>
+ http://www.idp.example:8080/openam/saml2/jsp/exportmetadata.jsp?entityid=
+ http://www.idp.example:8080/openam&amp;realm=/<replaceable>realm-name</replaceable></screen>
     <para>When you have configured only the top-level realm,
     <literal>/</literal>, you can omit the query string.</para>
     <para>Alternatively, provide the URL, to other providers so they can load
@@ -219,8 +219,8 @@
     <para>Export the XML-based metadata from your provider to share
     with other providers in your circle of trust.</para>
     <screen>$ curl -o metadata.xml
- http://sp.example:8080/openam/saml2/jsp/exportmetadata.jsp?entityid=
- http://sp.example:8080/openam&amp;realm=/<replaceable>realm-name</replaceable></screen>
+ http://www.sp.example:8080/openam/saml2/jsp/exportmetadata.jsp?entityid=
+ http://www.sp.example:8080/openam&amp;realm=/<replaceable>realm-name</replaceable></screen>
     <para>When you have configured only the top-level realm,
     <literal>/</literal>, you can omit the query string.</para>
     <para>Alternatively, provide the URL, to other providers so they can load
@@ -330,12 +330,12 @@
    purpose as a separate web application.</para>
 
    <para>Browsers only send cookies for the originating domain. Therefore
-   when a browser accesses the service provider in the <literal>sp.example</literal>
+   when a browser accesses the service provider in the <literal>www.sp.example</literal>
    domain, the service provider has no way of knowing whether the user has
-   perhaps already authenticated at <literal>this-idp.example</literal> or at
-   <literal>that-idp.example</literal>. The providers therefore host an identity
+   perhaps already authenticated at <literal>www.this-idp.example</literal> or at
+   <literal>www.that-idp.example</literal>. The providers therefore host an identity
    provider discovery service in a common domain, such as
-   <literal>disco.example</literal>, and use that service to discover where
+   <literal>www.disco.example</literal>, and use that service to discover where
    the user logged in. The identity provider discover service essentially
    writes and reads cookies from the common domain. The providers configure
    their circle of trust to use the identity provider discovery service
@@ -453,7 +453,7 @@ WAR file was created.</screen>
        <listitem>
         <para>The cookie domain is the common cookie domain used in your circle
         of trust for identity provider discovery, in this case
-        <literal>.disco.example</literal>.</para>
+        <literal>www.disco.example</literal>.</para>
        </listitem>
       </varlistentry>
       <varlistentry>
@@ -1436,7 +1436,7 @@ CookieWriterServlet.doGetPost: Redirect to
      <para>Liberty Identity Federation Framework service that writes identity
      provider entity identifiers to Common Domain cookies after successful
      authentication, used in identity provider discovery. Example:
-     <literal>http://disco.example:8080/openam/idffwriter</literal>.</para>
+     <literal>http://www.disco.example:8080/openam/idffwriter</literal>.</para>
     </listitem>
    </varlistentry>
    <varlistentry>
@@ -1445,7 +1445,7 @@ CookieWriterServlet.doGetPost: Redirect to
      <para>Liberty Identity Federation Framework service that reads identity
      provider entity identifiers from Common Domain cookies, used in identity
      provider discovery. Example:
-     <literal>http://disco.example:8080/openam/transfer</literal>.</para>
+     <literal>http://www.disco.example:8080/openam/transfer</literal>.</para>
     </listitem>
    </varlistentry>
    <varlistentry>
@@ -1454,7 +1454,7 @@ CookieWriterServlet.doGetPost: Redirect to
      <para>SAML 2.0 service that writes identity provider entity identifiers
      to Common Domain cookies after successful authentication, used in identity
      provider discovery. Example:
-     <literal>http://disco.example:8080/openam/saml2writer</literal>.</para>
+     <literal>http://www.disco.example:8080/openam/saml2writer</literal>.</para>
     </listitem>
    </varlistentry>
    <varlistentry>
@@ -1462,7 +1462,7 @@ CookieWriterServlet.doGetPost: Redirect to
     <listitem>
      <para>SAML 2.0 service that reads identity provider entity identifiers
      from Common Domain cookies, used in identity provider discovery. Example:
-     <literal>http://disco.example:8080/openam/saml2reader</literal>.</para>
+     <literal>http://www.disco.example:8080/openam/saml2reader</literal>.</para>
     </listitem>
    </varlistentry>
    <varlistentry>
