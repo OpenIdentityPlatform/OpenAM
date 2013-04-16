@@ -565,7 +565,9 @@ public abstract class AbstractFlow extends ServerResource {
         if (required != null && required.length > 0) {
             StringBuilder sb = null;
             for (String s : required) {
-                if (!getRequest().getAttributes().containsKey(s)) {
+                if (!getRequest().getAttributes().containsKey(s) ||
+                     getRequest().getAttributes().get(s) == null ||
+                        ((String)getRequest().getAttributes().get(s)).isEmpty()) {
                     if (null == sb) {
                         sb = new StringBuilder("Missing parameters: ");
                     }
