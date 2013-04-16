@@ -28,6 +28,8 @@
 
 package com.sun.identity.sm;
 
+import org.forgerock.openam.network.ValidateIPaddress;
+
 import java.util.Iterator;
 import java.util.Set;
 import java.util.StringTokenizer;
@@ -71,39 +73,7 @@ public class IPAddressValidator implements ServiceAttributeValidator {
      * @return true if the IP address is valid; false otherwise
      */
     public boolean validate(String value) {
-
-        StringTokenizer tok = new StringTokenizer(value, ".");
-
-        if (tok.countTokens() != 4) {
-            return false;
-        }
-
-        while (tok.hasMoreTokens()) {
-            String ipPart = tok.nextToken();
-            if (!isValidIPPart(ipPart)) {
-                return false;
-            }
-        }
-
-        return true;
-    }
-
-    private boolean isValidIPPart(String s) {
-
-        int value;
-
-        try {
-            value = Integer.valueOf(s).intValue();
-        } catch (Exception e) {
-            return false;
-        }
-
-        // the integer value must between 0 and 255
-        if (value < 0 || value > 255) {
-            return false;
-        }
-
-        return true;
+        return ValidateIPaddress.isValidIP(value);
     }
 
 }

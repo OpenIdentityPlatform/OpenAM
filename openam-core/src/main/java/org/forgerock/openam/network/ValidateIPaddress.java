@@ -101,10 +101,10 @@ public class ValidateIPaddress {
      * @param ipAddress is the IP address that is being verified
      * @return true is the IP address is valid, false if it is not valid
      */
-    public boolean isValidIP(String ipAddress){
-        if(this.isIPv4(ipAddress)) { // check if IPv4
+    public static boolean isValidIP(String ipAddress){
+        if(ValidateIPaddress.isIPv4(ipAddress)) { // check if IPv4
             return true;
-        } else if(this.isIPv6(ipAddress)){ // check if IPv6
+        } else if(ValidateIPaddress.isIPv6(ipAddress)){ // check if IPv6
             return true;
         } else { // not an IPv4 or IPv6
             return false;
