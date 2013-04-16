@@ -135,17 +135,17 @@ public interface Condition extends Cloneable {
      */
     public static final String AUTH_SCHEME = "AuthScheme";
 
-    /** 
+    /**
      * Key that is used to specify application name
      * for the resources protected by the policy
      */
     public static final String APPLICATION_NAME = "ApplicationName";
 
-    /** 
+    /**
      * Key that is used to specify the application
      * idle time out
      */
-    public static final String APPLICATION_IDLE_TIMEOUT 
+    public static final String APPLICATION_IDLE_TIMEOUT
             = "ApplicationIdleTimeout";
 
     /** Key that is used to define the name of authentication scheme of the 
@@ -193,7 +193,7 @@ public interface Condition extends Cloneable {
      *  @see #getConditionDecision(SSOToken, Map)
      *  @see #AUTHENTICATE_TO_REALM
      */
-    public static final String REQUEST_AUTHENTICATED_TO_REALMS 
+    public static final String REQUEST_AUTHENTICATED_TO_REALMS
             = "requestAuthenticatedToRealms";
 
     /**
@@ -209,7 +209,7 @@ public interface Condition extends Cloneable {
      *
      *  @see #setProperties(Map)
      */
-    public static final String AUTHENTICATE_TO_SERVICE 
+    public static final String AUTHENTICATE_TO_SERVICE
             = "AuthenticateToService";
 
     /** Key that is used to identify the names of authentication chains
@@ -226,7 +226,7 @@ public interface Condition extends Cloneable {
      *  @see #getConditionDecision(SSOToken, Map)
      *  @see #AUTHENTICATE_TO_SERVICE
      */
-    public static final String REQUEST_AUTHENTICATED_TO_SERVICES 
+    public static final String REQUEST_AUTHENTICATED_TO_SERVICES
             = "requestAuthenticatedToServices";
 
     /** Key that is used identify the advice messages from
@@ -240,19 +240,19 @@ public interface Condition extends Cloneable {
      */
     public static final String AUTHENTICATE_TO_SERVICE_CONDITION_ADVICE
             = "AuthenticateToServiceConditionAdvice";
-    
+
     /** Key that is used identify the advice messages from
      * <code>AuthLevelCondition</code>.
      */
     public static final String AUTH_LEVEL_CONDITION_ADVICE =
             "AuthLevelConditionAdvice";
-    
+
     /** Key that is used identify the advice messages from
      * <code>AuthenticateToRealmCondition</code>
      */
     public static final String AUTHENTICATE_TO_REALM_CONDITION_ADVICE =
             "AuthenticateToRealmConditionAdvice";
-    
+
     /**
      * Following keys are used to define relevant key names for processing
      * the environment Map of an IPCondition.
@@ -265,18 +265,28 @@ public interface Condition extends Cloneable {
      * that conforms to the pattern described here. If a value is
      * defined for START_IP,  a value should also be defined for END_IP.
      *
-     * The patterns is :
+     * The patterns for IP Version 4 is :
      *    n.n.n.n
      * where n would take any integer value between 0 and 255 inclusive.
      *
-     * Some sample values are
+     * Some sample values are:
      *     122.100.85.45
      *     145.64.55.35
      *     15.64.55.35
+     *
+     * The patterns for IP Version 6 is:
+     *    x:x:x:x:x:x:x:x
+     * where x are the hexadecimal values of the eight 16-bit pieces of the address
+     *
+     * Some sample values are:
+     *      FEDC:BA98:7654:3210:FEDC:BA98:7654:3210
+     *      1080:0:0:0:8:800:200C:417A
+     *
+     * @see <a href="http://tools.ietf.org/html/rfc3513#section-2.2">RFC 3513 - Section 2.2</a>
      * @see #setProperties(Map)
      */
     public static final String START_IP = "StartIp";
-    
+
     /** Key that is used in  <code>IPCondition</code> to define the  end of 
      *  IP address range for which a policy applies. 
      * The value corresponding to the key has to be a <code>Set</code> that 
@@ -292,10 +302,20 @@ public interface Condition extends Cloneable {
      *     122.100.85.45
      *     145.64.55.35
      *     15.64.55.35
+     *
+     * The patterns for IP Version 6 is:
+     *    x:x:x:x:x:x:x:x
+     * where x are the hexadecimal values of the eight 16-bit pieces of the address
+     *
+     * Some sample values are:
+     *      FEDC:BA98:7654:3210:FEDC:BA98:7654:3210
+     *      1080:0:0:0:8:800:200C:417A
+     *
+     * @see <a href="http://tools.ietf.org/html/rfc3513#section-2.2">RFC 3513 - Section 2.2</a>
      * @see #setProperties(Map)
      */
     public static final String END_IP = "EndIp";
-    
+
     /** Key that is used in an <code>IPCondition</code> to define the  DNS 
      * name values for which a policy applies. The value corresponding to the 
      * key has to be a <code>Set</code> where each element is a <code>String
@@ -317,25 +337,33 @@ public interface Condition extends Cloneable {
      * @see #setProperties(Map)
      */
     public static final String DNS_NAME = "DnsName";
-    
-    
+
+
     /** Key that is used to define request IP address that is passed in
      * the <code>env</code> parameter while invoking
      * <code>getConditionDecision</code> method of an <code>IPCondition</code>.
      * Value for the key should be a <code>String</code> that is a string 
-     * representation of IP of the client, in the form n.n.n.n where n is a 
+     * representation of IP of the client,
+     *
+     * For IP version 4:
+     * The form is  n.n.n.n where n is a
      * value between 0 and 255 inclusive.
+     *
+     * For IP version 6:
+     * The form is x:x:x:x:x:x:x:x where x is
+     * the hexadecimal values of the eight 16-bit pieces of the address
      *
      * @see #getConditionDecision(SSOToken, Map)
      * @see #REQUEST_DNS_NAME
      */
     public static final String REQUEST_IP = "requestIp";
-    
+
     /** Key that is used to define request DNS name that is passed in
      * the <code>env</code> parameter while invoking
      * <code>getConditionDecision</code> method of an <code>IPCondition</code>.
      * Value for the key should be a set of strings representing the
-     * DNS names of the client, in the form <code>ccc.ccc.ccc</code>.
+     * DNS names of the client, in the form <code>ccc.ccc.ccc</code> for IP version 4.
+     * For IP version 6, the form would be <code>x:x:x:x:x:x:x:x</code>
      * If the <code>env</code> parameter is null or does not
      * define value for <code>REQUEST_DNS_NAME</code>,  the 
      * value for <code>REQUEST_DNS_NAME</code> is obtained 
@@ -349,7 +377,7 @@ public interface Condition extends Cloneable {
      * Following keys are used to define relevant key names for processing
      * the environment Map of a LDAPFilterCondition.
      */
-    /** 
+    /**
      *  Key that is used in a <code>LDAPFilterCondition</code> to define the 
      *  ldap filter that should  be satisfied by the ldap entry of the user 
      *  for the condition to be satisifed
@@ -411,7 +439,7 @@ public interface Condition extends Cloneable {
      * @see #END_TIME
      */
     public static final String START_TIME = "StartTime";
-    
+
     /** Key that is used in a <code>SimpleTimeCondition</code> to define the  
      * end of time range during which a policy applies.The value corresponding 
      * to the key has to be  a <code>Set</code> that has just one element which 
@@ -434,7 +462,7 @@ public interface Condition extends Cloneable {
      * @see #START_TIME
      */
     public static final String END_TIME = "EndTime";
-    
+
     /** Key that is used in a <code>SimpleTimeCondition</code> to define the  
      * start of day of week  range for which a policy applies. The value 
      * corresponding to the key has to be a <code>Set</code> that has just one 
@@ -452,7 +480,7 @@ public interface Condition extends Cloneable {
      * @see #END_DAY
      */
     public static final String START_DAY = "StartDay";
-    
+
     /** Key that is used in a <code>SimpleTimeCondition</code> to define the  
      * end of day of week  range for which a policy applies. Its defined in a 
      * <code>SimpleTimeCondition </code> associated with the policy. The value 
@@ -471,7 +499,7 @@ public interface Condition extends Cloneable {
      * @see #START_DAY
      */
     public static final String END_DAY = "EndDay";
-    
+
     /** Key that is used in a <code>SimpleTimeCondition</code> to define the  
      * start of date range for which a policy applies.
      * The value corresponding to the key has to be a <code>Set</code> that has 
@@ -492,7 +520,7 @@ public interface Condition extends Cloneable {
      * @see #END_DATE
      */
     public static final String START_DATE = "StartDate";
-    
+
     /** Key that is used in a <code>SimpleTimeCondition</code> to define the  
      * end of date range for which a policy applies.The value corresponding to 
      * the key has to be a <code>Set</code> that has just one element which is 
@@ -512,7 +540,7 @@ public interface Condition extends Cloneable {
      * @see #START_DATE
      */
     public static final String END_DATE = "EndDate";
-    
+
     /** Key that is used in a <code>SimpleTimeCondition</code> to define the  
      *  time zone basis to evaluate the policy.
      *  The value corresponding to the key
@@ -528,7 +556,7 @@ public interface Condition extends Cloneable {
      */
     public static final String ENFORCEMENT_TIME_ZONE
             = "EnforcementTimeZone";
-    
+
     /** Key that is used to define the time zone that is passed in
      *  the <code>env</code> parameter while invoking
      *  <code>getConditionDecision</code> method of a 
@@ -542,7 +570,7 @@ public interface Condition extends Cloneable {
      *  @see java.util.TimeZone
      */
     public static final String REQUEST_TIME_ZONE = "requestTimeZone";
-    
+
     /** Key that is passed in the <code>env</code> parameter while invoking
      * <code>getConditionDecision</code> method of a <code>
      * SessionPropertyCondition</code> to indicate if a case insensitive 
@@ -558,7 +586,7 @@ public interface Condition extends Cloneable {
      *  a <code>Set</code>. Each element of the <code>Set</code> should be a 
      *  String, the uuid of the <code>AMIdentity</code> objet.
      */
-    public static final String INVOCATOR_PRINCIPAL_UUID 
+    public static final String INVOCATOR_PRINCIPAL_UUID
             = "invocatorPrincipalUuid";
 
     /** Key that is used in a <code>AMIdentityMembershipCondition</code> to 
@@ -677,7 +705,7 @@ public interface Condition extends Cloneable {
      *
      * @see com.sun.identity.policy.ConditionDecision
      */
-    public ConditionDecision getConditionDecision(SSOToken token, Map env) 
+    public ConditionDecision getConditionDecision(SSOToken token, Map env)
             throws PolicyException, SSOException;
 
     /**
