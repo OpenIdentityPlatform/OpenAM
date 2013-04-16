@@ -28,6 +28,9 @@
  */
 package org.forgerock.openam.authentication.modules.adaptive;
 
+import com.googlecode.ipv6.IPv6Address;
+import com.googlecode.ipv6.IPv6AddressRange;
+import com.googlecode.ipv6.IPv6Network;
 import com.iplanet.dpro.session.service.InternalSession;
 import com.iplanet.sso.SSOException;
 import com.iplanet.sso.SSOToken;
@@ -53,6 +56,7 @@ import com.sun.identity.shared.Constants;
 import com.sun.identity.shared.datastruct.CollectionHelper;
 import com.sun.identity.shared.debug.Debug;
 import com.sun.identity.shared.encode.Hash;
+import org.forgerock.openam.network.ValidateIPaddress;
 import org.forgerock.openam.utils.ClientUtils;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
@@ -189,6 +193,12 @@ public class Adaptive extends AMLoginModule implements AMPostAuthProcessInterfac
     private String reqHeaderValue = null;
     private int reqHeaderScore = 1;
     private boolean reqHeaderInvert = false;
+    private final static String IP_V4 = "IPv4";
+    private final static String IP_V6 = "IPv6";
+    private static final String IP_Version = "IPVersion";
+    private static final String IP_START = "IPStart";
+    private static final String IP_END = "IPEnd";
+    private static final String IP_TYPE = "Type";
 
     @Override
     public void init(Subject subject, Map sharedState, Map options) {
@@ -310,6 +320,71 @@ public class Adaptive extends AMLoginModule implements AMPostAuthProcessInterfac
         }
     }
 
+    /**
+     * Checks what type of version of IP range is
+     * @param range can be a range, CIDR, or a single IP address
+     * @return map containing details about range. IPType, IPVersion,
+     * start IP and End IP is applicable
+     */
+    private Map<String, String> checkIPVersion(String range) {
+        Map<String, String> details = new HashMap<String, String>(3);
+        StringTokenizer st;
+        String ipStart, ipEnd;
+        if (range.contains("-")) {
+            debug.message("IPRange found - ");
+            st = new StringTokenizer(range, "-");
+            if(st.countTokens() != 2){
+                throw new IllegalArgumentException(range + " is not a valid range");
+            }
+            ipStart = st.nextToken();
+            ipEnd = st.nextToken();
+            if(ValidateIPaddress.isIPv4(ipStart) && ValidateIPaddress.isIPv4(ipEnd)){
+                details.put(IP_Version, IP_V4);
+                details.put(IP_TYPE, "Range");
+            } else if (ValidateIPaddress.isIPv6(ipStart) && ValidateIPaddress.isIPv6(ipEnd)){
+                details.put(IP_Version, IP_V6);
+                details.put(IP_TYPE, "Range");
+                details.put(IP_START, ipStart);
+                details.put(IP_END, ipEnd);
+            } else {
+                throw new IllegalArgumentException(range + " is not a valid range");
+            }
+        } else if (range.contains("/")) {
+            debug.message("IPRange found / ");
+            String cidr;
+            st = new StringTokenizer(range, "/");
+            if(st.countTokens() != 2){
+                throw new IllegalArgumentException("Invalid CIDR found.");
+            }
+            ipStart = st.nextToken();
+            cidr = st.nextToken();
+            if(ValidateIPaddress.isIPv4(ipStart) &&
+                    (Integer.parseInt(cidr) >= 0) && (Integer.parseInt(cidr) <= 32)){
+                details.put(IP_Version, IP_V4);
+                details.put(IP_TYPE, "CIDR");
+            } else if (ValidateIPaddress.isIPv6(ipStart) &&
+                    (Integer.parseInt(cidr) >= 0) && (Integer.parseInt(cidr) <= 128)) {
+                details.put(IP_Version, IP_V6);
+                details.put(IP_TYPE, "CIDR");
+            } else {
+                throw new IllegalArgumentException(ipStart + " is not a valid format for CIDR");
+            }
+        } else {
+            debug.message("IPRange found single IP ");
+            // check single ip range
+            if(ValidateIPaddress.isIPv4(range)){
+                details.put(IP_Version, IP_V4);
+                details.put(IP_TYPE, "Single");
+            } else if(ValidateIPaddress.isIPv6(range)){
+                details.put(IP_Version, IP_V6);
+                details.put(IP_TYPE, "Single");
+            } else {
+                throw new IllegalArgumentException(range + " is not a valid IP");
+            }
+        }
+        return details;
+    }
+
     @Override
     public Principal getPrincipal() {
         if (userUUID != null) {
@@ -329,7 +404,7 @@ public class Adaptive extends AMLoginModule implements AMPostAuthProcessInterfac
      * This relies on the Auth Failure framework with Account Lockout enabled.
      *
      * Post_Auth_Class:  Should failure count be reset if successful?
-     * 
+     *
      * Returns authFailScore if AuthFailure
      *
      * @return score achieved with this test
@@ -357,7 +432,11 @@ public class Adaptive extends AMLoginModule implements AMPostAuthProcessInterfac
      * Range can be in the form of:
      * x.x.x.x/YY
      * or
-     * x.x.x.x:y.y.y.y.
+     * x.x.x.x-y.y.y.y.
+     * or
+     * x:x:x:x:x:x:x:x/YY
+     * or
+     * x:x:x:x:x:x:x:x-y:y:y:y:y:y:y:y
      *
      * There can be multiple ranges passed in
      *
@@ -365,14 +444,59 @@ public class Adaptive extends AMLoginModule implements AMPostAuthProcessInterfac
      */
     protected int checkIPRange() {
         int retVal = 0;
-
+        String ipVersion;
+        String ipType;
+        Map<String, String> holdDetails;
         for (String nextIP : IPRangeRange) {
-            if (debug.messageEnabled()) {
-                debug.message(ADAPTIVE + ".checkIPRange: " + clientIP + " --> " + nextIP);
+
+            try {
+                holdDetails = checkIPVersion(nextIP);
+            } catch (Exception e) {
+                debug.message("IP type could not be validated." + nextIP);
+                continue;
             }
-            IPRange theRange = new IPRange(nextIP);
-            if (theRange.inRange(clientIP)) {
-                retVal = IPRangeScore;
+
+            ipVersion = holdDetails.get(IP_Version);
+            ipType = holdDetails.get(IP_TYPE);
+
+            if(ipVersion.equalsIgnoreCase(IP_V6) && ValidateIPaddress.isIPv6(clientIP)){
+                if (debug.messageEnabled()) {
+                    debug.message(ADAPTIVE + ".checkIPRange: " + clientIP + " --> " + nextIP);
+                    debug.message("IP version is: " + IP_V6);
+                    debug.message("Client IP is: " + IPv6Address.fromString(clientIP));
+                }
+                if(ipType.equalsIgnoreCase("Range")){
+                    // Do range IPv6
+                    String first = holdDetails.get(IP_START);
+                    String last = holdDetails.get(IP_END);
+                    IPv6AddressRange iPv6AddressRange = IPv6AddressRange.fromFirstAndLast(
+                            IPv6Address.fromString(first), IPv6Address.fromString(last));
+                    if(iPv6AddressRange.contains(IPv6Address.fromString(clientIP))) {
+                        retVal = IPRangeScore;
+                    }
+                } else if(ipType.equalsIgnoreCase("CIDR")){
+                    // Subnet mask ip
+                    IPv6Network iPv6Network = IPv6Network.fromString(nextIP);
+                    if(iPv6Network.contains(IPv6Address.fromString(clientIP))){
+                        retVal = IPRangeScore;
+                    }
+                } else {
+                    // treat as single ip address
+                    IPv6Address iPv6AddressNextIP = IPv6Address.fromString(nextIP);
+                    if(iPv6AddressNextIP.compareTo(IPv6Address.fromString(clientIP)) == 0){
+                        retVal = IPRangeScore;
+                    }
+                }
+            } else if(ipVersion.equalsIgnoreCase(IP_V4) && ValidateIPaddress.isIPv4(clientIP)){ // treat as IPv4
+                if (debug.messageEnabled()) {
+                    debug.message(ADAPTIVE + ".checkIPRange: " + clientIP + " --> " + nextIP);
+                    debug.message("IP version is: " + IP_V4);
+                    debug.message("Client IP is: " + IPv6Address.fromString(clientIP));
+                }
+                IPRange theRange = new IPRange(nextIP);
+                if (theRange.inRange(clientIP)) {
+                    retVal = IPRangeScore;
+                }
             }
         }
 
@@ -764,7 +888,7 @@ public class Adaptive extends AMLoginModule implements AMPostAuthProcessInterfac
     }
 
     public void onLoginSuccess(Map requestParamsMap, HttpServletRequest request,
-            HttpServletResponse response, SSOToken token)
+                               HttpServletResponse response, SSOToken token)
             throws AuthenticationException {
         Map<String, String> m = new HashMap<String, String>();
         Map<String, Set> attrMap = new HashMap<String, Set>();
@@ -835,11 +959,11 @@ public class Adaptive extends AMLoginModule implements AMPostAuthProcessInterfac
     }
 
     public void onLoginFailure(Map requestParamsMap, HttpServletRequest request,
-            HttpServletResponse response) throws AuthenticationException {
+                               HttpServletResponse response) throws AuthenticationException {
     }
 
     public void onLogout(HttpServletRequest request,
-            HttpServletResponse response, SSOToken token)
+                         HttpServletResponse response, SSOToken token)
             throws AuthenticationException {
     }
 
