@@ -1976,7 +1976,7 @@ public class CTSPersistentStore extends GeneralTaskRunnable
         Map<String, Object> filters = (Map<String, Object>) request.get("params").required().asMap().get("filter");
         Set<Map<String, Set<String>>> tokens = new HashSet<Map<String, Set<String>>>();
         StringBuilder filter;
-        if (filters == null) {
+        if (filters == null || filters.isEmpty()) {
             filter = null;
         } else {
             filter = new StringBuilder();

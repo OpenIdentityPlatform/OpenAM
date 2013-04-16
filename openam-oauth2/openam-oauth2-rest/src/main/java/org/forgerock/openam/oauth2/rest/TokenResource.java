@@ -156,7 +156,11 @@ public class TokenResource implements CollectionResourceProvider {
                 AMIdentity uid = null;
                 try {
                     uid = getUid(context);
-                    query.put("username", uid.getName());
+                    if (!uid.equals(adminUserId)){
+                        query.put("username", uid.getName());
+                    } else {
+                        query.put("username", "*");
+                    }
                 } catch (Exception e){
                     PermanentException ex = new PermanentException(401, "Unauthorized" ,e);
                     handler.handleError(ex);
@@ -167,13 +171,7 @@ public class TokenResource implements CollectionResourceProvider {
                 for (String q: queries){
                     String[] params = q.split("=");
                     if (params.length == 2){
-                        if (!params[0].equalsIgnoreCase("username")){
-                            query.put(params[0], params[1]);
-                        } else {
-                            if (uid != null && (uid.equals(adminUserId) || uid.getName().equalsIgnoreCase(params[1]))){
-                                query.put(params[0], params[1]);
-                            }
-                        }
+                        query.put(params[0], params[1]);
                     }
                 }
 
