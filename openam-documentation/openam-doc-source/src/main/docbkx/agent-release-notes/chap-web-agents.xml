@@ -39,6 +39,15 @@
 
   <itemizedlist>
    <listitem>
+    <para>A new web policy agent, Varnish, has been added. Varnish is a unique policy
+    agent that does not require the Java environment and it has a unique set of 
+    instructions for the agentadmin command. Varnish also uses a directory
+    called vmods. This is the location where you will need to handle any required
+    installation or Varnish updates, and it requires the user to have administrative 
+    rights to update this directory for changes to take effect.</para>
+   </listitem>
+
+   <listitem>
     <para>All of the web policy agents have been updated to include support for Internet
     Protocol version 6 (IPv6) support, in addition to support for IPv4. <!--include in the notes when 
     AME-1134 is closed This includes removing unused libraries.--></para>
