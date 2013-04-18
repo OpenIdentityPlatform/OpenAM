@@ -22,6 +22,10 @@
  * "Portions Copyrighted [year] [name of copyright owner]"
  */
 
+/*
+ * Portions Copyrighted 2013 ForgeRock Inc 
+ */
+
 package org.forgerock.openam.oauth2.provider.impl;
 
 import com.iplanet.sso.SSOToken;
@@ -114,8 +118,8 @@ public class ClientVerifierImpl implements ClientVerifier{
         try {
             AMIdentity ret = authenticate(clientId, clientSecret.toCharArray(), realm);
             if (ret == null){
-                OAuth2Utils.DEBUG.error("ClientVerifierImpl::Unable to verify client password: " +
-                        clientSecret);
+                OAuth2Utils.DEBUG.error("ClientVerifierImpl::Unable to verify password for: " +
+                        clientId);
                 throw OAuthProblemException.OAuthError.INVALID_CLIENT.handle(null, "Invalid client");
             } else {
                 user = new ClientApplicationImpl(ret);
