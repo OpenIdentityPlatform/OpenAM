@@ -63,8 +63,9 @@
 $ which java
 /usr/bin/java</screen>
 
-  <para>Download the Sun Web Server policy agent for your platform from the
-  <link xlink:href="http://forgerock.org/openam.html">download page</link>.
+  <para>>Go to <link xlink:href="install-guide#download-openam-software"
+  xlink:role="http://docbook.org/xlink/role/olink"><citetitle>Obtaining OpenAM Software</citetitle></link>
+  to determine which version of the agent to download and download the agent.
   Also verify the checksum of the file you download against the checksum
   posted on the download page.</para>
   
