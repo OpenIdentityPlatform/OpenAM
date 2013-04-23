@@ -1,7 +1,7 @@
 /*
  * DO NOT REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright (c) 2012 ForgeRock Inc. All rights reserved.
+ * Copyright (c) 2012-2013 ForgeRock Inc. All rights reserved.
  *
  * The contents of this file are subject to the terms
  * of the Common Development and Distribution License
@@ -90,7 +90,7 @@ public class ClientApplicationImpl implements ClientApplication{
     public Set<URI> getRedirectionURIs(){
         Set<URI> redirectionURIs = null;
         try {
-            Set<String> redirectionURIsSet = id.getAttribute(REDIRECTION_URIS);
+            Set<String> redirectionURIsSet = convertAttributeValues(id.getAttribute(REDIRECTION_URIS));
             redirectionURIs = new HashSet<URI>();
             for (String uri : redirectionURIsSet){
                 redirectionURIs.add(URI.create(uri));
@@ -137,7 +137,7 @@ public class ClientApplicationImpl implements ClientApplication{
     public Set<String> getAllowedGrantScopes(){
         Set<String> scopes = null;
         try {
-            scopes = id.getAttribute(SCOPES);
+            scopes = convertAttributeValues(id.getAttribute(SCOPES));
         } catch (Exception e){
             OAuth2Utils.DEBUG.error("ClientApplicationImpl::Unable to get allowed grant scopes from repository", e);
             throw OAuthProblemException.OAuthError.SERVER_ERROR.handle(Request.getCurrent(),
@@ -153,7 +153,7 @@ public class ClientApplicationImpl implements ClientApplication{
     public Set<String> getDefaultGrantScopes(){
         Set<String> scopes = null;
         try {
-            scopes = id.getAttribute(DEFAULT_SCOPES);
+            scopes = convertAttributeValues(id.getAttribute(DEFAULT_SCOPES));
         } catch (Exception e){
             OAuth2Utils.DEBUG.error("ClientApplicationImpl::Unable to get defualt grant scopes from repository", e);
             throw OAuthProblemException.OAuthError.SERVER_ERROR.handle(Request.getCurrent(),
@@ -187,7 +187,7 @@ public class ClientApplicationImpl implements ClientApplication{
     public Set<String> getDisplayName(){
         Set<String> displayName = null;
         try {
-            displayName = id.getAttribute(NAME);
+            displayName = convertAttributeValues(id.getAttribute(NAME));
         } catch (Exception e){
             OAuth2Utils.DEBUG.error("ClientApplicationImpl::Unable to get display name from repository", e);
             throw OAuthProblemException.OAuthError.SERVER_ERROR.handle(Request.getCurrent(),
@@ -203,7 +203,7 @@ public class ClientApplicationImpl implements ClientApplication{
     public Set<String> getDisplayDescription(){
         Set<String> displayDescription = null;
         try {
-            displayDescription = id.getAttribute(DESCRIPTION);
+            displayDescription = convertAttributeValues(id.getAttribute(DESCRIPTION));
         } catch (Exception e){
             OAuth2Utils.DEBUG.error("ClientApplicationImpl::Unable to get display decription from repository", e);
             throw OAuthProblemException.OAuthError.SERVER_ERROR.handle(Request.getCurrent(),
@@ -212,5 +212,18 @@ public class ClientApplicationImpl implements ClientApplication{
         return displayDescription;
     }
 
+    private Set<String> convertAttributeValues(Set<String> input) {
+        Set<String> result = new HashSet<String>();
+        for (String param : input) {
+            int idx = param.indexOf('=');
+            if (idx != -1) {
+                String value = param.substring(idx + 1).trim();
+                if (!value.isEmpty()) {
+                    result.add(value);
+                }
+            }
+        }
 
+        return result;
+    }
 }

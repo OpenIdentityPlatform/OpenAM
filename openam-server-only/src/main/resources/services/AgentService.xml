@@ -93,38 +93,47 @@
                     -->
                    <AttributeSchema name="com.forgerock.openam.oauth2provider.redirectionURIs"
                                      type="list"
+                                     uitype="unorderedlist"
                                      syntax="string"
                                      i18nKey="a704">
                        <DefaultValues>
-                           <Value>10</Value>
+                           <Value>[0]=</Value>
                        </DefaultValues>
                    </AttributeSchema>
                    <AttributeSchema name="com.forgerock.openam.oauth2provider.scopes"
                                      type="list"
+                                     uitype="unorderedlist"
                                      syntax="string"
                                      i18nKey="a705">
                        <DefaultValues>
+                           <Value>[0]=</Value>
                        </DefaultValues>
                    </AttributeSchema>
                    <AttributeSchema name="com.forgerock.openam.oauth2provider.defaultScopes"
                                      type="list"
+                                     uitype="unorderedlist"
                                      syntax="string"
                                      i18nKey="a708">
                        <DefaultValues>
+                           <Value>[0]=</Value>
                        </DefaultValues>
                    </AttributeSchema>
                    <AttributeSchema name="com.forgerock.openam.oauth2provider.name"
                                      type="list"
+                                     uitype="unorderedlist"
                                      syntax="string"
                                      i18nKey="a706">
                        <DefaultValues>
+                           <Value>[0]=</Value>
                        </DefaultValues>
                    </AttributeSchema>
                    <AttributeSchema name="com.forgerock.openam.oauth2provider.description"
                                      type="list"
+                                     uitype="unorderedlist"
                                      syntax="string"
                                      i18nKey="a707">
                        <DefaultValues>
+                           <Value>[0]=</Value>
                        </DefaultValues>
                    </AttributeSchema>
                    <AttributeSchema name="sunIdentityServerDeviceStatus"
