@@ -732,6 +732,10 @@ public class AuthUtils extends AuthClientUtils {
     public static boolean getPersistentCookieMode(AuthContextLocal authContext) {
         return getLoginState(authContext).getPersistentCookieMode();
     }
+
+    public static boolean isZeroPageLoginEnabled(AuthContextLocal authContext) {
+        return getLoginState(authContext).isZeroPageLoginEnabled();
+    }
     
     /* return persistent cookie */
     public static Cookie getPersistentCookieString(AuthContextLocal authContext,

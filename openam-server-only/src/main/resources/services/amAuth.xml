@@ -29,7 +29,7 @@
 -->
 
 <!--
-    Portions Copyrighted 2011 ForgeRock AS
+    Portions Copyrighted 2011-2013 ForgeRock, Inc.
 -->
 
 <!DOCTYPE ServicesConfiguration
@@ -191,6 +191,18 @@
                     </BooleanValues>
                     <DefaultValues>
                         <Value>true</Value>
+                    </DefaultValues>
+                </AttributeSchema>
+                <AttributeSchema name="openam.auth.zero.page.login.enabled"
+                    type="single"
+                    syntax="boolean"
+                    i18nKey="a152">
+                    <BooleanValues>
+                        <BooleanTrueValue i18nKey="i18nTrue">true</BooleanTrueValue>
+                        <BooleanFalseValue i18nKey="i18nFalse">false</BooleanFalseValue>
+                    </BooleanValues>
+                    <DefaultValues>
+                        <Value>false</Value>
                     </DefaultValues>
                 </AttributeSchema>
                 <AttributeSchema name="iplanet-am-auth-login-failure-lockout-mode" 

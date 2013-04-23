@@ -160,6 +160,7 @@ public class LoginState {
     boolean ignoreUserProfile = false;
     boolean createWithAlias = false;
     boolean persistentCookieMode = false;
+    boolean zeroPageLoginEnabled = false;
     /**
      * Max. cookie time in seconad. Integer range is 0 - 2147483.
      * persistentCookieOn has to be true.
@@ -736,6 +737,9 @@ public class LoginState {
             tmp = CollectionHelper.getMapAttr(
                 attrs, ISAuthConstants.PERSISTENT_COOKIE_TIME);
             persistentCookieTime = tmp;
+
+            tmp = CollectionHelper.getMapAttr(attrs, Constants.ZERO_PAGE_LOGIN_ENABLED);
+            zeroPageLoginEnabled = Boolean.valueOf(tmp);
             
             AMAuthenticationManager authManager =
             new AMAuthenticationManager(ad.getSSOAuthSession(),getOrgDN());
@@ -876,32 +880,33 @@ public class LoginState {
                 attrs, ISAuthConstants.INVALID_ATTEMPTS_DATA_ATTR_NAME);
             
             if (messageEnabled) {
-                debug.message("Getting Org Profile: " + orgDN +
-                "\nlocale->" + localeContext.getLocale() +
-                "\ncharset->" + localeContext.getMIMECharset() +
-                "\ndynamicProfileCreation->" + dynamicProfileCreation +
-                "\ndefaultAuthLevel->" + defaultAuthLevel+
-                "\norgSucessLoginURLSet->" + orgSuccessLoginURLSet+
-                "\norgFailureLoginURLSet->" + orgFailureLoginURLSet+
-                "\nclientSuccessLoginURL ->" + clientOrgSuccessLoginURL+
-                "\ndefaultSuccessLoginURL ->" + defaultOrgSuccessLoginURL+
-                "\norgPostLoginClassSet ->" + orgPostLoginClassSet +
-                "\norgAuthConfig ->" + orgAuthConfig +
-                "\norgAdminAuthConfig ->" + orgAdminAuthConfig +
-                "\nclientFailureLoginURL ->" + clientOrgFailureLoginURL+
-                "\ndefaultFailureLoginURL ->" + defaultOrgFailureLoginURL+
-                "\nenableModuleBasedAuth ->" + enableModuleBasedAuth+
-                "\nloginFailureLockoutMode->" + loginFailureLockoutMode+
-                "\nloginFailureLockoutStoreInDS->" +
-                    loginFailureLockoutStoreInDS +
-                "\nloginFailureLockoutCount->" + loginFailureLockoutCount+
-                "\nloginFailureLockoutTime->"+loginFailureLockoutTime+
-                "\nloginLockoutUserWarning->"+loginLockoutUserWarning+
-                "\nloginLockoutNotification->"+loginLockoutNotification+
-                "\ninvalidAttemptsDataAttrName->"+invalidAttemptsDataAttrName+ 
-                "\npersistentCookieMode->" + persistentCookieMode+
-                "\nidentityTypes->" + identityTypes +
-                "\naliasAttrNames ->" + aliasAttrNames);
+                debug.message("Getting Org Profile: " + orgDN
+                        + "\nlocale->" + localeContext.getLocale()
+                        + "\ncharset->" + localeContext.getMIMECharset()
+                        + "\ndynamicProfileCreation->" + dynamicProfileCreation
+                        + "\ndefaultAuthLevel->" + defaultAuthLevel
+                        + "\norgSucessLoginURLSet->" + orgSuccessLoginURLSet
+                        + "\norgFailureLoginURLSet->" + orgFailureLoginURLSet
+                        + "\nclientSuccessLoginURL ->" + clientOrgSuccessLoginURL
+                        + "\ndefaultSuccessLoginURL ->" + defaultOrgSuccessLoginURL
+                        + "\norgPostLoginClassSet ->" + orgPostLoginClassSet
+                        + "\norgAuthConfig ->" + orgAuthConfig
+                        + "\norgAdminAuthConfig ->" + orgAdminAuthConfig
+                        + "\nclientFailureLoginURL ->" + clientOrgFailureLoginURL
+                        + "\ndefaultFailureLoginURL ->" + defaultOrgFailureLoginURL
+                        + "\nenableModuleBasedAuth ->" + enableModuleBasedAuth
+                        + "\nloginFailureLockoutMode->" + loginFailureLockoutMode
+                        + "\nloginFailureLockoutStoreInDS->"
+                        + loginFailureLockoutStoreInDS
+                        + "\nloginFailureLockoutCount->" + loginFailureLockoutCount
+                        + "\nloginFailureLockoutTime->" + loginFailureLockoutTime
+                        + "\nloginLockoutUserWarning->" + loginLockoutUserWarning
+                        + "\nloginLockoutNotification->" + loginLockoutNotification
+                        + "\ninvalidAttemptsDataAttrName->" + invalidAttemptsDataAttrName
+                        + "\npersistentCookieMode->" + persistentCookieMode
+                        + "\nzeroPageLoginEnabled->" + zeroPageLoginEnabled
+                        + "\nidentityTypes->" + identityTypes
+                        + "\naliasAttrNames ->" + aliasAttrNames);
             }
         } catch (AuthException ae) {
             debug.error("Error in populateOrgProfile", ae);
@@ -3164,6 +3169,15 @@ public class LoginState {
      */
     public boolean getPersistentCookieMode() {
         return persistentCookieMode;
+    }
+
+    /**
+     * Tells whether zero page login is enabled
+     *
+     * @return <code>true</code> if zero page login is enabled
+     */
+    public boolean isZeroPageLoginEnabled() {
+        return zeroPageLoginEnabled;
     }
 
     void setToken(String token) {

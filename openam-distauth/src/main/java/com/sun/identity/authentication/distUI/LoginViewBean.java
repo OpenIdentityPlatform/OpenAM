@@ -799,8 +799,8 @@ extends com.sun.identity.authentication.UI.AuthViewBeanBase {
     }
     
     private void setOnePageLogin() {
-        if (!bAuthLevel) {
-        // Auth Level login will never do one page login.
+        if (!bAuthLevel && SystemProperties.getAsBoolean(Constants.ZERO_PAGE_LOGIN_ENABLED)) {
+            // Auth Level login will never do one page login.
             parseUserCredentials();
 
             if (credentials != null) {

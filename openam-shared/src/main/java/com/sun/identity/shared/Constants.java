@@ -1242,4 +1242,9 @@ public interface Constants {
      */
     public static final String CONFIG_STORE_DOWN_REDIRECT_URL =
         "openam.configstore.down.redirect.url";
+
+    /**
+     * System property/service attribute name for CAS/DAS that should tell whether Zero Page Login is enabled or not.
+     */
+    public static final String ZERO_PAGE_LOGIN_ENABLED = "openam.auth.zero.page.login.enabled";
 }

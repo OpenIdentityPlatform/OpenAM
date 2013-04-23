@@ -1043,7 +1043,8 @@ public class LoginViewBean extends AuthViewBeanBase {
                     }
                 }
                 
-                if (onePageLogin) { // user input login info in URL
+                if (onePageLogin && AuthUtils.isZeroPageLoginEnabled(ac)) {
+                    // user input login info in URL
                     loginDebug.message("User input login information in URL!");
                     processLoginDisplay();
                 } else {
