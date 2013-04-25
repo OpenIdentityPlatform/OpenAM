@@ -343,8 +343,6 @@ $ ./agentadmin</screen>
       <screen>varnished -u root -F -T localhost:8080 -f
   /path/to/web_agents/varnish/instances/agent_1/config/am.vcl
   -a :80 -s malloc,50M</screen>
-   </listitem>
-
     </step>
     <step>
      <para>Start Varnish.</para>
