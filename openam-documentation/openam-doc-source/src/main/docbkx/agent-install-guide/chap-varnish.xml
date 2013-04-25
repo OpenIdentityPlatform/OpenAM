@@ -37,10 +37,11 @@
  
  <para>Varnish is unlike the other policy agents supported for OpenAM. It does
  not require the Java environment necessary for the other policy agents, and it has
- a unique set of instructions for the agentadmin command. Varnish also uses a directory
+ a unique set of instructions for the agentadmin command. Varnish uses a directory
  called vmods. This is the location where you will need to handle any required
  installation or Varnish updates, and it requires the user to have administrative 
- rights to update this directory for changes to take effect.</para>
+ rights to update this directory for changes to take effect. You can also configure
+ your Varnish instance using the Varnish Configuration Language (VCL) file.</para>
  
  <section xml:id="before-varnish-agent-install">
   <title>Before You Install</title>
@@ -166,7 +167,7 @@
     </procedure>
 
     <procedure xml:id="create-varnish-agent-pwdfile">
-     <title>To Create the Password File</title>
+     <title>To Create the Password File for Customized Installations</title>
    
      <step>
       <para>Create a text file containing only the password.</para>
@@ -263,11 +264,11 @@ $ ./agentadmin</screen>
     the agent configuration results. Verify the information. Click F4 when you
     are done.</para>
     <screen>Agent configuration results:
- OpenAM URL: http://openam.example.com:18080/openam
+ OpenAM URL: http://openam.example.com:8080/openam
   Agent URL: http://website.example.com
     Profile: webagent
  WebServer configuration:
-  /opt/webagent/web_agents/varnish/bin/..instances/agent_1/config/am.vcl</screen>
+  /opt/webagent/web_agents/varnish/bin/instances/agent_1/config/am.vcl</screen>
    </step>
    <step>
     <para>Encrypt the password if you want additional security.</para>
@@ -286,7 +287,7 @@ $ ./agentadmin</screen>
     <para>Each agent instance that you install on the system has its own
     numbered configuration and logs directory. The first agent's configuration
     and logs are thus located under the directory
-    <filename>/path/to/web_agents/varnish/instance/agent_1/</filename>.</para>
+    <filename>/path/to/web_agents/varnish/instances/agent_1/</filename>.</para>
     <variablelist>
      <varlistentry>
       <term><filename>config/OpenAMAgentBootstrap.properties</filename></term>
@@ -326,10 +327,29 @@ $ ./agentadmin</screen>
        the / to the path to your policy agent profile. This allows the policy agent
        to properly identify itself to the OpenAM server. </para>
     </step>
-   <step>
-    <para>Stop Varnish.</para>
-    <screen>$ sudo service varnish start</screen>
-   </step>
+    <step>
+     <para>Setup the port and host on the backend by updating the following lines.
+     Make sure to supply the information for your port and host.</para>
+     <screen>$ vi /path/to/web_agents/varnish/instances/agent_1/config/am.vcl
+ import am;
+ backend default {
+ .host = "127.0.0.1";
+ .port = "8080";
+ }</screen>
+    </step>
+    <step>
+     <para>Before you start Varnish, you can modify the VCL file to load new
+     scripts.</para>
+      <screen>varnished -u root -F -T localhost:8080 -f
+  /path/to/web_agents/varnish/instances/agent_1/config/am.vcl
+  -a :80 -s malloc,50M</screen>
+   </listitem>
+
+    </step>
+    <step>
+     <para>Start Varnish.</para>
+     <screen>$ sudo service varnish start</screen>
+    </step>
 
   </procedure>
   <procedure xml:id="check-varnish-agent-installation">
@@ -338,17 +358,17 @@ $ ./agentadmin</screen>
    <step>
     <para>Check the Varnish error log after you start the server to make
     sure startup completed successfully.</para>
-    <screen>$ tail -n 2 <filename>/path/to/web_agents/varnish/instance/agent_1/error_log</filename>
+    <screen>$ tail -n 2 <filename>/path/to/web_agents/varnish/instances/agent_1/error_log</filename>
 [Sat Mar 30 13:28:16 2013] [notice] Policy web agent shared memory conf...
  - resuming normal operations</screen>
    </step>
    <step>
     <para>Check the <filename>amAgent</filename> debug log to verify that
     no errors occurred on startup.</para>
-    <screen>$ tail /path/to/web_agents/apache22_agent/Agent_001/logs/debug/amAgent
+    <screen>$ tail /path/to/web_agents/varnish/instances/agent_1/debug/amAgent
 2011-09-03 13:28:16.971    -1 32686:9daae60 all: ==============...=====
 2011-09-03 13:28:16.972    -1 32686:9daae60 all: Version: ...
-2011-09-03 13:28:16.972    -1 32686:9daae60 all: 
+2011-09-03 13:28:16.972    -1 32686:9daae60 all: Revision
 2011-09-03 13:28:16.972    -1 32686:9daae60 all: Build Date: ...
 2011-09-03 13:28:16.972    -1 32686:9daae60 all: Build Machine: ..forgerock.com
 2011-09-03 13:28:16.972    -1 32686:9daae60 all: ==============...=====</screen>
@@ -374,7 +394,7 @@ $ ./agentadmin</screen>
   properly loaded when Varnish is started.</para>
   
   <itemizedlist>
-   <para>You can use the following command for customizing your Varnish policy
+   <para>You can use the following commands for customizing your Varnish policy
    agent.</para>
    <listitem>
     <para><literal>agentadmin -l</literal></para>
