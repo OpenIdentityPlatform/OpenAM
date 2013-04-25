@@ -1,7 +1,7 @@
 /*
  * DO NOT REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright (c) 2012 ForgeRock Inc. All rights reserved.
+ * Copyright (c) 2012-2013 ForgeRock Inc. All rights reserved.
  *
  * The contents of this file are subject to the terms
  * of the Common Development and Distribution License
@@ -22,10 +22,6 @@
  * "Portions copyright [year] [name of copyright owner]"
  */
 
-/**
- * Portions copyright 2012-2013 ForgeRock Inc
- */
-
 package org.forgerock.openam.oauth2;
 
 import java.net.URI;
@@ -42,6 +38,7 @@ import org.forgerock.restlet.ext.openam.server.OpenAMServletAuthenticator;
 import org.restlet.Application;
 import org.restlet.Context;
 import org.restlet.Restlet;
+import org.restlet.data.MediaType;
 import org.restlet.routing.Router;
 import org.restlet.security.Verifier;
 
@@ -51,6 +48,12 @@ import org.restlet.security.Verifier;
 public class OAuth2Application extends Application {
 
     private URI redirectURI = null;
+
+    public OAuth2Application(){
+        getMetadataService().setEnabled(true);
+        getMetadataService().setDefaultMediaType(MediaType.APPLICATION_JSON);
+        setStatusService(new OAuth2StatusService());
+    }
 
     @Override
     public Restlet createInboundRoot() {
