@@ -20,7 +20,7 @@
   !
   ! CCPL HEADER END
   !
-  !      Copyright 2011-2012 ForgeRock AS
+  !      Copyright 2011-2013 ForgeRock, Inc.
   !    
 -->
 <chapter xml:id='chap-session-failover'
@@ -79,9 +79,11 @@
   <title>Configure First OpenAM Instance Behind a Load Balancer</title>
   
   <para>Before you set up SFO, first configure OpenAM in a site
-  configuration with a load balancer as the entry point to the site. However, 
-  you may already have a working instance before realizing that multiple 
-  instances are necessary. The following steps walk you through setting
+  configuration with a load balancer as the entry point to the site. The most 
+  expedient way to configure the site is to set it up during the initial OpenAM
+  configuration, where OpenAM can manage and replicate server configuration for 
+  availability. However, you may already have a working instance before realizing that 
+  multiple instances are necessary. The following steps walk you through setting
   up the load balancer for the first instance.</para>
   
   <step>
@@ -147,6 +149,43 @@
   </step>
  </procedure>
  
+ <procedure>
+  <title>Configuring Session Failover after Installation</title>
+  
+  <itemizedlist>
+  <para>Deploying OpenAM session failover requires two components:</para>
+   <listitem>
+    <para>At least two instances of OpenAM running on different host servers</para>
+   </listitem>
+   <listitem>
+    <para>The instances configured as a site</para>
+   </listitem>
+  </itemizedlist>
+  
+  <note>
+   <para>If these are not setup before you begin the process, the New... button will
+   be greyed out.</para>
+  </note>
+    
+  <para>The following steps walk you through configuring an additional instance.</para>
+  <step> 
+   <para>In the OpenAM console for one of the servers in the site, select
+   Configuration &gt; Global &gt; Session &gt; and New... for the Secondary 
+   Configuration Instance.</para>
+  </step>
+  <step>
+   <para>Provide the information to create the Secondary Configuration Instance:</para>
+   <screen>Session Store User: openamuser
+ Session Store Password: cangetin
+ Session Store Password (confirm): cangetin
+ Maximum Wait Time: 1000
+ Database URL: openam.example.com:8080,openam.example.com:28080
+ Session Failover Enabled: (True)Enabled</screen>
+  </step>
+  <step>
+   <para>Save your changes.</para>
+  </step>
+ </procedure>
  <!--
  <procedure xml:id="prepare-site-session-data-service">
   <title>To Prepare the Session Data Service</title>
