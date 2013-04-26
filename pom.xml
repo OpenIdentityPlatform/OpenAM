@@ -289,20 +289,6 @@
         </developer>
 
         <developer>
-            <id>jeff.schenk</id>
-            <name>Jeff Schenk</name>
-            <email>jeff.schenk@forgerock.com</email>
-            <url>http://www.forgerock.com/</url>
-            <organization>ForgeRock US</organization>
-            <organizationUrl>http://www.forgerock.com</organizationUrl>
-            <roles>
-                <role>Build Master</role>
-                <role>Senior Software Development Engineer</role>
-                <role>Support Staff</role>
-            </roles>
-        </developer>
-
-        <developer>
             <id>jason.lemay</id>
             <name>Jason Lemay</name>
             <email>jason.lemay@forgerock.com</email>
