@@ -38,6 +38,28 @@
   <title>Major New Features</title>
 
   <listitem>
+   <para>The zero page login has been modified so that administrators can disable the
+   functionality. The zero page login process is the ability of the user to login
+   using only GET parameters, which presents a possible security issue. Zero page 
+   login is nowdisabled by default.</para>
+  </listitem>
+
+  <listitem>
+   <para>REST Authentication Service has been updated to handle Integrated Windows
+   Authentication. A new endpoint has been created, 
+   <filename>http://&lt;OpenAM Host&gt;:&lt;Port&gt;/&lt;deploy_uri&gt;/json/auth/1/authenticate</filename>.</para>
+  </listitem>
+
+  <listitem>
+   <para>The policy tree index has been updated so that resources first check the root
+   level of a realm first. The tree will be created from this level, and any subsequent
+   referrals will create another tree specific to the realm where the referral was
+   retrieved. This conserves memory and reduces the amount of time required to load
+   the tree. An intelligent indexing model now assists with quickly identifying relevant
+   policy rules for the resource being authorized.</para>
+  </listitem>
+
+  <listitem>
    <para>Users and realms can be created, read, edited, and deleted using an 
    HTTP POST of the JSON representation. See <link
    xlink:href="dev-guide#rest-api-crud-identity"
