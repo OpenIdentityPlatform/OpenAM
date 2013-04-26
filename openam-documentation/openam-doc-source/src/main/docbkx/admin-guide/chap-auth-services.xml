@@ -20,7 +20,7 @@
   !
   ! CCPL HEADER END
   !
-  !      Copyright 2011-2013 ForgeRock AS
+  !      Copyright 2011-2013 ForgeRock, Inc.
   !    
 -->
 <chapter xml:id='chap-auth-services'
@@ -1589,6 +1589,17 @@
       <literal>iplanet-am-auth-valid-goto-domains</literal></para>
      </listitem>
     </varlistentry>
+    <varlistentry>
+     <term>Zero Page Login</term>
+     <listitem>
+      <para>Enables the administrator to allow users to authenticate to a single
+      authentication screen using GET request parameters. Enable this with 
+      caution as it can allow credentials to be cached.</para>
+      <para><command>ssoadm</command> attribute:
+      <literal>openam.auth.zero.page.login.enabled</literal></para>
+     </listitem>
+    </varlistentry>
+
     <varlistentry>
      <term>Default Authentication Level</term>
      <listitem>
