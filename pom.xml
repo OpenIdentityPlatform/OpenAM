@@ -186,6 +186,7 @@
     <!-- Build order will be determined by the Maven Reactor. -->
     <modules>
 
+        <module>openam-ldap-utils</module>
         <!-- OpenAM Locale - Common Module -->
         <module>openam-locale</module>
 
@@ -661,6 +662,11 @@
             <dependency>
                 <groupId>org.forgerock.openam</groupId>
                 <artifactId>openam-dashboard</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.forgerock.openam</groupId>
+                <artifactId>openam-ldap-utils</artifactId>
                 <version>${project.version}</version>
             </dependency>
             <dependency>
