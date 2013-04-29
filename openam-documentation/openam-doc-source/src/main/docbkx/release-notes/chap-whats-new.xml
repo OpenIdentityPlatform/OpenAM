@@ -41,7 +41,7 @@
    <para>The zero page login has been modified so that administrators can disable the
    functionality. The zero page login process is the ability of the user to login
    using only GET parameters, which presents a possible security issue. Zero page 
-   login is nowdisabled by default.</para>
+   login is now disabled by default.</para>
   </listitem>
 
   <listitem>
