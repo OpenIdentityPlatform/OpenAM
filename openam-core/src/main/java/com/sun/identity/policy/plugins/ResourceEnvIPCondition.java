@@ -27,7 +27,7 @@
  */
 
 /*
- * Portions Copyrighted 2011 ForgeRock Inc
+ * Portions Copyrighted 2011-2013 ForgeRock Inc
  * Portions Copyrighted 2012 Open Source Solution Technology Corporation
  */
 package com.sun.identity.policy.plugins;
@@ -45,6 +45,8 @@ import java.util.HashSet;
 import java.util.ResourceBundle;
 import java.security.AccessController;
 
+import com.googlecode.ipv6.IPv6Address;
+import com.googlecode.ipv6.IPv6AddressRange;
 import com.sun.identity.policy.interfaces.Condition;
 import com.sun.identity.policy.ConditionDecision;
 import com.sun.identity.policy.PolicyException;
@@ -62,6 +64,7 @@ import com.sun.identity.authentication.config.AMConfigurationException;
 import com.sun.identity.shared.debug.Debug;
 import com.sun.identity.shared.locale.AMResourceBundleCache;
 import com.sun.identity.security.AdminTokenAction;
+import org.forgerock.openam.utils.ValidateIPaddress;
 
 
 /**
@@ -1136,9 +1139,21 @@ public class ResourceEnvIPCondition implements Condition {
                                 }
                             }
                         }
-        
-                        long requestIp = stringToIp(strIP);
-                        
+
+                        long requestIpV4 = 0;
+                        IPv6Address requestIpV6 = null;
+                        if(ValidateIPaddress.isIPv4(strIP)){
+                            requestIpV4 = stringToIp(strIP);
+                        } else if (ValidateIPaddress.isIPv6(strIP)){
+                            requestIpV6 = IPv6Address.fromString(strIP);
+                        } else {
+                            if ( DEBUG.messageEnabled()) {
+                                DEBUG.message("ResourceEnvIPCondition:getAdviceStrForEnv invalid strIP : "
+                                        + strIP);
+                            }
+                            continue;
+                        }
+
                         int bIndex = envParamValue.indexOf("[");
                         int lIndex = envParamValue.indexOf("]");
                         String ipVal = 
@@ -1160,23 +1175,45 @@ public class ResourceEnvIPCondition implements Condition {
                                 endIp = stIP.nextToken();
                             }
 
-                            long lStartIP = stringToIp(startIp);
-                            long lEndIP = stringToIp(endIp);
-
-                            if ( (requestIp >= lStartIP) && 
-                                ( requestIp <= lEndIP) ) {
-                                adviceStr = (String) adviceList.get(i);
-                                break;
+                            if(ValidateIPaddress.isIPv4(strIP) &&
+                                    ValidateIPaddress.isIPv4(startIp) && ValidateIPaddress.isIPv4(endIp)){
+                                long lStartIP = stringToIp(startIp);
+                                long lEndIP = stringToIp(endIp);
+                                if ( (requestIpV4 >= lStartIP) &&
+                                        ( requestIpV4 <= lEndIP) ) {
+                                    adviceStr = (String) adviceList.get(i);
+                                    break;
+                                }
+                            } else if (ValidateIPaddress.isIPv6(strIP) &&
+                                    ValidateIPaddress.isIPv6(startIp) && ValidateIPaddress.isIPv6(endIp)){
+                                IPv6AddressRange ipv6Range = IPv6AddressRange.fromFirstAndLast(
+                                        IPv6Address.fromString(startIp),IPv6Address.fromString(endIp));
+                                if(requestIpV6 != null && ipv6Range.contains(requestIpV6)) {
+                                    adviceStr = (String) adviceList.get(i);
+                                    break;
+                                }
+                            } else {
+                                String args[] = { strIP };
+                                throw new PolicyException(ResBundleUtils.rbName,
+                                        "invalid_property_value", args, null);
                             }
 
-                        } else if (ipVal.contains(".")) {
+                        } else if (requestIpV4 != 0 && ValidateIPaddress.isIPv4(ipVal)) {
                             long longIp = stringToIp(ipVal);
-                            if (requestIp == longIp) {
+                            if (requestIpV4 == longIp) {
                                 adviceStr = (String) adviceList.get(i);
                                 break;
                             }
+                        } else if (requestIpV6 != null && ValidateIPaddress.isIPv6(ipVal)) {
+                            // treat as single ip address
+                            IPv6Address iPv6AddressIpVal = IPv6Address.fromString(ipVal);
+                            if(iPv6AddressIpVal.compareTo(requestIpV6) == 0){
 
-                        } else if (ipVal.contains("*")) {
+                                adviceStr = (String) adviceList.get(i);
+                                break;
+                            }
+                        }
+                        else if (ipVal.contains("*")) {
                             adviceStr = (String) adviceList.get(i);
                             break;
                         } else {

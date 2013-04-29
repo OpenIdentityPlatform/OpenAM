@@ -40,7 +40,7 @@ import com.sun.identity.policy.Syntax;
 import com.iplanet.sso.SSOToken;
 import com.iplanet.sso.SSOException;
 import com.sun.identity.shared.debug.Debug;
-import org.forgerock.openam.network.ValidateIPaddress;
+import org.forgerock.openam.utils.ValidateIPaddress;
 
 import java.util.ArrayList;
 import java.util.HashMap;

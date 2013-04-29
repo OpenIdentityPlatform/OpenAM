@@ -1,7 +1,7 @@
 /**
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright (c) 2011-2012 ForgeRock AS. All Rights Reserved
+ * Copyright (c) 2011-2013 ForgeRock AS. All Rights Reserved
  *
  * The contents of this file are subject to the terms
  * of the Common Development and Distribution License
@@ -46,9 +46,9 @@ public class IPRange {
         String s1 = null;
         String s2 = null;
 
-        if (range.contains(":")) {
+        if (range.contains("-")) {
             debug.message("IPRange found : ");
-            st = new StringTokenizer(range, ":");
+            st = new StringTokenizer(range, "-");
             if (st.hasMoreTokens()) {
                 s1 = (String) st.nextToken();
                 s2 = (String) st.nextToken();
@@ -84,7 +84,7 @@ public class IPRange {
     @Override
     public String toString() {
         String retVal = "";
-        retVal = Long.toHexString(low) + ":" + Long.toHexString(high);
+        retVal = Long.toHexString(low) + "-" + Long.toHexString(high);
         return retVal;
     }
 

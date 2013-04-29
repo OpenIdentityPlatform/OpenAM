@@ -45,9 +45,9 @@ public class IPv4AddressRange {
         String s1 = null;
         String s2 = null;
 
-        if (range.contains(":")) {
+        if (range.contains("-")) {
             debug.message("IPRange found : ");
-            st = new StringTokenizer(range, ":");
+            st = new StringTokenizer(range, "-");
             if (st.hasMoreTokens()) {
                 s1 = (String) st.nextToken();
                 s2 = (String) st.nextToken();

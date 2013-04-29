@@ -26,6 +26,10 @@
  *
  */
 
+/*
+ * Portions Copyrighted 2013 ForgeRock, Inc.
+ */
+
 package com.sun.identity.setup;
 
 import com.sun.identity.common.DNUtils;
@@ -47,7 +51,7 @@ import java.util.Set;
 import java.util.StringTokenizer;
 import com.sun.identity.shared.ldap.LDAPDN;
 import com.sun.identity.shared.ldap.util.DN;
-import org.forgerock.openam.network.ValidateIPaddress;
+import org.forgerock.openam.utils.ValidateIPaddress;
 
 /**
  * This class holds the default values of service schema.

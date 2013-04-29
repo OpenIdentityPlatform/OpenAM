@@ -1,7 +1,7 @@
 /**
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright (c) 2011 ForgeRock AS. All Rights Reserved
+ * Copyright (c) 2011-2013 ForgeRock Inc. All Rights Reserved
  *
  * The contents of this file are subject to the terms
  * of the Common Development and Distribution License
@@ -23,9 +23,6 @@
  *
  */
 
-/*
- * Portions Copyrighted 2013 ForgeRock, Inc.
- */
 package org.forgerock.openam.authentication.modules.adaptive;
 
 import com.googlecode.ipv6.IPv6Address;
@@ -56,7 +53,7 @@ import com.sun.identity.shared.Constants;
 import com.sun.identity.shared.datastruct.CollectionHelper;
 import com.sun.identity.shared.debug.Debug;
 import com.sun.identity.shared.encode.Hash;
-import org.forgerock.openam.network.ValidateIPaddress;
+import org.forgerock.openam.utils.ValidateIPaddress;
 import org.forgerock.openam.utils.ClientUtils;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;

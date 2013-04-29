@@ -21,7 +21,7 @@
  * your own identifying information:
  * "Portions Copyrighted [year] [name of copyright owner]"
  */
-package org.forgerock.openam.network;
+package org.forgerock.openam.utils;
 
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;

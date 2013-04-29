@@ -31,7 +31,7 @@ import com.iplanet.sso.SSOToken;
 import com.sun.identity.policy.*;
 import com.sun.identity.policy.interfaces.Condition;
 import com.sun.identity.shared.debug.Debug;
-import org.forgerock.openam.network.ValidateIPaddress;
+import org.forgerock.openam.utils.ValidateIPaddress;
 
 import java.util.*;
 

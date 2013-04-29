@@ -28,7 +28,7 @@
 
 package com.sun.identity.sm;
 
-import org.forgerock.openam.network.ValidateIPaddress;
+import org.forgerock.openam.utils.ValidateIPaddress;
 
 import java.util.Iterator;
 import java.util.Set;
