@@ -328,8 +328,8 @@ $ ./agentadmin</screen>
        to properly identify itself to the OpenAM server. </para>
     </step>
     <step>
-     <para>Setup the port and host on the backend by updating the following lines.
-     Make sure to supply the information for your port and host.</para>
+     <para>Setup the backend by updating the following lines in the VLC script.
+     Make sure port and host are set correctly.</para>
      <screen>$ vi /path/to/web_agents/varnish/instances/agent_1/config/am.vcl
  import am;
  backend default {
@@ -338,15 +338,10 @@ $ ./agentadmin</screen>
  }</screen>
     </step>
     <step>
-     <para>Before you start Varnish, you can modify the VCL file to load new
-     scripts.</para>
-      <screen>varnished -u root -F -T localhost:8080 -f
-  /path/to/web_agents/varnish/instances/agent_1/config/am.vcl
-  -a :80 -s malloc,50M</screen>
-    </step>
-    <step>
-     <para>Start Varnish.</para>
-     <screen>$ sudo service varnish start</screen>
+     <para>Start Varnish with the following command. It will also load the 
+     VLC script.</para>
+      <screen>varnishd -u root -F -T localhost:8080 -f
+  /path/to/web_agents/varnish/instances/agent_1/config/am.vcl -a :80 -s malloc,50M</screen>
     </step>
 
   </procedure>
@@ -363,10 +358,10 @@ $ ./agentadmin</screen>
    <step>
     <para>Check the <filename>amAgent</filename> debug log to verify that
     no errors occurred on startup.</para>
-    <screen>$ tail /path/to/web_agents/varnish/instances/agent_1/debug/amAgent
+    <screen>$ tail /path/to/web_agents/varnish/instances/agent_1/logs/debug/amAgent
 2011-09-03 13:28:16.971    -1 32686:9daae60 all: ==============...=====
 2011-09-03 13:28:16.972    -1 32686:9daae60 all: Version: ...
-2011-09-03 13:28:16.972    -1 32686:9daae60 all: Revision
+2011-09-03 13:28:16.972    -1 32686:9daae60 all: Revision: ...
 2011-09-03 13:28:16.972    -1 32686:9daae60 all: Build Date: ...
 2011-09-03 13:28:16.972    -1 32686:9daae60 all: Build Machine: ..forgerock.com
 2011-09-03 13:28:16.972    -1 32686:9daae60 all: ==============...=====</screen>
