@@ -26,8 +26,6 @@ package org.forgerock.openam.oauth2.provider.impl;
 
 import com.iplanet.sso.SSOToken;
 import com.sun.identity.idm.*;
-import com.sun.identity.idm.server.IdServicesProviderImpl;
-import com.sun.identity.idsvcs.*;
 import com.sun.identity.security.AdminTokenAction;
 import com.sun.identity.shared.OAuth2Constants;
 import com.sun.identity.sm.ServiceConfig;
@@ -55,7 +53,7 @@ public class ScopeImpl implements Scope {
     @Override
     public Set<String> scopeToPresentOnAuthorizationPage(Set<String> requestedScope, Set<String> availableScopes, Set<String> defaultScopes){
 
-        if (requestedScope == null){
+        if (requestedScope == null || requestedScope.isEmpty()) {
             return defaultScopes;
         }
 
@@ -70,7 +68,7 @@ public class ScopeImpl implements Scope {
     @Override
     public Set<String> scopeRequestedForAccessToken(Set<String> requestedScope, Set<String> availableScopes, Set<String> defaultScopes){
 
-        if (requestedScope == null){
+        if (requestedScope == null || requestedScope.isEmpty()) {
             return defaultScopes;
         }
 
@@ -88,8 +86,8 @@ public class ScopeImpl implements Scope {
                                                      Set<String> allScopes,
                                                      Set<String> defaultScopes){
 
-        if (requestedScope == null){
-            return defaultScopes;
+        if (requestedScope == null || requestedScope.isEmpty()) {
+            return availableScopes;
         }
 
         Set<String> scopes = new HashSet<String>(availableScopes);
