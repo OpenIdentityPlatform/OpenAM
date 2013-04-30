@@ -351,9 +351,9 @@ $ ./agentadmin</screen>
    <step>
     <para>Check the Varnish error log after you start the server to make
     sure startup completed successfully.</para>
-    <screen>$ tail -n 2 <filename>/path/to/web_agents/varnish/instances/agent_1/error_log</filename>
+<!--    <screen>$ tail -n 2 <filename>/path/to/web_agents/varnish/instances/agent_1/error_log</filename>
 [Sat Mar 30 13:28:16 2013] [notice] Policy web agent shared memory conf...
- - resuming normal operations</screen>
+ - resuming normal operations</screen> -->
    </step>
    <step>
     <para>Check the <filename>amAgent</filename> debug log to verify that
