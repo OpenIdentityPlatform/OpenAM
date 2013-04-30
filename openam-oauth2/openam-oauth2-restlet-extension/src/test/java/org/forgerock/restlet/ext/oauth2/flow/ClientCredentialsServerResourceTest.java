@@ -1,7 +1,7 @@
 /*
  * DO NOT REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright (c) 2012 ForgeRock Inc. All rights reserved.
+ * Copyright (c) 2012-2013 ForgeRock Inc. All rights reserved.
  *
  * The contents of this file are subject to the terms
  * of the Common Development and Distribution License
@@ -34,7 +34,7 @@ import org.fest.assertions.Condition;
 import org.fest.assertions.MapAssert;
 import com.sun.identity.shared.OAuth2Constants;
 import org.forgerock.restlet.ext.oauth2.consumer.BearerOAuth2Proxy;
-import org.forgerock.restlet.ext.oauth2.consumer.BearerToken;
+import org.forgerock.openam.oauth2.model.BearerToken;
 import org.restlet.Request;
 import org.restlet.Response;
 import org.restlet.data.*;

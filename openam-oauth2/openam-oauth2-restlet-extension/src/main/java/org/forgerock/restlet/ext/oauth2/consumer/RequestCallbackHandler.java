@@ -1,7 +1,7 @@
 /*
  * DO NOT REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright (c) 2012 ForgeRock Inc. All rights reserved.
+ * Copyright (c) 2012-2013 ForgeRock Inc. All rights reserved.
  *
  * The contents of this file are subject to the terms
  * of the Common Development and Distribution License
@@ -19,7 +19,7 @@
  * If applicable, add the following below the CDDL Header,
  * with the fields enclosed by brackets [] replaced by
  * your own identifying information:
- * "Portions Copyrighted [2012] [ForgeRock Inc]"
+ * "Portions Copyrighted [year] [name of company]"
  */
 
 package org.forgerock.restlet.ext.oauth2.consumer;
@@ -27,6 +27,7 @@ package org.forgerock.restlet.ext.oauth2.consumer;
 import java.util.Collection;
 import java.util.Set;
 
+import org.forgerock.openam.oauth2.model.CoreToken;
 import org.forgerock.openam.oauth2.utils.OAuth2Utils;
 import org.restlet.Request;
 import org.restlet.data.Parameter;
@@ -39,7 +40,7 @@ import org.restlet.util.Series;
  * Used by the demo application.
  *
  */
-public interface RequestCallbackHandler<T extends AbstractAccessToken> {
+public interface RequestCallbackHandler<T extends CoreToken> {
 
     public T popAccessToken(Request request);
 

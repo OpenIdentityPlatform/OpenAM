@@ -1,7 +1,7 @@
 /*
  * DO NOT REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright (c) 2012 ForgeRock Inc. All rights reserved.
+ * Copyright (c) 2012-2013 ForgeRock Inc. All rights reserved.
  *
  * The contents of this file are subject to the terms
  * of the Common Development and Distribution License
@@ -19,17 +19,19 @@
  * If applicable, add the following below the CDDL Header,
  * with the fields enclosed by brackets [] replaced by
  * your own identifying information:
- * "Portions Copyrighted [2012] [ForgeRock Inc]"
+ * "Portions copyright [year] [name of copyright owner]"
  */
 
 package org.forgerock.restlet.ext.oauth2.flow;
 
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
 import com.sun.identity.shared.OAuth2Constants;
+import org.forgerock.openam.oauth2.model.CoreToken;
 import org.forgerock.openam.oauth2.utils.OAuth2Utils;
-import org.forgerock.openam.oauth2.model.AccessToken;
 import org.restlet.ext.jackson.JacksonRepresentation;
 import org.restlet.representation.Representation;
 import org.restlet.resource.Post;
@@ -53,9 +55,15 @@ public class ClientCredentialsServerResource extends AbstractFlow {
         // Validate the granted scope
         Set<String> checkedScope = executeAccessTokenScopePlugin(scope_before);
 
-        AccessToken token = createAccessToken(checkedScope);
+        CoreToken token = createAccessToken(checkedScope);
 
-        return new JacksonRepresentation<Map>(token.convertToMap());
+        Map<String, Object> response = token.convertToMap();
+
+        //execute post token creation pre return scope plugin for extra return data.
+        Map<String,String> data = new HashMap<String,String>();
+        response.putAll(executeExtraDataScopePlugin(data ,token));
+
+        return new JacksonRepresentation<Map>(response);
     }
 
     @Override
@@ -71,9 +79,9 @@ public class ClientCredentialsServerResource extends AbstractFlow {
      * @throws org.forgerock.openam.oauth2.exceptions.OAuthProblemException
      * 
      */
-    private AccessToken createAccessToken(Set<String> checkedScope) {
+    private CoreToken createAccessToken(Set<String> checkedScope) {
         return getTokenStore().createAccessToken(client.getClient().getAccessTokenType(),
-                checkedScope, OAuth2Utils.getRealm(getRequest()),
-                client.getClient().getClientId());
+                checkedScope, OAuth2Utils.getRealm(getRequest()), null,
+                client.getClient().getClientId(), null, null, null);
     }
 }

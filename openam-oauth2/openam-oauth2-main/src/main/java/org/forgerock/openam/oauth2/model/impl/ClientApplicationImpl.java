@@ -1,3 +1,4 @@
+
 /*
  * DO NOT REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
@@ -19,7 +20,7 @@
  * If applicable, add the following below the CDDL Header,
  * with the fields enclosed by brackets [] replaced by
  * your own identifying information:
- * "Portions Copyrighted [2012] [Forgerock Inc]"
+ * "Portions Copyrighted [year] [name of copyright owner]"
  */
 
 package org.forgerock.openam.oauth2.model.impl;
@@ -39,12 +40,7 @@ import java.util.Set;
  * Implementation of a {@link ClientApplication}
  */
 public class ClientApplicationImpl implements ClientApplication{
-    private static final String CLIENT_TYPE = "com.forgerock.openam.oauth2provider.clientType";
-    private static final String REDIRECTION_URIS = "com.forgerock.openam.oauth2provider.redirectionURIs";
-    private static final String SCOPES = "com.forgerock.openam.oauth2provider.scopes";
-    private static final String DEFAULT_SCOPES = "com.forgerock.openam.oauth2provider.defaultScopes";
-    private static final String NAME = "com.forgerock.openam.oauth2provider.name";
-    private static final String DESCRIPTION = "com.forgerock.openam.oauth2provider.description";
+    //oauth2 options
     private static final String AUTO_GRANT = "com.forgerock.openam.oauth2provider.autoGrant";
     private static final String TOKEN_TYPE = "com.forgerock.openam.oauth2provider.tokenType";
 
@@ -57,7 +53,6 @@ public class ClientApplicationImpl implements ClientApplication{
     /**
      * {@inheritDoc}
      */
-    @Override
     public String getClientId(){
         return id.getName();
     }
@@ -65,20 +60,19 @@ public class ClientApplicationImpl implements ClientApplication{
     /**
      * {@inheritDoc}
      */
-    @Override
     public ClientType getClientType(){
         ClientType clientType = null;
         try {
-            Set<String> clientTypeSet = id.getAttribute(CLIENT_TYPE);
+            Set<String> clientTypeSet = id.getAttribute(OAuth2Constants.OAuth2Client.CLIENT_TYPE);
             if (clientTypeSet.iterator().next().equalsIgnoreCase("CONFIDENTIAL")){
                 clientType = ClientType.CONFIDENTIAL;
             } else {
                 clientType = ClientType.PUBLIC;
             }
         } catch (Exception e){
-            OAuth2Utils.DEBUG.error("ClientApplicationImpl::Unable to get client type from repository", e);
+            OAuth2Utils.DEBUG.error("Unable to get "+ OAuth2Constants.OAuth2Client.CLIENT_TYPE +" from repository", e);
             throw OAuthProblemException.OAuthError.SERVER_ERROR.handle(Request.getCurrent(),
-                    "Unable to get client type from repository");
+                    "Unable to get "+ OAuth2Constants.OAuth2Client.CLIENT_TYPE +" from repository");
         }
         return clientType;
     }
@@ -86,19 +80,19 @@ public class ClientApplicationImpl implements ClientApplication{
     /**
      * {@inheritDoc}
      */
-    @Override
     public Set<URI> getRedirectionURIs(){
         Set<URI> redirectionURIs = null;
         try {
-            Set<String> redirectionURIsSet = convertAttributeValues(id.getAttribute(REDIRECTION_URIS));
+            Set<String> redirectionURIsSet = id.getAttribute(OAuth2Constants.OAuth2Client.REDIRECT_URI);
+            redirectionURIsSet = convertAttributeValues(redirectionURIsSet);
             redirectionURIs = new HashSet<URI>();
             for (String uri : redirectionURIsSet){
                 redirectionURIs.add(URI.create(uri));
             }
         } catch (Exception e){
-            OAuth2Utils.DEBUG.error("ClientApplicationImpl::Unable to get redirection URLs from repository", e);
+            OAuth2Utils.DEBUG.error("Unable to get "+ OAuth2Constants.OAuth2Client.REDIRECT_URI +" from repository", e);
             throw OAuthProblemException.OAuthError.SERVER_ERROR.handle(Request.getCurrent(),
-                    "Unable to get redirection URLs from repository");
+                    "Unable to get "+ OAuth2Constants.OAuth2Client.REDIRECT_URI +" from repository");
         }
         return redirectionURIs;
     }
@@ -106,7 +100,6 @@ public class ClientApplicationImpl implements ClientApplication{
     /**
      * {@inheritDoc}
      */
-    @Override
     public String getAccessTokenType(){
         /*
         Set<String> tokenTypesSet = null;
@@ -125,7 +118,6 @@ public class ClientApplicationImpl implements ClientApplication{
     /**
      * {@inheritDoc}
      */
-    @Override
     public String getClientAuthenticationSchema(){
         return null;
     }
@@ -133,39 +125,36 @@ public class ClientApplicationImpl implements ClientApplication{
     /**
      * {@inheritDoc}
      */
-    @Override
     public Set<String> getAllowedGrantScopes(){
         Set<String> scopes = null;
         try {
-            scopes = convertAttributeValues(id.getAttribute(SCOPES));
+            scopes = id.getAttribute(OAuth2Constants.OAuth2Client.SCOPES);
         } catch (Exception e){
-            OAuth2Utils.DEBUG.error("ClientApplicationImpl::Unable to get allowed grant scopes from repository", e);
+            OAuth2Utils.DEBUG.error("Unable to get "+ OAuth2Constants.OAuth2Client.SCOPES +" from repository", e);
             throw OAuthProblemException.OAuthError.SERVER_ERROR.handle(Request.getCurrent(),
-                    "Unable to get allowed grant scopes from repository");
+                    "Unable to get "+ OAuth2Constants.OAuth2Client.SCOPES +" from repository");
         }
-        return scopes;
+        return convertAttributeValues(scopes);
     }
 
     /**
      * {@inheritDoc}
      */
-    @Override
     public Set<String> getDefaultGrantScopes(){
         Set<String> scopes = null;
         try {
-            scopes = convertAttributeValues(id.getAttribute(DEFAULT_SCOPES));
+            scopes = id.getAttribute(OAuth2Constants.OAuth2Client.DEFAULT_SCOPES);
         } catch (Exception e){
-            OAuth2Utils.DEBUG.error("ClientApplicationImpl::Unable to get defualt grant scopes from repository", e);
+            OAuth2Utils.DEBUG.error("Unable to get "+ OAuth2Constants.OAuth2Client.DEFAULT_SCOPES +" from repository", e);
             throw OAuthProblemException.OAuthError.SERVER_ERROR.handle(Request.getCurrent(),
-                    "Unable to get default grant scopes from repository");
+                    "Unable to get "+ OAuth2Constants.OAuth2Client.DEFAULT_SCOPES +" from repository");
         }
-        return scopes;
+        return convertAttributeValues(scopes);
     }
 
     /**
      * {@inheritDoc}
      */
-    @Override
     public boolean isAutoGrant(){
         Set<String> autoGrantSet = null;
         boolean grant = false;
@@ -173,9 +162,9 @@ public class ClientApplicationImpl implements ClientApplication{
             autoGrantSet = id.getAttribute(AUTO_GRANT);
             grant = Boolean.parseBoolean(autoGrantSet.iterator().next());
         } catch (Exception e){
-            OAuth2Utils.DEBUG.error("ClientApplicationImpl::Unable to get auto grant status from repository", e);
+            OAuth2Utils.DEBUG.error("Unable to get "+ AUTO_GRANT +" from repository", e);
             throw OAuthProblemException.OAuthError.SERVER_ERROR.handle(Request.getCurrent(),
-                    "Unable to get auto grant status from repository");
+                    "Unable to get "+ AUTO_GRANT +" from repository");
         }
         return grant;
     }
@@ -183,33 +172,459 @@ public class ClientApplicationImpl implements ClientApplication{
     /**
      * {@inheritDoc}
      */
-    @Override
     public Set<String> getDisplayName(){
         Set<String> displayName = null;
         try {
-            displayName = convertAttributeValues(id.getAttribute(NAME));
+            displayName = id.getAttribute(OAuth2Constants.OAuth2Client.NAME);
         } catch (Exception e){
-            OAuth2Utils.DEBUG.error("ClientApplicationImpl::Unable to get display name from repository", e);
+            OAuth2Utils.DEBUG.error("Unable to get "+ OAuth2Constants.OAuth2Client.RESPONSE_TYPES +" from repository", e);
             throw OAuthProblemException.OAuthError.SERVER_ERROR.handle(Request.getCurrent(),
-                    "Unable to get display name from repository");
+                    "Unable to get "+ OAuth2Constants.OAuth2Client.RESPONSE_TYPES +" from repository");
         }
-        return displayName;
+        return convertAttributeValues(displayName);
     }
 
     /**
      * {@inheritDoc}
      */
-    @Override
     public Set<String> getDisplayDescription(){
         Set<String> displayDescription = null;
         try {
-            displayDescription = convertAttributeValues(id.getAttribute(DESCRIPTION));
+            displayDescription = id.getAttribute(OAuth2Constants.OAuth2Client.DESCRIPTION);
         } catch (Exception e){
-            OAuth2Utils.DEBUG.error("ClientApplicationImpl::Unable to get display decription from repository", e);
+            OAuth2Utils.DEBUG.error("Unable to get "+ OAuth2Constants.OAuth2Client.RESPONSE_TYPES +" from repository", e);
             throw OAuthProblemException.OAuthError.SERVER_ERROR.handle(Request.getCurrent(),
-                    "Unable to get display description from repository");
+                    "Unable to get "+ OAuth2Constants.OAuth2Client.RESPONSE_TYPES +" from repository");
         }
-        return displayDescription;
+        return convertAttributeValues(displayDescription);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public Set<String> getResponseTypes(){
+
+        Set<String> set = null;
+        try {
+            set = id.getAttribute(OAuth2Constants.OAuth2Client.RESPONSE_TYPES);
+        } catch (Exception e){
+            OAuth2Utils.DEBUG.error("Unable to get "+ OAuth2Constants.OAuth2Client.RESPONSE_TYPES +" from repository", e);
+            throw OAuthProblemException.OAuthError.SERVER_ERROR.handle(Request.getCurrent(),
+                    "Unable to get "+ OAuth2Constants.OAuth2Client.RESPONSE_TYPES +" from repository");
+        }
+        return convertAttributeValues(set);
+
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public Set<String> getGrantTypes(){
+
+        Set<String> set = null;
+        try {
+            set = id.getAttribute(OAuth2Constants.OAuth2Client.GRANT_TYPES);
+        } catch (Exception e){
+            OAuth2Utils.DEBUG.error("Unable to get "+ OAuth2Constants.OAuth2Client.GRANT_TYPES +" from repository", e);
+            throw OAuthProblemException.OAuthError.SERVER_ERROR.handle(Request.getCurrent(),
+                    "Unable to get "+ OAuth2Constants.OAuth2Client.GRANT_TYPES +" from repository");
+        }
+        return convertAttributeValues(set);
+
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public String getContacts(){
+
+        Set<String> set = null;
+        try {
+            set = id.getAttribute(OAuth2Constants.OAuth2Client.CONTACTS);
+        } catch (Exception e){
+            OAuth2Utils.DEBUG.error("Unable to get "+ OAuth2Constants.OAuth2Client.CONTACTS +" from repository", e);
+            throw OAuthProblemException.OAuthError.SERVER_ERROR.handle(Request.getCurrent(),
+                    "Unable to get "+ OAuth2Constants.OAuth2Client.CONTACTS +" from repository");
+        }
+        return set.iterator().next();
+
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public String getClientName(){
+
+        Set<String> set = null;
+        try {
+            set = id.getAttribute(OAuth2Constants.OAuth2Client.NAME);
+        } catch (Exception e){
+            OAuth2Utils.DEBUG.error("Unable to get "+ TOKEN_TYPE +" from repository", e);
+            throw OAuthProblemException.OAuthError.SERVER_ERROR.handle(Request.getCurrent(),
+                    "Unable to get "+ OAuth2Constants.OAuth2Client.NAME +" from repository");
+        }
+        return set.iterator().next();
+
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public String getLogoURI(){
+
+        Set<String> set = null;
+        try {
+            set = id.getAttribute(OAuth2Constants.OAuth2Client.LOGO_URI);
+        } catch (Exception e){
+            OAuth2Utils.DEBUG.error("Unable to get "+ OAuth2Constants.OAuth2Client.LOGO_URI +" from repository", e);
+            throw OAuthProblemException.OAuthError.SERVER_ERROR.handle(Request.getCurrent(),
+                    "Unable to get "+ OAuth2Constants.OAuth2Client.LOGO_URI +" from repository");
+        }
+        return set.iterator().next();
+
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public String getTokenEndpointAuthMethod(){
+
+        Set<String> set = null;
+        try {
+            set = id.getAttribute(OAuth2Constants.OAuth2Client.TOKEN_ENDPOINT_AUTH_METHOD);
+        } catch (Exception e){
+            OAuth2Utils.DEBUG.error("Unable to get "+ OAuth2Constants.OAuth2Client.TOKEN_ENDPOINT_AUTH_METHOD +" from repository", e);
+            throw OAuthProblemException.OAuthError.SERVER_ERROR.handle(Request.getCurrent(),
+                    "Unable to get "+ OAuth2Constants.OAuth2Client.TOKEN_ENDPOINT_AUTH_METHOD +" from repository");
+        }
+        return set.iterator().next();
+
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public String getPolicyURI(){
+
+        Set<String> set = null;
+        try {
+            set = id.getAttribute(OAuth2Constants.OAuth2Client.POLICY_URI);
+        } catch (Exception e){
+            OAuth2Utils.DEBUG.error("Unable to get "+ OAuth2Constants.OAuth2Client.POLICY_URI +" from repository", e);
+            throw OAuthProblemException.OAuthError.SERVER_ERROR.handle(Request.getCurrent(),
+                    "Unable to get "+ OAuth2Constants.OAuth2Client.POLICY_URI +" from repository");
+        }
+        return set.iterator().next();
+
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public String getTosURI(){
+
+        Set<String> set = null;
+        try {
+            set = id.getAttribute(OAuth2Constants.OAuth2Client.TOS_URI);
+        } catch (Exception e){
+            OAuth2Utils.DEBUG.error("Unable to get "+ OAuth2Constants.OAuth2Client.TOS_URI +" from repository", e);
+            throw OAuthProblemException.OAuthError.SERVER_ERROR.handle(Request.getCurrent(),
+                    "Unable to get "+ OAuth2Constants.OAuth2Client.TOS_URI +" from repository");
+        }
+        return set.iterator().next();
+
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public String getJwksURI(){
+
+        Set<String> set = null;
+        try {
+            set = id.getAttribute(OAuth2Constants.OAuth2Client.JKWS_URI);
+        } catch (Exception e){
+            OAuth2Utils.DEBUG.error("Unable to get "+ OAuth2Constants.OAuth2Client.JKWS_URI +" from repository", e);
+            throw OAuthProblemException.OAuthError.SERVER_ERROR.handle(Request.getCurrent(),
+                    "Unable to get "+ OAuth2Constants.OAuth2Client.JKWS_URI +" from repository");
+        }
+        return set.iterator().next();
+
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public String getSectorIdentifierURI(){
+
+        Set<String> set = null;
+        try {
+            set = id.getAttribute(OAuth2Constants.OAuth2Client.SECTOR_IDENTIFIER_URI);
+        } catch (Exception e){
+            OAuth2Utils.DEBUG.error("Unable to get "+ OAuth2Constants.OAuth2Client.SECTOR_IDENTIFIER_URI +" from repository", e);
+            throw OAuthProblemException.OAuthError.SERVER_ERROR.handle(Request.getCurrent(),
+                    "Unable to get "+ OAuth2Constants.OAuth2Client.SECTOR_IDENTIFIER_URI +" from repository");
+        }
+        return set.iterator().next();
+
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public SubjectType getSubjectType(){
+        SubjectType subjectType = null;
+        try {
+            Set<String> clientTypeSet = id.getAttribute(OAuth2Constants.OAuth2Client.SUBJECT_TYPE);
+            if (clientTypeSet.iterator().next().equalsIgnoreCase("PAIRWISE")){
+                subjectType = SubjectType.PAIRWISE;
+            } else {
+                subjectType = SubjectType.PUBLIC;
+            }
+        } catch (Exception e){
+            OAuth2Utils.DEBUG.error("Unable to get "+ OAuth2Constants.OAuth2Client.SUBJECT_TYPE +" from repository", e);
+            throw OAuthProblemException.OAuthError.SERVER_ERROR.handle(Request.getCurrent(),
+                    "Unable to get "+ OAuth2Constants.OAuth2Client.SUBJECT_TYPE +" from repository");
+        }
+        return subjectType;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public String getRequestObjectSigningAlgorithm(){
+
+        Set<String> set = null;
+        try {
+            set = id.getAttribute(OAuth2Constants.OAuth2Client.REQUEST_OBJECT_SIGNING_ALG);
+        } catch (Exception e){
+            OAuth2Utils.DEBUG.error("Unable to get "+ OAuth2Constants.OAuth2Client.REQUEST_OBJECT_SIGNING_ALG +" from repository", e);
+            throw OAuthProblemException.OAuthError.SERVER_ERROR.handle(Request.getCurrent(),
+                    "Unable to get "+ OAuth2Constants.OAuth2Client.REQUEST_OBJECT_SIGNING_ALG +" from repository");
+        }
+        return set.iterator().next();
+
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public String getUserInfoSignedResponseAlgorithm(){
+
+        Set<String> set = null;
+        try {
+            set = id.getAttribute(OAuth2Constants.OAuth2Client.USERINFO_SIGNED_RESPONSE_ALG);
+        } catch (Exception e){
+            OAuth2Utils.DEBUG.error("Unable to get "+ OAuth2Constants.OAuth2Client.USERINFO_SIGNED_RESPONSE_ALG +" from repository", e);
+            throw OAuthProblemException.OAuthError.SERVER_ERROR.handle(Request.getCurrent(),
+                    "Unable to get "+ OAuth2Constants.OAuth2Client.USERINFO_SIGNED_RESPONSE_ALG +" from repository");
+        }
+        return set.iterator().next();
+
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public String getUserInfoEncryptedResposneAlgorithm(){
+
+        Set<String> set = null;
+        try {
+            set = id.getAttribute(OAuth2Constants.OAuth2Client.USERINFO_ENCRYPTED_RESPONSE_ALG);
+        } catch (Exception e){
+            OAuth2Utils.DEBUG.error("Unable to get "+ OAuth2Constants.OAuth2Client.USERINFO_ENCRYPTED_RESPONSE_ALG +" from repository", e);
+            throw OAuthProblemException.OAuthError.SERVER_ERROR.handle(Request.getCurrent(),
+                    "Unable to get "+ OAuth2Constants.OAuth2Client.USERINFO_ENCRYPTED_RESPONSE_ALG +" from repository");
+        }
+        return set.iterator().next();
+
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public String getUserInfoEncryptedResponseEncoding(){
+
+        Set<String> set = null;
+        try {
+            set = id.getAttribute(OAuth2Constants.OAuth2Client.USERINFO_SIGN_AND_ENC_RESPONSE_ALG);
+        } catch (Exception e){
+            OAuth2Utils.DEBUG.error("Unable to get "+ OAuth2Constants.OAuth2Client.USERINFO_SIGN_AND_ENC_RESPONSE_ALG +" from repository", e);
+            throw OAuthProblemException.OAuthError.SERVER_ERROR.handle(Request.getCurrent(),
+                    "Unable to get "+ OAuth2Constants.OAuth2Client.USERINFO_SIGN_AND_ENC_RESPONSE_ALG +" from repository");
+        }
+        return set.iterator().next();
+
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public String getIDTokenSignedResponseAlgorithm(){
+
+        Set<String> set = null;
+        try {
+            set = id.getAttribute(OAuth2Constants.OAuth2Client.IDTOKEN_SIGNED_RESPONSE_ALG);
+        } catch (Exception e){
+            OAuth2Utils.DEBUG.error("Unable to get "+ OAuth2Constants.OAuth2Client.IDTOKEN_SIGNED_RESPONSE_ALG +" from repository", e);
+            throw OAuthProblemException.OAuthError.SERVER_ERROR.handle(Request.getCurrent(),
+                    "Unable to get "+ OAuth2Constants.OAuth2Client.IDTOKEN_SIGNED_RESPONSE_ALG +" from repository");
+        }
+        return set.iterator().next();
+
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public String getIDTokenEncryptedResposneAlgorithm(){
+
+        Set<String> set = null;
+        try {
+            set = id.getAttribute(OAuth2Constants.OAuth2Client.IDTOKEN_ENCRYPTED_RESPONSE_ALG);
+        } catch (Exception e){
+            OAuth2Utils.DEBUG.error("Unable to get "+ OAuth2Constants.OAuth2Client.IDTOKEN_ENCRYPTED_RESPONSE_ALG +" from repository", e);
+            throw OAuthProblemException.OAuthError.SERVER_ERROR.handle(Request.getCurrent(),
+                    "Unable to get "+ OAuth2Constants.OAuth2Client.IDTOKEN_ENCRYPTED_RESPONSE_ALG +" from repository");
+        }
+        return set.iterator().next();
+
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public String getIDTokenEncryptedResponseEncoding(){
+
+        Set<String> set = null;
+        try {
+            set = id.getAttribute(OAuth2Constants.OAuth2Client.IDTOKEN_ENC_AND_SIGNED_RESPONSE_ALG);
+        } catch (Exception e){
+            OAuth2Utils.DEBUG.error("Unable to get "+ OAuth2Constants.OAuth2Client.IDTOKEN_ENC_AND_SIGNED_RESPONSE_ALG +" from repository", e);
+            throw OAuthProblemException.OAuthError.SERVER_ERROR.handle(Request.getCurrent(),
+                    "Unable to get "+ OAuth2Constants.OAuth2Client.IDTOKEN_ENC_AND_SIGNED_RESPONSE_ALG +" from repository");
+        }
+        return set.iterator().next();
+
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public String getDefaultMaxAge(){
+
+        Set<String> set = null;
+        try {
+            set = id.getAttribute(OAuth2Constants.OAuth2Client.DEFAULT_MAX_AGE);
+        } catch (Exception e){
+            OAuth2Utils.DEBUG.error("Unable to get "+ OAuth2Constants.OAuth2Client.DEFAULT_MAX_AGE +" from repository", e);
+            throw OAuthProblemException.OAuthError.SERVER_ERROR.handle(Request.getCurrent(),
+                    "Unable to get "+ OAuth2Constants.OAuth2Client.DEFAULT_MAX_AGE +" from repository");
+        }
+        return set.iterator().next();
+
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public String getRequireAuthTime(){
+
+        Set<String> set = null;
+        try {
+            set = id.getAttribute(OAuth2Constants.OAuth2Client.REQUIRE_AUTH_TIME);
+        } catch (Exception e){
+            OAuth2Utils.DEBUG.error("Unable to get "+ OAuth2Constants.OAuth2Client.REQUIRE_AUTH_TIME +" from repository", e);
+            throw OAuthProblemException.OAuthError.SERVER_ERROR.handle(Request.getCurrent(),
+                    "Unable to get "+ OAuth2Constants.OAuth2Client.REQUIRE_AUTH_TIME +" from repository");
+        }
+        return set.iterator().next();
+
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public String getDefaultACRValues(){
+
+        Set<String> set = null;
+        try {
+            set = id.getAttribute(OAuth2Constants.OAuth2Client.DEFAULT_ACR_VALS);
+        } catch (Exception e){
+            OAuth2Utils.DEBUG.error("Unable to get "+ OAuth2Constants.OAuth2Client.DEFAULT_ACR_VALS +" from repository", e);
+            throw OAuthProblemException.OAuthError.SERVER_ERROR.handle(Request.getCurrent(),
+                    "Unable to get "+ OAuth2Constants.OAuth2Client.DEFAULT_ACR_VALS +" from repository");
+        }
+        return set.iterator().next();
+
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public String getinitiateLoginURI(){
+
+        Set<String> set = null;
+        try {
+            set = id.getAttribute(OAuth2Constants.OAuth2Client.INIT_LOGIN_URL);
+        } catch (Exception e){
+            OAuth2Utils.DEBUG.error("Unable to get "+ OAuth2Constants.OAuth2Client.INIT_LOGIN_URL +" from repository", e);
+            throw OAuthProblemException.OAuthError.SERVER_ERROR.handle(Request.getCurrent(),
+                    "Unable to get "+ OAuth2Constants.OAuth2Client.INIT_LOGIN_URL +" from repository");
+        }
+        return set.iterator().next();
+
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public String getPostLogoutRedirectionURI(){
+
+        Set<String> set = null;
+        try {
+            set = id.getAttribute(OAuth2Constants.OAuth2Client.POST_LOGOUT_URI);
+        } catch (Exception e){
+            OAuth2Utils.DEBUG.error("Unable to get "+ OAuth2Constants.OAuth2Client.POST_LOGOUT_URI +" from repository", e);
+            throw OAuthProblemException.OAuthError.SERVER_ERROR.handle(Request.getCurrent(),
+                    "Unable to get "+ OAuth2Constants.OAuth2Client.POST_LOGOUT_URI +" from repository");
+        }
+        return set.iterator().next();
+
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public String getRequestURIS(){
+
+        Set<String> set = null;
+        try {
+            set = id.getAttribute(OAuth2Constants.OAuth2Client.REQUEST_URLs);
+        } catch (Exception e){
+            OAuth2Utils.DEBUG.error("Unable to get "+ OAuth2Constants.OAuth2Client.REQUEST_URLs +" from repository", e);
+            throw OAuthProblemException.OAuthError.SERVER_ERROR.handle(Request.getCurrent(),
+                    "Unable to get "+ OAuth2Constants.OAuth2Client.REQUEST_URLs +" from repository");
+        }
+        return set.iterator().next();
+
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public String getAccessToken(){
+
+        Set<String> set = null;
+        try {
+            set = id.getAttribute(OAuth2Constants.OAuth2Client.ACCESS_TOKEN);
+        } catch (Exception e){
+            OAuth2Utils.DEBUG.error("Unable to get "+ OAuth2Constants.OAuth2Client.ACCESS_TOKEN +" from repository", e);
+            throw OAuthProblemException.OAuthError.SERVER_ERROR.handle(Request.getCurrent(),
+                    "Unable to get "+ OAuth2Constants.OAuth2Client.ACCESS_TOKEN +" from repository");
+        }
+        return set.iterator().next();
+
     }
 
     private Set<String> convertAttributeValues(Set<String> input) {

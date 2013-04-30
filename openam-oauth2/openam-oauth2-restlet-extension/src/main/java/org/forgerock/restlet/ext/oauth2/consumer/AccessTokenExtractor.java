@@ -1,7 +1,7 @@
 /*
  * DO NOT REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright (c) 2012 ForgeRock Inc. All rights reserved.
+ * Copyright (c) 2012-2013 ForgeRock Inc. All rights reserved.
  *
  * The contents of this file are subject to the terms
  * of the Common Development and Distribution License
@@ -19,7 +19,7 @@
  * If applicable, add the following below the CDDL Header,
  * with the fields enclosed by brackets [] replaced by
  * your own identifying information:
- * c
+ * "Portions Copyrighted [year] [name of copyright owner]"
  */
 
 package org.forgerock.restlet.ext.oauth2.consumer;
@@ -29,6 +29,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import com.sun.identity.shared.OAuth2Constants;
+import org.forgerock.openam.oauth2.model.CoreToken;
 import org.forgerock.openam.oauth2.utils.OAuth2Utils;
 import org.forgerock.openam.oauth2.exceptions.OAuthProblemException;
 import org.restlet.Request;
@@ -49,12 +50,9 @@ import org.restlet.util.Series;
  * An AccessTokenExtractor extracts the AccessToken from the Request.
  *
  */
-public abstract class AccessTokenExtractor<T extends AbstractAccessToken> extends
-        AuthenticatorHelper {
+public abstract class AccessTokenExtractor<T extends CoreToken> {
 
-    protected AccessTokenExtractor(ChallengeScheme challengeScheme, boolean clientSide,
-            boolean serverSide) {
-        super(challengeScheme, clientSide, serverSide);
+    protected AccessTokenExtractor() {
     }
 
     /**
@@ -192,6 +190,34 @@ public abstract class AccessTokenExtractor<T extends AbstractAccessToken> extend
             }
             break;
         }
+        }
+        return token;
+    }
+
+    public static Map<String, Object> extractToken(Request request) throws OAuthProblemException {
+        Map<String, Object> token = null;
+        if (request.getResourceRef().hasFragment()) {
+            token =
+                    new HashMap<String, Object>(new Form(request.getResourceRef()
+                            .getFragment()).getValuesMap());
+        } else if (request.getResourceRef().hasQuery()) {
+            token =
+                    new HashMap<String, Object>(request.getResourceRef().getQueryAsForm()
+                            .getValuesMap());
+        } else if (null != request.getEntity()
+            && MediaType.APPLICATION_JSON.equals(request.getEntity().getMediaType())) {
+            try {
+                token = new JacksonRepresentation<Map>(request.getEntity(), Map.class).getObject();
+            } catch (IOException e) {
+                /* ignored */
+            }
+        }
+        if (null != token) {
+            OAuthProblemException exception = extractException(token);
+            if (exception != null) {
+                OAuth2Utils.DEBUG.error("Unable to extract token from request", exception);
+                throw exception;
+            }
         }
         return token;
     }

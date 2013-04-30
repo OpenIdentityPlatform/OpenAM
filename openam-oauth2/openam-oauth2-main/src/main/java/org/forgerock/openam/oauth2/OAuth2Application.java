@@ -28,18 +28,30 @@ import java.net.URI;
 
 import com.sun.identity.shared.OAuth2Constants;
 import org.forgerock.openam.oauth2.internal.UserIdentityVerifier;
+import org.forgerock.openam.oauth2.model.CoreToken;
+import org.forgerock.openam.oauth2.openid.ConnectClientRegistration;
+import org.forgerock.openam.oauth2.openid.UserInfo;
 import org.forgerock.openam.oauth2.provider.impl.ClientVerifierImpl;
-import org.forgerock.openam.oauth2.store.impl.DefaultOAuthTokenStoreImpl;
+import org.forgerock.openam.ext.cts.repo.DefaultOAuthTokenStoreImpl;
 import org.forgerock.openam.oauth2.utils.OAuth2Utils;
+import org.forgerock.restlet.ext.oauth2.consumer.AccessTokenValidator;
+import org.forgerock.openam.oauth2.model.BearerToken;
+import org.forgerock.restlet.ext.oauth2.consumer.BearerTokenVerifier;
+import org.forgerock.restlet.ext.oauth2.consumer.OAuth2Authenticator;
+import org.forgerock.restlet.ext.oauth2.consumer.TokenVerifier;
+import org.forgerock.restlet.ext.oauth2.internal.DefaultScopeEnroler;
 import org.forgerock.restlet.ext.oauth2.provider.*;
 import org.forgerock.restlet.ext.openam.OpenAMParameters;
 import org.forgerock.restlet.ext.openam.internal.OpenAMServerAuthorizer;
 import org.forgerock.restlet.ext.openam.server.OpenAMServletAuthenticator;
 import org.restlet.Application;
 import org.restlet.Context;
+import org.restlet.Request;
 import org.restlet.Restlet;
+import org.restlet.data.Reference;
 import org.restlet.data.MediaType;
 import org.restlet.routing.Router;
+import org.restlet.security.RoleAuthorizer;
 import org.restlet.security.Verifier;
 
 /**
@@ -70,6 +82,28 @@ public class OAuth2Application extends Application {
 
         //go to register client endpoint
         root.attach("/register_client", RegisterClient.class);
+
+        //connect client register
+        Reference validationServerRef = new Reference(OAuth2Utils.getDeploymentURL(Request.getCurrent())+ "/oauth2" + OAuth2Utils.getTokenInfoPath(getContext()));
+        AccessTokenValidator<BearerToken> validator =
+                new ValidationServerResource(getContext(), validationServerRef);
+        TokenVerifier tokenVerifier = new BearerTokenVerifier(validator);
+        OAuth2Authenticator authenticator =
+                new OAuth2Authenticator(getContext(), null,
+                        OAuth2Utils.ParameterLocation.HTTP_HEADER, tokenVerifier);
+        authenticator.setNext(ConnectClientRegistration.class);
+        root.attach("/connect/register", authenticator);
+
+        //connect userinfo
+        validationServerRef = new Reference(OAuth2Utils.getDeploymentURL(Request.getCurrent())+ "/oauth2" + OAuth2Utils.getTokenInfoPath(getContext()));
+        validator =
+                new ValidationServerResource(getContext(), validationServerRef);
+        tokenVerifier = new BearerTokenVerifier(validator);
+        authenticator =
+                new OAuth2Authenticator(getContext(), null,
+                        OAuth2Utils.ParameterLocation.HTTP_HEADER, tokenVerifier);
+        authenticator.setNext(UserInfo.class);
+        root.attach("/userinfo", authenticator);
 
         return root;
     }

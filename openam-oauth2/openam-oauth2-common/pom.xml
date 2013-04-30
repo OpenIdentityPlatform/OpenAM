@@ -70,6 +70,12 @@
     </build>
 
     <dependencies>
+        <!-- OpenAM -->
+        <dependency>
+            <groupId>org.forgerock.openam</groupId>
+            <artifactId>openam-forgerock-rest</artifactId>
+        </dependency>
+
         <!-- Restlet -->
         <dependency>
             <groupId>org.restlet.osgi</groupId>
@@ -127,37 +133,5 @@
 	
     </dependencies>
     <profiles>
-        <profile>
-            <id>jrebel</id>
-            <build>
-                <plugins>
-                    <plugin>
-                        <groupId>org.zeroturnaround</groupId>
-                        <artifactId>jrebel-maven-plugin</artifactId>
-                        <version>1.1.3</version>
-                        <executions>
-                            <execution>
-                                <id>generate-rebel-xml</id>
-                                <phase>process-resources</phase>
-                                <goals>
-                                    <goal>generate</goal>
-                                </goals>
-                            </execution>
-                        </executions>
-                    </plugin>
-                    <plugin>
-                        <groupId>org.apache.felix</groupId>
-                        <artifactId>maven-bundle-plugin</artifactId>
-                        <extensions>true</extensions>
-                        <configuration>
-                            <instructions>
-                                <Include-Resource>{maven-resources},target/classes/rebel.xml
-                                </Include-Resource>
-                            </instructions>
-                        </configuration>
-                    </plugin>
-                </plugins>
-            </build>
-        </profile>
     </profiles>
 </project>

@@ -16,6 +16,7 @@
 
 package org.forgerock.openam.ext.cts;
 
+import com.sun.identity.shared.OAuth2Constants;
 import org.forgerock.openam.ext.cts.repo.MockTokenRepo;
 import org.forgerock.json.fluent.JsonValue;
 import org.testng.annotations.AfterClass;
@@ -59,11 +60,11 @@ public class CoreTokenServiceTest {
         scopes.add("write");
 
         JsonValue testAuthzCode = new JsonValue(new HashMap<String, Object>());
-        testAuthzCode.put("id", testUUID);
-        testAuthzCode.put("type", "authorization_code");
-        testAuthzCode.put("scope", scopes);
-        testAuthzCode.put("realm", "/");
-        testAuthzCode.put("expire_time", System.currentTimeMillis() + 1000 * 60 * 10); // Current time + 10 minutes
+        testAuthzCode.put(OAuth2Constants.CoreTokenParams.ID, testUUID);
+        testAuthzCode.put(OAuth2Constants.CoreTokenParams.TOKEN_TYPE, "authorization_code");
+        testAuthzCode.put(OAuth2Constants.CoreTokenParams.SCOPE, scopes);
+        testAuthzCode.put(OAuth2Constants.CoreTokenParams.REALM, "/");
+        testAuthzCode.put(OAuth2Constants.CoreTokenParams.EXPIRE_TIME, System.currentTimeMillis() + 1000 * 60 * 10); // Current time + 10 minutes
 
         JsonValue request = new JsonValue(new HashMap<String, Object>());
         request.put("id", "/token/oauth2/authorization_code");
@@ -88,9 +89,9 @@ public class CoreTokenServiceTest {
         LOGGER.log(Level.INFO, "Response: " + response.toString());
 
         assert response != null;
-        assert response.get("id").asString().equals(testUUID);
-        assert response.get("type").asString().equals("authorization_code");
-        assert response.get("realm").asString().equals("/");
+        assert response.get(OAuth2Constants.CoreTokenParams.ID).asString().equals(testUUID);
+        assert response.get(OAuth2Constants.CoreTokenParams.TOKEN_TYPE).asString().equals("authorization_code");
+        assert response.get(OAuth2Constants.CoreTokenParams.REALM).asString().equals("/");
 
         if (response == null) {
             LOGGER.log(Level.INFO, "Returned with null");
@@ -107,11 +108,11 @@ public class CoreTokenServiceTest {
         String testmod = "/testrealm";
 
         JsonValue testAuthzCode = new JsonValue(new HashMap<String, Object>());
-        testAuthzCode.put("id", testUUID);
-        testAuthzCode.put("type", "authorization_code");
-        testAuthzCode.put("scope", scopes);
-        testAuthzCode.put("realm", testmod);
-        testAuthzCode.put("expire_time", System.currentTimeMillis() + 1000 * 60 * 10); // Current time + 10 minutes
+        testAuthzCode.put(OAuth2Constants.CoreTokenParams.ID, testUUID);
+        testAuthzCode.put(OAuth2Constants.CoreTokenParams.TOKEN_TYPE, "authorization_code");
+        testAuthzCode.put(OAuth2Constants.CoreTokenParams.SCOPE, scopes);
+        testAuthzCode.put(OAuth2Constants.CoreTokenParams.REALM, testmod);
+        testAuthzCode.put(OAuth2Constants.CoreTokenParams.EXPIRE_TIME, System.currentTimeMillis() + 1000 * 60 * 10); // Current time + 10 minutes
 
         JsonValue request = new JsonValue(new HashMap<String, Object>());
         request.put("id", "/token/oauth2/authorization_code");
@@ -134,7 +135,7 @@ public class CoreTokenServiceTest {
         LOGGER.log(Level.INFO, "Returned with object: " + response2.toString());
         
         // Check that the realm has been updated
-        assert response2.get("realm").asString() == testmod;
+        assert response2.get(OAuth2Constants.CoreTokenParams.REALM).asString() == testmod;
 
 
     }

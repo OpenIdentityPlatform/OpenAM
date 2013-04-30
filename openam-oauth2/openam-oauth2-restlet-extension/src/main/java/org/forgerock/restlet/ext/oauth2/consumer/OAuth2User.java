@@ -77,7 +77,7 @@ public class OAuth2User extends User {
 
     public OAuth2User(Token token) {
         super(token.getUserID());
-        this.accessToken = token.getToken();
+        this.accessToken = token.getTokenID();
         this.expiresIn = token.getExpireTime();
         this.scope = token.getScope();
 

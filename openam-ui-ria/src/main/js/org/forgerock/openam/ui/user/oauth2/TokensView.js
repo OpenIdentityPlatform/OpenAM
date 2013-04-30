@@ -1,7 +1,7 @@
 /**
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright (c) 2011-2012 ForgeRock AS. All rights reserved.
+ * Copyright (c) 2011-2013 ForgeRock AS. All rights reserved.
  *
  * The contents of this file are subject to the terms
  * of the Common Development and Distribution License
@@ -20,10 +20,6 @@
  * with the fields enclosed by brackets [] replaced by
  * your own identifying information:
  * "Portions Copyrighted [year] [name of copyright owner]"
- */
-
-/**
- * "Portions Copyrighted 2011-2013 ForgeRock Inc"
  */
 
 /*global define, $, form2js, _ , console*/
@@ -81,7 +77,7 @@ define("org/forgerock/openam/ui/user/oauth2/TokensView", [
                                 cleanScope = '-';
                             }
                             data.aaData[i].cleanScope = $('<span class="cleanScope" />').text(cleanScope).wrap('<p>').parent().html();
-                            cleanDate = new Date(Number(data.aaData[i].expiry_time));
+                            cleanDate = new Date(Number(data.aaData[i].expireTime));
                             data.aaData[i].cleanDate = $('<span class="cleanDate" />').text(cleanDate).wrap('<p>').parent().html();
                         }
 
@@ -94,7 +90,7 @@ define("org/forgerock/openam/ui/user/oauth2/TokensView", [
                         "bSortable": false
                     },
                     {
-                        "mData": "client_id",
+                        "mData": "clientID",
                         "sTitle": $.t("templates.oauth.clientID")
                     },
                     {
@@ -110,7 +106,7 @@ define("org/forgerock/openam/ui/user/oauth2/TokensView", [
                         "sTitle": $.t("templates.oauth.expireDate")
                     },
                     {
-                        "mData": "type",
+                        "mData": "tokenName",
                         "sTitle": $.t("templates.oauth.tokenType")
                     }
                 ],
@@ -132,14 +128,14 @@ define("org/forgerock/openam/ui/user/oauth2/TokensView", [
                             if (tokenInfo.realm){
                                 output += '<tr><td>' + $.t("templates.oauth.realm") + '</td><td>'+tokenInfo.realm+'</td></tr>';
                             }
-                            if (tokenInfo.refresh_token){
-                                output += '<tr><td>' + $.t("templates.oauth.refreshToken") + '</td><td>'+tokenInfo.refresh_token+'</td></tr>';
+                            if (tokenInfo.refreshToken){
+                                output += '<tr><td>' + $.t("templates.oauth.refreshToken") + '</td><td>'+tokenInfo.refreshToken+'</td></tr>';
                             }
-                            if (tokenInfo.redirect_uri){
-                                output += '<tr><td>' + $.t("templates.oauth.redirectURI") + '</td><td>'+tokenInfo.redirect_uri+'</td></tr>';
+                            if (tokenInfo.redirectURI){
+                                output += '<tr><td>' + $.t("templates.oauth.redirectURI") + '</td><td>'+tokenInfo.redirectURI+'</td></tr>';
                             }
-                            if (tokenInfo.username){
-                                output += '<tr><td>' + $.t("templates.oauth.username") + '</td><td>'+tokenInfo.username+'</td></tr>';
+                            if (tokenInfo.userName){
+                                output += '<tr><td>' + $.t("templates.oauth.username") + '</td><td>'+tokenInfo.userName+'</td></tr>';
                             }
                             if (tokenInfo.parent){
                                 output += '<tr><td>' + $.t("templates.oauth.parent") + '</td><td>'+tokenInfo.parent+'</td></tr>';

@@ -24,19 +24,13 @@
 
 package org.forgerock.restlet.ext.oauth2.flow;
 
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 import com.sun.identity.shared.OAuth2Constants;
-import org.forgerock.openam.oauth2.exceptions.OAuthProblemException;
+import org.forgerock.openam.ext.cts.repo.DefaultOAuthTokenStoreImpl;
+import org.forgerock.openam.oauth2.model.CoreToken;
+import org.forgerock.openam.oauth2.provider.ResponseType;
 import org.forgerock.openam.oauth2.utils.OAuth2Utils;
-import org.forgerock.openam.oauth2.model.AccessToken;
-import org.restlet.data.Form;
-import org.restlet.data.Reference;
-import org.restlet.representation.Representation;
-import org.restlet.resource.Get;
-import org.restlet.resource.Post;
-import org.restlet.routing.Redirector;
 
 /**
  *
@@ -44,129 +38,25 @@ import org.restlet.routing.Redirector;
  *
  * @see <a href="http://tools.ietf.org/html/rfc6749#section-4.2">4.2.  Implicit Grant</a>
  */
-public class ImplicitGrantServerResource extends AbstractFlow {
+public class ImplicitGrantServerResource implements ResponseType {
 
-    protected boolean decision_allow = false;
-
-    /**
-     * Developers should note that some user-agents do not support the inclusion
-     * of a fragment component in the HTTP "Location" response header field.
-     * Such clients will require using other methods for redirecting the client
-     * than a 3xx redirection response. For example, returning an HTML page
-     * which includes a 'continue' button with an action linked to the
-     * redirection URI.
-     * <p/>
-     * If TLS is not available, the authorization server SHOULD warn the
-     * resource owner about the insecure endpoint prior to redirection.
-     * 
-     * @return
-     */
-    @Get("html")
-    @Post("html")
-    public Representation represent() {
-        resourceOwner = getAuthenticatedResourceOwner();
-
-        // Validate the client
-        client = validateRemoteClient();
-        // Validate Redirect URI throw exception
-        sessionClient =
-                client.getClientInstance(OAuth2Utils.getRequestParameter(getRequest(),
-                        OAuth2Constants.Params.REDIRECT_URI, String.class));
-
-        // The target contains the state
-        String state =
-                OAuth2Utils
-                        .getRequestParameter(getRequest(), OAuth2Constants.Params.STATE, String.class);
-
-        // Get the requested scope
-        String scope_before =
-                OAuth2Utils
-                        .getRequestParameter(getRequest(), OAuth2Constants.Params.SCOPE, String.class);
-
-        // Validate the granted scope
-        Set<String> checkedScope = executeAuthorizationPageScopePlugin(scope_before);
-
-        return getPage("authorize.ftl", getDataModel(checkedScope));
+    public CoreToken createToken(Map<String, Object> data){
+        DefaultOAuthTokenStoreImpl store = new DefaultOAuthTokenStoreImpl();
+        return store.createAccessToken((String)data.get(OAuth2Constants.CoreTokenParams.TOKEN_TYPE),
+                (Set<String>)data.get(OAuth2Constants.CoreTokenParams.SCOPE),
+                (String)data.get(OAuth2Constants.CoreTokenParams.REALM),
+                (String)data.get(OAuth2Constants.CoreTokenParams.USERNAME),
+                (String)data.get(OAuth2Constants.CoreTokenParams.CLIENT_ID),
+                (String)data.get(OAuth2Constants.CoreTokenParams.REDIRECT_URI),
+                null,
+                null);
     }
 
-    @Post("form:json")
-    public Representation represent(Representation entity) {
-        resourceOwner = getAuthenticatedResourceOwner();
-        client = validateRemoteClient();
-        sessionClient =
-                client.getClientInstance(OAuth2Utils.getRequestParameter(getRequest(),
-                        OAuth2Constants.Params.REDIRECT_URI, String.class));
-
-        String decision = OAuth2Utils.getRequestParameter(getRequest(), OAuth2Constants.Custom.DECISION,
-                String.class);
-
-        if (OAuth2Constants.Custom.ALLOW.equalsIgnoreCase(decision)) {
-            String scope_after =
-                OAuth2Utils
-                    .getRequestParameter(getRequest(), OAuth2Constants.Params.SCOPE, String.class);
-
-            String state =
-                    OAuth2Utils
-                            .getRequestParameter(getRequest(), OAuth2Constants.Params.STATE, String.class);
-
-            Set<String> checkedScope = executeAccessTokenScopePlugin(scope_after);
-
-            AccessToken token = createAccessToken(checkedScope);
-            Form tokenForm = tokenToForm(token.convertToMap());
-
-            /*
-             * scope OPTIONAL, if identical to the scope requested by the
-             * client, otherwise REQUIRED. The scope of the access token as
-             * described by Section 3.3.
-             */
-            if (isScopeChanged()) {
-                tokenForm.add(OAuth2Constants.Params.SCOPE, OAuth2Utils.join(checkedScope, OAuth2Utils
-                        .getScopeDelimiter(getContext())));
-            }
-            if (null != state) {
-                tokenForm.add(OAuth2Constants.Params.STATE, state);
-            }
-
-            Reference redirectReference = new Reference(sessionClient.getRedirectUri());
-            redirectReference.setFragment(tokenForm.getQueryString());
-
-            Redirector dispatcher =
-                    new Redirector(getContext(), redirectReference.toString(),
-                            Redirector.MODE_CLIENT_FOUND);
-            dispatcher.handle(getRequest(), getResponse());
-        } else {
-            OAuth2Utils.DEBUG.warning("ImplicitGrantServerResource::Resource Owner did not authorize the request");
-            throw OAuthProblemException.OAuthError.ACCESS_DENIED.handle(getRequest(),
-                    "Resource Owner did not authorize the request");
-        }
-        return getResponseEntity();
+    public String getReturnLocation(){
+        return "FRAGMENT";
     }
 
-    @Override
-    protected String[] getRequiredParameters() {
-        return new String[] { OAuth2Constants.Params.RESPONSE_TYPE, OAuth2Constants.Params.CLIENT_ID };
+    public String URIParamValue(){
+        return "access_token";
     }
-
-    /**
-     * This method is intended to be overridden by subclasses.
-     * 
-     * @param checkedScope
-     * @return
-     * @throws org.forgerock.openam.oauth2.exceptions.OAuthProblemException
-     * 
-     */
-    protected AccessToken createAccessToken(Set<String> checkedScope) {
-        return getTokenStore().createAccessToken(client.getClient().getAccessTokenType(),
-                checkedScope, OAuth2Utils.getRealm(getRequest()),
-                resourceOwner.getIdentifier(), sessionClient);
-    }
-
-    protected Form tokenToForm(Map<String, Object> token) {
-        Form result = new Form();
-        for (Map.Entry<String, Object> entry : token.entrySet()) {
-            result.add(entry.getKey(), entry.getValue().toString());
-        }
-        return result;
-    }
-
 }

@@ -1,7 +1,7 @@
 /*
  * DO NOT REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright (c) 2012 ForgeRock Inc. All rights reserved.
+ * Copyright (c) 2012-2013 ForgeRock Inc. All rights reserved.
  *
  * The contents of this file are subject to the terms
  * of the Common Development and Distribution License
@@ -37,14 +37,10 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
 import com.sun.identity.shared.OAuth2Constants;
+import org.forgerock.openam.oauth2.model.*;
 import org.forgerock.openam.oauth2.utils.OAuth2Utils;
 import org.forgerock.restlet.ext.oauth2.consumer.BearerOAuth2Proxy;
 import org.forgerock.restlet.ext.oauth2.internal.OAuth2Component;
-import org.forgerock.openam.oauth2.model.AccessToken;
-import org.forgerock.openam.oauth2.model.AuthorizationCode;
-import org.forgerock.openam.oauth2.model.ClientApplication;
-import org.forgerock.openam.oauth2.model.RefreshToken;
-import org.forgerock.openam.oauth2.model.SessionClient;
 import org.forgerock.openam.oauth2.provider.ClientVerifier;
 import org.forgerock.openam.oauth2.provider.OAuth2Provider;
 import org.forgerock.restlet.ext.oauth2.provider.OAuth2RealmRouter;
@@ -79,10 +75,10 @@ public class AbstractFlowTest {
 
     protected ConcurrentMap<String, AuthorizationCode> authorizationCodeMap =
             new ConcurrentHashMap<String, AuthorizationCode>();
-    protected ConcurrentMap<String, AccessToken> accessTokenMap =
-            new ConcurrentHashMap<String, AccessToken>();
-    protected ConcurrentMap<String, RefreshToken> refreshTokenMap =
-            new ConcurrentHashMap<String, RefreshToken>();
+    protected ConcurrentMap<String, CoreToken> accessTokenMap =
+            new ConcurrentHashMap<String, CoreToken>();
+    protected ConcurrentMap<String, CoreToken> refreshTokenMap =
+            new ConcurrentHashMap<String, CoreToken>();
 
     // protected static String AUTHORIZATION_CODE = "SplxlOBeZQQYbYS6WxSbIA";
     // protected static String ACCESS_TOKEN = "2YotnFZFEjr1zCsicMWpAA";
@@ -181,7 +177,7 @@ public class AbstractFlowTest {
                         (String) invocation.getArguments()[1]);
                 when(authorizationCode.getClient()).thenReturn(
                         (SessionClient) invocation.getArguments()[3]);
-                when(authorizationCode.getToken()).thenReturn(code);
+                when(authorizationCode.getTokenID()).thenReturn(code);
 
                 authorizationCodeMap.put(code, authorizationCode);
 
@@ -203,50 +199,9 @@ public class AbstractFlowTest {
                     public AuthorizationCode answer(InvocationOnMock invocation) throws Throwable {
                         return authorizationCodeMap.get(invocation.getArguments()[0]);
                     }
-                });
-
-        // Mock createAccessToken - Authorization Code
-        when(
-                realm.getTokenStore().createAccessToken(eq(OAuth2Constants.Bearer.BEARER), anySet(),
-                        any(AuthorizationCode.class), any(String.class))).then(new Answer<AccessToken>() {
-            @Override
-            public AccessToken answer(InvocationOnMock invocation) throws Throwable {
-                AuthorizationCode authorizationCode =
-                        (AuthorizationCode) invocation.getArguments()[2];
-
-                AccessToken accessToken = mock(AccessToken.class);
-                String token = UUID.randomUUID().toString();
-
-                RefreshToken refreshToken =
-                        realm.getTokenStore().createRefreshToken(
-                                (Set<String>) invocation.getArguments()[1],
-                                authorizationCode.getRealm(), authorizationCode.getUserID(),
-                                authorizationCode.getClient().getClientId(), null);
-
-                Map<String, Object> tokenMap = new HashMap<String, Object>();
-                tokenMap.put(OAuth2Constants.Params.ACCESS_TOKEN, token);
-                tokenMap.put(OAuth2Constants.Params.REFRESH_TOKEN, refreshToken.getToken());
-                tokenMap.put(OAuth2Constants.Params.TOKEN_TYPE, OAuth2Constants.Bearer.BEARER);
-                tokenMap.put(OAuth2Constants.Params.EXPIRES_IN, 3600);
-
-                when(accessToken.convertToMap()).thenReturn(tokenMap);
-                when(accessToken.getScope()).thenReturn((Set<String>) invocation.getArguments()[1]);
-                String value = authorizationCode.getRealm();
-                when(accessToken.getRealm()).thenReturn(value);
-                value = authorizationCode.getUserID();
-                when(accessToken.getUserID()).thenReturn(value);
-                SessionClient c = authorizationCode.getClient();
-                when(accessToken.getClient()).thenReturn(c);
-                when(accessToken.getToken()).thenReturn(token);
-                when(accessToken.getExpireTime()).thenReturn(System.currentTimeMillis() + 3600000L);
-                when(accessToken.isExpired()).thenReturn(false);
-                accessTokenMap.put(token, accessToken);
-
-                return accessToken;
-            }
         });
 
-        when(realm.getTokenStore().readRefreshToken(anyString())).then(new Answer<RefreshToken>() {
+        when(realm.getTokenStore().readRefreshToken(anyString())).then(new Answer<CoreToken>() {
 
             /**
              * @param invocation
@@ -256,7 +211,7 @@ public class AbstractFlowTest {
              *             the throwable to be thrown
              */
             @Override
-            public RefreshToken answer(InvocationOnMock invocation) throws Throwable {
+            public CoreToken answer(InvocationOnMock invocation) throws Throwable {
                 return refreshTokenMap.get(invocation.getArguments()[0]);
             }
         });
@@ -264,10 +219,10 @@ public class AbstractFlowTest {
         // Mock createRefreshToken
         when(
                 realm.getTokenStore().createRefreshToken(anySet(), anyString(), anyString(),
-                        anyString(), any(AuthorizationCode.class))).then(new Answer<RefreshToken>() {
+                        anyString(), any(String.class))).then(new Answer<CoreToken>() {
             @Override
-            public RefreshToken answer(InvocationOnMock invocation) throws Throwable {
-                RefreshToken token = mock(RefreshToken.class);
+            public CoreToken answer(InvocationOnMock invocation) throws Throwable {
+                CoreToken token = mock(CoreToken.class);
                 String code = UUID.randomUUID().toString();
 
                 when(token.getScope()).thenReturn((Set<String>) invocation.getArguments()[0]);
@@ -276,8 +231,7 @@ public class AbstractFlowTest {
                 // TODO We don't have redirect URI
                 SessionClient sc = mock(SessionClient.class);
                 when(sc.getClientId()).thenReturn((String) invocation.getArguments()[3]);
-                when(token.getClient()).thenReturn(sc);
-                when(token.getToken()).thenReturn(code);
+                //when(token.get("scope")).thenReturn(sc);
                 when(token.getExpireTime()).thenReturn(System.currentTimeMillis() + 600000L);
                 when(token.isExpired()).thenReturn(false);
                 refreshTokenMap.put(code, token);
@@ -289,17 +243,17 @@ public class AbstractFlowTest {
         // Mock createAccessToken - Refresh Token
         when(
                 realm.getTokenStore().createAccessToken(eq(OAuth2Constants.Bearer.BEARER), anySet(),
-                        any(RefreshToken.class), any(String.class))).then(new Answer<AccessToken>() {
+                        any(String.class), any(String.class), any(String.class), any(String.class), any(String.class), any(String.class))).then(new Answer<CoreToken>() {
             @Override
-            public AccessToken answer(InvocationOnMock invocation) throws Throwable {
-                RefreshToken refreshToken = (RefreshToken) invocation.getArguments()[2];
+            public CoreToken answer(InvocationOnMock invocation) throws Throwable {
+                CoreToken refreshToken = (CoreToken) invocation.getArguments()[2];
 
-                AccessToken accessToken = mock(AccessToken.class);
+                CoreToken accessToken = mock(CoreToken.class);
                 String token = UUID.randomUUID().toString();
 
                 Map<String, Object> tokenMap = new HashMap<String, Object>();
                 tokenMap.put(OAuth2Constants.Params.ACCESS_TOKEN, token);
-                tokenMap.put(OAuth2Constants.Params.REFRESH_TOKEN, refreshToken.getToken());
+                tokenMap.put(OAuth2Constants.Params.REFRESH_TOKEN, refreshToken.getParameter(OAuth2Constants.CoreTokenParams.REFRESH_TOKEN));
                 tokenMap.put(OAuth2Constants.Params.TOKEN_TYPE, OAuth2Constants.Bearer.BEARER);
                 tokenMap.put(OAuth2Constants.Params.EXPIRES_IN, 3600);
 
@@ -309,108 +263,7 @@ public class AbstractFlowTest {
                 when(accessToken.getRealm()).thenReturn(value);
                 value = refreshToken.getUserID();
                 when(accessToken.getUserID()).thenReturn(value);
-                SessionClient c = refreshToken.getClient();
-                when(accessToken.getClient()).thenReturn(c);
-                when(accessToken.getToken()).thenReturn(token);
-                when(accessToken.getExpireTime()).thenReturn(System.currentTimeMillis() + 3600000L);
-                when(accessToken.isExpired()).thenReturn(false);
-                accessTokenMap.put(token, accessToken);
-
-                return accessToken;
-            }
-        });
-
-        // Mock createAccessToken - Implicit
-        when(
-                realm.getTokenStore().createAccessToken(eq(OAuth2Constants.Bearer.BEARER), anySet(),
-                        anyString(), anyString(), any(SessionClient.class))).then(
-                new Answer<AccessToken>() {
-                    @Override
-                    public AccessToken answer(InvocationOnMock invocation) throws Throwable {
-                        AccessToken accessToken = mock(AccessToken.class);
-                        String token = UUID.randomUUID().toString();
-
-                        Map<String, Object> tokenMap = new HashMap<String, Object>();
-                        tokenMap.put(OAuth2Constants.Params.ACCESS_TOKEN, token);
-                        tokenMap.put(OAuth2Constants.Params.TOKEN_TYPE, OAuth2Constants.Bearer.BEARER);
-                        tokenMap.put(OAuth2Constants.Params.EXPIRES_IN, 3600);
-
-                        when(accessToken.convertToMap()).thenReturn(tokenMap);
-                        when(accessToken.getScope()).thenReturn(
-                                (Set<String>) invocation.getArguments()[1]);
-                        when(accessToken.getRealm()).thenReturn(
-                                (String) invocation.getArguments()[2]);
-                        when(accessToken.getUserID()).thenReturn(
-                                (String) invocation.getArguments()[3]);
-                        when(accessToken.getClient()).thenReturn(
-                                (SessionClient) invocation.getArguments()[4]);
-                        when(accessToken.getToken()).thenReturn(token);
-                        when(accessToken.getExpireTime()).thenReturn(
-                                System.currentTimeMillis() + 3600000L);
-                        when(accessToken.isExpired()).thenReturn(false);
-                        accessTokenMap.put(token, accessToken);
-
-                        return accessToken;
-                    }
-                });
-
-        // Mock createAccessToken - Client Credential
-        when(
-                realm.getTokenStore().createAccessToken(eq(OAuth2Constants.Bearer.BEARER), anySet(),
-                        anyString(), anyString())).then(new Answer<AccessToken>() {
-            @Override
-            public AccessToken answer(InvocationOnMock invocation) throws Throwable {
-                AccessToken accessToken = mock(AccessToken.class);
-                String token = UUID.randomUUID().toString();
-
-                Map<String, Object> tokenMap = new HashMap<String, Object>();
-                tokenMap.put(OAuth2Constants.Params.ACCESS_TOKEN, token);
-                tokenMap.put(OAuth2Constants.Params.TOKEN_TYPE, OAuth2Constants.Bearer.BEARER);
-                tokenMap.put(OAuth2Constants.Params.EXPIRES_IN, 3600);
-                when(accessToken.convertToMap()).thenReturn(tokenMap);
-
-                when(accessToken.getScope()).thenReturn((Set<String>) invocation.getArguments()[1]);
-                when(accessToken.getRealm()).thenReturn((String) invocation.getArguments()[2]);
-
-                // TODO We don't have redirect URI
-                SessionClient sc = mock(SessionClient.class);
-                when(sc.getClientId()).thenReturn((String) invocation.getArguments()[3]);
-                when(accessToken.getClient()).thenReturn(sc);
-
-                when(accessToken.getToken()).thenReturn(token);
-                when(accessToken.getExpireTime()).thenReturn(System.currentTimeMillis() + 3600000L);
-                when(accessToken.isExpired()).thenReturn(false);
-                accessTokenMap.put(token, accessToken);
-
-                return accessToken;
-            }
-        });
-
-        // Mock createAccessToken - Resource Owner Password
-        when(
-                realm.getTokenStore().createAccessToken(eq(OAuth2Constants.Bearer.BEARER), anySet(),
-                        anyString(), anyString(), any(SessionClient.class))).then(new Answer<AccessToken>() {
-            @Override
-            public AccessToken answer(InvocationOnMock invocation) throws Throwable {
-                AccessToken accessToken = mock(AccessToken.class);
-                String token = UUID.randomUUID().toString();
-
-                Map<String, Object> tokenMap = new HashMap<String, Object>();
-                tokenMap.put(OAuth2Constants.Params.ACCESS_TOKEN, token);
-                tokenMap.put(OAuth2Constants.Params.TOKEN_TYPE, OAuth2Constants.Bearer.BEARER);
-                tokenMap.put(OAuth2Constants.Params.EXPIRES_IN, 3600);
-                when(accessToken.convertToMap()).thenReturn(tokenMap);
-
-                when(accessToken.getScope()).thenReturn((Set<String>) invocation.getArguments()[1]);
-                when(accessToken.getRealm()).thenReturn((String) invocation.getArguments()[2]);
-                when(accessToken.getUserID()).thenReturn((String) invocation.getArguments()[3]);
-
-                // TODO We don't have redirect URI
-                SessionClient sc = mock(SessionClient.class);
-                when(sc.getClientId()).thenReturn((String) invocation.getArguments()[4]);
-                when(accessToken.getClient()).thenReturn(sc);
-
-                when(accessToken.getToken()).thenReturn(token);
+                when(accessToken.getTokenID()).thenReturn(token);
                 when(accessToken.getExpireTime()).thenReturn(System.currentTimeMillis() + 3600000L);
                 when(accessToken.isExpired()).thenReturn(false);
                 accessTokenMap.put(token, accessToken);

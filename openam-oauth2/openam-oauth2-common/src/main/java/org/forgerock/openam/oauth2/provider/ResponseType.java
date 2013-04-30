@@ -21,18 +21,39 @@
  * your own identifying information:
  * "Portions Copyrighted [2012] [ForgeRock Inc]"
  */
-package org.forgerock.openam.oauth2.model;
+/**
+ * "Portions Copyrighted 2012-2013 ForgeRock Inc"
+ *
+ */
+
+package org.forgerock.openam.oauth2.provider;
+
+import org.forgerock.openam.oauth2.model.CoreToken;
+
+import java.util.Map;
 
 /**
- * Implements the OAuth2 Refresh Token
- * @see <a href="http://tools.ietf.org/html/rfc6749#section-1.5">1.5.  Refresh Token</a>
+ * This class provides the functions that need to be implemented to create a response type for the authorize
+ * endpoint.
+ *
+ * @supported.all.api
  */
-public interface RefreshToken extends Token {
+public interface ResponseType {
+    /**
+     * Creates a token for a response type
+     * @param data The data needed to create the token
+     * @return  the created token
+     */
+    public CoreToken createToken(Map<String, Object> data);
 
     /**
-     * Get parent token
-     * 
-     * @return ID of parent token, will be null or an Access Code used to create this token
+     * Returns the location in the HTTP response the token should be returned
+     * @return A string of either FRAGMENT or QUERY
      */
-    public String getParentToken();
+    public String getReturnLocation();
+
+    /**
+     * The parameter in the URI to return the token as
+     */
+    public String URIParamValue();
 }

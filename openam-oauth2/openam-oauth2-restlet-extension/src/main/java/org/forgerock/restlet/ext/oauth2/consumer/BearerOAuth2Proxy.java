@@ -1,7 +1,7 @@
 /*
  * DO NOT REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright (c) 2012 ForgeRock Inc. All rights reserved.
+ * Copyright (c) 2012-2013 ForgeRock Inc. All rights reserved.
  *
  * The contents of this file are subject to the terms
  * of the Common Development and Distribution License
@@ -19,7 +19,7 @@
  * If applicable, add the following below the CDDL Header,
  * with the fields enclosed by brackets [] replaced by
  * your own identifying information:
- * "Portions Copyrighted [2012] [ForgeRock Inc]"
+ * "Portions Copyrighted [year] [name of copyright owner]"
  */
 
 package org.forgerock.restlet.ext.oauth2.consumer;
@@ -28,25 +28,26 @@ import org.restlet.Context;
 import org.restlet.Request;
 import org.restlet.Response;
 import org.restlet.Uniform;
+import org.forgerock.openam.oauth2.model.BearerToken;
 
 /**
  * A BearerOAuth2Proxy is a class used to test OAuth2 and by them demo application
  *
  */
-public class BearerOAuth2Proxy extends OAuth2Proxy<BearerAuthenticatorHelper, BearerToken> {
+public class BearerOAuth2Proxy extends OAuth2Proxy<BearerTokenExtractor, BearerToken> {
 
-    private BearerAuthenticatorHelper helper;
+    private BearerTokenExtractor helper;
     private RequestCallbackHandler<BearerToken> handler;
 
     public BearerOAuth2Proxy(Uniform oAuth2Client) {
         super(oAuth2Client);
-        this.helper = new BearerAuthenticatorHelper();
+        this.helper = new BearerTokenExtractor();
         this.handler = null;
     }
 
     public BearerOAuth2Proxy(Context context, Uniform oAuth2Client) {
         super(context, oAuth2Client);
-        this.helper = new BearerAuthenticatorHelper();
+        this.helper = new BearerTokenExtractor();
         this.handler = null;
     }
 
@@ -55,12 +56,12 @@ public class BearerOAuth2Proxy extends OAuth2Proxy<BearerAuthenticatorHelper, Be
     public BearerOAuth2Proxy(BearerOAuth2Proxy oAuth2Proxy, Flow flow,
             RequestCallbackHandler<BearerToken> handler) {
         super(oAuth2Proxy, flow);
-        this.helper = new BearerAuthenticatorHelper();
+        this.helper = new BearerTokenExtractor();
         this.handler = handler;
     }
 
     public BearerOAuth2Proxy(BearerOAuth2Proxy oAuth2Proxy, Flow flow,
-            BearerAuthenticatorHelper helper, RequestCallbackHandler handler) {
+                             BearerTokenExtractor helper, RequestCallbackHandler handler) {
         super(oAuth2Proxy, flow);
         this.helper = helper;
         this.handler = handler;
@@ -69,12 +70,12 @@ public class BearerOAuth2Proxy extends OAuth2Proxy<BearerAuthenticatorHelper, Be
     public BearerOAuth2Proxy(Context context, BearerOAuth2Proxy oAuth2Proxy, Flow flow,
             RequestCallbackHandler<BearerToken> handler) {
         super(context, oAuth2Proxy, flow);
-        this.helper = new BearerAuthenticatorHelper();
+        this.helper = new BearerTokenExtractor();
         this.handler = handler;
     }
 
     public BearerOAuth2Proxy(Context context, BearerOAuth2Proxy oAuth2Proxy, Flow flow,
-            BearerAuthenticatorHelper helper, RequestCallbackHandler<BearerToken> handler) {
+                             BearerTokenExtractor helper, RequestCallbackHandler<BearerToken> handler) {
         super(context, oAuth2Proxy, flow);
         this.helper = helper;
         this.handler = handler;
@@ -90,7 +91,7 @@ public class BearerOAuth2Proxy extends OAuth2Proxy<BearerAuthenticatorHelper, Be
     }
 
     @Override
-    public BearerAuthenticatorHelper getAccessTokenExtractor() {
+    public BearerTokenExtractor getAccessTokenExtractor() {
         return helper;
     }
 

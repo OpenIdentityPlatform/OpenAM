@@ -1,7 +1,7 @@
 /*
  * DO NOT REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright (c) 2012 ForgeRock Inc. All rights reserved.
+ * Copyright (c) 2012-2013 ForgeRock Inc. All rights reserved.
  *
  * The contents of this file are subject to the terms
  * of the Common Development and Distribution License
@@ -37,6 +37,7 @@ import java.util.*;
 import com.iplanet.am.util.SystemProperties;
 import com.iplanet.sso.SSOToken;
 import com.iplanet.sso.SSOTokenManager;
+import com.sun.identity.idm.*;
 import com.sun.identity.log.LogRecord;
 import com.sun.identity.log.Logger;
 import com.sun.identity.log.messageid.LogMessageProvider;
@@ -666,6 +667,10 @@ public class OAuth2Utils {
         return cleanScopes;
     }
 
+    public static Set<String> stringToSet(String string){
+        return OAuth2Utils.split(string, " ");
+    }
+
     /**
      * Gets the depoyment URI of the OAuth2 authorization server
      * @param request the request to get the deployment uri of
@@ -692,5 +697,44 @@ public class OAuth2Utils {
      * Constructor.
      */
     private OAuth2Utils() {
+    }
+
+    public static AMIdentity getClient(String clientId, String realm) throws OAuthProblemException {
+        SSOToken token = (SSOToken) AccessController.doPrivileged(AdminTokenAction.getInstance());
+        AMIdentity theID = null;
+
+        try {
+            AMIdentityRepository amIdRepo = new AMIdentityRepository(token, realm);
+
+            IdSearchControl idsc = new IdSearchControl();
+            idsc.setRecursive(true);
+            idsc.setAllReturnAttributes(true);
+            // search for the identity
+            Set<AMIdentity> results = Collections.EMPTY_SET;
+            idsc.setMaxResults(0);
+            IdSearchResults searchResults =
+                    amIdRepo.searchIdentities(IdType.AGENTONLY, clientId, idsc);
+            if (searchResults != null) {
+                results = searchResults.getSearchResults();
+            }
+
+            if (results == null || results.size() != 1) {
+                throw OAuthProblemException.OAuthError.UNAUTHORIZED_CLIENT.handle(null,
+                        "Not able to get client from OpenAM");
+
+            }
+
+            theID = results.iterator().next();
+
+            //if the client is deactivated return null
+            if (theID.isActive()){
+                return theID;
+            } else {
+                return null;
+            }
+        } catch (Exception e){
+            OAuth2Utils.DEBUG.error("OAuth2Utils::Unable to get client AMIdentity: ", e);
+            throw OAuthProblemException.OAuthError.UNAUTHORIZED_CLIENT.handle(null, "Not able to get client from OpenAM");
+        }
     }
 }

@@ -1,7 +1,7 @@
 /*
  * DO NOT REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright (c) 2012 ForgeRock Inc. All rights reserved.
+ * Copyright (c) 2012-2013 ForgeRock Inc. All rights reserved.
  *
  * The contents of this file are subject to the terms
  * of the Common Development and Distribution License
@@ -19,7 +19,7 @@
  * If applicable, add the following below the CDDL Header,
  * with the fields enclosed by brackets [] replaced by
  * your own identifying information:
- * "Portions Copyrighted [2012] [ForgeRock Inc]"
+ * "Portions Copyrighted [year] [name of company]"
  */
 
 package org.forgerock.restlet.ext.oauth2.consumer;
@@ -31,6 +31,7 @@ import java.util.HashSet;
 import java.util.Set;
 import java.util.Vector;
 
+import org.forgerock.openam.oauth2.model.CoreToken;
 import org.forgerock.openam.oauth2.utils.OAuth2Utils;
 import org.forgerock.openam.oauth2.exceptions.OAuthProblemException;
 import org.forgerock.restlet.ext.oauth2.consumer.RequestFactory.AuthorizationCodeRequest;
@@ -64,7 +65,7 @@ import org.restlet.util.Series;
  * Triggers the OAuth2 Flows for the demo
  *
  */
-public abstract class OAuth2Proxy<T extends AccessTokenExtractor<U>, U extends AbstractAccessToken>
+public abstract class OAuth2Proxy<T extends AccessTokenExtractor<U>, U extends CoreToken>
         extends Restlet {
 
     private Reference authorizationEndpoint = null;
@@ -567,11 +568,11 @@ public abstract class OAuth2Proxy<T extends AccessTokenExtractor<U>, U extends A
     protected AuthenticationStatus beforeHandle(Request request, Response response) {
         RequestCallbackHandler<U> callbackHandler = getRequestCallbackHandler(request, response);
         U token = callbackHandler.popAccessToken(request);
-        if (null == token || !token.isValid()) {
+        if (null == token || !token.isExpired()) {
 
             // TODO Call the REFRESH_TOKEN if it's possible
             Flow au = getAuthenticationFlow();
-            if (null != token && token.hasRefreshToken()) {
+            if (null != token && token.getRefreshToken() != null) {
                 switch (au) {
                 case AUTHORIZATION_CODE: {
                     au = Flow.REFRESH_TOKEN;
@@ -617,7 +618,7 @@ public abstract class OAuth2Proxy<T extends AccessTokenExtractor<U>, U extends A
                 break;
             }
             case REFRESH_TOKEN: {
-                if (token == null || !token.hasRefreshToken()) {
+                if (token == null || token.getRefreshToken() == null) {
                     return AuthenticationStatus.UNAUTHENTICATED;
                 }
                 token =

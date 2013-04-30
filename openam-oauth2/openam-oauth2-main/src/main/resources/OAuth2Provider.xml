@@ -87,12 +87,21 @@
                         <Value>org.forgerock.openam.oauth2.provider.impl.ScopeImpl</Value>
                     </DefaultValues>
                 </AttributeSchema>
+                <AttributeSchema name="forgerock-oauth2-provider-response-type-map-class"
+                                 type="list"
+                                 syntax="string"
+                                 i18nKey="a105">
+                    <DefaultValues>
+                        <Value>token|org.forgerock.restlet.ext.oauth2.flow.ImplicitGrantServerResource</Value>
+                        <Value>code|org.forgerock.restlet.ext.oauth2.flow.CodeServerResource</Value>
+                    </DefaultValues>
+                </AttributeSchema>
 
                 <AttributeSchema
                         name="forgerock-oauth2-provider-authentication-attributes"
                         type="list"
                         syntax="string"
-                        i18nKey="a105">
+                        i18nKey="a106">
                     <DefaultValues>
                         <Value>uid</Value>
                     </DefaultValues>
@@ -151,6 +160,15 @@
                                      i18nKey="a104">
                         <DefaultValues>
                             <Value>org.forgerock.openam.oauth2.provider.impl.ScopeImpl</Value>
+                        </DefaultValues>
+                    </AttributeSchema>
+                    <AttributeSchema name="forgerock-oauth2-provider-response-type-map-class"
+                                     type="list"
+                                     syntax="string"
+                                     i18nKey="a105">
+                        <DefaultValues>
+                            <Value>token|org.forgerock.restlet.ext.oauth2.flow.ImplicitGrantServerResource</Value>
+                            <Value>code|org.forgerock.restlet.ext.oauth2.flow.CodeServerResource</Value>
                         </DefaultValues>
                     </AttributeSchema>
 

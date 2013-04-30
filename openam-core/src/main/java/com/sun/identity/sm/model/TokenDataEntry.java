@@ -31,7 +31,7 @@ public class TokenDataEntry {
 
     public TokenDataEntry(JsonValue value){
         attributeValues = value.get("value");
-        dn = value.get("id").required().asString();
+        dn = value.get(OAuth2Constants.CoreTokenParams.ID).required().asString();
         if (dn == null){
             dn = UUID.randomUUID().toString();
         }
@@ -55,12 +55,10 @@ public class TokenDataEntry {
                    valueList.add(o.toString());
                }
            }
-           key = key.replace("_", "");
            if (!valueList.isEmpty()){
                attrList.add(new LDAPAttribute(key, valueList));
            }
        }
-       attrList.add(new LDAPAttribute(OAuth2Constants.Params.ID, dn));
        return attrList;
     }
 

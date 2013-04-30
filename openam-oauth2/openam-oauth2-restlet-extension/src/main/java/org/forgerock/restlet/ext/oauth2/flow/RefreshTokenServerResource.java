@@ -1,7 +1,7 @@
 /*
  * DO NOT REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright (c) 2012 ForgeRock Inc. All rights reserved.
+ * Copyright (c) 2012-2013 ForgeRock Inc. All rights reserved.
  *
  * The contents of this file are subject to the terms
  * of the Common Development and Distribution License
@@ -19,20 +19,19 @@
  * If applicable, add the following below the CDDL Header,
  * with the fields enclosed by brackets [] replaced by
  * your own identifying information:
- * "Portions Copyrighted [2012] [ForgeRock Inc]"
+ * "Portions Copyrighted [year] [name of company]"
  */
 
 package org.forgerock.restlet.ext.oauth2.flow;
 
-import java.util.Map;
-import java.util.Set;
-import java.util.TreeSet;
+import java.util.*;
 
 import com.sun.identity.shared.OAuth2Constants;
+import org.forgerock.openam.oauth2.model.CoreToken;
+import org.forgerock.openam.oauth2.model.SessionClient;
+import org.forgerock.openam.oauth2.model.SessionClientImpl;
 import org.forgerock.openam.oauth2.utils.OAuth2Utils;
 import org.forgerock.openam.oauth2.exceptions.OAuthProblemException;
-import org.forgerock.openam.oauth2.model.AccessToken;
-import org.forgerock.openam.oauth2.model.RefreshToken;
 import org.restlet.ext.jackson.JacksonRepresentation;
 import org.restlet.representation.Representation;
 import org.restlet.resource.Post;
@@ -58,14 +57,17 @@ public class RefreshTokenServerResource extends AbstractFlow {
                 OAuth2Utils.getRequestParameter(getRequest(), OAuth2Constants.Params.REFRESH_TOKEN,
                         String.class);
         // Find Token
-        RefreshToken refreshToken = getTokenStore().readRefreshToken(refresh_token);
+        CoreToken refreshToken = getTokenStore().readRefreshToken(refresh_token);
+
+        SessionClient refreshTokenClient = new SessionClientImpl(refreshToken.getClientID(),
+                                                                 refreshToken.getRedirectURI());
 
         if (null == refreshToken) {
             OAuth2Utils.DEBUG.error("Refresh token does not exist for id: " + refresh_token );
             throw OAuthProblemException.OAuthError.INVALID_REQUEST.handle(getRequest(),
                     "RefreshToken does not exist");
-        } else if (!refreshToken.getClient().getClientId().equals(client.getClient().getClientId())) {
-            OAuth2Utils.DEBUG.error("Refresh Token was issued to a different client id: " + refreshToken.getClient().getClientId() );
+        } else if (!refreshTokenClient.getClientId().equals(client.getClient().getClientId())) {
+            OAuth2Utils.DEBUG.error("Refresh Token was issued to a different client id: " + refreshTokenClient.getClientId() );
             throw OAuthProblemException.OAuthError.INVALID_REQUEST.handle(getRequest(),
                     "Token was issued to a different client");
         } else {
@@ -91,8 +93,13 @@ public class RefreshTokenServerResource extends AbstractFlow {
             Set<String> checkedScope = executeRefreshTokenScopePlugin(scope_before, granted_after);
 
             // Generate Token
-            AccessToken token = createAccessToken(refreshToken, checkedScope);
+            CoreToken token = createAccessToken(refreshToken, checkedScope);
             Map<String, Object> response = token.convertToMap();
+
+            //execute post token creation pre return scope plugin for extra return data.
+            Map<String, String> data = new HashMap<String, String>();
+            response.putAll(executeExtraDataScopePlugin(data ,token));
+
             return new JacksonRepresentation<Map>(response);
         }
     }
@@ -110,9 +117,10 @@ public class RefreshTokenServerResource extends AbstractFlow {
      * @throws org.forgerock.openam.oauth2.exceptions.OAuthProblemException
      * 
      */
-    protected AccessToken createAccessToken(RefreshToken refreshToken, Set<String> checkedScope) {
+    protected CoreToken createAccessToken(CoreToken refreshToken, Set<String> checkedScope) {
         return getTokenStore().createAccessToken(client.getClient().getAccessTokenType(),
-                checkedScope, refreshToken, OAuth2Utils.getRealm(getRequest()));
+                checkedScope,OAuth2Utils.getRealm(getRequest()), refreshToken.getUserID(),
+                refreshToken.getClientID(), refreshToken.getRedirectURI(), null, refreshToken.getTokenID());
     }
 
 }

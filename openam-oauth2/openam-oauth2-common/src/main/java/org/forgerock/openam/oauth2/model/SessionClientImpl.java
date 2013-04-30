@@ -22,12 +22,11 @@
  * "Portions Copyrighted [2012] [ForgeRock Inc]"
  */
 
-package org.forgerock.openam.oauth2.model.impl;
+package org.forgerock.openam.oauth2.model;
 
 import java.util.HashMap;
 
 import org.forgerock.json.fluent.JsonValue;
-import org.forgerock.openam.oauth2.model.SessionClient;
 
 /**
  * Implements a {@link SessionClient}

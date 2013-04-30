@@ -1,7 +1,7 @@
 /*
  * DO NOT REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright (c) 2012 ForgeRock Inc. All rights reserved.
+ * Copyright (c) 2012-2013 ForgeRock Inc. All rights reserved.
  *
  * The contents of this file are subject to the terms
  * of the Common Development and Distribution License
@@ -19,12 +19,12 @@
  * If applicable, add the following below the CDDL Header,
  * with the fields enclosed by brackets [] replaced by
  * your own identifying information:
- * "Portions Copyrighted [2012] [ForgeRock Inc]"
+ * "Portions Copyrighted [year] [name of company]"
  */
 
 package org.forgerock.openam.oauth2.provider;
 
-import org.forgerock.openam.oauth2.model.AccessToken;
+import org.forgerock.openam.oauth2.model.CoreToken;
 
 import java.util.Map;
 import java.util.Set;
@@ -74,6 +74,32 @@ public interface Scope {
      * @return returns a map of data to be added to the token json object that will be returned to the client,
      *          can be null if no information needs to be returned.
      */
-    public Map<String, Object> evaluateScope(AccessToken token);
+    public Map<String, Object> evaluateScope(CoreToken token);
+
+    /**
+     * This method is called before the access_token end point returns an access token. Whatever is returned by this
+     * method will be added to the json object returned by the access_token endpoint.
+     * @param parameters set of extra data to pass into the method
+     * @param token the token created that will be returned with the extra data from this method
+     * @return
+     */
+    public Map<String, Object> extraDataToReturnForTokenEndpoint(Map<String, String> parameters, CoreToken token);
+
+    /**
+     * This method is called before the access_token end point returns an access token. Whatever is returned by this
+     * method will be added to the json object returned by the access_token endpoint.
+     * @param parameters map of extra data to pass into the method
+     * @param tokens a map of token return names to the token. For example "code"=>tokenObject
+     * @return the return map should include the key value pair returnType=>Value where value is either FRAGMENT or QUERY
+     */
+    public Map<String, String> extraDataToReturnForAuthorizeEndpoint(Map<String, String> parameters, Map<String, CoreToken> tokens);
+
+    /**
+     * This method takes the scope values in the token and gets those user profile attributes for the owner of
+     * the token.
+     * @param token The OAuth2 bearer token.
+     * @return
+     */
+    public Map<String,Object> getUserInfo(CoreToken token);
 
 }

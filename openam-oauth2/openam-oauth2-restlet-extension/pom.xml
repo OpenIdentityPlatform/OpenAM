@@ -3,7 +3,7 @@
 <!--
   ~ DO NOT REMOVE COPYRIGHT NOTICES OR THIS HEADER.
   ~
-  ~ Copyright (c) 2012 ForgeRock Inc. All rights reserved.
+  ~ Copyright (c) 2012-2013 ForgeRock Inc. All rights reserved.
   ~
   ~ The contents of this file are subject to the terms
   ~ of the Common Development and Distribution License
@@ -81,9 +81,13 @@
         </dependency>
         <dependency>
             <groupId>org.forgerock.openam</groupId>
+            <artifactId>openam-oauth2-core-token-service</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.forgerock.openam</groupId>
             <artifactId>openam-federation-library</artifactId>
         </dependency>
-
+ 
         <!-- Restlet -->
         <dependency>
             <groupId>org.restlet.osgi</groupId>
@@ -92,6 +96,10 @@
         <dependency>
             <groupId>org.restlet.osgi</groupId>
             <artifactId>org.restlet.ext.jackson</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.restlet.osgi</groupId>
+            <artifactId>org.restlet.ext.json</artifactId>
         </dependency>
         <dependency>
             <groupId>org.restlet.osgi</groupId>
@@ -183,36 +191,5 @@
         </plugins>
     </build>
     <profiles>
-        <profile>
-            <id>jrebel</id>
-            <build>
-                <plugins>
-                    <plugin>
-                        <groupId>org.zeroturnaround</groupId>
-                        <artifactId>jrebel-maven-plugin</artifactId>
-                        <version>1.1.3</version>
-                        <executions>
-                            <execution>
-                                <id>generate-rebel-xml</id>
-                                <phase>process-resources</phase>
-                                <goals>
-                                    <goal>generate</goal>
-                                </goals>
-                            </execution>
-                        </executions>
-                    </plugin>
-                    <plugin>
-                        <groupId>org.apache.felix</groupId>
-                        <artifactId>maven-bundle-plugin</artifactId>
-                        <extensions>true</extensions>
-                        <configuration>
-                            <instructions>
-                                <Include-Resource>{maven-resources},target/classes/rebel.xml</Include-Resource>
-                            </instructions>
-                        </configuration>
-                    </plugin>
-                </plugins>
-            </build>
-        </profile>
     </profiles>
 </project>

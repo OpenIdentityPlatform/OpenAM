@@ -1,7 +1,7 @@
 /*
  * DO NOT REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright (c) 2012 ForgeRock Inc. All rights reserved.
+ * Copyright (c) 2012-2013 ForgeRock Inc. All rights reserved.
  *
  * The contents of this file are subject to the terms
  * of the Common Development and Distribution License
@@ -34,7 +34,7 @@ import com.sun.identity.saml2.common.SAML2Exception;
 import com.sun.identity.shared.OAuth2Constants;
 import com.sun.identity.shared.encode.Base64;
 import org.forgerock.openam.oauth2.exceptions.OAuthProblemException;
-import org.forgerock.openam.oauth2.model.AccessToken;
+import org.forgerock.openam.oauth2.model.CoreToken;
 import org.forgerock.openam.oauth2.utils.OAuth2Utils;
 import org.restlet.ext.jackson.JacksonRepresentation;
 import org.restlet.representation.Representation;
@@ -139,9 +139,9 @@ public class SAML20BearerServerResource extends AbstractFlow {
                 OAuth2Utils.getRealm(getRequest())+"\n"+
                 assertionObject.getSubject().getNameID().getValue()+"\n"+
                 client.getClient().getClientId());
-        AccessToken token = getTokenStore().createAccessToken(client.getClient().getAccessTokenType(), checkedScope,
+        CoreToken token = getTokenStore().createAccessToken(client.getClient().getAccessTokenType(), checkedScope,
                 OAuth2Utils.getRealm(getRequest()), assertionObject.getSubject().getNameID().getValue(),
-                client.getClient().getClientId());
+                client.getClient().getClientId(), null, null, null);
         OAuth2Utils.DEBUG.message("SAML20BearerServerResource.represent(): Token created: " + token.toString());
 
         Map<String, Object> response = token.convertToMap();

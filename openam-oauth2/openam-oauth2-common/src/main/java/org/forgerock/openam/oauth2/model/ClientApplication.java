@@ -1,7 +1,7 @@
 /*
  * DO NOT REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright (c) 2012 ForgeRock Inc. All rights reserved.
+ * Copyright (c) 2012-2013 ForgeRock Inc. All rights reserved.
  *
  * The contents of this file are subject to the terms
  * of the Common Development and Distribution License
@@ -19,7 +19,7 @@
  * If applicable, add the following below the CDDL Header,
  * with the fields enclosed by brackets [] replaced by
  * your own identifying information:
- * "Portions Copyrighted [2012] [ForgeRock Inc]"
+ * "Portions Copyrighted [year] [name of copyright owner]"
  */
 package org.forgerock.openam.oauth2.model;
 
@@ -34,6 +34,10 @@ public interface ClientApplication {
 
     public enum ClientType {
         CONFIDENTIAL, PUBLIC;
+    }
+
+    public enum SubjectType {
+        PAIRWISE, PUBLIC;
     }
 
     /**
@@ -128,5 +132,155 @@ public interface ClientApplication {
      *          a set of display descriptions for various locales
      */
     public Set<String> getDisplayDescription();
+
+    /**
+     * Gets the Response Types this client will use
+     * @return
+     */
+    public Set<String> getResponseTypes();
+
+    /**
+     * Gets the Grant Types this client will use
+     * @return
+     */
+    public Set<String> getGrantTypes();
+
+    /**
+     * Gets the list of people allowed to edit this client
+     * @return
+     */
+    public String getContacts();
+
+    /**
+     * Gets the readable name of the client
+     * @return
+     */
+    public String getClientName();
+
+    /**
+     * Gets the URI that has the clients logo
+     * @return
+     */
+    public String getLogoURI();
+
+    /**
+     * Gets the method of authentication for the token endpoint
+     * @return
+     */
+    public String getTokenEndpointAuthMethod();
+
+    /**
+     * Gets the URI of the clients policy
+     * @return
+     */
+    public String getPolicyURI();
+
+    /**
+     * Gets the URI of the Clients Terms of Service
+     * @return
+     */
+    public String getTosURI();
+
+    /**
+     * Gets the URI that contains the clients Json Web Keys
+     * @return
+     */
+    public String getJwksURI();
+
+    /**
+     * Gets the clients Sector Identifier URI
+     * @return
+     */
+    public String getSectorIdentifierURI();
+
+    /**
+     * Gets the clients subject type
+     * @return
+     */
+    public SubjectType getSubjectType();
+
+    /**
+     * Gets the signing algorithm used to sign the request object
+     * @return
+     */
+    public String getRequestObjectSigningAlgorithm();
+
+    /**
+     * Gets the algorithm to use to sign the userinfo endpoint response
+     * @return
+     */
+    public String getUserInfoSignedResponseAlgorithm();
+
+    /**
+     * Gets the algorithm to use to encrypt the userinfo endpoint response
+     * @return
+     */
+    public String getUserInfoEncryptedResposneAlgorithm();
+
+    /**
+     * Gets the algorithm to use to ecrypt and sign the response from the userinfo endpoint
+     * @return
+     */
+    public String getUserInfoEncryptedResponseEncoding();
+
+    /**
+     * Gets the algorithm to use to sign the IDToken response
+     * @return
+     */
+    public String getIDTokenSignedResponseAlgorithm();
+
+    /**
+     * Gets the algorithm to use to encrypt the IDToken response
+     * @return
+     */
+    public String getIDTokenEncryptedResposneAlgorithm();
+
+    /**
+     * Gets the algorithm to use to ecrypt and sign the response for the IDToken
+     * @return
+     */
+    public String getIDTokenEncryptedResponseEncoding();
+
+    /**
+     * Gets the default time a client can be authenticated for before they must re-authenticate
+     * @return
+     */
+    public String getDefaultMaxAge();
+
+    /**
+     * Gets whether or not the Auth Time attribute is required in the IDToken
+     * @return
+     */
+    public String getRequireAuthTime();
+
+    /**
+     * gets the default ACR Values for the client
+     * @return
+     */
+    public String getDefaultACRValues();
+
+    /**
+     * The URI for the client to initiate login
+     * @return
+     */
+    public String getinitiateLoginURI();
+
+    /**
+     * Gets the URI to redirect to when the client logs out
+     * @return
+     */
+    public String getPostLogoutRedirectionURI();
+
+    /**
+     * Gets the client URI that has a JSON array of valid Request URIS.
+     * @return
+     */
+    public String getRequestURIS();
+
+    /**
+     * Gets the client URI that has a JSON array of valid Request URIS.
+     * @return
+     */
+    public String getAccessToken();
 
 }

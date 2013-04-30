@@ -25,16 +25,17 @@
 dn: cn=schema
 changetype: modify
 add: attributeTypes
-attributeTypes: ( 1.3.6.1.4.1.36733.2.27.9.2.200 NAME ( 'expirytime' ) SYNTAX 1.3.6.1.4.1.1466.115.121.1.15 X-ORIGIN 'ForgeRock OpenAM CTS' )
+attributeTypes: ( 1.3.6.1.4.1.36733.2.27.9.2.200 NAME ( 'expireTime' ) SYNTAX 1.3.6.1.4.1.1466.115.121.1.15 X-ORIGIN 'ForgeRock OpenAM CTS' )
 attributeTypes: ( 1.3.6.1.4.1.36733.2.27.9.2.201 NAME ( 'scope' ) SYNTAX 1.3.6.1.4.1.1466.115.121.1.15 X-ORIGIN 'ForgeRock OpenAM CTS' )
 attributeTypes: ( 1.3.6.1.4.1.36733.2.27.9.2.202 NAME ( 'parent' ) SYNTAX 1.3.6.1.4.1.1466.115.121.1.15 X-ORIGIN 'ForgeRock OpenAM CTS' )
-attributeTypes: ( 1.3.6.1.4.1.36733.2.27.9.2.203 NAME ( 'username' ) SYNTAX 1.3.6.1.4.1.1466.115.121.1.15 X-ORIGIN 'ForgeRock OpenAM CTS' )
-attributeTypes: ( 1.3.6.1.4.1.36733.2.27.9.2.204 NAME ( 'redirecturi' ) SYNTAX 1.3.6.1.4.1.1466.115.121.1.15 X-ORIGIN 'ForgeRock OpenAM CTS' )
-attributeTypes: ( 1.3.6.1.4.1.36733.2.27.9.2.205 NAME ( 'refreshtoken' ) SYNTAX 1.3.6.1.4.1.1466.115.121.1.15 X-ORIGIN 'ForgeRock OpenAM CTS' )
+attributeTypes: ( 1.3.6.1.4.1.36733.2.27.9.2.203 NAME ( 'userName' ) SYNTAX 1.3.6.1.4.1.1466.115.121.1.15 X-ORIGIN 'ForgeRock OpenAM CTS' )
+attributeTypes: ( 1.3.6.1.4.1.36733.2.27.9.2.204 NAME ( 'redirectURI' ) SYNTAX 1.3.6.1.4.1.1466.115.121.1.15 X-ORIGIN 'ForgeRock OpenAM CTS' )
+attributeTypes: ( 1.3.6.1.4.1.36733.2.27.9.2.205 NAME ( 'refreshToken' ) SYNTAX 1.3.6.1.4.1.1466.115.121.1.15 X-ORIGIN 'ForgeRock OpenAM CTS' )
 attributeTypes: ( 1.3.6.1.4.1.36733.2.27.9.2.206 NAME ( 'issued' ) SYNTAX 1.3.6.1.4.1.1466.115.121.1.15 X-ORIGIN 'ForgeRock OpenAM CTS' )
-attributeTypes: ( 1.3.6.1.4.1.36733.2.27.9.2.207 NAME ( 'type' ) SYNTAX 1.3.6.1.4.1.1466.115.121.1.15 X-ORIGIN 'ForgeRock OpenAM CTS' )
+attributeTypes: ( 1.3.6.1.4.1.36733.2.27.9.2.207 NAME ( 'tokenType' ) SYNTAX 1.3.6.1.4.1.1466.115.121.1.15 X-ORIGIN 'ForgeRock OpenAM CTS' )
 attributeTypes: ( 1.3.6.1.4.1.36733.2.27.9.2.208 NAME ( 'realm' ) SYNTAX 1.3.6.1.4.1.1466.115.121.1.15 X-ORIGIN 'ForgeRock OpenAM CTS' )
 attributeTypes: ( 1.3.6.1.4.1.36733.2.27.9.2.209 NAME ( 'id' ) SYNTAX 1.3.6.1.4.1.1466.115.121.1.15 X-ORIGIN 'ForgeRock OpenAM CTS' )
-attributeTypes: ( 1.3.6.1.4.1.36733.2.27.9.2.210 NAME ( 'clientid' ) SYNTAX 1.3.6.1.4.1.1466.115.121.1.15 X-ORIGIN 'ForgeRock OpenAM CTS' )
+attributeTypes: ( 1.3.6.1.4.1.36733.2.27.9.2.210 NAME ( 'clientID' ) SYNTAX 1.3.6.1.4.1.1466.115.121.1.15 X-ORIGIN 'ForgeRock OpenAM CTS' )
+attributeTypes: ( 1.3.6.1.4.1.36733.2.27.9.2.211 NAME ( 'tokenName' ) SYNTAX 1.3.6.1.4.1.1466.115.121.1.15 X-ORIGIN 'ForgeRock OpenAM CTS' )
 add: objectclasses
-objectClasses: ( 1.3.6.1.4.1.36733.2.27.9.3.50 NAME 'frOAuth2Tokens' SUP top STRUCTURAL MUST id MAY ( realm $ clientid $ type $ redirecturi $ scope $ expirytime $ refreshtoken $ username $ parent $ issued ) X-ORIGIN 'ForgeRock OpenAM CTS' )
+objectClasses: ( 1.3.6.1.4.1.36733.2.27.9.3.50 NAME 'frOAuth2Tokens' SUP top STRUCTURAL MUST id MAY ( realm $ clientID $ tokenType $ redirectURI $ scope $ expireTime $ refreshToken $ userName $ parent $ issued $ tokenName ) X-ORIGIN 'ForgeRock OpenAM CTS' )

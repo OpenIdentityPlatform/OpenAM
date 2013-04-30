@@ -1,7 +1,7 @@
 /*
  * DO NOT REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright (c) 2012 ForgeRock Inc. All rights reserved.
+ * Copyright (c) 2012-2013 ForgeRock Inc. All rights reserved.
  *
  * The contents of this file are subject to the terms
  * of the Common Development and Distribution License
@@ -19,7 +19,7 @@
  * If applicable, add the following below the CDDL Header,
  * with the fields enclosed by brackets [] replaced by
  * your own identifying information:
- * "Portions Copyrighted [2012] [ForgeRock Inc]"
+ * "Portions Copyrighted [year] [name of company]"
  */
 
 package org.forgerock.openam.oauth2demo;
@@ -38,7 +38,7 @@ import com.sun.identity.shared.OAuth2Constants;
 import org.forgerock.openam.oauth2.utils.OAuth2Utils;
 import org.forgerock.openam.oauth2.exceptions.OAuthProblemException;
 import org.forgerock.restlet.ext.oauth2.consumer.BearerOAuth2Proxy;
-import org.forgerock.restlet.ext.oauth2.consumer.BearerToken;
+import org.forgerock.openam.oauth2.model.BearerToken;
 import org.forgerock.restlet.ext.oauth2.consumer.OAuth2Proxy;
 import org.forgerock.restlet.ext.oauth2.consumer.RequestCallbackHandler;
 import org.forgerock.openam.oauth2.provider.OAuth2TokenStore;

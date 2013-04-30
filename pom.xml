@@ -134,7 +134,7 @@
         <commons.json-patch.version>1.0.0</commons.json-patch.version>
         <forgerock.json.version>2.0.0-SNAPSHOT</forgerock.json.version>
 
-        <restlet.version>2.1.1</restlet.version>
+        <restlet.version>2.1-RC6</restlet.version>
         <xercesj.version>2.11.0</xercesj.version>
 
         <!--  Project web site -->
@@ -450,6 +450,11 @@
         <repository>
             <id>maven-restlet</id>
             <name>Public online Restlet repository</name>
+            <url>http://maven.restlet.org</url>
+        </repository>
+        <repository>
+            <id>powermock</id>
+            <name>Public online PowerMock repository</name>
             <url>http://maven.restlet.org</url>
         </repository>
 
@@ -1256,7 +1261,7 @@
             <dependency>
                 <groupId>org.mockito</groupId>
                 <artifactId>mockito-all</artifactId>
-                <version>1.9.0</version>
+                <version>1.9.5</version>
                 <scope>test</scope>
             </dependency>
 
@@ -1471,6 +1476,16 @@
                 <version>${restlet.version}</version>
             </dependency>
             <dependency>
+                <groupId>org.restlet.jse</groupId>
+                <artifactId>org.restlet.ext.json</artifactId>
+                <version>${restlet.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.restlet.osgi</groupId>
+                <artifactId>org.restlet.ext.json</artifactId>
+                <version>${restlet.version}</version>
+            </dependency>
+            <dependency>
                 <groupId>org.restlet.osgi</groupId>
                 <artifactId>org.restlet</artifactId>
                 <version>${restlet.version}</version>
@@ -1598,6 +1613,33 @@
                 <groupId>com.google.inject</groupId>
                 <artifactId>guice</artifactId>
                 <version>3.0</version>
+            </dependency>
+
+            <!-- Powermock -->
+            <dependency>
+                <groupId>org.powermock</groupId>
+                <artifactId>powermock-api-mockito</artifactId>
+                <version>1.5</version>
+            </dependency>
+            <dependency>
+                <groupId>org.powermock</groupId>
+                <artifactId>powermock-core</artifactId>
+                <version>1.5</version>
+            </dependency>
+            <dependency>
+                <groupId>org.powermock</groupId>
+                <artifactId>powermock-reflect</artifactId>
+                <version>1.5</version>
+            </dependency>
+            <dependency>
+                <groupId>org.powermock</groupId>
+                <artifactId>powermock-module-testng</artifactId>
+                <version>1.5</version>
+            </dependency>
+            <dependency>
+                <groupId>org.powermock</groupId>
+                <artifactId>powermock-module-testng-common</artifactId>
+                <version>1.5</version>
             </dependency>
         </dependencies>
     </dependencyManagement>

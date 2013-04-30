@@ -1,7 +1,7 @@
 /*
  * DO NOT REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright (c) 2012 ForgeRock Inc. All rights reserved.
+ * Copyright (c) 2012-2013 ForgeRock Inc. All rights reserved.
  *
  * The contents of this file are subject to the terms
  * of the Common Development and Distribution License
@@ -19,17 +19,16 @@
  * If applicable, add the following below the CDDL Header,
  * with the fields enclosed by brackets [] replaced by
  * your own identifying information:
- * "Portions Copyrighted [2012] [ForgeRock Inc]"
+ * "Portions Copyrighted [year] [name of company]"
  */
 package org.forgerock.restlet.ext.oauth2.consumer;
 
+import org.forgerock.openam.oauth2.model.CoreToken;
 import org.forgerock.openam.oauth2.utils.OAuth2Utils;
 import org.forgerock.openam.oauth2.exceptions.OAuthProblemException;
 import org.restlet.Request;
 import org.restlet.Response;
-import org.restlet.data.Form;
-import org.restlet.data.MediaType;
-import org.restlet.data.Method;
+import org.restlet.data.*;
 import org.restlet.representation.Representation;
 import org.restlet.security.User;
 import org.restlet.security.Verifier;
@@ -38,7 +37,7 @@ import org.restlet.security.Verifier;
  * Verifies and a generic token.
  *
  */
-public abstract class TokenVerifier<T extends AccessTokenExtractor<U>, U extends AbstractAccessToken> {
+public abstract class TokenVerifier<T extends AccessTokenExtractor<U>, U extends CoreToken> {
 
     public abstract User createUser(U token);
 
@@ -61,7 +60,6 @@ public abstract class TokenVerifier<T extends AccessTokenExtractor<U>, U extends
 
         private OAuth2Utils.ParameterLocation tokenLocation;
 
-        @Override
         public int verify(Request request, Response response) {
             int result = RESULT_INVALID;
             try {
@@ -73,14 +71,17 @@ public abstract class TokenVerifier<T extends AccessTokenExtractor<U>, U extends
                             || Method.HEAD.equals(request.getMethod())) {
                         token =
                                 getTokenExtractor().extractToken(
-                                        OAuth2Utils.ParameterLocation.HTTP_QUERY, request);
+                                        OAuth2Utils.ParameterLocation.HTTP_BODY, request);
                         break;
                     }
+                    break;
                 }
                 case HTTP_HEADER: {
                     if (request.getChallengeResponse() == null) {
                         return RESULT_MISSING;
                     }
+                    token = getTokenExtractor().extractToken(tokenLocation, request);
+                    break;
                 }
                 default: {
                     token = getTokenExtractor().extractToken(tokenLocation, request);
@@ -90,8 +91,14 @@ public abstract class TokenVerifier<T extends AccessTokenExtractor<U>, U extends
                     result = RESULT_MISSING;
                 } else {
                     U t = getTokenValidator().verify(token);
-                    if (null != t || t.isValid()) {
-                        request.getClientInfo().setUser(createUser(t));
+                    if (null != t || !t.isExpired()) {
+                        try {
+                            if (request.getClientInfo() != null){
+                                request.getClientInfo().setUser(createUser(t));
+                            }
+                        } catch (Exception e){
+                            //do nothing
+                        }
                         result = RESULT_VALID;
                     }
                 }

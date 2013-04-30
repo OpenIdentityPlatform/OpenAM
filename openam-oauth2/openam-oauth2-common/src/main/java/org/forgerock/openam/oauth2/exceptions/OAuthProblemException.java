@@ -1,7 +1,7 @@
 /*
  * DO NOT REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright (c) 2012 ForgeRock Inc. All rights reserved.
+ * Copyright (c) 2012-2013 ForgeRock Inc. All rights reserved.
  *
  * The contents of this file are subject to the terms
  * of the Common Development and Distribution License
@@ -19,7 +19,7 @@
  * If applicable, add the following below the CDDL Header,
  * with the fields enclosed by brackets [] replaced by
  * your own identifying information:
- * "Portions Copyrighted [2012] [ForgeRock Inc]"
+ * "Portions Copyrighted [year] [name of company]"
  */
 
 package org.forgerock.openam.oauth2.exceptions;
@@ -72,7 +72,7 @@ public class OAuthProblemException extends ResourceException {
         INVALID_TOKEN(
                 OAuth2Constants.Error.INVALID_TOKEN,
                 "The access token provided is expired, revoked, malformed, or invalid for other reasons.",
-                "", 401),
+                "", 403),
         INSUFFICIENT_SCOPE(OAuth2Constants.Error.INSUFFICIENT_SCOPE,
                 "The request requires higher privileges than provided by the access token.", "",
                 403),
@@ -99,8 +99,11 @@ public class OAuthProblemException extends ResourceException {
                 "The redirection URI provided does not match a pre-registered value.", ""),
         UNSUPPORTED_AUTH_TYPE(OAuth2Constants.Error.UNSUPPORTED_AUTH_TYPE,
                 "The requested authentication type is not supported by the authorization server.",
-                ""), NOT_FOUND(OAuth2Constants.Error.NOT_FOUND,
-                "The request is for data which does not exist.", "", 404);
+                ""),
+        NOT_FOUND(OAuth2Constants.Error.NOT_FOUND,
+                "The request is for data which does not exist.", "", 404),
+        INVALID_CLIENT_METADATA(OAuth2Constants.Error.INVALID_CLIENT_METADATA,
+                "The request contains invalid metadata.", "", 400);
         Status status;
 
         private OAuthError(String reasonPhrase, String description, String uri) {

@@ -102,6 +102,11 @@ public class OAuth2Constants {
         public static final String RESPONSE_TYPE = "response_type";
 
         /**
+         * Delimiter that seperates the response_type values
+         */
+        public static final String RESPONSE_TYPE_DELIMITER = " ";
+
+        /**
          * Parameter usage location: authorization request, token request
          */
         public static final String REDIRECT_URI = "redirect_uri";
@@ -180,11 +185,29 @@ public class OAuth2Constants {
 
     }
 
+    public class CoreTokenParams{
+
+        public static final String EXPIRE_TIME = "expireTime";
+        public static final String SCOPE = "scope";
+        public static final String PARENT = "parent";
+        public static final String USERNAME= "userName";
+        public static final String REDIRECT_URI = "redirectURI";
+        public static final String REFRESH_TOKEN = "refreshToken";
+        public static final String ISSUED = "issued";
+        public static final String TOKEN_TYPE = "tokenType";
+        public static final String REALM = "realm";
+        public static final String ID = "id";
+        public static final String CLIENT_ID = "clientID";
+        public static final String TOKEN_NAME = "tokenName";
+
+    }
+
     public class Token {
         public static final String OAUTH_ACCESS_TOKEN = "access_token";
         public static final String OAUTH_EXPIRES_IN = "expires_in";
         public static final String OAUTH_REFRESH_TOKEN = "refresh_token";
         public static final String OAUTH_TOKEN_TYPE = "token_type";
+        public static final String OAUTH_CODE_TYPE = "access_code";
     }
 
     public class StoredToken {
@@ -599,6 +622,11 @@ public class OAuth2Constants {
          * The request is for data which does not exist.
          */
         public static final String NOT_FOUND = "not_found";
+
+        /**
+         * The request contains invalid client metadata.
+         */
+        public static final String INVALID_CLIENT_METADATA = "invalid_client_metadata";
     }
 
     public class Custom {
@@ -613,12 +641,14 @@ public class OAuth2Constants {
          * even if he has already granted access to your application for a
          * particular set of scopes."
          */
+        public static final String PROMPT = "prompt";
         public static final String APPROVAL_PROMPT = "approval_prompt";
         public static final String AUTO = "auto";
         public static final String FORCE = "force";
         public static final String DECISION = "decision";
         public static final String ALLOW = "allow";
         public static final String DENY = "deny";
+        public static final String NONCE = "nonce";
         /**
          * The display mode in which to render the dialog. The default is
          * {@code page} on the www subdomain and {@code wap} on the m subdomain.
@@ -649,7 +679,7 @@ public class OAuth2Constants {
     }
 
     public enum DisplayType {
-        IFRAME, PAGE, POPUP, TOUCH, WAP;
+        PAGE, POPUP, TOUCH, WAP;
 
         public String getFolder() {
             return name().toLowerCase();
@@ -671,6 +701,8 @@ public class OAuth2Constants {
         public static final String ACCESS_TOKEN_LIFETIME_NAME = "forgerock-oauth2-provider-access-token-lifetime";
         public static final String ISSUE_REFRESH_TOKEN = "forgerock-oauth2-provider-issue-refresh-token";
         public static final String SCOPE_PLUGIN_CLASS= "forgerock-oauth2-provider-scope-implementation-class";
+        public static final String TOKEN_PLUGIN_LIST = "forgerock-oauth2-provider-token-map-class";
+        public static final String RESPONSE_TYPE_LIST = "forgerock-oauth2-provider-response-type-map-class";
         public static final String AUTHENITCATION_ATTRIBUTES = "forgerock-oauth2-provider-authentication-attributes";
     }
 
@@ -679,4 +711,46 @@ public class OAuth2Constants {
      */
     public static final String ACCESS_LOG_NAME = "OAuth2Provider.access";
     public static final String ERROR_LOG_NAME = "OAuth2Provider.error";
+
+    public class OAuth2Client{
+        public static final String REDIRECT_URI = "com.forgerock.openam.oauth2provider.redirectionURIs";
+        public static final String SCOPES = "com.forgerock.openam.oauth2provider.scopes";
+        public static final String DEFAULT_SCOPES = "com.forgerock.openam.oauth2provider.defaultScopes";
+        public static final String NAME = "com.forgerock.openam.oauth2provider.name";
+        public static final String DESCRIPTION = "com.forgerock.openam.oauth2provider.description";
+        public static final String GRANT_TYPES = "com.forgerock.openam.oauth2provider.grantTypes";
+        public static final String RESPONSE_TYPES = "com.forgerock.openam.oauth2provider.responseTypes";
+        public static final String CONTACTS = "com.forgerock.openam.oauth2provider.contacts";
+        public static final String LOGO_URI = "com.forgerock.openam.oauth2provider.logoURI";
+        public static final String TOKEN_ENDPOINT_AUTH_METHOD = "com.forgerock.openam.oauth2provider.tokenEndPointAuthMethod";
+        public static final String POLICY_URI = "com.forgerock.openam.oauth2provider.policyURI";
+        public static final String TOS_URI = "com.forgerock.openam.oauth2provider.tosURI";
+        public static final String JKWS_URI = "com.forgerock.openam.oauth2provider.jwksURI";
+        public static final String SECTOR_IDENTIFIER_URI = "com.forgerock.openam.oauth2provider.sectorIdentifierURI";
+        public static final String SUBJECT_TYPE = "com.forgerock.openam.oauth2provider.subjectType";
+        public static final String REQUEST_OBJECT_SIGNING_ALG = "com.forgerock.openam.oauth2provider.requestObjectSigningAlg";
+        public static final String USERINFO_SIGNED_RESPONSE_ALG = "com.forgerock.openam.oauth2provider.userinfoSignedResponseAlg";
+        public static final String USERINFO_ENCRYPTED_RESPONSE_ALG = "com.forgerock.openam.oauth2provider.userinfoEncryptedResponseAlg";
+        public static final String USERINFO_SIGN_AND_ENC_RESPONSE_ALG = "com.forgerock.openam.oauth2provider.userinfoEncryptedResponseEnc";
+        public static final String IDTOKEN_SIGNED_RESPONSE_ALG = "com.forgerock.openam.oauth2provider.idTokenSignedResponseAlg";
+        public static final String IDTOKEN_ENCRYPTED_RESPONSE_ALG = "com.forgerock.openam.oauth2provider.idTokenEncryptedResponseAlg";
+        public static final String IDTOKEN_ENC_AND_SIGNED_RESPONSE_ALG = "com.forgerock.openam.oauth2provider.idTokenEncryptedResponseEnc";
+        public static final String DEFAULT_MAX_AGE = "com.forgerock.openam.oauth2provider.defaultMaxAge";
+        public static final String REQUIRE_AUTH_TIME = "com.forgerock.openam.oauth2provider.requireAuthTime";
+        public static final String DEFAULT_ACR_VALS = "com.forgerock.openam.oauth2provider.defaultACRValues";
+        public static final String INIT_LOGIN_URL = "com.forgerock.openam.oauth2provider.initiateLoginUri";
+        public static final String POST_LOGOUT_URI = "com.forgerock.openam.oauth2provider.postLogoutRedirectURI";
+        public static final String REQUEST_URLs = "com.forgerock.openam.oauth2provider.requestURIs";
+        public static final String ACTIVE = "sunIdentityServerDeviceStatus";
+        public static final String CLIENT_TYPE = "com.forgerock.openam.oauth2provider.clientType";
+        public static final String USERPASSWORD = "userpassword";
+        public static final String REALM = "REALM";
+        public static final String CLIENT_ID = "client_id";
+        public static final String CLIENT_SECRET = "client_secret";
+        public static final String ACCESS_TOKEN = "com.forgerock.openam.oauth2provider.accessToken";
+    }
+
+    public class OpenIDConnectClient{
+
+    }
 }

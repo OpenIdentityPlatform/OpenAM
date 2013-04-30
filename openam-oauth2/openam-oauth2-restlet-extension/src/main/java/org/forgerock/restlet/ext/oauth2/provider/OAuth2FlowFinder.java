@@ -29,14 +29,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import com.sun.identity.shared.OAuth2Constants;
 import org.forgerock.openam.oauth2.utils.OAuth2Utils;
 import org.forgerock.openam.oauth2.exceptions.OAuthProblemException;
-import org.forgerock.restlet.ext.oauth2.flow.AbstractFlow;
-import org.forgerock.restlet.ext.oauth2.flow.AuthorizationCodeServerResource;
-import org.forgerock.restlet.ext.oauth2.flow.ClientCredentialsServerResource;
-import org.forgerock.restlet.ext.oauth2.flow.ErrorServerResource;
-import org.forgerock.restlet.ext.oauth2.flow.ImplicitGrantServerResource;
-import org.forgerock.restlet.ext.oauth2.flow.PasswordServerResource;
-import org.forgerock.restlet.ext.oauth2.flow.RefreshTokenServerResource;
-import org.forgerock.restlet.ext.oauth2.flow.SAML20BearerServerResource;
+import org.forgerock.restlet.ext.oauth2.flow.*;
 import org.restlet.Context;
 import org.restlet.Request;
 import org.restlet.Response;
@@ -91,7 +84,7 @@ public class OAuth2FlowFinder extends Finder {
          */
         switch (endpointType) {
         case AUTHORIZATION_ENDPOINT: {
-            return create(findTargetFlow(request, OAuth2Constants.Params.RESPONSE_TYPE), request, response);
+            return create(AuthorizeServerResource.class, request, response);
         }
         case TOKEN_ENDPOINT: {
             return create(findTargetFlow(request, OAuth2Constants.Params.GRANT_TYPE), request, response);
@@ -131,61 +124,32 @@ public class OAuth2FlowFinder extends Finder {
             if (type instanceof String && !type.isEmpty()) {
                 targetClass = flowServerResources.get(type);
                 if (targetClass == null) {
-                    if (OAuth2Constants.EndpointType.AUTHORIZATION_ENDPOINT.equals(endpointType)) {
-                        targetClass = ErrorServerResource.class;
+                    targetClass = ErrorServerResource.class;
 
-                        OAuth2Utils.DEBUG.error("OAuth2FlowFinder::Unsupported response type: Type is not supported: "
-                                + type);
-                        OAuthProblemException.OAuthError.UNSUPPORTED_RESPONSE_TYPE.handle(
-                                request, "Response type is not supported: " + type).pushException();
-                    } else {
-                        targetClass = ErrorServerResource.class;
-
-                        OAuth2Utils.DEBUG.error("OAuth2FlowFinder::Unsupported response type: Type is not supported: "
-                                + type);
-                        OAuthProblemException.OAuthError.UNSUPPORTED_GRANT_TYPE.handle(
-                                request, "Grant type is not supported: " + type).pushException();
-                    }
+                    OAuth2Utils.DEBUG.error("OAuth2FlowFinder::Unsupported grant type: Type is not supported: "
+                            + type);
+                    OAuthProblemException.OAuthError.UNSUPPORTED_GRANT_TYPE.handle(
+                            request, "Grant type is not supported: " + type).pushException();
                 }
             } else {
                 targetClass = ErrorServerResource.class;
 
-                if (OAuth2Constants.EndpointType.AUTHORIZATION_ENDPOINT.equals(endpointType)) {
-
-                    OAuth2Utils.DEBUG.error("OAuth2FlowFinder::Type is not set");
-                    OAuthProblemException.OAuthError.INVALID_REQUEST.handle(
-                            request, "Response type is not set").pushException();
-                } else {
-
-                    OAuth2Utils.DEBUG.error("OAuth2FlowFinder::Type is not set");
-                    OAuthProblemException.OAuthError.INVALID_REQUEST.handle(
-                            request, "Grant type is not set").pushException();
-                }
+                OAuth2Utils.DEBUG.error("OAuth2FlowFinder::Type is not set");
+                OAuthProblemException.OAuthError.INVALID_REQUEST.handle(
+                        request, "Grant type is not set").pushException();
 
             }
         } else {
 
-            targetClass = ErrorServerResource.class;
-
-            if (OAuth2Constants.EndpointType.AUTHORIZATION_ENDPOINT.equals(endpointType)) {
-
-                OAuth2Utils.DEBUG.error("OAuth2FlowFinder::Type is not set");
-                OAuthProblemException.OAuthError.INVALID_REQUEST.handle(
-                        request, "Response type is not set").pushException();
-            } else {
-
-                OAuth2Utils.DEBUG.error("OAuth2FlowFinder::Type is not set");
-                OAuthProblemException.OAuthError.INVALID_REQUEST.handle(
-                        request, "Grant type is not set").pushException();
-            }
+            OAuth2Utils.DEBUG.error("OAuth2FlowFinder::Type is not set");
+            OAuthProblemException.OAuthError.INVALID_REQUEST.handle(
+                    request, "Grant type is not set").pushException();
 
         }
         return targetClass;
     }
 
     public OAuth2FlowFinder supportAuthorizationCode() {
-        flowServerResources.put(OAuth2Constants.AuthorizationEndpoint.CODE,
-                AuthorizationCodeServerResource.class);
         flowServerResources.put(OAuth2Constants.TokeEndpoint.AUTHORIZATION_CODE,
                 AuthorizationCodeServerResource.class);
         flowServerResources
@@ -194,8 +158,6 @@ public class OAuth2FlowFinder extends Finder {
     }
 
     public OAuth2FlowFinder supportImplicit() {
-        flowServerResources.put(OAuth2Constants.AuthorizationEndpoint.TOKEN,
-                ImplicitGrantServerResource.class);
         return this;
     }
 

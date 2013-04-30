@@ -1,7 +1,7 @@
 /*
  * DO NOT REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright (c) 2012 ForgeRock Inc. All rights reserved.
+ * Copyright (c) 2012-2013 ForgeRock Inc. All rights reserved.
  *
  * The contents of this file are subject to the terms
  * of the Common Development and Distribution License
@@ -19,12 +19,14 @@
  * If applicable, add the following below the CDDL Header,
  * with the fields enclosed by brackets [] replaced by
  * your own identifying information:
- * "Portions Copyrighted [2012] [Forgerock Inc]"
+ * "Portions copyright [year] [name of copyright owner]"
  */
 
 package org.forgerock.restlet.ext.openam.server;
 
 import com.sun.identity.shared.OAuth2Constants;
+import edu.emory.mathcs.backport.java.util.Arrays;
+import org.forgerock.openam.oauth2.exceptions.OAuthProblemException;
 import org.forgerock.restlet.ext.openam.OpenAMParameters;
 import org.forgerock.restlet.ext.openam.OpenAMUser;
 import org.forgerock.openam.oauth2.utils.OAuth2Utils;
@@ -48,6 +50,9 @@ import com.sun.identity.idm.IdUtils;
 import javax.servlet.http.HttpServletRequest;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.Set;
 
 /**
  * Used to authenticate to OpenAM and redirect to its login page.
@@ -59,6 +64,9 @@ public abstract class AbstractOpenAMAuthenticator extends Authenticator {
     private String moduleName = null;
     private String realm = null;
     private String locale = null;
+
+    //ensure the prompt for login shows the login page atleast one time
+    static private boolean hasRan = false;
 
     /**
      * {@inheritDoc}
@@ -118,14 +126,43 @@ public abstract class AbstractOpenAMAuthenticator extends Authenticator {
      */
     @Override
     protected boolean authenticate(Request request, Response response) {
+        String prompt = OAuth2Utils.getRequestParameter(request, OAuth2Constants.Custom.PROMPT,String.class);
+        String[] prompts = null;
+        Set<String> promptSet = null;
+
+        //put the space separated prompts into a Set collection
+        if (prompt != null && !prompt.isEmpty()){
+            prompts = prompt.split(" ");
+        }
+        if (prompts != null && prompts.length > 0){
+            promptSet = new HashSet<String>(Arrays.asList(prompts));
+        } else {
+            promptSet = new HashSet<String>();
+        }
+
         try {
             SSOToken token = getToken(request, response);
+            if (promptSet != null && !promptSet.isEmpty() && promptSet.contains("login") && !hasRan){
+                hasRan = true;
+                return false;
+            }
             if (null != token) {
                 AMIdentity identity = IdUtils.getIdentity(token);
 
                 OpenAMUser user = new OpenAMUser(identity.getName(), token);
                 request.getClientInfo().setUser(user);
                 return identity.isActive();
+            } else {
+                if (promptSet != null && !promptSet.isEmpty() && promptSet.contains("none") && promptSet.size() == 1){
+                    OAuth2Utils.DEBUG.error("Not pre-authenticated and prompt parameter equals none.");
+                    throw OAuthProblemException.OAuthError.ACCESS_DENIED.handle(request);
+                } else if (prompt.contains("none") && promptSet.size() > 1){
+                    // prompt has more than one value with none error
+                    OAuth2Utils.DEBUG.error("Prompt parameter only allows none when none is present.");
+                    throw OAuthProblemException.OAuthError.INVALID_REQUEST.handle(request);
+                }
+                hasRan = false;
+                return false;
             }
         } catch (SSOException e) {
             OAuth2Utils.DEBUG.error("Error authenticating user against OpenAM: ", e );
