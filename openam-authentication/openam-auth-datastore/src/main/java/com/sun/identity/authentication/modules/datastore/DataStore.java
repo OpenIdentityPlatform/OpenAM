@@ -59,7 +59,9 @@ public class DataStore extends AMLoginModule {
     private String currentConfigName;
 
     private static String AUTHLEVEL = "sunAMAuthDataStoreAuthLevel";
-    
+    private static final String INVALID_CHARS =
+            "iplanet-am-auth-ldap-invalid-chars";
+
     private Map sharedState;
     public Map currentConfig;
     
@@ -130,7 +132,16 @@ public class DataStore extends AMLoginModule {
                 }
                 //store username password both in success and failure case
                 storeUsernamePasswd(userName, userPassword);
-                              
+                /*
+                Fix for OPENAM-1872. Reject usernames with illegal characters (e.g. * or ! or ) or ( or & ), just
+                like the LDAP LoginModule does. List of invalid characters comes from a new configuration entry (though
+                the list of illegal characters does not seem to be processed in validateUserName). I want the invocation
+                to be just like the LDAP LoginModule, and to handle the case in which the username format validator
+                cannot be successfully loaded in validateUserName.
+                 */
+                validateUserName(userName, CollectionHelper.getMapAttr(
+                        currentConfig, INVALID_CHARS));
+
                 AMIdentityRepository idrepo = getAMIdentityRepository(
                     getRequestOrg());
                 boolean success = idrepo.authenticate(idCallbacks);

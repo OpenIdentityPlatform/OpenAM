@@ -50,6 +50,14 @@
                         <Value>0</Value>
                     </DefaultValues>
                 </AttributeSchema>
+                <AttributeSchema name="iplanet-am-auth-ldap-invalid-chars"
+                     type="list"
+                     syntax="string"
+                     i18nKey="">
+                    <DefaultValues>
+                        <Value>*|(|)|&amp;|!</Value>
+                    </DefaultValues>
+                </AttributeSchema>
                 <SubSchema name="serverconfig" inheritance="multiple">
                     <AttributeSchema name="sunAMAuthDataStoreAuthLevel"
                         type="single"
@@ -57,6 +65,14 @@
                         i18nKey="a500">
                         <DefaultValues>
                             <Value>0</Value>
+                        </DefaultValues>
+                    </AttributeSchema>
+                    <AttributeSchema name="iplanet-am-auth-ldap-invalid-chars"
+                         type="list"
+                         syntax="string"
+                         i18nKey="">
+                        <DefaultValues>
+                            <Value>*|(|)|&amp;|!</Value>
                         </DefaultValues>
                     </AttributeSchema>
                 </SubSchema>
