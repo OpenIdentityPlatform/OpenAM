@@ -26,6 +26,10 @@
  *
  */
 
+/*
+ * Portions Copyrighted 2013 ForgeRock, Inc.
+ */
+
 package com.sun.identity.console.policy;
 
 import com.iplanet.jato.model.ModelControlException;
@@ -59,10 +63,13 @@ public class SessionPropertyConditionEditViewBean
         View view = null;
 
         if (name.equals(SessionPropertyConditionHelper.ATTR_VALUES)) {
-            Map map = (Map)getPageSessionAttribute(
-                SessionPropertyConditionHelper.PG_SESSION_PROPERTY_VALUES);
-            if (map != null) {
-                helper.populateTable(map, propertySheetModel);
+            // Only populate the model if it is in an undefined state.
+            if (tblValuesModel.getRowIndex() == -1) {
+                Map map = (Map)getPageSessionAttribute(
+                        SessionPropertyConditionHelper.PG_SESSION_PROPERTY_VALUES);
+                if (map != null) {
+                  helper.populateTable(map, propertySheetModel);
+                }
             }
             view = new CCActionTable(this, tblValuesModel, name);
         } else {
