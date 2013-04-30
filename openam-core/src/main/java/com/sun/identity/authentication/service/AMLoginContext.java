@@ -1801,9 +1801,6 @@ public class AMLoginContext {
                         orgDN + ", orgDN from query string: " + newOrgDN);
                     }
                     if (normOrgDN != null ) {
-                        // persistentCookieMode in loginState is more reliable
-                        // since pCookieMode is set according to login param
-                        pCookieMode = loginState.persistentCookieMode;
                         if (!normOrgDN.equals(newOrgDN) && !pCookieMode) {
 	                        st.setStatus(LoginStatus.AUTH_RESET);
 	                        loginState.setErrorCode(AMAuthErrorCode.AUTH_ERROR);

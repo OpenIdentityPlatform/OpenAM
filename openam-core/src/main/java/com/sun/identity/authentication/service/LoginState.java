@@ -346,7 +346,7 @@ public class LoginState {
     Map moduleMap = null;
     Map roleAttributeMap = null;
     Boolean foundPCookie =null;
-    long pCookieTimeCreated;
+    long pCookieTimeCreated = 0;
     Set identityTypes = Collections.EMPTY_SET;
     Set userSessionMapping = Collections.EMPTY_SET;
     Hashtable idRepoHash = new Hashtable();
@@ -3462,13 +3462,31 @@ public class LoginState {
                 SessionID oldSessionID = new SessionID(oldSidString);
                 AuthD.getSS().destroyInternalSession(oldSessionID);
             }
-            if (!getOrgName().equals(domainStr)) {
-                // force orgName to domain in PCookie
-                orgName = domainStr;
-                userOrg = orgName;
+
+            userOrg = domainStr;
+
+            String orgDN = DNMapper.orgNameToDN(userOrg);
+            if (!usernameStr.endsWith(orgDN)) {
+                orgDN = ServiceManager.getBaseDN();
+            }
+
+            OrganizationConfigManager orgConfigMgr = ad.getOrgConfigManager(orgDN);
+            ServiceConfig svcConfig = orgConfigMgr.getServiceConfig(ISAuthConstants.AUTH_SERVICE_NAME);
+
+            Map attrs = svcConfig.getAttributes();
+            persistentCookieTime = CollectionHelper.getMapAttr(attrs, ISAuthConstants.PERSISTENT_COOKIE_TIME);
+            int value = -1;
+            try {
+                value = Integer.parseInt(persistentCookieTime);
+            } catch (NumberFormatException nfe) {
+                //ignore
+            }
+
+            if ((pCookieTimeCreated + value * 1000) < System.currentTimeMillis()) {
+                //the cookie should have already reach its lifetime
+                return null;
             }
             
-            String authModuleName = null;
             if (messageEnabled) {
                 debug.message("authMethStr: " + authMethStr);
             }
@@ -3536,7 +3554,7 @@ public class LoginState {
                     "%" + Integer.toString(idleTime) +
                     "%" + Integer.toString(cacheTime) +
                     "%" + sid.toString() +
-                    "%" + System.currentTimeMillis();
+                    "%" + (pCookieTimeCreated != 0 ? pCookieTimeCreated : System.currentTimeMillis());
                 String pCookieValue = (String) AccessController.doPrivileged(
                     new EncodeAction(cookiestr));
                 pCookie = AuthUtils.createPersistentCookie(

@@ -1101,6 +1101,9 @@ public class AuthD  {
             debug.message("userOrgDN is : " +  userOrgDN);
         }
 
+        if (userOrg == null) {
+            return rootSuffixDN.toString();
+        }
         if ( (userOrgDN.equals(rootSuffixDN))
             || (userOrgDN.isDescendantOf(rootSuffixDN))
         ) {
@@ -1113,7 +1116,7 @@ public class AuthD  {
         if (debug.messageEnabled()) {
             debug.message("Returning OrgDN is : " + orgDN);
         }
-        return orgDN.toString();
+        return orgDN;
     }
     
     /**
