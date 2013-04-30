@@ -24,6 +24,11 @@
  *
  * $Id: IPCondition.java,v 1.3 2009/09/05 00:24:04 veiming Exp $
  */
+
+/*
+ * Portions Copyrighted 2013 ForgeRock Inc
+ */
+
 package com.sun.identity.entitlement;
 
 
@@ -34,8 +39,13 @@ import java.util.Map;
 import java.util.Set;
 import java.util.StringTokenizer;
 import javax.security.auth.Subject;
+
+import org.forgerock.openam.utils.ValidateIPaddress;
 import org.json.JSONObject;
 import org.json.JSONException;
+
+import com.googlecode.ipv6.IPv6Address;
+import com.googlecode.ipv6.IPv6AddressRange;
 
 /**
  * Entitlement Condition to represent IP constraint
@@ -141,12 +151,31 @@ public class IPCondition extends EntitlementConditionAdaptor {
         return new ConditionDecision(false, advice);
     }
 
-    private boolean isAllowedByIp(String ip)
-        throws EntitlementException {
-        long requestIp = stringToIp(ip);
-        long startIpNum = stringToIp(startIp);
-        long endIpNum = stringToIp(endIp);
-        return ((requestIp >= startIpNum) && (requestIp <= endIpNum));
+    private boolean isAllowedByIp(String ip) throws EntitlementException {
+        String args[] = { "ip", ip };
+        if(ValidateIPaddress.isIPv4(ip) &&
+                ValidateIPaddress.isIPv4(startIp) && ValidateIPaddress.isIPv4(endIp)) {
+            try{
+                long requestIp = stringToIp(ip);
+                long startIpNum = stringToIp(startIp);
+                long endIpNum = stringToIp(endIp);
+                return ((requestIp >= startIpNum) && (requestIp <= endIpNum));
+            } catch (Exception e){
+                throw new EntitlementException(400, args);
+            }
+        } else if(ValidateIPaddress.isIPv6(ip) &&
+                ValidateIPaddress.isIPv6(startIp) && ValidateIPaddress.isIPv6(endIp)) {
+            try{
+                IPv6AddressRange ipv6Range = IPv6AddressRange.fromFirstAndLast(
+                        IPv6Address.fromString(startIp),IPv6Address.fromString(endIp));
+                return ipv6Range.contains(IPv6Address.fromString(ip));
+            } catch (Exception e){
+                throw new EntitlementException(400, args);
+            }
+        } else {
+            PrivilegeManager.debug.error("IP address invalid" + ip);
+            throw new EntitlementException(400, args);
+        }
     }
 
     private long stringToIp(String ip) throws EntitlementException {
