@@ -1,7 +1,7 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright (c) 2012-2013 ForgeRock US Inc. All Rights Reserved
+ * Copyright (c) 2012-2013 ForgeRock, Inc. All Rights Reserved
  *
  * The contents of this file are subject to the terms of the Common Development and
  * Distribution License (the License). You may not use this file except in compliance with the
@@ -1026,13 +1026,9 @@ public class CTSPersistentStore extends GeneralTaskRunnable
      * @throws Exception if there is any problem with accessing the session
      *                   repository.
      */
-    public Map<String, String> getSessionsByUUID(String uuid) throws SessionException {
+    public Map<String, Long> getSessionsByUUID(String uuid) throws SessionException {
         try {
-            AMRecord amRecord = (AMRecord) this.read(uuid);
-            if ((amRecord != null) && (amRecord.getExtraStringAttributes() != null)) {
-                return amRecord.getExtraStringAttributes();
-            }
-            return null;
+            return getRecordCount(uuid);
         } catch (Exception e) {
             throw new SessionException(e);
         }

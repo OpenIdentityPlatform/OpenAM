@@ -26,7 +26,7 @@
  */
 
 /**
- * Portions Copyrighted 2012 ForgeRock AS
+ * Portions Copyrighted 2012-2013 ForgeRock, Inc.
  */
 package com.sun.identity.coretoken.interfaces;
 
@@ -145,7 +145,7 @@ public interface AMTokenRepository {
      * @throws Exception if there is any problem with accessing the session
      *                   repository.
      */
-    public Map getSessionsByUUID(String uuid) throws Exception;
+    public Map<String, Long> getSessionsByUUID(String uuid) throws Exception;
 
     /**
      * Merge of additional methods from PersistentStore Class for new session-ha.
