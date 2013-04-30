@@ -1,0 +1,244 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  ! CCPL HEADER START
+  !
+  ! This work is licensed under the Creative Commons
+  ! Attribution-NonCommercial-NoDerivs 3.0 Unported License.
+  ! To view a copy of this license, visit
+  ! http://creativecommons.org/licenses/by-nc-nd/3.0/
+  ! or send a letter to Creative Commons, 444 Castro Street,
+  ! Suite 900, Mountain View, California, 94041, USA.
+  !
+  ! You can also obtain a copy of the license at
+  ! src/main/resources/legal-notices/CC-BY-NC-ND.txt.
+  ! See the License for the specific language governing permissions
+  ! and limitations under the License.
+  !
+  ! If applicable, add the following below this CCPL HEADER, with the fields
+  ! enclosed by brackets "[]" replaced with your own identifying information:
+  !      Portions Copyright [yyyy] [name of copyright owner]
+  !
+  ! CCPL HEADER END
+  !
+  !      Copyright 2011-2013 ForgeRock, Inc.
+   !    
+-->
+<chapter xml:id='chap-upgrade-components'
+ xmlns='http://docbook.org/ns/docbook'
+ version='5.0' xml:lang='en'
+ xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance'
+ xsi:schemaLocation='http://docbook.org/ns/docbook http://docbook.org/xml/5.0/xsd/docbook.xsd'
+ xmlns:xlink='http://www.w3.org/1999/xlink'
+ xmlns:xinclude='http://www.w3.org/2001/XInclude'>
+<title>Upgrading OpenAM Components</title>
+ <indexterm><primary>Policy Agents</primary></indexterm>
+  <indexterm>
+   <primary>Tools</primary>
+   <secondary>ssoAdmin</secondary>
+  </indexterm>
+  <indexterm>
+   <primary>Tools</primary>
+   <secondary>ssoSession</secondary>
+  </indexterm>
+  <indexterm><primary>Distributed Authentication server</primary></indexterm>
+
+ <para>This chapter briefly describes the upgrade process for OpenAM
+ policy agents, tools, and the Distributed Authentication server. Before you begin upgrading, 
+ evaluate the changes in the Release Notes on the <link xlink:show="new" 
+ xlink:href="http://forgerock.org/openam-archive.html"><citetitle>Archives</citetitle></link> and 
+ <link xlink:show="new" xlink:href="http://forgerock.com/openam-downloads/"
+ ><citetitle>Enterprise Downloads</citetitle></link> for your component.</para> 
+ 
+ <section xml:id="upgrading-agents">
+  <title>Upgrading a Policy Agent</title>
+   <para>Unlike the other OpenAM components, policy agents are not part of the OpenAM
+   distribution. While OpenAM and its policy agents are released at the same time, you
+   do not have to upgrade your policy agent because you upgraded your OpenAM deployment.</para>
+
+   <procedure xml:id="upgrade-same-major-version-agents">
+    <title>To Update Policy Agents</title>
+  
+    <para>Follow these steps to upgrade to the most recently released policy agents.</para>
+
+    <step>
+     <para>For a web policy agent, backup the <filename>web_agents/</filename> 
+     directory. For Java EE policy agents, back up the <filename>j2ee_agents/</filename> 
+     directory.</para>
+    </step>
+    <step>
+     <para>Download your upgrade file or files from <link 
+     xlink:show="new" xlink:href="http://forgerock.com/openam-downloads/"
+     ><citetitle>Enterprise Downloads page</citetitle></link> or from the <link 
+     xlink:show="new" xlink:href="http://forgerock.org/openam-archive.html/"
+     ><citetitle>Archives page</citetitle></link>.</para>
+    </step>
+    <step>
+     <para>Extract the <filename>.zip</filename> for the new release over the existing 
+     policy agent files, replacing the current version with the new version.</para>
+    </step>
+    <step>
+     <para>Shutdown the web server or web container.</para>
+    </step>
+    <step>
+     <para>Backup the file system directory where the existing policy agent is
+     installed.</para>
+    </step>
+    <step>
+     <para>Replace the older version of the policy agent file by unzipping into
+     the same directory as your current policy agent.</para>
+    </step>
+    <step>
+     <para>Restart the web server or web container.</para>
+     <para>At this point, new configuration parameters introduced since the
+     release of the earlier policy agent have not yet been set, so the
+     policy agent uses the default values until you change the
+     configuration.</para>
+    </step>
+ 
+    <para>For Java EE agents, it is best to perform a clean uninstall then reinstall
+    the policy agent instead of attempting to save files over the old libraries.</para>
+   </procedure>
+  
+   <example xml:id="update-agent-example">
+ <?dbfo keep-together="auto"?>
+    <title>Updating Apache 2.2 Policy Agent Example</title>
+  
+    <para>The following example updates the Apache 2.2 web policy agent from version 
+    3.0.3 release to Apache 2.2 version 3.1.0.</para>
+   
+    <orderedlist numeration="arabic">
+     <listitem>
+      <para>Backup the <filename>web_agents</filename> directory.</para>
+
+      <screen>$ cp -r /path/to/web_agents /path/to/backup</screen>
+     </listitem>
+
+     <listitem>
+      <para>Download the Apache 2.2 version 3.1.0 policy agent from the 
+      <link xlink:show="new" xlink:href="http://forgerock.com/openam-downloads/"
+       ><citetitle>Enterprise Downloads page</citetitle></link>.</para>
+     </listitem>   
+
+     <listitem>
+      <para>Stop Apache.</para>
+      <screen>$ sudo /path/to/init.d/apache2 stop</screen>
+     </listitem>
+
+     <listitem>
+      <para>Replace the older version of the policy agent file by unzipping into the same 
+      directory as your current policy agent.</para>
+      <screen>$ cd /path/to/web_agent
+$ unzip ~/Downloads/apache_v22_Linux_64_agent_3.1.0-Xpress.zip -d /opt
+
+Archive:  /path/apache_v22_Linux_64_agent_3.1.0-Xpress.zip
+   creating: web_agents/
+   creating: web_agents/apache22_agent/
+   ...</screen>
+     </listitem>
+  
+     <listitem>
+      <para>Restart Apache.</para>
+      <screen>$ sudo /path/to/init.d/apache2 start</screen>
+     </listitem>
+  
+     <listitem>
+      <para>Reconfigure your instance to include new configuration parameters 
+      introduced since the release.</para>
+     </listitem>
+    </orderedlist>
+
+   </example>
+  </section>
+  
+  <section xml:id="upgrading-tools">
+   <title>Upgrading OpenAM Admin Tools</title>
+   
+    <procedure xml:id="tools-upgrade">
+     <title>To Upgrade OpenAM Admin Tools</title>
+     <para>Much like policy agents, it is generally best to simply delete and 
+     reinstall tools. </para>
+   
+     <note>
+      <para>Starting with OpenAM 10.1.0, the ssoSessionTools is no longer required, 
+      so you can simply remove the tools once you upgrade to OpenAM 10.1.0 or later.</para>
+     </note>
+    
+      <step>
+       <para>Download the tools upgrade <filename>.zip</filename> file or files from <link 
+       xlink:show="new" xlink:href="http://forgerock.com/openam-downloads/"
+       ><citetitle>Enterprise Downloads page</citetitle></link> or from the <link 
+       xlink:show="new" xlink:href="http://forgerock.org/openam-archive.html/"
+       ><citetitle>Archives page</citetitle></link>.</para>
+      </step>
+
+      <step>
+       <para>Delete the tools.</para>
+      </step>
+
+      <step>
+       <para>Unpack the tools in the old tools directory. If you unpack the 
+       tools in a new directory you will need to run the <literal>setup</literal> 
+       utility. If you are not sure what to do, follow the instructions in the 
+       <link xlink:href="install-guide#chap-install-tools" 
+       xlink:role="http://docbook.org/xlink/role/olink"><citetitle>Installing OpenAM Tools</citetitle></link>
+       in the Installation Guide.</para>
+      </step>
+     </procedure>
+   
+  </section>
+
+  <section xml:id="upgrading-disauth">
+   <title>Upgrading the OpenAM Distributed Authentication Server</title>
+   
+   <para>If you have deployed the DAS <filename>.war</filename> file with
+   your original deployment, you should upgrade your DAS <filename>.war</filename>
+   file when you upgrade OpenAM.</para>
+   
+   <procedure xml:id="upgrading-das-war">
+    <title>To Upgrade DAS</title>
+     
+      <step>
+       <para>Copy the newest DAS <filename>.war</filename> file over the existing
+       deployment.</para>
+      </step>
+      
+      <step>
+       <para>Delete the work directory.</para>
+      </step>
+      
+      <step>
+       <para>Restart the container.</para>
+      </step>
+   </procedure>
+          
+   <example xml:id="upgrading-das-101-example">
+    <title>Upgrading to DAS 10.2.0</title>
+
+<!--Update with 10.2.0 when it is near complete -->      
+     <para>This example applies to any OpenAM deployment from 10.1.0 and later.</para>
+
+      <orderedlist numeration="arabic">
+
+       <listitem>
+        <para>Copy the <filename><?eval ${distauthWarFile}?></filename> file into the 
+        <filename>webapps/</filename> directory.</para>
+        <screen>cp ~/Downloads/openam/
+        <?eval ${distauthWarFile}?> /path/to/das/tomcat/webapps</screen>
+       </listitem>
+      
+       <listitem>
+        <para>Delete the work directory.</para>
+        <screen>$ rm -rf /path/to/tomcat/work/Catalina/localhost/openam/</screen>
+       </listitem>
+        
+       <listitem>
+        <para>Restart your container if you have replaced the DAS 
+        <filename>.war</filename> file.</para>
+       </listitem>
+
+       </orderedlist>
+
+     </example>
+    </section>
+     
+</chapter>

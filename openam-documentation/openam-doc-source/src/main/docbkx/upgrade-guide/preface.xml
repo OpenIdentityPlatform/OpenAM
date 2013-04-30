@@ -31,91 +31,92 @@
  xmlns:xinclude='http://www.w3.org/2001/XInclude'>
  <title>Preface</title>
  
- <para>This guide provides information on upgrades, updates, and patches
- for core OpenAM services and for policy agents. </para>
+ <para>This guide provides information on upgrades for core OpenAM services, 
+ policy agents, and components.</para>
 
  <section>
   <title>Who Should Use this Guide</title>
   
-  <para>This guide is for anyone who needs to update or upgrade an OpenAM
-  deployment or to apply patches. This guide defines when each
-  of these apply and covers the tasks to complete each action. It is likely
-  you will need to periodically use this guide to keep your OpenAM instance
+  <para>This guide is for anyone who needs to upgrade an OpenAM deployment. 
+  This guide defines the different release types and the steps to complete an upgrade. 
+  It is likely you will need to periodically use this guide to keep your OpenAM instance
   current.</para>
    
   <itemizedlist>
    <para>This guide is organized as follows:</para>
   
    <listitem>
-    <para><link xlink:href="upgrade-guide#chap-intro"
+    <para><link xlink:href="upgrade-guide#chap-upgrade-intro"
      xlink:role="http://docbook.org/xlink/role/olink">
-     <citetitle>Introduction to Updates and Upgrades</citetitle></link>  
-     defines updates and upgrades, and details when each should be applied to
-     your OpenAM instance. The chapter details the importance of version numbers
-     and how they indicate what type of release you are considering. It also 
-     provides basic information about patches, policy agents, and legacy deployments. 
-     The chapter concludes with information on customization and how it
-     should be handled when transitioning to a new version of OpenAM.</para> 
+     <citetitle>Introduction to Upgrades</citetitle></link>  
+     defines the three version numbers and how they indicate what type of release 
+     you are considering. It also provides basic information about migrating legacy 
+     deployments and upgrading OpenAM components, like tools and policy agents. </para> 
    </listitem>
 
    <listitem>
-    <para><link xlink:href="upgrade-guide#chap-custom"
-     xlink:role="http://docbook.org/xlink/role/olink"><citetitle>Customizing 
-     An OpenAM Deployment</citetitle></link> gives the universal instructions 
-     for customizing OpenAM for your deployment.</para>
-   </listitem>
-
-   <listitem>
-    <para><link xlink:href="upgrade-guide#chap-patches"
+    <para><link xlink:href="upgrade-guide#chap-upgrade"
      xlink:role="http://docbook.org/xlink/role/olink">
-     <citetitle>Applying a Patch</citetitle></link> provides basic information on 
-     patches and how to apply them to your OpenAM instance.</para>
-   </listitem>
-
-   <listitem>
-    <para><link xlink:href="upgrade-guide#chap-update-basics"
-     xlink:role="http://docbook.org/xlink/role/olink">
-     <citetitle>Updating An OpenAM Deployment</citetitle></link> includes the procedure
-     to update your OpenAM instance and an example to illustrate the procedure.</para>
-   </listitem>
-   
-   <listitem>
-    <para><link xlink:href="upgrade-guide#chap-upgrade-basics"
-     xlink:role="http://docbook.org/xlink/role/olink">
-     <citetitle>Upgrading An OpenAM Deployment</citetitle></link> includes the procedure
+     <citetitle>Upgrading an OpenAM Deployment</citetitle></link> includes the procedure
      to upgrade your OpenAM instance and an example to illustrate the procedure.
      <!-- Add after testing It also provides the steps required to upgrade multiple OpenAM instances 
      without downtime.--></para>
    </listitem>
       
+<!--   <listitem>
+    <para><link xlink:href="upgrade-guide#chap-upgrade-server-only"
+     xlink:role="http://docbook.org/xlink/role/olink">
+     <citetitle>Upgrading OpernAM Server-Only Deployments</citetitle></link> 
+     includes the procedure to upgrade a server-only OpenAM deployment
+     and an example to illustrate the procedure.</para>
+   </listitem> -->
+   
    <listitem>
     <para><link xlink:href="upgrade-guide#chap-legacy"
      xlink:role="http://docbook.org/xlink/role/olink">
-     <citetitle>Upgrading Legacy OpenAM Deployments</citetitle></link> describes 
-     legacy deployments of OpenAM and procedures on how to upgrade to a more 
-     current version.</para>
+     <citetitle>Migrating from a Legacy OpenAM Deployment</citetitle></link> 
+     describes legacy deployments of OpenAM and procedures on how to upgrade to  
+     a more current version.</para>
    </listitem>
 
    <listitem>
-    <para><link xlink:href="upgrade-guide#chap-update-agents"
+    <para><link xlink:href="upgrade-guide#chap-upgrade-components"
      xlink:role="http://docbook.org/xlink/role/olink">
-     <citetitle>Updating Policy Agents</citetitle></link> includes the procedure
-     to update policy agents and an example of updating the Apache 2.2 web agent.</para>
+     <citetitle>Upgrading OpenAM Components</citetitle></link> includes the procedure
+     to update policy agents and an example of updating the Apache 2.2 web agent, 
+     to upgrade the tools and examples, and to upgrade Distributed Authentication 
+     services with an example.</para>
    </listitem>
 
    <listitem>
-    <para><link xlink:href="upgrade-guide#chap-restore"
-     xlink:role="http://docbook.org/xlink/role/olink">
-     <citetitle>Restoring An OpenAM Deployment</citetitle></link> provides the
-     procedure to redeploy an earlier version of your OpenAM instance. This
-     chapter provides instructions for rolling back OpenAM core and 
-     configuration store, but it does not cover information for instances
-     that have a dependency on an external replicated directory server.
-     Restoration of earlier policy agents is included in the chapter.</para>
+    <para><link xlink:href="upgrade-guide#appendix-best-practices"
+     xlink:role="http://docbook.org/xlink/role/olink"><citetitle>Best Practices
+     for Upgrading Your OpenAM Deployment</citetitle></link> gives general advice and 
+     instructions for backing up your deployment prior to upgrading, applying your
+     current customizations to the new OpenAM <filename>.war</filename>, and  
+     rolling back OpenAM core and configuration store. It does not cover 
+     information for instances that have a dependency on an external replicated 
+     directory server. Restoration of earlier policy agents is included in the 
+     appendix.</para>
+   </listitem>
+
+   <listitem>
+    <para><link xlink:href="upgrade-guide#appendix-troubleshooting"
+     xlink:role="http://docbook.org/xlink/role/olink"><citetitle>Troubleshooting 
+     the Upgrade Process</citetitle></link> provides information on ways
+     to troubleshoot issues you may encounter.</para>
+   </listitem>
+
+<!--    <listitem>
+    <para><link xlink:href="upgrade-guide#appendix-maven-artifacts"
+     xlink:role="http://docbook.org/xlink/role/olink"><citetitle>Maven Artifacts</citetitle></link> 
+     provides a closer look at the changes to OpenAM starting with OpenAM 10.1.0.
+     The maven build uses different artifacts than the original ant build,
+     so this appendix serves as a guide to help you better understand the changes.</para>
    </listitem>
 
 
-<!--   <listitem>
+  <listitem>
     <para>The <link xlink:href="upgrade-guide#chap-update-glossary"
      xlink:role="http://docbook.org/xlink/role/olink">
      <citetitle></para>

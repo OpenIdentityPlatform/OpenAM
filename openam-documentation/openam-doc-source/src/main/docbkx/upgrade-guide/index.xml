@@ -30,10 +30,10 @@
  xmlns:xlink='http://www.w3.org/1999/xlink'
  xmlns:xinclude='http://www.w3.org/2001/XInclude'>
  <info>
-  <title>OpenAM <?eval ${serverDocTargetVersion}?> Update and Upgrade Guide</title>
+  <title>OpenAM <?eval ${serverDocTargetVersion}?> Upgrade Guide</title>
   <abstract>
-   <para>This guide shows you how to update and upgrade OpenAM. OpenAM provides open source
-   Authentication, Authorization, Entitlement and Federation software.</para>
+   <para>This guide shows you how to upgrade OpenAM. OpenAM provides open source
+   Authentication, Authorization, Entitlement, and Federation software.</para>
   </abstract>
   <copyright>
    <year>2011-2013</year>
@@ -65,13 +65,13 @@
  <toc />
  
  <xinclude:include href="preface.xml" />
- <xinclude:include href="chap-intro.xml" />
- <xinclude:include href="chap-custom.xml" />
- <xinclude:include href="chap-patches.xml" />
- <xinclude:include href="chap-update-basics.xml" />
- <xinclude:include href="chap-upgrade-basics.xml" />
+ <xinclude:include href="chap-upgrade-intro.xml" />
+ <xinclude:include href="chap-upgrade.xml" />
+<!-- <xinclude:include href="chap-upgrade-server-only.xml" /> -->
  <xinclude:include href="chap-legacy.xml" />
- <xinclude:include href="chap-update-agents.xml" />
- <xinclude:include href="chap-restore.xml" />
+ <xinclude:include href="chap-upgrade-components.xml" />
+ <xinclude:include href="appendix-best-practices.xml" />
+ <xinclude:include href="appendix-troubleshooting.xml" />
+<!--  <xinclude:include href="appendix-maven-artifacts.xml" /> -->
  <index />
 </book>

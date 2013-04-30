@@ -1,0 +1,290 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  ! CCPL HEADER START
+  !
+  ! This work is licensed under the Creative Commons
+  ! Attribution-NonCommercial-NoDerivs 3.0 Unported License.
+  ! To view a copy of this license, visit
+  ! http://creativecommons.org/licenses/by-nc-nd/3.0/
+  ! or send a letter to Creative Commons, 444 Castro Street,
+  ! Suite 900, Mountain View, California, 94041, USA.
+  !
+  ! You can also obtain a copy of the license at
+  ! src/main/resources/legal-notices/CC-BY-NC-ND.txt.
+  ! See the License for the specific language governing permissions
+  ! and limitations under the License.
+  !
+  ! If applicable, add the following below this CCPL HEADER, with the fields
+  ! enclosed by brackets "[]" replaced with your own identifying information:
+  !      Portions Copyright [yyyy] [name of copyright owner]
+  !
+  ! CCPL HEADER END
+  !
+  !      Copyright 2011-2013 ForgeRock, Inc.
+  !    
+-->
+<chapter xml:id='chap-upgrade-basics'
+ xmlns='http://docbook.org/ns/docbook'
+ version='5.0' xml:lang='en'
+ xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance'
+ xsi:schemaLocation='http://docbook.org/ns/docbook http://docbook.org/xml/5.0/xsd/docbook.xsd'
+ xmlns:xlink='http://www.w3.org/1999/xlink'
+ xmlns:xinclude='http://www.w3.org/2001/XInclude'>
+ <title>Upgrading an OpenAM Deployment</title>
+ <indexterm><primary>Upgrading</primary></indexterm>
+
+ <para>This chapter shows you how to upgrade OpenAM core services. Starting
+ with OpenAM 10.0.0 and later, OpenAM supports configuration changes as 
+ part of an upgrade, so you can run the Upgrade Wizard and restart the container to
+ complete the process. The wizard will automatically write all necessary changes to the 
+ configuration store and will prompt you to restart the container. Even minor changes
+ to OpenAM, such as changes to the version string, will require you to run 
+ the Upgrade Wizard, so needing to run the Wizard does not necessarily mean
+ that any significant changes have been done to OpenAM. Make sure to read the 
+ Release Notes to determine the importance and extent of the changes.</para>
+ 
+ <para>You should try the default upgrade in a test environment before you 
+ apply it to a production environment. ForgeRock also recommends working on the 
+ customized version in a test environment before updating a productions version so 
+ that you will be aware of any potential issues that you may encounter with your 
+ customized version.</para>
+ 
+<!-- TO DO <para>Working with multiple instances of OpenAM requires some variations to 
+ the procedures, as noted below. An additional procedure is included if you 
+ want to complete an upgrade without downtime.</para>
+ -->
+ <note>
+  <para>There are two things to keep in mind when upgrading.</para>
+  <itemizedlist>
+   <listitem>
+    <para>ForgeRock strongly recommend that you do not expose an OpenAM instance to
+    users during the upgrade process since running the wizard does not require
+    authorization.</para>
+   </listitem>    
+
+   <listitem>
+    <para>Following an update to OpenAM 10.1.0, all users will
+    need to login again because OpenAM no longer uses Open Message Queue or 
+    Berkeley DB Java Edition for session failover. </para>
+   </listitem>
+  </itemizedlist>
+ </note>
+
+ <procedure xml:id="upgrade-procedure">
+  <title>To Upgrade From OpenAM 9.5 Or Later</title>
+  
+  <para>ForgeRock has enhanced the OpenAM core services upgrade. If your instance is 
+  OpenAM 9.5 or later, these steps will walk you through upgrading to the next version 
+  of OpenAM.</para>
+  
+  <step>
+   <para>Backup your deployment. The <link xlink:href="upgrade-guide#appendix-best-practices"
+     xlink:role="http://docbook.org/xlink/role/olink">
+     <citetitle>Best Practices for Upgrading Your OpenAM Deployment</citetitle></link>
+     provides steps if you would like to run through a backup checklist.</para>
+  </step>
+
+  <step>
+   <para>Download your upgrade file or files from <link 
+     xlink:show="new" xlink:href="http://forgerock.com/openam-downloads/"
+     ><citetitle>Enterprise Downloads page</citetitle></link> or from the <link 
+     xlink:show="new" xlink:href="http://forgerock.org/openam-archive.html/"
+     ><citetitle>Archives page</citetitle></link>.</para>
+  </step>
+
+  <step>
+   <para>Apply your customizations to the new <filename>.war</filename> file. The 
+   <link xlink:href="upgrade-guide#appendix-best-practices" xlink:role="http://docbook.org/xlink/role/olink">
+   <citetitle>Best Practices for Upgrading Your OpenAM Deployment</citetitle></link>
+   provides steps if you would like to run through a customization checklist.</para>
+  </step>
+  
+  <step>
+   <para>Stop OpenAM, or if necessary to redeploy OpenAM, stop the container where
+   OpenAM is running.</para>
+  </step>
+
+  <step>
+   <para>Deploy the customized upgrade <filename>.war</filename> file.</para>
+   
+  </step>
+
+  <step>
+   <para>Restart your container.</para>
+  </step>
+
+  <step>
+   <para>For the first instance, follow the instructions in the Upgrade Wizard. 
+   If you prefer, you can use the upgrade.jar from the command line to complete 
+   the upgrade process.</para>
+  </step>
+
+   <para>If OpenAM is running in a site deployment with multiple servers,
+   configure your load balancer to take the OpenAM server out of the site
+   pool during upgrade.</para>
+
+ </procedure>
+
+ <example xml:id="upgrade-example">
+ <?dbfo keep-together="auto"?>
+  <title>Upgrading to OpenAM <?eval ${serverDocTargetVersion}?></title>
+  <para>The following example upgrades OpenAM 9.5.5 to OpenAM <?eval ${serverDocTargetVersion}?> 
+  on a Linux server using Apache Tomcat.</para>
+  
+  <para>Your port numbers and directory names may be different than the ones
+  used in the example. Also, make sure to use your password where applicable.</para>
+  
+  <para>If you have multiple instances, make sure they are all running during the 
+  backup process.</para>
+  
+  <orderedlist numeration="arabic">
+  <listitem>
+   <para>Backup your deployed configuration.</para>
+  </listitem>
+
+  <listitem>
+   <para>Download the OpenAM <?eval ${serverDocTargetVersion}?> <filename>.zip</filename> 
+   or <filename><?eval ${coreWarFile}?></filename> file. If there are tools or other
+   components you need to upgrade, download them as well.</para>
+  </listitem>
+
+  <listitem>
+   <para>Apply your customizations to the OpenAM <filename><?eval ${coreWarFile}?></filename> 
+   file.</para>
+  </listitem>
+
+  <listitem>
+    <para>Shutdown Tomcat.</para>
+    <screen>$ cd /path/to/tomcat
+$ ./bin/shutdown.sh
+
+Password:
+ Using CATALINA_BASE:   /path/to/tomcat
+ Using CATALINA_HOME:   /path/to/tomcat
+ Using CATALINA_TMPDIR: /path/to/tomcat/temp
+ Using JRE_HOME:        /path/to/jdk1.6/jre
+ Using CLASSPATH:       /path/to/tomcat/bin/bootstrap.jar</screen>
+  </listitem>
+
+  <listitem>
+   <para>Deploy the customized upgrade <filename>.war</filename> file.</para>
+   <screen>$ cd /path/to/tomcat/webapps
+$ rm -rf openam
+$ rm openam.war
+$ rm -rf /path/to/tomcat/work/Catalina/localhost/openam
+$ cp /path/to/expanded-openam-war/upgrade-war/openam.war .</screen>
+  </listitem>
+
+  <listitem>
+   <para>Restart Tomcat.</para>
+   <screen>$ cd ..
+$ ./bin/startup.sh</screen>
+  </listitem>
+
+  <listitem>
+   <para>In your browser, go to your instance of OpenAM and follow the 
+   instructions in the Upgrade Wizard.</para>
+    <mediaobject xml:id="figure-upgrade-initial-screen">
+    <alt>Initial OpenAM upgrade screen</alt>
+    <imageobject>
+     <imagedata fileref="images/upgrade-initial-screen.png" format="PNG" />
+    </imageobject>
+    <textobject><para>The initial upgrade screen lets you choose to upgrade
+     or to restore the configuration.</para></textobject>
+   </mediaobject>
+    <mediaobject xml:id="figure-upgrade-report">
+    <alt>Initial OpenAM upgrade screen</alt>
+    <imageobject>
+     <imagedata fileref="images/upgrade-report.png" format="PNG" />
+    </imageobject>
+    <textobject><para>The initial upgrade screen lets you choose to upgrade
+     or to restore the configuration.</para></textobject>
+   </mediaobject>
+  </listitem>
+  
+  </orderedlist>
+
+ </example>
+
+<!--  Needs testing
+ <procedure xml:id="upgrade-multiple-instances-procedure">
+  <title>Upgrading Multiple OpenAM Instances To OpenAM 10.0.0 Without Downtime</title>
+  <para>If you need to keep all of your instances of OpenAM up and running
+  you can upgrade all of them without having any lapse in service. If you have
+  a functional session failover system, user sessions will be preserved throughout
+  and after the upgrade process.</para>
+
+  <para>If you need to reinstall the session tools, a cold restart of the session 
+  failover system is required. This means that all sessions will be stopped from 
+  the session database cluster, and most or all of your users will lose their 
+  active sessions and will need to login again. ForgeRock advise you to carry out a complete
+  upgrade with the tools in a maintenance window.</para>
+  
+  <para>If the internal representation of session objects is significantly changed
+  between versions ForgeRock recommends you preform a cold restart of your session 
+  failover cluster to remove old sessions.</para>
+  
+  <para>If you are upgrading all of your instances without upgrading the tools,
+  use the following procedure to upgrade without any downtime for your users.
+  The procedure is based four servers (A, B, C, and D).</para>
+  
+  <step>
+   <para>Remove servers A and B from the load balancer.</para>
+  </step>
+  
+  <step>
+   <para>Disable the following replication agreements in OpenDJ so that you will
+   have two separate OpenDJ clusters: A(C,D); B(C,D); C(A,B); D(A,B).</para>
+  </step>
+
+  <step>
+   <para>Stop servers A and B.</para>
+  </step>
+
+  <step>
+   <para>Follow the instructions upgrading an instance for servers A and 
+   restart it.</para>
+  </step>
+
+  <step>
+   <para>Run the Upgrade Wizard and restart servers A.</para>
+  </step>
+
+  <step>
+   <para>Follow the instructions upgrading an instance for servers B and 
+   restart it. You will not need to run the Upgrade Wizard since it
+   will automatically replicate the configuration from servers A.</para>
+  </step>
+
+  <step>
+   <para>Add servers A and B back to the load balancer and remove servers
+   C and D.</para>
+  </step>
+
+  <step>
+   <para>Stop servers C and D.</para>
+  </step>
+
+  <step>
+   <para>Follow the instructions upgrading an instance for servers C and 
+   restart it. You will not need to run the Upgrade Wizard.</para>
+  </step>
+ 
+  <step>
+   <para>Follow the instructions upgrading an instance for servers D and 
+   restart it. You will not need to run the Upgrade Wizard.</para>
+  </step>
+  
+  <step>
+   <para>Enable replication between all of the nodes.</para>
+  </step>
+
+  <step>
+   <para>Add servers C and D back to the load balancer.</para>
+  </step>
+
+ </procedure>
+-->
+</chapter>
+
+

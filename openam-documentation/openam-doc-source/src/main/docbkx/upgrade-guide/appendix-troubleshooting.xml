@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  ! CCPL HEADER START
+  !
+  ! This work is licensed under the Creative Commons
+  ! Attribution-NonCommercial-NoDerivs 3.0 Unported License.
+  ! To view a copy of this license, visit
+  ! http://creativecommons.org/licenses/by-nc-nd/3.0/
+  ! or send a letter to Creative Commons, 444 Castro Street,
+  ! Suite 900, Mountain View, California, 94041, USA.
+  !
+  ! You can also obtain a copy of the license at
+  ! src/main/resources/legal-notices/CC-BY-NC-ND.txt.
+  ! See the License for the specific language governing permissions
+  ! and limitations under the License.
+  !
+  ! If applicable, add the following below this CCPL HEADER, with the fields
+  ! enclosed by brackets "[]" replaced with your own identifying information:
+  !      Portions Copyright [yyyy] [name of copyright owner]
+  !
+  ! CCPL HEADER END
+  !
+  !      Copyright 2011-2013 ForgeRock, Inc.
+  !    
+-->
+<appendix xml:id='appendix-troubleshooting'
+ xmlns='http://docbook.org/ns/docbook'
+ version='5.0' xml:lang='en'
+ xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance'
+ xsi:schemaLocation='http://docbook.org/ns/docbook http://docbook.org/xml/5.0/xsd/docbook.xsd'
+ xmlns:xlink='http://www.w3.org/1999/xlink'
+ xmlns:xinclude='http://www.w3.org/2001/XInclude'>
+<title>Troubleshooting the Upgrade Process</title>
+<indexterm><primary>Troubleshooting</primary></indexterm>
+ <para>This appendix helps you through some basic debugging and troubleshooting
+ during the upgrade process.</para>
+ 
+
+ <qandaset xml:id="solutions-to-common-upgrade-issues" defaultlabel="qanda">
+  <title>Solutions to Common Upgrade Issues</title>
+
+   <para>This section provides information for possible issues you may
+  encounter during your upgrade.</para>
+  
+  <qandaentry xml:id="general-tools-upgrade">
+   <question>
+    <para>I've upgraded OpenAM, now my tools are not working properly. What 
+    happened?</para>
+   </question>
+   <answer>
+    <para>Every OpenAM component will need to be upgraded, not just the main
+    OpenAM <filename>.war</filename> file. If you did not upgrade the tools
+    too, they may not work as intended.</para>
+   </answer>
+  </qandaentry>
+
+  <qandaentry xml:id="where-are-ssoSessionTools">
+   <question>
+    <para>I'm trying to upgrade to <?eval ${cserverDocTargetVersion}?>, but
+    I do not see the file to upgrade my ssoSessionTools.</para>
+   </question>
+
+   <answer>
+    <para>Starting with OpenAM 10.1.0, session failover has been simplified and the 
+     ssoSessionTools are no longer required.</para>
+   </answer>
+  </qandaentry>
+
+ </qandaset>
+</appendix>

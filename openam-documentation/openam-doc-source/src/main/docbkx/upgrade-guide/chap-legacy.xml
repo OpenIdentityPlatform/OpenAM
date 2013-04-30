@@ -30,13 +30,20 @@
  xsi:schemaLocation='http://docbook.org/ns/docbook http://docbook.org/xml/5.0/xsd/docbook.xsd'
  xmlns:xlink='http://www.w3.org/1999/xlink'
  xmlns:xinclude='http://www.w3.org/2001/XInclude'>
- <title>Upgrading Legacy OpenAM Deployments</title>
+ <title>Migrating from a Legacy Deployment</title>
  <indexterm><primary>Legacy</primary></indexterm>
 
- <para>This chapter shows you how to upgrade OpenAM core services from OpenAM 9.0.x
- or earlier to a more current release. The following procedure includes some example 
+ <para>This chapter shows you how to migrate core services from deployments earlier
+ than OpenAM 9.5 to a more current release. The following procedure includes some example 
  instructions for a Tomcat instance. Port numbers and directory names may be 
  different for your deployment.</para>
+ 
+ <note>
+  <para>Migrating a legacy deployment is not considered an upgrade. It requires
+  the user to create an entirely new deployment from the original deployment and the
+  latest version of OpenAM. ForgeRock recommends removing the old deployment and storing 
+  it elsewhere before beginning.</para>
+ </note>
 
  <note>
   <para>For complex legacy deployments, ForgeRock can assist you through the 
@@ -46,86 +53,37 @@
  
  <procedure xml:id="upgrade-legacy">
   <title>To Upgrade A Legacy Deployment</title>
-    
-   <step>
-    <para>Verify that the JAVA_HOME is properly set.</para>
-    <screen>echo $JAVA_HOME
- /path/to/java-6-sun</screen>
-   </step>
 
-   <step>
-    <para><link xlink:href="upgrade-guide#chap-custom"
-      xlink:role="http://docbook.org/xlink/role/olink">
-      <citetitle>Customize</citetitle></link> your deployment if desired.</para>
-   </step>
+  <step>
+   <para>Backup your deployment.</para>
+  </step>
 
-   <step>
-    <para>Export your OpenAM configuration data.</para>
-    <para>If you have multiple instances, make sure all instances are running 
-    before you begin. This is a requirement to export multiple instances.</para>
-    <screen>$ cd /path/to/ssoadm-home/openam/bin
-$ ./ssoadm export-svc-cfg --adminid amadmin --password-file /path/to/password/file 
- --encryptsecret mySecretEncryptionKey --outfile openam-config-export.xml</screen>
-   </step>
-   
-   <step>
-    <para>Export configuration backbend or DN from the directory server
-    if you have userRoot in OpenDS or OpenDJ. For embedded configuration stores, 
-    this is typically <literal>~/openam/opends/bin</literal>.</para>
-    <screen>$ cd ~/openam/opends/bin/
-$ ./backup --port 4444 --binDN "cn=Directory Manager" --binPassword password 
- --backendID userRoot --backupDirectory /path/to/backup-directory --start 0</screen>
-   </step>
+  <step>
+   <para>Download the new version of OpenAM from <link 
+     xlink:show="new" xlink:href="http://forgerock.com/openam-downloads/"
+     ><citetitle>Enterprise Downloads page</citetitle></link> or from the <link 
+     xlink:show="new" xlink:href="http://forgerock.org/openam-archive.html/"
+     ><citetitle>Archives page</citetitle></link>.</para>
+  </step>
 
-   <step>
-    <para>Copy the configuration directory.</para>
-    <screen>$ tar -czvf openam-home.tar.gz ~/openam</screen>
-   </step>
-
-   <step>
-    <para>Copy your expanded <filename>.war</filename> directory to include 
-    any customized components within the web application.</para>
-    <screen>$ jar -cvf openam-customized.war /path/to/expanded-war-directory</screen>
-   </step>
-
-   <step>
-   <para>Stop OpenAM, or if necessary to redeploy OpenAM, stop the container 
-   where OpenAM is running.</para>
-   </step>
-
-   <step>
-    <para>Remove the old <filename>.war</filename> file.</para>
-   </step>
-
-   <step>
-    <para>Clear your container caches, as applicable.</para>
-   </step>
-
-   <step>
-    <para>Remove the OpenAM home directory. (<literal> What is the home directory? $HOME/ deployment-uri /, 
-    e.g. ~/openam? </literal>)</para>
-    <screen>$ rm -rf /path/to/openam-home-directory</screen>
-   </step>
-
-   <step>
-    <para>Delete the root DN of the old configurations if you have an external
-    OpenAM configuration store.</para>
-    <screen>$ ./ldapdelete --hostName opendj.example.com --port 1389 
- --bindDN "cn=DirectoryManager" --bindPassword password
- --noPropertiesFile dc=opensso,dc=java,dc=net</screen>
-   </step>
-
-   <step>
-    <para>Delete the OpenAM locator file from <literal>$ HOME/.openssocfg</literal>.</para>
-   </step>
-
-   <step>
-    <para>Refer to the <link xlink:href="http://openam.forgerock.org/openam-documentation/openam-doc-source/doc/install-guide/index.html">
-    <citetitle>Installation Guide</citetitle></link> for your new OpenAM instance
-    to deploy the <filename>.war</filename> file, particularly if you have 
-    multiple instances.</para>
-   </step>
+  <step>
+   <para>Apply customizations to the new <filename>.war</filename> file. The 
+   <link xlink:href="upgrade-guide#appendix-best-practices" xlink:role="http://docbook.org/xlink/role/olink">
+   <citetitle>Best Practices for Upgrading Your OpenAM Deployment</citetitle></link>
+   provides steps if you would like to run through a customization checklist.</para>
+  </step>
+  
+  <step>
+   <para>Follow <link xlink:href="install-guide#chap-install-core" 
+   xlink:role="http://docbook.org/xlink/role/olink">
+   <citetitle>Installing OpenAM Core Services</citetitle></link> in the
+   <citetitle>Installation Guide</citetitle> to complete the migration.</para>
+  </step>
 
  </procedure>
+
+ <para>Once you have completed the new installation, you can create and run a script 
+ that will apply the configuration settings on the new system. You can use something
+ like the ssoadm do-batch script to do this.</para>
 
 </chapter>
