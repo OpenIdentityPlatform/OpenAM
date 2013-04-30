@@ -25,6 +25,9 @@
    $Id: propertyPMConditionSessionProperty.xml,v 1.2 2008/06/25 05:45:12 qcheng Exp $
 
 -->
+<!--
+   Portions Copyrighted 2013 ForgeRock, Inc.
+-->
 
 <!DOCTYPE propertysheet SYSTEM "propertysheet.dtd">
 
@@ -56,7 +59,7 @@
             <attribute name="empty" value="policy.condition.attribute.label.session.property.condition.noentries" />
             <attribute name="showPaginationControls" value="false" />
             <attribute name="selectionType" value="multiple" />
-            <attribute name="selectionJavascript" value="toggleTblButtonStateEx(this)" />
+            <attribute name="selectionJavascript" value="toggleTblButtonStateLocal(this)" />
             <attribute name="showAdvancedSortingIcon" value="false" />
             <attribute name="showLowerActions" value="false" />
             <attribute name="showPaginationControls" value="false" />

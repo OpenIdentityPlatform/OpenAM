@@ -25,7 +25,9 @@
    $Id: SessionPropertyConditionEdit.jsp,v 1.3 2008/06/25 05:44:44 qcheng Exp $
 
 --%>
-
+<%--
+   Portions Copyrighted 2013 ForgeRock, Inc.
+--%>
 
 
 <%@ page info="SessionPropertyConditionEdit" language="java" %>
@@ -43,7 +45,7 @@
 <script language="javascript" src="../console/js/am.js"></script>
 
 <script language="javascript">
-    function toggleTblButtonStateEx(obj) {
+    function toggleTblButtonStateLocal(obj) {
         toggleTblButtonState('SessionPropertyConditionEdit',
             'SessionPropertyConditionEdit.Values',
             'propertyCount',
