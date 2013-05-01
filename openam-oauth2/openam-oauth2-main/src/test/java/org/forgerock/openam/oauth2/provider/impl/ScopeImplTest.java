@@ -16,25 +16,42 @@
 package org.forgerock.openam.oauth2.provider.impl;
 
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
+
+import static org.mockito.Matchers.anyString;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 import static org.testng.Assert.*;
-import org.testng.annotations.BeforeTest;
+import static org.powermock.api.support.membermodification.MemberMatcher.constructor;
+import static org.powermock.api.support.membermodification.MemberModifier.suppress;
+
+import com.sun.identity.idm.AMIdentity;
+import org.forgerock.openam.ext.cts.repo.DefaultOAuthTokenStoreImpl;
+import org.forgerock.openam.oauth2.model.CoreToken;
+import org.forgerock.openam.oauth2.provider.OAuth2TokenStore;
+import org.powermock.api.mockito.PowerMockito;
+import org.powermock.core.classloader.annotations.PrepareForTest;
+import org.powermock.modules.testng.PowerMockTestCase;
+import org.testng.IObjectFactory;
+import org.testng.annotations.ObjectFactory;
 import org.testng.annotations.Test;
 
-public class ScopeImplTest {
+@PrepareForTest(AMIdentity.class)
+public class ScopeImplTest extends PowerMockTestCase {
 
     ScopeImpl scopeImpl = null;
-
-    @BeforeTest
-    public void setup() {
-        this.scopeImpl = new ScopeImpl();
-    }
 
     /**
      * Test getting the default scope
      */
     @Test
     public void testGetDefaultScopeForScopeToPresentOnAuthorizationPage() {
+        suppress(constructor(DefaultOAuthTokenStoreImpl.class));
+        OAuth2TokenStore store = mock(DefaultOAuthTokenStoreImpl.class);
+        AMIdentity id = PowerMockito.mock(AMIdentity.class);
+        scopeImpl = new ScopeImpl(store, id);
+
         Set<String> requestedScope = new HashSet<String>();
         Set<String> availableScope = new HashSet<String>();
         Set<String> defaultScope = new HashSet<String>();
@@ -53,6 +70,12 @@ public class ScopeImplTest {
      */
     @Test
     public void testGetRequestedScopeForScopeToPresentOnAuthorizationPage() {
+
+        suppress(constructor(DefaultOAuthTokenStoreImpl.class));
+        OAuth2TokenStore store = mock(DefaultOAuthTokenStoreImpl.class);
+        AMIdentity id = PowerMockito.mock(AMIdentity.class);
+        scopeImpl = new ScopeImpl(store, id);
+
         Set<String> requestedScope = new HashSet<String>();
         Set<String> availableScope = new HashSet<String>();
         Set<String> defaultScope = new HashSet<String>();
@@ -80,6 +103,11 @@ public class ScopeImplTest {
      */
     @Test
     public void testGetRequestedScopeForScopeToPresentOnAuthorizationPageWithExtraScopeRequest() {
+        suppress(constructor(DefaultOAuthTokenStoreImpl.class));
+        OAuth2TokenStore store = mock(DefaultOAuthTokenStoreImpl.class);
+        AMIdentity id = PowerMockito.mock(AMIdentity.class);
+        scopeImpl = new ScopeImpl(store, id);
+
         Set<String> requestedScope = new HashSet<String>();
         Set<String> availableScope = new HashSet<String>();
         Set<String> defaultScope = new HashSet<String>();
@@ -102,5 +130,46 @@ public class ScopeImplTest {
         expectedScope.remove("scope6");
 
         assertEquals(returnedScope, expectedScope);
+    }
+
+    /**
+     * Tests getting user info for the user info endpoint
+     */
+    @Test
+    public void testGetUserInfo(){
+
+        //mock objects
+        suppress(constructor(DefaultOAuthTokenStoreImpl.class));
+        OAuth2TokenStore store = mock(DefaultOAuthTokenStoreImpl.class);
+        AMIdentity id = PowerMockito.mock(AMIdentity.class);
+        CoreToken token = mock(CoreToken.class);
+        scopeImpl = new ScopeImpl(store, id);
+
+        //setup AMIdentity attribute return values
+        Set idAttribute = new HashSet<String>();
+        idAttribute.add("attributeValue");
+
+        //setup token scope values
+        Set scopeValue = new HashSet<String>();
+        scopeValue.add("email");
+
+        try {
+            when(id.getAttribute(anyString())).thenReturn(idAttribute);
+        } catch (Exception e){
+            //do nothing
+        }
+        when(token.getUserID()).thenReturn("user");
+        when(token.getScope()).thenReturn(scopeValue);
+        when(token.getRealm()).thenReturn("/");
+
+        Map<String, Object> returnValues = scopeImpl.getUserInfo(token);
+
+        assert(returnValues.containsKey("sub") && returnValues.get("sub").equals("user"));
+        assert(returnValues.containsKey("email") && returnValues.get("email").equals("attributeValue"));
+    }
+
+    @ObjectFactory
+    public IObjectFactory getObjectFactory() {
+        return new org.powermock.modules.testng.PowerMockObjectFactory();
     }
 }
