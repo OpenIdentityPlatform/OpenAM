@@ -25,7 +25,9 @@
 package org.forgerock.restlet.ext.oauth2.flow;
 
 
+import com.sun.identity.idm.AMIdentity;
 import com.sun.identity.shared.OAuth2Constants;
+import edu.emory.mathcs.backport.java.util.Arrays;
 import org.forgerock.openam.oauth2.exceptions.OAuthProblemException;
 import org.forgerock.openam.oauth2.model.CoreToken;
 import org.forgerock.openam.oauth2.provider.ResponseType;
@@ -33,12 +35,12 @@ import org.forgerock.openam.oauth2.utils.OAuth2Utils;
 import org.restlet.data.Form;
 import org.restlet.data.Parameter;
 import org.restlet.data.Reference;
+import org.restlet.ext.json.JsonRepresentation;
 import org.restlet.representation.Representation;
 import org.restlet.resource.Get;
 import org.restlet.resource.Post;
 import org.restlet.routing.Redirector;
 
-import java.lang.reflect.Method;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
@@ -72,18 +74,38 @@ public class AuthorizeServerResource extends AbstractFlow {
 
         // The target contains the state
         String state =
-                OAuth2Utils
-                        .getRequestParameter(getRequest(), OAuth2Constants.Params.STATE, String.class);
+                OAuth2Utils.getRequestParameter(getRequest(), OAuth2Constants.Params.STATE, String.class);
 
         // Get the requested scope
         String scope_before =
-                OAuth2Utils
-                        .getRequestParameter(getRequest(), OAuth2Constants.Params.SCOPE, String.class);
+                OAuth2Utils.getRequestParameter(getRequest(), OAuth2Constants.Params.SCOPE, String.class);
 
         // Validate the granted scope
         Set<String> checkedScope = executeAuthorizationPageScopePlugin(scope_before);
 
-        return getPage("authorize.ftl", getDataModel(checkedScope));
+        String prompt =
+                OAuth2Utils.getRequestParameter(getRequest(), OAuth2Constants.Custom.PROMPT, String.class);
+
+        Set<String> promptSet = null;
+        if (prompt != null && !prompt.isEmpty()){
+            String [] prompts = prompt.split(" ");
+            if (prompts != null && prompts.length > 0){
+                promptSet = new HashSet<String>(Arrays.asList(prompts));
+            }
+        }
+
+        //check for saved consent
+        if (!savedConsent(resourceOwner.getIdentifier(), sessionClient.getClientId(), checkedScope) ||
+                (promptSet != null && promptSet.contains("consent"))  ){
+            return getPage("authorize.ftl", getDataModel(checkedScope));
+        } else {
+            //skip consent age if consent is saved
+            Map<String, Object> attrs = getRequest().getAttributes();
+            attrs.put(OAuth2Constants.Custom.DECISION, OAuth2Constants.Custom.ALLOW);
+            getRequest().setAttributes(attrs);
+            Representation rep = new JsonRepresentation(new HashMap());
+            return represent(rep);
+        }
     }
 
     @Post("form:json")
@@ -98,9 +120,15 @@ public class AuthorizeServerResource extends AbstractFlow {
                 String.class);
 
         if (OAuth2Constants.Custom.ALLOW.equalsIgnoreCase(decision)) {
+            String save_consent =
+                    OAuth2Utils.getRequestParameter(getRequest(), OAuth2Constants.Custom.SAVE_CONSENT, String.class);
+
             String scope_after =
-                    OAuth2Utils
-                            .getRequestParameter(getRequest(), OAuth2Constants.Params.SCOPE, String.class);
+                    OAuth2Utils.getRequestParameter(getRequest(), OAuth2Constants.Params.SCOPE, String.class);
+
+            if (save_consent != null && save_consent.equalsIgnoreCase("on")){
+                saveConsent(resourceOwner.getIdentifier(), sessionClient.getClientId(), scope_after);
+            }
 
             String state =
                     OAuth2Utils
@@ -240,6 +268,69 @@ public class AuthorizeServerResource extends AbstractFlow {
 
         }
         return result;
+    }
+
+    protected boolean savedConsent(String userid, String clientId, Set<String> scopes){
+        String attribute = OAuth2Utils.getOAuth2ProviderSetting(OAuth2Constants.OAuth2ProviderService.SAVED_CONSENT_ATTRIBUTE,
+                String.class,
+                getRequest());
+
+        AMIdentity id = OAuth2Utils.getIdentity(userid, OAuth2Utils.getRealm(getRequest()));
+        Set<String> attributeSet = null;
+
+        if (id != null){
+            try {
+                attributeSet = id.getAttribute(attribute);
+            }
+            catch (Exception e){
+                OAuth2Utils.DEBUG.error("AuthorizeServerResource.saveConsent(): Unable to get profile attribute", e);
+                return false;
+            }
+        }
+
+        //check the values of the attribute set vs the scope and client requested
+        //attribute set is in the form of client_id|scope1 scope2 scope3
+        for(String consent : attributeSet){
+            int loc = consent.indexOf(" ");
+            String consentClientId = consent.substring(0, loc);
+            String[] scopesArray = consent.substring(loc+1, consent.length()).split(" ");
+            Set<String> consentScopes = null;
+            if (scopesArray != null && scopesArray.length > 0){
+                consentScopes = new HashSet<String>(Arrays.asList(scopesArray));
+            } else {
+                consentScopes = new HashSet<String>();
+            }
+
+            //if both the client and the scopes are identical to the saved consent then approve
+            if (clientId.equals(consentClientId) && scopes.equals(consentScopes)){
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    protected void saveConsent(String userId, String clientId, String scopes){
+        AMIdentity id = OAuth2Utils.getIdentity(userId, OAuth2Utils.getRealm(getRequest()));
+        String consentAttribute =
+                OAuth2Utils.getOAuth2ProviderSetting(OAuth2Constants.OAuth2ProviderService.SAVED_CONSENT_ATTRIBUTE,
+                        String.class, getRequest());
+        try {
+
+            //get the current set of consents and add our new consent to it.
+            Set<String> consents = new HashSet<String>(id.getAttribute(consentAttribute));
+            StringBuilder sb = new StringBuilder();
+            sb.append(clientId.trim()).append(" ").append(scopes.trim());
+            consents.add(sb.toString());
+
+            //update the user profile with our new consent settings
+            Map<String, Set<String>> attrs = new HashMap<String, Set<String>>();
+            attrs.put(consentAttribute, consents);
+            id.setAttributes(attrs);
+            id.store();
+        } catch (Exception e){
+            OAuth2Utils.DEBUG.error("AuthorizeServerResource.saveConsent(): Unable to save consent ", e);
+        }
     }
 
 }

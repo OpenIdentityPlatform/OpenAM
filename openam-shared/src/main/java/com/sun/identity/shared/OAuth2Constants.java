@@ -649,6 +649,7 @@ public class OAuth2Constants {
         public static final String ALLOW = "allow";
         public static final String DENY = "deny";
         public static final String NONCE = "nonce";
+        public static final String SAVE_CONSENT= "save_consent";
         /**
          * The display mode in which to render the dialog. The default is
          * {@code page} on the www subdomain and {@code wap} on the m subdomain.
@@ -704,6 +705,7 @@ public class OAuth2Constants {
         public static final String TOKEN_PLUGIN_LIST = "forgerock-oauth2-provider-token-map-class";
         public static final String RESPONSE_TYPE_LIST = "forgerock-oauth2-provider-response-type-map-class";
         public static final String AUTHENITCATION_ATTRIBUTES = "forgerock-oauth2-provider-authentication-attributes";
+        public static final String SAVED_CONSENT_ATTRIBUTE = "forgerock-oauth2-provider-saved-consent-attribute";
     }
 
     /**

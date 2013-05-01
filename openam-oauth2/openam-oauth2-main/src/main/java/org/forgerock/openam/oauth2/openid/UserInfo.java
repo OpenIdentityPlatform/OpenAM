@@ -65,8 +65,13 @@ public class UserInfo extends ServerResource {
             OAuth2TokenStore store = new DefaultOAuthTokenStoreImpl();
             CoreToken token = store.readAccessToken(tokenid);
             try {
-                pluginClass = getScopePluginClass(OAuth2Utils.getRealm(getRequest()));
-                scopeClass = (Scope) Class.forName(pluginClass).newInstance();
+                pluginClass =
+                        OAuth2Utils.getOAuth2ProviderSetting(OAuth2Constants.OAuth2ProviderService.SCOPE_PLUGIN_CLASS,
+                                String.class,
+                                getRequest());
+                if (pluginClass != null && !pluginClass.isEmpty()){
+                    scopeClass = (Scope) Class.forName(pluginClass).newInstance();
+                }
             } catch (Exception e){
                 OAuth2Utils.DEBUG.error("AbstractFlow::Exception during userinfo scope execution", e);
                 throw OAuthProblemException.OAuthError.SERVER_ERROR.handle(getRequest());
@@ -75,25 +80,12 @@ public class UserInfo extends ServerResource {
             // Validate the granted scope
             if (scopeClass != null && pluginClass != null){
                 userinfo = scopeClass.getUserInfo(token);
+            } else {
+                OAuth2Utils.DEBUG.error("AbstractFlow::Exception during userinfo scope execution");
+                throw OAuthProblemException.OAuthError.SERVER_ERROR.handle(getRequest());
             }
 
             return userinfo;
         }
-
-    protected String getScopePluginClass(String realm) throws OAuthProblemException {
-        String pluginClass = null;
-        try {
-            SSOToken token = (SSOToken) AccessController.doPrivileged(AdminTokenAction.getInstance());
-            ServiceConfigManager mgr = new ServiceConfigManager(token, OAuth2Constants.OAuth2ProviderService.NAME, OAuth2Constants.OAuth2ProviderService.VERSION);
-            ServiceConfig scm = mgr.getOrganizationConfig(realm, null);
-            Map<String, Set<String>> attrs = scm.getAttributes();
-            pluginClass = attrs.get(OAuth2Constants.OAuth2ProviderService.SCOPE_PLUGIN_CLASS).iterator().next();
-        } catch (Exception e) {
-            OAuth2Utils.DEBUG.error("AbstractFlow::Unable to get scope plugin class", e);
-            throw OAuthProblemException.OAuthError.SERVER_ERROR.handle(getRequest());
-        }
-
-        return pluginClass;
-    }
 
 }

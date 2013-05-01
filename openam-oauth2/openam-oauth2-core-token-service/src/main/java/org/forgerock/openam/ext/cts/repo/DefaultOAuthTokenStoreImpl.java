@@ -74,28 +74,46 @@ public class DefaultOAuthTokenStoreImpl implements OAuth2TokenStore {
         try {
             repository = new CoreTokenService(OpenDJTokenRepo.getInstance());
         } catch (Exception e) {
-            // TODO: legacy code throws Exception, look to refactor
             throw new OAuthProblemException(Status.SERVER_ERROR_SERVICE_UNAVAILABLE.getCode(),
                     "Service unavailable", "Could not create underlying storage", null);
         }
     }
-    private void getSettings(String realm){
-        if (realm == null){
-            //default realm
-            realm = "/";
+    private void getSettings(){
+        String setting = null;
+        setting =
+            OAuth2Utils.getOAuth2ProviderSetting(OAuth2Constants.OAuth2ProviderService.AUTHZ_CODE_LIFETIME_NAME,
+                                                 String.class,
+                                                 Request.getCurrent());
+        if (setting != null && !setting.isEmpty()){
+            AUTHZ_CODE_LIFETIME = Long.parseLong(setting);
+            setting = null;
+        } else {
+            OAuth2Utils.DEBUG.error("DefaultOAuthTOkenStoreImpl::No setting set for code lifetime");
+            throw OAuthProblemException.OAuthError.SERVER_ERROR.handle(null, "No setting set for code lifetime");
         }
-        try {
-            SSOToken token = (SSOToken) AccessController.doPrivileged(AdminTokenAction.getInstance());
-            ServiceConfigManager mgr = new ServiceConfigManager(token, OAuth2Constants.OAuth2ProviderService.NAME, OAuth2Constants.OAuth2ProviderService.VERSION);
-            ServiceConfig scm = mgr.getOrganizationConfig(realm, null);
-            Map<String, Set<String>> attrs = scm.getAttributes();
-            AUTHZ_CODE_LIFETIME = Long.parseLong(attrs.get(OAuth2Constants.OAuth2ProviderService.AUTHZ_CODE_LIFETIME_NAME).iterator().next());
-            REFRESH_TOKEN_LIFETIME = Long.parseLong(attrs.get(OAuth2Constants.OAuth2ProviderService.REFRESH_TOKEN_LIFETIME_NAME).iterator().next());
-            ACCESS_TOKEN_LIFETIME = Long.parseLong(attrs.get(OAuth2Constants.OAuth2ProviderService.ACCESS_TOKEN_LIFETIME_NAME).iterator().next());
-        } catch (Exception e) {
-            OAuth2Utils.DEBUG.error("DefaultOAuthTokenStoreImpl::Unable to read service settings", e);
-            throw OAuthProblemException.OAuthError.SERVER_ERROR.handle(null,
-                    "Unable to read service settings");
+
+        setting =
+                OAuth2Utils.getOAuth2ProviderSetting(OAuth2Constants.OAuth2ProviderService.REFRESH_TOKEN_LIFETIME_NAME,
+                        String.class,
+                        Request.getCurrent());
+        if (setting != null && !setting.isEmpty()){
+            REFRESH_TOKEN_LIFETIME = Long.parseLong(setting);
+            setting = null;
+        } else {
+            OAuth2Utils.DEBUG.error("DefaultOAuthTOkenStoreImpl::No setting set for refresh lifetime");
+            throw OAuthProblemException.OAuthError.SERVER_ERROR.handle(null, "No setting set for refresh lifetime");
+        }
+
+        setting =
+                OAuth2Utils.getOAuth2ProviderSetting(OAuth2Constants.OAuth2ProviderService.ACCESS_TOKEN_LIFETIME_NAME,
+                        String.class,
+                        Request.getCurrent());
+        if (setting != null && !setting.isEmpty()){
+            ACCESS_TOKEN_LIFETIME = Long.parseLong(setting);
+            setting = null;
+        } else {
+            OAuth2Utils.DEBUG.error("DefaultOAuthTOkenStoreImpl::No setting set for token lifetime");
+            throw OAuthProblemException.OAuthError.SERVER_ERROR.handle(null, "No setting set for token lifetime");
         }
     }
 
@@ -107,7 +125,7 @@ public class DefaultOAuthTokenStoreImpl implements OAuth2TokenStore {
         if (OAuth2Utils.DEBUG.messageEnabled()){
             OAuth2Utils.DEBUG.message("DefaultOAuthTokenStoreImpl::Creating Authorization code");
         }
-        getSettings(realm);
+        getSettings();
         String id = UUID.randomUUID().toString();
         long expiresIn = AUTHZ_CODE_LIFETIME;
 
@@ -243,7 +261,7 @@ public class DefaultOAuthTokenStoreImpl implements OAuth2TokenStore {
         if (OAuth2Utils.DEBUG.messageEnabled()){
             OAuth2Utils.DEBUG.message("DefaultOAuthTokenStoreImpl::Creating access token");
         }
-        getSettings(realm);
+        getSettings();
         JsonValue response = null;
 
         String id = UUID.randomUUID().toString();
@@ -339,7 +357,7 @@ public class DefaultOAuthTokenStoreImpl implements OAuth2TokenStore {
         if (OAuth2Utils.DEBUG.messageEnabled()){
             OAuth2Utils.DEBUG.message("DefaultOAuthTokenStoreImpl::Create refresh token");
         }
-        getSettings(realm);
+        getSettings();
         JsonValue response;
 
         String id = UUID.randomUUID().toString();
@@ -449,7 +467,7 @@ public class DefaultOAuthTokenStoreImpl implements OAuth2TokenStore {
      */
     public String createSignedJWT(String realm, String uuid, String clientID, String deploymentURI, String authorizationParty, PrivateKey pk, String nonce){
         long timeInSeconds = System.currentTimeMillis()/1000;
-        getSettings(realm);
+        getSettings();
         JWTToken jwtToken = new JWTToken(deploymentURI, uuid, clientID, authorizationParty, timeInSeconds + ACCESS_TOKEN_LIFETIME, timeInSeconds, timeInSeconds, realm, nonce);
         String jwt = null;
         try {
@@ -466,7 +484,7 @@ public class DefaultOAuthTokenStoreImpl implements OAuth2TokenStore {
      */
     public String createEncryptedJWT(String realm, String uuid, String clientID, String deploymentURI, String authorizationParty, PrivateKey pk, String nonce){
         long timeInSeconds = System.currentTimeMillis()/1000;
-        getSettings(realm);
+        getSettings();
         JWTToken jwtToken = new JWTToken(deploymentURI, uuid, clientID, authorizationParty, timeInSeconds + ACCESS_TOKEN_LIFETIME, timeInSeconds, timeInSeconds, realm, nonce);
         String jwt = null;
         try {
@@ -483,7 +501,7 @@ public class DefaultOAuthTokenStoreImpl implements OAuth2TokenStore {
      */
     public String createSignedAndEncryptedJWT(String realm, String uuid, String clientID, String deploymentURI, String authorizationParty, PrivateKey pk, String nonce){
         long timeInSeconds = System.currentTimeMillis()/1000;
-        getSettings(realm);
+        getSettings();
         JWTToken jwtToken = new JWTToken(deploymentURI, uuid, clientID, authorizationParty, timeInSeconds + ACCESS_TOKEN_LIFETIME, timeInSeconds, timeInSeconds, realm, nonce);
         String jwt = null;
         try {

@@ -151,10 +151,9 @@ public class ScopeImpl implements Scope {
         if (resourceOwner != null){
             AMIdentity id = null;
             try {
-                Set<String> authAttributes = getAuthenticationAttributesForService(token.getRealm());
 
                 if (this.id == null){
-                    id = getIdentity(resourceOwner, token.getRealm(), authAttributes);
+                    id = OAuth2Utils.getIdentity(resourceOwner, token.getRealm());
                 } else {
                     id = this.id;
                 }
@@ -178,52 +177,6 @@ public class ScopeImpl implements Scope {
         return map;
     }
 
-    private AMIdentity getIdentity(String uName, String realm, Set<String> authAttributes) throws OAuthProblemException {
-        SSOToken token = (SSOToken) AccessController.doPrivileged(AdminTokenAction.getInstance());
-        AMIdentity theID = null;
-
-        try {
-            AMIdentityRepository amIdRepo = new AMIdentityRepository(token, realm);
-
-            IdSearchControl idsc = new IdSearchControl();
-            idsc.setRecursive(true);
-            idsc.setAllReturnAttributes(true);
-            // search for the identity
-            Set<AMIdentity> results = Collections.EMPTY_SET;
-            idsc.setMaxResults(0);
-            IdSearchResults searchResults =
-                    amIdRepo.searchIdentities(IdType.USER, uName, idsc);
-            if (searchResults != null && !searchResults.getResultAttributes().isEmpty()) {
-                results = searchResults.getSearchResults();
-            } else {
-                Map<String, Set<String>> avPairs = toAvPairMap(authAttributes, uName);
-                idsc.setSearchModifiers(IdSearchOpModifier.OR, avPairs);
-                searchResults =
-                        amIdRepo.searchIdentities(IdType.USER, "*", idsc);
-                if (searchResults != null) {
-                    results = searchResults.getSearchResults();
-                }
-            }
-
-            if (results == null || results.size() != 1) {
-                OAuth2Utils.DEBUG.error("ScopeImpl.getIdentity()::No user profile or more than one profile found.");
-                throw OAuthProblemException.OAuthError.UNAUTHORIZED_CLIENT.handle(null,
-                        "Not able to get client from OpenAM");
-            }
-
-            theID = results.iterator().next();
-
-            //if the client is deactivated return null
-            if (theID.isActive()){
-                return theID;
-            } else {
-                return null;
-            }
-        } catch (Exception e){
-            OAuth2Utils.DEBUG.error("ClientVerifierImpl::Unable to get client AMIdentity: ", e);
-            throw OAuthProblemException.OAuthError.UNAUTHORIZED_CLIENT.handle(null, "Not able to get client from OpenAM");
-        }
-    }
     /**
      * {@inheritDoc}
      */
@@ -311,9 +264,8 @@ public class ScopeImpl implements Scope {
         Set<String> scopes = token.getScope();
         Map<String,Object> response = new HashMap<String, Object>();
         AMIdentity id = null;
-        Set<String> authAttributes = getAuthenticationAttributesForService(token.getRealm());
         if (this.id == null){
-            id = getIdentity(token.getUserID(), token.getRealm(), authAttributes);
+            id = OAuth2Utils.getIdentity(token.getUserID(), token.getRealm());
         } else {
             id = this.id;
         }
@@ -381,41 +333,6 @@ public class ScopeImpl implements Scope {
         }
 
         return response;
-    }
-
-    private Map toAvPairMap(Set names, String token) {
-        if (token == null) {
-            return Collections.EMPTY_MAP;
-        }
-        Map map = new HashMap();
-        Set set = new HashSet();
-        set.add(token);
-        if (names == null || names.isEmpty()) {
-            return map;
-        }
-        Iterator it = names.iterator();
-        while (it.hasNext()) {
-            map.put((String) it.next(), set);
-        }
-        return map;
-    }
-
-    private Set<String> getAuthenticationAttributesForService(String realm){
-        if (realm == null){
-            //default realm
-            realm = "/";
-        }
-        try {
-            SSOToken token = (SSOToken) AccessController.doPrivileged(AdminTokenAction.getInstance());
-            ServiceConfigManager mgr = new ServiceConfigManager(token, OAuth2Constants.OAuth2ProviderService.NAME, OAuth2Constants.OAuth2ProviderService.VERSION);
-            ServiceConfig scm = mgr.getOrganizationConfig(realm, null);
-            Map<String, Set<String>> attrs = scm.getAttributes();
-            return attrs.get(OAuth2Constants.OAuth2ProviderService.AUTHENITCATION_ATTRIBUTES);
-        } catch (Exception e) {
-            OAuth2Utils.DEBUG.error("ScopeImpl::Unable to read service settings", e);
-            throw OAuthProblemException.OAuthError.SERVER_ERROR.handle(null,
-                    "Unable to read service settings");
-        }
     }
 
 }

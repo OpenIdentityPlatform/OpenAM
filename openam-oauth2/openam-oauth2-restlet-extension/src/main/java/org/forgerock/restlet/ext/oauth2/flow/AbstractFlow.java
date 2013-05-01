@@ -84,16 +84,12 @@ public abstract class AbstractFlow extends ServerResource {
     public AbstractFlow(){
     }
     protected boolean checkIfRefreshTokenIsRequired(Request request){
-        try {
-            SSOToken token = (SSOToken) AccessController.doPrivileged(AdminTokenAction.getInstance());
-            ServiceConfigManager mgr = new ServiceConfigManager(token, OAuth2Constants.OAuth2ProviderService.NAME, OAuth2Constants.OAuth2ProviderService.VERSION);
-            ServiceConfig scm = mgr.getOrganizationConfig(OAuth2Utils.getRealm(request), null);
-            Map<String, Set<String>> attrs = scm.getAttributes();
-            issueRefreshToken = Boolean.parseBoolean(attrs.get(OAuth2Constants.OAuth2ProviderService.ISSUE_REFRESH_TOKEN).iterator().next());
-        } catch (Exception e) {
-            OAuth2Utils.DEBUG.error("Could not get service settings", e);
-            throw new OAuthProblemException(Status.SERVER_ERROR_SERVICE_UNAVAILABLE.getCode(),
-                "Service unavailable", "Could not get service settings", null);
+        String setting = OAuth2Utils.getOAuth2ProviderSetting(OAuth2Constants.OAuth2ProviderService.ISSUE_REFRESH_TOKEN, String.class, request);
+        if (setting != null && !setting.isEmpty()){
+            issueRefreshToken = Boolean.parseBoolean(setting);
+        } else {
+            OAuth2Utils.DEBUG.error("AbstractFlow::No setting set for issue refresh token");
+            throw OAuthProblemException.OAuthError.SERVER_ERROR.handle(null, "No setting set for issue refresh token");
         }
         return issueRefreshToken;
     }
@@ -586,23 +582,6 @@ public abstract class AbstractFlow extends ServerResource {
     protected void validateNotAllowedParameters() throws OAuthProblemException {
     }
 
-    protected String getScopePluginClass(String realm) throws OAuthProblemException {
-        String pluginClass = null;
-        try {
-            SSOToken token = (SSOToken) AccessController.doPrivileged(AdminTokenAction.getInstance());
-            ServiceConfigManager mgr = new ServiceConfigManager(token, OAuth2Constants.OAuth2ProviderService.NAME, OAuth2Constants.OAuth2ProviderService.VERSION);
-            ServiceConfig scm = mgr.getOrganizationConfig(realm, null);
-            Map<String, Set<String>> attrs = scm.getAttributes();
-            pluginClass = attrs.get(OAuth2Constants.OAuth2ProviderService.SCOPE_PLUGIN_CLASS).iterator().next();
-        } catch (Exception e) {
-            OAuth2Utils.DEBUG.error("AbstractFlow::Unable to get scope plugin class", e);
-            throw new OAuthProblemException(Status.SERVER_ERROR_SERVICE_UNAVAILABLE.getCode(),
-                    "Service unavailable", "Could not create underlying storage", null);
-        }
-
-        return pluginClass;
-    }
-
     protected Set<String> executeAccessTokenScopePlugin(String scopeRequest){
         Set<String> checkedScope = null;
         Set<String> requestedScopeSet = null;
@@ -612,8 +591,13 @@ public abstract class AbstractFlow extends ServerResource {
             requestedScopeSet =
                     new TreeSet<String>(OAuth2Utils.split(scopeRequest, OAuth2Utils
                             .getScopeDelimiter(getContext())));
-            pluginClass = getScopePluginClass(OAuth2Utils.getRealm(getRequest()));
-            scopeClass = (Scope) Class.forName(pluginClass).newInstance();
+            pluginClass =
+                    OAuth2Utils.getOAuth2ProviderSetting(OAuth2Constants.OAuth2ProviderService.SCOPE_PLUGIN_CLASS,
+                            String.class,
+                            getRequest());
+            if (pluginClass != null && !pluginClass.isEmpty()){
+                scopeClass = (Scope) Class.forName(pluginClass).newInstance();
+            }
         } catch (Exception e){
             OAuth2Utils.DEBUG.error("AbstractFlow::Exception during scope execution", e);
             checkedScope = null;
@@ -624,6 +608,9 @@ public abstract class AbstractFlow extends ServerResource {
             checkedScope = scopeClass.scopeRequestedForAccessToken(requestedScopeSet,
                     OAuth2Utils.parseScope(client.getClient().getAllowedGrantScopes()),
                     OAuth2Utils.parseScope(client.getClient().getDefaultGrantScopes()));
+        } else {
+            OAuth2Utils.DEBUG.error("AbstractFlow::No setting set for scope plugin class");
+            throw OAuthProblemException.OAuthError.SERVER_ERROR.handle(null, "No setting set for scope plugin class");
         }
 
         return checkedScope;
@@ -638,8 +625,13 @@ public abstract class AbstractFlow extends ServerResource {
             requestedScopeSet =
                     new TreeSet<String>(OAuth2Utils.split(scopeRequest, OAuth2Utils
                             .getScopeDelimiter(getContext())));
-            pluginClass = getScopePluginClass(OAuth2Utils.getRealm(getRequest()));
-            scopeClass = (Scope) Class.forName(pluginClass).newInstance();
+            pluginClass =
+                    OAuth2Utils.getOAuth2ProviderSetting(OAuth2Constants.OAuth2ProviderService.SCOPE_PLUGIN_CLASS,
+                            String.class,
+                            getRequest());
+            if (pluginClass != null && !pluginClass.isEmpty()){
+                scopeClass = (Scope) Class.forName(pluginClass).newInstance();
+            }
         } catch (Exception e){
             OAuth2Utils.DEBUG.error("AbstractFlow::Exception during scope execution", e);
             checkedScope = null;
@@ -651,6 +643,9 @@ public abstract class AbstractFlow extends ServerResource {
                     maxScope,
                     OAuth2Utils.parseScope(client.getClient().getAllowedGrantScopes()),
                     OAuth2Utils.parseScope(client.getClient().getDefaultGrantScopes()));
+        } else {
+            OAuth2Utils.DEBUG.error("AbstractFlow::No setting set for scope plugin class");
+            throw OAuthProblemException.OAuthError.SERVER_ERROR.handle(null, "No setting set for scope plugin class");
         }
 
         return checkedScope;
@@ -665,8 +660,13 @@ public abstract class AbstractFlow extends ServerResource {
             requestedScopeSet =
                     new TreeSet<String>(OAuth2Utils.split(scopeRequest, OAuth2Utils
                             .getScopeDelimiter(getContext())));
-            pluginClass = getScopePluginClass(OAuth2Utils.getRealm(getRequest()));
-            scopeClass = (Scope) Class.forName(pluginClass).newInstance();
+            pluginClass =
+                    OAuth2Utils.getOAuth2ProviderSetting(OAuth2Constants.OAuth2ProviderService.SCOPE_PLUGIN_CLASS,
+                            String.class,
+                            getRequest());
+            if (pluginClass != null && !pluginClass.isEmpty()){
+                scopeClass = (Scope) Class.forName(pluginClass).newInstance();
+            }
         } catch (Exception e){
             OAuth2Utils.DEBUG.error("AbstractFlow::Exception during scope execution", e);
             checkedScope = null;
@@ -678,6 +678,9 @@ public abstract class AbstractFlow extends ServerResource {
             checkedScope = scopeClass.scopeToPresentOnAuthorizationPage(requestedScopeSet,
                     OAuth2Utils.parseScope(client.getClient().getAllowedGrantScopes()),
                     OAuth2Utils.parseScope(client.getClient().getDefaultGrantScopes()));
+        } else {
+            OAuth2Utils.DEBUG.error("AbstractFlow::No setting set for scope plugin class");
+            throw OAuthProblemException.OAuthError.SERVER_ERROR.handle(null, "No setting set for scope plugin class");
         }
 
         return checkedScope;
@@ -688,8 +691,13 @@ public abstract class AbstractFlow extends ServerResource {
         String pluginClass = null;
         Scope scopeClass = null;
         try {
-            pluginClass = getScopePluginClass(OAuth2Utils.getRealm(getRequest()));
-            scopeClass = (Scope) Class.forName(pluginClass).newInstance();
+            pluginClass =
+                    OAuth2Utils.getOAuth2ProviderSetting(OAuth2Constants.OAuth2ProviderService.SCOPE_PLUGIN_CLASS,
+                            String.class,
+                            getRequest());
+            if (pluginClass != null && !pluginClass.isEmpty()){
+                scopeClass = (Scope) Class.forName(pluginClass).newInstance();
+            }
         } catch (Exception e){
             OAuth2Utils.DEBUG.error("AbstractFlow::Exception during scope execution", e);
             jsonData = null;
@@ -699,6 +707,9 @@ public abstract class AbstractFlow extends ServerResource {
         // Validate the granted scope
         if (scopeClass != null && pluginClass != null){
             jsonData = scopeClass.extraDataToReturnForTokenEndpoint(data, token);
+        } else {
+            OAuth2Utils.DEBUG.error("AbstractFlow::No setting set for scope plugin class");
+            throw OAuthProblemException.OAuthError.SERVER_ERROR.handle(null, "No setting set for scope plugin class");
         }
 
         return jsonData;
@@ -709,8 +720,13 @@ public abstract class AbstractFlow extends ServerResource {
         String pluginClass = null;
         Scope scopeClass = null;
         try {
-            pluginClass = getScopePluginClass(OAuth2Utils.getRealm(getRequest()));
-            scopeClass = (Scope) Class.forName(pluginClass).newInstance();
+            pluginClass =
+                    OAuth2Utils.getOAuth2ProviderSetting(OAuth2Constants.OAuth2ProviderService.SCOPE_PLUGIN_CLASS,
+                            String.class,
+                            getRequest());
+            if (pluginClass != null && !pluginClass.isEmpty()){
+                scopeClass = (Scope) Class.forName(pluginClass).newInstance();
+            }
         } catch (Exception e){
             OAuth2Utils.DEBUG.error("AbstractFlow::Exception during scope execution", e);
             jsonData = null;
@@ -720,18 +736,19 @@ public abstract class AbstractFlow extends ServerResource {
         // Validate the granted scope
         if (scopeClass != null && pluginClass != null){
             jsonData = scopeClass.extraDataToReturnForAuthorizeEndpoint(data, token);
+        } else {
+            OAuth2Utils.DEBUG.error("AbstractFlow::No setting set for scope plugin class");
+            throw OAuthProblemException.OAuthError.SERVER_ERROR.handle(null, "No setting set for scope plugin class");
         }
 
         return jsonData;
     }
 
     protected Map<String,String> getResponseTypes(String realm){
-        try {
-            SSOToken token = (SSOToken) AccessController.doPrivileged(AdminTokenAction.getInstance());
-            ServiceConfigManager mgr = new ServiceConfigManager(token, OAuth2Constants.OAuth2ProviderService.NAME, OAuth2Constants.OAuth2ProviderService.VERSION);
-            ServiceConfig scm = mgr.getOrganizationConfig(realm, null);
-            Map<String, Set<String>> attrs = scm.getAttributes();
-            Set<String> responseTypeSet = attrs.get(OAuth2Constants.OAuth2ProviderService.RESPONSE_TYPE_LIST);
+            Set<String> responseTypeSet =
+                    OAuth2Utils.getOAuth2ProviderSetting(OAuth2Constants.OAuth2ProviderService.RESPONSE_TYPE_LIST,
+                            Set.class,
+                            getRequest());
             if (responseTypeSet == null || responseTypeSet.isEmpty()){
                 OAuth2Utils.DEBUG.error("AbstractFlow.getResponseType(): No response types for realm: " + realm);
                 throw OAuthProblemException.OAuthError.INVALID_REQUEST.handle(getRequest(), "Invlaid Response Type");
@@ -746,11 +763,6 @@ public abstract class AbstractFlow extends ServerResource {
                 responseTypes.put(parts[0], parts[1]);
             }
             return responseTypes;
-        } catch (Exception e) {
-            OAuth2Utils.DEBUG.error("AbstractFlow::Unable response types", e);
-            throw new OAuthProblemException(Status.SERVER_ERROR_SERVICE_UNAVAILABLE.getCode(),
-                    "Service unavailable", "Could not create underlying storage", null);
-        }
     }
 
 }

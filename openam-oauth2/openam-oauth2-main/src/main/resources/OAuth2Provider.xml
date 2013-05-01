@@ -107,6 +107,16 @@
                     </DefaultValues>
                 </AttributeSchema>
 
+                <AttributeSchema name="forgerock-oauth2-provider-saved-consent-attribute"
+                                 type="single"
+                                 syntax="string"
+                                 validator="RequiredValueValidator"
+                                 i18nKey="a107">
+                    <DefaultValues>
+                        <Value></Value>
+                    </DefaultValues>
+                </AttributeSchema>
+
                 <SubSchema name="serverconfig" inheritance="multiple">
 
                     <AttributeSchema name="forgerock-oauth2-provider-authorization-code-lifetime"
@@ -176,9 +186,19 @@
                             name="forgerock-oauth2-provider-authentication-attributes"
                             type="list"
                             syntax="string"
-                            i18nKey="a105">
+                            i18nKey="a106">
                         <DefaultValues>
                             <Value>uid</Value>
+                        </DefaultValues>
+                    </AttributeSchema>
+
+                    <AttributeSchema name="forgerock-oauth2-provider-saved-consent-attribute"
+                                     type="single"
+                                     syntax="string"
+                                     validator="RequiredValueValidator"
+                                     i18nKey="a107">
+                        <DefaultValues>
+                            <Value></Value>
                         </DefaultValues>
                     </AttributeSchema>
 
