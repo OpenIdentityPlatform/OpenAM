@@ -17,6 +17,7 @@
 package org.forgerock.openam.forgerockrest.authn;
 
 import com.sun.identity.authentication.client.AuthClientUtils;
+import org.forgerock.openam.guice.InjectorHolder;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;

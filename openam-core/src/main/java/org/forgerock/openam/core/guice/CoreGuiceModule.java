@@ -13,55 +13,39 @@
  *
  * Copyright 2013 ForgeRock Inc.
  */
-package org.forgerock.openam.entitlement.indextree;
+
+package org.forgerock.openam.core.guice;
 
 import com.google.inject.AbstractModule;
-import com.google.inject.Provider;
 import com.google.inject.TypeLiteral;
 import com.iplanet.sso.SSOToken;
 import com.sun.identity.security.AdminTokenAction;
 import com.sun.identity.sm.ServiceManagementDAO;
 import com.sun.identity.sm.ServiceManagementDAOWrapper;
-import org.forgerock.openam.entitlement.indextree.IndexTreeServiceImpl.DNWrapper;
+import org.forgerock.openam.entitlement.indextree.IndexTreeService;
+import org.forgerock.openam.entitlement.indextree.IndexTreeServiceImpl;
+import org.forgerock.openam.guice.AMGuiceModule;
 
 import javax.inject.Singleton;
 import java.security.PrivilegedAction;
 
 /**
- * Provides object wiring through the use of DI for entitlements.
+ * Guice Module for configuring bindings for the OpenAM Core classes.
  *
  * @author apforrest
  */
-public class EntitlementGuiceModule extends AbstractModule {
+@AMGuiceModule
+public class CoreGuiceModule extends AbstractModule {
 
-    private static final AdminTokenType ADMIN_TOKEN_TYPE;
-    private static final AdminTokenProvider ADMIN_TOKEN_PROVIDER;
-
-    static {
-        ADMIN_TOKEN_TYPE = new AdminTokenType();
-        ADMIN_TOKEN_PROVIDER = new AdminTokenProvider();
-    }
-
+    /**
+     * {@inheritDoc}
+     */
     @Override
     protected void configure() {
-        bind(ADMIN_TOKEN_TYPE).toProvider(ADMIN_TOKEN_PROVIDER).in(Singleton.class);
+        bind(new TypeLiteral<PrivilegedAction<SSOToken>>() {
+        }).toInstance(AdminTokenAction.getInstance());
         bind(ServiceManagementDAO.class).to(ServiceManagementDAOWrapper.class).in(Singleton.class);
-        bind(DNWrapper.class).in(Singleton.class);
+        bind(IndexTreeServiceImpl.DNWrapper.class).in(Singleton.class);
         bind(IndexTreeService.class).to(IndexTreeServiceImpl.class).in(Singleton.class);
     }
-
-    // Implementation exists to capture the generic type of the PrivilegedAction.
-    private static class AdminTokenType extends TypeLiteral<PrivilegedAction<SSOToken>> {
-    }
-
-    // Simple provide implementation to return the static instance of AdminTokenAction.
-    private static class AdminTokenProvider implements Provider<PrivilegedAction<SSOToken>> {
-
-        @Override
-        public PrivilegedAction<SSOToken> get() {
-            return AdminTokenAction.getInstance();
-        }
-
-    }
-
 }

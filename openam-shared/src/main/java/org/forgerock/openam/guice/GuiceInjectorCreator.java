@@ -14,30 +14,28 @@
  * Copyright 2013 ForgeRock Inc.
  */
 
-package org.forgerock.openam.forgerockrest.authn;
+package org.forgerock.openam.guice;
 
-import com.google.inject.AbstractModule;
-import com.google.inject.Provider;
-import org.forgerock.openam.utils.AMKeyProvider;
-import org.forgerock.openam.utils.SignatureUtil;
-
-import javax.inject.Singleton;
+import com.google.inject.Guice;
+import com.google.inject.Injector;
+import com.google.inject.Module;
 
 /**
- * Guice Module for configuring bindings for the IdentityRestService classes.
+ * Delegate for creating the Guice Injector, to allow for unit testing of the Guice initialisation code.
+ *
+ * @author Phill Cunnington
  */
-public class IdentityRestServiceGuiceModule extends AbstractModule {
+public class GuiceInjectorCreator {
 
     /**
-     * {@inheritDoc}
+     * Creates the Guice injector.
+     *
+     * @see Guice#createInjector(Iterable)
+     *
+     * @param modules {@inheritDoc}
+     * @return {@inheritDoc}
      */
-    @Override
-    protected void configure() {
-        bind(AMKeyProvider.class).in(Singleton.class);
-        bind(SignatureUtil.class).toProvider(new Provider<SignatureUtil>() {
-            public SignatureUtil get() {
-                return SignatureUtil.getInstance();
-            }
-        });
+    public Injector createInjector(Iterable<? extends Module> modules) {
+        return Guice.createInjector(modules);
     }
 }

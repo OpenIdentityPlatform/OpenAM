@@ -3,6 +3,11 @@
     <display-name>OpenAM Services</display-name>
     <distributable/>
 
+    <!-- Initialises the Guice Injector. -->
+    <listener>
+        <listener-class>org.forgerock.openam.guice.GuiceInitialisationFilter</listener-class>
+    </listener>
+
     <context-param>
         <param-name>jato:enforceStrictSessionTimeout</param-name>
         <param-value>true</param-value>

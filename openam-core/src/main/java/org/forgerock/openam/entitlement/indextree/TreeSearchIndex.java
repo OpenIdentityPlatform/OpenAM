@@ -20,6 +20,7 @@ import com.sun.identity.entitlement.ResourceSearchIndexes;
 import com.sun.identity.entitlement.interfaces.ISearchIndex;
 import com.sun.identity.entitlement.util.RelaxedURL;
 import com.sun.identity.shared.debug.Debug;
+import org.forgerock.openam.guice.InjectorHolder;
 
 import javax.inject.Inject;
 import java.net.MalformedURLException;
