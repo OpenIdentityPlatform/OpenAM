@@ -27,7 +27,8 @@ import javax.ws.rs.core.Response;
  */
 public class RestAuthException extends RuntimeException {
 
-    private final Response.Status responseStatus;
+    private Response.Status responseStatus;
+    private int statusCode;
 
     /**
      * Constructs a RestAuthException.
@@ -63,6 +64,17 @@ public class RestAuthException extends RuntimeException {
     }
 
     /**
+     * Constructs a RestAuthException.
+     *
+     * @param responseStatus The HTTP response to code to send back to the client.
+     * @param throwable The cause of the exception.
+     */
+    public RestAuthException(int responseStatus, Throwable throwable) {
+        super(throwable);
+        statusCode = responseStatus;
+    }
+
+    /**
      * Creates a JAX-RS Response object with the HTTP response code the exception was created with and the error
      * message as a JSON string in the body.
      *
@@ -70,7 +82,11 @@ public class RestAuthException extends RuntimeException {
      */
     public Response getResponse() {
 
-        Response.ResponseBuilder responseBuilder = Response.status(responseStatus);
+        if (responseStatus != null) {
+            statusCode = responseStatus.getStatusCode();
+        }
+
+        Response.ResponseBuilder responseBuilder = Response.status(statusCode);
 
         JsonValue jsonValue = JsonValueBuilder.jsonValue()
                 .put("errorMessage", getLocalizedMessage())

@@ -73,6 +73,7 @@ public class RestAuthenticationHandlerTest {
     private JwtBuilder jwtBuilder;
     private ServiceConfigManager serviceConfigManager;
     private SSOToken ssoToken;
+    private AMAuthErrorCodeResponseStatusMapping amAuthErrorCodeResponseStatusMapping;
 
     @BeforeMethod
     public void setUp() {
@@ -84,9 +85,11 @@ public class RestAuthenticationHandlerTest {
         jwtBuilder = mock(JwtBuilder.class);
         serviceConfigManager = mock(ServiceConfigManager.class);
         ssoToken = mock(SSOToken.class);
+        amAuthErrorCodeResponseStatusMapping = mock(AMAuthErrorCodeResponseStatusMapping.class);
+
 
         restAuthenticationHandler = new RestAuthenticationHandler(authContextStateMap, amKeyProvider,
-                restAuthCallbackHandlerManager, jwtBuilder) {
+                restAuthCallbackHandlerManager, jwtBuilder, amAuthErrorCodeResponseStatusMapping) {
             @Override
             protected AuthContext createAuthContext(String realm) throws AuthLoginException {
                 given(authContext.getOrganizationName()).willReturn(realm);

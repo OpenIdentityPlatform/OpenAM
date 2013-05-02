@@ -19,6 +19,7 @@ package org.forgerock.openam.forgerockrest.authn;
 import com.iplanet.sso.SSOException;
 import com.iplanet.sso.SSOToken;
 import com.sun.identity.authentication.AuthContext;
+import com.sun.identity.authentication.service.AMAuthErrorCode;
 import com.sun.identity.authentication.spi.AuthLoginException;
 import com.sun.identity.authentication.spi.PagePropertiesCallback;
 import com.sun.identity.security.AdminTokenAction;
@@ -70,6 +71,7 @@ public class RestAuthenticationHandler {
     private final AMKeyProvider amKeyProvider;
     private final RestAuthCallbackHandlerManager restAuthCallbackHandlerManager;
     private final JwtBuilder jwtBuilder;
+    private final AMAuthErrorCodeResponseStatusMapping amAuthErrorCodeResponseStatusMapping;
 
     /**
      * Constructs an instance of the RestAuthenticationHandler.
@@ -81,11 +83,13 @@ public class RestAuthenticationHandler {
      */
     @Inject
     public RestAuthenticationHandler(AuthContextStateMap authContextStateMap, AMKeyProvider amKeyProvider,
-            RestAuthCallbackHandlerManager restAuthCallbackHandlerManager, JwtBuilder jwtBuilder) {
+            RestAuthCallbackHandlerManager restAuthCallbackHandlerManager, JwtBuilder jwtBuilder,
+            AMAuthErrorCodeResponseStatusMapping amAuthErrorCodeResponseStatusMapping) {
         this.authContextStateMap = authContextStateMap;
         this.amKeyProvider = amKeyProvider;
         this.restAuthCallbackHandlerManager = restAuthCallbackHandlerManager;
         this.jwtBuilder = jwtBuilder;
+        this.amAuthErrorCodeResponseStatusMapping = amAuthErrorCodeResponseStatusMapping;
     }
 
     /**
@@ -138,7 +142,7 @@ public class RestAuthenticationHandler {
             return new RestAuthException(Response.Status.INTERNAL_SERVER_ERROR, e).getResponse();
         } catch (AuthLoginException e) {
             DEBUG.error(e.getMessage(), e);
-            return new RestAuthException(Response.Status.UNAUTHORIZED, e).getResponse();
+            return new RestAuthException(getAuthLoginExceptionResponseStatus(e), e).getResponse();
         } catch (RestAuthCallbackHandlerResponseException e) {
             // Construct a Response object from the exception.
             responseBuilder = Response.status(e.getResponseStatus());
@@ -150,6 +154,29 @@ public class RestAuthenticationHandler {
         }
 
         return responseBuilder.build();
+    }
+
+    /**
+     * Determines the HTTP Error code to return for the AMErrorCode for the AuthLoginException.
+     *
+     * @param e The AuthLoginException.
+     * @return The HTTP response code/
+     */
+    private int getAuthLoginExceptionResponseStatus(AuthLoginException e) {
+
+        int statusCode = Response.Status.UNAUTHORIZED.getStatusCode();
+
+        Map<String, Response.Status> authErrorCodeResponseStatuses =
+                amAuthErrorCodeResponseStatusMapping.getAMAuthErrorCodeResponseStatuses();
+
+        Response.Status responseStatus = authErrorCodeResponseStatuses.get(e.getErrorCode());
+        if (responseStatus == null && AMAuthErrorCode.AUTH_TIMEOUT.equals(e.getErrorCode())) {
+            statusCode = 408;
+        } else if (responseStatus != null) {
+            statusCode = responseStatus.getStatusCode();
+        }
+
+        return statusCode;
     }
 
     /**
@@ -575,6 +602,10 @@ public class RestAuthenticationHandler {
 
             String authId = jsonRequestObject.get("authId").asString();
 
+            if (authId == null) {
+                return new RestAuthException(Response.Status.BAD_REQUEST, "No AuthId").getResponse();
+            }
+
             AuthContext authContext = authContextStateMap.getAuthContext(authId);
 
             if (authContext == null) {
@@ -624,7 +655,7 @@ public class RestAuthenticationHandler {
             return new RestAuthException(Response.Status.INTERNAL_SERVER_ERROR, e).getResponse();
         } catch (AuthLoginException e) {
             DEBUG.error(e.getMessage(), e);
-            return new RestAuthException(Response.Status.UNAUTHORIZED, e).getResponse();
+            return new RestAuthException(getAuthLoginExceptionResponseStatus(e), e).getResponse();
         } catch (RestAuthCallbackHandlerResponseException e) {
             // Construct a Response object from the exception.
             responseBuilder = Response.status(e.getResponseStatus());
