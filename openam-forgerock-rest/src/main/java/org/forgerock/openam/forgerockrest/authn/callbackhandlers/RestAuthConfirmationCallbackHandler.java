@@ -112,8 +112,13 @@ public class RestAuthConfirmationCallbackHandler extends AbstractRestAuthCallbac
             throw new JsonException("JSON Callback does not include a input field");
         }
 
-        JsonValue inputField = input.get(0);
-        int value = inputField.get("value").asInteger();
+        JsonValue inputFieldValue = input.get(0).get("value").required();
+        int value;
+        if (inputFieldValue.isString()) {
+            value = Integer.parseInt(inputFieldValue.asString());
+        } else {
+            value = inputFieldValue.asInteger();
+        }
         callback.setSelectedIndex(value);
 
         return callback;

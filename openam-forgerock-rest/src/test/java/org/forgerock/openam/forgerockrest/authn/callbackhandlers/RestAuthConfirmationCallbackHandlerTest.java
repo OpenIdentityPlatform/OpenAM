@@ -177,13 +177,47 @@ public class RestAuthConfirmationCallbackHandlerTest {
                 ConfirmationCallback.INFORMATION, new String[]{"OK", "NO", "CANCEL"}, 0);
         JsonValue jsonConfirmationCallback = JsonValueBuilder.jsonValue()
                 .array("input")
-                    .addLast(JsonValueBuilder.jsonValue().put("value", 2).build())
+                .addLast(JsonValueBuilder.jsonValue().put("value", 2).build())
                 .array("output")
-                    .add(JsonValueBuilder.jsonValue().put("value", "Select confirmation:").build())
-                    .add(JsonValueBuilder.jsonValue().put("value", 0).build())
-                    .add(JsonValueBuilder.jsonValue().put("value", new String[]{"OK", "NO", "CANCEL"}).build())
-                    .add(JsonValueBuilder.jsonValue().put("value", -1).build())
-                    .addLast(JsonValueBuilder.jsonValue().put("value", 0).build())
+                .add(JsonValueBuilder.jsonValue().put("value", "Select confirmation:").build())
+                .add(JsonValueBuilder.jsonValue().put("value", 0).build())
+                .add(JsonValueBuilder.jsonValue().put("value", new String[]{"OK", "NO", "CANCEL"}).build())
+                .add(JsonValueBuilder.jsonValue().put("value", -1).build())
+                .addLast(JsonValueBuilder.jsonValue().put("value", 0).build())
+                .put("type", "ConfirmationCallback")
+                .build();
+
+        //When
+        ConfirmationCallback convertedConfirmationCallback = restAuthConfirmationCallbackHandler.convertFromJson(
+                confirmationCallback, jsonConfirmationCallback);
+
+        //Then
+        assertEquals(confirmationCallback, convertedConfirmationCallback);
+        assertEquals("Select confirmation:", convertedConfirmationCallback.getPrompt());
+        assertEquals(ConfirmationCallback.INFORMATION, convertedConfirmationCallback.getMessageType());
+        assertEquals("OK", convertedConfirmationCallback.getOptions()[0]);
+        assertEquals("NO", convertedConfirmationCallback.getOptions()[1]);
+        assertEquals("CANCEL", convertedConfirmationCallback.getOptions()[2]);
+        assertEquals(-1, convertedConfirmationCallback.getOptionType());
+        assertEquals(0, convertedConfirmationCallback.getDefaultOption());
+        assertEquals(2, convertedConfirmationCallback.getSelectedIndex());
+    }
+
+    @Test
+    public void shouldConvertFromJsonWithStringChoice() {
+
+        //Given
+        ConfirmationCallback confirmationCallback = new ConfirmationCallback("Select confirmation:",
+                ConfirmationCallback.INFORMATION, new String[]{"OK", "NO", "CANCEL"}, 0);
+        JsonValue jsonConfirmationCallback = JsonValueBuilder.jsonValue()
+                .array("input")
+                .addLast(JsonValueBuilder.jsonValue().put("value", 2).build())
+                .array("output")
+                .add(JsonValueBuilder.jsonValue().put("value", "Select confirmation:").build())
+                .add(JsonValueBuilder.jsonValue().put("value", 0).build())
+                .add(JsonValueBuilder.jsonValue().put("value", new String[]{"OK", "NO", "CANCEL"}).build())
+                .add(JsonValueBuilder.jsonValue().put("value", -1).build())
+                .addLast(JsonValueBuilder.jsonValue().put("value", "0").build())
                 .put("type", "ConfirmationCallback")
                 .build();
 
