@@ -161,7 +161,7 @@ public class PrivilegeResource extends ResourceBase {
             PrivilegeManager pm = PrivilegeManager.getInstance(realm, caller);
             Privilege privilege = pm.getPrivilege(name);
             JSONObject jo = new JSONObject();
-            jo.put(RESULT, privilege.toMinimalJSONObject().toString());
+            jo.put(RESULT, privilege.toMinimalJSONObject());
             return createResponseJSONString(200, headers, jo);
         } catch (JSONException e) {
             PrivilegeManager.debug.error("PrivilegeResource.privilege", e);
