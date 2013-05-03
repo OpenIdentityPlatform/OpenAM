@@ -96,7 +96,7 @@ public class OAuthProblemException extends ResourceException {
         INVALID_CODE(OAuth2Constants.Error.INVALID_CODE, "The code provided is invalid.",
                 ""),
         REDIRECT_URI_MISMATCH(OAuth2Constants.Error.REDIRECT_URI_MISMATCH,
-                "The redirection URI provided does not match a pre-registered value.", ""),
+                "The redirection URI provided does not match a pre-registered value.", "", 400),
         UNSUPPORTED_AUTH_TYPE(OAuth2Constants.Error.UNSUPPORTED_AUTH_TYPE,
                 "The requested authentication type is not supported by the authorization server.",
                 ""),
@@ -107,7 +107,7 @@ public class OAuthProblemException extends ResourceException {
         Status status;
 
         private OAuthError(String reasonPhrase, String description, String uri) {
-            this.status = new Status(401, reasonPhrase, description, uri);
+            this.status = new Status(400, reasonPhrase, description, uri);
         }
 
         private OAuthError(String reasonPhrase, String description, String uri, int code) {
