@@ -50,7 +50,6 @@ import javax.security.auth.callback.Callback;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpSession;
 import javax.servlet.http.Cookie;
 
 import com.iplanet.sso.SSOException;
@@ -2116,7 +2115,7 @@ public class AuthUtils extends AuthClientUtils {
                                  HttpServletResponse response) 
     throws SSOException {
         if (token == null) {
-            throw new SSOException("token cannot be null");
+            return false;
         }
         Object loginContext = null;
         
