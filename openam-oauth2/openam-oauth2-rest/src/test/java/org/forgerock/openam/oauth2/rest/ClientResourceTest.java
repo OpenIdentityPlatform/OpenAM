@@ -25,7 +25,9 @@
 package org.forgerock.openam.oauth2.rest;
 
 import com.iplanet.sso.SSOException;
+import com.sun.identity.coretoken.interfaces.OAuth2TokenRepository;
 import com.sun.identity.idm.IdRepoException;
+import com.sun.identity.sm.ldap.CTSPersistentStore;
 import org.forgerock.json.fluent.JsonValue;
 import org.forgerock.json.resource.*;
 import org.testng.annotations.Test;
@@ -71,7 +73,7 @@ public class ClientResourceTest {
         when(val.getObject()).thenReturn(client);
 
 
-        ClientResource resource = spy(new ClientResource(mockManager));
+        ClientResource resource = spy(new ClientResource(mockManager, new mockOAuth2TokenRepository()));
 
         // When
         resource.createInstance(null, request, mockHandler);
@@ -95,7 +97,7 @@ public class ClientResourceTest {
         DeleteRequest request = mock(DeleteRequest.class);
 
 
-        ClientResource resource = spy(new ClientResource(mockManager));
+        ClientResource resource = spy(new ClientResource(mockManager, new mockOAuth2TokenRepository()));
 
         // When
         resource.deleteInstance(null, "client", request, mockHandler);
@@ -103,5 +105,38 @@ public class ClientResourceTest {
         // Then
         verify(mockHandler, times(1)).handleResult(any(Object.class));
         verify(mockHandler, times(0)).handleError(any(ResourceException.class));
+    }
+}
+
+/**
+ * Mock OAuth2TokenRepository
+ */
+class mockOAuth2TokenRepository implements OAuth2TokenRepository {
+    public JsonValue oauth2Create(JsonValue request) throws JsonResourceException{
+        return null;
+    }
+
+    public JsonValue oauth2Read(JsonValue request) throws JsonResourceException{
+        return null;
+    }
+
+    public JsonValue oauth2Update(JsonValue request) throws JsonResourceException{
+        return null;
+    }
+
+    public JsonValue oauth2Delete(JsonValue request) throws JsonResourceException{
+        return null;
+    }
+
+    public JsonValue oauth2Query(JsonValue request) throws JsonResourceException{
+        return null;
+    }
+
+    public void oauth2DeleteWithFilter(String filter) throws JsonResourceException{
+        return;
+    }
+
+    public void oauth2Delete(String id) throws JsonResourceException{
+        return;
     }
 }

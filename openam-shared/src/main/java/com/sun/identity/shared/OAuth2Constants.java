@@ -746,7 +746,7 @@ public class OAuth2Constants {
         public static final String ACTIVE = "sunIdentityServerDeviceStatus";
         public static final String CLIENT_TYPE = "com.forgerock.openam.oauth2provider.clientType";
         public static final String USERPASSWORD = "userpassword";
-        public static final String REALM = "REALM";
+        public static final String REALM = "realm";
         public static final String CLIENT_ID = "client_id";
         public static final String CLIENT_SECRET = "client_secret";
         public static final String ACCESS_TOKEN = "com.forgerock.openam.oauth2provider.accessToken";

@@ -36,29 +36,31 @@ import org.forgerock.json.resource.*;
 import org.forgerock.json.resource.NotSupportedException;
 import org.forgerock.json.resource.ResourceException;
 import org.forgerock.json.resource.CollectionResourceProvider;
+import org.forgerock.openam.ext.cts.repo.DefaultOAuthTokenStoreImpl;
 import org.forgerock.openam.oauth2.utils.OAuth2Utils;
 import java.util.*;
 
 public class ClientResource  implements CollectionResourceProvider {
 
     private ClientResourceManager manager;
+    private OAuth2TokenRepository store;
 
     public ClientResource() {
+        this.store = CTSPersistentStore.getInstance();
         this.manager = new ClientResourceManager();
     }
 
-    public ClientResource(ClientResourceManager manager) {
+    public ClientResource(ClientResourceManager manager, OAuth2TokenRepository store) {
+        this.store = store;
         this.manager = manager;
     }
 
-    @Override
     public void actionCollection(ServerContext context, ActionRequest actionRequest, ResultHandler<JsonValue> handler){
         final ResourceException e =
                 new NotSupportedException("Actions are not supported for resource instances");
         handler.handleError(e);
     }
 
-    @Override
     public void actionInstance(ServerContext context, String resourceId, ActionRequest request,
                                ResultHandler<JsonValue> handler){
         final ResourceException e =
@@ -66,7 +68,6 @@ public class ClientResource  implements CollectionResourceProvider {
         handler.handleError(e);
     }
 
-    @Override
     public void createInstance(ServerContext context, CreateRequest createRequest, ResultHandler<Resource> handler){
 
         Map<String, ArrayList<String>> client = (Map<String, ArrayList<String>>) createRequest.getContent().getObject();
@@ -180,7 +181,6 @@ public class ClientResource  implements CollectionResourceProvider {
         }
     }
 
-    @Override
     public void deleteInstance(ServerContext context, String resourceId, DeleteRequest request,
                                ResultHandler<Resource> handler){
         Map<String, String> responseVal = new HashMap<String, String>();
@@ -193,11 +193,10 @@ public class ClientResource  implements CollectionResourceProvider {
             manager.deleteIdentity(resourceId);
 
             //delete the tokens associated with that client_id
-            OAuth2TokenRepository tokens = CTSPersistentStore.getInstance();
             StringBuilder sb = new StringBuilder();
             sb.append("(").append(OAuth2Constants.CoreTokenParams.CLIENT_ID).append("=").append(resourceId).append(")");
             try {
-                tokens.oauth2DeleteWithFilter(sb.toString());
+                store.oauth2DeleteWithFilter(sb.toString());
             } catch (Exception e){
                 if (OAuth2Utils.logStatus) {
                     String[] obs = {"FAILED_DELETE_CLIENT", responseVal.toString()};
@@ -245,7 +244,6 @@ public class ClientResource  implements CollectionResourceProvider {
         }
     }
 
-    @Override
     public void patchInstance(ServerContext context, String resourceId, PatchRequest request,
                               ResultHandler<Resource> handler){
         final ResourceException e =
@@ -253,14 +251,12 @@ public class ClientResource  implements CollectionResourceProvider {
         handler.handleError(e);
     }
 
-    @Override
     public void queryCollection(ServerContext context, QueryRequest queryRequest, QueryResultHandler handler){
         final ResourceException e =
                 new NotSupportedException("Query is not supported for resource instances");
         handler.handleError(e);
     }
 
-    @Override
     public void readInstance(ServerContext context, String resourceId, ReadRequest request,
                              ResultHandler<Resource> handler){
         final ResourceException e =
@@ -268,7 +264,6 @@ public class ClientResource  implements CollectionResourceProvider {
         handler.handleError(e);
     }
 
-    @Override
     public void updateInstance(ServerContext context, String resourceId, UpdateRequest request,
                                ResultHandler<Resource> handler){
         final ResourceException e =
