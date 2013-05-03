@@ -578,6 +578,13 @@
                 <artifactId>openam-auth-datastore</artifactId>
                 <version>${project.version}</version>
             </dependency>
+
+            <dependency>
+                <groupId>org.forgerock.openam</groupId>
+                <artifactId>openam-auth-deviceprint-module</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+
             <dependency>
                 <groupId>org.forgerock.openam</groupId>
                 <artifactId>openam-auth-hotp</artifactId>

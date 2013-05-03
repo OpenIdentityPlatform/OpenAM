@@ -329,6 +329,38 @@
                 </configuration>
             </plugin>
 
+            <plugin>
+                <groupId>org.apache.portals.jetspeed-2</groupId>
+                <artifactId>jetspeed-unpack-maven-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <phase>generate-resources</phase>
+                        <goals>
+                            <goal>unpack</goal>
+                        </goals>
+                    </execution>
+                </executions>
+                <dependencies>
+                    <dependency>
+                        <groupId>org.forgerock.openam</groupId>
+                        <artifactId>openam-auth-deviceprint-scripts</artifactId>
+                        <version>${project.version}</version>
+                        <type>zip</type>
+                    </dependency>
+                </dependencies>
+                <configuration>
+                    <unpack>
+                        <artifact>org.forgerock.openam:openam-auth-deviceprint-scripts:zip</artifact>
+                        <resources>
+                            <resource>
+                                <path>/**</path>
+                                <include>*.js</include>
+                                <destination>openam_TEMP/js</destination>
+                            </resource>
+                        </resources>
+                    </unpack>
+                </configuration>
+            </plugin>
         </plugins>
 
         <resources>
@@ -483,6 +515,11 @@
         <dependency>
             <groupId>org.forgerock.openam</groupId>
             <artifactId>openam-auth-datastore</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>org.forgerock.openam</groupId>
+            <artifactId>openam-auth-deviceprint-module</artifactId>
         </dependency>
 
         <dependency>

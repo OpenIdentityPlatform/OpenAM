@@ -967,6 +967,7 @@
                             <Value>sunIdentityServerLibertyPPService</Value>
                             <Value>sunFMSAML2NameIdentifier</Value>
                             <Value>forgerock-am-dashboard-service</Value>
+                            <Value>devicePrintProfilesContainer</Value>
                         </DefaultValues>
                     </AttributeSchema>
 
@@ -1060,6 +1061,7 @@
                             <Value>sun-fm-saml2-nameid-infokey</Value>
                             <Value>sun-fm-saml2-nameid-info</Value>
                             <Value>assignedDashboard</Value>
+                            <Value>devicePrintProfiles</Value>
                         </DefaultValues>
                     </AttributeSchema>
 
@@ -1657,6 +1659,7 @@
                             <Value>sunIdentityServerLibertyPPService</Value>
                             <Value>sunFMSAML2NameIdentifier</Value>
                             <Value>forgerock-am-dashboard-service</Value>
+                            <Value>devicePrintProfilesContainer</Value>
                         </DefaultValues>
                     </AttributeSchema>
 
@@ -1749,6 +1752,7 @@
                             <Value>sun-fm-saml2-nameid-infokey</Value>
                             <Value>sun-fm-saml2-nameid-info</Value>
                             <Value>assignedDashboard</Value>
+                            <Value>devicePrintProfiles</Value>
                         </DefaultValues>
                     </AttributeSchema>
 
@@ -2210,6 +2214,7 @@
                             <Value>sunIdentityServerLibertyPPService</Value>
                             <Value>sunFMSAML2NameIdentifier</Value>
                             <Value>forgerock-am-dashboard-service</Value>
+                            <Value>devicePrintProfilesContainer</Value>
                         </DefaultValues>
                     </AttributeSchema>
 
@@ -2302,6 +2307,7 @@
                             <Value>sun-fm-saml2-nameid-infokey</Value>
                             <Value>sun-fm-saml2-nameid-info</Value>
                             <Value>assignedDashboard</Value>
+                            <Value>devicePrintProfiles</Value>
                         </DefaultValues>
                     </AttributeSchema>
 
@@ -2851,6 +2857,7 @@
                             <Value>sun-fm-saml2-nameid-infokey</Value>
                             <Value>sun-fm-saml2-nameid-info</Value>
                             <Value>assignedDashboard</Value>
+                            <Value>devicePrintProfiles</Value>
                         </DefaultValues>
                     </AttributeSchema>
 
@@ -3321,6 +3328,7 @@
                             <Value>top</Value>
                             <Value>user</Value>
                             <Value>forgerock-am-dashboard-service</Value>
+                            <Value>devicePrintProfilesContainer</Value>
                         </DefaultValues>
                     </AttributeSchema>
 
@@ -3410,6 +3418,7 @@
                             <Value>sun-fm-saml2-nameid-infokey</Value>
                             <Value>sun-fm-saml2-nameid-info</Value>
                             <Value>assignedDashboard</Value>
+                            <Value>devicePrintProfiles</Value>
                         </DefaultValues>
                     </AttributeSchema>
 

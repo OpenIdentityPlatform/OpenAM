@@ -145,42 +145,42 @@
                         <Value>SMS and E-mail</Value>
                     </DefaultValues>
                 </AttributeSchema>
-		<AttributeSchema
-		   name="sunAMAuthHOTPAutoClicking"
-		   cosQualifier="default" type="single"
-		   syntax="boolean" i18nKey="a520">
-		  <BooleanValues>
-		    <BooleanTrueValue i18nKey="i18nTrue">true</BooleanTrueValue>
-		    <BooleanFalseValue i18nKey="i18nFalse">false</BooleanFalseValue>
-		  </BooleanValues>
-		  <DefaultValues>
-		    <Value>false</Value>
-		  </DefaultValues>
-		</AttributeSchema>
-		<AttributeSchema name="openamTelephoneAttribute"
-				 type="single"
-				 syntax="string"
-				 i18nKey="a510">
-		  <DefaultValues>
-		    <Value>telephoneNumber</Value>
-		  </DefaultValues>
-		</AttributeSchema>
-		<AttributeSchema name="openamSMSCarrierAttribute"
-				 type="single"
-				 syntax="string"
-				 i18nKey="a511">
-		  <DefaultValues>
-		    <Value></Value>
-		  </DefaultValues>
-		</AttributeSchema>
-		<AttributeSchema name="openamEmailAttribute"
-				 type="single"
-				 syntax="string"
-				 i18nKey="a512">
-		  <DefaultValues>
-		    <Value>mail</Value>
-		  </DefaultValues>
-		</AttributeSchema>
+                <AttributeSchema
+                   name="sunAMAuthHOTPAutoClicking"
+                   cosQualifier="default" type="single"
+                   syntax="boolean" i18nKey="a520">
+                  <BooleanValues>
+                    <BooleanTrueValue i18nKey="i18nTrue">true</BooleanTrueValue>
+                    <BooleanFalseValue i18nKey="i18nFalse">false</BooleanFalseValue>
+                  </BooleanValues>
+                  <DefaultValues>
+                    <Value>false</Value>
+                  </DefaultValues>
+                </AttributeSchema>
+                <AttributeSchema name="openamTelephoneAttribute"
+                         type="single"
+                         syntax="string"
+                         i18nKey="a510">
+                  <DefaultValues>
+                    <Value>telephoneNumber</Value>
+                  </DefaultValues>
+                </AttributeSchema>
+                <AttributeSchema name="openamSMSCarrierAttribute"
+                         type="single"
+                         syntax="string"
+                         i18nKey="a511">
+                  <DefaultValues>
+                    <Value></Value>
+                  </DefaultValues>
+                </AttributeSchema>
+                <AttributeSchema name="openamEmailAttribute"
+                         type="single"
+                         syntax="string"
+                         i18nKey="a512">
+                  <DefaultValues>
+                    <Value>mail</Value>
+                  </DefaultValues>
+                </AttributeSchema>
                 <SubSchema name="serverconfig" inheritance="multiple">
                     <AttributeSchema name="sunAMAuthHOTPAuthLevel"
                         type="single"
@@ -283,41 +283,41 @@
                             <Value>SMS and E-mail</Value>
                         </DefaultValues>
                     </AttributeSchema>
-		    <AttributeSchema
+		            <AttributeSchema
                       name="sunAMAuthHOTPAutoClicking"
                       cosQualifier="default" type="single"
                       syntax="boolean" i18nKey="a520">
                       <BooleanValues>
-			<BooleanTrueValue i18nKey="i18nTrue">true</BooleanTrueValue>
-			<BooleanFalseValue i18nKey="i18nFalse">false</BooleanFalseValue>
-		      </BooleanValues>
+                        <BooleanTrueValue i18nKey="i18nTrue">true</BooleanTrueValue>
+                        <BooleanFalseValue i18nKey="i18nFalse">false</BooleanFalseValue>
+		              </BooleanValues>
                       <DefaultValues>
-			<Value>false</Value>
+			            <Value>false</Value>
                       </DefaultValues>
-		    </AttributeSchema>
-                    <AttributeSchema name="openamTelephoneAttribute"
-                                     type="single"
-                                     syntax="string"
-                                     i18nKey="a510">
-                      <DefaultValues>
-			<Value>telephoneNumber</Value>
-                      </DefaultValues>
-		    </AttributeSchema>
-		    <AttributeSchema name="openamSMSCarrierAttribute"
-                                     type="single"
-                                     syntax="string"
-                                     i18nKey="a511">
-                      <DefaultValues>
-			<Value></Value>
-		      </DefaultValues>
-                    </AttributeSchema>
-                    <AttributeSchema name="openamEmailAttribute"
-                                     type="single"
-                                     syntax="string"
-                                     i18nKey="a512">
-                      <DefaultValues>
-			<Value>mail</Value>
-                      </DefaultValues>
+                        </AttributeSchema>
+                                <AttributeSchema name="openamTelephoneAttribute"
+                                                 type="single"
+                                                 syntax="string"
+                                                 i18nKey="a510">
+                                  <DefaultValues>
+                        <Value>telephoneNumber</Value>
+                                  </DefaultValues>
+                        </AttributeSchema>
+                        <AttributeSchema name="openamSMSCarrierAttribute"
+                                                 type="single"
+                                                 syntax="string"
+                                                 i18nKey="a511">
+                                  <DefaultValues>
+                        <Value></Value>
+                          </DefaultValues>
+                                </AttributeSchema>
+                                <AttributeSchema name="openamEmailAttribute"
+                                                 type="single"
+                                                 syntax="string"
+                                                 i18nKey="a512">
+                                  <DefaultValues>
+                        <Value>mail</Value>
+                                  </DefaultValues>
                     </AttributeSchema>
                 </SubSchema>
             </Organization>

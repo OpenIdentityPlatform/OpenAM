@@ -62,7 +62,7 @@
         <module>openam-auth-safeword</module>
         <module>openam-auth-securid</module>
         <module>openam-auth-windowsdesktopsso</module>
-
+        <module>deviceprint</module>
     </modules>
 
     <dependencies>

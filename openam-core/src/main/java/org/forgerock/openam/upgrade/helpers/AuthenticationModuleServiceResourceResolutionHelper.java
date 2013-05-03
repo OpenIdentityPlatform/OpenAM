@@ -75,6 +75,9 @@ public class AuthenticationModuleServiceResourceResolutionHelper {
         /** amAuthDataStore.xml **/
         resourceNeighborClassNames.put("amAuthDataStore.xml","com.sun.identity.authentication.modules.datastore.DataStore");
 
+        /** amAuthDevicePrint.xml **/
+        resourceNeighborClassNames.put("amAuthDevicePrintModule.xml","org.forgerock.openam.authentication.modules.deviceprint.DevicePrintModule");
+
         /** amAuthHOTP.xml **/
         resourceNeighborClassNames.put("amAuthHOTP.xml","com.sun.identity.authentication.modules.hotp.HOTP");
 
