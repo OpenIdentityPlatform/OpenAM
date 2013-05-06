@@ -240,18 +240,18 @@ http://stackoverflow.com/questions/794243/internet-explorer-ignores-cookies-on-s
         <title>Configure SSO on One Domain</title>
 
         <step>
-            <para>Install OpenAM as described in the <link xlink:href="install-guide"
-            xlink:role="http://docbook.org/xlink/role/olink"><citetitle>OpenAM Installation 
-            Guide</citetitle></link>. This procedure uses a Server URL of 
+            <para>Install OpenAM as described in the <link xlink:href="install-guide#install-guide"
+            xlink:role="http://docbook.org/xlink/role/olink"><citetitle>OpenAM Policy
+            <?eval ${agentsDocTargetVersion}?> Installation Guide</citetitle></link>. This procedure uses a Server URL of 
             <literal>http://openam.example.net:8080/openam</literal>.</para>
         </step>
 
         <step>
-            <para>Install the appropriate policy agent, as described in the <link xlink:href="agent-install-guide"
-            xlink:role="http://docbook.org/xlink/role/olink"><citetitle>OpenAM Policy Agent 
-            Installation Guide</citetitle></link>. This procedure uses an agent URL of 
-            <literal>http://app.example.net:80</literal>, and an agent name of 
-            <literal>webagent1</literal>.</para>
+            <para>Install the appropriate policy agent, as described in the <link xlink:href="agent-install-guide#agent-install-guide"
+            xlink:role="http://docbook.org/xlink/role/olink"><citetitle>OpenAM Policy
+            Agent <?eval ${agentsDocTargetVersion}?> Installation Guide</citetitle></link>. 
+            This procedure uses an agent URL of <literal>http://app.example.net:80</literal>, 
+            and an agent name of <literal>webagent1</literal>.</para>
         </step>
 
         <step>
@@ -263,9 +263,9 @@ http://stackoverflow.com/questions/794243/internet-explorer-ignores-cookies-on-s
         <step>
             <para>Return to the OpenAM server on <literal>http://openam.example.net:8080/openam</literal>. Log in as
                 the administrative user, normally <literal>amadmin</literal>. To activate and configure the agent,
-                follow the procedure described in the
-                <link xlink:href="agent-install-guide" xlink:role="http://docbook.org/xlink/role/olink">
-                <citetitle>OpenAM Policy Agent Installation Guide</citetitle></link>.</para>
+                follow the procedure described in the <link xlink:href="agent-install-guide#agent-install-guide"
+                xlink:role="http://docbook.org/xlink/role/olink"><citetitle>OpenAM Policy
+                Agent <?eval ${agentsDocTargetVersion}?> Installation Guide</citetitle></link>.</para>
         </step>
 
         <step>
