@@ -325,7 +325,7 @@ Install log file location:
       <screen>$ vi /path/to/startWebLogic.sh
  # Any changes to this script may be lost when adding extensions to this configuration.
  DOMAIN_HOME="/opt/Oracle/Middleware/user_projects/domains/base_domain"
-  . ./path/to/setAgentEnv_AdminServer.sh
+  ./path/to/setAgentEnv_AdminServer.sh
  ${DOMAIN_HOME}/bin/startWebLogic.sh $*</screen>
      </step>
     </stepalternatives>
@@ -341,7 +341,7 @@ Install log file location:
      </note>    
    </step>
    <step>
-    <para>Restart the WebLogic server.</para>
+    <para>Start the WebLogic server.</para>
    </step>
    <!-- Fix for OpenAM-945: Document WebLogic install process change -->
    <step>
