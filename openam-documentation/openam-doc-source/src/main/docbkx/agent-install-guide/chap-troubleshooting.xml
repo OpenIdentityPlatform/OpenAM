@@ -67,9 +67,11 @@
      </listitem>
 
      <listitem>
-      <para>Microsoft IIS 7.5 Manager also lets you set custom <link
-      xlink:href="http://www.orcsweb.com/blog/jamie-furr/how-to-create-custom-error-pages-in-iis-7-5-with-asp-net/"
-      xlink:show="new">.NET Error Pages</link>.</para>
+      <para>Microsoft IIS 7 also lets you create <link
+      xlink:href="http://technet.microsoft.com/en-us/library/cc753103(v=ws.10).aspx"
+      xlink:show="new">custom HTTP error responses</link>, and generally <link
+      xlink:href="http://technet.microsoft.com/en-us/library/cc731570(v=ws.10).aspx"
+      xlink:show="new">configure HTTP error responses</link>.</para>
      </listitem>
     </itemizedlist>
 
