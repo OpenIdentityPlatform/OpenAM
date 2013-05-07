@@ -205,7 +205,8 @@ public class ClientResource  implements CollectionResourceProvider {
                 handler.handleError(new InternalServerErrorException("Unable to delete client"));
             }
 
-	    response = new JsonValue(responseVal);
+            responseVal.put("success", "true");
+	        response = new JsonValue(responseVal);
 
             Resource resource = new Resource("results", "1", response);
             if (OAuth2Utils.logStatus) {

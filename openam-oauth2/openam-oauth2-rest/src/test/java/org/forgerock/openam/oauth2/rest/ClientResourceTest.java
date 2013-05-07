@@ -31,6 +31,7 @@ import com.sun.identity.sm.ldap.CTSPersistentStore;
 import org.forgerock.json.fluent.JsonValue;
 import org.forgerock.json.resource.*;
 import org.testng.annotations.Test;
+import org.forgerock.openam.oauth2.rest.mocks.mockOAuth2TokenRepository;
 
 import java.util.*;
 
@@ -72,6 +73,12 @@ public class ClientResourceTest {
         when(request.getContent()).thenReturn(val);
         when(val.getObject()).thenReturn(client);
 
+        Map<String, String> responseVal = new HashMap<String, String>();
+        JsonValue response = null;
+        responseVal.put("success", "true");
+        response = new JsonValue(responseVal);
+
+        Resource expectedResource = new Resource("results", "1", response);
 
         ClientResource resource = spy(new ClientResource(mockManager, new mockOAuth2TokenRepository()));
 
@@ -79,7 +86,7 @@ public class ClientResourceTest {
         resource.createInstance(null, request, mockHandler);
 
         // Then
-        verify(mockHandler, times(1)).handleResult(any(Object.class));
+        verify(mockHandler, times(1)).handleResult(expectedResource);
         verify(mockHandler, times(0)).handleError(any(ResourceException.class));
     }
 
@@ -97,46 +104,20 @@ public class ClientResourceTest {
         DeleteRequest request = mock(DeleteRequest.class);
 
 
+        Map<String, String> responseVal = new HashMap<String, String>();
+        JsonValue response = null;
+        responseVal.put("success", "true");
+        response = new JsonValue(responseVal);
+
+        Resource expectedResource = new Resource("results", "1", response);
+
         ClientResource resource = spy(new ClientResource(mockManager, new mockOAuth2TokenRepository()));
 
         // When
         resource.deleteInstance(null, "client", request, mockHandler);
 
         // Then
-        verify(mockHandler, times(1)).handleResult(any(Object.class));
+        verify(mockHandler, times(1)).handleResult(expectedResource);
         verify(mockHandler, times(0)).handleError(any(ResourceException.class));
-    }
-}
-
-/**
- * Mock OAuth2TokenRepository
- */
-class mockOAuth2TokenRepository implements OAuth2TokenRepository {
-    public JsonValue oauth2Create(JsonValue request) throws JsonResourceException{
-        return null;
-    }
-
-    public JsonValue oauth2Read(JsonValue request) throws JsonResourceException{
-        return null;
-    }
-
-    public JsonValue oauth2Update(JsonValue request) throws JsonResourceException{
-        return null;
-    }
-
-    public JsonValue oauth2Delete(JsonValue request) throws JsonResourceException{
-        return null;
-    }
-
-    public JsonValue oauth2Query(JsonValue request) throws JsonResourceException{
-        return null;
-    }
-
-    public void oauth2DeleteWithFilter(String filter) throws JsonResourceException{
-        return;
-    }
-
-    public void oauth2Delete(String id) throws JsonResourceException{
-        return;
     }
 }
