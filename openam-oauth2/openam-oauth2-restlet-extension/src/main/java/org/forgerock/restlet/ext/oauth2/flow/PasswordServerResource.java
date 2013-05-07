@@ -58,12 +58,6 @@ public class PasswordServerResource extends AbstractFlow {
         String password =
                 OAuth2Utils.getRequestParameter(getRequest(), OAuth2Constants.Params.PASSWORD, String.class);
 
-        if(username == null || username.isEmpty() || password == null || password.isEmpty()){
-            OAuth2Utils.DEBUG.error("Username or password is missing or empty: password:"+ password+" username:" + username);
-
-            throw OAuthProblemException.OAuthError.INVALID_REQUEST.handle(getRequest());
-        }
-
         // Authenticate ResourceOwner
         if (getContext().getDefaultVerifier() instanceof SecretVerifier) {
             if (Verifier.RESULT_VALID == ((SecretVerifier) getContext().getDefaultVerifier())

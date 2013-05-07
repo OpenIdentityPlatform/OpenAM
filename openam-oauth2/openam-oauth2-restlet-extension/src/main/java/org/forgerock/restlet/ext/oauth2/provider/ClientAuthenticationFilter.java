@@ -113,7 +113,6 @@ public class ClientAuthenticationFilter extends Authenticator {
                 if (null != client_id) {
                     Collection<ChallengeScheme> scheme =
                             getVerifier().getRequiredAuthenticationScheme(client_id);
-                    // Todo Rechellenge the client
                 }
                 response.setEntity(new JacksonRepresentation<Map>(e.getErrorMessage()));
                 throw e;

@@ -536,7 +536,8 @@ public abstract class AbstractFlow extends ServerResource {
         if (required != null && required.length > 0) {
             StringBuilder sb = null;
             for (String s : required) {
-                if (OAuth2Utils.getRequestParameter(getRequest(), s, String.class) == null) {
+                String str = OAuth2Utils.getRequestParameter(getRequest(), s, String.class);
+                if (str == null || str.isEmpty()) {
                     if (null == sb) {
                         sb = new StringBuilder("Missing parameters: ");
                     }
