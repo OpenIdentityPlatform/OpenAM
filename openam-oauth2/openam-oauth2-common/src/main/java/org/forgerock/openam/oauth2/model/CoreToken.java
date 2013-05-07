@@ -263,4 +263,8 @@ public class CoreToken extends JsonValue implements Token {
         return this.getParameter(OAuth2Constants.CoreTokenParams.ISSUED).iterator().next();
     }
 
+    public void setIssued(){
+        this.put(OAuth2Constants.CoreTokenParams.ISSUED, OAuth2Utils.stringToSet("true"));
+    }
+
 }

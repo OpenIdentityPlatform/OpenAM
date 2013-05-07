@@ -115,9 +115,13 @@ public class AuthorizationCodeServerResource extends AbstractFlow {
             CoreToken token = createAccessToken(code);
 
             //set access token issued
-            // TODO code.put(OAuth2Constants.CoreTokenParams.ISSUED, "true");
-            //getTokenStore().updateAuthorizationCode(code_p, code);
+            code.setIssued();
+            getTokenStore().updateAuthorizationCode(code_p, code);
             Map<String, Object> response = token.convertToMap();
+
+            if (token != null && !token.getRefreshToken().isEmpty()){
+                response.put(OAuth2Constants.Params.REFRESH_TOKEN, token.getRefreshToken());
+            }
 
             //execute post token creation pre return scope plugin for extra return data.
             Map<String, String> data = new HashMap<String, String>();

@@ -239,9 +239,6 @@ public class DefaultOAuthTokenStoreImpl implements OAuth2TokenStore {
                     "Could not find token using CTS", null);
         }
 
-        // Create a query for other tokens with this as a parent
-        // TODO secondary key search via query
-
         // Delete the code
         try {
             response = accessor.delete(id, null);
