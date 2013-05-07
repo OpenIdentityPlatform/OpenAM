@@ -25,6 +25,8 @@
 package com.sun.identity.shared.ldap;
 
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
+
 import com.sun.identity.shared.ldap.client.*;
 import com.sun.identity.shared.ldap.client.opers.*;
 import com.sun.identity.shared.ldap.ber.stream.*;
@@ -70,7 +72,7 @@ class LDAPConnThread implements Runnable {
     transient private static int m_highMsgId;
     transient private InputStream m_serverInput, m_origServerInput;
     transient private OutputStream m_serverOutput, m_origServerOutput;
-    transient private Hashtable m_requests;
+    transient private ConcurrentHashMap<Integer, LDAPMessageQueue> m_requests;
     transient private Hashtable m_messages = null;
     transient private Set m_registered;       
     transient private LDAPCache m_cache = null;
@@ -100,7 +102,7 @@ class LDAPConnThread implements Runnable {
      */
     public LDAPConnThread(LDAPConnSetupMgr connMgr, LDAPCache cache,
         Object traceOutput) {
-        m_requests = new Hashtable ();
+        m_requests = new ConcurrentHashMap<Integer, LDAPMessageQueue>();
         m_registered = Collections.synchronizedSet(new HashSet());
         m_connMgr = connMgr;
         setCache( cache );
@@ -582,8 +584,6 @@ class LDAPConnThread implements Runnable {
 
         while (true) {
 
-            synchronized (m_requests) {
-            
                 if (m_requests.size() == 0) {
                     return;
                 }
@@ -625,7 +625,6 @@ class LDAPConnThread implements Runnable {
                         return;
                     }
                 }
-            }
             synchronized(this) {
                 wait(3000);
             }            
