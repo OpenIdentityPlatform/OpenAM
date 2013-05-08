@@ -533,6 +533,7 @@ public abstract class AbstractFlow extends ServerResource {
 
     protected void validateRequiredParameters() throws OAuthProblemException {
         String[] required = getRequiredParameters();
+        boolean isClientID = false;
         if (required != null && required.length > 0) {
             StringBuilder sb = null;
             for (String s : required) {
@@ -542,11 +543,18 @@ public abstract class AbstractFlow extends ServerResource {
                         sb = new StringBuilder("Missing parameters: ");
                     }
                     sb.append(s).append(" ");
+                    if (s.equalsIgnoreCase(OAuth2Constants.Params.CLIENT_ID)){
+                        isClientID = true;
+                    }
                 }
             }
-            if (null != sb) {
+            if (null != sb && !isClientID) {
                 OAuth2Utils.DEBUG.error("AbstractFlow::Invlaid parameters in request: " + sb.toString());
                 throw OAuthProblemException.OAuthError.INVALID_REQUEST.handle(getRequest(), sb
+                        .toString());
+            } else if (null != sb && isClientID) {
+                OAuth2Utils.DEBUG.error("AbstractFlow::Invlaid parameters in request: " + sb.toString());
+                throw OAuthProblemException.OAuthError.INVALID_REQUEST.handle(null, sb
                         .toString());
             }
         }
