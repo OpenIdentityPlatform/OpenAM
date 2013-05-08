@@ -72,6 +72,6 @@
  <xinclude:include href="chap-upgrade-components.xml" />
  <xinclude:include href="appendix-best-practices.xml" />
  <xinclude:include href="appendix-troubleshooting.xml" />
-<!--  <xinclude:include href="appendix-maven-artifacts.xml" /> -->
+ <xinclude:include href="appendix-maven-artifacts.xml" /> 
  <index />
 </book>

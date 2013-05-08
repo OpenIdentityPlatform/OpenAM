@@ -1,0 +1,809 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  ! CCPL HEADER START
+  !
+  ! This work is licensed under the Creative Commons
+  ! Attribution-NonCommercial-NoDerivs 3.0 Unported License.
+  ! To view a copy of this license, visit
+  ! http://creativecommons.org/licenses/by-nc-nd/3.0/
+  ! or send a letter to Creative Commons, 444 Castro Street,
+  ! Suite 900, Mountain View, California, 94041, USA.
+  !
+  ! You can also obtain a copy of the license at
+  ! src/main/resources/legal-notices/CC-BY-NC-ND.txt.
+  ! See the License for the specific language governing permissions
+  ! and limitations under the License.
+  !
+  ! If applicable, add the following below this CCPL HEADER, with the fields
+  ! enclosed by brackets "[]" replaced with your own identifying information:
+  !      Portions Copyright [yyyy] [name of copyright owner]
+  !
+  ! CCPL HEADER END
+  !
+  !      Copyright 2013 ForgeRock, Inc.
+  !    
+-->
+<appendix xml:id='appendix-maven-artifacts'
+ xmlns='http://docbook.org/ns/docbook'
+ version='5.0' xml:lang='en'
+ xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance'
+ xsi:schemaLocation='http://docbook.org/ns/docbook http://docbook.org/xml/5.0/xsd/docbook.xsd'
+ xmlns:xlink='http://www.w3.org/1999/xlink'
+ xmlns:xinclude='http://www.w3.org/2001/XInclude'>
+<title>Maven Artifacts</title>
+<indexterm>
+ <primary>Artifacts</primary>
+ <secondary>Maven</secondary>
+</indexterm>
+<indexterm>
+ <primary>Artifacts</primary>
+ <secondary>Ant</secondary>
+</indexterm>
+
+ <para>This appendix provides users detailed information on how the move to 
+ build OpenAM using Apache Maven has translated different artifacts from the 
+ familiar ant artifacts. It is designed to help long time users understand the
+ changes prior to upgrading to all releases from OpenAM 10.1.0 and later.</para>
+ 
+ <para>For OpenAM, artifacts are files that maven generates during the build.
+ Maven assigns a name to each artifact that includes three components:</para>
+ 
+ <itemizedlist>
+  <listitem>
+   <para>Artifact ID - The identifier that matches the artifact to a particular
+   component of OpenAM. For example, core functionality is <literal>openam-core</literal> 
+   and shared libraries are <literal>openam-shared</literal>.</para>
+  </listitem>
+  <listitem>
+   <para>Version - The identifier that shows when the artifact was generated. For 
+   OpenAM, the version includes different information to let you know what type of 
+   build you are using.</para>
+    <itemizedlist>
+     <listitem>
+      <para>Nightly builds use <literal>-version-SNAPSHOT_nightly_date</literal></para>
+     </listitem>
+     <listitem>
+      <para>Released builds include just the version</para>
+     </listitem>
+    </itemizedlist>
+  </listitem>
+  <listitem>
+    <para>Packaging - The file extension, such as .war or .zip.</para>
+  </listitem>
+ </itemizedlist>
+ 
+ <para>For example, the artifact <literal>openam-core-10.2.0-SNAPSHOT_nightly_20130424.jar</literal> 
+ is the core artifact of the nightly build from 24 April 2013. The artifact
+ <literal>openam-core-10.1.0.jar</literal> is the core artifact file for the released
+ OpenAM 10.1.0.</para>
+ 
+ <section xml:id="artifact-correlation">
+  <title>Correlating Maven Artifacts to Earlier Builds</title>
+
+  <para>The names have changed for many of the artifacts. If you are familiar with
+  the older file names, the following will help you locate the files you need
+  starting with OpenAM 10.1.0 and later.</para>
+  
+ <table xml:id="ant-to-maven-artifacts" pgwide="1">
+  <title>Determining the Maven Artifact</title>
+  <tgroup cols="3">
+   <thead>
+    <row>
+     <entry>Old And Artifact</entry>
+     <entry>Maven Artifact</entry>
+     <entry>Purpose</entry>
+    </row>
+   </thead>
+   <tbody>
+     <row>
+      <entry>amserver</entry>
+      <entry>openam-auth-ad</entry>
+      <entry>Contains the core OpenAM components, including all of the authentication
+      modules</entry>
+     </row>
+     <row>
+      <entry>amserver</entry>
+      <entry>openam-auth-adaptive</entry>
+      <entry>Contains the components for adaptive risk authentication module</entry>
+     </row>
+     <row>
+      <entry>amserver</entry>
+      <entry>openam-auth-anonymous</entry>
+      <entry>Contains the components for anonymous authentication module</entry>
+     </row>
+     <row>
+      <entry>amserver</entry>
+      <entry>openam-auth-application</entry>
+      <entry>Contains the components for the internally used application authentication 
+      module</entry>
+     </row>
+     <row>
+      <entry>amserver</entry>
+      <entry>openam-auth-cert</entry>
+      <entry>Contains the components for certification authentication module</entry>
+     </row>
+     <row>
+      <entry>amserver</entry>
+      <entry>openam-auth-datastore</entry>
+      <entry>Contains the components for data store authentication module</entry>
+     </row>
+     <row>
+      <entry>amserver</entry>
+      <entry>openam-auth-hotp</entry>
+      <entry>Contains the components for HOTP authentication module</entry>
+     </row>
+     <row>
+      <entry>amserver</entry>
+      <entry>openam-auth-httpbasic</entry>
+      <entry>Contains the components for HTTP Basic authentication module</entry>
+     </row>
+     <row>
+      <entry>amserver</entry>
+      <entry>openam-auth-jdbc</entry>
+      <entry>Contains the components for JDBC authentication module</entry>
+     </row>
+     <row>
+      <entry>amserver</entry>
+      <entry>openam-auth-ldap</entry>
+      <entry>Contains the components for LDAP authentication module</entry>
+     </row>
+     <row>
+      <entry>amserver</entry>
+      <entry>openam-auth-membership</entry>
+      <entry>Contains the components for Membership authentication module</entry>
+     </row>
+     <row>
+      <entry>amserver</entry>
+      <entry>openam-auth-msisdn</entry>
+      <entry>Contains the components for MSISDN authentication module</entry>
+     </row>
+     <row>
+      <entry>amserver</entry>
+      <entry>openam-auth-nt</entry>
+      <entry>Contains the components for Windows NT authentication module</entry>
+     </row>
+     <row>
+      <entry>amserver</entry>
+      <entry>openam-auth-oath</entry>
+      <entry>Contains the components for the OATH authentication module</entry>
+     </row>
+     <row>
+      <entry>amserver</entry>
+      <entry>openam-auth-oauth2</entry>
+      <entry>Contains the components for configuring the OAuth 2.0 authentication module</entry>
+     </row>
+     <row>
+      <entry>amserver</entry>
+      <entry>openam-auth-radius</entry>
+      <entry>Contains the components for RADIUS authentication module</entry>
+     </row>
+     <row>
+      <entry>amserver</entry>
+      <entry>openam-auth-securid</entry>
+      <entry>Contains the components for SecurID authentication module</entry>
+     </row>
+     <row>
+      <entry>amserver</entry>
+      <entry>openam-auth-windowsdesktopsso</entry>
+      <entry>Contains the components for Windows Desktop SSO authentication module</entry>
+     </row>
+     <row>
+      <entry>amserver</entry>
+      <entry>openam-common-auth-ui</entry>
+      <entry>Contains the components for the common authentication UI shared between
+      the main OpenAM server and DAS</entry>
+     </row>
+     <row>
+      <entry>amserver</entry>
+      <entry>openam-distauth</entry>
+      <entry>Contains the distributed authorization service</entry>
+     </row>
+     <row>
+      <entry>amserver</entry>
+      <entry>openam-dtd-schema</entry>
+      <entry>Contains the components for the DTD file schemas</entry>
+     </row>
+     <row>
+      <entry>amserver</entry>
+      <entry>openam-entitlements</entry>
+      <entry>Contains the OpenAM entitlement elements</entry>
+     </row>
+     <row>
+      <entry>amserver</entry>
+      <entry>openam-idsvcs-schema</entry>
+      <entry>Contains the elements of the ID services schema</entry>
+     </row>
+     <row>
+      <entry>amserver</entry>
+      <entry>openam-jaxrpc-schema</entry>
+      <entry>Contains the elements for the JAX-RPC schema</entry>
+     </row>
+     <row>
+      <entry>amserver</entry>
+      <entry>openam-mib-schema</entry>
+      <entry>Contains generated classes for SNMP/JMX/RMI monitoring</entry>
+     </row>
+     <row>
+      <entry>amserver</entry>
+      <entry>openam-server-auth-ui</entry>
+      <entry>Contains the elements of the server authorization UI</entry>
+     </row>
+     <row>
+      <entry>amserver and openfm</entry>
+      <entry>openam-cli</entry>
+      <entry>Contains the components for the command line interface</entry>
+     </row>
+     <row>
+      <entry>amserver and openfm</entry>
+      <entry>openam-cli-definitions</entry>
+      <entry>Contains the definitions for the different CLI commands</entry>
+     </row>
+     <row>
+      <entry>amserver and openfm</entry>
+      <entry>openam-cli-impl</entry>
+      <entry>Contains the implementation of the CLI tools (ssoadm)</entry>
+     </row>
+     <row>
+      <entry>amserver and openfm</entry>
+      <entry>openam-console</entry>
+      <entry>Contains all of the administrative console components</entry>
+     </row>
+     <row>
+      <entry>Centralized from several different locations</entry>
+      <entry>openam-diagnostics-plugins</entry>
+      <entry>Contains the components for the diagnostic plugin elements</entry>
+     </row>
+     <row>
+      <entry>openfedlib</entry>
+      <entry>openam-federation-library</entry>
+      <entry>Contains the elements of the OpenAM Federation library</entry>
+     </row>
+     <row>
+      <entry>openfedlib</entry>
+      <entry>openam-idpdiscovery</entry>
+      <entry>Contains the elements of IDP Discovery</entry>
+     </row>
+     <row>
+      <entry>openfedlib</entry>
+      <entry>openam-idpdiscovery-war</entry>
+      <entry>Contains the elements of the IDP Discovery war file</entry>
+     </row>
+     <row>
+      <entry>openfedlib</entry>
+      <entry>openam-liberty-schema</entry>
+      <entry>Contains the elements of the Liberty schema</entry>
+     </row>
+     <row>
+      <entry>openfedlib</entry>
+      <entry>openam-saml2-schema</entry>
+      <entry>Contains the components for the SAML2 schema</entry>
+     </row>
+     <row>
+      <entry>openam-site/src</entry>
+      <entry>openam-doc-source</entry>
+      <entry>Source code for documentaiton</entry>
+     </row>
+     <row>
+      <entry>openam-site</entry>
+      <entry>openam-documentation</entry>
+      <entry>Contains OpenAM documentation</entry>
+     </row>
+     <row>
+      <entry>site-helper</entry>
+      <entry>openam-doc-content</entry>
+      <entry>Documentation compiler</entry>
+     </row>
+   </tbody>
+  </tgroup>
+ </table>
+    
+ </section>
+    
+ <section xml:id="artifact-new">
+  <title>Finding the New Artifacts</title>
+  <para>The maven build includes several new artifacts.</para>
+  
+  <table xml:id="new-maven-artifacts" pgwide="1">
+   <title>New Maven Artifact</title>
+   <tgroup cols="2">
+    <thead>
+     <row>
+      <entry>Maven Artifact</entry>
+      <entry>Purpose</entry>
+     </row>
+    </thead>
+    <tbody>
+     <row>
+      <entry>openam-auth-postauthentication</entry>
+      <entry>Contains the AccountExpirePlugin for Post Authentication Processing</entry>
+     </row>
+     <row>
+      <entry>openam-build-tools</entry>
+      <entry>Contains the components for assist the OpenAM build process</entry>
+     </row>
+     <row>
+      <entry>openam-dashboard</entry>
+      <entry>Contains the components for the Dashboard service</entry>
+     </row>
+     <row>
+      <entry>openam-diagnostics-schema</entry>
+      <entry>Generated classes based on the diagnostics XML schema</entry>
+     </row>
+     <row>
+      <entry>openam-distribution-diagnostics</entry>
+      <entry>Contains the OpenAM diagnostics tools</entry>
+     </row>
+     <row>
+      <entry>openam-distribution-fedlet-unconfigured</entry>
+      <entry>Contains the OpenAM fedlet</entry>
+     </row>
+     <row>
+      <entry>openam-distribution-kit</entry>
+      <entry>Contains all of the OpenAM components</entry>
+     </row>
+     <row>
+      <entry>openam-distribution-ssoadmintools</entry>
+      <entry>Contains the OpenAM Admin tools</entry>
+     </row>
+     <row>
+      <entry>openam-distribution-ssoconfiguratortools</entry>
+      <entry>Contains the OpenAM configurator tools</entry>
+     </row>
+     <row>
+      <entry>openam-forgerock-rest</entry>
+      <entry>Contains the elements of the OpenAM REST interface</entry>
+     </row>
+     <row>
+      <entry>openam-locale</entry>
+      <entry>Contains property files of the OpenAM core</entry>
+     </row>
+     <row>
+      <entry>openam-oauth2-common</entry>
+      <entry>Contains the common components of OAuth 2.0</entry>
+     </row>
+     <row>
+      <entry>openam-oauth2-cover-token-service</entry>
+      <entry>Contains the basic token service elements required by OAuth 2.0</entry>
+     </row>
+     <row>
+      <entry>openam-oauth2-demo</entry>
+      <entry>Contains the demo tools for OAuth 2.0</entry>
+     </row>
+     <row>
+      <entry>openam-oauth2-main</entry>
+      <entry>Contains the required components of OAuth 2.0</entry>
+     </row>
+     <row>
+      <entry>openam-oauth2-openam-extension</entry>
+      <entry>Contains the plugin components of OAuth 2.0</entry>
+     </row>
+     <row>
+      <entry>openam-oauth2-rest</entry>
+      <entry>Contains the REST interface for OAuth 2.0</entry>
+     </row>
+     <row>
+      <entry>openam-oauth2-restlet-extension</entry>
+      <entry>Contains the REST extension of the REST interface for OAuth 2.0</entry>
+     </row>
+     <row>
+      <entry>openam-plugins</entry>
+      <entry>Contains OpenAM plugins</entry>
+     </row>
+     <row>
+      <entry>openam-server-only</entry>
+      <entry>Contains the elements for OpenAM without the console</entry>
+     </row>
+     <row>
+      <entry>openam-ui-ria</entry>
+      <entry>Contains the elements for the rich internet application UI</entry>
+     </row>
+     <row>
+      <entry>openam-wsfederation-schema</entry>
+      <entry>Contains the WS federation schema</entry>
+     </row>
+<!--     <row>
+      <entry>openam-xacml3-schema</entry>
+      <entry></entry>
+     </row> -->
+    </tbody>
+   </tgroup>
+  </table>
+ </section>
+  
+ <section xml:id="main-maven-artifacts">
+  <title>The Maven Artifacts</title>
+  <para>The following provides a list of the main maven artifacts to help you 
+  navigate to the files you need.</para>
+
+  <table xml:id="maven-artifacts" pgwide="1">
+   <title>List of Maven Artifact</title>
+   <tgroup cols="3">
+    <thead>
+     <row>
+      <entry>Maven Artifact</entry>
+      <entry>Previous Name/New</entry>
+      <entry>Purpose</entry>
+     </row>
+    </thead>
+    <tbody>
+     <row>
+      <entry>openam-auth-ad</entry>
+      <entry>amserver</entry>
+      <entry>Contains the core OpenAM components, including all of the authentication
+      modules</entry>
+     </row>
+     <row>
+      <entry>openam-auth-adaptive</entry>
+      <entry>amserver</entry>
+      <entry>Contains the components for adaptive risk authentication module</entry>
+     </row>
+     <row>
+      <entry>openam-auth-anonymous</entry>
+      <entry>amserver</entry>
+      <entry>Contains the components for anonymous authentication module</entry>
+     </row>
+     <row>
+      <entry>openam-auth-application</entry>
+      <entry>amserver</entry>
+      <entry>Contains the components for the internally used application authentication 
+      module</entry>
+     </row>
+     <row>
+      <entry>openam-auth-cert</entry>
+      <entry>amserver</entry>
+      <entry>Contains the components for certification authentication module</entry>
+     </row>
+     <row>
+      <entry>openam-auth-datastore</entry>
+      <entry>amserver</entry>
+      <entry>Contains the components for data store authentication module</entry>
+     </row>
+     <row>
+      <entry>openam-auth-hotp</entry>
+      <entry>amserver</entry>
+      <entry>Contains the components for HOTP authentication module</entry>
+     </row>
+     <row>
+      <entry>openam-auth-httpbasic</entry>
+      <entry>amserver</entry>
+      <entry>Contains the components for HTTP Basic authentication module</entry>
+     </row>
+     <row>
+      <entry>openam-auth-jdbc</entry>
+      <entry>amserver</entry>
+      <entry>Contains the components for JDBC authentication module</entry>
+     </row>
+     <row>
+      <entry>openam-auth-ldap</entry>
+      <entry>amserver</entry>
+      <entry>Contains the components for LDAP authentication module</entry>
+     </row>
+     <row>
+      <entry>openam-auth-membership</entry>
+      <entry>amserver</entry>
+      <entry>Contains the components for Membership authentication module</entry>
+     </row>
+     <row>
+      <entry>openam-auth-msisdn</entry>
+      <entry>amserver</entry>
+      <entry>Contains the components for MSISDN authentication module</entry>
+     </row>
+     <row>
+      <entry>openam-auth-nt</entry>
+      <entry>amserver</entry>
+      <entry>Contains the components for Windows NT authentication module</entry>
+     </row>
+     <row>
+      <entry>openam-auth-oath</entry>
+      <entry>amserver</entry>
+      <entry>Contains the components for the OATH authentication module</entry>
+     </row>
+     <row>
+      <entry>openam-auth-oauth2</entry>
+      <entry>amserver</entry>
+      <entry>Contains the components for configuring the OAuth 2.0 authentication module</entry>
+     </row>
+     <row>
+      <entry>openam-auth-postauthentication</entry>
+      <entry>New</entry>
+      <entry>Contains the AccountExpirePlugin for Post Authentication Processing</entry>
+     </row>
+     <row>
+      <entry>openam-auth-radius</entry>
+      <entry>amserver</entry>
+      <entry>Contains the components for RADIUS authentication module</entry>
+     </row>
+     <row>
+      <entry>openam-auth-securid</entry>
+      <entry>amserver</entry>
+      <entry>Contains the components for SecurID authentication module</entry>
+     </row>
+     <row>
+      <entry>openam-auth-windowsdesktopsso</entry>
+      <entry>amserver</entry>
+      <entry>Contains the components for Windows Desktop SSO authentication module</entry>
+     </row>
+     <row>
+      <entry>openam-build-tools</entry>
+      <entry>New</entry>
+      <entry>Contains the components for assist the OpenAM build process</entry>
+     </row>
+     <row>
+      <entry>openam-cli</entry>
+      <entry>amserver and openfm</entry>
+      <entry>Contains the components for the command line interface</entry>
+     </row>
+     <row>
+      <entry>openam-cli-definitions</entry>
+      <entry>amserver and openfm</entry>
+      <entry>Contains the definitions for the different CLI commands</entry>
+     </row>
+     <row>
+      <entry>openam-cli-impl</entry>
+      <entry>amserver and openfm</entry>
+      <entry>Contains the implementation of the CLI tools (ssoadm)</entry>
+     </row>
+     <row>
+      <entry>openam-clientsdk</entry>
+      <entry>clientsdk</entry>
+      <entry>Contains the client SDK for remote interaction with the OpenAM server</entry>
+     </row>
+     <row>
+      <entry>openam-common-auth-ui</entry>
+      <entry>amserver</entry>
+      <entry>Contains the components for the common authentication UI shared between
+      the main OpenAM server and DAS</entry>
+     </row>
+     <row>
+      <entry>openam-console</entry>
+      <entry>amserver and openfm</entry>
+      <entry>Contains all of the administrative console components</entry>
+     </row>
+     <row>
+      <entry>openam-core</entry>
+      <entry>core</entry>
+      <entry>Contains the core functionalities of OpenAM, like authentication and audit logs</entry>
+     </row>
+     <row>
+      <entry>openam-dashboard</entry>
+      <entry>New</entry>
+      <entry>Contains the components for the Dashboard service</entry>
+     </row>
+     <row>
+      <entry>openam-diagnostics-base</entry>
+      <entry>base</entry>
+      <entry>Contains the basic framework for the diagnostic tools</entry>
+     </row>
+     <row>
+      <entry>openam-diagnostics-plugins</entry>
+      <entry>Centralized from several different locations</entry>
+      <entry>Contains the components for the diagnostic plugin elements</entry>
+     </row>
+     <row>
+      <entry>openam-diagnostics-schema</entry>
+      <entry>New</entry>
+      <entry>Generated classes based on the diagnostics XML schema</entry>
+     </row>
+     <row>
+      <entry>openam-distauth</entry>
+      <entry>amserver</entry>
+      <entry>Contains the distributed authorization service</entry>
+     </row>
+     <row>
+      <entry>openam-distribution-diagnostics</entry>
+      <entry>New</entry>
+      <entry>Contains the OpenAM diagnostics tools</entry>
+     </row>
+     <row>
+      <entry>openam-distribution-fedlet-unconfigured</entry>
+      <entry>New</entry>
+      <entry>Contains the OpenAM fedlet</entry>
+     </row>
+     <row>
+      <entry>openam-distribution-kit</entry>
+      <entry>New</entry>
+      <entry>Contains all of the OpenAM components</entry>
+     </row>
+     <row>
+      <entry>openam-distribution-ssoadmintools</entry>
+      <entry>New</entry>
+      <entry>Contains the OpenAM Admin tools</entry>
+     </row>
+     <row>
+      <entry>openam-distribution-ssoconfiguratortools</entry>
+      <entry>New</entry>
+      <entry>Contains the OpenAM configurator tools</entry>
+     </row>
+     <row>
+      <entry>openam-doc-content</entry>
+      <entry>site-helper</entry>
+      <entry>Documentation compiler</entry>
+     </row>
+     <row>
+      <entry>openam-doc-source</entry>
+      <entry>openam-site/src</entry>
+      <entry>Source code for documentaiton</entry>
+     </row>
+     <row>
+      <entry>openam-documentation</entry>
+      <entry>openam-site</entry>
+      <entry>Contains OpenAM documentation</entry>
+     </row>
+     <row>
+      <entry>openam-dtd-schema</entry>
+      <entry>amserver</entry>
+      <entry>Contains the components for the DTD file schemas</entry>
+     </row>
+     <row>
+      <entry>openam-entitlements</entry>
+      <entry>amserver</entry>
+      <entry>Contains the OpenAM entitlement elements</entry>
+     </row>
+     <row>
+      <entry>openam-example-clientsdk-cli</entry>
+      <entry>opensso-client.zip</entry>
+      <entry>Contains the examples of the client SDK for CLI</entry>
+     </row>
+     <row>
+      <entry>openam-example-clientsdk-war</entry>
+      <entry>opensso-client.zip</entry>
+      <entry>Contains the war file for the client SDK example</entry>
+     </row>
+     <row>
+      <entry>openam-federation-library</entry>
+      <entry>openfedlib</entry>
+      <entry>Contains the elements of the OpenAM Federation library</entry>
+     </row>
+     <row>
+      <entry>openam-forgerock-rest</entry>
+      <entry>New</entry>
+      <entry>Contains the elements of the OpenAM REST interface</entry>
+     </row>
+     <row>
+      <entry>openam-idpdiscovery</entry>
+      <entry>openfedlib</entry>
+      <entry>Contains the elements of IDP Discovery</entry>
+     </row>
+     <row>
+      <entry>openam-idpdiscovery-war</entry>
+      <entry>openfedlib</entry>
+      <entry>Contains the elements of the IDP Discovery war file</entry>
+     </row>
+     <row>
+      <entry>openam-idsvcs-schema</entry>
+      <entry>amserver</entry>
+      <entry>Contains the elements of the ID services schema</entry>
+     </row>
+     <row>
+      <entry>openam-installtools</entry>
+      <entry>installtools</entry>
+      <entry>Contains the components for the OpenAM tools</entry>
+     </row>
+     <row>
+      <entry>openam-installtools-launcher</entry>
+      <entry>installtools</entry>
+      <entry>Contains the components for launching OpenAM tools</entry>
+     </row>
+     <row>
+      <entry>openam-jaxrpc-schema</entry>
+      <entry>amserver</entry>
+      <entry>Contains the elements for the JAX-RPC schema</entry>
+     </row>
+     <row>
+      <entry>openam-liberty-schema</entry>
+      <entry>openfedlib</entry>
+      <entry>Contains the elements of the Liberty schema</entry>
+     </row>
+     <row>
+      <entry>openam-locale</entry>
+      <entry>New</entry>
+      <entry>Contains property files of the OpenAM core</entry>
+     </row>
+     <row>
+      <entry>openam-mib-schema</entry>
+      <entry>amserver</entry>
+      <entry>Contains generated classes for SNMP/JMX/RMI monitoring</entry>
+     </row>
+     <row>
+      <entry>openam-oauth</entry>
+      <entry>oauth</entry>
+      <entry>Contains the components for OAuth 1.0</entry>
+     </row>
+     <row>
+      <entry>openam-oauth2-common</entry>
+      <entry>New</entry>
+      <entry>Contains the common components of OAuth 2.0</entry>
+     </row>
+     <row>
+      <entry>openam-oauth2-cover-token-service</entry>
+      <entry>New</entry>
+      <entry>Contains the basic token service elements required by OAuth 2.0</entry>
+     </row>
+     <row>
+      <entry>openam-oauth2-demo</entry>
+      <entry>New</entry>
+      <entry>Contains the demo tools for OAuth 2.0</entry>
+     </row>
+     <row>
+      <entry>openam-oauth2-main</entry>
+      <entry>New</entry>
+      <entry>Contains the required components of OAuth 2.0</entry>
+     </row>
+     <row>
+      <entry>openam-oauth2-openam-extension</entry>
+      <entry>New</entry>
+      <entry>Contains the plugin components of OAuth 2.0</entry>
+     </row>
+     <row>
+      <entry>openam-oauth2-rest</entry>
+      <entry>New</entry>
+      <entry>Contains the REST interface for OAuth 2.0</entry>
+     </row>
+     <row>
+      <entry>openam-oauth2-restlet-extension</entry>
+      <entry>New</entry>
+      <entry>Contains the REST extension of the REST interface for OAuth 2.0</entry>
+     </row>
+     <row>
+      <entry>openam-plugins</entry>
+      <entry>New</entry>
+      <entry>Contains OpenAM plugins</entry>
+     </row>
+     <row>
+      <entry>openam-rest</entry>
+      <entry>rest</entry>
+      <entry>Contains the components for the legacy REST interface for managing
+      entitlements</entry>
+     </row>
+     <row>
+      <entry>openam-saml2-schema</entry>
+      <entry>openfedlib</entry>
+      <entry>Contains the components for the SAML2 schema</entry>
+     </row>
+     <row>
+      <entry>openam-server</entry>
+      <entry>server</entry>
+      <entry>Contains the components of the server</entry>
+     </row>
+     <row>
+      <entry>openam-server-auth-ui</entry>
+      <entry>amserver</entry>
+      <entry>Contains the elements of the server authorization UI</entry>
+     </row>
+     <row>
+      <entry>openam-server-only</entry>
+      <entry>New</entry>
+      <entry>Contains the elements for OpenAM without the console</entry>
+     </row>
+     <row>
+      <entry>openam-shared</entry>
+      <entry>sharedlib</entry>
+      <entry>Contains the shared libraries</entry>
+     </row>
+     <row>
+      <entry>openam-tools</entry>
+      <entry>tools</entry>
+      <entry>Contains the components for OpenAM tools</entry>
+     </row>
+     <row>
+      <entry>openam-ui-ria</entry>
+      <entry>New</entry>
+      <entry>Contains the elements for the rich internet application UI</entry>
+     </row>
+     <row>
+      <entry>openam-wsfederation-schema</entry>
+      <entry>New</entry>
+      <entry>Contains the WS federation schema</entry>
+     </row>
+<!--     <row>
+      <entry>openam-xacml3-schema</entry>
+      <entry>New</entry>
+      <entry></entry>
+     </row> -->
+    </tbody>
+   </tgroup>
+  </table>
+  
+ </section>
+
+</appendix>
