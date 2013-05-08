@@ -241,7 +241,7 @@ http://stackoverflow.com/questions/794243/internet-explorer-ignores-cookies-on-s
 
         <step>
             <para>Install OpenAM as described in the <link xlink:href="install-guide#install-guide"
-            xlink:role="http://docbook.org/xlink/role/olink"><citetitle>OpenAM Policy
+            xlink:role="http://docbook.org/xlink/role/olink"><citetitle>OpenAM
             <?eval ${agentsDocTargetVersion}?> Installation Guide</citetitle></link>. This procedure uses a Server URL of 
             <literal>http://openam.example.net:8080/openam</literal>.</para>
         </step>
