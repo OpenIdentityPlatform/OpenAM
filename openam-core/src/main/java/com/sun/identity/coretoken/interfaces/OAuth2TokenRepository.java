@@ -30,7 +30,8 @@ import org.forgerock.json.resource.JsonResourceException;
 
 public interface OAuth2TokenRepository {
 
-    static final String EXPDATE_FILTER_PRE_OAUTH = "(expirytime<=";
+    static final String EXPDATE_FILTER_PRE_OAUTH = "(";
+    static final String EXPDATE_FILTER_COMPARE = "<=";
     static final String EXPDATE_FILTER_POST_OAUTH = ")";
 
     static final String SYS_PROPERTY_TOKEN_OAUTH2_REPOSITORY_ROOT_SUFFIX = "iplanet-am-token-oauth2-root-suffix";

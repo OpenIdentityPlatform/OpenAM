@@ -497,7 +497,9 @@ public class CTSPersistentStore extends GeneralTaskRunnable
                     }
                     // Delete expired OAuth2 tokens
                     StringBuilder filter = new StringBuilder();
-                    filter.append(EXPDATE_FILTER_PRE_OAUTH).append(System.currentTimeMillis()).append(EXPDATE_FILTER_POST_OAUTH);
+                    filter.append(EXPDATE_FILTER_PRE_OAUTH).append(OAuth2Constants.CoreTokenParams.EXPIRE_TIME)
+                          .append(EXPDATE_FILTER_COMPARE).append(System.currentTimeMillis())
+                          .append(EXPDATE_FILTER_POST_OAUTH);
                     oauth2DeleteWithFilter(filter.toString());
                     if (shutdown) {
                         break;
