@@ -48,7 +48,7 @@ define(["org/forgerock/openam/extensions/authmodules/adaptivedeviceprint/Abstrac
             }
             
             if(screen.pixelDepth) {
-                ret.screenColorDepth = screen.pixelDepth;
+                ret.screenColourDepth = screen.pixelDepth;
             }
             
             return ret;

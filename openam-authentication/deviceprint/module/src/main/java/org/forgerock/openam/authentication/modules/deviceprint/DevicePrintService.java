@@ -137,7 +137,12 @@ public class DevicePrintService {
         }
 
         ComparisonResult selectedComparisonResult = comparisonResultMap.firstKey();
-        UserProfile selectedProfile = comparisonResultMap.get(selectedComparisonResult);
+
+        UserProfile selectedProfile = null;
+        if (selectedComparisonResult.getPenaltyPoints() <= devicePrintAuthenticationConfig.getLong(
+                DevicePrintAuthenticationConfig.MAX_TOLERATED_PENALTY_POINTS)) {
+            selectedProfile = comparisonResultMap.get(selectedComparisonResult);
+        }
 
         return selectedProfile;
     }

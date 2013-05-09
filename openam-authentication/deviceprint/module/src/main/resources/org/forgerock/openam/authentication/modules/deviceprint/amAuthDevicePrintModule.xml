@@ -61,6 +61,15 @@
 					</DefaultValues>
 				</AttributeSchema>
 
+                <AttributeSchema
+                        name="iplanet-am-auth-adaptive-device-print-max-tolerated-penalty-points"
+                        type="single" syntax="number_range" rangeStart="0" rangeEnd="2147483647"
+                        i18nKey="a029">
+                    <DefaultValues>
+                        <Value>50</Value>
+                    </DefaultValues>
+                </AttributeSchema>
+
 				<AttributeSchema
 					name="iplanet-am-auth-adaptive-device-print-user-agent-penalty-points"
 					type="single" syntax="number_range" rangeStart="0" rangeEnd="2147483647"
@@ -436,6 +445,15 @@
 							<Value>default</Value>
 						</DefaultValues>
 					</AttributeSchema>
+
+                    <AttributeSchema
+                            name="iplanet-am-auth-adaptive-device-print-max-tolerated-penalty-points"
+                            type="single" syntax="number_range" rangeStart="0" rangeEnd="2147483647"
+                            i18nKey="a029">
+                        <DefaultValues>
+                            <Value>50</Value>
+                        </DefaultValues>
+                    </AttributeSchema>
 
 					<AttributeSchema
 						name="iplanet-am-auth-adaptive-device-print-user-agent-penalty-points"
