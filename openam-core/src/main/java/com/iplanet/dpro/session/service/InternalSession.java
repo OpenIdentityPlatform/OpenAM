@@ -27,7 +27,7 @@
  */
 
 /*
- * Portions Copyrighted 2011-2012 ForgeRock Inc
+ * Portions Copyrighted 2011-2013 ForgeRock Inc
  */
 
 package com.iplanet.dpro.session.service;
@@ -1072,7 +1072,10 @@ public class InternalSession implements TaskRunnable, Serializable {
                 SessionEvent.SESSION_CREATION);
         SessionService.getSessionService().sendEvent(this,
                 SessionEvent.SESSION_CREATION);
-        SessionService.incrementActiveSessions();
+        
+        if (!isAppSession() || SessionService.returnAppSession) {
+            SessionService.incrementActiveSessions();
+        }
         return true;
     }
 
@@ -1199,7 +1202,9 @@ public class InternalSession implements TaskRunnable, Serializable {
             ss.destroyInternalSession(sessionID);
             return;
         }
-        SessionService.decrementActiveSessions();
+        if (!isAppSession() || SessionService.returnAppSession) {
+            SessionService.decrementActiveSessions();
+        }
         SessionCount.decrementSessionCount(this);  
         setState(Session.INVALID);
         if(SessionService.getSessionService().isSessionTrimmingEnabled()){

@@ -27,7 +27,7 @@
  */
 
 /*
- * Portions Copyrighted 2010-2012 ForgeRock Inc
+ * Portions Copyrighted 2010-2013 ForgeRock Inc
  */
 
 package com.iplanet.dpro.session.service;
@@ -276,7 +276,7 @@ public class SessionService {
      */
     private static SSOToken adminToken = null;
 
-    private static boolean returnAppSession = Boolean
+    protected static boolean returnAppSession = Boolean
             .valueOf(
                     SystemProperties.get(Constants.SESSION_RETURN_APP_SESSION,
                             "false")).booleanValue();
