@@ -166,6 +166,9 @@ public class DevicePrintServiceTest {
         given(devicePrintComparator.compare(devicePrint, userProfileThreeDevicePrint,
                 devicePrintAuthenticationConfig)).willReturn(userProfileThreeResult);
 
+        given(devicePrintAuthenticationConfig.getLong(
+                DevicePrintAuthenticationConfig.MAX_TOLERATED_PENALTY_POINTS)).willReturn(50L);
+
         //When
         UserProfile selectedUserProfile = devicePrintService.getBestMatchingUserProfile(devicePrint);
 
