@@ -152,20 +152,9 @@
  <procedure>
   <title>Configuring Session Failover after Installation</title>
   
-  <itemizedlist>
-  <para>Deploying OpenAM session failover requires two components:</para>
-   <listitem>
-    <para>At least two instances of OpenAM running on different host servers</para>
-   </listitem>
-   <listitem>
-    <para>The instances configured as a site</para>
-   </listitem>
-  </itemizedlist>
-  
-  <note>
-   <para>If these are not setup before you begin the process, the New... button will
-   be greyed out.</para>
-  </note>
+  <para>Enabling session failover in  OpenAM requires a site configuration with one or
+  more servers and OpenDJ as a configuration store (embedded or external). If these are 
+  not setup before you begin the process, the New... button will be greyed out.</para>
     
   <para>The following steps walk you through configuring an additional instance.</para>
   <step> 
@@ -174,13 +163,8 @@
    Configuration Instance.</para>
   </step>
   <step>
-   <para>Provide the information to create the Secondary Configuration Instance:</para>
-   <screen>Session Store User: openamuser
- Session Store Password: cangetin
- Session Store Password (confirm): cangetin
- Maximum Wait Time: 1000
- Database URL: openam.example.com:8080,openam.example.com:28080
- Session Failover Enabled: (True)Enabled</screen>
+   <para>Verify that the additional instance appears in the Name text box and that
+   Session Persistence and High Availability Failover Enabled is checked.</para>
   </step>
   <step>
    <para>Save your changes.</para>
