@@ -1978,7 +1978,7 @@ public class CTSPersistentStore extends GeneralTaskRunnable
             filter = null;
         } else {
             filter = new StringBuilder();
-            filter.append("(&");
+            filter.append("(|");
             for (String key : filters.keySet()) {
                 filter.append("(").append(key.replace("_", "")).append(Constants.EQUALS)
                         .append(filters.get(key).toString()).append(")");

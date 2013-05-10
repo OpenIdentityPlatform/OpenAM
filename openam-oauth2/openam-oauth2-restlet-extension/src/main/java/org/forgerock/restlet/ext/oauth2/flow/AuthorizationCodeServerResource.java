@@ -203,16 +203,18 @@ public class AuthorizationCodeServerResource extends AbstractFlow {
 
         JsonValue token = getTokenStore().queryForToken(id);
 
-        Set<HashMap<String,String>> list = (Set<HashMap<String,String>>) token.getObject();
+        Set<HashMap<String,Set<String>>> list = (Set<HashMap<String,Set<String>>>) token.getObject();
 
         if (list != null && !list.isEmpty() ){
-            for (HashMap<String,String> entry : list){
-                if (entry.get(OAuth2Constants.CoreTokenParams.ID) != null && !entry.get(OAuth2Constants.CoreTokenParams.ID).isEmpty()){
-                    String entryID = entry.get(OAuth2Constants.CoreTokenParams.ID);
-                    invalidateTokens(entry.get(OAuth2Constants.CoreTokenParams.ID));
+            for (HashMap<String,Set<String>> entry : list){
+                Set<String> idSet = entry.get(OAuth2Constants.CoreTokenParams.ID);
+                if (idSet != null && !idSet.isEmpty()){
+                    String entryID = idSet.iterator().next();
+                    invalidateTokens(entryID);
                     String type = null;
-                    if (entry.get(OAuth2Constants.CoreTokenParams.TOKEN_TYPE) != null){
-                        type = entry.get(OAuth2Constants.CoreTokenParams.TOKEN_TYPE);
+                    Set<String> tokenTypeSet = entry.get(OAuth2Constants.CoreTokenParams.TOKEN_TYPE);
+                    if (tokenTypeSet != null && !tokenTypeSet.isEmpty()){
+                        type = tokenTypeSet.iterator().next();
                     }
                     deleteToken(type, entryID);
                 }

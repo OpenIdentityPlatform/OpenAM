@@ -443,7 +443,8 @@ public class DefaultOAuthTokenStoreImpl implements OAuth2TokenStore {
 
         //construct the filter
         Map query = new HashMap<String,String>();
-        query.put("parent", id);
+        query.put(OAuth2Constants.CoreTokenParams.PARENT, id);
+        query.put(OAuth2Constants.CoreTokenParams.REFRESH_TOKEN, id);
         JsonValue queryFilter = new JsonValue(new HashMap<String, HashMap<String, String>>());
         if (query != null){
             queryFilter.put("filter", query);
