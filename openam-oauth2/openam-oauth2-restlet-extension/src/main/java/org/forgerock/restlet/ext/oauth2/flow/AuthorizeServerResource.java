@@ -100,11 +100,11 @@ public class AuthorizeServerResource extends AbstractFlow {
         if (responseType != null && !responseType.isEmpty()){
             if (!validResponseTypes(OAuth2Utils.stringToSet(responseType))){
                 OAuth2Utils.DEBUG.warning("AuthorizeServerResource.represent(): Requested a response type that is not configured.");
-                throw OAuthProblemException.OAuthError.INVALID_REQUEST.handle(getRequest(), "Invalid response type");
+                throw OAuthProblemException.OAuthError.UNSUPPORTED_RESPONSE_TYPE.handle(getRequest(), "Response type is not supported");
             }
         } else {
             OAuth2Utils.DEBUG.warning("AuthorizeServerResource.represent(): Requested a response type that is not configured.");
-            throw OAuthProblemException.OAuthError.INVALID_REQUEST.handle(getRequest(), "Invalid response type");
+            throw OAuthProblemException.OAuthError.UNSUPPORTED_RESPONSE_TYPE.handle(getRequest(), "Response type is not supported");
         }
 
         //check for saved consent
@@ -166,24 +166,24 @@ public class AuthorizeServerResource extends AbstractFlow {
 
             if (requestedResponseTypes == null || requestedResponseTypes.isEmpty()){
                 OAuth2Utils.DEBUG.error("AuthorizeServerResource.represent(): Error response_type not set");
-                throw OAuthProblemException.OAuthError.INVALID_REQUEST.handle(getRequest(),
-                        "No response type set");
+                throw OAuthProblemException.OAuthError.UNSUPPORTED_RESPONSE_TYPE.handle(getRequest(),
+                        "Response type is not supported");
             } else {
                 try {
                     for(String request: requestedResponseTypes){
                         String responseClass = responseTypes.get(request);
                         if (responseClass == null || responseClass.isEmpty()){
                             OAuth2Utils.DEBUG.warning("AuthorizeServerResource.represent(): Requested a response type that is not configured. response_type=" + request);
-                            throw OAuthProblemException.OAuthError.INVALID_REQUEST.handle(getRequest(),
-                                    "Invalid response type");
+                            throw OAuthProblemException.OAuthError.UNSUPPORTED_RESPONSE_TYPE.handle(getRequest(),
+                                    "Response type is not supported");
                         }
                         Class clazz = Class.forName(responseClass);
                         ResponseType classObj = (ResponseType) clazz.newInstance();
                         CoreToken token = classObj.createToken(data);
                         String paramName = classObj.getReturnLocation();
                         if (listOfTokens.containsKey(paramName)){
-                            OAuth2Utils.DEBUG.error("AuthorizeServerResource.represent(): Error response_type not set");
-                            throw OAuthProblemException.OAuthError.INVALID_REQUEST.handle(getRequest(),
+                            OAuth2Utils.DEBUG.error("AuthorizeServerResource.represent(): Returning multiple response types with the same url value");
+                            throw OAuthProblemException.OAuthError.UNSUPPORTED_RESPONSE_TYPE.handle(getRequest(),
                                     "Returning multiple response types with the same url value");
                         }
                         listOfTokens.put(classObj.URIParamValue(), token);
@@ -199,7 +199,7 @@ public class AuthorizeServerResource extends AbstractFlow {
                 } catch (Exception e){
                     OAuth2Utils.DEBUG.error("AuthorizeServerResource.represent(): Error invoking classes for response_type", e);
                     throw OAuthProblemException.OAuthError.UNSUPPORTED_RESPONSE_TYPE.handle(getRequest(),
-                            "Error invoking classes for response types");
+                            "Response type is not supported");
                 }
             }
 
