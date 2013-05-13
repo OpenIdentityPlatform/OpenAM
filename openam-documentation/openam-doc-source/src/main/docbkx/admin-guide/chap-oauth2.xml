@@ -20,7 +20,7 @@
   !
   ! CCPL HEADER END
   !
-  !      Copyright 2012-2013 ForgeRock AS
+  !      Copyright 2012-2013 ForgeRock, Inc.
   !    
 -->
 <chapter xml:id='chap-oauth2'
@@ -43,7 +43,7 @@
  framework. The chapter begins by showing where OpenAM fits into the OAuth 2.0
  authorization framework, and then shows how to configure the
  functionality.</para>
-
+ 
  <section xml:id="about-oauth2-support">
   <title>About OAuth 2.0 Support in OpenAM</title>
 
@@ -723,23 +723,18 @@
        </listitem>
       </varlistentry>
       <varlistentry>
-       <term>Account Mapper Configuration</term>
+<!--       <term>Attribute Mapper</term>
        <listitem>
-        <para>In this example, <literal>cn=cn</literal>.</para>
+        <para>In this example, 
+        <literal>org.forgerock.openam.authentication.modules.oauth2.DefaultAttributeMapper</literal>.</para>
        </listitem>
       </varlistentry>
       <varlistentry>
-       <term>Account Mapper Configuration</term>
+       <term>Attribute Mapper Configuration</term>
        <listitem>
         <para>In this example, <literal>cn=cn</literal>.</para>
        </listitem>
-      </varlistentry>
-      <varlistentry>
-       <term>Account Mapper Configuration</term>
-       <listitem>
-        <para>In this example, <literal>cn=cn</literal>.</para>
-       </listitem>
-      </varlistentry>
+      </varlistentry>  -->
       <varlistentry>
        <term>Create account if it does not exist</term>
        <listitem>
