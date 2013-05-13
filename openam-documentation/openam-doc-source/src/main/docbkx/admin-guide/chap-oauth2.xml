@@ -722,8 +722,8 @@
         additional subjects, or to update existing subjects.</para>
        </listitem>
       </varlistentry>
-      <varlistentry>
-<!--       <term>Attribute Mapper</term>
+<!--      <varlistentry>
+       <term>Attribute Mapper</term>
        <listitem>
         <para>In this example, 
         <literal>org.forgerock.openam.authentication.modules.oauth2.DefaultAttributeMapper</literal>.</para>
