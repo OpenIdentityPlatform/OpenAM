@@ -1941,8 +1941,11 @@ public class AccessManager {
         optionAliases={},
         macro="authentication",
         optionalOptions={
-            "serverurl|s|s|Server URL. e.g. http://www.example.com:58080/openam. This option is valid for J2EEAgent and WebAgent.",
-            "agenturl|g|s|Agent URL. e.g. http://www.agent.example:8080/agent. WebAgent does not take URL with path. e.g. http://www.agent.example:8080. This option is valid for J2EEAgent and WebAgent.",
+            "serverurl|s|s|Server URL. e.g. http://www.example.com:58080/openam. This option is valid for J2EEAgent and"
+                + " WebAgent. This parameter is required if the agent is created without datafile/attributes.",
+            "agenturl|g|s|Agent URL. e.g. http://www.agent.example:8080/agent. WebAgent does not take URL with path. "
+                + "e.g. http://www.agent.example:8080. This option is valid for J2EEAgent and WebAgent. This parameter "
+                + "is required if the agent is created without datafile/attributes.",
             "attributevalues|a|m|Properties e.g. sunIdentityServerDeviceKeyValue=https://agent.example.com:443/",
             "datafile|D|s|Name of file that contains properties."},
         resourceStrings={
@@ -1954,7 +1957,8 @@ public class AccessManager {
             "agent-url-invalid=Agent URL is invalid.",
             "does-not-support-agent-creation={0} did not support agent creation.",
             "agent-creation-pwd-needed=An agent password is required when you create the agent configuration. Either datafile or attributevalues must include a value for the userpassword attribute.",
-            "create-agent-succeeded=Agent configuration was created."
+            "create-agent-succeeded=Agent configuration was created.",
+            "missing-urls=Server URL and Agent URL must be provided when attributes/datafile are not available."
         }
     )
     private String create_agent;

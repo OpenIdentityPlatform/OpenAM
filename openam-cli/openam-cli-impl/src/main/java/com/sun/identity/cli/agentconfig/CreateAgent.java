@@ -113,10 +113,15 @@ public class CreateAgent extends AuthenticatedCommand {
                     ExitCodes.REQUEST_CANNOT_BE_PROCESSED);
             }
         } else {
-            if (serverURL == null) {
+            if (agentURL != null && serverURL == null) {
                 throw new CLIException(getResourceString("server-url-missing"), ExitCodes.REQUEST_CANNOT_BE_PROCESSED);
-            } else if (agentURL == null) {
+            }
+            if (serverURL != null && agentURL == null) {
                 throw new CLIException(getResourceString("agent-url-missing"), ExitCodes.REQUEST_CANNOT_BE_PROCESSED);
+            }
+            if (serverURL == null && agentURL == null && attributeValues.size() == 1) {
+                //only the password is provided
+                throw new CLIException(getResourceString("missing-urls"), ExitCodes.REQUEST_CANNOT_BE_PROCESSED);
             }
         }
 
