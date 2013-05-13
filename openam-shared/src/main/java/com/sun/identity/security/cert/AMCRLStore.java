@@ -26,6 +26,10 @@
  *
  */
 
+/**
+ * Portions Copyrighted 2013 ForgeRock Inc
+ */
+
 package com.sun.identity.security.cert;
 
 import java.io.ByteArrayInputStream;
@@ -126,7 +130,15 @@ public class AMCRLStore extends AMCertStore {
      */
     public X509CRL getCRL(X509Certificate certificate) throws IOException  {
         LDAPEntry crlEntry = null;
-        X509CRL crl = (X509CRL) getCRLFromCache(certificate);
+        X509CRL crl = null;
+        
+        if (storeParam.isDoCRLCaching()) {
+            if (debug.messageEnabled()) {
+                debug.message("AMCRLStore.getCRL: Trying to get CRL from cache");
+            }
+            crl = (X509CRL) getCRLFromCache(certificate);
+        }
+        
     	LDAPConnection ldc = getConnection();
 
         try {
@@ -184,8 +196,14 @@ public class AMCRLStore extends AMCertStore {
 		}
 	        crl = tmpcrl;
  	    }
-		    
-	    updateCRLCache(certificate, crl);
+		
+            if (storeParam.isDoCRLCaching()) {
+                if (debug.messageEnabled()) {
+                    debug.message("AMCRLStore.getCRL: Updating CRL cache");
+                }
+                updateCRLCache(certificate, crl);
+            }
+            
         } catch (Exception e) {
             debug.error("AMCRLStore.getCRL: Error in getting CRL : ", e);
         } finally {

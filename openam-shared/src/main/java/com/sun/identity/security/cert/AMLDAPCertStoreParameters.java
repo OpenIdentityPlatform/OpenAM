@@ -26,6 +26,10 @@
  *
  */
 
+/**
+ * Portions Copyrighted 2013 ForgeRock Inc
+ */
+
 package com.sun.identity.security.cert;
 
 import com.sun.identity.shared.ldap.LDAPSocketFactory;
@@ -44,6 +48,7 @@ public class AMLDAPCertStoreParameters {
     private String uriParams = null;
     private LDAPSocketFactory sockFactory = null;
     static public final int ldap_version = 3;
+    private boolean doCRLCaching = true;
 
     /**
      * @param server
@@ -178,4 +183,20 @@ public class AMLDAPCertStoreParameters {
     public LDAPSocketFactory getSecureSocketFactory() {
         return sockFactory;
     }
+
+    /**
+     * @return the doCRLCaching
+     */
+    public boolean isDoCRLCaching() {
+        return doCRLCaching;
+    }
+
+    /**
+     * @param doCRLCaching the doCRLCaching to set
+     */
+    public void setDoCRLCaching(boolean doCRLCaching) {
+        this.doCRLCaching = doCRLCaching;
+    }
+    
+    
 }

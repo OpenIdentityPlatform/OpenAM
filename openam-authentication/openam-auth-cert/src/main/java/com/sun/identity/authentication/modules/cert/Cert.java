@@ -26,6 +26,10 @@
  *
  */
 
+/**
+ * Portions Copyrighted 2013 ForgeRock Inc
+ */
+
 package com.sun.identity.authentication.modules.cert;
 
 import java.io.ByteArrayInputStream;
@@ -150,6 +154,9 @@ public class Cert extends AMLoginModule {
     static String UPNOID = "1.3.6.1.4.1.311.20.2.3";
     static boolean usingJSSHandler = false;
     
+    private String amAuthCert_cacheCRL;
+    private boolean doCRLCaching = true;
+    
     static {
         String handler = SystemProperties.get(Constants.PROTOCOL_HANDLER,
             Constants.JSSE_HANDLER);
@@ -229,6 +236,12 @@ public class Cert extends AMLoginModule {
                 } else {
                     amAuthCert_chkAttributesCRL = trimItems(amAuthCert_chkAttrCRL.split(","));
                 }
+                amAuthCert_cacheCRL = CollectionHelper.getMapAttr(
+                        options, "openam-am-auth-cert-attr-cache-crl","true");
+                if (amAuthCert_cacheCRL.equalsIgnoreCase("false")) {
+                    doCRLCaching = false;
+                }
+                
                 crlEnabled = true;
             }
             amAuthCert_validateCA = CollectionHelper.getMapAttr(
@@ -354,6 +367,7 @@ public class Cert extends AMLoginModule {
                     "\n\tchkCRL=" + amAuthCert_chkCRL +
                     "\n\tchkAttrCRL=" + amAuthCert_chkAttrCRL +
                     "\n\tchkAttributesCRL=" + Arrays.toString(amAuthCert_chkAttributesCRL) +
+                    "\n\tcacheCRL=" + doCRLCaching +
                     "\n\tchkCertInLDAP=" + amAuthCert_chkCertInLDAP +
                     "\n\tchkAttrCertInLDAP=" + amAuthCert_chkAttrCertInLDAP +
                     "\n\temailAddr=" + amAuthCert_emailAddrTag +
@@ -584,6 +598,9 @@ public class Cert extends AMLoginModule {
                 ldapParam.setSecureSocketFactory
                     (SSLSocketFactoryManager.getSSLSocketFactory());
             }
+            
+            ldapParam.setDoCRLCaching(doCRLCaching);
+            
         } catch (Exception e) {
             debug.error("validate.SSLSocketFactory", e);
             setFailureID(userTokenId);

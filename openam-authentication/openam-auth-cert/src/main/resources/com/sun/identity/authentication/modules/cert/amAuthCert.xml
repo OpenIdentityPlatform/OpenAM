@@ -28,8 +28,9 @@
 
 -->
 <!--
-    Portions Copyrighted 2011 ForgeRock AS
+    Portions Copyrighted 2011-2013 ForgeRock AS
 -->
+
 <!DOCTYPE ServicesConfiguration
     PUBLIC "=//iPlanet//Service Management Services (SMS) 1.0 DTD//EN"
     "jar://com/sun/identity/sm/sms.dtd">
@@ -83,6 +84,14 @@
                         <Value>CN</Value>
                     </DefaultValues>
                 </AttributeSchema>
+                <AttributeSchema name="openam-am-auth-cert-attr-cache-crl"
+                    type="single"
+                    syntax="boolean"
+                    i18nKey="a1024">
+                    <DefaultValues>
+                        <Value>true</Value>
+                    </DefaultValues>
+                </AttributeSchema>                
                 <AttributeSchema name="iplanet-am-auth-cert-param-get-crl"
                     type="single"
                     syntax="string"
@@ -246,6 +255,14 @@
                             <Value>CN</Value>
                         </DefaultValues>
                     </AttributeSchema>
+                    <AttributeSchema name="openam-am-auth-cert-attr-cache-crl"
+                        type="single"
+                        syntax="boolean"
+                        i18nKey="a1024">
+                        <DefaultValues>
+                            <Value>true</Value>
+                        </DefaultValues>
+                    </AttributeSchema>                       
                     <AttributeSchema name="iplanet-am-auth-cert-param-get-crl"
                         type="single"
                         syntax="string"
