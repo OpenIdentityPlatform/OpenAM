@@ -1,7 +1,7 @@
 /**
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright (c) 2012 ForgeRock AS Inc. All Rights Reserved
+ * Copyright (c) 2012-2013 ForgeRock, Inc. All Rights Reserved
  *
  * The contents of this file are subject to the terms
  * of the Common Development and Distribution License
@@ -47,10 +47,10 @@ import com.sun.identity.shared.debug.Debug;
 
 import com.sun.identity.sm.ldap.CTSPersistentStore;
 import org.apache.commons.codec.DecoderException;
-import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.codec.binary.Hex;
 import org.forgerock.i18n.LocalizableMessage;
 import com.iplanet.dpro.session.exceptions.StoreException;
+import com.sun.identity.shared.encode.Base64;
 import org.forgerock.openam.session.ha.i18n.AmsessionstoreMessages;
 import org.forgerock.openam.session.model.AMRootEntity;
 import org.opends.server.protocols.ldap.LDAPAttribute;
@@ -155,8 +155,7 @@ public class AMRecordDataEntry {
         if (attributeValues.get(SERIALIZED_INTERNAL_SESSION_BLOB) != null) {
             Set<String> values = attributeValues.get(SERIALIZED_INTERNAL_SESSION_BLOB);
             for (String value : values) {
-                Base64 base64 = new Base64();
-                record.setSerializedInternalSessionBlob(base64.decode(value));
+                record.setSerializedInternalSessionBlob(Base64.decode(value));
             }
         }
 
@@ -281,8 +280,7 @@ public class AMRecordDataEntry {
 
         if (record.getSerializedInternalSessionBlob() != null) {
             set = new HashSet<String>();
-            Base64 base64 = new Base64();
-            set.add(base64.encodeAsString(record.getSerializedInternalSessionBlob()));
+            set.add(Base64.encode(record.getSerializedInternalSessionBlob()));
             attributeValues.put(SERIALIZED_INTERNAL_SESSION_BLOB, set);
         }
 
