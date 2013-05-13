@@ -54,11 +54,9 @@ import com.sun.identity.shared.ldap.LDAPModification;
 import com.sun.identity.shared.ldap.LDAPSearchResults;
 import com.sun.identity.shared.ldap.LDAPUrl;
 import sun.security.x509.CertificateExtensions;
-import sun.security.x509.Extension;
 import sun.security.x509.GeneralNames;
 import sun.security.x509.PKIXExtensions;
 import sun.security.x509.X509CertImpl;
-import sun.security.x509.X509CertInfo;
 
 import sun.security.x509.CRLDistributionPointsExtension;
 import sun.security.x509.DistributionPoint;
@@ -69,6 +67,7 @@ import com.iplanet.security.x509.X500Name;
 import com.sun.identity.shared.encode.URLEncDec;
 
 import com.sun.identity.common.HttpURLConnectionManager;
+import org.apache.commons.lang.ArrayUtils;
 
 /**
 * The class is used to manage crl store in LDAP server
@@ -106,6 +105,7 @@ public class AMCRLStore extends AMCertStore {
 
     // In memory CRL cache
     private static Hashtable cachedcrls = new Hashtable();
+
     private String mCrlAttrName = null;
 
     /**
@@ -688,54 +688,113 @@ public class AMCRLStore extends AMCertStore {
      * This dn entry has to have CRL in attribute certificaterevocationlist 
      * or certificaterevocationlist;binary.
      * 
+     * if attrNames does only contain one value the ldap search filter will be
+     * (attrName=Value_of_the_corresponding_Attribute_from_SubjectDN)
+     * e.g. SubjectDN of issuer cert 'C=BE, CN=Citizen CA, serialNumber=201007'
+     * attrNames is 'CN', search filter used will be (CN=Citizen CA)
+     * 
+     * if attrNames does contain serveral values the ldap search filter value will be
+     * a comma separated list of name attribute values, the search attribute will be 'cn'
+     * (cn="attrNames[0]=Value_of_the_corresponding_Attribute_from_SubjectDN,
+     * attrNames[1]=Value_of_the_corresponding_Attribute_from_SubjectDN")
+     * 
+     * e.g. SubjectDN of issuer cert 'C=BE, CN=Citizen CA, serialNumber=201007'
+     * attrNames is {"CN","serialNumber"}, search filter used will be
+         * (cn=CN=Citizen CA,serialNumber=201007)
+     * 
+     * The order of the values of attrNames matter as they must match the value of the
+     * 'cn' attribute of a crlDistributionPoint entry in the directory server
+     * 
      * @param ldapParam 
      * @param cert
-     * @param attrName 
+     * @param attrNames, attributes names from the subjectDN of the issuer cert
      */
     static public X509CRL getCRL(AMLDAPCertStoreParameters ldapParam, 
-                                 X509Certificate cert, String attrName) {
+                                 X509Certificate cert, String... attrNames) {
         X509CRL crl = null;
-	try {
-            /*
-             * Get the CN of the input certificate
-             */
-            String attrValue = null;
+        
+        try {
+        
+            if (!ArrayUtils.isEmpty(attrNames)) {
 
-            try {
-                X500Name dn = AMCRLStore.getIssuerDN(cert);
-                // Retrieve attribute value of the attribute name 
-                if (dn != null) {
-                    attrValue = dn.getAttributeValue(attrName);
+                X500Name dn = null;
+
+                try {
+                    dn = AMCRLStore.getIssuerDN(cert);
+                } catch (Exception ex) {
+                    if (debug.messageEnabled()) {
+                        debug.message("AMCRLStore:getCRL " 
+                            + "Certificate - getIssuerDN: ",ex);
+                    }
+                    return crl;
                 }
-            } catch (Exception ex) {
+
+                String searchFilter = null;
+
+                if (attrNames.length < 2) {
+                    /*
+                     * Get the CN of the input certificate
+                     */
+                    String attrValue = null;
+
+                    if (null != dn) {
+                        // Retrieve attribute value of the attribute name
+                        attrValue = dn.getAttributeValue(attrNames[0]);
+                    }
+
+                    if (null == attrValue) {
+                        return crl;
+                    }
+
+                    searchFilter = setSearchFilter(attrNames[0], attrValue);
+
+
+                } else {         
+
+                    String searchFilterValue = buildSearchFilterValue(attrNames, dn);
+
+                    if (searchFilterValue.isEmpty()) {
+                        return crl;
+                    }
+                    searchFilter = setSearchFilter("cn", searchFilterValue);
+                }
+
                 if (debug.messageEnabled()) {
-                    debug.message("AMCRLStore:getCRL " 
-                        + "Certificate - cn substring: " + ex); 
+                    debug.message("AMCRLStore:getCRL using searchFilter " + searchFilter);
                 }
-                return null;
+
+                /*
+                 * Lookup the certificate in the LDAP certificate directory
+                 */ 
+
+                ldapParam.setSearchFilter(searchFilter);
+
+                AMCRLStore store = new AMCRLStore(ldapParam);	        
+                crl = store.getCRL(cert);
             }
-
-            if (attrValue == null)
-                return null;
-
-            if (debug.messageEnabled()) {
-                debug.message("Certificate - cn substring: " + attrValue); 
-            }
-
-            /*
-             * Lookup the certificate in the LDAP certificate
-             * directory and compare the values.
-             */ 
-
-            String searchFilter = setSearchFilter(attrName, attrValue);
-	    ldapParam.setSearchFilter(searchFilter);
-		
-	    AMCRLStore store = new AMCRLStore(ldapParam);	        
-	    crl = store.getCRL(cert);
-	} catch (Exception e) {
-	    debug.error("AMCRLStore:getCRL " + e.toString());
-	}
+            
+        } catch (Exception e) {
+            debug.error("AMCRLStore:getCRL ",e);
+        }
 		
         return crl; 
     }
+    
+    private static String buildSearchFilterValue(String[] attrNames, X500Name dn) throws IOException {
+        StringBuilder searchFilterBuilder = new StringBuilder();
+        for (int i = 0; i < attrNames.length; i++) {
+            String attrName = attrNames[i];
+            String attrValue = dn.getAttributeValue(attrName);
+
+            if (null != attrValue) {
+                searchFilterBuilder.append(attrName);
+                searchFilterBuilder.append("=");
+                searchFilterBuilder.append(attrValue);
+                if (i < attrNames.length - 1) {
+                    searchFilterBuilder.append(",");
+                }
+            }
+        }
+        return searchFilterBuilder.toString();
+    }    
 }
