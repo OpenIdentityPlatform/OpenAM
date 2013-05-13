@@ -157,6 +157,11 @@ public class Cert extends AMLoginModule {
     private String amAuthCert_cacheCRL;
     private boolean doCRLCaching = true;
     
+    //attribute and flag to check whether CRLs should be updated from CRL distribution point
+    private String amAuthCert_updateCRL;
+    private boolean doCRLUpdate = true;
+    
+    
     static {
         String handler = SystemProperties.get(Constants.PROTOCOL_HANDLER,
             Constants.JSSE_HANDLER);
@@ -241,6 +246,11 @@ public class Cert extends AMLoginModule {
                 if (amAuthCert_cacheCRL.equalsIgnoreCase("false")) {
                     doCRLCaching = false;
                 }
+                amAuthCert_updateCRL = CollectionHelper.getMapAttr(
+                        options, "openam-am-auth-cert-update-crl", "true");
+                if (amAuthCert_updateCRL.equalsIgnoreCase("false")) {
+                    doCRLUpdate = false;
+                }               
                 
                 crlEnabled = true;
             }
@@ -368,6 +378,7 @@ public class Cert extends AMLoginModule {
                     "\n\tchkAttrCRL=" + amAuthCert_chkAttrCRL +
                     "\n\tchkAttributesCRL=" + Arrays.toString(amAuthCert_chkAttributesCRL) +
                     "\n\tcacheCRL=" + doCRLCaching +
+                    "\n\tupdateCRLs=" + doCRLUpdate +
                     "\n\tchkCertInLDAP=" + amAuthCert_chkCertInLDAP +
                     "\n\tchkAttrCertInLDAP=" + amAuthCert_chkAttrCertInLDAP +
                     "\n\temailAddr=" + amAuthCert_emailAddrTag +
@@ -600,6 +611,7 @@ public class Cert extends AMLoginModule {
             }
             
             ldapParam.setDoCRLCaching(doCRLCaching);
+            ldapParam.setDoCRLUpdate(doCRLUpdate);
             
         } catch (Exception e) {
             debug.error("validate.SSLSocketFactory", e);
@@ -945,6 +957,7 @@ public class Cert extends AMLoginModule {
         amAuthCert_chkAttrCertInLDAP = null;
         amAuthCert_emailAddrTag = null;
         portalGateways = null;
+        amAuthCert_updateCRL = null;
     }
     
     private String[] trimItems(String[] items) {

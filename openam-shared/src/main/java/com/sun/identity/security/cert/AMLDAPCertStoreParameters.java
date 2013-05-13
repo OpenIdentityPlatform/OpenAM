@@ -49,6 +49,7 @@ public class AMLDAPCertStoreParameters {
     private LDAPSocketFactory sockFactory = null;
     static public final int ldap_version = 3;
     private boolean doCRLCaching = true;
+    private boolean doCRLupdate = true;
 
     /**
      * @param server
@@ -198,5 +199,18 @@ public class AMLDAPCertStoreParameters {
         this.doCRLCaching = doCRLCaching;
     }
     
+    /**
+     * @return the doCRLupdate
+     */
+    public boolean isDoUpdateCRLs() {
+        return doCRLupdate;
+    }
+
+    /**
+     * @param doCRLupdate the doCRLupdate to set
+     */
+    public void setDoCRLUpdate(boolean doCRLupdate) {
+        this.doCRLupdate = doCRLupdate;
+    }    
     
 }

@@ -150,7 +150,7 @@ public class AMCRLStore extends AMCertStore {
 		crl = getCRLFromEntry(crlEntry);
 	    }
 
-            if (needCRLUpdate(crl)) {
+            if (storeParam.isDoUpdateCRLs() && needCRLUpdate(crl)) {
 	        if (debug.messageEnabled()) {
                     debug.message("AMCRLStore.getCRL: need CRL update");
                 }
