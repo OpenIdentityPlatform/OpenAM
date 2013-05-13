@@ -1154,7 +1154,7 @@
       <para>This connection pool is different than the SDK connection pool
       configured in <filename>serverconfig.xml</filename>.</para>
       <para><command>ssoadm</command> attributes:
-      <literal>iplanet-am-auth-ldap-connection-pool-size </literal>, and
+      <literal>iplanet-am-auth-ldap-connection-pool-size</literal>, and
       <literal>iplanet-am-auth-ldap-connection-pool-default-size</literal></para>
      </listitem>
     </varlistentry>
