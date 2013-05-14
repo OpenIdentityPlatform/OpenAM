@@ -272,12 +272,12 @@ $ ./agentadmin</screen>
    </step>
    <step>
     <para>Encrypt the password if you want additional security.</para>
+    <note>
+     <para>The new agent appears as <literal>agent_1</literal>. You can return
+     to this screen at any time by running <literal>/path/to/web_agents/varnish/bin/agentadmin</literal>
+     to remove it.</para>
+    </note>
    </step>
-   <note>
-    <para>The new agent appears as <literal>agent_1</literal>. You can return
-    to this screen at any time by running <literal>/path/to/web_agents/varnish/bin/agentadmin</literal> 
-    to remove it.</para>
-   </note>
    <step>
     <para>Exit the screen.</para>
    </step>
