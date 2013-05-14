@@ -323,7 +323,6 @@ Install log file location:
 Your client is not allowed to access the requested object.</literallayout>
     <para>If it appears the protection is inadequate, complete one of the 
     following steps.</para>
-   </step>
 
       <note>
        <para>A potential cause for the protection failing is updates to the 
@@ -376,7 +375,11 @@ Your client is not allowed to access the requested object.</literallayout>
  &lt;/Object&gt;</screen>
      </step>
     </stepalternatives>
-    <step>Save the file and restart the Sun Web Server</step>
+    </step>
+
+    <step>
+     <para>Save the file and restart the Sun Web Server.</para>
+    </step>
   </procedure>
 
 
