@@ -293,10 +293,103 @@
     <primary>Federation</primary>
     <secondary>Configuring</secondary>
    </indexterm>
+
    <para>When your organization acts as the identity provider, and you want
    quickly to enable service providers to federate their services with yours,
    you can provide them with a <firstterm>fedlet</firstterm>. A fedlet is
-   a small web application </para>
+   a small Java or .NET web application that can act as a service provider for
+   a specific identity provider without requiring that you install all of
+   OpenAM.</para>
+
+   <para>Fedlets support the following SAML 2.0 features.</para>
+
+   <table>
+    <title>Fedlet Support for SAML 2.0 Features</title>
+    <tgroup cols="3">
+     <colspec colnum="1" colwidth="4*"/>
+     <colspec colnum="2" colwidth="1*"/>
+     <colspec colnum="3" colwidth="1*"/>
+     <thead>
+      <row>
+       <entry>SAML 2.0 Feature</entry>
+       <entry>Java Fedlet</entry>
+       <entry>.NET Fedlet</entry>
+      </row>
+     </thead>
+     <tbody>
+      <row>
+       <entry>IDP &amp; SP-initiated Single Sign-On (HTTP Artifact)</entry>
+       <entry>Supported</entry>
+       <entry>Supported</entry>
+      </row>
+      <row>
+       <entry>IDP &amp; SP-initiated Single Sign-On (HTTP POST)</entry>
+       <entry>Supported</entry>
+       <entry>Supported</entry>
+      </row>
+      <row>
+       <entry>IDP &amp; SP-initiated Single Logout (HTTP POST)</entry>
+       <entry>Supported</entry>
+       <entry>Supported</entry>
+      </row>
+      <row>
+       <entry>IDP &amp; SP-initiated Single Logout (HTTP Redirect)</entry>
+       <entry>Supported</entry>
+       <entry>Supported</entry>
+      </row>
+      <row>
+       <entry>Sign Requests &amp; Responses</entry>
+       <entry>Supported</entry>
+       <entry>Supported</entry>
+      </row>
+      <row>
+       <entry>Encrypt Assertion, Attribute, &amp; NameID Elements</entry>
+       <entry>Supported</entry>
+       <entry>Supported</entry>
+      </row>
+      <row>
+       <entry>Export SP Metadata</entry>
+       <entry>Supported</entry>
+       <entry>Supported</entry>
+      </row>
+      <row>
+       <entry>Attribute Queries</entry>
+       <entry>Supported</entry>
+       <entry>Supported</entry>
+      </row>
+      <row>
+       <entry>XACML Requests</entry>
+       <entry>Supported</entry>
+       <entry>Not supported</entry>
+      </row>
+      <row>
+       <entry>Multiple IDPs</entry>
+       <entry>Supported</entry>
+       <entry>Supported</entry>
+      </row>
+      <row>
+       <entry>External IDP Discovery Service</entry>
+       <entry>Supported</entry>
+       <entry>Supported</entry>
+      </row>
+      <row>
+       <entry>Bundled IDP Reader Service for Discovery</entry>
+       <entry>Supported</entry>
+       <entry>Not supported</entry>
+      </row>
+     </tbody>
+    </tgroup>
+   </table>
+
+   <para>For more information on using fedlets, see <link xlink:show="new"
+   xlink:href="dev-guide#chap-fedlet-java"><citetitle>Using Fedlets in Java Web
+   Applications</citetitle></link> and <link xlink:show="new"
+   xlink:href="dev-guide#chap-fedlet-java"><citetitle>Using Fedlets in .NET
+   Applications</citetitle></link> in the <citetitle>Developer's
+   Guide</citetitle>.</para>
+
+   <para>The following procedure describes how to create a Java Fedlet.</para>
+
    <step performance="optional">
     <para>If you have not done so already, set up your identity provider.</para>
    </step>
