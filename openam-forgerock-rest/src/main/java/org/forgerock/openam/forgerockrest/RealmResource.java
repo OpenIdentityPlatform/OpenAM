@@ -129,7 +129,7 @@ public final class RealmResource implements CollectionResourceProvider {
             realm = jVal.get("realm").asString();
 
             if (realm == null || realm.isEmpty()) {
-                handler.handleError(new BadRequestException("No realm name provided."));
+                throw new BadRequestException("No realm name provided.");
             } else if (!realm.startsWith("/")) {
                 realm = "/" + realm;
             }
@@ -181,6 +181,10 @@ public final class RealmResource implements CollectionResourceProvider {
             } catch (Exception e) {
                 handler.handleError(new BadRequestException(e.getMessage(), e));
             }
+        } catch (BadRequestException be){
+            RestDispatcher.debug.error("RealmResource.createInstance()" + "Cannot CREATE "
+                    + realm + ":" + be);
+            handler.handleError(be);
         } catch (PermanentException pe) {
             RestDispatcher.debug.error("RealmResource.createInstance()" + "Cannot CREATE "
                     + realm + ":" + pe);
@@ -585,20 +589,22 @@ public final class RealmResource implements CollectionResourceProvider {
             // The initial attempt to UPDATE a realm,
             // if the realm does not exist it must be created
             ocm = new OrganizationConfigManager(getSSOToken(), realm);
-
             List newServiceNames = null;
             // update ID_REPO attributes
             updateConfiguredServices(ocm, createServicesMap(realmDetails));
             newServiceNames = realmDetails.get(SERVICE_NAMES).asList();
-            if (newServiceNames != null && !newServiceNames.isEmpty()) {
+            if (newServiceNames == null || newServiceNames.isEmpty()) {
+                RestDispatcher.debug.error("RealmResource.updateInstance()" + "No Services defined.");
+                handler.handleError(new BadRequestException("No services have been defined."));
+            } else {
                 assignServices(ocm, newServiceNames); //assign services to realm
-            }
-            // READ THE REALM
-            realmCreatedOcm = new OrganizationConfigManager(getSSOToken(), realm);
-            // create a resource for handler to return
-            resource = new Resource(realm, "0", createJsonMessage("realmUpdated",
+                // READ THE REALM
+                realmCreatedOcm = new OrganizationConfigManager(getSSOToken(), realm);
+                // create a resource for handler to return
+                resource = new Resource(realm, "0", createJsonMessage("realmUpdated",
                     realmCreatedOcm.getOrganizationName()));
-            handler.handleResult(resource);
+                handler.handleResult(resource);
+            }
         } catch (SMSException e) {
             try {
                 configureErrorMessage(e);
