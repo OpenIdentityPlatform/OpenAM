@@ -27,7 +27,7 @@
 
 -->
 <!--
-    Portions Copyrighted 2012 ForgeRock Inc
+    Portions Copyrighted 2012-2013 ForgeRock Inc
     Portions Copyrighted 2012 Nomura Research Institute, Ltd
 -->
 
@@ -37,18 +37,18 @@
 
 <ModuleProperties moduleName="HOTP" version="1.0" >
     <Callbacks length="0" order="1" timeout="120" header="#WILL NOT BE SHOWN#" />
-    <Callbacks length="2" order="2" timeout="120" header="This server uses HOTP authentication" >
+    <Callbacks length="2" order="2" timeout="120" header="Please enter your One Time Password, or request a new one" >
         <PasswordCallback echoPassword="false" >
-            <Prompt> Enter OTP Code: </Prompt>
+            <Prompt> Enter OTP </Prompt>
         </PasswordCallback>
         <ConfirmationCallback>
             <OptionValues>
                 <OptionValue>
-                    <Value> Submit OTP Code </Value>
+                    <Value> Submit OTP </Value>
 
                 </OptionValue>
                 <OptionValue>
-                    <Value> Request OTP Code </Value>
+                    <Value> Request OTP </Value>
                 </OptionValue>
              </OptionValues>
         </ConfirmationCallback>
