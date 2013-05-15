@@ -3271,8 +3271,8 @@ com.sun.identity.agents.config.cdsso.cookie.domain[1]=.example.net</literallayou
      <listitem>
       <para>When enabled, allow programmatic authentication with the JBoss
       container using the WebAuthentication feature. This feature works only with
-      JBoss 4.2.2 to 7 when the <literal>J2EE_POLICY/ALL</literal> filter mode
-      is in use.</para>
+      JBoss 4.2.2 to 7 when the <literal>J2EE_POLICY</literal> or
+      <literal>ALL</literal> filter mode is in use.</para>
       <para>Property: <literal>com.sun.identity.agents.config.jboss.webauth.available</literal></para>
      </listitem>
     </varlistentry>
