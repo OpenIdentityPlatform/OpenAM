@@ -27,7 +27,7 @@
  */
 
  /*
- * Portions Copyrighted [2010] [ForgeRock AS]
+ * Portions Copyrighted 2010-2013 ForgeRock Inc
  */
 
 package com.sun.identity.saml2.profile;
@@ -1296,7 +1296,59 @@ public class AttributeQueryUtil {
     /**
      * Sends the AttributeQuery to specifiied attribute authority, 
      * validates the response and returns the attribute map
-     * <code>Map</code> to the Fedlet
+     * <code>Map<String, String></code> to the Fedlet
+     *
+     * @param spEntityID SP entity ID
+     * @param idpEntityID IDP entity ID
+     * @param nameIDValue  NameID value 
+     * @param attrsList The list of attributes whose values needs to be 
+     *                  fetched from IDP
+     * @param attrQueryProfileAlias  Attribute Query Profile Alias
+     * @param subjectDN  Attribute name which contains X.509 subject DN
+     *
+     * @return the <code>Map</code> object
+     * @exception SAML2Exception if the operation is not successful
+     *
+     * @deprecated Use #getAttributesForFedlet(String, String, String, List, String, String)
+     */
+    public static Map<String, String> getAttributeMapForFedlet(String spEntityID,
+                                               String idpEntityID,
+                                               String nameIDValue,
+                                               List attrsList,
+                                               String attrQueryProfileAlias,
+                                               String subjectDN)
+                                               throws SAML2Exception {
+    	Map<String, Set<String>> attrMap = getAttributesForFedlet(spEntityID,
+    			idpEntityID,
+    			nameIDValue,
+    			attrsList,
+    			attrQueryProfileAlias,
+    			subjectDN);
+    	
+    	Map<String, String> newAttrMap = new HashMap<String, String>(); 
+    	for (Map.Entry<String, Set<String>> entry : attrMap.entrySet()) {
+    		String attrName = entry.getKey();
+    		Set<String> attrValue = entry.getValue();
+    		StringBuilder pipedValue = new StringBuilder();
+    		for(String value : attrValue) {
+    			// Multiple attribute values
+    			// are seperated with "|"
+    			if (pipedValue.length() > 0 ) {
+    				pipedValue.append('|');
+    			}
+    			pipedValue.append(value);
+    		}
+    		newAttrMap.put(attrName, pipedValue.toString());
+    		
+    	}
+    	
+    	return newAttrMap;
+    }
+    
+    /**
+     * Sends the AttributeQuery to specifiied attribute authority, 
+     * validates the response and returns the attribute map
+     * <code>Map<String, Set<String>></code> to the Fedlet
      *
      * @param spEntityID SP entity ID
      * @param idpEntityID IDP entity ID
@@ -1311,7 +1363,7 @@ public class AttributeQueryUtil {
      *
      * @supported.api
      */
-    public static Map getAttributeMapForFedlet(String spEntityID,
+    public static Map<String, Set<String>> getAttributesForFedlet(String spEntityID,
                                                String idpEntityID,
                                                String nameIDValue,
                                                List attrsList,
@@ -1372,7 +1424,7 @@ public class AttributeQueryUtil {
         boolean validResp = validateSAMLResponseForFedlet(samlResp, 
                                                           spEntityID,
                                                           wantNameIDEncrypted);
-        Map attrMap = new HashMap();
+        Map<String, Set<String>> attrMap = new HashMap();
         if (validResp) {
             // Return back the AttributeMap
             if (samlResp != null) {
@@ -1409,22 +1461,15 @@ public class AttributeQueryUtil {
                                         String attrName = attr.getName();
                                         List attrValueList =
                                             attr.getAttributeValueString();
-                                        StringBuffer attrValue =
-                                                     new StringBuffer();
+                                        Set<String> attrValue = new HashSet(); 
                                         for (Iterator attrValueIter =
                                              attrValueList.iterator();
                                              attrValueIter.hasNext(); ) {
-                                            // Multiple attribute values
-                                            // are seperated with "|"
-                                            if (attrValue.length() > 0) {
-                                                attrValue.append('|');
-                                            }
                                             String value =
                                                 (String)attrValueIter.next();
-                                            attrValue.append(value);
+                                            attrValue.add(value);
                                         }
-                                        attrMap.put(attrName,
-                                                    attrValue.toString());
+                                        attrMap.put(attrName,attrValue);
                                     }
                                 } else {
                                     if (SAML2Utils.debug.messageEnabled()) {
