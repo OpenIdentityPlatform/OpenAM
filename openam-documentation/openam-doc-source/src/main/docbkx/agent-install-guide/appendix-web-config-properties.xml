@@ -715,6 +715,20 @@ com.sun.identity.agents.config.cdsso.cookie.domain[1]=.example.net</literallayou
      SSO.</para>
     </listitem>
    </varlistentry>
+
+   <varlistentry>
+    <term><literal>com.sun.identity.agents.config.change.notification.enable</literal></term>
+    <listitem>
+     <para>Enables agent to receive notification messages from OpenAM server
+     for configuration changes.</para>
+
+     <para>For centralized configurations this property is configured under
+     Access Control &gt; <replaceable>Realm Name</replaceable> &gt; Agents &gt;
+     Web &gt; <replaceable>Agent Name</replaceable> &gt; Global &gt;
+     Profile.</para>
+    </listitem>
+   </varlistentry>
+
    <varlistentry>
     <term><literal>com.sun.identity.agents.config.cleanup.interval</literal></term>
     <listitem>
@@ -1523,6 +1537,25 @@ com.sun.identity.agents.config.notenforced.url[1]= \
      property sets the name and value of the sticky cookie to use.</para>
     </listitem>
    </varlistentry>
+
+   <varlistentry>
+    <term><literal>com.sun.identity.agents.config.postdata.preserve.stickysession.mode</literal></term>
+    <listitem>
+     <para>Specifies whether to create a cookie, or to append a query string to
+      the URL to assist with sticky load balancing.</para>
+    </listitem>
+   </varlistentry>
+
+   <varlistentry>
+    <term><literal>com.sun.identity.agents.config.postdata.preserve.stickysession.value</literal></term>
+    <listitem>
+     <para>Specifies the key-value pair for stickysession mode. For example,
+     a setting of <literal>lb=myserver</literal> either sets an
+     <literal>lb</literal> cookie with <literal>myserver</literal> value, or
+     adds <literal>lb=myserver</literal> to the URL query string.</para>
+    </listitem>
+   </varlistentry>
+
    <varlistentry>
     <term><literal>com.sun.identity.agents.config.profile.attribute.cookie.maxage</literal></term>
     <listitem>

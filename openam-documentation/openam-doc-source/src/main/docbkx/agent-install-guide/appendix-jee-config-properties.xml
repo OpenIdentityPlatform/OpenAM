@@ -431,6 +431,20 @@
      Skew.</para>
     </listitem>
    </varlistentry>
+
+   <varlistentry>
+    <term><literal>com.sun.identity.agents.config.cdsso.domain</literal></term>
+    <listitem>
+     <para>List of domains, such as <literal>.example.com</literal>, in which
+     cookies have to be set in CDSSO.</para>
+
+     <para>For centralized configurations this property is configured under
+     Access Control &gt; <replaceable>Realm Name</replaceable> &gt; Agents &gt;
+     J2EE &gt; <replaceable>Agent Name</replaceable> &gt; SSO &gt; Cross Domain
+     SSO.</para>
+    </listitem>
+   </varlistentry>
+
    <varlistentry>
     <term><literal>com.sun.identity.agents.config.cdsso.enable</literal></term>
     <listitem>
@@ -451,6 +465,20 @@
      Redirect URI.</para>
     </listitem>
    </varlistentry>
+
+   <varlistentry>
+    <term><literal>com.sun.identity.agents.config.cdsso.secure.enable</literal></term>
+    <listitem>
+     <para>When enabled, the agent marks the SSO Token cookie as secure, thus
+     the cookie is only transmitted over secure connections.</para>
+
+     <para>For centralized configurations this property is configured under
+     Access Control &gt; <replaceable>Realm Name</replaceable> &gt; Agents &gt;
+     J2EE &gt; <replaceable>Agent Name</replaceable> &gt; SSO &gt; Cross Domain
+     SSO.</para>
+    </listitem>
+   </varlistentry>
+
    <varlistentry>
     <term><literal>com.sun.identity.agents.config.cdsso.trusted.id.provider</literal></term>
     <listitem>
@@ -462,6 +490,20 @@
      Trusted ID Provider.</para>
     </listitem>
    </varlistentry>
+
+   <varlistentry>
+    <term><literal>com.sun.identity.agents.config.change.notification.enable</literal></term>
+    <listitem>
+     <para>Enable agent to receive notification messages from OpenAM server for
+     configuration changes.</para>
+
+     <para>For centralized configurations this property is configured under
+     Access Control &gt; <replaceable>Realm Name</replaceable> &gt; Agents &gt;
+     J2EE &gt; <replaceable>Agent Name</replaceable> &gt; Global &gt;
+     Profile.</para>
+    </listitem>
+   </varlistentry>
+
    <varlistentry>
     <term><literal>com.sun.identity.agents.config.client.hostname.header</literal></term>
     <listitem>
@@ -675,6 +717,22 @@
      Ignore Path Info in Request URL.</para>
     </listitem>
    </varlistentry>
+
+   <varlistentry>
+    <term><literal>com.sun.identity.agents.config.jboss.webauth.available</literal></term>
+    <listitem>
+     <para>When enabled, allow programmatic authentication with the JBoss
+     container using the WebAuthentication feature. This feature works only with
+     JBoss 4.2.2 to 7 when the <literal>J2EE_POLICY/ALL</literal> filter mode
+     is in use.</para>
+
+     <para>For centralized configurations this property is configured under
+     Access Control &gt; <replaceable>Realm Name</replaceable> &gt; Agents &gt;
+     J2EE &gt; <replaceable>Agent Name</replaceable> &gt; Advanced &gt;
+     JBoss Application Server.</para>
+    </listitem>
+   </varlistentry>
+
    <varlistentry>
     <term><literal>com.sun.identity.agents.config.legacy.redirect.uri</literal></term>
     <listitem>
@@ -1144,6 +1202,21 @@
      Not Enforced URIs.</para>
     </listitem>
    </varlistentry>
+
+   <varlistentry>
+    <term><literal>com.sun.identity.agents.config.policy.advice.use.redirect</literal></term>
+    <listitem>
+     <para>When enabled, the remote policy client is configured to use
+     HTTP-Redirect instead of HTTP-POST for composite advice.</para>
+
+     <para>For centralized configurations this property is configured under
+     Access Control &gt; <replaceable>Realm Name</replaceable> &gt; Agents &gt;
+     J2EE &gt; <replaceable>Agent Name</replaceable> &gt; OpenAM Services &gt;
+     Policy Client Service.</para>
+    </listitem>
+   </varlistentry>
+
+
    <varlistentry>
     <term><literal>com.sun.identity.agents.config.policy.env.get.param</literal></term>
     <listitem>
@@ -1214,6 +1287,76 @@
      Port Check Setting.</para>
     </listitem>
    </varlistentry>
+
+   <varlistentry>
+    <term><literal>com.sun.identity.agents.config.postdata.preserve.cache.entry.ttl</literal></term>
+    <listitem>
+     <para>POST data storage lifetime in milliseconds. Default: 300000.</para>
+
+     <para>For centralized configurations this property is configured under
+     Access Control &gt; <replaceable>Realm Name</replaceable> &gt; Agents &gt;
+     J2EE &gt; <replaceable>Agent Name</replaceable> &gt; Advanced &gt;
+     Post Data Preservation.</para>
+    </listitem>
+   </varlistentry>
+
+   <varlistentry>
+    <term><literal>com.sun.identity.agents.config.postdata.preserve.cache.noentry.url</literal></term>
+    <listitem>
+     <para>Specifies a list of application-specific URIs if the referenced
+      Post Data Preservation entry cannot be found in the local cache because
+      it has exceeded its POST entry TTL. Either the agent redirects to a
+      URI in this list, or it shows an HTTP 403 Forbidden error.</para>
+
+     <para>For centralized configurations this property is configured under
+     Access Control &gt; <replaceable>Realm Name</replaceable> &gt; Agents &gt;
+     J2EE &gt; <replaceable>Agent Name</replaceable> &gt; Advanced &gt;
+     Post Data Preservation.</para>
+    </listitem>
+   </varlistentry>
+
+   <varlistentry>
+    <term><literal>com.sun.identity.agents.config.postdata.preserve.enable</literal></term>
+    <listitem>
+     <para>Enables HTTP POST data preservation, storing POST data before
+      redirecting the browser to the login screen, and then autosubmitting
+      the same POST after successful authentication to the original URL.</para>
+
+     <para>For centralized configurations this property is configured under
+     Access Control &gt; <replaceable>Realm Name</replaceable> &gt; Agents &gt;
+     J2EE &gt; <replaceable>Agent Name</replaceable> &gt; Advanced &gt;
+     Post Data Preservation.</para>
+    </listitem>
+   </varlistentry>
+
+   <varlistentry>
+    <term><literal>com.sun.identity.agents.config.postdata.preserve.stickysession.mode</literal></term>
+    <listitem>
+     <para>Specifies whether to create a cookie, or to append a query string to
+      the URL to assist with sticky load balancing.</para>
+
+     <para>For centralized configurations this property is configured under
+     Access Control &gt; <replaceable>Realm Name</replaceable> &gt; Agents &gt;
+     J2EE &gt; <replaceable>Agent Name</replaceable> &gt; Advanced &gt;
+     Post Data Preservation.</para>
+    </listitem>
+   </varlistentry>
+
+   <varlistentry>
+    <term><literal>com.sun.identity.agents.config.postdata.preserve.stickysession.value</literal></term>
+    <listitem>
+     <para>Specifies the key-value pair for stickysession mode. For example,
+      a setting of <literal>lb=myserver</literal> either sets an
+      <literal>lb</literal> cookie with <literal>myserver</literal> value, or
+      adds <literal>lb=myserver</literal> to the URL query string.</para>
+
+     <para>For centralized configurations this property is configured under
+     Access Control &gt; <replaceable>Realm Name</replaceable> &gt; Agents &gt;
+     J2EE &gt; <replaceable>Agent Name</replaceable> &gt; Advanced &gt;
+     Post Data Preservation.</para>
+    </listitem>
+   </varlistentry>
+
    <varlistentry>
     <term><literal>com.sun.identity.agents.config.privileged.attribute.mapping.enable</literal></term>
     <listitem>
@@ -1584,6 +1727,37 @@
      Web Service Response Processor.</para>
     </listitem>
    </varlistentry>
+
+   <varlistentry>
+    <term><literal>com.sun.identity.agents.config.xss.code.elements</literal></term>
+    <listitem>
+     <para>Specifies strings that, when found in the request, cause the agent
+     to redirect the client to an error page.</para>
+
+     <para>For centralized configurations this property is configured under
+     Access Control &gt; <replaceable>Realm Name</replaceable> &gt; Agents &gt;
+     J2EE &gt; <replaceable>Agent Name</replaceable> &gt; Advanced &gt;
+     Cross Site Scripting Detection.</para>
+    </listitem>
+   </varlistentry>
+
+   <varlistentry>
+    <term><literal>com.sun.identity.agents.config.xss.redirect.uri</literal></term>
+    <listitem>
+     <para>Maps applications to URIs of customized pages to which to redirect
+     clients upon detection of XSS code elements.</para>
+
+     <para>For example, to redirect clients of MyApp to
+     <literal>/myapp/error.html</literal>, use MyApp as the key and
+     <literal>/myapp/error.html</literal> as the corresponding value.</para>
+
+     <para>For centralized configurations this property is configured under
+     Access Control &gt; <replaceable>Realm Name</replaceable> &gt; Agents &gt;
+     J2EE &gt; <replaceable>Agent Name</replaceable> &gt; Advanced &gt;
+     Cross Site Scripting Detection.</para>
+    </listitem>
+   </varlistentry>
+
    <varlistentry>
     <term><literal>com.sun.identity.agents.notification.enabled</literal></term>
     <listitem>

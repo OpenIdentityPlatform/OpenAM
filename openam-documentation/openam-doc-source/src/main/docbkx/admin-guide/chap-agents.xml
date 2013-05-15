@@ -1582,6 +1582,33 @@ com.sun.identity.agents.config.cdsso.cookie.domain[1]=.example.net</literallayou
       <para>Property: <literal>com.sun.identity.agents.config.postdata.preserve.lbcookie</literal></para>
      </listitem>
     </varlistentry>
+
+    <varlistentry>
+     <term>Post Data Preservation URI Prefix (Not yet in OpenAM Console)</term>
+     <listitem>
+      <para>If you run multiple web servers with policy agents behind a load
+      balancer that directs traffic based on the request URI, and you need to
+      preserve POST data, then set this property.</para>
+
+      <para>By default, policy agents use a dummy URL for POST data preservation,
+      <literal>http://<replaceable>agent.host</replaceable>:<replaceable
+      >port</replaceable>/dummypost/sunpostpreserve</literal>,
+      to handle POST data across redirects to and from OpenAM. When you set this
+      property, the policy agent prefixes the property value to the dummy URL
+      path. In other words, when you set
+      <literal>com.forgerock.agents.config.pdpuri.prefix = app1</literal>,
+      the policy agent uses the dummy URL,
+      <literal>http://<replaceable>agent.host</replaceable>:<replaceable
+      >port</replaceable>/app1/dummypost/sunpostpreserve</literal>.</para>
+
+      <para>Next, use the prefix you set when you define load balancer URI
+      rules. This ensures that clients end up being redirected to the policy
+      agent that preserved the POST data.</para>
+
+      <para>Property: <literal>com.forgerock.agents.config.pdpuri.prefix</literal></para>
+     </listitem>
+    </varlistentry>
+
    </variablelist>
    
    <variablelist xml:id="web-agent-sjsws-properties">
@@ -2856,7 +2883,7 @@ com.sun.identity.agents.config.cdsso.cookie.domain[1]=.example.net</literallayou
       <para>Time in seconds used adjust time difference between agent system
       and OpenAM. Clock skew in seconds = AgentTime - OpenAMServerTime.</para>
       <para>Default: 10.</para>
-      <para>Property: <literal>com.sun.identity.agents.config.policy.clockSkew</literal></para>
+      <para>Property: <literal>com.sun.identity.policy.client.clockSkew</literal></para>
       <para>Hot swap: no</para>
      </listitem>
     </varlistentry>
@@ -3243,7 +3270,9 @@ com.sun.identity.agents.config.cdsso.cookie.domain[1]=.example.net</literallayou
      <term>WebAuthentication Available</term>
      <listitem>
       <para>When enabled, allow programmatic authentication with the JBoss
-      container using the WebAuthentication feature.</para>
+      container using the WebAuthentication feature. This feature works only with
+      JBoss 4.2.2 to 7 when the <literal>J2EE_POLICY/ALL</literal> filter mode
+      is in use.</para>
       <para>Property: <literal>com.sun.identity.agents.config.jboss.webauth.available</literal></para>
      </listitem>
     </varlistentry>
