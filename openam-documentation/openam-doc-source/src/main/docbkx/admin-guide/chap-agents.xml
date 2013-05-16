@@ -2709,12 +2709,12 @@ com.sun.identity.agents.config.cdsso.cookie.domain[1]=.example.net</literallayou
       FQDN check. Otherwise, the policy agent redirects the user-agent to the
       first URL in the list.</para>
 
-      <para>Property: <literal>com.forgerock.agents.conditional.login.url</literal></para>
+      <para>Property: <literal>com.sun.identity.agents.config.conditional.login.url</literal></para>
 
-      <para>Examples: <literal>com.forgerock.agents.conditional.login.url[0]=
+      <para>Examples: <literal>com.sun.identity.agents.config.conditional.login.url[0]=
       login.example.com/|http://openam1.example.com/openam/UI/Login,
       http://openam2.example.com/openam/UI/Login</literal>,
-      <literal>com.forgerock.agents.conditional.login.url[1]=
+      <literal>com.sun.identity.agents.config.conditional.login.url[1]=
       login.example.com|http://openam3.example.com/openam/UI/Login,
       http://openam4.example.com/openam/UI/Login</literal></para>
      </listitem>
