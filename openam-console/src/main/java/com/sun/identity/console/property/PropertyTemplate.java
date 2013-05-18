@@ -27,7 +27,7 @@
  */
 
 /*
- * Portions Copyrighted 2011 ForgeRock AS
+ * Portions Copyrighted 2011-2013 ForgeRock, Inc.
  */
 
 package com.sun.identity.console.property;
@@ -78,7 +78,7 @@ public interface PropertyTemplate {
                                                                                 
     String PWD_CONFIRM_SUFFIX = "_confirm";
 
-    String DEFINITION = "<?xml version=\"1.0\" encoding=\"{0}\" ?>\n" + 
+    String DEFINITION = "<?xml version=\"1.0\" encoding=\"UTF-8\" ?>\n" +
         "<!DOCTYPE propertysheet SYSTEM \"propertysheet.dtd\">\n";
     String START_TAG = "<propertysheet>\n";
     String END_TAG = "</propertysheet>\n";

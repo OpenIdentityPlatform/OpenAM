@@ -58,6 +58,7 @@ import java.io.InputStream;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.nio.charset.Charset;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -124,7 +125,7 @@ public class AMPropertySheetModel
     }
 
     public AMPropertySheetModel(String name) {
-        setDocument(new ByteArrayInputStream(name.getBytes()));
+        setDocument(new ByteArrayInputStream(name.getBytes(Charset.forName(UTF_8))));
     }
 
     public AMPropertySheetModel(ServletContext sc, String file) {
@@ -139,7 +140,7 @@ public class AMPropertySheetModel
         try {
             String strXML = toString(is);
             strXML = extractAddRemoveOptions(strXML);
-            is = new ByteArrayInputStream(strXML.getBytes());
+            is = new ByteArrayInputStream(strXML.getBytes(Charset.forName(UTF_8)));
         } catch (IOException e) {
             AMModelBase.debug.error("AMPropertySheetModel.setDocument", e);
         }
@@ -458,7 +459,7 @@ public class AMPropertySheetModel
         String content = null;
 
         try {
-            rawReader = new BufferedReader(new InputStreamReader(is));
+            rawReader = new BufferedReader(new InputStreamReader(is, Charset.forName(UTF_8)));
             StringBuffer buff = new StringBuffer();
             String line = null;
 

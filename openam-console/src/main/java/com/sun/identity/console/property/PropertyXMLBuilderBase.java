@@ -27,7 +27,7 @@
  */
 
 /*
- * Portions Copyrighted 2011 ForgeRock AS
+ * Portions Copyrighted 2011-2013 ForgeRock, Inc.
  */
 
 package com.sun.identity.console.property;
@@ -70,10 +70,8 @@ public abstract class PropertyXMLBuilderBase
     protected static Map mapUITypeToName = new HashMap(8);
     protected static Map mapTypeToName = new HashMap(8);
     protected static Map mapSyntaxToName = new HashMap(20);
-    private static String platformDefaultEncoding;
 
     static {
-        getDefaultEncoding();
         mapSchemaTypeToName.put(SchemaType.GLOBAL, "schemaType.global");
         mapSchemaTypeToName.put(SchemaType.ORGANIZATION,
             "schemaType.organization");
@@ -1131,14 +1129,7 @@ public abstract class PropertyXMLBuilderBase
             as.getValidator().equals("RequiredValueValidator"));
     }
 
-    private static void getDefaultEncoding() {
-        platformDefaultEncoding = "UTF-8";
-        // The JVM Should specify "file.encoding=utf-8" for proper encoding.
-        // java.nio.charset.Charset.defaultCharset().toString();
-    }
-
     public static String getXMLDefinitionHeader() {
-        Object[] param = {platformDefaultEncoding};
-        return MessageFormat.format(PropertyTemplate.DEFINITION, param);
+        return PropertyTemplate.DEFINITION;
     }
 }
