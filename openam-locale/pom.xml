@@ -72,7 +72,7 @@
                         <phase>validate</phase>
                         <configuration>
                             <target>
-
+                                <property name="build.class.path" refid="maven.compile.classpath" />
                                 <property name="locale.resources" value="${project.basedir}/src/main/resources" />
 
                                 <property
@@ -145,7 +145,7 @@
 
                                 <java classname="com.sun.identity.tools.nightly.MergeSDKProperties"
                                       fork="true" failOnError="true"
-                                      classpath="${project.basedir}/../openam-tools/openam-build-tools/target/openam-build-tools-${project.version}.jar:${build.class.path}">
+                                      classpath="${build.class.path}">
                                     <arg value="${locale.resources.i18n.dir}"/>
                                     <arg value="${locale.target.resources.dir}"/>
                                 </java>
