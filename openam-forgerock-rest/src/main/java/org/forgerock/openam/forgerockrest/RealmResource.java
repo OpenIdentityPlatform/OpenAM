@@ -25,6 +25,8 @@ import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+
+import com.iplanet.sso.SSOException;
 import com.iplanet.sso.SSOToken;
 import com.sun.identity.cli.realm.RealmUtils;
 import com.sun.identity.idm.AMIdentity;
@@ -120,10 +122,7 @@ public final class RealmResource implements CollectionResourceProvider {
         String realm = null;
 
         try {
-            if (!hasPermission(context)) {
-                throw new PermanentException(401, "Unauthorized", null);
-            }
-
+            hasPermission(context);
             final JsonValue jVal = request.getContent();
             // get the realm
             realm = jVal.get("realm").asString();
@@ -181,6 +180,14 @@ public final class RealmResource implements CollectionResourceProvider {
             } catch (Exception e) {
                 handler.handleError(new BadRequestException(e.getMessage(), e));
             }
+        } catch (SSOException sso){
+            RestDispatcher.debug.error("RealmResource.updateInstance()" + "Cannot CREATE "
+                    + realm + ":" + sso);
+            handler.handleError(new PermanentException(401, "Access Denied", null));
+        } catch (ForbiddenException fe){
+            RestDispatcher.debug.error("RealmResource.updateInstance()" + "Cannot CREATE "
+                    + realm + ":" + fe);
+            handler.handleError(fe);
         } catch (BadRequestException be){
             RestDispatcher.debug.error("RealmResource.createInstance()" + "Cannot CREATE "
                     + realm + ":" + be);
@@ -248,9 +255,8 @@ public final class RealmResource implements CollectionResourceProvider {
         String holdResourceId = resourceId;
 
         try {
-            if (!hasPermission(context)) {
-                throw new PermanentException(401, "Unauthorized", null);
-            }
+            hasPermission(context);
+
             if (holdResourceId != null && !holdResourceId.startsWith("/")) {
                 holdResourceId = "/" + holdResourceId;
             }
@@ -290,11 +296,16 @@ public final class RealmResource implements CollectionResourceProvider {
             } catch (Exception e) {
                 handler.handleError(new BadRequestException(e.getMessage(), e));
             }
-        }  catch (PermanentException pe) {
-            RestDispatcher.debug.error("RealmResource.deleteInstance()" + "Cannot DELETE "
-                    + resourceId + ":" + pe);
-            // Cannot recover from this exception
-            handler.handleError(pe);
+        } catch (SSOException sso){
+            RestDispatcher.debug.error("RealmResource.updateInstance()" + "Cannot DELETE "
+                    + resourceId + ":" + sso);
+            handler.handleError(new PermanentException(401, "Access Denied", null));
+        } catch (ForbiddenException fe){
+            RestDispatcher.debug.error("RealmResource.updateInstance()" + "Cannot DELETE "
+                    + resourceId + ":" + fe);
+            handler.handleError(fe);
+        } catch (Exception e) {
+            handler.handleError(new BadRequestException(e.getMessage(), e));
         }
 
     }
@@ -315,7 +326,8 @@ public final class RealmResource implements CollectionResourceProvider {
     @Override
     public void queryCollection(final ServerContext context, final QueryRequest request,
                                 final QueryResultHandler handler) {
-        if (hasPermission(context)) { //check to make sure admin
+        try {
+            hasPermission(context);
             for (Object theRealm : subRealms) {
                 String realm = (String) theRealm;
                 JsonValue val = new JsonValue(realm);
@@ -323,10 +335,17 @@ public final class RealmResource implements CollectionResourceProvider {
                 handler.handleResource(resource);
             }
             handler.handleResult(new QueryResult());
-        } else {
-            handler.handleError(new PermanentException(401, "Unauthorized", null));
+        } catch (SSOException sso){
+            RestDispatcher.debug.error("RealmResource.queryCollection()" + "Cannot QUERY "
+                    + ":" + sso);
+            handler.handleError(new PermanentException(401, "Access Denied", null));
+        } catch (ForbiddenException fe){
+            RestDispatcher.debug.error("RealmResource.updateInstance()" + "Cannot QUERY "
+                    + ":" + fe);
+            handler.handleError(fe);
+        } catch (Exception e) {
+            handler.handleError(new BadRequestException(e.getMessage(), e));
         }
-
     }
 
     /**
@@ -341,9 +360,7 @@ public final class RealmResource implements CollectionResourceProvider {
         String holdResourceId = resourceId;
 
         try {
-            if (!hasPermission(context)) {
-                throw new PermanentException(401, "Unauthorized", null);
-            }
+            hasPermission(context);
             if (holdResourceId != null && !holdResourceId.startsWith("/")) {
                 holdResourceId = "/" + holdResourceId;
             }
@@ -357,16 +374,19 @@ public final class RealmResource implements CollectionResourceProvider {
             resource = new Resource(resourceId, "0", jval);
             handler.handleResult(resource);
 
-        } catch (PermanentException pe) {
+        } catch (SSOException sso){
+            RestDispatcher.debug.error("RealmResource.updateInstance()" + "Cannot READ "
+                    + resourceId + ":" + sso);
+            handler.handleError(new PermanentException(401, "Access Denied", null));
+        } catch (ForbiddenException fe){
             RestDispatcher.debug.error("RealmResource.readInstance()" + "Cannot READ "
-                    + resourceId + ":" + pe);
-            // Cannot recover from this exception
-            handler.handleError(pe);
-        } catch (SMSException smse) {
+                    + resourceId + ":" + fe);
+            handler.handleError(fe);
+        }  catch (SMSException smse) {
             try {
                 configureErrorMessage(smse);
             } catch (NotFoundException nf) {
-                RestDispatcher.debug.error("RealmResource.readInstance()" + "Cannot find "
+                RestDispatcher.debug.error("RealmResource.readInstance()" + "Cannot READ "
                         + resourceId + ":" + smse);
                 handler.handleError(nf);
             } catch (ForbiddenException fe) {
@@ -390,6 +410,8 @@ public final class RealmResource implements CollectionResourceProvider {
             } catch (Exception e) {
                 handler.handleError(new BadRequestException(e.getMessage(), e));
             }
+        } catch (Exception e) {
+            handler.handleError(new BadRequestException(e.getMessage(), e));
         }
     }
 
@@ -575,10 +597,8 @@ public final class RealmResource implements CollectionResourceProvider {
         OrganizationConfigManager realmCreatedOcm = null;
 
         try {
-            if (!hasPermission(context)) {
-                throw new PermanentException(401, "Unauthorized", null);
-            }
 
+            hasPermission(context);
             realm = resourceId;
             if (realm != null && !realm.startsWith("/")) {
                 realm = "/" + realm;
@@ -680,8 +700,16 @@ public final class RealmResource implements CollectionResourceProvider {
                         + resourceId + ":" + ex);
                 handler.handleError(new NotFoundException("Cannot update realm.", ex));
             }
-        }catch (PermanentException pe) {
+        } catch (SSOException sso){
             RestDispatcher.debug.error("RealmResource.updateInstance()" + "Cannot UPDATE "
+                    + resourceId + ":" + sso);
+            handler.handleError(new PermanentException(401, "Access Denied", null));
+        } catch (ForbiddenException fe){
+            RestDispatcher.debug.error("RealmResource.updateInstance()" + "Cannot UPDATE "
+                    + resourceId + ":" + fe);
+            handler.handleError(fe);
+        } catch (PermanentException pe) {
+            RestDispatcher.debug.error("RealmResource.Instance()" + "Cannot UPDATE "
                     + resourceId + ":" + pe);
             // Cannot recover from this exception
             handler.handleError(pe);

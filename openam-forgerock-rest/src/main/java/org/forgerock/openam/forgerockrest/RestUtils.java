@@ -51,13 +51,19 @@ import com.sun.identity.idsvcs.opensso.IdentityServicesImpl;
  */
 final public class  RestUtils {
 
-    private static SSOToken token = (SSOToken) AccessController.doPrivileged(AdminTokenAction.getInstance());
-    private static String adminUser = SystemProperties.get(Constants.AUTHENTICATION_SUPER_USER);
+    private static SSOToken token = null;
+    private static String adminUser = null;
     private static AMIdentity adminUserId = null;
+
     static {
+        SSOToken token = (SSOToken) AccessController.doPrivileged(AdminTokenAction.getInstance());
+        String adminUser = SystemProperties.get(Constants.AUTHENTICATION_SUPER_USER);
+        AMIdentity adminUserId = null;
         if (adminUser != null) {
             adminUserId = new AMIdentity(token,
                     adminUser, IdType.USER, "/", null);
+        } else {
+            RestDispatcher.debug.error("SystemProperties AUTHENTICATION_SUPER_USER not set");
         }
     }
     /**
@@ -114,31 +120,24 @@ final public class  RestUtils {
         return null;
     }
 
-    static public boolean hasPermission(final ServerContext context){
+    static public void hasPermission(final ServerContext context) throws SSOException, IdRepoException, ForbiddenException {
         //Checks to see if User is amadmin, currently only amAdmin can access realms
-        JsonValue result = new JsonValue(new LinkedHashMap<String, Object>(1));
-
         Token admin = new Token();
         admin.setId(getCookieFromServerContext(context));
         SSOToken ssotok = null;
         AMIdentity amIdentity = null;
 
-        try {
-            SSOTokenManager mgr = SSOTokenManager.getInstance();
-            ssotok = mgr.createSSOToken(getCookieFromServerContext(context));
-            amIdentity = new AMIdentity(ssotok);
+        SSOTokenManager mgr = SSOTokenManager.getInstance();
+        ssotok = mgr.createSSOToken(getCookieFromServerContext(context));
+        mgr.validateToken(ssotok);
+        mgr.refreshSession(ssotok);
+        amIdentity = new AMIdentity(ssotok);
 
-            if (!(amIdentity.equals(adminUserId))){
-                RestDispatcher.debug.error("Unauthorized user.");
-                return false;
-            }
-            return true;
-        } catch (SSOException e) {
-            RestDispatcher.debug.error("IdentityResource.idFromSession() :: Cannot retrieve SSO Token: " + e);
-        } catch (IdRepoException ex) {
-            RestDispatcher.debug.error("IdentityResource.idFromSession() :: Cannot retrieve user from IdRepo" + ex);
+        if (!(amIdentity.equals(adminUserId))){
+            RestDispatcher.debug.error("Unauthorized user.");
+            throw new ForbiddenException("Access Denied");
         }
-        return false;
+
     }
 
 
