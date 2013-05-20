@@ -39,6 +39,8 @@ public abstract class ContextKey<T> {
     }
 
     /**
+     * This type is used to assist with casting the value into its true type.
+     *
      * @return The class of the value type.
      */
     public abstract Class<T> getType();

@@ -65,18 +65,6 @@ public class TreeSaveIndexTest {
     }
 
     @Test
-    public void cleanUpWhiteSpace() {
-        ResourceSaveIndexes result = saveIndex.getIndexes("   http://www.test.com/*   ");
-
-        Set<String> expectedResults = new HashSet<String>();
-        expectedResults.add("http://www.test.com/*");
-
-        assertEquals(expectedResults, result.getPathIndexes());
-        assertTrue(result.getHostIndexes().isEmpty());
-        assertTrue(result.getParentPathIndexes().isEmpty());
-    }
-
-    @Test
     public void enforceLowerCase() {
         ResourceSaveIndexes result = saveIndex.getIndexes("HtTp://wWw.tESt.CoM/*");
 

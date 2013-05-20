@@ -474,4 +474,59 @@ public class SimpleReferenceTreeTest {
         }
     }
 
+    @Test
+    public void removalOfRules() {
+        tree.addIndexRule("http://www.test1.com");
+        tree.addIndexRule("http://www.test2.com");
+        tree.addIndexRule("http://www.test1.com");
+
+        Set<String> results = tree.searchTree("http://www.test1.com");
+        Set<String> expectedResults = new HashSet<String>();
+        expectedResults.add("http://www.test1.com");
+        assertEquals(expectedResults, results);
+
+        results = tree.searchTree("http://www.test2.com");
+        expectedResults.clear();
+        expectedResults.add("http://www.test2.com");
+        assertEquals(expectedResults, results);
+
+        results = tree.searchTree("http://www.test3.com");
+        assertTrue(results.isEmpty());
+
+        // Now remove tree entry.
+        tree.removeIndexRule("http://www.test1.com");
+
+        results = tree.searchTree("http://www.test1.com");
+        expectedResults.clear();
+        expectedResults.add("http://www.test1.com");
+        assertEquals(expectedResults, results);
+
+        results = tree.searchTree("http://www.test2.com");
+        expectedResults.clear();
+        expectedResults.add("http://www.test2.com");
+        assertEquals(expectedResults, results);
+
+        // Now remove tree entry the other entry.
+        tree.removeIndexRule("http://www.test1.com");
+
+        results = tree.searchTree("http://www.test1.com");
+        assertTrue(results.isEmpty());
+
+        results = tree.searchTree("http://www.test2.com");
+        expectedResults.clear();
+        expectedResults.add("http://www.test2.com");
+        assertEquals(expectedResults, results);
+    }
+
+    @Test
+    public void printTreeString() {
+        tree.addIndexRule("abc");
+        tree.addIndexRule("http://www.example.org");
+        tree.addIndexRule("http://www.test.com");
+        tree.addIndexRule("http://www.test.com/abc");
+
+        String expectedTreeString = "http://www.test.com/abc\n           example.org\nabc";
+        assertEquals(expectedTreeString, tree.toString());
+    }
+
 }

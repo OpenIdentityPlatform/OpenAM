@@ -23,8 +23,9 @@
  * "Portions Copyrighted [year] [name of copyright owner]"
  *
  * $Id: ResourceSearchIndexes.java,v 1.1 2009/08/19 05:40:33 veiming Exp $
+ *
+ * Portions copyright 2013 ForgeRock, Inc.
  */
-
 package com.sun.identity.entitlement;
 
 import java.util.HashSet;
@@ -98,4 +99,12 @@ public class ResourceSearchIndexes {
     public Set<String> getPathIndexes() {
         return pathIndexes;
     }
+
+    /**
+     * @return Whether there are any indexes present.
+     */
+    public boolean isEmpty() {
+        return hostIndexes.isEmpty() && parentPathIndexes.isEmpty() && pathIndexes.isEmpty();
+    }
+
 }

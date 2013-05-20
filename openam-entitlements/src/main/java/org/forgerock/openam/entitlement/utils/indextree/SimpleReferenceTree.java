@@ -28,19 +28,49 @@ import java.util.List;
 import java.util.Set;
 
 /**
+ * The core purpose of the tree is to identify all matching rules given a resource and it does this by the use of an
+ * election approach that is iterative. Starting at the top of the tree and starting with the first character of the
+ * resource, the first tree node and its immediate children are asked whether they have interest in the character. For
+ * all nodes that have an interest, they are elected into the pool. This is the first iteration completed. The second
+ * character is taken of the resource and this time all the previous elected nodes now in the pool are asked whether
+ * they and their immediate children have interest in the character. Any previously elected node that has interest is
+ * reelected and any child nodes that have interest are elected for the first time; all other previously elected nodes
+ * are disregarded. The same approach is taken for each character of the resource.
+ * <p />
+ * Once this process has completed for all characters of the resource, any nodes that exist in the election pool will
+ * have in some way matched the resource, whether explicitly or implicitly via the use of wildcards. Each node in the
+ * pool is now asked whether it represents an end point and hence a previously added rule. The list of those that do
+ * is the list that is returned.
+ * <p/>
+ * Rules are added in a tree structure, each node representing the next character within a rule. The tree node that
+ * represents the last character of a rule is know as an end point; end point nodes mark this fact. The following
+ * rules end up in the proceeding structure:
+ * <pre>
+ *     Sample urls:
+ *     http://www.example.com/
+ *     http://www.example.com/index.jsp
+ *     http://www.test.com/home.html
+ *
+ *     Tree structure:
+ *     http://www.example.com/
+ *                            index.jsp
+ *                test.com/home.html
+ * </pre>
+ * In the above scenario '/', 'p' and 'l' all become end points, marking in the tree where a policy rule ends. The three
+ * rules equate to 85 characters, but once in the tree structure this reduces to 50 characters, giving a compression
+ * just over 40% in this scenario.
+ * <p/>
+ * Only additions to the tree actually modify the trees structure and therefore concise synchronisation has been added
+ * to this method, to ensure it's thread safe whilst not hindering the performance of the tree. Tree removes never
+ * actually remove node elements but instead reduce end point markers on the matching nodes. Searches can rest assured
+ * that the tree structure will always be stable, however due to the lack of synchronisation to keep performance high,
+ * there's a chance that a read may retrieve stale data if an add occurs at the same time.
+ * <p />
  * This implementation makes use of simple tree node references to help improve tree navigation performance and to keep
  * the memory footprint to a minimal. It does this by using tree nodes that contain basic references to its position in
- * the tree as opposed to using {@link List} for instance.
+ * the tree as opposed to using other structures to assist, such as {@link List}.
  * <p/>
  * It makes use of a factory for the node creation so that the behavior of resource evaluation can be adapted.
- * <p/>
- * A search against the tree makes a single traversal down the tree and across the passed resource string. Each
- * character of the passed resource is evaluated against nodes at the corresponding position within the tree. A
- * node that has interest in the current resource character elects itself as a candidate. Each subsequent character of
- * the resource is evaluated against the elected candidates and their child nodes. Once the tree and resource is fully
- * traversed a collection of elected tree nodes would have been populated, where these nodes have an exact match against
- * the resource or by part match by use of wildcards. The tree path of these nodes represents an index rule and if such
- * a node is an end point, represents an index rule initially added to the tree.
  *
  * @author apforrest
  */
@@ -64,34 +94,27 @@ public class SimpleReferenceTree implements IndexRuleTree {
             throw new IllegalArgumentException("Pattern must not be null");
         }
 
-        char[] rule = indexRule.toCharArray();
+        StringBuilder rule = new StringBuilder(indexRule);
+        TreeNode parentNode = null, childNode = null;
 
-        TreeNode parentNode = root, childNode = root;
-        int index = 0, length = rule.length;
+        // Locates the last matching node.
+        TreeNode lockNode = findLastMatchingNode(root, rule);
 
-        // Identify creation point.
-        for (; index < length; index++) {
+        // Lock on the node to ensure thread safety during tree modifications.
+        // FIXME: Synchronisation needs to be reconsidered as this fails with three or more threads.
+        synchronized (lockNode) {
 
-            // Search for a matching child.
-            childNode = parentNode.getChild();
-            while (childNode != null && childNode.getNodeValue() != rule[index]) {
-                childNode = childNode.getSibling();
+            // Verify no additional matching sub-nodes have been added during the lock.
+            parentNode = childNode = findLastMatchingNode(lockNode, rule);
+
+            // Build out additional tree nodes.
+            for (int index = 0; index < rule.length(); index++) {
+                childNode = factory.getTreeNode(rule.charAt(index));
+                childNode.setParent(parentNode);
+                childNode.setSibling(parentNode.getChild());
+                parentNode.setChild(childNode);
+                parentNode = childNode;
             }
-
-            if (childNode == null) {
-                break;
-            }
-
-            parentNode = childNode;
-        }
-
-        // Build out additional tree nodes.
-        for (; index < length; index++) {
-            childNode = factory.getTreeNode(rule[index]);
-            childNode.setParent(parentNode);
-            childNode.setSibling(parentNode.getChild());
-            parentNode.setChild(childNode);
-            parentNode = childNode;
         }
 
         // Mark child node.
@@ -106,6 +129,59 @@ public class SimpleReferenceTree implements IndexRuleTree {
     }
 
     @Override
+    public void removeIndexRule(String indexRule) {
+        if (indexRule == null) {
+            throw new IllegalArgumentException("Pattern must not be null");
+        }
+
+        StringBuilder rule = new StringBuilder(indexRule);
+
+        // Identify creation point.
+        TreeNode parentNode = null;
+        // Locates the last matching node.
+        parentNode = findLastMatchingNode(root, rule);
+
+        if (!parentNode.isRoot()) {
+            parentNode.removeEndPoint();
+        }
+    }
+
+    /**
+     * Locates the deepest matching tree node given the passed rule.
+     *
+     * @param startNode
+     *         The node from which to start matching.
+     * @param rule
+     *         The rule for comparison.
+     * @return The last matching node.
+     */
+    private TreeNode findLastMatchingNode(TreeNode startNode, StringBuilder rule) {
+        assert (startNode != null) : "The start node must not be null";
+
+        TreeNode parentNode = startNode;
+        TreeNode childNode = null;
+
+        while (rule.length() > 0) {
+
+            // Search for a matching child.
+            childNode = parentNode.getChild();
+            while (childNode != null && childNode.getNodeValue() != rule.charAt(0)) {
+                childNode = childNode.getSibling();
+            }
+
+            if (childNode == null) {
+                break;
+            }
+
+            // Removed matched character from the rule.
+            rule.delete(0, 1);
+            parentNode = childNode;
+        }
+
+        return parentNode;
+    }
+
+    @Override
     public Set<String> searchTree(String resource) {
         if (resource == null) {
             throw new IllegalArgumentException("The search term must not be null");
@@ -113,20 +189,20 @@ public class SimpleReferenceTree implements IndexRuleTree {
 
         char[] searchTerm = resource.toCharArray();
 
-        List<TreeNode> candidates = new ArrayList<TreeNode>();
+        List<TreeNode> electionPool = new ArrayList<TreeNode>();
         // Start with the root node as the candidate.
-        candidates.add(root);
+        electionPool.add(root);
 
         // Create a new search context for the current search.
         SearchContext context = new MapSearchContext();
 
-        for (int i = 0; i < searchTerm.length && !candidates.isEmpty(); i++) {
+        for (int i = 0, l = searchTerm.length; i < l && !electionPool.isEmpty(); i++) {
             // For each character of the search term.
-            searchTree(searchTerm[i], candidates, context);
+            searchTree(searchTerm[i], electionPool, context);
         }
 
         Set<String> results = new HashSet<String>();
-        for (TreeNode candidate : candidates) {
+        for (TreeNode candidate : electionPool) {
             if (candidate.isEndPoint()) {
                 // Filter out valid index rules.
                 results.add(candidate.getFullPath());
@@ -137,30 +213,30 @@ public class SimpleReferenceTree implements IndexRuleTree {
     }
 
     /**
-     * Evaluate previous candidates for reelection and their children for first election.
+     * Evaluate previous electionPool for reelection and their children for first election.
      *
      * @param searchTerm
      *         Current search character.
-     * @param candidates
-     *         Elected candidates as potential matches.
+     * @param electionPool
+     *         The pool of elected candidates.
      * @param context
      *         The shared search context.
      */
-    private void searchTree(char searchTerm, List<TreeNode> candidates, SearchContext context) {
+    private void searchTree(char searchTerm, List<TreeNode> electionPool, SearchContext context) {
         // Every candidate has to be reelected.
-        List<TreeNode> previousCandidates = new ArrayList<TreeNode>(candidates);
-        candidates.clear();
+        List<TreeNode> previousPool = new ArrayList<TreeNode>(electionPool);
+        electionPool.clear();
 
-        for (TreeNode previousCandidate : previousCandidates) {
+        for (TreeNode previousCandidate : previousPool) {
 
             if (previousCandidate.isWildcard() && previousCandidate.hasInterestIn(searchTerm, context)) {
                 // Reelect previous candidate.
-                candidates.add(previousCandidate);
+                electionPool.add(previousCandidate);
             }
 
             if (previousCandidate.hasChild()) {
-                // Evaluate previous candidates children.
-                evaluateChildren(searchTerm, previousCandidate.getChild(), candidates, context);
+                // Evaluate previous electionPool children.
+                evaluateChildren(searchTerm, previousCandidate.getChild(), electionPool, context);
             }
 
         }
@@ -173,21 +249,21 @@ public class SimpleReferenceTree implements IndexRuleTree {
      *         Current search character.
      * @param child
      *         Current tree node position.
-     * @param candidates
-     *         Elected candidates as potential matches.
+     * @param electionPool
+     *         The pool of elected candidates.
      * @param context
      *         The shared search context.
      */
-    private void evaluateChildren(char searchTerm, TreeNode child, List<TreeNode> candidates, SearchContext context) {
+    private void evaluateChildren(char searchTerm, TreeNode child, List<TreeNode> electionPool, SearchContext context) {
         while (child != null) {
 
             if (child.hasInterestIn(searchTerm, context)) {
                 // Elect child as a candidate.
-                candidates.add(child);
+                electionPool.add(child);
 
                 if (child.isWildcard() && child.hasChild()) {
                     // This scenario handles zero or more characters.
-                    evaluateChildren(searchTerm, child.getChild(), candidates, context);
+                    evaluateChildren(searchTerm, child.getChild(), electionPool, context);
                 }
             }
 
@@ -198,7 +274,7 @@ public class SimpleReferenceTree implements IndexRuleTree {
 
     @Override
     public String toString() {
-        return String.valueOf(root);
+        return root.toString(false);
     }
 
 }

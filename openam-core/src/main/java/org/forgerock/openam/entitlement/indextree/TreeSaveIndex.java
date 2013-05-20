@@ -22,33 +22,42 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 
+/**
+ * Implementation provides a simple save index, which is the passed policy rule as a path index.
+ * <p />
+ * Expects the passed resource to have already been normalised.
+ *
+ * @author apforrest
+ */
 public class TreeSaveIndex implements ISaveIndex {
 
+    private static final String FULL_SINGLE_LEVEL_WILDCARD = "-*-";
+    private static final String ABBREVIATED_SINGLE_LEVEL_WILDCARD = "^";
+
     @Override
-    public ResourceSaveIndexes getIndexes(String resource) {
+    public ResourceSaveIndexes getIndexes(String policyRule) {
         // Ignore host and parent path indexes.
         Set<String> hostIndexes = Collections.emptySet();
         Set<String> parentPathIndexes = Collections.emptySet();
 
+        // Indexes are handled in lower case.
+        policyRule = policyRule.toLowerCase();
         // Capture the full resource path as the path index.
         Set<String> pathIndexes = new HashSet<String>();
-        pathIndexes.add(normaliseResource(resource));
+        pathIndexes.add(parsePolicyRule(policyRule));
 
         return new ResourceSaveIndexes(hostIndexes, pathIndexes, parentPathIndexes);
     }
 
     /**
-     * Normalises the resource string to ensure consistency around whitespace, case and special characters
+     * Parse the policy rule of special wildcards into a simple form.
      *
-     * @param resource
-     *         The resource.
-     * @return The normalised resource.
+     * @param policyRule
+     *         The policy rule.
+     * @return The parsed policy rule.
      */
-    protected String normaliseResource(String resource) {
-        resource = resource.trim();
-        resource = resource.toLowerCase();
-        resource = resource.replace("-*-", "^");
-        return resource;
+    protected String parsePolicyRule(String policyRule) {
+        return policyRule.replace(FULL_SINGLE_LEVEL_WILDCARD, ABBREVIATED_SINGLE_LEVEL_WILDCARD);
     }
 
 }

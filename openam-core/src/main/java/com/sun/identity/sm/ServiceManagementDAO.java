@@ -67,4 +67,9 @@ public interface ServiceManagementDAO {
      */
     public boolean checkIfEntryExists(String dn, SSOToken token);
 
+    /**
+     * @return The root suffix (dn).
+     */
+    public String getRootSuffix();
+
 }

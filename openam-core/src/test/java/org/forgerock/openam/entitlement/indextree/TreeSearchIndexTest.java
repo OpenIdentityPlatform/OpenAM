@@ -72,24 +72,12 @@ public class TreeSearchIndexTest {
      * Tests that the search index implementation normalises the passed resource URL.
      */
     @Test
-    public void normaliseURL() throws Exception {
+    public void enforceLowerCase() throws Exception {
         // Execute the actual evaluation.
-        searchIndex.getIndexes("http://www.test1.com:80", "/test-realm");
-        searchIndex.getIndexes("http://www.test2.com:80/helloworld", "/test-realm");
-        searchIndex.getIndexes("http://www.test3.com", "/test-realm");
-        searchIndex.getIndexes("https://www.test4.com", "/test-realm");
-        searchIndex.getIndexes("https://www.test5.com/hello?a=b,c=d", "/test-realm");
-        searchIndex.getIndexes("   http://www.test6.com:80/   ", "/test-realm");
-        searchIndex.getIndexes("HtTp://wWw.tESt7.CoM:80/", "/test-realm");
+        searchIndex.getIndexes("HtTp://wWw.tESt1.CoM:80/", "/test-realm");
 
         // Verify the use of the mock object.
         verify(treeService).searchTree("http://www.test1.com:80/", "/test-realm");
-        verify(treeService).searchTree("http://www.test2.com:80/helloworld", "/test-realm");
-        verify(treeService).searchTree("http://www.test3.com:80/", "/test-realm");
-        verify(treeService).searchTree("https://www.test4.com:443/", "/test-realm");
-        verify(treeService).searchTree("https://www.test5.com:443/hello?a=b,c=d", "/test-realm");
-        verify(treeService).searchTree("http://www.test6.com:80/", "/test-realm");
-        verify(treeService).searchTree("http://www.test7.com:80/", "/test-realm");
     }
 
     /**
@@ -116,18 +104,6 @@ public class TreeSearchIndexTest {
 
         // Verify the use of the mock object.
         verify(treeService).searchTree("http://www.test.com:80/", "/test-realm");
-    }
-
-    /**
-     * Though the framework may be passed an invalid URL, it should still attempt to authorise it.
-     */
-    @Test
-    public void handleInvalidURL() throws Exception {
-        // Execute the actual evaluation.
-        searchIndex.getIndexes("abcdefgh", "/test-realm");
-
-        // Verify the use of the mock object.
-        verify(treeService).searchTree("abcdefgh", "/test-realm");
     }
 
 }

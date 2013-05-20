@@ -33,6 +33,7 @@ import com.sun.identity.entitlement.util.NetworkMonitor;
 
 import com.sun.identity.shared.debug.Debug;
 import java.security.Principal;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedList;
@@ -212,10 +213,17 @@ class PrivilegeEvaluator {
         init(adminSubject, subject, realm, applicationName,
             entitlement.getResourceName(), 
             entitlement.getActionValues().keySet(), envParameters, false);
-        long start = PRIVILEGE_EVAL_MONITOR_RES_INDEX.start();
         entitlement.setApplicationName(applicationName);
+
+        long start = PRIVILEGE_EVAL_MONITOR_RES_INDEX.start();
         indexes = entitlement.getResourceSearchIndexes(adminSubject, realm);
         PRIVILEGE_EVAL_MONITOR_RES_INDEX.end(start);
+
+        if (indexes.isEmpty()) {
+            // No policies indexes retrieved, therefore return default behaviour to fail.
+            return false;
+        }
+
         List<Entitlement> results = evaluate(realm);
         Entitlement result = results.get(0);
 
@@ -227,6 +235,7 @@ class PrivilegeEvaluator {
                 return false;
             }
         }
+
         return true;
     }
 
@@ -258,7 +267,14 @@ class PrivilegeEvaluator {
         long start = PRIVILEGE_EVAL_MONITOR_RES_INDEX.start();
         indexes = getApplication().getResourceSearchIndex(resourceName, realm);
         PRIVILEGE_EVAL_MONITOR_RES_INDEX.end(start);
-        return evaluate(realm);
+
+        List<Entitlement> entitlements = Collections.emptyList();
+
+        if (!indexes.isEmpty()) {
+            entitlements = evaluate(realm);
+        }
+
+        return entitlements;
     }
     
     private List<Entitlement> evaluate(String realm)

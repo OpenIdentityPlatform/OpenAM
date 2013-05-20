@@ -21,7 +21,7 @@ import java.util.Iterator;
 import java.util.Set;
 
 /**
- * Until SMSEntry is refactored to separate out its various responsibilties, for now this wrapper class delegates to it.
+ * Until SMSEntry is refactored to separate out its various responsibilities, for now this wrapper class delegates to it.
  * This allows consumers to not be coupled to a concrete implementation and to static method calls.
  *
  * @author apforrest
@@ -45,6 +45,11 @@ public class ServiceManagementDAOWrapper implements ServiceManagementDAO {
     @Override
     public boolean checkIfEntryExists(String dn, SSOToken token) {
         return SMSEntry.checkIfEntryExists(dn, token);
+    }
+
+    @Override
+    public String getRootSuffix() {
+        return SMSEntry.getRootSuffix();
     }
 
 }

@@ -24,10 +24,7 @@
  *
  * $Id: PolicyEvaluator.java,v 1.19 2010/01/14 23:18:35 dillidorai Exp $
  *
- */
-
-/*
- * Portions Copyrighted 2011 ForgeRock AS
+ * Portions copyright 2011-2013 ForgeRock, Inc.
  */
 package com.sun.identity.policy;
 
@@ -614,13 +611,14 @@ public class PolicyEvaluator {
             AdminTokenAction.getInstance());
 
         try {
-            Entitlement entitlement = new Entitlement(serviceTypeName,
-                resourceName, actions);
-            Evaluator eval = new Evaluator(
-                SubjectUtils.createSubject(adminSSOToken), serviceTypeName);
-            return eval.hasEntitlement(realm,
-                SubjectUtils.createSubject(token), entitlement,
-                envParameters);
+            Subject adminSubject =  SubjectUtils.createSubject(token);
+
+            Entitlement entitlement = new Entitlement(serviceTypeName, resourceName, actions);
+            entitlement.canonicalizeResources(adminSubject, realm);
+
+            Evaluator eval = new Evaluator(adminSubject, serviceTypeName);
+            return eval.hasEntitlement(realm, SubjectUtils.createSubject(token), entitlement, envParameters);
+
         } catch (EntitlementException e) {
             throw new PolicyException(e);
         }

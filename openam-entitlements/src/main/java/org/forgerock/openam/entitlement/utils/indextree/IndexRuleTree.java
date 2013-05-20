@@ -23,32 +23,40 @@ import java.util.Set;
  * rule. Therefore a given tree will be as deep as the number of characters in the longest index rule. As a result tree
  * searches are not effected by the size of the tree and should give a constant time. This is because adding additional
  * index rules will effect the width of the tree, whereas the search is interested in the depth of the tree.
- * 
+ *
  * @author apforrest
  */
 public interface IndexRuleTree {
 
     /**
      * Adds an index rule to the tree.
-     * 
+     *
      * @param indexRule
-     *            The index rule.
+     *         The index rule.
      */
     public void addIndexRule(String indexRule);
 
     /**
      * Adds a collection of index rules to the tree.
-     * 
+     *
      * @param indexRules
-     *            The collection of index rules.
+     *         The collection of index rules.
      */
     public void addIndexRules(Collection<String> indexRules);
 
     /**
+     * Removes the given index rule from the tree.
+     *
+     * @param indexRule
+     *         The index rule to be removed.
+     */
+    public void removeIndexRule(String indexRule);
+
+    /**
      * Given a resource searches the tree for all matching index rules.
-     * 
+     *
      * @param resource
-     *            The resource to be used to search the tree.
+     *         The resource to be used to search the tree.
      * @return A set of matched index rules.
      */
     public Set<String> searchTree(String resource);

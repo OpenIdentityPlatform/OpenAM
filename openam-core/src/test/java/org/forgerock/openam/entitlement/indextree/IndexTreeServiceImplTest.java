@@ -18,7 +18,9 @@ package org.forgerock.openam.entitlement.indextree;
 import com.iplanet.sso.SSOToken;
 import com.sun.identity.sm.SMSDataEntry;
 import com.sun.identity.sm.ServiceManagementDAO;
-import org.forgerock.openam.entitlement.indextree.IndexTreeServiceImpl.DNWrapper;
+import org.forgerock.openam.core.guice.CoreGuiceModule.DNWrapper;
+import org.forgerock.openam.core.guice.CoreGuiceModule.ShutdownManagerWrapper;
+import org.forgerock.opendj.ldap.ErrorResultException;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -45,35 +47,47 @@ import static org.mockito.Mockito.when;
  */
 public class IndexTreeServiceImplTest {
 
+    private static final String ROOT_SUFFIX = "dc=openam,dc=forgerock,dc=org";
+
     private static final String REALM = "/test-realm";
-    private static final String REALM_DN = "ou=test-realm,dc=openam,dc=forgerock,dc=org";
+    private static final String REALM_DN = "ou=test-realm," + ROOT_SUFFIX;
     private static final String SERVICE_DN = "ou=default,ou=OrganizationConfig,ou=1.0," +
             "ou=sunEntitlementIndexes,ou=services," + REALM_DN;
 
     private static final String REALM2 = "/some-other-test-realm";
-    private static final String REALM_DN2 = "ou=some-other-test-realm,dc=openam,dc=forgerock,dc=org";
+    private static final String REALM_DN2 = "ou=some-other-test-realm," + ROOT_SUFFIX;
     private static final String SERVICE_DN2 = "ou=default,ou=OrganizationConfig,ou=1.0," +
             "ou=sunEntitlementIndexes,ou=services," + REALM_DN2;
 
     private static final String FILTER = "(sunserviceID=indexes)";
 
-    private IndexTreeService treeService;
+    private IndexTreeServiceImpl treeService;
+    private IndexChangeManager manager;
     private PrivilegedAction<SSOToken> privilegedAction;
     private ServiceManagementDAO serviceManagementDAO;
+    private ShutdownManagerWrapper shutdownManager;
     private DNWrapper dnMapper;
     private SSOToken ssoToken;
 
     private Set<String> excludes;
 
     @Before
-    public void setUp() {
+    public void setUp() throws ErrorResultException {
+        // Create mock objects.
+        manager = mock(IndexChangeManager.class);
         privilegedAction = mock(MockPrivilegedAction.class);
         serviceManagementDAO = mock(ServiceManagementDAO.class);
         dnMapper = mock(DNWrapper.class);
+        shutdownManager = mock(ShutdownManagerWrapper.class);
         ssoToken = mock(SSOToken.class);
         excludes = Collections.emptySet();
 
-        treeService = new IndexTreeServiceImpl(privilegedAction, serviceManagementDAO, dnMapper);
+        treeService = new IndexTreeServiceImpl(
+                manager, privilegedAction, serviceManagementDAO, dnMapper, shutdownManager);
+
+        verify(shutdownManager).addShutdownListener(treeService);
+        verify(manager).registerObserver(treeService);
+        verify(manager).init();
     }
 
     /**
@@ -250,8 +264,18 @@ public class IndexTreeServiceImplTest {
         assertTrue(results.isEmpty());
     }
 
+
+    /**
+     * Verify that shutdown causes any clean up, including the connection being closed.
+     */
+    @Test
+    public void shutdownCleanUp() {
+
+    }
+
     // Type marker interface.
     private static interface MockPrivilegedAction extends PrivilegedAction<SSOToken> {
     }
+
 
 }

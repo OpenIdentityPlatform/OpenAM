@@ -18,24 +18,22 @@ package org.forgerock.openam.entitlement.indextree;
 import com.sun.identity.entitlement.EntitlementException;
 import com.sun.identity.entitlement.ResourceSearchIndexes;
 import com.sun.identity.entitlement.interfaces.ISearchIndex;
-import com.sun.identity.entitlement.util.RelaxedURL;
 import com.sun.identity.shared.debug.Debug;
 import org.forgerock.openam.guice.InjectorHolder;
 
 import javax.inject.Inject;
-import java.net.MalformedURLException;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 
 /**
  * Implementation provides search index by means of an in memory rule index cache.
+ * <p />
+ * Expects the passed resource to have already been normalised.
  *
  * @author apforrest
  */
 public class TreeSearchIndex implements ISearchIndex {
-
-    private static final Debug LOGGER = Debug.getInstance("amEntitlements");
 
     private final IndexTreeService indexTreeService;
 
@@ -59,34 +57,15 @@ public class TreeSearchIndex implements ISearchIndex {
         Set<String> hostIndexes = Collections.emptySet();
         Set<String> parentPathIndexes = Collections.emptySet();
 
+        // Indexes are handled in lower case.
+        resource = resource.toLowerCase();
         // Search the index tree for matching path indexes.
-        Set<String> pathIndexes = indexTreeService.searchTree(normaliseResource(resource), realm);
+        Set<String> pathIndexes = indexTreeService.searchTree(resource, realm);
 
         return new ResourceSearchIndexes(hostIndexes, escapePathIndexes(pathIndexes), parentPathIndexes);
     }
 
-    /**
-     * Normalises the resource.
-     *
-     * @param resource
-     *         The resource.
-     * @return The normalised resource.
-     */
-    protected String normaliseResource(String resource) {
-        resource = resource.trim();
-        resource = resource.toLowerCase();
 
-        try {
-            RelaxedURL url = new RelaxedURL(resource);
-            resource = url.toString();
-        } catch (MalformedURLException mUrlE) {
-            // Unable to parse the URL.
-            // Flag up as a warning and pass through the string.
-            LOGGER.warning("Unable to parse incoming resource as a valid URL.", mUrlE);
-        }
-
-        return resource;
-    }
 
     /**
      * Prepare path indexes for LDAP search.

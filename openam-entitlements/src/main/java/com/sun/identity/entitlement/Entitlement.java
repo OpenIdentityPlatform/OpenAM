@@ -451,7 +451,6 @@ public class Entitlement {
         }
         
         ResourceName resComparator = getResourceComparator(adminSubject, realm);
-        resourceName = resComparator.canonicalize(resourceName);
 
         Set<String> matched = new HashSet<String>();
 

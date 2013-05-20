@@ -17,7 +17,7 @@ package org.forgerock.openam.entitlement.utils.indextree.treenodes;
 
 /**
  * Provides a basic abstract representation of a tree node.
- * 
+ *
  * @author apforrest
  */
 public abstract class BasicTreeNode implements TreeNode {
@@ -26,22 +26,40 @@ public abstract class BasicTreeNode implements TreeNode {
     private TreeNode child;
     private TreeNode sibling;
 
-    private int endPointCount;
+    /**
+     * End point count represents the number of added rules that end at this tree node.
+     * Due to its atomic nature this variable needs to be thread safe. Several options
+     * have been considered and it was a balancing act between performance and memory
+     * consumption. In the end intrinsic synchronisation was the preferred choice as
+     * it still gave good performance in this scenario, whereas AtomicInteger had a big
+     * impact on memory as tree node count reached the 100,000s.
+     */
+    private volatile int endPointCount;
 
     @Override
     public void markEndPoint() {
-        endPointCount++;
+        // It is essential that markEndPoint() and removeEndPoint() are
+        // synchronised to ensure the integrity of the increment.
+        synchronized (this) {
+            endPointCount++;
+        }
     }
 
     @Override
     public void removeEndPoint() {
-        if (endPointCount > 0) {
-            endPointCount--;
+        // It is essential that markEndPoint() and removeEndPoint() are
+        // synchronised to ensure the integrity of the decrement.
+        synchronized (this) {
+            if (endPointCount > 0) {
+                endPointCount--;
+            }
         }
     }
 
     @Override
     public boolean isEndPoint() {
+        // The read has not been synchronised to improve the performance of
+        // read, therefore a read may not return the most up to date value.
         return endPointCount > 0;
     }
 
@@ -143,11 +161,15 @@ public abstract class BasicTreeNode implements TreeNode {
             view.append(getNodeValue());
         }
 
-        if (includeEndPoint && endPointCount > 0) {
-            // Add the rule count
-            view.append('(');
-            view.append(endPointCount);
-            view.append(')');
+        if (includeEndPoint) {
+            synchronized (this) {
+                if (endPointCount > 0) {
+                    // Add the rule count
+                    view.append('(');
+                    view.append(endPointCount);
+                    view.append(')');
+                }
+            }
         }
 
         if (child != null) {
