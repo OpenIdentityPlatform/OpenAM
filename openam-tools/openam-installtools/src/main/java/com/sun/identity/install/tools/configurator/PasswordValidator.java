@@ -27,7 +27,7 @@
  */
 
 /*
- * Portions Copyrighted [2010] [ForgeRock AS]
+ * Portions Copyrighted 2010-2013 ForgeRock Inc
  */
 package com.sun.identity.install.tools.configurator;
 
@@ -174,10 +174,11 @@ public class PasswordValidator extends ValidatorBase {
                 restAuthURL = serverURL +
                         "/identity/authenticate";
                 String encodingType = "UTF-8";
-                String encodedPostData = "username="  +
-                        URLEncoder.encode(agentUserName, encodingType) +
-                        "&password=" +
-                        URLEncoder.encode(agentUserPasswd, encodingType);
+                String encodedPostData = "username="
+                        + URLEncoder.encode(agentUserName, encodingType)
+                        + "&password="
+                        + URLEncoder.encode(agentUserPasswd, encodingType)
+                        + "&uri=" + URLEncoder.encode("realm=/&module=Application", encodingType);
                 RESTUtils.RESTResponse response = RESTUtils.callServiceURL(
                         restAuthURL, encodedPostData);
                 
@@ -293,10 +294,11 @@ public class PasswordValidator extends ValidatorBase {
             restAuthURL = serverURL +
                     "/identity/authenticate";
             String encodingType = "UTF-8";
-            String encodedPostData = "username="  +
-                    URLEncoder.encode(agentUserName, encodingType) +
-                    "&password=" +
-                    URLEncoder.encode(agentUserPasswd, encodingType);
+            String encodedPostData = "username="
+                    + URLEncoder.encode(agentUserName, encodingType)
+                    + "&password="
+                    + URLEncoder.encode(agentUserPasswd, encodingType)
+                    + "&uri=" + URLEncoder.encode("realm=/&module=Application", encodingType);
             RESTUtils.RESTResponse response = RESTUtils.callServiceURL(
                     restAuthURL, encodedPostData);
             
