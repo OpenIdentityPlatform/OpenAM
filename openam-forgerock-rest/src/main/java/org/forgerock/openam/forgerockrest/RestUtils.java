@@ -51,18 +51,19 @@ import com.sun.identity.idsvcs.opensso.IdentityServicesImpl;
  */
 final public class  RestUtils {
 
-    private static SSOToken token = null;
-    private static String adminUser = null;
-    private static AMIdentity adminUserId = null;
+    private static final SSOToken token;
+    private static final String adminUser;
+    private static final AMIdentity adminUserId;
 
     static {
-        SSOToken token = (SSOToken) AccessController.doPrivileged(AdminTokenAction.getInstance());
-        String adminUser = SystemProperties.get(Constants.AUTHENTICATION_SUPER_USER);
-        AMIdentity adminUserId = null;
+        token = (SSOToken) AccessController.doPrivileged(AdminTokenAction.getInstance());
+        adminUser = SystemProperties.get(Constants.AUTHENTICATION_SUPER_USER);
+
         if (adminUser != null) {
             adminUserId = new AMIdentity(token,
                     adminUser, IdType.USER, "/", null);
         } else {
+            adminUserId = null;
             RestDispatcher.debug.error("SystemProperties AUTHENTICATION_SUPER_USER not set");
         }
     }
