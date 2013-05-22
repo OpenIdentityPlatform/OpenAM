@@ -41,7 +41,7 @@
                 <include>org.forgerock.openam:openam-shared</include>
                 <include>javax.xml.bind:jaxb-api</include>
                 <include>com.sun.xml.bind:jaxb-impl</include>
-                <include>net.java.dev.msv.datatype.xsd:xsdlib</include>
+                <include>com.sun.msv.datatype.xsd:xsdlib</include>
                 <include>external:webservices-rt</include>
                 <include>external:OpenDJ</include>
             </includes>

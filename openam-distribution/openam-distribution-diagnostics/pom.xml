@@ -100,7 +100,7 @@
             <artifactId>jaxb-impl</artifactId>
         </dependency>
         <dependency>
-            <groupId>net.java.dev.msv.datatype.xsd</groupId>
+            <groupId>com.sun.msv.datatype.xsd</groupId>
             <artifactId>xsdlib</artifactId>
         </dependency>
         <dependency>

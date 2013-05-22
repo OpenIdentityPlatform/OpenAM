@@ -43,7 +43,7 @@
                 <include>xalan:xalan</include>
                 <include>xerces-J:xml-serializer</include><!-- for metadata export -->
                 <include>xerces-J:xercesImpl</include>
-                <include>net.java.dev.msv.datatype.xsd:xsdlib</include>
+                <include>com.sun.msv.datatype.xsd:xsdlib</include>
             </includes>
         </dependencySet>
         <dependencySet>
