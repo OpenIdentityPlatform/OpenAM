@@ -19,6 +19,7 @@ package org.forgerock.openam.core.guice;
 import com.google.inject.AbstractModule;
 import com.google.inject.Provider;
 import com.google.inject.TypeLiteral;
+import com.iplanet.am.util.SystemProperties;
 import com.iplanet.services.ldap.DSConfigMgr;
 import com.iplanet.services.ldap.LDAPServiceException;
 import com.iplanet.services.ldap.LDAPUser;
@@ -27,6 +28,7 @@ import com.iplanet.services.ldap.ServerInstance;
 import com.iplanet.sso.SSOToken;
 import com.sun.identity.common.ShutdownListener;
 import com.sun.identity.common.ShutdownManager;
+import com.sun.identity.entitlement.EntitlementException;
 import com.sun.identity.security.AdminTokenAction;
 import com.sun.identity.sm.DNMapper;
 import com.sun.identity.sm.ServiceManagementDAO;
@@ -36,9 +38,9 @@ import org.forgerock.openam.entitlement.indextree.IndexChangeManager;
 import org.forgerock.openam.entitlement.indextree.IndexChangeManagerImpl;
 import org.forgerock.openam.entitlement.indextree.IndexChangeMonitor;
 import org.forgerock.openam.entitlement.indextree.IndexChangeMonitorImpl;
-import org.forgerock.openam.entitlement.indextree.events.IndexChangeObservable;
 import org.forgerock.openam.entitlement.indextree.IndexTreeService;
 import org.forgerock.openam.entitlement.indextree.IndexTreeServiceImpl;
+import org.forgerock.openam.entitlement.indextree.events.IndexChangeObservable;
 import org.forgerock.openam.guice.AMGuiceModule;
 import org.forgerock.opendj.ldap.ConnectionFactory;
 import org.forgerock.opendj.ldap.Connections;
@@ -49,6 +51,7 @@ import org.forgerock.opendj.ldap.requests.Requests;
 
 import javax.inject.Singleton;
 import java.security.PrivilegedAction;
+import java.util.Set;
 
 /**
  * Guice Module for configuring bindings for the OpenAM Core classes.
@@ -69,7 +72,10 @@ public class CoreGuiceModule extends AbstractModule {
         bind(SearchResultHandler.class).to(IndexChangeHandler.class).in(Singleton.class);
         bind(IndexChangeManager.class).to(IndexChangeManagerImpl.class).in(Singleton.class);
         bind(IndexChangeMonitor.class).to(IndexChangeMonitorImpl.class).in(Singleton.class);
-        bind(IndexTreeService.class).to(IndexTreeServiceImpl.class).in(Singleton.class);
+
+        // When in client mode, provide a dummy implementation.
+        bind(IndexTreeService.class).to(SystemProperties.isServerMode() ?
+                IndexTreeServiceImpl.class : DummyService.class).in(Singleton.class);
     }
 
     // Implementation exists to capture the generic type of the PrivilegedAction.
@@ -83,6 +89,18 @@ public class CoreGuiceModule extends AbstractModule {
         public PrivilegedAction<SSOToken> get() {
             // Provider used over bind(..).getInstance(..) to enforce a lazy loading approach.
             return AdminTokenAction.getInstance();
+        }
+
+    }
+
+    // Implementation represents a dumb service that has no behaviour. This is to work around creeping
+    // boundaries of the client SDK, which can result in the index tree service being instantiated.
+    // FIXME: Better define the boundaries/interface of the SDK to avoid such context switching.
+    private static class DummyService implements IndexTreeService {
+
+        @Override
+        public Set<String> searchTree(String resource, String realm) throws EntitlementException {
+            throw new UnsupportedOperationException("Behaviour not supported on the client.");
         }
 
     }
