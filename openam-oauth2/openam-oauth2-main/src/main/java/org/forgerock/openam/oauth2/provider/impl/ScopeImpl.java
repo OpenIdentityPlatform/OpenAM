@@ -25,22 +25,15 @@
 package org.forgerock.openam.oauth2.provider.impl;
 
 import com.iplanet.sso.SSOException;
-import com.iplanet.sso.SSOToken;
 import com.sun.identity.idm.*;
-import com.sun.identity.security.AdminTokenAction;
 import com.sun.identity.shared.OAuth2Constants;
 import org.forgerock.openam.ext.cts.repo.DefaultOAuthTokenStoreImpl;
-import com.sun.identity.sm.ServiceConfig;
-import com.sun.identity.sm.ServiceConfigManager;
-import org.forgerock.openam.oauth2.exceptions.OAuthProblemException;
+import org.forgerock.json.jwt.SignedJwt;
 import org.forgerock.openam.oauth2.model.CoreToken;
-import org.forgerock.openam.oauth2.model.JWTToken;
 import org.forgerock.openam.oauth2.provider.OAuth2TokenStore;
 import org.forgerock.openam.oauth2.provider.Scope;
 import org.forgerock.openam.oauth2.utils.OAuth2Utils;
-import org.restlet.Request;
 
-import java.security.*;
 import java.util.*;
 
 /**
@@ -51,18 +44,6 @@ import java.util.*;
  * upon the completion of the retrieveTokenInfoEndPoint method
  */
 public class ScopeImpl implements Scope {
-
-    // TODO remove this temporary keypair generation and use the client keypair
-    static KeyPair keyPair;
-    static{
-        try {
-            KeyPairGenerator keyPairGenerator = KeyPairGenerator.getInstance("RSA");
-            keyPairGenerator.initialize(1024);
-            keyPair = keyPairGenerator.genKeyPair();
-        } catch (NoSuchAlgorithmException e){
-
-        }
-    }
 
     private static Map<String, Object> scopeToUserUserProfileAttributes;
 
@@ -188,14 +169,16 @@ public class ScopeImpl implements Scope {
         // if an openid scope return the id_token
         if (scope != null && scope.contains("openid")){
             DefaultOAuthTokenStoreImpl store = new DefaultOAuthTokenStoreImpl();
-            String jwtToken = store.createSignedJWT(token.getRealm(),
+            CoreToken jwtToken = store.createJWT(token.getRealm(),
                     token.getUserID(),
                     token.getClientID(),
-                    OAuth2Utils.getDeploymentURL(Request.getCurrent()),
                     token.getClientID(),
-                    keyPair.getPrivate(),
                     parameters.get(OAuth2Constants.Custom.NONCE));
-            map.put("id_token", jwtToken);
+
+            //TODO setting for this
+            //sign the JWT token
+            SignedJwt sjwt = OAuth2Utils.signJWT(jwtToken);
+            map.put("id_token", sjwt.build());
         }
         //END OpenID Connect
         return map;
@@ -206,53 +189,6 @@ public class ScopeImpl implements Scope {
      */
     public Map<String, String> extraDataToReturnForAuthorizeEndpoint(Map<String, String> parameters, Map<String, CoreToken> tokens){
         Map<String, String> map = new HashMap<String, String>();
-
-        // OpenID Connect
-        boolean fragment = false;
-        if (tokens != null && !tokens.isEmpty()){
-            for(Map.Entry<String, CoreToken> token : tokens.entrySet() ){
-                Set<String> scope = token.getValue().getScope();
-                String responseType = null;
-                Set<String> responseTypes = null;
-
-                //get the set of response types passed in
-                if (parameters != null){
-                    responseType = parameters.get(OAuth2Constants.Params.RESPONSE_TYPE);
-                    if (responseType != null && !responseType.isEmpty()){
-                        responseTypes = new HashSet<String>(Arrays.asList(responseType.split(" ")));
-                    }
-                }
-
-                //create an id token if requested and we are in an openid flow.
-                if (scope != null && scope.contains("openid") && !token.getKey().equalsIgnoreCase(OAuth2Constants.AuthorizationEndpoint.CODE)
-                    && responseTypes != null && responseTypes.contains("id_token")){
-                    String nonce = parameters.get(OAuth2Constants.Custom.NONCE);
-                    if (nonce == null || nonce.isEmpty()){
-                        // nonce is required
-                        OAuth2Utils.DEBUG.error("Nonce is required for the authorization endpoint.");
-                        throw OAuthProblemException.OAuthError.INVALID_REQUEST.handle(Request.getCurrent(),
-                                "Nonce is required for the authorization endpoint.");
-                    }
-
-                    String jwtToken = store.createSignedJWT(token.getValue().getRealm(),
-                                                token.getValue().getUserID(),
-                                                token.getValue().getClientID(),
-                                                OAuth2Utils.getDeploymentURL(Request.getCurrent()),
-                                                token.getValue().getClientID(),
-                                                keyPair.getPrivate(),
-                                                parameters.get(OAuth2Constants.Custom.NONCE));
-                    map.put("id_token", jwtToken);
-                    fragment = true;
-                    break;
-                }
-            }
-        }
-        //set the return type for the redirect uri.
-        if (fragment){
-            map.put("returnType", "FRAGMENT");
-        }
-        //end OpenID Connect
-
         return map;
     }
 

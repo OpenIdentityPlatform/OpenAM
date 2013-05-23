@@ -29,9 +29,11 @@
 package org.forgerock.openam.oauth2.utils;
 
 import java.io.IOException;
-import java.io.UnsupportedEncodingException;
-import java.net.URLDecoder;
 import java.security.AccessController;
+import java.security.KeyPair;
+import java.security.KeyPairGenerator;
+import java.security.NoSuchAlgorithmException;
+import java.security.SignatureException;
 import java.util.*;
 
 import com.iplanet.am.util.SystemProperties;
@@ -47,6 +49,10 @@ import com.sun.identity.shared.Constants;
 import com.sun.identity.shared.OAuth2Constants;
 import com.sun.identity.sm.ServiceConfig;
 import com.sun.identity.sm.ServiceConfigManager;
+import org.forgerock.json.jwt.JwsAlgorithm;
+import org.forgerock.json.jwt.SignedJwt;
+import org.forgerock.openam.oauth2.model.CoreToken;
+import org.forgerock.openam.oauth2.model.JWTToken;
 import org.forgerock.openam.oauth2.provider.ClientVerifier;
 import org.forgerock.openam.oauth2.provider.OAuth2TokenStore;
 import org.forgerock.openam.oauth2.exceptions.OAuthProblemException;
@@ -805,7 +811,7 @@ public class OAuth2Utils {
             if (results == null || results.size() != 1) {
                 OAuth2Utils.DEBUG.error("ScopeImpl.getIdentity()::No user profile or more than one profile found.");
                 throw OAuthProblemException.OAuthError.UNAUTHORIZED_CLIENT.handle(null,
-                        "Not able to get client from OpenAM");
+                        "Not able to get user from OpenAM");
             }
 
             theID = results.iterator().next();
@@ -838,4 +844,29 @@ public class OAuth2Utils {
         }
         return map;
     }
+
+    public static KeyPair getServerKeyPair(){
+        //TODO get this from server settings
+        KeyPair keyPair = null;
+        try {
+            KeyPairGenerator keyPairGenerator = KeyPairGenerator.getInstance("RSA");
+            keyPairGenerator.initialize(1024);
+            keyPair = keyPairGenerator.genKeyPair();
+        } catch (NoSuchAlgorithmException e){
+
+        }
+        return keyPair;
+    }
+
+    public static SignedJwt signJWT(CoreToken jwt){
+        SignedJwt sjwt = null;
+        try {
+            sjwt = ((JWTToken)jwt).sign(JwsAlgorithm.HS256, getServerKeyPair().getPrivate());
+        } catch (SignatureException e){
+            throw OAuthProblemException.OAuthError.SERVER_ERROR.handle(null, "Not able sign jwt");
+        }
+        return sjwt;
+    }
+
+
 }
