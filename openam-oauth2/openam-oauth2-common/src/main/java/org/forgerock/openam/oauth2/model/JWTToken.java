@@ -25,7 +25,7 @@
 package org.forgerock.openam.oauth2.model;
 
 import org.forgerock.json.fluent.JsonValue;
-import org.forgerock.openam.forgerockrest.jwt.*;
+import org.forgerock.json.jwt.*;
 
 import java.security.PrivateKey;
 import java.security.SignatureException;

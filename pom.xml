@@ -1567,6 +1567,11 @@
             </dependency>
             <dependency>
                 <groupId>org.forgerock.commons</groupId>
+                <artifactId>json-web-token</artifactId>
+                <version>${forgerock.json.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.forgerock.commons</groupId>
                 <artifactId>i18n-core</artifactId>
                 <version>1.4.0</version>
             </dependency>

@@ -44,7 +44,7 @@ import org.forgerock.json.resource.JsonResourceException;
 import org.forgerock.openam.ext.cts.CoreTokenService;
 import org.forgerock.openam.ext.cts.repo.OpenDJTokenRepo;
 import com.sun.identity.shared.OAuth2Constants;
-import org.forgerock.openam.forgerockrest.jwt.JwsAlgorithm;
+import org.forgerock.json.jwt.JwsAlgorithm;
 import org.forgerock.openam.oauth2.model.*;
 import org.forgerock.openam.oauth2.exceptions.OAuthProblemException;
 import org.forgerock.openam.oauth2.provider.OAuth2TokenStore;
