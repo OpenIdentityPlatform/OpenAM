@@ -55,7 +55,7 @@ public class UserIdentityVerifier extends AbstractIdentityVerifier<OpenAMUser> {
     @Override
     protected OpenAMUser createUser(AuthContext authContext) throws Exception {
         SSOToken token = authContext.getSSOToken();
-        return new OpenAMUser(token.getProperty("UserId"), token);
+        return new OpenAMUser(token.getProperty("UserToken"), token);
     }
 
     /**
@@ -126,7 +126,7 @@ public class UserIdentityVerifier extends AbstractIdentityVerifier<OpenAMUser> {
             return authenticate(username, password, OAuth2Utils.getRealm(request));
         } else {
             try {
-                return new OpenAMUser(token.getProperty("UserId"), token);
+                return new OpenAMUser(token.getProperty("UserToken"), token);
             } catch (Exception e){
                 OAuth2Utils.DEBUG.error("UserIdentityVerifier:: Unable to create OpenAMUser", e);
             }

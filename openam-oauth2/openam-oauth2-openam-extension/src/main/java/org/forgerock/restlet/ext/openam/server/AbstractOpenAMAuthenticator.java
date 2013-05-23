@@ -149,7 +149,7 @@ public abstract class AbstractOpenAMAuthenticator extends Authenticator {
             if (null != token) {
                 AMIdentity identity = IdUtils.getIdentity(token);
 
-                OpenAMUser user = new OpenAMUser(identity.getName(), token);
+                OpenAMUser user = new OpenAMUser(token.getProperty("UserToken"), token);
                 request.getClientInfo().setUser(user);
                 return identity.isActive();
             } else {
