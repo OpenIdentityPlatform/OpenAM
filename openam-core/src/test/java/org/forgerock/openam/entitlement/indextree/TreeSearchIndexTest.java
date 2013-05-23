@@ -42,7 +42,7 @@ public class TreeSearchIndexTest {
     @Before
     public void setUp() {
         treeService = mock(IndexTreeService.class);
-        searchIndex = new TreeSearchIndex(treeService);
+        searchIndex = new TreeSearchIndexDelegate(treeService);
     }
 
     /**
