@@ -175,42 +175,14 @@ public interface OAuth2TokenStore {
     public JsonValue queryForToken(String id) throws OAuthProblemException;
 
     /**
-     * Creates a signed JWT token
+     * Creates a  JWT token
      * @param realm realm of the token
      * @param uuid  the subject of the token
      * @param clientID the audience of the token
-     * @param deploymentURI the issuer of the token
      * @param authorizationParty the client allowed to use the token as an access token
-     * @param pk the private key to sign the JWT with
      * @param nonce The nonce passed in from the request
      * @return
      */
-    public String createSignedJWT(String realm, String uuid, String clientID, String deploymentURI, String authorizationParty, PrivateKey pk, String nonce);
-
-    /**
-     * Creates a signed JWT token
-     * @param realm realm of the token
-     * @param uuid  the subject of the token
-     * @param clientID the audience of the token
-     * @param deploymentURI the issuer of the token
-     * @param authorizationParty the client allowed to use the token as an access token
-     * @param pk the private key to sign the JWT with
-     * @param nonce The nonce passed in from the request
-     * @return
-     */
-    public String createEncryptedJWT(String realm, String uuid, String clientID, String deploymentURI, String authorizationParty, PrivateKey pk, String nonce);
-
-    /**
-     * Creates a signed JWT token
-     * @param realm realm of the token
-     * @param uuid  the subject of the token
-     * @param clientID the audience of the token
-     * @param deploymentURI the issuer of the token
-     * @param authorizationParty the client allowed to use the token as an access token
-     * @param pk the private key to sign the JWT with
-     * @param nonce The nonce passed in from the request
-     * @return
-     */
-    public String createSignedAndEncryptedJWT(String realm, String uuid, String clientID, String deploymentURI, String authorizationParty, PrivateKey pk, String nonce);
+    public CoreToken createJWT(String realm, String uuid, String clientID, String authorizationParty, String nonce);
 
 }

@@ -24,6 +24,7 @@
 
 package org.forgerock.openam.oauth2.model;
 
+import com.sun.identity.shared.OAuth2Constants;
 import org.forgerock.json.fluent.JsonValue;
 import org.forgerock.json.jwt.*;
 
@@ -32,8 +33,9 @@ import java.security.SignatureException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.ResourceBundle;
+import java.util.Set;
 
-public class JWTToken extends CoreToken {
+public class JWTToken extends CoreToken implements Token {
 
     private PlaintextJwt jwt = null;
     private JwtBuilder jwtBuilder = new JwtBuilder();
@@ -61,6 +63,8 @@ public class JWTToken extends CoreToken {
         setAuthTime(ath);
         setRealm(realm);
         setNonce(nonce);
+        setTokenType(OAuth2Constants.JWTTokenParams.JWT_TOKEN);
+        setTokenName(OAuth2Constants.JWTTokenParams.ID_TOKEN);
         jwt = jwtBuilder.jwt();
         jwt.content(super.asMap());
 
@@ -79,7 +83,7 @@ public class JWTToken extends CoreToken {
     }
 
     /**
-     * Creates an Bearer Access Token
+     * Creates an JWT ID Token
      *
      * @param id
      *            Id of the access Token
@@ -96,10 +100,10 @@ public class JWTToken extends CoreToken {
      */
     public Map<String, Object> convertToMap(){
         Map<String, Object> tokenMap = new HashMap<String, Object>();
+        tokenMap.put(OAuth2Constants.JWTTokenParams.ID_TOKEN, this.build());
         return tokenMap;
     }
 
-    @Override
     /**
      * @{inheritDoc}
      */
@@ -109,11 +113,17 @@ public class JWTToken extends CoreToken {
     }
 
     /**
+     * @{inheritDoc}
+     */
+    public String getTokenID(){
+        return this.build();
+    }
+    /**
      *  Sets the issuer of the response
      * @param issuer user identifier of the issuer
      */
     private void setIssuer(String issuer){
-        super.put("iss", issuer);
+        super.put(OAuth2Constants.JWTTokenParams.ISS, issuer);
     }
 
     /**
@@ -121,7 +131,7 @@ public class JWTToken extends CoreToken {
      * @param subject identifier of the end user
      */
     private void setSubject(String subject){
-        super.put("sub", subject);
+        super.put(OAuth2Constants.JWTTokenParams.SUB, subject);
     }
 
     /**
@@ -129,7 +139,7 @@ public class JWTToken extends CoreToken {
      * @param audience The identifier of the audience
      */
     private void setAudience(String audience){
-        super.put("aud", audience);
+        super.put(OAuth2Constants.JWTTokenParams.AUD, audience);
 
     }
 
@@ -138,7 +148,7 @@ public class JWTToken extends CoreToken {
      * @param party identifier of the client_id
      */
     private void setAuthorizeParty(String party){
-        super.put("azp", party);
+        super.put(OAuth2Constants.JWTTokenParams.AZP, party);
     }
 
     /**
@@ -146,7 +156,7 @@ public class JWTToken extends CoreToken {
      * @param time time the token expires in seconds since epoc
      */
     private void setExpirationTime(long time){
-        super.put("exp", time);
+        super.put(OAuth2Constants.JWTTokenParams.EXP, time);
     }
 
     /**
@@ -154,7 +164,7 @@ public class JWTToken extends CoreToken {
      * @param time Seconds since epoc
      */
     private void setIssueTime(long time){
-        super.put("iat", time);
+        super.put(OAuth2Constants.JWTTokenParams.IAT, time);
     }
 
     /**
@@ -162,7 +172,19 @@ public class JWTToken extends CoreToken {
      * @param time Seconds since epoc
      */
     private void setAuthTime(long time){
-        super.put("ath", time);
+        super.put(OAuth2Constants.JWTTokenParams.ATH, time);
+    }
+
+    protected void setTokenType(String tokenType){
+        super.put(OAuth2Constants.CoreTokenParams.TOKEN_TYPE, tokenType);
+    }
+
+    protected void setTokenName(String tokenName){
+        super.put(OAuth2Constants.CoreTokenParams.TOKEN_NAME, tokenName);
+    }
+
+    protected void setRealm(String realm){
+        this.put(OAuth2Constants.CoreTokenParams.REALM, realm);
     }
 
     /**
@@ -170,6 +192,48 @@ public class JWTToken extends CoreToken {
      * @param nonce
      */
     private void setNonce(String nonce){
-        super.put("nonce", nonce);
+        super.put(OAuth2Constants.JWTTokenParams.NONCE, nonce);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public String getUserID() {
+        return this.get(OAuth2Constants.JWTTokenParams.SUB).asString();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public String getRealm() {
+        return this.get(OAuth2Constants.CoreTokenParams.REALM).asString();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public long getExpireTime() {
+        return Long.parseLong(this.get(OAuth2Constants.JWTTokenParams.EXP).asString());
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public boolean isExpired() {
+        return (System.currentTimeMillis() > getExpireTime());
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public String getTokenType(){
+        return this.get(OAuth2Constants.CoreTokenParams.TOKEN_TYPE).asString();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public String getTokenName(){
+        return this.get(OAuth2Constants.CoreTokenParams.TOKEN_NAME).asString();
     }
 }

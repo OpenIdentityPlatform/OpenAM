@@ -92,8 +92,9 @@
                                  syntax="string"
                                  i18nKey="a105">
                     <DefaultValues>
-                        <Value>token|org.forgerock.restlet.ext.oauth2.flow.ImplicitGrantServerResource</Value>
-                        <Value>code|org.forgerock.restlet.ext.oauth2.flow.CodeServerResource</Value>
+                        <Value>token|org.forgerock.restlet.ext.oauth2.flow.responseTypes.TokenResponseType</Value>
+                        <Value>code|org.forgerock.restlet.ext.oauth2.flow.responseTypes.CodeResponseType</Value>
+                        <Value>id_token|org.forgerock.restlet.ext.oauth2.flow.responseTypes</Value>
                     </DefaultValues>
                 </AttributeSchema>
 
@@ -177,8 +178,9 @@
                                      syntax="string"
                                      i18nKey="a105">
                         <DefaultValues>
-                            <Value>token|org.forgerock.restlet.ext.oauth2.flow.ImplicitGrantServerResource</Value>
-                            <Value>code|org.forgerock.restlet.ext.oauth2.flow.CodeServerResource</Value>
+                            <Value>token|org.forgerock.restlet.ext.oauth2.flow.responseTypes.TokenResponseType</Value>
+                            <Value>code|org.forgerock.restlet.ext.oauth2.flow.responseTypes.CodeResponseType</Value>
+                            <Value>id_token|org.forgerock.restlet.ext.oauth2.flow.responseTypes</Value>
                         </DefaultValues>
                     </AttributeSchema>
 

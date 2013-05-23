@@ -1,7 +1,7 @@
 /*
  * DO NOT REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright (c) 2012 ForgeRock Inc. All rights reserved.
+ * Copyright (c) 2012-2013 ForgeRock Inc. All rights reserved.
  *
  * The contents of this file are subject to the terms
  * of the Common Development and Distribution License
@@ -19,10 +19,10 @@
  * If applicable, add the following below the CDDL Header,
  * with the fields enclosed by brackets [] replaced by
  * your own identifying information:
- * "Portions Copyrighted [2012] [ForgeRock Inc]"
+ * "Portions copyright [year] [name of copyright owner]"
  */
 
-package org.forgerock.restlet.ext.oauth2.flow;
+package org.forgerock.restlet.ext.oauth2.flow.responseTypes;
 
 import java.util.*;
 
@@ -38,7 +38,7 @@ import org.forgerock.openam.oauth2.utils.OAuth2Utils;
  *
  * @see <a href="http://tools.ietf.org/html/rfc6749#section-4.2">4.2.  Implicit Grant</a>
  */
-public class ImplicitGrantServerResource implements ResponseType {
+public class TokenResponseType implements ResponseType {
 
     public CoreToken createToken(Map<String, Object> data){
         DefaultOAuthTokenStoreImpl store = new DefaultOAuthTokenStoreImpl();

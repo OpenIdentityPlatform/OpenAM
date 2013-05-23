@@ -146,6 +146,9 @@ public class AuthorizeServerResource extends AbstractFlow {
             String state =
                     OAuth2Utils
                             .getRequestParameter(getRequest(), OAuth2Constants.Params.STATE, String.class);
+            String nonce =
+                    OAuth2Utils
+                            .getRequestParameter(getRequest(), OAuth2Constants.Params.STATE, String.class);
 
             Set<String> checkedScope = executeAccessTokenScopePlugin(scope_after);
 
@@ -162,6 +165,7 @@ public class AuthorizeServerResource extends AbstractFlow {
             data.put(OAuth2Constants.CoreTokenParams.USERNAME, resourceOwner.getIdentifier());
             data.put(OAuth2Constants.CoreTokenParams.CLIENT_ID, sessionClient.getClientId());
             data.put(OAuth2Constants.CoreTokenParams.REDIRECT_URI, sessionClient.getRedirectUri());
+            data.put(OAuth2Constants.Custom.NONCE, nonce);
 
 
             if (requestedResponseTypes == null || requestedResponseTypes.isEmpty()){
@@ -176,11 +180,18 @@ public class AuthorizeServerResource extends AbstractFlow {
                             OAuth2Utils.DEBUG.warning("AuthorizeServerResource.represent(): Requested a response type that is not configured. response_type=" + request);
                             throw OAuthProblemException.OAuthError.UNSUPPORTED_RESPONSE_TYPE.handle(getRequest(),
                                     "Response type is not supported");
+                        } else if (responseClass.equalsIgnoreCase("none")){
+                            continue;
                         }
+                        //execute response type class
                         Class clazz = Class.forName(responseClass);
                         ResponseType classObj = (ResponseType) clazz.newInstance();
+
+                        //create the response type token
                         CoreToken token = classObj.createToken(data);
-                        String paramName = classObj.getReturnLocation();
+
+                        //get the response type return location
+                        String paramName = classObj.URIParamValue();
                         if (listOfTokens.containsKey(paramName)){
                             OAuth2Utils.DEBUG.error("AuthorizeServerResource.represent(): Returning multiple response types with the same url value");
                             throw OAuthProblemException.OAuthError.UNSUPPORTED_RESPONSE_TYPE.handle(getRequest(),
@@ -188,6 +199,7 @@ public class AuthorizeServerResource extends AbstractFlow {
                         }
                         listOfTokens.put(classObj.URIParamValue(), token);
 
+                        //if return location is fragment all tokens need to be returned as a fragment
                         if (fragment == false){
                             String location = classObj.getReturnLocation();
                             if (location.equalsIgnoreCase("FRAGMENT")){
@@ -207,9 +219,6 @@ public class AuthorizeServerResource extends AbstractFlow {
 
             //execute post token creation pre return scope plugin for extra return data.
             Map<String, String> extraData = new HashMap<String, String>();
-            String nonce = OAuth2Utils.getRequestParameter(getRequest(), OAuth2Constants.Custom.NONCE, String.class);
-            extraData.put(OAuth2Constants.Custom.NONCE, nonce);
-            extraData.put(OAuth2Constants.Params.RESPONSE_TYPE, OAuth2Utils.getRequestParameter(getRequest(), OAuth2Constants.Params.RESPONSE_TYPE, String.class));
 
             Map<String, String> valuesToAdd = executeAuthorizationExtraDataScopePlugin(extraData, listOfTokens);
 
