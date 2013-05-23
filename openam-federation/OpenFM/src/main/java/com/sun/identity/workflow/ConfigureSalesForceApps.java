@@ -27,7 +27,7 @@
  */
 
 /**
- * Portions Copyrighted 2012 ForgeRock Inc
+ * Portions Copyrighted 2012-2013 ForgeRock Inc
  */
 package com.sun.identity.workflow;
 
@@ -53,10 +53,11 @@ import javax.xml.bind.JAXBException;
  **/
 public class ConfigureSalesForceApps
         extends Task {
+    private static final String ENTITY_ID_PLACEHOLDER = "ENTITY_ID_PLACEHOLDER";
 
     private static final String
-            METADATA = "<EntityDescriptor entityID=\"https://saml.salesfor" +
-                "ce.com\" xmlns=\"urn:oasis:names:tc:SAML:2.0:metadata\"><SP" +
+            METADATA = "<EntityDescriptor entityID=\"ENTITY_ID_PLACEHOLDER\" " +
+                "xmlns=\"urn:oasis:names:tc:SAML:2.0:metadata\"><SP" +
                 "SSODescriptor AuthnRequestsSigned=\"false\" WantAssertionsSi" +
                 "gned=\"false\" protocolSupportEnumeration=\"urn:oasis:name" +
                 "s:tc:SAML:2.0:protocol\"> <NameIDFormat>urn:oasis:names:t" +
@@ -73,29 +74,35 @@ public class ConfigureSalesForceApps
     @Override
     public String execute(Locale locale, Map params)
             throws WorkflowException {
-        String entityId = getString(params, ParameterKeys.P_IDP);
+        String idp = getString(params, ParameterKeys.P_IDP);
         String realm = getString(params, ParameterKeys.P_REALM);
         String cot = getString(params, ParameterKeys.P_COT);
+        String entityId = getString(params, ParameterKeys.P_ENTITY_ID);
+        if ((entityId == null) || entityId.isEmpty()) {
+             throw new WorkflowException("sp.entity.id.not.specified", null);
+        }
         List attrMapping = getAttributeMapping(params);
         if (attrMapping.isEmpty()) {
-            Object[] param = {entityId};
+            Object[] param = {idp};
             throw new WorkflowException("attributemapping.is.empty", param);
         }
 
-        updateSPMeta(realm, cot, attrMapping);
+        updateSPMeta(entityId, realm, cot, attrMapping);
 
-        Object[] param = {entityId};
+        Object[] param = {idp};
         return MessageFormat.format(
                 getMessage("google.apps.configured.success", locale), param);
     }
 
-    private void updateSPMeta(String realm, String cot, List attrMapping)
+    private void updateSPMeta(String entityId, String realm, String cot, List attrMapping)
             throws WorkflowException {
 
         String extendedMeta = null;
+        String localMetadata = null;
         try {
+            localMetadata = METADATA.replace(ENTITY_ID_PLACEHOLDER, entityId);
             EntityDescriptorElement e =
-                SAML2MetaUtils.getEntityDescriptorElement(METADATA);
+                SAML2MetaUtils.getEntityDescriptorElement(localMetadata);
             String eId = e.getEntityID();
             String metaAlias = generateMetaAliasForSP(realm);
             Map map = new HashMap();
@@ -109,11 +116,11 @@ public class ConfigureSalesForceApps
             throw new WorkflowException(ex.getMessage());
         }
         String[] results = ImportSAML2MetaData.importData(
-                realm, METADATA, extendedMeta);
-        String entityId = results[1];
+                realm, localMetadata, extendedMeta);
+        String configuredEntityId = results[1];
         if ((cot != null) && (cot.length() > 0)) {
             try {
-                AddProviderToCOT.addToCOT(realm, cot, entityId);
+                AddProviderToCOT.addToCOT(realm, cot, configuredEntityId);
             } catch (COTException e) {
                 throw new WorkflowException(e.getMessage());
             }
@@ -123,9 +130,9 @@ public class ConfigureSalesForceApps
             if (!attrMapping.isEmpty()) {
                 SAML2MetaManager manager = new SAML2MetaManager();
                 EntityConfigElement config =
-                        manager.getEntityConfig(realm, entityId);
+                        manager.getEntityConfig(realm, configuredEntityId);
                 SPSSOConfigElement ssoConfig =
-                        manager.getSPSSOConfig(realm, entityId);
+                        manager.getSPSSOConfig(realm, configuredEntityId);
 
                 if (ssoConfig != null) {
                     ObjectFactory objFactory = new ObjectFactory();

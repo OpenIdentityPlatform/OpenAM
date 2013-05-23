@@ -27,7 +27,7 @@
  */
 
 /*
- * Portions Copyrighted 2011 ForgeRock AS
+ * Portions Copyrighted 2011-2013 ForgeRock Inc.
  */
 
 package com.sun.identity.console.task.model;
@@ -352,8 +352,7 @@ public class TaskModelImpl
             ) throws AMConsoleException 
     {
         Map map = new HashMap();
-        StringTokenizer st = new StringTokenizer(attrMapping, "=");
-        String assertName = st.nextToken().trim();
+        String attributeNames = getAttributeNames(attrMapping);
         IDPSSODescriptorElement idpssoDescriptor = null;
         try {
             SAML2MetaManager samlManager = new SAML2MetaManager();
@@ -377,17 +376,43 @@ public class TaskModelImpl
             String publickey =
                 SAML2MetaSecurityUtils.buildX509Certificate(signingCertAlias);
             String str = "-----BEGIN CERTIFICATE-----\n" 
-                    + publickey + "-----END CERTIFICATE-----\n";
+                    + publickey + "\n-----END CERTIFICATE-----\n";
 
             map.put("PubKey", returnEmptySetIfValueIsNull(str));
             map.put("IssuerID", returnEmptySetIfValueIsNull(entityId));
 
-            map.put("AttributeName", returnEmptySetIfValueIsNull(assertName));
+            map.put("AttributeName", returnEmptySetIfValueIsNull(attributeNames));
 
         } catch (SAML2MetaException ex) {
             throw new AMConsoleException(ex.getMessage());
         }
         return map;
+    }
+
+    /*
+    Added for OpenAM-1232. Want to return a set of the attribute names configured. The user should allow to select
+    a specific appropriate attribute name as the SAML FederationId.
+    The attributes String is in format ATTR_NAME=ATTR_VALUE|
+    The jato widgets displaying a selectable list are problematic. I will simply return a string containing
+    the attribute names.
+     */
+    private String getAttributeNames(String attributes) {
+        StringBuilder attributeNames = new StringBuilder();
+        StringTokenizer attributeTokens = new StringTokenizer(attributes, "|");
+        int count = 0;
+        while (attributeTokens.hasMoreTokens()) {
+            String attribute = attributeTokens.nextToken();
+            String attributeName = new StringTokenizer(attribute, "=").nextToken();
+            if (attributeName != null) {
+                if (count > 0) {
+                    attributeNames.append(" ").append(attributeName);
+                } else {
+                    attributeNames.append(attributeName);
+                }
+                count++;
+            }
+        }
+        return attributeNames.toString();
     }
 
     /**

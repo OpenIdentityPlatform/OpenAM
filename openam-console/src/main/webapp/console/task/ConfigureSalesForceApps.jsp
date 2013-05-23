@@ -26,6 +26,9 @@
 
 --%>
 
+<%--
+   Portions Copyrighted 2013 ForgeRock Inc.
+--%>
 <%@ page info="CreateSalesForce" language="java" %>
 <%@taglib uri="/WEB-INF/jato.tld" prefix="jato" %>
 <%@taglib uri="/WEB-INF/cc.tld" prefix="cc" %>
@@ -163,11 +166,12 @@
     var idpNew = frm.elements['ConfigureSalesForceApps.choiceIDP'].value;
     var realmNew = frm.elements['ConfigureSalesForceApps.tfRealm'].value;
     var attrMappNew = escapeEx(getNameAttributeMapping());
+    var spEntityIdNew = escapeEx(frm.elements['ConfigureSalesForceApps.salesforceSPId'].value);
 
   <%--  var domainIdNew ;--%>
     
     var msgCreating = "<p><img src=\"../console/images/processing.gif\" width=\"66\" height\"66\"/></p><cc:text name="txtConfiguring" defaultValue="configuring.salesforce.apps.waiting" bundleID="amConsole" escape="false" />";
-    var msgCreated = "<p>&nbsp;</p><input name=\"btnOK\" type=\"submit\" class=\"Btn1\" value=\"<cc:text name="txtOKBtn" defaultValue="ajax.ok.button" bundleID="amConsole" />\" onClick=\"document.location.replace(\'../task/ConfigureSalesForceAppsComplete?idp=\' + idpNew + \'&realm=\' + realmNew + \'&attrMapp=\' +attrMappNew);return false;\" /></div></p>";
+    var msgCreated = "<p>&nbsp;</p><input name=\"btnOK\" type=\"submit\" class=\"Btn1\" value=\"<cc:text name="txtOKBtn" defaultValue="ajax.ok.button" bundleID="amConsole" />\" onClick=\"document.location.replace(\'../task/ConfigureSalesForceAppsComplete?idp=\' + idpNew + \'&realm=\' + realmNew + \'&attrMapp=\' + attrMappNew + \'&entityId=\' + spEntityIdNew);return false;\" /></div></p>";
     var ttlCreated = "<h3><cc:text name="txtTtlCreated" defaultValue="salesforce.apps.configured.msg" escape="false" bundleID="amConsole" /></h3>";
     var closeBtn = "<p>&nbsp;</p><p><div class=\"TtlBtnDiv\"><input name=\"btnClose\" type=\"submit\" class=\"Btn1\" value=\"<cc:text name="txtCloseBtn" defaultValue="ajax.close.button" bundleID="amConsole" />\" onClick=\"focusMain();return false;\" /></div></p>";
     var msgMissingAttrMappingValues = "<cc:text name="txtMissingAttrValues" defaultValue="configure.provider.missing.attribute.mapping.values" bundleID="amConsole" escape="false" />" + "<p>" + closeBtn + "</p>";
@@ -192,16 +196,19 @@
         idpNew = frm.elements['ConfigureSalesForceApps.choiceIDP'].value;
         realmNew = frm.elements['ConfigureSalesForceApps.tfRealm'].value;
         attrMappNew = escapeEx(getNameAttributeMapping());
+        spEntityIdNew = escapeEx(frm.elements['ConfigureSalesForceApps.salesforceSPId'].value);
         ajaxPost(ajaxObj, url, params, configured);
         return false;
     }
 
     function getData() {
+        var entityId = frm.elements['ConfigureSalesForceApps.salesforceSPId'].value;
         var cot = frm.elements['ConfigureSalesForceApps.choiceCOT'].value;
         var idp = frm.elements['ConfigureSalesForceApps.choiceIDP'].value;
         var realm = frm.elements['ConfigureSalesForceApps.tfRealm'].value; 
 
-        return "&realm=" + escapeEx(realm) +
+        return "&entityId=" + escapeEx(entityId) +
+            "&realm=" + escapeEx(realm) +
             "&cot=" + escapeEx(cot) +
             "&idp=" + escapeEx(idp) +
             "&attributemappings=" + escapeEx(getNameAttributeMapping());

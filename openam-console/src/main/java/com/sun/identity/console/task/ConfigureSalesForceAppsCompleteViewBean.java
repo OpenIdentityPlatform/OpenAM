@@ -25,6 +25,10 @@
  * $Id: ConfigureSalesForceAppsCompleteViewBean.java,v 1.3 2009/07/28 17:45:40 babysunil Exp $
  *
  */
+
+/**
+ * Portions Copyrighted 2013 ForgeRock Inc.
+ */
 package com.sun.identity.console.task;
 
 import com.iplanet.jato.RequestContext;
@@ -70,6 +74,7 @@ public class ConfigureSalesForceAppsCompleteViewBean
     private CCPageTitleModel ptModel;
     private static final String PGTITLE_ONE_BTNS =
             "pgtitleOneBtns";
+    private static final String ENTITY_ID = "entityId";
     private boolean initialized;
 
     /**
@@ -121,11 +126,13 @@ public class ConfigureSalesForceAppsCompleteViewBean
             super.beginDisplay(event);
             HttpServletRequest req = getRequestContext().getRequest();
             String realm = req.getParameter("realm");
-            String entityId = req.getParameter("idp");
+            String idp = req.getParameter("idp");
             String attrMapp = req.getParameter("attrMapp");
+            String spEntityId = req.getParameter(ENTITY_ID);
+            setPageSessionAttribute(ENTITY_ID, spEntityId);
             setPageSessionAttribute("entityRealm", realm);
             TaskModel model = (TaskModel) getModelInternal();
-            Map values = model.getConfigureSalesForceAppsURLs(realm, entityId, attrMapp);
+            Map values = model.getConfigureSalesForceAppsURLs(realm, idp, attrMapp);
 
             String domainId = getModel().getLocalizedString("salesforce.link");           
             String msg = "<ul>";
@@ -179,7 +186,7 @@ public class ConfigureSalesForceAppsCompleteViewBean
         try {
             if ((acsUrl != null) && (acsUrl.length() > 0)) {
                 String realm = (String) getPageSessionAttribute("entityRealm");
-                String entityId = "https://saml.salesforce.com";
+                String entityId = (String) getPageSessionAttribute(ENTITY_ID);
                 TaskModel model = (TaskModel) getModelInternal();
                 model.setAcsUrl(realm, entityId, acsUrl);
                 HomeViewBean vb = (HomeViewBean) getViewBean(HomeViewBean.class);

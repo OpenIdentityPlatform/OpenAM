@@ -26,10 +26,22 @@
 
 -->
 
+<!--
+   Portions Copyrighted 2013 ForgeRock Inc.
+-->
+
 <!DOCTYPE propertysheet SYSTEM "propertysheet.dtd">
 
     <propertysheet>
         <section name="question" defaultValue="blank.header">
+            <property required="true">
+                <label name="lblSalesforceSPId" defaultValue="configure.salesforce.apps.label.salesforceSPId" labelFor="salesforceSPId" />
+                <cc name="salesforceSPId" tagclass="com.sun.web.ui.taglib.html.CCTextFieldTag" >
+                </cc>
+                <fieldhelp name="salesforceSPIdHelp"
+                           defaultValue="configure.salesforce.apps.help.salesforceSPId" />
+            </property>
+
             <property required="true">
                 <label name="lblRealm" defaultValue="configure.salesforce.apps.label.realm" labelFor="tfRealm" />
                 <cc name="tfRealm" tagclass="com.sun.web.ui.taglib.html.CCDropDownMenuTag">
