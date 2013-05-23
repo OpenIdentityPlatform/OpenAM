@@ -208,14 +208,21 @@ public class AuthorizationCodeServerResource extends AbstractFlow {
         if (list != null && !list.isEmpty() ){
             for (HashMap<String,Set<String>> entry : list){
                 Set<String> idSet = entry.get(OAuth2Constants.CoreTokenParams.ID);
-                if (idSet != null && !idSet.isEmpty()){
+                Set<String> tokenNameSet = entry.get(OAuth2Constants.CoreTokenParams.TOKEN_NAME);
+                Set<String> refreshTokenSet = entry.get(OAuth2Constants.CoreTokenParams.REFRESH_TOKEN);
+                String refreshTokenID = null;
+                if (idSet != null && !idSet.isEmpty() && tokenNameSet != null && !tokenNameSet.isEmpty()){
                     String entryID = idSet.iterator().next();
-                    invalidateTokens(entryID);
-                    String type = null;
-                    Set<String> tokenTypeSet = entry.get(OAuth2Constants.CoreTokenParams.TOKEN_TYPE);
-                    if (tokenTypeSet != null && !tokenTypeSet.isEmpty()){
-                        type = tokenTypeSet.iterator().next();
+                    String type = tokenNameSet.iterator().next();
+
+                    //if access_token delete the refresh token if it exists
+                    if (tokenNameSet.iterator().next().equalsIgnoreCase(OAuth2Constants.Token.OAUTH_ACCESS_TOKEN) &&
+                        refreshTokenSet != null && !refreshTokenSet.isEmpty()){
+                        refreshTokenID = refreshTokenSet.iterator().next();
+                        deleteToken(OAuth2Constants.Token.OAUTH_REFRESH_TOKEN, refreshTokenID);
                     }
+                    //delete the access_token
+                    invalidateTokens(entryID);
                     deleteToken(type, entryID);
                 }
              }
