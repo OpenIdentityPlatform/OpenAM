@@ -26,7 +26,7 @@
  *
  */
 
- /*
+/*
  * Portions copyright 2010-2013 ForgeRock, Inc.
  */
 
@@ -120,7 +120,7 @@ public class AttributeQueryUtil {
     }
 
     /**
-     * Sends the <code>AttributeQuery</code> to specifiied
+     * Sends the <code>AttributeQuery</code> to specified
      * attribute authority and returns <code>Response</code> coming
      * from the attribute authority.
      *
@@ -180,7 +180,7 @@ public class AttributeQueryUtil {
     }
 
      /**
-     * Sends the <code>AttributeQuery</code> to specifiied
+     * Sends the <code>AttributeQuery</code> to specified
      * attribute authority and returns <code>Response</code> coming
      * from the attribute authority.
      *
@@ -1294,14 +1294,14 @@ public class AttributeQueryUtil {
     }
 
     /**
-     * Sends the AttributeQuery to specifiied attribute authority, 
+     * Sends the AttributeQuery to specified attribute authority,
      * validates the response and returns the attribute map
-     * <code>Map<String, String></code> to the Fedlet
+     * <code>Map&lt;String, String&gt;</code> to the Fedlet
      *
      * @param spEntityID SP entity ID
      * @param idpEntityID IDP entity ID
      * @param nameIDValue  NameID value 
-     * @param attrsList The list of attributes whose values needs to be 
+     * @param attrsList The list of attributes whose values need to be
      *                  fetched from IDP
      * @param attrQueryProfileAlias  Attribute Query Profile Alias
      * @param subjectDN  Attribute name which contains X.509 subject DN
@@ -1346,14 +1346,14 @@ public class AttributeQueryUtil {
     }
     
     /**
-     * Sends the AttributeQuery to specifiied attribute authority, 
+     * Sends the AttributeQuery to specified attribute authority,
      * validates the response and returns the attribute map
-     * <code>Map<String, Set<String>></code> to the Fedlet
+     * <code>Map&lt;String, Set&lt;String&gt;&gt;</code> to the Fedlet
      *
      * @param spEntityID SP entity ID
      * @param idpEntityID IDP entity ID
      * @param nameIDValue  NameID value 
-     * @param attrsList The list of attributes whose values needs to be 
+     * @param attrsList The list of attributes whose values need to be
      *                  fetched from IDP
      * @param attrQueryProfileAlias  Attribute Query Profile Alias
      * @param subjectDN  Attribute name which contains X.509 subject DN
