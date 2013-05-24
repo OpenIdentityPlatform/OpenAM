@@ -27,7 +27,7 @@
  */
 
  /*
- * Portions Copyrighted 2010-2013 ForgeRock Inc
+ * Portions copyright 2010-2013 ForgeRock, Inc.
  */
 
 package com.sun.identity.saml2.profile;
@@ -96,7 +96,7 @@ import java.io.IOException;
 
 
 /**
- * This class provides methods to send or processs <code>AttributeQuery</code>.
+ * This class provides methods to send or process <code>AttributeQuery</code>.
  *
  * @supported.api
  */

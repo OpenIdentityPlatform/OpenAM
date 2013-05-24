@@ -26,6 +26,9 @@
  *
  */
 
+/*
+ * Portions copyright 2013 ForgeRock, Inc.
+ */
 
 package com.sun.identity.saml2.profile;
 
@@ -74,7 +77,7 @@ import com.sun.identity.saml2.protocol.Status;
 import com.sun.identity.shared.xml.XMLUtils;
 
 /**
- * This class provides methods to send or processs
+ * This class provides methods to send or process
  * <code>NameIDMappingRequest</code>.
  *
  * @supported.api

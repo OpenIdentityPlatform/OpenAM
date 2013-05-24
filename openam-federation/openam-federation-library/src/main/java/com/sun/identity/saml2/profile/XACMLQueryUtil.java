@@ -26,6 +26,9 @@
  *
  */
 
+/*
+ * Portions copyright 2013 ForgeRock, Inc.
+ */
 
 package com.sun.identity.saml2.profile;
 
@@ -55,7 +58,7 @@ import com.sun.identity.xacml.context.Result;
 import com.sun.identity.xacml.context.Subject;
 
 /**
- * This class provides methods to send or processs <code>AttributeQuery</code>.
+ * This class provides methods to send or process <code>AttributeQuery</code>.
  *
  * @supported.api
  */
