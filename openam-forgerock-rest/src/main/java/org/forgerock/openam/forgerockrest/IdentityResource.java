@@ -22,9 +22,12 @@ import java.util.*;
 
 
 import com.iplanet.am.util.SystemProperties;
+import com.sun.identity.authentication.AuthContext;
 import com.sun.identity.idm.AMIdentity;
 import com.sun.identity.idm.IdRepoException;
+import com.sun.identity.idm.IdUtils;
 import com.sun.identity.idsvcs.*;
+import com.sun.identity.shared.encode.Hash;
 import org.forgerock.json.fluent.JsonValue;
 import org.forgerock.json.fluent.JsonValueException;
 import org.forgerock.json.resource.*;
@@ -35,8 +38,14 @@ import com.iplanet.sso.SSOTokenManager;
 
 import com.sun.identity.idsvcs.opensso.IdentityServicesImpl;
 import static org.forgerock.openam.forgerockrest.RestUtils.getCookieFromServerContext;
+import static org.forgerock.openam.forgerockrest.RestUtils.hasPermission;
+import static org.forgerock.openam.forgerockrest.RestUtils.isAdmin;
 
 import org.forgerock.json.resource.servlet.HttpContext;
+
+import javax.security.auth.callback.Callback;
+import javax.security.auth.callback.NameCallback;
+import javax.security.auth.callback.PasswordCallback;
 
 
 /**
@@ -395,6 +404,78 @@ public final class IdentityResource implements CollectionResourceProvider {
         }
     }
 
+    private boolean checkValidPassword(String username, char[] password, String realm) throws BadRequestException {
+        if(username == null || password == null ){
+            throw new BadRequestException("Invalid Username or Password");
+        }
+        try {
+            AuthContext lc = new AuthContext(realm);
+            lc.login();
+            while (lc.hasMoreRequirements()) {
+                Callback[] callbacks = lc.getRequirements();
+                ArrayList missing = new ArrayList();
+                // loop through the requires setting the needs..
+                for (int i = 0; i < callbacks.length; i++) {
+                    if (callbacks[i] instanceof NameCallback) {
+                        NameCallback nc = (NameCallback) callbacks[i];
+                        nc.setName(username);
+                    } else if (callbacks[i] instanceof PasswordCallback) {
+                        PasswordCallback pc = (PasswordCallback) callbacks[i];
+                        pc.setPassword(password);
+                    } else {
+                        missing.add(callbacks[i]);
+                    }
+                }
+                // there's missing requirements not filled by this
+                if (missing.size() > 0) {
+                    throw new BadRequestException("Insufficient Requirements");
+                }
+                lc.submitRequirements(callbacks);
+            }
+
+            // validate the password..
+            if (lc.getStatus() == AuthContext.Status.SUCCESS) {
+                lc.logout();
+                return true;
+            } else {
+                return false;
+            }
+        } catch (Exception e) {
+
+        }
+        return false;
+    }
+
+    private String getPasswordFromHeader(ServerContext context){
+        List<String> cookies = null;
+        String cookieName = "olduserpassword";
+        HttpContext header = null;
+
+        try {
+            header = context.asContext(HttpContext.class);
+            if (header == null) {
+                RestDispatcher.debug.error("IdentityResource.getPasswordFromHeader :: " +
+                        "Cannot retrieve ServerContext as HttpContext");
+                return null;
+            }
+            //get the cookie from header directly   as the name of com.iplanet.am.cookie.am
+            cookies = header.getHeaders().get(cookieName.toLowerCase());
+            if (cookies != null && !cookies.isEmpty()) {
+                for (String s : cookies) {
+                    if (s == null || s.isEmpty()) {
+                        return null;
+                    } else {
+                        return s;
+                    }
+                }
+            }
+        } catch (Exception e) {
+            RestDispatcher.debug.error("IdentityResource.getPasswordFromHeader :: " +
+                    "Cannot get cookie from ServerContext!" + e);
+        }
+        return null;
+    }
+
     /**
      * {@inheritDoc}
      */
@@ -407,7 +488,6 @@ public final class IdentityResource implements CollectionResourceProvider {
 
         final JsonValue jVal = request.getNewContent();
         final String rev = request.getRevision();
-
         IdentityDetails dtls = null, newDtls = null;
         IdentityServicesImpl idsvc = null;
         Resource resource = null;
@@ -419,6 +499,21 @@ public final class IdentityResource implements CollectionResourceProvider {
 
             newDtls = jsonValueToIdentityDetails(jVal);
             newDtls.setName(resourceId);
+            String userpass = jVal.get("userpassword").asString();
+            //check that the attribute userpassword is in the json object
+            if(userpass != null && !userpass.isEmpty()) {
+                if(checkValidPassword(resourceId, userpass.toCharArray(),realm) || isAdmin(context)){
+                    // same password as before, update the attributes
+                } else {
+                    // check header to make sure that oldpassword is there check to see if it's correct
+                    if(checkValidPassword(resourceId, getPasswordFromHeader(context).toCharArray(), realm)){
+                        //continue will allow password change
+                    } else{
+                        throw new PermanentException(401, "Unauthorized", null);
+                    }
+                }
+            }
+
             // update resource with new details
             UpdateResponse message = idsvc.update(newDtls, admin);
             // read updated identity back to client
@@ -431,7 +526,6 @@ public final class IdentityResource implements CollectionResourceProvider {
             try {
                 dtls = jsonValueToIdentityDetails(jVal);
                 dtls.setName(resourceId);
-
                 // create resource because it does not exist
                 CreateResponse success = idsvc.create(dtls, admin);
                 // check created identity

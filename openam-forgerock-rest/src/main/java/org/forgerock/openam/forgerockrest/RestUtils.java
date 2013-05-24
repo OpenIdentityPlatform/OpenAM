@@ -121,6 +121,32 @@ final public class  RestUtils {
         return null;
     }
 
+    static public boolean isAdmin(final ServerContext context){
+
+        JsonValue result = new JsonValue(new LinkedHashMap<String, Object>(1));
+
+        Token admin = new Token();
+        admin.setId(getCookieFromServerContext(context));
+        SSOToken ssotok = null;
+        AMIdentity amIdentity = null;
+
+        try {
+            SSOTokenManager mgr = SSOTokenManager.getInstance();
+            ssotok = mgr.createSSOToken(getCookieFromServerContext(context));
+            amIdentity = new AMIdentity(ssotok);
+
+            if (!(amIdentity.equals(adminUserId))){
+                RestDispatcher.debug.error("Unauthorized user.");
+                return false;
+            }
+            return true;
+        } catch (SSOException e) {
+            RestDispatcher.debug.error("IdentityResource.idFromSession() :: Cannot retrieve SSO Token: " + e);
+        } catch (IdRepoException ex) {
+            RestDispatcher.debug.error("IdentityResource.idFromSession() :: Cannot retrieve user from IdRepo" + ex);
+        }
+        return false;
+    }
     static public void hasPermission(final ServerContext context) throws SSOException, IdRepoException, ForbiddenException {
         //Checks to see if User is amadmin, currently only amAdmin can access realms
         Token admin = new Token();
