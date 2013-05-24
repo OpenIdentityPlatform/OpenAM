@@ -148,6 +148,11 @@
             <groupId>org.forgerock.openam</groupId>
             <artifactId>openam-xacml3-schema</artifactId>
         </dependency>
+        <dependency>
+            <groupId>org.forgerock.openam</groupId>
+            <artifactId>openam-ldap-utils</artifactId>
+        </dependency>
+
         <!-- LDAP APIs -->
         <dependency>
                 <groupId>org.forgerock.opendj</groupId>

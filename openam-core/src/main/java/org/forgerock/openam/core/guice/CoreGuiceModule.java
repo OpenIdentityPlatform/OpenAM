@@ -25,6 +25,7 @@ import com.iplanet.services.ldap.LDAPUser;
 import com.iplanet.services.ldap.ServerGroup;
 import com.iplanet.services.ldap.ServerInstance;
 import com.iplanet.sso.SSOToken;
+import org.forgerock.openam.sm.DataLayerConnectionFactory;
 import com.sun.identity.common.ShutdownListener;
 import com.sun.identity.common.ShutdownManager;
 import com.sun.identity.security.AdminTokenAction;
@@ -70,6 +71,23 @@ public class CoreGuiceModule extends AbstractModule {
         bind(IndexChangeManager.class).to(IndexChangeManagerImpl.class).in(Singleton.class);
         bind(IndexChangeMonitor.class).to(IndexChangeMonitorImpl.class).in(Singleton.class);
         bind(IndexTreeService.class).to(IndexTreeServiceImpl.class).in(Singleton.class);
+
+        /**
+         * Configuration data for Data Layer LDAP connections.
+         * Using a provider to defer initialisation of the factory until
+         * it is needed.
+         */
+        bind(DataLayerConnectionFactory.class).in(Singleton.class);
+        bind(DSConfigMgr.class).toProvider(new Provider<DSConfigMgr>() {
+            @Override
+            public DSConfigMgr get() {
+                try {
+                    return DSConfigMgr.getDSConfigMgr();
+                } catch (LDAPServiceException e) {
+                    throw new IllegalStateException(e);
+                }
+            }
+        }).in(Singleton.class);
     }
 
     // Implementation exists to capture the generic type of the PrivilegedAction.
