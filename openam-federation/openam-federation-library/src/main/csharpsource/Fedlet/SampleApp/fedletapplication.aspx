@@ -25,6 +25,9 @@
  *
  * $Id: fedletapplication.aspx,v 1.6 2009/11/12 00:36:50 ggennaro Exp $
  */
+/*
+ * Portions Copyrighted 2013 ForgeRock Inc.
+ */
 --%>
 <%@ Page Language="C#" MasterPageFile="~/site.master" %>
 <%@ Import Namespace="System.IO" %>
@@ -67,9 +70,9 @@
         }
     %>
 
-    <h1>Sample Application with OpenSSO and ASP.NET</h1>
+    <h1>Fedlet Single Sign On Results</h1><hr/>
     <p>
-    Once succesfully authenticated by your OpenSSO deployment, your browser was redirected
+    Once succesfully authenticated by your OpenAM deployment, your browser was redirected
     to this location with a SAML response. This response can be consumed as follows:
     </p>
 
@@ -186,21 +189,23 @@
     {
         string idpDeployment = null;
         string idpMetaAlias = null;
-        string pattern = "(.+?/opensso).+?/metaAlias(.+?)$";
-        Match m = null;
-
+        
         foreach (XmlNode node in idp.SingleLogOutServiceLocations)
         {
             string location = node.Attributes["Location"].Value;
             if (location != null)
             {
-                m = Regex.Match(location, pattern);
-                if (m.Success && m.Groups.Count == 3)
+                UriBuilder uri = new UriBuilder(location);
+                if (uri != null)
                 {
-                    idpDeployment = m.Groups[1].Value;
-                    idpMetaAlias = m.Groups[2].Value;
+                    string[] v = uri.Path.Split('/');
+                    if (v != null && location.Contains("metaAlias") && v.Length > 2)
+                    {
+                        idpDeployment = uri.Scheme + "://" + uri.Host + (uri.Port > 0 ? ":" + uri.Port : "") + "/" + v[1];
+                        idpMetaAlias = "/" + v[v.Length - 1];
+                        break;
+                    }
                 }
-                break;
             }
         }
 
@@ -229,14 +234,62 @@
     sloListItems.Append(String.Format(sloListItemFormat, spUrl, "Fedlet", "SOAP"));
 
 %>
-
-        <p>Use one of the links below to perform Single Log Out with <b><%=idp.EntityId %></b>:</p>
+    <h1>Fedlet Attribute Query</h1><hr/>
+    <p>Use this form to perform <b>Attribute Query</b> with <b><%=idp.EntityId %></b>:</p>
+    <form id="frm_post" action="attrqueryres.aspx" method="POST">
+        <table border="0">
+            <tbody>
+                <tr>
+                    <td colspan="2"><b>Subject:</b></td>
+                </tr>
+                <tr>
+                    <td colspan="2">SAML2 Token (Transient)</td>
+                </tr>
+                <tr>
+                    <td>Attribute 1:</td>
+                    <td>
+                        <input id="Text1" type="text" name="attr1" value="CommonName" size="50" /></td>
+                </tr>
+                <tr>
+                    <td>Attribute 2:</td>
+                    <td>
+                        <input id="Text2" type="text" name="attr2" value="EmailAddress" size="50" /></td>
+                </tr>
+                <tr>
+                    <td>Attribute 3:</td>
+                    <td>
+                        <input id="Text3" type="text" name="attr3" value="UserStatus" size="50" /></td>
+                </tr>
+                <tr>
+                    <td><b>Profile Name:</b></td>
+                    <td><i>will use the Default when no X.509 Subject DN value below is entered</i></td>
+                </tr>
+                <tr>
+                    <td>X.509 Subject DN:</td>
+                    <td>
+                        <input id="Text4" type="text" name="attr4" value="" size="100" /></td>
+                </tr>
+                <tr>
+                    <td></td>
+                    <td>
+                        <input id="Text6" type="hidden" name="idpEntityID" value="<%=idp.EntityId %>" />
+                        <input id="Text7" type="hidden" name="SubjectNameId" value="<%=authnResponse.SubjectNameId %>" />
+                        <input id="Text5" type="submit" value="send" /></td>
+                </tr>
+            </tbody>
+        </table>
+        
+    </form>
+    
+    <h1>Fedlet Single Log Out</h1><hr/>
+    <p>Use one of the links below to perform <b>Single Log Out</b> with <b><%=idp.EntityId %></b>:</p>
         <ul>
             <%=sloListItems.ToString() %>
         </ul>
         
     <% } %>
 
+    <br/>
     <p>
     Return to the <a href="default.aspx">homepage</a> to try other examples available in this sample application.
     </p>

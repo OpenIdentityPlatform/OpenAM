@@ -24,6 +24,9 @@
  * 
  * $Id: IdentityProvider.cs,v 1.6 2010/01/19 18:23:09 ggennaro Exp $
  */
+/*
+ * Portions Copyrighted 2013 ForgeRock Inc.
+ */
 
 using System.Collections;
 using System.IO;
@@ -83,6 +86,7 @@ namespace Sun.Identity.Saml2
                 this.metadataNsMgr = new XmlNamespaceManager(this.metadata.NameTable);
                 this.metadataNsMgr.AddNamespace("md", "urn:oasis:names:tc:SAML:2.0:metadata");
                 this.metadataNsMgr.AddNamespace("ds", "http://www.w3.org/2000/09/xmldsig#");
+                this.metadataNsMgr.AddNamespace("aq", "urn:oasis:names:tc:SAML:metadata:X509:query");
 
                 this.extendedMetadata = new XmlDocument();
                 this.extendedMetadata.Load(extendedMetadataFileName);
@@ -150,6 +154,58 @@ namespace Sun.Identity.Saml2
             {
                 return this.signingCertificate;
             }
+        }
+
+        /// <summary>
+        /// Gets Attribute Query service locations
+        /// </summary>
+        public XmlNodeList AttributeServiceLocations
+        {
+            get
+            {
+                string xpath = "/md:EntityDescriptor/md:AttributeAuthorityDescriptor/md:AttributeService";
+                XmlNode root = this.metadata.DocumentElement;
+                XmlNodeList nodeList = root.SelectNodes(xpath, this.metadataNsMgr);
+                return nodeList;
+            }
+        }
+
+        /// <summary>
+        /// Obtain the single attribute query location based on the given binding and support for X509 query.
+        /// </summary>
+        /// <param name="binding">
+        /// The binding associated with the desired service.
+        /// </param>
+        /// <param name="supportsX509Query">
+        /// Flag for X509 query type
+        /// </param>
+        /// <returns>
+        /// Service location as defined in the metadata for the specified IDP,
+        /// binding and support for X509 query.
+        /// </returns>
+        public string GetSingleAttributeServiceLocation(string binding, bool supportsX509Query)
+        {
+            StringBuilder xpath = new StringBuilder();
+            xpath.Append("/md:EntityDescriptor/md:AttributeAuthorityDescriptor/md:AttributeService");
+            xpath.Append("[@Binding='");
+            xpath.Append(binding);
+            if (!supportsX509Query)
+            {
+                xpath.Append("' and not(@supportsX509Query)]");
+            }
+            else
+            {
+                xpath.Append("' and @supportsX509Query='true']");
+            }
+
+            XmlNode root = this.metadata.DocumentElement;
+            XmlNode node = root.SelectSingleNode(xpath.ToString(), this.metadataNsMgr);
+            if (node != null)
+            {
+                return node.Attributes["Location"].Value.Trim();
+            }
+
+            return null;
         }
 
         /// <summary>

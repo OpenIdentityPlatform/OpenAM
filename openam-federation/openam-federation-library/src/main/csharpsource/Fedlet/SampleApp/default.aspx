@@ -25,6 +25,9 @@
  * 
  * $Id: default.aspx,v 1.6 2009/11/13 18:23:36 ggennaro Exp $
  */
+/*
+ * Portions Copyrighted 2013 ForgeRock Inc.
+ */
 --%>
 <%@ Page Language="C#" MasterPageFile="~/site.master"%>
 <%@ Import Namespace="System.Xml" %>
@@ -36,17 +39,17 @@
     fedletUrl = fedletUrl.Substring(0, fedletUrl.LastIndexOf("/")) + "/fedletapplication.aspx";
 %>
 
-    <h1>Sample Application with OpenSSO and ASP.NET</h1>
+    <h1>Sample Application with OpenAM and ASP.NET</h1>
     <p>
-    This sample application demonstrates a simple Fedlet with OpenSSO and
+    This sample application demonstrates a simple Fedlet with OpenAM and
     a .NET application. Please be sure to follow the instructions of the
     README file to ensure your sample application will function correctly.
     </p>
 
     <h2>Based on the README file, you should have...</h2>
     <ol class="instructions">
-        <li>A Circle of Trust within your OpenSSO deployment.</li>
-        <li>A hosted Identity Service Provider within your OpenSSO deployment.</li>
+        <li>A Circle of Trust within your OpenAM deployment.</li>
+        <li>A hosted Identity Service Provider within your OpenAM deployment.</li>
         <li>
             This sample application configured with metadata edited appropriately
             and placed into this application's <span class="resource">App_Data/</span>
@@ -54,7 +57,7 @@
             <ol class="summary">
                 <li>
                     The HTTP-POST service location should have been edited appropriately
-                    within your OpenSSO deployment for this Service Provider.<br />
+                    within your OpenAM deployment for this Service Provider.<br />
                     For example:
                     <span class="resource"><%=Server.HtmlEncode(fedletUrl)%></span>
                 </li>
@@ -108,22 +111,24 @@
                 // create the idp initiated links
                 string deploymentUrl = null;
                 string metaAlias = null;
-                string pattern = "(.+?/opensso).+?/metaAlias(.+?)$";
-                Match m = null;
-
+                
                 foreach (XmlNode node in idp.SingleSignOnServiceLocations)
                 {
                     string binding = node.Attributes["Binding"].Value;
                     string location = node.Attributes["Location"].Value;
                     if (binding != null && location != null)
                     {
-                        m = Regex.Match(location, pattern);
-                        if (m.Success && m.Groups.Count == 3)
+                        UriBuilder uri = new UriBuilder(location);
+                        if (uri != null)
                         {
-                            deploymentUrl = m.Groups[1].Value;
-                            metaAlias = m.Groups[2].Value;
+                            string[] v = uri.Path.Split('/');
+                            if (v != null && location.Contains("metaAlias") && v.Length > 2)
+                            {
+                                deploymentUrl = uri.Scheme + "://" + uri.Host + (uri.Port > 0 ? ":" + uri.Port : "") + "/" + v[1];
+                                metaAlias = "/" + v[v.Length - 1];
+                                break;
+                            }
                         }
-                        break;
                     }
                 }
 
@@ -183,7 +188,7 @@
 
             if (idpListItems.Length == 0)
             {
-                idpListItems.Append("<li>IDP initiated SSO is currently only supported with an OpenSSO deployment.</li>");
+                idpListItems.Append("<li>IDP initiated SSO is currently only supported with an OpenAM deployment.</li>");
             }
             if (spListItems.Length == 0)
             {
@@ -199,7 +204,7 @@
     <% if( errorMessage == null ) { %>
     
         <p>
-        Perform the IDP initiated Single Sign On to take you to the OpenSSO login form. 
+        Perform the IDP initiated Single Sign On to take you to the OpenAM login form. 
         Upon successfull login, you will be taken to the location configured for your Fedlet
         for this sample application.  
         </p>
@@ -226,7 +231,7 @@
 
         <p>
         The above demonstrates how a .NET developer could issue a redirect
-        to non-authenticated users from their .NET application to the OpenSSO 
+        to non-authenticated users from their .NET application to the OpenAM 
         login page for authentication.
         </p>
     

@@ -24,6 +24,9 @@
  * 
  * $Id: RequestedAuthnContext.cs,v 1.1 2009/06/11 18:37:58 ggennaro Exp $
  */
+/*
+ * Portions Copyrighted 2013 ForgeRock Inc.
+ */
 
 using System;
 using System.Collections;
@@ -97,7 +100,7 @@ namespace Sun.Identity.Saml2
 
             StringBuilder rawXml = new StringBuilder();
 
-            rawXml.Append("<RequestedAuthnContext Comparison=\"");
+            rawXml.Append("<samlp:RequestedAuthnContext Comparison=\"");
             rawXml.Append(this.Comparison);
             rawXml.Append("\">");
 
@@ -105,9 +108,9 @@ namespace Sun.Identity.Saml2
             {
                 foreach (string value in this.AuthnContextClassRef)
                 {
-                    rawXml.Append("<AuthnContextClassRef>");
+                    rawXml.Append("<saml:AuthnContextClassRef>");
                     rawXml.Append(value);
-                    rawXml.Append("</AuthnContextClassRef>");
+                    rawXml.Append("</saml:AuthnContextClassRef>");
                 }
             }
 
@@ -115,13 +118,13 @@ namespace Sun.Identity.Saml2
             {
                 foreach (string value in this.AuthnContextDeclRef)
                 {
-                    rawXml.Append("<AuthnContextDeclRef>");
+                    rawXml.Append("<saml:AuthnContextDeclRef>");
                     rawXml.Append(value);
-                    rawXml.Append("</AuthnContextDeclRef>");
+                    rawXml.Append("</saml:AuthnContextDeclRef>");
                 }
             }
 
-            rawXml.Append("</RequestedAuthnContext>");
+            rawXml.Append("</samlp:RequestedAuthnContext>");
 
             return rawXml.ToString();
         }

@@ -24,6 +24,9 @@
  * 
  * $Id: AuthnRequest.cs,v 1.2 2010/01/19 18:23:09 ggennaro Exp $
  */
+/*
+ * Portions Copyrighted 2013 ForgeRock Inc.
+ */
 
 using System;
 using System.Collections;
@@ -130,15 +133,19 @@ namespace Sun.Identity.Saml2
             // Get RequestedAuthnContext if parameters are available...
             RequestedAuthnContext reqAuthnContext = GetRequestedAuthnContext(serviceProvider, parameters);
 
+            // Get Scoping if available...
+            Scoping scoping = GetScoping(serviceProvider);
+
             // Generate the XML for the AuthnRequest...
             StringBuilder rawXml = new StringBuilder();
-            rawXml.Append("<samlp:AuthnRequest ");
+            rawXml.Append("<samlp:AuthnRequest");
             rawXml.Append(" xmlns:samlp=\"urn:oasis:names:tc:SAML:2.0:protocol\"");
+            rawXml.Append(" xmlns:saml=\"urn:oasis:names:tc:SAML:2.0:assertion\"");
             rawXml.Append(" ID=\"" + this.Id + "\"");
             rawXml.Append(" Version=\"2.0\"");
             rawXml.Append(" IssueInstant=\"" + this.IssueInstant + "\"");
-            rawXml.Append(" IsPassive=\"" + this.IsPassive + "\"");
-            rawXml.Append(" ForceAuthn=\"" + this.ForceAuthn + "\"");
+            rawXml.Append(" IsPassive=\"" + (this.IsPassive ? "true" : "false") + "\"");
+            rawXml.Append(" ForceAuthn=\"" + (this.ForceAuthn ? "true" : "false") + "\"");
 
             if (!String.IsNullOrEmpty(this.Consent))
             {
@@ -161,14 +168,19 @@ namespace Sun.Identity.Saml2
             }
 
             rawXml.Append(">");
-            rawXml.Append("<saml:Issuer xmlns:saml=\"urn:oasis:names:tc:SAML:2.0:assertion\">" + serviceProvider.EntityId + "</saml:Issuer>");
+            rawXml.Append("<saml:Issuer>" + serviceProvider.EntityId + "</saml:Issuer>");
+            rawXml.Append("<samlp:NameIDPolicy AllowCreate=\"" + (this.AllowCreate ? "true" : "false") + "\" />");
 
             if (reqAuthnContext != null)
             {
                 rawXml.Append(reqAuthnContext.GenerateXmlString());
             }
 
-            rawXml.Append("<samlp:NameIdPolicy AllowCreate=\"" + this.AllowCreate + "\" />");
+            if (scoping != null)
+            {
+                rawXml.Append(scoping.GenerateXmlString());
+            }
+                        
             rawXml.Append("</samlp:AuthnRequest>");
 
             this.xml.LoadXml(rawXml.ToString());
@@ -295,6 +307,21 @@ namespace Sun.Identity.Saml2
             }
 
             return reqAuthnContext;
+        }
+
+        private static Scoping GetScoping(ServiceProvider serviceProvider)
+        {
+            Scoping scoping = null;
+
+            if (serviceProvider.ScopingProxyCount > 0)
+            {
+                scoping = new Scoping();
+                ArrayList idpEntry = new ArrayList();
+                idpEntry.AddRange(serviceProvider.ScopingIDPList);
+                scoping.SetIDPEntry(idpEntry);
+            }
+
+            return scoping;
         }
         #endregion
     }

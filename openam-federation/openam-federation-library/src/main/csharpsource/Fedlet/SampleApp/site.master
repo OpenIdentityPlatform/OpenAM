@@ -25,20 +25,23 @@
  *
  * $Id: site.master,v 1.1 2009/05/01 15:19:58 ggennaro Exp $
  */
+/*
+ * Portions Copyrighted 2013 ForgeRock Inc.
+ */
 --%>
 <%@ Master Language="C#" %>
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html>
 <head id="Head1" runat="server">
-    <title>Sample Application with OpenSSO and ASP.NET</title>
+    <title>Sample Application with OpenAM and ASP.NET</title>
     <link rel="stylesheet" type="text/css" href="css/site.css" />
     <script type="text/javascript" src="js/site.js"></script>
 </head>
 <body>
 
     <div class="header">
-        <div class="primary"><img src="images/PrimaryProductName.png" alt="OpenSSO" /></div>
-        <div class="secondary"><img src="images/masthead-sunname.gif" alt="Sun Microsystems, Inc."/></div>
+        <div class="primary"><img src="images/PrimaryProductName.png" alt="OpenAM" /></div>
+        <div class="secondary"><img src="images/masthead-sunname.gif" alt="ForgeRock, Inc."/></div>
     </div>
 
     <div class="content">

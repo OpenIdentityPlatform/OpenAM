@@ -1,7 +1,7 @@
-﻿/**
+﻿/*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright (c) 2011 ForgeRock AS. All Rights Reserved
+ * Copyright (c) 2011-2013 ForgeRock Inc. All Rights Reserved
  *
  * The contents of this file are subject to the terms
  * of the Common Development and Distribution License
@@ -85,10 +85,10 @@ namespace Sun.Identity.Common
                 //which looks for ds:KeyName XML tags
                 ret = base.GetDecryptionKey(encryptedData, symmetricAlgorithmUri);
             }
-            catch (CryptographicException ce)
+            catch (CryptographicException)
             {
                 // now let's try it our way:
-                ret = GetAlgorithm(encryptedData.EncryptionMethod.KeyAlgorithm);
+                ret = Saml2Utils.GetAlgorithm(encryptedData.EncryptionMethod.KeyAlgorithm);
                 ret.IV = GetDecryptionIV(encryptedData, encryptedData.EncryptionMethod.KeyAlgorithm);
                 X509Certificate2 decryptionKey =
                         FedletCertificateFactory.GetCertificateByFriendlyName(serviceProvider.EncryptionCertificateAlias);
@@ -106,41 +106,6 @@ namespace Sun.Identity.Common
                 ret.Key = DecryptKey(encKey.CipherData.CipherValue, (RSA)decryptionKey.PrivateKey, false);
             }
             return ret;
-        }
-
-        private static SymmetricAlgorithm GetAlgorithm(string symAlgUri)
-        {
-            SymmetricAlgorithm symAlg = null;
-
-            switch (symAlgUri)
-            {
-                case XmlEncAES128Url:
-                case XmlEncAES128KeyWrapUrl:
-                    symAlg = SymmetricAlgorithm.Create("Rijndael");
-                    symAlg.KeySize = 128;
-                    break;
-                case XmlEncAES192Url:
-                case XmlEncAES192KeyWrapUrl:
-                    symAlg = SymmetricAlgorithm.Create("Rijndael");
-                    symAlg.KeySize = 192;
-                    break;
-                case XmlEncAES256Url:
-                case XmlEncAES256KeyWrapUrl:
-                    symAlg = SymmetricAlgorithm.Create("Rijndael");
-                    symAlg.KeySize = 256;
-                    break;
-                case XmlEncDESUrl:
-                    symAlg = SymmetricAlgorithm.Create("DES");
-                    break;
-                case XmlEncTripleDESUrl:
-                case XmlEncTripleDESKeyWrapUrl:
-                    symAlg = SymmetricAlgorithm.Create("TripleDES");
-                    break;
-                default:
-                    throw new ArgumentException("symAlgUri");
-            }
-
-            return symAlg;
         }
     }
 }

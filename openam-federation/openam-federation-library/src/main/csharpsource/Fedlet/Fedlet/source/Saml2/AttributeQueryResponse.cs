@@ -1,31 +1,26 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
- * 
- * Copyright (c) 2009 Sun Microsystems Inc. All Rights Reserved
- * 
+ *
+ * Copyright (c) 2013 ForgeRock Inc. All Rights Reserved
+ *
  * The contents of this file are subject to the terms
  * of the Common Development and Distribution License
  * (the License). You may not use this file except in
  * compliance with the License.
- * 
+ *
  * You can obtain a copy of the License at
- * https://opensso.dev.java.net/public/CDDLv1.0.html or
- * opensso/legal/CDDLv1.0.txt
+ * http://forgerock.org/license/CDDLv1.0.html
  * See the License for the specific language governing
  * permission and limitations under the License.
- * 
+ *
  * When distributing Covered Code, include this CDDL
  * Header Notice in each file and include the License file
- * at opensso/legal/CDDLv1.0.txt.
+ * at http://forgerock.org/license/CDDLv1.0.html
  * If applicable, add the following below the CDDL Header,
  * with the fields enclosed by brackets [] replaced by
  * your own identifying information:
  * "Portions Copyrighted [year] [name of copyright owner]"
- * 
- * $Id: AuthnResponse.cs,v 1.5 2009/11/11 18:13:39 ggennaro Exp $
- */
-/*
- * Portions Copyrighted 2011-2013 ForgeRock Inc.
+ *
  */
 
 using System;
@@ -37,14 +32,15 @@ using System.Xml.XPath;
 using Sun.Identity.Common;
 using Sun.Identity.Properties;
 using Sun.Identity.Saml2.Exceptions;
+using System.Text;
 
 namespace Sun.Identity.Saml2
 {
     /// <summary>
-    /// SAMLv2 AuthnResponse object constructed from a response obtained from
+    /// SAMLv2 AttributeQueryResponse object constructed from a response obtained from
     /// an Identity Provider for the hosted Service Provider.
     /// </summary>
-    public class AuthnResponse
+    public class AttributeQueryResponse
     {
         #region Members
         /// <summary>
@@ -60,10 +56,10 @@ namespace Sun.Identity.Saml2
 
         #region Constructors
         /// <summary>
-        /// Initializes a new instance of the AuthnResponse class.
+        /// Initializes a new instance of the AttributeQueryResponse class.
         /// </summary>
         /// <param name="samlResponse">Decoded SAMLv2 Response</param>
-        public AuthnResponse(string samlResponse)
+        public AttributeQueryResponse(string samlResponse)
         {
             try
             {
@@ -79,11 +75,11 @@ namespace Sun.Identity.Saml2
             }
             catch (ArgumentNullException ane)
             {
-                throw new Saml2Exception(Resources.AuthnResponseNullArgument, ane);
+                throw new Saml2Exception(Resources.AttributeQueryResponseNullArgument, ane);
             }
             catch (XmlException xe)
             {
-                throw new Saml2Exception(Resources.AuthnResponseXmlException, xe);
+                throw new Saml2Exception(Resources.AttributeQueryResponseXmlException, xe);
             }
         }
         #endregion
@@ -91,7 +87,7 @@ namespace Sun.Identity.Saml2
         #region Properties
 
         /// <summary>
-        /// Gets the XML representation of the received authn response.
+        /// Gets the XML representation of the received attribute query response.
         /// </summary>
         public IXPathNavigable XmlDom
         {
@@ -102,25 +98,10 @@ namespace Sun.Identity.Saml2
         }
 
         /// <summary>
-        /// Gets the signature of the authn response attached to the 
-        /// assertion as an XML element.
-        /// </summary>
-        public IXPathNavigable XmlAssertionSignature
-        {
-            get
-            {
-                string xpath = "/samlp:Response/saml:Assertion/ds:Signature";
-                XmlNode root = this.xml.DocumentElement;
-                XmlNode signatureElement = root.SelectSingleNode(xpath, this.nsMgr);
-                return signatureElement;
-            }
-        }
-
-        /// <summary>
-        /// Gets the signature of the authn response attached to the 
+        /// Gets the signature of the attribute query response attached to the 
         /// response as an XML element.
         /// </summary>
-        public IXPathNavigable XmlResponseSignature
+        public IXPathNavigable XmlSignature
         {
             get
             {
@@ -160,7 +141,7 @@ namespace Sun.Identity.Saml2
         }
 
         /// <summary>
-        /// Gets the InResponseTo attribute value of the authn response, null
+        /// Gets the InResponseTo attribute value of the attribute query response, null
         /// if not present.
         /// </summary>
         public string InResponseTo
@@ -170,18 +151,16 @@ namespace Sun.Identity.Saml2
                 string xpath = "/samlp:Response";
                 XmlNode root = this.xml.DocumentElement;
                 XmlNode node = root.SelectSingleNode(xpath, this.nsMgr);
-
                 if (node.Attributes["InResponseTo"] == null)
                 {
                     return null;
                 }
-
                 return node.Attributes["InResponseTo"].Value.Trim();
             }
         }
 
         /// <summary>
-        /// Gets the name of the issuer of the authn response.
+        /// Gets the name of the issuer of the attribute query response.
         /// </summary>
         public string Issuer
         {
@@ -195,7 +174,7 @@ namespace Sun.Identity.Saml2
         }
 
         /// <summary>
-        /// Gets the status code of the authn response within the status element.
+        /// Gets the status code of the attribute query response within the status element.
         /// </summary>
         public string StatusCode
         {
@@ -204,69 +183,34 @@ namespace Sun.Identity.Saml2
                 string xpath = "/samlp:Response/samlp:Status/samlp:StatusCode";
                 XmlNode root = this.xml.DocumentElement;
                 XmlNode node = root.SelectSingleNode(xpath, this.nsMgr);
-                return node.Attributes["Value"].Value.Trim();
-            }
-        }
-
-        /// <summary>
-        /// Gets the X509 signature certificate of the authn response attached
-        /// to the assertion, null if none provided.
-        /// </summary>
-        public string AssertionSignatureCertificate
-        {
-            get
-            {
-                string xpath = "/samlp:Response/saml:Assertion/ds:Signature/ds:KeyInfo/ds:X509Data/ds:X509Certificate";
-                XmlNode root = this.xml.DocumentElement;
-                XmlNode node = root.SelectSingleNode(xpath, this.nsMgr);
-                if (node == null)
+                if (node != null)
                 {
-                    return null;
+                    return node.Attributes["Value"].Value.Trim();
                 }
-
-                string value = node.InnerText.Trim();
-                return value;
+                return null;
             }
         }
 
         /// <summary>
-        /// Gets the X509 signature certificate of the authn response attached
-        /// to the response, null if none provided.
+        /// Gets the status message of the attribute query response within the status element.
         /// </summary>
-        public string ResponseSignatureCertificate
+        public string StatusMessage
         {
             get
             {
-                string xpath = "/samlp:Response/ds:Signature/ds:KeyInfo/ds:X509Data/ds:X509Certificate";
+                string xpath = "/samlp:Response/samlp:Status/samlp:StatusMessage";
                 XmlNode root = this.xml.DocumentElement;
                 XmlNode node = root.SelectSingleNode(xpath, this.nsMgr);
-                if (node == null)
+                if (node != null)
                 {
-                    return null;
+                    return node.InnerText.Trim();
                 }
-
-                string value = node.InnerText.Trim();
-                return value;
+                return null;
             }
         }
 
         /// <summary>
-        /// Gets the session index within the authn statement within the authn
-        /// response assertion.
-        /// </summary>
-        public string SessionIndex
-        {
-            get
-            {
-                string xpath = "/samlp:Response/saml:Assertion/saml:AuthnStatement";
-                XmlNode root = this.xml.DocumentElement;
-                XmlNode node = root.SelectSingleNode(xpath, this.nsMgr);
-                return node.Attributes["SessionIndex"].Value.Trim();
-            }
-        }
-
-        /// <summary>
-        /// Gets the name ID of the subject within the authn response assertion.
+        /// Gets the name ID of the subject within the attribute query response assertion.
         /// </summary>
         public string SubjectNameId
         {
@@ -280,7 +224,7 @@ namespace Sun.Identity.Saml2
         }
 
         /// <summary>
-        /// Gets the extracted "NotBefore" condition from the authn response.
+        /// Gets the extracted "NotBefore" condition from the attribute query response.
         /// </summary>
         public DateTime ConditionNotBefore
         {
@@ -294,7 +238,7 @@ namespace Sun.Identity.Saml2
         }
 
         /// <summary>
-        /// Gets the extracted "NotOnOrAfter" condition from the authn response.
+        /// Gets the extracted "NotOnOrAfter" condition from the attribute query response.
         /// </summary>
         public DateTime ConditionNotOnOrAfter
         {
@@ -309,7 +253,7 @@ namespace Sun.Identity.Saml2
 
         /// <summary>
         /// Gets the list containing string of entity ID's that are considered
-        /// appropriate audiences for this authn response.
+        /// appropriate audiences for this attribute query response.
         /// </summary>
         public ArrayList ConditionAudiences
         {

@@ -24,6 +24,9 @@
  * 
  * $Id: Saml2Utils.cs,v 1.8 2010/01/26 01:20:14 ggennaro Exp $
  */
+/*
+ * Portions Copyrighted 2013 ForgeRock Inc.
+ */
 
 using System;
 using System.Collections;
@@ -120,10 +123,10 @@ namespace Sun.Identity.Saml2
         /// <returns>String representing a random ID with length specified by Saml2Constants.IdLength</returns>
         public static string GenerateId()
         {
-            Random random = new Random();
+            RNGCryptoServiceProvider random = new RNGCryptoServiceProvider();
             byte[] byteArray = new byte[Saml2Constants.IdLength];
-            random.NextBytes(byteArray);
-            string id = BitConverter.ToString(byteArray).Replace("-", string.Empty);
+            random.GetBytes(byteArray);
+            string id = "S2" + BitConverter.ToString(byteArray).Replace("-", string.Empty);
 
             return id;
         }
@@ -224,6 +227,7 @@ namespace Sun.Identity.Saml2
             XmlDocument xmlDoc = (XmlDocument)xml;
 
             byte[] buffer = Encoding.UTF8.GetBytes(xmlDoc.OuterXml);
+
             MemoryStream memoryStream = new MemoryStream();
             DeflateStream compressedStream = new DeflateStream(memoryStream, CompressionMode.Compress, true);
             compressedStream.Write(buffer, 0, buffer.Length);
@@ -262,6 +266,46 @@ namespace Sun.Identity.Saml2
             streamReader.Close();
 
             return decompressedMessage;
+        }
+
+        /// <summary>
+        /// Constructs SymmetricAlgorithm object based on algorithm name.
+        /// </summary>
+        /// <param name="symAlgUri">symmetric algorithm name to undergo the process</param>
+        /// <returns>SymmetricAlgorithm object matching algorithm name.</returns>
+        public static SymmetricAlgorithm GetAlgorithm(string symAlgUri)
+        {
+            SymmetricAlgorithm symAlg = null;
+
+            switch (symAlgUri)
+            {
+                case EncryptedXml.XmlEncAES128Url:
+                case EncryptedXml.XmlEncAES128KeyWrapUrl:
+                    symAlg = SymmetricAlgorithm.Create("Rijndael");
+                    symAlg.KeySize = 128;
+                    break;
+                case EncryptedXml.XmlEncAES192Url:
+                case EncryptedXml.XmlEncAES192KeyWrapUrl:
+                    symAlg = SymmetricAlgorithm.Create("Rijndael");
+                    symAlg.KeySize = 192;
+                    break;
+                case EncryptedXml.XmlEncAES256Url:
+                case EncryptedXml.XmlEncAES256KeyWrapUrl:
+                    symAlg = SymmetricAlgorithm.Create("Rijndael");
+                    symAlg.KeySize = 256;
+                    break;
+                case EncryptedXml.XmlEncDESUrl:
+                    symAlg = SymmetricAlgorithm.Create("DES");
+                    break;
+                case EncryptedXml.XmlEncTripleDESUrl:
+                case EncryptedXml.XmlEncTripleDESKeyWrapUrl:
+                    symAlg = SymmetricAlgorithm.Create("TripleDES");
+                    break;
+                default:
+                    throw new ArgumentException("symAlgUri");
+            }
+
+            return symAlg;
         }
 
         /// <summary>
@@ -333,9 +377,9 @@ namespace Sun.Identity.Saml2
                 throw new Saml2Exception(Resources.SignedQueryStringSigAlgNotSupported);
             }
 
-            string signedQueryString 
-                        = queryString 
-                        + "&" + Saml2Constants.Signature 
+            string signedQueryString
+                        = queryString
+                        + "&" + Saml2Constants.Signature
                         + "=" + HttpUtility.UrlEncode(encodedSignature);
 
             return signedQueryString;
@@ -425,6 +469,103 @@ namespace Sun.Identity.Saml2
         }
 
         /// <summary>
+        /// Encrypts the NameID attribute of the AttributeQuery request.
+        /// </summary>
+        /// <param name="certFriendlyName">
+        /// Friendly Name of the X509Certificate to be retrieved
+        /// from the LocalMachine keystore and used to encrypt generated symmetric key.
+        /// Be sure to have appropriate permissions set on the keystore.
+        /// </param>
+        /// <param name="xmlDoc">
+        /// XML document to be encrypted.
+        /// </param>
+        /// <param name="symmetricAlgorithmUri">
+        /// Symmetric algorithm uri used for encryption.
+        /// </param>
+        public static void EncryptAttributeQueryNameID(string certFriendlyName, string symmetricAlgorithmUri, XmlDocument xmlDoc)
+        {
+            if (string.IsNullOrWhiteSpace(certFriendlyName))
+            {
+                throw new Saml2Exception(Resources.EncryptedXmlInvalidCertFriendlyName);
+            }
+
+            if (string.IsNullOrWhiteSpace(symmetricAlgorithmUri))
+            {
+                throw new Saml2Exception(Resources.EncryptedXmlInvalidEncrAlgorithm);
+            }
+
+            if (xmlDoc == null)
+            {
+                throw new Saml2Exception(Resources.SignedXmlInvalidXml);
+            }
+
+            X509Certificate2 cert = FedletCertificateFactory.GetCertificateByFriendlyName(certFriendlyName);
+            if (cert == null)
+            {
+                throw new Saml2Exception(Resources.EncryptedXmlCertNotFound);
+            }
+
+            XmlNamespaceManager nsMgr = new XmlNamespaceManager(xmlDoc.NameTable);
+            nsMgr.AddNamespace("ds", SignedXml.XmlDsigNamespaceUrl);
+            nsMgr.AddNamespace("saml", Saml2Constants.NamespaceSamlAssertion);
+            nsMgr.AddNamespace("samlp", Saml2Constants.NamespaceSamlProtocol);
+
+            string xpath = "/samlp:AttributeQuery/saml:Subject/saml:NameID";
+            XmlNode root = xmlDoc.DocumentElement;
+            XmlNode node = root.SelectSingleNode(xpath, nsMgr);
+
+            XmlNode encryptedID = xmlDoc.CreateNode(XmlNodeType.Element, "EncryptedID", Saml2Constants.NamespaceSamlAssertion);
+            node.ParentNode.PrependChild(encryptedID);
+
+            XmlElement elementToEncrypt = (XmlElement)encryptedID.AppendChild(node.Clone());
+            if (elementToEncrypt == null)
+            {
+                throw new Saml2Exception(Resources.EncryptedXmlInvalidXml);
+            }
+            encryptedID.ParentNode.RemoveChild(node);
+
+            SymmetricAlgorithm alg = Saml2Utils.GetAlgorithm(symmetricAlgorithmUri);
+
+            if (alg == null)
+            {
+                throw new Saml2Exception(Resources.EncryptedXmlInvalidEncrAlgorithm);
+            }
+
+            alg.GenerateKey();
+
+            string encryptionElementID = Saml2Utils.GenerateId();
+            string encryptionKeyElementID = Saml2Utils.GenerateId();
+            EncryptedData encryptedData = new EncryptedData();
+            encryptedData.Type = EncryptedXml.XmlEncElementUrl;
+            encryptedData.EncryptionMethod = new EncryptionMethod(EncryptedXml.XmlEncAES128Url);
+            encryptedData.Id = encryptionElementID;
+
+            EncryptedXml encryptedXml = new EncryptedXml();
+            byte[] encryptedElement = encryptedXml.EncryptData(elementToEncrypt, alg, false);
+            encryptedData.CipherData.CipherValue = encryptedElement;
+            encryptedData.KeyInfo = new KeyInfo();
+
+            EncryptedKey encryptedKey = new EncryptedKey();
+            encryptedKey.Id = encryptionKeyElementID;
+            RSA publicKeyRSA = cert.PublicKey.Key as RSA;
+            encryptedKey.EncryptionMethod = new EncryptionMethod(EncryptedXml.XmlEncRSA15Url);
+            encryptedKey.CipherData = new CipherData(EncryptedXml.EncryptKey(alg.Key, publicKeyRSA, false));
+
+            encryptedData.KeyInfo.AddClause(new KeyInfoRetrievalMethod("#" + encryptionKeyElementID, "http://www.w3.org/2001/04/xmlenc#EncryptedKey"));
+
+            KeyInfoName kin = new KeyInfoName();
+            kin.Value = cert.SubjectName.Name;
+            encryptedKey.KeyInfo.AddClause(kin);
+
+            EncryptedXml.ReplaceElement(elementToEncrypt, encryptedData, false);
+
+            XmlNode importKeyNode = xmlDoc.ImportNode(encryptedKey.GetXml(), true);
+            encryptedID.AppendChild(importKeyNode);
+
+        }
+
+
+        /// <summary>
         /// Validates a relay state URL with a list of allowed relay states,
         /// each expected to be written as a regular expression pattern. If
         /// the list is empty, then by default all are allowed.
@@ -453,7 +594,7 @@ namespace Sun.Identity.Saml2
             {
                 throw new Saml2Exception(Resources.MalformedRelayState);
             }
-            
+
             bool valid = false;
             foreach (string pattern in allowedRelayStates)
             {
@@ -555,7 +696,7 @@ namespace Sun.Identity.Saml2
 
             string sigAlg = HttpUtility.UrlDecode(queryParams[Saml2Constants.SignatureAlgorithm]);
             string signature = HttpUtility.UrlDecode(queryParams[Saml2Constants.Signature]);
-            
+
             // construct a new query string with specific sequence and no signature param
             string newQueryString = string.Empty;
             if (!string.IsNullOrEmpty(queryParams[Saml2Constants.RequestParameter]))

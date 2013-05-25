@@ -24,12 +24,16 @@
  * 
  * $Id: FedletCertificateFactory.cs,v 1.1 2010/01/12 18:04:55 ggennaro Exp $
  */
+/*
+ * Portions Copyrighted 2013 ForgeRock Inc.
+ */
 
 using System.Security;
 using System.Security.Cryptography;
 using System.Security.Cryptography.X509Certificates;
 using Sun.Identity.Common;
 using Sun.Identity.Properties;
+using System.Text;
 
 namespace Sun.Identity.Common
 {
@@ -58,9 +62,16 @@ namespace Sun.Identity.Common
             {
                 store.Open(OpenFlags.ReadOnly);
 
+                StringBuilder logMessageCert = new StringBuilder();
+                logMessageCert.Append("GetCertificateByFriendlyName(): looking for: \"").Append(friendlyName).Append("\" certificate\r\n");
+                FedletLogger.Info(logMessageCert.ToString());
+
                 X509Certificate2Enumerator certEnum = store.Certificates.GetEnumerator();
                 while (certEnum.MoveNext())
                 {
+                    logMessageCert.Clear();
+                    logMessageCert.Append("GetCertificateByFriendlyName(): found: \"").Append(certEnum.Current.FriendlyName).Append("\" certificate\r\n");
+                    FedletLogger.Info(logMessageCert.ToString());
                     if (certEnum.Current.FriendlyName == friendlyName)
                     {
                         cert = certEnum.Current;

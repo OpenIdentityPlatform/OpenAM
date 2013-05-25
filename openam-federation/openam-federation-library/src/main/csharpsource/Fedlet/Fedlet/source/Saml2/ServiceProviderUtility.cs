@@ -25,7 +25,7 @@
  * $Id: ServiceProviderUtility.cs,v 1.9 2010/01/26 01:20:14 ggennaro Exp $
  */
 /*
- * Portions Copyrighted 2011 ForgeRock AS
+ * Portions Copyrighted 2011-2013 ForgeRock Inc.
  */
 
 using System;
@@ -42,6 +42,10 @@ using System.Xml;
 using Sun.Identity.Common;
 using Sun.Identity.Properties;
 using Sun.Identity.Saml2.Exceptions;
+using System.Collections.Generic;
+using System.Configuration;
+using System.Security.Cryptography.X509Certificates;
+using System.Security.Cryptography.Xml;
 
 namespace Sun.Identity.Saml2
 {
@@ -82,7 +86,7 @@ namespace Sun.Identity.Saml2
         {
             this.Initialize(homeFolder);
         }
-        
+
         #endregion
 
         #region Properties
@@ -358,7 +362,7 @@ namespace Sun.Identity.Saml2
             {
                 if (request.HttpMethod == "GET")
                 {
-                    string queryString 
+                    string queryString
                         = request.RawUrl.Substring(request.RawUrl.IndexOf("?", StringComparison.Ordinal) + 1);
                     FedletLogger.Info("LogoutRequest query string:\r\n" + queryString);
                     this.ValidateForRedirect(logoutRequest, queryString);
@@ -422,7 +426,7 @@ namespace Sun.Identity.Saml2
             {
                 if (request.HttpMethod == "GET")
                 {
-                    string queryString 
+                    string queryString
                         = request.RawUrl.Substring(request.RawUrl.IndexOf("?", StringComparison.Ordinal) + 1);
                     FedletLogger.Info("LogoutResponse query string:\r\n" + queryString);
                     this.ValidateForRedirect(logoutResponse, LogoutRequestCache.GetSentLogoutRequests(context), queryString);
@@ -510,7 +514,7 @@ namespace Sun.Identity.Saml2
             string inputFieldFormat = "<input type=\"hidden\" name=\"{0}\" value=\"{1}\" />";
 
             StringBuilder html = new StringBuilder();
-            html.Append("<html><head><title>OpenSSO - SP initiated SSO</title></head>");
+            html.Append("<html><head><title>OpenAM - SP initiated SSO</title></head>");
             html.Append("<body onload=\"document.forms[0].submit();\">");
             html.Append("<form method=\"post\" action=\"");
             html.Append(ssoPostLocation);
@@ -529,7 +533,7 @@ namespace Sun.Identity.Saml2
                                           Saml2Constants.RelayState,
                                           HttpUtility.HtmlEncode(relayState)));
             }
-            
+
             html.Append("</form>");
             html.Append("</body>");
             html.Append("</html>");
@@ -666,7 +670,7 @@ namespace Sun.Identity.Saml2
             string inputFieldFormat = "<input type=\"hidden\" name=\"{0}\" value=\"{1}\" />";
 
             StringBuilder html = new StringBuilder();
-            html.Append("<html><head><title>OpenSSO - SP initiated SLO</title></head>");
+            html.Append("<html><head><title>OpenAM - SP initiated SLO</title></head>");
             html.Append("<body onload=\"document.forms[0].submit();\">");
             html.Append("<form method=\"post\" action=\"");
             html.Append(sloPostLocation);
@@ -822,7 +826,7 @@ namespace Sun.Identity.Saml2
             string inputFieldFormat = "<input type=\"hidden\" name=\"{0}\" value=\"{1}\" />";
 
             StringBuilder html = new StringBuilder();
-            html.Append("<html><head><title>OpenSSO - IDP initiated SLO</title></head>");
+            html.Append("<html><head><title>OpenAM - IDP initiated SLO</title></head>");
             html.Append("<body onload=\"document.forms[0].submit();\">");
             html.Append("<form method=\"post\" action=\"");
             html.Append(sloPostResponseLocation);
@@ -1234,6 +1238,210 @@ namespace Sun.Identity.Saml2
             context.Response.Write(soapMessage);
         }
 
+        /// <summary>
+        /// Sends an AttributeQueryRequest to the specified IDP with the given 
+        /// parameters.
+        /// </summary>
+        /// <param name="context">
+        /// HttpContext containing session, request, and response objects.
+        /// </param>
+        /// <param name="idpEntityId">Entity ID of the IDP.</param>
+        /// <param name="parameters">
+        /// NameValueCollection of varying parameters for use in the 
+        /// construction of the AttributeQueryRequest.
+        /// </param>
+        /// <param name="attributes">
+        /// A list of SamlAttributes for use in the 
+        /// construction of the AttributeQueryRequest.
+        /// </param>
+        public AttributeQueryResponse SendAttributeQueryRequest(HttpContext context, string idpEntityId, NameValueCollection parameters,
+             List<SamlAttribute> attributes)
+        {
+            IdentityProvider idp = (IdentityProvider)this.IdentityProviders[idpEntityId];
+            if (idp == null)
+            {
+                throw new ServiceProviderUtilityException(Resources.ServiceProviderUtilityIdentityProviderNotFound);
+            }
+
+            if (parameters == null)
+            {
+                parameters = new NameValueCollection();
+            }
+
+            AttributeQueryRequest aqRequest = new AttributeQueryRequest(idp, this.ServiceProvider, parameters, attributes);
+            XmlDocument xmlDoc = (XmlDocument)aqRequest.XmlDom;
+            StringBuilder logMessage = new StringBuilder();
+            logMessage.Append("AttributeQueryRequest:\r\n").Append(xmlDoc.OuterXml);
+            FedletLogger.Info(logMessage.ToString());
+            return this.SendSoapAttributeQueryRequest(aqRequest, idpEntityId);
+        }
+
+        /// <summary>
+        /// Sends a SOAP AttributeQueryRequest to the specified IDP.
+        /// </summary>
+        /// <param name="attrQueryRequest">
+        /// AttributeQueryRequest object.
+        /// </param>
+        /// <param name="idpEntityId">Entity ID of the IDP.</param>
+        public AttributeQueryResponse SendSoapAttributeQueryRequest(AttributeQueryRequest attrQueryRequest, string idpEntityId)
+        {
+            XmlNodeList soapFault = null;
+            HttpWebRequest request = null;
+            HttpWebResponse response = null;
+            AttributeQueryResponse attributeQueryResponse = null;
+            IdentityProvider idp = (IdentityProvider)this.IdentityProviders[idpEntityId];
+
+            if (attrQueryRequest == null)
+            {
+                throw new ServiceProviderUtilityException(Resources.ServiceProviderUtilityAttributeQueryRequestIsNull);
+            }
+            else if (idp == null)
+            {
+                throw new ServiceProviderUtilityException(Resources.ServiceProviderUtilityIdentityProviderNotFound);
+            }
+            else if (idp.GetSingleAttributeServiceLocation(Saml2Constants.HttpSoapProtocolBinding, attrQueryRequest.X509SubjectName) == null)
+            {
+                throw new ServiceProviderUtilityException(Resources.ServiceProviderUtilityIdpSingleAttributeQuerySvcLocNotDefined);
+            }
+
+            try
+            {
+
+                Uri soapAttributeQuerySvcUri = new Uri(idp.GetSingleAttributeServiceLocation(Saml2Constants.HttpSoapProtocolBinding, attrQueryRequest.X509SubjectName));
+                if (soapAttributeQuerySvcUri.Scheme == "https")
+                {
+                    System.Net.ServicePointManager.ServerCertificateValidationCallback +=
+                    delegate(object sender, System.Security.Cryptography.X509Certificates.X509Certificate certificate,
+                    System.Security.Cryptography.X509Certificates.X509Chain chain,
+                    System.Net.Security.SslPolicyErrors sslPolicyErrors)
+                    {
+                        return true;
+                    };
+
+                    ServicePointManager.SecurityProtocol = SecurityProtocolType.Ssl3;
+                }
+
+                request = (HttpWebRequest)WebRequest.Create(soapAttributeQuerySvcUri);
+
+                string authCertAlias = ConfigurationManager.AppSettings[Saml2Constants.MutualAuthCertAlias];
+
+                if (soapAttributeQuerySvcUri.Scheme == "https" && !string.IsNullOrWhiteSpace(authCertAlias))
+                {
+                    X509Certificate2 cert = FedletCertificateFactory.GetCertificateByFriendlyName(authCertAlias);
+                    if (cert != null)
+                    {
+                        request.ClientCertificates.Add(cert);
+                    }
+                }
+
+                XmlDocument attrQueryRequestXml = (XmlDocument)attrQueryRequest.XmlDom;
+
+                if (this.ServiceProvider.WantNameIDEncryptedAttributeQuery)
+                {
+                    if (string.IsNullOrWhiteSpace(this.ServiceProvider.AttributeQueryEncryptionCertificateAlias))
+                    {
+                        throw new ServiceProviderUtilityException(Resources.ServiceProviderUtilityEncryptFailedNoCertAlias);
+                    }
+
+                    if (string.IsNullOrWhiteSpace(this.ServiceProvider.EncryptionMethodAlgorithm))
+                    {
+                        throw new ServiceProviderUtilityException(Resources.ServiceProviderUtilityEncryptFailedNoEncrAlgorithm);
+                    }
+
+                    Saml2Utils.EncryptAttributeQueryNameID(
+                        this.ServiceProvider.AttributeQueryEncryptionCertificateAlias,
+                        this.ServiceProvider.EncryptionMethodAlgorithm,
+                        attrQueryRequestXml);
+                }
+
+                if (string.IsNullOrWhiteSpace(this.ServiceProvider.AttributeQuerySigningCertificateAlias))
+                {
+                    throw new ServiceProviderUtilityException(Resources.ServiceProviderUtilitySignFailedNoCertAlias);
+                }
+                else
+                {
+                    Saml2Utils.SignXml(
+                         this.ServiceProvider.AttributeQuerySigningCertificateAlias,
+                         attrQueryRequestXml,
+                         attrQueryRequest.Id,
+                         true);
+                }
+
+                string soapMessage = Saml2Utils.CreateSoapMessage(attrQueryRequestXml.InnerXml);
+                StringBuilder logMessageSoap = new StringBuilder();
+                logMessageSoap.Append("AttributeQuerySOAPRequest:\r\n").Append(soapMessage);
+                FedletLogger.Info(logMessageSoap.ToString());
+
+                byte[] byteArray = Encoding.UTF8.GetBytes(soapMessage);
+                request.ContentType = "text/xml";
+                request.ContentLength = byteArray.Length;
+                request.AllowAutoRedirect = false;
+                request.Method = "POST";
+
+                Stream requestStream = request.GetRequestStream();
+                requestStream.Write(byteArray, 0, byteArray.Length);
+                requestStream.Close();
+
+                response = (HttpWebResponse)request.GetResponse();
+                StreamReader streamReader = new StreamReader(response.GetResponseStream());
+                string responseContent = streamReader.ReadToEnd();
+                streamReader.Close();
+
+                XmlDocument soapResponse = new XmlDocument();
+                soapResponse.PreserveWhitespace = true;
+                soapResponse.LoadXml(responseContent);
+
+                XmlNamespaceManager soapNsMgr = new XmlNamespaceManager(soapResponse.NameTable);
+                soapNsMgr.AddNamespace("soap", "http://schemas.xmlsoap.org/soap/envelope/");
+                soapNsMgr.AddNamespace("samlp", "urn:oasis:names:tc:SAML:2.0:protocol");
+                soapNsMgr.AddNamespace("saml", "urn:oasis:names:tc:SAML:2.0:assertion");
+                soapNsMgr.AddNamespace("ds", "http://www.w3.org/2000/09/xmldsig#");
+
+                XmlElement root = soapResponse.DocumentElement;
+
+                if ((soapFault = root.GetElementsByTagName("Fault", "http://schemas.xmlsoap.org/soap/envelope/")).Count > 0)
+                {
+                    StringBuilder faultMessage = new StringBuilder();
+                    faultMessage.Append("AttributeQueryResponse Error:\r\n");
+                    faultMessage.Append(soapFault[0].InnerText);
+                    FedletLogger.Info(faultMessage.ToString());
+                    throw new ServiceProviderUtilityException(Resources.ServiceProviderUtilitySoapFault, new SoapException(soapFault[0].InnerText));
+                }
+
+                XmlNode responseXml = root.SelectSingleNode("/soap:Envelope/soap:Body/samlp:Response", soapNsMgr);
+                string attrQueryResponseXml = responseXml.OuterXml;
+
+                attributeQueryResponse = new AttributeQueryResponse(attrQueryResponseXml);
+                StringBuilder logMessage = new StringBuilder();
+                logMessage.Append("AttributeQueryResponse:\r\n").Append(attrQueryResponseXml);
+                FedletLogger.Info(logMessage.ToString());
+
+                if (attributeQueryResponse != null && !string.IsNullOrWhiteSpace(attributeQueryResponse.StatusCode)
+                    && !attributeQueryResponse.StatusCode.Equals(Saml2Constants.Success))
+                {
+                    throw new ServiceProviderUtilityException(Resources.ServiceProviderUtilityErrorSamlResponseReceived,
+                        new Saml2Exception(attributeQueryResponse.StatusMessage));
+                }
+
+                ArrayList attributeQueryRequests = new ArrayList();
+                attributeQueryRequests.Add(attrQueryRequest);
+                this.Validate(attributeQueryResponse, attributeQueryRequests);
+
+            }
+            catch (WebException we)
+            {
+                throw new ServiceProviderUtilityException(Resources.AttributeQueryRequestWebException, we);
+            }
+            finally
+            {
+                if (response != null)
+                {
+                    response.Close();
+                }
+            }
+            return attributeQueryResponse;
+        }
+
         #endregion
 
         #region Public Validation Methods
@@ -1316,7 +1524,7 @@ namespace Sun.Identity.Saml2
                 this.CheckSignature(logoutRequest, queryString);
             }
         }
-        
+
         /// <summary>
         /// Validates the given LogoutResponse object obtained from a POST. If
         /// this service provider desires the logout respone to be signed, XML
@@ -1444,6 +1652,34 @@ namespace Sun.Identity.Saml2
 
             // Didn't find one, complain loudly.
             throw new Saml2Exception(Resources.LogoutResponseInvalidInResponseTo);
+        }
+
+        /// <summary>
+        /// Checks the InResponseTo field of the given AttributeQueryResponse to
+        /// see if it is one of the managed attribute query requests.
+        /// </summary>
+        /// <param name="attributeQueryResponse">SAMLv2 AttributeQueryResponse.</param>
+        /// <param name="attributeQueryRequests">
+        /// Collection of previously sent AttributeQueryRequests.
+        /// </param>
+        private static void CheckInResponseTo(AttributeQueryResponse attributeQueryResponse, ICollection attributeQueryRequests)
+        {
+            if (attributeQueryResponse != null && attributeQueryResponse.InResponseTo != null)
+            {
+                IEnumerator i = attributeQueryRequests.GetEnumerator();
+                while (i.MoveNext())
+                {
+                    AttributeQueryRequest request = (AttributeQueryRequest)i.Current;
+                    if (request.Id == attributeQueryResponse.InResponseTo)
+                    {
+                        // Found one, return quietly.
+                        return;
+                    }
+                }
+            }
+
+            // Didn't find one, complain loudly.
+            throw new Saml2Exception(Resources.AttributeQueryResponseInvalidInResponseTo);
         }
 
         /// <summary>
@@ -1900,6 +2136,50 @@ namespace Sun.Identity.Saml2
             this.CheckIssuer(logoutResponse.Issuer);
             this.CheckCircleOfTrust(logoutResponse.Issuer);
             ServiceProviderUtility.CheckStatusCode(logoutResponse.StatusCode);
+        }
+
+        /// <summary>
+        /// Validates the given AttributeQueryResponse object except for xml signature.
+        /// XML signature checking is expected to be done prior to calling
+        /// this method based on the appropriate profile.
+        /// </summary>
+        /// <param name="attributeQueryResponse">AttributeQueryResponse object.</param>
+        /// <param name="attributeQueryRequests">
+        /// Collection of previously sent attributeQueryRequests used to compare with
+        /// the InResponseTo attribute of the AttributeQueryResponse (if present).
+        /// </param>
+        private void Validate(AttributeQueryResponse attributeQueryResponse, ICollection attributeQueryRequests)
+        {
+            if (attributeQueryResponse == null)
+            {
+                throw new Saml2Exception(Resources.ServiceProviderUtilityAttributeQueryResponseIsNull);
+            }
+
+            ServiceProviderUtility.CheckInResponseTo(attributeQueryResponse, attributeQueryRequests);
+            this.CheckIssuer(attributeQueryResponse.Issuer);
+            this.CheckCircleOfTrust(attributeQueryResponse.Issuer);
+            ServiceProviderUtility.CheckStatusCode(attributeQueryResponse.StatusCode);
+        }
+
+        /// <summary>
+        /// Checks the signature of the given attributeQueryResponse assuming
+        /// the signature is within the XML.
+        /// </summary>
+        /// <param name="attributeQueryResponse">SAMLv2 AttributeQueryResponse object.</param>
+        private void CheckSignature(AttributeQueryResponse attributeQueryResponse)
+        {
+            IdentityProvider idp = (IdentityProvider)this.IdentityProviders[attributeQueryResponse.Issuer];
+
+            if (idp == null)
+            {
+                throw new Saml2Exception(Resources.InvalidIssuer);
+            }
+
+            Saml2Utils.ValidateSignedXml(
+                idp.SigningCertificate,
+                attributeQueryResponse.XmlDom,
+                attributeQueryResponse.XmlSignature,
+                attributeQueryResponse.Id);
         }
 
         #endregion

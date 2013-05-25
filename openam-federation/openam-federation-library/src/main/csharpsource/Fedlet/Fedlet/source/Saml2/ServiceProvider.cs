@@ -24,6 +24,9 @@
  * 
  * $Id: ServiceProvider.cs,v 1.6 2010/01/26 01:20:14 ggennaro Exp $
  */
+/*
+ * Portions Copyrighted 2013 ForgeRock Inc.
+ */
 
 using System;
 using System.Collections;
@@ -171,12 +174,28 @@ namespace Sun.Identity.Saml2
                 string xpath = "/mdx:EntityConfig/mdx:SPSSOConfig/mdx:Attribute[@name='encryptionCertAlias']/mdx:Value";
                 XmlNode root = this.extendedMetadata.DocumentElement;
                 XmlNode node = root.SelectSingleNode(xpath, this.extendedMetadataNsMgr);
-
                 if (node != null)
                 {
                     return node.InnerText.Trim();
                 }
+                return null;
+            }
+        }
 
+        /// <summary>
+        /// Gets the encryption algorithm, installed on this service provider.
+        /// </summary>
+        public string EncryptionMethodAlgorithm
+        {
+            get
+            {
+                string xpath = "/md:EntityDescriptor/md:SPSSODescriptor/md:KeyDescriptor[@use='encryption']/md:EncryptionMethod";
+                XmlNode root = this.metadata.DocumentElement;
+                XmlNode node = root.SelectSingleNode(xpath, this.metadataNsMgr);
+                if (node != null)
+                {
+                    return node.Attributes["Algorithm"].Value;
+                }
                 return null;
             }
         }
@@ -224,6 +243,126 @@ namespace Sun.Identity.Saml2
                 }
 
                 return null;
+            }
+        }
+
+        /// <summary>
+        /// Gets the certificate alias, installed on this service provider, 
+        /// for signing.
+        /// </summary>
+        public string AttributeQuerySigningCertificateAlias
+        {
+            get
+            {
+                string xpath = "/mdx:EntityConfig/mdx:AttributeQueryConfig/mdx:Attribute[@name='signingCertAlias']/mdx:Value";
+                XmlNode root = this.extendedMetadata.DocumentElement;
+                XmlNode node = root.SelectSingleNode(xpath, this.extendedMetadataNsMgr);
+                if (node != null)
+                {
+                    return node.InnerText.Trim();
+                }
+                return null;
+            }
+        }
+
+        /// <summary>
+        /// Gets the certificate alias, installed on this service provider, 
+        /// for encryption (AttributeQuery).
+        /// </summary>
+        public string AttributeQueryEncryptionCertificateAlias
+        {
+            get
+            {
+                string xpath = "/mdx:EntityConfig/mdx:AttributeQueryConfig/mdx:Attribute[@name='encryptionCertAlias']/mdx:Value";
+                XmlNode root = this.extendedMetadata.DocumentElement;
+                XmlNode node = root.SelectSingleNode(xpath, this.extendedMetadataNsMgr);
+                if (node != null)
+                {
+                    return node.InnerText.Trim();
+                }
+                return null;
+            }
+        }
+
+        /// <summary>
+        /// Gets a value indicating whether the IPD Proxy setting is true or false.
+        /// </summary>
+        public bool ScopingIDPProxyEnabled
+        {
+            get
+            {
+                string xpath = "/mdx:EntityConfig/mdx:SPSSOConfig/mdx:Attribute[@name='enableIDPProxy']/mdx:Value";
+                XmlNode root = this.extendedMetadata.DocumentElement;
+                XmlNode node = root.SelectSingleNode(xpath, this.extendedMetadataNsMgr);
+                if (node != null)
+                {
+                    string value = node.InnerText.Trim();
+                    return Saml2Utils.GetBoolean(value);
+                }
+                return false;
+            }
+        }
+
+        /// <summary>
+        /// Gets the IPD Proxy count
+        /// </summary>
+        public int ScopingProxyCount
+        {
+            get
+            {
+                string xpath = "/mdx:EntityConfig/mdx:SPSSOConfig/mdx:Attribute[@name='idpProxyCount']/mdx:Value";
+                if (this.ScopingIDPProxyEnabled)
+                {
+                    XmlNode root = this.extendedMetadata.DocumentElement;
+                    XmlNode node = root.SelectSingleNode(xpath, this.extendedMetadataNsMgr);
+                    if (node != null)
+                    {
+                        return Convert.ToInt32(node.InnerText.Trim(), CultureInfo.InvariantCulture);
+                    }
+                }
+                return 0;
+            }
+        }
+
+        /// <summary>
+        /// Gets the list IPD Proxy entries
+        /// </summary>
+        public ArrayList ScopingIDPList
+        {
+            get
+            {
+                ArrayList values = new ArrayList();
+                string xpath = "/mdx:EntityConfig/mdx:SPSSOConfig/mdx:Attribute[@name='idpProxyList']/mdx:Value";
+                XmlNode root = this.extendedMetadata.DocumentElement;
+                XmlNodeList nodeList = root.SelectNodes(xpath, this.extendedMetadataNsMgr);
+                if (nodeList != null)
+                {
+                    foreach (XmlNode node in nodeList)
+                    {
+                        values.Add(node.InnerText.Trim());
+                    }
+                }
+                return values;
+            }
+        }
+
+        /// <summary>
+        /// Gets a value indicating whether the extended metadata value for 
+        /// wantNameIDEncrypted is true or false.
+        /// </summary>
+        public bool WantNameIDEncryptedAttributeQuery
+        {
+            get
+            {
+                string xpath = "/mdx:EntityConfig/mdx:AttributeQueryConfig/mdx:Attribute[@name='wantNameIDEncrypted']/mdx:Value";
+                XmlNode root = this.extendedMetadata.DocumentElement;
+                XmlNode node = root.SelectSingleNode(xpath, this.extendedMetadataNsMgr);
+                if (node != null)
+                {
+                    string value = node.InnerText.Trim();
+                    return Saml2Utils.GetBoolean(value);
+                }
+                return false;
             }
         }
 

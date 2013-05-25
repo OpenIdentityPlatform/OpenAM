@@ -10,14 +10,15 @@
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>Sun.Identity</RootNamespace>
     <AssemblyName>Fedlet</AssemblyName>
-    <TargetFrameworkVersion>v3.5</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <SignAssembly>true</SignAssembly>
     <AssemblyOriginatorKeyFile>fedlet.pfx</AssemblyOriginatorKeyFile>
     <FileUpgradeFlags>
     </FileUpgradeFlags>
-    <OldToolsVersion>3.5</OldToolsVersion>
+    <OldToolsVersion>4.0</OldToolsVersion>
     <UpgradeBackupLocation />
+    <TargetFrameworkProfile />
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -42,15 +43,15 @@
     <Reference Include="System" />
     <Reference Include="System.configuration" />
     <Reference Include="System.Core">
-      <RequiredTargetFramework>3.5</RequiredTargetFramework>
+      <RequiredTargetFramework>4.0</RequiredTargetFramework>
     </Reference>
     <Reference Include="System.Security" />
     <Reference Include="System.Web" />
     <Reference Include="System.Xml.Linq">
-      <RequiredTargetFramework>3.5</RequiredTargetFramework>
+      <RequiredTargetFramework>4.0</RequiredTargetFramework>
     </Reference>
     <Reference Include="System.Data.DataSetExtensions">
-      <RequiredTargetFramework>3.5</RequiredTargetFramework>
+      <RequiredTargetFramework>4.0</RequiredTargetFramework>
     </Reference>
     <Reference Include="System.Data" />
     <Reference Include="System.Xml" />
@@ -62,6 +63,10 @@
     <Compile Include="source\Saml2\Artifact.cs" />
     <Compile Include="source\Saml2\ArtifactResolve.cs" />
     <Compile Include="source\Saml2\ArtifactResponse.cs" />
+    <Compile Include="source\Saml2\AttributeQueryResponse.cs" />
+    <Compile Include="source\Saml2\Exceptions\SoapException.cs" />
+    <Compile Include="source\Saml2\SamlAttribute.cs" />
+    <Compile Include="source\Saml2\AttributeQueryRequest.cs" />
     <Compile Include="source\Saml2\AuthnRequest.cs" />
     <Compile Include="source\Saml2\AuthnRequestCache.cs" />
     <Compile Include="source\Saml2\LogoutRequestCache.cs" />
@@ -85,6 +90,7 @@
     <Compile Include="source\Saml2\IdentityProviderDiscoveryUtils.cs" />
     <Compile Include="source\Saml2\Saml2Constants.cs" />
     <Compile Include="source\Saml2\Saml2Utils.cs" />
+    <Compile Include="source\Saml2\Scoping.cs" />
     <Compile Include="source\Saml2\ServiceProvider.cs" />
     <Compile Include="source\Saml2\ServiceProviderUtility.cs" />
   </ItemGroup>
@@ -103,11 +109,4 @@
     <None Include="fedlet.pfx" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
-  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
-       Other similar extension points exist, see Microsoft.Common.targets.
-  <Target Name="BeforeBuild">
-  </Target>
-  <Target Name="AfterBuild">
-  </Target>
-  -->
 </Project>

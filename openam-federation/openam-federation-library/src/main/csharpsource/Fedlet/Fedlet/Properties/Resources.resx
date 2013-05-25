@@ -112,10 +112,10 @@
     <value>2.0</value>
   </resheader>
   <resheader name="reader">
-    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
   <resheader name="writer">
-    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
   <data name="CircleOfTrustDirNotFound" xml:space="preserve">
     <value>Specified home folder for the circle of trusts could not be found.</value>
@@ -404,5 +404,68 @@
   </data>
   <data name="DecryptionFailed" xml:space="preserve">
     <value>Unable to decrypt the received SAML response.</value>
+  </data>
+  <data name="AttributeQueryRequestNullArgument" xml:space="preserve">
+    <value>Specified SAML attribute query request was null.</value>
+  </data>
+  <data name="AttributeQueryRequestXmlException" xml:space="preserve">
+    <value>Specified SAML attribute query request threw an XML exception.</value>
+  </data>
+  <data name="AttributeQueryRequestIdentityProviderIsNull" xml:space="preserve">
+    <value>IdentityProvider was null.</value>
+  </data>
+  <data name="AttributeQueryRequestIsEmpty" xml:space="preserve">
+    <value>AttributeQuery request is empty</value>
+  </data>
+  <data name="AttributeQueryRequestServiceProviderIsNull" xml:space="preserve">
+    <value>Service Provider was null.</value>
+  </data>
+  <data name="AttributeQueryRequestSubjectNameIdNotDefined" xml:space="preserve">
+    <value>SubjectNameId was not defined.</value>
+  </data>
+  <data name="AttributeQueryResponseNullArgument" xml:space="preserve">
+    <value>Specified SAML response was null.</value>
+  </data>
+  <data name="AttributeQueryResponseXmlException" xml:space="preserve">
+    <value>Specified SAML response threw an XML exception.</value>
+  </data>
+  <data name="EncryptedXmlCertNotFound" xml:space="preserve">
+    <value>Specified certificate not found based on provided alias.</value>
+  </data>
+  <data name="EncryptedXmlInvalidCertFriendlyName" xml:space="preserve">
+    <value>Invalid certificate friendly name specified.</value>
+  </data>
+  <data name="EncryptedXmlInvalidEncrAlgorithm" xml:space="preserve">
+    <value>Invalid encryption algorithm name specified.</value>
+  </data>
+  <data name="EncryptedXmlInvalidXml" xml:space="preserve">
+    <value>Invalid XML specified.</value>
+  </data>
+  <data name="ServiceProviderUtilityAttributeQueryRequestIsNull" xml:space="preserve">
+    <value>AttributeQueryRequest was null.</value>
+  </data>
+  <data name="ServiceProviderUtilityEncryptFailedNoCertAlias" xml:space="preserve">
+    <value>XML can not be encrypted due to either empty or unknown encryption certificate alias in extended metadata.</value>
+  </data>
+  <data name="ServiceProviderUtilityEncryptFailedNoEncrAlgorithm" xml:space="preserve">
+    <value>XML can not be encrypted due to either empty or unknown encryption algorithm in extended metadata.</value>
+  </data>
+  <data name="ServiceProviderUtilityIdpSingleAttributeQuerySvcLocNotDefined" xml:space="preserve">
+    <value>Single AttributeQuery Service Location not defined for the specified IDP.</value>
+  </data>
+  <data name="AttributeQueryRequestWebException" xml:space="preserve">
+    <value>An error occurred in sending the AttributeQuery SOAP message.</value>
+  </data>
+  <data name="AttributeQueryResponseInvalidInResponseTo" xml:space="preserve">
+    <value>Attribute Query invalid responseTo</value>
+  </data>
+  <data name="ServiceProviderUtilityAttributeQueryResponseIsNull" xml:space="preserve">
+    <value>Attribute Query validation response is null</value>
+  </data>
+  <data name="ServiceProviderUtilitySoapFault" xml:space="preserve">
+    <value>SOAP Request returned Fault message.</value>
+  </data>
+  <data name="ServiceProviderUtilityErrorSamlResponseReceived" xml:space="preserve">
+    <value>Received Error in SAML Response.</value>
   </data>
 </root>

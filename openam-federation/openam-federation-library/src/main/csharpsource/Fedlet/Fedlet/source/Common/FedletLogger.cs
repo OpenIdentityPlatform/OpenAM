@@ -119,7 +119,7 @@ namespace Sun.Identity.Common
         /// </param>
         private static void LogMessage(string message, EventLogEntryType entryType)
         {
-            string logLevel = ConfigurationSettings.AppSettings[FedletLogger.AppSettingParameter];
+            string logLevel = ConfigurationManager.AppSettings[FedletLogger.AppSettingParameter];
 
             if (!string.IsNullOrEmpty(logLevel))
             {

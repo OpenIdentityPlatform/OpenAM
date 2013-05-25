@@ -24,6 +24,9 @@
  * 
  * $Id: Saml2Constants.cs,v 1.6 2010/01/12 18:04:54 ggennaro Exp $
  */
+/*
+ * Portions Copyrighted 2013 ForgeRock Inc.
+ */
 
 namespace Sun.Identity.Saml2
 {
@@ -218,5 +221,26 @@ namespace Sun.Identity.Saml2
         /// Constant for status codes used in SAML responses.
         /// </summary>
         public const string Success = "urn:oasis:names:tc:SAML:2.0:status:Success";
+
+        /// <summary>
+        /// Constant for the MutualAuthCertAlias parameter.
+        /// </summary>
+        public const string MutualAuthCertAlias = "fedletMutualAuthCertAlias";
+
+        /// <summary>
+        /// Constant for the X509SubjectName parameter.
+        /// </summary>
+        public const string X509SubjectName = "X509SubjectName";
+
+        /// <summary>
+        /// Constant for the SAMLv2 namespace for basic attribute name format.
+        /// </summary>
+        public const string AttributeNameFormatBasic = "urn:oasis:names:tc:SAML:2.0:attrname-format:basic";
+
+        /// <summary>
+        /// Constant for the SAMLv2 namespace for X500 attribute name format.
+        /// </summary>
+        public const string AttributeNameFormatX500 = "urn:oasis:names:tc:SAML:2.0:attrname-format:uri";
+
     }
 }
