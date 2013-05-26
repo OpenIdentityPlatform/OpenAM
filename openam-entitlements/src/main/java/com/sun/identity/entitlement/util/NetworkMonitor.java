@@ -26,7 +26,7 @@
  */
 
 /*
- * Portions Copyrighted 2011 ForgeRock AS
+ * Portions Copyrighted 2011-2013 ForgeRock, Inc.
  */
 
 package com.sun.identity.entitlement.util;
@@ -52,6 +52,9 @@ public class NetworkMonitor extends HttpServlet {
 
     // Static variables
     private static HashMap<String, NetworkMonitor> stats = new HashMap();
+    private static EntitlementConfiguration ec = EntitlementConfiguration.getInstance(
+            PrivilegeManager.superAdminSubject, "/");
+    private static boolean collectStats = ec.networkMonitorEnabled();
 
     // Instance variables
     int maxHistory = 600; // 10 minutes
@@ -65,20 +68,15 @@ public class NetworkMonitor extends HttpServlet {
      * @return the collectStats
      */
     public static boolean isCollectStats() {
-        EntitlementConfiguration ec = EntitlementConfiguration.getInstance(
-                        PrivilegeManager.superAdminSubject, "/");
-        
-        return ec.networkMonitorEnabled();
+        return collectStats;
     }
 
     /**
      * @param aCollectStats the collectStats to set
      */
     public static void setCollectStats(boolean aCollectStats) {
-        EntitlementConfiguration ec = EntitlementConfiguration.getInstance(
-                PrivilegeManager.superAdminSubject, "/");
-        
         ec.setNetworkMonitorEnabled(aCollectStats);
+        collectStats = aCollectStats;
     }
     
     public static Set<String> getInstanceNames() {
