@@ -50,11 +50,10 @@
    <listitem>
     <para>All of the web policy agents have been updated to include support for Internet
     Protocol version 6 (IPv6) support, in addition to support for IPv4. <!--include in the notes when 
-    AME-1134 is closed This includes removing unused libraries.--></para>
+    AME-1134 is closed, which includes removing unused libraries.--></para>
     <para>IPv6 replaces IPv4 to fix the problems of IPv4 address exhaustion. The new 
     protocol version increases the number of available internet addresses by using 
-    128-bit addresses instead of 32-bit addresses of IPv4. IPv6 includes eight
-    groups of hexadecimal digits to increase the number of available addresses.</para>
+    128-bit addresses instead of the 32-bit addresses of IPv4.</para>
    </listitem>
 
    <listitem>
