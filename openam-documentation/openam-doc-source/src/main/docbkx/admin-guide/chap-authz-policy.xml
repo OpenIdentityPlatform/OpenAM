@@ -20,7 +20,7 @@
   !
   ! CCPL HEADER END
   !
-  !      Copyright 2011-2012 ForgeRock AS
+  !      Copyright 2011-2013 ForgeRock, Inc.
   !    
 -->
 <chapter xml:id='chap-authz-policy'
@@ -72,7 +72,7 @@
   page that users access to update their profiles. An OpenAM policy agent
   installed in the web server intercepts client requests to enforce policy.
   The policy says that authenticated users can access the page to update their
-  profiles as long come in over HTTPS, rather than HTTP.</para>
+  profiles as long as they come in over HTTPS, rather than HTTP.</para>
   
   <para>When a user browses to the page to update her profile, the OpenAM
   policy agent intercepts the request. The policy agent notices that the
@@ -352,7 +352,24 @@
        <listitem>
         <para>IP Address/DNS Name lets you apply the policy to clients in
         specific IP address ranges or coming from a particular DNS
-        domain.</para>
+        domain. It also lets you choose between IPv4 and IPv6 address versions.</para>
+        <itemizedlist>
+         <listitem>
+          <para>For IPv4, fill in the fields for the From and To with four sets of
+          four characters.</para>
+         </listitem>
+         <listitem>
+          <para>For IPv6, fill in the fields for the From and To with eight sets of
+          four hexadecimal characters. The default is colons, which indicates an IPv6
+          only address.</para>
+         </listitem>
+         <listitem>
+          <para>For a hybrid address, select IPv6. Fill in the first four fields for the 
+          From and To with four characters of the IPv6 address, then change
+          the punctuation to a . and add the four IPv4 characters in the remaining three 
+          fields.</para>
+         </listitem>
+        </itemizedlist>
        </listitem>
        <listitem>
         <para>LDAP Filter Condition lets you make the policy depend on whether
@@ -368,7 +385,7 @@
         <para>Resource/Environment/IP Address lets you make the policy apply
         using a complex condition such as whether the user is making a request
         from the localhost and has authenticated with the LDAP authentication
-        module.</para>
+        module. This address also works with IPv4, IPv6, or a hybrid of the two.</para>
        </listitem>
        <listitem>
         <para>Time (day, date, time, and timezone) lets you make the policy
