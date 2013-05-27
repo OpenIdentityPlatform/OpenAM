@@ -20,7 +20,7 @@
   !
   ! CCPL HEADER END
   !
-  !      Copyright 2011-2012 ForgeRock AS
+  !      Copyright 2011-2013 ForgeRock, Inc.
   !    
 -->
 <chapter xml:id='chap-api-overview'
@@ -125,5 +125,18 @@
     database.</para>
    </listitem>
   </itemizedlist>
+ </section>
+ 
+ <section xml:id="openam-ipv">
+ <title>OpenAM, IPv4, and IPv6</title>
+  <para>OpenAM provides functionality for IPv4, IPv6, and a hybrid of the two. 
+  While the majority of the interaction is done on the backend, there are a few
+  places where the GUI requires some inputs, such as setting up policy conditions.
+  These areas follow the same standard that applies to IPv4 and IPv6. IPv4 uses a 32-bit 
+  integer value, with a dot-decimal system. IPv6 uses a hexadecimal system, and the eight 
+  groups of hexadecimal digits are separated by a colon.<!--If you elect to use a hybrid of 
+  the two, use a colon for the first portion of the address to indicate it is part fo the 
+  IPv6 standard, and periods for the remaining fields that should be IPv4.--></para>
+  
  </section>
 </chapter>
