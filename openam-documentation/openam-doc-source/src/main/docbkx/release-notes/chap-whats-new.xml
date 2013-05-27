@@ -37,12 +37,14 @@
  <itemizedlist>
   <title>Major New Features</title>
 
-  <listitem>
-   <para>The zero page login has been modified so that administrators can disable the
-   functionality. The zero page login process is the ability of the user to login
-   using only GET parameters, which presents a possible security issue. Zero page 
-   login is now disabled by default.</para>
-  </listitem>
+   <listitem>
+    <para>All of the web policy agents have been updated to include support for Internet
+    Protocol version 6 (IPv6) support, in addition to support for IPv4. <!--include in the notes when 
+    AME-1134 is closed, which includes removing unused libraries.--></para>
+    <para>IPv6 replaces IPv4 to fix the problems of IPv4 address exhaustion. The new 
+    protocol version increases the number of available internet addresses by using 
+    128-bit addresses instead of the 32-bit addresses of IPv4.</para>
+   </listitem>
 
   <listitem>
    <para>REST Authentication Service has been updated to handle Integrated Windows
@@ -143,6 +145,15 @@
 
  <itemizedlist>
   <title>Additional New Features</title>
+
+  <listitem>
+   <para>The zero page login has been modified so that administrators can disable the
+   functionality. The zero page login process is the ability of the user to login
+   using only GET parameters, which presents a possible security issue. Zero page 
+   login is now disabled by default (<link
+   xlink:href="https://bugster.forgerock.org/jira/browse/OPENAM-2354"
+   xlink:show="new">OPENAM-2354</link>).</para>
+  </listitem>
 
   <listitem>
    <!-- AME-219 and CR-889 -->
