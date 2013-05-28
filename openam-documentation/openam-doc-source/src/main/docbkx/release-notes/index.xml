@@ -51,8 +51,13 @@
      <firstname>Vanessa</firstname><surname>Richie</surname>
     </personname>
    </author>
-  </authorgroup>
-  <xinclude:include href="../legal.xml" />
+   <author>
+    <personname>
+     <firstname>Mike</firstname><surname>Jang </surname>
+    </personname>
+   </author>
+ </authorgroup>
+    <xinclude:include href="../legal.xml" />
   <date><?dbtimestamp format="B d, Y"?></date>
   <pubdate>Publication date: <?dbtimestamp format="B d, Y"?></pubdate>
   <releaseinfo><?eval ${softwareReleaseDate}?></releaseinfo>

@@ -147,6 +147,10 @@
   <title>Additional New Features</title>
 
   <listitem>
+    <para>OpenID now adds support for OpenID Connect 1.0.</para>
+  </listitem>
+
+  <listitem>
    <para>The zero page login has been modified so that administrators can disable the
    functionality. The zero page login process is the ability of the user to login
    using only GET parameters, which presents a possible security issue. Zero page 
