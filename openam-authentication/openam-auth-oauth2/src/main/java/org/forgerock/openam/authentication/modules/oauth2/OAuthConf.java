@@ -24,6 +24,10 @@
  *
  */
 
+/* 
+ * Portions Copyrighted 2013 ForgeRock Inc
+ */
+
 package org.forgerock.openam.authentication.modules.oauth2;
 
 import com.sun.identity.authentication.spi.AuthLoginException;
@@ -54,6 +58,7 @@ public class OAuthConf {
     private String authServiceUrl = null;
     private String tokenServiceUrl = null;
     private String profileServiceUrl = null;
+    private String profileServiceParam = null;
     private String ssoProxyUrl = null;
     private String accountMapper = null;
     private String attributeMapper = null;
@@ -86,6 +91,7 @@ public class OAuthConf {
         authServiceUrl = CollectionHelper.getMapAttr(config, KEY_AUTH_SERVICE);
         tokenServiceUrl = CollectionHelper.getMapAttr(config, KEY_TOKEN_SERVICE);
         profileServiceUrl = CollectionHelper.getMapAttr(config, KEY_PROFILE_SERVICE);
+        profileServiceParam = CollectionHelper.getMapAttr(config, KEY_PROFILE_SERVICE_PARAM, "access_token");
         // ssoLoginUrl = CollectionHelper.getMapAttr(config, KEY_SSO_LOGIN_URL);
         ssoProxyUrl = CollectionHelper.getMapAttr(config, KEY_SSO_PROXY_URL);
         accountMapper = CollectionHelper.getMapAttr(config, KEY_ACCOUNT_MAPPER);
@@ -269,10 +275,10 @@ public class OAuthConf {
     String getProfileServiceUrl(String token) {
 
         if (profileServiceUrl.indexOf("?") == -1) {
-            return profileServiceUrl + "?" + PARAM_ACCESS_TOKEN
+            return profileServiceUrl + "?" + profileServiceParam
                     + "=" + token;
         } else {
-            return profileServiceUrl + "&" + PARAM_ACCESS_TOKEN
+            return profileServiceUrl + "&" + profileServiceParam
                     + "=" + token;
         }
 

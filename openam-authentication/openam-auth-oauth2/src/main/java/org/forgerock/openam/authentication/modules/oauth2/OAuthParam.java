@@ -24,6 +24,9 @@
  *
  */
 
+/* 
+ * Portions Copyrighted 2013 ForgeRock Inc
+ */
 
 package org.forgerock.openam.authentication.modules.oauth2;
 
@@ -37,6 +40,7 @@ public class OAuthParam {
     static final String KEY_AUTH_SERVICE = "iplanet-am-auth-oauth-auth-service";
     static final String KEY_TOKEN_SERVICE = "iplanet-am-auth-oauth-token-service";
     static final String KEY_PROFILE_SERVICE = "iplanet-am-auth-oauth-user-profile-service";
+    static final String KEY_PROFILE_SERVICE_PARAM = "iplanet-am-auth-oauth-user-profile-param";
     static final String KEY_SCOPE = "iplanet-am-auth-oauth-scope";
     static final String KEY_SSO_PROXY_URL = "iplanet-am-auth-oauth-sso-proxy-url";
     static final String KEY_AUTH_LEVEL = "iplanet-am-auth-oauth-auth-level";
