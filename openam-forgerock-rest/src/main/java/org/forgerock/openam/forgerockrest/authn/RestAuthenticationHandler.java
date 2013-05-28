@@ -384,8 +384,10 @@ public class RestAuthenticationHandler {
         String keyAlias = getKeystoreAlias(authContext.getOrganizationName());
 
         Map<String, Object> jwtValues = new HashMap<String, Object>();
-        jwtValues.put("authIndexType", indexType);
-        jwtValues.put("authIndexValue", authIndexValue);
+        if (indexType != null && authIndexValue != null) {
+            jwtValues.put("authIndexType", indexType);
+            jwtValues.put("authIndexValue", authIndexValue);
+        }
         String authId = generateAuthId(keyAlias, jwtValues);
         authContextStateMap.addAuthContext(authId, authContext);
         return authId;
