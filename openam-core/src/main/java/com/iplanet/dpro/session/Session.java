@@ -451,6 +451,11 @@ public class Session extends GeneralTaskRunnable {
         }
     }
 
+    private Session(SessionID sid, boolean sessionIsLocal) {
+        this(sid);
+        this.sessionIsLocal = sessionIsLocal;
+    }
+
     /**
      * Returns cookie name for the Session
      * @return cookie name
@@ -1395,8 +1400,10 @@ public class Session extends GeneralTaskRunnable {
             int status[] = { 0 };
             List<SessionInfo> infos = null;
 
+            boolean isLocal = false;
             if (sessionService != null && sessionService.isLocalSessionService(svcurl)) {
                 infos = sessionService.getValidSessions(this, pattern, status);
+                isLocal = true;
             } else {
                 SessionRequest sreq = 
                         new SessionRequest(SessionRequest.GetValidSessions, sessionID.toString(), false);
@@ -1415,7 +1422,7 @@ public class Session extends GeneralTaskRunnable {
             
             for (SessionInfo info : infos) {
                 SessionID sid = new SessionID(info.sid);
-                session = new Session(sid);
+                session = new Session(sid, isLocal);
                 session.sessionServiceURL = svcurl;
                 session.update(info);
                 sessions.put(info.sid, session);
