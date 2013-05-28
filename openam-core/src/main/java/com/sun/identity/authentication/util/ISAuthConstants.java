@@ -691,4 +691,14 @@ public interface ISAuthConstants {
     // Property name for valid go to url domains attribute
     public static final String AUTH_GOTO_DOMAINS = AUTH_ATTR_PREFIX	 
         + "valid-goto-domains";    
+
+    /**
+     * Property name for persistent cookie auth level.
+     */
+    public static final String PCOOKIE_AUTH_LEVEL = "openam-auth-pcookie-auth-level";
+
+    /**
+     * The AuthType string for persistent cookie based logins.
+     */
+    public static final String PCOOKIE_AUTH_TYPE = "PCookie";
 }

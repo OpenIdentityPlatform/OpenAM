@@ -183,6 +183,7 @@ public class LoginState {
     int cacheTime;
     int authLevel=0;
     int moduleAuthLevel=Integer.MIN_VALUE;
+    private String pCookieAuthLevel;
     String client= null;
     String authMethName="";
     String pAuthMethName=null;
@@ -878,7 +879,8 @@ public class LoginState {
             
             invalidAttemptsDataAttrName = CollectionHelper.getMapAttr(
                 attrs, ISAuthConstants.INVALID_ATTEMPTS_DATA_ATTR_NAME);
-            
+
+            pCookieAuthLevel = CollectionHelper.getMapAttr(attrs, ISAuthConstants.PCOOKIE_AUTH_LEVEL);
             if (messageEnabled) {
                 debug.message("Getting Org Profile: " + orgDN
                         + "\nlocale->" + localeContext.getLocale()
@@ -3023,6 +3025,10 @@ public class LoginState {
      * @param authLevel Authentication Level.
      */
     public void setAuthLevel(String authLevel) {
+        //check if we authenticated using a persistent cookie, and if so, use the persistent cookie authlevel instead
+        if (foundPCookie != null && foundPCookie) {
+            authLevel = pCookieAuthLevel;
+        }
         // check if module Level is set and is greater
         // then authenticated modules level
         if (authLevel == null) {
@@ -3486,15 +3492,12 @@ public class LoginState {
                 //the cookie should have already reach its lifetime
                 return null;
             }
-            
-            if (messageEnabled) {
-                debug.message("authMethStr: " + authMethStr);
-            }
-            pAuthMethName = authMethStr;
+
+            pAuthMethName = ISAuthConstants.PCOOKIE_AUTH_TYPE;
             if (messageEnabled) {
                 debug.message("Found valid PC : username=" + usernameStr +
                     "\ndomainname=" + domainStr + "\nauthMethod=" +
-                    pAuthMethName + "\nmaxSession=" + maxSession +
+                    authMethStr + "\nmaxSession=" + maxSession +
                     "\nidleTime=" + idleTime + "\ncacheTime=" + cacheTime +
                     "\norgDN=" + orgDN);
             }

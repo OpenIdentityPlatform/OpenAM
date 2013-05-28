@@ -410,6 +410,14 @@
                     syntax="string"
                     i18nKey="a150">
                 </AttributeSchema>
+                <AttributeSchema name="openam-auth-pcookie-auth-level"
+                    type="single"
+                    syntax="string"
+                    i18nKey="a153">
+                    <DefaultValues>
+                        <Value>0</Value>
+                    </DefaultValues>
+                </AttributeSchema>
             </Organization>
         </Schema>
         <Configuration>
