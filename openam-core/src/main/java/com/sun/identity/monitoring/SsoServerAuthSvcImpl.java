@@ -27,7 +27,7 @@
  */
 
 /*
- * Portions Copyrighted 2011 ForgeRock AS
+ * Portions Copyrighted 2011-13 ForgeRock Inc.
  */
 package com.sun.identity.monitoring;
 
@@ -101,52 +101,57 @@ public class SsoServerAuthSvcImpl extends SsoServerAuthSvc {
             debug.message("Monitoring interval set to " + interval + "ms.");
         }
 
-        historicSuccessRecords = new LinkedBlockingDeque<Long>(AVERAGE_RECORD_COUNT);
-        historicFailureRecords = new LinkedBlockingDeque<Long>(AVERAGE_RECORD_COUNT);
+        historicFailureRecords = new LinkedBlockingDeque<Long>();
+        historicSuccessRecords = new LinkedBlockingDeque<Long>();
+
     }
 
-    protected void updateSsoServerAuthenticationFailureRate() {
-        long li = AuthenticationFailureRate.longValue();
 
-        if (lastCheckpoint + frequency > System.currentTimeMillis()) {
-            if (!historicFailureRecords.offerLast(li)) {
-                historicFailureRecords.removeFirst();
-                historicFailureRecords.offerLast(li);
-            }
+    /*
+    Update both success and failure rates at the same time
+     */
+    protected void updateSsoServerAuthenticationRates() {
 
+        // if our checkpoint is stale, replace it with a new one
+        if (System.currentTimeMillis() > (lastCheckpoint + (interval * 1000))) {
             lastCheckpoint = System.currentTimeMillis();
         }
 
-        Long historicCount = historicFailureRecords.peekFirst();
-        long average = li / interval;
-
-        if (historicCount != null) {
-             average = (li - historicCount.longValue()) / interval;
+        // remove success records that are older than the interval we're interested in
+        while (historicSuccessRecords.size() > 0 &&
+                historicSuccessRecords.peekFirst() < (lastCheckpoint - (interval * 1000))) {
+            historicSuccessRecords.removeFirst();
         }
 
-        AuthenticationFailureRate = Long.valueOf(average);
-    }
+        // remove failure records that are older than the interval we're interested in
+        while (historicFailureRecords.size() > 0 &&
+                historicFailureRecords.peekFirst() < (lastCheckpoint - (interval * 1000))) {
+            historicFailureRecords.removeFirst();
+        }
 
-    protected void updateSsoServerAuthenticationSuccessRate() {
-        long li = AuthenticationSuccessRate.longValue();
+        // get count of successful and failed logins
+        long lis = historicSuccessRecords.size();
+        long lif = historicFailureRecords.size();
 
-        if (lastCheckpoint + frequency < System.currentTimeMillis()) {
-            if (!historicSuccessRecords.offerLast(li)) {
-                historicSuccessRecords.removeFirst();
-                historicSuccessRecords.offerLast(li);
+        long total = lis + lif;
+
+        // if there are no logins then assign 0 so we don't divide by 0
+        if (total == 0) {
+            AuthenticationSuccessRate = 0;
+            AuthenticationFailureRate = 0;
+        } else {
+            AuthenticationSuccessRate = (int) (100 * lis/total);
+            AuthenticationFailureRate = (int) (100 * lif/total);
+
+            // make the addition of both rates == 100
+            if (AuthenticationFailureRate + AuthenticationSuccessRate < 100) {
+                if (AuthenticationFailureRate > AuthenticationSuccessRate) {
+                    AuthenticationFailureRate += (100 - (AuthenticationFailureRate + AuthenticationSuccessRate));
+                } else {
+                    AuthenticationSuccessRate += (100 - (AuthenticationFailureRate + AuthenticationSuccessRate));
+                }
             }
-
-            lastCheckpoint = System.currentTimeMillis();
         }
-
-        Long historicCount = historicSuccessRecords.peekFirst();
-        long average = li / interval;
-
-        if (historicCount != null) {
-             average = (li - historicCount.longValue()) / interval;
-        }
-
-        AuthenticationSuccessRate = Long.valueOf(average);
     }
 
     /*
@@ -160,16 +165,18 @@ public class SsoServerAuthSvcImpl extends SsoServerAuthSvc {
         long li = AuthenticationFailureCount.longValue();
         li++;
         AuthenticationFailureCount = Long.valueOf(li);
+        historicFailureRecords.add(System.currentTimeMillis());
 
-        updateSsoServerAuthenticationFailureRate();
+        updateSsoServerAuthenticationRates();
     }
 
     public void incSsoServerAuthenticationSuccessCount() {
         long li = AuthenticationSuccessCount.longValue();
         li++;
         AuthenticationSuccessCount = Long.valueOf(li);
+        historicSuccessRecords.add(System.currentTimeMillis());
 
-        updateSsoServerAuthenticationSuccessRate();
+        updateSsoServerAuthenticationRates();
     }
 
     /**

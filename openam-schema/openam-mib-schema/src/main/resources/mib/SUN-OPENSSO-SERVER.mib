@@ -369,7 +369,7 @@ authenticationFailureCount OBJECT-TYPE
     ::= { ssoServerAuthSvc 2 }
 
 authenticationSuccessRate OBJECT-TYPE
-    SYNTAX        Counter64
+    SYNTAX        Integer32
     MAX-ACCESS    read-only
     STATUS        current
     DESCRIPTION
@@ -378,7 +378,7 @@ authenticationSuccessRate OBJECT-TYPE
     ::= { ssoServerAuthSvc 3 }
 
 authenticationFailureRate OBJECT-TYPE
-    SYNTAX        Counter64
+    SYNTAX        Integer32
     MAX-ACCESS    read-only
     STATUS        current
     DESCRIPTION
