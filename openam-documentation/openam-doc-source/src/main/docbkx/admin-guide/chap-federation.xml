@@ -382,10 +382,12 @@
    </table>
 
    <para>For more information on using fedlets, see <link xlink:show="new"
-   xlink:href="dev-guide#chap-fedlet-java"><citetitle>Using Fedlets in Java Web
-   Applications</citetitle></link> and <link xlink:show="new"
-   xlink:href="dev-guide#chap-fedlet-java"><citetitle>Using Fedlets in .NET
-   Applications</citetitle></link> in the <citetitle>Developer's
+   xlink:href="dev-guide#chap-fedlet-java"
+   xlink:role="http://docbook.org/xlink/role/olink"><citetitle>Using Fedlets in
+   Java Web Applications</citetitle></link> and <link xlink:show="new"
+   xlink:href="dev-guide#chap-fedlet-dotnet"
+   xlink:role="http://docbook.org/xlink/role/olink"><citetitle>Using Fedlets in
+   .NET Applications</citetitle></link> in the <citetitle>Developer's
    Guide</citetitle>.</para>
 
    <para>The following procedure describes how to create a Java Fedlet.</para>

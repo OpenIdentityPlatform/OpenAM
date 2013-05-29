@@ -23,7 +23,7 @@
   !      Copyright 2011-2013 ForgeRock, Inc.
   !    
 -->
-<appendix xml:id='chap-best-practices'
+<appendix xml:id='appendix-best-practices'
  xmlns='http://docbook.org/ns/docbook'
  version='5.0' xml:lang='en'
  xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance'
@@ -65,13 +65,13 @@ $ tar -xvzf ~/.openssocfg</screen>
 
     <step>
      <para>Copy the OpenAM <filename>.war</filename> file.</para>
+     <note>
+      <para>If you use this method, it will be more difficult to read your old
+      configuration. Should you start the older version of OpenDJ the information will
+      be in binary instead of the expected LDIF export format. If this is a potential
+      problem, you can use <command>export-svc-cfg</command> instead.</para>
+     </note>
     </step>
-    <note>
-     <para>If you use this method, it will be more difficult to read your old 
-     configuration. Should you start the older version of OpenDJ the information will 
-     be in binary instead of the expected LDIF export format. If this is a potential 
-     problem, you can use <command>export-svc-cfg</command> instead.</para>
-    </note>
    </procedure>
 
   </section>
@@ -115,7 +115,7 @@ $ tar -xvzf ~/.openssocfg</screen>
      <para>Download your upgrade file from <link 
      xlink:show="new" xlink:href="http://forgerock.com/openam-downloads/"
      ><citetitle>Enterprise Downloads page</citetitle></link> or from the <link 
-     xlink:show="new" xlink:href="http://forgerock.org/openam-archive.html/"
+     xlink:show="new" xlink:href="http://forgerock.org/openam-archive.html"
      ><citetitle>Archives page</citetitle></link>.</para>
     </step>
     <step>
@@ -151,7 +151,7 @@ $ jar xvf /path/to/tomcat/webapps/openam.war</screen>
      <para>Download your upgrade file or files from <link 
      xlink:show="new" xlink:href="http://forgerock.com/openam-downloads/"
      ><citetitle>Enterprise Downloads page</citetitle></link> or from the <link 
-     xlink:show="new" xlink:href="http://forgerock.org/openam-archive.html/"
+     xlink:show="new" xlink:href="http://forgerock.org/openam-archive.html"
      ><citetitle>Archives page</citetitle></link>.</para>
     </listitem>
 

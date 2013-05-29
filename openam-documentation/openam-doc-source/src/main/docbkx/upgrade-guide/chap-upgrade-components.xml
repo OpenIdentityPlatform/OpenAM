@@ -69,7 +69,7 @@
      <para>Download your upgrade file or files from <link 
      xlink:show="new" xlink:href="http://forgerock.com/openam-downloads/"
      ><citetitle>Enterprise Downloads page</citetitle></link> or from the <link 
-     xlink:show="new" xlink:href="http://forgerock.org/openam-archive.html/"
+     xlink:show="new" xlink:href="http://forgerock.org/openam-archive.html"
      ><citetitle>Archives page</citetitle></link>.</para>
     </step>
     <step>
@@ -94,9 +94,11 @@
      policy agent uses the default values until you change the
      configuration.</para>
     </step>
- 
-    <para>For Java EE agents, it is best to perform a clean uninstall then reinstall
-    the policy agent instead of attempting to save files over the old libraries.</para>
+
+    <step>
+     <para>For Java EE agents, it is best to perform a clean uninstall then reinstall
+     the policy agent instead of attempting to save files over the old libraries.</para>
+    </step>
    </procedure>
   
    <example xml:id="update-agent-example">
@@ -167,7 +169,7 @@ Archive:  /path/apache_v22_Linux_64_agent_3.1.0-Xpress.zip
        <para>Download the tools upgrade <filename>.zip</filename> file or files from <link 
        xlink:show="new" xlink:href="http://forgerock.com/openam-downloads/"
        ><citetitle>Enterprise Downloads page</citetitle></link> or from the <link 
-       xlink:show="new" xlink:href="http://forgerock.org/openam-archive.html/"
+       xlink:show="new" xlink:href="http://forgerock.org/openam-archive.html"
        ><citetitle>Archives page</citetitle></link>.</para>
       </step>
 

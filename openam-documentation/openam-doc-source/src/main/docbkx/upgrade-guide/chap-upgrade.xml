@@ -23,7 +23,7 @@
   !      Copyright 2011-2013 ForgeRock, Inc.
   !    
 -->
-<chapter xml:id='chap-upgrade-basics'
+<chapter xml:id='chap-upgrade'
  xmlns='http://docbook.org/ns/docbook'
  version='5.0' xml:lang='en'
  xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance'
@@ -88,7 +88,7 @@
    <para>Download your upgrade file or files from <link 
      xlink:show="new" xlink:href="http://forgerock.com/openam-downloads/"
      ><citetitle>Enterprise Downloads page</citetitle></link> or from the <link 
-     xlink:show="new" xlink:href="http://forgerock.org/openam-archive.html/"
+     xlink:show="new" xlink:href="http://forgerock.org/openam-archive.html"
      ><citetitle>Archives page</citetitle></link>.</para>
   </step>
 
@@ -119,10 +119,11 @@
    the upgrade process.</para>
   </step>
 
+  <step>
    <para>If OpenAM is running in a site deployment with multiple servers,
    configure your load balancer to take the OpenAM server out of the site
    pool during upgrade.</para>
-
+  </step>
  </procedure>
 
  <example xml:id="upgrade-example">

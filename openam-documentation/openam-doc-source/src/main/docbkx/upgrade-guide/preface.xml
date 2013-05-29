@@ -46,7 +46,7 @@
    <para>This guide is organized as follows:</para>
   
    <listitem>
-    <para><link xlink:href="upgrade-guide#chap-upgrade-intro"
+    <para><link xlink:href="upgrade-guide#chap-intro"
      xlink:role="http://docbook.org/xlink/role/olink">
      <citetitle>Introduction to Upgrades</citetitle></link>  
      defines the three version numbers and how they indicate what type of release 
