@@ -79,11 +79,11 @@
   <xinclude:include href='man-ampassword-1.xml' />
   <xinclude:include href='man-amverifyarchive-1.xml' />
   <xinclude:include href='man-configurator-jar-1.xml' />
-  <xinclude:include href='../../../../target/generated-resources/man-ssoadm-1.xml' /> 
+  <xinclude:include href='../../../target/generated-resources/man-ssoadm-1.xml' /> 
  </reference>
 
  <xinclude:include href="chap-config-ref.xml" />
- <xinclude:include href='../../../../target/generated-resources/chap-log-messages.xml' />
+ <xinclude:include href='../../../target/generated-resources/chap-log-messages.xml' /> 
  <xinclude:include href='chap-error-messages.xml' />
  <xinclude:include href='chap-ports-used.xml' />
  <xinclude:include href='chap-l10n.xml' />
