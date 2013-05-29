@@ -88,6 +88,7 @@
  <xinclude:include href='chap-troubleshooting.xml' />
 
  <xinclude:include href="glossary.xml" />
+ <xinclude:include href='appendix-interface-stability.xml' />
 
  <index />
 </book>
