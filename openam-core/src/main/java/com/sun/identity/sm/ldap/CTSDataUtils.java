@@ -27,15 +27,21 @@ import com.sun.identity.common.LDAPUtils;
 import com.sun.identity.setup.AMSetupServlet;
 import com.sun.identity.setup.SetupConstants;
 import com.sun.identity.shared.debug.Debug;
-import com.sun.identity.shared.ldap.*;
+import com.sun.identity.shared.ldap.LDAPConnection;
+import com.sun.identity.shared.ldap.LDAPException;
+import com.sun.identity.shared.ldap.LDAPSearchConstraints;
+import com.sun.identity.shared.ldap.LDAPSearchResults;
+import com.sun.identity.shared.ldap.LDAPv2;
 import com.sun.identity.shared.ldap.util.LDIF;
+import org.forgerock.i18n.LocalizableMessage;
+
 import java.io.ByteArrayInputStream;
 import java.io.DataInputStream;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
-import org.forgerock.i18n.LocalizableMessage;
-import static org.forgerock.openam.session.ha.i18n.AmsessionstoreMessages.*;
+
+import static org.forgerock.openam.session.ha.i18n.AmsessionstoreMessages.DB_ENT_NOT_P;
 
 /**
  * Public class to provide Additional Data Utilities for the CTS Directory Store

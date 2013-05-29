@@ -25,19 +25,23 @@
 package org.forgerock.openam.oauth2.rest;
 
 import com.iplanet.sso.SSOException;
-import com.sun.identity.coretoken.interfaces.OAuth2TokenRepository;
 import com.sun.identity.idm.IdRepoException;
 import com.sun.identity.sm.ldap.CTSPersistentStore;
 import org.forgerock.json.fluent.JsonValue;
-import org.forgerock.json.resource.*;
+import org.forgerock.json.resource.CreateRequest;
+import org.forgerock.json.resource.DeleteRequest;
+import org.forgerock.json.resource.InternalServerErrorException;
+import org.forgerock.json.resource.Resource;
+import org.forgerock.json.resource.ResourceException;
+import org.forgerock.json.resource.ResultHandler;
+import org.forgerock.json.resource.ServerContext;
 import org.testng.annotations.Test;
-import org.forgerock.openam.oauth2.rest.mocks.mockOAuth2TokenRepository;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 
 import static org.mockito.Mockito.*;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
 
 public class ClientResourceTest {
 
@@ -80,7 +84,7 @@ public class ClientResourceTest {
 
         Resource expectedResource = new Resource("results", "1", response);
 
-        ClientResource resource = spy(new ClientResource(mockManager, new mockOAuth2TokenRepository()));
+        ClientResource resource = spy(new ClientResource(mockManager, mock(CTSPersistentStore.class)));
 
         // When
         resource.createInstance(null, request, mockHandler);
@@ -111,7 +115,7 @@ public class ClientResourceTest {
 
         Resource expectedResource = new Resource("results", "1", response);
 
-        ClientResource resource = spy(new ClientResource(mockManager, new mockOAuth2TokenRepository()));
+        ClientResource resource = spy(new ClientResource(mockManager, mock(CTSPersistentStore.class)));
 
         // When
         resource.deleteInstance(null, "client", request, mockHandler);

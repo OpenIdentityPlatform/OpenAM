@@ -26,7 +26,7 @@
  *
  */
 
-/*
+/**
  * Portions Copyrighted 2011-2013 ForgeRock Inc
  */
 
@@ -47,6 +47,10 @@ import com.sun.identity.common.TaskRunnable;
 import com.sun.identity.common.TimerPool;
 import com.sun.identity.session.util.SessionUtils;
 import com.sun.identity.shared.Constants;
+import com.sun.identity.shared.debug.Debug;
+
+import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.Serializable;
@@ -61,8 +65,6 @@ import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
 import java.util.StringTokenizer;
-import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpSession;
 
 /**
  * The <code>InternalSession</code> class represents a Webtop internal
@@ -80,6 +82,12 @@ import javax.servlet.http.HttpSession;
  */
 
 public class InternalSession implements TaskRunnable, Serializable {
+
+    // Debug should not be serialised.
+    private transient Debug DEBUG;
+
+    // Session Service should not be serialised.
+    private transient SessionService ss;
 
     /* user universal unique ID*/
     private String uuid;
@@ -116,8 +124,6 @@ public class InternalSession implements TaskRunnable, Serializable {
 
     /** Flag to indicate upgrading the session */
     transient private boolean isSessionUpgrade = false;
-
-    private static SessionService ss = SessionService.getSessionService();
 
     /*
      * The following object map is meant to be used to store the transient
@@ -338,18 +344,44 @@ public class InternalSession implements TaskRunnable, Serializable {
         Collections.synchronizedMap(new HashMap<String, Set<SessionID>>());
 
     /**
-     * Creates a new InternalSession with the invalid state 
-     * @ param sid SessionID
+     * Creates an instance of the Internal Session with its key dependences exposed.
+     *
+     * Note: This InternalSession will be in an invalid state.
+     *
+     * @param sid Non null Session ID.
+     * @param service Non null SessionService.
+     * @param debug Debugging instance to use for all logging.
      */
-    InternalSession(SessionID sid) {
+    public InternalSession(SessionID sid, SessionService service, Debug debug) {
+        sessionID = sid;
+        ss = service;
+        DEBUG = debug;
+
         maxIdleTime = maxDefaultIdleTime;
         maxSessionTime = maxDefaultIdleTime;
         reschedulePossible = maxDefaultIdleTime > maxIdleTime;
-        sessionID = sid;
         sessionState = Session.INVALID;
         timerPool = SystemTimerPool.getTimerPool();
         sessionProperties = new Properties();
         willExpireFlag = true;
+    }
+
+    /**
+     * Creates a new InternalSession with the given Session ID.
+     *
+     * Note: This InternalSession will be in an invalid state.
+     *
+     * @param sid SessionID Non null Session ID.
+     */
+    public InternalSession(SessionID sid) {
+        this(sid, SessionService.getSessionService(), SessionService.sessionDebug);
+    }
+
+    /**
+     * Default constructor required for deserialisation.
+     */
+    public InternalSession() {
+        this(null, SessionService.getSessionService(), SessionService.sessionDebug);
     }
 
     /**
@@ -857,7 +889,7 @@ public class InternalSession implements TaskRunnable, Serializable {
      *
      * Note that package default access is being used
      *
-     * @param SSOToken
+     * @param clientToken
      *            Token of the client setting external property.
      * @param key
      *            Property key
@@ -876,8 +908,8 @@ public class InternalSession implements TaskRunnable, Serializable {
 			throw se;
 		}
         internalPutProperty(key,value);
-        if (SessionService.sessionDebug.messageEnabled()) {
-            SessionService.sessionDebug.message("Updated protected property"
+        if (DEBUG.messageEnabled()) {
+            DEBUG.message("Updated protected property"
                 + " after validating client identity and permissions");
         }
     }
@@ -921,7 +953,7 @@ public class InternalSession implements TaskRunnable, Serializable {
                     sessionProperties.put(HOST_NAME, hostName);
                     sessionProperties.put(HOST, value);
                 } catch (UnknownHostException uhe) {
-                    SessionService.sessionDebug.error(
+                    DEBUG.error(
                             "InternalSession.internalputProperty():"
                                     + "Unable to get HostName for:" + value
                                     + " SessionException: ", uhe);
@@ -1054,8 +1086,8 @@ public class InternalSession implements TaskRunnable, Serializable {
                 && !shouldIgnoreSessionQuotaChecking(userDN)) {
 
             if (SessionConstraint.checkQuotaAndPerformAction(this)) {
-                if (SessionService.sessionDebug.messageEnabled()) {
-                    SessionService.sessionDebug.message("Session Quota "
+                if (DEBUG.messageEnabled()) {
+                    DEBUG.message("Session Quota "
                             + "exhausted!");
                 }
                 SessionService.getSessionService().logEvent(this,
@@ -1472,8 +1504,8 @@ public class InternalSession implements TaskRunnable, Serializable {
     public String encodeURL(String url, short encodingScheme, boolean escape,
             String cookieName) {
 
-        if (SessionService.sessionDebug.messageEnabled()) {
-            SessionService.sessionDebug.message("Session: url: " + url);
+        if (DEBUG.messageEnabled()) {
+            DEBUG.message("Session: url: " + url);
         }
         String encodedURL = url;
 
@@ -1491,8 +1523,8 @@ public class InternalSession implements TaskRunnable, Serializable {
                 }
             }
         }
-        if (SessionService.sessionDebug.messageEnabled()) {
-            SessionService.sessionDebug.message("Returning encoded "
+        if (DEBUG.messageEnabled()) {
+            DEBUG.message("Returning encoded "
                     + "Session: url: " + encodedURL);
         }
 
@@ -1514,13 +1546,12 @@ public class InternalSession implements TaskRunnable, Serializable {
                 cookieSupport = this.cookieMode.booleanValue();
             }
         } catch (Exception ex) {
-            SessionService.sessionDebug.error(
+            DEBUG.error(
                     "Error getting cookieSupport value: ", ex);
             cookieSupport = true;
         }
-        if (SessionService.sessionDebug.messageEnabled()) {
-            SessionService.sessionDebug
-                    .message("InternalSession: getCookieSupport: "
+        if (DEBUG.messageEnabled()) {
+            DEBUG.message("InternalSession: getCookieSupport: "
                             + cookieSupport);
         }
         return cookieSupport;
@@ -1600,7 +1631,7 @@ public class InternalSession implements TaskRunnable, Serializable {
      */
 
     public void setCookieMode(Boolean cookieMode) {
-        SessionService.sessionDebug.message("CookieMode is:" + cookieMode);
+        DEBUG.message("CookieMode is:" + cookieMode);
         if (cookieMode != null) {
             this.cookieMode = cookieMode;
         }

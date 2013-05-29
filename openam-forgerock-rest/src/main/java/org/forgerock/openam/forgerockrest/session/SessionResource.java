@@ -39,6 +39,7 @@ import org.forgerock.json.resource.ResultHandler;
 import org.forgerock.json.resource.ServerContext;
 import org.forgerock.json.resource.UpdateRequest;
 import org.forgerock.openam.dashboard.ServerContextHelper;
+import org.forgerock.openam.forgerockrest.RestUtils;
 import org.forgerock.openam.forgerockrest.session.query.SessionQueryFactory;
 import org.forgerock.openam.forgerockrest.session.query.SessionQueryManager;
 
@@ -282,15 +283,11 @@ public class SessionResource implements CollectionResourceProvider {
         return Math.round(mins);
     }
 
-    private NotSupportedException generateException(String type) {
-        return new NotSupportedException(type + " are not supported for this Resource");
-    }
-
     /**
      * {@inheritDoc}
      */
     public void createInstance(ServerContext ctx, CreateRequest request, ResultHandler<Resource> handler) {
-        handler.handleError(generateException("Creates"));
+        RestUtils.generateUnsupportedOperation(handler);
     }
 
     /**
@@ -298,7 +295,7 @@ public class SessionResource implements CollectionResourceProvider {
      */
     public void deleteInstance(ServerContext ctx, String resId, DeleteRequest request,
             ResultHandler<Resource> handler) {
-        handler.handleError(generateException("Deletes"));
+        RestUtils.generateUnsupportedOperation(handler);
     }
 
     /**
@@ -306,7 +303,7 @@ public class SessionResource implements CollectionResourceProvider {
      */
     public void patchInstance(ServerContext ctx, String resId, PatchRequest request,
             ResultHandler<Resource> handler) {
-        handler.handleError(generateException("Patches"));
+        RestUtils.generateUnsupportedOperation(handler);
     }
 
     /**
@@ -314,6 +311,6 @@ public class SessionResource implements CollectionResourceProvider {
      */
     public void updateInstance(ServerContext ctx, String resId, UpdateRequest request,
             ResultHandler<Resource> handler) {
-        handler.handleError(generateException("Updates"));
+        RestUtils.generateUnsupportedOperation(handler);
     }
 }

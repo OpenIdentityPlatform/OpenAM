@@ -27,17 +27,20 @@
  */
 
 /**
- * Portions Copyrighted [2011] [ForgeRock AS]
+ * Portions Copyrighted 2011, 2013 ForgeRock, Inc.
  */
+
 package com.iplanet.dpro.session;
 
 import com.iplanet.am.util.SystemProperties;
 import com.iplanet.dpro.session.share.SessionEncodeURL;
 import com.iplanet.services.naming.WebtopNaming;
-import com.sun.identity.shared.debug.Debug;
 import com.sun.identity.shared.Constants;
+import com.sun.identity.shared.debug.Debug;
 import com.sun.identity.shared.encode.Base64;
 import com.sun.identity.shared.encode.CookieUtils;
+
+import javax.servlet.http.HttpServletRequest;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.DataInputStream;
@@ -48,7 +51,6 @@ import java.net.URL;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
-import javax.servlet.http.HttpServletRequest;
 
 /**
  * The <code>SessionID</code> class is used to identify a Session object. It
@@ -59,9 +61,7 @@ import javax.servlet.http.HttpServletRequest;
  */
 
 public class SessionID implements Serializable {
-
     private String encryptedString = "";
-
     private boolean isParsed = false;
 
     private boolean comingFromAuth = false;
@@ -71,7 +71,7 @@ public class SessionID implements Serializable {
     private String sessionServer = "";
 
     private String sessionServerPort = "";
-    
+
     private String sessionServerURI = "";
 
     protected String sessionDomain = "";
@@ -162,6 +162,13 @@ public class SessionID implements Serializable {
                 }
             }
         }
+    }
+
+    /**
+     * Creates a default instance of SessionID with a null Session ID.
+     * Note: This function is needed for deserialisation.
+     */
+    public SessionID() {
     }
 
     /**

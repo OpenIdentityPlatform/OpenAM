@@ -26,15 +26,20 @@
  *
  */
 
+/**
+ * Portions copyright 2013 ForgeRock, Inc.
+ */
+
 package com.sun.identity.saml2.profile;
+
+import com.sun.identity.plugin.session.SessionException;
+import com.sun.identity.plugin.session.SessionManager;
+import com.sun.identity.plugin.session.SessionProvider;
+import com.sun.identity.saml2.common.SAML2Utils;
 
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
-import com.sun.identity.saml2.common.SAML2Utils;
-import com.sun.identity.plugin.session.SessionManager;
-import com.sun.identity.plugin.session.SessionProvider;
-import com.sun.identity.plugin.session.SessionException;
 
 /**
  * This class represents a copy of a session in the identity provider side.
@@ -48,7 +53,7 @@ public class IDPSessionCopy implements Serializable {
 
     private String ssoTokenID = null;
     private List nameIDandSPpairs = null;
-    private String pendingLogoutRequestID = null; 
+    private String pendingLogoutRequestID = null;
     private String originatingLogoutRequestID = null;
     private String originatingLogoutSPEntityID = null;
     private boolean doLogoutAll = false;

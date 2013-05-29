@@ -23,7 +23,10 @@
  * "Portions Copyrighted [year] [name of copyright owner]"
  *
  * $Id: SMProfileViewBean.java,v 1.3 2009/10/13 21:17:03 asyhuang Exp $
- *
+ */
+
+/**
+ * Portions copyright 2013 ForgeRock, Inc.
  */
 
 package com.sun.identity.console.session;
@@ -44,8 +47,8 @@ import com.sun.identity.console.session.model.SMProfileModel;
 import com.sun.identity.console.session.model.SMProfileModelImpl;
 import com.sun.identity.console.session.model.SMSessionCache;
 import com.sun.identity.console.session.model.SMSessionData;
-import com.sun.identity.coretoken.interfaces.AMTokenRepository;
 import com.sun.identity.shared.configuration.SystemPropertiesManager;
+import com.sun.identity.sm.ldap.api.CoreTokenConstants;
 import com.sun.web.ui.model.CCActionTableModel;
 import com.sun.web.ui.model.CCNavNodeInterface;
 import com.sun.web.ui.model.CCPageTitleModel;
@@ -59,13 +62,13 @@ import com.sun.web.ui.view.pagetitle.CCPageTitle;
 import com.sun.web.ui.view.table.CCActionTable;
 import com.sun.web.ui.view.tabs.CCTabs;
 
+import javax.servlet.http.HttpServletRequest;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import javax.servlet.http.HttpServletRequest;
 
 public class SMProfileViewBean
     extends SMViewBeanBase
@@ -229,8 +232,8 @@ public class SMProfileViewBean
             addSessionsTab(model,1);
             // Disable, if SFO (not the Airport) HA is enabled and the Type is specified as well.
             // Both the SFO is Enabled and Repository Type has been Specified for view of HA Tabs.
-            if ( (!SystemPropertiesManager.get(AMTokenRepository.IS_SFO_ENABLED, "false").equalsIgnoreCase("true")) &&
-                 (SystemPropertiesManager.get(AMTokenRepository.SYS_PROPERTY_SESSION_HA_REPOSITORY_TYPE, "None").equalsIgnoreCase("None")) )
+            if ( (!SystemPropertiesManager.get(CoreTokenConstants.IS_SFO_ENABLED, "false").equalsIgnoreCase("true")) &&
+                 (SystemPropertiesManager.get(CoreTokenConstants.SYS_PROPERTY_SESSION_HA_REPOSITORY_TYPE, "None").equalsIgnoreCase("None")) )
             {
                 removeSessionsTab();
             }

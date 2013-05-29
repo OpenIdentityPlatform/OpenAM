@@ -1,4 +1,4 @@
-/*
+/**
  * DO NOT REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
  * Copyright (c) 2012-2013 ForgeRock Inc. All rights reserved.
@@ -25,32 +25,48 @@
 package org.forgerock.openam.oauth2.rest;
 
 import com.iplanet.sso.SSOException;
-import com.sun.identity.coretoken.interfaces.OAuth2TokenRepository;
-import com.sun.identity.coretoken.interfaces.OAuth2TokenRepository;
-import com.sun.identity.idm.*;
+import com.sun.identity.idm.IdRepoException;
 import com.sun.identity.shared.OAuth2Constants;
 import com.sun.identity.sm.ldap.CTSPersistentStore;
+import com.sun.identity.sm.ldap.api.fields.CoreTokenField;
+import com.sun.identity.sm.ldap.api.fields.OAuthTokenField;
+import com.sun.identity.sm.ldap.exceptions.DeleteFailedException;
 import org.forgerock.json.fluent.JsonValue;
-import org.forgerock.json.resource.*;
-
-import org.forgerock.json.resource.NotSupportedException;
-import org.forgerock.json.resource.ResourceException;
+import org.forgerock.json.resource.ActionRequest;
 import org.forgerock.json.resource.CollectionResourceProvider;
-import org.forgerock.openam.ext.cts.repo.DefaultOAuthTokenStoreImpl;
+import org.forgerock.json.resource.CreateRequest;
+import org.forgerock.json.resource.DeleteRequest;
+import org.forgerock.json.resource.InternalServerErrorException;
+import org.forgerock.json.resource.NotSupportedException;
+import org.forgerock.json.resource.PatchRequest;
+import org.forgerock.json.resource.PermanentException;
+import org.forgerock.json.resource.QueryRequest;
+import org.forgerock.json.resource.QueryResultHandler;
+import org.forgerock.json.resource.ReadRequest;
+import org.forgerock.json.resource.Resource;
+import org.forgerock.json.resource.ResourceException;
+import org.forgerock.json.resource.ResultHandler;
+import org.forgerock.json.resource.ServerContext;
+import org.forgerock.json.resource.UpdateRequest;
 import org.forgerock.openam.oauth2.utils.OAuth2Utils;
-import java.util.*;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
 
 public class ClientResource  implements CollectionResourceProvider {
 
     private ClientResourceManager manager;
-    private OAuth2TokenRepository store;
+    private CTSPersistentStore store;
 
     public ClientResource() {
         this.store = CTSPersistentStore.getInstance();
         this.manager = new ClientResourceManager();
     }
 
-    public ClientResource(ClientResourceManager manager, OAuth2TokenRepository store) {
+    public ClientResource(ClientResourceManager manager, CTSPersistentStore store) {
         this.store = store;
         this.manager = manager;
     }
@@ -193,11 +209,11 @@ public class ClientResource  implements CollectionResourceProvider {
             manager.deleteIdentity(resourceId);
 
             //delete the tokens associated with that client_id
-            StringBuilder sb = new StringBuilder();
-            sb.append("(").append(OAuth2Constants.CoreTokenParams.CLIENT_ID).append("=").append(resourceId).append(")");
+            Map<CoreTokenField, Object> query = new HashMap<CoreTokenField, Object>();
+            query.put(OAuthTokenField.CLIENT_ID.getField(), resourceId);
             try {
-                store.oauth2DeleteWithFilter(sb.toString());
-            } catch (Exception e){
+                store.delete(query);
+            } catch (DeleteFailedException e) {
                 if (OAuth2Utils.logStatus) {
                     String[] obs = {"FAILED_DELETE_CLIENT", responseVal.toString()};
                     OAuth2Utils.logErrorMessage("FAILED_DELETE_CLIENT", obs, null);

@@ -1,7 +1,7 @@
-/*
+/**
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright (c) 2012 ForgeRock US Inc. All Rights Reserved
+ * Copyright (c) 2012-2013 ForgeRock US Inc. All Rights Reserved
  *
  * The contents of this file are subject to the terms of the Common Development and
  * Distribution License (the License). You may not use this file except in compliance with the
@@ -21,7 +21,7 @@
 package com.sun.identity.saml2.common;
 
 import com.iplanet.dpro.session.SessionException;
-import com.iplanet.dpro.session.exceptions.StoreException;
+import com.iplanet.dpro.session.service.CoreTokenServiceFactory;
 import com.iplanet.dpro.session.service.SessionService;
 import com.iplanet.dpro.session.share.SessionBundle;
 import com.iplanet.services.naming.ServerEntryNotFoundException;
@@ -29,15 +29,28 @@ import com.iplanet.services.naming.WebtopNaming;
 import com.sun.identity.common.GeneralTaskRunnable;
 import com.sun.identity.common.SystemTimer;
 import com.sun.identity.coretoken.interfaces.AMTokenSAML2Repository;
-import com.sun.identity.session.util.SessionUtils;
 import com.sun.identity.shared.Constants;
 import com.sun.identity.shared.configuration.SystemPropertiesManager;
 import com.sun.identity.shared.debug.Debug;
 import com.sun.identity.sm.ldap.CTSPersistentStore;
-import com.sun.identity.sm.model.AMRecord;
-import com.sun.identity.sm.model.FAMRecord;
+import com.sun.identity.sm.ldap.adapters.SAMLAdapter;
+import com.sun.identity.sm.ldap.adapters.TokenAdapter;
+import com.sun.identity.sm.ldap.api.fields.CoreTokenField;
+import com.sun.identity.sm.ldap.api.fields.SAMLTokenField;
+import com.sun.identity.sm.ldap.api.tokens.SAMLToken;
+import com.sun.identity.sm.ldap.api.tokens.Token;
+import com.sun.identity.sm.ldap.api.tokens.TokenIdFactory;
+import com.sun.identity.sm.ldap.exceptions.CoreTokenException;
+import com.sun.identity.sm.ldap.utils.JSONSerialisation;
+import com.sun.identity.sm.ldap.utils.KeyConversion;
+import com.sun.identity.sm.ldap.utils.LDAPDataConversion;
 
-import java.util.*;
+import java.util.Collection;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
 
 
 /**
@@ -77,7 +90,7 @@ public class SAML2CTSPersistentStore extends GeneralTaskRunnable
      * This instance actually brings in the implementation for all CRUD
      * Operations and main implementation.  @see CTSPersistentStore.
      */
-    private static volatile AMTokenSAML2Repository amTokenSAML2Repository = null;
+    private static volatile CTSPersistentStore persistentStore = null;
 
     /**
      * grace period before expired session records are removed from the
@@ -102,15 +115,6 @@ public class SAML2CTSPersistentStore extends GeneralTaskRunnable
     private static final String LOG_MSG_DB_UNAVAILABLE =
         "SESSION_DATABASE_UNAVAILABLE";
 
-    /**
-     * Time period between two successive runs of repository cleanup thread
-     * which checks and removes expired records
-     */
-
-    private static long cleanUpPeriod = 5 * 60 * 1000; // 5 min in milliseconds
-
-    private static long cleanUpValue = 0;
-
     public static final String CLEANUP_RUN_PERIOD =
         "com.sun.identity.saml2.repository.cleanupRunPeriod";
 
@@ -133,6 +137,13 @@ public class SAML2CTSPersistentStore extends GeneralTaskRunnable
     static Debug debug = Debug.getInstance("amToken");
     private String SAML2="saml2";
 
+    private KeyConversion keyConversion = new KeyConversion();
+    private TokenIdFactory tokenIdFactory = new TokenIdFactory(keyConversion);
+    private TokenAdapter<SAMLToken> tokenAdapter = new SAMLAdapter(
+            tokenIdFactory,
+            new JSONSerialisation(),
+            new LDAPDataConversion());
+
     /**
      * Static Initialization Stanza.
      */
@@ -146,14 +157,6 @@ public class SAML2CTSPersistentStore extends GeneralTaskRunnable
         }
 
         try {
-            cleanUpPeriod = Integer.parseInt(SystemPropertiesManager.get(
-                    CLEANUP_RUN_PERIOD, String.valueOf(cleanUpPeriod)));
-        } catch (Exception e) {
-            debug.error("Invalid value for " + CLEANUP_RUN_PERIOD
-                    + ", using default");
-        }
-
-        try {
             healthCheckPeriod = Integer
                     .parseInt(SystemPropertiesManager.get(HEALTH_CHECK_RUN_PERIOD,
                             String.valueOf(healthCheckPeriod)));
@@ -161,10 +164,6 @@ public class SAML2CTSPersistentStore extends GeneralTaskRunnable
             debug.error("Invalid value for " + HEALTH_CHECK_RUN_PERIOD
                     + ", using default");
         }
-
-        runPeriod = (cleanUpPeriod <= healthCheckPeriod) ? cleanUpPeriod
-                : healthCheckPeriod;
-        cleanUpValue = cleanUpPeriod;
 
         // Instantiate the Singleton Instance.
         try {
@@ -226,8 +225,8 @@ public class SAML2CTSPersistentStore extends GeneralTaskRunnable
     private static void initPersistSession() {
         try {
             // Obtain our AM Token Repository Instance to provide the Backend CRUD for Tokens.
-            amTokenSAML2Repository = CTSPersistentStore.getInstance();
-            if (amTokenSAML2Repository != null) {
+            persistentStore = CoreTokenServiceFactory.getInstance();
+            if (persistentStore != null) {
                 isDatabaseUp = true;
             } else {
                 // This Throw will be caught below.
@@ -264,12 +263,10 @@ public class SAML2CTSPersistentStore extends GeneralTaskRunnable
         }
         try {
             // Retrieve the SAML2 Token from the Repository using the SAML2 Primary Key.
-            AMRecord amRecord = (AMRecord) amTokenSAML2Repository.retrieveSAML2Token(samlKey);
-            // Obtain the Serialized Internal Session to unMarshal the SAML2 Object.
-            byte[] blob = amRecord.getSerializedInternalSessionBlob();
-            Object unMarshaledObject = SessionUtils.decode(blob);
-            return unMarshaledObject;
-        } catch (StoreException e) {
+            Token token = persistentStore.read(samlKey);
+            SAMLToken samlToken = tokenAdapter.fromToken(token);
+            return samlToken.getToken();
+        } catch (CoreTokenException e) {
             isDatabaseUp = false;
             logDBStatus();
             debug.error(BRIEF_DB_ERROR_MSG, e);
@@ -296,28 +293,19 @@ public class SAML2CTSPersistentStore extends GeneralTaskRunnable
             return null;
         }
         try {
-            // Retrieve the SAML2 Token from the Repository using the SAML2 Primary Key.
-            List<Object> results = amTokenSAML2Repository.retrieveSAML2TokenWithSecondaryKey(secKey);
-            if ( (results == null) || (results.size() <= 0) )
-                { return null; }
-            FAMRecord famRecord = (FAMRecord) results.get(0);
-            // Obtain the Additional Attributes and UnMarshal.
-            Map map = famRecord.getExtraStringAttributes();
-            if ((map != null) && (!map.isEmpty())) {
-                Vector blobs = (Vector)map.values().iterator().next();
+            // Perform a query against the token store with the secondary key.
+            Map<CoreTokenField, Object> queryMap = new HashMap<CoreTokenField, Object>();
+            queryMap.put(SAMLTokenField.SECONDARY_KEY.getField(), secKey);
 
-                if ((blobs != null) && (!blobs.isEmpty())) {
-                    List list = new ArrayList();
-                    for(int i=0; i<blobs.size(); i++) {
-                        byte[] blob = (byte[])blobs.get(i);
-                        Object obj = SessionUtils.decode(blob);
-                        list.add(obj);
-                    }
-                    return list;
-                }
+            Collection<Token> tokens = persistentStore.list(queryMap);
+            List<Object> results = new LinkedList<Object>();
+            for (Token token : tokens) {
+                SAMLToken samlToken = tokenAdapter.fromToken(token);
+                results.add(samlToken.getToken());
             }
-            return null;
-        } catch (StoreException e) {
+
+            return results;
+        } catch (CoreTokenException e) {
             isDatabaseUp = false;
             logDBStatus();
             debug.error(BRIEF_DB_ERROR_MSG, e);
@@ -341,8 +329,8 @@ public class SAML2CTSPersistentStore extends GeneralTaskRunnable
             return;
         }
         try {
-            amTokenSAML2Repository.deleteSAML2Token(samlKey);
-        } catch (Exception e) {
+            persistentStore.delete(samlKey);
+        } catch (CoreTokenException e) {
             isDatabaseUp = false;
             logDBStatus();
             debug.error(BRIEF_DB_ERROR_MSG, e);
@@ -359,21 +347,6 @@ public class SAML2CTSPersistentStore extends GeneralTaskRunnable
      * @exception Exception When Unable to delete the expired SAML2 objects
      */
     public void deleteExpiredSAML2Tokens()  {
-        if (!isDatabaseUp) {
-            return;
-        }
-        try {
-            amTokenSAML2Repository.deleteExpiredSAML2Tokens();
-        } catch (Exception e) {
-            isDatabaseUp = false;
-            logDBStatus();
-            debug.error(BRIEF_DB_ERROR_MSG, e);
-            if (debug.messageEnabled()) {
-                debug.message(DB_ERROR_MSG, e);
-            }
-            debug.error("AMTokenSAML2Repository.deleteExpiredSAML2Tokens(): failed "
-                    + "deleting Expired saml2 object", e);
-        }
     }
 
    /**
@@ -392,8 +365,10 @@ public class SAML2CTSPersistentStore extends GeneralTaskRunnable
         // Save the SAML2 Token.
         try {
             // Perform the Save of the Token to the Token Repository.
-            amTokenSAML2Repository.saveSAML2Token(samlKey, samlObj, expirationTime, secKey);
-        } catch (Exception e) {
+            SAMLToken samlToken = new SAMLToken(samlKey, secKey, expirationTime, samlObj);
+            Token token = tokenAdapter.toToken(samlToken);
+            persistentStore.create(token);
+        } catch (CoreTokenException e) {
             isDatabaseUp = false;
             logDBStatus();
             debug.error(BRIEF_DB_ERROR_MSG, e);
@@ -493,16 +468,6 @@ public class SAML2CTSPersistentStore extends GeneralTaskRunnable
             if (debug.messageEnabled()) {
                 debug.message(classMethod + "Cleaning expired SAML2 records");
             }
-
-            /*
-             * Clean up is done based on the cleanUpPeriod even though the
-             * thread runs based on the runPeriod.
-             */
-            if (SAML2Utils.isSAML2FailOverEnabled() && (cleanUpValue <= 0)) {
-                deleteExpiredSAML2Tokens();
-                cleanUpValue = cleanUpPeriod;
-            }
-            cleanUpValue = cleanUpValue - runPeriod;
 
             /*
              * HealthChecking is done based on the runPeriod but only when

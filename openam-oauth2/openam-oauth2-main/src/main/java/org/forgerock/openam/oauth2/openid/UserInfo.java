@@ -24,30 +24,20 @@
 
 package org.forgerock.openam.oauth2.openid;
 
-import com.iplanet.sso.SSOToken;
-import com.sun.identity.coretoken.interfaces.OAuth2TokenRepository;
-import com.sun.identity.security.AdminTokenAction;
 import com.sun.identity.shared.OAuth2Constants;
-import com.sun.identity.sm.ServiceConfig;
-import com.sun.identity.sm.ServiceConfigManager;
 import org.forgerock.openam.ext.cts.repo.DefaultOAuthTokenStoreImpl;
 import org.forgerock.openam.oauth2.exceptions.OAuthProblemException;
 import org.forgerock.openam.oauth2.model.CoreToken;
 import org.forgerock.openam.oauth2.provider.OAuth2TokenStore;
 import org.forgerock.openam.oauth2.provider.Scope;
 import org.forgerock.openam.oauth2.utils.OAuth2Utils;
-import org.restlet.Request;
-import org.restlet.data.Status;
 import org.restlet.ext.json.JsonRepresentation;
 import org.restlet.representation.Representation;
 import org.restlet.resource.Get;
 import org.restlet.resource.Post;
 import org.restlet.resource.ServerResource;
 
-import java.security.AccessController;
 import java.util.Map;
-import java.util.Set;
-import java.util.TreeSet;
 
 public class UserInfo extends ServerResource {
 

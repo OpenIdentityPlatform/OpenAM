@@ -26,7 +26,7 @@
  *
  */
 
-/*
+/**
  * Portions Copyrighted 2010-2013 ForgeRock Inc
  */
 
@@ -61,20 +61,22 @@ import com.sun.identity.common.ShutdownListener;
 import com.sun.identity.common.ShutdownManager;
 import com.sun.identity.common.configuration.ServerConfiguration;
 import com.sun.identity.common.configuration.SiteConfiguration;
-import com.sun.identity.coretoken.interfaces.AMTokenRepository;
+import com.sun.identity.delegation.DelegationEvaluator;
+import com.sun.identity.delegation.DelegationException;
+import com.sun.identity.delegation.DelegationPermission;
 import com.sun.identity.idm.AMIdentity;
 import com.sun.identity.idm.IdRepoException;
 import com.sun.identity.idm.IdSearchResults;
 import com.sun.identity.idm.IdType;
 import com.sun.identity.idm.IdUtils;
-import com.sun.identity.delegation.DelegationEvaluator;
-import com.sun.identity.delegation.DelegationException;
-import com.sun.identity.delegation.DelegationPermission;
 import com.sun.identity.log.LogConstants;
 import com.sun.identity.log.LogRecord;
 import com.sun.identity.log.Logger;
 import com.sun.identity.log.messageid.LogMessageProvider;
 import com.sun.identity.log.messageid.MessageProviderFactory;
+import com.sun.identity.monitoring.Agent;
+import com.sun.identity.monitoring.MonitoringUtil;
+import com.sun.identity.monitoring.SsoServerSessSvcImpl;
 import com.sun.identity.security.AdminDNAction;
 import com.sun.identity.security.AdminPasswordAction;
 import com.sun.identity.security.AdminTokenAction;
@@ -91,13 +93,27 @@ import com.sun.identity.sm.ServiceConfig;
 import com.sun.identity.sm.ServiceConfigManager;
 import com.sun.identity.sm.ServiceSchema;
 import com.sun.identity.sm.ServiceSchemaManager;
+import com.sun.identity.sm.ldap.CTSPersistentStore;
+import com.sun.identity.sm.ldap.CoreTokenConfig;
+import com.sun.identity.sm.ldap.adapters.SessionAdapter;
+import com.sun.identity.sm.ldap.adapters.TokenAdapter;
+import com.sun.identity.sm.ldap.api.CoreTokenConstants;
+import com.sun.identity.sm.ldap.api.tokens.Token;
+import com.sun.identity.sm.ldap.api.tokens.TokenIdFactory;
+import com.sun.identity.sm.ldap.exceptions.CoreTokenException;
+import com.sun.identity.sm.ldap.utils.JSONSerialisation;
+import com.sun.identity.sm.ldap.utils.KeyConversion;
+import com.sun.identity.sm.ldap.utils.LDAPDataConversion;
+import org.forgerock.openam.session.service.SessionTimeoutHandler;
 
+import javax.servlet.http.HttpSession;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InterruptedIOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.OutputStream;
@@ -107,33 +123,24 @@ import java.net.URL;
 import java.security.AccessController;
 import java.security.NoSuchProviderException;
 import java.security.SecureRandom;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Hashtable;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.StringTokenizer;
 import java.util.Vector;
-import java.util.concurrent.ExecutorService;
-import java.util.logging.Level;
-import javax.servlet.http.HttpSession;
-
-import com.sun.identity.monitoring.Agent;
-import com.sun.identity.monitoring.MonitoringUtil;
-import com.sun.identity.monitoring.SsoServerSessSvcImpl;
-
-import java.io.InterruptedIOException;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
-
-import org.forgerock.openam.session.service.SessionTimeoutHandler;
+import java.util.logging.Level;
 
 /**
  * This class represents a Session Service
@@ -155,7 +162,7 @@ public class SessionService {
     /**
      * AM Session Repository for Session Persistence.
      */
-    private static volatile AMTokenRepository amTokenRepository = null;
+    private static volatile CTSPersistentStore coreTokenService = null;
 
     /**
      * SSO Token Manager Instance Reference.
@@ -353,7 +360,7 @@ public class SessionService {
     // but we default this to Disabled or Off for Now.
     private static boolean isSessionFailoverEnabled = Boolean.valueOf(
             SystemProperties.get(
-                    AMTokenRepository.IS_SFO_ENABLED,
+                    CoreTokenConstants.IS_SFO_ENABLED,
                     "false")).booleanValue();
 
     // Must be True to permit Session Failover HA to be available.
@@ -376,10 +383,16 @@ public class SessionService {
 
     private static ClusterStateService clusterStateService = null;
 
+    private TokenIdFactory tokenIdFactory;
+    private CoreTokenConfig coreTokenConfig;
+    private TokenAdapter<InternalSession> tokenAdapter;
+
     /**
-     * Static initialization Stanza
+     * Static initialisation section will be called the first time the SessionService is initailised.
+     *
+     * Note: This function depends on the singleton pattern that the SessionService follows.
      */
-    static {
+    private static void initialiseStatic() {
         sessionDebug = Debug.getInstance("amSession");
         stats = Stats.getInstance("amMasterSessionTableStats");
 
@@ -443,7 +456,7 @@ public class SessionService {
             status = "INACTIVE";
         }
         logStatus = status.equalsIgnoreCase("ACTIVE");
-    } // End of static stanza.
+    }
 
     /**
      * Returns Session Service. If a Session Service already exists then it
@@ -451,6 +464,8 @@ public class SessionService {
      */
     public static SessionService getSessionService() {
         if (sessionService == null) {
+            initialiseStatic();
+
             if (SystemProperties.isServerMode()) {
                 synchronized (SessionService.class) {
                     if (sessionService == null) {
@@ -760,7 +775,8 @@ public class SessionService {
         if (isSessionFailoverEnabled && isSessionStored) {
             if (getUseInternalRequestRouting()) {
                 try {
-                    getRepository().delete(sid);
+                    String tokenId = tokenIdFactory.toSessionTokenId(session);
+                    getRepository().delete(tokenId);
                 } catch (Exception e) {
                     sessionDebug.error(
                             "SessionService : failed deleting session ", e);
@@ -776,7 +792,8 @@ public class SessionService {
     void deleteFromRepository(SessionID sid) {
         if (isSessionFailoverEnabled) {
             try {
-                getRepository().delete(sid);
+                String tokenId = tokenIdFactory.toSessionTokenId(sid);
+                getRepository().delete(tokenId);
             } catch (Exception e) {
                 sessionDebug.error("SessionService : failed deleting session ",
                         e);
@@ -1739,6 +1756,16 @@ public class SessionService {
      * Private Singleton Session Service.
      */
     private SessionService() {
+        // Initialise all CTS fields.
+        KeyConversion keyConversion = new KeyConversion();
+        tokenIdFactory = new TokenIdFactory(keyConversion);
+        coreTokenConfig = new CoreTokenConfig();
+        tokenAdapter = new SessionAdapter(
+                tokenIdFactory,
+                coreTokenConfig,
+                new JSONSerialisation(),
+                new LDAPDataConversion());
+
         try {
             dsameAdminDN = (String) AccessController
                     .doPrivileged(new AdminDNAction());
@@ -1813,13 +1840,13 @@ public class SessionService {
              * In session failover mode we need to distinguish between server
              * instance own address and the cluster address We will use new set
              * of properties
-             * 
+             *
              * com.iplanet.am.localserver.{protocol,host,port}
-             * 
+             *
              * to point to this instance while existing properties
-             * 
+             *
              * com.iplanet.am.server.{protocol,host,port}
-             * 
+             *
              * will point to the load balancer address
              */
 
@@ -2082,20 +2109,20 @@ public class SessionService {
      *
      * @return reference to session repository
      */
-    protected static AMTokenRepository getRepository() {
+    protected static CTSPersistentStore getRepository() {
         if (!getUseInternalRequestRouting()) {
             sessionDebug.warning("Not Using Internal Request Routing, unable to provide Session Storage!");
             return null;
         }
-        if (amTokenRepository == null) {
+        if (coreTokenService == null) {
             try {   // Obtain our AM Session Repository Instance to provide Session HA and Failover.
-                amTokenRepository = AMTokenRepositoryFactory.getInstance();
+                coreTokenService = CoreTokenServiceFactory.getInstance();
             } catch (Exception e) {
                 sessionDebug
                         .error("Failed to initialize CTS BackEnd Repository", e);
             }
         }
-        return amTokenRepository;
+        return coreTokenService;
     }
 
     /**
@@ -2202,7 +2229,7 @@ public class SessionService {
                 Map sessionAttrs = subConfig.getAttributes();
                 boolean sfoEnabled = Boolean.valueOf(
                         CollectionHelper.getMapAttr(
-                                sessionAttrs, AMTokenRepository.IS_SFO_ENABLED, "false")
+                                sessionAttrs, CoreTokenConstants.IS_SFO_ENABLED, "false")
                 ).booleanValue();
                 // Currently, we are not allowing to default to Session Failover HA,
                 // even with a single server to enable session persistence.
@@ -2229,13 +2256,13 @@ public class SessionService {
                     initializationClusterService();
 
                     // ************************************************************************
-                    // Now Bootstrap AMTokenRepository Implementation, if one was specified.
-                    if (amTokenRepository == null) {
+                    // Now Bootstrap CoreTokenService Implementation, if one was specified.
+                    if (coreTokenService == null) {
                         // Instantiate our Session Repository Implementation.
                         // Allows Static Elements to Initialize.
-                        amTokenRepository = getRepository();
+                        coreTokenService = getRepository();
                         sessionDebug.message("amTokenRepository Implementation: " +
-                                ((amTokenRepository == null) ? "None" : amTokenRepository.getClass().getSimpleName()));
+                                ((coreTokenService == null) ? "None" : coreTokenService.getClass().getSimpleName()));
                     }
                 } // End of sfoEnabled check.
             } // End of Sub-Configuration Existence check.
@@ -2881,11 +2908,16 @@ public class SessionService {
         if (getUseInternalRequestRouting()) {
             InternalSession sess = null;
             try {
-                sess = getRepository().retrieve(sid);
-                if (sess != null) {
-                    updateSessionMaps(sess);
+                String tokenId = tokenIdFactory.toSessionTokenId(sid);
+                Token token = getRepository().read(tokenId);
+
+                if (token == null) {
+                    return sess;
                 }
-            } catch (Exception e) {
+
+                sess = tokenAdapter.fromToken(token);
+                updateSessionMaps(sess);
+            } catch (CoreTokenException e) {
                 sessionDebug.error("Failed to retrieve new session", e);
             }
             return sess;
@@ -3251,7 +3283,7 @@ public class SessionService {
                 return;
             }
             try {
-                getRepository().save(session);
+                getRepository().update(tokenAdapter.toToken(session));
             } catch (Exception e) {
                 sessionDebug.error("SessionService.saveForFailover: " +
                         "exception encountered", e);

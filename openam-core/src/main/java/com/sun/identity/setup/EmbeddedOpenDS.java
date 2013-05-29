@@ -38,42 +38,60 @@ import com.sun.identity.common.ShutdownManager;
 import com.sun.identity.common.ShutdownPriority;
 import com.sun.identity.shared.Constants;
 import com.sun.identity.shared.debug.Debug;
+import com.sun.identity.shared.ldap.LDAPAttribute;
+import com.sun.identity.shared.ldap.LDAPConnection;
+import com.sun.identity.shared.ldap.LDAPEntry;
+import com.sun.identity.shared.ldap.LDAPException;
+import com.sun.identity.shared.ldap.LDAPModification;
+import org.opends.messages.Message;
+import org.opends.server.core.DirectoryServer;
+import org.opends.server.extensions.ConfigFileHandler;
+import org.opends.server.extensions.SaltedSHA512PasswordStorageScheme;
+import org.opends.server.tools.InstallDS;
+import org.opends.server.tools.RebuildIndex;
+import org.opends.server.tools.dsconfig.DSConfig;
+import org.opends.server.tools.dsreplication.ReplicationCliMain;
+import org.opends.server.types.DirectoryEnvironmentConfig;
+import org.opends.server.util.EmbeddedUtils;
+import org.opends.server.util.ServerConstants;
+import org.opends.server.util.TimeThread;
 
-import java.io.*;
+import javax.crypto.Cipher;
+import javax.crypto.NoSuchPaddingException;
+import javax.servlet.ServletContext;
+import java.io.BufferedInputStream;
+import java.io.BufferedOutputStream;
+import java.io.BufferedReader;
+import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.FileReader;
+import java.io.FileWriter;
+import java.io.FilenameFilter;
+import java.io.IOException;
+import java.io.OutputStream;
+import java.io.StringReader;
 import java.nio.ByteBuffer;
 import java.nio.channels.Channels;
 import java.nio.channels.FileChannel;
 import java.nio.channels.ReadableByteChannel;
 import java.nio.channels.WritableByteChannel;
 import java.security.NoSuchAlgorithmException;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Enumeration;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.Scanner;
+import java.util.Set;
+import java.util.StringTokenizer;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 
-import javax.crypto.Cipher;
-import javax.crypto.NoSuchPaddingException;
-import javax.servlet.ServletContext;
-
-import com.sun.identity.shared.ldap.LDAPAttribute;
-import com.sun.identity.shared.ldap.LDAPConnection;
-import com.sun.identity.shared.ldap.LDAPEntry;
-import com.sun.identity.shared.ldap.LDAPException;
-import com.sun.identity.shared.ldap.LDAPModification;
-
-import org.opends.messages.Message;
-import org.opends.server.core.DirectoryServer;
-import org.opends.server.extensions.ConfigFileHandler;
-import org.opends.server.extensions.SaltedSHA512PasswordStorageScheme;
-import org.opends.server.tools.dsconfig.DSConfig;
-import org.opends.server.tools.RebuildIndex;
-import org.opends.server.types.DirectoryEnvironmentConfig;
-import org.opends.server.util.EmbeddedUtils;
-import org.opends.server.util.ServerConstants;
-import org.opends.server.util.TimeThread;
-
 // OpenDS does not have APIs to install and setup replication yet
-import org.opends.server.tools.InstallDS;
-import org.opends.server.tools.dsreplication.ReplicationCliMain;
 
 /**
  * This class encapsulates all <code>OpenDS</code>  dependencies.
@@ -1434,20 +1452,7 @@ public class EmbeddedOpenDS {
                 getOpenDJConfigFile(map),
                 "--baseDN",
                 (String) map.get(SetupConstants.CONFIG_VAR_ROOT_SUFFIX),
-                "--index",
-                "sunxmlkeyvalue",
-                "--index",
-                "memberof",
-                "--index",
-                "iplanet-am-user-federation-info-key",
-                "--index",
-                "sun-fm-saml2-nameid-infokey",
-                "--index",
-                "pkey",
-                "--index",
-                "skey",
-                "--index",
-                "expirationDate"};
+                "--rebuildAll"};
         OutputStream bos = new ByteArrayOutputStream();
         OutputStream boe = new ByteArrayOutputStream();
         TimeThread.start();

@@ -31,7 +31,6 @@
  */
 package com.iplanet.am.util;
 
-import com.sun.identity.coretoken.interfaces.AMTokenRepository;
 import com.iplanet.sso.SSOToken;
 import com.sun.identity.common.configuration.ServerConfiguration;
 import com.sun.identity.security.AdminTokenAction;
@@ -39,6 +38,8 @@ import com.sun.identity.common.AttributeStruct;
 import com.sun.identity.common.PropertiesFinder;
 import com.sun.identity.shared.Constants;
 import com.sun.identity.sm.SMSEntry;
+import com.sun.identity.sm.ldap.api.CoreTokenConstants;
+
 import java.io.ByteArrayOutputStream;
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -149,9 +150,9 @@ public class SystemProperties {
         mapTagswap.put("%SERVER_PROTO%", Constants.AM_SERVER_PROTOCOL);
         mapTagswap.put("%BASE_DIR%", CONFIG_PATH);
         mapTagswap.put("%SESSION_ROOT_SUFFIX%",
-                AMTokenRepository.SYS_PROPERTY_SESSION_HA_REPOSITORY_ROOT_SUFFIX);
+                CoreTokenConstants.SYS_PROPERTY_SESSION_HA_REPOSITORY_ROOT_SUFFIX);
         mapTagswap.put("%SESSION_STORE_TYPE%",
-                AMTokenRepository.SYS_PROPERTY_SESSION_HA_REPOSITORY_TYPE);
+                CoreTokenConstants.SYS_PROPERTY_SESSION_HA_REPOSITORY_TYPE);
 
         try {
             // Initialize properties

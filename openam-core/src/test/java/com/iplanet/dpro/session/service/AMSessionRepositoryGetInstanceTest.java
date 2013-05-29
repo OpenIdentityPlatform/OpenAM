@@ -1,7 +1,7 @@
 /**
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright (c) 2012 ForgeRock AS Inc. All Rights Reserved
+ * Copyright (c) 2012-2013 ForgeRock AS Inc. All Rights Reserved
  *
  * The contents of this file are subject to the terms
  * of the Common Development and Distribution License
@@ -29,13 +29,8 @@
 
 package com.iplanet.dpro.session.service;
 
-import com.iplanet.am.util.SystemProperties;
-import com.sun.identity.coretoken.interfaces.AMTokenRepository;
-import org.junit.Ignore;
 import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeClass;
-
-import static org.testng.Assert.*;
 
 /**
  * AMSessionRepositoryEncodingTest Tester.
@@ -53,17 +48,4 @@ public class AMSessionRepositoryGetInstanceTest {
     @AfterClass
     public void after() throws Exception {
     }
-
-    @Ignore
-    public void testGetInstance() throws Exception {
-        // Not working.  As it needs too much environment
-        // to properly test, which is unfortunate.
-
-        // Acquire System Properties for minimum environment.
-        SystemProperties systemProperties = new SystemProperties();
-        AMTokenRepository amTokenRepository = AMTokenRepositoryFactory.getInstance();
-        assertNotNull(amTokenRepository);
-    }
-
-
 } 

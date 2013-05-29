@@ -17,37 +17,31 @@ package org.forgerock.openam.forgerockrest;
 
 
 import com.iplanet.am.util.SystemProperties;
-
 import com.iplanet.sso.SSOException;
 import com.iplanet.sso.SSOToken;
 import com.iplanet.sso.SSOTokenManager;
 import com.sun.identity.idm.AMIdentity;
 import com.sun.identity.idm.IdRepoException;
 import com.sun.identity.idm.IdType;
+import com.sun.identity.idsvcs.Token;
 import com.sun.identity.security.AdminTokenAction;
 import com.sun.identity.shared.Constants;
-import org.forgerock.json.fluent.JsonValue;
-import org.forgerock.json.resource.*;
+import org.forgerock.json.resource.ForbiddenException;
+import org.forgerock.json.resource.NotSupportedException;
+import org.forgerock.json.resource.ResultHandler;
+import org.forgerock.json.resource.ServerContext;
 import org.forgerock.json.resource.servlet.HttpContext;
 
-
-import java.lang.Exception;
-import java.lang.Object;
-import java.lang.String;
 import java.security.AccessController;
-import java.util.LinkedHashMap;
 import java.util.List;
-
-
-import com.sun.identity.idsvcs.*;
-import org.forgerock.json.fluent.JsonValueException;
-
-import com.sun.identity.idsvcs.opensso.IdentityServicesImpl;
 
 
 
 /**
- * forgerock-rest utility methods and variables
+ * A collection of ForgeRock-REST based utility functions.
+ *
+ * @author alin.brici@forgerock.com
+ * @author robert.wapshott@forgerock.com
  */
 final public class  RestUtils {
 
@@ -67,6 +61,7 @@ final public class  RestUtils {
             RestDispatcher.debug.error("SystemProperties AUTHENTICATION_SUPER_USER not set");
         }
     }
+
     /**
      * Returns TokenID from headers
      *
@@ -123,8 +118,6 @@ final public class  RestUtils {
 
     static public boolean isAdmin(final ServerContext context){
 
-        JsonValue result = new JsonValue(new LinkedHashMap<String, Object>(1));
-
         Token admin = new Token();
         admin.setId(getCookieFromServerContext(context));
         SSOToken ssotok = null;
@@ -164,9 +157,15 @@ final public class  RestUtils {
             RestDispatcher.debug.error("Unauthorized user.");
             throw new ForbiddenException("Access Denied");
         }
-
     }
 
-
-
+    /**
+     * Signals to the handler that the current operation is unsupported.
+     *
+     * @param handler Non null handler.
+     */
+    public static void generateUnsupportedOperation(ResultHandler handler) {
+        NotSupportedException exception = new NotSupportedException("Operation is not supported.");
+        handler.handleError(exception);
+    }
 }

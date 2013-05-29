@@ -26,13 +26,12 @@
  */
 
 /**
- * Portions Copyrighted 2010-2012 ForgeRock Inc
+ * Portions Copyrighted 2010-2013 ForgeRock Inc
  */
 
 package com.sun.identity.coretoken.interfaces;
 
 import com.iplanet.dpro.session.exceptions.StoreException;
-import com.sun.identity.sm.model.AMRecord;
 
 import java.util.List;
 
@@ -44,10 +43,7 @@ import java.util.List;
  */
 public interface AMTokenSAML2Repository {
 
-    static final String SYS_PROPERTY_TOKEN_SAML2_REPOSITORY_ROOT_SUFFIX =
-            "iplanet-am-token-saml2-root-suffix";
-
-   /**
+    /**
     * Retrives existing SAML2 object from persistent Repository.
     *
     * @param samlKey primary key 

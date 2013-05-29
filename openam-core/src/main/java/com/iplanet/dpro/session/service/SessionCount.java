@@ -25,22 +25,14 @@
  * $Id: SessionCount.java,v 1.5 2008/06/25 05:41:31 qcheng Exp $
  *
  */
+
 /**
- * Portions Copyrighted 2011-2012 ForgeRock Inc
+ * Portions Copyrighted 2011-2013 ForgeRock Inc
  */
+
 package com.iplanet.dpro.session.service;
 
 import com.iplanet.am.util.SystemProperties;
-import java.net.URL;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.Map;
-import java.util.Set;
-
-import com.sun.identity.coretoken.interfaces.AMTokenRepository;
-import com.sun.identity.shared.debug.Debug;
 import com.iplanet.dpro.session.Session;
 import com.iplanet.dpro.session.SessionException;
 import com.iplanet.dpro.session.SessionID;
@@ -52,6 +44,16 @@ import com.iplanet.sso.SSOTokenManager;
 import com.sun.identity.common.configuration.SiteConfiguration;
 import com.sun.identity.session.util.RestrictedTokenContext;
 import com.sun.identity.shared.Constants;
+import com.sun.identity.shared.debug.Debug;
+import com.sun.identity.sm.ldap.CTSPersistentStore;
+
+import java.net.URL;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.Map;
+import java.util.Set;
 
  
  /**
@@ -260,13 +262,13 @@ public class SessionCount {
         return sessions;
     }
 
-    private static Map getSessionsFromRepository(String uuid) throws Exception {
+    private static Map<String, Long> getSessionsFromRepository(String uuid) throws Exception {
 
-        AMTokenRepository repo = SessionService.getSessionService()
+        CTSPersistentStore repo = SessionService.getSessionService()
                 .getRepository();
-        Map sessions = null;
+        Map<String, Long> sessions = null;
         try {
-            sessions = repo.getSessionsByUUID(uuid);
+            sessions = repo.getTokensByUUID(uuid);
         } catch (Exception e) {
             debug.error("SessionCount.getSessionsFromRepository: "+
                 "Session repository is not available", e);            

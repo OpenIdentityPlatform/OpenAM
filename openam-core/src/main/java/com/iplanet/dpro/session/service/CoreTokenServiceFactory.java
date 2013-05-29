@@ -1,7 +1,7 @@
-/*
+/**
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright (c) 2012 ForgeRock US Inc. All Rights Reserved
+ * Copyright (c) 2012-2013 ForgeRock US Inc. All Rights Reserved
  *
  * The contents of this file are subject to the terms of the Common Development and
  * Distribution License (the License). You may not use this file except in compliance with the
@@ -21,11 +21,11 @@
 package com.iplanet.dpro.session.service;
 
 import com.iplanet.am.util.SystemProperties;
-import com.sun.identity.coretoken.interfaces.AMTokenRepository;
 import com.sun.identity.sm.ldap.CTSPersistentStore;
+import com.sun.identity.sm.ldap.api.CoreTokenConstants;
 
 /**
- * <code>AMTokenRepositoryFactory</code> provides a default
+ * <code>CoreTokenServiceFactory</code> provides a default
  * factory for obtaining our Core Token services BackEnd Repository.
  *
  * ** This is a Package Protected class **
@@ -33,9 +33,11 @@ import com.sun.identity.sm.ldap.CTSPersistentStore;
  * ** This class is sort of duplicated in:
  * com.sun.identity.saml2.common.AMTokenRepositoryFactoryAccessor
  *
+ * @author robert.wapshott@forgerock.com
+ * @author jeff.schenk@forgerock.com
  */
 
-class AMTokenRepositoryFactory {
+public class CoreTokenServiceFactory {
 
     /**
      * Global Definitions.
@@ -44,45 +46,42 @@ class AMTokenRepositoryFactory {
             CTSPersistentStore.class.getName();
 
     private static final String CTS_REPOSITORY_CLASS_NAME = SystemProperties.get(
-            AMTokenRepository.CTS_REPOSITORY_CLASS_PROPERTY, DEFAULT_CTS_REPOSITORY_CLASS_NAME);
+            CoreTokenConstants.CTS_REPOSITORY_CLASS_PROPERTY, DEFAULT_CTS_REPOSITORY_CLASS_NAME);
 
     /**
      * Singleton instance of AM Session Repository aka CTS.
      */
-    private static volatile AMTokenRepository amTokenRepository = null;
+    private static volatile CTSPersistentStore coreTokenService = null;
 
     /**
      * Prevent Instantiation and only use as a functional static class.
      */
-    private AMTokenRepositoryFactory() {
+    private CoreTokenServiceFactory() {
     }
 
     /**
      * Common Get Instance method to obtain access to
      * Service Methods.
      *
-     * @return AMTokenRepository Singleton Instance.
+     * @return CoreTokenService Singleton Instance.
      * @throws Exception
      */
-    public static AMTokenRepository getInstance()
-            throws Exception {
-        if (amTokenRepository == null) {
+    public synchronized static CTSPersistentStore getInstance() {
+        if (coreTokenService == null) {
             if (CTS_REPOSITORY_CLASS_NAME.equals(CTSPersistentStore.class.getName())) {
-                amTokenRepository = CTSPersistentStore.getInstance();
-            } else if (CTS_REPOSITORY_CLASS_NAME.equals(com.sun.identity.sm.mq.JMQSessionRepository.class.getName())) {
-                amTokenRepository = com.sun.identity.sm.mq.JMQSessionRepository.getInstance();
+                coreTokenService = CTSPersistentStore.getInstance();
             } else {
-                throw new IllegalAccessException("Unable to instantiate the CTS Persistent Store as Implementation Class:["+
+                throw new RuntimeException("Unable to instantiate the CTS Persistent Store as Implementation Class:["+
                         CTS_REPOSITORY_CLASS_NAME+"], is unknown to OpenAM!");
             }
         }
         // Check if we have gone null during initialization due to offending processing exceptions during instantiation phase.
-        if (amTokenRepository == null) {
+        if (coreTokenService == null) {
             throw new IllegalAccessError("Unable to instantiate the CTS Persistent Store as Implementation Class:["+
                     CTS_REPOSITORY_CLASS_NAME+"], failed during Initialization.");
         }
         // return the implementation.
-        return amTokenRepository;
+        return coreTokenService;
     }
 
 }

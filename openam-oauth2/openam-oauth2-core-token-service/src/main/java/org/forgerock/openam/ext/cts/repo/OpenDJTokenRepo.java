@@ -24,9 +24,20 @@
 
 package org.forgerock.openam.ext.cts.repo;
 
-import com.sun.identity.coretoken.interfaces.OAuth2TokenRepository;
+import com.iplanet.dpro.session.service.CoreTokenServiceFactory;
 import com.sun.identity.shared.debug.Debug;
 import com.sun.identity.sm.ldap.CTSPersistentStore;
+import com.sun.identity.sm.ldap.adapters.OAuthAdapter;
+import com.sun.identity.sm.ldap.adapters.TokenAdapter;
+import com.sun.identity.sm.ldap.api.fields.CoreTokenField;
+import com.sun.identity.sm.ldap.api.fields.OAuthTokenField;
+import com.sun.identity.sm.ldap.api.tokens.Token;
+import com.sun.identity.sm.ldap.api.tokens.TokenIdFactory;
+import com.sun.identity.sm.ldap.exceptions.CoreTokenException;
+import com.sun.identity.sm.ldap.impl.QueryFilter;
+import com.sun.identity.sm.ldap.utils.JSONSerialisation;
+import com.sun.identity.sm.ldap.utils.KeyConversion;
+import com.sun.identity.sm.ldap.utils.LDAPDataConversion;
 import org.forgerock.json.fluent.JsonValue;
 import org.forgerock.json.fluent.JsonValueException;
 import org.forgerock.json.resource.JsonResource;
@@ -34,14 +45,29 @@ import org.forgerock.json.resource.JsonResourceException;
 import org.forgerock.json.resource.SimpleJsonResource;
 import org.forgerock.openam.oauth2.exceptions.OAuthProblemException;
 import org.forgerock.openam.oauth2.utils.OAuth2Utils;
+import org.forgerock.opendj.ldap.Filter;
 import org.restlet.Request;
+
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
 
 public class OpenDJTokenRepo implements JsonResource {
 
 
     final static Debug debug = Debug.getInstance("CTS");
-    private static volatile OAuth2TokenRepository cts = CTSPersistentStore.getInstance();
+
+    private static volatile KeyConversion keyConversion = new KeyConversion();
+    private static volatile TokenIdFactory tokenIdFactory = new TokenIdFactory(keyConversion);
+    private static volatile TokenAdapter<JsonValue> tokenAdapter = new OAuthAdapter(
+            tokenIdFactory, new JSONSerialisation());
+    private static volatile CTSPersistentStore cts = CoreTokenServiceFactory.getInstance();
     private static volatile OpenDJTokenRepo instance = new OpenDJTokenRepo();
+
+    private static volatile LDAPDataConversion conversion = new LDAPDataConversion();
+    private static volatile QueryFilter queryFilter = new QueryFilter(conversion);
 
     /**
      * Default Singleton Constructor.
@@ -75,17 +101,17 @@ public class OpenDJTokenRepo implements JsonResource {
     public JsonValue handle(JsonValue request) throws JsonResourceException {
         try {
             try {
-                JsonValue result = null;
                 switch (request.get("method").required().asEnum(SimpleJsonResource.Method.class)) {
                     case create:
                         try{
-                            result = cts.oauth2Create(request);
+                            request = validateTokenId(request);
+                            cts.create(tokenAdapter.toToken(request));
                             if (OAuth2Utils.logStatus) {
                                 String[] obs = {"CREATED_TOKEN", request.toString()};
                                 OAuth2Utils.logAccessMessage("CREATED_TOKEN", obs, OAuth2Utils.getSSOToken(Request.getCurrent()));
                             }
-                            return  result;
-                        } catch(JsonResourceException e){
+                            return request;
+                        } catch(CoreTokenException e){
                             OAuth2Utils.DEBUG.error("Create Token failed", e);
                             if (OAuth2Utils.logStatus) {
                                 String[] obs = {"FAILED_CREATE_TOKEN", request.toString()};
@@ -94,18 +120,20 @@ public class OpenDJTokenRepo implements JsonResource {
                             throw e;
                         }
                     case read:
-                        return cts.oauth2Read(request);
+                        String tokenId = tokenIdFactory.toOAuthTokenId(request);
+                        return tokenAdapter.fromToken(cts.read(tokenId));
                     case update:
-                        return cts.oauth2Update(request);
+                        cts.update(tokenAdapter.toToken(request));
+                        return request;
                     case delete:
                         try{
-                            result = cts.oauth2Delete(request);
+                            cts.delete(tokenAdapter.toToken(request));
                             if (OAuth2Utils.logStatus) {
                                 String[] obs = {"FAILED_DELETE_TOKEN", request.toString()};
                                 OAuth2Utils.logAccessMessage("FAILED_DELETE_TOKEN", obs, OAuth2Utils.getSSOToken(Request.getCurrent()));
                             }
-                            return  result;
-                        } catch(JsonResourceException e){
+                            return request;
+                        } catch(CoreTokenException e){
                             OAuth2Utils.DEBUG.error("Delete Token failed", e);
                             if (OAuth2Utils.logStatus) {
                                 String[] obs = {"DELETE_FAILED", request.toString()};
@@ -114,7 +142,8 @@ public class OpenDJTokenRepo implements JsonResource {
                             throw e;
                         }
                     case query:
-                        return cts.oauth2Query(request);
+                        Collection<Token> tokens = cts.list(convertRequest(request));
+                        return convertResults(tokens);
                     default:
                         throw new JsonResourceException(JsonResourceException.BAD_REQUEST);
                 }
@@ -134,5 +163,73 @@ public class OpenDJTokenRepo implements JsonResource {
                 }
             }
         }
+    }
+
+    /**
+     * Parse the JsonValue and extract the query parameters from this.
+     *
+     * Note: We are assuming that values will correspond with the known attributes
+     * of the OAuthTokenField enum. If they do not, the OAuthTokenField will throw
+     * a runtime exception.
+     *
+     * @param request Non null JsonValue query request.
+     * @return A Mapping of CoreTokenField to Objects to query by.
+     */
+    private Filter convertRequest(JsonValue request) {
+        @SuppressWarnings("unchecked") // If this cast fails, it should be a runtime error.
+        Map<String, Object> filters = (Map<String, Object>) request.get("params").required().asMap().get("filter");
+
+        QueryFilter.QueryFilterBuilder builder = queryFilter.or();
+        for (OAuthTokenField field : OAuthTokenField.values()) {
+            builder.attribute(field.getField(), filters.get(field.getOAuthField()));
+        }
+
+        return builder.build();
+    }
+
+    /**
+     * Internal conversion function to handle the CTSPersistentStore query result.
+     * @param tokens A non null, but possibly empty collection of tokens.
+     * @return The JsonValue expected by the caller.
+     */
+    private JsonValue convertResults(Collection<Token> tokens) {
+        Set<Map<String, Set<String>>> results = new HashSet<Map<String, Set<String>>>();
+
+        for (Token token : tokens) {
+            results.add(convertToken(token));
+        }
+
+        return new JsonValue(results);
+    }
+
+    /**
+     * Internal conversion function.
+     *
+     * @param token The token to convert.
+     * @return A Token in String to Set of Strings representation.
+     */
+    private Map<String, Set<String>> convertToken(Token token) {
+        Map<String, Set<String>> results = new HashMap<String, Set<String>>();
+
+        for (CoreTokenField field : token.getAttributeNames()) {
+            Set<String> values = new HashSet<String>();
+            Object value = token.getValue(field);
+            values.add(value.toString());
+            results.put(field.toString(), values);
+        }
+
+        return results;
+    }
+
+    /**
+     * Validates that the request contains an id value.
+     *
+     * @param request The request to validate.
+     * @return The returned JsonValue will have an id value assigned.
+     */
+    private JsonValue validateTokenId(JsonValue request) {
+        String id = tokenIdFactory.toOAuthTokenId(request);
+        request.get(TokenIdFactory.ID).setObject(id);
+        return request;
     }
 }

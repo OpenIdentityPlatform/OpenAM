@@ -25,6 +25,7 @@
 dn: cn=schema
 changetype: modify
 add: attributeTypes
+# CTSv1 Schema Attributes
 attributeTypes: ( 1.3.6.1.4.1.36733.2.27.9.2.81 NAME ( 'pKey' ) DESC 'FAMRecord primaryKey field' SYNTAX 1.3.6.1.4.1.1466.115.121.1.26  SINGLE-VALUE X-ORIGIN 'ForgeRock OpenAM CTS' )
 attributeTypes: ( 1.3.6.1.4.1.36733.2.27.9.2.82 NAME ( 'expirationDate' ) DESC 'FAMRecord expiration time' SYNTAX 1.3.6.1.4.1.1466.115.121.1.24 X-ORIGIN 'ForgeRock OpenAM CTS' )
 attributeTypes: ( 1.3.6.1.4.1.36733.2.27.9.2.83 NAME ( 'data' ) DESC 'Attribute to store the blob of the FAMRecord' SYNTAX 1.3.6.1.4.1.1466.115.121.1.5 X-ORIGIN 'ForgeRock OpenAM CTS' )
@@ -36,5 +37,44 @@ attributeTypes: ( 1.3.6.1.4.1.36733.2.27.9.2.88 NAME ( 'auxData' ) DESC 'FAMReco
 attributeTypes: ( 1.3.6.1.4.1.36733.2.27.9.2.89 NAME ( 'extraByteAttr' ) DESC 'FAMRecord extra byte attrs field' SYNTAX 1.3.6.1.4.1.1466.115.121.1.26 X-ORIGIN 'ForgeRock OpenAM CTS' )
 attributeTypes: ( 1.3.6.1.4.1.36733.2.27.9.2.90 NAME ( 'extraStringAttr' ) DESC 'FAMRecord extra string attrs field' SYNTAX 1.3.6.1.4.1.1466.115.121.1.26 X-ORIGIN 'ForgeRock OpenAM CTS' )
 attributeTypes: ( 1.3.6.1.4.1.36733.2.27.9.2.95 NAME ( 'serializedInternalSessionBlob' ) DESC 'Attribute to store the blob of the FAMRecord' SYNTAX 1.3.6.1.4.1.1466.115.121.1.40 X-ORIGIN 'ForgeRock OpenAM CTS' )
+# CTSv2 Schema Attributes
+attributeTypes: ( 1.3.6.1.4.1.36733.2.27.9.2.96 NAME ( 'tokenId' ) DESC 'Token unique ID' SYNTAX 1.3.6.1.4.1.1466.115.121.1.15  SINGLE-VALUE X-ORIGIN 'ForgeRock OpenAM CTSv2' )
+attributeTypes: ( 1.3.6.1.4.1.36733.2.27.9.2.97 NAME ( 'tokenType' ) DESC 'Token type' SYNTAX 1.3.6.1.4.1.1466.115.121.1.15  SINGLE-VALUE X-ORIGIN 'ForgeRock OpenAM CTSv2' )
+attributeTypes: ( 1.3.6.1.4.1.36733.2.27.9.2.98 NAME ( 'tokenExpirationDate' ) DESC 'Token expiration date' SYNTAX 1.3.6.1.4.1.1466.115.121.1.24  SINGLE-VALUE X-ORIGIN 'ForgeRock OpenAM CTSv2' )
+attributeTypes: ( 1.3.6.1.4.1.36733.2.27.9.2.99 NAME ( 'tokenUserId' ) DESC 'ID of the owning user' SYNTAX 1.3.6.1.4.1.1466.115.121.1.15  SINGLE-VALUE X-ORIGIN 'ForgeRock OpenAM CTSv2' )
+attributeTypes: ( 1.3.6.1.4.1.36733.2.27.9.2.100 NAME ( 'tokenObject' ) DESC 'Serialised JSON object for Token' SYNTAX 1.3.6.1.4.1.1466.115.121.1.5  SINGLE-VALUE X-ORIGIN 'ForgeRock OpenAM CTSv2' )
+attributeTypes: ( 1.3.6.1.4.1.36733.2.27.9.2.101 NAME ( 'string01' ) DESC 'General mapped string field' SYNTAX 1.3.6.1.4.1.1466.115.121.1.15  SINGLE-VALUE X-ORIGIN 'ForgeRock OpenAM CTSv2' )
+attributeTypes: ( 1.3.6.1.4.1.36733.2.27.9.2.102 NAME ( 'string02' ) DESC 'General mapped string field' SYNTAX 1.3.6.1.4.1.1466.115.121.1.15  SINGLE-VALUE X-ORIGIN 'ForgeRock OpenAM CTSv2' )
+attributeTypes: ( 1.3.6.1.4.1.36733.2.27.9.2.103 NAME ( 'string03' ) DESC 'General mapped string field' SYNTAX 1.3.6.1.4.1.1466.115.121.1.15  SINGLE-VALUE X-ORIGIN 'ForgeRock OpenAM CTSv2' )
+attributeTypes: ( 1.3.6.1.4.1.36733.2.27.9.2.104 NAME ( 'string04' ) DESC 'General mapped string field' SYNTAX 1.3.6.1.4.1.1466.115.121.1.15  SINGLE-VALUE X-ORIGIN 'ForgeRock OpenAM CTSv2' )
+attributeTypes: ( 1.3.6.1.4.1.36733.2.27.9.2.105 NAME ( 'string05' ) DESC 'General mapped string field' SYNTAX 1.3.6.1.4.1.1466.115.121.1.15  SINGLE-VALUE X-ORIGIN 'ForgeRock OpenAM CTSv2' )
+attributeTypes: ( 1.3.6.1.4.1.36733.2.27.9.2.106 NAME ( 'string06' ) DESC 'General mapped string field' SYNTAX 1.3.6.1.4.1.1466.115.121.1.15  SINGLE-VALUE X-ORIGIN 'ForgeRock OpenAM CTSv2' )
+attributeTypes: ( 1.3.6.1.4.1.36733.2.27.9.2.107 NAME ( 'string07' ) DESC 'General mapped string field' SYNTAX 1.3.6.1.4.1.1466.115.121.1.15  SINGLE-VALUE X-ORIGIN 'ForgeRock OpenAM CTSv2' )
+attributeTypes: ( 1.3.6.1.4.1.36733.2.27.9.2.108 NAME ( 'string08' ) DESC 'General mapped string field' SYNTAX 1.3.6.1.4.1.1466.115.121.1.15  SINGLE-VALUE X-ORIGIN 'ForgeRock OpenAM CTSv2' )
+attributeTypes: ( 1.3.6.1.4.1.36733.2.27.9.2.109 NAME ( 'string09' ) DESC 'General mapped string field' SYNTAX 1.3.6.1.4.1.1466.115.121.1.15  SINGLE-VALUE X-ORIGIN 'ForgeRock OpenAM CTSv2' )
+attributeTypes: ( 1.3.6.1.4.1.36733.2.27.9.2.110 NAME ( 'string10' ) DESC 'General mapped string field' SYNTAX 1.3.6.1.4.1.1466.115.121.1.15  SINGLE-VALUE X-ORIGIN 'ForgeRock OpenAM CTSv2' )
+attributeTypes: ( 1.3.6.1.4.1.36733.2.27.9.2.111 NAME ( 'string11' ) DESC 'General mapped string field' SYNTAX 1.3.6.1.4.1.1466.115.121.1.15  SINGLE-VALUE X-ORIGIN 'ForgeRock OpenAM CTSv2' )
+attributeTypes: ( 1.3.6.1.4.1.36733.2.27.9.2.112 NAME ( 'string12' ) DESC 'General mapped string field' SYNTAX 1.3.6.1.4.1.1466.115.121.1.15  SINGLE-VALUE X-ORIGIN 'ForgeRock OpenAM CTSv2' )
+attributeTypes: ( 1.3.6.1.4.1.36733.2.27.9.2.113 NAME ( 'string13' ) DESC 'General mapped string field' SYNTAX 1.3.6.1.4.1.1466.115.121.1.15  SINGLE-VALUE X-ORIGIN 'ForgeRock OpenAM CTSv2' )
+attributeTypes: ( 1.3.6.1.4.1.36733.2.27.9.2.114 NAME ( 'string14' ) DESC 'General mapped string field' SYNTAX 1.3.6.1.4.1.1466.115.121.1.15  SINGLE-VALUE X-ORIGIN 'ForgeRock OpenAM CTSv2' )
+attributeTypes: ( 1.3.6.1.4.1.36733.2.27.9.2.115 NAME ( 'string15' ) DESC 'General mapped string field' SYNTAX 1.3.6.1.4.1.1466.115.121.1.15  SINGLE-VALUE X-ORIGIN 'ForgeRock OpenAM CTSv2' )
+attributeTypes: ( 1.3.6.1.4.1.36733.2.27.9.2.116 NAME ( 'integer01' ) DESC 'General mapped integer field' SYNTAX 1.3.6.1.4.1.1466.115.121.1.27  SINGLE-VALUE X-ORIGIN 'ForgeRock OpenAM CTSv2' )
+attributeTypes: ( 1.3.6.1.4.1.36733.2.27.9.2.117 NAME ( 'integer02' ) DESC 'General mapped integer field' SYNTAX 1.3.6.1.4.1.1466.115.121.1.27  SINGLE-VALUE X-ORIGIN 'ForgeRock OpenAM CTSv2' )
+attributeTypes: ( 1.3.6.1.4.1.36733.2.27.9.2.118 NAME ( 'integer03' ) DESC 'General mapped integer field' SYNTAX 1.3.6.1.4.1.1466.115.121.1.27  SINGLE-VALUE X-ORIGIN 'ForgeRock OpenAM CTSv2' )
+attributeTypes: ( 1.3.6.1.4.1.36733.2.27.9.2.119 NAME ( 'integer04' ) DESC 'General mapped integer field' SYNTAX 1.3.6.1.4.1.1466.115.121.1.27  SINGLE-VALUE X-ORIGIN 'ForgeRock OpenAM CTSv2' )
+attributeTypes: ( 1.3.6.1.4.1.36733.2.27.9.2.120 NAME ( 'integer05' ) DESC 'General mapped integer field' SYNTAX 1.3.6.1.4.1.1466.115.121.1.27  SINGLE-VALUE X-ORIGIN 'ForgeRock OpenAM CTSv2' )
+attributeTypes: ( 1.3.6.1.4.1.36733.2.27.9.2.121 NAME ( 'integer06' ) DESC 'General mapped integer field' SYNTAX 1.3.6.1.4.1.1466.115.121.1.27  SINGLE-VALUE X-ORIGIN 'ForgeRock OpenAM CTSv2' )
+attributeTypes: ( 1.3.6.1.4.1.36733.2.27.9.2.122 NAME ( 'integer07' ) DESC 'General mapped integer field' SYNTAX 1.3.6.1.4.1.1466.115.121.1.27  SINGLE-VALUE X-ORIGIN 'ForgeRock OpenAM CTSv2' )
+attributeTypes: ( 1.3.6.1.4.1.36733.2.27.9.2.123 NAME ( 'integer08' ) DESC 'General mapped integer field' SYNTAX 1.3.6.1.4.1.1466.115.121.1.27  SINGLE-VALUE X-ORIGIN 'ForgeRock OpenAM CTSv2' )
+attributeTypes: ( 1.3.6.1.4.1.36733.2.27.9.2.124 NAME ( 'integer09' ) DESC 'General mapped integer field' SYNTAX 1.3.6.1.4.1.1466.115.121.1.27  SINGLE-VALUE X-ORIGIN 'ForgeRock OpenAM CTSv2' )
+attributeTypes: ( 1.3.6.1.4.1.36733.2.27.9.2.125 NAME ( 'integer10' ) DESC 'General mapped integer field' SYNTAX 1.3.6.1.4.1.1466.115.121.1.27  SINGLE-VALUE X-ORIGIN 'ForgeRock OpenAM CTSv2' )
+attributeTypes: ( 1.3.6.1.4.1.36733.2.27.9.2.126 NAME ( 'date01' ) DESC 'General mapped date field' SYNTAX 1.3.6.1.4.1.1466.115.121.1.24  SINGLE-VALUE X-ORIGIN 'ForgeRock OpenAM CTSv2' )
+attributeTypes: ( 1.3.6.1.4.1.36733.2.27.9.2.127 NAME ( 'date02' ) DESC 'General mapped date field' SYNTAX 1.3.6.1.4.1.1466.115.121.1.24  SINGLE-VALUE X-ORIGIN 'ForgeRock OpenAM CTSv2' )
+attributeTypes: ( 1.3.6.1.4.1.36733.2.27.9.2.128 NAME ( 'date03' ) DESC 'General mapped date field' SYNTAX 1.3.6.1.4.1.1466.115.121.1.24  SINGLE-VALUE X-ORIGIN 'ForgeRock OpenAM CTSv2' )
+attributeTypes: ( 1.3.6.1.4.1.36733.2.27.9.2.129 NAME ( 'date04' ) DESC 'General mapped date field' SYNTAX 1.3.6.1.4.1.1466.115.121.1.24  SINGLE-VALUE X-ORIGIN 'ForgeRock OpenAM CTSv2' )
+attributeTypes: ( 1.3.6.1.4.1.36733.2.27.9.2.130 NAME ( 'date05' ) DESC 'General mapped date field' SYNTAX 1.3.6.1.4.1.1466.115.121.1.24  SINGLE-VALUE X-ORIGIN 'ForgeRock OpenAM CTSv2' )
 add: objectclasses
-objectClasses: ( 1.3.6.1.4.1.36733.2.27.9.3.26 NAME 'frFamRecord' DESC 'object containing famrecord' SUP top STRUCTURAL MUST pKey MAY ( expirationDate $ data $ serializedInternalSessionBlob $ operation $ sKey $ service $ state $ auxData $ extraByteAttr $ extraStringAttr ) X-ORIGIN 'ForgeRock OpenAM CTS' ) 
+# CTSv1 Object
+objectClasses: ( 1.3.6.1.4.1.36733.2.27.9.3.26 NAME 'frFamRecord' DESC 'object containing famrecord' SUP top STRUCTURAL MUST pKey MAY ( expirationDate $ data $ serializedInternalSessionBlob $ operation $ sKey $ service $ state $ auxData $ extraByteAttr $ extraStringAttr ) X-ORIGIN 'ForgeRock OpenAM CTS' )
+# CTSv2 Object
+objectClasses: ( 1.3.6.1.4.1.36733.2.27.9.3.27 NAME 'frCoreToken' DESC 'object containing ForgeRock Core Token' SUP top STRUCTURAL MUST ( tokenId $ tokenType ) MAY ( tokenExpirationDate $ tokenUserId $ tokenObject $ string01 $ string02 $ string03 $ string04 $ string05 $ string06 $ string07 $ string08 $ string09 $ string10 $ string11 $ string12 $ string13 $ string14 $ string15 $ integer01 $ integer02 $ integer03 $ integer04 $ integer05 $ integer06 $ integer07 $ integer08 $ integer09 $ integer10 $ date01 $ date02 $ date03 $ date04 $ date05 ) X-ORIGIN 'ForgeRock OpenAM CTSv2' )

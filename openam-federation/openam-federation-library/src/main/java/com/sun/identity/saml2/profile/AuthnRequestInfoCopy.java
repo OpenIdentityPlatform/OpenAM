@@ -1,7 +1,7 @@
-/*
+/**
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright © 2011 ForgeRock AS. All rights reserved.
+ * Copyright © 2011-2013 ForgeRock AS. All rights reserved.
  *
  * The contents of this file are subject to the terms
  * of the Common Development and Distribution License
@@ -26,10 +26,11 @@ package com.sun.identity.saml2.profile;
 
 import com.sun.identity.saml2.common.SAML2Exception;
 import com.sun.identity.saml2.protocol.ProtocolFactory;
-import java.io.Serializable;
-import java.util.Map;
+
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.io.Serializable;
+import java.util.Map;
 
 /**
  * This class represents a copy of a AuthnRequestInfo in the service provider and
@@ -41,7 +42,6 @@ import javax.servlet.http.HttpServletResponse;
  * @author Mark de Reeper mark.dereeper@forgerock.com
  */
 public class AuthnRequestInfoCopy implements Serializable {
-    
     private Map paramsMap;
     private String realm;
     private String authnRequest;

@@ -26,16 +26,13 @@
  *
  */
 
+/**
+ * Portions copyright 2013 ForgeRock, Inc.
+ */
+
 package com.sun.identity.diagnostic.plugin.services.server;
 
-import java.net.URL;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Set;
-import java.util.StringTokenizer;
-
 import com.iplanet.am.util.SystemProperties;
-import com.sun.identity.coretoken.interfaces.AMTokenRepository;
 import com.iplanet.services.naming.WebtopNaming;
 import com.iplanet.sso.SSOToken;
 import com.sun.identity.common.configuration.ServerConfiguration;
@@ -45,6 +42,13 @@ import com.sun.identity.shared.datastruct.CollectionHelper;
 import com.sun.identity.shared.debug.Debug;
 import com.sun.identity.sm.ServiceConfig;
 import com.sun.identity.sm.ServiceConfigManager;
+import com.sun.identity.sm.ldap.api.CoreTokenConstants;
+
+import java.net.URL;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Set;
+import java.util.StringTokenizer;
 
 
 /**
@@ -117,7 +121,7 @@ public class SFOConfigValidator extends ServerConfigBase {
                 Map sessionAttrs = subConfig.getAttributes();
                 boolean sfoEnabled = Boolean.valueOf(
                     CollectionHelper.getMapAttr(
-                    sessionAttrs, AMTokenRepository.IS_SFO_ENABLED, "false")
+                    sessionAttrs, CoreTokenConstants.IS_SFO_ENABLED, "false")
                     ).booleanValue();
                 if (sfoEnabled) {
                     isSessionFailoverEnabled = true;

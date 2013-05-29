@@ -15,12 +15,14 @@
  */
 package org.forgerock.openam.forgerockrest;
 
+import com.iplanet.dpro.session.service.CoreTokenServiceFactory;
 import com.iplanet.sso.SSOToken;
 import com.sun.identity.security.AdminTokenAction;
 import com.sun.identity.shared.debug.Debug;
 import com.sun.identity.sm.OrganizationConfigManager;
 import com.sun.identity.sm.SMSException;
-
+import com.sun.identity.sm.ldap.CTSPersistentStore;
+import com.sun.identity.sm.ldap.utils.JSONSerialisation;
 import org.apache.commons.lang.StringUtils;
 import org.forgerock.json.fluent.JsonValue;
 import org.forgerock.json.resource.ActionRequest;
@@ -32,21 +34,26 @@ import org.forgerock.json.resource.PatchRequest;
 import org.forgerock.json.resource.QueryRequest;
 import org.forgerock.json.resource.QueryResultHandler;
 import org.forgerock.json.resource.ReadRequest;
-import org.forgerock.json.resource.Router;
-import org.forgerock.json.resource.RoutingMode;
 import org.forgerock.json.resource.RequestHandler;
 import org.forgerock.json.resource.Resource;
 import org.forgerock.json.resource.ResourceException;
 import org.forgerock.json.resource.Resources;
 import org.forgerock.json.resource.ResultHandler;
+import org.forgerock.json.resource.Router;
+import org.forgerock.json.resource.RoutingMode;
 import org.forgerock.json.resource.ServerContext;
 import org.forgerock.json.resource.UpdateRequest;
 import org.forgerock.openam.dashboard.DashboardResource;
+import org.forgerock.openam.forgerockrest.cts.CoreTokenResource;
 import org.forgerock.openam.forgerockrest.session.SessionResource;
 
-import java.security.AccessController;
 import javax.servlet.ServletException;
-import java.util.*;
+import java.security.AccessController;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
+import java.util.StringTokenizer;
 
 /**
  * A simple {@code Map} based collection resource provider.
@@ -62,6 +69,7 @@ public final class RestDispatcher {
     final static private String AGENTS = "/agents";
     final static private String DASHBOARD = "/dashboard";
     final static private String SESSIONS = "/sessions";
+    final static private String TOKENS = "/tokens";
 
     private static RestDispatcher instance = null;
     private ConnectionFactory factory = null;
@@ -70,8 +78,10 @@ public final class RestDispatcher {
 
     }
 
-    public final static RestDispatcher getInstance() {
-        if (instance == null) instance = new RestDispatcher();
+    public static RestDispatcher getInstance() {
+        if (instance == null) {
+            instance = new RestDispatcher();
+        }
         return instance;
     }
 
@@ -88,6 +98,7 @@ public final class RestDispatcher {
         endpoints.add(REALMS);
         endpoints.add(DASHBOARD);
         endpoints.add(SESSIONS);
+        endpoints.add(TOKENS);
         return endpoints;
     }
 
@@ -120,6 +131,11 @@ public final class RestDispatcher {
             router.addRoute(endpoint, new DashboardResource());
         } else if (endpoint.equalsIgnoreCase(SESSIONS)) {
             router.addRoute(endpoint, new SessionResource());
+        } else if (endpoint.equalsIgnoreCase(TOKENS)) {
+            JSONSerialisation serialisation = new JSONSerialisation();
+            CTSPersistentStore store = CoreTokenServiceFactory.getInstance();
+            CoreTokenResource resource = new CoreTokenResource(serialisation, store);
+            router.addRoute(endpoint, resource);
         }
         return router;
     }
