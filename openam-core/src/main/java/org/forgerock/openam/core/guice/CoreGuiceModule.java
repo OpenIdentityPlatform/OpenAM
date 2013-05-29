@@ -64,7 +64,6 @@ public class CoreGuiceModule extends AbstractModule {
         bind(new AdminTokenType()).toProvider(new AdminTokenProvider()).in(Singleton.class);
         bind(ServiceManagementDAO.class).to(ServiceManagementDAOWrapper.class).in(Singleton.class);
         bind(DNWrapper.class).in(Singleton.class);
-        bind(ConnectionFactory.class).toProvider(new ConnectionFactoryProvider()).in(Singleton.class);
         bind(IndexChangeObservable.class).in(Singleton.class);
         bind(ShutdownManagerWrapper.class).in(Singleton.class);
         bind(SearchResultHandler.class).to(IndexChangeHandler.class).in(Singleton.class);
@@ -101,35 +100,6 @@ public class CoreGuiceModule extends AbstractModule {
         public PrivilegedAction<SSOToken> get() {
             // Provider used over bind(..).getInstance(..) to enforce a lazy loading approach.
             return AdminTokenAction.getInstance();
-        }
-
-    }
-
-    // Simple provider implementation to return a connection factory.
-    private static class ConnectionFactoryProvider implements Provider<ConnectionFactory> {
-
-        @Override
-        public ConnectionFactory get() {
-            // TODO: This needs to delegate to the new connection utils class.
-            DSConfigMgr dsCfg = null;
-
-            try {
-                dsCfg = DSConfigMgr.getDSConfigMgr();
-            } catch (LDAPServiceException e) {
-                throw new RuntimeException(e);
-            }
-
-            ServerGroup sg = dsCfg.getServerGroup("sms");
-            ServerInstance svrCfg = sg.getServerInstance(LDAPUser.Type.AUTH_ADMIN);
-            String connDN = svrCfg.getAuthID();
-            String connPWD = svrCfg.getPasswd();
-            String hostString = dsCfg.getHostName("sms");
-            int pos = hostString.indexOf(":");
-            String hostName = hostString.substring(0, pos);
-            int port = Integer.parseInt(hostString.substring(pos + ":".length()));
-            ConnectionFactory factory = new LDAPConnectionFactory(hostName, port);
-            BindRequest bindRequest = Requests.newSimpleBindRequest(connDN, connPWD.toCharArray());
-            return Connections.newAuthenticatedConnectionFactory(factory, bindRequest);
         }
 
     }

@@ -44,8 +44,7 @@ public class IndexChangeManagerImpl implements IndexChangeManager, Runnable, Ind
     private final IndexChangeObservable observable;
 
     private final ScheduledExecutorService scheduler;
-    // TODO: Does schedulerStatus need to be volatile?
-    private ScheduledFuture<?> schedulerStatus;
+    private volatile ScheduledFuture<?> schedulerStatus;
 
     private long lastLog;
 

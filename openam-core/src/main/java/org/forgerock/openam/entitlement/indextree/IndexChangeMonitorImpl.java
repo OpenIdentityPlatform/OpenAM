@@ -16,6 +16,7 @@
 package org.forgerock.openam.entitlement.indextree;
 
 import com.sun.identity.sm.ServiceManagementDAO;
+import org.forgerock.openam.sm.DataLayerConnectionFactory;
 import org.forgerock.opendj.ldap.Connection;
 import org.forgerock.opendj.ldap.ConnectionFactory;
 import org.forgerock.opendj.ldap.FutureResult;
@@ -40,16 +41,16 @@ public class IndexChangeMonitorImpl implements IndexChangeMonitor {
     private static final String PATH_INDEX_FILTER = "(&(sunserviceID=indexes)(sunxmlKeyValue=pathindex=*))";
 
     private final SearchResultHandler handler;
-    private final ConnectionFactory factory;
+    private final DataLayerConnectionFactory factory;
 
     private final SearchRequest request;
 
-    // TODO: Does connection and searchStatus need to be volatile?
-    private Connection connection;
-    private FutureResult<Result> searchStatus;
+    private volatile Connection connection;
+    private volatile FutureResult<Result> searchStatus;
 
     @Inject
-    public IndexChangeMonitorImpl(SearchResultHandler handler, ConnectionFactory factory, ServiceManagementDAO smDAO) {
+    public IndexChangeMonitorImpl(SearchResultHandler handler,
+                                  DataLayerConnectionFactory factory, ServiceManagementDAO smDAO) {
         this.handler = handler;
         this.factory = factory;
 
