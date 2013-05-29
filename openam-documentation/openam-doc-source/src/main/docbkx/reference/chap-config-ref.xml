@@ -1438,6 +1438,31 @@
    </varlistentry>
 
    <varlistentry>
+    <term>Response Type Plugins</term>
+    <listitem>
+     <para>List of plugins that handle the valid
+     <literal>response_type</literal> values. OAuth 2.0 clients pass response
+     types as parameters to the OAuth 2.0 Authorization end point
+     (<literal>/oauth2/authorize</literal>) to indicate which grant type is
+     requested from the provider. For example, the client passes
+     <literal>code</literal> when requesting an authorization code, and
+     <literal>token</literal> when requesting an access token.</para>
+
+     <para>Values in this list take the form <literal
+     ><replaceable>response-type</replaceable>|<replaceable
+     >plugin-class-name</replaceable></literal>.</para>
+
+     <para>Defaults:
+     <literal>code|org.forgerock.restlet.ext.oauth2.flow.responseTypes.CodeResponseType</literal>,
+     <literal>id_token|org.forgerock.restlet.ext.oauth2.flow.responseTypes</literal>,
+     <literal>token|org.forgerock.restlet.ext.oauth2.flow.responseTypes.TokenResponseType</literal></para>
+
+     <para><command>ssoadm</command> attribute:
+     <literal>forgerock-oauth2-provider-response-type-map-class</literal></para>
+    </listitem>
+   </varlistentry>
+
+   <varlistentry>
     <term>User Profile Attribute(s) the Resource Owner is Authenticated On</term>
     <listitem>
      <para>Names of profile attributes that resource owners use to log in.
@@ -1446,6 +1471,21 @@
 
      <para><command>ssoadm</command> attribute:
      <literal>forgerock-oauth2-provider-authentication-attributes</literal></para>
+    </listitem>
+   </varlistentry>
+
+   <varlistentry>
+    <term>Shared Consent Attribute Name</term>
+    <listitem>
+     <para>Name of a multi-valued attribute on resource owner profiles where
+     OpenAM can save authorization consent decisions. When the resource owner
+     chooses to save the decision to authorize access for a client application,
+     then OpenAM updates the resource owner's profile to avoid having to
+     prompt the resource owner to grant authorization when the client issues
+     subsequent authorization requests.</para>
+
+     <para><command>ssoadm</command> attribute:
+     <literal>forgerock-oauth2-provider-saved-consent-attribute</literal></para>
     </listitem>
    </varlistentry>
   </variablelist>

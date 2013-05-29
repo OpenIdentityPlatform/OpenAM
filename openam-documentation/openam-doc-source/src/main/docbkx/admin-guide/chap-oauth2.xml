@@ -407,6 +407,12 @@
    </step>
 
    <step performance="optional">
+    <para>If your provider has plugins for custom response types, add the
+    custom response types and the corresponding plugin class names to the
+    list of Response Type Plugins.</para>
+   </step>
+
+   <step performance="optional">
     <para>If resource owners log in with a user name that is not their user ID,
     but instead their mail address or some other profile attribute, then add the
     profile attribute name to the list that can be used for authentication.</para>
@@ -414,7 +420,23 @@
     <para>To make the change, browse to Access Control &gt; <replaceable>Realm
     Name</replaceable> &gt; Services &gt; OAuth2 Provider, add the profile
     attributes to the list titled User Profile Attribute(s) the Resource Owner
-    is Authenticated On, and then Save your work.</para>
+    is Authenticated On.</para>
+   </step>
+
+   <step>
+    <para>Set a multi-valued profile attribute where OpenAM can store a resource
+    owner's decisions to authorize clients without further interaction in the
+    Shared Consent Attribute Name field.</para>
+
+    <para>If no profile attribute is available for this purpose, you can add
+    an attribute as described in <link xlink:href="dev-guide#chap-custom-attr"
+    xlink:show="new" xlink:role="http://docbook.org/xlink/role/olink"><citetitle
+    >Customizing Profile Attributes</citetitle></link> in the <citetitle
+    >Developer's Guide</citetitle>.</para>
+   </step>
+
+   <step>
+    <para>Save your changes.</para>
    </step>
   </procedure>
 
@@ -599,7 +621,7 @@
      <para>The policies for this example protect the Apache Tomcat examples
      under <literal>http://www.example.com:8080/examples/</literal>, allowing
      GET and POST operations by all authenticated users. For more information
-     on creating policies, see <link
+     on creating policies, see <link xlink:show="new"
      xlink:href="admin-guide#configure-authz-policy"
      xlink:role="http://docbook.org/xlink/role/olink"><citetitle>Configuring
      Policies</citetitle></link>.</para>
@@ -722,19 +744,25 @@
         additional subjects, or to update existing subjects.</para>
        </listitem>
       </varlistentry>
-<!--      <varlistentry>
+      <varlistentry>
+       <term>Proxy URL</term>
+       <listitem>
+        <para>The client redirect URL, which in this example is
+        <literal>http://oauth2.example.com:8080/openam/oauth2c/OAuthProxy.jsp</literal>.</para>
+       </listitem></varlistentry>
+      <varlistentry>
        <term>Attribute Mapper</term>
        <listitem>
         <para>In this example, 
-        <literal>org.forgerock.openam.authentication.modules.oauth2.DefaultAttributeMapper</literal>.</para>
+        <literal>org.forgerock.openam.authentication.modules.oauth2.DefaultAccountMapper</literal>.</para>
        </listitem>
       </varlistentry>
       <varlistentry>
-       <term>Attribute Mapper Configuration</term>
+       <term>Account Mapper Configuration</term>
        <listitem>
         <para>In this example, <literal>cn=cn</literal>.</para>
        </listitem>
-      </varlistentry>  -->
+      </varlistentry>
       <varlistentry>
        <term>Create account if it does not exist</term>
        <listitem>
@@ -829,7 +857,6 @@
      as user <literal>demo</literal>, password <literal>changeit</literal>,
      OpenAM presents you with an authorization decision page.</para>
 
-     <!-- TODO: Something besides plain, generic vanilla would be nice. -->
      <mediaobject xml:id="figure-oauth2-authz-page">
       <alt>OpenAM presenting authorization decision page to resource owner</alt>
       <imageobject>
@@ -842,7 +869,12 @@
 
      <para>When you click Allow, the authorization service creates an SSO
      session, and redirects the client back to the resource, thus allowing
-     the client to access the protected resource.</para>
+     the client to access the protected resource. If you configured an attribute
+     on which to store the saved consent decision, and you choose to save the
+     consent decision for this authorization, then OpenAM can use that saved
+     decision to avoid prompting you for authorization next time the client
+     accesses the resource, but only ensure that you have authenticated and
+     have a valid session.</para>
 
      <mediaobject xml:id="figure-oauth2-examples-again">
       <alt>Successfully accessing the Apache Tomcat examples</alt>
