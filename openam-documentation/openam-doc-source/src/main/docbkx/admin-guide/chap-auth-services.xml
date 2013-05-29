@@ -2358,7 +2358,7 @@
    <title>Hints For the OATH Module</title>
    <para>The Open Authentication (OATH) module provides a more secure method for users to 
       access their accounts with the help of a device, such as their mobile phone or 
-      Yubikey. Users can log into OpenAm and update their information more securely from
+      Yubikey. Users can log into OpenAM and update their information more securely from
       a one-time password (OTP) displayed on their device. The OATH module includes the
       <link xlink:show="new" xlink:href="http://www.openauthentication.org/about/"
       >OATH standard protocols</link> (<link xlink:show="new"
