@@ -83,7 +83,7 @@ public class IdentityRestService {
     @Produces(MediaType.APPLICATION_JSON)
     public Response authenticate(@Context HttpHeaders headers, @Context HttpServletRequest request,
             @Context HttpServletResponse response, @QueryParam("authIndexType") String authIndexType,
-            @QueryParam("authIndex") String authIndexValue/*, @QueryParam("realm") String realm*/) {
+            @QueryParam("authIndexValue") String authIndexValue/*, @QueryParam("realm") String realm*/) {
         //initiate
         String realm = getRealm(request);
 
