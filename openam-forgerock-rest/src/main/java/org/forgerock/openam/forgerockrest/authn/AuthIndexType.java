@@ -50,4 +50,20 @@ public enum AuthIndexType {
     public AuthContext.IndexType getIndexType() {
         return indexType;
     }
+
+    /**
+     * Gets the AuthIndexType Enum for the corresponding AuthContext.IndexType String.
+     *
+     * @param indexTypeString The AuthContext.IndexType String.
+     * @return The AuthIndexType.
+     */
+    public static AuthIndexType getAuthIndexType(String indexTypeString) {
+        for (AuthIndexType authIndexType : AuthIndexType.values()) {
+            if (authIndexType.getIndexType().toString().equals(indexTypeString.toLowerCase())) {
+                return authIndexType;
+            }
+        }
+
+        throw new IllegalArgumentException("Unknown Authentication Index Type, " + indexTypeString);
+    }
 }
