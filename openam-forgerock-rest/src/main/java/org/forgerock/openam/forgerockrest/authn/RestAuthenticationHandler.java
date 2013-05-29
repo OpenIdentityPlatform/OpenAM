@@ -385,7 +385,7 @@ public class RestAuthenticationHandler {
 
         Map<String, Object> jwtValues = new HashMap<String, Object>();
         if (indexType != null && authIndexValue != null) {
-            jwtValues.put("authIndexType", indexType);
+            jwtValues.put("authIndexType", indexType.toString());
             jwtValues.put("authIndexValue", authIndexValue);
         }
         String authId = generateAuthId(keyAlias, jwtValues);
