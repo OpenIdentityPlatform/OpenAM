@@ -25,7 +25,9 @@
  * $Id: RemovePrivileges.java,v 1.3 2008/06/25 05:42:15 qcheng Exp $
  *
  */
-
+/**
+ * Portions Copyrighted 2013 ForgeRock, Inc.
+ */
 package com.sun.identity.cli.idrepo;
 
 
@@ -41,8 +43,6 @@ import com.sun.identity.delegation.DelegationException;
 import com.sun.identity.delegation.DelegationManager;
 import com.sun.identity.delegation.DelegationPrivilege;
 import com.sun.identity.idm.AMIdentity;
-import com.sun.identity.idm.AMIdentityRepository;
-import com.sun.identity.idm.IdRepoException;
 import com.sun.identity.idm.IdType;
 import java.text.MessageFormat;
 import java.util.Iterator;
@@ -54,6 +54,9 @@ import java.util.logging.Level;
  * This command removes privileges to an identity.
  */
 public class RemovePrivileges extends IdentityCommand {
+
+    private static final String ALL_AUTHENTICATED_USERS = "All Authenticated Users";
+
     /**
      * Services a Commandline Request.
      *
@@ -81,10 +84,14 @@ public class RemovePrivileges extends IdentityCommand {
                 adminSSOToken, realm);
             Set privilegeObjects = mgr.getPrivileges();
 
-            AMIdentityRepository amir = new AMIdentityRepository(
-                adminSSOToken, realm);
-            AMIdentity amid = new AMIdentity(
-                adminSSOToken, idName, idType, realm, null); 
+            AMIdentity amid;
+            if (idType.equals(IdType.ROLE) && idName.equalsIgnoreCase(ALL_AUTHENTICATED_USERS)) {
+                //realm needs to be /, see DelegationPolicyImpl#privilegeToPolicy implementation
+                amid = new AMIdentity(adminSSOToken, idName, idType, "/", null);
+                //do not check the existense of all authenticated users role as it would fail
+            } else {
+                amid = new AMIdentity(adminSSOToken, idName, idType, realm, null);
+            }
             String uid = amid.getUniversalId();
 
             for (Iterator i = privileges.iterator(); i.hasNext(); ){
@@ -118,12 +125,6 @@ public class RemovePrivileges extends IdentityCommand {
             writeLog(LogWriter.LOG_ACCESS, Level.INFO,
                 "SUCCEED_IDREPO_REMOVE_PRIVILEGES", params);
         } catch (DelegationException e) {
-            String[] args = {realm, type, idName, e.getMessage()};
-            debugError("RemovePrivileges.handleRequest", e);
-            writeLog(LogWriter.LOG_ERROR, Level.INFO,
-                "FAILED_IDREPO_REMOVE_PRIVILEGES", args);
-            throw new CLIException(e, ExitCodes.REQUEST_CANNOT_BE_PROCESSED);
-        } catch (IdRepoException e) {
             String[] args = {realm, type, idName, e.getMessage()};
             debugError("RemovePrivileges.handleRequest", e);
             writeLog(LogWriter.LOG_ERROR, Level.INFO,
