@@ -106,12 +106,14 @@
                         <includes>
                             <include>org.forgerock.commons:forgerock-util</include>
                             <include>org.forgerock.openam:openam-core</include>
+                            <include>org.forgerock.openam:openam-entitlements</include>
                             <include>org.forgerock.openam:openam-locale</include>
                             <include>org.forgerock.openam:openam-shared</include>
                             <include>org.forgerock.openam:openam-dtd-schema</include>
                             <include>org.forgerock.openam:openam-jaxrpc-schema</include>
                             <include>org.forgerock.openam:openam-liberty-schema</include>
                             <include>org.forgerock.openam:openam-saml2-schema</include>
+                            <include>org.forgerock.openam:openam-xacml3-schema</include>
                             <include>org.forgerock.openam:openam-federation-library</include>
                             <include>org.forgerock.openam:OpenFM</include>
                             <include>org.json:json</include>
@@ -147,6 +149,8 @@
                                 <include>com/sun/identity/authentication/internal/AuthSSOProvider*</include>
                                 <include>com/sun/identity/authentication/internal/AuthSSOToken*</include>
                                 <include>com/sun/identity/authentication/internal/InvalidAuthContextException*</include>
+                                <include>com/sun/identity/authentication/internal/server/AuthSPrincipal*</include>
+                                <include>com/sun/identity/authentication/internal/util/AuthI18n*</include>
                                 <!-- TODO do we really need all the authentication module's principals here? -->
                                 <include>com/sun/identity/authentication/service/AMAuthErrorCode*</include>
                                 <include>com/sun/identity/authentication/service/AuthException*</include>
@@ -190,6 +194,7 @@
                                 <include>com/sun/identity/common/SystemProperties*</include>
                                 <include>com/sun/identity/configuration/SystemProperties*</include>
                                 <include>com/sun/identity/delegation/DelegationException*</include>
+                                <include>com/sun/identity/entitlement/**</include>
                                 <include>com/sun/identity/entity/*</include>
                                 <include>com/sun/identity/idm/*</include>
                                 <include>com/sun/identity/idm/common/**</include>
@@ -227,6 +232,7 @@
                                 <include>com/sun/identity/util/**</include>
                                 <include>org/forgerock/openam/authentication/service/protocol/**</include>
                                 <include>org/forgerock/openam/services/cdm/**</include>
+                                <include>org/forgerock/openam/upgrade/UpgradeException*</include>
                                 <include>org/forgerock/openam/validation/ResponseValidationFilter*</include>
                             </includes>
                             <excludes>
@@ -404,6 +410,12 @@
                             </includes>
                         </filter>
                         <filter>
+                            <artifact>org.forgerock.openam:openam-xacml3-schema</artifact>
+                            <includes>
+                                <include>**/**</include>
+                            </includes>
+                        </filter>
+                        <filter>
                             <artifact>org.forgerock.openam:openam-dtd-schema</artifact>
                             <includes>
                                 <include>com/sun/identity/log/messageid/amLogMessage.dtd</include>
@@ -448,6 +460,12 @@
                                 <include>libSessionProvider.properties</include>
                                 <include>libXACML.properties</include>
                            </includes>
+                        </filter>
+                        <filter>
+                            <artifact>org.forgerock.openam:openam-entitlements</artifact>
+                            <includes>
+                                <include>**/**</include>
+                            </includes>
                         </filter>
                         <filter>
                             <artifact>org.json:json</artifact>
@@ -502,11 +520,19 @@
         </dependency>
         <dependency>
             <groupId>org.forgerock.openam</groupId>
+            <artifactId>openam-xacml3-schema</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.forgerock.openam</groupId>
             <artifactId>OpenFM</artifactId>
         </dependency>
         <dependency>
             <groupId>org.forgerock.openam</groupId>
             <artifactId>openam-locale</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.forgerock.openam</groupId>
+            <artifactId>openam-entitlements</artifactId>
         </dependency>
     </dependencies>
 </project>
