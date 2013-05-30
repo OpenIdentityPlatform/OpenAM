@@ -147,33 +147,6 @@
 
   <variablelist>
    <varlistentry>
-    <term><literal>com.forgerock.agents.conditional.login.url</literal></term>
-    <listitem>
-     <para>To conditionally redirect users based on the incoming request URL,
-     set this property.</para>
-
-     <para>This takes the incoming request URL to match, a vertical bar
-     ( <literal>|</literal> ), and then a comma-separated list of URLs to
-     which to redirect incoming users.</para>
-
-     <para>If the string before the vertical bar matches an incoming request
-     URL, then the policy agent uses the list of URLs to determine how to
-     redirect the user-agent. If the global property FQDN Check
-     (<literal>com.sun.identity.agents.config.fqdn.check.enable</literal>)
-     is enabled for the policy agent, then the policy agent iterates through
-     the list until it finds an appropriate redirect URL that matches the
-     FQDN check. Otherwise, the policy agent redirects the user-agent to the
-     first URL in the list.</para>
-
-     <para>Examples: <literal>com.forgerock.agents.conditional.login.url[0]=
-     login.example.com/|http://openam1.example.com/openam/UI/Login,
-     http://openam2.example.com/openam/UI/Login</literal>,
-     <literal>com.forgerock.agents.conditional.login.url[1]=
-     login.example.com|http://openam3.example.com/openam/UI/Login,
-     http://openam4.example.com/openam/UI/Login</literal></para>
-    </listitem>
-   </varlistentry>
-   <varlistentry>
     <term><literal>com.iplanet.am.cookie.name</literal></term>
     <listitem>
      <para>Name of the SSO Token cookie used between the OpenAM server and
@@ -532,6 +505,33 @@
      Access Control &gt; <replaceable>Realm Name</replaceable> &gt; Agents &gt;
      J2EE &gt; <replaceable>Agent Name</replaceable> &gt; Advanced &gt; Client
      IP Address Header.</para>
+    </listitem>
+   </varlistentry>
+   <varlistentry>
+    <term><literal>com.sun.identity.agents.config.conditional.login.url</literal></term>
+    <listitem>
+     <para>To conditionally redirect users based on the incoming request URL,
+     set this property.</para>
+
+     <para>This takes the incoming request domain to match, a vertical bar
+     ( <literal>|</literal> ), and then a comma-separated list of URLs to
+     which to redirect incoming users.</para>
+
+     <para>If the domain before the vertical bar matches an incoming request
+     URL, then the policy agent uses the list of URLs to determine how to
+     redirect the user-agent. If the global property FQDN Check
+     (<literal>com.sun.identity.agents.config.fqdn.check.enable</literal>)
+     is enabled for the policy agent, then the policy agent iterates through
+     the list until it finds an appropriate redirect URL that matches the
+     FQDN check. Otherwise, the policy agent redirects the user-agent to the
+     first URL in the list.</para>
+
+     <para>Examples: <literal>com.sun.identity.agents.config.conditional.login.url[0]=
+     login.example.com|http://openam1.example.com/openam/UI/Login,
+     http://openam2.example.com/openam/UI/Login</literal>,
+     <literal>com.sun.identity.agents.config.conditional.login.url[1]=
+     signin.example.com|http://openam3.example.com/openam/UI/Login,
+     http://openam4.example.com/openam/UI/Login</literal></para>
     </listitem>
    </varlistentry>
    <varlistentry>
