@@ -85,9 +85,13 @@ public class AddPrivileges extends IdentityCommand {
             DelegationManager mgr = new DelegationManager(
                 adminSSOToken, realm);
             Set privilegeObjects = mgr.getPrivileges();
-            AMIdentity amid = new AMIdentity(adminSSOToken, idName, idType, realm, null);
-            if (!(idType.equals(IdType.ROLE) && idName.equalsIgnoreCase(ALL_AUTHENTICATED_USERS) )) {
+            AMIdentity amid;
+            if (idType.equals(IdType.ROLE) && idName.equalsIgnoreCase(ALL_AUTHENTICATED_USERS)) {
+                //realm needs to be /, see DelegationPolicyImpl#privilegeToPolicy implementation
+                amid = new AMIdentity(adminSSOToken, idName, idType, "/", null);
                 //do not check the existense of all authenticated users role as it would fail
+            } else {
+                amid = new AMIdentity(adminSSOToken, idName, idType, realm, null);
                 if (!amid.isExists()) {
                     Object[] p = {idName, type};
                     throw new CLIException(MessageFormat.format(
