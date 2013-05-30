@@ -1787,6 +1787,10 @@
      <listitem>
       <para>Provides the name of the carrier that will send the text
       message.</para>
+      <para>Every carrier has their own attribute name ending, for example Verizon
+      uses @vtext.com or vtext.com. Contact your mobile carrier to find out what their 
+      attribute name is. If you will be sending international texts, ask your carrier 
+      if a country code is a required.</para>
       <para><command>ssoadm</command> attribute:
       <literal>openamSMSCarrierAttribute</literal></para>
      </listitem>
