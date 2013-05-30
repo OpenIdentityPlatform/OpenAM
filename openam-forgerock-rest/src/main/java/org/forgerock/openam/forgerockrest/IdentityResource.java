@@ -506,10 +506,11 @@ public final class IdentityResource implements CollectionResourceProvider {
                     // same password as before, update the attributes
                 } else {
                     // check header to make sure that oldpassword is there check to see if it's correct
-                    if(checkValidPassword(resourceId, getPasswordFromHeader(context).toCharArray(), realm)){
+                    String strPass = getPasswordFromHeader(context);
+                    if(strPass != null && !strPass.isEmpty() && checkValidPassword(resourceId, strPass.toCharArray(), realm)){
                         //continue will allow password change
                     } else{
-                        throw new PermanentException(401, "Unauthorized", null);
+                        throw new ForbiddenException("Access Denied", null);
                     }
                 }
             }
@@ -557,6 +558,10 @@ public final class IdentityResource implements CollectionResourceProvider {
             RestDispatcher.debug.error("IdentityResource.updateInstance() :: Cannot UPDATE " +
                     generalFailure);
             handler.handleError(new BadRequestException(generalFailure.getMessage(), generalFailure));
+        } catch (ForbiddenException fe){
+            RestDispatcher.debug.error("IdentityResource.updateInstance() :: Cannot UPDATE! "
+                    + resourceId + ":" + fe);
+            handler.handleError(fe);
         } catch (final Exception exception) {
             RestDispatcher.debug.error("IdentityResource.updateInstance() :: Cannot UPDATE! " +
                     exception);
