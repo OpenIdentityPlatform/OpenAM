@@ -1,7 +1,7 @@
 /**
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright (c) 2010-2011 ForgeRock AS. All Rights Reserved
+ * Copyright (c) 2010-2013 ForgeRock, Inc. All Rights Reserved
  *
  * The contents of this file are subject to the terms
  * of the Common Development and Distribution License
@@ -60,7 +60,7 @@ public class RemoteServletRequest implements ServletRequest, Serializable {
     private int contentLength = -1;
     private String contentType = null;
     private Map internalParameters = new HashMap();
-    private Map internalParamererMap = null;
+    private Map internalParamererMap = new HashMap();
     private Set internalParameterNames = new HashSet();
     private Map internalParameterValues = new HashMap();
     private String protocol = null;
@@ -136,7 +136,7 @@ public class RemoteServletRequest implements ServletRequest, Serializable {
             } 
         }
         
-        internalParamererMap = getParameterMap();
+        internalParamererMap.putAll(getParameterMap());
         protocol = getProtocol();
         scheme = getScheme();
         serverName = getServerName();
