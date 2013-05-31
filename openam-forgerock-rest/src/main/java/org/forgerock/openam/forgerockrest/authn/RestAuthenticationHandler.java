@@ -20,11 +20,14 @@ import com.iplanet.sso.SSOException;
 import com.iplanet.sso.SSOToken;
 import com.sun.identity.authentication.AuthContext;
 import com.sun.identity.authentication.service.AMAuthErrorCode;
+import com.sun.identity.authentication.service.AuthUtils;
 import com.sun.identity.authentication.spi.AuthLoginException;
 import com.sun.identity.authentication.spi.PagePropertiesCallback;
+import com.sun.identity.authentication.util.AMAuthUtils;
 import com.sun.identity.security.AdminTokenAction;
 import com.sun.identity.shared.debug.Debug;
 import com.sun.identity.shared.locale.L10NMessageImpl;
+import com.sun.identity.sm.DNMapper;
 import com.sun.identity.sm.SMSException;
 import com.sun.identity.sm.ServiceConfig;
 import com.sun.identity.sm.ServiceConfigManager;
@@ -42,6 +45,7 @@ import org.forgerock.openam.utils.JsonValueBuilder;
 
 import javax.inject.Inject;
 import javax.security.auth.callback.Callback;
+import javax.security.auth.callback.ChoiceCallback;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.ws.rs.core.HttpHeaders;
@@ -116,9 +120,24 @@ public class RestAuthenticationHandler {
             realm = "/";
         }
 
+        AuthContext authContext = null;
+        try {
+            authContext = createAuthContext(realm);
+        } catch (AuthLoginException e) {
+            DEBUG.error(e.getMessage(), e);
+            return new RestAuthException(getAuthLoginExceptionResponseStatus(e), e).getResponse();
+        }
+
+        return authenticate(headers, request, response, realm, indexType, authIndexValue, httpMethod, authContext);
+    }
+
+    private Response authenticate(HttpHeaders headers, HttpServletRequest request, HttpServletResponse response,
+            String realm, AuthContext.IndexType indexType, String authIndexValue, HttpMethod httpMethod,
+            AuthContext authContext) {
+
         Response.ResponseBuilder responseBuilder;
         try {
-            AuthContext authContext = startAuthenticationProcess(realm, indexType, authIndexValue, request, response);
+            authContext = startAuthenticationProcess(indexType, authIndexValue, request, response, authContext);
 
             JsonValue jsonResponseObject = processAuthContextRequirements(headers, request, response, authContext,
                     indexType, authIndexValue, httpMethod);
@@ -182,7 +201,6 @@ public class RestAuthenticationHandler {
     /**
      * Starts the authentication process by creating the AuthContext and calling login() on it.
      *
-     * @param realm The realm.
      * @param indexType The IndexType.
      * @param authIndexValue The IndexType value.
      * @param request The HttpServletRequest.
@@ -190,11 +208,9 @@ public class RestAuthenticationHandler {
      * @return The AuthContext.
      * @throws AuthLoginException If a problem occurred when creating the AuthContext or calling the login() method.
      */
-    private AuthContext startAuthenticationProcess(String realm, AuthContext.IndexType indexType,
-            String authIndexValue, HttpServletRequest request, HttpServletResponse response) throws
+    private AuthContext startAuthenticationProcess(AuthContext.IndexType indexType,
+            String authIndexValue, HttpServletRequest request, HttpServletResponse response, AuthContext authContext) throws
             AuthLoginException {
-
-        AuthContext authContext = createAuthContext(realm);
 
         if (indexType != null) {
             authContext.login(indexType, authIndexValue, null, request, response);
@@ -617,7 +633,8 @@ public class RestAuthenticationHandler {
                 String authIndexType = jwt.getJwt().getContent("authIndexType", String.class);
                 AuthContext.IndexType indexType = getAuthIndexType(authIndexType);
                 String authIndexValue = jwt.getJwt().getContent("authIndexValue", String.class);
-                authContext = startAuthenticationProcess(realm, indexType, authIndexValue, request, response);
+                authContext = createAuthContext(realm);
+                authContext = startAuthenticationProcess(indexType, authIndexValue, request, response, authContext);
             }
 
             String keyAlias = getKeystoreAlias(authContext.getOrganizationName());
@@ -633,15 +650,7 @@ public class RestAuthenticationHandler {
             Callback[] responseCallbacks = handleCallbacks(headers, request, response, originalCallbacks,
                     jsonRequestObject);
 
-            authContext.submitRequirements(responseCallbacks);
-
-            JsonValue jsonResponseObject = processAuthContextRequirements(headers, request, response,
-                    jsonRequestObject, authContext, authId, null, null, httpMethod);
-
-            responseBuilder = Response.status(Response.Status.OK);
-            responseBuilder.header("Cache-control", "no-cache");
-            responseBuilder.type(MediaType.APPLICATION_JSON_TYPE);
-            responseBuilder.entity(jsonResponseObject.toString());
+            return processLoginProcess(headers, request, response, httpMethod, authContext, authId, responseCallbacks);
 
         } catch (RestAuthException e) {
             DEBUG.error(e.getMessage());
@@ -669,6 +678,70 @@ public class RestAuthenticationHandler {
         }
 
         return responseBuilder.build();
+    }
+
+    private Response processLoginProcess(HttpHeaders headers, HttpServletRequest request,
+            HttpServletResponse response, HttpMethod httpMethod, AuthContext authContext, String authId,
+            Callback[] responseCallbacks) throws RestAuthCallbackHandlerResponseException, L10NMessageImpl,
+            SignatureException {
+
+        SignedJwt jwt = (SignedJwt) jwtBuilder.recontructJwt(authId);
+        String realm = jwt.getJwt().getContent("realm", String.class);
+        String authIndexType = jwt.getJwt().getContent("authIndexType", String.class);
+        AuthContext.IndexType indexType = getAuthIndexType(authIndexType);
+        String authIndexValue;
+
+        String choice = null;
+
+        for (Callback responseCallback : responseCallbacks) {
+            if (responseCallback instanceof ChoiceCallback) {
+                int selectedIndex = ((ChoiceCallback) responseCallback).getSelectedIndexes()[0];
+                choice = ((ChoiceCallback) responseCallback).getChoices()[selectedIndex];
+                break;
+            }
+        }
+
+        if ((indexType == AuthContext.IndexType.LEVEL) || (indexType == AuthContext.IndexType.COMPOSITE_ADVICE)) {
+            authIndexValue = AMAuthUtils.getDataFromRealmQualifiedData(choice);
+            String qualifiedRealm = AMAuthUtils.getRealmFromRealmQualifiedData(choice);
+            String orgDN = null;
+            if ((qualifiedRealm != null) && (qualifiedRealm.length() != 0)) {
+                orgDN = DNMapper.orgNameToDN(qualifiedRealm);
+                authContext.getAuthContextLocal().setOrgDN(orgDN);
+            }
+
+            int type = AuthUtils.getCompositeAdviceType(authContext.getAuthContextLocal());
+
+            if (type == AuthUtils.MODULE) {
+                indexType = AuthContext.IndexType.MODULE_INSTANCE;
+            } else if (type == AuthUtils.SERVICE) {
+                indexType = AuthContext.IndexType.SERVICE;
+            } else if (type == AuthUtils.REALM) {
+                indexType = AuthContext.IndexType.SERVICE;
+                orgDN = DNMapper.orgNameToDN(choice);
+                authIndexValue = AuthUtils.getOrgConfiguredAuthenticationChain(orgDN);
+                authContext.getAuthContextLocal().setOrgDN(orgDN);
+            } else {
+                indexType = AuthContext.IndexType.MODULE_INSTANCE;
+            }
+
+            return authenticate(headers, request, response, realm, indexType, authIndexValue, httpMethod, authContext);
+
+        } else {
+            authContext.submitRequirements(responseCallbacks);
+
+            JsonValue jsonResponseObject = processAuthContextRequirements(headers, request, response,
+                    new JsonValue(new HashMap<String, String>()), authContext, authId, null, null, httpMethod);
+
+
+            Response.ResponseBuilder responseBuilder;
+            responseBuilder = Response.status(Response.Status.OK);
+            responseBuilder.header("Cache-control", "no-cache");
+            responseBuilder.type(MediaType.APPLICATION_JSON_TYPE);
+            responseBuilder.entity(jsonResponseObject.toString());
+
+            return responseBuilder.build();
+        }
     }
 
     /**

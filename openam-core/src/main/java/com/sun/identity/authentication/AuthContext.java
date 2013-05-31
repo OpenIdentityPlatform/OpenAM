@@ -43,6 +43,7 @@ import com.iplanet.sso.SSOException;
 import com.iplanet.sso.SSOToken;
 import com.iplanet.sso.SSOTokenManager;
 import com.sun.identity.authentication.client.AuthClientUtils;
+import com.sun.identity.authentication.server.AuthContextLocal;
 import com.sun.identity.authentication.service.AMAuthErrorCode;
 import com.sun.identity.authentication.service.AuthException;
 import com.sun.identity.authentication.service.LoginState;
@@ -2496,5 +2497,9 @@ public class AuthContext extends Object implements java.io.Serializable {
         }
 
         return appToken;
+    }
+
+    public AuthContextLocal getAuthContextLocal() {
+        return acLocal;
     }
 }
