@@ -347,7 +347,7 @@ I. Signing
       b) Specify the list of attributes to be fetched in the Attribute Map
 	 IDP Entity -> Assertion Processing -> Attribute Map
 	 ex : CommonName=cn
-	      GiveName=sn
+	      GivenName=sn
 	      UserStatus=inetUserStatus
 
       c) Obtain the standard metadata from Fedlet(i.e sp.xml) and 
@@ -425,7 +425,7 @@ II. Signing and Encryption
       b) Specify the list of attributes to be fetched in the Attribute Map
 	 IDP Entity -> Assertion Processing -> Attribute Map
 	 ex : CommonName=cn
-	      GiveName=sn
+	      GivenName=sn
 	      UserStatus=inetUserStatus
       c) Specify the Attribute Authority Mapper.
 	  IDP Entity -> Attribute Authority -> Subject Data Store 
