@@ -706,7 +706,7 @@ public class InternalSession implements TaskRunnable, Serializable {
             mayReschedule = true;
         }
         maxIdleTime = t;
-        reschedulePossible = maxDefaultIdleTime > maxIdleTime;
+        reschedulePossible = (maxDefaultIdleTime > maxIdleTime) || (maxDefaultIdleTime > maxSessionTime);
         if (httpSession != null) {
             int httpIdleTime = httpSession.getMaxInactiveInterval();
             if (maxIdleTime > httpIdleTime) {
