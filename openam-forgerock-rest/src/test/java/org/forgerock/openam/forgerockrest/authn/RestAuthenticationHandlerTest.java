@@ -512,6 +512,7 @@ public class RestAuthenticationHandlerTest {
         PrivateKey privateKey = mock(PrivateKey.class);
         X509Certificate certificate = mock(X509Certificate.class);
         SignedJwt signedJwt = mock(SignedJwt.class);
+        PlaintextJwt plaintextJwt = mock(PlaintextJwt.class);
         Callback callback1 = mock(Callback.class);
         Callback callback2 = mock(Callback.class);
         Callback[] callbacks = new Callback[]{callback1, callback2};
@@ -523,6 +524,9 @@ public class RestAuthenticationHandlerTest {
         given(amKeyProvider.getX509Certificate(anyString())).willReturn(certificate);
         given(jwtBuilder.recontructJwt("AUTH_ID")).willReturn(signedJwt);
         given(authContextStateMap.getAuthContext("AUTH_ID")).willReturn(authContext);
+        given(signedJwt.getJwt()).willReturn(plaintextJwt);
+//        given(plaintextJwt.getContent("realm", String.class)).willReturn();
+//        given(plaintextJwt.getContent("authIndexType", String.class)).willReturn();
         given(signedJwt.verify(privateKey, certificate)).willReturn(true);
         given(authContext.getRequirements()).willReturn(callbacks);
         given(restAuthCallbackHandlerManager.handleJsonCallbacks(
