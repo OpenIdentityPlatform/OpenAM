@@ -24,12 +24,14 @@ import org.forgerock.opendj.ldap.Attribute;
 import org.forgerock.opendj.ldap.AttributeDescription;
 import org.forgerock.opendj.ldap.DN;
 import org.forgerock.opendj.ldap.Entry;
+import org.forgerock.opendj.ldap.LinkedHashMapEntry;
 import org.testng.annotations.Test;
 
 import java.util.Calendar;
 
 import static org.mockito.BDDMockito.*;
 import static org.testng.Assert.assertTrue;
+import static org.testng.AssertJUnit.assertFalse;
 
 /**
  * @author robert.wapshott@forgerock.com
@@ -112,9 +114,7 @@ public class TokenAttributeConversionTest {
     @Test
     public void shouldConvertTokenToEntryAndBack() {
         // Given
-        CoreTokenConstants constants = new CoreTokenConstants("dn=rootDN");
-        LDAPDataConversion dataConversion = new LDAPDataConversion();
-        TokenAttributeConversion conversion = new TokenAttributeConversion(constants, dataConversion);
+        TokenAttributeConversion conversion = generateTokenAttributeConversion();
 
         Calendar calendar = Calendar.getInstance();
         calendar.setTimeZone(LDAPDataConversionTest.BERLIN);
@@ -134,4 +134,44 @@ public class TokenAttributeConversionTest {
         TokenTestUtils.compareTokens(token, result);
     }
 
+    @Test
+    public void shouldHandleEmptyStrings() {
+        // Given
+        Token token = new Token("id", TokenType.OAUTH);
+        token.setAttribute(CoreTokenField.STRING_ONE, "");
+
+        TokenAttributeConversion conversion = generateTokenAttributeConversion();
+
+        // When
+        Entry result = conversion.getEntry(token);
+
+        // Then
+        Attribute attribute = result.getAttribute(CoreTokenField.STRING_ONE.toString());
+        String string = attribute.firstValue().toString();
+        assertFalse(string.isEmpty());
+    }
+
+    @Test
+    public void shouldUnderstandEmptyStrings() {
+        // Given
+        Entry entry = new LinkedHashMapEntry();
+        entry.addAttribute(CoreTokenField.TOKEN_ID.toString(), "id");
+        entry.addAttribute(CoreTokenField.TOKEN_TYPE.toString(), TokenType.OAUTH.toString());
+        entry.addAttribute(CoreTokenField.STRING_ONE.toString(), TokenAttributeConversion.EMPTY);
+
+        TokenAttributeConversion conversion = generateTokenAttributeConversion();
+
+        // When
+        Token result = conversion.tokenFromEntry(entry);
+
+        // Then
+        String string = result.getValue(CoreTokenField.STRING_ONE);
+        assertTrue(string.isEmpty());
+    }
+
+    private TokenAttributeConversion generateTokenAttributeConversion() {
+        CoreTokenConstants constants = new CoreTokenConstants("dn=rootDN");
+        LDAPDataConversion dataConversion = new LDAPDataConversion();
+        return new TokenAttributeConversion(constants, dataConversion);
+    }
 }

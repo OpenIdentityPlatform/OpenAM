@@ -44,6 +44,12 @@ import java.util.Map;
  * @author robert.wapshott@forgerock.com
  */
 public class TokenAttributeConversion {
+    /**
+     * Empty Strings cannot be stored in LDAP, so they are replaced by a keyword which
+     * will be handled accordingly.
+     */
+    static final String EMPTY = "-empty-";
+
     private CoreTokenConstants constants;
     private LDAPDataConversion conversion;
 
@@ -86,6 +92,9 @@ public class TokenAttributeConversion {
                 entry.addAttribute(key, ByteString.valueOf(value));
             } else if (CoreTokenFieldTypes.isString(field)) {
                 String value = token.getValue(field);
+                if (value.isEmpty()) {
+                    value = EMPTY;
+                }
                 entry.addAttribute(key, ByteString.valueOf(value));
             } else {
                 throw new IllegalStateException();
@@ -127,6 +136,9 @@ public class TokenAttributeConversion {
                 r.put(field, calendar);
             } else if (CoreTokenFieldTypes.isString(field)) {
                 String value = entry.parseAttribute(description).asString();
+                if (EMPTY.equals(value)) {
+                    value = "";
+                }
                 r.put(field, value);
             } else if (CoreTokenFieldTypes.isInteger(field)) {
                 Integer value = entry.parseAttribute(description).asInteger();

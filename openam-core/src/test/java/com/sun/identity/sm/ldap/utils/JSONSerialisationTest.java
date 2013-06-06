@@ -24,7 +24,6 @@ import com.sun.identity.sm.ldap.TimedAction;
 import com.sun.identity.sm.ldap.TokenTestUtils;
 import com.sun.identity.sm.ldap.api.TokenType;
 import com.sun.identity.sm.ldap.api.tokens.Token;
-import org.mockito.BDDMockito;
 import org.testng.annotations.Test;
 
 import java.text.MessageFormat;
@@ -41,7 +40,7 @@ public class JSONSerialisationTest {
 
     public void shouldSerialiseAString() {
         // Given
-        JSONSerialisation serialisation = new JSONSerialisation(BDDMockito.mock(Debug.class));
+        JSONSerialisation serialisation = new JSONSerialisation(mock(Debug.class));
 
         String test = "Badger";
         // When
@@ -52,7 +51,7 @@ public class JSONSerialisationTest {
 
     public void shouldSerialiseAMap() {
         // Given
-        JSONSerialisation serialisation = new JSONSerialisation(BDDMockito.mock(Debug.class));
+        JSONSerialisation serialisation = new JSONSerialisation(mock(Debug.class));
 
         Map<String, Object> test = new HashMap<String, Object>();
         test.put("badger", 1234);
@@ -67,7 +66,7 @@ public class JSONSerialisationTest {
 
     public void shouldDeserialiseSerialisedToken() {
         // Given
-        JSONSerialisation serialisation = new JSONSerialisation(BDDMockito.mock(Debug.class));
+        JSONSerialisation serialisation = new JSONSerialisation(mock(Debug.class));
         Token token = new Token("id", TokenType.OAUTH);
 
         // When

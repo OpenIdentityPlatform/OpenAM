@@ -19,12 +19,14 @@ package org.forgerock.openam.core.guice;
 import com.google.inject.AbstractModule;
 import com.google.inject.Provider;
 import com.google.inject.TypeLiteral;
+import com.iplanet.dpro.session.service.CoreTokenServiceFactory;
 import com.iplanet.services.ldap.DSConfigMgr;
 import com.iplanet.services.ldap.LDAPServiceException;
 import com.iplanet.services.ldap.LDAPUser;
 import com.iplanet.services.ldap.ServerGroup;
 import com.iplanet.services.ldap.ServerInstance;
 import com.iplanet.sso.SSOToken;
+import com.sun.identity.sm.ldap.CTSPersistentStore;
 import org.forgerock.openam.sm.DataLayerConnectionFactory;
 import com.sun.identity.common.ShutdownListener;
 import com.sun.identity.common.ShutdownManager;
@@ -87,6 +89,16 @@ public class CoreGuiceModule extends AbstractModule {
                 }
             }
         }).in(Singleton.class);
+
+        /**
+         * Core Token Service bindings
+         * CTSPersistentStore using provider to delay initialisation.
+         */
+        bind(CTSPersistentStore.class).toProvider(new Provider<CTSPersistentStore>() {
+            public CTSPersistentStore get() {
+                return CoreTokenServiceFactory.getInstance();
+            }
+        });
     }
 
     // Implementation exists to capture the generic type of the PrivilegedAction.

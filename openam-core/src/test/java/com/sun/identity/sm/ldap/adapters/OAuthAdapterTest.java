@@ -16,7 +16,6 @@
 package com.sun.identity.sm.ldap.adapters;
 
 import com.sun.identity.shared.debug.Debug;
-import com.sun.identity.sm.ldap.TokenTestUtils;
 import com.sun.identity.sm.ldap.api.TokenType;
 import com.sun.identity.sm.ldap.api.fields.OAuthTokenField;
 import com.sun.identity.sm.ldap.api.tokens.Token;
@@ -27,58 +26,135 @@ import edu.emory.mathcs.backport.java.util.Arrays;
 import org.forgerock.json.fluent.JsonValue;
 import org.testng.annotations.Test;
 
+import java.util.Calendar;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 import static org.mockito.BDDMockito.given;
 import static org.mockito.BDDMockito.mock;
 import static org.testng.Assert.assertEquals;
+import static org.testng.Assert.assertNotNull;
+import static org.testng.AssertJUnit.assertTrue;
 
 /**
  * @author robert.wapshott@forgerock.com
  */
 public class OAuthAdapterTest {
     @Test
-    public void shouldSerialiseAString() {
-        JSONSerialisation serialisation = new JSONSerialisation(mock(Debug.class));
-        String badger = "badger";
-        String serialised = serialisation.serialise(badger);
-        String result = serialisation.deserialise(serialised, String.class);
-        assertEquals(result, badger);
+    public void shouldSerialiseSimpleString() {
+        // Given
+        OAuthAdapter adapter = generateOAuthAdapter();
+
+        String text = "badger";
+        OAuthTokenField field = OAuthTokenField.PARENT;
+
+        Map<String, Object> values = new HashMap<String, Object>();
+        values.put(field.getOAuthField(), text);
+        JsonValue jsonValue = makeDefaultJsonValue(values);
+
+        // When
+        Token result = adapter.toToken(jsonValue);
+
+        // Then
+        assertEquals(text, result.getValue(field.getField()));
     }
 
     @Test
-    public void shouldSerialiseAndDeserialiseASimpleString() {
+    public void shouldSerialiseCollectionOfStrings() {
+        // Given
+        OAuthAdapter adapter = generateOAuthAdapter();
+
+        String one = "badger";
+        String two = "weasel";
+        String three = "ferret";
+
+        OAuthTokenField field = OAuthTokenField.SCOPE;
+
+        Map<String, Object> values = new HashMap<String, Object>();
+        values.put(field.getOAuthField(), Arrays.asList(new String[]{one, two, three}));
+        JsonValue jsonValue = makeDefaultJsonValue(values);
+
+        // When
+        String result = adapter.toToken(jsonValue).getValue(field.getField());
+
+        // Then
+        assertTrue(result.contains(one));
+        assertTrue(result.contains(two));
+        assertTrue(result.contains(three));
+    }
+
+    @Test (expectedExceptions = IllegalStateException.class)
+    public void shouldNotAllowASingleDate() {
+        // Given
+        OAuthAdapter adapter = generateOAuthAdapter();
+
+        String text = "1234567890";
+        OAuthTokenField field = OAuthTokenField.EXPIRY_TIME;
+
+        Map<String, Object> values = new HashMap<String, Object>();
+        values.put(field.getOAuthField(), text);
+        JsonValue jsonValue = makeDefaultJsonValue(values);
+
+        // When
+        adapter.toToken(jsonValue);
+    }
+
+    @Test
+    public void shouldSerialiseACollectionOfTimestamps() {
+        // Given
+        OAuthAdapter adapter = generateOAuthAdapter();
+
+        String text = "1370425721197";
+        OAuthTokenField field = OAuthTokenField.EXPIRY_TIME;
+
+        Map<String, Object> values = new HashMap<String, Object>();
+        values.put(field.getOAuthField(), Arrays.asList(new String[]{text}));
+        JsonValue jsonValue = makeDefaultJsonValue(values);
+
+        // When
+        Calendar result = adapter.toToken(jsonValue).getExpiryTimestamp();
+
+        // Then
+        // Wed, 05 Jun 2013 10:48:41 BST
+        assertEquals(result.get(Calendar.MONTH), 5);
+        assertEquals(result.get(Calendar.YEAR), 2013);
+        assertEquals(result.get(Calendar.HOUR_OF_DAY), 10);
+        assertEquals(result.get(Calendar.MINUTE), 48);
+    }
+
+    @Test
+    public void shouldDeserialiseSerialisedToken() {
         // Given
         String id = "badger";
+        OAuthTokenField field = OAuthTokenField.ID;
 
         JSONSerialisation serialisation = new JSONSerialisation(mock(Debug.class));
-        KeyConversion keyConversion = new KeyConversion();
-        OAuthAdapter adapter = new OAuthAdapter(new TokenIdFactory(keyConversion), serialisation);
+        OAuthAdapter adapter = generateOAuthAdapter();
 
-        // Populate the map with fields we know are queried during this conversion.
-        Map<String, String> blob = new HashMap<String, String>();
-        blob.put(OAuthTokenField.ID.getOAuthField(), id);
-        String serialisedObject = serialisation.serialise(blob);
+        // Populate a map for serialisation.
+        Map<String, String> values = new HashMap<String, String>();
+        values.put(field.getOAuthField(), id);
+        Map<String, Object> map = new HashMap<String, Object>();
+        map.put(OAuthAdapter.VALUE, values);
+        String serialisedObject = serialisation.serialise(map);
 
         Token token = new Token(id, TokenType.OAUTH);
-        // Set the binary data fields
+        // Set the serialised binary data
         token.setBlob(serialisedObject.getBytes());
 
         // When
-        Token result = adapter.toToken(adapter.fromToken(token));
+        JsonValue result = adapter.fromToken(token);
 
         // Then
-        TokenTestUtils.compareTokens(result, token);
+        assertNotNull(result);
+        JsonValue value = result.get(OAuthAdapter.VALUE);
+        assertEquals(value.asMap().get(field.getOAuthField()), id);
     }
 
     @Test (expectedExceptions = IllegalArgumentException.class)
     public void shouldVerifyThatObjectIsAMap() {
         // Given
-        JSONSerialisation serialisation = new JSONSerialisation(mock(Debug.class));
-        KeyConversion keyConversion = new KeyConversion();
-        OAuthAdapter adapter = new OAuthAdapter(new TokenIdFactory(keyConversion), serialisation);
+        OAuthAdapter adapter = generateOAuthAdapter();
 
         JsonValue mockValue = mock(JsonValue.class);
         given(mockValue.getObject()).willReturn("badger");
@@ -91,8 +167,7 @@ public class OAuthAdapterTest {
     public void shouldNotDeserialiseATokenWhichDoesntContainAMap() {
         // Given
         JSONSerialisation serialisation = new JSONSerialisation(mock(Debug.class));
-        KeyConversion keyConversion = new KeyConversion();
-        OAuthAdapter adapter = new OAuthAdapter(new TokenIdFactory(keyConversion), serialisation);
+        OAuthAdapter adapter = generateOAuthAdapter();
 
         Token token = new Token("", TokenType.OAUTH);
         token.setBlob(serialisation.serialise("badger").getBytes());
@@ -101,41 +176,24 @@ public class OAuthAdapterTest {
         adapter.fromToken(token);
     }
 
-    @Test
-    public void shouldExtractOAuthValuesFromJsonValue() {
-        // Given
-        String id = "badger";
 
+    /**
+     * @return Makes a standard OAuthAdapter with real dependencies.
+     */
+    private OAuthAdapter generateOAuthAdapter() {
         JSONSerialisation serialisation = new JSONSerialisation(mock(Debug.class));
         KeyConversion keyConversion = new KeyConversion();
-        OAuthAdapter adapter = new OAuthAdapter(new TokenIdFactory(keyConversion), serialisation);
+        OAuthValues oAuthValues = new OAuthValues();
+        return new OAuthAdapter(new TokenIdFactory(keyConversion), serialisation, oAuthValues);
+    }
 
-        Map<String, Object> blob = new HashMap<String, Object>();
-        blob.put(OAuthTokenField.ID.getOAuthField(), id);
-
-        Map<String, String> values = new HashMap<String, String>();
-        values.put(OAuthTokenField.PARENT.getOAuthField(), "Badgers parent");
-        values.put(OAuthTokenField.SCOPE.getOAuthField(), "Badgers scope");
-        blob.put(OAuthAdapter.VALUE, values);
-
-        String serialisedObject = serialisation.serialise(blob);
-
-        Token token = new Token(id, TokenType.OAUTH);
-        // Set the binary data fields
-        token.setBlob(serialisedObject.getBytes());
-
-        // When
-        JsonValue value = adapter.fromToken(token);
-
-        // Then
-        Map<String, Object> resultMap = value.get(OAuthAdapter.VALUE).asMap();
-        assertEquals(resultMap.size(), 2);
-        List<String> fields = Arrays.asList(new String[]{
-                OAuthTokenField.PARENT.getOAuthField(),
-                OAuthTokenField.SCOPE.getOAuthField()});
-
-        for (String field : fields) {
-            assertEquals(resultMap.get(field), values.get(field));
-        }
+    /**
+     * @param values Generate a JsonValue based on the values in this map.
+     * @return A non null JsonValue.
+     */
+    private JsonValue makeDefaultJsonValue(Map<String, Object> values) {
+        Map<String, Object> map = new HashMap<String, Object>();
+        map.put(OAuthAdapter.VALUE, values);
+        return new JsonValue(map);
     }
 }

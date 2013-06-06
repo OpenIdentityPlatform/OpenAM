@@ -15,6 +15,7 @@
  */
 package com.sun.identity.sm.ldap.api.tokens;
 
+import com.google.inject.Inject;
 import com.iplanet.dpro.session.SessionID;
 import com.iplanet.dpro.session.service.InternalSession;
 import com.sun.identity.sm.ldap.api.fields.OAuthTokenField;
@@ -33,6 +34,7 @@ public class TokenIdFactory {
     private KeyConversion encoding;
     public static final String ID = OAuthTokenField.ID.getOAuthField();
 
+    @Inject
     public TokenIdFactory(KeyConversion encoding) {
         this.encoding = encoding;
     }

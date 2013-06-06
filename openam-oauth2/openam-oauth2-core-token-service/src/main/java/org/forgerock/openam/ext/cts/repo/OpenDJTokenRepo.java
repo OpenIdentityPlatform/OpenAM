@@ -24,7 +24,6 @@
 
 package org.forgerock.openam.ext.cts.repo;
 
-import com.iplanet.dpro.session.service.CoreTokenServiceFactory;
 import com.sun.identity.shared.debug.Debug;
 import com.sun.identity.sm.ldap.CTSPersistentStore;
 import com.sun.identity.sm.ldap.adapters.OAuthAdapter;
@@ -35,14 +34,13 @@ import com.sun.identity.sm.ldap.api.tokens.Token;
 import com.sun.identity.sm.ldap.api.tokens.TokenIdFactory;
 import com.sun.identity.sm.ldap.exceptions.CoreTokenException;
 import com.sun.identity.sm.ldap.impl.QueryFilter;
-import com.sun.identity.sm.ldap.utils.JSONSerialisation;
-import com.sun.identity.sm.ldap.utils.KeyConversion;
 import com.sun.identity.sm.ldap.utils.LDAPDataConversion;
 import org.forgerock.json.fluent.JsonValue;
 import org.forgerock.json.fluent.JsonValueException;
 import org.forgerock.json.resource.JsonResource;
 import org.forgerock.json.resource.JsonResourceException;
 import org.forgerock.json.resource.SimpleJsonResource;
+import org.forgerock.openam.guice.InjectorHolder;
 import org.forgerock.openam.oauth2.exceptions.OAuthProblemException;
 import org.forgerock.openam.oauth2.utils.OAuth2Utils;
 import org.forgerock.opendj.ldap.Filter;
@@ -59,15 +57,13 @@ public class OpenDJTokenRepo implements JsonResource {
 
     final static Debug debug = Debug.getInstance("CTS");
 
-    private static volatile KeyConversion keyConversion = new KeyConversion();
-    private static volatile TokenIdFactory tokenIdFactory = new TokenIdFactory(keyConversion);
-    private static volatile TokenAdapter<JsonValue> tokenAdapter = new OAuthAdapter(
-            tokenIdFactory, new JSONSerialisation());
-    private static volatile CTSPersistentStore cts = CoreTokenServiceFactory.getInstance();
-    private static volatile OpenDJTokenRepo instance = new OpenDJTokenRepo();
+    private static final TokenIdFactory tokenIdFactory = InjectorHolder.getInstance(TokenIdFactory.class);
+    private static final TokenAdapter<JsonValue> tokenAdapter = InjectorHolder.getInstance(OAuthAdapter.class);
+    private static final CTSPersistentStore cts = InjectorHolder.getInstance(CTSPersistentStore.class);
+    private static final OpenDJTokenRepo instance = new OpenDJTokenRepo();
 
-    private static volatile LDAPDataConversion conversion = new LDAPDataConversion();
-    private static volatile QueryFilter queryFilter = new QueryFilter(conversion);
+    private static final LDAPDataConversion conversion = new LDAPDataConversion();
+    private static final QueryFilter queryFilter = new QueryFilter(conversion);
 
     /**
      * Default Singleton Constructor.

@@ -23,6 +23,7 @@ import org.testng.annotations.Test;
 import java.util.Calendar;
 import java.util.Collection;
 
+import static org.junit.Assert.assertArrayEquals;
 import static org.testng.Assert.assertEquals;
 
 /**
@@ -30,7 +31,7 @@ import static org.testng.Assert.assertEquals;
  */
 public class TokenTest {
     @Test
-    public void shouldReturnAttributeStored() {
+    public void shouldStoreString() {
         // Given
         CoreTokenField key = CoreTokenField.STRING_ONE;
         String value = "Badger";
@@ -39,6 +40,43 @@ public class TokenTest {
         token.setAttribute(key, value);
         // Then
         assertEquals(value, token.getValue(key));
+    }
+
+    @Test
+    public void shouldStoreDate() {
+        // Given
+        Calendar now = Calendar.getInstance();
+        CoreTokenField key = CoreTokenField.EXPIRY_DATE;
+        Token token = new Token("", TokenType.SESSION);
+        // When
+        token.setAttribute(key, now);
+        // Then
+        Calendar result = token.getValue(key);
+        assertEquals(now.getTimeInMillis(), result.getTimeInMillis());
+    }
+
+    @Test
+    public void shouldStoreInteger() {
+        // Given
+        Integer value = new Integer(12345);
+        CoreTokenField key = CoreTokenField.INTEGER_EIGHT;
+        Token token = new Token("", TokenType.SESSION);
+        // When
+        token.setAttribute(key, value);
+        // Then
+        assertEquals(value, token.getValue(key));
+    }
+
+    @Test
+    public void shouldStoreByteData() {
+        // Given
+        byte[] data = "Badger".getBytes();
+        CoreTokenField key = CoreTokenField.BLOB;
+        Token token = new Token("", TokenType.SESSION);
+        // When
+        token.setAttribute(key, data);
+        // Then
+        assertArrayEquals(data, token.<byte[]>getValue(key));
     }
 
     @Test
