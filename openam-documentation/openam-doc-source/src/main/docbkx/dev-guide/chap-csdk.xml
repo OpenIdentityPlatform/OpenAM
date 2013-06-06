@@ -20,7 +20,7 @@
   !
   ! CCPL HEADER END
   !
-  !      Copyright 2011-2012 ForgeRock AS
+  !      Copyright 2011-2013 ForgeRock AS
   !    
 -->
 <chapter xml:id='chap-csdk'
@@ -35,32 +35,30 @@
   <primary>Installing</primary>
   <secondary>C SDK</secondary>
  </indexterm>
- <para>This chapter introduces OpenAM C SDK. OpenAM C SDK is delivered for
- selected platforms in
- <filename>libraries/native/agent-csdk/agent-csdk.zip</filename> where you
- unpacked the full version of OpenAM. To prepare to install OpenAM C SDK, first
- unzip <filename>agent-csdk.zip</filename>.</para>
+ <para>This chapter introduces OpenAM C SDK. OpenAM C SDK is available for
+ selected platforms on the OpenAM <link xlink:show="new"
+ xlink:href="http://forgerock.org/openam.html">nightly builds page</link>.
+ Contact <link xlink:href="mailto:info@forgerock.com">info@forgerock.com</link>
+ if you need OpenAM C SDK support.</para>
 
- <screen>$ unzip ~/Downloads/opensso/libraries/native/agent-csdk/agent-csdk.zip
-Archive:  ~/Downloads/opensso/libraries/native/agent-csdk/agent-csdk.zip
-  inflating: README
-  inflating: agent-csdk-linux-32.tar.gz
-  inflating: agent-csdk-linux-64.tar.gz
-  inflating: agent-csdk-solaris-sparc-32.tar.gz
-  inflating: agent-csdk-solaris-sparc-64.tar.gz
-  inflating: agent-csdk-solaris-x86-32.tar.gz
-  inflating: agent-csdk-solaris-x86-64.tar.gz
- extracting: agent-csdk-windows-32.zip
- extracting: agent-csdk-windows-64.zip</screen>
+ <para>To prepare to install OpenAM C SDK, first download the version for your
+ platform and unpack the archive as in the following example.</para>
 
- <para>Unpack the archive for your platform.</para>
+ <screen>$ mkdir -p /path/to/openam-client &amp;&amp; cd /path/to/openam-client
+$ tar xf ~/Downloads/common_3_0_Linux_i686.tar.gz</screen>
 
- <screen>$ mkdir -p /path/to/openam-client ; cd /path/to/openam-client
-$ tar xzvf /path/to/agent-csdk-linux-32.tar.gz</screen>
+ <para>Windows C SDK deliveries are .zip files. Deliveries for other platforms
+ are .tar.gz files.</para>
 
  <variablelist>
-  <para>As a result, you have several directories that include the SDK and also
-  sample client applications.</para>
+  <para>As a result, you have a license file, several directories that include
+  the SDK, and also sample client applications.</para>
+  <varlistentry>
+   <term><filename>THIRD_PARTY_LICENSE.TXT</filename></term>
+   <listitem>
+    <para>The license file</para>
+   </listitem>
+  </varlistentry>
   <varlistentry>
    <term><filename>bin/</filename></term>
    <listitem>
