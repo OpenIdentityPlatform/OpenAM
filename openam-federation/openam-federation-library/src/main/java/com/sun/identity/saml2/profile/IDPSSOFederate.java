@@ -630,16 +630,8 @@ public class IDPSSOFederate {
                                     false);
                         } else {
                             try {
-                                Response res = SAML2Utils.getErrorResponse(authnReq,
-                                        SAML2Constants.RESPONDER,
-                                        SAML2Constants.NOPASSIVE, null, idpEntityID);
-                                StringBuffer returnedBinding = new StringBuffer();
-                                String acsURL = IDPSSOUtil.getACSurl(spEntityID, realm,
-                                        authnReq, request, returnedBinding);
-                                String acsBinding = returnedBinding.toString();
-                                IDPSSOUtil.sendResponse(request, response, acsBinding,
-                                        spEntityID, idpEntityID, idpMetaAlias, realm, relayState,
-                                        acsURL, res, session);
+                                sendPassiveResponse(request, response, session, idpMetaAlias, idpEntityID, realm,
+                                        authnReq, relayState, spEntityID);
                             } catch (SAML2Exception sme) {
                                 SAML2Utils.debug.error(classMethod, sme);
                                 sendError(request, response,
@@ -796,16 +788,8 @@ public class IDPSSOFederate {
                                 return;
                             } else {
                                 try {
-                                    Response res = SAML2Utils.getErrorResponse(authnReq,
-                                            SAML2Constants.RESPONDER,
-                                            SAML2Constants.NOPASSIVE, null, idpEntityID);
-                                    StringBuffer returnedBinding = new StringBuffer();
-                                    String acsURL = IDPSSOUtil.getACSurl(spEntityID, realm,
-                                            authnReq, request, returnedBinding);
-                                    String acsBinding = returnedBinding.toString();
-                                    IDPSSOUtil.sendResponse(request, response, acsBinding,
-                                            spEntityID, idpEntityID, idpMetaAlias, realm, relayState,
-                                            acsURL, res, session);
+                                    sendPassiveResponse(request, response, session, idpMetaAlias, idpEntityID, realm,
+                                            authnReq, relayState, spEntityID);
                                 } catch (SAML2Exception sme) {
                                     SAML2Utils.debug.error(classMethod, sme);
                                     sendError(request, response,
@@ -901,48 +885,70 @@ public class IDPSSOFederate {
 
                 // We need the session to pass it to the IDP Adapter preSendResponse
                 SessionProvider sessionProvider = SessionManager.getProvider();
-                session = sessionProvider.getSession(request);
+                try {
+                    session = sessionProvider.getSession(request);
+                } catch (SessionException se) {
+                    SAML2Utils.debug.error("An error occurred while retrieving the session: " + se.getMessage());
+                    session = null;
+                }
 
                 // Get the cached Authentication Request and Relay State before
                 // invoking the IDP Adapter
 
                 CacheObject cacheObj = null;
                 synchronized (IDPCache.authnRequestCache) {
-                    cacheObj =
-                        (CacheObject)IDPCache.authnRequestCache.get(reqID);
+                    cacheObj = (CacheObject) IDPCache.authnRequestCache.get(reqID);
                 }
                 if (cacheObj != null) {
                     authnReq = (AuthnRequest)cacheObj.getObject();
                 }
 
-                relayState =(String)IDPCache.relayStateCache.get(reqID);
+                relayState = (String) IDPCache.relayStateCache.get(reqID);
                 
                 // Let's verify if the session belongs to the proper realm
-                boolean isValidSessionInRealm = isValidSessionInRealm(realm, session);
-                if (!isValidSessionInRealm) {
-                    SAML2Utils.debug.error(classMethod + "The realm of the session"
-                            + " does not correspond to that of the IdP");
-                    String sessionRealm = sessionProvider.getProperty(session, 
-                            SAML2Constants.ORGANIZATION)[0];
-                    String IPAddress = ClientUtils.getClientIPAddress(request);
-                    String authnReqString = "";
-                    try {
-                        authnReqString = authnReq.toXMLString();
-                    } catch (SAML2Exception ex) {
-                        SAML2Utils.debug.error(classMethod + "Could not obtain the AuthnReq "
-                                + "to be logged");
-                    }
-                    String[] data = { sessionRealm, realm, idpEntityID, 
-                        IPAddress, authnReqString};
-                    LogUtil.error(Level.INFO, LogUtil.INVALID_REALM_FOR_SESSION, 
-                            data, session, null);
-                    sendError(request, response, 
-                                SAML2Constants.CLIENT_FAULT,
-                                "UnableToDOSSOOrFederation", null,
-                                isFromECP, idpAdapter);
-                    return;
-                }
+                boolean isValidSessionInRealm = session != null && isValidSessionInRealm(realm, session);
 
+                // There should be a session on the second pass. If this is not the case then provide an error message
+                // If there is a session then it must belong to the proper realm
+                if (!isValidSessionInRealm) {
+                    if (authnReq.isPassive()) {
+                        // Send an appropriate response to the passive request
+                        String spEntityID = authnReq.getIssuer().getValue();
+                        try {
+                            sendPassiveResponse(request, response, session, idpMetaAlias, idpEntityID, realm, authnReq,
+                                    relayState, spEntityID);
+                        } catch (SAML2Exception sme) {
+                            SAML2Utils.debug.error(classMethod, sme);
+                            sendError(request, response, SAML2Constants.SERVER_FAULT, "metaDataError", null, isFromECP,
+                                    idpAdapter);
+                        }
+                    } else {
+                        // No attempt to authenticate now, since it is assumed that that has already been tried
+                        String ipAddress = request.getRemoteAddr();
+                        String authnReqString = "";
+                        try {
+                            authnReqString = authnReq.toXMLString();
+                        } catch (SAML2Exception ex) {
+                            SAML2Utils.debug.error(classMethod + "Could not obtain the AuthnReq to be logged");
+                        }
+
+                        if (session == null) {
+                            String[] data = {"null", realm, idpEntityID, ipAddress, authnReqString};
+                            SAML2Utils.debug.error(classMethod + "The IdP has not been able to create a session");
+                            LogUtil.error(Level.INFO, LogUtil.SSO_NOT_FOUND, data, session, null);
+                        } else if (!isValidSessionInRealm) {
+                            String sessionRealm = sessionProvider.getProperty(session, SAML2Constants.ORGANIZATION)[0];
+                            String[] data = {sessionRealm, realm, idpEntityID, ipAddress, authnReqString};
+                            SAML2Utils.debug.error(classMethod + "The realm of the session"
+                                    + " does not correspond to that of the IdP");
+                            LogUtil.error(Level.INFO, LogUtil.INVALID_REALM_FOR_SESSION, data, session, null);
+                        }
+
+                        sendError(request, response, SAML2Constants.CLIENT_FAULT, "UnableToDOSSOOrFederation", null,
+                                isFromECP, idpAdapter);
+                        return;
+                    }
+                }
                 // Invoke the IDP Adapter after the user has been authenticated
                 try {
                         SAML2Utils.debug.message("Invoking the IDP Adapter preSendResponse hook");
@@ -1040,6 +1046,21 @@ public class IDPSSOFederate {
         } catch (SOAPException soapex) {
             SAML2Utils.debug.error("IDPSSOFederate.doSSOFederate:" , soapex);
         }
+    }
+
+    private static void sendPassiveResponse(HttpServletRequest request, HttpServletResponse response,
+            Object session, String idpMetaAlias,
+            String idpEntityID, String realm,
+            AuthnRequest authnReq, String relayState,
+            String spEntityID) throws SAML2Exception {
+        // Construct the response
+        Response res = SAML2Utils.getErrorResponse(authnReq, SAML2Constants.RESPONDER, SAML2Constants.NOPASSIVE, null,
+                idpEntityID);
+        StringBuffer returnedBinding = new StringBuffer();
+        String acsURL = IDPSSOUtil.getACSurl(spEntityID, realm, authnReq, request, returnedBinding);
+        String acsBinding = returnedBinding.toString();
+        IDPSSOUtil.sendResponse(request, response, acsBinding, spEntityID, idpEntityID, idpMetaAlias, realm, relayState,
+                acsURL, res, session);
     }
 
     private static void sendError(HttpServletRequest request,
