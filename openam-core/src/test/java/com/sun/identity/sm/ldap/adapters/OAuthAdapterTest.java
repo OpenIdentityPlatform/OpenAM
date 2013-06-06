@@ -29,6 +29,7 @@ import org.testng.annotations.Test;
 import java.util.Calendar;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.TimeZone;
 
 import static org.mockito.BDDMockito.given;
 import static org.mockito.BDDMockito.mock;
@@ -116,9 +117,10 @@ public class OAuthAdapterTest {
 
         // Then
         // Wed, 05 Jun 2013 10:48:41 BST
+        result.setTimeZone(TimeZone.getTimeZone("Europe/London"));
         assertEquals(result.get(Calendar.MONTH), 5);
         assertEquals(result.get(Calendar.YEAR), 2013);
-        assertEquals(result.get(Calendar.HOUR_OF_DAY), 10);
+        assertEquals(result.get(Calendar.HOUR_OF_DAY), 2);
         assertEquals(result.get(Calendar.MINUTE), 48);
     }
 
