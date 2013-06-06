@@ -1112,7 +1112,7 @@ public class LDAPAuthUtils {
                     debug.message("Failed auth due to inappropriate authentication");
                 }
                 
-                throw new LDAPUtilException("InappAuth",
+                throw new LDAPUtilException("amAuth", "InappAuth",
                     ResultCode.INAPPROPRIATE_AUTHENTICATION, null);
             } else if (ere.getResult().getResultCode().equals(ResultCode.CONSTRAINT_VIOLATION)) {
                 if (debug.messageEnabled()) {
@@ -1126,7 +1126,7 @@ public class LDAPAuthUtils {
                     debug.message("Cannot authenticate to " + serverHost, ere);
                 }
                 
-                throw new LDAPUtilException("FAuth", (Object[]) null);
+                throw new LDAPUtilException("amAuth", "FAuth", null, null);
             }
         }   
     }

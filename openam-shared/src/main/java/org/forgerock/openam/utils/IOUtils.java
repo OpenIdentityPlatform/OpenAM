@@ -1,7 +1,7 @@
 /**
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright (c) 2011 ForgeRock AS. All Rights Reserved
+ * Copyright (c) 2011-2013 ForgeRock, Inc. All Rights Reserved
  *
  * The contents of this file are subject to the terms
  * of the Common Development and Distribution License
@@ -25,6 +25,7 @@
 package org.forgerock.openam.utils;
 
 import java.io.BufferedReader;
+import java.io.Closeable;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -137,5 +138,19 @@ public final class IOUtils {
             content.append(line);
         }
         return content.toString();
+    }
+
+    /**
+     * Closes the passed in resource if not null.
+     *
+     * @param closeable The resource that needs to be closed.
+     */
+    public static void closeIfNotNull(Closeable closeable) {
+        if (closeable != null) {
+            try {
+                closeable.close();
+            } catch (IOException ignored) {
+            }
+        }
     }
 }

@@ -126,7 +126,7 @@
 
         <!-- Version Properties -->
         <opendj.server.version>2.4.6</opendj.server.version>
-        <opendj.sdk.version>3.0.0-SNAPSHOT</opendj.sdk.version>
+        <opendj.sdk.version>2.5.0-SNAPSHOT</opendj.sdk.version>
 
         <commons.forgerock-util.version>1.1.0-SNAPSHOT</commons.forgerock-util.version>
         <commons.json-fluent.version>1.1.0</commons.json-fluent.version>
@@ -187,6 +187,7 @@
     <modules>
 
         <module>openam-ldap-utils</module>
+        <module>openam-datastore</module>
         <!-- OpenAM Locale - Common Module -->
         <module>openam-locale</module>
 
@@ -674,6 +675,11 @@
             <dependency>
                 <groupId>org.forgerock.openam</groupId>
                 <artifactId>openam-dashboard</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.forgerock.openam</groupId>
+                <artifactId>openam-datastore</artifactId>
                 <version>${project.version}</version>
             </dependency>
             <dependency>
@@ -1637,26 +1643,31 @@
                 <groupId>org.powermock</groupId>
                 <artifactId>powermock-api-mockito</artifactId>
                 <version>1.5</version>
+                <scope>test</scope>
             </dependency>
             <dependency>
                 <groupId>org.powermock</groupId>
                 <artifactId>powermock-core</artifactId>
                 <version>1.5</version>
+                <scope>test</scope>
             </dependency>
             <dependency>
                 <groupId>org.powermock</groupId>
                 <artifactId>powermock-reflect</artifactId>
                 <version>1.5</version>
+                <scope>test</scope>
             </dependency>
             <dependency>
                 <groupId>org.powermock</groupId>
                 <artifactId>powermock-module-testng</artifactId>
                 <version>1.5</version>
+                <scope>test</scope>
             </dependency>
             <dependency>
                 <groupId>org.powermock</groupId>
                 <artifactId>powermock-module-testng-common</artifactId>
                 <version>1.5</version>
+                <scope>test</scope>
             </dependency>
         </dependencies>
     </dependencyManagement>

@@ -486,6 +486,11 @@
             <artifactId>openam-dashboard</artifactId>
         </dependency>
 
+        <dependency>
+            <groupId>org.forgerock.openam</groupId>
+            <artifactId>openam-datastore</artifactId>
+        </dependency>
+
         <!-- Include all Authentication Modules -->
         <dependency>
             <groupId>org.forgerock.openam</groupId>

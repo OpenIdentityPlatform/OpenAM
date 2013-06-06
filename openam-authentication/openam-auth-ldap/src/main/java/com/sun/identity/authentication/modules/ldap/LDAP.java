@@ -82,6 +82,7 @@ public class LDAP extends AMLoginModule {
     private static final String INVALID_CHARS =
         "iplanet-am-auth-ldap-invalid-chars";
     private static final String PIPE_SEPARATOR="|";
+    private static final String AM_AUTH = "amAuth";
     private static boolean ldapSSL = false;
     private boolean sslTrustAll = false;
     private boolean sslEnabled = false;
@@ -379,7 +380,7 @@ public class LDAP extends AMLoginModule {
             }
         } catch (Exception ex) {
             debug.error("Init Exception", ex);
-            throw new AuthLoginException(amAuthLDAP, "LDAPex", null, ex);
+            throw new AuthLoginException(AM_AUTH, "LDAPex", null, ex);
         }
         return false;
     }
@@ -517,7 +518,7 @@ public class LDAP extends AMLoginModule {
                         
                         setFailureID(ldapUtil.getUserId(userName));
                         throw new AuthLoginException(
-                            amAuthLDAP, "InvalidUP", null);
+                            AM_AUTH, "InvalidUP", null);
                     }
                 } else {
                     if (initializeLDAP()) {
@@ -633,7 +634,7 @@ public class LDAP extends AMLoginModule {
                 }
             } else {
                 setFailureID(ldapUtil.getUserId(userName));
-                throw new AuthLoginException(amAuthLDAP, "LDAPex", null);
+                throw new AuthLoginException(AM_AUTH, "LDAPex", null);
             }
         } catch (LDAPUtilException ex) {
             if (getCredentialsFromSharedState && !isUseFirstPassEnabled()) {
@@ -648,14 +649,14 @@ public class LDAP extends AMLoginModule {
                     debug.message("The specified user does not exist.");
                 }
                     
-                throw new AuthLoginException(amAuthLDAP, "NoUser", null);
+                throw new AuthLoginException(AM_AUTH, "NoUser", null);
             } else if (ex.getResultCode().equals(ResultCode.INVALID_CREDENTIALS)) {
                 if (debug.messageEnabled()) {
                     debug.message("Invalid password.");
                 }
                 
                 String failureUserID = ldapUtil.getUserId();
-                throw new InvalidPasswordException(amAuthLDAP, "InvalidUP",
+                throw new InvalidPasswordException(AM_AUTH, "InvalidUP",
                     null, failureUserID, null);
             } else if (ex.getResultCode().equals(ResultCode.UNWILLING_TO_PERFORM)) {
                 if (debug.messageEnabled()) {
@@ -669,7 +670,7 @@ public class LDAP extends AMLoginModule {
                     debug.message("Inappropriate authentication.");
                 }
                     
-                throw new AuthLoginException(amAuthLDAP, "InappAuth", null);
+                throw new AuthLoginException(AM_AUTH, "InappAuth", null);
             } else if (ex.getResultCode().equals(ResultCode.CONSTRAINT_VIOLATION)) {
                 if (debug.messageEnabled()) {
                     debug.message("Exceed password retry limit.");
@@ -678,7 +679,7 @@ public class LDAP extends AMLoginModule {
                 throw new AuthLoginException(amAuthLDAP,
                         ISAuthConstants.EXCEED_RETRY_LIMIT, null);
             } else {
-                throw new AuthLoginException(amAuthLDAP, "LDAPex", null);
+                throw new AuthLoginException(AM_AUTH, "LDAPex", null);
             }
         } catch (UserNamePasswordValidationException upve) {
             // Note: Do not set failure Id for this exception
@@ -867,7 +868,7 @@ public class LDAP extends AMLoginModule {
                     
                     if (!getSubConfig()) {
                         throw new AuthLoginException(
-                            amAuthLDAP, "LDAPex", null);
+                            AM_AUTH, "LDAPex", null);
                     }
                     if (initializeLDAP()) {
                         ldapUtil.authenticateUser(userName, userPassword);
@@ -888,7 +889,7 @@ public class LDAP extends AMLoginModule {
             if (newState != ModuleState.USER_NOT_FOUND) {
                 debug.error("Unknown Login State:", ex);
             }
-            throw new AuthLoginException(amAuthLDAP, "LDAPex", null, ex);
+            throw new AuthLoginException(AM_AUTH, "LDAPex", null, ex);
         }
     }
     

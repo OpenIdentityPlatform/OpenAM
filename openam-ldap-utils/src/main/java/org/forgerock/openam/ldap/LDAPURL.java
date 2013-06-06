@@ -20,7 +20,7 @@ package org.forgerock.openam.ldap;
  *
  * @author Peter Major
  */
-public final class LDAPURL {
+public final class LDAPURL implements Comparable<LDAPURL> {
 
     private static final int DEFAULT_PORT = 389;
     private static final char SEPARATOR = ':';
@@ -89,5 +89,10 @@ public final class LDAPURL {
     @Override
     public String toString() {
         return url + SEPARATOR + port;
+    }
+
+    @Override
+    public int compareTo(LDAPURL o) {
+        return toString().compareTo(o.toString());
     }
 }

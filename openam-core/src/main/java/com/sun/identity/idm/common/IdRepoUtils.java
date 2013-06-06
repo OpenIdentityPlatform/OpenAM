@@ -26,7 +26,7 @@
  */
 
 /*
- * Portions Copyrighted [2011] [ForgeRock AS]
+ * Portions Copyrighted 2011-2013 ForgeRock, Inc.
  */
 package com.sun.identity.idm.common;
 
@@ -34,7 +34,6 @@ import java.io.ByteArrayInputStream;
 import java.io.DataInputStream;
 import java.io.InputStreamReader;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.Map;
 import java.util.ResourceBundle;
 import java.util.Set;
@@ -45,10 +44,13 @@ import com.iplanet.am.sdk.AMHashMap;
 import com.iplanet.am.util.SSLSocketFactoryManager;
 import com.iplanet.sso.SSOException;
 import com.iplanet.sso.SSOToken;
+import com.sun.identity.common.CaseInsensitiveHashMap;
 import com.sun.identity.common.LDAPUtils;
 import com.sun.identity.idm.IdConstants;
+import com.sun.identity.idm.IdOperation;
 import com.sun.identity.idm.IdRepoBundle;
 import com.sun.identity.idm.IdRepoException;
+import com.sun.identity.idm.IdType;
 import com.sun.identity.shared.StringUtils;
 import com.sun.identity.shared.datastruct.CollectionHelper;
 import com.sun.identity.shared.debug.Debug;
@@ -62,6 +64,7 @@ import com.sun.identity.setup.ServicesDefaultValues;
 import com.sun.identity.sm.SMSException;
 import com.sun.identity.sm.ServiceConfig;
 import com.sun.identity.sm.ServiceConfigManager;
+import java.util.HashMap;
 
 
 /**
@@ -82,11 +85,10 @@ public class IdRepoUtils {
     private static final String TIVOLI_LDIF = "tivoliUserSchema";
 
     private static final String SCHEMA_PROPERTY_FILENAME = "schemaNames";
-    private static Set defaultPwdAttrs = null;
-    private static Debug debug = Debug.getInstance("amIdm");
+    private static final Set<String> defaultPwdAttrs = new HashSet<String>(2);
+    private static Debug DEBUG = Debug.getInstance("IdRepoUtils");
 
     static {
-        defaultPwdAttrs = new HashSet();
         defaultPwdAttrs.add("userpassword");
         defaultPwdAttrs.add("unicodepwd");
     }
@@ -99,25 +101,22 @@ public class IdRepoUtils {
      *
      * @return an attribute map with all the password attributes being masked.
      */
-    public static Map getAttrMapWithoutPasswordAttrs(Map attrMap,
-        Set pwdAttrs) {
-
-        if ((attrMap == null) || (attrMap.isEmpty())) {
+    public static <T> Map<String, T> getAttrMapWithoutPasswordAttrs(Map<String, T> attrMap, Set<String> pwdAttrs) {
+        if (attrMap == null || attrMap.isEmpty()) {
             return attrMap;
         }
 
-        Set allPwdAttrs = null;
-        if ((pwdAttrs == null) || (pwdAttrs.isEmpty())) {
+        Set<String> allPwdAttrs;
+        if (pwdAttrs == null || pwdAttrs.isEmpty()) {
             allPwdAttrs = defaultPwdAttrs;
         } else {
-            allPwdAttrs = new HashSet();
+            allPwdAttrs = new HashSet<String>();
             allPwdAttrs.addAll(defaultPwdAttrs);
             allPwdAttrs.addAll(pwdAttrs);
         }
 
         AMHashMap returnAttrMap = null;
-        for(Iterator iter = allPwdAttrs.iterator(); iter.hasNext(); ) {
-            String pwdAttr = (String)iter.next();
+        for (String pwdAttr : allPwdAttrs) {
             if (attrMap.containsKey(pwdAttr)) {
                 if (returnAttrMap == null) {
                     returnAttrMap = new AMHashMap();
@@ -190,8 +189,8 @@ public class IdRepoUtils {
             ServiceConfig cfg = svcCfgMgr.getOrganizationConfig(realm, null);
             ServiceConfig ss = cfg.getSubConfig(idRepoName);
             if (ss == null) {
-                if (debug.messageEnabled()) {
-                    debug.message("IdRepoUtils.loadIdRepoSchema: data store " +
+                if (DEBUG.messageEnabled()) {
+                    DEBUG.message("IdRepoUtils.loadIdRepoSchema: data store " +
                     idRepoName + " for realm " + realm + " doesn't exist.");
                 }
                 Object args[] = { idRepoName, realm };
@@ -205,8 +204,8 @@ public class IdRepoUtils {
 
             String schemaFiles = getSchemaFiles(idRepoType);
             if ((schemaFiles == null) || (schemaFiles.trim().length() == 0)) {
-                if (debug.messageEnabled()) {
-                    debug.message("IdRepoUtils.loadIdRepoSchema: data store " +
+                if (DEBUG.messageEnabled()) {
+                    DEBUG.message("IdRepoUtils.loadIdRepoSchema: data store " +
                     idRepoName + " for realm " + realm + " doesn't have " +
                     "schema files.");
                 }
@@ -220,20 +219,20 @@ public class IdRepoUtils {
                     idRepoType);
             }
         } catch (SMSException smsex) {
-            if (debug.messageEnabled()) {
-                debug.message("IdRepoUtils.loadIdRepoSchema:", smsex);
+            if (DEBUG.messageEnabled()) {
+                DEBUG.message("IdRepoUtils.loadIdRepoSchema:", smsex);
             }
             Object args[] = { idRepoName, realm };
             throw new IdRepoException(IdRepoBundle.BUNDLE_NAME, "314", args);
         } catch (SSOException ssoex) {
-            if (debug.messageEnabled()) {
-                debug.message("IdRepoUtils.loadIdRepoSchema:", ssoex);
+            if (DEBUG.messageEnabled()) {
+                DEBUG.message("IdRepoUtils.loadIdRepoSchema:", ssoex);
             }
             Object args[] = { idRepoName, realm };
             throw new IdRepoException(IdRepoBundle.BUNDLE_NAME, "315", args);
         } catch (Exception ex) {
-            if (debug.messageEnabled()) {
-                debug.message("IdRepoUtils.loadIdRepoSchema:", ex);
+            if (DEBUG.messageEnabled()) {
+                DEBUG.message("IdRepoUtils.loadIdRepoSchema:", ex);
             }
             Object args[] = { idRepoName, realm, ex.getMessage() };
             throw new IdRepoException(IdRepoBundle.BUNDLE_NAME, "316", args);
@@ -368,5 +367,106 @@ public class IdRepoUtils {
         // hostPort contains port so 389 will be ignored
         ld.connect(3, hostPort, 389, bindDn, bindPwd);
         return ld;
+    }
+
+    /**
+     * Parses the incoming types and operations in string format to their domain object equivalent. For example:
+     * <code>user=read,edit,service,delete</code>
+     * will be turned into USER identity type with READ, EDIT, SERVICE, DELETE operations.
+     *
+     * @param typesAndOperations The parsable type and operation lines (each line represents an identity type.
+     * @return The parsed identity types and operation mappings.
+     */
+    public static Map<IdType, Set<IdOperation>> parseSupportedTypesAndOperations(Set<String> typesAndOperations) {
+        Map<IdType, Set<IdOperation>> supportedTypesAndOperations = new HashMap<IdType, Set<IdOperation>>(6);
+        if (DEBUG.messageEnabled()) {
+            DEBUG.message("Parsing supported types and operations:" + typesAndOperations);
+        }
+        for (String typeAndOperation : typesAndOperations) {
+            int idx = typeAndOperation.indexOf('=');
+            if (idx == -1) {
+                DEBUG.error("Invalid supported type/operation configuration: " + typeAndOperation);
+                continue;
+            }
+            String type = typeAndOperation.substring(0, idx).trim();
+            IdType idType = null;
+            boolean supportsService = false;
+            if (type.equalsIgnoreCase(IdType.USER.getName())) {
+                idType = IdType.USER;
+                supportsService = true;
+            } else if (type.equalsIgnoreCase(IdType.GROUP.getName())) {
+                idType = IdType.GROUP;
+            } else if (type.equalsIgnoreCase(IdType.ROLE.getName())) {
+                idType = IdType.ROLE;
+            } else if (type.equalsIgnoreCase(IdType.FILTEREDROLE.getName())) {
+                idType = IdType.FILTEREDROLE;
+            } else if (type.equalsIgnoreCase(IdType.AGENT.getName())) {
+                idType = IdType.AGENT;
+            } else if (type.equalsIgnoreCase(IdType.REALM.getName())) {
+                idType = IdType.REALM;
+                supportsService = true;
+            }
+            supportedTypesAndOperations.put(idType,
+                    parseSupportedOperations(typeAndOperation.substring(idx + 1), supportsService));
+        }
+        //we need to make sure that realm=service is always present
+        Set<IdOperation> realmOps = supportedTypesAndOperations.get(IdType.REALM);
+        if (realmOps == null) {
+            realmOps = new HashSet<IdOperation>(1);
+        }
+        realmOps.add(IdOperation.SERVICE);
+        supportedTypesAndOperations.put(IdType.REALM, realmOps);
+        if (DEBUG.messageEnabled()) {
+            DEBUG.message("Parsed supported types and operations are: " + supportedTypesAndOperations);
+        }
+        return supportedTypesAndOperations;
+    }
+
+    private static Set<IdOperation> parseSupportedOperations(String operations, boolean supportsService) {
+        String[] ops = operations.split(",");
+        Set<IdOperation> idOperations = new HashSet<IdOperation>(5);
+        for (String op : ops) {
+            op = op.trim();
+            if (op.equalsIgnoreCase(IdOperation.CREATE.getName())) {
+                idOperations.add(IdOperation.CREATE);
+            } else if (op.equalsIgnoreCase(IdOperation.DELETE.getName())) {
+                idOperations.add(IdOperation.DELETE);
+            } else if (op.equalsIgnoreCase(IdOperation.EDIT.getName())) {
+                idOperations.add(IdOperation.EDIT);
+            } else if (op.equalsIgnoreCase(IdOperation.READ.getName())) {
+                idOperations.add(IdOperation.READ);
+            } else if (op.equalsIgnoreCase(IdOperation.SERVICE.getName())) {
+                if (supportsService) {
+                    idOperations.add(IdOperation.SERVICE);
+                }
+            }
+        }
+        return idOperations;
+    }
+
+    /**
+     * Parses attribute mapping settings in the format of "from=to". If there is no mapping provided, then this will be
+     * a mapping to itself.
+     *
+     * @param mappings A set of mappings that needs to be parsed
+     * @return The processed mappings returned as a map.
+     */
+    public static Map<String, String> parseAttributeMapping(Set<String> mappings) {
+        Map<String, String> map = new CaseInsensitiveHashMap();
+        if (mappings == null) {
+            return map;
+        }
+
+        for (String mapping : mappings) {
+            int idx = mapping.indexOf('=');
+            if (idx == -1) {
+                map.put(mapping, mapping);
+            } else {
+                String from = mapping.substring(0, idx);
+                String to = mapping.substring(idx + 1);
+                map.put(from, to);
+            }
+        }
+        return map;
     }
 }

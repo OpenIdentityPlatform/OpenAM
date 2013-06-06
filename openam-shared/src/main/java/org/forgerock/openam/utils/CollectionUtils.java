@@ -16,8 +16,8 @@
 package org.forgerock.openam.utils;
 
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.Set;
 
 /**
@@ -27,8 +27,11 @@ import java.util.Set;
  */
 public class CollectionUtils {
 
+    private CollectionUtils() {
+    }
+
     /**
-     * Converts the passed in objects to a Set.
+     * Converts the passed in objects to a HashSet.
      *
      * @param <T> The type of the passed in objects.
      * @param values An unbounded amount of objects that needs to be converted to Set.
@@ -36,9 +39,23 @@ public class CollectionUtils {
      */
     public static <T> Set<T> asSet(T... values) {
         if (values == null) {
-            return Collections.EMPTY_SET;
+            return new HashSet<T>(0);
         } else {
             return new HashSet<T>(Arrays.asList(values));
+        }
+    }
+
+    /**
+     * Converts the passed in objects to a LinkedHashSet.
+     * @param <T> The type of the passed in objects.
+     * @param values An unbounded amount of objects that needs to be converted to Set.
+     * @return either an empty set (if there was no value passed in), or a Set that holds all the values passed in.
+     */
+    public static <T> Set<T> asOrderedSet(T... values) {
+        if (values == null) {
+            return new LinkedHashSet<T>(0);
+        } else {
+            return new LinkedHashSet<T>(Arrays.asList(values));
         }
     }
 }

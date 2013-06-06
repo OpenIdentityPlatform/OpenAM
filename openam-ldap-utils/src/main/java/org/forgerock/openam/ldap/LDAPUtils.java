@@ -17,7 +17,6 @@ package org.forgerock.openam.ldap;
 
 import com.sun.identity.shared.debug.Debug;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -26,6 +25,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.StringTokenizer;
+import java.util.concurrent.TimeUnit;
 import org.forgerock.i18n.LocalizedIllegalArgumentException;
 import org.forgerock.opendj.ldap.Attribute;
 import org.forgerock.opendj.ldap.ByteString;
@@ -197,7 +197,7 @@ public class LDAPUtils {
             cf = Connections.newAuthenticatedConnectionFactory(cf, Requests.newSimpleBindRequest(username, password));
         }
         if (heartbeat) {
-            cf = Connections.newHeartBeatConnectionFactory(cf);
+            cf = Connections.newHeartBeatConnectionFactory(cf, 5, TimeUnit.MINUTES);
         }
         return cf;
     }
@@ -285,7 +285,7 @@ public class LDAPUtils {
      */
     public static Filter parseFilter(String filter, Filter defaultFilter) {
         try {
-            return Filter.valueOf(filter);
+            return filter == null ? defaultFilter : Filter.valueOf(filter);
         } catch (LocalizedIllegalArgumentException liae) {
             DEBUG.error("Unable to construct Filter from " + filter + " -> " + liae.getMessage()
                     + "\nFalling back to " + defaultFilter.toString());

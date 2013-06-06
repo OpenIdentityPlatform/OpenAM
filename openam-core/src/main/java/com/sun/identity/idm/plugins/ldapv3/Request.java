@@ -35,6 +35,10 @@ import com.sun.identity.shared.ldap.LDAPConnection;
 import com.iplanet.sso.SSOToken;
 import com.sun.identity.idm.IdRepoListener;
 
+/**
+ *
+ * @deprecated Since OpenAM 10.2.0
+ */
 class Request {
 
     // plugin config info

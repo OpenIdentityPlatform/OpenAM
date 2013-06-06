@@ -58,7 +58,7 @@ public abstract class IdRepo {
 
     public static final int REMOVEMEMBER = 2;
 
-    public Map configMap = Collections.EMPTY_MAP;
+    public Map<String, Set<String>> configMap = Collections.EMPTY_MAP;
 
     public static final int NO_MOD = -1;
 
@@ -72,7 +72,7 @@ public abstract class IdRepo {
      * @param configParams
      * @throws IdRepoException 
      */
-    public void initialize(Map configParams) throws IdRepoException {
+    public void initialize(Map<String, Set<String>> configParams) throws IdRepoException {
         configMap = Collections.unmodifiableMap(configParams);
     }
 
@@ -94,8 +94,8 @@ public abstract class IdRepo {
      *     Identity type
      * @return set of IdOperation supported for this IdType.
      */
-    public Set getSupportedOperations(IdType type) {
-        Set set = new HashSet();
+    public Set<IdOperation> getSupportedOperations(IdType type) {
+        Set<IdOperation> set = new HashSet<IdOperation>();
         set.add(IdOperation.READ);
         return set;
     }
@@ -108,7 +108,7 @@ public abstract class IdRepo {
      *
      * @return a Set of IdTypes supported by this plugin.
      */
-    public Set getSupportedTypes() {
+    public Set<IdType> getSupportedTypes() {
         return Collections.EMPTY_SET;
     }
 
@@ -182,7 +182,7 @@ public abstract class IdRepo {
      * @throws IdRepoException If there are repository related error conditions.
      * @throws SSOException If identity's single sign on token is invalid.
      */
-    public abstract Map getAttributes(SSOToken token, IdType type, String name)
+    public abstract Map<String, Set<String>> getAttributes(SSOToken token, IdType type, String name)
             throws IdRepoException, SSOException;
 
     /**
@@ -201,8 +201,8 @@ public abstract class IdRepo {
      * @throws IdRepoException If there are repository related error conditions.
      * @throws SSOException If identity's single sign on token is invalid.
      */
-    public abstract Map getAttributes(SSOToken token, IdType type, String name,
-            Set attrNames) throws IdRepoException, SSOException;
+    public abstract Map<String, Set<String>> getAttributes(SSOToken token, IdType type, String name,
+            Set<String> attrNames) throws IdRepoException, SSOException;
 
     /**
      * Returns requested binary attributes as an array of bytes.
@@ -220,8 +220,8 @@ public abstract class IdRepo {
      * @throws IdRepoException If there are repository related error conditions.
      * @throws SSOException If identity's single sign on token is invalid.
      */
-    public abstract Map getBinaryAttributes(SSOToken token, IdType type,
-            String name, Set attrNames) throws IdRepoException, SSOException;
+    public abstract Map<String, byte[][]> getBinaryAttributes(SSOToken token, IdType type,
+            String name, Set<String> attrNames) throws IdRepoException, SSOException;
 
     /**
      * Creates an identity.
@@ -238,7 +238,7 @@ public abstract class IdRepo {
      * @throws SSOException If identity's single sign on token is invalid.
      */
     public abstract String create(SSOToken token, IdType type, String name,
-            Map attrMap) throws IdRepoException, SSOException;
+            Map<String, Set<String>> attrMap) throws IdRepoException, SSOException;
 
     /**
      * Deletes an identity.
@@ -273,7 +273,7 @@ public abstract class IdRepo {
      * @throws SSOException If identity's single sign on token is invalid.
      */
     public abstract void setAttributes(SSOToken token, IdType type,
-            String name, Map attributes, boolean isAdd) throws IdRepoException,
+            String name, Map<String, Set<String>> attributes, boolean isAdd) throws IdRepoException,
             SSOException;
 
     /**
@@ -295,7 +295,7 @@ public abstract class IdRepo {
      * @throws SSOException If identity's single sign on token is invalid.
      */
     public abstract void setBinaryAttributes(SSOToken token, IdType type,
-            String name, Map attributes, boolean isAdd) throws IdRepoException,
+            String name, Map<String, byte[][]> attributes, boolean isAdd) throws IdRepoException,
             SSOException;
 
     /**
@@ -335,7 +335,7 @@ public abstract class IdRepo {
      * @throws SSOException If identity's single sign on token is invalid.
      */
     public abstract void removeAttributes(SSOToken token, IdType type,
-            String name, Set attrNames) throws IdRepoException, SSOException;
+            String name, Set<String> attrNames) throws IdRepoException, SSOException;
 
     /**
      * Search for specific type of identities.
@@ -363,8 +363,8 @@ public abstract class IdRepo {
      * @throws SSOException If identity's single sign on token is invalid.
      */
     public abstract RepoSearchResults search(SSOToken token, IdType type,
-            String pattern, int maxTime, int maxResults, Set returnAttrs,
-            boolean returnAllAttrs, int filterOp, Map avPairs, 
+            String pattern, int maxTime, int maxResults, Set<String> returnAttrs,
+            boolean returnAllAttrs, int filterOp, Map<String, Set<String>> avPairs, 
             boolean recursive) throws IdRepoException, SSOException;
 
     /**
@@ -387,7 +387,7 @@ public abstract class IdRepo {
      * @throws SSOException If identity's single sign on token is invalid.
      */
     public abstract void modifyMemberShip(SSOToken token, IdType type,
-            String name, Set members, IdType membersType, int operation)
+            String name, Set<String> members, IdType membersType, int operation)
             throws IdRepoException, SSOException;
 
     /**
@@ -407,7 +407,7 @@ public abstract class IdRepo {
      * @throws IdRepoException If there are repository related error conditions.
      * @throws SSOException If identity's single sign on token is invalid.
      */
-    public abstract Set getMembers(SSOToken token, IdType type, String name,
+    public abstract Set<String> getMembers(SSOToken token, IdType type, String name,
             IdType membersType) throws IdRepoException, SSOException;
 
     /**
@@ -427,7 +427,7 @@ public abstract class IdRepo {
      * @throws IdRepoException If there are repository related error conditions.
      * @throws SSOException If identity's single sign on token is invalid.
      */
-    public abstract Set getMemberships(SSOToken token, IdType type,
+    public abstract Set<String> getMemberships(SSOToken token, IdType type,
             String name, IdType membershipType) throws IdRepoException,
             SSOException;
 
@@ -457,7 +457,7 @@ public abstract class IdRepo {
      * @throws SSOException If identity's single sign on token is invalid.
      */
     public abstract void assignService(SSOToken token, IdType type,
-            String name, String serviceName, SchemaType stype, Map attrMap)
+            String name, String serviceName, SchemaType stype, Map<String, Set<String>> attrMap)
             throws IdRepoException, SSOException;
 
     /**
@@ -478,8 +478,8 @@ public abstract class IdRepo {
      * @throws IdRepoException If there are repository related error conditions.
      * @throws SSOException If identity's single sign on token is invalid.
      */
-    public abstract Set getAssignedServices(SSOToken token, IdType type,
-            String name, Map mapOfServicesAndOCs) throws IdRepoException,
+    public abstract Set<String> getAssignedServices(SSOToken token, IdType type,
+            String name, Map<String, Set<String>> mapOfServicesAndOCs) throws IdRepoException,
             SSOException;
 
     /**
@@ -501,7 +501,7 @@ public abstract class IdRepo {
      * @throws SSOException If identity's single sign on token is invalid.
      */
     public abstract void unassignService(SSOToken token, IdType type,
-            String name, String serviceName, Map attrMap)
+            String name, String serviceName, Map<String, Set<String>> attrMap)
             throws IdRepoException, SSOException;
 
     /**
@@ -522,8 +522,8 @@ public abstract class IdRepo {
      * @throws IdRepoException If there are repository related error conditions.
      * @throws SSOException If identity's single sign on token is invalid.
      */
-    public abstract Map getServiceAttributes(SSOToken token, IdType type,
-            String name, String serviceName, Set attrNames)
+    public abstract Map<String, Set<String>> getServiceAttributes(SSOToken token, IdType type,
+            String name, String serviceName, Set<String> attrNames)
             throws IdRepoException, SSOException;
 
     /**
@@ -545,8 +545,8 @@ public abstract class IdRepo {
      * @throws IdRepoException If there are repository related error conditions.
      * @throws SSOException If identity's single sign on token is invalid.
      */
-    public abstract Map getBinaryServiceAttributes(SSOToken token, IdType type,
-            String name, String serviceName, Set attrNames)
+    public abstract Map<String, byte[][]> getBinaryServiceAttributes(SSOToken token, IdType type,
+            String name, String serviceName, Set<String> attrNames)
             throws   IdRepoException, SSOException;
 
     /**
@@ -567,7 +567,7 @@ public abstract class IdRepo {
      * @throws SSOException If identity's single sign on token is invalid.
      */
     public abstract void modifyService(SSOToken token, IdType type,
-            String name, String serviceName, SchemaType sType, Map attrMap)
+            String name, String serviceName, SchemaType sType, Map<String, Set<String>> attrMap)
             throws IdRepoException, SSOException;
 
     /**
@@ -597,7 +597,7 @@ public abstract class IdRepo {
      * 
      * @return configuration map
      */
-    public Map getConfiguration() {
+    public Map<String, Set<String>> getConfiguration() {
         return configMap;
     }
 
