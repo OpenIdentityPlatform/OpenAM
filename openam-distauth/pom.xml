@@ -73,7 +73,7 @@
                             </resource>
                             <resource>
                                 <path>WEB-INF/</path>
-                                <include>auth.tld,jato.tld</include>
+                                <include>distUI_auth.tld,jato.tld</include>
                                 <flat>true</flat>
                                 <destination>generated-resources</destination>
                             </resource>
@@ -143,15 +143,13 @@
                                 <include>amAuthContext_*.properties</include>
                                 <include>amClientDetection*.properties</include>
                                 <include>debugfiles.properties</include>
-                                <include>WEB-INF/auth.tld</include>
-                                <include>WEB-INF/jato.tld</include>
                             </includes>
                             <targetPath>WEB-INF/classes</targetPath>
                         </resource>
                         <resource>
                             <directory>${project.build.directory}/generated-resources</directory>
                             <includes>
-                                <include>auth.tld</include>
+                                <include>distUI_auth.tld</include>
                                 <include>jato.tld</include>
                             </includes>
                             <targetPath>WEB-INF</targetPath>
