@@ -147,7 +147,7 @@ $ mv fedlet.war /path/to/tomcat/webapps</screen>
   must be configured with the Attribute Authority (<literal>AttrAuth</literal>)
   type and should sign responses. The Fedlet must be configured to deal with
   signed responses. Furthermore, map the attributes to request in both the
-  identity provider and the Fedlet configurations.</para>
+  Identity Provider and the Fedlet configurations.</para>
 
   <step>
    <para>Add the Attribute Authority type to the hosted Identity Provider.</para>
