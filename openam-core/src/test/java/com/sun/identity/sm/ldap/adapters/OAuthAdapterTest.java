@@ -26,8 +26,10 @@ import edu.emory.mathcs.backport.java.util.Arrays;
 import org.forgerock.json.fluent.JsonValue;
 import org.testng.annotations.Test;
 
+import java.util.Calendar;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.TimeZone;
 
 import static org.mockito.BDDMockito.given;
 import static org.mockito.BDDMockito.mock;
@@ -98,29 +100,33 @@ public class OAuthAdapterTest {
         adapter.toToken(jsonValue);
     }
 
-//    @Test
-//    public void shouldSerialiseACollectionOfTimestamps() {
-//        // Given
-//        OAuthAdapter adapter = generateOAuthAdapter();
-//
-//        String text = "1370425721197";
-//        OAuthTokenField field = OAuthTokenField.EXPIRY_TIME;
-//
-//        Map<String, Object> values = new HashMap<String, Object>();
-//        values.put(field.getOAuthField(), Arrays.asList(new String[]{text}));
-//        JsonValue jsonValue = makeDefaultJsonValue(values);
-//
-//        // When
-//        Calendar result = adapter.toToken(jsonValue).getExpiryTimestamp();
-//
-//        // Then
-//        // Wed, 05 Jun 2013 10:48:41 BST
-//        result.setTimeZone(TimeZone.getTimeZone("Europe/London"));
-//        assertEquals(result.get(Calendar.MONTH), 5);
-//        assertEquals(result.get(Calendar.YEAR), 2013);
-//        assertEquals(result.get(Calendar.HOUR_OF_DAY), 2);
-//        assertEquals(result.get(Calendar.MINUTE), 48);
-//    }
+    @Test
+    public void shouldSerialiseACollectionOfTimestamps() {
+        // Given
+        OAuthAdapter adapter = generateOAuthAdapter();
+
+        String timestamp = "1370425721197";
+        OAuthTokenField field = OAuthTokenField.EXPIRY_TIME;
+
+        Map<String, Object> values = new HashMap<String, Object>();
+        values.put(field.getOAuthField(), Arrays.asList(new String[]{timestamp}));
+        JsonValue jsonValue = makeDefaultJsonValue(values);
+
+        // When
+        Calendar result = adapter.toToken(jsonValue).getExpiryTimestamp();
+
+        // Then
+        // The result timezone is set to local time.
+        // Convert this timestamp to a known timezone.
+        Calendar c = Calendar.getInstance(TimeZone.getTimeZone("Europe/London"));
+        c.setTimeInMillis(result.getTimeInMillis());
+
+        // Wed, 05 Jun 2013 10:48:41 BST
+        assertEquals(c.get(Calendar.MONTH), 5);
+        assertEquals(c.get(Calendar.YEAR), 2013);
+        assertEquals(c.get(Calendar.HOUR_OF_DAY), 10);
+        assertEquals(c.get(Calendar.MINUTE), 48);
+    }
 
     @Test
     public void shouldDeserialiseSerialisedToken() {
