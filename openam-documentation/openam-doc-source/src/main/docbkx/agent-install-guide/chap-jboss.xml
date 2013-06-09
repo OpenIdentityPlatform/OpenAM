@@ -362,7 +362,7 @@ fi</programlisting>
     to set the classpath needed for the agent, by adding these lines after
     the code block you located in the previous step.</para>
 
-    <programlisting language="shell">if [ -r "setAgentClasspathdefault.sh" ]; then
+    <programlisting language="shell">if [ -r "$JBOSS_HOME/bin/setAgentClasspathdefault.sh" ]; then 
     . $JBOSS_HOME/bin/setAgentClasspathdefault.sh
 fi</programlisting>
 
