@@ -145,7 +145,7 @@ token.id=AQIC5wM2LY4SfcxvdvHOXjtC_eWSs2RB54tgvgK8SuYi7aQ.*AAJTSQACMDE.*</screen>
  </section>
  
  <section xml:id="rest-api-tokens">
-  <title>Token Validation &amp; Attribute Retrieval</title>
+  <title>Token Validation, Attribute Retrieval, &amp; Cookie Information</title>
   <para>You check whether a token is valid as follows.</para>
 
   <screen>$ curl --request POST --data "tokenid=AQIC5w...*AAJTSQACMDE.*" 
@@ -222,6 +222,18 @@ userdetails.token.id=
 userdetails.attribute.name=cn
 userdetails.attribute.value=Babs Jensen
 userdetails.attribute.value=Barbara Jensen</screen>
+
+  <para>You can retrieve the name of the cookie used for storing the session 
+  token. By default it is <literal>iPlanetDirectoryPro</literal>.</para>
+  <screen>$ curl https://openam.example.com:8443/openam/identity/getCookieNameForToken
+string=iPlanetDirectoryPro</screen>
+
+  <para>You can also retrieve the name of the cookie used for storing the session 
+  token and the names of the cookies to forward with requests.</para>
+  <screen>$ curl https://openam.example.com:8443/openam/identity/getCookieNameForToken
+string=iPlanetDirectoryPro
+string=amlbcookie</screen>
+
  </section>
  
  <section xml:id="rest-api-authz">
