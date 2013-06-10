@@ -735,7 +735,7 @@ cGy/F2Zuj8XJJpuQRSE6PtQqBuDEHjjmOQJ0rV/r8mO1ZCtHRhpZ5zYRjhRC9eCbjx9VrFax0JDC
     <term><filename>saml2/jsp/</filename></term>
     <listitem>
      <para>JSPs to initiate single sign on and single logout, and to handle
-     error, and also a JSP for obtaining Fedlet metadata,
+     errors, and also a JSP for obtaining Fedlet metadata,
      <filename>saml2/jsp/exportmetadata.jsp</filename></para>
     </listitem>
    </varlistentry>
