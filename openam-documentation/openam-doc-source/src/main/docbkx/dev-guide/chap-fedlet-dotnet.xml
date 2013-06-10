@@ -20,7 +20,7 @@
   !
   ! CCPL HEADER END
   !
-  !      Copyright 2011-2012 ForgeRock AS
+  !      Copyright 2011-2013 ForgeRock AS
   !    
 -->
 <chapter xml:id='chap-fedlet-dotnet'
@@ -36,28 +36,204 @@
   <secondary>.NET</secondary>
  </indexterm>
  <para>This chapter explains how to use the Fedlet in your .NET application.
- You must configure the OpenAM .NET Fedlet to work with the identity provider.
- Before creating the Fedlet, therefore, set up a Hosted Identity Provider in
- OpenAM.</para>
+ You must configure the OpenAM .NET Fedlet to work with the identity
+ provider.</para>
+
+ <para>Before you try the .NET Fedlet with OpenAM, create a hosted identity
+ provider in a Circle of Trust to which you plan to add the Fedlet. You can
+ perform these steps using the Create Hosted Identity Provider wizard on the
+ Common Tasks page of the OpenAM console. The .NET Fedlet demo requires a
+ signing key for the Identity Provider. For evaluation, use the
+ <literal>test</literal> certificate installed with OpenAM.</para>
+
+ <para>Before configuring the .NET Fedlet, prepare Microsoft IIS 7 with ASP.NET
+ v4. Import and configure access on Windows to any certificates and private
+ keys the .NET Fedlet needs. Also prepare Windows to allow the .NET Fedlet to
+ log messages to Windows Event Log.</para>
+
+ <procedure xml:id="prepare-iis-for-fedlet">
+  <title>To Prepare IIS For Installing the .NET Fedlet</title>
+
+  <para>Microsoft Internet Information Server must be installed with ASP.NET v4
+  in order to support the .NET Fedlet application. The following steps describe
+  how to set up IIS on Windows Server 2008 R2 to support the .NET Fedlet.</para>
+
+  <step>
+   <para>Logon to the Windows server as Administrator.</para>
+  </step>
+
+  <step>
+   <para>In Server Manager, add the IIS 7 role to install IIS 7.</para>
+
+   <para>When adding the IIS 7 role, the wizard presents you with additional
+   installation options. Under Application Development, select ASP.NET.</para>
+  </step>
+
+  <step>
+   <para>Under Roles > Web Server (IIS) > Internet Information Services (IIS)
+   Manager > <replaceable>server-name</replaceable> > Application Pools,
+   change .NET Framework Version for your application pools to v4.0.</para>
+  </step>
+ </procedure>
+
+ <procedure xml:id="import-fedlet-key-pairs-windows">
+  <title>To Import Test Key Pairs on Windows</title>
+
+  <para>OpenAM ships with a test key pair unpacked during deployment into a
+  Java Key Store under OpenAM's configuration directory. You can import this
+  key pair on Windows, so that the .NET Fedlet demo can use the certificate and
+  private key to perform signing, encryption, and logging in Windows Event Log.
+  The following steps describe how to get the key pair imported and available
+  to the .NET Fedlet on Windows Server 2008 R2.</para>
+
+  <para>See Windows documentation for instructions on using your own key
+  pair when you plan to deploy the .NET Fedlet in production.</para>
+
+  <step>
+   <para>Move the key pair from the Java Key Store to a PKCS#12 key store.</para>
+
+   <para>You can use the Java <command>keytool</command> command to perform
+   this step on the system where OpenAM is installed if you do not have the
+   command installed on the Windows system.</para>
+
+   <screen>$ keytool
+ -importkeystore
+ -srckeystore keystore.jks
+ -destkeystore keystore.p12
+ -srcstoretype JKS
+ -deststoretype PKCS12
+ -srcstorepass changeit
+ -deststorepass changeit
+ -srcalias test
+ -destalias test
+ -srckeypass changeit
+ -destkeypass changeit
+ -noprompt</screen>
+  </step>
+
+  <step>
+   <para>If necessary, copy the resulting <filename>keystore.p12</filename> file
+   to the Windows system.</para>
+  </step>
+
+  <step>
+   <para>Open Microsoft Management Console.</para>
+
+   <para>Select Start > Run, then enter <literal>mmc</literal>.</para>
+  </step>
+
+  <step>
+   <para>In the console, add the Certificates snap-in for the Local Computer
+   store.</para>
+  </step>
+
+  <step>
+   <para>Select Certificates > Personal > More Actions > All Tasks > Import...</para>
+  </step>
+
+  <step>
+   <para>In the Certificate Import Wizard select the
+   <filename>keystore.p12</filename> file to import the keys. The password is
+   <literal>changeit</literal>.</para>
+
+   <para>Also select Mark this key as exportable.</para>
+
+   <para>Accept other defaults until you click Finish.</para>
+  </step>
+
+  <step>
+   <para>In Certificates > Personal > Certificates > test > More Actions >
+   Properties, make sure the Friendly name is test.</para>
+  </step>
+
+  <step>
+   <para>Certificates > Personal > Certificates > test > More Actions > All
+   Tasks > Manage Private Keys, add access for Everyone (or at least the
+   IIS 7 account, IUSR).</para>
+  </step>
+ </procedure>
+
+ <procedure xml:id="prepare-windows-dotnet-fedlet-event-log">
+  <title>To Prepare Windows For .NET Fedlet Event Logging</title>
+
+  <para>After importing the key pair for the .NET Fedlet, edit the registry
+  to add the key that allows the .NET Fedlet to write to the Windows
+  Event Log, and create an Event Log Custom View for the .NET Fedlet.</para>
+
+  <step>
+   <para>Edit the Windows registry.</para>
+
+   <substeps>
+    <step>
+     <para>Open the Windows registry editor.</para>
+
+     <para>Select Start > Run, then enter <literal>regedit</literal>.</para>
+    </step>
+
+    <step>
+     <para>Browse to
+     <literal>HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Services\Eventlog\Application</literal>.</para>
+    </step>
+
+    <step>
+     <para>Add a new key named <literal>Fedlet</literal>.</para>
+
+     <para>Right-click Application > New > Key.</para>
+    </step>
+
+    <step>
+     <para>Close the Windows registry editor.</para>
+    </step>
+   </substeps>
+  </step>
+
+
+  <step>
+   <para>Add the Event Log Custom View.</para>
+
+   <substeps>
+    <step>
+     <para>Select Start > Administrative Tools > Event Viewer.</para>
+    </step>
+
+    <step>
+     <para>Select Action > Create Custom View...</para>
+    </step>
+
+    <step>
+     <para>Select all Event level options.</para>
+    </step>
+
+    <step>
+     <para>Select By source, and then in the drop-down menu, select Fedlet.</para>
+    </step>
+
+    <step>
+     <para>Click OK to finish creating the custom view.</para>
+
+     <para>When the .NET Fedlet logs messages, you can read them under Event
+     Viewer (Local) > Custom Views > Fedlet.</para>
+    </step>
+   </substeps>
+  </step>
+ </procedure>
 
  <procedure xml:id="install-dotnet-fedlet">
   <title>To Install the .NET Fedlet as a Demo Application</title>
 
-  <para>Before you start, create the hosted identity provider, and the Circle
-  of Trust to which you plan to add the Fedlet. You can perform these steps
-  using the Create Hosted Identity Provider wizard on the Common Tasks page of
-  the OpenAM console. The .NET Fedlet demo requires a signing key for the
-  Identity Provider. For evaluation, use the <literal>test</literal>
-  certificate installed with OpenAM.</para>
-
   <para>Follow these steps to configure and install the .NET Fedlet demo
-  application.</para>
+  application. These instructions are sufficient to test single sign-on and
+  single logout. If you want to try the attribute query test, see the procedure,
+  <xref linkend="try-dotnet-fedlet-attribute-query" />.</para>
 
   <step>
    <para>Download the .NET Fedlet (<filename>Fedlet-aspnet.zip</filename>) from
-   the <link xlink:show="new" xlink:href="http://forgerock.org/openam.html"
-   >OpenAM download page</link>. Unpack the contents of the .zip file into a
-   working directory.</para>
+   the OpenAM <link xlink:show="new"
+   xlink:href="http://forgerock.org/openam.html">nightly builds page</link>.
+   Contact <link xlink:href="mailto:info@forgerock.com">info@forgerock.com</link>
+   if you need .NET Fedlet support.</para>
+
+   <para>Next, unpack the contents of the .zip file into a working directory.</para>
    <variablelist>
     <varlistentry>
      <term><filename>bin\</filename></term>
@@ -90,10 +266,33 @@
     </varlistentry>
    </variablelist>
   </step>
+
+  <step performance="optional">
+   <para>To ensure the .NET Fedlet can write messages to Windows Event Log,
+   edit <filename>SampleApp\Web.config</filename>, to make sure that the
+   certificate alias reflects the key pair installed in the Windows Local
+   Computer Store and available to the IIS 7 application pool user.</para>
+
+   <para>Default settings set the log level to write informational messages, and
+   use the test key pair shipped with OpenAM.</para>
+
+   <programlisting language="xml">&lt;appSettings&gt;
+    &lt;add key=&quot;fedletLogLevel&quot; value=&quot;info&quot; /&gt;
+    &lt;add key=&quot;fedletMutualAuthCertAlias&quot; value=&quot;test&quot; /&gt;
+&lt;/appSettings&gt;</programlisting>
+
+   <para>The key pair specified by the
+   <literal>fedletMutualAuthCertAlias</literal> is used for SSL Mutual
+   Certificate authentication when the certificate based authentication is
+   required by and configured for the web container where the Identity
+   Provider is deployed.</para>
+  </step>
+
   <step>
    <para>Edit the template files in the <filename>SampleApp\App_Data\</filename>
    folder based on where you deploy the Fedlet demo application, and on how your
    identity provider is configured.</para>
+
    <itemizedlist>
     <listitem>
      <para>Edit <filename>fedlet.cot</filename> to set
@@ -108,6 +307,40 @@
      and Circle of Trust names to correspond to your sample application.</para>
     </listitem>
    </itemizedlist>
+
+   <itemizedlist>
+   <para>Example files for a .NET Fedlet deployed at
+   <literal>http://openam.example.com/fedlet</literal> and an Identity Provider
+   in OpenAM deployed at <literal>http://openam.example.com:8080/openam</literal>
+   are available on the OpenAM Community Site. The Circle of Trust name in the
+   examples is <literal>cot</literal>, and both entities use the test key
+   pair.</para>
+
+    <listitem>
+     <para><link xlink:href="http://openam.forgerock.org/dotnet-fedlet/fedlet.cot"
+     xlink:show="new">fedlet.cot</link></para>
+    </listitem>
+
+    <listitem>
+     <para><link xlink:href="http://openam.forgerock.org/dotnet-fedlet/idp.xml"
+     xlink:show="new">idp.xml</link></para>
+    </listitem>
+
+    <listitem>
+     <para><link xlink:href="http://openam.forgerock.org/dotnet-fedlet/idp-extended.xml"
+     xlink:show="new">idp-extended.xml</link></para>
+    </listitem>
+
+    <listitem>
+     <para><link xlink:href="http://openam.forgerock.org/dotnet-fedlet/sp.xml"
+     xlink:show="new">sp.xml</link></para>
+    </listitem>
+
+    <listitem>
+     <para><link xlink:href="http://openam.forgerock.org/dotnet-fedlet/sp-extended.xml"
+     xlink:show="new">sp-extended.xml</link></para>
+    </listitem>
+   </itemizedlist>
   </step>
   <step>
    <para>Export the identity provider metadata from OpenAM, and copy the
@@ -116,7 +349,7 @@
    <filename>SampleApp\App_Data\</filename> folder.</para>
    <screen>$ ssoadm
  create-metadata-templ
- --entityid "http://idp.example.com:8080/openam"
+ --entityid "http://openam.example.com:8080/openam"
  --adminid amadmin
  --password-file /tmp/pwd.txt
  --identityprovider /idp
@@ -126,6 +359,9 @@
 
 Hosted entity configuration was written to idp-extended.xml.
 Hosted entity descriptor was written to idp.xml.</screen>
+
+   <para>You can also perform this step using <literal>ssoadm.jsp</literal>
+   if it is enabled.</para>
   </step>
   <step>
    <para>Register the Fedlet with OpenAM as a remote service provider using the
@@ -141,22 +377,506 @@ Hosted entity descriptor was written to idp.xml.</screen>
 
 Import file, sp.xml.
 Import file, sp-extended.xml.</screen>
+
+   <para>You can also perform this step in OpenAM console by selecting
+   Federation > Entity Providers > Import Entity...</para>
   </step>
   <step>
-   <para>Deploy the demo application in Internet Information Server.</para>
-   <note>
-    <para>IIS must be installed with ASP.NET and additional application
-    support necessary for web applications beyond static web sites. The
-    additional support is not necessarily installed by default when you
-    activate IIS as a Windows feature.</para>
-   </note>
+   <para>Deploy the .NET Fedlet demo application in IIS.</para>
+
+   <substeps>
+    <step>
+     <para>Add read and execute permissions for <literal>Everyone</literal> to
+     the <filename>SampleApp</filename> folder.</para>
+    </step>
+
+    <step>
+     <para>Add the .NET Fedlet as an application.</para>
+
+     <para>Select IIS console > <replaceable>server-name</replaceable> > Sites >
+     Default Web Site > View Applications > Add Applications.</para>
+
+     <para>In the window to add the application, Alias is the deployment URI to
+     the .NET Fedlet, so <literal>fedlet</literal> for
+     <literal>/fedlet</literal>. Physical path is the file system path to the
+     <filename>SampleApp</filename> folder.</para>
+    </step>
+
+    <step>
+     <para>Restart IIS.</para>
+    </step>
+   </substeps>
   </step>
   <step>
-   <para>Try the demo application links to run Fedlet initiated single sign
-   on using HTTP POST binding and HTTP Artifact binding.</para>
-   <para>If you are using the embedded directory as a user store, you can
-   authenticate to OpenAM using the <literal>demo</literal> user whose password
-   is <literal>changeit</literal>.</para>
+   <para>Try the demo application links to run .NET Fedlet initiated single
+   sign-on.</para>
+
+   <para>At first try the .NET Fedlet as Administrator using Internet Explorer
+   on the Windows system where you installed the Fedlet. This allows you to see
+   more explicit error messages should any such messages appear.</para>
+
+   <substeps>
+    <step>
+     <para>Access the .NET Fedlet.</para>
+
+     <mediaobject xml:id="figure-dotnet-fedlet-sso-request">
+      <alt>Home page for demo .NET Fedlet</alt>
+      <imageobject>
+       <imagedata fileref="images/dotnet-fedlet-sso-request.png" format="PNG" />
+      </imageobject>
+      <textobject>
+       <para>The home page for the demo .NET Fedlet lets you try Fedlet (SP)
+       initiated and IDP initiated single sign on and single logout.</para>
+      </textobject>
+     </mediaobject>
+    </step>
+
+    <step>
+     <para>Try SSO with user name <literal>demo</literal>, password
+     <literal>changeit</literal>.</para>
+
+     <mediaobject xml:id="figure-dotnet-fedlet-sso-response">
+      <alt>.NET Fedlet SSO response page</alt>
+      <imageobject>
+       <imagedata fileref="images/dotnet-fedlet-sso-response.png" format="PNG" />
+      </imageobject>
+      <textobject>
+       <para>After signing in, you should see information about the
+       authentication and also other tests to try.</para>
+      </textobject>
+     </mediaobject>
+
+     <para>If you instead get HTTP 500.19 error status, ASP.NET did not register
+     correctly. Register ASP.NET v4 manually as Administrator.</para>
+
+     <screen>PS C:\> C:\Windows\Microsoft.NET\Framework64\v4.0.30319\aspnet_regiis.exe -i
+Start installing ASP.NET (4.0.30319).
+....
+Finished installing ASP.NET (4.0.30319).</screen>
+    </step>
+   </substeps>
+  </step>
+ </procedure>
+
+ <procedure xml:id="try-dotnet-fedlet-attribute-query">
+  <title>To Try the .NET Fedlet Attribute Query</title>
+
+  <para>To try the .NET Fedlet Attribute Query test, the Identity Provider
+  must be configured with the Attribute Authority (<literal>AttrAuth</literal>)
+  type and should sign responses. The Fedlet must be configured to deal with
+  signed and encrypted responses. Furthermore, map the attributes to request
+  in both the Identity Provider and the Fedlet configurations.</para>
+
+  <step>
+   <para>Add the Attribute Authority type to the hosted Identity Provider.</para>
+
+   <substeps>
+    <step>
+     <para>On OpenAM where the Identity Provider is hosted, log in to OpenAM
+     console as <literal>amadmin</literal>.</para>
+    </step>
+
+    <step>
+     <para>Under Federation &gt; Entity Providers, select the Identity Provider,
+     and then click New..., even though you plan to change the configuration
+     rather than create a new provider.</para>
+    </step>
+
+    <step>
+     <para>Select the protocol of the provider: SAMLv2.</para>
+    </step>
+
+    <step>
+     <para>In the Create SAMLv2 Entity Provider page, do the following.</para>
+
+     <itemizedlist>
+      <listitem>
+       <para>Set the Realm.</para>
+      </listitem>
+
+      <listitem>
+       <para>Set the Entity Identifier to the same entity identifier you
+       selected in the previous screen.</para>
+      </listitem>
+
+      <listitem>
+       <para>In the Attribute Authority section, set the Meta Alias for example
+       to <literal>/attra</literal>, and set the Signing certificate alias and
+       Encryption certificate alias values to <literal>test</literal> (to use
+       the test certificate).</para>
+      </listitem>
+
+      <listitem>
+       <para>Click Create to save your changes.</para>
+
+       <para>Disregard any error messages stating that the entity already
+       exists.</para>
+      </listitem>
+     </itemizedlist>
+
+     <para><literal>AttrAuth</literal> now appears in the list of Types for
+     your Identity Provider.</para>
+    </step>
+   </substeps>
+  </step>
+
+  <step>
+   <para>Under Federation &gt; Entity Providers, click the Identity Provider
+   link to open the provider's configuration.</para>
+  </step>
+
+  <step>
+   <para>Make sure attributes for the query are mapped on the Identity
+   Provider.</para>
+
+   <para>Under IDP &gt; Attribute Mapper, add the following values to the
+   Attribute Map if they are not yet present.</para>
+
+   <itemizedlist>
+    <listitem><para><literal>cn=cn</literal></para></listitem>
+    <listitem><para><literal>sn=sn</literal></para></listitem>
+    <listitem><para><literal>uid=uid</literal></para></listitem>
+   </itemizedlist>
+
+   <para>Click Save to save your changes.</para>
+  </step>
+
+  <step>
+   <para>As described in the procedure, <xref linkend="install-dotnet-fedlet" />,
+   export the Identity Provider metadata from OpenAM, and copy the
+   resulting <filename>idp.xml</filename> and
+   <filename>idp-extended.xml</filename> metadata to the .NET Fedlet
+   <filename>SampleApp\App_Data\</filename> folder.</para>
+  </step>
+
+  <step>
+   <para>Update the .NET Fedlet configuration and metadata.</para>
+
+   <substeps>
+    <step performance="optional">
+     <para>To ensure the .NET Fedlet can write messages to Windows Event Log,
+     edit <filename>SampleApp\Web.config</filename>, to make sure that the
+     certificate alias reflects the key pair installed in the Windows Local
+     Computer Store and available to the IIS 7 application pool user.</para>
+
+     <para>Default settings set the log level to write informational messages,
+     and use the test key pair shipped with OpenAM.</para>
+
+     <programlisting language="xml">&lt;appSettings&gt;
+    &lt;add key=&quot;fedletLogLevel&quot; value=&quot;info&quot; /&gt;
+    &lt;add key=&quot;fedletMutualAuthCertAlias&quot; value=&quot;test&quot; /&gt;
+&lt;/appSettings&gt;</programlisting>
+
+     <para>The key pair specified by the
+     <literal>fedletMutualAuthCertAlias</literal> is used for SSL Mutual
+     Certificate authentication when the certificate based authentication is
+     required by and configured for the web container where the Identity
+     Provider is deployed.</para>
+    </step>
+
+    <step>
+     <para>Edit the .NET Fedlet metadata files in
+     <filename>SampleApp\App_Data</filename>, <filename>fedlet.cot</filename>,
+     <filename>sp.xml</filename>, and <filename>sp-extended.xml</filename> to
+     replace the following if you have not already done so.</para>
+
+     <itemizedlist>
+      <listitem>
+       <para>Replace <literal>FEDLET_COT</literal> with the name of the
+       Circle of Trust.</para>
+      </listitem>
+      <listitem>
+       <para>Replace <literal>FEDLET_ENTITY_ID</literal> with the entity
+       identifier such as <literal>http://openam.example.com/fedlet</literal>.</para>
+      </listitem>
+      <listitem>
+       <para>Replace <literal>FEDLET_DEPLOY_URI</literal> with the URL to the
+       .NET Fedlet, generally theh same as the entity identifier.</para>
+      </listitem>
+      <listitem>
+       <para>Replace <literal>IDP_ENTITY_ID</literal> with the entity identifier
+       of the Identity Provider such as
+       <literal>http://openam.example.com:8080/openam</literal>.</para>
+      </listitem>
+     </itemizedlist>
+    </step>
+
+    <step>
+     <para>Set up signing and encryption in <filename>sp.xml</filename> for
+     the .NET Fedlet.</para>
+
+     <para>The Attribute Authority encrypts the response with the Fedlet's
+     public key, and the Fedlet decrypts the response with its private key. You
+     can set up both signing and encryption by adding a &lt;KeyDescriptor> as
+     the first element in the &lt;SSODescriptor>, as in the following
+     example.</para>
+
+     <programlisting language="xml">&lt;KeyDescriptor use=&quot;signing&quot;&gt;
+      &lt;ds:KeyInfo xmlns:ds=&quot;http://www.w3.org/2000/09/xmldsig#&quot;&gt;
+        &lt;ds:X509Data&gt;
+          &lt;ds:X509Certificate&gt;
+MIICQDCCAakCBEeNB0swDQYJKoZIhvcNAQEEBQAwZzELMAkGA1UEBhMCVVMxEzARBgNVBAgTCkNh
+bGlmb3JuaWExFDASBgNVBAcTC1NhbnRhIENsYXJhMQwwCgYDVQQKEwNTdW4xEDAOBgNVBAsTB09w
+ZW5TU08xDTALBgNVBAMTBHRlc3QwHhcNMDgwMTE1MTkxOTM5WhcNMTgwMTEyMTkxOTM5WjBnMQsw
+CQYDVQQGEwJVUzETMBEGA1UECBMKQ2FsaWZvcm5pYTEUMBIGA1UEBxMLU2FudGEgQ2xhcmExDDAK
+BgNVBAoTA1N1bjEQMA4GA1UECxMHT3BlblNTTzENMAsGA1UEAxMEdGVzdDCBnzANBgkqhkiG9w0B
+AQEFAAOBjQAwgYkCgYEArSQc/U75GB2AtKhbGS5piiLkmJzqEsp64rDxbMJ+xDrye0EN/q1U5Of+
+RkDsaN/igkAvV1cuXEgTL6RlafFPcUX7QxDhZBhsYF9pbwtMzi4A4su9hnxIhURebGEmxKW9qJNY
+Js0Vo5+IgjxuEWnjnnVgHTs1+mq5QYTA7E6ZyL8CAwEAATANBgkqhkiG9w0BAQQFAAOBgQB3Pw/U
+QzPKTPTYi9upbFXlrAKMwtFf2OW4yvGWWvlcwcNSZJmTJ8ARvVYOMEVNbsT4OFcfu2/PeYoAdiDA
+cGy/F2Zuj8XJJpuQRSE6PtQqBuDEHjjmOQJ0rV/r8mO1ZCtHRhpZ5zYRjhRC9eCbjx9VrFax0JDC
+/FfwWigmrW0Y0Q==
+          &lt;/ds:X509Certificate&gt;
+        &lt;/ds:X509Data&gt;
+      &lt;/ds:KeyInfo&gt;
+    &lt;/KeyDescriptor&gt;
+    &lt;KeyDescriptor use=&quot;encryption&quot;&gt;
+      &lt;ds:KeyInfo xmlns:ds=&quot;http://www.w3.org/2000/09/xmldsig#&quot;&gt;
+        &lt;ds:X509Data&gt;
+          &lt;ds:X509Certificate&gt;
+MIICQDCCAakCBEeNB0swDQYJKoZIhvcNAQEEBQAwZzELMAkGA1UEBhMCVVMxEzARBgNVBAgTCkNh
+bGlmb3JuaWExFDASBgNVBAcTC1NhbnRhIENsYXJhMQwwCgYDVQQKEwNTdW4xEDAOBgNVBAsTB09w
+ZW5TU08xDTALBgNVBAMTBHRlc3QwHhcNMDgwMTE1MTkxOTM5WhcNMTgwMTEyMTkxOTM5WjBnMQsw
+CQYDVQQGEwJVUzETMBEGA1UECBMKQ2FsaWZvcm5pYTEUMBIGA1UEBxMLU2FudGEgQ2xhcmExDDAK
+BgNVBAoTA1N1bjEQMA4GA1UECxMHT3BlblNTTzENMAsGA1UEAxMEdGVzdDCBnzANBgkqhkiG9w0B
+AQEFAAOBjQAwgYkCgYEArSQc/U75GB2AtKhbGS5piiLkmJzqEsp64rDxbMJ+xDrye0EN/q1U5Of+
+RkDsaN/igkAvV1cuXEgTL6RlafFPcUX7QxDhZBhsYF9pbwtMzi4A4su9hnxIhURebGEmxKW9qJNY
+Js0Vo5+IgjxuEWnjnnVgHTs1+mq5QYTA7E6ZyL8CAwEAATANBgkqhkiG9w0BAQQFAAOBgQB3Pw/U
+QzPKTPTYi9upbFXlrAKMwtFf2OW4yvGWWvlcwcNSZJmTJ8ARvVYOMEVNbsT4OFcfu2/PeYoAdiDA
+cGy/F2Zuj8XJJpuQRSE6PtQqBuDEHjjmOQJ0rV/r8mO1ZCtHRhpZ5zYRjhRC9eCbjx9VrFax0JDC
+/FfwWigmrW0Y0Q==
+          &lt;/ds:X509Certificate&gt;
+        &lt;/ds:X509Data&gt;
+      &lt;/ds:KeyInfo&gt;
+      &lt;EncryptionMethod
+        Algorithm=&quot;http://www.w3.org/2001/04/xmlenc#aes128-cbc&quot;&gt;
+        &lt;xenc:KeySize
+          xmlns:xenc=&quot;http://www.w3.org/2001/04/xmlenc#&quot;
+          &gt;128&lt;/xenc:KeySize&gt;
+      &lt;/EncryptionMethod&gt;
+    &lt;/KeyDescriptor&gt;</programlisting>
+
+     <para>For the Attribute Query feature, add a &lt;RoleDescriptor> to the
+     &lt;EntityDescriptor> after the &lt;SSODescriptor>. The &lt;RoleDescriptor>
+     describes the certificates that are used for signing and encryption.</para>
+
+     <programlisting language="xml">&lt;RoleDescriptor
+      xmlns:xsi=&quot;http://www.w3.org/2001/XMLSchema-instance&quot;
+        xmlns:query=&quot;urn:oasis:names:tc:SAML:metadata:ext:query&quot;
+        xsi:type=&quot;query:AttributeQueryDescriptorType&quot;
+        protocolSupportEnumeration=&quot;urn:oasis:names:tc:SAML:2.0:protocol&quot;&gt;
+    &lt;KeyDescriptor use=&quot;signing&quot;&gt;
+      &lt;ds:KeyInfo xmlns:ds=&quot;http://www.w3.org/2000/09/xmldsig#&quot;&gt;
+        &lt;ds:X509Data&gt;
+          &lt;ds:X509Certificate&gt;
+MIICQDCCAakCBEeNB0swDQYJKoZIhvcNAQEEBQAwZzELMAkGA1UEBhMCVVMxEzARBgNVBAgTCkNh
+bGlmb3JuaWExFDASBgNVBAcTC1NhbnRhIENsYXJhMQwwCgYDVQQKEwNTdW4xEDAOBgNVBAsTB09w
+ZW5TU08xDTALBgNVBAMTBHRlc3QwHhcNMDgwMTE1MTkxOTM5WhcNMTgwMTEyMTkxOTM5WjBnMQsw
+CQYDVQQGEwJVUzETMBEGA1UECBMKQ2FsaWZvcm5pYTEUMBIGA1UEBxMLU2FudGEgQ2xhcmExDDAK
+BgNVBAoTA1N1bjEQMA4GA1UECxMHT3BlblNTTzENMAsGA1UEAxMEdGVzdDCBnzANBgkqhkiG9w0B
+AQEFAAOBjQAwgYkCgYEArSQc/U75GB2AtKhbGS5piiLkmJzqEsp64rDxbMJ+xDrye0EN/q1U5Of+
+RkDsaN/igkAvV1cuXEgTL6RlafFPcUX7QxDhZBhsYF9pbwtMzi4A4su9hnxIhURebGEmxKW9qJNY
+Js0Vo5+IgjxuEWnjnnVgHTs1+mq5QYTA7E6ZyL8CAwEAATANBgkqhkiG9w0BAQQFAAOBgQB3Pw/U
+QzPKTPTYi9upbFXlrAKMwtFf2OW4yvGWWvlcwcNSZJmTJ8ARvVYOMEVNbsT4OFcfu2/PeYoAdiDA
+cGy/F2Zuj8XJJpuQRSE6PtQqBuDEHjjmOQJ0rV/r8mO1ZCtHRhpZ5zYRjhRC9eCbjx9VrFax0JDC
+/FfwWigmrW0Y0Q==
+          &lt;/ds:X509Certificate&gt;
+        &lt;/ds:X509Data&gt;
+      &lt;/ds:KeyInfo&gt;
+    &lt;/KeyDescriptor&gt;
+    &lt;KeyDescriptor use=&quot;encryption&quot;&gt;
+      &lt;ds:KeyInfo xmlns:ds=&quot;http://www.w3.org/2000/09/xmldsig#&quot;&gt;
+        &lt;ds:X509Data&gt;
+          &lt;ds:X509Certificate&gt;
+MIICQDCCAakCBEeNB0swDQYJKoZIhvcNAQEEBQAwZzELMAkGA1UEBhMCVVMxEzARBgNVBAgTCkNh
+bGlmb3JuaWExFDASBgNVBAcTC1NhbnRhIENsYXJhMQwwCgYDVQQKEwNTdW4xEDAOBgNVBAsTB09w
+ZW5TU08xDTALBgNVBAMTBHRlc3QwHhcNMDgwMTE1MTkxOTM5WhcNMTgwMTEyMTkxOTM5WjBnMQsw
+CQYDVQQGEwJVUzETMBEGA1UECBMKQ2FsaWZvcm5pYTEUMBIGA1UEBxMLU2FudGEgQ2xhcmExDDAK
+BgNVBAoTA1N1bjEQMA4GA1UECxMHT3BlblNTTzENMAsGA1UEAxMEdGVzdDCBnzANBgkqhkiG9w0B
+AQEFAAOBjQAwgYkCgYEArSQc/U75GB2AtKhbGS5piiLkmJzqEsp64rDxbMJ+xDrye0EN/q1U5Of+
+RkDsaN/igkAvV1cuXEgTL6RlafFPcUX7QxDhZBhsYF9pbwtMzi4A4su9hnxIhURebGEmxKW9qJNY
+Js0Vo5+IgjxuEWnjnnVgHTs1+mq5QYTA7E6ZyL8CAwEAATANBgkqhkiG9w0BAQQFAAOBgQB3Pw/U
+QzPKTPTYi9upbFXlrAKMwtFf2OW4yvGWWvlcwcNSZJmTJ8ARvVYOMEVNbsT4OFcfu2/PeYoAdiDA
+cGy/F2Zuj8XJJpuQRSE6PtQqBuDEHjjmOQJ0rV/r8mO1ZCtHRhpZ5zYRjhRC9eCbjx9VrFax0JDC
+/FfwWigmrW0Y0Q==
+          &lt;/ds:X509Certificate&gt;
+        &lt;/ds:X509Data&gt;
+      &lt;/ds:KeyInfo&gt;
+      &lt;EncryptionMethod
+        Algorithm=&quot;http://www.w3.org/2001/04/xmlenc#aes128-cbc&quot;&gt;
+        &lt;xenc:KeySize
+          xmlns:xenc=&quot;http://www.w3.org/2001/04/xmlenc#&quot;
+          &gt;128&lt;/xenc:KeySize&gt;
+      &lt;/EncryptionMethod&gt;
+    &lt;/KeyDescriptor&gt;
+  &lt;/RoleDescriptor&gt;</programlisting>
+    </step>
+
+    <step>
+     <para>Edit <filename>sp-extended.xml</filename> for your configuration.</para>
+
+     <para>Set the signing and encryption certificate aliases.</para>
+
+     <programlisting language="xml">&lt;Attribute name=&quot;signingCertAlias&quot;&gt;
+  &lt;Value&gt;test&lt;/Value&gt;
+&lt;/Attribute&gt;
+&lt;Attribute name=&quot;encryptionCertAlias&quot;&gt;
+  &lt;Value&gt;test&lt;/Value&gt;
+&lt;/Attribute&gt;</programlisting>
+
+     <para>Update the attribute map in to coincide with the mapped attributes
+     on the Identity Provider.</para>
+
+     <programlisting language="xml">&lt;Attribute name=&quot;attributeMap&quot;&gt;
+   &lt;Value&gt;cn=cn&lt;/Value&gt;
+   &lt;Value&gt;sn=sn&lt;/Value&gt;
+   &lt;Value&gt;uid=uid&lt;/Value&gt;
+&lt;/Attribute&gt;</programlisting>
+
+     <para>Add a logout URL.</para>
+
+     <programlisting language="xml">&lt;Attribute name=&quot;appLogoutUrl&quot;&gt;
+   &lt;Value&gt;http://openam.example.com/fedlet/logout.aspx&lt;/Value&gt;
+&lt;/Attribute&gt;</programlisting>
+
+     <para>Add an &lt;AttributeQueryConfig> to the &lt;EntityDescriptor> that
+     references the certificate aliases.</para>
+
+     <programlisting language="xml">&lt;AttributeQueryConfig metaAlias=&quot;/attrQuery&quot;&gt;
+  &lt;Attribute name=&quot;signingCertAlias&quot;&gt;
+    &lt;Value&gt;test&lt;/Value&gt;
+  &lt;/Attribute&gt;
+  &lt;Attribute name=&quot;encryptionCertAlias&quot;&gt;
+    &lt;Value&gt;test&lt;/Value&gt;
+  &lt;/Attribute&gt;
+  &lt;Attribute name=&quot;wantNameIDEncrypted&quot;&gt;
+    &lt;Value&gt;true&lt;/Value&gt;
+  &lt;/Attribute&gt;
+  &lt;Attribute name=&quot;cotlist&quot;&gt;
+    &lt;Value&gt;cot&lt;/Value&gt;
+  &lt;/Attribute&gt;
+&lt;/AttributeQueryConfig&gt;</programlisting>
+    </step>
+
+    <step>
+     <para>Check your work by comparing and contrasting your configuration with
+     the sample configuration files on the OpenAM Community Site.</para>
+
+     <itemizedlist>
+      <listitem>
+       <para><link xlink:href="http://openam.forgerock.org/dotnet-fedlet/fedlet.cot"
+       xlink:show="new">fedlet.cot</link></para>
+      </listitem>
+
+      <listitem>
+       <para><link xlink:href="http://openam.forgerock.org/dotnet-fedlet/idp.xml"
+       xlink:show="new">idp.xml</link></para>
+      </listitem>
+
+      <listitem>
+       <para><link xlink:href="http://openam.forgerock.org/dotnet-fedlet/idp-extended.xml"
+       xlink:show="new">idp-extended.xml</link></para>
+      </listitem>
+
+      <listitem>
+       <para><link xlink:href="http://openam.forgerock.org/dotnet-fedlet/sp.xml"
+       xlink:show="new">sp.xml</link></para>
+      </listitem>
+
+      <listitem>
+       <para><link xlink:href="http://openam.forgerock.org/dotnet-fedlet/sp-extended.xml"
+       xlink:show="new">sp-extended.xml</link></para>
+      </listitem>
+     </itemizedlist>
+    </step>
+
+    <step>
+     <para>In OpenAM console where the hosted Identity Provider is configured,
+     under Federation > Entity Providers delete the .NET Fedlet configuration
+     if it exists.</para>
+    </step>
+
+    <step>
+     <para>Under Federation > Entity Providers, click Import Entity..., and
+     then import the .NET Fedlet configuration using your
+     <filename>sp.xml</filename> and <filename>sp-extended.xml</filename>
+     metadata files.</para>
+    </step>
+   </substeps>
+  </step>
+
+  <step>
+   <para>Deploy the .NET Fedlet as described in the deploy step of the procedure,
+   <xref linkend="install-dotnet-fedlet" />, making sure you restart IIS.</para>
+  </step>
+
+  <step>
+   <para>Try the .NET Fedlet Attribute Query test.</para>
+
+   <para>At first try the .NET Fedlet as Administrator using Internet Explorer
+   on the Windows system where you installed the Fedlet. This allows you to see
+   more explicit error messages should any such messages appear.</para>
+
+   <substeps>
+    <step>
+     <para>Access the .NET Fedlet.</para>
+
+     <mediaobject xml:id="figure-dotnet-fedlet-sso-request-attr-query">
+      <alt>Home page for demo .NET Fedlet</alt>
+      <imageobject>
+       <imagedata fileref="images/dotnet-fedlet-sso-request.png" format="PNG" />
+      </imageobject>
+      <textobject>
+       <para>The home page for the demo .NET Fedlet lets you try Fedlet (SP)
+       initiated and IDP initiated single sign on and single logout.</para>
+      </textobject>
+     </mediaobject>
+    </step>
+
+    <step>
+     <para>Try SSO with user name <literal>demo</literal>, password
+     <literal>changeit</literal>.</para>
+
+     <mediaobject xml:id="figure-dotnet-fedlet-sso-response-attr-query">
+      <alt>.NET Fedlet SSO response page</alt>
+      <imageobject>
+       <imagedata fileref="images/dotnet-fedlet-sso-response.png" format="PNG" />
+      </imageobject>
+      <textobject>
+       <para>After signing in, you should see information about the
+       authentication and also other tests to try.</para>
+      </textobject>
+     </mediaobject>
+
+     <para>If you instead get HTTP 500.19 error status, ASP.NET did not register
+     correctly. Register ASP.NET v4 manually as Administrator.</para>
+
+     <screen>PS C:\> C:\Windows\Microsoft.NET\Framework64\v4.0.30319\aspnet_regiis.exe -i
+Start installing ASP.NET (4.0.30319).
+....
+Finished installing ASP.NET (4.0.30319).</screen>
+     </step>
+
+     <step>
+      <para>At the bottom of the web page, et the attributes in the Attribute
+      Query page to match the mapped attributes, and then click Send.</para>
+    </step>
+
+    <step>
+      <para>Check that you see the attribute values in the response page.</para>
+
+      <mediaobject xml:id="figure-dotnet-fedlet-attr-query-response">
+       <alt>.NET Fedlet Attribute Query response page</alt>
+       <imageobject>
+        <imagedata fileref="images/dotnet-fedlet-attr-query-response.png" format="PNG" />
+       </imageobject>
+       <textobject>
+        <para>The responses for each attribute value in this case should be
+        <literal>demo</literal>.</para>
+       </textobject>
+      </mediaobject>
+     </step>
+   </substeps>
   </step>
  </procedure>
 </chapter>
