@@ -303,7 +303,7 @@
 
    <para>Fedlets support the following SAML 2.0 features.</para>
 
-   <table>
+   <table xml:id="fedlet-saml2-features">
     <title>Fedlet Support for SAML 2.0 Features</title>
     <tgroup cols="3">
      <colspec colnum="1" colwidth="4*"/>
