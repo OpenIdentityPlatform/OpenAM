@@ -38,254 +38,257 @@
  <para>This chapter introduces OpenAM Fedlets, and shows how to use the Fedlet
  as part of your Java web application.</para>
 
- <para>An OpenAM <firstterm>Fedlet</firstterm> is a small web application that
- can do federation in your service provider application with OpenAM acting as
- the identity provider. The Fedlet does not require an entire OpenAM
- installation alongside your application, but instead can redirect to OpenAM
- for single sign on, and to retrieve SAML assertions.</para>
+ <section xml:id="create-install-java-fedlet">
+  <title>Creating &amp; Installing a Java Fedlet</title>
 
- <procedure xml:id="create-a-java-fedlet">
-  <title>To Create a Fedlet</title>
-  <para>The OpenAM administrator running the identity provider server creates
-  a <filename>Fedlet.zip</filename> file for your service provider application,
-  and then sends you the .zip.</para>
-  
-  <step>
-   <para>Before creating the Fedlet, create a Hosted Identity Provider if
-   you have not already done so, using the test certificate for the signing
-   key.</para>
+  <para>An OpenAM <firstterm>Fedlet</firstterm> is a small web application that
+  can do federation in your service provider application with OpenAM acting as
+  the identity provider. The Fedlet does not require an entire OpenAM
+  installation alongside your application, but instead can redirect to OpenAM
+  for single sign on, and to retrieve SAML assertions.</para>
 
-   <para>The single sign-on and single logout features that the Java Fedlet
-   demonstrates do work with the Hosted Identity Provider you create starting
-   from the Common Tasks page. The Java Fedlet Attribute Query and XACML Query
-   tests require additional configuration, however.</para>
+  <procedure xml:id="create-a-java-fedlet">
+   <title>To Create a Fedlet</title>
+   <para>The OpenAM administrator running the identity provider server creates
+   a <filename>Fedlet.zip</filename> file for your service provider application,
+   and then sends you the .zip.</para>
 
-   <para>See <xref linkend="try-fedlet-attribute-query" /> and
-   <xref linkend="try-fedlet-xacml-query" /> for details.</para>
-  </step>
+   <step>
+    <para>Before creating the Fedlet, create a Hosted Identity Provider if
+    you have not already done so, using the test certificate for the signing
+    key.</para>
 
-  <step>
-   <para>On the Common Tasks page of the OpenAM console, click Create
-   Fedlet.</para>
-  </step>
-  <step>
-   <para>Note that the Circle of Trust includes your hosted identity provider,
-   and that Identity Provider is set to your to hosted identity
-   provider.</para>
-  </step>
-  <step>
-   <para>Name the Fedlet, and also set the Destination URL.</para>
-   <para>You can use the deployment URL, such as
-   <literal>http://openam.example.com:8080/fedlet</literal> as both the name and
-   the destination URL.</para>
-  </step>
-  <step>
-   <para>Click create to generate the Fedlet.zip file, such as
-   <filename>$HOME/openam/myfedlets/httpopenamexamplecom8080fedlet/Fedlet.zip</filename>.</para>
-  </step>
-  <step>
-   <para>Provide the Fedlet to the service provider, or install it yourself to
-   demonstrate the Fedlet's features.</para>
-  </step>
- </procedure>
+    <para>The single sign-on and single logout features that the Java Fedlet
+    demonstrates do work with the Hosted Identity Provider you create starting
+    from the Common Tasks page. The Java Fedlet Attribute Query and XACML Query
+    tests require additional configuration, however.</para>
+
+    <para>See <xref linkend="try-fedlet-attribute-query" /> and
+    <xref linkend="try-fedlet-xacml-query" /> for details.</para>
+   </step>
+
+   <step>
+    <para>On the Common Tasks page of the OpenAM console, click Create
+    Fedlet.</para>
+   </step>
+   <step>
+    <para>Note that the Circle of Trust includes your hosted identity provider,
+    and that Identity Provider is set to your to hosted identity
+    provider.</para>
+   </step>
+   <step>
+    <para>Name the Fedlet, and also set the Destination URL.</para>
+    <para>You can use the deployment URL, such as
+    <literal>http://openam.example.com:8080/fedlet</literal> as both the name and
+    the destination URL.</para>
+   </step>
+   <step>
+    <para>Click create to generate the Fedlet.zip file, such as
+    <filename>$HOME/openam/myfedlets/httpopenamexamplecom8080fedlet/Fedlet.zip</filename>.</para>
+   </step>
+   <step>
+    <para>Provide the Fedlet to the service provider, or install it yourself to
+    demonstrate the Fedlet's features.</para>
+   </step>
+  </procedure>
  
- <procedure xml:id="install-fedlet-as-demo">
-  <title>To Install the Fedlet as a Demo Application</title>
-  <para><filename>Fedlet.zip</filename> includes the
-  <filename>fedlet.war</filename> archive corresponding to the identity
-  provider, and a <filename>README</filename> file.</para>
+  <procedure xml:id="install-fedlet-as-demo">
+   <title>To Install the Fedlet as a Demo Application</title>
+   <para><filename>Fedlet.zip</filename> includes the
+   <filename>fedlet.war</filename> archive corresponding to the identity
+   provider, and a <filename>README</filename> file.</para>
 
-  <itemizedlist>
-   <listitem>
-    <para>The <filename>fedlet.war</filename> archive contains both the Fedlet
-    as a demo web application, and also the files you use to include the Fedlet
-    in your service provider application.</para>
-   </listitem>
-   <listitem>
-    <para>The README file describes how to use the Fedlet.</para>
-   </listitem>
-  </itemizedlist>
+   <itemizedlist>
+    <listitem>
+     <para>The <filename>fedlet.war</filename> archive contains both the Fedlet
+     as a demo web application, and also the files you use to include the Fedlet
+     in your service provider application.</para>
+    </listitem>
+    <listitem>
+     <para>The README file describes how to use the Fedlet.</para>
+    </listitem>
+   </itemizedlist>
 
-  <para>Perform the following steps to try single sign-on and single logout
-  tests. For the attribute query and XACML query tests, additional configuration
-  is required.</para>
+   <para>Perform the following steps to try single sign-on and single logout
+   tests. For the attribute query and XACML query tests, additional configuration
+   is required.</para>
 
-  <step>
-   <para>Deploy the Fedlet in your web container.</para>
-   <screen>$ unzip Fedlet.zip
+   <step>
+    <para>Deploy the Fedlet in your web container.</para>
+    <screen>$ unzip Fedlet.zip
 $ mv fedlet.war /path/to/tomcat/webapps</screen>
-  </step>
-  <step>
-   <para>Browse to the Fedlet URL, and then click the links to set up the
-   configuration directory in <filename>$HOME/fedlet</filename>, where $HOME
-   corresponds to the user running the web application container.</para>
-  </step>
+   </step>
+   <step>
+    <para>Browse to the Fedlet URL, and then click the links to set up the
+    configuration directory in <filename>$HOME/fedlet</filename>, where $HOME
+    corresponds to the user running the web application container.</para>
+   </step>
 
-  <step>
-   <para>Try one or more examples from the Fedlet home page to validate Fedlet
-   setup.</para>
-   <mediaobject xml:id="figure-fedlet-demo">
-    <alt>Home page for demo Fedlet</alt>
-    <imageobject>
-     <imagedata fileref="images/fedlet-demo.png" format="PNG" />
-    </imageobject>
-    <textobject>
-     <para>The home page for the demo Fedlet lets you try Fedlet (SP)
-     initiated and IDP initiated single sign on and single logout.</para>
-    </textobject>
-   </mediaobject>
-   <para>After setting up OpenAM with the default subjects, you can login on
-   the identity provider with user name <literal>demo</literal> and password
-   <literal>changeit</literal>.</para>
-  </step>
- </procedure>
+   <step>
+    <para>Try one or more examples from the Fedlet home page to validate Fedlet
+    setup.</para>
+    <mediaobject xml:id="figure-fedlet-demo">
+     <alt>Home page for demo Fedlet</alt>
+     <imageobject>
+      <imagedata fileref="images/fedlet-demo.png" format="PNG" />
+     </imageobject>
+     <textobject>
+      <para>The home page for the demo Fedlet lets you try Fedlet (SP)
+      initiated and IDP initiated single sign on and single logout.</para>
+     </textobject>
+    </mediaobject>
+    <para>After setting up OpenAM with the default subjects, you can login on
+    the identity provider with user name <literal>demo</literal> and password
+    <literal>changeit</literal>.</para>
+   </step>
+  </procedure>
 
- <procedure xml:id="try-fedlet-attribute-query">
-  <title>To Try the Fedlet Attribute Query</title>
+  <procedure xml:id="try-fedlet-attribute-query">
+   <title>To Try the Fedlet Attribute Query</title>
 
-  <para>To try the Fedlet Attribute Query test, the Identity Provider
-  must be configured with the Attribute Authority (<literal>AttrAuth</literal>)
-  type and should sign responses. The Fedlet must be configured to deal with
-  signed responses. Furthermore, map the attributes to request in both the
-  Identity Provider and the Fedlet configurations.</para>
+   <para>To try the Fedlet Attribute Query test, the Identity Provider
+   must be configured with the Attribute Authority (<literal>AttrAuth</literal>)
+   type and should sign responses. The Fedlet must be configured to deal with
+   signed responses. Furthermore, map the attributes to request in both the
+   Identity Provider and the Fedlet configurations.</para>
 
-  <step>
-   <para>Add the Attribute Authority type to the hosted Identity Provider.</para>
+   <step>
+    <para>Add the Attribute Authority type to the hosted Identity Provider.</para>
 
-   <substeps>
-    <step>
-     <para>On OpenAM where the Identity Provider is hosted, log in to OpenAM
-     console as <literal>amadmin</literal>.</para>
-    </step>
+    <substeps>
+     <step>
+      <para>On OpenAM where the Identity Provider is hosted, log in to OpenAM
+      console as <literal>amadmin</literal>.</para>
+     </step>
 
-    <step>
-     <para>Under Federation &gt; Entity Providers, select the Identity Provider,
-     and then click New..., even though you plan to change the configuration
-     rather than create a new provider.</para>
-    </step>
+     <step>
+      <para>Under Federation &gt; Entity Providers, select the Identity Provider,
+      and then click New..., even though you plan to change the configuration
+      rather than create a new provider.</para>
+     </step>
 
-    <step>
-     <para>Select the protocol of the provider: SAMLv2.</para>
-    </step>
+     <step>
+      <para>Select the protocol of the provider: SAMLv2.</para>
+     </step>
 
-    <step>
-     <para>In the Create SAMLv2 Entity Provider page, do the following.</para>
+     <step>
+      <para>In the Create SAMLv2 Entity Provider page, do the following.</para>
 
-     <itemizedlist>
-      <listitem>
-       <para>Set the Realm.</para>
-      </listitem>
+      <itemizedlist>
+       <listitem>
+        <para>Set the Realm.</para>
+       </listitem>
 
-      <listitem>
-       <para>Set the Entity Identifier to the same entity identifier you
-       selected in the previous screen.</para>
-      </listitem>
+       <listitem>
+        <para>Set the Entity Identifier to the same entity identifier you
+        selected in the previous screen.</para>
+       </listitem>
 
-      <listitem>
-       <para>In the Attribute Authority section, set the Meta Alias for example
-       to <literal>/attra</literal>, and set the Signing certificate alias and
-       Encryption certificate alias values to <literal>test</literal> (to use
-       the test certificate).</para>
-      </listitem>
+       <listitem>
+        <para>In the Attribute Authority section, set the Meta Alias for example
+        to <literal>/attra</literal>, and set the Signing certificate alias and
+        Encryption certificate alias values to <literal>test</literal> (to use
+        the test certificate).</para>
+       </listitem>
 
-      <listitem>
-       <para>Click Create to save your changes.</para>
+       <listitem>
+        <para>Click Create to save your changes.</para>
 
-       <para>Disregard any error messages stating that the entity already
-       exists.</para>
-      </listitem>
-     </itemizedlist>
+        <para>Disregard any error messages stating that the entity already
+        exists.</para>
+       </listitem>
+      </itemizedlist>
 
-     <para><literal>AttrAuth</literal> now appears in the list of Types for
-     your Identity Provider.</para>
-    </step>
-   </substeps>
-  </step>
+      <para><literal>AttrAuth</literal> now appears in the list of Types for
+      your Identity Provider.</para>
+     </step>
+    </substeps>
+   </step>
 
-  <step>
-   <para>Under Federation &gt; Entity Providers, click the Identity Provider
-   link to open the provider's configuration.</para>
-  </step>
+   <step>
+    <para>Under Federation &gt; Entity Providers, click the Identity Provider
+    link to open the provider's configuration.</para>
+   </step>
 
-  <step>
-   <para>Make sure attributes for the query are mapped on the Identity
-   Provider.</para>
+   <step>
+    <para>Make sure attributes for the query are mapped on the Identity
+    Provider.</para>
 
-   <para>Under IDP &gt; Attribute Mapper, add the following values to the
-   Attribute Map if they are not yet present.</para>
+    <para>Under IDP &gt; Attribute Mapper, add the following values to the
+    Attribute Map if they are not yet present.</para>
 
-   <itemizedlist>
-    <listitem><para><literal>cn=cn</literal></para></listitem>
-    <listitem><para><literal>sn=sn</literal></para></listitem>
-    <listitem><para><literal>uid=uid</literal></para></listitem>
-   </itemizedlist>
+    <itemizedlist>
+     <listitem><para><literal>cn=cn</literal></para></listitem>
+     <listitem><para><literal>sn=sn</literal></para></listitem>
+     <listitem><para><literal>uid=uid</literal></para></listitem>
+    </itemizedlist>
 
-   <para>Click Save to save your changes.</para>
-  </step>
+    <para>Click Save to save your changes.</para>
+   </step>
 
-  <step>
-   <para>Create the Fedlet as described in <xref linkend="create-a-java-fedlet" />,
-   making sure you map the attributes.</para>
+   <step>
+    <para>Create the Fedlet as described in <xref linkend="create-a-java-fedlet" />,
+    making sure you map the attributes.</para>
 
-   <itemizedlist>
-    <listitem><para><literal>cn=cn</literal></para></listitem>
-    <listitem><para><literal>sn=sn</literal></para></listitem>
-    <listitem><para><literal>uid=uid</literal></para></listitem>
-   </itemizedlist>
+    <itemizedlist>
+     <listitem><para><literal>cn=cn</literal></para></listitem>
+     <listitem><para><literal>sn=sn</literal></para></listitem>
+     <listitem><para><literal>uid=uid</literal></para></listitem>
+    </itemizedlist>
 
-   <para>This step creates a Fedlet with updated Identity Provider metadata.
-   If you already created a Fedlet, either use a different name, or delete
-   the existing Fedlet.</para>
-  </step>
+    <para>This step creates a Fedlet with updated Identity Provider metadata.
+    If you already created a Fedlet, either use a different name, or delete
+    the existing Fedlet.</para>
+   </step>
 
-  <step>
-   <para>Deploy the new Fedlet .war as described in <xref linkend="install-fedlet-as-demo" />.</para>
-  </step>
+   <step>
+    <para>Deploy the new Fedlet .war as described in <xref linkend="install-fedlet-as-demo" />.</para>
+   </step>
 
-  <step>
-   <para>Edit the new Fedlet configuration to request signing and encryption,
-   and replace the existing configuration in OpenAM with the edited
-   configuration.</para>
+   <step>
+    <para>Edit the new Fedlet configuration to request signing and encryption,
+    and replace the existing configuration in OpenAM with the edited
+    configuration.</para>
 
-   <substeps>
-    <step>
-     <para>Copy the test key store from OpenAM, and prepare password files.</para>
+    <substeps>
+     <step>
+      <para>Copy the test key store from OpenAM, and prepare password files.</para>
 
-     <screen>$ scp user@openam:/home/user/openam/openam/keystore.jks ~/fedlet/</screen>
+      <screen>$ scp user@openam:/home/user/openam/openam/keystore.jks ~/fedlet/</screen>
 
-     <para>The Fedlet uses password files when accessing the keystore. These
-     password files contain encoded passwords, where the encoding is specific
-     to the Fedlet.</para>
+      <para>The Fedlet uses password files when accessing the keystore. These
+      password files contain encoded passwords, where the encoding is specific
+      to the Fedlet.</para>
 
-     <para>To encode the password, use <literal>fedletEncode.jsp</literal>.
-     <literal>fedletEncode.jsp</literal> is in the deployed Fedlet, for example
-     <literal>http://openam.example.com:8080/fedlet/fedletEncode.jsp</literal>.
-     The only password to encode for OpenAM's test keystore is
-     <literal>changeit</literal>, because the key store and private key
-     passwords are both the same.</para>
+      <para>To encode the password, use <literal>fedletEncode.jsp</literal>.
+      <literal>fedletEncode.jsp</literal> is in the deployed Fedlet, for example
+      <literal>http://openam.example.com:8080/fedlet/fedletEncode.jsp</literal>.
+      The only password to encode for OpenAM's test keystore is
+      <literal>changeit</literal>, because the key store and private key
+      passwords are both the same.</para>
 
-     <para>Use the encoded value to create the password files as in the
-     following example.</para>
+      <para>Use the encoded value to create the password files as in the
+      following example.</para>
 
-     <screen>$ echo AQIC5BHNSjLwT303GqndmHbyYvzP9Tz7OAnK > ~/fedlet/.storepass
+      <screen>$ echo AQIC5BHNSjLwT303GqndmHbyYvzP9Tz7OAnK > ~/fedlet/.storepass
 $ echo AQIC5BHNSjLwT303GqndmHbyYvzP9Tz7OAnK > ~/fedlet/.keypass</screen>
-    </step>
+     </step>
 
-    <step>
-     <para>Edit <filename>~/fedlet/sp.xml</filename> to use the test
-     certificate for the attribute query.</para>
+     <step>
+      <para>Edit <filename>~/fedlet/sp.xml</filename> to use the test
+      certificate for the attribute query.</para>
 
-     <para>Change the following:</para>
+      <para>Change the following:</para>
 
-     <programlisting language="xml">&lt;RoleDescriptor xmlns:xsi=&quot;http://www.w3.org/2001/XMLSchema-instance&quot;
+      <programlisting language="xml">&lt;RoleDescriptor xmlns:xsi=&quot;http://www.w3.org/2001/XMLSchema-instance&quot;
     xmlns:query=&quot;urn:oasis:names:tc:SAML:metadata:ext:query&quot;
     xsi:type=&quot;query:AttributeQueryDescriptorType&quot;
     protocolSupportEnumeration=&quot;urn:oasis:names:tc:SAML:2.0:protocol&quot;&gt;
  &lt;/RoleDescriptor&gt;</programlisting>
 
-     <para>To:</para>
+      <para>To:</para>
 
-     <programlisting language="xml"> &lt;RoleDescriptor xmlns:xsi=&quot;http://www.w3.org/2001/XMLSchema-instance&quot;
+      <programlisting language="xml"> &lt;RoleDescriptor xmlns:xsi=&quot;http://www.w3.org/2001/XMLSchema-instance&quot;
     xmlns:query=&quot;urn:oasis:names:tc:SAML:metadata:ext:query&quot;
     xsi:type=&quot;query:AttributeQueryDescriptorType&quot;
     protocolSupportEnumeration=&quot;urn:oasis:names:tc:SAML:2.0:protocol&quot;&gt;
@@ -332,16 +335,16 @@ cGy/F2Zuj8XJJpuQRSE6PtQqBuDEHjjmOQJ0rV/r8mO1ZCtHRhpZ5zYRjhRC9eCbjx9VrFax0JDC
    &lt;/EncryptionMethod&gt;
   &lt;/KeyDescriptor&gt;
  &lt;/RoleDescriptor&gt;</programlisting>
-    </step>
+     </step>
 
-    <step>
-     <para>Edit <filename>~/fedlet/sp-extended.xml</filename> to use the test
-     certificate for the attribute query.</para>
+     <step>
+      <para>Edit <filename>~/fedlet/sp-extended.xml</filename> to use the test
+      certificate for the attribute query.</para>
 
-     <para>Change the following, assuming your Circle of Trust is called
-     <literal>cot</literal>:</para>
+      <para>Change the following, assuming your Circle of Trust is called
+      <literal>cot</literal>:</para>
 
-     <programlisting language="xml">&lt;AttributeQueryConfig metaAlias=&quot;/attrQuery&quot;&gt;
+      <programlisting language="xml">&lt;AttributeQueryConfig metaAlias=&quot;/attrQuery&quot;&gt;
     &lt;Attribute name=&quot;signingCertAlias&quot;&gt;
         &lt;Value&gt;&lt;/Value&gt;
     &lt;/Attribute&gt;
@@ -356,9 +359,9 @@ cGy/F2Zuj8XJJpuQRSE6PtQqBuDEHjjmOQJ0rV/r8mO1ZCtHRhpZ5zYRjhRC9eCbjx9VrFax0JDC
     &lt;/Attribute&gt;
 &lt;/AttributeQueryConfig&gt;</programlisting>
 
-     <para>To:</para>
+      <para>To:</para>
 
-     <programlisting language="xml">&lt;AttributeQueryConfig metaAlias=&quot;/attrQuery&quot;&gt;
+      <programlisting language="xml">&lt;AttributeQueryConfig metaAlias=&quot;/attrQuery&quot;&gt;
     &lt;Attribute name=&quot;signingCertAlias&quot;&gt;
         &lt;Value&gt;test&lt;/Value&gt;
     &lt;/Attribute&gt;
@@ -372,491 +375,312 @@ cGy/F2Zuj8XJJpuQRSE6PtQqBuDEHjjmOQJ0rV/r8mO1ZCtHRhpZ5zYRjhRC9eCbjx9VrFax0JDC
         &lt;Value&gt;cot&lt;/Value&gt;
     &lt;/Attribute&gt;
 &lt;/AttributeQueryConfig&gt;</programlisting>
-    </step>
+     </step>
 
-    <step>
-     <para>In OpenAM Console, under Federation &gt; Entity Providers, delete
-     the existing configuration for your new Fedlet.</para>
-    </step>
+     <step>
+      <para>In OpenAM Console, under Federation &gt; Entity Providers, delete
+      the existing configuration for your new Fedlet.</para>
+     </step>
 
-    <step>
-     <para>Under Federation &gt; Entity Providers, click Import Entity... and
-     import your updated Fedlet configuration.</para>
+     <step>
+      <para>Under Federation &gt; Entity Providers, click Import Entity... and
+      import your updated Fedlet configuration.</para>
 
-     <para>This ensures OpenAM has the correct service provider configuration
-     for your new Fedlet.</para>
-    </step>
+      <para>This ensures OpenAM has the correct service provider configuration
+      for your new Fedlet.</para>
+     </step>
 
-    <step>
-     <para>Restart the Fedlet or the container where it is deployed.</para>
-    </step>
-   </substeps>
-  </step>
+     <step>
+      <para>Restart the Fedlet or the container where it is deployed.</para>
+     </step>
+    </substeps>
+   </step>
 
-  <step>
-   <para>Try the Attribute Query test.</para>
+   <step>
+    <para>Try the Attribute Query test.</para>
 
-   <substeps>
-    <step>
-     <para>Access the Fedlet.</para>
+    <substeps>
+     <step>
+      <para>Access the Fedlet.</para>
 
-     <mediaobject xml:id="figure-fedlet-sso-request">
-      <alt>Home page for demo Fedlet</alt>
-      <imageobject>
-       <imagedata fileref="images/fedlet-sso-request.png" format="PNG" />
-      </imageobject>
-      <textobject>
-       <para>The home page for the demo Fedlet lets you try Fedlet (SP)
-       initiated and IDP initiated single sign on and single logout.</para>
-      </textobject>
-     </mediaobject>
-    </step>
+      <mediaobject xml:id="figure-fedlet-sso-request">
+       <alt>Home page for demo Fedlet</alt>
+       <imageobject>
+        <imagedata fileref="images/fedlet-sso-request.png" format="PNG" />
+       </imageobject>
+       <textobject>
+        <para>The home page for the demo Fedlet lets you try Fedlet (SP)
+        initiated and IDP initiated single sign on and single logout.</para>
+       </textobject>
+      </mediaobject>
+     </step>
 
-    <step>
-     <para>Try SSO with user name <literal>demo</literal>, password
-     <literal>changeit</literal>.</para>
+     <step>
+      <para>Try SSO with user name <literal>demo</literal>, password
+      <literal>changeit</literal>.</para>
 
-     <mediaobject xml:id="figure-fedlet-sso-response">
-      <alt>Fedlet SSO response page</alt>
-      <imageobject>
-       <imagedata fileref="images/fedlet-sso-response.png" format="PNG" />
-      </imageobject>
-      <textobject>
-       <para>After signing in, you should see information about the
-       authentication and also other tests to try.</para>
-      </textobject>
-     </mediaobject>
-    </step>
+      <mediaobject xml:id="figure-fedlet-sso-response">
+       <alt>Fedlet SSO response page</alt>
+       <imageobject>
+        <imagedata fileref="images/fedlet-sso-response.png" format="PNG" />
+       </imageobject>
+       <textobject>
+        <para>After signing in, you should see information about the
+        authentication and also other tests to try.</para>
+       </textobject>
+      </mediaobject>
+     </step>
 
-    <step>
-     <para>Click Fedlet Attribute Query, set the attributes in the Attribute
-     Query page to match the mapped attributes, and then click Submit.</para>
+     <step>
+      <para>Click Fedlet Attribute Query, set the attributes in the Attribute
+      Query page to match the mapped attributes, and then click Submit.</para>
 
-     <mediaobject xml:id="figure-fedlet-attr-query-request">
-      <alt>Fedlet Attribute Query request page</alt>
-      <imageobject>
-       <imagedata fileref="images/fedlet-attr-query-request.png" format="PNG" />
-      </imageobject>
-      <textobject>
-       <para>After signing in, you can try the Attribute Query demo.</para>
-      </textobject>
-     </mediaobject>
-    </step>
+      <mediaobject xml:id="figure-fedlet-attr-query-request">
+       <alt>Fedlet Attribute Query request page</alt>
+       <imageobject>
+        <imagedata fileref="images/fedlet-attr-query-request.png" format="PNG" />
+       </imageobject>
+       <textobject>
+        <para>After signing in, you can try the Attribute Query demo.</para>
+       </textobject>
+      </mediaobject>
+     </step>
 
-    <step>
-     <para>Check that you see the attribute values in the response.</para>
+     <step>
+      <para>Check that you see the attribute values in the response.</para>
 
-     <mediaobject xml:id="figure-fedlet-attr-query-response">
-      <alt>Fedlet Attribute Query response page</alt>
-      <imageobject>
-       <imagedata fileref="images/fedlet-attr-query-response.png" format="PNG" />
-      </imageobject>
-      <textobject>
-       <para>The responses for each attribute value in this case should be
-       <literal>demo</literal>.</para>
-      </textobject>
-     </mediaobject>
-    </step>
-   </substeps>
-  </step>
- </procedure>
+      <mediaobject xml:id="figure-fedlet-attr-query-response">
+       <alt>Fedlet Attribute Query response page</alt>
+       <imageobject>
+        <imagedata fileref="images/fedlet-attr-query-response.png" format="PNG" />
+       </imageobject>
+       <textobject>
+        <para>The responses for each attribute value in this case should be
+        <literal>demo</literal>.</para>
+       </textobject>
+      </mediaobject>
+     </step>
+    </substeps>
+   </step>
+  </procedure>
 
- <procedure xml:id="try-fedlet-xacml-query">
-  <title>To Try the Fedlet XACML Query</title>
+  <procedure xml:id="try-fedlet-xacml-query">
+   <title>To Try the Fedlet XACML Query</title>
 
-  <para>To try the Fedlet XACML Query test, the Identity Provider
-  must have a policy configured, must be configured with the Policy Decision
-  Point (<literal>XACML PDP</literal>) type, and must have a SAMLv2 SOAP Binding
-  PDP handler configured.</para>
+   <para>To try the Fedlet XACML Query test, the Identity Provider
+   must have a policy configured, must be configured with the Policy Decision
+   Point (<literal>XACML PDP</literal>) type, and must have a SAMLv2 SOAP Binding
+   PDP handler configured.</para>
 
-  <step>
-   <para>Configure a policy on the hosted Identity Provider.</para>
+   <step>
+    <para>Configure a policy on the hosted Identity Provider.</para>
 
-   <para>OpenAM uses the policy to make the decision whether to permit or deny
-   access to a resource. For the purpose of the demonstration, configure a
-   simple policy that allows all authenticated users HTTP GET access on
-   <literal>http://www.example.com/</literal>.</para>
+    <para>OpenAM uses the policy to make the decision whether to permit or deny
+    access to a resource. For the purpose of the demonstration, configure a
+    simple policy that allows all authenticated users HTTP GET access on
+    <literal>http://www.example.com/</literal>.</para>
 
-   <substeps>
-    <step>
-     <para>Log in to OpenAM console as <literal>amadmin</literal>.</para>
-    </step>
+    <substeps>
+     <step>
+      <para>Log in to OpenAM console as <literal>amadmin</literal>.</para>
+     </step>
 
-    <step>
-     <para>Under Access Control &gt; <replaceable>realm-name</replaceable> &gt;
-     Policies, click New Policy...</para>
-    </step>
+     <step>
+      <para>Under Access Control &gt; <replaceable>realm-name</replaceable> &gt;
+      Policies, click New Policy...</para>
+     </step>
 
-    <step>
-     <para>Set Name: Test policy.</para>
-    </step>
+     <step>
+      <para>Set Name: Test policy.</para>
+     </step>
 
-    <step>
-     <para>Click Rules &gt; New... and set the following.</para>
+     <step>
+      <para>Click Rules &gt; New... and set the following.</para>
 
-     <itemizedlist>
-      <listitem><para>Service Type: <literal>URL Policy Agent</literal></para></listitem>
-      <listitem><para>Name: <literal>http://www.example.com/</literal></para></listitem>
-      <listitem><para>Resource Name: <literal>http://www.example.com/</literal></para></listitem>
-      <listitem><para>Actions: allow <literal>GET</literal></para></listitem>
-     </itemizedlist>
+      <itemizedlist>
+       <listitem><para>Service Type: <literal>URL Policy Agent</literal></para></listitem>
+       <listitem><para>Name: <literal>http://www.example.com/</literal></para></listitem>
+       <listitem><para>Resource Name: <literal>http://www.example.com/</literal></para></listitem>
+       <listitem><para>Actions: allow <literal>GET</literal></para></listitem>
+      </itemizedlist>
 
-     <para>Then click Finish.</para>
-    </step>
+      <para>Then click Finish.</para>
+     </step>
 
-    <step>
-     <para>Click Subjects &gt; New... and set the following.</para>
+     <step>
+      <para>Click Subjects &gt; New... and set the following.</para>
 
-     <itemizedlist>
-      <listitem><para>Type: <literal>Authenticated Users</literal></para></listitem>
-      <listitem><para>Name: <literal>All authenticated users</literal></para></listitem>
-     </itemizedlist>
+      <itemizedlist>
+       <listitem><para>Type: <literal>Authenticated Users</literal></para></listitem>
+       <listitem><para>Name: <literal>All authenticated users</literal></para></listitem>
+      </itemizedlist>
 
-     <para>Then click Finish.</para>
-    </step>
+      <para>Then click Finish.</para>
+     </step>
 
-    <step>
-     <para>Click OK to save the new Test policy.</para>
-    </step>
-   </substeps>
-  </step>
+     <step>
+      <para>Click OK to save the new Test policy.</para>
+     </step>
+    </substeps>
+   </step>
 
-  <step>
-   <para>Add the Policy Decision Point type to the Identity Provider.</para>
+   <step>
+    <para>Add the Policy Decision Point type to the Identity Provider.</para>
 
-   <substeps>
-    <step>
-     <para>Under Federation &gt; Entity Providers, select the Identity Provider,
-     and then click New..., even though you plan to change the configuration
-     rather than create a new provider.</para>
-    </step>
+    <substeps>
+     <step>
+      <para>Under Federation &gt; Entity Providers, select the Identity Provider,
+      and then click New..., even though you plan to change the configuration
+      rather than create a new provider.</para>
+     </step>
 
-    <step>
-     <para>Select the protocol of the provider: SAMLv2.</para>
-    </step>
+     <step>
+      <para>Select the protocol of the provider: SAMLv2.</para>
+     </step>
 
-    <step>
-     <para>In the Create SAMLv2 Entity Provider page, do the following.</para>
+     <step>
+      <para>In the Create SAMLv2 Entity Provider page, do the following.</para>
 
-     <itemizedlist>
-      <listitem>
-       <para>Set the Realm.</para>
-      </listitem>
+      <itemizedlist>
+       <listitem>
+        <para>Set the Realm.</para>
+       </listitem>
 
-      <listitem>
-       <para>Set the Entity Identifier to the entity identifier for the hosted
-       Identity Provider.</para>
-      </listitem>
+       <listitem>
+        <para>Set the Entity Identifier to the entity identifier for the hosted
+        Identity Provider.</para>
+       </listitem>
 
-      <listitem>
-       <para>In the XACML Policy Decision Point section, set the Meta Alias for
-       example to <literal>/pdp</literal>.</para>
-      </listitem>
+       <listitem>
+        <para>In the XACML Policy Decision Point section, set the Meta Alias for
+        example to <literal>/pdp</literal>.</para>
+       </listitem>
 
-      <listitem>
-       <para>Click Create to save your changes.</para>
+       <listitem>
+        <para>Click Create to save your changes.</para>
 
-       <para>Disregard any error messages stating that the entity already
-       exists.</para>
-      </listitem>
-     </itemizedlist>
+        <para>Disregard any error messages stating that the entity already
+        exists.</para>
+       </listitem>
+      </itemizedlist>
 
-     <para><literal>XACML PDP</literal> now appears in the list of Types for
-     your identity provider.</para>
-    </step>
-   </substeps>
-  </step>
+      <para><literal>XACML PDP</literal> now appears in the list of Types for
+      your identity provider.</para>
+     </step>
+    </substeps>
+   </step>
 
-  <step>
-   <para>Add the PDP handler for the SAMLv2 SOAP Binding.</para>
+   <step>
+    <para>Add the PDP handler for the SAMLv2 SOAP Binding.</para>
 
-   <substeps>
-    <step>
-     <para>Under Configuration &gt; Global &gt; SAMLv2 SOAP Binding, click
-     New...</para>
-    </step>
+    <substeps>
+     <step>
+      <para>Under Configuration &gt; Global &gt; SAMLv2 SOAP Binding, click
+      New...</para>
+     </step>
 
-    <step>
-     <para>Set the new key to match the meta alias you used when adding the
-     XACML PDP type to the Identity Provider configuration, for example
-     <literal>/pdp</literal>.</para>
+     <step>
+      <para>Set the new key to match the meta alias you used when adding the
+      XACML PDP type to the Identity Provider configuration, for example
+      <literal>/pdp</literal>.</para>
 
-     <itemizedlist>
-      <listitem><para>Key: <literal>/pdp</literal></para></listitem>
-      <listitem><para>Class: <literal>com.sun.identity.xacml.plugins.XACMLAuthzDecisionQueryHandler</literal></para></listitem>
-     </itemizedlist>
+      <itemizedlist>
+       <listitem><para>Key: <literal>/pdp</literal></para></listitem>
+       <listitem><para>Class: <literal>com.sun.identity.xacml.plugins.XACMLAuthzDecisionQueryHandler</literal></para></listitem>
+      </itemizedlist>
 
-     <para>Click OK. (Your changes are not saved, yet.)</para>
-    </step>
+      <para>Click OK. (Your changes are not saved, yet.)</para>
+     </step>
 
-    <step>
-     <para>Click Save to actually save the new Key:Class pair.</para>
-    </step>
-   </substeps>
-  </step>
+     <step>
+      <para>Click Save to actually save the new Key:Class pair.</para>
+     </step>
+    </substeps>
+   </step>
 
-  <step>
-   <para>Create the Fedlet as described in <xref linkend="create-a-java-fedlet" />.</para>
+   <step>
+    <para>Create the Fedlet as described in <xref linkend="create-a-java-fedlet" />.</para>
 
-   <para>This step creates a Fedlet with updated identity provider metadata.
-   If you already created a Fedlet, either use a different name, or delete
-   the existing Fedlet.</para>
-  </step>
+    <para>This step creates a Fedlet with updated identity provider metadata.
+    If you already created a Fedlet, either use a different name, or delete
+    the existing Fedlet.</para>
+   </step>
 
-  <step>
-   <para>Deploy the new Fedlet .war as described in <xref linkend="install-fedlet-as-demo" />.</para>
-  </step>
+   <step>
+    <para>Deploy the new Fedlet .war as described in <xref linkend="install-fedlet-as-demo" />.</para>
+   </step>
 
-  <step>
-   <para>Try the XACML Query test.</para>
+   <step>
+    <para>Try the XACML Query test.</para>
 
-   <substeps>
-    <step>
-     <para>Access the Fedlet.</para>
+    <substeps>
+     <step>
+      <para>Access the Fedlet.</para>
 
-     <mediaobject xml:id="figure-fedlet-sso-request-xacml">
-      <alt>Home page for demo Fedlet</alt>
-      <imageobject>
-       <imagedata fileref="images/fedlet-sso-request.png" format="PNG" />
-      </imageobject>
-      <textobject>
-       <para>The home page for the demo Fedlet lets you try Fedlet (SP)
-       initiated and IDP initiated single sign on and single logout.</para>
-      </textobject>
-     </mediaobject>
-    </step>
+      <mediaobject xml:id="figure-fedlet-sso-request-xacml">
+       <alt>Home page for demo Fedlet</alt>
+       <imageobject>
+        <imagedata fileref="images/fedlet-sso-request.png" format="PNG" />
+       </imageobject>
+       <textobject>
+        <para>The home page for the demo Fedlet lets you try Fedlet (SP)
+        initiated and IDP initiated single sign on and single logout.</para>
+       </textobject>
+      </mediaobject>
+     </step>
 
-    <step>
-     <para>Try SSO with user name <literal>demo</literal>, password
-     <literal>changeit</literal>.</para>
+     <step>
+      <para>Try SSO with user name <literal>demo</literal>, password
+      <literal>changeit</literal>.</para>
 
-     <mediaobject xml:id="figure-fedlet-sso-response-xacml">
-      <alt>Fedlet SSO response page</alt>
-      <imageobject>
-       <imagedata fileref="images/fedlet-sso-response.png" format="PNG" />
-      </imageobject>
-      <textobject>
-       <para>After signing in, you should see information about the
-       authentication and also other tests to try.</para>
-      </textobject>
-     </mediaobject>
-    </step>
+      <mediaobject xml:id="figure-fedlet-sso-response-xacml">
+       <alt>Fedlet SSO response page</alt>
+       <imageobject>
+        <imagedata fileref="images/fedlet-sso-response.png" format="PNG" />
+       </imageobject>
+       <textobject>
+        <para>After signing in, you should see information about the
+        authentication and also other tests to try.</para>
+       </textobject>
+      </mediaobject>
+     </step>
 
-    <step>
-     <para>Click XACML Attribute Query, set the Resource URL in the XACML
-     Query page to <literal>http://www.example.com/</literal>, and then
-     click Submit.</para>
+     <step>
+      <para>Click XACML Attribute Query, set the Resource URL in the XACML
+      Query page to <literal>http://www.example.com/</literal>, and then
+      click Submit.</para>
 
-     <mediaobject xml:id="figure-fedlet-xacml-query-request">
-      <alt>Fedlet XACML Query request page</alt>
-      <imageobject>
-       <imagedata fileref="images/fedlet-xacml-query-request.png" format="PNG" />
-      </imageobject>
-      <textobject>
-       <para>After signing in, you can try the XACML Query demo.</para>
-      </textobject>
-     </mediaobject>
-    </step>
+      <mediaobject xml:id="figure-fedlet-xacml-query-request">
+       <alt>Fedlet XACML Query request page</alt>
+       <imageobject>
+        <imagedata fileref="images/fedlet-xacml-query-request.png" format="PNG" />
+       </imageobject>
+       <textobject>
+        <para>After signing in, you can try the XACML Query demo.</para>
+       </textobject>
+      </mediaobject>
+     </step>
 
-    <step>
-     <para>Check that you see the permit decision in the response.</para>
+     <step>
+      <para>Check that you see the permit decision in the response.</para>
 
-     <mediaobject xml:id="figure-fedlet-xacml-query-response">
-      <alt>Fedlet XACML Query response page</alt>
-      <imageobject>
-       <imagedata fileref="images/fedlet-xacml-query-response.png" format="PNG" />
-      </imageobject>
-      <textobject>
-       <para>The response is to permit the user to access the resource.</para>
-      </textobject>
-     </mediaobject>
-    </step>
-   </substeps>
-  </step>
- </procedure>
-
- <procedure xml:id="hello-world-with-fedlet">
-  <title>To Add Your Application</title>
-  
-  <variablelist>
-   <para>The Fedlet includes the following files that you use when building
-   your own service provider application based on the demo web application,
-   including a set of JavaServer Pages (JSP) examples.</para>
-   <varlistentry>
-    <term><filename>conf/</filename></term>
-    <listitem>
-     <para>Configuration files copied to <filename>$HOME/fedlet</filename> when
-     you first deploy and configure the Fedlet. When deploying your application,
-     you can move these to an alternate location passed to the Java virtual
-     machine for the web application container at startup. For example, if
-     you store the configuration under <filename>/export/fedlet/</filename>,
-     then you could pass the following property to the JVM.</para>
-     <literallayout class="monospaced"
-     >-Dcom.sun.identity.fedlet.home=/export/fedlet/conf</literallayout>
-     <para>You do not need to include these files in your application.</para>
-    </listitem>
-   </varlistentry>
-   <varlistentry>
-    <term><filename>fedletAttrQuery.jsp</filename></term>
-    <term><filename>fedletAttrResp.jsp</filename></term>
-    <listitem>
-     <para>Sample SAML attribute query and response handlers.</para>
-    </listitem>
-   </varlistentry>
-   <varlistentry>
-    <term><filename>fedletEncode.jsp</filename></term>
-    <listitem>
-     <para>Utility JSP to encode a password, such as the password used to
-     protect a Java keystore</para>
-    </listitem>
-   </varlistentry>
-   <varlistentry>
-    <term><filename>fedletSampleApp.jsp</filename></term>
-    <term><filename>index.jsp</filename></term>
-    <listitem>
-     <para>Demo application. You can remove these before deployment to replace
-     them with your application.</para>
-    </listitem>
-   </varlistentry>
-   <varlistentry>
-    <term><filename>fedletXACMLQuery.jsp</filename></term>
-    <term><filename>fedletXACMLResp.jsp</filename></term>
-    <listitem>
-     <para>Sample SAML XACML query and response handlers.</para>
-    </listitem>
-   </varlistentry>
-   <varlistentry>
-    <term><filename>logout.jsp</filename></term>
-    <listitem>
-     <para>Utility page to perform single log out</para>
-    </listitem>
-   </varlistentry>
-   <varlistentry>
-    <term><filename>saml2/jsp/</filename></term>
-    <listitem>
-     <para>JSPs to initiate single sign on and single logout, and to handle
-     errors, and also a JSP for obtaining Fedlet metadata,
-     <filename>saml2/jsp/exportmetadata.jsp</filename></para>
-    </listitem>
-   </varlistentry>
-   <varlistentry>
-    <term><filename>WEB-INF/classes/</filename></term>
-    <listitem>
-     <para>Localized Java properties files for strings used in the Fedlet user
-     interface</para>
-    </listitem>
-   </varlistentry>
-   <varlistentry>
-    <term><filename>WEB-INF/lib/</filename></term>
-    <listitem>
-     <para>Fedlet libraries required by your application</para>
-    </listitem>
-   </varlistentry>
-   <varlistentry>
-    <term><filename>WEB-INF/web.xml</filename></term>
-    <listitem>
-     <para>Fedlet web application configuration, showing how JSPs map to URLs
-     used in the Fedlet. Add mappings for your application before
-     deployment.</para>
-     <para>In the <filename>web.xml</filename> mappings, your application must
-     be mapped to <literal>/fedletapplication</literal>, as this is the
-     assertion consumer URL set in the Fedlet metadata.</para>
-     <programlisting language="xml">&lt;servlet&gt;
-    &lt;servlet-name&gt;yourApp&lt;/servlet-name&gt;
-    &lt;jsp-file&gt;/fedletSampleApp.jsp&lt;/jsp-file&gt;
-&lt;/servlet&gt;
-&lt;servlet-mapping&gt;
-    &lt;servlet-name&gt;yourApp&lt;/servlet-name&gt;
-    &lt;url-pattern&gt;/fedletapplication&lt;/url-pattern&gt;
-&lt;/servlet-mapping&gt;</programlisting>
-    </listitem>
-   </varlistentry>
-  </variablelist>
-
-  <para>Follow these steps for a very simple demonstration of how to customize
-  the Fedlet.</para>
-  <step>
-   <para>Backup <filename>fedletSampleApp.jsp</filename>.</para>
-   <screen>$ cd /path/to/tomcat/webapps/fedlet/
-$ cp fedletSampleApp.jsp fedletSampleApp.jsp.orig</screen>
-  </step>
-  <step>
-   <para>Edit <filename>fedletSampleApp.jsp</filename> to reduce it to a single
-   redirection to <filename>myapp.jsp</filename>. An implementation of the
-   &lt;html&gt; element of the file follows below.</para>
-   <programlisting language="html">&lt;html&gt;
-&lt;head&gt;
-    &lt;title&gt;Fedlet Sample Application&lt;/title&gt;
-    &lt;meta http-equiv=&quot;Content-Type&quot; content=&quot;text/html; charset=iso-8859-1&quot; /&gt;
-&lt;/head&gt;
-
-&lt;body&gt;
-&lt;%
-    // BEGIN : following code is a must for Fedlet (SP) side application
-    Map map;
-    try {
-        // invoke the Fedlet processing logic. this will do all the
-        // necessary processing conforming to SAMLv2 specifications,
-        // such as XML signature validation, Audience and Recipient
-        // validation etc.  
-        map = SPACSUtils.processResponseForFedlet(request, response);
-        response.sendRedirect(&quot;myapp.jsp&quot;);
-    } catch (SAML2Exception sme) {
-        SAMLUtils.sendError(request, response,
-            response.SC_INTERNAL_SERVER_ERROR, &quot;failedToProcessSSOResponse&quot;,
-            sme.getMessage());
-        return;
-    } catch (IOException ioe) {
-        SAMLUtils.sendError(request, response,
-            response.SC_INTERNAL_SERVER_ERROR, &quot;failedToProcessSSOResponse&quot;,
-            ioe.getMessage());
-        return;
-    } catch (SessionException se) {
-        SAMLUtils.sendError(request, response, 
-            response.SC_INTERNAL_SERVER_ERROR, &quot;failedToProcessSSOResponse&quot;,
-            se.getMessage());
-        return;
-    } catch (ServletException se) {
-        SAMLUtils.sendError(request, response,
-            response.SC_BAD_REQUEST, &quot;failedToProcessSSOResponse&quot;,
-            se.getMessage());
-        return;
-    }
-    // END : code is a must for Fedlet (SP) side application
-%&gt;
-&lt;/body&gt;
-&lt;/html&gt;</programlisting>
-  </step>
-  <step>
-   <para>Add a <filename>myapp.jsp</filename> page to the Fedlet, such as the
-   following.</para>
-   <programlisting language="html">&lt;html&gt;
-&lt;head&gt;
-&lt;title&gt;My Application&lt;/title&gt;
-&lt;meta http-equiv=&quot;Content-Type&quot; content=&quot;text/html&quot; /&gt;
-&lt;/head&gt;
-
-&lt;body&gt;
-&lt;h1&gt;My Application&lt;/h1&gt;
-&lt;p&gt;After you change the &lt;code&gt;fedletSampleApp.jsp&lt;/code&gt;,
-   all it does is redirect to this home page after
-   successful login.&lt;/p&gt;
-&lt;p&gt;See the fedlet README file and example JSPs for hints
-   on how to retrieve attributes from OpenAM, or to send
-   XACML queries for policy decisions.&lt;/p&gt;
-&lt;/body&gt;
-&lt;/html&gt;</programlisting>
-  </step>
-  <step>
-   <para>Browse to the Fedlet URL, such as
-   <literal>http://openam.example.com:8080/fedlet/</literal>, and try one
-   of the login methods.</para>
-   <para>After login you are redirected to <filename>myapp.jsp</filename>.</para>
-  </step>
- </procedure>
+      <mediaobject xml:id="figure-fedlet-xacml-query-response">
+       <alt>Fedlet XACML Query response page</alt>
+       <imageobject>
+        <imagedata fileref="images/fedlet-xacml-query-response.png" format="PNG" />
+       </imageobject>
+       <textobject>
+        <para>The response is to permit the user to access the resource.</para>
+       </textobject>
+      </mediaobject>
+     </step>
+    </substeps>
+   </step>
+  </procedure>
+ </section>
 
  <section xml:id="fedlet-signing-encryption">
-  <title>Signing &amp; Encryption</title>
+  <title>Signing &amp; Encryption For a Fedlet</title>
 
   <para>By default when you create the Java Fedlet, signing and encryption are
   not configured. You can however set up OpenAM and the fedlet to sign and
@@ -1250,5 +1074,303 @@ cGy/F2Zuj8XJJpuQRSE6PtQqBuDEHjjmOQJ0rV/r8mO1ZCtHRhpZ5zYRjhRC9eCbjx9VrFax0JDC
     metadata.</para>
    </step>
   </procedure>
+ </section>
+
+ <section xml:id="customize-java-fedlet">
+  <title>Customizing a Java Fedlet</title>
+
+  <para>You can customize the Java Fedlet to perform many of the SAML 2.0
+  service provider operations. The Java Fedlet has the SAML 2.0 capabilities
+  identified in the table in the <citetitle>Administration Guide</citetitle>,
+  <link xlink:show="new" xlink:href="admin-guide#fedlet-saml2-features"
+  xlink:role="http://docbook.org/xlink/role/olink"><citetitle>Fedlet Support for
+  SAML 2.0 Features</citetitle></link>.</para>
+
+  <procedure xml:id="hello-world-with-fedlet">
+   <title>To Add Your Application</title>
+
+   <variablelist>
+    <para>The Fedlet includes the following files that you use when building
+    your own service provider application based on the demo web application,
+    including a set of JavaServer Pages (JSP) examples.</para>
+    <varlistentry>
+     <term><filename>conf/</filename></term>
+     <listitem>
+      <para>Configuration files copied to <filename>$HOME/fedlet</filename> when
+      you first deploy and configure the Fedlet. When deploying your application,
+      you can move these to an alternate location passed to the Java virtual
+      machine for the web application container at startup. For example, if
+      you store the configuration under <filename>/export/fedlet/</filename>,
+      then you could pass the following property to the JVM.</para>
+      <literallayout class="monospaced"
+      >-Dcom.sun.identity.fedlet.home=/export/fedlet/conf</literallayout>
+      <para>You do not need to include these files in your application.</para>
+     </listitem>
+    </varlistentry>
+    <varlistentry>
+     <term><filename>fedletAttrQuery.jsp</filename></term>
+     <term><filename>fedletAttrResp.jsp</filename></term>
+     <listitem>
+      <para>Sample SAML attribute query and response handlers.</para>
+     </listitem>
+    </varlistentry>
+    <varlistentry>
+     <term><filename>fedletEncode.jsp</filename></term>
+     <listitem>
+      <para>Utility JSP to encode a password, such as the password used to
+      protect a Java keystore</para>
+     </listitem>
+    </varlistentry>
+    <varlistentry>
+     <term><filename>fedletSampleApp.jsp</filename></term>
+     <term><filename>index.jsp</filename></term>
+     <listitem>
+      <para>Demo application. You can remove these before deployment to replace
+      them with your application.</para>
+     </listitem>
+    </varlistentry>
+    <varlistentry>
+     <term><filename>fedletXACMLQuery.jsp</filename></term>
+     <term><filename>fedletXACMLResp.jsp</filename></term>
+     <listitem>
+      <para>Sample SAML XACML query and response handlers.</para>
+     </listitem>
+    </varlistentry>
+    <varlistentry>
+     <term><filename>logout.jsp</filename></term>
+     <listitem>
+      <para>Utility page to perform single log out</para>
+     </listitem>
+    </varlistentry>
+    <varlistentry>
+     <term><filename>saml2/jsp/</filename></term>
+     <listitem>
+      <para>JSPs to initiate single sign on and single logout, and to handle
+      errors, and also a JSP for obtaining Fedlet metadata,
+      <filename>saml2/jsp/exportmetadata.jsp</filename></para>
+     </listitem>
+    </varlistentry>
+    <varlistentry>
+     <term><filename>WEB-INF/classes/</filename></term>
+     <listitem>
+      <para>Localized Java properties files for strings used in the Fedlet user
+      interface</para>
+     </listitem>
+    </varlistentry>
+    <varlistentry>
+     <term><filename>WEB-INF/lib/</filename></term>
+     <listitem>
+      <para>Fedlet libraries required by your application</para>
+     </listitem>
+    </varlistentry>
+    <varlistentry>
+     <term><filename>WEB-INF/web.xml</filename></term>
+     <listitem>
+      <para>Fedlet web application configuration, showing how JSPs map to URLs
+      used in the Fedlet. Add mappings for your application before
+      deployment.</para>
+      <para>In the <filename>web.xml</filename> mappings, your application must
+      be mapped to <literal>/fedletapplication</literal>, as this is the
+      assertion consumer URL set in the Fedlet metadata.</para>
+      <programlisting language="xml">&lt;servlet&gt;
+    &lt;servlet-name&gt;yourApp&lt;/servlet-name&gt;
+    &lt;jsp-file&gt;/fedletSampleApp.jsp&lt;/jsp-file&gt;
+&lt;/servlet&gt;
+&lt;servlet-mapping&gt;
+    &lt;servlet-name&gt;yourApp&lt;/servlet-name&gt;
+    &lt;url-pattern&gt;/fedletapplication&lt;/url-pattern&gt;
+&lt;/servlet-mapping&gt;</programlisting>
+     </listitem>
+    </varlistentry>
+   </variablelist>
+
+   <para>Follow these steps for a very simple demonstration of how to customize
+   the Fedlet.</para>
+   <step>
+    <para>Backup <filename>fedletSampleApp.jsp</filename>.</para>
+    <screen>$ cd /path/to/tomcat/webapps/fedlet/
+$ cp fedletSampleApp.jsp fedletSampleApp.jsp.orig</screen>
+   </step>
+   <step>
+    <para>Edit <filename>fedletSampleApp.jsp</filename> to reduce it to a single
+    redirection to <filename>myapp.jsp</filename>. An implementation of the
+    &lt;html&gt; element of the file follows below.</para>
+    <programlisting language="html">&lt;html&gt;
+&lt;head&gt;
+    &lt;title&gt;Fedlet Sample Application&lt;/title&gt;
+    &lt;meta http-equiv=&quot;Content-Type&quot; content=&quot;text/html; charset=iso-8859-1&quot; /&gt;
+&lt;/head&gt;
+
+&lt;body&gt;
+&lt;%
+    // BEGIN : following code is a must for Fedlet (SP) side application
+    Map map;
+    try {
+        // invoke the Fedlet processing logic. this will do all the
+        // necessary processing conforming to SAMLv2 specifications,
+        // such as XML signature validation, Audience and Recipient
+        // validation etc.
+        map = SPACSUtils.processResponseForFedlet(request, response);
+        response.sendRedirect(&quot;myapp.jsp&quot;);
+    } catch (SAML2Exception sme) {
+        SAMLUtils.sendError(request, response,
+            response.SC_INTERNAL_SERVER_ERROR, &quot;failedToProcessSSOResponse&quot;,
+            sme.getMessage());
+        return;
+    } catch (IOException ioe) {
+        SAMLUtils.sendError(request, response,
+            response.SC_INTERNAL_SERVER_ERROR, &quot;failedToProcessSSOResponse&quot;,
+            ioe.getMessage());
+        return;
+    } catch (SessionException se) {
+        SAMLUtils.sendError(request, response,
+            response.SC_INTERNAL_SERVER_ERROR, &quot;failedToProcessSSOResponse&quot;,
+            se.getMessage());
+        return;
+    } catch (ServletException se) {
+        SAMLUtils.sendError(request, response,
+            response.SC_BAD_REQUEST, &quot;failedToProcessSSOResponse&quot;,
+            se.getMessage());
+        return;
+    }
+    // END : code is a must for Fedlet (SP) side application
+%&gt;
+&lt;/body&gt;
+&lt;/html&gt;</programlisting>
+   </step>
+   <step>
+    <para>Add a <filename>myapp.jsp</filename> page to the Fedlet, such as the
+    following.</para>
+    <programlisting language="html">&lt;html&gt;
+&lt;head&gt;
+&lt;title&gt;My Application&lt;/title&gt;
+&lt;meta http-equiv=&quot;Content-Type&quot; content=&quot;text/html&quot; /&gt;
+&lt;/head&gt;
+
+&lt;body&gt;
+&lt;h1&gt;My Application&lt;/h1&gt;
+&lt;p&gt;After you change the &lt;code&gt;fedletSampleApp.jsp&lt;/code&gt;,
+   all it does is redirect to this home page after
+   successful login.&lt;/p&gt;
+&lt;p&gt;See the fedlet README file and example JSPs for hints
+   on how to retrieve attributes from OpenAM, or to send
+   XACML queries for policy decisions.&lt;/p&gt;
+&lt;/body&gt;
+&lt;/html&gt;</programlisting>
+   </step>
+   <step>
+    <para>Browse to the Fedlet URL, such as
+    <literal>http://openam.example.com:8080/fedlet/</literal>, and try one
+    of the login methods.</para>
+    <para>After login you are redirected to <filename>myapp.jsp</filename>.</para>
+   </step>
+  </procedure>
+
+  <section xml:id="fedlet-perform-sso">
+   <title>Performing Single Sign-On</title>
+
+   <para>The Java Fedlet includes a JSP file,
+   <filename>saml2/jsp/fedletSSOInit.jsp</filename>, that you can call to
+   initiate single sign-on from the Fedlet (SP) side. The Fedlet home page,
+   <filename>index.jsp</filename>, calls this page when the user does
+   Fedlet-initiated single sign-on.</para>
+
+   <para>When calling this JSP, the parameters to use are those also used by
+   <filename>saml2/jsp/spSSOInit.jsp</filename> in OpenAM. Those parameters are
+   described in the <citetitle>Administration Guide</citetitle> section,
+   <link xlink:show="new" xlink:href="admin-guide#spssoinit-parameters"
+   xlink:role="http://docbook.org/xlink/role/olink"><citetitle
+   ><filename>spSSOInit.jsp</filename> Parameters</citetitle></link>.</para>
+
+   <para>For IDP-initiated single sign-on, call the appropriate page on the
+   Identity Provider. OpenAM's page is described in the
+   <citetitle>Administration Guide</citetitle> section,
+   <link xlink:show="new" xlink:href="admin-guide#idpssoinit-parameters"
+   xlink:role="http://docbook.org/xlink/role/olink"><citetitle
+   ><filename>idpSSOInit.jsp</filename> Parameters</citetitle></link>.</para>
+
+   <para>After single sign-on, the user-agent is directed by default to the
+   assertion consumer URI set in the Fedlet metadata, which by default is
+   <literal>/fedletapplication</literal>. Also by default that URI points to
+   the JSP, <filename>fedletSampleApp.jsp</filename></para>
+  </section>
+
+  <section xml:id="fedlet-perform-slo">
+   <title>Performing Single Logout</title>
+
+   <para>The Java Fedlet includes a JSP file,
+   <filename>saml2/jsp/spSingleLogoutInit.jsp</filename>, that you can call to
+   initiate single logout from the Fedlet (SP) side. The Fedlet assertion
+   consumer page, <filename>fedletSampleApp.jsp</filename>, calls this when
+   the user does Fedlet-initiated single logout.</para>
+
+   <para>When calling this JSP, the parameters to use are those also used by
+   <filename>saml2/jsp/spSingleLogoutInit.jsp</filename> in OpenAM. Those
+   parameters are described in the <citetitle>Administration Guide</citetitle>
+   section, <link xlink:show="new" xlink:href="admin-guide#spsloinit-parameters"
+   xlink:role="http://docbook.org/xlink/role/olink"><citetitle
+   ><filename>spSingleLogoutInit.jsp</filename> Parameters</citetitle></link>.</para>
+
+   <para>For IDP-initiated single logout, call the appropriate page on the
+   Identity Provider. OpenAM's page is described in the
+   <citetitle>Administration Guide</citetitle> section,
+   <link xlink:show="new" xlink:href="admin-guide#idpsloinit-parameters"
+   xlink:role="http://docbook.org/xlink/role/olink"><citetitle
+   ><filename>idpSingleLogoutInit.jsp</filename> Parameters</citetitle></link>.</para>
+
+   <para>Set the <literal>RelayState</literal> parameter when initiating logout
+   to redirect the user-agent appropriately when the process is complete.</para>
+  </section>
+
+  <section xml:id="fedlet-perform-attr-query">
+   <title>Performing Attribute Queries</title>
+
+   <para>As seen in the procedure, <xref linkend="try-fedlet-attribute-query" />,
+   an attribute query allows the Fedlet to get profile information about a
+   subject from the Attribute Authority. The Fedlet must be configured to deal
+   with responses from the Attribute Authority, including configuration for
+   signing and encryption. Also, an Identity Provider and Attribute Authority
+   is likely to share only those attributes that the Fedlet absolutely requires
+   to provide service, such as, for example, a name to customize a page. The
+   attributes must then be mapped in the Attribute Authority and Fedlet
+   metadata.</para>
+
+   <para>The Java Fedlet includes a JSP file,
+   <filename>fedletAttrQuery.jsp</filename>, which is used in the procedure
+   described above to prepare an attribute query using the transient subject
+   identifier obtained during single sign-on. The
+   <filename>fedletAttrQuery.jsp</filename> also supports using the Subject
+   name from an X.509 identity certificate.</para>
+
+   <para>Another JSP file, <filename>fedletAttrResp.jsp</filename>, sends the
+   query to the Attribute Authority using
+   <literal>com.sun.identity.saml2.profile.AttributeQueryUtil.html.getAttributesForFedlet()</literal>,
+   and if successful processes the result, which is a
+   <literal>java.util.Map</literal> of the attribute types and their
+   values.</para>
+  </section>
+
+  <section xml:id="fedlet-perform-xacml-query">
+   <title>Performing XACML Queries</title>
+
+   <para>As seen in the procedure, <xref linkend="try-fedlet-xacml-query" />,
+   a XACML query allows the Fedlet to request a policy decision from a XACML
+   PDP. You can configure OpenAM to respond to such queries as described in that
+   procedure.</para>
+
+   <para>The Java Fedlet includes a JSP file,
+   <filename>fedletXACMLQuery.jsp</filename>, which is used in the procedure
+   described above to prepare a XACML query, identifying a resource URL and a
+   type of HTTP operation to perform, and specifying the subject identifier
+   obtained during single sign-on.</para>
+
+   <para>Another JSP file, <filename>fedletXACMLResp.jsp</filename>, sends the
+   query to the XACML PDP using
+   <literal>com.sun.identity.saml2.profile.XACMLQueryUtil.getPolicyDecisionForFedlet()</literal>,
+   and if successful processes the result, which is a
+   <literal>java.lang.String</literal> representing the decision, such as
+   <literal>Permit</literal> if the decision is to allow access, or
+   <literal>Deny</literal> if the decision is to deny access.</para>
+  </section>
  </section>
 </chapter>
