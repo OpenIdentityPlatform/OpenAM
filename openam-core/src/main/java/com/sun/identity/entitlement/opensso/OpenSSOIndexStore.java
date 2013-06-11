@@ -382,38 +382,45 @@ public class OpenSSOIndexStore extends PrivilegeIndexStore {
     }
 
     public Iterator<IPrivilege> search(String realm,
-        ResourceSearchIndexes indexes,
-        Set<String> subjectIndexes, 
-        boolean bSubTree,
-        boolean bReferral
+                                       ResourceSearchIndexes indexes,
+                                       Set<String> subjectIndexes,
+                                       boolean bSubTree,
+                                       boolean bReferral
     ) throws EntitlementException {
         BufferedIterator iterator = (isMultiThreaded) ? new BufferedIterator() :
-            new SimpleIterator();
-        Set setDNs = new HashSet();
-        if (indexCacheSize > 0) {
-            setDNs.addAll(searchPrivileges(indexes, subjectIndexes, bSubTree,
-                iterator));
-            setDNs.addAll(searchReferrals(indexes, bSubTree, iterator));
-        }
+                new SimpleIterator();
 
-        if (bReferral) {
-            String tmp = (DN.isDN(realm)) ?
-                DNMapper.orgNameToRealmName(realm) : realm;
-            if (tmp.equals("/")) { 
-                ReferralPrivilege ref = getOrgAliasReferral(indexes);
-                if (ref != null) {
-                    iterator.add(ref);
+        // Only interested in the search if some indexes have been provided to search against.
+        if (!indexes.isEmpty()) {
+
+            Set setDNs = new HashSet();
+            if (indexCacheSize > 0) {
+                setDNs.addAll(searchPrivileges(indexes, subjectIndexes, bSubTree,
+                        iterator));
+                setDNs.addAll(searchReferrals(indexes, bSubTree, iterator));
+            }
+
+            if (bReferral) {
+                String tmp = (DN.isDN(realm)) ?
+                        DNMapper.orgNameToRealmName(realm) : realm;
+                if (tmp.equals("/")) {
+                    ReferralPrivilege ref = getOrgAliasReferral(indexes);
+                    if (ref != null) {
+                        iterator.add(ref);
+                    }
                 }
             }
+
+            if ((indexCacheSize == 0) || doDSSearch()) {
+                SearchTask st = new SearchTask(this, iterator, indexes,
+                        subjectIndexes, bSubTree, setDNs);
+                threadPool.submit(st);
+            } else {
+                iterator.isDone();
+            }
+
         }
-        
-        if ((indexCacheSize == 0) || doDSSearch()) {
-            SearchTask st = new SearchTask(this, iterator, indexes,
-                subjectIndexes, bSubTree, setDNs);
-            threadPool.submit(st);
-        } else {
-            iterator.isDone();
-        }
+
         return iterator;
     }
 

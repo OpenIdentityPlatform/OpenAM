@@ -167,14 +167,15 @@ public class URLResourceName
         if (query != null) {
             int indexQuery = urlPath.lastIndexOf(query); 
             String prefix = super.canonicalize(
-                urlPath.substring(0, indexQuery));
+                urlPath.substring(0, indexQuery - 1));
+            sb.append(prefix);
+            sb.append('?');
             // check if there are more than one query parameters
             int indexAmp = query.indexOf(QUERY_PARAMETER_DELIMITER);
             if (indexAmp != -1) {
                 // there are more than query parameters in the url
                 String suffix= urlPath.substring(
                                    indexQuery + query.length());
-                sb.append(prefix);
                 ArrayList al = new ArrayList();
                 StringTokenizer st = new StringTokenizer(query, 
                                         QUERY_PARAMETER_DELIMITER);
@@ -196,7 +197,6 @@ public class URLResourceName
                 sb.append(suffix);
             } else {
                 // there is only one query parameter in the url
-                sb.append(prefix);
                 sb.append(query);
             }
         } else {

@@ -1450,6 +1450,9 @@ public class PolicyEvaluator {
             AdminTokenAction.getInstance());
 
         try {
+            // Parse the resource name before proceeding.
+            resourceName = serviceType.canonicalize(resourceName);
+
             Subject userSubject = SubjectUtils.createSubject(token);
             Evaluator eval = new Evaluator(
                 SubjectUtils.createSubject(adminSSOToken), serviceTypeName);

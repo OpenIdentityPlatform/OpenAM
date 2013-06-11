@@ -219,11 +219,6 @@ class PrivilegeEvaluator {
         indexes = entitlement.getResourceSearchIndexes(adminSubject, realm);
         PRIVILEGE_EVAL_MONITOR_RES_INDEX.end(start);
 
-        if (indexes.isEmpty()) {
-            // No policies indexes retrieved, therefore return default behaviour to fail.
-            return false;
-        }
-
         List<Entitlement> results = evaluate(realm);
         Entitlement result = results.get(0);
 
@@ -268,13 +263,7 @@ class PrivilegeEvaluator {
         indexes = getApplication().getResourceSearchIndex(resourceName, realm);
         PRIVILEGE_EVAL_MONITOR_RES_INDEX.end(start);
 
-        List<Entitlement> entitlements = Collections.emptyList();
-
-        if (!indexes.isEmpty()) {
-            entitlements = evaluate(realm);
-        }
-
-        return entitlements;
+        return evaluate(realm);
     }
     
     private List<Entitlement> evaluate(String realm)

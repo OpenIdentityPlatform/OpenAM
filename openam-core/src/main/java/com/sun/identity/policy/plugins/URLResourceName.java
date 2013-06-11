@@ -163,45 +163,45 @@ public class URLResourceName
         if (debug.messageEnabled()) {
             debug.message("URLResourceName: url query=" + query);
         }
-        
+
         if (query != null) {
-            int indexQuery = urlPath.lastIndexOf(query); 
+            int indexQuery = urlPath.lastIndexOf(query);
             String prefix = super.canonicalize(
-                urlPath.substring(0, indexQuery));
+                    urlPath.substring(0, indexQuery - 1));
+            sb.append(prefix);
+            sb.append('?');
             // check if there are more than one query parameters
             int indexAmp = query.indexOf(QUERY_PARAMETER_DELIMITER);
             if (indexAmp != -1) {
                 // there are more than query parameters in the url
                 String suffix= urlPath.substring(
-                                   indexQuery + query.length());
-                sb.append(prefix);
+                        indexQuery + query.length());
                 ArrayList al = new ArrayList();
-                StringTokenizer st = new StringTokenizer(query, 
-                                        QUERY_PARAMETER_DELIMITER);
+                StringTokenizer st = new StringTokenizer(query,
+                        QUERY_PARAMETER_DELIMITER);
                 while (st.hasMoreTokens()) {
                     al.add(st.nextToken());
                 }
-                // sort the query parameters based on rules of 
+                // sort the query parameters based on rules of
                 // the comparator
                 Collections.sort(al, comparator);
                 int size = al.size();
                 // reconstruct the url in canonicalized form
                 for (int i = 0; i < size; i++) {
-                   if (i < (size-1)) {
+                    if (i < (size-1)) {
                         sb.append((String) al.get(i)).append(QUERY_PARAMETER_DELIMITER);
-                   } else {
-                       sb.append((String)al.get(i));
-                   }
+                    } else {
+                        sb.append((String)al.get(i));
+                    }
                 }
                 sb.append(suffix);
             } else {
                 // there is only one query parameter in the url
-                sb.append(prefix);
                 sb.append(query);
             }
         } else {
             // there is no query string in the url
-            sb.append(super.canonicalize(urlPath)); 
+            sb.append(super.canonicalize(urlPath));
         }
             
         return sb.toString();

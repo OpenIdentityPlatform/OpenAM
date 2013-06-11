@@ -792,6 +792,12 @@ public class PrefixResourceName implements ResourceName {
                 preceedingDelimiter = false;
             }
         }
+
+        if (preceedingDelimiter) {
+            // Remove any trailing forward slash on the end.
+            j--;
+        }
+
         return String.valueOf(newchars, 0, j);         
     } 
 }

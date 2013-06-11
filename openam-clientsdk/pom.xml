@@ -231,6 +231,8 @@
                                 <include>com/sun/identity/sm/jaxrpc/**</include>
                                 <include>com/sun/identity/util/**</include>
                                 <include>org/forgerock/openam/authentication/service/protocol/**</include>
+                                <include>org/forgerock/openam/entitlement/indextree/TreeSaveIndex*</include>
+                                <include>org/forgerock/openam/entitlement/indextree/TreeSearchIndex*</include>
                                 <include>org/forgerock/openam/services/cdm/**</include>
                                 <include>org/forgerock/openam/upgrade/UpgradeException*</include>
                                 <include>org/forgerock/openam/validation/ResponseValidationFilter*</include>
