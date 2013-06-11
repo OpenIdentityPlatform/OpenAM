@@ -1642,7 +1642,437 @@
    <literal>amAuthDataStore</literal>, and
    <literal>sunAMAuthDataStoreAuthLevel</literal></para>
   </section>
-  
+
+    <section xml:id="device-print-auth-module-conf-hints">
+        <title>Hints For the Device Print Authentication Module</title>
+        <para>The Device Print module is a device fingerprinter. It supports the risk-based identification
+        of the variety of devices used to connect to SPs. This module does not stand on its own, as it
+        uses authentication information from a service to validate a username. The Device Print module then
+        validates other characteristics of the user's system.</para>
+
+        <note><para>The following example
+        assumes that the Device Print module comes after LDAP authentication. Alternatively, you could
+        set it up after another directory service module such as Active Directory, Data Store, RADIUS, or
+        Windows NT.</para></note>
+
+        <indexterm>
+            <primary>Device</primary>
+            <secondary>Fingerprinting</secondary>
+        </indexterm>
+
+        <mediaobject xml:id="figure-device-print-module">
+            <alt>Including the Device Print module in an authentication chain</alt>
+            <imageobject>
+                <imagedata fileref="images/device-print-module.png" format="PNG" />
+            </imageobject>
+            <textobject><para>The Device Print module must come after another module that validates the associated
+                username. Appropriate modules include Active Directory, Data Store, LDAP, RADIUS, and Windows NT.
+            </para></textobject>
+        </mediaobject>
+        <para>A device fingerprint is based on the unique characteristics of a user like yourself and your
+            associated device. You can configure the characteristics that should be part of the fingerprint.
+            These characteristics can include:</para>
+
+            <itemizedlist>
+                <listitem>
+                    <para>User agents, associated with the configuration of a web browser.</para>
+                </listitem>
+                <listitem>
+                    <para>Installed fonts.</para>
+                </listitem>
+                <listitem>
+                    <para>The plugins installed for the web browser.</para>
+                </listitem>
+                <listitem>
+                    <para>The resolution and color depth associated with a display</para>
+                </listitem>
+                <listitem>
+                    <para>The timezone or even the geolocation of a device.</para>
+                </listitem>
+            </itemizedlist>
+
+            <para>You can specify <literal>penalty points</literal> when characteristics of the fingerprint have
+            changed. If the total <literal>penalty points</literal> exceeds some configured score, the user may
+            be asked to verify their identity using HOTP.</para>
+
+            <para>The default value for each <literal>*-penalty-points</literal>
+            attribute is 35, with a <literal>*-max-tolerated-penalty-points</literal> of 50.
+            In other words, if more than one characteristic of the device fingerprint has changed, the
+            module assumes that the user is trying to connect from a different system.</para>
+
+        <para><command>ssoadm</command> service name:
+            <literal>iPlanetAMAuthDevicePrintModuleService</literal></para>
+
+        <variablelist>
+            <varlistentry>
+                <term>Authentication Level</term>
+                <listitem>
+                    <para>Sets the authentication level used to indicate the level of security
+                        associated with the module. The value can range from 0 to any positive integer.</para>
+                    <para><command>ssoadm</command> attribute:
+                        <literal>sunAMAuthHOTPAuthLevel</literal></para>
+                </listitem>
+            </varlistentry>
+            <varlistentry>
+                <term>Profile expiration days</term>
+                <listitem>
+                    <para>The list of device attributes is collected in a profile, which automatically expires
+                        in a given number of days. Default: 30.</para>
+                    <para><command>ssoadm</command> attribute:
+                        <literal>iplanet-am-auth-adaptive-device-print-profile-expiration-days</literal></para>
+                </listitem>
+            </varlistentry>
+            <varlistentry>
+                <term>Maximum stored profile quantity</term>
+                <listitem>
+                    <para>The number of device profiles may be limited by user. Default: 5.</para>
+                    <para><command>ssoadm</command> attribute:
+                        <literal>iplanet-am-auth-adaptive-device-print-maximum-profiles-stored-quantity</literal></para>
+                </listitem>
+            </varlistentry>
+            <varlistentry>
+                <term>Automatically store new profiles</term>
+                <listitem>
+                    <para>When enabled, new device profiles are automatically stored, once the HOTP is verified.
+                        Otherwise, the user is prompted for confirmation.</para>
+                    <para><command>ssoadm</command> attribute:</para>
+                    <literal>iplanet-am-auth-adaptive-device-print-store-profiles-without-confirmation</literal>
+                </listitem>
+            </varlistentry>
+            <varlistentry>
+                <term>Default user profile name</term>
+                <listitem>
+                    <para>Every device requires a default profile name that represents the user.
+                    </para>
+                    <para><command>ssoadm</command> attribute:</para>
+                    <literal>iplanet-am-auth-adaptive-device-print-default-profile-name</literal>
+                </listitem>
+            </varlistentry>
+            <varlistentry>
+                <term>User agent penalty points</term>
+                <listitem>
+                    <para>Specifies the number of penalty points added when there is a difference between the current
+                        and stored user agent. The module adds a fixed number of points if the web browser or
+                        related fields are changed. Version differences are ignored if the
+                        <literal>User-Agent version ignore</literal> attribute is active. Default: 35.</para>
+                    <para><command>ssoadm</command> attribute:</para>
+                    <literal>iplanet-am-auth-adaptive-device-print-user-agent-penalty-points</literal>
+                </listitem>
+            </varlistentry>
+            <varlistentry>
+                <term>Installed fonts penalty points</term>
+                <listitem>
+                    <para>Frequently, when a user installs a new software component, additional fonts are installed.
+                        The Device Print module adds a fixed number of penalty points if there is a change in the
+                        installed fonts since the last login beyond some maximum tolerated level, and the
+                        <literal>Installed fonts required</literal> attribute is enabled. Default: 35.</para>
+                    <para><command>ssoadm</command> attribute:</para>
+                    <literal>iplanet-am-auth-adaptive-device-print-installed-fonts-penalty-points</literal>
+                </listitem>
+            </varlistentry>
+            <varlistentry>
+                <term>Installed plugins penalty points</term>
+                <listitem>
+                    <para>Most devices have a number of plugins installed on their browsers, such as Java, Flash, and
+                        document readers. If the plugins feature is enabled, and there is a change beyond a maximum
+                        tolerated level, a fixed number of penalty points is added. Default: 35.</para>
+                    <para><command>ssoadm</command> attribute:</para>
+                    <literal>iplanet-am-auth-adaptive-device-print-installed-plugins-penalty-points</literal>
+                </listitem>
+            </varlistentry>
+            <varlistentry>
+                <term>Screen color depth penalty points</term>
+                <listitem>
+                    <para>Most client devices are connected to a color monitor, or at least have settings related to
+                        such a device. If the <literal>Screen parameters</literal>feature is enabled, and a change in
+                        color depth is detected, a fixed number of penalty points is added. Default: 35.</para>
+                    <para><command>ssoadm</command> attribute:</para>
+                    <literal>iplanet-am-auth-adaptive-device-print-screen-color-depth-penalty-points</literal>
+                </listitem>
+            </varlistentry>
+            <varlistentry>
+                <term>Screen resolution penalty points</term>
+                <listitem>
+                    <para>Differences in screen resolution sometimes indicate that the user has changed monitors, or
+                        perhaps is adjusting to changing eyesight. Whenever a different screen resolution is detected,
+                        a fixed number of penalty points is added. Default: 35.</para>
+                    <para><command>ssoadm</command> attribute:</para>
+                    <literal>iplanet-am-auth-adaptive-device-print-screen-resoultion-penalty-points</literal>
+                </listitem>
+            </varlistentry>
+            <varlistentry>
+                <term>Timezone penalty points</term>
+                <listitem>
+                    <para>Whenever a connection is made from a different timezone, the Device Print module normally
+                        adds a fixed number of penalty points. Organizations where most users travel may want to set
+                        this attribute to a lower value. Default: 35.</para>
+                    <para><command>ssoadm</command> attribute:</para>
+                    <literal>iplanet-am-auth-adaptive-device-print-timezone-penalty-points</literal>
+                </listitem>
+            </varlistentry>
+            <varlistentry>
+                <term>Allowed location range</term>
+                <listitem>
+                    <para>If geolocation is enabled, each profile should include a geographic location. The allowed
+                    location range specifies a maximum distance, in miles. If a user has travelled beyond that distance,
+                    the <literal>Location penalty points</literal> is added to the total. Default: 100.</para>
+                    <para><command>ssoadm</command> attribute:</para>
+                    <literal>iplanet-am-auth-adaptive-device-print-location-allowed-range</literal>
+                </listitem>
+            </varlistentry>
+            <varlistentry>
+                <term>User-Agent version ignore</term>
+                <listitem>
+                    <para>Upgrades change the version associated with a user agent. Unless this option is enabled, every
+                        change in the version of a browser or related fields is detected as a difference with the stored
+                        profile.</para>
+                    <para><command>ssoadm</command> attribute:</para>
+                    <literal>iplanet-am-auth-adaptive-device-print-ignore-version-in-user-agent</literal>
+                </listitem>
+            </varlistentry>
+            <varlistentry>
+                <term>Max number of tolerated different installed fonts</term>
+                <listitem>
+                    <para>If the <literal>Installed fonts required</literal> attribute is enabled, a comparison is made
+                        in installed fonts between the existing and stored profiles. Default: 0.</para>
+                    <para><command>ssoadm</command> attribute:</para>
+                    <literal>iplanet-am-auth-adaptive-device-print-max-tolerated-diffs-in-installed-fonts</literal>
+                </listitem>
+            </varlistentry>
+            <varlistentry>
+                <term>Max tolerated percentage difference between installed fonts</term>
+                <listitem>
+                    <para>If the <literal>Installed fonts required</literal> attribute is enabled, a comparison is made
+                        in installed fonts between the existing and stored profiles. Any differences in number of fonts
+                        is noted in percent. Default: 0.</para>
+                    <para><command>ssoadm</command> attribute:</para>
+                    <literal>iplanet-am-auth-adaptive-device-print-max-tolerated-percentage-to-mark-as-different-installed-fonts</literal>
+                </listitem>
+            </varlistentry>
+            <varlistentry>
+                <term>Max number of tolerated different installed plugins</term>
+                <listitem>
+                    <para>If the <literal>Installed plugins required</literal> attribute is enabled, a comparison is made
+                        between the installed plugins defined in the existing and stored profiles. Default: 0.</para>
+                    <para><command>ssoadm</command> attribute:</para>
+                    <literal>iplanet-am-auth-adaptive-device-print-max-tolerated-diffs-in-installed-plugins</literal>
+                </listitem>
+            </varlistentry>
+            <varlistentry>
+                <term>Max tolerated percentage difference between installed plugins</term>
+                <listitem>
+                    <para>If the <literal>Installed plugins required</literal> attribute is enabled, a comparison is
+                        made between the installed plugins defined in the existing and stored profiles. Any differences
+                        in number of plugins is noted in percent. Default: 0.</para>
+                    <para><command>ssoadm</command> attribute:</para>
+                    <literal>iplanet-am-auth-adaptive-device-print-max-tolerated-percentage-to-mark-as-different-plugins</literal>
+                </listitem>
+            </varlistentry>
+            <varlistentry>
+                <term>User agent required</term>
+                <listitem>
+                    <para>The user agent, as defined by <link xlink:show="new"
+                        xlink:href="http://tools.ietf.org/html/rfc4226#section-14.43">RFC 4226 Section 14.43</link>
+                        provides information about the browser, and frequently on the operating system. Default:
+                        enabled.</para>
+                    <para><command>ssoadm</command> attribute:</para>
+                    <literal>iplanet-am-auth-adaptive-device-print-user-agent-required</literal>
+                </listitem>
+            </varlistentry>
+            <varlistentry>
+                <term>Installed plugins required</term>
+                <listitem>
+                    <para>Plugins are components that add a specific feature to an existing application. In this
+                        context, examples of browser plugins are flash, java, and shockwave.</para>
+                    <para><command>ssoadm</command> attribute:</para>
+                    <literal>iplanet-am-auth-adaptive-device-print-plugins-required</literal>
+                </listitem>
+            </varlistentry>
+            <varlistentry>
+                <term>Installed fonts required</term>
+                <listitem>
+                    <para>Fonts are frequently added to an operating system when new applications are installed. If
+                        enabled, installed font information is stored as part of the profile, and checked upon
+                        reconnection for comparison.</para>
+                    <para><command>ssoadm</command> attribute:</para>
+                    <literal>iplanet-am-auth-adaptive-device-print-fonts-required</literal>
+                </listitem>
+            </varlistentry>
+            <!-- see OPENAM-2492; this should be changed (IMO) to "Geolocation required" -->
+            <varlistentry>
+                <term>Localization required</term>
+                <listitem>
+                    <para>The geographic location of a device can be tracked. Can be used to limit access from this device to a
+                        specified range.</para>
+                    <para><command>ssoadm</command> attribute:</para>
+                    <literal>iplanet-am-auth-adaptive-device-print-geolocation-required</literal>
+                </listitem>
+            </varlistentry>
+            <varlistentry>
+                <term>Screen parameters required</term>
+                <listitem>
+                    <para>Display parameters can be used to help differentiate a profile. If enabled, the Device Print module uses
+                        screen color depth and resolution.</para>
+                    <para><command>ssoadm</command> attribute:</para>
+                    <literal>iplanet-am-auth-adaptive-device-print-screen-params-required</literal>
+                </listitem>
+            </varlistentry>
+            <varlistentry>
+                <term>Time zone required</term>
+                <listitem>
+                    <para>The time zone of the current and stored profiles can be collected and compared.</para>
+                    <para><command>ssoadm</command> attribute:</para>
+                    <literal>iplanet-am-auth-adaptive-device-print-timezone-required</literal>
+                </listitem>
+            </varlistentry>
+            <varlistentry>
+                <term>Location penalty points</term>
+                <listitem>
+                    <para>If geo-location has been enabled, and the current location does not match the value stored in
+                    the profile this many points are added as a penalty. Default: 35.</para>
+                    <para><command>ssoadm</command> attribute:</para>
+                    <literal>iplanet-am-auth-adaptive-device-print-location-penalty-points</literal>
+                </listitem>
+            </varlistentry>
+            <varlistentry>
+                <term>Maximum tolerated penalty points</term>
+                <listitem>
+                    <para>A limit, in number of points, between the current and stored Device Print profiles. If the
+                    total is below that value, the Device Print module sees a match. Default: 50.</para>
+                    <para><command>ssoadm</command> attribute:</para>
+                    <literal>iplanet-am-auth-adaptive-device-print-max-tolerated-penalty-points</literal>
+                </listitem>
+            </varlistentry>
+            <varlistentry>
+                <term>SMS Gateway Implementation Class</term>
+                <listitem>
+                    <para>Change this if you must customize the SMS gateway implementation.
+                        The default class sends an SMS or email, depending on the
+                        configuration.</para>
+                    <para><command>ssoadm</command> attribute:
+                        <literal>sunAMAuthHOTPSMSGatewayImplClassName</literal></para>
+                </listitem>
+            </varlistentry>
+            <varlistentry>
+                <term>Mail Server Host Name</term>
+                <listitem>
+                    <para>Host name of the mail server supporting Simple Message Transfer
+                        Protocol for electronic mail.</para>
+                    <para><command>ssoadm</command> attribute:
+                        <literal>sunAMAuthHOTPSMTPHostName</literal></para>
+                </listitem>
+            </varlistentry>
+            <varlistentry>
+                <term>Mail Server Host Port</term>
+                <listitem>
+                    <para>The default outgoing mail server port is 25, 465
+                        (when connecting over SSL).</para>
+                    <para><command>ssoadm</command> attribute:
+                        <literal>sunAMAuthHOTPSMTPHostPort</literal></para>
+                </listitem>
+            </varlistentry>
+            <varlistentry>
+                <term>Mail Server Authentication Username</term>
+                <listitem>
+                    <para>User name for OpenAM to connect to the mail server.</para>
+                    <para><command>ssoadm</command> attribute:
+                        <literal>sunAMAuthHOTPSMTPUserName</literal></para>
+                </listitem>
+            </varlistentry>
+            <varlistentry>
+                <term>Mail Server Authentication Password</term>
+                <listitem>
+                    <para>Password for OpenAM to connect to the mail server.</para>
+                    <para><command>ssoadm</command> attribute:
+                        <literal>sunAMAuthHOTPSMTPUserPassword</literal></para>
+                </listitem>
+            </varlistentry>
+            <varlistentry>
+                <term>Mail Server Secure Connection</term>
+                <listitem>
+                    <para>If OpenAM connects to the mail server securely, OpenAM must be able
+                        to trust the server certificate.</para>
+                    <para><command>ssoadm</command> attribute:
+                        <literal>sunAMAuthHOTPSMTPSSLEnabled</literal></para>
+                </listitem>
+            </varlistentry>
+            <varlistentry>
+                <term>Email From Address</term>
+                <listitem>
+                    <para>The <literal>From:</literal> address when sending a one-time
+                        password by mail.</para>
+                    <para><command>ssoadm</command> attribute:
+                        <literal>sunAMAuthHOTPSMTPFromAddress</literal></para>
+                </listitem>
+            </varlistentry>
+            <varlistentry>
+                <term>One Time Password Validity Length (in minutes)</term>
+                <listitem>
+                    <para>One-time passwords are valid for 5 minutes after they are generated
+                        by default.</para>
+                    <para><command>ssoadm</command> attribute:
+                        <literal>sunAMAuthHOTPPasswordValidityDuration</literal></para>
+                </listitem>
+            </varlistentry>
+            <varlistentry>
+                <term>One Time Password Length (in digits)</term>
+                <listitem>
+                    <para>Set the length of the one-time password to 6 or 8 digits.</para>
+                    <para><command>ssoadm</command> attribute:
+                        <literal>sunAMAuthHOTPPasswordLength</literal></para>
+                </listitem>
+            </varlistentry>
+            <varlistentry>
+                <term>One Time Password Delivery</term>
+                <listitem>
+                    <para>Send the one-time password by SMS, by mail, or both.</para>
+                    <para><command>ssoadm</command> attribute:
+                        <literal>sunAMAuthHOTPasswordDelivery</literal></para>
+                </listitem>
+            </varlistentry>
+            <varlistentry>
+                <term>Mobile Phone Number Attribute Names</term>
+                <listitem>
+                    <para>Provides the attribute name used for the text message. The
+                        default value is <literal>telephoneNumber</literal>.</para>
+                    <para><command>ssoadm</command> attribute:
+                        <literal>openamTelephoneAttribute</literal></para>
+                </listitem>
+            </varlistentry>
+            <varlistentry>
+                <term>Mobile Carrier Attribute Name</term>
+                <listitem>
+                    <para>Provides the name of the carrier that will send the text
+                        message.</para>
+                    <para>Every carrier has their own attribute name ending, for example Verizon
+                        uses @vtext.com or vtext.com. Contact your mobile carrier to find out what their
+                        attribute name is. If you will be sending international texts, ask your carrier
+                        if a country code is a required.</para>
+                    <para><command>ssoadm</command> attribute:
+                        <literal>openamSMSCarrierAttribute</literal></para>
+                </listitem>
+            </varlistentry>
+            <varlistentry>
+                <term>Email Attribute Name</term>
+                <listitem>
+                    <para>Provides the attribute name used to email the OTP. The
+                        default value is <literal>mail</literal> (email).</para>
+                    <para><command>ssoadm</command> attribute:
+                        <literal>openamEmailAttribute</literal></para>
+                </listitem>
+            </varlistentry>
+            <varlistentry>
+                <term>Auto Send OTP Code</term>
+                <listitem>
+                    <para>Setup the HOTP module to automatically generate an email
+                        or text message when users begin the login process. </para>
+                    <para><command>ssoadm</command> attribute:
+                        <literal>sunAMAuthHOTPAutoClicking</literal></para>
+                </listitem>
+            </varlistentry>
+        </variablelist>
+    </section>
+
   <section xml:id="federation-module-conf-hints">
    <title>Hints For the Federation Authentication Module</title>
    <para>The Federation authentication module is used by a service provider
@@ -1659,170 +2089,170 @@
    <para><command>ssoadm</command> attribute:
    <literal>sunAMAuthFederationAuthLevel</literal></para>
   </section>
-  
-  <section xml:id="hotp-module-conf-hints">
-   <title>Hints For the HOTP Authentication Module</title>
-   <para>The HMAC One-Time Password authentication module works together with
-   the Data Store module to retrieve a user's mail address or telephone number
-   to send a one-time password to complete authentication.</para>
-   <para>To use HOTP you set up an authentication chain with the Data Store
-   module as the <literal>requisite</literal> first module, and the HOTP module
-   as the second <literal>requisite</literal> module. When authentication
-   succeeds against the Data Store module, OpenAM passes the Email Address
-   and Telephone Number attributes from the user profile to the HOTP module.
-   For the HOTP module to use either attribute, the Email Address must contain
-   a valid email address, or the Telephone Number must contain a valid
-   SMS telephone number.</para>
-   <para>You can set the HOTP module to automatically generate a password when
-   users begin logging into the system. You can also setup a mobile phone, 
-   mobile carrier, and email attributes for tighter controls over where 
-   the messages are generated and what provider the messages go through to reach
-   the user.</para>
-   <indexterm>
-    <primary>Authentication</primary>
-    <secondary>HMAC One-Time Password (HOTP)</secondary>
-   </indexterm>
-   
-   <para><command>ssoadm</command> service name:
-   <literal>sunAMAuthHOTPService</literal></para>
-   
-   <variablelist>
-    <varlistentry>
-     <term>SMS Gateway Implementation Class</term>
-     <listitem>
-      <para>Change this if you must customize the SMS gateway implementation.
-      The default class sends an SMS or email, depending on the
-      configuration.</para>
-      <para><command>ssoadm</command> attribute:
-      <literal>sunAMAuthHOTPSMSGatewayImplClassName</literal></para>
-     </listitem>
-    </varlistentry>
-    <varlistentry>
-     <term>SMTP Host Name</term>
-     <listitem>
-      <para>Host name of the mail server supporting Simple Message Transfer
-      Protocol for electronic mail.</para>
-      <para><command>ssoadm</command> attribute:
-      <literal>sunAMAuthHOTPSMTPHostName</literal></para>
-     </listitem>
-    </varlistentry>
-    <varlistentry>
-     <term>SMTP Host Port</term>
-     <listitem>
-      <para>The default SMTP port is 25, 465 (when connecting over SSL).</para>
-      <para><command>ssoadm</command> attribute:
-      <literal>sunAMAuthHOTPSMTPHostPort</literal></para>
-     </listitem>
-    </varlistentry>
-    <varlistentry>
-     <term>SMTP User Name</term>
-     <listitem>
-      <para>User name for OpenAM to connect to the mail server.</para>
-      <para><command>ssoadm</command> attribute:
-      <literal>sunAMAuthHOTPSMTPUserName</literal></para>
-     </listitem>
-    </varlistentry>
-    <varlistentry>
-     <term>SMTP User Password</term>
-     <listitem>
-      <para>Password for OpenAM to connect to the mail server.</para>
-      <para><command>ssoadm</command> attribute:
-      <literal>sunAMAuthHOTPSMTPUserPassword</literal></para>
-     </listitem>
-    </varlistentry>
-    <varlistentry>
-     <term>SMTP Connection</term>
-     <listitem>
-      <para>If OpenAM connects to the mail server securely, OpenAM must be able
-      to trust the server certificate.</para>
-      <para><command>ssoadm</command> attribute:
-      <literal>sunAMAuthHOTPSMTPSSLEnabled</literal></para>
-     </listitem>
-    </varlistentry>
-    <varlistentry>
-     <term>Email From Address</term>
-     <listitem>
-      <para>The <literal>From:</literal> address when sending a one-time
-      password by mail.</para>
-      <para><command>ssoadm</command> attribute:
-      <literal>sunAMAuthHOTPSMTPFromAddress</literal></para>
-     </listitem>
-    </varlistentry>
-    <varlistentry>
-     <term>One Time Password Validity Length (in minutes)</term>
-     <listitem>
-      <para>One-time passwords are valid for 5 minutes after they are generated
-      by default.</para>
-      <para><command>ssoadm</command> attribute:
-      <literal>sunAMAuthHOTPPasswordValidityDuration</literal></para>
-     </listitem>
-    </varlistentry>
-    <varlistentry>
-     <term>One Time Password Length (in digits)</term>
-     <listitem>
-      <para>Set the length of the one-time password to 6 or 8 digits.</para>
-      <para><command>ssoadm</command> attribute:
-      <literal>sunAMAuthHOTPPasswordLength</literal></para>
-     </listitem>
-    </varlistentry>
-    <varlistentry>
-     <term>One Time Password Delivery</term>
-     <listitem>
-      <para>Send the one-time password by SMS, by mail, or both.</para>
-      <para><command>ssoadm</command> attribute:
-      <literal>sunAMAuthHOTPasswordDelivery</literal></para>
-     </listitem>
-    </varlistentry>
-    <varlistentry>
-     <term>Mobile Phone Number Attribute Names</term>
-     <listitem>
-      <para>Provides the attribute name used for the text message. The 
-      default value is <literal>telephoneNumber</literal>.</para>
-      <para><command>ssoadm</command> attribute:
-      <literal>openamTelephoneAttribute</literal></para>
-     </listitem>
-    </varlistentry>
-    <varlistentry>
-     <term>Mobile Carrier Attribute Name</term>
-     <listitem>
-      <para>Provides the name of the carrier that will send the text
-      message.</para>
-      <para>Every carrier has their own attribute name ending, for example Verizon
-      uses @vtext.com or vtext.com. Contact your mobile carrier to find out what their 
-      attribute name is. If you will be sending international texts, ask your carrier 
-      if a country code is a required.</para>
-      <para><command>ssoadm</command> attribute:
-      <literal>openamSMSCarrierAttribute</literal></para>
-     </listitem>
-    </varlistentry>
-    <varlistentry>
-     <term>Email Attribute Name</term>
-     <listitem>
-      <para>Provides the attribute name used to email the OTP. The
-      default value is <literal>mail</literal> (email).</para>
-      <para><command>ssoadm</command> attribute:
-      <literal>openamEmailAttribute</literal></para>
-     </listitem>
-    </varlistentry>
-    <varlistentry>
-     <term>Auto Send OTP Code</term>
-     <listitem>
-      <para>Setup the HOTP module to automatically generate an email
-      or text message when users begin the login process. </para>
-      <para><command>ssoadm</command> attribute:
-      <literal>sunAMAuthHOTPAutoClicking</literal></para>
-     </listitem>
-    </varlistentry>
-    <varlistentry>
-     <term>Authentication Level</term>
-     <listitem>
-      <para><command>ssoadm</command> attribute:
-      <literal>sunAMAuthHOTPAuthLevel</literal></para>
-     </listitem>
-    </varlistentry>
-   </variablelist>
-  </section>
-  
+
+     <section xml:id="hotp-module-conf-hints">
+         <title>Hints For the HOTP Authentication Module</title>
+         <para>The HMAC One-Time Password authentication module works together with
+             the Data Store module to retrieve a user's mail address or telephone number
+             to send a one-time password to complete authentication.</para>
+         <para>To use HOTP you set up an authentication chain with the Data Store
+             module as the <literal>requisite</literal> first module, and the HOTP module
+             as the second <literal>requisite</literal> module. When authentication
+             succeeds against the Data Store module, OpenAM passes the Email Address
+             and Telephone Number attributes from the user profile to the HOTP module.
+             For the HOTP module to use either attribute, the Email Address must contain
+             a valid email address, or the Telephone Number must contain a valid
+             SMS telephone number.</para>
+         <para>You can set the HOTP module to automatically generate a password when
+             users begin logging into the system. You can also setup a mobile phone,
+             mobile carrier, and email attributes for tighter controls over where
+             the messages are generated and what provider the messages go through to reach
+             the user.</para>
+         <indexterm>
+             <primary>Authentication</primary>
+             <secondary>HMAC One-Time Password (HOTP)</secondary>
+         </indexterm>
+
+         <para><command>ssoadm</command> service name:
+             <literal>sunAMAuthHOTPService</literal></para>
+
+         <variablelist>
+             <varlistentry>
+                 <term>SMS Gateway Implementation Class</term>
+                 <listitem>
+                     <para>Change this if you must customize the SMS gateway implementation.
+                         The default class sends an SMS or email, depending on the
+                         configuration.</para>
+                     <para><command>ssoadm</command> attribute:
+                         <literal>sunAMAuthHOTPSMSGatewayImplClassName</literal></para>
+                 </listitem>
+             </varlistentry>
+             <varlistentry>
+                 <term>Mail Server Host Name</term>
+                 <listitem>
+                     <para>Host name of the mail server supporting Simple Message Transfer
+                         Protocol for electronic mail.</para>
+                     <para><command>ssoadm</command> attribute:
+                         <literal>sunAMAuthHOTPSMTPHostName</literal></para>
+                 </listitem>
+             </varlistentry>
+             <varlistentry>
+                 <term>Mail Server Host Port</term>                                                                       `
+                 <listitem>
+                     <para>The default outgoing mail server port is 25, 465 (when connecting over SSL).</para>
+                     <para><command>ssoadm</command> attribute:
+                         <literal>sunAMAuthHOTPSMTPHostPort</literal></para>
+                 </listitem>
+             </varlistentry>
+             <varlistentry>
+                 <term>Mail Server User Name</term>
+                 <listitem>
+                     <para>User name for OpenAM to connect to the mail server.</para>
+                     <para><command>ssoadm</command> attribute:
+                         <literal>sunAMAuthHOTPSMTPUserName</literal></para>
+                 </listitem>
+             </varlistentry>
+             <varlistentry>
+                 <term>Mail Server User Password</term>
+                 <listitem>
+                     <para>Password for OpenAM to connect to the mail server.</para>
+                     <para><command>ssoadm</command> attribute:
+                         <literal>sunAMAuthHOTPSMTPUserPassword</literal></para>
+                 </listitem>
+             </varlistentry>
+             <varlistentry>
+                 <term>Mail Server Connection</term>
+                 <listitem>
+                     <para>If OpenAM connects to the mail server securely, OpenAM must be able
+                         to trust the server certificate.</para>
+                     <para><command>ssoadm</command> attribute:
+                         <literal>sunAMAuthHOTPSMTPSSLEnabled</literal></para>
+                 </listitem>
+             </varlistentry>
+             <varlistentry>
+                 <term>Email From Address</term>
+                 <listitem>
+                     <para>The <literal>From:</literal> address when sending a one-time
+                         password by mail.</para>
+                     <para><command>ssoadm</command> attribute:
+                         <literal>sunAMAuthHOTPMail ServerFromAddress</literal></para>
+                 </listitem>
+             </varlistentry>
+             <varlistentry>
+                 <term>One Time Password Validity Length (in minutes)</term>
+                 <listitem>
+                     <para>One-time passwords are valid for 5 minutes after they are generated
+                         by default.</para>
+                     <para><command>ssoadm</command> attribute:
+                         <literal>sunAMAuthHOTPPasswordValidityDuration</literal></para>
+                 </listitem>
+             </varlistentry>
+             <varlistentry>
+                 <term>One Time Password Length (in digits)</term>
+                 <listitem>
+                     <para>Set the length of the one-time password to 6 or 8 digits.</para>
+                     <para><command>ssoadm</command> attribute:
+                         <literal>sunAMAuthHOTPPasswordLength</literal></para>
+                 </listitem>
+             </varlistentry>
+             <varlistentry>
+                 <term>One Time Password Delivery</term>
+                 <listitem>
+                     <para>Send the one-time password by SMS, by mail, or both.</para>
+                     <para><command>ssoadm</command> attribute:
+                         <literal>sunAMAuthHOTPasswordDelivery</literal></para>
+                 </listitem>
+             </varlistentry>
+             <varlistentry>
+                 <term>Mobile Phone Number Attribute Names</term>
+                 <listitem>
+                     <para>Provides the attribute name used for the text message. The
+                         default value is <literal>telephoneNumber</literal>.</para>
+                     <para><command>ssoadm</command> attribute:
+                         <literal>openamTelephoneAttribute</literal></para>
+                 </listitem>
+             </varlistentry>
+             <varlistentry>
+                 <term>Mobile Carrier Attribute Name</term>
+                 <listitem>
+                     <para>Provides the name of the carrier that will send the text
+                         message.</para>
+                     <para>Every carrier has their own attribute name ending, for example Verizon
+                         uses @vtext.com or vtext.com. Contact your mobile carrier to find out what their
+                         attribute name is. If you will be sending international texts, ask your carrier
+                         if a country code is a required.</para>
+                     <para><command>ssoadm</command> attribute:
+                         <literal>openamSMSCarrierAttribute</literal></para>
+                 </listitem>
+             </varlistentry>
+             <varlistentry>
+                 <term>Email Attribute Name</term>
+                 <listitem>
+                     <para>Provides the attribute name used to email the OTP. The
+                         default value is <literal>mail</literal> (email).</para>
+                     <para><command>ssoadm</command> attribute:
+                         <literal>openamEmailAttribute</literal></para>
+                 </listitem>
+             </varlistentry>
+             <varlistentry>
+                 <term>Auto Send OTP Code</term>
+                 <listitem>
+                     <para>Setup the HOTP module to automatically generate an email
+                         or text message when users begin the login process. </para>
+                     <para><command>ssoadm</command> attribute:
+                         <literal>sunAMAuthHOTPAutoClicking</literal></para>
+                 </listitem>
+             </varlistentry>
+             <varlistentry>
+                 <term>Authentication Level</term>
+                 <listitem>
+                     <para><command>ssoadm</command> attribute:
+                         <literal>sunAMAuthHOTPAuthLevel</literal></para>
+                 </listitem>
+             </varlistentry>
+         </variablelist>
+     </section>
+
   <section xml:id="http-module-conf-hints">
    <title>Hints For the HTTP Basic Authentication Module</title>
    <para>HTTP basic authentication takes a user name and password from HTTP
@@ -3309,7 +3739,7 @@
     </varlistentry>
    </variablelist>
   </section>
-  
+
 <!--   <section xml:id="yubikey-module-conf-hints">
    <title>Hints For the YubiKey Authentication Module</title>
    <para>Use the following hints to configure the module.</para>
@@ -3317,10 +3747,10 @@
     <primary>Authentication</primary>
     <secondary>YubiKey</secondary>
    </indexterm>
-   
+
    <para><command>ssoadm</command> service name:
    <literal>TODO</literal></para>
-   
+
    <variablelist>
     <varlistentry>
      <term>TODO</term>
@@ -3331,7 +3761,7 @@
    </variablelist>
   </section> -->
  </section>
- 
+
  <section xml:id="configure-authn-chains">
   <title>Configuring Authentication Chains</title>
    <indexterm>
