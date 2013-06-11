@@ -98,7 +98,8 @@ public final class AMSetupFilter implements Filter {
                     filterChain.doFilter(httpRequest, httpResponse);
                 }
             } else {
-                if (AMSetupServlet.getBootStrapFile() != null && !UpgradeUtils.isVersionNewer()) {
+                if (AMSetupServlet.getBootStrapFile() != null && !UpgradeUtils.isVersionNewer() 
+                        && !AMSetupServlet.isUpgradeCompleted()) {
                     String redirectUrl = System.getProperty(Constants.CONFIG_STORE_DOWN_REDIRECT_URL);
                     if (redirectUrl != null && redirectUrl.length() > 0) {
                         httpResponse.sendRedirect(redirectUrl);
