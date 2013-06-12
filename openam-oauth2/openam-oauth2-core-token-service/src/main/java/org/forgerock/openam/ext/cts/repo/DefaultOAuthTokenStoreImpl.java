@@ -47,7 +47,9 @@ import com.sun.identity.shared.OAuth2Constants;
 import org.forgerock.json.jwt.JwsAlgorithm;
 import org.forgerock.openam.oauth2.model.*;
 import org.forgerock.openam.oauth2.exceptions.OAuthProblemException;
+import org.forgerock.openam.oauth2.provider.OAuth2ProviderSettings;
 import org.forgerock.openam.oauth2.provider.OAuth2TokenStore;
+import org.forgerock.openam.oauth2.provider.impl.OAuth2ProviderSettingsImpl;
 import org.forgerock.openam.oauth2.utils.OAuth2Utils;
 import org.restlet.Request;
 import org.restlet.data.Status;
@@ -64,6 +66,7 @@ public class DefaultOAuthTokenStoreImpl implements OAuth2TokenStore {
     private long ACCESS_TOKEN_LIFETIME = 1;
 
     private JsonResource repository;
+    private OAuth2ProviderSettings settings = null;
 
     /**
      * Constructor, creates the repository instance used.
@@ -79,42 +82,10 @@ public class DefaultOAuthTokenStoreImpl implements OAuth2TokenStore {
         }
     }
     private void getSettings(){
-        String setting = null;
-        setting =
-            OAuth2Utils.getOAuth2ProviderSetting(OAuth2Constants.OAuth2ProviderService.AUTHZ_CODE_LIFETIME_NAME,
-                                                 String.class,
-                                                 Request.getCurrent());
-        if (setting != null && !setting.isEmpty()){
-            AUTHZ_CODE_LIFETIME = Long.parseLong(setting);
-            setting = null;
-        } else {
-            OAuth2Utils.DEBUG.error("DefaultOAuthTOkenStoreImpl::No setting set for code lifetime");
-            throw OAuthProblemException.OAuthError.SERVER_ERROR.handle(null, "No setting set for code lifetime");
-        }
-
-        setting =
-                OAuth2Utils.getOAuth2ProviderSetting(OAuth2Constants.OAuth2ProviderService.REFRESH_TOKEN_LIFETIME_NAME,
-                        String.class,
-                        Request.getCurrent());
-        if (setting != null && !setting.isEmpty()){
-            REFRESH_TOKEN_LIFETIME = Long.parseLong(setting);
-            setting = null;
-        } else {
-            OAuth2Utils.DEBUG.error("DefaultOAuthTOkenStoreImpl::No setting set for refresh lifetime");
-            throw OAuthProblemException.OAuthError.SERVER_ERROR.handle(null, "No setting set for refresh lifetime");
-        }
-
-        setting =
-                OAuth2Utils.getOAuth2ProviderSetting(OAuth2Constants.OAuth2ProviderService.ACCESS_TOKEN_LIFETIME_NAME,
-                        String.class,
-                        Request.getCurrent());
-        if (setting != null && !setting.isEmpty()){
-            ACCESS_TOKEN_LIFETIME = Long.parseLong(setting);
-            setting = null;
-        } else {
-            OAuth2Utils.DEBUG.error("DefaultOAuthTOkenStoreImpl::No setting set for token lifetime");
-            throw OAuthProblemException.OAuthError.SERVER_ERROR.handle(null, "No setting set for token lifetime");
-        }
+        settings = OAuth2Utils.getSettingsProvider(Request.getCurrent());
+        AUTHZ_CODE_LIFETIME = settings.getAuthorizationCodeLifetime();
+        REFRESH_TOKEN_LIFETIME = settings.getRefreshTokenLifetime();
+        ACCESS_TOKEN_LIFETIME = settings.getAccessTokenLifetime();
     }
 
     /**

@@ -117,6 +117,57 @@
                         <Value></Value>
                     </DefaultValues>
                 </AttributeSchema>
+                <!--
+                <AttributeSchema
+                        name="forgerock-oauth2-provider-supported-scopes"
+                        type="list"
+                        syntax="string"
+                        i18nKey="a108">
+                    <DefaultValues>
+                        <Value>openid</Value>
+                    </DefaultValues>
+                </AttributeSchema>
+                -->
+                <AttributeSchema
+                        name="forgerock-oauth2-provider-jkws-uri"
+                        type="list"
+                        syntax="string"
+                        i18nKey="a109">
+                    <DefaultValues>
+                        <Value></Value>
+                    </DefaultValues>
+                </AttributeSchema>
+
+                <AttributeSchema
+                        name="forgerock-oauth2-provider-subject-types-supported"
+                        type="list"
+                        syntax="string"
+                        i18nKey="a110">
+                    <DefaultValues>
+                        <Value>pairwise</Value>
+                        <Value>public</Value>
+                    </DefaultValues>
+                </AttributeSchema>
+
+                <AttributeSchema
+                        name="forgerock-oauth2-provider-id-token-signing-algorithms-supported"
+                        type="list"
+                        syntax="string"
+                        i18nKey="a111">
+                    <DefaultValues>
+                        <Value></Value>
+                    </DefaultValues>
+                </AttributeSchema>
+
+                <AttributeSchema
+                        name="forgerock-oauth2-provider-supported-claims"
+                        type="list"
+                        syntax="string"
+                        i18nKey="a112">
+                    <DefaultValues>
+                        <Value></Value>
+                    </DefaultValues>
+                </AttributeSchema>
 
                 <SubSchema name="serverconfig" inheritance="multiple">
 
@@ -199,6 +250,58 @@
                                      syntax="string"
                                      validator="RequiredValueValidator"
                                      i18nKey="a107">
+                        <DefaultValues>
+                            <Value></Value>
+                        </DefaultValues>
+                    </AttributeSchema>
+
+                    <!--
+                    <AttributeSchema
+                            name="forgerock-oauth2-provider-supported-scopes"
+                            type="list"
+                            syntax="string"
+                            i18nKey="a108">
+                        <DefaultValues>
+                            <Value>openid</Value>
+                        </DefaultValues>
+                    </AttributeSchema>
+                    -->
+                    <AttributeSchema
+                            name="forgerock-oauth2-provider-jkws-uri"
+                            type="list"
+                            syntax="string"
+                            i18nKey="a109">
+                        <DefaultValues>
+                            <Value></Value>
+                        </DefaultValues>
+                    </AttributeSchema>
+
+                    <AttributeSchema
+                            name="forgerock-oauth2-provider-subject-types-supported"
+                            type="list"
+                            syntax="string"
+                            i18nKey="a110">
+                        <DefaultValues>
+                            <Value>pairwise</Value>
+                            <Value>public</Value>
+                        </DefaultValues>
+                    </AttributeSchema>
+
+                    <AttributeSchema
+                            name="forgerock-oauth2-provider-id-token-signing-algorithms-supported"
+                            type="list"
+                            syntax="string"
+                            i18nKey="a111">
+                        <DefaultValues>
+                            <Value></Value>
+                        </DefaultValues>
+                    </AttributeSchema>
+
+                    <AttributeSchema
+                            name="forgerock-oauth2-provider-supported-claims"
+                            type="list"
+                            syntax="string"
+                            i18nKey="a112">
                         <DefaultValues>
                             <Value></Value>
                         </DefaultValues>

@@ -54,8 +54,10 @@ import org.forgerock.json.jwt.SignedJwt;
 import org.forgerock.openam.oauth2.model.CoreToken;
 import org.forgerock.openam.oauth2.model.JWTToken;
 import org.forgerock.openam.oauth2.provider.ClientVerifier;
+import org.forgerock.openam.oauth2.provider.OAuth2ProviderSettings;
 import org.forgerock.openam.oauth2.provider.OAuth2TokenStore;
 import org.forgerock.openam.oauth2.exceptions.OAuthProblemException;
+import org.forgerock.openam.oauth2.provider.impl.OAuth2ProviderSettingsImpl;
 import org.restlet.Context;
 import org.restlet.Request;
 import org.restlet.data.Form;
@@ -83,6 +85,8 @@ public class OAuth2Utils {
     private static Logger accessLogger;
     private static Logger errorLogger;
     public static boolean logStatus = false;
+    private static Map<String, OAuth2ProviderSettings> settingsProviderMap =
+            new HashMap<String, OAuth2ProviderSettings>();
 
     static {
         DEBUG = Debug.getInstance("OAuth2Provider");
@@ -796,9 +800,8 @@ public class OAuth2Utils {
             if (searchResults != null && !searchResults.getResultAttributes().isEmpty()) {
                 results = searchResults.getSearchResults();
             } else {
-                Map<String, Set<String>> avPairs = toAvPairMap(OAuth2Utils.getOAuth2ProviderSetting(OAuth2Constants.OAuth2ProviderService.AUTHENITCATION_ATTRIBUTES,
-                                                                    Set.class,
-                                                                    Request.getCurrent()),
+                OAuth2ProviderSettings settings = OAuth2Utils.getSettingsProvider(Request.getCurrent());
+                Map<String, Set<String>> avPairs = toAvPairMap(settings.getListOfAttributesTheResourceOwnerIsAuthenticatedOn(),
                                                                uName);
                 idsc.setSearchModifiers(IdSearchOpModifier.OR, avPairs);
                 searchResults =
@@ -866,6 +869,18 @@ public class OAuth2Utils {
             throw OAuthProblemException.OAuthError.SERVER_ERROR.handle(null, "Not able sign jwt");
         }
         return sjwt;
+    }
+
+    public static OAuth2ProviderSettings getSettingsProvider(Request request){
+        String realm = OAuth2Utils.getRealm(request);
+        OAuth2ProviderSettings setting = settingsProviderMap.get(realm);
+        if (setting != null){
+            return setting;
+        } else {
+            setting = new OAuth2ProviderSettingsImpl(request);
+            settingsProviderMap.put(realm, setting);
+            return setting;
+        }
     }
 
 

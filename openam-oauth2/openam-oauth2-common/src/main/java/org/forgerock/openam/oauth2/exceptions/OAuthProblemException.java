@@ -103,7 +103,9 @@ public class OAuthProblemException extends ResourceException {
         NOT_FOUND(OAuth2Constants.Error.NOT_FOUND,
                 "The request is for data which does not exist.", "", 404),
         INVALID_CLIENT_METADATA(OAuth2Constants.Error.INVALID_CLIENT_METADATA,
-                "The request contains invalid metadata.", "", 400);
+                "The request contains invalid metadata.", "", 400),
+        BAD_REQUEST(OAuth2Constants.Error.BAD_REQUEST,
+                "The request could not be understood by the server due to malformed syntax", "", 400);
         Status status;
 
         private OAuthError(String reasonPhrase, String description, String uri) {

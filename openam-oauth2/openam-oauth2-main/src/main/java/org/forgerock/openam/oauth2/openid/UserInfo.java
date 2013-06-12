@@ -28,6 +28,7 @@ import com.sun.identity.shared.OAuth2Constants;
 import org.forgerock.openam.ext.cts.repo.DefaultOAuthTokenStoreImpl;
 import org.forgerock.openam.oauth2.exceptions.OAuthProblemException;
 import org.forgerock.openam.oauth2.model.CoreToken;
+import org.forgerock.openam.oauth2.provider.OAuth2ProviderSettings;
 import org.forgerock.openam.oauth2.provider.OAuth2TokenStore;
 import org.forgerock.openam.oauth2.provider.Scope;
 import org.forgerock.openam.oauth2.utils.OAuth2Utils;
@@ -55,10 +56,10 @@ public class UserInfo extends ServerResource {
             OAuth2TokenStore store = new DefaultOAuthTokenStoreImpl();
             CoreToken token = store.readAccessToken(tokenid);
             try {
-                pluginClass =
-                        OAuth2Utils.getOAuth2ProviderSetting(OAuth2Constants.OAuth2ProviderService.SCOPE_PLUGIN_CLASS,
-                                String.class,
-                                getRequest());
+                OAuth2ProviderSettings settings =
+                        OAuth2Utils.getSettingsProvider(getRequest());
+
+                pluginClass = settings.getScopeImplementationClass();
                 if (pluginClass != null && !pluginClass.isEmpty()){
                     scopeClass = (Scope) Class.forName(pluginClass).newInstance();
                 }

@@ -627,6 +627,8 @@ public class OAuth2Constants {
          * The request contains invalid client metadata.
          */
         public static final String INVALID_CLIENT_METADATA = "invalid_client_metadata";
+
+        public static final String BAD_REQUEST = "bad_request";
     }
 
     public class Custom {
@@ -706,6 +708,12 @@ public class OAuth2Constants {
         public static final String RESPONSE_TYPE_LIST = "forgerock-oauth2-provider-response-type-map-class";
         public static final String AUTHENITCATION_ATTRIBUTES = "forgerock-oauth2-provider-authentication-attributes";
         public static final String SAVED_CONSENT_ATTRIBUTE = "forgerock-oauth2-provider-saved-consent-attribute";
+        public static final String SUPPORTED_SCOPE = "forgerock-oauth2-provider-supported-scopes";
+        public static final String JKWS_URI = "forgerock-oauth2-provider-jkws-uri";
+        public static final String SUBJECT_TYPES_SUPPORTED = "forgerock-oauth2-provider-subject-types-supported";
+        public static final String ID_TOKEN_SIGNING_ALGORITHMS =
+                "forgerock-oauth2-provider-id-token-signing-algorithms-supported";
+        public static final String SUPPORTED_CLAIMS = "forgerock-oauth2-provider-supported-claims";
     }
 
     /**

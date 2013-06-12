@@ -30,6 +30,8 @@ import com.sun.identity.shared.OAuth2Constants;
 import org.forgerock.openam.oauth2.internal.UserIdentityVerifier;
 import org.forgerock.openam.oauth2.model.CoreToken;
 import org.forgerock.openam.oauth2.openid.ConnectClientRegistration;
+import org.forgerock.openam.oauth2.openid.OpenIDConnectConfiguration;
+import org.forgerock.openam.oauth2.openid.OpenIDConnectDiscovery;
 import org.forgerock.openam.oauth2.openid.UserInfo;
 import org.forgerock.openam.oauth2.provider.impl.ClientVerifierImpl;
 import org.forgerock.openam.ext.cts.repo.DefaultOAuthTokenStoreImpl;
@@ -116,7 +118,7 @@ public class OAuth2Application extends Application {
     public Restlet activate() {
         Context childContext = getContext().createChildContext();
         Router root = new Router(childContext);
-        
+
         OpenAMParameters parameters = new OpenAMParameters();
         OpenAMServletAuthenticator authenticator =
                 new OpenAMServletAuthenticator(childContext, parameters);

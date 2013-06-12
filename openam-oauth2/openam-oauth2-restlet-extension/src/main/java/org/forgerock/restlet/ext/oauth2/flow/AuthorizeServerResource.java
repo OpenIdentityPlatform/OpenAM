@@ -30,6 +30,7 @@ import com.sun.identity.shared.OAuth2Constants;
 import edu.emory.mathcs.backport.java.util.Arrays;
 import org.forgerock.openam.oauth2.exceptions.OAuthProblemException;
 import org.forgerock.openam.oauth2.model.CoreToken;
+import org.forgerock.openam.oauth2.provider.OAuth2ProviderSettings;
 import org.forgerock.openam.oauth2.provider.ResponseType;
 import org.forgerock.openam.oauth2.utils.OAuth2Utils;
 import org.restlet.data.Form;
@@ -296,9 +297,8 @@ public class AuthorizeServerResource extends AbstractFlow {
     }
 
     protected boolean savedConsent(String userid, String clientId, Set<String> scopes){
-        String attribute = OAuth2Utils.getOAuth2ProviderSetting(OAuth2Constants.OAuth2ProviderService.SAVED_CONSENT_ATTRIBUTE,
-                String.class,
-                getRequest());
+        OAuth2ProviderSettings settings = OAuth2Utils.getSettingsProvider(getRequest());
+        String attribute = settings.getSharedConsentAttributeName();
 
         AMIdentity id = OAuth2Utils.getIdentity(userid, OAuth2Utils.getRealm(getRequest()));
         Set<String> attributeSet = null;
@@ -337,9 +337,8 @@ public class AuthorizeServerResource extends AbstractFlow {
 
     protected void saveConsent(String userId, String clientId, String scopes){
         AMIdentity id = OAuth2Utils.getIdentity(userId, OAuth2Utils.getRealm(getRequest()));
-        String consentAttribute =
-                OAuth2Utils.getOAuth2ProviderSetting(OAuth2Constants.OAuth2ProviderService.SAVED_CONSENT_ATTRIBUTE,
-                        String.class, getRequest());
+        OAuth2ProviderSettings settings = OAuth2Utils.getSettingsProvider(getRequest());
+        String consentAttribute = settings.getSharedConsentAttributeName();
         try {
 
             //get the current set of consents and add our new consent to it.

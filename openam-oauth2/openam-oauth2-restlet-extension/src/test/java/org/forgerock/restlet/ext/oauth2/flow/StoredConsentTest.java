@@ -2,6 +2,7 @@ package org.forgerock.restlet.ext.oauth2.flow;
 
 
 import com.sun.identity.idm.AMIdentity;
+import org.forgerock.openam.oauth2.provider.OAuth2ProviderSettings;
 import org.forgerock.openam.oauth2.utils.OAuth2Utils;
 import org.powermock.api.mockito.PowerMockito;
 import org.powermock.core.classloader.annotations.PrepareForTest;
@@ -29,6 +30,7 @@ public class StoredConsentTest extends PowerMockTestCase {
 
         PowerMockito.mockStatic(OAuth2Utils.class);
         AMIdentity id = PowerMockito.mock(AMIdentity.class);
+        OAuth2ProviderSettings settings = PowerMockito.mock(OAuth2ProviderSettings.class);
 
         String userID = "testUser";
         String clientID = "testClient";
@@ -46,7 +48,8 @@ public class StoredConsentTest extends PowerMockTestCase {
         doNothing().when(id).store();
 
         when(OAuth2Utils.getIdentity(anyString(), anyString())).thenReturn(id);
-        when(OAuth2Utils.getOAuth2ProviderSetting(anyString(), any(Class.class), any(Request.class))).thenReturn(attribute);
+        when(OAuth2Utils.getSettingsProvider(any(Request.class))).thenReturn(settings);
+        when(settings.getSharedConsentAttributeName()).thenReturn(attribute);
 
         AuthorizeServerResource resource = new AuthorizeServerResource();
         resource.saveConsent(userID, clientID, scopes);
@@ -57,6 +60,7 @@ public class StoredConsentTest extends PowerMockTestCase {
 
         PowerMockito.mockStatic(OAuth2Utils.class);
         AMIdentity id = PowerMockito.mock(AMIdentity.class);
+        OAuth2ProviderSettings settings = PowerMockito.mock(OAuth2ProviderSettings.class);
 
         String userID = "testUser";
         String clientID = "testClient";
@@ -72,7 +76,8 @@ public class StoredConsentTest extends PowerMockTestCase {
         when(id.getAttribute(attribute)).thenReturn(set);
 
         when(OAuth2Utils.getIdentity(anyString(), anyString())).thenReturn(id);
-        when(OAuth2Utils.getOAuth2ProviderSetting(anyString(), any(Class.class), any(Request.class))).thenReturn(attribute);
+        when(OAuth2Utils.getSettingsProvider(any(Request.class))).thenReturn(settings);
+        when(settings.getSharedConsentAttributeName()).thenReturn(attribute);
         when(OAuth2Utils.getRealm(any(Request.class))).thenReturn("/");
 
         AuthorizeServerResource resource = new AuthorizeServerResource();

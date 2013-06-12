@@ -42,7 +42,9 @@ public interface Scope {
      * @param defaultScopes The set of scopes set in the client registration as default
      * @return The set of scopes to grant the token
      */
-    public Set<String> scopeToPresentOnAuthorizationPage(Set<String> requestedScopes, Set<String> availableScopes, Set<String> defaultScopes);
+    public Set<String> scopeToPresentOnAuthorizationPage(Set<String> requestedScopes,
+                                                         Set<String> availableScopes,
+                                                         Set<String> defaultScopes);
 
     /**
      * ScopeRequestedForAccessToken is called when a token is created and the token scope is requested.
@@ -51,7 +53,9 @@ public interface Scope {
      * @param defaultScopes The set of scopes set in the client registration as default
      * @return The set of scopes to grant the token
      */
-    public Set<String> scopeRequestedForAccessToken(Set<String> requestedScopes, Set<String> availableScopes, Set<String> defaultScopes);
+    public Set<String> scopeRequestedForAccessToken(Set<String> requestedScopes,
+                                                    Set<String> availableScopes,
+                                                    Set<String> defaultScopes);
 
     /**
      * ScopeRequestedForRefreshToken is called when the client tries to refresh an Access Token. The scope returned MUST
@@ -83,7 +87,8 @@ public interface Scope {
      * @param token the token created that will be returned with the extra data from this method
      * @return
      */
-    public Map<String, Object> extraDataToReturnForTokenEndpoint(Map<String, String> parameters, CoreToken token);
+    public Map<String, Object> extraDataToReturnForTokenEndpoint(Map<String, String> parameters,
+                                                                 CoreToken token);
 
     /**
      * This method is called before the authorize end point returns an response. Whatever is returned by this
@@ -92,12 +97,13 @@ public interface Scope {
      * @param tokens a map of token return names to the token objects. For example "code"=>tokenObject
      * @return the return map should include the key value pair returnType=>Value where value is either FRAGMENT or QUERY
      */
-    public Map<String, String> extraDataToReturnForAuthorizeEndpoint(Map<String, String> parameters, Map<String, CoreToken> tokens);
+    public Map<String, String> extraDataToReturnForAuthorizeEndpoint(Map<String, String> parameters,
+                                                                     Map<String, CoreToken> tokens);
 
     /**
      * This method takes the scope values in the token and gets those user profile attributes for the owner of
      * the token.
-     * @param token The OAuth2 bearer token.
+     * @param token The OAuth2 bearer token containing the user to get the info about
      * @return
      */
     public Map<String,Object> getUserInfo(CoreToken token);
