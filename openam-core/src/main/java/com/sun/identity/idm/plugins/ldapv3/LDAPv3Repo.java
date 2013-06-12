@@ -118,6 +118,8 @@ import com.sun.identity.sm.SchemaType;
 
 public class LDAPv3Repo extends IdRepo {
 
+    private static final String AM_AUTH = "amAuth";
+
     private Map supportedOps = new HashMap();
 
     // config is part of IdRepo.java superclass and
@@ -532,7 +534,6 @@ public class LDAPv3Repo extends IdRepo {
     protected String LDAPv3Repo = "LDAPv3Repo";
 
     protected String amAuthLDAP = "amAuthLDAP";
-
 
     public LDAPv3Repo() {
         if (debug == null) {
@@ -5090,7 +5091,7 @@ public class LDAPv3Repo extends IdRepo {
                             "The specified user does not exist. " +
                             "username=" + username);
                     }
-                    throw new AuthLoginException(amAuthLDAP,
+                    throw new AuthLoginException(AM_AUTH,
                             "NoUser", null);
                 case LDAPUtilException.INVALID_CREDENTIALS:
                     if (debug.messageEnabled()) {
@@ -5098,7 +5099,7 @@ public class LDAPv3Repo extends IdRepo {
                             " Invalid password. username=" + username);
                     }
                     String failureUserID = ldapAuthUtil.getUserId();
-                    throw new InvalidPasswordException(amAuthLDAP,
+                    throw new InvalidPasswordException(AM_AUTH,
                         "InvalidUP", null, failureUserID, null);
                 case LDAPUtilException.UNWILLING_TO_PERFORM:
                     if (debug.messageEnabled()) {
@@ -5114,7 +5115,7 @@ public class LDAPv3Repo extends IdRepo {
                             "Inappropriate authentication. username="
                             + username);
                     }
-                    throw new AuthLoginException(amAuthLDAP, "InappAuth",
+                    throw new AuthLoginException(AM_AUTH, "InappAuth",
                         null);
                 case LDAPUtilException.CONSTRAINT_VIOLATION:
                     if (debug.messageEnabled()) {
@@ -5129,7 +5130,7 @@ public class LDAPv3Repo extends IdRepo {
                         debug.message("LDAPv3Repo:authenticateIt. " +
                             "default exception. username=" + username);
                     }
-                    throw new AuthLoginException(amAuthLDAP, "LDAPex", null);
+                    throw new AuthLoginException(AM_AUTH, "LDAPex", null);
             }
         }
         return ((ldapAuthUtil.getState() == LDAPAuthUtils.SUCCESS) || 
