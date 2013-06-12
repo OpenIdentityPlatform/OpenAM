@@ -88,7 +88,17 @@ public class ClientVerifierImpl implements ClientVerifier{
             OAuth2Utils.DEBUG.error("ClientVerifierImpl::Client (" + clientId + ") using multiple authentication methods");
             throw OAuthProblemException.OAuthError.INVALID_CLIENT.handle(null, "Client authentication failed");
         } else if (request.getChallengeResponse() != null) {
-            client = verify(request.getChallengeResponse(), realm);
+            try {
+                client = verify(request.getChallengeResponse(), realm);
+            } catch (OAuthProblemException e){
+                Series<Header> responseHeaders = (Series<Header>) response.getAttributes().get("org.restlet.http.headers");
+                if (responseHeaders == null) {
+                    responseHeaders = new Series(Header.class);
+                    response.getAttributes().put("org.restlet.http.headers", responseHeaders);
+                }
+                responseHeaders.add(new Header("WWW-Authenticate", "Basic realm=\"" + OAuth2Utils.getRealm(request) + "\""));
+                throw e;
+            }
         } else if (clientSecret != null && clientId != null && !clientId.isEmpty()) {
                 client = verify(clientId, clientSecret, realm);
         } else {
