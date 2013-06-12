@@ -133,6 +133,7 @@
         <commons.json-resource.version>1.2.2</commons.json-resource.version>
         <commons.json-patch.version>1.0.0</commons.json-patch.version>
         <forgerock.json.version>2.0.0-SNAPSHOT</forgerock.json.version>
+        <commons.authnfilter.version>0.1.1-SNAPSHOT</commons.authnfilter.version>
 
         <restlet.version>2.1.1</restlet.version>
         <xercesj.version>2.11.0</xercesj.version>
@@ -218,6 +219,9 @@
 
         <!-- OpenAM Core Module -->
         <module>openam-core</module>
+
+        <!-- OpenAM Commons Authentication Filter -->
+        <module>openam-authn-filter</module>
 
         <!-- OpenAM CLI Module -->
         <module>openam-cli</module>
@@ -545,6 +549,16 @@
             <dependency>
                 <groupId>org.forgerock.openam</groupId>
                 <artifactId>openam-core</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.forgerock.openam</groupId>
+                <artifactId>openam-authn-filter-config</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.forgerock.openam</groupId>
+                <artifactId>openam-authn-filter-modules</artifactId>
                 <version>${project.version}</version>
             </dependency>
 
@@ -1580,6 +1594,16 @@
                 <groupId>org.forgerock.commons</groupId>
                 <artifactId>forgerock-util</artifactId>
                 <version>${commons.forgerock-util.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.forgerock.commons</groupId>
+                <artifactId>forgerock-jaspi-container</artifactId>
+                <version>${commons.authnfilter.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.glassfish</groupId>
+                <artifactId>javax.security.auth.message</artifactId>
+                <version>3.1</version>
             </dependency>
 
             <dependency>

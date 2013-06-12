@@ -72,7 +72,7 @@ import java.util.Set;
  *
  * @supported.api
  */
-public final class SSOTokenManager {
+public class SSOTokenManager {
     
     /*
      * SSOTokenManager is not a real provider but implements SSOProvider for

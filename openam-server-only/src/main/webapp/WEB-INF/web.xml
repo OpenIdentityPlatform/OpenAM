@@ -45,6 +45,17 @@
         <filter-class>com.sun.identity.rest.AuthZFilter</filter-class>
     </filter>
 
+    <listener>
+        <listener-class>org.forgerock.openam.jaspi.config.AuthnFilterConfigurator</listener-class>
+    </listener>
+    <filter>
+        <filter-name>CommonsAuthnFilter</filter-name>
+        <filter-class>org.forgerock.jaspi.filter.AuthNFilter</filter-class>
+        <init-param>
+            <param-name>moduleConfiguration</param-name>
+            <param-value>all</param-value>
+        </init-param>
+    </filter>
 
     <!-- filter declaration -->
 
@@ -64,6 +75,10 @@
         <filter-name>AuthZFilter</filter-name>
         <url-pattern>/ws/*</url-pattern>
     </filter-mapping>
+    <!--<filter-mapping>-->
+        <!--<filter-name>CommonsAuthnFilter</filter-name>-->
+        <!--<url-pattern>/json/session/*</url-pattern>-->
+    <!--</filter-mapping>-->
 
     <!-- filter mapping -->
 
