@@ -25,14 +25,18 @@
  * $Id: CaseInsensitiveKey.java,v 1.2 2008/06/25 05:42:25 qcheng Exp $
  *
  */
-
+/**
+ * Portions Copyrighted 2013 ForgeRock, Inc.
+ */
 package com.sun.identity.common;
+
+import java.io.Serializable;
 
 /**
  * String wrapper that returns a case insensitive hash code useful for case
  * insensitive hashing in HashSet and HashMap.
  */
-public class CaseInsensitiveKey {
+public class CaseInsensitiveKey implements Serializable {
     String mKey;
 
     public CaseInsensitiveKey(String key) {

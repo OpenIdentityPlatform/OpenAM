@@ -1,7 +1,7 @@
 /**
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright (c) 2010 ForgeRock AS. All Rights Reserved
+ * Copyright (c) 2010-2013 ForgeRock, Inc. All Rights Reserved
  *
  * The contents of this file are subject to the terms
  * of the Common Development and Distribution License
@@ -25,6 +25,8 @@
 
 package org.forgerock.openam.authentication.service.protocol;
 
+import com.sun.identity.common.CaseInsensitiveHashMap;
+import com.sun.identity.common.CaseInsensitiveHashSet;
 import java.io.Serializable;
 import java.security.Principal;
 import java.util.Enumeration;
@@ -55,9 +57,9 @@ public class RemoteHttpServletRequest extends RemoteServletRequest
     // normal cookies are not serialized.
     private transient Cookie[] cookies = null;
     private RemoteCookie[] internalCookies = null;
-    private Set headerNames = new HashSet();
-    private Map internalHeader = new HashMap();
-    private Map internalHeaders = new HashMap();
+    private Set headerNames = new CaseInsensitiveHashSet();
+    private Map internalHeader = new CaseInsensitiveHashMap();
+    private Map internalHeaders = new CaseInsensitiveHashMap();
     private String method = null;
     private String pathInfo = null;
     private String pathTranslated = null;
