@@ -17,7 +17,7 @@
 package org.forgerock.openam.forgerockrest.authn.callbackhandlers;
 
 import org.forgerock.json.fluent.JsonValue;
-import org.forgerock.openam.forgerockrest.authn.HttpMethod;
+import org.forgerock.openam.forgerockrest.authn.core.HttpMethod;
 import org.forgerock.openam.forgerockrest.authn.exceptions.RestAuthException;
 import org.forgerock.openam.utils.JsonValueBuilder;
 import org.mockito.Matchers;

@@ -16,22 +16,39 @@
 
 package org.forgerock.openam.forgerockrest.authn;
 
-import javax.ws.rs.core.Application;
-import java.util.HashSet;
+import org.testng.annotations.Test;
+
 import java.util.Set;
 
-/**
- * Defines the list of JAX-RS endpoint classes for the RestAuthService uri mapping.
- */
-public class RestAuthService extends Application {
+import static junit.framework.Assert.assertEquals;
+import static junit.framework.Assert.assertTrue;
 
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public Set<Class<?>> getClasses() {
-        Set<Class<?>> classes = new HashSet<Class<?>>();
-        classes.add(AuthenticationRestService.class);
-        return classes;
+public class RestAuthServiceTest {
+
+    @Test
+    public void shouldGetClasses() {
+
+        //Given
+        RestAuthService restAuthService = new RestAuthService();
+
+        //When
+        Set<Class<?>> classes = restAuthService.getClasses();
+
+        //Then
+        assertEquals(classes.size(), 1);
+        assertTrue(classes.contains(AuthenticationRestService.class));
+    }
+
+    @Test
+    public void shouldGetSingletons() {
+
+        //Given
+        RestAuthService restAuthService = new RestAuthService();
+
+        //When
+        Set<Object> singletons = restAuthService.getSingletons();
+
+        //Then
+        assertEquals(singletons.size(), 0);
     }
 }

@@ -16,6 +16,7 @@
 
 package org.forgerock.openam.forgerockrest.authn;
 
+import com.google.inject.Singleton;
 import com.sun.identity.authentication.share.RedirectCallbackHandler;
 import com.sun.identity.authentication.spi.HttpCallback;
 import com.sun.identity.authentication.spi.RedirectCallback;
@@ -49,6 +50,7 @@ import java.text.MessageFormat;
 /**
  * Factory class for getting the appropriate RestAuthCallbackHandlers for the given Callbacks.
  */
+@Singleton
 public class RestAuthCallbackHandlerFactory {
 
     private static final Debug DEBUG = Debug.getInstance("amIdentityServices");

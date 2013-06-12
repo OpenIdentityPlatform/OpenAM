@@ -14,7 +14,7 @@
  * Copyright 2013 ForgeRock Inc.
  */
 
-package org.forgerock.openam.forgerockrest.authn;
+package org.forgerock.openam.forgerockrest.authn.core;
 
 import com.sun.identity.authentication.AuthContext;
 
@@ -23,6 +23,7 @@ import com.sun.identity.authentication.AuthContext;
  */
 public enum AuthIndexType {
 
+    NONE(null),
     USER(AuthContext.IndexType.USER),
     ROLE(AuthContext.IndexType.ROLE),
     SERVICE(AuthContext.IndexType.SERVICE),
@@ -52,18 +53,25 @@ public enum AuthIndexType {
     }
 
     /**
-     * Gets the AuthIndexType Enum for the corresponding AuthContext.IndexType String.
+     * Gets the AuthIndexType Enum when either given the corresponding AuthContext.IndexType String, or the
+     * AuthIndexType Enum as string.
      *
-     * @param indexTypeString The AuthContext.IndexType String.
+     * @param indexTypeString The AuthContext.IndexType String or AuthIndexType enum as a String.
      * @return The AuthIndexType.
      */
     public static AuthIndexType getAuthIndexType(String indexTypeString) {
-        for (AuthIndexType authIndexType : AuthIndexType.values()) {
-            if (authIndexType.getIndexType().toString().equals(indexTypeString.toLowerCase())) {
-                return authIndexType;
+        if (indexTypeString == null) {
+            return NONE;
+        } else {
+            for (AuthIndexType authIndexType : AuthIndexType.values()) {
+                if (AuthIndexType.NONE.equals(authIndexType)) {
+                    continue;
+                }
+                if (indexTypeString.toLowerCase().equals(authIndexType.getIndexType().toString())) {
+                    return authIndexType;
+                }
             }
         }
-
-        throw new IllegalArgumentException("Unknown Authentication Index Type, " + indexTypeString);
+        return AuthIndexType.valueOf(indexTypeString.toUpperCase());
     }
 }

@@ -44,7 +44,7 @@ public class RestAuthTextInputCallbackHandler extends AbstractRestAuthCallbackHa
      * {@inheritDoc}
      */
     boolean doUpdateCallbackFromRequest(HttpHeaders headers, HttpServletRequest request, HttpServletResponse response,
-            JsonValue postBody, TextInputCallback callback) throws RestAuthCallbackHandlerResponseException {
+                                        JsonValue postBody, TextInputCallback callback) throws RestAuthCallbackHandlerResponseException {
 
         String text = request.getParameter("text");
 
@@ -61,7 +61,7 @@ public class RestAuthTextInputCallbackHandler extends AbstractRestAuthCallbackHa
      * {@inheritDoc}
      */
     public TextInputCallback handle(HttpHeaders headers, HttpServletRequest request, HttpServletResponse response,
-            JsonValue postBody, TextInputCallback originalCallback) {
+                                    JsonValue postBody, TextInputCallback originalCallback) {
         return originalCallback;
     }
 
@@ -84,10 +84,10 @@ public class RestAuthTextInputCallbackHandler extends AbstractRestAuthCallbackHa
         JsonValue jsonValue = JsonValueBuilder.jsonValue()
                 .put("type", CALLBACK_NAME)
                 .array("output")
-                    .add(createOutputField("prompt", prompt))
-                    .addLast(createOutputField("defaultText", defaultText))
+                .add(createOutputField("prompt", prompt))
+                .addLast(createOutputField("defaultText", defaultText))
                 .array("input")
-                    .addLast(createInputField(index, text))
+                .addLast(createInputField(index, text))
                 .build();
 
         return jsonValue;

@@ -39,7 +39,7 @@ public class RestAuthTextOutputCallbackHandler extends AbstractRestAuthCallbackH
      * {@inheritDoc}
      */
     boolean doUpdateCallbackFromRequest(HttpHeaders headers, HttpServletRequest request, HttpServletResponse response,
-            JsonValue postBody, TextOutputCallback callback) throws RestAuthCallbackHandlerResponseException {
+                                        JsonValue postBody, TextOutputCallback callback) throws RestAuthCallbackHandlerResponseException {
         return false;
     }
 
@@ -47,7 +47,7 @@ public class RestAuthTextOutputCallbackHandler extends AbstractRestAuthCallbackH
      * {@inheritDoc}
      */
     public TextOutputCallback handle(HttpHeaders headers, HttpServletRequest request, HttpServletResponse response,
-            JsonValue postBody, TextOutputCallback originalCallback) {
+                                     JsonValue postBody, TextOutputCallback originalCallback) {
         return originalCallback;
     }
 
@@ -69,8 +69,8 @@ public class RestAuthTextOutputCallbackHandler extends AbstractRestAuthCallbackH
         JsonValue jsonValue = JsonValueBuilder.jsonValue()
                 .put("type", CALLBACK_NAME)
                 .array("output")
-                    .add(createOutputField("message", message))
-                    .addLast(createOutputField("messageType", messageType))
+                .add(createOutputField("message", message))
+                .addLast(createOutputField("messageType", messageType))
                 .build();
 
         return jsonValue;

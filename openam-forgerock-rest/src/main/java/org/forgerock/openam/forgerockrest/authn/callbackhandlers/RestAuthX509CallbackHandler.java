@@ -18,7 +18,7 @@ package org.forgerock.openam.forgerockrest.authn.callbackhandlers;
 
 import com.sun.identity.authentication.spi.X509CertificateCallback;
 import org.forgerock.json.fluent.JsonValue;
-import org.forgerock.openam.forgerockrest.authn.HttpMethod;
+import org.forgerock.openam.forgerockrest.authn.core.HttpMethod;
 import org.forgerock.openam.forgerockrest.authn.exceptions.RestAuthException;
 
 import javax.servlet.http.HttpServletRequest;
@@ -44,8 +44,8 @@ public class RestAuthX509CallbackHandler extends AbstractRestAuthCallbackHandler
      * {@inheritDoc}
      */
     public boolean updateCallbackFromRequest(HttpHeaders headers, HttpServletRequest request,
-            HttpServletResponse response, JsonValue postBody, X509CertificateCallback callback,
-            HttpMethod httpMethod) {
+                                             HttpServletResponse response, JsonValue postBody, X509CertificateCallback callback,
+                                             HttpMethod httpMethod) {
 
         X509Certificate[] certificates = (X509Certificate[]) request.getAttribute(
                 "javax.servlet.request.X509Certificate");
@@ -64,7 +64,7 @@ public class RestAuthX509CallbackHandler extends AbstractRestAuthCallbackHandler
      * {@inheritDoc}
      */
     boolean doUpdateCallbackFromRequest(HttpHeaders headers, HttpServletRequest request, HttpServletResponse response,
-            JsonValue postBody, X509CertificateCallback callback) throws RestAuthCallbackHandlerResponseException {
+                                        JsonValue postBody, X509CertificateCallback callback) throws RestAuthCallbackHandlerResponseException {
         return false;
     }
 
@@ -72,7 +72,7 @@ public class RestAuthX509CallbackHandler extends AbstractRestAuthCallbackHandler
      * {@inheritDoc}
      */
     public X509CertificateCallback handle(HttpHeaders headers, HttpServletRequest request, HttpServletResponse response,
-            JsonValue postBody, X509CertificateCallback originalCallback) {
+                                          JsonValue postBody, X509CertificateCallback originalCallback) {
         return originalCallback;
     }
 

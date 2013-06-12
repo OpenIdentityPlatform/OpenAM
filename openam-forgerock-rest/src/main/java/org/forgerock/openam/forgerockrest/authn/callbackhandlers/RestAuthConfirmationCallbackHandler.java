@@ -44,7 +44,7 @@ public class RestAuthConfirmationCallbackHandler extends AbstractRestAuthCallbac
      * {@inheritDoc}
      */
     boolean doUpdateCallbackFromRequest(HttpHeaders headers, HttpServletRequest request, HttpServletResponse response,
-            JsonValue postBody, ConfirmationCallback callback) throws RestAuthCallbackHandlerResponseException {
+                                        JsonValue postBody, ConfirmationCallback callback) throws RestAuthCallbackHandlerResponseException {
 
         String selectedIndex = request.getParameter("selectedIndex");
 
@@ -61,7 +61,7 @@ public class RestAuthConfirmationCallbackHandler extends AbstractRestAuthCallbac
      * {@inheritDoc}
      */
     public ConfirmationCallback handle(HttpHeaders headers, HttpServletRequest request, HttpServletResponse response,
-            JsonValue postBody, ConfirmationCallback originalCallback) {
+                                       JsonValue postBody, ConfirmationCallback originalCallback) {
         return originalCallback;
     }
 
@@ -87,13 +87,13 @@ public class RestAuthConfirmationCallbackHandler extends AbstractRestAuthCallbac
         JsonValue jsonValue = JsonValueBuilder.jsonValue()
                 .put("type", CALLBACK_NAME)
                 .array("output")
-                    .add(createOutputField("prompt", prompt))
-                    .add(createOutputField("messageType", messageType))
-                    .add(createOutputField("options", options))
-                    .add(createOutputField("optionType", optionType))
-                    .addLast(createOutputField("defaultOption", defaultOption))
+                .add(createOutputField("prompt", prompt))
+                .add(createOutputField("messageType", messageType))
+                .add(createOutputField("options", options))
+                .add(createOutputField("optionType", optionType))
+                .addLast(createOutputField("defaultOption", defaultOption))
                 .array("input")
-                    .addLast(createInputField(index, selectedIndex))
+                .addLast(createInputField(index, selectedIndex))
                 .build();
 
         return jsonValue;

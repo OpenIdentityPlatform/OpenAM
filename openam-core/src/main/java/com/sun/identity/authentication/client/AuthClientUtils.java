@@ -900,7 +900,7 @@ public class AuthClientUtils {
     }
 
     // search valve in the String
-    private static boolean isContain(String value, String key) {
+    public static boolean isContain(String value, String key) {
         if (value == null) {
             return (false);
         }

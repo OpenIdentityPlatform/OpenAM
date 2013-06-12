@@ -16,7 +16,8 @@
 
 package org.forgerock.openam.forgerockrest.authn;
 
-import com.sun.identity.authentication.client.AuthClientUtils;
+import com.google.inject.Singleton;
+import org.forgerock.openam.forgerockrest.authn.core.HttpMethod;
 import org.forgerock.openam.guice.InjectorHolder;
 
 import javax.servlet.http.HttpServletRequest;
@@ -35,28 +36,29 @@ import javax.ws.rs.core.Response;
 /**
  * JAX-RS endpoint for version 1 RESTful authentication requests.
  */
+@Singleton
 @Path("/1")
-public class IdentityRestService {
+public class AuthenticationRestService {
 
     private final RestAuthenticationHandler restAuthenticationHandler;
 
     /**
-     * Constructs an instance of the IdentityRestService.
+     * Constructs an instance of the AuthenticationRestService.
      *
      * Used by the Jersey framework to create the instance.
      */
-    public IdentityRestService() {
-        restAuthenticationHandler = InjectorHolder.getInstance(RestAuthenticationHandler.class);
+    public AuthenticationRestService() {
+        this.restAuthenticationHandler = InjectorHolder.getInstance(RestAuthenticationHandler.class);
     }
 
     /**
-     * Constructs an instance of the IdentityRestService.
+     * Constructs an instance of the AuthenticationRestService.
      *
      * Used by tests to inject a mock RestAuthenticationHandler.
      *
      * @param restAuthenticationHandler An instance of the RestAuthenticationHandler.
      */
-    public IdentityRestService(RestAuthenticationHandler restAuthenticationHandler) {
+    public AuthenticationRestService(RestAuthenticationHandler restAuthenticationHandler) {
         this.restAuthenticationHandler = restAuthenticationHandler;
     }
 
@@ -74,6 +76,7 @@ public class IdentityRestService {
      * @param response The HttpServletResponse of the RESTful call.
      * @param authIndexType The authentication index type from the url parameters.
      * @param authIndexValue The authentication index value from the url parameters.
+     * @param sessionUpgradeSSOTokenId The SSO Token Id of the user's current session.
      * @return A response to be sent back to the client. The response will contain either a JSON object containing the
      * SSOToken id from a successful authentication, a JSON object containing a number of Callbacks for the client to
      * complete and return or a JSON object containing an exception message.
@@ -82,13 +85,12 @@ public class IdentityRestService {
     @Path("authenticate")
     @Produces(MediaType.APPLICATION_JSON)
     public Response authenticate(@Context HttpHeaders headers, @Context HttpServletRequest request,
-            @Context HttpServletResponse response, @QueryParam("authIndexType") String authIndexType,
-            @QueryParam("authIndexValue") String authIndexValue/*, @QueryParam("realm") String realm*/) {
-        //initiate
-        String realm = getRealm(request);
+                                 @Context HttpServletResponse response, @QueryParam("authIndexType") String authIndexType,
+                                 @QueryParam("authIndexValue") String authIndexValue,
+                                 @QueryParam("sessionUpgrade") String sessionUpgradeSSOTokenId) {
 
-        return restAuthenticationHandler.authenticate(headers, request, response, realm, authIndexType,
-                authIndexValue, HttpMethod.GET);
+        return restAuthenticationHandler.authenticate(headers, request, response, authIndexType, authIndexValue,
+                sessionUpgradeSSOTokenId, HttpMethod.GET);
     }
 
     /**
@@ -106,6 +108,7 @@ public class IdentityRestService {
      * @param response The HttpServletResponse of the RESTfull call.
      * @param authIndexType The authentication index type from the url parameters.
      * @param authIndexValue The authentication index value from the url parameters.
+     * @param sessionUpgradeSSOTokenId The SSO Token Id of the user's current session.
      * @param postBody The body of the POST request.
      * @return A response to be sent back to the client. The response will contain either a JSON object containing the
      * SSOToken id from a successful authentication, a JSON object containing a number of Callbacks for the client to
@@ -116,29 +119,18 @@ public class IdentityRestService {
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
     public Response authenticate(@Context HttpHeaders headers, @Context HttpServletRequest request,
-            @Context HttpServletResponse response, @QueryParam("authIndexType") String authIndexType,
-            @QueryParam("authIndexValue") String authIndexValue, /*@QueryParam("realm") String realm, */String postBody) {
+                                 @Context HttpServletResponse response, @QueryParam("authIndexType") String authIndexType,
+                                 @QueryParam("authIndexValue") String authIndexValue,
+                                 @QueryParam("sessionUpgrade") String sessionUpgradeSSOTokenId, String postBody) {
 
         if (postBody != null && !"".equals(postBody)) {
             //submitReqs
-            return restAuthenticationHandler.processAuthenticationRequirements(headers, request, response, postBody,
-                    HttpMethod.POST);
+            return restAuthenticationHandler.authenticate(headers, request, response, postBody,
+                    sessionUpgradeSSOTokenId);
         } else {
             //initiate
-            String realm = getRealm(request);
-
-            return restAuthenticationHandler.authenticate(headers, request, response, realm, authIndexType,
-                    authIndexValue, HttpMethod.POST);
+            return restAuthenticationHandler.authenticate(headers, request, response, authIndexType, authIndexValue,
+                    sessionUpgradeSSOTokenId, HttpMethod.POST);
         }
-    }
-
-    /**
-     * Gets the realm from the request.
-     *
-     * @param request The HttpServletRequest.
-     * @return The realm.
-     */
-    String getRealm(HttpServletRequest request) {
-        return AuthClientUtils.getDomainNameByRequest(request, AuthClientUtils.parseRequestParameters(request));
     }
 }

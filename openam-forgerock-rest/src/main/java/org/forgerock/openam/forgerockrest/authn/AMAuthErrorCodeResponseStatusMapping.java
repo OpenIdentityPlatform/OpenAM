@@ -17,6 +17,7 @@
 package org.forgerock.openam.forgerockrest.authn;
 
 import com.sun.identity.authentication.service.AMAuthErrorCode;
+import com.sun.identity.authentication.spi.AuthLoginException;
 
 import javax.ws.rs.core.Response;
 import java.util.HashMap;
@@ -27,12 +28,28 @@ import java.util.Map;
  */
 public class AMAuthErrorCodeResponseStatusMapping {
 
+    public int getAuthLoginExceptionResponseStatus(String authErrorCode) {
+
+        int statusCode = Response.Status.UNAUTHORIZED.getStatusCode();
+
+        Map<String, Response.Status> authErrorCodeResponseStatuses = getAMAuthErrorCodeResponseStatuses();
+
+        Response.Status responseStatus = authErrorCodeResponseStatuses.get(authErrorCode);
+        if (responseStatus == null && AMAuthErrorCode.AUTH_TIMEOUT.equals(authErrorCode)) {
+            statusCode = 408;
+        } else if (responseStatus != null) {
+            statusCode = responseStatus.getStatusCode();
+        }
+
+        return statusCode;
+    }
+
     /**
      * Returns a map of AMErrorCodes to Http Response Status codes.
      *
      * @return A Map of AM error codes to Response.Status.
      */
-    public Map<String, Response.Status> getAMAuthErrorCodeResponseStatuses() {
+    private Map<String, Response.Status> getAMAuthErrorCodeResponseStatuses() {
 
         Map<String, Response.Status> authErrorCodeResponseStatuses = new HashMap<String, Response.Status>();
 

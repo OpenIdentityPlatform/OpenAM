@@ -19,7 +19,7 @@ package org.forgerock.openam.forgerockrest.authn.callbackhandlers;
 import com.sun.identity.authentication.spi.HttpCallback;
 import com.sun.identity.shared.debug.Debug;
 import org.forgerock.json.fluent.JsonValue;
-import org.forgerock.openam.forgerockrest.authn.HttpMethod;
+import org.forgerock.openam.forgerockrest.authn.core.HttpMethod;
 import org.forgerock.openam.forgerockrest.authn.exceptions.RestAuthException;
 import org.forgerock.openam.utils.JsonValueBuilder;
 
@@ -51,7 +51,7 @@ public class RestAuthHttpCallbackHandler extends AbstractRestAuthCallbackHandler
      * {@inheritDoc}
      */
     public boolean updateCallbackFromRequest(HttpHeaders headers, HttpServletRequest request,
-            HttpServletResponse response, JsonValue postBody, HttpCallback callback, HttpMethod httpMethod) throws
+                                             HttpServletResponse response, JsonValue postBody, HttpCallback callback, HttpMethod httpMethod) throws
             RestAuthCallbackHandlerResponseException {
 
         String httpAuthorization = request.getHeader(callback.getAuthorizationHeader());
@@ -80,7 +80,7 @@ public class RestAuthHttpCallbackHandler extends AbstractRestAuthCallbackHandler
      * {@inheritDoc}
      */
     boolean doUpdateCallbackFromRequest(HttpHeaders headers, HttpServletRequest request, HttpServletResponse response,
-            JsonValue postBody, HttpCallback callback) throws RestAuthCallbackHandlerResponseException {
+                                        JsonValue postBody, HttpCallback callback) throws RestAuthCallbackHandlerResponseException {
         return false;
     }
 
@@ -88,7 +88,7 @@ public class RestAuthHttpCallbackHandler extends AbstractRestAuthCallbackHandler
      * {@inheritDoc}
      */
     public HttpCallback handle(HttpHeaders headers, HttpServletRequest request, HttpServletResponse response,
-            JsonValue postBody, HttpCallback originalCallback) {
+                               JsonValue postBody, HttpCallback originalCallback) {
         if (isJsonAttributePresent(postBody, "reason") && postBody.get("reason").asString().equals(IWA_FAILED)) {
             request.setAttribute(IWA_FAILED, true);
         }

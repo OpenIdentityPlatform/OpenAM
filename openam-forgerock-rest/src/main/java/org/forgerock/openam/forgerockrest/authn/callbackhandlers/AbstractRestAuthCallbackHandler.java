@@ -18,7 +18,7 @@ package org.forgerock.openam.forgerockrest.authn.callbackhandlers;
 
 import com.sun.identity.shared.debug.Debug;
 import org.forgerock.json.fluent.JsonValue;
-import org.forgerock.openam.forgerockrest.authn.HttpMethod;
+import org.forgerock.openam.forgerockrest.authn.core.HttpMethod;
 import org.forgerock.openam.forgerockrest.authn.exceptions.RestAuthException;
 import org.forgerock.openam.utils.JsonArray;
 import org.forgerock.openam.utils.JsonObject;
@@ -45,7 +45,7 @@ public abstract class AbstractRestAuthCallbackHandler<T extends Callback> {
      * {@inheritDoc}
      */
     public boolean updateCallbackFromRequest(HttpHeaders headers, HttpServletRequest request,
-            HttpServletResponse response, JsonValue postBody, T callback, HttpMethod httpMethod)
+                                             HttpServletResponse response, JsonValue postBody, T callback, HttpMethod httpMethod)
             throws RestAuthCallbackHandlerResponseException {
 
         // If HttMethod is GET then by default callbacks should not be handled internally/
@@ -74,7 +74,7 @@ public abstract class AbstractRestAuthCallbackHandler<T extends Callback> {
      * @throws RestAuthCallbackHandlerResponseException If one of the CallbackHandlers has its own response to be sent.
      */
     abstract boolean doUpdateCallbackFromRequest(HttpHeaders headers, HttpServletRequest request,
-            HttpServletResponse response, JsonValue postBody, T callback)
+                                                 HttpServletResponse response, JsonValue postBody, T callback)
             throws RestAuthCallbackHandlerResponseException;
 
     /**

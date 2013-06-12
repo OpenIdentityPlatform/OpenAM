@@ -25,7 +25,7 @@ import org.forgerock.util.SignatureUtil;
 import javax.inject.Singleton;
 
 /**
- * Guice Module for configuring bindings for the IdentityRestService classes.
+ * Guice Module for configuring bindings for the AuthenticationRestService classes.
  *
  * @author Phill Cunnington
  */

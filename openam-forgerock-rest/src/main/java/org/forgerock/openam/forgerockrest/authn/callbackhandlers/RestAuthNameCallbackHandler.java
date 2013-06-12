@@ -51,7 +51,7 @@ public class RestAuthNameCallbackHandler extends AbstractRestAuthCallbackHandler
      * {@inheritDoc}
      */
     boolean doUpdateCallbackFromRequest(HttpHeaders headers, HttpServletRequest request, HttpServletResponse response,
-            JsonValue postBody, NameCallback callback) throws RestAuthCallbackHandlerResponseException {
+                                        JsonValue postBody, NameCallback callback) throws RestAuthCallbackHandlerResponseException {
 
         String username = request.getParameter("username");
 
@@ -68,7 +68,7 @@ public class RestAuthNameCallbackHandler extends AbstractRestAuthCallbackHandler
      * {@inheritDoc}
      */
     public NameCallback handle(HttpHeaders headers, HttpServletRequest request, HttpServletResponse response,
-            JsonValue postBody, NameCallback originalCallback) {
+                               JsonValue postBody, NameCallback originalCallback) {
         return originalCallback;
     }
 
@@ -83,9 +83,9 @@ public class RestAuthNameCallbackHandler extends AbstractRestAuthCallbackHandler
         JsonValue jsonValue = JsonValueBuilder.jsonValue()
                 .put("type", CALLBACK_NAME)
                 .array("output")
-                    .addLast(createOutputField("prompt", prompt))
+                .addLast(createOutputField("prompt", prompt))
                 .array("input")
-                    .addLast(createInputField(index, name))
+                .addLast(createInputField(index, name))
                 .build();
 
         return jsonValue;
