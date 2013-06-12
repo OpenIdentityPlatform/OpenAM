@@ -149,7 +149,7 @@ public class AuthorizeServerResource extends AbstractFlow {
                             .getRequestParameter(getRequest(), OAuth2Constants.Params.STATE, String.class);
             String nonce =
                     OAuth2Utils
-                            .getRequestParameter(getRequest(), OAuth2Constants.Params.STATE, String.class);
+                            .getRequestParameter(getRequest(), OAuth2Constants.Custom.NONCE, String.class);
 
             Set<String> checkedScope = executeAccessTokenScopePlugin(scope_after);
 
@@ -176,6 +176,10 @@ public class AuthorizeServerResource extends AbstractFlow {
             } else {
                 try {
                     for(String request: requestedResponseTypes){
+                        if (request.isEmpty()){
+                            throw OAuthProblemException.OAuthError.UNSUPPORTED_RESPONSE_TYPE.handle(getRequest(),
+                                    "Response type is not supported");
+                        }
                         String responseClass = responseTypes.get(request);
                         if (responseClass == null || responseClass.isEmpty()){
                             OAuth2Utils.DEBUG.warning("AuthorizeServerResource.represent(): Requested a response type that is not configured. response_type=" + request);

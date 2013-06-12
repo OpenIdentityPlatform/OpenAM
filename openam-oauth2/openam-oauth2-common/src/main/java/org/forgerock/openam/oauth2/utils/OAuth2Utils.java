@@ -682,7 +682,9 @@ public class OAuth2Utils {
     }
 
     public static Set<String> stringToSet(String string){
-        return OAuth2Utils.split(string, " ");
+        String[] values = string.trim().split(" ");
+        Set<String> set = new HashSet<String>(Arrays.asList(values));
+        return set;
     }
 
     /**
