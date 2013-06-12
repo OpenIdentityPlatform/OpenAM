@@ -51,7 +51,9 @@ import java.util.Collections;
 import java.util.Set;
 
 import org.restlet.data.Status;
+import org.restlet.engine.header.Header;
 import org.restlet.resource.ResourceException;
+import org.restlet.util.Series;
 
 import javax.security.auth.callback.Callback;
 import javax.security.auth.callback.NameCallback;
@@ -90,7 +92,7 @@ public class ClientVerifierImpl implements ClientVerifier{
         } else if (clientSecret != null && clientId != null && !clientId.isEmpty()) {
                 client = verify(clientId, clientSecret, realm);
         } else {
-            throw OAuthProblemException.OAuthError.INVALID_REQUEST.handle(null, "No client authentication supplied");
+            throw OAuthProblemException.OAuthError.INVALID_CLIENT.handle(null, "No client authentication supplied");
         }
         if (OAuth2Utils.logStatus) {
             if (client == null){
@@ -196,7 +198,7 @@ public class ClientVerifierImpl implements ClientVerifier{
     public ClientApplication findClient(String clientId, Request request){
 
         if (clientId == null || clientId.isEmpty()){
-            throw OAuthProblemException.OAuthError.INVALID_REQUEST.handle(null);
+            throw OAuthProblemException.OAuthError.INVALID_CLIENT.handle(null);
         }
         String realm = OAuth2Utils.getRealm(request);
         ClientApplication user = null;
@@ -229,7 +231,7 @@ public class ClientVerifierImpl implements ClientVerifier{
             }
 
             if (results == null || results.size() != 1) {
-                throw OAuthProblemException.OAuthError.UNAUTHORIZED_CLIENT.handle(null,
+                throw OAuthProblemException.OAuthError.INVALID_CLIENT.handle(null,
                                                                                  "Not able to get client from OpenAM");
 
             }
@@ -244,7 +246,7 @@ public class ClientVerifierImpl implements ClientVerifier{
             }
         } catch (Exception e){
             OAuth2Utils.DEBUG.error("ClientVerifierImpl::Unable to get client AMIdentity: ", e);
-            throw OAuthProblemException.OAuthError.UNAUTHORIZED_CLIENT.handle(null, "Not able to get client from OpenAM");
+            throw OAuthProblemException.OAuthError.INVALID_CLIENT.handle(null, "Not able to get client from OpenAM");
         }
     }
 }
