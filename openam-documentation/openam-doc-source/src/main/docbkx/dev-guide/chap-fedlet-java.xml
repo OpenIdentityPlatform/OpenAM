@@ -1248,13 +1248,13 @@ $ cp fedletSampleApp.jsp fedletSampleApp.jsp.orig</screen>
 &lt;/head&gt;
 
 &lt;body&gt;
+
 &lt;h1&gt;My Application&lt;/h1&gt;
+
 &lt;p&gt;After you change the &lt;code&gt;fedletSampleApp.jsp&lt;/code&gt;,
    all it does is redirect to this home page after
    successful login.&lt;/p&gt;
-&lt;p&gt;See the fedlet README file and example JSPs for hints
-   on how to retrieve attributes from OpenAM, or to send
-   XACML queries for policy decisions.&lt;/p&gt;
+
 &lt;/body&gt;
 &lt;/html&gt;</programlisting>
    </step>
