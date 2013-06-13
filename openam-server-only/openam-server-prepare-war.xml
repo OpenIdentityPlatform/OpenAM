@@ -3,7 +3,7 @@
 <!--
 * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
 *
-* Copyright (c) 2011 ForgeRock AS. All Rights Reserved
+* Copyright (c) 2011,2013 ForgeRock Inc. All Rights Reserved
 *
 * The contents of this file are subject to the terms
 * of the Common Development and Distribution License
@@ -124,12 +124,49 @@
 
         <copy todir="${amserver.target.resources.dir}" filtering="true">
             <fileset dir="${amserver.resources.i18n.dir}">
-                <include name="*.properties"/>
+                <include name="**/*.properties"/>
                 <exclude name="Services.properties"/>
                 <exclude name="ums.properties"/>
                 <exclude name="sso.properties"/>
                 <exclude name="SMS.properties"/>
                 <exclude name="authentication_util.properties"/>
+            </fileset>
+            <globmapper from="*.properties" to="*_en.properties"/>
+        </copy>
+
+        <!--
+            Fix for OPENAM-2337: need to copy contents of the openam-locale/src/main/resources subdirectories into the
+            WEB_INF/classes directory to support fedlet creation. Following the existing pattern of copying things twice -
+            once with a globalmapper to change *.properties to *_en.properties, so we will have both the default .properties
+            (based on English), and the *_en.properties. None of the specified excludes in the two copy tasks above existed
+            in the directories targeted by the copy below.
+        -->
+        <copy todir="${amserver.target.resources.dir}" flatten="true" filtering="true">
+            <fileset dir="${library.resources.i18n.dir}">
+                <include name="**"/>
+                <include name="*.properties"/>
+            </fileset>
+        </copy>
+
+        <copy todir="${amserver.target.resources.dir}" flatten="true" filtering="true">
+            <fileset dir="${library.resources.i18n.dir}">
+                <include name="**"/>
+                <include name="*.properties"/>
+            </fileset>
+            <globmapper from="*.properties" to="*_en.properties"/>
+        </copy>
+
+        <copy todir="${amserver.target.resources.dir}" flatten="true" filtering="true">
+            <fileset dir="${openfm.resources.i18n.dir}">
+                <include name="**"/>
+                <include name="*.properties"/>
+            </fileset>
+        </copy>
+
+        <copy todir="${amserver.target.resources.dir}" flatten="true" filtering="true">
+            <fileset dir="${openfm.resources.i18n.dir}">
+                <include name="**"/>
+                <include name="*.properties"/>
             </fileset>
             <globmapper from="*.properties" to="*_en.properties"/>
         </copy>
