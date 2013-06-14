@@ -370,7 +370,7 @@ public class WindowsDesktopSSO extends AMLoginModule {
             (byte)0x02 };
 
     /**
-     * Checks the request for an attribute "iwa-failed".
+     * Checks the request for an attribute "http-auth-failed".
      *
      * @param request THe HttpServletRequest.
      * @return If the attribute is present and set to true true is returned otherwise false is returned.
