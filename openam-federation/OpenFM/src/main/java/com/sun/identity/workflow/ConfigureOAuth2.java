@@ -58,7 +58,7 @@ public class ConfigureOAuth2 extends Task {
     private static final String POLICY_NAME = "OAuth2ProviderPolicy";
     private static final String RULE_NAME = "OAuth2ProviderRule";
     private static final String SUBJECT_NAME = "OAuth2ProviderSubject";
-    private static final String OAUTH2_AUTHORIZE_ENDPOINT = "/oauth2/authorize*";
+    private static final String OAUTH2_AUTHORIZE_ENDPOINT = "/oauth2/authorize?*";
     private static final String ROOT_REALM = "/";
 
     public ConfigureOAuth2(){
