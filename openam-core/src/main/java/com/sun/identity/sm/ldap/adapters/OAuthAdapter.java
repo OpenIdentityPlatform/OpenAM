@@ -24,7 +24,10 @@ import com.sun.identity.sm.ldap.utils.JSONSerialisation;
 import org.forgerock.json.fluent.JsonValue;
 
 import java.util.Collection;
+import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 /**
  * OAuth TokenAdapter provides conversion to and from OAuth JsonValue tokens.
@@ -146,6 +149,14 @@ public class OAuthAdapter implements TokenAdapter<JsonValue> {
         JsonValue r;
         try {
             r = new JsonValue(serialisation.deserialise(data, Map.class));
+            r = new JsonValue(r.get("value").asMap());
+            Set<String> keys = r.keys();
+            for (String key : keys){
+                List<String> x = r.get(key).asList(String.class);
+                Set<String> set = new HashSet<String>(x);
+                r.remove(key);
+                r.add(key, set);
+            }
         } catch (RuntimeException e) {
             throw new IllegalArgumentException(
                     "The CTS usage of the JsonValue depends on the value being of " +

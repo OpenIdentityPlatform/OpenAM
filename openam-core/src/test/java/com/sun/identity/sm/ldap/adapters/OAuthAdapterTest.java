@@ -26,9 +26,13 @@ import edu.emory.mathcs.backport.java.util.Arrays;
 import org.forgerock.json.fluent.JsonValue;
 import org.testng.annotations.Test;
 
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.TimeZone;
 
 import static org.mockito.BDDMockito.given;
@@ -46,7 +50,8 @@ public class OAuthAdapterTest {
         // Given
         OAuthAdapter adapter = generateOAuthAdapter();
 
-        String text = "badger";
+        Set<String> text = new HashSet<String>();
+        text.add("badger");
         OAuthTokenField field = OAuthTokenField.PARENT;
 
         Map<String, Object> values = new HashMap<String, Object>();
@@ -57,7 +62,7 @@ public class OAuthAdapterTest {
         Token result = adapter.toToken(jsonValue);
 
         // Then
-        assertEquals(text, result.getValue(field.getField()));
+        assert(result.getValue(field.getField()).toString().contains("badger"));
     }
 
     @Test
@@ -131,20 +136,21 @@ public class OAuthAdapterTest {
     @Test
     public void shouldDeserialiseSerialisedToken() {
         // Given
-        String id = "badger";
+        String[] id = {"badger"};
+        List<String> list = new ArrayList<String>(Arrays.asList(id));
         OAuthTokenField field = OAuthTokenField.ID;
 
         JSONSerialisation serialisation = new JSONSerialisation(mock(Debug.class));
         OAuthAdapter adapter = generateOAuthAdapter();
 
         // Populate a map for serialisation.
-        Map<String, String> values = new HashMap<String, String>();
-        values.put(field.getOAuthField(), id);
+        Map<String, Object> values = new HashMap<String, Object>();
+        values.put(field.getOAuthField(), list);
         Map<String, Object> map = new HashMap<String, Object>();
         map.put(OAuthAdapter.VALUE, values);
         String serialisedObject = serialisation.serialise(map);
 
-        Token token = new Token(id, TokenType.OAUTH);
+        Token token = new Token(id[0], TokenType.OAUTH);
         // Set the serialised binary data
         token.setBlob(serialisedObject.getBytes());
 
@@ -153,8 +159,7 @@ public class OAuthAdapterTest {
 
         // Then
         assertNotNull(result);
-        JsonValue value = result.get(OAuthAdapter.VALUE);
-        assertEquals(value.asMap().get(field.getOAuthField()), id);
+        assert(result.asMap().get(field.getOAuthField()).toString().contains(id[0]));
     }
 
     @Test (expectedExceptions = IllegalArgumentException.class)

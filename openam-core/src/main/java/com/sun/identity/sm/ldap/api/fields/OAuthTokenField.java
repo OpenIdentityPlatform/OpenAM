@@ -39,7 +39,7 @@ public enum OAuthTokenField {
     ISSUED(OAuth2Constants.CoreTokenParams.ISSUED, CoreTokenField.STRING_SIX),
     TYPE(OAuth2Constants.CoreTokenParams.TOKEN_TYPE, CoreTokenField.STRING_SEVEN),
     REALM(OAuth2Constants.CoreTokenParams.REALM, CoreTokenField.STRING_EIGHT),
-    ID(OAuth2Constants.CoreTokenParams.CLIENT_ID, CoreTokenField.TOKEN_ID),
+    ID(OAuth2Constants.CoreTokenParams.ID, CoreTokenField.TOKEN_ID),
     CLIENT_ID(OAuth2Constants.CoreTokenParams.CLIENT_ID, CoreTokenField.STRING_NINE),
     TOKEN_NAME(OAuth2Constants.CoreTokenParams.TOKEN_NAME, CoreTokenField.STRING_TEN);
 
