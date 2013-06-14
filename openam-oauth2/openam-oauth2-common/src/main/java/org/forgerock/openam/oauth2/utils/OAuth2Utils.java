@@ -682,6 +682,9 @@ public class OAuth2Utils {
     }
 
     public static Set<String> stringToSet(String string){
+        if (string == null || string.isEmpty()){
+            return Collections.EMPTY_SET;
+        }
         String[] values = string.split(" ");
         Set<String> set = new HashSet<String>(Arrays.asList(values));
         return set;
