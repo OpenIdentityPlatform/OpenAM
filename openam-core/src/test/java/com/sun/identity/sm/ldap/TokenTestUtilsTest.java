@@ -59,10 +59,11 @@ public class TokenTestUtilsTest {
     }
 
     @Test (expectedExceptions = AssertionError.class)
-    public void shouldCompareDateWithTimeZoneOffset() {
+    public void shouldFailBecauseTokenTimestampsAreDifferentTimeZones() {
         // Given
         Token expected = new Token("", TokenType.SESSION);
         Calendar expectedCal = Calendar.getInstance();
+        expectedCal.setTimeZone(LDAPDataConversionTest.CHICAGO);
         expected.setExpiryTimestamp(expectedCal);
 
         Token result = new Token("", TokenType.SESSION);

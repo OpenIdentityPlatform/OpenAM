@@ -27,7 +27,7 @@ import static org.testng.Assert.assertEquals;
  */
 public class LDAPDataConversionTest {
     // Reference time zones useful for testing.
-    public final static TimeZone CHICARGO = TimeZone.getTimeZone("America/Chicago");
+    public final static TimeZone CHICAGO = TimeZone.getTimeZone("America/Chicago");
     public final static TimeZone BERLIN = TimeZone.getTimeZone("Europe/Berlin");
     public final static TimeZone MALDIVES = TimeZone.getTimeZone("Indian/Maldives");
 
