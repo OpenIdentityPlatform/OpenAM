@@ -41,7 +41,7 @@ public class RestAuthHttpCallbackHandler extends AbstractRestAuthCallbackHandler
 
     private static final String CALLBACK_NAME = "HttpCallback";
 
-    private static final String IWA_FAILED = "iwa-failed";
+    private static final String HTTP_AUTH_FAILED = "http-auth-failed";
 
     /**
      * Checks the request for the presence of a header with the Authorization Header as define in the HttpCallBack,
@@ -51,7 +51,7 @@ public class RestAuthHttpCallbackHandler extends AbstractRestAuthCallbackHandler
      * {@inheritDoc}
      */
     public boolean updateCallbackFromRequest(HttpHeaders headers, HttpServletRequest request,
-                                             HttpServletResponse response, JsonValue postBody, HttpCallback callback, HttpMethod httpMethod) throws
+            HttpServletResponse response, JsonValue postBody, HttpCallback callback, HttpMethod httpMethod) throws
             RestAuthCallbackHandlerResponseException {
 
         String httpAuthorization = request.getHeader(callback.getAuthorizationHeader());
@@ -61,10 +61,10 @@ public class RestAuthHttpCallbackHandler extends AbstractRestAuthCallbackHandler
 
             JsonValue jsonValue = JsonValueBuilder.jsonValue()
                     .put("failure", true)
-                    .put("reason", IWA_FAILED)
+                    .put("reason", HTTP_AUTH_FAILED)
                     .build();
             Map<String, String> responseHeaders = new HashMap<String, String>();
-            responseHeaders.put("WWW-Authenticate", "Negotiate");
+            responseHeaders.put(callback.getNegotiationHeaderName(), callback.getNegotiationHeaderValue());
             throw new RestAuthCallbackHandlerResponseException(Response.Status.UNAUTHORIZED,
                     responseHeaders, jsonValue);
         }
@@ -80,7 +80,7 @@ public class RestAuthHttpCallbackHandler extends AbstractRestAuthCallbackHandler
      * {@inheritDoc}
      */
     boolean doUpdateCallbackFromRequest(HttpHeaders headers, HttpServletRequest request, HttpServletResponse response,
-                                        JsonValue postBody, HttpCallback callback) throws RestAuthCallbackHandlerResponseException {
+            JsonValue postBody, HttpCallback callback) throws RestAuthCallbackHandlerResponseException {
         return false;
     }
 
@@ -88,9 +88,9 @@ public class RestAuthHttpCallbackHandler extends AbstractRestAuthCallbackHandler
      * {@inheritDoc}
      */
     public HttpCallback handle(HttpHeaders headers, HttpServletRequest request, HttpServletResponse response,
-                               JsonValue postBody, HttpCallback originalCallback) {
-        if (isJsonAttributePresent(postBody, "reason") && postBody.get("reason").asString().equals(IWA_FAILED)) {
-            request.setAttribute(IWA_FAILED, true);
+            JsonValue postBody, HttpCallback originalCallback) {
+        if (isJsonAttributePresent(postBody, "reason") && postBody.get("reason").asString().equals(HTTP_AUTH_FAILED)) {
+            request.setAttribute(HTTP_AUTH_FAILED, true);
         }
         return originalCallback;
     }

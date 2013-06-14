@@ -140,9 +140,14 @@ public class RestAuthenticationHandler {
         try {
             AuthIndexType indexType = getAuthIndexType(authIndexType);
 
-            String authId;
+            String authId = null;
+
+            if (postBody != null) {
+                authId = postBody.get("authId").asString();
+            }
+
             String sessionId = null;
-            if (postBody != null && (authId = postBody.get("authId").asString()) != null) {
+            if (authId != null) {
                 SignedJwt jwt = (SignedJwt) jwtBuilder.recontructJwt(authId);
                 sessionId = jwt.getJwt().getContent("sessionId", String.class);
                 String authIndexTypeString = jwt.getJwt().getContent("authIndexType", String.class);
@@ -159,13 +164,12 @@ public class RestAuthenticationHandler {
 
             LoginProcess loginProcess = loginAuthenticator.getLoginProcess(loginConfiguration);
 
-
-            if (postBody != null && (authId = postBody.get("authId").asString()) != null) {
+            if (authId != null) {
                 authIdHelper.verifyAuthId(loginProcess, authId);
             }
 
-            responseBuilder = processAuthentication(headers, request, response, postBody, httpMethod, loginProcess,
-                    loginConfiguration);
+            responseBuilder = processAuthentication(headers, request, response, postBody, httpMethod, authId,
+                    loginProcess, loginConfiguration);
 
         } catch (RestAuthException e) {
             DEBUG.error(e.getMessage());
@@ -216,9 +220,9 @@ public class RestAuthenticationHandler {
      * @throws SignatureException If there is a problem creating the JWT to use in the response to the client.
      */
     private Response.ResponseBuilder processAuthentication(HttpHeaders headers, HttpServletRequest request,
-                                                           HttpServletResponse response, JsonValue postBody, HttpMethod httpMethod, LoginProcess loginProcess,
-                                                           LoginConfiguration loginConfiguration) throws RestAuthCallbackHandlerResponseException,
-            AuthLoginException, SignatureException {
+            HttpServletResponse response, JsonValue postBody, HttpMethod httpMethod, String authId,
+            LoginProcess loginProcess, LoginConfiguration loginConfiguration)
+            throws RestAuthCallbackHandlerResponseException, AuthLoginException, SignatureException {
 
         Response.ResponseBuilder responseBuilder;
 
@@ -229,8 +233,18 @@ public class RestAuthenticationHandler {
 
                 JsonValue jsonCallbacks = null;
                 if (postBody == null) {
-                    jsonCallbacks = restAuthCallbackHandlerManager.handleCallbacks(headers, request, response,
-                            postBody, callbacks, httpMethod);
+                    try {
+                        jsonCallbacks = restAuthCallbackHandlerManager.handleCallbacks(headers, request, response,
+                                postBody, callbacks, httpMethod);
+                    } catch (RestAuthCallbackHandlerResponseException e) {
+                        // Include the authId in the JSON response.
+                        if (authId == null) {
+                            authId = authIdHelper.createAuthId(loginConfiguration, loginProcess.getAuthContext());
+                        }
+                        e.getJsonResponse().put("authId", authId);
+                        throw e;
+                    }
+
                 } else if (!postBody.get("callbacks").isNull()) {
                     JsonValue jCallbacks = postBody.get("callbacks");
 
@@ -245,8 +259,7 @@ public class RestAuthenticationHandler {
 
                     JsonObject jsonResponseObject = JsonValueBuilder.jsonValue();
 
-                    String authId;
-                    if (postBody == null || (authId = postBody.get("authId").asString()) == null) {
+                    if (authId == null) {
                         authId = authIdHelper.createAuthId(loginConfiguration, loginProcess.getAuthContext());
                     }
                     jsonResponseObject.put("authId", authId);
@@ -265,8 +278,8 @@ public class RestAuthenticationHandler {
 
                 } else {
                     loginProcess = loginProcess.next(callbacks);
-                    responseBuilder = processAuthentication(headers, request, response, null, httpMethod, loginProcess,
-                            loginConfiguration);
+                    responseBuilder = processAuthentication(headers, request, response, null, httpMethod, authId,
+                            loginProcess, loginConfiguration);
                 }
                 break;
             }

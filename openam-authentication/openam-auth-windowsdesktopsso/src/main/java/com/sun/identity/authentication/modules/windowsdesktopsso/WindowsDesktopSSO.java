@@ -376,7 +376,7 @@ public class WindowsDesktopSSO extends AMLoginModule {
      * @return If the attribute is present and set to true true is returned otherwise false is returned.
      */
     private boolean hasWDSSOFailed(HttpServletRequest request) {
-        return Boolean.valueOf((String) request.getAttribute("iwa-failed"));
+        return Boolean.valueOf((String) request.getAttribute("http-auth-failed"));
     }
 
     private byte[] getSPNEGOTokenFromHTTPRequest(HttpServletRequest req) {
