@@ -107,7 +107,7 @@
 				</AttributeSchema>
 
 				<AttributeSchema
-					name="iplanet-am-auth-adaptive-device-print-screen-resoultion-penalty-points"
+					name="iplanet-am-auth-adaptive-device-print-screen-resolution-penalty-points"
 					type="single" syntax="number_range" rangeStart="0" rangeEnd="2147483647"
 					i18nKey="a013">
 					<DefaultValues>
@@ -492,7 +492,7 @@
 					</AttributeSchema>
 
 					<AttributeSchema
-						name="iplanet-am-auth-adaptive-device-print-screen-resoultion-penalty-points"
+						name="iplanet-am-auth-adaptive-device-print-screen-resolution-penalty-points"
 						type="single" syntax="number_range" rangeStart="0" rangeEnd="2147483647"
 						i18nKey="a013">
 						<DefaultValues>

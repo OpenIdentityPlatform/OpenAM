@@ -1797,7 +1797,7 @@
                         perhaps is adjusting to changing eyesight. Whenever a different screen resolution is detected,
                         a fixed number of penalty points is added. Default: 35.</para>
                     <para><command>ssoadm</command> attribute:</para>
-                    <literal>iplanet-am-auth-adaptive-device-print-screen-resoultion-penalty-points</literal>
+                    <literal>iplanet-am-auth-adaptive-device-print-screen-resolution-penalty-points</literal>
                 </listitem>
             </varlistentry>
             <varlistentry>
