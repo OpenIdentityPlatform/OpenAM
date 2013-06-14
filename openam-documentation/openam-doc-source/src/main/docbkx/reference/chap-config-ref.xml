@@ -57,6 +57,84 @@
   <para>The primary difference is that when configuring services globally,
   you set the default values to be used when a module is configured further
   for a specific realm.</para>
+  
+  <para>The Core Authentication module includes some fields under this tab that are not 
+  available through the realm changes under the <literal>Access Control</literal> tab. 
+  Because attributes set under the <literal>Configuration</literal> tab apply on a 
+  server level, the changes you make here will apply to all realms. Attributes 
+  set under the <literal>Access Control</literal> tab only apply to the realms that
+  you specify. The Authentication table under the <literal>Configuration</literal> tab
+  lists all existing types of modules available for configuration, including any
+  customized modules you have added.</para>
+  
+  <para>The following are the global fields you can configure for the Core Authentication 
+  module under the <literal>Configuration</literal> tab.</para>
+  
+   <variablelist>
+    <varlistentry>
+     <term>Pluggable Authentication Module Classes</term>
+     <listitem>
+      <para>Add class names for custom authentication modules to this list.</para>
+      <para><command>ssoadm</command> attribute:
+      <literal>iplanet-am-auth-authenticators</literal></para>
+     </listitem>
+    </varlistentry>
+    <varlistentry>
+     <term>LDAP Connection Pool Size, Default LDAP Connection Pool Size</term>
+     <listitem>
+      <para>Sets a minimum and maximum number of LDAP connections in the pool
+      for connecting to a directory server. When tuning for production, start
+      with <literal>10:65</literal> (10 minimum, 65 maximum). Explicit settings
+      for specific servers override the default.</para>
+      <para>This attribute is for LDAP and Membership authentication services
+      only.</para>
+      <para>This connection pool is different than the SDK connection pool
+      configured in <filename>serverconfig.xml</filename>.</para>
+      <para><command>ssoadm</command> attributes:
+      <literal>iplanet-am-auth-ldap-connection-pool-size</literal>, and
+      <literal>iplanet-am-auth-ldap-connection-pool-default-size</literal></para>
+     </listitem>
+    </varlistentry>
+    <varlistentry>
+     <term>LDAP Connection Pool Size, Default LDAP Connection Pool Size</term>
+     <listitem>
+      <para>Sets a minimum and maximum number of LDAP connections in the pool
+      for connecting to a directory server. When tuning for production, start
+      with <literal>10:65</literal> (10 minimum, 65 maximum). Explicit settings
+      for specific servers override the default.</para>
+      <para>This attribute is for LDAP and Membership authentication services
+      only.</para>
+      <para>This connection pool is different than the SDK connection pool
+      configured in <filename>serverconfig.xml</filename>.</para>
+      <para><command>ssoadm</command> attributes:
+      <literal>iplanet-am-auth-ldap-connection-pool-size</literal>, and
+      <literal>iplanet-am-auth-ldap-connection-pool-default-size</literal></para>
+     </listitem>
+    </varlistentry>
+    <varlistentry>
+     <term>Remote Auth Security</term>
+     <listitem>
+      <para>Require the authenticating application to send its SSOToken. This
+      allows the Authentication Service to obtain the username and password
+      associated with the application.</para>
+      <para><command>ssoadm</command> attribute:
+      <literal>sunRemoteAuthSecurityEnabled</literal></para>
+     </listitem>
+    </varlistentry>
+    <varlistentry>
+     <term>Keep Post Process Objects for Logout Processing, Keep Authentication
+     Module Objects for Logout Processing</term>
+     <listitem>
+      <para>When enabled, retain objects used to process authentication or
+      post authentication operations in the user session until the user
+      logs out.</para>
+      <para><command>ssoadm</command> attributes:
+      <literal>sunAMAuthKeepPostProcessInstances</literal>, and
+      <literal>sunAMAuthKeepAuthModuleIntances</literal></para>
+     </listitem>
+    </varlistentry>
+   </variablelist>
+  
  </section>
 
  <section xml:id="console-configuration">
