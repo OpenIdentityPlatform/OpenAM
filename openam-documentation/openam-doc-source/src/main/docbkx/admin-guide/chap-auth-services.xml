@@ -187,15 +187,7 @@
   the HOTP module for OTP authentication requires information
   about the password length and the mail server or SMS gateway for sending the
   password during authentication.</para>
-  
-  <tip>
-   <para>One parameter that all modules have is Authentication Level.
-   You change Authentication Level from 0 to a positive integer in order to
-   indicate those modules are seen as more secure. Then you configure
-   authorization to require a minimum authentication level required to access
-   protected resources.</para>
-  </tip>
-  
+    
   <section xml:id="ad-module-conf-hints">
    <title>Hints For the Active Directory Authentication Module</title>
    <para>OpenAM connects to Active Directory over Lightweight Directory Access
@@ -267,7 +259,9 @@
      </listitem>
     </varlistentry>
     <varlistentry>
-     <term>Attributes, Filter, Scope</term>
+     <term>Attributes Used to Search for a User to be Authenticated</term>
+     <term>User Search Filter</term>
+     <term>Search Scope</term>
      <listitem>
       <para>LDAP searches for user entries return entries with attribute
       values matching the filter you provide. For example if you search under
@@ -280,18 +274,27 @@
       both <literal>uid</literal> and <literal>mail</literal>, then Barbara
       Jensen can authenticate with either <literal>bjensen</literal> or
       <literal>bjensen@example.com</literal>.</para>
-      <para>Should you require a more complex filter for performance, you
-      add that to the User Search Filter text box. For example, if you search
-      on <literal>mail</literal> and add User Search Filter
-      <literal>(objectClass=inetOrgPerson)</literal>, then OpenAM uses the
-      resulting search filter
-      <literal>(&amp;(mail=<replaceable>address</replaceable>)(objectClass=inetOrgPerson))</literal>,
-      where <replaceable>address</replaceable> is the mail address provided
-      by the user.</para>
-      <para>Scope OBJECT means search only the entry specified as the DN to
-      Start User Search, whereas ONELEVEL means search only the entries
-      that are directly children of that object. SUBTREE means search the
-      entry specified and every entry under it.</para>
+      <para>The User Search Filter text box provides a more complex filter. For example, 
+      if you search on <literal>mail</literal> and add User Search Filter
+      <literal>(objectClass=inetOrgPerson)</literal>, then OpenAM uses the resulting 
+      search filter <literal>(&amp;(mail=<replaceable>address</replaceable>)
+      (objectClass=inetOrgPerson))</literal>, where <replaceable>address</replaceable> 
+      is the mail address provided by the user.</para>
+      <para>This controls how and the level of the directory that will be searched.
+      You can set the search to run at a high level or against a specific area.</para>
+       <itemizedlist>
+        <listitem>
+         <para>OBJECT will search only for the entry specified as the DN to Start User
+         Search.</para>
+        </listitem>
+        <listitem>
+         <para>ONELEVEL will search only the entries that are directly children of that
+         object.</para>
+        </listitem>
+        <listitem>
+         <para>SUBTREE will search the entry specified and every entry under it.</para>
+        </listitem>
+       </itemizedlist>
       <para><command>ssoadm</command> attributes:
       <literal>iplanet-am-auth-ldap-user-naming-attribute</literal>,
       <literal>iplanet-am-auth-ldap-user-search-attributes</literal>,
@@ -300,9 +303,9 @@
      </listitem>
     </varlistentry>
     <varlistentry>
-     <term>SSL Access to Active Directory Server</term>
+     <term>SSL/TLS Access to Active Directory Server</term>
      <listitem>
-      <para>If you enable SSL, OpenAM must be able to trust Active Directory
+      <para>If you enable SSL/TLS, OpenAM must be able to trust Active Directory
       certificates, either because the Active Directory certificates were
       signed by a CA whose certificate is already included in the trust store
       used by the container where OpenAM runs, or because you imported the
@@ -312,7 +315,7 @@
      </listitem>
     </varlistentry>
     <varlistentry>
-     <term>Return User DN to Authenticate</term>
+     <term>Return User DN to DataStore</term>
      <listitem>
       <para>When enabled, and OpenAM uses Active Directory as the user store,
       the module returns the DN rather than the User ID, so the bind for
@@ -343,6 +346,8 @@
     </varlistentry>
     <varlistentry>
      <term>Authentication Level</term>
+      <para>Sets the authentication level used to indicate the level of security
+      associated with the module. The value can range from 0 to any positive integer.</para>
      <listitem><para><command>ssoadm</command> attribute:
      <literal>sunAMAuthADAuthLevel</literal></para></listitem>
     </varlistentry>
@@ -395,10 +400,10 @@
     <title>General</title>
     <varlistentry>
      <term>Authentication Level</term>
-     <listitem>
-      <para><command>ssoadm</command> attribute:
-      <literal>openam-auth-adaptive-auth-level</literal></para>
-     </listitem>
+      <para>Sets the authentication level used to indicate the level of security
+      associated with the module. The value can range from 0 to any positive integer.</para>
+      <listitem><para><command>ssoadm</command> attribute:
+       <literal>openam-auth-adaptive-auth-level</literal></para></listitem>
     </varlistentry>
     <varlistentry>
      <term>Risk Threshold</term>
@@ -681,7 +686,7 @@
      </listitem>
     </varlistentry>
     <varlistentry>
-     <term>Max Time Since Last Login</term>
+     <term>Max Time since Last Login</term>
      <listitem>
       <para>Specifies a threshold age of the last login time in days. If the
       client's last login time is more recent than the number of days specified,
@@ -691,7 +696,7 @@
      </listitem>
     </varlistentry>
     <varlistentry>
-     <term>Save Time of Successful Login</term>
+     <term>Save time of Successful Login</term>
      <listitem>
       <para>When enabled, save the specified cookie with the current time
       encrypted as the last login value in the client's browser following
@@ -722,7 +727,7 @@
    <variablelist>
     <title>Profile Attribute</title>
     <varlistentry>
-     <term>Profile Risk Attribute Check</term>
+     <term>Profile Risk Attribute check</term>
      <listitem>
       <para>When enabled, check whether the user profile contains the specified
       attribute and value.</para>
@@ -911,10 +916,10 @@
     </varlistentry>
     <varlistentry>
      <term>Authentication Level</term>
-     <listitem>
-      <para><command>ssoadm</command> attribute:
-      <literal>iplanet-am-auth-anonymous-auth-level</literal></para>
-     </listitem>
+      <para>Sets the authentication level used to indicate the level of security
+      associated with the module. The value can range from 0 to any positive integer.</para>
+      <listitem><para><command>ssoadm</command> attribute:
+      <literal>iplanet-am-auth-anonymous-auth-level</literal></para></listitem>
     </varlistentry>
    </variablelist>
   </section>
@@ -924,7 +929,7 @@
    <para>X.509 digital certificates can enable secure authentication without
    the need for user names and passwords or other credentials. Certificate
    authentication can be handy to manage authentication by applications.
-   If all certificates are signed by a recognized Certficate Authority (CA),
+   If all certificates are signed by a recognized Certificate Authority (CA),
    then you might get away without additional configuration. If you need to
    look up public keys of OpenAM clients, this module can also look up public
    keys in an LDAP directory server.</para>
@@ -1034,7 +1039,7 @@
      </listitem>
     </varlistentry>
     <varlistentry>
-     <term>LDAP Search Start DN</term>
+     <term>LDAP Search Start or Base DN</term>
      <listitem>
       <para>Valid base DN for the LDAP search, such as
       <literal>dc=example,dc=com</literal>.</para>
@@ -1043,7 +1048,7 @@
      </listitem>
     </varlistentry>
     <varlistentry>
-     <term>LDAP Server Principal User, LDAP Server Principal Password</term>
+     <term>LDAP Server Authentication User, LDAP Server Authentication Password</term>
      <listitem>
       <para>If OpenAM stores attributes in the LDAP directory, for example to
       manage account lockout, or if the LDAP directory requires that OpenAM
@@ -1055,9 +1060,9 @@
      </listitem>
     </varlistentry>
     <varlistentry>
-     <term>Use SSL for LDAP Access</term>
+     <term>Use SSL/TLS for LDAP Access</term>
      <listitem>
-      <para>If you use SSL for LDAP access, OpenAM must be able to trust the
+      <para>If you use SSL/TLS for LDAP access, OpenAM must be able to trust the
       LDAP server certificate.</para>
       <para><command>ssoadm</command> attribute:
       <literal>iplanet-am-auth-cert-use-ssl</literal></para>
@@ -1073,6 +1078,16 @@
       User Profile text box.</para>
       <para><command>ssoadm</command> attribute:
       <literal>iplanet-am-auth-cert-user-profile-mapper</literal></para>
+     </listitem>
+    </varlistentry>
+    <varlistentry>
+     <term>Other Certificate Field Used to Access User Profile</term>
+     <listitem>
+      <para>This field is only used if the Certificate Field Used to Access
+      User Profile attribute is set to other. This field allows a custom
+      certificate field to be used as the basis of the user search.</para>
+      <para><command>ssoadm</command> attribute:
+      <literal>iplanet-am-auth-cert-user-profile-mapper-other</literal></para>
      </listitem>
     </varlistentry>
     <varlistentry>
@@ -1105,12 +1120,14 @@
     </varlistentry>
     <varlistentry>
      <term>Authentication Level</term>
+      <para>Sets the authentication level used to indicate the level of security
+      associated with the module. The value can range from 0 to any positive integer.</para>
      <listitem><para><command>ssoadm</command> attribute:
      <literal>iplanet-am-auth-cert-auth-level</literal></para></listitem>
     </varlistentry>
    </variablelist>
   </section>
-  
+
   <section xml:id="core-module-conf-hints">
    <title>Hints For the Core Authentication Module</title>
    <para>The Core module is a sort of meta-module.</para>
@@ -1125,68 +1142,75 @@
     <secondary>Core</secondary>
    </indexterm>
    
+      <itemizedlist>
+      <para>The Core Authentication module has two configurable screens:</para>
+       <listitem>
+        <para><xref linkend="auth-core-main-page" /></para>
+       </listitem>
+       <listitem>
+        <para><xref linkend="auth-all-core" /></para>
+       </listitem>
+      </itemizedlist>
+
+   
    <para><command>ssoadm</command> service name:
    <literal>iPlanetAMAuthService</literal></para>
    
-   <variablelist>
+   <variablelist xml:id="auth-core-main-page">
+    <title>Core - Authentication Main Page</title>
+    <para>This section of the Core Authentication module is on the main authentication 
+    page before the Module Instances Table.</para>
     <varlistentry>
-     <term>Pluggable Authentication Module Classes</term>
+     <term>Organization Authentication Configuration</term>
      <listitem>
-      <para>Add class names for custom authentication modules to this list.</para>
+      <para>Defines the default authentication chain used by the realm's users.
+      The authentication chain must first be created before it is displayed as
+      an option in this attribute's drop down list. Default: ldapService</para>
       <para><command>ssoadm</command> attribute:
-      <literal>iplanet-am-auth-authenticators</literal></para>
+      <literal>iplanet-am-auth-org-config</literal></para>
      </listitem>
     </varlistentry>
     <varlistentry>
-     <term>Supported Authentication Modules for Clients</term>
+     <term>Administrator Authentication Configuration</term>
      <listitem>
-      <para>This list serves to limit what types of authentication modules
-      can be used with specify types of client applications. The client type
-      is an arbitary string, such as the default <literal>genericHTML</literal>,
-      which is set by OpenAM when the Client Detection Service is enabled.</para>
+      <para>Defines the authentication chain used by administrators when the
+      process needs to be different from the authentication chain defined
+      for end users. The authentication chain must first be created before
+      it is displayed as an option in this attribute's drop down list.
+      Default: ldapService</para>
       <para><command>ssoadm</command> attribute:
-      <literal>iplanet-am-auth-supported-auth-modules</literal></para>
+      <literal>iplanet-am-auth-admin-auth-module</literal></para>
      </listitem>
     </varlistentry>
     <varlistentry>
-     <term>LDAP Connection Pool Size, Default LDAP Connection Pool Size</term>
+     <term>Organization Authentication Keystore Alias</term>
      <listitem>
-      <para>Sets a minimum and maximum number of LDAP connections in the pool
-      for connecting to a directory server. When tuning for production, start
-      with <literal>10:65</literal> (10 minimum, 65 maximum). Explicit settings
-      for specific servers override the default.</para>
-      <para>This attribute is for LDAP and Membership authentication services
-      only.</para>
-      <para>This connection pool is different than the SDK connection pool
-      configured in <filename>serverconfig.xml</filename>.</para>
-      <para><command>ssoadm</command> attributes:
-      <literal>iplanet-am-auth-ldap-connection-pool-size</literal>, and
-      <literal>iplanet-am-auth-ldap-connection-pool-default-size</literal></para>
-     </listitem>
-    </varlistentry>
-    <varlistentry>
-     <term>Remote Auth Security</term>
-     <listitem>
-      <para>Require the authenticating application to send its SSOToken. This
-      allows the Authentication Service to obtain the username and password
-      associated with the application.</para>
+      <para>Defines the alias for public and private keys used in the Keystore for 
+      RESTful authentication. Default: test</para>
       <para><command>ssoadm</command> attribute:
-      <literal>sunRemoteAuthSecurityEnabled</literal></para>
+      <literal>iplanet-am-auth-jwt-signing-key-alias</literal></para>
      </listitem>
     </varlistentry>
     <varlistentry>
-     <term>Keep Post Process Objects for Logout Processing, Keep Authentication
-     Module Objects for Logout Processing</term>
+     <term>Default Success Login URL</term>
      <listitem>
-      <para>When enabled, retain objects used to process authentication or
-      post authentication operations in the user session until the user
-      logs out.</para>
-      <para><command>ssoadm</command> attributes:
-      <literal>sunAMAuthKeepPostProcessInstances</literal>, and
-      <literal>sunAMAuthKeepAuthModuleIntances</literal></para>
+      <para>Accepts a list of values that specifies where users are directed
+      after successful authentication. The format of this attribute is
+      <literal><replaceable>client-type</replaceable>|<replaceable>URL</replaceable></literal>
+      although the only value you can specify at this time is a URL
+      which assumes the type HTML. The default value is
+      <literal>/openam/console</literal>. Values that do not specify HTTP have
+      that appended to the deployment URI.</para>
+      <para><command>ssoadm</command> attribute:
+      <literal>iplanet-am-auth-login-success-url</literal></para>
      </listitem>
     </varlistentry>
+   </variablelist>
+    
+   <variablelist xml:id="auth-all-core">
+    <title>Core - All Core Settings Page</title>
     <varlistentry>
+    <term><emphasis>User Profile</emphasis></term>
      <term>User Profile</term>
      <listitem>
       <para>Whether a user profile needs to exist in the user data store,
@@ -1232,17 +1256,6 @@
      </listitem>
     </varlistentry>
     <varlistentry>
-     <term>Administrator Authentication Configuration</term>
-     <listitem>
-      <para>Defines the authentication chain used by administrators when the
-      process needs to be different from the authentication chain defined
-      for end users. The authentication chain must first be created before
-      it is displayed as an option in this attribute's drop down list.</para>
-      <para><command>ssoadm</command> attribute:
-      <literal>iplanet-am-auth-admin-auth-module</literal></para>
-     </listitem>
-    </varlistentry>
-    <varlistentry>
      <term>User Profile Dynamic Creation Default Roles</term>
      <listitem>
       <para>Specifies the Distinguished Name (DN) of a role to be assigned to
@@ -1259,6 +1272,19 @@
      </listitem>
     </varlistentry>
     <varlistentry>
+     <term>Alias Search Attribute Name</term>
+     <listitem>
+      <para>After a user is successfully authenticated, the user's profile is
+      retrieved. OpenAM first searches for the user based on the data store settings. 
+      If that fails to find the user, OpenAM will use the attributes listed here to 
+      lookup the user profile. This setting accepts any data store specific attribute 
+      name.</para>
+      <para><command>ssoadm</command> attribute:
+      <literal>iplanet-am-auth-alias-attr-name</literal></para>
+     </listitem>
+    </varlistentry>
+    <varlistentry>
+    <term><emphasis>Persistent Cookie</emphasis></term>
      <term>Persistent Cookie Mode</term>
      <listitem>
       <para>Determines whether users can return to their authenticated session
@@ -1287,42 +1313,7 @@
      </listitem>
     </varlistentry>
     <varlistentry>
-     <term>Alias Search Attribute Name</term>
-     <listitem>
-      <para>After a user is successfully authenticated, the user's profile is
-      retrieved. This field specifies a second LDAP attribute to use in a
-      search for the profile if a search using the first LDAP attribute fails
-      to locate a matching user profile. Primarily, this attribute is used
-      when the user identification returned from an authentication module
-      is not the same as that specified in User Naming Attribute. For example,
-      a RADIUS server might return abc1234 but the user name is abc. There is
-      no default value for this attribute. The field takes any valid
-      LDAP attribute.</para>
-      <para><command>ssoadm</command> attribute:
-      <literal>iplanet-am-auth-alias-attr-name</literal></para>
-     </listitem>
-    </varlistentry>
-    <varlistentry>
-     <term>Default Authentication Locale</term>
-     <listitem>
-      <para>Specifies the default language subtype to be used by the
-      Authentication Service. The default value is
-      <literal>en_US</literal>.</para>
-      <para><command>ssoadm</command> attribute:
-      <literal>iplanet-am-auth-locale</literal></para>
-     </listitem>
-    </varlistentry>
-    <varlistentry>
-     <term>Organization Authentication Configuration</term>
-     <listitem>
-      <para>Defines the default authentication chain used by the realm's users.
-      The authentication chain must first be created before it is displayed as
-      an option in this attribute's drop down list.</para>
-      <para><command>ssoadm</command> attribute:
-      <literal>iplanet-am-auth-org-config</literal></para>
-     </listitem>
-    </varlistentry>
-    <varlistentry>
+    <term><emphasis>Account Lockout</emphasis></term>
      <term>Login Failure Lockout Mode</term>
      <listitem>
       <para>Selecting this attribute enables a physical lockout. Physical
@@ -1439,6 +1430,136 @@
      </listitem>
     </varlistentry>
     <varlistentry>
+     <term>Store Invalid Attempts in Data Store</term>
+     <listitem>
+      <para>Enables the storage of information regarding failed authentication
+      attempts as the value of the Invalid Attempts Data Attribute Name in
+      the user data store. In order to store data in this attribute, the
+      OpenAM schema has to be loaded. Information stored includes number of
+      invalid attempts, time of last failed attempt, lockout time and lockout
+      duration. Storing this information in the identity repository allows it
+      to be shared among multiple instances of OpenAM.</para>
+      <para><command>ssoadm</command> attribute:
+      <literal>sunStoreInvalidAttemptsInDS</literal></para>
+     </listitem>
+    </varlistentry>
+    <varlistentry>
+    <term><emphasis>General</emphasis></term>
+     <term>Default Authentication Locale</term>
+     <listitem>
+      <para>Specifies the default language subtype to be used by the
+      Authentication Service. The default value is
+      <literal>en_US</literal>.</para>
+      <para><command>ssoadm</command> attribute:
+      <literal>iplanet-am-auth-locale</literal></para>
+     </listitem>
+    </varlistentry>
+    <varlistentry>
+     <term>Identity Types</term>
+     <listitem>
+      <para>Lists the type or types of identities used during a profile lookup. You can
+      choose more than one to search on multiple types if you would like OpenAM to 
+      conduct a second lookup if the first lookup fails. Default: Agent and User</para>
+      <variablelist>
+       <varlistentry>
+        <term>Agent</term>
+        <listitem>
+         <para>Searches for identities under your agents.</para>
+        </listitem>
+       </varlistentry>
+       <varlistentry>
+        <term>agentgroup</term>
+        <listitem>
+         <para>Searches for identities according to your established agent group.</para>
+        </listitem>
+       </varlistentry>
+       <varlistentry>
+        <term>agentonly</term>
+        <listitem>
+         <para>Searches for identities only under your agents.</para>
+        </listitem>
+       </varlistentry>
+       <varlistentry>
+        <term>Group</term>
+        <listitem>
+         <para>Searches for identities according to your established groups.</para>
+        </listitem>
+       </varlistentry>
+       <varlistentry>
+        <term>User</term>
+        <listitem>
+         <para>Searches for identities according to your users.</para>
+        </listitem>
+       </varlistentry>
+      </variablelist>
+
+      <para><command>ssoadm</command> attribute:
+      <literal>sunAMIdentityType</literal></para>
+     </listitem>
+    </varlistentry>
+    <varlistentry>
+     <term>Pluggable User Status Event Classes</term>
+     <listitem>
+      <para>Specifies one or more Java classes used to provide a callback
+      mechanism for user status changes during the authentication process.
+      The Java class must implement the
+      <literal>com.sun.identity.authentication.spi.AMAuthCallBack</literal>
+      OpenAM interface. OpenAM supports account lockout and password changes.
+      OpenAM supports password changes through the LDAP authentication module,
+      and so the feature is only available for the LDAP module.</para>
+      <para>A .jar containing the user status event class belongs in
+      the <filename>WEB-INF/lib</filename> directory of the deployed OpenAM
+      instance. If you do not build a .jar, add the class files under
+      <filename>WEB-INF/classes</filename>. <!--For deployment, add the .jar or
+      classes into a custom OpenAM .war file.--></para> 
+      <para><command>ssoadm</command> attribute:
+      <literal>sunAMUserStatusCallbackPlugins</literal></para>
+     </listitem>
+    </varlistentry>
+    <varlistentry>
+     <term>Default Authentication Level</term>
+     <listitem>
+      <para>Specifies the default authentication level for authentication modules.</para>
+      <para><command>ssoadm</command> attribute:
+      <literal>iplanet-am-auth-default-auth-level</literal></para>
+     </listitem>
+    </varlistentry>
+    <varlistentry>
+    <term><emphasis>Security</emphasis></term>
+     <term>Module Based Authentication</term>
+     <listitem>
+      <para>Enables users to authenticate using module-based authentication.
+      Otherwise, all attempts at authentication using the
+      <literal>module=<replaceable>module-name</replaceable></literal> login
+      parameter result in failure. It is recommended that this be turned off in 
+      a production environment.</para>
+      <para><command>ssoadm</command> attribute:
+      <literal>sunEnableModuleBasedAuth</literal></para>
+     </listitem>
+    </varlistentry>
+    <varlistentry>
+     <term>Valid goto URL domains</term>
+     <listitem>
+      <para>List external domains to which clients can be redirected after
+      authentication. This attribute requires valid DNS domains that reflect
+      the set policy rules, such as https://website.example.com/* or 
+      https://website.example.com/*?*.</para>
+      <para><command>ssoadm</command> attribute:
+      <literal>iplanet-am-auth-valid-goto-domains</literal></para>
+     </listitem>
+    </varlistentry>
+    <varlistentry>
+     <term>Zero Page Login</term>
+     <listitem>
+      <para>Enables the administrator to allow users to authenticate to a single
+      authentication screen using GET request parameters. Enable this with 
+      caution as it can allow credentials to be cached.</para>
+      <para><command>ssoadm</command> attribute:
+      <literal>openam.auth.zero.page.login.enabled</literal></para>
+     </listitem>
+    </varlistentry>
+    <varlistentry>
+    <term><emphasis>Post Authentication Processing</emphasis></term>
      <term>Default Success Login URL</term>
      <listitem>
       <para>Accepts a list of values that specifies where users are directed
@@ -1505,58 +1626,6 @@
      </listitem>
     </varlistentry>
     <varlistentry>
-     <term>Identity Types</term>
-     <listitem>
-      <para>Lists the type or types of identities for which OpenAM searches.</para>
-      <para><command>ssoadm</command> attribute:
-      <literal>sunAMIdentityType</literal></para>
-     </listitem>
-    </varlistentry>
-    <varlistentry>
-     <term>Pluggable User Status Event Classes</term>
-     <listitem>
-      <para>Specifies one or more Java classes used to provide a callback
-      mechanism for user status changes during the authentication process.
-      The Java class must implement the
-      <literal>com.sun.identity.authentication.spi.AMAuthCallBack</literal>
-      OpenAM interface. OpenAM supports account lockout and password changes.
-      OpenAM supports password changes through the LDAP authentication module,
-      and so the feature is only available for the LDAP module.</para>
-      <para>A .jar containing the user status event class belongs in
-      the <filename>WEB-INF/lib</filename> directory of the deployed OpenAM
-      instance. If you do not build a .jar, add the class files under
-      <filename>WEB-INF/classes</filename>. For deployment, add the .jar or
-      classes into a custom OpenAM .war file.</para>
-      <para><command>ssoadm</command> attribute:
-      <literal>sunAMUserStatusCallbackPlugins</literal></para>
-     </listitem>
-    </varlistentry>
-    <varlistentry>
-     <term>Store Invalid Attempts in Data Store</term>
-     <listitem>
-      <para>Enables the storage of information regarding failed authentication
-      attempts as the value of the Invalid Attempts Data Attribute Name in
-      the user data store. In order to store data in this attribute, the
-      OpenAM schema has to be loaded. Information stored includes number of
-      invalid attempts, time of last failed attempt, lockout time and lockout
-      duration. Storing this information in the identity repository allows it
-      to be shared among multiple instances of OpenAM.</para>
-      <para><command>ssoadm</command> attribute:
-      <literal>sunStoreInvalidAttemptsInDS</literal></para>
-     </listitem>
-    </varlistentry>
-    <varlistentry>
-     <term>Module Based Authentication</term>
-     <listitem>
-      <para>Enables users to authenticate using module-based authentication.
-      Otherwise, all attempts at authentication using the
-      <literal>module=<replaceable>module-name</replaceable></literal> login
-      parameter result in failure.</para>
-      <para><command>ssoadm</command> attribute:
-      <literal>sunEnableModuleBasedAuth</literal></para>
-     </listitem>
-    </varlistentry>
-    <varlistentry>
      <term>User Attribute Mapping to Session Attribute</term>
      <listitem>
       <para>Enables the authenticating user's identity attributes (stored in
@@ -1586,36 +1655,8 @@
       <literal>sunAMUserAttributesSessionMapping</literal></para>
      </listitem>
     </varlistentry>
-    <varlistentry>
-     <term>Valid goto URL domains</term>
-     <listitem>
-      <para>List external domains to which clients can be redirected after
-      authentication.</para>
-      <para><command>ssoadm</command> attribute:
-      <literal>iplanet-am-auth-valid-goto-domains</literal></para>
-     </listitem>
-    </varlistentry>
-    <varlistentry>
-     <term>Zero Page Login</term>
-     <listitem>
-      <para>Enables the administrator to allow users to authenticate to a single
-      authentication screen using GET request parameters. Enable this with 
-      caution as it can allow credentials to be cached.</para>
-      <para><command>ssoadm</command> attribute:
-      <literal>openam.auth.zero.page.login.enabled</literal></para>
-     </listitem>
-    </varlistentry>
-
-    <varlistentry>
-     <term>Default Authentication Level</term>
-     <listitem>
-      <para>The level set here applies when no authentication level has been
-      specified in the Authentication Level field for a realm.</para>
-      <para><command>ssoadm</command> attribute:
-      <literal>iplanet-am-auth-default-auth-level</literal></para>
-     </listitem>
-    </varlistentry>
    </variablelist>
+
   </section>
   
   <section xml:id="datastore-module-conf-hints">
@@ -1638,9 +1679,16 @@
    
    <para><command>ssoadm</command> service name:
    <literal>sunAMAuthDataStoreService</literal></para>
-   <para><command>ssoadm</command> attributes:
-   <literal>amAuthDataStore</literal>, and
-   <literal>sunAMAuthDataStoreAuthLevel</literal></para>
+   
+   <variablelist>
+    <varlistentry>
+     <term>Authentication Level</term>
+      <para>Sets the authentication level used to indicate the level of security
+      associated with the module. The value can range from 0 to any positive integer.</para>
+      <listitem><para><command>ssoadm</command> attribute:
+      <literal>sunAMAuthDataStoreAuthLevel</literal></para></listitem>
+    </varlistentry>
+   </variablelist>
   </section>
 
     <section xml:id="device-print-auth-module-conf-hints">
@@ -1742,8 +1790,7 @@
             <varlistentry>
                 <term>Default user profile name</term>
                 <listitem>
-                    <para>Every device requires a default profile name that represents the user.
-                    </para>
+                    <para>Every device requires a default profile name that represents the user.</para>
                     <para><command>ssoadm</command> attribute:</para>
                     <literal>iplanet-am-auth-adaptive-device-print-default-profile-name</literal>
                 </listitem>
@@ -1834,7 +1881,7 @@
                 <term>Max number of tolerated different installed fonts</term>
                 <listitem>
                     <para>If the <literal>Installed fonts required</literal> attribute is enabled, a comparison is made
-                        in installed fonts between the existing and stored profiles. Default: 0.</para>
+                        in installed fonts between the existing and stored profiles.</para>
                     <para><command>ssoadm</command> attribute:</para>
                     <literal>iplanet-am-auth-adaptive-device-print-max-tolerated-diffs-in-installed-fonts</literal>
                 </listitem>
@@ -1844,7 +1891,7 @@
                 <listitem>
                     <para>If the <literal>Installed fonts required</literal> attribute is enabled, a comparison is made
                         in installed fonts between the existing and stored profiles. Any differences in number of fonts
-                        is noted in percent. Default: 0.</para>
+                        is noted in percent.</para>
                     <para><command>ssoadm</command> attribute:</para>
                     <literal>iplanet-am-auth-adaptive-device-print-max-tolerated-percentage-to-mark-as-different-installed-fonts</literal>
                 </listitem>
@@ -1853,7 +1900,7 @@
                 <term>Max number of tolerated different installed plugins</term>
                 <listitem>
                     <para>If the <literal>Installed plugins required</literal> attribute is enabled, a comparison is made
-                        between the installed plugins defined in the existing and stored profiles. Default: 0.</para>
+                        between the installed plugins defined in the existing and stored profiles.</para>
                     <para><command>ssoadm</command> attribute:</para>
                     <literal>iplanet-am-auth-adaptive-device-print-max-tolerated-diffs-in-installed-plugins</literal>
                 </listitem>
@@ -1863,7 +1910,7 @@
                 <listitem>
                     <para>If the <literal>Installed plugins required</literal> attribute is enabled, a comparison is
                         made between the installed plugins defined in the existing and stored profiles. Any differences
-                        in number of plugins is noted in percent. Default: 0.</para>
+                        in number of plugins is noted in percent.</para>
                     <para><command>ssoadm</command> attribute:</para>
                     <literal>iplanet-am-auth-adaptive-device-print-max-tolerated-percentage-to-mark-as-different-plugins</literal>
                 </listitem>
@@ -2086,173 +2133,181 @@
    
    <para><command>ssoadm</command> service name:
    <literal>sunAMAuthFederationService</literal></para>
-   <para><command>ssoadm</command> attribute:
-   <literal>sunAMAuthFederationAuthLevel</literal></para>
+
+   <variablelist>
+    <varlistentry>
+     <term>Authentication Level</term>
+      <para>Sets the authentication level used to indicate the level of security
+      associated with the module. The value can range from 0 to any positive integer.</para>
+      <listitem><para><command>ssoadm</command> attribute:
+      <literal>sunAMAuthFederationAuthLevel</literal></para></listitem>
+    </varlistentry>
+   </variablelist>
   </section>
-
-     <section xml:id="hotp-module-conf-hints">
-         <title>Hints For the HOTP Authentication Module</title>
-         <para>The HMAC One-Time Password authentication module works together with
-             the Data Store module to retrieve a user's mail address or telephone number
-             to send a one-time password to complete authentication.</para>
-         <para>To use HOTP you set up an authentication chain with the Data Store
-             module as the <literal>requisite</literal> first module, and the HOTP module
-             as the second <literal>requisite</literal> module. When authentication
-             succeeds against the Data Store module, OpenAM passes the Email Address
-             and Telephone Number attributes from the user profile to the HOTP module.
-             For the HOTP module to use either attribute, the Email Address must contain
-             a valid email address, or the Telephone Number must contain a valid
-             SMS telephone number.</para>
-         <para>You can set the HOTP module to automatically generate a password when
-             users begin logging into the system. You can also setup a mobile phone,
-             mobile carrier, and email attributes for tighter controls over where
-             the messages are generated and what provider the messages go through to reach
-             the user.</para>
-         <indexterm>
-             <primary>Authentication</primary>
-             <secondary>HMAC One-Time Password (HOTP)</secondary>
-         </indexterm>
-
-         <para><command>ssoadm</command> service name:
-             <literal>sunAMAuthHOTPService</literal></para>
-
-         <variablelist>
-             <varlistentry>
-                 <term>SMS Gateway Implementation Class</term>
-                 <listitem>
-                     <para>Change this if you must customize the SMS gateway implementation.
-                         The default class sends an SMS or email, depending on the
-                         configuration.</para>
-                     <para><command>ssoadm</command> attribute:
-                         <literal>sunAMAuthHOTPSMSGatewayImplClassName</literal></para>
-                 </listitem>
-             </varlistentry>
-             <varlistentry>
-                 <term>Mail Server Host Name</term>
-                 <listitem>
-                     <para>Host name of the mail server supporting Simple Message Transfer
-                         Protocol for electronic mail.</para>
-                     <para><command>ssoadm</command> attribute:
-                         <literal>sunAMAuthHOTPSMTPHostName</literal></para>
-                 </listitem>
-             </varlistentry>
-             <varlistentry>
-                 <term>Mail Server Host Port</term>                                                                       `
-                 <listitem>
-                     <para>The default outgoing mail server port is 25, 465 (when connecting over SSL).</para>
-                     <para><command>ssoadm</command> attribute:
-                         <literal>sunAMAuthHOTPSMTPHostPort</literal></para>
-                 </listitem>
-             </varlistentry>
-             <varlistentry>
-                 <term>Mail Server User Name</term>
-                 <listitem>
-                     <para>User name for OpenAM to connect to the mail server.</para>
-                     <para><command>ssoadm</command> attribute:
-                         <literal>sunAMAuthHOTPSMTPUserName</literal></para>
-                 </listitem>
-             </varlistentry>
-             <varlistentry>
-                 <term>Mail Server User Password</term>
-                 <listitem>
-                     <para>Password for OpenAM to connect to the mail server.</para>
-                     <para><command>ssoadm</command> attribute:
-                         <literal>sunAMAuthHOTPSMTPUserPassword</literal></para>
-                 </listitem>
-             </varlistentry>
-             <varlistentry>
-                 <term>Mail Server Connection</term>
-                 <listitem>
-                     <para>If OpenAM connects to the mail server securely, OpenAM must be able
-                         to trust the server certificate.</para>
-                     <para><command>ssoadm</command> attribute:
-                         <literal>sunAMAuthHOTPSMTPSSLEnabled</literal></para>
-                 </listitem>
-             </varlistentry>
-             <varlistentry>
-                 <term>Email From Address</term>
-                 <listitem>
-                     <para>The <literal>From:</literal> address when sending a one-time
-                         password by mail.</para>
-                     <para><command>ssoadm</command> attribute:
-                         <literal>sunAMAuthHOTPMail ServerFromAddress</literal></para>
-                 </listitem>
-             </varlistentry>
-             <varlistentry>
-                 <term>One Time Password Validity Length (in minutes)</term>
-                 <listitem>
-                     <para>One-time passwords are valid for 5 minutes after they are generated
-                         by default.</para>
-                     <para><command>ssoadm</command> attribute:
-                         <literal>sunAMAuthHOTPPasswordValidityDuration</literal></para>
-                 </listitem>
-             </varlistentry>
-             <varlistentry>
-                 <term>One Time Password Length (in digits)</term>
-                 <listitem>
-                     <para>Set the length of the one-time password to 6 or 8 digits.</para>
-                     <para><command>ssoadm</command> attribute:
-                         <literal>sunAMAuthHOTPPasswordLength</literal></para>
-                 </listitem>
-             </varlistentry>
-             <varlistentry>
-                 <term>One Time Password Delivery</term>
-                 <listitem>
-                     <para>Send the one-time password by SMS, by mail, or both.</para>
-                     <para><command>ssoadm</command> attribute:
-                         <literal>sunAMAuthHOTPasswordDelivery</literal></para>
-                 </listitem>
-             </varlistentry>
-             <varlistentry>
-                 <term>Mobile Phone Number Attribute Names</term>
-                 <listitem>
-                     <para>Provides the attribute name used for the text message. The
-                         default value is <literal>telephoneNumber</literal>.</para>
-                     <para><command>ssoadm</command> attribute:
-                         <literal>openamTelephoneAttribute</literal></para>
-                 </listitem>
-             </varlistentry>
-             <varlistentry>
-                 <term>Mobile Carrier Attribute Name</term>
-                 <listitem>
-                     <para>Provides the name of the carrier that will send the text
-                         message.</para>
-                     <para>Every carrier has their own attribute name ending, for example Verizon
-                         uses @vtext.com or vtext.com. Contact your mobile carrier to find out what their
-                         attribute name is. If you will be sending international texts, ask your carrier
-                         if a country code is a required.</para>
-                     <para><command>ssoadm</command> attribute:
-                         <literal>openamSMSCarrierAttribute</literal></para>
-                 </listitem>
-             </varlistentry>
-             <varlistentry>
-                 <term>Email Attribute Name</term>
-                 <listitem>
-                     <para>Provides the attribute name used to email the OTP. The
-                         default value is <literal>mail</literal> (email).</para>
-                     <para><command>ssoadm</command> attribute:
-                         <literal>openamEmailAttribute</literal></para>
-                 </listitem>
-             </varlistentry>
-             <varlistentry>
-                 <term>Auto Send OTP Code</term>
-                 <listitem>
-                     <para>Setup the HOTP module to automatically generate an email
-                         or text message when users begin the login process. </para>
-                     <para><command>ssoadm</command> attribute:
-                         <literal>sunAMAuthHOTPAutoClicking</literal></para>
-                 </listitem>
-             </varlistentry>
-             <varlistentry>
-                 <term>Authentication Level</term>
-                 <listitem>
-                     <para><command>ssoadm</command> attribute:
-                         <literal>sunAMAuthHOTPAuthLevel</literal></para>
-                 </listitem>
-             </varlistentry>
-         </variablelist>
-     </section>
-
+  
+  <section xml:id="hotp-module-conf-hints">
+   <title>Hints For the HOTP Authentication Module</title>
+   <para>The HMAC One-Time Password authentication module works together with
+   the Data Store module to retrieve a user's mail address or telephone number
+   to send a one-time password to complete authentication.</para>
+   <para>To use HOTP you set up an authentication chain with the Data Store
+   module as the <literal>requisite</literal> first module, and the HOTP module
+   as the second <literal>requisite</literal> module. When authentication
+   succeeds against the Data Store module, OpenAM passes the Email Address
+   and Telephone Number attributes from the user profile to the HOTP module.
+   For the HOTP module to use either attribute, the Email Address must contain
+   a valid email address, or the Telephone Number must contain a valid
+   SMS telephone number.</para>
+   <para>You can set the HOTP module to automatically generate a password when
+   users begin logging into the system. You can also setup a mobile phone, 
+   mobile carrier, and email attributes for tighter controls over where 
+   the messages are generated and what provider the messages go through to reach
+   the user.</para>
+   <indexterm>
+    <primary>Authentication</primary>
+    <secondary>HMAC One-Time Password (HOTP)</secondary>
+   </indexterm>
+   
+   <para><command>ssoadm</command> service name:
+   <literal>sunAMAuthHOTPService</literal></para>
+   
+   <variablelist>
+    <varlistentry>
+     <term>Authentication Level</term>
+      <para>Sets the authentication level used to indicate the level of security
+      associated with the module. The value can range from 0 to any positive integer.</para>
+      <listitem><para><command>ssoadm</command> attribute:
+      <literal>sunAMAuthHOTPAuthLevel</literal></para></listitem>
+    </varlistentry>
+    <varlistentry>
+     <term>SMS Gateway Implementation Class</term>
+     <listitem>
+      <para>Change this if you must customize the SMS gateway implementation.
+      The default class sends an SMS or email, depending on the
+      configuration.</para>
+      <para><command>ssoadm</command> attribute:
+      <literal>sunAMAuthHOTPSMSGatewayImplClassName</literal></para>
+     </listitem>
+    </varlistentry>
+    <varlistentry>
+     <term>Mail Server Host Name</term>
+     <listitem>
+      <para>Host name of the mail server supporting Simple Message Transfer
+      Protocol for electronic mail.</para>
+      <para><command>ssoadm</command> attribute:
+      <literal>sunAMAuthHOTPSMTPHostName</literal></para>
+     </listitem>
+    </varlistentry>
+    <varlistentry>
+     <term>Mail Server Host Port</term>
+     <listitem>
+      <para>The default outgoing mail server port is 25, 465 (when connecting over SSL).</para>
+      <para><command>ssoadm</command> attribute:
+      <literal>sunAMAuthHOTPSMTPHostPort</literal></para>
+     </listitem>
+    </varlistentry>
+    <varlistentry>
+     <term>Mail Server Authentication Username</term>
+     <listitem>
+      <para>User name for OpenAM to connect to the mail server.</para>
+      <para><command>ssoadm</command> attribute:
+      <literal>sunAMAuthHOTPSMTPUserName</literal></para>
+     </listitem>
+    </varlistentry>
+    <varlistentry>
+     <term>Mail Server Authentication Password</term>
+     <listitem>
+      <para>Password for OpenAM to connect to the mail server.</para>
+      <para><command>ssoadm</command> attribute:
+      <literal>sunAMAuthHOTPSMTPUserPassword</literal></para>
+     </listitem>
+    </varlistentry>
+    <varlistentry>
+     <term>Mail Server Secure Connection</term>
+     <listitem>
+      <para>If OpenAM connects to the mail server securely, OpenAM must be able
+      to trust the server certificate.</para>
+      <para><command>ssoadm</command> attribute:
+      <literal>sunAMAuthHOTPSMTPSSLEnabled</literal></para>
+     </listitem>
+    </varlistentry>
+    <varlistentry>
+     <term>Email From Address</term>
+     <listitem>
+      <para>The <literal>From:</literal> address when sending a one-time
+      password by mail.</para>
+      <para><command>ssoadm</command> attribute:
+      <literal>sunAMAuthHOTPSMTPFromAddress</literal></para>
+     </listitem>
+    </varlistentry>
+    <varlistentry>
+     <term>One Time Password Validity Length (in minutes)</term>
+     <listitem>
+      <para>One-time passwords are valid for 5 minutes after they are generated
+      by default.</para>
+      <para><command>ssoadm</command> attribute:
+      <literal>sunAMAuthHOTPPasswordValidityDuration</literal></para>
+     </listitem>
+    </varlistentry>
+    <varlistentry>
+     <term>One Time Password Length (in digits)</term>
+     <listitem>
+      <para>Set the length of the one-time password to 6 or 8 digits.</para>
+      <para><command>ssoadm</command> attribute:
+      <literal>sunAMAuthHOTPPasswordLength</literal></para>
+     </listitem>
+    </varlistentry>
+    <varlistentry>
+     <term>One Time Password Delivery</term>
+     <listitem>
+      <para>Send the one-time password by SMS, by mail, or both.</para>
+      <para><command>ssoadm</command> attribute:
+      <literal>sunAMAuthHOTPasswordDelivery</literal></para>
+     </listitem>
+    </varlistentry>
+    <varlistentry>
+     <term>Mobile Phone Number Attribute Names</term>
+     <listitem>
+      <para>Provides the attribute name used for the text message. The 
+      default value is <literal>telephoneNumber</literal>.</para>
+      <para><command>ssoadm</command> attribute:
+      <literal>openamTelephoneAttribute</literal></para>
+     </listitem>
+    </varlistentry>
+    <varlistentry>
+     <term>Mobile Carrier Attribute Name</term>
+     <listitem>
+      <para>Provides the name of the carrier that will send the text
+      message.</para>
+      <para>Every carrier has their own attribute name ending, for example Verizon
+      uses @vtext.com or vtext.com. Contact your mobile carrier to find out what their 
+      attribute name is. If you will be sending international texts, ask your carrier 
+      if a country code is a required.</para>
+      <para><command>ssoadm</command> attribute:
+      <literal>openamSMSCarrierAttribute</literal></para>
+     </listitem>
+    </varlistentry>
+    <varlistentry>
+     <term>Email Attribute Name</term>
+     <listitem>
+      <para>Provides the attribute name used to email the OTP. The
+      default value is <literal>mail</literal> (email).</para>
+      <para><command>ssoadm</command> attribute:
+      <literal>openamEmailAttribute</literal></para>
+     </listitem>
+    </varlistentry>
+    <varlistentry>
+     <term>Auto Send OTP Code</term>
+     <listitem>
+      <para>Setup the HOTP module to automatically generate an email
+      or text message when users begin the login process. </para>
+      <para><command>ssoadm</command> attribute:
+      <literal>sunAMAuthHOTPAutoClicking</literal></para>
+     </listitem>
+    </varlistentry>
+   </variablelist>
+  </section>
+  
   <section xml:id="http-module-conf-hints">
    <title>Hints For the HTTP Basic Authentication Module</title>
    <para>HTTP basic authentication takes a user name and password from HTTP
@@ -2277,10 +2332,10 @@
     </varlistentry>
     <varlistentry>
      <term>Authentication Level</term>
-     <listitem>
-      <para><command>ssoadm</command> attribute:
-      <literal>iplanet-am-auth-httpbasic-auth-level</literal></para>
-     </listitem>
+      <para>Sets the authentication level used to indicate the level of security
+      associated with the module. The value can range from 0 to any positive integer.</para>
+      <listitem><para><command>ssoadm</command> attribute:
+      <literal>iplanet-am-auth-httpbasic-auth-level</literal></para></listitem>
     </varlistentry>
    </variablelist>
   </section>
@@ -2302,7 +2357,7 @@
      <term>Connection Type</term>
      <listitem>
       <para>Choose Connection pool is retrieved via JNDI to connect using the
-      Java Naming and Diretory Interface connection pool supported by the web
+      Java Naming and Directory Interface connection pool supported by the web
       container in which OpenAM runs. Choose Non-persistent JDBC connection to
       connect directly through the JDBC driver.</para>
       <para><command>ssoadm</command> attribute:
@@ -2343,7 +2398,7 @@
      </listitem>
     </varlistentry>
     <varlistentry>
-     <term>Connect This User to Database</term>
+     <term>Database Username</term>
      <listitem>
       <para>Specify the user name to open the database connection.</para>
       <para><command>ssoadm</command> attribute:
@@ -2351,7 +2406,7 @@
      </listitem>
     </varlistentry>
     <varlistentry>
-     <term>Password for Connecting to Database</term>
+     <term>Database Password</term>
      <listitem>
       <para>Specify the password for the user opening the database connection.</para>
       <para><command>ssoadm</command> attribute:
@@ -2359,7 +2414,7 @@
      </listitem>
     </varlistentry>
     <varlistentry>
-     <term>Password Column String</term>
+     <term>Password Column Name</term>
      <listitem>
       <para>Specify the database column name where passwords are stored.</para>
       <para><command>ssoadm</command> attribute:
@@ -2389,6 +2444,8 @@
     </varlistentry>
     <varlistentry>
      <term>Authentication Level</term>
+      <para>Sets the authentication level used to indicate the level of security
+      associated with the module. The value can range from 0 to any positive integer.</para>
      <listitem><para><command>ssoadm</command> attribute:
      <literal>sunAMAuthJDBCAuthLevel</literal></para></listitem>
     </varlistentry>
@@ -2478,7 +2535,9 @@
      </listitem>
     </varlistentry>
     <varlistentry>
-     <term>Attributes, Filter, Scope</term>
+     <term>Attributes Used to Search for a User to be Authenticated</term>
+     <term>User Search Filter</term>
+     <term>Search Scope</term>
      <listitem>
       <para>LDAP searches for user entries return entries with attribute
       values matching the filter you provide. For example if you search under
@@ -2508,6 +2567,17 @@
       <literal>iplanet-am-auth-ldap-user-search-attributes</literal>,
       <literal>iplanet-am-auth-ldap-search-filter</literal>, and
       <literal>iplanet-am-auth-ldap-search-scope</literal></para>
+     </listitem>
+    </varlistentry>
+    <varlistentry>
+     <term>SSL/TLS Access to LDAP Server</term>
+     <listitem>
+      <para>If you enable SSL/TLS, OpenAM must be able to trust LDAP certificates, either because the certificates were
+      signed by a CA whose certificate is already included in the trust store
+      used by the container where OpenAM runs, or because you imported the
+      certificates into the trust store.</para>
+      <para><command>ssoadm</command> attribute:
+      <literal>iplanet-am-auth-ldap-ssl-enabled</literal></para>
      </listitem>
     </varlistentry>
     <varlistentry>
@@ -2548,15 +2618,6 @@
      </listitem>
     </varlistentry>
     <varlistentry>
-     <term>Trust All Server Certificates</term>
-     <listitem>
-      <para>When enabled, blindly trust server certificates, including
-      self-signed test certificates.</para>
-      <para><command>ssoadm</command> attribute:
-      <literal>iplanet-am-auth-ldap-ssl-trust-all</literal></para>
-     </listitem>
-    </varlistentry>
-    <varlistentry>
      <term>LDAP Behera Password Policy Support</term>
      <listitem>
       <para>When enabled, support interoperability with servers that implement
@@ -2578,7 +2639,18 @@
      </listitem>
     </varlistentry>
     <varlistentry>
+     <term>Trust All Server Certificates</term>
+     <listitem>
+      <para>When enabled, blindly trust server certificates, including
+      self-signed test certificates.</para>
+      <para><command>ssoadm</command> attribute:
+      <literal>iplanet-am-auth-ldap-ssl-trust-all</literal></para>
+     </listitem>
+    </varlistentry>
+    <varlistentry>
      <term>Authentication Level</term>
+      <para>Sets the authentication level used to indicate the level of security
+      associated with the module. The value can range from 0 to any positive integer.</para>
      <listitem><para><command>ssoadm</command> attribute:
      <literal>iplanet-am-auth-ldap-auth-level</literal></para></listitem>
     </varlistentry>
@@ -2634,6 +2706,8 @@
     </varlistentry>
     <varlistentry>
      <term>Authentication Level</term>
+      <para>Sets the authentication level used to indicate the level of security
+      associated with the module. The value can range from 0 to any positive integer.</para>
      <listitem><para><command>ssoadm</command> attribute:
      <literal>iplanet-am-auth-membership-auth-level</literal></para></listitem>
     </varlistentry>
@@ -2669,7 +2743,7 @@
      </listitem>
     </varlistentry>
     <varlistentry>
-     <term>MSISDN Number Argument</term>
+     <term>MSISDN Number Search Parameter Name</term>
      <listitem>
       <para>Specifies a list of parameter names that identify which parameters
       to search in the request header or cookie header for the MSISDN number.
@@ -2712,7 +2786,7 @@
      </listitem>
     </varlistentry>
     <varlistentry>
-     <term>LDAP Server Principal User</term>
+     <term>LDAP Server Authentication User</term>
      <listitem>
       <para>If OpenAM must authenticate to the directory server in order to
       search, then specify the bind DN. The default is
@@ -2722,7 +2796,7 @@
      </listitem>
     </varlistentry>
     <varlistentry>
-     <term>LDAP Server Principal Password</term>
+     <term>LDAP Server Authentication Password</term>
      <listitem>
       <para>Specify the password corresponding to the bind DN.</para>
       <para><command>ssoadm</command> attribute:
@@ -2782,6 +2856,8 @@
     </varlistentry>
     <varlistentry>
      <term>Authentication Level</term>
+      <para>Sets the authentication level used to indicate the level of security
+      associated with the module. The value can range from 0 to any positive integer.</para>
      <listitem><para><command>ssoadm</command> attribute:
      <literal>sunAMAuthMSISDNAuthLevel</literal></para></listitem>
     </varlistentry>
@@ -2838,11 +2914,26 @@
    
    <variablelist>
     <varlistentry>
+     <term>Authentication Level</term>
+      <para>Sets the authentication level used to indicate the level of security
+      associated with the module. The value can range from 0 to any positive integer.</para>
+     <listitem><para><command>ssoadm</command> attribute:
+      <literal>iplanet-am-auth-oath-auth-level</literal></para></listitem>
+    </varlistentry>
+    <varlistentry>
      <term>One Time Password Length (in digits)</term>
      <listitem>
       <para>Set the length of the OTP between 6 and 9 digits long. The default value is 6 digits.</para>
       <para><command>ssoadm</command> attribute:
-      <literal>iPlanetAMAuthOATHPasswordLength</literal></para>
+      <literal>iplanet-am-auth-oath-password-length</literal></para>
+     </listitem>
+    </varlistentry>
+    <varlistentry>
+     <term>Minimum Secret Key Length</term>
+     <listitem>
+      <para>The minimal number of characters required to set the Secret Key.</para>
+      <para><command>ssoadm</command> attribute:
+      <literal>iplanet-am-auth-oath-min-secret-key-length</literal></para>
      </listitem>
     </varlistentry>
     <varlistentry>
@@ -2850,16 +2941,16 @@
      <listitem>
       <para>The name of the attribute where the key will be stored in the user profile.</para>
       <para><command>ssoadm</command> attribute:
-      <literal>iPlanetAMAuthOATHSecretKeyAttribute</literal></para>
+      <literal>iplanet-am-auth-oath-secret-key-attribute</literal></para>
      </listitem>
     </varlistentry>
     <varlistentry>
-     <term>OATH Algorithm</term>
+     <term>OATH Algorithm to Use</term>
      <listitem>
       <para>Select whether to use HOTP or TOTP. You can create an authentication chain to
       allow for a greater variety of devices. The default value is HOTP.</para>
       <para><command>ssoadm</command> attribute:
-      <literal>iPlanetAMAuthOATHAlgorithm</literal></para>
+      <literal>iplanet-am-auth-oath-algorithm</literal></para>
      </listitem>
     </varlistentry>
     <varlistentry>
@@ -2869,7 +2960,7 @@
       the password. If a user passes this number of requests before logging 
       into the system, the password will not work. The default value is 100.</para>
       <para><command>ssoadm</command> attribute:
-      <literal>iPlanetAMAuthOATHHOTPWindowSize</literal></para>
+      <literal>iplanet-am-auth-oath-hotp-window-size</literal></para>
      </listitem>
     </varlistentry>
     <varlistentry>
@@ -2877,7 +2968,7 @@
      <listitem>
       <para>The name of the HOTP attribute where the counter will be stored in the user profile.</para>
       <para><command>ssoadm</command> attribute:
-      <literal>iPlanetAMAuthOATHHOTPCounterAttribute</literal></para>
+      <literal>iplanet-am-auth-oath-hotp-counter-attribute</literal></para>
      </listitem>
     </varlistentry>
     <varlistentry>
@@ -2886,7 +2977,7 @@
       <para>Adds a checksum digit at the end of the HOTP password to verify it was entered correctly. 
       The default value is No.</para>
       <para><command>ssoadm</command> attribute:
-      <literal>iPlanetAMAuthOATHAddChecksum</literal></para>
+      <literal>iplanet-am-auth-oath-add-checksum</literal></para>
      </listitem>
     </varlistentry>
     <varlistentry>
@@ -2896,7 +2987,7 @@
       the functionality. The default value is -1. If not required by the device, leave at the default 
       setting.</para>
       <para><command>ssoadm</command> attribute:
-      <literal>iPlanetAMAuthOATHTruncationOffset</literal></para>
+      <literal>iplanet-am-auth-oath-truncation-offset</literal></para>
      </listitem>
     </varlistentry>
     <varlistentry>
@@ -2907,7 +2998,7 @@
       logs out, they will not be able to login again until two full time cycles have passed.
       The default value is 30 seconds.</para>
       <para><command>ssoadm</command> attribute:
-      <literal>iPlanetAMAuthOATHSizeofTimeStep</literal></para>
+      <literal>iplanet-am-auth-oath-size-of-time-step</literal></para>
      </listitem>
     </varlistentry>
     <varlistentry>
@@ -2917,23 +3008,16 @@
       the password. If a user passes this number of requests before logging into the system,
       the password will not work. The default value is 2.</para>
       <para><command>ssoadm</command> attribute:
-      <literal>iPlanetAMAuthOATHStepsinWindow</literal></para>
+      <literal>iplanet-am-auth-oath-steps-in-window</literal></para>
      </listitem>
     </varlistentry>
     <varlistentry>
-     <term>Last Login Time</term>
+     <term>Last Login Time Attribute</term>
      <listitem>
       <para>The name of the attribute where both HOTP and TOTP authentication will store information
       on when a person last logged in.</para>
       <para><command>ssoadm</command> attribute:
-      <literal>iPlanetAMAuthOATHLastLoginTimeAttributeName</literal></para>
-     </listitem>
-    </varlistentry>
-    <varlistentry>
-     <term>Authentication Level</term>
-     <listitem>
-      <para><command>ssoadm</command> attribute:
-      <literal>sunAMAuthHOTPAuthLevel</literal></para>
+      <literal>iplanet-am-auth-oath-last-login-time-attribute-name</literal></para>
      </listitem>
     </varlistentry>
    </variablelist>
@@ -3121,7 +3205,7 @@
     <varlistentry>
      <term>Map to anonymous user</term>
      <listitem>
-      <para>When enabled, map the OAuth authenticated user to the anoymous
+      <para>When enabled, map the OAuth authenticated user to the anonymous
       user you specify. No account is created, even if Create account if it
       does not exist is enabled.</para>
       <para><command>ssoadm</command> attribute:
@@ -3222,10 +3306,10 @@
     </varlistentry>
     <varlistentry>
      <term>Authentication Level</term>
-     <listitem>
-      <para><command>ssoadm</command> attribute:
-      <literal>iplanet-am-auth-oauth-auth-level</literal></para>
-     </listitem>
+      <para>Sets the authentication level used to indicate the level of security
+      associated with the module. The value can range from 0 to any positive integer.</para>
+      <listitem><para><command>ssoadm</command> attribute:
+      <literal>iplanet-am-auth-oauth-auth-level</literal></para></listitem>
     </varlistentry>
    </variablelist>
 
@@ -3436,22 +3520,14 @@
    
    <variablelist>
     <varlistentry>
-     <term>Server 1</term>
+     <term>Primary Radius Servers, Secondary Radius Servers</term>
      <listitem>
       <para>Specify the IP address or fully qualified domain name of the
       primary RADIUS server. The default is <literal>127.0.0.1</literal>
       (localhost loopback).</para>
       <para><command>ssoadm</command> attribute:
-      <literal>iplanet-am-auth-radius-server1</literal></para>
-     </listitem>
-    </varlistentry>
-    <varlistentry>
-     <term>Server 2</term>
-     <listitem>
-      <para>Specify the IP address or fully qualified domain name of the
-      secondary RADIUS server. The default is <literal>127.0.0.1</literal>.</para>
-      <para><command>ssoadm</command> attribute:
-      <literal>iplanet-am-auth-radius-server2</literal></para>
+      <literal>primary is iplanet-am-auth-radius-server1</literal>;
+      secondary is <literal>iplanet-am-auth-radius-server2</literal></para>
      </listitem>
     </varlistentry>
     <varlistentry>
@@ -3492,6 +3568,8 @@
     </varlistentry>
     <varlistentry>
      <term>Authentication Level</term>
+      <para>Sets the authentication level used to indicate the level of security
+      associated with the module. The value can range from 0 to any positive integer.</para>
      <listitem><para><command>ssoadm</command> attribute:
      <literal>iplanet-am-auth-radius-auth-level</literal></para></listitem>
     </varlistentry>
@@ -3511,10 +3589,20 @@
     <secondary>Secure Attribute Exchange (SAE)</secondary>
    </indexterm>
    
-   <para><command>ssoadm</command> service name:
-   <literal>sunAMAuthSAEService</literal></para>
    <para><command>ssoadm</command> attribute:
-   <literal>sunAMAuthSAEAuthLevel</literal></para>
+   <literal>sunAMAuthSAEService</literal></para>
+
+   <variablelist>
+    <varlistentry>
+     <term>Authentication Level</term>
+      <para>Sets the authentication level used to indicate the level of security
+      associated with the module. The value can range from 0 to any positive integer.</para>
+     <listitem><para><command>ssoadm</command> attribute:
+     <literal>sunAMAuthSAEAuthLevel</literal></para></listitem>
+    </varlistentry>
+   </variablelist>
+
+
   </section>
   
   <section xml:id="securid-module-conf-hints">
@@ -3544,6 +3632,8 @@
     </varlistentry>
     <varlistentry>
      <term>Authentication Level</term>
+      <para>Sets the authentication level used to indicate the level of security
+      associated with the module. The value can range from 0 to any positive integer.</para>
      <listitem><para><command>ssoadm</command> attribute:
      <literal>iplanet-am-auth-securid-auth-level</literal></para></listitem>
     </varlistentry>
@@ -3634,8 +3724,20 @@
     </varlistentry>
     <varlistentry>
      <term>Authentication Level</term>
-     <listitem><para><command>ssoadm</command> attribute:
-     <literal>iplanet-am-auth-windowsdesktopsso-auth-level</literal></para></listitem>
+      <para>Sets the authentication level used to indicate the level of security
+      associated with the module. The value can range from 0 to any positive integer.</para>
+      <listitem><para><command>ssoadm</command> attribute:
+      <literal>iplanet-am-auth-windowsdesktopsso-auth-level</literal></para></listitem>
+    </varlistentry>
+    <varlistentry>
+     <term>Search for the user in the realm</term>
+     <listitem>
+     <para>Validates the user against the configured data stores. If the user from the
+     Kerberos token is not found, authentication will fail. If an authentication
+     chain is set, the user will be able to authenticate through another module.</para>
+     <para><command>ssoadm</command> attribute:
+     <literal>iplanet-am-auth-windowsdesktopsso-lookupUserInRealm</literal></para>
+     </listitem>
     </varlistentry>
    </variablelist>
   </section>
@@ -3683,8 +3785,10 @@
     </varlistentry>
     <varlistentry>
      <term>Authentication Level</term>
-     <listitem><para><command>ssoadm</command> attribute:
-     <literal>iplanet-am-auth-nt-auth-level</literal></para></listitem>
+      <para>Sets the authentication level used to indicate the level of security
+      associated with the module. The value can range from 0 to any positive integer.</para>
+      <listitem><para><command>ssoadm</command> attribute:
+      <literal>iplanet-am-auth-nt-auth-level</literal></para></listitem>
     </varlistentry>
    </variablelist>
   </section>
@@ -3732,10 +3836,10 @@
     </varlistentry>
     <varlistentry>
      <term>Authentication Level</term>
-     <listitem>
-      <para><command>ssoadm</command> attribute:
-      <literal>sunWebservicesAuthenticationLevel</literal></para>
-     </listitem>
+      <para>Sets the authentication level used to indicate the level of security
+      associated with the module. The value can range from 0 to any positive integer.</para>
+     <listitem><para><command>ssoadm</command> attribute:
+      <literal>sunWebservicesAuthenticationLevel</literal></para></listitem>
     </varlistentry>
    </variablelist>
   </section>
@@ -4193,7 +4297,7 @@
 
    <listitem>
     <para>Enable lockout by checking Login Failure Lockout Mode, setting
-    the number of attenpts, and setting the lockout interval and
+    the number of attempts, and setting the lockout interval and
     duration.</para>
     <para>You can also opt to warn users after several consecutive failures,
     or to multiply the lockout duration on each successive lockout.</para>
