@@ -14,13 +14,15 @@
  * Copyright 2013 ForgeRock Inc.
  */
 
-package org.forgerock.openam.forgerockrest.authn.core;
+package org.forgerock.openam.forgerockrest.authn.core.wrappers;
 
 import com.iplanet.dpro.session.SessionID;
 import com.iplanet.sso.SSOToken;
 import com.sun.identity.authentication.AuthContext;
 import com.sun.identity.authentication.server.AuthContextLocal;
 import com.sun.identity.authentication.spi.AuthLoginException;
+import org.forgerock.openam.forgerockrest.authn.core.AuthIndexType;
+import org.forgerock.openam.forgerockrest.authn.core.AuthenticationContext;
 
 import javax.security.auth.callback.Callback;
 import java.util.Map;
@@ -168,5 +170,13 @@ public class AuthContextLocalWrapper implements AuthenticationContext {
     @Override
     public SessionID getSessionID() {
         return authContextLocal.getLoginState().getSid();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void setOrgDN(String orgDN) {
+        authContextLocal.setOrgDN(orgDN);
     }
 }

@@ -145,4 +145,6 @@ public interface AuthenticationContext {
      * @return The Session ID.
      */
     SessionID getSessionID();
+
+    void setOrgDN(String orgDN);
 }

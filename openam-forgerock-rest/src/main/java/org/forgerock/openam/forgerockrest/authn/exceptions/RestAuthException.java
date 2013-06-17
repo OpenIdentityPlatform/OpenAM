@@ -67,6 +67,17 @@ public class RestAuthException extends RuntimeException {
      * Constructs a RestAuthException.
      *
      * @param responseStatus The HTTP response to code to send back to the client.
+     * @param errorMessage The error message relating to the exception.
+     */
+    public RestAuthException(int responseStatus, String errorMessage) {
+        super(errorMessage);
+        statusCode = responseStatus;
+    }
+
+    /**
+     * Constructs a RestAuthException.
+     *
+     * @param responseStatus The HTTP response to code to send back to the client.
      * @param throwable The cause of the exception.
      */
     public RestAuthException(int responseStatus, Throwable throwable) {

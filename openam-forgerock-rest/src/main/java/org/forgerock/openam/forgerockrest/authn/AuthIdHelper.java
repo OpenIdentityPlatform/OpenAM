@@ -26,9 +26,8 @@ import org.forgerock.json.jwt.JwsAlgorithm;
 import org.forgerock.json.jwt.JwtBuilder;
 import org.forgerock.json.jwt.SignedJwt;
 import org.forgerock.openam.forgerockrest.authn.core.AuthenticationContext;
-import org.forgerock.openam.forgerockrest.authn.core.CoreServicesWrapper;
+import org.forgerock.openam.forgerockrest.authn.core.wrappers.CoreServicesWrapper;
 import org.forgerock.openam.forgerockrest.authn.core.LoginConfiguration;
-import org.forgerock.openam.forgerockrest.authn.core.LoginProcess;
 import org.forgerock.openam.forgerockrest.authn.exceptions.RestAuthException;
 import org.forgerock.openam.utils.AMKeyProvider;
 
@@ -51,6 +50,7 @@ public class AuthIdHelper {
 
     private static final SecureRandom RANDOM = new SecureRandom();
     private static final String AUTH_SERVICE_NAME = "iPlanetAMAuthService";
+    private static final String JWT_SIGNING_KEY_ALIAS = "iplanet-am-auth-jwt-signing-key-alias";
 
     private final CoreServicesWrapper coreServicesWrapper;
     private final AMKeyProvider amKeyProvider;
@@ -76,7 +76,7 @@ public class AuthIdHelper {
      * @param loginConfiguration The Login Configuration used in the login process.
      * @param authContext The underlying AuthContextLocal object.
      * @return The authentication id JWT.
-     * @throws java.security.SignatureException If there is a problem signing or verifying the JWT.
+     * @throws SignatureException If there is a problem signing or verifying the JWT.
      */
     public String createAuthId(LoginConfiguration loginConfiguration, AuthenticationContext authContext)
             throws SignatureException {
@@ -88,6 +88,7 @@ public class AuthIdHelper {
             jwtValues.put("authIndexType", loginConfiguration.getIndexType().getIndexType().toString());
             jwtValues.put("authIndexValue", loginConfiguration.getIndexValue());
         }
+        jwtValues.put("realm", authContext.getOrgDN());
         jwtValues.put("sessionId", authContext.getSessionID().toString());
 
         String authId = generateAuthId(keyAlias, jwtValues);
@@ -109,7 +110,7 @@ public class AuthIdHelper {
             ServiceConfigManager scm = coreServicesWrapper.getServiceConfigManager(AUTH_SERVICE_NAME, token);
 
             ServiceConfig orgConfig = scm.getOrganizationConfig(orgName, null);
-            Set<String> values = (Set<String>) orgConfig.getAttributes().get("iplanet-am-auth-jwt-signing-key-alias");
+            Set<String> values = (Set<String>) orgConfig.getAttributes().get(JWT_SIGNING_KEY_ALIAS);
             for (String value : values) {
                 if (value != null && !"".equals(value)) {
                     keyAlias = value;
@@ -129,15 +130,11 @@ public class AuthIdHelper {
      * Generates the authentication id JWT.
      *
      * @param keyAlias The key alias.
-     * @param jwtValues A Map of key values to include in the JWT payload.
+     * @param jwtValues A Map of key values to include in the JWT payload. Must not be null.
      * @return The authentication id JWT.
-     * @throws java.security.SignatureException If there is a problem signing the JWT.
+     * @throws SignatureException If there is a problem signing the JWT.
      */
     private String generateAuthId(String keyAlias, Map<String, Object> jwtValues) throws SignatureException {
-
-        if (jwtValues == null) {
-            jwtValues = new HashMap<String, Object>();
-        }
 
         String keyStoreAlias = keyAlias;
 
@@ -151,7 +148,7 @@ public class AuthIdHelper {
         String otk = new BigInteger(130, RANDOM).toString(32);
 
         String jwt = jwtBuilder.jwt()
-                .header("alg", "HS256")
+                .header("alg", JwsAlgorithm.HS256.toString())
                 .content("otk", otk)
                 .content(jwtValues)
                 .sign(JwsAlgorithm.HS256, privateKey)
@@ -160,16 +157,20 @@ public class AuthIdHelper {
         return jwt;
     }
 
+    public SignedJwt reconstructAuthId(String authId) {
+        return  (SignedJwt) jwtBuilder.recontructJwt(authId);
+    }
+
     /**
      * Verifies the signature of the JWT, to ensure the JWT is valid.
      *
-     * @param loginProcess The Login Process for the authentication.
+     * @param realmDN The DN for the realm being authenticated against.
      * @param authId The authentication id JWT.
-     * @throws java.security.SignatureException If there is a problem verifying the JWT.
+     * @throws SignatureException If there is a problem verifying the JWT.
      */
-    public void verifyAuthId(LoginProcess loginProcess, String authId) throws SignatureException {
+    public void verifyAuthId(String realmDN, String authId) throws SignatureException {
 
-        String keyAlias = getKeyAlias(loginProcess.getAuthContext().getOrgDN());
+        String keyAlias = getKeyAlias(realmDN);
 
         PrivateKey privateKey = amKeyProvider.getPrivateKey(keyAlias);
         X509Certificate certificate = amKeyProvider.getX509Certificate(keyAlias);

@@ -18,15 +18,18 @@ package org.forgerock.openam.forgerockrest.authn.core;
 
 import com.google.inject.Singleton;
 import com.iplanet.dpro.session.SessionID;
+import com.iplanet.sso.SSOException;
 import com.iplanet.sso.SSOToken;
 import com.sun.identity.authentication.service.AuthException;
-import com.sun.identity.authentication.service.AuthUtils;
 import com.sun.identity.authentication.spi.AuthLoginException;
 import com.sun.identity.shared.debug.Debug;
+import org.forgerock.openam.forgerockrest.authn.core.wrappers.AuthContextLocalWrapper;
+import org.forgerock.openam.forgerockrest.authn.core.wrappers.CoreServicesWrapper;
 
 import javax.inject.Inject;
 import javax.servlet.http.HttpServletRequest;
 import java.util.Map;
+import java.util.Set;
 
 /**
  * This class is responsible for starting or continuing a login process.
@@ -49,37 +52,6 @@ public class LoginAuthenticator {
     }
 
     /**
-     * Either creates or retrieves an existing AuthContextLocal dependent on whether this request is a new
-     * authentication request or the continuation of an existing one.
-     *
-     * This method will also determine whether the request is a new authentication request for session upgrade.
-     *
-     * NOTE: A new authentication request, which includes a user's current SSO Token Id, which is not a session upgrade
-     * request, will result in a new AuthContextLocal object being created and a new login process being started.
-     * It does not check if the user's current SSO Token Id is valid and return if valid.
-     *
-     * @param loginConfiguration The LoginConfiguration object to be used to start or continue the login process.
-     * @return The AuthContextLocal wrapped as a AuthContextLocalWrapper.
-     * @throws com.sun.identity.authentication.service.AuthException If there is a problem creating/retrieving the AuthContextLocal.
-     * @throws com.sun.identity.authentication.spi.AuthLoginException If there is a problem checking if the authentication request requires session upgrade.
-     */
-    private AuthContextLocalWrapper getAuthContext(LoginConfiguration loginConfiguration) throws AuthException,
-            AuthLoginException {
-
-        HttpServletRequest request = loginConfiguration.getHttpRequest();
-        SessionID sessionID = new SessionID(loginConfiguration.getSessionId());
-        boolean isSessionUpgrade = false;
-        if (loginConfiguration.isSessionUpgradeRequest() && sessionID.isNull()) {
-            sessionID = new SessionID(loginConfiguration.getSSOTokenId());
-            SSOToken ssoToken = AuthUtils.getExistingValidSSOToken(new SessionID(loginConfiguration.getSSOTokenId()));
-            isSessionUpgrade = checkSessionUpgrade(ssoToken, loginConfiguration.getIndexType(),
-                    loginConfiguration.getIndexValue());
-        }
-        boolean isBackPost = false;//TODO document what is this should i ignore?
-        return coreServicesWrapper.getAuthContext(request, null, sessionID, isSessionUpgrade, isBackPost);
-    }
-
-    /**
      * Gets the Login Process object using the given Login Configuration.
      *
      * If it is the first request to initiate a login process then a new AuthContextLocal will be created and given
@@ -91,14 +63,16 @@ public class LoginAuthenticator {
      *
      * @param loginConfiguration The LoginConfiguration object to be used to start or continue the login process.
      * @return The LoginProcess object.
-     * @throws com.sun.identity.authentication.service.AuthException If there is a problem retrieving or creating the underlying AuthContextLocal.
-     * @throws com.sun.identity.authentication.spi.AuthLoginException If there is a problem retrieving or creating the underlying AuthContextLocal or
+     * @throws AuthException If there is a problem retrieving or creating the underlying AuthContextLocal.
+     * @throws AuthLoginException If there is a problem retrieving or creating the underlying AuthContextLocal or
      *                              starting the login process.
+     * @throws SSOException If there is a problem starting the login process.
      */
-    public LoginProcess getLoginProcess(LoginConfiguration loginConfiguration) throws AuthException, AuthLoginException {
+    public LoginProcess getLoginProcess(LoginConfiguration loginConfiguration) throws AuthException, AuthLoginException,
+            SSOException {
 
         AuthContextLocalWrapper authContext = getAuthContext(loginConfiguration);
-        LoginProcess loginProcess = new LoginProcess(this, loginConfiguration, authContext);
+        LoginProcess loginProcess = new LoginProcess(this, loginConfiguration, authContext, coreServicesWrapper);
         if (coreServicesWrapper.isNewRequest(authContext)) {
             startLoginProcess(loginProcess);
         }
@@ -111,7 +85,7 @@ public class LoginAuthenticator {
      *
      * @param loginProcess The Login Process object that will maintain the login process state for the request.
      * @return The Login Process object.
-     * @throws com.sun.identity.authentication.spi.AuthLoginException If there is a problem starting the login process.
+     * @throws AuthLoginException If there is a problem starting the login process.
      */
     LoginProcess startLoginProcess(LoginProcess loginProcess) throws AuthLoginException {
 
@@ -122,7 +96,7 @@ public class LoginAuthenticator {
         AuthContextLocalWrapper authContext = loginProcess.getAuthContext();
 
         if (indexType != null && indexType.equals(AuthIndexType.RESOURCE)) {
-            Map envMap = coreServicesWrapper.getEnvMap(request);
+            Map<String, Set<String>> envMap = coreServicesWrapper.getEnvMap(request);
             authContext.login(indexType.getIndexType(), indexValue, false, envMap, null);
         } else if (indexType.getIndexType() != null) {
             authContext.login(indexType.getIndexType(), indexValue);
@@ -134,6 +108,39 @@ public class LoginAuthenticator {
     }
 
     /**
+     * Either creates or retrieves an existing AuthContextLocal dependent on whether this request is a new
+     * authentication request or the continuation of an existing one.
+     *
+     * This method will also determine whether the request is a new authentication request for session upgrade.
+     *
+     * NOTE: A new authentication request, which includes a user's current SSO Token Id, which is not a session upgrade
+     * request, will result in a new AuthContextLocal object being created and a new login process being started.
+     * It does not check if the user's current SSO Token Id is valid and return if valid.
+     *
+     * @param loginConfiguration The LoginConfiguration object to be used to start or continue the login process.
+     * @return The AuthContextLocal wrapped as a AuthContextLocalWrapper.
+     * @throws AuthException If there is a problem creating/retrieving the AuthContextLocal.
+     * @throws AuthLoginException If there is a problem checking if the authentication request requires session upgrade.
+     * @throws SSOException If there is a problem checking if the authentication request requires session upgrade.
+     */
+    private AuthContextLocalWrapper getAuthContext(LoginConfiguration loginConfiguration) throws AuthException,
+            AuthLoginException, SSOException {
+
+        HttpServletRequest request = loginConfiguration.getHttpRequest();
+        SessionID sessionID = new SessionID(loginConfiguration.getSessionId());
+        boolean isSessionUpgrade = false;
+        if (loginConfiguration.isSessionUpgradeRequest() && sessionID.isNull()) {
+            sessionID = new SessionID(loginConfiguration.getSSOTokenId());
+            SSOToken ssoToken = coreServicesWrapper.getExistingValidSSOToken(
+                    new SessionID(loginConfiguration.getSSOTokenId()));
+            isSessionUpgrade = checkSessionUpgrade(ssoToken, loginConfiguration.getIndexType(),
+                    loginConfiguration.getIndexValue());
+        }
+        boolean isBackPost = false;//TODO document what is this should i ignore?
+        return coreServicesWrapper.getAuthContext(request, null, sessionID, isSessionUpgrade, isBackPost);
+    }
+
+    /**
      * Checks to see if the authentication method, used to retrieve the user's current SSO Token ID, meets the required
      * authentication requirements.
      *
@@ -141,58 +148,54 @@ public class LoginAuthenticator {
      * @param indexType The Authentication Index Type for the authentication requirements that must be met.
      * @param indexValue The Authentication Index value for the authentication requirements that must be met.
      * @return Whether the user's current session meets the authentication requirements.
-     * @throws com.sun.identity.authentication.spi.AuthLoginException If there is a problem determining whether a user's session needs upgrading.
+     * @throws AuthLoginException If there is a problem determining whether a user's session needs upgrading.
+     * @throws SSOException If there is a problem determining whether a user's session needs upgrading.
      */
     private boolean checkSessionUpgrade(SSOToken ssoToken, AuthIndexType indexType, String indexValue)
-            throws AuthLoginException {
+            throws AuthLoginException, SSOException {
 
         String value;
         boolean upgrade = false;
-        try {
             switch (indexType) {
-                case USER: {
-                    value = ssoToken.getProperty("UserToken");
-                    if (!indexType.equals(value)) {
-                        upgrade = true;
-                    }
-                    break;
-                }
-                case ROLE: {
-                    value = ssoToken.getProperty("Role");
-                    if (!coreServicesWrapper.doesValueContainKey(value, indexValue)) {
-                        upgrade = true;
-                    }
-                    break;
-                }
-                case SERVICE: {
-                    value = ssoToken.getProperty("Service");
-                    if (!coreServicesWrapper.doesValueContainKey(value, indexValue)) {
-                        upgrade = true;
-                    }
-                    break;
-                }
-                case MODULE: {
-                    value = ssoToken.getProperty("AuthType");
-                    if (!coreServicesWrapper.doesValueContainKey(value, indexValue)) {
-                        upgrade = true;
-                    }
-                    break;
-                }
-                case LEVEL: {
-                    int i = Integer.parseInt(indexValue);
-                    if (i>Integer.parseInt(ssoToken.getProperty("AuthLevel"))) {
-                        upgrade = true;
-                    }
-                    break;
-                }
-                case COMPOSITE: {
+            case USER: {
+                value = ssoToken.getProperty("UserToken");
+                if (!indexValue.equals(value)) {
                     upgrade = true;
-                    break;
                 }
+                break;
             }
-        } catch (Exception e) {
-            DEBUG.error("Exception in checkSessionUpgrade : ", e);
-            throw new AuthLoginException("Exception in checkSessionUpgrade : ", e);
+            case ROLE: {
+                value = ssoToken.getProperty("Role");
+                if (!coreServicesWrapper.doesValueContainKey(value, indexValue)) {
+                    upgrade = true;
+                }
+                break;
+            }
+            case SERVICE: {
+                value = ssoToken.getProperty("Service");
+                if (!coreServicesWrapper.doesValueContainKey(value, indexValue)) {
+                    upgrade = true;
+                }
+                break;
+            }
+            case MODULE: {
+                value = ssoToken.getProperty("AuthType");
+                if (!coreServicesWrapper.doesValueContainKey(value, indexValue)) {
+                    upgrade = true;
+                }
+                break;
+            }
+            case LEVEL: {
+                int i = Integer.parseInt(indexValue);
+                if (i > Integer.parseInt(ssoToken.getProperty("AuthLevel"))) {
+                    upgrade = true;
+                }
+                break;
+            }
+            case COMPOSITE: {
+                upgrade = true;
+                break;
+            }
         }
 
         return upgrade;

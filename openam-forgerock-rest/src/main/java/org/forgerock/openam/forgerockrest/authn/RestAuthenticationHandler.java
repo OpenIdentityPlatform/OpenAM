@@ -54,7 +54,6 @@ public class RestAuthenticationHandler {
 
     private final LoginAuthenticator loginAuthenticator;
     private final RestAuthCallbackHandlerManager restAuthCallbackHandlerManager;
-    private final JwtBuilder jwtBuilder;
     private final AMAuthErrorCodeResponseStatusMapping amAuthErrorCodeResponseStatusMapping;
     private final AuthIdHelper authIdHelper;
 
@@ -63,25 +62,23 @@ public class RestAuthenticationHandler {
      *
      * @param loginAuthenticator An instance of the LoginAuthenticator.
      * @param restAuthCallbackHandlerManager An instance of the RestAuthCallbackHandlerManager.
-     * @param jwtBuilder An instance of the JwtBuilder.
      * @param amAuthErrorCodeResponseStatusMapping An instance of the AMAuthErrorCodeResponseStatusMapping.
      * @param authIdHelper An instance of the AuthIdHelper.
      */
     @Inject
     public RestAuthenticationHandler(LoginAuthenticator loginAuthenticator,
-                                     RestAuthCallbackHandlerManager restAuthCallbackHandlerManager, JwtBuilder jwtBuilder,
-                                     AMAuthErrorCodeResponseStatusMapping amAuthErrorCodeResponseStatusMapping,
-                                     AuthIdHelper authIdHelper) {
+            RestAuthCallbackHandlerManager restAuthCallbackHandlerManager,
+            AMAuthErrorCodeResponseStatusMapping amAuthErrorCodeResponseStatusMapping,
+            AuthIdHelper authIdHelper) {
         this.loginAuthenticator = loginAuthenticator;
         this.restAuthCallbackHandlerManager = restAuthCallbackHandlerManager;
-        this.jwtBuilder = jwtBuilder;
         this.amAuthErrorCodeResponseStatusMapping = amAuthErrorCodeResponseStatusMapping;
         this.authIdHelper = authIdHelper;
     }
 
     /**
-     * Handles authentication requests from HTTP both GET and POST. Will then either create or retrieve the Login
-     * Process, dependent on if the request is a new authentication request or a continuation of one.
+     * Handles authentication requests from HTTP both GET and POST. Will then either create the Login
+     * Process, as the request will be a new authentication request.
      *
      * @param headers The HttpHeaders of the request.
      * @param request The HttpServletRequest.
@@ -93,8 +90,8 @@ public class RestAuthenticationHandler {
      * @param httpMethod The HTTP method used to make the request.
      * @return The Response of the authentication request.
      */
-    public Response authenticate(HttpHeaders headers, HttpServletRequest request, HttpServletResponse response,
-                                 String authIndexType, String indexValue, String sessionUpgradeSSOTokenId, HttpMethod httpMethod) {
+    public Response initiateAuthentication(HttpHeaders headers, HttpServletRequest request, HttpServletResponse response,
+                                           String authIndexType, String indexValue, String sessionUpgradeSSOTokenId, HttpMethod httpMethod) {
         return authenticate(headers, request, response, null, authIndexType, indexValue, sessionUpgradeSSOTokenId,
                 httpMethod);
     }
@@ -111,8 +108,8 @@ public class RestAuthenticationHandler {
      *                                 upgrade.
      * @return The Response of the authentication request.
      */
-    public Response authenticate(HttpHeaders headers, HttpServletRequest request, HttpServletResponse response,
-                                 String postBody, String sessionUpgradeSSOTokenId) {
+    public Response continueAuthentication(HttpHeaders headers, HttpServletRequest request, HttpServletResponse response,
+                                           String postBody, String sessionUpgradeSSOTokenId) {
         return authenticate(headers, request, response, JsonValueBuilder.toJsonValue(postBody), null, null,
                 sessionUpgradeSSOTokenId, HttpMethod.POST);
     }
@@ -133,8 +130,8 @@ public class RestAuthenticationHandler {
      * @return The Response of the authentication request.
      */
     private Response authenticate(HttpHeaders headers, HttpServletRequest request, HttpServletResponse response,
-                                  JsonValue postBody, String authIndexType, String indexValue, String sessionUpgradeSSOTokenId,
-                                  HttpMethod httpMethod) {
+            JsonValue postBody, String authIndexType, String indexValue, String sessionUpgradeSSOTokenId,
+            HttpMethod httpMethod) {
 
         Response.ResponseBuilder responseBuilder;
         try {
@@ -148,11 +145,13 @@ public class RestAuthenticationHandler {
 
             String sessionId = null;
             if (authId != null) {
-                SignedJwt jwt = (SignedJwt) jwtBuilder.recontructJwt(authId);
+                SignedJwt jwt = authIdHelper.reconstructAuthId(authId);
                 sessionId = jwt.getJwt().getContent("sessionId", String.class);
                 String authIndexTypeString = jwt.getJwt().getContent("authIndexType", String.class);
-                indexType = AuthIndexType.getAuthIndexType(authIndexTypeString);
+                indexType = getAuthIndexType(authIndexTypeString);
                 indexValue = jwt.getJwt().getContent("authIndexValue", String.class);
+                String realmDN = jwt.getJwt().getContent("realm", String.class);
+                authIdHelper.verifyAuthId(realmDN, authId);
             }
 
             LoginConfiguration loginConfiguration = new LoginConfiguration()
@@ -164,10 +163,6 @@ public class RestAuthenticationHandler {
 
             LoginProcess loginProcess = loginAuthenticator.getLoginProcess(loginConfiguration);
 
-            if (authId != null) {
-                authIdHelper.verifyAuthId(loginProcess, authId);
-            }
-
             responseBuilder = processAuthentication(headers, request, response, postBody, httpMethod, authId,
                     loginProcess, loginConfiguration);
 
@@ -176,7 +171,8 @@ public class RestAuthenticationHandler {
             return e.getResponse();
         } catch (L10NMessageImpl e) {
             DEBUG.error(e.getMessage(), e);
-            return new RestAuthException(Response.Status.UNAUTHORIZED, e).getResponse();
+            return new RestAuthException(amAuthErrorCodeResponseStatusMapping.getAuthLoginExceptionResponseStatus(
+                    e.getErrorCode()), e).getResponse();
         } catch (JsonException e)  {
             DEBUG.error(e.getMessage(), e);
             return new RestAuthException(Response.Status.INTERNAL_SERVER_ERROR, e).getResponse();
@@ -224,55 +220,28 @@ public class RestAuthenticationHandler {
             LoginProcess loginProcess, LoginConfiguration loginConfiguration)
             throws RestAuthCallbackHandlerResponseException, AuthLoginException, SignatureException {
 
-        Response.ResponseBuilder responseBuilder;
+        Response.ResponseBuilder responseBuilder = null;
 
         switch (loginProcess.getLoginStage()) {
             case REQUIREMENTS_WAITING: {
+
                 Callback[] callbacks = loginProcess.getCallbacks();
-                PagePropertiesCallback pagePropertiesCallback = loginProcess.getPagePropertiesCallback();
 
-                JsonValue jsonCallbacks = null;
-                if (postBody == null) {
-                    try {
-                        jsonCallbacks = restAuthCallbackHandlerManager.handleCallbacks(headers, request, response,
-                                postBody, callbacks, httpMethod);
-                    } catch (RestAuthCallbackHandlerResponseException e) {
-                        // Include the authId in the JSON response.
-                        if (authId == null) {
-                            authId = authIdHelper.createAuthId(loginConfiguration, loginProcess.getAuthContext());
-                        }
-                        e.getJsonResponse().put("authId", authId);
-                        throw e;
-                    }
-
-                } else if (!postBody.get("callbacks").isNull()) {
-                    JsonValue jCallbacks = postBody.get("callbacks");
-
-                    callbacks = restAuthCallbackHandlerManager.handleJsonCallbacks(callbacks, jCallbacks);
-                } else {
-                    callbacks = restAuthCallbackHandlerManager.handleResponseCallbacks(headers, request, response,
-                            callbacks, postBody);
-                }
-
-
-                if (jsonCallbacks != null && jsonCallbacks.size() > 0) {
-
-                    JsonObject jsonResponseObject = JsonValueBuilder.jsonValue();
-
+                JsonValue jsonCallbacks;
+                try {
+                    jsonCallbacks = handleCallbacks(headers, request, response, postBody, httpMethod, callbacks);
+                } catch (RestAuthCallbackHandlerResponseException e) {
+                    // Include the authId in the JSON response.
                     if (authId == null) {
                         authId = authIdHelper.createAuthId(loginConfiguration, loginProcess.getAuthContext());
                     }
-                    jsonResponseObject.put("authId", authId);
-                    if (pagePropertiesCallback != null) {
-                        jsonResponseObject.put("template", pagePropertiesCallback.getTemplateName());
-                        String moduleName = pagePropertiesCallback.getModuleName();
-                        String state = pagePropertiesCallback.getPageState();
-                        jsonResponseObject.put("stage", moduleName + state);
-                    }
-                    jsonResponseObject.put("callbacks", jsonCallbacks);
+                    e.getJsonResponse().put("authId", authId);
+                    throw e;
+                }
 
-                    JsonValue jsonValue = jsonResponseObject.build();
-
+                if (jsonCallbacks != null && jsonCallbacks.size() > 0) {
+                    JsonValue jsonValue = createJsonCallbackResponse(authId, loginConfiguration, loginProcess,
+                            jsonCallbacks);
                     responseBuilder = Response.status(Response.Status.OK);
                     responseBuilder.entity(jsonValue.toString());
 
@@ -284,6 +253,7 @@ public class RestAuthenticationHandler {
                 break;
             }
             case COMPLETE: {
+
                 if (loginProcess.isSuccessful()) {
                     // send token to client
                     JsonObject jsonResponseObject = JsonValueBuilder.jsonValue();
@@ -306,14 +276,51 @@ public class RestAuthenticationHandler {
                 }
                 break;
             }
-            default: {
-                responseBuilder = Response.status(Response.Status.INTERNAL_SERVER_ERROR);
-                JsonValue jsonValue = JsonValueBuilder.jsonValue().put("errorMessage", "Invalid Login Stage").build();
-                responseBuilder.entity(jsonValue.toString());
-            }
         }
 
         return responseBuilder;
+    }
+
+    private JsonValue handleCallbacks(HttpHeaders headers, HttpServletRequest request, HttpServletResponse response,
+            JsonValue postBody, HttpMethod httpMethod, Callback[] callbacks)
+            throws RestAuthCallbackHandlerResponseException {
+
+        JsonValue jsonCallbacks = null;
+        if (postBody == null) {
+                jsonCallbacks = restAuthCallbackHandlerManager.handleCallbacks(headers, request, response,
+                        postBody, callbacks, httpMethod);
+
+        } else if (!postBody.get("callbacks").isNull()) {
+            JsonValue jCallbacks = postBody.get("callbacks");
+
+            restAuthCallbackHandlerManager.handleJsonCallbacks(callbacks, jCallbacks);
+        } else {
+            restAuthCallbackHandlerManager.handleResponseCallbacks(headers, request, response, callbacks, postBody);
+        }
+
+        return jsonCallbacks;
+    }
+
+    private JsonValue createJsonCallbackResponse(String authId, LoginConfiguration loginConfiguration,
+            LoginProcess loginProcess, JsonValue jsonCallbacks) throws SignatureException {
+
+        PagePropertiesCallback pagePropertiesCallback = loginProcess.getPagePropertiesCallback();
+
+        JsonObject jsonResponseObject = JsonValueBuilder.jsonValue();
+
+        if (authId == null) {
+            authId = authIdHelper.createAuthId(loginConfiguration, loginProcess.getAuthContext());
+        }
+        jsonResponseObject.put("authId", authId);
+        if (pagePropertiesCallback != null) {
+            jsonResponseObject.put("template", pagePropertiesCallback.getTemplateName());
+            String moduleName = pagePropertiesCallback.getModuleName();
+            String state = pagePropertiesCallback.getPageState();
+            jsonResponseObject.put("stage", moduleName + state);
+        }
+        jsonResponseObject.put("callbacks", jsonCallbacks);
+
+        return jsonResponseObject.build();
     }
 
     /**
@@ -328,7 +335,7 @@ public class RestAuthenticationHandler {
             return AuthIndexType.getAuthIndexType(authIndexType);
         } catch (IllegalArgumentException e) {
             DEBUG.message("Unknown Authentication Index Type, " + authIndexType);
-            throw new RestAuthException(Response.Status.INTERNAL_SERVER_ERROR, "Unknown Authentication Index Type, "
+            throw new RestAuthException(Response.Status.BAD_REQUEST, "Unknown Authentication Index Type, "
                     + authIndexType);
         }
     }

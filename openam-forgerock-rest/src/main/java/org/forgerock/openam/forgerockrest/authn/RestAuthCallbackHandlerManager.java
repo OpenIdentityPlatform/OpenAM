@@ -67,7 +67,7 @@ public class RestAuthCallbackHandlerManager {
      * @throws RestAuthCallbackHandlerResponseException If one of the CallbackHandlers has its own response to be sent.
      */
     public JsonValue handleCallbacks(HttpHeaders headers, HttpServletRequest request,
-                                     HttpServletResponse response, JsonValue postBody, Callback[] callbacks, HttpMethod httpMethod)
+            HttpServletResponse response, JsonValue postBody, Callback[] callbacks, HttpMethod httpMethod)
             throws RestAuthCallbackHandlerResponseException {
 
         List<JsonValue> jsonCallbacks = new ArrayList<JsonValue>();
@@ -108,7 +108,7 @@ public class RestAuthCallbackHandlerManager {
      * @throws RestAuthCallbackHandlerResponseException If one of the CallbackHandlers has its own response to be sent.
      */
     private boolean handleCallbacksInternally(HttpHeaders headers, HttpServletRequest request,
-                                              HttpServletResponse response, JsonValue postBody, Callback[] callbacks, HttpMethod httpMethod)
+            HttpServletResponse response, JsonValue postBody, Callback[] callbacks, HttpMethod httpMethod)
             throws RestAuthCallbackHandlerResponseException {
 
         for (Callback callback : callbacks) {
@@ -183,7 +183,7 @@ public class RestAuthCallbackHandlerManager {
      * @return The updated originalCallbacks.
      */
     public Callback[] handleResponseCallbacks(HttpHeaders headers, HttpServletRequest request,
-                                              HttpServletResponse response, Callback[] originalCallbacks, JsonValue jsonRequestObject) {
+            HttpServletResponse response, Callback[] originalCallbacks, JsonValue jsonRequestObject) {
 
         for (Callback originalCallback : originalCallbacks) {
 

@@ -85,11 +85,11 @@ public class AuthenticationRestService {
     @Path("authenticate")
     @Produces(MediaType.APPLICATION_JSON)
     public Response authenticate(@Context HttpHeaders headers, @Context HttpServletRequest request,
-                                 @Context HttpServletResponse response, @QueryParam("authIndexType") String authIndexType,
-                                 @QueryParam("authIndexValue") String authIndexValue,
-                                 @QueryParam("sessionUpgrade") String sessionUpgradeSSOTokenId) {
+            @Context HttpServletResponse response, @QueryParam("authIndexType") String authIndexType,
+            @QueryParam("authIndexValue") String authIndexValue,
+            @QueryParam("sessionUpgrade") String sessionUpgradeSSOTokenId) {
 
-        return restAuthenticationHandler.authenticate(headers, request, response, authIndexType, authIndexValue,
+        return restAuthenticationHandler.initiateAuthentication(headers, request, response, authIndexType, authIndexValue,
                 sessionUpgradeSSOTokenId, HttpMethod.GET);
     }
 
@@ -119,17 +119,17 @@ public class AuthenticationRestService {
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
     public Response authenticate(@Context HttpHeaders headers, @Context HttpServletRequest request,
-                                 @Context HttpServletResponse response, @QueryParam("authIndexType") String authIndexType,
-                                 @QueryParam("authIndexValue") String authIndexValue,
-                                 @QueryParam("sessionUpgrade") String sessionUpgradeSSOTokenId, String postBody) {
+            @Context HttpServletResponse response, @QueryParam("authIndexType") String authIndexType,
+            @QueryParam("authIndexValue") String authIndexValue,
+            @QueryParam("sessionUpgrade") String sessionUpgradeSSOTokenId, String postBody) {
 
         if (postBody != null && !"".equals(postBody)) {
             //submitReqs
-            return restAuthenticationHandler.authenticate(headers, request, response, postBody,
+            return restAuthenticationHandler.continueAuthentication(headers, request, response, postBody,
                     sessionUpgradeSSOTokenId);
         } else {
             //initiate
-            return restAuthenticationHandler.authenticate(headers, request, response, authIndexType, authIndexValue,
+            return restAuthenticationHandler.initiateAuthentication(headers, request, response, authIndexType, authIndexValue,
                     sessionUpgradeSSOTokenId, HttpMethod.POST);
         }
     }

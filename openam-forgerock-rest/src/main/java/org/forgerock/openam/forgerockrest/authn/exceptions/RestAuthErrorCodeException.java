@@ -16,17 +16,16 @@
 
 package org.forgerock.openam.forgerockrest.authn.exceptions;
 
-import com.sun.identity.authentication.service.AMAuthErrorCode;
-
-import javax.ws.rs.core.Response;
-import java.util.Arrays;
-import java.util.List;
+import org.forgerock.openam.forgerockrest.authn.AMAuthErrorCodeResponseStatusMapping;
 
 /**
  * This exception is designed to be thrown from RESTful authentication calls when authentication fails with a
  * AMAuthErrorCode.
  */
 public class RestAuthErrorCodeException extends RestAuthException {
+
+    private static final AMAuthErrorCodeResponseStatusMapping amAuthErrorCodeResponseStatusMapping =
+            new AMAuthErrorCodeResponseStatusMapping();
 
     /**
      * Constructs a RestAuthException.
@@ -35,37 +34,6 @@ public class RestAuthErrorCodeException extends RestAuthException {
      * @param errorMessage The error message relating to the exception.
      */
     public RestAuthErrorCodeException(String errorCode, String errorMessage) {
-        super(getResponseStatus(errorCode), errorMessage);
-    }
-
-    /**
-     * Translates the AMAuthErrorCode into a HTTP error code.
-     *
-     * @param errorCode The AMAuthErrorCode for the reason of authentication failure.
-     * @return The HTTP error code for the AMAuthErrorCode.
-     */
-    private static Response.Status getResponseStatus(String errorCode) {
-
-        if (get401AuthErrorCodes().contains(errorCode)) {
-            return Response.Status.UNAUTHORIZED;
-        } else {
-            return Response.Status.INTERNAL_SERVER_ERROR;
-        }
-    }
-
-    /**
-     * Returns a List of the AMAuthErrorCodes which map to the HTTP 401 Unauthorized error code.
-     *
-     * @return A List of HTTP 401 AMAuthErrorCodes.
-     */
-    private static List get401AuthErrorCodes() {
-
-        String[] amAuth401ErrorCodes = new String[]{AMAuthErrorCode.AUTH_INVALID_PASSWORD,
-                AMAuthErrorCode.AUTH_PROFILE_ERROR, AMAuthErrorCode.AUTH_USER_NOT_FOUND,
-                AMAuthErrorCode.AUTH_USER_INACTIVE, AMAuthErrorCode.AUTH_USER_LOCKED,
-                AMAuthErrorCode.AUTH_ACCOUNT_EXPIRED, AMAuthErrorCode.AUTH_LOGIN_FAILED,
-                AMAuthErrorCode.AUTH_MAX_SESSION_REACHED, AMAuthErrorCode.AUTH_ERROR};
-
-        return Arrays.asList(amAuth401ErrorCodes);
+        super(amAuthErrorCodeResponseStatusMapping.getAuthLoginExceptionResponseStatus(errorCode), errorMessage);
     }
 }

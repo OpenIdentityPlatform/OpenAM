@@ -14,7 +14,7 @@
  * Copyright 2013 ForgeRock Inc.
  */
 
-package org.forgerock.openam.forgerockrest.authn.core;
+package org.forgerock.openam.forgerockrest.authn.core.wrappers;
 
 import com.google.inject.Singleton;
 import com.iplanet.dpro.session.SessionID;
@@ -24,9 +24,12 @@ import com.sun.identity.authentication.client.AuthClientUtils;
 import com.sun.identity.authentication.server.AuthContextLocal;
 import com.sun.identity.authentication.service.AuthException;
 import com.sun.identity.authentication.service.AuthUtils;
+import com.sun.identity.authentication.util.AMAuthUtils;
 import com.sun.identity.security.AdminTokenAction;
+import com.sun.identity.sm.DNMapper;
 import com.sun.identity.sm.SMSException;
 import com.sun.identity.sm.ServiceConfigManager;
+import org.forgerock.openam.forgerockrest.authn.core.wrappers.AuthContextLocalWrapper;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -138,5 +141,29 @@ public class CoreServicesWrapper {
      */
     public boolean doesValueContainKey(String value, String key) {
         return AuthClientUtils.isContain(value, key);
+    }
+
+    public SSOToken getExistingValidSSOToken(SessionID sessionID) {
+        return AuthUtils.getExistingValidSSOToken(sessionID);
+    }
+
+    public String getDataFromRealmQualifiedData(String realmQualifiedData) {
+        return AMAuthUtils.getDataFromRealmQualifiedData(realmQualifiedData);
+    }
+
+    public String getRealmFromRealmQualifiedData(String realmQualifiedData) {
+        return AMAuthUtils.getRealmFromRealmQualifiedData(realmQualifiedData);
+    }
+
+    public String orgNameToDN(String orgName) {
+        return DNMapper.orgNameToDN(orgName);
+    }
+
+    public int getCompositeAdviceType(AuthContextLocalWrapper authContext) {
+        return AuthUtils.getCompositeAdviceType(authContext.getAuthContext());
+    }
+
+    public String getOrgConfiguredAuthenticationChain(String orgDN) {
+        return AuthUtils.getOrgConfiguredAuthenticationChain(orgDN);
     }
 }

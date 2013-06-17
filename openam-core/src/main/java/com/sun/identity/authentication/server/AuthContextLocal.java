@@ -83,7 +83,7 @@ import javax.servlet.http.HttpSession;
  * It should be serializable as a requirement to be stored in HttpSession.
  *
  */
-public final class AuthContextLocal extends Object 
+public final class AuthContextLocal extends Object
     implements java.io.Serializable {
 
     /*

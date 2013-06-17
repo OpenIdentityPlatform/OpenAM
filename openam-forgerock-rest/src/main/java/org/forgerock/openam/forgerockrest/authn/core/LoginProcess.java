@@ -20,8 +20,8 @@ import com.sun.identity.authentication.AuthContext;
 import com.sun.identity.authentication.service.AuthUtils;
 import com.sun.identity.authentication.spi.AuthLoginException;
 import com.sun.identity.authentication.spi.PagePropertiesCallback;
-import com.sun.identity.authentication.util.AMAuthUtils;
-import com.sun.identity.sm.DNMapper;
+import org.forgerock.openam.forgerockrest.authn.core.wrappers.AuthContextLocalWrapper;
+import org.forgerock.openam.forgerockrest.authn.core.wrappers.CoreServicesWrapper;
 
 import javax.security.auth.callback.Callback;
 import javax.security.auth.callback.ChoiceCallback;
@@ -38,6 +38,7 @@ public class LoginProcess {
     private final LoginAuthenticator loginAuthenticator;
     private final LoginConfiguration loginConfiguration;
     private final AuthContextLocalWrapper authContext;
+    private final CoreServicesWrapper coreServicesWrapper;
 
     /**
      * Constructs an instance of the LoginProcess.
@@ -47,10 +48,11 @@ public class LoginProcess {
      * @param authContext The underlying AuthContextLocal object wrapped as a AuthContextLocalWrapper.
      */
     public LoginProcess(LoginAuthenticator loginAuthenticator, LoginConfiguration loginConfiguration,
-            AuthContextLocalWrapper authContext) {
+            AuthContextLocalWrapper authContext, CoreServicesWrapper coreServicesWrapper) {
         this.loginAuthenticator = loginAuthenticator;
         this.loginConfiguration = loginConfiguration;
         this.authContext = authContext;
+        this.coreServicesWrapper = coreServicesWrapper;
     }
 
     /**
@@ -133,14 +135,14 @@ public class LoginProcess {
                 }
             }
 
-            String indexValue = AMAuthUtils.getDataFromRealmQualifiedData(choice);
-            String qualifiedRealm = AMAuthUtils.getRealmFromRealmQualifiedData(choice);
+            String indexValue = coreServicesWrapper.getDataFromRealmQualifiedData(choice);
+            String qualifiedRealm = coreServicesWrapper.getRealmFromRealmQualifiedData(choice);
             if ((qualifiedRealm != null) && (qualifiedRealm.length() != 0)) {
-                String orgDN = DNMapper.orgNameToDN(qualifiedRealm);
-                authContext.getAuthContext().setOrgDN(orgDN);
+                String orgDN = coreServicesWrapper.orgNameToDN(qualifiedRealm);
+                authContext.setOrgDN(orgDN);
             }
 
-            int type = AuthUtils.getCompositeAdviceType(authContext.getAuthContext());
+            int type = coreServicesWrapper.getCompositeAdviceType(authContext);
 
             if (type == AuthUtils.MODULE) {
                 indexType = AuthIndexType.MODULE;
@@ -148,9 +150,9 @@ public class LoginProcess {
                 indexType = AuthIndexType.SERVICE;
             } else if (type == AuthUtils.REALM) {
                 indexType = AuthIndexType.SERVICE;
-                String orgDN = DNMapper.orgNameToDN(choice);
-                indexValue = AuthUtils.getOrgConfiguredAuthenticationChain(orgDN);
-                authContext.getAuthContext().setOrgDN(orgDN);
+                String orgDN = coreServicesWrapper.orgNameToDN(choice);
+                indexValue = coreServicesWrapper.getOrgConfiguredAuthenticationChain(orgDN);
+                authContext.setOrgDN(orgDN);
             } else {
                 indexType = AuthIndexType.MODULE;
             }

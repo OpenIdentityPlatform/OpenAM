@@ -139,7 +139,7 @@ public class LoginConfiguration {
      *          returned, otherwise false.
      */
     public boolean isSessionUpgradeRequest() {
-        return ssoTokenId != null && !"".equals(ssoTokenId);
+        return !"".equals(ssoTokenId);
     }
 
     /**
