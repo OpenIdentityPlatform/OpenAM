@@ -20,7 +20,7 @@
   !
   ! CCPL HEADER END
   !
-  !      Copyright 2011 ForgeRock AS
+  !      Copyright 2011-2013 ForgeRock, Inc.
   !    
 -->
 <chapter xml:id='chap-log-messages'
@@ -30,6 +30,159 @@
  xsi:schemaLocation='http://docbook.org/ns/docbook http://docbook.org/xml/5.0/xsd/docbook.xsd'
  xmlns:xlink='http://www.w3.org/1999/xlink'
  xmlns:xinclude='http://www.w3.org/2001/XInclude'>
- <title>Log Messages</title>
+ <title>Log Files and Messages</title>
 
- <para>This chapter describes OpenAM log messages.</para>
+  <para>This chapter gives information about the different log files and messages for 
+  OpenAM.</para>
+
+ <section xml:id="log-files">
+  <title>Log Files</title>
+ 
+  <para>This section describes the different OpenAM log files.</para>
+ 
+  <variablelist xml:id="log-admin-files">
+   <title>Administrative Log Files</title>
+
+   <para>Administrative logs record information on OpenAM events. You can adjust the
+   amount of detail in the administrative logs under Configuration &gt; System &gt; 
+   Logging.</para>
+
+   <indexterm>
+    <primary>Logs</primary>
+    <secondary>Administrative Files</secondary>
+   </indexterm>
+   <varlistentry>
+    <term>amAuthentication.access</term>
+    <listitem>
+     <para>Contains log data for when users log into and out of OpenAM, including failed 
+     authentications</para>
+    </listitem>
+   </varlistentry>
+   <varlistentry>
+    <term>amAuthentication.error</term>
+    <listitem>
+     <para>Contains log data about errors encountered when users login and out of OpenAM</para>
+    </listitem>
+   </varlistentry>
+   <varlistentry>
+    <term>amConsole.access</term>
+    <listitem>
+     <para>Contains data about actions run as the administrator in the console, including
+     changes to realms and policies</para>
+    </listitem>
+   </varlistentry>
+   <varlistentry>
+    <term>amConsole.error</term>
+    <listitem>
+     <para>Contains data on errors encountered during administrator sessions</para>
+    </listitem>
+   </varlistentry>
+   <varlistentry>
+    <term>amPolicy.access</term>
+    <listitem>
+     <para>Contains data about authorization actions permitted by policies, including 
+     policy creation, removal, or modification</para>
+    </listitem>
+   </varlistentry>
+   <varlistentry>
+    <term>amPolicy.error</term>
+    <listitem>
+     <para>Contains data on errors encountered during actions related to the policy</para>
+    </listitem>
+   </varlistentry>
+   <varlistentry>
+    <term>amPolicyDelegation.access</term>
+    <listitem>
+     <para>Contains data about actions as part of the policy delegation, including any
+     changes to the delegation</para>
+    </listitem>
+   </varlistentry>
+   <varlistentry>
+    <term>amSSO.access</term>
+    <listitem>
+     <para>Contains data about user sessions, including times of access, session time outs, 
+     and session creation/termination</para>
+    </listitem>
+   </varlistentry>
+   <varlistentry>
+    <term>entitlement.access</term>
+    <listitem>
+     <para>Contains data about entitlement actions or changes</para>
+    </listitem>
+   </varlistentry>
+   <varlistentry>
+    <term>IDFF.access</term>
+    <listitem>
+     <para>Contains data about federation actions, including the creation of 
+     authentication domains or the hosted providers</para>
+    </listitem>
+   </varlistentry>
+   <varlistentry>
+    <term>IDFF.error</term>
+    <listitem>
+     <para>Contains data on errors encountered during federation actions</para>
+    </listitem>
+   </varlistentry>
+   <varlistentry>
+    <term>SAML2.access</term>
+    <listitem>
+     <para>Contains data about SAML 2 actions, including changes to assertions, artifacts,
+     response, and requests</para>
+    </listitem>
+   </varlistentry>
+   <varlistentry>
+    <term>SAML2.error</term>
+    <listitem>
+     <para>Contains data about errors encountered during SAML 2 actions</para>
+    </listitem>
+   </varlistentry>
+   <varlistentry>
+    <term>WSFederation.access</term>
+    <listitem>
+     <para>Contains data about activity for WS Federation, including changes and
+     access information</para>
+    </listitem>
+   </varlistentry>
+   <varlistentry>
+    <term>WSFederation.error</term>
+    <listitem>
+     <para>Contains data on errors encountered during WS Federation</para>
+    </listitem>
+   </varlistentry>
+  </variablelist>
+  
+  <variablelist xml:id="log-debug-files">
+   <title>Debug Log Files</title>
+
+   <para>Debug logs provide information that can help you troubleshoot. You can adjust the
+   amount of detail in the debug logs under Configuration &gt; System &gt; Logging.</para>
+   <indexterm>
+    <primary>Logs</primary>
+    <secondary>Debug Files</secondary>
+   </indexterm>
+   <varlistentry>
+    <term>Authentication</term>
+    <listitem>
+     <para>Contains information about problems encountered during user authentication</para>
+    </listitem>
+   </varlistentry>
+   <varlistentry>
+    <term>Configuration</term>
+    <listitem>
+     <para>Contains information about problems with the OpenAM configuration</para>
+    </listitem>
+   </varlistentry>
+   <varlistentry>
+    <term>CoreSystem</term>
+    <listitem>
+     <para>Contains information about problems specific to your core deployment of
+     OpenAM that are not part of the authentication process or part of your current 
+     configuration</para>
+    </listitem>
+   </varlistentry>
+  </variablelist>
+ </section>
+ 
+ <section xml:id="log-messages">
+  <title>Log Messages</title>
+  <para>This section describes OpenAM log messages.</para>
