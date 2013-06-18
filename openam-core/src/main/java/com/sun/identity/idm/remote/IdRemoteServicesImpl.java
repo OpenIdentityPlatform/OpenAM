@@ -25,7 +25,9 @@
  * $Id: IdRemoteServicesImpl.java,v 1.23 2010/01/06 01:58:26 veiming Exp $
  *
  */
-
+/**
+ * Portions Copyrighted 2013 ForgeRock, Inc.
+ */
 package com.sun.identity.idm.remote;
 
 import com.iplanet.am.sdk.AMHashMap;
@@ -50,6 +52,7 @@ import com.sun.identity.idm.IdType;
 import com.sun.identity.idm.IdUtils;
 import com.sun.identity.security.AdminTokenAction;
 import com.sun.identity.shared.Constants;
+import com.sun.identity.shared.encode.Base64;
 import com.sun.identity.shared.jaxrpc.SOAPClient;
 import com.sun.identity.sm.SMSException;
 import com.sun.identity.sm.SchemaType;
@@ -218,35 +221,61 @@ public class IdRemoteServicesImpl implements IdServices {
         }
     }
 
-    public Map getAttributes(SSOToken token, IdType type, String name,
-            Set attrNames, String amOrgName, String amsdkDN, boolean isString)
-            throws IdRepoException, SSOException {
-        
-        Map res = null;
-        
-        try {
-            Object[] objs = { getTokenString(token), type.getName(),
-                    name, attrNames, amOrgName, amsdkDN };
-            res = ((Map) client.send(client.encodeMessage(
-                    "getAttributes1_idrepo", objs), 
-                    Session.getLBCookie(token.getTokenID().toString()), null));
-            if (res != null) {
-                Map res2 = new AMHashMap();
-                Iterator it = res.keySet().iterator();
-                while (it.hasNext()) {
-                    Object attr = it.next();
-                    Set set = (Set)res.get(attr);
-                    set = XMLUtils.decodeAttributeSet(set);
-                    res2.put(attr, set);
+    public Map getAttributes(SSOToken token, IdType type, String name, Set attrNames, String amOrgName, String amsdkDN,
+            boolean isString) throws IdRepoException, SSOException {
+        if (isString) {
+            Map<String, Set<String>> res = null;
+
+            try {
+                Object[] objs = {getTokenString(token), type.getName(), name, attrNames, amOrgName, amsdkDN};
+                res = (Map<String, Set<String>>) client.send(client.encodeMessage("getAttributes1_idrepo", objs),
+                        Session.getLBCookie(token.getTokenID().toString()), null);
+                if (res != null) {
+                    Map<String, Set<String>> res2 = new AMHashMap();
+                    for (Map.Entry<String, Set<String>> entry : res.entrySet()) {
+                        String attr = entry.getKey();
+                        Set<String> set = entry.getValue();
+                        set = XMLUtils.decodeAttributeSet(set);
+                        res2.put(attr, set);
+                    }
+                    res = res2;
                 }
-                res = res2;
+            } catch (Exception ex) {
+                processException(ex);
             }
-            
+
+            return res;
+        } else {
+            return getBinaryAttributes(token, type, name, attrNames, amOrgName, amsdkDN);
+        }
+    }
+
+    private Map<String, byte[][]> getBinaryAttributes(SSOToken token, IdType type, String name, Set<String> attrNames,
+            String amOrgName, String amsdkDN) throws IdRepoException, SSOException {
+
+        Map<String, byte[][]> ret = new AMHashMap(true);
+        try {
+            Object[] objs = {getTokenString(token), type.getName(), name, attrNames, amOrgName, amsdkDN};
+            Map<String, Set<String>> encodedAttributes = (Map<String, Set<String>>) client.send(
+                    client.encodeMessage("getBinaryAttributes_idrepo", objs),
+                    Session.getLBCookie(token.getTokenID().toString()), null);
+            if (encodedAttributes != null) {
+
+                for (Map.Entry<String, Set<String>> entry : encodedAttributes.entrySet()) {
+                    String attrName = entry.getKey();
+                    Set<String> stringValues = XMLUtils.decodeAttributeSet(entry.getValue());
+                    byte[][] values = new byte[stringValues.size()][];
+                    int counter = 0;
+                    for (String value : stringValues) {
+                        values[counter++] = Base64.decode(value);
+                    }
+                    ret.put(attrName, values);
+                }
+            }
         } catch (Exception ex) {
             processException(ex);
         }
-        
-        return res;
+        return ret;
     }
 
     public Map getAttributes(SSOToken token, IdType type, String name,

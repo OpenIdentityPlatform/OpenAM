@@ -25,7 +25,9 @@
  * $Id: DirectoryManagerIF.java,v 1.9 2010/01/06 01:58:26 veiming Exp $
  *
  */
-
+/**
+ * Portions Copyrighted 2013 ForgeRock, Inc.
+ */
 package com.iplanet.am.sdk.remote;
 
 import java.rmi.Remote;
@@ -227,6 +229,24 @@ public interface DirectoryManagerIF extends Remote {
     public Map getAttributes2_idrepo(String token, String type, String name,
             String amOrgName, String amsdkDN) throws RemoteException,
             IdRepoException, SSOException;
+
+    /**
+     * Returns attributes in binary format for a given identity using the IdRepo API.
+     *
+     * @param token Token identifying the requester.
+     * @param type The identity type we need to query the attributes for.
+     * @param name The name of the identity.
+     * @param attrNames The attribute names that needs to be queried.
+     * @param amOrgName The realm identifier.
+     * @param amsdkDN The AM SDK DN, may be null.
+     * @return A map of attribute names and values, where the values are all in Base64 encoded format.
+     * @throws RemoteException If there was a communication problem.
+     * @throws IdRepoException If there was a problem while retrieving the attributes from the identity repository.
+     * @throws SSOException If there was an error with the provided token.
+     */
+    public Map<String, Set<String>> getBinaryAttributes_idrepo(String token, String type, String name,
+            Set<String> attrNames, String amOrgName, String amsdkDN)
+            throws RemoteException, IdRepoException, SSOException;
 
     public Set getMembers_idrepo(String token, String type, String name,
             String amOrgName, String membersType, String amsdkDN)
