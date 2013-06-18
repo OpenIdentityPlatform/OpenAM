@@ -1026,10 +1026,8 @@ public class InternalSession implements TaskRunnable, Serializable {
 
     /*
      * The session quota checking will be bypassed if:
-     * (1) the login user is the super user, or
-     * (2) the token is an application token (e.g. Agent), or
-     * (3) the login user has the top level admin role (this
-     *  checking will be enabled only when XXX
+     * (1) the login user is the super user (not including users assigned the top level admin role), or
+     * (2) the token is an application token (e.g. Agent)
      */
     private boolean shouldIgnoreSessionQuotaChecking(String userDN) {
 
@@ -1040,20 +1038,8 @@ public class InternalSession implements TaskRunnable, Serializable {
         if (SessionService.getSessionService().
                 isSuperUser(getUUID()) || (isAppSession())) {
             ignore = true;
-        } else {
-            // Need to check if the user has the top-level admin role
-            // (expensive operation) only when the session constraint
-            // needs to be bypassed for the top-level admins.
-            boolean checkTopLevelAdminRole = SessionService
-                    .bypassConstraintForToplevelAdmin();
-
-            if (checkTopLevelAdminRole) {
-                if (SessionService.getSessionService().
-                    hasTopLevelAdminRole(getUUID())) {
-                    ignore = true;
-                }
-            }
         }
+
         return ignore;
     }
 

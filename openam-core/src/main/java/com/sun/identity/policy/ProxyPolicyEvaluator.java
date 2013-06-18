@@ -68,16 +68,6 @@ import com.sun.identity.shared.ldap.util.DN;
  */
 public class ProxyPolicyEvaluator {
 
-    private static final String TOP_LEVEL_ADMIN_ROLE 
-            = "cn=Top-level Admin Role,";
-
-    private static final String TOP_LEVEL_POLICY_ADMIN_ROLE 
-            = "cn=Top-level Policy Admin Role,";
-    private static final String ORG_ADMIN_ROLE 
-            = "cn=Organization Admin Role,";
-    private static final String ORG_POLICY_ADMIN_ROLE 
-            = "cn=Organization Policy Admin Role,";
-
     private SSOToken adminToken;
     private String serviceType;
     private PolicyEvaluator policyEvaluator;

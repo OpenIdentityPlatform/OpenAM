@@ -287,19 +287,6 @@ iplanet-am-role-display-options: actionuserproperties=viewproperties
 iplanet-am-role-display-options: actionpolicyproperties=viewproperties
 iplanet-am-role-display-options: actionentityproperties=viewproperties
 
-dn: cn=Top-level Admin Role,@NORMALIZED_RS@
-objectClass: top
-objectClass: nsmanagedroledefinition
-objectClass: nssimpleroledefinition
-objectClass: nsroledefinition
-objectClass: ldapsubentry
-objectClass: iplanet-am-managed-role
-iplanet-am-role-type: 1
-iplanet-am-role-description: Top-level Admin
-iplanet-am-role-aci-description: Top-level Admin Description
-iplanet-am-role-aci-list: @NORMALIZED_RS@:aci: (target="ldap:///@NORMALIZED_RS@")(targetattr="*")(version 3.0; acl "S1IS Top-level Admin Permissions"; allow (all) roledn = "ldap:///cn=Top-level Admin Role,@NORMALIZED_RS@"; )
-iplanet-am-role-managed-container-dn: @NORMALIZED_RS@
-
 dn: cn=Top-level Help Desk Admin Role,@NORMALIZED_RS@
 objectClass: top
 objectClass: nsmanagedroledefinition
@@ -334,7 +321,7 @@ objectClass: iplanet-am-managed-role
 iplanet-am-role-type: 2
 iplanet-am-role-description: Top-level Policy Admin
 iplanet-am-role-aci-description: Top-level Policy Admin Description
-iplanet-am-role-aci-list:@NORMALIZED_RS@:aci: (target="ldap:///@NORMALIZED_RS@")(targetfilter=(!(|(nsroledn=cn=Top-level Admin Role,@NORMALIZED_RS@))))(targetattr = "*") (version 3.0; acl "S1IS Top-level Policy Admin Role access allow"; allow (read,search) roledn = "ldap:///cn=Top-level Policy Admin Role,@NORMALIZED_RS@";)
+iplanet-am-role-aci-list:@NORMALIZED_RS@:aci: (target="ldap:///@NORMALIZED_RS@")(targetattr = "*") (version 3.0; acl "S1IS Top-level Policy Admin Role access allow"; allow (read,search) roledn = "ldap:///cn=Top-level Policy Admin Role,@NORMALIZED_RS@";)
 iplanet-am-role-managed-container-dn: @NORMALIZED_RS@
 iplanet-am-role-display-options: rootnavmenu=policies,organizations,services,policyadministrator
 iplanet-am-role-display-options: organizationnavmenu=policies,organizations,services,policyadministrator
@@ -364,7 +351,7 @@ objectClass: iplanet-am-managed-role
 iplanet-am-role-type: 2
 iplanet-am-role-description: People Container Admin
 iplanet-am-role-aci-description: People Container Admin Description
-iplanet-am-role-aci-list: @NORMALIZED_RS@:aci: (target="ldap:///ou=People,@NORMALIZED_RS@")(targetfilter=(!(|(nsroledn=cn=Top-level Admin Role,@NORMALIZED_RS@)(nsroledn=cn=Top-level Help Desk Admin Role,@NORMALIZED_RS@)(nsroledn=cn=Top-level Policy Admin Role,@NORMALIZED_RS@)(nsroledn=cn=Organization Admin Role,@NORMALIZED_RS@)(nsroledn=cn=Container Admin Role,@NORMALIZED_RS@))))(targetattr != "iplanet-am-web-agent-access-allow-list || iplanet-am-domain-url-access-allow || iplanet-am-web-agent-access-deny-list || nsroledn") (version 3.0; acl "S1IS People container admin role"; allow (all) roledn = "ldap:///cn=ou=@People_NM_ORG_ROOT_SUFFIX@,@NORMALIZED_RS@";)
+iplanet-am-role-aci-list: @NORMALIZED_RS@:aci: (target="ldap:///ou=People,@NORMALIZED_RS@")(targetfilter=(!(|(nsroledn=cn=Top-level Help Desk Admin Role,@NORMALIZED_RS@)(nsroledn=cn=Top-level Policy Admin Role,@NORMALIZED_RS@)(nsroledn=cn=Organization Admin Role,@NORMALIZED_RS@)(nsroledn=cn=Container Admin Role,@NORMALIZED_RS@))))(targetattr != "iplanet-am-web-agent-access-allow-list || iplanet-am-domain-url-access-allow || iplanet-am-web-agent-access-deny-list || nsroledn") (version 3.0; acl "S1IS People container admin role"; allow (all) roledn = "ldap:///cn=ou=@People_NM_ORG_ROOT_SUFFIX@,@NORMALIZED_RS@";)
 iplanet-am-role-managed-container-dn: ou=People,@NORMALIZED_RS@
 iplanet-am-role-display-options: userprofilemenu=iplanetamuserservice,resourceoffering
 iplanet-am-role-display-options: actionroleproperties=noaccessobject

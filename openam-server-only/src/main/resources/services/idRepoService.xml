@@ -4161,10 +4161,6 @@
                             <Attribute name="telephoneNumber" />
                             <Value></Value>
                         </AttributeValuePair>
-                        <AttributeValuePair>
-                            <Attribute name="roles" />
-                            <Value>Top-level Admin Role</Value>
-                        </AttributeValuePair>
                     </SubConfiguration>
                     <SubConfiguration name="dsameuser"
                         id="user">

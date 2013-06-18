@@ -32,33 +32,6 @@
     PUBLIC "-//iPlanet//OpenSSO 2005Q4 Admin CLI DTD//EN"    "jar://com/sun/identity/policy/policyAdmin.dtd">
                                                                                 
 <Policies>
-<Policy name="@SM_ROOT_SUFFIX_HAT@^^RealmAdmin" referralPolicy="false" active="true" >
-    <Rule name="delegation-rule1">
-        <ServiceName name="sunAMDelegationService" />
-        <ResourceName name="sms://*@SM_CONFIG_ROOT_SUFFIX@/*" />
-        <AttributeValuePair>
-            <Attribute name="MODIFY" />
-            <Value>allow</Value>
-        </AttributeValuePair>
-        <AttributeValuePair>
-            <Attribute name="DELEGATE" />
-            <Value>allow</Value>
-        </AttributeValuePair>
-        <AttributeValuePair>
-            <Attribute name="READ" />
-            <Value>allow</Value>
-        </AttributeValuePair>
-    </Rule>
-    <Subjects name="Subjects" description="">
-        <Subject name="delegation-subject" type="AMIdentitySubject" includeType="inclusive">
-            <AttributeValuePair>
-                <Attribute name="Values"/>
-                <Value>id=Top-level Admin Role,ou=role,@SM_CONFIG_ROOT_SUFFIX@,amsdkdn=cn=Top-level Admin Role,@ROOT_SUFFIX@</Value>
-            </AttributeValuePair>
-            </Subject>
-    </Subjects>
-</Policy>
-
 
 <Policy name="@SM_ROOT_SUFFIX_HAT@^^PolicyAdmin1"
     referralPolicy="false" active="true" >

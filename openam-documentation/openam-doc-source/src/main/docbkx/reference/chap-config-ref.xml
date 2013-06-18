@@ -2519,17 +2519,6 @@
    </varlistentry>
 
    <varlistentry>
-    <term>Exempt top-level admins from constraint checking</term>
-    <listitem>
-     <para>If yes, then OpenAM exempts to top-level admin role from quota
-     constraints.</para>
-
-     <para><command>ssoadm</command> attribute:
-     <literal>iplanet-am-session-enable-session-constraint-bypass-topleveladmin</literal></para>
-    </listitem>
-   </varlistentry>
-
-   <varlistentry>
     <term>Resulting behavior if session quota exhausted</term>
     <listitem>
      <para>You can either set the next expiring session to be destroyed,

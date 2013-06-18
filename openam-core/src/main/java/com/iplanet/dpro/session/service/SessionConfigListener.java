@@ -63,9 +63,6 @@ public class SessionConfigListener implements ServiceListener {
     private static final String DENY_LOGIN_IF_DB_IS_DOWN =
         "iplanet-am-session-deny-login-if-db-is-down";
     
-    private static final String BYPASS_CONSTRAINT_ON_TOPLEVEL_ADMINS = 
-        "iplanet-am-session-enable-session-constraint-bypass-topleveladmin";
-    
     private static final String CONSTRAINT_HANDLER =
         "iplanet-am-session-constraint-handler";
 
@@ -162,14 +159,6 @@ public class SessionConfigListener implements ServiceListener {
                 SessionService.setDenyLoginIfDBIsDown(true);
             } else {
             	SessionService.setDenyLoginIfDBIsDown(false);
-            }
-            
-            String bypassConstratintStr = CollectionHelper.getMapAttr(
-                attrs, BYPASS_CONSTRAINT_ON_TOPLEVEL_ADMINS, "NO");
-            if (bypassConstratintStr.equalsIgnoreCase("YES")) {
-                SessionService.setBypassConstraintForToplevelAdmin(true);
-            } else {
-            	SessionService.setBypassConstraintForToplevelAdmin(false);
             }
 
             SessionService.setConstraintHandler(CollectionHelper.getMapAttr(

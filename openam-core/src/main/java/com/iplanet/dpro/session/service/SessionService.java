@@ -244,14 +244,8 @@ public class SessionService {
     private static final String MAX_WAIT_TIME_FOR_CONSTARINT =
             "iplanet-am-session-constraint-max-wait-time";
 
-    private static final String BYPASS_CONSTRAINT_ON_TOPLEVEL_ADMINS =
-            "iplanet-am-session-enable-session-constraint-bypass-topleveladmin";
-
     private static final String CONSTRAINT_HANDLER =
             "iplanet-am-session-constraint-handler";
-
-    private static final String TOP_LEVEL_ADMIN_ROLE =
-            "Top-level Admin Role";
 
     private static final String SESSION_REPOSITORY_TYPE =
             "iplanet-am-session-sfo-store-type";
@@ -322,8 +316,6 @@ public class SessionService {
     private static boolean isSessionConstraintEnabled = false;
 
     private static boolean denyLoginIfDBIsDown = false;
-
-    private static boolean bypassConstraintForToplevelAdmin = false;
 
     private static String constraintHandler =
             SessionConstraint.DESTROY_OLDEST_SESSION_CLASS;
@@ -2088,14 +2080,6 @@ public class SessionService {
         return denyLoginIfDBIsDown;
     }
 
-    static public void setBypassConstraintForToplevelAdmin(boolean value) {
-        bypassConstraintForToplevelAdmin = value;
-    }
-
-    static public boolean bypassConstraintForToplevelAdmin() {
-        return bypassConstraintForToplevelAdmin;
-    }
-
     public static String getConstraintHandler() {
         return constraintHandler;
     }
@@ -2184,17 +2168,6 @@ public class SessionService {
             if (sessionDebug.messageEnabled()) {
                 sessionDebug.message("SessionService.postInit: " +
                         "denyLoginIfDBIsDown=" + denyLoginIfDBIsDown);
-            }
-
-            String bypassConstratintStr = CollectionHelper.getMapAttr(
-                    attrs, BYPASS_CONSTRAINT_ON_TOPLEVEL_ADMINS, "NO");
-            if (bypassConstratintStr.equalsIgnoreCase("YES")) {
-                bypassConstraintForToplevelAdmin = true;
-            }
-
-            if (sessionDebug.messageEnabled()) {
-                sessionDebug.message("bypassConstraintForToplevelAdmin="
-                        + bypassConstraintForToplevelAdmin);
             }
 
             constraintHandler = CollectionHelper.getMapAttr(attrs,
@@ -2589,34 +2562,6 @@ public class SessionService {
         SSOToken ssoSession = getSSOTokenManager().createSSOToken(
                 s.getID().toString());
         return hasTopLevelAdminRole(ssoSession, s.getClientID());
-    }
-
-    /**
-     * Returns true if the user has top level admin role
-     *
-     * @param uuid the uuid of the login user
-     */
-    protected boolean hasTopLevelAdminRole(String uuid) {
-        boolean isTopLevelAdmin = false;
-        try {
-            AMIdentity topAdminRole = new AMIdentity(getAdminToken(),
-                    TOP_LEVEL_ADMIN_ROLE, IdType.ROLE, "/", null);
-            AMIdentity user =
-                    IdUtils.getIdentity(getAdminToken(), uuid);
-            isTopLevelAdmin = user.isMember(topAdminRole);
-        } catch (SSOException ssoe) {
-            sessionDebug.error("SessionService.hasTopLevelAdminRole:" +
-                    "Cannot get the admin token for this operation.");
-        } catch (IdRepoException idme) {
-            sessionDebug.error("SessionService.hasTopLevelAdminRole:" +
-                    "Cannot get the user identity or role.");
-        }
-
-        if (sessionDebug.messageEnabled()) {
-            sessionDebug.message("**** New:isTopLevelAdmin = " + isTopLevelAdmin);
-        }
-
-        return isTopLevelAdmin;
     }
 
     /**

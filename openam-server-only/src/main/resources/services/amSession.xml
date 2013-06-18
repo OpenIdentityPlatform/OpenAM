@@ -123,18 +123,6 @@
                         <Value>OFF</Value>
                     </DefaultValues>
                 </AttributeSchema>
-                <AttributeSchema name="iplanet-am-session-enable-session-constraint-bypass-topleveladmin"
-                                 type="single_choice"
-                                 syntax="string"
-                                 i18nKey="a119a">
-                    <ChoiceValues>
-                        <ChoiceValue i18nKey="choiceYES">YES</ChoiceValue>
-                        <ChoiceValue i18nKey="choiceNO">NO</ChoiceValue>
-                    </ChoiceValues>
-                    <DefaultValues>
-                        <Value>NO</Value>
-                    </DefaultValues>
-                </AttributeSchema>
                 <AttributeSchema name="iplanet-am-session-constraint-resulting-behavior"
                                  type="single_choice"
                                  syntax="string"
