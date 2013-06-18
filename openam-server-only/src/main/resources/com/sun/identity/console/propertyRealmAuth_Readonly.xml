@@ -26,6 +26,9 @@
 
 -->
 
+<!--
+    Portions Copyrighted 2013 ForgeRock AS
+-->
 
 <!DOCTYPE propertysheet SYSTEM "propertysheet.dtd">
 
@@ -55,14 +58,6 @@
                labelFor="iplanet-am-auth-admin-auth-module" />
             <cc name="iplanet-am-auth-admin-auth-module"
                 tagclass="com.sun.web.ui.taglib.html.CCDropDownMenuTag" />
-        </property>
-
-        <property>
-            <label name="authKeyAlias"
-                   defaultValue="a151"
-                   labelFor="iplanet-am-auth-jwt-signing-key-alias" />
-            <cc name="iplanet-am-auth-jwt-signing-key-alias"
-                tagclass="com.sun.web.ui.taglib.html.CCTextFieldTag" />
         </property>
     
         <property>
