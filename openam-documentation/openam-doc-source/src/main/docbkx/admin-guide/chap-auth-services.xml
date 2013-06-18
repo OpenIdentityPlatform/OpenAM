@@ -1947,7 +1947,7 @@
             </varlistentry>
             <!-- see OPENAM-2492; this should be changed (IMO) to "Geolocation required" -->
             <varlistentry>
-                <term>Localization required</term>
+                <term>Geolocation required</term>
                 <listitem>
                     <para>The geographic location of a device can be tracked. Can be used to limit access from this device to a
                         specified range.</para>
