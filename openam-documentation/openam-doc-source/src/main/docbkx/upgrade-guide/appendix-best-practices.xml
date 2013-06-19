@@ -113,7 +113,7 @@ $ tar -xvzf ~/.openssocfg</screen>
     </step>
     <step>
      <para>Download your upgrade file from <link 
-     xlink:show="new" xlink:href="http://forgerock.com/openam-downloads/"
+     xlink:show="new" xlink:href="http://forgerock.com/download-stack/"
      ><citetitle>Enterprise Downloads page</citetitle></link> or from the <link 
      xlink:show="new" xlink:href="http://forgerock.org/openam-archive.html"
      ><citetitle>Archives page</citetitle></link>.</para>
@@ -149,7 +149,7 @@ $ jar xvf /path/to/tomcat/webapps/openam.war</screen>
 
     <listitem>
      <para>Download your upgrade file or files from <link 
-     xlink:show="new" xlink:href="http://forgerock.com/openam-downloads/"
+     xlink:show="new" xlink:href="http://forgerock.com/download-stack/"
      ><citetitle>Enterprise Downloads page</citetitle></link> or from the <link 
      xlink:show="new" xlink:href="http://forgerock.org/openam-archive.html"
      ><citetitle>Archives page</citetitle></link>.</para>
