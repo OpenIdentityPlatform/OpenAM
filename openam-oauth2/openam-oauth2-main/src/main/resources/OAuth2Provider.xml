@@ -94,7 +94,7 @@
                     <DefaultValues>
                         <Value>token|org.forgerock.restlet.ext.oauth2.flow.responseTypes.TokenResponseType</Value>
                         <Value>code|org.forgerock.restlet.ext.oauth2.flow.responseTypes.CodeResponseType</Value>
-                        <Value>id_token|org.forgerock.restlet.ext.oauth2.flow.responseTypes</Value>
+                        <Value>id_token|org.forgerock.restlet.ext.oauth2.flow.responseTypes.IDTokenResponseType</Value>
                     </DefaultValues>
                 </AttributeSchema>
 
@@ -231,7 +231,7 @@
                         <DefaultValues>
                             <Value>token|org.forgerock.restlet.ext.oauth2.flow.responseTypes.TokenResponseType</Value>
                             <Value>code|org.forgerock.restlet.ext.oauth2.flow.responseTypes.CodeResponseType</Value>
-                            <Value>id_token|org.forgerock.restlet.ext.oauth2.flow.responseTypes</Value>
+                            <Value>id_token|org.forgerock.restlet.ext.oauth2.flow.responseTypes.IDTokenResponseType</Value>
                         </DefaultValues>
                     </AttributeSchema>
 
