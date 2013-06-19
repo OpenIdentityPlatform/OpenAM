@@ -42,6 +42,11 @@ public class RestAuthRedirectCallbackHandler extends AbstractRestAuthCallbackHan
 
     private final RedirectCallbackHandler redirectCallbackHandler;
 
+    /**
+     * Constructs an instance of the RestAuthRedirectCallbackHandler.
+     *
+     * @param redirectCallbackHandler An instance of the RedirectCallbackHandler.
+     */
     public RestAuthRedirectCallbackHandler(RedirectCallbackHandler redirectCallbackHandler) {
         this.redirectCallbackHandler = redirectCallbackHandler;
     }
@@ -52,7 +57,7 @@ public class RestAuthRedirectCallbackHandler extends AbstractRestAuthCallbackHan
      * {@inheritDoc}
      */
     public boolean updateCallbackFromRequest(HttpHeaders headers, HttpServletRequest request,
-                                             HttpServletResponse response, JsonValue postBody, RedirectCallback callback, HttpMethod httpMethod) {
+            HttpServletResponse response, JsonValue postBody, RedirectCallback callback, HttpMethod httpMethod) {
 
         try {
             String contextPath = request.getContextPath();
@@ -78,7 +83,7 @@ public class RestAuthRedirectCallbackHandler extends AbstractRestAuthCallbackHan
      * {@inheritDoc}
      */
     boolean doUpdateCallbackFromRequest(HttpHeaders headers, HttpServletRequest request, HttpServletResponse response,
-                                        JsonValue postBody, RedirectCallback callback) throws RestAuthCallbackHandlerResponseException {
+            JsonValue postBody, RedirectCallback callback) throws RestAuthCallbackHandlerResponseException {
         return false;
     }
 
@@ -86,7 +91,7 @@ public class RestAuthRedirectCallbackHandler extends AbstractRestAuthCallbackHan
      * {@inheritDoc}
      */
     public RedirectCallback handle(HttpHeaders headers, HttpServletRequest request, HttpServletResponse response,
-                                   JsonValue postBody, RedirectCallback originalCallback) {
+            JsonValue postBody, RedirectCallback originalCallback) {
         return originalCallback;
     }
 

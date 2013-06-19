@@ -48,11 +48,11 @@ public interface RestAuthCallbackHandler<T extends Callback> extends JsonCallbac
      * @param callback The Callback to update with its required values from the headers and request.
      * @param httpMethod The HTTP method of the request.
      * @return Whether or not the Callback was successfully updated.
-     * @throws RestAuthCallbackHandlerResponseException
+     * @throws RestAuthCallbackHandlerResponseException Thrown if the Callback Handler has a Response to send to the
+     *          client.
      */
     boolean updateCallbackFromRequest(HttpHeaders headers, HttpServletRequest request, HttpServletResponse response,
-                                      JsonValue postBody, T callback, HttpMethod httpMethod) throws
-            RestAuthCallbackHandlerResponseException;
+            JsonValue postBody, T callback, HttpMethod httpMethod) throws RestAuthCallbackHandlerResponseException;
 
     /**
      * Handles the processing of the JSON given in the request and updates the Callback objects from it.

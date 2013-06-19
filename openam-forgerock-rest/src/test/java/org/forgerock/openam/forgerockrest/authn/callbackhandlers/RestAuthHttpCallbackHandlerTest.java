@@ -115,7 +115,7 @@ public class RestAuthHttpCallbackHandlerTest {
         assertEquals(exception.getResponseHeaders().size(), 1);
         assertTrue(exception.getResponseHeaders().containsKey("WWW-Authenticate"));
         assertTrue(exception.getResponseHeaders().containsValue("Negotiate"));
-        assertEquals(exception.getJsonResponse().get("failure").asBoolean(), (Boolean)true);
+        assertEquals(exception.getJsonResponse().get("failure").asBoolean(), (Boolean) true);
         assertEquals(exception.getJsonResponse().get("reason").asString(), "http-auth-failed");
     }
 
@@ -151,7 +151,7 @@ public class RestAuthHttpCallbackHandlerTest {
         assertEquals(exception.getResponseHeaders().size(), 1);
         assertTrue(exception.getResponseHeaders().containsKey("WWW-Authenticate"));
         assertTrue(exception.getResponseHeaders().containsValue("Negotiate"));
-        assertEquals(exception.getJsonResponse().get("failure").asBoolean(), (Boolean)true);
+        assertEquals(exception.getJsonResponse().get("failure").asBoolean(), (Boolean) true);
         assertEquals(exception.getJsonResponse().get("reason").asString(), "http-auth-failed");
     }
 

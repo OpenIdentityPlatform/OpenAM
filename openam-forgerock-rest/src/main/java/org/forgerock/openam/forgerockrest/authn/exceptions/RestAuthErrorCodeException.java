@@ -24,7 +24,7 @@ import org.forgerock.openam.forgerockrest.authn.AMAuthErrorCodeResponseStatusMap
  */
 public class RestAuthErrorCodeException extends RestAuthException {
 
-    private static final AMAuthErrorCodeResponseStatusMapping amAuthErrorCodeResponseStatusMapping =
+    private static final AMAuthErrorCodeResponseStatusMapping AM_AUTH_ERROR_CODE_RESPONSE_STATUS_MAPPING =
             new AMAuthErrorCodeResponseStatusMapping();
 
     /**
@@ -34,6 +34,6 @@ public class RestAuthErrorCodeException extends RestAuthException {
      * @param errorMessage The error message relating to the exception.
      */
     public RestAuthErrorCodeException(String errorCode, String errorMessage) {
-        super(amAuthErrorCodeResponseStatusMapping.getAuthLoginExceptionResponseStatus(errorCode), errorMessage);
+        super(AM_AUTH_ERROR_CODE_RESPONSE_STATUS_MAPPING.getAuthLoginExceptionResponseStatus(errorCode), errorMessage);
     }
 }

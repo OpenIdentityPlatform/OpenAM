@@ -51,7 +51,7 @@ public class RestAuthNameCallbackHandler extends AbstractRestAuthCallbackHandler
      * {@inheritDoc}
      */
     boolean doUpdateCallbackFromRequest(HttpHeaders headers, HttpServletRequest request, HttpServletResponse response,
-                                        JsonValue postBody, NameCallback callback) throws RestAuthCallbackHandlerResponseException {
+            JsonValue postBody, NameCallback callback) throws RestAuthCallbackHandlerResponseException {
 
         String username = request.getParameter("username");
 
@@ -68,7 +68,7 @@ public class RestAuthNameCallbackHandler extends AbstractRestAuthCallbackHandler
      * {@inheritDoc}
      */
     public NameCallback handle(HttpHeaders headers, HttpServletRequest request, HttpServletResponse response,
-                               JsonValue postBody, NameCallback originalCallback) {
+            JsonValue postBody, NameCallback originalCallback) {
         return originalCallback;
     }
 

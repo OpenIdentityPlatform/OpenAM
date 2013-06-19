@@ -26,6 +26,9 @@ import javax.security.auth.callback.Callback;
 import java.util.Map;
 import java.util.Set;
 
+/**
+ * Interface for all Authentication Contexts.
+ */
 public interface AuthenticationContext {
 
     /**
@@ -146,5 +149,10 @@ public interface AuthenticationContext {
      */
     SessionID getSessionID();
 
+    /**
+     * Sets the organisation DN.
+     *
+     * @param orgDN The organisation DN.
+     */
     void setOrgDN(String orgDN);
 }

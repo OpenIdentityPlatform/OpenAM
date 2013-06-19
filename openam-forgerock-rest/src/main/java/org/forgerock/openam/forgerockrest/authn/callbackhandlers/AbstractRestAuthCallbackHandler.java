@@ -33,6 +33,8 @@ import java.text.MessageFormat;
 
 /**
  * This class contains common functionality for all of the RestAuthCallbackHandlers.
+ *
+ * @param <T> Callback type.
  */
 public abstract class AbstractRestAuthCallbackHandler<T extends Callback> {
 
@@ -45,7 +47,7 @@ public abstract class AbstractRestAuthCallbackHandler<T extends Callback> {
      * {@inheritDoc}
      */
     public boolean updateCallbackFromRequest(HttpHeaders headers, HttpServletRequest request,
-                                             HttpServletResponse response, JsonValue postBody, T callback, HttpMethod httpMethod)
+            HttpServletResponse response, JsonValue postBody, T callback, HttpMethod httpMethod)
             throws RestAuthCallbackHandlerResponseException {
 
         // If HttMethod is GET then by default callbacks should not be handled internally/
@@ -74,7 +76,7 @@ public abstract class AbstractRestAuthCallbackHandler<T extends Callback> {
      * @throws RestAuthCallbackHandlerResponseException If one of the CallbackHandlers has its own response to be sent.
      */
     abstract boolean doUpdateCallbackFromRequest(HttpHeaders headers, HttpServletRequest request,
-                                                 HttpServletResponse response, JsonValue postBody, T callback)
+            HttpServletResponse response, JsonValue postBody, T callback)
             throws RestAuthCallbackHandlerResponseException;
 
     /**

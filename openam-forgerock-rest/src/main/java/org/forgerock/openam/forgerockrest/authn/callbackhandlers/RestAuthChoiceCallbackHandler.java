@@ -44,7 +44,7 @@ public class RestAuthChoiceCallbackHandler extends AbstractRestAuthCallbackHandl
      * {@inheritDoc}
      */
     boolean doUpdateCallbackFromRequest(HttpHeaders headers, HttpServletRequest request, HttpServletResponse response,
-                                        JsonValue postBody, ChoiceCallback callback) throws RestAuthCallbackHandlerResponseException {
+            JsonValue postBody, ChoiceCallback callback) throws RestAuthCallbackHandlerResponseException {
 
         String choiceString = request.getParameter("choices");
 
@@ -61,7 +61,7 @@ public class RestAuthChoiceCallbackHandler extends AbstractRestAuthCallbackHandl
      * {@inheritDoc}
      */
     public ChoiceCallback handle(HttpHeaders headers, HttpServletRequest request, HttpServletResponse response,
-                                 JsonValue postBody, ChoiceCallback originalCallback) {
+            JsonValue postBody, ChoiceCallback originalCallback) {
         return originalCallback;
     }
 

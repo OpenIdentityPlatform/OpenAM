@@ -162,11 +162,11 @@ public class RestAuthConfirmationCallbackHandlerTest {
         assertEquals("OK", jsonObject.get("output").get(2).get("value").get(0).asString());
         assertEquals("NO", jsonObject.get("output").get(2).get("value").get(1).asString());
         assertEquals("CANCEL", jsonObject.get("output").get(2).get("value").get(2).asString());
-        assertEquals(-1, (int)jsonObject.get("output").get(3).get("value").asInteger());
-        assertEquals(0, (int)jsonObject.get("output").get(4).get("value").asInteger());
+        assertEquals(-1, (int) jsonObject.get("output").get(3).get("value").asInteger());
+        assertEquals(0, (int) jsonObject.get("output").get(4).get("value").asInteger());
         assertNotNull(jsonObject.get("input"));
         assertEquals(1, jsonObject.get("input").size());
-        assertEquals(0, (int)jsonObject.get("input").get(0).get("value").asInteger());
+        assertEquals(0, (int) jsonObject.get("input").get(0).get("value").asInteger());
     }
 
     @Test

@@ -29,7 +29,6 @@ import com.sun.identity.security.AdminTokenAction;
 import com.sun.identity.sm.DNMapper;
 import com.sun.identity.sm.SMSException;
 import com.sun.identity.sm.ServiceConfigManager;
-import org.forgerock.openam.forgerockrest.authn.core.wrappers.AuthContextLocalWrapper;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -48,7 +47,8 @@ public class CoreServicesWrapper {
     /**
      * Gets the Session Id from the HttpServletRequest.
      *
-     * {@link com.sun.identity.authentication.service.AuthUtils.getSessionIDFromRequest( javax.servlet.http.HttpServletRequest)}
+     * {@link com.sun.identity.authentication.service.AuthUtils.getSessionIDFromRequest(
+     *      javax.servlet.http.HttpServletRequest)}
      *
      * @param request The HttpServletRequest.
      * @return The SessionID from the request.
@@ -60,7 +60,8 @@ public class CoreServicesWrapper {
     /**
      * Will either create or retrieve an existing AuthContextLocal.
      *
-     * {@link com.sun.identity.authentication.service.AuthUtils.getAuthContext( com.sun.identity.authentication.server.AuthContextLocal)}
+     * {@link com.sun.identity.authentication.service.AuthUtils.getAuthContext(
+     *      com.sun.identity.authentication.server.AuthContextLocal)}
      *
      * @param request The HttpServletRequest.
      * @param response The HttpServletResponse.
@@ -68,21 +69,23 @@ public class CoreServicesWrapper {
      * @param isSessionUpgrade Whether the AuthContextLocal should be created for session upgrade.
      * @param isBackPost True if back posting.
      * @return The AuthContextLocal wrapped as a AuthContextLocalWrapper.
-     * @throws com.sun.identity.authentication.service.AuthException If there is a problem creating/retrieving the AuthContextLocal.
+     * @throws com.sun.identity.authentication.service.AuthException If there is a problem creating/retrieving the
+     *      AuthContextLocal.
      */
     public AuthContextLocalWrapper getAuthContext(HttpServletRequest request, HttpServletResponse response,
             SessionID sessionID, boolean isSessionUpgrade, boolean isBackPost) throws AuthException {
         AuthContextLocal authContextLocal = AuthUtils.getAuthContext(request, response, sessionID, isSessionUpgrade,
                 isBackPost);
         String orgDN = AuthClientUtils.getDomainNameByRequest(request, AuthClientUtils.parseRequestParameters(request));
-        authContextLocal.setOrgDN(orgDN);       //TODO not sure if this is right, will it get right orgDN when using sub realm??
+        authContextLocal.setOrgDN(orgDN); //TODO not sure if this is right, will it get right orgDN when using sub realm
         return new AuthContextLocalWrapper(authContextLocal);
     }
 
     /**
      * Checks to see if an AuthContextLocal is a new or an existing login process.
      *
-     * {@link com.sun.identity.authentication.service.AuthUtils.isNewRequest( com.sun.identity.authentication.server.AuthContextLocal)}
+     * {@link com.sun.identity.authentication.service.AuthUtils.isNewRequest(
+     *      com.sun.identity.authentication.server.AuthContextLocal)}
      *
      * @param authContextLocalWrapper The AuthContextLocal wrapped as a AuthContextLocalWrapper.
      * @return If the AuthContextLocal is a new login request or not.
@@ -94,7 +97,7 @@ public class CoreServicesWrapper {
     /**
      * Gets the environment map from a HttpServletRequest.
      *
-     * {@link com.sun.identity.authentication.client.AuthClientUtils.getEnvMap( javax.servlet.http.HttpServletRequest)}
+     * {@link com.sun.identity.authentication.client.AuthClientUtils.getEnvMap(javax.servlet.http.HttpServletRequest)}
      *
      * @param request The HttpServletRequest.
      * @return The environment map.
@@ -106,7 +109,7 @@ public class CoreServicesWrapper {
     /**
      * Gets the admin SSO Token.
      *
-     * {@link java.security.AccessController.doPrivileged( com.sun.identity.security.AdminTokenAction)}
+     * {@link java.security.AccessController.doPrivileged(com.sun.identity.security.AdminTokenAction)}
      *
      * @return The SSOToken.
      */
@@ -143,26 +146,64 @@ public class CoreServicesWrapper {
         return AuthClientUtils.isContain(value, key);
     }
 
+    /**
+     * Gets the SSO Token for an existing valid session.
+     *
+     * @param sessionID The SSO Token Id/Session id of the existing session.
+     * @return The SSO Token.
+     */
     public SSOToken getExistingValidSSOToken(SessionID sessionID) {
         return AuthUtils.getExistingValidSSOToken(sessionID);
     }
 
+    /**
+     * Returns the data from Realm qualified data. This could be authentication scheme or authentication level or
+     * service.
+     *
+     * @param realmQualifiedData Realm qualified data.
+     * @return String representing of Realmm qualified data.
+     */
     public String getDataFromRealmQualifiedData(String realmQualifiedData) {
         return AMAuthUtils.getDataFromRealmQualifiedData(realmQualifiedData);
     }
 
+    /**
+     * Returns the Realm name from Realm qualified data.
+     *
+     * @param realmQualifiedData Realm qualified data. This could be Realm qualified authentication scheme or
+     *                           authentication level or service.
+     * @return String representing realm name.
+     */
     public String getRealmFromRealmQualifiedData(String realmQualifiedData) {
         return AMAuthUtils.getRealmFromRealmQualifiedData(realmQualifiedData);
     }
 
+    /**
+     * Converts organisation name which is "/" separated to DN, else if DN normalize the DN and return.
+     *
+     * @param orgName The organisation name.
+     * @return The Organisation DN.
+     */
     public String orgNameToDN(String orgName) {
         return DNMapper.orgNameToDN(orgName);
     }
 
+    /**
+     * Gets the Composite Advice Type for the Auth Context.
+     *
+     * @param authContext The AuthContextLocalWrapper.
+     * @return The Composite Advice Type.
+     */
     public int getCompositeAdviceType(AuthContextLocalWrapper authContext) {
         return AuthUtils.getCompositeAdviceType(authContext.getAuthContext());
     }
 
+    /**
+     * Returns the authentication service or chain configured for the given organization.
+     *
+     * @param orgDN organization DN.
+     * @return the authentication service or chain configured for the given organization.
+     */
     public String getOrgConfiguredAuthenticationChain(String orgDN) {
         return AuthUtils.getOrgConfiguredAuthenticationChain(orgDN);
     }

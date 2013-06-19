@@ -89,8 +89,8 @@ public class AuthenticationRestService {
             @QueryParam("authIndexValue") String authIndexValue,
             @QueryParam("sessionUpgrade") String sessionUpgradeSSOTokenId) {
 
-        return restAuthenticationHandler.initiateAuthentication(headers, request, response, authIndexType, authIndexValue,
-                sessionUpgradeSSOTokenId, HttpMethod.GET);
+        return restAuthenticationHandler.initiateAuthentication(headers, request, response, authIndexType,
+                authIndexValue, sessionUpgradeSSOTokenId, HttpMethod.GET);
     }
 
     /**
@@ -129,8 +129,8 @@ public class AuthenticationRestService {
                     sessionUpgradeSSOTokenId);
         } else {
             //initiate
-            return restAuthenticationHandler.initiateAuthentication(headers, request, response, authIndexType, authIndexValue,
-                    sessionUpgradeSSOTokenId, HttpMethod.POST);
+            return restAuthenticationHandler.initiateAuthentication(headers, request, response, authIndexType,
+                    authIndexValue, sessionUpgradeSSOTokenId, HttpMethod.POST);
         }
     }
 }

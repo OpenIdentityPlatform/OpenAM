@@ -157,6 +157,12 @@ public class AuthIdHelper {
         return jwt;
     }
 
+    /**
+     * Reconstructs the Auth Id from a String to a JWT.
+     *
+     * @param authId The Auth Id jwt string
+     * @return The JWT object.
+     */
     public SignedJwt reconstructAuthId(String authId) {
         return  (SignedJwt) jwtBuilder.recontructJwt(authId);
     }

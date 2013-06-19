@@ -44,7 +44,7 @@ public class RestAuthConfirmationCallbackHandler extends AbstractRestAuthCallbac
      * {@inheritDoc}
      */
     boolean doUpdateCallbackFromRequest(HttpHeaders headers, HttpServletRequest request, HttpServletResponse response,
-                                        JsonValue postBody, ConfirmationCallback callback) throws RestAuthCallbackHandlerResponseException {
+            JsonValue postBody, ConfirmationCallback callback) throws RestAuthCallbackHandlerResponseException {
 
         String selectedIndex = request.getParameter("selectedIndex");
 
@@ -61,7 +61,7 @@ public class RestAuthConfirmationCallbackHandler extends AbstractRestAuthCallbac
      * {@inheritDoc}
      */
     public ConfirmationCallback handle(HttpHeaders headers, HttpServletRequest request, HttpServletResponse response,
-                                       JsonValue postBody, ConfirmationCallback originalCallback) {
+            JsonValue postBody, ConfirmationCallback originalCallback) {
         return originalCallback;
     }
 

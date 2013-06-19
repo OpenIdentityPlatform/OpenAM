@@ -159,11 +159,11 @@ public class RestAuthChoiceCallbackHandlerTest {
         assertEquals("34", jsonObject.get("output").get(1).get("value").get(1).asString());
         assertEquals("66", jsonObject.get("output").get(1).get("value").get(2).asString());
         assertEquals("93", jsonObject.get("output").get(1).get("value").get(3).asString());
-        assertEquals(0, (int)jsonObject.get("output").get(2).get("value").asInteger());
+        assertEquals(0, (int) jsonObject.get("output").get(2).get("value").asInteger());
 
         assertNotNull(jsonObject.get("input"));
         assertEquals(1, jsonObject.get("input").size());
-        assertEquals(0, (int)jsonObject.get("input").get(0).get("value").asInteger());
+        assertEquals(0, (int) jsonObject.get("input").get(0).get("value").asInteger());
     }
 
     @Test
@@ -187,11 +187,11 @@ public class RestAuthChoiceCallbackHandlerTest {
         assertEquals("34", jsonObject.get("output").get(1).get("value").get(1).asString());
         assertEquals("66", jsonObject.get("output").get(1).get("value").get(2).asString());
         assertEquals("93", jsonObject.get("output").get(1).get("value").get(3).asString());
-        assertEquals(0, (int)jsonObject.get("output").get(2).get("value").asInteger());
+        assertEquals(0, (int) jsonObject.get("output").get(2).get("value").asInteger());
 
         assertNotNull(jsonObject.get("input"));
         assertEquals(1, jsonObject.get("input").size());
-        assertEquals(1, (int)jsonObject.get("input").get(0).get("value").asInteger());
+        assertEquals(1, (int) jsonObject.get("input").get(0).get("value").asInteger());
     }
 
     @Test

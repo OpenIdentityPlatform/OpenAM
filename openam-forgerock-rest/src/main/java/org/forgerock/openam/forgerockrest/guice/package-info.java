@@ -14,19 +14,8 @@
  * Copyright 2013 ForgeRock Inc.
  */
 
-package org.forgerock.openam.forgerockrest.authn.core;
-
 /**
- * The possible stages of the Login process.
- *
- * Can only be in a stage where there are requirements(callbacks) to be submitted or all requirements have been
- * submitted and the login process has completed and the status of the login process will need to be check to
- * determine the actual outcome of the login process.
+ * This package contains the Guice Module class responsible for all the Guice bindings required for the
+ * openam-forgerock-rest maven module.
  */
-public enum LoginStage {
-
-    /** Login Stage when requirements are still to be submitted. */
-    REQUIREMENTS_WAITING,
-    /** Login Stage when all requirements have been submitted. */
-    COMPLETE;
-}
+package org.forgerock.openam.forgerockrest.guice;

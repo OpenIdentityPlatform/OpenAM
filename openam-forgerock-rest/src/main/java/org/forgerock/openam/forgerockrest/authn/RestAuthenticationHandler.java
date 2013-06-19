@@ -22,7 +22,6 @@ import com.sun.identity.shared.debug.Debug;
 import com.sun.identity.shared.locale.L10NMessageImpl;
 import org.forgerock.json.fluent.JsonException;
 import org.forgerock.json.fluent.JsonValue;
-import org.forgerock.json.jwt.JwtBuilder;
 import org.forgerock.json.jwt.SignedJwt;
 import org.forgerock.openam.forgerockrest.authn.callbackhandlers.RestAuthCallbackHandlerResponseException;
 import org.forgerock.openam.forgerockrest.authn.core.AuthIndexType;
@@ -90,8 +89,9 @@ public class RestAuthenticationHandler {
      * @param httpMethod The HTTP method used to make the request.
      * @return The Response of the authentication request.
      */
-    public Response initiateAuthentication(HttpHeaders headers, HttpServletRequest request, HttpServletResponse response,
-                                           String authIndexType, String indexValue, String sessionUpgradeSSOTokenId, HttpMethod httpMethod) {
+    public Response initiateAuthentication(HttpHeaders headers, HttpServletRequest request,
+            HttpServletResponse response, String authIndexType, String indexValue, String sessionUpgradeSSOTokenId,
+            HttpMethod httpMethod) {
         return authenticate(headers, request, response, null, authIndexType, indexValue, sessionUpgradeSSOTokenId,
                 httpMethod);
     }
@@ -108,8 +108,8 @@ public class RestAuthenticationHandler {
      *                                 upgrade.
      * @return The Response of the authentication request.
      */
-    public Response continueAuthentication(HttpHeaders headers, HttpServletRequest request, HttpServletResponse response,
-                                           String postBody, String sessionUpgradeSSOTokenId) {
+    public Response continueAuthentication(HttpHeaders headers, HttpServletRequest request,
+            HttpServletResponse response, String postBody, String sessionUpgradeSSOTokenId) {
         return authenticate(headers, request, response, JsonValueBuilder.toJsonValue(postBody), null, null,
                 sessionUpgradeSSOTokenId, HttpMethod.POST);
     }
@@ -223,59 +223,59 @@ public class RestAuthenticationHandler {
         Response.ResponseBuilder responseBuilder = null;
 
         switch (loginProcess.getLoginStage()) {
-            case REQUIREMENTS_WAITING: {
+        case REQUIREMENTS_WAITING: {
 
-                Callback[] callbacks = loginProcess.getCallbacks();
+            Callback[] callbacks = loginProcess.getCallbacks();
 
-                JsonValue jsonCallbacks;
-                try {
-                    jsonCallbacks = handleCallbacks(headers, request, response, postBody, httpMethod, callbacks);
-                } catch (RestAuthCallbackHandlerResponseException e) {
-                    // Include the authId in the JSON response.
-                    if (authId == null) {
-                        authId = authIdHelper.createAuthId(loginConfiguration, loginProcess.getAuthContext());
-                    }
-                    e.getJsonResponse().put("authId", authId);
-                    throw e;
+            JsonValue jsonCallbacks;
+            try {
+                jsonCallbacks = handleCallbacks(headers, request, response, postBody, httpMethod, callbacks);
+            } catch (RestAuthCallbackHandlerResponseException e) {
+                // Include the authId in the JSON response.
+                if (authId == null) {
+                    authId = authIdHelper.createAuthId(loginConfiguration, loginProcess.getAuthContext());
                 }
-
-                if (jsonCallbacks != null && jsonCallbacks.size() > 0) {
-                    JsonValue jsonValue = createJsonCallbackResponse(authId, loginConfiguration, loginProcess,
-                            jsonCallbacks);
-                    responseBuilder = Response.status(Response.Status.OK);
-                    responseBuilder.entity(jsonValue.toString());
-
-                } else {
-                    loginProcess = loginProcess.next(callbacks);
-                    responseBuilder = processAuthentication(headers, request, response, null, httpMethod, authId,
-                            loginProcess, loginConfiguration);
-                }
-                break;
+                e.getJsonResponse().put("authId", authId);
+                throw e;
             }
-            case COMPLETE: {
 
-                if (loginProcess.isSuccessful()) {
-                    // send token to client
-                    JsonObject jsonResponseObject = JsonValueBuilder.jsonValue();
+            if (jsonCallbacks != null && jsonCallbacks.size() > 0) {
+                JsonValue jsonValue = createJsonCallbackResponse(authId, loginConfiguration, loginProcess,
+                        jsonCallbacks);
+                responseBuilder = Response.status(Response.Status.OK);
+                responseBuilder.entity(jsonValue.toString());
 
-                    String tokenId = loginProcess.getAuthContext().getSSOToken().getTokenID().toString();
-                    jsonResponseObject.put("tokenId", tokenId);
-
-                    JsonValue jsonValue = jsonResponseObject.build();
-
-                    responseBuilder = Response.status(Response.Status.OK);
-                    responseBuilder.entity(jsonValue.toString());
-
-                } else {
-                    // send Error to client
-                    AuthenticationContext authContext = loginProcess.getAuthContext();
-                    String errorCode = authContext.getErrorCode();
-                    String errorMessage = authContext.getErrorMessage();
-
-                    throw new RestAuthErrorCodeException(errorCode, errorMessage);
-                }
-                break;
+            } else {
+                loginProcess = loginProcess.next(callbacks);
+                responseBuilder = processAuthentication(headers, request, response, null, httpMethod, authId,
+                        loginProcess, loginConfiguration);
             }
+            break;
+        }
+        case COMPLETE: {
+
+            if (loginProcess.isSuccessful()) {
+                // send token to client
+                JsonObject jsonResponseObject = JsonValueBuilder.jsonValue();
+
+                String tokenId = loginProcess.getAuthContext().getSSOToken().getTokenID().toString();
+                jsonResponseObject.put("tokenId", tokenId);
+
+                JsonValue jsonValue = jsonResponseObject.build();
+
+                responseBuilder = Response.status(Response.Status.OK);
+                responseBuilder.entity(jsonValue.toString());
+
+            } else {
+                // send Error to client
+                AuthenticationContext authContext = loginProcess.getAuthContext();
+                String errorCode = authContext.getErrorCode();
+                String errorMessage = authContext.getErrorMessage();
+
+                throw new RestAuthErrorCodeException(errorCode, errorMessage);
+            }
+            break;
+        }
         }
 
         return responseBuilder;
@@ -287,8 +287,8 @@ public class RestAuthenticationHandler {
 
         JsonValue jsonCallbacks = null;
         if (postBody == null) {
-                jsonCallbacks = restAuthCallbackHandlerManager.handleCallbacks(headers, request, response,
-                        postBody, callbacks, httpMethod);
+            jsonCallbacks = restAuthCallbackHandlerManager.handleCallbacks(headers, request, response,
+                    postBody, callbacks, httpMethod);
 
         } else if (!postBody.get("callbacks").isNull()) {
             JsonValue jCallbacks = postBody.get("callbacks");

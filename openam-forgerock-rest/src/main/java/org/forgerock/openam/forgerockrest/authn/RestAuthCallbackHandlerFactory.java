@@ -51,7 +51,7 @@ import java.text.MessageFormat;
  * Factory class for getting the appropriate RestAuthCallbackHandlers for the given Callbacks.
  */
 @Singleton
-public class RestAuthCallbackHandlerFactory {
+public final class RestAuthCallbackHandlerFactory {
 
     private static final Debug DEBUG = Debug.getInstance("amIdentityServices");
 

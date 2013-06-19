@@ -241,7 +241,8 @@ public class LoginProcessTest {
     }
 
     @Test
-    public void shouldRestartLoginProcessWhenLevelUsedToChooseAuthModuleWithAuthTypeService() throws AuthLoginException {
+    public void shouldRestartLoginProcessWhenLevelUsedToChooseAuthModuleWithAuthTypeService()
+            throws AuthLoginException {
 
         //Given
         Callback callbackOne = mock(Callback.class);
@@ -270,7 +271,8 @@ public class LoginProcessTest {
     }
 
     @Test
-    public void shouldRestartLoginProcessWhenCompositeUsedToChooseAuthModuleWithAuthTypeRealm() throws AuthLoginException {
+    public void shouldRestartLoginProcessWhenCompositeUsedToChooseAuthModuleWithAuthTypeRealm()
+            throws AuthLoginException {
 
         //Given
         Callback callbackOne = mock(Callback.class);

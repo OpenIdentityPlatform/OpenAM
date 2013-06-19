@@ -44,7 +44,7 @@ public class RestAuthTextInputCallbackHandler extends AbstractRestAuthCallbackHa
      * {@inheritDoc}
      */
     boolean doUpdateCallbackFromRequest(HttpHeaders headers, HttpServletRequest request, HttpServletResponse response,
-                                        JsonValue postBody, TextInputCallback callback) throws RestAuthCallbackHandlerResponseException {
+            JsonValue postBody, TextInputCallback callback) throws RestAuthCallbackHandlerResponseException {
 
         String text = request.getParameter("text");
 
@@ -61,7 +61,7 @@ public class RestAuthTextInputCallbackHandler extends AbstractRestAuthCallbackHa
      * {@inheritDoc}
      */
     public TextInputCallback handle(HttpHeaders headers, HttpServletRequest request, HttpServletResponse response,
-                                    JsonValue postBody, TextInputCallback originalCallback) {
+            JsonValue postBody, TextInputCallback originalCallback) {
         return originalCallback;
     }
 

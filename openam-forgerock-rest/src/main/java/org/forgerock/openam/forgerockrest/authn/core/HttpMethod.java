@@ -21,6 +21,14 @@ package org.forgerock.openam.forgerockrest.authn.core;
  */
 public enum HttpMethod {
 
+    /** HTTP GET Method. */
     GET,
-    POST;
+    /** HTTP POST Method. */
+    POST,
+    /** HTTP PUT Method. */
+    PUT,
+    /** HTTP PATCH Method. */
+    PATCH,
+    /** HTTP DELETE Method. */
+    DELETE;
 }

@@ -136,7 +136,7 @@ public class LoginAuthenticator {
             isSessionUpgrade = checkSessionUpgrade(ssoToken, loginConfiguration.getIndexType(),
                     loginConfiguration.getIndexValue());
         }
-        boolean isBackPost = false;//TODO document what is this should i ignore?
+        boolean isBackPost = false;
         return coreServicesWrapper.getAuthContext(request, null, sessionID, isSessionUpgrade, isBackPost);
     }
 
@@ -156,46 +156,46 @@ public class LoginAuthenticator {
 
         String value;
         boolean upgrade = false;
-            switch (indexType) {
-            case USER: {
-                value = ssoToken.getProperty("UserToken");
-                if (!indexValue.equals(value)) {
-                    upgrade = true;
-                }
-                break;
-            }
-            case ROLE: {
-                value = ssoToken.getProperty("Role");
-                if (!coreServicesWrapper.doesValueContainKey(value, indexValue)) {
-                    upgrade = true;
-                }
-                break;
-            }
-            case SERVICE: {
-                value = ssoToken.getProperty("Service");
-                if (!coreServicesWrapper.doesValueContainKey(value, indexValue)) {
-                    upgrade = true;
-                }
-                break;
-            }
-            case MODULE: {
-                value = ssoToken.getProperty("AuthType");
-                if (!coreServicesWrapper.doesValueContainKey(value, indexValue)) {
-                    upgrade = true;
-                }
-                break;
-            }
-            case LEVEL: {
-                int i = Integer.parseInt(indexValue);
-                if (i > Integer.parseInt(ssoToken.getProperty("AuthLevel"))) {
-                    upgrade = true;
-                }
-                break;
-            }
-            case COMPOSITE: {
+        switch (indexType) {
+        case USER: {
+            value = ssoToken.getProperty("UserToken");
+            if (!indexValue.equals(value)) {
                 upgrade = true;
-                break;
             }
+            break;
+        }
+        case ROLE: {
+            value = ssoToken.getProperty("Role");
+            if (!coreServicesWrapper.doesValueContainKey(value, indexValue)) {
+                upgrade = true;
+            }
+            break;
+        }
+        case SERVICE: {
+            value = ssoToken.getProperty("Service");
+            if (!coreServicesWrapper.doesValueContainKey(value, indexValue)) {
+                upgrade = true;
+            }
+            break;
+        }
+        case MODULE: {
+            value = ssoToken.getProperty("AuthType");
+            if (!coreServicesWrapper.doesValueContainKey(value, indexValue)) {
+                upgrade = true;
+            }
+            break;
+        }
+        case LEVEL: {
+            int i = Integer.parseInt(indexValue);
+            if (i > Integer.parseInt(ssoToken.getProperty("AuthLevel"))) {
+                upgrade = true;
+            }
+            break;
+        }
+        case COMPOSITE: {
+            upgrade = true;
+            break;
+        }
         }
 
         return upgrade;

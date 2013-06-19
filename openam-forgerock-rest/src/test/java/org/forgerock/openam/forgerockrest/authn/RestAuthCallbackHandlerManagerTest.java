@@ -300,7 +300,7 @@ public class RestAuthCallbackHandlerManagerTest {
         given(restAuthCallbackHandler2.convertFromJson(callback2, jsonCallback2)).willReturn(callback2);
 
         //When
-            restAuthCallbackHandlerManager.handleJsonCallbacks(callbacks, jsonCallbacks);
+        restAuthCallbackHandlerManager.handleJsonCallbacks(callbacks, jsonCallbacks);
 
         //Then
         fail();

@@ -17,7 +17,6 @@
 package org.forgerock.openam.forgerockrest.authn;
 
 import com.sun.identity.authentication.service.AMAuthErrorCode;
-import com.sun.identity.authentication.spi.AuthLoginException;
 
 import javax.ws.rs.core.Response;
 import java.util.HashMap;
@@ -28,6 +27,12 @@ import java.util.Map;
  */
 public class AMAuthErrorCodeResponseStatusMapping {
 
+    /**
+     * Returns the Http Status code for the given AMAuth error code.
+     *
+     * @param authErrorCode The AMAuthErrorCode.
+     * @return The Http Status code.
+     */
     public int getAuthLoginExceptionResponseStatus(String authErrorCode) {
 
         int statusCode = Response.Status.UNAUTHORIZED.getStatusCode();
@@ -69,7 +74,8 @@ public class AMAuthErrorCodeResponseStatusMapping {
         authErrorCodeResponseStatuses.put(AMAuthErrorCode.AUTH_TYPE_DENIED, Response.Status.BAD_REQUEST);
         authErrorCodeResponseStatuses.put(AMAuthErrorCode.AUTH_MAX_SESSION_REACHED, Response.Status.UNAUTHORIZED);
         authErrorCodeResponseStatuses.put(AMAuthErrorCode.AUTH_PROFILE_CREATE, Response.Status.BAD_REQUEST);
-        authErrorCodeResponseStatuses.put(AMAuthErrorCode.AUTH_SESSION_CREATE_ERROR, Response.Status.INTERNAL_SERVER_ERROR);
+        authErrorCodeResponseStatuses.put(AMAuthErrorCode.AUTH_SESSION_CREATE_ERROR,
+                Response.Status.INTERNAL_SERVER_ERROR);
         authErrorCodeResponseStatuses.put(AMAuthErrorCode.INVALID_AUTH_LEVEL, Response.Status.BAD_REQUEST);
         authErrorCodeResponseStatuses.put(AMAuthErrorCode.MODULE_BASED_AUTH_NOT_ALLOWED, Response.Status.UNAUTHORIZED);
         authErrorCodeResponseStatuses.put(AMAuthErrorCode.AUTH_TOO_MANY_ATTEMPTS, Response.Status.UNAUTHORIZED);

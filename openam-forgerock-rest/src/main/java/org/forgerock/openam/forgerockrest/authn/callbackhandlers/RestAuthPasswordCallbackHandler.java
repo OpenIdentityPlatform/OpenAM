@@ -44,7 +44,7 @@ public class RestAuthPasswordCallbackHandler extends AbstractRestAuthCallbackHan
      * {@inheritDoc}
      */
     boolean doUpdateCallbackFromRequest(HttpHeaders headers, HttpServletRequest request, HttpServletResponse response,
-                                        JsonValue postBody, PasswordCallback callback) throws RestAuthCallbackHandlerResponseException {
+            JsonValue postBody, PasswordCallback callback) throws RestAuthCallbackHandlerResponseException {
 
         String password = request.getParameter("password");
 
@@ -61,7 +61,7 @@ public class RestAuthPasswordCallbackHandler extends AbstractRestAuthCallbackHan
      * {@inheritDoc}
      */
     public PasswordCallback handle(HttpHeaders headers, HttpServletRequest request, HttpServletResponse response,
-                                   JsonValue postBody, PasswordCallback originalCallback) {
+            JsonValue postBody, PasswordCallback originalCallback) {
         return originalCallback;
     }
 

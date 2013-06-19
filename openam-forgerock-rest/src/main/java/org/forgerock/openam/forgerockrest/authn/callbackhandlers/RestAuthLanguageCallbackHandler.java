@@ -46,7 +46,7 @@ public class RestAuthLanguageCallbackHandler extends AbstractRestAuthCallbackHan
      * {@inheritDoc}
      */
     boolean doUpdateCallbackFromRequest(HttpHeaders headers, HttpServletRequest request, HttpServletResponse response,
-                                        JsonValue postBody, LanguageCallback callback) throws RestAuthCallbackHandlerResponseException {
+            JsonValue postBody, LanguageCallback callback) throws RestAuthCallbackHandlerResponseException {
 
         String localeLanguage = request.getParameter("localeLanguage");
         String localeCountry = request.getParameter("localeCountry");
@@ -64,7 +64,7 @@ public class RestAuthLanguageCallbackHandler extends AbstractRestAuthCallbackHan
      * {@inheritDoc}
      */
     public LanguageCallback handle(HttpHeaders headers, HttpServletRequest request, HttpServletResponse response,
-                                   JsonValue postBody, LanguageCallback originalCallback) {
+            JsonValue postBody, LanguageCallback originalCallback) {
         return originalCallback;
     }
 

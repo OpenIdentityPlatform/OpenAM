@@ -46,6 +46,7 @@ public class LoginProcess {
      * @param loginAuthenticator An instance of the LoginAuthenticator.
      * @param loginConfiguration The LoginConfiguration object used to start the login process.
      * @param authContext The underlying AuthContextLocal object wrapped as a AuthContextLocalWrapper.
+     * @param coreServicesWrapper An instance of the CoreServicesWrapper.
      */
     public LoginProcess(LoginAuthenticator loginAuthenticator, LoginConfiguration loginConfiguration,
             AuthContextLocalWrapper authContext, CoreServicesWrapper coreServicesWrapper) {
@@ -63,8 +64,8 @@ public class LoginProcess {
      */
     public LoginStage getLoginStage() {
 
-        boolean isLevelOrCompositeIndexType = AuthIndexType.LEVEL.equals(loginConfiguration.getIndexType()) ||
-                AuthIndexType.COMPOSITE.equals(loginConfiguration.getIndexType());
+        boolean isLevelOrCompositeIndexType = AuthIndexType.LEVEL.equals(loginConfiguration.getIndexType())
+                || AuthIndexType.COMPOSITE.equals(loginConfiguration.getIndexType());
 
         if ((isLevelOrCompositeIndexType && authContext.getRequirements() == null) || !isLevelOrCompositeIndexType) {
             authContext.hasMoreRequirements();

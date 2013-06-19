@@ -23,13 +23,21 @@ import com.sun.identity.authentication.AuthContext;
  */
 public enum AuthIndexType {
 
+    /** The empty AuthIndexType.  */
     NONE(null),
+    /** The User AuthIndexType. */
     USER(AuthContext.IndexType.USER),
+    /** The Role AuthIndexType. */
     ROLE(AuthContext.IndexType.ROLE),
+    /** The Sevice AuthIndexType. */
     SERVICE(AuthContext.IndexType.SERVICE),
+    /** The Level AuthIndexType. */
     LEVEL(AuthContext.IndexType.LEVEL),
+    /** The Module AuthIndexType. */
     MODULE(AuthContext.IndexType.MODULE_INSTANCE),
+    /** The Resource AuthIndexType. */
     RESOURCE(AuthContext.IndexType.RESOURCE),
+    /** The Composite AuthIndexType. */
     COMPOSITE(AuthContext.IndexType.COMPOSITE_ADVICE);
 
     private final AuthContext.IndexType indexType;

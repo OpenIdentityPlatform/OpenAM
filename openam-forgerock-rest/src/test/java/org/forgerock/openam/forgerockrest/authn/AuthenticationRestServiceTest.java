@@ -64,8 +64,8 @@ public class AuthenticationRestServiceTest {
 
         //Then
         assertEquals(jaxrsResponse, resp);
-        verify(restAuthenticationHandler).initiateAuthentication(headers, request, response, authIndexType, authIndexValue,
-                sessionUpgradeSSOTokenId, HttpMethod.GET);
+        verify(restAuthenticationHandler).initiateAuthentication(headers, request, response, authIndexType,
+                authIndexValue, sessionUpgradeSSOTokenId, HttpMethod.GET);
     }
 
     @Test
@@ -80,17 +80,17 @@ public class AuthenticationRestServiceTest {
         Response jaxrsResponse = mock(Response.class);
         String sessionUpgradeSSOTokenId = "SSO_TOKEN_ID";
 
-        given(restAuthenticationHandler.initiateAuthentication(headers, request, response, authIndexType, authIndexValue,
-                sessionUpgradeSSOTokenId, HttpMethod.POST)).willReturn(jaxrsResponse);
+        given(restAuthenticationHandler.initiateAuthentication(headers, request, response, authIndexType,
+                authIndexValue, sessionUpgradeSSOTokenId, HttpMethod.POST)).willReturn(jaxrsResponse);
 
         //When
-        Response resp = authenticationRestService.authenticate(headers, request, response, authIndexType, authIndexValue,
-                sessionUpgradeSSOTokenId, null);
+        Response resp = authenticationRestService.authenticate(headers, request, response, authIndexType,
+                authIndexValue, sessionUpgradeSSOTokenId, null);
 
         //Then
         assertEquals(jaxrsResponse, resp);
-        verify(restAuthenticationHandler).initiateAuthentication(headers, request, response, authIndexType, authIndexValue,
-                sessionUpgradeSSOTokenId, HttpMethod.POST);
+        verify(restAuthenticationHandler).initiateAuthentication(headers, request, response, authIndexType,
+                authIndexValue, sessionUpgradeSSOTokenId, HttpMethod.POST);
     }
 
     @Test
@@ -106,8 +106,8 @@ public class AuthenticationRestServiceTest {
         Response jaxrsResponse = mock(Response.class);
         String sessionUpgradeSSOTokenId = "SSO_TOKEN_ID";
 
-        given(restAuthenticationHandler.continueAuthentication(headers, request, response, postBody, sessionUpgradeSSOTokenId))
-                .willReturn(jaxrsResponse);
+        given(restAuthenticationHandler.continueAuthentication(headers, request, response, postBody,
+                sessionUpgradeSSOTokenId)).willReturn(jaxrsResponse);
 
         //When
         Response resp = authenticationRestService.authenticate(headers, request, response, authIndexType,
@@ -115,6 +115,7 @@ public class AuthenticationRestServiceTest {
 
         //Then
         assertEquals(jaxrsResponse, resp);
-        verify(restAuthenticationHandler).continueAuthentication(headers, request, response, postBody, sessionUpgradeSSOTokenId);
+        verify(restAuthenticationHandler).continueAuthentication(headers, request, response, postBody,
+                sessionUpgradeSSOTokenId);
     }
 }
