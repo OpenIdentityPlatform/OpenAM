@@ -27,7 +27,7 @@
  */
 
 /*
- * Portions Copyrighted 2010-2012 ForgeRock Inc
+ * Portions Copyrighted 2010-2013 ForgeRock, Inc.
  */
 
 package com.sun.identity.saml2.common;
@@ -905,7 +905,13 @@ public interface SAML2Constants {
      * signing certificate alias
      */
     public String SIGNING_CERT_ALIAS = "signingCertAlias";
-    
+
+    /**
+     * This is an attribute in entity config for the
+     * signing certificate encrypted keypass
+     */
+    public String SIGNING_CERT_KEYPASS = "signingCertKeyPass";
+
     /**
      * This is an attribute in entity config for the
      * encryption certificate alias

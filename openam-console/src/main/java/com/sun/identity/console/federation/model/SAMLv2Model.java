@@ -26,8 +26,8 @@
  *
  */
 
-/**
- * Portions Copyrighted 2010-2012 ForgeRock Inc
+/*
+ * Portions Copyrighted 2010-2013 ForgeRock, Inc.
  */
 
 package com.sun.identity.console.federation.model;
@@ -133,8 +133,10 @@ public interface SAMLv2Model
         "isDefaultMNI";
     
     //SAML2 IDP Extended Attributes
-    public static final String IDP_SIGN_CERT_ALIAS = 
+    public static final String IDP_SIGN_CERT_ALIAS =
         "signingCertAlias";
+    public static final String IDP_SIGN_CERT_KEYPASS =
+         "signingCertKeyPass";
     public static final String IDP_ENCRYPT_CERT_ALIAS =
         "encryptionCertAlias";
     public static final String IDP_BASIC_AUTH_ON = "basicAuthOn";
@@ -187,6 +189,7 @@ public interface SAMLv2Model
     
     //SAML2 SP Extended Attributes
     public static final String SP_SIGN_CERT_ALIAS = "signingCertAlias";
+    public static final String SP_SIGN_CERT_KEYPASS = "signingCertKeyPass";
     public static final String SP_ENCRYPT_CERT_ALIAS = "encryptionCertAlias";
     public static final String SP_BASIC_AUTH_ON = "basicAuthOn";
     public static final String SP_BASIC_AUTH_USER = "basicAuthUser";

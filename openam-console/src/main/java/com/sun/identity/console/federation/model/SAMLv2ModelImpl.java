@@ -26,8 +26,8 @@
  *
  */
 
-/**
- * Portions Copyrighted 2010-2012 ForgeRock Inc
+/*
+ * Portions Copyrighted 2010-2013 ForgeRock, Inc.
  */
 
 package com.sun.identity.console.federation.model;
@@ -40,7 +40,6 @@ import com.sun.identity.saml2.meta.SAML2MetaUtils;
 import com.sun.identity.saml2.meta.SAML2MetaSecurityUtils;
 import com.sun.identity.saml2.meta.SAML2MetaManager;
 import com.sun.identity.saml2.meta.SAML2MetaException;
-import com.sun.identity.saml2.jaxb.metadata.EntityDescriptorElement;
 import com.sun.identity.saml2.jaxb.metadata.IDPSSODescriptorElement;
 import com.sun.identity.saml2.jaxb.entityconfig.IDPSSOConfigElement;
 import com.sun.identity.saml2.jaxb.entityconfig.AttributeElement;
@@ -60,7 +59,6 @@ import com.sun.identity.saml2.jaxb.entityconfig.AttributeType;
 import com.sun.identity.saml2.jaxb.entityconfig.BaseConfigType;
 import com.sun.identity.saml2.jaxb.entityconfig.EntityConfigElement;
 import com.sun.identity.saml2.jaxb.entityconfig.ObjectFactory;
-import com.sun.identity.saml2.jaxb.metadata.EntityDescriptorElement;
 import com.sun.identity.saml2.jaxb.metadata.XACMLAuthzServiceElement;
 import com.sun.identity.saml2.jaxb.metadata.NameIDMappingServiceElement;
 import com.sun.identity.saml2.jaxb.metadata.AuthnAuthorityDescriptorElement;
@@ -110,6 +108,7 @@ public class SAMLv2ModelImpl extends EntityModelImpl implements SAMLv2Model {
     //extended metadata attributes for idp only
     static {
         extendedMetaIdpMap.put(IDP_SIGN_CERT_ALIAS, Collections.EMPTY_SET);
+        extendedMetaIdpMap.put(IDP_SIGN_CERT_KEYPASS, Collections.EMPTY_SET);
         extendedMetaIdpMap.put(IDP_ENCRYPT_CERT_ALIAS, Collections.EMPTY_SET);
         extendedMetaIdpMap.put(IDP_BASIC_AUTH_ON, Collections.EMPTY_SET);
         extendedMetaIdpMap.put(IDP_BASIC_AUTH_USER, Collections.EMPTY_SET);
@@ -252,6 +251,7 @@ public class SAMLv2ModelImpl extends EntityModelImpl implements SAMLv2Model {
         extendedACMetaIdpMap.put(IDP_MNI_REQ_SIGN, Collections.EMPTY_SET);
         extendedACMetaIdpMap.put(IDP_MNI_RESP_SIGN, Collections.EMPTY_SET);
         extendedACMetaIdpMap.put(IDP_SIGN_CERT_ALIAS, Collections.EMPTY_SET);
+        extendedACMetaIdpMap.put(IDP_SIGN_CERT_KEYPASS, Collections.EMPTY_SET);
         extendedACMetaIdpMap.put(IDP_ENCRYPT_CERT_ALIAS, Collections.EMPTY_SET);
         extendedACMetaIdpMap.put(IDP_NAMEID_ENCRYPTED, Collections.EMPTY_SET); 
         extendedACMetaIdpMap.put(NAMEID_FORMAT_MAP,Collections.EMPTY_SET);
@@ -311,7 +311,7 @@ public class SAMLv2ModelImpl extends EntityModelImpl implements SAMLv2Model {
     //extended Assertion Content metadata attributes for sp only    
     static {
         extendedACMetaSpMap.put(SP_SIGN_CERT_ALIAS, Collections.EMPTY_SET);
-        extendedACMetaSpMap.put(SP_ENCRYPT_CERT_ALIAS, Collections.EMPTY_SET);        
+        extendedACMetaSpMap.put(SP_ENCRYPT_CERT_ALIAS, Collections.EMPTY_SET);
         extendedACMetaSpMap.put(SP_NAMEID_ENCRYPTED, Collections.EMPTY_SET);
         extendedACMetaSpMap.put(WANT_ATTR_ENCRYPTED, Collections.EMPTY_SET);
         extendedACMetaSpMap.put(WANT_ASSERTION_ENCRYPTED,
@@ -3623,7 +3623,7 @@ public class SAMLv2ModelImpl extends EntityModelImpl implements SAMLv2Model {
      * Saves the Soap ManageNameID Service for SP.
      *
      * @param mnisoapLocation is the location url.
-     * @param mnirespsoapLocation is the response location url.
+     * @param mnirespLoaction is the response location url.
      * @param manageNameIdList the live list to be updated.
      * @param objFact the Object Factory class.
      * @throws JAXBException if save fails.

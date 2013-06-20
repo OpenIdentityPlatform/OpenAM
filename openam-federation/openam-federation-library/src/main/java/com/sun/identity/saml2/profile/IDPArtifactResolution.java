@@ -27,7 +27,7 @@
  */
 
 /*
- * Portions Copyrighted 2012 ForgeRock Inc.
+ * Portions Copyrighted 2012-2013 ForgeRock, Inc.
  */
 
 package com.sun.identity.saml2.profile;
@@ -35,6 +35,7 @@ package com.sun.identity.saml2.profile;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.security.PrivateKey;
 import java.security.cert.X509Certificate;
 import java.util.Date;
 import java.util.Enumeration;
@@ -474,16 +475,13 @@ public class IDPArtifactResolution {
         }
         // encrypt the assertion or its NameID and/or Attribute based
         // on SP config setting and sign the assertion.
-        IDPSSOUtil.signAndEncryptResponseComponents(
-            realm, spEntityID, idpEntityID, res, signAssertion);
+        IDPSSOUtil.signAndEncryptResponseComponents(realm, spEntityID, idpEntityID, res, signAssertion);
 
-        ArtifactResponse artResponse = 
-                ProtocolFactory.getInstance().createArtifactResponse();
+        ArtifactResponse artResponse = ProtocolFactory.getInstance().createArtifactResponse();
 
         Status status = ProtocolFactory.getInstance().createStatus();
 
-        StatusCode statusCode = 
-                     ProtocolFactory.getInstance().createStatusCode();
+        StatusCode statusCode = ProtocolFactory.getInstance().createStatusCode();
         statusCode.setValue(SAML2Constants.SUCCESS);
         status.setStatusCode(statusCode);
         
@@ -501,44 +499,41 @@ public class IDPArtifactResolution {
         artResponse.setDestination(XMLUtils.escapeSpecialCharacters(acsURL)); 
         
         String wantArtifactResponseSigned = 
-           SAML2Utils.getAttributeValueFromSSOConfig(
-               realm, spEntityID, SAML2Constants.SP_ROLE, 
+           SAML2Utils.getAttributeValueFromSSOConfig(realm, spEntityID, SAML2Constants.SP_ROLE,
                SAML2Constants.WANT_ARTIFACT_RESPONSE_SIGNED);
-        if ((wantArtifactResponseSigned != null)
-            && (wantArtifactResponseSigned.equals(SAML2Constants.TRUE))) {     
+        if ((wantArtifactResponseSigned != null) && (wantArtifactResponseSigned.equals(SAML2Constants.TRUE))) {
             KeyProvider kp = KeyUtil.getKeyProviderInstance();
             if (kp == null) {
-                SAML2Utils.debug.error(classMethod +
-                    "Unable to get a key provider instance.");
-                return SAML2Utils.createSOAPFault(
-                    SAML2Constants.SERVER_FAULT, "nullKeyProvider", null);
+                SAML2Utils.debug.error(classMethod + "Unable to get a key provider instance.");
+                return SAML2Utils.createSOAPFault(SAML2Constants.SERVER_FAULT, "nullKeyProvider", null);
             }
-            String idpSignCertAlias = SAML2Utils.getSigningCertAlias(
-                        realm, idpEntityID, SAML2Constants.IDP_ROLE); 
+            String idpSignCertAlias = SAML2Utils.getSigningCertAlias(realm, idpEntityID, SAML2Constants.IDP_ROLE);
             if (idpSignCertAlias == null) {
-                SAML2Utils.debug.error(classMethod +
-                    "Unable to get the hosted IDP signing certificate alias.");
-                return SAML2Utils.createSOAPFault(
-                    SAML2Constants.SERVER_FAULT, 
-                    "missingSigningCertAlias", null);
+                SAML2Utils.debug.error(classMethod + "Unable to get the hosted IDP signing certificate alias.");
+                return SAML2Utils.createSOAPFault(SAML2Constants.SERVER_FAULT, "missingSigningCertAlias", null);
             }
-            artResponse.sign(kp.getPrivateKey(idpSignCertAlias), 
-                           kp.getX509Certificate(idpSignCertAlias));
+            String encryptedKeyPass =
+                    SAML2Utils.getSigningCertEncryptedKeyPass(realm, idpEntityID, SAML2Constants.IDP_ROLE);
+            PrivateKey key;
+            if (encryptedKeyPass == null || encryptedKeyPass.isEmpty()) {
+                key = kp.getPrivateKey(idpSignCertAlias);
+            } else {
+                key = kp.getPrivateKey(idpSignCertAlias, encryptedKeyPass);
+            }
+
+            artResponse.sign(key, kp.getX509Certificate(idpSignCertAlias));
         }
 
         String str = artResponse.toXMLString(true,true);
         String[] logdata = {idpEntityID, artStr, str};
-        LogUtil.access(Level.INFO,
-            LogUtil.ARTIFACT_RESPONSE, logdata, null, props);
+        LogUtil.access(Level.INFO, LogUtil.ARTIFACT_RESPONSE, logdata, null, props);
         if (str != null) {
             if (SAML2Utils.debug.messageEnabled()) {
-                SAML2Utils.debug.message(classMethod +
-                    "ArtifactResponse message:\n"+ str);
+                SAML2Utils.debug.message(classMethod + "ArtifactResponse message:\n"+ str);
             }
         } else {
             if (SAML2Utils.debug.messageEnabled()) {
-                SAML2Utils.debug.message(classMethod +
-                    "Unable to print ArtifactResponse message.");
+                SAML2Utils.debug.message(classMethod + "Unable to print ArtifactResponse message.");
             }
         }        
 
@@ -546,10 +541,8 @@ public class IDPArtifactResolution {
         try {
             msg = SAML2Utils.createSOAPMessage(str, false);
         } catch (SOAPException se) {
-            SAML2Utils.debug.error(classMethod +
-                "Unable to create a SOAPMessage and add a document ", se);
-            return SAML2Utils.createSOAPFault(
-                SAML2Constants.SERVER_FAULT, "unableToCreateSOAPMessage", null);
+            SAML2Utils.debug.error(classMethod + "Unable to create a SOAPMessage and add a document ", se);
+            return SAML2Utils.createSOAPFault(SAML2Constants.SERVER_FAULT, "unableToCreateSOAPMessage", null);
         }
 
         return msg;

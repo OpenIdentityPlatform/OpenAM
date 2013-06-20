@@ -27,7 +27,7 @@
  */
 
 /*
- * Portions copyright 2013 ForgeRock, Inc.
+ * Portions Copyrighted 2013 ForgeRock, Inc
  */
 
 package com.sun.identity.saml2.profile;
@@ -627,10 +627,15 @@ public class AssertionIDRequestUtil {
         String samlAuthorityEntityID, String role, String realm,
         boolean includeCert) throws SAML2Exception {
         
-        String alias = SAML2Utils.getSigningCertAlias(realm,
-            samlAuthorityEntityID, role);
+        String alias = SAML2Utils.getSigningCertAlias(realm, samlAuthorityEntityID, role);
 
-        PrivateKey signingKey = keyProvider.getPrivateKey(alias);
+        String encryptedKeyPass = SAML2Utils.getSigningCertEncryptedKeyPass(realm, samlAuthorityEntityID, role);
+        PrivateKey signingKey;
+        if (encryptedKeyPass == null  || encryptedKeyPass.isEmpty()) {
+            signingKey = keyProvider.getPrivateKey(alias);
+        } else {
+            signingKey = keyProvider.getPrivateKey(alias, encryptedKeyPass);
+        }
         X509Certificate signingCert = null;
         if (includeCert) {
             signingCert = keyProvider.getX509Certificate(alias);

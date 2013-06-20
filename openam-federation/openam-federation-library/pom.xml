@@ -117,6 +117,14 @@
             <scope>test</scope>
         </dependency>
 
+        <!-- Xerces-J Required for Tests -->
+        <dependency>
+            <groupId>xerces-J</groupId>
+            <artifactId>xml-apis</artifactId>
+            <version>${xercesj.version}</version>
+            <scope>test</scope>
+        </dependency>
+
         <dependency>
             <groupId>com.sun.jersey</groupId>
             <artifactId>jersey-bundle</artifactId>

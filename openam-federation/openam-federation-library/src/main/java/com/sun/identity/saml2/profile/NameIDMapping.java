@@ -27,7 +27,7 @@
  */
 
 /*
- * Portions copyright 2013 ForgeRock, Inc.
+ * Portions Copyrighted 2013 ForgeRock, Inc.
  */
 
 package com.sun.identity.saml2.profile;
@@ -59,7 +59,6 @@ import com.sun.identity.saml2.common.SAML2SDKUtils;
 import com.sun.identity.saml2.common.SAML2Utils;
 import com.sun.identity.saml2.jaxb.entityconfig.BaseConfigType;
 import com.sun.identity.saml2.jaxb.metadata.IDPSSODescriptorElement;
-import com.sun.identity.saml2.jaxb.metadata.KeyDescriptorType;
 import com.sun.identity.saml2.jaxb.metadata.NameIDMappingServiceElement;
 import com.sun.identity.saml2.jaxb.metadata.RoleDescriptorType;
 import com.sun.identity.saml2.jaxb.metadata.SPSSODescriptorElement;
@@ -561,7 +560,14 @@ public class NameIDMapping {
 
         }
 
-        PrivateKey signingKey = keyProvider.getPrivateKey(alias);
+        String encryptedKeyPass =
+                SAML2Utils.getSigningCertEncryptedKeyPass(realm, idpEntityID, SAML2Constants.IDP_ROLE);
+        PrivateKey signingKey;
+        if (encryptedKeyPass == null || encryptedKeyPass.isEmpty()) {
+            signingKey = keyProvider.getPrivateKey(alias);
+        } else {
+            signingKey = keyProvider.getPrivateKey(alias, encryptedKeyPass);
+        }
         X509Certificate signingCert = null;
         if (includeCert) {
             signingCert = keyProvider.getX509Certificate(alias);
@@ -603,22 +609,27 @@ public class NameIDMapping {
         String realm, String idpEntityID){
 
         NameID nameID = nimRequest.getNameID();
-	if (nameID == null) {
-            String alias = SAML2Utils.getSigningCertAlias(realm,
-                idpEntityID, SAML2Constants.IDP_ROLE);
+        if (nameID == null) {
+            String alias = SAML2Utils.getSigningCertAlias(realm, idpEntityID, SAML2Constants.IDP_ROLE);
+            String encryptedKeyPass =
+                    SAML2Utils.getSigningCertEncryptedKeyPass(realm, idpEntityID, SAML2Constants.IDP_ROLE);
+            PrivateKey signingKey;
+            if (encryptedKeyPass == null || encryptedKeyPass.isEmpty()) {
+                signingKey = keyProvider.getPrivateKey(alias);
+            } else {
+                signingKey = keyProvider.getPrivateKey(alias, encryptedKeyPass);
+            }
 
-            PrivateKey signingKey = keyProvider.getPrivateKey(alias);
-
-	    EncryptedID encryptedID = nimRequest.getEncryptedID();
+            EncryptedID encryptedID = nimRequest.getEncryptedID();
             try {
                 nameID = encryptedID.decrypt(signingKey);
             } catch (SAML2Exception ex) {
                 if (SAML2Utils.debug.messageEnabled()) {
                     SAML2Utils.debug.message("NameIDMapping.getNameID:", ex);
                 }
-                return null; 
+                return null;
             }
-	}
+        }
 
         if (!SAML2Utils.isPersistentNameID(nameID)) {
             return null;

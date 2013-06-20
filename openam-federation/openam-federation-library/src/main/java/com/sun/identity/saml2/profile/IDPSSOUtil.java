@@ -27,8 +27,8 @@
  */
 
 /*
-* Portions Copyrighted 2010-2012 ForgeRock Inc
-*/
+ * Portions Copyrighted 2010-2013 ForgeRock, Inc
+ */
 
 package com.sun.identity.saml2.profile;
 
@@ -101,6 +101,7 @@ import com.sun.identity.saml2.plugins.SAML2IdentityProviderAdapter;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.io.PrintWriter;
+import java.security.PrivateKey;
 import java.util.logging.Level;
 import java.util.ArrayList;
 import java.util.Date;
@@ -2495,8 +2496,16 @@ public class IDPSSOUtil {
                     SAML2Utils.bundle.getString("missingSigningCertAlias"));
         }
 
-        assertion.sign(kp.getPrivateKey(idpSignCertAlias),
-                kp.getX509Certificate(idpSignCertAlias));
+        String encryptedKeyPass =
+                SAML2Utils.getSigningCertEncryptedKeyPass(realm, idpEntityID, SAML2Constants.IDP_ROLE);
+        PrivateKey key;
+        if (encryptedKeyPass == null || encryptedKeyPass.isEmpty()) {
+            key = kp.getPrivateKey(idpSignCertAlias);
+        } else {
+            key = kp.getPrivateKey(idpSignCertAlias, encryptedKeyPass);
+        }
+
+        assertion.sign(key, kp.getX509Certificate(idpSignCertAlias));
     }
 
     /**
@@ -2958,8 +2967,17 @@ public class IDPSSOUtil {
                     SAML2Utils.bundle.getString("missingSigningCertAlias"));
 
         }
-        response.sign(kp.getPrivateKey(idpSignCertAlias),
-                kp.getX509Certificate(idpSignCertAlias));
+
+        String encryptedKeyPass =
+                SAML2Utils.getSigningCertEncryptedKeyPass(realm, idpEntityID, SAML2Constants.IDP_ROLE);
+        PrivateKey key;
+        if (encryptedKeyPass == null || encryptedKeyPass.isEmpty()) {
+            key = kp.getPrivateKey(idpSignCertAlias);
+        } else {
+            key = kp.getPrivateKey(idpSignCertAlias, encryptedKeyPass);
+        }
+
+        response.sign(key, kp.getX509Certificate(idpSignCertAlias));
     }
 
     /**

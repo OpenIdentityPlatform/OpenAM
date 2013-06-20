@@ -27,8 +27,9 @@
  */
 
 /**
- * Portions Copyrighted 2010-2011 ForgeRock AS
+ * Portions Copyrighted 2010-2013 ForgeRock, Inc.
  */
+
 package com.sun.identity.saml2.meta;
 
 import java.security.KeyStore;
@@ -76,12 +77,8 @@ import com.sun.identity.saml2.jaxb.metadata.IDPSSODescriptorElement;
 import com.sun.identity.saml2.jaxb.metadata.KeyDescriptorElement;
 import com.sun.identity.saml2.jaxb.metadata.RoleDescriptorType;
 import com.sun.identity.saml2.jaxb.metadata.SPSSODescriptorElement;
-import com.sun.identity.saml2.jaxb.metadataattr.EntityAttributesType;
-import com.sun.identity.saml2.jaxb.metadataattr.EntityAttributesElement;
 import com.sun.identity.saml2.common.SAML2Constants;
-import com.sun.identity.saml2.common.SAML2SDKUtils;
 import com.sun.identity.saml2.key.KeyUtil;
-import com.sun.identity.saml2.common.SAML2SDKUtils;
 
 /**
  * The <code>SAML2MetaUtils</code> provides metadata security related util
@@ -162,6 +159,7 @@ public final class SAML2MetaSecurityUtils {
         String idpId = null;
         String spCertAlias = null;
         String idpCertAlias = null;
+        String idpCertKeyPass = null;
 
         if (spconfig != null) {
             Map map = SAML2MetaUtils.getAttributes(spconfig);
@@ -185,13 +183,16 @@ public final class SAML2MetaSecurityUtils {
             if (list != null && !list.isEmpty()) {
                 idpCertAlias = ((String)list.get(0)).trim();
                 if (idpCertAlias.length() > 0) {
-                    IDPSSODescriptorElement idpDesc = 
-                            SAML2MetaUtils.getIDPSSODescriptor(descriptor);
+                    IDPSSODescriptorElement idpDesc = SAML2MetaUtils.getIDPSSODescriptor(descriptor);
                     if (idpDesc != null) {
                         idpId = SAMLUtils.generateID();
                         idpDesc.setID(idpId);
                     }
                 }
+            }
+            list = (List)map.get(SAML2Constants.SIGNING_CERT_KEYPASS);
+            if (list != null && !list.isEmpty()) {
+                idpCertKeyPass = ((String)list.get(0)).trim();
             }
         }
 
@@ -227,8 +228,11 @@ public final class SAML2MetaSecurityUtils {
                 String xpath = "//*[local-name()=\"" + TAG_IDP_SSO_DESCRIPTOR +
                                "\" and namespace-uri()=\"" + NS_META +
                                "\"]/*[1]";
-                sigManager.signXML(doc, idpCertAlias, null, "ID", idpId, true,
-                                   xpath);
+                if (idpCertKeyPass == null || idpCertKeyPass.isEmpty()) {
+                    sigManager.signXML(doc, idpCertAlias, null, "ID", idpId, true, xpath);
+                } else {
+                    sigManager.signXMLUsingKeyPass(doc, idpCertAlias, idpCertKeyPass, null, "ID", idpId, true, xpath);
+                }
             } catch (XMLSignatureException xmlse) {
                 if (debug.messageEnabled()) {
                     debug.message("SAML2MetaSecurityUtils.sign:", xmlse);
@@ -496,11 +500,11 @@ public final class SAML2MetaSecurityUtils {
                 // remove key info
                 removeKeyDescriptor(idpDesp, isSigning); 
                 if (isSigning) {
-                    setExtendedAttributeValue(idpConfig, 
-                        SAML2Constants.SIGNING_CERT_ALIAS, null); 
+                    setExtendedAttributeValue(idpConfig,
+                        SAML2Constants.SIGNING_CERT_ALIAS, null);
                 } else {
-                    setExtendedAttributeValue(idpConfig, 
-                        SAML2Constants.ENCRYPTION_CERT_ALIAS, null); 
+                    setExtendedAttributeValue(idpConfig,
+                        SAML2Constants.ENCRYPTION_CERT_ALIAS, null);
                 }
             } else {
                 KeyDescriptorElement kde = 
@@ -510,11 +514,11 @@ public final class SAML2MetaSecurityUtils {
                 Set value = new HashSet();
                 value.add(certAlias);
                 if (isSigning) {
-                    setExtendedAttributeValue(idpConfig, 
-                        SAML2Constants.SIGNING_CERT_ALIAS, value); 
+                    setExtendedAttributeValue(idpConfig,
+                        SAML2Constants.SIGNING_CERT_ALIAS, value);
                 } else {
-                    setExtendedAttributeValue(idpConfig, 
-                        SAML2Constants.ENCRYPTION_CERT_ALIAS, value); 
+                    setExtendedAttributeValue(idpConfig,
+                        SAML2Constants.ENCRYPTION_CERT_ALIAS, value);
                 }
             }
             metaManager.setEntityDescriptor(realm, desp);
@@ -546,11 +550,11 @@ public final class SAML2MetaSecurityUtils {
                 Set value = new HashSet();
                 value.add(certAlias);
                 if (isSigning) {
-                    setExtendedAttributeValue(spConfig, 
-                        SAML2Constants.SIGNING_CERT_ALIAS, value); 
+                    setExtendedAttributeValue(spConfig,
+                        SAML2Constants.SIGNING_CERT_ALIAS, value);
                 } else {
-                    setExtendedAttributeValue(spConfig, 
-                        SAML2Constants.ENCRYPTION_CERT_ALIAS, value); 
+                    setExtendedAttributeValue(spConfig,
+                        SAML2Constants.ENCRYPTION_CERT_ALIAS, value);
                 }
             }
             metaManager.setEntityDescriptor(realm, desp);

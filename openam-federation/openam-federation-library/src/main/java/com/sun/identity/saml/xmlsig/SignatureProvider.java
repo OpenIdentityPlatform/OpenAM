@@ -26,13 +26,14 @@
  *
  */
 
-
+/*
+ * Portions Copyrighted 2013 ForgeRock, Inc.
+ */
 
 package com.sun.identity.saml.xmlsig;
 
-import java.security.PrivateKey;
-import java.security.cert.X509Certificate;
-import java.util.*;
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
 
 /**
  * This is an interface to be implemented to sign and verify XML signature.
@@ -191,13 +192,40 @@ public interface SignatureProvider {
      * @return signature dom object
      * @throws XMLSignatureException if the document could not be signed
      */
-    public org.w3c.dom.Element signXML(org.w3c.dom.Document doc,
-        java.lang.String certAlias,
-        java.lang.String algorithm,
-        java.lang.String idAttrName,
-        java.lang.String id,
+    public Element signXML(Document doc,
+        String certAlias,
+        String algorithm,
+        String idAttrName,
+        String id,
         boolean includeCert,
-        java.lang.String xpath)
+        String xpath)
+        throws XMLSignatureException;
+
+    /**
+     * Sign part of the XML document referred by the supplied id attribute
+     * using enveloped signatures and use exclusive XML canonicalization.
+     * @param doc XML dom object
+     * @param certAlias Signer's certificate alias name
+     * @param encryptedKeyPass Use the supplied encrypted key password to get the private key
+     * @param algorithm XML signature algorithm
+     * @param idAttrName attribute name for the id attribute of the node to be
+     *        signed.
+     * @param id id attribute value of the node to be signed
+     * @param includeCert if true, include the signing certificate in
+     *        <code>KeyInfo</code>.
+     *                    if false, does not include the signing certificate.
+     * @param xpath expression should uniquely identify a node before which
+     * @return signature dom object
+     * @throws XMLSignatureException if the document could not be signed
+     */
+    public Element signXMLUsingKeyPass(Document doc,
+        String certAlias,
+        String encryptedKeyPass,
+        String algorithm,
+        String idAttrName,
+        String id,
+        boolean includeCert,
+        String xpath)
         throws XMLSignatureException;
 
     /**                                                                    

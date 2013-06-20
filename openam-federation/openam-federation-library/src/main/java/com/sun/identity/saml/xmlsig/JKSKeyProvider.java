@@ -26,6 +26,10 @@
  *
  */
 
+/*
+ * Portions Copyrighted 2013 ForgeRock, Inc.
+ */
+
 package com.sun.identity.saml.xmlsig;
 
 import com.sun.identity.saml.common.SAMLException;
@@ -36,6 +40,7 @@ import java.io.IOException;
 import java.security.KeyStore;
 import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
+import java.security.PrivateKey;
 import java.security.cert.Certificate;
 import java.security.cert.CertificateException;
 
@@ -105,6 +110,16 @@ public class JKSKeyProvider implements KeyProvider {
      */
     public java.security.PrivateKey getPrivateKey (String certAlias) {
         return keyProvider.getPrivateKey(certAlias);
+    }
+
+    /**
+     * Return the {@link java.security.PrivateKey} for the specified certAlias and encrypted private key password.
+     * @param certAlias Certificate alias name
+     * @param encryptedKeyPass The encrypted keypass to use when getting the private certificate
+     * @return PrivateKey which matches the certAlias, return null if the private key could not be found.
+     */
+    public PrivateKey getPrivateKey (String certAlias, String encryptedKeyPass) {
+        return keyProvider.getPrivateKey(certAlias, encryptedKeyPass);
     }
 
     /**

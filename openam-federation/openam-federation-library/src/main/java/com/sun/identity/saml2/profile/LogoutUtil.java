@@ -27,7 +27,7 @@
  */
 
 /*
- * Portions Copyrighted 2012 ForgeRock AS
+ * Portions Copyrighted 2012-2013 ForgeRock, Inc.
  */
 
 package com.sun.identity.saml2.profile;
@@ -375,7 +375,7 @@ public class LogoutUtil {
      * Performs SOAP logout, this method will send LogoutResuest to IDP using
      * SOAP binding, and process LogoutResponse.
      * @param requestID Request id.
-     * @param sloRequestXMLString  a string representation of LogoutRequest.
+     * @param sloRequest  a string representation of LogoutRequest.
      * @param sloURL SOAP logout URL on IDP side.
      * @param realm  a string representation of LogoutRequest.
      * @param hostEntity  host entity is sending the request.
@@ -766,8 +766,8 @@ public class LogoutUtil {
             return;
         }
         
-        String alias = 
-            SAML2Utils.getSigningCertAlias(realm, hostEntity, hostEntityRole);
+        String alias = SAML2Utils.getSigningCertAlias(realm, hostEntity, hostEntityRole);
+        String encryptedKeyPass = SAML2Utils.getSigningCertEncryptedKeyPass(realm, hostEntity, hostEntityRole);
         if (debug.messageEnabled()) {
             debug.message(method + "realm is : "+ realm);
             debug.message(method + "hostEntity is : " + hostEntity);
@@ -775,8 +775,17 @@ public class LogoutUtil {
             debug.message(method + "Cert Alias is : " + alias);
             debug.message(method + "SLO Request before sign : " 
                             + sloRequest.toXMLString(true, true));
+            if (encryptedKeyPass != null && !encryptedKeyPass.isEmpty()) {
+                debug.message(method + "Using provided Cert KeyPass");
+            }
         }
-        PrivateKey signingKey = keyProvider.getPrivateKey(alias);
+
+        PrivateKey signingKey;
+        if (encryptedKeyPass == null || encryptedKeyPass.isEmpty()) {
+            signingKey = keyProvider.getPrivateKey(alias);
+        } else {
+            signingKey = keyProvider.getPrivateKey(alias, encryptedKeyPass);
+        }
         X509Certificate signingCert = null;
         if (includeCert) {
             signingCert = keyProvider.getX509Certificate(alias);
@@ -902,15 +911,24 @@ public class LogoutUtil {
             return;
         }
 
-        String alias = 
-            SAML2Utils.getSigningCertAlias(realm, hostEntity, hostEntityRole);
+        String alias = SAML2Utils.getSigningCertAlias(realm, hostEntity, hostEntityRole);
+        String encryptedKeyPass = SAML2Utils.getSigningCertEncryptedKeyPass(realm, hostEntity, hostEntityRole);
         if (debug.messageEnabled()) {
             debug.message(method + "realm is : "+ realm);
             debug.message(method + "hostEntity is : " + hostEntity);
             debug.message(method + "Host Entity role is : " + hostEntityRole);
             debug.message(method + "Cert Alias is : " + alias);
+            if (encryptedKeyPass != null && !encryptedKeyPass.isEmpty()) {
+                debug.message(method + "Using provided Cert KeyPass");
+            }
         }
-        PrivateKey signingKey = keyProvider.getPrivateKey(alias);
+
+        PrivateKey signingKey;
+        if (encryptedKeyPass == null || encryptedKeyPass.isEmpty()) {
+            signingKey = keyProvider.getPrivateKey(alias);
+        } else {
+            signingKey = keyProvider.getPrivateKey(alias, encryptedKeyPass);
+        }
         X509Certificate signingCert = null;
         if (includeCert) {
             signingCert = keyProvider.getX509Certificate(alias);

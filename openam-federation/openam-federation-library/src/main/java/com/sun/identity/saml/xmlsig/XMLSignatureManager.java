@@ -26,16 +26,20 @@
  *
  */
 
+/*
+ * Portions Copyrighted 2013 ForgeRock, Inc.
+ */
+
 package com.sun.identity.saml.xmlsig;
 
-import java.util.Date; 
-import java.security.PrivateKey;
-import java.security.cert.X509Certificate;
+import java.util.Date;
 import com.sun.identity.saml.common.*;
 import com.sun.identity.common.SystemConfigurationUtil;
 import com.sun.identity.common.TaskRunnable;
 import com.sun.identity.common.TimerPool;
 import com.sun.identity.common.SystemTimerPool;
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
 
 /**
  * The class <code>XMLSignatureManager</code> provides methods 
@@ -301,7 +305,36 @@ public class XMLSignatureManager {
             return sp.signXML(doc, certAlias, algorithm, 
                               idAttrName, id, includeCert, xpath);
     }
-                                                                               
+
+    /**
+     * Sign part of the XML document referred by the supplied id attribute
+     * using enveloped signatures and use exclusive XML canonicalization.
+     * @param doc XML dom object
+     * @param certAlias Signer's certificate alias name
+     * @param encryptedKeyPass Use the supplied encrypted key password to get the private key
+     * @param algorithm XML signature algorithm
+     * @param idAttrName attribute name for the id attribute of the node to be
+     *        signed.
+     * @param id id attribute value of the node to be signed
+     * @param includeCert if true, include the signing certificate in
+     *        <code>KeyInfo</code>.
+     *                    if false, does not include the signing certificate.
+     * @param xpath expression should uniquely identify a node before which
+     * @return a signed dom object
+     * @throws XMLSignatureException if the document could not be signed
+     */
+    public Element signXMLUsingKeyPass(Document doc,
+                                       String certAlias,
+                                       String encryptedKeyPass,
+                                       String algorithm,
+                                       String idAttrName,
+                                       String id,
+                                       boolean includeCert,
+                                       String xpath)  throws XMLSignatureException {
+
+        return sp.signXMLUsingKeyPass(doc, certAlias, encryptedKeyPass, algorithm, idAttrName, id, includeCert, xpath);
+    }
+
    /**                                                                    
      * Sign the XML string using enveloped signatures.                         
      * @param xmlString XML string to be signed                                

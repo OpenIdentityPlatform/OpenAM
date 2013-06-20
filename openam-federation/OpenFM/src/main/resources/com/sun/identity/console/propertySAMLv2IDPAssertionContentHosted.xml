@@ -26,6 +26,10 @@
 
 -->
 
+<!--
+   Portions Copyrighted 2013 ForgeRock, Inc.
+-->
+
 <!DOCTYPE propertysheet SYSTEM "propertysheet.dtd">
 
 <propertysheet>  
@@ -102,15 +106,28 @@
                     <label name="lblSigncertAlias"
                            defaultValue="samlv2idp.attribute.label.signcertAlias"
                            labelFor="signingCertAlias" />
-                    
-                    <cc name="signingCertAlias" 
+
+                    <cc name="signingCertAlias"
                         tagclass="com.sun.web.ui.taglib.html.CCTextFieldTag" >
                         <attribute name="size" value="75" />
                         <attribute name="autoSubmit" value="false" />
                         <attribute name="localizeDisplayFieldValue" value="false" />
                     </cc>
                     <fieldhelp name="signingCertAlias.help" defaultValue="signingCertAlias.help" />
-                </property>                
+                </property>
+                <property>
+                    <label name="lblSigncertKeyPass"
+                           defaultValue="samlv2idp.attribute.label.signcertKeyPass"
+                           labelFor="signingCertKeyPass" />
+
+                    <cc name="signingCertKeyPass"
+                        tagclass="com.sun.web.ui.taglib.html.CCPasswordTag" >
+                        <attribute name="size" value="75" />
+                        <attribute name="autoSubmit" value="false" />
+                        <attribute name="localizeDisplayFieldValue" value="false" />
+                    </cc>
+                    <fieldhelp name="signingCertKeyPass.help" defaultValue="signingCertKeyPass.help" />
+                </property>
                 <property>
                     <label name="lblEncryptioncertAlias"
                            defaultValue="samlv2idp.attribute.label.encryptionCertAlias"

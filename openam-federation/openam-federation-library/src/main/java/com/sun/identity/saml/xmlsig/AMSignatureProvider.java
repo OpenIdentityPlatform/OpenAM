@@ -26,17 +26,17 @@
  *
  */
 
+/*
+ * Portions Copyrighted 2013 ForgeRock, Inc
+ */
+
 package com.sun.identity.saml.xmlsig;
 
 import java.io.*;
-import java.net.*;
-import java.lang.reflect.*;
 import java.math.BigInteger;
 import java.util.*;
 import java.security.*;
 import java.security.cert.*;
-import javax.xml.transform.TransformerException;
-import javax.xml.parsers.*;
 import org.w3c.dom.*;
 
 import com.sun.identity.shared.encode.Base64;
@@ -47,27 +47,18 @@ import com.sun.identity.saml.common.*;
 import com.sun.org.apache.xpath.internal.XPathAPI;
 import com.sun.org.apache.xml.internal.security.c14n.Canonicalizer;
 import com.sun.org.apache.xml.internal.security.utils.IdResolver;
-import com.sun.org.apache.xml.internal.security.exceptions.XMLSecurityException;
 import com.sun.org.apache.xml.internal.security.signature.XMLSignature;
 import com.sun.org.apache.xml.internal.security.keys.KeyInfo;
-import com.sun.org.apache.xml.internal.security.keys.content.keyvalues.
-       DSAKeyValue;
-import com.sun.org.apache.xml.internal.security.keys.content.keyvalues.
-       RSAKeyValue;
+import com.sun.org.apache.xml.internal.security.keys.content.keyvalues.DSAKeyValue;
+import com.sun.org.apache.xml.internal.security.keys.content.keyvalues.RSAKeyValue;
 import com.sun.org.apache.xml.internal.security.keys.storage.StorageResolver;
-import com.sun.org.apache.xml.internal.security.keys.storage.
-       implementations.KeyStoreResolver;
-import com.sun.org.apache.xml.internal.security.keys.keyresolver.
-       implementations.X509CertificateResolver;
-import com.sun.org.apache.xml.internal.security.keys.keyresolver.
-       implementations.X509SubjectNameResolver;
-import com.sun.org.apache.xml.internal.security.keys.keyresolver.
-       implementations.X509IssuerSerialResolver;
-import com.sun.org.apache.xml.internal.security.keys.keyresolver.
-       implementations.X509SKIResolver;
+import com.sun.org.apache.xml.internal.security.keys.storage.implementations.KeyStoreResolver;
+import com.sun.org.apache.xml.internal.security.keys.keyresolver.implementations.X509CertificateResolver;
+import com.sun.org.apache.xml.internal.security.keys.keyresolver.implementations.X509SubjectNameResolver;
+import com.sun.org.apache.xml.internal.security.keys.keyresolver.implementations.X509IssuerSerialResolver;
+import com.sun.org.apache.xml.internal.security.keys.keyresolver.implementations.X509SKIResolver;
 import com.sun.org.apache.xml.internal.security.utils.Constants;
 import com.sun.org.apache.xml.internal.security.transforms.Transforms;
-import com.sun.org.apache.xml.internal.security.Init;
 import com.sun.identity.liberty.ws.common.wsse.WSSEConstants;
 import com.sun.identity.liberty.ws.soapbinding.SOAPBindingConstants;
 
@@ -416,7 +407,7 @@ public class AMSignatureProvider implements SignatureProvider {
     }
     
      /**
-     * Sign part of the xml document referered by the supplied id attribute
+     * Sign part of the xml document referred by the supplied id attribute
      * using enveloped signatures and use exclusive xml canonicalization.
      * @param doc XML dom object
      * @param certAlias Signer's certificate alias name
@@ -427,17 +418,53 @@ public class AMSignatureProvider implements SignatureProvider {
      * @param includeCert if true, include the signing certificate in KeyInfo.
      *                    if false, does not include the signing certificate.
      * @param xpath expression should uniquly identify a node before which
-     * @return signature dom object
+     * @return a signed dom object
      * @throws XMLSignatureException if the document could not be signed
      */
-    public org.w3c.dom.Element signXML(org.w3c.dom.Document doc,
-                                       java.lang.String certAlias,
-                                       java.lang.String algorithm,
-                                       java.lang.String idAttrName,
-                                       java.lang.String id,
+    public Element signXML(Document doc,
+                           String certAlias,
+                           String algorithm,
+                           String idAttrName,
+                           String id,
+                           boolean includeCert,
+				           String xpath) throws XMLSignatureException {
+
+        return signXMLUsingKeyPass(doc,
+                certAlias,
+                null,
+                algorithm,
+                idAttrName,
+                id,
+                includeCert,
+                xpath);
+    }
+
+    /**
+     * Sign part of the XML document referred by the supplied id attribute
+     * using enveloped signatures and use exclusive XML canonicalization.
+     * @param doc XML dom object
+     * @param certAlias Signer's certificate alias name
+     * @param encryptedKeyPass Use the supplied encrypted key password to get the private key
+     * @param algorithm XML signature algorithm
+     * @param idAttrName attribute name for the id attribute of the node to be
+     *        signed.
+     * @param id id attribute value of the node to be signed
+     * @param includeCert if true, include the signing certificate in
+     *        <code>KeyInfo</code>.
+     *                    if false, does not include the signing certificate.
+     * @param xpath expression should uniquely identify a node before which
+     * @return a signed dom object
+     * @throws XMLSignatureException if the document could not be signed
+     */
+    public Element signXMLUsingKeyPass(Document doc,
+                                       String certAlias,
+                                       String encryptedKeyPass,
+                                       String algorithm,
+                                       String idAttrName,
+                                       String id,
                                        boolean includeCert,
-				       java.lang.String xpath)
-        throws XMLSignatureException {
+                                       String xpath) throws XMLSignatureException {
+
         if (doc == null) { 
             SAMLUtilsCommon.debug.error("signXML: doc is null.");  
             throw new XMLSignatureException( 
@@ -449,12 +476,16 @@ public class AMSignatureProvider implements SignatureProvider {
             throw new XMLSignatureException(   
                       SAMLUtilsCommon.bundle.getString("nullInput"));
         }    
-        org.w3c.dom.Element root = null;    
+        Element root = null;
         XMLSignature sig = null; 
         try {      
-            Constants.setSignatureSpecNSprefix("ds");    
-            PrivateKey privateKey =         
-                (PrivateKey) keystore.getPrivateKey(certAlias);
+            Constants.setSignatureSpecNSprefix("ds");
+            PrivateKey privateKey;
+            if (encryptedKeyPass == null || encryptedKeyPass.isEmpty()) {
+                privateKey = keystore.getPrivateKey(certAlias);
+            } else {
+                privateKey = keystore.getPrivateKey(certAlias, encryptedKeyPass);
+            }
             if (privateKey == null) {         
                 SAMLUtilsCommon.debug.error("private key is null");  
                 throw new XMLSignatureException(   
@@ -483,15 +514,14 @@ public class AMSignatureProvider implements SignatureProvider {
             }   
             sig = new XMLSignature(doc, "", algorithm,   
                 Canonicalizer.ALGO_ID_C14N_EXCL_OMIT_COMMENTS);  
-	    if(xpath == null) {
-                root.appendChild(sig.getElement());  
-	    } else {
-		Node beforeNode = XPathAPI.selectSingleNode(doc, xpath);
-		root.insertBefore(sig.getElement(), beforeNode);
-	    }
-            sig.getSignedInfo().addResourceResolver(   
-                        new com.sun.identity.saml.xmlsig.OfflineResolver()); 
-            // register the id for the elment, so it could be found
+            if (xpath == null) {
+                root.appendChild(sig.getElement());
+            } else {
+                Node beforeNode = XPathAPI.selectSingleNode(doc, xpath);
+                root.insertBefore(sig.getElement(), beforeNode);
+            }
+            sig.getSignedInfo().addResourceResolver(new OfflineResolver());
+            // register the id for the element, so it could be found
             // by Reference object based on URI
             if (!idAttrName.equals(DEF_ID_ATTRIBUTE)) {
                 IdResolver.registerElementById(root, id);
@@ -510,7 +540,7 @@ public class AMSignatureProvider implements SignatureProvider {
             }
             sig.sign(privateKey);  
         } catch (Exception e) {     
-	    SAMLUtilsCommon.debug.error("signXML Exception: ", e);
+	        SAMLUtilsCommon.debug.error("signXML Exception: ", e);
             throw new XMLSignatureException(e.getMessage());     
         }   
         return (sig.getElement());   

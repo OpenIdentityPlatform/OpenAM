@@ -25,6 +25,11 @@
  * $Id: SAMLv2IDPAssertionContentViewBean.java,v 1.5 2008/09/25 01:52:20 babysunil Exp $
  *
  */
+
+/**
+ * Portions Copyrighted 2013 ForgeRock, Inc.
+ */
+
 package com.sun.identity.console.federation;
 
 import com.iplanet.jato.view.event.RequestInvocationEvent;
@@ -35,17 +40,15 @@ import com.iplanet.jato.view.View;
 import com.sun.identity.console.base.AMPropertySheet;
 import com.sun.identity.console.base.AMTableTiledView;
 import com.sun.identity.console.base.model.AMPropertySheetModel;
+import com.sun.identity.security.EncodeAction;
 import com.sun.web.ui.view.alert.CCAlert;
 import com.sun.identity.console.base.model.AMConsoleException;
 import com.sun.identity.console.federation.model.SAMLv2Model;
-import com.sun.identity.console.federation.SAMLv2AuthContexts;
 import com.sun.web.ui.model.CCActionTableModel;
 import com.sun.web.ui.view.table.CCActionTable;
-import java.util.Map;
-import java.util.HashMap;
-import java.util.Set;
-import java.util.Iterator;
-import java.util.List;
+
+import java.security.AccessController;
+import java.util.*;
 
 public class SAMLv2IDPAssertionContentViewBean extends SAMLv2Base {
     public static final String DEFAULT_DISPLAY_URL =
@@ -251,42 +254,58 @@ public class SAMLv2IDPAssertionContentViewBean extends SAMLv2Base {
     throws ModelControlException {
         try {
             SAMLv2Model model = (SAMLv2Model)getModel();
-            AMPropertySheet ps =
-                    (AMPropertySheet)getChild(PROPERTY_ATTRIBUTES);
+            AMPropertySheet ps = (AMPropertySheet)getChild(PROPERTY_ATTRIBUTES);
             
             //retrieve the standard metadata values from the property sheet
             Map idpStdValues = ps.getAttributeValues(
-                    model.getStandardIdentityProviderAttributes(
-                    realm, entityName), false, model);
+                    model.getStandardIdentityProviderAttributes(realm, entityName), false, model);
             
             //retrieve the extended metadata values from the property sheet
             Map idpExtValues = getExtendedValues();
-            Map new_idpExtValues = ps.getAttributeValues(
-                model.getIDPEXACDataMap(), false, model);
+            Map new_idpExtValues = ps.getAttributeValues(model.getIDPEXACDataMap(), false, model);
+
+            // Check if the signing keypass has been updated, if it hasn't then remove it from the update since
+            // password fields are set to AMPropertySheetModel.passwordRandom before they are displayed to the user.
+            if (new_idpExtValues.containsKey(SAMLv2Model.IDP_SIGN_CERT_KEYPASS)) {
+                Set value = (Set)new_idpExtValues.get(SAMLv2Model.IDP_SIGN_CERT_KEYPASS);
+                if (value != null && !value.isEmpty()) {
+                    String keyPass = (String)value.iterator().next();
+                    if (AMPropertySheetModel.passwordRandom.equals(keyPass)) {
+                        // User did not change the password => remove fake value to avoid it overriding the stored value
+                        new_idpExtValues.remove(SAMLv2Model.IDP_SIGN_CERT_KEYPASS);
+                    } else {
+                        // The value has been updated
+                        Set<String> encodedValue = new HashSet<String>(1);
+                        // If the value is blank, don't encode
+                        if (keyPass.isEmpty()) {
+                            encodedValue.add(keyPass);
+                        } else {
+                            //Since it is plain text we need to encrypt it before storing
+                            encodedValue.add(AccessController.doPrivileged(new EncodeAction(keyPass)));
+                        }
+                        new_idpExtValues.put(SAMLv2Model.IDP_SIGN_CERT_KEYPASS, encodedValue);
+                    }
+                }
+            }
             idpExtValues.putAll(new_idpExtValues);
  
             //save the standard metadata values for the Idp
-              model.setIDPStdAttributeValues(realm, entityName, idpStdValues);
+            model.setIDPStdAttributeValues(realm, entityName, idpStdValues);
             
             //save the extended metadata values for the Idp
-            model.setIDPExtAttributeValues(realm, entityName, idpExtValues,
-                    location);
+            model.setIDPExtAttributeValues(realm, entityName, idpExtValues, location);
            
            if (isHosted()) {
                 //update Authentication Contexts
-                model.updateIDPAuthenticationContexts(realm, entityName, 
-                    getAuthenticationContexts());
+                model.updateIDPAuthenticationContexts(realm, entityName, getAuthenticationContexts());
                 
                 //save the encryption and signing info
-                 model.updateKeyinfo(realm, entityName, idpExtValues, 
-                      idpStdValues, true);
+                 model.updateKeyinfo(realm, entityName, idpExtValues, idpStdValues, true);
             }
                        
-            setInlineAlertMessage(CCAlert.TYPE_INFO, "message.information",
-                    "samlv2.idp.property.updated");
+            setInlineAlertMessage(CCAlert.TYPE_INFO, "message.information", "samlv2.idp.property.updated");
         } catch (AMConsoleException e) {
-            setInlineAlertMessage(CCAlert.TYPE_ERROR, "message.error",
-                    e.getMessage());
+            setInlineAlertMessage(CCAlert.TYPE_ERROR, "message.error", e.getMessage());
         }
         forwardTo();
     }
@@ -329,6 +348,6 @@ public class SAMLv2IDPAssertionContentViewBean extends SAMLv2Base {
         }
         return extendedValues;
     }
-    
+
 }
 

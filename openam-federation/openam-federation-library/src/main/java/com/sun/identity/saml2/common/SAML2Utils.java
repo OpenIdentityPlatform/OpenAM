@@ -25,7 +25,7 @@
  */
 
 /*
- * Portions Copyrighted 2010-2013 ForgeRock Inc
+ * Portions Copyrighted 2010-2013 ForgeRock, Inc.
  */
 
 package com.sun.identity.saml2.common;
@@ -2174,7 +2174,27 @@ public class SAML2Utils extends SAML2SDKUtils {
         return getAttributeValueFromSSOConfig(realm, hostEntityId, entityRole,
                 SAML2Constants.SIGNING_CERT_ALIAS);
     }
-    
+
+    /**
+     * Returns signing certificate key password (encrypted).
+     * @param realm realm of hosted entity.
+     * @param hostEntityId name of hosted entity.
+     * @param entityRole role of hosted entity.
+     * @return The encrypted keypass of the private key used for signing.
+     */
+    public static String getSigningCertEncryptedKeyPass(String realm,
+                                                        String hostEntityId,
+                                                        String entityRole) {
+        if (debug.messageEnabled()) {
+            String method = "getSigningCertEncryptedKeyPass : ";
+            debug.message(method + "realm - " + realm);
+            debug.message(method + "hostEntityId - " + hostEntityId);
+            debug.message(method + "entityRole - " + entityRole);
+        }
+        return getAttributeValueFromSSOConfig(realm, hostEntityId, entityRole,
+                SAML2Constants.SIGNING_CERT_KEYPASS);
+    }
+
     /**
      * Returns true if wantAssertionEncrypted has <code>String</code> true.
      * @param realm realm of hosted entity.
@@ -2648,16 +2668,24 @@ public class SAML2Utils extends SAML2SDKUtils {
             debug.message(method + "queryString :" + queryString);
         }
         
-        String alias = SAML2Utils.getSigningCertAlias(
-            realm, hostEntity, hostEntityRole);
-        
+        String alias = getSigningCertAlias(realm, hostEntity, hostEntityRole);
+        String encryptedKeyPass = getSigningCertEncryptedKeyPass(realm, hostEntity, hostEntityRole);
+
         if (debug.messageEnabled()) {
             debug.message(method + "realm is : "+ realm);
             debug.message(method + "hostEntity is : " + hostEntity);
             debug.message(method + "Host Entity role is : " + hostEntityRole);
             debug.message(method + "Signing Cert Alias is : " + alias);
+            if (encryptedKeyPass != null && !encryptedKeyPass.isEmpty()) {
+                debug.message(method + "Using provided Signing Cert KeyPass");
+            }
         }
-        PrivateKey signingKey = keyProvider.getPrivateKey(alias);
+        PrivateKey signingKey;
+        if (encryptedKeyPass == null || encryptedKeyPass.isEmpty()) {
+            signingKey = keyProvider.getPrivateKey(alias);
+        } else {
+            signingKey = keyProvider.getPrivateKey(alias, encryptedKeyPass);
+        }
         
         if (signingKey == null) {
             debug.error("Incorrect configuration for Signing Certificate.");
