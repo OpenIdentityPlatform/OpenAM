@@ -152,6 +152,13 @@
              with the HOTP authentication module.</para>
   </listitem>
 
+  <listitem>
+    <para>OpenAM now supports the Core Token Service version 2 (CTSv2), with a more
+    generalized token storage format. This covers all CTS areas including sessions,
+    SAML Tokens, and OAuth Tokens. A new LDAP schema has been defined which is in
+    addition to the existing schema.</para>
+  </listitem>
+
  </itemizedlist>
 
  <itemizedlist>
