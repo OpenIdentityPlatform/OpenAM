@@ -4058,8 +4058,8 @@ to a runtime exception with messages that I think suggest that it needed to be c
                 <term><literal>/SPECP/*</literal></term>
                 <listitem>
                     <para>The associated SPECPService class receives and processes single logout (SLO) requests, using
-                        SOAP bindings on the SP. The associated SPECService.java file was deleted from at least one of
-                        the trunk directories in September of 2012, so this may be in less frequent use.
+                        SOAP bindings on the SP. <!-- The associated SPECService.java file was deleted from at least one of
+                        the trunk directories in September of 2012, so this may be in less frequent use. -->
                     </para>
                 </listitem>
             </varlistentry>
@@ -4068,9 +4068,9 @@ to a runtime exception with messages that I think suggest that it needed to be c
                 <term><literal>/SPSloSoap/*</literal></term>
                 <listitem>
                     <para>The associated SPSingleLogoutServiceSOAP class receives and processes single logout
-                        (SLO) requests, using SOAP bindings on the SP. The associated SPSingleLogoutServiceSOAP.java
+                        (SLO) requests, using SOAP bindings on the SP. <!-- The associated SPSingleLogoutServiceSOAP.java
                         file was deleted from at least one of
-                        the trunk directories in September of 2012, so this may be in less frequent use.
+                        the trunk directories in September of 2012, so this may be in less frequent use. -->
                     </para>
                 </listitem>
             </varlistentry>
@@ -4132,9 +4132,9 @@ to a runtime exception with messages that I think suggest that it needed to be c
             <varlistentry>
                 <term><literal>/NIMSoap/*</literal></term>
                 <listitem>
-                    <para>Used by a servlet named NameIDMappingServiceSOAP; The associated NameIDMappingServiceSOAP.java
+                    <para>Used by a servlet named NameIDMappingServiceSOAP. <!--  The associated NameIDMappingServiceSOAP.java
                         file was deleted from at least one of
-                        the trunk directories in September of 2012, so this may be in less frequent use.
+                        the trunk directories in September of 2012, so this may be in less frequent use. -->
                     </para>
                 </listitem>
             </varlistentry>
@@ -4142,9 +4142,9 @@ to a runtime exception with messages that I think suggest that it needed to be c
             <varlistentry>
                 <term><literal>/AIDReqUri/*</literal></term>
                 <listitem>
-                    <para>Used by a servlet named AssertionIDRequestServiceSoap; The associated
+                    <para>Used by a servlet named AssertionIDRequestServiceSoap. <!-- The associated
                         AssertionIDRequestURI.java file was deleted from at least one of
-                        the trunk directories in September of 2012, so this may be in less frequent use.
+                        the trunk directories in September of 2012, so this may be in less frequent use. -->
                     </para>
                 </listitem>
             </varlistentry>
@@ -4152,9 +4152,9 @@ to a runtime exception with messages that I think suggest that it needed to be c
             <varlistentry>
                 <term><literal>/AIDReqSoap/*</literal></term>
                 <listitem>
-                    <para>Used by a servlet named AssertionIDRequestServiceSoap; The associated
+                    <para>Used by a servlet named AssertionIDRequestServiceSoap. <!-- The associated
                         AssertionIDRequestSOAP.java file was deleted from at least one of
-                        the trunk directories in September of 2012, so this may be in less frequent use.
+                        the trunk directories in September of 2012, so this may be in less frequent use. -->
                     </para>
                 </listitem>
             </varlistentry>
@@ -4162,9 +4162,9 @@ to a runtime exception with messages that I think suggest that it needed to be c
             <varlistentry>
                 <term><literal>/AuthnQuerySerivceSoap/*</literal></term>
                 <listitem>
-                    <para>Used by a servlet named AuthnQueryServiceSoap; The associated
+                    <para>Used by a servlet named AuthnQueryServiceSoap. <!-- The associated
                         AuthnQueryServiceSOAP.java file was deleted from at least one of
-                        the trunk directories in September of 2012, so this may be in less frequent use.
+                        the trunk directories in September of 2012, so this may be in less frequent use. -->
                     </para>
                 </listitem>
             </varlistentry>
@@ -4172,9 +4172,9 @@ to a runtime exception with messages that I think suggest that it needed to be c
             <varlistentry>
                 <term><literal>/AttributeServiceSoap/*</literal></term>
                 <listitem>
-                    <para>Used by a servlet named AttributeServiceSoap; The associated
+                    <para>Used by a servlet named AttributeServiceSoap. <!-- The associated
                         AttributeServiceSOAP.java file was deleted from at least one of
-                        the trunk directories in September of 2012, so this may be  in less frequent use.
+                        the trunk directories in September of 2012, so this may be  in less frequent use. -->
                     </para>
                 </listitem>
             </varlistentry>
@@ -4182,9 +4182,9 @@ to a runtime exception with messages that I think suggest that it needed to be c
             <varlistentry>
                 <term><literal>/SSOSoap/*</literal></term>
                 <listitem>
-                    <para>Used by a servlet named SSOSoap; The associated
+                    <para>Used by a servlet named SSOSoap. <!-- The associated
                         IDPSingleSignOnServiceSOAP.java file was deleted from at least one of
-                        the trunk directories in September of 2012, so this may be in less frequent use.
+                        the trunk directories in September of 2012, so this may be in less frequent use. -->
                     </para>
                 </listitem>
             </varlistentry>
@@ -4192,9 +4192,9 @@ to a runtime exception with messages that I think suggest that it needed to be c
             <varlistentry>
                 <term><literal>/IDPMniSoap/*</literal></term>
                 <listitem>
-                    <para>Used by a servlet named IDPMniSoap; The associated
+                    <para>Used by a servlet named IDPMniSoap. <!-- The associated
                         IDPManageNameIDServiceSOAP.java file was deleted from at least one of
-                        the trunk directories in September of 2012, so this may be in less frequent use.
+                        the trunk directories in September of 2012, so this may be in less frequent use. -->
                     </para>
                 </listitem>
             </varlistentry>
@@ -4229,9 +4229,9 @@ to a runtime exception with messages that I think suggest that it needed to be c
             <varlistentry>
                 <term><literal>/IDPSloSoap/*</literal></term>
                 <listitem>
-                    <para>Used by a servlet named IDPSloSoap; The associated
+                    <para>Used by a servlet named IDPSloSoap. <!-- The associated
                         IDPSingleLogoutServiceSOAP.java file was deleted from at least one of
-                        the trunk directories in September of 2012, so this may be in less frequent use.
+                        the trunk directories in September of 2012, so this may be in less frequent use. -->
                     </para>
                 </listitem>
             </varlistentry>
@@ -4266,9 +4266,9 @@ to a runtime exception with messages that I think suggest that it needed to be c
             <varlistentry>
                 <term><literal>/ArtifactResolver/*</literal></term>
                 <listitem>
-                    <para>Used by a servlet named IDPArtifactResolver; The associated
+                    <para>Used by a servlet named IDPArtifactResolver. <!-- The associated
                         IDPArtifactResolutionServiceSOAP.java file was deleted from at least one of
-                        the trunk directories in September of 2012, so this may be in less frequent use.
+                        the trunk directories in September of 2012, so this may be in less frequent use. -->
                     </para>
                 </listitem>
             </varlistentry>
