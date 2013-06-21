@@ -20,7 +20,6 @@ import com.iplanet.dpro.session.service.InternalSession;
 import com.iplanet.dpro.session.service.SessionService;
 import com.sun.identity.session.util.SessionUtils;
 import com.sun.identity.shared.debug.Debug;
-import com.sun.identity.sm.ldap.TimedAction;
 import com.sun.identity.sm.ldap.TokenTestUtils;
 import com.sun.identity.sm.ldap.api.TokenType;
 import com.sun.identity.sm.ldap.api.tokens.Token;
@@ -29,15 +28,18 @@ import org.testng.annotations.Test;
 import java.text.MessageFormat;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
 
 import static org.mockito.BDDMockito.mock;
 import static org.testng.Assert.assertEquals;
-import static org.testng.Assert.fail;
 
-@Test
+/**
+ * @author robert.wapshott@forgerock.com
+ */
 public class JSONSerialisationTest {
-    private static final Float ITERATIONS = new Float(5000);
-
+    @Test
     public void shouldSerialiseAString() {
         // Given
         JSONSerialisation serialisation = new JSONSerialisation(mock(Debug.class));
@@ -49,6 +51,7 @@ public class JSONSerialisationTest {
         assertEquals(test, result);
     }
 
+    @Test
     public void shouldSerialiseAMap() {
         // Given
         JSONSerialisation serialisation = new JSONSerialisation(mock(Debug.class));
@@ -64,6 +67,7 @@ public class JSONSerialisationTest {
         assertEquals(test, result);
     }
 
+    @Test
     public void shouldDeserialiseSerialisedToken() {
         // Given
         JSONSerialisation serialisation = new JSONSerialisation(mock(Debug.class));
@@ -76,44 +80,7 @@ public class JSONSerialisationTest {
         TokenTestUtils.compareTokens(result, token);
     }
 
-    public void shouldImproveOnPerformance() {
-        // Given
-        TimedAction previous = new TimedAction(){
-            @Override
-            public void action() {
-                try {
-                    SessionUtils.encode(generateSession());
-                } catch (Exception e) {
-                    fail(e.getMessage());
-                }
-            }
-        };
-
-        TimedAction current = new TimedAction(){
-            private JSONSerialisation serialisation = new JSONSerialisation(mock(Debug.class));
-            @Override
-            public void action() {
-                serialisation.serialise(generateSession());
-            }
-        };
-
-        // When
-        float previousAvg = previous.go();
-        float currentAvg = current.go();
-
-        // Then
-        String message = MessageFormat.format(
-                "The previous method took: {1}\n" +
-                "Current method took: {2}",
-                ITERATIONS,
-                previous,
-                current);
-
-        if (currentAvg > previousAvg) {
-            throw new AssertionError(message);
-        }
-    }
-
+    @Test
     public void shouldSerialiseAndDeserialiseAToken() {
         // Given
         Token token = TokenTestUtils.generateToken();
@@ -130,7 +97,7 @@ public class JSONSerialisationTest {
      *
      * @return Non null.
      */
-    public static InternalSession generateSession() {
+    private static InternalSession generateSession() {
         SessionID sid = new SessionID(randomString());
         InternalSession r = new InternalSession(sid, mock(SessionService.class), mock(Debug.class));
         // String
@@ -154,5 +121,66 @@ public class JSONSerialisationTest {
 
     private static long randomLong() {
         return Math.round(Math.random() * 1000);
+    }
+
+    /**
+     * Demonstrates that neither serialisation mechanism is consistent with the time it takes
+     * to serialise a session. This is not a completely fair test because the Internal Session
+     * class being serialised is awkward at best to serialise and deserialise.
+     *
+     * @param args none.
+     */
+    public static void main(String[] args) throws InterruptedException {
+        final ExecutorService service = Executors.newFixedThreadPool(8);
+        final long iterations = 1000;
+        final JSONSerialisation serialisation = new JSONSerialisation(mock(Debug.class));
+
+        final Runnable command = new Runnable() {
+            public void run() {
+
+                /**
+                 * Time the previous mechanism
+                 */
+                long start = System.currentTimeMillis();
+                for (int ii = 0; ii < iterations; ii++) {
+                    try {
+                        SessionUtils.encode(generateSession());
+                    } catch (Exception e) {
+                        throw new IllegalStateException(e);
+                    }
+                }
+                long delta = System.currentTimeMillis() - start;
+                float previous = (float)delta / iterations;
+
+                /**
+                 * Time the current mechanism
+                 */
+                start = System.currentTimeMillis();
+                for (int ii = 0; ii < iterations; ii++) {
+                    serialisation.serialise(generateSession());
+                }
+                delta = System.currentTimeMillis() - start;
+                float current = (float)delta / iterations;
+
+                String msg = MessageFormat.format(
+                        "Object {0}ms vs JSON: {1}ms",
+                        previous,
+                        current);
+                (current <= previous ? System.out : System.err).println(msg);
+
+                if (!service.isShutdown()) {
+                    service.execute(this);
+                }
+            }
+        };
+
+        System.out.println("Serialisation Test");
+        for (int ii = 0; ii < 8; ii++) {
+            service.execute(command);
+        }
+        Thread.sleep(3000);
+        service.shutdown();
+        service.awaitTermination(1, TimeUnit.SECONDS);
+        System.exit(0);
     }
 }
