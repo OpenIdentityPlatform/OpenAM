@@ -86,7 +86,7 @@
     <para>Other endpoints can only be used when called by some option in the OpenAM console. For example, while the
     AgentAdd.jsp endpoint exists in the console/agentconfig subdirectory, you would get an error by navigating directly
     to a URL such as <literal>http://sp.example.com:8080/openam/console/agentconfig/AgentAdd.jsp</literal>. For that
-    particluar endpoint, you'll have click through the options required to add an agent. (Access Control &gt;
+    particular endpoint, you'll have click through the options required to add an agent. (Access Control &gt;
     <replaceable>realm name</replaceable> &gt; Agents &gt; Agent &gt; New)</para>
 
     <para>In general, this chapter does not include dynamic endpoints, such as those that may include security
