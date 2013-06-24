@@ -346,9 +346,10 @@
     </varlistentry>
     <varlistentry>
      <term>Authentication Level</term>
+     <listitem>
       <para>Sets the authentication level used to indicate the level of security
       associated with the module. The value can range from 0 to any positive integer.</para>
-     <listitem><para><command>ssoadm</command> attribute:
+      <para><command>ssoadm</command> attribute:
      <literal>sunAMAuthADAuthLevel</literal></para></listitem>
     </varlistentry>
    </variablelist>
@@ -400,9 +401,10 @@
     <title>General</title>
     <varlistentry>
      <term>Authentication Level</term>
+     <listitem>
       <para>Sets the authentication level used to indicate the level of security
       associated with the module. The value can range from 0 to any positive integer.</para>
-      <listitem><para><command>ssoadm</command> attribute:
+      <para><command>ssoadm</command> attribute:
        <literal>openam-auth-adaptive-auth-level</literal></para></listitem>
     </varlistentry>
     <varlistentry>
@@ -916,9 +918,10 @@
     </varlistentry>
     <varlistentry>
      <term>Authentication Level</term>
+     <listitem>
       <para>Sets the authentication level used to indicate the level of security
       associated with the module. The value can range from 0 to any positive integer.</para>
-      <listitem><para><command>ssoadm</command> attribute:
+      <para><command>ssoadm</command> attribute:
       <literal>iplanet-am-auth-anonymous-auth-level</literal></para></listitem>
     </varlistentry>
    </variablelist>
@@ -1120,9 +1123,10 @@
     </varlistentry>
     <varlistentry>
      <term>Authentication Level</term>
+     <listitem>
       <para>Sets the authentication level used to indicate the level of security
       associated with the module. The value can range from 0 to any positive integer.</para>
-     <listitem><para><command>ssoadm</command> attribute:
+      <para><command>ssoadm</command> attribute:
      <literal>iplanet-am-auth-cert-auth-level</literal></para></listitem>
     </varlistentry>
    </variablelist>
@@ -1683,9 +1687,10 @@
    <variablelist>
     <varlistentry>
      <term>Authentication Level</term>
+     <listitem>
       <para>Sets the authentication level used to indicate the level of security
       associated with the module. The value can range from 0 to any positive integer.</para>
-      <listitem><para><command>ssoadm</command> attribute:
+      <para><command>ssoadm</command> attribute:
       <literal>sunAMAuthDataStoreAuthLevel</literal></para></listitem>
     </varlistentry>
    </variablelist>
@@ -1783,16 +1788,16 @@
                 <listitem>
                     <para>When enabled, new device profiles are automatically stored, once the HOTP is verified.
                         Otherwise, the user is prompted for confirmation.</para>
-                    <para><command>ssoadm</command> attribute:</para>
-                    <literal>iplanet-am-auth-adaptive-device-print-store-profiles-without-confirmation</literal>
+                    <para><command>ssoadm</command> attribute:
+                    <literal>iplanet-am-auth-adaptive-device-print-store-profiles-without-confirmation</literal></para>
                 </listitem>
             </varlistentry>
             <varlistentry>
                 <term>Default user profile name</term>
                 <listitem>
                     <para>Every device requires a default profile name that represents the user.</para>
-                    <para><command>ssoadm</command> attribute:</para>
-                    <literal>iplanet-am-auth-adaptive-device-print-default-profile-name</literal>
+                    <para><command>ssoadm</command> attribute:
+                    <literal>iplanet-am-auth-adaptive-device-print-default-profile-name</literal></para>
                 </listitem>
             </varlistentry>
             <varlistentry>
@@ -1802,8 +1807,8 @@
                         and stored user agent. The module adds a fixed number of points if the web browser or
                         related fields are changed. Version differences are ignored if the
                         <literal>User-Agent version ignore</literal> attribute is active. Default: 35.</para>
-                    <para><command>ssoadm</command> attribute:</para>
-                    <literal>iplanet-am-auth-adaptive-device-print-user-agent-penalty-points</literal>
+                    <para><command>ssoadm</command> attribute:
+                    <literal>iplanet-am-auth-adaptive-device-print-user-agent-penalty-points</literal></para>
                 </listitem>
             </varlistentry>
             <varlistentry>
@@ -1813,8 +1818,8 @@
                         The Device Print module adds a fixed number of penalty points if there is a change in the
                         installed fonts since the last login beyond some maximum tolerated level, and the
                         <literal>Installed fonts required</literal> attribute is enabled. Default: 35.</para>
-                    <para><command>ssoadm</command> attribute:</para>
-                    <literal>iplanet-am-auth-adaptive-device-print-installed-fonts-penalty-points</literal>
+                    <para><command>ssoadm</command> attribute:
+                    <literal>iplanet-am-auth-adaptive-device-print-installed-fonts-penalty-points</literal></para>
                 </listitem>
             </varlistentry>
             <varlistentry>
@@ -1823,8 +1828,8 @@
                     <para>Most devices have a number of plugins installed on their browsers, such as Java, Flash, and
                         document readers. If the plugins feature is enabled, and there is a change beyond a maximum
                         tolerated level, a fixed number of penalty points is added. Default: 35.</para>
-                    <para><command>ssoadm</command> attribute:</para>
-                    <literal>iplanet-am-auth-adaptive-device-print-installed-plugins-penalty-points</literal>
+                    <para><command>ssoadm</command> attribute:
+                    <literal>iplanet-am-auth-adaptive-device-print-installed-plugins-penalty-points</literal></para>
                 </listitem>
             </varlistentry>
             <varlistentry>
@@ -1833,8 +1838,8 @@
                     <para>Most client devices are connected to a color monitor, or at least have settings related to
                         such a device. If the <literal>Screen parameters</literal>feature is enabled, and a change in
                         color depth is detected, a fixed number of penalty points is added. Default: 35.</para>
-                    <para><command>ssoadm</command> attribute:</para>
-                    <literal>iplanet-am-auth-adaptive-device-print-screen-color-depth-penalty-points</literal>
+                    <para><command>ssoadm</command> attribute:
+                    <literal>iplanet-am-auth-adaptive-device-print-screen-color-depth-penalty-points</literal></para>
                 </listitem>
             </varlistentry>
             <varlistentry>
@@ -1843,8 +1848,8 @@
                     <para>Differences in screen resolution sometimes indicate that the user has changed monitors, or
                         perhaps is adjusting to changing eyesight. Whenever a different screen resolution is detected,
                         a fixed number of penalty points is added. Default: 35.</para>
-                    <para><command>ssoadm</command> attribute:</para>
-                    <literal>iplanet-am-auth-adaptive-device-print-screen-resolution-penalty-points</literal>
+                    <para><command>ssoadm</command> attribute:
+                    <literal>iplanet-am-auth-adaptive-device-print-screen-resolution-penalty-points</literal></para>
                 </listitem>
             </varlistentry>
             <varlistentry>
@@ -1853,8 +1858,8 @@
                     <para>Whenever a connection is made from a different timezone, the Device Print module normally
                         adds a fixed number of penalty points. Organizations where most users travel may want to set
                         this attribute to a lower value. Default: 35.</para>
-                    <para><command>ssoadm</command> attribute:</para>
-                    <literal>iplanet-am-auth-adaptive-device-print-timezone-penalty-points</literal>
+                    <para><command>ssoadm</command> attribute:
+                    <literal>iplanet-am-auth-adaptive-device-print-timezone-penalty-points</literal></para>
                 </listitem>
             </varlistentry>
             <varlistentry>
@@ -1863,8 +1868,8 @@
                     <para>If geolocation is enabled, each profile should include a geographic location. The allowed
                     location range specifies a maximum distance, in miles. If a user has travelled beyond that distance,
                     the <literal>Location penalty points</literal> is added to the total. Default: 100.</para>
-                    <para><command>ssoadm</command> attribute:</para>
-                    <literal>iplanet-am-auth-adaptive-device-print-location-allowed-range</literal>
+                    <para><command>ssoadm</command> attribute:
+                    <literal>iplanet-am-auth-adaptive-device-print-location-allowed-range</literal></para>
                 </listitem>
             </varlistentry>
             <varlistentry>
@@ -1873,8 +1878,8 @@
                     <para>Upgrades change the version associated with a user agent. Unless this option is enabled, every
                         change in the version of a browser or related fields is detected as a difference with the stored
                         profile.</para>
-                    <para><command>ssoadm</command> attribute:</para>
-                    <literal>iplanet-am-auth-adaptive-device-print-ignore-version-in-user-agent</literal>
+                    <para><command>ssoadm</command> attribute:
+                    <literal>iplanet-am-auth-adaptive-device-print-ignore-version-in-user-agent</literal></para>
                 </listitem>
             </varlistentry>
             <varlistentry>
@@ -1882,8 +1887,8 @@
                 <listitem>
                     <para>If the <literal>Installed fonts required</literal> attribute is enabled, a comparison is made
                         in installed fonts between the existing and stored profiles.</para>
-                    <para><command>ssoadm</command> attribute:</para>
-                    <literal>iplanet-am-auth-adaptive-device-print-max-tolerated-diffs-in-installed-fonts</literal>
+                    <para><command>ssoadm</command> attribute:
+                    <literal>iplanet-am-auth-adaptive-device-print-max-tolerated-diffs-in-installed-fonts</literal></para>
                 </listitem>
             </varlistentry>
             <varlistentry>
@@ -1892,8 +1897,8 @@
                     <para>If the <literal>Installed fonts required</literal> attribute is enabled, a comparison is made
                         in installed fonts between the existing and stored profiles. Any differences in number of fonts
                         is noted in percent.</para>
-                    <para><command>ssoadm</command> attribute:</para>
-                    <literal>iplanet-am-auth-adaptive-device-print-max-tolerated-percentage-to-mark-as-different-installed-fonts</literal>
+                    <para><command>ssoadm</command> attribute:
+                    <literal>iplanet-am-auth-adaptive-device-print-max-tolerated-percentage-to-mark-as-different-installed-fonts</literal></para>
                 </listitem>
             </varlistentry>
             <varlistentry>
@@ -1901,8 +1906,8 @@
                 <listitem>
                     <para>If the <literal>Installed plugins required</literal> attribute is enabled, a comparison is made
                         between the installed plugins defined in the existing and stored profiles.</para>
-                    <para><command>ssoadm</command> attribute:</para>
-                    <literal>iplanet-am-auth-adaptive-device-print-max-tolerated-diffs-in-installed-plugins</literal>
+                    <para><command>ssoadm</command> attribute:
+                    <literal>iplanet-am-auth-adaptive-device-print-max-tolerated-diffs-in-installed-plugins</literal></para>
                 </listitem>
             </varlistentry>
             <varlistentry>
@@ -1911,8 +1916,8 @@
                     <para>If the <literal>Installed plugins required</literal> attribute is enabled, a comparison is
                         made between the installed plugins defined in the existing and stored profiles. Any differences
                         in number of plugins is noted in percent.</para>
-                    <para><command>ssoadm</command> attribute:</para>
-                    <literal>iplanet-am-auth-adaptive-device-print-max-tolerated-percentage-to-mark-as-different-plugins</literal>
+                    <para><command>ssoadm</command> attribute:
+                    <literal>iplanet-am-auth-adaptive-device-print-max-tolerated-percentage-to-mark-as-different-plugins</literal></para>
                 </listitem>
             </varlistentry>
             <varlistentry>
@@ -1922,8 +1927,8 @@
                         xlink:href="http://tools.ietf.org/html/rfc4226#section-14.43">RFC 4226 Section 14.43</link>
                         provides information about the browser, and frequently on the operating system. Default:
                         enabled.</para>
-                    <para><command>ssoadm</command> attribute:</para>
-                    <literal>iplanet-am-auth-adaptive-device-print-user-agent-required</literal>
+                    <para><command>ssoadm</command> attribute:
+                    <literal>iplanet-am-auth-adaptive-device-print-user-agent-required</literal></para>
                 </listitem>
             </varlistentry>
             <varlistentry>
@@ -1931,8 +1936,8 @@
                 <listitem>
                     <para>Plugins are components that add a specific feature to an existing application. In this
                         context, examples of browser plugins are flash, java, and shockwave.</para>
-                    <para><command>ssoadm</command> attribute:</para>
-                    <literal>iplanet-am-auth-adaptive-device-print-plugins-required</literal>
+                    <para><command>ssoadm</command> attribute:
+                    <literal>iplanet-am-auth-adaptive-device-print-plugins-required</literal></para>
                 </listitem>
             </varlistentry>
             <varlistentry>
@@ -1941,8 +1946,8 @@
                     <para>Fonts are frequently added to an operating system when new applications are installed. If
                         enabled, installed font information is stored as part of the profile, and checked upon
                         reconnection for comparison.</para>
-                    <para><command>ssoadm</command> attribute:</para>
-                    <literal>iplanet-am-auth-adaptive-device-print-fonts-required</literal>
+                    <para><command>ssoadm</command> attribute:
+                    <literal>iplanet-am-auth-adaptive-device-print-fonts-required</literal></para>
                 </listitem>
             </varlistentry>
             <!-- see OPENAM-2492; this should be changed (IMO) to "Geolocation required" -->
@@ -1951,8 +1956,8 @@
                 <listitem>
                     <para>The geographic location of a device can be tracked. Can be used to limit access from this device to a
                         specified range.</para>
-                    <para><command>ssoadm</command> attribute:</para>
-                    <literal>iplanet-am-auth-adaptive-device-print-geolocation-required</literal>
+                    <para><command>ssoadm</command> attribute:
+                    <literal>iplanet-am-auth-adaptive-device-print-geolocation-required</literal></para>
                 </listitem>
             </varlistentry>
             <varlistentry>
@@ -1960,16 +1965,16 @@
                 <listitem>
                     <para>Display parameters can be used to help differentiate a profile. If enabled, the Device Print module uses
                         screen color depth and resolution.</para>
-                    <para><command>ssoadm</command> attribute:</para>
-                    <literal>iplanet-am-auth-adaptive-device-print-screen-params-required</literal>
+                    <para><command>ssoadm</command> attribute:
+                    <literal>iplanet-am-auth-adaptive-device-print-screen-params-required</literal></para>
                 </listitem>
             </varlistentry>
             <varlistentry>
                 <term>Time zone required</term>
                 <listitem>
                     <para>The time zone of the current and stored profiles can be collected and compared.</para>
-                    <para><command>ssoadm</command> attribute:</para>
-                    <literal>iplanet-am-auth-adaptive-device-print-timezone-required</literal>
+                    <para><command>ssoadm</command> attribute:
+                    <literal>iplanet-am-auth-adaptive-device-print-timezone-required</literal></para>
                 </listitem>
             </varlistentry>
             <varlistentry>
@@ -1977,8 +1982,8 @@
                 <listitem>
                     <para>If geo-location has been enabled, and the current location does not match the value stored in
                     the profile this many points are added as a penalty. Default: 35.</para>
-                    <para><command>ssoadm</command> attribute:</para>
-                    <literal>iplanet-am-auth-adaptive-device-print-location-penalty-points</literal>
+                    <para><command>ssoadm</command> attribute:
+                    <literal>iplanet-am-auth-adaptive-device-print-location-penalty-points</literal></para>
                 </listitem>
             </varlistentry>
             <varlistentry>
@@ -1986,8 +1991,8 @@
                 <listitem>
                     <para>A limit, in number of points, between the current and stored Device Print profiles. If the
                     total is below that value, the Device Print module sees a match. Default: 50.</para>
-                    <para><command>ssoadm</command> attribute:</para>
-                    <literal>iplanet-am-auth-adaptive-device-print-max-tolerated-penalty-points</literal>
+                    <para><command>ssoadm</command> attribute:
+                    <literal>iplanet-am-auth-adaptive-device-print-max-tolerated-penalty-points</literal></para>
                 </listitem>
             </varlistentry>
             <varlistentry>
@@ -2137,9 +2142,10 @@
    <variablelist>
     <varlistentry>
      <term>Authentication Level</term>
+     <listitem>
       <para>Sets the authentication level used to indicate the level of security
       associated with the module. The value can range from 0 to any positive integer.</para>
-      <listitem><para><command>ssoadm</command> attribute:
+      <para><command>ssoadm</command> attribute:
       <literal>sunAMAuthFederationAuthLevel</literal></para></listitem>
     </varlistentry>
    </variablelist>
@@ -2174,9 +2180,10 @@
    <variablelist>
     <varlistentry>
      <term>Authentication Level</term>
+     <listitem>
       <para>Sets the authentication level used to indicate the level of security
       associated with the module. The value can range from 0 to any positive integer.</para>
-      <listitem><para><command>ssoadm</command> attribute:
+      <para><command>ssoadm</command> attribute:
       <literal>sunAMAuthHOTPAuthLevel</literal></para></listitem>
     </varlistentry>
     <varlistentry>
@@ -2332,9 +2339,10 @@
     </varlistentry>
     <varlistentry>
      <term>Authentication Level</term>
+     <listitem>
       <para>Sets the authentication level used to indicate the level of security
       associated with the module. The value can range from 0 to any positive integer.</para>
-      <listitem><para><command>ssoadm</command> attribute:
+      <para><command>ssoadm</command> attribute:
       <literal>iplanet-am-auth-httpbasic-auth-level</literal></para></listitem>
     </varlistentry>
    </variablelist>
@@ -2444,9 +2452,10 @@
     </varlistentry>
     <varlistentry>
      <term>Authentication Level</term>
+     <listitem>
       <para>Sets the authentication level used to indicate the level of security
       associated with the module. The value can range from 0 to any positive integer.</para>
-     <listitem><para><command>ssoadm</command> attribute:
+      <para><command>ssoadm</command> attribute:
      <literal>sunAMAuthJDBCAuthLevel</literal></para></listitem>
     </varlistentry>
    </variablelist>
@@ -2649,9 +2658,10 @@
     </varlistentry>
     <varlistentry>
      <term>Authentication Level</term>
+     <listitem>
       <para>Sets the authentication level used to indicate the level of security
       associated with the module. The value can range from 0 to any positive integer.</para>
-     <listitem><para><command>ssoadm</command> attribute:
+     <para><command>ssoadm</command> attribute:
      <literal>iplanet-am-auth-ldap-auth-level</literal></para></listitem>
     </varlistentry>
    </variablelist>
@@ -2706,9 +2716,10 @@
     </varlistentry>
     <varlistentry>
      <term>Authentication Level</term>
+     <listitem>
       <para>Sets the authentication level used to indicate the level of security
       associated with the module. The value can range from 0 to any positive integer.</para>
-     <listitem><para><command>ssoadm</command> attribute:
+      <para><command>ssoadm</command> attribute:
      <literal>iplanet-am-auth-membership-auth-level</literal></para></listitem>
     </varlistentry>
    </variablelist>
@@ -2856,9 +2867,10 @@
     </varlistentry>
     <varlistentry>
      <term>Authentication Level</term>
+     <listitem>
       <para>Sets the authentication level used to indicate the level of security
       associated with the module. The value can range from 0 to any positive integer.</para>
-     <listitem><para><command>ssoadm</command> attribute:
+      <para><command>ssoadm</command> attribute:
      <literal>sunAMAuthMSISDNAuthLevel</literal></para></listitem>
     </varlistentry>
    </variablelist>
@@ -2915,9 +2927,10 @@
    <variablelist>
     <varlistentry>
      <term>Authentication Level</term>
+     <listitem>
       <para>Sets the authentication level used to indicate the level of security
       associated with the module. The value can range from 0 to any positive integer.</para>
-     <listitem><para><command>ssoadm</command> attribute:
+      <para><command>ssoadm</command> attribute:
       <literal>iplanet-am-auth-oath-auth-level</literal></para></listitem>
     </varlistentry>
     <varlistentry>
@@ -3306,9 +3319,10 @@
     </varlistentry>
     <varlistentry>
      <term>Authentication Level</term>
+     <listitem>
       <para>Sets the authentication level used to indicate the level of security
       associated with the module. The value can range from 0 to any positive integer.</para>
-      <listitem><para><command>ssoadm</command> attribute:
+      <para><command>ssoadm</command> attribute:
       <literal>iplanet-am-auth-oauth-auth-level</literal></para></listitem>
     </varlistentry>
    </variablelist>
@@ -3568,9 +3582,10 @@
     </varlistentry>
     <varlistentry>
      <term>Authentication Level</term>
+     <listitem>
       <para>Sets the authentication level used to indicate the level of security
       associated with the module. The value can range from 0 to any positive integer.</para>
-     <listitem><para><command>ssoadm</command> attribute:
+      <para><command>ssoadm</command> attribute:
      <literal>iplanet-am-auth-radius-auth-level</literal></para></listitem>
     </varlistentry>
    </variablelist>
@@ -3595,9 +3610,10 @@
    <variablelist>
     <varlistentry>
      <term>Authentication Level</term>
+     <listitem>
       <para>Sets the authentication level used to indicate the level of security
       associated with the module. The value can range from 0 to any positive integer.</para>
-     <listitem><para><command>ssoadm</command> attribute:
+      <para><command>ssoadm</command> attribute:
      <literal>sunAMAuthSAEAuthLevel</literal></para></listitem>
     </varlistentry>
    </variablelist>
@@ -3632,9 +3648,10 @@
     </varlistentry>
     <varlistentry>
      <term>Authentication Level</term>
+     <listitem>
       <para>Sets the authentication level used to indicate the level of security
       associated with the module. The value can range from 0 to any positive integer.</para>
-     <listitem><para><command>ssoadm</command> attribute:
+      <para><command>ssoadm</command> attribute:
      <literal>iplanet-am-auth-securid-auth-level</literal></para></listitem>
     </varlistentry>
    </variablelist>
@@ -3724,9 +3741,10 @@
     </varlistentry>
     <varlistentry>
      <term>Authentication Level</term>
+     <listitem>
       <para>Sets the authentication level used to indicate the level of security
       associated with the module. The value can range from 0 to any positive integer.</para>
-      <listitem><para><command>ssoadm</command> attribute:
+      <para><command>ssoadm</command> attribute:
       <literal>iplanet-am-auth-windowsdesktopsso-auth-level</literal></para></listitem>
     </varlistentry>
     <varlistentry>
@@ -3785,9 +3803,10 @@
     </varlistentry>
     <varlistentry>
      <term>Authentication Level</term>
+     <listitem>
       <para>Sets the authentication level used to indicate the level of security
       associated with the module. The value can range from 0 to any positive integer.</para>
-      <listitem><para><command>ssoadm</command> attribute:
+      <para><command>ssoadm</command> attribute:
       <literal>iplanet-am-auth-nt-auth-level</literal></para></listitem>
     </varlistentry>
    </variablelist>
@@ -3836,9 +3855,10 @@
     </varlistentry>
     <varlistentry>
      <term>Authentication Level</term>
+     <listitem>
       <para>Sets the authentication level used to indicate the level of security
       associated with the module. The value can range from 0 to any positive integer.</para>
-     <listitem><para><command>ssoadm</command> attribute:
+      <para><command>ssoadm</command> attribute:
       <literal>sunWebservicesAuthenticationLevel</literal></para></listitem>
     </varlistentry>
    </variablelist>
