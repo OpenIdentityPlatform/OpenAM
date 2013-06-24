@@ -77,6 +77,9 @@ $ which java
   <variablelist>
    <para>When you unzip the policy agent, you find the following directories
    under the <filename>j2ee_agents/websphere_v61_agent</filename> directory.</para>
+
+   <para>Despite the directory name, the policy agent supports
+   <?eval ${agentWebSphereSupport}?>.</para>
    <varlistentry>
     <term><filename>bin</filename></term>
     <listitem>

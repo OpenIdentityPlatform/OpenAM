@@ -75,6 +75,9 @@ $ which java
   <variablelist>
    <para>When you unzip the policy agent, you find the following directories
    under the <filename>j2ee_agents/weblogic_v10_agent</filename> directory.</para>
+
+   <para>Despite the directory name, the policy agent supports
+   <?eval ${agentWebLogicSupport}?>.</para>
    <varlistentry>
     <term><filename>bin</filename></term>
     <listitem>

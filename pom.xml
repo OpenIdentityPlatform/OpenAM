@@ -1987,10 +1987,11 @@
                 </configuration>
             </plugin>
 
+            <!-- Run link test as part of the documentation build
             <plugin>
                 <groupId>org.forgerock.maven.plugins</groupId>
                 <artifactId>linktester-maven-plugin</artifactId>
-                <version>1.1.0</version>
+                <version>1.2.0</version>
                 <inherited>false</inherited>
                 <configuration>
                     <includes>
@@ -2010,6 +2011,7 @@
                     </execution>
                 </executions>
             </plugin>
+            -->
         </plugins>
 
         <pluginManagement>

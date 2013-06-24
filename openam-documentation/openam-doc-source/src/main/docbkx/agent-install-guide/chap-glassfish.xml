@@ -51,7 +51,8 @@
   to test your policy agent after installation.</para>
 
   <para>You must install GlassFish before you install the policy agent, and you
-  must stop the domain with applications to protect during installation.</para>
+  must stop the domain with applications to protect during installation. Policy
+  agents support <?eval ${agentGlassFishSupport}?>.</para>
   
   <para>You must install a Java 6 runtime environment, and set the
   <literal>JAVA_HOME</literal> environment variable.</para>

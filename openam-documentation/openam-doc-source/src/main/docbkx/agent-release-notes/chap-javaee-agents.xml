@@ -129,23 +129,22 @@
     containers.</para>
 
     <listitem>
-     <para>Apache Tomcat 6, 7</para>
+     <para><?eval ${agentTomcatSupport}?></para>
     </listitem>
     <listitem>
-     <para>GlassFish v2, v3</para>
+     <para><?eval ${agentGlassFishSupport}?></para>
     </listitem>
     <listitem>
-     <para>IBM WebSphere Application Server <!-- 6.1, -->7, 8, 8.5</para>
+     <para><?eval ${agentWebSphereSupport}?></para>
     </listitem>
     <listitem>
-     <para>JBoss Enterprise Application Platform 5</para>
-     <!-- Pending OPENAM-1735: <para>JBoss Application Server 7.1</para>-->
+     <para><?eval ${agentJBossSupport}?></para>
     </listitem>
     <listitem>
-     <para>Jetty 7</para>
+     <para><?eval ${agentJettySupport}?></para>
     </listitem>
     <listitem>
-     <para>Oracle WebLogic Server 10g or later</para>
+     <para><?eval ${agentWebLogicSupport}?></para>
     </listitem>
    </itemizedlist>
   </section>

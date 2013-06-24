@@ -222,19 +222,18 @@
     <para>Web policy agents support the following web servers.</para>
 
     <listitem>
-     <para>Apache HTTP Server 2.0, 2.2, 2.4</para>
+     <para><?eval ${agentApacheSupport}?></para>
     </listitem>
     <listitem>
-     <para>Microsoft IIS 6, 7</para>
+     <para><?eval ${agentIISSupport}?></para>
     </listitem>
  <!-- Pending doc and testing
     <listitem>
-     <para>Nginx 1.???</para>
+     <para><?eval ${agentNginxSupport}?></para>
     </listitem>
   -->
      <listitem>
-      <para>Oracle iPlanet Web Server 7.0 (also known as Sun Web Server)
-      <!-- (deprecated)--></para>
+      <para><?eval ${agentSunWebServerSupport}?></para>
 
       <para>In this release, this web policy agent is not at feature parity with
       the other web policy agents and is lacking some fixes. In particular,
@@ -252,7 +251,7 @@
       Solaris.</para>
      </listitem>
      <listitem>
-      <para>Sun Proxy Server 4.0 (deprecated)</para>
+      <para><?eval ${agentSunProxyServerSupport}?></para>
      </listitem>
     </itemizedlist>
    </section>
