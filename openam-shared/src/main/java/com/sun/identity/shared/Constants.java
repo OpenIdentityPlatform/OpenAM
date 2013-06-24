@@ -907,6 +907,8 @@ public interface Constants {
     static final String SERVERID_LBCOOKIEVALUE_LIST =
             "iplanet-am-platform-lb-cookie-value-list";
 
+    static final String DISTAUTH_BOOTSTRAP_FILE = "openam.das.bootstrap.file";
+
     /**
      * Configuration Variable for distauth bootstrap file base directory.
      */
