@@ -52,7 +52,7 @@ public class AuthnFilterConfiguratorTest {
         Configuration configuration = argumentCaptor.getValue();
         assertEquals(configuration.keySet().size(), 1);
         Map<String, Object> authContext = configuration.get("all");
-        Map<String, String> sessionModule = (Map<String, String>) authContext.get("session-module");
-        assertEquals(sessionModule.get("class-name"), LocalSSOTokenSessionModule.class.getCanonicalName());
+        Map<String, String> sessionModule = (Map<String, String>) authContext.get("sessionModule");
+        assertEquals(sessionModule.get("className"), LocalSSOTokenSessionModule.class.getCanonicalName());
     }
 }

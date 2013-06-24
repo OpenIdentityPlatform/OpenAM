@@ -18,6 +18,7 @@ package org.forgerock.openam.utils;
 
 import com.sun.identity.saml.xmlsig.KeyProvider;
 import com.sun.identity.security.EncodeAction;
+import com.sun.identity.shared.encode.URLEncDec;
 import org.testng.Assert;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
@@ -27,10 +28,10 @@ import java.security.PrivateKey;
 import java.security.PublicKey;
 import java.security.cert.X509Certificate;
 
-
 public class AMKeyProviderTest {
 
-    private static final String KEY_STORE_FILE = ClassLoader.getSystemResource("keystore.jks").getFile();
+    private static final String KEY_STORE_FILE = URLEncDec.decode(ClassLoader.getSystemResource("keystore.jks")
+            .getFile());
     private static final String KEY_STORE_TYPE = "JKS";
     private static final String KEY_STORE_PASS = "testcase";
     private static final String DEFAULT_PRIVATE_KEY_PASS = "testcase";

@@ -18,6 +18,7 @@ package com.sun.identity.saml.xmlsig;
 
 import com.sun.identity.security.EncodeAction;
 import com.sun.identity.shared.debug.Debug;
+import com.sun.identity.shared.encode.URLEncDec;
 import com.sun.identity.shared.xml.XMLUtils;
 import org.forgerock.openam.utils.AMKeyProvider;
 import org.testng.Assert;
@@ -31,7 +32,8 @@ import java.security.AccessController;
 
 public class XMLSignatureManagerTest {
 
-    private static final String KEY_STORE_FILE = ClassLoader.getSystemResource("keystore.jks").getFile();
+    private static final String KEY_STORE_FILE = URLEncDec.decode(ClassLoader.getSystemResource("keystore.jks")
+            .getFile());
     private static final String KEY_STORE_TYPE = "JKS";
     private static final String KEY_STORE_PASS = "testcase";
     private static final String DEFAULT_PRIVATE_KEY_PASS = "testcase";
