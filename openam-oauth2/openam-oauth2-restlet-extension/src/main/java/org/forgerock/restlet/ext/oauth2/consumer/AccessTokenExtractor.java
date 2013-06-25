@@ -238,6 +238,7 @@ public abstract class AccessTokenExtractor<T extends CoreToken> {
                 && MediaType.APPLICATION_JSON.equals(response.getEntity().getMediaType())) {
             try {
                 token = new JacksonRepresentation<Map>(response.getEntity(), Map.class).getObject();
+
             } catch (IOException e) {
                 /* ignored */
             }

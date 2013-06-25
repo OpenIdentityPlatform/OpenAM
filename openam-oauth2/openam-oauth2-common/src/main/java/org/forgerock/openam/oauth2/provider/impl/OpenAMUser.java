@@ -21,7 +21,7 @@
  * your own identifying information:
  * "Portions Copyrighted [2012] [Forgerock Inc]"
  */
-package org.forgerock.restlet.ext.openam;
+package org.forgerock.openam.oauth2.provider.impl;
 
 import org.restlet.security.User;
 

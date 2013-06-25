@@ -26,7 +26,7 @@ package org.forgerock.restlet.ext.openam.server;
 
 import org.forgerock.restlet.ext.openam.OpenAMParameters;
 import org.forgerock.restlet.ext.openam.OpenAMTestBase;
-import org.forgerock.restlet.ext.openam.OpenAMUser;
+import org.forgerock.openam.oauth2.provider.impl.OpenAMUser;
 import org.forgerock.restlet.ext.openam.client.OpenAMProxy;
 import org.restlet.Client;
 import org.restlet.Context;

@@ -24,6 +24,7 @@
 
 package org.forgerock.restlet.ext.openam;
 
+import org.forgerock.openam.oauth2.provider.impl.OpenAMUser;
 import org.restlet.representation.Representation;
 import org.restlet.representation.StringRepresentation;
 import org.restlet.resource.Get;

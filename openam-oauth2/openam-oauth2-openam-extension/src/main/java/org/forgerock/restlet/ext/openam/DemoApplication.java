@@ -24,7 +24,7 @@
 
 package org.forgerock.restlet.ext.openam;
 
-import org.forgerock.restlet.ext.openam.internal.OpenAMServerAuthorizer;
+import org.forgerock.openam.oauth2.provider.impl.OpenAMServerAuthorizer;
 import org.forgerock.restlet.ext.openam.server.OpenAMServletAuthenticator;
 import org.restlet.Application;
 import org.restlet.Restlet;

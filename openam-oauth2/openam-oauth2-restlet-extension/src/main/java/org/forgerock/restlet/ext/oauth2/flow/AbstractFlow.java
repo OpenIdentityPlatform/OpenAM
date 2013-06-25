@@ -32,6 +32,8 @@ import com.sun.identity.shared.OAuth2Constants;
 import org.forgerock.openam.oauth2.model.CoreToken;
 import org.forgerock.openam.oauth2.provider.OAuth2ProviderSettings;
 import org.forgerock.openam.oauth2.provider.Scope;
+import org.forgerock.openam.oauth2.provider.impl.OpenAMIdentityVerifier;
+import org.forgerock.openam.oauth2.provider.impl.OpenAMServerAuthorizer;
 import org.forgerock.openam.oauth2.utils.OAuth2Utils;
 import org.forgerock.openam.oauth2.exceptions.OAuthProblemException;
 import org.forgerock.openam.oauth2.model.ClientApplication;
@@ -71,6 +73,8 @@ public abstract class AbstractFlow extends ServerResource {
     protected SessionClient sessionClient = null;
     protected boolean issueRefreshToken = false;
     protected boolean fragment = false;
+
+    protected static final int RESULT_VALID = 4;
 
     /**
      * If the {@link AbstractFlow#getCheckedScope} change the requested scope
@@ -376,8 +380,16 @@ public abstract class AbstractFlow extends ServerResource {
     }
 
     protected User getAuthenticatedResourceOwner() throws OAuthProblemException {
-        if (getRequest().getClientInfo().getUser() != null
-                && getRequest().getClientInfo().isAuthenticated()) {
+        //authenticate the resource owner
+        OpenAMIdentityVerifier identityVerifier = new OpenAMIdentityVerifier(getContext());
+        int verified = identityVerifier.verify(getRequest(), getResponse());
+        if (verified != RESULT_VALID){
+            OAuth2Utils.DEBUG.warning("AuthorizeServerResource.represent(): Unable to login resource owner.");
+            throw OAuthProblemException.OAuthError.SERVER_ERROR.handle(getRequest(), "Resource Owner unable to login");
+        }
+        OpenAMServerAuthorizer authorizer = new OpenAMServerAuthorizer();
+        authorizer.handle(getRequest(), getResponse());
+        if (getRequest().getClientInfo().getUser() != null) {
             return getRequest().getClientInfo().getUser();
         }
         OAuth2Utils.DEBUG.error("The authorization server can not authenticate the resource owner.");

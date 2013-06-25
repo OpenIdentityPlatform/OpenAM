@@ -22,7 +22,7 @@
  * "Portions Copyrighted [year] [name of copyright owner]"
  */
 
-package org.forgerock.openam.oauth2.internal;
+package org.forgerock.openam.oauth2.provider;
 
 import java.util.ArrayList;
 
@@ -31,7 +31,6 @@ import javax.security.auth.callback.NameCallback;
 import javax.security.auth.callback.PasswordCallback;
 
 import org.forgerock.openam.oauth2.utils.OAuth2Utils;
-import org.forgerock.restlet.ext.openam.OpenAMParameters;
 import org.restlet.Request;
 import org.restlet.Response;
 import org.restlet.data.Status;

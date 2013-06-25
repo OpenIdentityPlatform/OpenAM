@@ -22,7 +22,7 @@
  * "Portions Copyrighted [2012] [Forgerock Inc]"
  */
 
-package org.forgerock.restlet.ext.openam.internal;
+package org.forgerock.openam.oauth2.provider.impl;
 
 import java.util.HashMap;
 import java.util.HashSet;
@@ -31,15 +31,14 @@ import java.util.Map;
 import java.util.Set;
 
 import org.forgerock.openam.oauth2.utils.OAuth2Utils;
-import org.forgerock.restlet.ext.openam.OpenAMUser;
-import org.forgerock.restlet.ext.openam.server.AbstractOpenAMAuthorizer;
+import org.forgerock.openam.oauth2.provider.impl.OpenAMUser;
+import org.forgerock.openam.oauth2.provider.AbstractOpenAMAuthorizer;
 import org.restlet.Request;
 import org.restlet.Response;
 import org.restlet.data.Status;
 import org.restlet.resource.ResourceException;
 
 import com.iplanet.sso.SSOException;
-import com.sun.identity.policy.PolicyDecision;
 import com.sun.identity.policy.PolicyEvaluator;
 import com.sun.identity.policy.PolicyException;
 
@@ -94,13 +93,9 @@ public class OpenAMServerAuthorizer extends AbstractOpenAMAuthorizer {
         Set<String> paramValue = new HashSet<String>(1);
         paramValue.add(getIdentifier());
         env.put("application_identifier", paramValue);
-        // env.put(Condition.REQUEST_AUTHENTICATED_TO_REALMS, "/");
 
         Set<String> actions = new HashSet<String>();
         actions.add(request.getMethod().getName());
-        PolicyDecision pd =
-                pe.getPolicyDecision(user.getToken(), request.getResourceRef().toString(), actions,
-                        env);
         return pe.isAllowed(user.getToken(), request.getResourceRef().toString(), request
                 .getMethod().getName(), env);
     }

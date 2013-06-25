@@ -32,6 +32,8 @@ import org.forgerock.openam.oauth2.exceptions.OAuthProblemException;
 import org.forgerock.openam.oauth2.model.CoreToken;
 import org.forgerock.openam.oauth2.provider.OAuth2ProviderSettings;
 import org.forgerock.openam.oauth2.provider.ResponseType;
+import org.forgerock.openam.oauth2.provider.impl.OpenAMIdentityVerifier;
+import org.forgerock.openam.oauth2.provider.impl.OpenAMServerAuthorizer;
 import org.forgerock.openam.oauth2.utils.OAuth2Utils;
 import org.restlet.data.Form;
 import org.restlet.data.Parameter;
@@ -64,7 +66,6 @@ public class AuthorizeServerResource extends AbstractFlow {
      */
     @Get("html")
     public Representation represent() {
-        resourceOwner = getAuthenticatedResourceOwner();
 
         // Validate the client
         client = validateRemoteClient();
@@ -107,6 +108,9 @@ public class AuthorizeServerResource extends AbstractFlow {
             OAuth2Utils.DEBUG.warning("AuthorizeServerResource.represent(): Requested a response type that is not configured.");
             throw OAuthProblemException.OAuthError.UNSUPPORTED_RESPONSE_TYPE.handle(getRequest(), "Response type is not supported");
         }
+
+        //authenticate the resource owner
+        resourceOwner = getAuthenticatedResourceOwner();
 
         //check for saved consent
         if (!savedConsent(resourceOwner.getIdentifier(), sessionClient.getClientId(), checkedScope) ||
@@ -322,7 +326,10 @@ public class AuthorizeServerResource extends AbstractFlow {
         for(String consent : attributeSet){
             int loc = consent.indexOf(" ");
             String consentClientId = consent.substring(0, loc);
-            String[] scopesArray = consent.substring(loc+1, consent.length()).split(" ");
+            String[] scopesArray = null;
+            if (loc+1 <= consent.length()){
+                scopesArray = consent.substring(loc+1, consent.length()).split(" ");
+            }
             Set<String> consentScopes = null;
             if (scopesArray != null && scopesArray.length > 0){
                 consentScopes = new HashSet<String>(Arrays.asList(scopesArray));
@@ -348,7 +355,11 @@ public class AuthorizeServerResource extends AbstractFlow {
             //get the current set of consents and add our new consent to it.
             Set<String> consents = new HashSet<String>(id.getAttribute(consentAttribute));
             StringBuilder sb = new StringBuilder();
-            sb.append(clientId.trim()).append(" ").append(scopes.trim());
+            if(scopes == null || scopes.isEmpty()){
+                sb.append(clientId.trim()).append(" ");
+            } else {
+                sb.append(clientId.trim()).append(" ").append(scopes.trim());
+            }
             consents.add(sb.toString());
 
             //update the user profile with our new consent settings

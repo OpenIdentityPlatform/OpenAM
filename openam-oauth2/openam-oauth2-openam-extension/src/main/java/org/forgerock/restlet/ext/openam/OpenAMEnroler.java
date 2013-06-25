@@ -25,6 +25,7 @@ package org.forgerock.restlet.ext.openam;
 
 import java.util.Set;
 
+import org.forgerock.openam.oauth2.provider.impl.OpenAMUser;
 import org.restlet.data.ClientInfo;
 import org.restlet.security.Enroler;
 import org.restlet.security.Role;

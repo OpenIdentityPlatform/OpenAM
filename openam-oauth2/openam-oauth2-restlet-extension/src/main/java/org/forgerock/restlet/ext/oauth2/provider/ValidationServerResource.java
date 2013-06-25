@@ -165,7 +165,7 @@ public class ValidationServerResource extends ServerResource implements
         }
 
         if (error != null) {
-            response.putAll(error.getErrorMessage());
+            throw error;
         }
 
         // Sets the no-store Cache-Control header
