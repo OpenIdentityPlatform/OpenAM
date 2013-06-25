@@ -119,7 +119,7 @@ public class AuthorizationCodeServerResource extends AbstractFlow {
             getTokenStore().updateAuthorizationCode(code_p, code);
             Map<String, Object> response = token.convertToMap();
 
-            if (token != null && !token.getRefreshToken().isEmpty()){
+            if (token != null && token.getRefreshToken() != null && !token.getRefreshToken().isEmpty()){
                 response.put(OAuth2Constants.Params.REFRESH_TOKEN, token.getRefreshToken());
             }
 

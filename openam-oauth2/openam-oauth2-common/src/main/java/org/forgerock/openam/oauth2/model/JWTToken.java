@@ -66,7 +66,7 @@ public class JWTToken extends CoreToken implements Token {
         setTokenType(OAuth2Constants.JWTTokenParams.JWT_TOKEN);
         setTokenName(OAuth2Constants.JWTTokenParams.ID_TOKEN);
         jwt = jwtBuilder.jwt();
-        jwt.content(super.asMap());
+        jwt = jwt.content(asMap());
 
     }
 
@@ -123,6 +123,9 @@ public class JWTToken extends CoreToken implements Token {
      * @param issuer user identifier of the issuer
      */
     private void setIssuer(String issuer){
+        if (issuer == null || issuer.isEmpty()){
+            return;
+        }
         super.put(OAuth2Constants.JWTTokenParams.ISS, issuer);
     }
 
@@ -131,6 +134,9 @@ public class JWTToken extends CoreToken implements Token {
      * @param subject identifier of the end user
      */
     private void setSubject(String subject){
+        if (subject == null || subject.isEmpty()){
+            return;
+        }
         super.put(OAuth2Constants.JWTTokenParams.SUB, subject);
     }
 
@@ -139,6 +145,9 @@ public class JWTToken extends CoreToken implements Token {
      * @param audience The identifier of the audience
      */
     private void setAudience(String audience){
+        if (audience == null || audience.isEmpty()){
+            return;
+        }
         super.put(OAuth2Constants.JWTTokenParams.AUD, audience);
 
     }
@@ -148,6 +157,9 @@ public class JWTToken extends CoreToken implements Token {
      * @param party identifier of the client_id
      */
     private void setAuthorizeParty(String party){
+        if (party == null || party.isEmpty()){
+            return;
+        }
         super.put(OAuth2Constants.JWTTokenParams.AZP, party);
     }
 
@@ -176,14 +188,23 @@ public class JWTToken extends CoreToken implements Token {
     }
 
     protected void setTokenType(String tokenType){
+        if (tokenType == null || tokenType.isEmpty()){
+            return;
+        }
         super.put(OAuth2Constants.CoreTokenParams.TOKEN_TYPE, tokenType);
     }
 
     protected void setTokenName(String tokenName){
+        if (tokenName == null || tokenName.isEmpty()){
+            return;
+        }
         super.put(OAuth2Constants.CoreTokenParams.TOKEN_NAME, tokenName);
     }
 
     protected void setRealm(String realm){
+        if (realm == null || realm.isEmpty()){
+            return;
+        }
         this.put(OAuth2Constants.CoreTokenParams.REALM, realm);
     }
 
@@ -192,6 +213,9 @@ public class JWTToken extends CoreToken implements Token {
      * @param nonce
      */
     private void setNonce(String nonce){
+        if (nonce == null || nonce.isEmpty()){
+            return;
+        }
         super.put(OAuth2Constants.JWTTokenParams.NONCE, nonce);
     }
 

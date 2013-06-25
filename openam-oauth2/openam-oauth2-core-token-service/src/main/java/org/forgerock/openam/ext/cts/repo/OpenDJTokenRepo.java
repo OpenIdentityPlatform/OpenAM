@@ -125,8 +125,8 @@ public class OpenDJTokenRepo implements JsonResource {
                         try{
                             cts.delete(tokenAdapter.toToken(request));
                             if (OAuth2Utils.logStatus) {
-                                String[] obs = {"FAILED_DELETE_TOKEN", request.toString()};
-                                OAuth2Utils.logAccessMessage("FAILED_DELETE_TOKEN", obs, OAuth2Utils.getSSOToken(Request.getCurrent()));
+                                String[] obs = {"DELETED_TOKEN", request.toString()};
+                                OAuth2Utils.logAccessMessage("DELETED_TOKEN", obs, OAuth2Utils.getSSOToken(Request.getCurrent()));
                             }
                             return request;
                         } catch(CoreTokenException e){
