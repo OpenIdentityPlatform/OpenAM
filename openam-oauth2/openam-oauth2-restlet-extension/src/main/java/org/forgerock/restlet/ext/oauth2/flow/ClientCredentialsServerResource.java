@@ -81,7 +81,7 @@ public class ClientCredentialsServerResource extends AbstractFlow {
      */
     private CoreToken createAccessToken(Set<String> checkedScope) {
         return getTokenStore().createAccessToken(client.getClient().getAccessTokenType(),
-                checkedScope, OAuth2Utils.getRealm(getRequest()), null,
+                checkedScope, OAuth2Utils.getRealm(getRequest()),client.getClient().getClientId(),
                 client.getClient().getClientId(), null, null, null);
     }
 }
