@@ -37,14 +37,14 @@
  <section xml:id="java-requirements">
   <title>Java Requirements</title>
 
-  <para>This release of OpenAM requires Java Development Kit 1.6, at least
-  1.6.0_10. ForgeRock recommends the most recent release of Java 6 to
-  ensure you have the latest security fixes.</para>
+  <para>This release of OpenAM requires Java Development Kit 6 or
+  Java Development Kit 7. ForgeRock recommends the most recent update
+  of Java 6 or 7 to ensure you have the latest security fixes.</para>
   
   <para>ForgeRock has tested this release of OpenAM primarily with Oracle
   Java SE JDK.</para>
 
-  <para>OpenAM Java SDK requires Java Development Kit 1.5 or 1.6.</para>
+  <para>OpenAM Java SDK requires Java Development Kit 5, 6 or 7.</para>
  </section>
 
  <section xml:id="web-container-requirements">

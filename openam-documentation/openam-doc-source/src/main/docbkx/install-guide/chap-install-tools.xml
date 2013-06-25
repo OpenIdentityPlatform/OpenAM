@@ -73,7 +73,7 @@
    <para>Make sure the <literal>JAVA_HOME</literal> environment variable
    is properly set.</para>
    <screen>$ echo $JAVA_HOME
-/path/to/jdk1.6</screen>
+/path/to/jdk</screen>
   </step>
   <step>
    <para>Unpack the tools from where you unzipped OpenAM.</para>
@@ -191,7 +191,7 @@ http://openam.example.com:8080/openam</screen>
    <para>Make sure the <literal>JAVA_HOME</literal> environment variable
    is properly set.</para>
    <screen>$ echo $JAVA_HOME
-/path/to/jdk1.6</screen>
+/path/to/jdk</screen>
   </step>
   <step>
    <para>Unpack the tools from where you unzipped OpenAM.</para>
@@ -228,7 +228,7 @@ Archive:  ~/Downloads/openam/<?eval ${ssoadminZipFile}?>
    <para>Make sure the <literal>JAVA_HOME</literal> environment variable
    is properly set.</para>
    <screen>$ echo $JAVA_HOME
-/path/to/jdk1.6</screen>
+/path/to/jdk</screen>
   </step>
   <step>
    <para>Unpack the tools from where you unzipped OpenAM.</para>

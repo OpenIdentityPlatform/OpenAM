@@ -102,9 +102,12 @@
   <section xml:id="java-requirements-javaee-agents">
    <title>Java EE Agents Java Requirements</title>
 
-   <para>Java EE policy agents run in a container using Java 6 or later.
-   ForgeRock recommends the most recent release of Java 6 or later to ensure
-   you have the latest security fixes.</para>
+   <para>Java EE policy agents run in a Java EE Web container.
+       Please review the <link xlink:show="new"
+       xlink:href="http://openam.forgerock.org/openam-documentation/openam-doc-source/doc/release-notes/#java-requirements">
+           <citetitle>OpenAM Release Notes</citetitle></link> for the currently supported version
+       of Java. ForgeRock recommends the most recent update of the installed version of Java
+       to ensure you have the latest security fixes.</para>
 
    <para>ForgeRock has tested this release with Oracle Java SE JDK.</para>
   </section>

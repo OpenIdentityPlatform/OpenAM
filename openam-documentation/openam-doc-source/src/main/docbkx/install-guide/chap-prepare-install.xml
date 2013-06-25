@@ -66,7 +66,7 @@
    installation.</para>
 
    <listitem>
-    <para>A Java 6 runtime environment</para>
+    <para>A supported Java runtime environment</para>
 
     <para>Check the output of <command>java -version</command> to make
     sure your the version is supported according to the <citetitle>Release
@@ -289,7 +289,7 @@ $ unzip ~/Downloads/<?eval ${coreDirectoryFile}?>.zip</screen>
 # description: Manage Tomcat web application container
 CATALINA_HOME="/path/to/tomcat"
 export CATALINA_HOME
-JAVA_HOME=/path/to/jdk1.6
+JAVA_HOME=/path/to/jdk
 export JAVA_HOME
 CATALINA_OPTS="-Xmx1024m -XX:MaxPermSize=256m"
 export CATALINA_OPTS

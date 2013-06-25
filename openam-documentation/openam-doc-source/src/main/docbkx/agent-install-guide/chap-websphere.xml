@@ -53,12 +53,16 @@
 
   <para>You must install WebSphere before you install the policy agent, and you
   must stop the server during installation.</para>
-  
-  <para>You must install a Java 6 runtime environment, and set the
-  <literal>JAVA_HOME</literal> environment variable.</para>
 
-  <screen>$ echo $JAVA_HOME
-/path/to/java1.6
+      <para>You must install a supported version of the Java runtime environment.
+          Please review the <link xlink:show="new"
+          xlink:href="http://openam.forgerock.org/openam-documentation/openam-doc-source/doc/release-notes/#java-requirements">
+              <citetitle>OpenAM Release Notes</citetitle></link> for the currently supported version
+          of Java, and set the <literal>JAVA_HOME</literal> environment
+          variable accordingly.</para>
+
+      <screen>$ echo $JAVA_HOME
+/path/to/java
 $ which java
 /usr/bin/java</screen>
 

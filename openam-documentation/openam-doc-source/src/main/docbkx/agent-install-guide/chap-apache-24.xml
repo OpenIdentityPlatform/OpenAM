@@ -60,12 +60,14 @@
    http://httpd.apache.org/docs/2.4/install.html. This was on Ubuntu
    12.04 desktop.
   -->
-  
-  <para>You must install a Java 6 runtime environment, and set the
-  <literal>JAVA_HOME</literal> environment variable. The policy agent installer
-  requires Java.</para>
+     <para>You must install a supported version of the Java runtime environment.
+         Please review the <link xlink:show="new"
+         xlink:href="http://openam.forgerock.org/openam-documentation/openam-doc-source/doc/release-notes/#java-requirements">
+             <citetitle>OpenAM Release Notes</citetitle></link> for the currently supported version
+         of Java, and set the <literal>JAVA_HOME</literal> environment
+         variable accordingly. The policy agent installer requires Java.</para>
 
-  <para>>Go to <link xlink:href="install-guide#download-openam-software"
+     <para>>Go to <link xlink:href="install-guide#download-openam-software"
   xlink:role="http://docbook.org/xlink/role/olink"><citetitle>Obtaining OpenAM Software</citetitle></link>
   to determine which version of the agent to download and download the agent.
   Also verify the checksum of the file you download against the checksum

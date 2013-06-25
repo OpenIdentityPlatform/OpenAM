@@ -274,7 +274,7 @@ Password:
 Using CATALINA_BASE:   /path/to/tomcat
 Using CATALINA_HOME:   /path/to/tomcat
 Using CATALINA_TMPDIR: /path/to/tomcat/temp
-Using JRE_HOME:        /path/to/jdk1.6/jre
+Using JRE_HOME:        /path/to/jdk/jre
 Using CLASSPATH:
        /path/to/tomcat/bin/bootstrap.jar:/path/to/tomcat/bin/tomcat-juli.jar</screen>
   </step>
@@ -300,7 +300,7 @@ Password:
 Using CATALINA_BASE:   /path/to/tomcat
 Using CATALINA_HOME:   /path/to/tomcat
 Using CATALINA_TMPDIR: /path/to/tomcat/temp
-Using JRE_HOME:        /path/to/jdk1.6/jre
+Using JRE_HOME:        /path/to/jdk/jre
 Using CLASSPATH:
        /path/to/tomcat/bin/bootstrap.jar:/path/to/tomcat/bin/tomcat-juli.jar</screen>
   </step>
