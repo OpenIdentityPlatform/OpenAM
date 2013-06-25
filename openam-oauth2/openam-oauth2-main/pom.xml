@@ -3,7 +3,7 @@
 <!--
   ~ DO NOT REMOVE COPYRIGHT NOTICES OR THIS HEADER.
   ~
-  ~ Copyright (c) 2012 ForgeRock Inc. All rights reserved.
+  ~ Copyright (c) 2012-2013 ForgeRock Inc. All rights reserved.
   ~
   ~ The contents of this file are subject to the terms
   ~ of the Common Development and Distribution License
@@ -147,27 +147,38 @@
         <dependency>
             <groupId>org.mockito</groupId>
             <artifactId>mockito-all</artifactId>
+            <scope>test</scope>
         </dependency>
         <!-- Powermock -->
         <dependency>
             <groupId>org.powermock</groupId>
             <artifactId>powermock-api-mockito</artifactId>
+            <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>org.powermock</groupId>
             <artifactId>powermock-core</artifactId>
+            <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>org.powermock</groupId>
             <artifactId>powermock-reflect</artifactId>
+            <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>org.powermock</groupId>
             <artifactId>powermock-module-testng</artifactId>
+            <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>org.powermock</groupId>
             <artifactId>powermock-module-testng-common</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>javassist</groupId>
+            <artifactId>javassist</artifactId>
+            <version>3.12.1.GA</version>
         </dependency>
 
     </dependencies>

@@ -104,10 +104,10 @@
 
         <!-- Java Properties -->
 
-        <java.source.version>1.5</java.source.version>
+        <java.source.version>1.6</java.source.version>
         <!-- Backed off from 1.6 -->
 
-        <java.target.version>1.5</java.target.version>
+        <java.target.version>1.6</java.target.version>
         <!-- Backed off from 1.6 -->
 
         <!-- Surefire Argument Line -->
@@ -137,6 +137,7 @@
 
         <restlet.version>2.1.1</restlet.version>
         <xercesj.version>2.11.0</xercesj.version>
+        <powermock.version>1.5</powermock.version>
 
         <!--  Project web site -->
         <siteDistributionURL>scp://forgerock.org/var/www/vhosts/openam.forgerock.org/httpdocs</siteDistributionURL>
@@ -1666,32 +1667,37 @@
             <dependency>
                 <groupId>org.powermock</groupId>
                 <artifactId>powermock-api-mockito</artifactId>
-                <version>1.5</version>
+                <version>${powermock.version}</version>
                 <scope>test</scope>
             </dependency>
             <dependency>
                 <groupId>org.powermock</groupId>
                 <artifactId>powermock-core</artifactId>
-                <version>1.5</version>
+                <version>${powermock.version}</version>
                 <scope>test</scope>
             </dependency>
             <dependency>
                 <groupId>org.powermock</groupId>
                 <artifactId>powermock-reflect</artifactId>
-                <version>1.5</version>
+                <version>${powermock.version}</version>
                 <scope>test</scope>
             </dependency>
             <dependency>
                 <groupId>org.powermock</groupId>
                 <artifactId>powermock-module-testng</artifactId>
-                <version>1.5</version>
+                <version>${powermock.version}</version>
                 <scope>test</scope>
             </dependency>
             <dependency>
                 <groupId>org.powermock</groupId>
                 <artifactId>powermock-module-testng-common</artifactId>
-                <version>1.5</version>
+                <version>${powermock.version}</version>
                 <scope>test</scope>
+            </dependency>
+            <dependency>
+                <groupId>javassist</groupId>
+                <artifactId>javassist</artifactId>
+                <version>3.12.1.GA</version>
             </dependency>
         </dependencies>
     </dependencyManagement>
