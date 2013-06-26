@@ -26,6 +26,9 @@
  *
  */
 
+/**
+ * Portions Copyrighted 2013 ForgeRock, Inc.
+ */
 package com.sun.identity.delegation;
 
 import com.sun.identity.sm.SMSException;
@@ -49,6 +52,7 @@ import com.sun.identity.sm.DNMapper;
 import com.sun.identity.sm.PluginSchema;
 import com.sun.identity.sm.ServiceConfig;
 import com.sun.identity.sm.ServiceConfigManager;
+import com.sun.identity.sm.ServiceManager;
 import com.sun.identity.sm.ServiceSchema;
 import com.sun.identity.sm.ServiceSchemaManager;
 
@@ -85,6 +89,7 @@ public final class DelegationManager {
     private String orgName;
     
     private SSOToken token;
+    private static final String AUTHN_USERS_ID = "id=All Authenticated Users,ou=role," + ServiceManager.getBaseDN();
     
     /**
      * Constructor of <code>DelegationManager</code> for the specified realm.
@@ -227,18 +232,24 @@ public final class DelegationManager {
                 if ((subjs != null) && (!subjs.isEmpty())) {
                     for (Iterator j = subjs.iterator(); j.hasNext(); ) {
                         String subject = (String)j.next();
-                        try {
-                            AMIdentity id = IdUtils.getIdentity(
-                                token, subject);
-                            if (id.equals(identity)) {
-                                applicablePrivileges.add(dp);
-                                break;
+                        if (subject.equals(AUTHN_USERS_ID)) {
+                            //getPrivileges returned delegation privileges for this realm, hence if the subject is all
+                            //authenticated users, then the privilege is always a match.
+                            applicablePrivileges.add(dp);
+                        } else {
+                            try {
+                                AMIdentity id = IdUtils.getIdentity(
+                                        token, subject);
+                                if (id.equals(identity)) {
+                                    applicablePrivileges.add(dp);
+                                    break;
+                                }
+                            } catch (IdRepoException e) {
+                                /*
+                                 * ignore this exception because Identity may
+                                 * not exist.
+                                 */
                             }
-                        } catch (IdRepoException e) {
-                            /*
-                             * ignore this exception because Identity may
-                             * not exist.
-                             */
                         }
                     }
                 }
