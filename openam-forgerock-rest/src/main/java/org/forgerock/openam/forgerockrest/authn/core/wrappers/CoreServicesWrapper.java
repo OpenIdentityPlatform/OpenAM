@@ -22,9 +22,12 @@ import com.iplanet.sso.SSOException;
 import com.iplanet.sso.SSOToken;
 import com.sun.identity.authentication.client.AuthClientUtils;
 import com.sun.identity.authentication.server.AuthContextLocal;
+import com.sun.identity.authentication.service.AuthD;
 import com.sun.identity.authentication.service.AuthException;
 import com.sun.identity.authentication.service.AuthUtils;
 import com.sun.identity.authentication.util.AMAuthUtils;
+import com.sun.identity.idm.IdRepoException;
+import com.sun.identity.idm.IdUtils;
 import com.sun.identity.security.AdminTokenAction;
 import com.sun.identity.sm.DNMapper;
 import com.sun.identity.sm.SMSException;
@@ -33,6 +36,7 @@ import com.sun.identity.sm.ServiceConfigManager;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.security.AccessController;
+import java.util.Hashtable;
 import java.util.Map;
 import java.util.Set;
 
@@ -206,5 +210,32 @@ public class CoreServicesWrapper {
      */
     public String getOrgConfiguredAuthenticationChain(String orgDN) {
         return AuthUtils.getOrgConfiguredAuthenticationChain(orgDN);
+    }
+
+    /**
+     * This method determines the organization parameter and determines the organization DN based on query parameters.
+     *
+     * {@link com.sun.identity.authentication.client.AuthClientUtils.getDomainNameByRequest(HttpServletRequest,
+     *          Hashtable)}
+     *
+     * @param request The HTTP Servlet Request.
+     * @return Organization DN.
+     */
+    public String getDomainNameByRequest(HttpServletRequest request) {
+        return AuthClientUtils.getDomainNameByRequest(request, AuthClientUtils.parseRequestParameters(request));
+    }
+
+    /**
+     * Checks to see if the Organization is active.
+     *
+     * {@link com.sun.identity.idm.IdUtils.isOrganizationActive(SSOToken, String)}
+     *
+     * @param orgDN The organization DN to check the status of.
+     * @return True if organization is active, otherwise false.
+     * @throws IdRepoException If cannot find any information for organization.
+     * @throws SSOException If there is a problem with the admin SSOToken.
+     */
+    public boolean isOrganizationActive(String orgDN) throws IdRepoException, SSOException {
+        return IdUtils.isOrganizationActive(getAdminToken(), orgDN);
     }
 }

@@ -16,10 +16,13 @@
 
 package org.forgerock.openam.forgerockrest.authn;
 
+import com.iplanet.sso.SSOException;
 import com.sun.identity.authentication.spi.AuthLoginException;
 import com.sun.identity.authentication.spi.PagePropertiesCallback;
+import com.sun.identity.idm.IdRepoException;
 import com.sun.identity.shared.debug.Debug;
 import com.sun.identity.shared.locale.L10NMessageImpl;
+import org.apache.commons.lang3.StringUtils;
 import org.forgerock.json.fluent.JsonException;
 import org.forgerock.json.fluent.JsonValue;
 import org.forgerock.json.jwt.SignedJwt;
@@ -30,6 +33,7 @@ import org.forgerock.openam.forgerockrest.authn.core.HttpMethod;
 import org.forgerock.openam.forgerockrest.authn.core.LoginAuthenticator;
 import org.forgerock.openam.forgerockrest.authn.core.LoginConfiguration;
 import org.forgerock.openam.forgerockrest.authn.core.LoginProcess;
+import org.forgerock.openam.forgerockrest.authn.core.wrappers.CoreServicesWrapper;
 import org.forgerock.openam.forgerockrest.authn.exceptions.RestAuthErrorCodeException;
 import org.forgerock.openam.forgerockrest.authn.exceptions.RestAuthException;
 import org.forgerock.openam.utils.JsonObject;
@@ -55,6 +59,7 @@ public class RestAuthenticationHandler {
     private final RestAuthCallbackHandlerManager restAuthCallbackHandlerManager;
     private final AMAuthErrorCodeResponseStatusMapping amAuthErrorCodeResponseStatusMapping;
     private final AuthIdHelper authIdHelper;
+    private final CoreServicesWrapper coreServicesWrapper;
 
     /**
      * Constructs an instance of the RestAuthenticationHandler.
@@ -63,16 +68,18 @@ public class RestAuthenticationHandler {
      * @param restAuthCallbackHandlerManager An instance of the RestAuthCallbackHandlerManager.
      * @param amAuthErrorCodeResponseStatusMapping An instance of the AMAuthErrorCodeResponseStatusMapping.
      * @param authIdHelper An instance of the AuthIdHelper.
+     * @param coreServicesWrapper An instance of the CoreServicesWrapper.
      */
     @Inject
     public RestAuthenticationHandler(LoginAuthenticator loginAuthenticator,
             RestAuthCallbackHandlerManager restAuthCallbackHandlerManager,
             AMAuthErrorCodeResponseStatusMapping amAuthErrorCodeResponseStatusMapping,
-            AuthIdHelper authIdHelper) {
+            AuthIdHelper authIdHelper, CoreServicesWrapper coreServicesWrapper) {
         this.loginAuthenticator = loginAuthenticator;
         this.restAuthCallbackHandlerManager = restAuthCallbackHandlerManager;
         this.amAuthErrorCodeResponseStatusMapping = amAuthErrorCodeResponseStatusMapping;
         this.authIdHelper = authIdHelper;
+        this.coreServicesWrapper = coreServicesWrapper;
     }
 
     /**
@@ -161,6 +168,8 @@ public class RestAuthenticationHandler {
                     .sessionId(sessionId)
                     .sessionUpgrade(sessionUpgradeSSOTokenId);
 
+            verifyAuthenticationRealm(loginConfiguration.getHttpRequest());
+
             LoginProcess loginProcess = loginAuthenticator.getLoginProcess(loginConfiguration);
 
             responseBuilder = processAuthentication(headers, request, response, postBody, httpMethod, authId,
@@ -195,6 +204,31 @@ public class RestAuthenticationHandler {
         responseBuilder.header("Cache-control", "no-cache");
         responseBuilder.type(MediaType.APPLICATION_JSON_TYPE);
         return responseBuilder.build();
+    }
+
+    /**
+     * Checks to see if the realm that is being authenticated against exists and can be resolved.
+     *
+     * Will throw RestAuthException if the realm cannot be verified.
+     *
+     * @param request The HttpServletRequest.
+     * @throws AuthLoginException If there is a problem verifying the realm.
+     * @throws com.iplanet.sso.SSOException If there is a problem verifying the realm.
+     */
+    private void verifyAuthenticationRealm(HttpServletRequest request) throws AuthLoginException,
+            SSOException {
+
+        String orgDN = coreServicesWrapper.getDomainNameByRequest(request);
+
+        if (StringUtils.isEmpty(orgDN)) {
+            throw new RestAuthException(400, "Invalid Domain Alias");
+        } else {
+            try {
+                coreServicesWrapper.isOrganizationActive(orgDN);
+            } catch (IdRepoException e) {
+                throw new RestAuthException(400, "Invalid Domain DN");
+            }
+        }
     }
 
     /**
