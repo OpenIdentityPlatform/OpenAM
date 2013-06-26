@@ -955,7 +955,7 @@ public class AuthD  {
      * @throws IdRepoException if can not can any information for org
      * @throws SSOException if can not use <code>SSOToken</code> for admin
      */
-    public boolean getInetDomainStatus(String orgName)
+    boolean getInetDomainStatus(String orgName)
         throws IdRepoException, SSOException {
         return IdUtils.isOrganizationActive(ssoAuthSession,orgName);
     }
