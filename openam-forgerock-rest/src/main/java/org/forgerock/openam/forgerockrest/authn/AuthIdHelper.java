@@ -50,7 +50,7 @@ public class AuthIdHelper {
 
     private static final SecureRandom RANDOM = new SecureRandom();
     private static final String AUTH_SERVICE_NAME = "iPlanetAMAuthService";
-    private static final String JWT_SIGNING_KEY_ALIAS = "iplanet-am-auth-jwt-signing-key-alias";
+    private static final String KEY_ALIAS_KEY = "iplanet-am-auth-key-alias";
 
     private final CoreServicesWrapper coreServicesWrapper;
     private final AMKeyProvider amKeyProvider;
@@ -110,7 +110,7 @@ public class AuthIdHelper {
             ServiceConfigManager scm = coreServicesWrapper.getServiceConfigManager(AUTH_SERVICE_NAME, token);
 
             ServiceConfig orgConfig = scm.getOrganizationConfig(orgName, null);
-            Set<String> values = (Set<String>) orgConfig.getAttributes().get(JWT_SIGNING_KEY_ALIAS);
+            Set<String> values = (Set<String>) orgConfig.getAttributes().get(KEY_ALIAS_KEY);
             for (String value : values) {
                 if (value != null && !"".equals(value)) {
                     keyAlias = value;

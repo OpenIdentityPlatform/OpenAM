@@ -43,6 +43,7 @@
 
     <!-- Child Modules -->
     <modules>
+        <module>openam-auth-common</module>
         <module>openam-auth-ad</module>
         <module>openam-auth-anonymous</module>
         <module>openam-auth-adaptive</module>
@@ -62,6 +63,7 @@
         <module>openam-auth-safeword</module>
         <module>openam-auth-securid</module>
         <module>openam-auth-windowsdesktopsso</module>
+        <module>openam-auth-persistentcookie</module>
         <module>deviceprint</module>
     </modules>
 

@@ -61,6 +61,7 @@
                         <Value>com.sun.identity.authentication.modules.windowsdesktopsso.WindowsDesktopSSO</Value>
                         <Value>com.sun.identity.authentication.modules.msisdn.MSISDN</Value>
                         <Value>com.sun.identity.authentication.modules.datastore.DataStore</Value>
+                        <Value>org.forgerock.openam.authentication.modules.persistentcookie.PersistentCookie</Value>
                         <Value>org.forgerock.openam.authentication.modules.deviceprint.DevicePrintModule</Value>
                         <Value>com.sun.identity.authentication.modules.radius.RADIUS</Value>
                         <Value>com.sun.identity.authentication.modules.hotp.HOTP</Value>
@@ -149,7 +150,7 @@
                         <Value>[Empty]</Value>
                     </DefaultValues>
                 </AttributeSchema>
-                <AttributeSchema name="iplanet-am-auth-jwt-signing-key-alias"
+                <AttributeSchema name="iplanet-am-auth-key-alias"
                         type="single"
                         syntax="string"
                         i18nKey="a151">

@@ -594,6 +594,16 @@
                 <artifactId>openam-auth-datastore</artifactId>
                 <version>${project.version}</version>
             </dependency>
+            <dependency>
+                <groupId>org.forgerock.openam</groupId>
+                <artifactId>openam-auth-persistentcookie</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.forgerock.openam</groupId>
+                <artifactId>openam-auth-common</artifactId>
+                <version>${project.version}</version>
+            </dependency>
 
             <dependency>
                 <groupId>org.forgerock.openam</groupId>
@@ -1599,6 +1609,11 @@
             <dependency>
                 <groupId>org.forgerock.commons</groupId>
                 <artifactId>forgerock-jaspi-container</artifactId>
+                <version>${commons.authnfilter.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.forgerock.commons</groupId>
+                <artifactId>forgerock-jaspi-jwt-session-module</artifactId>
                 <version>${commons.authnfilter.version}</version>
             </dependency>
             <dependency>

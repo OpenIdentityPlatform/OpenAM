@@ -333,11 +333,38 @@ public class AMKeyProvider implements KeyProvider {
     }
 
     /**
+     * Gets the Keystore password.
+     *
+     * @return The Keystore password
+     */
+    public char[] getKeystorePass() {
+        return keystorePass.toCharArray();
+    }
+
+    /**
      * Get the private key password
      * @return the private key password
      */
     public String getPrivateKeyPass() {
         return privateKeyPass;
+    }
+
+    /**
+     * Gets the Keystore type.
+     *
+     * @return The Keystore type.
+     */
+    public String getKeystoreType() {
+        return keystoreType;
+    }
+
+    /**
+     * Gets the Keystore File path.
+     *
+     * @return The Keystore file path.
+     */
+    public String getKeystoreFilePath() {
+        return keystoreFile;
     }
 
     /**

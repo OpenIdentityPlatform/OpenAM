@@ -54,7 +54,7 @@ import java.util.Set;
  */
 public class DevicePrintModule extends AMLoginModule {
 
-    private static final String AUTH_MODULE_NAME = "amAuthDevicePrintAMModule";
+    private static final String AUTH_MODULE_NAME = "amAuthDevicePrint";
     private static final Debug DEBUG = Debug.getInstance(AUTH_MODULE_NAME);
 
     private final DevicePrintModuleInitialiser moduleInitialiser;

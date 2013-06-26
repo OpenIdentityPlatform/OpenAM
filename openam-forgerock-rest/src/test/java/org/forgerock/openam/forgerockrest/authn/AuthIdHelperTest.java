@@ -89,7 +89,7 @@ public class AuthIdHelperTest {
         if (!nullKeyAlias) {
             orgConfigSet.add("KEY_ALIAS");
         }
-        orgConfigAttributes.put("iplanet-am-auth-jwt-signing-key-alias", orgConfigSet);
+        orgConfigAttributes.put("iplanet-am-auth-key-alias", orgConfigSet);
         given(coreServicesWrapper.getAdminToken()).willReturn(adminToken);
         given(coreServicesWrapper.getServiceConfigManager("iPlanetAMAuthService", adminToken))
                 .willReturn(serviceConfigManager);

@@ -1192,7 +1192,7 @@
       <para>Defines the alias for public and private keys used in the Keystore for 
       RESTful authentication. Default: test</para>
       <para><command>ssoadm</command> attribute:
-      <literal>iplanet-am-auth-jwt-signing-key-alias</literal></para>
+      <literal>iplanet-am-auth-key-alias</literal></para>
      </listitem>
     </varlistentry>
     <varlistentry>
