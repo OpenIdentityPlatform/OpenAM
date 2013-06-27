@@ -73,8 +73,15 @@
                             </resource>
                             <resource>
                                 <path>WEB-INF/</path>
-                                <include>distUI_auth.tld,jato.tld</include>
+                                <include>jato.tld</include>
                                 <flat>true</flat>
+                                <destination>generated-resources</destination>
+                            </resource>
+                            <resource>
+                                <path>WEB-INF/</path>
+                                <include>distUI_auth.tld</include>
+                                <flat>true</flat>
+                                <name>auth.tld</name>
                                 <destination>generated-resources</destination>
                             </resource>
                             <resource>
@@ -149,7 +156,7 @@
                         <resource>
                             <directory>${project.build.directory}/generated-resources</directory>
                             <includes>
-                                <include>distUI_auth.tld</include>
+                                <include>auth.tld</include>
                                 <include>jato.tld</include>
                             </includes>
                             <targetPath>WEB-INF</targetPath>
