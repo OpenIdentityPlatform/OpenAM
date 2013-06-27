@@ -165,15 +165,11 @@ public class ClientVerifierImpl implements ClientVerifier{
                 }
                 // there's missing requirements not filled by this
                 if (missing.size() > 0) {
+                    lc.logout();
                     throw new ResourceException(Status.SERVER_ERROR_INTERNAL,
                             "Missing requirements");
                 }
                 lc.submitRequirements(callbacks);
-            }
-
-            if (OAuth2Utils.DEBUG.messageEnabled()) {
-                OAuth2Utils.DEBUG.message("ClientVerifierImpl::authenticate returning an InvalidCredentials"
-                        + " exception for invalid passwords.");
             }
 
             // validate the password..
@@ -185,11 +181,14 @@ public class ClientVerifierImpl implements ClientVerifier{
                             + "Unable to get SSOToken", e);
                     // we're going to throw a generic error
                     // because the system is likely down..
+                    lc.logout();
                     throw new ResourceException(Status.SERVER_ERROR_INTERNAL, e);
                 }
             } else {
+                lc.logout();
                 throw new ResourceException(Status.CLIENT_ERROR_UNAUTHORIZED);
             }
+            lc.logout();
         } catch (AuthLoginException le) {
             OAuth2Utils.DEBUG.error("ClientVerifierImpl::authContext AuthException", le);
             throw new ResourceException(Status.SERVER_ERROR_INTERNAL, le);
