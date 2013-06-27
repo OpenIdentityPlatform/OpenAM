@@ -15,12 +15,14 @@
  */
 package org.forgerock.openam.forgerockrest.session;
 
+import com.iplanet.dpro.session.service.SessionService;
 import com.iplanet.dpro.session.share.SessionInfo;
 import com.iplanet.services.naming.WebtopNaming;
 import com.iplanet.sso.SSOException;
 import com.iplanet.sso.SSOToken;
 import com.iplanet.sso.SSOTokenManager;
 import com.sun.identity.authentication.service.AuthUtils;
+import com.sun.identity.shared.debug.Debug;
 import org.forgerock.json.fluent.JsonValue;
 import org.forgerock.json.resource.ActionRequest;
 import org.forgerock.json.resource.BadRequestException;
@@ -66,6 +68,8 @@ import java.util.Map;
  * @author robert.wapshott@forgerock.com
  */
 public class SessionResource implements CollectionResourceProvider {
+
+    private static final Debug DEBUG = SessionService.sessionDebug;
 
     public static final String KEYWORD_ALL = "all";
     public static final String KEYWORD_LIST = "list";
@@ -119,19 +123,24 @@ public class SessionResource implements CollectionResourceProvider {
             String tokenId = ServerContextHelper.getCookieFromServerContext(context);
 
             if (tokenId == null) {
-                handler.handleError(new BadRequestException("iPlanetDirectoryCookie not set on request"));
+                BadRequestException e = new BadRequestException("iPlanetDirectoryCookie not set on request");
+                DEBUG.error("iPlanetDirectoryCookie not set on request", e);
+                handler.handleError(e);
             }
 
             try {
                 JsonValue jsonValue = logout(tokenId);
                 handler.handleResult(jsonValue);
             } catch (InternalServerErrorException e) {
+                DEBUG.error("Exception handling logout", e);
                 handler.handleError(e);
             }
             return;
         }
 
-        handler.handleError(new NotSupportedException("Not implemented for this Resource"));
+        NotSupportedException e = new NotSupportedException("Action, " + id + ", Not implemented for this Resource");
+        DEBUG.error("Action, " + id + ", Not implemented for this Resource", e);
+        handler.handleError(e);
     }
 
     /**
@@ -151,12 +160,15 @@ public class SessionResource implements CollectionResourceProvider {
                 JsonValue jsonValue = logout(resourceId);
                 handler.handleResult(jsonValue);
             } catch (InternalServerErrorException e) {
+                DEBUG.error("Exception handling logout", e);
                 handler.handleError(e);
             }
             return;
         }
 
-        handler.handleError(new NotSupportedException(id + ", not implemented for this Resource"));
+        NotSupportedException e = new NotSupportedException("Action, " + id + ", Not implemented for this Resource");
+        DEBUG.error("Action, " + id + ", Not implemented for this Resource", e);
+        handler.handleError(e);
     }
 
     /**
@@ -170,6 +182,7 @@ public class SessionResource implements CollectionResourceProvider {
         SSOToken ssoToken;
         try {
             if (tokenId == null) {
+                DEBUG.error("Invalid Token Id");
                 throw new InternalServerErrorException("Invalid Token Id");
             }
             SSOTokenManager mgr = SSOTokenManager.getInstance();
@@ -177,6 +190,7 @@ public class SessionResource implements CollectionResourceProvider {
         } catch (SSOException ex) {
             Map<String, Object> map = new HashMap<String, Object>();
             map.put("result", "Token has expired");
+            DEBUG.error("Token has expired");
             return new JsonValue(map);
         }
 
@@ -184,12 +198,14 @@ public class SessionResource implements CollectionResourceProvider {
             try {
                 AuthUtils.logout(ssoToken.getTokenID().toString(), null, null);
             } catch (SSOException e) {
+                DEBUG.error("Error logging out", e);
                 throw new InternalServerErrorException("Error logging out", e);
             }
         }
 
         Map<String, Object> map = new HashMap<String, Object>();
         map.put("result", "Successfully logged out");
+        DEBUG.message("Successfully logged out");
         return new JsonValue(map);
     }
 
