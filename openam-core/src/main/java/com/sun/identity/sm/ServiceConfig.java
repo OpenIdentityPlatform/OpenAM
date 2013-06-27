@@ -27,7 +27,7 @@
  */
 
 /*
- * Portions Copyrighted 2011 ForgeRock Inc
+ * Portions Copyrighted 2011-2013 ForgeRock Inc
  * Portions Copyrighted 2012 Open Source Solution Technology Corporation
  */
 package com.sun.identity.sm;
@@ -656,6 +656,13 @@ public class ServiceConfig {
         // Get current attributes
         Map attributes = getAttributes();
         // Validate values
+
+        Set currentValues = (Set) attributes.get(attrName);
+        if (currentValues != null && !currentValues.contains(oldValue)) {
+            throw (new SMSException("Current value doesn't match supplied value",
+                    "sms-INVALID_PARAMETERS"));
+        }
+
         Set newVals = new HashSet();
         Set oldVals = (Set) attributes.get(attrName);
         if (oldVals != null) {
