@@ -26,11 +26,13 @@
  *
  */
 /**
- * Portions Copyrighted 2012 ForgeRock Inc
+ * Portions Copyrighted 2012-2013 ForgeRock Inc
  * Portions Copyrighted 2012 Open Source Solution Technology Corporation
  */
 
 package com.sun.identity.password.ui.model;
+
+import com.iplanet.sso.SSOException;
 
 /**
  * <code>PWResetModelImpl</code> defines the basic and commonly used
@@ -51,11 +53,6 @@ public interface PWResetModel {
      * OpenSSO's user service name
      */
     String USER_SERVICE = "iPlanetAMUserService";
-
-    /**
-     * Name of user mail attribute
-     */
-    String USER_MAIL_ATTR = "mail";
 
     /**
      * Name of user active status.
@@ -275,4 +272,12 @@ public interface PWResetModel {
      * @param localeString localeString.
      */
     void setUserLocale(String localeString);
+
+    /**
+     * Returns the name of the mail attribute.
+     *
+     * @param realm The realm the user belongs to.
+     * @return The name of the mail attribute in the provided realm.
+     */
+    public String getMailAttribute(String realm) throws SSOException;
 }

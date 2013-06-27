@@ -25,7 +25,9 @@
  * $Id: EmailPassword.java,v 1.2 2008/06/25 05:43:41 qcheng Exp $
  *
  */
-
+/**
+ * Portions Copyrighted 2013 ForgeRock, Inc.
+ */
 package com.sun.identity.password.plugins;
 
 import com.iplanet.am.util.AMSendMail;
@@ -50,16 +52,11 @@ import javax.mail.MessagingException;
  * that are required to notify a user when a password is changed.
  */
 public class EmailPassword implements NotifyPassword {
+
     private PWResetModel model = new PWResetModelImpl();
     static private G11NSettings g11nSettings = G11NSettings.getInstance();
     static private String bundleName = PWResetModel.DEFAULT_RB;
     private Locale userLocale = null;
-
-    /**
-     * Constructs a email password object.
-     */
-    public EmailPassword() {
-    }
 
     /**
      * Notifies user when password is changed.
@@ -69,31 +66,26 @@ public class EmailPassword implements NotifyPassword {
      * @param locale user locale
      * @throws PWResetException if password cannot be notified
      */
-    public void notifyPassword(
-        AMIdentity user, 
-        String password, 
-        Locale locale)
-        throws PWResetException
-    {
+    public void notifyPassword(AMIdentity user, String password, Locale locale) throws PWResetException {
         ResourceBundle rb = null;
         try {
-            Set set = user.getAttribute(PWResetModel.USER_MAIL_ATTR);
-	    Set localeSet = user.getAttribute(Constants.USER_LOCALE_ATTR);
-            
-	    if ((localeSet == null) || localeSet.isEmpty()) {
+            Set<String> set = user.getAttribute(model.getMailAttribute(user.getRealm()));
+	    Set<String> localeSet = user.getAttribute(Constants.USER_LOCALE_ATTR);
+
+	    if (localeSet == null || localeSet.isEmpty()) {
 		userLocale = locale;
 	    } else {
-		String localeStr = localeSet.iterator().next().toString();
-		userLocale = com.sun.identity.shared.locale.Locale.getLocale (localeStr);
+		String localeStr = localeSet.iterator().next();
+		userLocale = com.sun.identity.shared.locale.Locale.getLocale(localeStr);
 	    }
-            
+
             rb = PWResetResBundleCacher.getBundle(bundleName, userLocale);
-            
-            if ((set == null) || set.isEmpty()) {
+
+            if (set == null || set.isEmpty()) {
                 model.debugWarning("There is no email address for this user.");
                 throw new PWResetException(rb.getString("noEmail.message"));
             } else {
-                String emailAddress = (String)set.iterator().next();
+                String emailAddress = set.iterator().next();
                 sendEmailToUser(emailAddress, password);
             }
         } catch (SSOException e) {

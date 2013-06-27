@@ -27,7 +27,7 @@
  */
 
 /*
- * Portions Copyrighted [2011] [ForgeRock AS]
+ * Portions Copyrighted 2011-2013 ForgeRock, Inc.
  */
 package com.sun.identity.password.ui.model;
 
@@ -109,16 +109,18 @@ public class PWResetModelImpl
     private static final String PW_RESET_FAILURE_LOCKOUT_DURATION =
         "iplanet-am-password-reset-lockout-duration";
 
+    private static final String DEFAULT_MAIL_ATTR = "mail";
+
+    /**
+     * Name of the mail attribute.
+     */
+    private static final String PASSWORD_RESET_MAIL_ATTR_NAME = "openam-password-reset-mail-attribute-name";
+
     /**
      *  Name of password reset lockout multiplier.
      */
     private static final String PW_RESET_FAILURE_LOCKOUT_MULTIPLIER =
         "sunLockoutDurationMultiplier";
-
-    /**
-     *  Name for locale string
-     */
-    private static final String LOCALE_STR = "Locale";
 
     /**
      *  Name of password reset lockout attribute name.
@@ -826,5 +828,18 @@ public class PWResetModelImpl
      */
     public void setUserLocale(String localeString) {
         localeContext.setUserLocale(localeString);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public String getMailAttribute(String realm) {
+        String mail = DEFAULT_MAIL_ATTR;
+        try {
+            mail = getAttributeValue(realm, PASSWORD_RESET_MAIL_ATTR_NAME);
+        } catch (Exception ex) {
+            debug.warning("An error occurred while trying to retrieve the name of the mail attribute", ex);
+        }
+        return mail;
     }
 }

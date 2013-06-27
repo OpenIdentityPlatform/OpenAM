@@ -26,7 +26,7 @@
  *
  */
 /**
- * Portions Copyrighted 2012 ForgeRock Inc
+ * Portions Copyrighted 2012-2013 ForgeRock Inc
  * Portions Copyrighted 2012 Open Source Solution Technology Corporation
  */
 
@@ -78,18 +78,6 @@ public class PWResetQuestionModelImpl extends PWResetModelImpl
      */
     private static final String PW_RESET_NOTIFICATION =
         "iplanet-am-password-reset-notification";
-
-    /**
-     * Name of password reset bind DN attribute
-     */
-    private static final String PW_RESET_BIND_DN =
-        "iplanet-am-password-reset-bindDN";
-
-    /**
-     * Name of password reset bind password attribute
-     */
-    private static final String PW_RESET_BIND_PASSWORD =
-        "iplanet-am-password-reset-bindPasswd";
 
     /**
      * Name of user question answer attribute
@@ -371,12 +359,12 @@ public class PWResetQuestionModelImpl extends PWResetModelImpl
      * @param user User object
      */
     private void sendAttemptEmail(AMIdentity user) {
-        Set set = Collections.EMPTY_SET;
-	Set localeSet = null;
+        Set<String> set = Collections.EMPTY_SET;
+	Set<String> localeSet = null;
 
         try {
-            set = (Set)user.getAttribute(USER_MAIL_ATTR);
-	    localeSet = (Set)user.getAttribute(USER_LOCALE_ATTR);
+            set = user.getAttribute(getMailAttribute(user.getRealm()));
+	    localeSet = user.getAttribute(USER_LOCALE_ATTR);
         } catch (SSOException e) {
             debug.error("PWResetQuestionModelImpl.sendAttemptEmail", e);
         } catch (IdRepoException e) {
@@ -384,19 +372,17 @@ public class PWResetQuestionModelImpl extends PWResetModelImpl
         }
 
 	Locale userLocale = null;
-	if ( localeSet != null && !localeSet.isEmpty() ) {
-	    String localeStr = localeSet.iterator().next().toString();
-	    userLocale = (localeStr != null) ?
-                com.sun.identity.shared.locale.Locale.getLocale (localeStr):null;
+	if (localeSet != null && !localeSet.isEmpty()) {
+	    String localeStr = localeSet.iterator().next();
+	    userLocale = (localeStr != null) ? com.sun.identity.shared.locale.Locale.getLocale(localeStr) : null;
 	}
 	if (userLocale == null) {
 	    userLocale = localeContext.getLocale();
         }
-	ResourceBundle rb = PWResetResBundleCacher.getBundle(
-                 DEFAULT_RB, userLocale);
+	ResourceBundle rb = PWResetResBundleCacher.getBundle(DEFAULT_RB, userLocale);
 
         if (set != null && !set.isEmpty()) {
-            String to[] = { (String)set.iterator().next() };
+            String to[] = { set.iterator().next() };
             String msg = rb.getString("attemptEmail.message");
             String subject = rb.getString("attemptSubject.message");
 	    String from = rb.getString("fromAddress.label");
