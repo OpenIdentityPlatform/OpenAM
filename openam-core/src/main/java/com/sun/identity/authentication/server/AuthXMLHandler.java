@@ -426,7 +426,7 @@ public class AuthXMLHandler implements RequestHandler {
                     //setServletRequest(servletRequest,authContext);
                     processRequirements(xml, authContext,authResponse, params,
                         servletRequest);
-
+                    loginStatus = authContext.getStatus();
                     authResponse.setRemoteRequest(loginState.getHttpServletRequest());
                     authResponse.setRemoteResponse(loginState.getHttpServletResponse());
 
@@ -477,6 +477,7 @@ public class AuthXMLHandler implements RequestHandler {
                     //setServletRequest(servletRequest,authContext);
                     processRequirements(xml, authContext,authResponse, params,
                         servletRequest);
+                    loginStatus = authContext.getStatus();
                     authResponse.setRemoteRequest(loginState.getHttpServletRequest());
                     authResponse.setRemoteResponse(loginState.getHttpServletResponse());
                     postProcess(loginState, authResponse);
@@ -494,6 +495,7 @@ public class AuthXMLHandler implements RequestHandler {
                     processRequirements(xml, authContext,authResponse, params,
                         servletRequest);
                     postProcess(loginState, authResponse);
+                    loginStatus = authContext.getStatus();
                     checkACException(authResponse, authContext);
                 } catch (AuthLoginException ale) {
                     debug.error("Exception during LoginSubject", ale);
