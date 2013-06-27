@@ -175,7 +175,7 @@ public class ClientVerifierImpl implements ClientVerifier{
             // validate the password..
             if (lc.getStatus() == AuthContext.Status.SUCCESS) {
                 try {
-                    ret = IdUtils.getIdentity(lc.getSSOToken());
+                    ret = OAuth2Utils.getClientIdentity(username, realm);
                 } catch (Exception e) {
                     OAuth2Utils.DEBUG.error( "ClientVerifierImpl::authContext: "
                             + "Unable to get SSOToken", e);

@@ -787,6 +787,43 @@ public class OAuth2Utils {
         }
     }
 
+    public static AMIdentity getClientIdentity(String uName, String realm) throws OAuthProblemException {
+        SSOToken token = (SSOToken) AccessController.doPrivileged(AdminTokenAction.getInstance());
+        AMIdentity theID = null;
+
+        try {
+            AMIdentityRepository amIdRepo = new AMIdentityRepository(token, realm);
+
+            IdSearchControl idsc = new IdSearchControl();
+            idsc.setRecursive(true);
+            idsc.setAllReturnAttributes(true);
+            // search for the identity
+            Set<AMIdentity> results = Collections.EMPTY_SET;
+            idsc.setMaxResults(0);
+            IdSearchResults searchResults =
+                    amIdRepo.searchIdentities(IdType.AGENTONLY, uName, idsc);
+                results = searchResults.getSearchResults();
+
+            if (results == null || results.size() != 1) {
+                OAuth2Utils.DEBUG.error("OAuth2Utils.getClientIdentity()::No client profile or more than one profile found.");
+                throw OAuthProblemException.OAuthError.UNAUTHORIZED_CLIENT.handle(null,
+                        "Not able to get client from OpenAM");
+            }
+
+            theID = results.iterator().next();
+
+            //if the client is deactivated return null
+            if (theID.isActive()){
+                return theID;
+            } else {
+                return null;
+            }
+        } catch (Exception e){
+            OAuth2Utils.DEBUG.error("OAuth2Utils::Unable to get client AMIdentity: ", e);
+            throw OAuthProblemException.OAuthError.UNAUTHORIZED_CLIENT.handle(null, "Not able to get client from OpenAM");
+        }
+    }
+
     public static AMIdentity getIdentity(String uName, String realm) throws OAuthProblemException {
         SSOToken token = (SSOToken) AccessController.doPrivileged(AdminTokenAction.getInstance());
         AMIdentity theID = null;
@@ -807,7 +844,7 @@ public class OAuth2Utils {
             } else {
                 OAuth2ProviderSettings settings = OAuth2Utils.getSettingsProvider(Request.getCurrent());
                 Map<String, Set<String>> avPairs = toAvPairMap(settings.getListOfAttributesTheResourceOwnerIsAuthenticatedOn(),
-                                                               uName);
+                        uName);
                 idsc.setSearchModifiers(IdSearchOpModifier.OR, avPairs);
                 searchResults =
                         amIdRepo.searchIdentities(IdType.USER, "*", idsc);
