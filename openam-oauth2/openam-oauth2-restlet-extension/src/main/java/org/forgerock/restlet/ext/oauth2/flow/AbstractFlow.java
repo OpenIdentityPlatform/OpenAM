@@ -25,7 +25,6 @@
 package org.forgerock.restlet.ext.oauth2.flow;
 
 import java.io.IOException;
-import java.security.AccessController;
 import java.util.*;
 
 import com.sun.identity.shared.OAuth2Constants;
@@ -42,13 +41,10 @@ import org.forgerock.openam.oauth2.provider.ClientVerifier;
 import org.forgerock.restlet.ext.oauth2.provider.OAuth2Client;
 import org.forgerock.openam.oauth2.provider.OAuth2TokenStore;
 import org.forgerock.restlet.ext.oauth2.representation.TemplateFactory;
-import com.iplanet.sso.SSOToken;
-import com.sun.identity.security.AdminTokenAction;
-import com.sun.identity.sm.ServiceConfig;
-import com.sun.identity.sm.ServiceConfigManager;
 import org.restlet.Context;
 import org.restlet.Request;
 import org.restlet.Response;
+import org.restlet.Restlet;
 import org.restlet.data.*;
 import org.restlet.engine.header.Header;
 import org.restlet.engine.header.HeaderConstants;
@@ -388,6 +384,7 @@ public abstract class AbstractFlow extends ServerResource {
             throw OAuthProblemException.OAuthError.SERVER_ERROR.handle(getRequest(), "Resource Owner unable to login");
         }
         OpenAMServerAuthorizer authorizer = new OpenAMServerAuthorizer();
+        authorizer.setNext((Restlet)null);
         authorizer.handle(getRequest(), getResponse());
         if (getRequest().getClientInfo().getUser() != null) {
             return getRequest().getClientInfo().getUser();
