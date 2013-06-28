@@ -27,12 +27,16 @@
  */
 
 /*
- * Portions Copyrighted [2010-2011] [ForgeRock AS]
+ * Portions Copyrighted 2010-2013 ForgeRock Inc.
  */
 
 package com.sun.identity.authentication.jaas;
 
+import com.sun.identity.authentication.spi.InvalidPasswordException;
 import com.sun.identity.shared.debug.Debug;
+
+import java.io.PrintWriter;
+import java.io.StringWriter;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -42,7 +46,7 @@ import javax.security.auth.login.*;
 import javax.security.auth.Subject;
 import javax.security.auth.callback.*;
 
-import com.sun.identity.authentication.spi.*;
+import javax.security.auth.login.AppConfigurationEntry.LoginModuleControlFlag;
 
 /**
  * This class is pulled out from JDK1.4.
@@ -57,29 +61,24 @@ public class LoginContext {
     private static final String COMMIT_METHOD = "commit";
     private static final String ABORT_METHOD = "abort";
     private static final String LOGOUT_METHOD = "logout";
-    private static final String OTHER = "other";
-    private static final String DEFAULT_HANDLER =
-        "auth.login.defaultCallbackHandler";
+    private static final Class[] PARAMS = { };
+
+    private ExceptionHolder optionalExceptionHolder;
+    private ExceptionHolder requiredExceptionHolder;
+
     private Subject subject = null;
     private boolean subjectProvided = false;
     private boolean loginSucceeded = false;
     private CallbackHandler callbackHandler;
     private Map state = new HashMap();
-
-    private Configuration config;
-    private boolean configProvided = false;
     private ModuleInfo[] moduleStack;
-    private static final Class[] PARAMS = { };
-
-    LoginException passwordError = null;    // OPENAM-46
-
-    LoginException firstError = null;
-    LoginException firstRequiredError = null;
     boolean success = false;
 
     private static final Debug debug = Debug.getInstance("amJAAS");
 
     private void init(AppConfigurationEntry[] entries) throws LoginException {
+        optionalExceptionHolder = new ExceptionHolder();
+        requiredExceptionHolder = new ExceptionHolder();
         moduleStack = new ModuleInfo[entries.length];
         for (int i = 0; i < entries.length; i++) {
             // clone returned array
@@ -150,36 +149,42 @@ public class LoginContext {
         return subject;
     }
 
-    private void throwException(LoginException originalError, LoginException le)
-        throws LoginException {
-        throw ((originalError != null) ? originalError : le);
-    }
-
+    /**
+     * Attempts to invoke the method described by methodName against each module within the stack.
+     *
+     * @param methodName
+     *         String method name to be invoked on each module.
+     * @throws LoginException
+     *         Throw in the case of some login failure.
+     */
     private void invoke(String methodName) throws LoginException {
 
         for (int i = 0; i < moduleStack.length; i++) {
+
+            ModuleInfo info = moduleStack[i];
+            LoginModuleControlFlag controlFlag = info.entry.getControlFlag();
+
             try {
 
                 int mIndex = 0;
                 Method[] methods = null;
 
-                if (moduleStack[i].module != null) {
-                    methods = moduleStack[i].module.getClass().getMethods();
+                if (info.module != null) {
+                    methods = info.module.getClass().getMethods();
                 } else {
 
                     // instantiate the LoginModule
-                    Class c = Class.forName(
-                        moduleStack[i].entry.getLoginModuleName(), true,
-                        Thread.currentThread().getContextClassLoader());
+                    Class c = Class.forName(info.entry.getLoginModuleName(), true,
+                            Thread.currentThread().getContextClassLoader());
 
                     Constructor constructor = c.getConstructor(PARAMS);
-                    Object[] args = { };
+                    Object[] args = {};
 
                     // allow any object to be a LoginModule
                     // as long as it conforms to the interface
-                    moduleStack[i].module = constructor.newInstance(args);
+                    info.module = constructor.newInstance(args);
 
-                    methods = moduleStack[i].module.getClass().getMethods();
+                    methods = info.module.getClass().getMethods();
 
                     // call the LoginModule's initialize method
                     for (mIndex = 0; mIndex < methods.length; mIndex++) {
@@ -187,12 +192,9 @@ public class LoginContext {
                             break;
                     }
 
-                    Object[] initArgs = {subject,
-                                        callbackHandler,
-                                        state,
-                                        moduleStack[i].entry.getOptions() };
-                    // invoke the LoginModule initialize method
-                    methods[mIndex].invoke(moduleStack[i].module, initArgs);
+                    // Invoke the LoginModule initialize method
+                    Object[] initArgs = {subject, callbackHandler, state, info.entry.getOptions()};
+                    methods[mIndex].invoke(info.module, initArgs);
                 }
 
                 // find the requested method in the LoginModule
@@ -202,159 +204,141 @@ public class LoginContext {
                 }
 
                 // set up the arguments to be passed to the LoginModule method
-                Object[] args = { };
+                Object[] args = {};
 
                 // invoke the LoginModule method
-                boolean status = ((Boolean)methods[mIndex].invoke
-                                (moduleStack[i].module, args)).booleanValue();
+                boolean status = (Boolean)methods[mIndex].invoke(info.module, args);
 
-                if (status == true) {
+                if (status) {
 
                     // if SUFFICIENT, return if no prior REQUIRED errors
-                    if (!methodName.equals(ABORT_METHOD) &&
-                        !methodName.equals(LOGOUT_METHOD) &&
-                        moduleStack[i].entry.getControlFlag() ==
-                    AppConfigurationEntry.LoginModuleControlFlag.SUFFICIENT &&
-                        firstRequiredError == null) {
+                    if (!requiredExceptionHolder.hasException() && controlFlag == LoginModuleControlFlag.SUFFICIENT &&
+                            (methodName.equals(LOGIN_METHOD) || methodName.equals(COMMIT_METHOD))) {
 
-                        if (debug.messageEnabled())
+                        if (debug.messageEnabled()) {
                             debug.message(methodName + " SUFFICIENT success");
+                        }
+
                         return;
                     }
 
-                    if (debug.messageEnabled())
+                    if (debug.messageEnabled()) {
                         debug.message(methodName + " success");
+                    }
+
                     success = true;
                 } else {
-                    if (debug.messageEnabled())
+                    if (debug.messageEnabled()) {
                         debug.message(methodName + " ignored");
+                    }
                 }
 
             } catch (NoSuchMethodException nsme) {
-                throw new LoginException(
-                        "unable to instantiate LoginModule, module, because " +
-                        "it does not provide a no-argument constructor:" +
-                        moduleStack[i].entry.getLoginModuleName());
+                throw new LoginException("unable to instantiate LoginModule, module, because it does " +
+                        "not provide a no-argument constructor:" + info.entry.getLoginModuleName());
             } catch (InstantiationException ie) {
-                throw new LoginException("unable to instantiate " +
-                    "LoginModule: " +ie.getMessage());
+                throw new LoginException("unable to instantiate LoginModule: " + ie.getMessage());
             } catch (ClassNotFoundException cnfe) {
-                throw new LoginException(
-                        "unable to find LoginModule class: " +
-                        cnfe.getMessage());
+                throw new LoginException("unable to find LoginModule class: " + cnfe.getMessage());
             } catch (IllegalAccessException iae) {
-                throw new LoginException(
-                        "unable to access LoginModule: " +
-                        iae.getMessage());
+                throw new LoginException("unable to access LoginModule: " + iae.getMessage());
             } catch (InvocationTargetException ite) {
-                if (ite.getTargetException() instanceof java.lang.Error) {
-                    if (debug.messageEnabled()){	
-                        debug.message("LoginContext.invoke():" +
-                        "Handling expected java.lang.Error");
+
+                if (ite.getTargetException() instanceof Error) {
+                    if (debug.messageEnabled()) {
+                        debug.message("LoginContext.invoke(): Handling expected java.lang.Error");
                     }
-                    throw (java.lang.Error)ite.getTargetException();
+                    throw (Error)ite.getTargetException();
                 }
+
                 // failure cases
-                LoginException le;
+                LoginException le = null;
 
                 if (ite.getTargetException() instanceof LoginException) {
                     le = (LoginException)ite.getTargetException();
-                } else if (ite.getTargetException() instanceof
-                    SecurityException) {
+                } else if (ite.getTargetException() instanceof SecurityException) {
                     // do not want privacy leak
                     // (e.g., sensitive file path in exception msg)
                     le = new LoginException("Security Exception");
                     // le.initCause(new SecurityException());
                     if (debug.messageEnabled()) {
-                        debug.message
-                            ("original security exception with detail msg " +
-                            "replaced by new exception with empty detail msg");
-                        debug.message("original security exception: " +
-                                ite.getTargetException().toString());
+                        debug.message("original security exception with detail msg " +
+                                "replaced by new exception with empty detail msg");
+                        debug.message("original security exception: " + ite.getTargetException().toString());
                     }
                 } else {
                     // capture an unexpected LoginModule exception
-                    java.io.StringWriter sw = new java.io.StringWriter();
-                    ite.getTargetException().printStackTrace
-                                                (new java.io.PrintWriter(sw));
+                    StringWriter sw = new StringWriter();
+                    ite.getTargetException().printStackTrace(new PrintWriter(sw));
                     sw.flush();
                     le = new LoginException(sw.toString());
                 }
 
-                // If we have a InvalidPasswordException save the exception,
-                // so we can rethrow it for account lockout OPENAM-46
-                if (le instanceof InvalidPasswordException) {
-                    if (passwordError == null)
-                        passwordError = le;
+                if (debug.messageEnabled()) {
+                    debug.message(String.format("Method %s %s failure.", methodName, controlFlag));
                 }
 
-                if (moduleStack[i].entry.getControlFlag() ==
-                    AppConfigurationEntry.LoginModuleControlFlag.REQUISITE) {
-
-                    if (debug.messageEnabled()) 
-                        debug.message(methodName + " REQUISITE failure");
-
-                    // if REQUISITE, then immediately throw an exception
-                    if (methodName.equals(ABORT_METHOD) ||
-                        methodName.equals(LOGOUT_METHOD)) {
-                        if (firstRequiredError == null)
-                            firstRequiredError = le;
-                    } else if (passwordError != null) {
-                        throwException(passwordError, le);
-                    } else {
-                        throwException(firstRequiredError, le);
-                    }
-
-                } else if (moduleStack[i].entry.getControlFlag() ==
-                    AppConfigurationEntry.LoginModuleControlFlag.REQUIRED) {
-
-                    if (debug.messageEnabled())  {
-                        debug.message(methodName + " REQUIRED failure");
-                        debug.message("Exception: " + le);
-                    }
-
-                    // mark down that a REQUIRED module failed
-                    if (firstRequiredError == null) {
-                        firstRequiredError = le;
-                        debug.message("Set firstRequiredError to " + le);
-                    }
-
-                } else {
-
-                    if (debug.messageEnabled()) 
-                        debug.message(methodName + " OPTIONAL failure");
-
+                if (controlFlag == LoginModuleControlFlag.OPTIONAL || controlFlag == LoginModuleControlFlag.SUFFICIENT) {
                     // mark down that an OPTIONAL module failed
-                    if (firstError == null)
-                        firstError = le;
+                    optionalExceptionHolder.setException(le);
+                } else {
+                    requiredExceptionHolder.setException(le);
+
+                    if (controlFlag == LoginModuleControlFlag.REQUISITE &&
+                            (methodName.equals(LOGIN_METHOD) || methodName.equals(COMMIT_METHOD))) {
+                        // if REQUISITE, then immediately throw an exception
+                        throw requiredExceptionHolder.getException();
+                    }
                 }
             }
         }
 
-        // we went thru all the LoginModules.
-        // If there was a password error,  throw as exception so account lockout
-        // works as expected.  OPENAM-46
-        
-        if (passwordError != null) {
-            throwException(passwordError, null);
-        } else if (firstRequiredError != null) {
+        if (requiredExceptionHolder.hasException()) {
             // a REQUIRED module failed -- return the error
-            throwException(firstRequiredError, null);
-        } else if (success == false && firstError != null) {
-            // no module succeeded -- return the first error
-            throwException(firstError, null);
+            throw requiredExceptionHolder.getException();
+        } else if (success == false && optionalExceptionHolder.hasException()) {
+            // no module succeeded -- return the first optional error
+            throw optionalExceptionHolder.getException();
         } else if (success == false) {
             // no module succeeded -- all modules were IGNORED
-            throwException(new LoginException(
-                "Login Failure: all modules ignored"),
-                null);
-        } else {
-            // success
-            return;
+            throw new LoginException("Login Failure: all modules ignored");
         }
     }
 
+    // Exception holder class. Prompts InvalidPasswordExceptions above other LoginException types.
+    private static class ExceptionHolder {
 
+        private LoginException exception;
+
+        /**
+         * The captured exception.
+         *
+         * @param exception
+         *         Captured exception.
+         */
+        public void setException(LoginException exception) {
+            if (this.exception == null ||
+                    (!(this.exception instanceof InvalidPasswordException) &&
+                            exception instanceof InvalidPasswordException)) {
+                this.exception = exception;
+            }
+        }
+
+        /**
+         * @return The captured exception.
+         */
+        public LoginException getException() {
+            return exception;
+        }
+
+        /**
+         * @return Whether a valid exception has been captured.
+         */
+        public boolean hasException() {
+            return exception != null;
+        }
+
+    }
 
     /**
      * LoginModule information -
