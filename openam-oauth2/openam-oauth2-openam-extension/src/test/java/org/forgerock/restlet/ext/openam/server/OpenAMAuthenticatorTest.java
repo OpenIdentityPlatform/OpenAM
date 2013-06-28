@@ -47,49 +47,5 @@ import org.testng.annotations.Test;
  * @author Laszlo Hordos
  */
 public class OpenAMAuthenticatorTest extends OpenAMTestBase {
-    private Server server;
 
-    @BeforeClass
-    public void setUp() throws Exception {
-        OpenAMParameters parameters = new OpenAMParameters();
-        // Protect the ServerResource
-        OpenAMAuthenticator filter = new OpenAMAuthenticator(new Context(), parameters);
-        // Authorize
-        OpenAMAuthorizer authorizer = new OpenAMAuthorizer("OAUTH2");
-        filter.setNext(authorizer);
-        authorizer.setNext(OpenAMAuthenticatorTest.class);
-        server = new Server(Protocol.HTTP, 8182, filter);
-        server.start();
-    }
-
-    @AfterClass
-    public void shutDown() throws Exception {
-        if (null != server) {
-            server.stop();
-        }
-    }
-
-    @Test
-    public void testAuthentication() throws Exception {
-        ClientResource clientResource = new ClientResource(new Context(), "http://localhost:8182");
-        Client client = new Client(new Context(), Protocol.HTTP);
-
-        // Pre-Authenticate the Request
-        OpenAMProxy proxy = new OpenAMProxy(clientResource.getContext(), new OpenAMParameters());
-        proxy.setNext(client);
-        clientResource.setNext(proxy);
-
-        Representation representation = clientResource.get();
-        Assert.assertEquals(representation.getText(), "amadmin");
-
-    }
-
-    @Get
-    public Representation represent() {
-        if (getRequest().getClientInfo().getUser() instanceof OpenAMUser) {
-            return new StringRepresentation(((OpenAMUser) getRequest().getClientInfo().getUser())
-                    .getIdentifier());
-        }
-        return new StringRepresentation("failed");
-    }
 }

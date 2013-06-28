@@ -61,6 +61,17 @@ public class OpenAMServerAuthorizer extends AbstractOpenAMAuthorizer {
         init();
     }
 
+    /**
+     * Constructor.
+     *
+     * @param identifier
+     *            The identifier unique within an application.
+     */
+    public OpenAMServerAuthorizer(String identifier) {
+        super(identifier);
+        init();
+    }
+
     protected void init() {
         try {
             pe = new PolicyEvaluator(WEB_AGENT_SERVICE);
