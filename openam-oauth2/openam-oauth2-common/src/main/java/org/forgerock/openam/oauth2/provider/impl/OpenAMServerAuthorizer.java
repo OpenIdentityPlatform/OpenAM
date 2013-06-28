@@ -61,17 +61,6 @@ public class OpenAMServerAuthorizer extends AbstractOpenAMAuthorizer {
         init();
     }
 
-    /**
-     * Constructor.
-     * 
-     * @param identifier
-     *            The identifier unique within an application.
-     */
-    public OpenAMServerAuthorizer(String identifier) {
-        super(identifier);
-        init();
-    }
-
     protected void init() {
         try {
             pe = new PolicyEvaluator(WEB_AGENT_SERVICE);
@@ -86,7 +75,6 @@ public class OpenAMServerAuthorizer extends AbstractOpenAMAuthorizer {
         }
     }
 
-    @Override
     protected boolean getPolicyDecision(OpenAMUser user, Request request, Response response)
             throws SSOException, PolicyException {
         Map<String, Set<String>> env = new HashMap<String, Set<String>>();

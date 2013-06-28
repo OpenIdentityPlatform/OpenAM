@@ -44,25 +44,26 @@ import com.sun.identity.policy.PolicyException;
  * {@link com.sun.identity.policy.client.PolicyEvaluator}
  *
  */
-public abstract class AbstractOpenAMAuthorizer extends Authorizer {
+public abstract class AbstractOpenAMAuthorizer{
 
     public static final String WEB_AGENT_SERVICE = "iPlanetAMWebAgentService";
+    protected String identifier = null;
 
     /**
      * Default constructor.
      */
     public AbstractOpenAMAuthorizer() {
-        super();
+        identifier = "OAUTH2";
     }
 
     /**
      * Constructor.
-     * 
+     *
      * @param identifier
      *            The identifier unique within an application.
      */
     public AbstractOpenAMAuthorizer(String identifier) {
-        super(identifier);
+        this.identifier = identifier;
     }
 
     /**
@@ -74,8 +75,7 @@ public abstract class AbstractOpenAMAuthorizer extends Authorizer {
      *            The response to update.
      * @return True if the authorization succeeded.
      */
-    @Override
-    protected boolean authorize(Request request, Response response) {
+    public boolean authorize(Request request, Response response) {
         if (request.getClientInfo().getUser() instanceof OpenAMUser) {
             try {
                 OpenAMUser user = (OpenAMUser) request.getClientInfo().getUser();
@@ -95,4 +95,8 @@ public abstract class AbstractOpenAMAuthorizer extends Authorizer {
 
     protected abstract boolean getPolicyDecision(OpenAMUser user, Request request, Response response)
             throws SSOException, PolicyException;
+
+    protected String getIdentifier(){
+        return identifier;
+    }
 }

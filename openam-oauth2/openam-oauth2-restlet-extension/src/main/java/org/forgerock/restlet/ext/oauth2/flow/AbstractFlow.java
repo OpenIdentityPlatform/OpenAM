@@ -384,8 +384,11 @@ public abstract class AbstractFlow extends ServerResource {
             throw OAuthProblemException.OAuthError.SERVER_ERROR.handle(getRequest(), "Resource Owner unable to login");
         }
         OpenAMServerAuthorizer authorizer = new OpenAMServerAuthorizer();
-        authorizer.setNext((Restlet)null);
-        authorizer.handle(getRequest(), getResponse());
+        if (authorizer.authorize(getRequest(), getResponse()) == false){
+            OAuth2Utils.DEBUG.error("The authorization server can not authorize the resource owner.");
+            throw OAuthProblemException.OAuthError.ACCESS_DENIED.handle(getRequest(),
+                    "The authorization server can not authorize the resource owner.");
+        }
         if (getRequest().getClientInfo().getUser() != null) {
             return getRequest().getClientInfo().getUser();
         }
