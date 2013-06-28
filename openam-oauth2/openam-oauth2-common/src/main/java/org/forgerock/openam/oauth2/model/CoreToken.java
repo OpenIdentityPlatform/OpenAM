@@ -222,7 +222,7 @@ public class CoreToken extends JsonValue implements Token {
         if (value != null && !value.isEmpty()){
             return value;
         }
-        return null;
+        return Collections.EMPTY_SET;
     }
 
     /**
