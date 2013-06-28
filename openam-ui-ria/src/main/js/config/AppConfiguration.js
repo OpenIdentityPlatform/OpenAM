@@ -136,11 +136,11 @@ define("config/AppConfiguration", [
                                     "dashboard": {
                                         "url": "#dashboard/",
                                         "name": "config.AppConfiguration.Navigation.links.dashboard"
-                                    },
+                                    }/*,
                                     "oauth2": {
                                         "url": "#oauth2/tokens",
                                         "name": "config.AppConfiguration.Navigation.links.oauthtokens"
-                                    }
+                                    }*/
                                 }
                             }
                         }
