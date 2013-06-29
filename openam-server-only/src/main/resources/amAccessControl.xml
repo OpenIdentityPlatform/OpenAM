@@ -25,7 +25,9 @@
    $Id: amAccessControl.xml,v 1.22 2010/01/08 00:27:01 babysunil Exp $
 
 -->
-
+<!--
+   Portions Copyrighted 2013 ForgeRock, Inc.
+-->
 <accesscontrols>
     <!-- REALM -->
     <viewbean classname="com.sun.identity.console.realm.RMRealmViewBean"
@@ -248,7 +250,7 @@
 
     <neednodealwith classname="com.sun.identity.console.user.UMChangeUserPasswordViewBean" />
     <neednodealwith classname="com.sun.identity.console.idm.EndUserViewBean" />
-    <neednodealwith classname="com.sun.identity.console.idm.UMUserPasswordResetOptions" />
+    <neednodealwith classname="com.sun.identity.console.user.UMUserPasswordResetOptionsViewBean" />
 
     <viewbean view="*" modify="*" classname="com.sun.identity.console.authentication.NewAuthConfigViewBean" />
     <viewbean view="*" modify="*" classname="com.sun.identity.console.authentication.NewAuthInstanceViewBean" />
@@ -346,7 +348,6 @@
     <viewbean view="*" modify="*" classname="com.sun.identity.console.session.SMProfileViewBean" />
     <viewbean view="*" modify="*" classname="com.sun.identity.console.delegation.DelegationViewBean" />
     <viewbean view="*" modify="*" classname="com.sun.identity.console.delegation.DelegationPropertiesViewBean" />
-    <viewbean view="*" modify="*" classname="com.sun.identity.console.user.UMUserPasswordResetOptionsViewBean" />
     <viewbean view="*" modify="*" classname="com.sun.identity.console.policy.PMAuthenticatedUsersSubjectAddViewBean" />
     <viewbean view="*" modify="*" classname="com.sun.identity.console.policy.SelectRealmViewBean" />
     <viewbean view="*" modify="*" classname="com.sun.identity.console.federation.CreateCOTViewBean" />
