@@ -26,6 +26,9 @@
  *
  */
 
+/*
+ * Portions Copyrighted 2013 ForgeRock AS
+ */
 
 package com.sun.identity.saml2.assertion.impl;
 
@@ -300,7 +303,7 @@ public class SubjectConfirmationImpl implements SubjectConfirmation {
                 "objectImmutable"));
         }
         method = value;
-    } 
+    }
 
    /**
     * Returns a String representation
@@ -311,9 +314,8 @@ public class SubjectConfirmationImpl implements SubjectConfirmation {
     * @return A String representation
     * @exception SAML2Exception if something is wrong during conversion
     */
-    public String toXMLString(boolean includeNSPrefix, boolean declareNS)
-        throws SAML2Exception {
-        StringBuffer sb = new StringBuffer(2000);
+    public String toXMLString(boolean includeNSPrefix, boolean declareNS) throws SAML2Exception {
+        StringBuilder sb = new StringBuilder(2000);
         String NS = "";
         String appendNS = "";
         if (declareNS) {
@@ -322,48 +324,28 @@ public class SubjectConfirmationImpl implements SubjectConfirmation {
         if (includeNSPrefix) {
             appendNS = SAML2Constants.ASSERTION_PREFIX;
         }
-        sb.append("<").append(appendNS).append(SUBJECT_CONFIRMATION_ELEMENT).
-            append(NS);
+        sb.append("<").append(appendNS).append(SUBJECT_CONFIRMATION_ELEMENT).append(NS);
         if ((method == null) || (method.trim().length() == 0)) {
-            SAML2SDKUtils.debug.error(
-                "SubjectConfirmationImpl.toXMLString(): method missing");
-            throw new SAML2Exception(SAML2SDKUtils.bundle.getString(
-                "missing_confirmation_method"));
+            SAML2SDKUtils.debug.error("SubjectConfirmationImpl.toXMLString(): method missing");
+            throw new SAML2Exception(SAML2SDKUtils.bundle.getString("missing_confirmation_method"));
         } 
-        sb.append(" ").append(METHOD_ATTR).append("=\"").
-            append(method).append("\"").append(">\n");
-        if (subjectConfirmationData == null) {
-            if ((baseId != null) || (nameId != null) || (encryptedId != null)) {
-                if ((baseId != null) && (nameId == null) 
-                    && (encryptedId == null)) {
-                    sb.append(baseId.toXMLString(includeNSPrefix, false));
-                } else if ((nameId != null) && (baseId == null)
-                    && (encryptedId == null)) {
-                    sb.append(nameId.toXMLString(includeNSPrefix, false));
-                } else if ((encryptedId != null) && (baseId == null)
-                    && (nameId == null)) {
-                    sb.append(encryptedId.toXMLString(includeNSPrefix, false));
-                } else { 
-                    SAML2SDKUtils.debug.error(
-                        "SubjectConfirmationImpl.toXMLString(): "
-                        + "more than one types of id specified");
-                    throw new SAML2Exception(SAML2SDKUtils.bundle.getString(
-                          "too_many_ids_specified"));
-                }
+        sb.append(" ").append(METHOD_ATTR).append("=\"").append(method).append("\"").append(">\n");
+        if ((baseId != null) || (nameId != null) || (encryptedId != null)) {
+            if ((baseId != null) && (nameId == null) && (encryptedId == null)) {
+                sb.append(baseId.toXMLString(includeNSPrefix, false));
+            } else if ((nameId != null) && (baseId == null) && (encryptedId == null)) {
+                sb.append(nameId.toXMLString(includeNSPrefix, false));
+            } else if ((encryptedId != null) && (baseId == null) && (nameId == null)) {
+                sb.append(encryptedId.toXMLString(includeNSPrefix, false));
+            } else {
+                SAML2SDKUtils.debug.error("SubjectConfirmationImpl.toXMLString(): more than one types of id specified");
+                throw new SAML2Exception(SAML2SDKUtils.bundle.getString("too_many_ids_specified"));
             }
-        } else {
-            if ((baseId != null) || (nameId != null) || (encryptedId != null)) {
-                SAML2SDKUtils.debug.error("SubjectConfirmationImpl."
-                    +"toXMLString(): Only one of the ids or confirmation"
-                    +" can be specified");
-                throw new SAML2Exception(SAML2SDKUtils.bundle.getString(
-                    "id_and_confirmation_both_specified"));
-            }
-            sb.append(subjectConfirmationData.toXMLString(
-                includeNSPrefix, false));
         }
-        sb.append("</").append(appendNS).
-            append(SUBJECT_CONFIRMATION_ELEMENT).append(">\n");
+        if (subjectConfirmationData != null) {
+            sb.append(subjectConfirmationData.toXMLString(includeNSPrefix, false));
+        }
+        sb.append("</").append(appendNS).append(SUBJECT_CONFIRMATION_ELEMENT).append(">\n");
         return sb.toString();
     }
 
