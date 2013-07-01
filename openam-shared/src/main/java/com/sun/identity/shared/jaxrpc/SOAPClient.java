@@ -26,7 +26,7 @@
  *
  */
 /**
- * Portions Copyrighted 2012 ForgeRock Inc
+ * Portions Copyrighted 2012-2013 ForgeRock Inc
  */
 package com.sun.identity.shared.jaxrpc;
 
@@ -49,6 +49,7 @@ import java.net.URL;
 import java.rmi.RemoteException;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.TreeSet;
 import java.util.Iterator;
 import java.util.LinkedList;
@@ -445,11 +446,18 @@ public class SOAPClient {
     public String encodeMap(Map map) {
         return (encodeMap("Map_1", map));
     }
-    
+
     String encodeByteArrayArray(String name, byte[][] data) {
-        return (null);
+        if (data == null || data.length == 0) {
+            throw new IllegalArgumentException("The provided byte array is null or empty");
+        }
+        Set<String> converted = new HashSet<String>(data.length);
+        for (byte[] bytes : data) {
+            converted.add(Base64.encode(bytes));
+        }
+        return encodeSet(name, converted);
     }
-    
+
     public String encodeMap(String name, Map map) {
         StringBuffer sb = new StringBuffer(200);
         sb.append("<").append(name);

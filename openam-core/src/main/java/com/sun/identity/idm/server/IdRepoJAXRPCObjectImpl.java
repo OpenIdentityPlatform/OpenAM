@@ -26,7 +26,7 @@
 */
 
 /*
- * Portions Copyrighted [2011] [ForgeRock AS]
+ * Portions Copyrighted 2011-2013 ForgeRock AS
  */
 package com.sun.identity.idm.server;
 
@@ -645,6 +645,19 @@ public abstract class IdRepoJAXRPCObjectImpl implements DirectoryManagerIF {
     ) throws RemoteException, IdRepoException, SSOException {
         SSOToken ssoToken = getSSOToken(token);
         IdType idtype = IdUtils.getType(type);
+        if (!isString) {
+            Map<String, byte[][]> binaryAttributes = new HashMap<String, byte[][]>(attributes.size());
+            for (Map.Entry<String, Set<String>> entry : ((Map<String, Set<String>>) attributes).entrySet()) {
+                Set<String> stringValues = entry.getValue();
+                byte[][] values = new byte[stringValues.size()][];
+                int counter = 0;
+                for (String value : stringValues) {
+                    values[counter++] = Base64.decode(value);
+                }
+                binaryAttributes.put(entry.getKey(), values);
+            }
+            attributes = binaryAttributes;
+        }
         idServices.setAttributes(ssoToken, idtype, name, attributes, isAdd,
             amOrgName, amsdkDN, isString);
     }
