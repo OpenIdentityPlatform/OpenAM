@@ -27,7 +27,7 @@
  */
 
 /*
- * Portions Copyrighted 2010-2012 ForgeRock AS
+ * Portions Copyrighted 2010-2013 ForgeRock, Inc.
  */
 
 package com.sun.identity.setup;
@@ -90,6 +90,7 @@ import java.util.Set;
 import java.util.StringTokenizer;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
+import org.forgerock.openam.utils.IOUtils;
 
 // OpenDS does not have APIs to install and setup replication yet
 
@@ -171,21 +172,8 @@ public class EmbeddedOpenDS {
                     "EmbeddedOpenDS.setup(): Error copying zip file", ioe);
             throw ioe;
         } finally {
-            if (bin != null) {
-                try {
-                    bin.close();
-                } catch (Exception ex) {
-                    //No handling requried
-                }
-            }
-
-            if (bout != null) {
-                try {
-                    bout.close();
-                } catch (Exception ex) {
-                    //No handling requried
-                }
-            }
+            IOUtils.closeIfNotNull(bin);
+            IOUtils.closeIfNotNull(bout);
         }
 
         ZipFile opendsZip = new ZipFile(odsRoot + "/opendj.zip");
@@ -214,21 +202,8 @@ public class EmbeddedOpenDS {
                         "EmbeddedOpenDS.setup(): Error loading ldifs", ioe);
                 throw ioe;
             } finally {
-                if (is != null) {
-                    try {
-                        is.close();
-                    } catch (Exception ex) {
-                        //No handling requried
-                    }
-                }
-
-                if (fos != null) {
-                    try {
-                        fos.close();
-                    } catch (Exception ex) {
-                        //No handling requried
-                    }
-                }
+                IOUtils.closeIfNotNull(is);
+                IOUtils.closeIfNotNull(fos);
             } // End of Inner Finally.
 
             if (file.getName().endsWith("sh") || file.getName().startsWith("bin")) {
@@ -261,21 +236,8 @@ public class EmbeddedOpenDS {
                         "EmbeddedOpenDS.setup(): Error copying zip file", ioe);
                 throw ioe;
             } finally {
-                if (inChannel != null) {
-                    try {
-                        inChannel.close();
-                    } catch (Exception ex) {
-                        //No handling requried
-                    }
-                }
-
-                if (outChannel != null) {
-                    try {
-                        outChannel.close();
-                    } catch (Exception ex) {
-                        //No handling requried
-                    }
-                }
+                IOUtils.closeIfNotNull(inChannel);
+                IOUtils.closeIfNotNull(outChannel);
             }
         }
 
@@ -306,20 +268,8 @@ public class EmbeddedOpenDS {
                         "EmbeddedOpenDS.setup(): Error tag swapping files", e);
                 throw e;
             } finally {
-                if (fin != null) {
-                    try {
-                        fin.close();
-                    } catch (Exception ex) {
-                        //No handling requried
-                    }
-                }
-                if (fout != null) {
-                    try {
-                        fout.close();
-                    } catch (Exception ex) {
-                        //No handling requried
-                    }
-                }
+                IOUtils.closeIfNotNull(fin);
+                IOUtils.closeIfNotNull(fout);
             }
         }
 
@@ -902,15 +852,14 @@ public class EmbeddedOpenDS {
                             "userRoot",                                         // 5
                             "-l",                                               // 6
                             ldif,                                               // 7
-                            "-Q",                                               // 8
-                            "--trustAll",                                       // 9
-                            "-D",                                               // 10
-                            "cn=Directory Manager",                             // 11
-                            "-w",                                               // 12
-                            "password"                                          // 13
+                            "--trustAll",                                       // 8
+                            "-D",                                               // 9
+                            "cn=Directory Manager",                             // 10
+                            "-w",                                               // 11
+                            "password"                                          // 12
                     };
-            args1[11] = (String) map.get(SetupConstants.CONFIG_VAR_DS_MGR_DN);
-            args1[13] = (String) map.get(SetupConstants.CONFIG_VAR_DS_MGR_PWD);
+            args1[10] = (String) map.get(SetupConstants.CONFIG_VAR_DS_MGR_DN);
+            args1[12] = (String) map.get(SetupConstants.CONFIG_VAR_DS_MGR_PWD);
             ret = org.opends.server.tools.ImportLDIF.mainImportLDIF(args1, false,
                     SetupProgress.getOutputStream(), SetupProgress.getOutputStream());
 

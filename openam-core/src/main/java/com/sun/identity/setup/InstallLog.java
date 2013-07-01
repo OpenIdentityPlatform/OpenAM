@@ -25,21 +25,26 @@
  * $Id: InstallLog.java,v 1.2 2008/06/25 05:44:02 qcheng Exp $
  *
  */
-
+/**
+ * Portions Copyrighted 2013 ForgeRock, Inc.
+ */
 package com.sun.identity.setup;
 
-import com.iplanet.am.util.SystemProperties;
+import java.io.File;
 import java.io.FileWriter;
 import java.io.PrintWriter;
 import java.io.StringWriter;
+import org.forgerock.openam.utils.IOUtils;
 
 /**
  * Installation Log
  */
 public class InstallLog {
-    private StringBuffer buff = null;
-    private final static String FILENAME = "install.log";
+
+    private static final String FILE_NAME = "install.log";
     private static InstallLog instance = new InstallLog();
+    private StringBuilder buff = null;
+    private String logPath;
     
     public static InstallLog getInstance() {
         return instance;
@@ -48,30 +53,21 @@ public class InstallLog {
     private InstallLog() {
     }
 
-    public synchronized void open() {
-        buff = new StringBuffer();
+    public synchronized void open(String folder) {
+        buff = new StringBuilder(15000);
+        logPath = folder + File.separator + FILE_NAME;
     }
     
     public synchronized void close() {
+        FileWriter fout = null;
         try {
-            String baseDir = SystemProperties.get(
-                SystemProperties.CONFIG_PATH);
-            FileWriter fout = null;
-            try {
-                fout = new FileWriter(baseDir + "/" + FILENAME);
-                fout.write(buff.toString());
-                buff = null;
-            } finally {
-                if (fout != null) {
-                    try {
-                        fout.close();
-                    } catch (Exception ex) {
-                    //No handling requried
-                    }
-                }
-            }
+            fout = new FileWriter(logPath);
+            fout.write(buff.toString());
+            buff = null;
         } catch (Exception ex) {
             System.err.println(ex.getMessage());
+        } finally {
+            IOUtils.closeIfNotNull(fout);
         }
     }
 

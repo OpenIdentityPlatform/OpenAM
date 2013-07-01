@@ -603,7 +603,7 @@ public class AMSetupServlet extends HttpServlet {
             IHttpServletResponse response
     ) {
         setLocale(request);
-        InstallLog.getInstance().open();
+        InstallLog.getInstance().open((String) request.getParameterMap().get(SetupConstants.CONFIG_VAR_BASE_DIR));
         /*
          * This logic needs refactoring later. setServiceConfigValues()
          * attempts to check if directory is up and makes a call

@@ -1,7 +1,7 @@
 /**
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright (c) 2011 ForgeRock AS. All Rights Reserved
+ * Copyright (c) 2011-2013 ForgeRock, Inc. All Rights Reserved
  *
  * The contents of this file are subject to the terms
  * of the Common Development and Distribution License
@@ -115,22 +115,22 @@ public class UpgradeProgress {
                 @Override
                 public void write(int b) throws IOException {
                     writer.write("<script>addProgressText(\"");
-                    writer.write(String.valueOf((char) b).replace("\n", "\\\n"));
-                    writer.write("<br>\");</script>");
+                    writer.write(String.valueOf((char) b).replace("\n", "\\\n").replace("\"", "\\\""));
+                    writer.write("<br/>\");</script>");
                     writer.flush();
                 }
                 @Override
                 public void write(byte[] b) throws IOException {
                     writer.write("<script>addProgressText(\"");
-                    writer.write(new String(b, encoding).replace("\n", "\\\n"));
-                    writer.write("<br>\");</script>");
+                    writer.write(new String(b, encoding).replace("\n", "\\\n").replace("\"", "\\\""));
+                    writer.write("<br/>\");</script>");
                     writer.flush();
                 }
                 @Override
                 public void write(byte[] b, int off, int len) throws IOException {
                     writer.write("<script>addProgressText(\"");
-                    writer.write(new String(b, off, len, encoding).replace("\n", "\\\n"));
-                    writer.write("<br>\");</script>");
+                    writer.write(new String(b, off, len, encoding).replace("\n", "\\\n").replace("\"", "\\\""));
+                    writer.write("<br/>\");</script>");
                     writer.flush();
                 }
                 @Override

@@ -27,7 +27,7 @@
  */
 
 /*
- * Portions Copyrighted 2011 ForgeRock AS
+ * Portions Copyrighted 2011-2013 ForgeRock, Inc.
  */
 
 package com.sun.identity.setup;
@@ -92,8 +92,9 @@ public class SetupProgress {
             out = new OutputStream() {
                 @Override
                 public void write(int b) throws IOException {
-                    writer.write(URLEncoder.encode(String.valueOf((char) b),
-                        encoding));
+                    String text = String.valueOf((char) b);
+                    InstallLog.getInstance().write(text);
+                    writer.write(URLEncoder.encode(text, encoding));
                     writer.flush();
                 }
 
@@ -106,24 +107,30 @@ public class SetupProgress {
             out = new OutputStream() {
                 @Override
                 public void write(int b) throws IOException {
+                    String text = String.valueOf((char) b);
+                    InstallLog.getInstance().write(text);
                     writer.write("<script>addProgressText(\""
-                            + String.valueOf((char) b).replace("\n", "\\\n")
-                            + "<br>\");</script>");
+                            + text.replace("\n", "\\\n").replace("\"", "\\\"")
+                            + "<br/>\");</script>");
                     writer.flush();
                 }
 
                 @Override
                 public void write(byte[] b) throws IOException {
+                    String text = new String(b, encoding);
+                    InstallLog.getInstance().write(text);
                     writer.write("<script>addProgressText(\"");
-                    writer.write(new String(b, encoding).replace("\n", "\\\n"));
-                    writer.write("<br>\");</script>");
+                    writer.write(text.replace("\n", "\\\n").replace("\"", "\\\""));
+                    writer.write("<br/>\");</script>");
                     writer.flush();
                 }
                 @Override
                 public void write(byte[] b, int off, int len) throws IOException {
+                    String text = new String(b, off, len, encoding);
+                    InstallLog.getInstance().write(text);
                     writer.write("<script>addProgressText(\"");
-                    writer.write(new String(b, off, len, encoding).replace("\n", "\\\n"));
-                    writer.write("<br>\");</script>");
+                    writer.write(text.replace("\n", "\\\n").replace("\"", "\\\""));
+                    writer.write("<br/>\");</script>");
                     writer.flush();
                 }
                 @Override
