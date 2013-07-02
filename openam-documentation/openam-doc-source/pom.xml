@@ -213,10 +213,13 @@
                                             openam-schema/openam-dtd-schema/src/main/resources/com/sun/identity/log/messageid/CoreTokenLogMessageIDs.xml
                                         </include>
                                         <include>
-                                            openam-schema/openam-dtd-schema/src/main/resources/com/sun/identity/log/messageid/ntitlementLogMessageIDs.xml
+                                            openam-schema/openam-dtd-schema/src/main/resources/com/sun/identity/log/messageid/EntitlementLogMessageIDs.xml
                                         </include>
                                         <include>
                                             openam-schema/openam-dtd-schema/src/main/resources/com/sun/identity/log/messageid/LoggingLogMessageIDs.xml
+                                        </include>
+                                        <include>
+                                            openam-schema/openam-dtd-schema/src/main/resources/com/sun/identity/log/messageid/OAuth2ProviderLogMessageIDs.xml
                                         </include>
                                         <include>
                                             openam-schema/openam-dtd-schema/src/main/resources/com/sun/identity/log/messageid/PolicyLogMessageIDs.xml
