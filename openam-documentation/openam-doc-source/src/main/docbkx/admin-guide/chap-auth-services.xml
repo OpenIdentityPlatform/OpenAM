@@ -3034,6 +3034,16 @@
      </listitem>
     </varlistentry>
    </variablelist>
+    <para>If you plan to use Yubikey for your OATH module, you will need to take some
+    time to set it up. Go to the <link xlink:show="new"
+    xlink:href="http://www.yubico.com/products/services-software/personalization-tools/use/">
+    YubiKey website</link> to configure your YubiKey device. If you do not have a
+    YubiKey device, you can purchase them from this page as well.</para>
+
+    <para>Select the appropriate instructions, keeping in mind that the cross-platform
+    personalization tool is recommended unless you have specific need for one of the
+    other types. You have the greatest selection of platforms for this choice. Each 
+    device will need to be setup before use.</para>
   </section>  
  
   
