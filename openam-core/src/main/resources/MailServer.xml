@@ -1,0 +1,199 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE ServicesConfiguration
+        PUBLIC "=//iPlanet//Service Management Services (SMS) 1.0 DTD//EN"
+        "jar://com/sun/identity/sm/sms.dtd">
+<!--
+      DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
+
+   Copyright (c) 2013 ForgeRock Inc. All Rights Reserved
+
+   The contents of this file are subject to the terms
+   of the Common Development and Distribution License
+   (the License). You may not use this file except in
+   compliance with the License.
+
+   You can obtain a copy of the License at
+   http://forgerock.org/license/CDDLv1.0.html
+   See the License for the specific language governing
+   permission and limitations under the License.
+
+   When distributing Covered Code, include this CDDL
+   Header Notice in each file and include the License file
+   at http://forgerock.org/license/CDDLv1.0.html
+   If applicable, add the following below the CDDL Header,
+   with the fields enclosed by brackets [] replaced by
+   your own identifying information:
+   "Portions copyright [year] [name of copyright owner]"
+-->
+
+<ServicesConfiguration>
+    <Service name="MailServer" version="1.0">
+        <Schema
+                serviceHierarchy="/DSAMEConfig/ForgeRockSendEmailService"
+                i18nFileName="MailServer"
+                revisionNumber="1"
+                i18nKey="forgerock-email-service-description">
+
+            <Organization>
+                <AttributeSchema name="forgerockMailServerImplClassName"
+                                 type="single"
+                                 syntax="string"
+                                 i18nKey="a100">
+                    <DefaultValues>
+                        <Value>org.forgerock.openam.services.email.MailServerImpl</Value>
+                    </DefaultValues>
+                </AttributeSchema>
+                <AttributeSchema name="forgerockEmailServiceSMTPHostName"
+                                 type="single"
+                                 syntax="string"
+                                 i18nKey="a101">
+                    <DefaultValues>
+                        <Value>smtp.gmail.com</Value>
+                    </DefaultValues>
+                </AttributeSchema>
+                <AttributeSchema name="forgerockEmailServiceSMTPHostPort"
+                                 type="single"
+                                 syntax="number_range" rangeStart="0" rangeEnd="65535"
+                                 i18nKey="a102">
+                    <DefaultValues>
+                        <Value>465</Value>
+                    </DefaultValues>
+                </AttributeSchema>
+                <AttributeSchema name="forgerockEmailServiceSMTPUserName"
+                                 type="single"
+                                 syntax="string"
+                                 i18nKey="a103">
+                    <DefaultValues>
+                        <Value>forgerocksmtp</Value>
+                    </DefaultValues>
+                </AttributeSchema>
+                <AttributeSchema name="forgerockEmailServiceSMTPUserPassword"
+                                 type="single"
+                                 syntax="password"
+                                 i18nKey="a104">
+                    <DefaultValues>
+                        <Value>ForgeRock2013!</Value>
+                    </DefaultValues>
+                </AttributeSchema>
+                <AttributeSchema name="forgerockEmailServiceSMTPSSLEnabled"
+                                 type="single_choice"
+                                 syntax="string"
+                                 i18nKey="a105">
+                    <ChoiceValues>
+                        <ChoiceValue i18nKey="ssl">SSL</ChoiceValue>
+                        <ChoiceValue i18nKey="nonssl">Non SSL</ChoiceValue>
+                    </ChoiceValues>
+                    <DefaultValues>
+                        <Value>SSL</Value>
+                    </DefaultValues>
+                </AttributeSchema>
+                <AttributeSchema name="forgerockEmailServiceSMTPFromAddress"
+                                 type="single"
+                                 syntax="string"
+                                 i18nKey="a106">
+                    <DefaultValues>
+                        <Value>no-reply@openam.org</Value>
+                    </DefaultValues>
+                </AttributeSchema>
+                <AttributeSchema name="openamEmailAttribute"
+                                 type="single"
+                                 syntax="string"
+                                 i18nKey="a107">
+                    <DefaultValues>
+                        <Value>mail</Value>
+                    </DefaultValues>
+                </AttributeSchema>
+                <AttributeSchema name="forgerockEmailServiceSMTPSubject"
+                                 type="single"
+                                 syntax="string"
+                                 i18nKey="a108">
+                </AttributeSchema>
+                <AttributeSchema name="forgerockEmailServiceSMTPMessage"
+                                 type="single"
+                                 syntax="string"
+                                 i18nKey="a109">
+                </AttributeSchema>
+                <SubSchema name="serverconfig" inheritance="multiple">
+                    <AttributeSchema name="forgerockMailServerImplClassName"
+                                     type="single"
+                                     syntax="string"
+                                     i18nKey="a100">
+                        <DefaultValues>
+                            <Value>org.forgerock.openam.services.email.MailServerImpl</Value>
+                        </DefaultValues>
+                    </AttributeSchema>
+                    <AttributeSchema name="forgerockEmailServiceSMTPHostName"
+                                     type="single"
+                                     syntax="string"
+                                     i18nKey="a501">
+                        <DefaultValues>
+                            <Value>smtp.gmail.com</Value>
+                        </DefaultValues>
+                    </AttributeSchema>
+                    <AttributeSchema name="forgerockEmailServiceSMTPHostPort"
+                                     type="single"
+                                     syntax="number_range" rangeStart="0" rangeEnd="65535"
+                                     i18nKey="a102">
+                        <DefaultValues>
+                            <Value>465</Value>
+                        </DefaultValues>
+                    </AttributeSchema>
+                    <AttributeSchema name="forgerockEmailServiceSMTPUserName"
+                                     type="single"
+                                     syntax="string"
+                                     i18nKey="a103">
+                        <DefaultValues>
+                            <Value>forgerocksmtp</Value>
+                        </DefaultValues>
+                    </AttributeSchema>
+                    <AttributeSchema name="forgerockEmailServiceSMTPUserPassword"
+                                     type="single"
+                                     syntax="password"
+                                     i18nKey="a104">
+                        <DefaultValues>
+                            <Value>ForgeRock2013!</Value>
+                        </DefaultValues>
+                    </AttributeSchema>
+                    <AttributeSchema name="forgerockEmailServiceSMTPSSLEnabled"
+                                     type="single_choice"
+                                     syntax="string"
+                                     i18nKey="a105">
+                        <ChoiceValues>
+                            <ChoiceValue i18nKey="ssl">SSL</ChoiceValue>
+                            <ChoiceValue i18nKey="nonssl">Non SSL</ChoiceValue>
+                        </ChoiceValues>
+                        <DefaultValues>
+                            <Value>SSL</Value>
+                        </DefaultValues>
+                    </AttributeSchema>
+                    <AttributeSchema name="forgerockEmailServiceSMTPFromAddress"
+                                     type="single"
+                                     syntax="string"
+                                     i18nKey="a106">
+                        <DefaultValues>
+                            <Value>no-reply@openam.org</Value>
+                        </DefaultValues>
+                    </AttributeSchema>
+                    <AttributeSchema name="openamEmailAttribute"
+                                     type="single"
+                                     syntax="string"
+                                     i18nKey="a107">
+                        <DefaultValues>
+                            <Value>mail</Value>
+                        </DefaultValues>
+                    </AttributeSchema>
+                    <AttributeSchema name="forgerockEmailServiceSMTPSubject"
+                                     type="single"
+                                     syntax="string"
+                                     i18nKey="a108">
+                    </AttributeSchema>
+                    <AttributeSchema name="forgerockEmailServiceSMTPMessage"
+                                     type="single"
+                                     syntax="string"
+                                     i18nKey="a109">
+                    </AttributeSchema>
+                </SubSchema>
+            </Organization>
+        </Schema>
+    </Service>
+</ServicesConfiguration>
