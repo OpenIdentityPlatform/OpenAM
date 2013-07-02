@@ -82,7 +82,7 @@ public class OAuthProblemException extends ResourceException {
         INVALID_CLIENT(
                 OAuth2Constants.Error.INVALID_CLIENT,
                 "The client identifier provided is invalid, the client failed to authenticate, the client did not include its credentials, provided multiple client credentials, or used unsupported credentials type.",
-                "", 400),
+                "", 401),
         UNKNOWN_ERROR(
                 OAuth2Constants.Error.UNKNOWN_ERROR,
                 "The authenticated client is not authorized to use the access grant type provided.",
