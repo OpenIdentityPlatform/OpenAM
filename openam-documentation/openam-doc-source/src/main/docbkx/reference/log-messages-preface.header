@@ -52,6 +52,18 @@
     <secondary>Administrative Files</secondary>
    </indexterm>
    <varlistentry>
+    <term>amAdmin.access</term>
+    <listitem>
+     <para>Contains log data about actions conducted by users logged in as amAdmin</para>
+    </listitem>
+   </varlistentry>
+   <varlistentry>
+    <term>amAdmin.error</term>
+    <listitem>
+     <para>Contains log data about errors encountered for users logged in as amAdmin</para>
+    </listitem>
+   </varlistentry>
+   <varlistentry>
     <term>amAuthentication.access</term>
     <listitem>
      <para>Contains log data for when users log into and out of OpenAM, including failed 
@@ -78,6 +90,12 @@
     </listitem>
    </varlistentry>
    <varlistentry>
+    <term>amPasswordReset.access</term>
+    <listitem>
+     <para>Contains data about password resets</para>
+    </listitem>
+   </varlistentry>
+   <varlistentry>
     <term>amPolicy.access</term>
     <listitem>
      <para>Contains data about authorization actions permitted by policies, including 
@@ -98,6 +116,12 @@
     </listitem>
    </varlistentry>
    <varlistentry>
+    <term>amRemotePolicy.access</term>
+    <listitem>
+     <para>Contains data about policies accessed remotely</para>
+    </listitem>
+   </varlistentry>
+   <varlistentry>
     <term>amSSO.access</term>
     <listitem>
      <para>Contains data about user sessions, including times of access, session time outs, 
@@ -105,9 +129,45 @@
     </listitem>
    </varlistentry>
    <varlistentry>
-    <term>entitlement.access</term>
+    <term>CoreToken.access</term>
+    <listitem>
+     <para>Contains data about actions run against the core token</para>
+    </listitem>
+   </varlistentry>
+   <varlistentry>
+    <term>CoreToken.error</term>
+    <listitem>
+     <para>Contains data on errors encountered regarding the core token</para>
+    </listitem>
+   </varlistentry>
+   <varlistentry>
+    <term>COT.access</term>
+    <listitem>
+     <para>Contains data about the circle of trust</para>
+    </listitem>
+   </varlistentry>
+   <varlistentry>
+    <term>COT.error</term>
+    <listitem>
+     <para>Contains data on errors encountered for the circle of trust</para>
+    </listitem>
+   </varlistentry>
+   <varlistentry>
+    <term>Entitlement.access</term>
     <listitem>
      <para>Contains data about entitlement actions or changes</para>
+    </listitem>
+   </varlistentry>
+   <varlistentry>
+    <term>Federation.access</term>
+    <listitem>
+     <para>Contains data about federation events</para>
+    </listitem>
+   </varlistentry>
+   <varlistentry>
+    <term>Federation.error</term>
+    <listitem>
+     <para>Contains data on errors encountered while executing actions for federation</para>
     </listitem>
    </varlistentry>
    <varlistentry>
@@ -124,6 +184,30 @@
     </listitem>
    </varlistentry>
    <varlistentry>
+    <term>Liberty.access</term>
+    <listitem>
+     <para>Contains data about actions run for the federation Liberty schema</para>
+    </listitem>
+   </varlistentry>
+   <varlistentry>
+    <term>Liberty.error</term>
+    <listitem>
+     <para>Contains data on errors encountered for the federation Liberty schema</para>
+    </listitem>
+   </varlistentry>
+   <varlistentry>
+    <term>OAuth2Provider.access</term>
+    <listitem>
+     <para>Contains data about actions for the OAuth 2.0 provider</para>
+    </listitem>
+   </varlistentry>
+   <varlistentry>
+    <term>OAuth2Provider.error</term>
+    <listitem>
+     <para>Contains data about errors encountered by the OAuth 2.0 provider</para>
+    </listitem>
+   </varlistentry>
+   <varlistentry>
     <term>SAML2.access</term>
     <listitem>
      <para>Contains data about SAML 2 actions, including changes to assertions, artifacts,
@@ -134,6 +218,37 @@
     <term>SAML2.error</term>
     <listitem>
      <para>Contains data about errors encountered during SAML 2 actions</para>
+    </listitem>
+   </varlistentry>
+   <varlistentry>
+    <term>SAML.access</term>
+    <listitem>
+     <para>Contains data about SAML actions, including changes to assertions, artifacts,
+     response, and requests</para>
+    </listitem>
+   </varlistentry>
+   <varlistentry>
+    <term>SAML.error</term>
+    <listitem>
+     <para>Contains data about errors encountered during SAML actions</para>
+    </listitem>
+   </varlistentry>
+   <varlistentry>
+    <term>ssoadm.access</term>
+    <listitem>
+     <para>Contains data about actions completed for SSO as admin</para>
+    </listitem>
+   </varlistentry>
+   <varlistentry>
+    <term>WebServicesSecurity.access</term>
+    <listitem>
+     <para>Contains data about activity for Web Services Security</para>
+    </listitem>
+   </varlistentry>
+   <varlistentry>
+    <term>WebServicesSecurity.error</term>
+    <listitem>
+     <para>Contains data on errors encountered by Web Services Security</para>
     </listitem>
    </varlistentry>
    <varlistentry>
@@ -163,13 +278,14 @@
    <varlistentry>
     <term>Authentication</term>
     <listitem>
-     <para>Contains information about problems encountered during user authentication</para>
+     <para>Contains information about problems encountered during user authentication, 
+     including authentication services, framework, modules, callbacks, JAAS, and API</para>
     </listitem>
    </varlistentry>
    <varlistentry>
     <term>Configuration</term>
     <listitem>
-     <para>Contains information about problems with the OpenAM configuration</para>
+     <para>Contains information about problems with the OpenAM configuration     </para>
     </listitem>
    </varlistentry>
    <varlistentry>
@@ -177,7 +293,51 @@
     <listitem>
      <para>Contains information about problems specific to your core deployment of
      OpenAM that are not part of the authentication process or part of your current 
-     configuration</para>
+     configuration, including core infrastructure services, PLL, cookies, naming, 
+     logging, and upgrades</para>
+    </listitem>
+   </varlistentry>
+   <varlistentry>
+    <term>Entitlement</term>
+    <listitem>
+     <para>Contains information about problems specific to entitlement</para>
+    </listitem>
+   </varlistentry>
+   <varlistentry>
+    <term>Federation</term>
+    <listitem>
+     <para>Contains information about problems specific to federation, including 
+     federated SSO, the federation protocols (SAML, SAML 2.0, ID-FF, and WS-Federation), 
+     metadata, hub, and circles of trust</para>
+    </listitem>
+   </varlistentry>
+   <varlistentry>
+    <term>IdRepo</term>
+    <listitem>
+     <para>Contains information about problems specific to the identity repository, 
+     including datastores and plugins</para>
+    </listitem>
+   </varlistentry>
+   <varlistentry>
+    <term>Policy</term>
+    <listitem>
+     <para>Contains information about problems specific to the policies you have setup, 
+     including policy framework, their subjects, conditions, resource attributes, 
+     plugins, and API</para>
+    </listitem>
+   </varlistentry>
+   <varlistentry>
+    <term>Session</term>
+    <listitem>
+     <para>Contains information about problems specific to OpenAM sessions, including
+     session framework, management SSOToken, failover, and API</para>
+    </listitem>
+   </varlistentry>
+   <varlistentry>
+    <term>WebServices</term>
+    <listitem>
+     <para>Contains information about problems specific to Web Services, including
+     STS and Identity Services</para>
     </listitem>
    </varlistentry>
   </variablelist>
