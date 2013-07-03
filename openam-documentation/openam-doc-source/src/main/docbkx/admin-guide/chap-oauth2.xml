@@ -20,7 +20,7 @@
   !
   ! CCPL HEADER END
   !
-  !      Copyright 2012-2013 ForgeRock, Inc.
+  !      Copyright 2012-2013 ForgeRock AS
   !    
 -->
 <chapter xml:id='chap-oauth2'
@@ -97,7 +97,7 @@
     <title>OAuth 2.0 Authorization Grant</title>
     <para>The authorization code grant starts with the client, such as a
     web-based service, redirecting the resource owner's user-agent to the OpenAM
-    authorization service. After authenticating the resource owner again
+    authorization service. After authenticating the resource owner and
     obtaining the resource owner's authorization, OpenAM redirects the resource
     owner's user-agent back to the client with an authorization code that the
     client uses to request the access token. The following sequence diagram

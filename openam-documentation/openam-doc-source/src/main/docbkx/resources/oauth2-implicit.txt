@@ -21,7 +21,7 @@
    
     CCPL HEADER END
    
-         Copyright 2012 ForgeRock AS
+         Copyright 2012-2013 ForgeRock AS
 
     To generate a sequence diagram from this file, process
     it with PlantUML, http://plantuml.sourceforge.net/sequence.html
@@ -40,7 +40,7 @@ Client->Owner: Redirect...
 
 Owner->AuthzServer: ...with client_id, scope, state, redirect_uri
 
-Owner->AuthzServer: Authenticate resource owner and\nconfirm authorization grant
+Owner->AuthzServer: Authenticate resource owner and\nconfirm resource access
 
 AuthzServer->Owner: Redirect with redirect_uri, access token in URI fragment...
 

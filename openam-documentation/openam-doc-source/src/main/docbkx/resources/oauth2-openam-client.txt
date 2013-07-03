@@ -21,7 +21,7 @@
    
     CCPL HEADER END
    
-         Copyright 2012 ForgeRock AS
+         Copyright 2012-2013 ForgeRock AS
 
     To generate a sequence diagram from this file, process
     it with PlantUML, http://plantuml.sourceforge.net/sequence.html
@@ -37,7 +37,7 @@ participant "Resource Server\nProtected with Policy Agent" as ResourceServer
 
 Client->Owner: Redirect... 
 
-Owner->AuthzServer: ...to OpenAM OAuth 2.0 authentication module
+Owner->AuthzServer: ...to OpenAM OAuth 2.0 authorization server
 
 Owner->AuthzServer: Authenticate, and confirm authorization grant
 
