@@ -52,8 +52,8 @@ import java.util.ResourceBundle;
  */
 public class DevicePrintModuleInitialiser {
 
-    private static final String AUTH_MODULE_NAME = "amAuthDevicePrint";
-    private static final Debug DEBUG = Debug.getInstance(AUTH_MODULE_NAME);
+    private static final String AUTH_MODULE_NAME = "amAuthDevicePrintModule";
+    private static final Debug DEBUG = Debug.getInstance("amAuthDevicePrint");
 
     private static final String FROM_ADDRESS = "sunAMAuthHOTPSMTPFromAddress";
     private static final String GATEWAY_SMS_IMPL_CLASS = "sunAMAuthHOTPSMSGatewayImplClassName";
@@ -91,7 +91,7 @@ public class DevicePrintModuleInitialiser {
             DEBUG.message("HOTP.init() : " + "email attribute=" + emailAttribute);
         }
 
-        ResourceBundle bundle = amCache.getResBundle("amAuth" + AUTH_MODULE_NAME, locale);
+        ResourceBundle bundle = amCache.getResBundle(AUTH_MODULE_NAME, locale);
         if (DEBUG.messageEnabled()) {
             DEBUG.message("HOTP.init() : " + "HOTP resouce bundle locale=" + locale);
         }
