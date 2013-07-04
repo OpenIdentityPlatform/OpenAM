@@ -52,7 +52,7 @@ import java.util.ResourceBundle;
  */
 public class DevicePrintModuleInitialiser {
 
-    private static final String AUTH_MODULE_NAME = DevicePrintModule.class.getSimpleName();
+    private static final String AUTH_MODULE_NAME = "amAuthDevicePrint";
     private static final Debug DEBUG = Debug.getInstance(AUTH_MODULE_NAME);
 
     private static final String FROM_ADDRESS = "sunAMAuthHOTPSMTPFromAddress";

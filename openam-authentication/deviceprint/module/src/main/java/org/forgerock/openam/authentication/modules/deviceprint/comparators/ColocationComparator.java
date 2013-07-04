@@ -40,7 +40,7 @@ import org.forgerock.openam.authentication.modules.deviceprint.DevicePrintModule
  */
 public class ColocationComparator {
 	
-	private static final Debug DEBUG = Debug.getInstance(DevicePrintModule.class.getSimpleName());
+	private static final Debug DEBUG = Debug.getInstance("amAuthDevicePrint");
 
     /**
      * Compares two locations, taking into account a degree of difference.

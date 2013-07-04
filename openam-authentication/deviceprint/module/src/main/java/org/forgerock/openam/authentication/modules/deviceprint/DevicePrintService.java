@@ -56,7 +56,7 @@ import java.util.TreeMap;
  */
 public class DevicePrintService {
 	
-	private final static Debug debug = Debug.getInstance(DevicePrintModule.class.getSimpleName());
+	private final static Debug DEBUG = Debug.getInstance("amAuthDevicePrint");
 	
 	private final UserProfilesDao userProfilesDao;
     private final DevicePrintAuthenticationConfig devicePrintAuthenticationConfig;
@@ -200,7 +200,7 @@ public class DevicePrintService {
 			//maximum stored profiles had been reached			
 			if (profileMaximumProfilesStoredQuantity != null) {
 				while (userProfilesDao.getProfiles().size() >= profileMaximumProfilesStoredQuantity) {
-					debug.message("Removing oldest user profile due to maximum profiles stored quantity");
+					DEBUG.message("Removing oldest user profile due to maximum profiles stored quantity");
 					removeOldestProfile();						
 				}
 			}

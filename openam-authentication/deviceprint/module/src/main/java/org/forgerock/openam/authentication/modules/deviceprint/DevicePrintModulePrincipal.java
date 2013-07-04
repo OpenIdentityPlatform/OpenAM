@@ -36,12 +36,12 @@ import java.security.Principal;
 /**
  * Represents the user's principle for the Device Print authentication module.
  */
-public class DevicePrintModulePrinciple implements Principal, Serializable {
+public class DevicePrintModulePrincipal implements Principal, Serializable {
 
     private static final long serialVersionUID = 1L;
 	private String name;
 
-    public DevicePrintModulePrinciple(String name) {
+    public DevicePrintModulePrincipal(String name) {
         if (name == null) {
             throw new RuntimeException("illegal null input");
         }
@@ -50,7 +50,7 @@ public class DevicePrintModulePrinciple implements Principal, Serializable {
     }
 
     /**
-     * Return the LDAP username for this <code> DevicePrintModulePrinciple </code>.
+     * Return the LDAP username for this <code> DevicePrintModulePrincipal </code>.
      *
      * @return The LDAP username.
      */
@@ -59,27 +59,27 @@ public class DevicePrintModulePrinciple implements Principal, Serializable {
     }
 
     /**
-     * Return a string representation of this <code> DevicePrintModulePrinciple </code>.
+     * Return a string representation of this <code> DevicePrintModulePrincipal </code>.
      *
-     * @return A string representation of this <code>DevicePrintModulePrinciple</code>.
+     * @return A string representation of this <code>DevicePrintModulePrincipal</code>.
      */
     @Override
     public String toString() {
         return new StringBuilder()
-                .append(DevicePrintModulePrinciple.class.getName())
+                .append(DevicePrintModulePrincipal.class.getName())
                 .append(":")
                 .append(name)
                 .toString();
     }
 
     /**
-     * Compares the specified Object with this <code> DevicePrintModulePrinciple </code> for equality.  Returns true if
-     * the given object is also a <code> DevicePrintModulePrinciple </code> and the two DevicePrintModulePrinciple have
+     * Compares the specified Object with this <code> DevicePrintModulePrincipal </code> for equality.  Returns true if
+     * the given object is also a <code> DevicePrintModulePrincipal </code> and the two DevicePrintModulePrincipal have
      * the same username.
      *
-     * @param o Object to be compared for equality with this <code> DevicePrintModulePrinciple </code>.
+     * @param o Object to be compared for equality with this <code> DevicePrintModulePrincipal </code>.
      *
-     * @return true if the specified Object is equal equal to this <code> DevicePrintModulePrinciple </code>.
+     * @return true if the specified Object is equal equal to this <code> DevicePrintModulePrincipal </code>.
      */
     @Override
     public boolean equals(Object o) {
@@ -91,10 +91,10 @@ public class DevicePrintModulePrinciple implements Principal, Serializable {
             return true;
         }
 
-        if (!(o instanceof DevicePrintModulePrinciple)) {
+        if (!(o instanceof DevicePrintModulePrincipal)) {
             return false;
         }
-        DevicePrintModulePrinciple that = (DevicePrintModulePrinciple) o;
+        DevicePrintModulePrincipal that = (DevicePrintModulePrincipal) o;
 
         if (this.getName().equals(that.getName())) {
             return true;
@@ -103,7 +103,7 @@ public class DevicePrintModulePrinciple implements Principal, Serializable {
     }
 
     /**
-     * Return a hash code for this <code> DevicePrintModulePrinciple </code>.
+     * Return a hash code for this <code> DevicePrintModulePrincipal </code>.
      *
      * @return A hash code.
      */

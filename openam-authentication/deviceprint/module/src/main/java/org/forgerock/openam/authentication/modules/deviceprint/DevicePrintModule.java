@@ -99,7 +99,7 @@ public class DevicePrintModule extends AMLoginModule {
      */
     @Override
     public Principal getPrincipal() {
-        return new DevicePrintModulePrinciple(userName);
+        return new DevicePrintModulePrincipal(userName);
     }
 
     /**

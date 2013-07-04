@@ -51,7 +51,7 @@ import org.forgerock.openam.authentication.modules.deviceprint.model.UserProfile
  */
 public class UserProfilesDao {
 
-	private static final Debug DEBUG = Debug.getInstance(DevicePrintModule.class.getSimpleName());
+	private static final Debug DEBUG = Debug.getInstance("amAuthDevicePrint");
 	
 	private static final String LDAP_DEVICE_PRINT_ATTRIBUTE_NAME = "devicePrintProfiles";
 

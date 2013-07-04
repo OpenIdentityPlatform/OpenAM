@@ -43,7 +43,7 @@ import org.forgerock.openam.authentication.modules.deviceprint.model.DevicePrint
 public class FormExtractor implements Extractor {
 
 	private static final String DEVICE_PRINT_INFO = "IDToken0";
-	private static final Debug DEBUG = Debug.getInstance("amAuthDevicePrintAMModule");
+	private static final Debug DEBUG = Debug.getInstance("amAuthDevicePrint");
 
 	/**
      * {@inheritDoc}

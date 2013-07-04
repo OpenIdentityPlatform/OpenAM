@@ -46,7 +46,7 @@ import com.sun.identity.shared.debug.Debug;
  */
 public class MultiValueAttributeComparator {
 
-	private static final Debug DEBUG = Debug.getInstance(DevicePrintModule.class.getSimpleName());
+	private static final Debug DEBUG = Debug.getInstance("amAuthDevicePrint");
 
 	private static final BigDecimal HUNDRED = BigDecimal.valueOf(100);
 

@@ -41,7 +41,7 @@ import java.util.Map;
  */
 public class DevicePrintAuthenticationConfig {
 
-    private static final Debug DEBUG = Debug.getInstance(DevicePrintModule.class.getSimpleName());
+    private static final Debug DEBUG = Debug.getInstance("amAuthDevicePrint");
 
     public static final String PROFILE_EXPIRATION_DAYS = "iplanet-am-auth-adaptive-device-print-profile-expiration-days";
     public static final String MAX_STORED_PROFILES = "iplanet-am-auth-adaptive-device-print-maximum-profiles-stored-quantity";

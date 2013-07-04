@@ -41,7 +41,7 @@ import org.forgerock.openam.authentication.modules.deviceprint.model.DevicePrint
  */
 public class DevicePrintComparator {
 
-    private static final Debug DEBUG = Debug.getInstance(DevicePrintModule.class.getSimpleName());
+    private static final Debug DEBUG = Debug.getInstance("amAuthDevicePrint");
 
     private final MultiValueAttributeComparator multiValueAttributeComparator;
     private final ColocationComparator colocationComparator;
@@ -131,9 +131,11 @@ public class DevicePrintComparator {
         if (DEBUG.messageEnabled()) {
             DEBUG.message("Compared device current print: " + currentDevicePrint);
             DEBUG.message("Compared stored device print: " + storedDevicePrint);
-            DEBUG.message("Penalty points");
-            DEBUG.message("UserAgent " + userAgentComparisonResult + " fonts:" + installedFontsComparisonResult
-                    + " plugins" + installedPluginsComparisonResult);
+            DEBUG.message("Penalty points: " + aggregatedComparisonResult.getPenaltyPoints());
+            DEBUG.message("UserAgent: " + userAgentComparisonResult + ", fonts: " + installedFontsComparisonResult
+                    + ", plugins: " + installedPluginsComparisonResult + ", colourDepth: " + colorDepthComparisonResult
+                    + ", timezone: " + timezoneComparisonResult + ", screenRes: " + screenResolutionComparisonResult
+                    + ", location: " + locationComparisonResult);
         }
 
         return aggregatedComparisonResult;
