@@ -441,29 +441,17 @@
                 <enabled>true</enabled>
             </snapshots>
         </repository>
-
         <repository>
-            <id>maven-central</id>
-            <url>http://maven.forgerock.org/repo/maven-central</url>
+            <id>restlet-cache</id>
+            <name>Restlet Cache Repository</name>
+            <url>http://maven.forgerock.org/repo/maven.restlet.org</url>
             <releases>
                 <enabled>true</enabled>
             </releases>
             <snapshots>
-                <enabled>true</enabled>
+                <enabled>false</enabled>
             </snapshots>
         </repository>
-
-        <repository>
-            <id>maven-restlet</id>
-            <name>Public online Restlet repository</name>
-            <url>http://maven.restlet.org</url>
-        </repository>
-        <repository>
-            <id>powermock</id>
-            <name>Public online PowerMock repository</name>
-            <url>http://maven.restlet.org</url>
-        </repository>
-
     </repositories>
 
     <pluginRepositories>
@@ -481,17 +469,6 @@
             <id>forgerock-openam-plugin-snapshots</id>
             <name>openam-snapshots</name>
             <url>http://maven.forgerock.org/repo/openam-snapshots</url>
-            <snapshots>
-                <enabled>true</enabled>
-            </snapshots>
-        </pluginRepository>
-
-        <pluginRepository>
-            <id>maven-central-plugins</id>
-            <url>http://maven.forgerock.org/repo/maven-central</url>
-            <releases>
-                <enabled>true</enabled>
-            </releases>
             <snapshots>
                 <enabled>true</enabled>
             </snapshots>

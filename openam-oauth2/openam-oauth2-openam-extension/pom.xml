@@ -43,37 +43,6 @@
         <skipTests>true</skipTests>
     </properties>
 
-    <repositories>
-        <repository>
-            <id>forgerock-openam-repository</id>
-            <name>ForgeRock Release Repository</name>
-            <url>http://repo.forgerock.org/</url>
-            <snapshots>
-                <enabled>true</enabled>
-            </snapshots>
-        </repository>
-        <repository>
-            <id>forgerock-staging-repository</id>
-            <name>ForgeRock Release Repository</name>
-            <url>http://maven.forgerock.org/repo/releases</url>
-            <snapshots>
-                <enabled>false</enabled>
-            </snapshots>
-        </repository>
-        <repository>
-            <id>forgerock-snapshots-repository</id>
-            <name>ForgeRock Snapshot Repository</name>
-            <url>http://maven.forgerock.org/repo/snapshots</url>
-            <releases>
-                <enabled>false</enabled>
-            </releases>
-        </repository>
-        <repository>
-            <id>maven-restlet</id>
-            <name>Public online Restlet repository</name>
-            <url>http://maven.restlet.org</url>
-        </repository>
-    </repositories>
     <dependencies>
         <!--    mvn versions:display-plugin-updates
                 mvn versions:display-dependency-updates
