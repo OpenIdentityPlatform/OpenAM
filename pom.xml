@@ -534,6 +534,7 @@
     <!-- Source Control -->
     <scm>
         <connection>scm:svn:https://svn.forgerock.org/openam/trunk/</connection>
+        <developerConnection>scm:svn:https://svn.forgerock.org/openam/trunk/</developerConnection>
         <url>http://sources.forgerock.org/browse/openam/trunk</url>
     </scm>
 
