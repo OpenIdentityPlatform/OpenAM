@@ -79,68 +79,15 @@
             <groupId>org.forgerock.openam</groupId>
             <artifactId>openam-oauth2-common</artifactId>
         </dependency>
-        <!-- Commons -->
-        <!--
-       <module>json-fluent</module>
-       <module>json-patch</module>
-       <module>json-ref</module>
-       <module>json-ref-jackson</module>
-       <module>json-schema</module>
-       <module>json-schema-cli</module>
-       <module>json-crypto</module>
-       <module>json-crypto-cli</module>
-       <module>json-resource</module>
-       <module>json-resource-servlet</module>
-        -->
-        <!--
-        <dependency>
-            <groupId>org.forgerock.commons</groupId>
-            <artifactId>org.forgerock.json.resource</artifactId>
-        </dependency>
-        -->
-        <dependency>
-            <groupId>org.forgerock.commons</groupId>
-            <artifactId>json-patch</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.forgerock.commons</groupId>
-            <artifactId>json-fluent</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.forgerock.commons</groupId>
-            <artifactId>json-resource-servlet</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.forgerock.commons</groupId>
-            <artifactId>json-resource</artifactId>
-        </dependency>
 
-	<dependency>
-	  <groupId>javax.servlet</groupId>
-	  <artifactId>servlet-api</artifactId>
-	  <version>2.5</version>
-	  <scope>provided</scope>
-	</dependency>
-        <!-- OpenAM -->
-        <!--
-        <dependency>
-            <groupId>org.forgerock</groupId>
-            <artifactId>openam-core</artifactId>
-        </dependency>
 
         <dependency>
-            <groupId>org.restlet.jse</groupId>
-            <artifactId>org.restlet</artifactId>
+            <groupId>javax.servlet</groupId>
+            <artifactId>servlet-api</artifactId>
+            <version>2.5</version>
+            <scope>provided</scope>
         </dependency>
-        <dependency>
-            <groupId>org.restlet.osgi</groupId>
-            <artifactId>org.restlet.ext.servlet</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>javax.ws.rs</groupId>
-            <artifactId>jsr311-api</artifactId>
-        </dependency>
-        -->
+
         <!-- Test Dependencies -->
         <dependency>
             <groupId>org.easytesting</groupId>

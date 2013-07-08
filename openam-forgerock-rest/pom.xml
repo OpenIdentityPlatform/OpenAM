@@ -99,6 +99,10 @@
             <artifactId>servlet-api</artifactId>
             <scope>provided</scope>
         </dependency>
+        <dependency>
+            <groupId>org.restlet.jse</groupId>
+            <artifactId>org.restlet.ext.json</artifactId>
+        </dependency>
 
         <!-- OpenAM-CLI -->
         <dependency>
@@ -141,6 +145,17 @@
         <dependency>
             <groupId>javax.ws.rs</groupId>
             <artifactId>jsr311-api</artifactId>
+        </dependency>
+
+
+        <!-- OAuth2 Dependencies -->
+        <dependency>
+            <groupId>org.forgerock.openam</groupId>
+            <artifactId>openam-oauth2-core-token-service</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.forgerock.openam</groupId>
+            <artifactId>openam-oauth2-common</artifactId>
         </dependency>
 
         <!-- Test Dependencies -->
@@ -193,6 +208,11 @@
             <groupId>httpunit</groupId>
             <artifactId>httpunit</artifactId>
             <version>1.3</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.powermock</groupId>
+            <artifactId>powermock-module-testng-common</artifactId>
             <scope>test</scope>
         </dependency>
         <dependency>

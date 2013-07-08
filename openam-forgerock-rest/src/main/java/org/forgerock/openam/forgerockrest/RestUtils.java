@@ -32,9 +32,11 @@ import org.forgerock.json.resource.ResultHandler;
 import org.forgerock.json.resource.ServerContext;
 import org.forgerock.json.resource.servlet.HttpContext;
 
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.security.AccessController;
 import java.util.List;
-
+import java.util.Map;
 
 
 /**
@@ -167,5 +169,38 @@ final public class  RestUtils {
     public static void generateUnsupportedOperation(ResultHandler handler) {
         NotSupportedException exception = new NotSupportedException("Operation is not supported.");
         handler.handleError(exception);
+    }
+
+    /**
+     * Parses out deployment url
+     * @param deploymentURL
+     */
+    public static StringBuilder getFullDeploymentURI(final String deploymentURL) throws URISyntaxException{
+
+        // get URI
+        String deploymentURI = null;
+        URI uriHold = new URI(deploymentURL);
+        String uri = uriHold.getPath();
+        //Parse out the deployment URI
+        int firstSlashIndex = uri.indexOf("/");
+        int secondSlashIndex = uri.indexOf("/", firstSlashIndex + 1);
+        if (secondSlashIndex != -1) {
+            deploymentURI = uri.substring(0, secondSlashIndex);
+        }
+        //Build string that consist of protocol,host,port, and deployment uri
+        StringBuilder fullDepURL = new StringBuilder(100);
+        fullDepURL.append(uriHold.getScheme()).append("://")
+                .append(uriHold.getHost()).append(":")
+                .append(uriHold.getPort())
+                .append(deploymentURI);
+        return fullDepURL;
+    }
+
+    /**
+     * Gets an SSOToken for Administrator
+     * @return
+     */
+    public static SSOToken getToken() {
+        return token;
     }
 }

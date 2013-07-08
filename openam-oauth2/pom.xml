@@ -43,7 +43,6 @@
         <module>openam-oauth2-main</module>
         <module>openam-oauth2-demo</module>
         <module>openam-oauth2-common</module>
-        <module>openam-oauth2-rest</module>
     </modules>
 
     <properties>
