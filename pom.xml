@@ -1897,6 +1897,23 @@
             </plugin>
 
             <plugin>
+                <groupId>org.forgerock.maven.plugins</groupId>
+                <artifactId>javadoc-updater-maven-plugin</artifactId>
+                <version>1.0.0</version>
+                <executions>
+                    <execution>
+                        <phase>site</phase>
+                        <goals>
+                            <goal>fixjavadoc</goal>
+                        </goals>
+                        <configuration>
+                            <directory>${project.reporting.outputDirectory}</directory>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+
+            <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-source-plugin</artifactId>
                 <inherited>true</inherited>
