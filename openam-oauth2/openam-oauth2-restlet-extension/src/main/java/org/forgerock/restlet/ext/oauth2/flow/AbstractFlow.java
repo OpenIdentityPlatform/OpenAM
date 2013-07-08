@@ -377,7 +377,7 @@ public abstract class AbstractFlow extends ServerResource {
 
     protected User getAuthenticatedResourceOwner() throws OAuthProblemException {
         //authenticate the resource owner
-        OpenAMIdentityVerifier identityVerifier = new OpenAMIdentityVerifier(getContext());
+        OpenAMIdentityVerifier identityVerifier = new OpenAMIdentityVerifier();
         int verified = identityVerifier.verify(getRequest(), getResponse());
         if (verified != RESULT_VALID){
             OAuth2Utils.DEBUG.warning("AuthorizeServerResource.represent(): Unable to login resource owner.");
