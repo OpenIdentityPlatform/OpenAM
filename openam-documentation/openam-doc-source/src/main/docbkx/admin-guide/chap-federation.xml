@@ -2227,9 +2227,9 @@ CookieWriterServlet.doGetPost: Redirect to
     <listitem>
      <para>(Optional) Use this parameter to indicate what binding to use for the
      authentication request. Valid values in include
-     <literal>binding=urn:oasis:names:tc:SAML:2.0:bindings:HTTP-Redirect</literal>
+     <literal>urn:oasis:names:tc:SAML:2.0:bindings:HTTP-Redirect</literal>
      (default) and
-     <literal>binding=urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST</literal>.</para>
+     <literal>urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST</literal>.</para>
     </listitem>
    </varlistentry>
 
@@ -2258,10 +2258,10 @@ CookieWriterServlet.doGetPost: Redirect to
     <listitem>
      <para>(Required) Use this parameter to indicate what binding to use for the
      operation. The full, long name format is required for this parameter to work.
-     For example, specify <literal>binding=urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST</literal>
+     For example, specify <literal>urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST</literal>
      to use HTTP POST binding with a self-submitting form rather than the default
      HTTP redirect binding. In addition, you can use 
-     <literal>binding=urn:oasis:names:tc:SAML:2.0:bindings:HTTP-Artifact</literal>.</para>
+     <literal>urn:oasis:names:tc:SAML:2.0:bindings:HTTP-Artifact</literal>.</para>
     </listitem>
    </varlistentry>
    
