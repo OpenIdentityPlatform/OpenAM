@@ -26,9 +26,6 @@ package org.forgerock.openam.oauth2.provider.impl;
 
 import com.iplanet.sso.SSOException;
 import com.iplanet.sso.SSOTokenManager;
-import com.sun.identity.idm.AMIdentity;
-import com.sun.identity.idm.IdRepoException;
-import com.sun.identity.idm.IdUtils;
 import com.sun.identity.shared.OAuth2Constants;
 import edu.emory.mathcs.backport.java.util.Arrays;
 import org.forgerock.openam.oauth2.exceptions.OAuthProblemException;
@@ -36,13 +33,13 @@ import org.forgerock.openam.oauth2.provider.AbstractIdentityVerifier;
 import org.forgerock.openam.oauth2.utils.OAuth2Utils;
 import com.iplanet.sso.SSOToken;
 import com.sun.identity.authentication.AuthContext;
-import org.restlet.Application;
 import org.restlet.Context;
 import org.restlet.Request;
 import org.restlet.Response;
+import org.restlet.data.Form;
+import org.restlet.data.Parameter;
 import org.restlet.data.Reference;
 import org.restlet.data.Status;
-import org.restlet.engine.util.ChildContext;
 import org.restlet.ext.servlet.ServletUtils;
 import org.restlet.resource.ResourceException;
 import org.restlet.routing.Redirector;
@@ -63,18 +60,13 @@ public class OpenAMIdentityVerifier extends AbstractIdentityVerifier<OpenAMUser>
     private String moduleName = null;
     private String realm = null;
     private String locale = null;
-    private Context context = null;
-
-    //ensure the prompt for login shows the login page atleast one time
-    static private boolean hasRan = false;
 
     /**
      * Constructor.
      * <p/>
      *
      */
-    public OpenAMIdentityVerifier(Context context) {
-        this.context = context;
+    public OpenAMIdentityVerifier() {
     }
 
     @Override
@@ -114,37 +106,50 @@ public class OpenAMIdentityVerifier extends AbstractIdentityVerifier<OpenAMUser>
             promptSet = new HashSet<String>();
         }
 
-        try {
-            SSOToken token = getToken(request, response);
-            if (promptSet != null && !promptSet.isEmpty() && promptSet.contains("login") && !hasRan){
-                hasRan = true;
-                return false;
-            }
-            if (null != token) {
-                AMIdentity identity = IdUtils.getIdentity(token);
-
-                OpenAMUser user = new OpenAMUser(token.getProperty("UserToken"), token);
-                request.getClientInfo().setUser(user);
-                return identity.isActive();
-            } else {
-                if (promptSet != null && !promptSet.isEmpty() && promptSet.contains("none") && promptSet.size() == 1){
-                    OAuth2Utils.DEBUG.error("Not pre-authenticated and prompt parameter equals none.");
-                    throw OAuthProblemException.OAuthError.ACCESS_DENIED.handle(request);
-                } else if (promptSet.contains("none") && promptSet.size() > 1){
-                    // prompt has more than one value with none error
-                    OAuth2Utils.DEBUG.error("Prompt parameter only allows none when none is present.");
-                    throw OAuthProblemException.OAuthError.INVALID_REQUEST.handle(request);
-                }
-                hasRan = false;
-                return false;
-            }
-        } catch (SSOException e) {
-            OAuth2Utils.DEBUG.error("Error authenticating user against OpenAM: ", e );
-            redirect(request, response);
-        } catch (IdRepoException e) {
-            OAuth2Utils.DEBUG.error("Error authenticating user against OpenAM: ", e );
-            throw new ResourceException(Status.SERVER_ERROR_INTERNAL, e.getMessage(), e);
+        //if prompt contains values other than none and none error
+        if (promptSet != null && promptSet.contains("none") && promptSet.size() > 1){
+            // prompt has more than one value with none error
+            OAuth2Utils.DEBUG.error("Prompt parameter only allows none when none is present.");
+            throw OAuthProblemException.OAuthError.INVALID_REQUEST.handle(request);
         }
+
+        SSOToken token = null;
+        try {
+            token = getToken(request, response);
+        } catch (SSOException e) {
+            OAuth2Utils.DEBUG.warning("Error authenticating user against OpenAM: ", e);
+        }
+
+        if (token != null){
+
+            if (promptSet != null && promptSet.contains("login")){
+                try {
+                    SSOTokenManager mgr = SSOTokenManager.getInstance();
+                    mgr.destroyToken(token);
+                } catch (SSOException e) {
+                    OAuth2Utils.DEBUG.error("Error destorying SSOToken: ", e);
+                }
+                redirect(request, response);
+            }
+
+            OpenAMUser user = null;
+            try {
+                user = new OpenAMUser(token.getProperty("UserToken"), token);
+            } catch (SSOException e) {
+                OAuth2Utils.DEBUG.error("Error authenticating user against OpenAM: ", e);
+                throw OAuthProblemException.OAuthError.ACCESS_DENIED.handle(request);
+            }
+            request.getClientInfo().setUser(user);
+            return true;
+        } else {
+            if (promptSet != null && promptSet.contains("none")){
+                OAuth2Utils.DEBUG.error("Not pre-authenticated and prompt parameter equals none.");
+                throw OAuthProblemException.OAuthError.ACCESS_DENIED.handle(request);
+            }
+            redirect(request, response);
+        }
+        redirect(request, response);
+
         return false;
     }
 
@@ -183,8 +188,16 @@ public class OpenAMIdentityVerifier extends AbstractIdentityVerifier<OpenAMUser>
         }
         //TODO investigate more options for the LOGIN servlet
 
+        //remove prompt parameter
+        Form query = request.getResourceRef().getQueryAsForm();
+        Parameter p = query.getFirst("prompt");
+        if (p.getSecond().equalsIgnoreCase("login")){
+            query.remove(p);
+        }
+        request.getResourceRef().setQuery(query.getQueryString());
+
         amserver.addQueryParameter(OAuth2Constants.Custom.GOTO, request.getResourceRef().toString());
-        //response.redirectPermanent(amserver);
+
         Redirector redirector =
                 new Redirector(new Context(), amserver.toString(), Redirector.MODE_CLIENT_FOUND);
         redirector.handle(request, response);
