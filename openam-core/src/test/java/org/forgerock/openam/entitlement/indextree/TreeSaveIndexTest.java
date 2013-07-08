@@ -17,14 +17,15 @@ package org.forgerock.openam.entitlement.indextree;
 
 import com.sun.identity.entitlement.ResourceSaveIndexes;
 import com.sun.identity.entitlement.interfaces.ISaveIndex;
-import org.junit.Before;
-import org.junit.Test;
+import org.testng.annotations.BeforeMethod;
+import org.testng.annotations.Test;
 
+import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import static org.testng.Assert.assertEquals;
+import static org.testng.Assert.assertTrue;
 
 /**
  * Unit test for TreeSaveIndex.
@@ -35,7 +36,7 @@ public class TreeSaveIndexTest {
 
     private ISaveIndex saveIndex;
 
-    @Before
+    @BeforeMethod
     public void setUp() {
         saveIndex = new TreeSaveIndex();
     }
@@ -47,9 +48,9 @@ public class TreeSaveIndexTest {
         Set<String> expectedResults = new HashSet<String>();
         expectedResults.add("http://www.test.com/*");
 
+        assertEquals(Arrays.asList("://www.test.com"), result.getHostIndexes());
         assertEquals(expectedResults, result.getPathIndexes());
-        assertTrue(result.getHostIndexes().isEmpty());
-        assertTrue(result.getParentPathIndexes().isEmpty());
+        assertEquals(Arrays.asList("/"), result.getParentPathIndexes());
     }
 
     @Test
@@ -59,9 +60,9 @@ public class TreeSaveIndexTest {
         Set<String> expectedResults = new HashSet<String>();
         expectedResults.add("http://www.test.com/^/hello");
 
+        assertEquals(Arrays.asList("://www.test.com"), result.getHostIndexes());
         assertEquals(expectedResults, result.getPathIndexes());
-        assertTrue(result.getHostIndexes().isEmpty());
-        assertTrue(result.getParentPathIndexes().isEmpty());
+        assertEquals(Arrays.asList("/"), result.getParentPathIndexes());
     }
 
     @Test
@@ -71,9 +72,9 @@ public class TreeSaveIndexTest {
         Set<String> expectedResults = new HashSet<String>();
         expectedResults.add("http://www.test.com/*");
 
+        assertEquals(Arrays.asList("://www.test.com"), result.getHostIndexes());
         assertEquals(expectedResults, result.getPathIndexes());
-        assertTrue(result.getHostIndexes().isEmpty());
-        assertTrue(result.getParentPathIndexes().isEmpty());
+        assertEquals(Arrays.asList("/"), result.getParentPathIndexes());
     }
 
 }

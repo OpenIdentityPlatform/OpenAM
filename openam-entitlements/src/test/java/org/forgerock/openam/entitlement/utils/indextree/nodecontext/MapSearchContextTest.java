@@ -15,8 +15,12 @@
  */
 package org.forgerock.openam.entitlement.utils.indextree.nodecontext;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
+import org.testng.annotations.Test;
+
+import static org.testng.Assert.assertEquals;
+import static org.testng.Assert.assertFalse;
+import static org.testng.Assert.assertNotNull;
+import static org.testng.Assert.assertTrue;
 
 /**
  * Unit test for MapSearchContext.

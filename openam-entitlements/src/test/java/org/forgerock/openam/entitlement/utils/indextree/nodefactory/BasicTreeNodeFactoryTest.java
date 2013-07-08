@@ -20,13 +20,13 @@ import org.forgerock.openam.entitlement.utils.indextree.nodecontext.MapSearchCon
 import org.forgerock.openam.entitlement.utils.indextree.treenodes.MultiWildcardNode;
 import org.forgerock.openam.entitlement.utils.indextree.treenodes.SingleWildcardNode;
 import org.forgerock.openam.entitlement.utils.indextree.treenodes.TreeNode;
-import org.junit.Before;
-import org.junit.Test;
+import org.testng.annotations.BeforeMethod;
+import org.testng.annotations.Test;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
+import static org.testng.Assert.assertEquals;
+import static org.testng.Assert.assertFalse;
+import static org.testng.Assert.assertNotNull;
+import static org.testng.Assert.assertTrue;
 
 /**
  * Unit test for BasicTreeNodeFactory and consequently, AbstractTreeNodeFactory.
@@ -37,7 +37,7 @@ public class BasicTreeNodeFactoryTest {
 
     private TreeNodeFactory factory;
 
-    @Before
+    @BeforeMethod
     public void setUp() {
         factory = new BasicTreeNodeFactory();
     }

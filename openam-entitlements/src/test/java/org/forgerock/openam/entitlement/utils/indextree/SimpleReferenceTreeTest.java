@@ -17,19 +17,19 @@ package org.forgerock.openam.entitlement.utils.indextree;
 
 import org.forgerock.openam.entitlement.utils.indextree.nodefactory.TreeNodeFactory;
 import org.forgerock.openam.entitlement.utils.indextree.treenodes.TreeNode;
-import org.junit.Before;
-import org.junit.Test;
+import org.testng.annotations.BeforeMethod;
+import org.testng.annotations.Test;
 
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import static org.testng.Assert.assertTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import static org.testng.Assert.assertEquals;
 
 /**
  * Unit test for SimpleReferenceTree.
@@ -40,7 +40,7 @@ public class SimpleReferenceTreeTest {
 
     private IndexRuleTree tree;
 
-    @Before
+    @BeforeMethod
     public void setUp() {
         tree = new SimpleReferenceTree();
     }

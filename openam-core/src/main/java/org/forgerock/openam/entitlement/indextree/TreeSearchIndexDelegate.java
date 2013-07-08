@@ -18,23 +18,30 @@ package org.forgerock.openam.entitlement.indextree;
 import com.sun.identity.entitlement.EntitlementException;
 import com.sun.identity.entitlement.ResourceSearchIndexes;
 import com.sun.identity.entitlement.interfaces.ISearchIndex;
+import com.sun.identity.entitlement.util.ResourceNameSplitter;
 import org.forgerock.openam.guice.InjectorHolder;
 
 import javax.inject.Inject;
-import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 
 /**
  * Implementation provides search index by means of an in memory rule index cache.
- * <p />
+ * <p/>
  * Expects the passed resource to have already been normalised.
  *
  * @author apforrest
  */
 public class TreeSearchIndexDelegate implements ISearchIndex {
 
+    private static final ISearchIndex legacySearchIndex;
+
     private final IndexTreeService indexTreeService;
+
+    static {
+        // TODO: Deprecate the need to call into the earlier implementation to assist with subtree mode.
+        legacySearchIndex = new ResourceNameSplitter();
+    }
 
     /**
      * This constructor has been added as the entitlements framework expects a no args constructor due to its use of
@@ -52,19 +59,17 @@ public class TreeSearchIndexDelegate implements ISearchIndex {
 
     @Override
     public ResourceSearchIndexes getIndexes(String resource, String realm) throws EntitlementException {
-        // Ignore host and parent path indexes.
-        Set<String> hostIndexes = Collections.emptySet();
-        Set<String> parentPathIndexes = Collections.emptySet();
+        // Create legacy indexes first.
+        ResourceSearchIndexes legacyIndexes = legacySearchIndex.getIndexes(resource, realm);
 
         // Indexes are handled in lower case.
         resource = resource.toLowerCase();
         // Search the index tree for matching path indexes.
-        Set<String> pathIndexes = indexTreeService.searchTree(resource, realm);
+        Set<String> pathIndexes = escapePathIndexes(indexTreeService.searchTree(resource, realm));
 
-        return new ResourceSearchIndexes(hostIndexes, escapePathIndexes(pathIndexes), parentPathIndexes);
+        return new ResourceSearchIndexes(
+                legacyIndexes.getHostIndexes(), pathIndexes, legacyIndexes.getParentPathIndexes());
     }
-
-
 
     /**
      * Prepare path indexes for LDAP search.

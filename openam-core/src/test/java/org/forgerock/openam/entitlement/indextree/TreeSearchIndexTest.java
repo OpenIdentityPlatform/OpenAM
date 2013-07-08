@@ -17,17 +17,18 @@ package org.forgerock.openam.entitlement.indextree;
 
 import com.sun.identity.entitlement.ResourceSearchIndexes;
 import com.sun.identity.entitlement.interfaces.ISearchIndex;
-import org.junit.Before;
-import org.junit.Test;
+import org.testng.annotations.BeforeMethod;
+import org.testng.annotations.Test;
 
+import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import static org.testng.Assert.assertEquals;
+import static org.testng.Assert.assertTrue;
 
 /**
  * Unit test for TreeSearchIndex.
@@ -39,7 +40,7 @@ public class TreeSearchIndexTest {
     private IndexTreeService treeService;
     private ISearchIndex searchIndex;
 
-    @Before
+    @BeforeMethod
     public void setUp() {
         treeService = mock(IndexTreeService.class);
         searchIndex = new TreeSearchIndexDelegate(treeService);
@@ -60,9 +61,9 @@ public class TreeSearchIndexTest {
         ResourceSearchIndexes result = searchIndex.getIndexes("http://www.test.com:80/", "/test-realm");
 
         // Verify the test results
+        assertEquals(Arrays.asList("://", "://.com", "://www.test.com", "://.test.com"), result.getHostIndexes());
         assertEquals(indexes, result.getPathIndexes());
-        assertTrue(result.getHostIndexes().isEmpty());
-        assertTrue(result.getParentPathIndexes().isEmpty());
+        assertEquals(Arrays.asList("/"), result.getParentPathIndexes());
 
         // Verify the use of the mock object.
         verify(treeService).searchTree("http://www.test.com:80/", "/test-realm");
@@ -98,9 +99,10 @@ public class TreeSearchIndexTest {
         Set<String> parsedIndexes = new HashSet<String>();
         parsedIndexes.add("a-b-\\2A-d-e");
         parsedIndexes.add("a-\\2A-c-\\2A-e");
+
+        assertEquals(Arrays.asList("://", "://.com", "://www.test.com", "://.test.com"), result.getHostIndexes());
         assertEquals(parsedIndexes, result.getPathIndexes());
-        assertTrue(result.getHostIndexes().isEmpty());
-        assertTrue(result.getParentPathIndexes().isEmpty());
+        assertEquals(Arrays.asList("/"), result.getParentPathIndexes());
 
         // Verify the use of the mock object.
         verify(treeService).searchTree("http://www.test.com:80/", "/test-realm");

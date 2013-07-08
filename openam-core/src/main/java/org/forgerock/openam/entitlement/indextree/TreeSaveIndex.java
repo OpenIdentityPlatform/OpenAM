@@ -17,6 +17,7 @@ package org.forgerock.openam.entitlement.indextree;
 
 import com.sun.identity.entitlement.ResourceSaveIndexes;
 import com.sun.identity.entitlement.interfaces.ISaveIndex;
+import com.sun.identity.entitlement.util.ResourceNameIndexGenerator;
 
 import java.util.Collections;
 import java.util.HashSet;
@@ -34,11 +35,17 @@ public class TreeSaveIndex implements ISaveIndex {
     private static final String FULL_SINGLE_LEVEL_WILDCARD = "-*-";
     private static final String ABBREVIATED_SINGLE_LEVEL_WILDCARD = "^";
 
+    private static final ISaveIndex legacySaveIndex;
+
+    static {
+        // TODO: Deprecate the need to call into the earlier implementation to assist with subtree mode.
+        legacySaveIndex = new ResourceNameIndexGenerator();
+    }
+
     @Override
     public ResourceSaveIndexes getIndexes(String policyRule) {
-        // Ignore host and parent path indexes.
-        Set<String> hostIndexes = Collections.emptySet();
-        Set<String> parentPathIndexes = Collections.emptySet();
+        // Create legacy indexes first.
+        ResourceSaveIndexes legacyIndexes = legacySaveIndex.getIndexes(policyRule);
 
         // Indexes are handled in lower case.
         policyRule = policyRule.toLowerCase();
@@ -46,7 +53,8 @@ public class TreeSaveIndex implements ISaveIndex {
         Set<String> pathIndexes = new HashSet<String>();
         pathIndexes.add(parsePolicyRule(policyRule));
 
-        return new ResourceSaveIndexes(hostIndexes, pathIndexes, parentPathIndexes);
+        return new ResourceSaveIndexes(
+                legacyIndexes.getHostIndexes(), pathIndexes, legacyIndexes.getParentPathIndexes());
     }
 
     /**

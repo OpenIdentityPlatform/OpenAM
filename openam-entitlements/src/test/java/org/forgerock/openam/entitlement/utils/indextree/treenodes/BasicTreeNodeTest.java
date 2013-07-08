@@ -16,12 +16,13 @@
 package org.forgerock.openam.entitlement.utils.indextree.treenodes;
 
 import org.forgerock.openam.entitlement.utils.indextree.nodecontext.SearchContext;
-import org.junit.Before;
-import org.junit.Test;
+import org.testng.annotations.BeforeMethod;
+import org.testng.annotations.Test;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+
+import static org.testng.Assert.assertEquals;
+import static org.testng.Assert.assertFalse;
+import static org.testng.Assert.assertTrue;
 import static org.mockito.Mockito.mock;
 
 /**
@@ -33,7 +34,7 @@ public class BasicTreeNodeTest {
 
     private TreeNode basicTreeNode;
 
-    @Before
+    @BeforeMethod
     public void setUp() {
         basicTreeNode = new TestBasicTreeNode('\u0000');
     }

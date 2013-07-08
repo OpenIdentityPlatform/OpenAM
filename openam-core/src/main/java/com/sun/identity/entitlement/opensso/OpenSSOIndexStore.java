@@ -381,44 +381,62 @@ public class OpenSSOIndexStore extends PrivilegeIndexStore {
         return search(realm, indexes, subjectIndexes, bSubTree, true);
     }
 
+    /**
+     * Search for policies.
+     *
+     * @param realm
+     *         The realm of which the policy resides.
+     * @param indexes
+     *         Policy indexes.
+     * @param subjectIndexes
+     *         Subject indexes.
+     * @param bSubTree
+     *         Whether in subtree mode.
+     * @param bReferral
+     *         Whether there is a policy referral.
+     * @return An iterator of policies.
+     * @throws EntitlementException
+     *         Should an error occur searching for policies.
+     */
     public Iterator<IPrivilege> search(String realm,
                                        ResourceSearchIndexes indexes,
                                        Set<String> subjectIndexes,
                                        boolean bSubTree,
                                        boolean bReferral
     ) throws EntitlementException {
-        BufferedIterator iterator = (isMultiThreaded) ? new BufferedIterator() :
-                new SimpleIterator();
+        BufferedIterator iterator = (isMultiThreaded) ? new BufferedIterator() : new SimpleIterator();
 
-        // Only interested in the search if some indexes have been provided to search against.
-        if (!indexes.isEmpty()) {
+        // When not in subtree mode path indexes should be available.
+        if (!bSubTree && indexes.getPathIndexes().isEmpty()) {
+            return iterator;
+        }
 
-            Set setDNs = new HashSet();
-            if (indexCacheSize > 0) {
-                setDNs.addAll(searchPrivileges(indexes, subjectIndexes, bSubTree,
-                        iterator));
-                setDNs.addAll(searchReferrals(indexes, bSubTree, iterator));
-            }
+        // When in subtree mode parent path indexes should be available.
+        if (bSubTree && indexes.getParentPathIndexes().isEmpty()) {
+            return iterator;
+        }
 
-            if (bReferral) {
-                String tmp = (DN.isDN(realm)) ?
-                        DNMapper.orgNameToRealmName(realm) : realm;
-                if (tmp.equals("/")) {
-                    ReferralPrivilege ref = getOrgAliasReferral(indexes);
-                    if (ref != null) {
-                        iterator.add(ref);
-                    }
+        Set setDNs = new HashSet();
+        if (indexCacheSize > 0) {
+            setDNs.addAll(searchPrivileges(indexes, subjectIndexes, bSubTree, iterator));
+            setDNs.addAll(searchReferrals(indexes, bSubTree, iterator));
+        }
+
+        if (bReferral) {
+            String tmp = DN.isDN(realm) ? DNMapper.orgNameToRealmName(realm) : realm;
+
+            if (tmp.equals("/")) {
+                ReferralPrivilege ref = getOrgAliasReferral(indexes);
+                if (ref != null) {
+                    iterator.add(ref);
                 }
             }
+        }
 
-            if ((indexCacheSize == 0) || doDSSearch()) {
-                SearchTask st = new SearchTask(this, iterator, indexes,
-                        subjectIndexes, bSubTree, setDNs);
-                threadPool.submit(st);
-            } else {
-                iterator.isDone();
-            }
-
+        if (indexCacheSize == 0 || doDSSearch()) {
+            threadPool.submit(new SearchTask(this, iterator, indexes, subjectIndexes, bSubTree, setDNs));
+        } else {
+            iterator.isDone();
         }
 
         return iterator;
@@ -532,7 +550,7 @@ public class OpenSSOIndexStore extends PrivilegeIndexStore {
         boolean bSubTree, BufferedIterator iterator)
     {
         Set<String> setDNs = referralIndexCache.getMatchingEntries(indexes,
-            null, bSubTree);
+                null, bSubTree);
         for (Iterator<String> i = setDNs.iterator(); i.hasNext();) {
             String dn = (String) i.next();
             ReferralPrivilege r = referralCache.getReferral(dn);
@@ -605,7 +623,7 @@ public class OpenSSOIndexStore extends PrivilegeIndexStore {
             getResourceSearchFilter(appNameToResources, realm) + searchFilters + ")";
 
         return dataStore.search(adminSubject, realm, ldapFilters,
-            numOfEntries * (2), sortResults, ascendingOrder);
+                numOfEntries * (2), sortResults, ascendingOrder);
     }
 
     /**
@@ -730,7 +748,7 @@ public class OpenSSOIndexStore extends PrivilegeIndexStore {
             }
         }
         return dataStore.searchReferral(adminSubject, currentRealm,
-            strFilter.toString(), numOfEntries, sortResults, ascendingOrder);
+                strFilter.toString(), numOfEntries, sortResults, ascendingOrder);
     }
 
     /**
@@ -841,7 +859,7 @@ public class OpenSSOIndexStore extends PrivilegeIndexStore {
         Set<String> results = new HashSet<String>();
 
         if (applicationTypeName.equalsIgnoreCase(
-            ApplicationTypeManager.URL_APPLICATION_TYPE_NAME)) {
+                ApplicationTypeManager.URL_APPLICATION_TYPE_NAME)) {
             SSOToken adminToken = (SSOToken) AccessController.doPrivileged(
                 AdminTokenAction.getInstance());
 
@@ -914,7 +932,7 @@ public class OpenSSOIndexStore extends PrivilegeIndexStore {
     public boolean hasPrivilgesWithApplication(
         String realm, String applName) throws EntitlementException {
         return dataStore.hasPrivilgesWithApplication(getAdminSubject(), realm,
-            applName);
+                applName);
     }
 
     public class SearchTask implements Runnable {

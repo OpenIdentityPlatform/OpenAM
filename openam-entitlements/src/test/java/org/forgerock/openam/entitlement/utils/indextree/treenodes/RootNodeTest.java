@@ -16,12 +16,12 @@
 package org.forgerock.openam.entitlement.utils.indextree.treenodes;
 
 import org.forgerock.openam.entitlement.utils.indextree.nodecontext.SearchContext;
-import org.junit.Before;
-import org.junit.Test;
+import org.testng.annotations.BeforeMethod;
+import org.testng.annotations.Test;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+import static org.testng.Assert.assertEquals;
+import static org.testng.Assert.assertFalse;
+import static org.testng.Assert.assertTrue;
 import static org.mockito.Mockito.mock;
 
 /**
@@ -33,7 +33,7 @@ public class RootNodeTest {
 
     private TreeNode rootTreeNode;
 
-    @Before
+    @BeforeMethod
     public void setUp() {
         rootTreeNode = new RootNode();
     }
@@ -49,7 +49,7 @@ public class RootNodeTest {
      * Exception thrown if hasInterestIn on root node.
      * Root node is an anchor and so have no behaviour.
      */
-    @Test(expected = IllegalAccessError.class)
+    @Test(expectedExceptions = IllegalAccessError.class)
     public void hasInterestInDisabled() {
         rootTreeNode.hasInterestIn('a', mock(SearchContext.class));
     }
@@ -58,7 +58,7 @@ public class RootNodeTest {
      * Exception thrown if setSibling on root node.
      * Root node can not have siblings.
      */
-    @Test(expected = IllegalAccessError.class)
+    @Test(expectedExceptions = IllegalAccessError.class)
     public void setSiblingDisabled() {
         rootTreeNode.setSibling(mock(TreeNode.class));
     }
@@ -67,7 +67,7 @@ public class RootNodeTest {
      * Exception thrown if setParent on root node.
      * Root is the top most node and so can not have a parent.
      */
-    @Test(expected = IllegalAccessError.class)
+    @Test(expectedExceptions = IllegalAccessError.class)
     public void setParentDisabled() {
         rootTreeNode.setParent(mock(TreeNode.class));
     }

@@ -100,11 +100,4 @@ public class ResourceSearchIndexes {
         return pathIndexes;
     }
 
-    /**
-     * @return Whether there are any indexes present.
-     */
-    public boolean isEmpty() {
-        return hostIndexes.isEmpty() && parentPathIndexes.isEmpty() && pathIndexes.isEmpty();
-    }
-
 }

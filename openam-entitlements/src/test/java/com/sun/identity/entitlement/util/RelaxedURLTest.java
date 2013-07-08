@@ -15,11 +15,11 @@
  */
 package com.sun.identity.entitlement.util;
 
-import org.junit.Test;
+import org.testng.annotations.Test;
 
 import java.net.MalformedURLException;
 
-import static org.junit.Assert.assertEquals;
+import static org.testng.Assert.assertEquals;
 
 /**
  * Unit test to exercise the RelaxedURL behaviour.
