@@ -27,7 +27,7 @@
  */
 
 /*
- * Portions Copyrighted 2011 ForgeRock AS
+ * Portions Copyrighted 2011-2013 ForgeRock AS
  */
 package com.sun.identity.common;
 
@@ -824,18 +824,25 @@ public class LDAPConnectionPool {
 
     private void decreaseCurrentConnection() {
         synchronized (this) {
-            try {
-                LDAPConnection con = pool[currentConnectionCount -
-                    busyConnectionCount - 1];
-                currentPool.remove(con);
-                backupPool.remove(con);
-                con.disconnect();
-            } catch (LDAPException e) {
-                debug.error("LDAPConnection pool:" + name +
-                    ":Error during disconnect.", e);
+            int index = currentConnectionCount - busyConnectionCount;
+            if (index >0 && index <= pool.length) {
+                try {
+                    LDAPConnection con = pool[index - 1];
+                    currentPool.remove(con);
+                    backupPool.remove(con);
+                    con.disconnect();
+                } catch (LDAPException e) {
+                    debug.error("LDAPConnection pool:" + name +
+                        ":Error during disconnect.", e);
+                }
+                pool[index - 1] = null;
+                adjustCurrentConnections(-1);
+            } else {
+                debug.warning("LDAPConnection pool:" + name +
+                    " currentConnectionCount="+currentConnectionCount +
+                    " busyConnectionCount="+busyConnectionCount );
+
             }
-            pool[currentConnectionCount - busyConnectionCount - 1] = null;
-            adjustCurrentConnections(-1);
         }
     }
     
