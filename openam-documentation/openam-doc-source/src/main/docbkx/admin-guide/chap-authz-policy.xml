@@ -121,6 +121,115 @@
   Response providers extend HTTP headers with additional information beyond
   an "allow" or "deny" decision. For example, a response provider can return
   a message about why access was denied.</para>
+
+  <section xml:id="configure-policy-wildcard">
+   <title>About Wildcards</title>
+   <para>OpenAM allows the use of wildcards. Wildcards allow the policy to be generic so 
+   that it can be analyzed against established resources. Use a wildcard in the 
+   <literal>Resource Name</literal> when establishing the rules for a policy. For example, 
+   the resource name <filename>http://website.example.com:80/*</filename>
+   uses the <literal>*</literal> to allow the policy to analyze against all resources 
+   associated with <filename>http://website.example.com:80/</filename>. OpenAM supports 
+   both single- and multi-level wildcards.</para>
+   
+   <para>The following tables defines the expected behavior for wildcards.</para>
+
+    <table xml:id="wildcard-bahavior" pgwide="1">
+     <title>Expected Wildcard Behavior</title>
+     <tgroup cols="3">
+      <thead>
+       <row>
+        <entry>Wildcard <footnote><para>All reserved and unreserved characters within 
+        the URI follow the guidelines provided in 
+        <link xlink:show="new" xlink:href="http://tools.ietf.org/html/rfc2396section-2.2">sections 2.2 and 2.3 of RFC 2396</link>.</para></footnote></entry>
+        <entry>Level</entry>
+        <entry>Behavior</entry>
+       </row>
+      </thead>
+      <tbody>
+       <row>
+        <entry><literal>*</literal> (single asterisk)</entry>
+        <entry>Multi-level wildcard</entry>
+        <entry>
+         <para>Can be used within the protocol, host, port, path and query string parts</para>
+         <para>Matches any character except <literal>?</literal> and spans across levels</para>
+         <para>Can be used to assist query string matching</para>
+         <para>It cannot be used in the same URL as a <literal>-*-</literal></para>
+       </entry>
+       </row>
+       <row>
+        <entry><literal>-*-</literal></entry>
+        <entry>Single-level</entry>
+        <entry>
+         <para>Can only be used in the URL path</para>
+         <para>Matches all characters except <literal>?</literal> and /</para>
+         <para>It cannot be used in the same URL as <literal>*</literal></para>
+       </entry>
+       </row>
+       <row>
+        <entry><literal>/</literal> (single forward slash)</entry>
+        <entry>Multi-level wildcard</entry>
+        <entry>
+         <para>Separates different levels with a rule</para>
+         <para>Does not match a single forward slash</para>
+         <para>Example: <literal>mult/*/dirs</literal> matches
+         <literal>mult/iple/dirs</literal>, but not <literal>mult/dirs</literal></para>
+        </entry>
+       </row>        
+       <row>
+        <entry><literal>/ /</literal> (multiple forward slashes separated by text) </entry>
+        <entry>Single-level wildcard</entry>
+        <entry>
+         <para>Trailing forward slashes will be ignored</para>
+         <para>Example: <literal>http://www.website.example.com:80/</literal> will be
+         read as <literal>http://www.website.example.com:80</literal></para>
+        </entry>
+       </row>        
+       <row>
+        <entry>Query Strings</entry>
+        <entry>Not applicable</entry>
+        <entry>
+         <para>Does not match <literal>?</literal>	</para>
+         <para>Requires a single <literal>*</literal> at the end to run</para>
+         <para>Example: <literal>http://www.website.example.com/a?*</literal> will match
+         <literal>http://www.website.example.com/a?b=c</literal> and 
+         <literal>http://www.website.example.com/a?d=e</literal></para>
+       </entry>
+       </row>
+       <row>
+        <entry>General Wildcards (defined by RFC 2396)</entry>
+        <entry>Single- and Multi-level Wildcards</entry>
+        <entry>
+         <para>Different wildcards cannot be mixed within a single rule</para>
+       </entry>
+       </row>
+      </tbody>
+     </tgroup>
+    </table>
+
+         
+   <para>Based on the expected behavior, OpenAM first normalizes the policy
+   resource name URL pattern you provide and the actual requested
+   resource URL. In addition to sorting the query string field-value pairs,
+   OpenAM ensures that both the URL pattern and the resource URL include the
+   port number. If no port number is specified, OpenAM uses 80 for HTTP or
+   443 for HTTPS. In other words, <literal>http://www.example.com/*</literal>
+   gets normalized to <literal>http://www.example.com:80/*</literal>. Also,
+   <literal>http://*/*</literal> gets normalized to
+   <literal>http://*:80/*</literal>. Notice that <literal>http://*/*</literal>
+   does matches when the port number is 80, but not when the port number is
+   something else, such as
+   <literal>http://www.example.com:1080/index.html</literal>. <footnote><para>This
+   explanation focuses on how this works for web resources such as
+   <literal>http://www.example.com:80/index.html</literal>,
+   where the delimiter is <literal>/</literal>, the wildcard is
+   <literal>*</literal>, and the one-level wildcard is
+   <literal>-*-</literal>. By default, comparisons are not case sensitive.
+   The delimiter, wildcards and case sensitivity are configurable. To see
+   examples of other configurations, browse in the OpenAM console to
+   Configuration &gt; Global &gt; Policy Configuration &gt; Resource
+   Comparator.</para></footnote></para>
+  </section>
  </section>
  
  <section xml:id="configure-authz-policy">
@@ -200,60 +309,7 @@
       field, and set whether to allow or deny HTTP GET and POST requests
       to the URL.</para>
 
-      <para>Your Resource Name can use wildcards.<footnote><para>This
-      explanation focuses on how this works for web resources such as
-      <literal>http://www.example.com:80/index.html</literal>,
-      where the delimiter is <literal>/</literal>, the wildcard is
-      <literal>*</literal>, and the one-level wildcard is
-      <literal>-*-</literal>. By default, comparisons are not case sensitive.
-      The delimiter, wildcards and case sensitivity are configurable. To see
-      examples of other configurations, browse in the OpenAM console to
-      Configuration &gt; Global &gt; Policy Configuration &gt; Resource
-      Comparator.</para></footnote></para>
-      <itemizedlist>
-       <listitem>
-        <para>A <literal>*</literal> matches zero or more characters including
-        <literal>/</literal>, but</para>
-       </listitem>
-       <listitem>
-        <para>A <literal>*</literal> at the end of the Resource Name
-        immediately following <literal>/</literal> matches one or more
-        characters including <literal>/</literal>.</para>
-       </listitem>
-       <listitem>
-        <para>Multiple forward slashes do not match a single forward slash, so
-        <literal>mult/*/dirs</literal> matches
-        <literal>mult/iple/dirs</literal>, yet <literal>mult/*/dirs</literal>
-        does not match <literal>mult/dirs</literal>.</para>
-       </listitem>
-       <listitem>
-        <para>Trailing forward slashes are not recognized as part of a Resource
-        Name. Therefore <literal>http://www.example.com/images//</literal> and
-        <literal>http://www.example.com/images</literal> are equivalent.</para>
-       </listitem>
-       <listitem>
-        <para>A <literal>-*-</literal> matches all characters except forward
-        slash (<literal>/</literal>) or question mark (<literal>?</literal>),
-        and cannot be escaped. As it does not match <literal>/</literal>,
-        <literal>-*-</literal> does not span multiple levels in a URL.</para>
-     
-        <para>OpenAM does not let you mix <literal>*</literal> and
-        <literal>-*-</literal> in the same URL.</para>
-       </listitem>
-      </itemizedlist>
-
-      <para>To check for a match, OpenAM first normalizes both the policy
-      resource name URL pattern you provide, and also the actual requested
-      resource URL. In addition to sorting the query string field-value pairs,
-      OpenAM ensures that both the URL pattern and the resource URL include the
-      port number. If no port number is specified, OpenAM uses 80 for HTTP or
-      443 for HTTPS. In other words, <literal>http://www.example.com/*</literal>
-      gets normalized to <literal>http://www.example.com:80/*</literal>. Also,
-      <literal>http://*/*</literal> gets normalized to
-      <literal>http://*:80/*</literal>. Notice that <literal>http://*/*</literal>
-      does matches when the port number is 80, but not when the port number is
-      something else, such as
-      <literal>http://www.example.com:1080/index.html</literal>.</para>
+      <para>Your Resource Name can use wildcards as described in <xref linkend="configure-policy-wildcard" />.</para>
      </step>
      <step>
       <para>Click Finish.</para>
