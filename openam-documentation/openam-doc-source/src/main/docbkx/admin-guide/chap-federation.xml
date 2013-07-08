@@ -20,7 +20,7 @@
   !
   ! CCPL HEADER END
   !
-  !      Copyright 2011-2013 ForgeRock, Inc.
+  !      Copyright 2011-2013 ForgeRock AS
   !    
 -->
 <chapter xml:id='chap-federation'
@@ -2227,9 +2227,9 @@ CookieWriterServlet.doGetPost: Redirect to
     <listitem>
      <para>(Optional) Use this parameter to indicate what binding to use for the
      authentication request. Valid values in include
-     <literal>urn:oasis:names:tc:SAML:2.0:bindings:HTTP-Redirect</literal>
+     <literal>binding=urn:oasis:names:tc:SAML:2.0:bindings:HTTP-Redirect</literal>
      (default) and
-     <literal>urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST</literal>.</para>
+     <literal>binding=urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST</literal>.</para>
     </listitem>
    </varlistentry>
 
@@ -2257,10 +2257,11 @@ CookieWriterServlet.doGetPost: Redirect to
     <term><literal>binding</literal></term>
     <listitem>
      <para>(Required) Use this parameter to indicate what binding to use for the
-     operation. For example, specify <literal>binding=HTTP-POST</literal> to
-     use HTTP POST binding with a self-submitting form rather than the default
-     HTTP redirect binding. In addition to <literal>binding=HTTP-POST</literal>,
-     you can also use <literal>binding=HTTP-Artifact</literal>.</para>
+     operation. The full, long name format is required for this parameter to work.
+     For example, specify <literal>binding=urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST</literal>
+     to use HTTP POST binding with a self-submitting form rather than the default
+     HTTP redirect binding. In addition, you can use 
+     <literal>binding=urn:oasis:names:tc:SAML:2.0:bindings:HTTP-Artifact</literal>.</para>
     </listitem>
    </varlistentry>
    
@@ -2324,10 +2325,11 @@ CookieWriterServlet.doGetPost: Redirect to
     <term><literal>binding</literal></term>
     <listitem>
      <para>(Required) Use this parameter to indicate what binding to use for the
-     operation. For example, specify <literal>binding=HTTP-POST</literal> to
-     use HTTP POST binding with a self-submitting form rather than the default
-     HTTP redirect binding. In addition to <literal>binding=HTTP-POST</literal>,
-     you can also use <literal>binding=HTTP-Artifact</literal>.</para>
+     operation. The full, long name format is required for this parameter to work.
+     For example, specify <literal>binding=urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST</literal> 
+     to use HTTP POST binding with a self-submitting form rather than the default
+     HTTP redirect binding. In addition, you can use 
+     <literal>binding=urn:oasis:names:tc:SAML:2.0:bindings:HTTP-Artifact</literal>.</para>
     </listitem>
    </varlistentry>
 
