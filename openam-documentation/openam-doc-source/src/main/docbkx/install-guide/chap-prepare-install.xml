@@ -34,8 +34,16 @@
 
  <indexterm><primary>Prerequisites</primary></indexterm>
  <para>This chapter covers prerequisites for installing OpenAM software,
- including how to prepare your application server to run OpenAM, and how to
- prepare your identity repository to handle OpenAM identities.</para>
+ including how to prepare your application server to run OpenAM, how to prepare
+ directory services to store configuration data, and how to prepare an identity
+ repository to handle OpenAM identities.</para>
+
+ <note>
+  <para>If a Java Security Manager is enabled for your application server,
+  add permissions before installing OpenAM.</para>
+  <!-- TODO: Define permissions for supported containers. Could these be
+  separate files available in the product directory when you unpack?-->
+ </note>
 
  <section xml:id="prepare-networking">
   <title>Preparing a Fully-Qualified Domain Name</title>
@@ -50,118 +58,438 @@
   DNS.</para>
  </section>
 
- <section xml:id="prepare-prerequisites">
-  <title>Preparing Prerequisite Software</title>
+ <section xml:id="prepare-java">
+  <title>Preparing a Java Environment</title>
 
   <indexterm>
-   <primary>Software requirements</primary>
+   <primary>Java requirements</primary>
   </indexterm>
+
+  <para>OpenAM software depends on a Java runtime environment. Check the output
+  of <command>java -version</command> to make sure your the version is supported
+  according to the <citetitle>Release Notes</citetitle> section on <link
+  xlink:href="release-notes#java-requirements" xlink:show="new"
+  xlink:role="http://docbook.org/xlink/role/olink"><citetitle>Java
+  Requirements</citetitle></link>.</para>
+ </section>
+
+ <section xml:id="prepare-configuration-store">
+  <title>Preparing a Configuration Data Store</title>
+
   <indexterm>
-   <primary>Memory requirements</primary>
+   <primary>Directory service requirements</primary>
   </indexterm>
+
+  <para>OpenAM stores configuration, session, and token data in an LDAP
+  directory service. This data is private to OpenAM. In other words, OpenAM
+  controls this data and other applications should access it, if necessary,
+  only through OpenAM.</para>
+
+  <para>OpenAM ships with an embedded OpenDJ directory server that you can
+  install as part of the OpenAM configuration process. You can use the
+  embedded directory server to simplify evaluation. By default OpenAM installs
+  the embedded directory alongside configuration settings under the $HOME of the
+  user running OpenAM, and runs the embedded directory in the same memory space
+  as OpenAM. Before deploying OpenAM in production, measure the impact of
+  using the embedded directory not only for relatively static configuration
+  data, but also for volatile session and token data. Your tests should subject
+  OpenAM to the same load patterns you expect in production. If it looks like
+  a better choice to use an external directory service, then use one of the
+  supported external configuration stores listed in the <link xlink:show="new"
+  xlink:href="release-notes#chap-before-you-install"
+  xlink:role="http://docbook.org/xlink/role/olink"><citetitle>Release
+  Notes</citetitle></link>, such as OpenDJ.</para>
+
+  <para>With the embedded OpenDJ directory and the default configuration
+  settings, OpenAM connects as directory super user, bypassing access control
+  evaluation because OpenAM manages the directory as its private store.</para>
 
   <itemizedlist>
-   <para>OpenAM core services require that you install a Java runtime
-   environment and an application container before you begin OpenAM
-   installation.</para>
+   <para>With an external directory service, the directory administrator can
+   require OpenAM to connect with normal application credentials. In that case,
+   the directory administrator must grant OpenAM specific access.</para>
+
+   <tip>
+    <para>If you are the directory administrator, and do not yet know directory
+    services very well, take some time to read the documentation for your
+    directory server, especially the documentation covering directory schema
+    and covering how to configure access to directory data.</para>
+   </tip>
 
    <listitem>
-    <para>A supported Java runtime environment</para>
+    <para>OpenAM requires specific directory schema definitions for the object
+    classes and attribute types that describe its data. For the configuration
+    store, the directory administrator should let OpenAM update the directory
+    schema at configuration time.</para>
 
-    <para>Check the output of <command>java -version</command> to make
-    sure your the version is supported according to the <citetitle>Release
-    Notes</citetitle> section on <link
-    xlink:href="release-notes#java-requirements"
-    xlink:role="http://docbook.org/xlink/role/olink"><citetitle>Java
-    Requirements</citetitle></link>.</para>
+    <para>These access rights are only required during configuration, and only
+    if the directory administrator does not add the OpenAM directory schema
+    definitions manually.</para>
+
+    <para>To grant the required access with OpenDJ for example, first add a
+    global access control instruction (ACI) permitting the OpenAM user to modify
+    schema definitions as in the following example where the OpenAM entry has DN
+    <literal>uid=openam,ou=admins,dc=example,dc=com</literal>.</para>
+
+    <programlisting language="ldif"
+    >global-aci: (target = "ldap:///cn=schema")(targetattr = "attributeTypes ||
+  objectClasses")(version 3.0;acl "Modify schema"; allow (write)(userdn = "
+ ldap:///uid=openam,ou=admins,dc=example,dc=com");)</programlisting>
+
+    <para>Also give the OpenAM user privileges to modify the schema and write
+    to subentries such as the schema entry. Set the following attributes on
+    the OpenAM user entry.</para>
+
+    <programlisting language="ldif"
+    >ds-privilege-name: subentry-write
+ds-privilege-name: update-schema</programlisting>
+
+    <!-- TODO: Reconsider the href here when DOCS-83 is implemented. -->
+    <para>See the OpenDJ documentation about <link xlink:show="new"
+    xlink:href="http://docs.forgerock.org/en/opendj/2.6.0/admin-guide/index/chap-privileges-acis.html"
+    >Configuring Privileges &amp; Access Control</link> for a more in-depth
+    explanation of how access is configured for OpenDJ.</para>
    </listitem>
 
    <listitem>
+    <para>When OpenAM connects to an external directory service to store its
+    data, it requires both read and write access.</para>
 
-    <para>A supported application server as the deployment container</para>
+    <para>With OpenDJ for example, add following ACIs to the configuration
+    base Distinguished Name (DN) entry. Adjust them as necessary if the OpenAM
+    user DN differs from
+    <literal>uid=openam,ou=admins,dc=example,dc=com</literal>.</para>
 
-    <para>See the <link xlink:href="release-notes#chap-before-you-install"
-    xlink:role="http://docbook.org/xlink/role/olink"><citetitle>Release
-    Notes</citetitle></link> for a list.</para>
-
-    <para>If a Java Security Manager is enabled for your deployment container,
-    add permissions before installing OpenAM.</para>
-    <!-- TODO: Define permissions for supported containers. Could these be
-    separate files available in the product directory when you unpack?-->
-   </listitem>
-
-   <listitem>
-    <para>A supported identity repository for user identity data</para>
-
-    <para>For evaluation you can use the embedded OpenDJ LDAP directory server,
-    which ships as part of OpenAM and that you can install as part of the OpenAM
-    configuration process. Evaluation does not therefore require a separate user
-    data or configuration store.</para>
-
-    <para>When moving to put OpenAM in production use a separate user data
-    store in most cases. Also if you have more than four OpenAM servers in your
-    production deployment, then use a separate LDAP directory server for the
-    configuration store as well. See the <link
-    xlink:href="release-notes#chap-before-you-install"
-    xlink:role="http://docbook.org/xlink/role/olink"><citetitle>Release
-    Notes</citetitle></link> for a list of supported external stores.</para>
-
-    <para>Examples in the documentation that show a separate user data
-    repository use OpenDJ unless otherwise indicated. In such examples OpenDJ
-    is installed on <literal>openam.example.com</literal>, and listens on the
-    following ports.</para>
-
-    <itemizedlist>
-     <listitem><para>Port 1389 for LDAP requests and StartTLS</para></listitem>
-     <listitem><para>Port 1636 for LDAP requests over SSL</para></listitem>
-     <listitem><para>Port 4444 for administrative traffic</para></listitem>
-    </itemizedlist>
-
-    <para>The script <filename>/etc/init.d/opendj</filename>, created with the
-    OpenDJ <command>create-rc-script</command> command, manages the service
-    at system startup and shutdown. This script assumes you run OpenDJ as the
-    user <literal>opendj</literal>.</para>
-
-    <programlisting language="shell">#!/bin/sh
-#...
-# chkconfig: 345 95 5
-# description: Control the OpenDJ Directory Server
-
-
-# Set the path to the OpenDJ instance to manage
-INSTALL_ROOT="/path/to/OpenDJ"
-export INSTALL_ROOT
-
-cd ${INSTALL_ROOT}
-
-# Determine what action should be performed on the server
-case "${1}" in
-start)
-  /bin/su opendj -c "${INSTALL_ROOT}/bin/start-ds --quiet"
-  exit ${?}
-  ;;
-stop)
-  /bin/su opendj -c "${INSTALL_ROOT}/bin/stop-ds --quiet"
-  exit ${?}
-  ;;
-restart)
-  /bin/su opendj -c "${INSTALL_ROOT}/bin/stop-ds --restart --quiet"
-  exit ${?}
-  ;;
-*)
-  echo "Usage:  $0 { start | stop | restart }"
-  exit 1
-  ;;
-esac
-</programlisting>
-
-    <para>The Example.com sample data loaded into OpenDJ are taken from
-    the file, <link xlink:href="http://opendj.forgerock.org/Example.ldif"
-    >Example.ldif</link>, that you can download.</para>
-    <para>See the <citetitle>OpenDJ Installation Guide</citetitle> for
-    detailed installation instructions.</para>
+    <programlisting language="ldif"
+    >aci: (targetattr="*")(version 3.0;acl "Allow entry search"; allow (
+ search, read)(userdn = "ldap:///uid=openam,ou=admins,dc=example,dc=com");)
+aci: (targetattr="*")(version 3.0;acl "Modify config entry"; allow (write)(
+ userdn = "ldap:///uid=openam,ou=admins,dc=example,dc=com");)
+aci: (targetcontrol="2.16.840.1.113730.3.4.3")(version 3.0;acl "Allow
+  persistent search"; allow (search, read)(userdn = "ldap:///uid=openam
+ ,ou=admins,dc=example,dc=com");)
+aci: (version 3.0;acl "Add config entry"; allow (add)(userdn = "ldap:///
+ uid=openam,ou=admins,dc=example,dc=com");)
+aci: (version 3.0;acl "Delete config entry"; allow (delete)(userdn = "ldap:///
+ uid=openam,ou=admins,dc=example,dc=com");)</programlisting>
    </listitem>
   </itemizedlist>
+
+  <para>In addition, the directory administrator should index the following
+  attributes used by OpenAM.</para>
+
+  <table xml:id="prepare-configuration-store-indexes">
+   <title>Configuration Data Store Indexes</title>
+
+   <tgroup cols="2">
+     <colspec colnum="1" colwidth="1*"/>
+     <colspec colnum="2" colwidth="1*"/>
+
+     <thead>
+      <row>
+       <entry>Attribute</entry>
+       <entry>Indexes Required</entry>
+      </row>
+     </thead>
+
+     <tbody>
+      <row>
+       <entry><literal>date01</literal></entry>
+       <entry>equality</entry>
+      </row>
+      <row>
+       <entry><literal>date02</literal></entry>
+       <entry>equality</entry>
+      </row>
+      <row>
+       <entry><literal>date03</literal></entry>
+       <entry>equality</entry>
+      </row>
+      <row>
+       <entry><literal>date04</literal></entry>
+       <entry>equality</entry>
+      </row>
+      <row>
+       <entry><literal>date05</literal></entry>
+       <entry>equality</entry>
+      </row>
+      <row>
+       <entry><literal>expirationDate</literal></entry>
+       <entry>equality</entry>
+      </row>
+      <row>
+       <entry><literal>integer01</literal></entry>
+       <entry>equality</entry>
+      </row>
+      <row>
+       <entry><literal>integer02</literal></entry>
+       <entry>equality</entry>
+      </row>
+      <row>
+       <entry><literal>integer03</literal></entry>
+       <entry>equality</entry>
+      </row>
+      <row>
+       <entry><literal>integer04</literal></entry>
+       <entry>equality</entry>
+      </row>
+      <row>
+       <entry><literal>integer05</literal></entry>
+       <entry>equality</entry>
+      </row>
+      <row>
+       <entry><literal>integer06</literal></entry>
+       <entry>equality</entry>
+      </row>
+      <row>
+       <entry><literal>integer07</literal></entry>
+       <entry>equality</entry>
+      </row>
+      <row>
+       <entry><literal>integer08</literal></entry>
+       <entry>equality</entry>
+      </row>
+      <row>
+       <entry><literal>integer09</literal></entry>
+       <entry>equality</entry>
+      </row>
+      <row>
+       <entry><literal>integer10</literal></entry>
+       <entry>equality</entry>
+      </row>
+      <row>
+       <entry><literal>iplanet-am-user-federation-info-key</literal></entry>
+       <entry>equality</entry>
+      </row>
+      <!-- not used
+      <row>
+       <entry><literal>memberof</literal></entry>
+       <entry>equality, presence</entry>
+      </row>
+      -->
+      <row>
+       <entry><literal>pkey</literal></entry>
+       <entry>equality</entry>
+      </row>
+      <row>
+       <entry><literal>skey</literal></entry>
+       <entry>equality</entry>
+      </row>
+      <row>
+       <entry><literal>string01</literal></entry>
+       <entry>equality</entry>
+      </row>
+      <row>
+       <entry><literal>string02</literal></entry>
+       <entry>equality</entry>
+      </row>
+      <row>
+       <entry><literal>string03</literal></entry>
+       <entry>equality</entry>
+      </row>
+      <row>
+       <entry><literal>string04</literal></entry>
+       <entry>equality</entry>
+      </row>
+      <row>
+       <entry><literal>string05</literal></entry>
+       <entry>equality</entry>
+      </row>
+      <row>
+       <entry><literal>string06</literal></entry>
+       <entry>equality</entry>
+      </row>
+      <row>
+       <entry><literal>string07</literal></entry>
+       <entry>equality</entry>
+      </row>
+      <row>
+       <entry><literal>string08</literal></entry>
+       <entry>equality</entry>
+      </row>
+      <row>
+       <entry><literal>string09</literal></entry>
+       <entry>equality</entry>
+      </row>
+      <row>
+       <entry><literal>string10</literal></entry>
+       <entry>equality</entry>
+      </row>
+      <row>
+       <entry><literal>string11</literal></entry>
+       <entry>equality</entry>
+      </row>
+      <row>
+       <entry><literal>string12</literal></entry>
+       <entry>equality</entry>
+      </row>
+      <row>
+       <entry><literal>string13</literal></entry>
+       <entry>equality</entry>
+      </row>
+      <row>
+       <entry><literal>string14</literal></entry>
+       <entry>equality</entry>
+      </row>
+      <row>
+       <entry><literal>string15</literal></entry>
+       <entry>equality</entry>
+      </row>
+      <row>
+       <entry><literal>sun-fm-saml2-nameid-infokey</literal></entry>
+       <entry>equality</entry>
+      </row>
+      <row>
+       <entry><literal>sunxmlkeyvalue</literal></entry>
+       <entry>equality, substring</entry>
+      </row>
+      <row>
+       <entry><literal>tokenExpirationDate</literal></entry>
+       <entry>ordering</entry>
+      </row>
+      <row>
+       <entry><literal>tokenUserId</literal></entry>
+       <entry>equality</entry>
+      </row>
+     </tbody>
+   </tgroup>
+  </table>
+ </section>
+
+ <section xml:id="prepare-identity-repository">
+  <title>Preparing an Identity Repository</title>
+
+  <indexterm>
+   <primary>Directory service requirements</primary>
+  </indexterm>
+
+  <para>OpenAM stores user identity data in one or more identity repositories.
+  In many deployments OpenAM connects to existing LDAP directory services
+  for user identity data. OpenAM is designed therefore to share data in an
+  identity repository with other applications.</para>
+
+  <para>OpenAM ships with an embedded OpenDJ directory server that you can
+  install as part of the OpenAM configuration process. In deployments where you
+  will only ever have a few users to manage and do not need to share identity
+  data with other applications, you can use the embedded store as your identity
+  repository and avoid the additional overhead of maintaining a separate
+  directory service. If OpenAM will share identity data with other applications,
+  or if you expect to have lots of users, then connect OpenAM to an external
+  identity repository. See the <link xlink:show="new"
+  xlink:href="release-notes#chap-before-you-install"
+  xlink:role="http://docbook.org/xlink/role/olink"><citetitle>Release
+  Notes</citetitle></link> for a list of supported external identity
+  repositories.</para>
+
+  <para>When OpenAM connects to an external identity repository, the
+  administrator must give OpenAM the following access rights.</para>
+
+  <itemizedlist>
+   <listitem>
+    <para>OpenAM requires specific directory schema definitions for the object
+    classes and attribute types that describe its data. The directory
+    administrator can find these definitions in the <filename>ldif</filename>
+    directory found inside the full .zip delivery.</para>
+
+    <para>If the directory administrator chooses instead to have OpenAM update
+    the directory schema at configuration time, then the directory administrator
+    must grant OpenAM access.</para>
+
+    <para>To grant this access right with OpenDJ for example, first add a global
+    ACI permitting the OpenAM user to modify schema definitions as in the
+    following example where the OpenAM entry has DN
+    <literal>uid=openam,ou=admins,dc=example,dc=com</literal>.</para>
+
+    <programlisting language="ldif"
+    >global-aci: (target = "ldap:///cn=schema")(targetattr = "attributeTypes ||
+  objectClasses")(version 3.0;acl "Modify schema"; allow (write)(userdn = "
+ ldap:///uid=openam,ou=admins,dc=example,dc=com");)</programlisting>
+
+    <para>Also give the OpenAM user privileges to modify the schema and write
+    to subentries such as the schema entry. Set the following attributes on
+    the OpenAM user entry.</para>
+
+    <programlisting language="ldif">ds-privilege-name: subentry-write
+ds-privilege-name: update-schema</programlisting>
+   </listitem>
+
+   <listitem>
+    <para>Allow OpenAM to read directory schema.</para>
+
+    <para>With OpenDJ for example, keep the default "User-Visible Schema
+    Operational Attributes" global ACI.</para>
+   </listitem>
+
+   <listitem>
+    <para>When OpenAM connects to an external identity repository, it requires
+    access to read and potentially to update data.</para>
+
+    <para>To grant the access rights with OpenDJ for example, add following ACIs
+    to the configuration base DN entry. Adjust them as necessary if the OpenAM
+    user DN differs from
+    <literal>uid=openam,ou=admins,dc=example,dc=com</literal>.</para>
+
+    <programlisting language="ldif"
+    >aci: (targetattr="* || aci")(version 3.0;acl "Allow identity modification";
+  allow (write)(userdn = "ldap:///uid=openam,ou=admins,dc=example,dc=com");)
+aci: (targetattr!="userPassword||authPassword")(version 3.0;
+ acl "Allow identity search"; allow (search, read)(userdn = "ldap:///
+ uid=openam,ou=admins,dc=example,dc=com");)
+aci: (targetcontrol="2.16.840.1.113730.3.4.3")(version 3.0;acl "Allow
+  persistent search"; allow (search, read)(userdn = "ldap:///
+ uid=openam,ou=admins,dc=example,dc=com");)
+aci: (version 3.0;acl "Add identity"; allow (add)(userdn = "ldap:///
+ uid=openam,ou=admins,dc=example,dc=com");)
+aci: (version 3.0;acl "Delete identity"; allow (delete)(userdn = "ldap:///
+ uid=openam,ou=admins,dc=example,dc=com");)</programlisting>
+   </listitem>
+
+   <listitem>
+    <para>Allow the OpenAM user to reset other users' passwords.</para>
+
+    <para>To grant this privilege in OpenDJ for example, set the following
+    attribute on the OpenAM user entry.</para>
+
+    <programlisting language="ldif"
+    >ds-privilege-name: password-reset</programlisting>
+   </listitem>
+  </itemizedlist>
+
+  <para>In addition for external directory services, the directory administrator
+  should index the following attributes used by OpenAM.</para>
+
+  <table xml:id="prepare-identity-repository-indexes">
+   <title>Configuration Data Store Indexes</title>
+
+   <tgroup cols="2">
+     <colspec colnum="1" colwidth="1*"/>
+     <colspec colnum="2" colwidth="1*"/>
+
+     <thead>
+      <row>
+       <entry>Attribute</entry>
+       <entry>Indexes Required</entry>
+      </row>
+     </thead>
+
+     <tbody>
+      <row>
+       <entry><literal>iplanet-am-user-federation-info-key</literal></entry>
+       <entry>equality</entry>
+      </row>
+      <!-- not used
+      <row>
+       <entry><literal>memberof</literal></entry>
+       <entry>equality, presence</entry>
+      </row>
+      -->
+      <row>
+       <entry><literal>sun-fm-saml2-nameid-infokey</literal></entry>
+       <entry>equality</entry>
+      </row>
+     </tbody>
+   </tgroup>
+  </table>
  </section>
 
  <section xml:id="download-openam-software">
