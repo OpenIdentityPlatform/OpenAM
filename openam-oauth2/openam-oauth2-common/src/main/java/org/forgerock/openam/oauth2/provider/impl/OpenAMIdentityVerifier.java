@@ -191,7 +191,7 @@ public class OpenAMIdentityVerifier extends AbstractIdentityVerifier<OpenAMUser>
         //remove prompt parameter
         Form query = request.getResourceRef().getQueryAsForm();
         Parameter p = query.getFirst("prompt");
-        if (p.getSecond().equalsIgnoreCase("login")){
+        if (p != null && p.getSecond().equalsIgnoreCase("login")){
             query.remove(p);
         }
         request.getResourceRef().setQuery(query.getQueryString());
