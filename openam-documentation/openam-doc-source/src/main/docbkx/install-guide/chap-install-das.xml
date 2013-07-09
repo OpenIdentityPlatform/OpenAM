@@ -20,7 +20,7 @@
   !
   ! CCPL HEADER END
   !
-  !      Copyright 2011-2012 ForgeRock AS
+  !      Copyright 2011-2013 ForgeRock AS
   !    
 -->
 <chapter xml:id='chap-install-das'
@@ -163,6 +163,21 @@
    <programlisting language="ini">com.sun.identity.distauth.cluster=
  http://das.example.com:8080/das/UI/Login,
  http://das2.example.com:8080/das/UI/Login</programlisting>
+  </step>
+
+  <step>
+   <para>Some application servers such as JBoss 7 mount the content of the
+   deployed .war file in a temporary location that can change on restart. To
+   make sure that the DAS can find its bootstrap configuration in this case,
+   specify the path to the bootstrap configuration file as a Java runtime option
+   for the DAS, as in the following example. The property to set is
+   <literal>openam.das.bootstrap.file</literal>.</para>
+
+   <programlisting language="ini"
+   >-Dopenam.das.bootstrap.file=/home/openam/FAMDistAuth/AMDistAuthConfig.properties</programlisting>
+
+   <para>You must make sure that the value of the option corresponds to the path
+   to the correct <filename>AMDistAuthConfig.properties</filename> file.</para>
   </step>
  </procedure>
 </chapter>
