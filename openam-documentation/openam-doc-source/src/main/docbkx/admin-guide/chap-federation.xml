@@ -1709,6 +1709,14 @@ CookieWriterServlet.doGetPost: Redirect to
    </step>
 
    <step>
+    <para>Enter the EntityID for your Salesforce service provider.</para>
+    
+    <para>This ID is used as the persistent EntityDescriptor metadata
+    element so that users can have multiple service provider instances.
+    This field is used for the EntityDescriptor on the next page.</para>
+   </step>
+
+   <step>
     <para>On the OpenAM console Common Tasks page, click Configure Salesforce
     CRM.</para>
    </step>
@@ -1719,9 +1727,8 @@ CookieWriterServlet.doGetPost: Redirect to
     from Salesforce CRM with the user profile attribute on your IDP.</para>
 
     <para>For example, add a mapping for <literal>IDPEmail</literal> to
-    <literal>mail</literal>, and then click Create. In any case, make sure
-    the attribute mapper is sending the correct attribute to be used for
-    the federated identity.</para>
+    <literal>mail</literal>, and then click Create. Make sure the attribute mapper 
+    is sending the correct attribute to be used for the federated identity.</para>
    </step>
 
    <step>
@@ -1766,7 +1773,7 @@ CookieWriterServlet.doGetPost: Redirect to
 
      <step>
       <para>In Salesforce CRM, browse to Setup &gt; Administration Setup &gt;
-      Single Sign-On Settings &gt; Security Controls, and then click Edit for
+      Security Controls &gt; Single Sign-On Settings, and then click Edit for
       Single Sign-On Settings.</para>
      </step>
 
@@ -1784,8 +1791,8 @@ CookieWriterServlet.doGetPost: Redirect to
      </step>
 
      <step>
-      <para>Save the OpenAM verification certificate to a text file, such as
-      <filename>OpenAM.pem</filename>.</para>
+      <para>Copy or download the OpenAM verification certificate to a text file, such 
+      as <filename>OpenAMCert.pem</filename> or <filename>OpenAMCert.txt</filename>.</para>
      </step>
 
      <step>
@@ -1794,13 +1801,23 @@ CookieWriterServlet.doGetPost: Redirect to
      </step>
 
      <step>
-      <para>For SAML User ID Type in Salesforce CRM, choose Assertion contains
+      <para>For SAML Identity Type in Salesforce CRM, choose Assertion contains
       the Federation ID from the User object.</para>
      </step>
 
      <step>
-      <para>For SAML User Location in Salesforce CRM, choose User ID is in an
+      <para>For SAML Identity Location in Salesforce CRM, choose Identity is in an
       Attribute element.</para>
+     </step>
+
+     <step>
+      <para>If you require specific login or logout pages, enter them in the next
+      two fields.</para>
+     </step>
+
+     <step>
+      <para>Enter the URL of your page specific error page if you have a page where
+      you would like users redirected to when they encounter an error.</para>
      </step>
 
      <step>
@@ -1830,16 +1847,10 @@ CookieWriterServlet.doGetPost: Redirect to
      </step>
 
      <step>
-      <para>Salesforce CRM displays a Salesforce.com Single Logout URL.</para>
-
-      <para>If you want to perform Global Logout when a user logs out of
-      Salesforce, edit this form to include the OpenAM Logout URL here.</para>
-
-      <para>If you do not want to OpenAM to end the user's session when they
-      log out of Salesforce, edit this for to leave this blank.</para>
+      <para>Salesforce CRM returns to the Single Sign-On Settings form.</para>
      </step>
-
-     <step><!-- Pending OPENAM-1232: Enhance Salesforce workflow -->
+     
+     <step>
       <para>Click Download Metadata to download the Salesforce CRM SP
       metadata.</para>
 
@@ -1880,6 +1891,26 @@ CookieWriterServlet.doGetPost: Redirect to
      <step>
       <para>Click Import Entity..., and then use the Import Entity Provider
       page to import the Salesforce CRM metadata.</para>
+      
+      <itemizedlist>
+       <listitem>
+        <para>Update the <literal>Realm Name</literal> to the appropriate realm.</para>
+       </listitem>
+       <listitem>
+        <para>Select the location where the metadata file is.</para>
+       </listitem>
+       <listitem>
+        <para>Enter the path for the metadata file.</para>
+       </listitem>
+       <listitem>
+        <para>If you have an extended data file, select the location where the file
+        is.</para>
+       </listitem>
+       <listitem>
+        <para>If you have an extended data file, enter the path for the metadata 
+        file.</para>
+       </listitem>
+      </itemizedlist>
      </step>
     </substeps>
 
