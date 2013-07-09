@@ -122,6 +122,32 @@
     <para>OpenAM currently uses Sun Java System Application Framework (JATO).
     JATO is deprecated and is likely to be replaced in a future release.</para>
    </listitem>
+
+   <listitem>
+    <para>Older REST services relying on the following end points are
+    deprecated.</para>
+
+    <simplelist type="vert" columns="2">
+     <member>/identity/attributes</member>
+     <member>/identity/authenticate</member>
+     <member>/identity/authorize</member>
+     <member>/identity/create</member>
+     <member>/identity/delete</member>
+     <member>/identity/isTokenValid</member>
+     <member>/identity/log</member>
+     <member>/identity/logout</member>
+     <member>/identity/read</member>
+     <member>/identity/search</member>
+     <member>/identity/update</member>
+     <member>/ws/1/entitlement/decision</member>
+     <member>/ws/1/entitlement/decisions</member>
+     <member>/ws/1/entitlement/entitlement</member>
+    </simplelist>
+
+    <para>Support for these older REST services is likely to be removed in a
+    future release as the older services are supplanted with newer REST
+    services.</para>
+   </listitem>
   </itemizedlist>
  </section>
 
