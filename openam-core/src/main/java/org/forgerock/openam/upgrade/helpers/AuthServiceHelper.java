@@ -41,6 +41,8 @@ public class AuthServiceHelper extends AbstractUpgradeHelper {
     private final static String ADAPTIVE = "org.forgerock.openam.authentication.modules.adaptive.Adaptive";
     private final static String OAUTH2 = "org.forgerock.openam.authentication.modules.oauth2.OAuth";
     private final static String OATH = "org.forgerock.openam.authentication.modules.oath.OATH";
+    private final static String DEVICE_PRINT = "org.forgerock.openam.authentication.modules.deviceprint.DevicePrintModule";
+    private final static String PERSISTENT_COOKIE = "org.forgerock.openam.authentication.modules.persistentcookie.PersistentCookie";
     
     // remove modules
     private final static String SAFEWORD = "com.sun.identity.authentication.modules.safeword.SafeWord";
@@ -64,9 +66,10 @@ public class AuthServiceHelper extends AbstractUpgradeHelper {
         
         Set<String> defaultValues = existingAttr.getDefaultValues();
         
-        if (defaultValues.contains(SECURID) && defaultValues.contains(ADAPTIVE) && defaultValues.contains(OAUTH2) &&
-            defaultValues.contains(OATH) &&
-            !defaultValues.contains(SAFEWORD) && !defaultValues.contains(UNIX)) {
+        if (defaultValues.contains(SECURID) && defaultValues.contains(ADAPTIVE) && defaultValues.contains(OAUTH2)
+                && defaultValues.contains(OATH) && defaultValues.contains(DEVICE_PRINT)
+                && defaultValues.contains(PERSISTENT_COOKIE)
+                && !defaultValues.contains(SAFEWORD) && !defaultValues.contains(UNIX)) {
             // nothing to do
             return null;
         }
@@ -75,6 +78,8 @@ public class AuthServiceHelper extends AbstractUpgradeHelper {
         defaultValues.add(ADAPTIVE);
         defaultValues.add(OAUTH2);
         defaultValues.add(OATH);
+        defaultValues.add(DEVICE_PRINT);
+        defaultValues.add(PERSISTENT_COOKIE);
         defaultValues.remove(SAFEWORD);
         defaultValues.remove(UNIX);
         newAttr = updateDefaultValues(newAttr, defaultValues);
