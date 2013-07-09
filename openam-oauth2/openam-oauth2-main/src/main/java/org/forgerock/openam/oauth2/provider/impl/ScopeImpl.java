@@ -129,7 +129,7 @@ public class ScopeImpl implements Scope {
         Set<String> scopes = token.getScope();
         String resourceOwner = token.getUserID();
 
-        if (resourceOwner != null){
+        if ((resourceOwner != null) && (scopes != null) && (!scopes.isEmpty())){
             AMIdentity id = null;
             try {
 
@@ -141,7 +141,7 @@ public class ScopeImpl implements Scope {
             } catch (Exception e){
                 OAuth2Utils.DEBUG.error("Unable to get user identity", e);
             }
-            if (id != null && scopes != null){
+            if (id != null){
                 for (String scope : scopes){
                     try {
                         Set<String> mail = id.getAttribute(scope);
