@@ -166,6 +166,24 @@
   </step>
 
   <step>
+   <para>If your deployment includes multiple OpenAM servers, then edit the
+   DAS configuration file, <filename>$HOME/FAMDistAuth/*AmDistAuthConfig.properties</filename>,
+   to include <literal>X-Forwarded-For</literal> in the list of
+   <link xlink:show="new"
+   xlink:href="reference#openam-retained-http-request-headers"
+   xlink:role="http://docbook.org/xlink/role/olink"><literal
+   >openam.retained.http.request.headers</literal></link>.</para>
+
+   <para>Example: <literal>openam.retained.http.request.headers=X-DSAMEVersion,X-Forwarded-For</literal></para>
+
+   <para>This ensures the authoritative OpenAM authentication server gets
+   the client IP address in this header of the forwarded HTTP request. You can
+   also add the header to the list for the
+   <literal>openam.retained.http.headers</literal> property to have OpenAM copy
+   the header to the response.</para>
+  </step>
+
+  <step>
    <para>Some application servers such as JBoss 7 mount the content of the
    deployed .war file in a temporary location that can change on restart. To
    make sure that the DAS can find its bootstrap configuration in this case,

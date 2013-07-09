@@ -4018,22 +4018,75 @@
     <term><literal>openam.retained.http.headers</literal></term>
     <listitem>
      <para>Comma-separated list of HTTP headers to copy to the forwarded
-     request when the distributed authentication server forwards a request to
-     another distributed authentication server. Usually requests are forwarded
-     when the user has an <literal>AMAuthCookie</literal> from a different
-     distributed authentication server.</para>
+     response when the server forwards a request to another server.</para>
+
+     <para>Requests are forwarded when the server receiving the request is
+     not the server that originally initiated authentication. The server that
+     originally initiated authentication is identified by a cookie.</para>
+
+     <para>When the distributed authentication service (DAS) is in use, then
+     the cookie is the <literal>AMDistAuthCookie</literal> that identifies the
+     DAS server by its URL.</para>
+
+     <para>When authentication is done directly on OpenAM, then the cookie is
+     the <literal>AMAuthCookie</literal> that holds a session ID that identifies
+     the OpenAM server.</para>
+
+     <para>On subsequent requests the server receiving the request checks the
+     cookie. If the cookie identifies another server, the current server
+     forwards the request to that server.</para>
+
+     <para>If a header such as <literal>Cache-Control</literal> has been
+     included in the list of values for the property
+     <literal>openam.retained.http.request.headers</literal>
+     and the header must also be copied to the response, then add it to the
+     list of values for this property.</para>
+
+     <para>Example: <literal>openam.retained.http.headers=X-DSAMEVersion,Cache-Control</literal></para>
+
      <para>Default: <literal>X-DSAMEVersion</literal></para>
     </listitem>
    </varlistentry>
 
-   <varlistentry>
+   <varlistentry xml:id="openam-retained-http-request-headers">
     <term><literal>openam.retained.http.request.headers</literal></term>
     <listitem>
      <para>Comma-separated list of HTTP headers to copy to the forwarded request
-     when the distributed authentication server forwards a request to another
-     distributed authentication server. Usually requests are forwarded when the
-     user has an <literal>AMAuthCookie</literal> from a different distributed
-     authentication server.</para>
+     when the server forwards a request to another server.</para>
+
+     <para>Requests are forwarded when the server receiving the request is
+     not the server that originally initiated authentication. The server that
+     originally initiated authentication is identified by a cookie.</para>
+
+     <para>When the distributed authentication service (DAS) is in use, then
+     the cookie is the <literal>AMDistAuthCookie</literal> that identifies the
+     DAS server by its URL.</para>
+
+     <para>When authentication is done directly on OpenAM, then the cookie is
+     the <literal>AMAuthCookie</literal> that holds a session ID that identifies
+     the OpenAM server.</para>
+
+     <para>On subsequent requests the server receiving the request checks the
+     cookie. If the cookie identifies another server, the current server
+     forwards the request to that server.</para>
+
+     <para>When configuring the distributed authentication service, or when a
+     reverse proxy is set up to provide the client IP address in the
+     <literal>X-Forwarded-For</literal> header, if your deployment includes
+     multiple OpenAM servers, then this property must be set to include the
+     header.</para>
+
+     <para>Example: <literal>openam.retained.http.request.headers=X-DSAMEVersion,X-Forwarded-For</literal></para>
+
+     <para>OpenAM copies the header when forwarding a request to the
+     authoritative server where the client originally began the authentication
+     process, so that the authoritative OpenAM server receiving the forwarded
+     request can determine the real client IP address.</para>
+
+     <para>In order to retain headers to return in the response to the OpenAM
+     server that forwarded the request, use the property
+     <literal>openam.retained.http.headers</literal>.</para>
+
      <para>Default: <literal>X-DSAMEVersion</literal></para>
     </listitem>
    </varlistentry>
