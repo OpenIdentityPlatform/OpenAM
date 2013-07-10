@@ -23,11 +23,17 @@ import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
 import javax.security.auth.Subject;
+import javax.security.auth.callback.CallbackHandler;
+import javax.security.auth.message.AuthException;
 import javax.security.auth.message.AuthStatus;
 import javax.security.auth.message.MessageInfo;
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+
+import java.security.Principal;
+import java.util.HashMap;
+import java.util.Map;
 
 import static junit.framework.Assert.assertEquals;
 import static org.mockito.BDDMockito.given;
@@ -73,7 +79,7 @@ public class LocalSSOTokenSessionModuleTest {
     }
 
     @Test
-    public void shouldValidateRequestWithCookiesNull() {
+    public void shouldValidateRequestWithCookiesNull() throws AuthException {
 
         //Given
         MessageInfo messageInfo = mock(MessageInfo.class);
@@ -91,7 +97,7 @@ public class LocalSSOTokenSessionModuleTest {
     }
 
     @Test
-    public void shouldValidateRequestWithCookiesEmpty() {
+    public void shouldValidateRequestWithCookiesEmpty() throws AuthException {
 
         //Given
         MessageInfo messageInfo = mock(MessageInfo.class);
@@ -110,7 +116,7 @@ public class LocalSSOTokenSessionModuleTest {
     }
 
     @Test
-    public void shouldValidateRequestWithCookiesNoSSOToken() {
+    public void shouldValidateRequestWithCookiesNoSSOToken() throws AuthException {
 
         //Given
         MessageInfo messageInfo = mock(MessageInfo.class);
@@ -129,7 +135,7 @@ public class LocalSSOTokenSessionModuleTest {
     }
 
     @Test
-    public void shouldValidateRequestWithCookiesIncludingInvalidSSOToken() throws SSOException {
+    public void shouldValidateRequestWithCookiesIncludingInvalidSSOToken() throws SSOException, AuthException {
 
         //Given
         MessageInfo messageInfo = mock(MessageInfo.class);
@@ -150,7 +156,7 @@ public class LocalSSOTokenSessionModuleTest {
     }
 
     @Test
-    public void shouldValidateRequestWithCookiesIncludingValidSSOToken() throws SSOException {
+    public void shouldValidateRequestWithCookiesIncludingValidSSOToken() throws SSOException, AuthException {
 
         //Given
         MessageInfo messageInfo = mock(MessageInfo.class);
@@ -158,11 +164,23 @@ public class LocalSSOTokenSessionModuleTest {
         Subject serviceSubject = new Subject();
         HttpServletRequest request = mock(HttpServletRequest.class);
         SSOToken ssoToken = mock(SSOToken.class);
+        Principal principal = mock(Principal.class);
+        Map<String, Object> map = new HashMap<String, Object>();
+        Map<String, Object> context = new HashMap<String, Object>();
 
         given(messageInfo.getRequestMessage()).willReturn(request);
+        map.put("org.forgerock.security.context", context);
+        given(messageInfo.getMap()).willReturn(map);
         given(request.getCookies()).willReturn(new Cookie[]{new Cookie("2", "2"),
                 new Cookie(SSO_TOKEN_ID_COOKIE_NAME, "SSO_TOKEN_ID"), new Cookie("1", "1")});
         given(ssoTokenManager.createSSOToken("SSO_TOKEN_ID")).willReturn(ssoToken);
+        given(ssoToken.getPrincipal()).willReturn(principal);
+        given(principal.getName()).willReturn("PRINCIPAL");
+
+        messageInfo.getMap().get("org.forgerock.security.context");
+
+        CallbackHandler handler = mock(CallbackHandler.class);
+        localSSOTokenSessionModule.initialize(null, null, handler, null);
 
         //When
         AuthStatus authStatus = localSSOTokenSessionModule.validateRequest(messageInfo, clientSubject, serviceSubject);

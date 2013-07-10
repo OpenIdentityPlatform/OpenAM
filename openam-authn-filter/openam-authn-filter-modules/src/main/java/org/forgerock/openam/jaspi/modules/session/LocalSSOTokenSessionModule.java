@@ -11,7 +11,7 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2013 ForgeRock Inc.
+ * Copyright 2013 ForgeRock AS.
  */
 
 package org.forgerock.openam.jaspi.modules.session;
@@ -24,15 +24,19 @@ import com.sun.identity.shared.debug.Debug;
 import org.apache.commons.lang3.StringUtils;
 
 import javax.security.auth.Subject;
+import javax.security.auth.callback.Callback;
 import javax.security.auth.callback.CallbackHandler;
+import javax.security.auth.callback.UnsupportedCallbackException;
 import javax.security.auth.message.AuthException;
 import javax.security.auth.message.AuthStatus;
 import javax.security.auth.message.MessageInfo;
 import javax.security.auth.message.MessagePolicy;
+import javax.security.auth.message.callback.CallerPrincipalCallback;
 import javax.security.auth.message.module.ServerAuthModule;
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
 import java.util.Map;
 
 /**
@@ -49,6 +53,8 @@ public class LocalSSOTokenSessionModule implements ServerAuthModule {
 
     private static final Debug DEBUG = Debug.getInstance("amIdentityServices");
 
+    private CallbackHandler handler;
+
     /**
      * No initialisation required for this module.
      *
@@ -61,6 +67,7 @@ public class LocalSSOTokenSessionModule implements ServerAuthModule {
     @Override
     public void initialize(MessagePolicy requestPolicy, MessagePolicy responsePolicy, CallbackHandler handler,
             Map options) throws AuthException {
+        this.handler = handler;
     }
 
     /**
@@ -101,9 +108,10 @@ public class LocalSSOTokenSessionModule implements ServerAuthModule {
      * @param clientSubject {@inheritDoc}
      * @param serviceSubject {@inheritDoc}
      * @return {@inheritDoc}
+     * @throws AuthException If there is a problem validating the request.
      */
     @Override
-    public AuthStatus validateRequest(MessageInfo messageInfo, Subject clientSubject, Subject serviceSubject) {
+    public AuthStatus validateRequest(MessageInfo messageInfo, Subject clientSubject, Subject serviceSubject) throws AuthException {
 
         HttpServletRequest request = (HttpServletRequest) messageInfo.getRequestMessage();
 
@@ -125,11 +133,24 @@ public class LocalSSOTokenSessionModule implements ServerAuthModule {
                 SSOToken ssoToken = mgr.createSSOToken(tokenId);
 
                 if (ssoToken != null) {
+                    handler.handle(new Callback[]{
+                            new CallerPrincipalCallback(clientSubject, ssoToken.getPrincipal().getName())
+                    });
+                    Map<String, Object> context = (Map<String, Object>) messageInfo.getMap().get("org.forgerock.security.context");
+                    context.put("authLevel", ssoToken.getAuthLevel());
+                    //TODO add more properties to context map
+
                     return AuthStatus.SUCCESS;
                 }
             }
         } catch (SSOException e) {
             DEBUG.error("SSOToken not valid", e);
+        } catch (UnsupportedCallbackException e) {
+            DEBUG.error("Error setting user principal", e);
+            throw new AuthException(e.getMessage());
+        } catch (IOException e) {
+            DEBUG.error("Error setting user principal", e);
+            throw new AuthException(e.getMessage());
         }
 
         return AuthStatus.SEND_FAILURE;

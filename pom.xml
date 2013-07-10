@@ -133,7 +133,7 @@
         <commons.json-resource.version>1.2.2</commons.json-resource.version>
         <commons.json-patch.version>1.0.0</commons.json-patch.version>
         <forgerock.json.version>2.0.0-SNAPSHOT</forgerock.json.version>
-        <commons.authnfilter.version>0.1.1-SNAPSHOT</commons.authnfilter.version>
+        <commons.authnfilter.version>1.0.0-SNAPSHOT</commons.authnfilter.version>
 
         <restlet.version>2.1.1</restlet.version>
         <xercesj.version>2.11.0</xercesj.version>

@@ -50,7 +50,7 @@
     </listener>
     <filter>
         <filter-name>CommonsAuthnFilter</filter-name>
-        <filter-class>org.forgerock.jaspi.filter.AuthNFilter</filter-class>
+        <filter-class>org.forgerock.openam.jaspi.config.AMAuthNFilter</filter-class>
         <init-param>
             <param-name>moduleConfiguration</param-name>
             <param-value>all</param-value>
@@ -75,10 +75,10 @@
         <filter-name>AuthZFilter</filter-name>
         <url-pattern>/ws/*</url-pattern>
     </filter-mapping>
-    <!--<filter-mapping>-->
-        <!--<filter-name>CommonsAuthnFilter</filter-name>-->
-        <!--<url-pattern>/json/session/*</url-pattern>-->
-    <!--</filter-mapping>-->
+    <filter-mapping>
+        <filter-name>CommonsAuthnFilter</filter-name>
+        <url-pattern>/json/*</url-pattern>
+    </filter-mapping>
 
     <!-- filter mapping -->
 
