@@ -440,9 +440,6 @@
    following stages.</para>
    <orderedlist>
     <listitem>
-     <para>Create the .war file for the discovery service.</para>
-    </listitem>
-    <listitem>
      <para>Deploy the .war file into your web application container.</para>
     </listitem>
     <listitem>
@@ -459,27 +456,6 @@
     </listitem>
    </orderedlist>
    
-   <procedure xml:id="create-idpdisco-file">
-    <title>To Create the Discovery Service Web Application</title>
-    
-    <para>Before you start, have access to metadata for the identity and
-    service providers in the circle of trust.</para>
-    
-    <step>
-     <para>Unpack the <filename>opensso.war</filename> file into a temporary
-     directory.</para>
-     <screen>$ mkdir /tmp/disco ; cd /tmp/disco
-$ jar xf ~/Downloads/opensso/deployable-war/opensso.war</screen>
-    </step>
-    <step>
-     <para>Create the <filename>disco.war</filename> file.</para>
-     <screen>$ cd ~/Downloads/opensso/deployable-war
-$ sh createwar.sh --staging /tmp/disco --type idpdiscovery --warfile disco.war
-
-WAR file was created.</screen>
-    </step>
-   </procedure>
-   
    <procedure xml:id="deploy-idpdisco-on-tomcat">
     <title>To Deploy the Discovery Service on Tomcat</title>
 
@@ -488,16 +464,16 @@ WAR file was created.</screen>
     on Apache Tomcat.</para>
 
     <step>
-     <para>Put the <filename>disco.war</filename> you created in the Tomcat
-     <filename>webapps/</filename> directory.</para>
-     <screen>$ mv disco.war /path/to/tomcat/webapps/</screen>
+     <para>Copy the <filename><?eval ${ipdiscoWarFile}?></filename> file to
+     the <filename>webapps/</filename> directory.</para>
+     <screen>$ ~/Downloads/openam/<?eval ${ipdiscoWarFile}?> /path/to/tomcat/webapps/disco.war</screen>
     </step>
     <step>
      <para>Access the configuration screen through your browser.</para>
      <para>In this example, Apache Tomcat listens for HTTP requests on
-     <literal>idp.disco.example:8080</literal>, and Tomcat has unpacked the
+     <literal>www.disco.example:8080</literal>, and Tomcat has unpacked the
      application under <literal>/disco</literal>, so the URL is
-     <literal>http://idp.disco.example:8080/disco</literal>, which redirects to
+     <literal>http://www.disco.example:8080/disco</literal>, which redirects to
      <filename>Configurator.jsp</filename>.</para>
     </step>
    </procedure>
@@ -548,7 +524,7 @@ WAR file was created.</screen>
        <listitem>
         <para>The cookie domain is the common cookie domain used in your circle
         of trust for identity provider discovery, in this case
-        <literal>www.disco.example</literal>.</para>
+        <literal>.disco.example</literal>.</para>
        </listitem>
       </varlistentry>
       <varlistentry>
@@ -601,9 +577,9 @@ WAR file was created.</screen>
      discovery service endpoints, and Save your work.</para>
 
      <para>In this example, the writer URL is
-     <literal>http://idp.disco.example:8080/disco/saml2writer</literal>, and the
+     <literal>http://www.disco.example:8080/disco/saml2writer</literal>, and the
      reader URL is
-     <literal>http://idp.disco.example:8080/disco/saml2reader</literal>.</para>
+     <literal>http://www.disco.example:8080/disco/saml2reader</literal>.</para>
     </step>
 
     <step>

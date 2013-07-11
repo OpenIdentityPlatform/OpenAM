@@ -115,6 +115,7 @@
         <clientsdkJarFile><![CDATA[openam-clientsdk-${project.version}.jar]]></clientsdkJarFile>
         <clientSDKExamplesCliFile><![CDATA[openam-example-clientsdk-cli-${project.version}.zip]]></clientSDKExamplesCliFile>
         <clientSDKExamplesWarFile><![CDATA[openam-example-clientsdk-war-${project.version}.war]]></clientSDKExamplesWarFile>
+        <ipdiscoWarFile><![CDATA[openam-idpdiscovery-war-${project.version}.war]]></ipdiscoWarFile>
         <distauthWarFile><![CDATA[openam-distauth-${project.version}.war]]></distauthWarFile>
         <diagnosticsZipFile><![CDATA[openam-distribution-diagnostics-${project.version}.zip]]></diagnosticsZipFile>
         <fedletZipFile><![CDATA[openam-distribution-fedlet-unconfigured-${project.version}.zip]]></fedletZipFile>

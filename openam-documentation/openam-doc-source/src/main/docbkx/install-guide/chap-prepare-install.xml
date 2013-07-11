@@ -571,6 +571,32 @@ $ unzip ~/Downloads/<?eval ${coreDirectoryFile}?>.zip</screen>
     the command line</para></listitem>
    </varlistentry>
    <varlistentry>
+    <term><filename><?eval ${clientSDKExamplesCliFile}?></filename></term>
+    <listitem>
+     <para>The .zip file containing the Java client SDK command-line examples,
+     and .jar files needed to run the examples</para>
+    </listitem>
+   </varlistentry>
+   <varlistentry>
+    <term><filename><?eval ${clientSDKExamplesWarFile}?></filename></term>
+    <listitem>
+     <para>The .war file containing Java client SDK examples in a web
+     application</para>
+    </listitem>
+   </varlistentry>
+   <varlistentry>
+    <term><filename><?eval ${ipdiscoWarFile}?></filename></term>
+    <listitem>
+     <para>The IDP discovery .war file, deployed as a service to service
+     providers that must discover which identity provider corresponds to a
+     SAML 2.0 request</para>
+
+     <para>For details, see <link xlink:href="admin-guide#deploy-idp-discovery"
+     xlink:show="new" xlink:role="http://docbook.org/xlink/role/olink"
+     ><citetitle>Deploying the Identity Provider Discovery Service</citetitle></link>.</para>
+    </listitem>
+   </varlistentry>
+   <varlistentry>
     <term><filename><?eval ${coreWarFile}?></filename></term>
     <listitem><para>The deployable .war file</para></listitem>
    </varlistentry>
@@ -578,20 +604,6 @@ $ unzip ~/Downloads/<?eval ${coreDirectoryFile}?>.zip</screen>
     <term><filename><?eval ${serveronlyWarFile}?></filename></term>
     <listitem><para>The deployable .war file when you want to deploy OpenAM
     server without the OpenAM console</para></listitem>
-   </varlistentry>
-   <varlistentry>
-    <term><filename><?eval ${clientSDKExamplesCliFile}?></filename></term>
-    <listitem>
-     <para>The .zip file containing the Java client SDK command-line examples,
-     and .jar files needed to run the examples.</para>
-    </listitem>
-   </varlistentry>
-   <varlistentry>
-    <term><filename><?eval ${clientSDKExamplesWarFile}?></filename></term>
-    <listitem>
-     <para>The .war file containing Java client SDK examples in a web
-     application.</para>
-    </listitem>
    </varlistentry>
   </variablelist>
  </section>
