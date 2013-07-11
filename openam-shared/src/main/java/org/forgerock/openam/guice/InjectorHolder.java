@@ -40,7 +40,19 @@ public enum InjectorHolder {
         InjectorFactory injectorFactory = new InjectorFactory(new ClasspathScanner(),
                 new GuiceModuleCreator(), new GuiceInjectorCreator());
 
-        injector = injectorFactory.createInjector(AMGuiceModule.class);
+        try {
+            injector = injectorFactory.createInjector(AMGuiceModule.class);
+        } catch (Exception e) {
+            /**
+             * This will occur during application server startup. The OpenAM
+             * debugging framework will not be available at this point.
+             *
+             * The error gets consumed by the application server startup, which
+             * is why we are printing the stack trace.
+             **/
+            e.printStackTrace();
+            throw new IllegalStateException(e);
+        }
     }
 
     /**

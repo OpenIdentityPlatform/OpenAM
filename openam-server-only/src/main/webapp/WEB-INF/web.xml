@@ -48,6 +48,12 @@
     <listener>
         <listener-class>org.forgerock.openam.jaspi.config.AuthnFilterConfigurator</listener-class>
     </listener>
+
+    <filter>
+        <filter-name>SessionAdminOnlyFilter</filter-name>
+        <filter-class>org.forgerock.openam.authz.filter.AdminAuthZFilter</filter-class>
+    </filter>
+
     <filter>
         <filter-name>CommonsAuthnFilter</filter-name>
         <filter-class>org.forgerock.openam.jaspi.config.AMAuthNFilter</filter-class>
@@ -78,6 +84,10 @@
     <filter-mapping>
         <filter-name>CommonsAuthnFilter</filter-name>
         <url-pattern>/json/*</url-pattern>
+    </filter-mapping>
+    <filter-mapping>
+        <filter-name>SessionAdminOnlyFilter</filter-name>
+        <url-pattern>/json/sessions/*</url-pattern>
     </filter-mapping>
 
     <!-- filter mapping -->

@@ -20,20 +20,17 @@ import com.google.inject.AbstractModule;
 import com.google.inject.Provider;
 import com.google.inject.TypeLiteral;
 import com.iplanet.dpro.session.service.CoreTokenServiceFactory;
+import com.iplanet.dpro.session.service.SessionService;
 import com.iplanet.services.ldap.DSConfigMgr;
 import com.iplanet.services.ldap.LDAPServiceException;
-import com.iplanet.services.ldap.LDAPUser;
-import com.iplanet.services.ldap.ServerGroup;
-import com.iplanet.services.ldap.ServerInstance;
 import com.iplanet.sso.SSOToken;
-import com.sun.identity.sm.ldap.CTSPersistentStore;
-import org.forgerock.openam.sm.DataLayerConnectionFactory;
 import com.sun.identity.common.ShutdownListener;
 import com.sun.identity.common.ShutdownManager;
 import com.sun.identity.security.AdminTokenAction;
 import com.sun.identity.sm.DNMapper;
 import com.sun.identity.sm.ServiceManagementDAO;
 import com.sun.identity.sm.ServiceManagementDAOWrapper;
+import com.sun.identity.sm.ldap.CTSPersistentStore;
 import org.forgerock.openam.entitlement.indextree.IndexChangeHandler;
 import org.forgerock.openam.entitlement.indextree.IndexChangeManager;
 import org.forgerock.openam.entitlement.indextree.IndexChangeManagerImpl;
@@ -43,12 +40,8 @@ import org.forgerock.openam.entitlement.indextree.IndexTreeService;
 import org.forgerock.openam.entitlement.indextree.IndexTreeServiceImpl;
 import org.forgerock.openam.entitlement.indextree.events.IndexChangeObservable;
 import org.forgerock.openam.guice.AMGuiceModule;
-import org.forgerock.opendj.ldap.ConnectionFactory;
-import org.forgerock.opendj.ldap.Connections;
-import org.forgerock.opendj.ldap.LDAPConnectionFactory;
+import org.forgerock.openam.sm.DataLayerConnectionFactory;
 import org.forgerock.opendj.ldap.SearchResultHandler;
-import org.forgerock.opendj.ldap.requests.BindRequest;
-import org.forgerock.opendj.ldap.requests.Requests;
 
 import javax.inject.Singleton;
 import java.security.PrivilegedAction;
@@ -57,6 +50,7 @@ import java.security.PrivilegedAction;
  * Guice Module for configuring bindings for the OpenAM Core classes.
  *
  * @author apforrest
+ * @author robert.wapshott@forgerock.com
  */
 @AMGuiceModule
 public class CoreGuiceModule extends AbstractModule {
@@ -99,6 +93,15 @@ public class CoreGuiceModule extends AbstractModule {
                 return CoreTokenServiceFactory.getInstance();
             }
         });
+
+        /**
+         * Session related dependencies.
+         */
+        bind(SessionService.class).toProvider(new Provider<SessionService>() {
+            public SessionService get() {
+                return SessionService.getSessionService();
+            }
+        }).in(Singleton.class);
     }
 
     // Implementation exists to capture the generic type of the PrivilegedAction.

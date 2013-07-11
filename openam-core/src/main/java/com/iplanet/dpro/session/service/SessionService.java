@@ -104,6 +104,7 @@ import com.sun.identity.sm.ldap.exceptions.CoreTokenException;
 import com.sun.identity.sm.ldap.utils.JSONSerialisation;
 import com.sun.identity.sm.ldap.utils.KeyConversion;
 import com.sun.identity.sm.ldap.utils.LDAPDataConversion;
+import org.forgerock.openam.guice.InjectorHolder;
 import org.forgerock.openam.session.service.SessionTimeoutHandler;
 
 import javax.servlet.http.HttpSession;
@@ -2099,12 +2100,7 @@ public class SessionService {
             return null;
         }
         if (coreTokenService == null) {
-            try {   // Obtain our AM Session Repository Instance to provide Session HA and Failover.
-                coreTokenService = CoreTokenServiceFactory.getInstance();
-            } catch (Exception e) {
-                sessionDebug
-                        .error("Failed to initialize CTS BackEnd Repository", e);
-            }
+            coreTokenService = InjectorHolder.getInstance(CTSPersistentStore.class);
         }
         return coreTokenService;
     }
@@ -2599,7 +2595,7 @@ public class SessionService {
      *
      * @param uuid the uuid of the login user
      */
-    boolean isSuperUser(String uuid) {
+    public boolean isSuperUser(String uuid) {
         boolean isSuperUser = false;
         try {
             // Get the AMIdentity Object for super user 

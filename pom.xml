@@ -222,7 +222,7 @@
         <module>openam-core</module>
 
         <!-- OpenAM Commons Authentication Filter -->
-        <module>openam-authn-filter</module>
+        <module>openam-auth-filter</module>
 
         <!-- OpenAM CLI Module -->
         <module>openam-cli</module>
@@ -537,6 +537,11 @@
             <dependency>
                 <groupId>org.forgerock.openam</groupId>
                 <artifactId>openam-authn-filter-modules</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.forgerock.openam</groupId>
+                <artifactId>openam-authz-filter</artifactId>
                 <version>${project.version}</version>
             </dependency>
 
@@ -890,6 +895,12 @@
                 <artifactId>openam-distribution-ssoconfiguratortools</artifactId>
                 <version>${project.version}</version>
                 <type>zip</type>
+            </dependency>
+
+            <dependency>
+                <groupId>org.forgerock.openam</groupId>
+                <artifactId>openam-authfilter-shared</artifactId>
+                <version>${project.version}</version>
             </dependency>
 
             <!-- External project dependencies -->

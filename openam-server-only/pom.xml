@@ -435,6 +435,11 @@
 
         <dependency>
             <groupId>org.forgerock.openam</groupId>
+            <artifactId>openam-authz-filter</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>org.forgerock.openam</groupId>
             <artifactId>openam-cli-definitions</artifactId>
             <version>${project.version}</version>
         </dependency>
