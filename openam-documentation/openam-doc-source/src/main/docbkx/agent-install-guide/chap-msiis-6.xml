@@ -302,7 +302,7 @@ Internet services successfully restarted</screen>
     <step>
      <para>If the web policy agent performs naming URL validation, which you
      can configure by setting the
-     <literal>com.forgerock.agents.ext.url.validation.disable</literal> property
+     <literal>com.forgerock.agents.ext.url.validation.level</literal> property
      in <filename>config\OpenSSOAgentBootstrap.properties</filename>, then
      make sure the <literal>IUSR_<replaceable>MachineName</replaceable></literal>
      user has read-write access to <filename>C:\Windows\Temp\</filename> before
