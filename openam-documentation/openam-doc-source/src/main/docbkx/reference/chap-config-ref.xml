@@ -20,7 +20,7 @@
   !
   ! CCPL HEADER END
   !
-  !      Copyright 2012-2013 ForgeRock, Inc.
+  !      Copyright 2012-2013 ForgeRock AS
   !    
 -->
 <chapter xml:id='chap-config-ref'
@@ -2557,8 +2557,8 @@
    <varlistentry>
     <term>DN Restriction Only Enabled</term>
     <listitem>
-     <para>If enabled, then OpenAM performs strict DN checks while setting
-     restrictions in cookie hijacking migration mode.</para>
+     <para>If enabled, OpenAM does not perform DNS lookups when checking
+     restrictions in cookie hijacking mode.</para>
 
      <para><command>ssoadm</command> attribute:
      <literal>iplanet-am-session-dnrestrictiononly</literal></para>
