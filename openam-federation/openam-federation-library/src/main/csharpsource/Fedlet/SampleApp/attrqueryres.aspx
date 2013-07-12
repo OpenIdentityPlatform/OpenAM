@@ -78,7 +78,7 @@
 
             if (!String.IsNullOrEmpty(parameters["attr4"]))
             {
-                parameters.Add(Saml2Constants.X509SubjectName, "1");
+                parameters.Add(Saml2Constants.X509SubjectName, Boolean.TrueString);
                 parameters[Saml2Constants.SubjectNameId] = parameters["attr4"];
             }
 

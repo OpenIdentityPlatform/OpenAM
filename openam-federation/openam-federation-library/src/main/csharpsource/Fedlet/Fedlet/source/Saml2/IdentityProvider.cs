@@ -191,11 +191,11 @@ namespace Sun.Identity.Saml2
             xpath.Append(binding);
             if (!supportsX509Query)
             {
-                xpath.Append("' and not(@supportsX509Query)]");
+                xpath.Append("' and not(@aq:supportsX509Query)]");
             }
             else
             {
-                xpath.Append("' and @supportsX509Query='true']");
+                xpath.Append("' and @aq:supportsX509Query='true']");
             }
 
             XmlNode root = this.metadata.DocumentElement;

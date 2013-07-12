@@ -140,7 +140,29 @@ namespace Sun.Identity.Saml2
             try
             {
                 Uri artifactResolutionSvcUri = new Uri(artifactResolutionSvcLoc);
+                if (artifactResolutionSvcUri.Scheme == "https")
+                {
+                    System.Net.ServicePointManager.ServerCertificateValidationCallback +=
+                    delegate(object sender, System.Security.Cryptography.X509Certificates.X509Certificate certificate,
+                    System.Security.Cryptography.X509Certificates.X509Chain chain,
+                    System.Net.Security.SslPolicyErrors sslPolicyErrors)
+                    {
+                        return true;
+                    };
+                }
+
                 request = (HttpWebRequest)WebRequest.Create(artifactResolutionSvcUri);
+
+                string authCertAlias = ConfigurationManager.AppSettings[Saml2Constants.MutualAuthCertAlias];
+                if (artifactResolutionSvcUri.Scheme == "https" && !string.IsNullOrWhiteSpace(authCertAlias))
+                {
+                    X509Certificate2 cert = FedletCertificateFactory.GetCertificateByFriendlyName(authCertAlias);
+                    if (cert != null)
+                    {
+                        request.ClientCertificates.Add(cert);
+                    }
+                }
+
                 XmlDocument artifactResolveXml = (XmlDocument)artifactResolve.XmlDom;
 
                 if (idp.WantArtifactResolveSigned)
@@ -1058,7 +1080,29 @@ namespace Sun.Identity.Saml2
             try
             {
                 Uri soapLogoutSvcUri = new Uri(idp.GetSingleLogoutServiceLocation(Saml2Constants.HttpSoapProtocolBinding));
+                if (soapLogoutSvcUri.Scheme == "https")
+                {
+                    System.Net.ServicePointManager.ServerCertificateValidationCallback +=
+                    delegate(object sender, System.Security.Cryptography.X509Certificates.X509Certificate certificate,
+                    System.Security.Cryptography.X509Certificates.X509Chain chain,
+                    System.Net.Security.SslPolicyErrors sslPolicyErrors)
+                    {
+                        return true;
+                    };
+                }
+
                 request = (HttpWebRequest)WebRequest.Create(soapLogoutSvcUri);
+
+                string authCertAlias = ConfigurationManager.AppSettings[Saml2Constants.MutualAuthCertAlias];
+                if (soapLogoutSvcUri.Scheme == "https" && !string.IsNullOrWhiteSpace(authCertAlias))
+                {
+                    X509Certificate2 cert = FedletCertificateFactory.GetCertificateByFriendlyName(authCertAlias);
+                    if (cert != null)
+                    {
+                        request.ClientCertificates.Add(cert);
+                    }
+                }
+
                 XmlDocument logoutRequestXml = (XmlDocument)logoutRequest.XmlDom;
 
                 if (idp.WantLogoutRequestSigned)
@@ -1317,14 +1361,11 @@ namespace Sun.Identity.Saml2
                     {
                         return true;
                     };
-
-                    ServicePointManager.SecurityProtocol = SecurityProtocolType.Ssl3;
                 }
 
                 request = (HttpWebRequest)WebRequest.Create(soapAttributeQuerySvcUri);
 
                 string authCertAlias = ConfigurationManager.AppSettings[Saml2Constants.MutualAuthCertAlias];
-
                 if (soapAttributeQuerySvcUri.Scheme == "https" && !string.IsNullOrWhiteSpace(authCertAlias))
                 {
                     X509Certificate2 cert = FedletCertificateFactory.GetCertificateByFriendlyName(authCertAlias);
