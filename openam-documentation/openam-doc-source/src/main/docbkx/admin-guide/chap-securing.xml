@@ -297,7 +297,7 @@
                 <para>You'll also need to change the password for the administrator on the directory server. If you are
                     using OpenDJ, refer to the <link xlink:show="new"
                     xlink:href='http://opendj.forgerock.org/doc/admin-guide/index.html#troubleshoot-reset-admin-passwords'
-                            ><citetitle>OpenDJ 2.5.0 Administration Guide</citetitle> section on Resetting Administrator
+                            ><citetitle>OpenDJ Administration Guide</citetitle> section on Resetting Administrator
                     Passwords</link>. If you are using a different directory server, you will have to refer to the
                 documentation for that server.</para>
             </step>
