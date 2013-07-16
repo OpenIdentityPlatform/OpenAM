@@ -37,7 +37,11 @@ import com.sun.identity.saml2.protocol.AttributeQuery;
 
 /**
  * This interface <code>AttributeAuthorityMapper</code> is used by attribute
- * authority to process attribute query.
+ * authority to process attribute query. Make sure to use thread-safe code if 
+ * you implement the AttributeAuthorityMapper. You can use the attributes on 
+ * the HttpRequest instead of synchronizing them. The default 
+ * AttributeAuthorityMapper uses an attribute on the HttpServletRequest to
+ * pass information to the AttributeQueryUtil.
  *
  * @supported.all.api
  */ 
