@@ -20,7 +20,7 @@
   !
   ! CCPL HEADER END
   !
-  !      Copyright 2011-2012 ForgeRock AS
+  !      Copyright 2011-2013 ForgeRock AS
   !    
 -->
 <chapter xml:id='chap-install-core'
@@ -51,8 +51,12 @@
  and credential replay functionality. It can function as a standards-based 
  policy enforcement point. Policy agents provide policy enforcement on supported
  web servers and Java EE containers, and are tightly integrated with OpenAM. 
- See the <link xlink:href="http://openam.forgerock.org/doc/agent-install-guide/index.html"
- xlink:show="new"><citetitle>Policy Agent Installation Guide</citetitle></link>
+ See the <link xlink:href="web-agent-install-guide#web-agent-install-guide"
+ xlink:role="http://docbook.org/xlink/role/olink"><citetitle>OpenAM Web Policy
+ Agent <?eval ${agentsDocTargetVersion}?> Installation Guide</citetitle></link>
+ or <link xlink:href="jee-agent-install-guide#jee-agent-install-guide"
+ xlink:role="http://docbook.org/xlink/role/olink"><citetitle>OpenAM Java EE Policy
+ Agent <?eval ${agentsDocTargetVersion}?> Installation Guide</citetitle></link>
  for instructions on installing OpenAM agents in supported web servers and
  Java EE application containers.</para>
 

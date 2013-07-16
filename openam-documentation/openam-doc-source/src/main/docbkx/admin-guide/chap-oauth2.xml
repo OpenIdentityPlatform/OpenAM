@@ -611,8 +611,11 @@
      <literal>/</literal>, to protect resources. So far this is standard
      OpenAM, unrelated to OAuth 2.0.</para>
 
-     <para>See the <link xlink:href="agent-install-guide#agent-install-guide"
-     xlink:role="http://docbook.org/xlink/role/olink"><citetitle>OpenAM Policy
+     <para>See the <link xlink:href="web-agent-install-guide#web-agent-install-guide"
+     xlink:role="http://docbook.org/xlink/role/olink"><citetitle>OpenAM Web Policy
+     Agent <?eval ${agentsDocTargetVersion}?> Installation Guide</citetitle></link>
+     or <link xlink:href="jee-agent-install-guide#jee-agent-install-guide"
+     xlink:role="http://docbook.org/xlink/role/olink"><citetitle>OpenAM Java EE Policy
      Agent <?eval ${agentsDocTargetVersion}?> Installation Guide</citetitle></link>
      for instructions on installing a policy agent. This example relies on the
      Apache Tomcat Java EE policy agent, configured to protect resources in

@@ -20,7 +20,7 @@
   !
   ! CCPL HEADER END
   !
-  !      Copyright 2011-2013 ForgeRock, Inc.
+  !      Copyright 2011-2013 ForgeRock AS
   !    
 -->
 <chapter xml:id='chap-sso'
@@ -33,9 +33,6 @@
  <title>Configuring Single Sign-On within One Domain</title>
 
 
-    <!-- Given the nature of this chapter, I've set this up , esp the description of Peter's diagram,
-more for newbies, mj -->
-
     <para>This chapter describes the configuration of <firstterm>Single Sign-On</firstterm> (SSO) services for
         multiple resources on one domain. To understand how SSO works, you need to understand some key elements of the
         HTTP cookie, as described in RFC 6525, <link xlink:show="new" xlink:href="http://tools.ietf.org/html/rfc6265">
@@ -44,9 +41,6 @@ more for newbies, mj -->
     <indexterm><primary>Single Sign-On (SSO)</primary></indexterm>
 
     <para>With SSO a user can access multiple independent services from a single session.</para>
-
-    <!-- Since I was clearly having trouble with definitions, I think the contrast helps (and I consulted other sources,
-    -->
 
     <section xml:id="sso-cookies">
         <title>The Basics of the HTTP Cookie</title>
@@ -121,10 +115,6 @@ more for newbies, mj -->
         </note>
 
     </section>
-
-    <!-- From Peter's citation of
-http://stackoverflow.com/questions/794243/internet-explorer-ignores-cookies-on-some-domains-cannot-read-or-set-cookies
-    -->
 
 <section xml:id="sso-process">
 <title>Cookies and the SSO Session Process</title>
@@ -247,8 +237,11 @@ http://stackoverflow.com/questions/794243/internet-explorer-ignores-cookies-on-s
         </step>
 
         <step>
-            <para>Install the appropriate policy agent, as described in the <link xlink:href="agent-install-guide#agent-install-guide"
-            xlink:role="http://docbook.org/xlink/role/olink"><citetitle>OpenAM Policy
+            <para>Install the appropriate policy agent, as described in the <link xlink:href="web-agent-install-guide#web-agent-install-guide"
+            xlink:role="http://docbook.org/xlink/role/olink"><citetitle>OpenAM Web Policy
+            Agent <?eval ${agentsDocTargetVersion}?> Installation Guide</citetitle></link>
+            or <link xlink:href="jee-agent-install-guide#jee-install-guide"
+            xlink:role="http://docbook.org/xlink/role/olink"><citetitle>OpenAM Java EE Policy
             Agent <?eval ${agentsDocTargetVersion}?> Installation Guide</citetitle></link>. 
             This procedure uses an agent URL of <literal>http://app.example.net:80</literal>, 
             and an agent name of <literal>webagent1</literal>.</para>
@@ -263,8 +256,11 @@ http://stackoverflow.com/questions/794243/internet-explorer-ignores-cookies-on-s
         <step>
             <para>Return to the OpenAM server on <literal>http://openam.example.net:8080/openam</literal>. Log in as
                 the administrative user, normally <literal>amadmin</literal>. To activate and configure the agent,
-                follow the procedure described in the <link xlink:href="agent-install-guide#agent-install-guide"
-                xlink:role="http://docbook.org/xlink/role/olink"><citetitle>OpenAM Policy
+                follow the procedure described in the <link xlink:href="web-agent-install-guide#web-agent-install-guide"
+                xlink:role="http://docbook.org/xlink/role/olink"><citetitle>OpenAM Web Policy
+                Agent <?eval ${agentsDocTargetVersion}?> Installation Guide</citetitle></link>
+                or <link xlink:href="jee-agent-install-guide#jee-agent-install-guide"
+                xlink:role="http://docbook.org/xlink/role/olink"><citetitle>OpenAM Java EE Policy
                 Agent <?eval ${agentsDocTargetVersion}?> Installation Guide</citetitle></link>.</para>
         </step>
 
