@@ -222,6 +222,13 @@ $ mv fedlet.war /path/to/tomcat/webapps</screen>
      <listitem><para><literal>sn=sn</literal></para></listitem>
      <listitem><para><literal>uid=uid</literal></para></listitem>
     </itemizedlist>
+    
+    <note>
+     <para>Make sure to use thread-safe code if you implement the AttributeAuthorityMapper.
+     You can use the attributes on the HttpRequest instead of synchronizing them. The 
+     default AttributeAuthorityMapper uses an attribute on the HttpServletRequest to
+     pass information to the AttributeQueryUtil.</para>
+    </note>
 
     <para>Click Save to save your changes.</para>
    </step>
