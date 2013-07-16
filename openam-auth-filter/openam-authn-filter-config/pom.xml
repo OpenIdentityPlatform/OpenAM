@@ -30,7 +30,7 @@
     <!-- Parent Project -->
     <parent>
         <groupId>org.forgerock.openam</groupId>
-        <artifactId>openam-authn-filter</artifactId>
+        <artifactId>openam-auth-filter</artifactId>
         <version>10.2.0-SNAPSHOT</version>
     </parent>
 
