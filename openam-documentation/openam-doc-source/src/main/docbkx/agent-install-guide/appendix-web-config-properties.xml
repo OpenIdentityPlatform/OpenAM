@@ -384,7 +384,15 @@
     <listitem>
      <para>When SSL is configured, set to <literal>false</literal> to trust the
      OpenAM SSL certificate only if the certificate is found to be correct and
-     valid. Default is <literal>true</literal>.</para>
+     valid. Default is <literal>true</literal> to make it easy to try SSL during
+     evaluation.</para>
+
+     <important>
+      <para>Notice that the default setting, <literal>true</literal>, means that
+      the web policy agent trusts all server certificates. Change this to
+      <literal>false</literal>, and test that your web policy agent can trust
+      server certificates before deploying the policy agent in production.</para>
+     </important>
     </listitem>
    </varlistentry>
    <varlistentry>
