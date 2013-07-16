@@ -53,7 +53,7 @@
     <a href="./openam-documentation/openam-doc-source/doc/OpenAM-Install-Guide.pdf">PDF</a>,
     <a href="./openam-documentation/openam-doc-source/doc/OpenAM-Install-Guide.rtf">RTF</a></dd>
 
-    <dt>OpenAM Update and Upgrade Guide</dt>
+    <dt>OpenAM Upgrade Guide</dt>
     <dd><a href="./openam-documentation/openam-doc-source/doc/OpenAM-Upgrade-Guide.epub">EPUB</a>,
     <a href="./openam-documentation/openam-doc-source/doc/upgrade-guide/index.html">HTML (single page)</a>,
     <a href="./openam-documentation/openam-doc-source/doc/upgrade-guide/index/index.html">HTML (1 page/chapter)</a>,
@@ -84,19 +84,33 @@
     <dt>OpenAM Javadoc</dt>
     <dd><a href="./apidocs/index.html">HTML</a></dd>
 
-    <dt>Policy Agent Release Notes</dt>
-    <dd><a href="./openam-documentation/openam-doc-source/doc/OpenAM-Agent-Release-Notes.epub">EPUB</a>,
-    <a href="./openam-documentation/openam-doc-source/doc/agent-release-notes/index.html">HTML (single page)</a>,
-    <a href="./openam-documentation/openam-doc-source/doc/agent-release-notes/index/index.html">HTML (1 page/chapter)</a>,
-    <a href="./openam-documentation/openam-doc-source/doc/OpenAM-Agent-Release-Notes.pdf">PDF</a>,
-    <a href="./openam-documentation/openam-doc-source/doc/OpenAM-Agent-Release-Notes.rtf">RTF</a></dd>
+    <dt>Jave EE Policy Agent Release Notes</dt>
+    <dd><a href="./openam-documentation/openam-doc-source/doc/OpenAM-Java-EE-Policy-Agent-Release-Notes.epub">EPUB</a>,
+    <a href="./openam-documentation/openam-doc-source/doc/jee-agent-release-notes/index.html">HTML (single page)</a>,
+    <a href="./openam-documentation/openam-doc-source/doc/jee-agent-release-notes/index/index.html">HTML (1 page/chapter)</a>,
+    <a href="./openam-documentation/openam-doc-source/doc/OpenAM-Java-EE-Policy-Agent-Release-Notes.pdf">PDF</a>,
+    <a href="./openam-documentation/openam-doc-source/doc/OpenAM-Java-EE-Policy-Agent-Release-Notes.rtf">RTF</a></dd>
 
-    <dt>Policy Agent Installation Guide</dt>
-    <dd><a href="./openam-documentation/openam-doc-source/doc/OpenAM-Agent-Install-Guide.epub">EPUB</a>,
-    <a href="./openam-documentation/openam-doc-source/doc/agent-install-guide/index.html">HTML (single page)</a>,
-    <a href="./openam-documentation/openam-doc-source/doc/agent-install-guide/index/index.html">HTML (1 page/chapter)</a>,
-    <a href="./openam-documentation/openam-doc-source/doc/OpenAM-Agent-Install-Guide.pdf">PDF</a>,
-    <a href="./openam-documentation/openam-doc-source/doc/OpenAM-Agent-Install-Guide.rtf">RTF</a></dd>
+    <dt>Java EE Policy Agent Installation Guide</dt>
+    <dd><a href="./openam-documentation/openam-doc-source/doc/OpenAM-Java-EE-Policy-Agent-Install-Guide.epub">EPUB</a>,
+    <a href="./openam-documentation/openam-doc-source/doc/jee-agent-install-guide/index.html">HTML (single page)</a>,
+    <a href="./openam-documentation/openam-doc-source/doc/jee-agent-install-guide/index/index.html">HTML (1 page/chapter)</a>,
+    <a href="./openam-documentation/openam-doc-source/doc/OpenAM-Java-EE-Policy-Agent-Install-Guide.pdf">PDF</a>,
+    <a href="./openam-documentation/openam-doc-source/doc/OpenAM-Java-EE-Policy-Agent-Install-Guide.rtf">RTF</a></dd>
+
+    <dt>Web Policy Agent Release Notes</dt>
+    <dd><a href="./openam-documentation/openam-doc-source/doc/OpenAM-Web-Policy-Agent-Release-Notes.epub">EPUB</a>,
+    <a href="./openam-documentation/openam-doc-source/doc/web-agent-release-notes/index.html">HTML (single page)</a>,
+    <a href="./openam-documentation/openam-doc-source/doc/web-agent-release-notes/index/index.html">HTML (1 page/chapter)</a>,
+    <a href="./openam-documentation/openam-doc-source/doc/OpenAM-Web-Policy-Agent-Release-Notes.pdf">PDF</a>,
+    <a href="./openam-documentation/openam-doc-source/doc/OpenAM-Web-Policy-Agent-Release-Notes.rtf">RTF</a></dd>
+
+    <dt>Web Policy Agent Installation Guide</dt>
+    <dd><a href="./openam-documentation/openam-doc-source/doc/OpenAM-Web-Policy-Agent-Install-Guide.epub">EPUB</a>,
+    <a href="./openam-documentation/openam-doc-source/doc/web-agent-install-guide/index.html">HTML (single page)</a>,
+    <a href="./openam-documentation/openam-doc-source/doc/web-agent-install-guide/index/index.html">HTML (1 page/chapter)</a>,
+    <a href="./openam-documentation/openam-doc-source/doc/OpenAM-Web-Policy-Agent-Install-Guide.pdf">PDF</a>,
+    <a href="./openam-documentation/openam-doc-source/doc/OpenAM-Web-Policy-Agent-Install-Guide.rtf">RTF</a></dd>
    </dl>
   </section>
  </body>
