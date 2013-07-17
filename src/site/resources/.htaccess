@@ -4,16 +4,3 @@ RedirectMatch 301 ^/doc/(.*)$ http://openam.forgerock.org/openam-documentation/o
 RedirectMatch 301 ^/openam-documentation/openam-site/(.*)$ http://openam.forgerock.org/openam-documentation/openam-doc-source/$1
 # Mavenization also changed the Javadoc location
 RedirectMatch 301 ^/doc/public-api/(.*)$ http://openam.forgerock.org/apidocs/$1
-
-# Redirect in the aftermath of AME-2089
-
-RedirectMatch 301 ^/doc/OpenAM-Policy-Agent-Installation-Guide(.*)$ http://openam.forgerock.org/docs.html$1
-RedirectMatch 301 ^/doc/agent-install-guide/(.*)$ http://openam.forgerock.org/docs.html$1
-RedirectMatch 301 ^/openam-documentation/openam-doc-source/doc/OpenAM-Policy-Agent-Installation-Guide(.*)$ http://openam.forgerock.org/docs.html$1
-RedirectMatch 301 ^/openam-documentation/openam-doc-source/doc/agent-install-guide/(.*)$ http://openam.forgerock.org/docs.html$1
-
-RedirectMatch 301 ^/doc/OpenAM-Policy-Agent-Release-Notes(.*)$ http://openam.forgerock.org/docs.html$1
-RedirectMatch 301 ^/doc/agent-release-notes(.*)$ http://openam.forgerock.org/docs.html$1
-RedirectMatch 301 ^/openam-documentation/openam-doc-source/doc/OpenAM-Policy-Agent-Release-Notes(.*)$ http://openam.forgerock.org/docs.html$1
-RedirectMatch 301 ^/openam-documentation/openam-doc-source/doc/agent-release-notes(.*)$ http://openam.forgerock.org/docs.html$1
-

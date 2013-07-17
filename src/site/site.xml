@@ -66,7 +66,7 @@
    <item name="All Formats" href="docs.html"/>
    <item name="Release Notes" href="./openam-documentation/openam-doc-source/doc/release-notes/index.html" />
    <item name="Installation Guide" href="./openam-documentation/openam-doc-source/doc/install-guide/index.html" />
-   <item name="Upgrade Guide" href="./openam-documentation/openam-doc-source/doc/upgrade-guide/index.html" />
+   <item name="Update and Upgrade Guide" href="./openam-documentation/openam-doc-source/doc/upgrade-guide/index.html" />
    <item name="Admin Guide" href="./openam-documentation/openam-doc-source/doc/admin-guide/index.html" />
    <item name="Developer Guide" href="./openam-documentation/openam-doc-source/doc/dev-guide/index.html" />
    <item name="Reference" href="./openam-documentation/openam-doc-source/doc/reference/index.html" />
@@ -75,10 +75,8 @@
 
   <menu name="Policy Agent Docs (in progress)">
    <item name="All Formats" href="docs.html"/>
-   <item name="Java EE Release Notes" href="./openam-documentation/openam-doc-source/doc/jee-agent-release-notes/index.html" />
-   <item name="Java EE Install Guide" href="./openam-documentation/openam-doc-source/doc/jee-agent-install-guide/index.html" />
-   <item name="Web Release Notes" href="./openam-documentation/openam-doc-source/doc/web-agent-release-notes/index.html" />
-   <item name="Web Install Guide" href="./openam-documentation/openam-doc-source/doc/web-agent-install-guide/index.html" />
+   <item name="Release Notes" href="./openam-documentation/openam-doc-source/doc/agent-release-notes/index.html" />
+   <item name="Install Guide" href="./openam-documentation/openam-doc-source/doc/agent-install-guide/index.html" />
   </menu>
 
   <menu name="Project Information">
