@@ -24,11 +24,11 @@
   !    
 -->
 <chapter xml:id='chap-web-agents'
- xmlns='http://docbook.org/ns/docbook' version='5.0' xml:lang='en'
- xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance'
- xsi:schemaLocation='http://docbook.org/ns/docbook http://docbook.org/xml/5.0/xsd/docbook.xsd'
- xmlns:xlink='http://www.w3.org/1999/xlink'
- xmlns:xinclude='http://www.w3.org/2001/XInclude'>
+         xmlns='http://docbook.org/ns/docbook' version='5.0' xml:lang='en'
+         xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance'
+         xsi:schemaLocation='http://docbook.org/ns/docbook http://docbook.org/xml/5.0/xsd/docbook.xsd'
+         xmlns:xlink='http://www.w3.org/1999/xlink'
+        >
  <title>Web Policy Agents <?eval ${agentsDocTargetVersion}?></title>
 
  <para>This chapter concerns OpenAM web policy agents. Web policy agents
@@ -366,9 +366,20 @@
   </section>
 
   <section xml:id="web-agent-limitations">
-   <title>Limitations</title>
+      <title>Limitations</title>
 
-   <para>OpenAM web policy agents do not currently support IPv6.</para>
+      <para>OpenAM web policy agents do not currently support IPv6.</para>
+
+      <para>If you are running an Apache Web agent on RHEL 6 (CentOS 6), and are also
+          running SELinux in enforcing mode, Apache may fail to restart with a 'Permission
+          denied' message, with a pointer to a file in the
+          <filename>/path/to/web_agents/apache2x_agent/lib</filename> directory. SELinux
+          expects most library files to be configured with a
+          <literal>lib_t</literal> label; you can set that up with the
+          <command>chcon -t lib_t /path/to/web_agents/apache2x_agent/lib/*.so</command> and
+          <command>semanage fcontext -a -t lib_t /path/to/web_agents/apache2x_agent/lib/*.so</command>
+          commands.</para>
+
   </section>
 
   <section xml:id="web-agent-known-issues">
