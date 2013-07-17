@@ -20,22 +20,21 @@
   !
   ! CCPL HEADER END
   !
-  !      Copyright 2011-2013 ForgeRock, Inc.
+  !      Copyright 2011-2013 ForgeRock AS
   !    
 -->
-<chapter xml:id='chap-weblogic'
+<chapter xml:id='chap-glassfish'
  xmlns='http://docbook.org/ns/docbook'
  version='5.0' xml:lang='en'
  xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance'
  xsi:schemaLocation='http://docbook.org/ns/docbook http://docbook.org/xml/5.0/xsd/docbook.xsd'
  xmlns:xlink='http://www.w3.org/1999/xlink'
  xmlns:xinclude='http://www.w3.org/2001/XInclude'>
- <title>Installing the Oracle WebLogic Policy Agent</title>
- <indexterm><primary>Oracle WebLogic Server</primary></indexterm>
- <para>This chapter covers installation of the policy agent for Oracle
- WebLogic.</para>
+ <title>Installing the GlassFish Policy Agent</title>
+ <indexterm><primary>GlassFish Server</primary></indexterm>
+ <para>This chapter covers installation of the policy agent for GlassFish.</para>
  
-  <section xml:id="before-weblogic-agent-install">
+  <section xml:id="before-glassfish-agent-install">
   <title>Before You Install</title>
   
   <para>Make sure OpenAM is installed and running, and that you can contact OpenAM
@@ -51,8 +50,9 @@
   policy that allows only authenticated users to access your resources, in order
   to test your policy agent after installation.</para>
 
-  <para>You must install WebLogic before you install the policy agent, and you
-  must stop the server during installation.</para>
+  <para>You must install GlassFish before you install the policy agent, and you
+  must stop the domain with applications to protect during installation. Policy
+  agents support <?eval ${agentGlassFishSupport}?>.</para>
 
       <para>You must install a supported version of the Java runtime environment.
           Please review the <link xlink:show="new"
@@ -78,10 +78,7 @@ $ which java
   
   <variablelist>
    <para>When you unzip the policy agent, you find the following directories
-   under the <filename>j2ee_agents/weblogic_v10_agent</filename> directory.</para>
-
-   <para>Despite the directory name, the policy agent supports
-   <?eval ${agentWebLogicSupport}?>.</para>
+   under the <filename>j2ee_agents/appserver_v10_agent</filename> directory.</para>
    <varlistentry>
     <term><filename>bin</filename></term>
     <listitem>
@@ -105,7 +102,7 @@ $ which java
    <varlistentry>
     <term><filename>etc</filename></term>
     <listitem>
-     <para>Agent web application and startup configuration</para>
+     <para>Agent web application used during installation</para>
     </listitem>
    </varlistentry>
    <varlistentry>
@@ -136,13 +133,13 @@ $ which java
   </variablelist>
  </section>
  
- <section xml:id="install-weblogic-agent">
-  <title>Installing the WebLogic Policy Agent</title>
+ <section xml:id="install-glassfish-agent">
+  <title>Installing the GlassFish Policy Agent</title>
   
   <para>Complete the following procedures to install the policy agent.</para>
   
-  <procedure xml:id="create-weblogic-agent-profile">
-   <title>To Create the WebLogic Agent Profile</title>
+  <procedure xml:id="create-glassfish-agent-profile">
+   <title>To Create the GlassFish Agent Profile</title>
    
    <para>Regardless of whether you store configurations centrally in OpenAM
    or locally with your agents, the agent requires a profile so that it can
@@ -200,7 +197,7 @@ $ which java
    </step>
   </procedure>
   
-  <procedure xml:id="create-weblogic-agent-pwdfile">
+  <procedure xml:id="create-glassfish-agent-pwdfile">
    <title>To Create the Password File</title>
    
    <step>
@@ -214,30 +211,32 @@ $ which java
    </step>
   </procedure>
   
-  <procedure xml:id="install-agent-into-weblogic">
-   <title>To Install the Policy Agent into WebLogic</title>
+  <procedure xml:id="install-agent-into-glassfish">
+   <title>To Install the Policy Agent into GlassFish</title>
    
    <step>
-    <para>Shut down the WebLogic server where you plan to install the
+    <para>Shut down the GlassFish domain where you plan to install the
     agent.</para>
+    <screen>$ /path/to/glassfish/bin/asadmin stop-domain domain1
+Waiting for the domain to stop ....
+Command stop-domain executed successfully.</screen>
    </step>
    <step>
     <para>Make sure OpenAM is running.</para>
    </step>
    <step>
     <para>Run <command>agentadmin --install</command> to install the agent.</para>
-    <screen>$ /path/to/j2ee_agents/weblogic_v10_agent/bin/agentadmin --install
+    <screen>$ /path/to/j2ee_agents/appserver_v10_agent/bin/agentadmin --install
 ...
 -----------------------------------------------
 SUMMARY OF YOUR RESPONSES
 -----------------------------------------------
-Startup script location :
-/path/to/domain/mydomain/bin/startWebLogic.sh
-WebLogic Server instance name : AdminServer
-WebLogic home directory : /path/to/wlserver
+Application Server Config Directory :
+/path/to/glassfish/glassfish/domains/domain1/config
+Application Server Instance name : server
 OpenAM server URL : http://openam.example.com:8080/openam
-Agent URL : http://www.example.com:7001/agentapp
-Agent Profile name : WebLogic Agent
+Agent URL : http://www.example.com:8080/agentapp
+Agent Profile name : GlassFish Agent
 Agent Profile Password file name : /tmp/pwd.txt
 
 ...
@@ -245,23 +244,23 @@ SUMMARY OF AGENT INSTALLATION
 -----------------------------
 Agent instance name: Agent_001
 Agent Bootstrap file location:
-/path/to/j2ee_agents/weblogic_v10_agent/Agent_001/config/
+/path/to/j2ee_agents/appserver_v10_agent/Agent_001/config/
  <?eval ${agentsBootstrapFile}?>
 Agent Configuration file location
-/path/to/j2ee_agents/weblogic_v10_agent/Agent_001/config/
+/path/to/j2ee_agents/appserver_v10_agent/Agent_001/config/
  <?eval ${agentsConfigurationFile}?>
 Agent Audit directory location:
-/path/to/j2ee_agents/weblogic_v10_agent/Agent_001/logs/audit
+/path/to/j2ee_agents/appserver_v10_agent/Agent_001/logs/audit
 Agent Debug directory location:
-/path/to/j2ee_agents/weblogic_v10_agent/Agent_001/logs/debug
+/path/to/j2ee_agents/appserver_v10_agent/Agent_001/logs/debug
 
 
 Install log file location:
-/path/to/j2ee_agents/weblogic_v10_agent/installer-logs/audit/install.log
+/path/to/j2ee_agents/appserver_v10_agent/installer-logs/audit/install.log
 ...</screen>
-    <para>Upon successful completion, the installer has updated the WebLogic
-    configuration, copied the agent libraries to WebLogic's library directory,
-    and also set up configuration and log directories for the agent.</para>
+    <para>Upon successful completion, the installer has updated the GlassFish
+    configuration, and also set up configuration and log directories for the
+    agent.</para>
     <note>
      <para>If the agent is in a different domain than the server, refer to <citetitle>Administration Guide</citetitle> procedure, <link
    xlink:href="admin-guide#chap-cdsso"
@@ -274,7 +273,7 @@ Install log file location:
     <para>Each agent instance that you install on the system has its own
     numbered configuration and logs directory. The first agent's configuration
     and logs are thus located under the directory
-    <filename>j2ee_agents/weblogic_v10_agent/Agent_001/</filename>.</para>
+    <filename>j2ee_agents/appserver_v10_agent/Agent_001/</filename>.</para>
     <variablelist>
      <varlistentry>
       <term><filename>config/<?eval ${agentsBootstrapFile}?></filename></term>
@@ -314,88 +313,12 @@ Install log file location:
        the / to the path to your policy agent profile. This allows the policy agent
        to properly identify itself to the OpenAM server. </para>
    </step>
-
    <step>
-    <para>The agent requires sourcing before it will work properly. There are two 
-    ways to source.</para>
-    <stepalternatives>
-     <step>
-      <para>Manually source the file containing the policy agent environment settings for 
-      WebLogic before starting the application server. </para>
-      <screen>. /path/to/setAgentEnv_AdminServer.sh</screen>
-     </step>
-     <step>
-      <para>Or edit the <filename>startWebLogic.sh</filename> script to set the sourcing
-      needed for the agent, by adding these lines after the code block shown. Add the
-      setAgentEnv_AdminServer.sh line to the following location in the file. The drawback 
-      to this approach is that it could be overwritten, as noted in the file.</para>
-      <screen>$ vi /path/to/startWebLogic.sh
- # Any changes to this script may be lost when adding extensions to this configuration.
- DOMAIN_HOME="/opt/Oracle/Middleware/user_projects/domains/base_domain"
-  . /path/to/setAgentEnv_AdminServer.sh
- ${DOMAIN_HOME}/bin/startWebLogic.sh $*</screen>
-     </step>
-    </stepalternatives>
-    <note>
-     <para>If the sourcing is not properly set, the following message appears.</para>
-     <screen>&lt;Error&gt; &lt;HTTP&gt; &lt;cent.example.com&gt; 
- &lt;AdminServer&gt; &lt;[STANDBY] ExecuteThread: '5' for queue: 'weblogic.kernel.Default 
- (self-tuning)'&gt; &lt;&lt;WLS Kernel&gt;&gt; &lt;&gt;&lt;&gt; &lt;&gt; &lt;1360800613441&gt; 
- &lt;BEA-101165&gt; &lt;Could not load user defined filter in web.xml: 
- ServletContext@1761850405[app:agentapp module:agentapp.war path:null 
- spec-version:null] com.sun.identity.agents.filter.AmAgentFilter.
- java.lang.ClassNotFoundException: com.sun.identity.agents.filter.AmAgentFilter</screen>
-     </note>    
-   </step>
-   <step>
-    <para>Start the WebLogic server.</para>
-   </step>
-   <!-- Fix for OpenAM-945: Document WebLogic install process change -->
-   <step>
-    <para>Configure shutdown classes for the environment.</para>
-    <substeps>
-     <step>
-      <para>In WebLogic console, browse to Environment &gt; Startup &amp;
-      Shutdown Classes.</para>
-     </step>
-     <step>
-      <para>Click Lock &amp; Edit.</para>
-     </step>
-     <step>
-      <para>Click New.</para>
-     </step>
-     <step>
-      <para>Select the Shutdown Class option, and then click Next.</para>
-     </step>
-     <step>
-      <para>Provide the Name <literal>Agent</literal>, and the Class Name
-      <literal>org.forgerock.agents.weblogic.v10.lifecycle.ShutdownListener</literal>.</para>
-     </step>
-     <step>
-      <para>Select the appropriate targets to call the shutdown class once per
-      Java Virtual Machine, and then click Finish.</para>
-     </step>
-     <step>
-      <para>Click Activate Changes.</para>
-     </step>
-    </substeps>
-   </step>
-  </procedure>
-  
-  <procedure xml:id="protect-weblogic-apps-after-agent-installation">
-   <title>To Protect Applications After Agent Installation</title>
-   
-   <step performance="optional">
-    <para>Deploy the
-    <filename>/path/to/j2ee_agents/weblogic_v10_agent/etc/agentapp.war</filename>
-    agent application in WebLogic.</para>
-   </step>
-   <step>
-    <para>For each web application to protect, add the following filter
+    <para>To protect a web application, you must add the following filter
     to the application's <filename>web.xml</filename> configuration,
     following the opening &lt;web-app&gt; tag. The file for the sample 
     application delivered with the agent is 
-    <filename>/path/to/j2ee_agents/weblogic_v10_agent/sampleapp/etc/web.xml</filename>.</para>
+    <filename>/path/to/j2ee_agents/appserver_v10_agent/sampleapp/etc/web.xml</filename>.</para>
     <programlisting language="xml"> &lt;filter&gt;
   &lt;filter-name&gt;Agent&lt;/filter-name&gt;
   &lt;display-name&gt;Agent&lt;/display-name&gt;
@@ -410,24 +333,37 @@ Install log file location:
   &lt;dispatcher&gt;FORWARD&lt;/dispatcher&gt;
   &lt;dispatcher&gt;ERROR&lt;/dispatcher&gt;
  &lt;/filter-mapping&gt;</programlisting>
-    <para>You might also have to update additional configuration files. See
-    the sample application located under
-    <filename>/path/to/j2ee_agents/weblogic_v10_agent/sampleapp</filename>
-    for examples.</para>
    </step>
-   <step performance="optional">
-    <para>If you have a policy configured, you can test your policy agent.
-    For example, try to browse to a resource that your policy agent protects.
-    You should be redirected to OpenAM to authenticate, for example as user
-    <literal>demo</literal>, password <literal>changeit</literal>. After
-    you authenticate, OpenAM then redirects you back to the resource you tried
-    to access.</para>
+   <step>
+    <para>Start the GlassFish domain where you installed the agent.</para>
+    <screen>$ /path/to/glassfish/bin/asadmin start-domain domain1
+Waiting for domain1 to start .....
+Successfully started the domain : domain1
+domain  Location: /path/to/glassfish/glassfish/domains/domain1
+Log File: /path/to/glassfish/glassfish/domains/domain1/logs/server.log
+Admin Port: 4848
+Command start-domain executed successfully.</screen>
+   </step>
+   <step>
+    <para>Deploy the agent web application.</para>
+    <screen>cd /path/to/glassfish/glassfish/bin/asadmin
+    $ deploy --name agentapp --contextroot /agentapp
+ /path/to/j2ee_agents/appserver_v10_agent/etc/agentapp.war</screen>
+   </step>
+   <step>
+    <para>Check your work by quickly deploying the sample application,
+    <filename>/path/to/j2ee_agents/appserver_v10_agent/sampleapp/dist/agentsample.ear</filename>
+    through the GlassFish administration console, and verifying that the agent
+    redirects to OpenAM for authentication and that access is denied after
+    successful login to OpenAM. (Access is denied because when no policy exists
+    for a protected resource the default decision for OpenAM is to deny all
+    access.)</para>
    </step>
   </procedure>
  </section>
  
- <section xml:id="silent-weblogic-agent-installation">
-  <title>Silent WebLogic Policy Agent Installation</title>
+ <section xml:id="silent-glassfish-agent-installation">
+  <title>Silent GlassFish Policy Agent Installation</title>
   
   <para>When performing a scripted, silent installation, use
   <command>agentadmin --install --saveResponse
@@ -437,67 +373,21 @@ Install log file location:
   <replaceable>response-file</replaceable></command>.</para>
  </section>
  
- <section xml:id="post-weblogic-agent-installation">
-  <title>Post Installation of WebLogic Policy Agent</title>
-  
-  <para>After installing WebLogic, some configuration is required before
-  the policy agent will work.</para>
-  <procedure xml:id="configure-weblogic-agent">
-   <title>To Configure the WebLogic Policy Agent</title>
-   <para>WebLogic is unique in that it requires additional configuration
-   after the installation is complete.</para>
-   <step>
-    <para>Go to the WebLogic Server Administratotion Console and login.</para>
-   </step>
-   <step>
-    <para>Click <literal>Security realms</literal>.</para>
-   </step>  
-   <step>
-    <para>Click the name of the realm to use for OpenAM.</para>
-   </step>  
-   <step>
-    <para>Click <literal>Providers</literal> > <literal>Authentication</literal>.</para>
-   </step>  
-   <step>
-    <para>Click <literal>Lock &amp; Edit</literal> > <literal>New</literal>.</para>
-   </step>  
-   <step>
-    <para>Enter the desired type in <literal>Type as AgentAuthenticator</literal>,
-    provide a name, and click <literal>OK</literal>.</para>
-   </step>  
-   <step>
-    <para>Click on the name of the agent authenticator you just created.</para>
-   </step>  
-   <step>
-    <para>Use <literal>OPTIONAL</literal> for the control flag and save.</para>
-   </step>
-   <step>
-    <para>Click on <literal>Providers</literal> to display the Authentication
-    Providers Table.</para>
-   </step>
-   <step>
-    <para>Click on <literal>Default Authenticator</literal>, use <literal>OPTIONAL</literal>
-    for the control flag, and save.</para>
-   </step>
-   <step>
-    <para>Activate the changes once the default authenticator is done saving.</para>
-    <para>You will need to restart the WebLogic Server to implement the changes.</para>
-   </step>
-  
-  </procedure>
- </section>
- 
- <section xml:id="uninstall-weblogic-agent">
-  <title>Removing WebLogic Policy Agent Software</title>
-  
-  <para>Shut down the WebLogic server before you uninstall the
+ <section xml:id="uninstall-glassfish-agent">
+  <title>Removing GlassFish Policy Agent Software</title>
+
+  <para>Shut down the GlassFish domain before you uninstall the
     policy agent.</para>
 
+  <screen>$ /path/to/glassfish/bin/asadmin stop-domain domain1
+    Waiting for the domain to stop ....
+    Command stop-domain executed successfully.</screen>
+  
   <para>To remove the J2EE policy agent, use <command>agentadmin
-  --uninstall</command>. You must provide the WebLogic configuration directory
-  location.</para>
+  --uninstall</command>. You must provide the GlassFish configuration directory
+  location, and the instance name.</para>
   
   <para>Uninstall does not remove the agent instance directory, but you can
-  do so manually after removing the agent configuration from WebLogic.</para>
+  do so manually after removing the agent configuration from GlassFish.</para>
  </section>
 </chapter>

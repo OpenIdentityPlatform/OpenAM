@@ -20,22 +20,22 @@
   !
   ! CCPL HEADER END
   !
-  !      Copyright 2011-2013 ForgeRock, Inc.
+  !      Copyright 2011-2013 ForgeRock AS
   !    
 -->
-<chapter xml:id='chap-jboss'
+<chapter xml:id='chap-apache-tomcat'
  xmlns='http://docbook.org/ns/docbook'
  version='5.0' xml:lang='en'
  xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance'
  xsi:schemaLocation='http://docbook.org/ns/docbook http://docbook.org/xml/5.0/xsd/docbook.xsd'
  xmlns:xlink='http://www.w3.org/1999/xlink'
  xmlns:xinclude='http://www.w3.org/2001/XInclude'>
- <title>Installing the JBoss Application Server Policy Agent</title>
- <indexterm><primary>JBoss Application Server</primary></indexterm>
- <para>This chapter covers installation of the policy agent for JBoss
- Application Server.</para>
-
-  <section xml:id="before-jboss-agent-install">
+ <title>Installing the Apache Tomcat Policy Agent</title>
+ <indexterm><primary>Apache Tomcat Server</primary></indexterm>
+ <para>This chapter covers installation of the policy agent for Apache
+ Tomcat.</para>
+ 
+  <section xml:id="before-tomcat-agent-install">
   <title>Before You Install</title>
   
   <para>Make sure OpenAM is installed and running, and that you can contact OpenAM
@@ -51,14 +51,22 @@
   policy that allows only authenticated users to access your resources, in order
   to test your policy agent after installation.</para>
 
-  <para>You must install JBoss before you install the policy agent, and you
-  must stop the server during installation.</para>
+  <para>You must install Apache Tomcat before you install the policy
+  agent, and you must stop the server during installation.</para>
+  
+  <para>All of the Tomcat scripts must be present in
+  <filename>$CATALINA_HOME/bin</filename>. The Tomcat Windows executable
+  installer does not include the scripts, for example. If the scripts
+  are not present in your installation, copy the contents of the
+  <filename>bin</filename> directory from a .zip download of Tomcat of
+  the same version as the one you installed.</para>
+
       <para>You must install a supported version of the Java runtime environment.
           Please review the <link xlink:show="new"
           xlink:href="http://openam.forgerock.org/openam-documentation/openam-doc-source/doc/release-notes/#java-requirements">
               <citetitle>OpenAM Release Notes</citetitle></link> for the currently supported version
           of Java, and set the <literal>JAVA_HOME</literal> environment
-          variable accordingly.</para>
+          variable accordingly. The policy agent installer requires Java.</para>
 
       <screen>$ echo $JAVA_HOME
 /path/to/java
@@ -77,10 +85,10 @@ $ which java
   
   <variablelist>
    <para>When you unzip the policy agent, you find the following directories
-   under the <filename>j2ee_agents/jboss_v42_agent</filename> directory.</para>
+   under the <filename>j2ee_agents/tomcat_v6_agent</filename> directory.</para>
 
    <para>Despite the directory name, the policy agent supports
-   <?eval ${agentJBossSupport}?>.</para>
+   <?eval ${agentTomcatSupport}?>.</para>
    <varlistentry>
     <term><filename>bin</filename></term>
     <listitem>
@@ -104,8 +112,7 @@ $ which java
    <varlistentry>
     <term><filename>etc</filename></term>
     <listitem>
-     <para>Agent web application and configuration templates used during
-     installation</para>
+     <para>Configuration templates used during installation</para>
     </listitem>
    </varlistentry>
    <varlistentry>
@@ -136,13 +143,13 @@ $ which java
   </variablelist>
  </section>
  
- <section xml:id="install-jboss-agent">
-  <title>Installing the JBoss Policy Agent</title>
+ <section xml:id="install-tomcat-agent">
+  <title>Installing the Tomcat Policy Agent</title>
   
   <para>Complete the following procedures to install the policy agent.</para>
   
-  <procedure xml:id="create-jboss-agent-profile">
-   <title>To Create the JBoss Agent Profile</title>
+  <procedure xml:id="create-tomcat-agent-profile">
+   <title>To Create the Tomcat Agent Profile</title>
    
    <para>Regardless of whether you store configurations centrally in OpenAM
    or locally with your agents, the agent requires a profile so that it can
@@ -190,8 +197,7 @@ $ which java
      <varlistentry>
       <term>Agent URL</term>
       <listitem>
-       <para>The URL to the J2EE agent application, such as
-       <literal>http://www.example.com:8080/agentapp</literal></para>
+       <para>The URL to the J2EE application that the agent protects</para>
        <para>In centralized configuration mode, the Agent URL is used to
        populate the Agent Profile for services such as notifications.</para>
       </listitem>
@@ -200,7 +206,7 @@ $ which java
    </step>
   </procedure>
   
-  <procedure xml:id="create-jboss-agent-pwdfile">
+  <procedure xml:id="create-tomcat-agent-pwdfile">
    <title>To Create the Password File</title>
    
    <step>
@@ -214,56 +220,54 @@ $ which java
    </step>
   </procedure>
   
-  <procedure xml:id="install-agent-into-jboss">
-   <title>To Install the Policy Agent into JBoss</title>
+  <procedure xml:id="install-agent-into-tomcat">
+   <title>To Install the Policy Agent into Tomcat</title>
    
    <step>
-    <para>Shut down the JBoss server where you plan to install the
+    <para>Shut down the Tomcat server where you plan to install the
     agent.</para>
+    <screen>$ /path/to/tomcat/bin/shutdown.sh</screen>
    </step>
    <step>
     <para>Make sure OpenAM is running.</para>
    </step>
    <step>
     <para>Run <command>agentadmin --install</command> to install the agent.</para>
-    <screen>$ /path/to/j2ee_agents/jboss_v42_agent/bin/agentadmin --install
+    <screen>$ /path/to/j2ee_agents/tomcat_v6_agent/bin/agentadmin --install
 ...
 -----------------------------------------------
 SUMMARY OF YOUR RESPONSES
 -----------------------------------------------
-JBoss Server Config Directory : /path/to/jboss/server/default/conf
-JBoss Server Home Directory : /path/to/jboss
+Tomcat Server Config Directory : /path/to/tomcat/conf
 OpenAM server URL : http://openam.example.com:8080/openam
+$CATALINA_HOME environment variable : /path/to/tomcat
+Tomcat global web.xml filter install : true
 Agent URL : http://www.example.com:8080/agentapp
-Agent Profile name : JBoss Agent
+Agent Profile name : Tomcat Agent
 Agent Profile Password file name : /tmp/pwd.txt
-Agent permissions gets added to java permissions policy file : false
 
 ...
 SUMMARY OF AGENT INSTALLATION
 -----------------------------
 Agent instance name: Agent_001
 Agent Bootstrap file location:
-/path/to/j2ee_agents/jboss_v42_agent/Agent_001/config/
+/path/to/j2ee_agents/tomcat_v6_agent/Agent_001/config/
  <?eval ${agentsBootstrapFile}?>
 Agent Configuration file location
-/path/to/j2ee_agents/jboss_v42_agent/Agent_001/config/
+/path/to/j2ee_agents/tomcat_v6_agent/Agent_001/config/
  <?eval ${agentsConfigurationFile}?>
 Agent Audit directory location:
-/path/to/j2ee_agents/jboss_v42_agent/Agent_001/logs/audit
+/path/to/j2ee_agents/tomcat_v6_agent/Agent_001/logs/audit
 Agent Debug directory location:
-/path/to/j2ee_agents/jboss_v42_agent/Agent_001/logs/debug
+/path/to/j2ee_agents/tomcat_v6_agent/Agent_001/logs/debug
 
 
 Install log file location:
-/path/to/j2ee_agents/jboss_v42_agent/installer-logs/audit/install.log
+/path/to/j2ee_agents/tomcat_v6_agent/installer-logs/audit/install.log
 ...</screen>
-    <para>Upon successful completion, the installer has updated the JBoss
-    configuration, created a
-    <filename>JBOSS_HOME/bin/setAgentClasspathdefault.sh</filename> script,
-    added the agent web application under
-    <filename>JBOSS_HOME/server/default/deploy/</filename>, and also set up
-    configuration and log directories for the agent.</para>
+    <para>Upon successful completion, the installer has added the agent
+    configuration to Tomcat's configuration, and also set up configuration
+    and log directories for the agent.</para>
     <note>
      <para>If the agent is in a different domain than the server, refer to <citetitle>Administration Guide</citetitle> procedure, <link
    xlink:href="admin-guide#chap-cdsso"
@@ -276,7 +280,7 @@ Install log file location:
     <para>Each agent instance that you install on the system has its own
     numbered configuration and logs directory. The first agent's configuration
     and logs are thus located under the directory
-    <filename>j2ee_agents/jboss_v42_agent/Agent_001/</filename>.</para>
+    <filename>j2ee_agents/tomcat_v6_agent/Agent_001/</filename>.</para>
     <variablelist>
      <varlistentry>
       <term><filename>config/<?eval ${agentsBootstrapFile}?></filename></term>
@@ -302,8 +306,8 @@ Install log file location:
      <varlistentry>
       <term><filename>logs/debug/</filename></term>
       <listitem>
-       <para>Debug directory where the debug file resides. Useful in
-       troubleshooting policy agent issues.</para>
+       <para>Debug directory where the <filename>debug.out</filename> debug
+       file resides. Useful in troubleshooting policy agent issues.</para>
       </listitem>
      </varlistentry>
     </variablelist>
@@ -316,12 +320,13 @@ Install log file location:
        the / to the path to your policy agent profile. This allows the policy agent
        to properly identify itself to the OpenAM server. </para>
    </step>
-   <step>
-    <para>To protect a web application, you must add the following filter
-    to the application's <filename>web.xml</filename> configuration,
-    following the opening &lt;web-app&gt; tag. The file for the sample 
-    application delivered with the agent is 
-    <filename>/path/to/j2ee_agents/jboss_v42_agent/sampleapp/etc/web.xml</filename>.</para>
+   <step performance="optional">
+    <para>If you choose not to let the installer install a global filter in
+    Tomcat's <filename>web.xml</filename>, then you must add the filter
+    manually for each protected application's <filename>web.xml</filename>
+    configuration, following the opening &lt;web-app&gt; tag. The file for  
+    the sample application delivered with the agent is 
+    <filename>/path/to/j2ee_agents/tomcat_v6_agent/sampleapp/etc/web.xml</filename>.</para>
     <programlisting language="xml"> &lt;filter&gt;
   &lt;filter-name&gt;Agent&lt;/filter-name&gt;
   &lt;display-name&gt;Agent&lt;/display-name&gt;
@@ -336,48 +341,39 @@ Install log file location:
   &lt;dispatcher&gt;FORWARD&lt;/dispatcher&gt;
   &lt;dispatcher&gt;ERROR&lt;/dispatcher&gt;
  &lt;/filter-mapping&gt;</programlisting>
-    <para>You must also add the following security domain specification to the
-    application's <filename>jboss.xml</filename> and
-    <filename>jboss-web.xml</filename> configuration files.</para>
-    <programlisting language="xml">&lt;security-domain&gt;java:/jaas/AMRealm&lt;/security-domain&gt;</programlisting>
+   </step>
+   <step>
+    <para>Add the agent application web archive to Tomcat's webapps.</para>
+    <para>$ cp /path/to/j2ee_agents/tomcat_v6_agent/etc/agentapp.war
+ /path/to/tomcat/webapps/</para>
+   </step>
+   <step>
+    <para>Start the Tomcat server where you installed the agent.</para>
+    <screen>$ /path/to/tomcat/bin/startup.sh</screen>
    </step>
   </procedure>
   
-  <procedure xml:id="run-jboss-after-agent-installation">
-   <title>To Run JBoss After Agent Installation</title>
+  <procedure xml:id="check-tomcat-agent-installation">
+   <title>To Check the Policy Agent Installation</title>
    
    <step>
-    <para>Render the script to set the agent classpath executable.</para>
-    <screen>$ chmod +x $JBOSS_HOME/bin/setAgentClasspathdefault.sh</screen>
+    <para>Check the Tomcat server log after you start the server to make
+    sure startup completed successfully.</para>
+    <screen>$ tail -n 1 /path/to/tomcat/logs/catalina.out
+INFO: Server startup in 810 ms</screen>
    </step>
    <step>
-    <para>Open the <filename>JBOSS_HOME/bin/run.sh</filename> script for
-    editing, and locate the following code block.</para>
+    <para>Check the <filename>debug.out</filename> debug log to verify that
+    the agent did start up.</para>
+    <screen>$ tail -n 7 /path/to/j2ee_agents/tomcat_v6_agent/Agent_001/logs/debug/debug.out
+=======================================
+Version: ...
+Revision: 3111
+Build Date: 20120915
+Build Machine: builds.forgerock.org
+=======================================
 
-    <programlisting language="shell">if [ "x$JBOSS_CLASSPATH" = "x" ]; then
-    JBOSS_CLASSPATH="$JBOSS_BOOT_CLASSPATH"
-else
-    JBOSS_CLASSPATH="$JBOSS_CLASSPATH:$JBOSS_BOOT_CLASSPATH"
-fi
-if [ "x$JAVAC_JAR_FILE" != "x" ]; then
-    JBOSS_CLASSPATH="$JBOSS_CLASSPATH:$JAVAC_JAR_FILE"
-fi</programlisting>
-   </step>
-   <step>
-    <para>Edit the <filename>JBOSS_HOME/bin/run.sh</filename> script
-    to set the classpath needed for the agent, by adding these lines after
-    the code block you located in the previous step.</para>
-
-    <programlisting language="shell">if [ -r "$JBOSS_HOME/bin/setAgentClasspathdefault.sh" ]; then 
-    . $JBOSS_HOME/bin/setAgentClasspathdefault.sh
-fi</programlisting>
-
-   </step>
-   <step>
-    <para>Start the JBoss server where you installed the agent.</para>
-    <screen>$ cd $JBOSS_HOME ; ./bin/run.sh -b 0.0.0.0
-...
-16:30:31,172 INFO  [ServerImpl] JBoss ... Started in 1m:44s:759ms</screen>
+</screen>
    </step>
    <step performance="optional">
     <para>If you have a policy configured, you can test your policy agent.
@@ -390,8 +386,8 @@ fi</programlisting>
   </procedure>
  </section>
  
- <section xml:id="silent-jboss-agent-installation">
-  <title>Silent JBoss Policy Agent Installation</title>
+ <section xml:id="silent-tomcat-agent-installation">
+  <title>Silent Tomcat Policy Agent Installation</title>
   
   <para>When performing a scripted, silent installation, use
   <command>agentadmin --install --saveResponse
@@ -401,17 +397,19 @@ fi</programlisting>
   <replaceable>response-file</replaceable></command>.</para>
  </section>
  
- <section xml:id="uninstall-jboss-agent">
-  <title>Removing JBoss Policy Agent Software</title>
+ <section xml:id="uninstall-tomcat-agent">
+  <title>Remove Tomcat Policy Agent Software</title>
   
-  <para>Shut down the JBoss server before you uninstall the
+  <para>Shut down the Tomcat server before you uninstall the
     policy agent.</para>
-
+  
+  <screen>$ /path/to/tomcat/bin/shutdown.sh</screen>
+  
   <para>To remove the J2EE policy agent, use <command>agentadmin
-  --uninstall</command>. You must provide the JBoss configuration directory
-  location.</para>
+  --uninstall</command>. You must provide the Tomcat server configuration
+  directory location.</para>
   
   <para>Uninstall does not remove the agent instance directory, but you can
-  do so manually after removing the agent configuration from JBoss.</para>
+  do so manually after removing the agent configuration from Tomcat.</para>
  </section>
 </chapter>

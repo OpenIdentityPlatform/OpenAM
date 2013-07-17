@@ -20,21 +20,22 @@
   !
   ! CCPL HEADER END
   !
-  !      Copyright 2011-2013 ForgeRock, Inc.
+  !      Copyright 2011-2013 ForgeRock AS
   !    
 -->
-<chapter xml:id='chap-glassfish'
+<chapter xml:id='chap-jboss'
  xmlns='http://docbook.org/ns/docbook'
  version='5.0' xml:lang='en'
  xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance'
  xsi:schemaLocation='http://docbook.org/ns/docbook http://docbook.org/xml/5.0/xsd/docbook.xsd'
  xmlns:xlink='http://www.w3.org/1999/xlink'
  xmlns:xinclude='http://www.w3.org/2001/XInclude'>
- <title>Installing the GlassFish Policy Agent</title>
- <indexterm><primary>GlassFish Server</primary></indexterm>
- <para>This chapter covers installation of the policy agent for GlassFish.</para>
- 
-  <section xml:id="before-glassfish-agent-install">
+ <title>Installing the JBoss Application Server Policy Agent</title>
+ <indexterm><primary>JBoss Application Server</primary></indexterm>
+ <para>This chapter covers installation of the policy agent for JBoss
+ Application Server.</para>
+
+  <section xml:id="before-jboss-agent-install">
   <title>Before You Install</title>
   
   <para>Make sure OpenAM is installed and running, and that you can contact OpenAM
@@ -50,10 +51,8 @@
   policy that allows only authenticated users to access your resources, in order
   to test your policy agent after installation.</para>
 
-  <para>You must install GlassFish before you install the policy agent, and you
-  must stop the domain with applications to protect during installation. Policy
-  agents support <?eval ${agentGlassFishSupport}?>.</para>
-
+  <para>You must install JBoss before you install the policy agent, and you
+  must stop the server during installation.</para>
       <para>You must install a supported version of the Java runtime environment.
           Please review the <link xlink:show="new"
           xlink:href="http://openam.forgerock.org/openam-documentation/openam-doc-source/doc/release-notes/#java-requirements">
@@ -78,7 +77,10 @@ $ which java
   
   <variablelist>
    <para>When you unzip the policy agent, you find the following directories
-   under the <filename>j2ee_agents/appserver_v10_agent</filename> directory.</para>
+   under the <filename>j2ee_agents/jboss_v42_agent</filename> directory.</para>
+
+   <para>Despite the directory name, the policy agent supports
+   <?eval ${agentJBossSupport}?>.</para>
    <varlistentry>
     <term><filename>bin</filename></term>
     <listitem>
@@ -102,7 +104,8 @@ $ which java
    <varlistentry>
     <term><filename>etc</filename></term>
     <listitem>
-     <para>Agent web application used during installation</para>
+     <para>Agent web application and configuration templates used during
+     installation</para>
     </listitem>
    </varlistentry>
    <varlistentry>
@@ -133,13 +136,13 @@ $ which java
   </variablelist>
  </section>
  
- <section xml:id="install-glassfish-agent">
-  <title>Installing the GlassFish Policy Agent</title>
+ <section xml:id="install-jboss-agent">
+  <title>Installing the JBoss Policy Agent</title>
   
   <para>Complete the following procedures to install the policy agent.</para>
   
-  <procedure xml:id="create-glassfish-agent-profile">
-   <title>To Create the GlassFish Agent Profile</title>
+  <procedure xml:id="create-jboss-agent-profile">
+   <title>To Create the JBoss Agent Profile</title>
    
    <para>Regardless of whether you store configurations centrally in OpenAM
    or locally with your agents, the agent requires a profile so that it can
@@ -197,7 +200,7 @@ $ which java
    </step>
   </procedure>
   
-  <procedure xml:id="create-glassfish-agent-pwdfile">
+  <procedure xml:id="create-jboss-agent-pwdfile">
    <title>To Create the Password File</title>
    
    <step>
@@ -211,56 +214,56 @@ $ which java
    </step>
   </procedure>
   
-  <procedure xml:id="install-agent-into-glassfish">
-   <title>To Install the Policy Agent into GlassFish</title>
+  <procedure xml:id="install-agent-into-jboss">
+   <title>To Install the Policy Agent into JBoss</title>
    
    <step>
-    <para>Shut down the GlassFish domain where you plan to install the
+    <para>Shut down the JBoss server where you plan to install the
     agent.</para>
-    <screen>$ /path/to/glassfish/bin/asadmin stop-domain domain1
-Waiting for the domain to stop ....
-Command stop-domain executed successfully.</screen>
    </step>
    <step>
     <para>Make sure OpenAM is running.</para>
    </step>
    <step>
     <para>Run <command>agentadmin --install</command> to install the agent.</para>
-    <screen>$ /path/to/j2ee_agents/appserver_v10_agent/bin/agentadmin --install
+    <screen>$ /path/to/j2ee_agents/jboss_v42_agent/bin/agentadmin --install
 ...
 -----------------------------------------------
 SUMMARY OF YOUR RESPONSES
 -----------------------------------------------
-Application Server Config Directory :
-/path/to/glassfish/glassfish/domains/domain1/config
-Application Server Instance name : server
+JBoss Server Config Directory : /path/to/jboss/server/default/conf
+JBoss Server Home Directory : /path/to/jboss
 OpenAM server URL : http://openam.example.com:8080/openam
 Agent URL : http://www.example.com:8080/agentapp
-Agent Profile name : GlassFish Agent
+Agent Profile name : JBoss Agent
 Agent Profile Password file name : /tmp/pwd.txt
+Agent permissions gets added to java permissions policy file : false
 
 ...
 SUMMARY OF AGENT INSTALLATION
 -----------------------------
 Agent instance name: Agent_001
 Agent Bootstrap file location:
-/path/to/j2ee_agents/appserver_v10_agent/Agent_001/config/
+/path/to/j2ee_agents/jboss_v42_agent/Agent_001/config/
  <?eval ${agentsBootstrapFile}?>
 Agent Configuration file location
-/path/to/j2ee_agents/appserver_v10_agent/Agent_001/config/
+/path/to/j2ee_agents/jboss_v42_agent/Agent_001/config/
  <?eval ${agentsConfigurationFile}?>
 Agent Audit directory location:
-/path/to/j2ee_agents/appserver_v10_agent/Agent_001/logs/audit
+/path/to/j2ee_agents/jboss_v42_agent/Agent_001/logs/audit
 Agent Debug directory location:
-/path/to/j2ee_agents/appserver_v10_agent/Agent_001/logs/debug
+/path/to/j2ee_agents/jboss_v42_agent/Agent_001/logs/debug
 
 
 Install log file location:
-/path/to/j2ee_agents/appserver_v10_agent/installer-logs/audit/install.log
+/path/to/j2ee_agents/jboss_v42_agent/installer-logs/audit/install.log
 ...</screen>
-    <para>Upon successful completion, the installer has updated the GlassFish
-    configuration, and also set up configuration and log directories for the
-    agent.</para>
+    <para>Upon successful completion, the installer has updated the JBoss
+    configuration, created a
+    <filename>JBOSS_HOME/bin/setAgentClasspathdefault.sh</filename> script,
+    added the agent web application under
+    <filename>JBOSS_HOME/server/default/deploy/</filename>, and also set up
+    configuration and log directories for the agent.</para>
     <note>
      <para>If the agent is in a different domain than the server, refer to <citetitle>Administration Guide</citetitle> procedure, <link
    xlink:href="admin-guide#chap-cdsso"
@@ -273,7 +276,7 @@ Install log file location:
     <para>Each agent instance that you install on the system has its own
     numbered configuration and logs directory. The first agent's configuration
     and logs are thus located under the directory
-    <filename>j2ee_agents/appserver_v10_agent/Agent_001/</filename>.</para>
+    <filename>j2ee_agents/jboss_v42_agent/Agent_001/</filename>.</para>
     <variablelist>
      <varlistentry>
       <term><filename>config/<?eval ${agentsBootstrapFile}?></filename></term>
@@ -318,7 +321,7 @@ Install log file location:
     to the application's <filename>web.xml</filename> configuration,
     following the opening &lt;web-app&gt; tag. The file for the sample 
     application delivered with the agent is 
-    <filename>/path/to/j2ee_agents/appserver_v10_agent/sampleapp/etc/web.xml</filename>.</para>
+    <filename>/path/to/j2ee_agents/jboss_v42_agent/sampleapp/etc/web.xml</filename>.</para>
     <programlisting language="xml"> &lt;filter&gt;
   &lt;filter-name&gt;Agent&lt;/filter-name&gt;
   &lt;display-name&gt;Agent&lt;/display-name&gt;
@@ -333,37 +336,62 @@ Install log file location:
   &lt;dispatcher&gt;FORWARD&lt;/dispatcher&gt;
   &lt;dispatcher&gt;ERROR&lt;/dispatcher&gt;
  &lt;/filter-mapping&gt;</programlisting>
+    <para>You must also add the following security domain specification to the
+    application's <filename>jboss.xml</filename> and
+    <filename>jboss-web.xml</filename> configuration files.</para>
+    <programlisting language="xml">&lt;security-domain&gt;java:/jaas/AMRealm&lt;/security-domain&gt;</programlisting>
+   </step>
+  </procedure>
+  
+  <procedure xml:id="run-jboss-after-agent-installation">
+   <title>To Run JBoss After Agent Installation</title>
+   
+   <step>
+    <para>Render the script to set the agent classpath executable.</para>
+    <screen>$ chmod +x $JBOSS_HOME/bin/setAgentClasspathdefault.sh</screen>
    </step>
    <step>
-    <para>Start the GlassFish domain where you installed the agent.</para>
-    <screen>$ /path/to/glassfish/bin/asadmin start-domain domain1
-Waiting for domain1 to start .....
-Successfully started the domain : domain1
-domain  Location: /path/to/glassfish/glassfish/domains/domain1
-Log File: /path/to/glassfish/glassfish/domains/domain1/logs/server.log
-Admin Port: 4848
-Command start-domain executed successfully.</screen>
+    <para>Open the <filename>JBOSS_HOME/bin/run.sh</filename> script for
+    editing, and locate the following code block.</para>
+
+    <programlisting language="shell">if [ "x$JBOSS_CLASSPATH" = "x" ]; then
+    JBOSS_CLASSPATH="$JBOSS_BOOT_CLASSPATH"
+else
+    JBOSS_CLASSPATH="$JBOSS_CLASSPATH:$JBOSS_BOOT_CLASSPATH"
+fi
+if [ "x$JAVAC_JAR_FILE" != "x" ]; then
+    JBOSS_CLASSPATH="$JBOSS_CLASSPATH:$JAVAC_JAR_FILE"
+fi</programlisting>
    </step>
    <step>
-    <para>Deploy the agent web application.</para>
-    <screen>cd /path/to/glassfish/glassfish/bin/asadmin
-    $ deploy --name agentapp --contextroot /agentapp
- /path/to/j2ee_agents/appserver_v10_agent/etc/agentapp.war</screen>
+    <para>Edit the <filename>JBOSS_HOME/bin/run.sh</filename> script
+    to set the classpath needed for the agent, by adding these lines after
+    the code block you located in the previous step.</para>
+
+    <programlisting language="shell">if [ -r "$JBOSS_HOME/bin/setAgentClasspathdefault.sh" ]; then 
+    . $JBOSS_HOME/bin/setAgentClasspathdefault.sh
+fi</programlisting>
+
    </step>
    <step>
-    <para>Check your work by quickly deploying the sample application,
-    <filename>/path/to/j2ee_agents/appserver_v10_agent/sampleapp/dist/agentsample.ear</filename>
-    through the GlassFish administration console, and verifying that the agent
-    redirects to OpenAM for authentication and that access is denied after
-    successful login to OpenAM. (Access is denied because when no policy exists
-    for a protected resource the default decision for OpenAM is to deny all
-    access.)</para>
+    <para>Start the JBoss server where you installed the agent.</para>
+    <screen>$ cd $JBOSS_HOME ; ./bin/run.sh -b 0.0.0.0
+...
+16:30:31,172 INFO  [ServerImpl] JBoss ... Started in 1m:44s:759ms</screen>
+   </step>
+   <step performance="optional">
+    <para>If you have a policy configured, you can test your policy agent.
+    For example, try to browse to a resource that your policy agent protects.
+    You should be redirected to OpenAM to authenticate, for example as user
+    <literal>demo</literal>, password <literal>changeit</literal>. After
+    you authenticate, OpenAM then redirects you back to the resource you tried
+    to access.</para>
    </step>
   </procedure>
  </section>
  
- <section xml:id="silent-glassfish-agent-installation">
-  <title>Silent GlassFish Policy Agent Installation</title>
+ <section xml:id="silent-jboss-agent-installation">
+  <title>Silent JBoss Policy Agent Installation</title>
   
   <para>When performing a scripted, silent installation, use
   <command>agentadmin --install --saveResponse
@@ -373,21 +401,17 @@ Command start-domain executed successfully.</screen>
   <replaceable>response-file</replaceable></command>.</para>
  </section>
  
- <section xml:id="uninstall-glassfish-agent">
-  <title>Removing GlassFish Policy Agent Software</title>
-
-  <para>Shut down the GlassFish domain before you uninstall the
+ <section xml:id="uninstall-jboss-agent">
+  <title>Removing JBoss Policy Agent Software</title>
+  
+  <para>Shut down the JBoss server before you uninstall the
     policy agent.</para>
 
-  <screen>$ /path/to/glassfish/bin/asadmin stop-domain domain1
-    Waiting for the domain to stop ....
-    Command stop-domain executed successfully.</screen>
-  
   <para>To remove the J2EE policy agent, use <command>agentadmin
-  --uninstall</command>. You must provide the GlassFish configuration directory
-  location, and the instance name.</para>
+  --uninstall</command>. You must provide the JBoss configuration directory
+  location.</para>
   
   <para>Uninstall does not remove the agent instance directory, but you can
-  do so manually after removing the agent configuration from GlassFish.</para>
+  do so manually after removing the agent configuration from JBoss.</para>
  </section>
 </chapter>

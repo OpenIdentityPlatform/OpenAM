@@ -35,31 +35,6 @@
  agents run in web application containers and protect Java EE
  applications.</para>
 
- <important>
-  <para>OpenAM Java EE Policy Agents <?eval ${agentsDocTargetVersion}?> Xpress
-  is a milestone release from the main development branch of the product. The
-  Xpress release contains selected key features and all current fixed issues.
-  An Xpress release undergoes important functional testing but not the complete
-  testing cycle that is done for a full Enterprise release.</para>
-
-  <para>Xpress releases are supported through ForgeRock subscriptions and are
-  upgradeable to the Enterprise version, which has long term support.</para>
-
-  <para>The goal of an Xpress release is to enable you to start build phases
-  earlier, with the most recent features, instead of having to wait for the
-  Enterprise release date. Fixes to issues that are discovered in an Xpress
-  release are delivered as patches to ForgeRock customers, and are guaranteed
-  to be delivered in the Enterprise release that follows. Xpress releases are
-  supported for a grace period after the Enterprise version has been
-  released.</para>
-
-  <para>With the exception of these Release Notes, the official documentation
-  for this release is still in progress, and is accessible at
-  <link xlink:href="http://openam.forgerock.org/docs.html" xlink:show="new"
-  >http://openam.forgerock.org/docs.html</link>. The complete, validated
-  documentation set will be available with the Enterprise release.</para>
- </important>
-
  <section xml:id="what-new-javaee-agents">
   <title>New in JavaEE Policy Agents <?eval ${javaEEAgentsDocTargetVersion}?></title>
 

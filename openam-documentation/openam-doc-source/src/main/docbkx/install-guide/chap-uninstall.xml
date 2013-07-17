@@ -20,7 +20,7 @@
   !
   ! CCPL HEADER END
   !
-  !      Copyright 2011-2012 ForgeRock AS
+  !      Copyright 2011-2013 ForgeRock AS
   !    
 -->
 <chapter xml:id='chap-uninstall'
@@ -33,8 +33,13 @@
  <title>Removing OpenAM Software</title>
  <indexterm><primary>Uninstalling</primary></indexterm>
  <para>This chapter shows you how to uninstall OpenAM core software. See
- the <citetitle>Policy Agent Installation Guide</citetitle> for instructions
- on removing OpenAM agents.</para>
+ the <link xlink:href="web-agent-install-guide#web-agent-install-guide"
+ xlink:role="http://docbook.org/xlink/role/olink"><citetitle>OpenAM Web Policy
+ Agent <?eval ${agentsDocTargetVersion}?> Installation Guide</citetitle></link>
+ or <link xlink:href="jee-agent-install-guide#jee-agent-install-guide"
+ xlink:role="http://docbook.org/xlink/role/olink"><citetitle>OpenAM Java EE Policy
+ Agent <?eval ${agentsDocTargetVersion}?> Installation Guide</citetitle></link> for 
+ instructions on removing OpenAM agents.</para>
 
  <procedure xml:id="uninstall-OpenAM-core">
   <title>To Remove OpenAM Core Software</title>

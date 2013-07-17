@@ -41,51 +41,6 @@
    <para>This section offers solutions to common problems when installing 
    OpenAM policy agents.</para>
   
-  <qandaentry xml:id="web-agent-error-page">
-   <question>
-    <para>How can I configure a custom error page to be returned by the web
-    policy agent on HTTP 403 Forbidden or HTTP 500 Internal Server Error for
-    example?</para>
-   </question>
-
-   <answer>
-    <para>Web servers generally let you set custom error pages for specific
-    HTTP status codes. Check the documentation for your web server to see
-    how to set the custom pages.</para>
-
-    <itemizedlist>
-     <listitem>
-      <para>Apache HTTP Server uses the <link xlink:show="new"
-      xlink:href="http://httpd.apache.org/docs/2.0/mod/core.html#errordocument"
-      ><literal>ErrorDocument</literal> directive</link>.</para>
-     </listitem>
-
-     <listitem>
-      <para>Microsoft IIS 6 Manager lets you configure <link xlink:show="new"
-      xlink:href="http://www.microsoft.com/technet/prodtechnol/WindowsServer2003/Library/IIS/80cb8d8d-8fd8-4af5-bb3b-4d11fff3ab9c.mspx?mfr=true"
-      >Custom Errors settings</link>.</para>
-     </listitem>
-
-     <listitem>
-      <para>Microsoft IIS 7 also lets you create <link
-      xlink:href="http://technet.microsoft.com/en-us/library/cc753103(v=ws.10).aspx"
-      xlink:show="new">custom HTTP error responses</link>, and generally <link
-      xlink:href="http://technet.microsoft.com/en-us/library/cc731570(v=ws.10).aspx"
-      xlink:show="new">configure HTTP error responses</link>.</para>
-     </listitem>
-    </itemizedlist>
-
-    <para>When you set up the error pages, make sure they are in the agent's
-    list of Not Enforced URLs as described in <link xlink:show="new"
-    xlink:href="admin-guide#web-agent-not-enforced-url-properties"
-    xlink:role="http://docbook.org/xlink/role/olink"><citetitle>Not Enforced URL
-    Processing properties</citetitle></link>, or alternatively make sure the
-    pages are on a web server that is not protected by the web policy agent.
-    You do not want the agent to prevent user from seeing the HTTP 403 Forbidden
-    custom error page for instance.</para>
-   </answer>
-  </qandaentry>
-
   <qandaentry xml:id="cannot-install-over-https">
    <question>
     <para>I am trying to install a policy agent, connecting to OpenAM over

@@ -20,7 +20,7 @@
   !
   ! CCPL HEADER END
   !
-  !      Copyright 2011-2012 ForgeRock AS
+  !      Copyright 2011-2013 ForgeRock AS
   !    
 -->
 <preface xml:id='preface'
@@ -31,18 +31,15 @@
  xmlns:xinclude='http://www.w3.org/2001/XInclude'>
  <title>Preface</title>
 
- <para>This guide shows you how to install OpenAM web server and Java EE
- policy agents, as well as how to integrate with other access management
- software. Unless you are planning a throwaway evaluation or test
- installation, read the <citetitle>Release Notes</citetitle> before
- you get started.</para>
+ <para>This guide shows you how to install OpenAM Java EE policy agents, as well as 
+ how to integrate with other access management software. Read the 
+ <citetitle>Release Notes</citetitle> before you get started.</para>
 
  <section>
   <title>Who Should Use this Guide</title>
   
   <para>This guide is written for anyone installing OpenAM policy agents to 
-  interface with supported web servers and Java EE application
-  containers.</para>
+  interface with supported Java EE application containers.</para>
    
   <para>This guide covers procedures that you theoretically perform only
   once per version. This guide aims to provide you with at least some idea

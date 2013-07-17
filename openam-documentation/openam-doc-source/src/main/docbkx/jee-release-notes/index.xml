@@ -20,24 +20,25 @@
   !
   ! CCPL HEADER END
   !
-  !      Copyright 2011-2013 ForgeRock, Inc.
+  !      Copyright 2011-2013 ForgeRock AS
   !    
 -->
-<book xml:id='agent-install-guide'
+<book xml:id='jee-agent-release-notes'
  xmlns='http://docbook.org/ns/docbook' version='5.0' xml:lang='en'
  xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance'
  xsi:schemaLocation='http://docbook.org/ns/docbook http://docbook.org/xml/5.0/xsd/docbook.xsd'
  xmlns:xlink='http://www.w3.org/1999/xlink'
  xmlns:xinclude='http://www.w3.org/2001/XInclude'>
  <info>
-  <title>OpenAM Policy Agent <?eval ${agentsDocTargetVersion}?> Installation Guide</title>
+  <title>OpenAM Java EE Policy Agent <?eval ${agentsDocTargetVersion}?> Release Notes</title>
   <abstract>
-   <para>Guide to installing OpenAM policy agents. OpenAM provides open source
-   Authentication, Authorization, Entitlement and Federation software.</para>
+   <para>Notes covering prerequisites, fixes, known issues for OpenAM Java EE 
+   policy agents. OpenAM provides open source Authentication, Authorization,
+   Entitlement and Federation software.</para>
   </abstract>
   <copyright>
    <year>2011-2013</year>
-   <holder>ForgeRock, Inc.</holder>
+   <holder>ForgeRock AS</holder>
   </copyright>
   <authorgroup>
    <author>
@@ -50,6 +51,11 @@
      <firstname>Vanessa</firstname><surname>Richie</surname>
     </personname>
    </author>
+   <author>
+    <personname>
+     <firstname>Mike</firstname><surname>Jang</surname>
+    </personname>
+   </author>
   </authorgroup>
   <xinclude:include href="../legal.xml" />
   <date><?dbtimestamp format="B d, Y"?></date>
@@ -58,29 +64,8 @@
  </info>
 
  <toc />
- 
- <xinclude:include href="preface.xml" />
- <xinclude:include href='chap-about-web-agents.xml' />
- <xinclude:include href='chap-apache-20.xml' />
- <xinclude:include href='chap-apache-22.xml' />
- <xinclude:include href='chap-apache-24.xml' />
- <xinclude:include href='chap-msiis-6.xml' />
- <xinclude:include href='chap-msiis-7.xml' />
- <xinclude:include href='chap-sun-websvr.xml' />
- <xinclude:include href='chap-varnish.xml' />
 
- <xinclude:include href='chap-about-jee-agents.xml' />
- <xinclude:include href='chap-apache-tomcat.xml' />
- <xinclude:include href='chap-glassfish.xml' />
- <xinclude:include href='chap-jboss.xml' />
- <xinclude:include href='chap-jetty.xml' />
- <xinclude:include href='chap-websphere.xml' />
- <xinclude:include href='chap-weblogic.xml' />
-
- <xinclude:include href='chap-troubleshooting.xml' />
-
- <xinclude:include href='appendix-web-config-properties.xml' />
- <xinclude:include href='appendix-jee-config-properties.xml' />
-
- <index />
+ <xinclude:include href='chap-javaee-agents.xml' />
+ <xinclude:include href="../shared/chap-feedback.xml" />
+ <xinclude:include href="../shared/chap-support.xml" />
 </book>
