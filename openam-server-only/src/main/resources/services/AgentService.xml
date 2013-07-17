@@ -1272,6 +1272,32 @@
                             <Value></Value>
                         </DefaultValues>
                     </AttributeSchema>
+                    <AttributeSchema
+                        name="com.sun.identity.agents.config.iis.password.header"
+ 	 	 	type="single"
+ 	 	 	syntax="boolean"
+ 	 	 	i18nKey="a602">
+ 	 	 	<BooleanValues>
+ 	 	 	    <BooleanTrueValue i18nKey="a105">true</BooleanTrueValue>
+ 	 	 	    <BooleanFalseValue i18nKey="a106">false</BooleanFalseValue>
+ 	 	 	</BooleanValues>
+ 	 	 	<DefaultValues>
+ 	 	 	   <Value>false</Value>
+ 	 	 	</DefaultValues>
+ 	 	     </AttributeSchema>
+ 	 	     <AttributeSchema
+ 	 	 	name="com.sun.identity.agents.config.iis.logonuser"
+ 	 	 	type="single"
+ 	 	 	syntax="boolean"
+ 	 	 	i18nKey="a603">
+ 	 	 	<BooleanValues>
+ 	 	 	   <BooleanTrueValue i18nKey="a105">true</BooleanTrueValue>
+ 	 	 	   <BooleanFalseValue i18nKey="a106">false</BooleanFalseValue>
+ 	 	 	</BooleanValues>
+ 	 	 	<DefaultValues>
+ 	 	 	   <Value>false</Value>
+ 	 	 	</DefaultValues>
+ 	 	     </AttributeSchema>
                      <AttributeSchema
                         name="com.sun.identity.agents.config.domino.check.name.database"
                         type="single"
