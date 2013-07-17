@@ -30,7 +30,7 @@
  xmlns:xlink='http://www.w3.org/1999/xlink'
  xmlns:xinclude='http://www.w3.org/2001/XInclude'>
  <info>
-  <title>OpenAM Java EEPolicy Agent <?eval ${agentsDocTargetVersion}?> Installation Guide</title>
+  <title>OpenAM Java EE Policy Agent <?eval ${agentsDocTargetVersion}?> Installation Guide</title>
   <abstract>
    <para>Guide to installing OpenAM Java EE policy agents. OpenAM provides open source
    Authentication, Authorization, Entitlement and Federation software.</para>

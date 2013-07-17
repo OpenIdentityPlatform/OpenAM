@@ -32,7 +32,7 @@
  <info>
   <title>OpenAM Web Policy Agent <?eval ${agentsDocTargetVersion}?> Release Notes</title>
   <abstract>
-   <para>Notes covering prerequisites, fixes, known issues for OpenAM policy
+   <para>Notes covering prerequisites, fixes, known issues for OpenAM web policy
    agents. OpenAM provides open source Authentication, Authorization,
    Entitlement and Federation software.</para>
   </abstract>
