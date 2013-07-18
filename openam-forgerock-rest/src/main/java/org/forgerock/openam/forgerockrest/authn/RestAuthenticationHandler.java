@@ -17,6 +17,7 @@
 package org.forgerock.openam.forgerockrest.authn;
 
 import com.iplanet.sso.SSOException;
+import com.iplanet.sso.SSOToken;
 import com.sun.identity.authentication.spi.AuthLoginException;
 import com.sun.identity.authentication.spi.PagePropertiesCallback;
 import com.sun.identity.idm.IdRepoException;
@@ -292,8 +293,13 @@ public class RestAuthenticationHandler {
                 // send token to client
                 JsonObject jsonResponseObject = JsonValueBuilder.jsonValue();
 
-                String tokenId = loginProcess.getAuthContext().getSSOToken().getTokenID().toString();
-                jsonResponseObject.put("tokenId", tokenId);
+                SSOToken ssoToken = loginProcess.getAuthContext().getSSOToken();
+                if (ssoToken != null) {
+                    String tokenId = loginProcess.getAuthContext().getSSOToken().getTokenID().toString();
+                    jsonResponseObject.put("tokenId", tokenId);
+                } else {
+                    jsonResponseObject.put("message", "Authentication Successful");
+                }
 
                 JsonValue jsonValue = jsonResponseObject.build();
 

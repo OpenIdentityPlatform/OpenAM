@@ -802,9 +802,9 @@ public class AMLoginContext {
 		if (authImpl == null) {
 		    authImpl = Agent.getAuthSvcMBean();
 		}
-		if (authImpl != null) {
-	            authImpl.incSsoServerAuthenticationSuccessCount();
 		}
+        if (authImpl != null && !loginState.isNoSession()) {
+            authImpl.incSsoServerAuthenticationSuccessCount();
 	    }
 	}
         

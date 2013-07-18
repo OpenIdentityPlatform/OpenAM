@@ -464,6 +464,11 @@ public class LogConstants {
      */
     public static final String CONTEXT_ID = "ContextID";
     /**
+     * The NoSession field. Whether the authentication request was made with the noSession query parameter
+     * and that no permanent session was created when the authentication was successful.
+     */
+    public static final String NO_SESSION = "NoSession";
+    /**
      * The MessageID field. The unique Message Identifier associated with
      * this particular log record data field.
      * @supported.api
