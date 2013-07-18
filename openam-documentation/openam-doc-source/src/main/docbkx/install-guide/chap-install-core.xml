@@ -51,10 +51,10 @@
  and credential replay functionality. It can function as a standards-based 
  policy enforcement point. Policy agents provide policy enforcement on supported
  web servers and Java EE containers, and are tightly integrated with OpenAM. 
- See the <link xlink:href="web-agent-install-guide#web-agent-install-guide"
+ See the <link xlink:href="web-install-guide#web-install-guide" 
  xlink:role="http://docbook.org/xlink/role/olink"><citetitle>OpenAM Web Policy
  Agent <?eval ${agentsDocTargetVersion}?> Installation Guide</citetitle></link>
- or <link xlink:href="jee-agent-install-guide#jee-agent-install-guide"
+ or <link xlink:href="jee-install-guide#jee-install-guide" 
  xlink:role="http://docbook.org/xlink/role/olink"><citetitle>OpenAM Java EE Policy
  Agent <?eval ${agentsDocTargetVersion}?> Installation Guide</citetitle></link>
  for instructions on installing OpenAM agents in supported web servers and

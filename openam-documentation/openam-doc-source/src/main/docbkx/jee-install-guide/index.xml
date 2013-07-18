@@ -23,7 +23,7 @@
   !      Copyright 2011-2013 ForgeRock AS
   !    
 -->
-<book xml:id='jee-agent-install-guide'
+<book xml:id='jee-install-guide'
  xmlns='http://docbook.org/ns/docbook' version='5.0' xml:lang='en'
  xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance'
  xsi:schemaLocation='http://docbook.org/ns/docbook http://docbook.org/xml/5.0/xsd/docbook.xsd'

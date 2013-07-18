@@ -237,10 +237,10 @@
         </step>
 
         <step>
-            <para>Install the appropriate policy agent, as described in the <link xlink:href="web-agent-install-guide#web-agent-install-guide"
+            <para>Install the appropriate policy agent, as described in the <link xlink:href="web-install-guide#web-install-guide"
             xlink:role="http://docbook.org/xlink/role/olink"><citetitle>OpenAM Web Policy
             Agent <?eval ${agentsDocTargetVersion}?> Installation Guide</citetitle></link>
-            or <link xlink:href="jee-agent-install-guide#jee-install-guide"
+            or <link xlink:href="jee-install-guide#jee-install-guide"
             xlink:role="http://docbook.org/xlink/role/olink"><citetitle>OpenAM Java EE Policy
             Agent <?eval ${agentsDocTargetVersion}?> Installation Guide</citetitle></link>. 
             This procedure uses an agent URL of <literal>http://app.example.net:80</literal>, 
@@ -256,10 +256,10 @@
         <step>
             <para>Return to the OpenAM server on <literal>http://openam.example.net:8080/openam</literal>. Log in as
                 the administrative user, normally <literal>amadmin</literal>. To activate and configure the agent,
-                follow the procedure described in the <link xlink:href="web-agent-install-guide#web-agent-install-guide"
+                follow the procedure described in the <link xlink:href="web-install-guide#web-install-guide"
                 xlink:role="http://docbook.org/xlink/role/olink"><citetitle>OpenAM Web Policy
                 Agent <?eval ${agentsDocTargetVersion}?> Installation Guide</citetitle></link>
-                or <link xlink:href="jee-agent-install-guide#jee-agent-install-guide"
+                or <link xlink:href="jee-install-guide#jee-install-guide"
                 xlink:role="http://docbook.org/xlink/role/olink"><citetitle>OpenAM Java EE Policy
                 Agent <?eval ${agentsDocTargetVersion}?> Installation Guide</citetitle></link>.</para>
         </step>

@@ -33,10 +33,10 @@
  <title>Removing OpenAM Software</title>
  <indexterm><primary>Uninstalling</primary></indexterm>
  <para>This chapter shows you how to uninstall OpenAM core software. See
- the <link xlink:href="web-agent-install-guide#web-agent-install-guide"
+ the <link xlink:href="web-install-guide#web-install-guide"
  xlink:role="http://docbook.org/xlink/role/olink"><citetitle>OpenAM Web Policy
  Agent <?eval ${agentsDocTargetVersion}?> Installation Guide</citetitle></link>
- or <link xlink:href="jee-agent-install-guide#jee-agent-install-guide"
+ or <link xlink:href="jee-install-guide#jee-install-guide"
  xlink:role="http://docbook.org/xlink/role/olink"><citetitle>OpenAM Java EE Policy
  Agent <?eval ${agentsDocTargetVersion}?> Installation Guide</citetitle></link> for 
  instructions on removing OpenAM agents.</para>
