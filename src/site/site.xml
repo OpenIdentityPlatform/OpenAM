@@ -80,7 +80,7 @@
    <item name="Java EE Reference" href="./openam-documentation/openam-doc-source/doc/jee-reference/index.html" />
    <item name="Web Release Notes" href="./openam-documentation/openam-doc-source/doc/web-release-notes/index.html" />
    <item name="Web Install Guide" href="./openam-documentation/openam-doc-source/doc/web-install-guide/index.html" />
-   <item name="Web Install Guide" href="./openam-documentation/openam-doc-source/doc/web-reference/index.html" />
+   <item name="Web Reference" href="./openam-documentation/openam-doc-source/doc/web-reference/index.html" />
   </menu>
 
   <menu name="Project Information">
