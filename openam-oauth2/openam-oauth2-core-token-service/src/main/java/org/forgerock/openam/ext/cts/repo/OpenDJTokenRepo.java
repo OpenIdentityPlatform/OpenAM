@@ -117,7 +117,12 @@ public class OpenDJTokenRepo implements JsonResource {
                         }
                     case read:
                         String tokenId = tokenIdFactory.toOAuthTokenId(request);
-                        return tokenAdapter.fromToken(cts.read(tokenId));
+                        Token token = cts.read(tokenId);
+                        if (token != null) {
+                            return tokenAdapter.fromToken(token);
+                        } else {
+                            return null;
+                        }
                     case update:
                         cts.update(tokenAdapter.toToken(request));
                         return request;
