@@ -85,7 +85,7 @@ public class OAuth2Utils {
     private static Logger accessLogger;
     private static Logger errorLogger;
     public static boolean logStatus = false;
-    private static Map<String, OAuth2ProviderSettings> settingsProviderMap =
+    private static final Map<String, OAuth2ProviderSettings> settingsProviderMap =
             new HashMap<String, OAuth2ProviderSettings>();
 
     static {
@@ -913,17 +913,20 @@ public class OAuth2Utils {
         return sjwt;
     }
 
+    /*
+     * This method is called from multiple threads, and must initialize a new OAuth2ProviderSettings instance atomically.
+     */
     public static OAuth2ProviderSettings getSettingsProvider(Request request){
-        String realm = OAuth2Utils.getRealm(request);
-        OAuth2ProviderSettings setting = settingsProviderMap.get(realm);
-        if (setting != null){
-            return setting;
-        } else {
-            setting = new OAuth2ProviderSettingsImpl(request);
-            settingsProviderMap.put(realm, setting);
-            return setting;
+        synchronized (settingsProviderMap) {
+            String realm = OAuth2Utils.getRealm(request);
+            OAuth2ProviderSettings setting = settingsProviderMap.get(realm);
+            if (setting != null){
+                return setting;
+            } else {
+                setting = new OAuth2ProviderSettingsImpl(request);
+                settingsProviderMap.put(realm, setting);
+                return setting;
+            }
         }
     }
-
-
 }
