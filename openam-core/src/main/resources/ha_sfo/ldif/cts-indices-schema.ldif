@@ -44,6 +44,12 @@ ds-cfg-index-type: equality
 
 # CTS v2 Indexes
 
+dn: ds-cfg-attribute=tokenId,cn=Index,ds-cfg-backend-id=@DB_NAME@,cn=Backends,cn=config
+objectClass: top
+objectClass: ds-cfg-local-db-index
+ds-cfg-attribute: tokenId
+ds-cfg-index-type: equality
+
 dn: ds-cfg-attribute=tokenExpirationDate,cn=Index,ds-cfg-backend-id=@DB_NAME@,cn=Backends,cn=config
 objectClass: top
 objectClass: ds-cfg-local-db-index
