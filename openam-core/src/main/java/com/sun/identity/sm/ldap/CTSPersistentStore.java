@@ -365,37 +365,7 @@ public class CTSPersistentStore extends GeneralTaskRunnable {
      * @throws CoreTokenException If there was a non-recoverable error during the operation.
      */
     public Token read(String tokenId) throws CoreTokenException {
-
-        Filter filter = new QueryFilter(dataConversion).and().tokenId(tokenId).build();
-        Collection<Token> tokens = getAdapter().query().withFilter(filter).execute();
-
-        if (tokens.isEmpty()) {
-            if (DEBUG.messageEnabled()) {
-                DEBUG.message(MessageFormat.format(
-                        CoreTokenConstants.DEBUG_HEADER +
-                        "Read: No token found with id {0}",
-                        tokenId));
-            }
-            return null;
-        }
-
-        if (tokens.size() > 1) {
-            throw new CoreTokenException("More than one token read for " + tokenId);
-        }
-
-        Token token = tokens.iterator().next();
-
-        if (coreTokenConfig.isTokenEncrypted()) {
-            token = tokenEncryption.decrypt(token);
-        }
-
-        if (DEBUG.messageEnabled()) {
-            DEBUG.message(MessageFormat.format(
-                    CoreTokenConstants.DEBUG_HEADER +
-                    "Read: {0} read successfully.",
-                    tokenId));
-        }
-        return token;
+        return getAdapter().read(tokenId);
     }
 
     /**

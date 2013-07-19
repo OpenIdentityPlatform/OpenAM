@@ -33,6 +33,8 @@ import org.forgerock.opendj.ldap.LinkedHashMapEntry;
 import org.forgerock.opendj.ldap.ResultCode;
 import org.forgerock.opendj.ldap.requests.ModifyRequest;
 import org.forgerock.opendj.ldap.responses.Result;
+import org.forgerock.opendj.ldap.responses.SearchResultEntry;
+import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
 import java.util.LinkedList;
@@ -42,24 +44,40 @@ import static org.mockito.BDDMockito.given;
 import static org.mockito.BDDMockito.mock;
 import static org.mockito.Matchers.*;
 import static org.mockito.Mockito.verify;
+import static org.testng.Assert.assertEquals;
+import static org.testng.AssertJUnit.assertNull;
 
 /**
  * @author robert.wapshott@forgerock.com
  */
 public class CoreTokenLDAPAdapterTest {
+    private Connection mockConnection;
+    private DataLayerConnectionFactory mockFactory;
+    private CoreTokenConstants constants;
+    private LDAPDataConversion dataConversion;
+    private TokenAttributeConversion attributeConversion;
+
+    @BeforeMethod
+    public void setup() {
+        mockConnection = mock(Connection.class);
+        mockFactory = mock(DataLayerConnectionFactory.class);
+        try {
+            given(mockFactory.getConnection()).willReturn(mockConnection);
+        } catch (ErrorResultException e) {
+            throw new IllegalStateException(e);
+        }
+
+        constants = new CoreTokenConstants("cn=test");
+        dataConversion = new LDAPDataConversion();
+        attributeConversion = new TokenAttributeConversion(constants, dataConversion);
+    }
+
+
     @Test
     public void shouldCreateToken() throws CoreTokenException, ErrorResultException {
         // Given
-        DataLayerConnectionFactory connectionFactory = mock(DataLayerConnectionFactory.class);
-        Connection connection = mock(Connection.class);
-        given(connectionFactory.getConnection()).willReturn(connection);
-
-        CoreTokenConstants constants = new CoreTokenConstants("cn=test");
-        LDAPDataConversion dataConversion = new LDAPDataConversion();
-        TokenAttributeConversion attributeConversion = new TokenAttributeConversion(constants, dataConversion);
-
         CoreTokenLDAPAdapter adapter = new CoreTokenLDAPAdapter(
-                connectionFactory,
+                mockFactory,
                 dataConversion,
                 attributeConversion,
                 constants,
@@ -70,29 +88,22 @@ public class CoreTokenLDAPAdapterTest {
 
         // Ensure the Connection add is a success
         Result result = successResult();
-        given(connection.add(any(Entry.class))).willReturn(result);
+        given(mockConnection.add(any(Entry.class))).willReturn(result);
 
         // When
         adapter.create(token);
 
         // Then
-        verify(connection).add(any(Entry.class));
+        verify(mockConnection).add(any(Entry.class));
     }
 
     @Test
     public void shouldGenerateAnInstanceOfQueryBuilder() throws ErrorResultException {
         // Given
-        DataLayerConnectionFactory connectionFactory = mock(DataLayerConnectionFactory.class);
-        Connection connection = mock(Connection.class);
-        given(connectionFactory.getConnection()).willReturn(connection);
-
-        CoreTokenConstants constants = new CoreTokenConstants("cn=test");
-        LDAPDataConversion dataConversion = new LDAPDataConversion();
-        TokenAttributeConversion attributeConversion = new TokenAttributeConversion(constants, dataConversion);
         QueryFactory factory = mock(QueryFactory.class);
 
         CoreTokenLDAPAdapter adapter = new CoreTokenLDAPAdapter(
-                connectionFactory,
+                mockFactory,
                 dataConversion,
                 attributeConversion,
                 constants,
@@ -103,22 +114,14 @@ public class CoreTokenLDAPAdapterTest {
         adapter.query();
 
         // Then
-        verify(factory).createInstance(connectionFactory, constants);
+        verify(factory).createInstance(mockFactory, constants);
     }
 
     @Test (expectedExceptions = CoreTokenException.class)
     public void shouldFailIfMultipleTokensFoundWhilstUpdating() throws CoreTokenException, ErrorResultException {
         // Given
-        DataLayerConnectionFactory connectionFactory = mock(DataLayerConnectionFactory.class);
-        Connection connection = mock(Connection.class);
-        given(connectionFactory.getConnection()).willReturn(connection);
-
-        CoreTokenConstants constants = new CoreTokenConstants("cn=test");
-        LDAPDataConversion dataConversion = new LDAPDataConversion();
-        TokenAttributeConversion attributeConversion = new TokenAttributeConversion(constants, dataConversion);
-
         CoreTokenLDAPAdapter adapter = new CoreTokenLDAPAdapter(
-                connectionFactory,
+                mockFactory,
                 dataConversion,
                 attributeConversion,
                 constants,
@@ -135,16 +138,8 @@ public class CoreTokenLDAPAdapterTest {
     @Test
     public void shouldCreateTokenIfNotPresentWhilstUpdating() throws CoreTokenException, ErrorResultException {
         // Given
-        DataLayerConnectionFactory connectionFactory = mock(DataLayerConnectionFactory.class);
-        Connection connection = mock(Connection.class);
-        given(connectionFactory.getConnection()).willReturn(connection);
-
-        CoreTokenConstants constants = new CoreTokenConstants("cn=test");
-        LDAPDataConversion dataConversion = new LDAPDataConversion();
-        TokenAttributeConversion attributeConversion = new TokenAttributeConversion(constants, dataConversion);
-
         CoreTokenLDAPAdapter adapter = new CoreTokenLDAPAdapter(
-                connectionFactory,
+                mockFactory,
                 dataConversion,
                 attributeConversion,
                 constants,
@@ -155,28 +150,20 @@ public class CoreTokenLDAPAdapterTest {
 
         // Ensure the Connection add is a success
         Result success = successResult();
-        given(connection.add(any(Entry.class))).willReturn(success);
+        given(mockConnection.add(any(Entry.class))).willReturn(success);
 
         // When
         adapter.update(token);
 
         // Then
-        verify(connection).add(any(Entry.class));
+        verify(mockConnection).add(any(Entry.class));
     }
 
     @Test
     public void shouldPerformUpdate() throws ErrorResultException, CoreTokenException {
         // Given
-        DataLayerConnectionFactory connectionFactory = mock(DataLayerConnectionFactory.class);
-        Connection connection = mock(Connection.class);
-        given(connectionFactory.getConnection()).willReturn(connection);
-
-        CoreTokenConstants constants = new CoreTokenConstants("cn=test");
-        LDAPDataConversion dataConversion = new LDAPDataConversion();
-        TokenAttributeConversion attributeConversion = new TokenAttributeConversion(constants, dataConversion);
-
         CoreTokenLDAPAdapter adapter = new CoreTokenLDAPAdapter(
-                connectionFactory,
+                mockFactory,
                 dataConversion,
                 attributeConversion,
                 constants,
@@ -187,28 +174,22 @@ public class CoreTokenLDAPAdapterTest {
 
         // Ensure the Connection add is a success
         Result success = successResult();
-        given(connection.modify(any(ModifyRequest.class))).willReturn(success);
+        given(mockConnection.modify(any(ModifyRequest.class))).willReturn(success);
 
         // When
         adapter.update(token);
 
         // Then
-        verify(connection).modify(any(ModifyRequest.class));
+        verify(mockConnection).modify(any(ModifyRequest.class));
     }
 
     @Test
     public void shouldDeleteToken() throws ErrorResultException, DeleteFailedException {
         // Given
-        DataLayerConnectionFactory connectionFactory = mock(DataLayerConnectionFactory.class);
-        Connection connection = mock(Connection.class);
-        given(connectionFactory.getConnection()).willReturn(connection);
-
-        CoreTokenConstants constants = new CoreTokenConstants("cn=test");
-        LDAPDataConversion dataConversion = new LDAPDataConversion();
-        TokenAttributeConversion attributeConversion = mock(TokenAttributeConversion.class);
+        attributeConversion = mock(TokenAttributeConversion.class);
 
         CoreTokenLDAPAdapter adapter = new CoreTokenLDAPAdapter(
-                connectionFactory,
+                mockFactory,
                 dataConversion,
                 attributeConversion,
                 constants,
@@ -219,7 +200,7 @@ public class CoreTokenLDAPAdapterTest {
 
         // Ensure the delete operation is a success
         Result success = successResult();
-        given(connection.delete(anyString())).willReturn(success);
+        given(mockConnection.delete(anyString())).willReturn(success);
 
         // Ensure conversion via TokenAttributeConversion is successful
         DN dn = DN.rootDN();
@@ -229,7 +210,76 @@ public class CoreTokenLDAPAdapterTest {
         adapter.delete(token);
 
         // Then
-        verify(connection).delete(anyString());
+        verify(mockConnection).delete(anyString());
+    }
+
+    @Test
+    public void shouldReturnTokenWhenRead() throws CoreTokenException, ErrorResultException {
+        // Given
+        attributeConversion = mock(TokenAttributeConversion.class);
+
+        String tokenId = "badger";
+        CoreTokenLDAPAdapter adapter = new CoreTokenLDAPAdapter(
+                mockFactory,
+                dataConversion,
+                attributeConversion,
+                constants,
+                new QueryFactory(),
+                mock(Debug.class));
+
+        // Ensure the connection returns something useful
+        SearchResultEntry mockResult = mock(SearchResultEntry.class);
+        given(mockConnection.readEntry(any(DN.class))).willReturn(mockResult);
+
+        // Ensure we generate a suitable token from the SearchResultEntry conversion.
+        Token mockToken = mock(Token.class);
+        given(mockToken.getTokenId()).willReturn(tokenId);
+        given(attributeConversion.tokenFromEntry(mockResult)).willReturn(mockToken);
+
+        // When
+        Token result = adapter.read(tokenId);
+
+        // Then
+        assertEquals(tokenId, result.getTokenId());
+    }
+
+    @Test (expectedExceptions = CoreTokenException.class)
+    public void shouldFailReadIfOtherExceptionIsEncountered() throws CoreTokenException, ErrorResultException {
+        // Given
+        String tokenId = "badger";
+        CoreTokenLDAPAdapter adapter = new CoreTokenLDAPAdapter(
+                mockFactory,
+                dataConversion,
+                attributeConversion,
+                constants,
+                new QueryFactory(),
+                mock(Debug.class));
+        ErrorResultException exception = ErrorResultException.newErrorResult(ResultCode.OTHER, "test");
+        given(mockConnection.readEntry(any(DN.class))).willThrow(exception);
+
+        // When / Then
+        adapter.read(tokenId);
+    }
+
+    @Test
+    public void shouldReturnNullIfNoTokenFoundWhenRead() throws ErrorResultException, CoreTokenException {
+        // Given
+        String tokenId = "badger";
+        CoreTokenLDAPAdapter adapter = new CoreTokenLDAPAdapter(
+                mockFactory,
+                dataConversion,
+                attributeConversion,
+                constants,
+                new QueryFactory(),
+                mock(Debug.class));
+        ErrorResultException exception = ErrorResultException.newErrorResult(ResultCode.NO_SUCH_OBJECT, "test");
+        given(mockConnection.readEntry(any(DN.class))).willThrow(exception);
+
+        // When
+        Token result = adapter.read(tokenId);
+
+        // Then
+        assertNull(result);
     }
 
     private QueryFactory mockQueryBuilderFactory(int entriesToReturn) throws CoreTokenException {

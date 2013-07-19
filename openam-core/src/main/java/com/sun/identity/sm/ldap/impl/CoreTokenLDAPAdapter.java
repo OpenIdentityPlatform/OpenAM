@@ -37,6 +37,7 @@ import org.forgerock.opendj.ldap.Filter;
 import org.forgerock.opendj.ldap.ResultCode;
 import org.forgerock.opendj.ldap.requests.ModifyRequest;
 import org.forgerock.opendj.ldap.responses.Result;
+import org.forgerock.opendj.ldap.responses.SearchResultEntry;
 
 import java.text.MessageFormat;
 import java.util.Collection;
@@ -122,6 +123,52 @@ public class CoreTokenLDAPAdapter {
 
         } catch (ErrorResultException e) {
             throw new CreateFailedException(token, e);
+        } finally {
+            if (connection != null) {
+                connection.close();
+            }
+        }
+    }
+
+    /**
+     * Read the Token based on its Token ID.
+     *
+     * @param tokenId The non null Token ID to read from the Token store.
+     * @return Null if the Token could not be found, otherwise a non null Token.
+     * @throws CoreTokenException If there was an unexpected problem with the request.
+     */
+    public Token read(String tokenId) throws CoreTokenException {
+        Connection connection = null;
+        try {
+            connection = connectionFactory.getConnection();
+            DN tokenDN = attributeConversion.generateTokenDN(tokenId);
+            SearchResultEntry entry = connection.readEntry(tokenDN);
+            Token token = attributeConversion.tokenFromEntry(entry);
+
+            if (debug.messageEnabled()) {
+                debug.message(MessageFormat.format(
+                        CoreTokenConstants.DEBUG_HEADER +
+                        "Read: {0} successfully.",
+                        tokenId));
+            }
+
+            return token;
+        } catch (ErrorResultException e) {
+            Result result = e.getResult();
+
+            // Check for NO_SUCH_OBJECT
+            if (result != null && result.getResultCode() == ResultCode.NO_SUCH_OBJECT) {
+                if (debug.messageEnabled()) {
+                    debug.message(MessageFormat.format(
+                            CoreTokenConstants.DEBUG_HEADER +
+                            "Read: {0} failed.",
+                            tokenId));
+                }
+                return null;
+            }
+
+            // Any other error is unexpected.
+            throw new OperationFailedException(result);
         } finally {
             if (connection != null) {
                 connection.close();
