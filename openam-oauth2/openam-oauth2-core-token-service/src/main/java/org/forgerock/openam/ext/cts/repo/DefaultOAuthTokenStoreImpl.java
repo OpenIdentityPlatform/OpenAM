@@ -78,8 +78,9 @@ public class DefaultOAuthTokenStoreImpl implements OAuth2TokenStore {
             repository = new CoreTokenService(OpenDJTokenRepo.getInstance());
         } catch (Exception e) {
             throw new OAuthProblemException(Status.SERVER_ERROR_SERVICE_UNAVAILABLE.getCode(),
-                    "Service unavailable", "Could not create underlying storage", null);
+                    "Service unavailable", "Could not create underlying storage. Exception: " + e, null);
         }
+
     }
     private void getSettings(){
         settings = OAuth2Utils.getSettingsProvider(Request.getCurrent());
@@ -111,13 +112,15 @@ public class DefaultOAuthTokenStoreImpl implements OAuth2TokenStore {
         try {
             response = accessor.create(id, code);
         } catch (JsonResourceException e) {
-            OAuth2Utils.DEBUG.error("DefaultOAuthTokenStoreImpl::Unable to create authorization code", e);
+            OAuth2Utils.DEBUG.error("DefaultOAuthTokenStoreImpl::Unable to create authorization code "
+                    + ((code != null) ? code.getTokenInfo() : null), e);
             throw new OAuthProblemException(Status.SERVER_ERROR_INTERNAL.getCode(),
                     "Internal error", "Could not create token in CTS", null);
         }
 
         if (response == null) {
-            OAuth2Utils.DEBUG.error("DefaultOAuthTokenStoreImpl::Unable to create authorization code");
+            OAuth2Utils.DEBUG.error("DefaultOAuthTokenStoreImpl::Unable to create authorization code "
+                    + ((code != null) ? code.getTokenInfo() : null));
             throw new OAuthProblemException(Status.SERVER_ERROR_INTERNAL.getCode(),
                     "Internal error", "Could not create token in CTS", null);
         }
@@ -140,13 +143,15 @@ public class DefaultOAuthTokenStoreImpl implements OAuth2TokenStore {
         try {
             response = accessor.create(id, code2);
         } catch (JsonResourceException e) {
-            OAuth2Utils.DEBUG.error("DefaultOAuthTokenStoreImpl::Unable to create authorization code", e);
+            OAuth2Utils.DEBUG.error("DefaultOAuthTokenStoreImpl::Unable to create authorization code "
+                    + ((code2 != null) ? code2.getTokenInfo() : null), e);
             throw new OAuthProblemException(Status.SERVER_ERROR_INTERNAL.getCode(),
                     "Internal error", "Could not create token in CTS", null);
         }
 
         if (response == null) {
-            OAuth2Utils.DEBUG.error("DefaultOAuthTokenStoreImpl::Unable to create authorization code");
+            OAuth2Utils.DEBUG.error("DefaultOAuthTokenStoreImpl::Unable to create authorization code "
+                    + ((code2 != null) ? code2.getTokenInfo() : null));
             throw new OAuthProblemException(Status.SERVER_ERROR_INTERNAL.getCode(),
                     "Internal error", "Could not create token in CTS", null);
         }
@@ -167,13 +172,13 @@ public class DefaultOAuthTokenStoreImpl implements OAuth2TokenStore {
         try {
             response = accessor.read(id);
         } catch (JsonResourceException e) {
-            OAuth2Utils.DEBUG.error("DefaultOAuthTokenStoreImpl::Unable to read authorization code", e);
+            OAuth2Utils.DEBUG.error("DefaultOAuthTokenStoreImpl::Unable to read authorization code corresponding to id: " + id, e);
             throw new OAuthProblemException(Status.SERVER_ERROR_INTERNAL.getCode(),
                     "Internal error", "Could not read token from CTS: " + e.getMessage(), null);
         }
 
         if (response == null) {
-            OAuth2Utils.DEBUG.error("DefaultOAuthTokenStoreImpl::Unable to create authorization code");
+            OAuth2Utils.DEBUG.error("DefaultOAuthTokenStoreImpl::Unable to read authorization code corresponding to id: " + id);
             throw new OAuthProblemException(Status.CLIENT_ERROR_NOT_FOUND.getCode(), "Not found",
                     "Could not find token from CTS", null);
         }
@@ -194,16 +199,17 @@ public class DefaultOAuthTokenStoreImpl implements OAuth2TokenStore {
         // Read from CTS
         JsonResourceAccessor accessor =
                 new JsonResourceAccessor(repository, JsonResourceContext.newRootContext());
+
         try {
             response = accessor.read(id);
         } catch (JsonResourceException e) {
-            OAuth2Utils.DEBUG.error("DefaultOAuthTokenStoreImpl::Unable to delete authorization code", e);
+            OAuth2Utils.DEBUG.error("DefaultOAuthTokenStoreImpl::Unable to read authorization code corresponding to id: " + id, e);
             throw new OAuthProblemException(Status.SERVER_ERROR_INTERNAL.getCode(),
                     "Internal error", "Could not read token from CTS: " + e.getMessage(), null);
         }
 
         if (response == null) {
-            OAuth2Utils.DEBUG.error("DefaultOAuthTokenStoreImpl::Unable to create authorization code");
+            OAuth2Utils.DEBUG.error("DefaultOAuthTokenStoreImpl::Unable to read authorization code corresponding to id: " + id);
             throw new OAuthProblemException(Status.CLIENT_ERROR_NOT_FOUND.getCode(), "Not found",
                     "Could not find token using CTS", null);
         }
@@ -212,7 +218,7 @@ public class DefaultOAuthTokenStoreImpl implements OAuth2TokenStore {
         try {
             response = accessor.delete(id, null);
         } catch (JsonResourceException e) {
-            OAuth2Utils.DEBUG.error("DefaultOAuthTokenStoreImpl::Unable to delete authorization code", e);
+            OAuth2Utils.DEBUG.error("DefaultOAuthTokenStoreImpl::Unable to delete authorization code corresponding to id: " + id, e);
             throw new OAuthProblemException(Status.SERVER_ERROR_INTERNAL.getCode(),
                     "Internal error", "Could not delete token from CTS: " + e.getMessage(), null);
         }
@@ -250,13 +256,15 @@ public class DefaultOAuthTokenStoreImpl implements OAuth2TokenStore {
         try {
             response = accessor.create(id, accessToken);
         } catch (JsonResourceException e) {
-            OAuth2Utils.DEBUG.error("DefaultOAuthTokenStoreImpl::Unable to create access token", e);
+            OAuth2Utils.DEBUG.error("DefaultOAuthTokenStoreImpl::Unable to create access token: "
+                    + ((accessToken != null) ? accessToken.getTokenInfo() : null), e);
             throw new OAuthProblemException(Status.SERVER_ERROR_INTERNAL.getCode(),
                     "Internal error", "Could not create token in CTS: " + e.getMessage(), null);
         }
 
         if (response == null) {
-            OAuth2Utils.DEBUG.error("DefaultOAuthTokenStoreImpl::Unable to create access token");
+            OAuth2Utils.DEBUG.error("DefaultOAuthTokenStoreImpl::Unable to create access token: "
+                    + ((accessToken != null) ? accessToken.getTokenInfo() : null) );
             throw new OAuthProblemException(Status.CLIENT_ERROR_NOT_FOUND.getCode(), "Not found",
                     "Could not create token in CTS", null);
         }
@@ -279,13 +287,13 @@ public class DefaultOAuthTokenStoreImpl implements OAuth2TokenStore {
         try {
             response = accessor.read(id);
         } catch (JsonResourceException e) {
-            OAuth2Utils.DEBUG.error("DefaultOAuthTokenStoreImpl::Unable to read access token", e);
+            OAuth2Utils.DEBUG.error("DefaultOAuthTokenStoreImpl::Unable to read access token corresponding to id: " + id, e);
             throw new OAuthProblemException(Status.SERVER_ERROR_INTERNAL.getCode(),
                     "Internal error", "Could not read token in CTS: " + e.getMessage(), null);
         }
 
         if (response == null) {
-            OAuth2Utils.DEBUG.error("DefaultOAuthTokenStoreImpl::Unable to read access token");
+            OAuth2Utils.DEBUG.error("DefaultOAuthTokenStoreImpl::Unable to read access token corresponding to id: " + id);
             throw new OAuthProblemException(Status.CLIENT_ERROR_NOT_FOUND.getCode(), "Not found",
                     "Could not read token in CTS", null);
         }
@@ -309,7 +317,7 @@ public class DefaultOAuthTokenStoreImpl implements OAuth2TokenStore {
         try {
             response = accessor.delete(id, null);
         } catch (JsonResourceException e) {
-            OAuth2Utils.DEBUG.error("DefaultOAuthTokenStoreImpl::Unable to delete access token", e);
+            OAuth2Utils.DEBUG.error("DefaultOAuthTokenStoreImpl::Unable to delete access token corresponding to id: " + id, e);
             throw new OAuthProblemException(Status.SERVER_ERROR_INTERNAL.getCode(),
                     "Internal error", "Could not delete token from CTS: " + e.getMessage(), null);
         }
@@ -339,13 +347,15 @@ public class DefaultOAuthTokenStoreImpl implements OAuth2TokenStore {
         try {
             response = accessor.create(id, refreshToken);
         } catch (JsonResourceException e) {
-            OAuth2Utils.DEBUG.error("DefaultOAuthTokenStoreImpl::Unable to create refresh token", e);
+            OAuth2Utils.DEBUG.error("DefaultOAuthTokenStoreImpl::Unable to create refresh token: " +
+                    ((refreshToken != null) ? refreshToken.getTokenInfo() : null), e);
             throw new OAuthProblemException(Status.SERVER_ERROR_INTERNAL.getCode(),
                     "Internal error", "Could not create token in CTS: " + e.getMessage(), null);
         }
 
         if (response == null) {
-            OAuth2Utils.DEBUG.error("DefaultOAuthTokenStoreImpl::Unable to create refresh token");
+            OAuth2Utils.DEBUG.error("DefaultOAuthTokenStoreImpl::Unable to create refresh token: " +
+                    ((refreshToken != null) ? refreshToken.getTokenInfo() : null));
             throw new OAuthProblemException(Status.CLIENT_ERROR_NOT_FOUND.getCode(), "Not found",
                     "Could not create token in CTS", null);
         }
@@ -368,12 +378,12 @@ public class DefaultOAuthTokenStoreImpl implements OAuth2TokenStore {
         try {
             response = accessor.read(id);
         } catch (JsonResourceException e) {
-            OAuth2Utils.DEBUG.error("DefaultOAuthTokenStoreImpl::Unable to read refresh token", e);
+            OAuth2Utils.DEBUG.error("DefaultOAuthTokenStoreImpl::Unable to read refresh token corresponding to id: " + id, e);
             throw OAuthProblemException.OAuthError.INVALID_REQUEST.handle(Request.getCurrent());
         }
 
         if (response == null) {
-            OAuth2Utils.DEBUG.error("DefaultOAuthTokenStoreImpl::Unable to read refresh token");
+            OAuth2Utils.DEBUG.error("DefaultOAuthTokenStoreImpl::Unable to read refresh token corresponding to id: " + id);
             throw new OAuthProblemException(Status.CLIENT_ERROR_NOT_FOUND.getCode(), "Not found",
                     "Could not find token from CTS", null);
         }
@@ -394,7 +404,7 @@ public class DefaultOAuthTokenStoreImpl implements OAuth2TokenStore {
         try {
             response = accessor.delete(id, null);
         } catch (JsonResourceException e) {
-            OAuth2Utils.DEBUG.error("DefaultOAuthTokenStoreImpl::Unable to delete refresh token", e);
+            OAuth2Utils.DEBUG.error("DefaultOAuthTokenStoreImpl::Unable to delete refresh token corresponding to id: " + id, e);
             throw OAuthProblemException.OAuthError.INVALID_REQUEST.handle(Request.getCurrent());
         }
 
@@ -422,7 +432,7 @@ public class DefaultOAuthTokenStoreImpl implements OAuth2TokenStore {
         try {
             response = accessor.query(id, queryFilter);
         } catch (JsonResourceException e) {
-            OAuth2Utils.DEBUG.error("DefaultOAuthTokenStoreImpl::Unable to delete refresh token", e);
+            OAuth2Utils.DEBUG.error("DefaultOAuthTokenStoreImpl::Unable to query refresh token corresponding to id: " + id, e);
             throw OAuthProblemException.OAuthError.INVALID_REQUEST.handle(Request.getCurrent());
         }
 
