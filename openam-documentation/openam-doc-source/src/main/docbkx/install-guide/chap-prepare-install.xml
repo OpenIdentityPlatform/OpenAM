@@ -71,6 +71,65 @@
   xlink:href="release-notes#java-requirements" xlink:show="new"
   xlink:role="http://docbook.org/xlink/role/olink"><citetitle>Java
   Requirements</citetitle></link>.</para>
+
+  <section xml:id="prepare-java-sun">
+   <title>Settings For Sun/Oracle Java Environments</title>
+
+   <variablelist>
+    <para>When using a Sun or Oracle Java environment set at least the
+    following options.</para>
+
+    <varlistentry>
+     <term><literal>-server</literal></term>
+     <listitem>
+      <para>Use <literal>-server</literal> rather than
+      <literal>-client</literal>.</para>
+     </listitem>
+    </varlistentry>
+    <varlistentry>
+     <term><literal>-XX:MaxPermSize=256m</literal></term>
+     <listitem>
+      <para>Set the permanent generation size to 256 MB.</para>
+     </listitem>
+    </varlistentry>
+    <varlistentry>
+     <term><literal>-Xmx1024m</literal> (minimum)</term>
+     <listitem>
+      <para>OpenAM requires at least a 1 GB heap. Higher volume and higher
+      performance deployments require additional heap space.</para>
+     </listitem>
+    </varlistentry>
+   </variablelist>
+
+   <para>For additional JVM tuning recommendations, see <link xlink:show="new"
+   xlink:href="admin-guide#tuning-jvm-for-openam"
+   xlink:role="http://docbook.org/xlink/role/olink"><citetitle>Java Virtual
+   Machine Settings</citetitle></link>.</para>
+  </section>
+
+  <section xml:id="prepare-java-ibm">
+   <title>Settings For IBM Java Environments</title>
+
+   <variablelist>
+    <para>When using an IBM Java environment set at least the following
+    options.</para>
+
+    <varlistentry>
+     <term><literal>-DamCryptoDescriptor.provider=IBMJCE</literal></term>
+     <term><literal>-DamKeyGenDescriptor.provider=IBMJCE</literal></term>
+     <listitem>
+      <para>Use the IBM Java Cryptography Extensions.</para>
+     </listitem>
+    </varlistentry>
+    <varlistentry>
+     <term><literal>-Xmx1024m</literal> (minimum)</term>
+     <listitem>
+      <para>OpenAM requires at least a 1 GB heap. Higher volume and higher
+      performance deployments require additional heap space.</para>
+     </listitem>
+    </varlistentry>
+   </variablelist>
+  </section>
  </section>
 
  <section xml:id="prepare-configuration-store">
@@ -499,7 +558,6 @@ aci: (version 3.0;acl "Delete identity"; allow (delete)(userdn = "ldap:///
   </indexterm>
   <para>Download OpenAM releases from one of the following locations:</para>
   
-  
    <itemizedlist>
     <listitem>
      <para><link xlink:show="new" xlink:href="http://forgerock.com/download-stack/"
@@ -619,7 +677,8 @@ $ unzip ~/Downloads/<?eval ${coreDirectoryFile}?>.zip</screen>
   <literal>openam</literal>.</para>
 
   <para>OpenAM core services require a minimum JVM heap size of 1 GB, and a
-  permanent generation size of 256 MB.</para>
+  permanent generation size of 256 MB. See <xref linkend="prepare-java" /> for
+  details.</para>
 
   <programlisting language="shell">#!/bin/sh
 #
@@ -654,31 +713,10 @@ esac
  <section xml:id="prepare-glassfish-v2">
   <title>Preparing GlassFish v2</title>
 
-  <para>Before you deploy OpenAM, update these JVM options. These settings
-  are accessible in the administration console under Application Server &gt;
-  JVM Settings &gt; JVM Options.</para>
-
-  <variablelist>
-   <varlistentry>
-    <term><literal>-server</literal></term>
-    <listitem>
-     <para>Use <literal>-server</literal> rather than
-     <literal>-client</literal>.</para>
-    </listitem>
-   </varlistentry>
-   <varlistentry>
-    <term><literal>-XX:MaxPermSize=256m</literal></term>
-    <listitem>
-     <para>Set the permanent generation size to 256 MB.</para>
-    </listitem>
-   </varlistentry>
-   <varlistentry>
-    <term><literal>-Xmx1024m</literal></term>
-    <listitem>
-     <para>Make sure OpenAM has at least 1 GB heap.</para>
-    </listitem>
-   </varlistentry>
-  </variablelist>
+  <para>Before you deploy OpenAM, update the JVM options as described in
+  <xref linkend="prepare-java" />. The settings are accessible in the
+  administration console under Application Server &gt; JVM Settings &gt;
+  JVM Options.</para>
  </section>
 
  <section xml:id="prepare-jboss-5">
@@ -721,29 +759,8 @@ $ cat WEB-INF/jboss-web.xml</screen>
 
   <screen>$ jar -cf ../openam.war *</screen>
 
-  <para>Before you deploy OpenAM, update these JVM options.</para>
-
-  <variablelist>
-   <varlistentry>
-    <term><literal>-server</literal></term>
-    <listitem>
-     <para>Use <literal>-server</literal> rather than
-     <literal>-client</literal>.</para>
-    </listitem>
-   </varlistentry>
-   <varlistentry>
-    <term><literal>-XX:MaxPermSize=256m</literal></term>
-    <listitem>
-     <para>Set the permanent generation size to 256 MB.</para>
-    </listitem>
-   </varlistentry>
-   <varlistentry>
-    <term><literal>-Xmx1024m</literal></term>
-    <listitem>
-     <para>Make sure OpenAM has at least 1 GB heap.</para>
-    </listitem>
-   </varlistentry>
-  </variablelist>
+  <para>Before you deploy OpenAM, update the JVM options as described in
+  <xref linkend="prepare-java" />.</para>
  </section>
 
  <section xml:id="prepare-jboss-7">
@@ -848,22 +865,9 @@ $ cat WEB-INF/jboss-web.xml</screen>
        </listitem>
       </varlistentry>
       <varlistentry>
-       <term><literal>-server</literal></term>
+       <term>Additional Options</term>
        <listitem>
-        <para>Use <literal>-server</literal> rather than
-        <literal>-client</literal>.</para>
-       </listitem>
-      </varlistentry>
-      <varlistentry>
-       <term><literal>-XX:MaxPermSize=256m</literal></term>
-       <listitem>
-        <para>Set the permanent generation size to 256 MB.</para>
-       </listitem>
-      </varlistentry>
-      <varlistentry>
-       <term><literal>-Xmx1024m</literal></term>
-       <listitem>
-        <para>Make sure OpenAM has at least 1 GB heap.</para>
+        <para>See <xref linkend="prepare-java" /> for details.</para>
        </listitem>
       </varlistentry>
      </variablelist>
@@ -874,59 +878,28 @@ $ cat WEB-INF/jboss-web.xml</screen>
  <section xml:id="prepare-jetty-7">
   <title>Preparing Jetty 7</title>
 
-  <para>When you deploy OpenAM, make sure you start Jetty with enough memory.
-  OpenAM core services require a minimum JVM heap size of 1 GB, and a
-  permanent generation size of 256 MB.</para>
+  <para>When you deploy OpenAM, make sure you start Jetty with enough
+  memory.</para>
 
   <screen>$ cd /path/to/jetty
 $ java -server -Xmx1024m -XX:MaxPermSize=256m -jar start.jar</screen>
+
+  <para>For details on the JVM options to use, see
+  <xref linkend="prepare-java" />.</para>
  </section>
 
  <section xml:id="prepare-oracle-weblogic">
   <title>Preparing Oracle WebLogic</title>
 
-  <para>Before you deploy OpenAM, update these JVM options.</para>
-
-  <variablelist>
-   <varlistentry>
-    <term><literal>-server</literal></term>
-    <listitem>
-     <para>Use <literal>-server</literal> rather than
-     <literal>-client</literal>.</para>
-    </listitem>
-   </varlistentry>
-   <varlistentry>
-    <term><literal>-XX:MaxPermSize=256m</literal></term>
-    <listitem>
-     <para>Set the permanent generation size to 256 MB.</para>
-    </listitem>
-   </varlistentry>
-   <varlistentry>
-    <term><literal>-Xmx1024m</literal></term>
-    <listitem>
-     <para>Make sure OpenAM has at least 1 GB heap.</para>
-    </listitem>
-   </varlistentry>
-  </variablelist>
+  <para>Before you deploy OpenAM, update the JVM options as described in
+  <xref linkend="prepare-java" />.</para>
  </section>
 
  <section xml:id="prepare-ibm-websphere">
   <title>Preparing IBM<superscript>®</superscript> WebSphere<superscript>®</superscript></title>
 
-  <para>Before you deploy OpenAM, add these JVM parameters in the Administrator console.</para>
-
-  <variablelist>
-   <varlistentry>
-    <term><literal>Generic JVM arguments</literal></term>
-    <listitem>
-     <para>-DamCryptoDescriptor.provider=IBMJCE</para>
-     <para>-DamKeyGenDescriptor.provider=IBMJCE</para>
-    </listitem>
-   </varlistentry>
-  </variablelist>
-
-  <para>Make sure OpenAM has at least 1 GB heap.</para>
-
+  <para>Before you deploy OpenAM, use the Administrator console to update
+  JVM options as described in <xref linkend="prepare-java" />.</para>
  </section>
 
 </chapter>
