@@ -1,7 +1,7 @@
 /**
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright (c) 2010 ForgeRock AS. All Rights Reserved
+ * Copyright (c) 2010-2013 ForgeRock AS. All Rights Reserved
  *
  * The contents of this file are subject to the terms
  * of the Common Development and Distribution License
@@ -69,17 +69,11 @@ public class SsoServerConnPoolSvcImpl extends SsoServerConnPoolSvc {
         }
     }
 
-    public void adjustCurrentConnections(int diff) {
-        NumConnUsedCurrent += diff;
-        if (NumConnUsedCurrent < NumConnUsedLowWaterMark) {
-            NumConnUsedLowWaterMark = NumConnUsedCurrent;
-        }
-        if (NumConnUsedHighWaterMark < NumConnUsedCurrent) {
-            NumConnUsedHighWaterMark = NumConnUsedCurrent;
-        }
-    }
-
     public void incReleasedConns() {
         NumConnReleased++;
+    }
+    
+    public void setUsedConnections(int newVal) {
+    	NumConnUsedCurrent = newVal;
     }
 }

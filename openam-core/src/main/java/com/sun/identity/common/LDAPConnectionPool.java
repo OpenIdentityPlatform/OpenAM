@@ -459,7 +459,7 @@ public class LDAPConnectionPool {
             try {
                 con = createConnection(LDAPConnPoolUtils.connectionPoolsStatus);
                 backupPool.add(con);
-                adjustCurrentConnections(+1);
+                adjustCurrentConnections(1);
                 adjustBusyConnections(1);
             } catch(Exception ex) {
                 debug.error("LDAPConnection pool:" + name +
@@ -467,15 +467,20 @@ public class LDAPConnectionPool {
             }
         } else {
             if (currentConnectionCount > busyConnectionCount) {
-                con = pool[currentConnectionCount - busyConnectionCount - 1];
-                pool[currentConnectionCount - busyConnectionCount - 1] = null;
-                adjustBusyConnections(1);
-                currentPool.remove(con);
-                if ((cleaner != null) && 
-                    ((currentConnectionCount - busyConnectionCount) >=
-                    minSize)) {
-                    cleaner.removeElement(null);
-                }
+            	int index = currentConnectionCount - busyConnectionCount;
+            	if (index <= pool.length) {
+            	    con = pool[index - 1];
+                    pool[index - 1] = null;
+                    adjustBusyConnections(1);
+                    currentPool.remove(con);
+                    if ((cleaner != null) && 
+                        (index >= minSize)) {
+                        cleaner.removeElement(null);
+                    }
+            	} else {
+            	    debug.error("LDAPConnection pool:" + name +
+                    ":Error getting connection. pool size too small");
+            	} 
             }
         }
         return con;
@@ -643,8 +648,8 @@ public class LDAPConnectionPool {
             backupPool.add(pool[i]);
             currentPool.add(pool[i]);
         }
-        adjustCurrentConnections(minSize);
-        busyConnectionCount = 0;
+        currentConnectionCount = minSize;
+        setBusyConnectionCount(0);
         waitCount = 0;
     }
 
@@ -1297,10 +1302,14 @@ public class LDAPConnectionPool {
 
     private void adjustCurrentConnections(int diff) {
         currentConnectionCount += diff;
-        if (MonitoringUtil.isRunning()) {
+    }
+
+    private void setBusyConnectionCount(int newVal) {
+    	busyConnectionCount = newVal;
+    	if (MonitoringUtil.isRunning()) {
             SsoServerConnPoolSvcImpl monitor = Agent.getConnPoolSvcMBean();
-            monitor.adjustCurrentConnections(diff);
-        }
+            monitor.setUsedConnections(newVal);
+    	}
     }
 
     private void incReleasedConns() {
