@@ -653,7 +653,7 @@ public class LDAPConnectionPool {
         waitCount = 0;
     }
 
-    private LDAPConnection createConnection(HashMap aConnectionPoolsStatus)
+    private LDAPConnection createConnection(Map<String, LDAPConnectionPool> aConnectionPoolsStatus)
         throws LDAPException {
 
         // Make LDAP connection, using template if available
@@ -703,9 +703,7 @@ public class LDAPConnectionPool {
                         // Mark the host to be down and failover
                         // to the next server in line.
                         if (aConnectionPoolsStatus != null) {
-                            synchronized(aConnectionPoolsStatus) {
-                                aConnectionPoolsStatus.put(key, this);
-                            }
+                            aConnectionPoolsStatus.put(key, this);
                         }
                         if (debug.messageEnabled()) {
                             debug.message("LDAPConnectionPool: "+
@@ -727,9 +725,7 @@ public class LDAPConnectionPool {
             // Mark the host to be down and failover
             // to the next server in line.
             if (aConnectionPoolsStatus != null) {
-                synchronized(aConnectionPoolsStatus) {
-                    aConnectionPoolsStatus.put(key, this);
-                }
+                aConnectionPoolsStatus.put(key, this);
             }
             throw le;
         }
@@ -1067,9 +1063,7 @@ public class LDAPConnectionPool {
         String downKey = name + ":" + ld.getHost() + ":" +
             ld.getPort() + ":" + authdn;
         if (LDAPConnPoolUtils.connectionPoolsStatus != null) {
-            synchronized(LDAPConnPoolUtils.connectionPoolsStatus) {
-                LDAPConnPoolUtils.connectionPoolsStatus.put(downKey, this);
-            }
+            LDAPConnPoolUtils.connectionPoolsStatus.put(downKey, this);
         }
 
         for (int i = 0; i < size; i++) {
@@ -1146,11 +1140,8 @@ public class LDAPConnectionPool {
             // from the hashmap to denote that the server which was
             // down earlier is up now.
             if (LDAPConnPoolUtils.connectionPoolsStatus != null) {
-                synchronized(LDAPConnPoolUtils.connectionPoolsStatus) {
-                    if (LDAPConnPoolUtils.connectionPoolsStatus.containsKey(
-                        upKey)) {
-                        LDAPConnPoolUtils.connectionPoolsStatus.remove(upKey);
-                    }
+                if (LDAPConnPoolUtils.connectionPoolsStatus.containsKey(upKey)) {
+                    LDAPConnPoolUtils.connectionPoolsStatus.remove(upKey);
                 }
             }
             if (debug.messageEnabled()) {
@@ -1180,14 +1171,7 @@ public class LDAPConnectionPool {
                         } else {
                             // Mark the host to be down and failover
                             // to the next server in line.
-                            if (LDAPConnPoolUtils.
-                                connectionPoolsStatus != null) {
-                                synchronized(LDAPConnPoolUtils.
-                                    connectionPoolsStatus) {
-                                    LDAPConnPoolUtils.
-                                    connectionPoolsStatus.put(upKey, this);
-                                }
-                            }
+                            LDAPConnPoolUtils.connectionPoolsStatus.put(upKey, this);
                             debug.message("LDAPConnectionPool."+
                                 "failoverAndfallback():primary host-" +
                                 upHost +" primary port-" + upPort +
@@ -1206,11 +1190,7 @@ public class LDAPConnectionPool {
                          // Mark the host to be down and failover
                          // to the next server in line.
                          if (LDAPConnPoolUtils.connectionPoolsStatus != null) {
-                             synchronized(LDAPConnPoolUtils.
-                                 connectionPoolsStatus) {
-                                 LDAPConnPoolUtils.connectionPoolsStatus.put(
-                                 upKey, this);
-                             }
+                             LDAPConnPoolUtils.connectionPoolsStatus.put(upKey, this);
                          }
                          debug.message("LDAPConnectionPool. "+
                              "failoverAndfallback():primary host-" + upHost +
@@ -1234,11 +1214,8 @@ public class LDAPConnectionPool {
             && (upPort != null) && (upPort.length() != 0) ) {
             String upKey = name + ":" + upHost + ":" +upPort + ":" + authdn;
             if (LDAPConnPoolUtils.connectionPoolsStatus != null) {
-                synchronized(LDAPConnPoolUtils.connectionPoolsStatus) {
-                    if (!LDAPConnPoolUtils.connectionPoolsStatus.
-                        containsKey(upKey)) {
-                        retVal = true;
-                    }
+                if (!LDAPConnPoolUtils.connectionPoolsStatus.containsKey(upKey)) {
+                    retVal = true;
                 }
             }
         }

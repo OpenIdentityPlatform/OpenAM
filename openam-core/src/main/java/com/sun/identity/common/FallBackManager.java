@@ -26,6 +26,9 @@
  *
  */
 
+/*
+ * Portions Copyrighted 2013 ForgeRock AS
+ */
 package com.sun.identity.common;
 
 import java.util.*;
@@ -121,7 +124,6 @@ public class FallBackManager extends GeneralTaskRunnable {
         try {
             if ( (LDAPConnPoolUtils.connectionPoolsStatus != null)
                 && (!LDAPConnPoolUtils.connectionPoolsStatus.isEmpty()) ) {
-                synchronized (LDAPConnPoolUtils.connectionPoolsStatus) {
                     Set keyset1 = LDAPConnPoolUtils.connectionPoolsStatus
                         .keySet();
                     Iterator iter1 = keyset1.iterator();
@@ -170,7 +172,6 @@ public class FallBackManager extends GeneralTaskRunnable {
                             }
                         }
                     }
-                }
             }
         } catch (Exception exp) {
             debug.error("FallBackManager:Error in FallBack Manager Thread",

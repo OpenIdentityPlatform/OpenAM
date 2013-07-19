@@ -26,9 +26,13 @@
  *
  */
 
+/*
+ * Portions Copyrighted 2013 ForgeRock AS
+ */
 package com.sun.identity.common;
 
-import java.util.HashMap;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.Map;
 
 /**
  * Class to maintain a map of individual connection status to the
@@ -37,5 +41,6 @@ import java.util.HashMap;
 
 public class LDAPConnPoolUtils {
  
-    static HashMap connectionPoolsStatus = new HashMap();
+    static Map<String, LDAPConnectionPool> connectionPoolsStatus = 
+        new ConcurrentHashMap<String, LDAPConnectionPool>();
 }
