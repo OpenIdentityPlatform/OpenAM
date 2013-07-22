@@ -26,6 +26,9 @@
  *
  */
 
+/*
+ * Portions Copyrighted 2013 ForgeRock AS
+ */
 package com.sun.identity.protocol;
 
 import javax.net.ssl.KeyManager;
@@ -46,40 +49,42 @@ import com.sun.identity.security.SecurityDebug;
  */
 
 public class SSLSocketFactoryManager {
-    static private String keyStore = null;
-    static private AMX509KeyManager amKeyMgr = null;
-    static private KeyManager[] keyMgr = null;
-    static private TrustManager[] amTrustMgr = null;
-    static private SSLContext ctx = null;
+
+    private static AMX509KeyManager amKeyMgr = null;
+    private static SSLContext ctx = null;
 	
     static {
-        keyStore = System.getProperty("javax.net.ssl.keyStore", null);
-
+        KeyManager[] keyMgr = null;
+        String keyStore = System.getProperty("javax.net.ssl.keyStore", null);
     	try {
     	    if (keyStore != null) {
                 amKeyMgr = AMX509KeyManagerFactory.createAMX509KeyManager();
-        	keyMgr = new KeyManager[] { amKeyMgr };
-    	    }
+        	    keyMgr = new KeyManager[] { amKeyMgr };
+    	    } else {
+                if (SecurityDebug.debug.messageEnabled()) {
+                    SecurityDebug.debug.message("SSLSocketFactoryManager: no keyStore specified, amKeyMgr will be null");
+                }
+            }
     	    
-    	    amTrustMgr = new TrustManager[] { new AMX509TrustManager() };
+            TrustManager[] amTrustMgr = new TrustManager[] { new AMX509TrustManager() };
 	
     	    ctx = SSLContext.getInstance("SSL");
     	    ctx.init(keyMgr, amTrustMgr, null);
-	} catch (Exception e) {
-	    SecurityDebug.debug.error(
-                "Exception in SSLSocketFactoryManager.init()" + e.toString());
-	}
+        } catch (Exception e) {
+            SecurityDebug.debug.error("Exception in SSLSocketFactoryManager static initializer" + e.getMessage(), e);
+        }
     }
 
-    static public SSLSocketFactory getSocketFactory() {
-	SSLSocketFactory sf = null;
-	if (ctx != null) {
+    public static SSLSocketFactory getSocketFactory() {
+
+        SSLSocketFactory sf = null;
+	    if (ctx != null) {
             sf = ctx.getSocketFactory();
-	}
+	    }
         return sf;
     }
 
-    static public AMX509KeyManager getKeyStoreMgr() {
+    public static AMX509KeyManager getKeyStoreMgr() {
         return amKeyMgr;
     }
 }

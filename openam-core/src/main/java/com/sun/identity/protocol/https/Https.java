@@ -27,40 +27,52 @@
  */
 
 /*
- * Portions Copyrighted [2011] [ForgeRock AS]
+ * Portions Copyrighted 2011-2013 ForgeRock AS
  */
 package com.sun.identity.protocol.https;
 
 import javax.net.ssl.HttpsURLConnection;
-import javax.net.ssl.SSLContext;
 import javax.net.ssl.SSLSocketFactory;
 
 
+import com.sun.identity.security.keystore.AMX509KeyManager;
 import com.sun.identity.shared.debug.Debug;
 import com.sun.identity.protocol.SSLSocketFactoryManager;
 
 public class Https {
-    static private SSLSocketFactory sf = null;
-    static private SSLContext ctx = null;
-    static private Debug debug = Debug.getInstance("amJSSE");
+
+    private static Debug debug = Debug.getInstance("amJSSE");
 	
     static {
-	try {
-            sf = SSLSocketFactoryManager.getSocketFactory();
+        try {
+            SSLSocketFactory sf = SSLSocketFactoryManager.getSocketFactory();
             HttpsURLConnection.setDefaultSSLSocketFactory(sf);
-            HttpsURLConnection.setDefaultHostnameVerifier(
-                    new AMHostnameVerifier());
-	} catch (Exception e) {
-            debug.error("Exception in Https.init()" + e.toString());
-	}
+            HttpsURLConnection.setDefaultHostnameVerifier(new AMHostnameVerifier());
+        } catch (Exception e) {
+            debug.error("Exception in Https static initializer " + e.getMessage(), e);
+        }
     }
 
-    static public void init() {
-	init(null);
+    public static void init() {
+	    init(null);
     }
 	
-    static public void init(String alias) {
-	SSLSocketFactoryManager.getKeyStoreMgr().setAlias(alias);
+    public static void init(String alias) {
+
+        if (alias != null && !alias.trim().isEmpty()) {
+            AMX509KeyManager manager = SSLSocketFactoryManager.getKeyStoreMgr();
+            if (manager != null) {
+                manager.setAlias(alias);
+            } else {
+                if (debug.messageEnabled()) {
+                    debug.message("Https.init: AMX509KeyManager was null when trying to set alias: " + alias);
+                }
+            }
+        } else {
+            if (debug.messageEnabled()) {
+                debug.message("Https.init: Alias was null or empty");
+            }
+        }
     }
 }
 
