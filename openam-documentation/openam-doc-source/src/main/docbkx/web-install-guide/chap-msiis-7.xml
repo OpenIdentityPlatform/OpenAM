@@ -356,8 +356,7 @@ Internet services successfully restarted</screen>
     <term>Microsoft Support Issue: 841215</term>
     <listitem>
      <para>Link: <link xlink:show="new"
-     xlink:href="http://support.microsoft.com/kb/841215"
-     >http://support.microsoft.com/kb/841215</link></para>
+     xlink:href="http://support.microsoft.com/kb/841215" /></para>
      <para>Description: Error message when you try to connect to a Windows
      SharePoint document library: "System error 5 has occurred"</para>
      <para>Summary: Enable Basic Authentication on the client computer.</para>
@@ -368,8 +367,7 @@ Internet services successfully restarted</screen>
     <term>Microsoft Support Issue: 870853</term>
     <listitem>
      <para>Link: <link xlink:show="new"
-     xlink:href="http://support.microsoft.com/kb/870853"
-     >http://support.microsoft.com/kb/870853</link></para>
+     xlink:href="http://support.microsoft.com/kb/870853" /></para>
      <para>Description: Office 2003 and 2007 Office documents open read-only
      in Internet Explorer</para>
      <para>Summary: Add registry keys as described in Microsoft's support
@@ -381,8 +379,7 @@ Internet services successfully restarted</screen>
     <term>Microsoft Support Issue: 928692</term>
     <listitem>
      <para>Link: <link xlink:show="new"
-     xlink:href="http://support.microsoft.com/kb/928692"
-     >http://support.microsoft.com/kb/928692</link></para>
+     xlink:href="http://support.microsoft.com/kb/928692" /></para>
      <para>Description: Error message when you open a Web site by using Basic
      authentication in Expression Web on a computer that is running Windows
      Vista: "The folder name is not valid"</para>
@@ -395,8 +392,7 @@ Internet services successfully restarted</screen>
     <term>Microsoft Support Issue: 932118</term>
     <listitem>
      <para>Link: <link xlink:show="new"
-     xlink:href="http://support.microsoft.com/kb/932118"
-     >http://support.microsoft.com/kb/932118</link></para>
+     xlink:href="http://support.microsoft.com/kb/932118" /></para>
      <para>Description: Persistent cookies are not shared between Internet
      Explorer and Office applications</para>
      <para>Summary: Add the web site the list of trusted sites.</para>
@@ -407,8 +403,7 @@ Internet services successfully restarted</screen>
     <term>Microsoft Support Issue: 943280</term>
     <listitem>
      <para>Link: <link xlink:show="new"
-     xlink:href="http://support.microsoft.com/kb/943280"
-     >http://support.microsoft.com/kb/943280</link></para>
+     xlink:href="http://support.microsoft.com/kb/943280" /></para>
      <para>Description: Prompt for Credentials When Accessing FQDN Sites From a
      Windows Vista or Windows 7 Computer</para>
      <para>Summary: Edit the registry as described in Microsoft's support
@@ -420,8 +415,7 @@ Internet services successfully restarted</screen>
     <term>Microsoft Support Issue: 968851</term>
     <listitem>
      <para>Link: <link xlink:show="new"
-     xlink:href="http://support.microsoft.com/kb/968851"
-     >http://support.microsoft.com/kb/968851</link></para>
+     xlink:href="http://support.microsoft.com/kb/968851" /></para>
      <para>Description: SharePoint Server 2007 Cumulative Update Server
      Hotfix Package (MOSS server-package): April 30, 2009</para>
      <para>Summary: Apply the fix from Microsoft if you use SharePoint.</para>
@@ -432,8 +426,7 @@ Internet services successfully restarted</screen>
     <term>Microsoft Support Issue: 2123563</term>
     <listitem>
      <para>Link: <link xlink:show="new"
-     xlink:href="http://support.microsoft.com/kb/2123563"
-     >http://support.microsoft.com/kb/2123563</link></para>
+     xlink:href="http://support.microsoft.com/kb/2123563" /></para>
      <para>Description: You cannot open Office file types directly from a
      server that supports only Basic authentication over a non-SSL
      connection</para>
