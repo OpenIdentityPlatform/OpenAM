@@ -25,14 +25,17 @@
 # This script creates the cut down OpenDJ.zip for inclusion in the build
 # OpenDJ libraries must be copied into extlib manually
 
+#Portions Copyrighted 2013 ForgeRock, AS.
+
 SED=`which sed`
 UNZIP=`which unzip`
 ZIP=`which zip`
 ZIP_FILE=opendj.zip
 LIST=opendj_inclusion_list
-LDIF=ldif
+LDIF=template/ldif/
 LDIF_FILE=openam_suffix.ldif.template
-CONFIG=config/config.ldif
+CONFIG=template/config/config.ldif
+CONFIG_UPGRADE_DIR=./template/config/upgrade/
 
 if [ -z ${@} ] ; then
        echo "Error! No command line argument supplied"
@@ -43,9 +46,22 @@ fi
 PWD=`pwd`
 cd "${@}"
 cp ../${LDIF_FILE} ${LDIF}
-for i in ${CONFIG} config/upgrade/config.ldif.* ; do
+for i in ${CONFIG} template/config/config.ldif ; do
         ${SED} -i -e '/dn: cn=SNMP/,/^$/d' $i
 done
+
+#strip out the HTTP Connection Handler class so we don't get a classloader issues with tomcat 6
+#and we can use a smaller set of jars
+for i in ${CONFIG} template/config/config.ldif ; do
+        ${SED} -i -e '/dn: cn=HTTP/,/^$/d' $i
+done
+
+#add a config.ldif.${VERSION_NO} file to the upgrade
+#directory for easy upgrading from Pre-OPENDJ2.4.5 versions
+VERSION_NO=`ls ${CONFIG_UPGRADE_DIR} | sed s/"[a-z/.]*//"`
+
+cp ${CONFIG} ${CONFIG_UPGRADE_DIR}"config.ldif."$VERSION_NO
+
 ${ZIP} -r -i@../${LIST} ../${ZIP_FILE} .
 cd ${PWD}
 

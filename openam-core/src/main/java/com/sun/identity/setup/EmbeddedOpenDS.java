@@ -211,39 +211,9 @@ public class EmbeddedOpenDS {
             }
         } // End of File Elements from Zip for OpenDJ.
 
-        // copy OpenDJ jar file
-        // TODO Make this Dynamic, so we can eliminate versions on Jars.
-        String[] opendsJarFiles = {
-                "opendj-server-2.4.6.jar",     // Was OpenDJ.jar before Maven Support.
-                "sleepycat-je-2011-04-07.jar",          // Was je.jar before Maven Support.
-                "mail-1.4.5.jar"                        // Was mail.jar before Maven Support.
-        };
-        String[] NewOpendsJarFiles = {                 // We use this table to rename the files
-                "opendj-server.jar",                   // Since OpenDJ seems to need je.jar by name
-                "je.jar",
-                "mail-1.4.5.jar"
-        };
-
-        for (int i = 0; i < opendsJarFiles.length; i++) {
-            String jarFileName = "/WEB-INF/lib/" + opendsJarFiles[i];
-            ReadableByteChannel inChannel = Channels.newChannel(AMSetupServlet.getResourceAsStream(servletCtx, jarFileName));
-            FileChannel outChannel = new FileOutputStream(odsRoot + "/lib/" + NewOpendsJarFiles[i]).getChannel();
-
-            try {
-                channelCopy(inChannel, outChannel);
-            } catch (IOException ioe) {
-                Debug.getInstance(SetupConstants.DEBUG_NAME).error(
-                        "EmbeddedOpenDS.setup(): Error copying zip file", ioe);
-                throw ioe;
-            } finally {
-                IOUtils.closeIfNotNull(inChannel);
-                IOUtils.closeIfNotNull(outChannel);
-            }
-        }
-
         // create tag swapped files
         String[] tagSwapFiles = {
-                "ldif/openam_suffix.ldif.template"
+                "template/ldif/openam_suffix.ldif.template"
         };
 
         for (int i = 0; i < tagSwapFiles.length; i++) {
@@ -275,7 +245,7 @@ public class EmbeddedOpenDS {
 
         // ****************************************************
         // Copy in additional Schemata Definitions.
-        copyFiles(additionalSchemaToBeApplied, odsRoot + "/config/schema/", servletCtx);
+        copyFiles(additionalSchemaToBeApplied, odsRoot + "/template/config/schema/", servletCtx);
 
         // remove zip
         File toDelete = new File(odsRoot + "/opendj.zip");
@@ -480,11 +450,9 @@ public class EmbeddedOpenDS {
                 "--jmxPort",                    // 12
                 "1689",                         // 13
                 "--no-prompt",                  // 14
-                "--configFile",                 // 15
-                "/path/to/config.ldif",         // 16
-                "--doNotStart",                 // 17
-                "--hostname",                   // 18
-                "hostname"                      // 19
+                "--doNotStart",                 // 15
+                "--hostname",                   // 16
+                "hostname"                      // 17
         };
 
         setupCmd[2] = (String) map.get(SetupConstants.CONFIG_VAR_DIRECTORY_ADMIN_SERVER_PORT);
@@ -492,8 +460,7 @@ public class EmbeddedOpenDS {
         setupCmd[6] = (String) map.get(SetupConstants.CONFIG_VAR_DS_MGR_DN);
         setupCmd[8] = (String) map.get(SetupConstants.CONFIG_VAR_DIRECTORY_SERVER_PORT);
         setupCmd[13] = (String) map.get(SetupConstants.CONFIG_VAR_DIRECTORY_JMX_SERVER_PORT);
-        setupCmd[16] = getOpenDJConfigFile(map);
-        setupCmd[19] = getOpenDJHostName(map);
+        setupCmd[17] = getOpenDJHostName(map);
 
         Object[] params = {concat(setupCmd)};
         SetupProgress.reportStart("emb.setupcommand", params);
@@ -501,7 +468,7 @@ public class EmbeddedOpenDS {
         setupCmd[11] = (String) map.get(SetupConstants.CONFIG_VAR_DS_MGR_PWD);
 
         int ret = InstallDS.mainCLI(
-                setupCmd, true,
+                setupCmd,
                 SetupProgress.getOutputStream(),
                 SetupProgress.getOutputStream(),
                 null);
@@ -1394,6 +1361,7 @@ public class EmbeddedOpenDS {
         int ret = 0;
         shutdownServer("Rebuild index");
         Debug debug = Debug.getInstance(SetupConstants.DEBUG_NAME);
+
         String[] args = {
                 "--configClass",
                 "org.opends.server.extensions.ConfigFileHandler",

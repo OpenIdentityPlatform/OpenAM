@@ -23,11 +23,16 @@
  *
  */
 
+/*
+   Portions Copyrighted 2013 ForgeRock, AS.
+ */
+
 package org.forgerock.openam.upgrade;
 
 import com.sun.identity.setup.AMSetupServlet;
 import com.sun.identity.setup.SetupConstants;
 import com.sun.identity.shared.debug.Debug;
+
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
 import java.io.ByteArrayOutputStream;
@@ -39,6 +44,11 @@ import java.io.FilenameFilter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
+import java.io.FileReader;
+import java.io.FileWriter;
+import java.io.FileNotFoundException;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.NavigableSet;
@@ -47,6 +57,7 @@ import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 
 import javax.servlet.ServletContext;
+
 import org.forgerock.opendj.ldap.Attribute;
 import org.forgerock.opendj.ldap.ByteString;
 import org.forgerock.opendj.ldap.DN;
@@ -58,9 +69,9 @@ import org.forgerock.opendj.ldif.EntryReader;
 import org.forgerock.opendj.ldif.LDIF;
 import org.forgerock.opendj.ldif.LDIFEntryReader;
 import org.forgerock.opendj.ldif.LDIFEntryWriter;
+import org.opends.server.core.LockFileManager;
 import org.opends.server.tools.RebuildIndex;
 import org.opends.server.util.TimeThread;
-
 
 
 /**
@@ -105,6 +116,8 @@ public final class OpenDJUpgrader {
     private final int currentVersion;
     private final int newVersion;
     private final ServletContext servletCtx;
+    private final int dj245Version = 7743;
+    private final int dj246Version = 8102;
 
     /**
      * Creates a new OpenDJ upgrader.
@@ -132,30 +145,6 @@ public final class OpenDJUpgrader {
     }
 
     /**
-     * Returns the revision number associated with the version of OpenDS/OpenDJ
-     * that was last used by OpenAM. Note that if an upgrade has partially
-     * completed then the returned revision number will still be accurate, i.e. it
-     * will not reference the new version.
-     *
-     * @return The revision number associated with the version of OpenDS/OpenDJ
-     *         that was last used by OpenAM.
-     */
-    public int getCurrentVersion() {
-        return currentVersion;
-    }
-
-    /**
-     * Returns the revision number associated with the version of OpenDJ contained
-     * in the OpenAM WAR file.
-     *
-     * @return The revision number associated with the version of OpenDJ contained
-     *         in the OpenAM WAR file.
-     */
-    public int getNewVersion() {
-        return newVersion;
-    }
-
-    /**
      * Returns {@code true} if the version of OpenDJ contained in the OpenAM WAR
      * file is more recent (newer) than the the version of OpenDS/OpenDJ last used
      * by OpenAM.
@@ -167,8 +156,8 @@ public final class OpenDJUpgrader {
     }
 
     /**
-     * Upgrades the embedded OpenDS instance to OpenDJ 2.4.4. See the class
-     * description for me detailed information.
+     * Upgrades the embedded DS instance to OpenDJ 2.6 See the class
+     * description for more detailed information.
      *
      * @throws Exception
      *           If an unexpected exception occurred.
@@ -183,20 +172,65 @@ public final class OpenDJUpgrader {
         // Create a marker file which will be removed only on completion.
         upgradeMarker.createNewFile();
 
-        // First back up customized configuration files.
-        backupFile("config/config.ldif");
-        backupFile("config/admin-backend.ldif");
-        backupFile("config/java.properties");
+        // Check DS version if it is less than 2.4.5
+        // then use the old method to upgrade
+        if (currentVersion < dj245Version) {
 
-        // Unpack opendj.zip over the top of the existing installation.
-        unpackZipFile();
+            // First back up customized configuration files.
+            backupFile("config/config.ldif");
+            backupFile("config/admin-backend.ldif");
+            backupFile("config/java.properties");
 
-        // Copy remaining JAR files.
-        copyFileFromWAR("lib/opendj-server-2.4.6.jar");           // Was OpenDJ.jar before Maven Support.
-        copyFileFromWAR("lib/sleepycat-je-2011-04-07.jar");            // Was je.jar before Maven Support.
-        copyFileFromWAR("lib/mail-1.4.5.jar");                 // Was mail.jar before Maven Support.
+            // Unpack opendj.zip over the top of the existing installation.
+            unpackZipFile(true);
+            callOldDJUpgrade();
+        } else {
+            // Unpack opendj.zip over the top of the existing installation.
+            unpackZipFile(false);
 
-        // Delete files which are no longer needed.
+            // check if this is OpenAM10.10/OpenDJ 2.4.6 and if so
+            // delete the cts-add schema.  See AME-932
+            if (currentVersion == dj246Version) {
+                try {
+                    File badSchema = new File(installRoot + File.separator + "config"
+                            + File.separator + "schema" + File.separator + "cts-add-schema.ldif");
+                    badSchema.delete();
+                } catch (Exception e) {
+                    // do nothing here, we don't care if the file
+                    // doesn't exist
+                }
+                // copy replacement over
+                File goodSchema = new File(servletCtx.getRealPath(File.separator + "WEB-INF" + File.separator +
+                        "template" + File.separator + "ldif" + File.separator +"sfha" + File.separator +
+                        "cts-add-schema.ldif"));
+                File moveTo = new File(installRoot+ File.separator + "config"+ File.separator +
+                        "schema" + File.separator + "cts-add-schema.ldif");
+                copy(goodSchema, moveTo);
+            }
+
+
+
+            // call the new OpenDJ upgrade mechanism
+            int ret = callDJUpgradeMechanism();
+
+            if (ret == 0) {
+                message("Upgrade completed successfully");
+                upgradeMarker.delete();
+
+                // Attempt to release the server lock, OpenDJ does not do this after an upgrade
+                // Work around for OPENDJ-1078
+                final String lockFile = LockFileManager.getServerLockFileName();
+                LockFileManager.releaseLock(lockFile, new StringBuilder());
+
+                // Work around for OPENDJ-1079
+                fixDJConfig();
+            } else {
+                throw new Exception("OpenDJ upgrade failed with code:  "+ret);
+            }
+        }
+    }
+
+    private void callOldDJUpgrade() throws Exception{
         deleteFile("lib/OpenDS.jar");
         deleteFile("lib/OpenDJ.jar");
         deleteFile("lib/activation.jar");
@@ -220,8 +254,73 @@ public final class OpenDJUpgrader {
         upgradeMarker.delete();
     }
 
+    private int callDJUpgradeMechanism() {
+
+        final String[] args = {
+                "--configClass", "org.opends.server.extensions.ConfigFileHandler",
+                "--configFile", installRoot + "/config/config.ldif",
+                "--acceptLicense",
+                "--force",
+                "--no-prompt"
+        };
+        // put system properties out in the env so DJ knows where it's at
+
+        System.setProperty("INSTALL_ROOT", installRoot);
+        System.setProperty("org.opends.server.ServerRoot", installRoot);
+        return org.opends.server.tools.upgrade.UpgradeCli.main(args, true, System.out, System.err);
+    }
+
+
+    // Work around for OPENDJ-1079 is to remove the HTTP Connection Handler from the
+    // config.  This entry breaks Tomcat6/OpenAM and must be removed
+
+    private void fixDJConfig() {
+        File readConfig = new File(installRoot+"/config/config.ldif");
+        File writeConfig = new File(installRoot+"/config/config.ldif.UPDATED");
+
+        String currentLine;
+        String targetLine = new String("dn: cn=HTTP Connection Handler");
+
+        BufferedReader read = null;
+        BufferedWriter write = null;
+
+        try {
+            read = new BufferedReader(
+                    new FileReader(readConfig));
+
+            write = new BufferedWriter(
+                    new FileWriter(writeConfig));
+
+            while ((currentLine = read.readLine()) != null) {
+                if (currentLine.contains(targetLine)) {
+                    while(((currentLine = read.readLine()) != null) &&
+                            (currentLine.length() != 0)) {
+                        // skip lines in the target dn
+                        continue;
+                    }
+                } else {
+                    // write out the lines we're not interested in
+                    write.write(currentLine+"\n");
+                }
+            }
+
+            // delete old config and rename new config
+            readConfig.delete();
+            writeConfig.renameTo(new File(installRoot+"/config/config.ldif"));
+
+        } catch(FileNotFoundException fnfe) {
+            error("Could not find file:  "+fnfe.getMessage());
+        } catch (IOException ioe) {
+            error("Could not read/write file:  "+ioe.getMessage());
+        } finally {
+            closeIfNotNull(write);
+            closeIfNotNull(read);
+
+        }
+    }
+
     private void backupFile(final String fileName)
-    throws IOException {
+            throws IOException {
         message("Backing up file " + fileName + "...");
         final File currentFile = new File(installRoot, fileName);
         final File backupFile = getBackupFileName(fileName);
@@ -239,6 +338,95 @@ public final class OpenDJUpgrader {
             }
         }
     }
+
+    private void deleteFile(final String fileName) {
+        message("Deleting file " + fileName + "...");
+        final File file = new File(installRoot + "/" + fileName);
+
+        if (file.delete()) {
+            message("done");
+        } else {
+            // File may not exist - benign.
+            message("skipped (not found?)");
+        }
+    }
+
+    private void restoreFile(final String fileName)
+            throws IOException {
+        message("Restoring file " + fileName + "...");
+        final File currentFile = new File(installRoot, fileName);
+        final File backupFile = getBackupFileName(fileName);
+
+        try {
+            copy(backupFile, currentFile);
+            message("done");
+        } catch (final IOException ioe) {
+            // File may not exist - benign.
+            error("failed: ", ioe);
+            throw ioe;
+        }
+    }
+
+    private final void copy(final File from, final File to)
+            throws IOException {
+        FileInputStream is = null;
+        FileOutputStream os = null;
+
+        try {
+            is = new FileInputStream(from);
+            os = new FileOutputStream(to);
+            copy(is, os);
+        } finally {
+            closeIfNotNull(os);
+            closeIfNotNull(is);
+        }
+    }
+
+    private List<DN> findBaseDNs()
+            throws IOException {
+        final List<DN> baseDNs = new LinkedList<DN>();
+        final SearchRequest request = Requests.newSearchRequest(
+                "cn=backends,cn=config", SearchScope.WHOLE_SUBTREE,
+                "(objectclass=ds-cfg-local-db-backend)", "ds-cfg-base-dn");
+        FileInputStream is = null;
+        LDIFEntryReader reader = null;
+
+        try {
+            is = new FileInputStream(installRoot + "/config/config.ldif");
+            reader = new LDIFEntryReader(is);
+            final EntryReader filteredReader = LDIF.search(reader, request);
+
+            while (filteredReader.hasNext()) {
+                final Entry entry = filteredReader.readEntry();
+                final Attribute values = entry.getAttribute("ds-cfg-base-dn");
+
+                if (values != null) {
+                    for (final ByteString value : values) {
+                        baseDNs.add(DN.valueOf(value.toString()));
+                    }
+                }
+            }
+        } finally {
+            closeIfNotNull(reader);
+            closeIfNotNull(is);
+        }
+
+        return baseDNs;
+    }
+
+    private void copy(final InputStream from, final OutputStream to)
+            throws IOException {
+        final BufferedInputStream bis = new BufferedInputStream(from);
+        final BufferedOutputStream bos = new BufferedOutputStream(to);
+
+        for (int b = bis.read(); b != -1; b = bis.read()) {
+            bos.write(b);
+        }
+
+        bos.flush();
+    }
+
+
 
     private boolean checkUpgradePreconditions() {
         if (currentVersion == 0) {
@@ -268,106 +456,9 @@ public final class OpenDJUpgrader {
         return true;
     }
 
-    private final void copy(final File from, final File to)
-    throws IOException {
-        FileInputStream is = null;
-        FileOutputStream os = null;
-
-        try {
-            is = new FileInputStream(from);
-            os = new FileOutputStream(to);
-            copy(is, os);
-        } finally {
-            closeIfNotNull(os);
-            closeIfNotNull(is);
-        }
-    }
-
-    private void copy(final InputStream from, final OutputStream to)
-    throws IOException {
-        final BufferedInputStream bis = new BufferedInputStream(from);
-        final BufferedOutputStream bos = new BufferedOutputStream(to);
-        
-        for (int b = bis.read(); b != -1; b = bis.read()) {
-            bos.write(b);
-        }
-        
-        bos.flush();
-    }
-
-    private void copyFileFromWAR(final String fileName)
-    throws IOException {
-        message("Copying file " + fileName + " from WAR...");
-        InputStream is = null;
-        OutputStream os = null;
-
-        try {
-            is = AMSetupServlet.getResourceAsStream(servletCtx, "/WEB-INF/" + fileName);
-            os = new FileOutputStream(new File(installRoot + "/" + fileName));
-            copy(is, os);
-            message("done");
-        } catch (final IOException ioe) {
-            message("failed: " + ioe.getMessage());
-            throw ioe;
-        } finally {
-            closeIfNotNull(is);
-            closeIfNotNull(os);
-        }
-    }
-
-    private void deleteFile(final String fileName) {
-        message("Deleting file " + fileName + "...");
-        final File file = new File(installRoot + "/" + fileName);
-        
-        if (file.delete()) {
-            message("done");
-        } else {
-            // File may not exist - benign.
-            message("skipped (not found?)");
-        }
-    }
-
-    private List<DN> findBaseDNs()
-    throws IOException {
-        final List<DN> baseDNs = new LinkedList<DN>();
-        final SearchRequest request = Requests.newSearchRequest(
-            "cn=backends,cn=config", SearchScope.WHOLE_SUBTREE,
-            "(objectclass=ds-cfg-local-db-backend)", "ds-cfg-base-dn");
-        FileInputStream is = null;
-        LDIFEntryReader reader = null;
-        
-        try {
-            is = new FileInputStream(installRoot + "/config/config.ldif");
-            reader = new LDIFEntryReader(is);
-            final EntryReader filteredReader = LDIF.search(reader, request);
-
-            while (filteredReader.hasNext()) {
-                final Entry entry = filteredReader.readEntry();
-                final Attribute values = entry.getAttribute("ds-cfg-base-dn");
-
-                if (values != null) {
-                    for (final ByteString value : values) {
-                        baseDNs.add(DN.valueOf(value.toString()));
-                    }
-                }
-            }
-        } finally {
-            closeIfNotNull(reader);
-            closeIfNotNull(is);
-        }
-
-        return baseDNs;
-    }
-
-    private File getBackupFileName(final String fileName) {
-        final File backupFile = new File(installRoot, fileName + "."
-            + currentVersion + ".bak");
-        return backupFile;
-    }
-
     private NavigableSet<Integer> getVersionHistory() {
         final File upgradeDirName = new File(installRoot, "config/upgrade");
-        final String pattern = "config.ldif.";
+        final String pattern = "schema.ldif.";
         final NavigableSet<Integer> versions = new TreeSet<Integer>();
 
         // Always include 0 in order to avoid checking for empty/null.
@@ -412,37 +503,43 @@ public final class OpenDJUpgrader {
         Debug.getInstance(SetupConstants.DEBUG_NAME).error(msg, th);
     }
 
+    private File getBackupFileName(final String fileName) {
+        final File backupFile = new File(installRoot, fileName + "."
+                + currentVersion + ".bak");
+        return backupFile;
+    }
+
     private void patchConfiguration()
-    throws IOException {
+            throws IOException {
         message("Patching configuration config/config.ldif...");
         InputStream defaultCurrentConfig = null;
         InputStream defaultNewConfig = null;
         InputStream currentConfig = null;
         OutputStream newCurrentConfig = null;
-        
+
         try {
             defaultCurrentConfig = new FileInputStream(installRoot + "/"
-                + "config/upgrade/config.ldif." + currentVersion);
+                    + "config/upgrade/config.ldif." + currentVersion);
             defaultNewConfig = new FileInputStream(installRoot + "/"
-                + "config/upgrade/config.ldif." + newVersion);
+                    + "config/upgrade/config.ldif." + newVersion);
             currentConfig = new FileInputStream(
-                getBackupFileName("config/config.ldif"));
+                    getBackupFileName("config/config.ldif"));
             newCurrentConfig = new FileOutputStream(installRoot + "/"
-                + "config/config.ldif");
+                    + "config/config.ldif");
 
             final LDIFEntryReader defaultCurrentConfigReader = new LDIFEntryReader(
-                defaultCurrentConfig);
+                    defaultCurrentConfig);
             final LDIFEntryReader defaultNewConfigReader = new LDIFEntryReader(
-                defaultNewConfig);
+                    defaultNewConfig);
             final LDIFEntryReader currentConfigReader = new LDIFEntryReader(
-                currentConfig);
+                    currentConfig);
             final LDIFEntryWriter newConfigWriter = new LDIFEntryWriter(
-                newCurrentConfig);
+                    newCurrentConfig);
 
             LDIF.copyTo(
-                LDIF.patch(currentConfigReader,
-                    LDIF.diff(defaultCurrentConfigReader, defaultNewConfigReader)),
-                newConfigWriter);
+                    LDIF.patch(currentConfigReader,
+                            LDIF.diff(defaultCurrentConfigReader, defaultNewConfigReader)),
+                    newConfigWriter);
             newConfigWriter.flush();
             message("done");
         } catch (final IOException ioe) {
@@ -457,7 +554,7 @@ public final class OpenDJUpgrader {
     }
 
     private int readNewVersion() {
-        final String pattern = "config/upgrade/config.ldif.";
+        final String pattern = "template/config/upgrade/schema.ldif.";
 
         InputStream is = null;
         ZipInputStream zis = null;
@@ -493,56 +590,7 @@ public final class OpenDJUpgrader {
         return 0;
     }
 
-    private void rebuildAllIndexes(final DN baseDN)
-    throws Exception {
-        // @formatter:off
-        final String[] args = {
-            "--configClass", "org.opends.server.extensions.ConfigFileHandler",
-            "--configFile", installRoot + "/config/config.ldif",
-            "--rebuildAll",
-            "--baseDN", baseDN.toString()
-        };
-        // @formatter:on
-
-        message("Rebuilding indexes for suffix \"" + baseDN.toString() + "\"...");
-        final OutputStream stdout = new ByteArrayOutputStream();
-        final OutputStream stderr = new ByteArrayOutputStream();
-        
-        try {
-            TimeThread.start();
-            System.setProperty("org.opends.server.ServerRoot", installRoot);
-            final int rc = RebuildIndex.mainRebuildIndex(args, true, stdout, stderr);
-          
-            if (rc == 0) {
-                message("done");
-            } else {
-                throw new IOException("failed with return code " + rc);
-            }
-        } catch (final Exception ex) {
-            error("Rebuilding indexes", ex);
-            throw ex;
-        } finally {
-            TimeThread.stop();
-        }
-    }
-
-    private void restoreFile(final String fileName)
-    throws IOException {
-        message("Restoring file " + fileName + "...");
-        final File currentFile = new File(installRoot, fileName);
-        final File backupFile = getBackupFileName(fileName);
-        
-        try {
-            copy(backupFile, currentFile);
-            message("done");
-        } catch (final IOException ioe) {
-            // File may not exist - benign.
-            error("failed: ", ioe);
-            throw ioe;
-        }
-    }
-
-    private void unpackZipFile()
+    private void unpackZipFile(boolean oldStructure)
     throws IOException {
         message("Unzipping " + ZIP_FILE + "...");
         InputStream is = null;
@@ -552,10 +600,18 @@ public final class OpenDJUpgrader {
         try {
             is = AMSetupServlet.getResourceAsStream(servletCtx, ZIP_FILE);
             zis = new ZipInputStream(is);
-      
+
             for (ZipEntry zipEntry = zis.getNextEntry(); zipEntry != null; zipEntry = zis.getNextEntry()) {
-                final File outputFileName = new File(installRoot + "/" + zipEntry.getName());
-        
+                File outputFileName;
+                // If we're upgrading with the old mechanism we need
+                // to strip the "template/" from the directory path so
+                // the files end up in the correct location
+                if (oldStructure && zipEntry.getName().contains("template")) {
+                    String newName = zipEntry.getName().replace("template/", "");
+                    outputFileName = new File(installRoot + "/" + newName);
+                } else {
+                    outputFileName = new File(installRoot + "/" + zipEntry.getName());
+                }
                 if (zipEntry.isDirectory()) {
                     outputFileName.mkdir();
                 } else {
@@ -569,7 +625,7 @@ public final class OpenDJUpgrader {
                         outputFileName.setExecutable(true);
                     }
                 }
-                
+
                 zis.closeEntry();
             }
       
@@ -581,6 +637,41 @@ public final class OpenDJUpgrader {
             closeIfNotNull(fos);
             closeIfNotNull(zis);
             closeIfNotNull(is);
+        }
+    }
+
+    private void rebuildAllIndexes(final DN baseDN)
+            throws Exception {
+        // @formatter:off
+        final String[] args = {
+                "--configClass", "org.opends.server.extensions.ConfigFileHandler",
+                "--configFile", installRoot + "/config/config.ldif",
+                "--rebuildAll",
+                "--baseDN", baseDN.toString()
+        };
+        // @formatter:on
+
+        message("Rebuilding indexes for suffix \"" + baseDN.toString() + "\"...");
+        final OutputStream stdout = new ByteArrayOutputStream();
+        final OutputStream stderr = new ByteArrayOutputStream();
+
+        try {
+            TimeThread.start();
+            System.setProperty("org.opends.server.ServerRoot", installRoot);
+            final int rc = RebuildIndex.mainRebuildIndex(args, true, stdout, stderr);
+
+            if (rc == 0) {
+                message(stdout.toString());
+                message("done");
+            } else {
+                throw new IOException("failed with return code " + rc);
+            }
+        } catch (final Exception ex) {
+            error(stderr.toString());
+            error("Rebuilding indexes", ex);
+            throw ex;
+        } finally {
+            TimeThread.stop();
         }
     }
 }

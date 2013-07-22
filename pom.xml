@@ -125,8 +125,8 @@
         <openam.properties>openam.properties</openam.properties>
 
         <!-- Version Properties -->
-        <opendj.server.version>2.4.6</opendj.server.version>
-        <opendj.sdk.version>2.5.0-SNAPSHOT</opendj.sdk.version>
+        <opendj.server.version>2.6.0</opendj.server.version>
+        <opendj.sdk.version>2.6.0</opendj.sdk.version>
 
         <commons.forgerock-util.version>1.1.0-SNAPSHOT</commons.forgerock-util.version>
         <commons.json-fluent.version>1.1.0</commons.json-fluent.version>
@@ -1002,9 +1002,9 @@
             </dependency>
 
             <dependency>
-                <groupId>external</groupId>
-                <artifactId>sleepycat-je</artifactId>
-                <version>2011-04-07</version>
+                <groupId>com.sleepycat</groupId>
+                <artifactId>je</artifactId>
+                <version>5.0.73</version>
             </dependency>
 
             <dependency>
@@ -1272,7 +1272,7 @@
                 <artifactId>opendj-ldap-sdk</artifactId>
                 <version>${opendj.sdk.version}</version>
             </dependency>
-            <!-- OpenDJ Server - 2.4.6 -->
+            <!-- OpenDJ Server - 2.6 -->
             <dependency>
                 <groupId>org.forgerock.opendj</groupId>
                 <artifactId>opendj-server</artifactId>
