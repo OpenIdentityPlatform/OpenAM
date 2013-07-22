@@ -27,7 +27,7 @@
  */
 
 /*
- * Portions Copyrighted 2013 ForgeRock, Inc
+ * Portions Copyrighted 2013 ForgeRock AS
  */
 
 package com.sun.identity.saml.xmlsig;
@@ -46,7 +46,6 @@ import com.sun.identity.saml.common.*;
 
 import com.sun.org.apache.xpath.internal.XPathAPI;
 import com.sun.org.apache.xml.internal.security.c14n.Canonicalizer;
-import com.sun.org.apache.xml.internal.security.utils.IdResolver;
 import com.sun.org.apache.xml.internal.security.signature.XMLSignature;
 import com.sun.org.apache.xml.internal.security.keys.KeyInfo;
 import com.sun.org.apache.xml.internal.security.keys.content.keyvalues.DSAKeyValue;
@@ -501,11 +500,11 @@ public class AMSignatureProvider implements SignatureProvider {
                     SAMLUtilsCommon.bundle.getString("invalidIDAttribute"));  
             }
             
-            // add to IdResolver for idAttrName is not "id" case. 
-            if (!id.equals(this.DEF_ID_ATTRIBUTE)) {
-                IdResolver.registerElementById(root, id); 
+            // Set the ID attribute if idAttrName is not the default.
+            if (!idAttrName.equals(DEF_ID_ATTRIBUTE)) {
+                root.setIdAttribute(idAttrName, true);
             }
-            if (algorithm == null || algorithm.length() == 0) {   
+            if (algorithm == null || algorithm.length() == 0) {
                 algorithm = getKeyAlgorithm(privateKey); ; 
             }    
             if (!isValidAlgorithm(algorithm)) { 
@@ -521,11 +520,6 @@ public class AMSignatureProvider implements SignatureProvider {
                 root.insertBefore(sig.getElement(), beforeNode);
             }
             sig.getSignedInfo().addResourceResolver(new OfflineResolver());
-            // register the id for the element, so it could be found
-            // by Reference object based on URI
-            if (!idAttrName.equals(DEF_ID_ATTRIBUTE)) {
-                IdResolver.registerElementById(root, id);
-            }
             // do transform   
             Transforms transforms = new Transforms(doc); 
             transforms.addTransform(Transforms.TRANSFORM_ENVELOPED_SIGNATURE); 
@@ -805,7 +799,7 @@ public class AMSignatureProvider implements SignatureProvider {
                    Element elem = (Element) wsuNodes.item(i);
                    String id = elem.getAttributeNS(wsuNS, "Id");
                    if (id != null && id.length() != 0) {
-                       IdResolver.registerElementById(elem, id);
+                       elem.setIdAttributeNS(wsuNS, "Id", true);
                    }
                }
             }
@@ -946,7 +940,7 @@ public class AMSignatureProvider implements SignatureProvider {
                    Element elem = (Element) wsuNodes.item(i);
                    String id = elem.getAttributeNS(wsuNS, "Id");
                    if (id != null && id.length() != 0) {
-                       IdResolver.registerElementById(elem, id);
+                       elem.setIdAttributeNS(wsuNS, "Id", true);
                    }
                }
             }
@@ -1077,7 +1071,7 @@ public class AMSignatureProvider implements SignatureProvider {
                    Element elem = (Element) wsuNodes.item(i);
                    String id = elem.getAttributeNS(wsuNS, "Id");
                    if ((id != null) && (id.length() != 0)) {
-                       IdResolver.registerElementById(elem, id);
+                       elem.setIdAttributeNS(wsuNS, "Id", true);
                    }
                }
             }
@@ -1093,11 +1087,11 @@ public class AMSignatureProvider implements SignatureProvider {
                         String id = elem.getAttribute(attrs[j]);
                         if (id != null && id.length() != 0) {
                             if (SAMLUtils.debug.messageEnabled()) {
-                                SAMLUtils.debug.message("found " + attrs[j] + 
-                                    "=" + id + " elment=" +
+                                SAMLUtils.debug.message("found " + attrs[j] +
+                                    "=" + id + " element=" +
                                     XMLUtils.print(elem));
                             }
-                            IdResolver.registerElementById(elem, id);
+                            elem.setIdAttribute(attrs[j], true);
                         }
                     }
                 }
@@ -1403,6 +1397,7 @@ public class AMSignatureProvider implements SignatureProvider {
                 throw new XMLSignatureException(  
                     SAMLUtilsCommon.bundle.getString("invalidIDAttribute"));  
             }
+            root.setIdAttribute(idAttrName, true);
             String[] attrs = {"AssertionID", "RequestID", "ResponseID"}; 
             for ( int j = 0; j < attrs.length; j++) {
                 NodeList aList = (NodeList) XPathAPI.selectNodeList(   
@@ -1423,7 +1418,7 @@ public class AMSignatureProvider implements SignatureProvider {
                                    attrs[j]+ "=" + id + " elment=" +
                                    XMLUtils.print(elem));
                             }
-                            IdResolver.registerElementById(elem, id);
+                            elem.setIdAttribute(attrs[j], true);
                         }
                     }
                 }

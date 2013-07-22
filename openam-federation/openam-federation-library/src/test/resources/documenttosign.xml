@@ -1,4 +1,4 @@
-<DocumentToSign>
-    <SubElement ID="signme">
+<DocumentToSign ID="signme">
+    <SubElement>
     </SubElement>
 </DocumentToSign>
