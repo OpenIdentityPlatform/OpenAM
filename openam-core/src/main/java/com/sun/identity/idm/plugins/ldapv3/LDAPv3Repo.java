@@ -27,7 +27,7 @@
  */
 
 /*
- * Portions Copyrighted 2011 ForgeRock Inc 
+ * Portions Copyrighted 2011-2013 ForgeRock AS 
  * Portions Copyrighted 2012 Open Source Solution Technology Corporation
  */
 
@@ -664,7 +664,17 @@ public class LDAPv3Repo extends IdRepo {
             }
         }
     }
+    
+    private String getLDAPServerList() {
+    	StringBuilder sb = new StringBuilder();
+    	for (String ldapServerHost : ldapServers) {
+    		sb.append(ldapServerHost);
+    		sb.append(" ");
+    	}
+    	return sb.toString();
+    }
 
+    
     private void initConnectionPool(Map configParams) {
 
         // connOptions has the default options set for failover and 
@@ -705,25 +715,6 @@ public class LDAPv3Repo extends IdRepo {
         }
 
         LDAPConnection ldc = null;
-
-        // loop through the configured ldap servers until we find one that works
-        for (String ldapServerHost : ldapServers) {
-            String origLdapHost = ldapServerHost;
-            int index = origLdapHost.indexOf(':');
-            int ldapServerPort = 389;
-
-            if (index > -1) {
-                ldapHost = origLdapHost.substring(0, index);
-
-                try {
-                    ldapServerPort = Integer.parseInt(origLdapHost.substring(index + 1));
-                } catch(NumberFormatException nfe) {
-                    if (debug.warningEnabled()) {
-                        debug.warning("LDAPv3Repo:initConnectionPool :" + origLdapHost +
-                                      " incorrect port number, using default 389");
-                    }
-                }
-            }
 
             try {
                 if (ssl != null && ssl.equalsIgnoreCase("true")) {
@@ -780,8 +771,12 @@ public class LDAPv3Repo extends IdRepo {
                     ldc.setConnectTimeout(3);
                 }
 
-                ldc.connect(ldapHost, ldapServerPort, authid, authpw);
+                String ldapServerList = getLDAPServerList();
+                ldc.connect(ldapServerList, 389, authid, authpw);
                 connOptions.put("referrals", Boolean.valueOf(referrals));
+                
+                ldapHost = ldc.getHost();
+                ldapPort = ldc.getPort();
 
                 // Construct the pool by cloning the successful connection
                 ShutdownManager shutdownMan = ShutdownManager.getInstance();
@@ -789,7 +784,7 @@ public class LDAPv3Repo extends IdRepo {
                 if (shutdownMan.acquireValidLock()) {
                     try {
                         connPool = new LDAPConnectionPool("LDAPv3Repo", minPoolSize,
-                            maxPoolSize, ldapHost, ldapPort,
+                            maxPoolSize, ldapServerList, ldapPort,
                             ldc.getAuthenticationDN(),
                                 ldc.getAuthenticationPassword(),
                                 ldc, connOptions);
@@ -808,14 +803,11 @@ public class LDAPv3Repo extends IdRepo {
                         shutdownMan.releaseLockAndNotify();
                     }
                 }
-
-                // LDAP connection pool created successfully
-                break;
             } catch (LDAPException lex) {
                 int resultCode = lex.getLDAPResultCode();
                 ldapConnError = Integer.toString(resultCode);
                 debug.error("LDAPv3Repo: initConnectionPool ConnectionPool failed: " +
-                            resultCode + "; to server " + ldapHost + ":" + ldapServerPort,lex);
+                            resultCode + "; to server " + ldapHost + ":" + ldapPort,lex);
                 connPool = null;
 
                 try {
@@ -825,7 +817,6 @@ public class LDAPv3Repo extends IdRepo {
                         + lex1.getLDAPResultCode());
                 }
             }
-        }
 
         // if we get here and connPool is still null, all servers failed
         if (connPool == null) {
