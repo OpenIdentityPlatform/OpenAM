@@ -1,6 +1,4 @@
-/**
- * Copyright 2013 ForgeRock, Inc.
- *
+/*
  * The contents of this file are subject to the terms of the Common Development and
  * Distribution License (the License). You may not use this file except in compliance with the
  * License.
@@ -12,7 +10,10 @@
  * the License file at legal/CDDLv1.0.txt. If applicable, add the following below the CDDL
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
+ *
+ * Copyright 2013 ForgeRock AS.
  */
+
 package org.forgerock.openam.authz.filter;
 
 import com.iplanet.dpro.session.service.SessionService;
@@ -23,10 +24,7 @@ import org.forgerock.openam.auth.shared.SSOTokenFactory;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
-import javax.servlet.FilterChain;
 import javax.servlet.ServletException;
-import javax.servlet.ServletRequest;
-import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
@@ -34,15 +32,15 @@ import java.io.IOException;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.BDDMockito.mock;
 import static org.mockito.Matchers.*;
-import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
+import static org.testng.Assert.assertTrue;
 
 /**
  * @author robert.wapshott@forgerock.com
  */
 public class AdminAuthZFilterTest {
 
-    private AdminAuthZFilter filter;
+    private AdminAuthorizationFilter filter;
     private AuthnRequestUtils mockUtils;
     private SessionService mockService;
     private SSOTokenFactory mockFactory;
@@ -55,17 +53,17 @@ public class AdminAuthZFilterTest {
         mockUtils = mock(AuthnRequestUtils.class);
         mockService = mock(SessionService.class);
         mockFactory = mock(SSOTokenFactory.class);
-        filter = new AdminAuthZFilter(mockFactory, mockUtils, mockService);
+        filter = new AdminAuthorizationFilter(mockFactory, mockUtils, mockService);
     }
 
     @Test
-    public void shouldUseRquestUtilsForTokenId() throws IOException, ServletException {
+    public void shouldUseRequestUtilsForTokenId() throws IOException, ServletException {
         // Given
         HttpServletResponse mockResponse = mock(HttpServletResponse.class);
         given(mockUtils.getTokenId(any(HttpServletRequest.class))).willReturn(null);
 
         // When
-        filter.doFilter(null, mockResponse, null);
+        filter.authorize(null, mockResponse);
 
         // Then
         verify(mockUtils).getTokenId(any(HttpServletRequest.class));
@@ -78,10 +76,10 @@ public class AdminAuthZFilterTest {
         given(mockUtils.getTokenId(any(HttpServletRequest.class))).willReturn(null);
 
         // When
-        filter.doFilter(null, mockResponse, null);
+        boolean result = filter.authorize(null, mockResponse);
 
         // Then
-        verify(mockResponse).setStatus(HttpServletResponse.SC_FORBIDDEN);
+        assertTrue(!result);
     }
 
     @Test
@@ -92,7 +90,7 @@ public class AdminAuthZFilterTest {
         given(mockUtils.getTokenId(any(HttpServletRequest.class))).willReturn(key);
 
         // When
-        filter.doFilter(null, mockResponse, null);
+        filter.authorize(null, mockResponse);
 
         // Then
         verify(mockFactory).getTokenFromId(eq(key));
@@ -106,10 +104,10 @@ public class AdminAuthZFilterTest {
         given(mockUtils.getTokenId(any(HttpServletRequest.class))).willReturn(key);
 
         // When
-        filter.doFilter(null, mockResponse, null);
+        boolean result = filter.authorize(null, mockResponse);
 
         // Then
-        verify(mockResponse).setStatus(HttpServletResponse.SC_FORBIDDEN);
+        assertTrue(!result);
     }
 
     @Test
@@ -117,7 +115,6 @@ public class AdminAuthZFilterTest {
         // Given
         String key = "badger";
 
-        FilterChain mockFilterChain = mock(FilterChain.class);
         HttpServletResponse mockResponse = mock(HttpServletResponse.class);
         given(mockUtils.getTokenId(any(HttpServletRequest.class))).willReturn(key);
 
@@ -127,7 +124,7 @@ public class AdminAuthZFilterTest {
         given(mockToken.getProperty(anyString())).willReturn(key);
 
         // When
-        filter.doFilter(null, mockResponse, mockFilterChain);
+        filter.authorize(null, mockResponse);
 
         // Then
         verify(mockService).isSuperUser(eq(key));
@@ -138,7 +135,6 @@ public class AdminAuthZFilterTest {
         // Given
         String key = "badger";
 
-        FilterChain mockFilterChain = mock(FilterChain.class);
         HttpServletResponse mockResponse = mock(HttpServletResponse.class);
         given(mockUtils.getTokenId(any(HttpServletRequest.class))).willReturn(key);
 
@@ -149,10 +145,10 @@ public class AdminAuthZFilterTest {
         given(mockService.isSuperUser(anyString())).willReturn(Boolean.TRUE);
 
         // When
-        filter.doFilter(null, mockResponse, mockFilterChain);
+        boolean result = filter.authorize(null, mockResponse);
 
         // Then
-        verify(mockResponse, times(0)).setStatus(anyInt());
+        assertTrue(result);
     }
 
     @Test
@@ -160,7 +156,6 @@ public class AdminAuthZFilterTest {
         // Given
         String key = "badger";
 
-        FilterChain mockFilterChain = mock(FilterChain.class);
         HttpServletResponse mockResponse = mock(HttpServletResponse.class);
         given(mockUtils.getTokenId(any(HttpServletRequest.class))).willReturn(key);
 
@@ -171,31 +166,9 @@ public class AdminAuthZFilterTest {
         given(mockService.isSuperUser(anyString())).willReturn(Boolean.FALSE);
 
         // When
-        filter.doFilter(null, mockResponse, mockFilterChain);
+        boolean result = filter.authorize(null, mockResponse);
 
         // Then
-        verify(mockResponse).setStatus(HttpServletResponse.SC_FORBIDDEN);
-    }
-
-    @Test
-    public void shouldCallDoFilterOnceComplete() throws SSOException, IOException, ServletException {
-        // Given
-        String key = "badger";
-
-        FilterChain mockFilterChain = mock(FilterChain.class);
-        HttpServletResponse mockResponse = mock(HttpServletResponse.class);
-        given(mockUtils.getTokenId(any(HttpServletRequest.class))).willReturn(key);
-
-        SSOToken mockToken = mock(SSOToken.class);
-        given(mockToken.getProperty(anyString())).willReturn(key);
-        given(mockFactory.getTokenFromId(anyString())).willReturn(mockToken);
-
-        given(mockService.isSuperUser(anyString())).willReturn(Boolean.TRUE);
-
-        // When
-        filter.doFilter(null, mockResponse, mockFilterChain);
-
-        // Then
-        verify(mockFilterChain).doFilter(any(ServletRequest.class), any(ServletResponse.class));
+        assertTrue(!result);
     }
 }

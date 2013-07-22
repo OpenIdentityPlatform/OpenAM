@@ -134,6 +134,7 @@
         <commons.json-patch.version>1.0.0</commons.json-patch.version>
         <forgerock.json.version>2.0.0-SNAPSHOT</forgerock.json.version>
         <commons.authnfilter.version>1.0.0-SNAPSHOT</commons.authnfilter.version>
+        <commons.authzfilter.version>1.0.0-SNAPSHOT</commons.authzfilter.version>
 
         <restlet.version>2.1.1</restlet.version>
         <xercesj.version>2.11.0</xercesj.version>
@@ -1513,6 +1514,16 @@
                 <groupId>org.forgerock.commons</groupId>
                 <artifactId>forgerock-jaspi-jwt-session-module</artifactId>
                 <version>${commons.authnfilter.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.forgerock.commons</groupId>
+                <artifactId>forgerock-auth-filter-common</artifactId>
+                <version>${commons.authzfilter.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.forgerock.commons</groupId>
+                <artifactId>forgerock-authz-filter</artifactId>
+                <version>${commons.authzfilter.version}</version>
             </dependency>
             <dependency>
                 <groupId>org.glassfish</groupId>
