@@ -133,8 +133,7 @@
         <commons.json-resource.version>1.2.2</commons.json-resource.version>
         <commons.json-patch.version>1.0.0</commons.json-patch.version>
         <forgerock.json.version>2.0.0-SNAPSHOT</forgerock.json.version>
-        <commons.authnfilter.version>1.0.0-SNAPSHOT</commons.authnfilter.version>
-        <commons.authzfilter.version>1.0.0-SNAPSHOT</commons.authzfilter.version>
+        <commons.authfilter.version>1.0.0-SNAPSHOT</commons.authfilter.version>
 
         <restlet.version>2.1.1</restlet.version>
         <xercesj.version>2.11.0</xercesj.version>
@@ -1508,22 +1507,22 @@
             <dependency>
                 <groupId>org.forgerock.commons</groupId>
                 <artifactId>forgerock-jaspi-container</artifactId>
-                <version>${commons.authnfilter.version}</version>
+                <version>${commons.authfilter.version}</version>
             </dependency>
             <dependency>
                 <groupId>org.forgerock.commons</groupId>
                 <artifactId>forgerock-jaspi-jwt-session-module</artifactId>
-                <version>${commons.authnfilter.version}</version>
+                <version>${commons.authfilter.version}</version>
             </dependency>
             <dependency>
                 <groupId>org.forgerock.commons</groupId>
                 <artifactId>forgerock-auth-filter-common</artifactId>
-                <version>${commons.authzfilter.version}</version>
+                <version>${commons.authfilter.version}</version>
             </dependency>
             <dependency>
                 <groupId>org.forgerock.commons</groupId>
                 <artifactId>forgerock-authz-filter</artifactId>
-                <version>${commons.authzfilter.version}</version>
+                <version>${commons.authfilter.version}</version>
             </dependency>
             <dependency>
                 <groupId>org.glassfish</groupId>
