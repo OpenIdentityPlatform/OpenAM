@@ -44,6 +44,7 @@ import java.util.*;
  * upon the completion of the retrieveTokenInfoEndPoint method
  */
 public class ScopeImpl implements Scope {
+    private static final String MULTI_ATTRIBUTE_SEPARATOR = ",";
 
     private static Map<String, Object> scopeToUserUserProfileAttributes;
 
@@ -144,9 +145,17 @@ public class ScopeImpl implements Scope {
             if (id != null){
                 for (String scope : scopes){
                     try {
-                        Set<String> mail = id.getAttribute(scope);
-                        if (mail != null || !mail.isEmpty()){
-                            map.put(scope, mail.iterator().next());
+                        Set<String> attributes = id.getAttribute(scope);
+                        if (attributes != null || !attributes.isEmpty()) {
+                            Iterator<String> iter = attributes.iterator();
+                            StringBuilder builder = new StringBuilder();
+                            while (iter.hasNext()) {
+                                builder.append(iter.next());
+                                if (iter.hasNext()) {
+                                    builder.append(MULTI_ATTRIBUTE_SEPARATOR);
+                                }
+                            }
+                            map.put(scope, builder.toString());
                         }
                     } catch (Exception e){
                         OAuth2Utils.DEBUG.error("Unable to get attribute", e);
