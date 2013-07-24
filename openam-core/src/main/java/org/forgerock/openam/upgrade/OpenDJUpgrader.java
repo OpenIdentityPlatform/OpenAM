@@ -232,16 +232,15 @@ public final class OpenDJUpgrader {
 
     private void callOldDJUpgrade() throws Exception{
         deleteFile("lib/OpenDS.jar");
-        deleteFile("lib/OpenDJ.jar");
         deleteFile("lib/activation.jar");
-
-        // Restore remaining backups (config has been patched).
-        restoreFile("config/admin-backend.ldif");
-        restoreFile("config/java.properties");
 
         // Patch the current configuration with the differences between the default
         // current configuration and the default new configuration.
         patchConfiguration();
+
+        // Restore remaining backups (config has been patched).
+        restoreFile("config/admin-backend.ldif");
+        restoreFile("config/java.properties");
 
         // Rebuild all indexes for all local DB backends.
         final List<DN> baseDNs = findBaseDNs();
