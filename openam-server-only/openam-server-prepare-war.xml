@@ -77,17 +77,6 @@
         <copy file="${project.basedir}/../openam-core/src/main/resources/ha_sfo/ldif/cts-delete-schema.ldif"
               tofile="${openam.temp.target}/WEB-INF/template/ldif/sfha/cts-delete-schema.ldif"
               filtering="false"/>
-	
-	    <mkdir dir="${openam.temp.target}/WEB-INF/template/ldif/oauth2"/>
-        <!-- Handled in CTS Container LDIF Template.
-	        <copy file="${project.basedir}/../openam-oauth2/openam-oauth2-core-token-service/src/main/resources/oauth2_container.ldif.template"
-                tofile="${openam.temp.target}/WEB-INF/template/ldif/oauth2/oauth2_container.ldif"
-                filtering="false"/>
-        -->
-
-        <copy file="${project.basedir}/../openam-oauth2/openam-oauth2-core-token-service/src/main/resources/99-oauth2attributes.ldif"
-              tofile="${openam.temp.target}/WEB-INF/template/ldif/oauth2/99-oauth2attributes.ldif"
-              filtering="false"/>
 
         <mkdir dir="${openam.temp.target}/WEB-INF/template/sms"/>
         <copy todir="${openam.temp.target}/WEB-INF/template/sms" filtering="true">

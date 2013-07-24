@@ -102,7 +102,6 @@ class CTSDataUtils {
      */
     private static final String[] UPGRADE_LDIF_SCHEMA_FILENAMES = {
             // CTS Version 1 LDAP Schemata
-            WEB_INF + "/template/ldif/oauth2/99-oauth2attributes.ldif",
             WEB_INF + "/template/ldif/sfha/cts-add-schema.ldif",
             // CTS Version 1 LDAP Indices
             WEB_INF + "/template/ldif/sfha/cts-indices-schema.ldif"
