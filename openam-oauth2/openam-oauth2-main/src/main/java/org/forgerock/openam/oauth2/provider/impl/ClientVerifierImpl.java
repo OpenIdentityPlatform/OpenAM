@@ -97,7 +97,7 @@ public class ClientVerifierImpl implements ClientVerifier{
                     response.getAttributes().put("org.restlet.http.headers", responseHeaders);
                 }
                 responseHeaders.add(new Header("WWW-Authenticate", "Basic realm=\"" + OAuth2Utils.getRealm(request) + "\""));
-                throw e;
+                throw OAuthProblemException.OAuthError.INVALID_CLIENT_401.handle(null, "Client authentication failed");
             }
         } else if (clientSecret != null && clientId != null && !clientId.isEmpty()) {
                 client = verify(clientId, clientSecret, realm);
