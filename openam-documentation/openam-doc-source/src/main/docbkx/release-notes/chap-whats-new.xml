@@ -159,6 +159,12 @@
     addition to the existing schema.</para>
   </listitem>
 
+  <listitem>
+    <para>The C SDK for OpenAM has been simplified. The packages are all available as
+    ZIP files, for Linux, Solaris x86, Solaris SPARC, and Windows operating systems, for
+    both 32- and 64-bit varieties.</para>
+  </listitem>
+
  </itemizedlist>
 
  <itemizedlist>
