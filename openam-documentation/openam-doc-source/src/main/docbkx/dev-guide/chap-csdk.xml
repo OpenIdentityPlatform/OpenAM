@@ -44,21 +44,44 @@
  <para>To prepare to install OpenAM C SDK, first download the version for your
  platform and unpack the archive as in the following example.</para>
 
- <screen>$ mkdir -p /path/to/openam-client &amp;&amp; cd /path/to/openam-client
-$ tar xf ~/Downloads/common_3_0_Linux_i686.tar.gz</screen>
+ <screen># mkdir -p /path/to/openam-client
+# cd /path/to/openam-client
+$ unzip ~/Downloads/common_3_0_Linux_64bit.zip</screen>
 
- <para>Windows C SDK deliveries are .zip files. Deliveries for other platforms
- are .tar.gz files.</para>
+ <para>All C SDK deliveries are .zip files, and the filenames are self-explanatory.
+ The <filename>SunOS</filename> in some of the .zip files refer to the Solaris
+ OS.</para>
+    <!-- Unfortuantely, I think it's time to state explicitly that SunOS=Solaris -->
+    <itemizedlist>
+        <listitem>
+            <para><filename>common_3_0_Linux.zip</filename></para>
+        </listitem>
+        <listitem>
+            <para><filename>common_3_0_Linux_64bit.zip</filename></para>
+        </listitem>
+        <listitem>
+            <para><filename>common_3_0_windows.zip</filename></para>
+        </listitem>
+        <listitem>
+            <para><filename>common_3_0_windows_64bit.zip</filename></para>
+        </listitem>
+        <listitem>
+            <para><filename>common_3_0_SunOS_x86.zip</filename></para>
+        </listitem>
+        <listitem>
+            <para><filename>common_3_0_SunOS_64bit.zip</filename></para>
+        </listitem>
+        <listitem>
+            <para><filename>common_3_0_SunOS_sparc.zip</filename></para>
+        </listitem>
+        <listitem>
+            <para><filename>common_3_0_SunOS_sparc_64bit.zip</filename></para>
+        </listitem>
+    </itemizedlist>
 
  <variablelist>
-  <para>As a result, you have a license file, several directories that include
+  <para>Once unpacked, you have several directories that include
   the SDK, and also sample client applications.</para>
-  <varlistentry>
-   <term><filename>THIRD_PARTY_LICENSE.TXT</filename></term>
-   <listitem>
-    <para>The license file</para>
-   </listitem>
-  </varlistentry>
   <varlistentry>
    <term><filename>bin/</filename></term>
    <listitem>
@@ -97,25 +120,13 @@ $ tar xf ~/Downloads/common_3_0_Linux_i686.tar.gz</screen>
   
   <step>
    <para>Review the <filename>samples/README.TXT</filename> file to complete
-   any specific instructions required for your platform.</para>
+   any specific instructions required for your platform. The two commands
+   shown here confirm that the specified system is a 64-bit Linux OS. Make
+   sure it matches the C SDK package that you have downloaded.</para>
    <screen>$ uname -s
 Linux
-$ cd ../lib
-$ ln -s libamsdk.so.3 libamsdk.so
-$ ln -s libxml2.so.2 libxml2.so
-$ cd ../samples</screen>
-  </step>
-  <step>
-   <para>Build the samples in the appropriate way for your platform.</para>
-   <screen>$ LD_LIBRARY_PATH=../lib gmake</screen>
-   <para>On recent systems, you might need to install compatibility libraries
-   for the build to complete successfully. You might make the following change
-   on Linux, for example.</para>
-   <screen>$ diff Makefile Makefile.orig 
-115c115
-&lt; LDFLAGS = -L$(AM_LIB_DIR) $(LIBS) /usr/lib/libstdc++.so.5
----
-&gt; LDFLAGS = -L$(AM_LIB_DIR) $(LIBS)</screen>
+$ uname -m
+x86_64</screen>
   </step>
   <step>
    <para>Set up <filename>OpenSSOAgentBootstrap.properties</filename>
