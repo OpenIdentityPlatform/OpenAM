@@ -184,9 +184,8 @@
   </listitem>
 
   <listitem>
-   <para>OpenAM now bundles OpenDJ 2.4.6 (<link
-   xlink:href="https://bugster.forgerock.org/jira/browse/OPENAM-1954"
-   xlink:show="new">OPENAM-1954</link>).</para>
+   <!-- AME-1652: Update DJ from 2.4.6 to 2.6 -->
+   <para>OpenAM now bundles OpenDJ 2.6.</para>
   </listitem>
 
   <listitem>
