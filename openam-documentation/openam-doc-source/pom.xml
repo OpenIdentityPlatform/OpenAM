@@ -145,13 +145,16 @@
         <products-basedir>${basedir}</products-basedir>
         <gaId>UA-23412190-7</gaId>
         <!--
-             Release date is specified only when building the documentation
-             for publication. For example:
-                 -D"releaseDate=Software release date: January 1, 1970"
-             Otherwise release date should remain empty.
+             Release date and publication date are set at release build time.
+               -D"releaseDate=Software release date: January 1, 1970"
+               -D"pubDate=Publication date: December 31, 1969"
+             At all other times, the dates should be empty.
         -->
         <releaseDate />
         <softwareReleaseDate>${releaseDate}</softwareReleaseDate>
+        <pubDate />
+        <publicationDate>${pubDate}</publicationDate>
+
         <defaultRootSuffix>dc=openam,dc=forgerock,dc=org</defaultRootSuffix>
     </properties>
 
