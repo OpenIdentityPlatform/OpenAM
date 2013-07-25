@@ -30,15 +30,15 @@
 -->
 
 <!DOCTYPE logmessages
-    PUBLIC "OpenSSO Log Message DTD/EN"
-    "jar://com/sun/identity/log/messageid/amLogMessage.dtd"
+PUBLIC "OpenSSO Log Message DTD/EN"
+"jar://com/sun/identity/log/messageid/amLogMessage.dtd"
 >
 <logmessages prefix="CONSOLE">
     
     <!-- id 1 to 10 are reserved for identity creation -->
-    <logmessage name="ATTEMPT_IDENTITY_CREATION" id="1"
-                loglevel="LL_INFO"
-                description="Attempt to create Identity">
+ <logmessage name="ATTEMPT_IDENTITY_CREATION" id="1"
+             loglevel="LL_INFO"
+             description="Attempt to create Identity">
         <datainfo>
             <item>identity name</item>
             <item>identity type</item>
@@ -47,7 +47,7 @@
         <triggers>
             <item>Click on create button in Realm Creation Page.</item>
         </triggers>
-        <actions />
+        <actions/>
     </logmessage>
     <logmessage name="IDENTITY_CREATED" id="2"
                 loglevel="LL_INFO"
@@ -60,7 +60,7 @@
         <triggers>
             <item>Click on create button in Realm Creation Page.</item>
         </triggers>
-        <actions />
+        <actions/>
     </logmessage>
     <logmessage name="SSO_EXCEPTION_IDENTITY_CREATION" id="3"
                 loglevel="LL_SEVERE"
@@ -94,11 +94,11 @@
             <item>Look under data store log for more information.</item>
         </actions>
     </logmessage>
-    
-    <!-- id 11 to 20 are reserved for identity creation -->
-    <logmessage name="ATTEMPT_SEARCH_IDENTITY" id="11"
-                loglevel="LL_INFO"
-                description="Attempt to search for Identities">
+
+ <!-- id 11 to 20 are reserved for identity creation -->
+ <logmessage name="ATTEMPT_SEARCH_IDENTITY" id="11"
+             loglevel="LL_INFO"
+             description="Attempt to search for Identities">
         <datainfo>
             <item>base realm</item>
             <item>identity type</item>
@@ -109,7 +109,7 @@
         <triggers>
             <item>Click on Search button in identity search view.</item>
         </triggers>
-        <actions />
+        <actions/>
     </logmessage>
     <logmessage name="SUCCEED_SEARCH_IDENTITY" id="12"
                 loglevel="LL_INFO"
@@ -124,7 +124,7 @@
         <triggers>
             <item>Click on Search button in identity search view.</item>
         </triggers>
-        <actions />
+        <actions/>
     </logmessage>
     <logmessage name="SSO_EXCEPTION_SEARCH_IDENTITY" id="13"
                 loglevel="LL_SEVERE"
@@ -158,11 +158,11 @@
             <item>Look under data store log for more information.</item>
         </actions>
     </logmessage>
-    
-    <!-- id 21 to 30 are reserved for getting attribute values of identity -->
-    <logmessage name="ATTEMPT_READ_IDENTITY_ATTRIBUTE_VALUE" id="21"
-                loglevel="LL_INFO"
-                description="Attempt to read attribute values of an identity">
+
+ <!-- id 21 to 30 are reserved for getting attribute values of identity -->
+ <logmessage name="ATTEMPT_READ_IDENTITY_ATTRIBUTE_VALUE" id="21"
+             loglevel="LL_INFO"
+             description="Attempt to read attribute values of an identity">
         <datainfo>
             <item>identity name</item>
             <item>name of attributes</item>
@@ -170,7 +170,7 @@
         <triggers>
             <item>View identity profile view.</item>
         </triggers>
-        <actions />
+        <actions/>
     </logmessage>
     <logmessage name="SUCCEED_READ_IDENTITY_ATTRIBUTE_VALUE" id="22"
                 loglevel="LL_INFO"
@@ -182,7 +182,7 @@
         <triggers>
             <item>View identity profile view.</item>
         </triggers>
-        <actions />
+        <actions/>
     </logmessage>
     <logmessage name="SSO_EXCEPTION_READ_IDENTITY_ATTRIBUTE_VALUE" id="23"
                 loglevel="LL_SEVERE"
@@ -229,11 +229,11 @@
             <item>Look under service manage log for more information.</item>
         </actions>
     </logmessage>
-    
-    <!-- id 31 to 40 are reserved for modifying attribute values of identity -->
-    <logmessage name="ATTEMPT_MODIFY_IDENTITY_ATTRIBUTE_VALUE" id="31"
-                loglevel="LL_INFO"
-                description="Attempt to modify attribute values of an identity">
+
+ <!-- id 31 to 40 are reserved for modifying attribute values of identity -->
+ <logmessage name="ATTEMPT_MODIFY_IDENTITY_ATTRIBUTE_VALUE" id="31"
+             loglevel="LL_INFO"
+             description="Attempt to modify attribute values of an identity">
         <datainfo>
             <item>identity name</item>
             <item>name of attributes</item>
@@ -241,7 +241,7 @@
         <triggers>
             <item>Click on Save button in identity profile view.</item>
         </triggers>
-        <actions />
+        <actions/>
     </logmessage>
     <logmessage name="SUCCEED_MODIFY_IDENTITY_ATTRIBUTE_VALUE" id="32"
                 loglevel="LL_INFO"
@@ -253,7 +253,7 @@
         <triggers>
             <item>Click on Save button in identity profile view.</item>
         </triggers>
-        <actions />
+        <actions/>
     </logmessage>
     <logmessage name="SSO_EXCEPTION_MODIFY_IDENTITY_ATTRIBUTE_VALUE" id="33"
                 loglevel="LL_SEVERE"
@@ -285,11 +285,11 @@
             <item>Look under data store log for more information.</item>
         </actions>
     </logmessage>
-    
-    <!-- id 41 to 50 are reserved for deleting identity -->
-    <logmessage name="ATTEMPT_DELETE_IDENTITY" id="41"
-                loglevel="LL_INFO"
-                description="Attempt to delete identities">
+
+ <!-- id 41 to 50 are reserved for deleting identity -->
+ <logmessage name="ATTEMPT_DELETE_IDENTITY" id="41"
+             loglevel="LL_INFO"
+             description="Attempt to delete identities">
         <datainfo>
             <item>realm name</item>
             <item>name of identities to be deleted</item>
@@ -297,7 +297,7 @@
         <triggers>
             <item>Click on Delete button in identity search view.</item>
         </triggers>
-        <actions />
+        <actions/>
     </logmessage>
     <logmessage name="SUCCEED_DELETE_IDENTITY" id="42"
                 loglevel="LL_INFO"
@@ -309,7 +309,7 @@
         <triggers>
             <item>Click on Delete button in identity search view.</item>
         </triggers>
-        <actions />
+        <actions/>
     </logmessage>
     <logmessage name="SSO_EXCEPTION_DELETE_IDENTITY" id="43"
                 loglevel="LL_SEVERE"
@@ -341,11 +341,11 @@
             <item>Look under data store log for more information.</item>
         </actions>
     </logmessage>
-    
-    <!-- id 51 to 60 are reserved for membership of identity -->
-    <logmessage name="ATTEMPT_READ_IDENTITY_MEMBERSHIP" id="51"
-                loglevel="LL_INFO"
-                description="Attempt to read identity's memberships information">
+
+ <!-- id 51 to 60 are reserved for membership of identity -->
+ <logmessage name="ATTEMPT_READ_IDENTITY_MEMBERSHIP" id="51"
+             loglevel="LL_INFO"
+             description="Attempt to read identity's memberships information">
         <datainfo>
             <item>name of identity</item>
             <item>membership identity type</item>
@@ -353,7 +353,7 @@
         <triggers>
             <item>View membership page of an identity.</item>
         </triggers>
-        <actions />
+        <actions/>
     </logmessage>
     <logmessage name="SUCCEED_READ_IDENTITY_MEMBERSHIP" id="52"
                 loglevel="LL_INFO"
@@ -365,7 +365,7 @@
         <triggers>
             <item>View membership page of an identity.</item>
         </triggers>
-        <actions />
+        <actions/>
     </logmessage>
     <logmessage name="SSO_EXCEPTION_READ_IDENTITY_MEMBERSHIP" id="53"
                 loglevel="LL_SEVERE"
@@ -397,11 +397,11 @@
             <item>Look under data store log for more information.</item>
         </actions>
     </logmessage>
-    
-    <!-- id 61 to 70 are reserved for members of identity -->
-    <logmessage name="ATTEMPT_READ_IDENTITY_MEMBER" id="61"
-                loglevel="LL_INFO"
-                description="Attempt to read identity's members information">
+
+ <!-- id 61 to 70 are reserved for members of identity -->
+ <logmessage name="ATTEMPT_READ_IDENTITY_MEMBER" id="61"
+             loglevel="LL_INFO"
+             description="Attempt to read identity's members information">
         <datainfo>
             <item>name of identity</item>
             <item>members identity type</item>
@@ -409,7 +409,7 @@
         <triggers>
             <item>View members page of an identity.</item>
         </triggers>
-        <actions />
+        <actions/>
     </logmessage>
     <logmessage name="SUCCEED_READ_IDENTITY_MEMBER" id="62"
                 loglevel="LL_INFO"
@@ -421,7 +421,7 @@
         <triggers>
             <item>View members page of an identity.</item>
         </triggers>
-        <actions />
+        <actions/>
     </logmessage>
     <logmessage name="SSO_EXCEPTION_READ_IDENTITY_MEMBER" id="63"
                 loglevel="LL_SEVERE"
@@ -453,11 +453,11 @@
             <item>Look under data store log for more information.</item>
         </actions>
     </logmessage>
-    
-    <!-- id 71 to 80 are reserved for adding member to identity -->
-    <logmessage name="ATTEMPT_ADD_IDENTITY_MEMBER" id="71"
-                loglevel="LL_INFO"
-                description="Attempt to add member to an identity">
+
+ <!-- id 71 to 80 are reserved for adding member to identity -->
+ <logmessage name="ATTEMPT_ADD_IDENTITY_MEMBER" id="71"
+             loglevel="LL_INFO"
+             description="Attempt to add member to an identity">
         <datainfo>
             <item>name of identity</item>
             <item>name of identity to be added.</item>
@@ -465,7 +465,7 @@
         <triggers>
             <item>Select members to be added to an identity.</item>
         </triggers>
-        <actions />
+        <actions/>
     </logmessage>
     <logmessage name="SUCCEED_ADD_IDENTITY_MEMBER" id="72"
                 loglevel="LL_INFO"
@@ -477,7 +477,7 @@
         <triggers>
             <item>Select members to be added to an identity.</item>
         </triggers>
-        <actions />
+        <actions/>
     </logmessage>
     <logmessage name="SSO_EXCEPTION_ADD_IDENTITY_MEMBER" id="73"
                 loglevel="LL_SEVERE"
@@ -509,11 +509,11 @@
             <item>Look under data store log for more information.</item>
         </actions>
     </logmessage>
-    
-    <!-- id 81 to 90 are reserved for removing member from identity -->
-    <logmessage name="ATTEMPT_REMOVE_IDENTITY_MEMBER" id="81"
-                loglevel="LL_INFO"
-                description="Attempt to remove member from an identity">
+
+ <!-- id 81 to 90 are reserved for removing member from identity -->
+ <logmessage name="ATTEMPT_REMOVE_IDENTITY_MEMBER" id="81"
+             loglevel="LL_INFO"
+             description="Attempt to remove member from an identity">
         <datainfo>
             <item>name of identity</item>
             <item>name of identity to be removed.</item>
@@ -521,7 +521,7 @@
         <triggers>
             <item>Select members to be removed from an identity.</item>
         </triggers>
-        <actions />
+        <actions/>
     </logmessage>
     <logmessage name="SUCCEED_REMOVE_IDENTITY_MEMBER" id="82"
                 loglevel="LL_INFO"
@@ -533,7 +533,7 @@
         <triggers>
             <item>Select members to be removed from an identity.</item>
         </triggers>
-        <actions />
+        <actions/>
     </logmessage>
     <logmessage name="SSO_EXCEPTION_REMOVE_IDENTITY_MEMBER" id="83"
                 loglevel="LL_SEVERE"
@@ -565,18 +565,18 @@
             <item>Look under data store log for more information.</item>
         </actions>
     </logmessage>
-    
-    <!-- id 91 to 100 are reserved for reading assigned service names of an identity -->
-    <logmessage name="ATTEMPT_READ_IDENTITY_ASSIGNED_SERVICE" id="91"
-                loglevel="LL_INFO"
-                description="Attempt to read assigned service names of an identity">
+
+ <!-- id 91 to 100 are reserved for reading assigned service names of an identity -->
+ <logmessage name="ATTEMPT_READ_IDENTITY_ASSIGNED_SERVICE" id="91"
+             loglevel="LL_INFO"
+             description="Attempt to read assigned service names of an identity">
         <datainfo>
             <item>name of identity</item>
         </datainfo>
         <triggers>
             <item>Click on Add button in service assignment view of an identity.</item>
         </triggers>
-        <actions />
+        <actions/>
     </logmessage>
     <logmessage name="SUCCEED_READ_IDENTITY_ASSIGNED_SERVICE" id="92"
                 loglevel="LL_INFO"
@@ -587,7 +587,7 @@
         <triggers>
             <item>Click on Add button in service assignment view of an identity.</item>
         </triggers>
-        <actions />
+        <actions/>
     </logmessage>
     <logmessage name="SSO_EXCEPTION_READ_IDENTITY_ASSIGNED_SERVICE" id="93"
                 loglevel="LL_SEVERE"
@@ -617,18 +617,18 @@
             <item>Look under data store log for more information.</item>
         </actions>
     </logmessage>
-    
-    <!-- id 101 to 110 are reserved for reading assignble service names of an identity -->
-    <logmessage name="ATTEMPT_READ_IDENTITY_ASSIGNABLE_SERVICE" id="101"
-                loglevel="LL_INFO"
-                description="Attempt to read assignable service names of an identity">
+
+ <!-- id 101 to 110 are reserved for reading assignble service names of an identity -->
+ <logmessage name="ATTEMPT_READ_IDENTITY_ASSIGNABLE_SERVICE" id="101"
+             loglevel="LL_INFO"
+             description="Attempt to read assignable service names of an identity">
         <datainfo>
             <item>name of identity</item>
         </datainfo>
         <triggers>
             <item>View the services page of an identity.</item>
         </triggers>
-        <actions />
+        <actions/>
     </logmessage>
     <logmessage name="SUCCEED_READ_IDENTITY_ASSIGNABLE_SERVICE" id="102"
                 loglevel="LL_INFO"
@@ -639,7 +639,7 @@
         <triggers>
             <item>View the services page of an identity.</item>
         </triggers>
-        <actions />
+        <actions/>
     </logmessage>
     <logmessage name="SSO_EXCEPTION_READ_IDENTITY_ASSIGNABLE_SERVICE" id="103"
                 loglevel="LL_SEVERE"
@@ -669,10 +669,10 @@
             <item>Look under data store log for more information.</item>
         </actions>
     </logmessage>
-    <!-- id 111 to 120 are reserved for assigning service to an identity -->
-    <logmessage name="ATTEMPT_IDENTITY_ASSIGN_SERVICE" id="111"
-                loglevel="LL_INFO"
-                description="Attempt to assign a service to an identity">
+ <!-- id 111 to 120 are reserved for assigning service to an identity -->
+ <logmessage name="ATTEMPT_IDENTITY_ASSIGN_SERVICE" id="111"
+             loglevel="LL_INFO"
+             description="Attempt to assign a service to an identity">
         <datainfo>
             <item>name of identity</item>
             <item>name of service</item>
@@ -680,7 +680,7 @@
         <triggers>
             <item>Click Add button of service view of an identity.</item>
         </triggers>
-        <actions />
+        <actions/>
     </logmessage>
     <logmessage name="SUCCEED_IDENTITY_ASSIGN_SERVICE" id="112"
                 loglevel="LL_INFO"
@@ -692,7 +692,7 @@
         <triggers>
             <item>Click Add button of service view of an identity.</item>
         </triggers>
-        <actions />
+        <actions/>
     </logmessage>
     <logmessage name="SSO_EXCEPTION_IDENTITY_ASSIGN_SERVICE" id="113"
                 loglevel="LL_SEVERE"
@@ -724,11 +724,11 @@
             <item>Look under data store log for more information.</item>
         </actions>
     </logmessage>
-    
-    <!-- id 121 to 130 are reserved for unassigning service from an identity -->
-    <logmessage name="ATTEMPT_IDENTITY_UNASSIGN_SERVICE" id="121"
-                loglevel="LL_INFO"
-                description="Attempt to unassign a service from an identity">
+
+ <!-- id 121 to 130 are reserved for unassigning service from an identity -->
+ <logmessage name="ATTEMPT_IDENTITY_UNASSIGN_SERVICE" id="121"
+             loglevel="LL_INFO"
+             description="Attempt to unassign a service from an identity">
         <datainfo>
             <item>name of identity</item>
             <item>name of service</item>
@@ -736,7 +736,7 @@
         <triggers>
             <item>Click Remove button in service view of an identity.</item>
         </triggers>
-        <actions />
+        <actions/>
     </logmessage>
     <logmessage name="SUCCEED_IDENTITY_UNASSIGN_SERVICE" id="122"
                 loglevel="LL_INFO"
@@ -748,7 +748,7 @@
         <triggers>
             <item>Click Remove button in service view of an identity.</item>
         </triggers>
-        <actions />
+        <actions/>
     </logmessage>
     <logmessage name="SSO_EXCEPTION_IDENTITY_UNASSIGN_SERVICE" id="123"
                 loglevel="LL_SEVERE"
@@ -780,11 +780,11 @@
             <item>Look under data store log for more information.</item>
         </actions>
     </logmessage>
-    
-    <!-- id 131 to 140 are reserved for unassigning service from an identity -->
-    <logmessage name="ATTEMPT_IDENTITY_READ_SERVICE_ATTRIBUTE_VALUES" id="131"
-                loglevel="LL_INFO"
-                description="Attempt to read service attribute values of an identity">
+
+ <!-- id 131 to 140 are reserved for unassigning service from an identity -->
+ <logmessage name="ATTEMPT_IDENTITY_READ_SERVICE_ATTRIBUTE_VALUES" id="131"
+             loglevel="LL_INFO"
+             description="Attempt to read service attribute values of an identity">
         <datainfo>
             <item>name of identity</item>
             <item>name of service</item>
@@ -792,7 +792,7 @@
         <triggers>
             <item>View service profile view of an identity.</item>
         </triggers>
-        <actions />
+        <actions/>
     </logmessage>
     <logmessage name="SUCCEED_IDENTITY_READ_SERVICE_ATTRIBUTE_VALUES" id="132"
                 loglevel="LL_INFO"
@@ -804,9 +804,10 @@
         <triggers>
             <item>View service profile view of an identity.</item>
         </triggers>
-        <actions />
+        <actions/>
     </logmessage>
-    <logmessage name="SSO_EXCEPTION_IDENTITY_READ_SERVICE_ATTRIBUTE_VALUES" id="133"
+    <logmessage name="SSO_EXCEPTION_IDENTITY_READ_SERVICE_ATTRIBUTE_VALUES"
+                id="133"
                 loglevel="LL_SEVERE"
                 description="Reading of service attribute values of an identity failed.">
         <datainfo>
@@ -821,7 +822,8 @@
             <item>Look under data store log for more information.</item>
         </actions>
     </logmessage>
-    <logmessage name="IDM_EXCEPTION_IDENTITY_READ_SERVICE_ATTRIBUTE_VALUES" id="134"
+    <logmessage name="IDM_EXCEPTION_IDENTITY_READ_SERVICE_ATTRIBUTE_VALUES"
+                id="134"
                 loglevel="LL_SEVERE"
                 description="Reading of service attribute values of an identity failed.">
         <datainfo>
@@ -836,11 +838,11 @@
             <item>Look under data store log for more information.</item>
         </actions>
     </logmessage>
-    
-    <!-- id 141 to 150 are reserved for writing service attribute values to an identity -->
-    <logmessage name="ATTEMPT_IDENTITY_WRITE_SERVICE_ATTRIBUTE_VALUES" id="141"
-                loglevel="LL_INFO"
-                description="Attempt to write service attribute values to an identity">
+
+ <!-- id 141 to 150 are reserved for writing service attribute values to an identity -->
+ <logmessage name="ATTEMPT_IDENTITY_WRITE_SERVICE_ATTRIBUTE_VALUES" id="141"
+             loglevel="LL_INFO"
+             description="Attempt to write service attribute values to an identity">
         <datainfo>
             <item>name of identity</item>
             <item>name of service</item>
@@ -848,7 +850,7 @@
         <triggers>
             <item>Click on Save button in service profile view of an identity.</item>
         </triggers>
-        <actions />
+        <actions/>
     </logmessage>
     <logmessage name="SUCCEED_IDENTITY_WRITE_SERVICE_ATTRIBUTE_VALUES" id="142"
                 loglevel="LL_INFO"
@@ -860,9 +862,10 @@
         <triggers>
             <item>Click on Save button in service profile view of an identity.</item>
         </triggers>
-        <actions />
+        <actions/>
     </logmessage>
-    <logmessage name="SSO_EXCEPTION_IDENTITY_WRITE_SERVICE_ATTRIBUTE_VALUES" id="143"
+    <logmessage name="SSO_EXCEPTION_IDENTITY_WRITE_SERVICE_ATTRIBUTE_VALUES"
+                id="143"
                 loglevel="LL_SEVERE"
                 description="Writing of service attribute values to an identity failed.">
         <datainfo>
@@ -877,7 +880,8 @@
             <item>Look under data store log for more information.</item>
         </actions>
     </logmessage>
-    <logmessage name="IDM_EXCEPTION_IDENTITY_WRITE_SERVICE_ATTRIBUTE_VALUES" id="144"
+    <logmessage name="IDM_EXCEPTION_IDENTITY_WRITE_SERVICE_ATTRIBUTE_VALUES"
+                id="144"
                 loglevel="LL_SEVERE"
                 description="Writing of service attribute values to an identity failed.">
         <datainfo>
@@ -892,18 +896,18 @@
             <item>Look under data store log for more information.</item>
         </actions>
     </logmessage>
-    
-    <!-- id 201 to 210 are reserved for getting global default service attribute values -->
-    <logmessage name="ATTEMPT_READ_ALL_GLOBAL_DEFAULT_ATTRIBUTE_VALUES" id="201"
-                loglevel="LL_INFO"
-                description="Attempt to read all global service default attribute values">
+
+ <!-- id 201 to 210 are reserved for getting global default service attribute values -->
+ <logmessage name="ATTEMPT_READ_ALL_GLOBAL_DEFAULT_ATTRIBUTE_VALUES" id="201"
+             loglevel="LL_INFO"
+             description="Attempt to read all global service default attribute values">
         <datainfo>
             <item>name of service</item>
         </datainfo>
         <triggers>
             <item>View global configuration view of a service.</item>
         </triggers>
-        <actions />
+        <actions/>
     </logmessage>
     <logmessage name="SUCCEED_READ_ALL_GLOBAL_DEFAULT_ATTRIBUTE_VALUES" id="202"
                 loglevel="LL_INFO"
@@ -914,7 +918,7 @@
         <triggers>
             <item>View global configuration view of a service.</item>
         </triggers>
-        <actions />
+        <actions/>
     </logmessage>
     <logmessage name="ATTEMPT_READ_GLOBAL_DEFAULT_ATTRIBUTE_VALUES" id="203"
                 loglevel="LL_INFO"
@@ -926,7 +930,7 @@
         <triggers>
             <item>View global configuration view of a service.</item>
         </triggers>
-        <actions />
+        <actions/>
     </logmessage>
     <logmessage name="SUCCEED_READ_GLOBAL_DEFAULT_ATTRIBUTE_VALUES" id="204"
                 loglevel="LL_INFO"
@@ -938,7 +942,7 @@
         <triggers>
             <item>View global configuration view of a service.</item>
         </triggers>
-        <actions />
+        <actions/>
     </logmessage>
     <logmessage name="FAILED_READ_GLOBAL_DEFAULT_ATTRIBUTE_VALUES" id="205"
                 loglevel="LL_INFO"
@@ -954,11 +958,11 @@
             <item>Look under service management log for more information.</item>
         </actions>
     </logmessage>
-    
-    <!-- 211 to 220 are reserved for setting global default service attribute values -->
-    <logmessage name="ATTEMPT_WRITE_GLOBAL_DEFAULT_ATTRIBUTE_VALUES" id="211"
-                loglevel="LL_INFO"
-                description="Attempt to write global service default attribute values">
+
+ <!-- 211 to 220 are reserved for setting global default service attribute values -->
+ <logmessage name="ATTEMPT_WRITE_GLOBAL_DEFAULT_ATTRIBUTE_VALUES" id="211"
+             loglevel="LL_INFO"
+             description="Attempt to write global service default attribute values">
         <datainfo>
             <item>name of service</item>
             <item>name of attribute</item>
@@ -966,7 +970,7 @@
         <triggers>
             <item>Click on Save button in  global configuration view of a service.</item>
         </triggers>
-        <actions />
+        <actions/>
     </logmessage>
     <logmessage name="SUCCEED_WRITE_GLOBAL_DEFAULT_ATTRIBUTE_VALUES" id="212"
                 loglevel="LL_INFO"
@@ -978,9 +982,10 @@
         <triggers>
             <item>Click on Save button in  global configuration view of a service.</item>
         </triggers>
-        <actions />
+        <actions/>
     </logmessage>
-    <logmessage name="SSO_EXCEPTION_WRITE_GLOBAL_DEFAULT_ATTRIBUTE_VALUES" id="213"
+    <logmessage name="SSO_EXCEPTION_WRITE_GLOBAL_DEFAULT_ATTRIBUTE_VALUES"
+                id="213"
                 loglevel="LL_SEVERE"
                 description="Writing of global service default attribute values failed.">
         <datainfo>
@@ -994,7 +999,8 @@
         <actions>
         <item>Look under service management log for more information.</item>	</actions>
     </logmessage>
-    <logmessage name="SMS_EXCEPTION_WRITE_GLOBAL_DEFAULT_ATTRIBUTE_VALUES" id="214"
+    <logmessage name="SMS_EXCEPTION_WRITE_GLOBAL_DEFAULT_ATTRIBUTE_VALUES"
+                id="214"
                 loglevel="LL_SEVERE"
                 description="Writing of global service default attribute values failed.">
         <datainfo>
@@ -1008,11 +1014,11 @@
         <actions>
         <item>Look under service management log for more information.</item>	</actions>
     </logmessage>
-    
-    <!-- 221 to 230 are reserved for getting sub configuration names -->
-    <logmessage name="ATTEMPT_READ_GLOBAL_SUB_CONFIGURATION_NAMES" id="221"
-                loglevel="LL_INFO"
-                description="Attempt to get sub configuration names">
+
+ <!-- 221 to 230 are reserved for getting sub configuration names -->
+ <logmessage name="ATTEMPT_READ_GLOBAL_SUB_CONFIGURATION_NAMES" id="221"
+             loglevel="LL_INFO"
+             description="Attempt to get sub configuration names">
         <datainfo>
             <item>name of service</item>
             <item>name of base global sub configuration</item>
@@ -1020,7 +1026,7 @@
         <triggers>
             <item>View a global service view of which its service has sub schema.</item>
         </triggers>
-        <actions />
+        <actions/>
     </logmessage>
     <logmessage name="SUCCEED_READ_GLOBAL_SUB_CONFIGURATION_NAMES" id="222"
                 loglevel="LL_INFO"
@@ -1032,9 +1038,10 @@
         <triggers>
             <item>View a global service view of which its service has sub schema.</item>
         </triggers>
-        <actions />
+        <actions/>
     </logmessage>
-    <logmessage name="SSO_EXCEPTION_READ_GLOBAL_SUB_CONFIGURATION_NAMES" id="223"
+    <logmessage name="SSO_EXCEPTION_READ_GLOBAL_SUB_CONFIGURATION_NAMES"
+                id="223"
                 loglevel="LL_SEVERE"
                 description="Reading of global sub configuration names failed.">
         <datainfo>
@@ -1048,7 +1055,8 @@
         <actions>
         <item>Look under service management log for more information.</item>	</actions>
     </logmessage>
-    <logmessage name="SMS_EXCEPTION_READ_GLOBAL_SUB_CONFIGURATION_NAMES" id="224"
+    <logmessage name="SMS_EXCEPTION_READ_GLOBAL_SUB_CONFIGURATION_NAMES"
+                id="224"
                 loglevel="LL_SEVERE"
                 description="Reading of global sub configuration names failed.">
         <datainfo>
@@ -1062,11 +1070,11 @@
         <actions>
         <item>Look under service management log for more information.</item>	</actions>
     </logmessage>
-    
-    <!-- 231 to 240 are reserved for deleting sub configuration -->
-    <logmessage name="ATTEMPT_DELETE_GLOBAL_SUB_CONFIGURATION" id="231"
-                loglevel="LL_INFO"
-                description="Attempt to delete sub configuration">
+
+ <!-- 231 to 240 are reserved for deleting sub configuration -->
+ <logmessage name="ATTEMPT_DELETE_GLOBAL_SUB_CONFIGURATION" id="231"
+             loglevel="LL_INFO"
+             description="Attempt to delete sub configuration">
         <datainfo>
             <item>name of service</item>
             <item>name of base global sub configuration</item>
@@ -1075,7 +1083,7 @@
         <triggers>
             <item>Click on delete selected button in global service profile view.</item>
         </triggers>
-        <actions />
+        <actions/>
     </logmessage>
     <logmessage name="SUCCEED_DELETE_GLOBAL_SUB_CONFIGURATION" id="232"
                 loglevel="LL_INFO"
@@ -1088,7 +1096,7 @@
         <triggers>
             <item>Click on delete selected button in global service profile view.</item>
         </triggers>
-        <actions />
+        <actions/>
     </logmessage>
     <logmessage name="SSO_EXCEPTION_DELETE_GLOBAL_SUB_CONFIGURATION" id="233"
                 loglevel="LL_SEVERE"
@@ -1120,11 +1128,11 @@
         <actions>
         <item>Look under service management log for more information.</item>	</actions>
     </logmessage>
-    
-    <!-- 241 to 250 are reserved for creating sub configuration -->
-    <logmessage name="ATTEMPT_CREATE_GLOBAL_SUB_CONFIGURATION" id="241"
-                loglevel="LL_INFO"
-                description="Attempt to create sub configuration">
+
+ <!-- 241 to 250 are reserved for creating sub configuration -->
+ <logmessage name="ATTEMPT_CREATE_GLOBAL_SUB_CONFIGURATION" id="241"
+             loglevel="LL_INFO"
+             description="Attempt to create sub configuration">
         <datainfo>
             <item>name of service</item>
             <item>name of base global sub configuration</item>
@@ -1134,7 +1142,7 @@
         <triggers>
             <item>Click on add button in create sub configuration view.</item>
         </triggers>
-        <actions />
+        <actions/>
     </logmessage>
     <logmessage name="SUCCEED_CREATE_GLOBAL_SUB_CONFIGURATION" id="242"
                 loglevel="LL_INFO"
@@ -1148,7 +1156,7 @@
         <triggers>
             <item>Click on add button in create sub configuration view.</item>
         </triggers>
-        <actions />
+        <actions/>
     </logmessage>
     <logmessage name="SSO_EXCEPTION_CREATE_GLOBAL_SUB_CONFIGURATION" id="243"
                 loglevel="LL_SEVERE"
@@ -1182,24 +1190,26 @@
         <actions>
         <item>Look under service management log for more information.</item>	</actions>
     </logmessage>
-    
-    <!-- 251 to 260 are reserved for reading sub configuration's attribute values -->
-    <logmessage name="SUCCEED_READ_GLOBAL_SUB_CONFIGURATION_ATTRIBUTE_VALUES" id="251"
-                loglevel="LL_INFO"
-                description="Reading of sub configuration's attribute values succeeded">	<datainfo>
+
+ <!-- 251 to 260 are reserved for reading sub configuration's attribute values -->
+ <logmessage name="SUCCEED_READ_GLOBAL_SUB_CONFIGURATION_ATTRIBUTE_VALUES"
+             id="251"
+             loglevel="LL_INFO"
+             description="Reading of sub configuration's attribute values succeeded">	<datainfo>
             <item>name of service</item>
             <item>name of sub configuration</item>
         </datainfo>
         <triggers>
             <item>View sub configuration profile view.</item>
         </triggers>
-        <actions />
+        <actions/>
     </logmessage>
-    
-    <!-- 261 to 270 are reserved for writing sub configuration's attribute values -->
-    <logmessage name="ATTEMPT_WRITE_GLOBAL_SUB_CONFIGURATION_ATTRIBUTE_VALUES" id="261"
-                loglevel="LL_INFO"
-                description="Attempt to write sub configuration's attribute values">
+
+ <!-- 261 to 270 are reserved for writing sub configuration's attribute values -->
+ <logmessage name="ATTEMPT_WRITE_GLOBAL_SUB_CONFIGURATION_ATTRIBUTE_VALUES"
+             id="261"
+             loglevel="LL_INFO"
+             description="Attempt to write sub configuration's attribute values">
         <datainfo>
             <item>name of service</item>
             <item>name of sub configuration</item>
@@ -1207,9 +1217,10 @@
         <triggers>
             <item>Click on save button in sub configuration profile view.</item>
         </triggers>
-        <actions />
+        <actions/>
     </logmessage>
-    <logmessage name="SUCCEED_WRITE_GLOBAL_SUB_CONFIGURATION_ATTRIBUTE_VALUES" id="262"
+    <logmessage name="SUCCEED_WRITE_GLOBAL_SUB_CONFIGURATION_ATTRIBUTE_VALUES"
+                id="262"
                 loglevel="LL_INFO"
                 description="Writing of sub configuration's attribute values succeeded">
         <datainfo>
@@ -1219,11 +1230,13 @@
         <triggers>
             <item>Click on save button in sub configuration profile view.</item>
         </triggers>
-        <actions />
+        <actions/>
     </logmessage>
-    <logmessage name="SSO_EXCEPTION_WRITE_GLOBAL_SUB_CONFIGURATION_ATTRIBUTE_VALUES" id="263"
-                loglevel="LL_SEVERE"
-                description="Writing of sub configuration's attribute value failed.">
+    <logmessage
+    name="SSO_EXCEPTION_WRITE_GLOBAL_SUB_CONFIGURATION_ATTRIBUTE_VALUES"
+    id="263"
+    loglevel="LL_SEVERE"
+    description="Writing of sub configuration's attribute value failed.">
         <datainfo>
             <item>name of service</item>
             <item>name of sub configuration</item>
@@ -1235,9 +1248,11 @@
         <actions>
         <item>Look under service management log for more information.</item>	</actions>
     </logmessage>
-    <logmessage name="SMS_EXCEPTION_WRITE_GLOBAL_SUB_CONFIGURATION_ATTRIBUTE_VALUES_NAMES" id="264"
-                loglevel="LL_SEVERE"
-                description="Writing of sub configuration's attribute value failed.">
+    <logmessage
+    name="SMS_EXCEPTION_WRITE_GLOBAL_SUB_CONFIGURATION_ATTRIBUTE_VALUES_NAMES"
+    id="264"
+    loglevel="LL_SEVERE"
+    description="Writing of sub configuration's attribute value failed.">
         <datainfo>
             <item>name of service</item>
             <item>name of sub configuration</item>
@@ -1249,18 +1264,18 @@
         <actions>
         <item>Look under service management log for more information.</item>	</actions>
     </logmessage>
-    
-    <!-- 301 - 310 are reserved for getting policy names -->
-    <logmessage name="ATTEMPT_GET_POLICY_NAMES" id="301"
-                loglevel="LL_INFO"
-                description="Attempt to get policy names under a realm.">
+
+ <!-- 301 - 310 are reserved for getting policy names -->
+ <logmessage name="ATTEMPT_GET_POLICY_NAMES" id="301"
+             loglevel="LL_INFO"
+             description="Attempt to get policy names under a realm.">
         <datainfo>
             <item>name of realm</item>
         </datainfo>
         <triggers>
             <item>View policy main page.</item>
         </triggers>
-        <actions />
+        <actions/>
     </logmessage>
     <logmessage name="SUCCEED_GET_POLICY_NAMES" id="302"
                 loglevel="LL_INFO"
@@ -1271,7 +1286,7 @@
         <triggers>
             <item>View policy main page.</item>
         </triggers>
-        <actions />
+        <actions/>
     </logmessage>
     <logmessage name="SSO_EXCEPTION_GET_POLICY_NAMES" id="303"
                 loglevel="LL_SEVERE"
@@ -1301,11 +1316,11 @@
             <item>Look under policy log for more information.</item>
         </actions>
     </logmessage>
-    
-    <!-- 311 - 320 are reserved for getting policy names -->
-    <logmessage name="ATTEMPT_CREATE_POLICY" id="311"
-                loglevel="LL_INFO"
-                description="Attempt to create policy under a realm.">
+
+ <!-- 311 - 320 are reserved for getting policy names -->
+ <logmessage name="ATTEMPT_CREATE_POLICY" id="311"
+             loglevel="LL_INFO"
+             description="Attempt to create policy under a realm.">
         <datainfo>
             <item>name of realm</item>
             <item>name of policy</item>
@@ -1313,7 +1328,7 @@
         <triggers>
             <item>Click on New button in policy creation page.</item>
         </triggers>
-        <actions />
+        <actions/>
     </logmessage>
     <logmessage name="SUCCEED_CREATE_POLICY" id="312"
                 loglevel="LL_INFO"
@@ -1325,7 +1340,7 @@
         <triggers>
             <item>Click on New button in policy creation page.</item>
         </triggers>
-        <actions />
+        <actions/>
     </logmessage>
     <logmessage name="SSO_EXCEPTION_CREATE_POLICY" id="313"
                 loglevel="LL_SEVERE"
@@ -1357,11 +1372,11 @@
             <item>Look under policy log for more information.</item>
         </actions>
     </logmessage>
-    
-    <!-- 321 - 330 are reserved for getting policy names -->
-    <logmessage name="ATTEMPT_MODIFY_POLICY" id="321"
-                loglevel="LL_INFO"
-                description="Attempt to modify policy.">
+
+ <!-- 321 - 330 are reserved for getting policy names -->
+ <logmessage name="ATTEMPT_MODIFY_POLICY" id="321"
+             loglevel="LL_INFO"
+             description="Attempt to modify policy.">
         <datainfo>
             <item>name of realm</item>
             <item>name of policy</item>
@@ -1369,7 +1384,7 @@
         <triggers>
             <item>Click on Save button in policy profile page.</item>
         </triggers>
-        <actions />
+        <actions/>
     </logmessage>
     <logmessage name="SUCCEED_MODIFY_POLICY" id="322"
                 loglevel="LL_INFO"
@@ -1381,7 +1396,7 @@
         <triggers>
             <item>Click on Save button in policy profile page.</item>
         </triggers>
-        <actions />
+        <actions/>
     </logmessage>
     <logmessage name="SSO_EXCEPTION_MODIFY_POLICY" id="323"
                 loglevel="LL_SEVERE"
@@ -1413,11 +1428,11 @@
             <item>Look under policy log for more information.</item>
         </actions>
     </logmessage>
-    
-    <!-- 331 - 340 are reserved for getting policy names -->
-    <logmessage name="ATTEMPT_DELETE_POLICY" id="331"
-                loglevel="LL_INFO"
-                description="Attempt to delete policy.">
+
+ <!-- 331 - 340 are reserved for getting policy names -->
+ <logmessage name="ATTEMPT_DELETE_POLICY" id="331"
+             loglevel="LL_INFO"
+             description="Attempt to delete policy.">
         <datainfo>
             <item>name of realm</item>
             <item>names of policies</item>
@@ -1425,7 +1440,7 @@
         <triggers>
             <item>Click on Delete button in policy main page.</item>
         </triggers>
-        <actions />
+        <actions/>
     </logmessage>
     <logmessage name="SUCCEED_DELETE_POLICY" id="332"
                 loglevel="LL_INFO"
@@ -1437,7 +1452,7 @@
         <triggers>
             <item>Click on Delete button in policy main page.</item>
         </triggers>
-        <actions />
+        <actions/>
     </logmessage>
     <logmessage name="SSO_EXCEPTION_DELETE_POLICY" id="333"
                 loglevel="LL_SEVERE"
@@ -1468,18 +1483,18 @@
             <item>Look under policy log for more information.</item>
         </actions>
     </logmessage>
-    
-    <!-- 401 - 410 are reserved for getting realm names -->
-    <logmessage name="ATTEMPT_GET_REALM_NAMES" id="401"
-                loglevel="LL_INFO"
-                description="Attempt to get realm names">
+
+ <!-- 401 - 410 are reserved for getting realm names -->
+ <logmessage name="ATTEMPT_GET_REALM_NAMES" id="401"
+             loglevel="LL_INFO"
+             description="Attempt to get realm names">
         <datainfo>
             <item>name of parent realm</item>
         </datainfo>
         <triggers>
             <item>View realm main page.</item>
         </triggers>
-        <actions />
+        <actions/>
     </logmessage>
     <logmessage name="SUCCEED_GET_REALM_NAMES" id="402"
                 loglevel="LL_INFO"
@@ -1490,7 +1505,7 @@
         <triggers>
             <item>View realm main page.</item>
         </triggers>
-        <actions />
+        <actions/>
     </logmessage>
     <logmessage name="SMS_EXCEPTION_GET_REALM_NAMES" id="403"
                 loglevel="LL_SEVERE"
@@ -1506,11 +1521,11 @@
             <item>Look under service management log for more information.</item>
         </actions>
     </logmessage>
-    
-    <!-- 411 - 420 are reserved for create realm -->
-    <logmessage name="ATTEMPT_CREATE_REALM" id="411"
-                loglevel="LL_INFO"
-                description="Attempt to create realm">
+
+ <!-- 411 - 420 are reserved for create realm -->
+ <logmessage name="ATTEMPT_CREATE_REALM" id="411"
+             loglevel="LL_INFO"
+             description="Attempt to create realm">
         <datainfo>
             <item>name of parent realm</item>
             <item>name of new realm</item>
@@ -1518,7 +1533,7 @@
         <triggers>
             <item>Click on New button in create realm page.</item>
         </triggers>
-        <actions />
+        <actions/>
     </logmessage>
     <logmessage name="SUCCEED_CREATE_REALM" id="412"
                 loglevel="LL_INFO"
@@ -1530,7 +1545,7 @@
         <triggers>
             <item>Click on New button in create realm page.</item>
         </triggers>
-        <actions />
+        <actions/>
     </logmessage>
     <logmessage name="SMS_EXCEPTION_CREATE_REALM" id="413"
                 loglevel="LL_SEVERE"
@@ -1547,11 +1562,11 @@
             <item>Look under service management log for more information.</item>
         </actions>
     </logmessage>
-    
-    <!-- 421 - 430 are reserved for delete realm -->
-    <logmessage name="ATTEMPT_DELETE_REALM" id="421"
-                loglevel="LL_INFO"
-                description="Attempt to delete realm">
+
+ <!-- 421 - 430 are reserved for delete realm -->
+ <logmessage name="ATTEMPT_DELETE_REALM" id="421"
+             loglevel="LL_INFO"
+             description="Attempt to delete realm">
         <datainfo>
             <item>name of parent realm</item>
             <item>name of realm to delete</item>
@@ -1559,7 +1574,7 @@
         <triggers>
             <item>Click on Delete button in realm main page.</item>
         </triggers>
-        <actions />
+        <actions/>
     </logmessage>
     <logmessage name="SUCCEED_DELETE_REALM" id="422"
                 loglevel="LL_INFO"
@@ -1571,7 +1586,7 @@
         <triggers>
             <item>Click on Delete button in realm main page.</item>
         </triggers>
-        <actions />
+        <actions/>
     </logmessage>
     <logmessage name="SMS_EXCEPTION_DELETE_REALM" id="423"
                 loglevel="LL_SEVERE"
@@ -1588,18 +1603,18 @@
             <item>Look under service management log for more information.</item>
         </actions>
     </logmessage>
-    
-    <!-- 431 - 440 are reserved for get attribute values of realm -->
-    <logmessage name="ATTEMPT_GET_ATTR_VALUES_OF_REALM" id="431"
-                loglevel="LL_INFO"
-                description="Attempt to get attribute values of realm">
+
+ <!-- 431 - 440 are reserved for get attribute values of realm -->
+ <logmessage name="ATTEMPT_GET_ATTR_VALUES_OF_REALM" id="431"
+             loglevel="LL_INFO"
+             description="Attempt to get attribute values of realm">
         <datainfo>
             <item>name of realm</item>
         </datainfo>
         <triggers>
             <item>View realm profile page.</item>
         </triggers>
-        <actions />
+        <actions/>
     </logmessage>
     <logmessage name="SUCCEED_GET_ATTR_VALUES_OF_REALM" id="432"
                 loglevel="LL_INFO"
@@ -1610,7 +1625,7 @@
         <triggers>
             <item>View realm profile page.</item>
         </triggers>
-        <actions />
+        <actions/>
     </logmessage>
     <logmessage name="SMS_EXCEPTION_GET_ATTR_VALUES_OF_REALM" id="433"
                 loglevel="LL_SEVERE"
@@ -1626,18 +1641,18 @@
             <item>Look under service management log for more information.</item>
         </actions>
     </logmessage>
-    
-    <!-- 441 - 450 are reserved for modify realm's profile -->
-    <logmessage name="ATTEMPT_SET_ATTR_VALUES_OF_REALM" id="441"
-                loglevel="LL_INFO"
-                description="Attempt to modify realm's profile">
+
+ <!-- 441 - 450 are reserved for modify realm's profile -->
+ <logmessage name="ATTEMPT_SET_ATTR_VALUES_OF_REALM" id="441"
+             loglevel="LL_INFO"
+             description="Attempt to modify realm's profile">
         <datainfo>
             <item>name of realm</item>
         </datainfo>
         <triggers>
             <item>Click on Save button in realm profile page.</item>
         </triggers>
-        <actions />
+        <actions/>
     </logmessage>
     <logmessage name="SUCCEED_SET_ATTR_VALUES_OF_REALM" id="442"
                 loglevel="LL_INFO"
@@ -1648,7 +1663,7 @@
         <triggers>
             <item>Click on Save button in realm profile page.</item>
         </triggers>
-        <actions />
+        <actions/>
     </logmessage>
     <logmessage name="SMS_EXCEPTION_SET_ATTR_VALUES_OF_REALM" id="443"
                 loglevel="LL_SEVERE"
@@ -1664,11 +1679,11 @@
             <item>Look under service management log for more information.</item>
         </actions>
     </logmessage>
-    
-    <!-- 501 - 510 are reserved for get delegation subjects under a realm -->
-    <logmessage name="ATTEMPT_GET_DELEGATION_SUBJECTS" id="501"
-                loglevel="LL_INFO"
-                description="Attempt to get delegation subjects under a realm">
+
+ <!-- 501 - 510 are reserved for get delegation subjects under a realm -->
+ <logmessage name="ATTEMPT_GET_DELEGATION_SUBJECTS" id="501"
+             loglevel="LL_INFO"
+             description="Attempt to get delegation subjects under a realm">
         <datainfo>
             <item>name of realm</item>
             <item>search pattern</item>
@@ -1676,7 +1691,7 @@
         <triggers>
             <item>View delegation main page.</item>
         </triggers>
-        <actions />
+        <actions/>
     </logmessage>
     <logmessage name="SUCCEED_GET_DELEGATION_SUBJECTS" id="502"
                 loglevel="LL_INFO"
@@ -1688,7 +1703,7 @@
         <triggers>
             <item>View delegation main page.</item>
         </triggers>
-        <actions />
+        <actions/>
     </logmessage>
     <logmessage name="SSO_EXCEPTION_GET_DELEGATION_SUBJECTS" id="503"
                 loglevel="LL_SEVERE"
@@ -1720,11 +1735,11 @@
             <item>Look under delegation management log for more information.</item>
         </actions>
     </logmessage>
-    
-    <!-- 511 - 520 are reserved for get privileges for delegation subject -->
-    <logmessage name="ATTEMPT_GET_PRIVILEGES_OF_DELEGATION_SUBJECT" id="511"
-                loglevel="LL_INFO"
-                description="Attempt to get privileges of delegation subject">
+
+ <!-- 511 - 520 are reserved for get privileges for delegation subject -->
+ <logmessage name="ATTEMPT_GET_PRIVILEGES_OF_DELEGATION_SUBJECT" id="511"
+             loglevel="LL_INFO"
+             description="Attempt to get privileges of delegation subject">
         <datainfo>
             <item>name of realm</item>
             <item>ID of delegation subject</item>
@@ -1732,7 +1747,7 @@
         <triggers>
             <item>View delegation subject profile page.</item>
         </triggers>
-        <actions />
+        <actions/>
     </logmessage>
     <logmessage name="SUCCEED_GET_PRIVILEGES_OF_DELEGATION_SUBJECT" id="512"
                 loglevel="LL_INFO"
@@ -1744,9 +1759,10 @@
         <triggers>
             <item>View delegation subject profile page.</item>
         </triggers>
-        <actions />
+        <actions/>
     </logmessage>
-    <logmessage name="SSO_EXCEPTION_GET_PRIVILEGES_OF_DELEGATION_SUBJECT" id="513"
+    <logmessage name="SSO_EXCEPTION_GET_PRIVILEGES_OF_DELEGATION_SUBJECT"
+                id="513"
                 loglevel="LL_SEVERE"
                 description="Getting privileges of delegation subject failed.">
         <datainfo>
@@ -1761,7 +1777,8 @@
             <item>Look under delegation management log for more information.</item>
         </actions>
     </logmessage>
-    <logmessage name="DELEGATION_EXCEPTION_GET_PRIVILEGES_OF_DELEGATION_SUBJECT" id="514"
+    <logmessage name="DELEGATION_EXCEPTION_GET_PRIVILEGES_OF_DELEGATION_SUBJECT"
+                id="514"
                 loglevel="LL_SEVERE"
                 description="Getting privileges of delegation subject failed.">
         <datainfo>
@@ -1776,11 +1793,11 @@
             <item>Look under delegation management log for more information.</item>
         </actions>
     </logmessage>
-    
-    <!-- 521 - 530 are reserved for modify delegation privilege -->
-    <logmessage name="ATTEMPT_MODIFY_DELEGATION_PRIVILEGE" id="521"
-                loglevel="LL_INFO"
-                description="Attempt to modify delegation privilege">
+
+ <!-- 521 - 530 are reserved for modify delegation privilege -->
+ <logmessage name="ATTEMPT_MODIFY_DELEGATION_PRIVILEGE" id="521"
+             loglevel="LL_INFO"
+             description="Attempt to modify delegation privilege">
         <datainfo>
             <item>name of realm</item>
             <item>ID of delegation privilege</item>
@@ -1789,7 +1806,7 @@
         <triggers>
             <item>Click on Save button in delegation subject profile page.</item>
         </triggers>
-        <actions />
+        <actions/>
     </logmessage>
     <logmessage name="SUCCEED_MODIFY_DELEGATION_PRIVILEGE" id="522"
                 loglevel="LL_INFO"
@@ -1802,7 +1819,7 @@
         <triggers>
             <item>Click on Save button in delegation subject profile page.</item>
         </triggers>
-        <actions />
+        <actions/>
     </logmessage>
     <logmessage name="SSO_EXCEPTION_MODIFY_DELEGATION_PRIVILEGE" id="523"
                 loglevel="LL_SEVERE"
@@ -1836,18 +1853,18 @@
             <item>Look under delegation management log for more information.</item>
         </actions>
     </logmessage>
-    
-    <!-- 601 - 610 are reserved for get data store names -->
-    <logmessage name="ATTEMPT_GET_ID_REPO_NAMES" id="601"
-                loglevel="LL_INFO"
-                description="Attempt to get data store names">
+
+ <!-- 601 - 610 are reserved for get data store names -->
+ <logmessage name="ATTEMPT_GET_ID_REPO_NAMES" id="601"
+             loglevel="LL_INFO"
+             description="Attempt to get data store names">
         <datainfo>
             <item>name of realm</item>
         </datainfo>
         <triggers>
             <item>View data store main page.</item>
         </triggers>
-        <actions />
+        <actions/>
     </logmessage>
     <logmessage name="SUCCEED_GET_ID_REPO_NAMES" id="602"
                 loglevel="LL_INFO"
@@ -1858,7 +1875,7 @@
         <triggers>
             <item>View data store main page.</item>
         </triggers>
-        <actions />
+        <actions/>
     </logmessage>
     <logmessage name="SSO_EXCEPTION_GET_ID_REPO_NAMES" id="603"
                 loglevel="LL_SEVERE"
@@ -1888,11 +1905,11 @@
             <item>Look under service management log for more information.</item>
         </actions>
     </logmessage>
-    
-    <!-- 611 - 620 are reserved for get attribute values of data store -->
-    <logmessage name="ATTEMPT_GET_ATTR_VALUES_ID_REPO" id="611"
-                loglevel="LL_INFO"
-                description="Attempt to get attribute values of identity repository">
+
+ <!-- 611 - 620 are reserved for get attribute values of data store -->
+ <logmessage name="ATTEMPT_GET_ATTR_VALUES_ID_REPO" id="611"
+             loglevel="LL_INFO"
+             description="Attempt to get attribute values of identity repository">
         <datainfo>
             <item>name of realm</item>
             <item>name of identity repository</item>
@@ -1900,7 +1917,7 @@
         <triggers>
             <item>View data store profile page.</item>
         </triggers>
-        <actions />
+        <actions/>
     </logmessage>
     <logmessage name="SUCCEED_GET_ATTR_VALUES_ID_REPO" id="612"
                 loglevel="LL_INFO"
@@ -1912,7 +1929,7 @@
         <triggers>
             <item>View data store profile page.</item>
         </triggers>
-        <actions />
+        <actions/>
     </logmessage>
     <logmessage name="SSO_EXCEPTION_GET_ATTR_VALUES_ID_REPO" id="613"
                 loglevel="LL_SEVERE"
@@ -1944,11 +1961,11 @@
             <item>Look under service management log for more information.</item>
         </actions>
     </logmessage>
-    
-    <!-- 621 - 630 are reserved for create data store -->
-    <logmessage name="ATTEMPT_CREATE_ID_REPO" id="621"
-                loglevel="LL_INFO"
-                description="Attempt to create identity repository">
+
+ <!-- 621 - 630 are reserved for create data store -->
+ <logmessage name="ATTEMPT_CREATE_ID_REPO" id="621"
+             loglevel="LL_INFO"
+             description="Attempt to create identity repository">
         <datainfo>
             <item>name of realm</item>
             <item>name of identity repository</item>
@@ -1957,7 +1974,7 @@
         <triggers>
             <item>Click on New button in data store creation page.</item>
         </triggers>
-        <actions />
+        <actions/>
     </logmessage>
     <logmessage name="SUCCEED_CREATE_ID_REPO" id="622"
                 loglevel="LL_INFO"
@@ -1970,7 +1987,7 @@
         <triggers>
             <item>Click on New button in data store creation page.</item>
         </triggers>
-        <actions />
+        <actions/>
     </logmessage>
     <logmessage name="SSO_EXCEPTION_CREATE_ID_REPO" id="623"
                 loglevel="LL_SEVERE"
@@ -2004,11 +2021,11 @@
             <item>Look under service management log for more information.</item>
         </actions>
     </logmessage>
-    
-    <!-- 631 - 640 are reserved for delete data store -->
-    <logmessage name="ATTEMPT_DELETE_ID_REPO" id="631"
-                loglevel="LL_INFO"
-                description="Attempt to delete identity repository">
+
+ <!-- 631 - 640 are reserved for delete data store -->
+ <logmessage name="ATTEMPT_DELETE_ID_REPO" id="631"
+             loglevel="LL_INFO"
+             description="Attempt to delete identity repository">
         <datainfo>
             <item>name of realm</item>
             <item>name of identity repository</item>
@@ -2016,7 +2033,7 @@
         <triggers>
             <item>Click on Delete button in data store main page.</item>
         </triggers>
-        <actions />
+        <actions/>
     </logmessage>
     <logmessage name="SUCCEED_DELETE_ID_REPO" id="632"
                 loglevel="LL_INFO"
@@ -2028,7 +2045,7 @@
         <triggers>
             <item>Click on Delete button in data store main page.</item>
         </triggers>
-        <actions />
+        <actions/>
     </logmessage>
     <logmessage name="SSO_EXCEPTION_DELETE_ID_REPO" id="633"
                 loglevel="LL_SEVERE"
@@ -2060,11 +2077,11 @@
             <item>Look under service management log for more information.</item>
         </actions>
     </logmessage>
-    
-    <!-- 641 - 650 are reserved for modify data store -->
-    <logmessage name="ATTEMPT_MODIFY_ID_REPO" id="641"
-                loglevel="LL_INFO"
-                description="Attempt to modify identity repository">
+
+ <!-- 641 - 650 are reserved for modify data store -->
+ <logmessage name="ATTEMPT_MODIFY_ID_REPO" id="641"
+             loglevel="LL_INFO"
+             description="Attempt to modify identity repository">
         <datainfo>
             <item>name of realm</item>
             <item>name of identity repository</item>
@@ -2072,7 +2089,7 @@
         <triggers>
             <item>Click on Save button in data store profile page.</item>
         </triggers>
-        <actions />
+        <actions/>
     </logmessage>
     <logmessage name="SUCCEED_MODIFY_ID_REPO" id="642"
                 loglevel="LL_INFO"
@@ -2084,7 +2101,7 @@
         <triggers>
             <item>Click on Save button in data store profile page.</item>
         </triggers>
-        <actions />
+        <actions/>
     </logmessage>
     <logmessage name="SSO_EXCEPTION_MODIFY_ID_REPO" id="643"
                 loglevel="LL_SEVERE"
@@ -2116,18 +2133,18 @@
             <item>Look under service management log for more information.</item>
         </actions>
     </logmessage>
-    
-    <!-- 701 - 710 are reserved for get assigned services of realm -->
-    <logmessage name="ATTEMPT_GET_ASSIGNED_SERVICE_OF_REALM" id="701"
-                loglevel="LL_INFO"
-                description="Attempt to get assigned services of realm">
+
+ <!-- 701 - 710 are reserved for get assigned services of realm -->
+ <logmessage name="ATTEMPT_GET_ASSIGNED_SERVICE_OF_REALM" id="701"
+             loglevel="LL_INFO"
+             description="Attempt to get assigned services of realm">
         <datainfo>
             <item>name of realm</item>
         </datainfo>
         <triggers>
             <item>View realm's service main page.</item>
         </triggers>
-        <actions />
+        <actions/>
     </logmessage>
     <logmessage name="SUCCEED_GET_ASSIGNED_SERVICE_OF_REALM" id="702"
                 loglevel="LL_INFO"
@@ -2138,9 +2155,10 @@
         <triggers>
             <item>View realm's service main page.</item>
         </triggers>
-        <actions />
+        <actions/>
     </logmessage>
-    <logmessage name="CONFIGURATION_EXCEPTION_GET_ASSIGNED_SERVICE_OF_REALM" id="703"
+    <logmessage name="CONFIGURATION_EXCEPTION_GET_ASSIGNED_SERVICE_OF_REALM"
+                id="703"
                 loglevel="LL_SEVERE"
                 description="Getting assigned services of realm failed.">
         <datainfo>
@@ -2196,18 +2214,18 @@
             <item>Look under service management log for more information.</item>
         </actions>
     </logmessage>
-    
-    <!-- 711 - 720 are reserved for get assignable services of realm -->
-    <logmessage name="ATTEMPT_GET_ASSIGNABLE_SERVICE_OF_REALM" id="711"
-                loglevel="LL_INFO"
-                description="Attempt to get assignable services of realm">
+
+ <!-- 711 - 720 are reserved for get assignable services of realm -->
+ <logmessage name="ATTEMPT_GET_ASSIGNABLE_SERVICE_OF_REALM" id="711"
+             loglevel="LL_INFO"
+             description="Attempt to get assignable services of realm">
         <datainfo>
             <item>name of realm</item>
         </datainfo>
         <triggers>
             <item>View realm's service main page.</item>
         </triggers>
-        <actions />
+        <actions/>
     </logmessage>
     <logmessage name="SUCCEED_GET_ASSIGNABLE_SERVICE_OF_REALM" id="712"
                 loglevel="LL_INFO"
@@ -2218,9 +2236,10 @@
         <triggers>
             <item>View realm's service main page.</item>
         </triggers>
-        <actions />
+        <actions/>
     </logmessage>
-    <logmessage name="CONFIGURATION_EXCEPTION_GET_ASSIGNABLE_SERVICE_OF_REALM" id="713"
+    <logmessage name="CONFIGURATION_EXCEPTION_GET_ASSIGNABLE_SERVICE_OF_REALM"
+                id="713"
                 loglevel="LL_SEVERE"
                 description="Getting assignable services of realm failed.">
         <datainfo>
@@ -2276,11 +2295,11 @@
             <item>Look under service management log for more information.</item>
         </actions>
     </logmessage>
-    
-    <!-- 721 - 730 are reserved for unassign service from realm -->
-    <logmessage name="ATTEMPT_UNASSIGN_SERVICE_FROM_REALM" id="721"
-                loglevel="LL_INFO"
-                description="Attempt to unassign service from realm">
+
+ <!-- 721 - 730 are reserved for unassign service from realm -->
+ <logmessage name="ATTEMPT_UNASSIGN_SERVICE_FROM_REALM" id="721"
+             loglevel="LL_INFO"
+             description="Attempt to unassign service from realm">
         <datainfo>
             <item>name of realm</item>
             <item>name of service</item>
@@ -2288,7 +2307,7 @@
         <triggers>
             <item>Click on Unassign button in realm's service page.</item>
         </triggers>
-        <actions />
+        <actions/>
     </logmessage>
     <logmessage name="SUCCEED_UNASSIGN_SERVICE_FROM_REALM" id="722"
                 loglevel="LL_INFO"
@@ -2300,7 +2319,7 @@
         <triggers>
             <item>Click on Unassign button in realm's service page.</item>
         </triggers>
-        <actions />
+        <actions/>
     </logmessage>
     <logmessage name="SMS_EXCEPTION_UNASSIGN_SERVICE_FROM_REALM" id="723"
                 loglevel="LL_SEVERE"
@@ -2347,11 +2366,11 @@
             <item>Look under data store management log for more information.</item>
         </actions>
     </logmessage>
-    
-    <!-- 731 - 740 are reserved for assign service from realm -->
-    <logmessage name="ATTEMPT_ASSIGN_SERVICE_TO_REALM" id="731"
-                loglevel="LL_INFO"
-                description="Attempt to assign service to realm">
+
+ <!-- 731 - 740 are reserved for assign service from realm -->
+ <logmessage name="ATTEMPT_ASSIGN_SERVICE_TO_REALM" id="731"
+             loglevel="LL_INFO"
+             description="Attempt to assign service to realm">
         <datainfo>
             <item>name of realm</item>
             <item>name of service</item>
@@ -2359,7 +2378,7 @@
         <triggers>
             <item>Click on assign button in realm's service page.</item>
         </triggers>
-        <actions />
+        <actions/>
     </logmessage>
     <logmessage name="SUCCEED_ASSIGN_SERVICE_TO_REALM" id="732"
                 loglevel="LL_INFO"
@@ -2371,7 +2390,7 @@
         <triggers>
             <item>Click on assign button in realm's service page.</item>
         </triggers>
-        <actions />
+        <actions/>
     </logmessage>
     <logmessage name="SMS_EXCEPTION_ASSIGN_SERVICE_TO_REALM" id="733"
                 loglevel="LL_SEVERE"
@@ -2418,11 +2437,11 @@
             <item>Look under service management log for more information.</item>
         </actions>
     </logmessage>
-    
-    <!-- 741 - 750 are reserved for get attribute values of service -->
-    <logmessage name="ATTEMPT_GET_ATTR_VALUE_OF_SERVICE_UNDER_REALM" id="741"
-                loglevel="LL_INFO"
-                description="Attempt to get attribute values of service in realm">
+
+ <!-- 741 - 750 are reserved for get attribute values of service -->
+ <logmessage name="ATTEMPT_GET_ATTR_VALUE_OF_SERVICE_UNDER_REALM" id="741"
+             loglevel="LL_INFO"
+             description="Attempt to get attribute values of service in realm">
         <datainfo>
             <item>name of realm</item>
             <item>name of service</item>
@@ -2431,7 +2450,7 @@
         <triggers>
             <item>View realm's service profile page.</item>
         </triggers>
-        <actions />
+        <actions/>
     </logmessage>
     <logmessage name="SUCCEED_GET_ATTR_VALUE_OF_SERVICE_UNDER_REALM" id="742"
                 loglevel="LL_INFO"
@@ -2444,9 +2463,10 @@
         <triggers>
             <item>View realm's service profile page.</item>
         </triggers>
-        <actions />
+        <actions/>
     </logmessage>
-    <logmessage name="SMS_EXCEPTION_GET_ATTR_VALUE_OF_SERVICE_UNDER_REALM" id="743"
+    <logmessage name="SMS_EXCEPTION_GET_ATTR_VALUE_OF_SERVICE_UNDER_REALM"
+                id="743"
                 loglevel="LL_SEVERE"
                 description="Getting of attribute values of service under realm failed.">
         <datainfo>
@@ -2462,7 +2482,8 @@
             <item>Look under service management log for more information.</item>
         </actions>
     </logmessage>
-    <logmessage name="IDREPO_EXCEPTION_GET_ATTR_VALUE_OF_SERVICE_UNDER_REALM" id="744"
+    <logmessage name="IDREPO_EXCEPTION_GET_ATTR_VALUE_OF_SERVICE_UNDER_REALM"
+                id="744"
                 loglevel="LL_INFO"
                 description="Getting of attribute values of service under realm failed.">
         <datainfo>
@@ -2478,7 +2499,8 @@
             <item>Look under service management log for more information.</item>
         </actions>
     </logmessage>
-    <logmessage name="SSO_EXCEPTION_GET_ATTR_VALUE_OF_SERVICE_UNDER_REALM" id="745"
+    <logmessage name="SSO_EXCEPTION_GET_ATTR_VALUE_OF_SERVICE_UNDER_REALM"
+                id="745"
                 loglevel="LL_SEVERE"
                 description="Getting of attribute values of service under realm failed.">
         <datainfo>
@@ -2494,11 +2516,11 @@
             <item>Look under service management log for more information.</item>
         </actions>
     </logmessage>
-    
-    <!-- 751 - 760 are reserved for modify service profile under realm -->
-    <logmessage name="ATTEMPT_MODIFY_SERVICE_UNDER_REALM" id="751"
-                loglevel="LL_INFO"
-                description="Attempt to modify attribute values of service in realm">
+
+ <!-- 751 - 760 are reserved for modify service profile under realm -->
+ <logmessage name="ATTEMPT_MODIFY_SERVICE_UNDER_REALM" id="751"
+             loglevel="LL_INFO"
+             description="Attempt to modify attribute values of service in realm">
         <datainfo>
             <item>name of realm</item>
             <item>name of service</item>
@@ -2506,7 +2528,7 @@
         <triggers>
             <item>Click on Save button in realm's service profile page.</item>
         </triggers>
-        <actions />
+        <actions/>
     </logmessage>
     <logmessage name="SUCCEED_MODIFY_SERVICE_UNDER_REALM" id="752"
                 loglevel="LL_INFO"
@@ -2518,7 +2540,7 @@
         <triggers>
             <item>Click on Save button in realm's service profile page.</item>
         </triggers>
-        <actions />
+        <actions/>
     </logmessage>
     <logmessage name="SMS_EXCEPTION_MODIFY_SERVICE_UNDER_REALM" id="753"
                 loglevel="LL_SEVERE"
@@ -2565,18 +2587,18 @@
             <item>Look under data store log for more information.</item>
         </actions>
     </logmessage>
-    
-    <!-- 801 - 810 are reserved for getting authentication type -->
-    <logmessage name="ATTEMPT_GET_AUTH_TYPE" id="801"
-                loglevel="LL_INFO"
-                description="Attempt to get authentication type">
+
+ <!-- 801 - 810 are reserved for getting authentication type -->
+ <logmessage name="ATTEMPT_GET_AUTH_TYPE" id="801"
+             loglevel="LL_INFO"
+             description="Attempt to get authentication type">
         <datainfo>
             <item>server instance name</item>
         </datainfo>
         <triggers>
             <item>View authentication profile page.</item>
         </triggers>
-        <actions />
+        <actions/>
     </logmessage>
     <logmessage name="SUCCEED_GET_AUTH_TYPE" id="802"
                 loglevel="LL_INFO"
@@ -2587,7 +2609,7 @@
         <triggers>
             <item>View authentication profile page.</item>
         </triggers>
-        <actions />
+        <actions/>
     </logmessage>
     <logmessage name="SMS_EXCEPTION_GET_AUTH_TYPE" id="803"
                 loglevel="LL_SEVERE"
@@ -2602,18 +2624,18 @@
             <item>Look under authentication management log for more information.</item>
         </actions>
     </logmessage>
-    
-    <!-- 811 - 820 are reserved for get authentication instances under a realm -->
-    <logmessage name="ATTEMPT_GET_AUTH_INSTANCE" id="811"
-                loglevel="LL_INFO"
-                description="Attempt to get authentication instances under a realm">
+
+ <!-- 811 - 820 are reserved for get authentication instances under a realm -->
+ <logmessage name="ATTEMPT_GET_AUTH_INSTANCE" id="811"
+             loglevel="LL_INFO"
+             description="Attempt to get authentication instances under a realm">
         <datainfo>
             <item>name of realm</item>
         </datainfo>
         <triggers>
             <item>View authentication profile page.</item>
         </triggers>
-        <actions />
+        <actions/>
     </logmessage>
     <logmessage name="SUCCEED_GET_AUTH_INSTANCE" id="812"
                 loglevel="LL_INFO"
@@ -2624,7 +2646,7 @@
         <triggers>
             <item>View authentication profile page.</item>
         </triggers>
-        <actions />
+        <actions/>
     </logmessage>
     <logmessage name="AUTH_CONFIG_EXCEPTION_GET_AUTH_INSTANCE" id="813"
                 loglevel="LL_SEVERE"
@@ -2639,11 +2661,11 @@
             <item>Look under authentication management log for more information.</item>
         </actions>
     </logmessage>
-    
-    <!-- 821 - 830 are reserved for remove authentication instances under a realm -->
-    <logmessage name="ATTEMPT_REMOVE_AUTH_INSTANCE" id="821"
-                loglevel="LL_INFO"
-                description="Attempt to remove authentication instances under a realm">
+
+ <!-- 821 - 830 are reserved for remove authentication instances under a realm -->
+ <logmessage name="ATTEMPT_REMOVE_AUTH_INSTANCE" id="821"
+             loglevel="LL_INFO"
+             description="Attempt to remove authentication instances under a realm">
         <datainfo>
             <item>name of realm</item>
             <item>name of authentication instance</item>
@@ -2651,7 +2673,7 @@
         <triggers>
             <item>View authentication profile page.</item>
         </triggers>
-        <actions />
+        <actions/>
     </logmessage>
     <logmessage name="SUCCEED_REMOVE_AUTH_INSTANCE" id="822"
                 loglevel="LL_INFO"
@@ -2663,7 +2685,7 @@
         <triggers>
             <item>View authentication profile page.</item>
         </triggers>
-        <actions />
+        <actions/>
     </logmessage>
     <logmessage name="AUTH_CONFIG_EXCEPTION_REMOVE_AUTH_INSTANCE" id="823"
                 loglevel="LL_SEVERE"
@@ -2679,11 +2701,11 @@
             <item>Look under authentication management log for more information.</item>
         </actions>
     </logmessage>
-    
-    <!-- 831 - 840 are reserved for create authentication instance under a realm -->
-    <logmessage name="ATTEMPT_CREATE_AUTH_INSTANCE" id="831"
-                loglevel="LL_INFO"
-                description="Attempt to create authentication instance under a realm">
+
+ <!-- 831 - 840 are reserved for create authentication instance under a realm -->
+ <logmessage name="ATTEMPT_CREATE_AUTH_INSTANCE" id="831"
+             loglevel="LL_INFO"
+             description="Attempt to create authentication instance under a realm">
         <datainfo>
             <item>name of realm</item>
             <item>name of authentication instance</item>
@@ -2692,7 +2714,7 @@
         <triggers>
             <item>Click on New button in authentication creation page.</item>
         </triggers>
-        <actions />
+        <actions/>
     </logmessage>
     <logmessage name="SUCCEED_CREATE_AUTH_INSTANCE" id="832"
                 loglevel="LL_INFO"
@@ -2705,7 +2727,7 @@
         <triggers>
             <item>Click on New button in authentication creation page.</item>
         </triggers>
-        <actions />
+        <actions/>
     </logmessage>
     <logmessage name="AUTH_CONFIG_EXCEPTION_CREATE_AUTH_INSTANCE" id="833"
                 loglevel="LL_SEVERE"
@@ -2722,11 +2744,11 @@
             <item>Look under authentication configuration log for more information.</item>
         </actions>
     </logmessage>
-    
-    <!-- 841 - 850 are reserved for modify authentication instance -->
-    <logmessage name="ATTEMPT_MODIFY_AUTH_INSTANCE" id="841"
-                loglevel="LL_INFO"
-                description="Attempt to modify authentication instance">
+
+ <!-- 841 - 850 are reserved for modify authentication instance -->
+ <logmessage name="ATTEMPT_MODIFY_AUTH_INSTANCE" id="841"
+             loglevel="LL_INFO"
+             description="Attempt to modify authentication instance">
         <datainfo>
             <item>name of realm</item>
             <item>name of authentication service</item>
@@ -2734,7 +2756,7 @@
         <triggers>
             <item>Click on Save button in authentication profile page.</item>
         </triggers>
-        <actions />
+        <actions/>
     </logmessage>
     <logmessage name="SUCCEED_MODIFY_AUTH_INSTANCE" id="842"
                 loglevel="LL_INFO"
@@ -2746,7 +2768,7 @@
         <triggers>
             <item>Click on Save button in authentication profile page.</item>
         </triggers>
-        <actions />
+        <actions/>
     </logmessage>
     <logmessage name="SMS_EXCEPTION_MODIFY_AUTH_INSTANCE" id="843"
                 loglevel="LL_SEVERE"
@@ -2778,11 +2800,11 @@
             <item>Look under service management log for more information.</item>
         </actions>
     </logmessage>
-    
-    <!-- 851 - 860 are reserved for get authentication instance profile -->
-    <logmessage name="ATTEMPT_GET_AUTH_INSTANCE_PROFILE" id="851"
-                loglevel="LL_INFO"
-                description="Attempt to get authentication instance profile">
+
+ <!-- 851 - 860 are reserved for get authentication instance profile -->
+ <logmessage name="ATTEMPT_GET_AUTH_INSTANCE_PROFILE" id="851"
+             loglevel="LL_INFO"
+             description="Attempt to get authentication instance profile">
         <datainfo>
             <item>name of realm</item>
             <item>name of authentication instance</item>
@@ -2790,7 +2812,7 @@
         <triggers>
             <item>View authentication instance profile page.</item>
         </triggers>
-        <actions />
+        <actions/>
     </logmessage>
     <logmessage name="SUCCEED_GET_AUTH_INSTANCE_PROFILE" id="852"
                 loglevel="LL_INFO"
@@ -2802,9 +2824,10 @@
         <triggers>
             <item>View authentication instance profile page.</item>
         </triggers>
-        <actions />
+        <actions/>
     </logmessage>
-    <logmessage name="AUTH_CONFIGURATION_EXCEPTION_GET_AUTH_INSTANCE_PROFILE" id="853"
+    <logmessage name="AUTH_CONFIGURATION_EXCEPTION_GET_AUTH_INSTANCE_PROFILE"
+                id="853"
                 loglevel="LL_SEVERE"
                 description="Getting of authentication instance profile failed.">
         <datainfo>
@@ -2819,11 +2842,11 @@
             <item>Look under authentication management log for more information.</item>
         </actions>
     </logmessage>
-    
-    <!-- 861 - 870 are reserved for modify authentication instance profile -->
-    <logmessage name="ATTEMPT_MODIFY_AUTH_INSTANCE_PROFILE" id="861"
-                loglevel="LL_INFO"
-                description="Attempt to modify authentication instance profile">
+
+ <!-- 861 - 870 are reserved for modify authentication instance profile -->
+ <logmessage name="ATTEMPT_MODIFY_AUTH_INSTANCE_PROFILE" id="861"
+             loglevel="LL_INFO"
+             description="Attempt to modify authentication instance profile">
         <datainfo>
             <item>name of realm</item>
             <item>name of authentication instance</item>
@@ -2831,7 +2854,7 @@
         <triggers>
             <item>Click on Save button in authentication instance profile page.</item>
         </triggers>
-        <actions />
+        <actions/>
     </logmessage>
     <logmessage name="SUCCEED_MODIFY_AUTH_INSTANCE_PROFILE" id="862"
                 loglevel="LL_INFO"
@@ -2843,9 +2866,10 @@
         <triggers>
             <item>Click on Save button in authentication instance profile page.</item>
         </triggers>
-        <actions />
+        <actions/>
     </logmessage>
-    <logmessage name="AUTH_CONFIGURATION_EXCEPTION_MODIFY_AUTH_INSTANCE_PROFILE" id="863"
+    <logmessage name="AUTH_CONFIGURATION_EXCEPTION_MODIFY_AUTH_INSTANCE_PROFILE"
+                id="863"
                 loglevel="LL_SEVERE"
                 description="Modification of authentication instance profile failed.">
         <datainfo>
@@ -2875,7 +2899,8 @@
             <item>Look under service management log for more information.</item>
         </actions>
     </logmessage>
-    <logmessage name="SSO_EXCEPTION_MODIFY_AUTH_INSTANCE_PROFILE" id="865"         loglevel="LL_SEVERE"
+    <logmessage name="SSO_EXCEPTION_MODIFY_AUTH_INSTANCE_PROFILE" id="865"
+                loglevel="LL_SEVERE"
                 description="Modification of authentication instance profile failed.">
         <datainfo>
             <item>name of realm</item>
@@ -2888,18 +2913,18 @@
         <actions>
         <item>Look under service management log for more information.</item>        </actions>
     </logmessage>
-    
-    <!-- 871 - 880 are reserved for get authentication profile under a realm -->
-    <logmessage name="ATTEMPT_GET_AUTH_PROFILE_IN_REALM" id="871"
-                loglevel="LL_INFO"
-                description="Attempt to get authentication profile under a realm">
+
+ <!-- 871 - 880 are reserved for get authentication profile under a realm -->
+ <logmessage name="ATTEMPT_GET_AUTH_PROFILE_IN_REALM" id="871"
+             loglevel="LL_INFO"
+             description="Attempt to get authentication profile under a realm">
         <datainfo>
             <item>name of realm</item>
         </datainfo>
         <triggers>
             <item>View authentication profile under a realm page.</item>
         </triggers>
-        <actions />
+        <actions/>
     </logmessage>
     <logmessage name="SUCCEED_GET_AUTH_PROFILE_IN_REALM" id="872"
                 loglevel="LL_INFO"
@@ -2910,9 +2935,10 @@
         <triggers>
             <item>View authentication profile under a realm page.</item>
         </triggers>
-        <actions />
+        <actions/>
     </logmessage>
-    <logmessage name="SMS_CONFIGURATION_EXCEPTION_GET_AUTH_PROFILE_IN_REALM" id="873"
+    <logmessage name="SMS_CONFIGURATION_EXCEPTION_GET_AUTH_PROFILE_IN_REALM"
+                id="873"
                 loglevel="LL_SEVERE"
                 description="Getting authentication profile under a realm failed.">
         <datainfo>
@@ -2926,10 +2952,10 @@
             <item>Look under service management log for more information.</item>
         </actions>
     </logmessage>
-    <!-- 881 - 890 are reserved for get authentication configuration profile -->
-    <logmessage name="ATTEMPT_GET_AUTH_CONFIG_PROFILE" id="881"
-                loglevel="LL_INFO"
-                description="Attempt to get authentication configuration profile">
+ <!-- 881 - 890 are reserved for get authentication configuration profile -->
+ <logmessage name="ATTEMPT_GET_AUTH_CONFIG_PROFILE" id="881"
+             loglevel="LL_INFO"
+             description="Attempt to get authentication configuration profile">
         <datainfo>
             <item>name of realm</item>
             <item>name of authentication configuration</item>
@@ -2937,7 +2963,7 @@
         <triggers>
             <item>View authentication configuration profile page.</item>
         </triggers>
-        <actions />
+        <actions/>
     </logmessage>
     <logmessage name="SUCCEED_GET_AUTH_CONFIG_PROFILE" id="882"
                 loglevel="LL_INFO"
@@ -2949,7 +2975,7 @@
         <triggers>
             <item>View authentication configuration profile page.</item>
         </triggers>
-        <actions />
+        <actions/>
     </logmessage>
     <logmessage name="SSO_EXCEPTION_GET_AUTH_CONFIG_PROFILE" id="883"
                 loglevel="LL_SEVERE"
@@ -2979,7 +3005,8 @@
         <actions>
         <item>Look under service management log for more information.</item>        </actions>
     </logmessage>
-    <logmessage name="AUTH_CONFIGURATION_EXCEPTION_GET_AUTH_CONFIG_PROFILE" id="885"
+    <logmessage name="AUTH_CONFIGURATION_EXCEPTION_GET_AUTH_CONFIG_PROFILE"
+                id="885"
                 loglevel="LL_SEVERE"
                 description="Getting authentication configuration profile failed.">
         <datainfo>
@@ -2994,11 +3021,11 @@
             <item>Look under authentication configuration log for more information.</item>
         </actions>
     </logmessage>
-    
-    <!-- 891 - 900 are reserved for modify authentication configuration profile -->
-    <logmessage name="ATTEMPT_MODIFY_AUTH_CONFIG_PROFILE" id="891"
-                loglevel="LL_INFO"
-                description="Attempt to modify authentication configuration profile">
+
+ <!-- 891 - 900 are reserved for modify authentication configuration profile -->
+ <logmessage name="ATTEMPT_MODIFY_AUTH_CONFIG_PROFILE" id="891"
+             loglevel="LL_INFO"
+             description="Attempt to modify authentication configuration profile">
         <datainfo>
             <item>name of realm</item>
             <item>name of authentication configuration</item>
@@ -3006,7 +3033,7 @@
         <triggers>
             <item>Click on Save button in authentication configuration profile page.</item>
         </triggers>
-        <actions />
+        <actions/>
     </logmessage>
     <logmessage name="SUCCEED_MODIFY_AUTH_CONFIG_PROFILE" id="892"
                 loglevel="LL_INFO"
@@ -3018,7 +3045,7 @@
         <triggers>
             <item>Click on Save button in authentication configuration profile page.</item>
         </triggers>
-        <actions />
+        <actions/>
     </logmessage>
     <logmessage name="SSO_EXCEPTION_MODIFY_AUTH_CONFIG_PROFILE" id="893"
                 loglevel="LL_SEVERE"
@@ -3048,7 +3075,8 @@
         <actions>
         <item>Look under service management log for more information.</item>        </actions>
     </logmessage>
-    <logmessage name="AUTH_CONFIGURATION_EXCEPTION_MODIFY_AUTH_CONFIG_PROFILE" id="895"
+    <logmessage name="AUTH_CONFIGURATION_EXCEPTION_MODIFY_AUTH_CONFIG_PROFILE"
+                id="895"
                 loglevel="LL_SEVERE"
                 description="Modification of authentication configuration profile failed.">
         <datainfo>
@@ -3063,11 +3091,11 @@
             <item>Look under authentication configuration log for more information.</item>
         </actions>
     </logmessage>
-    
-    <!-- 901 - 910 are reserved for create authentication configuration -->
-    <logmessage name="ATTEMPT_CREATE_AUTH_CONFIG" id="901"
-                loglevel="LL_INFO"
-                description="Attempt to create authentication configuration">
+
+ <!-- 901 - 910 are reserved for create authentication configuration -->
+ <logmessage name="ATTEMPT_CREATE_AUTH_CONFIG" id="901"
+             loglevel="LL_INFO"
+             description="Attempt to create authentication configuration">
         <datainfo>
             <item>name of realm</item>
             <item>name of authentication configuration</item>
@@ -3075,7 +3103,7 @@
         <triggers>
             <item>Click on New button in authentication configuration creation page.</item>
         </triggers>
-        <actions />
+        <actions/>
     </logmessage>
     <logmessage name="SUCCEED_CREATE_AUTH_CONFIG" id="902"
                 loglevel="LL_INFO"
@@ -3087,7 +3115,7 @@
         <triggers>
             <item>Click on New button in authentication configuration creation page.</item>
         </triggers>
-        <actions />
+        <actions/>
     </logmessage>
     <logmessage name="SSO_EXCEPTION_CREATE_AUTH_CONFIG" id="903"
                 loglevel="LL_SEVERE"
@@ -3132,19 +3160,19 @@
             <item>Look under authentication configuration log for more information.</item>
         </actions>
     </logmessage>
-    
-    
-    <!-- 1001 - 1010 are reserved for getting entity descriptor names -->
-    <logmessage name="ATTEMPT_GET_ENTITY_DESCRIPTOR" id="1001"
-                loglevel="LL_INFO"
-                description="Attempt to get entity descriptor names.">
+
+
+ <!-- 1001 - 1010 are reserved for getting entity descriptor names -->
+ <logmessage name="ATTEMPT_GET_ENTITY_DESCRIPTOR" id="1001"
+             loglevel="LL_INFO"
+             description="Attempt to get entity descriptor names.">
         <datainfo>
             <item>search pattern</item>
         </datainfo>
         <triggers>
             <item>View entity descriptor main page.</item>
         </triggers>
-        <actions />
+        <actions/>
     </logmessage>
     <logmessage name="SUCCEED_GET_ENTITY_DESCRIPTOR" id="1002"
                 loglevel="LL_INFO"
@@ -3155,7 +3183,7 @@
         <triggers>
             <item>View entity descriptor main page.</item>
         </triggers>
-        <actions />
+        <actions/>
     </logmessage>
     <logmessage name="FEDERATION_EXCEPTION_GET_ENTITY_DESCRIPTOR" id="1003"
                 loglevel="LL_SEVERE"
@@ -3171,11 +3199,11 @@
             <item>Look under federation log for more information.</item>
         </actions>
     </logmessage>
-    
-    <!-- 1011 - 1020 are reserved for create federation's entity descriptor -->
-    <logmessage name="ATTEMPT_CREATE_ENTITY_DESCRIPTOR" id="1011"
-                loglevel="LL_INFO"
-                description="Attempt to create entity descriptor.">
+
+ <!-- 1011 - 1020 are reserved for create federation's entity descriptor -->
+ <logmessage name="ATTEMPT_CREATE_ENTITY_DESCRIPTOR" id="1011"
+             loglevel="LL_INFO"
+             description="Attempt to create entity descriptor.">
         <datainfo>
             <item>descriptor realm</item>
             <item>descriptor name</item>
@@ -3184,7 +3212,7 @@
         </datainfo>
         <triggers>
         <item>Click on New button in entity descriptor creation page.</item>       </triggers>
-        <actions />
+        <actions/>
     </logmessage>
     <logmessage name="SUCCEED_CREATE_ENTITY_DESCRIPTOR" id="1012"
                 loglevel="LL_INFO"
@@ -3198,7 +3226,7 @@
         <triggers>
             <item>Click on New button in entity descriptor creation page.</item>
         </triggers>
-        <actions />
+        <actions/>
     </logmessage>
     <logmessage name="FEDERATION_EXCEPTION_CREATE_ENTITY_DESCRIPTOR" id="1013"
                 loglevel="LL_SEVERE"
@@ -3217,18 +3245,18 @@
             <item>Look under federation log for more information.</item>
         </actions>
     </logmessage>
-    
-    <!-- 1021 - 1030 are reserved for delete federation's entity descriptor -->
-    <logmessage name="ATTEMPT_DELETE_ENTITY_DESCRIPTORS" id="1021"
-                loglevel="LL_INFO"
-                description="Attempt to delete entity descriptors.">
+
+ <!-- 1021 - 1030 are reserved for delete federation's entity descriptor -->
+ <logmessage name="ATTEMPT_DELETE_ENTITY_DESCRIPTORS" id="1021"
+             loglevel="LL_INFO"
+             description="Attempt to delete entity descriptors.">
         <datainfo>
             <item>descriptor names</item>
         </datainfo>
         <triggers>
             <item>Click on Delete button in entity descriptor main page.</item>
         </triggers>
-        <actions />
+        <actions/>
     </logmessage>
     <logmessage name="SUCCEED_DELETE_ENTITY_DESCRIPTORS" id="1022"
                 loglevel="LL_INFO"
@@ -3239,7 +3267,7 @@
         <triggers>
             <item>Click on Delete button in entity descriptor main page.</item>
         </triggers>
-        <actions />
+        <actions/>
     </logmessage>
     <logmessage name="FEDERATION_EXCEPTION_DELETE_ENTITY_DESCRIPTORS" id="1023"
                 loglevel="LL_SEVERE"
@@ -3255,11 +3283,12 @@
             <item>Look under federation log for more information.</item>
         </actions>
     </logmessage>
-    
-    <!-- 1031 - 1040 are reserved for getting attribute values of affiliated entity descriptor -->
-    <logmessage name="ATTEMPT_GET_AFFILIATE_ENTITY_DESCRIPTOR_ATTR_VALUES" id="1031"
-                loglevel="LL_INFO"
-                description="Attempt to get attribute values of an affiliate entity descriptor.">
+
+ <!-- 1031 - 1040 are reserved for getting attribute values of affiliated entity descriptor -->
+ <logmessage name="ATTEMPT_GET_AFFILIATE_ENTITY_DESCRIPTOR_ATTR_VALUES"
+             id="1031"
+             loglevel="LL_INFO"
+             description="Attempt to get attribute values of an affiliate entity descriptor.">
         <datainfo>
             <item>descriptor realm</item>
             <item>descriptor name</item>
@@ -3268,9 +3297,10 @@
         <triggers>
             <item>View affiliate entity descriptor profile page.</item>
         </triggers>
-        <actions />
+        <actions/>
     </logmessage>
-    <logmessage name="SUCCEED_GET_AFFILIATE_ENTITY_DESCRIPTOR_ATTR_VALUES" id="1032"
+    <logmessage name="SUCCEED_GET_AFFILIATE_ENTITY_DESCRIPTOR_ATTR_VALUES"
+                id="1032"
                 loglevel="LL_INFO"
                 description="Getting of attribute values of an affiliate entity descriptor succeeded.">
         <datainfo>
@@ -3281,11 +3311,13 @@
         <triggers>
             <item>View affiliate entity descriptor profile page.</item>
         </triggers>
-        <actions />
+        <actions/>
     </logmessage>
-    <logmessage name="FEDERATION_EXCEPTION_GET_AFFILIATE_ENTITY_DESCRIPTOR_ATTR_VALUES" id="1033"
-                loglevel="LL_SEVERE"
-                description="Getting of attribute values of an affiliate entity descriptor failed.">
+    <logmessage
+    name="FEDERATION_EXCEPTION_GET_AFFILIATE_ENTITY_DESCRIPTOR_ATTR_VALUES"
+    id="1033"
+    loglevel="LL_SEVERE"
+    description="Getting of attribute values of an affiliate entity descriptor failed.">
         <datainfo>
             <item>descriptor realm</item>
             <item>descriptor name</item>
@@ -3299,11 +3331,11 @@
             <item>Look under federation log for more information.</item>
         </actions>
     </logmessage>
-    
-    <!-- 1041 - 1050 are reserved for modifying attribute values of affiliated entity descriptor -->
-    <logmessage name="ATTEMPT_MODIFY_AFFILIATE_ENTITY_DESCRIPTOR" id="1041"
-                loglevel="LL_INFO"
-                description="Attempt to modify an affiliate entity descriptor.">
+
+ <!-- 1041 - 1050 are reserved for modifying attribute values of affiliated entity descriptor -->
+ <logmessage name="ATTEMPT_MODIFY_AFFILIATE_ENTITY_DESCRIPTOR" id="1041"
+             loglevel="LL_INFO"
+             description="Attempt to modify an affiliate entity descriptor.">
         <datainfo>
             <item>descriptor realm</item>
             <item>descriptor name</item>
@@ -3312,7 +3344,7 @@
         <triggers>
             <item>Click on Save button of affiliate entity descriptor profile page.</item>
         </triggers>
-        <actions />
+        <actions/>
     </logmessage>
     <logmessage name="SUCCEED_MODIFY_AFFILIATE_ENTITY_DESCRIPTOR" id="1042"
                 loglevel="LL_INFO"
@@ -3325,9 +3357,10 @@
         <triggers>
             <item>Click on Save button of affiliate entity descriptor profile page.</item>
         </triggers>
-        <actions />
+        <actions/>
     </logmessage>
-    <logmessage name="FEDERATION_EXCEPTION_MODIFY_AFFILIATE_ENTITY_DESCRIPTOR" id="1043"
+    <logmessage name="FEDERATION_EXCEPTION_MODIFY_AFFILIATE_ENTITY_DESCRIPTOR"
+                id="1043"
                 loglevel="LL_SEVERE"
                 description="Modification of an affiliate entity descriptor failed.">
         <datainfo>
@@ -3343,9 +3376,11 @@
             <item>Look under federation log for more information.</item>
         </actions>
     </logmessage>
-    <logmessage name="ATTRIBUTE_FORMAT_EXCEPTION_MODIFY_AFFILIATE_ENTITY_DESCRIPTOR" id="1044"
-                loglevel="LL_SEVERE"
-                description="Modification of an affiliate entity descriptor failed.">
+    <logmessage
+    name="ATTRIBUTE_FORMAT_EXCEPTION_MODIFY_AFFILIATE_ENTITY_DESCRIPTOR"
+    id="1044"
+    loglevel="LL_SEVERE"
+    description="Modification of an affiliate entity descriptor failed.">
         <datainfo>
             <item>descriptor name</item>
             <item>error message</item>
@@ -3357,11 +3392,11 @@
             <item>Look under federation log for more information.</item>
         </actions>
     </logmessage>
-    
-    <!-- 1051 - 1060 are reserved for getting attribute values of entity descriptor -->
-    <logmessage name="ATTEMPT_GET_ENTITY_DESCRIPTOR_ATTR_VALUES" id="1051"
-                loglevel="LL_INFO"
-                description="Attempt to get attribute values of an entity descriptor.">
+
+ <!-- 1051 - 1060 are reserved for getting attribute values of entity descriptor -->
+ <logmessage name="ATTEMPT_GET_ENTITY_DESCRIPTOR_ATTR_VALUES" id="1051"
+             loglevel="LL_INFO"
+             description="Attempt to get attribute values of an entity descriptor.">
         <datainfo>            
             <item>descriptor realm</item>
             <item>descriptor name</item>
@@ -3371,7 +3406,7 @@
         <triggers>
             <item>View entity descriptor profile page.</item>
         </triggers>
-        <actions />
+        <actions/>
     </logmessage>
     <logmessage name="SUCCEED_GET_ENTITY_DESCRIPTOR_ATTR_VALUES" id="1052"
                 loglevel="LL_INFO"
@@ -3385,9 +3420,10 @@
         <triggers>
             <item>View entity descriptor profile page.</item>
         </triggers>
-        <actions />
+        <actions/>
     </logmessage>
-    <logmessage name="FEDERATION_EXCEPTION_GET_ENTITY_DESCRIPTOR_ATTR_VALUES" id="1053"
+    <logmessage name="FEDERATION_EXCEPTION_GET_ENTITY_DESCRIPTOR_ATTR_VALUES"
+                id="1053"
                 loglevel="LL_SEVERE"
                 description="Getting attribute values of entity descriptor failed.">
         <datainfo>
@@ -3404,11 +3440,11 @@
             <item>Look under federation log for more information.</item>
         </actions>
     </logmessage>
-    
-    <!-- 1061 - 1070 are reserved for modifying entity descriptor -->
-    <logmessage name="ATTEMPT_MODIFY_ENTITY_DESCRIPTOR" id="1061"
-                loglevel="LL_INFO"
-                description="Attempt to modify entity descriptor.">
+
+ <!-- 1061 - 1070 are reserved for modifying entity descriptor -->
+ <logmessage name="ATTEMPT_MODIFY_ENTITY_DESCRIPTOR" id="1061"
+             loglevel="LL_INFO"
+             description="Attempt to modify entity descriptor.">
         <datainfo>
             <item>descriptor realm</item>
             <item>descriptor name</item>
@@ -3417,7 +3453,7 @@
         </datainfo>
         <triggers>
         <item>Click on Save button in entity descriptor profile page.</item>       </triggers>
-        <actions />
+        <actions/>
     </logmessage>
     <logmessage name="SUCCEED_MODIFY_ENTITY_DESCRIPTOR" id="1062"
                 loglevel="LL_INFO"
@@ -3431,7 +3467,7 @@
         <triggers>
             <item>Click on Save button in entity descriptor profile page.</item>
         </triggers>
-        <actions />
+        <actions/>
     </logmessage>
     <logmessage name="FEDERATION_EXCEPTION_MODIFY_ENTITY_DESCRIPTOR" id="1063"
                 loglevel="LL_SEVERE"
@@ -3450,18 +3486,18 @@
             <item>Look under federation log for more information.</item>
         </actions>
     </logmessage>
-    
-    <!-- 1101 - 1110 are reserved for getting authentication domain names -->
-    <logmessage name="ATTEMPT_GET_AUTH_DOMAINS" id="1101"
-                loglevel="LL_INFO"
-                description="Attempt to get authentication domain names.">
+
+ <!-- 1101 - 1110 are reserved for getting authentication domain names -->
+ <logmessage name="ATTEMPT_GET_AUTH_DOMAINS" id="1101"
+             loglevel="LL_INFO"
+             description="Attempt to get authentication domain names.">
         <datainfo>
             <item>search pattern</item>
         </datainfo>
         <triggers>
             <item>View authentication domain main page.</item>
         </triggers>
-        <actions />
+        <actions/>
     </logmessage>
     <logmessage name="SUCCEED_GET_AUTH_DOMAINS" id="1102"
                 loglevel="LL_INFO"
@@ -3472,7 +3508,7 @@
         <triggers>
             <item>View authentication domain main page.</item>
         </triggers>
-        <actions />
+        <actions/>
     </logmessage>
     <logmessage name="FEDERATION_EXCEPTION_GET_AUTH_DOMAINS" id="1103"
                 loglevel="LL_SEVERE"
@@ -3488,18 +3524,18 @@
             <item>Look under federation log for more information.</item>
         </actions>
     </logmessage>
-    
-    <!-- 1111 - 1120 are reserved for create authentication domain -->
-    <logmessage name="ATTEMPT_CREATE_AUTH_DOMAIN" id="1111"
-                loglevel="LL_INFO"
-                description="Attempt to create authentication domain">
+
+ <!-- 1111 - 1120 are reserved for create authentication domain -->
+ <logmessage name="ATTEMPT_CREATE_AUTH_DOMAIN" id="1111"
+             loglevel="LL_INFO"
+             description="Attempt to create authentication domain">
         <datainfo>
             <item>name of authentication domain</item>
         </datainfo>
         <triggers>
             <item>Click on New button in authentication domain creation page.</item>
         </triggers>
-        <actions />
+        <actions/>
     </logmessage>
     <logmessage name="SUCCEED_CREATE_AUTH_DOMAIN" id="1112"
                 loglevel="LL_INFO"
@@ -3510,7 +3546,7 @@
         <triggers>
             <item>Click on New button in authentication domain creation page.</item>
         </triggers>
-        <actions />
+        <actions/>
     </logmessage>
     <logmessage name="FEDERATION_EXCEPTION_CREATE_AUTH_DOMAIN" id="1113"
                 loglevel="LL_SEVERE"
@@ -3526,11 +3562,11 @@
             <item>Look under federation log for more information.</item>
         </actions>
     </logmessage>
-    
-    <!-- 1121 - 1130 are reserved for delete authentication domain -->
-    <logmessage name="ATTEMPT_DELETE_AUTH_DOMAINS" id="1121"
-                loglevel="LL_INFO"
-                description="Attempt to delete authentication domains">
+
+ <!-- 1121 - 1130 are reserved for delete authentication domain -->
+ <logmessage name="ATTEMPT_DELETE_AUTH_DOMAINS" id="1121"
+             loglevel="LL_INFO"
+             description="Attempt to delete authentication domains">
         <datainfo>
             <item>name of realm</item>
             <item>name of authentication domains</item>
@@ -3538,7 +3574,7 @@
         <triggers>
             <item>Click on Delete button in authentication domain main page.</item>
         </triggers>
-        <actions />
+        <actions/>
     </logmessage>
     <logmessage name="SUCCEED_DELETE_AUTH_DOMAIN" id="1122"
                 loglevel="LL_INFO"
@@ -3550,7 +3586,7 @@
         <triggers>
             <item>Click on Delete button in authentication domain main page.</item>
         </triggers>
-        <actions />
+        <actions/>
     </logmessage>
     <logmessage name="FEDERATION_EXCEPTION_DELETE_AUTH_DOMAIN" id="1123"
                 loglevel="LL_SEVERE"
@@ -3567,11 +3603,11 @@
             <item>Look under federation log for more information.</item>
         </actions>
     </logmessage>
-    
-    <!-- 1131 - 1140 are reserved for get authentication domain's attribute values -->
-    <logmessage name="ATTEMPT_GET_AUTH_DOMAIN_ATTR_VALUES" id="1131"
-                loglevel="LL_INFO"
-                description="Attempt to get authentication domain's attribute values">
+
+ <!-- 1131 - 1140 are reserved for get authentication domain's attribute values -->
+ <logmessage name="ATTEMPT_GET_AUTH_DOMAIN_ATTR_VALUES" id="1131"
+             loglevel="LL_INFO"
+             description="Attempt to get authentication domain's attribute values">
         <datainfo>
             <item>name of realm</item>
             <item>name of authentication domain</item>
@@ -3579,7 +3615,7 @@
         <triggers>
             <item>View authentication domain profile page.</item>
         </triggers>
-        <actions />
+        <actions/>
     </logmessage>
     <logmessage name="SUCCEED_GET_AUTH_DOMAIN_ATTR_VALUES" id="1132"
                 loglevel="LL_INFO"
@@ -3591,9 +3627,10 @@
         <triggers>
             <item>View authentication domain profile page.</item>
         </triggers>
-        <actions />
+        <actions/>
     </logmessage>
-    <logmessage name="FEDERATION_EXCEPTION_GET_AUTH_DOMAIN_ATTR_VALUES" id="1133"
+    <logmessage name="FEDERATION_EXCEPTION_GET_AUTH_DOMAIN_ATTR_VALUES"
+                id="1133"
                 loglevel="LL_SEVERE"
                 description="Getting attribute values of authentication domain failed.">        
         <datainfo>
@@ -3608,11 +3645,11 @@
             <item>Look under federation log for more information.</item>
         </actions>
     </logmessage>
-    
-    <!-- 1141 - 1150 are reserved for modify authentication domain -->
-    <logmessage name="ATTEMPT_MODIFY_AUTH_DOMAIN" id="1141"
-                loglevel="LL_INFO"
-                description="Attempt to modify authentication domain">
+
+ <!-- 1141 - 1150 are reserved for modify authentication domain -->
+ <logmessage name="ATTEMPT_MODIFY_AUTH_DOMAIN" id="1141"
+             loglevel="LL_INFO"
+             description="Attempt to modify authentication domain">
         <datainfo>
             <item>name of realm</item>
             <item>name of authentication domain</item>
@@ -3620,7 +3657,7 @@
         <triggers>
             <item>Click on Save button in authentication domain profile page.</item>
         </triggers>
-        <actions />
+        <actions/>
     </logmessage>
     <logmessage name="SUCCEED_MODIFY_AUTH_DOMAIN" id="1142"
                 loglevel="LL_INFO"
@@ -3632,7 +3669,7 @@
         <triggers>
             <item>Click on Save button in authentication domain profile page.</item>
         </triggers>
-        <actions />
+        <actions/>
     </logmessage>
     <logmessage name="FEDERATION_EXCEPTION_MODIFY_AUTH_DOMAIN" id="1143"
                 loglevel="LL_SEVERE"
@@ -3649,18 +3686,18 @@
             <item>Look under federation log for more information.</item>
         </actions>
     </logmessage>
-    
-    <!-- 1151 - 1160 are reserved for get all provider names -->
-    <logmessage name="ATTEMPT_GET_ALL_PROVIDER_NAMES" id="1151"
-                loglevel="LL_INFO"
-                description="Attempt to get all provider names">
+
+ <!-- 1151 - 1160 are reserved for get all provider names -->
+ <logmessage name="ATTEMPT_GET_ALL_PROVIDER_NAMES" id="1151"
+             loglevel="LL_INFO"
+             description="Attempt to get all provider names">
         <datainfo>
             <item>realm name</item>
         </datainfo>
         <triggers>
             <item>View authentication domain profile page.</item>
         </triggers>
-        <actions />
+        <actions/>
     </logmessage>
     <logmessage name="SUCCEED_GET_ALL_PROVIDER_NAMES" id="1152"
                 loglevel="LL_INFO"
@@ -3671,7 +3708,7 @@
         <triggers>
             <item>View authentication domain profile page.</item>
         </triggers>
-        <actions />
+        <actions/>
     </logmessage>
     <logmessage name="FEDERATION_EXCEPTION_GET_ALL_PROVIDER_NAMES" id="1153"
                 loglevel="LL_SEVERE"
@@ -3686,11 +3723,11 @@
             <item>Look under federation log for more information.</item>
         </actions>
     </logmessage>
-    
-    <!-- 1161 - 1170 are reserved for get provider names registered under a authentication domain -->
-    <logmessage name="ATTEMPT_GET_PROVIDER_NAMES_UNDER_AUTH_DOMAIN" id="1161"
-                loglevel="LL_INFO"
-                description="Attempt to get provider names under a authentication domain">
+
+ <!-- 1161 - 1170 are reserved for get provider names registered under a authentication domain -->
+ <logmessage name="ATTEMPT_GET_PROVIDER_NAMES_UNDER_AUTH_DOMAIN" id="1161"
+             loglevel="LL_INFO"
+             description="Attempt to get provider names under a authentication domain">
         <datainfo>
             <item>name of realm</item>
             <item>name of authentication domain</item>
@@ -3698,7 +3735,7 @@
         <triggers>
             <item>View authentication domain profile page.</item>
         </triggers>
-        <actions />
+        <actions/>
     </logmessage>
     <logmessage name="SUCCEED_GET_PROVIDER_NAMES_UNDER_AUTH_DOMAIN" id="1162"
                 loglevel="LL_INFO"
@@ -3710,9 +3747,10 @@
         <triggers>
             <item>View authentication domain profile page.</item>
         </triggers>
-        <actions />
+        <actions/>
     </logmessage>
-    <logmessage name="FEDERATION_EXCEPTION_GET_PROVIDER_NAMES_UNDER_AUTH_DOMAIN" id="1163"
+    <logmessage name="FEDERATION_EXCEPTION_GET_PROVIDER_NAMES_UNDER_AUTH_DOMAIN"
+                id="1163"
                 loglevel="LL_SEVERE"
                 description="Getting provider names under authentication domain failed.">
         <datainfo>
@@ -3727,11 +3765,11 @@
             <item>Look under federation log for more information.</item>
         </actions>
     </logmessage>
-    
-    <!-- 1171 - 1180 are reserved for add providers to authentication domain -->
-    <logmessage name="ATTEMPT_ADD_PROVIDERS_TO_AUTH_DOMAIN" id="1171"
-                loglevel="LL_INFO"
-                description="Attempt to add providers to an authentication domain">
+
+ <!-- 1171 - 1180 are reserved for add providers to authentication domain -->
+ <logmessage name="ATTEMPT_ADD_PROVIDERS_TO_AUTH_DOMAIN" id="1171"
+             loglevel="LL_INFO"
+             description="Attempt to add providers to an authentication domain">
         <datainfo>
             <item>name of realm</item>
             <item>name of authentication domain</item>
@@ -3740,7 +3778,7 @@
         <triggers>
             <item>Click on Save button in provider assignment page.</item>
         </triggers>
-        <actions />
+        <actions/>
     </logmessage>
     <logmessage name="SUCCEED_ADD_PROVIDERS_TO_AUTH_DOMAIN" id="1172"
                 loglevel="LL_INFO"
@@ -3753,9 +3791,10 @@
         <triggers>
             <item>Click on Save button in provider assignment page.</item>
         </triggers>
-        <actions />
+        <actions/>
     </logmessage>
-    <logmessage name="FEDERATION_EXCEPTION_ADD_PROVIDERS_TO_AUTH_DOMAIN" id="1173"
+    <logmessage name="FEDERATION_EXCEPTION_ADD_PROVIDERS_TO_AUTH_DOMAIN"
+                id="1173"
                 loglevel="LL_SEVERE"
                 description="Addition of provider to an authentication domain failed.">
         <datainfo>
@@ -3771,11 +3810,11 @@
             <item>Look under federation log for more information.</item>
         </actions>
     </logmessage>
-    
-    <!-- 1181 - 1190 are reserved for remove providers from authentication domain -->
-    <logmessage name="ATTEMPT_REMOVE_PROVIDERS_FROM_AUTH_DOMAIN" id="1181"
-                loglevel="LL_INFO"
-                description="Attempt to remove providers from authentication domain">
+
+ <!-- 1181 - 1190 are reserved for remove providers from authentication domain -->
+ <logmessage name="ATTEMPT_REMOVE_PROVIDERS_FROM_AUTH_DOMAIN" id="1181"
+             loglevel="LL_INFO"
+             description="Attempt to remove providers from authentication domain">
         <datainfo>
             <item>name of realm</item>
             <item>name of authentication domain</item>
@@ -3784,7 +3823,7 @@
         <triggers>
             <item>Click on Save button in provider assignment page.</item>
         </triggers>
-        <actions />
+        <actions/>
     </logmessage>
     <logmessage name="SUCCEED_REMOVE_PROVIDERS_FROM_AUTH_DOMAIN" id="1182"
                 loglevel="LL_INFO"
@@ -3797,9 +3836,10 @@
         <triggers>
             <item>Click on Save button in provider assignment page.</item>
         </triggers>
-        <actions />
+        <actions/>
     </logmessage>
-    <logmessage name="FEDERATION_EXCEPTION_REMOVE_PROVIDERS_FROM_AUTH_DOMAIN" id="1183"
+    <logmessage name="FEDERATION_EXCEPTION_REMOVE_PROVIDERS_FROM_AUTH_DOMAIN"
+                id="1183"
                 loglevel="LL_SEVERE"
                 description="Deletion of provider from authentication domain failed.">
         <datainfo>
@@ -3815,11 +3855,11 @@
             <item>Look under federation log for more information.</item>
         </actions>
     </logmessage>
-    
-    <!-- 1301 - 1310 are reserved for create provider -->
-    <logmessage name="ATTEMPT_CREATE_PROVIDER" id="1301"
-                loglevel="LL_INFO"
-                description="Attempt to create provider">
+
+ <!-- 1301 - 1310 are reserved for create provider -->
+ <logmessage name="ATTEMPT_CREATE_PROVIDER" id="1301"
+             loglevel="LL_INFO"
+             description="Attempt to create provider">
         <datainfo>
             <item>name of provider</item>
             <item>role of provider</item>
@@ -3829,7 +3869,7 @@
         <triggers>
             <item>Click on Save button in provider assignment page.</item>
         </triggers>
-        <actions />
+        <actions/>
     </logmessage>
     <logmessage name="SUCCEED_CREATE_PROVIDER" id="1302"
                 loglevel="LL_INFO"
@@ -3842,7 +3882,7 @@
         <triggers>
             <item>Click on Save button in provider assignment page.</item>
         </triggers>
-        <actions />
+        <actions/>
     </logmessage>
     <logmessage name="FEDERATION_EXCEPTION_CREATE_PROVIDER" id="1303"
                 loglevel="LL_SEVERE"
@@ -3892,11 +3932,11 @@
             <item>This is a web application error. Please contact Sun Support for assistant.</item>
         </actions>
     </logmessage>
-    
-    <!-- 1311 - 1320 are reserved for get attribute values for provider -->
-    <logmessage name="ATTEMPT_GET_PROVIDER_ATTRIBUTE_VALUES" id="1311"
-                loglevel="LL_INFO"
-                description="Attempt to get attribute values for provider">
+
+ <!-- 1311 - 1320 are reserved for get attribute values for provider -->
+ <logmessage name="ATTEMPT_GET_PROVIDER_ATTRIBUTE_VALUES" id="1311"
+             loglevel="LL_INFO"
+             description="Attempt to get attribute values for provider">
         <datainfo>
             <item>name of provider</item>
             <item>role of provider</item>
@@ -3905,7 +3945,7 @@
         <triggers>
             <item>View provider profile page.</item>
         </triggers>
-        <actions />
+        <actions/>
     </logmessage>
     <logmessage name="SUCCEED_GET_PROVIDER_ATTRIBUTE_VALUES" id="1312"
                 loglevel="LL_INFO"
@@ -3918,13 +3958,13 @@
         <triggers>
             <item>View provider profile page.</item>
         </triggers>
-        <actions />
+        <actions/>
     </logmessage>
-    
-    <!-- 1321 - 1330 are reserved for get handler to provider -->
-    <logmessage name="ATTEMPT_GET_HANDLER_TO_PROVIDER" id="1321"
-                loglevel="LL_INFO"
-                description="Attempt to get handler to provider">
+
+ <!-- 1321 - 1330 are reserved for get handler to provider -->
+ <logmessage name="ATTEMPT_GET_HANDLER_TO_PROVIDER" id="1321"
+             loglevel="LL_INFO"
+             description="Attempt to get handler to provider">
         <datainfo>
             <item>name of provider</item>
             <item>role of provider</item>
@@ -3932,7 +3972,7 @@
         <triggers>
             <item>View provider profile page.</item>
         </triggers>
-        <actions />
+        <actions/>
     </logmessage>
     <logmessage name="SUCCEED_GET_HANDLER_TO_PROVIDER" id="1322"
                 loglevel="LL_INFO"
@@ -3944,9 +3984,10 @@
         <triggers>
             <item>View provider profile page.</item>
         </triggers>
-        <actions />
+        <actions/>
     </logmessage>
-    <logmessage name="FEDERATION_EXCEPTION_GET_HANDLER_TO_PROVIDER" id="1323"         loglevel="LL_SEVERE"
+    <logmessage name="FEDERATION_EXCEPTION_GET_HANDLER_TO_PROVIDER" id="1323"
+                loglevel="LL_SEVERE"
                 description="Getting handler to provider failed.">
         <datainfo>
             <item>name of provider</item>
@@ -3960,11 +4001,11 @@
             <item>Look under federation log for more information.</item>
         </actions>
     </logmessage>
-    
-    <!-- 1331 - 1340 are reserved for modify provider -->
-    <logmessage name="ATTEMPT_MODIFY_PROVIDER" id="1331"
-                loglevel="LL_INFO"
-                description="Attempt to modify provider">
+
+ <!-- 1331 - 1340 are reserved for modify provider -->
+ <logmessage name="ATTEMPT_MODIFY_PROVIDER" id="1331"
+             loglevel="LL_INFO"
+             description="Attempt to modify provider">
         <datainfo>
             <item>name of provider</item>
             <item>role of provider</item>
@@ -3972,7 +4013,7 @@
         <triggers>
             <item>Click on Save button in provider profile page.</item>
         </triggers>
-        <actions />
+        <actions/>
     </logmessage>
     <logmessage name="SUCCEED_MODIFY_PROVIDER" id="1332"
                 loglevel="LL_INFO"
@@ -3984,7 +4025,7 @@
         <triggers>
             <item>Click on Save button in provider profile page.</item>
         </triggers>
-        <actions />
+        <actions/>
     </logmessage>
     <logmessage name="FEDERATION_EXCEPTION_MODIFY_PROVIDER" id="1333"
                 loglevel="LL_SEVERE"
@@ -4001,7 +4042,8 @@
             <item>Look under federation log for more information.</item>
         </actions>
     </logmessage>
-    <logmessage name="INVOCATION_TARGET_EXCEPTION_MODIFY_PROVIDER" id="1334"         loglevel="LL_SEVERE"
+    <logmessage name="INVOCATION_TARGET_EXCEPTION_MODIFY_PROVIDER" id="1334"
+                loglevel="LL_SEVERE"
                 description="Modification of provider failed.">
         <datainfo>
             <item>name of provider</item>
@@ -4015,11 +4057,11 @@
             <item>This is a web application error. Please contact Sun Support for assistant.</item>
         </actions>
     </logmessage>
-    
-    <!-- 1341 - 1350 are reserved for delete provider -->
-    <logmessage name="ATTEMPT_DELETE_PROVIDER" id="1341"
-                loglevel="LL_INFO"
-                description="Attempt to delete provider">
+
+ <!-- 1341 - 1350 are reserved for delete provider -->
+ <logmessage name="ATTEMPT_DELETE_PROVIDER" id="1341"
+             loglevel="LL_INFO"
+             description="Attempt to delete provider">
         <datainfo>
             <item>name of provider</item>
             <item>role of provider</item>
@@ -4027,7 +4069,7 @@
         <triggers>
             <item>Click on delete provider button in provider profile page.</item>
         </triggers>
-        <actions />
+        <actions/>
     </logmessage>
     <logmessage name="SUCCEED_DELETE_PROVIDER" id="1342"
                 loglevel="LL_INFO"
@@ -4039,7 +4081,7 @@
         <triggers>
             <item>Click on delete provider button in provider profile page.</item>
         </triggers>
-        <actions />
+        <actions/>
     </logmessage>
     <logmessage name="FEDERATION_EXCEPTION_DELETE_PROVIDER" id="1343"
                 loglevel="LL_SEVERE"
@@ -4056,11 +4098,11 @@
             <item>Look under federation log for more information.</item>
         </actions>
     </logmessage>
-    
-    <!-- 1351 - 1360 are reserved for get prospective trusted provider of a provider -->
-    <logmessage name="ATTEMPT_GET_PROSPECTIVE_TRUSTED_PROVIDER" id="1351"
-                loglevel="LL_INFO"
-                description="Attempt to get prospective trusted provider">
+
+ <!-- 1351 - 1360 are reserved for get prospective trusted provider of a provider -->
+ <logmessage name="ATTEMPT_GET_PROSPECTIVE_TRUSTED_PROVIDER" id="1351"
+             loglevel="LL_INFO"
+             description="Attempt to get prospective trusted provider">
         <datainfo>
             <item>name of provider</item>
             <item>role of provider</item>
@@ -4068,7 +4110,7 @@
         <triggers>
             <item>View add trusted provider page.</item>
         </triggers>
-        <actions />
+        <actions/>
     </logmessage>
     <logmessage name="SUCCEED_GET_PROSPECTIVE_TRUSTED_PROVIDER" id="1352"
                 loglevel="LL_INFO"
@@ -4080,9 +4122,10 @@
         <triggers>
             <item>View add trusted provider page.</item>
         </triggers>
-        <actions />
+        <actions/>
     </logmessage>
-    <logmessage name="FEDERATION_EXCEPTION_GET_PROSPECTIVE_TRUSTED_PROVIDER" id="1353"
+    <logmessage name="FEDERATION_EXCEPTION_GET_PROSPECTIVE_TRUSTED_PROVIDER"
+                id="1353"
                 loglevel="LL_SEVERE"
                 description="Getting of prospective trusted provider failed.">
         <datainfo>
@@ -4097,11 +4140,11 @@
             <item>Look under federation log for more information.</item>
         </actions>
     </logmessage>
-    
-    <!-- 2001 - 2010 are reserved for get attribute values of schema type of a service schema -->
-    <logmessage name="ATTEMPT_GET_ATTR_VALUE_SCHEMA_TYPE" id="2001"
-                loglevel="LL_INFO"
-                description="Attempt to get attribute values of schema type of a service schema">
+
+ <!-- 2001 - 2010 are reserved for get attribute values of schema type of a service schema -->
+ <logmessage name="ATTEMPT_GET_ATTR_VALUE_SCHEMA_TYPE" id="2001"
+             loglevel="LL_INFO"
+             description="Attempt to get attribute values of schema type of a service schema">
         <datainfo>
             <item>name of service</item>
             <item>name of schema type</item>
@@ -4110,7 +4153,7 @@
         <triggers>
             <item>View service profile page.</item>
         </triggers>
-        <actions />
+        <actions/>
     </logmessage>
     <logmessage name="SUCCEED_GET_ATTR_VALUE_SCHEMA_TYPE" id="2002"
                 loglevel="LL_INFO"
@@ -4123,7 +4166,7 @@
         <triggers>
             <item>View service profile page.</item>
         </triggers>
-        <actions />
+        <actions/>
     </logmessage>
     <logmessage name="SSO_EXCEPTION_GET_ATTR_VALUE_SCHEMA_TYPE" id="2003"
                 loglevel="LL_SEVERE"
@@ -4170,12 +4213,12 @@
             <item>Need no action on this event. Console attempts to get a schema from a service but schema does not exist.</item>
         </actions>
     </logmessage>
-    
-    
-    <!-- 2011 - 2020 are reserved for get attribute values of schema type of a service schema -->
-    <logmessage name="ATTEMPT_GET_ATTR_VALUE_ATR_SCHEMA_SCHEMA_TYPE" id="2011"
-                loglevel="LL_INFO"
-                description="Attempt to get attribute values of attribute schema of a schema type of a service schema">
+
+
+ <!-- 2011 - 2020 are reserved for get attribute values of schema type of a service schema -->
+ <logmessage name="ATTEMPT_GET_ATTR_VALUE_ATR_SCHEMA_SCHEMA_TYPE" id="2011"
+             loglevel="LL_INFO"
+             description="Attempt to get attribute values of attribute schema of a schema type of a service schema">
         <datainfo>
             <item>name of service</item>
             <item>name of schema type</item>
@@ -4184,7 +4227,7 @@
         <triggers>
             <item>View service profile page.</item>
         </triggers>
-        <actions />
+        <actions/>
     </logmessage>
     <logmessage name="SUCCEED_GET_ATTR_VALUE_ATR_SCHEMA_SCHEMA_TYPE" id="2012"
                 loglevel="LL_INFO"
@@ -4197,9 +4240,10 @@
         <triggers>
             <item>View service profile page.</item>
         </triggers>
-        <actions />
+        <actions/>
     </logmessage>
-    <logmessage name="SSO_EXCEPTION_GET_ATTR_VALUE_ATR_SCHEMA_SCHEMA_TYPE" id="2013"
+    <logmessage name="SSO_EXCEPTION_GET_ATTR_VALUE_ATR_SCHEMA_SCHEMA_TYPE"
+                id="2013"
                 loglevel="LL_SEVERE"
                 description="Getting attribute values of attribute schema of a schema type of a service schema failed.">
         <datainfo>
@@ -4214,7 +4258,8 @@
         <actions>
         <item>Look under service management log for more information.</item>        </actions>
     </logmessage>
-    <logmessage name="SMS_EXCEPTION_GET_ATTR_VALUE_ATR_SCHEMA_SCHEMA_TYPE" id="2014"
+    <logmessage name="SMS_EXCEPTION_GET_ATTR_VALUE_ATR_SCHEMA_SCHEMA_TYPE"
+                id="2014"
                 loglevel="LL_SEVERE"
                 description="Getting attribute values of attribute schema of a schema type of a service schema failed.">
         <datainfo>
@@ -4229,11 +4274,11 @@
         <actions>
         <item>Look under service management log for more information.</item>        </actions>
     </logmessage>
-    
-    <!-- 2021 - 2030 are reserved for set attribute values of schema type of a service schema -->
-    <logmessage name="ATTEMPT_SET_ATTR_VALUE_ATR_SCHEMA_SCHEMA_TYPE" id="2021"
-                loglevel="LL_INFO"
-                description="Attempt to modify attribute values of attribute schema of a schema type of a service schema">
+
+ <!-- 2021 - 2030 are reserved for set attribute values of schema type of a service schema -->
+ <logmessage name="ATTEMPT_SET_ATTR_VALUE_ATR_SCHEMA_SCHEMA_TYPE" id="2021"
+             loglevel="LL_INFO"
+             description="Attempt to modify attribute values of attribute schema of a schema type of a service schema">
         <datainfo>
             <item>name of service</item>
             <item>name of schema type</item>
@@ -4242,7 +4287,7 @@
         <triggers>
             <item>Click on Save button in service profile page.</item>
         </triggers>
-        <actions />
+        <actions/>
     </logmessage>
     <logmessage name="SUCCEED_SET_ATTR_VALUE_ATR_SCHEMA_SCHEMA_TYPE" id="2022"
                 loglevel="LL_INFO"
@@ -4255,9 +4300,10 @@
         <triggers>
             <item>Click on Save button in service profile page.</item>
         </triggers>
-        <actions />
+        <actions/>
     </logmessage>
-    <logmessage name="SSO_EXCEPTION_SET_ATTR_VALUE_ATR_SCHEMA_SCHEMA_TYPE" id="2023"
+    <logmessage name="SSO_EXCEPTION_SET_ATTR_VALUE_ATR_SCHEMA_SCHEMA_TYPE"
+                id="2023"
                 loglevel="LL_SEVERE"
                 description="Modification attribute values of attribute schema of a schema type of a service schema failed.">
         <datainfo>
@@ -4272,7 +4318,8 @@
         <actions>
         <item>Look under service management log for more information.</item>        </actions>
     </logmessage>
-    <logmessage name="SMS_EXCEPTION_SET_ATTR_VALUE_ATR_SCHEMA_SCHEMA_TYPE" id="2024"
+    <logmessage name="SMS_EXCEPTION_SET_ATTR_VALUE_ATR_SCHEMA_SCHEMA_TYPE"
+                id="2024"
                 loglevel="LL_SEVERE"
                 description="Modification attribute values of attribute schema of a schema type of a service schema failed.">
         <datainfo>
@@ -4287,11 +4334,11 @@
         <actions>
         <item>Look under service management log for more information.</item>        </actions>
     </logmessage>
-    
-    <!-- 2501 - 2510 are reserved for get device names of client detection service -->
-    <logmessage name="ATTEMPT_CLIENT_DETECTION_GET_DEVICE_NAMES" id="2501"
-                loglevel="LL_INFO"
-                description="Attempt to get device names of client detection service">
+
+ <!-- 2501 - 2510 are reserved for get device names of client detection service -->
+ <logmessage name="ATTEMPT_CLIENT_DETECTION_GET_DEVICE_NAMES" id="2501"
+             loglevel="LL_INFO"
+             description="Attempt to get device names of client detection service">
         <datainfo>
             <item>name of profile</item>
             <item>name of style</item>
@@ -4300,7 +4347,7 @@
         <triggers>
             <item>View client profile page.</item>
         </triggers>
-        <actions />
+        <actions/>
     </logmessage>
     <logmessage name="SUCCEED_CLIENT_DETECTION_GET_DEVICE_NAMES" id="2502"
                 loglevel="LL_INFO"
@@ -4313,20 +4360,20 @@
         <triggers>
             <item>View client profile page.</item>
         </triggers>
-        <actions />
+        <actions/>
     </logmessage>
-    
-    <!-- 2511 - 2520 are reserved for delete client in client detection service -->
-    <logmessage name="ATTEMPT_CLIENT_DETECTION_DELETE_CLIENT" id="2511"
-                loglevel="LL_INFO"
-                description="Attempt to delete client in client detection service">
+
+ <!-- 2511 - 2520 are reserved for delete client in client detection service -->
+ <logmessage name="ATTEMPT_CLIENT_DETECTION_DELETE_CLIENT" id="2511"
+             loglevel="LL_INFO"
+             description="Attempt to delete client in client detection service">
         <datainfo>
             <item>type of client</item>
         </datainfo>
         <triggers>
             <item>Click on client type delete hyperlink page.</item>
         </triggers>
-        <actions />
+        <actions/>
     </logmessage>
     <logmessage name="SUCCEED_CLIENT_DETECTION_DELETE_CLIENT" id="2512"
                 loglevel="LL_INFO"
@@ -4337,9 +4384,10 @@
         <triggers>
             <item>Click on client type delete hyperlink page.</item>
         </triggers>
-        <actions />
+        <actions/>
     </logmessage>
-    <logmessage name="CLIENT_SDK_EXCEPTION_CLIENT_DETECTION_DELETE_CLIENT" id="2513"
+    <logmessage name="CLIENT_SDK_EXCEPTION_CLIENT_DETECTION_DELETE_CLIENT"
+                id="2513"
                 loglevel="LL_SEVERE"
                 description="Deletion of client in client detection service failed.">         <datainfo>
             <item>type of client</item>
@@ -4352,18 +4400,18 @@
             <item>Look under client detection management log for more information.</item>
         </actions>
     </logmessage>
-    
-    <!-- 2521 - 2530 are reserved for create client in client detection service -->
-    <logmessage name="ATTEMPT_CLIENT_DETECTION_CREATE_CLIENT" id="2521"
-                loglevel="LL_INFO"
-                description="Attempt to create client in client detection service">
+
+ <!-- 2521 - 2530 are reserved for create client in client detection service -->
+ <logmessage name="ATTEMPT_CLIENT_DETECTION_CREATE_CLIENT" id="2521"
+             loglevel="LL_INFO"
+             description="Attempt to create client in client detection service">
         <datainfo>
             <item>type of client</item>
         </datainfo>
         <triggers>
             <item>Click on New button in Client Creation Page.</item>
         </triggers>
-        <actions />
+        <actions/>
     </logmessage>
     <logmessage name="SUCCEED_CLIENT_DETECTION_CREATE_CLIENT" id="2522"
                 loglevel="LL_INFO"
@@ -4374,9 +4422,10 @@
         <triggers>
             <item>Click on New button in Client Creation Page.</item>
         </triggers>
-        <actions />
+        <actions/>
     </logmessage>
-    <logmessage name="CLIENT_SDK_EXCEPTION_CLIENT_DETECTION_CREATE_CLIENT" id="2523"
+    <logmessage name="CLIENT_SDK_EXCEPTION_CLIENT_DETECTION_CREATE_CLIENT"
+                id="2523"
                 loglevel="LL_SEVERE"
                 description="Creation of client in client detection service failed.">
         <datainfo>
@@ -4390,7 +4439,8 @@
             <item>Look under client detection management log for more information.</item>
         </actions>
     </logmessage>
-    <logmessage name="INVALID_CLIENT_TYPE_CLIENT_DETECTION_CREATE_CLIENT" id="2524"
+    <logmessage name="INVALID_CLIENT_TYPE_CLIENT_DETECTION_CREATE_CLIENT"
+                id="2524"
                 loglevel="LL_INFO"
                 description="Creation of client in client detection service failed.">
         <datainfo>
@@ -4403,18 +4453,18 @@
             <item>Check the client type again before creation.</item>
         </actions>
     </logmessage>
-    
-    <!-- 2531 - 2540 are reserved for get client profile in client detection service -->
-    <logmessage name="ATTEMPT_CLIENT_DETECTION_GET_CLIENT_PROFILE" id="2531"
-                loglevel="LL_INFO"
-                description="Attempt to get client profile in client detection service">        <datainfo>
+
+ <!-- 2531 - 2540 are reserved for get client profile in client detection service -->
+ <logmessage name="ATTEMPT_CLIENT_DETECTION_GET_CLIENT_PROFILE" id="2531"
+             loglevel="LL_INFO"
+             description="Attempt to get client profile in client detection service">        <datainfo>
             <item>type of client</item>
             <item>classification</item>
         </datainfo>
         <triggers>
             <item>View client profile page.</item>
         </triggers>
-        <actions />
+        <actions/>
     </logmessage>
     <logmessage name="SUCCEED_CLIENT_DETECTION_GET_CLIENT_PROFILE" id="2532"
                 loglevel="LL_INFO"
@@ -4426,21 +4476,23 @@
         <triggers>
             <item>View client profile page.</item>
         </triggers>
-        <actions />
-    </logmessage> 
-    
-    <!-- 2541 - 2550 are reserved for modify client profile in client detection service -->
-    <logmessage name="ATTEMPT_CLIENT_DETECTION_MODIFY_CLIENT_PROFILE" id="2541"        loglevel="LL_INFO"
-                description="Attempt to modify client profile in client detection service">
+        <actions/>
+    </logmessage>
+
+ <!-- 2541 - 2550 are reserved for modify client profile in client detection service -->
+ <logmessage name="ATTEMPT_CLIENT_DETECTION_MODIFY_CLIENT_PROFILE" id="2541"
+             loglevel="LL_INFO"
+             description="Attempt to modify client profile in client detection service">
         <datainfo>
             <item>type of client</item>
         </datainfo>
         <triggers>
             <item>Click on Save button client profile page.</item>
         </triggers>
-        <actions />
+        <actions/>
     </logmessage>
-    <logmessage name="SUCCEED_CLIENT_DETECTION_MODIFY_CLIENT_PROFILE" id="2542"         loglevel="LL_INFO"
+    <logmessage name="SUCCEED_CLIENT_DETECTION_MODIFY_CLIENT_PROFILE" id="2542"
+                loglevel="LL_INFO"
                 description="Modification of client profile in client detection service succeeded.">
         <datainfo>
             <item>type of client</item>
@@ -4448,9 +4500,10 @@
         <triggers>
             <item>Click on Save button client profile page.</item>
         </triggers>
-        <actions />
+        <actions/>
     </logmessage>
-    <logmessage name="CLIENT_SDK_EXCEPTION_CLIENT_DETECTION_CREATE_CLIENT" id="2543"
+    <logmessage name="CLIENT_SDK_EXCEPTION_CLIENT_DETECTION_CREATE_CLIENT"
+                id="2543"
                 loglevel="LL_SEVERE"
                 description="Modification of client profile in client detection service failed.">
         <datainfo>
@@ -4464,11 +4517,11 @@
             <item>Look under client detection management log for more information.</item>
         </actions>
     </logmessage>
-    
-    <!-- 3001 - 3010 are reserved for getting current sessions -->
-    <logmessage name="ATTEMPT_GET_CURRENT_SESSIONS" id="3001"
-                loglevel="LL_INFO"
-                description="Attempt to get current sessions">
+
+ <!-- 3001 - 3010 are reserved for getting current sessions -->
+ <logmessage name="ATTEMPT_GET_CURRENT_SESSIONS" id="3001"
+             loglevel="LL_INFO"
+             description="Attempt to get current sessions">
         <datainfo>
             <item>name of server</item>
             <item>search pattern</item>
@@ -4476,7 +4529,7 @@
         <triggers>
             <item>View session main page.</item>
         </triggers>
-        <actions />
+        <actions/>
     </logmessage>
     <logmessage name="SUCCEED_GET_CURRENT_SESSIONS" id="3002"
                 loglevel="LL_INFO"
@@ -4488,7 +4541,7 @@
         <triggers>
             <item>View session main page.</item>
         </triggers>
-        <actions />
+        <actions/>
     </logmessage>
     <logmessage name="SESSION_EXCEPTION_GET_CURRENT_SESSIONS" id="3003"
                 loglevel="LL_SEVERE"
@@ -4504,11 +4557,11 @@
         <actions>
         <item>Look under session management log for more information.</item>        </actions>
     </logmessage>
-    
-    <!-- 3011 - 3020 are reserved for invalidate session -->
-    <logmessage name="ATTEMPT_INVALIDATE_SESSIONS" id="3011"
-                loglevel="LL_INFO"
-                description="Attempt to invalidate session">
+
+ <!-- 3011 - 3020 are reserved for invalidate session -->
+ <logmessage name="ATTEMPT_INVALIDATE_SESSIONS" id="3011"
+             loglevel="LL_INFO"
+             description="Attempt to invalidate session">
         <datainfo>
             <item>name of server</item>
             <item>ID of session</item>
@@ -4516,7 +4569,7 @@
         <triggers>
             <item>Click on Invalidate button in session main page.</item>
         </triggers>
-        <actions />
+        <actions/>
     </logmessage>
     <logmessage name="SUCCEED_INVALIDATE_SESSIONS" id="3012"
                 loglevel="LL_INFO"
@@ -4528,7 +4581,7 @@
         <triggers>
             <item>Click on Invalidate button in session main page.</item>
         </triggers>
-        <actions />
+        <actions/>
     </logmessage>
     <logmessage name="SESSION_EXCEPTION_INVALIDATE_SESSIONS" id="3013"
                 loglevel="LL_SEVERE"
@@ -4554,7 +4607,7 @@
         <triggers>
             <item>View site and server management page.</item>
         </triggers>
-        <actions />
+        <actions/>
     </logmessage>
     <logmessage name="SUCCEED_GET_SITE_NAMES" id="12002"
                 loglevel="LL_INFO"
@@ -4565,7 +4618,7 @@
         <triggers>
             <item>View site and server management page.</item>
         </triggers>
-        <actions />
+        <actions/>
     </logmessage>
     <logmessage name="SSO_EXCEPTION_GET_SITE_NAMES" id="12003"
                 loglevel="LL_SEVERE"
@@ -4603,7 +4656,7 @@
         <triggers>
             <item>View site profile page.</item>
         </triggers>
-        <actions />
+        <actions/>
     </logmessage>
     <logmessage name="SUCCEED_GET_SITE_PRIMARY_URL" id="12012"
                 loglevel="LL_INFO"
@@ -4614,7 +4667,7 @@
         <triggers>
             <item>View site profile page.</item>
         </triggers>
-        <actions />
+        <actions/>
     </logmessage>
     <logmessage name="SSO_EXCEPTION_GET_SITE_PRIMARY_URL" id="12013"
                 loglevel="LL_SEVERE"
@@ -4654,7 +4707,7 @@
         <triggers>
             <item>View site profile page.</item>
         </triggers>
-        <actions />
+        <actions/>
     </logmessage>
     <logmessage name="SUCCEED_GET_SITE_FAILOVER_URLS" id="12022"
                 loglevel="LL_INFO"
@@ -4665,7 +4718,7 @@
         <triggers>
             <item>View site profile page.</item>
         </triggers>
-        <actions />
+        <actions/>
     </logmessage>
     <logmessage name="SSO_EXCEPTION_GET_SITE_FAILOVER_URLS" id="12023"
                 loglevel="LL_SEVERE"
@@ -4705,7 +4758,7 @@
         <triggers>
             <item>View site profile page.</item>
         </triggers>
-        <actions />
+        <actions/>
     </logmessage>
     <logmessage name="SUCCEED_GET_SITE_MEMBERS" id="12032"
                 loglevel="LL_INFO"
@@ -4716,7 +4769,7 @@
         <triggers>
             <item>View site profile page.</item>
         </triggers>
-        <actions />
+        <actions/>
     </logmessage>
     <logmessage name="SSO_EXCEPTION_GET_SITE_MEMBERS" id="12033"
                 loglevel="LL_SEVERE"
@@ -4756,7 +4809,7 @@
         <triggers>
             <item>View create site page.</item>
         </triggers>
-        <actions />
+        <actions/>
     </logmessage>
     <logmessage name="SUCCEED_CREATE_SITE" id="12042"
                 loglevel="LL_INFO"
@@ -4767,7 +4820,7 @@
         <triggers>
             <item>Click on create button on creation page.</item>
         </triggers>
-        <actions />
+        <actions/>
     </logmessage>
     <logmessage name="SSO_EXCEPTION_CREATE_SITE" id="12043"
                 loglevel="LL_SEVERE"
@@ -4807,7 +4860,7 @@
         <triggers>
             <item>View create server page.</item>
         </triggers>
-        <actions />
+        <actions/>
     </logmessage>
     <logmessage name="SUCCEED_CREATE_SERVER" id="12052"
                 loglevel="LL_INFO"
@@ -4818,7 +4871,7 @@
         <triggers>
             <item>Click on create button on creation page.</item>
         </triggers>
-        <actions />
+        <actions/>
     </logmessage>
     <logmessage name="SSO_EXCEPTION_CREATE_SERVER" id="12053"
                 loglevel="LL_SEVERE"
@@ -4886,7 +4939,7 @@
         <triggers>
             <item>Click on delete site button.</item>
         </triggers>
-        <actions />
+        <actions/>
     </logmessage>
     <logmessage name="SUCCEED_DELETE_SITE" id="12062"
                 loglevel="LL_INFO"
@@ -4897,7 +4950,7 @@
         <triggers>
             <item>Click on delete button.</item>
         </triggers>
-        <actions />
+        <actions/>
     </logmessage>
     <logmessage name="SSO_EXCEPTION_DELETE_SITE" id="12063"
                 loglevel="LL_SEVERE"
@@ -4937,7 +4990,7 @@
         <triggers>
             <item>Click on OK button in site profile page.</item>
         </triggers>
-        <actions />
+        <actions/>
     </logmessage>
     <logmessage name="SUCCEED_MODIFY_SITE" id="12072"
                 loglevel="LL_INFO"
@@ -4948,7 +5001,7 @@
         <triggers>
             <item>Click on OK button in site profile page.</item>
         </triggers>
-        <actions />
+        <actions/>
     </logmessage>
     <logmessage name="SSO_EXCEPTION_MODIFY_SITE" id="12073"
                 loglevel="LL_SEVERE"
@@ -5002,7 +5055,7 @@
         <triggers>
             <item>View site and server management page.</item>
         </triggers>
-        <actions />
+        <actions/>
     </logmessage>
     <logmessage name="SUCCEED_GET_SERVER_NAMES" id="12082"
                 loglevel="LL_INFO"
@@ -5013,7 +5066,7 @@
         <triggers>
             <item>View site and server management page.</item>
         </triggers>
-        <actions />
+        <actions/>
     </logmessage>
     <logmessage name="SSO_EXCEPTION_GET_SERVER_NAMES" id="12083"
                 loglevel="LL_SEVERE"
@@ -5051,7 +5104,7 @@
         <triggers>
             <item>View server profile page.</item>
         </triggers>
-        <actions />
+        <actions/>
     </logmessage>
     <logmessage name="SUCCEED_GET_SERVER_SITE" id="12092"
                 loglevel="LL_INFO"
@@ -5062,7 +5115,7 @@
         <triggers>
             <item>View server profile page.</item>
         </triggers>
-        <actions />
+        <actions/>
     </logmessage>
     <logmessage name="SSO_EXCEPTION_GET_SERVER_SITE" id="12093"
                 loglevel="LL_SEVERE"
@@ -5102,7 +5155,7 @@
         <triggers>
             <item>Click on delete button in server management page.</item>
         </triggers>
-        <actions />
+        <actions/>
     </logmessage>
     <logmessage name="SUCCEED_DELETE_SERVER" id="12102"
                 loglevel="LL_INFO"
@@ -5113,7 +5166,7 @@
         <triggers>
             <item>Click on delete button in server management page.</item>
         </triggers>
-        <actions />
+        <actions/>
     </logmessage>
     <logmessage name="SSO_EXCEPTION_DELETE_SERVER" id="12103"
                 loglevel="LL_SEVERE"
@@ -5154,7 +5207,7 @@
         <triggers>
             <item>Click on clone button in server management page.</item>
         </triggers>
-        <actions />
+        <actions/>
     </logmessage>
     <logmessage name="SUCCEED_CLONE_SERVER" id="12202"
                 loglevel="LL_INFO"
@@ -5166,7 +5219,7 @@
         <triggers>
             <item>Click on clone button in server management page.</item>
         </triggers>
-        <actions />
+        <actions/>
     </logmessage>
     <logmessage name="SSO_EXCEPTION_CLONE_SERVER" id="12203"
                 loglevel="LL_SEVERE"
@@ -5223,7 +5276,7 @@
         <triggers>
             <item>View server profile page.</item>
         </triggers>
-        <actions />
+        <actions/>
     </logmessage>
     <logmessage name="SUCCEED_GET_SERVER_CONFIG" id="12212"
                 loglevel="LL_INFO"
@@ -5234,7 +5287,7 @@
         <triggers>
             <item>View server profile page.</item>
         </triggers>
-        <actions />
+        <actions/>
     </logmessage>
     <logmessage name="SSO_EXCEPTION_GET_SERVER_CONFIG" id="12213"
                 loglevel="LL_SEVERE"
@@ -5288,7 +5341,7 @@
         <triggers>
             <item>View server profile page.</item>
         </triggers>
-        <actions />
+        <actions/>
     </logmessage>
     <logmessage name="SUCCEED_GET_SERVER_DEFAULT_CONFIG" id="12222"
                 loglevel="LL_INFO"
@@ -5299,7 +5352,7 @@
         <triggers>
             <item>View server profile page.</item>
         </triggers>
-        <actions />
+        <actions/>
     </logmessage>
     
     <logmessage name="ATTEMPT_MODIFY_SERVER" id="12231"
@@ -5311,7 +5364,7 @@
         <triggers>
             <item>Click on OK button in server profile page.</item>
         </triggers>
-        <actions />
+        <actions/>
     </logmessage>
     <logmessage name="SUCCEED_MODIFY_SERVER" id="12232"
                 loglevel="LL_INFO"
@@ -5322,7 +5375,7 @@
         <triggers>
             <item>Click on OK button in server profile page.</item>
         </triggers>
-        <actions />
+        <actions/>
     </logmessage>
     <logmessage name="SSO_EXCEPTION_MODIFY_SERVER" id="12233"
                 loglevel="LL_SEVERE"
@@ -5390,7 +5443,7 @@
         <triggers>
             <item>Click on OK button in server inheritance setting page.</item>
         </triggers>
-        <actions />
+        <actions/>
     </logmessage>
     <logmessage name="SUCCEED_MODIFY_SERVER_INHERITANCE" id="12242"
                 loglevel="LL_INFO"
@@ -5401,7 +5454,7 @@
         <triggers>
             <item>Click on OK button in server inheritance setting page.</item>
         </triggers>
-        <actions />
+        <actions/>
     </logmessage>
     <logmessage name="SSO_EXCEPTION_MODIFY_SERVER_INHERITANCE" id="12243"
                 loglevel="LL_SEVERE"
@@ -5445,7 +5498,8 @@
             <item>Look under console log for more information.</item>
         </actions>
     </logmessage>
-    <logmessage name="CONFIGURATION_EXCEPTION_MODIFY_SERVER_INHERITANCE" id="12246"
+    <logmessage name="CONFIGURATION_EXCEPTION_MODIFY_SERVER_INHERITANCE"
+                id="12246"
                 loglevel="LL_SEVERE"
                 description="modify server's inheritance.">
         <datainfo>
@@ -5468,7 +5522,7 @@
         <triggers>
             <item>View server's server configuration XML profile  page.</item>
         </triggers>
-        <actions />
+        <actions/>
     </logmessage>
     <logmessage name="SUCCEED_GET_SERVER_CONFIG_XML" id="12252"
                 loglevel="LL_INFO"
@@ -5479,7 +5533,7 @@
         <triggers>
             <item>View server's server configuration XML profile  page.</item>
         </triggers>
-        <actions />
+        <actions/>
     </logmessage>
     <logmessage name="SSO_EXCEPTION_GET_SERVER_CONFIG_XML" id="12253"
                 loglevel="LL_SEVERE"
@@ -5532,7 +5586,7 @@
         <triggers>
             <item>Click on OK button in server's server configuration XML profile  page.</item>
         </triggers>
-        <actions />
+        <actions/>
     </logmessage>
     <logmessage name="SUCCEED_SET_SERVER_CONFIG_XML" id="12262"
                 loglevel="LL_INFO"
@@ -5543,7 +5597,7 @@
         <triggers>
             <item>Click on OK button in server's server configuration XML profile  page.</item>
         </triggers>
-        <actions />
+        <actions/>
     </logmessage>
     <logmessage name="SSO_EXCEPTION_SET_SERVER_CONFIG_XML" id="12263"
                 loglevel="LL_SEVERE"
@@ -5587,7 +5641,7 @@
         <triggers>
             <item>Click on Search button in agent search view.</item>
         </triggers>
-        <actions />
+        <actions/>
     </logmessage>
     <logmessage name="SUCCEED_SEARCH_AGENT" id="13002"
                 loglevel="LL_INFO"
@@ -5602,7 +5656,7 @@
         <triggers>
             <item>Click on Search button in agent search view.</item>
         </triggers>
-        <actions />
+        <actions/>
     </logmessage>
     <logmessage name="EXCEPTION_SEARCH_AGENT" id="13003"
                 loglevel="LL_SEVERE"
@@ -5632,7 +5686,7 @@
         <triggers>
             <item>Click on Delete button in agent home page.</item>
         </triggers>
-        <actions />
+        <actions/>
     </logmessage>
     <logmessage name="SUCCEED_DELETE_AGENT" id="13012"
                 loglevel="LL_INFO"
@@ -5644,7 +5698,7 @@
         <triggers>
             <item>Click on Delete button in agent home page.</item>
         </triggers>
-        <actions />
+        <actions/>
     </logmessage>
     <logmessage name="EXCEPTION_DELETE_AGENT" id="13013"
                 loglevel="LL_SEVERE"
@@ -5674,7 +5728,7 @@
         <triggers>
             <item>Click on Search button in agent search view.</item>
         </triggers>
-        <actions />
+        <actions/>
     </logmessage>
     <logmessage name="SUCCEED_SEARCH_AGENT_GROUP" id="13022"
                 loglevel="LL_INFO"
@@ -5689,7 +5743,7 @@
         <triggers>
             <item>Click on Search button in agent search view.</item>
         </triggers>
-        <actions />
+        <actions/>
     </logmessage>
     <logmessage name="EXCEPTION_SEARCH_AGENT_GROUP" id="13023"
                 loglevel="LL_SEVERE"
@@ -5720,7 +5774,7 @@
         <triggers>
             <item>Click on Delete button in agent home page.</item>
         </triggers>
-        <actions />
+        <actions/>
     </logmessage>
     <logmessage name="SUCCEED_DELETE_AGENT_GROUP" id="13032"
                 loglevel="LL_INFO"
@@ -5732,7 +5786,7 @@
         <triggers>
             <item>Click on Delete button in agent home page.</item>
         </triggers>
-        <actions />
+        <actions/>
     </logmessage>
     <logmessage name="EXCEPTION_DELETE_AGENT_GROUP" id="13033"
                 loglevel="LL_SEVERE"
@@ -5761,7 +5815,7 @@
         <triggers>
             <item>Click on New button in agent home page.</item>
         </triggers>
-        <actions />
+        <actions/>
     </logmessage>
     <logmessage name="SUCCEED_CREATE_AGENT" id="13042"
                 loglevel="LL_INFO"
@@ -5774,7 +5828,7 @@
         <triggers>
             <item>Click on New button in agent home page.</item>
         </triggers>
-        <actions />
+        <actions/>
     </logmessage>
     <logmessage name="EXCEPTION_CREATE_AGENT" id="13043"
                 loglevel="LL_SEVERE"
@@ -5804,7 +5858,7 @@
         <triggers>
             <item>Click on New button in agent home page.</item>
         </triggers>
-        <actions />
+        <actions/>
     </logmessage>
     <logmessage name="SUCCEED_CREATE_AGENT_GROUP" id="13052"
                 loglevel="LL_INFO"
@@ -5817,7 +5871,7 @@
         <triggers>
             <item>Click on New button in agent home page.</item>
         </triggers>
-        <actions />
+        <actions/>
     </logmessage>
     <logmessage name="EXCEPTION_CREATE_AGENT_GROUP" id="13053"
                 loglevel="LL_SEVERE"
@@ -5845,7 +5899,7 @@
         <triggers>
             <item>Visit agent profile page.</item>
         </triggers>
-        <actions />
+        <actions/>
     </logmessage>
     <logmessage name="SUCCEED_GET_AGENT_ATTRIBUTE_VALUES" id="13062"
                 loglevel="LL_INFO"
@@ -5856,7 +5910,7 @@
         <triggers>
             <item>Visit agent profile page.</item>
         </triggers>
-        <actions />
+        <actions/>
     </logmessage>
     <logmessage name="EXCEPTION_GET_AGENT_ATTRIBUTE_VALUES" id="13063"
                 loglevel="LL_SEVERE"
@@ -5881,18 +5935,18 @@
         <triggers>
             <item>Click on save button in agent profile page.</item>
         </triggers>
-        <actions />
+        <actions/>
     </logmessage>
     <logmessage name="SUCCEED_SET_AGENT_ATTRIBUTE_VALUE" id="13072"
                 loglevel="LL_INFO"
-                description="Agent attribute values is retrieved.">
+                description="Agent attribute values set successfully">
         <datainfo>
             <item>agent universal Id</item>
         </datainfo>
         <triggers>
             <item>Click on save button in agent profile page.</item>
         </triggers>
-        <actions />
+        <actions/>
     </logmessage>
     <logmessage name="EXCEPTION_SET_AGENT_ATTRIBUTE_VALUE" id="13073"
                 loglevel="LL_SEVERE"
@@ -5909,19 +5963,20 @@
         </actions>
     </logmessage>
 
-    <!-- 13074 - 13079 are reserved for modify session HA related properties profile -->
-    <logmessage name="ATTEMPT_GET_ATTR_VALUES_OF_SESSION_HA_PROPERTIES" id="13074"
-                loglevel="LL_INFO"
-                description="Attempt to read session HA properties">
+ <!-- 13074 - 13079 are reserved for modify session HA related properties profile -->
+ <logmessage name="ATTEMPT_GET_ATTR_VALUES_OF_SESSION_HA_PROPERTIES" id="13074"
+             loglevel="LL_INFO"
+             description="Attempt to read session HA properties">
         <datainfo>
             <item>name of attribute</item>
         </datainfo>
         <triggers>
             <item>Click on Save button in session profile page.</item>
         </triggers>
-        <actions />
+        <actions/>
     </logmessage>
-    <logmessage name="SUCCEED_GET_ATTR_VALUES_OF_SESSION_HA_PROPERTIES" id="13075"
+    <logmessage name="SUCCEED_GET_ATTR_VALUES_OF_SESSION_HA_PROPERTIES"
+                id="13075"
                 loglevel="LL_INFO"
                 description="Read Access of session HA properties succeeded.">
         <datainfo>
@@ -5930,9 +5985,10 @@
         <triggers>
             <item>Click on Save button in session profile page.</item>
         </triggers>
-        <actions />
+        <actions/>
     </logmessage>
-    <logmessage name="SMS_EXCEPTION_GET_ATTR_VALUES_OF_SESSION_HA_PROPERTIES" id="13076"
+    <logmessage name="SMS_EXCEPTION_GET_ATTR_VALUES_OF_SESSION_HA_PROPERTIES"
+                id="13076"
                 loglevel="LL_SEVERE"
                 description="Read Access of session HA properties failed.">
         <datainfo>
@@ -5946,7 +6002,8 @@
             <item>Look under service management log for more information.</item>
         </actions>
     </logmessage>
-    <logmessage name="ATTEMPT_SET_ATTR_VALUES_OF_SESSION_HA_PROPERTIES" id="13077"
+    <logmessage name="ATTEMPT_SET_ATTR_VALUES_OF_SESSION_HA_PROPERTIES"
+                id="13077"
                 loglevel="LL_INFO"
                 description="Attempt to modify session HA properties">
         <datainfo>
@@ -5955,9 +6012,10 @@
         <triggers>
             <item>Click on Save button in session profile page.</item>
         </triggers>
-        <actions />
+        <actions/>
     </logmessage>
-    <logmessage name="SUCCEED_SET_ATTR_VALUES_OF_SESSION_HA_PROPERTIES" id="13078"
+    <logmessage name="SUCCEED_SET_ATTR_VALUES_OF_SESSION_HA_PROPERTIES"
+                id="13078"
                 loglevel="LL_INFO"
                 description="Modification of session HA properties succeeded.">
         <datainfo>
@@ -5966,9 +6024,10 @@
         <triggers>
             <item>Click on Save button in session profile page.</item>
         </triggers>
-        <actions />
+        <actions/>
     </logmessage>
-    <logmessage name="SMS_EXCEPTION_SET_ATTR_VALUES_OF_SESSION_HA_PROPERTIES" id="13079"
+    <logmessage name="SMS_EXCEPTION_SET_ATTR_VALUES_OF_SESSION_HA_PROPERTIES"
+                id="13079"
                 loglevel="LL_SEVERE"
                 description="Modification of session HA properties failed.">
         <datainfo>
