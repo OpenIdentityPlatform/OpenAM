@@ -647,6 +647,9 @@ public class AMSetupServlet extends HttpServlet {
                     // this will write bootstrap file after configuration is 
                     // done; and also register the observer.
                     ServerConfigXMLObserver.getInstance().update(true);
+                    // register our other observers
+                    SMSPropertiesObserver.getInstance().notifyChanges();
+                    DebugPropertiesObserver.getInstance().notifyChanges();
                     Map mapBootstrap = new HashMap(2);
                     Set set = new HashSet(2);
                     set.add(fileBootstrap);
@@ -1229,9 +1232,7 @@ public class AMSetupServlet extends HttpServlet {
         AdminUtils.initialize();
         SMSAuthModule.initialize();
         SystemProperties.initializeProperties(prop, true, true);
-        DebugPropertiesObserver.getInstance().notifyChanges();
-        SMSPropertiesObserver.getInstance().notifyChanges();
-        
+
         List plugins = getConfigPluginClasses();
         Map map = ServicesDefaultValues.getDefaultValues();
         String basedir = (String)map.get(SetupConstants.CONFIG_VAR_BASE_DIR);
