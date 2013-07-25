@@ -122,7 +122,7 @@
   <screen>$ cd /path/to/tomcat/webapps/openam/
 $ mkdir classes
 $ javac -d classes
- -classpath /path/to/tomcat/webapps/openam/WEB-INF/lib/<?eval ${coreLibrary}?>.jar:
+ -classpath /path/to/tomcat/webapps/openam/WEB-INF/lib/<?eval ${coreLibrary}?>:
   /path/to/tomcat/webapps/openam/WEB-INF/lib/<?eval ${sharedLibrary}?>
   ~/Downloads/com/sun/identity/samples/policy/Sample*.java
 $ cd classes/
@@ -143,19 +143,18 @@ $ jar cf ../policy-plugins.jar .</screen>
   <para>This section shows how to configure the sample custom policy condition
   that you built. Configuration involves defining the strings that describe
   the policy condition, and plugging the policy condition into the
-  <literal>iPlanetAMPolicyService</literal>, and then restarting OpenAM in
-  order to be able to add the condition to your policies.</para>
+  <literal>iPlanetAMPolicyService</literal>, and then restarting OpenAM
+  to be able to add the condition to your policies.</para>
   
-  <para>The strings describing your plugin belong as properties values in two
-  files,
-  <filename><replaceable>war-file-name</replaceable>/WEB-INF/classes/amPolicy.properties</filename>
-  and
-  <filename><replaceable>war-file-name</replaceable>/WEB-INF/classes/amPolicyConfig.properties</filename>.
-  To the former, add this property:</para>
+  <para>You need to update two files where the strings describing your plugin are
+  included as properties values.</para>
+  <para>In <filename><replaceable>war-file-name</replaceable>/WEB-INF/classes/amPolicy.properties</filename>
+  add this property:</para>
   
   <literallayout class="monospaced">samplecondition-policy-name=Sample Condition</literallayout>
-  
-  <para>To the later, add this property:</para>
+ 
+  <para>In <filename><replaceable>war-file-name</replaceable>/WEB-INF/classes/amPolicyConfig.properties</filename>
+  add this property:</para>
   
   <literallayout class="monospaced">x100=Sample Condition</literallayout>
   
@@ -185,7 +184,7 @@ Plug-in schema, Condition was added to service, iPlanetAMPolicyService.</screen>
  --schematype Organization
  --attributename iplanet-am-policy-selected-conditions
  --add
- --choicevalues "x100=Sample Condition"
+ --choicevalues "x100=SampleCondition"
 
 Choice Values were set.</screen>
   
@@ -198,7 +197,7 @@ Choice Values were set.</screen>
  --password-file /tmp/pwd.txt
  --servicename iPlanetAMPolicyConfigService
  --schematype Organization
- --attributevalues "iplanet-am-policy-selected-conditions=Sample Condition"
+ --attributevalues "iplanet-am-policy-selected-conditions=SampleCondition"
 
 Schema attribute defaults were added.</screen>
   
