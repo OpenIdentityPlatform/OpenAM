@@ -113,6 +113,11 @@
    <primary>Session tokens</primary>
    <secondary>REST API</secondary>
   </indexterm>
+
+  <para>Interface Stability: <link xlink:show="new"
+  xlink:href="admin-guide#interface-stability"
+  xlink:role="http://docbook.org/xlink/role/olink">Deprecated</link></para>
+
   <para>Simple authentication with a user name and password returns a
   token.</para>
   
@@ -146,6 +151,11 @@ token.id=AQIC5wM2LY4SfcxvdvHOXjtC_eWSs2RB54tgvgK8SuYi7aQ.*AAJTSQACMDE.*</screen>
  
  <section xml:id="rest-api-tokens">
   <title>Token Validation, Attribute Retrieval, &amp; Cookie Information</title>
+
+  <para>Interface Stability: <link xlink:show="new"
+  xlink:href="admin-guide#interface-stability"
+  xlink:role="http://docbook.org/xlink/role/olink">Deprecated</link></para>
+
   <para>You check whether a token is valid as follows.</para>
 
   <screen>$ curl --request POST --data "tokenid=AQIC5w...*AAJTSQACMDE.*" 
@@ -246,7 +256,11 @@ string=amlbcookie</screen>
   <para>You can call on OpenAM to decide whether to authorize access to a
   protected resource based on a valid token. Of course, you must percent
   encode the resource URI.</para>
-  
+
+  <para>Interface Stability: <link xlink:show="new"
+  xlink:href="admin-guide#interface-stability"
+  xlink:role="http://docbook.org/xlink/role/olink">Deprecated</link></para>
+
   <screen>$ curl "https://openam.example.com:8443/openam/identity/authorize?
  uri=http%3A%2F%2Fwww.example.com%3A8080%2Fexamples%2Findex.html
  &amp;subjectid=AQIC5wM2LY4SfcxuxIP0VnP2lVjs7ypEM6VDx6srk56CN1Q.*AAJTSQACMDE.*"
@@ -254,63 +268,402 @@ boolean=true</screen>
   
   <para>To indicate access denied, OpenAM returns
   <literal>boolean=false</literal>.</para>
-  
-  <para>Additionally, you can access entitlements and entitlement policy
-  decisions using the REST interface. In order to access the entitlements
-  interface, you cannot however use the authentication token as is.
-  Instead you must encode the token as performed in
-  <link
-  xlink:href="http://sources.forgerock.org/browse/~raw,r=6/openam/trunk/opensso/www/public/use/docs/fampdf/Encoder.java"
-  ><filename>Encoder.java</filename></link>, and then URL-encode the
-  result.</para>
-  
-  <para>The entitlements REST interface uses the following path suffixes and
-  query string parameters.</para>
-  
-  <itemizedlist>
-   <para>Path suffixes for entitlements include the following.</para>
-   <listitem>
-    <para><literal>ws/1/entitlement/decision</literal>: request a decision
-    pertaining to a single resource</para>
-   </listitem>
-   <listitem>
-    <para><literal>ws/1/entitlement/decisions</literal>: request decisions
-    pertaining to multiple resources</para>
-   </listitem>
-   <listitem>
-    <para><literal>ws/1/entitlement/entitlement</literal>: request decisions
-    for a specified resource URL and all resources underneath</para>
-   </listitem>
-  </itemizedlist>
-  
-  <itemizedlist>
-   <para>Query string parameters for entitlements include the following.</para>
-   <listitem>
-    <para><literal>subject=<replaceable>encoded-token</replaceable></literal>,
-    where the encoded token is as describe above.</para>
-   </listitem>
-   <listitem>
-    <para><literal>action=get</literal>, or <literal>action=post</literal>,
-    which identifies the user agent action when requesting a decision.</para>
-   </listitem>
-   <listitem>
-    <para><literal>application=iPlanetAMWebAgentService</literal></para>
-   </listitem>
-   <listitem>
-    <para><literal>resource=<replaceable>resource-url</replaceable></literal>,
-    or multiple <literal>resources=<replaceable>resource-url</replaceable></literal>
-    parameters for multiple decisions.</para>
-   </listitem>
-   <listitem>
-    <para><literal>env=<replaceable>requestDnsName%3Dfqdn</replaceable></literal>,
-    <literal>env=<replaceable>requestIP%3Ddotted-quads</replaceable></literal>,
-    <literal>env=<replaceable>requestTime%3Dseconds-since-epoch</replaceable></literal>,
-    and <literal>env=<replaceable>requestDnsName%3Dtime-zone</replaceable></literal>
-    where <replaceable>time-zone</replaceable> is from Java
-    <literal>TimeZone.getTimeZone().getID()</literal>. The
-    <literal>env</literal> parameters thus express conditions.</para>
-   </listitem>
-  </itemizedlist>
+
+  <section xml:id="rest-api-policy-decisions">
+   <title>Requesting Policy Decisions</title>
+
+   <para>OpenAM provides additional REST APIs for requesting policy
+   decisions.</para>
+
+   <para>Interface Stability: <link xlink:show="new"
+   xlink:href="admin-guide#interface-stability"
+   xlink:role="http://docbook.org/xlink/role/olink">Deprecated</link></para>
+
+   <itemizedlist>
+    <para>The policy decision interfaces use the following path suffixes and
+    query string parameters.</para>
+
+    <para>Path suffixes for policy decision requests include the following.</para>
+    <listitem>
+     <para><literal>ws/1/entitlement/decision</literal>: request a decision
+     pertaining to a single resource</para>
+    </listitem>
+    <listitem>
+     <para><literal>ws/1/entitlement/decisions</literal>: request decisions
+     pertaining to multiple resources</para>
+    </listitem>
+    <listitem>
+     <para><literal>ws/1/entitlement/entitlement</literal>: request decisions
+     for a specified resource URL and all resources underneath</para>
+    </listitem>
+   </itemizedlist>
+
+   <itemizedlist>
+    <para>Query string parameters for policy decision requests include the
+    following.</para>
+
+    <listitem>
+     <para><literal>subject=<replaceable>encoded-token</replaceable></literal>,
+     where the token is encoded using the method implemented in <link
+     xlink:show="new"
+     xlink:href="http://sources.forgerock.org/browse/~raw,r=6/openam/trunk/opensso/www/public/use/docs/fampdf/Encoder.java"
+     ><filename>Encoder.java</filename></link>.</para>
+
+     <para>In the examples for this section, the token ID obtained during
+     authentication for <literal>amadmin</literal> is abbreviated as
+     <literal>AQIC5...DU3*</literal> and the encoded token ID for the subject
+     is <literal>MJ3QFTr4ZV2QrtlJvXlg0Q2dMRM=</literal>.</para>
+    </listitem>
+
+    <listitem>
+     <para><literal>action=get</literal>, or <literal>action=post</literal>,
+     which identifies the user agent action when requesting a decision.</para>
+    </listitem>
+
+    <listitem>
+     <para><literal>application=iPlanetAMWebAgentService</literal></para>
+    </listitem>
+
+    <listitem>
+     <para><literal>resource=<replaceable>resource-url</replaceable></literal>,
+     or multiple <literal>resources=<replaceable>resource-url</replaceable></literal>
+     parameters for multiple decisions.</para>
+    </listitem>
+
+    <listitem>
+     <para><literal>env=<replaceable>requestDnsName%3Dfqdn</replaceable></literal>,
+     <literal>env=<replaceable>requestIP%3Ddotted-quads</replaceable></literal>,
+     <literal>env=<replaceable>requestTime%3Dseconds-since-epoch</replaceable></literal>,
+     and <literal>env=<replaceable>requestDnsName%3Dtime-zone</replaceable></literal>
+     where <replaceable>time-zone</replaceable> is from Java
+     <literal>TimeZone.getTimeZone().getID()</literal>. The
+     <literal>env</literal> parameters thus express conditions.</para>
+    </listitem>
+   </itemizedlist>
+
+   <para>Authentication for these interfaces uses cookies, so if your
+   application is not running in a browser, first authenticate as described in
+   <xref linkend="rest-api-auth" />.</para>
+
+   <para>To request a decision for a single resource, use an HTTP GET on
+   <literal>/ws/1/entitlement/decision</literal> as in the following example.</para>
+
+   <screen>$ curl
+ --request GET
+ --cookie "iPlanetDirectoryPro=AQIC5...DU3*"
+ "http://openam.example.com:8080/openam/ws/1/entitlement/decision
+ ?subject=MJ3QFTr4ZV2QrtlJvXlg0Q2dMRM=&amp;action=GET
+ &amp;application=iPlanetAMWebAgentService
+ &amp;resource=http%3A%2F%2Fwww.example.com%2Findex.html"
+allow</screen>
+
+   <para>If access is denied, the result is <literal>deny</literal>.</para>
+
+   <para>To request decisions for multiple resources, use an HTTP GET on
+   <literal>/ws/1/entitlement/decisions</literal> as in the following example.</para>
+
+   <screen>$ curl
+ --request GET
+ --cookie "iPlanetDirectoryPro=AQIC5...DU3*"
+ "http://openam.example.com:8080/openam/ws/1/entitlement/decisions
+ ?subject=MJ3QFTr4ZV2QrtlJvXlg0Q2dMRM=&amp;action=GET
+ &amp;application=iPlanetAMWebAgentService
+ &amp;resources=http%3A%2F%2Fwww.example.com%2Findex.html
+ &amp;resources=http%3A%2F%2Fwww.example.com%2Ffavicon.ico"
+{
+    "statusCode": 200,
+    "body": {
+        "results": [
+            {
+                "actionsValues": {
+                    "POST": true,
+                    "GET": true
+                },
+                "attributes": {},
+                "advices": {},
+                "resourceName": "http://www.example.com:80/index.html"
+            },
+            {
+                "actionsValues": {
+                    "POST": true,
+                    "GET": true
+                },
+                "attributes": {},
+                "advices": {},
+                "resourceName": "http://www.example.com:80/favicon.ico"
+            }
+        ]
+    },
+    "statusMessage": "OK"
+}</screen>
+
+   <para>To request decisions for all resource underneath a given resource, use
+   an HTTP GET on <literal>/ws/1/entitlement/entitlement</literal> as in the
+   following example.</para>
+
+   <screen>$ curl
+ --request GET
+ --cookie "iPlanetDirectoryPro=AQIC5...DU3*"
+ "http://openam.example.com:8080/openam/ws/1/entitlement/entitlement
+ ?subject=MJ3QFTr4ZV2QrtlJvXlg0Q2dMRM=
+ &amp;application=iPlanetAMWebAgentService
+ &amp;resource=http%3A%2F%2Fwww.example.com%2F*"
+{
+    "statusCode": 200,
+    "body": {
+        "actionsValues": {
+            "POST": true,
+            "GET": true
+        },
+        "attributes": {},
+        "advices": {},
+        "resourceName": "http://www.example.com:80/*"
+    },
+    "statusMessage": "OK"
+}</screen>
+  </section>
+
+  <section xml:id="rest-api-policy-management">
+   <title>Managing Policies</title>
+
+   <para>OpenAM exposes a REST API through the
+   <literal>/ws/1/entitlement/privilege</literal> endpoint under the
+   deployment URI. The API lets you create, read, update, delete, and query
+   policies.</para>
+
+   <para>Interface Stability: <link xlink:show="new"
+   xlink:href="admin-guide#interface-stability"
+   xlink:role="http://docbook.org/xlink/role/olink">Deprecated</link></para>
+
+   <para>Authentication for these interfaces uses cookies, so if your
+   application is not running in a browser, first authenticate as described in
+   <xref linkend="rest-api-auth" />.</para>
+
+   <section xml:id="rest-api-policy-management-create">
+    <title>Creating Policies</title>
+
+    <para>You create a policy by using an HTTP POST of the JSON representation
+    to the endpoint. You must URL encode the JSON before passing it to
+    OpenAM.</para>
+
+    <screen>$ cat entitlement.json
+{
+    "name": "Example HTTP",
+    "eSubject": {
+        "state": {
+            "className": "com.sun.identity.policy.plugins.AuthenticatedUsers",
+            "exclusive": false,
+            "name": "All Authenticated Users",
+            "values": []
+        },
+        "className": "com.sun.identity.entitlement.opensso.PolicySubject"
+    },
+    "entitlement": {
+        "actionsValues": {
+            "POST": true,
+            "GET": true
+        },
+        "applicationName": "iPlanetAMWebAgentService",
+        "name": "authorize",
+        "resourceNames": [
+            "http://www.example.com:80/*"
+        ]
+    }
+}$ curl
+ --request POST
+ --cookie "iPlanetDirectoryPro=AQIC5...DU3*"
+ --data-urlencode "privilege.json@entitlement.json"
+ http://openam.example.com:8080/openam/ws/1/entitlement/privilege
+{"statusCode":201,"body":"Created","statusMessage":"Created"}
+
+$ cat entitlement2.json
+{
+    "name": "Example HTTPS",
+    "eSubject": {
+        "state": {
+            "className": "com.sun.identity.policy.plugins.AuthenticatedUsers",
+            "exclusive": false,
+            "name": "All Authenticated Users",
+            "values": []
+        },
+        "className": "com.sun.identity.entitlement.opensso.PolicySubject"
+    },
+    "entitlement": {
+        "actionsValues": {
+            "POST": false,
+            "GET": true
+        },
+        "applicationName": "iPlanetAMWebAgentService",
+        "name": "authorize",
+        "resourceNames": [
+            "https://www.example.com:443/*?*"
+        ]
+    }
+}$ curl
+ --request POST
+ --cookie "iPlanetDirectoryPro=AQIC5...DU3*"
+ --data-urlencode "privilege.json@entitlement2.json"
+ http://openam.example.com:8080/openam/ws/1/entitlement/privilege
+{"statusCode":201,"body":"Created","statusMessage":"Created"}</screen>
+   </section>
+
+   <section xml:id="rest-api-policy-management-read">
+    <title>Reading Policies</title>
+
+    <para>To read a policy, use an HTTP GET on the endpoint followed by
+    the URL-encoded name of the policy.</para>
+
+    <para>Notice that the "state" is returned as a long string, and so is not
+    shown here in full.</para>
+
+    <screen>$ curl
+ --request GET
+ --cookie "iPlanetDirectoryPro=AQIC5...DU3*"
+ http://openam.example.com:8080/openam/ws/1/entitlement/privilege/Example%20HTTP
+{
+    "statusCode": 200,
+    "body": {
+        "results": {
+            "name": "Example HTTP",
+            "eSubject": {
+                "state": "{\n  \"className\": \"com.sun.identity.policy...}",
+                "className": "com.sun.identity.entitlement.opensso.PolicySubject"
+            },
+            "entitlement": {
+                "actionsValues": {
+                    "POST": true,
+                    "GET": true
+                },
+                "applicationName": "iPlanetAMWebAgentService",
+                "name": "authorize",
+                "resourceNames": [
+                    "http://www.example.com:80/*"
+                ]
+            }
+        }
+    },
+    "statusMessage": "OK"
+}
+
+$ curl
+ --request GET
+ --cookie "iPlanetDirectoryPro=AQIC5...DU3*"
+ http://openam.example.com:8080/openam/ws/1/entitlement/privilege/Example%20HTTPS
+{
+    "statusCode": 200,
+    "body": {
+        "results": {
+            "name": "Example HTTPS",
+            "eSubject": {
+                "state": "{\n  \"className\": \"com.sun.identity.policy...}",
+                "className": "com.sun.identity.entitlement.opensso.PolicySubject"
+            },
+            "entitlement": {
+                "actionsValues": {
+                    "POST": false,
+                    "GET": true
+                },
+                "applicationName": "iPlanetAMWebAgentService",
+                "name": "authorize",
+                "resourceNames": [
+                    "https://www.example.com:443/*?*"
+                ]
+            }
+        }
+    },
+    "statusMessage": "OK"
+}</screen>
+   </section>
+
+   <section xml:id="rest-api-policy-management-update">
+    <title>Updating Policies</title>
+
+    <para>To update a policy, use an HTTP PUT on the endpoint followed by the
+    URL-encoded name of the policy.</para>
+
+    <screen>$ cat update.json {
+    "name": "Example HTTP",
+    "eSubject": {
+        "state": {
+            "className": "com.sun.identity.policy.plugins.AuthenticatedUsers",
+            "exclusive": false,
+            "name": "All Authenticated Users",
+            "values": []
+        },
+        "className": "com.sun.identity.entitlement.opensso.PolicySubject"
+    },
+    "entitlement": {
+        "actionsValues": {
+            "POST": false,
+            "GET": true
+        },
+        "applicationName": "iPlanetAMWebAgentService",
+        "name": "authorize",
+        "resourceNames": [
+            "http://www.example.com:80/*?*"
+        ]
+    }
+}$ curl
+ --request PUT
+ --cookie "iPlanetDirectoryPro=AQIC5...DU3*"
+ --data-urlencode "privilege.json@update.json"
+ http://openam.example.com:8080/openam/ws/1/entitlement/privilege/Example%20HTTP
+{"statusCode":200,"body":"OK","statusMessage":"OK"}</screen>
+   </section>
+
+   <section xml:id="rest-api-policy-management-delete">
+    <title>Deleting Policies</title>
+
+    <para>To delete a policy, use an HTTP DELETE on the endpoint followed by
+    the URL-encoded name of the policy.</para>
+
+    <screen>$ curl
+ --request DELETE
+ --cookie "iPlanetDirectoryPro=AQIC5...DU3*"
+ http://openam.example.com:8080/openam/ws/1/entitlement/privilege/Example%20HTTPS
+{"statusCode":200,"body":"OK","statusMessage":"OK"}</screen>
+   </section>
+
+   <section xml:id="rest-api-policy-management-query">
+    <title>Querying Policies</title>
+
+    <para>To get the names of policies, use an HTTP GET on the endpoint.</para>
+
+    <screen>$ curl
+ --request GET
+ --cookie "iPlanetDirectoryPro=AQIC5...DU3*"
+ http://openam.example.com:8080/openam/ws/1/entitlement/privilege
+{
+    "statusCode": 200,
+    "body": {
+        "results": [
+            "Example HTTPS",
+            "Example HTTP"
+        ]
+    },
+    "statusMessage": "OK"
+}</screen>
+
+    <para>You can pass a filter query parameter to get only policies
+    that match the filter. Make sure you URL encode the filter value.</para>
+
+    <screen>$ curl
+ --request GET
+ --cookie "iPlanetDirectoryPro=AQIC5...DU3*"
+ "http://openam.example.com:8080/openam/ws/1/entitlement/privilege
+ ?subject=MJ3QFTr4ZV2QrtlJvXlg0Q2dMRM=&amp;filter=name%3D*HTTP"
+{
+    "statusCode": 200,
+    "body": {
+        "results": [
+            "Example HTTP"
+        ]
+    },
+    "statusMessage": "OK"
+}
+</screen>
+   </section>
+  </section>
  </section>
 
  <section xml:id="rest-api-oauth2">
@@ -781,7 +1134,11 @@ $ curl --request POST --header "iplanetDirectoryPro: AQIC5wM...3MTYxOA..*"
 
  <section xml:id="rest-api-logging">
   <title>Logging</title>
-  
+
+  <para>Interface Stability: <link xlink:show="new"
+  xlink:href="admin-guide#interface-stability"
+  xlink:role="http://docbook.org/xlink/role/olink">Deprecated</link></para>
+
   <para>You can send OpenAM messages to log, specifying the message content
   and the log file in which to write your message.</para>
   
@@ -1276,7 +1633,12 @@ $ curl --request DELETE --header "iplanetDirectoryPro: AQIC5w...2NzEz*"
 
   <section xml:id="rest-api-create-legacy">
    <title>Creating Identities (Legacy API)</title>
-   
+
+   <para>Interface Stability: <link xlink:show="new"
+   xlink:href="admin-guide#interface-stability"
+   xlink:role="http://docbook.org/xlink/role/olink">Deprecated</link></para>
+
+
    <para>OpenAM lets you create user profiles, and also create web and J2EE
    policy agent profiles. When you create an entry, you must provide the
    following parameters.</para>
@@ -1338,7 +1700,11 @@ $ curl "https://openam.example.com:8443/openam/identity/create?
   
   <section xml:id="rest-api-read-legacy">
    <title>Reading &amp; Searching for Identities (Legacy API)</title>
-   
+
+   <para>Interface Stability: <link xlink:show="new"
+   xlink:href="admin-guide#interface-stability"
+   xlink:role="http://docbook.org/xlink/role/olink">Deprecated</link></para>
+
    <para>Reading is similar to attribute retrieval, as described in
    <xref linkend="rest-api-tokens" />, but obtained using the token of
    a user with permissions to perform the search, as shown in the following
@@ -1434,7 +1800,11 @@ string=bjensen</screen>
   
   <section xml:id="rest-api-update-legacy">
    <title>Updating Identities (Legacy API)</title>
-   
+
+   <para>Interface Stability: <link xlink:show="new"
+   xlink:href="admin-guide#interface-stability"
+   xlink:role="http://docbook.org/xlink/role/olink">Deprecated</link></para>
+
    <para>You can update an identity with the same parameters used to create
    identities, provided the token corresponds to a user with access to
    update the identity.</para>
@@ -1451,6 +1821,11 @@ string=bjensen</screen>
   <section xml:id="rest-api-delete-legacy">
    <title>Deleting Identities (Legacy API)</title>
    
+
+   <para>Interface Stability: <link xlink:show="new"
+   xlink:href="admin-guide#interface-stability"
+   xlink:role="http://docbook.org/xlink/role/olink">Deprecated</link></para>
+
    <para>You can also delete an identity.</para>
    
    <screen>$ curl "https://openam.example.com:8443/openam/identity/delete?
