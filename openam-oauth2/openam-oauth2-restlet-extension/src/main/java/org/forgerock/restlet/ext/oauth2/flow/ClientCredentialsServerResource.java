@@ -1,7 +1,7 @@
 /*
  * DO NOT REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright (c) 2012-2013 ForgeRock Inc. All rights reserved.
+ * Copyright (c) 2012-2013 ForgeRock AS. All rights reserved.
  *
  * The contents of this file are subject to the terms
  * of the Common Development and Distribution License
@@ -38,6 +38,7 @@ import org.restlet.resource.Post;
 
 /**
  * Implements the Client Credentials Flow
+ *
  * @see <a
  *      href="http://tools.ietf.org/html/rfc6749#section-4.4>4.4.
  *      Client Credentials Grant</a>
@@ -60,28 +61,33 @@ public class ClientCredentialsServerResource extends AbstractFlow {
         Map<String, Object> response = token.convertToMap();
 
         //execute post token creation pre return scope plugin for extra return data.
-        Map<String,String> data = new HashMap<String,String>();
-        response.putAll(executeExtraDataScopePlugin(data ,token));
+        Map<String, String> data = new HashMap<String, String>();
+        response.putAll(executeExtraDataScopePlugin(data, token));
+
+        if (checkedScope != null && !checkedScope.isEmpty()) {
+            response.put(OAuth2Constants.Params.SCOPE, OAuth2Utils.join(checkedScope,
+                    OAuth2Utils.getScopeDelimiter(getContext())));
+        }
 
         return new JacksonRepresentation<Map>(response);
     }
 
     @Override
     protected String[] getRequiredParameters() {
-        return new String[] { OAuth2Constants.Params.GRANT_TYPE };
+        return new String[]{OAuth2Constants.Params.GRANT_TYPE};
     }
 
     /**
      * This method is intended to be overridden by subclasses.
-     * 
+     *
      * @param checkedScope
      * @return
      * @throws org.forgerock.openam.oauth2.exceptions.OAuthProblemException
-     * 
+     *
      */
     private CoreToken createAccessToken(Set<String> checkedScope) {
         return getTokenStore().createAccessToken(client.getClient().getAccessTokenType(),
-                checkedScope, OAuth2Utils.getRealm(getRequest()),client.getClient().getClientId(),
+                checkedScope, OAuth2Utils.getRealm(getRequest()), client.getClient().getClientId(),
                 client.getClient().getClientId(), null, null, null);
     }
 }

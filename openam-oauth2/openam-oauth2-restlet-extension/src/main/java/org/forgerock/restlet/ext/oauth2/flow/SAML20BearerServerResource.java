@@ -1,7 +1,7 @@
 /*
  * DO NOT REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright (c) 2012-2013 ForgeRock Inc. All rights reserved.
+ * Copyright (c) 2012-2013 ForgeRock AS. All rights reserved.
  *
  * The contents of this file are subject to the terms
  * of the Common Development and Distribution License
@@ -23,7 +23,7 @@
  */
 
 /**
- * Portions copyright 2012-2013 ForgeRock Inc
+ * Portions copyright 2012-2013 ForgeRock AS
  */
 
 package org.forgerock.restlet.ext.oauth2.flow;
@@ -47,6 +47,7 @@ import java.util.Set;
 
 /**
  * Implements a SAML 2.0 Flow. This is an Extension grant.
+ *
  * @see <a href="http://tools.ietf.org/html/rfc6749#section-4.5">4.5.  Extension Grants</a>
  */
 public class SAML20BearerServerResource extends AbstractFlow {
@@ -100,7 +101,7 @@ public class SAML20BearerServerResource extends AbstractFlow {
         OAuth2Utils.DEBUG.message("SAML20BearerServerResource.represent(): Assertion:\n" + assertion);
 
         byte[] decodedAsertion = Base64.decode(assertion.replace(" ", "+"));
-        if (decodedAsertion == null){
+        if (decodedAsertion == null) {
             OAuth2Utils.DEBUG.error("SAML20BearerServerResource.represent(): Decoding assertion failed\nassertion:" + assertion);
         }
         String finalAssertion = new String(decodedAsertion);
@@ -118,7 +119,7 @@ public class SAML20BearerServerResource extends AbstractFlow {
                     "Assertion is invalid.");
         }
 
-        if (!valid){
+        if (!valid) {
             OAuth2Utils.DEBUG.error("SAML20BearerServerResource.represent(): Error parsing assertion");
             throw OAuthProblemException.OAuthError.INVALID_GRANT.handle(getRequest(),
                     "Assertion is invalid.");
@@ -134,10 +135,10 @@ public class SAML20BearerServerResource extends AbstractFlow {
 
 
         OAuth2Utils.DEBUG.message("SAML20BearerServerResource.represent(): Creating token with data: " +
-                client.getClient().getAccessTokenType()+"\n"+
-                checkedScope.toString()+"\n"+
-                OAuth2Utils.getRealm(getRequest())+"\n"+
-                assertionObject.getSubject().getNameID().getValue()+"\n"+
+                client.getClient().getAccessTokenType() + "\n" +
+                checkedScope.toString() + "\n" +
+                OAuth2Utils.getRealm(getRequest()) + "\n" +
+                assertionObject.getSubject().getNameID().getValue() + "\n" +
                 client.getClient().getClientId());
         CoreToken token = getTokenStore().createAccessToken(client.getClient().getAccessTokenType(), checkedScope,
                 OAuth2Utils.getRealm(getRequest()), assertionObject.getSubject().getNameID().getValue(),
@@ -145,13 +146,18 @@ public class SAML20BearerServerResource extends AbstractFlow {
         OAuth2Utils.DEBUG.message("SAML20BearerServerResource.represent(): Token created: " + token.toString());
 
         Map<String, Object> response = token.convertToMap();
+
+        if (checkedScope != null && !checkedScope.isEmpty()) {
+            response.put(OAuth2Constants.Params.SCOPE, OAuth2Utils.join(checkedScope,
+                    OAuth2Utils.getScopeDelimiter(getContext())));
+        }
         return new JacksonRepresentation<Map>(response);
     }
 
     private boolean validAssertion(Assertion assertion) throws SAML2Exception {
         //must contain issuer
         Issuer issuer = assertion.getIssuer();
-        if (issuer == null){
+        if (issuer == null) {
             OAuth2Utils.DEBUG.error("SAML20BearerServerResource.validAssertion(): Issuer does not exist");
             return false;
         }
@@ -169,12 +175,12 @@ public class SAML20BearerServerResource extends AbstractFlow {
          */
 
         Conditions conditions = assertion.getConditions();
-        if (conditions == null){
+        if (conditions == null) {
             OAuth2Utils.DEBUG.error("SAML20BearerServerResource.validAssertion(): Conditions does not exist");
             return false;
         }
         List<AudienceRestriction> audienceRestriction = conditions.getAudienceRestrictions();
-        if (audienceRestriction == null || audienceRestriction.isEmpty()){
+        if (audienceRestriction == null || audienceRestriction.isEmpty()) {
             OAuth2Utils.DEBUG.error("SAML20BearerServerResource.validAssertion(): Audience Restriction does not exist");
             return false;
         }
@@ -182,27 +188,27 @@ public class SAML20BearerServerResource extends AbstractFlow {
         //String oauthTokenURL = OAuth2Utils.getDeploymentURL(getRequest());
         String deploymentURL = OAuth2Utils.getDeploymentURL(getRequest());
         OAuth2Utils.DEBUG.message("SAML20BearerServerResource.validAssertion(): URL of authorization server: " + deploymentURL);
-        for (AudienceRestriction restriction : audienceRestriction){
+        for (AudienceRestriction restriction : audienceRestriction) {
             List<String> audiences = restriction.getAudience();
-            if (audiences == null || audiences.isEmpty()){
+            if (audiences == null || audiences.isEmpty()) {
                 continue;
             }
-            for (String audience: audiences ){
+            for (String audience : audiences) {
                 //TODO ADD service provider SAML entity of its controlling domain
                 //check for the url with and without trailing /
-                if (deploymentURL.endsWith("/")){
-                    deploymentURL = deploymentURL.substring(0,deploymentURL.length()-1);
+                if (deploymentURL.endsWith("/")) {
+                    deploymentURL = deploymentURL.substring(0, deploymentURL.length() - 1);
                 }
-                if (audience.endsWith("/")){
-                    audience = audience.substring(0,audience.length()-1);
+                if (audience.endsWith("/")) {
+                    audience = audience.substring(0, audience.length() - 1);
                 }
-                if (audience.equalsIgnoreCase(deploymentURL)){
+                if (audience.equalsIgnoreCase(deploymentURL)) {
                     found = true;
                 }
             }
         }
-        if (found == false){
-            OAuth2Utils.DEBUG.error("SAML20BearerServerResource.validAssertion(): Didnt find the oauth2 provider in"+
+        if (found == false) {
+            OAuth2Utils.DEBUG.error("SAML20BearerServerResource.validAssertion(): Didnt find the oauth2 provider in" +
                     "audience restrictions");
             return false;
         }
@@ -219,7 +225,7 @@ public class SAML20BearerServerResource extends AbstractFlow {
          * MAY be included in an <AttributeStatement>.
          */
         Subject subject = assertion.getSubject();
-        if (subject == null){
+        if (subject == null) {
             OAuth2Utils.DEBUG.error("SAML20BearerServerResource.validAssertion(): Subject does not exist");
             return false;
         }
@@ -260,34 +266,34 @@ public class SAML20BearerServerResource extends AbstractFlow {
         List<SubjectConfirmation> subjectConfirmations = subject.getSubjectConfirmation();
 
         found = false;
-        if (subjectConfirmations == null || subjectConfirmations.isEmpty()){
+        if (subjectConfirmations == null || subjectConfirmations.isEmpty()) {
             OAuth2Utils.DEBUG.error("SAML20BearerServerResource.validAssertion(): Subject Confirmations does not exist");
             return false;
         }
         //if conditions is expired assertion is expired
-        if (!assertion.isTimeValid()){
+        if (!assertion.isTimeValid()) {
             OAuth2Utils.DEBUG.error("SAML20BearerServerResource.validAssertion(): Assertion expired");
             return false;
         } else {
             found = true;
         }
-        for (SubjectConfirmation subjectConfirmation : subjectConfirmations ){
-            if (subjectConfirmation.getMethod() == null){
+        for (SubjectConfirmation subjectConfirmation : subjectConfirmations) {
+            if (subjectConfirmation.getMethod() == null) {
                 continue;
             }
-            if (subjectConfirmation.getMethod().equalsIgnoreCase(OAuth2Constants.SAML20.SUBJECT_CONFIRMATION_METHOD)){
+            if (subjectConfirmation.getMethod().equalsIgnoreCase(OAuth2Constants.SAML20.SUBJECT_CONFIRMATION_METHOD)) {
                 SubjectConfirmationData subjectConfirmationData = subjectConfirmation.getSubjectConfirmationData();
-                if (subjectConfirmationData == null){
+                if (subjectConfirmationData == null) {
                     continue;
                 } else if (subjectConfirmationData.getNotOnOrAfter().before(new Date())
-                        && subjectConfirmationData.getRecipient().equalsIgnoreCase(deploymentURL)){
+                        && subjectConfirmationData.getRecipient().equalsIgnoreCase(deploymentURL)) {
                     found = true;
                 }
                 //TODO check Client Address
             }
         }
 
-        if (!found){
+        if (!found) {
             OAuth2Utils.DEBUG.error("SAML20BearerServerResource.validAssertion(): Assertion expired or subject expired");
             return false;
         }
@@ -324,12 +330,12 @@ public class SAML20BearerServerResource extends AbstractFlow {
          * authorization server MUST verify the signature.
          */
 
-        if (!assertion.isSigned()){
+        if (!assertion.isSigned()) {
             OAuth2Utils.DEBUG.error("SAML20BearerServerResource.validAssertion(): Assertion must be signed");
             return false;
         }
         if (!SAMLUtils.checkSignatureValid(
-                assertion.toXMLString(), "ID", issuer.getValue())){
+                assertion.toXMLString(), "ID", issuer.getValue())) {
             OAuth2Utils.DEBUG.error("SAML20BearerServerResource.validAssertion(): Assertion signature verification failed");
             return false;
         }
@@ -338,7 +344,7 @@ public class SAML20BearerServerResource extends AbstractFlow {
 
     @Override
     protected String[] getRequiredParameters() {
-        return new String[] { OAuth2Constants.Params.GRANT_TYPE, OAuth2Constants.SAML20.ASSERTION,
-                OAuth2Constants.Params.CLIENT_ID };
+        return new String[]{OAuth2Constants.Params.GRANT_TYPE, OAuth2Constants.SAML20.ASSERTION,
+                OAuth2Constants.Params.CLIENT_ID};
     }
 }

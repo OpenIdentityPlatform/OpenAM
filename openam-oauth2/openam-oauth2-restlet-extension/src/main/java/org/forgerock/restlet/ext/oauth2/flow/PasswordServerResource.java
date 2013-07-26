@@ -1,7 +1,7 @@
 /*
  * DO NOT REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright (c) 2012-2013 ForgeRock Inc. All rights reserved.
+ * Copyright (c) 2012-2013 ForgeRock AS. All rights reserved.
  *
  * The contents of this file are subject to the terms
  * of the Common Development and Distribution License
@@ -42,6 +42,7 @@ import org.restlet.security.Verifier;
 
 /**
  * Implements the Resource Owner Password Credentials Flow
+ *
  * @see <a
  *      href="http://tools.ietf.org/html/rfc6749#section-4.3>4.3.
  *      Resource Owner Password Credentials Grant</a>
@@ -82,7 +83,7 @@ public class PasswordServerResource extends AbstractFlow {
         CoreToken token = null;
         Map<String, Object> result = null;
 
-        if (checkIfRefreshTokenIsRequired(getRequest())){
+        if (checkIfRefreshTokenIsRequired(getRequest())) {
             CoreToken refreshToken = createRefreshToken(checkedScope);
             token = createAccessToken(checkedScope, refreshToken);
             result = token.convertToMap();
@@ -93,28 +94,33 @@ public class PasswordServerResource extends AbstractFlow {
         }
 
         //execute post token creation pre return scope plugin for extra return data.
-        Map<String,String> data = new HashMap<String,String>();
-        result.putAll(executeExtraDataScopePlugin(data ,token));
+        Map<String, String> data = new HashMap<String, String>();
+        result.putAll(executeExtraDataScopePlugin(data, token));
+
+        if (checkedScope != null && !checkedScope.isEmpty()) {
+            result.put(OAuth2Constants.Params.SCOPE, OAuth2Utils.join(checkedScope,
+                    OAuth2Utils.getScopeDelimiter(getContext())));
+        }
 
         return new JacksonRepresentation<Map>(result);
     }
 
     @Override
     protected String[] getRequiredParameters() {
-        return new String[] { OAuth2Constants.Params.GRANT_TYPE, OAuth2Constants.Params.USERNAME,
-            OAuth2Constants.Params.PASSWORD };
+        return new String[]{OAuth2Constants.Params.GRANT_TYPE, OAuth2Constants.Params.USERNAME,
+                OAuth2Constants.Params.PASSWORD};
     }
 
     /**
      * This method is intended to be overridden by subclasses.
-     * 
+     *
      * @param checkedScope
      * @return
      * @throws org.forgerock.openam.oauth2.exceptions.OAuthProblemException
-     * 
+     *
      */
     protected CoreToken createAccessToken(Set<String> checkedScope, CoreToken token) {
-        if (token == null){
+        if (token == null) {
             return getTokenStore().createAccessToken(client.getClient().getAccessTokenType(),
                     checkedScope, OAuth2Utils.getRealm(getRequest()),
                     resourceOwner.getIdentifier(), client.getClient().getClientId(), null, null, null);
@@ -127,11 +133,11 @@ public class PasswordServerResource extends AbstractFlow {
 
     /**
      * This method is intended to be overridden by subclasses.
-     * 
+     *
      * @param checkedScope
      * @return
      * @throws org.forgerock.openam.oauth2.exceptions.OAuthProblemException
-     * 
+     *
      */
     protected CoreToken createRefreshToken(Set<String> checkedScope) {
         return getTokenStore().createRefreshToken(checkedScope,

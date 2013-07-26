@@ -1,7 +1,7 @@
 /*
  * DO NOT REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright (c) 2013 ForgeRock Inc. All rights reserved.
+ * Copyright (c) 2013 ForgeRock AS. All rights reserved.
  *
  * The contents of this file are subject to the terms
  * of the Common Development and Distribution License
@@ -42,17 +42,17 @@ import java.util.Set;
 import java.util.concurrent.atomic.AtomicReference;
 
 /**
-  An instance of this class is consulted for OAuth2 provider configuration settings (e.g. token lifetimes) when tokens
- are issued, etc. This class will pull the configuration state from the SMS upon initialization, and update this state
- atomically, via an AtomicReference, when the ServiceListener is invoked with service changes. The AtomicReference will
- reference an instance of the immutable ProviderConfiguration class. The OAuth2ProviderSettingsChangeListener is the ServiceListener
- which will respond to OAuth2Provider settings changes, and create a new instance of the ProviderConfiguration class and update
- the AtomicReference if the update applies to the realm corresponding to this instance of the OAuth2ProviderSettingsImpl.
-
- For explanation for idiom in setProviderConfig method below, see chapter 15 in Goetz' Java Concurrency in Practice.
-
- @author Dirk Hogan
- @author Jason Lemay
+ * An instance of this class is consulted for OAuth2 provider configuration settings (e.g. token lifetimes) when tokens
+ * are issued, etc. This class will pull the configuration state from the SMS upon initialization, and update this state
+ * atomically, via an AtomicReference, when the ServiceListener is invoked with service changes. The AtomicReference will
+ * reference an instance of the immutable ProviderConfiguration class. The OAuth2ProviderSettingsChangeListener is the ServiceListener
+ * which will respond to OAuth2Provider settings changes, and create a new instance of the ProviderConfiguration class and update
+ * the AtomicReference if the update applies to the realm corresponding to this instance of the OAuth2ProviderSettingsImpl.
+ * <p/>
+ * For explanation for idiom in setProviderConfig method below, see chapter 15 in Goetz' Java Concurrency in Practice.
+ *
+ * @author Dirk Hogan
+ * @author Jason Lemay
  */
 public class OAuth2ProviderSettingsImpl implements OAuth2ProviderSettings {
     private class OAuth2ProviderSettingsChangeListener implements ServiceListener {
@@ -115,17 +115,17 @@ public class OAuth2ProviderSettingsImpl implements OAuth2ProviderSettings {
         final Set<String> supportedClaims;
 
         private ProviderConfiguration(long authorizationCodeLifetime,
-                                     long refreshTokenLifetime,
-                                     long accessTokenLifetime,
-                                     boolean refreshTokensEnabled,
-                                     String scopeImplementationClass,
-                                     Set<String> responseTypes,
-                                     Set<String> resourceOwnerAuthenticationAttributes,
-                                     String savedConsentAttribute,
-                                     String jwksUri,
-                                     Set<String> supportedSubjectTypes,
-                                     Set<String> supportedIdSigningAlgorithms,
-                                     Set<String> supportedClaims) {
+                                      long refreshTokenLifetime,
+                                      long accessTokenLifetime,
+                                      boolean refreshTokensEnabled,
+                                      String scopeImplementationClass,
+                                      Set<String> responseTypes,
+                                      Set<String> resourceOwnerAuthenticationAttributes,
+                                      String savedConsentAttribute,
+                                      String jwksUri,
+                                      Set<String> supportedSubjectTypes,
+                                      Set<String> supportedIdSigningAlgorithms,
+                                      Set<String> supportedClaims) {
 
             this.authorizationCodeLifetime = authorizationCodeLifetime;
             this.refreshTokenLifetime = refreshTokenLifetime;
@@ -159,6 +159,7 @@ public class OAuth2ProviderSettingsImpl implements OAuth2ProviderSettings {
             return builder.toString();
         }
     }
+
     /*
     AtomicReference to the class which encapsulates all OAuth2 provider configuration state so the reference can be
     updated atomically when configuration state changes trigger listener invocation.
@@ -173,7 +174,7 @@ public class OAuth2ProviderSettingsImpl implements OAuth2ProviderSettings {
     related to reading service config state when updating due to service changes - don't want
     to propagate exceptions to service notifier thread.
      */
-    private static final boolean PROPAGATE_EXCEPTIONS = true;
+    private static final boolean PROPAGATE_EXCEPTIONS = false;
 
     public OAuth2ProviderSettingsImpl(Request request) {
         providerConfiguration = new AtomicReference<ProviderConfiguration>();
@@ -201,6 +202,7 @@ public class OAuth2ProviderSettingsImpl implements OAuth2ProviderSettings {
             }
         }
     }
+
     private void initializeSettings(boolean propagateException, ServiceConfigManager serviceConfigManager) {
         try {
             ServiceConfig serviceConfig = serviceConfigManager.getOrganizationConfig(realm, null);
@@ -218,22 +220,22 @@ public class OAuth2ProviderSettingsImpl implements OAuth2ProviderSettings {
             Set<String> supportedClaims = getStringSetAttribute(serviceConfig, OAuth2Constants.OAuth2ProviderService.SUPPORTED_CLAIMS);
 
             ProviderConfiguration newProviderSettings = new ProviderConfiguration(
-                                                                authorizationCodeLifetime,
-                                                                refreshTokenLifetime,
-                                                                accessTokenLifetime,
-                                                                issueRefreshToken,
-                                                                scopeImplementationClass,
-                                                                responseTypes,
-                                                                authenticationAttributes,
-                                                                sharedConsent,
-                                                                jkwsUri,
-                                                                supportedSubjectTypes,
-                                                                idTokenSigningAlgorithms,
-                                                                supportedClaims);
+                    authorizationCodeLifetime,
+                    refreshTokenLifetime,
+                    accessTokenLifetime,
+                    issueRefreshToken,
+                    scopeImplementationClass,
+                    responseTypes,
+                    authenticationAttributes,
+                    sharedConsent,
+                    jkwsUri,
+                    supportedSubjectTypes,
+                    idTokenSigningAlgorithms,
+                    supportedClaims);
             setProviderConfig(newProviderSettings);
             if (OAuth2Utils.DEBUG.messageEnabled()) {
                 OAuth2Utils.DEBUG.message("Successfully updated OAuth2 provider settings for realm " + realm + " with settings " +
-                    newProviderSettings);
+                        newProviderSettings);
             }
         } catch (Exception e) {
             OAuth2Utils.DEBUG.error("Exception caught initializing OAuth2 settings: " + e, e);
@@ -261,7 +263,7 @@ public class OAuth2ProviderSettingsImpl implements OAuth2ProviderSettings {
         if (attribute != null && !attribute.isEmpty()) {
             return Long.parseLong(attribute.iterator().next());
         } else {
-            OAuth2Utils.DEBUG.error("OAuth2Utils::Unable to get provider setting: "+
+            OAuth2Utils.DEBUG.error("OAuth2Utils::Unable to get provider setting: " +
                     attributeName);
             throw OAuthProblemException.OAuthError.SERVER_ERROR.handle(null, "Not able to get provider setting");
         }
@@ -273,7 +275,7 @@ public class OAuth2ProviderSettingsImpl implements OAuth2ProviderSettings {
         if (attribute != null && !attribute.isEmpty()) {
             return Boolean.parseBoolean(attribute.iterator().next());
         } else {
-            OAuth2Utils.DEBUG.error("OAuth2Utils::Unable to get provider setting: "+
+            OAuth2Utils.DEBUG.error("OAuth2Utils::Unable to get provider setting: " +
                     attributeName);
             throw OAuthProblemException.OAuthError.SERVER_ERROR.handle(null, "Not able to get provider setting");
         }
@@ -285,7 +287,7 @@ public class OAuth2ProviderSettingsImpl implements OAuth2ProviderSettings {
         if (attribute != null && !attribute.isEmpty()) {
             return attribute.iterator().next();
         } else {
-            OAuth2Utils.DEBUG.error("OAuth2Utils::Unable to get provider setting: "+
+            OAuth2Utils.DEBUG.error("OAuth2Utils::Unable to get provider setting: " +
                     attributeName);
             throw OAuthProblemException.OAuthError.SERVER_ERROR.handle(null, "Not able to get provider setting");
         }
@@ -297,7 +299,7 @@ public class OAuth2ProviderSettingsImpl implements OAuth2ProviderSettings {
         if (attribute != null && !attribute.isEmpty()) {
             return attribute;
         } else {
-            OAuth2Utils.DEBUG.error("OAuth2Utils::Unable to get provider setting: "+
+            OAuth2Utils.DEBUG.error("OAuth2Utils::Unable to get provider setting: " +
                     attributeName);
             throw OAuthProblemException.OAuthError.SERVER_ERROR.handle(null, "Not able to get provider setting");
         }
@@ -306,29 +308,29 @@ public class OAuth2ProviderSettingsImpl implements OAuth2ProviderSettings {
     /**
      * {@inheritDoc}
      */
-    public String getOpenIDConnectVersion(){
+    public String getOpenIDConnectVersion() {
         return "3.0";
     }
 
     /**
      * {@inheritDoc}
      */
-    public String getOpenIDConnectIssuer(){
+    public String getOpenIDConnectIssuer() {
         return deploymentUrl;
     }
 
     /**
      * {@inheritDoc}
      */
-    public String getCheckSessionEndpoint(){
-        return deploymentUrl+"/oauth2/connect/checkSession";
+    public String getCheckSessionEndpoint() {
+        return deploymentUrl + "/oauth2/connect/checkSession";
     }
 
     /**
      * {@inheritDoc}
      */
-    public String getEndSessionEndPoint(){
-        return deploymentUrl+"/oauth2/connect/endSession";
+    public String getEndSessionEndPoint() {
+        return deploymentUrl + "/oauth2/connect/endSession";
     }
 
     @Override
@@ -394,27 +396,28 @@ public class OAuth2ProviderSettingsImpl implements OAuth2ProviderSettings {
     /**
      * {@inheritDoc}
      */
-    public String getClientRegistrationEndpoint(){
-        return deploymentUrl+"/oauth2/connect/register";
-    }
-    /**
-     * {@inheritDoc}
-     */
-    public String getAuthorizationEndpoint(){
-        return deploymentUrl+"/oauth2/authorize";
+    public String getClientRegistrationEndpoint() {
+        return deploymentUrl + "/oauth2/connect/register";
     }
 
     /**
      * {@inheritDoc}
      */
-    public String getTokenEndpoint(){
-        return deploymentUrl+"/oauth2/access_token";
+    public String getAuthorizationEndpoint() {
+        return deploymentUrl + "/oauth2/authorize";
     }
 
     /**
      * {@inheritDoc}
      */
-    public String getUserInfoEndpoint(){
-        return deploymentUrl+"/oauth2/userinfo";
+    public String getTokenEndpoint() {
+        return deploymentUrl + "/oauth2/access_token";
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public String getUserInfoEndpoint() {
+        return deploymentUrl + "/oauth2/userinfo";
     }
 }

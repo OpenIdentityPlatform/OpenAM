@@ -1,7 +1,7 @@
 /*
  * DO NOT REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright (c) 2012-2013 ForgeRock Inc. All rights reserved.
+ * Copyright (c) 2012-2013 ForgeRock AS. All rights reserved.
  *
  * The contents of this file are subject to the terms
  * of the Common Development and Distribution License
@@ -87,10 +87,9 @@ public class AuthorizationCodeServerResource extends AbstractFlow {
                 OAuth2Utils.getRequestParameter(getRequest(), OAuth2Constants.Params.CODE, String.class);
         CoreToken code = null;
 
-        try{
+        try {
             code = getTokenStore().readAuthorizationCode(code_p);
-        }
-        catch (Exception e ){
+        } catch (Exception e) {
             OAuth2Utils.DEBUG.error("AuthorizationCodeServerResource::Authorization code doesn't exist.");
             throw OAuthProblemException.OAuthError.INVALID_GRANT.handle(getRequest());
         }
@@ -119,7 +118,7 @@ public class AuthorizationCodeServerResource extends AbstractFlow {
             getTokenStore().updateAuthorizationCode(code_p, code);
             Map<String, Object> response = token.convertToMap();
 
-            if (token != null && token.getRefreshToken() != null && !token.getRefreshToken().isEmpty()){
+            if (token != null && token.getRefreshToken() != null && !token.getRefreshToken().isEmpty()) {
                 response.put(OAuth2Constants.Params.REFRESH_TOKEN, token.getRefreshToken());
             }
 
@@ -127,7 +126,17 @@ public class AuthorizationCodeServerResource extends AbstractFlow {
             Map<String, String> data = new HashMap<String, String>();
             String nonce = OAuth2Utils.getRequestParameter(getRequest(), OAuth2Constants.Custom.NONCE, String.class);
             data.put(OAuth2Constants.Custom.NONCE, nonce);
-            response.putAll(executeExtraDataScopePlugin(data ,token));
+            response.putAll(executeExtraDataScopePlugin(data, token));
+
+            String scope_before =
+                    OAuth2Utils.getRequestParameter(getRequest(), OAuth2Constants.Params.SCOPE, String.class);
+
+            Set<String> checkedScope = executeAccessTokenScopePlugin(scope_before);
+
+            if (checkedScope != null && !checkedScope.isEmpty()) {
+                response.put(OAuth2Constants.Params.SCOPE, OAuth2Utils.join(checkedScope,
+                        OAuth2Utils.getScopeDelimiter(getContext())));
+            }
 
             return new JacksonRepresentation<Map>(response);
         }
@@ -154,37 +163,37 @@ public class AuthorizationCodeServerResource extends AbstractFlow {
     protected String[] getRequiredParameters() {
         Set<String> required = null;
         switch (endpointType) {
-        case AUTHORIZATION_ENDPOINT: {
-            return new String[] { OAuth2Constants.Params.RESPONSE_TYPE, OAuth2Constants.Params.CLIENT_ID };
-        }
-        case TOKEN_ENDPOINT: {
-            return new String[] { OAuth2Constants.Params.GRANT_TYPE, OAuth2Constants.Params.CODE,
-                OAuth2Constants.Params.REDIRECT_URI };
-        }
-        default: {
-            return null;
-        }
+            case AUTHORIZATION_ENDPOINT: {
+                return new String[]{OAuth2Constants.Params.RESPONSE_TYPE, OAuth2Constants.Params.CLIENT_ID};
+            }
+            case TOKEN_ENDPOINT: {
+                return new String[]{OAuth2Constants.Params.GRANT_TYPE, OAuth2Constants.Params.CODE,
+                        OAuth2Constants.Params.REDIRECT_URI};
+            }
+            default: {
+                return null;
+            }
         }
     }
 
-    protected CoreToken createRefreshToken(CoreToken code){
+    protected CoreToken createRefreshToken(CoreToken code) {
         resourceOwner = getAuthenticatedResourceOwner();
         return getTokenStore().createRefreshToken(code.getScope(),
-                                                    OAuth2Utils.getRealm(getRequest()),
-                                                    code.getUserID(),
-                                                    sessionClient.getClientId(),
-                                                    sessionClient.getRedirectUri());
+                OAuth2Utils.getRealm(getRequest()),
+                code.getUserID(),
+                sessionClient.getClientId(),
+                sessionClient.getRedirectUri());
     }
 
     /**
      * This method is intended to be overridden by subclasses.
-     * 
+     *
      * @param code
      * @return
      * @throws OAuthProblemException
      */
     protected CoreToken createAccessToken(CoreToken code) {
-        if (checkIfRefreshTokenIsRequired(getRequest())){
+        if (checkIfRefreshTokenIsRequired(getRequest())) {
             //create refresh token
             CoreToken token = createRefreshToken(code);
 
@@ -199,25 +208,25 @@ public class AuthorizationCodeServerResource extends AbstractFlow {
         }
     }
 
-    private void invalidateTokens(String id){
+    private void invalidateTokens(String id) {
 
         JsonValue token = getTokenStore().queryForToken(id);
 
-        Set<HashMap<String,Set<String>>> list = (Set<HashMap<String,Set<String>>>) token.getObject();
+        Set<HashMap<String, Set<String>>> list = (Set<HashMap<String, Set<String>>>) token.getObject();
 
-        if (list != null && !list.isEmpty() ){
-            for (HashMap<String,Set<String>> entry : list){
+        if (list != null && !list.isEmpty()) {
+            for (HashMap<String, Set<String>> entry : list) {
                 Set<String> idSet = entry.get(OAuth2Constants.CoreTokenParams.ID);
                 Set<String> tokenNameSet = entry.get(OAuth2Constants.CoreTokenParams.TOKEN_NAME);
                 Set<String> refreshTokenSet = entry.get(OAuth2Constants.CoreTokenParams.REFRESH_TOKEN);
                 String refreshTokenID = null;
-                if (idSet != null && !idSet.isEmpty() && tokenNameSet != null && !tokenNameSet.isEmpty()){
+                if (idSet != null && !idSet.isEmpty() && tokenNameSet != null && !tokenNameSet.isEmpty()) {
                     String entryID = idSet.iterator().next();
                     String type = tokenNameSet.iterator().next();
 
                     //if access_token delete the refresh token if it exists
                     if (tokenNameSet.iterator().next().equalsIgnoreCase(OAuth2Constants.Token.OAUTH_ACCESS_TOKEN) &&
-                        refreshTokenSet != null && !refreshTokenSet.isEmpty()){
+                            refreshTokenSet != null && !refreshTokenSet.isEmpty()) {
                         refreshTokenID = refreshTokenSet.iterator().next();
                         deleteToken(OAuth2Constants.Token.OAUTH_REFRESH_TOKEN, refreshTokenID);
                     }
@@ -225,16 +234,16 @@ public class AuthorizationCodeServerResource extends AbstractFlow {
                     invalidateTokens(entryID);
                     deleteToken(type, entryID);
                 }
-             }
+            }
         }
     }
 
-    private void deleteToken(String type, String id){
-        if (type.equalsIgnoreCase(OAuth2Constants.Token.OAUTH_ACCESS_TOKEN)){
+    private void deleteToken(String type, String id) {
+        if (type.equalsIgnoreCase(OAuth2Constants.Token.OAUTH_ACCESS_TOKEN)) {
             getTokenStore().deleteAccessToken(id);
-        } else if (type.equalsIgnoreCase(OAuth2Constants.Token.OAUTH_REFRESH_TOKEN)){
+        } else if (type.equalsIgnoreCase(OAuth2Constants.Token.OAUTH_REFRESH_TOKEN)) {
             getTokenStore().deleteRefreshToken(id);
-        } else if (type.equalsIgnoreCase(OAuth2Constants.Params.CODE)){
+        } else if (type.equalsIgnoreCase(OAuth2Constants.Params.CODE)) {
             getTokenStore().deleteAuthorizationCode(id);
         } else {
             //shouldnt ever happen

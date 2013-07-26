@@ -1,7 +1,7 @@
 /*
  * DO NOT REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright (c) 2012-2013 ForgeRock Inc. All rights reserved.
+ * Copyright (c) 2012-2013 ForgeRock AS. All rights reserved.
  *
  * The contents of this file are subject to the terms
  * of the Common Development and Distribution License
@@ -38,6 +38,7 @@ import org.restlet.resource.Post;
 
 /**
  * Implements the Refresh Token Flow
+ *
  * @see <a href="http://tools.ietf.org/html/rfc6749#section-6">6. Refreshing an Access Token</a>
  */
 public class RefreshTokenServerResource extends AbstractFlow {
@@ -60,14 +61,14 @@ public class RefreshTokenServerResource extends AbstractFlow {
         CoreToken refreshToken = getTokenStore().readRefreshToken(refresh_token);
 
         SessionClient refreshTokenClient = new SessionClientImpl(refreshToken.getClientID(),
-                                                                 refreshToken.getRedirectURI());
+                refreshToken.getRedirectURI());
 
         if (null == refreshToken) {
-            OAuth2Utils.DEBUG.error("Refresh token does not exist for id: " + refresh_token );
+            OAuth2Utils.DEBUG.error("Refresh token does not exist for id: " + refresh_token);
             throw OAuthProblemException.OAuthError.INVALID_REQUEST.handle(getRequest(),
                     "RefreshToken does not exist");
         } else if (!refreshTokenClient.getClientId().equals(client.getClient().getClientId())) {
-            OAuth2Utils.DEBUG.error("Refresh Token was issued to a different client id: " + refreshTokenClient.getClientId() );
+            OAuth2Utils.DEBUG.error("Refresh Token was issued to a different client id: " + refreshTokenClient.getClientId());
             throw OAuthProblemException.OAuthError.INVALID_REQUEST.handle(getRequest(),
                     "Token was issued to a different client");
         } else {
@@ -83,7 +84,7 @@ public class RefreshTokenServerResource extends AbstractFlow {
 
             Set<String> granted_after = null;
             // Get the granted scope
-            if (null != refreshToken.getScope()){
+            if (null != refreshToken.getScope()) {
                 granted_after = new TreeSet<String>(refreshToken.getScope());
             } else {
                 granted_after = new TreeSet<String>();
@@ -98,7 +99,12 @@ public class RefreshTokenServerResource extends AbstractFlow {
 
             //execute post token creation pre return scope plugin for extra return data.
             Map<String, String> data = new HashMap<String, String>();
-            response.putAll(executeExtraDataScopePlugin(data ,token));
+            response.putAll(executeExtraDataScopePlugin(data, token));
+
+            if (checkedScope != null && !checkedScope.isEmpty()) {
+                response.put(OAuth2Constants.Params.SCOPE, OAuth2Utils.join(checkedScope,
+                        OAuth2Utils.getScopeDelimiter(getContext())));
+            }
 
             return new JacksonRepresentation<Map>(response);
         }
@@ -106,20 +112,20 @@ public class RefreshTokenServerResource extends AbstractFlow {
 
     @Override
     protected String[] getRequiredParameters() {
-        return new String[] { OAuth2Constants.Params.GRANT_TYPE, OAuth2Constants.Params.REFRESH_TOKEN };
+        return new String[]{OAuth2Constants.Params.GRANT_TYPE, OAuth2Constants.Params.REFRESH_TOKEN};
     }
 
     /**
      * This method is intended to be overridden by subclasses.
-     * 
+     *
      * @param checkedScope
      * @return
      * @throws org.forgerock.openam.oauth2.exceptions.OAuthProblemException
-     * 
+     *
      */
     protected CoreToken createAccessToken(CoreToken refreshToken, Set<String> checkedScope) {
         return getTokenStore().createAccessToken(client.getClient().getAccessTokenType(),
-                checkedScope,OAuth2Utils.getRealm(getRequest()), refreshToken.getUserID(),
+                checkedScope, OAuth2Utils.getRealm(getRequest()), refreshToken.getUserID(),
                 refreshToken.getClientID(), refreshToken.getRedirectURI(), null, refreshToken.getTokenID());
     }
 
