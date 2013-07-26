@@ -207,28 +207,42 @@
      </tgroup>
     </table>
 
-         
-   <para>Based on the expected behavior, OpenAM first normalizes the policy
-   resource name URL pattern you provide and the actual requested
-   resource URL. In addition to sorting the query string field-value pairs,
-   OpenAM ensures that both the URL pattern and the resource URL include the
-   port number. If no port number is specified, OpenAM uses 80 for HTTP or
-   443 for HTTPS. In other words, <literal>http://www.example.com/*</literal>
-   gets normalized to <literal>http://www.example.com:80/*</literal>. Also,
-   <literal>http://*/*</literal> gets normalized to
-   <literal>http://*:80/*</literal>. Notice that <literal>http://*/*</literal>
-   does matches when the port number is 80, but not when the port number is
-   something else, such as
-   <literal>http://www.example.com:1080/index.html</literal>. <footnote><para>This
-   explanation focuses on how this works for web resources such as
-   <literal>http://www.example.com:80/index.html</literal>,
-   where the delimiter is <literal>/</literal>, the wildcard is
-   <literal>*</literal>, and the one-level wildcard is
-   <literal>-*-</literal>. By default, comparisons are not case sensitive.
-   The delimiter, wildcards and case sensitivity are configurable. To see
-   examples of other configurations, browse in the OpenAM console to
-   Configuration &gt; Global &gt; Policy Configuration &gt; Resource
-   Comparator.</para></footnote></para>
+   <para>In order to match resource URLs with policies, OpenAM normalizes
+   both the policy URL pattern you provide and the actual requested resource
+   URL. OpenAM does the following during URL normalization.</para>
+
+   <itemizedlist>
+    <listitem>
+     <para>OpenAM includes default port numbers if they are missing.</para>
+
+     <para>The URL <literal>http://www.example.com/index.html</literal> becomes
+     <literal>http://www.example.com:80/index.html</literal>.</para>
+
+     <para>The URL <literal>https://www.example.com/index.html</literal> becomes
+     <literal>https://www.example.com:443/index.html</literal>.</para>
+    </listitem>
+
+    <listitem>
+     <para>OpenAM sorts the query string field-value pairs by field name.</para>
+
+     <para>The query string
+     <literal>?subject=SPBnfm+t5PlP+ISyQhVlplE22A8=&amp;action=get</literal>
+     becomes
+     <literal>?action=get&amp;subject=SPBnfm+t5PlP+ISyQhVlplE22A8=</literal>.</para>
+    </listitem>
+
+    <listitem>
+     <para>OpenAM removes extra slashes, including trailing slashes.</para>
+
+     <para>The URL <literal>http://www.example.com//blog/</literal> becomes
+     <literal>http://www.example.com:80/blog</literal>.</para>
+    </listitem>
+   </itemizedlist>
+
+   <para>By default, comparisons are not case sensitive. The delimiter,
+   wildcards and case sensitivity are configurable. To see examples of other
+   configurations, browse in the OpenAM console to Configuration &gt; Global
+   &gt; Policy Configuration &gt; Resource Comparator.</para>
   </section>
  </section>
  
