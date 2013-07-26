@@ -58,7 +58,7 @@
           </AttributeValuePair>
           <AttributeValuePair>
              <Attribute name="sun-idrepo-ldapv3-config-psearch-filter"/>
-             <Value>(&amp;(objectclass=*)(!(ou:dn:=services)))</Value>
+             <Value>(&amp;(objectclass=*)(!(ou:dn:=services))(!(ou:dn:=tokens)))</Value>
           </AttributeValuePair>
         </SubConfiguration>
       </OrganizationConfiguration>
