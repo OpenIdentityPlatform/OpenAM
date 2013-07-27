@@ -29,5 +29,10 @@ define("org/forgerock/openam/ui/common/util/Constants", [
 ], function (commonConstants) {
     commonConstants.context = "openam";
     
+    commonConstants.LESS_VERSION = 'libs/less-1.3.3-min.js';
+    
+    commonConstants.THEME_CONFIG_PATH = 'themeConfig.json';
+    
+    
     return commonConstants;
 });

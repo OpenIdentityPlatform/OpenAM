@@ -122,6 +122,7 @@ require([
     "org/forgerock/openam/ui/user/main",
     "org/forgerock/openam/ui/dashboard/main",
     "org/forgerock/openam/ui/user/delegates/UserDelegate",
+    "org/forgerock/openam/ui/common/util/ThemeManager",
     "org/forgerock/commons/ui/user/main",
     "org/forgerock/commons/ui/common/main"
 ], function(a, b, c, d, e, f, g, h, i, j, k, l, m, n, i18n, constants, eventManager) {

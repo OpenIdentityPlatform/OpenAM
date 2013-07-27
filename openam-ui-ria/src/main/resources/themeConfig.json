@@ -1,0 +1,64 @@
+{
+        "themes": [
+            {
+                "name": "default",
+                "path": "",
+                "realms": [".*"],
+                "regex": true,
+                "icon": "favicon.ico",
+                "settings": {
+                    "logo": {
+                        "src": "images/logo.png",
+                        "title": "ForgeRock",
+                        "alt": "ForgeRock",
+                        "height": "60",
+                        "width": "226"
+                    },
+                    "lessVars": {
+                        "background-color": "#f2f2f2",
+                        "background-image": "url('')",
+                        "background-repeat": "no-repeat",
+                        "background-position": "left top",
+                        "footer-background-color": "#f2f2f2",
+                        "background-font-color": "#5a646d",
+                        "column-padding": "160px",
+                        
+                        "login-container-width": "480px",
+                        "login-container-label-align": "right",
+            
+                        "message-background-color": "#F9F9F9",
+                        "content-background": "#ffffff",
+                        "font-color": "#5a646d",
+                        "font-size": "14px",
+                        "font-family": "Arial, Helvetica, sans-serif",
+                        "site-width": "960px",
+                        "line-height": "18px",
+            
+                        "color-active": "#f36e09",
+                        "color-inactive": "#626d75",
+            
+                        "active-menu-color": "#fc8a28",
+                        "inactive-menu-color": "#5d6871",
+                        "button-hover-lightness": "4%",   
+            
+                        "href-color": "#0e99b8",
+                        "color-error": "red",
+                        "color-warning": "yellow",
+                        "color-success": "green",
+                        "color-info": "blue",
+                        "color-inactive": "gray",
+            
+                        "input-border-basic": "#DBDBDB",
+                        "header-border-color": "#5D5D5D",
+            
+            
+                        "footer-height": "126px"
+                    },
+                    "footer": {
+                        "mailto": "info@forgerock.com",
+                        "phone": "+47 21520108"
+                    }
+                }
+            }
+        ]
+}

@@ -81,7 +81,7 @@
                 "requestedPageCouldNotBeFound" : "The requested page could not be found."
             },
             "DefaultBaseTemplate" : {
-                "orPhone" : ", or phone %s."
+                "orPhone" : ", or phone"
             },
             "ChangeSecurityDataDialogTemplate" : {
                 "securityDataChange" : "Security data change",
