@@ -1674,13 +1674,22 @@ public class IDPSSOUtil {
      * @throws SAML2Exception if the operation is not successful
      */
     public static String getACSurl(String spEntityID,
-                                   String realm,
-                                   AuthnRequest authnReq,
-                                   HttpServletRequest request,
-                                   StringBuffer rBinding)
+            String realm,
+            AuthnRequest authnReq,
+            HttpServletRequest request,
+            StringBuffer rBinding)
             throws SAML2Exception {
-        return getACSurl(spEntityID, realm, authnReq.getAssertionConsumerServiceURL(), authnReq.getProtocolBinding(),
-                authnReq.getAssertionConsumerServiceIndex(), request, rBinding);
+        String acsURL = null;
+        String acsBinding;
+        Integer acsIndex = null;
+        if (authnReq != null) {
+            acsURL = authnReq.getAssertionConsumerServiceURL();
+            acsBinding = authnReq.getProtocolBinding();
+            acsIndex = authnReq.getAssertionConsumerServiceIndex();
+        } else {
+            acsBinding = request.getParameter(SAML2Constants.BINDING);
+        }
+        return getACSurl(spEntityID, realm, acsURL, acsBinding, acsIndex, request, rBinding);
     }
 
     /**
