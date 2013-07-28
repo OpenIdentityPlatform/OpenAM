@@ -27,7 +27,7 @@
  */
 
 /*
- * Portions Copyrighted 2012 ForgeRock Inc
+ * Portions Copyrighted 2012-2013 ForgeRock AS
  */
 package com.sun.identity.sm;
 
@@ -128,14 +128,17 @@ public class ServiceSchemaManagerImpl implements SMSObjectListener {
      * @return validity of this object
      */
     public boolean isValid() throws SMSException {
-        if (smsEntry.isValid() && smsEntry.isDirty()) {
-            smsEntry.refresh();
-        }
-        // Check if entry exists i.e service name with version exists
-        if (smsEntry.isNewEntry()) {
-            String[] msgs = { serviceName };
-            throw (new ServiceNotFoundException(IUMSConstants.UMS_BUNDLE_NAME,
+        // if cache is not valid, don't bother checking the rest
+    	if (smsEntry.isValid()) {
+    	    if (smsEntry.isDirty()) {
+                smsEntry.refresh();
+            }
+            // Check if entry exists i.e service name with version exists
+            if (smsEntry.isNewEntry()) {
+                String[] msgs = { serviceName };
+                throw (new ServiceNotFoundException(IUMSConstants.UMS_BUNDLE_NAME,
                     IUMSConstants.SMS_service_does_not_exist, msgs));
+            }
         }
         return (smsEntry.isValid());
     }
