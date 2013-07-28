@@ -1679,60 +1679,58 @@ public class IDPSSOUtil {
                                    HttpServletRequest request,
                                    StringBuffer rBinding)
             throws SAML2Exception {
+        return getACSurl(spEntityID, realm, authnReq.getAssertionConsumerServiceURL(), authnReq.getProtocolBinding(),
+                authnReq.getAssertionConsumerServiceIndex(), request, rBinding);
+    }
 
-        String acsURL = null;
-        String acsBinding = null;
-
-        if (authnReq != null) {
-            acsURL = authnReq.getAssertionConsumerServiceURL();
-            acsBinding = authnReq.getProtocolBinding();
-        } else {
-            acsBinding = request.getParameter(SAML2Constants.BINDING);
-        }
-
-        if ((acsBinding != null) && (acsBinding.trim().length() != 0) &&
-                (!acsBinding.startsWith(SAML2Constants.BINDING_PREFIX))) {
+    /**
+     * Returns the assertion consumer service <code>URL</code>.
+     *
+     * @param spEntityID The entity id of the service provider.
+     * @param realm The realm name of the identity provider.
+     * @param acsURL AssertionConsumerServiceURL in AuthnRequest.
+     * @param binding ProtocolBinding in AuthnRequest.
+     * @param index AssertionConsumerServiceIndex in AuthnRequest.
+     * @param request The <code>HttpServletRequest</code> object.
+     * @param rBinding The binding used to send back <code>Response</code>.
+     * @return The assertion consumer service <code>URL</code>.
+     * @throws SAML2Exception if the operation is not successful.
+     */
+    public static String getACSurl(String spEntityID, String realm, String acsURL, String binding, Integer index,
+            HttpServletRequest request, StringBuffer rBinding) throws SAML2Exception {
+        if (binding != null && !binding.trim().isEmpty()
+                && !binding.startsWith(SAML2Constants.BINDING_PREFIX)) {
             // convert short format binding to long format
-            acsBinding = SAML2Constants.BINDING_PREFIX + acsBinding;
+            binding = SAML2Constants.BINDING_PREFIX + binding;
         }
         if (acsURL == null || acsURL.length() == 0) {
             StringBuffer returnedBinding = new StringBuffer();
-            if ((acsBinding != null) && (acsBinding.trim().length() != 0)) {
-                acsURL = IDPSSOUtil.getACSurlFromMetaByBinding(
-                        spEntityID, realm, acsBinding, returnedBinding);
+            if ((binding != null) && (binding.trim().length() != 0)) {
+                acsURL = IDPSSOUtil.getACSurlFromMetaByBinding(spEntityID, realm, binding, returnedBinding);
             } else {
-                int acsIndex = 0;
-                if (authnReq != null) {
-                    Integer acsIndexInteger =
-                            authnReq.getAssertionConsumerServiceIndex();
-                    if (acsIndexInteger == null) {
-                        acsURL = getDefaultACSurl(spEntityID, realm,
-                                returnedBinding);
-                    } else {
-                        acsIndex = acsIndexInteger.intValue();
-                        if (acsIndex < 0 || acsIndex > 65535) {
-                            acsIndex = 0;
-                        }
-                        acsURL = IDPSSOUtil.getACSurlFromMetaByIndex(
-                                spEntityID, realm, acsIndex, returnedBinding);
-                    }
+                int acsIndex;
+                if (index == null) {
+                    acsURL = getDefaultACSurl(spEntityID, realm, returnedBinding);
                 } else {
-                    acsURL = getDefaultACSurl(spEntityID,
-                            realm, returnedBinding);
+                    acsIndex = index.intValue();
+                    if (acsIndex < 0 || acsIndex > 65535) {
+                        acsIndex = 0;
+                    }
+                    acsURL = IDPSSOUtil.getACSurlFromMetaByIndex(spEntityID, realm, acsIndex, returnedBinding);
                 }
             }
-            acsBinding = returnedBinding.toString();
+            binding = returnedBinding.toString();
         } else {
             if (isACSurlValidInMetadataSP(acsURL, spEntityID, realm)) {
-                if (acsBinding == null || acsBinding.length() == 0) {
-                    acsBinding = getBindingForAcsUrl(spEntityID, realm, acsURL);
+                if (binding == null || binding.isEmpty()) {
+                    binding = getBindingForAcsUrl(spEntityID, realm, acsURL);
                 }
             } else {
                 String[] args = {acsURL, spEntityID};
                 throw new SAML2Exception("libSAML2", "invalidAssertionConsumerServiceURL", args);
             }
         }
-        rBinding.append(acsBinding);
+        rBinding.append(binding);
         return acsURL;
     }
 

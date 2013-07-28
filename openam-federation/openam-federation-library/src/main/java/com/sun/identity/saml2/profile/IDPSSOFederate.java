@@ -65,12 +65,12 @@ import com.sun.identity.shared.configuration.SystemPropertiesManager;
 import com.sun.identity.shared.encode.Base64;
 import com.sun.identity.shared.encode.URLEncDec;
 import com.sun.identity.shared.xml.XMLUtils;
-import org.forgerock.openam.utils.ClientUtils;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.nio.charset.Charset;
 import java.security.cert.X509Certificate;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -98,6 +98,10 @@ import org.w3c.dom.Element;
 
 public class IDPSSOFederate {
 
+    private static final String INDEX = "index";
+    private static final String ACS_URL = "acsURL";
+    private static final String SP_ENTITY_ID = "spEntityID";
+    private static final String BINDING = "binding";
     private static final String REQ_ID = "ReqID";
 
     private static FedMonAgent agent;
@@ -625,7 +629,7 @@ public class IDPSSOFederate {
                     // redirect to the authentication service
                     try {
                         if (!Boolean.TRUE.equals(authnReq.isPassive())) {
-                            redirectAuthentication(request, response, reqID,
+                            redirectAuthentication(request, response, authnReq,
                                     idpAuthnContextInfo, realm, idpEntityID, spEntityID,
                                     false);
                         } else {
@@ -782,7 +786,7 @@ public class IDPSSOFederate {
 
                         try {
                             if (!Boolean.TRUE.equals(authnReq.isPassive())) {
-                                redirectAuthentication(request, response, reqID,
+                                redirectAuthentication(request, response, authnReq,
                                         idpAuthnContextInfo, realm, idpEntityID,
                                         spEntityID, true);
                                 return;
@@ -982,10 +986,46 @@ public class IDPSSOFederate {
                 
                 relayState = (String)IDPCache.relayStateCache.remove(reqID);
                 if (authnReq == null) {
-                    SAML2Utils.debug.error(classMethod +
-                        "Unable to get AuthnRequest from cache.");
-                    sendError(request, response, SAML2Constants.SERVER_FAULT,
-                        "UnableToGetAuthnReq", null, isFromECP, idpAdapter);
+                    //handle the case when the authn request is no longer available in the local cache. This could
+                    //happen for multiple reasons:
+                    //* the SAML response has been already sent back for this request (i.e. browser back button)
+                    //* the second visit reached a different OpenAM server, than the first and SAML SFO is disabled
+                    //* the cache interval has passed
+                    SAML2Utils.debug.error(classMethod + "Unable to get AuthnRequest from cache, sending error"
+                            + " response");
+                    try {
+                        SAML2Utils.debug.message("Invoking IDP adapter preSendFailureResponse hook");
+                        try {
+                            if (idpAdapter != null) {
+                                idpAdapter.preSendFailureResponse(request, response, SAML2Constants.SERVER_FAULT,
+                                        "UnableToGetAuthnReq");
+                            }
+                        } catch (SAML2Exception se2) {
+                            SAML2Utils.debug.error("Error invoking the IDP Adapter", se2);
+                        }
+                        Response res = SAML2Utils.getErrorResponse(null, SAML2Constants.RESPONDER, null, null,
+                                idpEntityID);
+                        res.setInResponseTo(reqID);
+                        StringBuffer returnedBinding = new StringBuffer();
+                        String spEntityID = request.getParameter(SP_ENTITY_ID);
+                        String acsURL = request.getParameter(ACS_URL);
+                        String binding = request.getParameter(BINDING);
+                        Integer index;
+                        try {
+                            index = Integer.valueOf(request.getParameter(INDEX));
+                        } catch (NumberFormatException nfe) {
+                            index = null;
+                        }
+                        acsURL = IDPSSOUtil.getACSurl(spEntityID, realm, acsURL, binding, index, request,
+                                returnedBinding);
+                        String acsBinding = returnedBinding.toString();
+                        IDPSSOUtil.sendResponse(request, response, acsBinding, spEntityID, idpEntityID, idpMetaAlias,
+                                realm, relayState, acsURL, res, session);
+                    } catch (SAML2Exception sme) {
+                        SAML2Utils.debug.error(classMethod + "an error occured while sending error response", sme);
+                        sendError(request, response, SAML2Constants.SERVER_FAULT, "UnableToGetAuthnReq", null,
+                                isFromECP, idpAdapter);
+                    }
                     return;
                 }
                 if (SAML2Utils.debug.messageEnabled()) {
@@ -1221,7 +1261,7 @@ public class IDPSSOFederate {
      * a redirection
      */
     private static void redirectAuthentication(HttpServletRequest request,
-        HttpServletResponse response, String reqID, IDPAuthnContextInfo info,
+        HttpServletResponse response, AuthnRequest authnReq, IDPAuthnContextInfo info,
         String realm, String idpEntityID, String spEntityID,
         boolean isSessionUpgrade) throws SAML2Exception, IOException {
 
@@ -1263,7 +1303,7 @@ public class IDPSSOFederate {
             && (!authnTypeAndValues.isEmpty())) { 
             Iterator iter = authnTypeAndValues.iterator();
             boolean isFirst = true;
-            StringBuffer authSB = new StringBuffer();
+            StringBuilder authSB = new StringBuilder();
             while (iter.hasNext()) {
                 String authnValue = (String) iter.next();
                 int index = authnValue.indexOf("=");
@@ -1317,8 +1357,15 @@ public class IDPSSOFederate {
                 gotoURL = request.getRequestURL();
             }
         }
-        newURL.append(URLEncDec.encode(gotoURL.
-                append("?ReqID=").append(reqID).toString()));
+        gotoURL.append("?ReqID=").append(authnReq.getID()).append('&');
+        //adding these extra parameters will ensure that we can send back SAML error response to the SP even when the
+        //originally received AuthnRequest gets lost.
+        gotoURL.append(INDEX).append('=').append(authnReq.getAssertionConsumerServiceIndex()).append('&');
+        gotoURL.append(ACS_URL).append('=')
+                .append(URLEncDec.encode(authnReq.getAssertionConsumerServiceURL())).append('&');
+        gotoURL.append(SP_ENTITY_ID).append('=').append(URLEncDec.encode(authnReq.getIssuer().getValue())).append('&');
+        gotoURL.append(BINDING).append('=').append(URLEncDec.encode(authnReq.getProtocolBinding()));
+        newURL.append(URLEncDec.encode(gotoURL.toString()));
 
         if (SAML2Utils.debug.messageEnabled()) {
             SAML2Utils.debug.message(classMethod +
@@ -1341,7 +1388,6 @@ public class IDPSSOFederate {
         } else {
             response.sendRedirect(newURL.toString());
         }
-        return;
     }
 
     /**

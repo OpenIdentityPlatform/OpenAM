@@ -1736,7 +1736,19 @@ public class AuthClientUtils {
         if(encoded == null){
         	encoded = "false"; 
         }
-        
+        if (request.getAttribute("javax.servlet.forward.servlet_path") != null) {
+            //this is a forwarded request, we should only save the forwarded URL.
+            queryString = request.getQueryString();
+            if (queryString != null) {
+                loginURL.append('?').append(queryString);
+            }
+
+            if (utilDebug.messageEnabled()) {
+                utilDebug.message("constructLoginURL: Returning login url for forwarded request: "
+                        + loginURL.toString());
+            }
+            return loginURL.toString();
+        }
         Enumeration parameters = request.getParameterNames();
         for ( ; parameters.hasMoreElements() ;) {
             String parameter = (String)parameters.nextElement();
