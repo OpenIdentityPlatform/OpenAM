@@ -245,7 +245,7 @@ public class DJLDAPv3Repo extends IdRepo {
         roleObjectClasses = getNonNullSettingValues(LDAP_ROLE_OBJECT_CLASS);
         filteredRoleObjectClasses = getNonNullSettingValues(LDAP_FILTERED_ROLE_OBJECT_CLASS);
         defaultGroupMember = CollectionHelper.getMapAttr(configParams, LDAP_DEFAULT_GROUP_MEMBER);
-        uniqueMemberAttr = CollectionHelper.getMapAttr(configParams, LDAP_UNIQUE_MEMBER);
+        uniqueMemberAttr = CollectionHelper.getMapAttr(configParams, LDAP_UNIQUE_MEMBER, UNIQUE_MEMBER_ATTR);
         memberURLAttr = CollectionHelper.getMapAttr(configParams, LDAP_MEMBER_URL);
         memberOfAttr = CollectionHelper.getMapAttr(configParams, LDAP_MEMBER_OF);
         peopleContainerName = CollectionHelper.getMapAttr(configParams, LDAP_PEOPLE_CONTAINER_NAME);

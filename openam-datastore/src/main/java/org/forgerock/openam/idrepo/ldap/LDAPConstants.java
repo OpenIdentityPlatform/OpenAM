@@ -35,6 +35,7 @@ public class LDAPConstants {
     public static final String ROLE_DN_ATTR = "nsRoleDN";
     public static final String ROLE_FILTER_ATTR = "nsRoleFilter";
     public static final String DEFAULT_USER_STATUS_ATTR = "inetUserStatus";
+    public static final String UNIQUE_MEMBER_ATTR = "uniqueMember";
     //status constants
     public static final String STATUS_ACTIVE = "Active";
     public static final String STATUS_INACTIVE = "Inactive";
