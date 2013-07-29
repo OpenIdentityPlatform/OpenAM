@@ -1858,7 +1858,7 @@ public class LoginState {
         requestType = true;
         servletRequest = request;
         servletResponse = response;
-        this.requestHash = requestHash;
+        setParamHash(requestHash);
         client = getClient();
         this.sid = sid;
         if (messageEnabled) {
