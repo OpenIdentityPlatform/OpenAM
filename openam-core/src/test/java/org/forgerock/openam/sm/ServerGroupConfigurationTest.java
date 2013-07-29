@@ -19,7 +19,6 @@ import com.iplanet.services.ldap.Server;
 import com.iplanet.services.ldap.ServerGroup;
 import com.iplanet.services.ldap.ServerInstance;
 import org.forgerock.openam.ldap.LDAPURL;
-import org.forgerock.openam.sm.ServerGroupConfiguration;
 import org.testng.annotations.Test;
 
 import java.util.Arrays;
@@ -80,5 +79,19 @@ public class ServerGroupConfigurationTest {
 
         // Then
         verify(mockInstance).getPasswd();
+    }
+
+    @Test
+    public void shouldReturnMaxConnectionsFromInstance() {
+        // Given
+        ServerInstance mockInstance = mock(ServerInstance.class);
+        ServerGroup mockGroup = mock(ServerGroup.class);
+        ServerGroupConfiguration config = new ServerGroupConfiguration(mockGroup, mockInstance);
+
+        // When
+        config.getMaxConnections();
+
+        // Then
+        verify(mockInstance).getMaxConnections();
     }
 }

@@ -58,6 +58,13 @@ public class ServerGroupConfiguration {
     }
 
     /**
+     * @return The maximum number of connections that should be used in the connection to LDAP.
+     */
+    public int getMaxConnections() {
+        return instance.getMaxConnections();
+    }
+
+    /**
      * @return A non null, but possibly empty mapping of the server hostname to its port
      * for all servers in the selected Server Group.
      */

@@ -50,9 +50,6 @@ public class DataLayerConnectionFactory implements ShutdownListener {
     private final Debug debug;
     private final ServerConfigurationFactory parser;
 
-    // The connection factory maintains connections in a pool of size:
-    private static final int CONNECTION_POOL_SIZE = 50;
-
     // State for intialising and shutting down the factory.
     private final ConnectionFactory factory;
 
@@ -122,6 +119,7 @@ public class DataLayerConnectionFactory implements ShutdownListener {
         List<LDAPURL> hosts = config.getHostnamesAndPorts();
         String password = config.getBindPassword();
         String bindDN = config.getBindDN();
+        int maxConnections = config.getMaxConnections();
 
         for (LDAPURL url : hosts) {
             String hostname = url.getUrl();
@@ -130,7 +128,7 @@ public class DataLayerConnectionFactory implements ShutdownListener {
             ConnectionFactory factory = new LDAPConnectionFactory(hostname, port);
             BindRequest bindRequest = Requests.newSimpleBindRequest(bindDN, password.toCharArray());
             factory = Connections.newAuthenticatedConnectionFactory(factory, bindRequest);
-            factory = Connections.newFixedConnectionPool(factory, CONNECTION_POOL_SIZE);
+            factory = Connections.newFixedConnectionPool(factory, maxConnections);
             factories.add(factory);
         }
 

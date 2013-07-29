@@ -431,9 +431,11 @@ public class CTSPersistentStore extends GeneralTaskRunnable {
      *
      * @param query Non null filters which will be combined logically using AND.
      *
+     * @return total number of tokens deleted by query.
+     *
      * @throws DeleteFailedException If the delete failed for any reason.
      */
-    public void delete(Map<CoreTokenField, Object> query) throws DeleteFailedException {
+    public int delete(Map<CoreTokenField, Object> query) throws DeleteFailedException {
         QueryFilter.QueryFilterBuilder queryFilter = getAdapter().buildFilter().and();
         for (Map.Entry<CoreTokenField, Object> entry : query.entrySet()) {
             CoreTokenField key = entry.getKey();
@@ -446,8 +448,9 @@ public class CTSPersistentStore extends GeneralTaskRunnable {
                 .withFilter(queryFilter.build())
                 .returnTheseAttributes(CoreTokenField.TOKEN_ID);
 
+        Collection<Entry> entries;
         try {
-            Collection<Entry> entries = builder.executeRawResults();
+            entries = builder.executeRawResults();
             for (Entry entry : entries) {
                 Attribute attribute = entry.getAttribute(CoreTokenField.TOKEN_ID.toString());
                 String tokenId = attribute.firstValueAsString();
@@ -462,6 +465,7 @@ public class CTSPersistentStore extends GeneralTaskRunnable {
         } catch (CoreTokenException e) {
             throw new DeleteFailedException(builder, e);
         }
+        return entries.size();
     }
 
     /**

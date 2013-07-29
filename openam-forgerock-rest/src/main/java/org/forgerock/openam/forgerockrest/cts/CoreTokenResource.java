@@ -35,6 +35,9 @@ import org.forgerock.json.resource.ServerContext;
 import org.forgerock.json.resource.UpdateRequest;
 import org.forgerock.openam.forgerockrest.RestUtils;
 
+import java.util.HashMap;
+import java.util.Map;
+
 /**
  * CoreTokenResource is responsible for exposing the functions of the CoreTokenService via a REST
  * interface to external callers.
@@ -45,8 +48,15 @@ import org.forgerock.openam.forgerockrest.RestUtils;
  * @author robert.wapshott@forgerock.com
  */
 public class CoreTokenResource implements CollectionResourceProvider {
-    private JSONSerialisation serialisation;
-    private CTSPersistentStore store;
+    // Injected
+    private final JSONSerialisation serialisation;
+    private final CTSPersistentStore store;
+
+    /**
+     * On a return response, we need to describe the Token ID field in a consistent manner.
+     * This way, the name of the value is independent of the LDAP attribute.
+     */
+    private static final String TOKEN_ID = "token.id";
 
     /**
      * Create a default instance of the interface with required dependencies.
@@ -74,7 +84,10 @@ public class CoreTokenResource implements CollectionResourceProvider {
         try {
             store.create(token);
 
-            Resource resource = new Resource(token.getTokenId(), "0", new JsonValue("Token Created"));
+            Map<String, String> result = new HashMap<String, String>();
+            result.put(TOKEN_ID, token.getTokenId());
+
+            Resource resource = new Resource(token.getTokenId(), "0", new JsonValue(result));
             handler.handleResult(resource);
 
         } catch (CoreTokenException e) {
@@ -94,7 +107,10 @@ public class CoreTokenResource implements CollectionResourceProvider {
         try {
             store.delete(tokenId);
 
-            Resource resource = new Resource(tokenId, "0", new JsonValue("Token Deleted"));
+            Map<String, String> result = new HashMap<String, String>();
+            result.put(TOKEN_ID, tokenId);
+
+            Resource resource = new Resource(tokenId, "0", new JsonValue(result));
             handler.handleResult(resource);
         } catch (CoreTokenException e) {
             handler.handleError(generateException(e));
