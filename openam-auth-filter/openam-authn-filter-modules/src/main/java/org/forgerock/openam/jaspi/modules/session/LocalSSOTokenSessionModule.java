@@ -50,6 +50,8 @@ import java.util.Map;
  */
 public class LocalSSOTokenSessionModule implements ServerAuthModule {
 
+    private static final String COOKIE_HEADER_KEY = "iPlanetDirectoryPro";
+
     private AuthnRequestUtils requestUtils;
     private SSOTokenFactory factory;
     private CallbackHandler handler;
@@ -121,7 +123,8 @@ public class LocalSSOTokenSessionModule implements ServerAuthModule {
      * @throws AuthException If there is a problem validating the request.
      */
     @Override
-    public AuthStatus validateRequest(MessageInfo messageInfo, Subject clientSubject, Subject serviceSubject) throws AuthException {
+    public AuthStatus validateRequest(MessageInfo messageInfo, Subject clientSubject, Subject serviceSubject)
+            throws AuthException {
         if (!isInitialised()) {
             initDependencies();
         }
@@ -129,6 +132,9 @@ public class LocalSSOTokenSessionModule implements ServerAuthModule {
         HttpServletRequest request = (HttpServletRequest) messageInfo.getRequestMessage();
 
         String tokenId = getRequestUtils().getTokenId(request);
+        if (StringUtils.isEmpty(tokenId)) {
+            tokenId = request.getHeader(COOKIE_HEADER_KEY);
+        }
         if (!StringUtils.isEmpty(tokenId)) {
             SSOToken ssoToken = getFactory().getTokenFromId(tokenId);
 
@@ -147,7 +153,8 @@ public class LocalSSOTokenSessionModule implements ServerAuthModule {
                     throw new AuthException(e.getMessage());
                 }
 
-                Map<String, Object> context = (Map<String, Object>) messageInfo.getMap().get("org.forgerock.security.context");
+                Map<String, Object> context =
+                        (Map<String, Object>) messageInfo.getMap().get("org.forgerock.security.context");
                 context.put("authLevel", authLevel);
                 //TODO add more properties to context map
 
