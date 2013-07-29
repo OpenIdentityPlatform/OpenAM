@@ -136,5 +136,7 @@ lib/mail.jar
 lib/opendj-ldap-sdk.jar
 lib/quicksetup.jar
 lib/OpenDJ.jar
+lib/launcher_administrator.exe
+lib/winlauncher.exe
 template/locks/
 template/logs/
