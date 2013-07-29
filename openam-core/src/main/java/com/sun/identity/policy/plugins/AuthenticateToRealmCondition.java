@@ -26,9 +26,14 @@
  *
  */
 
+/*
+ * Portions Copyrighted 2013 ForgeRock AS
+ */
+
 package com.sun.identity.policy.plugins;
 
 import com.sun.identity.authentication.util.AMAuthUtils;
+import com.sun.identity.common.CaseInsensitiveHashSet;
 import com.sun.identity.policy.interfaces.Condition;
 import com.sun.identity.policy.ConditionDecision;
 import com.sun.identity.policy.PolicyManager;
@@ -205,13 +210,13 @@ public class AuthenticateToRealmCondition implements Condition {
      */
     public ConditionDecision getConditionDecision(SSOToken token, Map env) 
             throws PolicyException, SSOException {
-        boolean allowed = false;
-        Set requestAuthnRealms = new HashSet();
+
+        // We don't care about case of the realm when doing the comparison so use a CaseInsensitiveHashSet
+        Set requestAuthnRealms = new CaseInsensitiveHashSet();
         if ( (env != null) 
                     && (env.get(REQUEST_AUTHENTICATED_TO_REALMS) != null) ) {
             try {
-                requestAuthnRealms = (Set) env.get(
-                    REQUEST_AUTHENTICATED_TO_REALMS);
+                requestAuthnRealms.addAll((Set) env.get(REQUEST_AUTHENTICATED_TO_REALMS));
                 if ( debugMessageEnabled) {
                     DEBUG.message("At AuthenticateToRealmCondition."
                             + "getConditionDecision(): "
@@ -241,7 +246,7 @@ public class AuthenticateToRealmCondition implements Condition {
             }
         }
 
-        allowed = true;
+        boolean allowed = true;
         Set adviceMessages = new HashSet(1);
         if (!requestAuthnRealms.contains(authenticateToRealm)) {
             allowed = false;
