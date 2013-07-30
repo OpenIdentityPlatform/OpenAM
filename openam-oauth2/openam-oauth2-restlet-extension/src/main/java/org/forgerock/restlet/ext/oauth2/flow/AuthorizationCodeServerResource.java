@@ -25,26 +25,18 @@
 package org.forgerock.restlet.ext.oauth2.flow;
 
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
 import com.sun.identity.shared.OAuth2Constants;
 import org.forgerock.json.fluent.JsonValue;
 import org.forgerock.openam.oauth2.model.CoreToken;
-import org.forgerock.openam.oauth2.model.SessionClient;
-import org.forgerock.openam.oauth2.model.SessionClientImpl;
 import org.forgerock.openam.oauth2.utils.OAuth2Utils;
 import org.forgerock.openam.oauth2.exceptions.OAuthProblemException;
-import org.forgerock.openam.oauth2.model.AuthorizationCode;
-import org.forgerock.restlet.ext.oauth2.provider.OAuth2Client;
 import org.restlet.data.Form;
-import org.restlet.data.Reference;
 import org.restlet.ext.jackson.JacksonRepresentation;
 import org.restlet.representation.Representation;
-import org.restlet.resource.Get;
 import org.restlet.resource.Post;
-import org.restlet.routing.Redirector;
 
 /**
  * Implements the Authorization Code Flow
@@ -177,7 +169,6 @@ public class AuthorizationCodeServerResource extends AbstractFlow {
     }
 
     protected CoreToken createRefreshToken(CoreToken code) {
-        resourceOwner = getAuthenticatedResourceOwner();
         return getTokenStore().createRefreshToken(code.getScope(),
                 OAuth2Utils.getRealm(getRequest()),
                 code.getUserID(),
