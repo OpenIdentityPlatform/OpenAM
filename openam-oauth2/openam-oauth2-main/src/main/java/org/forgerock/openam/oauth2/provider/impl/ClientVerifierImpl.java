@@ -107,10 +107,10 @@ public class ClientVerifierImpl implements ClientVerifier{
         if (OAuth2Utils.logStatus) {
             if (client == null){
                 String[] obs = {"FAILED_AUTHENTICATE_CLIENT", clientId};
-                OAuth2Utils.logErrorMessage("FAILED_AUTHENTICATE_CLIENT", obs, OAuth2Utils.getSSOToken(request));
+                OAuth2Utils.logErrorMessage("FAILED_AUTHENTICATE_CLIENT", obs, null);
             } else {
-                String[] obs2 = {"AUTHENTICATED_CLIENT", client.getClientId()};
-                OAuth2Utils.logAccessMessage("AUTHENTICATED_CLIENT", obs2, OAuth2Utils.getSSOToken(request));
+                String[] obs = {"AUTHENTICATED_CLIENT", client.getClientId()};
+                OAuth2Utils.logAccessMessage("AUTHENTICATED_CLIENT", obs, null);
             }
         }
         return client;
