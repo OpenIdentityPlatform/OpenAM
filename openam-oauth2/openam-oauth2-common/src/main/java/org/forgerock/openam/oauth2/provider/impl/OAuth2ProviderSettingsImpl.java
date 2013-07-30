@@ -30,7 +30,7 @@ import com.sun.identity.sm.DNMapper;
 import com.sun.identity.sm.ServiceConfig;
 import com.sun.identity.sm.ServiceListener;
 import com.sun.identity.sm.ServiceConfigManager;
-import edu.emory.mathcs.backport.java.util.Collections;
+import java.util.Collections;
 import org.forgerock.openam.oauth2.exceptions.OAuthProblemException;
 import org.forgerock.openam.oauth2.provider.OAuth2ProviderSettings;
 import org.forgerock.openam.oauth2.utils.OAuth2Utils;
@@ -42,17 +42,14 @@ import java.util.Set;
 import java.util.concurrent.atomic.AtomicReference;
 
 /**
- * An instance of this class is consulted for OAuth2 provider configuration settings (e.g. token lifetimes) when tokens
- * are issued, etc. This class will pull the configuration state from the SMS upon initialization, and update this state
- * atomically, via an AtomicReference, when the ServiceListener is invoked with service changes. The AtomicReference will
- * reference an instance of the immutable ProviderConfiguration class. The OAuth2ProviderSettingsChangeListener is the ServiceListener
- * which will respond to OAuth2Provider settings changes, and create a new instance of the ProviderConfiguration class and update
- * the AtomicReference if the update applies to the realm corresponding to this instance of the OAuth2ProviderSettingsImpl.
- * <p/>
- * For explanation for idiom in setProviderConfig method below, see chapter 15 in Goetz' Java Concurrency in Practice.
- *
- * @author Dirk Hogan
- * @author Jason Lemay
+  An instance of this class is consulted for OAuth2 provider configuration settings (e.g. token lifetimes) when tokens
+ are issued, etc. This class will pull the configuration state from the SMS upon initialization, and update this state
+ atomically, when the ServiceListener is invoked with service changes.  The OAuth2ProviderSettingsChangeListener is the ServiceListener
+ which will respond to OAuth2Provider settings changes, and create a new instance of the ProviderConfiguration class and update
+ the reference if the update applies to the realm corresponding to this instance of the OAuth2ProviderSettingsImpl.
+
+
+ @author Dirk Hogan
  */
 public class OAuth2ProviderSettingsImpl implements OAuth2ProviderSettings {
     private class OAuth2ProviderSettingsChangeListener implements ServiceListener {
@@ -101,10 +98,10 @@ public class OAuth2ProviderSettingsImpl implements OAuth2ProviderSettings {
     }
 
     private static class ProviderConfiguration {
-        final long authorizationCodeLifetime;
-        final long refreshTokenLifetime;
-        final long accessTokenLifetime;
-        final boolean refreshTokensEnabled;
+        final Long authorizationCodeLifetime;
+        final Long refreshTokenLifetime;
+        final Long accessTokenLifetime;
+        final Boolean refreshTokensEnabled;
         final String scopeImplementationClass;
         final Set<String> responseTypes;
         final Set<String> resourceOwnerAuthenticationAttributes;
@@ -114,31 +111,32 @@ public class OAuth2ProviderSettingsImpl implements OAuth2ProviderSettings {
         final Set<String> supportedIdSigningAlgorithms;
         final Set<String> supportedClaims;
 
-        private ProviderConfiguration(long authorizationCodeLifetime,
-                                      long refreshTokenLifetime,
-                                      long accessTokenLifetime,
-                                      boolean refreshTokensEnabled,
-                                      String scopeImplementationClass,
-                                      Set<String> responseTypes,
-                                      Set<String> resourceOwnerAuthenticationAttributes,
-                                      String savedConsentAttribute,
-                                      String jwksUri,
-                                      Set<String> supportedSubjectTypes,
-                                      Set<String> supportedIdSigningAlgorithms,
-                                      Set<String> supportedClaims) {
+        private ProviderConfiguration(Long authorizationCodeLifetime,
+                                     Long refreshTokenLifetime,
+                                     Long accessTokenLifetime,
+                                     Boolean refreshTokensEnabled,
+                                     String scopeImplementationClass,
+                                     Set<String> responseTypes,
+                                     Set<String> resourceOwnerAuthenticationAttributes,
+                                     String savedConsentAttribute,
+                                     String jwksUri,
+                                     Set<String> supportedSubjectTypes,
+                                     Set<String> supportedIdSigningAlgorithms,
+                                     Set<String> supportedClaims) {
 
             this.authorizationCodeLifetime = authorizationCodeLifetime;
             this.refreshTokenLifetime = refreshTokenLifetime;
             this.accessTokenLifetime = accessTokenLifetime;
             this.refreshTokensEnabled = refreshTokensEnabled;
             this.scopeImplementationClass = scopeImplementationClass;
-            this.responseTypes = Collections.unmodifiableSet(responseTypes);
-            this.resourceOwnerAuthenticationAttributes = Collections.unmodifiableSet(resourceOwnerAuthenticationAttributes);
+            this.responseTypes = (responseTypes != null) ? Collections.unmodifiableSet(responseTypes) : null;
+            this.resourceOwnerAuthenticationAttributes =
+                    (resourceOwnerAuthenticationAttributes != null) ? Collections.unmodifiableSet(resourceOwnerAuthenticationAttributes) : null;
             this.savedConsentAttribute = savedConsentAttribute;
             this.jwksUri = jwksUri;
-            this.supportedSubjectTypes = Collections.unmodifiableSet(supportedSubjectTypes);
-            this.supportedIdSigningAlgorithms = Collections.unmodifiableSet(supportedIdSigningAlgorithms);
-            this.supportedClaims = Collections.unmodifiableSet(supportedClaims);
+            this.supportedSubjectTypes = (supportedSubjectTypes != null) ? Collections.unmodifiableSet(supportedSubjectTypes) : null;
+            this.supportedIdSigningAlgorithms = (supportedIdSigningAlgorithms != null) ? Collections.unmodifiableSet(supportedIdSigningAlgorithms) : null;
+            this.supportedClaims = (supportedClaims != null) ? Collections.unmodifiableSet(supportedClaims) : null;
         }
 
         @Override
@@ -159,12 +157,7 @@ public class OAuth2ProviderSettingsImpl implements OAuth2ProviderSettings {
             return builder.toString();
         }
     }
-
-    /*
-    AtomicReference to the class which encapsulates all OAuth2 provider configuration state so the reference can be
-    updated atomically when configuration state changes trigger listener invocation.
-     */
-    private final AtomicReference<ProviderConfiguration> providerConfiguration;
+    private ProviderConfiguration providerConfiguration;
 
     private final String deploymentUrl;
     private final String realm;
@@ -177,17 +170,21 @@ public class OAuth2ProviderSettingsImpl implements OAuth2ProviderSettings {
     private static final boolean PROPAGATE_EXCEPTIONS = false;
 
     public OAuth2ProviderSettingsImpl(Request request) {
-        providerConfiguration = new AtomicReference<ProviderConfiguration>();
         deploymentUrl = OAuth2Utils.getDeploymentURL(request);
         realm = OAuth2Utils.getRealm(request);
         SSOToken token = (SSOToken) AccessController.doPrivileged(AdminTokenAction.getInstance());
+        ServiceConfigManager serviceConfigManager = null;
         try {
-            ServiceConfigManager serviceConfigManager = new ServiceConfigManager(token, OAuth2Constants.OAuth2ProviderService.NAME, OAuth2Constants.OAuth2ProviderService.VERSION);
-            initializeSettings(PROPAGATE_EXCEPTIONS, serviceConfigManager);
-            serviceConfigManager.addListener(new OAuth2ProviderSettingsChangeListener());
+            serviceConfigManager = new ServiceConfigManager(token, OAuth2Constants.OAuth2ProviderService.NAME, OAuth2Constants.OAuth2ProviderService.VERSION);
         } catch (Exception e) {
-            OAuth2Utils.DEBUG.error("OAuth2Utils::Unable to get provider settings: " + e, e);
-            throw OAuthProblemException.OAuthError.SERVER_ERROR.handle(null, "Not able to get provider settings.");
+            String message = "OAuth2Utils::Unable to construct ServiceConfigManager: " + e;
+            OAuth2Utils.DEBUG.error(message, e);
+            throw OAuthProblemException.OAuthError.SERVER_ERROR.handle(null, message);
+        }
+        initializeSettings(PROPAGATE_EXCEPTIONS, serviceConfigManager);
+        if (serviceConfigManager.addListener(new OAuth2ProviderSettingsChangeListener()) == null) {
+            OAuth2Utils.DEBUG.error("Could not add listener to ServiceConfigManager instance. OAuth2 provider service " +
+                    "changes will not be dynamically updated for realm " + realm);
         }
     }
 
@@ -238,46 +235,46 @@ public class OAuth2ProviderSettingsImpl implements OAuth2ProviderSettings {
                         newProviderSettings);
             }
         } catch (Exception e) {
-            OAuth2Utils.DEBUG.error("Exception caught initializing OAuth2 settings: " + e, e);
+            String message = "Not able to initialize OAuth2 provider settings for realm " + realm + " Exception: " + e;
+            OAuth2Utils.DEBUG.error(message, e);
             if (propagateException) {
-                throw OAuthProblemException.OAuthError.SERVER_ERROR.handle(null, "Not able to get provider setting");
+                throw OAuthProblemException.OAuthError.SERVER_ERROR.handle(null, message);
             }
         }
     }
 
     /*
-    Use CAS to update reference to provider configuration - much better performance than locking under low contention
-    scenarios, like service configuration updates.
+        Method is synchronized:
+        1. to exclude concurrent updates
+        2. primary reason: to insure visibility of changes made by event propagation thread to threads calling get*
+        methods below.
      */
-    private void setProviderConfig(ProviderConfiguration newSettings) {
-        while (true) {
-            if (providerConfiguration.compareAndSet(providerConfiguration.get(), newSettings)) {
-                return;
+    private synchronized void setProviderConfig(ProviderConfiguration newSettings) {
+        providerConfiguration = newSettings;
+    }
+
+    private Long getLongAttribute(ServiceConfig serviceConfig, String attributeName) {
+        Map<String, Set<String>> attributes = serviceConfig.getAttributes();
+        Set<String> attribute = attributes.get(attributeName);
+        if (attribute != null && !attribute.isEmpty()) {
+            try {
+                return Long.decode(attribute.iterator().next());
+            } catch (NumberFormatException e) {
+                OAuth2Utils.DEBUG.error("Number format exception decoding Long attribute " + attributeName + " Exception: " + e, e);
+                return null;
             }
+        } else {
+            return null;
         }
     }
 
-    private long getLongAttribute(ServiceConfig serviceConfig, String attributeName) {
+    private Boolean getBooleanAttribute(ServiceConfig serviceConfig, String attributeName) {
         Map<String, Set<String>> attributes = serviceConfig.getAttributes();
         Set<String> attribute = attributes.get(attributeName);
         if (attribute != null && !attribute.isEmpty()) {
-            return Long.parseLong(attribute.iterator().next());
+            return Boolean.valueOf(attribute.iterator().next());
         } else {
-            OAuth2Utils.DEBUG.error("OAuth2Utils::Unable to get provider setting: " +
-                    attributeName);
-            throw OAuthProblemException.OAuthError.SERVER_ERROR.handle(null, "Not able to get provider setting");
-        }
-    }
-
-    private boolean getBooleanAttribute(ServiceConfig serviceConfig, String attributeName) {
-        Map<String, Set<String>> attributes = serviceConfig.getAttributes();
-        Set<String> attribute = attributes.get(attributeName);
-        if (attribute != null && !attribute.isEmpty()) {
-            return Boolean.parseBoolean(attribute.iterator().next());
-        } else {
-            OAuth2Utils.DEBUG.error("OAuth2Utils::Unable to get provider setting: " +
-                    attributeName);
-            throw OAuthProblemException.OAuthError.SERVER_ERROR.handle(null, "Not able to get provider setting");
+            return null;
         }
     }
 
@@ -287,9 +284,7 @@ public class OAuth2ProviderSettingsImpl implements OAuth2ProviderSettings {
         if (attribute != null && !attribute.isEmpty()) {
             return attribute.iterator().next();
         } else {
-            OAuth2Utils.DEBUG.error("OAuth2Utils::Unable to get provider setting: " +
-                    attributeName);
-            throw OAuthProblemException.OAuthError.SERVER_ERROR.handle(null, "Not able to get provider setting");
+            return null;
         }
     }
 
@@ -299,9 +294,7 @@ public class OAuth2ProviderSettingsImpl implements OAuth2ProviderSettings {
         if (attribute != null && !attribute.isEmpty()) {
             return attribute;
         } else {
-            OAuth2Utils.DEBUG.error("OAuth2Utils::Unable to get provider setting: " +
-                    attributeName);
-            throw OAuthProblemException.OAuthError.SERVER_ERROR.handle(null, "Not able to get provider setting");
+            return null;
         }
     }
 
@@ -335,62 +328,146 @@ public class OAuth2ProviderSettingsImpl implements OAuth2ProviderSettings {
 
     @Override
     public long getAuthorizationCodeLifetime() {
-        return providerConfiguration.get().authorizationCodeLifetime;
+        if ((providerConfiguration != null) && (providerConfiguration.authorizationCodeLifetime != null)) {
+            return providerConfiguration.authorizationCodeLifetime;
+        } else {
+            String message = "OAuth2Utils::Unable to get provider setting for : "+
+                    OAuth2Constants.OAuth2ProviderService.AUTHZ_CODE_LIFETIME_NAME;
+            OAuth2Utils.DEBUG.error(message);
+            throw OAuthProblemException.OAuthError.SERVER_ERROR.handle(null, message);
+        }
     }
 
     @Override
     public long getRefreshTokenLifetime() {
-        return providerConfiguration.get().refreshTokenLifetime;
+        if ((providerConfiguration != null) && (providerConfiguration.refreshTokenLifetime != null)) {
+            return providerConfiguration.refreshTokenLifetime;
+        } else {
+            String message = "OAuth2Utils::Unable to get provider setting for : "+
+                    OAuth2Constants.OAuth2ProviderService.REFRESH_TOKEN_LIFETIME_NAME;
+            OAuth2Utils.DEBUG.error(message);
+            throw OAuthProblemException.OAuthError.SERVER_ERROR.handle(null, message);
+        }
     }
 
     @Override
     public long getAccessTokenLifetime() {
-        return providerConfiguration.get().accessTokenLifetime;
+        if ((providerConfiguration != null) && (providerConfiguration.accessTokenLifetime != null)) {
+            return providerConfiguration.accessTokenLifetime;
+        } else {
+            String message = "OAuth2Utils::Unable to get provider setting for : "+
+                    OAuth2Constants.OAuth2ProviderService.ACCESS_TOKEN_LIFETIME_NAME;
+            OAuth2Utils.DEBUG.error(message);
+            throw OAuthProblemException.OAuthError.SERVER_ERROR.handle(null, message);
+        }
     }
 
     @Override
     public boolean getRefreshTokensEnabledState() {
-        return providerConfiguration.get().refreshTokensEnabled;
+        if ((providerConfiguration != null) && (providerConfiguration.refreshTokensEnabled != null)) {
+            return providerConfiguration.refreshTokensEnabled;
+        } else {
+            String message = "OAuth2Utils::Unable to get provider setting for : "+
+                    OAuth2Constants.OAuth2ProviderService.ISSUE_REFRESH_TOKEN;
+            OAuth2Utils.DEBUG.error(message);
+            throw OAuthProblemException.OAuthError.SERVER_ERROR.handle(null, message);
+        }
     }
 
     @Override
     public String getScopeImplementationClass() {
-        return providerConfiguration.get().scopeImplementationClass;
+        if ((providerConfiguration != null) && (providerConfiguration.scopeImplementationClass != null)) {
+            return providerConfiguration.scopeImplementationClass;
+        } else {
+            String message = "OAuth2Utils::Unable to get provider setting for : "+
+                    OAuth2Constants.OAuth2ProviderService.SCOPE_PLUGIN_CLASS;
+            OAuth2Utils.DEBUG.error(message);
+            throw OAuthProblemException.OAuthError.SERVER_ERROR.handle(null, message);
+        }
     }
 
     @Override
     public Set<String> getResponseTypes() {
-        return providerConfiguration.get().responseTypes;
+        if ((providerConfiguration != null) && (providerConfiguration.responseTypes != null)) {
+            return providerConfiguration.responseTypes;
+        } else {
+            String message = "OAuth2Utils::Unable to get provider setting for : "+
+                    OAuth2Constants.OAuth2ProviderService.RESPONSE_TYPE_LIST;
+            OAuth2Utils.DEBUG.error(message);
+            throw OAuthProblemException.OAuthError.SERVER_ERROR.handle(null, message);
+        }
     }
 
     @Override
     public Set<String> getListOfAttributesTheResourceOwnerIsAuthenticatedOn() {
-        return providerConfiguration.get().resourceOwnerAuthenticationAttributes;
+        if ((providerConfiguration != null) && (providerConfiguration.resourceOwnerAuthenticationAttributes != null)) {
+            return providerConfiguration.resourceOwnerAuthenticationAttributes;
+        } else {
+            String message = "OAuth2Utils::Unable to get provider setting for : "+
+                    OAuth2Constants.OAuth2ProviderService.AUTHENITCATION_ATTRIBUTES;
+            OAuth2Utils.DEBUG.error(message);
+            throw OAuthProblemException.OAuthError.SERVER_ERROR.handle(null, message);
+        }
     }
 
     @Override
     public String getSharedConsentAttributeName() {
-        return providerConfiguration.get().savedConsentAttribute;
+        if ((providerConfiguration != null) && (providerConfiguration.savedConsentAttribute != null)) {
+            return providerConfiguration.savedConsentAttribute;
+        } else {
+            String message = "OAuth2Utils::Unable to get provider setting for : "+
+                    OAuth2Constants.OAuth2ProviderService.SAVED_CONSENT_ATTRIBUTE;
+            OAuth2Utils.DEBUG.error(message);
+            throw OAuthProblemException.OAuthError.SERVER_ERROR.handle(null, message);
+        }
     }
 
     @Override
     public String getJWKSUri() {
-        return providerConfiguration.get().jwksUri;
+        if ((providerConfiguration != null) && (providerConfiguration.jwksUri != null)) {
+            return providerConfiguration.jwksUri;
+        } else {
+            String message = "OAuth2Utils::Unable to get provider setting for : "+
+                    OAuth2Constants.OAuth2ProviderService.JKWS_URI;
+            OAuth2Utils.DEBUG.error(message);
+            throw OAuthProblemException.OAuthError.SERVER_ERROR.handle(null, message);
+        }
     }
 
     @Override
     public Set<String> getSubjectTypesSupported() {
-        return providerConfiguration.get().supportedSubjectTypes;
+        if ((providerConfiguration != null) && (providerConfiguration.supportedSubjectTypes != null)) {
+            return providerConfiguration.supportedSubjectTypes;
+        } else {
+            String message = "OAuth2Utils::Unable to get provider setting for : "+
+                    OAuth2Constants.OAuth2ProviderService.SUBJECT_TYPES_SUPPORTED;
+            OAuth2Utils.DEBUG.error(message);
+            throw OAuthProblemException.OAuthError.SERVER_ERROR.handle(null, message);
+        }
     }
 
     @Override
     public Set<String> getTheIDTokenSigningAlgorithmsSupported() {
-        return providerConfiguration.get().supportedIdSigningAlgorithms;
+        if ((providerConfiguration != null) && (providerConfiguration.supportedIdSigningAlgorithms != null)) {
+            return providerConfiguration.supportedIdSigningAlgorithms;
+        } else {
+            String message = "OAuth2Utils::Unable to get provider setting for : "+
+                    OAuth2Constants.OAuth2ProviderService.ID_TOKEN_SIGNING_ALGORITHMS;
+            OAuth2Utils.DEBUG.error(message);
+            throw OAuthProblemException.OAuthError.SERVER_ERROR.handle(null, message);
+        }
     }
 
     @Override
     public Set<String> getSupportedClaims() {
-        return providerConfiguration.get().supportedClaims;
+        if ((providerConfiguration != null) && (providerConfiguration.supportedClaims != null)) {
+            return providerConfiguration.supportedClaims;
+        } else {
+            String message = "OAuth2Utils::Unable to get provider setting for : "+
+                    OAuth2Constants.OAuth2ProviderService.SUPPORTED_CLAIMS;
+            OAuth2Utils.DEBUG.error(message);
+            throw OAuthProblemException.OAuthError.SERVER_ERROR.handle(null, message);
+        }
     }
 
     /**
