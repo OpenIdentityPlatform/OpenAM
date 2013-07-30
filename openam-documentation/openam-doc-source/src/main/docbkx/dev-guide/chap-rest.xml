@@ -20,7 +20,7 @@
   !
   ! CCPL HEADER END
   !
-  !      Copyright 2011-2013 ForgeRock, Inc.
+  !      Copyright 2011-2013 ForgeRock AS
   !    
 -->
 <chapter xml:id='chap-rest'
@@ -350,7 +350,7 @@ boolean=true</screen>
 
    <screen>$ curl
  --request GET
- --cookie "iPlanetDirectoryPro=AQIC5...DU3*"
+ --header "X-Query-Parameters: ssotoken:AQIC5...DU3*"
  "http://openam.example.com:8080/openam/ws/1/entitlement/decision
  ?subject=MJ3QFTr4ZV2QrtlJvXlg0Q2dMRM=&amp;action=GET
  &amp;application=iPlanetAMWebAgentService
