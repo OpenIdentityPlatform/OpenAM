@@ -3978,6 +3978,16 @@
    </varlistentry>
 
    <varlistentry>
+    <term><literal>openam.auth.version.header.enabled</literal></term>
+    <listitem>
+     <para>The X-DSAMEVersion http header provides detailed information about the version
+     of OpenAM currently running on the system, including the build and date/time of
+     the build. OpenAM will need to be restarted once this property is enabled.</para>
+     <para>Default: false</para>
+    </listitem>
+   </varlistentry>
+
+   <varlistentry>
     <term><literal>openam.authentication.ignore_goto_during_logout</literal></term>
     <listitem>
      <para>Whether to ignore the <literal>goto</literal> query string parameter
