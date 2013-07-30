@@ -66,7 +66,6 @@ public class RestAuthenticationHandlerTest {
     private RestAuthCallbackHandlerManager restAuthCallbackHandlerManager;
     private AMAuthErrorCodeResponseStatusMapping amAuthErrorCodeResponseStatusMapping;
     private AuthIdHelper authIdHelper;
-    private CoreServicesWrapper coreServicesWrapper;
 
     @BeforeMethod
     public void setUp() {
@@ -75,10 +74,9 @@ public class RestAuthenticationHandlerTest {
         restAuthCallbackHandlerManager = mock(RestAuthCallbackHandlerManager.class);
         amAuthErrorCodeResponseStatusMapping = mock(AMAuthErrorCodeResponseStatusMapping.class);
         authIdHelper = mock(AuthIdHelper.class);
-        coreServicesWrapper = mock(CoreServicesWrapper.class);
 
         restAuthenticationHandler = new RestAuthenticationHandler(loginAuthenticator, restAuthCallbackHandlerManager,
-                amAuthErrorCodeResponseStatusMapping, authIdHelper, coreServicesWrapper);
+                amAuthErrorCodeResponseStatusMapping, authIdHelper);
     }
 
     @Test
@@ -108,8 +106,6 @@ public class RestAuthenticationHandlerTest {
         given(loginProcess.getAuthContext()).willReturn(authContextLocalWrapper);
 
         given(loginAuthenticator.getLoginProcess(Matchers.<LoginConfiguration>anyObject())).willReturn(loginProcess);
-
-        given(coreServicesWrapper.getDomainNameByRequest(request)).willReturn("ORG_DN");
 
         //When
         Response response = restAuthenticationHandler.initiateAuthentication(headers, request, httpResponse,
@@ -154,8 +150,6 @@ public class RestAuthenticationHandlerTest {
         given(loginProcess.getAuthContext()).willReturn(authContextLocalWrapper);
 
         given(loginAuthenticator.getLoginProcess(Matchers.<LoginConfiguration>anyObject())).willReturn(loginProcess);
-
-        given(coreServicesWrapper.getDomainNameByRequest(request)).willReturn("ORG_DN");
 
         //When
         Response response = restAuthenticationHandler.initiateAuthentication(headers, request, httpResponse,
@@ -216,8 +210,6 @@ public class RestAuthenticationHandlerTest {
         given(authIdHelper.createAuthId(Matchers.<LoginConfiguration>anyObject(), eq(authContextLocalWrapper)))
                 .willReturn("AUTH_ID");
 
-        given(coreServicesWrapper.getDomainNameByRequest(request)).willReturn("ORG_DN");
-
         //When
         Response response = restAuthenticationHandler.initiateAuthentication(headers, request, httpResponse,
                 authIndexType, indexValue, sessionUpgradeSSOTokenId, HttpMethod.GET);
@@ -277,8 +269,6 @@ public class RestAuthenticationHandlerTest {
         given(authIdHelper.createAuthId(Matchers.<LoginConfiguration>anyObject(), eq(authContextLocalWrapper)))
                 .willReturn("AUTH_ID");
 
-        given(coreServicesWrapper.getDomainNameByRequest(request)).willReturn("ORG_DN");
-
         //When
         Response response = restAuthenticationHandler.initiateAuthentication(headers, request, httpResponse,
                 authIndexType, indexValue, sessionUpgradeSSOTokenId, HttpMethod.GET);
@@ -333,8 +323,6 @@ public class RestAuthenticationHandlerTest {
                 HttpMethod.GET)).willThrow(restAuthCallbackHandlerResponseException);
         given(authIdHelper.createAuthId(Matchers.<LoginConfiguration>anyObject(), eq(authContextLocalWrapper)))
                 .willReturn("AUTH_ID");
-
-        given(coreServicesWrapper.getDomainNameByRequest(request)).willReturn("ORG_DN");
 
         //When
         Response response = restAuthenticationHandler.initiateAuthentication(headers, request, httpResponse,
@@ -413,8 +401,6 @@ public class RestAuthenticationHandlerTest {
 
         given(authIdHelper.reconstructAuthId("AUTH_ID")).willReturn(signedJwt);
 
-        given(coreServicesWrapper.getDomainNameByRequest(request)).willReturn("ORG_DN");
-
         //When
         Response response = restAuthenticationHandler.continueAuthentication(headers, request, httpResponse,
                 postBody, sessionUpgradeSSOTokenId);
@@ -436,84 +422,5 @@ public class RestAuthenticationHandlerTest {
         assertEquals(loginConfiguration.getIndexValue(), "INDEX_VALUE");
         assertEquals(loginConfiguration.getSessionId(), "SESSION_ID");
         assertEquals(loginConfiguration.getSSOTokenId(), "SSO_TOKEN_ID");
-    }
-
-    @Test
-    public void shouldGetLoginProcessAndThrow400ExceptionWithOrgDNNotValidReturningNull() throws SSOException,
-            AuthException, AuthLoginException, IOException {
-
-        //Given
-        HttpHeaders headers = mock(HttpHeaders.class);
-        HttpServletRequest request = mock(HttpServletRequest.class);
-        HttpServletResponse httpResponse = mock(HttpServletResponse.class);
-        String authIndexType = null;
-        String indexValue = null;
-        String sessionUpgradeSSOTokenId = null;
-
-        given(coreServicesWrapper.getDomainNameByRequest(request)).willReturn(null);
-
-        //When
-        Response response = restAuthenticationHandler.initiateAuthentication(headers, request, httpResponse,
-                authIndexType, indexValue, sessionUpgradeSSOTokenId, HttpMethod.GET);
-
-        //Then
-        assertEquals(response.getStatus(), 400);
-        ObjectMapper objectMapper = new ObjectMapper();
-        JsonValue jsonValue = new JsonValue(objectMapper.readValue((String) response.getEntity(), Map.class));
-        assertEquals(jsonValue.size(), 1);
-        assertTrue(jsonValue.isDefined("errorMessage"));
-    }
-
-    @Test
-    public void shouldGetLoginProcessAndThrow400ExceptionWithOrgDNNotValidReturningEmptyString() throws SSOException,
-            AuthException, AuthLoginException, IOException {
-
-        //Given
-        HttpHeaders headers = mock(HttpHeaders.class);
-        HttpServletRequest request = mock(HttpServletRequest.class);
-        HttpServletResponse httpResponse = mock(HttpServletResponse.class);
-        String authIndexType = null;
-        String indexValue = null;
-        String sessionUpgradeSSOTokenId = null;
-
-        given(coreServicesWrapper.getDomainNameByRequest(request)).willReturn("");
-
-        //When
-        Response response = restAuthenticationHandler.initiateAuthentication(headers, request, httpResponse,
-                authIndexType, indexValue, sessionUpgradeSSOTokenId, HttpMethod.GET);
-
-        //Then
-        assertEquals(response.getStatus(), 400);
-        ObjectMapper objectMapper = new ObjectMapper();
-        JsonValue jsonValue = new JsonValue(objectMapper.readValue((String) response.getEntity(), Map.class));
-        assertEquals(jsonValue.size(), 1);
-        assertTrue(jsonValue.isDefined("errorMessage"));
-    }
-
-    @Test
-    public void shouldGetLoginProcessAndThrow400ExceptionWithOrgDNNotValid() throws SSOException, AuthException,
-            AuthLoginException, IdRepoException, IOException {
-
-        //Given
-        HttpHeaders headers = mock(HttpHeaders.class);
-        HttpServletRequest request = mock(HttpServletRequest.class);
-        HttpServletResponse httpResponse = mock(HttpServletResponse.class);
-        String authIndexType = null;
-        String indexValue = null;
-        String sessionUpgradeSSOTokenId = null;
-
-        given(coreServicesWrapper.getDomainNameByRequest(request)).willReturn("ORG_DN");
-        given(coreServicesWrapper.isOrganizationActive("ORG_DN")).willThrow(IdRepoException.class);
-
-        //When
-        Response response = restAuthenticationHandler.initiateAuthentication(headers, request, httpResponse,
-                authIndexType, indexValue, sessionUpgradeSSOTokenId, HttpMethod.GET);
-
-        //Then
-        assertEquals(response.getStatus(), 400);
-        ObjectMapper objectMapper = new ObjectMapper();
-        JsonValue jsonValue = new JsonValue(objectMapper.readValue((String) response.getEntity(), Map.class));
-        assertEquals(jsonValue.size(), 1);
-        assertTrue(jsonValue.isDefined("errorMessage"));
     }
 }

@@ -20,11 +20,8 @@ import org.testng.annotations.Test;
 
 import javax.servlet.http.HttpServletRequest;
 
-import static org.testng.Assert.assertEquals;
-import static org.testng.Assert.assertFalse;
-import static org.testng.Assert.assertTrue;
-
 import static org.mockito.Mockito.*;
+import static org.testng.Assert.*;
 
 public class LoginConfigurationTest {
 
@@ -56,16 +53,34 @@ public class LoginConfigurationTest {
     }
 
     @Test
-    public void shouldIndexValue() {
+    public void shouldSetIndexValue() {
 
         //Given
-        LoginConfiguration loginConfiguration = new LoginConfiguration();
+        LoginConfiguration loginConfiguration = new LoginConfiguration().indexType(AuthIndexType.MODULE);
 
         //When
         loginConfiguration.indexValue("INDEX_VALUE");
 
         //Then
         assertEquals(loginConfiguration.getIndexValue(), "INDEX_VALUE");
+    }
+
+    @Test
+    public void shouldSetIndexValueWithCompositeIndexType() {
+
+        //Given
+        HttpServletRequest request = mock(HttpServletRequest.class);
+        LoginConfiguration loginConfiguration = new LoginConfiguration()
+                .httpRequest(request)
+                .indexType(AuthIndexType.COMPOSITE);
+
+        //When
+        loginConfiguration.indexValue("INDEX_VALUE");
+
+        //Then
+        assertEquals(loginConfiguration.getIndexValue(), "INDEX_VALUE");
+        assertNotEquals(loginConfiguration.getHttpRequest(), request);
+        assertEquals(loginConfiguration.getHttpRequest().getParameterMap().size(), 1);
     }
 
     @Test

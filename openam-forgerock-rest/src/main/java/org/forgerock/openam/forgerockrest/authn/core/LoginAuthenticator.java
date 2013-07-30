@@ -22,9 +22,12 @@ import com.iplanet.sso.SSOException;
 import com.iplanet.sso.SSOToken;
 import com.sun.identity.authentication.service.AuthException;
 import com.sun.identity.authentication.spi.AuthLoginException;
+import com.sun.identity.idm.IdRepoException;
 import com.sun.identity.shared.debug.Debug;
+import org.apache.commons.lang3.StringUtils;
 import org.forgerock.openam.forgerockrest.authn.core.wrappers.AuthContextLocalWrapper;
 import org.forgerock.openam.forgerockrest.authn.core.wrappers.CoreServicesWrapper;
+import org.forgerock.openam.forgerockrest.authn.exceptions.RestAuthException;
 
 import javax.inject.Inject;
 import javax.servlet.http.HttpServletRequest;
@@ -71,6 +74,8 @@ public class LoginAuthenticator {
     public LoginProcess getLoginProcess(LoginConfiguration loginConfiguration) throws AuthException, AuthLoginException,
             SSOException {
 
+        verifyAuthenticationRealm(loginConfiguration.getHttpRequest());
+
         AuthContextLocalWrapper authContext = getAuthContext(loginConfiguration);
         LoginProcess loginProcess = new LoginProcess(this, loginConfiguration, authContext, coreServicesWrapper);
         if (coreServicesWrapper.isNewRequest(authContext)) {
@@ -78,6 +83,31 @@ public class LoginAuthenticator {
         }
 
         return loginProcess;
+    }
+
+    /**
+     * Checks to see if the realm that is being authenticated against exists and can be resolved.
+     *
+     * Will throw RestAuthException if the realm cannot be verified.
+     *
+     * @param request The HttpServletRequest.
+     * @throws AuthLoginException If there is a problem verifying the realm.
+     * @throws com.iplanet.sso.SSOException If there is a problem verifying the realm.
+     */
+    private void verifyAuthenticationRealm(HttpServletRequest request) throws AuthLoginException,
+            SSOException {
+
+        String orgDN = coreServicesWrapper.getDomainNameByRequest(request);
+
+        if (StringUtils.isEmpty(orgDN)) {
+            throw new RestAuthException(400, "Invalid Domain Alias");
+        } else {
+            try {
+                coreServicesWrapper.isOrganizationActive(orgDN);
+            } catch (IdRepoException e) {
+                throw new RestAuthException(400, "Invalid Domain DN");
+            }
+        }
     }
 
     /**

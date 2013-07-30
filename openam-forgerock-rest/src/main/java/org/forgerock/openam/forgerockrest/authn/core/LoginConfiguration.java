@@ -16,6 +16,9 @@
 
 package org.forgerock.openam.forgerockrest.authn.core;
 
+import com.sun.identity.authentication.client.AuthClientUtils;
+import com.sun.identity.authentication.service.LoginState;
+
 import javax.servlet.http.HttpServletRequest;
 
 /**
@@ -71,11 +74,21 @@ public class LoginConfiguration {
 
     /**
      * Sets the Authentication Index value to use in the login process.
+     * <p>
+     * Also checks to see if the AuthIndexType is COMPOSITE and if it is will add another parameter to the request
+     * with the same indexValue but using the legacy key "sunamcompositeadvice". This then allows composite
+     * advices to work correctly.
      *
      * @param indexValue The Authentication Index value.
      * @return This LoginConfiguration object.
      */
     public LoginConfiguration indexValue(String indexValue) {
+        switch (indexType) {
+        case COMPOSITE: {
+            httpRequest = new RestAuthHttpRequestWrapper(httpRequest);
+            ((RestAuthHttpRequestWrapper) httpRequest).addParameter(AuthClientUtils.COMPOSITE_ADVICE, indexValue);
+        }
+        }
         this.indexValue = indexValue;
         return this;
     }
