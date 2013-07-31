@@ -25,5 +25,6 @@ package com.sun.identity.sm.ldap.api;
 public enum TokenType {
     SESSION(),
     SAML2(),
-    OAUTH();
+    OAUTH(),
+    REST();
 }

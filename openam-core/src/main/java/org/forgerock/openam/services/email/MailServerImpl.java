@@ -50,8 +50,8 @@ public class MailServerImpl implements MailServer {
     private static String SUBJECT = "forgerockEmailServiceSMTPSubject";
     private static String MESSAGE = "forgerockEmailServiceSMTPMessage";
 
-    private final static String SERVICE_NAME = "MailServer";
-    private final static String SERVICE_VERSION = "1.0";
+    final static public String SERVICE_NAME = "MailServer";
+    final static public String SERVICE_VERSION = "1.0";
 
     private Map<String, Set<String>> options = null;
     private String smtpHostName = null;
@@ -134,7 +134,7 @@ public class MailServerImpl implements MailServer {
             from = CollectionHelper.getMapAttr(this.options, FROM_ADDRESS);
         }
         subject = CollectionHelper.getMapAttr(options, SUBJECT);
-        if(subject == null || subject.isEmpty()){
+        if(subject == null ){
             subject = CollectionHelper.getMapAttr(this.options, SUBJECT);
         }
         message = CollectionHelper.getMapAttr(options, MESSAGE);

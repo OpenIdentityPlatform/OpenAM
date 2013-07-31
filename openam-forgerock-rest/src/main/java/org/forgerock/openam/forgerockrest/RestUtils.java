@@ -26,6 +26,7 @@ import com.sun.identity.idm.IdType;
 import com.sun.identity.idsvcs.Token;
 import com.sun.identity.security.AdminTokenAction;
 import com.sun.identity.shared.Constants;
+import com.sun.identity.sm.ServiceConfig;
 import org.forgerock.json.resource.ForbiddenException;
 import org.forgerock.json.resource.NotSupportedException;
 import org.forgerock.json.resource.ResultHandler;
@@ -37,6 +38,7 @@ import java.net.URISyntaxException;
 import java.security.AccessController;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 
 /**
@@ -202,5 +204,41 @@ final public class  RestUtils {
      */
     public static SSOToken getToken() {
         return token;
+    }
+
+    public static Long getLongAttribute(ServiceConfig serviceConfig, String attributeName) {
+        Map<String, Set<String>> attributes = serviceConfig.getAttributes();
+        Set<String> attribute = attributes.get(attributeName);
+        if (attribute != null && !attribute.isEmpty()) {
+            try {
+                return Long.decode(attribute.iterator().next());
+            } catch (NumberFormatException e) {
+                RestDispatcher.debug.error("RestUtils.getLongAttribute() :: " +
+                        "Number format exception decoding Long attribute  " + e);
+                return null;
+            }
+        } else {
+            return null;
+        }
+    }
+
+    public static Boolean getBooleanAttribute(ServiceConfig serviceConfig, String attributeName) {
+        Map<String, Set<String>> attributes = serviceConfig.getAttributes();
+        Set<String> attribute = attributes.get(attributeName);
+        if (attribute != null && !attribute.isEmpty()) {
+            return Boolean.valueOf(attribute.iterator().next());
+        } else {
+            return null;
+        }
+    }
+
+    public static String getStringAttribute(ServiceConfig serviceConfig, String attributeName) {
+        Map<String, Set<String>> attributes = serviceConfig.getAttributes();
+        Set<String> attribute = attributes.get(attributeName);
+        if (attribute != null && !attribute.isEmpty()) {
+            return attribute.iterator().next();
+        } else {
+            return null;
+        }
     }
 }

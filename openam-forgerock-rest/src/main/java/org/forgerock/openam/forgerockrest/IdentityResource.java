@@ -21,6 +21,12 @@ import java.lang.String;
 import java.security.AccessController;
 import java.util.*;
 
+import com.sun.identity.sm.SMSException;
+import com.sun.identity.sm.ServiceNotFoundException;
+import com.sun.identity.sm.ldap.CTSPersistentStore;
+import com.sun.identity.sm.ldap.api.TokenType;
+import com.sun.identity.sm.ldap.exceptions.CoreTokenException;
+import org.apache.commons.lang3.RandomStringUtils;
 
 import com.iplanet.am.util.SystemProperties;
 import com.iplanet.services.util.Hash;
@@ -28,9 +34,30 @@ import com.sun.identity.authentication.AuthContext;
 import com.sun.identity.idm.AMIdentity;
 import com.sun.identity.idm.IdRepoException;
 import com.sun.identity.idm.IdUtils;
-import com.sun.identity.idsvcs.*;
+import com.sun.identity.idsvcs.AccessDenied;
+import com.sun.identity.idsvcs.AccountExpired;
+import com.sun.identity.idsvcs.CreateResponse;
+import com.sun.identity.idsvcs.DeleteResponse;
+import com.sun.identity.idsvcs.DuplicateObject;
+import com.sun.identity.idsvcs.GeneralFailure;
+import com.sun.identity.idsvcs.IdentityDetails;
+import com.sun.identity.idsvcs.InvalidCredentials;
+import com.sun.identity.idsvcs.InvalidPassword;
+import com.sun.identity.idsvcs.LogResponse;
+import com.sun.identity.idsvcs.LogoutResponse;
+import com.sun.identity.idsvcs.MaximumSessionReached;
+import com.sun.identity.idsvcs.NeedMoreCredentials;
+import com.sun.identity.idsvcs.ObjectNotFound;
+import com.sun.identity.idsvcs.OrgInactive;
+import com.sun.identity.idsvcs.Token;
+import com.sun.identity.idsvcs.UpdateResponse;
+import com.sun.identity.idsvcs.UserDetails;
+import com.sun.identity.idsvcs.UserInactive;
+import com.sun.identity.idsvcs.UserLocked;
+import com.sun.identity.idsvcs.UserNotFound;
+import com.sun.identity.idsvcs.TokenExpired;
+import com.sun.identity.idsvcs.Attribute;
 import com.sun.identity.security.AdminTokenAction;
-import com.sun.identity.shared.OAuth2Constants;
 import com.sun.identity.sm.ServiceConfig;
 import com.sun.identity.sm.ServiceConfigManager;
 import org.forgerock.json.fluent.JsonValue;
@@ -46,18 +73,9 @@ import static org.forgerock.openam.forgerockrest.RestUtils.getCookieFromServerCo
 import static org.forgerock.openam.forgerockrest.RestUtils.isAdmin;
 
 import org.forgerock.json.resource.servlet.HttpContext;
-import org.forgerock.openam.oauth2.provider.OAuth2Provider;
-import org.forgerock.openam.oauth2.utils.OAuth2RestUtils;
+import org.forgerock.openam.guice.InjectorHolder;
+import org.forgerock.openam.services.RestSecurity;
 import org.forgerock.openam.services.email.MailServerImpl;
-import org.restlet.Client;
-import org.restlet.Response;
-import org.restlet.data.Form;
-import org.restlet.data.MediaType;
-import org.restlet.data.Protocol;
-import org.restlet.data.Reference;
-import org.restlet.ext.json.JsonRepresentation;
-import org.restlet.resource.ClientResource;
-import org.restlet.Context;
 
 import javax.security.auth.callback.Callback;
 import javax.security.auth.callback.NameCallback;
@@ -70,15 +88,25 @@ import javax.security.auth.callback.PasswordCallback;
 public final class IdentityResource implements CollectionResourceProvider {
     // TODO: filters, sorting, paged results.
 
+    private final List<Attribute> idSvcsAttrList;
+    private String realm;
+    private String userType;
 
-    private final List<Attribute> idSvcsAttrList = new ArrayList();
-    private String realm = null;
-    private String userType = null;
+    private ServiceConfigManager mailmgr;
+    private ServiceConfig mailscm;
+    Map<String, HashSet<String>> mailattrs;
 
-    private ServiceConfigManager mgr = null;
-    private ServiceConfig scm = null;
+    static private final CTSPersistentStore cts = InjectorHolder.getInstance(CTSPersistentStore.class);
 
-    static private final String OAUTH2_ACCESS = "/oauth2/access_token";
+    final static String MAIL_IMPL_CLASS = "forgerockMailServerImplClassName";
+    final static String MAIL_SUBJECT = "forgerockEmailServiceSMTPSubject";
+    final static String MAIL_MESSAGE = "forgerockEmailServiceSMTPMessage";
+
+    final static String EMAIL = "email";
+    final static String TOKEN_ID = "tokenId";
+    final static String CONFIRMATION_ID = "confirmationId";
+
+    private RestSecurity restSecurity = null;
     /**
      * Creates a backend
      */
@@ -87,25 +115,24 @@ public final class IdentityResource implements CollectionResourceProvider {
         String[] realmval = {realm};
         this.realm = realm;
         this.userType = userType;
+        idSvcsAttrList = new ArrayList();
         idSvcsAttrList.add(new Attribute("objecttype", userval));
         idSvcsAttrList.add(new Attribute("realm", realmval));
-        try {
-            mgr = new ServiceConfigManager((SSOToken) AccessController.doPrivileged(AdminTokenAction.getInstance()),
-                    "MailServer", "1.0");
-        } catch (Exception e){
-
-        }
+        restSecurity = new RestSecurity(realm);
     }
-    //constructor used for testing...
-    public IdentityResource(String userType, String realm, ServiceConfigManager mgr, ServiceConfig scm){
+
+    // Constructor used for testing...
+    public IdentityResource(String userType, String realm, ServiceConfigManager mailmgr,
+                            ServiceConfig mailscm,RestSecurity restSecurity){
         String[] userval = {userType};
         String[] realmval = {realm};
         this.realm = realm;
         this.userType = userType;
+        idSvcsAttrList = new ArrayList();
         idSvcsAttrList.add(new Attribute("objecttype", userval));
         idSvcsAttrList.add(new Attribute("realm", realmval));
-        this.mgr = mgr;
-        this.scm = scm;
+        this.mailmgr = mailmgr;
+        this.mailscm = mailscm;
     }
 
     /**
@@ -119,8 +146,8 @@ public final class IdentityResource implements CollectionResourceProvider {
                                final ResultHandler<JsonValue> handler) {
 
         JsonValue result = new JsonValue(new LinkedHashMap<String, Object>(1));
-        SSOToken ssotok = null;
-        AMIdentity amIdentity = null;
+        SSOToken ssotok;
+        AMIdentity amIdentity;
 
         try {
             SSOTokenManager mgr = SSOTokenManager.getInstance();
@@ -143,7 +170,32 @@ public final class IdentityResource implements CollectionResourceProvider {
     }
 
     /**
-     * This method will create a OAuth2Token from the email address provided
+     * Generates a secure hash to use as token ID
+     * @param resource string that will be used to create random hash
+     * @return random string
+     */
+    static private String generateTokenID(String resource) {
+        if(resource == null || resource.isEmpty()) {
+            return null;
+        }
+        return Hash.hash(resource + RandomStringUtils.randomAlphanumeric(32));
+    }
+
+    private com.sun.identity.sm.ldap.api.tokens.Token generateToken(String resource, String userId,
+                                                                    Long tokenLifeTimeSeconds) {
+        Calendar ttl = Calendar.getInstance();
+        com.sun.identity.sm.ldap.api.tokens.Token ctsToken = new com.sun.identity.sm.ldap.api.tokens.Token(
+                generateTokenID(resource), TokenType.REST);
+        if(userId != null && !userId.isEmpty()) {
+            ctsToken.setUserId(userId);
+        }
+        ttl.setTimeInMillis(ttl.getTimeInMillis() + (tokenLifeTimeSeconds*1000));
+        ctsToken.setExpiryTimestamp(ttl);
+        return ctsToken;
+    }
+    /**
+     * This method will create a confirmation email that contains a {@link com.sun.identity.sm.ldap.api.tokens.Token},
+     * confirmationId and email that was provided in the request.
      * @param context Current Server Context
      * @param request Request from client to retrieve id
      * @param handler Result handler
@@ -151,60 +203,60 @@ public final class IdentityResource implements CollectionResourceProvider {
     private void createRegistrationEmail(final ServerContext context, final ActionRequest request,
                                          final ResultHandler<JsonValue> handler){
 
-        String CLIENT_NAME = "IdentityResourceClient";
+
         JsonValue result = new JsonValue(new LinkedHashMap<String, Object>(1));
         final JsonValue jVal = request.getContent();
         String emailAddress = null;
+        String confirmationLink;
+        String tokenID;
 
         try {
-            // Create OAuth2 Default Client
-            AMIdentity OAuth2client = OAuth2RestUtils.createOAuth2Client(CLIENT_NAME, realm);
 
+            if(restSecurity == null){
+                RestDispatcher.debug.warning("IdentityResource.createRegistrationEmail(): " +
+                        "Rest Security not created. restSecurity = " + restSecurity);
+                throw new NotFoundException("Rest Security Service not created" );
+            }
+            if(!restSecurity.isSelfRegistration()){
+                RestDispatcher.debug.warning("IdentityResource.createRegistrationEmail(): Self-Registration set to :"
+                        + restSecurity.isSelfRegistration());
+                throw new NotFoundException("Self Registration is not accessible.");
+            }
             // Get full deployment URL
             HttpContext header = null;
             header = context.asContext(HttpContext.class);
             StringBuilder deploymentURL = RestUtils.getFullDeploymentURI(header.getPath());
 
-            // Append oauth2 access token URI
-            deploymentURL.append(OAUTH2_ACCESS);
-
-            // Create Default OAuth2Service
-            ServiceConfigManager sm = new ServiceConfigManager(OAuth2Constants.OAuth2ProviderService.NAME, RestUtils.getToken());
-            OAuth2RestUtils.createOAuth2Service(sm, realm);
-
-            // Do flow of client
-            Reference reference = new Reference(deploymentURL.toString());
-            Form form = new Form();
-            form.add(OAuth2Constants.Params.CLIENT_SECRET, "cangetin");
-            form.add(OAuth2Constants.Params.GRANT_TYPE, "client_credentials");
-            form.add(OAuth2Constants.Params.CLIENT_ID, CLIENT_NAME);
-
-            Client client = new Client(new Context(), Protocol.HTTP);
-            ClientResource clientResource = new ClientResource(reference.toUri());
-            clientResource.setNext(client);
-
-            clientResource.post(form, MediaType.APPLICATION_WWW_FORM);
-            Response r = clientResource.getResponse();
-
-            // Collect the Response from the OAuth2 Client
-            JsonRepresentation jsonRep = new JsonRepresentation(r.getEntity());
-            String access_token = jsonRep.getJsonObject().getString("access_token");
-
             // Get the email address provided from registration page
-            emailAddress = jVal.get("email").asString();
+            emailAddress = jVal.get(EMAIL).asString();
             if(emailAddress == null || emailAddress.isEmpty()){
                 throw new BadRequestException("Email not provided");
             }
 
             String subject = jVal.get("subject").asString();
+            String message = jVal.get("message").asString();
 
-            Map<String, HashSet<String>> options = null;
+            // Retrieve email registration token life time
+            Long tokenLifeTime = restSecurity.getSelfRegTLT();
 
-            // Create confirmationID
-            String confirmationID = Hash.hash(access_token + emailAddress + SystemProperties.get("am.encryption.pwd"));
+            // Create CTS Token
+            com.sun.identity.sm.ldap.api.tokens.Token ctsToken = generateToken(emailAddress, "anonymous", tokenLifeTime);
+
+            // Store token in datastore
+            cts.create(ctsToken);
+            tokenID = ctsToken.getTokenId();
+            // Create confirmationId
+            String confirmationId = Hash.hash(tokenID + emailAddress + SystemProperties.get("am.encryption.pwd"));
+
+            // Build Confirmation URL
+            confirmationLink = deploymentURL.append("/json/confirmation/register?")
+                    .append("confirmationId=").append(confirmationId)
+                    .append("&email=").append(emailAddress)
+                    .append("&tokenId=").append(tokenID)
+                    .toString();
 
             // Send Registration
-            sendRegistrationInfo(deploymentURL,null,emailAddress,subject,null,confirmationID,access_token, options);
+            sendNotification(emailAddress, subject,message, confirmationLink);
             handler.handleResult(result);
         } catch (BadRequestException be) {
             RestDispatcher.debug.error("IdentityResource.createRegistrationEmail: Cannot send email to : " + emailAddress
@@ -222,55 +274,67 @@ public final class IdentityResource implements CollectionResourceProvider {
     }
 
     /**
-     * This method send out the registration confirmation
-     * to the email address provided during the registration
-     * step.
+     * Sends email notification to end user
+     * @param to Resource receiving notification
+     * @param subject Notification subject
+     * @param message Notification Message
+     * @param confirmationLink Confirmation Link to be sent
+     * @throws Exception when message cannot be sent
      */
-    private void sendRegistrationInfo(StringBuilder deploymentURL, String from, String to, String subject, String message,
-                                      String confirmationID, String accessToken, Map options) throws Exception{
-        Map<String, HashSet<String>> attrs;
+    private void sendNotification(String to, String subject, String message, String confirmationLink) throws Exception{
 
+        try {
+            mailmgr = new ServiceConfigManager(RestUtils.getToken(),
+                    MailServerImpl.SERVICE_NAME, MailServerImpl.SERVICE_VERSION);
+            mailscm = mailmgr.getOrganizationConfig(realm,null);
+            mailattrs = mailscm.getAttributes();
 
-        scm = mgr.getOrganizationConfig(realm,null);
-        attrs = scm.getAttributes();
+        } catch (SMSException smse) {
+            RestDispatcher.debug.error("IdentityResource.idFromSession() :: Cannot create service " +
+                    MailServerImpl.SERVICE_NAME + smse);
+            throw new InternalServerErrorException("Cannot create the service: "+ MailServerImpl.SERVICE_NAME, smse);
 
-        if(attrs == null || attrs.isEmpty()){
-            RestDispatcher.debug.error("IdentityResource.sendRegistrationInfor :: no attrs set"  + attrs );
+        } catch (SSOException ssoe){
+            RestDispatcher.debug.error("IdentityResource.IdentityResouce() :: Invalid SSOToken " + ssoe);
+            throw new InternalServerErrorException("Cannot create the service: "+ MailServerImpl.SERVICE_NAME, ssoe);
+        }
+
+        if(mailattrs == null || mailattrs.isEmpty()){
+            RestDispatcher.debug.error("IdentityResource.sendNotification() :: no attrs set"  + mailattrs );
             throw new NotFoundException("No service Config Manager found for realm " + realm);
         }
 
-        // check each attribute
-
-
         // Get MailServer Implementation class
-        String attr = attrs.get("forgerockMailServerImplClassName").iterator().next();
+        String attr = mailattrs.get(MAIL_IMPL_CLASS).iterator().next();
         MailServerImpl mailServImpl = (MailServerImpl)Class.forName(attr).getDeclaredConstructor(String.class).newInstance(realm);
 
-        StringBuilder fullMsg = RestUtils.getFullDeploymentURI(deploymentURL.toString());
-
-        // Build Confirmation URL
-        message = fullMsg.append("/json/confirmation/register?" +
-                "confirmationID=" + confirmationID +
-                "&email=" + to +
-                "&access_token=" + accessToken)
-                .toString();
-
-        // Check if subject has been included
-        if(subject != null && !subject.isEmpty()) {
-            subject = attrs.get("forgerockEmailServiceSMTPSubject").iterator().next();
+        try {
+            // Check if subject has not  been included
+            if(subject == null || subject.isEmpty()) {
+                // Use default email service subject
+                subject = mailattrs.get(MAIL_SUBJECT).iterator().next();
+            }
+        } catch (Exception e){
+            RestDispatcher.debug.warning("IdentityResource.sendNotification() :: no subject found"  + e.getMessage());
+            subject = "";
         }
-
-        // Check if Custom Message has been included
-        String serviceMsg = attrs.get("forgerockEmailServiceSMTPMessage").iterator().next();
-        if(serviceMsg != null && !serviceMsg.isEmpty()) {
-            message = serviceMsg + System.getProperty("line.separator") + message;
+        try {
+            // Check if Custom Message has been included
+            if(message == null || message.isEmpty()){
+                // Use default email service message
+                message = mailattrs.get(MAIL_MESSAGE).iterator().next();
+            }
+            message = message + System.getProperty("line.separator")  + confirmationLink;
+        } catch (Exception e){
+            RestDispatcher.debug.warning("IdentityResource.sendNotification() :: no message found"  + e.getMessage());
+            message = confirmationLink;
         }
         // Send the emails via the implementation class
         mailServImpl.sendEmail(to, subject, message);
     }
 
     /**
-     * Will validate confirmationID is correct
+     * Will validate confirmationId is correct
      * @param context Current Server Context
      * @param request Request from client to confirm registration
      * @param handler Result handler
@@ -278,21 +342,21 @@ public final class IdentityResource implements CollectionResourceProvider {
     private void confirmRegistration(final ServerContext context, final ActionRequest request,
                                      final ResultHandler<JsonValue> handler){
         final JsonValue jVal = request.getContent();
-        String access_token = null;
-        String confirmationID = null;
+        String tokenID;
+        String confirmationId;
         String email = null;
         JsonValue result = new JsonValue(new LinkedHashMap<String, Object>(1));
 
         try{
-            access_token = jVal.get("access_token").asString();
-            confirmationID = jVal.get("confirmationID").asString();
-            email = jVal.get("email").asString();
+            tokenID = jVal.get(TOKEN_ID).asString();
+            confirmationId = jVal.get(CONFIRMATION_ID).asString();
+            email = jVal.get(EMAIL).asString();
 
             if(email == null || email.isEmpty()){
                 throw new BadRequestException("Email not provided");
             }
-            if(confirmationID == null || confirmationID.isEmpty()){
-                throw new BadRequestException("ConfirmationID not provided");
+            if(confirmationId == null || confirmationId.isEmpty()){
+                throw new BadRequestException("confirmationId not provided");
             }
 
             // Get full deployment URL
@@ -300,28 +364,24 @@ public final class IdentityResource implements CollectionResourceProvider {
             header = context.asContext(HttpContext.class);
             StringBuilder fullDepURL = RestUtils.getFullDeploymentURI(header.getPath());
 
-            // Validate the OAuth2 Token
-            Response r = OAuth2RestUtils.validateOAuth2Token(fullDepURL, access_token);
-
-            if(200 == r.getStatus().getCode()){
-                // access_token is valid
-                // check confirmationID
-                if(!confirmationID.equalsIgnoreCase(Hash.hash(
-                        access_token + email+ SystemProperties.get("am.encryption.pwd")))){
-                    RestDispatcher.debug.error("IdentityResource.confirmRegistration: Invalid confirmationID : "
-                            + confirmationID);
-                    throw new BadRequestException("Invalid confirmationID", null);
-                }
-                // build resource
-                result.put("email",email );
-                result.put("access_token", access_token);
-                result.put("confirmationID", confirmationID);
-                handler.handleResult(result);
-            } else {
-                RestDispatcher.debug.error("IdentityResource.confirmRegistration: Invalid access_token : "
-                        + access_token);
-                throw new BadRequestException("Invalid access_token.", null);
+            // Check Token is still in CTS
+            // Check that tokenID is not expired
+            if(cts.read(tokenID) == null){
+                throw new NotFoundException("Cannot find tokenID: " + tokenID);
             }
+
+            // check confirmationId
+            if(!confirmationId.equalsIgnoreCase(Hash.hash(
+                    tokenID + email+ SystemProperties.get("am.encryption.pwd")))){
+                RestDispatcher.debug.error("IdentityResource.confirmRegistration: Invalid confirmationId : "
+                            + confirmationId);
+                throw new BadRequestException("Invalid confirmationId", null);
+            }
+            // build resource
+            result.put(EMAIL,email );
+            result.put(TOKEN_ID, tokenID);
+            result.put(CONFIRMATION_ID, confirmationId);
+            handler.handleResult(result);
 
         } catch (BadRequestException be){
             RestDispatcher.debug.error("IdentityResource.confirmRegistration: Cannot confirm registration for : "
@@ -349,8 +409,12 @@ public final class IdentityResource implements CollectionResourceProvider {
             createRegistrationEmail(context,request, handler);
         } else if(action.equalsIgnoreCase("confirm")) {
             confirmRegistration(context, request, handler);
-        }else if(action.equalsIgnoreCase("anonymousCreate")) {
-            anonymousCreate(context,request,handler);
+        } else if(action.equalsIgnoreCase("anonymousCreate")) {
+            anonymousCreate(context, request, handler);
+        } else if(action.equalsIgnoreCase("forgotPassword")){
+            generateNewPasswordEmail(context, request, handler);
+        } else if(action.equalsIgnoreCase("forgotPasswordReset")){
+            anonymousUpdate(context, request, handler);
         } else { // for now this is the only case coming in, so fail if otherwise
             final ResourceException e =
                     new NotSupportedException("Actions are not supported for resource instances");
@@ -358,20 +422,199 @@ public final class IdentityResource implements CollectionResourceProvider {
         }
     }
 
-    private void anonymousCreate(final ServerContext context, final ActionRequest request,
-                                 final ResultHandler<JsonValue> handler){
-
+    private void generateNewPasswordEmail(final ServerContext context, final ActionRequest request,
+                                     final ResultHandler<JsonValue> handler){
+        JsonValue result = new JsonValue(new LinkedHashMap<String, Object>(1));
         final JsonValue jVal = request.getContent();
-        String access_token = null;
-        String confirmationID = null;
-        String email = null;
+        String username = null;
+
+        IdentityServicesImpl idsvc;
+        IdentityDetails dtls;
+
+        try {
+            // Generate Admin Token
+            SSOToken tok = RestUtils.getToken();
+            Token admin = new Token();
+            admin.setId(tok.getTokenID().toString());
+
+            // Get the user id provided from forgot password page
+            username = jVal.get("username").asString();
+            if(username == null || username.isEmpty()){
+                throw new BadRequestException("Username not provided");
+            }
+
+            // Look up Idenity
+            idsvc = new IdentityServicesImpl();
+            dtls = idsvc.read(username, idSvcsAttrList, admin);
+
+            String email = null;
+            Attribute[] attrs = dtls.getAttributes();
+            for (Attribute attribute : attrs){
+                String tmp = attribute.getName();
+                if(tmp != null && !tmp.isEmpty() && tmp.equalsIgnoreCase("mail")){
+                    email = attribute.getValues()[0];
+                }
+            }
+            if(email == null || email.isEmpty()){
+                throw new NotFoundException("No email provided in profile.");
+            }
+
+            // Get full deployment URL
+            HttpContext header;
+            header = context.asContext(HttpContext.class);
+            StringBuilder deploymentURL = RestUtils.getFullDeploymentURI(header.getPath());
+
+            String subject = jVal.get("subject").asString();
+            String message = jVal.get("message").asString();
+
+            // Retrieve email registration token life time
+            if(restSecurity == null){
+                RestDispatcher.debug.warning("IdentityResource.generateNewPasswordEmail(): " +
+                        "Rest Security not created. restSecurity = " + restSecurity);
+                throw new NotFoundException("Rest Security Service not created" );
+            }
+            Long tokenLifeTime = restSecurity.getForgotPassTLT();
+
+            // Generate Token
+            com.sun.identity.sm.ldap.api.tokens.Token ctsToken = generateToken(email, username, tokenLifeTime);
+
+            // Store token in datastore
+            cts.create(ctsToken);
+
+            // Create confirmationId
+            String confirmationId = Hash.hash(ctsToken.getTokenId() + username + SystemProperties.get("am.encryption.pwd"));
+
+            String confirmationLink;
+            // Build Confirmation URL
+            confirmationLink = deploymentURL.append("/json/confirmation/forgotPassword?")
+                    .append("confirmationId=").append(confirmationId)
+                    .append("&tokenId=").append(ctsToken.getTokenId())
+                    .append("&username=").append(username)
+                    .toString()
+                    .toString();
+
+            // Send Registration
+            sendNotification(email, subject,message, confirmationLink);
+            handler.handleResult(result);
+        } catch (BadRequestException be) {
+            RestDispatcher.debug.error("IdentityResource.generateNewPasswordEmail(): Cannot send email to : " + username
+                    + be.getMessage());
+            handler.handleError(be);
+        } catch (NotFoundException nfe){
+            RestDispatcher.debug.error("IdentityResource.generateNewPasswordEmail(): Cannot send email to : " + username
+                    + nfe.getMessage());
+            handler.handleError(nfe);
+        } catch (CoreTokenException cte){
+            RestDispatcher.debug.error("IdentityResource.generateNewPasswordEmail(): Cannot send email to : " + username
+                    + cte.getMessage());
+            handler.handleError(new NotFoundException("Email not sent"));
+        } catch (Exception e){
+            RestDispatcher.debug.error("IdentityResource.generateNewPasswordEmail(): Cannot send email to : " + username
+                    + e.getMessage());
+            handler.handleError(new NotFoundException("Email not sent"));
+        }
+    }
+
+    private void anonymousUpdate(final ServerContext context, final ActionRequest request,
+                                 final ResultHandler<JsonValue> handler) {
+        String tokenID;
+        String confirmationId;
+        String username;
+        String nwpassword;
+        final JsonValue jVal = request.getContent();
 
         try{
-            access_token = jVal.get("access_token").asString();
-            jVal.remove("access_token");
-            confirmationID = jVal.get("confirmationID").asString();
-            jVal.remove("confirmationID");
-            email = jVal.get("email").asString();
+            tokenID = jVal.get(TOKEN_ID).asString();
+            jVal.remove(TOKEN_ID);
+            confirmationId = jVal.get(CONFIRMATION_ID).asString();
+            jVal.remove(CONFIRMATION_ID);
+            username = jVal.get("username").asString();
+            nwpassword =  jVal.get("userpassword").asString();
+
+            if(username == null || username.isEmpty()){
+                throw new BadRequestException("username not provided");
+            }
+            if(nwpassword == null || username.isEmpty()) {
+                throw new BadRequestException("new password not provided");
+            }
+
+            // Check that tokenID is not expired
+            if(cts.read(tokenID) == null){
+                throw new NotFoundException("Cannot find tokenID: " + tokenID);
+            }
+            // check confirmationId
+            if(!confirmationId.equalsIgnoreCase(Hash.hash(
+                    tokenID + username + SystemProperties.get("am.encryption.pwd")))){
+                RestDispatcher.debug.error("IdentityResource.anonymousUpdate(): Invalid confirmationId : "
+                            + confirmationId);
+                throw new BadRequestException("Invalid confirmationId", null);
+            }
+            // update Idenitty
+            SSOToken tok = RestUtils.getToken();
+            Token admin = new Token();
+            admin.setId(tok.getTokenID().toString());
+
+            // Update instance with new password value
+            updateInstance(admin, jVal, handler);
+
+        } catch (BadRequestException be){
+            RestDispatcher.debug.error("IdentityResource.anonymousUpdate():" + be.getMessage());
+            handler.handleError(be);
+        } catch (CoreTokenException cte){
+            RestDispatcher.debug.error("IdentityResource.anonymousUpdate():" + cte.getMessage());
+            handler.handleError(new NotFoundException(cte.getMessage()));
+        } catch (Exception e){
+            RestDispatcher.debug.error("IdentityResource.anonymousUpdate():" + e.getMessage());
+            handler.handleError(new NotFoundException(e.getMessage()));
+        }
+
+    }
+
+    /**
+     * Updates an instance given a JSON object with User Attributes
+     * @param admin Token that has administrative privileges
+     * @param details Json Value containing details of user identity
+     * @param handler handles result of operation
+     */
+    private void updateInstance(Token admin, final JsonValue details, final ResultHandler<JsonValue> handler){
+        JsonValue jVal = details;
+        IdentityDetails newDtls, identity;
+        IdentityServicesImpl idsvc;
+        String resourceId = jVal.get("username").asString();
+
+        try {
+            idsvc = new IdentityServicesImpl();
+            newDtls = jsonValueToIdentityDetails(jVal);
+            newDtls.setName(resourceId);
+
+            // update resource with new details
+            UpdateResponse message = idsvc.update(newDtls, admin);
+            // read updated identity back to client
+            IdentityDetails checkIdent = idsvc.read(resourceId, idSvcsAttrList, admin);
+            // handle updated resource
+            handler.handleResult(identityDetailsToJsonValue(checkIdent));
+        } catch (final Exception exception) {
+            RestDispatcher.debug.error("IdentityResource.updateInstance() :: Cannot UPDATE! " +
+                    exception);
+            handler.handleError(new NotFoundException(exception.getMessage(), exception));
+        }
+    }
+
+
+    private void anonymousCreate(final ServerContext context, final ActionRequest request,
+                                 final ResultHandler<JsonValue> handler) {
+
+        final JsonValue jVal = request.getContent();
+        String tokenID = null;
+        String confirmationId;
+        String email;
+
+        try{
+            tokenID = jVal.get(TOKEN_ID).asString();
+            jVal.remove(TOKEN_ID);
+            confirmationId = jVal.get(CONFIRMATION_ID).asString();
+            jVal.remove(CONFIRMATION_ID);
+            email = jVal.get(EMAIL).asString();
 
             if(email == null || email.isEmpty()){
                 throw new BadRequestException("Email not provided");
@@ -379,40 +622,39 @@ public final class IdentityResource implements CollectionResourceProvider {
             // Convert to IDRepo Attribute schema
             jVal.put("mail",email);
 
-            if(confirmationID == null || confirmationID.isEmpty()){
-                throw new BadRequestException("ConfirmationID not provided");
+            if(confirmationId == null || confirmationId.isEmpty()){
+                throw new BadRequestException("confirmationId not provided");
             }
 
-            HttpContext header = context.asContext(HttpContext.class);
-            StringBuilder fullDepURL = RestUtils.getFullDeploymentURI(header.getPath());
-            // Check that OAuth2 Token still exists
-            Response r = OAuth2RestUtils.validateOAuth2Token(fullDepURL, access_token);
-            if(200 == r.getStatus().getCode()){
-                // access_token is valid
-                // check confirmationID
-                if(!confirmationID.equalsIgnoreCase(Hash.hash(
-                        access_token + email+ SystemProperties.get("am.encryption.pwd")))){
-                    RestDispatcher.debug.error("IdentityResource.confirmRegistration: Invalid confirmationID : "
-                            + confirmationID);
-                    throw new BadRequestException("Invalid confirmationID", null);
-                }
-                // create an Identity
-                SSOToken tok = RestUtils.getToken();
-                Token admin = new Token();
-                admin.setId(tok.getTokenID().toString());
-                createInstance(admin, jVal, handler);
-            } else {
-                RestDispatcher.debug.error("IdentityResource.confirmRegistration: Invalid access_token : "
-                        + access_token);
-                throw new BadRequestException("Invalid access_token.", null);
+            // Check Token is still in CTS
+            // Check that tokenID is not expired
+            if(cts.read(tokenID) == null){
+                throw new NotFoundException("Cannot find tokenID: " + tokenID);
             }
+
+            // check confirmationId
+            if(!confirmationId.equalsIgnoreCase(Hash.hash(
+                    tokenID + email+ SystemProperties.get("am.encryption.pwd")))){
+                RestDispatcher.debug.error("IdentityResource.anonymousCreate: Invalid confirmationId : "
+                        + confirmationId);
+                throw new BadRequestException("Invalid confirmationId", null);
+            }
+
+            // create an Identity
+            SSOToken tok = RestUtils.getToken();
+            Token admin = new Token();
+            admin.setId(tok.getTokenID().toString());
+            createInstance(admin, jVal, handler);
+
         } catch (BadRequestException be){
+            RestDispatcher.debug.error("IdentityResource.anonymouseCreate() :: Invalid Parameter " + be);
             handler.handleError(be);
+        } catch (NotFoundException nfe){
+            RestDispatcher.debug.error("IdentityResource.anonymousCreate(): Invalid tokenID : " + tokenID);
+            handler.handleError(nfe);
         } catch (Exception e){
             handler.handleError(new NotFoundException(e.getMessage()));
         }
-
-
     }
     /**
      * {@inheritDoc}
@@ -427,15 +669,15 @@ public final class IdentityResource implements CollectionResourceProvider {
 
     /**
      * Creates an a resource using a privileged token
-     * @param admin Privileged Token
+     * @param admin Token that has administrative privileges
      * @param details resource details that needs to be created
      * @param handler handles result of operation
      */
-    private void createInstance(Token admin, final JsonValue details, final ResultHandler<JsonValue> handler){
+    private void createInstance(Token admin, final JsonValue details, final ResultHandler<JsonValue> handler) {
 
         JsonValue jVal = details;
-        IdentityDetails dtls = null, identity = null;
-        IdentityServicesImpl idsvc = null;
+        IdentityDetails dtls, identity;
+        IdentityServicesImpl idsvc;
         String resourceId = null;
 
         try {
@@ -484,9 +726,9 @@ public final class IdentityResource implements CollectionResourceProvider {
 
         final JsonValue jVal = request.getContent();
         //createInstance(admin, jVal, handler);
-        IdentityDetails dtls = null, identity = null;
-        Resource resource = null;
-        IdentityServicesImpl idsvc = null;
+        IdentityDetails dtls, identity;
+        Resource resource;
+        IdentityServicesImpl idsvc;
         String resourceId = null;
 
         try {
@@ -533,14 +775,12 @@ public final class IdentityResource implements CollectionResourceProvider {
         Token admin = new Token();
         admin.setId(getCookieFromServerContext(context));
 
-        JsonValue result = null;
-        Resource resource = null;
-        IdentityDetails dtls = null;
-        IdentityServicesImpl idsvc = null;
+        JsonValue result = new JsonValue(new LinkedHashMap<String, Object>(1));
+        Resource resource;
+        IdentityDetails dtls;
+        IdentityServicesImpl idsvc = new IdentityServicesImpl();
 
         try {
-            result = new JsonValue(new LinkedHashMap<String, Object>(1));
-            idsvc = new IdentityServicesImpl();
 
             // read to see if resource is available to user
             dtls = idsvc.read(resourceId, idSvcsAttrList, admin);
@@ -667,7 +907,7 @@ public final class IdentityResource implements CollectionResourceProvider {
         admin.setId(getCookieFromServerContext(context));
 
 
-        String queryFilter = null;
+        String queryFilter;
 
         try {
             // This will only return 1 user..
@@ -701,9 +941,9 @@ public final class IdentityResource implements CollectionResourceProvider {
         Token admin = new Token();
         admin.setId(getCookieFromServerContext(context));
 
-        IdentityServicesImpl idsvc = null;
-        IdentityDetails dtls = null;
-        Resource resource = null;
+        IdentityServicesImpl idsvc;
+        IdentityDetails dtls;
+        Resource resource;
 
         try {
             idsvc = new IdentityServicesImpl();
@@ -781,9 +1021,9 @@ public final class IdentityResource implements CollectionResourceProvider {
     }
 
     private String getPasswordFromHeader(ServerContext context){
-        List<String> cookies = null;
+        List<String> cookies;
         String cookieName = "olduserpassword";
-        HttpContext header = null;
+        HttpContext header;
 
         try {
             header = context.asContext(HttpContext.class);
@@ -822,20 +1062,21 @@ public final class IdentityResource implements CollectionResourceProvider {
 
         final JsonValue jVal = request.getNewContent();
         final String rev = request.getRevision();
-        IdentityDetails dtls = null, newDtls = null;
-        IdentityServicesImpl idsvc = null;
-        Resource resource = null;
+        IdentityDetails dtls, newDtls;
+        IdentityServicesImpl idsvc = new IdentityServicesImpl();;
+        Resource resource;
 
         try {
-            idsvc = new IdentityServicesImpl();
-            dtls = idsvc.read(resourceId, idSvcsAttrList, admin);//Retrieve details about user to be updated
+            // Retrieve details about user to be updated
+            dtls = idsvc.read(resourceId, idSvcsAttrList, admin);
             // Continue modifying the identity if read success
 
             newDtls = jsonValueToIdentityDetails(jVal);
             newDtls.setName(resourceId);
             String userpass = jVal.get("userpassword").asString();
-            //check that the attribute userpassword is in the json object
+            // Check that the attribute userpassword is in the json object
             if(userpass != null && !userpass.isEmpty()) {
+                // If so password reset attempt
                 if(checkValidPassword(resourceId, userpass.toCharArray(),realm) || isAdmin(context)){
                     // same password as before, update the attributes
                 } else {
