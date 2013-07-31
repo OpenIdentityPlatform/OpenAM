@@ -91,7 +91,7 @@ public class OAuth2ProviderSettingsImpl implements OAuth2ProviderSettings {
         private boolean currentRealmTargetedByOrganizationUpdate(String serviceName, String version, String orgName, int type) {
             return OAuth2Constants.OAuth2ProviderService.NAME.equals(serviceName) &&
                     OAuth2Constants.OAuth2ProviderService.VERSION.equals(version) &&
-                    (ServiceListener.MODIFIED == type) &&
+                    ((ServiceListener.MODIFIED == type) || (ServiceListener.ADDED == type)) &&
                     (orgName != null) &&
                     orgName.equals(DNMapper.orgNameToDN(realm));
         }
