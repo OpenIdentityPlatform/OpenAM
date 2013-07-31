@@ -31,48 +31,47 @@ package com.sun.identity.sm.ldap.api.fields;
  * @author robert.wapshott@forgerock.com
  */
 public enum CoreTokenField {
-    USER_ID("tokenUserId"),
-    TOKEN_TYPE("tokenType"),
-    TOKEN_ID("tokenId"),
-    EXPIRY_DATE("tokenExpirationDate"),
-    BLOB("tokenObject"),
+    USER_ID("coreTokenUserId"),
+    TOKEN_TYPE("coreTokenType"),
+    TOKEN_ID("coreTokenId"),
+    EXPIRY_DATE("coreTokenExpirationDate"),
+    BLOB("coreTokenObject"),
 
-    // Generic i
-    // ndexed String fields
-    STRING_ONE("string01"),
-    STRING_TWO("string02"),
-    STRING_THREE("string03"),
-    STRING_FOUR("string04"),
-    STRING_FIVE("string05"),
-    STRING_SIX("string06"),
-    STRING_SEVEN("string07"),
-    STRING_EIGHT("string08"),
-    STRING_NINE("string09"),
-    STRING_TEN("string10"),
-    STRING_ELEVEN("string11"),
-    STRING_TWELVE("string12"),
-    STRING_THIRTEEN("string13"),
-    STRING_FOURTEEN("string14"),
-    STRING_FIFTEEN("string15"),
+    // Generic indexed String fields
+    STRING_ONE("coreTokenString01"),
+    STRING_TWO("coreTokenString02"),
+    STRING_THREE("coreTokenString03"),
+    STRING_FOUR("coreTokenString04"),
+    STRING_FIVE("coreTokenString05"),
+    STRING_SIX("coreTokenString06"),
+    STRING_SEVEN("coreTokenString07"),
+    STRING_EIGHT("coreTokenString08"),
+    STRING_NINE("coreTokenString09"),
+    STRING_TEN("coreTokenString10"),
+    STRING_ELEVEN("coreTokenString11"),
+    STRING_TWELVE("coreTokenString12"),
+    STRING_THIRTEEN("coreTokenString13"),
+    STRING_FOURTEEN("coreTokenString14"),
+    STRING_FIFTEEN("coreTokenString15"),
 
     // Generic indexed Integer fields
-    INTEGER_ONE("integer01"),
-    INTEGER_TWO("integer02"),
-    INTEGER_THREE("integer03"),
-    INTEGER_FOUR("integer04"),
-    INTEGER_FIVE("integer05"),
-    INTEGER_SIX("integer06"),
-    INTEGER_SEVEN("integer07"),
-    INTEGER_EIGHT("integer08"),
-    INTEGER_NINE("integer09"),
-    INTEGER_TEN("integer10"),
+    INTEGER_ONE("coreTokenInteger01"),
+    INTEGER_TWO("coreTokenInteger02"),
+    INTEGER_THREE("coreTokenInteger03"),
+    INTEGER_FOUR("coreTokenInteger04"),
+    INTEGER_FIVE("coreTokenInteger05"),
+    INTEGER_SIX("coreTokenInteger06"),
+    INTEGER_SEVEN("coreTokenInteger07"),
+    INTEGER_EIGHT("coreTokenInteger08"),
+    INTEGER_NINE("coreTokenInteger09"),
+    INTEGER_TEN("coreTokenInteger10"),
 
     // Generic indexed Date fields
-    DATE_ONE("date01"),
-    DATE_TWO("date02"),
-    DATE_THREE("date03"),
-    DATE_FOUR("date04"),
-    DATE_FIVE("date05");
+    DATE_ONE("coreTokenDate01"),
+    DATE_TWO("coreTokenDate02"),
+    DATE_THREE("coreTokenDate03"),
+    DATE_FOUR("coreTokenDate04"),
+    DATE_FIVE("coreTokenDate05");
 
     private final String ldapAttribute;
 
