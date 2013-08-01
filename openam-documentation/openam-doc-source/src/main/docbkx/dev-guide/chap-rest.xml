@@ -240,7 +240,7 @@ string=iPlanetDirectoryPro</screen>
 
   <para>You can also retrieve the name of the cookie used for storing the session 
   token and the names of the cookies to forward with requests.</para>
-  <screen>$ curl https://openam.example.com:8443/openam/identity/getCookieNameForToken
+  <screen>$ curl https://openam.example.com:8443/openam/identity/getCookieNamesToForward
 string=iPlanetDirectoryPro
 string=amlbcookie</screen>
 
