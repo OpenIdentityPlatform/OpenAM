@@ -1097,26 +1097,10 @@ public final class IdentityResource implements CollectionResourceProvider {
             // handle updated resource
             resource = new Resource(resourceId, "0", identityDetailsToJsonValue(checkIdent));
             handler.handleResult(resource);
-        } catch (final ObjectNotFound o) {
-            // Create Resource
-            try {
-                dtls = jsonValueToIdentityDetails(jVal);
-                dtls.setName(resourceId);
-                // create resource because it does not exist
-                CreateResponse success = idsvc.create(dtls, admin);
-                // check created identity
-                IdentityDetails checkIdent = idsvc.read(dtls.getName(), idSvcsAttrList, admin);
-                // Send client back resource created response
-                resource = new Resource(resourceId, "0", identityDetailsToJsonValue(checkIdent));
-                handler.handleResult(resource);
-            } catch (final TokenExpired tokenExpired) {
-                RestDispatcher.debug.error("IdentityResource.updateInstance() :: Cannot CREATE " +
-                        resourceId + ":" + tokenExpired);
-                handler.handleError(new PermanentException(401, "Unauthorized", null));
-            } catch (final Exception e) {
-                RestDispatcher.debug.error("IdentityResource.updateInstance() :: Cannot UPDATE! " + e);
-                handler.handleError(new BadRequestException(e.getMessage(), e));
-            }
+        } catch (final ObjectNotFound onf) {
+            RestDispatcher.debug.error("IdentityResource.updateInstance() :: Cannot UPDATE! " +
+                    onf);
+            handler.handleError(new NotFoundException("Could not find the resource [ " + resourceId + " ] to update", onf));
         } catch (final NeedMoreCredentials needMoreCredentials) {
             RestDispatcher.debug.error("IdentityResource.updateInstance() :: Cannot UPDATE " +
                     resourceId + ":" + needMoreCredentials);
