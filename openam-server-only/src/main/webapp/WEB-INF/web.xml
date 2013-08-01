@@ -59,11 +59,11 @@
     </filter>
 
     <filter>
-        <filter-name>SessionAdminOnlyFilter</filter-name>
+        <filter-name>SessionAuthorizationFilter</filter-name>
         <filter-class>org.forgerock.authz.AuthZFilter</filter-class>
         <init-param>
             <param-name>configurator</param-name>
-            <param-value>org.forgerock.openam.authz.filter.AdminOnlyAuthZConfigurator</param-value>
+            <param-value>org.forgerock.openam.authz.filter.session.SessionResourceAuthZConfigurator</param-value>
         </init-param>
     </filter>
 
@@ -90,7 +90,7 @@
         <url-pattern>/json/*</url-pattern>
     </filter-mapping>
     <filter-mapping>
-        <filter-name>SessionAdminOnlyFilter</filter-name>
+        <filter-name>SessionAuthorizationFilter</filter-name>
         <url-pattern>/json/sessions/*</url-pattern>
     </filter-mapping>
 
