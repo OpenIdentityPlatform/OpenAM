@@ -26,7 +26,13 @@
  *
  */
 
+/*
+ * Portions Copyrighted 2013 ForgeRock AS
+ */
+
 package com.iplanet.services.comm.share;
+
+import com.sun.identity.shared.xml.XMLUtils;
 
 /**
  * This <code>Response</code> class represents a response. The most important
@@ -50,7 +56,7 @@ public class Response {
      */
 
     /**
-     * Contructs an instance of Response class with the content of the Response.
+     * Constructs an instance of Response class with the content of the Response.
      * The DTD ID needs to be set explicitly using the corresponding setter as
      * it is optional for the response.
      * 
@@ -58,7 +64,7 @@ public class Response {
      *            The content of this Response.
      */
     public Response(String content) {
-        responseContent = content;
+        responseContent =  XMLUtils.removeInvalidXMLChars(content);
     }
 
     /*

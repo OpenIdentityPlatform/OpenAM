@@ -26,7 +26,13 @@
  *
  */
 
+/**
+ * Portions Copyrighted 2012 ForgeRock Inc
+ */
+
 package com.iplanet.services.comm.share;
+
+import com.sun.identity.shared.xml.XMLUtils;
 
 /**
  * This <code>Notification</code> class represents a notification. The most
@@ -50,7 +56,7 @@ public class Notification {
      */
 
     /**
-     * Contructs an instance of Notification class with the content of the
+     * Constructs an instance of Notification class with the content of the
      * Notification. The DTD ID needs to be set explicitly using the
      * corresponding setter as it is optional for the notification.
      * 
@@ -58,7 +64,7 @@ public class Notification {
      *            The content of this Notification.
      */
     public Notification(String content) {
-        notificationContent = content;
+    	notificationContent =  XMLUtils.removeInvalidXMLChars(content);
     }
 
     /**

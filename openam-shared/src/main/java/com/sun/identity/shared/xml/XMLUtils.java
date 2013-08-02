@@ -98,8 +98,9 @@ public class XMLUtils {
             "com_sun_identity_opensso_base64_encoded";
     private static int ATTR_BASE64_ENCODED_LENGTH =
             ATTR_BASE64_ENCODED.length();
+    private static final String INVALID_XML_CHARACTERS = "[\u0000-\u0008\u000b-\u001f\ufffe\uffff]";   
     private static Pattern invalidXMLChars =
-            Pattern.compile("[\u0000-\u0008\u000b-\u001f\ufffe\uffff]");
+            Pattern.compile(INVALID_XML_CHARACTERS);
 
     static {
         try {
@@ -822,6 +823,19 @@ public class XMLUtils {
     private static boolean invalidXMLCharExists(String st) {
         Matcher matcher = invalidXMLChars.matcher(st);
         return matcher.find();
+    }
+       
+    /**
+     * Remove invalid XML characters from a string.
+     * @param text the text to cleanse.
+     * @return cleansed text or the original string if it is null or empty
+     */
+    public static String removeInvalidXMLChars(String text){
+    	if (text == null || text.length() == 0) {
+    		return text;
+    	}
+    	String modifiedText = text.replaceAll(INVALID_XML_CHARACTERS, "");    	
+    	return modifiedText;
     }
 
     public static Set encodeAttributeSet(Set set, Debug debug) {

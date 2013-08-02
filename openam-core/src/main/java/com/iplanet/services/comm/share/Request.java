@@ -26,7 +26,13 @@
  *
  */
 
+/*
+ * Portions Copyrighted 2013 ForgeRock AS
+ */
+
 package com.iplanet.services.comm.share;
+
+import com.sun.identity.shared.xml.XMLUtils;
 
 /**
  * This <code>Request</code> class represents a request. The most important
@@ -56,7 +62,7 @@ public class Request {
      *            The content of this Request.
      */
     public Request(String content) {
-        requestContent = content;
+    	requestContent =  XMLUtils.removeInvalidXMLChars(content);
     }
 
     /*
