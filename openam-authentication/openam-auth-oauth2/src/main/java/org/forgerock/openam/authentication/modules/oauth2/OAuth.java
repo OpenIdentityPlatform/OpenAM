@@ -105,6 +105,9 @@ public class OAuth extends AMLoginModule {
             state = GET_OAUTH_TOKEN_STATE;
         }
 
+        // The Proxy is used to return with a POST to the module
+        proxyURL = config.getProxyURL();
+
         switch (state) {
             case ISAuthConstants.LOGIN_START: {
                 serverName = request.getServerName();
@@ -114,10 +117,7 @@ public class OAuth extends AMLoginModule {
                 if (requestedQuery != null) {
                     requestedURL += "?" + requestedQuery;
                 }
-                
-                // The Proxy is used to return with a POST to the module
-                proxyURL = config.getProxyURL();
-                
+
                 // Find the domains for which we are configured
                 Set<String> domains = AuthClientUtils.getCookieDomains();
                 
@@ -344,7 +344,7 @@ public class OAuth extends AMLoginModule {
             throws AuthLoginException, JSONException, SSOException, IdRepoException {
 
         String user = null;
-        if (userNames != null) {
+        if ((userNames != null) && !userNames.isEmpty()) {
             AMIdentity userIdentity = accountMapper.searchUser(
                     getAMIdentityRepository(realm), userNames);
             if (userIdentity != null) {
