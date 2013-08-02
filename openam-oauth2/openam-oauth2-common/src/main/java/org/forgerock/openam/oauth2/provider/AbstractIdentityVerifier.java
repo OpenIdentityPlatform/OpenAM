@@ -111,7 +111,11 @@ public abstract class AbstractIdentityVerifier<T extends User> extends SecretVer
     }
 
     /**
-     * Attempt to authenticate using simple user/password credentials.
+     * Attempt to authenticate using simple user/password credentials. It appears that this method is only ever
+     * consumed by the UserIdentityVerifier class. Not entirely clear why it is defined here, along with the verify
+     * method above. Not sure why this class implements SecretVerifier, if the subclasses (OpenAMIdentityVerifier and
+     * UserIdentityVerifier) also implement the verify(Request,Response) method. Makes usage hard to follow. Also does
+     * not seem to need to be a generic type, as only the OpenAMUser User subclass is ever instantiated. Ripe for a refactor.
      * 
      * @param username
      *            Subject's user name.
@@ -124,8 +128,9 @@ public abstract class AbstractIdentityVerifier<T extends User> extends SecretVer
     public T authenticate(String username, char[] password, String realm) {
 
         T ret = null;
+        AuthContext lc = null;
         try {
-            AuthContext lc = new AuthContext(realm);
+            lc = new AuthContext(realm);
             lc.login();
             while (lc.hasMoreRequirements()) {
                 Callback[] callbacks = lc.getRequirements();
@@ -166,6 +171,17 @@ public abstract class AbstractIdentityVerifier<T extends User> extends SecretVer
         } catch (AuthLoginException le) {
             OAuth2Utils.DEBUG.error("AbstractIdentityVerifier::authContext AuthException", le);
             throw new ResourceException(Status.SERVER_ERROR_INTERNAL, le);
+        } finally {
+            if (lc != null && AuthContext.Status.SUCCESS.equals(lc.getStatus())) {
+                try {
+                    lc.logout();
+                    if (OAuth2Utils.DEBUG.messageEnabled()) {
+                        OAuth2Utils.DEBUG.message("Logged user out in AbstractIdentityVerifier.authenticate.");
+                    }
+                } catch (AuthLoginException e) {
+                    OAuth2Utils.DEBUG.error("Exception caught logging out of AuthContext after successful login: " + e, e);
+                }
+            }
         }
         return ret;
     }

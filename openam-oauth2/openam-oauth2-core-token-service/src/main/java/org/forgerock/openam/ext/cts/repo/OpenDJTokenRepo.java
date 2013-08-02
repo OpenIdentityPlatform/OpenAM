@@ -104,14 +104,14 @@ public class OpenDJTokenRepo implements JsonResource {
                             cts.create(tokenAdapter.toToken(request));
                             if (OAuth2Utils.logStatus) {
                                 String[] obs = {"CREATED_TOKEN", request.toString()};
-                                OAuth2Utils.logAccessMessage("CREATED_TOKEN", obs, OAuth2Utils.getSSOToken(Request.getCurrent()));
+                                OAuth2Utils.logAccessMessage("CREATED_TOKEN", obs, null);
                             }
                             return request;
                         } catch(CoreTokenException e){
                             OAuth2Utils.DEBUG.error("Create Token failed", e);
                             if (OAuth2Utils.logStatus) {
                                 String[] obs = {"FAILED_CREATE_TOKEN", request.toString()};
-                                OAuth2Utils.logErrorMessage("FAILED_CREATE_TOKEN", obs, OAuth2Utils.getSSOToken(Request.getCurrent()));
+                                OAuth2Utils.logErrorMessage("FAILED_CREATE_TOKEN", obs, null);
                             }
                             throw e;
                         }
@@ -131,14 +131,14 @@ public class OpenDJTokenRepo implements JsonResource {
                             cts.delete(tokenAdapter.toToken(request));
                             if (OAuth2Utils.logStatus) {
                                 String[] obs = {"DELETED_TOKEN", request.toString()};
-                                OAuth2Utils.logAccessMessage("DELETED_TOKEN", obs, OAuth2Utils.getSSOToken(Request.getCurrent()));
+                                OAuth2Utils.logAccessMessage("DELETED_TOKEN", obs, null);
                             }
                             return request;
                         } catch(CoreTokenException e){
                             OAuth2Utils.DEBUG.error("Delete Token failed", e);
                             if (OAuth2Utils.logStatus) {
                                 String[] obs = {"DELETE_FAILED", request.toString()};
-                                OAuth2Utils.logErrorMessage("DELETE_FAILED", obs, OAuth2Utils.getSSOToken(Request.getCurrent()));
+                                OAuth2Utils.logErrorMessage("DELETE_FAILED", obs, null);
                             }
                             throw e;
                         }

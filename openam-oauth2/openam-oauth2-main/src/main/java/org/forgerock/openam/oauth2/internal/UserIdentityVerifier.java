@@ -39,7 +39,8 @@ import javax.servlet.http.HttpServletRequest;
 
 
 /**
- * Verifies an OpenAMUser
+ * Verifies an OpenAMUser.
+ * This class is only consumed by the PasswordServerResource in the resource owner credentials flow.
  */
 public class UserIdentityVerifier extends AbstractIdentityVerifier<OpenAMUser> {
 
