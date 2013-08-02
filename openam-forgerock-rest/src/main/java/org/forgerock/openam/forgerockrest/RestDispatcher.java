@@ -45,6 +45,7 @@ import org.forgerock.json.resource.ServerContext;
 import org.forgerock.json.resource.UpdateRequest;
 import org.forgerock.openam.dashboard.DashboardResource;
 import org.forgerock.openam.forgerockrest.cts.CoreTokenResource;
+import org.forgerock.openam.forgerockrest.server.ServerInfoResource;
 import org.forgerock.openam.forgerockrest.session.SessionResource;
 
 import javax.servlet.ServletException;
@@ -70,6 +71,7 @@ public final class RestDispatcher {
     final static private String DASHBOARD = "/dashboard";
     final static private String SESSIONS = "/sessions";
     final static private String TOKENS = "/tokens";
+    final static private String SERVER_INFO = "/serverinfo";
 
     private static RestDispatcher instance = null;
     private ConnectionFactory factory = null;
@@ -99,6 +101,7 @@ public final class RestDispatcher {
         endpoints.add(DASHBOARD);
         endpoints.add(SESSIONS);
         endpoints.add(TOKENS);
+        endpoints.add(SERVER_INFO);
         return endpoints;
     }
 
@@ -136,6 +139,8 @@ public final class RestDispatcher {
             CTSPersistentStore store = CoreTokenServiceFactory.getInstance();
             CoreTokenResource resource = new CoreTokenResource(serialisation, store);
             router.addRoute(endpoint, resource);
+        } else if (endpoint.equalsIgnoreCase(SERVER_INFO)){
+            router.addRoute(endpoint, new ServerInfoResource());
         }
         return router;
     }
