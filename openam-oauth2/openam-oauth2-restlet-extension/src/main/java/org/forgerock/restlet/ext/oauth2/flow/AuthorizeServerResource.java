@@ -44,10 +44,11 @@ import org.restlet.resource.Get;
 import org.restlet.resource.Post;
 import org.restlet.routing.Redirector;
 
-import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Set;
 import java.util.HashSet;
 import java.util.Map;
-import java.util.Set;
+import java.util.HashMap;
 
 public class AuthorizeServerResource extends AbstractFlow {
 
@@ -268,7 +269,10 @@ public class AuthorizeServerResource extends AbstractFlow {
             if (fragment) {
                 redirectReference.setFragment(tokenForm.getQueryString());
             } else {
-                redirectReference.setQuery(tokenForm.getQueryString());
+                Iterator<Parameter> iter = tokenForm.iterator();
+                while (iter.hasNext()) {
+                    redirectReference.addQueryParameter(iter.next());
+                }
             }
 
             Redirector dispatcher =
