@@ -360,13 +360,14 @@ public class IDPProxyUtil {
  
             newRequest.setIssuer(issuer);
             NameIDPolicy origNameIDPolicy = origRequest.getNameIDPolicy();
-            NameIDPolicy newNameIDPolicy = ProtocolFactory.getInstance().
-                createNameIDPolicy();
-            newNameIDPolicy.setFormat(origNameIDPolicy.getFormat());
-            newNameIDPolicy.setSPNameQualifier(hostedEntityId);
-            newNameIDPolicy.setAllowCreate(origNameIDPolicy.isAllowCreate());
-            
-            newRequest.setNameIDPolicy(newNameIDPolicy);
+            if (origNameIDPolicy != null) {
+                NameIDPolicy newNameIDPolicy = ProtocolFactory.getInstance().createNameIDPolicy();
+                newNameIDPolicy.setFormat(origNameIDPolicy.getFormat());
+                newNameIDPolicy.setSPNameQualifier(hostedEntityId);
+                newNameIDPolicy.setAllowCreate(origNameIDPolicy.isAllowCreate());
+
+                newRequest.setNameIDPolicy(newNameIDPolicy);
+            }
             newRequest.setRequestedAuthnContext(origRequest.
                 getRequestedAuthnContext());
             newRequest.setExtensions(origRequest.getExtensions()); 
