@@ -25,7 +25,9 @@
  * $Id: GetPrivileges.java,v 1.3 2008/06/25 05:42:15 qcheng Exp $
  *
  */
-
+/**
+ * Portions Copyrighted 2013 ForgeRock AS
+ */
 package com.sun.identity.cli.idrepo;
 
 
@@ -53,6 +55,9 @@ import java.util.logging.Level;
  * This command gets the privilege of an identity.
  */
 public class GetPrivileges extends IdentityCommand {
+
+    private static final String ALL_AUTHENTICATED_USERS = "All Authenticated Users";
+
     /**
      * Services a Commandline Request.
      *
@@ -78,8 +83,19 @@ public class GetPrivileges extends IdentityCommand {
                 adminSSOToken, realm);
             writeLog(LogWriter.LOG_ACCESS, Level.INFO,
                 "ATTEMPT_IDREPO_GET_PRIVILEGES", params);
-            AMIdentity amid = new AMIdentity(
-                adminSSOToken, idName, idType, realm, null); 
+            AMIdentity amid;
+            if (idType.equals(IdType.ROLE) && idName.equalsIgnoreCase(ALL_AUTHENTICATED_USERS)) {
+                //realm needs to be /, see DelegationPolicyImpl#privilegeToPolicy implementation
+                amid = new AMIdentity(adminSSOToken, idName, idType, "/", null);
+                //do not check the existense of all authenticated users role as it would fail
+            } else {
+                amid = new AMIdentity(adminSSOToken, idName, idType, realm, null);
+                if (!amid.isExists()) {
+                    Object[] p = {idName, type};
+                    throw new CLIException(MessageFormat.format(getResourceString("identity-does-not-exist"), p),
+                            ExitCodes.REQUEST_CANNOT_BE_PROCESSED);
+                }
+            }
             Set results = mgr.getPrivileges(amid.getUniversalId());
 
             if ((results != null) && !results.isEmpty()) {

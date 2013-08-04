@@ -1445,6 +1445,7 @@ public class AccessManager {
         optionalOptions={},
         resourceStrings={
             "privilege-result={0}",
+            "identity-does-not-exist=Identity {0} of type {1} does not exist.",
             "no-privileges=There were no privileges."})
     private String show_privileges;
 
