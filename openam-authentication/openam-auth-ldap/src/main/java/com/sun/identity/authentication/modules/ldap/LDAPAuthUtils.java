@@ -153,10 +153,15 @@ public class LDAPAuthUtils {
     String [] attrs = null;
     private static Debug debug2 = Debug.getInstance("amAuthLDAP");
     private static String AD_PASSWORD_EXPIRED = "data 532";
+    private static String S4_PASSWORD_EXPIRED = "NT_STATUS_PASSWORD_EXPIRED";
     private static String AD_ACCOUNT_DISABLED = "data 533";
+    private static String S4_ACCOUNT_DISABLED = "NT_STATUS_ACCOUNT_DISABLED";
     private static String AD_ACCOUNT_EXPIRED = "data 701";
+    private static String S4_ACCOUNT_EXPIRED = "NT_STATUS_ACCOUNT_EXPIRED";
     private static String AD_PASSWORD_RESET = "data 773";
+    private static String S4_PASSWORD_RESET = "NT_STATUS_PASSWORD_MUST_CHANGE";
     private static String AD_ACCOUNT_LOCKED = "data 775";
+    private static String S4_ACCOUNT_LOCKED = "NT_STATUS_ACCOUNT_LOCKED_OUT";
     private static String LDAP_PASSWD_ATTR = "userpassword";
     private static String AD_PASSWD_ATTR = "UnicodePwd";
     
@@ -1443,15 +1448,15 @@ public class LDAPAuthUtils {
      * @return The correct PasswordPolicyResult or null if not matched
      */
     private PasswordPolicyResult checkADResult(String diagMessage) {
-        if (diagMessage.contains(AD_PASSWORD_EXPIRED)) {
+        if (diagMessage.contains(AD_PASSWORD_EXPIRED) || diagMessage.contains(S4_PASSWORD_EXPIRED)) {
             return new PasswordPolicyResult(PasswordPolicyErrorType.PASSWORD_EXPIRED);
-        } else if (diagMessage.contains(AD_ACCOUNT_DISABLED)) {
+        } else if (diagMessage.contains(AD_ACCOUNT_DISABLED) || diagMessage.contains(S4_ACCOUNT_DISABLED)) {
             return new PasswordPolicyResult(PasswordPolicyErrorType.ACCOUNT_LOCKED);
-        } else if (diagMessage.contains(AD_ACCOUNT_EXPIRED)) {
+        } else if (diagMessage.contains(AD_ACCOUNT_EXPIRED) || diagMessage.contains(S4_ACCOUNT_EXPIRED)) {
             return new PasswordPolicyResult(PasswordPolicyErrorType.ACCOUNT_LOCKED);
-        } else if (diagMessage.contains(AD_PASSWORD_RESET)) {
+        } else if (diagMessage.contains(AD_PASSWORD_RESET) || diagMessage.contains(S4_PASSWORD_RESET)) {
             return new PasswordPolicyResult(PasswordPolicyErrorType.CHANGE_AFTER_RESET);
-        } else if (diagMessage.contains(AD_ACCOUNT_LOCKED)) {
+        } else if (diagMessage.contains(AD_ACCOUNT_LOCKED) || diagMessage.contains(S4_ACCOUNT_LOCKED)) {
             return new PasswordPolicyResult(PasswordPolicyErrorType.ACCOUNT_LOCKED);
         } else {
             return null;
