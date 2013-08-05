@@ -32,7 +32,7 @@ import org.forgerock.openam.forgerockrest.RestUtils;
 import java.util.LinkedHashMap;
 import java.util.Set;
 /**
- * Represents Server Information that can queried via a REST interface.
+ * Represents Server Information that can be queried via a REST interface.
  *
  * This resources acts as a read only resource for the moment.
  *
@@ -46,14 +46,16 @@ public class ServerInfoResource implements CollectionResourceProvider{
      * @param request Request from client to retrieve id
      * @param handler Result handler which handles error or success
      */
-    private void getCookieDomains(ServerContext context, ActionRequest request,
-                             ResultHandler<JsonValue> handler) {
+    private void getCookieDomains(ServerContext context, String resourceId,  ReadRequest request,
+                                  ResultHandler<Resource> handler) {
         JsonValue result = new JsonValue(new LinkedHashMap<String, Object>(1));
         Set<String> cookieDomains;
+        Resource resource;
         try {
             cookieDomains = AuthClientUtils.getCookieDomains();
             result.put("domains", cookieDomains);
-            handler.handleResult(result);
+            resource = new Resource(resourceId, "0", result);
+            handler.handleResult(resource);
         } catch (Exception e) {
             RestDispatcher.debug.error("ServerInforResource.getCookieDomains:: Cannot retrieve cookie domains." + e);
             handler.handleError(new NotFoundException(e.getMessage()));
@@ -64,14 +66,7 @@ public class ServerInfoResource implements CollectionResourceProvider{
      */
     public void actionCollection(ServerContext context, ActionRequest request,
                                  ResultHandler<JsonValue> handler) {
-        final String action = request.getAction();
-        if(action.equalsIgnoreCase("getCookieDomains")){
-            getCookieDomains(context, request, handler);
-        } else { // for now this is the only case coming in, so fail if otherwise
-            final ResourceException e =
-                    new NotSupportedException("Actions are not supported for resource instances");
-            handler.handleError(e);
-        }
+        RestUtils.generateUnsupportedOperation(handler);
     }
 
     /**
@@ -119,7 +114,13 @@ public class ServerInfoResource implements CollectionResourceProvider{
      */
     public void readInstance(ServerContext context, String s, ReadRequest request,
                              ResultHandler<Resource> handler) {
-        RestUtils.generateUnsupportedOperation(handler);
+        if(s.equalsIgnoreCase("cookieDomains")){
+            getCookieDomains(context, s, request, handler);
+        } else { // for now this is the only case coming in, so fail if otherwise
+            final ResourceException e =
+                    new NotSupportedException("ResourceId not supported: " + s);
+            handler.handleError(e);
+        }
     }
 
     /**
