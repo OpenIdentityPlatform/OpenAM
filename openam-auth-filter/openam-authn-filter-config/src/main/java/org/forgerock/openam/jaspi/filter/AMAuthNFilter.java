@@ -14,7 +14,7 @@
  * Copyright 2013 ForgeRock AS.
  */
 
-package org.forgerock.openam.jaspi.config;
+package org.forgerock.openam.jaspi.filter;
 
 import com.sun.identity.shared.debug.Debug;
 import org.forgerock.jaspi.filter.AuthNFilter;
@@ -27,7 +27,9 @@ import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.HttpMethod;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 /**
@@ -41,7 +43,7 @@ public class AMAuthNFilter extends AuthNFilter {
 
     private static final Debug DEBUG = Debug.getInstance("amIdentityServices");
 
-    private final static Set<UnprotectedEndpoint> unprotectedRestEndpoints = new HashSet<UnprotectedEndpoint>();
+    private final static EndpointMatcher ENDPOINT_MATCHER = new EndpointMatcher();
 
     /**
      * Only the REST Authentication Endpoint is unprotected. Other endpoints that don't need to be authenticated
@@ -49,59 +51,10 @@ public class AMAuthNFilter extends AuthNFilter {
      * allow the anonymous user access.
      */
     static {
-        unprotectedRestEndpoints.add(new UnprotectedEndpoint("/json/auth/1/authenticate", HttpMethod.GET));
-        unprotectedRestEndpoints.add(new UnprotectedEndpoint("/json/auth/1/authenticate", HttpMethod.POST));
-    }
-
-    /**
-     * Models an UnprotectedEndpoint.
-     */
-    private static class UnprotectedEndpoint {
-
-        private final String uri;
-        private final String httpMethod;
-
-        /**
-         * Constructs an instance of an UnprotectedEndpoint.
-         *
-         * @param uri The Uri of the unprotected endpoint.
-         * @param httpMethod The Http method allowed for the unprotected endpoint.
-         */
-        public UnprotectedEndpoint(String uri, String httpMethod) {
-            this.uri = uri;
-            this.httpMethod = httpMethod;
-        }
-
-        /**
-         * Determines if two unprotected endpoints are equal.
-         *
-         * @param o {@inheritDoc}
-         * @return {@inheritDoc}
-         */
-        @Override
-        public boolean equals(Object o) {
-            if (this == o) return true;
-            if (o == null || getClass() != o.getClass()) return false;
-
-            UnprotectedEndpoint that = (UnprotectedEndpoint) o;
-
-            if (!httpMethod.equals(that.httpMethod)) return false;
-            if (!uri.equals(that.uri)) return false;
-
-            return true;
-        }
-
-        /**
-         * Determines the hash code for this unprotected endpoint.
-         *
-         * @return {@inheritDoc}
-         */
-        @Override
-        public int hashCode() {
-            int result = uri.hashCode();
-            result = 31 * result + httpMethod.hashCode();
-            return result;
-        }
+        ENDPOINT_MATCHER.endpoint("/json/auth/1/authenticate", HttpMethod.GET);
+        ENDPOINT_MATCHER.endpoint("/json/auth/1/authenticate", HttpMethod.POST);
+        ENDPOINT_MATCHER.endpoint("/json/users", HttpMethod.POST, "_action", "register", "confirm", "forgotPassword",
+                "forgotPasswordReset");
     }
 
     /**
@@ -128,12 +81,10 @@ public class AMAuthNFilter extends AuthNFilter {
         HttpServletRequest request = (HttpServletRequest) servletRequest;
 
         String contextPath = request.getContextPath();
-
         String requestURI = request.getRequestURI();
-
         String path = requestURI.substring(contextPath.length());
 
-        if (unprotectedRestEndpoints.contains(new UnprotectedEndpoint(path, request.getMethod()))) {
+        if (ENDPOINT_MATCHER.match(request)) {
             DEBUG.message("Path: " + path + " Method: " + request.getMethod() + " Added as exception. Not protected.");
             filterChain.doFilter(servletRequest, servletResponse);
         } else {

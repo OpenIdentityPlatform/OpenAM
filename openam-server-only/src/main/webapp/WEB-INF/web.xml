@@ -51,7 +51,7 @@
 
     <filter>
         <filter-name>CommonsAuthnFilter</filter-name>
-        <filter-class>org.forgerock.openam.jaspi.config.AMAuthNFilter</filter-class>
+        <filter-class>org.forgerock.openam.jaspi.filter.AMAuthNFilter</filter-class>
         <init-param>
             <param-name>moduleConfiguration</param-name>
             <param-value>all</param-value>
