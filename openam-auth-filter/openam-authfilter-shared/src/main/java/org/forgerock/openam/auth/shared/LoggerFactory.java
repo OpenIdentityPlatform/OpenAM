@@ -11,38 +11,31 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2013 ForgeRock AS.
+ * Copyright 2013 ForgeRock Inc.
  */
 
-package org.forgerock.openam.authz.filter;
+package org.forgerock.openam.auth.shared;
 
-import org.forgerock.auth.common.AuditLogger;
-import org.forgerock.auth.common.DebugLogger;
-import org.forgerock.authz.AuthorizationConfigurator;
-import org.forgerock.openam.guice.InjectorHolder;
+import com.sun.identity.log.Logger;
+
+import javax.inject.Singleton;
 
 /**
- * Common implementation of the Authorization Configurator that provides the correct AM debug and audit logs for
- * authorization.
+ * Simple factory for getting an instance of a Logger.
  *
  * @author Phill Cunnington
  * @since 10.2.0
  */
-public abstract class AuthZConfigurator implements AuthorizationConfigurator {
+@Singleton
+public class LoggerFactory {
 
     /**
-     * {@inheritDoc}
+     * Gets an instance of a Logger with the specified name.
+     *
+     * @param name The name of the Logger.
+     * @return The Logger instance.
      */
-    @Override
-    public DebugLogger getDebugLogger() {
-        return new AuthDebugLogger("authzFilter");
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public AuditLogger getAuditLogger() {
-        return InjectorHolder.getInstance(AuthZAuditLogger.class);
+    public Logger getLogger(String name) {
+        return (Logger) Logger.getLogger(name);
     }
 }

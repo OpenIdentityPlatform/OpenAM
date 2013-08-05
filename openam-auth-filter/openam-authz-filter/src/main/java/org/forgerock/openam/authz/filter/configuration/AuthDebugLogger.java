@@ -14,9 +14,8 @@
  * Copyright 2013 ForgeRock AS.
  */
 
-package org.forgerock.openam.authz.filter;
+package org.forgerock.openam.authz.filter.configuration;
 
-import com.google.inject.Singleton;
 import com.sun.identity.shared.debug.Debug;
 import org.forgerock.auth.common.DebugLogger;
 
@@ -26,7 +25,6 @@ import org.forgerock.auth.common.DebugLogger;
  * @author Phill Cunnington
  * @since 10.2.0
  */
-@Singleton
 public class AuthDebugLogger implements DebugLogger {
 
     private final Debug debug;

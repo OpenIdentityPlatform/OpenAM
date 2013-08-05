@@ -14,25 +14,25 @@
  * Copyright 2013 ForgeRock AS.
  */
 
-package org.forgerock.openam.authz.filter.session;
+package org.forgerock.openam.authz.filter;
 
 import org.forgerock.authz.AuthorizationFilter;
 import org.forgerock.openam.authz.filter.configuration.AuthZConfigurator;
 import org.forgerock.openam.guice.InjectorHolder;
 
 /**
- * AuthZConfigurator sub-type which will get the Authorization Filter for the REST Session Resource.
+ * Implementation of the AM authorization configurator for the Admin Only AuthorizationFilter implementation.
  *
  * @author Phill Cunnington
  * @since 10.2.0
  */
-public class SessionResourceAuthZConfigurator extends AuthZConfigurator {
+public class AdminAuthorizationConfigurator extends AuthZConfigurator {
 
     /**
      * {@inheritDoc}
      */
     @Override
     public AuthorizationFilter getAuthorizationFilter() {
-        return InjectorHolder.getInstance(SessionResourceAuthzFilter.class);
+        return InjectorHolder.getInstance(AdminAuthorizationFilter.class);
     }
 }

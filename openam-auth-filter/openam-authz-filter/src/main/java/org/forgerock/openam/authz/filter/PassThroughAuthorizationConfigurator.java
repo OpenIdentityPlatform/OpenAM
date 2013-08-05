@@ -11,27 +11,28 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2013 ForgeRock AS.
+ * Copyright 2013 ForgeRock Inc.
  */
 
 package org.forgerock.openam.authz.filter;
 
 import org.forgerock.authz.AuthorizationFilter;
+import org.forgerock.openam.authz.filter.configuration.AuthZConfigurator;
 import org.forgerock.openam.guice.InjectorHolder;
 
 /**
- * Implementation of the AM authorization configurator for the Admin Only AuthorizationFilter implementation.
+ * Implementation of the AM authorization configurator for the NOP Logging Only AuthorizationFilter implementation.
  *
  * @author Phill Cunnington
  * @since 10.2.0
  */
-public class AdminOnlyAuthZConfigurator extends AuthZConfigurator {
+public class PassThroughAuthorizationConfigurator extends AuthZConfigurator {
 
     /**
      * {@inheritDoc}
      */
     @Override
     public AuthorizationFilter getAuthorizationFilter() {
-        return InjectorHolder.getInstance(AdminAuthorizationFilter.class);
+        return InjectorHolder.getInstance(PassThroughAuthorizationFilter.class);
     }
 }

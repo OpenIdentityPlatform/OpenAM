@@ -19,8 +19,11 @@ import com.google.inject.Inject;
 import com.iplanet.sso.SSOException;
 import com.iplanet.sso.SSOToken;
 import com.iplanet.sso.SSOTokenManager;
+import com.sun.identity.security.AdminTokenAction;
 import com.sun.identity.shared.debug.Debug;
 import org.apache.commons.lang3.StringUtils;
+
+import java.security.AccessController;
 
 /**
  * Responsible for generating SSOTokens.
@@ -70,5 +73,14 @@ public class SSOTokenFactory {
             debug.warning("Failed to create SSO Token for ID: " + tokenId, e);
             return null;
         }
+    }
+
+    /**
+     * Gets a SSOToken for the Super User.
+     *
+     * @return The Admin users SSOToken.
+     */
+    public SSOToken getAdminToken() {
+        return AccessController.doPrivileged(AdminTokenAction.getInstance());
     }
 }

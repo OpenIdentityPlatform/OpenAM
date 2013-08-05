@@ -14,7 +14,7 @@
  * Copyright 2013 ForgeRock AS.
  */
 
-package org.forgerock.openam.authz.filter;
+package org.forgerock.openam.authz.filter.configuration;
 
 import com.google.inject.Singleton;
 import com.iplanet.sso.SSOToken;
@@ -23,7 +23,9 @@ import com.sun.identity.log.Logger;
 import com.sun.identity.security.AdminTokenAction;
 import org.forgerock.auth.common.AuditLogger;
 import org.forgerock.auth.common.AuditRecord;
+import org.forgerock.auth.common.AuthResult;
 import org.forgerock.openam.auth.shared.AuthnRequestUtils;
+import org.forgerock.openam.auth.shared.LoggerFactory;
 import org.forgerock.openam.auth.shared.SSOTokenFactory;
 
 import javax.inject.Inject;
@@ -43,17 +45,21 @@ public class AuthZAuditLogger implements AuditLogger {
 
     private final SSOTokenFactory ssoTokenFactory;
     private final AuthnRequestUtils requestUtils;
+    private final LoggerFactory loggerFactory;
 
     /**
      * Constructs a new instance of the AuthZAuditLogger.
      *
      * @param ssoTokenFactory An instance of the SSOTokenFactory.
      * @param requestUtils An instance of the AuthnRequestUtils.
+     * @param loggerFactory An instance of the LoggerFactory.
      */
     @Inject
-    public AuthZAuditLogger(SSOTokenFactory ssoTokenFactory, AuthnRequestUtils requestUtils) {
+    public AuthZAuditLogger(SSOTokenFactory ssoTokenFactory, AuthnRequestUtils requestUtils,
+            LoggerFactory loggerFactory) {
         this.ssoTokenFactory = ssoTokenFactory;
         this.requestUtils = requestUtils;
+        this.loggerFactory = loggerFactory;
     }
 
     /**
@@ -71,16 +77,16 @@ public class AuthZAuditLogger implements AuditLogger {
         switch (auditRecord.getAuthResult()) {
             case SUCCESS: {
                 message = "Authorization Succeeded. " + auditRecord.getHttpServletRequest().getRequestURI();
-                logger = (Logger) Logger.getLogger(AUDIT_LOG_NAME + ".access");
+                logger = loggerFactory.getLogger(AUDIT_LOG_NAME + ".access");
                 break;
             }
             default: {
                 message = "Authorization Failed. " + auditRecord.getHttpServletRequest().getRequestURI();
-                logger = (Logger) Logger.getLogger(AUDIT_LOG_NAME + ".error");
+                logger = loggerFactory.getLogger(AUDIT_LOG_NAME + ".error");
             }
         }
 
-        SSOToken adminToken = AccessController.doPrivileged(AdminTokenAction.getInstance());
+        SSOToken adminToken = ssoTokenFactory.getAdminToken();
         SSOToken subjectToken = ssoTokenFactory.getTokenFromId(tokenId);
         LogRecord logRecord = new LogRecord(Level.INFO, message, subjectToken);
 

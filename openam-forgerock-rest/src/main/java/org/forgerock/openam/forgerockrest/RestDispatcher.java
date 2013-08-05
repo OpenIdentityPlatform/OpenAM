@@ -64,14 +64,14 @@ public final class RestDispatcher {
     public static Debug debug = Debug.getInstance("frRest");
 
     /* Endpoints for forgerock-rest */
-    final static private String REALMS = "/realms";
-    final static private String USERS = "/users";
-    final static private String GROUPS = "/groups";
-    final static private String AGENTS = "/agents";
-    final static private String DASHBOARD = "/dashboard";
-    final static private String SESSIONS = "/sessions";
-    final static private String TOKENS = "/tokens";
-    final static private String SERVER_INFO = "/serverinfo";
+    final static private String REALMS = "/realms";          // Protected by AdminAuthorizationFilter
+    final static private String USERS = "/users";            // Protected by PassThroughAuthorizationFilter-Just logging
+    final static private String GROUPS = "/groups";          // Protected by PassThroughAuthorizationFilter-Just logging
+    final static private String AGENTS = "/agents";          // Protected by PassThroughAuthorizationFilter-Just logging
+    final static private String DASHBOARD = "/dashboard";    // Protected by PassThroughAuthorizationFilter-Just logging
+    final static private String SESSIONS = "/sessions";      // Protected by SessionResourceAuthZFilter - Admin + custom
+    final static private String TOKENS = "/tokens";          // Protected by AdminAuthorizationFilter
+    final static private String SERVER_INFO = "/serverinfo"; // Protected by PassThroughAuthorizationFilter-Just logging
 
     private static RestDispatcher instance = null;
     private ConnectionFactory factory = null;

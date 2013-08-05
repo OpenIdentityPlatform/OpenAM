@@ -25,6 +25,7 @@ import javax.inject.Inject;
 import javax.inject.Singleton;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.util.Map;
 
 /**
  * Extends the Admin Only Authorization Filter to provide an exception case to the ?_action=logout on the
@@ -58,8 +59,9 @@ public class SessionResourceAuthzFilter extends AdminAuthorizationFilter {
     @Override
     public boolean authorize(HttpServletRequest servletRequest, HttpServletResponse servletResponse) {
 
-        if (servletRequest.getParameterMap().containsKey("_action") &&
-                "logout".equalsIgnoreCase(servletRequest.getParameter("_action"))) {
+        Map<String, String> parameterMap = servletRequest.getParameterMap();
+        if (parameterMap.containsKey("_action") &&
+                "logout".equalsIgnoreCase(parameterMap.get("_action"))) {
             return true;
         }
 

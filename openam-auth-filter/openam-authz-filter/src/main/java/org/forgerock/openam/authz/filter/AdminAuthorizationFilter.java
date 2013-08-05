@@ -76,6 +76,7 @@ public class AdminAuthorizationFilter implements AuthorizationFilter {
      *
      * @param servletRequest {@inheritDoc}
      * @param servletResponse {@inheritDoc}
+     * @return {@inheritDoc}
      */
     @Override
     public boolean authorize(HttpServletRequest servletRequest, HttpServletResponse servletResponse) {

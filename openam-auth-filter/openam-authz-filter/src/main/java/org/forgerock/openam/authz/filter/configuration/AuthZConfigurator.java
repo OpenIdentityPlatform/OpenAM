@@ -14,25 +14,35 @@
  * Copyright 2013 ForgeRock AS.
  */
 
-package org.forgerock.openam.authz.filter.session;
+package org.forgerock.openam.authz.filter.configuration;
 
-import org.forgerock.authz.AuthorizationFilter;
-import org.forgerock.openam.authz.filter.configuration.AuthZConfigurator;
+import org.forgerock.auth.common.AuditLogger;
+import org.forgerock.auth.common.DebugLogger;
+import org.forgerock.authz.AuthorizationConfigurator;
 import org.forgerock.openam.guice.InjectorHolder;
 
 /**
- * AuthZConfigurator sub-type which will get the Authorization Filter for the REST Session Resource.
+ * Common implementation of the Authorization Configurator that provides the correct AM debug and audit logs for
+ * authorization.
  *
  * @author Phill Cunnington
  * @since 10.2.0
  */
-public class SessionResourceAuthZConfigurator extends AuthZConfigurator {
+public abstract class AuthZConfigurator implements AuthorizationConfigurator {
 
     /**
      * {@inheritDoc}
      */
     @Override
-    public AuthorizationFilter getAuthorizationFilter() {
-        return InjectorHolder.getInstance(SessionResourceAuthzFilter.class);
+    public DebugLogger getDebugLogger() {
+        return new AuthDebugLogger("authorizationFilter");
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public AuditLogger getAuditLogger() {
+        return InjectorHolder.getInstance(AuthZAuditLogger.class);
     }
 }
