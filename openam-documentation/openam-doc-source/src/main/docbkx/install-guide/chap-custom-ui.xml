@@ -20,7 +20,7 @@
   !
   ! CCPL HEADER END
   !
-  !      Copyright 2011-2012 ForgeRock AS
+  !      Copyright 2011-2013 ForgeRock AS
   !    
 -->
 <chapter xml:id='chap-custom-ui'
@@ -49,6 +49,12 @@
  
  <para>First you copy the pages to customize to the proper location, then
  you customize the files themselves.</para>
+ 
+ <note>
+  <para>Case mismatch can cause failures in the UI lookup for some systems. To ensure
+  lookup success and for consistency, use lowercase names for your customized
+  directories. All of the default directories are already lowercase.</para>
+ </note>
  
  <para>Images in this example are located in
  <filename>/path/to/tomcat/webapps/openam/images/</filename>, and CSS in
