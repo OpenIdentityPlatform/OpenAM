@@ -332,6 +332,10 @@ Internet services successfully restarted</screen>
   file. Encrypt passwords using <command>cryptit.exe</command>.</para>
   
   <screen>C:\web_agents\iis6_agent\bin&gt;cryptit.exe <replaceable>pwd-file</replaceable> <replaceable>encryption-key</replaceable></screen>
+
+  <para>The <command>cryptit.exe</command> command uses its own implementation of the
+  Rivest Cipher 5 (RC5) encryption algorithm.</para>
+
  </section>
  
  <section xml:id="uninstall-iis6-agent">

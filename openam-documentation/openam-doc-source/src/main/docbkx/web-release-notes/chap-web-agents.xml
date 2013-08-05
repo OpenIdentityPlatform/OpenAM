@@ -315,6 +315,27 @@
      </listitem>
 
      <listitem>
+         <para>The IIS web policy agents no longer depend on third-party libraries.
+         They are now built and shipped as single Dynamic-Link Libraries (DLLs). </para>
+     </listitem>
+
+     <listitem>
+         <para>The IIS 6 agent, installed on older versions (pre R2) of Windows 2003,
+         may require the installation of Microsoft Core XML Services (MSXML) 6.0 and
+         any applicable service packs and updates. The IIS7 agent also requires
+         MSXML 6.0 or above. For installation instructions, see the <link xlink:show="new"
+         xlink:href="http://www.microsoft.com/en-us/download/details.aspx?id=3988"
+         ><citetitle>Microsoft Download Center page for MSXML 6.0</citetitle></link></para>
+     </listitem>
+
+     <listitem>
+         <para>When SSL is used, the Linux/Solaris agents no longer include independent
+         NSS/NSPR libraries. They rely on the libraries included in the OS native
+         <filename>libxml2</filename> and <filename>openssl</filename> packages.
+         The package names may vary slightly, depending on release / distribution.</para>
+     </listitem>
+
+     <listitem>
       <para>Naming URL validation was introduced after release 3.0.4. The initial
       implementation of naming URL validation for web policy agents enabled
       validation by default. Naming URL validation is now fully disabled by

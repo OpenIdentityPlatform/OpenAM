@@ -401,6 +401,13 @@
      <para>Set this to the user name of the agent authenticator.</para>
     </listitem>
    </varlistentry>
+<!--
+      <varlistentry>
+          <term><literal>com.forgerock.agents.config.cert.key.password</literal></term>
+          <listitem>
+              <para>Reserved for future use.</para>
+          </listitem>
+      </varlistentry> -->
   </variablelist>
  </section>
 
@@ -498,6 +505,58 @@
      signin.example.com|http://openam3.example.com/openam/UI/Login,
      http://openam4.example.com/openam/UI/Login</literal></para>
     </listitem>
+   </varlistentry>
+
+   <varlistentry>
+          <term>com.forgerock.agents.config.cert.ca.file</term>
+          <listitem>
+              <para>Set this property to the file name that contains one or more CA certificates.
+                  If <literal>trust.server.certs=false</literal>, the file should be PEM encoded.</para>
+              <note><para>For OpenSSL, PEM format is base 64 encoded ASCII data. The acronym stands for
+                  Privacy Enhanced Mail format, as it was originally designed to secure email using public-key
+                  cryptography.</para></note>
+          </listitem>
+   </varlistentry>
+
+   <varlistentry>
+       <term>com.forgerock.agents.config.cert.file</term>
+       <listitem>
+           <para>Set this property to the name of the file that contains the PEM encoded
+           public key certificate.</para>
+       </listitem>
+   </varlistentry>
+
+   <varlistentry>
+          <term><literal>com.forgerock.agents.config.cert.key</literal></term>
+          <listitem>
+              <para>Set this property to the name of the file that contains the private key.
+                  On UNIX systems, that key should be encoded in PEM format.</para>
+              <para>On Windows systems,
+                  that entry depends. If SSL mutual authentication is required with OpenAM, that
+                  entry should contain the name of the private key or certificate imported
+                  in the Windows Certificate Manager, part of the Microsoft Management Console.
+                  For a web server, that should point to the Local Machine or Service certificate
+                  store, depending on the account associated with the Web server.</para>
+          </listitem>
+   </varlistentry>
+
+   <varlistentry>
+       <term>com.forgerock.agents.config.ciphers</term>
+       <listitem>
+           <para>Set this property to the name of the cipher list. That list consists of
+           one or more <literal>cipher strings</literal> separated by colons, as defined
+           in the man page for <filename>ciphers</filename> available at <link xlink:show="new"
+           xlink:href="http://http://www.openssl.org/docs/apps/ciphers.html"
+           >http://www.openssl.org/docs/apps/ciphers.html</link>.</para>
+           <para>Default: <literal>HIGH:MEDIUM</literal>.</para>
+
+           <para>Cipher restrictions can be configured as described in the Microsoft article
+           entitled <link xlink:show="new" xlink:href="http://support.microsoft.com/kb/245030">
+           <citetitle>How to Restrict the Use of Certain Cryptographic Algorithms and Protocols
+           in Schannel.dll</citetitle></link>.</para>
+
+
+       </listitem>
    </varlistentry>
 
    <varlistentry>
