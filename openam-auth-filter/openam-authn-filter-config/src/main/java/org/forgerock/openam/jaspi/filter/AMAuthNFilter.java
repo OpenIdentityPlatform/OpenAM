@@ -55,6 +55,7 @@ public class AMAuthNFilter extends AuthNFilter {
         ENDPOINT_MATCHER.endpoint("/json/auth/1/authenticate", HttpMethod.POST);
         ENDPOINT_MATCHER.endpoint("/json/users", HttpMethod.POST, "_action", "register", "confirm", "forgotPassword",
                 "forgotPasswordReset");
+        ENDPOINT_MATCHER.endpoint("/json/serverinfo/cookieDomains", HttpMethod.GET);
     }
 
     /**

@@ -18,8 +18,6 @@ package org.forgerock.openam.authz.filter;
 
 import com.iplanet.sso.SSOException;
 import com.iplanet.sso.SSOToken;
-import com.sun.identity.idm.AMIdentity;
-import com.sun.identity.idm.IdRepoException;
 import org.forgerock.auth.common.AuditLogger;
 import org.forgerock.auth.common.DebugLogger;
 import org.forgerock.auth.common.LoggingConfigurator;
@@ -84,23 +82,26 @@ public class PassThroughAuthorizationFilter implements AuthorizationFilter {
             debugLogger.debug("Request made without TokenID");
         }
 
-        String authorizationDebugMessage = request.getRequestURI() + " Accessed using PassThroughAuthorizationFilter, with "
-                + "unauthenticated user.";
+        String authorizationDebugMessage = request.getRequestURI() + " Accessed using PassThroughAuthorizationFilter, "
+                + "with unauthenticated user. Letting request through.";
 
         if (tokenId != null) {
             // Must generate a valid SSOToken from this TokenID.
             SSOToken token = ssoTokenFactory.getTokenFromId(tokenId);
             if (token == null) {
-                return false;
+                debugLogger.debug(request.getRequestURI() + " Accessed using PassThroughAuthorizationFilter, with "
+                        + tokenId + ", but failed to get SSOToken for it. Letting request through.");
+                return true;
             }
 
             try {
                 String name = token.getPrincipal().getName();
                 String realm = token.getProperty("Organization");
-                authorizationDebugMessage = request.getRequestURI() + " Accessed using PassThroughAuthorizationFilter by user, "
-                        + name + " on realm, " + realm + " with token, " + token.getTokenID();
+                authorizationDebugMessage = request.getRequestURI() + " Accessed using PassThroughAuthorizationFilter "
+                        + "by user, " + name + " on realm, " + realm + " with token, " + token.getTokenID()
+                        + ". Letting request through.";
             } catch (SSOException e) {
-                debugLogger.error("Error getting AMIdentity for token.", e);
+                debugLogger.error("Error getting AMIdentity for token. Not letting request through.", e);
                 return false;
             }
         }
