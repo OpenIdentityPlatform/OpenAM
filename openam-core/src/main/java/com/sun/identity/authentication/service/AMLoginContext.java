@@ -27,7 +27,7 @@
  */
 
 /**
- * Portions Copyrighted 2011-2012 ForgeRock Inc
+ * Portions Copyrighted 2011-2013 ForgeRock Inc
  */
 package com.sun.identity.authentication.service;
 
@@ -675,7 +675,7 @@ public class AMLoginContext {
             logFailedMessage = bundle.getString("invalidPasswd");
             logFailedError = "INVALIDPASSWORD";
             if (accountLocked) {
-                loginState.setErrorCode(AMAuthErrorCode.AUTH_USER_INACTIVE);
+                loginState.setErrorCode(AMAuthErrorCode.AUTH_USER_LOCKED);
                 if (failedUserId != null) {
                     loginState.logFailed(failedUserId, "LOCKEDOUT");
                 } else {
