@@ -26,10 +26,10 @@
 # $Id: amverifyarchive,v 1.11 2009/07/06 22:00:08 hvijay Exp $
 #
 
-# Portions Copyrighted 2011-2013 ForgeRock, Inc.
+# Portions Copyrighted 2011-2013 ForgeRock AS.
 
 TOOLS_HOME="@TOOLS_HOME@"
-JAVA_HOME="@JAVA_HOME@"
+JAVA_HOME="\@JAVA_HOME@"
 
 TOOLS_CLASSPATH="@CONFIG_DIR@"
 TOOLS_CLASSPATH="$TOOLS_CLASSPATH:$TOOLS_HOME/lib/forgerock-util-${commons.forgerock-util.version}.jar"

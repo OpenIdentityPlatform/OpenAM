@@ -26,7 +26,7 @@
 : $Id: ampassword.bat,v 1.18 2009/01/28 05:34:45 ww203982 Exp $
 :
 
-: Portions Copyrighted 2010-2013 ForgeRock, Inc.
+: Portions Copyrighted 2010-2013 ForgeRock AS.
 
 set TOOLS_HOME="@TOOLS_HOME@"
 
@@ -57,6 +57,6 @@ set CLASSPATH="%CLASSPATH%;lib/openam-shared-${project.version}.jar"
 set CLASSPATH="%CLASSPATH%;lib/openam-dtd-schema-${project.version}.jar"
 set CLASSPATH="%CLASSPATH%;lib/openam-rest-${project.version}.jar"
 
-"@JAVA_HOME@/bin/java.exe" -Xms64m -Xmx256m -classpath %CLASSPATH% -D"bootstrap.dir=@CONFIG_DIR@" -D"java.version.current=java.vm.version" -D"java.version.expected=1.4+"  -D"am.version.current=com.iplanet.am.version" -D"am.version.expected=@AM_VERSION@" com.iplanet.services.ldap.ServerConfigMgr %PARAMS%
+"\@JAVA_HOME@/bin/java.exe" -Xms64m -Xmx256m -classpath %CLASSPATH% -D"bootstrap.dir=@CONFIG_DIR@" -D"java.version.current=java.vm.version" -D"java.version.expected=1.4+"  -D"am.version.current=com.iplanet.am.version" -D"am.version.expected=@AM_VERSION@" com.iplanet.services.ldap.ServerConfigMgr %PARAMS%
 endlocal
 :END

@@ -5,7 +5,7 @@
     <!--
     * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
     *
-    * Copyright (c) 2011-2013 ForgeRock Inc. All Rights Reserved
+    * Copyright (c) 2011-2013 ForgeRock AS. All Rights Reserved
     *
     * The contents of this file are subject to the terms
     * of the Common Development and Distribution License
@@ -2009,7 +2009,7 @@
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-assembly-plugin</artifactId>
-                    <version>2.2-beta-5</version>
+                    <version>2.4</version>
                 </plugin>
                 <plugin>
                     <groupId>org.apache.portals.jetspeed-2</groupId>

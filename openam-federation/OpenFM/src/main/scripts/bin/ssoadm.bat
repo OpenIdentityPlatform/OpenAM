@@ -26,12 +26,12 @@
 : $Id: ssoadm.bat,v 1.19 2010/01/28 00:49:05 bigfatrat Exp $
 :
 
-: Portions Copyrighted 2010-2013 ForgeRock, Inc.
+: Portions Copyrighted 2010-2013 ForgeRock AS.
 
 setlocal
 
 IF NOT DEFINED JAVA_HOME (
-	set JAVA_HOME=@JAVA_HOME@
+	set JAVA_HOME=\@JAVA_HOME@
 )
 set TOOLS_HOME=@TOOLS_HOME@
 

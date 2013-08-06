@@ -25,10 +25,10 @@
 # $Id: ssoadm,v 1.20 2010/01/28 00:49:05 bigfatrat Exp $
 #
 
-# Portions Copyrighted 2010-2013 ForgeRock, Inc.
+# Portions Copyrighted 2010-2013 ForgeRock AS.
 
 if [ -z "$JAVA_HOME" ] ; then
-        JAVA_HOME="@JAVA_HOME@"
+        JAVA_HOME="\@JAVA_HOME@"
 fi
 
 TOOLS_HOME="@TOOLS_HOME@"
