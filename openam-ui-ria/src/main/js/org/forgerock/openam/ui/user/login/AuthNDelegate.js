@@ -43,9 +43,11 @@ define("org/forgerock/openam/ui/user/login/AuthNDelegate", [
         knownAuth = {}; // to be used to keep track of the attributes associated with whatever requirementList contains
     
     obj.begin = function () {
-        var args = {},
+        var url,
+            args = {},
             promise = $.Deferred(),
-            cookiePromise = $.Deferred();
+            cookiePromise = $.Deferred(),
+            i18nCookie = cookieHelper.getCookie('i18next');
         
         if (cookieName === "") {
             cookiePromise = obj.serviceCall({
@@ -65,9 +67,32 @@ define("org/forgerock/openam/ui/user/login/AuthNDelegate", [
 
         knownAuth = _.clone(configuration.globalData.auth);
         
+        url = "?" + $.param(args);
+        if(configuration.globalData.auth.additional){
+            if(args.realm){
+                url += configuration.globalData.auth.additional;
+            }
+            else{
+                //if no realm get rid of the 1st char ('&')
+                url += configuration.globalData.auth.additional.substring(1);
+            }
+        }
+        
+        //always tack on the locale to the url params of the following rest call
+        if(i18nCookie){
+            if(!configuration.globalData.auth.urlParams.locale){
+                if(args.realm || configuration.globalData.auth.additional){
+                    url += "&locale=" + i18nCookie;
+                }
+                else{
+                    url += "locale=" + i18nCookie;
+                }
+            }
+        }
+        
         obj.serviceCall({
                 type: "GET",
-                url: "?" + $.param(args) + (configuration.globalData.auth.additional || ""),
+                url: url,
                 errorsHandlers: {
                     "unauthorized": { status: "401"}
                 }
@@ -75,6 +100,10 @@ define("org/forgerock/openam/ui/user/login/AuthNDelegate", [
         .done(function (requirements) {
                     // only resolve the auth promise when we know the cookie name
                     cookiePromise.done(function () {
+                        var tokenCookie = cookieHelper.getCookie(cookieName);
+                        if(configuration.loggedUser && tokenCookie){
+                            requirements.tokenId = tokenCookie;
+                        }
                         promise.resolve(requirements);
                     });
                 })
@@ -122,7 +151,7 @@ define("org/forgerock/openam/ui/user/login/AuthNDelegate", [
                 obj.resetProcess();
                 promise.reject(failedStage);
             };
-     
+            
         obj.serviceCall({
             type: "POST",
             data: JSON.stringify(requirements),

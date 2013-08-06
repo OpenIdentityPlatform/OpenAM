@@ -34,8 +34,9 @@ define("org/forgerock/openam/ui/user/login/RESTLoginView", [
     "org/forgerock/commons/ui/common/main/SessionManager",
     "org/forgerock/commons/ui/common/main/Router",
     "org/forgerock/commons/ui/common/util/CookieHelper",
-    "org/forgerock/commons/ui/common/util/UIUtils"
-], function(AbstractView, authNDelegate, validatorsManager, eventManager, constants, conf, sessionManager, router, cookieHelper, uiUtils) {
+    "org/forgerock/commons/ui/common/util/UIUtils",
+    "org/forgerock/commons/ui/common/main/i18nManager"
+], function(AbstractView, authNDelegate, validatorsManager, eventManager, constants, conf, sessionManager, router, cookieHelper, uiUtils,i18nManager) {
     
     var LoginView = AbstractView.extend({
         template: "templates/openam/RESTLoginTemplate.html",
@@ -46,6 +47,18 @@ define("org/forgerock/openam/ui/user/login/RESTLoginView", [
         data: {},
         events: {
             "click input[type=submit]": "formSubmit"
+        },
+        autoLogin: function() {
+              var index,
+                  submitContent = {};
+              _.each(_.keys(conf.globalData.auth.urlParams),function(key){
+                  if(key.indexOf('IDToken') > -1){
+                      index = parseInt(key.substring(7),10) - 1;
+                      submitContent['callback_' + index] = conf.globalData.auth.urlParams['IDToken' + key.substring(7)]; 
+                  }
+              });
+              conf.globalData.auth.autoLoginAttempts = 1;
+              eventManager.sendEvent(constants.EVENT_LOGIN_REQUEST, submitContent);
         },
         formSubmit: function (e) {
             var submitContent,expire;
@@ -71,10 +84,32 @@ define("org/forgerock/openam/ui/user/login/RESTLoginView", [
             eventManager.sendEvent(constants.EVENT_LOGIN_REQUEST, submitContent);
         },
         render: function(args, callback) {
+            var urlParams = {};//deserialized querystring params
             
             if (args && args.length) {
                 conf.globalData.auth.realm = args[0];
                 conf.globalData.auth.additional = args[1]; // may be "undefined"
+                conf.globalData.auth.urlParams = urlParams;
+                
+                if(args[1]){
+                    urlParams = this.handleUrlParams();
+                }
+                
+                if(urlParams.realm && args[0] === "/"){
+                    if(urlParams.realm.substring(0,1) !== "/"){
+                        urlParams.realm = "/" + urlParams.realm;
+                    }
+                    conf.globalData.auth.realm = urlParams.realm;
+                }
+                
+                //if there are IDTokens try to login with the provided credentials
+                if(urlParams.IDToken1 && !conf.globalData.auth.autoLoginAttempts){
+                    this.autoLogin();
+                }
+                
+                if(urlParams.locale){
+                    i18nManager.setLanguage(urlParams.locale);
+                }
             }
             
             authNDelegate.getRequirements()
@@ -82,10 +117,20 @@ define("org/forgerock/openam/ui/user/login/RESTLoginView", [
                 var cleaned = _.clone(reqs),
                     implicitConfirmation = true;
                 
+                //clear out existing session if instructed 
+                if (reqs.hasOwnProperty("tokenId") && urlParams.arg === 'newsession') {
+                    sessionManager.logout();
+                    conf.setProperty('loggedUser', null);
+                }
+                
                 // if simply by asking for the requirements, we end up with a token, then we must have auto-logged-in somehow
-                if (reqs.hasOwnProperty("tokenId")) {
-                    eventManager.sendEvent(constants.EVENT_DISPLAY_MESSAGE_REQUEST, "loggedIn");
-                    
+                if (reqs.hasOwnProperty("tokenId") && urlParams.ForceAuth !== 'true') {
+                    //eventManager.sendEvent(constants.EVENT_DISPLAY_MESSAGE_REQUEST, "loggedIn");
+                    if(conf.globalData.auth.urlParams && conf.globalData.auth.urlParams.goto){
+                        window.location.href = decodeURIComponent(conf.globalData.auth.urlParams.goto);
+                        $('body').empty();
+                        return false;
+                    }
                     // if we have a token, let's see who we are logged in as....
                     sessionManager.getLoggedUser(function(user) {
                         conf.setProperty('loggedUser', user);
@@ -99,6 +144,10 @@ define("org/forgerock/openam/ui/user/login/RESTLoginView", [
                         } else {
                             router.navigate("", {trigger: true});
                         }
+                    },function(){
+                        //there is a tokenId but it is invalid so kill it
+                        sessionManager.logout();
+                        conf.setProperty('loggedUser', null);
                     });
                     
                 } else { // we aren't logged in yet, so render a form...
@@ -143,22 +192,29 @@ define("org/forgerock/openam/ui/user/login/RESTLoginView", [
                     this.reqs = reqs;
                     this.data.reqs = cleaned;
                     
-                    // attempt to load a stage-specific template to render this form.  If not found, use the generic one.
-                    uiUtils
-                        .fillTemplateWithData("templates/openam/authn/" + reqs.stage + ".html", 
-                            _.extend(conf.globalData, this.data),
-                            _.bind(function (populatedTemplate) {
-                                if (typeof populatedTemplate === "string") { // a rendered template will be a string; an error will be an object
-                                    this.template = "templates/openam/authn/" + reqs.stage + ".html";
-                                } else {
-                                    this.template = this.genericTemplate;
-                                }
-                                
-                                this.parentRender(_.bind(function() {
-                                    this.reloadData();
-                                }, this));
-                            }, this)
-                        );
+                    //is there an attempt at autologin happening?
+                    //if yes then don't render the form until it fails one time
+                    if(urlParams.IDToken1 && conf.globalData.auth.autoLoginAttempts === 1){
+                        conf.globalData.auth.autoLoginAttempts++;
+                    }
+                    else{
+                        // attempt to load a stage-specific template to render this form.  If not found, use the generic one.
+                        uiUtils
+                            .fillTemplateWithData("templates/openam/authn/" + reqs.stage + ".html", 
+                                _.extend(conf.globalData, this.data),
+                                _.bind(function (populatedTemplate) {
+                                    if (typeof populatedTemplate === "string") { // a rendered template will be a string; an error will be an object
+                                        this.template = "templates/openam/authn/" + reqs.stage + ".html";
+                                    } else {
+                                        this.template = this.genericTemplate;
+                                    }
+                                    
+                                    this.parentRender(_.bind(function() {
+                                        this.reloadData();
+                                    }, this));
+                                }, this)
+                            );
+                    }
                 
                 }
             }, this))
@@ -181,7 +237,23 @@ define("org/forgerock/openam/ui/user/login/RESTLoginView", [
             } else {
                 this.$el.find(":input:first").focus();
             }
-
+        },
+        handleUrlParams: function() {
+            var urlParams = uiUtils.convertCurrentUrlToJSON().params;
+            
+            //rest does not accept the params listed in the array below as is
+            //they must be transformed into the 'authIndexType' and 'authIndexValue' params
+            _.each(['authlevel','module','service','user'],function(p){
+                if(urlParams[p]){
+                    urlParams.authIndexType = p;
+                    urlParams.authIndexValue = urlParams[p];
+                    //***note special case for authLevel
+                    conf.globalData.auth.additional += '&authIndexType=' + ((p === 'authlevel') ? 'level' : p) + '&authIndexValue=' + urlParams[p];
+                }
+            });
+            
+            conf.globalData.auth.urlParams = urlParams;
+            return urlParams;
         }
     }); 
     
@@ -241,7 +313,6 @@ define("org/forgerock/openam/ui/user/login/RESTLoginView", [
         
         return new Handlebars.SafeString(result);
     });
-    
     
     return new LoginView();
 });
