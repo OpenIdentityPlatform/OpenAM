@@ -215,10 +215,6 @@ public class LoginState {
     Set orgFailureLoginURLSet = null;
     Map requestMap = new HashMap();
     /**
-     * Indicates whether to create a session once a user has been authenticated.
-     */
-    private boolean noSession = false;
-    /**
      * Indicates userID generate mode is enabled
      */
     public boolean userIDGeneratorEnabled;
@@ -646,8 +642,6 @@ public class LoginState {
                 this.requestMap.put(key,value);
             }
         }
-
-        noSession = Boolean.parseBoolean((String) requestHash.get(NO_SESSION_QUERY_PARAM));
     }
     
     /**
@@ -1167,7 +1161,7 @@ public class LoginState {
             setSuccessLoginURL(indexType,indexName);
 
             SessionID oldSessId = session.getID();
-            if (noSession) {
+            if (isNoSession()) {
                 //destroying the authentication session
                 AuthD.getSS().destroyInternalSession(oldSessId);
                 return true;
@@ -4379,7 +4373,7 @@ public class LoginState {
      * @return <code>true</code> if the authentication request was made with the noSession query parameter set to true.
      */
     public boolean isNoSession() {
-        return noSession;
+        return Boolean.parseBoolean((String) requestMap.get(NO_SESSION_QUERY_PARAM));
     }
     
     protected String getAccountLife() {
@@ -4763,9 +4757,13 @@ public class LoginState {
                     dataList.add(indexName);
                 }
             }
+            dataList.add("isNoSession=" + isNoSession());
             String[] data = (String[])dataList.toArray(new String[0]);
             String contextId = null;
-            SSOToken localSSOToken = getSSOToken();
+            SSOToken localSSOToken = null;
+            if (!isNoSession()) {
+                localSSOToken = getSSOToken();
+            }
             if (localSSOToken != null) {
                 contextId = localSSOToken.getProperty(Constants.AM_CTX_ID);
             }
@@ -4789,9 +4787,6 @@ public class LoginState {
             if (contextId != null) {
                 props.put(LogConstants.CONTEXT_ID, contextId);
             }
-            if (noSession) {
-                props.put(LogConstants.NO_SESSION, noSession);
-            }
             
             ad.logIt(data,ad.LOG_ACCESS,messageId.toString(), props);
         } catch (Exception e) {
@@ -4811,6 +4806,7 @@ public class LoginState {
             ArrayList dataList = new ArrayList();
             dataList.add(logSuccess);
 
+            dataList.add("isNoSession=" + isNoSession());
             String[] data = (String[])dataList.toArray(new String[0]);
             
             Hashtable props = new Hashtable();
@@ -4828,9 +4824,6 @@ public class LoginState {
             }
             if (session != null) {
                 props.put(LogConstants.LOGIN_ID_SID, sid.toString());
-            }
-            if (noSession) {
-                props.put(LogConstants.NO_SESSION, noSession);
             }
 
             ad.logIt(data, ad.LOG_ACCESS, logId, props);
@@ -4943,9 +4936,6 @@ public class LoginState {
             }
             if (contextId != null) {
                 props.put(LogConstants.CONTEXT_ID, contextId);
-            }
-            if (noSession) {
-                props.put(LogConstants.NO_SESSION, noSession);
             }
 
             ad.logIt(data,ad.LOG_ERROR,messageId.toString(), props);
@@ -5797,7 +5787,7 @@ public class LoginState {
      * failover is enabled
      */
     void updateSessionForFailover() {
-        if (!noSession) {
+        if (!isNoSession()) {
             InternalSession intSess = getSession();
             intSess.setIsISStored(true);
         }
