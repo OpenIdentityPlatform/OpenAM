@@ -26,19 +26,25 @@ package org.forgerock.openam.oauth2.model;
 
 import com.sun.identity.shared.OAuth2Constants;
 import org.forgerock.json.fluent.JsonValue;
-import org.forgerock.json.jwt.*;
+import org.forgerock.json.jose.builders.JwtBuilderFactory;
+import org.forgerock.json.jose.jwe.EncryptedJwt;
+import org.forgerock.json.jose.jwe.EncryptionMethod;
+import org.forgerock.json.jose.jwe.JweAlgorithm;
+import org.forgerock.json.jose.jws.JwsAlgorithm;
+import org.forgerock.json.jose.jws.SignedJwt;
+import org.forgerock.json.jose.jwt.JwtClaimsSet;
 
 import java.security.PrivateKey;
+import java.security.PublicKey;
 import java.security.SignatureException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.ResourceBundle;
-import java.util.Set;
 
 public class JWTToken extends CoreToken implements Token {
 
-    private PlaintextJwt jwt = null;
-    private JwtBuilder jwtBuilder = new JwtBuilder();
+    private JwtClaimsSet jwtClaimsSet = new JwtClaimsSet();
+    private JwtBuilderFactory jwtBuilderFactory = new JwtBuilderFactory();
     private static ResourceBundle rb = ResourceBundle.getBundle("OAuth2CoreToken");
 
     /**
@@ -65,21 +71,32 @@ public class JWTToken extends CoreToken implements Token {
         setNonce(nonce);
         setTokenType(OAuth2Constants.JWTTokenParams.JWT_TOKEN);
         setTokenName(OAuth2Constants.JWTTokenParams.ID_TOKEN);
-        jwt = jwtBuilder.jwt();
-        jwt = jwt.content(asMap());
-
+        jwtClaimsSet = jwtBuilderFactory.claims().claims(asMap()).build();
     }
 
-    public SignedJwt sign(JwsAlgorithm alg, PrivateKey pk) throws SignatureException{
-        return jwt.sign(alg, pk);
+    public SignedJwt sign(JwsAlgorithm alg, PrivateKey pk) throws SignatureException {
+        return jwtBuilderFactory.jws(pk)
+                .headers()
+                .alg(alg)
+                .done()
+                .claims(jwtClaimsSet)
+                .asJwt();
     }
 
-    public EncryptedJwt encrypt() throws SignatureException{
-        return jwt.encrypt();
+    public EncryptedJwt encrypt(PublicKey pk, JweAlgorithm alg, EncryptionMethod enc) throws SignatureException {
+        return jwtBuilderFactory.jwe(pk)
+                .headers()
+                .alg(alg)
+                .enc(enc)
+                .done()
+                .claims(jwtClaimsSet)
+                .asJwt();
     }
 
-    public String build(){
-        return jwt.build();
+    public String build() {
+        return jwtBuilderFactory.jwt()
+                .claims(jwtClaimsSet)
+                .build();
     }
 
     /**

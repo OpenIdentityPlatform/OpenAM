@@ -16,18 +16,15 @@
 
 package org.forgerock.openam.forgerockrest.authn;
 
-import com.iplanet.sso.SSOException;
 import com.iplanet.sso.SSOToken;
 import com.iplanet.sso.SSOTokenID;
-import com.sun.identity.authentication.service.AuthException;
 import com.sun.identity.authentication.spi.AuthLoginException;
 import com.sun.identity.authentication.spi.PagePropertiesCallback;
-import com.sun.identity.idm.IdRepoException;
 import com.sun.identity.shared.locale.L10NMessageImpl;
 import org.codehaus.jackson.map.ObjectMapper;
 import org.forgerock.json.fluent.JsonValue;
-import org.forgerock.json.jwt.PlaintextJwt;
-import org.forgerock.json.jwt.SignedJwt;
+import org.forgerock.json.jose.jws.SignedJwt;
+import org.forgerock.json.jose.jwt.JwtClaimsSet;
 import org.forgerock.openam.forgerockrest.authn.callbackhandlers.RestAuthCallbackHandlerResponseException;
 import org.forgerock.openam.forgerockrest.authn.core.AuthIndexType;
 import org.forgerock.openam.forgerockrest.authn.core.HttpMethod;
@@ -36,7 +33,6 @@ import org.forgerock.openam.forgerockrest.authn.core.LoginConfiguration;
 import org.forgerock.openam.forgerockrest.authn.core.LoginProcess;
 import org.forgerock.openam.forgerockrest.authn.core.LoginStage;
 import org.forgerock.openam.forgerockrest.authn.core.wrappers.AuthContextLocalWrapper;
-import org.forgerock.openam.forgerockrest.authn.core.wrappers.CoreServicesWrapper;
 import org.json.JSONException;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Matchers;
@@ -389,15 +385,15 @@ public class RestAuthenticationHandlerTest {
 
         given(loginAuthenticator.getLoginProcess(Matchers.<LoginConfiguration>anyObject())).willReturn(loginProcess);
 
-        PlaintextJwt plaintextJwt = mock(PlaintextJwt.class);
-        given(plaintextJwt.getContent("sessionId", String.class)).willReturn("SESSION_ID");
-        given(plaintextJwt.getContent("authIndexType", String.class))
-                .willReturn(AuthIndexType.MODULE.getIndexType().toString());
-        given(plaintextJwt.getContent("authIndexValue", String.class)).willReturn("INDEX_VALUE");
-        given(plaintextJwt.getContent("realm", String.class)).willReturn("REALM_DN");
-
         SignedJwt signedJwt = mock(SignedJwt.class);
-        given(signedJwt.getJwt()).willReturn(plaintextJwt);
+        JwtClaimsSet claimsSet = mock(JwtClaimsSet.class);
+
+        given(signedJwt.getClaimsSet()).willReturn(claimsSet);
+        given(claimsSet.getClaim("sessionId", String.class)).willReturn("SESSION_ID");
+        given(claimsSet.getClaim("authIndexType", String.class))
+                .willReturn(AuthIndexType.MODULE.getIndexType().toString());
+        given(claimsSet.getClaim("authIndexValue", String.class)).willReturn("INDEX_VALUE");
+        given(claimsSet.getClaim("realm", String.class)).willReturn("REALM_DN");
 
         given(authIdHelper.reconstructAuthId("AUTH_ID")).willReturn(signedJwt);
 

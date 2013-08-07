@@ -22,10 +22,15 @@ import com.iplanet.sso.SSOToken;
 import com.sun.identity.sm.SMSException;
 import com.sun.identity.sm.ServiceConfig;
 import com.sun.identity.sm.ServiceConfigManager;
-import org.forgerock.json.jwt.JwsAlgorithm;
-import org.forgerock.json.jwt.JwtBuilder;
-import org.forgerock.json.jwt.PlaintextJwt;
-import org.forgerock.json.jwt.SignedJwt;
+import org.forgerock.json.jose.builders.JwsHeaderBuilder;
+import org.forgerock.json.jose.builders.JwtBuilderFactory;
+import org.forgerock.json.jose.builders.JwtClaimsSetBuilder;
+import org.forgerock.json.jose.builders.SignedJwtBuilder;
+import org.forgerock.json.jose.builders.SignedJwtBuilderImpl;
+import org.forgerock.json.jose.jws.JwsAlgorithm;
+import org.forgerock.json.jose.jws.SignedJwt;
+import org.forgerock.json.jose.jwt.Algorithm;
+import org.forgerock.json.jose.jwt.JwtClaimsSet;
 import org.forgerock.openam.forgerockrest.authn.core.AuthIndexType;
 import org.forgerock.openam.forgerockrest.authn.core.LoginConfiguration;
 import org.forgerock.openam.forgerockrest.authn.core.wrappers.AuthContextLocalWrapper;
@@ -33,9 +38,11 @@ import org.forgerock.openam.forgerockrest.authn.core.wrappers.CoreServicesWrappe
 import org.forgerock.openam.forgerockrest.authn.exceptions.RestAuthException;
 import org.forgerock.openam.utils.AMKeyProvider;
 import org.mockito.ArgumentCaptor;
+import org.mockito.Matchers;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
+import java.security.Key;
 import java.security.PrivateKey;
 import java.security.SignatureException;
 import java.security.cert.X509Certificate;
@@ -54,28 +61,38 @@ public class AuthIdHelperTest {
 
     private CoreServicesWrapper coreServicesWrapper;
     private AMKeyProvider amKeyProvider;
-    private JwtBuilder jwtBuilder;
+    private JwtBuilderFactory jwtBuilderFactory;
 
-    private PlaintextJwt plaintextJwt;
-    private SignedJwt signedJwt;
+    private JwsHeaderBuilder jwsHeaderBuilder;
+    private JwtClaimsSetBuilder claimsSetBuilder;
 
     @BeforeMethod
     public void setUp() {
 
         coreServicesWrapper = mock(CoreServicesWrapper.class);
         amKeyProvider = mock(AMKeyProvider.class);
-        jwtBuilder = mock(JwtBuilder.class);
+        jwtBuilderFactory = mock(JwtBuilderFactory.class);
 
-        authIdHelper = new AuthIdHelper(coreServicesWrapper, amKeyProvider, jwtBuilder);
+        authIdHelper = new AuthIdHelper(coreServicesWrapper, amKeyProvider, jwtBuilderFactory);
 
-        plaintextJwt = mock(PlaintextJwt.class);
-        signedJwt = mock(SignedJwt.class);
-        given(jwtBuilder.jwt()).willReturn(plaintextJwt);
-        given(plaintextJwt.header(anyString(), anyString())).willReturn(plaintextJwt);
-        given(plaintextJwt.content(anyString(), anyString())).willReturn(plaintextJwt);
-        given(plaintextJwt.content(anyMap())).willReturn(plaintextJwt);
-        given(plaintextJwt.sign(eq(JwsAlgorithm.HS256), (PrivateKey) anyObject())).willReturn(signedJwt);
-        given(signedJwt.build()).willReturn("JWT_STRING");
+        jwsHeaderBuilder = mock(JwsHeaderBuilder.class);
+        claimsSetBuilder = mock(JwtClaimsSetBuilder.class);
+        JwtClaimsSet claimsSet = mock(JwtClaimsSet.class);
+        SignedJwtBuilderImpl signedJwtBuilder = mock(SignedJwtBuilderImpl.class);
+
+        given(jwtBuilderFactory.claims()).willReturn(claimsSetBuilder);
+        given(claimsSetBuilder.claim(anyString(), anyObject())).willReturn(claimsSetBuilder);
+        given(claimsSetBuilder.claims(anyMap())).willReturn(claimsSetBuilder);
+        given(claimsSetBuilder.build()).willReturn(claimsSet);
+
+
+        given(jwtBuilderFactory.jws(Matchers.<Key>anyObject())).willReturn(signedJwtBuilder);
+        given(signedJwtBuilder.headers()).willReturn(jwsHeaderBuilder);
+        given(jwsHeaderBuilder.alg(Matchers.<Algorithm>anyObject())).willReturn(jwsHeaderBuilder);
+        given(jwsHeaderBuilder.done()).willReturn(signedJwtBuilder);
+        given(signedJwtBuilder.claims(claimsSet)).willReturn(signedJwtBuilder);
+
+        given(signedJwtBuilder.build()).willReturn("JWT_STRING");
     }
 
     private void mockGetKeyAliasMethod(String orgName, boolean nullKeyAlias) throws SMSException, SSOException {
@@ -119,10 +136,10 @@ public class AuthIdHelperTest {
 
         //Then
         assertNotNull(authId);
-        verify(plaintextJwt).header("alg", JwsAlgorithm.HS256.toString());
-        verify(plaintextJwt).content(eq("otk"), anyString());
+        verify(jwsHeaderBuilder).alg(JwsAlgorithm.HS256);
+        verify(claimsSetBuilder).claim(eq("otk"), anyString());
         ArgumentCaptor<Map> contentArgumentCaptor = ArgumentCaptor.forClass(Map.class);
-        verify(plaintextJwt).content(contentArgumentCaptor.capture());
+        verify(claimsSetBuilder).claims(contentArgumentCaptor.capture());
         Map jwtContent = contentArgumentCaptor.getValue();
         assertTrue(jwtContent.containsKey("realm"));
         assertTrue(jwtContent.containsValue("ORG_DN"));
@@ -155,10 +172,10 @@ public class AuthIdHelperTest {
 
         //Then
         assertNotNull(authId);
-        verify(plaintextJwt).header("alg", JwsAlgorithm.HS256.toString());
-        verify(plaintextJwt).content(eq("otk"), anyString());
+        verify(jwsHeaderBuilder).alg(JwsAlgorithm.HS256);
+        verify(claimsSetBuilder).claim(eq("otk"), anyString());
         ArgumentCaptor<Map> argumentCaptor = ArgumentCaptor.forClass(Map.class);
-        verify(plaintextJwt).content(argumentCaptor.capture());
+        verify(claimsSetBuilder).claims(argumentCaptor.capture());
         Map jwtValues = argumentCaptor.getValue();
         assertTrue(jwtValues.containsKey("realm"));
         assertTrue(jwtValues.containsValue("ORG_DN"));
@@ -262,7 +279,7 @@ public class AuthIdHelperTest {
         authIdHelper.reconstructAuthId("AUTH_ID");
 
         //Then
-        verify(jwtBuilder).recontructJwt("AUTH_ID");
+        verify(jwtBuilderFactory).reconstruct("AUTH_ID", SignedJwt.class);
     }
 
     @Test
@@ -271,12 +288,10 @@ public class AuthIdHelperTest {
         //Given
         SignedJwt signedJwt = mock(SignedJwt.class);
         PrivateKey privateKey = mock(PrivateKey.class);
-        X509Certificate certificate = mock(X509Certificate.class);
 
-        given(jwtBuilder.recontructJwt("AUTH_ID")).willReturn(signedJwt);
-        given(signedJwt.verify(privateKey, certificate)).willReturn(true);
+        given(jwtBuilderFactory.reconstruct("AUTH_ID", SignedJwt.class)).willReturn(signedJwt);
+        given(signedJwt.verify(privateKey)).willReturn(true);
         given(amKeyProvider.getPrivateKey("KEY_ALIAS")).willReturn(privateKey);
-        given(amKeyProvider.getX509Certificate("KEY_ALIAS")).willReturn(certificate);
 
         mockGetKeyAliasMethod("REALM_DN", false);
 
@@ -284,8 +299,8 @@ public class AuthIdHelperTest {
         authIdHelper.verifyAuthId("REALM_DN", "AUTH_ID");
 
         //Then
-        verify(jwtBuilder).recontructJwt("AUTH_ID");
-        verify(signedJwt).verify(privateKey, certificate);
+        verify(jwtBuilderFactory).reconstruct("AUTH_ID", SignedJwt.class);
+        verify(signedJwt).verify(privateKey);
     }
 
     @Test
@@ -294,12 +309,10 @@ public class AuthIdHelperTest {
         //Given
         SignedJwt signedJwt = mock(SignedJwt.class);
         PrivateKey privateKey = mock(PrivateKey.class);
-        X509Certificate certificate = mock(X509Certificate.class);
 
-        given(jwtBuilder.recontructJwt("AUTH_ID")).willReturn(signedJwt);
-        given(signedJwt.verify(privateKey, certificate)).willReturn(false);
+        given(jwtBuilderFactory.reconstruct("AUTH_ID", SignedJwt.class)).willReturn(signedJwt);
+        given(signedJwt.verify(privateKey)).willReturn(false);
         given(amKeyProvider.getPrivateKey("KEY_ALIAS")).willReturn(privateKey);
-        given(amKeyProvider.getX509Certificate("KEY_ALIAS")).willReturn(certificate);
 
         mockGetKeyAliasMethod("REALM_DN", false);
 
@@ -313,8 +326,8 @@ public class AuthIdHelperTest {
         }
 
         //Then
-        verify(jwtBuilder).recontructJwt("AUTH_ID");
-        verify(signedJwt).verify(privateKey, certificate);
+        verify(jwtBuilderFactory).reconstruct("AUTH_ID", SignedJwt.class);
+        verify(signedJwt).verify(privateKey);
         assertTrue(exceptionCaught);
     }
 }

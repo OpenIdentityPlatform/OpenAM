@@ -24,35 +24,29 @@
 
 package org.forgerock.openam.ext.cts.repo;
 
-import java.security.AccessController;
-import java.security.PrivateKey;
-import java.security.SignatureException;
-import java.util.HashMap;
-import java.util.Set;
-import java.util.Map;
-import java.util.UUID;
-
-import com.iplanet.sso.SSOToken;
-import com.sun.identity.security.AdminTokenAction;
-import com.sun.identity.sm.ServiceConfig;
-import com.sun.identity.sm.ServiceConfigManager;
+import com.sun.identity.shared.OAuth2Constants;
 import org.forgerock.json.fluent.JsonValue;
 import org.forgerock.json.resource.JsonResource;
 import org.forgerock.json.resource.JsonResourceAccessor;
 import org.forgerock.json.resource.JsonResourceContext;
 import org.forgerock.json.resource.JsonResourceException;
 import org.forgerock.openam.ext.cts.CoreTokenService;
-import org.forgerock.openam.ext.cts.repo.OpenDJTokenRepo;
-import com.sun.identity.shared.OAuth2Constants;
-import org.forgerock.json.jwt.JwsAlgorithm;
-import org.forgerock.openam.oauth2.model.*;
 import org.forgerock.openam.oauth2.exceptions.OAuthProblemException;
+import org.forgerock.openam.oauth2.model.BearerToken;
+import org.forgerock.openam.oauth2.model.CoreToken;
+import org.forgerock.openam.oauth2.model.JWTToken;
+import org.forgerock.openam.oauth2.model.SessionClient;
+import org.forgerock.openam.oauth2.model.SessionClientImpl;
 import org.forgerock.openam.oauth2.provider.OAuth2ProviderSettings;
 import org.forgerock.openam.oauth2.provider.OAuth2TokenStore;
-import org.forgerock.openam.oauth2.provider.impl.OAuth2ProviderSettingsImpl;
 import org.forgerock.openam.oauth2.utils.OAuth2Utils;
 import org.restlet.Request;
 import org.restlet.data.Status;
+
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Set;
+import java.util.UUID;
 
 /**
  * Implementation of the OAuthTokenStore interface that uses the

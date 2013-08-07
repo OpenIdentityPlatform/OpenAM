@@ -23,7 +23,7 @@ import com.sun.identity.shared.debug.Debug;
 import com.sun.identity.shared.locale.L10NMessageImpl;
 import org.forgerock.json.fluent.JsonException;
 import org.forgerock.json.fluent.JsonValue;
-import org.forgerock.json.jwt.SignedJwt;
+import org.forgerock.json.jose.jws.SignedJwt;
 import org.forgerock.openam.forgerockrest.authn.callbackhandlers.RestAuthCallbackHandlerResponseException;
 import org.forgerock.openam.forgerockrest.authn.core.AuthIndexType;
 import org.forgerock.openam.forgerockrest.authn.core.AuthenticationContext;
@@ -146,11 +146,11 @@ public class RestAuthenticationHandler {
             String sessionId = null;
             if (authId != null) {
                 SignedJwt jwt = authIdHelper.reconstructAuthId(authId);
-                sessionId = jwt.getJwt().getContent("sessionId", String.class);
-                String authIndexTypeString = jwt.getJwt().getContent("authIndexType", String.class);
+                sessionId = jwt.getClaimsSet().getClaim("sessionId", String.class);
+                String authIndexTypeString = jwt.getClaimsSet().getClaim("authIndexType", String.class);
                 indexType = getAuthIndexType(authIndexTypeString);
-                indexValue = jwt.getJwt().getContent("authIndexValue", String.class);
-                String realmDN = jwt.getJwt().getContent("realm", String.class);
+                indexValue = jwt.getClaimsSet().getClaim("authIndexValue", String.class);
+                String realmDN = jwt.getClaimsSet().getClaim("realm", String.class);
                 authIdHelper.verifyAuthId(realmDN, authId);
             }
 

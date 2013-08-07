@@ -22,12 +22,13 @@ import com.iplanet.sso.SSOToken;
 import com.sun.identity.sm.SMSException;
 import com.sun.identity.sm.ServiceConfig;
 import com.sun.identity.sm.ServiceConfigManager;
-import org.forgerock.json.jwt.JwsAlgorithm;
-import org.forgerock.json.jwt.JwtBuilder;
-import org.forgerock.json.jwt.SignedJwt;
+import org.forgerock.json.jose.builders.JwtBuilderFactory;
+import org.forgerock.json.jose.jws.JwsAlgorithm;
+import org.forgerock.json.jose.jws.SignedJwt;
+import org.forgerock.json.jose.jwt.JwtClaimsSet;
 import org.forgerock.openam.forgerockrest.authn.core.AuthenticationContext;
-import org.forgerock.openam.forgerockrest.authn.core.wrappers.CoreServicesWrapper;
 import org.forgerock.openam.forgerockrest.authn.core.LoginConfiguration;
+import org.forgerock.openam.forgerockrest.authn.core.wrappers.CoreServicesWrapper;
 import org.forgerock.openam.forgerockrest.authn.exceptions.RestAuthException;
 import org.forgerock.openam.utils.AMKeyProvider;
 
@@ -37,7 +38,6 @@ import java.math.BigInteger;
 import java.security.PrivateKey;
 import java.security.SecureRandom;
 import java.security.SignatureException;
-import java.security.cert.X509Certificate;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
@@ -54,20 +54,21 @@ public class AuthIdHelper {
 
     private final CoreServicesWrapper coreServicesWrapper;
     private final AMKeyProvider amKeyProvider;
-    private final JwtBuilder jwtBuilder;
+    private final JwtBuilderFactory jwtBuilderFactory;
 
     /**
      * Constructs an instance of the AuthIdHelper.
      *
      * @param coreServicesWrapper An instance of the CoreServicesWrapper.
      * @param amKeyProvider An instance of the AMKeyProvider.
-     * @param jwtBuilder An instance of the JwtBuilder.
+     * @param jwtBuilderFactory An instance of the JwtBuilderFactory.
      */
     @Inject
-    public AuthIdHelper(CoreServicesWrapper coreServicesWrapper, AMKeyProvider amKeyProvider, JwtBuilder jwtBuilder) {
+    public AuthIdHelper(CoreServicesWrapper coreServicesWrapper, AMKeyProvider amKeyProvider,
+            JwtBuilderFactory jwtBuilderFactory) {
         this.coreServicesWrapper = coreServicesWrapper;
         this.amKeyProvider = amKeyProvider;
-        this.jwtBuilder = jwtBuilder;
+        this.jwtBuilderFactory = jwtBuilderFactory;
     }
 
     /**
@@ -147,11 +148,16 @@ public class AuthIdHelper {
 
         String otk = new BigInteger(130, RANDOM).toString(32);
 
-        String jwt = jwtBuilder.jwt()
-                .header("alg", JwsAlgorithm.HS256.toString())
-                .content("otk", otk)
-                .content(jwtValues)
-                .sign(JwsAlgorithm.HS256, privateKey)
+        JwtClaimsSet claimsSet = jwtBuilderFactory.claims()
+                .claim("otk", otk)
+                .claims(jwtValues)
+                .build();
+
+        String jwt = jwtBuilderFactory.jws(privateKey)
+                .headers()
+                .alg(JwsAlgorithm.HS256)
+                .done()
+                .claims(claimsSet)
                 .build();
 
         return jwt;
@@ -164,7 +170,7 @@ public class AuthIdHelper {
      * @return The JWT object.
      */
     public SignedJwt reconstructAuthId(String authId) {
-        return  (SignedJwt) jwtBuilder.recontructJwt(authId);
+        return jwtBuilderFactory.reconstruct(authId, SignedJwt.class);
     }
 
     /**
@@ -179,9 +185,8 @@ public class AuthIdHelper {
         String keyAlias = getKeyAlias(realmDN);
 
         PrivateKey privateKey = amKeyProvider.getPrivateKey(keyAlias);
-        X509Certificate certificate = amKeyProvider.getX509Certificate(keyAlias);
 
-        boolean verified = ((SignedJwt) jwtBuilder.recontructJwt(authId)).verify(privateKey, certificate);
+        boolean verified = jwtBuilderFactory.reconstruct(authId, SignedJwt.class).verify(privateKey);
         if (!verified) {
             throw new SignatureException("AuthId JWT Signature not valid");
         }
