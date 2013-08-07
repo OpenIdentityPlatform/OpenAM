@@ -87,7 +87,7 @@ fi
 
 CLASSPATH=""
 CLASSPATH="lib/openam-distribution-amadmsetup-${project.version}.jar"
-CLASSPATH="$CLASSPATH:lib/opendj-server-2.4.6.jar"
+CLASSPATH="$CLASSPATH:lib/opendj-server-${opendj.server.version}.jar"
 CLASSPATH="$CLASSPATH:lib/forgerock-util-${commons.forgerock-util.version}.jar"
 CLASSPATH="$CLASSPATH:lib/json-20090211.jar"
 CLASSPATH="$CLASSPATH:lib/xalan-2.7.1.jar"
