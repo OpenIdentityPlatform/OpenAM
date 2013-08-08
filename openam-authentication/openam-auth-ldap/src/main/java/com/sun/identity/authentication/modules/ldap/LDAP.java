@@ -775,9 +775,11 @@ public class LDAP extends AMLoginModule {
                     currentState = LoginScreen.PASSWORD_CHANGE.intValue();
                     break;
                 case PASSWORD_EXPIRED_STATE:
+                    setFailureID(ldapUtil.getUserId(userName));
                     currentState = LoginScreen.PASSWORD_EXPIRED_SCREEN.intValue();
                     break;
                 case ACCOUNT_LOCKED:
+                    setFailureID(ldapUtil.getUserId(userName));
                     currentState = LoginScreen.ACCOUNT_LOCKED.intValue();
                     break;
                 case GRACE_LOGINS:
