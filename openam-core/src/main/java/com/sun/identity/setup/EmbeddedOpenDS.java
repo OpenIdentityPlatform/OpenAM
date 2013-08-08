@@ -108,13 +108,6 @@ public class EmbeddedOpenDS {
     private static boolean serverStarted = false;
 
     /**
-     * List of Schema to be copied and applied during installation.
-     */
-    private static final String[] additionalSchemaToBeApplied = {
-            "/WEB-INF/template/ldif/sfha/cts-add-schema.ldif"
-    };
-
-    /**
      * Returns <code>true</code> if the server has already been started.
      *
      * @return <code>true</code> if the server has already been started.
@@ -242,10 +235,6 @@ public class EmbeddedOpenDS {
             }
         }
 
-        // ****************************************************
-        // Copy in additional Schemata Definitions.
-        copyFiles(additionalSchemaToBeApplied, odsRoot + "/template/config/schema/", servletCtx);
-
         // remove zip
         File toDelete = new File(odsRoot + "/opendj.zip");
         if (!toDelete.delete()) {
@@ -284,44 +273,6 @@ public class EmbeddedOpenDS {
 
             //EmbeddedOpenDS.startServer(odsRoot);
         } // End of single / first server check.
-    }
-
-    /**
-     * Helper Method to Copy Files.
-     *
-     * @param sourceFiles
-     * @param targetDirectory
-     * @throws IOException
-     */
-    protected static void copyFiles(String[] sourceFiles, String targetDirectory,
-                                    ServletContext servletCtx) throws IOException {
-        if ((targetDirectory == null) || (!new File(targetDirectory).exists())) {
-            Debug.getInstance(SetupConstants.DEBUG_NAME).error("Invalid Target Directory Destination: "
-                    + targetDirectory + ", Ignoring.");
-            return;
-        }
-        // ****************************************************
-        // Copy in additional Schemata Definitions.
-        for (String additionalSchemaSourceFileName : sourceFiles) {
-            File additionalSchemaSourceFile = new File(servletCtx.getRealPath(additionalSchemaSourceFileName));
-            if (!additionalSchemaSourceFile.canRead()) {
-                Debug.getInstance(SetupConstants.DEBUG_NAME).error("Unable to Read Schema File:["
-                        + additionalSchemaSourceFile.getAbsolutePath() + "], Ignoring!");
-                continue;
-            }
-            ReadableByteChannel inChannel = null;
-            FileChannel outChannel = null;
-            try {
-                // Copy over the File.
-                inChannel = new FileInputStream(additionalSchemaSourceFile).getChannel();
-                outChannel = new FileOutputStream(targetDirectory + additionalSchemaSourceFile.getName()).getChannel();
-                channelCopy(inChannel, outChannel);
-            } catch (IOException ioe) {
-                Debug.getInstance(SetupConstants.DEBUG_NAME).error(
-                        "EmbeddedOpenDS.setup(): Error copying schema file: " + additionalSchemaSourceFile.toString(), ioe);
-                throw ioe;
-            }
-        } // End of For Each Loop.
     }
 
     /**

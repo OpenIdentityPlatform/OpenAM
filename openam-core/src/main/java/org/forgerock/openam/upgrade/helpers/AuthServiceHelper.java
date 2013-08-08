@@ -1,7 +1,7 @@
 /**
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright (c) 2011 ForgeRock AS. All Rights Reserved
+ * Copyright (c) 2011-2013 ForgeRock AS. All Rights Reserved
  *
  * The contents of this file are subject to the terms
  * of the Common Development and Distribution License
@@ -48,12 +48,8 @@ public class AuthServiceHelper extends AbstractUpgradeHelper {
     private final static String SAFEWORD = "com.sun.identity.authentication.modules.safeword.SafeWord";
     private final static String UNIX = "com.sun.identity.authentication.modules.unix.Unix";
     private final static String ATTR = "iplanet-am-auth-authenticators";
-    
-    static {
-        initialize();
-    }
-    
-    private static void initialize() {
+
+    public AuthServiceHelper() {
         attributes.add(ATTR);
     }
     

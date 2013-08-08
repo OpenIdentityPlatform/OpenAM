@@ -263,6 +263,7 @@
         <module>openam-dashboard</module>
 
         <module>openam-examples</module>
+        <module>openam-annotations</module>
     </modules>
 
     <!-- Mailing Lists -->
@@ -592,6 +593,11 @@
             <dependency>
                 <groupId>org.forgerock.openam</groupId>
                 <artifactId>openam-dashboard</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.forgerock.openam</groupId>
+                <artifactId>openam-annotations</artifactId>
                 <version>${project.version}</version>
             </dependency>
             <dependency>

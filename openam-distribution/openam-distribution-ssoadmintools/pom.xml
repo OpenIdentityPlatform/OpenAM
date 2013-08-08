@@ -71,44 +71,16 @@
                                 <filter token="DATESTAMP" value="${war.time.stamp}" />
                                 <filter token="VERSION" value="${version.set}" />
 
-                                <concat destfile="${target.resources.dir}/amSDK.properties">
-                                    <fileset dir="${resources.i18n.dir}">
-                                        <include name="Services.properties" />
-                                        <include name="DSConfig.properties" />
-                                        <include name="ums.properties" />
-                                        <include name="sso.properties" />
-                                        <include name="SMS.properties" />
-                                        <include name="authentication_util.properties" />
-                                    </fileset>
-                                </concat>
-
-                                <java classname="com.sun.identity.tools.nightly.MergeSDKProperties" fork="true" failOnError="true" classpath="${build.class.path}">
-                                    <arg value="${resources.i18n.dir}" />
-                                    <arg value="${target.resources.dir}" />
-                                </java>
-
-                                <copy file="${target.resources.dir}/amSDK.properties" tofile="${target.resources.dir}/amSDK_en.properties" />
-
                                 <copy todir="${project.build.directory}/resources" overwrite="false" filtering="true">
                                     <fileset
                                             dir="${project.basedir}/../../openam-locale/src/main/resources/federation-locale">
                                         <include name="*.properties" />
-                                        <exclude name="Services.properties" />
-                                        <exclude name="ums.properties" />
-                                        <exclude name="sso.properties" />
-                                        <exclude name="SMS.properties" />
-                                        <exclude name="authentication_util.properties" />
                                     </fileset>
                                     <globmapper from="*.properties" to="*_en.properties" />
                                 </copy>
                                 <copy todir="${project.build.directory}/resources" overwrite="false" filtering="true" flatten="yes">
                                     <fileset dir="${project.basedir}/../../openam-locale/src/main/resources/locale">
                                         <include name="*.properties" />
-                                        <exclude name="Services.properties" />
-                                        <exclude name="ums.properties" />
-                                        <exclude name="sso.properties" />
-                                        <exclude name="SMS.properties" />
-                                        <exclude name="authentication_util.properties" />
                                     </fileset>
                                     <globmapper from="*.properties" to="*_en.properties" />
                                 </copy>
@@ -116,11 +88,6 @@
                                     <fileset
                                             dir="${project.basedir}/../../openam-locale/src/main/resources/openfm-locale">
                                         <include name="*.properties" />
-                                        <exclude name="Services.properties" />
-                                        <exclude name="ums.properties" />
-                                        <exclude name="sso.properties" />
-                                        <exclude name="SMS.properties" />
-                                        <exclude name="authentication_util.properties" />
                                     </fileset>
                                     <globmapper from="*.properties" to="*_en.properties" />
                                 </copy>
@@ -129,32 +96,17 @@
                                     <fileset
                                             dir="${project.basedir}/../../openam-locale/src/main/resources/federation-locale">
                                         <include name="**/*.properties" />
-                                        <exclude name="Services.properties" />
-                                        <exclude name="ums.properties" />
-                                        <exclude name="sso.properties" />
-                                        <exclude name="SMS.properties" />
-                                        <exclude name="authentication_util.properties" />
                                     </fileset>
                                 </copy>
                                 <copy todir="${project.build.directory}/resources" overwrite="false" filtering="true" flatten="yes">
                                     <fileset dir="${project.basedir}/../../openam-locale/src/main/resources/locale">
                                         <include name="**/*.properties" />
-                                        <exclude name="Services.properties" />
-                                        <exclude name="ums.properties" />
-                                        <exclude name="sso.properties" />
-                                        <exclude name="SMS.properties" />
-                                        <exclude name="authentication_util.properties" />
                                     </fileset>
                                 </copy>
                                 <copy todir="${project.build.directory}/resources" overwrite="false" filtering="true" flatten="yes">
                                     <fileset
                                             dir="${project.basedir}/../../openam-locale/src/main/resources/openfm-locale">
                                         <include name="**/*.properties" />
-                                        <exclude name="Services.properties" />
-                                        <exclude name="ums.properties" />
-                                        <exclude name="sso.properties" />
-                                        <exclude name="SMS.properties" />
-                                        <exclude name="authentication_util.properties" />
                                     </fileset>
                                 </copy>
 

@@ -151,7 +151,7 @@ public class UpgradeProgress {
 
     /**
      * Sets text mode.
-     * @param textMode true if output should be in text format or false in 
+     * @param textMode true if output should be in text format or false in
            html format.
      */
     public static void setTextMode(boolean textMode) {
@@ -164,7 +164,7 @@ public class UpgradeProgress {
       * @param str i18n key to be printed
       * @param param Object to be printed.
       */
-    public static void reportStart(String str, Object[] param) { 
+    public static void reportStart(String str, Object... param) {
         writeProgressText(str, param, false);
     }
 
@@ -173,7 +173,7 @@ public class UpgradeProgress {
      * @param str i18n key to be printed
      * @param param Object to be printed.
      */
-    public static void reportEnd(String str, Object[] param) {
+    public static void reportEnd(String str, Object... param) {
         writeProgressText(str, param, true);
     }
 
@@ -183,7 +183,7 @@ public class UpgradeProgress {
         boolean newline
     ) {
         String istr = null;
-        
+
         try {
             istr = bundle.getString(str);
             if ((param != null) && (param.length > 0)) {
@@ -221,5 +221,5 @@ public class UpgradeProgress {
         } catch (IOException ex) {
             //ignore
         }
-    }    
+    }
 }

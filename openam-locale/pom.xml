@@ -85,74 +85,16 @@
                                 <property name="openfm.resources.i18n.dir" value="${locale.resources}/openfm-locale" />
 
                                 <copy todir="${locale.target.resources.dir}" flatten="true">
-                                    <fileset dir="${locale.resources.i18n.dir}" includes="*.properties">
-                                                <exclude name="Services.properties"/>
-                                                <exclude name="ums.properties"/>
-                                                <exclude name="sso.properties"/>
-                                                <exclude name="SMS.properties"/>
-                                                <exclude name="authentication_util.properties"/>
-                                            </fileset>
-                                    <fileset dir="${library.resources.i18n.dir}" includes="*.properties">
-                                                <exclude name="Services.properties"/>
-                                                <exclude name="ums.properties"/>
-                                                <exclude name="sso.properties"/>
-                                                <exclude name="SMS.properties"/>
-                                                <exclude name="authentication_util.properties"/>
-                                            </fileset>
-                                    <fileset dir="${openfm.resources.i18n.dir}" includes="*.properties">
-                                                <exclude name="Services.properties"/>
-                                                <exclude name="ums.properties"/>
-                                                <exclude name="sso.properties"/>
-                                                <exclude name="SMS.properties"/>
-                                                <exclude name="authentication_util.properties"/>
-                                            </fileset>
+                                    <fileset dir="${locale.resources.i18n.dir}" includes="*.properties" />
+                                    <fileset dir="${library.resources.i18n.dir}" includes="*.properties" />
+                                    <fileset dir="${openfm.resources.i18n.dir}" includes="*.properties" />
                                 </copy>
                                 <copy todir="${locale.target.resources.dir}" flatten="true">
-                                    <fileset dir="${locale.resources.i18n.dir}" includes="*.properties">
-                                                <exclude name="Services.properties"/>
-                                                <exclude name="ums.properties"/>
-                                                <exclude name="sso.properties"/>
-                                                <exclude name="SMS.properties"/>
-                                                <exclude name="authentication_util.properties"/>
-                                            </fileset>
-                                    <fileset dir="${library.resources.i18n.dir}" includes="*.properties">
-                                                <exclude name="Services.properties"/>
-                                                <exclude name="ums.properties"/>
-                                                <exclude name="sso.properties"/>
-                                                <exclude name="SMS.properties"/>
-                                                <exclude name="authentication_util.properties"/>
-                                            </fileset>
-                                    <fileset dir="${openfm.resources.i18n.dir}" includes="*.properties">
-                                                <exclude name="Services.properties"/>
-                                                <exclude name="ums.properties"/>
-                                                <exclude name="sso.properties"/>
-                                                <exclude name="SMS.properties"/>
-                                                <exclude name="authentication_util.properties"/>
-                                            </fileset>
+                                    <fileset dir="${locale.resources.i18n.dir}" includes="*.properties" />
+                                    <fileset dir="${library.resources.i18n.dir}" includes="*.properties" />
+                                    <fileset dir="${openfm.resources.i18n.dir}" includes="*.properties" />
                                     <globmapper from="*.properties" to="*_en.properties"/>
                                 </copy>
-
-                                <concat destfile="${locale.target.resources.dir}/amSDK.properties">
-                                    <fileset dir="${locale.resources.i18n.dir}">
-                                        <include name="Services.properties"/>
-                                        <include name="DSConfig.properties"/>
-                                        <include name="ums.properties"/>
-                                        <include name="sso.properties"/>
-                                        <include name="SMS.properties"/>
-                                        <include name="authentication_util.properties"/>
-                                    </fileset>
-                                </concat>
-
-                                <java classname="com.sun.identity.tools.nightly.MergeSDKProperties"
-                                      fork="true" failOnError="true"
-                                      classpath="${build.class.path}">
-                                    <arg value="${locale.resources.i18n.dir}"/>
-                                    <arg value="${locale.target.resources.dir}"/>
-                                </java>
-
-                                <copy file="${locale.target.resources.dir}/amSDK.properties"
-                                      tofile="${locale.target.resources.dir}/amSDK_en.properties"/>
-
                             </target>
                         </configuration>
                         <goals>
@@ -247,12 +189,5 @@
             <groupId>org.forgerock.commons</groupId>
             <artifactId>i18n-core</artifactId>
         </dependency>
-        <dependency>
-            <groupId>org.forgerock.openam</groupId>
-            <artifactId>openam-build-tools</artifactId>
-            <version>${project.version}</version>
-            <scope>compile</scope>
-        </dependency>
     </dependencies>
-    
 </project>

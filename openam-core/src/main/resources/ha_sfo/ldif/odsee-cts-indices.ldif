@@ -1,0 +1,249 @@
+#
+# DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
+#
+# Copyright (c) 2013 ForgeRock AS. All Rights Reserved
+#
+# The contents of this file are subject to the terms
+# of the Common Development and Distribution License
+# (the License). You may not use this file except in
+# compliance with the License.
+#
+# You can obtain a copy of the License at
+# http://forgerock.org/license/CDDLv1.0.html
+# See the License for the specific language governing
+# permission and limitations under the License.
+#
+# When distributing Covered Code, include this CDDL
+# Header Notice in each file and include the License file
+# at http://forgerock.org/license/CDDLv1.0.html
+# If applicable, add the following below the CDDL Header,
+# with the fields enclosed by brackets [] replaced by
+# your own identifying information:
+# "Portions Copyrighted [year] [name of copyright owner]"
+#
+
+dn: cn=coreTokenExpirationDate,cn=@DB_NAME@,cn=ldbm database,cn=plugins,cn=config
+objectclass: top
+objectclass: nsIndex
+nsSystemIndex: false
+cn: coreTokenExpirationDate
+nsIndexType: eq
+nsIndexType: pres
+nsIndexType: sub
+
+dn: cn=coreTokenUserId,cn=@DB_NAME@,cn=ldbm database,cn=plugins,cn=config
+objectclass: top
+objectclass: nsIndex
+nsSystemIndex: false
+cn: coreTokenUserId
+nsIndexType: eq
+
+dn: cn=coreTokenString01,cn=@DB_NAME@,cn=ldbm database,cn=plugins,cn=config
+objectclass: top
+objectclass: nsIndex
+nsSystemIndex: false
+cn: coreTokenString01
+nsIndexType: eq
+
+dn: cn=coreTokenString02,cn=@DB_NAME@,cn=ldbm database,cn=plugins,cn=config
+objectclass: top
+objectclass: nsIndex
+nsSystemIndex: false
+cn: coreTokenString02
+nsIndexType: eq
+
+dn: cn=coreTokenString03,cn=@DB_NAME@,cn=ldbm database,cn=plugins,cn=config
+objectclass: top
+objectclass: nsIndex
+nsSystemIndex: false
+cn: coreTokenString03
+nsIndexType: eq
+
+dn: cn=coreTokenString04,cn=@DB_NAME@,cn=ldbm database,cn=plugins,cn=config
+objectclass: top
+objectclass: nsIndex
+nsSystemIndex: false
+cn: coreTokenString04
+nsIndexType: eq
+
+dn: cn=coreTokenString05,cn=@DB_NAME@,cn=ldbm database,cn=plugins,cn=config
+objectclass: top
+objectclass: nsIndex
+nsSystemIndex: false
+cn: coreTokenString05
+nsIndexType: eq
+
+dn: cn=coreTokenString06,cn=@DB_NAME@,cn=ldbm database,cn=plugins,cn=config
+objectclass: top
+objectclass: nsIndex
+nsSystemIndex: false
+cn: coreTokenString06
+nsIndexType: eq
+
+dn: cn=coreTokenString07,cn=@DB_NAME@,cn=ldbm database,cn=plugins,cn=config
+objectclass: top
+objectclass: nsIndex
+nsSystemIndex: false
+cn: coreTokenString07
+nsIndexType: eq
+
+dn: cn=coreTokenString08,cn=@DB_NAME@,cn=ldbm database,cn=plugins,cn=config
+objectclass: top
+objectclass: nsIndex
+nsSystemIndex: false
+cn: coreTokenString08
+nsIndexType: eq
+
+dn: cn=coreTokenString09,cn=@DB_NAME@,cn=ldbm database,cn=plugins,cn=config
+objectclass: top
+objectclass: nsIndex
+nsSystemIndex: false
+cn: coreTokenString09
+nsIndexType: eq
+
+dn: cn=coreTokenString10,cn=@DB_NAME@,cn=ldbm database,cn=plugins,cn=config
+objectclass: top
+objectclass: nsIndex
+nsSystemIndex: false
+cn: coreTokenString10
+nsIndexType: eq
+
+dn: cn=coreTokenString11,cn=@DB_NAME@,cn=ldbm database,cn=plugins,cn=config
+objectclass: top
+objectclass: nsIndex
+nsSystemIndex: false
+cn: coreTokenString11
+nsIndexType: eq
+
+dn: cn=coreTokenString12,cn=@DB_NAME@,cn=ldbm database,cn=plugins,cn=config
+objectclass: top
+objectclass: nsIndex
+nsSystemIndex: false
+cn: coreTokenString12
+nsIndexType: eq
+
+dn: cn=coreTokenString13,cn=@DB_NAME@,cn=ldbm database,cn=plugins,cn=config
+objectclass: top
+objectclass: nsIndex
+nsSystemIndex: false
+cn: coreTokenString13
+nsIndexType: eq
+
+dn: cn=coreTokenString14,cn=@DB_NAME@,cn=ldbm database,cn=plugins,cn=config
+objectclass: top
+objectclass: nsIndex
+nsSystemIndex: false
+cn: coreTokenString14
+nsIndexType: eq
+
+dn: cn=coreTokenString15,cn=@DB_NAME@,cn=ldbm database,cn=plugins,cn=config
+objectclass: top
+objectclass: nsIndex
+nsSystemIndex: false
+cn: coreTokenString15
+nsIndexType: eq
+
+dn: cn=coreTokenInteger01,cn=@DB_NAME@,cn=ldbm database,cn=plugins,cn=config
+objectclass: top
+objectclass: nsIndex
+nsSystemIndex: false
+cn: coreTokenInteger01
+nsIndexType: eq
+
+dn: cn=coreTokenInteger02,cn=@DB_NAME@,cn=ldbm database,cn=plugins,cn=config
+objectclass: top
+objectclass: nsIndex
+nsSystemIndex: false
+cn: coreTokenInteger02
+nsIndexType: eq
+
+dn: cn=coreTokenInteger03,cn=@DB_NAME@,cn=ldbm database,cn=plugins,cn=config
+objectclass: top
+objectclass: nsIndex
+nsSystemIndex: false
+cn: coreTokenInteger03
+nsIndexType: eq
+
+dn: cn=coreTokenInteger04,cn=@DB_NAME@,cn=ldbm database,cn=plugins,cn=config
+objectclass: top
+objectclass: nsIndex
+nsSystemIndex: false
+cn: coreTokenInteger04
+nsIndexType: eq
+
+dn: cn=coreTokenInteger05,cn=@DB_NAME@,cn=ldbm database,cn=plugins,cn=config
+objectclass: top
+objectclass: nsIndex
+nsSystemIndex: false
+cn: coreTokenInteger05
+nsIndexType: eq
+
+dn: cn=coreTokenInteger06,cn=@DB_NAME@,cn=ldbm database,cn=plugins,cn=config
+objectclass: top
+objectclass: nsIndex
+nsSystemIndex: false
+cn: coreTokenInteger06
+nsIndexType: eq
+
+dn: cn=coreTokenInteger07,cn=@DB_NAME@,cn=ldbm database,cn=plugins,cn=config
+objectclass: top
+objectclass: nsIndex
+nsSystemIndex: false
+cn: coreTokenInteger07
+nsIndexType: eq
+
+dn: cn=coreTokenInteger08,cn=@DB_NAME@,cn=ldbm database,cn=plugins,cn=config
+objectclass: top
+objectclass: nsIndex
+nsSystemIndex: false
+cn: coreTokenInteger08
+nsIndexType: eq
+
+dn: cn=coreTokenInteger09,cn=@DB_NAME@,cn=ldbm database,cn=plugins,cn=config
+objectclass: top
+objectclass: nsIndex
+nsSystemIndex: false
+cn: coreTokenInteger09
+nsIndexType: eq
+
+dn: cn=coreTokenInteger10,cn=@DB_NAME@,cn=ldbm database,cn=plugins,cn=config
+objectclass: top
+objectclass: nsIndex
+nsSystemIndex: false
+cn: coreTokenInteger10
+nsIndexType: eq
+
+dn: cn=coreTokenDate01,cn=@DB_NAME@,cn=ldbm database,cn=plugins,cn=config
+objectclass: top
+objectclass: nsIndex
+nsSystemIndex: false
+cn: coreTokenDate01
+nsIndexType: eq
+
+dn: cn=coreTokenDate02,cn=@DB_NAME@,cn=ldbm database,cn=plugins,cn=config
+objectclass: top
+objectclass: nsIndex
+nsSystemIndex: false
+cn: coreTokenDate02
+nsIndexType: eq
+
+dn: cn=coreTokenDate03,cn=@DB_NAME@,cn=ldbm database,cn=plugins,cn=config
+objectclass: top
+objectclass: nsIndex
+nsSystemIndex: false
+cn: coreTokenDate03
+nsIndexType: eq
+
+dn: cn=coreTokenDate04,cn=@DB_NAME@,cn=ldbm database,cn=plugins,cn=config
+objectclass: top
+objectclass: nsIndex
+nsSystemIndex: false
+cn: coreTokenDate04
+nsIndexType: eq
+
+dn: cn=coreTokenDate05,cn=@DB_NAME@,cn=ldbm database,cn=plugins,cn=config
+objectclass: top
+objectclass: nsIndex
+nsSystemIndex: false
+cn: coreTokenDate05
+nsIndexType: eq

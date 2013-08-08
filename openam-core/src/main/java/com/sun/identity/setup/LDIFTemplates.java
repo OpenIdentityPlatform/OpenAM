@@ -26,104 +26,54 @@
  */
 
 /*
- * Portions Copyrighted [2011] [ForgeRock AS]
+ * Portions Copyrighted 2011-2013 ForgeRock AS
  */
 package com.sun.identity.setup;
 
 import com.sun.identity.shared.debug.Debug;
-
 import java.io.File;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
+import java.util.Set;
 import javax.servlet.ServletContext;
 
 /**
  * This utility class manages LDIF template files.
  */
 public class LDIFTemplates {
-    private static List templates;
+
+    private static final List<String> templates = new ArrayList<String>();
+    private static final String PATH_PREFIX = "/WEB-INF/template/ldif/";
 
     static {
-        templates = new ArrayList();
-        templates.add("ad/ad_user_schema.ldif");
-        templates.add("adam/adam_user_schema.ldif");
-        templates.add("opendj/opendj_config_schema.ldif");
-        templates.add("opendj/opendj_user_schema.ldif");
-        templates.add("opendj/opendj_embinit.ldif");
-        templates.add("opendj/opendj_userinit.ldif");
-        templates.add("opendj/opendj_user_index.ldif");
-        templates.add("opendj/opendj_plugin.ldif");
-        templates.add("opendj/opendj_remove_user_schema.ldif");
-        templates.add("odsee/odsee_config_schema.ldif");
-        templates.add("odsee/odsee_config_index.ldif");
-        templates.add("odsee/odsee_user_index.ldif");
-        templates.add("odsee/odsee_user_schema.ldif");
-        templates.add("odsee/odsee_plugin.ldif");
-        templates.add("odsee/odsee_userinit.ldif");
-        templates.add("odsee/amsdk_plugin/amsdk_init_template.ldif");
-        templates.add("odsee/amsdk_plugin/amsdk_sunone_schema2.ldif");
-        templates.add("tivoli/tivoli_user_schema.ldif");
-        templates.add("sfha/cts-add-schema.ldif");
-        templates.add("sfha/cts-container.ldif");
-        templates.add("sfha/cts-indices-schema.ldif");
-        templates.add("sfha/odsee-cts-indices-schema.ldif");
+        templates.add("ad/");
+        templates.add("adam/");
+        templates.add("opendj/");
+        templates.add("odsee/");
+        templates.add("tivoli/");
+        templates.add("sfha/");
     }
 
     private LDIFTemplates() {
     }
 
     public static void copy(String dir, ServletContext servletCtx) {
-        for (Iterator i = templates.iterator(); i.hasNext(); ) {
-            String templ = (String) i.next();
-            String content = getContent(templ, servletCtx);
-            String newFile = dir + "/ldif/" + templ;
-            File file = new File(newFile);
-            file.getParentFile().mkdirs();
-            try {
-                AMSetupServlet.writeToFile(newFile, content);
-            } catch (IOException e) {
-                Debug.getInstance(SetupConstants.DEBUG_NAME).error(
-                        "LDIFTemplates.copy", e);
-            }
-        }
-    }
-
-    private static String getContent(
-            String templateName,
-            ServletContext servletCtx
-    ) {
-        InputStreamReader fin = null;
-        StringBuilder sbuf = new StringBuilder();
-
-        try {
-            InputStream inputStream = AMSetupServlet.getResourceAsStream(servletCtx,
-                    "/WEB-INF/template/ldif/" + templateName);
-            if (inputStream == null) {
-                return null;
-            }
-            fin = new InputStreamReader(inputStream);
-            char[] cbuf = new char[1024];
-            int len;
-            while ((len = fin.read(cbuf)) > 0) {
-                sbuf.append(cbuf, 0, len);
-            }
-        } catch (IOException e) {
-            Debug.getInstance(SetupConstants.DEBUG_NAME).error(
-                    "LDIFTemplates.getContent", e);
-        } finally {
-            if (fin != null) {
-                try {
-                    fin.close();
-                } catch (IOException e) {
-                    //ignore
+        for (String schemaDir : templates) {
+            Set<String> resourcePaths = servletCtx.getResourcePaths(PATH_PREFIX + schemaDir);
+            for (String resource : resourcePaths) {
+                if (resourcePaths != null) {
+                    try {
+                        StringBuffer content = AMSetupServlet.readFile(resource);
+                        String newPath = dir + "/ldif/" + resource.substring(PATH_PREFIX.length());
+                        File file = new File(newPath);
+                        file.getParentFile().mkdirs();
+                        AMSetupServlet.writeToFile(newPath, content.toString());
+                    } catch (IOException ioe) {
+                        Debug.getInstance(SetupConstants.DEBUG_NAME).error("LDIFTemplates.copy", ioe);
+                    }
                 }
             }
         }
-        return sbuf.toString();
     }
-
 }

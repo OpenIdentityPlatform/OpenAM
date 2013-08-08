@@ -26,30 +26,37 @@
  *
  */
 
-/*
- * Portions Copyrighted [2010] [ForgeRock AS]
+/**
+ * Portions Copyrighted 2010-2013 ForgeRock AS
  */
-
 package com.sun.identity.configuration;
 
 import com.iplanet.services.naming.WebtopNaming;
-import com.sun.identity.shared.Constants;
 import com.sun.identity.common.AttributeStruct;
 import com.sun.identity.common.PropertiesFinder;
 import com.sun.identity.common.SystemConfigurationUtil;
+import com.sun.identity.security.AdminTokenAction;
+import com.sun.identity.shared.Constants;
+import com.sun.identity.shared.datastruct.CollectionHelper;
+import com.sun.identity.shared.debug.Debug;
+import com.sun.identity.sm.OrganizationConfigManager;
+import com.sun.identity.sm.SMSException;
 import java.net.URL;
+import java.security.AccessController;
 import java.util.Collection;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.ResourceBundle;
+import java.util.Set;
 
 /**
  * This is the adapter class for Federation Manager to the shared library.
  * Mainly to provide system configuration information.
   */
 public class FedSystemProperties extends FedLibSystemProperties {
-    private static Map attributeMap = new HashMap();
+    private static Map<String, AttributeStruct> attributeMap = new HashMap<String, AttributeStruct>();
+    private static final String METADATA_SIGNING_KEY = "metadataSigningKey";
 
     static {
         initAttributeMapping();        
@@ -60,10 +67,9 @@ public class FedSystemProperties extends FedLibSystemProperties {
             systemConfigProps.clear();
         } 
         ResourceBundle rb = ResourceBundle.getBundle("serverAttributeMap");
-        for (Enumeration e = rb.getKeys(); e.hasMoreElements(); ) {
-            String propertyName = (String)e.nextElement();
-            attributeMap.put(propertyName, new AttributeStruct(
-                rb.getString(propertyName)));
+        for (Enumeration<String> e = rb.getKeys(); e.hasMoreElements(); ) {
+            String propertyName = e.nextElement();
+            attributeMap.put(propertyName, new AttributeStruct(rb.getString(propertyName)));
         }
     }
     
@@ -81,14 +87,28 @@ public class FedSystemProperties extends FedLibSystemProperties {
     @Override
     public String get(String key) {
         String value = null;
-        if (isServerMode()) {                    
-           AttributeStruct ast = (AttributeStruct)attributeMap.get(key);
-           if (ast != null) {
+        if (isServerMode()) {
+            AttributeStruct ast = attributeMap.get(key);
+            if (ast != null) {
                 value = PropertiesFinder.getProperty(key, ast);
             }
-        }        
-        return (value != null) ? value : getPropertyValue(key);
-       
+        }
+        if (key.startsWith(METADATA_SIGNING_KEY)) {
+            //this will be true for both the key alias and the password
+            int idx = key.indexOf('[');
+            String attribute = key.substring(0, idx);
+            String realm = key.substring(idx + 1, key.length() - 1);
+            try {
+                OrganizationConfigManager orgMgr = new OrganizationConfigManager(
+                        AccessController.doPrivileged(AdminTokenAction.getInstance()), realm);
+                Map<String, Set<String>> svcAttrs = orgMgr.getServiceAttributes("sunFAMSAML2Configuration");
+                return CollectionHelper.getMapAttr(svcAttrs, attribute);
+            } catch (SMSException smse) {
+                Debug.getInstance("libSAML2").error("Unable to retrieve " + attribute + " from realm: " + realm, smse);
+                return null;
+            }
+        }
+        return value != null ? value : getPropertyValue(key);
     }
     
     private boolean isServerMode() {

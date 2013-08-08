@@ -27,7 +27,9 @@
    $Id: famSAML2Config.xml,v 1.8 2009/06/12 22:21:43 mallas Exp $
                                                                                 
 -->
-
+<!--
+   Portions Copyrighted 2013 ForgeRock Inc
+-->
 
 <!DOCTYPE ServicesConfiguration 
     PUBLIC "=//iPlanet//Service Management Services (SMS) 1.0 DTD//EN" 
@@ -155,6 +157,24 @@
                     </DefaultValues>
                 </AttributeSchema>              
             </Global> 
+            <Organization>
+                <AttributeSchema name="metadataSigningKey"
+                    type="single"
+                    syntax="string"
+                    i18nKey="a113">
+                    <DefaultValues>
+                        <Value>test</Value>
+                    </DefaultValues>
+                </AttributeSchema>
+                <AttributeSchema name="metadataSigningKeyPass"
+                    type="single"
+                    syntax="password"
+                    i18nKey="a114">
+                    <DefaultValues>
+                        <Value>changeit</Value>
+                    </DefaultValues>
+                </AttributeSchema>
+            </Organization>
         </Schema> 
     </Service> 
 </ServicesConfiguration> 

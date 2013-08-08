@@ -51,10 +51,20 @@ public class ServiceSchemaModificationWrapper {
      * @param schemaName The name of the sub schema within the service
      */
     public ServiceSchemaModificationWrapper(String serviceName, String schemaName) {
-        this.serviceName = serviceName;
-        this.schemaName = schemaName;       
-        attributes = new HashSet<AttributeSchemaImpl>();
-        subSchemas = new HashMap<String, ServiceSchemaModificationWrapper>();
+        this(serviceName, schemaName, new HashSet<AttributeSchemaImpl>());
+    }
+
+    /**
+     * Create a new wrapper for a services attribute modifications
+     *
+     * @param serviceName The name of the service
+     * @param schemaName The name of the schema
+     * @param attrs Set of modified attributes
+     */
+    public ServiceSchemaModificationWrapper(String serviceName,
+                                            String schemaName,
+                                            Set<AttributeSchemaImpl> attrs) {
+        this(serviceName, schemaName, attrs, new HashMap<String, ServiceSchemaModificationWrapper>());
     }
     
     /**

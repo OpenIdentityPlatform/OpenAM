@@ -27,7 +27,7 @@
  */
 
 /**
- * Portions Copyrighted 2010-2012 ForgeRock Inc
+ * Portions Copyrighted 2010-2013 ForgeRock Inc
  */
 package com.sun.identity.saml2.meta;
 
@@ -591,12 +591,7 @@ public final class SAML2MetaUtils {
 	    }
 
 	    if (sign) {
-		SPSSOConfigElement spConfig = metaManager.getSPSSOConfig(
-		    realm, entityID);
-		IDPSSOConfigElement idpConfig = metaManager.getIDPSSOConfig(
-                    realm, entityID);
-		Document doc = SAML2MetaSecurityUtils.sign(descriptor,
-                    spConfig, idpConfig);
+		Document doc = SAML2MetaSecurityUtils.sign(realm, descriptor);
 		if (doc != null) {
                     xmlstr = XMLUtils.print(doc);
 		}

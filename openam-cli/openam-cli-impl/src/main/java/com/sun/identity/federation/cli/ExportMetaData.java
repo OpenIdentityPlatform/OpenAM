@@ -26,6 +26,9 @@
  *
  */
 
+/**
+ * Portions Copyrighted 2013 ForgeRock AS
+ */
 package com.sun.identity.federation.cli;
 
 import com.sun.identity.shared.xml.XMLUtils;
@@ -41,8 +44,6 @@ import com.sun.identity.federation.meta.IDFFMetaManager;
 import com.sun.identity.federation.meta.IDFFMetaUtils;
 import com.sun.identity.saml2.common.SAML2Constants;
 import com.sun.identity.saml2.jaxb.entityconfig.EntityConfigElement;
-import com.sun.identity.saml2.jaxb.entityconfig.IDPSSOConfigElement;
-import com.sun.identity.saml2.jaxb.entityconfig.SPSSOConfigElement;
 import com.sun.identity.saml2.jaxb.metadata.EntityDescriptorElement;
 import com.sun.identity.saml2.meta.SAML2MetaConstants;
 import com.sun.identity.saml2.meta.SAML2MetaException;
@@ -205,12 +206,7 @@ public class ExportMetaData extends AuthenticatedCommand {
                     objs2), ExitCodes.REQUEST_CANNOT_BE_PROCESSED);
             }
             
-            SPSSOConfigElement spConfig = metaManager.getSPSSOConfig(
-                realm, entityID);
-            IDPSSOConfigElement idpConfig = metaManager.getIDPSSOConfig(
-                realm, entityID);
-            Document doc = SAML2MetaSecurityUtils.sign(
-                descriptor, spConfig, idpConfig);
+            Document doc = SAML2MetaSecurityUtils.sign(realm, descriptor);
             if (doc == null) {
                 runExportMeta();
                 return;

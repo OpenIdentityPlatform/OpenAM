@@ -58,25 +58,11 @@
         </copy>
  
         <mkdir dir="${openam.temp.target}/WEB-INF/template/ldif/sfha"/>
-        <copy file="${project.basedir}/../openam-core/src/main/resources/ha_sfo/ldif/cts-container.ldif.template"
-              tofile="${openam.temp.target}/WEB-INF/template/ldif/sfha/cts-container.ldif"
-              filtering="false"/>
-
-        <copy file="${project.basedir}/../openam-core/src/main/resources/ha_sfo/ldif/cts-indices-schema.ldif"
-              tofile="${openam.temp.target}/WEB-INF/template/ldif/sfha/cts-indices-schema.ldif"
-              filtering="false"/>
-
-        <copy file="${project.basedir}/../openam-core/src/main/resources/ha_sfo/ldif/odsee-cts-indices-schema.ldif"
-              tofile="${openam.temp.target}/WEB-INF/template/ldif/sfha/odsee-cts-indices-schema.ldif"
-              filtering="false"/>
-
-        <copy file="${project.basedir}/../openam-core/src/main/resources/ha_sfo/ldif/cts-add-schema.ldif"
-              tofile="${openam.temp.target}/WEB-INF/template/ldif/sfha/cts-add-schema.ldif"
-              filtering="false"/>
-
-        <copy file="${project.basedir}/../openam-core/src/main/resources/ha_sfo/ldif/cts-delete-schema.ldif"
-              tofile="${openam.temp.target}/WEB-INF/template/ldif/sfha/cts-delete-schema.ldif"
-              filtering="false"/>
+        <copy todir="${openam.temp.target}/WEB-INF/template/ldif/sfha" filtering="false">
+            <fileset dir="${project.basedir}/../openam-core/src/main/resources/ha_sfo/ldif/">
+                <include name="*.ldif" />
+            </fileset>
+        </copy>
 
         <mkdir dir="${openam.temp.target}/WEB-INF/template/sms"/>
         <copy todir="${openam.temp.target}/WEB-INF/template/sms" filtering="true">
@@ -103,22 +89,12 @@
         <copy todir="${amserver.target.resources.dir}" flatten="true" filtering="true">
             <fileset dir="${amserver.resources.i18n.dir}">
                 <include name="**/*.properties"/>
-                <exclude name="Services.properties"/>
-                <exclude name="ums.properties"/>
-                <exclude name="sso.properties"/>
-                <exclude name="SMS.properties"/>
-                <exclude name="authentication_util.properties"/>
             </fileset>
         </copy>
 
         <copy todir="${amserver.target.resources.dir}" filtering="true">
             <fileset dir="${amserver.resources.i18n.dir}">
                 <include name="**/*.properties"/>
-                <exclude name="Services.properties"/>
-                <exclude name="ums.properties"/>
-                <exclude name="sso.properties"/>
-                <exclude name="SMS.properties"/>
-                <exclude name="authentication_util.properties"/>
             </fileset>
             <globmapper from="*.properties" to="*_en.properties"/>
         </copy>
@@ -307,27 +283,6 @@
                 <include name="*.*"/>
             </fileset>
         </copy>
-
-        <concat destfile="${amserver.target.resources.dir}/amSDK.properties">
-            <fileset dir="${amserver.resources.i18n.dir}">
-                <include name="Services.properties"/>
-                <include name="DSConfig.properties"/>
-                <include name="ums.properties"/>
-                <include name="sso.properties"/>
-                <include name="SMS.properties"/>
-                <include name="authentication_util.properties"/>
-            </fileset>
-        </concat>
-
-        <java classname="com.sun.identity.tools.nightly.MergeSDKProperties"
-              fork="true" failOnError="true" classpath="${build.class.path}">
-            <arg value="${amserver.resources.i18n.dir}"/>
-            <arg value="${amserver.target.resources.dir}"/>
-        </java>
-
-        <copy file="${amserver.target.resources.dir}/amSDK.properties"
-              tofile="${amserver.target.resources.dir}/amSDK_en.properties"/>
-
 
         <!-- Align the Console Definitions for WAR Inclusion. -->
         <copy todir="${project.build.directory}/classes" overwrite="false">

@@ -27,7 +27,7 @@
  */
 
 /*
- * Portions Copyrighted [2010-2011] [ForgeRock AS]
+ * Portions Copyrighted 2010-2013 ForgeRock AS
  */
 
 package com.sun.identity.setup;
@@ -57,6 +57,8 @@ import java.util.Map;
 import java.util.Properties;
 import java.util.StringTokenizer;
 import com.sun.identity.shared.ldap.util.DN;
+import org.forgerock.openam.upgrade.DirectoryContentUpgrader;
+import org.forgerock.openam.upgrade.UpgradeException;
 
 public class BootstrapData {
     private List data = new ArrayList();
@@ -142,7 +144,7 @@ public class BootstrapData {
     public String getDsameUserPassword() {
         return dsameUserPwd;
     }
-    
+
     /**
       * Gets attributes in a given row as a <code>Map</code>.
       * @param idx row (starting with 0)
@@ -183,6 +185,13 @@ public class BootstrapData {
         
         if (startDS) {
             startEmbeddedDS(basedir + AMSetupServlet.OPENDS_DIR);
+            if (AMSetupServlet.isOpenDJUpgraded()) {
+                try {
+                    new DirectoryContentUpgrader(basedir, dsbasedn).upgrade();
+                } catch (UpgradeException ue) {
+                    throw new IllegalStateException("An error occurred while upgrading directory content", ue);
+                }
+            }
         } else {
             EmbeddedOpenDS.initializeForClientUse();
         }

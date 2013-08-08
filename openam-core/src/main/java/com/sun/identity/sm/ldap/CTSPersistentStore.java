@@ -23,6 +23,8 @@ package com.sun.identity.sm.ldap;
 import com.iplanet.dpro.session.exceptions.StoreException;
 import com.iplanet.dpro.session.service.SessionService;
 import com.sun.identity.common.GeneralTaskRunnable;
+import com.sun.identity.common.ShutdownListener;
+import com.sun.identity.common.ShutdownManager;
 import com.sun.identity.shared.Constants;
 import com.sun.identity.shared.configuration.SystemPropertiesManager;
 import com.sun.identity.shared.debug.Debug;
@@ -51,7 +53,6 @@ import java.text.MessageFormat;
 import java.util.Calendar;
 import java.util.Collection;
 import java.util.HashMap;
-import java.util.LinkedHashSet;
 import java.util.LinkedList;
 import java.util.Map;
 
@@ -109,8 +110,6 @@ public class CTSPersistentStore extends GeneralTaskRunnable {
      * Service Globals
      */
     private static volatile boolean shutdown = false;
-    private static volatile boolean ditVerified = false;
-    private static volatile int attemptsToVerifyDIT = 0;
 
 
     private final static String ID = "CTSPersistentStore";
@@ -179,12 +178,6 @@ public class CTSPersistentStore extends GeneralTaskRunnable {
                     TOKEN_OAUTH2_HA_ROOT_SUFFIX + Constants.COMMA + TOKEN_ROOT;
 
     /**
-     * Return Attribute Constructs
-     */
-    private static LinkedHashSet<String> returnAttrs_DN_ONLY;
-    private static String[] returnAttrs_DN_ONLY_ARRAY;
-
-    /**
      * Private restricted to preserve Singleton Instantiation.
      */
     private CTSPersistentStore(CoreTokenConfig coreTokenConfig, LDAPDataConversion dataConversion,
@@ -213,10 +206,6 @@ public class CTSPersistentStore extends GeneralTaskRunnable {
                         new TokenEncryption(),
                         connectionFactory);
 
-                returnAttrs_DN_ONLY = new LinkedHashSet<String>();
-                returnAttrs_DN_ONLY.add("dn");
-                returnAttrs_DN_ONLY_ARRAY = returnAttrs_DN_ONLY.toArray(new String[returnAttrs_DN_ONLY.size()]);
-
                 // Proceed With Initialization of Service.
                 try {
                     // Initialize the Initial Singleton Service Instance.
@@ -226,31 +215,6 @@ public class CTSPersistentStore extends GeneralTaskRunnable {
                     DEBUG.error("CTS Persistent Store requests will be Ignored, until this condition is resolved!");
                 }
             }
-
-            if (!ditVerified) {
-                try {
-                    if (attemptsToVerifyDIT > 3) {
-                        // limit the number of Attempts that can possible be performed.
-                        return null;
-                    }
-                    attemptsToVerifyDIT++;
-                    CTSDataUtils ctsDataUtils = new CTSDataUtils(instance);
-                    if (!ctsDataUtils.isDITValid()) {
-                        DEBUG.warning("Existing CTS DIT Structure is not valid, attempting automatic upgrade of Directory.");
-                        if (ctsDataUtils.upgradeDIT()) {
-                            DEBUG.warning("CTS DIT Upgrade was Successful.");
-                        } else {
-                            DEBUG.error("CTS DIT Upgrade was not Successful, CTS persistence will be ignored until DIT fixed.");
-                            return null;
-                        }
-                    } // End of If Upgrade Check.
-                    // Set our Flag that our DIT Structure and schema has been verified and allow normal operations.
-                    ditVerified = true;
-                } catch (StoreException se) {
-                    DEBUG.error("Exception occurred verifying the CTS DIT Structure and Schemata, Please Verify Directory Configuration.", se);
-                    return null;
-                }
-            } // End of ditVerified if Check.
         } // End of synchronized block.
         // Return Instance.
         return instance;
@@ -268,11 +232,20 @@ public class CTSPersistentStore extends GeneralTaskRunnable {
         }
         // *******************************
         // Set up Shutdown Thread Hook.
-        Runtime.getRuntime().addShutdownHook(new Thread() {
-            public void run() {
-                internalShutdown();
+        ShutdownManager shutdownManager = ShutdownManager.getInstance();
+        if (shutdownManager.acquireValidLock()) {
+            try {
+                shutdownManager.addShutdownListener(new ShutdownListener() {
+                    @Override
+                    public void shutdown() {
+                        internalShutdown();
+                    }
+                });
+            } finally {
+                shutdownManager.releaseLockAndNotify();
             }
-        });
+        }
+
         // *************************************************************
         // Obtain our Directory Connection and ensure we can access our
         // Internal Directory Connection or use an External Source as
@@ -725,10 +698,6 @@ public class CTSPersistentStore extends GeneralTaskRunnable {
 
     protected static String getOauth2HaBaseDn() {
         return getFormattedDNString(OAUTH2_HA_BASE_DN, null, null);
-    }
-
-    protected static String[] getReturnAttrs_DN_ONLY_ARRAY() {
-        return returnAttrs_DN_ONLY_ARRAY;
     }
 
     /**

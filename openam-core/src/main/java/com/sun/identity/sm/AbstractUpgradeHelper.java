@@ -1,7 +1,7 @@
 /**
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright (c) 2011 ForgeRock AS. All Rights Reserved
+ * Copyright (c) 2011-2013 ForgeRock AS. All Rights Reserved
  *
  * The contents of this file are subject to the terms
  * of the Common Development and Distribution License
@@ -45,7 +45,7 @@ public abstract class AbstractUpgradeHelper implements UpgradeHelper {
             + SMSUtils.ATTRIBUTE_DEFAULT_ELEMENT + ">";
     private static final String VALUE_BEGIN = "<" + SMSUtils.ATTRIBUTE_VALUE + ">";
     private static final String VALUE_END = "</" + SMSUtils.ATTRIBUTE_VALUE + ">";
-    protected static Set<String> attributes = new HashSet<String>();
+    protected final Set<String> attributes = new HashSet<String>();
     
     protected AttributeSchemaImpl updateDefaultValues(AttributeSchemaImpl attribute, Set<String> defaultValues) 
     throws UpgradeException {
@@ -92,7 +92,8 @@ public abstract class AbstractUpgradeHelper implements UpgradeHelper {
     public abstract AttributeSchemaImpl upgradeAttribute(AttributeSchemaImpl oldAttr, AttributeSchemaImpl newAttr)
     throws UpgradeException;
 
-    public Set<String> getAttributes() {
+    @Override
+    public final Set<String> getAttributes() {
         return attributes;
     }
 }

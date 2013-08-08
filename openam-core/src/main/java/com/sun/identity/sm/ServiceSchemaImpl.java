@@ -27,7 +27,7 @@
  */
 
 /*
- * Portions Copyrighted 2012 ForgeRock Inc
+ * Portions Copyrighted 2012-2013 ForgeRock Inc
  */
 package com.sun.identity.sm;
 
@@ -73,7 +73,7 @@ class ServiceSchemaImpl {
 
     Set searchableAttributeNames;
 
-    Map attrSchemas;
+    Map<String, AttributeSchemaImpl> attrSchemas;
 
     Map attrValidators;
 
@@ -152,8 +152,8 @@ class ServiceSchemaImpl {
      * Returns the names of the schema attributes defined for the service. It
      * does not return the schema attributes defined for the sub-schema.
      */
-    Set getAttributeSchemaNames() {
-        return (new HashSet(attrSchemas.keySet()));
+    Set<String> getAttributeSchemaNames() {
+        return new HashSet<String>(attrSchemas.keySet());
     }
 
     /**
@@ -191,11 +191,11 @@ class ServiceSchemaImpl {
      * the top level for the service and not from the sub-schema.
      */
     AttributeSchemaImpl getAttributeSchema(String attributeName) {
-        return ((AttributeSchemaImpl) attrSchemas.get(attributeName));
+        return attrSchemas.get(attributeName);
     }
 
-    Set getAttributeSchemas() {
-        return (new HashSet(attrSchemas.values()));
+    Set<AttributeSchemaImpl> getAttributeSchemas() {
+        return new HashSet<AttributeSchemaImpl>(attrSchemas.values());
     }
 
     /**
@@ -301,7 +301,7 @@ class ServiceSchemaImpl {
         // Attributes
         if (attrSchemas.size() > 0) {
             sb.append("Attribute Schemas:\n");
-            Iterator items = attrSchemas.keySet().iterator();
+            Iterator<String> items = attrSchemas.keySet().iterator();
             while (items.hasNext()) {
                 sb.append(attrSchemas.get(items.next()).toString());
             }
@@ -353,7 +353,7 @@ class ServiceSchemaImpl {
         // Update sub-schema's, organization schema and attributes
         Set newServiceAttributes = new HashSet();
         Set newSearchableAttributeNames = new HashSet();
-        Map newAttrSchemas = new HashMap();
+        Map<String, AttributeSchemaImpl> newAttrSchemas = new HashMap<String, AttributeSchemaImpl>();
         Map newAttrValidators = new HashMap();
         Map newAttrDefaults = new HashMap();
         Map newSubSchemas = new CaseInsensitiveHashMap();
@@ -366,7 +366,7 @@ class ServiceSchemaImpl {
             if (node.getNodeName().equals(SMSUtils.SCHEMA_ATTRIBUTE)) {
                 AttributeSchemaImpl asi = null;
                 if (attrSchemas != null) {
-                    asi = (AttributeSchemaImpl) attrSchemas.get(name);
+                    asi = attrSchemas.get(name);
                 }
                 if (asi == null) {
                     asi = new AttributeSchemaImpl(node);

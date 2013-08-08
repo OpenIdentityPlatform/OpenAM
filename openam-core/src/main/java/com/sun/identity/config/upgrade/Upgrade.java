@@ -1,7 +1,7 @@
 /**
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright (c) 2011 ForgeRock AS. All Rights Reserved
+ * Copyright (c) 2011-2013 ForgeRock AS. All Rights Reserved
  *
  * The contents of this file are subject to the terms
  * of the Common Development and Distribution License
@@ -22,7 +22,6 @@
  * "Portions Copyrighted [year] [name of copyright owner]"
  *
  */
-
 package com.sun.identity.config.upgrade;
 
 import com.iplanet.sso.SSOToken;
@@ -30,10 +29,7 @@ import com.sun.identity.config.util.AjaxPage;
 import com.sun.identity.security.AdminTokenAction;
 import com.sun.identity.shared.debug.Debug;
 import java.security.AccessController;
-import javax.servlet.http.HttpServletRequestWrapper;
-import javax.servlet.http.HttpServletResponseWrapper;
 import org.apache.click.control.ActionLink;
-import org.forgerock.openam.upgrade.ServiceUpgradeWrapper;
 import org.forgerock.openam.upgrade.UpgradeException;
 import org.forgerock.openam.upgrade.UpgradeProgress;
 import org.forgerock.openam.upgrade.UpgradeServices;
@@ -46,61 +42,59 @@ import org.forgerock.openam.upgrade.UpgradeUtils;
 public class Upgrade extends AjaxPage {
 
     private UpgradeServices upgrade;
-    private ServiceUpgradeWrapper wrapper;
     private SSOToken adminToken;
     private Debug debug = UpgradeUtils.debug;
     public ActionLink doUpgradeLink = new ActionLink("doUpgrade", this, "doUpgrade");
     public ActionLink saveReportLink = new ActionLink("saveReport", this, "saveReport");
+    private boolean error = false;
 
     public Upgrade() {
         try {
-            adminToken = (SSOToken) AccessController.doPrivileged(
-                    AdminTokenAction.getInstance());
-            upgrade = new UpgradeServices();
-            wrapper = upgrade.preUpgrade(adminToken);
-            addModel("currentVersion", UpgradeUtils.getCurrentVersion());
-            addModel("newVersion", UpgradeUtils.getWarFileVersion());
-            addModel("changelist", upgrade.generateShortUpgradeReport(adminToken, wrapper, true));
+            debug.message("Initializing upgrade subsystem.");
+            adminToken = AccessController.doPrivileged(AdminTokenAction.getInstance());
+            upgrade = UpgradeServices.getInstance();
         } catch (Exception ue) {
-            addModel("error", true);
+            error = true;
             debug.error("An error occured, while initializing Upgrade page", ue);
         }
     }
 
-    public boolean doUpgrade() {
-        HttpServletRequestWrapper request =
-                new HttpServletRequestWrapper(getContext().getRequest());
-        HttpServletResponseWrapper response =
-                new HttpServletResponseWrapper(getContext().getResponse());
+    /**
+     * Creating the UI models in the #onRender method makes sure that these fields are not always reinitialized when an
+     * actionLink is clicked. This is necessary since Click always creates new instances for actionLink events.
+     */
+    @Override
+    public void onRender() {
+        if (error) {
+            addModel("error", true);
+        } else {
+            addModel("currentVersion", UpgradeUtils.getCurrentVersion());
+            addModel("newVersion", UpgradeUtils.getWarFileVersion());
+            addModel("changelist", upgrade.generateShortUpgradeReport(adminToken, true));
+        }
+    }
 
+    public boolean doUpgrade() {
         try {
-            upgrade.upgrade(adminToken, wrapper);
+            upgrade.upgrade(adminToken);
             writeToResponse("true");
-            setPath(null);
         } catch (UpgradeException ue) {
             writeToResponse(ue.getMessage());
-            setPath(null);
             debug.error("Error occured while upgrading OpenAM", ue);
         } finally {
+            setPath(null);
             UpgradeProgress.closeOutputStream();
         }
         return false;
     }
 
     public boolean saveReport() {
-        try {
-            String report = upgrade.
-                    generateDetailedUpgradeReport(adminToken, wrapper, false);
-            writeToResponse(report);
-            getContext().getResponse().setContentType("application/force-download; charset=\"UTF-8\"");
-            getContext().getResponse().setHeader(
-                    "Content-Disposition", "attachment; filename=\"upgradereport." + System.currentTimeMillis() + "\"");
-            getContext().getResponse().setHeader("Content-Description", "File Transfer");
-            
-            setPath(null);
-        } catch (UpgradeException ue) {
-            debug.error("Error occured while generating detailed report", ue);
-        }
+        getContext().getResponse().setContentType("application/force-download; charset=\"UTF-8\"");
+        getContext().getResponse().setHeader(
+                "Content-Disposition", "attachment; filename=\"upgradereport." + System.currentTimeMillis() + "\"");
+        getContext().getResponse().setHeader("Content-Description", "File Transfer");
+        writeToResponse(upgrade.generateDetailedUpgradeReport(adminToken, false));
+        setPath(null);
         return false;
     }
 }

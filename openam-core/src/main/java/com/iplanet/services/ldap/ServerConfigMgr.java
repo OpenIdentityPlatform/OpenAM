@@ -27,7 +27,7 @@
  */
 
 /**
- * Portions Copyrighted [2011] [ForgeRock AS]
+ * Portions Copyrighted 2011-2013 ForgeRock AS
  */
 package com.iplanet.services.ldap;
 
@@ -126,7 +126,7 @@ public class ServerConfigMgr {
     
     private static final String S_ENCRYPT = "-e";
     
-    private static final String RESOURCE_BUNDLE_NAME = "DSConfig";
+    private static final String RESOURCE_BUNDLE_NAME = "amSDK";
     
     private static final int MIN_PASSWORD_LEN = 8;
     

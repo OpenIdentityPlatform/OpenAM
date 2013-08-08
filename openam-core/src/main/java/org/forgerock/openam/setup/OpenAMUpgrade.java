@@ -24,7 +24,7 @@
  */
 
 /*
- * Portions Copyrighted 2012 ForgeRock Inc
+ * Portions Copyrighted 2012-2013 ForgeRock Inc
  * Portions Copyrighted 2012 Open Source Solution Technology Corporation
  */
 
@@ -135,6 +135,7 @@ public class OpenAMUpgrade {
             conn = (HttpURLConnection) url.openConnection();
             conn.setRequestMethod("GET");
             conn.setUseCaches(false);
+            conn.setInstanceFollowRedirects(false);
             conn.connect();
 
             int responseCode = conn.getResponseCode();
@@ -147,7 +148,7 @@ public class OpenAMUpgrade {
                     if (str.equals("true")) {
                         System.out.println("\nUpgrade Complete.");
                     } else {
-                        System.out.println("\nUpgrade Complete. Please check the amUpgrade debug file for errors");
+                        System.out.println("\nUpgrade Failed. Please check the amUpgrade debug file for errors");
                     }
                 }
             } else {

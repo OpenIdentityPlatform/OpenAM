@@ -118,6 +118,8 @@ public class DJLDAPv3Repo extends IdRepo {
     private IdRepoListener idRepoListener;
     private Map<IdType, Set<IdOperation>> supportedTypesAndOperations;
     private Map<String, String> creationAttributeMapping;
+    private int heartBeatInterval = 1;
+    private String heartBeatTimeUnit;
     private String rootSuffix;
     private String userStatusAttr;
     private boolean alwaysActive = false;
@@ -202,6 +204,9 @@ public class DJLDAPv3Repo extends IdRepo {
 
         String username = CollectionHelper.getMapAttr(configParams, LDAP_SERVER_USER_NAME);
         char[] password = CollectionHelper.getMapAttr(configParams, LDAP_SERVER_PASSWORD, "").toCharArray();
+        heartBeatInterval = CollectionHelper.getIntMapAttr(configParams, LDAP_SERVER_HEARTBEAT_INTERVAL, "1",
+                DEBUG);
+        heartBeatTimeUnit = CollectionHelper.getMapAttr(configParams, LDAP_SERVER_HEARTBEAT_TIME_UNIT, "minutes");
         bindConnectionFactory = createConnectionFactory(null, null, maxPoolSize);
         connectionFactory = createConnectionFactory(username, password, maxPoolSize);
 
@@ -297,9 +302,11 @@ public class DJLDAPv3Repo extends IdRepo {
             }
         }
         if (maxPoolSize == 1) {
-            return LDAPUtils.newFailoverConnectionFactory(ldapServers, username, password, true, ldapOptions);
+            return LDAPUtils.newFailoverConnectionFactory(ldapServers, username, password, heartBeatInterval,
+                    heartBeatTimeUnit, ldapOptions);
         } else {
-            return LDAPUtils.newFailoverConnectionPool(ldapServers, username, password, maxPoolSize, true, ldapOptions);
+            return LDAPUtils.newFailoverConnectionPool(ldapServers, username, password, maxPoolSize, heartBeatInterval,
+                    heartBeatTimeUnit, ldapOptions);
         }
     }
 

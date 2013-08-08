@@ -89,6 +89,34 @@
                     </archive>
                 </configuration>
             </plugin>
+            <plugin>
+                <groupId>org.bsc.maven</groupId>
+                <artifactId>maven-processor-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>process</id>
+                        <goals>
+                            <goal>process</goal>
+                        </goals>
+                        <phase>generate-resources</phase>
+                        <configuration>
+                            <processors>
+                                <processor>org.forgerock.openam.upgrade.apt.UpgradeStepProcessor</processor>
+                            </processors>
+                            <options>
+                                <outputFile>${project.build.directory}/generated-resources/upgradesteps.properties</outputFile>
+                            </options>
+                        </configuration>
+                    </execution>
+                </executions>
+                <dependencies>
+                    <dependency>
+                        <groupId>org.forgerock.openam</groupId>
+                        <artifactId>openam-build-tools</artifactId>
+                        <version>${project.version}</version>
+                    </dependency>
+                </dependencies>
+            </plugin>
 
         </plugins>
 
@@ -109,6 +137,9 @@
                 <includes>
                     <include>version_information.txt</include>
                 </includes>
+            </resource>
+            <resource>
+                <directory>${project.build.directory}/generated-resources</directory>
             </resource>
         </resources>
 
@@ -151,6 +182,10 @@
         <dependency>
             <groupId>org.forgerock.openam</groupId>
             <artifactId>openam-ldap-utils</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.forgerock.openam</groupId>
+            <artifactId>openam-annotations</artifactId>
         </dependency>
 
         <!-- LDAP APIs -->

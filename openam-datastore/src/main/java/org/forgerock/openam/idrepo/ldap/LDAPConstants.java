@@ -43,13 +43,14 @@ public class LDAPConstants {
     public static final String LDAP_SERVER_LIST = "sun-idrepo-ldapv3-config-ldap-server";
     public static final String LDAP_SERVER_USER_NAME = "sun-idrepo-ldapv3-config-authid";
     public static final String LDAP_SERVER_PASSWORD = "sun-idrepo-ldapv3-config-authpw";
+    public static final String LDAP_SERVER_HEARTBEAT_INTERVAL = "openam-idrepo-ldapv3-heartbeat-interval";
+    public static final String LDAP_SERVER_HEARTBEAT_TIME_UNIT = "openam-idrepo-ldapv3-heartbeat-timeunit";
     public static final String LDAP_SERVER_ROOT_SUFFIX = "sun-idrepo-ldapv3-config-organization_name";
     public static final String LDAP_CONNECTION_POOL_MAX_SIZE = "sun-idrepo-ldapv3-config-connection_pool_max_size";
     public static final String LDAP_SSL_ENABLED = "sun-idrepo-ldapv3-config-ssl-enabled";
     public static final String LDAP_PERSISTENT_SEARCH_BASE_DN = "sun-idrepo-ldapv3-config-psearchbase";
     public static final String LDAP_PERSISTENT_SEARCH_FILTER = "sun-idrepo-ldapv3-config-psearch-filter";
     public static final String LDAP_PERSISTENT_SEARCH_SCOPE = "sun-idrepo-ldapv3-config-psearch-scope";
-    public static final String LDAP_RETRY_ERROR_CODES = "sun-idrepo-ldapv3-config-errorcodes";
     public static final String LDAP_RETRY_INTERVAL = "com.iplanet.am.ldap.connection.delay.between.retries";
     public static final String LDAP_SUPPORTED_TYPES_AND_OPERATIONS = "sunIdRepoSupportedOperations";
     public static final String LDAP_USER_STATUS_ATTR_NAME = "sun-idrepo-ldapv3-config-isactive";

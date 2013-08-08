@@ -160,13 +160,9 @@ public class AMKeyProvider implements KeyProvider {
      * @return The decoded password or the same password parameter if the decoding failed.
      */
     public static String decodePassword(String password)  {
-        String decoPasswd;
-        try {
-            decoPasswd = AccessController.doPrivileged(new DecodeAction(password));
-        } catch (Throwable t) {
-            decoPasswd = password;
-        }
-        return decoPasswd;
+        String decodedPassword = AccessController.doPrivileged(new DecodeAction(password));
+
+        return decodedPassword == null ? password : decodedPassword;
     }
 
     private void mapPk2Cert(){

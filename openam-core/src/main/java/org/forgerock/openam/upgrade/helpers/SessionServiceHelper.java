@@ -1,7 +1,7 @@
 /**
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright (c) 2011-2012 ForgeRock, Inc. All Rights Reserved
+ * Copyright (c) 2011-2013 ForgeRock, Inc. All Rights Reserved
  *
  * The contents of this file are subject to the terms
  * of the Common Development and Distribution License
@@ -68,11 +68,7 @@ public class SessionServiceHelper extends AbstractUpgradeHelper {
     private static final String SFO_CPL_MAX_WAIT_TIME_ATTR = "iplanet-am-session-store-cpl-max-wait-time";
     private static final String SFO_JDBC_URL_ATTR = "iplanet-am-session-jdbc-url";
 
-    static {
-        initialize();
-    }
-
-    private static void initialize() {
+    public SessionServiceHelper() {
         attributes.add(SFO_USER_ATTR);
         attributes.add(SFO_PWD_ATTR);
         attributes.add(SFO_CPL_MAX_WAIT_TIME_ATTR);
@@ -108,6 +104,12 @@ public class SessionServiceHelper extends AbstractUpgradeHelper {
     @Override
     public AttributeSchemaImpl upgradeAttribute(AttributeSchemaImpl existingAttr, AttributeSchemaImpl newAttr)
             throws UpgradeException {
+        String i18nKey = existingAttr.getI18NKey();
+        if (i18nKey == null || i18nKey.isEmpty()) {
+            //Since at the moment all the upgradable attributes should have empty i18nKey, it's safe to return null.
+            //This way these attributes won't show up on the upgrade report.
+            return null;
+        }
         return newAttr;
     }
 

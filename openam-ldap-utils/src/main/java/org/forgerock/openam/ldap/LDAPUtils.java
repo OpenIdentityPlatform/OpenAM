@@ -85,7 +85,8 @@ public class LDAPUtils {
      * @param username The directory user's DN. May be null if this is an anonymous connection.
      * @param password The directory user's password.
      * @param maxSize The max size of the created pool.
-     * @param heartbeat Whether heartbeat should be enabled for this factory.
+     * @param heartBeatInterval The interval for sending out heartbeat requests.
+     * @param heartBeatTimeUnit The timeunit for the heartbeat interval.
      * @param ldapOptions Additional LDAP settings used to create the pool.
      * @return A failover loadbalanced authenticated/anonymous connection pool, which may also send heartbeat requests.
      */
@@ -95,10 +96,11 @@ public class LDAPUtils {
             String username,
             char[] password,
             int maxSize,
-            boolean heartbeat,
+            int heartBeatInterval,
+            String heartBeatTimeUnit,
             LDAPOptions ldapOptions) {
         return newFailoverConnectionPool(prioritizeServers(servers, hostServerId, hostSiteId),
-                username, password, maxSize, heartbeat, ldapOptions);
+                username, password, maxSize, heartBeatInterval, heartBeatTimeUnit, ldapOptions);
     }
 
     /**
@@ -108,7 +110,8 @@ public class LDAPUtils {
      * @param username The directory user's DN. May be null if this is an anonymous connection.
      * @param password The directory user's password.
      * @param maxSize The max size of the created pool.
-     * @param heartbeat Whether heartbeat should be enabled for this factory.
+     * @param heartBeatInterval The interval for sending out heartbeat requests.
+     * @param heartBeatTimeUnit The timeunit for the heartbeat interval.
      * @param ldapOptions Additional LDAP settings used to create the pool
      * @return A failover loadbalanced authenticated/anonymous connection pool, which may also send heartbeat requests.
      */
@@ -116,12 +119,14 @@ public class LDAPUtils {
             String username,
             char[] password,
             int maxSize,
-            boolean heartbeat,
+            int heartBeatInterval,
+            String heartBeatTimeUnit,
             LDAPOptions ldapOptions) {
         List<ConnectionFactory> factories = new ArrayList<ConnectionFactory>(servers.size());
         for (LDAPURL ldapurl : servers) {
             ConnectionFactory cf = Connections.newFixedConnectionPool(
-                    newConnectionFactory(ldapurl, username, password, heartbeat, ldapOptions), maxSize);
+                    newConnectionFactory(ldapurl, username, password, heartBeatInterval, heartBeatTimeUnit,
+                    ldapOptions), maxSize);
             factories.add(cf);
         }
 
@@ -138,7 +143,8 @@ public class LDAPUtils {
      * @param hostSiteId The site ID for this OpenAM server.
      * @param username The directory user's DN. May be null if this is an anonymous connection.
      * @param password The directory user's password.
-     * @param heartbeat Whether heartbeat should be enabled for this factory.
+     * @param heartBeatInterval The interval for sending out heartbeat requests.
+     * @param heartBeatTimeUnit The timeunit for the heartbeat interval.
      * @param options Additional LDAP settings used to create the connection factory.
      * @return A failover loadbalanced authenticated/anonymous connection factory, which may also send heartbeat
      * requests.
@@ -148,10 +154,11 @@ public class LDAPUtils {
             String hostSiteId,
             String username,
             char[] password,
-            boolean heartbeat,
+            int heartBeatInterval,
+            String heartBeatTimeUnit,
             LDAPOptions options) {
         return newFailoverConnectionFactory(prioritizeServers(servers, hostServerId, hostSiteId),
-                username, password, heartbeat, options);
+                username, password, heartBeatInterval, heartBeatTimeUnit, options);
     }
 
     /**
@@ -160,7 +167,8 @@ public class LDAPUtils {
      * @param servers The set of LDAP URLs that will be used to set up the connection factory.
      * @param username The directory user's DN. May be null if this is an anonymous connection.
      * @param password The directory user's password.
-     * @param heartbeat Whether heartbeat should be enabled for this factory.
+     * @param heartBeatInterval The interval for sending out heartbeat requests.
+     * @param heartBeatTimeUnit The timeunit for the heartbeat interval.
      * @param ldapOptions Additional LDAP settings used to create the connection factory.
      * @return A failover loadbalanced authenticated/anonymous connection factory, which may also send heartbeat
      * requests.
@@ -168,11 +176,13 @@ public class LDAPUtils {
     public static ConnectionFactory newFailoverConnectionFactory(Set<LDAPURL> servers,
             String username,
             char[] password,
-            boolean heartbeat,
+            int heartBeatInterval,
+            String heartBeatTimeUnit,
             LDAPOptions ldapOptions) {
         List<ConnectionFactory> factories = new ArrayList<ConnectionFactory>(servers.size());
         for (LDAPURL ldapurl : servers) {
-            factories.add(newConnectionFactory(ldapurl, username, password, heartbeat, ldapOptions));
+            factories.add(newConnectionFactory(ldapurl, username, password, heartBeatInterval, heartBeatTimeUnit,
+                    ldapOptions));
         }
         return loadBalanceFactories(factories);
     }
@@ -183,21 +193,23 @@ public class LDAPUtils {
      * @param ldapurl The address of the LDAP server.
      * @param username The directory user's DN. May be null if this is an anonymous connection.
      * @param password The directory user's password.
-     * @param heartbeat Whether heartbeat should be enabled for this factory.
+     * @param heartBeatInterval The interval for sending out heartbeat requests.
+     * @param heartBeatTimeUnit The timeunit for the heartbeat interval.
      * @param ldapOptions Additional LDAP settings used to create the connection factory.
      * @return An authenticated/anonymous connection factory, which may also send heartbeat requests.
      */
     private static ConnectionFactory newConnectionFactory(LDAPURL ldapurl,
             String username,
             char[] password,
-            boolean heartbeat,
+            int heartBeatInterval,
+            String heartBeatTimeUnit,
             LDAPOptions ldapOptions) {
         ConnectionFactory cf = new LDAPConnectionFactory(ldapurl.getUrl(), ldapurl.getPort(), ldapOptions);
         if (username != null) {
             cf = Connections.newAuthenticatedConnectionFactory(cf, Requests.newSimpleBindRequest(username, password));
         }
-        if (heartbeat) {
-            cf = Connections.newHeartBeatConnectionFactory(cf, 5, TimeUnit.MINUTES);
+        if (heartBeatInterval > 0) {
+            cf = Connections.newHeartBeatConnectionFactory(cf, heartBeatInterval, TimeUnit.valueOf(heartBeatTimeUnit));
         }
         return cf;
     }

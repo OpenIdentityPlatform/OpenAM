@@ -1030,7 +1030,7 @@
                             <BooleanFalseValue i18nKey="a106">false</BooleanFalseValue>
                         </BooleanValues>
                         <DefaultValues>
-                            <Value>true</Value>
+                            <Value>false</Value>
                         </DefaultValues>
                     </AttributeSchema>
                     <AttributeSchema
@@ -2822,7 +2822,7 @@
                             <ChoiceValue i18nKey="a28">self</ChoiceValue>
                         </ChoiceValues>
                         <DefaultValues>
-                            <Value>subtree</Value>
+                            <Value>self</Value>
                         </DefaultValues>
                     </AttributeSchema>
                     <AttributeSchema

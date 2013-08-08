@@ -36,7 +36,6 @@ import java.security.KeyStore;
 import java.security.PublicKey;
 import java.security.cert.X509Certificate;
 import java.util.List;
-import java.util.Map;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
@@ -102,10 +101,13 @@ public final class SAML2MetaSecurityUtils {
     public static final String PREFIX_MD_QUERY = "query";
     public static final String TAG_KEY_INFO = "KeyInfo";
     public static final String TAG_KEY_DESCRIPTOR = "KeyDescriptor";
+    public static final String TAG_ENTITY_DESCRIPTOR = "EntityDescriptor";
     public static final String TAG_SP_SSO_DESCRIPTOR = "SPSSODescriptor";
     public static final String TAG_IDP_SSO_DESCRIPTOR = "IDPSSODescriptor";
     public static final String ATTR_USE = "use";
     public static final String ATTR_ID = "ID";
+    private static final String METADATA_SIGNING_KEY = "metadataSigningKey";
+    private static final String METADATA_SIGNING_KEY_PASS = "metadataSigningKeyPass";
 
     private SAML2MetaSecurityUtils() {
 
@@ -136,67 +138,50 @@ public final class SAML2MetaSecurityUtils {
     }
 
     /**
-     * Signs service provider descriptor under entity descriptor if an cert
-     * alias is found in service provider config and identity provider
-     * descriptor under entity descriptor if an cert alias is found in
-     * identity provider config.
+     * Signs the entity descriptor root element by the following rules:
+     * <ul>
+     *  <li>Hosted Entity</li>
+     *  <ul>
+     *   <li>If there is a signature already on the EntityDescriptor, removes it, then signs the EntityDescriptor.
+     *   </li>
+     *   <li>Simply signs the EntityDescriptor otherwise.</li>
+     *  </ul>
+     *  <li>Remote Entity</li>
+     *  <ul>
+     *   <li>If there is a signature already on the EntityDescriptor, then does not change it, but returns the
+     *       Document with the original signature.
+     *   </li>
+     *   <li>Simply signs the EntityDescriptor otherwise</li>
+     *  </ul>
+     * </ul>
+     * If there is no extended metadata for the entity, the entity is considered as remote.
+     *
+     * @param realm The realm where the EntityDescriptor belongs to.
      * @param descriptor The entity descriptor.
-     * @param spconfig The service provider config.
-     * @param idpconfig The identity provider config.
-     * @return Signed <code>Document</code> for the entity descriptor or null
-     *         if both cert aliases are not found.
+     * @return Signed <code>Document</code> for the entity descriptor or null if no metadata signing key is found in
+     * the configuration.
      * @throws SAML2MetaException if unable to sign the entity descriptor. 
      * @throws JAXBException if the entity descriptor is invalid.
      */
-    public static Document sign(
-        EntityDescriptorElement descriptor,
-        SPSSOConfigElement spconfig,
-        IDPSSOConfigElement idpconfig
-    ) throws JAXBException, SAML2MetaException
-    {
-
-        String spId = null;
-        String idpId = null;
-        String spCertAlias = null;
-        String idpCertAlias = null;
-        String idpCertKeyPass = null;
-
-        if (spconfig != null) {
-            Map map = SAML2MetaUtils.getAttributes(spconfig);
-            List list = (List)map.get(SAML2Constants.SIGNING_CERT_ALIAS);
-            if (list != null && !list.isEmpty()) {
-                spCertAlias = ((String)list.get(0)).trim();
-                if (spCertAlias.length() > 0) {
-                    SPSSODescriptorElement spDesc = 
-                            SAML2MetaUtils.getSPSSODescriptor(descriptor);
-                    if (spDesc != null) {
-                        spId = SAMLUtils.generateID();
-                        spDesc.setID(spId);
-                    }
-                }
-            }
+    public static Document sign(String realm, EntityDescriptorElement descriptor)
+            throws JAXBException, SAML2MetaException {
+        if (descriptor == null) {
+            throw new SAML2MetaException("Unable to sign null descriptor");
         }
 
-        if (idpconfig != null) {
-            Map map = SAML2MetaUtils.getAttributes(idpconfig);
-            List list = (List)map.get(SAML2Constants.SIGNING_CERT_ALIAS);
-            if (list != null && !list.isEmpty()) {
-                idpCertAlias = ((String)list.get(0)).trim();
-                if (idpCertAlias.length() > 0) {
-                    IDPSSODescriptorElement idpDesc = SAML2MetaUtils.getIDPSSODescriptor(descriptor);
-                    if (idpDesc != null) {
-                        idpId = SAMLUtils.generateID();
-                        idpDesc.setID(idpId);
-                    }
-                }
-            }
-            list = (List)map.get(SAML2Constants.SIGNING_CERT_KEYPASS);
-            if (list != null && !list.isEmpty()) {
-                idpCertKeyPass = ((String)list.get(0)).trim();
-            }
+
+        SAML2MetaManager metaManager = new SAML2MetaManager();
+        EntityConfigElement cfgElem = metaManager.getEntityConfig(realm, descriptor.getEntityID());
+        boolean isHosted;
+        if (cfgElem == null) {
+            //if there is no EntityConfig, this is considered as a remote entity
+            isHosted = false;
+        } else {
+            isHosted = cfgElem.isHosted();
         }
 
-        if (spId == null && idpId == null) {
+        String signingCert = getRealmSetting(METADATA_SIGNING_KEY, realm);
+        if (signingCert == null) {
             return null;
         }
 
@@ -206,43 +191,41 @@ public final class SAML2MetaSecurityUtils {
         xmlstr = formatBase64BinaryElement(xmlstr);
 
         Document doc = XMLUtils.toDOMDocument(xmlstr, debug);
-
-        XMLSignatureManager sigManager = XMLSignatureManager.getInstance();
-        if (spId != null) {
-            try {
-                String xpath = "//*[local-name()=\"" + TAG_SP_SSO_DESCRIPTOR +
-                               "\" and namespace-uri()=\"" + NS_META +
-                               "\"]/*[1]";
-                sigManager.signXML(doc, spCertAlias, null, "ID", spId, true,
-                                   xpath);
-            } catch (XMLSignatureException xmlse) {
-                if (debug.messageEnabled()) {
-                    debug.message("SAML2MetaSecurityUtils.sign:", xmlse);
+        NodeList childNodes = doc.getDocumentElement().getChildNodes();
+        for (int i = 0; i < childNodes.getLength(); i++) {
+            Node node = childNodes.item(i);
+            if (node.getLocalName() != null
+                    && node.getLocalName().equals("Signature") && node.getNamespaceURI().equals(NS_XMLSIG)) {
+                if (isHosted) {
+                    node.getParentNode().removeChild(node);
+                    break;
+                } else {
+                    //one signature found for this remote entity on the root element,
+                    //in this case returning the entry with the original signature
+                    //as that may be judged more accurately
+                    return doc;
                 }
-                throw new SAML2MetaException(xmlse.getMessage());
             }
         }
 
-        if (idpId != null) {
-            try {
-                String xpath = "//*[local-name()=\"" + TAG_IDP_SSO_DESCRIPTOR +
-                               "\" and namespace-uri()=\"" + NS_META +
-                               "\"]/*[1]";
-                if (idpCertKeyPass == null || idpCertKeyPass.isEmpty()) {
-                    sigManager.signXML(doc, idpCertAlias, null, "ID", idpId, true, xpath);
-                } else {
-                    sigManager.signXMLUsingKeyPass(doc, idpCertAlias, idpCertKeyPass, null, "ID", idpId, true, xpath);
-                }
-            } catch (XMLSignatureException xmlse) {
-                if (debug.messageEnabled()) {
-                    debug.message("SAML2MetaSecurityUtils.sign:", xmlse);
-                }
-                throw new SAML2MetaException(xmlse.getMessage());
+        //we need to sign or re-sign the document, let's generate a new ID
+        String descriptorId = SAMLUtils.generateID();
+        doc.getDocumentElement().setAttribute(ATTR_ID, descriptorId);
+
+        XMLSignatureManager sigManager = XMLSignatureManager.getInstance();
+        try {
+            String xpath = "//*[local-name()=\"" + TAG_ENTITY_DESCRIPTOR
+                    + "\" and namespace-uri()=\"" + NS_META
+                    + "\"]/*[1]";
+            sigManager.signXMLUsingKeyPass(doc, signingCert, getRealmSetting(METADATA_SIGNING_KEY_PASS, realm), null,
+                    SAML2Constants.ID, descriptorId, true, xpath);
+        } catch (XMLSignatureException xmlse) {
+            if (debug.messageEnabled()) {
+                debug.message("SAML2MetaSecurityUtils.sign:", xmlse);
             }
         }
 
         return doc;
-
     }
 
     /**
@@ -624,7 +607,7 @@ public final class SAML2MetaSecurityUtils {
         try {
             String certString = 
                 SAML2MetaSecurityUtils.buildX509Certificate(certAlias);
-            StringBuffer sb = new StringBuffer(4000);
+            StringBuilder sb = new StringBuilder(4000);
             sb.append("<KeyDescriptor xmlns=\"urn:oasis:names:tc:SAML:2.0:metadata\" use=\"");
             if (isSigning) {
                 sb.append("signing");
@@ -643,7 +626,7 @@ public final class SAML2MetaSecurityUtils {
                 sb.append("<EncryptionMethod Algorithm=\"").append(encAlgo)
                   .append("\">\n");
                 sb.append("<KeySize xmlns=\"http://www.w3.org/2001/04/xmlenc#\">")
-                  .append("" + keySize).append("</KeySize>\n")
+                  .append(keySize).append("</KeySize>\n")
                   .append("</EncryptionMethod>");
             }
             sb.append("</KeyDescriptor>");
@@ -652,5 +635,17 @@ public final class SAML2MetaSecurityUtils {
         } catch (JAXBException e) {
             throw new SAML2MetaException(e);
         }
-    } 
+    }
+
+    /**
+     * Retrieves the Metadata signing key/pass configured either in the realm, or if that is not present (the SAML
+     * service is not added to the realm), the globally configured signing key alias/password will be used.
+     *
+     * @param attribute The name of the attribute that needs to be retrieved
+     * @param realm The realm where the signing key alias/password should be looked up
+     * @return The requested attribute configured in the realm or in the global settings.
+     */
+    private static String getRealmSetting(String attribute, String realm) throws SAML2MetaException {
+        return SystemPropertiesManager.get(attribute + "[" + realm + "]");
+    }
 }

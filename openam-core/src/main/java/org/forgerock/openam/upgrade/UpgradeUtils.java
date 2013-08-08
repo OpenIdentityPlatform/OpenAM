@@ -80,7 +80,7 @@ import com.sun.identity.shared.ldap.LDAPConnection;
 import com.sun.identity.shared.ldap.LDAPException;
 import com.sun.identity.shared.ldap.util.LDIF;
 import com.sun.identity.policy.Policy;
-import com.sun.identity.policy.PolicyException; 
+import com.sun.identity.policy.PolicyException;
 import com.sun.identity.policy.PolicyManager;
 import com.sun.identity.policy.Rule;
 import com.sun.identity.policy.SubjectTypeManager;
@@ -108,6 +108,8 @@ import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.Locale;
 import java.util.regex.Matcher;
@@ -119,56 +121,56 @@ import org.w3c.dom.NodeList;
 /**
  * This class contains utilities to upgrade the service schema
  * configuration to be compatible with OpenAM.
- * 
+ *
  */
 public class UpgradeUtils {
 
     private static final Pattern VERSION_FORMAT_PATTERN =
             Pattern.compile("^(?:.*?(\\d+\\.\\d+\\.?\\d*).*)?\\((.*)\\)");
     static Properties configTags;
-    public final static String SCHEMA_TYPE_GLOBAL = "global";
-    public final static String SCHEMA_TYPE_ORGANIZATION = "organization";
-    public final static String SCHEMA_TYPE_DYNAMIC = "dynamic";
-    public final static String SCHEMA_TYPE_USER = "user";
-    public final static String SCHEMA_TYPE_POLICY = "policy";
-    final static String AUTH_SERVICE_NAME = "iPlanetAMAuthService";
-    final static String AUTH_ATTR_NAME = "iplanet-am-auth-authenticators";
-    final static String ATTR_ADMIN_AUTH_MODULE =
+    public static final String SCHEMA_TYPE_GLOBAL = "global";
+    public static final String SCHEMA_TYPE_ORGANIZATION = "organization";
+    public static final String SCHEMA_TYPE_DYNAMIC = "dynamic";
+    public static final String SCHEMA_TYPE_USER = "user";
+    public static final String SCHEMA_TYPE_POLICY = "policy";
+    static final String AUTH_SERVICE_NAME = "iPlanetAMAuthService";
+    static final String AUTH_ATTR_NAME = "iplanet-am-auth-authenticators";
+    static final String ATTR_ADMIN_AUTH_MODULE =
             "iplanet-am-auth-admin-auth-module";
-    final static String ATTR_ORG_AUTH_MODULE = "iplanet-am-auth-org-config";
-    final static int AUTH_SUCCESS =
+    static final String ATTR_ORG_AUTH_MODULE = "iplanet-am-auth-org-config";
+    static final int AUTH_SUCCESS =
             com.sun.identity.authentication.internal.AuthContext.AUTH_SUCCESS;
-    final static String ORG_NAMING_ATTR = "o";
-    final static String OU = "ou";
-    final static String SERVICE_DN = "ou=services";
-    final static String COMMA = ",";
-    final static String EQUAL = "=";
-    final static String AUTH_CONFIG_SERVICE = "iPlanetAMAuthConfiguration";
-    final static String CONFIG_DN =
+    static final String ORG_NAMING_ATTR = "o";
+    static final String OU = "ou";
+    static final String SERVICE_DN = "ou=services";
+    static final String COMMA = ",";
+    static final String EQUAL = "=";
+    static final String AUTH_CONFIG_SERVICE = "iPlanetAMAuthConfiguration";
+    static final String CONFIG_DN =
             "ou=Configurations,ou=default,ou=OrganizationConfig,ou=1.0,";
-    final static String NAMED_CONFIG = "Configurations";
-    final static String SUB_NAMED_CONFIG = "NamedConfiguration";
-    final static String AUTH_ATTR_PREFIX = "iplanet-am-auth";
-    final static String ATTR_AUTH_CONFIG = "iplanet-am-auth-configuration";
-    final static String ATTR_AUTH_SUCCESS_URL =
+    static final String NAMED_CONFIG = "Configurations";
+    static final String SUB_NAMED_CONFIG = "NamedConfiguration";
+    static final String AUTH_ATTR_PREFIX = "iplanet-am-auth";
+    static final String ATTR_AUTH_CONFIG = "iplanet-am-auth-configuration";
+    static final String ATTR_AUTH_SUCCESS_URL =
             "iplanet-am-auth-login-success-url";
-    final static String ATTR_AUTH_FAIL_URL =
+    static final String ATTR_AUTH_FAIL_URL =
             "iplanet-am-auth-login-failure-url";
-    final static String ATTR_AUTH_POST_CLASS =
+    static final String ATTR_AUTH_POST_CLASS =
             "iplanet-am-auth-post-login-process-class";
-    final static String START_VALUE = "<Value>";
-    final static String END_VALUE = "</Value>";
-    final static String ATTR_START_VALUE = "<AttributeValuePair>";
-    final static String ATTR_END_VALUE = "</AttributeValuePair>";
-    final static String HIDDEN_REALM =
+    static final String START_VALUE = "<Value>";
+    static final String END_VALUE = "</Value>";
+    static final String ATTR_START_VALUE = "<AttributeValuePair>";
+    static final String ATTR_END_VALUE = "</AttributeValuePair>";
+    static final String HIDDEN_REALM =
             "/sunamhiddenrealmdelegationservicepermissions";
-    final static String IDREPO_SERVICE = "sunIdentityRepositoryService";
-    final static String IDFF_PROVIDER_SERVICE = 
+    static final String IDREPO_SERVICE = "sunIdentityRepositoryService";
+    static final String IDFF_PROVIDER_SERVICE =
         "iPlanetAMProviderConfigService";
-    final static String IDFF_SERVICE_VERSION = "1.1";
-    final static String SERVER_HOST = "com.iplanet.am.server.host";
-    final static String SERVER_PORT = "com.iplanet.am.server.port";
-    final static String SERVER_PROTO = "com.iplanet.am.server.protocol";
+    static final String IDFF_SERVICE_VERSION = "1.1";
+    static final String SERVER_HOST = "com.iplanet.am.server.host";
+    static final String SERVER_PORT = "com.iplanet.am.server.port";
+    static final String SERVER_PROTO = "com.iplanet.am.server.protocol";
 
     static SSOToken ssoToken;
     public static Debug debug = Debug.getInstance("amUpgrade");
@@ -198,47 +200,49 @@ public class UpgradeUtils {
     static String REALM_MODE = "realmMode";
     static String SERVER_DEFAULTS_FILE = "serverdefaults.properties";
     static String serverNameURL = null;
-    final static String COS_TEMPL_FILTER = "objectclass=costemplate";
-    final static String DELEGATION_SERVICE = "sunAMDelegationService";
-    final static String ORG_ADMIN_ROLE = "Organization Admin Role";
-    final static String DELEGATION_SUBJECT = "delegation-subject";
-    final static String POLICY_SERVICE = "iPlanetAMPolicyService";
-    final static String ORG_POLICY_ADMIN_ROLE =
+    static final String COS_TEMPL_FILTER = "objectclass=costemplate";
+    static final String DELEGATION_SERVICE = "sunAMDelegationService";
+    static final String ORG_ADMIN_ROLE = "Organization Admin Role";
+    static final String DELEGATION_SUBJECT = "delegation-subject";
+    static final String POLICY_SERVICE = "iPlanetAMPolicyService";
+    static final String ORG_POLICY_ADMIN_ROLE =
             "Organization Policy Admin Role";
-    final static String REALM_SERVICE = "sunAMRealmService";
-    final static String REALM_READ_ONLY = "RealmReadOnly";
-    final static String DATA_STORE_READ_ONLY = "DatastoresReadOnly";
-    final static String AM_ID_SUBJECT = "AMIdentitySubject";
-    final static String ATTR_SERVER_CONFIG = "serverconfig";
-    final static String ATTR_SERVER_CONFIG_XML = "serverconfigxml";
-    final static String CONFIG_SERVER_DEFAULT = "server-default";
-    final static String SUB_SCHEMA_SERVER = "server";
-    final static String SERVER_CONFIG_XML = "serverconfig.xml";
-    final static String BACKUP_SERVER_CONFIG_XML = "serverconfig.xml.bak";
-    final static String BACKUP_AMCONFIG = "AMConfig.properties.bak";
-    final static String ATTR_SERVER_ID = "serverid";
-    final static String ATTR_SUNSERVICE_ID = "sunserviceid";
-    final static String ATTR_SUN_KEY_VALUE = "sunkeyvalue";
-    final static String DIR_UPGRADE = "upgrade";
-    final static String DIR_CONFIG = "config";
-    final static String APPLICATION_SERVICE = "sunAMAuthApplicationService";
-    final static String POLICY_CONFIG_XML = "amPolicyConfig.xml";
-    final static String POLICY_XML = "amPolicy.xml";
-    final static String PASSWORD_RESET_XML = "amPasswordReset.xml";
-    final static String USER_XML = "amUser.xml";
-    final static String REPO_XML = "idRepoService.xml";
-    final static String UMS_XML = "ums.xml";
-    final static String UNIX_XML = "amAuthUnix.xml";
-    final static String DAI_LDIF = "FM_DAI_ds_remote_schema.ldif";
-    final static String INSTALL_LDIF = "FM_DAI_install.ldif";
+    static final String REALM_SERVICE = "sunAMRealmService";
+    static final String REALM_READ_ONLY = "RealmReadOnly";
+    static final String DATA_STORE_READ_ONLY = "DatastoresReadOnly";
+    static final String AM_ID_SUBJECT = "AMIdentitySubject";
+    static final String ATTR_SERVER_CONFIG = "serverconfig";
+    static final String ATTR_SERVER_CONFIG_XML = "serverconfigxml";
+    static final String CONFIG_SERVER_DEFAULT = "server-default";
+    static final String SUB_SCHEMA_SERVER = "server";
+    static final String SERVER_CONFIG_XML = "serverconfig.xml";
+    static final String BACKUP_SERVER_CONFIG_XML = "serverconfig.xml.bak";
+    static final String BACKUP_AMCONFIG = "AMConfig.properties.bak";
+    static final String ATTR_SERVER_ID = "serverid";
+    static final String ATTR_SUNSERVICE_ID = "sunserviceid";
+    static final String ATTR_SUN_KEY_VALUE = "sunkeyvalue";
+    static final String DIR_UPGRADE = "upgrade";
+    static final String DIR_CONFIG = "config";
+    static final String APPLICATION_SERVICE = "sunAMAuthApplicationService";
+    static final String POLICY_CONFIG_XML = "amPolicyConfig.xml";
+    static final String POLICY_XML = "amPolicy.xml";
+    static final String PASSWORD_RESET_XML = "amPasswordReset.xml";
+    static final String USER_XML = "amUser.xml";
+    static final String REPO_XML = "idRepoService.xml";
+    static final String UMS_XML = "ums.xml";
+    static final String UNIX_XML = "amAuthUnix.xml";
+    static final String DAI_LDIF = "FM_DAI_ds_remote_schema.ldif";
+    static final String INSTALL_LDIF = "FM_DAI_install.ldif";
     static Hashtable propertyFileMap = new Hashtable();
-    
+    private static final List<String> SCHEMA_ORDER = Arrays.asList(new String[]{"Global", "Organization", "Dynamic",
+        "Policy", "User", "Group", "Domain", "Generic", "PluginInterface"});
+
     static {
         bundle = ResourceBundle.getBundle(RESOURCE_BUNDLE_NAME);
     }
 
     /**
-     * Returns the SSOToken. 
+     * Returns the SSOToken.
      *
      * @return Admin Token.
      */
@@ -247,24 +251,24 @@ public class UpgradeUtils {
             ssoToken = (SSOToken) AccessController.doPrivileged(
                 AdminTokenAction.getInstance());
         }
-        
+
         return ssoToken;
     }
-    
+
     /**
-     * Returns true if this version can be upgraded; automatic upgrades from 9.5 
+     * Returns true if this version can be upgraded; automatic upgrades from 9.5
      * onwards are supported.
-     * 
+     *
      * @return true if this instance can be upgraded
      */
     public static boolean canUpgrade() {
         return true;
     }
-    
+
     /**
      * Returns true if the OpenAM version of the war file is newer than the one
      * currently deployed.
-     * 
+     *
      * @return true if the war file version is newer than the deployed version
      */
     public static boolean isVersionNewer() {
@@ -320,11 +324,11 @@ public class UpgradeUtils {
     public static String getCurrentVersion() {
         return SystemProperties.get(Constants.AM_VERSION);
     }
-    
+
     public static String getWarFileVersion() {
         return ServerConfiguration.getWarFileVersion();
     }
-    
+
     private static String[] parseVersion(String version) {
         Matcher matcher = VERSION_FORMAT_PATTERN.matcher(version);
         if (matcher.matches()) {
@@ -338,7 +342,7 @@ public class UpgradeUtils {
         }
         return null;
     }
-   
+
 
     /**
      * Creates a new service schema in the configuration store.
@@ -379,15 +383,15 @@ public class UpgradeUtils {
             }
         }
     }
-    
-    public static void createService(String xml, SSOToken adminSSOToken) 
+
+    public static void createService(String xml, SSOToken adminSSOToken)
     throws UpgradeException {
         String classMethod = "UpgradeUtils:createService : ";
         InputStream serviceStream = null;
-        
+
         try {
             ServiceManager serviceManager = new ServiceManager(adminSSOToken);
-            
+
             serviceStream = (InputStream) new ByteArrayInputStream(xml.getBytes());
             serviceManager.registerServices(serviceStream);
         } catch (SSOException ssoe) {
@@ -406,13 +410,13 @@ public class UpgradeUtils {
             }
         }
     }
-    
-    public static void modifyService(String serviceName, 
-                                     Map<String, ServiceSchemaUpgradeWrapper> serviceChanges, 
-                                     SSOToken adminToken) 
+
+    public static void modifyService(String serviceName,
+                                     Map<String, ServiceSchemaUpgradeWrapper> serviceChanges,
+                                     SSOToken adminToken)
     throws UpgradeException {
         for (Map.Entry<String, ServiceSchemaUpgradeWrapper> schemaMods : serviceChanges.entrySet()) {
-            ServiceSchemaUpgradeWrapper sUpdate = schemaMods.getValue(); 
+            ServiceSchemaUpgradeWrapper sUpdate = schemaMods.getValue();
 
             if (sUpdate != null) {
                 if (sUpdate.getAttributesAdded() != null &&
@@ -436,14 +440,14 @@ public class UpgradeUtils {
             }
         }
     }
-    
+
     public static void addNewSubSchemas(String serviceName,
                                        Map<String, SubSchemaUpgradeWrapper> subSchemaChanges,
                                        SSOToken adminToken)
     throws UpgradeException {
         for (Map.Entry<String, SubSchemaUpgradeWrapper> subSchemaAdds : subSchemaChanges.entrySet()) {
             SubSchemaUpgradeWrapper ssAdd = subSchemaAdds.getValue();
-            
+
             if (ssAdd != null) {
                 if (ssAdd.getSubSchemasAdded() != null &&
                         ssAdd.getSubSchemasAdded().subSchemaChanged()) {
@@ -453,19 +457,19 @@ public class UpgradeUtils {
             }
         }
     }
-    
-    public static void addNewSubSchema(String serviceName, 
-                                       SubSchemaModificationWrapper ssMod, 
-                                       ServiceSchema serviceSchema, 
+
+    public static void addNewSubSchema(String serviceName,
+                                       SubSchemaModificationWrapper ssMod,
+                                       ServiceSchema serviceSchema,
                                        SSOToken adminToken)
-    throws UpgradeException {       
+    throws UpgradeException {
         if (ssMod.hasNewSubSchema()) {
-            for (Map.Entry<String, NewSubSchemaWrapper> newSubSchema : ssMod.entrySet()) {                                    
+            for (Map.Entry<String, NewSubSchemaWrapper> newSubSchema : ssMod.entrySet()) {
                 addSubSchema(serviceName, newSubSchema.getValue().getSubSchemaName(), serviceSchema, newSubSchema.getValue().getSubSchemaNode());
-                
+
                 if (ssMod.getSubSchema().hasSubSchema()) {
                     ServiceSchema subSchema = null;
-            
+
                     try {
                         subSchema = serviceSchema.getSubSchema(newSubSchema.getKey());
                     } catch (SMSException smse) {
@@ -477,74 +481,74 @@ public class UpgradeUtils {
                 }
             }
         }
-        
+
 
     }
-    
-    protected static void addAttributesToSchema(String serviceName, 
-                                                String schemaType, 
+
+    protected static void addAttributesToSchema(String serviceName,
+                                                String schemaType,
                                                 ServiceSchemaModificationWrapper schemaMods,
                                                 ServiceSchema serviceSchema,
-                                                SSOToken adminToken) 
+                                                SSOToken adminToken)
     throws UpgradeException {
         if (!(schemaMods.getAttributes().isEmpty())) {
             for(AttributeSchemaImpl attrs : schemaMods.getAttributes()) {
-                    addAttributeToSchema(serviceName, 
-                                         null, 
-                                         schemaType, 
-                                         attrs.getAttributeSchemaNode(), 
+                    addAttributeToSchema(serviceName,
+                                         null,
+                                         schemaType,
+                                         attrs.getAttributeSchemaNode(),
                                          adminToken);
             }
         }
-      
+
         if (schemaMods.hasSubSchema()) {
             for (Map.Entry<String, ServiceSchemaModificationWrapper> schema : schemaMods.getSubSchemas().entrySet()) {
                 if (!(schema.getValue().getAttributes().isEmpty())) {
                     for(AttributeSchemaImpl attrs : schema.getValue().getAttributes()) {
                         ServiceSchema subSchema = null;
-                        
+
                         try {
                             subSchema = serviceSchema.getSubSchema(schema.getKey());
                         } catch (SMSException smse) {
                             debug.error("Unable to add attributes to schema", smse);
                             throw new UpgradeException(smse);
                         }
-                        
+
                         addAttributeToSchema(subSchema, attrs.getAttributeSchemaNode());
                     }
                 }
 
                 if (schema.getValue().hasSubSchema()) {
                     ServiceSchema ss = null;
-                    
+
                     try {
                         ss = serviceSchema.getSubSchema(schema.getKey());
                     } catch (SMSException smse) {
                         debug.error("Unable to add attributes to schema", smse);
                         throw new UpgradeException(smse);
                     }
-                    
+
                     addAttributesToSchema(serviceName, schemaType, schema.getValue(), ss, adminToken);
-                }            
+                }
             }
         }
     }
-    
-    protected static void modifyAttributesInExistingSchema(String serviceName, 
-                                                String schemaType, 
+
+    protected static void modifyAttributesInExistingSchema(String serviceName,
+                                                String schemaType,
                                                 ServiceSchemaModificationWrapper schemaMods,
                                                 ServiceSchema serviceSchema,
                                                 SSOToken adminToken)
     throws UpgradeException {
         for (AttributeSchemaImpl attrs : schemaMods.getAttributes()) {
-                modifyAttributeInExistingSchema(serviceName, 
-                                     null, 
+                modifyAttributeInExistingSchema(serviceName,
+                                     null,
                                      schemaType,
                                      attrs.getName(),
-                                     attrs.getAttributeSchemaNode(), 
+                                     attrs.getAttributeSchemaNode(),
                                      adminToken);
         }
-      
+
         if (schemaMods.hasSubSchema()) {
             for (Map.Entry<String, ServiceSchemaModificationWrapper> schema : schemaMods.getSubSchemas().entrySet()) {
                 for (AttributeSchemaImpl attrs : schema.getValue().getAttributes()) {
@@ -559,72 +563,72 @@ public class UpgradeUtils {
 
                     modifyAttributeInExistingSchema(subSchema, attrs.getName(), attrs.getAttributeSchemaNode());
                 }
-                
+
                 if (schema.getValue().hasSubSchema()) {
                     ServiceSchema ss = null;
-                    
+
                     try {
                         ss = serviceSchema.getSubSchema(schema.getKey());
                     } catch (SMSException smse) {
                         debug.error("Unable to modify attributes in schema", smse);
                         throw new UpgradeException(smse);
                     }
-                    
+
                     modifyAttributesInExistingSchema(serviceName, schemaType, schema.getValue(), ss, adminToken);
-                }            
+                }
             }
-        }    
+        }
     }
-    
-    protected static void removeAttributesFromSchema(String serviceName, 
-                                                     String schemaType, 
+
+    protected static void removeAttributesFromSchema(String serviceName,
+                                                     String schemaType,
                                                      ServiceSchemaModificationWrapper schemaMods,
                                                      ServiceSchema serviceSchema,
-                                                     SSOToken adminToken) 
+                                                     SSOToken adminToken)
     throws UpgradeException {
         if (!(schemaMods.getAttributes().isEmpty())) {
             for(AttributeSchemaImpl attrs : schemaMods.getAttributes()) {
                     removeAttributeSchema(serviceName, null, schemaType, attrs.getName(), adminToken);
             }
         }
-      
+
         if (schemaMods.hasSubSchema()) {
             for (Map.Entry<String, ServiceSchemaModificationWrapper> schema : schemaMods.getSubSchemas().entrySet()) {
                 if (!(schema.getValue().getAttributes().isEmpty())) {
                     for(AttributeSchemaImpl attrs : schema.getValue().getAttributes()) {
                         ServiceSchema subSchema = null;
-                        
+
                         try {
                             subSchema = serviceSchema.getSubSchema(schema.getKey());
                         } catch (SMSException smse) {
                             debug.error("Unable to remove attributes from schema", smse);
                             throw new UpgradeException(smse);
                         }
-                        
+
                         removeAttributeSchema(subSchema, attrs.getName());
                     }
                 }
 
                 if (schema.getValue().hasSubSchema()) {
                     ServiceSchema ss = null;
-                    
+
                     try {
                         ss = serviceSchema.getSubSchema(schema.getKey());
                     } catch (SMSException smse) {
                         debug.error("Unable to remove attributes from schema", smse);
                         throw new UpgradeException(smse);
                     }
-                    
+
                     removeAttributesFromSchema(serviceName, schemaType, schema.getValue(), ss, adminToken);
-                }            
+                }
             }
         }
     }
-    
-    public static void deleteService(String serviceName, SSOToken adminToken) 
+
+    public static void deleteService(String serviceName, SSOToken adminToken)
     throws UpgradeException {
         String classMethod = "UpgradeUtils:deleteService : ";
-        
+
         try {
             ServiceManager sm = new ServiceManager(adminToken);
             ServiceConfigManager scm = new ServiceConfigManager(
@@ -641,10 +645,10 @@ public class UpgradeUtils {
                 if (debug.messageEnabled()) {
                     debug.message("Service has policy schema; matching policy schema will be removed");
                 }
-                
+
                 deletePolicyRule(serviceName, adminToken);
             }
-            
+
             for (String version : versions) {
                 sm.removeService(serviceName, version);
             }
@@ -659,7 +663,7 @@ public class UpgradeUtils {
             throw new UpgradeException(ame);
         }
     }
-    
+
     private static void deletePolicyRule(String serviceName, SSOToken adminToken)
     throws SMSException, SSOException, AMException {
         String classMethod = "UpgradeUtils:deletePolicyRule : ";
@@ -676,7 +680,7 @@ public class UpgradeUtils {
                 }
             } else {
                 processCleanPolicies(serviceName, adminToken);
-                
+
                 if (debug.messageEnabled()) {
                     debug.message(classMethod + "policy schemas cleaned");
                 }
@@ -688,14 +692,14 @@ public class UpgradeUtils {
     throws SMSException, SSOException, AMException {
         PolicyUtils.removePolicyRules(adminToken, serviceName);
     }
-    
+
     public static Document parseServiceFile(InputStream xml, SSOToken adminToken)
     throws UpgradeException {
         String classMethod = "UpgradeUtils:parseServiceFile : ";
-        
+
         FileInputStream fis = null;
         Document doc = null;
-        
+
         try {
             ServiceManager ssm = getServiceManager(adminToken);
             doc = ssm.parseServicesFile(xml);
@@ -714,18 +718,18 @@ public class UpgradeUtils {
                 }
             }
         }
-        
+
         return doc;
     }
-    
-    public static Set<String> getExistingServiceNames(SSOToken adminToken) 
+
+    public static Set<String> getExistingServiceNames(SSOToken adminToken)
     throws UpgradeException {
         String classMethod = "UpgradeUtils:getExistingServiceNames : ";
         Set<String> existingServiceNames = null;
-        
+
         try {
             ServiceManager sm = new ServiceManager(adminToken);
-            existingServiceNames = sm.getServiceNames(); 
+            existingServiceNames = sm.getServiceNames();
         } catch (SSOException ssoe) {
             debug.error(classMethod + "SSOToken is not valid", ssoe);
             throw new UpgradeException(ssoe.getMessage());
@@ -733,18 +737,18 @@ public class UpgradeUtils {
             debug.error(classMethod + "Invalid service schema xml");
             throw new UpgradeException(sme.getMessage());
         }
-        
+
         return existingServiceNames;
     }
 
     /**
      * Adds new attribute schema to an existing service.
-     * 
+     *
      * @param serviceName the service name.
      * @param schemaType the schema type.
      * @param attributeSchemaNode attribute to add
      * @param adminToken admin SSOToken
-     * @throws UpgradeException if there is an error adding the 
+     * @throws UpgradeException if there is an error adding the
      *         attribute schema.
      * @supported.api
      */
@@ -756,20 +760,20 @@ public class UpgradeUtils {
             SSOToken adminToken)
     throws UpgradeException {
         String classMethod = "UpgradeUtils:addAttributeToSchema: ";
-        
+
         if (debug.messageEnabled()) {
-            debug.message(classMethod + "Adding attributeschema :" 
+            debug.message(classMethod + "Adding attributeschema :"
                     + "for service :" + serviceName);
         }
-        
+
         ServiceSchema ss = getServiceSchema(serviceName, subSchemaName, schemaType, adminToken);
         ByteArrayInputStream bis = null;
-        
+
         try {
             bis = new ByteArrayInputStream(XMLUtils.print(attributeSchemaNode).getBytes());
             ss.addAttributeSchema(bis);
         } catch (SMSException sme) {
-            debug.error(classMethod + "Cannot add attribute schema for " 
+            debug.error(classMethod + "Cannot add attribute schema for "
                     + serviceName, sme);
             throw new UpgradeException(sme.getMessage());
         } catch (SSOException ssoe) {
@@ -777,13 +781,13 @@ public class UpgradeUtils {
             throw new UpgradeException(ssoe.getMessage());
         }
     }
-    
+
     /**
      * Adds new attribute schema to an existing service.
-     * 
+     *
      * @param serviceSchema The underlying service schema.
      * @param attributeSchemaNode The attribute is add
-     * @throws UpgradeException if there is an error adding the 
+     * @throws UpgradeException if there is an error adding the
      *         attribute schema.
      * @supported.api
      */
@@ -791,19 +795,19 @@ public class UpgradeUtils {
             Node attributeSchemaNode)
     throws UpgradeException {
         String classMethod = "UpgradeUtils:addAttributeToSchema: ";
-        
+
         if (debug.messageEnabled()) {
-            debug.message(classMethod + "Adding attributeschema :" 
+            debug.message(classMethod + "Adding attributeschema :"
                     + "for service :" + serviceSchema.getName());
         }
-        
+
         ByteArrayInputStream bis = null;
-        
+
         try {
             bis = new ByteArrayInputStream(XMLUtils.print(attributeSchemaNode).getBytes());
             serviceSchema.addAttributeSchema(bis);
         } catch (SMSException sme) {
-            debug.error(classMethod + "Cannot add attribute schema for " 
+            debug.error(classMethod + "Cannot add attribute schema for "
                     + serviceSchema.getName(), sme);
             throw new UpgradeException(sme.getMessage());
         } catch (SSOException ssoe) {
@@ -820,7 +824,7 @@ public class UpgradeUtils {
      * @param schemaType the schema type.
      * @param attributeSchemaFile
      *         XML file containing attribute schema definition.
-     * @throws UpgradeException if there is an error adding the 
+     * @throws UpgradeException if there is an error adding the
      *         attribute schema.
      * @supported.api
      */
@@ -831,9 +835,9 @@ public class UpgradeUtils {
             String attributeSchemaFile) throws UpgradeException {
         String classMethod = "UpgradeUtils:addAttributeToSubSchema : ";
         if (debug.messageEnabled()) {
-            debug.message(classMethod + "Adding attribute schema : " 
+            debug.message(classMethod + "Adding attribute schema : "
                     + attributeSchemaFile);
-            debug.message(" to subSchema " + subSchemaName + 
+            debug.message(" to subSchema " + subSchemaName +
                     " to service " + serviceName);
         }
         FileInputStream fis = null;
@@ -846,7 +850,7 @@ public class UpgradeUtils {
             debug.error(classMethod + "File not found " + attributeSchemaFile);
             throw new UpgradeException(ioe.getMessage());
         } catch (SMSException sme) {
-            debug.error(classMethod + "Cannot add attribute schema to : " 
+            debug.error(classMethod + "Cannot add attribute schema to : "
                     + serviceName, sme);
             throw new UpgradeException(sme.getMessage());
         } catch (SSOException ssoe) {
@@ -857,7 +861,7 @@ public class UpgradeUtils {
             throw new UpgradeException(e.getMessage());
         }
     }
-    
+
     public static void modifyAttributeInExistingSchema(
             String serviceName,
             String subSchemaName,
@@ -867,30 +871,30 @@ public class UpgradeUtils {
             SSOToken adminToken)
     throws UpgradeException {
         String classMethod = "UpgradeUtils:modifyAttributeInExistingSchema: ";
-        
+
         if (debug.messageEnabled()) {
-            debug.message(classMethod + "Modifying attributeschema :" 
+            debug.message(classMethod + "Modifying attributeschema :"
                     + "for service :" + serviceName);
         }
-        
+
         removeAttributeSchema(serviceName, subSchemaName, schemaType, attrName, adminToken);
-        addAttributeToSchema(serviceName, 
-                             subSchemaName, 
-                             schemaType, 
-                             attributeSchemaNode, 
+        addAttributeToSchema(serviceName,
+                             subSchemaName,
+                             schemaType,
+                             attributeSchemaNode,
                              adminToken);
     }
-    
+
     public static void modifyAttributeInExistingSchema(ServiceSchema serviceSchema,
             String attrName, Node attributeSchemaNode)
     throws UpgradeException {
         String classMethod = "UpgradeUtils:modifyAttributeInExistingSchema: ";
-        
+
         if (debug.messageEnabled()) {
-            debug.message(classMethod + "Modifying attributeschema :" 
+            debug.message(classMethod + "Modifying attributeschema :"
                     + "for service :" + serviceSchema.getName());
         }
-        
+
         removeAttributeSchema(serviceSchema, attrName);
         addAttributeToSchema(serviceSchema, attributeSchemaNode);
     }
@@ -1020,16 +1024,16 @@ public class UpgradeUtils {
             attrSchema.addChoiceValue(value, i18nKey);
         }
     }
-    
+
     /**
      * Remove an attribute schema from an existing service.
-     * 
+     *
      * @param serviceName the service name.
      * @param subSchemaName name of the subschema
      * @param schemaType the schema type.
      * @param attributeName attribute to remove
      * @param adminToken admin SSOToken
-     * @throws UpgradeException if there is an error adding the 
+     * @throws UpgradeException if there is an error adding the
      *         attribute schema.
      * @supported.api
      */
@@ -1041,18 +1045,18 @@ public class UpgradeUtils {
             SSOToken adminToken)
     throws UpgradeException {
         String classMethod = "UpgradeUtils:removeAttributeSchema: ";
-        
+
         if (debug.messageEnabled()) {
-            debug.message(classMethod + "Removing attribute :" + attributeName  
-                    + "from service :" + serviceName);
+            debug.message(classMethod + "Removing attribute :" + attributeName
+                    + " from service :" + serviceName);
         }
-        
+
         ServiceSchema ss = getServiceSchema(serviceName, subSchemaName, schemaType, adminToken);
-        
+
         try {
             ss.removeAttributeSchema(attributeName);
         } catch (SMSException sme) {
-            debug.error(classMethod + "Cannot remove attribute schema for " 
+            debug.error(classMethod + "Cannot remove attribute schema for "
                     + serviceName, sme);
             throw new UpgradeException(sme.getMessage());
         } catch (SSOException ssoe) {
@@ -1060,13 +1064,13 @@ public class UpgradeUtils {
             throw new UpgradeException(ssoe.getMessage());
         }
     }
-    
+
     /**
      * Removes attribute schema from an existing service.
-     * 
+     *
      * @param serviceSchema The underlying service schema.
      * @param attributeName The attribute is add
-     * @throws UpgradeException if there is an error adding the 
+     * @throws UpgradeException if there is an error adding the
      *         attribute schema.
      * @supported.api
      */
@@ -1074,16 +1078,16 @@ public class UpgradeUtils {
             String attributeName)
     throws UpgradeException {
         String classMethod = "UpgradeUtils:removeAttributeFromSchema: ";
-        
+
         if (debug.messageEnabled()) {
-            debug.message(classMethod + "Removing attributeschema : " + attributeName 
+            debug.message(classMethod + "Removing attributeschema : " + attributeName
                     + "from service :" + serviceSchema.getName());
         }
-        
+
         try {
             serviceSchema.removeAttributeSchema(attributeName);
         } catch (SMSException sme) {
-            debug.error(classMethod + "Cannot remove attribute schema for " 
+            debug.error(classMethod + "Cannot remove attribute schema for "
                     + serviceSchema.getName(), sme);
             throw new UpgradeException(sme.getMessage());
         } catch (SSOException ssoe) {
@@ -1092,7 +1096,7 @@ public class UpgradeUtils {
         }
     }
 
-    /** 
+    /**
      * Sets the I18N File Name .
      *
      * @param serviceName name of the service.
@@ -1107,7 +1111,7 @@ public class UpgradeUtils {
             ServiceSchemaManager ssm = getServiceSchemaManager(serviceName);
             ssm.setI18NFileName(value);
             if (debug.messageEnabled()) {
-                debug.message(classMethod + serviceName + 
+                debug.message(classMethod + serviceName +
                     " :Setting I18NFileName " + value);
             }
         } catch (SSOException ssoe) {
@@ -1117,7 +1121,7 @@ public class UpgradeUtils {
         }
     }
 
-    /** 
+    /**
      * Sets the service revision number.
      *
      * @param serviceName name of the service.
@@ -1153,7 +1157,7 @@ public class UpgradeUtils {
     /**
      * Updates the values of the <code>any</code> attribute in the attribute
      * schema.
-     * 
+     *
      * @param serviceName the service name where the attribute exists.
      * @param subSchema the subschema name.
      * @param schemaType the schema type
@@ -1182,7 +1186,7 @@ public class UpgradeUtils {
     /**
      * Updates the values of the <code>i18NKey</code> attribute in the service`
      * subschema.
-     * 
+     *
      * @param serviceName the service name where the attribute exists.
      * @param subSchema the subschema name.
      * @param schemaType the schema type
@@ -1203,12 +1207,12 @@ public class UpgradeUtils {
             debug.error(classMethod + "Invalid SSOToken");
             throw new UpgradeException("Invalid SSOToken");
         } catch (SMSException sme) {
-            debug.error(classMethod + 
+            debug.error(classMethod +
                     "Error setting i18N key : " + serviceName,sme);
             throw new UpgradeException("Error setting i18NKey Value");
         }
     }
-    
+
     /**
      * Returns the current service revision number .
      *
@@ -1228,7 +1232,7 @@ public class UpgradeUtils {
      * Returns true if the value of realmMode attribute is true.
      * If there is an error retrieving the attribute a false will be
      * assumed.
-     * 
+     *
      * @return true if realmMode attribute value is true otherwise false.
      */
     public static boolean isRealmMode() {
@@ -1289,11 +1293,11 @@ public class UpgradeUtils {
 
     /**
      * Removes attributes default values.
-     * 
+     *
      * @param serviceName name of the service
      * @param schemaType the schema type
-     * @param attributeName name of the attribute 
-     * @param defaultValues a set of values to be removed 
+     * @param attributeName name of the attribute
+     * @param defaultValues a set of values to be removed
      * @param subSchema name of the sub schema
      * @throws UpgradeException if there is an error
      */
@@ -1345,8 +1349,8 @@ public class UpgradeUtils {
             String fileName) throws UpgradeException {
         String classMethod = "UpgradeUtils:addSubSchema : ";
         if (debug.messageEnabled()) {
-            debug.message(classMethod + "Adding subschema :" + 
-                fileName + "for service : " + serviceName);
+            debug.message(classMethod + "Adding subschema: " +
+                fileName + " for service: " + serviceName);
         }
         try {
             ServiceSchema ss =
@@ -1360,7 +1364,7 @@ public class UpgradeUtils {
             throw new UpgradeException("error creating subschema");
         }
     }
-    
+
     /**
      * Adds sub schema to a service.
      *
@@ -1374,17 +1378,17 @@ public class UpgradeUtils {
             String serviceName,
             String subSchemaName,
             ServiceSchema serviceSchema,
-            Node subSchemaNode) 
+            Node subSchemaNode)
     throws UpgradeException {
         String classMethod = "UpgradeUtils:addSubSchema : ";
-        
+
         if (debug.messageEnabled()) {
-            debug.message(classMethod + "Adding subschema :" + 
-                subSchemaName + "for service : " + serviceName);
+            debug.message(classMethod + "Adding subschema:" +
+                subSchemaName + " for service: " + serviceName);
         }
-        
+
         ByteArrayInputStream bis = null;
-        
+
         try {
             bis = new ByteArrayInputStream(XMLUtils.print(subSchemaNode).getBytes());
             serviceSchema.addSubSchema(bis);
@@ -1397,14 +1401,14 @@ public class UpgradeUtils {
 
     /**
      * Adds SubConfiguration to a service.
-     * 
+     *
      * @param serviceName the service name
-     * @param svcConfigName the service config 
-     * @param subConfigName the subconfig name 
+     * @param svcConfigName the service config
+     * @param subConfigName the subconfig name
      * @param subConfigID the subconfig id
      * @param attrValues a map of attribute value pairs to be added to the
      *        subconfig.
-     * @param priority the priority value 
+     * @param priority the priority value
      * @throws UpgradeException if there is an error.
      */
     public static void addSubConfiguration(
@@ -1422,8 +1426,7 @@ public class UpgradeUtils {
                 sc.addSubConfig(subConfigName, subConfigID,
                         priority, attrValues);
             } else {
-                debug.error(classMethod + 
-                        "Error adding sub cofiguration" + subConfigName);
+                debug.error(classMethod + "Error adding sub cofiguration " + subConfigName);
                 throw new UpgradeException("Error adding subconfig");
             }
         } catch (SSOException ssoe) {
@@ -1436,13 +1439,13 @@ public class UpgradeUtils {
 
     /**
      * Loads the ldif changes to the directory server.
-     * 
+     *
      * @param ldifFileName the name of the ldif file.
      */
     public static void loadLdif(String ldifFileName) {
         String classMethod = "UpgradeUtils:loadLdif : ";
         try {
-            System.out.println(bundle.getString("upg-load-ldif-file") 
+            System.out.println(bundle.getString("upg-load-ldif-file")
                 + " :" + ldifFileName);
             LDIF ldif = new LDIF(ldifFileName);
             ld = getLDAPConnection();
@@ -1524,7 +1527,7 @@ public class UpgradeUtils {
 
     /**
      * Imports service data
-     * 
+     *
      * @param fileList list of files to be imported.
      * @throws UpgradeException on error.
      */
@@ -1544,10 +1547,10 @@ public class UpgradeUtils {
         System.arraycopy(fileList, 0, args, 7, len);
         invokeAdminCLI(args);
     }
-    
+
     /**
      * Imports service data
-     * 
+     *
      * @param fileList list of files to be imported.
      * @throws UpgradeException
      */
@@ -1577,7 +1580,7 @@ public class UpgradeUtils {
 
     /**
      * Imports new service schema.
-     * 
+     *
      * @param fileList list of files to be imported.
      * @throws UpgradeException on error.
      */
@@ -1599,7 +1602,7 @@ public class UpgradeUtils {
 
     /**
      * Import new service schema
-     * 
+     *
      * @param fileName name of the file to be imported.
      * @throws UpgradeException on error.
      */
@@ -1619,7 +1622,7 @@ public class UpgradeUtils {
 
     /**
      * Imports new service schema.
-     * 
+     *
      * @param fileList list of files
      * @throws UpgradeException
      */
@@ -1656,7 +1659,7 @@ public class UpgradeUtils {
 
     /**
      * Returns the absolute path of new service schema xml file.
-     * 
+     *
      * @param fileName name of the service xml.
      * @return the absolute path of the file.
      */
@@ -1671,9 +1674,9 @@ public class UpgradeUtils {
 
     /**
      * Returns the absolute path of the <code>serverdefaults</code>
-     * properties file. This file is located in the staging directory 
+     * properties file. This file is located in the staging directory
      * under WEB-INF/classes.
-     * 
+     *
      * @return the absolute path of the file.
      */
     public static String getServerDefaultsPath() {
@@ -1689,9 +1692,9 @@ public class UpgradeUtils {
 
     /**
      * Returns the absolute path of the sms template files.
-     * properties file. This file is located in the staging directory 
+     * properties file. This file is located in the staging directory
      * under WEB-INF/template/sms.
-     * 
+     *
      * @return the absolute path of the file.
      */
     public static String getServiceTemplateDir(String SCHEMA_FILE) {
@@ -1710,7 +1713,7 @@ public class UpgradeUtils {
      * Returns the absolute path of service schema xml file.
      * The new service schema file will be located in the
      * staging directory under WEB-INF/classes.
-     * 
+     *
      * @param serviceName name of the service.
      * @param fileName name of the file.
      * @return the absolute path of the file.
@@ -1725,24 +1728,24 @@ public class UpgradeUtils {
 
         return sb.toString();
     }
-    
+
     /**
-     * Returns the name of a service 
-     * 
+     * Returns the name of a service
+     *
      * @param doc The service definition file in XML
      * @return The name of the service
      */
     public static String getServiceName(Document doc) {
         NodeList nodes = doc.getElementsByTagName(SMSUtils.SERVICE);
         Node serviceNode = nodes.item(0);
-           
+
         return XMLUtils.getNodeAttributeValue(serviceNode, SMSUtils.NAME);
     }
 
     /**
      * Returns the ssoToken used for admin operations.
      * NOTE: this might be replaced later.
-     * 
+     *
      * @param bindUser the user distinguished name.
      * @param bindPwd the user password
      * @return the <code>SSOToken</code>
@@ -1773,13 +1776,13 @@ public class UpgradeUtils {
 
     /**
      * Returns the <code>AuthContext</code>.
-     * 
+     *
      * @param bindUser the user distinguished name.
      * @param bindPwd the user password.
      * @return <code>AuthContext</code> object
      * @throws javax.security.auth.login.LoginException on error.
      */
-    private static com.sun.identity.authentication.internal.AuthContext 
+    private static com.sun.identity.authentication.internal.AuthContext
             getLDAPAuthContext(String bindUser, String bindPwd)
             throws LoginException {
         com.sun.identity.authentication.internal.AuthPrincipal principal =
@@ -1830,7 +1833,7 @@ public class UpgradeUtils {
 
     /**
      * Checks the service scheam for existance of an attribute.
-     * 
+     *
      * @param serviceName name of the service.
      * @param attributeName the attribute name
      * @param schemaType the schema type
@@ -1862,11 +1865,11 @@ public class UpgradeUtils {
     /**
      * Returns a value of an attribute.
      * This method assumes that the attribute is single valued.
-     * 
+     *
      * @param serviceName name of the service.
      * @param attributeName name of the attribute.
      * @param schemaType the schema type.
-     * @return the value of the attribute 
+     * @return the value of the attribute
      * @throws UpgradeException if there is an error.
      */
     public static String getAttributeValueString(
@@ -1884,7 +1887,7 @@ public class UpgradeUtils {
                 value = (String) (hashSet.iterator().next());
             }
         } catch (SMSException sme) {
-            throw new UpgradeException("Error getting attr value : " 
+            throw new UpgradeException("Error getting attr value : "
                     + sme.getMessage());
         }
         return value;
@@ -1892,7 +1895,7 @@ public class UpgradeUtils {
 
     /**
      * Returns a set of values of an attribute.
-     * 
+     *
      * @param serviceName name of the service.
      * @param attributeName the attribute name.
      * @param schemaType the schema type.
@@ -1904,15 +1907,15 @@ public class UpgradeUtils {
             String schemaType) throws UpgradeException {
         return getAttributeValue(serviceName, attributeName, schemaType, false);
     }
-    
+
     /**
      * Returns a set of values of an attribute.
-     * 
+     *
      * @param serviceName name of the service.
      * @param attributeName the attribute name.
      * @param schemaType the schema type.
-     * @param isOrgAttrSchema boolean value indicating whether 
-     *        the attribute is to be retrieved from 
+     * @param isOrgAttrSchema boolean value indicating whether
+     *        the attribute is to be retrieved from
      *        &lt;OrganizationAttributeSchema&gt;
      * @return a set of values for the attribute.
      * @throws UpgradeException if there is an error.
@@ -1935,9 +1938,9 @@ public class UpgradeUtils {
                 attrValues = (Set) attributeDefaults.get(attributeName);
             }
         } catch (SMSException sme) {
-            debug.error(classMethod + 
+            debug.error(classMethod +
                     "Error retreiving attribute values : ",sme);
-            throw new UpgradeException("Unable to get attribute values : " 
+            throw new UpgradeException("Unable to get attribute values : "
                     + sme.getMessage());
         }
         return attrValues;
@@ -1945,7 +1948,7 @@ public class UpgradeUtils {
 
     /**
      * Creates a site configuration.
-     * 
+     *
      * @param siteURL the site URL.
      * @param accessPoints a set of access points for the site.
      * @throws UpgradeException if there is an error.
@@ -1968,7 +1971,7 @@ public class UpgradeUtils {
      * Returns the server instance name.
      * The server instance is the server name appended with the
      * deployURI.
-     * 
+     *
      * @param serverName name of the server
      * @return the server instance name.
      */
@@ -1984,9 +1987,9 @@ public class UpgradeUtils {
         }
     }
 
-    /** 
+    /**
      * Creates a service instance.
-     * 
+     *
      * @param serverInstance the server instance value
      * @param serverId the server identifier
      * @throws UpgradeException if there is an error.
@@ -2007,9 +2010,9 @@ public class UpgradeUtils {
         }
     }
 
-    /** 
+    /**
      * Creates a service instance.
-     * 
+     *
      * @param serverInstance the server instance value
      * @param serverId the server identifier
      * @throws UpgradeException if there is an error.
@@ -2060,7 +2063,7 @@ public class UpgradeUtils {
 
     /**
      * Adds attributes to service sub configuration.
-     * 
+     *
      * @param serviceName the service name
      * @param subConfigName the sub configuration name
      * @param attrValues Map of attributes key is the attribute name and
@@ -2096,8 +2099,8 @@ public class UpgradeUtils {
             debug.error(classMethod + "Error adding attribute to subconfig:",e);
         }
         if (debug.messageEnabled()) {
-            debug.message(classMethod + "Added attributes " + attrValues + 
-                    " to subconfig " + subConfigName 
+            debug.message(classMethod + "Added attributes " + attrValues +
+                    " to subconfig " + subConfigName
                     + " in service " + serviceName);
         }
     }
@@ -2105,7 +2108,7 @@ public class UpgradeUtils {
     // the following methods might change.
     /**
      * Sets the distinguished name of the admin user.
-     * 
+     *
      * @param dn the dn of the admin user.
      */
     public static void setBindDN(String dn) {
@@ -2114,7 +2117,7 @@ public class UpgradeUtils {
 
     /**
      * Sets the deploy uri of OpenAM instance.
-     * 
+     *
      * @param uri the deployment uri
      */
     public static void setDeployURI(String uri) {
@@ -2133,7 +2136,7 @@ public class UpgradeUtils {
 
     /**
      * Sets the password of the admin user.
-     * 
+     *
      * @param password the password the admin user.
      */
     public static void setBindPass(String password) {
@@ -2142,7 +2145,7 @@ public class UpgradeUtils {
 
     /**
      * Sets the Directory Server host name.
-     * 
+     *
      * @param dsHost the directory server host name.
      */
     public static void setDSHost(String dsHost) {
@@ -2151,7 +2154,7 @@ public class UpgradeUtils {
 
     /**
      * Sets the directory server port.
-     * 
+     *
      * @param port the directory server port number.
      */
     public static void setDSPort(int port) {
@@ -2160,7 +2163,7 @@ public class UpgradeUtils {
 
     /**
      * Sets the distinguished name of the directory server manager.
-     * 
+     *
      * @param dn the dn of the directory server manager.
      */
     public static void setDirMgrDN(String dn) {
@@ -2169,7 +2172,7 @@ public class UpgradeUtils {
 
     /**
      * Sets the password of the directory server manager user.
-     * 
+     *
      * @param pass the password the directory server manager.
      */
     public static void setdirPass(String pass) {
@@ -2178,7 +2181,7 @@ public class UpgradeUtils {
 
     /**
      * Sets the location of the upgrade base directory.
-     * 
+     *
      * @param dir the name of the upgrade base directory.
      */
     public static void setBaseDir(String dir) {
@@ -2187,7 +2190,7 @@ public class UpgradeUtils {
 
     /**
      * Sets the location of the staging directory.
-     * 
+     *
      * @param dir the name of the staging directory.
      */
     public static void setStagingDir(String dir) {
@@ -2196,7 +2199,7 @@ public class UpgradeUtils {
 
     /**
      * Sets the configuration directory location
-     * 
+     *
      * @param dir the location of the config directory
      */
     public static void setConfigDir(String dir) {
@@ -2212,7 +2215,7 @@ public class UpgradeUtils {
 
     /**
      * Returns the <code>ServiceSchemaManager</code> for a service.
-     * 
+     *
      * @param serviceName the service name
      * @return the <code>ServiceSchemaManager</code> of the service.
      */
@@ -2223,7 +2226,7 @@ public class UpgradeUtils {
 
     /**
      * Returns the <code>ServiceSchemaManager</code> for a service.
-     * 
+     *
      * @param serviceName the service name
      * @param ssoToken the admin SSOToken.
      * @return the <code>ServiceSchemaManager</code> of the service.
@@ -2253,16 +2256,16 @@ public class UpgradeUtils {
         }
         return mgr;
     }
-    
+
     static ServiceSchema getServiceSchema(String serviceName,
-            String subSchemaName, String schemaType) 
+            String subSchemaName, String schemaType)
     throws UpgradeException {
         return getServiceSchema(serviceName, subSchemaName, schemaType, null);
     }
 
     /**
      * Returns the <code>ServiceSchema</code> of a service.
-     * 
+     *
      * @param serviceName the service name
      * @param subSchemaName the sub schema.
      * @param schemaType the schema type.
@@ -2281,7 +2284,7 @@ public class UpgradeUtils {
                 ss = ss.getSubSchema(subSchemaName);
             }
         } catch (SMSException sme) {
-            throw new UpgradeException("Cannot get service schema : " 
+            throw new UpgradeException("Cannot get service schema : "
                     + sme.getMessage());
         }
         return ss;
@@ -2289,7 +2292,7 @@ public class UpgradeUtils {
 
     /**
      * Returns the <code>SchemaType</code>
-     * 
+     *
      * @param schemaTypeName the schema type string value
      * @return the <code>SchemaType</code> object.
      */
@@ -2309,19 +2312,19 @@ public class UpgradeUtils {
         return schemaType;
     }
 
-    /** 
+    /**
      * Returns the <code>ServiceManager</code>.
-     * 
+     *
      * @return the <code>ServiceManager</code> object.
      * @throws <code>UpgradeException</cpde> if there is an error.
      */
     private static ServiceManager getServiceManager() throws UpgradeException {
         ServiceManager ssm = null;
-        
+
         if (ssoToken == null) {
             getSSOToken();
         }
-        
+
         try {
             ssm = new ServiceManager(ssoToken);
         } catch (SMSException e) {
@@ -2331,10 +2334,10 @@ public class UpgradeUtils {
         }
         return ssm;
     }
-    
-    /** 
+
+    /**
      * Returns the <code>ServiceManager</code>.
-     * 
+     *
      * @param adminToken admin SSOToken
      * @return the <code>ServiceManager</code> object.
      * @throws <code>UpgradeException</cpde> if there is an error.
@@ -2342,7 +2345,7 @@ public class UpgradeUtils {
     private static ServiceManager getServiceManager(SSOToken adminToken)
     throws UpgradeException {
         ServiceManager ssm = null;
-        
+
         try {
             ssm = new ServiceManager(adminToken);
         } catch (SMSException e) {
@@ -2350,14 +2353,14 @@ public class UpgradeUtils {
         } catch (SSOException e) {
             throw new UpgradeException("Invalid SSOToken");
         }
-        
+
         return ssm;
     }
 
     /**
      * Adds module names to the list of authenticators in core auth
      * service.
-     * 
+     *
      * @param moduleName a set of authentication module names.
      * @throws UpgradeException if there is an error.
      */
@@ -2404,7 +2407,7 @@ public class UpgradeUtils {
 
     /**
      * Modifies the i18nKey of the specified attribute in the schema.
-     * 
+     *
      * @param serviceName the service name where the attribute exists.
      * @param subSchema the subschema name.
      * @param schemaType the schema type
@@ -2429,7 +2432,7 @@ public class UpgradeUtils {
         } catch (SMSException sme) {
             throw new UpgradeException("Error setting i18N attribute");
         }
-   } 
+   }
 
     /**
      * Creates auth configurations for auth modules configuration in
@@ -2456,7 +2459,7 @@ public class UpgradeUtils {
             Set authConfigAttrValue =
                     (Set) aa.get(ATTR_ORG_AUTH_MODULE);
             if (debug.messageEnabled()) {
-                debug.message(classMethod + "authConfigAttrValue : " 
+                debug.message(classMethod + "authConfigAttrValue : "
                         + authConfigAttrValue);
             }
             Set newVal = new HashSet();
@@ -2468,7 +2471,7 @@ public class UpgradeUtils {
             }
             Set adminConfigAttrValue = (Set) aa.get(ATTR_ADMIN_AUTH_MODULE);
             if (debug.messageEnabled()) {
-                debug.message("adminauthConfigAttrValue : " 
+                debug.message("adminauthConfigAttrValue : "
                         + adminConfigAttrValue);
             }
             if (adminConfigAttrValue.size() != 1 &&
@@ -2508,13 +2511,13 @@ public class UpgradeUtils {
 
     /**
      * Returns value of an attribute.
-     * 
+     *
      * @param attrName name of the attribute.
      * @param attrs Map of attributes where key is the attribute name
      *          and values are a set of attributes.
-     * @param defaultValue the default value to be returned if value 
+     * @param defaultValue the default value to be returned if value
      *          is not found.
-     * @return the value of attribute if it is found else returns 
+     * @return the value of attribute if it is found else returns
      *          the defaultValue.
      */
     public static String getAttributeString(String attrName, Map attrs,
@@ -2529,7 +2532,7 @@ public class UpgradeUtils {
 
     /**
      * Creates Realm Admin Policy.
-     * 
+     *
      * @param policyManager the policy manager object.
      * @param orgDN the organization dn.
      * @param orgID the organization identifier.
@@ -2562,7 +2565,7 @@ public class UpgradeUtils {
 
     /**
      * Creates Policy Admin Policy.
-     * 
+     *
      * @param policyManager the policy manager object.
      * @param orgDN the organization dn.
      * @param orgID the organization identifier.
@@ -2595,7 +2598,7 @@ public class UpgradeUtils {
 
     /**
      * Creates Realm Read Only Policy
-     * 
+     *
      * @param policyManager the policy manager object.
      * @param orgDN the organization dn.
      * @param orgID the organization identifier.
@@ -2630,7 +2633,7 @@ public class UpgradeUtils {
 
     /**
      * Creates DataStores Read Only Policy
-     * 
+     *
      * @param policyManager the policy manager object.
      * @param orgDN the organization dn.
      * @param orgID the organization identifier.
@@ -2665,7 +2668,7 @@ public class UpgradeUtils {
 
     /**
      * Returns the policy <code>Rule</code> object.
-     * 
+     *
      * @param serviceName name of the service.
      * @param resourceName name of the resource
      * @return <code>Rule</code> object.
@@ -2689,12 +2692,12 @@ public class UpgradeUtils {
 
     /**
      * Returns the policy <code>Rule</code> object.
-     * 
+     *
      * @param serviceName name of the service.
      * @param resourceName name of the resource
      * @param actionsMap map of allowed actions on the resource.
-     *        the key is the actions (MODIFY,DELEGATE,READ) 
-     *        and the values is a set indicating whether 
+     *        the key is the actions (MODIFY,DELEGATE,READ)
+     *        and the values is a set indicating whether
      *        action is allowed or denied.
      * @return <code>Rule</code> object.
      */
@@ -2712,7 +2715,7 @@ public class UpgradeUtils {
 
     /**
      * Returns the policy <code>Subject</code>
-     * 
+     *
      */
     private static Subject getSubject(PolicyManager policyManager,
             String universalID) {
@@ -2741,7 +2744,7 @@ public class UpgradeUtils {
 
     /**
      * Return sub configurations in a service.
-     * 
+     *
      * @param serviceName the service name.
      * @param serviceVersion the version of the service
      * @param realm the realm to retreive the sub configs from.
@@ -2843,15 +2846,15 @@ public class UpgradeUtils {
     /**
      * Creates the default server configuration .
      * The values are read from the AMConfig.properties and for each server
-     * instance a subconfig is created under 
+     * instance a subconfig is created under
      * <code>com-sun-identity-servers</code>
-     * 
-     * @param serviceName the service name 
+     *
+     * @param serviceName the service name
      * @param subConfigName the sub configuration name.
      * @param instanceName the instance name
      * @param instanceID the instance identifier
      * @param values a Set of values to be set.
-     * @param serverConfigXML string representation of 
+     * @param serverConfigXML string representation of
      *     <code>serverconfig.xml</code>
      * @throws UpgradeException if there is an error.
      */
@@ -2926,7 +2929,7 @@ public class UpgradeUtils {
 
     /**
      * Returns the properties from existing <code>AMConfig.properties</code>.
-     * 
+     *
      * @return the properties from existing <code>AMConfig.properties</code>.
      */
     public static Properties getServerProperties() {
@@ -2963,7 +2966,7 @@ public class UpgradeUtils {
 
     /**
      * Returns the <code>serverconfig.xml</code> file contents as a string.
-     * 
+     *
      * @return a string representing the <code>serverconfig.xml<code> file.
      */
     public static String getServerConfigXML() {
@@ -2974,11 +2977,11 @@ public class UpgradeUtils {
         return readFile(fileName);
     }
 
-    /** 
+    /**
      * Returns the server name.
      * The server name is constructed by appending the protocol , host name
      * and port.
-     * 
+     *
      * @return the server name.
      */
     public static String getServerName() {
@@ -2995,18 +2998,18 @@ public class UpgradeUtils {
     /**
      * Returns the value of the server host.
      * The server host is retrieved from the <code>AMConfig.properties</code>
-     * 
+     *
      * @return the server host value .
      */
     public static String getServerHost() {
         Properties amconfigProp = getServerProperties();
         return amconfigProp.getProperty(SERVER_HOST);
     }
-    
+
     /**
      * Creates a file.
-     * This method is used to create the bootstrap file 
-     * 
+     * This method is used to create the bootstrap file
+     *
      * @param fileName mame of the file to be created.
      * @param content value to be written to the file.
      */
@@ -3032,12 +3035,12 @@ public class UpgradeUtils {
 
     /**
      * Adds attribute a sub schema.
-     * 
+     *
      * @param serviceName name of the service
      * @param parentSchemaName the parent schema name.
      * @param subSchemaName the subschema name
      * @param schemaType the schema type
-     * @param attributeSchemaFile the name of the file containing attributes 
+     * @param attributeSchemaFile the name of the file containing attributes
      *     to be added.
      * @throws UpgradeException if there is an error adding the attributes.
      */
@@ -3049,7 +3052,7 @@ public class UpgradeUtils {
             String attributeSchemaFile) throws UpgradeException {
         String classMethod = "UpgradeUtils:addAttributeToSubSchema : ";
         if (debug.messageEnabled()) {
-            debug.message(classMethod + "Adding attribute schema : " 
+            debug.message(classMethod + "Adding attribute schema : "
                     + attributeSchemaFile);
             debug.message(" to subSchema " + subSchemaName +
                     " to service " + serviceName);
@@ -3080,8 +3083,8 @@ public class UpgradeUtils {
 
     /**
      * Returns the value of <code>sunserviceid</code> attribute of a service
-     * sub-configuration. 
-     * 
+     * sub-configuration.
+     *
      * @param subConfig name of the service sub-configuration
      * @return string value of <code>sunserviceid</code> attribute.
      */
@@ -3116,16 +3119,16 @@ public class UpgradeUtils {
         }
         return serviceID;
     }
-    
+
     /**
      * Removes attributes default values from service subconfiguration.
-     * 
+     *
      * @param serviceName name of the service
      * @param sunServiceID set of service identifiers
      * @param realm the realm name
      * @param subConfigName the service sub-configuration name.
-     * @param attributeName name of the attribute 
-     * @param defaultValues a set of values to be removed 
+     * @param attributeName name of the attribute
+     * @param defaultValues a set of values to be removed
      */
     public static void removeSubConfigAttributeDefaultValues(
             String serviceName,
@@ -3166,7 +3169,7 @@ public class UpgradeUtils {
 
     /**
      * Adds defaults values to service sub-configuration
-     * 
+     *
      * @param serviceName the service name
      * @param sunServiceID set of sunservice identifiers for sub-configuration
      * @param realm the realm name
@@ -3229,7 +3232,7 @@ public class UpgradeUtils {
                 while (i.hasNext()) {
                     String attributeName = (String) i.next();
                     if (debug.messageEnabled()) {
-                        debug.message(classMethod 
+                        debug.message(classMethod
                                 + "Removing attr :" + attributeName);
                     }
                     subConfig.removeAttribute(attributeName);
@@ -3245,7 +3248,7 @@ public class UpgradeUtils {
 
     /**
      * Removes attribute default values from service schema.
-     * 
+     *
      * @param serviceName the service name
      * @param schemaType the schema type
      * @param attrName name of the attribute
@@ -3261,7 +3264,7 @@ public class UpgradeUtils {
 
     /**
      * Removes attribute default values from service schema.
-     * 
+     *
      * @param serviceName the service name
      * @param schemaType the schema type
      * @param attrName name of the attribute
@@ -3344,7 +3347,7 @@ public class UpgradeUtils {
         } catch (SSOException ssoe) {
             debug.error(classMethod + "Invalid SSO Token: ", ssoe);
         } catch (SMSException sme) {
-            debug.error(classMethod 
+            debug.error(classMethod
                     + "Error replacing default values for attribute : "
                     + attributeName, sme);
         }
@@ -3352,7 +3355,7 @@ public class UpgradeUtils {
 
     /**
      * Returns a set of valid attributes values for an attribute.
-     * 
+     *
      * @param subConfig the <code>ServiceConfig</code> object.
      * @param attrName the attribute name.
      * @param defaultVal set of attribute values to validate with the
@@ -3368,7 +3371,7 @@ public class UpgradeUtils {
             LDAPEntry ld1 = ld.read(dn);
             LDAPAttributeSet attrSet = ld1.getAttributeSet();
             if (attrSet != null) {
-                for (Enumeration enums = attrSet.getAttributes(); 
+                for (Enumeration enums = attrSet.getAttributes();
                 enums.hasMoreElements();) {
                     LDAPAttribute attr = (LDAPAttribute) enums.nextElement();
                     String attName = attr.getName();
@@ -3404,7 +3407,7 @@ public class UpgradeUtils {
 
     /**
      * Remove all default values from an attribute.
-     * 
+     *
      * @param serviceName name of the service
      * @param schemaType the schema type
      * @param attributeName name of the attribute
@@ -3437,12 +3440,12 @@ public class UpgradeUtils {
     /**
      * Returns a value of an attribute.
      * This method assumes that the attribute is single valued.
-     * 
+     *
      * @param serviceName name of the service.
      * @param attributeName name of the attribute.
      * @param schemaType the schema type.
      * @param subSchemaName the sub schema name.
-     * @return the value of the attribute 
+     * @return the value of the attribute
      */
      public static String getSubSchemaAttributeValue(
             String serviceName,
@@ -3467,7 +3470,7 @@ public class UpgradeUtils {
 
     /**
      * Checks if the instance is FM.
-     * 
+     *
      * @return true if the instance is FM.
      */
     public static boolean isFMInstance() {
@@ -3476,10 +3479,10 @@ public class UpgradeUtils {
         }
         return (instanceType != null && instanceType.equalsIgnoreCase("FM"));
    }
-   
+
     /**
      * Removes service schema from the config store.
-     * 
+     *
      * @param serviceName name of the SMS service to be deleted.
      * @param version the version of the service
      */
@@ -3497,7 +3500,7 @@ public class UpgradeUtils {
      }
     /**
      * Removes service schema from the config store.
-     * 
+     *
      * @param serviceName name of the SMS service to be deleted.
      */
     public static void removeService(String serviceName) {
@@ -3530,7 +3533,7 @@ public class UpgradeUtils {
 
     /**
      * Validates the Directory Server Credentials.
-     * 
+     *
      * @param dsHost the directory server host.
      * @param dsPort the directory server port.
      * @param bindDN the dn to bind with.
@@ -3617,7 +3620,7 @@ public class UpgradeUtils {
      *
      * @param serviceName name of the service
      * @param orgName name of the organization
-     * @param attrValues map of attribute names and their values. The 
+     * @param attrValues map of attribute names and their values. The
      *        key is the attribute name a string and the values is a Set
      *        of values.
      */
@@ -3635,14 +3638,14 @@ public class UpgradeUtils {
 
     /**
      * Adds SubConfiguration to an existing subconfiguration in a service.
-     * 
+     *
      * @param serviceName the service name
      * @param parentConfigName the name of parent sub configuration.
-     * @param subConfigName the subconfig name 
+     * @param subConfigName the subconfig name
      * @param subConfigID the subconfig id
      * @param attrValues a map of attribute value pairs to be added to the
      *        subconfig.
-     * @param priority the priority value 
+     * @param priority the priority value
      * @throws UpgradeException if there is an error.
      */
     public static void addSubConfig(
@@ -3660,7 +3663,7 @@ public class UpgradeUtils {
             if (sc != null) {
                 sc1.addSubConfig(subConfigName,subConfigID,priority,attrValues);
             } else {
-                debug.error(classMethod + 
+                debug.error(classMethod +
                         "Error adding sub cofiguration" + subConfigName);
                 throw new UpgradeException("Error adding subconfig");
             }
@@ -3677,7 +3680,7 @@ public class UpgradeUtils {
       * Removes Condition Properties.
       *
       * @param policyName Name of Policy.
-      * @param attributeName the name of the attribute whose default values 
+      * @param attributeName the name of the attribute whose default values
       *        needs to be updated.
       * @param conditionNameMap Map of condition name to map of property name to
       *        set of attribute values to be removed.
@@ -3756,5 +3759,76 @@ public class UpgradeUtils {
          } catch (SSOException e) {
              debug.error(classMethod,e);
          }
+    }
+
+    /**
+     * Looks for a key in the referenced resource bundle, then tokenizes the value and converts it to a list.
+     *
+     * @param bundle The name of the bundle we need to look up the key.
+     * @param key The key that needs to be looked up.
+     * @return The parsed in values in a list.
+     */
+    public static List<String> getPropertyValues(String bundle, String key) {
+        List<String> ret = new ArrayList<String>();
+        ResourceBundle rb = ResourceBundle.getBundle(bundle);
+        String names = rb.getString(key);
+        StringTokenizer st = new StringTokenizer(names);
+
+        while (st.hasMoreTokens()) {
+            ret.add(st.nextToken());
+        }
+        return ret;
+    }
+
+    /**
+     * Adds a new Schema to an already existing service.
+     *
+     * @param serviceName The name of the service that needs to be extended.
+     * @param schemaChanges A "container" object holding the details of the new schema.
+     * @param adminToken An admin token.
+     * @throws UpgradeException If there was an error while trying to add the new schema to the service.
+     */
+    public static void addNewSchema(String serviceName, SchemaUpgradeWrapper schemaChanges, SSOToken adminToken)
+            throws UpgradeException {
+        try {
+            ServiceSchemaManager ssm = new ServiceSchemaManager(serviceName, adminToken);
+            InputStream schemaStream = ssm.getSchema();
+            Document dom = XMLUtils.toDOMDocument(schemaStream, debug);
+            NodeList schemaElements = dom.getElementsByTagName("Schema");
+            String schemaName = schemaChanges.getNewSchema().getSchemaName();
+            debug.message("Adding new " + schemaName + " schema to " + serviceName);
+            if (schemaElements.getLength() == 1) {
+                Node schemaElement = schemaElements.item(0);
+                NodeList schemas = schemaElement.getChildNodes();
+                Node newNextSibling = null;
+                int idx = SCHEMA_ORDER.indexOf(schemaName);
+                for (int i = 0; i < schemas.getLength(); i++) {
+                    Node node = schemas.item(i);
+                    int currentIdx = SCHEMA_ORDER.indexOf(node.getNodeName());
+                    if (currentIdx > idx) {
+                        newNextSibling = node;
+                        break;
+                    }
+                }
+                String xml = "<" + schemaName + "></" + schemaName + ">";
+                Document doc = XMLUtils.toDOMDocument(xml, debug);
+                for (AttributeSchemaImpl attr : schemaChanges.getNewSchema().getAttributes()) {
+                    Node imported = doc.importNode(attr.getAttributeSchemaNode(), true);
+                    doc.getDocumentElement().appendChild(imported);
+                }
+                Node schemaNode = dom.importNode(doc.getDocumentElement(), true);
+                schemaElement.insertBefore(schemaNode, newNextSibling);
+                InputStream is = new ByteArrayInputStream(XMLUtils.print(dom.getDocumentElement()).getBytes());
+                ssm.replaceSchema(is);
+            } else {
+                debug.error("Unexpected number of Schema element in service XML for " + serviceName
+                        + "\n" + XMLUtils.print(dom));
+                throw new UpgradeException("Unexpected number of Schema element in service XML for " + serviceName);
+            }
+        } catch (Exception ex) {
+            UpgradeProgress.reportEnd("upgrade.failed");
+            debug.error("An error occurred while trying to add new schema to service: " + serviceName, ex);
+            throw new UpgradeException(ex);
+        }
     }
 }

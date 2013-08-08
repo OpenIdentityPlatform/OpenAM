@@ -160,6 +160,7 @@ public class AMSetupServlet extends HttpServlet {
     private static boolean isConfiguredFlag = false;
     private static boolean isVersionNewer = false;
     private static boolean upgradeCompleted = false;
+    private static boolean isOpenDJUpgraded = false;
     private final static String SMS_STR = "sms";
     private static SSOToken adminToken = null;
     private final static String LEGACY_PROPERTIES = "legacy";
@@ -269,6 +270,10 @@ public class AMSetupServlet extends HttpServlet {
         return upgradeCompleted;
     }
 
+    public static boolean isOpenDJUpgraded() {
+        return isOpenDJUpgraded;
+    }
+
     public static void enableDebug() {
         Collection<Debug> debugInstances = Debug.getInstances();
         
@@ -314,6 +319,7 @@ public class AMSetupServlet extends HttpServlet {
             Debug.getInstance(SetupConstants.DEBUG_NAME).error("OpenDJ upgrade exception: ", ex);
             throw new ServletException("An error occurred while upgrading embedded OpenDJ", ex);
         }
+        isOpenDJUpgraded = true;
     }
     
     protected static void createOpenDJBackup() {

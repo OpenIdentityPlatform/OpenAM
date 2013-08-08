@@ -26,7 +26,7 @@
  *
  */
 /**
- * Portions Copyrighted 2011-2012 ForgeRock Inc
+ * Portions Copyrighted 2011-2013 ForgeRock Inc
  */
 package com.sun.identity.common.configuration;
 
@@ -60,9 +60,6 @@ import java.util.ResourceBundle;
 import java.util.Set;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.ParserConfigurationException;
-import org.forgerock.openam.upgrade.ServerUpgrade;
-import org.forgerock.openam.upgrade.UpgradeException;
-import org.forgerock.openam.upgrade.UpgradeReport;
 import org.forgerock.openam.upgrade.UpgradeUtils;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -78,7 +75,7 @@ public class ServerConfiguration extends ConfigurationBase {
     private static final String ATTR_SERVER_CONFIG_XML = "serverconfigxml";
 
     public static final String SERVER_DEFAULTS = "serverdefaults";
-    private static final String DEFAULT_SERVER_ID = "00";
+    public static final String DEFAULT_SERVER_ID = "00";
 
     /**
      * Default server configuration.
@@ -342,273 +339,35 @@ public class ServerConfiguration extends ConfigurationBase {
         }
     }
     
-    public static Map<String, StringBuilder> upgradeDefaults(SSOToken ssoToken, boolean dryRun, boolean shortReport) 
-    throws SSOException, SMSException, UnknownPropertyNameException {
-        Map<String, StringBuilder> result;
+    public static Map<String, String> getNewServerDefaults(SSOToken ssoToken) throws SMSException, SSOException {
         boolean bCreated = false;
         ServiceConfig sc = getRootServerConfig(ssoToken);
-        
         try {
             bCreated = (sc.getSubConfig(DEFAULT_SERVER_CONFIG) != null);
         } catch (SMSException smse) {
             // ignore, default is not created.
         }
-        
+
         if (bCreated) {
             ResourceBundle res = ResourceBundle.getBundle(SERVER_DEFAULTS);
             Map<String, String> newValues = new HashMap<String, String>();
-            
-            for (Enumeration i = res.getKeys(); i.hasMoreElements(); ) {
-                String key = (String)i.nextElement();
-                String val = (String)res.getString(key);
-                
+
+            for (Enumeration<String> i = res.getKeys(); i.hasMoreElements();) {
+                String key = i.nextElement();
+                String val = res.getString(key);
+
                 if (val.equals(
-                    "@" + SetupConstants.CONFIG_VAR_PLATFORM_LOCALE + "@")
-                ) {
+                        "@" + SetupConstants.CONFIG_VAR_PLATFORM_LOCALE + "@")) {
                     val = Locale.getDefault().toString();
                 }
-                
+
                 newValues.put(key, val);
             }
-            
             newValues.put(Constants.PROPERTY_NAME_LB_COOKIE_VALUE, DEFAULT_SERVER_ID);
-            
-            Properties prop = null;
-            
-            try {
-                prop = getServerInstance(ssoToken, DEFAULT_SERVER_CONFIG);
-            } catch (SMSException smse) {
-                
-            } catch (IOException ioe) {
-                
-            }
-            
-            Set<String> attrsToUpgrade = null;
-        
-            try {
-                attrsToUpgrade = ServerUpgrade.getAttrsToUpgrade();
-            } catch (UpgradeException ue) {
-                if (UpgradeUtils.debug.warningEnabled()) {
-                    UpgradeUtils.debug.warning("Unable to fetch server defaults to upgrade", ue);
-                }
-            }
-            
-            Map<String, String> existingValues = new HashMap(prop);
-            Map<String, String> upgradedValues = calculateUpgradedServerDefaults(newValues, existingValues, attrsToUpgrade);
-            
-            if (dryRun) {
-                return generateServerDefaultsUpgradeReport(newValues, existingValues, shortReport, attrsToUpgrade);
-            }
-            
-            if (!dryRun) {
-                try {
-                    upgradeServerInstance(ssoToken, DEFAULT_SERVER_CONFIG,
-                        DEFAULT_SERVER_ID, upgradedValues);
-                } catch (ConfigurationException cex) {
-                    UpgradeUtils.debug.error("Unable to upgrade", cex);
-                } catch (IOException ioe) {
-                    UpgradeUtils.debug.error("Unable to upgrade", ioe);
-                }
-            }
-            
+            return newValues;
+        } else {
             return Collections.EMPTY_MAP;
         }
-        
-        return Collections.EMPTY_MAP;
-    }
-    
-    public static Map<String, StringBuilder> generateServerDefaultsUpgradeReport(
-            Map<String, String> newValues, Map<String, String> existingValues, boolean shortReport, Set<String> attrsToUpgrade) {
-        int add = 0, mod = 0, del = 0;
-        Map<String, StringBuilder> report = new HashMap<String, StringBuilder>();
-
-        // calcuate new attributes
-        Map<String, String> addedAttrs = calculateAddedServerDefaults(newValues, existingValues);
-        
-        if (!(addedAttrs.isEmpty())) {
-            StringBuilder aBuf = new StringBuilder();
-            
-            for (Map.Entry<String, String> newAttr : addedAttrs.entrySet()) {
-                if (shortReport) {
-                    add++;
-                } else {
-                    aBuf.append(UpgradeReport.BULLET).append("attr name: ").append(newAttr.getKey());
-                    aBuf.append(" : value: ").append(newAttr.getValue()).append(UpgradeReport.LF);
-                }
-            }
-            
-            if (!shortReport) {
-                report.put(UpgradeReport.NEW_ATTRS, aBuf);
-            }
-        } else {
-            report.put(UpgradeReport.NEW_ATTRS, new StringBuilder().append("* None"));
-        }
-        
-        // calculate modified attributes
-        Map<String, String> modifiedAttrs = calculateModifiedServerDefaults(newValues, existingValues, attrsToUpgrade);
-        
-        if (!(modifiedAttrs.isEmpty())) {
-            StringBuilder mBuf = new StringBuilder();
-            
-            for (Map.Entry<String, String> modAttr : modifiedAttrs.entrySet()) {
-                if (shortReport) {
-                    mod++;
-                } else {
-                    mBuf.append(UpgradeReport.BULLET).append("attr name: ");
-                    mBuf.append(modAttr.getKey()).append(UpgradeReport.LF);
-                    mBuf.append(UpgradeReport.INDENT).append("old value: ");
-                    mBuf.append(existingValues.get(modAttr.getKey())).append(UpgradeReport.LF);
-                    mBuf.append(UpgradeReport.INDENT).append("new value: ");
-                    mBuf.append(modAttr.getValue()).append(UpgradeReport.LF);
-                }
-            }       
-            
-            if (!shortReport) {
-                report.put(UpgradeReport.MOD_ATTRS, mBuf);
-            }
-        } else {
-            report.put(UpgradeReport.MOD_ATTRS, new StringBuilder().append("* None"));
-        }
-        
-        // calculate deleted attributes
-        Set<String> deletedAttrs = calculateDeletedServerDefaults(newValues, existingValues);
-        
-        if (!(deletedAttrs.isEmpty())) {
-            StringBuilder dBuf = new StringBuilder();
-            
-            for (String deletedAttr : deletedAttrs) {
-                if (shortReport) {
-                    del++;
-                } else {
-                    dBuf.append(UpgradeReport.BULLET).append("attr name: ").append(deletedAttr).append(UpgradeReport.LF);
-                }
-            }        
-            
-            if (!shortReport) {
-                report.put(UpgradeReport.DEL_ATTRS, dBuf);
-            }
-        } else {
-            report.put(UpgradeReport.DEL_ATTRS, new StringBuilder().append("* None"));
-        }
-        
-        if (shortReport) {
-            StringBuilder sBuf = new StringBuilder();
-            
-            if (add > 0 || mod > 0 || del > 0) {
-                sBuf.append("Server Defaults modified: ");
-            }
-                    
-            if (add > 0) {
-                sBuf.append("Added (").append(add).append(")");
-            }
-            
-            if (mod > 0) {
-                if (add > 0) {
-                    sBuf.append(", ");
-                }
-                
-                sBuf.append("Modified (").append(mod).append(")");
-            }
-            
-            if (del > 0) {
-                if (add > 0 || mod > 0) {
-                    sBuf.append(", ");
-                }
-                
-                sBuf.append("Deleted (").append(del).append(")");
-            }
-            
-            report.put(UpgradeReport.SHORT_REPORT, sBuf);
-        }
-
-        return report;
-    }
-           
-    public static Map<String, String> calculateUpgradedServerDefaults(
-            Map<String, String> newValues, Map<String, String> existingValues, Set<String> attrsToUpgrade) {
-        Map<String, String> upgradedValues = new HashMap<String, String>(existingValues);
-
-        // calcuate new attributes
-        Map<String, String> addedAttrs = calculateAddedServerDefaults(newValues, existingValues);
-        
-        if (!(addedAttrs.isEmpty())) {
-            for (Map.Entry<String, String> newAttr : addedAttrs.entrySet()) {
-                upgradedValues.put(newAttr.getKey(), newAttr.getValue());
-            }
-        }
-        
-        // calculate modified attributes
-        Map<String, String> modifiedAttrs = calculateModifiedServerDefaults(newValues, existingValues, attrsToUpgrade);
-        
-        if (!(modifiedAttrs.isEmpty())) {
-            for (Map.Entry<String, String> modAttr : modifiedAttrs.entrySet()) {
-                upgradedValues.put(modAttr.getKey(), modAttr.getValue());
-            }            
-        }
-        
-        // calculate deleted attributes
-        Set<String> deletedAttrs = calculateDeletedServerDefaults(newValues, existingValues);
-        
-        if (!(deletedAttrs.isEmpty())) {
-            for (String deletedAttr : deletedAttrs) {
-                upgradedValues.remove(deletedAttr);
-            }            
-        }
-
-        return upgradedValues;
-    }
-    
-    protected static Map<String, String> calculateAddedServerDefaults(
-            Map<String, String> newValues, Map<String, String> existingValues) {
-        Map<String, String> addedValues = new HashMap<String, String>();
-        
-        for (Map.Entry<String, String> newAttr : newValues.entrySet()) {
-            if (!(existingValues.containsKey(newAttr.getKey()))) {
-                addedValues.put(newAttr.getKey(), newAttr.getValue());
-            }
-                
-        }
-        
-        return addedValues;
-    }
-    
-    /**
-     * Only include in the list of modified attributes those that are listed
-     * in the serverupgrade.properites file; otherwise existing properties
-     * that have been locally modified will be over-written.
-     * 
-     * @param newValues
-     * @param existingValues
-     * @return modified key value pairs
-     */
-    protected static Map<String, String> calculateModifiedServerDefaults(
-            Map<String, String> newValues, Map<String, String> existingValues, Set<String> attrToModify) {
-        Map<String, String> modifiedValues = new HashMap<String, String>();
-        
-        for (Map.Entry<String, String> newAttr : newValues.entrySet()) {
-            if (attrToModify.contains(newAttr.getKey())) {
-                if (existingValues.containsKey(newAttr.getKey())) {
-                    if (!(existingValues.get(newAttr.getKey()).equals(newAttr.getValue()))) {
-                        modifiedValues.put(newAttr.getKey(), newAttr.getValue());
-                    }
-                }
-            }
-        }
-        
-        return modifiedValues;
-    }
-    
-    protected static Set<String> calculateDeletedServerDefaults(
-            Map<String, String> newValues, Map<String, String> existingValues) {
-        Set<String> deletedValues = new HashSet<String>();
-        
-        for (Map.Entry<String, String> existingAttr : existingValues.entrySet()) {
-            if (!(newValues.containsKey(existingAttr.getKey()))) {
-                deletedValues.add(existingAttr.getKey());
-            }
-        }
-        
-        return deletedValues;
     }
 
     public static Map getDefaultProperties() {
