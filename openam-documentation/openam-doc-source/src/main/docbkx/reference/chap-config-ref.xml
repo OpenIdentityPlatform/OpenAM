@@ -3831,6 +3831,21 @@
    </varlistentry>
 
    <varlistentry>
+    <term><literal>com.sun.identity.session.repository.enableEncryption</literal></term>
+    <listitem>
+     <para>Enables tokens to be encrypted when stored.</para>
+     <para>Multi-instance deployments require consistent use of this property, which should
+     be done under the Servers and Sites > Default Server Settings.</para>
+     </para>The <literal>am.encryption.pwd</literal> property must also be the same for 
+     all deployed instances. The <literal>am.encryption.pwd</literal> is under 
+     Servers and Sites > Server > Security > Password Encryption Key. You will need to 
+     verify that all servers have the same setting for this property as the default
+     server.</para>
+     <para>Default: <literal>false</literal></para>
+    </listitem>
+   </varlistentry>
+
+   <varlistentry>
     <term><literal>com.sun.identity.urlchecker.dorequest</literal></term>
     <listitem>
      <para>Whether to perform an HTTP GET on
