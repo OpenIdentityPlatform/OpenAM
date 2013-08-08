@@ -357,4 +357,23 @@ public class LDAPUtils {
         }
         return values;
     }
+
+    /**
+     * Converts the incoming set of URLs to {@link LDAPURL} instances and returns them as a set. The iteration order
+     * of the originally passed in Set is retained.
+     *
+     * @param servers The LDAP server URLs that needs to be converted to {@link LDAPURL} instances.
+     * @return A set of LDAPURLs corresponding to the passed in URLs.
+     */
+    public static Set<LDAPURL> convertToLDAPURLs(Set<String> servers) {
+        if (servers == null) {
+            return new LinkedHashSet<LDAPURL>(0);
+        } else {
+            Set<LDAPURL> ret = new LinkedHashSet<LDAPURL>(servers.size());
+            for (String server : servers) {
+                ret.add(new LDAPURL(server));
+            }
+            return ret;
+        }
+    }
 }

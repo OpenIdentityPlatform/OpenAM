@@ -136,14 +136,6 @@
                         <Value>0</Value>
                     </DefaultValues>
                 </AttributeSchema>
-                <AttributeSchema name="iplanet-am-auth-ldap-server-check"
-                    type="single"
-                    syntax="number"
-                    i18nKey="a113">
-                    <DefaultValues>
-                        <Value>15</Value>
-                    </DefaultValues>
-                </AttributeSchema>        
                 <AttributeSchema name="iplanet-am-ldap-user-creation-attr-list"
                     type="list"
                     syntax="string"
@@ -155,6 +147,27 @@
                     i18nKey="">
                     <DefaultValues>
                         <Value>*|(|)|&amp;|!</Value>
+                    </DefaultValues>
+                </AttributeSchema>
+                <AttributeSchema name="openam-auth-ldap-heartbeat-interval"
+                    type="single"
+                    syntax="number"
+                    i18nKey="a118">
+                    <DefaultValues>
+                        <Value>1</Value>
+                    </DefaultValues>
+                </AttributeSchema>
+                <AttributeSchema name="openam-auth-ldap-heartbeat-timeunit"
+                    type="single_choice"
+                    syntax="string"
+                    i18nKey="a119">
+                    <ChoiceValues>
+                        <ChoiceValue i18nKey="a1191">SECONDS</ChoiceValue>
+                        <ChoiceValue i18nKey="a1192">MINUTES</ChoiceValue>
+                        <ChoiceValue i18nKey="a1193">HOURS</ChoiceValue>
+                    </ChoiceValues>
+                    <DefaultValues>
+                        <Value>MINUTES</Value>
                     </DefaultValues>
                 </AttributeSchema>
                 <SubSchema name="serverconfig" inheritance="multiple">
@@ -251,14 +264,6 @@
                             <Value>0</Value>
                         </DefaultValues>
                     </AttributeSchema>
-                   <AttributeSchema name="iplanet-am-auth-ldap-server-check"
-                        type="single"
-                        syntax="number"
-                        i18nKey="a113">
-                        <DefaultValues>
-                            <Value>15</Value>
-                        </DefaultValues>
-                    </AttributeSchema>                        
                     <AttributeSchema name="iplanet-am-ldap-user-creation-attr-list"
                         type="list"
                         syntax="string"
@@ -270,6 +275,27 @@
                     i18nKey="">
                     <DefaultValues>
                         <Value>*|(|)|&amp;|!</Value>
+                    </DefaultValues>
+                </AttributeSchema>
+                <AttributeSchema name="openam-auth-ldap-heartbeat-interval"
+                    type="single"
+                    syntax="number"
+                    i18nKey="a118">
+                    <DefaultValues>
+                        <Value>1</Value>
+                    </DefaultValues>
+                </AttributeSchema>
+                <AttributeSchema name="openam-auth-ldap-heartbeat-timeunit"
+                    type="single_choice"
+                    syntax="string"
+                    i18nKey="a119">
+                    <ChoiceValues>
+                        <ChoiceValue i18nKey="a1191">SECONDS</ChoiceValue>
+                        <ChoiceValue i18nKey="a1192">MINUTES</ChoiceValue>
+                        <ChoiceValue i18nKey="a1193">HOURS</ChoiceValue>
+                    </ChoiceValues>
+                    <DefaultValues>
+                        <Value>MINUTES</Value>
                     </DefaultValues>
                 </AttributeSchema>
                 </SubSchema>

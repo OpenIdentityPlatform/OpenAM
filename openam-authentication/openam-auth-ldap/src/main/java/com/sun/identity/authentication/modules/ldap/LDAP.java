@@ -32,8 +32,6 @@
 
 package com.sun.identity.authentication.modules.ldap;
 
-import com.iplanet.am.util.SystemProperties;
-import com.sun.identity.authentication.service.AuthD;
 import com.sun.identity.authentication.spi.AMAuthCallBackImpl;
 import com.sun.identity.authentication.spi.AMAuthCallBackException;
 import com.sun.identity.authentication.spi.AMLoginModule;
@@ -41,52 +39,36 @@ import com.sun.identity.authentication.spi.AuthLoginException;
 import com.sun.identity.authentication.spi.InvalidPasswordException;
 import com.sun.identity.authentication.spi.UserNamePasswordValidationException;
 import com.sun.identity.authentication.util.ISAuthConstants;
-import com.sun.identity.common.GeneralTaskRunnable;
-import com.sun.identity.common.SystemTimer;
-import com.sun.identity.shared.Constants;
 import com.sun.identity.shared.datastruct.CollectionHelper;
 import com.sun.identity.shared.debug.Debug;
-import com.sun.identity.sm.ServiceConfig;
-import java.security.GeneralSecurityException;
 import java.security.Principal;
-import java.util.Date;
 import java.util.EnumSet;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.Locale;
 import java.util.Map;
 import java.util.ResourceBundle;
 import java.util.Set;
-import java.util.StringTokenizer;
-import javax.net.ssl.SSLContext;
 import javax.security.auth.Subject;
 import javax.security.auth.callback.Callback;
 import javax.security.auth.callback.ConfirmationCallback;
 import javax.security.auth.callback.NameCallback;
 import javax.security.auth.callback.PasswordCallback;
-import org.forgerock.opendj.ldap.Connection;
-import org.forgerock.opendj.ldap.ErrorResultException;
-import org.forgerock.opendj.ldap.LDAPConnectionFactory;
-import org.forgerock.opendj.ldap.LDAPOptions;
 import org.forgerock.opendj.ldap.ResultCode;
-import org.forgerock.opendj.ldap.SSLContextBuilder;
 import org.forgerock.opendj.ldap.SearchScope;
-import org.forgerock.opendj.ldap.TrustManagers;
 
 public class LDAP extends AMLoginModule {
     // static variables
-    private static HashMap orgMap = new HashMap();
-    private static final long DEFAULT_SERVER_CHECK_INTERVAL = 15;
     private static final String USER_CREATION_ATTR =
         "iplanet-am-ldap-user-creation-attr-list";
     private static final String INVALID_CHARS =
         "iplanet-am-auth-ldap-invalid-chars";
     private static final String PIPE_SEPARATOR="|";
     private static final String AM_AUTH = "amAuth";
-    private static boolean ldapSSL = false;
     private boolean sslTrustAll = false;
     private boolean sslEnabled = false;
-    
+
     // local variables
     ResourceBundle bundle = null;
     protected String validatedUserID;
@@ -96,50 +78,31 @@ public class LDAP extends AMLoginModule {
     private String regEx;
     private String currentConfigName;
     private String bindDN;
-    private Iterator subConfigNamesIter = null;
-    private ServiceConfig sc;
-    private boolean firstTry = true;
     private int currentState;
-    private boolean primary = true;
-    private int previousScreen;
     protected LDAPAuthUtils ldapUtil;
-    private static volatile FailbackManager fMgr;
     private boolean isReset;
-    private int primaryServerPort;
-    private String primaryServerHost;
     private boolean isProfileCreationEnabled;
     private boolean getCredentialsFromSharedState;
 
     private AMAuthCallBackImpl callbackImpl = null;
-    
-    private long interval = DEFAULT_SERVER_CHECK_INTERVAL;
-    
+
     private Set userCreationAttrs = new HashSet();
     private HashMap userAttrMap = new HashMap();
     private Map sharedState;
-    private String serverHost;
-    private int serverPort;
     public Map currentConfig;
-    
+
     protected Debug debug = null;
     protected String amAuthLDAP;
     protected Principal userPrincipal;
-    
-    static {
-        // initializing the login parameters by getting the values from
-        // ConfigProperties
-        ldapSSL = Boolean.valueOf(SystemProperties.get(
-        Constants.AM_DIRECTORY_SSL_ENABLED, "false")).booleanValue();
-    }
-    
+
     enum LoginScreen {
         LOGIN_START(1, "loginState"),
-        PASSWORD_CHANGE(2, "passwordChange"),    
+        PASSWORD_CHANGE(2, "passwordChange"),
         PASSWORD_EXPIRED_SCREEN(3, "passwordExpired"),
         USER_INACTIVE(4, "userInactive"),
         ACCOUNT_LOCKED(5, "accountLocked");
-        
-        private static final Map<Integer,LoginScreen> lookup = 
+
+        private static final Map<Integer,LoginScreen> lookup =
                 new HashMap<Integer,LoginScreen>();
 
         static {
@@ -147,7 +110,7 @@ public class LDAP extends AMLoginModule {
                 lookup.put(ls.intValue(), ls);
             }
         }
-        
+
         private final int state;
         private final String name;
 
@@ -160,14 +123,14 @@ public class LDAP extends AMLoginModule {
         public String toString() {
             return name;
         }
-        
+
         public static LoginScreen get(int screen) {
             return lookup.get(screen);
         }
-        
+
         int intValue() {
             return state;
-        }  
+        }
     }
 
     /**
@@ -182,21 +145,14 @@ public class LDAP extends AMLoginModule {
      * TODO-JAVADOC
      */
     public void init(Subject subject, Map sharedState, Map options) {
-        sc = (ServiceConfig) options.get("ServiceConfig");
         currentConfig = options;
-        currentConfigName = 
-            (String)options.get(ISAuthConstants.MODULE_INSTANCE_NAME);
-        primary = getPrimaryFlag(currentConfigName);
-        java.util.Locale locale = getLoginLocale();
+        currentConfigName = (String) options.get(ISAuthConstants.MODULE_INSTANCE_NAME);
+        Locale locale = getLoginLocale();
         bundle = amCache.getResBundle(amAuthLDAP, locale);
         if (debug.messageEnabled()) {
             debug.message("LDAP resbundle locale=" + locale);
         }
         this.sharedState = sharedState;
-        if (debug.messageEnabled()) {
-            debug.message("Host: " + AuthD.directoryHostName +
-            "\nPORT : " + AuthD.directoryPort);
-        }
     }
 
     /**
@@ -204,279 +160,143 @@ public class LDAP extends AMLoginModule {
      */
     public boolean initializeLDAP() throws AuthLoginException {
         debug.message("LDAP initialize()");
-        serverHost = null;
-        
+
         try {
-            if (currentConfig != null) {
-                try {
-                    String checkAttr = "iplanet-am-auth-ldap-server-check";
-                    interval = Long.parseLong(CollectionHelper.getServerMapAttr(
-                        currentConfig, checkAttr));
-                } catch (NumberFormatException nfe) {
-                    if (debug.messageEnabled()) {
-                        debug.message("Server Check Interval is not set.\n"+
-                        "Setting it to default value 15 min");
-                    }
-                    interval = DEFAULT_SERVER_CHECK_INTERVAL;
-                }
-                setInterval(interval);
-                if (primary) {
-                    serverHost = CollectionHelper.getServerMapAttr(
-                        currentConfig, "iplanet-am-auth-ldap-server");
-                    if (serverHost == null) {
-                        if (debug.messageEnabled()) {
-                            debug.message("No primary server for confing " +
-                            currentConfigName);
-                        }
-                        return false;
-                    }
-                } else {
-                    serverHost = CollectionHelper.getServerMapAttr(
-                        currentConfig, "iplanet-am-auth-ldap-server2");
-                    
-                    if (serverHost == null) {
-                        if (debug.messageEnabled()) {
-                            debug.message("No secondary server for confing " +
-                            currentConfigName);
-                        }
-                        return false;
-                    }
-                }
-                
-                String baseDN = CollectionHelper.getServerMapAttr(
-                    currentConfig, "iplanet-am-auth-ldap-base-dn");
-                if (baseDN == null) {
-                    debug.error("BaseDN for search is invalid: " + baseDN);
-                }
-                
-                String pLen = CollectionHelper.getMapAttr(currentConfig,
-                    "iplanet-am-auth-ldap-min-password-length"); 
-                if (pLen != null) {
-                    try {
-                        requiredPasswordLength = Integer.parseInt(pLen);
-                    } catch (NumberFormatException ex) {
-                        debug.error("LDAP.initializeLDAP : " + pLen, ex);
-                    }
-                } 
-                bindDN = CollectionHelper.getMapAttr(currentConfig,
-                    "iplanet-am-auth-ldap-bind-dn", "");
-                String bindPassword = CollectionHelper.getMapAttr(
-                    currentConfig, "iplanet-am-auth-ldap-bind-passwd", "");
-                String userNamingAttr = CollectionHelper.getMapAttr(
-                    currentConfig,
-                    "iplanet-am-auth-ldap-user-naming-attribute", "uid");
-                Set userSearchAttrs = (Set)currentConfig.get(
-                    "iplanet-am-auth-ldap-user-search-attributes");
-                String searchFilter = CollectionHelper.getMapAttr(
-                    currentConfig, "iplanet-am-auth-ldap-search-filter", "");
-                sslEnabled = Boolean.valueOf(CollectionHelper.getMapAttr(
-                    currentConfig, "iplanet-am-auth-ldap-ssl-enabled", "false")
-                    ).booleanValue();
-                getUserCreationAttrs(currentConfig);
-                String tmp = CollectionHelper.getMapAttr(currentConfig,
-                    "iplanet-am-auth-ldap-search-scope", "SUBTREE");
-                
-                String authLevel = CollectionHelper.getMapAttr(currentConfig,
-                    "iplanet-am-auth-ldap-auth-level");
-                if (authLevel != null) {
-                    try {
-                        setAuthLevel(Integer.parseInt(authLevel));
-                    } catch (Exception e) {
-                        debug.error("Unable to set auth level " + authLevel);
-                    }
-                }
-                
-                SearchScope searchScope = SearchScope.WHOLE_SUBTREE;
-                
-                if (tmp.equalsIgnoreCase("OBJECT")) {
-                    searchScope = SearchScope.BASE_OBJECT;
-                } else if (tmp.equalsIgnoreCase("ONELEVEL")) {
-                    searchScope = SearchScope.SINGLE_LEVEL;
-                }
-                
-                String returnUserDN = CollectionHelper.getMapAttr(
-                    currentConfig, ISAuthConstants.LDAP_RETURNUSERDN, "true");
-                regEx = CollectionHelper.getMapAttr(
-                    currentConfig, INVALID_CHARS);
-                
-                // set LDAP Parameters
-                int index = serverHost.indexOf(':');
-                serverPort = 389;
-                
-                if (index != -1) {
-                    serverPort = Integer.parseInt(
-                    serverHost.substring(index + 1));
-                    serverHost = serverHost.substring(0, index);
-                }
-                if (!primary) {
-                    primaryServerHost = CollectionHelper.getServerMapAttr(
-                        currentConfig, "iplanet-am-auth-ldap-server");
-                    primaryServerPort = 389;
-                    int colonIndex = primaryServerHost.indexOf(':');
-                    if (colonIndex != -1) {
-                        primaryServerPort = Integer.parseInt(
-                        primaryServerHost.substring(colonIndex + 1));
-                        primaryServerHost = primaryServerHost.substring(0,
-                            colonIndex);
-                    }
-                    if (LDAPAuthUtils.connectionPoolsStatus != null) {
-                        String poolKey = primaryServerHost + ":" +
-                            primaryServerPort + ":" + bindDN;
-                        LDAPAuthUtils.ServerStatus adminPoolStatus = 
-                                LDAPAuthUtils.connectionPoolsStatus.get(poolKey);
-                        if ( (adminPoolStatus == null) ||
-                            (adminPoolStatus.equals(LDAPAuthUtils.ServerStatus.STATUS_UP))) {
-                             setPrimaryFlag(currentConfigName, true);
-                             primary = true;
-                             serverHost = primaryServerHost;
-                             serverPort = primaryServerPort;
-                        }
-                    }
-                }
-                
-                boolean beheraEnabled = Boolean.valueOf(CollectionHelper.getMapAttr(
-                    currentConfig, "iplanet-am-auth-ldap-behera-password-policy-enabled", "false")
-                    ).booleanValue();
-                
-                sslTrustAll = Boolean.valueOf(CollectionHelper.getMapAttr(
-                    currentConfig, "iplanet-am-auth-ldap-ssl-trust-all", "false")
-                    ).booleanValue();
-                
-                isProfileCreationEnabled = isDynamicProfileCreationEnabled();
-                // set the optional attributes here
-                ldapUtil = new LDAPAuthUtils(serverHost, serverPort, sslEnabled, 
-                    bundle, baseDN, debug);
-                ldapUtil.setScope(searchScope);
-                ldapUtil.setFilter(searchFilter);
-                ldapUtil.setUserNamingAttribute(userNamingAttr);
-                ldapUtil.setUserSearchAttribute(userSearchAttrs);
-                ldapUtil.setAuthPassword(bindPassword);
-                ldapUtil.setAuthDN(bindDN);
-                ldapUtil.setReturnUserDN(returnUserDN);
-                ldapUtil.setUserAttributes(userCreationAttrs);
-                ldapUtil.setTrustAll(sslTrustAll);
-                ldapUtil.setDynamicProfileCreationEnabled(
-                    isProfileCreationEnabled);
-                ldapUtil.setBeheraEnabled(beheraEnabled);
-                
-                if (debug.messageEnabled()) {
-                    debug.message("bindDN-> " + bindDN +
-                    "\nrequiredPasswordLength-> " + requiredPasswordLength +
-                    "\nbaseDN-> " + baseDN +
-                    "\nuserNamingAttr-> " + userNamingAttr +
-                    "\nuserSearchAttr(s)-> " + userSearchAttrs +
-                    "\nuserCreationAttrs-> "+userCreationAttrs+
-                    "\nsearchFilter-> " + searchFilter +
-                    "\nsearchScope-> " + searchScope +
-                    "\nssl-> " + sslEnabled +
-                    "\ntrustAll-> " + sslTrustAll +        
-                    "\nauthLevel: " + authLevel + 
-                    "\nbeheraEnabled->" + beheraEnabled +
-                    "\nHost: " + serverHost +
-                    "\nPORT : " + serverPort +
-                    "\nPattern : " + regEx);
-                }
-                return true;
+            Set<String> primaryServers =
+                    CollectionHelper.getServerMapAttrs(currentConfig, "iplanet-am-auth-ldap-server");
+            Set<String> secondaryServers =
+                    CollectionHelper.getServerMapAttrs(currentConfig, "iplanet-am-auth-ldap-server2");
+
+            String baseDN = CollectionHelper.getServerMapAttr(
+                currentConfig, "iplanet-am-auth-ldap-base-dn");
+            if (baseDN == null) {
+                debug.error("BaseDN for search was null");
             }
+
+            String pLen = CollectionHelper.getMapAttr(currentConfig,
+                "iplanet-am-auth-ldap-min-password-length");
+            if (pLen != null) {
+                try {
+                    requiredPasswordLength = Integer.parseInt(pLen);
+                } catch (NumberFormatException ex) {
+                    debug.error("LDAP.initializeLDAP : " + pLen, ex);
+                }
+            }
+            bindDN = CollectionHelper.getMapAttr(currentConfig,
+                "iplanet-am-auth-ldap-bind-dn", "");
+            char[] bindPassword = CollectionHelper.getMapAttr(
+                currentConfig, "iplanet-am-auth-ldap-bind-passwd", "").toCharArray();
+            String userNamingAttr = CollectionHelper.getMapAttr(
+                currentConfig,
+                "iplanet-am-auth-ldap-user-naming-attribute", "uid");
+            Set userSearchAttrs = (Set)currentConfig.get(
+                "iplanet-am-auth-ldap-user-search-attributes");
+            String searchFilter = CollectionHelper.getMapAttr(
+                currentConfig, "iplanet-am-auth-ldap-search-filter", "");
+            sslEnabled = Boolean.valueOf(CollectionHelper.getMapAttr(
+                currentConfig, "iplanet-am-auth-ldap-ssl-enabled", "false")
+                ).booleanValue();
+            getUserCreationAttrs(currentConfig);
+            String tmp = CollectionHelper.getMapAttr(currentConfig,
+                "iplanet-am-auth-ldap-search-scope", "SUBTREE");
+
+            String authLevel = CollectionHelper.getMapAttr(currentConfig,
+                "iplanet-am-auth-ldap-auth-level");
+            if (authLevel != null) {
+                try {
+                    setAuthLevel(Integer.parseInt(authLevel));
+                } catch (Exception e) {
+                    debug.error("Unable to set auth level " + authLevel);
+                }
+            }
+
+            SearchScope searchScope = SearchScope.WHOLE_SUBTREE;
+
+            if (tmp.equalsIgnoreCase("OBJECT")) {
+                searchScope = SearchScope.BASE_OBJECT;
+            } else if (tmp.equalsIgnoreCase("ONELEVEL")) {
+                searchScope = SearchScope.SINGLE_LEVEL;
+            }
+
+            String returnUserDN = CollectionHelper.getMapAttr(
+                currentConfig, ISAuthConstants.LDAP_RETURNUSERDN, "true");
+            regEx = CollectionHelper.getMapAttr(
+                currentConfig, INVALID_CHARS);
+
+            boolean beheraEnabled = Boolean.valueOf(CollectionHelper.getMapAttr(
+                currentConfig, "iplanet-am-auth-ldap-behera-password-policy-enabled", "false")
+                ).booleanValue();
+
+            sslTrustAll = Boolean.valueOf(CollectionHelper.getMapAttr(
+                currentConfig, "iplanet-am-auth-ldap-ssl-trust-all", "false")
+                ).booleanValue();
+            int heartBeatInterval = CollectionHelper.getIntMapAttr(currentConfig,
+                    "openam-auth-ldap-heartbeat-interval", 1, debug);
+            String heartBeatTimeUnit = CollectionHelper.getMapAttr(currentConfig,
+                    "openam-auth-ldap-heartbeat-timeunit", "MINUTES");
+
+            isProfileCreationEnabled = isDynamicProfileCreationEnabled();
+            // set the optional attributes here
+            ldapUtil = new LDAPAuthUtils(getRequestOrg() + "|" + currentConfigName, primaryServers, secondaryServers,
+                    sslEnabled, bundle, baseDN);
+            ldapUtil.setScope(searchScope);
+            ldapUtil.setFilter(searchFilter);
+            ldapUtil.setUserNamingAttribute(userNamingAttr);
+            ldapUtil.setUserSearchAttribute(userSearchAttrs);
+            ldapUtil.setAuthPassword(bindPassword);
+            ldapUtil.setAuthDN(bindDN);
+            ldapUtil.setReturnUserDN(returnUserDN);
+            ldapUtil.setUserAttributes(userCreationAttrs);
+            ldapUtil.setTrustAll(sslTrustAll);
+            ldapUtil.setDynamicProfileCreationEnabled(
+                isProfileCreationEnabled);
+            ldapUtil.setBeheraEnabled(beheraEnabled);
+            ldapUtil.setHeartBeatInterval(heartBeatInterval);
+            ldapUtil.setHeartBeatTimeUnit(heartBeatTimeUnit);
+
+            if (debug.messageEnabled()) {
+                debug.message("bindDN-> " + bindDN
+                        + "\nrequiredPasswordLength-> " + requiredPasswordLength
+                        + "\nbaseDN-> " + baseDN
+                        + "\nuserNamingAttr-> " + userNamingAttr
+                        + "\nuserSearchAttr(s)-> " + userSearchAttrs
+                        + "\nuserCreationAttrs-> " + userCreationAttrs
+                        + "\nsearchFilter-> " + searchFilter
+                        + "\nsearchScope-> " + searchScope
+                        + "\nssl-> " + sslEnabled
+                        + "\ntrustAll-> " + sslTrustAll
+                        + "\nauthLevel-> " + authLevel
+                        + "\nbeheraEnabled->" + beheraEnabled
+                        + "\nprimaryServers-> " + primaryServers
+                        + "\nsecondaryServers-> " + secondaryServers
+                        + "\nheartBeatInterval-> " + heartBeatInterval
+                        + "\nheartBeatTimeUnit-> " + heartBeatTimeUnit
+                        + "\nPattern : " + regEx);
+            }
+            return true;
         } catch (Exception ex) {
             debug.error("Init Exception", ex);
             throw new AuthLoginException(AM_AUTH, "LDAPex", null, ex);
         }
-        return false;
     }
-    
-    private boolean getPrimaryFlag( String configName) {
-        synchronized (orgMap) {
-            String reqOrg = getRequestOrg();
-            Map flags = (Map) orgMap.get(reqOrg);
-            if (flags == null) {
-                flags = new HashMap();
-                flags.put(configName, "true");
-                orgMap.put(reqOrg, flags);
-                return true;
-            }
-            
-            String flag = (String) flags.get(configName);
-            if (flag == null) {
-                flags.put(configName, "true");
-                return true;
-            }
-            
-            return (flag.equals("true"));
-        }
-    }
-    
-    private void setPrimaryFlag( String configName, boolean flag) {
-        synchronized (orgMap) {
-            String reqOrg = getRequestOrg();
-            Map flags = (Map) orgMap.get(reqOrg);
-            if (flags == null) {
-                flags = new HashMap();
-                orgMap.put(reqOrg, flags);
-            }
-            
-            if (flag) {
-                flags.put(configName, "true");
-            } else {
-                flags.put(configName, "false");
-            }
-        }
-    }
-    
-    private boolean getSubConfig() {
-        firstTry = true;
-        try {
-            if (subConfigNamesIter == null) {
-                if (sc != null) {
-                    Set subConfigNames = sc.getSubConfigNames();
-                    if (subConfigNames == null || subConfigNames.isEmpty()) {
-                        return false;
-                    }
-                    subConfigNamesIter = subConfigNames.iterator();
-                }
-            }
-            
-            if (subConfigNamesIter != null) {
-                while (subConfigNamesIter.hasNext()) {
-                    String subConfigName = (String) subConfigNamesIter.next();
-                    ServiceConfig ssc = sc.getSubConfig(subConfigName);
-                    if (ssc != null) {
-                        if (debug.messageEnabled()) {
-                            debug.message("LDAP.getSubConfig subConfigName = " +
-                            subConfigName);
-                        }
-                        currentConfig = ssc.getAttributes();
-                        currentConfigName = subConfigName;
-                        primary = getPrimaryFlag(subConfigName);
-                        return true;
-                    }
-                }
-            }
-        } catch (Exception ex) {
-            if (debug.warningEnabled()) {
-                debug.warning("LDAP.getSubConfig unable to get sub config", ex);
-            }
-        }
-        return false;
-    }
-    
+
     public int process(Callback[] callbacks, int state)
             throws AuthLoginException {
         currentState = state;
         ModuleState newState;
         LoginScreen loginScreen = LoginScreen.get(state);
-        
+
         try {
-            
+
             if (loginScreen.equals(LoginScreen.LOGIN_START)) {
                 if (callbacks == null || callbacks.length == 0) {
                     userName = (String) sharedState.get(getUserKey());
                     userPassword = (String) sharedState.get(getPwdKey());
-                    
+
                     if (userName == null || userPassword == null) {
                         return LoginScreen.LOGIN_START.intValue();
                     }
-                    
+
                     getCredentialsFromSharedState = true;
                 } else {
                     //callbacks is not null
@@ -484,79 +304,54 @@ public class LDAP extends AMLoginModule {
                     userPassword = charToString(((PasswordCallback)
                     callbacks[1]).getPassword(), callbacks[1]);
                 }
-                
+
                 if (userPassword == null || userPassword.length() == 0) {
                     if (debug.messageEnabled()) {
                         debug.message("LDAP.process: Password is null/empty");
-                    } 
-                    
+                    }
+
                     throw new InvalidPasswordException("amAuth",
-                            "invalidPasswd", null); 
+                            "invalidPasswd", null);
                 }
-                
+
                 //store username password both in success and failure case
                 storeUsernamePasswd(userName, userPassword);
-                
-                /*
-                 * checks whether the superadmin and the username supplied
-                 * is same . This check is to allow Super Admin to log in
-                 * even though ldap parameters are messed up due to
-                 * misconfiguration
-                 */
-                if (isSuperAdmin(userName)) {
-                    ldapUtil = new LDAPAuthUtils(AuthD.directoryHostName,
-                    AuthD.directoryPort, ldapSSL, bundle, debug);
-                    ldapUtil.authenticateSuperAdmin(userName, userPassword);
-                    
-                    if (ldapUtil.getState().equals(ModuleState.SUCCESS)) {
-                        validatedUserID = userName;
-                        return ISAuthConstants.LOGIN_SUCCEED;
-                    } else {
-                        if (debug.messageEnabled()) {
-                            debug.message("Invalid adminID or admin Password");
-                        }
-                        
-                        setFailureID(ldapUtil.getUserId(userName));
-                        throw new AuthLoginException(
-                            AM_AUTH, "InvalidUP", null);
-                    }
+
+                if (initializeLDAP()) {
+                    //validate username
+                    validateUserName(userName, regEx);
+                    ldapUtil.authenticateUser(userName, userPassword);
+                    newState = ldapUtil.getState();
                 } else {
-                    if (initializeLDAP()) {
-                        //validate username
-                        validateUserName(userName, regEx);
-                        ldapUtil.authenticateUser(userName, userPassword);
-                        newState = ldapUtil.getState();
-                    } else {
-                        newState = ModuleState.SERVER_DOWN;
-                    }
-                    
-                    boolean passwordValidationSuccessFlag = true;
-                    // Validating Password only if authentication
-                    // information entered is correct
-                    if (newState == ModuleState.SUCCESS) {
-                        try {
-                            validatePassword(userPassword);
-                        } catch (UserNamePasswordValidationException upve) {
-                            if (debug.messageEnabled()) {
-                                debug.message("Password does not satisfy " +
-                                              "password policy rules specified"
-                                              + " in OpenAM");
-                            }
-                            isReset = true;
-                            String invalidMsg = bundle.getString(
-                                                   "PasswordInvalid");
-                            replaceHeader(LoginScreen.PASSWORD_CHANGE.intValue(), invalidMsg);
-                            currentState = LoginScreen.PASSWORD_CHANGE.intValue();
-                            passwordValidationSuccessFlag = false;
-                        }
-                    }
-                    
-                    if (passwordValidationSuccessFlag) {
-                        processLoginScreen(newState);
-                    }
-                    
-                    return currentState;
+                    newState = ModuleState.SERVER_DOWN;
                 }
+
+                boolean passwordValidationSuccessFlag = true;
+                // Validating Password only if authentication
+                // information entered is correct
+                if (newState == ModuleState.SUCCESS) {
+                    try {
+                        validatePassword(userPassword);
+                    } catch (UserNamePasswordValidationException upve) {
+                        if (debug.messageEnabled()) {
+                            debug.message("Password does not satisfy " +
+                                          "password policy rules specified"
+                                          + " in OpenAM");
+                        }
+                        isReset = true;
+                        String invalidMsg = bundle.getString(
+                                               "PasswordInvalid");
+                        replaceHeader(LoginScreen.PASSWORD_CHANGE.intValue(), invalidMsg);
+                        currentState = LoginScreen.PASSWORD_CHANGE.intValue();
+                        passwordValidationSuccessFlag = false;
+                    }
+                }
+
+                if (passwordValidationSuccessFlag) {
+                    processLoginScreen(newState);
+                }
+
+                return currentState;
             } else if (loginScreen.equals(LoginScreen.PASSWORD_CHANGE)) {
                 if (debug.messageEnabled()) {
                     debug.message("you are in Password Screen:" + currentState);
@@ -572,7 +367,7 @@ public class LDAP extends AMLoginModule {
                     callbacks[1]).getPassword(), callbacks[1]);
                     String confirmPassword = charToString(((PasswordCallback)
                     callbacks[2]).getPassword(), callbacks[2]);
-                    
+
                     try {
                         validatePassword(newPassword);
                         // check minimal password length requirement
@@ -583,7 +378,7 @@ public class LDAP extends AMLoginModule {
                         if (newPasswordLength < requiredPasswordLength) {
                             if (debug.messageEnabled()) {
                                 debug.message("LDAP.process: new password less"
-                                    + " than the minimal length of " 
+                                    + " than the minimal length of "
                                     + requiredPasswordLength);
                             }
                             newState = ModuleState.PASSWORD_MIN_CHARACTERS;
@@ -594,8 +389,8 @@ public class LDAP extends AMLoginModule {
                             ldapUtil.changePassword(oldPassword, newPassword,
                                 confirmPassword);
                             newState = ldapUtil.getState();
-                            
-                            if (newState == 
+
+                            if (newState ==
                                 ModuleState.PASSWORD_UPDATED_SUCCESSFULLY){
                                 // log change password success
                                 getLoginState("LDAP").logSuccess(
@@ -608,7 +403,7 @@ public class LDAP extends AMLoginModule {
                             }
                         }
                         processPasswordScreen(newState);
-                        
+
                         if (debug.messageEnabled()) {
                             debug.message("Password change state :" + newState);
                         }
@@ -620,9 +415,9 @@ public class LDAP extends AMLoginModule {
                         String invalidMsg = bundle.getString(
                                                 "NewPasswordInvalid");
                         replaceHeader(LoginScreen.PASSWORD_CHANGE.intValue(), invalidMsg);
-                        currentState = LoginScreen.PASSWORD_CHANGE.intValue();                    	
+                        currentState = LoginScreen.PASSWORD_CHANGE.intValue();
                     }
-                    
+
                     return currentState;
                 } else  {
                     if (isReset) {
@@ -641,20 +436,20 @@ public class LDAP extends AMLoginModule {
                 getCredentialsFromSharedState = false;
                 return LoginScreen.LOGIN_START.intValue();
             }
-            setFailureID((ldapUtil != null) ? 
+            setFailureID((ldapUtil != null) ?
                 ldapUtil.getUserId(userName) : userName);
-            
+
             if (ex.getResultCode().equals(ResultCode.NO_SUCH_OBJECT)) {
                 if (debug.messageEnabled()) {
                     debug.message("The specified user does not exist.");
                 }
-                    
+
                 throw new AuthLoginException(AM_AUTH, "NoUser", null);
             } else if (ex.getResultCode().equals(ResultCode.INVALID_CREDENTIALS)) {
                 if (debug.messageEnabled()) {
                     debug.message("Invalid password.");
                 }
-                
+
                 String failureUserID = ldapUtil.getUserId();
                 throw new InvalidPasswordException(AM_AUTH, "InvalidUP",
                     null, failureUserID, null);
@@ -662,20 +457,20 @@ public class LDAP extends AMLoginModule {
                 if (debug.messageEnabled()) {
                     debug.message("Unwilling to perform. Account inactivated.");
                 }
-                
+
                 currentState = LoginScreen.USER_INACTIVE.intValue();
                 return currentState;
             } else if (ex.getResultCode().equals(ResultCode.INAPPROPRIATE_AUTHENTICATION)) {
                 if (debug.messageEnabled()) {
                     debug.message("Inappropriate authentication.");
                 }
-                    
+
                 throw new AuthLoginException(AM_AUTH, "InappAuth", null);
             } else if (ex.getResultCode().equals(ResultCode.CONSTRAINT_VIOLATION)) {
                 if (debug.messageEnabled()) {
                     debug.message("Exceed password retry limit.");
                 }
-                
+
                 throw new AuthLoginException(amAuthLDAP,
                         ISAuthConstants.EXCEED_RETRY_LIMIT, null);
             } else {
@@ -686,11 +481,11 @@ public class LDAP extends AMLoginModule {
             if (debug.messageEnabled()) {
                 debug.message("Invalid Characters detected");
             }
-            
+
             throw new AuthLoginException(upve);
         }
     }
-   
+
     /**
      * Returns principal.
      *
@@ -706,7 +501,7 @@ public class LDAP extends AMLoginModule {
             return null;
         }
     }
-    
+
     /**
      * Cleans up state fields.
      */
@@ -723,16 +518,14 @@ public class LDAP extends AMLoginModule {
         userName = null ;
         userPassword = null;
         regEx = null;
-        subConfigNamesIter = null;
-        sc = null;
         userCreationAttrs = null;
         userAttrMap = null;
         sharedState = null;
         currentConfig = null;
-        
+
         amAuthLDAP = null;
     }
-    
+
     private void processLoginScreen(ModuleState newState) throws AuthLoginException {
         try {
             switch (newState) {
@@ -819,67 +612,12 @@ public class LDAP extends AMLoginModule {
                     setForceCallbacksRead(true);
                     forceCallbacksInit();
                     replaceHeader(LoginScreen.PASSWORD_CHANGE.intValue(), msg);
-                }                    
+                }
                     currentState = LoginScreen.PASSWORD_CHANGE.intValue();
                 case USER_NOT_FOUND:
-                    if (!getSubConfig()) {
-                        throw new LDAPUtilException("noUserMatchFound",
-                        (Object[])null);
-                    }
-                    if (initializeLDAP()) {
-                        ldapUtil.authenticateUser(userName, userPassword);
-                        newState = ldapUtil.getState();
-                    } else {
-                        newState = ModuleState.SERVER_DOWN;
-                    }
-                    processLoginScreen(newState);
-                    break;
+                    throw new LDAPUtilException("noUserMatchFound", (Object[])null);
                 case SERVER_DOWN:
-                    if (firstTry) {
-                        String key = serverHost + ":" + serverPort + ":" + bindDN;
-                        synchronized(LDAPAuthUtils.connectionPoolsStatus) {
-                            LDAPAuthUtils.connectionPoolsStatus.put(key,
-                                LDAPAuthUtils.ServerStatus.STATUS_DOWN);
-                        }
-                        synchronized(LDAPAuthUtils.connectionPools) {
-                            LDAPAuthUtils.connectionPools.remove(key);
-                        }
-                        synchronized(LDAPAuthUtils.adminConnectionPools) {
-                            LDAPAuthUtils.adminConnectionPools.remove(key);
-                        }
-                        firstTry = false;
-                        primary = !primary;
-                        setPrimaryFlag(currentConfigName, primary);
-                        if ((fMgr == null) ||
-                            (fMgr.scheduledExecutionTime() == -1)) {
-                            fMgr = new FailbackManager();
-                            SystemTimer.getTimer().schedule(fMgr, new Date(((
-                                System.currentTimeMillis()) / 1000) * 1000));
-                        } else {
-                            if (interval < fMgr.runPeriod) {
-                                fMgr.runPeriod = interval;
-                            }
-                        }
-                        if (initializeLDAP()) {
-                            ldapUtil.authenticateUser(userName, userPassword);
-                            newState = ldapUtil.getState();
-                            processLoginScreen(newState);
-                            break;
-                        }
-                    }
-                    
-                    if (!getSubConfig()) {
-                        throw new AuthLoginException(
-                            AM_AUTH, "LDAPex", null);
-                    }
-                    if (initializeLDAP()) {
-                        ldapUtil.authenticateUser(userName, userPassword);
-                        newState = ldapUtil.getState();
-                    } else {
-                        newState = ModuleState.SERVER_DOWN;
-                    }
-                    processLoginScreen(newState);
-                    break;
+                    throw new AuthLoginException(AM_AUTH, "LDAPex", null);
                 default:
             }
         } catch (LDAPUtilException ex) {
@@ -894,7 +632,7 @@ public class LDAP extends AMLoginModule {
             throw new AuthLoginException(AM_AUTH, "LDAPex", null, ex);
         }
     }
-    
+
     private void processPasswordScreen(ModuleState newState)
             throws AuthLoginException {
         switch (newState) {
@@ -933,7 +671,7 @@ public class LDAP extends AMLoginModule {
             case WRONG_PASSWORD_ENTERED:
                 replaceHeader(LoginScreen.PASSWORD_CHANGE.intValue(), bundle.getString("PasswdSame"));
                 currentState = LoginScreen.PASSWORD_CHANGE.intValue();
-                break;                
+                break;
             case PASSWORD_MIN_CHARACTERS:
                 replaceHeader(LoginScreen.PASSWORD_CHANGE.intValue(), bundle.getString("PasswdMinChars"));
                 currentState = LoginScreen.PASSWORD_CHANGE.intValue();
@@ -949,7 +687,7 @@ public class LDAP extends AMLoginModule {
             case PASSWORD_IN_HISTORY:
                 replaceHeader(LoginScreen.PASSWORD_CHANGE.intValue(), bundle.getString("pwdInHist"));
                 currentState = LoginScreen.PASSWORD_CHANGE.intValue();
-                break;            
+                break;
             case PASSWORD_TOO_SHORT:
                 replaceHeader(LoginScreen.PASSWORD_CHANGE.intValue(), bundle.getString("pwdToShort"));
                 currentState = LoginScreen.PASSWORD_CHANGE.intValue();
@@ -957,26 +695,26 @@ public class LDAP extends AMLoginModule {
             case PASSWORD_TOO_YOUNG:
                 replaceHeader(LoginScreen.PASSWORD_CHANGE.intValue(), bundle.getString("pwdToYoung"));
                 currentState = LoginScreen.PASSWORD_CHANGE.intValue();
-                break;                
+                break;
             default:
-                
+
         }
     }
 
     private void createProfile() {
         if (isProfileCreationEnabled && userCreationAttrs.size() > 0) {
             Map userAttributeValues = ldapUtil.getUserAttributeValues();
-            
+
             if (debug.messageEnabled()) {
                 debug.message("user creation attributes: " +
                         userAttributeValues);
             }
-            
+
             Map userValues= getAttributeMap(userAttributeValues);
             setUserAttributes(userValues);
         }
     }
-    
+
     private String charToString(char[] tmpPassword, Callback cbk) {
         if (tmpPassword == null) {
             // treat a NULL password as an empty password
@@ -987,139 +725,7 @@ public class LDAP extends AMLoginModule {
         ((PasswordCallback) cbk).clearPassword();
         return new String(pwd);
     }
-    
-    // reset replace text method should be provided by AMLoginModule
-    // untill then this method cannot be used for multiple replacement
-    private void setReplaceText(int state, int index, String msg)
-            throws AuthLoginException {
-        // set #REPLACE# in password callback
-        if (debug.messageEnabled()) {
-            debug.message("Entered in setReplaceText");
-        }
-        
-        Callback[] callbacks2 = getCallback(LoginScreen.PASSWORD_CHANGE.intValue());
-        // reset first callback at PASSWORD_CHANGE state
-        resetCallback(state, 0);
-        String origMsg = ( (PasswordCallback) callbacks2[0]).getPrompt();
-        int idx = origMsg.indexOf("#REPLACE#");
-        String setMsg = msg + origMsg.substring(idx + 9);
-        replaceCallback(state, 0, new PasswordCallback(setMsg,
-            ((PasswordCallback) callbacks2[0]).isEchoOn()));
-        
-        if (debug.messageEnabled()) {
-            debug.message("origmessage:" + origMsg + ":::+setMsg" + setMsg);
-        }
-    }
-    
-    
-    // sets the time interval to check whether primary is up
-    private void setInterval(long iVal) {
-        interval = (iVal*60000);
-    }
-    
-    // This class checks in regular intervals whether the connection is open
-    // if connection is open it sets primary to true.
-    class FailbackManager extends GeneralTaskRunnable {
-        public long runPeriod = interval;
-        
-        public FailbackManager() {
-            super();
-        }
-        
-        public long getRunPeriod() {
-            return runPeriod;
-        }
-        
-        public boolean isEmpty() {
-            return true;
-        }
-        
-        public boolean addElement(Object obj) {
-            return false;
-        }
-        
-        public boolean removeElement(Object obj) {
-            return false;
-        }
-        
-        public void run() {
-            boolean foundDown = true;
-            
-            try {
-                foundDown = false;
 
-                for (Map.Entry<String, LDAPAuthUtils.ServerStatus> server : 
-                        LDAPAuthUtils.connectionPoolsStatus.entrySet()) {
-                    String key = server.getKey();
-                    LDAPAuthUtils.ServerStatus status  = server.getValue();;
-                    if (status.equals(LDAPAuthUtils.ServerStatus.STATUS_DOWN)) {
-                        foundDown = true;
-                        
-                        if (debug.messageEnabled()) {
-                            debug.message("Checking for server " + key);
-                        }
-                        
-                        StringTokenizer st = new StringTokenizer(key,":");
-                        String downHost = (String)st.nextToken();
-                        String downPort = (String)st.nextToken();
-                        
-                        if ((downHost != null) && (downHost.length() != 0)
-                            && (downPort != null) && (downPort.length() != 0)) {
-                            int intPort = (Integer.valueOf(downPort)).
-                                intValue();
-                            Connection conn = null;
-                            LDAPOptions options = new LDAPOptions();
-                            LDAPConnectionFactory factory = null;
-
-                            try {
-                                if (ldapSSL) {
-                                    SSLContextBuilder builder = new SSLContextBuilder();
-
-                                    if (sslTrustAll) {
-                                        builder.setTrustManager(TrustManagers.trustAll());
-                                    }
-
-                                    SSLContext sslContext = builder.getSSLContext();
-                                    options.setSSLContext(sslContext);
-                                }
-
-                                factory = new LDAPConnectionFactory(downHost, intPort, options);
-                                conn = factory.getConnection();
-                                
-                                if (conn.isValid()) {
-                                    LDAPAuthUtils.connectionPoolsStatus.
-                                        put(key,LDAPAuthUtils.ServerStatus.STATUS_UP);  
-                                    
-                                    if (debug.messageEnabled()) {
-                                        debug.message("Server is running:" + key);
-                                    }
-                                }
-                            } catch (ErrorResultException ere) {
-                                if (debug.messageEnabled()) {
-                                    debug.message("Server is not running: " + key);
-                                }
-                            } catch (GeneralSecurityException gse) {
-                                if (debug.messageEnabled()) {
-                                    debug.message("Server is not running: " + key);
-                                }            
-                            } finally {
-                                if (conn != null) {
-                                    conn.close();
-                                }
-                            }
-                        }
-                    } 
-                }
-            } catch (Exception exp) {
-                debug.error("Error in Fallback Manager Thread", exp);
-            }
-            
-            if (!foundDown) {
-                runPeriod = -1;
-            }
-        }
-    }
-    
     /**
      * Retrieves the user creation attribute list from the
      * ldap configuration. The format of each line in the attribute
@@ -1133,22 +739,22 @@ public class LDAP extends AMLoginModule {
      */
     private void getUserCreationAttrs(Map currentConfig) {
         Set attrs = (Set)currentConfig.get(USER_CREATION_ATTR);
-        
+
         if (debug.messageEnabled()) {
             debug.message("attrs is : " + attrs);
         }
-        
+
         if ((attrs != null) && (!attrs.isEmpty())) {
             Iterator attrIterator = attrs.iterator();
-            
+
             while (attrIterator.hasNext()) {
                 String userAttr = (String) attrIterator.next();
                 int i = userAttr.indexOf(PIPE_SEPARATOR);
-                
+
                 if (i != -1) {
                     String localAttr =  userAttr.substring(0,i);
                     String extAttr = userAttr.substring(i+1,userAttr.length());
-                    
+
                     if ( (extAttr == null)  || (extAttr.length() == 0)) {
                         userCreationAttrs.add(localAttr);
                         userAttrMap.put(localAttr,localAttr);
@@ -1162,10 +768,8 @@ public class LDAP extends AMLoginModule {
                 }
             }
         }
-        
-        return;
     }
-    
+
     /**
      * this method retrieves the key which is the external
      * attribute from the attributeValues and maps it
@@ -1177,29 +781,29 @@ public class LDAP extends AMLoginModule {
         if (debug.messageEnabled()) {
             debug.message("In getAttribute Map: " + attributeValues);
         }
-        
+
         Map newAttrMap = new HashMap();
         Iterator userIterator = userAttrMap.keySet().iterator();
-        
+
         while (userIterator.hasNext()) {
             String key = (String) userIterator.next();
             String value = (String) userAttrMap.get(key);
             Set newValue = (Set) attributeValues.get(value);
-            
+
             if (debug.messageEnabled()) {
                 debug.message("key is : " + key);
                 debug.message("value is : " + newValue);
             }
-            
+
             if (newValue != null) {
                 newAttrMap.put(key,newValue);
             }
         }
-        
+
         if (debug.messageEnabled()) {
             debug.message("New attr map is : " + newAttrMap);
         }
-        
+
         return newAttrMap;
     }
 }

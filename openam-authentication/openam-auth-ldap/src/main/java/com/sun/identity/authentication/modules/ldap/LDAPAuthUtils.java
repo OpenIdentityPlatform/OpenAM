@@ -49,25 +49,28 @@ import java.util.Map;
 import java.util.ResourceBundle;
 import java.util.Set;
 import java.util.StringTokenizer;
-import java.io.InterruptedIOException;
-import java.io.UnsupportedEncodingException;
+import java.nio.charset.Charset;
 import java.security.GeneralSecurityException;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.LinkedHashSet;
 import java.util.List;
-import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.ConcurrentHashMap;
 import javax.net.ssl.SSLContext;
+import org.forgerock.openam.ldap.LDAPURL;
+import static org.forgerock.openam.ldap.LDAPUtils.*;
+import static org.forgerock.openam.utils.CollectionUtils.*;
 import org.forgerock.opendj.ldap.Attribute;
 import org.forgerock.opendj.ldap.ByteString;
 import org.forgerock.opendj.ldap.Connection;
 import org.forgerock.opendj.ldap.ConnectionFactory;
-import org.forgerock.opendj.ldap.ConnectionPool;
 import org.forgerock.opendj.ldap.Connections;
 import org.forgerock.opendj.ldap.DecodeException;
 import org.forgerock.opendj.ldap.DecodeOptions;
 import org.forgerock.opendj.ldap.ErrorResultException;
 import org.forgerock.opendj.ldap.ErrorResultIOException;
-import org.forgerock.opendj.ldap.LDAPConnectionFactory;
+import org.forgerock.opendj.ldap.FailoverLoadBalancingAlgorithm;
+import org.forgerock.opendj.ldap.Filter;
 import org.forgerock.opendj.ldap.LDAPOptions;
 import org.forgerock.opendj.ldap.ModificationType;
 import org.forgerock.opendj.ldap.ResultCode;
@@ -87,7 +90,6 @@ import org.forgerock.opendj.ldap.requests.ModifyRequest;
 import org.forgerock.opendj.ldap.requests.Requests;
 import org.forgerock.opendj.ldap.requests.SearchRequest;
 import org.forgerock.opendj.ldap.responses.BindResult;
-import org.forgerock.opendj.ldap.responses.Response;
 import org.forgerock.opendj.ldap.responses.Result;
 import org.forgerock.opendj.ldap.responses.SearchResultEntry;
 import org.forgerock.opendj.ldif.ConnectionEntryReader;
@@ -99,40 +101,38 @@ public class LDAPAuthUtils {
     private String searchFilter = "";
     private String userNamingValue = null;
     private String userNamingAttr = null;
-    private String ssl;
     private String baseDN;
-    private String serverHost;
-    private String secServerHost;
-    private int serverPort = 389;
-    private int secServerPort;
+    private String configName;
+    private Set<String> primaryServers;
+    private Set<String> secondaryServers;
+    //only used for logging
+    private Set<String> servers;
     private String userDN;
     private String userPassword;
     private String userId;
-    private String authPassword = "";
+    private char[] authPassword;
     private String expiryTime;
     private SearchScope searchScope;
+    private int heartBeatInterval = 1;
+    private String heartBeatTimeUnit;
     private ModuleState screenState;
     private int graceLogins;
-    private Debug debug = null;
+    private static final Debug debug = Debug.getInstance("amAuthLDAP");
     // JSS integration
     private boolean ldapSSL = false;
-    // logging message
-    private String logMessage = null;
     private boolean beheraEnabled = true;
     private boolean trustAll = true;
     private boolean isAd = false;
-    
+
     // Resource Bundle used to get l10N message
     private ResourceBundle bundle;
-    
-    static HashMap<String, ConnectionPool> connectionPools = 
-            new HashMap<String, ConnectionPool>();
-    static HashMap<String, ConnectionPool> adminConnectionPools = 
-            new HashMap<String, ConnectionPool>();
-    static HashMap<String, ServerStatus> connectionPoolsStatus = 
-            new HashMap<String, ServerStatus>();
-    private ConnectionPool cPool = null;
-    private ConnectionPool acPool = null;
+
+    private static Map<String, ConnectionFactory> connectionPools =
+            new ConcurrentHashMap<String, ConnectionFactory>();
+    private static Map<String, ConnectionFactory> adminConnectionPools =
+            new ConcurrentHashMap<String, ConnectionFactory>();
+    private ConnectionFactory cPool = null;
+    private ConnectionFactory acPool = null;
     private final static int NO_EXPIRY_TIME = -1;
     private final static int MIN_CONNECTION_POOL_SIZE = 1;
     private final static int MAX_CONNECTION_POOL_SIZE = 10;
@@ -142,16 +142,15 @@ public class LDAPAuthUtils {
     "iplanet-am-auth-ldap-connection-pool-default-size";
     private final static String SPACE = " ";
     private final static String COLON = ":";
-    
+
     private static int minDefaultPoolSize = MIN_CONNECTION_POOL_SIZE;
     private static int maxDefaultPoolSize = MAX_CONNECTION_POOL_SIZE;
     // contains host:port:min:max
     private static Set<String> poolSize = null;
-    private Set userAttributes = new HashSet();
-    private Map userAttributeValues = new HashMap();
+    private Set<String> userAttributes = new HashSet<String>();
+    private Map<String, Set<String>> userAttributeValues = new HashMap<String, Set<String>>();
     private boolean isDynamicUserEnabled;
-    String [] attrs = null;
-    private static Debug debug2 = Debug.getInstance("amAuthLDAP");
+    private String [] attrs = null;
     private static String AD_PASSWORD_EXPIRED = "data 532";
     private static String S4_PASSWORD_EXPIRED = "NT_STATUS_PASSWORD_EXPIRED";
     private static String AD_ACCOUNT_DISABLED = "data 533";
@@ -164,289 +163,201 @@ public class LDAPAuthUtils {
     private static String S4_ACCOUNT_LOCKED = "NT_STATUS_ACCOUNT_LOCKED_OUT";
     private static String LDAP_PASSWD_ATTR = "userpassword";
     private static String AD_PASSWD_ATTR = "UnicodePwd";
-    
-    enum ServerStatus {
-        STATUS_UP("statusUp"),    
-        STATUS_DOWN("statusDown");
-        
-        private final String status;
 
-        private ServerStatus(final String status) {
-            this.status = status;
-        }
-
-        @Override
-        public String toString() {
-            return status;
-        }
-    }
-    
     static {
-        SSOToken dUserToken = null;
-        
+        SSOToken dUserToken;
+
         try {
             // Gets the Admin SSOToken.
             // This API figures out admin DN and password and constructs
             // the SSOToken.
-            dUserToken = (SSOToken) AccessController.doPrivileged(
-            AdminTokenAction.getInstance());
-            
+            dUserToken = AccessController.doPrivileged(AdminTokenAction.getInstance());
+
             ServiceSchemaManager scm = new ServiceSchemaManager(
                 "iPlanetAMAuthService", dUserToken);
             ServiceSchema schema = scm.getGlobalSchema();
             Map attrs = schema.getAttributeDefaults();
-            
+
             poolSize = (Set<String>) attrs.get(CONNECTION_POOL_SIZE_ATTR);
-            
+
             String defaultPoolSize = CollectionHelper.getMapAttr(attrs,
             CONNECTION_POOL_DEFAULT_SIZE_ATTR,"");
             int index = defaultPoolSize.indexOf(COLON);
-            
+
             if (index != -1) {
                 try {
                     minDefaultPoolSize = Integer.parseInt(
                     defaultPoolSize.substring(0,index));
                 } catch (NumberFormatException ex) {
-                    debug2.error("Invalid ldap connection pool min size", ex);
+                    debug.error("Invalid ldap connection pool min size", ex);
                 }
-                
+
                 try {
                     maxDefaultPoolSize = Integer.parseInt(
                     defaultPoolSize.substring(index + 1));
                 } catch (NumberFormatException ex) {
-                    debug2.error("Invalid ldap connection pool max size", ex);
+                    debug.error("Invalid ldap connection pool max size", ex);
                 }
-                
+
                 if (maxDefaultPoolSize < minDefaultPoolSize) {
-                    debug2.error("ldap connection pool max size is less" +
+                    debug.error("ldap connection pool max size is less" +
                         " than min size");
                         minDefaultPoolSize = MIN_CONNECTION_POOL_SIZE;
                         maxDefaultPoolSize = MAX_CONNECTION_POOL_SIZE;
                 }
             } else {
-                debug2.error("Invalid ldap connection pool size");
+                debug.error("Invalid ldap connection pool size");
             }
         } catch (Exception ex) {
-            debug2.error("Unable to get ldap connection pool size", ex);
+            debug.error("Unable to get ldap connection pool size", ex);
         }
-        
-        dUserToken = null;
     }
-   
+
     /**
-     * TODO-JAVADOC
+     * Constructor initializing the basic parameters.
+     *
+     * @param configName Unique identifier for this auth module.
+     * @param primaryServers List of primary servers.
+     * @param secondaryServers List of secondary servers.
+     * @param ldapSSL <code>true</code> if it is SSL.
+     * @param bundle ResourceBundle to be used for getting localized messages.
+     * @param baseDN Directory Base DN.
+     * @param debug Debug object.
+     * @throws LDAPUtilException If the provided search base was invalid.
      */
-    public LDAPAuthUtils()
-    throws LDAPUtilException {
-    }
-    
-    public LDAPAuthUtils(
-        String host,
-        int port,
-        boolean ssl,
-        ResourceBundle bundle,
-        Debug debug
-    ) throws LDAPUtilException {
+    public LDAPAuthUtils(String configName, Set<String> primaryServers, Set<String> secondaryServers,
+            boolean ldapSSL, ResourceBundle bundle, String baseDN) throws LDAPUtilException {
+        this.configName = configName;
+        this.primaryServers = primaryServers;
+        this.secondaryServers = secondaryServers;
+        servers = new LinkedHashSet<String>(primaryServers);
+        servers.addAll(secondaryServers);
         this.bundle = bundle;
-        serverHost = host;
-        serverPort = port;
-        ldapSSL = ssl;
-        this.debug = debug;
-        
-        if ((serverHost == null) || (serverHost.length() < 1)) {
-            if (debug.messageEnabled()) {
-                debug.message("Invalid host name");
-            }
-            
-            throw new LDAPUtilException("HostInvalid", (Object[])null);
+        this.ldapSSL = ldapSSL;
+
+        this.baseDN = baseDN;
+
+        if (baseDN == null || baseDN.length() < 1) {
+            debug.message("Invalid  search Base");
+            throw new LDAPUtilException("SchBaseInvalid", (Object[]) null);
         }
     }
 
-    private static Set<String> getAllHostNames(String hostName, int portNumber, String bindingUser) {
-        Set<String> obj = new HashSet<String>();
-        StringTokenizer tokenStr = new StringTokenizer(hostName);
-        
-        while(tokenStr.hasMoreTokens()) {
-           String key = tokenStr.nextToken().trim();
-           
-           if(key.indexOf(COLON) > 0) {
-              key = key.substring(0,key.indexOf(COLON)) + COLON + portNumber + COLON + bindingUser;
-           } else {
-              key = key + COLON + portNumber + COLON + bindingUser;
-           }
-           
-           obj.add(key);
-        }
-        
-        return obj;
-    }
-    
-    private static ConnectionPool createConnectionPool(
-        HashMap<String, ConnectionPool> connectionPools,
-        HashMap<String, ServerStatus> aConnectionPoolsStatus,
-        String hostName,
-        int portNumber,
-        boolean isSSL,
-        String bindingUser,
-        String bindingPwd,
-        boolean adminPool,
-        boolean trustAll
-    ) throws ErrorResultException, LDAPUtilException {
-        ConnectionPool conPool = null;
-        
+    private ConnectionFactory createConnectionPool(Map<String, ConnectionFactory> connectionPools,
+        String bindingUser, char[] bindingPwd) throws ErrorResultException, LDAPUtilException {
+        ConnectionFactory connPool = null;
+
         try {
-            String key = hostName + ":" + portNumber + ":" + bindingUser;
-            Set<String> allHostNames = getAllHostNames(hostName, portNumber, bindingUser);
-            conPool = connectionPools.get(key);
-            
-            if (conPool == null) {
-                if (debug2.messageEnabled()) {
-                    debug2.message("Create ConnectionPool: " + hostName +
-                    ":" + portNumber);
-                }
-                
-                // Since connection pool for search and authentication
-                // are different, each gets half the configured size 
-                int min = minDefaultPoolSize / 2 + 1;
-                int max = maxDefaultPoolSize / 2;
-                
-                if (min >= max) {
-                    min = max - 1;
-                }
-                
-                if (poolSize != null && !poolSize.isEmpty()) {
-                    String tmpmin = null;
-                    String tmpmax = null;
-
-                    for (String val : poolSize) {
-                        // host:port:min:max
-                        StringTokenizer stz = new StringTokenizer(val, ":");
-                        
-                        if (stz.countTokens() == 4) {
-                            String h = stz.nextToken();
-                            String p = stz.nextToken();
-                            
-                            if (allHostNames.contains(h + ":" + p + ":" + bindingUser)) {
-                                tmpmin = stz.nextToken();
-                                tmpmax = stz.nextToken();
-                                break;
-                            }
-                        }
-                    }
-                    
-                    if (tmpmin != null) {
-                        try {
-                            min = Integer.parseInt(tmpmin);
-                            max = Integer.parseInt(tmpmax);
-                            if (max < min) {
-                                debug2.error("ldap connection pool max size " +
-                                "is less than min size");
-                                min = minDefaultPoolSize;
-                                max = maxDefaultPoolSize;
-                            }
-                        }
-                        catch (NumberFormatException ex) {
-                            debug2.error(
-                                "Invalid ldap connection pool size",ex);
-                            min = minDefaultPoolSize;
-                            max = maxDefaultPoolSize;
-                        }
-                    }
-                    
-                }
-                
-                if (debug2.messageEnabled()) {
-                    debug2.message("LDAPAuthUtils.LDAPAuthUtils: min=" +
-                    min + ", max=" + max);
-                }
-                
+            connPool = connectionPools.get(configName);
+            if (connPool == null) {
                 synchronized(connectionPools) {
-                    conPool = (ConnectionPool) connectionPools.get(key);
+                    connPool = connectionPools.get(configName);
                     LDAPOptions options = new LDAPOptions();
-                    
-                    if (conPool == null) {
-                        if (isSSL) {      
+
+                    if (connPool == null) {
+                        if (debug.messageEnabled()) {
+                            debug.message("Create ConnectionPool for servers:\n" + servers);
+                        }
+
+                        // Since connection pool for search and authentication
+                        // are different, each gets half the configured size
+                        int min = minDefaultPoolSize / 2 + 1;
+                        int max = maxDefaultPoolSize / 2;
+
+                        if (min >= max) {
+                            min = max - 1;
+                        }
+
+                        Set<LDAPURL> primaryUrls = convertToLDAPURLs(primaryServers);
+                        Set<LDAPURL> secondaryUrls = convertToLDAPURLs(secondaryServers);
+                        if (poolSize != null && !poolSize.isEmpty()) {
+                            String tmpmin = null;
+                            String tmpmax = null;
+
+                            for (String val : poolSize) {
+                                // host:port:min:max
+                                StringTokenizer stz = new StringTokenizer(val, ":");
+
+                                if (stz.countTokens() == 4) {
+                                    LDAPURL url = new LDAPURL(stz.nextToken() + ":" + stz.nextToken());
+                                    if (primaryUrls.contains(url) || secondaryUrls.contains(url)) {
+                                        tmpmin = stz.nextToken();
+                                        tmpmax = stz.nextToken();
+                                        break;
+                                    }
+                                }
+                            }
+
+                            if (tmpmin != null) {
+                                try {
+                                    min = Integer.parseInt(tmpmin);
+                                    max = Integer.parseInt(tmpmax);
+                                    if (max < min) {
+                                        debug.error("ldap connection pool max size is less than min size");
+                                        min = minDefaultPoolSize;
+                                        max = maxDefaultPoolSize;
+                                    }
+                                } catch (NumberFormatException ex) {
+                                    debug.error("Invalid ldap connection pool size", ex);
+                                    min = minDefaultPoolSize;
+                                    max = maxDefaultPoolSize;
+                                }
+                            }
+                        }
+
+                        if (debug.messageEnabled()) {
+                            debug.message("LDAPAuthUtils.LDAPAuthUtils: min="
+                                    + min + ", max=" + max);
+                        }
+                        if (ldapSSL) {
                             SSLContextBuilder builder = new SSLContextBuilder();
-                            
+
                             if (trustAll) {
                                 builder.setTrustManager(TrustManagers.trustAll());
                             }
-                            
+
                             SSLContext sslContext = builder.getSSLContext();
                             options.setSSLContext(sslContext);
                         }
-                        
-                        ConnectionFactory connFactory  = new LDAPConnectionFactory(hostName, portNumber, options);
-                        
-                        if (adminPool) {
-                            BindRequest bindRequest = Requests.newSimpleBindRequest(bindingUser, bindingPwd.toCharArray());
-                            connFactory = Connections.newAuthenticatedConnectionFactory(connFactory, bindRequest);
+
+                        final ConnectionFactory connFactory;
+                        ConnectionFactory primaryCf = newFailoverConnectionPool(primaryUrls, bindingUser,
+                                bindingPwd, max, heartBeatInterval, heartBeatTimeUnit, options);
+                        if (secondaryServers.isEmpty()) {
+                            connFactory = primaryCf;
+                        } else {
+                            ConnectionFactory secondaryCf = newFailoverConnectionPool(secondaryUrls, bindingUser,
+                                    bindingPwd, max, heartBeatInterval, heartBeatTimeUnit, options);
+                            connFactory = Connections.newLoadBalancer(
+                                    new FailoverLoadBalancingAlgorithm(asList(primaryCf, secondaryCf)));
                         }
-                        
-                        ShutdownManager shutdownMan = 
-                            ShutdownManager.getInstance();
-                        
+
+                        ShutdownManager shutdownMan = ShutdownManager.getInstance();
                         if (shutdownMan.acquireValidLock()) {
                             try {
-                                conPool = Connections.newFixedConnectionPool(connFactory, max);
-                                final ConnectionPool tempConPool = conPool;
-                                shutdownMan.addShutdownListener(
-                                    new ShutdownListener() {
-                                        public void shutdown() {
-                                            tempConPool.close();
-                                        }
+                                shutdownMan.addShutdownListener(new ShutdownListener() {
+                                    public void shutdown() {
+                                        connFactory.close();
                                     }
-                                );
+                                });
                             } finally {
                                 shutdownMan.releaseLockAndNotify();
                             }
                         }
-                        
-                        connectionPools.put(key, conPool);
-                        
-                        if (aConnectionPoolsStatus != null) {
-                            aConnectionPoolsStatus.put(key, ServerStatus.STATUS_UP);
-                        }
+
+                        connPool = connFactory;
+                        connectionPools.put(configName, connPool);
                     }
                 }
             }
         } catch (GeneralSecurityException gse) {
-            debug2.error("Unable to create connection pool", gse);
+            debug.error("Unable to create connection pool", gse);
             throw new LDAPUtilException(gse);
         }
-        
-        return conPool;
+
+        return connPool;
     }
-    
-    
-    /**
-     * Constructor with host, port and base initializers
-     *
-     * @param host Host name
-     * @param port port number
-     * @param ssl <code>true</code> if it is SSL.
-     * @param bundle ResourceBundle to be used for getting localized messages.
-     * @param searchBaseDN directory base.
-     * @param debug Debug object.
-     * @throws LDAPUtilException
-     */
-    public LDAPAuthUtils(
-        String host,
-        int port,
-        boolean ssl,
-        ResourceBundle bundle,
-        String searchBaseDN,
-        Debug debug
-    ) throws LDAPUtilException {
-        this(host, port, ssl, bundle, debug);
-        baseDN = searchBaseDN;
-        
-        if (baseDN.length() < 1) {
-            debug.message("Invalid  search Base");
-            throw new LDAPUtilException("SchBaseInvalid", (Object[])null);
-        }
-    }
-    
+
     /**
      * Authenticates to the LDAP server using user input.
      *
@@ -461,7 +372,7 @@ public class LDAPAuthUtils {
             throw new LDAPUtilException("PwdInvalid",
                 ResultCode.INVALID_CREDENTIALS, null);
         }
-        
+
         userId = user;
         userPassword = password;
         //retry just once if connection was closing
@@ -483,14 +394,14 @@ public class LDAPAuthUtils {
                // - low disk space (updates only)
                // - bind with no password (binds only)
                // retrying in case "disconnect in progress"
-               
+
                // there should be arg to err 53 from LDAPAuthUtils
                if (e.getResultCode().equals(ResultCode.UNWILLING_TO_PERFORM) ) {
                      // if the flag is already on, then we've already retried.
                      // not retrying more than once
                      if (!shouldRetry) {
                     	 Object[] errMsg = e.getMessageArgs();
-                    	 debug.error("Retying user authentication due to err("+ResultCode.UNWILLING_TO_PERFORM+") '"+errMsg[0]+"'");
+                         debug.error("Retying user authentication due to err("+ResultCode.UNWILLING_TO_PERFORM+") '"+errMsg[0]+"'");
                          // datastore was closing recycled connection. retry.
                          shouldRetry = true;
                      } else {
@@ -505,90 +416,32 @@ public class LDAPAuthUtils {
         } while (shouldRetry);
 
     }
-    
+
     /**
      * Returns connection from pool.  Re-authenticate if necessary
      *
      * @return connection that is available to use
      */
-    private Connection getConnection()
-    throws ErrorResultException, LDAPUtilException {
+    private Connection getConnection() throws ErrorResultException, LDAPUtilException {
         if (cPool == null) {
-            cPool = createConnectionPool(connectionPools,
-            null, serverHost, serverPort,
-            ldapSSL, authDN, authPassword, false, trustAll);
+            cPool = createConnectionPool(connectionPools, null, null);
         }
-        
+
         return cPool.getConnection();
     }
-    
+
     /**
      * Get connection from pool.  Re-authenticate if necessary
      * @return connection that is available to use
      */
-    private Connection getAdminConnection()
-    throws ErrorResultException, LDAPUtilException {
+    private Connection getAdminConnection() throws ErrorResultException, LDAPUtilException {
         if (acPool == null) {
-            acPool = createConnectionPool(adminConnectionPools,
-             connectionPoolsStatus, serverHost, serverPort,
-             ldapSSL, authDN, authPassword, true, trustAll);
+            acPool = createConnectionPool(adminConnectionPools, authDN, authPassword);
         }
-        
+
         return acPool.getConnection();
     }
-     
-    /**
-     * TODO-JAVADOC
-     */
-    public void authenticateSuperAdmin(String user, String password)
-    throws LDAPUtilException {
-        if (password == null || password.length() == 0) {
-            throw new LDAPUtilException("PwdInvalid",
-                ResultCode.INVALID_CREDENTIALS, null);
-        }
-        
-        userDN = user;
-        userPassword = password;
-        
-        //retry just once if connection was closing
-        boolean shouldRetry = false;
-    	do {
-    	    try {
-    	    	authenticate();
-    	    	shouldRetry = false;
-    	    } catch (LDAPUtilException e) {
-    	    	// cases for err=53
-                // - disconnect in progress
-                // - backend unavailable (read-only, etc)
-                // - server locked down
-                // - reject unauthenticated requests
-                // - low disk space (updates only)
-                // - bind with no password (binds only)
-    	    	// retrying in case "disconnect in progress"
 
-            	// there should be arg to err 53 from LDAPAuthUtils
-            	if (e.getResultCode().equals(ResultCode.UNWILLING_TO_PERFORM) ) {
-                    // if the flag is already on, then we've already retried. 
-            		// not retrying more than once
-            		if (!shouldRetry) {
-            			Object[] errMsg = e.getMessageArgs();
-            			debug.error("Retrying user authentication due to err("+ResultCode.UNWILLING_TO_PERFORM+") '"+errMsg[0]+"'");
-                        // datastore was closing recycled connection. retry.
-                        shouldRetry = true;
-            		} else {
-            			shouldRetry = false;
-            			throw e;
-            		}
-            	} else {
-            		// generic failure. do not retry
-            		throw e;
-            	}
-    	    }
-    	} while (shouldRetry);
-
-        userId = user;
-    }
-    
     /**
      * Updates to new password by using the parameters passed by the user.
      *
@@ -614,44 +467,44 @@ public class LDAPAuthUtils {
             setState(ModuleState.USER_PASSWORD_SAME);
             return;
         }
-        
+
         Connection modConn = null;
-        List<Control> controls = null;
-        
-        try {            
+        List<Control> controls;
+
+        try {
             ModifyRequest mods = Requests.newModifyRequest(userDN);
-            
+
             if (beheraEnabled) {
-                mods.addControl(PasswordPolicyRequestControl.newControl(false));        
+                mods.addControl(PasswordPolicyRequestControl.newControl(false));
             }
-               
+
             if (!isAd) {
                 mods.addModification(ModificationType.DELETE, LDAP_PASSWD_ATTR, oldPwd);
                 mods.addModification(ModificationType.ADD, LDAP_PASSWD_ATTR, password);
                 modConn = getConnection();
                 modConn.bind(userDN, oldPwd.toCharArray());
-            } else {                
+            } else {
                 mods.addModification(ModificationType.DELETE, AD_PASSWD_ATTR, updateADPassword(oldPwd));
                 mods.addModification(ModificationType.ADD, AD_PASSWD_ATTR, updateADPassword(password));
                 modConn = getAdminConnection();
             }
-            
+
             Result modResult = modConn.modify(mods);
             controls = processControls(modResult);
-            
+
             // Were there any password policy controls returned?
             PasswordPolicyResult result = checkControls(controls);
-            
+
             if (result == null) {
                 if (debug.messageEnabled()) {
                     debug.message("No controls returned");
                 }
-                
+
                 setState(ModuleState.PASSWORD_UPDATED_SUCCESSFULLY);
             } else {
                 processPasswordPolicyControls(result);
             }
-        } catch(ErrorResultException ere) {
+        } catch (ErrorResultException ere) {
             if (ere.getResult().getResultCode().equals(ResultCode.CONSTRAINT_VIOLATION)) {
                 PasswordPolicyResult result = checkControls(processControls(ere.getResult()));
                 if (result != null) {
@@ -667,10 +520,9 @@ public class LDAPAuthUtils {
                 ere.getResult().getResultCode().equals(ResultCode.CLIENT_SIDE_SERVER_DOWN) ||
                 ere.getResult().getResultCode().equals(ResultCode.UNAVAILABLE)) {
                 if (debug.messageEnabled()) {
-                    debug.message("changepassword:Cannot connect to " +
-                    serverHost +": ", ere);
+                    debug.message("changepassword:Cannot connect to " + servers + ": ", ere);
                 }
-                
+
                 setState(ModuleState.SERVER_DOWN);
                 return;
             } else if (ere.getResult().getResultCode().equals(ResultCode.UNWILLING_TO_PERFORM)) {
@@ -684,20 +536,20 @@ public class LDAPAuthUtils {
                 }
             } else if (ere.getResult().getResultCode().equals(ResultCode.INVALID_CREDENTIALS)) {
                 Result r = ere.getResult();
-                
+
                 if (r != null) {
                     // Were there any password policy controls returned?
                     PasswordPolicyResult result = checkControls(processControls(r));
 
                     if (result != null) {
                         processPasswordPolicyControls(result);
-                    }    
+                    }
                 }
                 setState(ModuleState.PASSWORD_NOT_UPDATE);
             } else {
                 setState(ModuleState.PASSWORD_NOT_UPDATE);
             }
-            
+
             if (debug.warningEnabled()) {
                 debug.warning("Cannot update : ", ere);
             }
@@ -709,50 +561,35 @@ public class LDAPAuthUtils {
     }
 
     private String buildUserFilter() {
-        StringBuilder buf = new StringBuilder(100);
-        buf.append("(");
-        
+        Filter filter;
         if (userSearchAttrs.size() == 1) {
-            buf.append((String) userSearchAttrs.iterator().next());
-            buf.append("=");
-            buf.append(userId);
+            filter = Filter.equality(userSearchAttrs.iterator().next(), userId);
         } else {
-            buf.append("|");
-            
+            List<Filter> searchFilters = new ArrayList<Filter>(userSearchAttrs.size());
             for (String searchAttr : userSearchAttrs) {
-                buf.append("(");
-                buf.append(searchAttr);
-                buf.append("=");
-                buf.append(userId);
-                buf.append(")");
+                searchFilters.add(Filter.equality(searchAttr, userId));
             }
+            filter = Filter.or(searchFilters);
         }
-        
-        buf.append(")");
-        return buf.toString();
+
+        return filter.toString();
     }
-    
+
     private ByteString updateADPassword(String password) {
         String quotedPassword = "\"" + password + "\"";
-        
-        byte[] newUnicodePassword = quotedPassword.getBytes();
-        
-        try {
-            newUnicodePassword = quotedPassword.getBytes("UTF-16LE");
-        } catch (UnsupportedEncodingException uee) {
-            uee.printStackTrace();
-        }
-        
+
+        byte[] newUnicodePassword = quotedPassword.getBytes(Charset.forName("UTF-16LE"));
+
         return ByteString.wrap(newUnicodePassword);
     }
-    
+
     /**
      * Searches and returns user for a specified attribute using parameters
      * specified in constructor and/or by setting properties.
      *
      * @throws LDAPUtilException
      */
-    public void searchForUser() 
+    public void searchForUser()
     throws LDAPUtilException {
         // make some special case where searchScope == BASE
         // construct the userDN without searching directory
@@ -766,12 +603,12 @@ public class LDAPAuthUtils {
                 dnBuffer.append(",");
                 dnBuffer.append(baseDN);
                 userDN = dnBuffer.toString();
-                
+
                 if (debug.messageEnabled()) {
                     debug.message("searchForUser, searchScope = BASE," +
                     "userDN =" + userDN);
                 }
-                
+
                 if (!isDynamicUserEnabled &&
                     userSearchAttrs.contains(userNamingAttr)) {
                     return;
@@ -780,14 +617,14 @@ public class LDAPAuthUtils {
                     debug.message("user creation attribute list is empty ");
                     return;
                 }
-                
+
                 baseDN=userDN;
             } else {
                 if (debug.messageEnabled()) {
                     debug.message("cannot find user entry using scope=0"+
                     "setting scope=1");
                 }
-                
+
                 searchScope = SearchScope.SINGLE_LEVEL;
             }
         }
@@ -795,7 +632,7 @@ public class LDAPAuthUtils {
             searchFilter = buildUserFilter();
         } else {
             StringBuilder bindFilter = new StringBuilder(200);
-            
+
             if (userId != null) {
                 bindFilter.append("(&");
                 bindFilter.append(buildUserFilter());
@@ -806,18 +643,16 @@ public class LDAPAuthUtils {
             }
             searchFilter = bindFilter.toString();
         }
-        
-        String[] res = null;
+
         userDN = null;
         Connection conn = null;
-        
+
         try {
             if (debug.messageEnabled()) {
-                debug.message("Connecting to " + serverHost + ":" +
-                serverPort + "\nSearching " + baseDN + " for " +
-                searchFilter + "\nscope = " + searchScope);
+                debug.message("Connecting to " + servers + "\nSearching " + baseDN + " for " + searchFilter
+                        + "\nscope = " + searchScope);
             }
-            
+
             // Search
             int userAttrSize=0;
             if (attrs == null) {
@@ -831,77 +666,76 @@ public class LDAPAuthUtils {
                     attrs = new String[userAttrSize + 2];
                     attrs[0] = "dn";
                     attrs[1] = userNamingAttr;
-                    
+
                     Iterator attrItr = userAttributes.iterator();
                     for (int i = 2; i < userAttrSize + 2; i++) {
                         attrs[i] = (String)attrItr.next();
                     }
                 }
             }
-            
+
             if (debug.messageEnabled()) {
                 debug.message("userAttrSize is : " + userAttrSize);
             }
-            
-            ConnectionEntryReader results = null;
+
+            ConnectionEntryReader results;
             SearchRequest searchForUser = Requests.newSearchRequest(baseDN, searchScope, searchFilter, attrs);
-            
+
+            int userMatches = 0;
+            SearchResultEntry entry;
+            boolean userNamingValueSet=false;
+
             try {
                 conn = getAdminConnection();
                 results = conn.search(searchForUser);
+                while (results.hasNext()) {
+                    if (results.isEntry()) {
+                        entry = results.readEntry();
+                        userDN = entry.getName().toString();
+                        userMatches++;
+
+                        if (attrs != null && attrs.length > 1) {
+                            userNamingValueSet = true;
+                            Attribute attr = entry.getAttribute(userNamingAttr);
+
+                            if (attr != null) {
+                                userNamingValue = attr.firstValueAsString();
+                            }
+
+                            if (isDynamicUserEnabled && (attrs.length > 2)) {
+                                for (int i = 2; i < userAttrSize + 2; i++) {
+                                    attr = entry.getAttribute(attrs[i]);
+
+                                    if (attr != null) {
+                                        Set<String> s = new HashSet<String>();
+                                        Iterator<ByteString> values = attr.iterator();
+
+                                        while (values.hasNext()) {
+                                            s.add(values.next().toString());
+                                        }
+
+                                        userAttributeValues.put(attrs[i], s);
+                                    }
+                                }
+                            }
+                        }
+                    } else {
+                        //read and ignore references
+                        results.readReference();
+                    }
+                }
             } finally {
                 if (conn != null) {
                     conn.close();
                 }
             }
-            
-            int userMatches = 0;
-            SearchResultEntry entry = null;
-            boolean userNamingValueSet=false;
-            
-            while (results.hasNext()) {
-                if (!results.isReference()) {
-                    entry = results.readEntry();
-                    userDN = entry.getName().toString();
-                    userMatches++;
 
-                    if (attrs != null && attrs.length > 1) {
-                        userNamingValueSet = true;
-                        Attribute attr = entry.getAttribute(userNamingAttr);
-
-                        if (attr != null) {
-                            userNamingValue = attr.firstValueAsString();
-                        }
-
-                        if (isDynamicUserEnabled && (attrs.length > 2)) {
-                            for (int i = 2; i < userAttrSize + 2; i++) {
-                                attr = entry.getAttribute(attrs[i]);
-
-                                if (attr != null) {
-                                    Set<String> s = new HashSet<String>();
-                                    Iterator<ByteString> values = attr.iterator();
-
-                                    while (values.hasNext()) {
-                                        s.add(values.next().toString());
-                                    }
-
-                                    userAttributeValues.put(attrs[i], s);
-                                }
-                            }
-                        }
-                    }
-                } else {
-                    //read and ignore references
-                    results.readReference();
-                }
-            }
-            
             if (userNamingValueSet && (userDN == null ||
                 userNamingValue == null)) {
                 if (debug.messageEnabled()) {
                     debug.message("Cannot find entries for " + searchFilter);
                 }
-                
+
                 setState(ModuleState.USER_NOT_FOUND);
                 return;
             } else {
@@ -910,7 +744,7 @@ public class LDAPAuthUtils {
                         debug.message(
                             "Cannot find entries for " + searchFilter);
                     }
-                    
+
                     setState(ModuleState.USER_NOT_FOUND);
                     return;
                 } else {
@@ -937,12 +771,12 @@ public class LDAPAuthUtils {
                 erio.getCause().getResult().getResultCode().equals(ResultCode.CLIENT_SIDE_SERVER_DOWN) ||
                 erio.getCause().getResult().getResultCode().equals(ResultCode.UNAVAILABLE)) {
                 if (debug.warningEnabled()) {
-                    debug.warning("Cannot connect to " + serverHost, erio);
+                    debug.warning("Cannot connect to " + servers, erio);
                     setState(ModuleState.SERVER_DOWN);
                     return;
                 }
             }
-            
+
             throw new LDAPUtilException(erio);
         } catch (SearchResultReferenceIOException srrio) {
             debug.error("Unable to complete search for user: " + userId, srrio);
@@ -952,28 +786,27 @@ public class LDAPAuthUtils {
                 debug.warning("Search for User error: ", ere);
                 debug.warning("resultCode: " + ere.getResult().getResultCode());
             }
-            
+
             if (ere.getResult().getResultCode().equals(ResultCode.CLIENT_SIDE_CONNECT_ERROR) ||
                 ere.getResult().getResultCode().equals(ResultCode.CLIENT_SIDE_SERVER_DOWN) ||
                 ere.getResult().getResultCode().equals(ResultCode.UNAVAILABLE)) {
                 if (debug.warningEnabled()) {
-                    debug.warning("Cannot connect to " + serverHost, ere);
+                    debug.warning("Cannot connect to " + servers, ere);
                 }
-                
+
                 setState(ModuleState.SERVER_DOWN);
-                return;
             } else if (ere.getResult().getResultCode().equals(ResultCode.INVALID_CREDENTIALS)) {
                 if (debug.warningEnabled()) {
                     debug.warning("Cannot authenticate ");
                 }
-                
+
                 throw new LDAPUtilException("FConnect",
                     ResultCode.INVALID_CREDENTIALS, null);
             } else if (ere.getResult().getResultCode().equals(ResultCode.UNWILLING_TO_PERFORM)) {
                 if (debug.warningEnabled()) {
                     debug.message("Account Inactivated or Locked ");
                 }
-                
+
                 throw new LDAPUtilException("FConnect",
                     ResultCode.UNWILLING_TO_PERFORM, null);
             } else if (ere.getResult().getResultCode().equals(ResultCode.NO_SUCH_OBJECT)) {
@@ -983,13 +816,12 @@ public class LDAPAuthUtils {
                 if (debug.warningEnabled()) {
                     debug.warning("Exception while searching", ere);
                 }
-                
+
                 setState(ModuleState.USER_NOT_FOUND);
-                return;
             }
         }
     }
-    
+
     /**
      * Connect to LDAP server using parameters specified in
      * constructor and/or by setting properties attempt to authenticate.
@@ -999,16 +831,16 @@ public class LDAPAuthUtils {
     throws LDAPUtilException {
         Connection conn = null;
         List<Control> controls = null;
-        
+
         try {
             try {
-                BindRequest bindRequest = 
+                BindRequest bindRequest =
                         Requests.newSimpleBindRequest(userDN, userPassword.toCharArray());
-                
+
                 if (beheraEnabled) {
-                    bindRequest.addControl(PasswordPolicyRequestControl.newControl(false));        
+                    bindRequest.addControl(PasswordPolicyRequestControl.newControl(false));
                 }
-                                
+
                 conn = getConnection();
                 BindResult bindResult = conn.bind(bindRequest);
                 controls = processControls(bindResult);
@@ -1017,15 +849,15 @@ public class LDAPAuthUtils {
                     conn.close();
                 }
             }
-            
+
             // Were there any password policy controls returned?
             PasswordPolicyResult result = checkControls(controls);
-            
+
             if (result == null) {
                 if (debug.messageEnabled()) {
                     debug.message("No controls returned");
                 }
-                
+
                 setState(ModuleState.SUCCESS);
             } else {
                 processPasswordPolicyControls(result);
@@ -1049,7 +881,6 @@ public class LDAPAuthUtils {
                             }
                             setState(ModuleState.PASSWORD_EXPIRED_STATE);
                         }
-                        return;
                     } else if (result != null && result.getPasswordPolicyErrorType() != null &&
                         result.getPasswordPolicyErrorType().equals(PasswordPolicyErrorType.ACCOUNT_LOCKED)) {
 
@@ -1058,7 +889,6 @@ public class LDAPAuthUtils {
                         }
 
                         processPasswordPolicyControls(result);
-                        return;
                     } else {
                         if (debug.messageEnabled()) {
                             debug.message("Failed auth due to invalid credentials");
@@ -1072,7 +902,6 @@ public class LDAPAuthUtils {
 
                     if (result != null) {
                         processPasswordPolicyControls(result);
-                        return;
                     } else {
                         if (debug.messageEnabled()) {
                             debug.message("Failed auth due to invalid credentials");
@@ -1086,21 +915,20 @@ public class LDAPAuthUtils {
                 if (debug.messageEnabled()) {
                     debug.message("user does not exist");
                 }
-                
+
                 throw new LDAPUtilException("UsrNotExist",
                     ResultCode.NO_SUCH_OBJECT, null);
             } else if (ere.getResult().getResultCode().equals(ResultCode.CLIENT_SIDE_CONNECT_ERROR) ||
                 ere.getResult().getResultCode().equals(ResultCode.CLIENT_SIDE_SERVER_DOWN) ||
                 ere.getResult().getResultCode().equals(ResultCode.UNAVAILABLE)) {
                 if (debug.messageEnabled()) {
-                    debug.message("Cannot connect to " + serverHost, ere);
+                    debug.message("Cannot connect to " + servers, ere);
                 }
-                
+
                 setState(ModuleState.SERVER_DOWN);
-                return;
             } else if (ere.getResult().getResultCode().equals(ResultCode.UNWILLING_TO_PERFORM)) {
                 if (debug.messageEnabled()) {
-                	debug.message(serverHost + " unwilling to perform auth request");
+                    debug.message(servers + " unwilling to perform auth request");
                 }
                 // cases for err=53
                 // - disconnect in progress
@@ -1108,46 +936,46 @@ public class LDAPAuthUtils {
                 // - server locked down
                 // - reject unauthenticated requests
                 // - low disk space (updates only)
-                // - bind with no password (binds only)             
+                // - bind with no password (binds only)
                 String[] args = { ere.getMessage() };
-                
+
                 throw new LDAPUtilException("FConnect", ResultCode.UNWILLING_TO_PERFORM, args);
             } else if (ere.getResult().getResultCode().equals(ResultCode.INAPPROPRIATE_AUTHENTICATION)) {
                 if (debug.messageEnabled()) {
                     debug.message("Failed auth due to inappropriate authentication");
                 }
-                
+
                 throw new LDAPUtilException("amAuth", "InappAuth",
                     ResultCode.INAPPROPRIATE_AUTHENTICATION, null);
             } else if (ere.getResult().getResultCode().equals(ResultCode.CONSTRAINT_VIOLATION)) {
                 if (debug.messageEnabled()) {
                     debug.message("Exceed password retry limit.");
                 }
-                
+
                 throw new LDAPUtilException(ISAuthConstants.EXCEED_RETRY_LIMIT,
                     ResultCode.CONSTRAINT_VIOLATION, null);
             } else {
                 if (debug.messageEnabled()) {
-                    debug.message("Cannot authenticate to " + serverHost, ere);
+                    debug.message("Cannot authenticate to " + servers, ere);
                 }
-                
+
                 throw new LDAPUtilException("amAuth", "FAuth", null, null);
             }
-        }   
+        }
     }
-    
+
     private List<Control> processControls(Result result) {
         if (result == null) {
             return Collections.EMPTY_LIST;
         }
-        
+
         List<Control> controls = new ArrayList<Control>();
         DecodeOptions options = new DecodeOptions();
-        Control c = null;
-        
+        Control c;
+
         try {
             c = result.getControl(PasswordExpiredResponseControl.DECODER, options);
-            
+
             if (c != null) {
                 controls.add(c);
             }
@@ -1156,10 +984,10 @@ public class LDAPAuthUtils {
                 debug.warning("unable to decode PasswordExpiredResponseControl", de);
             }
         }
-        
+
         try {
             c = result.getControl(PasswordExpiringResponseControl.DECODER, options);
-            
+
             if (c != null) {
                 controls.add(c);
             }
@@ -1168,10 +996,10 @@ public class LDAPAuthUtils {
                 debug.warning("unable to decode PasswordExpiringResponseControl", de);
             }
         }
-        
+
         try {
             c = result.getControl(PasswordPolicyResponseControl.DECODER, options);
-            
+
             if (c != null) {
                 controls.add(c);
             }
@@ -1179,11 +1007,11 @@ public class LDAPAuthUtils {
             if (debug.warningEnabled()) {
                 debug.warning("unable to decode PasswordPolicyResponseControl", de);
             }
-        }        
-        
+        }
+
         return controls;
     }
-    
+
     private void processPasswordPolicyControls(PasswordPolicyResult result) {
         if (result.getPasswordPolicyErrorType() != null) {
             switch (result.getPasswordPolicyErrorType()) {
@@ -1207,7 +1035,7 @@ public class LDAPAuthUtils {
                     }
 
                     setState(ModuleState.INSUFFICIENT_PASSWORD_QUALITY);
-                    break;                            
+                    break;
                 case MUST_SUPPLY_OLD_PASSWORD:
                     if (debug.messageEnabled()) {
                         debug.message("Must supply old password" );
@@ -1228,28 +1056,28 @@ public class LDAPAuthUtils {
                     }
 
                     setState(ModuleState.PASSWORD_IN_HISTORY);
-                    break;                            
+                    break;
                 case PASSWORD_MOD_NOT_ALLOWED:
                     if (debug.messageEnabled()) {
                         debug.message("password modification is not allowed" );
                     }
 
                     setState(ModuleState.PASSWORD_MOD_NOT_ALLOWED);
-                    break;                              
+                    break;
                 case PASSWORD_TOO_SHORT:
                     if (debug.messageEnabled()) {
                         debug.message("password too short" );
                     }
 
                     setState(ModuleState.PASSWORD_TOO_SHORT);
-                    break;                              
+                    break;
                 case PASSWORD_TOO_YOUNG:
                     if (debug.messageEnabled()) {
                         debug.message("password too young" );
                     }
 
                     setState(ModuleState.PASSWORD_TOO_YOUNG);
-                    break;                              
+                    break;
             }
         }
 
@@ -1281,145 +1109,145 @@ public class LDAPAuthUtils {
             }
         }
     }
-    
+
     /**
      * checks for  an LDAP v3 server whether the control has returned
      * if a password has expired or password is expiring and password
      * policy is enabled on the server.
-     * 
+     *
      * @return The PasswordPolicyResult or null if there were no controls
      */
     private PasswordPolicyResult checkControls(List<Control> controls) {
         PasswordPolicyResult result = null;
-        
-        if ((controls != null) && (!controls.isEmpty())) {            
+
+        if ((controls != null) && (!controls.isEmpty())) {
             for (Control control : controls) {
                 if (control instanceof PasswordExpiredResponseControl) {
                     if (result == null) {
-                        result = new PasswordPolicyResult(PasswordPolicyErrorType.PASSWORD_EXPIRED); 
+                        result = new PasswordPolicyResult(PasswordPolicyErrorType.PASSWORD_EXPIRED);
                     } else {
                         result.setPasswordPolicyErrorType(PasswordPolicyErrorType.PASSWORD_EXPIRED);
                     }
                 }
-                
+
                 if (control instanceof PasswordPolicyResponseControl) {
-                    PasswordPolicyErrorType policyErrorType = 
+                    PasswordPolicyErrorType policyErrorType =
                             ((PasswordPolicyResponseControl) control).getErrorType();
-                    
+
                     if (policyErrorType != null) {
                         switch (policyErrorType) {
                             case ACCOUNT_LOCKED:
                                 if (result == null) {
-                                    result = new PasswordPolicyResult(PasswordPolicyErrorType.ACCOUNT_LOCKED); 
+                                    result = new PasswordPolicyResult(PasswordPolicyErrorType.ACCOUNT_LOCKED);
                                 } else {
                                     result.setPasswordPolicyErrorType(PasswordPolicyErrorType.ACCOUNT_LOCKED);
                                 }
-                                
+
                                 break;
                             case CHANGE_AFTER_RESET:
                                 if (result == null) {
-                                    result = new PasswordPolicyResult(PasswordPolicyErrorType.CHANGE_AFTER_RESET); 
+                                    result = new PasswordPolicyResult(PasswordPolicyErrorType.CHANGE_AFTER_RESET);
                                 } else {
                                     result.setPasswordPolicyErrorType(PasswordPolicyErrorType.CHANGE_AFTER_RESET);
                                 }
-                                
+
                                 break;
                             case INSUFFICIENT_PASSWORD_QUALITY:
                                 if (result == null) {
-                                    result = new PasswordPolicyResult(PasswordPolicyErrorType.INSUFFICIENT_PASSWORD_QUALITY); 
+                                    result = new PasswordPolicyResult(PasswordPolicyErrorType.INSUFFICIENT_PASSWORD_QUALITY);
                                 } else {
                                     result.setPasswordPolicyErrorType(PasswordPolicyErrorType.INSUFFICIENT_PASSWORD_QUALITY);
                                 }
-                                
+
                                 break;
                             case MUST_SUPPLY_OLD_PASSWORD:
                                 if (result == null) {
-                                    result = new PasswordPolicyResult(PasswordPolicyErrorType.MUST_SUPPLY_OLD_PASSWORD); 
+                                    result = new PasswordPolicyResult(PasswordPolicyErrorType.MUST_SUPPLY_OLD_PASSWORD);
                                 } else {
                                     result.setPasswordPolicyErrorType(PasswordPolicyErrorType.MUST_SUPPLY_OLD_PASSWORD);
                                 }
-                                
+
                                 break;
                             case PASSWORD_EXPIRED:
                                 if (result == null) {
-                                    result = new PasswordPolicyResult(PasswordPolicyErrorType.PASSWORD_EXPIRED); 
+                                    result = new PasswordPolicyResult(PasswordPolicyErrorType.PASSWORD_EXPIRED);
                                 } else {
                                     result.setPasswordPolicyErrorType(PasswordPolicyErrorType.PASSWORD_EXPIRED);
                                 }
-                                
+
                                 break;
                             case PASSWORD_IN_HISTORY:
                                 if (result == null) {
-                                    result = new PasswordPolicyResult(PasswordPolicyErrorType.PASSWORD_IN_HISTORY); 
+                                    result = new PasswordPolicyResult(PasswordPolicyErrorType.PASSWORD_IN_HISTORY);
                                 } else {
                                     result.setPasswordPolicyErrorType(PasswordPolicyErrorType.PASSWORD_IN_HISTORY);
                                 }
-                                
+
                                 break;
                             case PASSWORD_MOD_NOT_ALLOWED:
                                 if (result == null) {
-                                    result = new PasswordPolicyResult(PasswordPolicyErrorType.PASSWORD_MOD_NOT_ALLOWED); 
+                                    result = new PasswordPolicyResult(PasswordPolicyErrorType.PASSWORD_MOD_NOT_ALLOWED);
                                 } else {
                                     result.setPasswordPolicyErrorType(PasswordPolicyErrorType.PASSWORD_MOD_NOT_ALLOWED);
                                 }
-                                
+
                                 break;
                             case PASSWORD_TOO_SHORT:
                                 if (result == null) {
-                                    result = new PasswordPolicyResult(PasswordPolicyErrorType.PASSWORD_TOO_SHORT); 
+                                    result = new PasswordPolicyResult(PasswordPolicyErrorType.PASSWORD_TOO_SHORT);
                                 } else {
                                     result.setPasswordPolicyErrorType(PasswordPolicyErrorType.PASSWORD_TOO_SHORT);
                                 }
-                                
+
                                 break;
                             case PASSWORD_TOO_YOUNG:
                                 if (result == null) {
-                                    result = new PasswordPolicyResult(PasswordPolicyErrorType.PASSWORD_TOO_YOUNG); 
+                                    result = new PasswordPolicyResult(PasswordPolicyErrorType.PASSWORD_TOO_YOUNG);
                                 } else {
                                     result.setPasswordPolicyErrorType(PasswordPolicyErrorType.PASSWORD_TOO_YOUNG);
                                 }
-                                
+
                                 break;
                         }
                     }
-                    
-                    PasswordPolicyWarningType policyWarningType = 
+
+                    PasswordPolicyWarningType policyWarningType =
                             ((PasswordPolicyResponseControl) control).getWarningType();
-                    
+
                     if (policyWarningType != null) {
                         switch (policyWarningType) {
                             case GRACE_LOGINS_REMAINING:
                                 if (result == null) {
                                     result = new PasswordPolicyResult(PasswordPolicyWarningType.GRACE_LOGINS_REMAINING,
-                                            ((PasswordPolicyResponseControl) control).getWarningValue()); 
+                                            ((PasswordPolicyResponseControl) control).getWarningValue());
                                 } else {
                                     result.setPasswordPolicyWarningType(PasswordPolicyWarningType.GRACE_LOGINS_REMAINING,
                                             ((PasswordPolicyResponseControl) control).getWarningValue());
                                 }
-                                
+
                                 break;
                             case TIME_BEFORE_EXPIRATION:
                                 if (result == null) {
-                                    result = new PasswordPolicyResult(PasswordPolicyWarningType.TIME_BEFORE_EXPIRATION, 
-                                        ((PasswordPolicyResponseControl) control).getWarningValue()); 
+                                    result = new PasswordPolicyResult(PasswordPolicyWarningType.TIME_BEFORE_EXPIRATION,
+                                        ((PasswordPolicyResponseControl) control).getWarningValue());
                                 } else {
                                     result.setPasswordPolicyWarningType(PasswordPolicyWarningType.TIME_BEFORE_EXPIRATION,
                                         ((PasswordPolicyResponseControl) control).getWarningValue());
                                 }
-                                
+
                                 break;
                         }
                     }
                 }
-                
+
                 if (control instanceof PasswordExpiringResponseControl) {
-                    PasswordExpiringResponseControl expiringControl = 
+                    PasswordExpiringResponseControl expiringControl =
                             (PasswordExpiringResponseControl) control;
-                    
+
                     if (control.hasValue()) {
                         if (result == null) {
                             result = new PasswordPolicyResult(PasswordPolicyWarningType.TIME_BEFORE_EXPIRATION,
-                                    expiringControl.getSecondsUntilExpiration()); 
+                                    expiringControl.getSecondsUntilExpiration());
                         } else {
                             result.setPasswordPolicyWarningType(PasswordPolicyWarningType.TIME_BEFORE_EXPIRATION,
                                     expiringControl.getSecondsUntilExpiration());
@@ -1427,23 +1255,23 @@ public class LDAPAuthUtils {
                     } else {
                         if (result == null) {
                             result = new PasswordPolicyResult(PasswordPolicyWarningType.TIME_BEFORE_EXPIRATION,
-                                    NO_EXPIRY_TIME); 
+                                    NO_EXPIRY_TIME);
                         } else {
                             result.setPasswordPolicyWarningType(PasswordPolicyWarningType.TIME_BEFORE_EXPIRATION,
                                     NO_EXPIRY_TIME);
                         }
                     }
-                    
+
                 }
             }
         }
-        
+
         return result;
     }
-    
+
     /**
      * Given a specific AD diagnostic message, creates a valid PasswordPolicyResult
-     * 
+     *
      * @param diagMessage The message from AD describing the status of the account
      * @return The correct PasswordPolicyResult or null if not matched
      */
@@ -1462,7 +1290,7 @@ public class LDAPAuthUtils {
             return null;
         }
     }
-    
+
     // LDAP parameters are set  here .......
     /**
      * TODO-JAVADOC
@@ -1475,7 +1303,7 @@ public class LDAPAuthUtils {
             return userNamingValue;
         }
     }
-    
+
     /**
      * TODO-JAVADOC
      */
@@ -1487,7 +1315,7 @@ public class LDAPAuthUtils {
             return name;
         }
     }
-    
+
     /**
      * TODO-JAVADOC
      */
@@ -1522,10 +1350,6 @@ public class LDAPAuthUtils {
         baseDN = basedn;
     }
 
-    private void setAuthProtocol(String protocol) {
-        ssl = protocol;
-    }
-    
     /**
      * Sets the DN to authenticate as; null or empty for anonymous.
      *
@@ -1534,13 +1358,13 @@ public class LDAPAuthUtils {
     public  void setAuthDN(String authdn) {
         authDN = authdn;
     }
-    
+
     /**
      * Sets the password for the DN to authenticate as.
      *
      * @param authpassword the password to use in authentication.
      */
-    public  void setAuthPassword(String authpassword) {
+    public void setAuthPassword(char[] authpassword) {
         authPassword = authpassword;
     }
 
@@ -1555,34 +1379,52 @@ public class LDAPAuthUtils {
     public void setScope(SearchScope scope) {
         searchScope = scope;
     }
-    
+
     /**
      * Sets if the behera password policy scheme should be used
-     * 
+     *
      * @param beheraEnabled true if behera is supported
      */
     public void setBeheraEnabled(boolean beheraEnabled) {
         this.beheraEnabled = beheraEnabled;
     }
-    
+
+    /**
+     * Sets the heartbeat interval.
+     *
+     * @param heartBeatInterval The heartbeat interval.
+     */
+    public void setHeartBeatInterval(int heartBeatInterval) {
+        this.heartBeatInterval = heartBeatInterval;
+    }
+
+    /**
+     * Sets the heartbeat timeunit.
+     *
+     * @param heartBeatTimeUnit The timeunit for the heartbeat interval.
+     */
+    public void setHeartBeatTimeUnit(String heartBeatTimeUnit) {
+        this.heartBeatTimeUnit = heartBeatTimeUnit;
+    }
+
     /**
      * Sets if the directory is Active Directory
-     * 
+     *
      * @param isAd true if the module is AD
      */
     public void setAD(boolean isAd) {
         this.isAd = isAd;
     }
-    
+
     /**
      * Enabled trust all server certificates
-     * 
+     *
      * @param trustAll true if we should trust all certs
      */
     public void setTrustAll(boolean trustAll) {
         this.trustAll = trustAll;
     }
-    
+
     /**
      * Returns the latest screen state.
      *
@@ -1604,23 +1446,21 @@ public class LDAPAuthUtils {
     private void setExpTime(int sec) {
         expiryTime = null;
         StringBuilder expTime = new StringBuilder();
-        
+
         int days = sec / (24*60*60);
         int hours = (sec%(24*60*60)) / 3600;
         int minutes = (sec%3600) / 60;
         int seconds = sec%60;
-        
+
         if (hours <= 0 && minutes <= 0 && seconds <= 0) {
             expTime.append(days).append(" days: ");
             expiryTime = expTime.toString();
-            
-            return;
         } else {
             expTime.append(days).append(SPACE).append(bundle.getString("days")).append(COLON).append(SPACE);
             expTime.append(hours).append(SPACE).append(bundle.getString("hours")).append(COLON).append(SPACE);
             expTime.append(minutes).append(SPACE).append(bundle.getString("minutes")).append(COLON).append(SPACE);
             expTime.append(seconds).append(SPACE).append(bundle.getString("seconds"));
-            
+
             expiryTime = expTime.toString();
         }
     }
@@ -1633,54 +1473,13 @@ public class LDAPAuthUtils {
     public String getExpTime() {
         return expiryTime;
     }
-    
+
     private void setGraceLogins(int graceLogins) {
         this.graceLogins = graceLogins;
     }
-    
+
     public int getGraceLogins() {
         return graceLogins;
-    }
-    
-    /**
-     * Returns <code>true</code> if the connection represented by this object
-     * is open at this time.
-     *
-     * @return <code>true</code> if connected to an LDAP server over this
-     *         connection.
-     *         Returns <code>false</code> if not connected to an LDAP server.
-     */
-    public boolean isServerRunning(String host, int port) {
-        Connection conn = null;
-        boolean running = false;
-        LDAPOptions options = new LDAPOptions();
-        LDAPConnectionFactory factory = null;
- 
-        try {
-            if (ldapSSL) {
-                SSLContext sslContext = new SSLContextBuilder().getSSLContext();
-                options.setSSLContext(sslContext);
-            }
-            
-            factory = new LDAPConnectionFactory(host, port, options);
-            conn = factory.getConnection();
-            running = conn.isValid();
-        } catch (ErrorResultException ere) {
-            if (debug.messageEnabled()) {
-                debug.message("Primary Server is not running");
-            }
-        } catch (GeneralSecurityException gse) {
-            if (debug.messageEnabled()) {
-                debug.message("Primary Server is not running");
-            }            
-        } finally {
-            if (conn != null) {
-                conn.close();
-            }
-        }
-        
-        return running;
-        
     }
 
     /**
@@ -1693,8 +1492,7 @@ public class LDAPAuthUtils {
             returnUserDN = false;
         }
     }
-    
-    
+
     /**
      * Sets attributes names to be use in the search for the
      * user prior to authenticating with the bind. These attributes
@@ -1707,17 +1505,17 @@ public class LDAPAuthUtils {
     public void setUserAttributes(Set attributeNames) {
         userAttributes = attributeNames;
     }
-    
+
     /**
      * Returns the attributes and their values obtained from the user
      * search during authentication.
      *
      * @return Map of attribute name to a set of values.
      */
-    public Map getUserAttributeValues() {
+    public Map<String, Set<String>> getUserAttributeValues() {
         return userAttributeValues;
     }
-    
+
     /**
      * Sets the value of the dynamic profile creation configured in
      * Authentication service.
@@ -1727,7 +1525,7 @@ public class LDAPAuthUtils {
     public void setDynamicProfileCreationEnabled(boolean isEnable) {
         isDynamicUserEnabled = isEnable;
     }
-    
+
     /**
      * Sets the return attributes for ldap search.
      *
@@ -1736,20 +1534,20 @@ public class LDAPAuthUtils {
     public void setUserAttrs(String[] attrs) {
         this.attrs = attrs;
     }
-    
+
     class PasswordPolicyResult {
         private PasswordPolicyErrorType errorResultType;
         private PasswordPolicyWarningType warningResultType;
         private int value;
-        
+
         public PasswordPolicyResult() {
             // do nothing
         }
-        
+
         public PasswordPolicyResult(PasswordPolicyErrorType errorResultType) {
             this.errorResultType = errorResultType;
-        } 
-        
+        }
+
         public PasswordPolicyResult(PasswordPolicyWarningType warningResultType) {
             this.warningResultType = warningResultType;
         }
@@ -1758,31 +1556,31 @@ public class LDAPAuthUtils {
             this.warningResultType = warningResultType;
             this.value = value;
         }
-        
-        public PasswordPolicyResult(PasswordPolicyErrorType errorResultType, 
+
+        public PasswordPolicyResult(PasswordPolicyErrorType errorResultType,
                                     PasswordPolicyWarningType warningResultType, int value) {
             this.errorResultType = errorResultType;
             this.warningResultType = warningResultType;
             this.value = value;
-        }        
+        }
 
         public PasswordPolicyErrorType getPasswordPolicyErrorType() {
             return errorResultType;
         }
-        
+
         public PasswordPolicyWarningType getPasswordPolicyWarningType() {
             return warningResultType;
         }
-        
+
         public void setPasswordPolicyErrorType(PasswordPolicyErrorType errorResultType) {
             this.errorResultType = errorResultType;
         }
-        
+
         public void setPasswordPolicyWarningType(PasswordPolicyWarningType warningResultType, int value) {
             this.warningResultType = warningResultType;
             this.value = value;
         }
-        
+
        public void setPasswordPolicyWarningType(PasswordPolicyWarningType warningResultType) {
             this.warningResultType = warningResultType;
         }
