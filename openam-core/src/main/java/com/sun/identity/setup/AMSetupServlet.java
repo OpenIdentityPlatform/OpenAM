@@ -292,7 +292,7 @@ public class AMSetupServlet extends HttpServlet {
     /**
      * Checks if the embedded directory (if present) needs to be upgraded
      */
-    public static void checkOpenDJUpgrade() {
+    public static void checkOpenDJUpgrade() throws ServletException {
         // check for embedded directory
         if (!isEmbeddedDS()) {
             return;
@@ -312,6 +312,7 @@ public class AMSetupServlet extends HttpServlet {
             upgrader.upgrade();
         } catch (Exception ex) {
             Debug.getInstance(SetupConstants.DEBUG_NAME).error("OpenDJ upgrade exception: ", ex);
+            throw new ServletException("An error occurred while upgrading embedded OpenDJ", ex);
         }
     }
     

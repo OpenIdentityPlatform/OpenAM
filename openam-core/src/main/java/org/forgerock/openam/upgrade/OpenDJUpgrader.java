@@ -162,8 +162,7 @@ public final class OpenDJUpgrader {
      * @throws Exception
      *           If an unexpected exception occurred.
      */
-    public void upgrade()
-    throws Exception {
+    public void upgrade() throws Exception {
         // First determine if upgrade is required.
         if (!checkUpgradePreconditions()) {
             return;
@@ -225,7 +224,7 @@ public final class OpenDJUpgrader {
                 // Work around for OPENDJ-1079
                 fixDJConfig();
             } else {
-                throw new Exception("OpenDJ upgrade failed with code:  "+ret);
+                throw new UpgradeException("OpenDJ upgrade failed with code:  "+ret);
             }
         }
     }
