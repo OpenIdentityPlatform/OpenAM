@@ -27,7 +27,7 @@
  */
 
 /**
- * Portions Copyrighted 2010-2012 ForgeRock AS
+ * Portions Copyrighted 2010-2013 ForgeRock AS
  */
 package com.sun.identity.idsvcs.opensso;
 
@@ -138,7 +138,7 @@ public class IdentityServicesImpl
      * @throws InvalidCredentials if credentials are invalid.
      * @throws GeneralFailure on other errors.
      */
-    public Token authenticate(String username, String password, String uri)
+    public Token authenticate(String username, String password, String uri, String client)
         throws UserNotFound, InvalidPassword, NeedMoreCredentials,
         InvalidCredentials, OrgInactive, UserInactive, AccountExpired,
         UserLocked, GeneralFailure, MaximumSessionReached, RemoteException {
@@ -180,6 +180,9 @@ public class IdentityServicesImpl
             }
 
             AuthContext lc = new AuthContext(realm);
+            if (client != null && !client.isEmpty()) {
+                lc.setClientHostName(client);
+            }
             if (authIndexType != null) {
                 lc.login(authIndexType, authIndexValue);
             } else {

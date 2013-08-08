@@ -334,6 +334,7 @@
                     <xsd:element name="username" type="xsd:string" minOccurs="0"></xsd:element>
                     <xsd:element name="password" type="xsd:string" minOccurs="0"></xsd:element>
                     <xsd:element name="uri" type="xsd:string" minOccurs="0"></xsd:element>
+                    <xsd:element name="client" type="xsd:string" minOccurs="0"></xsd:element>
                 </xsd:sequence>
             </xsd:complexType>
             

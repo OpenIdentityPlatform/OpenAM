@@ -27,7 +27,7 @@
  */
 
 /*
- * Portions Copyrighted 2011-2012 ForgeRock Inc
+ * Portions Copyrighted 2011-2013 ForgeRock AS
  * Portions Copyrighted 2012 Open Source Solution Technology Corporation
  */
 
@@ -189,6 +189,8 @@ public class IdentityServicesHandler extends HttpServlet {
             new SecurityParameter("USERNAME");
         public static final SecurityParameter PASSWORD =
             new SecurityParameter("PASSWORD");
+        public static final SecurityParameter CLIENT =
+                new SecurityParameter("CLIENT");
         public static final SecurityParameter TOKENID =
             new SecurityParameter("TOKENID", Token.class);
         public static final SecurityParameter SUBJECTID =
@@ -522,8 +524,9 @@ public class IdentityServicesHandler extends HttpServlet {
     public static class SecurityMethod {
 
         public static final SecurityMethod AUTHENTICATE = new SecurityMethod(
-            "AUTHENTICATE", Token.class, SecurityParameter.USERNAME,
-            SecurityParameter.PASSWORD, SecurityParameter.URI);
+            "AUTHENTICATE", Token.class, new SecurityParameter[]{
+            SecurityParameter.USERNAME, SecurityParameter.PASSWORD,
+            SecurityParameter.URI, SecurityParameter.CLIENT});
         public static final SecurityMethod ISTOKENVALID = new SecurityMethod(
             "ISTOKENVALID", Boolean.class, SecurityParameter.TOKENID);
         public static final SecurityMethod TOKENCOOKIE = new SecurityMethod(
