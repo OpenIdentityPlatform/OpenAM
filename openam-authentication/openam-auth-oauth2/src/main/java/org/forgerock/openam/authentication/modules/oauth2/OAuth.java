@@ -1,7 +1,7 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright © 2011-2012 ForgeRock AS. All rights reserved.
+ * Copyright © 2011-2013 ForgeRock AS. All rights reserved.
  * Copyright © 2011 Cybernetica AS. 
  * 
  * The contents of this file are subject to the terms
@@ -447,7 +447,8 @@ public class OAuth extends AMLoginModule {
                 getContentStreamByGET(serviceUrl)));
         StringBuilder buf = new StringBuilder();
         try {
-            for (String str; (str = in.readLine()) != null;) {
+            String str;
+            while ((str = in.readLine()) != null) {
                 buf.append(str);
             }
         } catch (IOException ioe) {
@@ -499,33 +500,24 @@ public class OAuth extends AMLoginModule {
             InputStream is = null;
             URL urlC = new URL(serviceUrl);
 
-            String OAuthToken = OAuthUtil.getParamValue(urlC.getQuery(),
-                   PARAM_ACCESS_TOKEN);
-            
-            OAuthUtil.debugMessage("OAuth.getContentStreamByGET: "
-                    + "OAUTHTOKEN = " + OAuthToken);
-
             HttpURLConnection connection = (HttpURLConnection) urlC.openConnection();
             connection.setDoOutput(true);
-            if (!OAuthToken.isEmpty()) {
-                connection.setRequestProperty("Authorization", "OAuth "
-                        + OAuthToken);
-            }
             connection.setRequestMethod("GET");
             connection.connect();
 
             if (connection.getResponseCode() == HttpURLConnection.HTTP_OK) {
-                OAuthUtil.debugMessage("OAuth.getContentStreamByGET: IT was OK");
+                OAuthUtil.debugMessage("OAuth.getContentStreamByGET: HTTP Conn OK");
                 is = connection.getInputStream();
-            } else if (connection.getResponseCode() == HttpURLConnection.HTTP_BAD_METHOD) {
-                // GET method not accepted by the Identity Provider
-                OAuthUtil.debugMessage("OAuth.getContentStreamByGET: IT was NOT-OK: " + 
-                        connection.getResponseCode() + " " + connection.getResponseMessage());
-                is = getContentStreamByPOST(serviceUrl);
             } else {
                 // Server returned HTTP error code.
-                String data[] = {String.valueOf(connection.getResponseCode())};
-                throw new AuthLoginException(BUNDLE_NAME, "httpErrorCode", data);
+                String errorStream = getErrorStream(connection);
+                if (OAuthUtil.debugMessageEnabled()) { 
+                  OAuthUtil.debugMessage("OAuth.getContentStreamByGET: HTTP Conn Error:\n" + 
+                        " Response code: " + connection.getResponseCode() + "\n " + 
+                        " Response message: " + connection.getResponseMessage() + "\n" + 
+                        " Error stream: " + errorStream + "\n");
+                }
+                is = getContentStreamByPOST(serviceUrl);
             }
 
             return is;
@@ -537,6 +529,31 @@ public class OAuth extends AMLoginModule {
         }
     }
     
+    private String getErrorStream(HttpURLConnection connection) {
+        InputStream errStream = connection.getErrorStream();
+        if (errStream == null) {
+            return "Empty error stream";
+        } else {
+            BufferedReader in = new BufferedReader(new InputStreamReader(errStream));
+            StringBuilder buf = new StringBuilder();
+            try {
+                String str;
+                while ((str = in.readLine()) != null) {
+                    buf.append(str);
+                }
+            }
+            catch (IOException ioe) {
+                OAuthUtil.debugError("OAuth.getErrorStream: IOException: " + ioe.getMessage());
+            } finally {
+                try {
+                    in.close();
+                } catch (IOException ioe) {
+                    OAuthUtil.debugError("OAuth.getContent: IOException: " + ioe.getMessage());
+                }
+            }
+            return buf.toString();
+        }
+    }   
     
     // Obtain the Profile Service information using POST
     public InputStream getContentStreamByPOST(String serviceUrl)
@@ -560,13 +577,15 @@ public class OAuth extends AMLoginModule {
             writer.close();
 
             if (connection.getResponseCode() == HttpURLConnection.HTTP_OK) {
-                OAuthUtil.debugMessage("OAuth.getContentStreamByPOST: IT was OK");
+                OAuthUtil.debugMessage("OAuth.getContentStreamByPOST: HTTP Conn OK");
                 is = connection.getInputStream();
             } else { // Error Code
-                OAuthUtil.debugError("OAuth.getContentStreamByPOST: IT was NOT-OK: " + 
-                        connection.getResponseCode() + " " + connection.getResponseMessage());
-                String data[] = {String.valueOf(connection.getResponseCode())};
-                throw new AuthLoginException(BUNDLE_NAME, "httpErrorCode", data);
+                String data2[] = {String.valueOf(connection.getResponseCode())};
+                OAuthUtil.debugError("OAuth.getContentStreamByPOST: HTTP Conn Error:\n" + 
+                        " Response code: " + connection.getResponseCode() + "\n" + 
+                        " Response message: " + connection.getResponseMessage() + "\n" + 
+                        " Error stream: " + getErrorStream(connection) + "\n");
+                throw new AuthLoginException(BUNDLE_NAME, "httpErrorCode", data2);
             }
         } catch (MalformedURLException e) {
             throw new AuthLoginException(BUNDLE_NAME,"malformedURL", null, e);
@@ -588,7 +607,7 @@ public class OAuth extends AMLoginModule {
             if (jsonToken != null
                     && !jsonToken.isNull(PARAM_ACCESS_TOKEN)) {
                 token = jsonToken.getString(PARAM_ACCESS_TOKEN);
-                OAuthUtil.debugMessage("access_token: " + token);
+                OAuthUtil.debugMessage(PARAM_ACCESS_TOKEN + ": " + token);
             }
         } catch (JSONException je) {
             OAuthUtil.debugMessage("OAuth.extractToken: Not in JSON format" + je);
@@ -615,7 +634,7 @@ public class OAuth extends AMLoginModule {
             OAuthUtil.debugMessage("mail: " + mail);
 
         } catch (JSONException je) {
-            OAuthUtil.debugMessage("OAuth.getMAil: Not in JSON format" + je);
+            OAuthUtil.debugMessage("OAuth.getMail: Not in JSON format" + je);
         }
 
         return mail;
@@ -626,7 +645,7 @@ public class OAuth extends AMLoginModule {
             String rule, int maxLength, boolean allowNull)
             throws AuthLoginException {
         if (!ESAPI.validator().isValidInput(tag, inputField, rule, maxLength, allowNull)) {
-            OAuthUtil.debugError("OAuth.process(): OAuth 2.0 Not valid input !");
+            OAuthUtil.debugError("OAuth.validateInput(): OAuth 2.0 Not valid input !");
             String msgdata[] = {tag, inputField};
             throw new AuthLoginException(BUNDLE_NAME, "invalidField", msgdata);
         };

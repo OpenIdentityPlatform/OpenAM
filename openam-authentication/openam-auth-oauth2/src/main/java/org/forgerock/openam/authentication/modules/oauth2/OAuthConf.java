@@ -1,7 +1,7 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright © 2011-2012 ForgeRock Inc. All rights reserved.
+ * Copyright © 2011-2013 ForgeRock Inc. All rights reserved.
  * Copyright © 2011 Cybernetica AS.
  * 
  * The contents of this file are subject to the terms
@@ -33,7 +33,6 @@ package org.forgerock.openam.authentication.modules.oauth2;
 import com.sun.identity.authentication.spi.AuthLoginException;
 import com.sun.identity.shared.datastruct.CollectionHelper;
 import java.io.UnsupportedEncodingException;
-import java.net.URLEncoder;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
