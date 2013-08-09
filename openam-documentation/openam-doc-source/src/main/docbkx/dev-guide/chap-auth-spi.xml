@@ -20,7 +20,7 @@
   !
   ! CCPL HEADER END
   !
-  !      Copyright 2011-2013 ForgeRock, Inc.
+  !      Copyright 2011-2013 ForgeRock AS
   !    
 -->
 <chapter xml:id='chap-auth-spi'
@@ -36,7 +36,7 @@
  </indexterm>
 
  <!-- Mostly purloined from Steve Ferris's work on the OpenAM wiki at
- https://wikis.forgerock.org/confluence/display/openam/Write+a+custom+authentication+module -->
+ https://wikis.forgerock.org/confluence/display/openam/Write+a+custom+authentication+module-->
 
  <para>This chapter shows how to customize authentication with a sample custom
  authentication module. For deployments with particular requirements not met by
@@ -53,38 +53,156 @@
   configure the module through OpenAM console, and also localize the user
   interface.</para>
   
-  <para>The name for the sample authentication module is
-  <literal>SampleAuth</literal>. Notice how this name is used to form module
-  component names according to OpenAM conventions.</para>
+  <para>Following the mavenization of OpenAM (release OpenAM 10.1.0 and later), all
+  authentication modules are contained within their own .jar file.</para>
   
-  <para>An OpenAM authentication module is comprised of five components.</para>
-  <itemizedlist>
-   <listitem>
-    <para>The authentication logic, which is a class that extends the
-    <literal>com.sun.identity.authentication.spi.AMLoginModule</literal>
-    class. In this case, <filename>SampleAuth.java</filename>.</para>
-   </listitem>
-   <listitem>
-    <para>The principal, which is a class that implements the
-    <literal>java.security.Principal</literal> interface. In this case,
-    <filename>SampleAuthPrincipal.java</filename>.</para>
-   </listitem>
-   <listitem>
-    <para>The callbacks XML file, which describes the states of authentication
-    logic and the user input needed for each state. In this case there is one
-    file, <filename>SampleAuth.xml</filename>.</para>
-   </listitem>
-   <listitem>
-    <para>The service configuration XML file, which defines how the
-    authentication module is configured in OpenAM. In this case,
-    <filename>amAuthSampleAuth.xml</filename>.</para>
-   </listitem>
-   <listitem>
-    <para>The properties files for the module, which map localized strings
-    to identifiers used elsewhere in the module. In this case,
-    <filename>amAuthSampleAuth.properties</filename>.</para>
-   </listitem>
-  </itemizedlist>
+   <section xml:id="auth-module-structure">
+    <title>Authentication Module Structure</title>
+     <para>Before creating and building a sample authentication module, it is
+     necessary to understand how the default authentication modules are designed.</para>
+     <itemizedlist>
+     <para>The default authentication modules all have a similar structure after they
+     are built:</para>
+       <listitem>
+        <para>Module properties file - this file map localized strings to identifies 
+        used by the module.</para>
+       </listitem>
+       <listitem>
+        <para>Config directory - the module callbacks are stored in this directory, 
+        including the different xml files for the eight supported languages.</para>
+       </listitem>
+       <listitem>
+        <para>META-INF directory - the files required for the maven build are stored
+        in this directory, including pom information, index list, and the manifest file.</para>
+       </listitem>
+       <listitem>
+        <para>Domain identifies directory - the directory is named for the top level domain
+        (e.g., com, org, and net). The majority of the files providing specifics for the
+        module are stored in this directory, including the logic, principals, and service
+        configuration files.</para>
+       </listitem>
+     </itemizedlist>
+
+     <para>A similar structure should be used for the sample module, and any subsequent
+     customized modules, to make it easier to track changes and to keep the modules
+     consistent.</para>
+     
+     <para>At a minimum an OpenAM authentication module has five required components.
+     These components are covered in the next section with the corresponding Sample
+     Authentication file.</para>
+    </section>
+     
+    <section xml:id="sample-module-structure">
+     <title>Sample Authentication Module Structure</title>
+     <para>The sample authentication module is going to follow a similar design as the 
+     existing modules. Comparable directories will be designed to make it easier to 
+     locate and update the sample module should you wish to run your own tests on it.
+     If you find that you want to make similar changes to the default modules, it will
+     be easier for you to locate the files you need to change since you will already be
+     familiar with the structure.</para>
+     <para>The name for the sample authentication module is
+     <literal>SampleAuth</literal>. Notice how this name is used to form module
+     component names according to OpenAM conventions.</para>
+    
+     <para>The five required components for an authentication module are stored
+     within the different directories of the .jar filel. You can expand one of the 
+     default modules to get a good idea of how the .jar files are structured. The 
+     following provides the  name, purpose, and location of each of the components, 
+     as well as the name of the file for the Sample Authentication Module.</para>
+     
+     <para>When you generate the Sample Authentication Module files, create a new 
+     section under <literal>openam-authentication/openam-auth-sample/src</literal>.</para>
+      
+     <orderedlist numeration="arabic">
+      <listitem>
+       <para>The properties file for the module, which map localized strings
+       to identifiers used elsewhere in the module. When you generate the file, save it
+       under a directory <literal>main/java</literal></para>
+       <para>The Sample Authentication Module <filename>amAuthSampleAuth.properties</filename>. 
+       file contains the required information. The <link xlink:href="properties-sample-auth-module"
+       xlink:role="http://docbook.org/xlink/role/olink"><citetitle>
+       Sample Authentication Properties</citetitle></link> section provides details on 
+       the properties file.</para>
+      </listitem>
+      <listitem>
+       <para>The callbacks XML file, which describes the states of authentication
+       logic and the user input needed for each state. The callbacks XML file is 
+       stored under the domain identifier directory.</para>
+       <para>The Sample Authentication Module <filename>SampleAuth.xml</filename>
+       file contains the required information. The <link xlink:href="callbacks-file-sample-auth-module"
+       xlink:role="http://docbook.org/xlink/role/olink"><citetitle>
+       Sample Auth Callbacks</citetitle></link> section provides details on 
+       the callbacks file. The section includes two example callback files with 
+       and explanation of the differences between them.</para>
+      </listitem>
+      <listitem>
+       <para>The authentication logic, which is a class that extends the
+       <literal>com.sun.identity.authentication.spi.AMLoginModule</literal>
+       class. The logic file is stored under the domain identifier directory. When
+       you generate the file, you will create a file with a .java extension, which
+       will be translated to a .class file during the build.</para>
+       <para>The Sample Authentication Module <filename>SampleAuth.java</filename> 
+       file contains the required information. The <link xlink:href="authentication-logic-sample-auth-module"
+       xlink:role="http://docbook.org/xlink/role/olink"><citetitle>
+       Sample Authentication Logic</citetitle></link> section provides details on 
+       the requirements of the file.</para>
+      </listitem>
+      <listitem>
+       <para>The principal, which is a class that implements the <literal>java.security. 
+       Principal</literal> interface. The principal file is stored under the domain
+       identifier directory. When you generate the file, you will create a file with 
+       a .java extension, which will be translated to a .class file during the build.</para>
+       <para>The Sample Authentication Module <filename>SampleAuthPrincipal.java</filename>
+       file contains the required information. The <link xlink:href="principal-sample-auth-module"
+       xlink:role="http://docbook.org/xlink/role/olink"><citetitle>
+       Sample Auth Principal</citetitle></link> section provides details on 
+       the requirements of the file.</para>
+      </listitem>
+      <listitem>
+       <para>The service configuration XML file, which defines how the authentication 
+       module is configured in OpenAM. The file is stored under the domain identifier
+       directory.</para>
+       <para>The Sample Authentication Module <filename>amAuthSampleAuth.xml</filename>
+       file contains the required information. The <link xlink:href="service-conf-sample-auth-module"
+       xlink:role="http://docbook.org/xlink/role/olink"><citetitle>
+       Sample Auth Service Configuration</citetitle></link> section provides details on 
+       the requirements of the file.</para>
+      </listitem> 
+     </orderedlist>
+   </section>  
+ </section>
+ 
+ <procedure>
+  <title>Creating a Build Area</title>
+  
+  <para>You will need to setup an area where you can generate the files and create the
+  .jar from which the module will be deployed.</para>
+  
+  <step>
+   <para></para>
+  </step>
+ </procedure>
+
+ <section xml:id="properties-sample-auth-module">
+  <title>The Sample Auth Properties</title>
+  
+  <para>OpenAM uses a Java properties file per locale to retrieve the
+  appropriate, localized strings for the authentication module. The properties file
+  is stored in the top level directory with the other directories.</para>
+  
+  <para>The following is the Sample Authentication Module properties file,
+  <filename>amAuthSampleAuth.properties</filename>.</para>
+  
+  <programlisting language="java">sampleauth-service-description=Sample Authentication Module
+a500=Authentication Level
+a501=Service Specific Attribute
+
+sampleauth-ui-login-header=Login
+sampleauth-ui-username-prompt=User Name:
+sampleauth-ui-password-prompt=Password:
+
+sampleauth-error-1=Error 1 occurred during the authentication
+sampleauth-error-2=Error 2 occurred during the authentication</programlisting>
  </section>
 
  <section xml:id="callbacks-file-sample-auth-module">
@@ -95,11 +213,17 @@
   file is described in
   <filename><replaceable>war-file-name</replaceable>/WEB-INF/Auth_Module_Properties.dtd</filename>.</para>
   
+  <tip>
+   <para>Callback files for built-in modules are in their respective <filename>.jar</filename>
+   files under <filename><replaceable>war-file-name</replaceable>/WEB-INF/lib/</filename>;
+   extension modules are stored in the OpenAM source tree.</para>
+  </tip>
+  
   <example xml:id="simplified-callbacks-file">
    <title>Simplified Callbacks File</title>
   
-   <para>This example shows a simplified sample auth callbacks XML file that
-   does no error handling. The file specifies only one state (order="1"), and
+   <para>This example shows a simplified sample auth callbacks XML file without
+   error handling. The file specifies only one state (order="1"), and
    prompts the user for two pieces of information: user name and password. All
    strings for the user interface are hard coded into the file.</para>
    
@@ -658,26 +782,6 @@ public class SampleAuthPrincipal implements Principal, Serializable
 &lt;/ServicesConfiguration&gt;</programlisting>
  </section>
 
- <section xml:id="properties-sample-auth-module">
-  <title>The Sample Auth Properties</title>
-  
-  <para>OpenAM uses a Java properties file per locale to retrieve the
-  appropriate, localized strings for the authentication module. The default
-  properties file,
-  <filename>amAuthSampleAuth.properties</filename>, is shown below.</para>
-  
-  <programlisting language="java">sampleauth-service-description=Sample Authentication Module
-a500=Authentication Level
-a501=Service Specific Attribute
-
-sampleauth-ui-login-header=Login
-sampleauth-ui-username-prompt=User Name:
-sampleauth-ui-password-prompt=Password:
-
-sampleauth-error-1=Error 1 occured during the authentication
-sampleauth-error-2=Error 2 occured during the authentication</programlisting>
- </section>
-
  <section xml:id="build-config-sample-auth-module">
   <title>Building &amp; Installing the Sample Auth Module</title>
   
@@ -723,7 +827,7 @@ sampleauth-error-2=Error 2 occured during the authentication</programlisting>
       </variablelist>
 
           <para>In the following commands, you'll create a classes directory. You can then process the .java files
-              into .classes You can cite the full path to each of these .jar files. The following commands present just
+          into .classes. You can cite the full path to each of these .jar files. The following commands present just
           one example; substitute for the directory paths shown as appropriate. (You may need to run these commands as
           the administrative user.)</para>
 
