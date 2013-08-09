@@ -169,6 +169,14 @@ public class TokenAttributeConversionTest {
         assertTrue(string.isEmpty());
     }
 
+    @Test
+    public void shouldAllowPlusSignInDN() {
+        // Given
+        TokenAttributeConversion conversion = generateTokenAttributeConversion();
+        // When / Then
+        conversion.generateTokenDN("Badger+");
+    }
+
     private TokenAttributeConversion generateTokenAttributeConversion() {
         CoreTokenConstants constants = new CoreTokenConstants("dn=rootDN");
         LDAPDataConversion dataConversion = new LDAPDataConversion();

@@ -231,6 +231,7 @@ public class TokenAttributeConversion {
      * @return Non null DN.
      */
     public DN generateTokenDN(String tokenId) {
-        return constants.getTokenDN().child(CoreTokenField.TOKEN_ID.toString() + "=" + tokenId);
+        DN rootDN = constants.getTokenDN();
+        return rootDN.child(CoreTokenField.TOKEN_ID.toString(), tokenId);
     }
 }
