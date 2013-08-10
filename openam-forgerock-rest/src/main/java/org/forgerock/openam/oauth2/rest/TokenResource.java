@@ -227,17 +227,19 @@ public class TokenResource implements CollectionResourceProvider {
                     new JsonResourceAccessor(repository, JsonResourceContext.newRootContext());
             try {
                 response = accessor.read(resourceId);
-                Set<String> usernameSet = (Set<String>)response.get(OAuth2Constants.CoreTokenParams.USERNAME).getObject();
-                if (usernameSet != null && !usernameSet.isEmpty()){
-                    username = usernameSet.iterator().next();
-                }
-                if(username == null || username.isEmpty()){
-                    PermanentException ex = new PermanentException(404, "Not Found", null);
-                    handler.handleError(ex);
-                }
-
             } catch (JsonResourceException e) {
-                throw new ServiceUnavailableException(e.getMessage(),e);
+                throw new NotFoundException("Token Not Found", e);
+            }
+            if (response == null){
+                throw new NotFoundException("Token Not Found", null);
+            }
+            Set<String> usernameSet = (Set<String>)response.get(OAuth2Constants.CoreTokenParams.USERNAME).getObject();
+            if (usernameSet != null && !usernameSet.isEmpty()){
+                username = usernameSet.iterator().next();
+            }
+            if(username == null || username.isEmpty()){
+                PermanentException ex = new PermanentException(404, "Not Found", null);
+                handler.handleError(ex);
             }
             if (uid.equals(adminUserId) || username.equalsIgnoreCase(uid.getName())){
                 resource = new Resource(OAuth2Constants.Params.ID, "1", response);
