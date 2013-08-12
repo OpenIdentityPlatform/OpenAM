@@ -68,7 +68,8 @@
  <xinclude:include href='chap-about-jee-agents.xml' />
  <xinclude:include href='chap-apache-tomcat.xml' />
  <xinclude:include href='chap-glassfish.xml' />
- <xinclude:include href='chap-jboss.xml' />
+ <xinclude:include href='chap-jboss-4and5.xml' />
+ <xinclude:include href='chap-jboss-7.xml' />
  <xinclude:include href='chap-jetty.xml' />
  <xinclude:include href='chap-weblogic.xml' />
  <xinclude:include href='chap-websphere.xml' />
