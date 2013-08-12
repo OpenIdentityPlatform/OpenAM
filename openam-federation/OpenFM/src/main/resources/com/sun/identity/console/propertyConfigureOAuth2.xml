@@ -28,7 +28,7 @@
     <section name="question" defaultValue="blank.header">
         <property required="true">
             <label name="lblRealm" defaultValue="create.fedlet.label.realm" labelFor="tfRealm" />
-            <cc name="tfRealm" tagclass="com.sun.web.ui.taglib.html.CCTextFieldTag" />
+            <cc name="tfRealm" tagclass="com.sun.web.ui.taglib.html.CCDropDownMenuTag" />
         </property>
     </section>
     <section name="question" defaultValue="configure.oauth2.section.serv">

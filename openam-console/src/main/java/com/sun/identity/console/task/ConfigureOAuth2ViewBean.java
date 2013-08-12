@@ -97,7 +97,15 @@ public class ConfigureOAuth2ViewBean
 
     public void beginDisplay(DisplayEvent e) {
         HttpServletRequest req = getRequestContext().getRequest();
-
+        try {
+            TaskModel model = (TaskModel) getModel();
+            Set realms = model.getRealms();
+            CCDropDownMenu menuRealm = (CCDropDownMenu) getChild(REALM);
+            menuRealm.setOptions(createOptionList(realms));
+        } catch (AMConsoleException ex) {
+            setInlineAlertMessage(CCAlert.TYPE_ERROR, "message.error",
+                    ex.getMessage());
+        }
     }
 
     public String endPropertyAttributesDisplay(
