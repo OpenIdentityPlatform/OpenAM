@@ -25,6 +25,9 @@
  * $Id: ReferredApplicationManager.java,v 1.2 2010/01/20 17:01:35 veiming Exp $
  */
 
+/*
+ * Portions Copyrighted 2013 ForgeRock AS
+ */
 package com.sun.identity.entitlement;
 
 import java.util.Collections;
@@ -33,6 +36,7 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
@@ -43,7 +47,7 @@ public class ReferredApplicationManager {
     private static final ReferredApplicationManager instance = new
         ReferredApplicationManager();
     private Map<String, Set<ReferredApplication>> mapRealmToReferredAppls =
-        new HashMap<String, Set<ReferredApplication>>();
+        new ConcurrentHashMap<String, Set<ReferredApplication>>();
     private ReadWriteLock rwlock = new ReentrantReadWriteLock();
 
     private ReferredApplicationManager() {
@@ -57,74 +61,43 @@ public class ReferredApplicationManager {
 
     public Set<ReferredApplication> getReferredApplications(String realm)
         throws EntitlementException {
-        rwlock.readLock().lock();
-        try {
-            Set<ReferredApplication> set = mapRealmToReferredAppls.get(realm);
-            if (set != null) {
-                return set;
-            }
-        } finally {
-            rwlock.readLock().unlock();
+        Set<ReferredApplication> set = mapRealmToReferredAppls.get(realm);
+        if (set != null) {
+            return set;
         }
 
-
-        rwlock.writeLock().lock();
-        try {
-            constructApplications(realm);
-            return mapRealmToReferredAppls.get(realm);
-        } finally {
-            rwlock.writeLock().unlock();
-        }
+        constructApplications(realm);
+        return mapRealmToReferredAppls.get(realm);
     }
 
     void clearCache(String realm) {
-        rwlock.writeLock().lock();
-        try {
-            mapRealmToReferredAppls.remove(realm);
-            ApplicationManager.clearCache(realm);
-        } finally {
-            rwlock.writeLock().unlock();
-        }
+        mapRealmToReferredAppls.remove(realm);
+        ApplicationManager.clearCache(realm);
     }
 
     public void clearCache() {
-        rwlock.writeLock().lock();
-        try {
-            if (mapRealmToReferredAppls.isEmpty()) {
-                mapRealmToReferredAppls.put("/", Collections.EMPTY_SET);
-            } else {
-                for (Iterator<String> i = mapRealmToReferredAppls.keySet().
-                    iterator(); i.hasNext();) {
-                    String realm = i.next();
-                    if (!realm.equals("/")) {
-                        i.remove();
-                        ApplicationManager.clearCache(realm);
-                    }
+        if (mapRealmToReferredAppls.isEmpty()) {
+            mapRealmToReferredAppls.put("/", Collections.EMPTY_SET);
+        } else {
+            for (Iterator<String> i = mapRealmToReferredAppls.keySet().
+                iterator(); i.hasNext();) {
+                String realm = i.next();
+                if (!realm.equals("/")) {
+                    i.remove();
+                    ApplicationManager.clearCache(realm);
                 }
             }
-        } finally {
-            rwlock.writeLock().unlock();
         }
     }
 
     private void constructApplications(String realm)
         throws EntitlementException {
-        rwlock.readLock().lock();
-        try {
-            Set<ReferredApplication> set = mapRealmToReferredAppls.get(realm);
-            if (set != null) {
-                return;
-            }
-        } finally {
-            rwlock.readLock().unlock();
+        Set<ReferredApplication> set = mapRealmToReferredAppls.get(realm);
+        if (set != null) {
+            return;
         }
         rwlock.writeLock().lock();
         try {
-            Set<ReferredApplication> set = mapRealmToReferredAppls.get(realm);
-            if (set != null) {
-                return;
-            }
-
             Map<String, ReferredApplication> tmpMap = new
                 HashMap<String, ReferredApplication>();
             set = new HashSet<ReferredApplication>();
