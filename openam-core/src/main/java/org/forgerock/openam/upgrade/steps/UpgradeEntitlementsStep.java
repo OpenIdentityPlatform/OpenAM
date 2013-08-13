@@ -108,7 +108,7 @@ public class UpgradeEntitlementsStep extends AbstractUpgradeStep {
             String saveImpl = CollectionHelper.getMapAttr(attrs, SAVE_INDEX_IMPL);
             if (NEW_SEARCH_IMPL.equals(searchImpl) && NEW_SAVE_IMPL.equals(saveImpl)) {
                 DEBUG.message("The entitlements framework is already using the new TreeSearchIndex/TreeSaveIndex"
-                        + "implementations");
+                        + " implementations");
             } else {
                 for (String realm : getRealmNames()) {
                     Map<PolicyType, Set<String>> map = new EnumMap<PolicyType, Set<String>>(PolicyType.class);
