@@ -126,6 +126,9 @@ public class ReplayPasswd implements AMPostAuthProcessInterface {
         }
 
         String userpasswd = request.getParameter(PASSWORD_TOKEN);
+        if (requestParamsMap != null && userpasswd == null ) {
+               userpasswd = (String)requestParamsMap.get(PASSWORD_TOKEN);
+        }
         String deskeystr = SystemProperties.get(REPLAY_PASSWORD_KEY);
         String iisOwaEnabled = 
             SystemProperties.get(IIS_OWA_ENABLED);
@@ -140,15 +143,17 @@ public class ReplayPasswd implements AMPostAuthProcessInterface {
             Cipher cipher = Cipher.getInstance(CIPHER_INSTANCE_NAME);
             cipher.init(Cipher.ENCRYPT_MODE, keySpec);
 
-            //The array size must be a multiply of 8 (DES block size)
-            int length = userpasswd.length() + (8 - userpasswd.length() % 8);
-            byte[] data = new byte[length];
-            System.arraycopy(userpasswd.getBytes(), 0, data, 0, userpasswd.length());
-            byte[] ciphertext = cipher.doFinal(data);
+            if (userpasswd != null) {
+                //The array size must be a multiply of 8 (DES block size)
+                int length = userpasswd.length() + (8 - userpasswd.length() % 8);
+                byte[] data = new byte[length];
+                System.arraycopy(userpasswd.getBytes(), 0, data, 0, userpasswd.length());
+                byte[] ciphertext = cipher.doFinal(data);
 			
-            String encodedpasswd = Base64.encode(ciphertext);
-            if (encodedpasswd != null) {
-               ssoToken.setProperty(SUN_IDENTITY_USER_PASSWORD, encodedpasswd);
+                String encodedpasswd = Base64.encode(ciphertext);
+                if (encodedpasswd != null) {
+                    ssoToken.setProperty(SUN_IDENTITY_USER_PASSWORD, encodedpasswd);
+                }
             }
 
             if(iisOwaEnabled != null && 
