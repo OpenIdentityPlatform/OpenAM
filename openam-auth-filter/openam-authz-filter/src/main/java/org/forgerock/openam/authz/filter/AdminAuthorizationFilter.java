@@ -19,6 +19,7 @@ import com.iplanet.dpro.session.service.SessionService;
 import com.iplanet.sso.SSOException;
 import com.iplanet.sso.SSOToken;
 import com.sun.identity.shared.Constants;
+import org.apache.commons.lang3.StringUtils;
 import org.forgerock.auth.common.AuditLogger;
 import org.forgerock.auth.common.DebugLogger;
 import org.forgerock.auth.common.LoggingConfigurator;
@@ -41,6 +42,8 @@ import javax.servlet.http.HttpServletResponse;
  */
 @Singleton
 public class AdminAuthorizationFilter implements AuthorizationFilter {
+
+    private static final String COOKIE_HEADER_KEY = "iPlanetDirectoryPro";
 
     private final SSOTokenFactory ssoTokenFactory;
     private final AuthnRequestUtils requestUtils;
@@ -83,7 +86,10 @@ public class AdminAuthorizationFilter implements AuthorizationFilter {
 
         // Request must contain the TokenID of the user.
         String tokenId = requestUtils.getTokenId(servletRequest);
-        if (tokenId == null) {
+        if (StringUtils.isEmpty(tokenId)) {
+            tokenId = servletRequest.getHeader(COOKIE_HEADER_KEY);
+        }
+        if (StringUtils.isEmpty(tokenId)) {
             return false;
         }
 
