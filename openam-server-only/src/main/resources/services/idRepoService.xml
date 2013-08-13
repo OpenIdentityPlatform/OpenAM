@@ -179,7 +179,7 @@
                 <!-- LDAPv3 plugin original 70 (generic ds)  -->
                 <SubSchema name= "LDAPv3"
                     inheritance = "multiple"
-                    i18nKey = "">
+                    i18nKey = "a2039">
                     <AttributeSchema name="RequiredValueValidator"
                         type="validator"
                         syntax="string">
