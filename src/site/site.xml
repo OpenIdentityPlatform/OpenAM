@@ -46,7 +46,7 @@
   <menu name="OpenAM">
    <item name="Welcome" href="index.html" />
    <item name="News" href="news.html" />
-   <item name="Join" href="https://idp.forgerock.org/openam/UI/Login?service=register" />
+   <item name="Join" href="https://sso.forgerock.com/openam/UI/Login" />
    <item name="FAQ" href="faq.html" />
    <item name="Mailing Lists" href="mail-lists.html" />
    <item name="Support" href="http://forgerock.com/what-we-offer/subscriptions/" />
