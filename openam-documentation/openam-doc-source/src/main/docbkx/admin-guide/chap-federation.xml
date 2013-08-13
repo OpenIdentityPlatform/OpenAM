@@ -2181,7 +2181,7 @@ CookieWriterServlet.doGetPost: Redirect to
    </varlistentry>
 
    <varlistentry>
-    <term><literal>ForceAuthN</literal></term>
+    <term><literal>ForceAuthn</literal></term>
     <listitem>
      <para>(Optional) Use this parameter to indicate whether the identity
      provider should force authentication (<literal>true</literal>) or can

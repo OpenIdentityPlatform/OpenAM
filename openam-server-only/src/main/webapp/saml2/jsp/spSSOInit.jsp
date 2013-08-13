@@ -24,6 +24,7 @@
 
    $Id: spSSOInit.jsp,v 1.11 2009/06/24 23:05:30 mrudulahg Exp $
 
+   Portions Copyright 2013 ForgeRock AS
 --%>
 
 
@@ -99,7 +100,7 @@
     9. isPassive	    true or false value indicating whether the IDP 
 			    should authenticate passively.
 
-    10. ForceAuthN	    true or false value indicating if IDP must
+    10. ForceAuthn	    true or false value indicating if IDP must
 			    force authentication OR false if IDP can rely on
 			    reusing existing security contexts.
 
