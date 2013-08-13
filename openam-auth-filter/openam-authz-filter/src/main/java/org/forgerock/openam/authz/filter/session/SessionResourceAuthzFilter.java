@@ -11,7 +11,7 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2013 ForgeRock Inc.
+ * Copyright 2013 ForgeRock AS.
  */
 
 package org.forgerock.openam.authz.filter.session;
@@ -59,10 +59,14 @@ public class SessionResourceAuthzFilter extends AdminAuthorizationFilter {
     @Override
     public boolean authorize(HttpServletRequest servletRequest, HttpServletResponse servletResponse) {
 
-        Map<String, String> parameterMap = servletRequest.getParameterMap();
-        if (parameterMap.containsKey("_action") &&
-                "logout".equalsIgnoreCase(parameterMap.get("_action"))) {
-            return true;
+        if (servletRequest != null) {
+            Map<String, String[]> parameterMap = servletRequest.getParameterMap();
+            if (parameterMap != null && parameterMap.containsKey("_action")) {
+                String[] values = parameterMap.get("_action");
+                if (values != null && values.length > 0 && "logout".equalsIgnoreCase(values[0])) {
+                    return true;
+                }
+            }
         }
 
         return super.authorize(servletRequest, servletResponse);

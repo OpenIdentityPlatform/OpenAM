@@ -11,7 +11,7 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2013 ForgeRock Inc.
+ * Copyright 2013 ForgeRock AS
  */
 
 package org.forgerock.openam.authz.filter.session;
@@ -54,10 +54,10 @@ public class SessionResourceAuthzFilterTest {
 
         //Given
         HttpServletRequest request = mock(HttpServletRequest.class);
-        Map<String, String> parameterMap = new HashMap<String, String>();
+        Map<String, String[]> parameterMap = new HashMap<String, String[]>();
 
         given(request.getParameterMap()).willReturn(parameterMap);
-        parameterMap.put("_action", "logOUT");
+        parameterMap.put("_action", new String[]{"logOUT"});
 
         //When
         boolean authorized = sessionResourceAuthzFilter.authorize(request, null);
