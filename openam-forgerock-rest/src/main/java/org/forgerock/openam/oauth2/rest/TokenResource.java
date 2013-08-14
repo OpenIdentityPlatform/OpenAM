@@ -33,19 +33,31 @@ import com.sun.identity.idm.IdType;
 import com.sun.identity.idm.IdUtils;
 import com.sun.identity.security.AdminTokenAction;
 import com.sun.identity.shared.Constants;
-import org.forgerock.openam.ext.cts.repo.OpenDJTokenRepo;
-import org.forgerock.json.fluent.JsonValue;
-import org.forgerock.json.resource.*;
-
-import org.forgerock.json.resource.NotSupportedException;
-import org.forgerock.json.resource.ResourceException;
-import org.forgerock.json.resource.CollectionResourceProvider;
-import org.forgerock.json.resource.servlet.HttpContext;
-import org.forgerock.openam.ext.cts.CoreTokenService;
 import com.sun.identity.shared.OAuth2Constants;
-import org.forgerock.openam.oauth2.exceptions.OAuthProblemException;
-import org.restlet.data.Status;
+import com.sun.identity.sm.ldap.exceptions.CoreTokenException;
+import org.forgerock.json.fluent.JsonValue;
+import org.forgerock.json.resource.ActionRequest;
+import org.forgerock.json.resource.CollectionResourceProvider;
+import org.forgerock.json.resource.CreateRequest;
+import org.forgerock.json.resource.DeleteRequest;
+import org.forgerock.json.resource.NotFoundException;
+import org.forgerock.json.resource.NotSupportedException;
+import org.forgerock.json.resource.PatchRequest;
+import org.forgerock.json.resource.PermanentException;
+import org.forgerock.json.resource.QueryRequest;
+import org.forgerock.json.resource.QueryResult;
+import org.forgerock.json.resource.QueryResultHandler;
+import org.forgerock.json.resource.ReadRequest;
+import org.forgerock.json.resource.Resource;
+import org.forgerock.json.resource.ResourceException;
+import org.forgerock.json.resource.ResultHandler;
+import org.forgerock.json.resource.ServerContext;
+import org.forgerock.json.resource.ServiceUnavailableException;
+import org.forgerock.json.resource.UpdateRequest;
+import org.forgerock.json.resource.servlet.HttpContext;
+import org.forgerock.openam.ext.cts.repo.OAuthTokenStore;
 
+import javax.inject.Inject;
 import java.security.AccessController;
 import java.util.HashMap;
 import java.util.List;
@@ -54,7 +66,7 @@ import java.util.Set;
 
 public class TokenResource implements CollectionResourceProvider {
 
-    private JsonResource repository;
+    private OAuthTokenStore oAuthTokenStore;
 
     private static SSOToken token = (SSOToken) AccessController.doPrivileged(AdminTokenAction.getInstance());
     private static String adminUser = SystemProperties.get(Constants.AUTHENTICATION_SUPER_USER);
@@ -66,13 +78,9 @@ public class TokenResource implements CollectionResourceProvider {
         }
     }
 
-    public TokenResource() {
-        try {
-            repository = new CoreTokenService(OpenDJTokenRepo.getInstance());
-        } catch (Exception e) {
-            throw new OAuthProblemException(Status.SERVER_ERROR_SERVICE_UNAVAILABLE.getCode(),
-                    "Service unavailable", "Could not create underlying storage", null);
-        }
+    @Inject
+    public TokenResource(OAuthTokenStore oAuthTokenStore) {
+        this.oAuthTokenStore = oAuthTokenStore;
     }
 
     @Override
@@ -105,13 +113,9 @@ public class TokenResource implements CollectionResourceProvider {
         try {
             uid = getUid(context);
 
-            JsonValue query = new JsonValue(null);
             JsonValue response = null;
-            Resource resource = null;
-            JsonResourceAccessor accessor =
-                    new JsonResourceAccessor(repository, JsonResourceContext.newRootContext());
             try {
-                response = accessor.read(resourceId);
+                response = oAuthTokenStore.read(resourceId);
                 Set<String> usernameSet = (Set<String>)response.get(OAuth2Constants.CoreTokenParams.USERNAME).getObject();
                 String username= null;
                 if (usernameSet != null && !usernameSet.isEmpty()){
@@ -121,19 +125,19 @@ public class TokenResource implements CollectionResourceProvider {
                     PermanentException ex = new PermanentException(404, "Not Found", null);
                     handler.handleError(ex);
                 }
-                if (uid.getName().equalsIgnoreCase(username) || uid.equals(adminUserId)){
-                    response = accessor.delete(resourceId, "1");
+                if (uid.getName().equalsIgnoreCase(username) || uid.equals(adminUserId)) {
+                    oAuthTokenStore.delete(resourceId);
                 } else {
                     PermanentException ex = new PermanentException(401, "Unauthorized", null);
                     handler.handleError(ex);
                 }
-            } catch (JsonResourceException e) {
+            } catch (CoreTokenException e) {
                 throw new ServiceUnavailableException(e.getMessage(),e);
             }
             Map< String, String> responseVal = new HashMap< String, String>();
             responseVal.put("success", "true");
             response = new JsonValue(responseVal);
-            resource = new Resource(resourceId, "1", response);
+            Resource resource = new Resource(resourceId, "1", response);
             handler.handleResult(resource);
         } catch (ResourceException e){
             handler.handleError(e);
@@ -155,16 +159,14 @@ public class TokenResource implements CollectionResourceProvider {
     @Override
     public void queryCollection(ServerContext context, QueryRequest queryRequest, QueryResultHandler handler){
         try{
-            JsonValue response;
+            JsonValue response = null;
             Resource resource;
-            JsonResourceAccessor accessor =
-                    new JsonResourceAccessor(repository, JsonResourceContext.newRootContext());
             try {
-                Map query = new HashMap<String,String>();
+                Map<String, Object> query = new HashMap<String, Object>();
                 String id = queryRequest.getQueryId();
 
                 //get uid of submitter
-                AMIdentity uid = null;
+                AMIdentity uid;
                 try {
                     uid = getUid(context);
                     if (!uid.equals(adminUserId)){
@@ -186,12 +188,8 @@ public class TokenResource implements CollectionResourceProvider {
                     }
                 }
 
-                JsonValue queryFilter = new JsonValue(new HashMap<String, HashMap<String, String>>());
-                if (query != null){
-                    queryFilter.put("filter", query);
-                }
-                response = accessor.query("1", queryFilter);
-            } catch (JsonResourceException e) {
+                response = oAuthTokenStore.query(query);
+            } catch (CoreTokenException e) {
                 throw new ServiceUnavailableException(e.getMessage(),e);
             }
             resource = new Resource("result", "1", response);
@@ -223,11 +221,9 @@ public class TokenResource implements CollectionResourceProvider {
 
             JsonValue response;
             Resource resource;
-            JsonResourceAccessor accessor =
-                    new JsonResourceAccessor(repository, JsonResourceContext.newRootContext());
             try {
-                response = accessor.read(resourceId);
-            } catch (JsonResourceException e) {
+                response = oAuthTokenStore.read(resourceId);
+            } catch (CoreTokenException e) {
                 throw new NotFoundException("Token Not Found", e);
             }
             if (response == null){

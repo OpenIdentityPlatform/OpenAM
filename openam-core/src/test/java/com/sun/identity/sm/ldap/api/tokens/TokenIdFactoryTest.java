@@ -17,13 +17,10 @@ package com.sun.identity.sm.ldap.api.tokens;
 
 import com.iplanet.dpro.session.SessionID;
 import com.sun.identity.sm.ldap.utils.KeyConversion;
-import org.forgerock.json.fluent.JsonValue;
-import org.mockito.BDDMockito;
+import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
-import java.util.HashMap;
-import java.util.Map;
-
+import static org.mockito.BDDMockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.testng.Assert.assertEquals;
@@ -33,12 +30,23 @@ import static org.testng.Assert.assertNotNull;
  * @author robert.wapshott@forgerock.com
  */
 public class TokenIdFactoryTest {
+
+    private TokenIdFactory factory;
+
+    private KeyConversion conversion;
+
+    @BeforeClass
+    public void setUp() {
+        conversion = mock(KeyConversion.class);
+
+        factory = new TokenIdFactory(conversion);
+    }
+
     @Test
     public void shouldUseKeyConversionForSAMLTokens() {
+
         // Given
         String key = "badger";
-        KeyConversion conversion = BDDMockito.mock(KeyConversion.class);
-        TokenIdFactory factory = new TokenIdFactory(conversion);
 
         // When
         factory.toSAMLPrimaryTokenId(key);
@@ -50,10 +58,9 @@ public class TokenIdFactoryTest {
 
     @Test
     public void shouldUseKeyConversionForSessionTokens() {
+
         // Given
         SessionID session = new SessionID("badger");
-        KeyConversion conversion = BDDMockito.mock(KeyConversion.class);
-        TokenIdFactory factory = new TokenIdFactory(conversion);
 
         // When
         factory.toSessionTokenId(session);
@@ -63,19 +70,13 @@ public class TokenIdFactoryTest {
     }
 
     @Test
-    public void shouldEncodeOAuthTokenIdWhenSet() {
+    public void shouldGetOAuthTokenIdWhenSet() {
+
         // Given
         String key = "badger";
 
-        Map<String, Object> values = new HashMap<String, Object>();
-        values.put(TokenIdFactory.ID, key);
-        JsonValue value = new JsonValue(values);
-
-        KeyConversion conversion = BDDMockito.mock(KeyConversion.class);
-        TokenIdFactory factory = new TokenIdFactory(conversion);
-
         // When
-        String result = factory.toOAuthTokenId(value);
+        String result = factory.getOAuthTokenId(key);
 
         // Then
         assertEquals(result, key);
@@ -83,14 +84,11 @@ public class TokenIdFactoryTest {
 
     @Test
     public void shouldGenerateRandomIdWhenOAuthTokenIdNotSet() {
-        // Given
-        JsonValue value = new JsonValue(new HashMap<String, Object>());
 
-        KeyConversion conversion = BDDMockito.mock(KeyConversion.class);
-        TokenIdFactory factory = new TokenIdFactory(conversion);
+        // Given
 
         // When
-        String result = factory.toOAuthTokenId(value);
+        String result = factory.getOAuthTokenId(null);
 
         // Then
         assertNotNull(result);

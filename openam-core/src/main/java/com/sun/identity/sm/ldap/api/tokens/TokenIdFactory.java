@@ -76,17 +76,15 @@ public class TokenIdFactory {
     }
 
     /**
-     * Extract the unique Id from the OAuth Token using the ID.
+     * Checks that the given id is not null, if so will generate an unique id, and then returns the non-null id.
      *
-     * @param request JsonValue of the OAuth Token.
+     * @param id The ID of the OAuth Token.
      * @return Non null Token Id.
      */
-    public String toOAuthTokenId(JsonValue request) {
-        String id = request.get(ID).asString();
+    public String getOAuthTokenId(String id) {
 
         if (id == null){
             id = UUID.randomUUID().toString();
-            request.get(ID).setObject(id);
         }
 
         return id;

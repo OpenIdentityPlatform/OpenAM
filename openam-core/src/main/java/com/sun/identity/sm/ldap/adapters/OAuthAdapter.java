@@ -87,7 +87,8 @@ public class OAuthAdapter implements TokenAdapter<JsonValue> {
     public Token toToken(JsonValue request) {
         assertObjectIsAMap(request);
 
-        String id = tokenIdFactory.toOAuthTokenId(request);
+        String id = tokenIdFactory.getOAuthTokenId(request.get(TokenIdFactory.ID).asString());
+        request.get(TokenIdFactory.ID).setObject(id);
         Token token = new Token(id, TokenType.OAUTH);
 
         // For each OAuth attribute, assign it to the token.

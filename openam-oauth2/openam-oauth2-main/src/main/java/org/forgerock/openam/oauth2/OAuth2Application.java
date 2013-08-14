@@ -27,6 +27,7 @@ package org.forgerock.openam.oauth2;
 import java.net.URI;
 
 import com.sun.identity.shared.OAuth2Constants;
+import org.forgerock.openam.guice.InjectorHolder;
 import org.forgerock.openam.oauth2.internal.UserIdentityVerifier;
 import org.forgerock.openam.oauth2.model.CoreToken;
 import org.forgerock.openam.oauth2.openid.ConnectClientRegistration;
@@ -175,7 +176,7 @@ public class OAuth2Application extends Application {
      *              A new token store.
      */
     public org.forgerock.openam.oauth2.provider.OAuth2TokenStore getTokenStore() {
-        return new DefaultOAuthTokenStoreImpl();
+        return InjectorHolder.getInstance(DefaultOAuthTokenStoreImpl.class);
     }
 
 }

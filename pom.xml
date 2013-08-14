@@ -129,11 +129,8 @@
         <opendj.sdk.version>2.6.0</opendj.sdk.version>
 
         <commons.forgerock-util.version>1.1.0-SNAPSHOT</commons.forgerock-util.version>
-        <commons.json-fluent.version>1.1.0</commons.json-fluent.version>
-        <commons.json-resource.version>1.2.2</commons.json-resource.version>
-        <commons.json-patch.version>1.0.0</commons.json-patch.version>
-        <forgerock.json.version>2.0.1-SNAPSHOT</forgerock.json.version>
-        <commons.authfilter.version>1.0.0-SNAPSHOT</commons.authfilter.version>
+        <forgerock.json.version>2.0.0</forgerock.json.version>
+        <commons.authfilter.version>1.1.0-SNAPSHOT</commons.authfilter.version>
 
         <restlet.version>2.1.1</restlet.version>
         <xercesj.version>2.11.0</xercesj.version>
@@ -1472,7 +1469,7 @@
             <!-- Commons Dependencies -->
             <dependency>
                 <groupId>org.forgerock.commons</groupId>
-                <artifactId>json-resource-servlet</artifactId>
+                <artifactId>json-fluent</artifactId>
                 <version>${forgerock.json.version}</version>
             </dependency>
             <dependency>
@@ -1482,18 +1479,8 @@
             </dependency>
             <dependency>
                 <groupId>org.forgerock.commons</groupId>
-                <artifactId>org.forgerock.json.resource</artifactId>
-                <version>${commons.json-resource.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.forgerock.commons</groupId>
-                <artifactId>json-patch</artifactId>
-                <version>${commons.json-patch.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.forgerock.commons</groupId>
-                <artifactId>json-fluent</artifactId>
-                <version>${commons.json-fluent.version}</version>
+                <artifactId>json-resource-servlet</artifactId>
+                <version>${forgerock.json.version}</version>
             </dependency>
             <dependency>
                 <groupId>org.forgerock.commons</groupId>

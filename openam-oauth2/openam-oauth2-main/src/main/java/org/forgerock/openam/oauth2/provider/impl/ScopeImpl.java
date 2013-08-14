@@ -29,6 +29,7 @@ import com.sun.identity.idm.*;
 import com.sun.identity.shared.OAuth2Constants;
 import org.forgerock.json.jose.jws.SignedJwt;
 import org.forgerock.openam.ext.cts.repo.DefaultOAuthTokenStoreImpl;
+import org.forgerock.openam.guice.InjectorHolder;
 import org.forgerock.openam.oauth2.model.CoreToken;
 import org.forgerock.openam.oauth2.provider.OAuth2TokenStore;
 import org.forgerock.openam.oauth2.provider.Scope;
@@ -68,7 +69,7 @@ public class ScopeImpl implements Scope {
     private AMIdentity id = null;
 
     public ScopeImpl(){
-        this.store = new DefaultOAuthTokenStoreImpl();
+        this.store = InjectorHolder.getInstance(DefaultOAuthTokenStoreImpl.class);
         this.id = null;
     }
 
@@ -177,7 +178,7 @@ public class ScopeImpl implements Scope {
         //OpenID Connect
         // if an openid scope return the id_token
         if (scope != null && scope.contains("openid")){
-            DefaultOAuthTokenStoreImpl store = new DefaultOAuthTokenStoreImpl();
+            DefaultOAuthTokenStoreImpl store = InjectorHolder.getInstance(DefaultOAuthTokenStoreImpl.class);
             CoreToken jwtToken = store.createJWT(token.getRealm(),
                     token.getUserID(),
                     token.getClientID(),

@@ -31,6 +31,9 @@ import com.sun.identity.sm.DNMapper;
 import com.sun.identity.sm.ServiceManagementDAO;
 import com.sun.identity.sm.ServiceManagementDAOWrapper;
 import com.sun.identity.sm.ldap.CTSPersistentStore;
+import com.sun.identity.sm.ldap.adapters.OAuthAdapter;
+import com.sun.identity.sm.ldap.adapters.TokenAdapter;
+import org.forgerock.json.fluent.JsonValue;
 import org.forgerock.openam.entitlement.indextree.IndexChangeHandler;
 import org.forgerock.openam.entitlement.indextree.IndexChangeManager;
 import org.forgerock.openam.entitlement.indextree.IndexChangeManagerImpl;
@@ -66,6 +69,7 @@ public class CoreGuiceModule extends AbstractModule {
         bind(IndexChangeManager.class).to(IndexChangeManagerImpl.class).in(Singleton.class);
         bind(IndexChangeMonitor.class).to(IndexChangeMonitorImpl.class).in(Singleton.class);
         bind(IndexTreeService.class).to(IndexTreeServiceImpl.class).in(Singleton.class);
+        bind(new TypeLiteral<TokenAdapter<JsonValue>>(){}).to(OAuthAdapter.class);
 
         /**
          * Configuration data for Data Layer LDAP connections.

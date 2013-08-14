@@ -26,6 +26,7 @@ package org.forgerock.openam.oauth2.openid;
 
 import com.sun.identity.shared.OAuth2Constants;
 import org.forgerock.openam.ext.cts.repo.DefaultOAuthTokenStoreImpl;
+import org.forgerock.openam.guice.InjectorHolder;
 import org.forgerock.openam.oauth2.exceptions.OAuthProblemException;
 import org.forgerock.openam.oauth2.model.CoreToken;
 import org.forgerock.openam.oauth2.provider.OAuth2ProviderSettings;
@@ -53,7 +54,7 @@ public class UserInfo extends ServerResource {
             String pluginClass = null;
             Scope scopeClass = null;
             String tokenid = getRequest().getChallengeResponse().getRawValue();
-            OAuth2TokenStore store = new DefaultOAuthTokenStoreImpl();
+            OAuth2TokenStore store = InjectorHolder.getInstance(DefaultOAuthTokenStoreImpl.class);
             CoreToken token = store.readAccessToken(tokenid);
             try {
                 OAuth2ProviderSettings settings =

@@ -1055,7 +1055,7 @@
 
         <init-param>
             <param-name>connection-factory-class</param-name>
-            <param-value>org.forgerock.openam.oauth2.rest.RestTokenDispathcer</param-value>
+            <param-value>org.forgerock.openam.oauth2.rest.RestTokenDispatcher</param-value>
         </init-param>
     </servlet>
 

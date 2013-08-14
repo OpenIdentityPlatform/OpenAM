@@ -25,12 +25,9 @@
 package org.forgerock.openam.ext.cts.repo;
 
 import com.sun.identity.shared.OAuth2Constants;
+import com.sun.identity.sm.ldap.exceptions.CoreTokenException;
+import com.sun.identity.sm.ldap.exceptions.DeleteFailedException;
 import org.forgerock.json.fluent.JsonValue;
-import org.forgerock.json.resource.JsonResource;
-import org.forgerock.json.resource.JsonResourceAccessor;
-import org.forgerock.json.resource.JsonResourceContext;
-import org.forgerock.json.resource.JsonResourceException;
-import org.forgerock.openam.ext.cts.CoreTokenService;
 import org.forgerock.openam.oauth2.exceptions.OAuthProblemException;
 import org.forgerock.openam.oauth2.model.BearerToken;
 import org.forgerock.openam.oauth2.model.CoreToken;
@@ -43,6 +40,8 @@ import org.forgerock.openam.oauth2.utils.OAuth2Utils;
 import org.restlet.Request;
 import org.restlet.data.Status;
 
+import javax.inject.Inject;
+import javax.inject.Singleton;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
@@ -52,6 +51,7 @@ import java.util.UUID;
  * Implementation of the OAuthTokenStore interface that uses the
  * CoreTokenService for storing the tokens as JSON objects.
  */
+@Singleton
 public class DefaultOAuthTokenStoreImpl implements OAuth2TokenStore {
 
     //lifetimes are in seconds
@@ -59,24 +59,21 @@ public class DefaultOAuthTokenStoreImpl implements OAuth2TokenStore {
     private long REFRESH_TOKEN_LIFETIME = 1;
     private long ACCESS_TOKEN_LIFETIME = 1;
 
-    private JsonResource repository;
+    private final OAuthTokenStore oAuthTokenStore;
+
     private OAuth2ProviderSettings settings = null;
 
     /**
      * Constructor, creates the repository instance used.
-     * 
-     * @throws OAuthProblemException
+     *
+     * @param oAuthTokenStore An instance of the OAuthTokenStore.
      */
-    public DefaultOAuthTokenStoreImpl() {
-        try {
-            repository = new CoreTokenService(OpenDJTokenRepo.getInstance());
-        } catch (Exception e) {
-            throw new OAuthProblemException(Status.SERVER_ERROR_SERVICE_UNAVAILABLE.getCode(),
-                    "Service unavailable", "Could not create underlying storage. Exception: " + e, null);
-        }
-
+    @Inject
+    public DefaultOAuthTokenStoreImpl(OAuthTokenStore oAuthTokenStore) {
+        this.oAuthTokenStore = oAuthTokenStore;
     }
-    private void getSettings(){
+
+    void getSettings(){
         settings = OAuth2Utils.getSettingsProvider(Request.getCurrent());
         AUTHZ_CODE_LIFETIME = settings.getAuthorizationCodeLifetime();
         REFRESH_TOKEN_LIFETIME = settings.getRefreshTokenLifetime();
@@ -95,26 +92,14 @@ public class DefaultOAuthTokenStoreImpl implements OAuth2TokenStore {
         String id = UUID.randomUUID().toString();
         long expiresIn = AUTHZ_CODE_LIFETIME;
 
-        BearerToken code =
-                new BearerToken(id, uuid, client,
-                        realm, scope, expiresIn, "false");
-        JsonValue response = null;
+        final BearerToken code = new BearerToken(id, uuid, client, realm, scope, expiresIn, "false");
 
         // Store in CTS
-        JsonResourceAccessor accessor =
-                new JsonResourceAccessor(repository, JsonResourceContext.newRootContext());
         try {
-            response = accessor.create(id, code);
-        } catch (JsonResourceException e) {
+            oAuthTokenStore.create(code);
+        } catch (CoreTokenException e) {
             OAuth2Utils.DEBUG.error("DefaultOAuthTokenStoreImpl::Unable to create authorization code "
                     + ((code != null) ? code.getTokenInfo() : null), e);
-            throw new OAuthProblemException(Status.SERVER_ERROR_INTERNAL.getCode(),
-                    "Internal error", "Could not create token in CTS", null);
-        }
-
-        if (response == null) {
-            OAuth2Utils.DEBUG.error("DefaultOAuthTokenStoreImpl::Unable to create authorization code "
-                    + ((code != null) ? code.getTokenInfo() : null));
             throw new OAuthProblemException(Status.SERVER_ERROR_INTERNAL.getCode(),
                     "Internal error", "Could not create token in CTS", null);
         }
@@ -127,25 +112,15 @@ public class DefaultOAuthTokenStoreImpl implements OAuth2TokenStore {
      */
     public void updateAuthorizationCode(String id, CoreToken code) throws OAuthProblemException{
         deleteAuthorizationCode(id);
-        JsonValue response = null;
-
-        // Store in CTS
-        JsonResourceAccessor accessor =
-                new JsonResourceAccessor(repository, JsonResourceContext.newRootContext());
 
         BearerToken code2 = new BearerToken(id, code);
+
+        // Store in CTS
         try {
-            response = accessor.create(id, code2);
-        } catch (JsonResourceException e) {
+            oAuthTokenStore.create(code2);
+        } catch (CoreTokenException e) {
             OAuth2Utils.DEBUG.error("DefaultOAuthTokenStoreImpl::Unable to create authorization code "
                     + ((code2 != null) ? code2.getTokenInfo() : null), e);
-            throw new OAuthProblemException(Status.SERVER_ERROR_INTERNAL.getCode(),
-                    "Internal error", "Could not create token in CTS", null);
-        }
-
-        if (response == null) {
-            OAuth2Utils.DEBUG.error("DefaultOAuthTokenStoreImpl::Unable to create authorization code "
-                    + ((code2 != null) ? code2.getTokenInfo() : null));
             throw new OAuthProblemException(Status.SERVER_ERROR_INTERNAL.getCode(),
                     "Internal error", "Could not create token in CTS", null);
         }
@@ -158,26 +133,24 @@ public class DefaultOAuthTokenStoreImpl implements OAuth2TokenStore {
         if (OAuth2Utils.DEBUG.messageEnabled()){
             OAuth2Utils.DEBUG.message("DefaultOAuthTokenStoreImpl::Reading Authorization code: " + id);
         }
-        JsonValue response = null;
+        JsonValue oAuthToken;
 
         // Read from CTS
-        JsonResourceAccessor accessor =
-                new JsonResourceAccessor(repository, JsonResourceContext.newRootContext());
         try {
-            response = accessor.read(id);
-        } catch (JsonResourceException e) {
+            oAuthToken = oAuthTokenStore.read(id);
+        } catch (CoreTokenException e) {
             OAuth2Utils.DEBUG.error("DefaultOAuthTokenStoreImpl::Unable to read authorization code corresponding to id: " + id, e);
             throw new OAuthProblemException(Status.SERVER_ERROR_INTERNAL.getCode(),
                     "Internal error", "Could not read token from CTS: " + e.getMessage(), null);
         }
 
-        if (response == null) {
+        if (oAuthToken == null) {
             OAuth2Utils.DEBUG.error("DefaultOAuthTokenStoreImpl::Unable to read authorization code corresponding to id: " + id);
             throw new OAuthProblemException(Status.CLIENT_ERROR_NOT_FOUND.getCode(), "Not found",
                     "Could not find token from CTS", null);
         }
 
-        CoreToken ac = new CoreToken(id, response);
+        CoreToken ac = new CoreToken(id, oAuthToken);
         return ac;
     }
 
@@ -188,21 +161,18 @@ public class DefaultOAuthTokenStoreImpl implements OAuth2TokenStore {
         if (OAuth2Utils.DEBUG.messageEnabled()){
             OAuth2Utils.DEBUG.message("DefaultOAuthTokenStoreImpl::Deleting Authorization code: " + id);
         }
-        JsonValue response = null;
+        JsonValue oAuthToken;
 
         // Read from CTS
-        JsonResourceAccessor accessor =
-                new JsonResourceAccessor(repository, JsonResourceContext.newRootContext());
-
         try {
-            response = accessor.read(id);
-        } catch (JsonResourceException e) {
+            oAuthToken = oAuthTokenStore.read(id);
+        } catch (CoreTokenException e) {
             OAuth2Utils.DEBUG.error("DefaultOAuthTokenStoreImpl::Unable to read authorization code corresponding to id: " + id, e);
             throw new OAuthProblemException(Status.SERVER_ERROR_INTERNAL.getCode(),
                     "Internal error", "Could not read token from CTS: " + e.getMessage(), null);
         }
 
-        if (response == null) {
+        if (oAuthToken == null) {
             OAuth2Utils.DEBUG.error("DefaultOAuthTokenStoreImpl::Unable to read authorization code corresponding to id: " + id);
             throw new OAuthProblemException(Status.CLIENT_ERROR_NOT_FOUND.getCode(), "Not found",
                     "Could not find token using CTS", null);
@@ -210,8 +180,8 @@ public class DefaultOAuthTokenStoreImpl implements OAuth2TokenStore {
 
         // Delete the code
         try {
-            response = accessor.delete(id, null);
-        } catch (JsonResourceException e) {
+            oAuthTokenStore.delete(id);
+        } catch (DeleteFailedException e) {
             OAuth2Utils.DEBUG.error("DefaultOAuthTokenStoreImpl::Unable to delete authorization code corresponding to id: " + id, e);
             throw new OAuthProblemException(Status.SERVER_ERROR_INTERNAL.getCode(),
                     "Internal error", "Could not delete token from CTS: " + e.getMessage(), null);
@@ -228,7 +198,6 @@ public class DefaultOAuthTokenStoreImpl implements OAuth2TokenStore {
             OAuth2Utils.DEBUG.message("DefaultOAuthTokenStoreImpl::Creating access token");
         }
         getSettings();
-        JsonValue response = null;
 
         String id = UUID.randomUUID().toString();
         long expireTime = ACCESS_TOKEN_LIFETIME;
@@ -245,22 +214,13 @@ public class DefaultOAuthTokenStoreImpl implements OAuth2TokenStore {
         }
 
         // Create in CTS
-        JsonResourceAccessor accessor =
-                new JsonResourceAccessor(repository, JsonResourceContext.newRootContext());
         try {
-            response = accessor.create(id, accessToken);
-        } catch (JsonResourceException e) {
+            oAuthTokenStore.create(accessToken);
+        } catch (CoreTokenException e) {
             OAuth2Utils.DEBUG.error("DefaultOAuthTokenStoreImpl::Unable to create access token: "
                     + ((accessToken != null) ? accessToken.getTokenInfo() : null), e);
             throw new OAuthProblemException(Status.SERVER_ERROR_INTERNAL.getCode(),
                     "Internal error", "Could not create token in CTS: " + e.getMessage(), null);
-        }
-
-        if (response == null) {
-            OAuth2Utils.DEBUG.error("DefaultOAuthTokenStoreImpl::Unable to create access token: "
-                    + ((accessToken != null) ? accessToken.getTokenInfo() : null) );
-            throw new OAuthProblemException(Status.CLIENT_ERROR_NOT_FOUND.getCode(), "Not found",
-                    "Could not create token in CTS", null);
         }
 
         return accessToken;
@@ -273,26 +233,24 @@ public class DefaultOAuthTokenStoreImpl implements OAuth2TokenStore {
         if (OAuth2Utils.DEBUG.messageEnabled()){
             OAuth2Utils.DEBUG.message("DefaultOAuthTokenStoreImpl::Reading access token");
         }
-        JsonValue response = null;
+        JsonValue oAuthToken;
 
-        // Create in CTS
-        JsonResourceAccessor accessor =
-                new JsonResourceAccessor(repository, JsonResourceContext.newRootContext());
+        // Read from CTS
         try {
-            response = accessor.read(id);
-        } catch (JsonResourceException e) {
+            oAuthToken = oAuthTokenStore.read(id);
+        } catch (CoreTokenException e) {
             OAuth2Utils.DEBUG.error("DefaultOAuthTokenStoreImpl::Unable to read access token corresponding to id: " + id, e);
             throw new OAuthProblemException(Status.SERVER_ERROR_INTERNAL.getCode(),
                     "Internal error", "Could not read token in CTS: " + e.getMessage(), null);
         }
 
-        if (response == null) {
+        if (oAuthToken == null) {
             OAuth2Utils.DEBUG.error("DefaultOAuthTokenStoreImpl::Unable to read access token corresponding to id: " + id);
             throw new OAuthProblemException(Status.CLIENT_ERROR_NOT_FOUND.getCode(), "Not found",
                     "Could not read token in CTS", null);
         }
 
-        BearerToken accessToken = new BearerToken(id, response);
+        BearerToken accessToken = new BearerToken(id, oAuthToken);
         return accessToken;
     }
 
@@ -303,14 +261,11 @@ public class DefaultOAuthTokenStoreImpl implements OAuth2TokenStore {
         if (OAuth2Utils.DEBUG.messageEnabled()){
             OAuth2Utils.DEBUG.message("DefaultOAuthTokenStoreImpl::Deleting access token");
         }
-        JsonValue response = null;
 
         // Delete the code
-        JsonResourceAccessor accessor =
-                new JsonResourceAccessor(repository, JsonResourceContext.newRootContext());
         try {
-            response = accessor.delete(id, null);
-        } catch (JsonResourceException e) {
+            oAuthTokenStore.delete(id);
+        } catch (DeleteFailedException e) {
             OAuth2Utils.DEBUG.error("DefaultOAuthTokenStoreImpl::Unable to delete access token corresponding to id: " + id, e);
             throw new OAuthProblemException(Status.SERVER_ERROR_INTERNAL.getCode(),
                     "Internal error", "Could not delete token from CTS: " + e.getMessage(), null);
@@ -326,7 +281,6 @@ public class DefaultOAuthTokenStoreImpl implements OAuth2TokenStore {
             OAuth2Utils.DEBUG.message("DefaultOAuthTokenStoreImpl::Create refresh token");
         }
         getSettings();
-        JsonValue response;
 
         String id = UUID.randomUUID().toString();
         long expireTime = REFRESH_TOKEN_LIFETIME;
@@ -336,22 +290,13 @@ public class DefaultOAuthTokenStoreImpl implements OAuth2TokenStore {
                                     expireTime, OAuth2Constants.Token.OAUTH_REFRESH_TOKEN);
 
         // Create in CTS
-        JsonResourceAccessor accessor =
-                new JsonResourceAccessor(repository, JsonResourceContext.newRootContext());
         try {
-            response = accessor.create(id, refreshToken);
-        } catch (JsonResourceException e) {
+            oAuthTokenStore.create(refreshToken);
+        } catch (CoreTokenException e) {
             OAuth2Utils.DEBUG.error("DefaultOAuthTokenStoreImpl::Unable to create refresh token: " +
                     ((refreshToken != null) ? refreshToken.getTokenInfo() : null), e);
             throw new OAuthProblemException(Status.SERVER_ERROR_INTERNAL.getCode(),
                     "Internal error", "Could not create token in CTS: " + e.getMessage(), null);
-        }
-
-        if (response == null) {
-            OAuth2Utils.DEBUG.error("DefaultOAuthTokenStoreImpl::Unable to create refresh token: " +
-                    ((refreshToken != null) ? refreshToken.getTokenInfo() : null));
-            throw new OAuthProblemException(Status.CLIENT_ERROR_NOT_FOUND.getCode(), "Not found",
-                    "Could not create token in CTS", null);
         }
 
         return refreshToken;
@@ -364,25 +309,23 @@ public class DefaultOAuthTokenStoreImpl implements OAuth2TokenStore {
         if (OAuth2Utils.DEBUG.messageEnabled()){
             OAuth2Utils.DEBUG.message("DefaultOAuthTokenStoreImpl::Read refresh token");
         }
-        JsonValue response = null;
+        JsonValue oAuthToken;
 
         // Read from CTS
-        JsonResourceAccessor accessor =
-                new JsonResourceAccessor(repository, JsonResourceContext.newRootContext());
         try {
-            response = accessor.read(id);
-        } catch (JsonResourceException e) {
+            oAuthToken = oAuthTokenStore.read(id);
+        } catch (CoreTokenException e) {
             OAuth2Utils.DEBUG.error("DefaultOAuthTokenStoreImpl::Unable to read refresh token corresponding to id: " + id, e);
             throw OAuthProblemException.OAuthError.INVALID_REQUEST.handle(Request.getCurrent());
         }
 
-        if (response == null) {
+        if (oAuthToken == null) {
             OAuth2Utils.DEBUG.error("DefaultOAuthTokenStoreImpl::Unable to read refresh token corresponding to id: " + id);
             throw new OAuthProblemException(Status.CLIENT_ERROR_NOT_FOUND.getCode(), "Not found",
                     "Could not find token from CTS", null);
         }
 
-        BearerToken rt = new BearerToken(id, response);
+        BearerToken rt = new BearerToken(id, oAuthToken);
         return rt;
     }
 
@@ -390,47 +333,36 @@ public class DefaultOAuthTokenStoreImpl implements OAuth2TokenStore {
      * {@inheritDoc}
      */
     public void deleteRefreshToken(String id) {
-        JsonValue response = null;
 
         // Delete the code
-        JsonResourceAccessor accessor =
-                new JsonResourceAccessor(repository, JsonResourceContext.newRootContext());
         try {
-            response = accessor.delete(id, null);
-        } catch (JsonResourceException e) {
+            oAuthTokenStore.delete(id);
+        } catch (DeleteFailedException e) {
             OAuth2Utils.DEBUG.error("DefaultOAuthTokenStoreImpl::Unable to delete refresh token corresponding to id: " + id, e);
             throw OAuthProblemException.OAuthError.INVALID_REQUEST.handle(Request.getCurrent());
         }
-
     }
 
     /**
      * {@inheritDoc}
      */
     public JsonValue queryForToken(String id) throws OAuthProblemException{
-        JsonValue response = null;
 
-        // Delete the code
-        JsonResourceAccessor accessor =
-                new JsonResourceAccessor(repository, JsonResourceContext.newRootContext());
+        JsonValue results;
 
         //construct the filter
-        Map query = new HashMap<String,String>();
+        Map<String, Object> query = new HashMap<String, Object>();
         query.put(OAuth2Constants.CoreTokenParams.PARENT, id);
         query.put(OAuth2Constants.CoreTokenParams.REFRESH_TOKEN, id);
-        JsonValue queryFilter = new JsonValue(new HashMap<String, HashMap<String, String>>());
-        if (query != null){
-            queryFilter.put("filter", query);
-        }
 
         try {
-            response = accessor.query(id, queryFilter);
-        } catch (JsonResourceException e) {
+            results = oAuthTokenStore.query(query);
+        } catch (CoreTokenException e) {
             OAuth2Utils.DEBUG.error("DefaultOAuthTokenStoreImpl::Unable to query refresh token corresponding to id: " + id, e);
             throw OAuthProblemException.OAuthError.INVALID_REQUEST.handle(Request.getCurrent());
         }
 
-        return response;
+        return results;
     }
 
     /**
@@ -442,5 +374,4 @@ public class DefaultOAuthTokenStoreImpl implements OAuth2TokenStore {
         return new JWTToken(OAuth2Utils.getDeploymentURL(Request.getCurrent()), uuid, clientID,
                 authorizationParty, timeInSeconds + ACCESS_TOKEN_LIFETIME, timeInSeconds, timeInSeconds, realm, nonce);
     }
-
 }

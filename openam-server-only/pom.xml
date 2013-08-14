@@ -615,13 +615,11 @@
         <dependency>
             <artifactId>json-resource</artifactId>
             <groupId>org.forgerock.commons</groupId>
-            <version>${forgerock.json.version}</version>
         </dependency>
 
         <dependency>
             <artifactId>json-resource-servlet</artifactId>
             <groupId>org.forgerock.commons</groupId>
-            <version>${forgerock.json.version}</version>
         </dependency>
 
 

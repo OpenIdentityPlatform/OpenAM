@@ -25,6 +25,7 @@
 package org.forgerock.restlet.ext.oauth2.consumer;
 
 import org.forgerock.openam.ext.cts.repo.DefaultOAuthTokenStoreImpl;
+import org.forgerock.openam.guice.InjectorHolder;
 import org.forgerock.openam.oauth2.exceptions.OAuthProblemException;
 import org.forgerock.openam.oauth2.model.BearerToken;
 import org.forgerock.openam.oauth2.provider.OAuth2TokenStore;
@@ -42,7 +43,7 @@ public class BearerTokenExtractor extends AccessTokenExtractor<BearerToken> {
         this.store = store;
     }
     public BearerTokenExtractor(){
-        this.store = new DefaultOAuthTokenStoreImpl();
+        this.store = InjectorHolder.getInstance(DefaultOAuthTokenStoreImpl.class);
     }
 
     /**

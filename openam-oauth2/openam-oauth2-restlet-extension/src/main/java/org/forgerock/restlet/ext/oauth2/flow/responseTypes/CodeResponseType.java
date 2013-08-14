@@ -26,6 +26,7 @@ package org.forgerock.restlet.ext.oauth2.flow.responseTypes;
 
 import com.sun.identity.shared.OAuth2Constants;
 import org.forgerock.openam.ext.cts.repo.DefaultOAuthTokenStoreImpl;
+import org.forgerock.openam.guice.InjectorHolder;
 import org.forgerock.openam.oauth2.model.CoreToken;
 import org.forgerock.openam.oauth2.model.SessionClientImpl;
 import org.forgerock.openam.oauth2.provider.ResponseType;
@@ -37,7 +38,7 @@ import java.util.Set;
 public class CodeResponseType implements ResponseType {
 
     public CoreToken createToken(Map<String, Object> data){
-        DefaultOAuthTokenStoreImpl store = new DefaultOAuthTokenStoreImpl();
+        DefaultOAuthTokenStoreImpl store = InjectorHolder.getInstance(DefaultOAuthTokenStoreImpl.class);
         return store.createAuthorizationCode((Set<String>)data.get(OAuth2Constants.CoreTokenParams.SCOPE),
                 (String)data.get(OAuth2Constants.CoreTokenParams.REALM),
                 (String)data.get(OAuth2Constants.CoreTokenParams.USERNAME),
