@@ -73,8 +73,12 @@ public class SAMLAdapter implements TokenAdapter<SAMLToken> {
         String className = samlToken.getToken().getClass().getName();
         token.setAttribute(SAMLTokenField.OBJECT_CLASS.getField(), className);
         // Persist the SAML secondary key because it can be queried over.
-        String secondaryKey = tokenIdFactory.toSAMLSecondaryTokenId(samlToken.getSecondaryKey());
-        token.setAttribute(SAMLTokenField.SECONDARY_KEY.getField(), secondaryKey);
+
+        String secondaryKey = samlToken.getSecondaryKey();
+        if (secondaryKey != null) {
+            secondaryKey = tokenIdFactory.toSAMLSecondaryTokenId(secondaryKey);
+            token.setAttribute(SAMLTokenField.SECONDARY_KEY.getField(), secondaryKey);
+        }
 
         // Binary data
         String jsonBlob = serialisation.serialise(samlToken.getToken());

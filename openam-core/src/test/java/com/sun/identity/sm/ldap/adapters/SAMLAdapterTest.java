@@ -19,6 +19,7 @@ import com.sun.identity.shared.debug.Debug;
 import com.sun.identity.sm.ldap.TokenTestUtils;
 import com.sun.identity.sm.ldap.api.TokenType;
 import com.sun.identity.sm.ldap.api.fields.SAMLTokenField;
+import com.sun.identity.sm.ldap.api.tokens.SAMLToken;
 import com.sun.identity.sm.ldap.api.tokens.Token;
 import com.sun.identity.sm.ldap.api.tokens.TokenIdFactory;
 import com.sun.identity.sm.ldap.utils.JSONSerialisation;
@@ -28,9 +29,10 @@ import org.testng.annotations.Test;
 
 import java.util.Calendar;
 
+import static org.fest.assertions.Assertions.assertThat;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.BDDMockito.mock;
-import static org.mockito.Matchers.eq;
+import static org.mockito.Matchers.*;
 
 /**
  * @author robert.wapshott@forgerock.com
@@ -74,5 +76,23 @@ public class SAMLAdapterTest {
 
         // Then
         TokenTestUtils.compareTokens(result, token);
+    }
+
+    @Test
+    public void shouldNotStoreSecondaryKeyIfNull() {
+        // Given
+        TokenIdFactory mockTokenIdFactory = mock(TokenIdFactory.class);
+        JSONSerialisation mockSerialisation = mock(JSONSerialisation.class);
+        SAMLAdapter adapter = new SAMLAdapter(mockTokenIdFactory, mockSerialisation, mock(LDAPDataConversion.class));
+        SAMLToken samlToken = new SAMLToken("primary", null, 12345, "");
+
+        given(mockTokenIdFactory.toSAMLPrimaryTokenId(anyString())).willReturn("id");
+        given(mockSerialisation.serialise(anyObject())).willReturn("");
+
+        // When
+        Token token = adapter.toToken(samlToken);
+
+        // Then
+        assertThat(token.getValue(SAMLTokenField.SECONDARY_KEY.getField())).isNull();
     }
 }

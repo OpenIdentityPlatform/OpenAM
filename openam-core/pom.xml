@@ -614,6 +614,10 @@
             <artifactId>powermock-module-testng-common</artifactId>
             <scope>test</scope>
         </dependency>
+        <dependency>
+            <groupId>org.easytesting</groupId>
+            <artifactId>fest-assert</artifactId>
+        </dependency>
     </dependencies>
 
 </project>
