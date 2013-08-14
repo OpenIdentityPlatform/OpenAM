@@ -89,10 +89,6 @@
              <Value>uniqueMember</Value>
           </AttributeValuePair>
           <AttributeValuePair>
-             <Attribute name="sun-idrepo-ldapv3-config-authenticatable-type"/>
-             <Value>User</Value>
-          </AttributeValuePair>
-          <AttributeValuePair>
              <Attribute name="sun-idrepo-ldapv3-config-auth-naming-attr"/>
              <Value>uid</Value>
           </AttributeValuePair>
