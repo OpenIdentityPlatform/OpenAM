@@ -62,7 +62,6 @@ public class DirectoryContentUpgrader {
 
     private static final Debug DEBUG = Debug.getInstance("amUpgrade");
     private static final String DASHBOARD_OC = "forgerock-am-dashboard-service";
-    private static final String NEW_DASHBOARD_OID = "1.3.6.1.4.1.36733.2.2.2.3.1";
     private static final String DEVICE_PRINT_OC = "devicePrintProfilesContainer";
     private final List<Upgrader> upgraders = new ArrayList<Upgrader>();
     private final DataLayerConnectionFactory connFactory;
@@ -297,17 +296,7 @@ public class DirectoryContentUpgrader {
 
         @Override
         public boolean isUpgradeNecessary(Connection conn, Schema schema) throws UpgradeException {
-            if (!schema.hasObjectClass(DASHBOARD_OC)) {
-                return true;
-            } else {
-                ObjectClass objectClass = schema.getObjectClass(DASHBOARD_OC);
-                if (!NEW_DASHBOARD_OID.equals(objectClass.getOID())) {
-                    throw new UpgradeException("Old version of " + DASHBOARD_OC + " objectclass has been detected,"
-                            + " please refer to Upgrade Guide regarding upgrade prerequisities");
-                } else {
-                    return false;
-                }
-            }
+            return !schema.hasObjectClass(DASHBOARD_OC);
         }
     }
 

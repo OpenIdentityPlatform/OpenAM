@@ -201,9 +201,10 @@ public final class OpenDJUpgrader {
                 // copy replacement over
                 File goodSchema = new File(servletCtx.getRealPath(File.separator + "WEB-INF" + File.separator +
                         "template" + File.separator + "ldif" + File.separator +"sfha" + File.separator +
-                        "cts-add-schema.ldif"));
+                        "99-cts-add-schema-backport.ldif"));
+                //adding the backport compatible cts schema file
                 File moveTo = new File(installRoot+ File.separator + "config"+ File.separator +
-                        "schema" + File.separator + "cts-add-schema.ldif");
+                        "schema" + File.separator + "99-cts-add-schema-backport.ldif");
                 copy(goodSchema, moveTo);
             }
 
