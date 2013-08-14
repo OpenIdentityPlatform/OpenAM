@@ -78,7 +78,19 @@ public class UpgradeOAuth2ClientStep extends AbstractUpgradeStep {
 
     private void findUpgradableConfigs(String realm, ServiceConfigManager scm, AgentType type)
             throws SMSException, SSOException {
-        ServiceConfig serviceConfig = scm.getOrganizationConfig(realm, type.instanceName);
+        ServiceConfig serviceConfig = null;
+        try {
+            serviceConfig = scm.getOrganizationConfig(realm, type.instanceName);
+        } catch (SMSException smse) {
+            if ("sms-no-such-instance".equals(smse.getErrorCode()) && AgentType.GROUP.equals(type)) {
+                //this case may be possible in scenarios where agentgroup isn't setup in the configuration
+                DEBUG.message("Unable to find agentgroup in the configuration: " + smse.getMessage());
+                return;
+            } else {
+                //this is not expected, let's rethrow it
+                throw smse;
+            }
+        }
         Set<String> subConfigNames = serviceConfig.getSubConfigNames("*", AgentConfiguration.AGENT_TYPE_OAUTH2);
         Map<AgentType, Set<String>> map = upgradableConfigs.get(realm);
         if (map == null) {
