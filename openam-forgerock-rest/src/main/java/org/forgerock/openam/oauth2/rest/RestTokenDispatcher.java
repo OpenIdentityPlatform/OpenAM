@@ -16,24 +16,24 @@
  */
 package org.forgerock.openam.oauth2.rest;
 
-import static org.forgerock.json.resource.RoutingMode.EQUALS;
-import javax.servlet.ServletException;
-
 import org.forgerock.json.resource.ConnectionFactory;
 import org.forgerock.json.resource.Resources;
 import org.forgerock.json.resource.Router;
+import org.forgerock.openam.guice.InjectorHolder;
+
+import javax.servlet.ServletException;
 
 
-public class RestTokenDispathcer {
+public class RestTokenDispatcher {
 
-    public RestTokenDispathcer(){
+    public RestTokenDispatcher(){
 
     }
 
     public static ConnectionFactory getConnectionFactory() throws ServletException {
         try {
             final Router router = new Router();
-            router.addRoute("/token/", new TokenResource());
+            router.addRoute("/token/", InjectorHolder.getInstance(TokenResource.class));
             router.addRoute("/client/", new ClientResource());
             final ConnectionFactory factory = Resources.newInternalConnectionFactory(router);
             return factory;
