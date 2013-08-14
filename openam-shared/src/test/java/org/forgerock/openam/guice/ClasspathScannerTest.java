@@ -16,38 +16,28 @@
 
 package org.forgerock.openam.guice;
 
-import org.forgerock.openam.guice.test.TestModule3;
-import org.forgerock.openam.guice.test.TestModule4;
-import org.forgerock.openam.guice.test.TestModule5;
-import org.testng.annotations.BeforeClass;
-import org.testng.annotations.Test;
-
-import java.util.Set;
-
-import static org.testng.Assert.assertFalse;
-import static org.testng.Assert.assertTrue;
-
+//TODO See TODO on ClasspathScanner class.
 public class ClasspathScannerTest {
 
-    private ClasspathScanner classpathScanner;
-
-    @BeforeClass
-    public void setUp() {
-        classpathScanner = new ClasspathScanner();
-    }
-
-    @Test
-    public void should() {
-
-        //Given
-        Class<AMGuiceModule> moduleAnnotation = AMGuiceModule.class;
-
-        //When
-        Set<Class<?>> types = classpathScanner.getTypesAnnotatedWith(moduleAnnotation);
-
-        //Then
-        assertFalse(types.contains(TestModule3.class));
-        assertTrue(types.contains(TestModule4.class));
-        assertTrue(types.contains(TestModule5.class));
-    }
+//    private ClasspathScanner classpathScanner;
+//
+//    @BeforeClass
+//    public void setUp() {
+//        classpathScanner = new ClasspathScanner();
+//    }
+//
+//    @Test
+//    public void should() {
+//
+//        //Given
+//        Class<AMGuiceModule> moduleAnnotation = AMGuiceModule.class;
+//
+//        //When
+//        Set<Class<?>> types = classpathScanner.getTypesAnnotatedWith(moduleAnnotation);
+//
+//        //Then
+//        assertFalse(types.contains(TestModule3.class));
+//        assertTrue(types.contains(TestModule4.class));
+//        assertTrue(types.contains(TestModule5.class));
+//    }
 }

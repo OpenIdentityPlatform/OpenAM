@@ -38,18 +38,18 @@ public class InjectorFactoryTest {
 
     private InjectorFactory injectorFactory;
 
-    private ClasspathScanner classpathScanner;
+    private GuiceConfiguration guiceConfiguration;
     private GuiceModuleCreator moduleCreator;
     private GuiceInjectorCreator injectorCreator;
 
     @BeforeClass
     public void setUp() {
 
-        classpathScanner = mock(ClasspathScanner.class);
+        guiceConfiguration = mock(GuiceConfiguration.class);
         moduleCreator = mock(GuiceModuleCreator.class);
         injectorCreator = mock(GuiceInjectorCreator.class);
 
-        injectorFactory = new InjectorFactory(classpathScanner, moduleCreator, injectorCreator);
+        injectorFactory = new InjectorFactory(guiceConfiguration, moduleCreator, injectorCreator);
     }
 
     @Test
@@ -59,7 +59,7 @@ public class InjectorFactoryTest {
         Class<AMGuiceModule> moduleAnnotation = AMGuiceModule.class;
 
         Set<Class<?>> modules = new HashSet<Class<?>>(asList(TestModule1.class, TestModule2.class));
-        given(classpathScanner.getTypesAnnotatedWith(moduleAnnotation)).willReturn(modules);
+        given(guiceConfiguration.getGuiceModuleClasses(moduleAnnotation)).willReturn(modules);
 
         TestModule1 testModule1 = mock(TestModule1.class);
         given(moduleCreator.createInstance(TestModule1.class)).willReturn(testModule1);
@@ -85,7 +85,7 @@ public class InjectorFactoryTest {
         Class<AMGuiceModule> moduleAnnotation = AMGuiceModule.class;
 
         Set<Class<?>> modules = new HashSet<Class<?>>(asList(TestModule1.class, BadModule.class, TestModule2.class));
-        given(classpathScanner.getTypesAnnotatedWith(moduleAnnotation)).willReturn(modules);
+        given(guiceConfiguration.getGuiceModuleClasses(moduleAnnotation)).willReturn(modules);
 
         //When
         injectorFactory.createInjector(moduleAnnotation);

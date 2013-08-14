@@ -16,19 +16,10 @@
 
 package org.forgerock.openam.guice;
 
-import org.reflections.Reflections;
-import org.reflections.scanners.TypeAnnotationsScanner;
-import org.reflections.util.ClasspathHelper;
-import org.reflections.util.ConfigurationBuilder;
-import org.reflections.util.FilterBuilder;
-
-import java.lang.annotation.Annotation;
-import java.net.URL;
-import java.util.HashSet;
-import java.util.Set;
-
+//TODO Not currently used as need support for jboss 7 VFS classpath handling and the org.reflections library cannot
+//TODO be used due to licence issues and other librarys do not offer the same level of integration.
 /**
- * Provides classpath scanning for annotations via the Reflections library.
+ * Provides classpath scanning for annotations via the Scannotations library.
  * <p>
  * This class is used to create the Guice Injector, so it must be possible to construct this class without Guice.
  *
@@ -36,47 +27,65 @@ import java.util.Set;
  */
 public class ClasspathScanner {
 
-    private static final String IPLANET_BASE_SCAN_PACKAGE = "com.iplanet";
-    private static final String SUN_IDENTITY_BASE_SCAN_PACKAGE = "com.sun.identity";
-    private static final String FORGEROCK_BASE_SCAN_PACKAGE = "org.forgerock.openam";
-
-    private Reflections reflections;
-
-    /**
-     * Find all classes in the classpath annotated with the given annotation.
-     *
-     * @param annotation The annotation to scan for.
-     * @return A Set of annotated classes.
-     */
-    public Set<Class<?>> getTypesAnnotatedWith(Class<? extends Annotation> annotation) {
-        return getReflections().getTypesAnnotatedWith(annotation);
-    }
-
-    /**
-     * Lazily initialises the Reflections library to scan packages under "com.iplanet", "com.sun.identity" and
-     * "org.forgerock.openam".
-     *
-     * Ignores packages under "java" and "javax".
-     *
-     * @return A Reflections instance.
-     */
-    private synchronized Reflections getReflections() {
-        if (reflections == null) {
-
-            Set<URL> javaClasspath = new HashSet<URL>();
-            javaClasspath.addAll(ClasspathHelper.forPackage(IPLANET_BASE_SCAN_PACKAGE));
-            javaClasspath.addAll(ClasspathHelper.forPackage(SUN_IDENTITY_BASE_SCAN_PACKAGE));
-            javaClasspath.addAll(ClasspathHelper.forPackage(FORGEROCK_BASE_SCAN_PACKAGE));
-
-            reflections = new Reflections(new ConfigurationBuilder()
-                    .setScanners(new TypeAnnotationsScanner())
-                    .setUrls(javaClasspath)
-                    .filterInputsBy(new FilterBuilder()
-                            .include(".*")
-                            .exclude("java\\..*")
-                            .exclude("javax\\..*")));
-        }
-
-        return reflections;
-    }
+//    private static final String IPLANET_BASE_SCAN_PACKAGE = "com/iplanet";
+//    private static final String SUN_IDENTITY_BASE_SCAN_PACKAGE = "com/sun/identity";
+//    private static final String FORGEROCK_BASE_SCAN_PACKAGE = "org/forgerock/openam";
+//
+//    /**
+//     * Find all classes in the classpath annotated with the given annotation.
+//     *
+//     * @param annotation The annotation to scan for.
+//     * @return A Set of annotated classes.
+//     */
+//    public Set<Class<?>> getTypesAnnotatedWith(Class<? extends Annotation> annotation) {
+//        Set<String> classNames = getAnnotationDB().getAnnotationIndex().get(annotation.getName());
+//
+//        Set<Class<?>> classes = new HashSet<Class<?>>();
+//        for (String className : classNames) {
+//            try {
+//                classes.add(Class.forName(className));
+//            } catch (ClassNotFoundException e) {
+//                throw new RuntimeException("Class not found, " + className, e);
+//            }
+//        }
+//        return classes;
+//    }
+//
+//    /**
+//     * Lazily initialises the Scannotations library to scan packages under "com.iplanet", "com.sun.identity" and
+//     * "org.forgerock.openam".
+//     *
+//     * Ignores packages under "java" and "javax".
+//     *
+//     * @return An AnnotationDB instance.
+//     */
+//    private synchronized AnnotationDB getAnnotationDB() {
+//
+//        AnnotationDB annotationDB = new AnnotationDB();
+//        annotationDB.setScanFieldAnnotations(false);
+//        annotationDB.setScanMethodAnnotations(false);
+//        annotationDB.setScanParameterAnnotations(false);
+//        annotationDB.setIgnoredPackages(new String[]{"java\\..*", "javax\\..*"});
+//        try {
+//            annotationDB.scanArchives(getScanPackages());
+//        } catch (IOException e) {
+//            throw new RuntimeException("Error whilst scanning packages", e);
+//        }
+//
+//        return annotationDB;
+//    }
+//
+//    private URL[] getScanPackages() {
+//
+//        URL[] iplanetPackage = ClasspathUrlFinder.findResourceBases(IPLANET_BASE_SCAN_PACKAGE);
+//        URL[] sunIdentityPackage = ClasspathUrlFinder.findResourceBases(SUN_IDENTITY_BASE_SCAN_PACKAGE);
+//        URL[] forgeRockPackage = ClasspathUrlFinder.findResourceBases(FORGEROCK_BASE_SCAN_PACKAGE);
+//
+//        List<URL> packages = new ArrayList<URL>();
+//        packages.addAll(Arrays.asList(iplanetPackage));
+//        packages.addAll(Arrays.asList(sunIdentityPackage));
+//        packages.addAll(Arrays.asList(forgeRockPackage));
+//
+//        return packages.toArray(new URL[0]);
+//    }
 }

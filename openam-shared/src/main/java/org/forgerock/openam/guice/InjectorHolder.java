@@ -37,7 +37,7 @@ public enum InjectorHolder {
      * Constructs an instance of the InjectorHolder and initialises the Guice Injector.
      */
     private InjectorHolder() {
-        InjectorFactory injectorFactory = new InjectorFactory(new ClasspathScanner(),
+        InjectorFactory injectorFactory = new InjectorFactory(new GuiceConfiguration(),
                 new GuiceModuleCreator(), new GuiceInjectorCreator());
 
         try {

@@ -33,20 +33,20 @@ import java.util.Set;
  */
 public class InjectorFactory {
 
-    private final ClasspathScanner classpathScanner;
+    private final GuiceConfiguration guiceConfiguration;
     private final GuiceModuleCreator moduleCreator;
     private final GuiceInjectorCreator injectorCreator;
 
     /**
      * Constructs an instance of the InjectorFactory.
      *
-     * @param classpathScanner An instance of the ClasspathScanner.
+     * @param guiceConfiguration An instance of the GuiceConfiguration.
      * @param moduleCreator An instance of the GuiceModuleCreator.
      * @param injectorCreator An instance of the GuiceInjectorCreator.
      */
-    public InjectorFactory(ClasspathScanner classpathScanner, GuiceModuleCreator moduleCreator,
+    public InjectorFactory(GuiceConfiguration guiceConfiguration, GuiceModuleCreator moduleCreator,
             GuiceInjectorCreator injectorCreator) {
-        this.classpathScanner = classpathScanner;
+        this.guiceConfiguration = guiceConfiguration;
         this.moduleCreator = moduleCreator;
         this.injectorCreator = injectorCreator;
     }
@@ -70,7 +70,7 @@ public class InjectorFactory {
      */
     private synchronized Set<Module> createModules(Class<? extends Annotation> moduleAnnotation) {
 
-        Set<Class<?>> moduleClasses = classpathScanner.getTypesAnnotatedWith(moduleAnnotation);
+        Set<Class<?>> moduleClasses = guiceConfiguration.getGuiceModuleClasses(moduleAnnotation);
 
         Set<Module> modules = new HashSet<Module>();
 

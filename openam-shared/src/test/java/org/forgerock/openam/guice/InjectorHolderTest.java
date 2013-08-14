@@ -16,24 +16,21 @@
 
 package org.forgerock.openam.guice;
 
-import org.forgerock.openam.guice.test.ExampleClass;
-import org.testng.annotations.Test;
-
-import static org.testng.Assert.assertTrue;
-
-public class InjectorHolderTest {
-
-    @Test
-    public void shouldGetInstance() {
-
-        //Given
-        Class<?> clazz = ExampleClass.class;
-
-        //When
-        Object obj = InjectorHolder.getInstance(clazz);
-
-        //Then
-        assertTrue(ExampleClass.class.isAssignableFrom(obj.getClass()));
-    }
-}
+//TODO See TODO comment on ClasspathScanner class
+//TODO this test is a moot point as we are doing the Guice Module finding statcially.
+//public class InjectorHolderTest {
+//
+//    @Test
+//    public void shouldGetInstance() {
+//
+//        //Given
+//        Class<?> clazz = ExampleClass.class;
+//
+//        //When
+//        Object obj = InjectorHolder.getInstance(clazz);
+//
+//        //Then
+//        assertTrue(ExampleClass.class.isAssignableFrom(obj.getClass()));
+//    }
+//}
 
