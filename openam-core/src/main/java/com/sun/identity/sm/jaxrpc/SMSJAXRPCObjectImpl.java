@@ -27,7 +27,7 @@
  */
 
 /*
- * Portions Copyrighted 2010-2011 ForgeRock AS
+ * Portions Copyrighted 2010-2013 ForgeRock AS
  */
 
 package com.sun.identity.sm.jaxrpc;
@@ -48,6 +48,8 @@ import javax.naming.directory.BasicAttribute;
 import javax.naming.directory.DirContext;
 import javax.naming.directory.ModificationItem;
 
+import com.iplanet.services.naming.ServerEntryNotFoundException;
+import com.iplanet.services.naming.WebtopNaming;
 import org.json.JSONException;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
@@ -80,7 +82,7 @@ public class SMSJAXRPCObjectImpl implements SMSObjectIF, SMSObjectListener {
 
     static Debug debug = Debug.getInstance("amSMSServerImpl");
 
-    static Map notificationURLs = new HashMap();
+    static Map<String, URL> notificationURLs = new HashMap<String, URL>();
 
     static SSOTokenManager tokenMgr;
 
@@ -529,11 +531,9 @@ public class SMSJAXRPCObjectImpl implements SMSObjectIF, SMSObjectListener {
 
         // If notification URLs are present, send notifications
         synchronized (notificationURLs) {
-            Map notifications = new HashMap(notificationURLs); // Make a copy
-            for (Iterator entries = notifications.entrySet().iterator(); 
-                entries.hasNext();) {
-                Map.Entry entry = (Map.Entry) entries.next();
-                URL url = (URL) entry.getValue();
+            for (Map.Entry<String, URL> entry : notificationURLs.entrySet()) {
+                String id = entry.getKey();
+                URL url = entry.getValue();
 
                 // Construct NotificationSet
                 Notification notification = new Notification(modItem);
@@ -543,17 +543,17 @@ public class SMSJAXRPCObjectImpl implements SMSObjectIF, SMSObjectListener {
                 try {
                     PLLServer.send(url, ns);
                     if (debug.messageEnabled()) {
-                        debug.message("SMSJAXRPCObjectImpl:sentNotification " +
+                        debug.message("SMSJAXRPCObjectImpl:objectChanged sent notification to " +
                             "URL: " + url + " Data: " + ns);
                     }
                 } catch (SendNotificationException ne) {
                     if (debug.warningEnabled()) {
-                        debug.warning("SMSJAXRPCObject: failed sending " +
+                        debug.warning("SMSJAXRPCObjectImpl:objectChanged failed sending " +
                             "notification to: " + url + "\nRemoving " +
                             "URL from notification list.", ne);
                     }
                     // Remove the URL from Notification List
-                    notificationURLs.remove((String) entry.getKey());
+                    notificationURLs.remove(id);
                 }
             }
         }
@@ -564,37 +564,57 @@ public class SMSJAXRPCObjectImpl implements SMSObjectIF, SMSObjectListener {
     }
 
     // Methods to register notification URLs
-    public String registerNotificationURL(String url)
-            throws RemoteException {
+    public String registerNotificationURL(String url) throws RemoteException {
         initialize();
-        String id = SMSUtils.getUniqueID();
+        // Default value if there are any issues with the registration process.
+        String id = "0";
         try {
             // Check URL is not the local server
             if (!url.toLowerCase().startsWith(serverURL)) {
                 synchronized (notificationURLs) {
-                    URL nURL = new URL(url);
-                    if (!notificationURLs.containsValue(nURL)) {
-                        notificationURLs.put(id, new URL(url));
-                        
-                        if (debug.messageEnabled()) {
-                            debug.message("SMSJAXRPCObjectImpl:register for "
-                                + "notification URL: " + url);
+                    URL notificationUrl = new URL(url);
+                    // Don't add the URL again if we already have it registered
+                    boolean alreadyRegistered = false;
+                    for (Map.Entry<String, URL> entry : notificationURLs.entrySet()) {
+                        if (notificationUrl.equals(entry.getValue())) {
+                            // This allows us to return the existing entry ID to support clients being able to
+                            // de-register the correct entry.
+                            id = entry.getKey();
+                            alreadyRegistered = true;
+                            if (debug.messageEnabled()) {
+                                debug.message("SMSJAXRPCObjectImpl:registerNotificationURL() - URL "
+                                        + url + " already registered, returning existing ID " + id);
+                            }
+                            break;
                         }
-                    } else {
+                    }
+                    // If we didn't find the url in our list, add it
+                    if (!alreadyRegistered) {
+                        String serverID = "";
+                        try {
+                            serverID = WebtopNaming.getAMServerID();
+                        } catch (ServerEntryNotFoundException e) {
+                            if (debug.messageEnabled()) {
+                                debug.message("SMSJAXRPCObjectImpl:registerNotificationURL - " +
+                                        "had a problem getting our serverID ", e);
+                            }
+                        }
+                        // Generate a unique value that includes the serverID to have a better chance of being unique
+                        // in a cluster should a de-register request end up on the wrong server.
+                        id = SMSUtils.getUniqueID() + "_" + serverID;
+                        notificationURLs.put(id, notificationUrl);
                         if (debug.messageEnabled()) {
-                            debug.message("SMSJAXRPCObjectImpl:register for " +
-                                "notification URL: " + url + " already present");
+                            debug.message("SMSJAXRPCObjectImpl:registerNotificationURL - " +
+                                    "registered notification URL: " + url + " with ID " + id);
                         }
                     }
                 }
             } else {
                 // Cannot add this server for notifications
                 if (debug.warningEnabled()) {
-                    debug.warning("SMSJAXRPCObjectImpl:registerURL "
+                    debug.warning("SMSJAXRPCObjectImpl:registerNotificationURL "
                             + "cannot add local server: " + url);
                 }
-                // Set the id to be "0'
-                id = "0";
             }
         } catch (MalformedURLException e) {
             if (debug.warningEnabled()) {
@@ -602,13 +622,16 @@ public class SMSJAXRPCObjectImpl implements SMSObjectIF, SMSObjectListener {
                         + " invalid URL: " + url, e);
             }
         }
-        return (id);
+        return id;
     }
 
-    public void deRegisterNotificationURL(String id)
-            throws RemoteException {
+    public void deRegisterNotificationURL(String id) throws RemoteException {
         synchronized (notificationURLs) {
-            notificationURLs.remove(id);
+            URL url = notificationURLs.remove(id);
+            if (url != null && debug.messageEnabled()) {
+                debug.message("SMSJAXRPCObjectImpl.deRegisterNotificationURL() - URL "
+                        + url + " de-registered for ID " + id);
+            }
         }
     }
 

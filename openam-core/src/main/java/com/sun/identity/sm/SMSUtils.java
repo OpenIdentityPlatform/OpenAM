@@ -27,7 +27,7 @@
  */
 
 /*
- * Portions Copyrighted [2011] [ForgeRock AS]
+ * Portions Copyrighted 2011-2013 ForgeRock AS
  */
 
 package com.sun.identity.sm;
@@ -217,9 +217,7 @@ public class SMSUtils {
     }
 
     public static String getUniqueID() {
-        int id = counter++;
-        StringBuilder sb = new StringBuilder(8);
-        return (sb.append(id).toString());
+        return String.valueOf(getInstanceID());
     }
 
     // Performs a deep copy of the Map

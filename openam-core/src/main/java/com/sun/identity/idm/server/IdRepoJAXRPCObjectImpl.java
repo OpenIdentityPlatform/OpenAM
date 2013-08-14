@@ -47,6 +47,8 @@ import com.iplanet.services.comm.server.PLLServer;
 import com.iplanet.services.comm.server.SendNotificationException;
 import com.iplanet.services.comm.share.Notification;
 import com.iplanet.services.comm.share.NotificationSet;
+import com.iplanet.services.naming.ServerEntryNotFoundException;
+import com.iplanet.services.naming.WebtopNaming;
 import com.iplanet.sso.SSOException;
 import com.iplanet.sso.SSOToken;
 import com.iplanet.sso.SSOTokenManager;
@@ -98,7 +100,7 @@ public abstract class IdRepoJAXRPCObjectImpl implements DirectoryManagerIF {
         
     static HashMap idrepoCache = null;
     
-    protected static HashMap idRepoNotificationURLs = new HashMap();
+    protected static Map<String, URL> idRepoNotificationURLs = new HashMap<String, URL>();
     
     protected static String serverURL ;
     protected static URL urlServer;
@@ -172,7 +174,7 @@ public abstract class IdRepoJAXRPCObjectImpl implements DirectoryManagerIF {
         } catch (MalformedURLException e) {
             if (idRepoDebug.warningEnabled()) {
                 idRepoDebug.warning("IdRepoJAXRPCObjectImpl." +
-                    "isCientOnSameServer() - clientURL is malformed." +
+                    "isClientOnSameServer() - clientURL is malformed " +
                     clientURL);
             }
             success = false;
@@ -693,11 +695,13 @@ public abstract class IdRepoJAXRPCObjectImpl implements DirectoryManagerIF {
         
     }
     
-    public void deRegisterNotificationURL_idrepo(
-        String notificationID)
-    throws RemoteException {
+    public void deRegisterNotificationURL_idrepo(String notificationID) throws RemoteException {
         synchronized (idRepoNotificationURLs) {
-            idRepoNotificationURLs.remove(notificationID);
+            URL url = idRepoNotificationURLs.remove(notificationID);
+            if (url != null && idRepoDebug.messageEnabled()) {
+                idRepoDebug.message("IdRepoJAXRPCObjectImpl.deRegisterNotificationURL_idrepo() - URL "
+                        + url + " de-registered for ID " + notificationID);
+            }
         }
     }
     
@@ -720,29 +724,61 @@ public abstract class IdRepoJAXRPCObjectImpl implements DirectoryManagerIF {
         return (answer);
     }
     
-    public String registerNotificationURL_idrepo(String url)
-    throws RemoteException {
-        // TODO Auto-generated method stub
-        String id = SMSUtils.getUniqueID();
+    public String registerNotificationURL_idrepo(String url) throws RemoteException {
+        return registerNotificationURL(url, idRepoNotificationURLs);
+    }
+
+    protected String registerNotificationURL(String url, Map<String, URL> notificationURLs) {
+
+        // Default value if there are any issues with the registration process.
+        String id = "0";
         try {
             // Check URL is not the local server
             if (!isClientOnSameServer(url)) {
-                synchronized (idRepoNotificationURLs) {
-                    idRepoNotificationURLs.put(id, new URL(url));
-                }
-                if (idRepoDebug.messageEnabled()) {
-                    idRepoDebug.message("IdRepoJAXRPCObjectImpl." 
-                            + "registerNotificationURL_idrepo() - register " 
-                            + "for notification URL: " + url);
+                synchronized (notificationURLs) {
+                    URL notificationUrl = new URL(url);
+                    // Don't add the URL again if we already have it registered
+                    boolean alreadyRegistered = false;
+                    for (Map.Entry<String, URL> entry : notificationURLs.entrySet()) {
+                        if (notificationUrl.equals(entry.getValue())) {
+                            // This allows us to return the existing entry ID to support clients being able to
+                            // de-register the correct entry.
+                            id = entry.getKey();
+                            alreadyRegistered = true;
+                            if (idRepoDebug.messageEnabled()) {
+                                idRepoDebug.message("IdRepoJAXRPCObjectImpl.registerNotificationURL() - URL "
+                                        + url + " already registered, returning existing ID " + id);
+                            }
+                            break;
+                        }
+                    }
+                    // If we didn't find the url in our list, add it
+                    if (!alreadyRegistered) {
+                        String serverID = "";
+                        try {
+                            serverID = WebtopNaming.getAMServerID();
+                        } catch (ServerEntryNotFoundException e) {
+                            if (idRepoDebug.messageEnabled()) {
+                                idRepoDebug.message("IdRepoJAXRPCObjectImpl.registerNotificationURL - " +
+                                        "had a problem getting our serverID ", e);
+                            }
+                        }
+                        // Generate a unique value that includes the serverID to have a better chance of being unique
+                        // in a cluster should a de-register request end up on the wrong server.
+                        id = SMSUtils.getUniqueID() + "_" + serverID;
+                        notificationURLs.put(id, notificationUrl);
+                        if (idRepoDebug.messageEnabled()) {
+                            idRepoDebug.message("IdRepoJAXRPCObjectImpl.registerNotificationURL - " +
+                                    "registered notification URL: " + url + " with ID " + id);
+                        }
+                    }
                 }
             } else {
                 // Cannot add this server for notifications
                 if (idRepoDebug.warningEnabled()) {
-                    idRepoDebug.warning("IdRepoJAXRPCObjectImpl.registerURL "
+                    idRepoDebug.warning("IdRepoJAXRPCObjectImpl.registerNotificationURL "
                         + "cannot add local server: " + url);
                 }
-                // Set the id to be "0'
-                id = "0";
             }
         } catch (MalformedURLException e) {
             if (idRepoDebug.warningEnabled()) {
@@ -750,7 +786,7 @@ public abstract class IdRepoJAXRPCObjectImpl implements DirectoryManagerIF {
                     "registerNotificationURL invalid URL: " + url, e);
             }
         }
-        return (id);
+        return id;
     }
 
      public Map getSpecialIdentities_idrepo(
@@ -842,11 +878,9 @@ public abstract class IdRepoJAXRPCObjectImpl implements DirectoryManagerIF {
         }
         NotificationSet ns = null;
         synchronized (idRepoNotificationURLs) {
-            for (Iterator entries = idRepoNotificationURLs.entrySet().iterator(); 
-                entries.hasNext();) {
-                Map.Entry entry = (Map.Entry) entries.next();
-                String id = (String) entry.getKey();
-                URL url = (URL) entry.getValue();
+            for (Map.Entry<String, URL> entry : idRepoNotificationURLs.entrySet()) {
+                String id = entry.getKey();
+                URL url = entry.getValue();
             
                 // Construct NotificationSet
                 if (ns == null) {
@@ -868,7 +902,7 @@ public abstract class IdRepoJAXRPCObjectImpl implements DirectoryManagerIF {
                             + "URL from notification list.", ne);
                     }
                     // Remove the URL from Notification List
-                    entries.remove();
+                    idRepoNotificationURLs.remove(id);
                 }
             }
         }

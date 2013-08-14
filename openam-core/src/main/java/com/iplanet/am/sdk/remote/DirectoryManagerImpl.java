@@ -27,7 +27,7 @@
  */
 
 /**
- * Portions Copyrighted [2011] [ForgeRock AS]
+ * Portions Copyrighted 2011-2013 ForgeRock AS
  */
 package com.iplanet.am.sdk.remote;
 
@@ -55,6 +55,8 @@ import com.iplanet.services.comm.server.PLLServer;
 import com.iplanet.services.comm.server.SendNotificationException;
 import com.iplanet.services.comm.share.Notification;
 import com.iplanet.services.comm.share.NotificationSet;
+import com.iplanet.services.naming.ServerEntryNotFoundException;
+import com.iplanet.services.naming.WebtopNaming;
 import com.iplanet.sso.SSOException;
 import com.iplanet.sso.SSOToken;
 import com.iplanet.sso.SSOTokenManager;
@@ -87,7 +89,7 @@ public class DirectoryManagerImpl extends IdRepoJAXRPCObjectImpl implements
         
     static HashMap cache = null;
         
-    static HashMap notificationURLs = new HashMap();
+    static Map<String, URL> notificationURLs = new HashMap<String, URL>();
     
     public DirectoryManagerImpl() {
         // Empty constructor
@@ -970,48 +972,17 @@ public class DirectoryManagerImpl extends IdRepoJAXRPCObjectImpl implements
         return (answer);
     }
     
-    public String registerNotificationURL(String url) 
-        throws RemoteException {
-        // Since clients tend to register for AMSDK and IdRepo
-        // donot initialize which might thrown an excpetion
-        // initialize();
-        String id = SMSUtils.getUniqueID();
-        try {
-            // Check URL is not the local server
-            if (!isClientOnSameServer(url)) {
-                synchronized (notificationURLs) {
-                    notificationURLs.put(id, new URL(url));
-                }
-                if (debug.messageEnabled()) {
-                    debug.message("DirectoryManagerImpl: " 
-                            + "registerNotificationURL register for " 
-                            + "notification URL: " + url);
-
-                }
-            } else {
-                // Cannot add this server for notifications
-                if (debug.warningEnabled()) {
-                    debug.warning("DirectoryManagerImpl:registerURL "
-                        + "cannot add local server: " + url);
-                }
-                throw (new RemoteException("invalid-notification-URL"));
-            }
-        } catch (MalformedURLException e) {
-            if (debug.warningEnabled()) {
-                debug.warning("DirectoryManagerImpl:registerNotificationURL "
-                    + " invalid URL: " + url, e);
-            }
-        }
-        return (id);
+    public String registerNotificationURL(String url) throws RemoteException {
+       return registerNotificationURL(url, notificationURLs);
     }
     
-    public void deRegisterNotificationURL(String notificationID)
-    throws RemoteException {
-        // Since clients tend to register & deregister for AMSDK and IdRepo
-        // donot initialize which might thrown an excpetion
-        // initialize();
+    public void deRegisterNotificationURL(String notificationID) throws RemoteException {
         synchronized (notificationURLs) {
-            notificationURLs.remove(notificationID);
+            URL url = notificationURLs.remove(notificationID);
+            if (url != null && debug.messageEnabled()) {
+                debug.message("DirectoryManagerImpl.deRegisterNotificationURL() - URL "
+                        + url + " de-registered for ID " + notificationID);
+            }
         }
     }
     
@@ -1070,14 +1041,11 @@ public class DirectoryManagerImpl extends IdRepoJAXRPCObjectImpl implements
         }
         
         // If notification URLs are present, send notifications
-        Map notifications = new HashMap(notificationURLs); // Make a copy
         NotificationSet ns = null;
         synchronized (notificationURLs) {
-            for (Iterator entries = notifications.entrySet().iterator(); 
-                entries.hasNext();) {
-                Map.Entry entry = (Map.Entry) entries.next();
-                String id = (String) entry.getKey();
-                URL url = (URL) entry.getValue();
+            for (Map.Entry<String, URL> entry : notificationURLs.entrySet()) {
+                String id = entry.getKey();
+                URL url = entry.getValue();
             
                 // Construct NotificationSet
                 if (ns == null) {
