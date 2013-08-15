@@ -3768,6 +3768,14 @@
      </listitem>
     </varlistentry>
    </variablelist>
+
+  <note><para>Note: For Windows 7 and later, you will need to turn off the "Enable
+  Integrated Windows Authentication" option in Internet Explorer. In addition, you
+  will need to add and activate the DisableNTMLPreAuth key to the Windows Registry.
+  For detailed instructions, see the Microsoft KB article on when <link xlink:show="new"
+  xlink:href="http://support.microsoft.com/kb/251404"><citetitle>You cannot post data
+  to a non-NTLM-authenticated Web site</citetitle></link></para></note>
+
   </section>
   
   <section xml:id="winnt-module-conf-hints">
