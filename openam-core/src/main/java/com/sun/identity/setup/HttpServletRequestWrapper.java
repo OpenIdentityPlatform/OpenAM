@@ -25,7 +25,9 @@
  * $Id: HttpServletRequestWrapper.java,v 1.4 2009/05/02 23:06:30 kevinserwin Exp $
  *
  */
-
+/**
+ * Portions Copyrighted 2013 ForgeRock AS
+ */
 package com.sun.identity.setup;
 
 import java.util.Enumeration;
@@ -96,8 +98,7 @@ public class HttpServletRequestWrapper
      * @return the context path.
      */
     public String getContextPath() {
-        return (req != null) ? req.getContextPath() : (String)parameterMap.get(
-            OpenSSOConfigurator.DEPLOYMENT_URI);
+        return (req != null) ? req.getContextPath() : (String) parameterMap.get("DEPLOYMENT_URI");
     }
 
     /**

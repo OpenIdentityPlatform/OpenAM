@@ -42,68 +42,6 @@
     <!-- Build -->
     <build>
         <plugins>
-            <!-- Pre-Packaging step for Zip Elements. -->
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-antrun-plugin</artifactId>
-                <executions>
-                    <execution>
-                        <id>zip-pre-packaging</id>
-                        <phase>package</phase>
-                        <configuration>
-                            <target>
-
-                                <tstamp>
-                                    <format property="war.time.stamp" pattern="yyyy-MMMM-dd HH:mm" locale="en,UK" />
-                                </tstamp>
-                                <property name="version.set" value="${project.version}" />
-
-                                <filter token="DATESTAMP" value="${war.time.stamp}" />
-                                <filter token="VERSION" value="${version.set}" />
-
-                                <copy todir="${project.build.outputDirectory}/locale/en_US" filtering="true">
-                                    <fileset
-                                        dir="${project.basedir}/../../openam-locale/src/main/resources/federation-locale">
-                                        <include name="*.properties" />
-                                        <exclude name="Services.properties" />
-                                        <exclude name="ums.properties" />
-                                        <exclude name="sso.properties" />
-                                        <exclude name="SMS.properties" />
-                                        <exclude name="authentication_util.properties" />
-                                    </fileset>
-                                    <globmapper from="*.properties" to="*_en.properties" />
-                                </copy>
-                                <copy todir="${project.build.outputDirectory}/locale/en_US" filtering="false">
-                                    <fileset dir="${project.basedir}/../../openam-locale/src/main/resources/locale">
-                                        <include name="*.properties" />
-                                        <exclude name="Services.properties" />
-                                        <exclude name="ums.properties" />
-                                        <exclude name="sso.properties" />
-                                        <exclude name="SMS.properties" />
-                                        <exclude name="authentication_util.properties" />
-                                    </fileset>
-                                    <globmapper from="*.properties" to="*_en.properties" />
-                                </copy>
-                                <copy todir="${project.build.outputDirectory}/locale/en_US" filtering="false">
-                                    <fileset dir="${project.basedir}/../../openam-locale/src/main/resources/openfm-locale">
-                                        <include name="*.properties" />
-                                        <exclude name="Services.properties" />
-                                        <exclude name="ums.properties" />
-                                        <exclude name="sso.properties" />
-                                        <exclude name="SMS.properties" />
-                                        <exclude name="authentication_util.properties" />
-                                    </fileset>
-                                    <globmapper from="*.properties" to="*_en.properties" />
-                                </copy>
-                            </target>
-                        </configuration>
-                        <goals>
-                            <goal>run</goal>
-                        </goals>
-                    </execution>
-                </executions>
-            </plugin>
-
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-assembly-plugin</artifactId>
@@ -253,11 +191,6 @@
         <dependency>
             <groupId>com.sun.msv.datatype.xsd</groupId>
             <artifactId>xsdlib</artifactId>
-        </dependency>
-
-        <dependency>
-            <groupId>xml-security</groupId>
-            <artifactId>xmlsec</artifactId>
         </dependency>
     </dependencies>
 </project>

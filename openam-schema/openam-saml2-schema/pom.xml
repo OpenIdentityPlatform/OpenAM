@@ -35,7 +35,7 @@
 
     <!-- Component Definition -->
     <name>OpenAM SAML2 Schema</name>
-    <description>OpenAM Schemata Components</description>
+    <description>OpenAM SAML2 Schema Components</description>
     <artifactId>openam-saml2-schema</artifactId>
     <packaging>jar</packaging>
 

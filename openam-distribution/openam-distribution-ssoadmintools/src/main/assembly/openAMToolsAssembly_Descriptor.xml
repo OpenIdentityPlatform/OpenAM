@@ -38,7 +38,6 @@
                 <include>relaxngDatatype:relaxngDatatype</include>
                 <include>external:webservices-api</include>
                 <include>external:webservices-rt</include>
-                <include>com.sun.tools.ws:webservices-tools</include>
                 <include>xalan:xalan</include>
                 <include>xerces-J:xml-serializer</include><!-- for metadata export -->
                 <include>xerces-J:xercesImpl</include>
@@ -75,15 +74,6 @@
             <fileMode>0755</fileMode>
             <filtered>true</filtered>
         </fileSet>
-        <fileSet>
-            <outputDirectory>classes</outputDirectory>
-            <directory>${project.basedir}/../../openam-server-only/src/main/webapp/WEB-INF/template/ldif/odsee</directory>
-            <includes>
-                <include>odsee_config_index.ldif</include>
-                <include>odsee_config_schema.ldif</include>
-            </includes>
-        </fileSet>
-
         <!-- First, Pick up Files from our AntRun -->
         <fileSet>
             <outputDirectory>resources</outputDirectory>
@@ -192,8 +182,6 @@
             <destName>amverifyarchive.bat.template</destName>
             <filtered>true</filtered>
         </file>
-
     </files>
-
 </assembly>
 

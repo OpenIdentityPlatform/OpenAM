@@ -43,58 +43,6 @@
     <build>
         <plugins>
             <plugin>
-                <groupId>org.apache.portals.jetspeed-2</groupId>
-                <artifactId>jetspeed-unpack-maven-plugin</artifactId>
-                <executions>
-                    <execution>
-                        <phase>generate-resources</phase>
-                        <goals>
-                            <goal>unpack</goal>                  
-                        </goals>
-                    </execution>
-                </executions>
-                <dependencies>
-                    <dependency>
-                        <groupId>org.forgerock.openam</groupId>
-                        <artifactId>openam-server</artifactId>
-                        <version>${project.version}</version>
-                        <type>war</type>
-                    </dependency>
-                </dependencies>
-                <configuration>
-                    <unpack>
-                        <artifact>org.forgerock.openam:openam-server:war</artifact>
-                        <resources>
-                            <resource>
-                                <path>WEB-INF/classes</path>
-                                <include>*.properties</include>
-                                <flat>true</flat>
-                                <destination>generated-resources</destination>
-                            </resource>
-                            <resource>
-                                <path>WEB-INF/</path>
-                                <include>jato.tld</include>
-                                <flat>true</flat>
-                                <destination>generated-resources</destination>
-                            </resource>
-                            <resource>
-                                <path>WEB-INF/</path>
-                                <include>distUI_auth.tld</include>
-                                <flat>true</flat>
-                                <name>auth.tld</name>
-                                <destination>generated-resources</destination>
-                            </resource>
-                            <resource>
-                                <path />
-                                <include>css/**,images/**,js/auth.js,js/browserVersion.js</include>
-                                <flat>false</flat>
-                                <destination>generated-resources/resources</destination>
-                            </resource>
-                        </resources>
-                    </unpack>
-                </configuration>
-            </plugin>
-            <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-war-plugin</artifactId>
                 <configuration>
@@ -104,8 +52,7 @@
                             <Specification-Version>${project.version} - ${maven.build.timestamp}</Specification-Version>
                             <Specification-Vendor>ForgeRock</Specification-Vendor>
                             <Implementation-Title>OpenAM DAS</Implementation-Title>
-                            <Implementation-Version>${project.version} - ${maven.build.timestamp}
-                            </Implementation-Version>
+                            <Implementation-Version>${project.version} - ${maven.build.timestamp}</Implementation-Version>
                             <Implementation-Vendor>ForgeRock</Implementation-Vendor>
                             <Build-Time>${maven.build.timestamp}</Build-Time>
                         </manifestEntries>
@@ -142,42 +89,59 @@
                     </nonFilteredFileExtensions>
                     <webResources>
                         <resource>
-                            <directory>${project.build.directory}/generated-resources</directory>
+                            <directory>${basedir}/../openam-server-only/src/main/webapp</directory>
                             <includes>
-                                <include>BasicClientTypesManager*.properties</include>
-                                <include>amAuthUI*.properties</include>
-                                <include>amAuth_*.properties</include>
-                                <include>amAuthContext_*.properties</include>
-                                <include>amClientDetection*.properties</include>
-                                <include>debugfiles.properties</include>
+                                <include>WEB-INF/jato.tld</include>
+                                <include>css/**</include>
+                                <include>images/**</include>
+                                <include>js/auth.js</include>
                             </includes>
-                            <targetPath>WEB-INF/classes</targetPath>
                         </resource>
                         <resource>
-                            <directory>${project.build.directory}/generated-resources</directory>
+                            <directory>${basedir}/../openam-server-only/src/main/webapp/com_sun_web_ui</directory>
                             <includes>
-                                <include>auth.tld</include>
-                                <include>jato.tld</include>
+                                <include>js/browserVersion.js</include>
                             </includes>
-                            <targetPath>WEB-INF</targetPath>
-                        </resource>
-                        <resource>
-                            <directory>${project.build.directory}/generated-resources/resources</directory>
-                            <includes>
-                                <include>**/**</include>
-                                <include>jato.tld</include>
-                            </includes>
-                            <targetPath />
                         </resource>
                     </webResources>
                 </configuration>
             </plugin>
-
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-javadoc-plugin</artifactId>
                 <configuration>
                     <skip>true</skip>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>com.github.goldin</groupId>
+                <artifactId>copy-maven-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <phase>generate-resources</phase>
+                        <goals>
+                            <goal>copy</goal>
+                        </goals>
+                    </execution>
+                </executions>
+                <configuration>
+                    <verbose>false</verbose>
+                    <resource>
+                        <directory>${basedir}/../openam-core/src/main/resources</directory>
+                        <includes>
+                            <include>BasicClientTypesManager.properties</include>
+                            <include>debugfiles.properties</include>
+                            <include>amAuth.properties</include>
+                            <include>amAuthUI.properties</include>
+                            <include>amAuthContext.properties</include>
+                            <include>amClientDetection.properties</include>
+                            <include>*_*/amAuth_*.properties</include>
+                            <include>*_*/amAuthUI_*.properties</include>
+                            <include>*_*/amAuthContext_*.properties</include>
+                            <include>*_*/amClientDetection_*.properties</include>
+                        </includes>
+                        <targetPath>${project.build.outputDirectory}</targetPath>
+                    </resource>
                 </configuration>
             </plugin>
         </plugins>

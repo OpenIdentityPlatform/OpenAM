@@ -44,6 +44,23 @@
     <build>
         <plugins>
             <plugin>
+                <groupId>org.forgerock.commons</groupId>
+                <artifactId>i18n-maven-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <phase>generate-sources</phase>
+                        <goals>
+                            <goal>generate-messages</goal>
+                        </goals>
+                        <configuration>
+                            <messageFiles>
+                                <messageFile>org/forgerock/openam/session/ha/i18n/amsessionstore.properties</messageFile>
+                            </messageFiles>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-jar-plugin</artifactId>
                 <configuration>
@@ -101,6 +118,27 @@
                     </dependency>
                 </dependencies>
             </plugin>
+            <plugin>
+                <groupId>com.github.goldin</groupId>
+                <artifactId>copy-maven-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <phase>generate-resources</phase>
+                        <goals>
+                            <goal>copy</goal>
+                        </goals>
+                    </execution>
+                </executions>
+                <configuration>
+                    <verbose>false</verbose>
+                    <resource>
+                        <directory>${basedir}/src/main/resources</directory>
+                        <include>*_*/*</include>
+                        <filtering>true</filtering>
+                        <targetPath>${project.build.outputDirectory}</targetPath>
+                    </resource>
+                </configuration>
+            </plugin>
         </plugins>
         <resources>
             <resource>
@@ -108,21 +146,18 @@
                 <includes>
                     <include>**/*</include>
                 </includes>
-                <filtering>false</filtering>
+                <excludes>
+                    <exclude>*_*/*</exclude>
+                </excludes>
+                <filtering>true</filtering>
             </resource>
-
             <resource>
                 <directory>${project.build.directory}/generated-resources</directory>
             </resource>
         </resources>
     </build>
 
-
     <dependencies>
-        <dependency>
-            <groupId>org.forgerock.openam</groupId>
-            <artifactId>openam-locale</artifactId>
-        </dependency>
         <dependency>
             <groupId>org.forgerock.openam</groupId>
             <artifactId>openam-shared</artifactId>

@@ -2,7 +2,7 @@
 <!--
 * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
 *
-* Copyright (c) 2011-2013 ForgeRock AS. All Rights Reserved
+* Copyright (c) 2013 ForgeRock Inc. All Rights Reserved
 *
 * The contents of this file are subject to the terms
 * of the Common Development and Distribution License
@@ -25,22 +25,18 @@
 -->
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
     <modelVersion>4.0.0</modelVersion>
-
     <!-- Parent Project -->
     <parent>
         <groupId>org.forgerock.openam</groupId>
-        <artifactId>openam-federation</artifactId>
+        <artifactId>openam-tools</artifactId>
         <version>10.2.0-SNAPSHOT</version>
     </parent>
 
     <!-- Component Definition -->
-    <name>OpenFM</name>
-    <description>OpenAM Federation</description>
-    <artifactId>OpenFM</artifactId>
+    <name>OpenAM Upgrade Tool</name>
+    <description>OpenAM Upgrade Tool</description>
+    <artifactId>openam-upgrade-tool</artifactId>
     <packaging>jar</packaging>
-    <properties>
-        <skipTests>true</skipTests>
-    </properties>
 
     <!-- Build -->
     <build>
@@ -53,13 +49,14 @@
                         <index>true</index>
                         <manifest>
                             <addClasspath>true</addClasspath>
+                            <mainClass>org.forgerock.openam.setup.OpenAMUpgrade</mainClass>
                             <classpathPrefix>lib/</classpathPrefix>
                         </manifest>
                         <manifestEntries>
-                            <Specification-Title>OpenAM Federation</Specification-Title>
+                            <Specification-Title>OpenAM Upgrade Tool</Specification-Title>
                             <Specification-Version>${project.version} - ${maven.build.timestamp}</Specification-Version>
                             <Specification-Vendor>ForgeRock</Specification-Vendor>
-                            <Implementation-Title>OpenAM Federation</Implementation-Title>
+                            <Implementation-Title>OpenAM Upgrade Tool</Implementation-Title>
                             <Implementation-Version>${project.version} - ${maven.build.timestamp}</Implementation-Version>
                             <Implementation-Vendor>ForgeRock</Implementation-Vendor>
                             <Built-By>${user.name}</Built-By>
@@ -74,62 +71,7 @@
                     </archive>
                 </configuration>
             </plugin>
-            <plugin>
-                <groupId>com.github.goldin</groupId>
-                <artifactId>copy-maven-plugin</artifactId>
-                <executions>
-                    <execution>
-                        <phase>generate-resources</phase>
-                        <goals>
-                            <goal>copy</goal>
-                        </goals>
-                    </execution>
-                </executions>
-                <configuration>
-                    <verbose>false</verbose>
-                    <resource>
-                        <directory>${basedir}/src/main/resources</directory>
-                        <include>*_*/*</include>
-                        <filtering>true</filtering>
-                        <targetPath>${project.build.outputDirectory}</targetPath>
-                    </resource>
-                </configuration>
-            </plugin>
         </plugins>
-        <resources>
-            <resource>
-                <directory>src/main/resources</directory>
-                <includes>
-                    <include>**/*</include>
-                </includes>
-                <excludes>
-                    <exclude>*_*/*</exclude>
-                </excludes>
-                <filtering>true</filtering>
-            </resource>
-        </resources>
     </build>
-
-    <dependencies>
-        <dependency>
-            <groupId>org.forgerock.openam</groupId>
-            <artifactId>openam-core</artifactId>
-        </dependency>
-
-        <dependency>
-            <groupId>org.forgerock.openam</groupId>
-            <artifactId>openam-federation-library</artifactId>
-        </dependency>
-
-        <dependency>
-            <groupId>javax.servlet</groupId>
-            <artifactId>servlet-api</artifactId>
-        </dependency>
-
-        <dependency>
-            <groupId>org.testng</groupId>
-            <artifactId>testng</artifactId>
-        </dependency>
-    </dependencies>
 </project>
 

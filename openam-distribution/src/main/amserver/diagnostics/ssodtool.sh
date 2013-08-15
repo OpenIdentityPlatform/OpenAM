@@ -58,6 +58,7 @@ TOOLS_HOME="`dirname $HOME`"
 EXT_CLASSPATH=$CLASSPATH
 
 CLASSPATH="resources"
+CLASSPATH="$CLASSPATH:lib/forgerock-util-${commons.forgerock-util.version}.jar"
 CLASSPATH="$CLASSPATH:lib/openam-diagnostics-base-${project.version}.jar"
 CLASSPATH="$CLASSPATH:lib/openam-diagnostics-schema-${project.version}.jar"
 CLASSPATH="$CLASSPATH:lib/openam-core-${project.version}.jar"

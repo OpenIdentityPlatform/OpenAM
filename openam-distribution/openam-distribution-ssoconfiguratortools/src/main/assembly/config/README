@@ -1,0 +1,76 @@
+<!--
+   DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
+
+   Copyright (c) 2008 Sun Microsystems Inc. All Rights Reserved
+
+   The contents of this file are subject to the terms
+   of the Common Development and Distribution License
+   (the License). You may not use this file except in
+   compliance with the License.
+
+   You can obtain a copy of the License at
+   https://opensso.dev.java.net/public/CDDLv1.0.html or
+   opensso/legal/CDDLv1.0.txt
+   See the License for the specific language governing
+   permission and limitations under the License.
+
+   When distributing Covered Code, include this CDDL
+   Header Notice in each file and include the License file
+   at opensso/legal/CDDLv1.0.txt.
+   If applicable, add the following below the CDDL Header,
+   with the fields enclosed by brackets [] replaced by
+   your own identifying information:
+   "Portions Copyrighted [year] [name of copyright owner]"
+
+   $Id: README.setup,v 1.1 2008/08/31 06:54:54 hengming Exp $
+
+-->
+
+<!--
+    Portions Copyrighted 2011-2013 ForgeRock AS
+-->
+
+OpenAM: openam-distribution-ssoconfiguratortools-${project.version}.zip
+====================================================
+
+This file contains information on installing and using
+openam-distribution-ssoconfiguratortools-${project.version}.zip.
+It is assumed that OpenAM Server has been deployed.
+
+Table of contents:
+-----------------
+1. Supported versions of Java Runtime
+2. Installing openam-distribution-ssoconfiguratortools-${project.version}.zip
+3. What does this package contain?
+
+1. Supported versions of Java Runtime
+-------------------------
+Java SE 1.5 or higher.
+
+2. Installing openam-distribution-ssoconfiguratortools-${project.version}.zip
+--------------------------------------
+
+Before setting up ssoConfiguratorTools.zip, JAVA_HOME environment variable
+needs to be initialized to a path of a compatible Java Runtime.
+
+If you want to setup OpenAM then run the following command:
+        \${JAVA_HOME}/bin/java -jar openam-configurator-tool-${project.version}.jar -f <configuration file>
+
+If you have already deployed OpenAM and want to upgrade run the following command:
+        \${JAVA_HOME}/bin/java -jar openam-upgrade-tool-${project.version}.jar -f <upgrade file>
+
+3. What does this package contain?
+----------------------------------
+<ZIP_ROOT>
+|
+|----README (this file)
+|
+|----openam-configurator-tool-${project.version}.jar (binaries needed for the configuration tool)
+|
+|----openam-upgrade-tool-${project.version}.jar (binaries needed for the upgrade tool)
+|
+|----license.txt (license file)
+|
+|----sampleconfiguration (a sample configuration file)
+|
+|----sampleupgrade (a sample upgrade file)

@@ -64,15 +64,6 @@
 
                                 <property name="amserver.target.resources.dir" value="${project.build.directory}/classes" />
 
-                                <property name="locale.resources"
-                                          value="${project.basedir}/../openam-locale/src/main/resources" />
-
-                                <property name="amserver.resources.i18n.dir" value="${locale.resources}/locale" />
-
-                                <property name="library.resources.i18n.dir" value="${locale.resources}/federation-locale" />
-
-                                <property name="openfm.resources.i18n.dir" value="${locale.resources}/openfm-locale" />
-
                                 <property name="core.xml.dir" value="${project.basedir}/../openam-core/src/main/resources/xml" />
 
                                 <property name="library.xml.dir" value="${project.basedir}/../openam-federation/openam-federation-library/src/main/resources/xml" />
@@ -278,28 +269,6 @@
                                 <include>**/**</include>
                             </includes>
                             <targetPath />
-                            <filtering>false</filtering>
-                        </webResource>
-                        <webResource>
-                            <directory>${project.basedir}/../openam-core/src/main/resources/ha_sfo/ldif
-                            </directory>
-                            <includes>
-                                <!-- These Files get moved into Place when installing OpenDJ. -->
-                                <include>cts-add-schema.ldif</include>
-                                <include>cts-delete-schema.ldif</include>
-                                <include>odsee-cts-indices-schema.ldif</include>
-                            </includes>
-                            <targetPath>WEB-INF/template/ldif/sfha</targetPath>
-                            <filtering>false</filtering>
-                        </webResource>
-			            <webResource>
-                            <directory>${project.basedir}/../openam-oauth2/openam-oauth2-core-token-service/src/main/resources
-                            </directory>
-                            <includes>
-                                <!-- These Files get moved into Place when installing OpenDJ. -->
-                                <include>99-oauth2attributes.ldif</include>
-                            </includes>
-                            <targetPath>WEB-INF/template/ldif/oauth2</targetPath>
                             <filtering>false</filtering>
                         </webResource>
                     </webResources>

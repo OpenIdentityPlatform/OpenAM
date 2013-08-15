@@ -33,8 +33,10 @@
     <includeBaseDirectory>false</includeBaseDirectory>
     <dependencySets>
         <dependencySet>
+            <outputFileNameMapping>${artifact.artifactId}-${artifact.baseVersion}.${artifact.extension}</outputFileNameMapping>
             <outputDirectory>lib</outputDirectory>
             <includes>
+                <include>org.forgerock.commons:forgerock-util</include>
                 <include>org.forgerock.openam:openam-diagnostics-base</include>
                 <include>org.forgerock.openam:openam-diagnostics-schema</include>
                 <include>org.forgerock.openam:openam-core</include>
@@ -95,10 +97,6 @@
         </file>
         <file>
             <source>${project.basedir}/../../openam-server-only/src/main/webapp/WEB-INF/template/sms/serverdefaults.properties</source>
-            <outputDirectory>resources</outputDirectory>
-        </file>
-        <file>
-            <source>${project.basedir}/../../openam-locale/src/main/resources/locale/amUtilMsgs.properties</source>
             <outputDirectory>resources</outputDirectory>
         </file>
     </files>

@@ -27,7 +27,7 @@
  */
 
 /**
- * Portions Copyrighted 2013 ForgeRock Inc
+ * Portions Copyrighted 2013 ForgeRock AS
  */
 
 package com.sun.identity.authentication.modules.cert;

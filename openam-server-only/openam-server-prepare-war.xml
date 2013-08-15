@@ -46,10 +46,6 @@
 
         <mkdir dir="${project.build.directory}/openam"/>
 
-        <copy file="${project.basedir}/../version.template"
-              tofile="${openam.temp.target}/version"
-              filtering="true"/>
-
         <mkdir dir="${openam.temp.target}/WEB-INF/template/opendj"/>
         <copy todir="${openam.temp.target}/WEB-INF/template/opendj" filtering="false">
             <fileset dir="${project.basedir}/binary">
@@ -57,103 +53,10 @@
             </fileset>
         </copy>
  
-        <mkdir dir="${openam.temp.target}/WEB-INF/template/ldif/sfha"/>
-        <copy todir="${openam.temp.target}/WEB-INF/template/ldif/sfha" filtering="false">
-            <fileset dir="${project.basedir}/../openam-core/src/main/resources/ha_sfo/ldif/">
-                <include name="*.ldif" />
-            </fileset>
-        </copy>
-
-        <mkdir dir="${openam.temp.target}/WEB-INF/template/sms"/>
-        <copy todir="${openam.temp.target}/WEB-INF/template/sms" filtering="true">
-            <fileset dir="${project.basedir}/../openam-core/src/main/resources/xml">
-                <include name="serverconfig.xml"/>
-            </fileset>
-        </copy>
-
-        <mkdir dir="${openam.temp.target}/images"/>
-        <copy todir="${openam.temp.target}/images" filtering="false">
-            <fileset dir="${project.basedir}/../openam-core/src/main/resources/lockhart/images">
-                <include name="button/**"/>
-                <include name="*.*"/>
-            </fileset>
-        </copy>
-
-        <mkdir dir="${openam.temp.target}/css"/>
-        <copy todir="${openam.temp.target}/css" filtering="false">
-            <fileset dir="${project.basedir}/../openam-core/src/main/resources/lockhart/css">
-                <include name="**/**"/>
-            </fileset>
-        </copy>
-
-        <copy todir="${amserver.target.resources.dir}" flatten="true" filtering="true">
-            <fileset dir="${amserver.resources.i18n.dir}">
-                <include name="**/*.properties"/>
-            </fileset>
-        </copy>
-
-        <copy todir="${amserver.target.resources.dir}" filtering="true">
-            <fileset dir="${amserver.resources.i18n.dir}">
-                <include name="**/*.properties"/>
-            </fileset>
-            <globmapper from="*.properties" to="*_en.properties"/>
-        </copy>
-
-        <!--
-            Fix for OPENAM-2337: need to copy contents of the openam-locale/src/main/resources subdirectories into the
-            WEB_INF/classes directory to support fedlet creation. Following the existing pattern of copying things twice -
-            once with a globalmapper to change *.properties to *_en.properties, so we will have both the default .properties
-            (based on English), and the *_en.properties. None of the specified excludes in the two copy tasks above existed
-            in the directories targeted by the copy below.
-        -->
-        <copy todir="${amserver.target.resources.dir}" flatten="true" filtering="true">
-            <fileset dir="${library.resources.i18n.dir}">
-                <include name="**"/>
-                <include name="*.properties"/>
-            </fileset>
-        </copy>
-
-        <copy todir="${amserver.target.resources.dir}" flatten="true" filtering="true">
-            <fileset dir="${library.resources.i18n.dir}">
-                <include name="**"/>
-                <include name="*.properties"/>
-            </fileset>
-            <globmapper from="*.properties" to="*_en.properties"/>
-        </copy>
-
-        <copy todir="${amserver.target.resources.dir}" flatten="true" filtering="true">
-            <fileset dir="${openfm.resources.i18n.dir}">
-                <include name="**"/>
-                <include name="*.properties"/>
-            </fileset>
-        </copy>
-
-        <copy todir="${amserver.target.resources.dir}" flatten="true" filtering="true">
-            <fileset dir="${openfm.resources.i18n.dir}">
-                <include name="**"/>
-                <include name="*.properties"/>
-            </fileset>
-            <globmapper from="*.properties" to="*_en.properties"/>
-        </copy>
-
         <mkdir dir="${openam.temp.target}/config/federation/default_en"/>
         <copy todir="${openam.temp.target}/config/federation/default_en" filtering="true">
             <fileset dir="${project.basedir}/src/main/webapp/config/federation/default">
                 <include name="**/**" />
-            </fileset>
-        </copy>
-
-        <mkdir dir="${openam.temp.target}/WEB-INF/classes"/>
-        <copy todir="${openam.temp.target}/WEB-INF/classes" filtering="true">
-            <fileset dir="${project.basedir}/../openam-federation/OpenFM/src/main/resources">
-                <include name="FederationManagerCLI.properties"/>
-            </fileset>
-            <globmapper from="*.properties" to="*_en.properties"/>
-        </copy>
-
-        <copy todir="${openam.temp.target}/WEB-INF/classes" filtering="true">
-            <fileset dir="${project.basedir}/../openam-federation/OpenFM/src/main/resources">
-                <include name="FederationManagerCLI.properties"/>
             </fileset>
         </copy>
 
@@ -325,7 +228,5 @@
                 <include name="browserVersion.js"/>
             </fileset>
         </copy>
-
     </target>
-
 </project>

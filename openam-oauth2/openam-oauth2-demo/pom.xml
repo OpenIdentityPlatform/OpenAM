@@ -48,11 +48,6 @@
             <artifactId>servlet-api</artifactId>
         </dependency>
 
-        <!-- OpenAM -->
-        <dependency>
-            <groupId>org.forgerock.openam</groupId>
-            <artifactId>openam-locale</artifactId>
-        </dependency>
         <dependency>
             <groupId>org.forgerock.openam</groupId>
             <artifactId>openam-core</artifactId>
@@ -138,35 +133,4 @@
             <artifactId>xml-serializer</artifactId>
         </dependency>
     </dependencies>
-
-    <build>
-        <plugins>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-war-plugin</artifactId>
-                <configuration>
-                    <webResources>
-                        <webResource>
-                            <directory>${project.basedir}/../../openam-core/src/main/resources
-                            </directory>
-                            <includes>
-                                <include>serverAttributeMap.properties</include>
-                            </includes>
-                            <targetPath>WEB-INF/classes</targetPath>
-                            <filtering>false</filtering>
-                        </webResource>
-                        <webResource>
-                            <directory>${project.basedir}/../../openam-locale/src/main/resources/locale
-                            </directory>
-                            <includes>
-                                <include>*.*</include>
-                            </includes>
-                            <targetPath>WEB-INF/classes</targetPath>
-                            <filtering>false</filtering>
-                        </webResource>
-                    </webResources>
-                </configuration>
-            </plugin>
-        </plugins>
-    </build>
 </project>

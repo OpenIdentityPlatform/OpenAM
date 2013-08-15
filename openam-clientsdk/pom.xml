@@ -107,7 +107,6 @@
                             <include>org.forgerock.commons:forgerock-util</include>
                             <include>org.forgerock.openam:openam-core</include>
                             <include>org.forgerock.openam:openam-entitlements</include>
-                            <include>org.forgerock.openam:openam-locale</include>
                             <include>org.forgerock.openam:openam-shared</include>
                             <include>org.forgerock.openam:openam-dtd-schema</include>
                             <include>org.forgerock.openam:openam-jaxrpc-schema</include>
@@ -123,6 +122,17 @@
                         <filter>
                             <artifact>org.forgerock.openam:openam-core</artifact>
                             <includes>
+                                <include>amAuth.properties</include>
+                                <include>amAuthContext.properties</include>
+                                <include>amIdRepo.properties</include>
+                                <include>amNaming.properties</include>
+                                <include>amPolicy.properties</include>
+                                <include>amProfile.properties</include>
+                                <include>amSDK.properties</include>
+                                <include>amSSOProvider.properties</include>
+                                <include>amSecurity.properties</include>
+                                <include>amSession.properties</include>
+                                <include>amUtilMsgs.properties</include>
                                 <include>serverAttributeMap.properties</include>
                                 <include>com/iplanet/am/sdk/**</include>
                                 <include>com/iplanet/am/util/**</include>
@@ -295,6 +305,12 @@
                             <artifact>org.forgerock.openam:OpenFM</artifact>
                             <includes>
                                 <include>META-INF/services/com.sun.xml.ws.api.pipe.TransportPipeFactory</include>
+                                <include>famSTS.properties</include>
+                                <include>fmConfigurationService.properties</include>
+                                <include>fmLibertySecurity.properties</include>
+                                <include>fmSessionProvider.properties</include>
+                                <include>fmWSSProvider.properties</include>
+                                <include>fmWSSecurity.properties</include>
                                 <include>com/sun/identity/classloader/**</include>
                                 <include>com/sun/identity/configuration/FedSystemProperties*</include>
                                 <include>com/sun/identity/liberty/ws/soapbinding/WebServiceAuthenticatorImpl*</include>
@@ -326,6 +342,23 @@
                         <filter>
                             <artifact>org.forgerock.openam:openam-federation-library</artifact>
                             <includes>
+                                <include>libAuthnSvc.properties</include>
+                                <include>libBinarySecurityToken.properties</include>
+                                <include>libConfigurationManager.properties</include>
+                                <include>libDSTService.properties</include>
+                                <include>libDisco.properties</include>
+                                <include>libEncryption.properties</include>
+                                <include>libIDFF.properties</include>
+                                <include>libIDFFMeta.properties</include>
+                                <include>libInteraction.properties</include>
+                                <include>libLibertySecurity.properties</include>
+                                <include>libPersonalProfile.properties</include>
+                                <include>libSAML.properties</include>
+                                <include>libSAML2.properties</include>
+                                <include>libSAML2Meta.properties</include>
+                                <include>libSOAPBinding.properties</include>
+                                <include>libSessionProvider.properties</include>
+                                <include>libXACML.properties</include>
                                 <include>com/sun/identity/common/ServerOrSiteEntry*</include>
                                 <include>com/sun/identity/common/SystemConfiguration*</include>
                                 <include>com/sun/identity/configuration/FedLibSystemProperties*</include>
@@ -423,46 +456,6 @@
                             </includes>
                         </filter>
                         <filter>
-                            <artifact>org.forgerock.openam:openam-locale</artifact>
-                            <includes>
-                                <include>amAuth.properties</include>
-                                <include>amAuthContext.properties</include>
-                                <include>amIdRepo.properties</include>
-                                <include>amNaming.properties</include>
-                                <include>amPolicy.properties</include>
-                                <include>amProfile.properties</include>
-                                <include>amSDK.properties</include>
-                                <include>amSSOProvider.properties</include>
-                                <include>amSecurity.properties</include>
-                                <include>amSession.properties</include>
-                                <include>amUtilMsgs.properties</include>
-                                <include>debugconfig.properties</include>
-                                <include>famSTS.properties</include>
-                                <include>fmConfigurationService.properties</include>
-                                <include>fmLibertySecurity.properties</include>
-                                <include>fmSessionProvider.properties</include>
-                                <include>fmWSSProvider.properties</include>
-                                <include>fmWSSecurity.properties</include>
-                                <include>libAuthnSvc.properties</include>
-                                <include>libBinarySecurityToken.properties</include>
-                                <include>libConfigurationManager.properties</include>
-                                <include>libDSTService.properties</include>
-                                <include>libDisco.properties</include>
-                                <include>libEncryption.properties</include>
-                                <include>libIDFF.properties</include>
-                                <include>libIDFFMeta.properties</include>
-                                <include>libInteraction.properties</include>
-                                <include>libLibertySecurity.properties</include>
-                                <include>libPersonalProfile.properties</include>
-                                <include>libSAML.properties</include>
-                                <include>libSAML2.properties</include>
-                                <include>libSAML2Meta.properties</include>
-                                <include>libSOAPBinding.properties</include>
-                                <include>libSessionProvider.properties</include>
-                                <include>libXACML.properties</include>
-                           </includes>
-                        </filter>
-                        <filter>
                             <artifact>org.forgerock.openam:openam-entitlements</artifact>
                             <includes>
                                 <include>**/**</include>
@@ -526,10 +519,6 @@
         <dependency>
             <groupId>org.forgerock.openam</groupId>
             <artifactId>OpenFM</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.forgerock.openam</groupId>
-            <artifactId>openam-locale</artifactId>
         </dependency>
         <dependency>
             <groupId>org.forgerock.openam</groupId>

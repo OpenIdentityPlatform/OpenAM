@@ -43,9 +43,11 @@
     <modules>
         <module>build-helper-plugin</module>
         <module>openam-build-tools</module>
+        <module>openam-configurator-tool</module>
         <module>openam-installtools</module>
         <module>openam-installtools-launcher</module>
         <module>openam-diagnostics</module>
+        <module>openam-upgrade-tool</module>
     </modules>
 </project>
 

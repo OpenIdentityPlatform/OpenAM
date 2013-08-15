@@ -1,4 +1,19 @@
 <?xml version="1.0" encoding="UTF-8"?>
+<!--
+ * Copyright 2013 ForgeRock AS.
+ *
+ * The contents of this file are subject to the terms of the Common Development and
+ * Distribution License (the License). You may not use this file except in compliance with the
+ * License.
+ *
+ * You can obtain a copy of the License at legal/CDDLv1.0.txt. See the License for the
+ * specific language governing permission and limitations under the License.
+ *
+ * When distributing Covered Software, include this CDDL Header Notice in each file and include
+ * the License file at legal/CDDLv1.0.txt. If applicable, add the following below the CDDL
+ * Header, with the fields enclosed by brackets [] replaced by your own identifying
+ * information: "Portions copyright [year] [name of copyright owner]".
+-->
 <assembly xmlns="http://maven.apache.org/plugins/maven-assembly-plugin/assembly/1.1.0"
           xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
           xsi:schemaLocation="http://maven.apache.org/plugins/maven-assembly-plugin/assembly/1.1.0 http://maven.apache.org/xsd/assembly-1.1.0.xsd">
@@ -12,6 +27,7 @@
         <dependencySet>
             <outputDirectory>WEB-INF/lib</outputDirectory>
             <includes>
+                <include>org.forgerock.commons:forgerock-util</include>
                 <include>org.forgerock.openam:openam-shared</include>
                 <include>org.forgerock.openam:openam-federation-library</include>
                 <include>org.forgerock.openam:openam-dtd-schema</include>
@@ -21,7 +37,6 @@
                 <include>org.forgerock.openam:openam-mib-schema</include>
                 <include>org.forgerock.openam:openam-wsfederation-schema</include>
                 <include>org.forgerock.openam:openam-xacml3-schema</include>
-                <include>org.forgerock.openam:openam-rest</include>
                 <include>external:esapiport</include>
                 <include>javax.mail:mail</include>
                 <include>relaxngDatatype:relaxngDatatype</include>
@@ -29,13 +44,11 @@
                 <include>external:webservices-extra</include>
                 <include>external:webservices-extra-api</include>
                 <include>external:webservices-rt</include>
-                <include>com.sun.tools.ws:webservices-tools</include>
                 <include>xalan:xalan</include>
                 <include>xerces-J:xercesImpl</include>
                 <include>xerces-J:xml-apis</include>
                 <include>xerces-J:xml-resolver</include>
                 <include>xerces-J:xml-serializer</include>
-                <include>xml-security:xmlsec</include>
             </includes>
         </dependencySet>
     </dependencySets>
@@ -66,187 +79,6 @@
             <includes>
                 <include>dot.gif</include>
                 <include>javalogo.gif</include>
-            </includes>
-        </fileSet>
-
-        <fileSet>
-            <outputDirectory>WEB-INF/classes</outputDirectory>
-            <directory>${project.basedir}/../../openam-server-only/src/main/resources/locale</directory>
-            <includes>
-                <include>*.properties</include>
-            </includes>
-        </fileSet>
-        <fileSet>
-            <outputDirectory>WEB-INF/classes</outputDirectory>
-            <directory>${project.basedir}/../../openam-server-only/src/main/resources/locale/de_DE</directory>
-            <includes>
-                <include>*.properties</include>
-            </includes>
-        </fileSet>
-        <fileSet>
-            <outputDirectory>WEB-INF/classes</outputDirectory>
-            <directory>${project.basedir}/../../openam-server-only/src/main/resources/locale/es_ES</directory>
-            <includes>
-                <include>*.properties</include>
-            </includes>
-        </fileSet>
-        <fileSet>
-            <outputDirectory>WEB-INF/classes</outputDirectory>
-            <directory>${project.basedir}/../../openam-server-only/src/main/resources/locale/fr_FR</directory>
-            <includes>
-                <include>*.properties</include>
-            </includes>
-        </fileSet>
-        <fileSet>
-            <outputDirectory>WEB-INF/classes</outputDirectory>
-            <directory>${project.basedir}/../../openam-server-only/src/main/resources/locale/ja_JP</directory>
-            <includes>
-                <include>*.properties</include>
-            </includes>
-        </fileSet>
-        <fileSet>
-            <outputDirectory>WEB-INF/classes</outputDirectory>
-            <directory>${project.basedir}/../../openam-server-only/src/main/resources/locale/ko_KR</directory>
-            <includes>
-                <include>*.properties</include>
-            </includes>
-        </fileSet>
-        <fileSet>
-            <outputDirectory>WEB-INF/classes</outputDirectory>
-            <directory>${project.basedir}/../../openam-server-only/src/main/resources/locale/zh_CN</directory>
-            <includes>
-                <include>*.properties</include>
-            </includes>
-        </fileSet>
-        <fileSet>
-            <outputDirectory>WEB-INF/classes</outputDirectory>
-            <directory>${project.basedir}/../../openam-server-only/src/main/resources/locale/zh_TW</directory>
-            <includes>
-                <include>*.properties</include>
-            </includes>
-        </fileSet>
-
-
-        <fileSet>
-            <outputDirectory>WEB-INF/classes</outputDirectory>
-            <directory>${project.basedir}/../../openam-server-only/src/main/resources/federation-locale</directory>
-            <includes>
-                <include>*.properties</include>
-            </includes>
-        </fileSet>
-
-        <fileSet>
-            <outputDirectory>WEB-INF/classes</outputDirectory>
-            <directory>${project.basedir}/../../openam-server-only/src/main/resources/federation-locale/de_DE</directory>
-            <includes>
-                <include>*.properties</include>
-            </includes>
-        </fileSet>
-        <fileSet>
-            <outputDirectory>WEB-INF/classes</outputDirectory>
-            <directory>${project.basedir}/../../openam-server-only/src/main/resources/federation-locale/es_ES</directory>
-            <includes>
-                <include>*.properties</include>
-            </includes>
-        </fileSet>
-        <fileSet>
-            <outputDirectory>WEB-INF/classes</outputDirectory>
-            <directory>${project.basedir}/../../openam-server-only/src/main/resources/federation-locale/fr_FR</directory>
-            <includes>
-                <include>*.properties</include>
-            </includes>
-        </fileSet>
-        <fileSet>
-            <outputDirectory>WEB-INF/classes</outputDirectory>
-            <directory>${project.basedir}/../../openam-server-only/src/main/resources/federation-locale/ja_JP</directory>
-            <includes>
-                <include>*.properties</include>
-            </includes>
-        </fileSet>
-        <fileSet>
-            <outputDirectory>WEB-INF/classes</outputDirectory>
-            <directory>${project.basedir}/../../openam-server-only/src/main/resources/federation-locale/ko_KR</directory>
-            <includes>
-                <include>*.properties</include>
-            </includes>
-        </fileSet>
-        <fileSet>
-            <outputDirectory>WEB-INF/classes</outputDirectory>
-            <directory>${project.basedir}/../../openam-server-only/src/main/resources/federation-locale/zh_CN</directory>
-            <includes>
-                <include>*.properties</include>
-            </includes>
-        </fileSet>
-        <fileSet>
-            <outputDirectory>WEB-INF/classes</outputDirectory>
-            <directory>${project.basedir}/../../openam-server-only/src/main/resources/federation-locale/zh_TW</directory>
-            <includes>
-                <include>*.properties</include>
-            </includes>
-        </fileSet>
-
-        <fileSet>
-            <outputDirectory>WEB-INF/classes</outputDirectory>
-            <directory>${project.basedir}/../../openam-server-only/src/main/resources/openfm-locale</directory>
-            <includes>
-                <include>*.properties</include>
-            </includes>
-        </fileSet>
-        <fileSet>
-            <outputDirectory>WEB-INF/classes</outputDirectory>
-            <directory>${project.basedir}/../../openam-server-only/src/main/resources/openfm-locale/de_DE</directory>
-            <includes>
-                <include>*.properties</include>
-            </includes>
-        </fileSet>
-        <fileSet>
-            <outputDirectory>WEB-INF/classes</outputDirectory>
-            <directory>${project.basedir}/../../openam-server-only/src/main/resources/openfm-locale/es_ES</directory>
-            <includes>
-                <include>*.properties</include>
-            </includes>
-        </fileSet>
-        <fileSet>
-            <outputDirectory>WEB-INF/classes</outputDirectory>
-            <directory>${project.basedir}/../../openam-server-only/src/main/resources/openfm-locale/fr_FR</directory>
-            <includes>
-                <include>*.properties</include>
-            </includes>
-        </fileSet>
-        <fileSet>
-            <outputDirectory>WEB-INF/classes</outputDirectory>
-            <directory>${project.basedir}/../../openam-server-only/src/main/resources/openfm-locale/ja_JP</directory>
-            <includes>
-                <include>*.properties</include>
-            </includes>
-        </fileSet>
-        <fileSet>
-            <outputDirectory>WEB-INF/classes</outputDirectory>
-            <directory>${project.basedir}/../../openam-server-only/src/main/resources/openfm-locale/ko_KR</directory>
-            <includes>
-                <include>*.properties</include>
-            </includes>
-        </fileSet>
-        <fileSet>
-            <outputDirectory>WEB-INF/classes</outputDirectory>
-            <directory>${project.basedir}/../../openam-server-only/src/main/resources/openfm-locale/zh_CN</directory>
-            <includes>
-                <include>*.properties</include>
-            </includes>
-        </fileSet>
-        <fileSet>
-            <outputDirectory>WEB-INF/classes</outputDirectory>
-            <directory>${project.basedir}/../../openam-server-only/src/main/resources/openfm-locale/zh_TW</directory>
-            <includes>
-                <include>*.properties</include>
-            </includes>
-        </fileSet>
-
-        <fileSet>
-            <outputDirectory>WEB-INF/classes</outputDirectory>
-            <directory>${project.build.directory}/locale/en_US</directory>
-            <includes>
-                <include>*.properties</include>
             </includes>
         </fileSet>
 
@@ -308,7 +140,62 @@
                 <include>index.html</include>
             </includes>
         </fileSet>
-
+        <fileSet>
+            <outputDirectory>WEB-INF/classes</outputDirectory>
+            <directory>${basedir}/../../openam-federation/OpenFM/src/main/resources</directory>
+            <includes>
+                <include>fmConfigurationService.properties</include>
+            </includes>
+        </fileSet>
+        <fileSet>
+            <outputDirectory>WEB-INF/classes</outputDirectory>
+            <directory>${basedir}/../../openam-federation/OpenFM/src/main/resources/de_DE</directory>
+            <includes>
+                <include>fmConfigurationService_de.properties</include>
+            </includes>
+        </fileSet>
+        <fileSet>
+            <outputDirectory>WEB-INF/classes</outputDirectory>
+            <directory>${basedir}/../../openam-federation/OpenFM/src/main/resources/es_ES</directory>
+            <includes>
+                <include>fmConfigurationService_es.properties</include>
+            </includes>
+        </fileSet>
+        <fileSet>
+            <outputDirectory>WEB-INF/classes</outputDirectory>
+            <directory>${basedir}/../../openam-federation/OpenFM/src/main/resources/fr_FR</directory>
+            <includes>
+                <include>fmConfigurationService_fr.properties</include>
+            </includes>
+        </fileSet>
+        <fileSet>
+            <outputDirectory>WEB-INF/classes</outputDirectory>
+            <directory>${basedir}/../../openam-federation/OpenFM/src/main/resources/ja_JP</directory>
+            <includes>
+                <include>fmConfigurationService_ja.properties</include>
+            </includes>
+        </fileSet>
+        <fileSet>
+            <outputDirectory>WEB-INF/classes</outputDirectory>
+            <directory>${basedir}/../../openam-federation/OpenFM/src/main/resources/ko_KR</directory>
+            <includes>
+                <include>fmConfigurationService_ko.properties</include>
+            </includes>
+        </fileSet>
+        <fileSet>
+            <outputDirectory>WEB-INF/classes</outputDirectory>
+            <directory>${basedir}/../../openam-federation/OpenFM/src/main/resources/zh_CN</directory>
+            <includes>
+                <include>fmConfigurationService_zh.properties</include>
+            </includes>
+        </fileSet>
+        <fileSet>
+            <outputDirectory>WEB-INF/classes</outputDirectory>
+            <directory>${basedir}/../../openam-federation/OpenFM/src/main/resources/zh_TW</directory>
+            <includes>
+                <include>fmConfigurationService_zh_TW.properties</include>
+            </includes>
+        </fileSet>
     </fileSets>
 
     <!-- Single Files -->

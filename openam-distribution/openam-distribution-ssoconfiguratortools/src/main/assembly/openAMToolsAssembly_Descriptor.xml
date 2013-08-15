@@ -2,7 +2,7 @@
 <!--
 * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
 *
-* Copyright (c) 2012 ForgeRock AS. All Rights Reserved
+* Copyright (c) 2012-2013 ForgeRock AS. All Rights Reserved
 *
 * The contents of this file are subject to the terms
 * of the Common Development and Distribution License
@@ -32,30 +32,27 @@
     </formats>
     <includeBaseDirectory>false</includeBaseDirectory>
 
+    <dependencySets>
+        <dependencySet>
+            <outputDirectory></outputDirectory>
+            <includes>
+                <include>org.forgerock.openam:openam-configurator-tool</include>
+                <include>org.forgerock.openam:openam-upgrade-tool</include>
+            </includes>
+        </dependencySet>
+    </dependencySets>
     <!-- Single Files -->
+    <fileSets>
+        <fileSet>
+            <directory>${basedir}/src/main/assembly/config</directory>
+            <outputDirectory></outputDirectory>
+            <filtered>true</filtered>
+        </fileSet>
+    </fileSets>
     <files>
         <file>
-            <source>${project.build.directory}/openam-distribution-configurator-${project.version}.jar</source>
+            <source>${project.basedir}/../../license/license.txt</source>
             <outputDirectory></outputDirectory>
-        </file>
-        <file>
-            <source>${project.build.directory}/openam-distribution-upgrade-${project.version}.jar</source>
-            <outputDirectory></outputDirectory>
-        </file>
-        <file>
-            <source>${project.basedir}/../src/main/amserver/scripts/configurator/sampleconfiguration</source>
-            <outputDirectory></outputDirectory>
-            <destName>sampleconfiguration</destName>
-        </file>
-        <file>
-            <source>${project.basedir}/../src/main/amserver/scripts/configurator/sampleupgrade</source>
-            <outputDirectory></outputDirectory>
-            <destName>sampleupgrade</destName>
-        </file>
-        <file>
-            <source>${project.basedir}/../src/main/amserver/scripts/configurator/README.setup</source>
-            <outputDirectory></outputDirectory>
-            <destName>sampleupgrade</destName>
         </file>
     </files>
 </assembly>

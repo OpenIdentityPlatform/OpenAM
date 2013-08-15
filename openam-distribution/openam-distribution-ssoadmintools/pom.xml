@@ -70,52 +70,12 @@
                                 <filter token="DATESTAMP" value="${war.time.stamp}" />
                                 <filter token="VERSION" value="${version.set}" />
 
-                                <copy todir="${project.build.directory}/resources" overwrite="false" filtering="true">
-                                    <fileset
-                                            dir="${project.basedir}/../../openam-locale/src/main/resources/federation-locale">
-                                        <include name="*.properties" />
-                                    </fileset>
-                                    <globmapper from="*.properties" to="*_en.properties" />
-                                </copy>
-                                <copy todir="${project.build.directory}/resources" overwrite="false" filtering="true" flatten="yes">
-                                    <fileset dir="${project.basedir}/../../openam-locale/src/main/resources/locale">
-                                        <include name="*.properties" />
-                                    </fileset>
-                                    <globmapper from="*.properties" to="*_en.properties" />
-                                </copy>
-                                <copy todir="${project.build.directory}/resources" overwrite="false" filtering="true" flatten="yes">
-                                    <fileset
-                                            dir="${project.basedir}/../../openam-locale/src/main/resources/openfm-locale">
-                                        <include name="*.properties" />
-                                    </fileset>
-                                    <globmapper from="*.properties" to="*_en.properties" />
-                                </copy>
-
-                                <copy todir="${project.build.directory}/resources" overwrite="false" filtering="true" flatten="yes">
-                                    <fileset
-                                            dir="${project.basedir}/../../openam-locale/src/main/resources/federation-locale">
-                                        <include name="**/*.properties" />
-                                    </fileset>
-                                </copy>
-                                <copy todir="${project.build.directory}/resources" overwrite="false" filtering="true" flatten="yes">
-                                    <fileset dir="${project.basedir}/../../openam-locale/src/main/resources/locale">
-                                        <include name="**/*.properties" />
-                                    </fileset>
-                                </copy>
-                                <copy todir="${project.build.directory}/resources" overwrite="false" filtering="true" flatten="yes">
-                                    <fileset
-                                            dir="${project.basedir}/../../openam-locale/src/main/resources/openfm-locale">
-                                        <include name="**/*.properties" />
-                                    </fileset>
-                                </copy>
-
                                 <!-- Set our Version Information for the Package -->
                                 <copy todir="${project.build.directory}/resources" overwrite="true" filtering="true" flatten="yes">
                                     <fileset dir="${project.basedir}/../../openam-server-only/src/main/resources/config">
                                         <include name="serviceDefaultValues.properties" />
                                     </fileset>
                                 </copy>
-
                             </target>
                         </configuration>
                         <goals>
@@ -147,19 +107,10 @@
                     </execution>
                 </executions>
             </plugin>
-
         </plugins>
-
     </build>
 
-
     <dependencies>
-
-        <dependency>
-            <groupId>org.forgerock.openam</groupId>
-            <artifactId>openam-distribution-amadmsetup</artifactId>
-        </dependency>
-
         <dependency>
             <groupId>org.forgerock.openam</groupId>
             <artifactId>openam-entitlements</artifactId>
@@ -213,11 +164,6 @@
         <dependency>
             <groupId>org.forgerock.openam</groupId>
             <artifactId>openam-saml2-schema</artifactId>
-        </dependency>
-
-        <dependency>
-            <groupId>org.forgerock.openam</groupId>
-            <artifactId>openam-rest</artifactId>
         </dependency>
 
         <dependency>

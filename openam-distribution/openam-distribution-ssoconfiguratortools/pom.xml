@@ -42,255 +42,10 @@
     <!-- Build -->
     <build>
         <plugins>
-
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-dependency-plugin</artifactId>
-                <executions>
-                    <execution>
-                        <id>unpack_1</id>
-                        <phase>package</phase>
-                        <goals>
-                            <goal>unpack</goal>
-                        </goals>
-                        <configuration>
-                            <artifactItems>
-                                <artifactItem>
-                                    <groupId>org.forgerock.openam</groupId>
-                                    <artifactId>openam-core</artifactId>
-                                    <version>${project.version}</version>
-                                    <type>jar</type>
-                                    <overWrite>false</overWrite>
-                                    <outputDirectory>${project.build.directory}/unpacked_1</outputDirectory>
-                                    <includes>com/sun/identity/setup/OpenSSOConfigurator**</includes>
-                                </artifactItem>
-                            </artifactItems>
-
-                        </configuration>
-                    </execution>
-                    <execution>
-                        <id>unpack_2</id>
-                        <phase>package</phase>
-                        <goals>
-                            <goal>unpack</goal>
-                        </goals>
-                        <configuration>
-                            <artifactItems>
-                                <artifactItem>
-                                    <groupId>org.forgerock.openam</groupId>
-                                    <artifactId>openam-core</artifactId>
-                                    <version>${project.version}</version>
-                                    <type>jar</type>
-                                    <overWrite>false</overWrite>
-                                    <outputDirectory>${project.build.directory}/unpacked_2</outputDirectory>
-                                    <includes>org/forgerock/openam/setup/OpenAMUpgrade**</includes>
-                                </artifactItem>
-                            </artifactItems>
-
-                        </configuration>
-                    </execution>
-                </executions>
-            </plugin>
-
-            <!-- Pre-Packaging step for Zip Elements. -->
-            <plugin>
-                <artifactId>maven-antrun-plugin</artifactId>
-                <executions>
-                    <execution>
-                        <id>zip-pre-packaging</id>
-                        <phase>package</phase>
-                        <configuration>
-                            <target>
-                                <tstamp>
-                                    <format property="war.time.stamp" pattern="yyyy-MMMM-dd HH:mm" locale="en,UK" />
-                                </tstamp>
-                                <property name="version.set" value="${project.version}" />
-
-                                <filter token="DATESTAMP" value="${war.time.stamp}" />
-                                <filter token="VERSION" value="${version.set}" />
-
-                                <!-- OpenSSOConfiguration Properties -->
-                                <copy todir="${project.build.directory}/unpacked_1" filtering="true">
-                                    <fileset dir="${project.basedir}/../../openam-locale/src/main/resources/locale">
-                                        <include name="OpenSSOConfigurator.properties" />
-                                    </fileset>
-                                    <globmapper from="*.properties" to="*_en.properties" />
-                                </copy>
-
-                                <copy todir="${project.build.directory}/unpacked_1" filtering="true">
-                                    <fileset dir="${project.basedir}/../../openam-locale/src/main/resources/locale">
-                                        <include name="OpenSSOConfigurator.properties" />
-                                    </fileset>
-                                </copy>
-
-                                <copy todir="${project.build.directory}/unpacked_1" filtering="true">
-                                    <fileset dir="${project.basedir}/../../openam-locale/src/main/resources/locale/de_DE">
-                                        <include name="OpenSSOConfigurator_de.properties" />
-                                    </fileset>
-                                </copy>
-
-                                <copy todir="${project.build.directory}/unpacked_1" filtering="true">
-                                    <fileset dir="${project.basedir}/../../openam-locale/src/main/resources/locale/es_ES">
-                                        <include name="OpenSSOConfigurator_es.properties" />
-                                    </fileset>
-                                </copy>
-
-                                <copy todir="${project.build.directory}/unpacked_1" filtering="true">
-                                    <fileset dir="${project.basedir}/../../openam-locale/src/main/resources/locale/fr_FR">
-                                        <include name="OpenSSOConfigurator_fr.properties" />
-                                    </fileset>
-                                </copy>
-
-                                <copy todir="${project.build.directory}/unpacked_1" filtering="true">
-                                    <fileset dir="${project.basedir}/../../openam-locale/src/main/resources/locale/ja_JP">
-                                        <include name="OpenSSOConfigurator_ja.properties" />
-                                    </fileset>
-                                </copy>
-
-                                <copy todir="${project.build.directory}/unpacked_1" filtering="true">
-                                    <fileset dir="${project.basedir}/../../openam-locale/src/main/resources/locale/ko_KR">
-                                        <include name="OpenSSOConfigurator_ko.properties" />
-                                    </fileset>
-                                </copy>
-
-                                <copy todir="${project.build.directory}/unpacked_1" filtering="true">
-                                    <fileset dir="${project.basedir}/../../openam-locale/src/main/resources/locale/zh_CN">
-                                        <include name="OpenSSOConfigurator_zh.properties" />
-                                    </fileset>
-                                </copy>
-
-                                <copy todir="${project.build.directory}/unpacked_1" filtering="true">
-                                    <fileset dir="${project.basedir}/../../openam-locale/src/main/resources/locale/zh_TW">
-                                        <include name="OpenSSOConfigurator_zh_TW.properties" />
-                                    </fileset>
-                                </copy>
-
-
-                                <!-- OpenSSOConfiguration Properties-->
-                                <copy todir="${project.build.directory}/unpacked_2" filtering="true">
-                                    <fileset dir="${project.basedir}/../../openam-locale/src/main/resources/locale">
-                                        <include name="OpenAMUpgrade.properties" />
-                                    </fileset>
-                                    <globmapper from="*.properties" to="*_en.properties" />
-                                </copy>
-
-                                <copy todir="${project.build.directory}/unpacked_2" filtering="true">
-                                    <fileset dir="${project.basedir}/../../openam-locale/src/main/resources/locale">
-                                        <include name="OpenAMUpgrade.properties" />
-                                    </fileset>
-                                </copy>
-
-                                <copy todir="${project.build.directory}/unpacked_2" filtering="true">
-                                    <fileset dir="${project.basedir}/../../openam-locale/src/main/resources/locale/de_DE">
-                                        <include name="OpenAMUpgrade_de.properties" />
-                                    </fileset>
-                                </copy>
-
-                                <copy todir="${project.build.directory}/unpacked_2" filtering="true">
-                                    <fileset dir="${project.basedir}/../../openam-locale/src/main/resources/locale/es_ES">
-                                        <include name="OpenAMUpgrade_es.properties" />
-                                    </fileset>
-                                </copy>
-
-                                <copy todir="${project.build.directory}/unpacked_2" filtering="true">
-                                    <fileset dir="${project.basedir}/../../openam-locale/src/main/resources/locale/fr_FR">
-                                        <include name="OpenAMUpgrade_fr.properties" />
-                                    </fileset>
-                                </copy>
-
-                            </target>
-                        </configuration>
-                        <goals>
-                            <goal>run</goal>
-                        </goals>
-                    </execution>
-                </executions>
-            </plugin>
-
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-assembly-plugin</artifactId>
                 <executions>
-                    <execution>
-                        <id>openam-configurator</id>
-                        <phase>package</phase>
-                        <goals>
-                            <goal>single</goal>
-                        </goals>
-                        <configuration>
-                            <finalName>openam-distribution-configurator-${project.version}</finalName>
-                            <appendAssemblyId>false</appendAssemblyId>
-                            <tarLongFileMode>gnu</tarLongFileMode>
-                            <descriptors>
-                                <descriptor>src/main/assembly/openAMConfiguratorAssembly_Descriptor.xml</descriptor>
-                            </descriptors>
-                            <archive>
-                                <!-- MANIFEST -->
-                                <manifest>
-                                    <addClasspath>true</addClasspath>
-                                    <classpathPrefix>lib/</classpathPrefix>
-                                    <mainClass>com.sun.identity.setup.OpenSSOConfigurator</mainClass>
-                                </manifest>
-                                <manifestEntries>
-                                    <Specification-Title>OpenAM Configurator</Specification-Title>
-                                    <Specification-Version>${project.version} - ${maven.build.timestamp}</Specification-Version>
-                                    <Specification-Vendor>ForgeRock</Specification-Vendor>
-                                    <Implementation-Title>OpenAM Configurator</Implementation-Title>
-                                    <Implementation-Version>${project.version} - ${maven.build.timestamp}
-                                    </Implementation-Version>
-                                    <Implementation-Vendor>ForgeRock</Implementation-Vendor>
-                                    <Built-By>${user.name}</Built-By>
-                                    <Build-Jdk>${java.version}</Build-Jdk>
-                                    <Build-Time>${maven.build.timestamp}</Build-Time>
-                                    <Version>${project.version}</Version>
-                                    <Create-On>${maven.build.timestamp}</Create-On>
-                                    <SVN-Revision>R${svn-revision.revision}</SVN-Revision>
-                                    <!-- TODO Add License to Manifest -->
-                                    <License />
-                                </manifestEntries>
-                            </archive>
-                        </configuration>
-                    </execution>
-                    <execution>
-                        <id>openam-upgrade</id>
-                        <phase>package</phase>
-                        <goals>
-                            <goal>single</goal>
-                        </goals>
-                        <configuration>
-                            <finalName>openam-distribution-upgrade-${project.version}</finalName>
-                            <appendAssemblyId>false</appendAssemblyId>
-                            <tarLongFileMode>gnu</tarLongFileMode>
-                            <descriptors>
-                                <descriptor>src/main/assembly/openAMUpgradeAssembly_Descriptor.xml</descriptor>
-                            </descriptors>
-                            <archive>
-                                <!-- MANIFEST -->
-                                <manifest>
-                                    <addClasspath>true</addClasspath>
-                                    <classpathPrefix>lib/</classpathPrefix>
-                                    <mainClass>org.forgerock.openam.setup.OpenAMUpgrade</mainClass>
-                                </manifest>
-                                <manifestEntries>
-                                    <Specification-Title>OpenAM Upgrade</Specification-Title>
-                                    <Specification-Version>${project.version} - ${maven.build.timestamp}</Specification-Version>
-                                    <Specification-Vendor>ForgeRock</Specification-Vendor>
-                                    <Implementation-Title>OpenAM Upgrade</Implementation-Title>
-                                    <Implementation-Version>${project.version} - ${maven.build.timestamp}
-                                    </Implementation-Version>
-                                    <Implementation-Vendor>ForgeRock</Implementation-Vendor>
-                                    <Built-By>${user.name}</Built-By>
-                                    <Build-Jdk>${java.version}</Build-Jdk>
-                                    <Build-Time>${maven.build.timestamp}</Build-Time>
-                                    <Version>${project.version}</Version>
-                                    <Create-On>${maven.build.timestamp}</Create-On>
-                                    <SVN-Revision>R${svn-revision.revision}</SVN-Revision>
-                                    <!-- TODO Add License to Manifest -->
-                                    <License />
-                                </manifestEntries>
-                            </archive>
-                        </configuration>
-                    </execution>
                     <execution>
                         <id>openam-ssoconfiguratortools</id>
                         <phase>package</phase>
@@ -304,6 +59,7 @@
                             <descriptors>
                                 <descriptor>src/main/assembly/openAMToolsAssembly_Descriptor.xml</descriptor>
                             </descriptors>
+                            <escapeString>\</escapeString>
                         </configuration>
                     </execution>
                 </executions>
@@ -314,7 +70,11 @@
     <dependencies>
         <dependency>
             <groupId>org.forgerock.openam</groupId>
-            <artifactId>openam-core</artifactId>
+            <artifactId>openam-configurator-tool</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.forgerock.openam</groupId>
+            <artifactId>openam-upgrade-tool</artifactId>
         </dependency>
     </dependencies>
 </project>

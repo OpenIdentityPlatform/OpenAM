@@ -79,6 +79,7 @@ SET DEBUG_FLAGS="-Xdebug -Xrunjdwp:transport=dt_socket,address=8888,server=y,sus
 set ORIG_CLASSPATH=%CLASSPATH%
 
 set CLASSPATH="resources"
+set CLASSPATH="%CLASSPATH%;lib/forgerock-util-${commons.forgerock-util.version}.jar"
 set CLASSPATH="%CLASSPATH%;lib/openam-diagnostics-base-${project.version}.jar"
 set CLASSPATH="%CLASSPATH%;lib/openam-diagnostics-schema-${project.version}.jar"
 set CLASSPATH="%CLASSPATH%;lib/openam-core-${project.version}.jar"

@@ -26,7 +26,6 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
-
     <!-- Build Notes:
 
          To Build all of OpenAM use the following Maven Command:
@@ -103,12 +102,10 @@
         <!-- **************************************************************** -->
 
         <!-- Java Properties -->
-
         <java.source.version>1.5</java.source.version>
-        <!-- Backed off from 1.6 -->
-
         <java.target.version>1.5</java.target.version>
-        <!-- Backed off from 1.6 -->
+        <federation.java.source.version>1.6</federation.java.source.version>
+        <federation.java.target.version>1.6</federation.java.target.version>
 
         <!-- Surefire Argument Line -->
         <java.surefire.options>-Xms2g -Xmx2g -XX:MaxPermSize=512m</java.surefire.options>
@@ -187,8 +184,6 @@
 
         <module>openam-ldap-utils</module>
         <module>openam-datastore</module>
-        <!-- OpenAM Locale - Common Module -->
-        <module>openam-locale</module>
 
         <!-- OpenAM Shared - Common Module -->
         <module>openam-shared</module>
@@ -589,11 +584,6 @@
             </dependency>
             <dependency>
                 <groupId>org.forgerock.openam</groupId>
-                <artifactId>openam-locale</artifactId>
-                <version>${project.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.forgerock.openam</groupId>
                 <artifactId>openam-oauth</artifactId>
                 <version>${project.version}</version>
             </dependency>
@@ -772,7 +762,12 @@
             </dependency>
             <dependency>
                 <groupId>org.forgerock.openam</groupId>
-                <artifactId>openam-distribution-amadmsetup</artifactId>
+                <artifactId>openam-configurator-tool</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.forgerock.openam</groupId>
+                <artifactId>openam-upgrade-tool</artifactId>
                 <version>${project.version}</version>
             </dependency>
             <dependency>
@@ -1857,6 +1852,11 @@
                     <groupId>org.codehaus.cargo</groupId>
                     <artifactId>cargo-maven2-plugin</artifactId>
                     <version>1.4.3</version>
+                </plugin>
+                <plugin>
+                    <groupId>com.github.goldin</groupId>
+                    <artifactId>copy-maven-plugin</artifactId>
+                    <version>0.2.5</version>
                 </plugin>
             </plugins>
         </pluginManagement>
