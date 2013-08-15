@@ -262,6 +262,13 @@
      <literal>true</literal>.</para>
     </step>
     <step>
+     <para>Make sure that the property
+     <literal>com.sun.identity.authentication.uniqueCookieName</literal> is
+     set to the name of the cookie that will hold the URL to the OpenAM server
+     that authenticated the user.</para>
+     <para>The default name is <literal>sunIdentityServerAuthNServer</literal>.</para>
+    </step>
+    <step>
      <para>Add the property
      <literal>com.sun.identity.authentication.uniqueCookieDomain</literal>,
      setting the value to the fully-qualified domain name of the OpenAM
@@ -279,6 +286,10 @@
   </step>
   <step>
    <para>Save your work.</para>
+  </step>
+  <step>
+   <para>Restart OpenAM or the container in which it runs for the configuration
+   changes to take effect.</para>
   </step>
  </procedure>
 </chapter>
