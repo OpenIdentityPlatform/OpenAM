@@ -56,7 +56,13 @@ define("ThemeManager", [
             href: theme.path + theme.icon
          }).appendTo("head");
         
-        return $.getScript(constants.LESS_VERSION);
+        return $.ajax({
+            url: constants.LESS_VERSION,
+            cache:true,
+            error: function (request, status, error) {
+                console.log(request.responseText);
+            }
+          });
     };
     
     obj.loadThemeConfig = function(){
