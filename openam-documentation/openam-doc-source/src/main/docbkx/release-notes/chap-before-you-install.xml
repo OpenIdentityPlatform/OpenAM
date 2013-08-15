@@ -115,7 +115,7 @@
    </listitem>
    <listitem>
     <para>Microsoft Active Directory (tested by ForgeRock on Windows Server
-    2008 R2)</para>
+    2008 R2 and 2012)</para>
    </listitem>
    <listitem>
     <para>IBM Tivoli Directory Server 6.3</para>
