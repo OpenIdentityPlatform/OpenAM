@@ -39,7 +39,7 @@ define("org/forgerock/openam/ui/user/login/AuthNDelegate", [
     var obj = new AbstractDelegate(constants.host + "/"+ constants.context + "/json/auth/1/authenticate"),
         requirementList = [],
         cookieName = "",
-        cookieDomain = document.domain.split(".").splice(1).join("."),
+        cookieDomains = [],
         knownAuth = {}; // to be used to keep track of the attributes associated with whatever requirementList contains
     
     obj.begin = function () {
@@ -47,6 +47,7 @@ define("org/forgerock/openam/ui/user/login/AuthNDelegate", [
             args = {},
             promise = $.Deferred(),
             cookiePromise = $.Deferred(),
+            cookieDomainsPromise = $.Deferred(),
             i18nCookie = cookieHelper.getCookie('i18next');
         
         if (cookieName === "") {
@@ -59,6 +60,15 @@ define("org/forgerock/openam/ui/user/login/AuthNDelegate", [
                 });
         } else {
             cookiePromise.resolve();
+        }
+        
+        if (!cookieDomains.length) {
+            cookieDomainsPromise = obj.getCookieDomains()
+                .done(function (d) {
+                    cookieDomains = d.domains;
+                });
+        } else {
+            cookieDomainsPromise.resolve();
         }
         
         if (configuration.globalData.auth.realm !== "/") {
@@ -80,7 +90,7 @@ define("org/forgerock/openam/ui/user/login/AuthNDelegate", [
         
         //always tack on the locale to the url params of the following rest call
         if(i18nCookie){
-            if(!configuration.globalData.auth.urlParams.locale){
+            if(configuration.globalData.auth.urlParams && !configuration.globalData.auth.urlParams.locale){
                 if(args.realm || configuration.globalData.auth.additional){
                     url += "&locale=" + i18nCookie;
                 }
@@ -99,7 +109,7 @@ define("org/forgerock/openam/ui/user/login/AuthNDelegate", [
             })
         .done(function (requirements) {
                     // only resolve the auth promise when we know the cookie name
-                    cookiePromise.done(function () {
+                    $.when(cookiePromise,cookieDomainsPromise).then(function () {
                         var tokenCookie = cookieHelper.getCookie(cookieName);
                         if(configuration.loggedUser && tokenCookie){
                             requirements.tokenId = tokenCookie;
@@ -136,7 +146,9 @@ define("org/forgerock/openam/ui/user/login/AuthNDelegate", [
         if (requirements.hasOwnProperty("authId")) {
             requirementList.push(requirements);
         } else if (requirements.hasOwnProperty("tokenId")) {
-            cookieHelper.setCookie(cookieName, requirements.tokenId, "", "/", cookieDomain);
+            _.each(cookieDomains,function(cookieDomain){
+                cookieHelper.setCookie(cookieName, requirements.tokenId, "", "/", cookieDomain);
+            });
         }
     };
     
@@ -237,7 +249,9 @@ define("org/forgerock/openam/ui/user/login/AuthNDelegate", [
     
     obj.logout = function () {
         obj.resetProcess();
-        return obj.serviceCall({
+        return obj.getCookieDomains().then(function(d){
+            cookieDomains = d.domains;
+            return obj.serviceCall({
                     type: "POST",
                     data: "{}",
                     url: "",
@@ -246,8 +260,22 @@ define("org/forgerock/openam/ui/user/login/AuthNDelegate", [
                 })
                 .done(function () {
                     console.debug("Successfully logged out");
-                    cookieHelper.deleteCookie(cookieName, "/", cookieDomain);
+                    _.each(cookieDomains,function(cookieDomain){
+                        cookieHelper.deleteCookie(cookieName, "/", cookieDomain);
+                    });
                 });
+        });
+    };
+    
+    obj.getCookieDomains = function() {
+        return obj.serviceCall({
+            type: "GET",
+            serviceUrl: constants.host + "/"+ constants.context + "/json/serverinfo/cookieDomains",
+            url: "",
+            errorsHandlers: {
+                "unauthorized": { status: "401"}
+            }
+        });
     };
     
     return obj;
