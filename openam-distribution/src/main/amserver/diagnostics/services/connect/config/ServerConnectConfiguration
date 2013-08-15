@@ -24,8 +24,8 @@
  *
  * $Id: ServerConnectConfiguration,v 1.1 2008/11/22 02:41:20 ak138937 Exp $
  *
+ * Portions Copyrighted 2013 ForgeRock AS
  */
 
 get-svr-connect=com.sun.identity.diagnostic.plugin.services.connect.ServerConnectValidation
 get-ds-connect=com.sun.identity.diagnostic.plugin.services.connect.DSConnectValidation
-get-mq-connect=com.sun.identity.diagnostic.plugin.services.connect.MQConnectValidation

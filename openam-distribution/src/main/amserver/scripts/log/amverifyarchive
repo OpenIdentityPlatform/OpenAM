@@ -33,7 +33,6 @@ JAVA_HOME="\@JAVA_HOME@"
 
 TOOLS_CLASSPATH="@CONFIG_DIR@"
 TOOLS_CLASSPATH="$TOOLS_CLASSPATH:$TOOLS_HOME/lib/forgerock-util-${commons.forgerock-util.version}.jar"
-TOOLS_CLASSPATH="$TOOLS_CLASSPATH:$TOOLS_HOME/lib/openam-distribution-amadmsetup-${project.version}.jar"
 TOOLS_CLASSPATH="$TOOLS_CLASSPATH:$TOOLS_HOME/lib/opendj-server-${opendj.server.version}.jar"
 TOOLS_CLASSPATH="$TOOLS_CLASSPATH:$TOOLS_HOME/lib/mail-1.4.5.jar"
 TOOLS_CLASSPATH="$TOOLS_CLASSPATH:$TOOLS_HOME/lib/j2ee-2007-18-10.jar"

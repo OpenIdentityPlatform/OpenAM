@@ -12,15 +12,14 @@
   Header, with the fields enclosed by brackets [] replaced by your own identifying
   information: "Portions Copyrighted [year] [name of copyright owner]".
 
-  Copyright © 2011 ForgeRock AS. All rights reserved.
+  Copyright 2011-2013 ForgeRock AS. All rights reserved.
 -->
 <!--
   Portions Copyrighted 2013 Syntegrity.
-  Portions Copyrighted 2013 ForgeRock Inc.
 -->
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
-	<modelVersion>4.0.0</modelVersion>
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
 
     <parent>
         <groupId>org.forgerock.openam</groupId>
@@ -34,90 +33,81 @@
         A set of JS collectors to gather user device print.
     </description>
     <artifactId>openam-auth-deviceprint-scripts</artifactId>
-	<packaging>js</packaging>
-
-    <properties>
-        <mortbay.jetty.version>7.0.0.pre5</mortbay.jetty.version>
-    </properties>
+    <packaging>js</packaging>
 
     <dependencies>
-		<dependency>
-			<groupId>org.codehaus.mojo</groupId>
-			<artifactId>jquery-amd</artifactId>
-			<type>js</type>
-		</dependency>
-		<dependency>
-			<groupId>org.codehaus.jstestrunner</groupId>
-			<artifactId>jstestrunner-junit</artifactId>
-			<scope>test</scope>
-		</dependency>
         <dependency>
-            <groupId>rhino</groupId>
-            <artifactId>js</artifactId>
+            <groupId>org.codehaus.mojo</groupId>
+            <artifactId>jquery-amd</artifactId>
+            <type>js</type>
+        </dependency>
+        <dependency>
+            <groupId>org.codehaus.jstestrunner</groupId>
+            <artifactId>jstestrunner-junit</artifactId>
         </dependency>
     </dependencies>
 
-	<build>
-		<resources>
-			<resource>
-				<directory>${basedir}/src/main/js</directory>
-			</resource>
-			<resource>
-				<directory>${basedir}/src/main/resources</directory>
-			</resource>
-		</resources>
-		<testResources>
-			<testResource>
-				<directory>${basedir}/src/test/js</directory>
-			</testResource>
-			<testResource>
-				<directory>${basedir}/src/test/resources</directory>
-			</testResource>
-		</testResources>
-		<extensions>
-			<extension>
-				<groupId>org.codehaus.mojo</groupId>
-				<artifactId>javascript-maven-plugin</artifactId>
-				<version>2.0.0-alpha-1</version>
-			</extension>
-		</extensions>
+    <build>
+        <resources>
+            <resource>
+                <directory>${basedir}/src/main/js</directory>
+            </resource>
+            <resource>
+                <directory>${basedir}/src/main/resources</directory>
+            </resource>
+        </resources>
+        <testResources>
+            <testResource>
+                <directory>${basedir}/src/test/js</directory>
+            </testResource>
+            <testResource>
+                <directory>${basedir}/src/test/resources</directory>
+            </testResource>
+        </testResources>
+        <extensions>
+            <extension>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>javascript-maven-plugin</artifactId>
+                <version>2.0.0-alpha-1</version>
+            </extension>
+        </extensions>
 
-		<plugins>
-			<plugin>
-				<groupId>org.codehaus.mojo</groupId>
-				<artifactId>jslint-maven-plugin</artifactId>
-				<configuration>
-					<assumeConsoleAlertEtc>true</assumeConsoleAlertEtc>
-					<strictWhiteSpace>false</strictWhiteSpace>
-					<excludes>
-						<exclude>**/libs/*.js</exclude>
-						<exclude>**/*Test.js</exclude>
-					</excludes>
-				</configuration>
-			</plugin>
-			<plugin>
-				<groupId>org.codehaus.mojo</groupId>
-				<artifactId>webminifier-maven-plugin</artifactId>
-				<configuration>
-					<splitDependencies>false</splitDependencies>
-				</configuration>
-				<executions>
-					<execution>
-						<id>default-minify-js</id>
-						<phase>none</phase>
-						<goals>
-							<goal>minify-js</goal>
-						</goals>
-					</execution>
-				</executions>
-			</plugin>
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-surefire-plugin</artifactId>
-				<configuration>
-					<skipTests>true</skipTests>
-				</configuration>
-		    </plugin>
+        <plugins>
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>jslint-maven-plugin</artifactId>
+                <configuration>
+                    <assumeConsoleAlertEtc>true</assumeConsoleAlertEtc>
+                    <strictWhiteSpace>false</strictWhiteSpace>
+                    <excludes>
+                        <exclude>**/libs/*.js</exclude>
+                        <exclude>**/*Test.js</exclude>
+                    </excludes>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>webminifier-maven-plugin</artifactId>
+                <configuration>
+                    <splitDependencies>false</splitDependencies>
+                </configuration>
+                <executions>
+                    <execution>
+                        <id>default-minify-js</id>
+                        <phase>none</phase>
+                        <goals>
+                            <goal>minify-js</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-surefire-plugin</artifactId>
+                <configuration>
+                    <skipTests>true</skipTests>
+                </configuration>
+            </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-assembly-plugin</artifactId>
@@ -140,62 +130,26 @@
             <plugin>
                 <groupId>org.mortbay.jetty</groupId>
                 <artifactId>jetty-maven-plugin</artifactId>
-                <version>${mortbay.jetty.version}</version>
             </plugin>
             <plugin>
                 <groupId>org.codehaus.mojo</groupId>
                 <artifactId>js-import-maven-plugin</artifactId>
-                <version>1.0.1</version>
             </plugin>
-		</plugins>
-	</build>
-
-	<profiles>
-		<profile>
-			<id>Optimize UI</id>
-			<activation>
-				<property>
-					<name>!without.ui.optimization</name>
-				</property>
-			</activation>
-			<build>
-				<plugins>
-					<plugin>
-						<groupId>org.apache.maven.plugins</groupId>
-						<artifactId>maven-antrun-plugin</artifactId>
-						<version>1.7</version>
-						<executions>
-							<execution>
-								<id>js/css optimization</id>
-								<phase>prepare-package</phase>
-
-								<configuration>
-									<target name="optimize">
-										<echo message="Running optimize." />
-
-										<property name="requirejs.dir" value="${basedir}/src/main/requirejs" />
-
-										<java classname="org.mozilla.javascript.tools.shell.Main" failonerror="true">
-											<classpath>
-                                                <pathelement location="${user.home}/.m2/repository/rhino/js/1.7R2/js-1.7R2.jar"/>
-											</classpath>
-											<arg value="${requirejs.dir}/r.js" />
-											<arg value="-o" />
-											<arg value="${requirejs.dir}/app.build.js" />
-										</java>
-
-										<copy file="${basedir}/target/minified/js/main.js" tofile="${basedir}/target/min/classes/openam-authnmodule-adaptive-deviceprint-scripts-min.js" />
-                                        <move file="${basedir}/target/minified/js/requirejs/requirejs/1.0.8/requirejs-1.0.8-min.js" tofile="${basedir}/target/minified/js/requirejs/requirejs/1.0.8/require-jquery.js" />
-									</target>
-								</configuration>
-								<goals>
-									<goal>run</goal>
-								</goals>
-							</execution>
-						</executions>
-					</plugin>
-				</plugins>
-			</build>
-		</profile>
-	</profiles>
+            <plugin>
+                <groupId>com.github.mcheely</groupId>
+                <artifactId>requirejs-maven-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>optimize</goal>
+                        </goals>
+                    </execution>
+                </executions>
+                <configuration>
+                    <configFile>${basedir}/src/main/requirejs/app.build.js</configFile>
+                    <optimizerFile>${basedir}/src/main/requirejs/r.js</optimizerFile>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
 </project>

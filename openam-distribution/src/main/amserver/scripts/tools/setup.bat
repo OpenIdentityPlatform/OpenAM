@@ -92,7 +92,6 @@ IF "%5" == "--path" SET path_AMConfig=%~6
 
 : lib/amserver.jar;lib/amadm_setup.jar;lib/opensso-sharedlib.jar;lib/opendj-server.jar;resources
 set CLASSPATH="@CONFIG_DIR@"
-set CLASSPATH="%CLASSPATH%;lib/openam-distribution-amadmsetup-${project.version}.jar"
 set CLASSPATH="%CLASSPATH%;lib/forgerock-util-${commons.forgerock-util.version}.jar"
 set CLASSPATH="%CLASSPATH%;lib/opendj-server-${opendj.server.version}.jar"
 set CLASSPATH="%CLASSPATH%;lib/mail-1.4.5.jar"

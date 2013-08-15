@@ -27,7 +27,7 @@
  */
 
 /*
- * Portions Copyrighted 2011 ForgeRock AS
+ * Portions Copyrighted 2011-2013 ForgeRock AS
  */
 package com.sun.identity.tools.bundles;
 
@@ -46,8 +46,6 @@ import java.util.MissingResourceException;
 import java.util.Properties;
 import java.util.ResourceBundle;
 import java.util.zip.GZIPInputStream;
-import java.util.zip.ZipEntry;
-import java.util.zip.ZipFile;
 
 public class SetupUtils implements SetupConstants{
 
@@ -361,45 +359,6 @@ public class SetupUtils implements SetupConstants{
         return null;
     }
     
-    /**
-     * Unzip the zip archive from source file to destinated directory.
-     *
-     * @param srcFile The path to the source zip archive.
-     * @param destDir The destinated directory for the decompressed zip archive.
-     * @param overwrite The flat to indicate whether to overwrite the files.
-     */
-    
-    public static void unzip(String srcFile, String destDir, boolean overwrite)
-        throws
-        IOException {
-        File jmqDir = new File(destDir);
-        if (! jmqDir.exists() || overwrite) {
-            jmqDir.mkdirs();
-            ZipFile zf = new ZipFile(srcFile);
-            Enumeration e = zf.entries();
-            byte[] buffer = new byte[BUFFER_SIZE];
-            while (e.hasMoreElements()) {
-                ZipEntry ze = (ZipEntry) e.nextElement();
-                if (ze.isDirectory()) {
-                    new File(destDir, ze.getName()).mkdirs();
-                } else {
-                    
-                    File destFile = new File(destDir, ze.getName());
-                    File destParentFile=new File(destFile.getParent());
-                    destParentFile.mkdirs();
-                    FileOutputStream fout = new FileOutputStream(destFile);
-                    InputStream in = zf.getInputStream(ze);
-                    int byteRead = 0;
-                    while ((byteRead = in.read(buffer)) != -1) {
-                        fout.write(buffer, 0, byteRead);
-                    }
-                    in.close();
-                    fout.close();
-                }
-            }
-        }
-    }
-
     /**
      * Ungzip the gzip archive from source file to destinated directory.
      *

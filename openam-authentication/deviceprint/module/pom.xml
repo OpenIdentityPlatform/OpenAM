@@ -12,15 +12,14 @@
   Header, with the fields enclosed by brackets [] replaced by your own identifying
   information: "Portions Copyrighted [year] [name of copyright owner]".
 
-  Copyright © 2011 ForgeRock AS. All rights reserved.
+  Copyright 2011-2013 ForgeRock AS. All rights reserved.
 -->
 <!--
   Portions Copyrighted 2013 Syntegrity.
-  Portions Copyrighted 2013 ForgeRock Inc.
 -->
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
-	<modelVersion>4.0.0</modelVersion>
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+    <modelVersion>4.0.0</modelVersion>
 
     <parent>
         <groupId>org.forgerock.openam</groupId>
@@ -34,12 +33,12 @@
         Adaptive authentication module which leverages user device print profiles in order to test security levels.
     </description>
     <artifactId>openam-auth-deviceprint-module</artifactId>
-	<packaging>jar</packaging>
+    <packaging>jar</packaging>
 
-	<dependencies>
+    <dependencies>
         <dependency>
             <groupId>org.forgerock.openam</groupId>
             <artifactId>openam-auth-hotp</artifactId>
         </dependency>
-	</dependencies>
+    </dependencies>
 </project>

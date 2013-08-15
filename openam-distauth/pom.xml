@@ -180,7 +180,6 @@
                     <skip>true</skip>
                 </configuration>
             </plugin>
-
         </plugins>
     </build>
 
@@ -188,12 +187,10 @@
         <dependency>
             <groupId>org.forgerock.openam</groupId>
             <artifactId>openam-common-auth-ui</artifactId>
-            <version>${project.version}</version>
         </dependency>
         <dependency>
             <groupId>org.forgerock.openam</groupId>
             <artifactId>openam-clientsdk</artifactId>
-            <version>${project.version}</version>
         </dependency>
         <dependency>
             <groupId>javax.servlet</groupId>
@@ -206,7 +203,6 @@
         <dependency>
             <groupId>external</groupId>
             <artifactId>esapiport</artifactId>
-            <version>2009-26-07</version>
         </dependency>
     </dependencies>
 </project>

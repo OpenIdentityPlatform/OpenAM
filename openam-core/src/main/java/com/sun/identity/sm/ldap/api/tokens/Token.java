@@ -20,13 +20,13 @@ import com.sun.identity.sm.ldap.api.TokenType;
 import com.sun.identity.sm.ldap.api.fields.CoreTokenField;
 import com.sun.identity.sm.ldap.api.fields.CoreTokenFieldTypes;
 import com.sun.identity.sm.ldap.exceptions.OperationFailedException;
-import edu.emory.mathcs.backport.java.util.Collections;
 import org.forgerock.opendj.ldap.GeneralizedTime;
 
 import java.text.DateFormat;
 import java.text.MessageFormat;
 import java.util.Calendar;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.LinkedHashMap;

@@ -2,7 +2,7 @@
 <!--
 * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
 *
-* Copyright (c) 2012 ForgeRock Inc. All Rights Reserved
+* Copyright (c) 2012-2013 ForgeRock AS. All Rights Reserved
 *
 * The contents of this file are subject to the terms
 * of the Common Development and Distribution License
@@ -43,15 +43,13 @@
                 <include>com.sun.xml.bind:jaxb-impl</include>
                 <include>com.sun.msv.datatype.xsd:xsdlib</include>
                 <include>external:webservices-rt</include>
-                <include>external:OpenDJ</include>
+                <include>org.forgerock.opendj:opendj-server</include>
             </includes>
         </dependencySet>
         <dependencySet>
             <outputDirectory>services/lib</outputDirectory>
             <includes>
                 <include>org.forgerock.openam:openam-diagnostics-plugins</include>
-                <include>com.sun.messaging.mq:jms</include>
-                <include>com.sun.messaging.mq:imq</include>
             </includes>
         </dependencySet>
     </dependencySets>

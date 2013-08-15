@@ -28,7 +28,7 @@
 
 -->
 <!--
-   Portions Copyrighted 2012 ForgeRock Inc
+   Portions Copyrighted 2012-2013 ForgeRock AS
 -->
 <!--
     Document   : connect_service.xml
@@ -52,7 +52,6 @@
         <category id="category_connect" operation="all" name="all" />
         <category id="category_connect" operation="get-svr-connect" name="server_and_site" />
         <category id="category_connect" operation="get-ds-connect" name="directory" />
-        <category id="category_connect" operation="get-mq-connect" name="message_queue" />
     </realization>    
     
     <!-- 
@@ -64,8 +63,6 @@
         <load-on-startup>true</load-on-startup>
         <libraries>
             <library>../lib/openam-diagnostics-plugins-${project.version}.jar</library>
-            <library>../lib/imq-4.4.2.jar</library>
-            <library>../lib/jms-4.4.2.jar</library>
         </libraries>
         <resource-bundles>
             <resource></resource>

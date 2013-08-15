@@ -27,13 +27,11 @@ package org.forgerock.restlet.ext.oauth2.flow;
 
 import com.sun.identity.idm.AMIdentity;
 import com.sun.identity.shared.OAuth2Constants;
-import edu.emory.mathcs.backport.java.util.Arrays;
+import java.util.Arrays;
 import org.forgerock.openam.oauth2.exceptions.OAuthProblemException;
 import org.forgerock.openam.oauth2.model.CoreToken;
 import org.forgerock.openam.oauth2.provider.OAuth2ProviderSettings;
 import org.forgerock.openam.oauth2.provider.ResponseType;
-import org.forgerock.openam.oauth2.provider.impl.OpenAMIdentityVerifier;
-import org.forgerock.openam.oauth2.provider.impl.OpenAMServerAuthorizer;
 import org.forgerock.openam.oauth2.utils.OAuth2Utils;
 import org.restlet.data.Form;
 import org.restlet.data.Parameter;

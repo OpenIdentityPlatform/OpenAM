@@ -25,7 +25,6 @@
 package org.forgerock.restlet.ext.openam.server;
 
 import com.sun.identity.shared.OAuth2Constants;
-import edu.emory.mathcs.backport.java.util.Arrays;
 import org.forgerock.openam.oauth2.exceptions.OAuthProblemException;
 import org.forgerock.restlet.ext.openam.OpenAMParameters;
 import org.forgerock.openam.oauth2.provider.impl.OpenAMUser;
@@ -50,6 +49,7 @@ import com.sun.identity.idm.IdUtils;
 import javax.servlet.http.HttpServletRequest;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
 

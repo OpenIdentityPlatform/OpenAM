@@ -16,10 +16,10 @@
 package org.forgerock.openam.forgerockrest.session.query;
 
 import com.iplanet.dpro.session.share.SessionInfo;
-import edu.emory.mathcs.backport.java.util.Arrays;
 import org.mockito.ArgumentCaptor;
 import org.testng.annotations.Test;
 
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;

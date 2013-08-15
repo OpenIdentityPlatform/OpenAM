@@ -1,31 +1,30 @@
 <?xml version="1.0" encoding="UTF-8"?>
+<!--
+* DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
+*
+* Copyright (c) 2011-2013 ForgeRock Inc. All Rights Reserved
+*
+* The contents of this file are subject to the terms
+* of the Common Development and Distribution License
+* (the License). You may not use this file except in
+* compliance with the License.
+*
+* You can obtain a copy of the License at
+* http://forgerock.org/license/CDDLv1.0.html
+* See the License for the specific language governing
+* permission and limitations under the License.
+*
+* When distributing Covered Code, include this CDDL
+* Header Notice in each file and include the License file
+* at http://forgerock.org/license/CDDLv1.0.html
+* If applicable, add the following below the CDDL Header,
+* with the fields enclosed by brackets [] replaced by
+* your own identifying information:
+* "Portions Copyrighted [year] [name of copyright owner]"
+*
+-->
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
     <modelVersion>4.0.0</modelVersion>
-
-    <!--
-    * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
-    *
-    * Copyright (c) 2011-2013 ForgeRock Inc. All Rights Reserved
-    *
-    * The contents of this file are subject to the terms
-    * of the Common Development and Distribution License
-    * (the License). You may not use this file except in
-    * compliance with the License.
-    *
-    * You can obtain a copy of the License at
-    * http://forgerock.org/license/CDDLv1.0.html
-    * See the License for the specific language governing
-    * permission and limitations under the License.
-    *
-    * When distributing Covered Code, include this CDDL
-    * Header Notice in each file and include the License file
-    * at http://forgerock.org/license/CDDLv1.0.html
-    * If applicable, add the following below the CDDL Header,
-    * with the fields enclosed by brackets [] replaced by
-    * your own identifying information:
-    * "Portions Copyrighted [year] [name of copyright owner]"
-    *
-    -->
 
     <!-- Parent Project -->
     <parent>
@@ -44,21 +43,6 @@
     <!-- Build -->
     <build>
         <plugins>
-
-            <!-- Surefire Tests -->
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-surefire-plugin</artifactId>
-                <configuration>
-                    <systemPropertyVariables>
-                        <templateLoaderPath>${notification.template.path}</templateLoaderPath>
-                    </systemPropertyVariables>
-                    <excludes>
-                        <exclude>**/IT_*</exclude>
-                    </excludes>
-                </configuration>
-            </plugin>
-
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-jar-plugin</artifactId>
@@ -117,32 +101,20 @@
                     </dependency>
                 </dependencies>
             </plugin>
-
         </plugins>
-
         <resources>
             <resource>
-                <filtering>false</filtering>
                 <directory>src/main/resources</directory>
                 <includes>
                     <include>**/*</include>
                 </includes>
-                <excludes>
-                    <exclude>version_information.txt</exclude>
-                </excludes>
+                <filtering>false</filtering>
             </resource>
-            <resource>
-                <filtering>true</filtering>
-                <directory>src/main/resources</directory>
-                <includes>
-                    <include>version_information.txt</include>
-                </includes>
-            </resource>
+
             <resource>
                 <directory>${project.build.directory}/generated-resources</directory>
             </resource>
         </resources>
-
     </build>
 
 
@@ -190,8 +162,8 @@
 
         <!-- LDAP APIs -->
         <dependency>
-                <groupId>org.forgerock.opendj</groupId>
-                <artifactId>opendj-server</artifactId>
+            <groupId>org.forgerock.opendj</groupId>
+            <artifactId>opendj-server</artifactId>
         </dependency>
         <dependency>
             <groupId>org.forgerock.opendj</groupId>
@@ -209,73 +181,7 @@
             <artifactId>cc</artifactId>
         </dependency>
 
-        <dependency>
-            <groupId>com.sun.web.ui</groupId>
-            <artifactId>cc_de</artifactId>
-        </dependency>
-
-        <dependency>
-            <groupId>com.sun.web.ui</groupId>
-            <artifactId>cc_es</artifactId>
-        </dependency>
-
-        <dependency>
-            <groupId>com.sun.web.ui</groupId>
-            <artifactId>cc_fr</artifactId>
-        </dependency>
-
-        <dependency>
-            <groupId>com.sun.web.ui</groupId>
-            <artifactId>cc_it</artifactId>
-        </dependency>
-
-        <dependency>
-            <groupId>com.sun.web.ui</groupId>
-            <artifactId>cc_ja</artifactId>
-        </dependency>
-
-        <dependency>
-            <groupId>com.sun.web.ui</groupId>
-            <artifactId>cc_ko</artifactId>
-        </dependency>
-
-        <dependency>
-            <groupId>com.sun.web.ui</groupId>
-            <artifactId>cc_sv</artifactId>
-        </dependency>
-
-        <dependency>
-            <groupId>com.sun.web.ui</groupId>
-            <artifactId>cc_zh</artifactId>
-        </dependency>
-
-        <dependency>
-            <groupId>com.sun.web.ui</groupId>
-            <artifactId>cc_zh_CN</artifactId>
-        </dependency>
-
-        <dependency>
-            <groupId>com.sun.web.ui</groupId>
-            <artifactId>cc_zh_HK</artifactId>
-        </dependency>
-
-        <dependency>
-            <groupId>com.sun.web.ui</groupId>
-            <artifactId>cc_zh_TW</artifactId>
-        </dependency>
-
-
         <!-- Use all Legacy extlib Dependencies for now and scale down as necessary. -->
-        <dependency>
-            <groupId>asm</groupId>
-            <artifactId>asm</artifactId>
-        </dependency>
-
-        <dependency>
-            <groupId>backport-util-concurrent</groupId>
-            <artifactId>backport-util-concurrent</artifactId>
-        </dependency>
-
         <dependency>
             <groupId>org.apache.click</groupId>
             <artifactId>click-extras</artifactId>
@@ -284,11 +190,6 @@
         <dependency>
             <groupId>org.apache.click</groupId>
             <artifactId>click-nodeps</artifactId>
-        </dependency>
-
-        <dependency>
-            <groupId>commons-beanutils</groupId>
-            <artifactId>commons-beanutils</artifactId>
         </dependency>
 
         <dependency>
@@ -302,23 +203,8 @@
         </dependency>
 
         <dependency>
-            <groupId>commons-digester</groupId>
-            <artifactId>commons-digester</artifactId>
-        </dependency>
-
-        <dependency>
             <groupId>commons-fileupload</groupId>
             <artifactId>commons-fileupload</artifactId>
-        </dependency>
-
-        <dependency>
-            <groupId>commons-io</groupId>
-            <artifactId>commons-io</artifactId>
-        </dependency>
-
-        <dependency>
-            <groupId>commons-lang</groupId>
-            <artifactId>commons-lang</artifactId>
         </dependency>
 
         <dependency>
@@ -337,36 +223,6 @@
         </dependency>
 
         <dependency>
-            <groupId>com.sun.messaging.mq</groupId>
-            <artifactId>imq</artifactId>
-        </dependency>
-
-        <dependency>
-            <groupId>org.glassfish.mq</groupId>
-            <artifactId>imq</artifactId>
-        </dependency>
-
-        <dependency>
-            <groupId>javax.xml.bind</groupId>
-            <artifactId>jaxb-api</artifactId>
-        </dependency>
-
-        <dependency>
-            <groupId>com.sun.xml.bind</groupId>
-            <artifactId>jaxb-impl</artifactId>
-        </dependency>
-
-        <dependency>
-            <groupId>com.sun.xml.bind</groupId>
-            <artifactId>jaxb-libs</artifactId>
-        </dependency>
-
-        <dependency>
-            <groupId>com.sun.xml.bind</groupId>
-            <artifactId>jaxb-xjc</artifactId>
-        </dependency>
-
-        <dependency>
             <groupId>javax.xml</groupId>
             <artifactId>jaxrpc-api</artifactId>
         </dependency>
@@ -382,11 +238,6 @@
         </dependency>
 
         <dependency>
-            <groupId>org.jdom</groupId>
-            <artifactId>jdom</artifactId>
-        </dependency>
-
-        <dependency>
             <groupId>com.sleepycat</groupId>
             <artifactId>je</artifactId>
         </dependency>
@@ -397,23 +248,8 @@
         </dependency>
 
         <dependency>
-            <groupId>com.sun.messaging.mq</groupId>
-            <artifactId>jms</artifactId>
-        </dependency>
-
-        <dependency>
             <groupId>org.json</groupId>
             <artifactId>json</artifactId>
-        </dependency>
-
-        <dependency>
-            <groupId>javax.xml.stream</groupId>
-            <artifactId>stax-api</artifactId>
-        </dependency>
-
-        <dependency>
-            <groupId>javax.ws.rs</groupId>
-            <artifactId>jsr311-api</artifactId>
         </dependency>
 
         <dependency>
@@ -442,61 +278,6 @@
         </dependency>
 
         <dependency>
-            <groupId>com.sun.jersey.contribs.jersey-oauth</groupId>
-            <artifactId>oauth-client</artifactId>
-        </dependency>
-
-        <dependency>
-            <groupId>com.sun.jersey.contribs.jersey-oauth</groupId>
-            <artifactId>oauth-server</artifactId>
-        </dependency>
-
-        <dependency>
-            <groupId>com.sun.jersey.contribs.jersey-oauth</groupId>
-            <artifactId>oauth-signature</artifactId>
-        </dependency>
-
-        <dependency>
-            <groupId>relaxngDatatype</groupId>
-            <artifactId>relaxngDatatype</artifactId>
-        </dependency>
-
-        <dependency>
-            <groupId>javax.xml.soap</groupId>
-            <artifactId>saaj-api</artifactId>
-        </dependency>
-
-        <dependency>
-            <groupId>com.sun.xml.messaging.saaj</groupId>
-            <artifactId>saaj-impl</artifactId>
-        </dependency>
-
-        <dependency>
-            <groupId>org.testng</groupId>
-            <artifactId>testng</artifactId>
-        </dependency>
-
-        <dependency>
-            <groupId>org.mockito</groupId>
-            <artifactId>mockito-all</artifactId>
-        </dependency>
-
-        <dependency>
-            <groupId>javax.xml.ws</groupId>
-            <artifactId>jaxws-api</artifactId>
-        </dependency>
-
-        <dependency>
-            <groupId>com.sun.xml.ws</groupId>
-            <artifactId>jaxws-rt</artifactId>
-        </dependency>
-
-        <dependency>
-            <groupId>com.sun.tools.ws</groupId>
-            <artifactId>webservices-tools</artifactId>
-        </dependency>
-
-        <dependency>
             <groupId>xalan</groupId>
             <artifactId>xalan</artifactId>
         </dependency>
@@ -511,50 +292,14 @@
             <artifactId>xml-serializer</artifactId>
         </dependency>
 
-        <dependency>
-            <groupId>xml-security</groupId>
-            <artifactId>xmlsec</artifactId>
-        </dependency>
-
-        <dependency>
-            <groupId>com.sun.msv.datatype.xsd</groupId>
-            <artifactId>xsdlib</artifactId>
-        </dependency>
-
         <!-- Legacy External Libraries for OpenAM -->
-        <!-- We need to eventually ween off of these -->
-        <dependency>
-            <!-- This version is different from what is out in central. Very Bad! -->
-            <groupId>external</groupId>
-            <artifactId>ant-contrib</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>external</groupId>
-            <artifactId>authapi</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>external</groupId>
-            <artifactId>FastInfoset</artifactId>
-        </dependency>
         <dependency>
             <groupId>external</groupId>
             <artifactId>jdmkrt</artifactId>
         </dependency>
         <dependency>
             <groupId>external</groupId>
-            <artifactId>jsr173_api</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>external</groupId>
-            <artifactId>jss4</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>external</groupId>
             <artifactId>publicsuffix</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>external</groupId>
-            <artifactId>swec</artifactId>
         </dependency>
         <dependency>
             <groupId>external</groupId>
@@ -573,48 +318,42 @@
             <artifactId>webservices-api</artifactId>
         </dependency>
         <dependency>
-            <groupId>org.forgerock.commons</groupId>
-            <artifactId>json-fluent</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.codehaus.jackson</groupId>
-            <artifactId>jackson-mapper-asl</artifactId>
-        </dependency>
-        <dependency>
             <groupId>com.google.inject</groupId>
             <artifactId>guice</artifactId>
         </dependency>
 
         <dependency>
+            <groupId>org.testng</groupId>
+            <artifactId>testng</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.mockito</groupId>
+            <artifactId>mockito-all</artifactId>
+        </dependency>
+        <dependency>
             <groupId>org.powermock</groupId>
             <artifactId>powermock-api-mockito</artifactId>
-            <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>org.powermock</groupId>
             <artifactId>powermock-core</artifactId>
-            <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>org.powermock</groupId>
             <artifactId>powermock-reflect</artifactId>
-            <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>org.powermock</groupId>
             <artifactId>powermock-module-testng</artifactId>
-            <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>org.powermock</groupId>
             <artifactId>powermock-module-testng-common</artifactId>
-            <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>org.easytesting</groupId>
             <artifactId>fest-assert</artifactId>
         </dependency>
     </dependencies>
-
 </project>
 

@@ -24,7 +24,7 @@
  *
  * $Id: JMQSAML2Repository.java,v 1.3 2008/08/01 22:15:00 hengming Exp $
  *
- * "Portions Copyrighted [2012] [ForgeRock Inc]".
+ * Portions Copyrighted 2012-2013 ForgeRock AS
  *
  */
 
@@ -49,11 +49,6 @@ public class SAML2RepositoryFactory {
     private static final String CTS_SAML2_REPOSITORY_CLASS_NAME =
             SystemConfigurationUtil.getProperty(
                     REPOSITORY_CLASS_PROPERTY, DEFAULT_REPOSITORY_CLASS);
-
-    // TODO -- Pull in 10.1.0.
-    @Deprecated
-    private static final String DEPRECATED_JMQ_REPOSITORY_CLASS =
-            "com.sun.identity.saml2.plugins.DefaultJMQSAML2Repository";
 
     /**
      * Cached Instance Reference to our SAML2 Token Repository

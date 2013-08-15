@@ -16,7 +16,7 @@
 
 package org.forgerock.openam.jaspi.filter;
 
-import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang.StringUtils;
 
 /**
  * A class that matches the query parameter contained by the QueryParameterMatcher against a given request query

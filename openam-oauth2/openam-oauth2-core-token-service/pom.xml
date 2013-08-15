@@ -3,7 +3,7 @@
 <!--
  DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
 
- Copyright © 2012 ForgeRock AS. All rights reserved.
+ Copyright © 2012-2013 ForgeRock AS. All rights reserved.
 
  The contents of this file are subject to the terms
  of the Common Development and Distribution License
@@ -34,10 +34,6 @@
 
     <artifactId>openam-oauth2-core-token-service</artifactId>
     <name>OpenAM OAuth2 Core Token Service</name>
-    <properties>
-        <maven.compiler.target>1.6</maven.compiler.target>
-        <maven.compiler.source>1.6</maven.compiler.source>
-    </properties>
 
 
     <dependencies>
@@ -76,59 +72,14 @@
         <dependency>
             <groupId>org.easytesting</groupId>
             <artifactId>fest-assert</artifactId>
-            <version>1.4</version>
-            <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>org.testng</groupId>
             <artifactId>testng</artifactId>
-            <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>org.mockito</groupId>
             <artifactId>mockito-all</artifactId>
-            <version>1.9.0</version>
-            <scope>test</scope>
         </dependency>
     </dependencies>
-
-    <build>
-        <pluginManagement>
-            <plugins>
-                <plugin>
-                    <groupId>org.apache.maven.plugins</groupId>
-                    <artifactId>maven-javadoc-plugin</artifactId>
-                    <configuration>
-                        <links>
-                            <link>http://docs.oracle.com/javase/6/docs/api</link>
-                            <link>http://openam.forgerock.org/doc/public-api</link>
-                        </links>
-                    </configuration>
-                </plugin>
-            </plugins>
-        </pluginManagement>
-        <!--plugins>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-checkstyle-plugin</artifactId>
-            </plugin>
-        </plugins>
-        <!- -plugins>
-            <plugin>
-                <groupId>org.apache.felix</groupId>
-                <artifactId>maven-bundle-plugin</artifactId>
-                <extensions>true</extensions>
-                <configuration>
-                    <instructions>
-                        <Export-Package>
-                            org.forgerock.openam.ext.cts*;version="${project.version}"
-                        </Export-Package>
-                    </instructions>
-                </configuration>
-            </plugin>
-        </plugins-->
-    </build>
-    <profiles>
-    </profiles>
-
 </project>

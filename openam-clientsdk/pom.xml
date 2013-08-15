@@ -130,7 +130,6 @@
                                 <include>com/iplanet/dpro/session/service/SessionService*</include>
                                 <include>com/iplanet/dpro/session/share/**</include>
                                 <include>com/iplanet/dpro/session/*</include>
-                                <!-- TODO is JMQSessionRepository required here? -->
                                 <include>com/iplanet/services/**</include>
                                 <include>com/iplanet/sso/**</include>
                                 <include>com/iplanet/ums/Guid*</include>

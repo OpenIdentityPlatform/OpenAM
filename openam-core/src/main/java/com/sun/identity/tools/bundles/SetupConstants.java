@@ -25,7 +25,9 @@
  * $Id: SetupConstants.java,v 1.5 2009/10/30 21:10:10 weisun2 Exp $
  *
  */
-
+/**
+ * Portions Copyrighted 2013 ForgeRock AS
+ */
 package com.sun.identity.tools.bundles;
 
 public interface SetupConstants {
@@ -38,8 +40,6 @@ public interface SetupConstants {
     String AIX = "aix"; 
     String DEFAULT_PROPERTIES_FILE = "com.sun.identity.tools.bundles." +
         "amadmtoolssetup";
-    String DEFAULT_SESSION_PROPERTIES_FILE = "com.sun.identity.tools.bundles." +
-        "amsessiontoolssetup";
     String SETUP_PROPERTIES_FILE = "file.setup";
     String AMCONFIG_PATH = "path.AMConfig";
     String FILE_SEPARATOR = System.getProperty("file.separator");
@@ -75,14 +75,6 @@ public interface SetupConstants {
     String PRINT_HELP = "help.print";
     String CONFIG_LOAD = "load.config";
     String ALL = "all";
-    String JMQ_DIR = "dir.jmq";
-    String DEFAULT_JMQ_DIR = "jmq";
-    String BDB_DIR = "dir.bdb";
-    String DEFAULT_BDB_DIR = "bdb";
-    String EXT_DIR = "dir.ext";
-    String DEFAULT_EXT_DIR = "ext";
-    String JMQ = ".jmq";
-    String BDB = ".bdb";
     int BUFFER_SIZE = 8192;
     String GZIP_EXT = ".gz";
     String PATH_DEST = "path.dest";

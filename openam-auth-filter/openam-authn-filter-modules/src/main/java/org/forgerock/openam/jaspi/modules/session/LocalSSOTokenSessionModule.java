@@ -18,7 +18,7 @@ package org.forgerock.openam.jaspi.modules.session;
 
 import com.iplanet.sso.SSOException;
 import com.iplanet.sso.SSOToken;
-import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang.StringUtils;
 import org.forgerock.openam.auth.shared.AuthnRequestUtils;
 import org.forgerock.openam.auth.shared.SSOTokenFactory;
 import org.forgerock.openam.guice.InjectorHolder;

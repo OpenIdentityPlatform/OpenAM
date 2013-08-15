@@ -47,18 +47,12 @@
                 <artifactId>maven-war-plugin</artifactId>
                 <configuration>
                     <packagingExcludes>
-                        WEB-INF/lib/ant-contrib-1.0b3.jar,
                         WEB-INF/lib/jersey-core-1.1.5.2.jar,
                         WEB-INF/lib/jaxb-api-1.0.6.jar,
                         WEB-INF/lib/jaxb-impl-1.0.6.jar,
                         WEB-INF/lib/jaxb-libs-1.0.6.jar,
                         WEB-INF/lib/jaxb-xjc-1.0.6.jar,
                         WEB-INF/lib/jdom-2.0.1.jar,
-                        WEB-INF/lib/jaxp-api-1.4.2.jar,
-                        WEB-INF/lib/jaxws-api-2.2.8.jar,
-                        WEB-INF/lib/jaxws-rt-2.2.7-promoted-b73.jar,
-                        WEB-INF/lib/stax-api-1.0-2.jar,
-                        WEB-INF/lib/webservices-api-2.1-b16.jar
                     </packagingExcludes>
                     <archive>
                         <manifestEntries>
@@ -181,12 +175,10 @@
         <dependency>
             <groupId>org.forgerock.openam</groupId>
             <artifactId>openam-core</artifactId>
-            <version>${project.version}</version>
         </dependency>
         <dependency>
             <groupId>org.forgerock.openam</groupId>
             <artifactId>OpenFM</artifactId>
-            <version>${project.version}</version>
         </dependency>
     </dependencies>
 </project>

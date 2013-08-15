@@ -12,11 +12,10 @@
   Header, with the fields enclosed by brackets [] replaced by your own identifying
   information: "Portions Copyrighted [year] [name of copyright owner]".
 
-  Copyright © 2011 ForgeRock AS. All rights reserved.
+  Copyright 2011-2013 ForgeRock AS. All rights reserved.
 -->
 <!--
   Portions Copyrighted 2013 Syntegrity.
-  Portions Copyrighted 2013 ForgeRock Inc.
 -->
 <assembly xmlns="http://maven.apache.org/plugins/maven-assembly-plugin/assembly/1.1.2" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
  xsi:schemaLocation="http://maven.apache.org/plugins/maven-assembly-plugin/assembly/1.1.2 http://maven.apache.org/xsd/assembly-1.1.2.xsd">
@@ -27,22 +26,30 @@
     </formats>
     <fileSets>
         <fileSet>
-            <directory>${basedir}/target/min/classes</directory>
+            <directory>${project.build.directory}/min/classes</directory>
             <outputDirectory>/js</outputDirectory>
         </fileSet>
         <fileSet>
-            <directory>${basedir}/target/minified/js/requirejs/requirejs/1.0.8</directory>
-            <outputDirectory>/js/</outputDirectory>
-        </fileSet>
-        <fileSet>
-            <directory>${basedir}/target/minified/js/swfobject</directory>
+            <directory>${project.build.directory}/minified/js/swfobject</directory>
             <outputDirectory>/js/swfobject</outputDirectory>
         </fileSet>
         <fileSet>
-            <directory>${basedir}/target/minified/js/json2</directory>
+            <directory>${project.build.directory}/minified/js/json2</directory>
             <outputDirectory>/js/json2</outputDirectory>
         </fileSet>
     </fileSets>
+    <files>
+        <file>
+            <source>${project.build.directory}/minified/js/main.js</source>
+            <outputDirectory>js</outputDirectory>
+            <destName>openam-authnmodule-adaptive-deviceprint-scripts-min.js</destName>
+        </file>
+        <file>
+            <source>${project.build.directory}/minified/js/requirejs/requirejs/1.0.8/requirejs-1.0.8-min.js</source>
+            <outputDirectory>js</outputDirectory>
+            <destName>require-jquery.js</destName>
+        </file>
+    </files>
     <dependencySets>
         <dependencySet>
             <includes>

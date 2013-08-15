@@ -26,7 +26,7 @@ import com.sun.identity.sm.ServiceNotFoundException;
 import com.sun.identity.sm.ldap.CTSPersistentStore;
 import com.sun.identity.sm.ldap.api.TokenType;
 import com.sun.identity.sm.ldap.exceptions.CoreTokenException;
-import org.apache.commons.lang3.RandomStringUtils;
+import org.apache.commons.lang.RandomStringUtils;
 
 import com.iplanet.am.util.SystemProperties;
 import com.iplanet.services.util.Hash;

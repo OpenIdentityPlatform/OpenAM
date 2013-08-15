@@ -2,7 +2,7 @@
 <!--
 * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
 *
-* Copyright (c) 2011-2012 ForgeRock Inc. All Rights Reserved
+* Copyright (c) 2011-2013 ForgeRock Inc. All Rights Reserved
 *
 * The contents of this file are subject to the terms
 * of the Common Development and Distribution License
@@ -45,7 +45,6 @@
             <plugin>
                 <groupId>org.codehaus.cargo</groupId>
                 <artifactId>cargo-maven2-plugin</artifactId>
-                <version>1.2.4</version>
                 <extensions>true</extensions>
                 <configuration>
                     <descriptor>src/assemble/merge.xml</descriptor>
@@ -71,13 +70,11 @@
         <dependency>
             <groupId>org.forgerock.openam</groupId>
             <artifactId>openam-server-only</artifactId>
-            <version>${project.version}</version>
             <type>war</type>
         </dependency>
         <dependency>
             <groupId>org.forgerock.openam</groupId>
             <artifactId>openam-console</artifactId>
-            <version>${project.version}</version>
             <type>war</type>
         </dependency>
     </dependencies>

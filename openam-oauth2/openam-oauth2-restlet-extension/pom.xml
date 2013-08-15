@@ -37,17 +37,10 @@
 
     <name>OpenAM OAuth2 Restlet Extensions</name>
     <properties>
-        <maven.compiler.target>1.6</maven.compiler.target>
-        <maven.compiler.source>1.6</maven.compiler.source>
         <skipTests>true</skipTests>
     </properties>
 
     <dependencies>
-        <!--    mvn versions:display-plugin-updates
-                mvn versions:display-dependency-updates
-                mvn versions:use-latest-versions
-        -->
-
         <dependency>
             <groupId>org.forgerock.openam</groupId>
             <artifactId>openam-core</artifactId>
@@ -81,7 +74,6 @@
         <dependency>
             <groupId>org.restlet.osgi</groupId>
             <artifactId>org.restlet.ext.freemarker</artifactId>
-            <version>${restlet.version}</version>
             <exclusions>
                 <exclusion>
                     <groupId>org.freemarker</groupId>
@@ -93,34 +85,25 @@
         <dependency>
             <groupId>org.freemarker</groupId>
             <artifactId>freemarker</artifactId>
-            <version>2.3.19</version>
-            <scope>provided</scope>
         </dependency>
 
         <dependency>
             <groupId>javax.servlet</groupId>
             <artifactId>servlet-api</artifactId>
-            <version>2.5</version>
-            <scope>provided</scope>
         </dependency>
 
         <!-- Test Dependencies -->
         <dependency>
             <groupId>org.easytesting</groupId>
             <artifactId>fest-assert</artifactId>
-            <version>1.4</version>
-            <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>org.testng</groupId>
             <artifactId>testng</artifactId>
-            <version>6.3.1</version>
-            <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>org.mockito</groupId>
             <artifactId>mockito-all</artifactId>
-            <scope>test</scope>
         </dependency>
 
         <!-- Powermock -->
@@ -147,27 +130,11 @@
         <dependency>
             <groupId>javassist</groupId>
             <artifactId>javassist</artifactId>
-            <version>3.12.1.GA</version>
+            <scope>test</scope>
         </dependency>
 
     </dependencies>
     <build>
-        <pluginManagement>
-            <plugins>
-                <plugin>
-                    <groupId>org.apache.maven.plugins</groupId>
-                    <artifactId>maven-javadoc-plugin</artifactId>
-                    <configuration>
-                        <links>
-                            <link>http://docs.oracle.com/javase/6/docs/api</link>
-                            <link>http://www.restlet.org/documentation/2.1/jse/api</link>
-                            <link>http://www.restlet.org/documentation/2.1/jse/ext</link>
-                            <link>http://www.restlet.org/documentation/2.1/jse/engine</link>
-                        </links>
-                    </configuration>
-                </plugin>
-            </plugins>
-        </pluginManagement>
         <plugins>
             <plugin>
                 <groupId>org.apache.felix</groupId>
@@ -193,6 +160,4 @@
             </plugin>
         </plugins>
     </build>
-    <profiles>
-    </profiles>
 </project>

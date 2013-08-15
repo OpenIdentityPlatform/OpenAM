@@ -333,9 +333,6 @@
             <outputDirectory>console</outputDirectory>
             <destName>index.html</destName>
         </file>
-
     </files>
-
-
 </assembly>
 

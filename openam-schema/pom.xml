@@ -52,13 +52,5 @@
         <module>openam-diagnostics-schema</module>
         <module>openam-dtd-schema</module>
     </modules>
-
-    <dependencies>
-        <dependency>
-            <groupId>org.forgerock.openam</groupId>
-            <artifactId>openam-shared</artifactId>
-        </dependency>
-    </dependencies>
-
 </project>
 

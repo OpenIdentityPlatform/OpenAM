@@ -45,7 +45,6 @@ import java.util.Set;
 import java.util.StringTokenizer;
 import java.util.Vector;
 
-import javax.mail.internet.MimeUtility;
 import javax.security.auth.Subject;
 import javax.security.auth.callback.Callback;
 import javax.security.auth.callback.CallbackHandler;
@@ -82,6 +81,7 @@ import com.sun.identity.security.cert.AMCRLStore;
 import com.sun.identity.security.cert.AMCertStore;
 import com.sun.identity.security.cert.AMLDAPCertStoreParameters;
 import com.sun.identity.security.cert.AMCertPath;
+import com.sun.identity.shared.encode.Base64;
 import java.util.Arrays;
 
 public class Cert extends AMLoginModule {
@@ -887,18 +887,12 @@ public class Cert extends AMLoginModule {
            throw new AuthLoginException(amAuthCert, "noCert", null);
        }
 
-       byte certbytes [] = certParam.getBytes();
-       debug.message("in Certificate: got certbytes"); 
-
-       // use the base64 decoder from MimeUtility instead of writing our own
-       ByteArrayInputStream barray = new ByteArrayInputStream(certbytes);
-       InputStream carray = null;
-       try {
-           carray = MimeUtility.decode(barray, "base64");
-       } catch (Exception e) {
-           debug.error("CertificateFromParameter(decode): exception", e);
+       byte[] decoded = Base64.decode(certParam);
+       if (decoded == null) {
+           debug.error("CertificateFromParameter(decode): failed, possibly invalid Base64 input");
            throw new AuthLoginException(amAuthCert, "CERTex", null);
        }
+       InputStream carray = new ByteArrayInputStream(decoded);
 
        debug.message("Certificate: CertificateFactory.getInstance.");
        CertificateFactory cf = null;

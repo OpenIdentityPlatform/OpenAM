@@ -27,7 +27,6 @@ package org.forgerock.openam.oauth2.provider.impl;
 import com.iplanet.sso.SSOException;
 import com.iplanet.sso.SSOTokenManager;
 import com.sun.identity.shared.OAuth2Constants;
-import edu.emory.mathcs.backport.java.util.Arrays;
 import org.forgerock.openam.oauth2.exceptions.OAuthProblemException;
 import org.forgerock.openam.oauth2.provider.AbstractIdentityVerifier;
 import org.forgerock.openam.oauth2.utils.OAuth2Utils;
@@ -47,6 +46,7 @@ import org.restlet.routing.Redirector;
 import javax.servlet.http.HttpServletRequest;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
 

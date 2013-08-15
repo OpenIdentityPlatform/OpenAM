@@ -17,7 +17,7 @@
 package org.forgerock.openam.guice;
 
 import com.google.inject.Module;
-import org.apache.commons.lang3.reflect.ConstructorUtils;
+import org.apache.commons.lang.reflect.ConstructorUtils;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;

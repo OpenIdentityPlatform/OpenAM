@@ -38,36 +38,6 @@
     <packaging>jar</packaging>
 
     <name>OpenAM OAuth2 Common</name>
-    <properties>
-        <maven.compiler.target>1.6</maven.compiler.target>
-        <maven.compiler.source>1.6</maven.compiler.source>
-    </properties>
-
-    <build>
-        <pluginManagement>
-            <plugins>
-                <plugin>
-                    <groupId>org.apache.maven.plugins</groupId>
-                    <artifactId>maven-javadoc-plugin</artifactId>
-                    <configuration>
-                        <links>
-                            <link>http://docs.oracle.com/javase/6/docs/api</link>
-                            <link>http://openam.forgerock.org/doc/public-api</link>
-                            <link>http://www.restlet.org/documentation/2.1/jse/api</link>
-                            <link>http://www.restlet.org/documentation/2.1/jse/ext</link>
-                            <link>http://www.restlet.org/documentation/2.1/jse/engine</link>
-                        </links>
-                    </configuration>
-                </plugin>
-            </plugins>
-        </pluginManagement>
-        <plugins>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-checkstyle-plugin</artifactId>
-            </plugin>
-        </plugins>
-    </build>
 
     <dependencies>
         <!-- Restlet -->
@@ -82,7 +52,6 @@
         <dependency>
             <groupId>org.restlet.osgi</groupId>
             <artifactId>org.restlet.ext.freemarker</artifactId>
-            <version>${restlet.version}</version>
             <exclusions>
                 <exclusion>
                     <groupId>org.freemarker</groupId>
@@ -103,8 +72,6 @@
         <dependency>
             <groupId>org.freemarker</groupId>
             <artifactId>freemarker</artifactId>
-            <version>2.3.19</version>
-            <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>org.forgerock.openam</groupId>
@@ -128,9 +95,5 @@
             <groupId>org.mockito</groupId>
             <artifactId>mockito-all</artifactId>
         </dependency>
-
-	
     </dependencies>
-    <profiles>
-    </profiles>
 </project>
