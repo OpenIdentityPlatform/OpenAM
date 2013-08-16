@@ -20,7 +20,7 @@
   !
   ! CCPL HEADER END
   !
-  !      Copyright 2011-2012 ForgeRock AS
+  !      Copyright 2011-2013 ForgeRock AS
   !    
 -->
 <chapter xml:id='chap-pwd-reset'
@@ -137,11 +137,11 @@
        the directory where OpenAM is deployed.</para>
        <para>For localized versions of this file, copy
        <filename>WEB-INF/classes/amPasswordReset.properties</filename> to
-       <filename>WEB-INF/classes/amPasswordReset.properties_<replaceable>locale</replaceable></filename>,
+       <filename>WEB-INF/classes/amPasswordReset_<replaceable>locale</replaceable>.properties</filename>,
        and localize only the values of the questions. For example if the
        default properties file contains:</para>
        <literallayout class="monospaced">favourite-restaurant=What is your favorite restaurant?</literallayout>
-       <para>Then <filename>WEB-INF/classes/amPasswordReset.properties_fr</filename>
+       <para>Then <filename>WEB-INF/classes/amPasswordReset_fr.properties</filename>
        ought to contain:</para>
        <literallayout class="monospaced">favourite-restaurant=Quel est votre restaurant préféré ?</literallayout>
        <para>If you change these files, you must restart OpenAM.</para>
@@ -279,7 +279,7 @@
       </listitem>
      </varlistentry>
      <varlistentry>
-      <term></term>
+      <term>Password Reset Lockout Attribute Value</term>
       <listitem>
        <para>If set to <literal>inactive</literal>, then a user who is locked
        out cannot attempt to reset her password if the Password Reset
