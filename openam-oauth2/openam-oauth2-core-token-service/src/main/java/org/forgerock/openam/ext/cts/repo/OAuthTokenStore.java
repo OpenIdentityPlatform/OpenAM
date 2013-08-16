@@ -123,7 +123,7 @@ public class OAuthTokenStore {
      * @return The JsonValue expected by the caller.
      */
     private JsonValue convertResults(Collection<Token> tokens) {
-        Set<Map<String, Set<String>>> results = new HashSet<Map<String, Set<String>>>();
+        Set<Map<String, Object>> results = new HashSet<Map<String, Object>>();
 
         for (Token token : tokens) {
             results.add(convertToken(token));
@@ -138,16 +138,10 @@ public class OAuthTokenStore {
      * @param token The token to convert.
      * @return A Token in String to Set of Strings representation.
      */
-    private Map<String, Set<String>> convertToken(Token token) {
-        Map<String, Set<String>> results = new HashMap<String, Set<String>>();
-
-        for (CoreTokenField field : token.getAttributeNames()) {
-            Set<String> values = new HashSet<String>();
-            Object value = token.getValue(field);
-            values.add(value.toString());
-            results.put(field.toString(), values);
+    private Map<String, Object> convertToken(Token token) {
+        if (token == null){
+            return null;
         }
-
-        return results;
+        return tokenAdapter.fromToken(token).asMap();
     }
 }

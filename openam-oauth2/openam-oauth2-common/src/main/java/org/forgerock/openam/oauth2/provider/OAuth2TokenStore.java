@@ -1,7 +1,7 @@
 /*
  * DO NOT REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright (c) 2012-2013 ForgeRock Inc. All rights reserved.
+ * Copyright (c) 2012-2013 ForgeRock AS All rights reserved.
  *
  * The contents of this file are subject to the terms
  * of the Common Development and Distribution License
@@ -181,8 +181,9 @@ public interface OAuth2TokenStore {
      * @param clientID the audience of the token
      * @param authorizationParty the client allowed to use the token as an access token
      * @param nonce The nonce passed in from the request
+     * @param ops The ssotoken id used to create the JWT
      * @return
      */
-    public CoreToken createJWT(String realm, String uuid, String clientID, String authorizationParty, String nonce);
+    public CoreToken createJWT(String realm, String uuid, String clientID, String authorizationParty, String nonce, String ops);
 
 }

@@ -123,10 +123,11 @@
         <opendj.sdk.version>2.6.0</opendj.sdk.version>
 
         <commons.forgerock-util.version>1.1.0</commons.forgerock-util.version>
-        <forgerock.json.version>2.0.0</forgerock.json.version>
+        <commons.json-resource.version>1.2.2</commons.json-resource.version>
+        <commons.json-patch.version>1.0.0</commons.json-patch.version>
+        <forgerock.json.version>2.0.1-SNAPSHOT</forgerock.json.version>
         <commons.authfilter.version>1.2.0-SNAPSHOT</commons.authfilter.version>
         <forgerock-ui.version>1.0.1-SNAPSHOT</forgerock-ui.version>
-
         <restlet.version>2.1.1</restlet.version>
         <xercesj.version>2.11.0</xercesj.version>
         <powermock.version>1.5</powermock.version>
@@ -1353,6 +1354,16 @@
                 <groupId>org.forgerock.commons</groupId>
                 <artifactId>json-web-token</artifactId>
                 <version>${forgerock.json.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.forgerock.commons</groupId>
+                <artifactId>org.forgerock.json.resource</artifactId>
+                <version>${commons.json-resource.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.forgerock.commons</groupId>
+                <artifactId>json-patch</artifactId>
+                <version>${commons.json-patch.version}</version>
             </dependency>
             <dependency>
                 <groupId>org.forgerock.commons</groupId>

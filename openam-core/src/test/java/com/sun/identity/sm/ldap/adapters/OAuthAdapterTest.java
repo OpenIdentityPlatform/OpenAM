@@ -146,9 +146,9 @@ public class OAuthAdapterTest {
         // Populate a map for serialisation.
         Map<String, Object> values = new HashMap<String, Object>();
         values.put(field.getOAuthField(), list);
-        Map<String, Object> map = new HashMap<String, Object>();
-        map.put(OAuthAdapter.VALUE, values);
-        String serialisedObject = serialisation.serialise(map);
+        //Map<String, Object> map = new HashMap<String, Object>();
+        //map.put(OAuthAdapter.VALUE, values);
+        String serialisedObject = serialisation.serialise(values);
 
         Token token = new Token(id[0], TokenType.OAUTH);
         // Set the serialised binary data
@@ -203,8 +203,6 @@ public class OAuthAdapterTest {
      * @return A non null JsonValue.
      */
     private JsonValue makeDefaultJsonValue(Map<String, Object> values) {
-        Map<String, Object> map = new HashMap<String, Object>();
-        map.put(OAuthAdapter.VALUE, values);
-        return new JsonValue(map);
+        return new JsonValue(values);
     }
 }

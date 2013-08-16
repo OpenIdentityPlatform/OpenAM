@@ -3,7 +3,7 @@
 <!--
   ~ DO NOT REMOVE COPYRIGHT NOTICES OR THIS HEADER.
   ~
-  ~ Copyright (c) 2012-2013 ForgeRock Inc. All rights reserved.
+  ~ Copyright (c) 2012-2013 ForgeRock AS All rights reserved.
   ~
   ~ The contents of this file are subject to the terms
   ~ of the Common Development and Distribution License
@@ -56,7 +56,24 @@
             <groupId>org.forgerock.openam</groupId>
             <artifactId>openam-oauth2-common</artifactId>
         </dependency>
-
+        <!-- Commons -->
+        <dependency>
+            <groupId>org.forgerock.commons</groupId>
+            <artifactId>org.forgerock.json.resource</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.forgerock.commons</groupId>
+            <artifactId>json-patch</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.forgerock.commons</groupId>
+            <artifactId>json-web-token</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.forgerock.commons</groupId>
+            <artifactId>json-fluent</artifactId>
+        </dependency>
+        
         <!-- OpenAM -->
         <dependency>
             <groupId>org.forgerock.openam</groupId>

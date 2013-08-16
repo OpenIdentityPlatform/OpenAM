@@ -86,13 +86,18 @@ public class OAuthAdapter implements TokenAdapter<JsonValue> {
      */
     public Token toToken(JsonValue request) {
         assertObjectIsAMap(request);
-
-        String id = tokenIdFactory.getOAuthTokenId(request.get(TokenIdFactory.ID).asString());
+        Set<String> idSet = (Set<String>) request.get(TokenIdFactory.ID).getObject();
+        String id = null;
+        if (idSet != null && !idSet.isEmpty()){
+            id = tokenIdFactory.getOAuthTokenId(idSet.iterator().next());
+        } else {
+            id = tokenIdFactory.getOAuthTokenId(null);
+        }
         request.get(TokenIdFactory.ID).setObject(id);
         Token token = new Token(id, TokenType.OAUTH);
 
         // For each OAuth attribute, assign it to the token.
-        Map<String,Object> values = request.get(VALUE).asMap();
+        Map<String,Object> values = request.asMap();
         if (values != null) {
             for (OAuthTokenField field : OAuthTokenField.values()) {
                 String key = field.getOAuthField();
@@ -150,7 +155,6 @@ public class OAuthAdapter implements TokenAdapter<JsonValue> {
         JsonValue r;
         try {
             r = new JsonValue(serialisation.deserialise(data, Map.class));
-            r = new JsonValue(r.get("value").asMap());
             Set<String> keys = r.keys();
             for (String key : keys){
                 List<String> x = r.get(key).asList(String.class);

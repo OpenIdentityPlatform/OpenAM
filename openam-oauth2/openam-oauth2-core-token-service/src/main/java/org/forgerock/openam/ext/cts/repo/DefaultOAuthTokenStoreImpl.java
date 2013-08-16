@@ -1,7 +1,7 @@
 /*
  * DO NOT REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright (c) 2012-2013 ForgeRock Inc. All rights reserved.
+ * Copyright (c) 2012-2013 ForgeRock AS. All rights reserved.
  *
  * The contents of this file are subject to the terms
  * of the Common Development and Distribution License
@@ -58,6 +58,7 @@ public class DefaultOAuthTokenStoreImpl implements OAuth2TokenStore {
     private long AUTHZ_CODE_LIFETIME = 1;
     private long REFRESH_TOKEN_LIFETIME = 1;
     private long ACCESS_TOKEN_LIFETIME = 1;
+    private long JWT_TOKEN_LIFETIME = 1;
 
     private final OAuthTokenStore oAuthTokenStore;
 
@@ -78,6 +79,7 @@ public class DefaultOAuthTokenStoreImpl implements OAuth2TokenStore {
         AUTHZ_CODE_LIFETIME = settings.getAuthorizationCodeLifetime();
         REFRESH_TOKEN_LIFETIME = settings.getRefreshTokenLifetime();
         ACCESS_TOKEN_LIFETIME = settings.getAccessTokenLifetime();
+        JWT_TOKEN_LIFETIME = settings.getJWTTokenLifetime();
     }
 
     /**
@@ -368,10 +370,10 @@ public class DefaultOAuthTokenStoreImpl implements OAuth2TokenStore {
     /**
      * @{@inheritDoc}
      */
-    public CoreToken createJWT(String realm, String uuid, String clientID, String authorizationParty, String nonce){
+    public CoreToken createJWT(String realm, String uuid, String clientID, String authorizationParty, String nonce, String ops){
         long timeInSeconds = System.currentTimeMillis()/1000;
         getSettings();
         return new JWTToken(OAuth2Utils.getDeploymentURL(Request.getCurrent()), uuid, clientID,
-                authorizationParty, timeInSeconds + ACCESS_TOKEN_LIFETIME, timeInSeconds, timeInSeconds, realm, nonce);
+                authorizationParty, timeInSeconds + JWT_TOKEN_LIFETIME, timeInSeconds, timeInSeconds, realm, nonce, ops);
     }
 }
