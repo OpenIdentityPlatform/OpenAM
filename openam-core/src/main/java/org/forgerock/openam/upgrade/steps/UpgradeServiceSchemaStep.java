@@ -55,7 +55,6 @@ import static org.forgerock.openam.upgrade.UpgradeServices.LF;
 import static org.forgerock.openam.upgrade.UpgradeServices.tagSwapReport;
 import org.forgerock.openam.upgrade.UpgradeStepInfo;
 import org.forgerock.openam.upgrade.UpgradeUtils;
-import org.forgerock.openam.upgrade.helpers.AuthenticationModuleServiceResourceResolutionHelper;
 import static org.forgerock.openam.utils.CollectionUtils.*;
 import org.forgerock.openam.utils.IOUtils;
 import org.w3c.dom.Document;
@@ -125,8 +124,7 @@ public class UpgradeServiceSchemaStep extends AbstractUpgradeStep {
             String strXML = null;
 
             try {
-                strXML = AuthenticationModuleServiceResourceResolutionHelper.getResourceContent(this.getClass(),
-                        serviceFileName);
+                strXML = IOUtils.readStream(getClass().getClassLoader().getResourceAsStream(serviceFileName));
             } catch (IOException ioe) {
                 DEBUG.error("unable to load services file: " + serviceFileName, ioe);
                 throw new UpgradeException(ioe);
@@ -135,12 +133,7 @@ public class UpgradeServiceSchemaStep extends AbstractUpgradeStep {
             // This string 'content' is to avoid plain text password
             // in the files copied to the config/xml directory.
 //            String content = strXML;
-            if ((strXML == null) || (strXML.length() <= 0)) {
-                String errorMessage = "Unable to load services file: " + serviceFileName;
-                DEBUG.error(errorMessage);
-                throw new UpgradeException(errorMessage);
-            }
-
+//
 //            if (tagswap) {
 //                content = StringUtils.strReplaceAll(content,
 //                        "@UM_DS_DIRMGRPASSWD@", "********");

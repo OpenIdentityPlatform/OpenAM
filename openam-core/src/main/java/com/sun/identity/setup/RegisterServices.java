@@ -27,65 +27,45 @@
  */
 
 /*
- * Portions Copyrighted [2011] [ForgeRock AS]
+ * Portions Copyrighted 2011-2013 ForgeRock AS
  */
 package com.sun.identity.setup;
 
 import com.iplanet.sso.SSOException;
 import com.iplanet.sso.SSOToken;
 import com.sun.identity.shared.StringUtils;
-import com.sun.identity.shared.debug.Debug;
 import com.sun.identity.shared.xml.XMLUtils;
 import com.sun.identity.sm.SMSException;
 import com.sun.identity.sm.ServiceManager;
-import org.forgerock.openam.upgrade.helpers.AuthenticationModuleServiceResourceResolutionHelper;
-
-import java.io.BufferedReader;
 import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.ResourceBundle;
 import java.util.StringTokenizer;
+import org.forgerock.openam.utils.IOUtils;
 
 /**
  * Registers service during setup time.
  */
 public class RegisterServices {
-    protected static Debug debug = Debug.getInstance("Configuration");
-
+    
     private static final List serviceNames = new ArrayList();
     private static final String umEmbeddedDS;
         
     static {
-        debug.error("Accessing Resource Bundle Named: "+SetupConstants.PROPERTY_FILENAME);
         ResourceBundle rb = ResourceBundle.getBundle(
             SetupConstants.PROPERTY_FILENAME);
-        if (rb == null)
-        {
-             debug.error("Unable to Access Resource Bundle Named: "+SetupConstants.PROPERTY_FILENAME);
-             umEmbeddedDS = null;
-        } else {
-             debug.message("Acquired Resource Bundle: ");
-             String names = rb.getString(SetupConstants.SERVICE_NAMES);
-             StringTokenizer st = new StringTokenizer(names);
-             while (st.hasMoreTokens()) {
-                    String element = st.nextToken();
-                    serviceNames.add(element);
-                    debug.message("Bundle Service Name Saved: "+element);
-             }
-            umEmbeddedDS = rb.getString("umEmbeddedDS");
-            if ( (umEmbeddedDS == null) || (umEmbeddedDS.length()<=0) )
-            {
-                debug.error("Unable to find the umEmbeddedDS Value within the Acquired Resource Bundle: "
-                     +SetupConstants.PROPERTY_FILENAME);
-            }
+        String names = rb.getString(SetupConstants.SERVICE_NAMES);
+        StringTokenizer st = new StringTokenizer(names);
+        while (st.hasMoreTokens()) {
+            serviceNames.add(st.nextToken());
         }
+        umEmbeddedDS = rb.getString("umEmbeddedDS");
     }
 
     /**
@@ -115,11 +95,10 @@ public class RegisterServices {
 
             Object[] params = {serviceFileName};
             SetupProgress.reportStart("emb.registerservice", params);
-            String strXML =
-                AuthenticationModuleServiceResourceResolutionHelper.getResourceContent(this.getClass(), serviceFileName);
+            String strXML = IOUtils.readStream(getClass().getClassLoader().getResourceAsStream(serviceFileName));
             // This string 'content' is to avoid plain text password
             // in the files copied to the config/xml directory.
-            String content = (strXML == null)?"":strXML;
+            String content = strXML;
             if (tagswap) {
                 content = StringUtils.strReplaceAll(content,
                     "@UM_DS_DIRMGRPASSWD@", "********");
@@ -127,7 +106,7 @@ public class RegisterServices {
                     ServicesDefaultValues.tagSwap(content, true);
             }
             if (tagswap) {
-                strXML = ServicesDefaultValues.tagSwap(((strXML == null)?"":strXML), true);
+                strXML = ServicesDefaultValues.tagSwap(strXML, true);
             }
 
             // Write to file without visible password values.
@@ -136,14 +115,8 @@ public class RegisterServices {
 
             // Write to directory server with original password 
             // values.
-            if (strXML == null)
-            {
-                // TODO Make a Specific Exception...
-                throw new RuntimeException("Unable to find Service File Name: "+serviceFileName);
-            } else {
-                registerService(strXML, adminToken);
-                SetupProgress.reportEnd("emb.success", null);
-            }
+            registerService(strXML, adminToken);
+            SetupProgress.reportEnd("emb.success", null);
         }
         
         if (!bUseExtUMDS) {
@@ -154,8 +127,7 @@ public class RegisterServices {
     private void addSubConfigForEmbeddedDS(SSOToken adminSSOToken)
         throws SSOException, SMSException, IOException {
         Map data = ServicesDefaultValues.getDefaultValues();
-        String xml =
-              AuthenticationModuleServiceResourceResolutionHelper.getResourceContent(this.getClass(), umEmbeddedDS);
+        String xml = IOUtils.readStream(getClass().getClassLoader().getResourceAsStream(umEmbeddedDS));
 
         xml = StringUtils.strReplaceAll(xml, "@UM_CONFIG_ROOT_SUFFIX@",
             XMLUtils.escapeSpecialCharacters(
@@ -192,8 +164,7 @@ public class RegisterServices {
             }
         }
     }
-
-
+    
     private String manipulateServiceXML(String serviceFileName, String strXML){
         if (serviceFileName.equals("idRepoService.xml")) {
             strXML = StringUtils.strReplaceAll(strXML, IDREPO_SUB_CONFIG_MARKER,
