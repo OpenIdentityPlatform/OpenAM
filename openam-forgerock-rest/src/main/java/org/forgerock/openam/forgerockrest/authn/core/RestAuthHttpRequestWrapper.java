@@ -11,7 +11,7 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2013 ForgeRock Inc.
+ * Copyright 2013 ForgeRock AS
  */
 
 package org.forgerock.openam.forgerockrest.authn.core;
@@ -34,7 +34,7 @@ import java.util.Map;
  */
 public class RestAuthHttpRequestWrapper extends HttpServletRequestWrapper {
 
-    private Map<String, String> parameterMap = new HashMap<String, String>();
+    private Map<String, String[]> parameterMap = new HashMap<String, String[]>();
 
     /**
      * Constructs a RestAuthHttpRequestWrapper.
@@ -57,7 +57,10 @@ public class RestAuthHttpRequestWrapper extends HttpServletRequestWrapper {
 
         String value = super.getParameter(name);
         if (value == null) {
-            value = parameterMap.get(name);
+            String[] values = parameterMap.get(name);
+            if (values != null && values.length > 0) {
+                value = values[0];
+            }
         }
 
         return value;
@@ -70,10 +73,9 @@ public class RestAuthHttpRequestWrapper extends HttpServletRequestWrapper {
      *
      * @return {@inheritDoc}
      */
-    @SuppressWarnings("unchecked")
     @Override
-    public Map<String, String> getParameterMap() {
-        Map<String, String> combined = new HashMap<String, String>(super.getParameterMap());
+    public Map<String, String[]> getParameterMap() {
+        Map<String, String[]> combined = new HashMap<String, String[]>(super.getParameterMap());
         combined.putAll(parameterMap);
         return combined;
     }
@@ -100,7 +102,7 @@ public class RestAuthHttpRequestWrapper extends HttpServletRequestWrapper {
      */
     @Override
     public String[] getParameterValues(String name) {
-        return getParameterMap().values().toArray(new String[0]);
+        return getParameterMap().get(name);
     }
 
     /**
@@ -110,6 +112,6 @@ public class RestAuthHttpRequestWrapper extends HttpServletRequestWrapper {
      * @param value The parameter value.
      */
     void addParameter(String key, String value) {
-        parameterMap.put(key, value);
+        parameterMap.put(key, new String[]{value});
     }
 }
