@@ -11,11 +11,12 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2013 ForgeRock Inc.
+ * Copyright 2013 ForgeRock AS.
  */
 package org.forgerock.openam.ldap;
 
 import com.sun.identity.shared.debug.Debug;
+import java.security.GeneralSecurityException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -36,6 +37,7 @@ import org.forgerock.opendj.ldap.FailoverLoadBalancingAlgorithm;
 import org.forgerock.opendj.ldap.Filter;
 import org.forgerock.opendj.ldap.LDAPConnectionFactory;
 import org.forgerock.opendj.ldap.LDAPOptions;
+import org.forgerock.opendj.ldap.SSLContextBuilder;
 import org.forgerock.opendj.ldap.SearchScope;
 import org.forgerock.opendj.ldap.requests.Requests;
 
@@ -204,7 +206,17 @@ public class LDAPUtils {
             int heartBeatInterval,
             String heartBeatTimeUnit,
             LDAPOptions ldapOptions) {
-        ConnectionFactory cf = new LDAPConnectionFactory(ldapurl.getUrl(), ldapurl.getPort(), ldapOptions);
+        Boolean ssl = ldapurl.isSSL();
+        if (ssl != null && ssl.booleanValue()) {
+            try {
+                //Creating a defensive copy of ldapOptions to handle the case when a mixture of SSL/non-SSL connections
+                //needs to be established.
+                ldapOptions = new LDAPOptions(ldapOptions).setSSLContext(new SSLContextBuilder().getSSLContext());
+            } catch (GeneralSecurityException gse) {
+                DEBUG.error("An error occurred while creating SSLContext", gse);
+            }
+        }
+        ConnectionFactory cf = new LDAPConnectionFactory(ldapurl.getHost(), ldapurl.getPort(), ldapOptions);
         if (username != null) {
             cf = Connections.newAuthenticatedConnectionFactory(cf, Requests.newSimpleBindRequest(username, password));
         }
@@ -260,11 +272,11 @@ public class LDAPUtils {
                 assignedSiteId = tokenizer.nextToken();
             }
             if (!assignedServerId.isEmpty() && assignedServerId.equals(hostServerId)) {
-                serverDefined.add(new LDAPURL(ldapUrl));
+                serverDefined.add(LDAPURL.valueOf(ldapUrl));
             } else if (!assignedSiteId.isEmpty() && assignedSiteId.equals(hostSiteId)) {
-                siteDefined.add(new LDAPURL(ldapUrl));
+                siteDefined.add(LDAPURL.valueOf(ldapUrl));
             } else {
-                nonMatchingServers.add(new LDAPURL(ldapUrl));
+                nonMatchingServers.add(LDAPURL.valueOf(ldapUrl));
             }
         }
         //Let's add them in the order of priority to the ldapServers set, this way the most appropriate servers should
@@ -371,7 +383,7 @@ public class LDAPUtils {
         } else {
             Set<LDAPURL> ret = new LinkedHashSet<LDAPURL>(servers.size());
             for (String server : servers) {
-                ret.add(new LDAPURL(server));
+                ret.add(LDAPURL.valueOf(server));
             }
             return ret;
         }

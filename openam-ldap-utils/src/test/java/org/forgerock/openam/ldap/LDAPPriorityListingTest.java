@@ -11,7 +11,7 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2013 ForgeRock Inc.
+ * Copyright 2013 ForgeRock AS.
  */
 package org.forgerock.openam.ldap;
 
@@ -26,12 +26,12 @@ public class LDAPPriorityListingTest {
 
     public void duplicatedEntriesAreRemoved() {
         Set<LDAPURL> list = LDAPUtils.prioritizeServers(asOrderedSet("test1.com:389", "test1.com"), "01", "02");
-        assertThat(list).hasSize(1).containsOnly(new LDAPURL("test1.com:389"));
+        assertThat(list).hasSize(1).containsOnly(LDAPURL.valueOf("test1.com:389"));
     }
 
     public void matchingAndNonMatchingServersAreUnique() {
         Set<LDAPURL> list = LDAPUtils.prioritizeServers(asOrderedSet("test1.com:389", "test1.com|03"), "01", "02");
-        assertThat(list).hasSize(1).containsOnly(new LDAPURL("test1.com:389"));
+        assertThat(list).hasSize(1).containsOnly(LDAPURL.valueOf("test1.com:389"));
     }
     
     public void nonMatchingServerIsAtTheEndOfTheList(){
@@ -62,7 +62,7 @@ public class LDAPPriorityListingTest {
     private Set<LDAPURL> urls(String... urls) {
         LinkedHashSet<LDAPURL> ret = new LinkedHashSet<LDAPURL>();
         for (String url : urls) {
-            ret.add(new LDAPURL(url));
+            ret.add(LDAPURL.valueOf(url));
         }
         return ret;
     }

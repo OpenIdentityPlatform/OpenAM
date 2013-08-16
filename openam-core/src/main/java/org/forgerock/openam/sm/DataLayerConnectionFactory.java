@@ -1,5 +1,5 @@
 /**
- * Copyright 2013 ForgeRock, Inc.
+ * Copyright 2013 ForgeRock AS.
  *
  * The contents of this file are subject to the terms of the Common Development and
  * Distribution License (the License). You may not use this file except in compliance with the
@@ -20,21 +20,13 @@ import com.iplanet.dpro.session.service.SessionService;
 import com.iplanet.services.ldap.LDAPUser;
 import com.sun.identity.common.ShutdownListener;
 import com.sun.identity.shared.debug.Debug;
-import org.forgerock.openam.ldap.LDAPURL;
+import org.forgerock.openam.ldap.LDAPUtils;
 import org.forgerock.openam.sm.exceptions.ConnectionCredentialsNotFound;
 import org.forgerock.openam.sm.exceptions.ServerConfigurationNotFound;
 import org.forgerock.opendj.ldap.Connection;
 import org.forgerock.opendj.ldap.ConnectionFactory;
-import org.forgerock.opendj.ldap.Connections;
 import org.forgerock.opendj.ldap.ErrorResultException;
-import org.forgerock.opendj.ldap.FailoverLoadBalancingAlgorithm;
-import org.forgerock.opendj.ldap.LDAPConnectionFactory;
-import org.forgerock.opendj.ldap.requests.BindRequest;
-import org.forgerock.opendj.ldap.requests.Requests;
-
-import java.util.LinkedList;
-import java.util.List;
-
+import org.forgerock.opendj.ldap.LDAPOptions;
 import static org.forgerock.openam.core.guice.CoreGuiceModule.ShutdownManagerWrapper;
 
 /**
@@ -115,24 +107,10 @@ public class DataLayerConnectionFactory implements ShutdownListener {
      * @return A non null LoadBalancingAlgorithm implementation.
      */
     private synchronized ConnectionFactory initialiseBalancer(ServerGroupConfiguration config) {
-        List<ConnectionFactory> factories = new LinkedList<ConnectionFactory>();
-        List<LDAPURL> hosts = config.getHostnamesAndPorts();
-        String password = config.getBindPassword();
-        String bindDN = config.getBindDN();
-        int maxConnections = config.getMaxConnections();
-
-        for (LDAPURL url : hosts) {
-            String hostname = url.getUrl();
-            int port = url.getPort();
-
-            ConnectionFactory factory = new LDAPConnectionFactory(hostname, port);
-            BindRequest bindRequest = Requests.newSimpleBindRequest(bindDN, password.toCharArray());
-            factory = Connections.newAuthenticatedConnectionFactory(factory, bindRequest);
-            factory = Connections.newFixedConnectionPool(factory, maxConnections);
-            factories.add(factory);
-        }
-
-        return Connections.newLoadBalancer(new FailoverLoadBalancingAlgorithm(factories));
+        //At the moment heartbeat interval/timeunit is not configurable for configuration stores, so for now, let's
+        //disable heartbeat feature.
+        return LDAPUtils.newFailoverConnectionPool(config.getLDAPURLs(), config.getBindDN(), config.getBindPassword(),
+                config.getMaxConnections(), -1, null, new LDAPOptions());
     }
 
     /**
@@ -149,6 +127,7 @@ public class DataLayerConnectionFactory implements ShutdownListener {
     /**
      * Signal that the connection factory should shutdown and release any connections and resources.
      */
+    @Override
     public void shutdown() {
         factory.close();
     }

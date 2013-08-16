@@ -11,7 +11,7 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2013 ForgeRock Inc.
+ * Copyright 2013 ForgeRock AS.
  */
 package org.forgerock.openam.ldap;
 
@@ -22,44 +22,77 @@ import static org.fest.assertions.Assertions.*;
 public class LDAPURLParsingTest {
 
     public void parsingWorksWithValidInput() {
-        LDAPURL url = new LDAPURL("localhost:1389");
+        LDAPURL url = LDAPURL.valueOf("localhost:1389");
         assertThat(url.getPort()).isEqualTo(1389);
-        assertThat(url.getUrl()).isEqualTo("localhost");
+        assertThat(url.getHost()).isEqualTo("localhost");
+        assertThat(url.isSSL()).isNull();
     }
 
     public void parsingWorksWithoutPort() {
-        LDAPURL url = new LDAPURL("localhost");
+        LDAPURL url = LDAPURL.valueOf("localhost");
         assertThat(url.getPort()).isEqualTo(389);
-        assertThat(url.getUrl()).isEqualTo("localhost");
+        assertThat(url.getHost()).isEqualTo("localhost");
     }
 
     public void parsingWithInvalidPortFallsBackToDefaultPort() {
-        LDAPURL url = new LDAPURL("localhost:abc");
+        LDAPURL url = LDAPURL.valueOf("localhost:abc");
         assertThat(url.getPort()).isEqualTo(389);
-        assertThat(url.getUrl()).isEqualTo("localhost");
+        assertThat(url.getHost()).isEqualTo("localhost");
     }
 
     public void parsingWithInvalidPortFallsBackToDefaultPort2() {
-        LDAPURL url = new LDAPURL("localhost:2389:2");
+        LDAPURL url = LDAPURL.valueOf("localhost:2389:2");
         assertThat(url.getPort()).isEqualTo(389);
-        assertThat(url.getUrl()).isEqualTo("localhost");
+        assertThat(url.getHost()).isEqualTo("localhost");
     }
 
     public void parsingWithInvalidPortFallsBackToDefaultPort3() {
-        LDAPURL url = new LDAPURL("localhost:2389|01");
+        LDAPURL url = LDAPURL.valueOf("localhost:2389|01");
         assertThat(url.getPort()).isEqualTo(389);
-        assertThat(url.getUrl()).isEqualTo("localhost");
+        assertThat(url.getHost()).isEqualTo("localhost");
+    }
+
+    public void parsingWithInvalidPortFallsBackToDefaultPort4() {
+        LDAPURL url = LDAPURL.valueOf("ldap://localhost:2389|010");
+        assertThat(url.getPort()).isEqualTo(389);
+        assertThat(url.getHost()).isEqualTo("localhost");
+        assertThat(url.isSSL()).isFalse();
+    }
+
+    public void parsingWithInvalidPortFallsBackToDefaultPort5() {
+        LDAPURL url = LDAPURL.valueOf("ldap://localhost:def");
+        assertThat(url.getPort()).isEqualTo(389);
+        assertThat(url.getHost()).isEqualTo("localhost");
+        assertThat(url.isSSL()).isFalse();
     }
 
     public void parsingWithNegativePortFallsBackToDefaultPort() {
-        LDAPURL url = new LDAPURL("localhost:-4");
+        LDAPURL url = LDAPURL.valueOf("localhost:-4");
         assertThat(url.getPort()).isEqualTo(389);
-        assertThat(url.getUrl()).isEqualTo("localhost");
+        assertThat(url.getHost()).isEqualTo("localhost");
     }
 
     public void parsingWithHighPortFallsBackToDefaultPort() {
-        LDAPURL url = new LDAPURL("localhost:65536");
+        LDAPURL url = LDAPURL.valueOf("localhost:65536");
         assertThat(url.getPort()).isEqualTo(389);
-        assertThat(url.getUrl()).isEqualTo("localhost");
+        assertThat(url.getHost()).isEqualTo("localhost");
+    }
+
+    public void parsingWithLDAPSchemeWorksWithValidInput() {
+        String value = "ldap://localhost:1389";
+        LDAPURL url = LDAPURL.valueOf(value);
+        assertThat(url.getPort()).isEqualTo(1389);
+        assertThat(url.getHost()).isEqualTo("localhost");
+        assertThat(url.isSSL()).isFalse();
+        assertThat(url.toString()).isEqualTo(value);
+    }
+
+    public void parsingWithLDAPSSchemeWorksWithValidInput() {
+        String value = "ldaps://localhost:10389";
+        LDAPURL url = LDAPURL.valueOf(value);
+        assertThat(url.getPort()).isEqualTo(10389);
+        assertThat(url.getHost()).isEqualTo("localhost");
+        assertThat(url.isSSL()).isTrue();
+        assertThat(url.toString()).isEqualTo(value);
     }
 }

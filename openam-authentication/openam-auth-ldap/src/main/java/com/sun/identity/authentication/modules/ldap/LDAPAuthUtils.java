@@ -27,7 +27,7 @@
  */
 
 /**
- * Portions Copyrighted 2011-2013 ForgeRock Inc
+ * Portions Copyrighted 2011-2013 ForgeRock AS
  */
 
 package com.sun.identity.authentication.modules.ldap;
@@ -279,7 +279,7 @@ public class LDAPAuthUtils {
                                 StringTokenizer stz = new StringTokenizer(val, ":");
 
                                 if (stz.countTokens() == 4) {
-                                    LDAPURL url = new LDAPURL(stz.nextToken() + ":" + stz.nextToken());
+                                    LDAPURL url = LDAPURL.valueOf(stz.nextToken() + ":" + stz.nextToken());
                                     if (primaryUrls.contains(url) || secondaryUrls.contains(url)) {
                                         tmpmin = stz.nextToken();
                                         tmpmax = stz.nextToken();

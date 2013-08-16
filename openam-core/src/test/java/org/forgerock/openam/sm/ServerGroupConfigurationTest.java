@@ -1,5 +1,5 @@
 /**
- * Copyright 2013 ForgeRock, Inc.
+ * Copyright 2013 ForgeRock AS.
  *
  * The contents of this file are subject to the terms of the Common Development and
  * Distribution License (the License). You may not use this file except in compliance with the
@@ -18,39 +18,70 @@ package org.forgerock.openam.sm;
 import com.iplanet.services.ldap.Server;
 import com.iplanet.services.ldap.ServerGroup;
 import com.iplanet.services.ldap.ServerInstance;
-import org.forgerock.openam.ldap.LDAPURL;
-import org.testng.annotations.Test;
-
 import java.util.Arrays;
-import java.util.List;
-
+import java.util.Set;
+import static org.fest.assertions.Assertions.*;
+import org.forgerock.openam.ldap.LDAPURL;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.BDDMockito.mock;
 import static org.mockito.Mockito.verify;
-import static org.testng.Assert.assertEquals;
+import org.testng.annotations.Test;
 
 /**
  * @author robert.wapshott@forgerock.com
  */
 public class ServerGroupConfigurationTest {
+
     @Test
-    public void shouldUseServerGroupForHostAndPorts() {
+    public void shouldReturnCorrectLDAPURLforSimpleConnections() {
         // Given
+        String hostName = "localhost";
+        int port = 389;
         Server one = mock(Server.class);
-        given(one.getServerName()).willReturn("");
-        given(one.getPort()).willReturn(0);
+        given(one.getServerName()).willReturn(hostName);
+        given(one.getPort()).willReturn(port);
+        given(one.getConnectionType()).willReturn(Server.Type.CONN_SIMPLE);
 
         ServerInstance mockInstance = mock(ServerInstance.class);
         ServerGroup mockGroup = mock(ServerGroup.class);
         given(mockGroup.getServersList()).willReturn(Arrays.asList(one));
 
         ServerGroupConfiguration config = new ServerGroupConfiguration(mockGroup, mockInstance);
-
         // When
-        List<LDAPURL> result = config.getHostnamesAndPorts();
+        Set<LDAPURL> result = config.getLDAPURLs();
 
         // Then
-        assertEquals(1, result.size());
+        assertThat(result).hasSize(1);
+        LDAPURL url = result.iterator().next();
+        assertThat(url.getHost()).isEqualTo(hostName);
+        assertThat(url.getPort()).isEqualTo(port);
+        assertThat(url.isSSL()).isFalse();
+    }
+
+    @Test
+    public void shouldReturnCorrectLDAPURLforSSLConnections() {
+        // Given
+        String hostName = "localhost";
+        int port = 389;
+        Server one = mock(Server.class);
+        given(one.getServerName()).willReturn(hostName);
+        given(one.getPort()).willReturn(port);
+        given(one.getConnectionType()).willReturn(Server.Type.CONN_SSL);
+
+        ServerInstance mockInstance = mock(ServerInstance.class);
+        ServerGroup mockGroup = mock(ServerGroup.class);
+        given(mockGroup.getServersList()).willReturn(Arrays.asList(one));
+
+        ServerGroupConfiguration config = new ServerGroupConfiguration(mockGroup, mockInstance);
+        // When
+        Set<LDAPURL> result = config.getLDAPURLs();
+
+        // Then
+        assertThat(result).hasSize(1);
+        LDAPURL url = result.iterator().next();
+        assertThat(url.getHost()).isEqualTo(hostName);
+        assertThat(url.getPort()).isEqualTo(port);
+        assertThat(url.isSSL()).isTrue();
     }
 
     @Test
@@ -73,6 +104,7 @@ public class ServerGroupConfigurationTest {
         ServerInstance mockInstance = mock(ServerInstance.class);
         ServerGroup mockGroup = mock(ServerGroup.class);
         ServerGroupConfiguration config = new ServerGroupConfiguration(mockGroup, mockInstance);
+        given(mockInstance.getPasswd()).willReturn("");
 
         // When
         config.getBindPassword();
