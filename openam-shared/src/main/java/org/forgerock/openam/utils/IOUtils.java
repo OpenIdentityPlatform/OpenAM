@@ -133,9 +133,13 @@ public final class IOUtils {
         StringBuilder content = new StringBuilder();
         String line;
         BufferedReader br = null;
-        br = new BufferedReader(new InputStreamReader(is, encoding));
-        while ((line = br.readLine()) != null) {
-            content.append(line);
+        try {
+            br = new BufferedReader(new InputStreamReader(is, encoding));
+            while ((line = br.readLine()) != null) {
+                content.append(line).append('\n');
+            }
+        } finally {
+            closeIfNotNull(br);
         }
         return content.toString();
     }
