@@ -530,7 +530,27 @@
 
   <para>OpenAM also lets resource owners browse and delete OAuth 2.0 tokens
   that they authorized. Resource owners can do this from the OAuth 2 Token
-  Manager page.</para>
+  Manager page. The OAuth 2 Token Manager page is not visible by default,
+  however, as the page is designed for advanced users.</para>
+
+  <para>To make the OAuth 2 Token Manager page visible to users, edit
+  <filename>XUI/config/AppConfiguration.js</filename> under the deployment
+  directory for OpenAM, changing the following lines to uncomment the
+  <literal>"oauth2"</literal> configuration. Changes these lines:</para>
+
+  <programlisting language="none">}/*,
+"oauth2": {
+  "url": "#oauth2/tokens",
+  "name": "config.AppConfiguration.Navigation.links.oauthtokens"
+}*/</programlisting>
+
+  <para>The resulting lines should appear as follows.</para>
+
+  <programlisting language="none">},
+"oauth2": {
+  "url": "#oauth2/tokens",
+  "name": "config.AppConfiguration.Navigation.links.oauthtokens"
+}</programlisting>
 
   <para>To access the page, login to OpenAM at <literal>/XUI</literal>, such as
   <literal>https://openam.example.com:8443/openam/XUI/</literal>, as the
