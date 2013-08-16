@@ -30,10 +30,11 @@
  xsi:schemaLocation='http://docbook.org/ns/docbook http://docbook.org/xml/5.0/xsd/docbook.xsd'
  xmlns:xlink='http://www.w3.org/1999/xlink'
  xmlns:xinclude='http://www.w3.org/2001/XInclude'>
- <title>Installing the Sun Web Server Policy Agent</title>
+ <title>Installing the Oracle iPlanet/Sun Web Server Policy Agent</title>
+ <indexterm><primary>Oracle iPlanet Web Server</primary></indexterm>
  <indexterm><primary>Sun Web Server</primary></indexterm>
- <para>This chapter covers installation of the policy agent for Sun
- Web Server.</para>
+ <para>This chapter covers installation of the policy agent for Oracle iPlanet
+ Web Server, formerly known as Sun Web Server.</para>
  
  <section xml:id="before-sjsws-agent-install">
   <title>Before You Install</title>
@@ -130,12 +131,12 @@ $ which java
  </section>
  
  <section xml:id="install-sjsws-web-agent">
-  <title>Installing Sun Web Server Web Policy Agent</title>
+  <title>Installing Oracle iPlanet Web Server Web Policy Agent</title>
   
   <para>Complete the following procedures to install the policy agent.</para>
   
   <procedure xml:id="create-sjsws-agent-profile">
-   <title>To Create the Sun Web Server Web Agent Profile</title>
+   <title>To Create the Oracle iPlanet Web Server Web Agent Profile</title>
    
    <para>Regardless of whether you store configurations centrally in OpenAM
    or locally with your agents, the agent requires a profile so that it can
@@ -207,11 +208,11 @@ $ which java
   </procedure>
   
   <procedure xml:id="install-agent-into-sjsws">
-   <title>To Install the Policy Agent into Sun Web Server</title>
+   <title>To Install the Policy Agent into Oracle iPlanet Web Server</title>
    
    <step>
-    <para>Shut down Sun Web Server instance where you plan to install the
-    agent.</para>
+    <para>Shut down Oracle iPlanet Web Server instance where you plan to install
+    the agent.</para>
    </step>
    <step>
     <para>Make sure OpenAM is running.</para>
@@ -251,7 +252,7 @@ Install log file location:
 /path/to/web_agents/sjsws_agent/installer-logs/audit/install.log
 ...</screen>
     <para>Upon successful completion, the installer has backed up and updated
-    the Sun Web Server instance configuration, and has also set up
+    the Oracle iPlanet Web Server instance configuration, and has also set up
     configuration and log directories for the agent.</para>
     <note>
      <para>If the agent is in a different domain than the server, refer to <citetitle>Administration Guide</citetitle> procedure, <link
@@ -312,7 +313,7 @@ Install log file location:
     <screen>chown -R webservd:webservd /opt/web_agents/sjsws_agent/Agent_<replaceable>number</replaceable>/logs</screen>
    </step>
    <step>
-    <para>Restart the Sun Web Server instance where you installed the
+    <para>Restart the Oracle iPlanet Web Server instance where you installed the
     agent.</para>
    </step>
    <step>
@@ -381,7 +382,7 @@ Your client is not allowed to access the requested object.</literallayout>
     </step>
 
     <step>
-     <para>Save the file and restart the Sun Web Server.</para>
+     <para>Save the file and restart the Oracle iPlanet Web Server.</para>
     </step>
   </procedure>
 
@@ -389,7 +390,7 @@ Your client is not allowed to access the requested object.</literallayout>
  </section>
  
  <section xml:id="custom-sjsws-agent-installation">
-  <title>Custom Sun Web Policy Agent Installation</title>
+  <title>Custom Oracle iPlanet Web Policy Agent Installation</title>
   
   <para>For alternative installations, use <command>agentadmin
   --custom-install</command>.</para>
@@ -417,9 +418,9 @@ Your client is not allowed to access the requested object.</literallayout>
  </section>
  
  <section xml:id="uninstall-sjsws-agent">
-  <title>Remove Sun Web Policy Agent Software</title>
+  <title>Remove Oracle iPlanet Web Policy Agent Software</title>
   
-  <para>Shut down the Sun Web Server before you uninstall the
+  <para>Shut down the Oracle iPlanet Web Server before you uninstall the
     policy agent.</para>
   
   <para>To remove the web policy agent, use <command>agentadmin
