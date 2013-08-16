@@ -26,9 +26,13 @@
  *
  */
 
-
+/*
+ * Portions Copyrighted 2013 ForgeRock AS
+ */
 package com.sun.identity.policy.client;
 
+import com.sun.identity.common.ShutdownListener;
+import com.sun.identity.common.ShutdownManager;
 import com.sun.identity.shared.debug.Debug;
 import com.iplanet.dpro.session.SessionException;
 import com.iplanet.sso.SSOException;
@@ -160,7 +164,7 @@ public class PolicyEvaluator {
      * @throws SSOException if application single sign on token is invalid.
      *
      */
-    private void init(String serviceName,
+    private void init(final String serviceName,
                       AppSSOTokenProvider appSSOTokenProvider)
 	    throws PolicyException, SSOException {
         this.ssoTokenManager = SSOTokenManager.getInstance();
@@ -188,7 +192,7 @@ public class PolicyEvaluator {
             if (debug.messageEnabled()) {
                 debug.message( "PolicyEvaluator.init():"
                         + "adding remote policy listener with policy "
-                        + "service");
+                        + "service " + serviceName);
 
             }
             if (policyProperties.useRESTProtocol()) {
@@ -197,6 +201,34 @@ public class PolicyEvaluator {
             } else {
                 resourceResultCache.addRemotePolicyListener(appSSOToken,
                         serviceName, policyProperties.getNotificationURL());
+            }
+            // Add a hook to remove our listener on shutdown.
+            ShutdownManager shutdownMan = ShutdownManager.getInstance();
+            if (shutdownMan.acquireValidLock()) {
+                try {
+                    shutdownMan.addShutdownListener(new ShutdownListener() {
+                        @Override
+                        public void shutdown() {
+                            if (policyProperties.useRESTProtocol()) {
+                                resourceResultCache.removeRESTRemotePolicyListener(appSSOToken,
+                                        serviceName, policyProperties.getRESTNotificationURL());
+                                if (debug.messageEnabled()) {
+                                    debug.message("PolicyEvaluator: called removeRESTRemotePolicyListener, service "
+                                            + serviceName + ", URL " + policyProperties.getRESTNotificationURL());
+                                }
+                            } else {
+                                resourceResultCache.removeRemotePolicyListener(appSSOToken,
+                                        serviceName, policyProperties.getNotificationURL());
+                                if (debug.messageEnabled()) {
+                                    debug.message("PolicyEvaluator: called removeRemotePolicyListener, service "
+                                            + serviceName + ", URL " + policyProperties.getNotificationURL());
+                                }
+                            }
+                        }
+                    });
+                } finally {
+                    shutdownMan.releaseLockAndNotify();
+                }
             }
         }
 

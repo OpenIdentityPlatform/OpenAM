@@ -27,7 +27,7 @@
  */
 
 /**
- * Portions Copyrighted [2011] [ForgeRock AS]
+ * Portions Copyrighted 2011-2013 ForgeRock AS
  */
 package com.iplanet.am.sdk.remote;
 
@@ -56,6 +56,8 @@ import com.iplanet.sso.SSOException;
 import com.iplanet.sso.SSOToken;
 import com.iplanet.sso.SSOTokenManager;
 import com.sun.identity.common.GeneralTaskRunnable;
+import com.sun.identity.common.ShutdownListener;
+import com.sun.identity.common.ShutdownManager;
 import com.sun.identity.common.SystemTimer;
 import com.sun.identity.shared.debug.Debug;
 import com.sun.identity.shared.jaxrpc.SOAPClient;
@@ -77,7 +79,9 @@ class EventListener {
     private static Set listeners = new HashSet();
     
     private static EventListener instance = null;
-    
+
+    private static String remoteId;
+
     private static final String NOTIFICATION_PROPERTY = 
         "com.sun.identity.idm.remote.notification.enabled";
     
@@ -97,9 +101,7 @@ class EventListener {
     /**
      * Constructor for <class>EventListener</class>. Should be instantiated
      * once by <code>RemoteServicesImpl</code>
-     * 
-     * @param set
-     *            of listeners interested in obtaining change events
+     *
      */
     private EventListener() {
 
@@ -120,10 +122,48 @@ class EventListener {
                 url = WebtopNaming.getNotificationURL();
 
                 // Register for notification with AM Server
-                client.send("registerNotificationURL", url.toString(), null, 
-                        null);
-
-                // Register with PLLClient for notificaiton
+                Object result = client.send("registerNotificationURL", url.toString(), null, null);
+                if (result != null) {
+                    remoteId = result.toString();
+                }
+                if (remoteId != null) {
+                    if (debug.messageEnabled()) {
+                        debug.message("EventListener: registerNotificationURL returned ID " + remoteId);
+                    }
+                } else {
+                    if (debug.messageEnabled()) {
+                        debug.message("EventListener: registerNotificationURL returned null ID");
+                    }
+                }
+                ShutdownManager shutdownMan = ShutdownManager.getInstance();
+                if (shutdownMan.acquireValidLock()) {
+                    try {
+                        shutdownMan.addShutdownListener(new ShutdownListener() {
+                            @Override
+                            public void shutdown() {
+                                try {
+                                    if (remoteId != null) {
+                                        client.send("deRegisterNotificationURL", remoteId, null, null);
+                                        if (debug.messageEnabled()) {
+                                            debug.message("EventListener: deRegisterNotificationURL for " + remoteId);
+                                        }
+                                    } else {
+                                        if (debug.messageEnabled()) {
+                                            debug.message("EventListener: Could not deRegisterNotificationURL " +
+                                                    "due to null ID");
+                                        }
+                                    }
+                                } catch (Exception e) {
+                                    debug.error("EventListener: There was a problem calling " +
+                                            "deRegisterNotificationURL with ID " +  remoteId, e);
+                                }
+                            }
+                        });
+                    } finally {
+                        shutdownMan.releaseLockAndNotify();
+                    }
+                }
+                // Register with PLLClient for notification
                 PLLClient.addNotificationHandler(
                         RemoteServicesImpl.SDK_SERVICE,
                         new EventNotificationHandler());
