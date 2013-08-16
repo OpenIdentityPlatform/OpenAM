@@ -49,7 +49,7 @@
 
      <listitem>
       <para>The advanced server property used to set the HTTP header name,
-      <literal>com.sun.identity.authentication.client.ipAddressHeader </literal>,
+      <literal>com.sun.identity.authentication.client.ipAddressHeader</literal>,
       has replaced the legacy OpenSSO property
       <literal>com.sun.identity.session.httpClientIPHeader</literal> (<link
       xlink:href="https://bugster.forgerock.org/jira/browse/OPENAM-1879"
