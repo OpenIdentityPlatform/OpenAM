@@ -42,7 +42,7 @@
    <listitem>
     <para>A new Java EE policy agent for JBoss 7 has been added. The new agent simplifies 
     integration with JBoss AS 7 (EAP 6) application servers by leveraging the module 
-    system introduced in JBoss 7..</para>
+    system introduced in JBoss 7.</para>
    </listitem>
   </itemizedlist>
   <itemizedlist>
