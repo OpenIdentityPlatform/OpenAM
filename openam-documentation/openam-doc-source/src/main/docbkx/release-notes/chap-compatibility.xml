@@ -35,7 +35,7 @@
  also deprecated and removed functionality.</para>
 
  <section xml:id="changes">
-  <title>Major Changes to Existing Functionality</title>
+  <title>Important Changes to Existing Functionality</title>
 
   <itemizedlist>
 
@@ -94,6 +94,22 @@
     <literal>dc=opensso,dc=java,dc=net</literal>.
     The default root suffix is now
     <literal><?eval ${defaultRootSuffix}?></literal>.</para>
+   </listitem>
+
+   <listitem>
+    <para>The default policy evaluation mode for new policy agent profiles is
+    now self rather than subtree, in order to better scale for large numbers of
+    policy rules.</para>
+
+    <para>Upgrade does not change existing policy agent profile configurations,
+    however. If you want to adopt the new default setting for existing policy
+    agents, you must change the setting manually.</para>
+
+    <para>To do so for Java EE policy agents, set
+    <literal>com.sun.identity.policy.client.cacheMode=self</literal>.</para>
+
+    <para>For web policy agents, set
+    <literal>com.sun.identity.agents.config.fetch.from.root.resource=false</literal>.</para>
    </listitem>
   </itemizedlist>
  </section>

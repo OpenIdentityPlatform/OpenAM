@@ -1075,6 +1075,9 @@ token=value;Domain=subdomain.domain.com</literal></para>
      can be useful when a client is expect to access multiple resources on the
      same path. Yet, caching can be expensive if very many policies are
      defined for the root resource.</para>
+
+     <para>Default: <literal>false</literal></para>
+
      <para>For centralized configurations this property is configured under
      Access Control &gt; <replaceable>Realm Name</replaceable> &gt; Agents &gt;
      Web &gt; <replaceable>Agent Name</replaceable> &gt; OpenAM Services &gt;

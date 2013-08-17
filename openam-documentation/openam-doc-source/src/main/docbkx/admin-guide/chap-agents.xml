@@ -1212,6 +1212,7 @@ com.sun.identity.agents.config.cdsso.cookie.domain[1]=.example.net</literallayou
       same path. Yet, caching can be expensive if very many policies are
       defined for the root resource.</para>
       <para>Property: <literal>com.sun.identity.agents.config.fetch.from.root.resource</literal></para>
+      <para>Default: false</para>
       <para>Hot swap: no</para>
      </listitem>
     </varlistentry>
@@ -2852,6 +2853,7 @@ com.sun.identity.agents.config.cdsso.cookie.domain[1]=.example.net</literallayou
       <para>Set to cache mode subtree when only a small number of policy rules
       are defined. For large numbers of policy rules, set to self.</para>
       <para>Property: <literal>com.sun.identity.policy.client.cacheMode</literal></para>
+      <para>Default: self</para>
       <para>Hot swap: no</para>
      </listitem>
     </varlistentry>

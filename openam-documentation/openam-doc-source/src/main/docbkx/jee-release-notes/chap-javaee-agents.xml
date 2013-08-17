@@ -166,10 +166,19 @@
   <?eval ${javaEEAgentsDocTargetVersion}?>.</para>
 
   <section xml:id="javaee-agent-major-changes">
-   <title>Major Changes to Java EE Policy Agent Functionality</title>
+   <title>Important Changes to Java EE Policy Agent Functionality</title>
 
-   <para>No major changes affecting compatibility have been made to the OpenAM
-   Java EE Policy Agents in this release.</para>
+   <para>The default policy evaluation mode for new policy agent profiles is
+   now self rather than subtree, in order to better scale for large numbers of
+   policy rules.</para>
+
+   <para>Upgrade does not change existing policy agent profile configurations,
+   however. If you want to adopt the new default setting for existing policy
+   agents, you must change the setting manually.</para>
+
+   <para>To do so for Java EE policy agents, set
+   <literal>com.sun.identity.policy.client.cacheMode=self</literal>.</para>
+
   </section>
 
   <section xml:id="javaee-agent-deprecated">

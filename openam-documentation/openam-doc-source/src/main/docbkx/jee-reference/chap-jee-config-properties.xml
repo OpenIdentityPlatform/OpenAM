@@ -1816,8 +1816,12 @@
    <varlistentry>
     <term><literal>com.sun.identity.policy.client.cacheMode</literal></term>
     <listitem>
-     <para>Set to cache mode subtree when only a small number of policy rules
-     are defined. For large numbers of policy rules, set to self.</para>
+     <para>Set to cache mode <literal>subtree</literal> when only a small number
+     of policy rules are defined. For large numbers of policy rules, set to
+     <literal>self</literal>.</para>
+
+     <para>Default: <literal>self</literal></para>
+
      <para>For centralized configurations this property is configured under
      Access Control &gt; <replaceable>Realm Name</replaceable> &gt; Agents &gt;
      J2EE &gt; <replaceable>Agent Name</replaceable> &gt; OpenAM Services &gt;

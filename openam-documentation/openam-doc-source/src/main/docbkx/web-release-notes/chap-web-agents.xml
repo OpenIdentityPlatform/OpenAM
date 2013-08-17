@@ -28,7 +28,7 @@
          xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance'
          xsi:schemaLocation='http://docbook.org/ns/docbook http://docbook.org/xml/5.0/xsd/docbook.xsd'
          xmlns:xlink='http://www.w3.org/1999/xlink'
-        >
+         xmlns:xinclude='http://www.w3.org/2001/XInclude'>
  <title>Web Policy Agents <?eval ${agentsDocTargetVersion}?></title>
 
  <para>This chapter concerns OpenAM web policy agents. Web policy agents
@@ -300,7 +300,7 @@
    <?eval ${webAgentsDocTargetVersion}?>.</para>
 
    <section xml:id="web-agent-major-changes">
-    <title>Major Changes to Web Policy Agent Functionality</title>
+    <title>Important Changes to Web Policy Agent Functionality</title>
 
     <itemizedlist>
      <listitem>
@@ -325,7 +325,7 @@
          any applicable service packs and updates. The IIS7 agent also requires
          MSXML 6.0 or above. For installation instructions, see the <link xlink:show="new"
          xlink:href="http://www.microsoft.com/en-us/download/details.aspx?id=3988"
-         ><citetitle>Microsoft Download Center page for MSXML 6.0</citetitle></link></para>
+         ><citetitle>Microsoft Download Center page for MSXML 6.0</citetitle></link>.</para>
      </listitem>
 
      <listitem>
@@ -342,6 +342,19 @@
       default. You can adjust this setting by using the bootstrap configuration
       property,
       <literal>com.forgerock.agents.ext.url.validation.disable</literal>.</para>
+     </listitem>
+
+     <listitem>
+      <para>The default policy evaluation mode for new policy agent profiles is
+      now self rather than subtree, in order to better scale for large numbers of
+      policy rules.</para>
+
+      <para>Upgrade does not change existing policy agent profile configurations,
+      however. If you want to adopt the new default setting for existing policy
+      agents, you must change the setting manually.</para>
+
+      <para>For web policy agents, set
+      <literal>com.sun.identity.agents.config.fetch.from.root.resource=false</literal>.</para>
      </listitem>
     </itemizedlist>
    </section>
