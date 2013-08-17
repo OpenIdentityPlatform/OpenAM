@@ -55,7 +55,7 @@ import org.forgerock.opendj.ldap.requests.Requests;
  * objects, or you can pass in the list to the newPrioritized* methods.
  *
  * @author Peter Major
- * @supported.api
+ * @supported.all.api
  */
 public class LDAPUtils {
 

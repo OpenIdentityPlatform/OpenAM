@@ -26,7 +26,9 @@
  *
  */
 
-
+/*
+ * Portions Copyright 2013 ForgeRock AS
+ */
 package com.sun.identity.liberty.ws.soapbinding; 
 
 import java.io.ByteArrayInputStream;
@@ -74,6 +76,8 @@ import com.sun.org.apache.xml.internal.utils.PrefixResolverDefault;
 
 /**
  * This class contains utility methods.
+ *
+ * @supported.api
  */
 
 public class Utils {

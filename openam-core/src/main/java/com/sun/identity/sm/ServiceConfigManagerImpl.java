@@ -27,7 +27,7 @@
  */
 
 /*
- * Portions Copyrighted 2010-2012 ForgeRock AS
+ * Portions Copyrighted 2010-2013 ForgeRock AS
  */
 package com.sun.identity.sm;
 
@@ -556,8 +556,6 @@ class ServiceConfigManagerImpl implements SMSObjectListener {
      * @param o
      *            object for comparison.
      * @return true if objects are equals.
-     *
-     * @supported.api
      */
     public boolean equals(Object o) {
         if (o instanceof ServiceConfigManager) {
@@ -574,8 +572,6 @@ class ServiceConfigManagerImpl implements SMSObjectListener {
      * Returns String representation of the service's name and version.
      * 
      * @return String representation of the service's name and version
-     *
-     * @supported.api
      */
     public String toString() {
         StringBuilder sb = new StringBuilder();

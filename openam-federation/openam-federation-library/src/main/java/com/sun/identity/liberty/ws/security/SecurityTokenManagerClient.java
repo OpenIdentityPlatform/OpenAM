@@ -26,7 +26,9 @@
  *
  */
 
-
+/*
+ * Portions Copyright 2013 ForgeRock AS
+ */
 package com.sun.identity.liberty.ws.security;
 
 import com.sun.identity.shared.locale.Locale;
@@ -81,6 +83,8 @@ import javax.xml.soap.SOAPException;
  * methods can be called to create/get <code>Assertion</code>, and 
  * <code>AssertionArtifact</code>, and to obtain decision from an 
  * <code>Query</code>.
+ *
+ * @supported.api
  */
 public final class SecurityTokenManagerClient {
 

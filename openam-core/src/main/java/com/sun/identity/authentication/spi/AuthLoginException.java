@@ -27,7 +27,7 @@
  */
 
 /*
- * Portions Copyrighted [2011] [ForgeRock AS]
+ * Portions Copyright 2011-2013 ForgeRock AS
  */
 package com.sun.identity.authentication.spi;
 
@@ -42,6 +42,8 @@ import javax.security.auth.login.LoginException;
 
 /**
  * This class is for handling message localization in LoginException.
+ *
+ * @supported.api
  */
 public class AuthLoginException extends LoginException implements L10NMessage {
 

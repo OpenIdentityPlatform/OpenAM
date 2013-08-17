@@ -26,6 +26,9 @@
  *
  */
 
+/*
+ * Portions Copyright 2013 ForgeRock AS
+ */
 package com.sun.identity.federation.common;
 
 import com.sun.identity.shared.locale.L10NMessageImpl;
@@ -160,6 +163,8 @@ import java.io.StringWriter;
  * @see #getRootCause()
  * @see java.lang.Exception
  * @see java.lang.RuntimeException
+ *
+ * @supported.api
  */
 public class FSRedirectException extends L10NMessageImpl {
     protected String _message = null;

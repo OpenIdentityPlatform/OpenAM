@@ -26,7 +26,9 @@
  *
  */
 
-
+/*
+ * Portions Copyright 2013 ForgeRock AS
+ */
 
 package com.sun.identity.authentication.server;
 
@@ -82,6 +84,7 @@ import javax.servlet.http.HttpSession;
  * <p>
  * It should be serializable as a requirement to be stored in HttpSession.
  *
+ * @supported.api
  */
 public final class AuthContextLocal extends Object
     implements java.io.Serializable {

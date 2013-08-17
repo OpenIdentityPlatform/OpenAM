@@ -50,8 +50,10 @@ import javax.servlet.http.HttpServletRequest;
 
 /**
  * This <code>final</code> class <code>SSOProviderImpl</code> implements 
- * <code>SSOProvider</code> interface and provides implemtation of the methods 
- * to create , destroy , check the validity of a single sign on token .
+ * <code>SSOProvider</code> interface and provides implementation of the methods
+ * to create , destroy , check the validity of a single sign on token.
+ *
+ * @supported.api
  */
 public final class SSOProviderImpl implements SSOProvider {
 

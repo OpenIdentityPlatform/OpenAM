@@ -1,4 +1,6 @@
 /*
+ * Copyright 2013 ForgeRock, Inc.
+ *
  * The contents of this file are subject to the terms of the Common Development and
  * Distribution License (the License). You may not use this file except in compliance with the
  * License.
@@ -10,11 +12,10 @@
  * the License file at legal/CDDLv1.0.txt. If applicable, add the following below the CDDL
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
- *
- * Copyright 2013 ForgeRock Inc.
  */
+
 /**
- * This package contains utility methods to ease/unify development when using the OpenDJ LDAP SDK.
+ * Utilities for service management.
  * @supported.api
  */
-package org.forgerock.openam.ldap;
+package com.iplanet.services.util;

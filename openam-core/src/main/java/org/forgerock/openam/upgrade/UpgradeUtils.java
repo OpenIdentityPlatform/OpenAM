@@ -122,6 +122,7 @@ import org.w3c.dom.NodeList;
  * This class contains utilities to upgrade the service schema
  * configuration to be compatible with OpenAM.
  *
+ * @supported.api
  */
 public class UpgradeUtils {
 

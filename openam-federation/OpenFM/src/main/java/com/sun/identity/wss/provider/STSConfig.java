@@ -25,32 +25,36 @@
  * $Id: STSConfig.java,v 1.10 2009/11/16 21:52:58 mallas Exp $
  *
  */
-package com.sun.identity.wss.provider;
 
-/**
- * This abstract class <code>STSConfig</code> represents the 
- * configuration of a Security Token Service client entity. It extends 
- * <code>TrustAuthorityConfig</code>.
- * 
- * <p>This class can be extended to define the trust authority config
- * which is WS-Trust protocol based client (STS client) configuration.
- * 
- * <p>Pluggable implementation of this abstract class can choose to store this 
- * configuration in desired configuration store. This pluggable implementation
- * class can be configured in client's AMConfig.properties as value of 
- * "com.sun.identity.wss.sts.config.plugin" property 
- * for STS client configuration.
- * 
- * <p>All the static methods in this class are for the persistent 
- * operations.
- * @supported.all.api
+/*
+ * Portions Copyright 2013 ForgeRock AS
  */
+package com.sun.identity.wss.provider;
 
 import java.util.Set;
 import java.util.List;
 import java.util.ArrayList;
 import com.sun.identity.wss.sts.STSConstants;
 
+/**
+ * This abstract class <code>STSConfig</code> represents the
+ * configuration of a Security Token Service client entity. It extends
+ * <code>TrustAuthorityConfig</code>.
+ *
+ * <p>This class can be extended to define the trust authority config
+ * which is WS-Trust protocol based client (STS client) configuration.
+ *
+ * <p>Pluggable implementation of this abstract class can choose to store this
+ * configuration in desired configuration store. This pluggable implementation
+ * class can be configured in client's AMConfig.properties as value of
+ * "com.sun.identity.wss.sts.config.plugin" property
+ * for STS client configuration.
+ *
+ * <p>All the static methods in this class are for the persistent
+ * operations.
+ *
+ * @supported.all.api
+ */
 public abstract class STSConfig extends TrustAuthorityConfig {
     
     protected String mexEndpoint = null;
