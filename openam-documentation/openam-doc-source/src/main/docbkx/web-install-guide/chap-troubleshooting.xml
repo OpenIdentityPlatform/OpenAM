@@ -122,28 +122,6 @@ ServerName www.localhost.example:8080</programlisting>
    </answer>
   </qandaentry>
 
-  <qandaentry xml:id="cannot-install-with-ibm-java">
-   <question>
-    <para>I am trying to install the WebSphere policy agent on Linux.
-    The system has IBM Java. When I run <command>agentadmin --install</command>,
-    the script fails to encrypt the password from the password file, ending
-    with this message:</para>
-
-    <literallayout class="monospaced"
-    >ERROR: An unknown error has occurred (null). Please try again.</literallayout>
-
-    <para>What should I do?</para>
-   </question>
-
-   <answer>
-    <para>You must edit <command>agentadmin</command> to use IBMJCE, and then
-    try again.</para>
-    <para>See <link xlink:href="agent-install-guide#install-with-ibm-jvm"
-    xlink:role="http://docbook.org/xlink/role/olink"><citetitle>To Install
-    With IBM Java</citetitle></link>.</para>
-   </answer>
-  </qandaentry>
-
   <qandaentry xml:id="web-agent-cannot-rotate-logs">
    <question>
     <para>My web server and web policy agent are installed as root, and the

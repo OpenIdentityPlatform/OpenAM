@@ -89,17 +89,6 @@ verifying OpenAM server URL.</screen>
    </answer>
   </qandaentry>
 
-  <qandaentry xml:id="debug-file-and-SELinux">
-   <question>
-    <para>I am trying to install the policy agent on SELinux and I am getting error messages
-  after installation. What happened?</para>
-   </question>
-   <answer>
-    <para>SELinux must be properly configured to connect the web policy agent and OpenAM
-  nodes. Either re-configure SELinux or disable it, then reinstall the policy agent.</para>
-   </answer>
-  </qandaentry>
-
   <qandaentry xml:id="cannot-install-with-ibm-java">
    <question>
     <para>I am trying to install the WebSphere policy agent on Linux.
@@ -122,28 +111,69 @@ verifying OpenAM server URL.</screen>
    </answer>
   </qandaentry>
 
-  <qandaentry xml:id="web-agent-cannot-rotate-logs">
+  <qandaentry xml:id="websphere-SRVE0190E-file-not-found">
    <question>
-    <para>My web server and web policy agent are installed as root, and the
-    agent cannot rotate logs. I am seeing this error.</para>
-
-    <literallayout class="monospaced">Could not rotate log file ... (error: 13)</literallayout>
-
-    <para>What should I do?</para>
+    <para>After installing a Java EE policy agent on WebSphere AS 7 or 8,
+    accessing a URL for a folder in a protected application such as
+    <literal>http://openam.example.com:9080/test/</literal> results in
+    <literal>Error 404: SRVE0190E: File not found: {0}</literal>, and
+    redirection fails. What should I do to work around this problem?</para>
    </question>
 
    <answer>
-    <para>First, avoid installing the web server (and therefore also the web
-    policy agent) as root, but instead create a web server user and install
-    as that user.</para>
+    <para>Perform the following steps to work around the problem, by setting
+    the WebSphere custom property
+    <literal>com.ibm.ws.webcontainer.invokeFiltersCompatibility=true</literal>.</para>
 
-    <para>If however you cannot avoid installing the web server and policy agent
-    as root, the you must give all users read and write permissions to the
-    <filename>logs/</filename> and <filename>logs/debug</filename> directories
-    under the agent instance directory (
-    <filename>/path/to/web_agents/<replaceable>type</replaceable>/Agent_<replaceable>number</replaceable>/logs/</filename>).
-    Otherwise the web policy agent fails to rotate log files with the error
-    you observed.</para>
+    <orderedlist>
+     <listitem>
+      <para>In the administration console, browse to Servers &gt; Server Types,
+      and then click WebSphere application servers.</para>
+     </listitem>
+
+     <listitem>
+      <para>Click the server for which to apply the custom property.</para>
+     </listitem>
+
+     <listitem>
+      <para>Browse to Configuration &gt; Container settings &gt; Web Container
+      Settings &gt; Web container.</para>
+     </listitem>
+
+     <listitem>
+      <para>Under Configuration &gt; Additional Properties, click Custom
+      Properties.</para>
+     </listitem>
+
+     <listitem>
+      <para>In the Custom Properties page, click New.</para>
+     </listitem>
+
+     <listitem>
+      <para>In the settings page, enter the Name
+      <literal>com.ibm.ws.webcontainer.invokeFiltersCompatibility</literal> and
+      Value <literal>true</literal> for the custom property.</para>
+
+      <para>Some properties are case sensitive.</para>
+     </listitem>
+
+     <listitem>
+      <para>Click Apply or OK as applicable.</para>
+     </listitem>
+
+     <listitem>
+      <para>Click Save in the Message box that appears.</para>
+     </listitem>
+
+     <listitem>
+      <para>Restart the server for the custom property to take effect.</para>
+     </listitem>
+    </orderedlist>
+
+    <para>See the IBM documentation on <link xlink:show="new"
+    xlink:href="http://www-01.ibm.com/support/docview.wss?uid=swg21284395"
+    ><citetitle>Setting webcontainer custom properties</citetitle></link>
+    for additional information.</para>
    </answer>
   </qandaentry>
  </qandaset>
