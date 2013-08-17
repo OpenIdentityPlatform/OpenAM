@@ -11,7 +11,7 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2013 ForgeRock Inc.
+ * Copyright 2013 ForgeRock AS.
  */
 package org.forgerock.openam.idrepo.ldap;
 
@@ -47,11 +47,6 @@ public class GenericRepoTest extends IdRepoTestBase {
 
     private static final String GENERIC_SETTINGS = "/config/genericsettings.properties";
     private static final String GENERIC_DS_LDIF = "/ldif/generic.ldif";
-    private static final String TEST1 = "test1";
-    private static final String TEST1_DN = "cn=test1,ou=groups,dc=openam,dc=forgerock,dc=org";
-    private static final String TEST_USER1 = "testuser1";
-    private static final String DEMO = "demo";
-    private static final String DEMO_DN = "uid=demo,ou=people,dc=openam,dc=forgerock,dc=org";
 
     @BeforeClass
     public void setUp() throws Exception {
@@ -357,38 +352,38 @@ public class GenericRepoTest extends IdRepoTestBase {
     @Test
     public void groupCreationSuccessful() throws Exception {
         Map<String, Set<String>> attributes = MapHelper.readMap("/config/groups/test1.properties");
-        idrepo.create(null, IdType.GROUP, TEST1, attributes);
+        idrepo.create(null, IdType.GROUP, TEST1_GROUP, attributes);
         Map<String, Set<String>> returnedAttrs =
-                new CaseInsensitiveHashMap(idrepo.getAttributes(null, IdType.GROUP, TEST1));
+                new CaseInsensitiveHashMap(idrepo.getAttributes(null, IdType.GROUP, TEST1_GROUP));
         assertThat(returnedAttrs.get("uniqueMember")).containsOnly("uid=demo,ou=people,dc=openam,dc=forgerock,dc=org");
-        assertThat(idrepo.getMembers(null, IdType.GROUP, TEST1, IdType.USER)).containsOnly(DEMO_DN);
-        assertThat(idrepo.getMemberships(null, IdType.USER, DEMO, IdType.GROUP)).contains(TEST1_DN);
+        assertThat(idrepo.getMembers(null, IdType.GROUP, TEST1_GROUP, IdType.USER)).containsOnly(DEMO_DN);
+        assertThat(idrepo.getMemberships(null, IdType.USER, DEMO, IdType.GROUP)).contains(TEST1_GROUP_DN);
     }
 
     @Test(dependsOnMethods = "groupCreationSuccessful")
     public void groupMemberRemovalSuccessful() throws Exception {
-        assertThat(idrepo.getMembers(null, IdType.GROUP, TEST1, IdType.USER)).containsOnly(DEMO_DN);
-        idrepo.modifyMemberShip(null, IdType.GROUP, TEST1, asSet(DEMO), IdType.USER, IdRepo.REMOVEMEMBER);
-        assertThat(idrepo.getMembers(null, IdType.GROUP, TEST1, IdType.USER)).isEmpty();
+        assertThat(idrepo.getMembers(null, IdType.GROUP, TEST1_GROUP, IdType.USER)).containsOnly(DEMO_DN);
+        idrepo.modifyMemberShip(null, IdType.GROUP, TEST1_GROUP, asSet(DEMO), IdType.USER, IdRepo.REMOVEMEMBER);
+        assertThat(idrepo.getMembers(null, IdType.GROUP, TEST1_GROUP, IdType.USER)).isEmpty();
     }
 
     @Test(dependsOnMethods = "groupMemberRemovalSuccessful")
     public void groupMembershipsAreConsistent() throws Exception {
-        assertThat(idrepo.getMembers(null, IdType.GROUP, TEST1, IdType.USER)).isEmpty();
+        assertThat(idrepo.getMembers(null, IdType.GROUP, TEST1_GROUP, IdType.USER)).isEmpty();
         assertThat(idrepo.getMemberships(null, IdType.USER, DEMO, IdType.GROUP)).isEmpty();
-        idrepo.modifyMemberShip(null, IdType.GROUP, TEST1, asSet(DEMO), IdType.USER, IdRepo.ADDMEMBER);
-        assertThat(idrepo.getMembers(null, IdType.GROUP, TEST1, IdType.USER)).containsOnly(DEMO_DN);
-        assertThat(idrepo.getMemberships(null, IdType.USER, DEMO, IdType.GROUP)).containsOnly(TEST1_DN);
-        idrepo.modifyMemberShip(null, IdType.GROUP, TEST1, asSet(DEMO), IdType.USER, IdRepo.REMOVEMEMBER);
-        assertThat(idrepo.getMembers(null, IdType.GROUP, TEST1, IdType.USER)).isEmpty();
+        idrepo.modifyMemberShip(null, IdType.GROUP, TEST1_GROUP, asSet(DEMO), IdType.USER, IdRepo.ADDMEMBER);
+        assertThat(idrepo.getMembers(null, IdType.GROUP, TEST1_GROUP, IdType.USER)).containsOnly(DEMO_DN);
+        assertThat(idrepo.getMemberships(null, IdType.USER, DEMO, IdType.GROUP)).containsOnly(TEST1_GROUP_DN);
+        idrepo.modifyMemberShip(null, IdType.GROUP, TEST1_GROUP, asSet(DEMO), IdType.USER, IdRepo.REMOVEMEMBER);
+        assertThat(idrepo.getMembers(null, IdType.GROUP, TEST1_GROUP, IdType.USER)).isEmpty();
         assertThat(idrepo.getMemberships(null, IdType.USER, DEMO, IdType.GROUP)).isEmpty();
     }
 
     @Test(dependsOnMethods = "groupMembershipsAreConsistent")
     public void groupDeletionSuccessful() throws Exception {
-        assertThat(idrepo.isExists(null, IdType.GROUP, TEST1)).isTrue();
-        idrepo.delete(null, IdType.GROUP, TEST1);
-        assertThat(idrepo.isExists(null, IdType.GROUP, TEST1)).isFalse();
+        assertThat(idrepo.isExists(null, IdType.GROUP, TEST1_GROUP)).isTrue();
+        idrepo.delete(null, IdType.GROUP, TEST1_GROUP);
+        assertThat(idrepo.isExists(null, IdType.GROUP, TEST1_GROUP)).isFalse();
     }
 
     @Test

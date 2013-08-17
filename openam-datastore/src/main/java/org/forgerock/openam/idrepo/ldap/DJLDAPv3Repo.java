@@ -11,7 +11,7 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2013 ForgeRock Inc.
+ * Copyright 2013 ForgeRock AS.
  */
 package org.forgerock.openam.idrepo.ldap;
 
@@ -1632,7 +1632,8 @@ public class DJLDAPv3Repo extends IdRepo {
     }
 
     /**
-     * Modifies role membership data in the directory. This will add/remove DNs to the nsRoleDN attribute.
+     * Modifies role membership data in the directory. This will add/remove the corresponding nsRoleDN attribute from
+     * the user entry.
      *
      * @param roleDN The DN of the role.
      * @param memberDNs The DNs of the role members.
@@ -1641,17 +1642,21 @@ public class DJLDAPv3Repo extends IdRepo {
      * @throws IdRepoException If there was an error while modifying the membership data.
      */
     private void modifyRoleMembership(String roleDN, Set<String> memberDNs, int operation) throws IdRepoException {
-        ModifyRequest modifyRequest = Requests.newModifyRequest(roleDN);
-        Attribute attr = new LinkedAttribute(roleDNAttr, memberDNs);
+        Attribute attr = new LinkedAttribute(roleDNAttr, roleDN);
+        Modification mod;
         if (ADDMEMBER == operation) {
-            modifyRequest.addModification(new Modification(ModificationType.ADD, attr));
+            mod = new Modification(ModificationType.ADD, attr);
         } else {
-            modifyRequest.addModification(new Modification(ModificationType.DELETE, attr));
+            mod = new Modification(ModificationType.DELETE, attr);
         }
         Connection conn = null;
         try {
             conn = connectionFactory.getConnection();
-            conn.modify(modifyRequest);
+            for (String memberDN : memberDNs) {
+                ModifyRequest modifyRequest = Requests.newModifyRequest(memberDN);
+                modifyRequest.addModification(mod);
+                conn.modify(modifyRequest);
+            }
         } catch (ErrorResultException ere) {
             DEBUG.error("An error occurred while trying to modify role membership. Name: " + roleDN
                     + " memberDNs: " + memberDNs, ere);
