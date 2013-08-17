@@ -27,15 +27,18 @@ package org.forgerock.openam.upgrade.helpers;
 
 import com.sun.identity.sm.AbstractUpgradeHelper;
 import com.sun.identity.sm.AttributeSchemaImpl;
+
+import java.util.HashSet;
 import java.util.Set;
+
 import org.forgerock.openam.upgrade.UpgradeException;
 
 /**
- * Used to upgrade the iPlanetAMAuthService. 
- * 
+ * Used to upgrade the iPlanetAMAuthService.
+ *
  * @author steve
  */
-public class AuthServiceHelper extends AbstractUpgradeHelper { 
+public class AuthServiceHelper extends AbstractUpgradeHelper {
     // new modules
     private final static String SECURID = "com.sun.identity.authentication.modules.securid.SecurID";
     private final static String ADAPTIVE = "org.forgerock.openam.authentication.modules.adaptive.Adaptive";
@@ -43,25 +46,26 @@ public class AuthServiceHelper extends AbstractUpgradeHelper {
     private final static String OATH = "org.forgerock.openam.authentication.modules.oath.OATH";
     private final static String DEVICE_PRINT = "org.forgerock.openam.authentication.modules.deviceprint.DevicePrintModule";
     private final static String PERSISTENT_COOKIE = "org.forgerock.openam.authentication.modules.persistentcookie.PersistentCookie";
-    
+
     // remove modules
     private final static String SAFEWORD = "com.sun.identity.authentication.modules.safeword.SafeWord";
     private final static String UNIX = "com.sun.identity.authentication.modules.unix.Unix";
     private final static String ATTR = "iplanet-am-auth-authenticators";
+    private final static String XUI = "openam-xui-interface-enabled";
 
     public AuthServiceHelper() {
         attributes.add(ATTR);
     }
-    
+
     @Override
     public AttributeSchemaImpl upgradeAttribute(AttributeSchemaImpl existingAttr, AttributeSchemaImpl newAttr)
-    throws UpgradeException {
+            throws UpgradeException {
         if (!(newAttr.getName().equals(ATTR))) {
             return newAttr;
         }
-        
+
         Set<String> defaultValues = existingAttr.getDefaultValues();
-        
+
         if (defaultValues.contains(SECURID) && defaultValues.contains(ADAPTIVE) && defaultValues.contains(OAUTH2)
                 && defaultValues.contains(OATH) && defaultValues.contains(DEVICE_PRINT)
                 && defaultValues.contains(PERSISTENT_COOKIE)
@@ -69,7 +73,7 @@ public class AuthServiceHelper extends AbstractUpgradeHelper {
             // nothing to do
             return null;
         }
-        
+
         defaultValues.add(SECURID);
         defaultValues.add(ADAPTIVE);
         defaultValues.add(OAUTH2);
@@ -79,7 +83,23 @@ public class AuthServiceHelper extends AbstractUpgradeHelper {
         defaultValues.remove(SAFEWORD);
         defaultValues.remove(UNIX);
         newAttr = updateDefaultValues(newAttr, defaultValues);
-        
+
         return newAttr;
-    }    
+    }
+
+    public AttributeSchemaImpl addNewAttribute(Set<AttributeSchemaImpl> existingAttrs, AttributeSchemaImpl newAttr)
+            throws UpgradeException {
+
+        if (!newAttr.getName().equals(XUI)) {
+            return newAttr;
+        }
+
+        // make XUI not default for this upgrade
+        Set<String> defaultValues = newAttr.getDefaultValues();
+        Set<String> newDefaultValues = new HashSet<String>(1);
+        newDefaultValues.add("false");
+        newAttr = updateDefaultValues(newAttr, newDefaultValues);
+        return newAttr;
+    }
+
 }
