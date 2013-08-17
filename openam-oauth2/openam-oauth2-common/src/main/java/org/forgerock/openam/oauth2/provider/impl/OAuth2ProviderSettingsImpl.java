@@ -1,7 +1,7 @@
 /*
  * DO NOT REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright (c) 2013 ForgeRock AS. All rights reserved.
+ * Copyright (c) 2013 ForgeRock AS All rights reserved.
  *
  * The contents of this file are subject to the terms
  * of the Common Development and Distribution License
@@ -101,6 +101,7 @@ public class OAuth2ProviderSettingsImpl implements OAuth2ProviderSettings {
         final Long authorizationCodeLifetime;
         final Long refreshTokenLifetime;
         final Long accessTokenLifetime;
+        final Long jwtTokenLifetime;
         final Boolean refreshTokensEnabled;
         final String scopeImplementationClass;
         final Set<String> responseTypes;
@@ -110,10 +111,12 @@ public class OAuth2ProviderSettingsImpl implements OAuth2ProviderSettings {
         final Set<String> supportedSubjectTypes;
         final Set<String> supportedIdSigningAlgorithms;
         final Set<String> supportedClaims;
+        final String keyStoreAlias;
 
         private ProviderConfiguration(Long authorizationCodeLifetime,
                                      Long refreshTokenLifetime,
                                      Long accessTokenLifetime,
+                                     Long jwtTokenLifetime,
                                      Boolean refreshTokensEnabled,
                                      String scopeImplementationClass,
                                      Set<String> responseTypes,
@@ -122,11 +125,13 @@ public class OAuth2ProviderSettingsImpl implements OAuth2ProviderSettings {
                                      String jwksUri,
                                      Set<String> supportedSubjectTypes,
                                      Set<String> supportedIdSigningAlgorithms,
-                                     Set<String> supportedClaims) {
+                                     Set<String> supportedClaims,
+                                     String keyStoreAlias) {
 
             this.authorizationCodeLifetime = authorizationCodeLifetime;
             this.refreshTokenLifetime = refreshTokenLifetime;
             this.accessTokenLifetime = accessTokenLifetime;
+            this.jwtTokenLifetime = jwtTokenLifetime;
             this.refreshTokensEnabled = refreshTokensEnabled;
             this.scopeImplementationClass = scopeImplementationClass;
             this.responseTypes = (responseTypes != null) ? Collections.unmodifiableSet(responseTypes) : null;
@@ -137,6 +142,7 @@ public class OAuth2ProviderSettingsImpl implements OAuth2ProviderSettings {
             this.supportedSubjectTypes = (supportedSubjectTypes != null) ? Collections.unmodifiableSet(supportedSubjectTypes) : null;
             this.supportedIdSigningAlgorithms = (supportedIdSigningAlgorithms != null) ? Collections.unmodifiableSet(supportedIdSigningAlgorithms) : null;
             this.supportedClaims = (supportedClaims != null) ? Collections.unmodifiableSet(supportedClaims) : null;
+            this.keyStoreAlias = keyStoreAlias;
         }
 
         @Override
@@ -145,6 +151,7 @@ public class OAuth2ProviderSettingsImpl implements OAuth2ProviderSettings {
             builder.append("\t").append("authorizationCodeLifetime: ").append(authorizationCodeLifetime).append("\n");
             builder.append("\t").append("refreshTokenLifetime: ").append(refreshTokenLifetime).append("\n");
             builder.append("\t").append("accessTokenLifetime: ").append(accessTokenLifetime).append("\n");
+            builder.append("\t").append("jwtTokenLifetime: ").append(jwtTokenLifetime).append("\n");
             builder.append("\t").append("refreshTokensEnabled: ").append(refreshTokensEnabled).append("\n");
             builder.append("\t").append("scopeImplementationClass: ").append(scopeImplementationClass).append("\n");
             builder.append("\t").append("responseTypes: ").append(responseTypes).append("\n");
@@ -154,6 +161,7 @@ public class OAuth2ProviderSettingsImpl implements OAuth2ProviderSettings {
             builder.append("\t").append("supportedSubjectTypes: ").append(supportedSubjectTypes).append("\n");
             builder.append("\t").append("idSigningAlgorithms: ").append(supportedIdSigningAlgorithms).append("\n");
             builder.append("\t").append("supportedClaims: ").append(supportedClaims).append("\n");
+            builder.append("\t").append("keyStoreAlias: ").append(keyStoreAlias).append("\n");
             return builder.toString();
         }
     }
@@ -206,6 +214,7 @@ public class OAuth2ProviderSettingsImpl implements OAuth2ProviderSettings {
             Long authorizationCodeLifetime = getLongAttribute(serviceConfig, OAuth2Constants.OAuth2ProviderService.AUTHZ_CODE_LIFETIME_NAME);
             Long refreshTokenLifetime = getLongAttribute(serviceConfig, OAuth2Constants.OAuth2ProviderService.REFRESH_TOKEN_LIFETIME_NAME);
             Long accessTokenLifetime = getLongAttribute(serviceConfig, OAuth2Constants.OAuth2ProviderService.ACCESS_TOKEN_LIFETIME_NAME);
+            Long jwtTokenLifetime = getLongAttribute(serviceConfig, OAuth2Constants.OAuth2ProviderService.JWT_TOKEN_LIFETIME_NAME);
             boolean issueRefreshToken = getBooleanAttribute(serviceConfig, OAuth2Constants.OAuth2ProviderService.ISSUE_REFRESH_TOKEN);
             String scopeImplementationClass = getStringAttribute(serviceConfig, OAuth2Constants.OAuth2ProviderService.SCOPE_PLUGIN_CLASS);
             Set<String> responseTypes = getStringSetAttribute(serviceConfig, OAuth2Constants.OAuth2ProviderService.RESPONSE_TYPE_LIST);
@@ -215,11 +224,13 @@ public class OAuth2ProviderSettingsImpl implements OAuth2ProviderSettings {
             Set<String> supportedSubjectTypes = getStringSetAttribute(serviceConfig, OAuth2Constants.OAuth2ProviderService.SUBJECT_TYPES_SUPPORTED);
             Set<String> idTokenSigningAlgorithms = getStringSetAttribute(serviceConfig, OAuth2Constants.OAuth2ProviderService.ID_TOKEN_SIGNING_ALGORITHMS);
             Set<String> supportedClaims = getStringSetAttribute(serviceConfig, OAuth2Constants.OAuth2ProviderService.SUPPORTED_CLAIMS);
+            String keyStoreAlias = getStringAttribute(serviceConfig, OAuth2Constants.OAuth2ProviderService.KEYSTORE_ALIAS);
 
             ProviderConfiguration newProviderSettings = new ProviderConfiguration(
                     authorizationCodeLifetime,
                     refreshTokenLifetime,
                     accessTokenLifetime,
+                    jwtTokenLifetime,
                     issueRefreshToken,
                     scopeImplementationClass,
                     responseTypes,
@@ -228,7 +239,8 @@ public class OAuth2ProviderSettingsImpl implements OAuth2ProviderSettings {
                     jkwsUri,
                     supportedSubjectTypes,
                     idTokenSigningAlgorithms,
-                    supportedClaims);
+                    supportedClaims,
+                    keyStoreAlias);
             setProviderConfig(newProviderSettings);
             if (OAuth2Utils.DEBUG.messageEnabled()) {
                 OAuth2Utils.DEBUG.message("Successfully updated OAuth2 provider settings for realm " + realm + " with settings " +
@@ -363,6 +375,18 @@ public class OAuth2ProviderSettingsImpl implements OAuth2ProviderSettings {
     }
 
     @Override
+    public long getJWTTokenLifetime() {
+        if ((providerConfiguration != null) && (providerConfiguration.jwtTokenLifetime != null)) {
+            return providerConfiguration.jwtTokenLifetime;
+        } else {
+            String message = "OAuth2Utils::Unable to get provider setting for : "+
+                    OAuth2Constants.OAuth2ProviderService.JWT_TOKEN_LIFETIME_NAME;
+            OAuth2Utils.DEBUG.error(message);
+            throw OAuthProblemException.OAuthError.SERVER_ERROR.handle(null, message);
+        }
+    }
+
+    @Override
     public boolean getRefreshTokensEnabledState() {
         if ((providerConfiguration != null) && (providerConfiguration.refreshTokensEnabled != null)) {
             return providerConfiguration.refreshTokensEnabled;
@@ -465,6 +489,18 @@ public class OAuth2ProviderSettingsImpl implements OAuth2ProviderSettings {
         } else {
             String message = "OAuth2Utils::Unable to get provider setting for : "+
                     OAuth2Constants.OAuth2ProviderService.SUPPORTED_CLAIMS;
+            OAuth2Utils.DEBUG.error(message);
+            throw OAuthProblemException.OAuthError.SERVER_ERROR.handle(null, message);
+        }
+    }
+
+    @Override
+    public String getKeyStoreAlias() {
+        if ((providerConfiguration != null) && (providerConfiguration.keyStoreAlias != null)) {
+            return providerConfiguration.keyStoreAlias;
+        } else {
+            String message = "OAuth2Utils::Unable to get provider setting for : "+
+                    OAuth2Constants.OAuth2ProviderService.KEYSTORE_ALIAS;
             OAuth2Utils.DEBUG.error(message);
             throw OAuthProblemException.OAuthError.SERVER_ERROR.handle(null, message);
         }

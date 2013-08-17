@@ -1,7 +1,7 @@
 /*
  * DO NOT REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright (c) 2012-2013 ForgeRock Inc. All rights reserved.
+ * Copyright (c) 2012-2013 ForgeRock AS. All rights reserved.
  *
  * The contents of this file are subject to the terms
  * of the Common Development and Distribution License
@@ -29,6 +29,8 @@ import java.util.Set;
 
 /**
  * Implements the interface that needs to be implemented to read the client settings
+ *
+ * @supported.all.api
  */
 public interface ClientApplication {
 
@@ -282,5 +284,11 @@ public interface ClientApplication {
      * @return
      */
     public String getAccessToken();
+
+    /**
+     * Gets the uri for the rp used in session management.
+     * @return
+     */
+    public String getClientSessionURI();
 
 }

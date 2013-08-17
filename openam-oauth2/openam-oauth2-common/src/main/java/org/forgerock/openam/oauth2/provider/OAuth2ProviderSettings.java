@@ -1,7 +1,7 @@
 /*
  * DO NOT REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright (c) 2013 ForgeRock Inc. All rights reserved.
+ * Copyright (c) 2013 ForgeRock AS All rights reserved.
  *
  * The contents of this file are subject to the terms
  * of the Common Development and Distribution License
@@ -48,6 +48,12 @@ public interface OAuth2ProviderSettings {
      * @return a number in seconds
      */
     public long getAccessTokenLifetime();
+
+    /**
+     * Gets the seconds that an Access Token is valid for
+     * @return a number in seconds
+     */
+    public long getJWTTokenLifetime();
 
     /**
      * Gets whether or not refresh tokens are enabled
@@ -161,6 +167,12 @@ public interface OAuth2ProviderSettings {
      * @return A set of strings representing the claims supported for the userinfo endpoint.
      */
     public Set<String> getSupportedClaims();
+
+    /**
+     * Gets the name of the key used to sign the JWT tokens.
+     * @return The name of the key in the keystore.
+     */
+    public String getKeyStoreAlias();
 
     /* Optional Values
        userinfo_signing_alg_values_supported

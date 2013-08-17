@@ -28,7 +28,7 @@
 
 -->
 
-<!-- Portions Copyrighted 2011-2013 ForgeRock Inc -->
+<!-- Portions Copyrighted 2011-2013 ForgeRock AS -->
 
 <!DOCTYPE ServicesConfiguration
     PUBLIC "=//iPlanet//Service Management Services (SMS) 1.0 DTD//EN"
@@ -136,6 +136,7 @@
                            <Value>[0]=</Value>
                        </DefaultValues>
                    </AttributeSchema>
+              <!--
                   <AttributeSchema
                           name="com.forgerock.openam.oauth2provider.grantTypes"
                           type="list"
@@ -232,6 +233,7 @@
                           <Value></Value>
                       </DefaultValues>
                   </AttributeSchema>
+                  -->
                   <AttributeSchema name="com.forgerock.openam.oauth2provider.subjectType"
                                    type="single_choice"
                                    syntax="string"
@@ -244,6 +246,7 @@
                           <Value>Pairwise</Value>
                       </DefaultValues>
                   </AttributeSchema>
+              <!--
                   <AttributeSchema
                           name="com.forgerock.openam.oauth2provider.requestObjectSigningAlg"
                           type="single"
@@ -280,15 +283,17 @@
                           <Value></Value>
                       </DefaultValues>
                   </AttributeSchema>
+                  -->
                   <AttributeSchema
                           name="com.forgerock.openam.oauth2provider.idTokenSignedResponseAlg"
                           type="single"
                           syntax="string"
                           i18nKey="a731">
                       <DefaultValues>
-                          <Value></Value>
+                          <Value>HmacSHA256</Value>
                       </DefaultValues>
                   </AttributeSchema>
+                  <!--
                   <AttributeSchema
                           name="com.forgerock.openam.oauth2provider.idTokenEncryptedResponseAlg"
                           type="single"
@@ -328,6 +333,8 @@
                           <Value>false</Value>
                       </DefaultValues>
                   </AttributeSchema>
+                  -->
+              <!--
                   <AttributeSchema
                           name="com.forgerock.openam.oauth2provider.defaultACRValues"
                           type="single"
@@ -346,6 +353,7 @@
                           <Value></Value>
                       </DefaultValues>
                   </AttributeSchema>
+                  -->
                   <AttributeSchema
                           name="com.forgerock.openam.oauth2provider.postLogoutRedirectURI"
                           type="single"
@@ -355,6 +363,7 @@
                           <Value></Value>
                       </DefaultValues>
                   </AttributeSchema>
+              <!--
                   <AttributeSchema
                           name="com.forgerock.openam.oauth2provider.requestURIs"
                           type="list"
@@ -365,7 +374,7 @@
                           <Value>[0]=</Value>
                       </DefaultValues>
                   </AttributeSchema>
-
+                  -->
                   <AttributeSchema
                           name="com.forgerock.openam.oauth2provider.accessToken"
                           type="single"
@@ -375,6 +384,16 @@
                           <Value></Value>
                       </DefaultValues>
                   </AttributeSchema>
+
+              <AttributeSchema
+                      name="com.forgerock.openam.oauth2provider.clientSessionURI"
+                      type="single"
+                      syntax="string"
+                      i18nKey="a745">
+                  <DefaultValues>
+                      <Value></Value>
+                  </DefaultValues>
+              </AttributeSchema>
 
                    <AttributeSchema name="sunIdentityServerDeviceStatus"
                                      type="single_choice"

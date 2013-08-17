@@ -1050,6 +1050,11 @@
     </servlet>
 
     <servlet>
+        <servlet-name>OAuth2ConnectCheckSession</servlet-name>
+        <jsp-file>/oauth2/checkSession.jsp</jsp-file>
+    </servlet>
+
+    <servlet>
         <servlet-name>OAuth2Rest</servlet-name>
         <servlet-class>org.forgerock.json.resource.servlet.HttpServlet</servlet-class>
 
@@ -1067,6 +1072,11 @@
     <servlet-mapping>
         <servlet-name>OAuth2RegisterClient</servlet-name>
         <url-pattern>/oauth2/registerClient.jsp</url-pattern>
+    </servlet-mapping>
+
+    <servlet-mapping>
+        <servlet-name>OAuth2ConnectCheckSession</servlet-name>
+        <url-pattern>/oauth2/connect/checkSession</url-pattern>
     </servlet-mapping>
 
     <!-- servlet declaration -->

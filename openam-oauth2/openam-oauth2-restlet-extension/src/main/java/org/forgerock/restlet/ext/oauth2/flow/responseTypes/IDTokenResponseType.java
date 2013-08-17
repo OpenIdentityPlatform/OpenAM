@@ -1,7 +1,7 @@
 /*
  * DO NOT REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright (c) 2013 ForgeRock Inc. All rights reserved.
+ * Copyright (c) 2013 ForgeRock AS All rights reserved.
  *
  * The contents of this file are subject to the terms
  * of the Common Development and Distribution License
@@ -40,7 +40,8 @@ public class IDTokenResponseType implements ResponseType {
                 (String)data.get(OAuth2Constants.CoreTokenParams.USERNAME),
                 (String)data.get(OAuth2Constants.CoreTokenParams.CLIENT_ID),
                 (String)data.get(OAuth2Constants.CoreTokenParams.CLIENT_ID),
-                (String)data.get(OAuth2Constants.Custom.NONCE));
+                (String)data.get(OAuth2Constants.Custom.NONCE),
+                (String)data.get(OAuth2Constants.Custom.SSO_TOKEN_ID));
     }
 
     public String getReturnLocation(){

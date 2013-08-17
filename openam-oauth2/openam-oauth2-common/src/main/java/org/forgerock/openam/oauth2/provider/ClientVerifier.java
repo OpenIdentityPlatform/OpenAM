@@ -1,7 +1,7 @@
 /*
  * DO NOT REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright (c) 2012 ForgeRock Inc. All rights reserved.
+ * Copyright (c) 2012 ForgeRock AS. All rights reserved.
  *
  * The contents of this file are subject to the terms
  * of the Common Development and Distribution License
@@ -46,8 +46,7 @@ import org.restlet.data.ChallengeScheme;
  * The authorization server MAY allow the client to register multiple
  * redirection endpoints.
  * 
- * @author $author$
- * @version $Revision$ $Date$
+ * @supported.all.api
  */
 public interface ClientVerifier {
     /**

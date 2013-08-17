@@ -1,7 +1,7 @@
 /*
  * DO NOT REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright (c) 2012-2013 ForgeRock Inc. All rights reserved.
+ * Copyright (c) 2012-2013 ForgeRock AS. All rights reserved.
  *
  * The contents of this file are subject to the terms
  * of the Common Development and Distribution License
@@ -175,8 +175,8 @@ public class AbstractFlowTest {
                         (Set<String>) invocation.getArguments()[0]);
                 when(authorizationCode.getUserID()).thenReturn(
                         (String) invocation.getArguments()[1]);
-                when(authorizationCode.getClient()).thenReturn(
-                        (SessionClient) invocation.getArguments()[3]);
+                //when(authorizationCode.getClient()).thenReturn(
+                //        (SessionClient) invocation.getArguments()[3]);
                 when(authorizationCode.getTokenID()).thenReturn(code);
 
                 authorizationCodeMap.put(code, authorizationCode);

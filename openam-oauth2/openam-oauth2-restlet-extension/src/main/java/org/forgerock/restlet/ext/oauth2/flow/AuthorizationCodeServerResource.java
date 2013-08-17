@@ -28,6 +28,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
+import com.iplanet.am.util.SystemProperties;
 import com.sun.identity.shared.OAuth2Constants;
 import org.forgerock.json.fluent.JsonValue;
 import org.forgerock.openam.oauth2.model.CoreToken;
@@ -118,6 +119,8 @@ public class AuthorizationCodeServerResource extends AbstractFlow {
             Map<String, String> data = new HashMap<String, String>();
             String nonce = OAuth2Utils.getRequestParameter(getRequest(), OAuth2Constants.Custom.NONCE, String.class);
             data.put(OAuth2Constants.Custom.NONCE, nonce);
+            data.put(OAuth2Constants.Custom.SSO_TOKEN_ID, getRequest().getCookies().getValues(
+                    SystemProperties.get("com.iplanet.am.cookie.name")));
             response.putAll(executeExtraDataScopePlugin(data, token));
 
             String scope_before =

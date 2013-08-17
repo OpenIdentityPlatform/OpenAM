@@ -25,6 +25,7 @@
 package org.forgerock.restlet.ext.oauth2.flow;
 
 
+import com.iplanet.am.util.SystemProperties;
 import com.sun.identity.idm.AMIdentity;
 import com.sun.identity.shared.OAuth2Constants;
 import java.util.Arrays;
@@ -170,6 +171,8 @@ public class AuthorizeServerResource extends AbstractFlow {
             data.put(OAuth2Constants.CoreTokenParams.CLIENT_ID, sessionClient.getClientId());
             data.put(OAuth2Constants.CoreTokenParams.REDIRECT_URI, sessionClient.getRedirectUri());
             data.put(OAuth2Constants.Custom.NONCE, nonce);
+            data.put(OAuth2Constants.Custom.SSO_TOKEN_ID, getRequest().getCookies().getValues(
+                    SystemProperties.get("com.iplanet.am.cookie.name")));
 
 
             if (requestedResponseTypes == null || requestedResponseTypes.isEmpty()) {

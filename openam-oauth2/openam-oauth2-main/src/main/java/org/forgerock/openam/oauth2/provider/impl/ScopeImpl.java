@@ -1,7 +1,7 @@
 /*
  * DO NOT REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright (c) 2012-2013 ForgeRock Inc. All rights reserved.
+ * Copyright (c) 2012-2013 ForgeRock AS All rights reserved.
  *
  * The contents of this file are subject to the terms
  * of the Common Development and Distribution License
@@ -25,16 +25,23 @@
 package org.forgerock.openam.oauth2.provider.impl;
 
 import com.iplanet.sso.SSOException;
+import com.iplanet.sso.SSOToken;
 import com.sun.identity.idm.*;
 import com.sun.identity.shared.OAuth2Constants;
+import org.forgerock.json.jose.jws.JwsAlgorithm;
 import org.forgerock.json.jose.jws.SignedJwt;
+import org.forgerock.json.jose.jwt.JwtClaimsSet;
 import org.forgerock.openam.ext.cts.repo.DefaultOAuthTokenStoreImpl;
+import org.forgerock.openam.oauth2.exceptions.OAuthProblemException;
 import org.forgerock.openam.guice.InjectorHolder;
 import org.forgerock.openam.oauth2.model.CoreToken;
+import org.forgerock.openam.oauth2.model.JWTToken;
 import org.forgerock.openam.oauth2.provider.OAuth2TokenStore;
 import org.forgerock.openam.oauth2.provider.Scope;
 import org.forgerock.openam.oauth2.utils.OAuth2Utils;
+import org.restlet.Request;
 
+import java.security.SignatureException;
 import java.util.*;
 
 /**
@@ -183,12 +190,17 @@ public class ScopeImpl implements Scope {
                     token.getUserID(),
                     token.getClientID(),
                     token.getClientID(),
-                    parameters.get(OAuth2Constants.Custom.NONCE));
-
-            //TODO setting for this
-            //sign the JWT token
-            SignedJwt sjwt = OAuth2Utils.signJWT(jwtToken);
-            map.put("id_token", sjwt.build());
+                    parameters.get(OAuth2Constants.Custom.NONCE),
+                    parameters.get(OAuth2Constants.Custom.SSO_TOKEN_ID));
+            SignedJwt signedJwt = null;
+            try {
+                signedJwt =((JWTToken) jwtToken).sign(OAuth2Utils.getServerKeyPair(Request.getCurrent()).getPrivate());
+            } catch (SignatureException e){
+                OAuth2Utils.DEBUG.error("ScopeImpl.extraDataToReturnForTokenEndpoint()::Unable to sign JWT", e);
+                throw OAuthProblemException.OAuthError.SERVER_ERROR.handle(Request.getCurrent(),
+                        "Cant sign JWT");
+            }
+            map.put("id_token", signedJwt.build());
         }
         //END OpenID Connect
         return map;

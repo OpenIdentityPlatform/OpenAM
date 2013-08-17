@@ -1,7 +1,7 @@
 /*
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright (c) 2012-2013 ForgeRock US Inc. All Rights Reserved
+ * Copyright (c) 2012-2013 ForgeRock AS. All Rights Reserved
  *
  * The contents of this file are subject to the terms of the Common Development and
  * Distribution License (the License). You may not use this file except in compliance with the
@@ -53,7 +53,7 @@ public class CoreToken extends JsonValue implements Token {
     }
 
     /**
-     * @{inheritDoc}
+     * {@inheritDoc}
      */
     public Map<String, Object> convertToMap(){
         Map<String, Object> tokenMap = new HashMap<String, Object>();
@@ -63,8 +63,7 @@ public class CoreToken extends JsonValue implements Token {
     }
 
     /**
-     * Gets information about the token for the tokeninfo end point
-     * @return
+     * {@inheritDoc}
      */
     public Map<String, Object> getTokenInfo() {
         Map<String, Object> tokenMap = new HashMap<String, Object>();
@@ -105,10 +104,7 @@ public class CoreToken extends JsonValue implements Token {
     }
 
     /**
-     * Get tokens id
-     *
-     * @return
-     *          ID of token
+     * {@inheritDoc}
      */
     public String getTokenID(){
         if (id != null){
@@ -160,10 +156,7 @@ public class CoreToken extends JsonValue implements Token {
     }
 
     /**
-     * Get tokens UserID
-     *
-     * @return
-     *          ID of user
+     * {@inheritDoc}
      */
     public String getUserID() {
         Set<String> value = this.getParameter(OAuth2Constants.CoreTokenParams.USERNAME);
@@ -174,10 +167,7 @@ public class CoreToken extends JsonValue implements Token {
     }
 
     /**
-     * Get Tokens Realm
-     *
-     * @return
-     *          the realm
+     * {@inheritDoc}
      */
     public String getRealm() {
         Set<String> value = this.getParameter(OAuth2Constants.CoreTokenParams.REALM);
@@ -188,9 +178,7 @@ public class CoreToken extends JsonValue implements Token {
     }
 
     /**
-     * Returns the seconds until token expire.
-     *
-     * @return time of expiry expressed as milliseconds since the epoch.
+     * {@inheritDoc}
      */
     public long getExpireTime() {
         Set<String> value = this.getParameter(OAuth2Constants.CoreTokenParams.EXPIRE_TIME);
@@ -201,21 +189,7 @@ public class CoreToken extends JsonValue implements Token {
     }
 
     /**
-     * Get tokens client
-     *
-     * @return
-     *          the {@link SessionClient} for the token
-     */
-    public SessionClient getClient(){
-
-        return new SessionClientImpl(getClientID(), getRedirectURI());
-    }
-
-    /**
-     * Gets the tokens scope
-     *
-     * @return
-     *          Set of strings that are the tokens scope
+     * {@inheritDoc}
      */
     public Set<String> getScope(){
         Set<String> value = this.getParameter(OAuth2Constants.CoreTokenParams.SCOPE);
@@ -226,20 +200,14 @@ public class CoreToken extends JsonValue implements Token {
     }
 
     /**
-     * Checks if token is expired
-     *
-     * @return
-     *          true if expired
-     *          false if not expired
+     * {@inheritDoc}
      */
     public boolean isExpired() {
         return (System.currentTimeMillis() > getExpireTime());
     }
 
     /**
-     * Returns the token type
-     *
-     * @return The type of token. For example {@link BearerToken}
+     * {@inheritDoc}
      */
     public String getTokenType(){
         Set<String> value = this.getParameter(OAuth2Constants.CoreTokenParams.TOKEN_TYPE);
@@ -250,9 +218,7 @@ public class CoreToken extends JsonValue implements Token {
     }
 
     /**
-     * Returns the name of the token
-     *
-     * @return The name of token. Will be either access_token, code, refresh_token
+     * {@inheritDoc}
      */
     public String getTokenName(){
         Set<String> value = this.getParameter(OAuth2Constants.CoreTokenParams.TOKEN_NAME);
@@ -263,9 +229,7 @@ public class CoreToken extends JsonValue implements Token {
     }
 
     /**
-     * Returns the client_id associated token
-     *
-     * @return The client_id associated with token
+     * {@inheritDoc}
      */
     public String getClientID(){
         Set<String> value = this.getParameter(OAuth2Constants.CoreTokenParams.CLIENT_ID);

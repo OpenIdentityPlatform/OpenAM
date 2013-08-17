@@ -1,7 +1,7 @@
 /*
  * DO NOT REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright (c) 2012-2013 ForgeRock Inc. All rights reserved.
+ * Copyright (c) 2012-2013 ForgeRock AS All rights reserved.
  *
  * The contents of this file are subject to the terms
  * of the Common Development and Distribution License
@@ -29,10 +29,8 @@ import java.net.URI;
 import com.sun.identity.shared.OAuth2Constants;
 import org.forgerock.openam.guice.InjectorHolder;
 import org.forgerock.openam.oauth2.internal.UserIdentityVerifier;
-import org.forgerock.openam.oauth2.model.CoreToken;
 import org.forgerock.openam.oauth2.openid.ConnectClientRegistration;
-import org.forgerock.openam.oauth2.openid.OpenIDConnectConfiguration;
-import org.forgerock.openam.oauth2.openid.OpenIDConnectDiscovery;
+import org.forgerock.openam.oauth2.openid.EndSession;
 import org.forgerock.openam.oauth2.openid.UserInfo;
 import org.forgerock.openam.oauth2.provider.impl.ClientVerifierImpl;
 import org.forgerock.openam.ext.cts.repo.DefaultOAuthTokenStoreImpl;
@@ -42,11 +40,7 @@ import org.forgerock.openam.oauth2.model.BearerToken;
 import org.forgerock.restlet.ext.oauth2.consumer.BearerTokenVerifier;
 import org.forgerock.restlet.ext.oauth2.consumer.OAuth2Authenticator;
 import org.forgerock.restlet.ext.oauth2.consumer.TokenVerifier;
-import org.forgerock.restlet.ext.oauth2.internal.DefaultScopeEnroler;
 import org.forgerock.restlet.ext.oauth2.provider.*;
-import org.forgerock.restlet.ext.openam.OpenAMParameters;
-import org.forgerock.openam.oauth2.provider.impl.OpenAMServerAuthorizer;
-import org.forgerock.restlet.ext.openam.server.OpenAMServletAuthenticator;
 import org.restlet.Application;
 import org.restlet.Context;
 import org.restlet.Request;
@@ -54,7 +48,6 @@ import org.restlet.Restlet;
 import org.restlet.data.Reference;
 import org.restlet.data.MediaType;
 import org.restlet.routing.Router;
-import org.restlet.security.RoleAuthorizer;
 import org.restlet.security.Verifier;
 
 /**
@@ -107,6 +100,9 @@ public class OAuth2Application extends Application {
                         OAuth2Utils.ParameterLocation.HTTP_HEADER, tokenVerifier);
         authenticator.setNext(UserInfo.class);
         root.attach("/userinfo", authenticator);
+
+        //connect session management
+        root.attach("/connect/endSession", EndSession.class);
 
         return root;
     }

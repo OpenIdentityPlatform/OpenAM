@@ -2,7 +2,7 @@
 /*
  * DO NOT REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright (c) 2012-2013 ForgeRock Inc. All rights reserved.
+ * Copyright (c) 2012-2013 ForgeRock AS. All rights reserved.
  *
  * The contents of this file are subject to the terms
  * of the Common Development and Distribution License
@@ -640,5 +640,17 @@ public class ClientApplicationImpl implements ClientApplication{
         }
 
         return result;
+    }
+
+    public String getClientSessionURI(){
+        Set<String> set = null;
+        try {
+            set = id.getAttribute(OAuth2Constants.OAuth2Client.CLIENT_SESSION_URI);
+        } catch (Exception e){
+            OAuth2Utils.DEBUG.error("Unable to get "+ OAuth2Constants.OAuth2Client.CLIENT_SESSION_URI +" from repository", e);
+            throw OAuthProblemException.OAuthError.SERVER_ERROR.handle(Request.getCurrent(),
+                    "Unable to get "+ OAuth2Constants.OAuth2Client.CLIENT_SESSION_URI +" from repository");
+        }
+        return set.iterator().next();
     }
 }

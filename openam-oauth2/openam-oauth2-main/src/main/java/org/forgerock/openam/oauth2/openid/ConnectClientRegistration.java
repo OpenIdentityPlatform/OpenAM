@@ -1,7 +1,7 @@
 /*
  * DO NOT REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright (c) 2012-2013 ForgeRock Inc. All rights reserved.
+ * Copyright (c) 2012-2013 ForgeRock AS. All rights reserved.
  *
  * The contents of this file are subject to the terms
  * of the Common Development and Distribution License
@@ -66,7 +66,7 @@ public class ConnectClientRegistration extends ServerResource {
 
         if (clientId != null){
             try {
-                AMIdentity client = OAuth2Utils.getClient(clientId, OAuth2Utils.getRealm(getRequest()));
+                AMIdentity client = OAuth2Utils.getClientIdentity(clientId, OAuth2Utils.getRealm(getRequest()));
                 ClientApplication oauth2client;
                 if (this.oauth2client != null){
                     oauth2client = this.oauth2client;
@@ -96,29 +96,29 @@ public class ConnectClientRegistration extends ServerResource {
         response.put(OAuth2Constants.OAuth2Client.DEFAULT_SCOPES, oauth2Client.getDefaultGrantScopes());
         response.put(OAuth2Constants.OAuth2Client.NAME, oauth2Client.getClientName());
         response.put(OAuth2Constants.OAuth2Client.DESCRIPTION, oauth2Client.getDisplayDescription());
-        response.put(OAuth2Constants.OAuth2Client.GRANT_TYPES, oauth2Client.getGrantTypes());
-        response.put(OAuth2Constants.OAuth2Client.RESPONSE_TYPES, oauth2Client.getResponseTypes());
-        response.put(OAuth2Constants.OAuth2Client.CONTACTS, oauth2Client.getContacts());
-        response.put(OAuth2Constants.OAuth2Client.LOGO_URI, oauth2Client.getLogoURI());
-        response.put(OAuth2Constants.OAuth2Client.TOKEN_ENDPOINT_AUTH_METHOD, oauth2Client.getTokenEndpointAuthMethod());
-        response.put(OAuth2Constants.OAuth2Client.POLICY_URI, oauth2Client.getPolicyURI());
-        response.put(OAuth2Constants.OAuth2Client.TOS_URI, oauth2Client.getTosURI());
+        //response.put(OAuth2Constants.OAuth2Client.GRANT_TYPES, oauth2Client.getGrantTypes());
+        //response.put(OAuth2Constants.OAuth2Client.RESPONSE_TYPES, oauth2Client.getResponseTypes());
+        //response.put(OAuth2Constants.OAuth2Client.CONTACTS, oauth2Client.getContacts());
+        //response.put(OAuth2Constants.OAuth2Client.LOGO_URI, oauth2Client.getLogoURI());
+        //response.put(OAuth2Constants.OAuth2Client.TOKEN_ENDPOINT_AUTH_METHOD, oauth2Client.getTokenEndpointAuthMethod());
+        //response.put(OAuth2Constants.OAuth2Client.POLICY_URI, oauth2Client.getPolicyURI());
+        //response.put(OAuth2Constants.OAuth2Client.TOS_URI, oauth2Client.getTosURI());
         response.put(OAuth2Constants.OAuth2Client.JKWS_URI, oauth2Client.getJwksURI());
-        response.put(OAuth2Constants.OAuth2Client.SECTOR_IDENTIFIER_URI, oauth2Client.getSectorIdentifierURI());
+        //response.put(OAuth2Constants.OAuth2Client.SECTOR_IDENTIFIER_URI, oauth2Client.getSectorIdentifierURI());
         response.put(OAuth2Constants.OAuth2Client.SUBJECT_TYPE, oauth2Client.getSubjectType());
-        response.put(OAuth2Constants.OAuth2Client.REQUEST_OBJECT_SIGNING_ALG, oauth2Client.getRequestObjectSigningAlgorithm());
-        response.put(OAuth2Constants.OAuth2Client.USERINFO_SIGNED_RESPONSE_ALG, oauth2Client.getUserInfoSignedResponseAlgorithm());
-        response.put(OAuth2Constants.OAuth2Client.USERINFO_ENCRYPTED_RESPONSE_ALG, oauth2Client.getUserInfoEncryptedResposneAlgorithm());
-        response.put(OAuth2Constants.OAuth2Client.USERINFO_SIGN_AND_ENC_RESPONSE_ALG, oauth2Client.getUserInfoEncryptedResponseEncoding());
+        //response.put(OAuth2Constants.OAuth2Client.REQUEST_OBJECT_SIGNING_ALG, oauth2Client.getRequestObjectSigningAlgorithm());
+        //response.put(OAuth2Constants.OAuth2Client.USERINFO_SIGNED_RESPONSE_ALG, oauth2Client.getUserInfoSignedResponseAlgorithm());
+        //response.put(OAuth2Constants.OAuth2Client.USERINFO_ENCRYPTED_RESPONSE_ALG, oauth2Client.getUserInfoEncryptedResposneAlgorithm());
+        //response.put(OAuth2Constants.OAuth2Client.USERINFO_SIGN_AND_ENC_RESPONSE_ALG, oauth2Client.getUserInfoEncryptedResponseEncoding());
         response.put(OAuth2Constants.OAuth2Client.IDTOKEN_SIGNED_RESPONSE_ALG, oauth2Client.getIDTokenSignedResponseAlgorithm());
-        response.put(OAuth2Constants.OAuth2Client.IDTOKEN_ENCRYPTED_RESPONSE_ALG, oauth2Client.getIDTokenEncryptedResposneAlgorithm());
-        response.put(OAuth2Constants.OAuth2Client.IDTOKEN_ENC_AND_SIGNED_RESPONSE_ALG, oauth2Client.getIDTokenEncryptedResponseEncoding());
-        response.put(OAuth2Constants.OAuth2Client.DEFAULT_MAX_AGE, oauth2Client.getDefaultMaxAge());
-        response.put(OAuth2Constants.OAuth2Client.REQUIRE_AUTH_TIME, oauth2Client.getRequireAuthTime());
-        response.put(OAuth2Constants.OAuth2Client.DEFAULT_ACR_VALS, oauth2Client.getDefaultACRValues());
-        response.put(OAuth2Constants.OAuth2Client.INIT_LOGIN_URL, oauth2Client.getinitiateLoginURI());
+        //response.put(OAuth2Constants.OAuth2Client.IDTOKEN_ENCRYPTED_RESPONSE_ALG, oauth2Client.getIDTokenEncryptedResposneAlgorithm());
+        //response.put(OAuth2Constants.OAuth2Client.IDTOKEN_ENC_AND_SIGNED_RESPONSE_ALG, oauth2Client.getIDTokenEncryptedResponseEncoding());
+        //response.put(OAuth2Constants.OAuth2Client.DEFAULT_MAX_AGE, oauth2Client.getDefaultMaxAge());
+        //response.put(OAuth2Constants.OAuth2Client.REQUIRE_AUTH_TIME, oauth2Client.getRequireAuthTime());
+        //response.put(OAuth2Constants.OAuth2Client.DEFAULT_ACR_VALS, oauth2Client.getDefaultACRValues());
+        //response.put(OAuth2Constants.OAuth2Client.INIT_LOGIN_URL, oauth2Client.getinitiateLoginURI());
         response.put(OAuth2Constants.OAuth2Client.POST_LOGOUT_URI, oauth2Client.getPostLogoutRedirectionURI());
-        response.put(OAuth2Constants.OAuth2Client.REQUEST_URLs, oauth2Client.getRequestURIS());
+        //response.put(OAuth2Constants.OAuth2Client.REQUEST_URLs, oauth2Client.getRequestURIS());
         response.put(OAuth2Constants.OAuth2Client.CLIENT_TYPE, oauth2Client.getClientType());
         response.put(OAuth2Constants.OAuth2Client.CLIENT_ID, oauth2Client.getClientId());
 
@@ -191,7 +191,7 @@ public class ConnectClientRegistration extends ServerResource {
         if (secret == null) {
             secret = UUID.randomUUID().toString();
             try {
-                response.put(OAuth2Constants.OAuth2Client.CLIENT_SECRET, new JSONArray(secret));
+                response.put(OAuth2Constants.OAuth2Client.CLIENT_SECRET, secret);
             } catch (Exception e) {
                 OAuth2Utils.DEBUG.error("ConnectClientRegistration.Validate(): Error adding client_secret", e);
                 throw OAuthProblemException.OAuthError.INVALID_CLIENT_METADATA.handle(getRequest());
@@ -203,7 +203,7 @@ public class ConnectClientRegistration extends ServerResource {
             if (mapEntry.getValue() instanceof String) {
                 Set<String> temp = new HashSet<String>();
                 temp.add((String) mapEntry.getValue());
-                attrs.put((String) mapEntry.getKey(), temp);
+                attrs.put(translate((String) mapEntry.getKey()), temp);
             } else if (mapEntry.getValue() instanceof JSONArray) {
                 JSONArray temp = (JSONArray)mapEntry.getValue();
                 Set<String> set = new HashSet<String>();
@@ -215,7 +215,7 @@ public class ConnectClientRegistration extends ServerResource {
                         throw OAuthProblemException.OAuthError.INVALID_CLIENT_METADATA.handle(getRequest());
                     }
                 }
-                attrs.put((String) mapEntry.getKey(), set);
+                attrs.put(translate((String) mapEntry.getKey()), set);
             } else {
                 OAuth2Utils.DEBUG.error("ConnectClientRegistration.Validate(): Unable to create client");
                 throw OAuthProblemException.OAuthError.INVALID_CLIENT_METADATA.handle(getRequest());
@@ -255,53 +255,53 @@ public class ConnectClientRegistration extends ServerResource {
         if (key.equalsIgnoreCase("redirect_uris")) {
             return OAuth2Constants.OAuth2Client.REDIRECT_URI;
         } else if (key.equalsIgnoreCase("response_types")) {
-            return OAuth2Constants.OAuth2Client.RESPONSE_TYPES;
+            //return OAuth2Constants.OAuth2Client.RESPONSE_TYPES;
         } else if (key.equalsIgnoreCase("grant_types")) {
-            return OAuth2Constants.OAuth2Client.GRANT_TYPES;
+            //return OAuth2Constants.OAuth2Client.GRANT_TYPES;
         } else if (key.equalsIgnoreCase("contacts")) {
-            return OAuth2Constants.OAuth2Client.CONTACTS;
+            //return OAuth2Constants.OAuth2Client.CONTACTS;
         } else if (key.equalsIgnoreCase("client_name")) {
             return OAuth2Constants.OAuth2Client.NAME;
         } else if (key.equalsIgnoreCase("logo_uri")) {
-            return OAuth2Constants.OAuth2Client.LOGO_URI;
+            //return OAuth2Constants.OAuth2Client.LOGO_URI;
         } else if (key.equalsIgnoreCase("token_endpoint_auth_method")) {
-            return OAuth2Constants.OAuth2Client.TOKEN_ENDPOINT_AUTH_METHOD;
+            //return OAuth2Constants.OAuth2Client.TOKEN_ENDPOINT_AUTH_METHOD;
         } else if (key.equalsIgnoreCase("policy_uri")) {
-            return OAuth2Constants.OAuth2Client.POLICY_URI;
+            //return OAuth2Constants.OAuth2Client.POLICY_URI;
         } else if (key.equalsIgnoreCase("tos_uri")) {
-            return OAuth2Constants.OAuth2Client.TOS_URI;
+            //return OAuth2Constants.OAuth2Client.TOS_URI;
         } else if (key.equalsIgnoreCase("jwks_uri")) {
             return OAuth2Constants.OAuth2Client.JKWS_URI;
         } else if (key.equalsIgnoreCase("sector_identifier_uri")) {
-            return OAuth2Constants.OAuth2Client.SECTOR_IDENTIFIER_URI;
+            //return OAuth2Constants.OAuth2Client.SECTOR_IDENTIFIER_URI;
         } else if (key.equalsIgnoreCase("subject_type")) {
             return OAuth2Constants.OAuth2Client.SUBJECT_TYPE;
         } else if (key.equalsIgnoreCase("request_object_signing_alg")) {
-            return OAuth2Constants.OAuth2Client.REQUEST_OBJECT_SIGNING_ALG;
+            //return OAuth2Constants.OAuth2Client.REQUEST_OBJECT_SIGNING_ALG;
         } else if (key.equalsIgnoreCase("userinfo_signed_response_alg")) {
-            return OAuth2Constants.OAuth2Client.USERINFO_SIGNED_RESPONSE_ALG;
+            //return OAuth2Constants.OAuth2Client.USERINFO_SIGNED_RESPONSE_ALG;
         } else if (key.equalsIgnoreCase("userinfo_encrypted_response_alg")) {
-            return OAuth2Constants.OAuth2Client.USERINFO_ENCRYPTED_RESPONSE_ALG;
+            //return OAuth2Constants.OAuth2Client.USERINFO_ENCRYPTED_RESPONSE_ALG;
         } else if (key.equalsIgnoreCase("userinfo_encrypted_response_enc")) {
-            return OAuth2Constants.OAuth2Client.USERINFO_SIGN_AND_ENC_RESPONSE_ALG;
+            //return OAuth2Constants.OAuth2Client.USERINFO_SIGN_AND_ENC_RESPONSE_ALG;
         } else if (key.equalsIgnoreCase("id_token_signed_response_alg")) {
             return OAuth2Constants.OAuth2Client.IDTOKEN_SIGNED_RESPONSE_ALG;
         } else if (key.equalsIgnoreCase("id_token_encrypted_response_alg")) {
-            return OAuth2Constants.OAuth2Client.IDTOKEN_ENCRYPTED_RESPONSE_ALG;
+            //return OAuth2Constants.OAuth2Client.IDTOKEN_ENCRYPTED_RESPONSE_ALG;
         } else if (key.equalsIgnoreCase("id_token_encrypted_response_enc")) {
-            return OAuth2Constants.OAuth2Client.IDTOKEN_ENC_AND_SIGNED_RESPONSE_ALG;
+            //return OAuth2Constants.OAuth2Client.IDTOKEN_ENC_AND_SIGNED_RESPONSE_ALG;
         } else if (key.equalsIgnoreCase("default_max_age")) {
-            return OAuth2Constants.OAuth2Client.DEFAULT_MAX_AGE;
+            //return OAuth2Constants.OAuth2Client.DEFAULT_MAX_AGE;
         } else if (key.equalsIgnoreCase("require_auth_time")) {
-            return OAuth2Constants.OAuth2Client.REQUIRE_AUTH_TIME;
+            //return OAuth2Constants.OAuth2Client.REQUIRE_AUTH_TIME;
         } else if (key.equalsIgnoreCase("default_acr_values")) {
-            return OAuth2Constants.OAuth2Client.DEFAULT_ACR_VALS;
+            //return OAuth2Constants.OAuth2Client.DEFAULT_ACR_VALS;
         } else if (key.equalsIgnoreCase("initiate_login_uri")) {
-            return OAuth2Constants.OAuth2Client.INIT_LOGIN_URL;
+            //return OAuth2Constants.OAuth2Client.INIT_LOGIN_URL;
         } else if (key.equalsIgnoreCase("post_logout_redirect_uri")) {
             return OAuth2Constants.OAuth2Client.POST_LOGOUT_URI;
         } else if (key.equalsIgnoreCase("request_uris")) {
-            return OAuth2Constants.OAuth2Client.REQUEST_URLs;
+            //return OAuth2Constants.OAuth2Client.REQUEST_URLs;
         } else if (key.equalsIgnoreCase("registration_access_token")){
             return OAuth2Constants.OAuth2Client.ACCESS_TOKEN;
         } else if (key.equalsIgnoreCase(OAuth2Constants.OAuth2Client.USERPASSWORD)) {
@@ -316,9 +316,12 @@ public class ConnectClientRegistration extends ServerResource {
             return OAuth2Constants.OAuth2Client.REALM;
         } else if (key.equalsIgnoreCase(OAuth2Constants.OAuth2Client.CLIENT_SECRET)) {
             return OAuth2Constants.OAuth2Client.USERPASSWORD;
+        } else if (key.equalsIgnoreCase(OAuth2Constants.OAuth2Client.CLIENT_SESSION_URI)) {
+            return OAuth2Constants.OAuth2Client.CLIENT_SESSION_URI;
         } else {
             return key;
         }
+        return key;
     }
 
     @Override

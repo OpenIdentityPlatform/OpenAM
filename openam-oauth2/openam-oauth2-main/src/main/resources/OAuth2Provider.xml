@@ -5,7 +5,7 @@
 <!--
    DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
 
-   Copyright (c) 2011-2013 ForgeRock Inc. All Rights Reserved
+   Copyright (c) 2011-2013 ForgeRock AS All Rights Reserved
 
    The contents of this file are subject to the terms
    of the Common Development and Distribution License
@@ -40,7 +40,7 @@
                                  validator="RequiredValueValidator"
                                  i18nKey="a100">
                     <DefaultValues>
-                        <Value>1</Value>
+                        <Value>10</Value>
                     </DefaultValues>
                 </AttributeSchema>
 
@@ -50,7 +50,7 @@
                                  validator="RequiredValueValidator"
                                  i18nKey="a101">
                     <DefaultValues>
-                        <Value>1</Value>
+                        <Value>600</Value>
                     </DefaultValues>
                 </AttributeSchema>
 
@@ -60,7 +60,7 @@
                                  validator="RequiredValueValidator"
                                  i18nKey="a102">
                     <DefaultValues>
-                        <Value>1</Value>
+                        <Value>60</Value>
                     </DefaultValues>
                 </AttributeSchema>
 
@@ -155,7 +155,9 @@
                         syntax="string"
                         i18nKey="a111">
                     <DefaultValues>
-                        <Value></Value>
+                        <Value>HmacSHA256</Value>
+                        <Value>HmacSHA384</Value>
+                        <Value>HmacSHA512</Value>
                     </DefaultValues>
                 </AttributeSchema>
 
@@ -165,7 +167,31 @@
                         syntax="string"
                         i18nKey="a112">
                     <DefaultValues>
-                        <Value></Value>
+                        <Value>openid</Value>
+                        <Value>profile</Value>
+                        <Value>email</Value>
+                        <Value>address</Value>
+                        <Value>phone</Value>
+                    </DefaultValues>
+                </AttributeSchema>
+
+                <AttributeSchema name="forgerock-oauth2-provider-jwt-token-lifetime"
+                                 type="single"
+                                 syntax="number_range" rangeStart="0" rangeEnd="2147483647"
+                                 validator="RequiredValueValidator"
+                                 i18nKey="a113">
+                    <DefaultValues>
+                        <Value>600</Value>
+                    </DefaultValues>
+                </AttributeSchema>
+
+                <AttributeSchema name="forgerock-oauth2-provider-keypair-name"
+                                 type="single"
+                                 syntax="string"
+                                 validator="RequiredValueValidator"
+                                 i18nKey="a114">
+                    <DefaultValues>
+                        <Value>test</Value>
                     </DefaultValues>
                 </AttributeSchema>
 
@@ -177,7 +203,7 @@
                                      validator="RequiredValueValidator"
                                      i18nKey="a100">
                         <DefaultValues>
-                            <Value>1</Value>
+                            <Value>10</Value>
                         </DefaultValues>
                     </AttributeSchema>
 
@@ -187,7 +213,7 @@
                                      validator="RequiredValueValidator"
                                      i18nKey="a101">
                         <DefaultValues>
-                            <Value>1</Value>
+                            <Value>600</Value>
                         </DefaultValues>
                     </AttributeSchema>
 
@@ -197,7 +223,7 @@
                                      validator="RequiredValueValidator"
                                      i18nKey="a102">
                         <DefaultValues>
-                            <Value>1</Value>
+                            <Value>60</Value>
                         </DefaultValues>
                     </AttributeSchema>
 
@@ -248,7 +274,6 @@
                     <AttributeSchema name="forgerock-oauth2-provider-saved-consent-attribute"
                                      type="single"
                                      syntax="string"
-                                     validator="RequiredValueValidator"
                                      i18nKey="a107">
                         <DefaultValues>
                             <Value></Value>
@@ -268,7 +293,7 @@
                     -->
                     <AttributeSchema
                             name="forgerock-oauth2-provider-jkws-uri"
-                            type="list"
+                            type="single"
                             syntax="string"
                             i18nKey="a109">
                         <DefaultValues>
@@ -293,7 +318,9 @@
                             syntax="string"
                             i18nKey="a111">
                         <DefaultValues>
-                            <Value></Value>
+                            <Value>HmacSHA256</Value>
+                            <Value>HmacSHA384</Value>
+                            <Value>HmacSHA512</Value>
                         </DefaultValues>
                     </AttributeSchema>
 
@@ -303,7 +330,31 @@
                             syntax="string"
                             i18nKey="a112">
                         <DefaultValues>
-                            <Value></Value>
+                            <Value>openid</Value>
+                            <Value>profile</Value>
+                            <Value>email</Value>
+                            <Value>address</Value>
+                            <Value>phone</Value>
+                        </DefaultValues>
+                    </AttributeSchema>
+
+                    <AttributeSchema name="forgerock-oauth2-provider-jwt-token-lifetime"
+                                     type="single"
+                                     syntax="number_range" rangeStart="0" rangeEnd="2147483647"
+                                     validator="RequiredValueValidator"
+                                     i18nKey="a113">
+                        <DefaultValues>
+                            <Value>600</Value>
+                        </DefaultValues>
+                    </AttributeSchema>
+
+                    <AttributeSchema name="forgerock-oauth2-provider-keypair-name"
+                                     type="single"
+                                     syntax="string"
+                                     validator="RequiredValueValidator"
+                                     i18nKey="a114">
+                        <DefaultValues>
+                            <Value>test</Value>
                         </DefaultValues>
                     </AttributeSchema>
 

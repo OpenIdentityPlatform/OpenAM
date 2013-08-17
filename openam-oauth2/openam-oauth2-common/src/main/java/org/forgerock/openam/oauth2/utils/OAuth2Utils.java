@@ -1,7 +1,7 @@
 /*
  * DO NOT REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright (c) 2012-2013 ForgeRock Inc. All rights reserved.
+ * Copyright (c) 2012-2013 ForgeRock AS All rights reserved.
  *
  * The contents of this file are subject to the terms
  * of the Common Development and Distribution License
@@ -28,11 +28,17 @@
 
 package org.forgerock.openam.oauth2.utils;
 
+import java.io.BufferedReader;
+import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.security.AccessController;
 import java.security.KeyPair;
 import java.security.KeyPairGenerator;
+import java.security.KeyStore;
 import java.security.NoSuchAlgorithmException;
+import java.security.PrivateKey;
+import java.security.PublicKey;
 import java.security.SignatureException;
 import java.util.*;
 
@@ -45,10 +51,13 @@ import com.sun.identity.log.Logger;
 import com.sun.identity.log.messageid.LogMessageProvider;
 import com.sun.identity.log.messageid.MessageProviderFactory;
 import com.sun.identity.security.AdminTokenAction;
+import com.sun.identity.security.DecodeAction;
 import com.sun.identity.shared.Constants;
 import com.sun.identity.shared.OAuth2Constants;
+import com.sun.identity.shared.configuration.SystemPropertiesManager;
 import com.sun.identity.sm.ServiceConfig;
 import com.sun.identity.sm.ServiceConfigManager;
+import org.forgerock.common.util.KeystoreManager;
 import org.forgerock.json.jose.jws.JwsAlgorithm;
 import org.forgerock.json.jose.jws.SignedJwt;
 import org.forgerock.openam.oauth2.model.CoreToken;
@@ -87,6 +96,16 @@ public class OAuth2Utils {
     public static boolean logStatus = false;
     private static final Map<String, OAuth2ProviderSettings> settingsProviderMap =
             new HashMap<String, OAuth2ProviderSettings>();
+
+
+    private final static String DEFAULT_KEYSTORE_FILE_PROP =
+            "com.sun.identity.saml.xmlsig.keystore";
+    private final static String DEFAULT_KEYSTORE_PASS_FILE_PROP =
+            "com.sun.identity.saml.xmlsig.storepass";
+    private final static String DEFAULT_KEYSTORE_TYPE_PROP =
+            "com.sun.identity.saml.xmlsig.storetype";
+    private final static String DEFAULT_PRIVATE_KEY_PASS_FILE_PROP  =
+            "com.sun.identity.saml.xmlsig.keypass";
 
     static {
         DEBUG = Debug.getInstance("OAuth2Provider");
@@ -718,45 +737,6 @@ public class OAuth2Utils {
     private OAuth2Utils() {
     }
 
-    public static AMIdentity getClient(String clientId, String realm) throws OAuthProblemException {
-        SSOToken token = (SSOToken) AccessController.doPrivileged(AdminTokenAction.getInstance());
-        AMIdentity theID = null;
-
-        try {
-            AMIdentityRepository amIdRepo = new AMIdentityRepository(token, realm);
-
-            IdSearchControl idsc = new IdSearchControl();
-            idsc.setRecursive(true);
-            idsc.setAllReturnAttributes(true);
-            // search for the identity
-            Set<AMIdentity> results = Collections.EMPTY_SET;
-            idsc.setMaxResults(0);
-            IdSearchResults searchResults =
-                    amIdRepo.searchIdentities(IdType.AGENTONLY, clientId, idsc);
-            if (searchResults != null) {
-                results = searchResults.getSearchResults();
-            }
-
-            if (results == null || results.size() != 1) {
-                throw OAuthProblemException.OAuthError.UNAUTHORIZED_CLIENT.handle(null,
-                        "Not able to get client from OpenAM");
-
-            }
-
-            theID = results.iterator().next();
-
-            //if the client is deactivated return null
-            if (theID.isActive()){
-                return theID;
-            } else {
-                return null;
-            }
-        } catch (Exception e){
-            OAuth2Utils.DEBUG.error("OAuth2Utils::Unable to get client AMIdentity: ", e);
-            throw OAuthProblemException.OAuthError.UNAUTHORIZED_CLIENT.handle(null, "Not able to get client from OpenAM");
-        }
-    }
-
     public static <T> T getOAuth2ProviderSetting(String setting, Class<T> clazz, Request request){
         SSOToken token = (SSOToken) AccessController.doPrivileged(AdminTokenAction.getInstance());
         ServiceConfig scm = null;
@@ -890,27 +870,68 @@ public class OAuth2Utils {
         return map;
     }
 
-    public static KeyPair getServerKeyPair(){
-        //TODO get this from server settings
-        KeyPair keyPair = null;
-        try {
-            KeyPairGenerator keyPairGenerator = KeyPairGenerator.getInstance("RSA");
-            keyPairGenerator.initialize(1024);
-            keyPair = keyPairGenerator.genKeyPair();
-        } catch (NoSuchAlgorithmException e){
+    public static String decodePassword(String password)  {
+        String decodedPassword = AccessController.doPrivileged(new DecodeAction(password));
 
-        }
-        return keyPair;
+        return decodedPassword == null ? password : decodedPassword;
     }
 
-    public static SignedJwt signJWT(CoreToken jwt){
-        SignedJwt sjwt = null;
-        try {
-            sjwt = ((JWTToken)jwt).sign(JwsAlgorithm.HS256, getServerKeyPair().getPrivate());
-        } catch (SignatureException e){
-            throw OAuthProblemException.OAuthError.SERVER_ERROR.handle(null, "Not able sign jwt");
+    public static KeyPair getServerKeyPair(Request request){
+        OAuth2ProviderSettings settings = getSettingsProvider(request);
+        String alias = settings.getKeyStoreAlias();
+
+        //get keystore password from file
+        String kspfile = SystemPropertiesManager.get(DEFAULT_KEYSTORE_PASS_FILE_PROP);
+        String keystorePass = null;
+        if (kspfile != null) {
+            try {
+                BufferedReader br = null;
+                try {
+                    br = new BufferedReader(new InputStreamReader(new FileInputStream(kspfile)));
+                    keystorePass = decodePassword(br.readLine());
+                } finally {
+                    if (br != null) {
+                        br.close();
+                    }
+                }
+            } catch (IOException e) {
+                OAuth2Utils.DEBUG.error("OAuth2Utils.getServerKeyPair():: Unable to read keystore password file " + kspfile, e);
+            }
+        } else {
+            OAuth2Utils.DEBUG.error("OAuth2Utils.getServerKeyPair():: keystore password is null");
         }
-        return sjwt;
+
+        String keypassfile = SystemPropertiesManager.get(DEFAULT_PRIVATE_KEY_PASS_FILE_PROP);
+        String keypass = null;
+        if (keypassfile != null) {
+            try {
+                BufferedReader br = null;
+                try {
+                    br = new BufferedReader(new InputStreamReader(new FileInputStream(keypassfile)));
+                    keypass = decodePassword(br.readLine());
+                } finally {
+                    if (br != null) {
+                        br.close();
+                    }
+                }
+            } catch (IOException e) {
+                OAuth2Utils.DEBUG.error("OAuth2Utils.getServerKeyPair():: Unable to read key password file " + keypassfile, e);
+            }
+        } else {
+            OAuth2Utils.DEBUG.error("OAuth2Utils.getServerKeyPair():: key password is null");
+        }
+
+        //get private key password
+
+        KeystoreManager keystoreManager = new KeystoreManager(
+                keypass,
+                SystemPropertiesManager.get(DEFAULT_KEYSTORE_TYPE_PROP, "JKS"),
+                SystemPropertiesManager.get(DEFAULT_KEYSTORE_FILE_PROP),
+                keystorePass);
+
+        PrivateKey privateKey = keystoreManager.getPrivateKey(alias);
+        PublicKey publicKey = keystoreManager.getPublicKey(alias);
+        return new KeyPair(publicKey, privateKey);
     }
 
     /*

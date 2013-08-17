@@ -1,7 +1,7 @@
 /*
  * DO NOT REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright (c) 2012-2013 ForgeRock Inc. All rights reserved.
+ * Copyright (c) 2012-2013 ForgeRock AS All rights reserved.
  *
  * The contents of this file are subject to the terms
  * of the Common Development and Distribution License
@@ -652,6 +652,7 @@ public class OAuth2Constants {
         public static final String DENY = "deny";
         public static final String NONCE = "nonce";
         public static final String SAVE_CONSENT= "save_consent";
+        public static final String SSO_TOKEN_ID = "ssoTokenId";
         /**
          * The display mode in which to render the dialog. The default is
          * {@code page} on the www subdomain and {@code wap} on the m subdomain.
@@ -702,6 +703,7 @@ public class OAuth2Constants {
         public static final String AUTHZ_CODE_LIFETIME_NAME = "forgerock-oauth2-provider-authorization-code-lifetime";
         public static final String REFRESH_TOKEN_LIFETIME_NAME = "forgerock-oauth2-provider-refresh-token-lifetime";
         public static final String ACCESS_TOKEN_LIFETIME_NAME = "forgerock-oauth2-provider-access-token-lifetime";
+        public static final String JWT_TOKEN_LIFETIME_NAME = "forgerock-oauth2-provider-jwt-token-lifetime";
         public static final String ISSUE_REFRESH_TOKEN = "forgerock-oauth2-provider-issue-refresh-token";
         public static final String SCOPE_PLUGIN_CLASS= "forgerock-oauth2-provider-scope-implementation-class";
         public static final String TOKEN_PLUGIN_LIST = "forgerock-oauth2-provider-token-map-class";
@@ -714,6 +716,7 @@ public class OAuth2Constants {
         public static final String ID_TOKEN_SIGNING_ALGORITHMS =
                 "forgerock-oauth2-provider-id-token-signing-algorithms-supported";
         public static final String SUPPORTED_CLAIMS = "forgerock-oauth2-provider-supported-claims";
+        public static final String KEYSTORE_ALIAS = "forgerock-oauth2-provider-keypair-name";
     }
 
     /**
@@ -758,6 +761,7 @@ public class OAuth2Constants {
         public static final String CLIENT_ID = "client_id";
         public static final String CLIENT_SECRET = "client_secret";
         public static final String ACCESS_TOKEN = "com.forgerock.openam.oauth2provider.accessToken";
+        public static final String CLIENT_SESSION_URI = "com.forgerock.openam.oauth2provider.clientSessionURI";
     }
 
     public class JWTTokenParams{
@@ -771,6 +775,7 @@ public class OAuth2Constants {
         public static final String IAT =  "iat";
         public static final String ATH = "ath";
         public static final String NONCE = "nonce";
+        public static final String OPS = "ops";
 
     }
 }
