@@ -35,13 +35,19 @@
   <primary>Installing</primary>
   <secondary>Behind the firewall</secondary>
  </indexterm>
- <para>When you need to prevent end users from having direct access to the
- service URLs OpenAM uses to manage access, you can deploy the distributed
- authentication service (DAS) in your DMZ, leaving OpenAM core services behind
- the firewall that end users cannot access.</para>
- 
- <para>You complete the following stages in deploying the DAS web
- service.</para>
+ <para>You can minimize the exposure of OpenAM to the Internet. It is a relatively standard
+ practice to protect an enterprise network with a pair of firewalls. Systems that require
+ external access are placed between the firewalls in a semi-secure area known as a demilitarized
+ zone (DMZ). You can deploy a small subset of OpenAM as the login interface in a DMZ. That
+ subset is known as the distributed authentication service (DAS). Logins through the DAS are
+ forwarded through the internal firewall to the OpenAM core server. For more information see
+ the OpenAM Administration Guide section on <link xlink:show="new"
+ xlink:href="admin-guide#protect-network-access"
+ xlink:role="http://docbook.org/xlink/role/olink"><citetitle>Protecting Network
+     Access</citetitle></link>.</para>
+
+ <para>To deploy the DAS securely, select a system in your DMZ. Then take the following
+ general steps:</para>
  <orderedlist>
   <listitem>
    <para>Make sure the cookie domain for the DAS is configured in OpenAM under

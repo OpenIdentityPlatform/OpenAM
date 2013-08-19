@@ -95,77 +95,80 @@
  <section xml:id="protect-network-access">
   <title>Protecting Network Access</title>
 
-  <itemizedlist>
-   <para>Reduce the opportunity for unauthorized access by exposing only what
-   is necessary.</para>
+   <para>Anytime users interact with a web service, there are risks. With OpenAM, you can
+   reduce those risks by deploying different parts of OpenAM in appropriate parts of an
+   enterprise network.</para>
 
-   <listitem>
-    <para>Do not deploy OpenAM console on Internet-facing servers.</para>
-    <para>Limit the number of endpoints exposed to the Internet.</para>
-    <para>To achieve this, deploy only the core server on Internet-facing
-    servers. See <link xlink:href="install-guide#which-war-to-deploy"
-    xlink:role="http://docbook.org/xlink/role/olink"><citetitle>Determine Which
-    War File to Deploy</citetitle></link>.</para>
-    <para>Even better, further limit what is exposed by deploying only the
-    distributed authentication user interface on Internet-facing servers. See
-    <link xlink:href="install-guide#chap-install-das"
-    xlink:role="http://docbook.org/xlink/role/olink"><citetitle>Installing
-    OpenAM Distributed Authentication</citetitle></link> for installation
-    instructions. The following figure shows the recommended
-    architecture.</para>
+    <para>To minimize risks, deploy only the core OpenAM server on systems directly connected
+        through a firewall. As a start, deploy only the core server (and the protected web application)
+        on Internet-facing servers. For instructions, see the following section from the
+        OpenAM Installation Guide: <link xlink:href="install-guide#which-war-to-deploy"
+        xlink:role="http://docbook.org/xlink/role/olink"><citetitle>Determine Which
+        War File to Deploy</citetitle></link>.</para>
 
-    <mediaobject xml:id="figure-securing-openam-daui">
-     <alt>Exposing only the Distributed Authentication UI to the Internet</alt>
-     <imageobject>
-      <imagedata fileref="images/securing-openam-daui.png" format="PNG" />
-     </imageobject>
-     <textobject><para>The OpenAM Distributed Authentication UI can hide many
-     OpenAM administrative capabilities from the Internet.  Notice that OpenAM
-     installed with the console is inside your infrastructure as
-     well.</para></textobject>
-    </mediaobject>
+    <para>You can further limit what is exposed through the firewall by using one of two strategies:</para>
 
-    <para>If you must provide Internet-facing user access to OpenAM, either use
-    a reverse proxy in front of OpenAM to allow access only to the necessary
-    URLs, or use the distributed authentication user interface. The following
-    figure shows the recommended architecture.</para>
+    <itemizedlist>
+        <listitem>
+            <para>Set up a distributed authentication user interface (UI) in a DMZ between firewalls.</para>
+            <para>The distributed authentication UI is essentially a small subset of the OpenAM server with
+            just enough login logic to receive user authentication requests. Those requests are forwarded
+            to the core OpenAM servers.</para>
+            <para>See <link xlink:href="install-guide#chap-install-das"
+                      xlink:role="http://docbook.org/xlink/role/olink"><citetitle>Installing
+                    OpenAM Distributed Authentication</citetitle></link> for installation
+                instructions. The following figure shows the recommended architecture.</para>
+            <mediaobject xml:id="figure-securing-openam-daui">
+                <alt>Exposing only the Distributed Authentication UI to the Internet</alt>
+                <imageobject>
+                    <imagedata fileref="images/secure-daui-diagram.png" format="PNG" />
+                </imageobject>
+                <textobject><para>The OpenAM Distributed Authentication UI can hide many
+                    OpenAM administrative capabilities from the Internet. Notice that OpenAM
+                    installed with the console is inside your infrastructure as well.</para></textobject>
+            </mediaobject>
+        </listitem>
 
-    <mediaobject xml:id="figure-securing-openam-rp">
-     <alt>Exposing only a reverse proxy to the Internet</alt>
-     <imageobject>
-      <imagedata fileref="images/securing-openam-rp.png" format="PNG" />
-     </imageobject>
-     <textobject><para>By placing a reverse proxy between OpenAM and the
-     Internet, you expose only the necessary endpoints outside your
-     infrastructure. Notice that OpenAM installed with the console is inside
-     your infrastructure as well.</para></textobject>
-    </mediaobject>
+        <listitem>
+            <para>Alternatively, use a reverse proxy in front of OpenAM to allow access only to
+            the necessary URLs. The following figure shows the recommended architecture with a
+            reverse proxy.</para>
 
-    <para>For access to the console, deploy the full OpenAM application<footnote
-    ><para>Console only deployment is no longer supported.</para></footnote> on
-    a separate system that is reachable only from internal systems. Do not
-    include the full OpenAM server in the load-balanced pool of OpenAM servers
-    serving applications.</para>
-   </listitem>
-
-   <listitem>
-    <para>Leave <literal>ssoadm.jsp</literal> disabled in production. (Advanced
-    property: <literal>ssoadm.disabled=true</literal>)</para>
-   </listitem>
-
-   <listitem>
-    <para>If possible in your deployment, control access to OpenAM console by
-    network address, such that administrators can only connect from well-known
-    systems and networks.</para>
-   </listitem>
-
-   <listitem>
-    <para>Restrict access to URIs that you do not use, and prevent internal
-    endpoints such as <literal>/sessionservice</literal> from being reachable
-    over the Internet.</para>
-    <!-- TODO: add olink, pending OPENAM-1798: List all endpoints -->
-   </listitem>
-  </itemizedlist>
+            <mediaobject xml:id="figure-securing-openam-rp">
+                <alt>Exposing only a reverse proxy to the Internet</alt>
+                <imageobject>
+                    <imagedata fileref="images/secure-reverse-proxy.png" format="PNG" />
+                </imageobject>
+                <textobject><para>By placing a reverse proxy between OpenAM and the
+                    Internet, you expose only the necessary endpoints outside your
+                    infrastructure. Notice that OpenAM installed with the console is inside
+                    your infrastructure as well.</para></textobject>
+            </mediaobject>
+            <para>For access to the console, deploy the full OpenAM application<footnote
+                    ><para>Console only deployment is no longer supported.</para></footnote> on
+                a separate system that is reachable only from internal systems. Do not
+                include the full OpenAM server in the load-balanced pool of OpenAM servers
+                serving applications.</para>
+        </listitem>
+        <listitem>
+            <para>Leave <literal>ssoadm.jsp</literal> disabled in production. (Advanced
+                property: <literal>ssoadm.disabled=true</literal>)</para>
+        </listitem>
+        <listitem>
+            <para>If possible in your deployment, control access to OpenAM console by
+                network address, such that administrators can only connect from well-known
+                systems and networks.</para>
+        </listitem>
+        <listitem>
+            <para>Restrict access to URIs that you do not use, and prevent internal
+                endpoints such as <literal>/sessionservice</literal> from being reachable
+                over the Internet.</para>
+            <para>For a full list of endpoints, see the OpenAM Reference Guide
+            Chapter on <link xlink:show="new" xlink:href="reference#chap-endpoints"
+            xlink:role="http://docbook.org/xlink/role/olink">
+            <citetitle>Service Endpoints</citetitle></link>.</para>
+        </listitem>
+    </itemizedlist>
  </section>
 
  <section xml:id="secure-openam-administration">
