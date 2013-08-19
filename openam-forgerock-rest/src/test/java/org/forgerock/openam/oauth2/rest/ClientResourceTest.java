@@ -26,6 +26,10 @@ package org.forgerock.openam.oauth2.rest;
 
 import com.iplanet.sso.SSOException;
 import com.sun.identity.idm.IdRepoException;
+import com.sun.identity.sm.AttributeSchema;
+import com.sun.identity.sm.SMSException;
+import com.sun.identity.sm.ServiceSchema;
+import com.sun.identity.sm.ServiceSchemaManager;
 import com.sun.identity.sm.ldap.CTSPersistentStore;
 import org.forgerock.json.fluent.JsonValue;
 import org.forgerock.json.resource.CreateRequest;
@@ -46,7 +50,7 @@ import static org.mockito.Mockito.*;
 public class ClientResourceTest {
 
     @Test
-    public void shouldCreateIdentity() throws SSOException, IdRepoException, InternalServerErrorException {
+    public void shouldCreateIdentity() throws SSOException, IdRepoException, InternalServerErrorException, SMSException {
         // Given
         Map<String, ArrayList<String>> client = new HashMap<String, ArrayList<String>>();
 
@@ -77,6 +81,14 @@ public class ClientResourceTest {
         when(request.getContent()).thenReturn(val);
         when(val.getObject()).thenReturn(client);
 
+        ServiceSchemaManager mockServiceSchemaManager = mock(ServiceSchemaManager.class);
+        ServiceSchema mockServiceSchema = mock(ServiceSchema.class);
+        AttributeSchema mockAttributeSchema = mock(AttributeSchema.class);
+        when(mockServiceSchemaManager.getSchema(anyString())).thenReturn(mockServiceSchema);
+        when(mockServiceSchema.getAttributeSchema(anyString())).thenReturn(mockAttributeSchema);
+        when(mockAttributeSchema.getUIType()).thenReturn(AttributeSchema.UIType.LINK);
+
+
         Map<String, String> responseVal = new HashMap<String, String>();
         JsonValue response = null;
         responseVal.put("success", "true");
@@ -84,7 +96,7 @@ public class ClientResourceTest {
 
         Resource expectedResource = new Resource("results", "1", response);
 
-        ClientResource resource = spy(new ClientResource(mockManager, mock(CTSPersistentStore.class)));
+        ClientResource resource = spy(new ClientResource(mockManager, mock(CTSPersistentStore.class), mockServiceSchemaManager));
 
         // When
         resource.createInstance(null, request, mockHandler);
@@ -115,7 +127,7 @@ public class ClientResourceTest {
 
         Resource expectedResource = new Resource("results", "1", response);
 
-        ClientResource resource = spy(new ClientResource(mockManager, mock(CTSPersistentStore.class)));
+        ClientResource resource = spy(new ClientResource(mockManager, mock(CTSPersistentStore.class),  mock(ServiceSchemaManager.class)));
 
         // When
         resource.deleteInstance(null, "client", request, mockHandler);
