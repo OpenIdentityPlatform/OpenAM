@@ -1,5 +1,5 @@
 /**
- * Copyright 2013 ForgeRock, Inc.
+ * Copyright 2013 ForgeRock, AS.
  *
  * The contents of this file are subject to the terms of the Common Development and
  * Distribution License (the License). You may not use this file except in compliance with the
@@ -22,6 +22,7 @@ import com.sun.identity.sm.ldap.api.tokens.Token;
 import com.sun.identity.sm.ldap.api.tokens.TokenIdFactory;
 import com.sun.identity.sm.ldap.utils.JSONSerialisation;
 import com.sun.identity.sm.ldap.utils.KeyConversion;
+import com.sun.identity.sm.ldap.utils.blob.TokenBlobUtils;
 import org.forgerock.json.fluent.JsonValue;
 import org.testng.annotations.Test;
 
@@ -195,7 +196,8 @@ public class OAuthAdapterTest {
         JSONSerialisation serialisation = new JSONSerialisation(mock(Debug.class));
         KeyConversion keyConversion = new KeyConversion();
         OAuthValues oAuthValues = new OAuthValues();
-        return new OAuthAdapter(new TokenIdFactory(keyConversion), serialisation, oAuthValues);
+        TokenBlobUtils blobUtils = new TokenBlobUtils();
+        return new OAuthAdapter(new TokenIdFactory(keyConversion), serialisation, oAuthValues, blobUtils);
     }
 
     /**

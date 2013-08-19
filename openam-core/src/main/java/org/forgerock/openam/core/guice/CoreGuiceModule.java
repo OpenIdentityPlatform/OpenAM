@@ -31,6 +31,7 @@ import com.sun.identity.sm.DNMapper;
 import com.sun.identity.sm.ServiceManagementDAO;
 import com.sun.identity.sm.ServiceManagementDAOWrapper;
 import com.sun.identity.sm.ldap.CTSPersistentStore;
+import com.sun.identity.sm.ldap.CoreTokenConfig;
 import com.sun.identity.sm.ldap.adapters.OAuthAdapter;
 import com.sun.identity.sm.ldap.adapters.TokenAdapter;
 import org.forgerock.json.fluent.JsonValue;
@@ -92,6 +93,7 @@ public class CoreGuiceModule extends AbstractModule {
          * Core Token Service bindings
          * CTSPersistentStore using provider to delay initialisation.
          */
+        bind(CoreTokenConfig.class).in(Singleton.class);
         bind(CTSPersistentStore.class).toProvider(new Provider<CTSPersistentStore>() {
             public CTSPersistentStore get() {
                 return CoreTokenServiceFactory.getInstance();

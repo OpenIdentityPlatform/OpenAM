@@ -1,5 +1,5 @@
 /**
- * Copyright 2013 ForgeRock, Inc.
+ * Copyright 2013 ForgeRock, AS.
  *
  * The contents of this file are subject to the terms of the Common Development and
  * Distribution License (the License). You may not use this file except in compliance with the
@@ -20,7 +20,6 @@ import org.testng.annotations.Test;
 
 import static org.mockito.BDDMockito.given;
 import static org.mockito.BDDMockito.mock;
-import static org.mockito.Mockito.verify;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertFalse;
 
@@ -28,21 +27,6 @@ import static org.testng.Assert.assertFalse;
  * @author robert.wapshott@forgerock.com
  */
 public class CoreTokenConfigTest {
-    @Test
-    public void shouldSetUUIDOnSessionIfNoUUIDPresent() {
-        // Given
-        InternalSession session = mock(InternalSession.class);
-        given(session.getUUID()).willReturn(null).willReturn("badger");
-
-        CoreTokenConfig config = new CoreTokenConfig();
-
-        // When
-        config.getUserId(session);
-
-        // Then
-        verify(session).setUUID();
-    }
-
     @Test
     public void shouldConvertUserIdToLowerCaseIfCaseSensitive() {
         // Given

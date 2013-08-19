@@ -26,8 +26,8 @@ import java.text.MessageFormat;
  *
  * @author robert.wapshott@forgerock.com
  */
-public class OperationFailedException extends CoreTokenException {
-    public OperationFailedException(Result result) {
+public class LDAPOperationFailedException extends CoreTokenException {
+    public LDAPOperationFailedException(Result result) {
         super(MessageFormat.format(
                     "\n" +
                     CoreTokenConstants.DEBUG_HEADER +
@@ -41,11 +41,11 @@ public class OperationFailedException extends CoreTokenException {
                 result.getCause());
     }
 
-    public OperationFailedException(String error, Throwable cause) {
+    public LDAPOperationFailedException(String error, Throwable cause) {
         super("\n" + CoreTokenConstants.DEBUG_HEADER + error, cause);
     }
 
-    public OperationFailedException(String error) {
+    public LDAPOperationFailedException(String error) {
         super(error, (Throwable) null);
     }
 }

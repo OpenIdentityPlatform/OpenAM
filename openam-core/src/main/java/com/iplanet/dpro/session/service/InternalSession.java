@@ -89,9 +89,6 @@ public class InternalSession implements TaskRunnable, Serializable {
     // Session Service should not be serialised.
     private transient SessionService ss;
 
-    /* user universal unique ID*/
-    private String uuid;
-
     /* Session Id (sid) */
     private SessionID sessionID;
 
@@ -168,12 +165,6 @@ public class InternalSession implements TaskRunnable, Serializable {
      * session has not timed out.
      */
     private volatile long timedOutAt = 0;
-
-    /**
-     * Logical version timestamp used to implement optimistic concurrency
-     * control in shared session repository
-     */
-    private long version = 0;
 
     /*
      * This is the maximum extra time for which the timed out sessions lives in
@@ -337,7 +328,7 @@ public class InternalSession implements TaskRunnable, Serializable {
      * The URL map for session events of THIS session only : SESSION_CREATION,
      * IDLE_TIMEOUT, MAX_TIMEOUT, LOGOUT, REACTIVATION, DESTROY. Each URL in the
      * map is associated with a set of token ids (master and potentially all of
-     * the restricted token ids associated with the master) that will be used in 
+     * the restricted token ids associated with the master) that will be used in
      * notification
      */
     private Map<String, Set<SessionID>> sessionEventURLs =
@@ -1064,9 +1055,6 @@ public class InternalSession implements TaskRunnable, Serializable {
             return false;
         }
 
-        // need to set the uuid first
-        setUUID();
-
         // checking Session Quota Constraints
         if ((SessionService.isSessionConstraintEnabled())
                 && !shouldIgnoreSessionQuotaChecking(userDN)) {
@@ -1097,20 +1085,12 @@ public class InternalSession implements TaskRunnable, Serializable {
         return true;
     }
 
-   /**
-    *  Sets the User Universal ID
-    *
-    */
-   public void setUUID() {
-        uuid = getProperty(UNIVERSAL_IDENTIFIER);
-    }
-
    /** 
     * Gets the User Universal ID
     * @return  UUID
     */
    public String getUUID() {
-        return uuid;
+        return getProperty(UNIVERSAL_IDENTIFIER);
     }
 
     /**
@@ -1245,9 +1225,9 @@ public class InternalSession implements TaskRunnable, Serializable {
         }
         info.cid = clientID;
         info.cdomain = clientDomain;
-        info.maxtime = Long.toString(maxSessionTime);
-        info.maxidle = Long.toString(maxIdleTime);
-        info.maxcaching = Long.toString(maxCachingTime);
+        info.maxtime = Long.toString(getMaxSessionTime());
+        info.maxidle = Long.toString(getMaxIdleTime());
+        info.maxcaching = Long.toString(getMaxCachingTime());
         if (willExpireFlag == true) {
             info.timeidle = Long.toString(getIdleTime());
             info.timeleft = Long.toString(getTimeLeft());
@@ -1631,25 +1611,6 @@ public class InternalSession implements TaskRunnable, Serializable {
 
     String getSessionHandle() {
         return sessionHandle;
-    }
-
-    /**
-     * Sets logical version timestamp value
-     * 
-     * @param version
-     *            version value
-     */
-    public void setVersion(long version) {
-        this.version = version;
-    }
-
-    /**
-     * Returns logical version timestamp value
-     * 
-     * @return version value
-     */
-    public long getVersion() {
-        return version;
     }
 
      /**

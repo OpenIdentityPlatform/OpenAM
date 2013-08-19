@@ -1,5 +1,5 @@
 /**
- * Copyright 2013 ForgeRock, Inc.
+ * Copyright 2013 ForgeRock, AS.
  *
  * The contents of this file are subject to the terms of the Common Development and
  * Distribution License (the License). You may not use this file except in compliance with the
@@ -22,7 +22,7 @@ import com.sun.identity.sm.ldap.api.tokens.Token;
 import com.sun.identity.sm.ldap.exceptions.CoreTokenException;
 import com.sun.identity.sm.ldap.exceptions.CreateFailedException;
 import com.sun.identity.sm.ldap.exceptions.DeleteFailedException;
-import com.sun.identity.sm.ldap.exceptions.OperationFailedException;
+import com.sun.identity.sm.ldap.exceptions.LDAPOperationFailedException;
 import com.sun.identity.sm.ldap.exceptions.QueryFailedException;
 import com.sun.identity.sm.ldap.exceptions.SetFailedException;
 import com.sun.identity.sm.ldap.utils.LDAPDataConversion;
@@ -168,7 +168,7 @@ public class CoreTokenLDAPAdapter {
             }
 
             // Any other error is unexpected.
-            throw new OperationFailedException(result);
+            throw new LDAPOperationFailedException(result);
         } finally {
             if (connection != null) {
                 connection.close();
@@ -197,8 +197,8 @@ public class CoreTokenLDAPAdapter {
      * This function will perform a read of the Token ID to determine if the Token has been
      * persisted already. If it has not been persisted, then delegates to the create function.
      *
-     * Otherwise performs a set based on the difference between the Token in the store and the
-     * Token being stored.
+     * Otherwise performs Modify operation based on the difference between the Token in
+     * the store and the Token being stored.
      *
      * If this difference has no changes, then there is nothing to be done.
      *
@@ -270,7 +270,7 @@ public class CoreTokenLDAPAdapter {
 
         } catch (ErrorResultException e) {
             throw new SetFailedException(token, request, e);
-        } catch (OperationFailedException e) {
+        } catch (LDAPOperationFailedException e) {
             throw new SetFailedException(token, request, e);
         } finally {
             if (connection != null) {
@@ -327,7 +327,7 @@ public class CoreTokenLDAPAdapter {
             }
 
             throw new DeleteFailedException(dnToDelete, e);
-        } catch (OperationFailedException e) {
+        } catch (LDAPOperationFailedException e) {
             throw new DeleteFailedException(dnToDelete, e);
         } finally {
             if (connection != null) {
@@ -339,12 +339,12 @@ public class CoreTokenLDAPAdapter {
     /**
      * Process the result and detect if there was an exceptional condition.
      * @param result Non null.
-     * @throws OperationFailedException If the operation failed, the reason will be included in this exception.
+     * @throws com.sun.identity.sm.ldap.exceptions.LDAPOperationFailedException If the operation failed, the reason will be included in this exception.
      */
-    private void processResult(Result result) throws OperationFailedException {
+    private void processResult(Result result) throws LDAPOperationFailedException {
         ResultCode resultCode = result.getResultCode();
         if (resultCode.isExceptional()) {
-            throw new OperationFailedException(result);
+            throw new LDAPOperationFailedException(result);
         }
     }
 }

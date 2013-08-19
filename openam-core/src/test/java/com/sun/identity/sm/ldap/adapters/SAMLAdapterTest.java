@@ -1,5 +1,5 @@
 /**
- * Copyright 2013 ForgeRock, Inc.
+ * Copyright 2013 ForgeRock, AS.
  *
  * The contents of this file are subject to the terms of the Common Development and
  * Distribution License (the License). You may not use this file except in compliance with the
@@ -25,6 +25,8 @@ import com.sun.identity.sm.ldap.api.tokens.TokenIdFactory;
 import com.sun.identity.sm.ldap.utils.JSONSerialisation;
 import com.sun.identity.sm.ldap.utils.KeyConversion;
 import com.sun.identity.sm.ldap.utils.LDAPDataConversion;
+import com.sun.identity.sm.ldap.utils.blob.TokenBlobUtils;
+import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
 import java.util.Calendar;
@@ -38,17 +40,35 @@ import static org.mockito.Matchers.*;
  * @author robert.wapshott@forgerock.com
  */
 public class SAMLAdapterTest {
+
+    private JSONSerialisation serialisation;
+    private LDAPDataConversion dataConversion;
+    private SAMLAdapter adapter;
+    private TokenIdFactory tokenIdFactory;
+    private TokenBlobUtils blobUtils;
+    private KeyConversion encoding;
+
+    @BeforeMethod
+    public void setup() {
+        serialisation = mock(JSONSerialisation.class);
+        dataConversion = mock(LDAPDataConversion.class);
+        tokenIdFactory = mock(TokenIdFactory.class);
+        blobUtils = mock(TokenBlobUtils.class);
+        encoding = mock(KeyConversion.class);
+
+        adapter = new SAMLAdapter(tokenIdFactory, serialisation, dataConversion, blobUtils);
+    }
+
     @Test
     public void shouldSerialiseAndDeserialiseToken() {
         // Given
-        JSONSerialisation serialisation = new JSONSerialisation(mock(Debug.class));
-        LDAPDataConversion dataConversion = new LDAPDataConversion();
-        KeyConversion encoding = mock(KeyConversion.class);
-
-        SAMLAdapter adapter = new SAMLAdapter(
+        // Need real delegates for this test.
+        serialisation = new JSONSerialisation(mock(Debug.class));
+        adapter = new SAMLAdapter(
                 new TokenIdFactory(encoding),
-                serialisation,
-                dataConversion);
+                new JSONSerialisation(mock(Debug.class)),
+                new LDAPDataConversion(),
+                new TokenBlobUtils());
 
         String tokenId = "badger";
         Token token = new Token(tokenId, TokenType.SAML2);
@@ -81,13 +101,10 @@ public class SAMLAdapterTest {
     @Test
     public void shouldNotStoreSecondaryKeyIfNull() {
         // Given
-        TokenIdFactory mockTokenIdFactory = mock(TokenIdFactory.class);
-        JSONSerialisation mockSerialisation = mock(JSONSerialisation.class);
-        SAMLAdapter adapter = new SAMLAdapter(mockTokenIdFactory, mockSerialisation, mock(LDAPDataConversion.class));
         SAMLToken samlToken = new SAMLToken("primary", null, 12345, "");
 
-        given(mockTokenIdFactory.toSAMLPrimaryTokenId(anyString())).willReturn("id");
-        given(mockSerialisation.serialise(anyObject())).willReturn("");
+        given(tokenIdFactory.toSAMLPrimaryTokenId(anyString())).willReturn("id");
+        given(serialisation.serialise(anyObject())).willReturn("");
 
         // When
         Token token = adapter.toToken(samlToken);

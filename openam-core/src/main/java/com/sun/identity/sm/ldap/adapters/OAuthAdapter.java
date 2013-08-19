@@ -21,6 +21,7 @@ import com.sun.identity.sm.ldap.api.fields.OAuthTokenField;
 import com.sun.identity.sm.ldap.api.tokens.Token;
 import com.sun.identity.sm.ldap.api.tokens.TokenIdFactory;
 import com.sun.identity.sm.ldap.utils.JSONSerialisation;
+import com.sun.identity.sm.ldap.utils.blob.TokenBlobUtils;
 import org.forgerock.json.fluent.JsonValue;
 
 import java.util.Collection;
@@ -47,6 +48,7 @@ public class OAuthAdapter implements TokenAdapter<JsonValue> {
     private final TokenIdFactory tokenIdFactory;
     private final JSONSerialisation serialisation;
     private final OAuthValues oAuthValues;
+    private final TokenBlobUtils blobUtils;
 
     /**
      * Keyword used to store all OAuth specific oAuthValues within the JsonValue map.
@@ -59,12 +61,15 @@ public class OAuthAdapter implements TokenAdapter<JsonValue> {
      * @param tokenIdFactory Non null.
      * @param serialisation
      * @param oAuthValues
+     * @param blobUtils
      */
     @Inject
-    public OAuthAdapter(TokenIdFactory tokenIdFactory, JSONSerialisation serialisation, OAuthValues oAuthValues) {
+    public OAuthAdapter(TokenIdFactory tokenIdFactory, JSONSerialisation serialisation,
+                        OAuthValues oAuthValues, TokenBlobUtils blobUtils) {
         this.tokenIdFactory = tokenIdFactory;
         this.serialisation = serialisation;
         this.oAuthValues = oAuthValues;
+        this.blobUtils = blobUtils;
     }
 
     /**
@@ -136,7 +141,7 @@ public class OAuthAdapter implements TokenAdapter<JsonValue> {
          */
         Object objectToStore = request.getObject();
         String serialisedObject = serialisation.serialise(objectToStore);
-        token.setBlob(serialisedObject.getBytes());
+        blobUtils.setBlobFromString(token, serialisedObject);
 
         return token;
     }
@@ -150,7 +155,7 @@ public class OAuthAdapter implements TokenAdapter<JsonValue> {
      * was not an instance of a Map.
      */
     public JsonValue fromToken(Token token) {
-        String data = new String(token.getBlob());
+        String data = blobUtils.getBlobAsString(token);
         
         JsonValue r;
         try {

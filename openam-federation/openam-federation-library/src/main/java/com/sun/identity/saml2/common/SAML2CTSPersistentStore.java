@@ -39,11 +39,8 @@ import com.sun.identity.sm.ldap.api.fields.CoreTokenField;
 import com.sun.identity.sm.ldap.api.fields.SAMLTokenField;
 import com.sun.identity.sm.ldap.api.tokens.SAMLToken;
 import com.sun.identity.sm.ldap.api.tokens.Token;
-import com.sun.identity.sm.ldap.api.tokens.TokenIdFactory;
 import com.sun.identity.sm.ldap.exceptions.CoreTokenException;
-import com.sun.identity.sm.ldap.utils.JSONSerialisation;
-import com.sun.identity.sm.ldap.utils.KeyConversion;
-import com.sun.identity.sm.ldap.utils.LDAPDataConversion;
+import org.forgerock.openam.guice.InjectorHolder;
 
 import java.util.Collection;
 import java.util.Date;
@@ -137,12 +134,7 @@ public class SAML2CTSPersistentStore extends GeneralTaskRunnable
     static Debug debug = Debug.getInstance("amToken");
     private String SAML2="saml2";
 
-    private KeyConversion keyConversion = new KeyConversion();
-    private TokenIdFactory tokenIdFactory = new TokenIdFactory(keyConversion);
-    private TokenAdapter<SAMLToken> tokenAdapter = new SAMLAdapter(
-            tokenIdFactory,
-            new JSONSerialisation(),
-            new LDAPDataConversion());
+    private TokenAdapter<SAMLToken> tokenAdapter = InjectorHolder.getInstance(SAMLAdapter.class);
 
     /**
      * Static Initialization Stanza.

@@ -595,6 +595,18 @@ public interface Constants {
             "com.sun.identity.session.repository.enableEncryption";
 
     /**
+     * Sessions that are stored in a compressed state will take less storage space and replicate quicker.
+     */
+    static final String SESSION_REPOSITORY_COMPRESSION =
+            "com.sun.identity.session.repository.enableCompression";
+
+    /**
+     * Additional compression option for Session Tokens.
+     */
+    static final String SESSION_REPOSITORY_ATTRIBUTE_NAME_COMPRESSION =
+            "com.sun.identity.session.repository.enableAttributeCompression";
+
+    /**
      * Property string for determining whether or not appplication sessions
      * should be returned via the getValidSessions() call.
      */

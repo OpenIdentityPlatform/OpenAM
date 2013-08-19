@@ -20,6 +20,7 @@
  */
 package com.sun.identity.sm.ldap;
 
+import com.google.inject.Inject;
 import com.iplanet.dpro.session.exceptions.StoreException;
 import com.iplanet.dpro.session.service.SessionService;
 import com.sun.identity.common.GeneralTaskRunnable;
@@ -41,7 +42,8 @@ import com.sun.identity.sm.ldap.impl.CoreTokenLDAPAdapter;
 import com.sun.identity.sm.ldap.impl.QueryBuilder;
 import com.sun.identity.sm.ldap.impl.QueryFilter;
 import com.sun.identity.sm.ldap.utils.LDAPDataConversion;
-import com.sun.identity.sm.ldap.utils.TokenEncryption;
+import com.sun.identity.sm.ldap.utils.blob.TokenBlobStrategy;
+import com.sun.identity.sm.ldap.utils.blob.TokenStrategyFailedException;
 import com.sun.identity.tools.objects.MapFormat;
 import org.forgerock.openam.guice.InjectorHolder;
 import org.forgerock.openam.sm.DataLayerConnectionFactory;
@@ -53,7 +55,6 @@ import java.text.MessageFormat;
 import java.util.Calendar;
 import java.util.Collection;
 import java.util.HashMap;
-import java.util.LinkedList;
 import java.util.Map;
 
 import static org.forgerock.openam.session.ha.i18n.AmsessionstoreMessages.*;
@@ -88,9 +89,9 @@ public class CTSPersistentStore extends GeneralTaskRunnable {
 
     private static Thread storeThread;
     private CoreTokenLDAPAdapter adapter = null;
-    private CoreTokenConfig coreTokenConfig;
-    private LDAPDataConversion dataConversion;
-    private TokenEncryption tokenEncryption;
+    private final CoreTokenConfig coreTokenConfig;
+    private final LDAPDataConversion dataConversion;
+    private final TokenBlobStrategy strategy;
     private final DataLayerConnectionFactory connectionFactory;
 
     /**
@@ -180,11 +181,12 @@ public class CTSPersistentStore extends GeneralTaskRunnable {
     /**
      * Private restricted to preserve Singleton Instantiation.
      */
-    private CTSPersistentStore(CoreTokenConfig coreTokenConfig, LDAPDataConversion dataConversion,
-                               TokenEncryption tokenEncryption, DataLayerConnectionFactory connectionFactory) {
+    @Inject
+    public CTSPersistentStore(CoreTokenConfig coreTokenConfig, LDAPDataConversion dataConversion,
+                              DataLayerConnectionFactory connectionFactory, TokenBlobStrategy strategy) {
         this.coreTokenConfig = coreTokenConfig;
         this.dataConversion = dataConversion;
-        this.tokenEncryption = tokenEncryption;
+        this.strategy = strategy;
         this.connectionFactory = connectionFactory;
         this.DEBUG = SessionService.sessionDebug;
     }
@@ -199,12 +201,11 @@ public class CTSPersistentStore extends GeneralTaskRunnable {
 
             if (instance == null) {
 
-                DataLayerConnectionFactory connectionFactory = InjectorHolder.getInstance(DataLayerConnectionFactory.class);
                 instance = new CTSPersistentStore(
-                        new CoreTokenConfig(),
-                        new LDAPDataConversion(),
-                        new TokenEncryption(),
-                        connectionFactory);
+                        InjectorHolder.getInstance(CoreTokenConfig.class),
+                        InjectorHolder.getInstance(LDAPDataConversion.class),
+                        InjectorHolder.getInstance(DataLayerConnectionFactory.class),
+                        InjectorHolder.getInstance(TokenBlobStrategy.class));
 
                 // Proceed With Initialization of Service.
                 try {
@@ -324,8 +325,10 @@ public class CTSPersistentStore extends GeneralTaskRunnable {
      * the Token already exists in the store.
      */
     public void create(Token token) throws CoreTokenException {
-        if (coreTokenConfig.isTokenEncrypted()) {
-            token = tokenEncryption.encrypt(token);
+        try {
+            strategy.perfom(token);
+        } catch (TokenStrategyFailedException e) {
+            throw new CoreTokenException("Failed to perform Token Blob strategy.", e);
         }
         getAdapter().create(token);
     }
@@ -338,7 +341,14 @@ public class CTSPersistentStore extends GeneralTaskRunnable {
      * @throws CoreTokenException If there was a non-recoverable error during the operation.
      */
     public Token read(String tokenId) throws CoreTokenException {
-        return getAdapter().read(tokenId);
+        Token token = getAdapter().read(tokenId);
+        try {
+            strategy.reverse(token);
+        } catch (TokenStrategyFailedException e) {
+            throw new CoreTokenException("Failed to reverse Token Blob strategy.", e);
+        }
+
+        return token;
     }
 
     /**
@@ -353,11 +363,14 @@ public class CTSPersistentStore extends GeneralTaskRunnable {
      * @throws CoreTokenException If there was a non-recoverable error during the operation.
      */
     public void update(Token token) throws CoreTokenException {
-        if (coreTokenConfig.isTokenEncrypted()) {
-            token = tokenEncryption.encrypt(token);
+        try {
+            strategy.perfom(token);
+        } catch (TokenStrategyFailedException e) {
+            throw new CoreTokenException("Failed to perform Token Blob strategy.", e);
         }
 
         getAdapter().update(token);
+
         if (DEBUG.messageEnabled()) {
             DEBUG.message(MessageFormat.format(
                     CoreTokenConstants.DEBUG_HEADER +
@@ -465,7 +478,7 @@ public class CTSPersistentStore extends GeneralTaskRunnable {
         }
 
         Collection<Token> tokens = builder.withFilter(filterBuilder.build()).execute();
-        tokens = decryptTokens(tokens);
+        decryptTokens(tokens);
 
         if (DEBUG.messageEnabled()) {
             DEBUG.message(MessageFormat.format(
@@ -489,7 +502,9 @@ public class CTSPersistentStore extends GeneralTaskRunnable {
      * @throws CoreTokenException If there was an unrecoverable error.
      */
     public Collection<Token> list(Filter filter) throws CoreTokenException {
-        return decryptTokens(getAdapter().query().withFilter(filter).execute());
+        Collection<Token> tokens = getAdapter().query().withFilter(filter).execute();
+        decryptTokens(tokens);
+        return tokens;
     }
 
     /**
@@ -498,15 +513,14 @@ public class CTSPersistentStore extends GeneralTaskRunnable {
      * @param tokens A non null collection of Tokens.
      * @return A new collection of Tokens with their byte contents decrypted if necessary.
      */
-    private Collection<Token> decryptTokens(Collection<Token> tokens) {
-        if (coreTokenConfig.isTokenEncrypted()) {
-            Collection<Token> encryptedTokens = new LinkedList<Token>();
-            for (Token token : tokens) {
-                encryptedTokens.add(tokenEncryption.decrypt(token));
+    private void decryptTokens(Collection<Token> tokens) throws CoreTokenException {
+        for (Token token : tokens) {
+            try {
+                strategy.reverse(token);
+            } catch (TokenStrategyFailedException e) {
+                throw new CoreTokenException("Failed to reverse Token Blob strategy.", e);
             }
-            return encryptedTokens;
         }
-        return tokens;
     }
 
     /**

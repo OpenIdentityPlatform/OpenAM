@@ -16,7 +16,8 @@
 package com.sun.identity.sm.ldap.api.fields;
 
 import com.sun.identity.sm.ldap.api.CoreTokenConstants;
-import com.sun.identity.sm.ldap.exceptions.OperationFailedException;
+import com.sun.identity.sm.ldap.exceptions.CoreTokenException;
+import com.sun.identity.sm.ldap.exceptions.LDAPOperationFailedException;
 
 import java.text.MessageFormat;
 import java.util.Calendar;
@@ -39,9 +40,9 @@ public class CoreTokenFieldTypes {
      * Validate a collection of key/value mappings.
      *
      * @param types A mapping of CoreTokenField to value. Non null, may be empty.
-     * @throws com.sun.identity.sm.ldap.exceptions.OperationFailedException If one of the values was invalid for the CoreTokenField field.
+     * @throws com.sun.identity.sm.ldap.exceptions.LDAPOperationFailedException If one of the values was invalid for the CoreTokenField field.
      */
-    public static void validateTypes(Map<CoreTokenField, Object> types) throws OperationFailedException {
+    public static void validateTypes(Map<CoreTokenField, Object> types) throws CoreTokenException {
         for (Map.Entry<CoreTokenField, Object> entry : types.entrySet()) {
             validateType(entry.getKey(), entry.getValue());
         }
@@ -52,11 +53,11 @@ public class CoreTokenFieldTypes {
      *
      * @param field The CoreTokenField to validate against.
      * @param value The value to verify. Non null.
-     * @throws OperationFailedException
+     * @throws com.sun.identity.sm.ldap.exceptions.LDAPOperationFailedException
      */
-    public static void validateType(CoreTokenField field, Object value) throws OperationFailedException {
+    public static void validateType(CoreTokenField field, Object value) throws CoreTokenException {
         if (value == null) {
-            throw new OperationFailedException(MessageFormat.format(
+            throw new LDAPOperationFailedException(MessageFormat.format(
                     "\n" +
                             CoreTokenConstants.DEBUG_HEADER +
                             "Value field cannot be null!" +
@@ -77,8 +78,8 @@ public class CoreTokenFieldTypes {
             } else {
                 throw new IllegalStateException("Unknown field: " + field.name());
             }
-        } catch (OperationFailedException e) {
-            throw new OperationFailedException(MessageFormat.format(
+        } catch (LDAPOperationFailedException e) {
+            throw new LDAPOperationFailedException(MessageFormat.format(
                     "\n" +
                     CoreTokenConstants.DEBUG_HEADER +
                     "Value was not the correct type:\n" +
@@ -176,11 +177,11 @@ public class CoreTokenFieldTypes {
      * Perform a simple class assertion.
      * @param value Non null value to assert.
      * @param clazz Non null class to assert against.
-     * @throws OperationFailedException If the value was not assignable from the clazz.
+     * @throws com.sun.identity.sm.ldap.exceptions.LDAPOperationFailedException If the value was not assignable from the clazz.
      */
-    private static void assertClass(Object value, Class clazz) throws OperationFailedException {
+    private static void assertClass(Object value, Class clazz) throws LDAPOperationFailedException {
         if (!clazz.isAssignableFrom(value.getClass())) {
-            throw new OperationFailedException(clazz.getName());
+            throw new LDAPOperationFailedException(clazz.getName());
         }
     }
 }

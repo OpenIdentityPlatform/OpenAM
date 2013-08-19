@@ -1,5 +1,5 @@
 /**
- * Copyright 2013 ForgeRock, Inc.
+ * Copyright 2013 ForgeRock, AS.
  *
  * The contents of this file are subject to the terms of the Common Development and
  * Distribution License (the License). You may not use this file except in compliance with the
@@ -34,6 +34,7 @@ import java.util.concurrent.TimeUnit;
 
 import static org.mockito.BDDMockito.mock;
 import static org.testng.Assert.assertEquals;
+import static org.testng.Assert.assertNotEquals;
 
 /**
  * @author robert.wapshott@forgerock.com
@@ -92,6 +93,12 @@ public class JSONSerialisationTest {
         TokenTestUtils.compareTokens(result, token);
     }
 
+    @Test
+    public void shouldChangeAttributeName() {
+        String name = "badger";
+        assertNotEquals(name, JSONSerialisation.jsonAttributeName(name));
+    }
+
     /**
      * Generate an InternalSession with some fields set to random values.
      *
@@ -106,8 +113,6 @@ public class JSONSerialisationTest {
         r.setCookieMode(randomBoolean());
         r.setExpire(randomBoolean());
         r.setIsSessionUpgrade(randomBoolean());
-        // Long
-        r.setVersion(randomLong());
         return r;
     }
 

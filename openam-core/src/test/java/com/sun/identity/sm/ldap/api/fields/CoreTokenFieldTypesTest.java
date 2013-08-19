@@ -1,5 +1,5 @@
 /**
- * Copyright 2013 ForgeRock, Inc.
+ * Copyright 2013 ForgeRock, AS.
  *
  * The contents of this file are subject to the terms of the Common Development and
  * Distribution License (the License). You may not use this file except in compliance with the
@@ -15,7 +15,7 @@
  */
 package com.sun.identity.sm.ldap.api.fields;
 
-import com.sun.identity.sm.ldap.exceptions.OperationFailedException;
+import com.sun.identity.sm.ldap.exceptions.CoreTokenException;
 import org.testng.annotations.Test;
 
 import java.util.Calendar;
@@ -25,7 +25,7 @@ import java.util.Calendar;
  */
 public class CoreTokenFieldTypesTest {
     @Test
-    public void shouldValidateIntegerField() throws OperationFailedException {
+    public void shouldValidateIntegerField() throws CoreTokenException {
         // Given
         CoreTokenField key = CoreTokenField.INTEGER_ONE;
         Integer value = 1234;
@@ -35,7 +35,7 @@ public class CoreTokenFieldTypesTest {
     }
 
     @Test
-    public void shouldValidateStringField() throws OperationFailedException {
+    public void shouldValidateStringField() throws CoreTokenException {
         // Given
         CoreTokenField key = CoreTokenField.STRING_ONE;
         String value = "badger";
@@ -45,7 +45,7 @@ public class CoreTokenFieldTypesTest {
     }
 
     @Test
-    public void shouldValidateDateField() throws OperationFailedException {
+    public void shouldValidateDateField() throws CoreTokenException {
         // Given
         CoreTokenField key = CoreTokenField.DATE_ONE;
         Calendar value = Calendar.getInstance();
@@ -55,7 +55,7 @@ public class CoreTokenFieldTypesTest {
     }
 
     @Test
-    public void shouldValidateByteField() throws OperationFailedException {
+    public void shouldValidateByteField() throws CoreTokenException {
         // Given
         CoreTokenField key = CoreTokenField.BLOB;
         byte[] value = new byte[]{1, 2, 3, 4};
@@ -64,8 +64,8 @@ public class CoreTokenFieldTypesTest {
         CoreTokenFieldTypes.validateType(key, value);
     }
 
-    @Test (expectedExceptions = OperationFailedException.class)
-    public void shouldValidateInvalidType() throws OperationFailedException {
+    @Test (expectedExceptions = CoreTokenException.class)
+    public void shouldValidateInvalidType() throws CoreTokenException {
         // Given
         CoreTokenField key = CoreTokenField.BLOB;
         Integer value = 1234;

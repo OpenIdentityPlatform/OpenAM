@@ -15,6 +15,7 @@
  */
 package com.sun.identity.sm.ldap.adapters;
 
+import com.google.inject.Inject;
 import com.sun.identity.sm.ldap.api.CoreTokenConstants;
 import com.sun.identity.sm.ldap.api.TokenType;
 import com.sun.identity.sm.ldap.api.fields.SAMLTokenField;
@@ -23,6 +24,7 @@ import com.sun.identity.sm.ldap.api.tokens.Token;
 import com.sun.identity.sm.ldap.api.tokens.TokenIdFactory;
 import com.sun.identity.sm.ldap.utils.JSONSerialisation;
 import com.sun.identity.sm.ldap.utils.LDAPDataConversion;
+import com.sun.identity.sm.ldap.utils.blob.TokenBlobUtils;
 
 import java.text.MessageFormat;
 import java.util.Calendar;
@@ -35,9 +37,11 @@ import java.util.Calendar;
  */
 public class SAMLAdapter implements TokenAdapter<SAMLToken> {
 
+    // Injected
     private final TokenIdFactory tokenIdFactory;
     private final JSONSerialisation serialisation;
     private final LDAPDataConversion dataConversion;
+    private final TokenBlobUtils blobUtils;
 
     /**
      * Default constructor with dependencies exposed.
@@ -45,11 +49,13 @@ public class SAMLAdapter implements TokenAdapter<SAMLToken> {
      * @param tokenIdFactory Non null.
      * @param serialisation Non null.
      */
+    @Inject
     public SAMLAdapter(TokenIdFactory tokenIdFactory, JSONSerialisation serialisation,
-                       LDAPDataConversion dataConversion) {
+                       LDAPDataConversion dataConversion, TokenBlobUtils blobUtils) {
         this.tokenIdFactory = tokenIdFactory;
         this.serialisation = serialisation;
         this.dataConversion = dataConversion;
+        this.blobUtils = blobUtils;
     }
 
     /**
@@ -82,7 +88,7 @@ public class SAMLAdapter implements TokenAdapter<SAMLToken> {
 
         // Binary data
         String jsonBlob = serialisation.serialise(samlToken.getToken());
-        token.setBlob(jsonBlob.getBytes());
+        blobUtils.setBlobFromString(token, jsonBlob);
 
         return token;
     }
@@ -112,7 +118,7 @@ public class SAMLAdapter implements TokenAdapter<SAMLToken> {
         }
 
         // Binary Data
-        String jsonBlob = new String(token.getBlob());
+        String jsonBlob = blobUtils.getBlobAsString(token);
         Object blob = serialisation.deserialise(jsonBlob, c);
 
         // Expiry Date

@@ -1,5 +1,5 @@
 /**
- * Copyright 2013 ForgeRock, Inc.
+ * Copyright 2013 ForgeRock, AS.
  *
  * The contents of this file are subject to the terms of the Common Development and
  * Distribution License (the License). You may not use this file except in compliance with the
@@ -134,5 +134,15 @@ public class JSONSerialisation {
                             clazz.getSimpleName()),
                     e);
         }
+    }
+
+    /**
+     * Wrap the attribute name in quotes and a colon to make it look like a JSON attribute.
+     *
+     * @param name Non null text to wrap.
+     * @return A string that represents a JSON Attribute Name
+     */
+    public static String jsonAttributeName(String name) {
+        return "\"" + name + "\":";
     }
 }

@@ -1,5 +1,5 @@
 /**
- * Copyright 2013 ForgeRock, Inc.
+ * Copyright 2013 ForgeRock, AS.
  *
  * The contents of this file are subject to the terms of the Common Development and
  * Distribution License (the License). You may not use this file except in compliance with the
@@ -20,7 +20,6 @@ import com.iplanet.dpro.session.service.InternalSession;
 import com.sun.identity.shared.Constants;
 import com.sun.identity.shared.configuration.SystemPropertiesManager;
 import com.sun.identity.sm.ldap.api.CoreTokenConstants;
-import org.apache.commons.lang.StringUtils;
 
 /**
  * Represents any configuration required for the Core Token Service.
@@ -29,17 +28,20 @@ import org.apache.commons.lang.StringUtils;
  */
 public class CoreTokenConfig {
 
-    private boolean caseSensitiveUserId;
-    private int sessionExpiryGracePeriod;
-    private int expiredSessionsSearchLimit;
+    private final boolean caseSensitiveUserId;
+    private final int sessionExpiryGracePeriod;
+    private final int expiredSessionsSearchLimit;
 
-    private int cleanupPeriod;
-    private int healthCheckPeriod;
+    private final int cleanupPeriod;
+    private final int healthCheckPeriod;
     private final int runPeriod;
 
-    private int sleepInterval;
+    private final int sleepInterval;
 
-    private boolean tokensEncrypted;
+    // Token Blob strategy flags
+    private final boolean tokensEncrypted;
+    private final boolean tokensCompressed;
+    private final boolean attributeNamesCompressed;
 
     /**
      * Create a new default instance of the CoreTokenConfig which will establish the various configuration
@@ -62,9 +64,13 @@ public class CoreTokenConfig {
         sleepInterval = 60 * 1000;
 
         // Indicate if all Tokens stored in the Core Token Service should be encrypted.
-        tokensEncrypted = Boolean.valueOf(
-                SystemProperties.get(Constants.SESSION_REPOSITORY_ENCRYPTION,
-                        "false"));
+        tokensEncrypted = SystemProperties.getAsBoolean(Constants.SESSION_REPOSITORY_ENCRYPTION);
+
+        // Control Token Compression.
+        tokensCompressed = SystemProperties.getAsBoolean(Constants.SESSION_REPOSITORY_COMPRESSION);
+
+        // Control Attribute Name Compression.
+        attributeNamesCompressed = SystemProperties.getAsBoolean(Constants.SESSION_REPOSITORY_ATTRIBUTE_NAME_COMPRESSION);
     }
 
     /**
@@ -139,10 +145,6 @@ public class CoreTokenConfig {
     public String getUserId(InternalSession session) {
         // If the sessions Users ID has not been initialised, calling set will initialise it.
         String userId = session.getUUID();
-        if (StringUtils.isEmpty(userId)) {
-            session.setUUID();
-            userId = session.getUUID();
-        }
 
         // Now process the case sensitivity for users id.
         if (isCaseSensitiveUserId()) {
@@ -156,5 +158,19 @@ public class CoreTokenConfig {
      */
     public boolean isTokenEncrypted() {
         return tokensEncrypted;
+    }
+
+    /**
+     * @return True if the tokens within the Core Token Service can be compressed. False is the default.
+     */
+    public boolean isTokenCompressed() {
+        return tokensCompressed;
+    }
+
+    /**
+     * @return True if The Token Attribute Names should be compressed as well. False by default.
+     */
+    public boolean isAttributeNamesCompressed() {
+        return attributeNamesCompressed;
     }
 }

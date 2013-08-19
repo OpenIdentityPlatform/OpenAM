@@ -15,15 +15,22 @@
  */
 package com.sun.identity.sm.ldap.adapters;
 
+import com.google.inject.Inject;
 import com.iplanet.dpro.session.service.InternalSession;
 import com.sun.identity.sm.ldap.CoreTokenConfig;
 import com.sun.identity.sm.ldap.api.TokenType;
+import com.sun.identity.sm.ldap.api.fields.SessionTokenField;
 import com.sun.identity.sm.ldap.api.tokens.Token;
 import com.sun.identity.sm.ldap.api.tokens.TokenIdFactory;
 import com.sun.identity.sm.ldap.utils.JSONSerialisation;
 import com.sun.identity.sm.ldap.utils.LDAPDataConversion;
+import com.sun.identity.sm.ldap.utils.blob.TokenBlobUtils;
+import com.sun.identity.sm.ldap.utils.blob.strategies.AttributeCompressionStrategy;
 
+import java.lang.reflect.Field;
 import java.util.Calendar;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * SessionAdapter is responsible for providing conversions to and from InternalSession
@@ -32,11 +39,17 @@ import java.util.Calendar;
  * @author robert.wapshott@forgerock.com
  */
 public class SessionAdapter implements TokenAdapter<InternalSession> {
-
+    // Injected
     private final TokenIdFactory tokenIdFactory;
     private final CoreTokenConfig config;
     private final JSONSerialisation serialisation;
     private final LDAPDataConversion dataConversion;
+    private final TokenBlobUtils blobUtils;
+
+    /**
+     * The field name Pattern is required for internal Session JSON fudging.
+     */
+    private static final Pattern LATEST_ACCESSED_TIME = getLatestAccessedTimeRegexp();
 
     /**
      * Creates a default instance with dependencies defined.
@@ -44,13 +57,17 @@ public class SessionAdapter implements TokenAdapter<InternalSession> {
      * @param tokenIdFactory Non null.
      * @param config Non null.
      * @param serialisation Non null.
+     * @param blobUtils
      */
+    @Inject
     public SessionAdapter(TokenIdFactory tokenIdFactory, CoreTokenConfig config,
-                          JSONSerialisation serialisation, LDAPDataConversion dataConversion) {
+                          JSONSerialisation serialisation, LDAPDataConversion dataConversion,
+                          TokenBlobUtils blobUtils) {
         this.tokenIdFactory = tokenIdFactory;
         this.config = config;
         this.serialisation = serialisation;
         this.dataConversion = dataConversion;
+        this.blobUtils = blobUtils;
     }
 
     /**
@@ -79,7 +96,12 @@ public class SessionAdapter implements TokenAdapter<InternalSession> {
 
         // Binary data
         String jsonBlob = serialisation.serialise(session);
-        token.setBlob(jsonBlob.getBytes());
+        blobUtils.setBlobFromString(token, jsonBlob);
+
+        String latestAccessTime = filterLatestAccessTime(token);
+        if (latestAccessTime != null) {
+            token.setAttribute(SessionTokenField.LATEST_ACCESS_TIME.getField(), latestAccessTime);
+        }
 
         return token;
     }
@@ -93,7 +115,72 @@ public class SessionAdapter implements TokenAdapter<InternalSession> {
      * @return Non null InternalSession.
      */
     public InternalSession fromToken(Token token) {
-        String jsonBlob = new String(token.getBlob());
+        String jsonBlob = blobUtils.getBlobAsString(token);
+        int index = findIndexOfValidField(jsonBlob);
+
+        // Do we need to insert the LatestAccessTime Into the Blob?
+        String latestAccessTime = token.getValue(SessionTokenField.LATEST_ACCESS_TIME.getField());
+        if (latestAccessTime != null && index != -1) {
+            // Assemble the Sting to insert
+            // latestAccessTime
+            String fieldName = SessionTokenField.LATEST_ACCESS_TIME.getInternalSessionFieldName();
+            // "latestAccessTime":
+            String jsonField = JSONSerialisation.jsonAttributeName(fieldName);
+            // "latestAccessTime":12345,
+            String addition = jsonField + latestAccessTime + ",";
+
+            // Insert the string into the JSON Blob
+            jsonBlob = jsonBlob.substring(0, index) + addition + jsonBlob.substring(index, jsonBlob.length());
+        }
+
         return serialisation.deserialise(jsonBlob, InternalSession.class);
+    }
+
+    /**
+     * Search the JSON blob contents and locate a valid field within the JSON.
+     *
+     * @param blob The serialised JSON blob string to search.
+     * @return -1 if no fields were found, or the index of the start position of a valid JSON field.
+     */
+    public int findIndexOfValidField(String blob) {
+        for (Field field : AttributeCompressionStrategy.getAllValidFields(InternalSession.class)) {
+            String search = JSONSerialisation.jsonAttributeName(field.getName());
+            int index = blob.indexOf(search);
+            if (index != -1) {
+                return index;
+            }
+        }
+        return -1;
+    }
+
+    /**
+     * Latest Accessed Time is a tricky field as it is internal to the InternalSession and only
+     * accessible when the Token has been serialised.
+     *
+     * @param token Token which will be examined for the serialised field. Non null.
+     */
+    public String filterLatestAccessTime(Token token) {
+        String contents = blobUtils.getBlobAsString(token);
+        Matcher matcher = LATEST_ACCESSED_TIME.matcher(contents);
+        if (!matcher.find()) {
+            return null;
+        }
+
+        String latestAccessTime = matcher.group(1);
+        contents = contents.substring(0, matcher.start()) + contents.substring(matcher.end(), contents.length());
+        blobUtils.setBlobFromString(token, contents);
+
+        return latestAccessTime;
+    }
+
+    /**
+     * Helper function to simplify code around this Pattern.
+     * @return Non null.
+     */
+    private static Pattern getLatestAccessedTimeRegexp() {
+        return Pattern.compile(
+                JSONSerialisation.jsonAttributeName(
+                        SessionTokenField.LATEST_ACCESS_TIME.getInternalSessionFieldName())
+                        + "\\s*?([0-9]+),??");
     }
 }

@@ -101,9 +101,7 @@ import com.sun.identity.sm.ldap.api.CoreTokenConstants;
 import com.sun.identity.sm.ldap.api.tokens.Token;
 import com.sun.identity.sm.ldap.api.tokens.TokenIdFactory;
 import com.sun.identity.sm.ldap.exceptions.CoreTokenException;
-import com.sun.identity.sm.ldap.utils.JSONSerialisation;
 import com.sun.identity.sm.ldap.utils.KeyConversion;
-import com.sun.identity.sm.ldap.utils.LDAPDataConversion;
 import org.forgerock.openam.guice.InjectorHolder;
 import org.forgerock.openam.session.service.SessionTimeoutHandler;
 
@@ -1751,13 +1749,9 @@ public class SessionService {
     private SessionService() {
         // Initialise all CTS fields.
         KeyConversion keyConversion = new KeyConversion();
-        tokenIdFactory = new TokenIdFactory(keyConversion);
-        coreTokenConfig = new CoreTokenConfig();
-        tokenAdapter = new SessionAdapter(
-                tokenIdFactory,
-                coreTokenConfig,
-                new JSONSerialisation(),
-                new LDAPDataConversion());
+        tokenIdFactory = InjectorHolder.getInstance(TokenIdFactory.class);
+        coreTokenConfig = InjectorHolder.getInstance(CoreTokenConfig.class);
+        tokenAdapter = InjectorHolder.getInstance(SessionAdapter.class);
 
         try {
             dsameAdminDN = (String) AccessController

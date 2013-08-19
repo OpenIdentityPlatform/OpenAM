@@ -1,5 +1,5 @@
 /**
- * Copyright 2013 ForgeRock, Inc.
+ * Copyright 2013 ForgeRock, AS.
  *
  * The contents of this file are subject to the terms of the Common Development and
  * Distribution License (the License). You may not use this file except in compliance with the
@@ -13,17 +13,20 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  */
-package com.sun.identity.sm.ldap.utils;
+package com.sun.identity.sm.ldap.utils.blob.strategies;
 
+import com.google.inject.Inject;
 import com.iplanet.dpro.session.service.SessionService;
-import com.iplanet.services.util.Crypt;
 import com.sun.identity.shared.debug.Debug;
 import com.sun.identity.sm.ldap.api.CoreTokenConstants;
 import com.sun.identity.sm.ldap.api.tokens.Token;
+import com.sun.identity.sm.ldap.utils.blob.BlobStrategy;
+import com.sun.identity.sm.ldap.utils.blob.TokenStrategyFailedException;
+import com.sun.identity.sm.ldap.utils.blob.strategies.encryption.DecryptAction;
+import com.sun.identity.sm.ldap.utils.blob.strategies.encryption.EncryptAction;
 
 import java.security.AccessController;
 import java.security.PrivilegedActionException;
-import java.security.PrivilegedExceptionAction;
 
 /**
  * Responsible for managing encryption of the Token based on the current Core Token Service
@@ -31,16 +34,20 @@ import java.security.PrivilegedExceptionAction;
  *
  * @author robert.wapshott@forgerock.com
  */
-public class TokenEncryption {
+public class EncryptionStrategy implements BlobStrategy {
+    private final Debug debug;
+    private final EncryptAction encyptionAction;
+    private final DecryptAction decyptAction;
 
-    private Debug debug;
-
-    public TokenEncryption() {
-        this(SessionService.sessionDebug);
+    @Inject
+    public EncryptionStrategy(EncryptAction encyptionAction, DecryptAction decyptAction) {
+        this(SessionService.sessionDebug, encyptionAction, decyptAction);
     }
 
-    public TokenEncryption(Debug debug) {
+    public EncryptionStrategy(Debug debug, EncryptAction encyptionAction, DecryptAction decyptAction) {
         this.debug = debug;
+        this.encyptionAction = encyptionAction;
+        this.decyptAction = decyptAction;
     }
 
     /**
@@ -52,23 +59,19 @@ public class TokenEncryption {
      *
      * @return Non null copy of the Token which has been encrypted.
      */
-    public Token encrypt(Token token) {
-        Token clone = new Token(token);
+    public void perform(Token token) throws TokenStrategyFailedException {
         try {
-            byte[] blob = token.getBlob();
-            byte[] encyptedBlob = AccessController.doPrivileged(new EncryptAction(blob));
-            clone.setBlob(encyptedBlob);
+            encyptionAction.setBlob(token.getBlob());
+            byte[] encryptedBlob = AccessController.doPrivileged(encyptionAction);
+            token.setBlob(encryptedBlob);
 
             if (debug.messageEnabled()) {
                 debug.message(CoreTokenConstants.DEBUG_HEADER + "Encrypted Token");
             }
 
         } catch (PrivilegedActionException e) {
-            throw new IllegalStateException(
-                    "\n" + CoreTokenConstants.DEBUG_HEADER + "Failed to encrypt the JSON blob",
-                    e);
+            throw new TokenStrategyFailedException("Failed to encrypt JSON Blob", e);
         }
-        return clone;
     }
 
     /**
@@ -80,54 +83,18 @@ public class TokenEncryption {
      *
      * @return Non null copy of the Token which has been decrypted.
      */
-    public Token decrypt(Token token) {
-
-        Token clone = new Token(token);
+    public void reverse(Token token) throws TokenStrategyFailedException {
         try {
-            byte[] blob = token.getBlob();
-            byte[] decryptedBlob = AccessController.doPrivileged(new DecryptAction(blob));
-            clone.setBlob(decryptedBlob);
+            decyptAction.setBlob(token.getBlob());
+            byte[] decryptedBlob = AccessController.doPrivileged(decyptAction);
+            token.setBlob(decryptedBlob);
 
             if (debug.messageEnabled()) {
                 debug.message(CoreTokenConstants.DEBUG_HEADER + "Decrypted Token");
             }
 
         } catch (PrivilegedActionException e) {
-            throw new IllegalStateException(
-                    "\n" + CoreTokenConstants.DEBUG_HEADER + "Failed to decrypt the JSON blob",
-                    e);
-        }
-
-        return clone;
-    }
-
-    /**
-     * Internal encryption action is responsible for coordinating the encryption functions.
-     */
-    private static class EncryptAction implements PrivilegedExceptionAction<byte[]> {
-        private final byte[] blob;
-
-        public EncryptAction(byte[] blob) {
-            this.blob = blob;
-        }
-
-        public byte[] run() throws Exception {
-            return Crypt.getEncryptor().encrypt(blob);
-        }
-    }
-
-    /**
-     * Internal encryption action is responsible for coordinating the decryption functions.
-     */
-    private static class DecryptAction implements PrivilegedExceptionAction<byte[]> {
-        private byte[] blob;
-
-        public DecryptAction(byte[] blob) {
-            this.blob = blob;
-        }
-
-        public byte[] run() throws Exception {
-            return Crypt.getEncryptor().decrypt(blob);
+            throw new TokenStrategyFailedException("Failed to decrypt JSON Blob", e);
         }
     }
 }

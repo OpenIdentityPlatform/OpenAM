@@ -1,5 +1,5 @@
 /**
- * Copyright 2013 ForgeRock, Inc.
+ * Copyright 2013 ForgeRock, AS.
  *
  * The contents of this file are subject to the terms of the Common Development and
  * Distribution License (the License). You may not use this file except in compliance with the
@@ -19,7 +19,7 @@ import com.sun.identity.shared.encode.Base64;
 import com.sun.identity.sm.ldap.api.TokenType;
 import com.sun.identity.sm.ldap.api.fields.CoreTokenField;
 import com.sun.identity.sm.ldap.api.fields.CoreTokenFieldTypes;
-import com.sun.identity.sm.ldap.exceptions.OperationFailedException;
+import com.sun.identity.sm.ldap.exceptions.CoreTokenException;
 import org.forgerock.opendj.ldap.GeneralizedTime;
 
 import java.text.DateFormat;
@@ -202,7 +202,7 @@ public class Token {
         // Validate that the type matches the field they are assigning.
         try {
             CoreTokenFieldTypes.validateType(field, value);
-        } catch (OperationFailedException e) {
+        } catch (CoreTokenException e) {
             throw new IllegalArgumentException(e.getMessage(), e);
         }
 
