@@ -15,6 +15,7 @@
  */
 package org.forgerock.openam.entitlement.utils.indextree;
 
+import org.forgerock.openam.entitlement.utils.indextree.nodecontext.ContextKey;
 import org.forgerock.openam.entitlement.utils.indextree.nodecontext.MapSearchContext;
 import org.forgerock.openam.entitlement.utils.indextree.nodecontext.SearchContext;
 import org.forgerock.openam.entitlement.utils.indextree.nodefactory.BasicTreeNodeFactory;
@@ -189,20 +190,25 @@ public class SimpleReferenceTree implements IndexRuleTree {
 
         char[] searchTerm = resource.toCharArray();
 
-        List<TreeNode> electionPool = new ArrayList<TreeNode>();
+        List<TreeNode> candidates = new ArrayList<TreeNode>();
         // Start with the root node as the candidate.
-        electionPool.add(root);
+        candidates.add(root);
 
         // Create a new search context for the current search.
         SearchContext context = new MapSearchContext();
 
-        for (int i = 0, l = searchTerm.length; i < l && !electionPool.isEmpty(); i++) {
+        for (int i = 0, l = searchTerm.length; i < l && !candidates.isEmpty(); i++) {
+            if (i == l - 1) {
+                // Record that this is the last character.
+                context.add(ContextKey.LAST_CHARACTER, Boolean.TRUE);
+            }
+
             // For each character of the search term.
-            searchTree(searchTerm[i], electionPool, context);
+            searchTree(searchTerm[i], candidates, context);
         }
 
         Set<String> results = new HashSet<String>();
-        for (TreeNode candidate : electionPool) {
+        for (TreeNode candidate : candidates) {
             if (candidate.isEndPoint()) {
                 // Filter out valid index rules.
                 results.add(candidate.getFullPath());
@@ -213,32 +219,25 @@ public class SimpleReferenceTree implements IndexRuleTree {
     }
 
     /**
-     * Evaluate previous electionPool for reelection and their children for first election.
+     * Evaluate previous candidates for reelection and their children for first election.
      *
      * @param searchTerm
      *         Current search character.
-     * @param electionPool
-     *         The pool of elected candidates.
+     * @param candidates
+     *         Elected candidates as potential matches.
      * @param context
      *         The shared search context.
      */
-    private void searchTree(char searchTerm, List<TreeNode> electionPool, SearchContext context) {
+    private void searchTree(char searchTerm, List<TreeNode> candidates, SearchContext context) {
         // Every candidate has to be reelected.
-        List<TreeNode> previousPool = new ArrayList<TreeNode>(electionPool);
-        electionPool.clear();
+        List<TreeNode> previousCandidates = new ArrayList<TreeNode>(candidates);
+        candidates.clear();
 
-        for (TreeNode previousCandidate : previousPool) {
-
-            if (previousCandidate.isWildcard() && previousCandidate.hasInterestIn(searchTerm, context)) {
-                // Reelect previous candidate.
-                electionPool.add(previousCandidate);
-            }
-
-            if (previousCandidate.hasChild()) {
-                // Evaluate previous electionPool children.
-                evaluateChildren(searchTerm, previousCandidate.getChild(), electionPool, context);
-            }
-
+        for (TreeNode previousCandidate : previousCandidates) {
+            // Reelect any previous wildcard candidates.
+            electWildcard(searchTerm, previousCandidate, candidates, context);
+            // Evaluate previous candidates children.
+            electChildren(searchTerm, previousCandidate.getChild(), candidates, context);
         }
     }
 
@@ -249,26 +248,72 @@ public class SimpleReferenceTree implements IndexRuleTree {
      *         Current search character.
      * @param child
      *         Current tree node position.
-     * @param electionPool
-     *         The pool of elected candidates.
+     * @param candidates
+     *         Elected candidates as potential matches.
      * @param context
      *         The shared search context.
      */
-    private void evaluateChildren(char searchTerm, TreeNode child, List<TreeNode> electionPool, SearchContext context) {
+    private void electChildren(char searchTerm, TreeNode child, List<TreeNode> candidates, SearchContext context) {
         while (child != null) {
 
             if (child.hasInterestIn(searchTerm, context)) {
                 // Elect child as a candidate.
-                electionPool.add(child);
-
-                if (child.isWildcard() && child.hasChild()) {
-                    // This scenario handles zero or more characters.
-                    evaluateChildren(searchTerm, child.getChild(), electionPool, context);
-                }
+                candidates.add(child);
+                // Checks for any last chance elections.
+                lastChanceElection(searchTerm, child.getChild(), candidates, context);
             }
 
-            // Next child
+            if (child.isWildcard()) {
+                // This scenario handles zero or more characters.
+                electChildren(searchTerm, child.getChild(), candidates, context);
+            }
+
+            // Next child.
             child = child.getSibling();
+        }
+    }
+
+    /**
+     * Given the last character in the resource, affirm whether a valid zero or more wildcard exists next in the tree.
+     *
+     * @param searchTerm
+     *         Current search character.
+     * @param child
+     *         Current tree node position.
+     * @param candidates
+     *         Elected candidates as potential matches.
+     * @param context
+     *         The shared search context.
+     */
+    private void lastChanceElection(char searchTerm, TreeNode child,
+                                    List<TreeNode> candidates, SearchContext context) {
+        // Check that the search term is indeed the last character of the resource.
+        if (context.has(ContextKey.LAST_CHARACTER)) {
+            while (child != null) {
+                // Elect the next tree node if it's a zero or more wildcard.
+                electWildcard(searchTerm, child, candidates, context);
+                // Next child.
+                child = child.getSibling();
+            }
+        }
+    }
+
+    /**
+     * Elects the current candidate if it's a wildcard tree node and has interest in the current search term.
+     *
+     * @param searchTerm
+     *         Current search character.
+     * @param candidate
+     *         Current tree node position.
+     * @param candidates
+     *         Elected candidates as potential matches.
+     * @param context
+     *         The shared search context.
+     */
+    private void electWildcard(char searchTerm, TreeNode candidate, List<TreeNode> candidates, SearchContext context) {
+        if (candidate.isWildcard() && candidate.hasInterestIn(searchTerm, context)) {
+            // Reelect previous candidate.
+            candidates.add(candidate);
         }
     }
 

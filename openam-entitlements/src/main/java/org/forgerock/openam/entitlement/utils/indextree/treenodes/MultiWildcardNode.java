@@ -15,6 +15,7 @@
  */
 package org.forgerock.openam.entitlement.utils.indextree.treenodes;
 
+import org.forgerock.openam.entitlement.utils.indextree.nodecontext.ContextKey;
 import org.forgerock.openam.entitlement.utils.indextree.nodecontext.SearchContext;
 
 /**
@@ -39,6 +40,12 @@ public class MultiWildcardNode extends BasicTreeNode {
     @Override
     public boolean hasInterestIn(char value, SearchContext context) {
         if (value == '?' || value == '#') {
+            // Ignore illegal character unless it is the last character.
+            return context.has(ContextKey.LAST_CHARACTER);
+        }
+
+        if (value == '/' && context.has(ContextKey.LAST_CHARACTER)) {
+            // '*' after a '/' matches one or more characters.
             return false;
         }
 

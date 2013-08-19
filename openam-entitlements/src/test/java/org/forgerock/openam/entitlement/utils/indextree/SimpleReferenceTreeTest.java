@@ -86,9 +86,7 @@ public class SimpleReferenceTreeTest {
         assertEquals(expectedResults, results);
 
         results = tree.searchTree("http://www.endurl.com/");
-        expectedResults.clear();
-        expectedResults.add("*");
-        assertEquals(expectedResults, results);
+        assertTrue(results.isEmpty());
 
         results = tree.searchTree("http://www.endurl.com/home");
         expectedResults.clear();
@@ -131,26 +129,21 @@ public class SimpleReferenceTreeTest {
         assertEquals(expectedResults, results);
 
         results = tree.searchTree("http://www.substringurl.com/");
-        expectedResults.clear();
-        expectedResults.add("*");
-        assertEquals(expectedResults, results);
+        assertTrue(results.isEmpty());
 
         results = tree.searchTree("http://www.substringurl.com/ab/");
         expectedResults.clear();
         expectedResults.add("http://www.substringurl.com/a*b/");
-        expectedResults.add("*");
         assertEquals(expectedResults, results);
 
         results = tree.searchTree("http://www.substringurl.com/ahellob/");
         expectedResults.clear();
         expectedResults.add("http://www.substringurl.com/a*b/");
-        expectedResults.add("*");
         assertEquals(expectedResults, results);
 
         results = tree.searchTree("http://www.substringurl.com/a/c/d/e/b/");
         expectedResults.clear();
         expectedResults.add("http://www.substringurl.com/a*b/");
-        expectedResults.add("*");
         assertEquals(expectedResults, results);
     }
 
@@ -235,7 +228,9 @@ public class SimpleReferenceTreeTest {
         assertEquals(expectedResults, results);
 
         results = tree.searchTree("http://www.test2.com/?");
-        assertTrue(results.isEmpty());
+        expectedResults.clear();
+        expectedResults.add("http://www.test2.com/*?");
+        assertEquals(expectedResults, results);
 
         results = tree.searchTree("http://www.test2.com/abc?");
         expectedResults.clear();
@@ -248,7 +243,9 @@ public class SimpleReferenceTreeTest {
         assertEquals(expectedResults, results);
 
         results = tree.searchTree("http://www.test3.com/?");
-        assertTrue(results.isEmpty());
+        expectedResults.clear();
+        expectedResults.add("http://www.test3.com/?*");
+        assertEquals(expectedResults, results);
 
         results = tree.searchTree("http://www.test3.com/?abc");
         expectedResults.clear();
@@ -261,13 +258,19 @@ public class SimpleReferenceTreeTest {
         assertEquals(expectedResults, results);
 
         results = tree.searchTree("http://www.test4.com/?");
-        assertTrue(results.isEmpty());
+        expectedResults.clear();
+        expectedResults.add("http://www.test4.com/*?*");
+        assertEquals(expectedResults, results);
 
         results = tree.searchTree("http://www.test4.com/?abc");
-        assertTrue(results.isEmpty());
+        expectedResults.clear();
+        expectedResults.add("http://www.test4.com/*?*");
+        assertEquals(expectedResults, results);
 
         results = tree.searchTree("http://www.test4.com/abc?");
-        assertTrue(results.isEmpty());
+        expectedResults.clear();
+        expectedResults.add("http://www.test4.com/*?*");
+        assertEquals(expectedResults, results);
 
         results = tree.searchTree("http://www.test4.com/abc?def");
         expectedResults.clear();
@@ -296,7 +299,9 @@ public class SimpleReferenceTreeTest {
         assertEquals(expectedResults, results);
 
         results = tree.searchTree("http://www.test2.com/?");
-        assertTrue(results.isEmpty());
+        expectedResults.clear();
+        expectedResults.add("http://www.test2.com/^?");
+        assertEquals(expectedResults, results);
 
         results = tree.searchTree("http://www.test2.com/abc?");
         expectedResults.clear();
@@ -307,7 +312,9 @@ public class SimpleReferenceTreeTest {
         assertTrue(results.isEmpty());
 
         results = tree.searchTree("http://www.test3.com/?");
-        assertTrue(results.isEmpty());
+        expectedResults.clear();
+        expectedResults.add("http://www.test3.com/?^");
+        assertEquals(expectedResults, results);
 
         results = tree.searchTree("http://www.test3.com/?abc");
         expectedResults.clear();
@@ -318,13 +325,19 @@ public class SimpleReferenceTreeTest {
         assertTrue(results.isEmpty());
 
         results = tree.searchTree("http://www.test4.com/?");
-        assertTrue(results.isEmpty());
+        expectedResults.clear();
+        expectedResults.add("http://www.test4.com/^?^");
+        assertEquals(expectedResults, results);
 
         results = tree.searchTree("http://www.test4.com/?abc");
-        assertTrue(results.isEmpty());
+        expectedResults.clear();
+        expectedResults.add("http://www.test4.com/^?^");
+        assertEquals(expectedResults, results);
 
         results = tree.searchTree("http://www.test4.com/abc?");
-        assertTrue(results.isEmpty());
+        expectedResults.clear();
+        expectedResults.add("http://www.test4.com/^?^");
+        assertEquals(expectedResults, results);
 
         results = tree.searchTree("http://www.test4.com/abc?def");
         expectedResults.clear();
@@ -351,7 +364,9 @@ public class SimpleReferenceTreeTest {
         assertEquals(expectedResults, results);
 
         results = tree.searchTree("http://www.test2.com/#");
-        assertTrue(results.isEmpty());
+        expectedResults = new HashSet<String>();
+        expectedResults.add("http://www.test2.com/*#");
+        assertEquals(expectedResults, results);
 
         results = tree.searchTree("http://www.test2.com/abc#");
         expectedResults.clear();
@@ -364,7 +379,9 @@ public class SimpleReferenceTreeTest {
         assertEquals(expectedResults, results);
 
         results = tree.searchTree("http://www.test3.com/#");
-        assertTrue(results.isEmpty());
+        expectedResults.clear();
+        expectedResults.add("http://www.test3.com/#*");
+        assertEquals(expectedResults, results);
 
         results = tree.searchTree("http://www.test3.com/#abc");
         expectedResults.clear();
@@ -377,13 +394,19 @@ public class SimpleReferenceTreeTest {
         assertEquals(expectedResults, results);
 
         results = tree.searchTree("http://www.test4.com/#");
-        assertTrue(results.isEmpty());
+        expectedResults.clear();
+        expectedResults.add("http://www.test4.com/*#*");
+        assertEquals(expectedResults, results);
 
         results = tree.searchTree("http://www.test4.com/#abc");
-        assertTrue(results.isEmpty());
+        expectedResults.clear();
+        expectedResults.add("http://www.test4.com/*#*");
+        assertEquals(expectedResults, results);
 
         results = tree.searchTree("http://www.test4.com/abc#");
-        assertTrue(results.isEmpty());
+        expectedResults.clear();
+        expectedResults.add("http://www.test4.com/*#*");
+        assertEquals(expectedResults, results);
 
         results = tree.searchTree("http://www.test4.com/abc#def");
         expectedResults.clear();
@@ -412,7 +435,9 @@ public class SimpleReferenceTreeTest {
         assertEquals(expectedResults, results);
 
         results = tree.searchTree("http://www.test2.com/#");
-        assertTrue(results.isEmpty());
+        expectedResults.clear();
+        expectedResults.add("http://www.test2.com/^#");
+        assertEquals(expectedResults, results);
 
         results = tree.searchTree("http://www.test2.com/abc#");
         expectedResults.clear();
@@ -423,7 +448,9 @@ public class SimpleReferenceTreeTest {
         assertTrue(results.isEmpty());
 
         results = tree.searchTree("http://www.test3.com/#");
-        assertTrue(results.isEmpty());
+        expectedResults.clear();
+        expectedResults.add("http://www.test3.com/#^");
+        assertEquals(expectedResults, results);
 
         results = tree.searchTree("http://www.test3.com/#abc");
         expectedResults.clear();
@@ -434,13 +461,19 @@ public class SimpleReferenceTreeTest {
         assertTrue(results.isEmpty());
 
         results = tree.searchTree("http://www.test4.com/#");
-        assertTrue(results.isEmpty());
+        expectedResults.clear();
+        expectedResults.add("http://www.test4.com/^#^");
+        assertEquals(expectedResults, results);
 
         results = tree.searchTree("http://www.test4.com/#abc");
-        assertTrue(results.isEmpty());
+        expectedResults.clear();
+        expectedResults.add("http://www.test4.com/^#^");
+        assertEquals(expectedResults, results);
 
         results = tree.searchTree("http://www.test4.com/abc#");
-        assertTrue(results.isEmpty());
+        expectedResults.clear();
+        expectedResults.add("http://www.test4.com/^#^");
+        assertEquals(expectedResults, results);
 
         results = tree.searchTree("http://www.test4.com/abc#def");
         expectedResults.clear();

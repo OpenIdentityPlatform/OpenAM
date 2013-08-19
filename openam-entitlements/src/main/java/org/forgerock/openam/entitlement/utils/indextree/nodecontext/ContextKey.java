@@ -34,6 +34,18 @@ public abstract class ContextKey<T> {
 
     };
 
+    /**
+     * Key used to signify the last character in the resource being searched for.
+     */
+    public static final ContextKey<Boolean> LAST_CHARACTER = new ContextKey<Boolean>() {
+
+        @Override
+        public Class<Boolean> getType() {
+            return Boolean.class;
+        }
+
+    };
+
     protected ContextKey() {
         // Can only be instantiated by sub-typing.
     }

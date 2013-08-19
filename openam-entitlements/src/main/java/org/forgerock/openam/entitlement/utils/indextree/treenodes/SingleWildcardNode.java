@@ -39,7 +39,12 @@ public class SingleWildcardNode extends BasicTreeNode {
 	}
 
 	@Override
-	public boolean hasInterestIn(char value, SearchContext context) {
+    public boolean hasInterestIn(char value, SearchContext context) {
+        if (value == '?' || value == '#') {
+            // Ignore illegal character unless it is the last character.
+            return context.has(ContextKey.LAST_CHARACTER);
+        }
+
         if (context.has(ContextKey.LEVEL_REACHED)) {
             // Next URL level reached, so no longer interested.
             context.remove(ContextKey.LEVEL_REACHED);
@@ -47,13 +52,14 @@ public class SingleWildcardNode extends BasicTreeNode {
         }
 
         if (value == '/') {
+            if (context.has(ContextKey.LAST_CHARACTER)) {
+                // '^' after a '/' matches one or more characters.
+                return false;
+            }
+
             // Make a note that the end of a URL level has been reached.
             context.add(ContextKey.LEVEL_REACHED, Boolean.TRUE);
             return true;
-        }
-
-        if (value == '?' || value == '#') {
-            return false;
         }
 
         return true;
