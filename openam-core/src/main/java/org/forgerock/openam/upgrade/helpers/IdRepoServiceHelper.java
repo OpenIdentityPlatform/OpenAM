@@ -28,14 +28,18 @@ import org.forgerock.openam.upgrade.UpgradeException;
  */
 public class IdRepoServiceHelper extends AbstractUpgradeHelper {
 
+    private static final String MEMBER_OF_ATTR = "sun-idrepo-ldapv3-config-memberof";
+
     public IdRepoServiceHelper() {
         attributes.add(IdConstants.ID_REPO);
+        attributes.add(MEMBER_OF_ATTR);
     }
 
     @Override
     public AttributeSchemaImpl upgradeAttribute(AttributeSchemaImpl oldAttr, AttributeSchemaImpl newAttr)
             throws UpgradeException {
-        //we only want to upgrade the sunIdRepoClass attribute, if it still refers to the old LDAPv3Repo implementation
+        //we only want to upgrade the sunIdRepoClass, if it still refers to the old LDAPv3Repo implementation
+        //this also covers the memberof attribute case, since only the default value have changed for it.
         if (oldAttr.getDefaultValues().equals(newAttr.getDefaultValues())) {
             return null;
         }

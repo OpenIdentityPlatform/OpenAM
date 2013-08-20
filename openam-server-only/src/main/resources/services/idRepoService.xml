@@ -28,7 +28,7 @@
   
 -->
 <!--
-   Portions Copyrighted 2012 ForgeRock AS
+   Portions Copyrighted 2012-2013 ForgeRock AS
 -->
 <!DOCTYPE ServicesConfiguration
     PUBLIC "=//iplanet//Service Management Services (SMS) 1.0 DTD//EN"
@@ -1106,9 +1106,6 @@
                         type="single"
                         syntax="string"
                         i18nKey="a2023">
-                        <DefaultValues>
-                            <Value>iplanet-am-static-group-dn</Value>
-                        </DefaultValues>
                     </AttributeSchema>
 
                     <AttributeSchema name="sun-idrepo-ldapv3-config-uniquemember"
