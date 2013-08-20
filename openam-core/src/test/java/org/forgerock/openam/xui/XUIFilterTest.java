@@ -13,7 +13,6 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  */
-
 package org.forgerock.openam.xui;
 
 import javax.servlet.FilterChain;
@@ -21,101 +20,91 @@ import javax.servlet.FilterConfig;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.ServletContext;
-
+import static org.fest.assertions.Assertions.*;
 import org.mockito.ArgumentCaptor;
-import org.mockito.Captor;
-import org.testng.annotations.Test;
-
-import static org.testng.Assert.*;
-
 import static org.mockito.BDDMockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.BDDMockito.when;
+import org.testng.annotations.BeforeMethod;
+import org.testng.annotations.Test;
 
 public class XUIFilterTest {
 
-    @Captor
-    private ArgumentCaptor<String> captor = new ArgumentCaptor<String>();
-    private ArgumentCaptor<String> captorEndUser = new ArgumentCaptor<String>();
+    private static final String CONTEXT = "/context";
+    private XUIFilter filter;
+
+    @BeforeMethod
+    public void setUp() {
+        filter = new XUIFilter() {
+
+            @Override
+            protected void detectXUIMode() {
+                initialized = true;
+                xuiEnabled = true;
+            }
+        };
+        FilterConfig filterConfig = mock(FilterConfig.class);
+        ServletContext servletContext = mock(ServletContext.class);
+        when(filterConfig.getServletContext()).thenReturn(servletContext);
+        when(servletContext.getContextPath()).thenReturn(CONTEXT);
+        filter.init(filterConfig);
+    }
 
     @Test
-    public void testLogin() throws Exception {
-        String contextPath = "/context";
-        String pathInfo = "UI/Login";
-        String query = "locale=fr";
+    public void loginRedirectsToXUIWithQuery() throws Exception {
+        String pathInfo = "/UI/Login";
+        String query = "locale=fr&realm=/";
         String xuiLoginPath = "/XUI/#login/";
 
         HttpServletRequest request = mock(HttpServletRequest.class);
         HttpServletResponse responseLogin = mock(HttpServletResponse.class);
-
-        FilterConfig filterConfig = mock(FilterConfig.class);
         FilterChain filterChain = mock(FilterChain.class);
-        ServletContext servletContext = mock(ServletContext.class);
 
-        XUIFilter xuifilterLogin = new XUIFilter(true, true);
-
-        when(filterConfig.getServletContext()).thenReturn(servletContext);
-        when(servletContext.getContextPath()).thenReturn(contextPath);
         when(request.getPathInfo()).thenReturn(pathInfo);
         when(request.getQueryString()).thenReturn(query);
 
-        xuifilterLogin.init(filterConfig);
-        xuifilterLogin.doFilter(request, responseLogin, filterChain);
+        filter.doFilter(request, responseLogin, filterChain);
 
+        ArgumentCaptor<String> captor = ArgumentCaptor.forClass(String.class);
         verify(responseLogin).sendRedirect(captor.capture());
 
-        assertTrue(captor.getValue().equalsIgnoreCase(contextPath + xuiLoginPath + "&" + query));
+        assertThat(captor.getValue()).isEqualTo(CONTEXT + xuiLoginPath + "&" + query);
     }
 
     @Test
     public void testLogout() throws Exception {
-        String contextPath = "/context";
         String xuiLogoutPath = "/XUI/#logout/";
-        String logoutPath = "UI/Logout";
+        String logoutPath = "/UI/Logout";
 
         HttpServletRequest request = mock(HttpServletRequest.class);
         HttpServletResponse responseLogout = mock(HttpServletResponse.class);
-
-        FilterConfig filterConfig = mock(FilterConfig.class);
         FilterChain filterChain = mock(FilterChain.class);
-        ServletContext servletContext = mock(ServletContext.class);
 
-        XUIFilter xuifilterLogout = new XUIFilter(true, true);
-
-        when(filterConfig.getServletContext()).thenReturn(servletContext);
-        when(servletContext.getContextPath()).thenReturn(contextPath);
         when(request.getPathInfo()).thenReturn(logoutPath);
         when(request.getQueryString()).thenReturn(null);
 
-        xuifilterLogout.init(filterConfig);
-        xuifilterLogout.doFilter(request, responseLogout, filterChain);
+        filter.doFilter(request, responseLogout, filterChain);
+        ArgumentCaptor<String> captor = ArgumentCaptor.forClass(String.class);
         verify(responseLogout).sendRedirect(captor.capture());
-        assertTrue(captor.getValue().equalsIgnoreCase(contextPath + xuiLogoutPath));
+        assertThat(captor.getValue()).isEqualTo(CONTEXT + xuiLogoutPath);
     }
 
     @Test
     public void testEndUserPage() throws Exception {
-        String contextPath = "/context";
         String profilePage = "/XUI/#profile/";
-        String endUserPath = "idm/EndUser";
+        String endUserPath = "/idm/EndUser";
 
         HttpServletRequest request = mock(HttpServletRequest.class);
         HttpServletResponse responseEndUser = mock(HttpServletResponse.class);
-        XUIFilter xuifilterEndUser = new XUIFilter(true, true);
-
-        FilterConfig filterConfig = mock(FilterConfig.class);
         FilterChain filterChain = mock(FilterChain.class);
-        ServletContext servletContext = mock(ServletContext.class);
 
-        when(filterConfig.getServletContext()).thenReturn(servletContext);
-        when(servletContext.getContextPath()).thenReturn(contextPath);
         when(request.getPathInfo()).thenReturn(endUserPath);
         when(request.getQueryString()).thenReturn(null);
-        xuifilterEndUser.init(filterConfig);
-        xuifilterEndUser.doFilter(request, responseEndUser, filterChain);
-        verify(responseEndUser).sendRedirect(captorEndUser.capture());
-        assertTrue(captorEndUser.getValue().equalsIgnoreCase(contextPath + profilePage));
+
+        filter.doFilter(request, responseEndUser, filterChain);
+
+        ArgumentCaptor<String> captor = ArgumentCaptor.forClass(String.class);
+        verify(responseEndUser).sendRedirect(captor.capture());
+        assertThat(captor.getValue()).isEqualTo(CONTEXT + profilePage);
     }
-
-
 }

@@ -27,10 +27,8 @@ package org.forgerock.openam.upgrade.helpers;
 
 import com.sun.identity.sm.AbstractUpgradeHelper;
 import com.sun.identity.sm.AttributeSchemaImpl;
-
-import java.util.HashSet;
 import java.util.Set;
-
+import static org.forgerock.openam.utils.CollectionUtils.*;
 import org.forgerock.openam.upgrade.UpgradeException;
 
 /**
@@ -51,6 +49,7 @@ public class AuthServiceHelper extends AbstractUpgradeHelper {
     private final static String SAFEWORD = "com.sun.identity.authentication.modules.safeword.SafeWord";
     private final static String UNIX = "com.sun.identity.authentication.modules.unix.Unix";
     private final static String ATTR = "iplanet-am-auth-authenticators";
+    // other attributes
     private final static String XUI = "openam-xui-interface-enabled";
 
     public AuthServiceHelper() {
@@ -87,6 +86,7 @@ public class AuthServiceHelper extends AbstractUpgradeHelper {
         return newAttr;
     }
 
+    @Override
     public AttributeSchemaImpl addNewAttribute(Set<AttributeSchemaImpl> existingAttrs, AttributeSchemaImpl newAttr)
             throws UpgradeException {
 
@@ -94,11 +94,8 @@ public class AuthServiceHelper extends AbstractUpgradeHelper {
             return newAttr;
         }
 
-        // make XUI not default for this upgrade
-        Set<String> defaultValues = newAttr.getDefaultValues();
-        Set<String> newDefaultValues = new HashSet<String>(1);
-        newDefaultValues.add("false");
-        newAttr = updateDefaultValues(newAttr, newDefaultValues);
+        // XUI should not be default for upgraded systems
+        newAttr = updateDefaultValues(newAttr, asSet("false"));
         return newAttr;
     }
 

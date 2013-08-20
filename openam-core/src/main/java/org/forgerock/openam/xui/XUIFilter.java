@@ -46,24 +46,13 @@ public class XUIFilter implements Filter, ServiceListener {
     private String xuiLoginPath;
     private String xuiLogoutPath;
     private String profilePage;
-    private boolean xuiState;
-    private volatile boolean initialized;
+    protected boolean xuiEnabled;
+    protected volatile boolean initialized;
     private static final String XUI_INTERFACE = "openam-xui-interface-enabled";
     private static final String SERVICE_NAME = "iPlanetAMAuthService";
     private static final Debug DEBUG = Debug.getInstance("Configuration");
     private String listenerID;
     private ServiceSchemaManager scm = null;
-
-    public XUIFilter() {
-        // no op
-    }
-
-    /* constructor for testing */
-    public XUIFilter(boolean init, boolean state) {
-        this.initialized = init;
-        this.xuiState = state;
-    }
-
 
     /**
      * {@inheritDoc}
@@ -100,7 +89,7 @@ public class XUIFilter implements Filter, ServiceListener {
             }
         }
 
-        if (xuiState && request.getPathInfo() != null) {
+        if (xuiEnabled && request.getPathInfo() != null) {
             String query = request.getQueryString();
 
             // prepare query
@@ -128,13 +117,13 @@ public class XUIFilter implements Filter, ServiceListener {
     /**
      * detectXUIMode will detect if XUI is enabled or disabled by inspecting the service
      */
-    private void detectXUIMode() {
+    protected void detectXUIMode() {
         try {
             SSOToken dUserToken = AccessController.doPrivileged(AdminTokenAction.getInstance());
             scm = new ServiceSchemaManager(SERVICE_NAME, dUserToken);
             ServiceSchema schema = scm.getGlobalSchema();
             Map attrs = schema.getAttributeDefaults();
-            xuiState = Boolean.parseBoolean(CollectionHelper.getMapAttr(attrs, XUI_INTERFACE, ""));
+            xuiEnabled = Boolean.parseBoolean(CollectionHelper.getMapAttr(attrs, XUI_INTERFACE, ""));
             if (listenerID == null) {
                 listenerID = scm.addListener(this);
             }

@@ -29,7 +29,7 @@
 -->
 
 <!--
-    Portions Copyrighted 2011-2013 ForgeRock, Inc.
+    Portions Copyrighted 2011-2013 ForgeRock AS
 -->
 
 <!DOCTYPE ServicesConfiguration
@@ -121,7 +121,7 @@
                                  syntax="boolean"
                                  i18nKey="a154">
                     <DefaultValues>
-                        <Value>false</Value>
+                        <Value>true</Value>
                     </DefaultValues>
                 </AttributeSchema>
             </Global>
