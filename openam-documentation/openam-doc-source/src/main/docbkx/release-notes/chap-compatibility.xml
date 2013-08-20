@@ -160,6 +160,18 @@
      <member>/ws/1/entitlement/entitlement</member>
     </simplelist>
 
+    <important><!-- Remove this with the fix for AME-969 -->
+     <para>As seen in the nightly builds of OpenAM, a number of new REST
+     endpoints have already been included to replace the older endpoints
+     listed above.</para>
+
+     <para>Documentation for these new endpoints is currently in progress, and
+     will be developed as an update to the <citetitle>Developer Guide</citetitle>
+     chapter on <link xlink:href="dev-guide#chap-rest" xlink:show="new"
+     xlink:role="http://docbook.org/xlink/role/olink"><citetitle>Using RESTful
+     Web Services</citetitle></link> in OpenAM.</para>
+    </important>
+
     <para>Support for these older REST services is likely to be removed in a
     future release as the older services are supplanted with newer REST
     services.</para>
