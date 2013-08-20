@@ -135,9 +135,6 @@
   <para>Your port numbers and directory names may be different than the ones
   used in the example. Also, make sure to use your password where applicable.</para>
   
-  <para>If you have multiple instances, make sure they are all running during the 
-  backup process.</para>
-  
   <orderedlist numeration="arabic">
   <listitem>
    <para>Backup your deployed configuration.</para>
