@@ -286,6 +286,65 @@ $ ./bin/startup.sh</screen>
 
  </procedure>
 -->
+
+ <procedure xml:id="after-upgrading-from-10-1">
+  <title>To Complete Upgrade from OpenAM 10.1.0-Xpress</title>
+
+   <para>When upgrading from OpenAM 10.1.0-Xpress, the upgrade tool does not
+   change the Dashboard service LDAP schema, although the object IDs used in
+   the Dashboard service LDAP schema definitions are not correct.</para>
+
+   <para>You can fix the object IDs manually using the OpenDJ
+   <command>ldapmodify</command> command. The command is delivered with OpenDJ
+   directory server.</para>
+
+  <step>
+   <para>Update the LDAP schema defined in the OpenDJ directory server where
+   OpenAM stores its configuration.</para>
+
+   <para>Make the change on one of the replicated OpenDJ configuration
+   directory servers.</para>
+
+   <para>The example command shown below uses the <command>ldapmodify</command>
+   command delivered with the embedded OpenDJ configuration directory server
+   for OpenAM with deployment URI <literal>/openam</literal>. When you use the
+   embedded OpenDJ configuration directory server, the password for the
+   <literal>cn=Directory Manager</literal> account is the same password used
+   by <literal>amadmin</literal>.</para>
+
+   <para>The LDAP schema definitions are stored on the LDAP subentry
+   with distinguished name <literal>cn=schema</literal>. You use the
+   following LDIF format definitions to correct the object IDs in the
+   definitions.</para>
+
+   <screen>$ cd ~/openam/opends/bin
+$ cat dash.ldif
+dn: cn=schema
+changetype: modify
+delete: attributeTypes
+attributeTypes: ( 1.3.6.1.4.1.36733.2.1.9.2.811 NAME ( 'assignedDashboard' )
+  DESC 'Dashboard App registry' SYNTAX 1.3.6.1.4.1.1466.115.121.1.15
+  X-ORIGIN 'OpenAM' )
+-
+add: attributeTypes
+attributeTypes: ( 1.3.6.1.4.1.36733.2.2.1.3.1 NAME ( 'assignedDashboard' )
+  DESC 'Dashboard App registry' SYNTAX 1.3.6.1.4.1.1466.115.121.1.15
+  X-ORIGIN 'OpenAM' )
+-
+delete: objectClasses
+objectClasses: ( 1.3.6.1.4.1.1466.101.120.1433 NAME
+  'forgerock-am-dashboard-service' AUXILIARY MAY (
+   assignedDashboard ) X-ORIGIN 'Forgerock' )
+-
+add: objectClasses
+objectClasses: ( 1.3.6.1.4.1.36733.2.2.2.3.1 NAME
+  'forgerock-am-dashboard-service' AUXILIARY MAY (
+  assignedDashboard ) X-ORIGIN 'Forgerock' )
+
+
+$ ./ldapmodify -p 1389 -D "cn=Directory Manager" -w password -f ./dash.ldif
+Processing MODIFY request for cn=schema
+MODIFY operation successful for DN cn=schema</screen>
+  </step>
+ </procedure>
 </chapter>
-
-
