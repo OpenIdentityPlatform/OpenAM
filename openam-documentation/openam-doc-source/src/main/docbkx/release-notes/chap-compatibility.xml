@@ -189,6 +189,19 @@
    </listitem>
 
    <listitem>
+    <para>The <literal>iplanet-am-auth-ldap-server-check</literal> property for
+    LDAP and Active Directory authentication modules has been removed and
+    replaced with a heartbeat mechanism configurable through the LDAP Connection
+    Heartbeat Interval (<literal>openam-auth-ldap-heartbeat-interval</literal>)
+    and LDAP Connection Heartbeat Time Unit
+    (<literal>openam-auth-ldap-heartbeat-interval</literal>) properties for the
+    modules.</para>
+
+    <para>Set these new properties as necessary when you have firewalls or
+    load balancers that drop connections that remain idle for too long.</para>
+   </listitem>
+
+   <listitem>
     <para>The advanced server property,
     <literal>openam.session.destroy_all_sessions</literal>, has been replaced
     by the built-in Global Session Service setting,

@@ -325,16 +325,7 @@
       <literal>iplanet-am-auth-ldap-return-user-dn</literal></para>
      </listitem>
     </varlistentry>
-    <varlistentry>
-     <term>Active Directory Server Check Interval</term>
-     <listitem>
-      <para>Used by the failover mechanism. Specifies the number of minutes
-      between checks whether a previously unavailable Active Directory has
-      become available again.</para>
-      <para><command>ssoadm</command> attribute:
-      <literal>iplanet-am-auth-ldap-server-check</literal></para>
-     </listitem>
-    </varlistentry>
+
     <varlistentry>
      <term>User Creation Attributes</term>
      <listitem>
@@ -344,6 +335,37 @@
       <literal>iplanet-am-ldap-user-creation-attr-list</literal></para>
      </listitem>
     </varlistentry>
+
+    <varlistentry>
+     <term>LDAP Connection Heartbeat Interval</term>
+     <listitem>
+      <para>Specifies how often OpenAM should send a heartbeat request to the
+      directory server to ensure that the connection does not remain idle. Some
+      network administrators configure firewalls and load balancers to drop
+      connections that are idle for too long. You can turn this off by setting
+      the value to 0 or to a negative number. To set the units for the interval
+      use LDAP Connection Heartbeat Time Unit.</para>
+
+      <para>Default: 1</para>
+
+      <para><command>ssoadm</command> attribute:
+      <literal>openam-auth-ldap-heartbeat-interval</literal></para>
+     </listitem>
+    </varlistentry>
+
+    <varlistentry>
+     <term>LDAP Connection Heartbeat Time Unit</term>
+     <listitem>
+      <para>Specifies the time unit corresponding to LDAP Connection Heartbeat
+      Interval.</para>
+
+      <para>Default: minute</para>
+
+      <para><command>ssoadm</command> attribute:
+      <literal>openam-auth-ldap-heartbeat-interval</literal></para>
+     </listitem>
+    </varlistentry>
+
     <varlistentry>
      <term>Authentication Level</term>
      <listitem>
@@ -2600,15 +2622,7 @@
       <literal>iplanet-am-auth-ldap-return-user-dn</literal></para>
      </listitem>
     </varlistentry>
-    <varlistentry>
-     <term>LDAP Server Check Interval</term>
-     <listitem>
-      <para>Specifies the number of minutes between checks that the primary
-      LDAP server continues to respond.</para>
-      <para><command>ssoadm</command> attribute:
-      <literal>iplanet-am-auth-ldap-server-check</literal></para>
-     </listitem>
-    </varlistentry>
+
     <varlistentry>
      <term>User Creation Attributes</term>
      <listitem>
@@ -2656,6 +2670,37 @@
       <literal>iplanet-am-auth-ldap-ssl-trust-all</literal></para>
      </listitem>
     </varlistentry>
+
+    <varlistentry>
+     <term>LDAP Connection Heartbeat Interval</term>
+     <listitem>
+      <para>Specifies how often OpenAM should send a heartbeat request to the
+      directory server to ensure that the connection does not remain idle. Some
+      network administrators configure firewalls and load balancers to drop
+      connections that are idle for too long. You can turn this off by setting
+      the value to 0 or to a negative number. To set the units for the interval
+      use LDAP Connection Heartbeat Time Unit.</para>
+
+      <para>Default: 1</para>
+
+      <para><command>ssoadm</command> attribute:
+      <literal>openam-auth-ldap-heartbeat-interval</literal></para>
+     </listitem>
+    </varlistentry>
+
+    <varlistentry>
+     <term>LDAP Connection Heartbeat Time Unit</term>
+     <listitem>
+      <para>Specifies the time unit corresponding to LDAP Connection Heartbeat
+      Interval.</para>
+
+      <para>Default: minute</para>
+
+      <para><command>ssoadm</command> attribute:
+      <literal>openam-auth-ldap-heartbeat-interval</literal></para>
+     </listitem>
+    </varlistentry>
+
     <varlistentry>
      <term>Authentication Level</term>
      <listitem>
