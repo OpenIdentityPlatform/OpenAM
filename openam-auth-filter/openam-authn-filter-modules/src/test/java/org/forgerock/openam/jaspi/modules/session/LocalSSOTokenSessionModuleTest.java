@@ -170,7 +170,7 @@ public class LocalSSOTokenSessionModuleTest {
         given(principal.getName()).willReturn("PRINCIPAL");
 
         given(messageInfo.getRequestMessage()).willReturn(request);
-        map.put("org.forgerock.security.context", context);
+        map.put("org.forgerock.authentication.context", context);
         given(messageInfo.getMap()).willReturn(map);
 
         given(request.getCookies()).willReturn(new Cookie[]{new Cookie("2", "2"),

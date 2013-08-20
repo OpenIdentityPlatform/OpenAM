@@ -154,7 +154,7 @@ public class LocalSSOTokenSessionModule implements ServerAuthModule {
                 }
 
                 Map<String, Object> context =
-                        (Map<String, Object>) messageInfo.getMap().get("org.forgerock.security.context");
+                        (Map<String, Object>) messageInfo.getMap().get("org.forgerock.authentication.context");
                 context.put("authLevel", authLevel);
                 //TODO add more properties to context map
 
