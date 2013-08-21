@@ -65,7 +65,7 @@ public class PasswordServerResource extends AbstractFlow {
                     .verify(getRequest(), getResponse())) {
                 resourceOwner = new User(username, password.toCharArray());
             } else {
-                OAuth2Utils.DEBUG.error("Unable to verify user: " + username + "password: " + password);
+                OAuth2Utils.DEBUG.error("Unable to verify user: " + username);
                 throw OAuthProblemException.OAuthError.INVALID_GRANT.handle(getRequest());
             }
         } else {
