@@ -4663,9 +4663,8 @@ to a runtime exception with messages that I think suggest that it needed to be c
                 <term><literal>/xacml/*</literal></term>
                 <listitem>
                     <para>Used by a servlet named XACMLContentAdapter. Associated with the XacmlContentHandlerService
-                        class. Provides the main endpoint for all XACML requests. For more information, see the next
-                        section on XACML 3 REST Endpoints.
-             <!-- Might need to split out into a separate section -->
+                        class. Provides the main endpoint for all XACML requests. <!--For more information, see the next
+                        section on XACML 3 REST Endpoints. -->
                     </para>
                 </listitem>
             </varlistentry>
@@ -4709,7 +4708,10 @@ to a runtime exception with messages that I think suggest that it needed to be c
                         For more information, see the chapter on
                         <link xlink:href="dev-guide#chap-rest"
                                              xlink:role="http://docbook.org/xlink/role/olink">
-                            <citetitle>Using RESTful Web Services</citetitle></link>.</para>
+                            <citetitle>Using RESTful Web Services</citetitle></link>. In addition, you
+                    can read more about associated REST endpoints in <link xlink:href="reference#json-rest-endpoints"
+                    xlink:role="http://docbook.org/xlink/role/olink"></link>
+                    <citetitle>JSON REST Endpoints</citetitle></para>
                 </listitem>
             </varlistentry>
 
@@ -4718,6 +4720,84 @@ to a runtime exception with messages that I think suggest that it needed to be c
         </variablelist>
     </section>
 
+    <section xml:id="json-rest-endponts">
+        <title>JSON REST Endpoints</title>
+        <indexterm>
+            <primary>REST</primary>
+            <secondary>JSON</secondary>
+        </indexterm>
+
+        <para>The endpoints in this section document the REST-based JSON interfaces used for authentication
+        and authorization.</para>
+        
+        <variablelist>
+            <varlistentry>
+                <term>/json/agents</term>
+                <listitem>
+                    <para>Authorization: Supports the PassThroughAuthorizationFilter. No authorization logic is
+                        performed in the filter. Information is logged. The authorization logic is performed by the
+                        underlying identity services.</para>
+                </listitem>
+            </varlistentry>
+            <varlistentry>
+                <term>/json/auth/1/authenticate</term>
+                <listitem>
+                    <para>Authentication: Supports HTTP GET and POST methods. Can handle Integrated Windows
+                    Authentication.</para>
+                    <para>Authorization: No filter.</para>
+                </listitem>
+            </varlistentry>
+            <varlistentry>
+                <term>/json/dashboard</term>
+                <listitem>
+                    <para>Authorization: Supports the PassThroughAuthorizationFilter. No authorization logic is
+                        performed in the filter. Information is logged.</para>
+                </listitem>
+            </varlistentry>
+            <varlistentry>
+                <term>/json/groups</term>
+                <listitem>
+                    <para>Authorization: Supports the PassThroughAuthorizationFilter. No authorization logic is
+                        performed in the filter. Information is logged. The authorization logic is performed by the
+                        underlying identity services.</para>
+                </listitem>
+            </varlistentry>
+            <varlistentry>
+                <term>/json/serverinfo</term>
+                <listitem>
+                    <para>Authorization: Supports the PassThroughAuthorizationFilter. No authorization logic is
+                        performed in the filter. Information is logged. One sub-endpoint,
+                    <literal>/json/serverinfo/cookieDomains</literal>, supports HTTP GET.</para>
+                </listitem>
+            </varlistentry>
+            <varlistentry>
+                <term>/json/sessions</term>
+                <listitem>
+                    <para>Authorization: Supports the SessionResourceAuthZFilter. Allows POST _action=logout for all
+                        users. Other functionality is limited to the administrative amadmin superuser.</para>
+                </listitem>
+            </varlistentry>
+            <varlistentry>
+                <term>/json/tokens</term>
+                <listitem>
+                    <para>Authorization: Supports the AdminAuthorizationFilter. Access limited to the amadmin
+                        superuser.</para>
+                </listitem>
+            </varlistentry>
+            <varlistentry>
+                <term>/json/users</term>
+                <listitem>
+                    <para>Authentication: Supports HTTP POST. Uses the _action query parameter with the following
+                        allowed values: register, confirm, forgotPassword, forgotPasswordReset.</para>
+                    <para>Authorization: Supports the PassThroughAuthorizationFilter. No authorization logic is
+                        performed in the filter. Information is logged. The authorization logic is performed by the
+                        underlying identity services.</para>
+                </listitem>
+            </varlistentry>
+        </variablelist>
+    </section>
+
+    <!-- Commented out until XACML 3 is included in OpenAM
     <section xml:id="xacml3-rest-endpoints">
         <title>XACML 3 REST Endpoints</title>
         <indexterm>
@@ -4728,12 +4808,12 @@ to a runtime exception with messages that I think suggest that it needed to be c
 
         <para>The endpoints described in this section, document the work that has been done to this time for XACML 3
             REST endpoints. The descriptions are different from other endpoints in this chapter.</para>
-
+         -->
         <!-- Given the state of development of these endpoints, I would not object if we delete this section.
         The "other XACML endpoints" are a reference to Jeff Schenk's notes on AME-928.
          In addition, Jeff says that he's planning to set up a toggle to deactivate / activate XACML
          endpoints. When that happens, I should add that info to this section. -->
-
+    <!--
         <variablelist>
 
             <varlistentry>
@@ -4773,5 +4853,5 @@ to a runtime exception with messages that I think suggest that it needed to be c
 
         </variablelist>
     </section>
-
+     -->
 </chapter>
