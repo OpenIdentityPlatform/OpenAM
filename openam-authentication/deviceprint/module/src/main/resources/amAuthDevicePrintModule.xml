@@ -1,4 +1,5 @@
-<!DOCTYPE ServicesConfiguration PUBLIC "=//iPlanet//Service Management Services (SMS) 1.0 DTD//EN"  "jar://com/sun/identity/sm/sms.dtd">
+<?xml version="1.0" encoding="ISO-8859-1"?>
+
 <!--
   The contents of this file are subject to the terms of the Common Development and
   Distribution License (the License). You may not use this file except in compliance with the
@@ -14,10 +15,12 @@
 
   Copyright 2011-2013 ForgeRock AS. All rights reserved.
 -->
+
 <!--
   Portions Copyrighted 2013 Syntegrity.
 -->
 
+<!DOCTYPE ServicesConfiguration PUBLIC "=//iPlanet//Service Management Services (SMS) 1.0 DTD//EN"  "jar://com/sun/identity/sm/sms.dtd">
 <ServicesConfiguration>
 	<Service name="iPlanetAMAuthDevicePrintModuleService"
 		version="1.0">
