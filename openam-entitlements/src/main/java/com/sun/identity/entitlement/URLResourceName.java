@@ -24,10 +24,7 @@
  *
  * $Id: URLResourceName.java,v 1.1 2009/08/19 05:40:34 veiming Exp $
  *
- */
-
-/*
- * Portions Copyrighted [2011] [ForgeRock AS]
+ * Portions Copyrighted 2012-2013 ForgeRock AS
  */
 package com.sun.identity.entitlement;
 
@@ -157,7 +154,7 @@ public class URLResourceName
         sb.append(proto);
         sb.append("://");
         sb.append(hostName);
-        if ((hostName.length() != 0) && !hostName.endsWith("*")) {
+        if (hostName.length() != 0) {
             sb.append(":");
             sb.append(port);
         }
