@@ -43,29 +43,32 @@ import javax.servlet.ServletContext;
  */
 public class LDIFTemplates {
 
-    private static final List<String> templates = new ArrayList<String>();
+    private static final List<String> TEMPLATES = new ArrayList<String>();
     private static final String PATH_PREFIX = "/WEB-INF/template/ldif/";
 
     static {
-        templates.add("ad/");
-        templates.add("adam/");
-        templates.add("opendj/");
-        templates.add("odsee/");
-        templates.add("tivoli/");
-        templates.add("sfha/");
+        TEMPLATES.add("ad/");
+        TEMPLATES.add("adam/");
+        TEMPLATES.add("opendj/");
+        TEMPLATES.add("odsee/");
+        TEMPLATES.add("tivoli/");
+        TEMPLATES.add("sfha/");
     }
 
     private LDIFTemplates() {
     }
 
-    public static void copy(String dir, ServletContext servletCtx) {
-        for (String schemaDir : templates) {
-            Set<String> resourcePaths = servletCtx.getResourcePaths(PATH_PREFIX + schemaDir);
-            for (String resource : resourcePaths) {
-                if (resourcePaths != null) {
+    private static void copyRecursively(ServletContext servletCtx, String from, String to) {
+        Set<String> resourcePaths = servletCtx.getResourcePaths(from);
+        if (resourcePaths != null) {
+            for (String resourcePath : resourcePaths) {
+                if (resourcePath.endsWith("/")) {
+                    //this is a folder, let's copy it recursively
+                    copyRecursively(servletCtx, resourcePath, to);
+                } else {
                     try {
-                        StringBuffer content = AMSetupServlet.readFile(resource);
-                        String newPath = dir + "/ldif/" + resource.substring(PATH_PREFIX.length());
+                        StringBuffer content = AMSetupServlet.readFile(resourcePath);
+                        String newPath = to + "/ldif/" + resourcePath.substring(PATH_PREFIX.length());
                         File file = new File(newPath);
                         file.getParentFile().mkdirs();
                         AMSetupServlet.writeToFile(newPath, content.toString());
@@ -74,6 +77,18 @@ public class LDIFTemplates {
                     }
                 }
             }
+        }
+    }
+
+    /**
+     * Copies the schema files recursively from the WAR file to the OpenAM installation directory.
+     *
+     * @param dir The directory where the files needs to be copied to.
+     * @param servletCtx The servlet context.
+     */
+    public static void copy(String dir, ServletContext servletCtx) {
+        for (String schemaDir : TEMPLATES) {
+            copyRecursively(servletCtx, PATH_PREFIX + schemaDir, dir);
         }
     }
 }
