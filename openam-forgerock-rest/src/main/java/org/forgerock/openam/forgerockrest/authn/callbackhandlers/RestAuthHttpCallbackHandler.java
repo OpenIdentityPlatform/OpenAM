@@ -11,7 +11,7 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2013 ForgeRock Inc.
+ * Copyright 2013 ForgeRock AS.
  */
 
 package org.forgerock.openam.forgerockrest.authn.callbackhandlers;
@@ -37,7 +37,7 @@ import java.util.Map;
 public class RestAuthHttpCallbackHandler extends AbstractRestAuthCallbackHandler<HttpCallback>
         implements RestAuthCallbackHandler<HttpCallback> {
 
-    private static final Debug DEBUG = Debug.getInstance("amIdentityServices");
+    private static final Debug DEBUG = Debug.getInstance("amAuthREST");
 
     private static final String CALLBACK_NAME = "HttpCallback";
 

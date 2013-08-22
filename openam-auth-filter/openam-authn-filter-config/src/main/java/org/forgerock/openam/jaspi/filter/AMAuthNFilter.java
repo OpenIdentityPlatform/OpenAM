@@ -41,7 +41,7 @@ import java.util.Set;
  */
 public class AMAuthNFilter extends AuthNFilter {
 
-    private static final Debug DEBUG = Debug.getInstance("amIdentityServices");
+    private static final Debug DEBUG = Debug.getInstance("amAuthREST");
 
     private final static EndpointMatcher ENDPOINT_MATCHER = new EndpointMatcher();
 

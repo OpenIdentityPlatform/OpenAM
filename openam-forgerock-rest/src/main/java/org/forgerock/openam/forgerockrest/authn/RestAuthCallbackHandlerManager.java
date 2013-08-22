@@ -11,7 +11,7 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2013 ForgeRock Inc.
+ * Copyright 2013 ForgeRock AS.
  */
 
 package org.forgerock.openam.forgerockrest.authn;
@@ -39,7 +39,7 @@ import java.util.List;
 @Singleton
 public class RestAuthCallbackHandlerManager {
 
-    private static final Debug logger = Debug.getInstance("amIdentityServices");
+    private static final Debug logger = Debug.getInstance("amAuthREST");
 
     private final RestAuthCallbackHandlerFactory restAuthCallbackHandlerFactory;
 
