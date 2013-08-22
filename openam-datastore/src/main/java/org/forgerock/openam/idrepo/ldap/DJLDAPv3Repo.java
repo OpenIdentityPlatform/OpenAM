@@ -740,13 +740,13 @@ public class DJLDAPv3Repo extends IdRepo {
             }
         }
         Connection conn = null;
-        String[] queryAttrs;
         Set<String> definedAttributes = getDefinedAttributes(type);
         if (attrs.isEmpty() || attrs.contains("*")) {
+            attrs.clear();
             if (definedAttributes.isEmpty()) {
-                queryAttrs = new String[]{"*"};
+                attrs.add("*");
             } else {
-                queryAttrs = definedAttributes.toArray(new String[definedAttributes.size()]);
+                attrs.addAll(definedAttributes);
             }
         } else {
             if (!definedAttributes.isEmpty()) {
@@ -754,13 +754,12 @@ public class DJLDAPv3Repo extends IdRepo {
             }
             if (attrs.isEmpty()) {
                 //there were only non-defined attributes requested, so we shouldn't return anything here.
-                return new HashMap(0);
+                return new HashMap<String, T>(0);
             }
-            queryAttrs = attrs.toArray(new String[attrs.size()]);
         }
         try {
             conn = connectionFactory.getConnection();
-            SearchResultEntry entry = conn.readEntry(dn, queryAttrs);
+            SearchResultEntry entry = conn.readEntry(dn, attrs.toArray(new String[attrs.size()]));
             for (Attribute attribute : entry.getAllAttributes()) {
                 String attrName = attribute.getAttributeDescriptionAsString();
                 if (!definedAttributes.isEmpty() && !definedAttributes.contains(attrName)) {

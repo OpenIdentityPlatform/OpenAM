@@ -162,10 +162,16 @@ public class GenericRepoTest extends IdRepoTestBase {
     }
 
     @Test
+    public void getAttributesReturnsDNIfNoAttributesAreRequested() throws Exception {
+        Map<String, Set<String>> attrs = idrepo.getAttributes(null, IdType.USER, DEMO);
+        assertThat(attrs.get("dn")).isNotNull().contains(DEMO_DN);
+    }
+
+    @Test
     public void getAttributesReturnsDNIfRequested() throws Exception {
         Map<String, Set<String>> attrs = idrepo.getAttributes(null, IdType.USER, DEMO, asSet("dn"));
         assertThat(attrs.keySet()).hasSize(1).contains("dn");
-        assertThat(attrs.get("dn")).isNotNull().contains("uid=demo,ou=people,dc=openam,dc=forgerock,dc=org");
+        assertThat(attrs.get("dn")).isNotNull().contains(DEMO_DN);
     }
 
     @Test
