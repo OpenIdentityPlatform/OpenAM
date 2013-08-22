@@ -26,7 +26,7 @@
  */
 
 /*
- * Portions Copyrighted 2011-2013 ForgeRock, Inc.
+ * Portions Copyrighted 2011-2013 ForgeRock AS
  */
 package com.sun.identity.idm.common;
 
@@ -101,17 +101,15 @@ public class IdRepoUtils {
      *
      * @return an attribute map with all the password attributes being masked.
      */
-    public static <T> Map<String, T> getAttrMapWithoutPasswordAttrs(Map<String, T> attrMap, Set<String> pwdAttrs) {
+    public static Map<String, ?> getAttrMapWithoutPasswordAttrs(Map<String, ?> attrMap, Set<String> pwdAttrs) {
         if (attrMap == null || attrMap.isEmpty()) {
             return attrMap;
         }
 
-        Set<String> allPwdAttrs;
-        if (pwdAttrs == null || pwdAttrs.isEmpty()) {
-            allPwdAttrs = defaultPwdAttrs;
-        } else {
-            allPwdAttrs = new HashSet<String>();
-            allPwdAttrs.addAll(defaultPwdAttrs);
+        //the attrmap needs to be case-insensitive in order to detect password attributes correctly
+        attrMap = new CaseInsensitiveHashMap(attrMap);
+        Set<String> allPwdAttrs = new HashSet<String>(defaultPwdAttrs);
+        if (pwdAttrs != null) {
             allPwdAttrs.addAll(pwdAttrs);
         }
 
