@@ -11,7 +11,7 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2012-2013 ForgeRock Inc.
+ * Copyright 2012-2013 ForgeRock AS
  */
 package org.forgerock.openam.forgerockrest;
 
@@ -73,7 +73,8 @@ public final class RealmResource implements CollectionResourceProvider {
     private String realmPath = null;
 
     final private static String SERVICE_NAMES = "serviceNames";
-
+    final private static String TOP_LEVEL_REALM = "topLevelRealm";
+    final private static String FORWARD_SLASH = "/";
     /**
      * Creates a new empty backend.
      */
@@ -126,7 +127,7 @@ public final class RealmResource implements CollectionResourceProvider {
             final JsonValue jVal = request.getContent();
             // get the realm
             realm = jVal.get("realm").asString();
-
+            realm = checkForTopLevelRealm(realm);
             if (realm == null || realm.isEmpty()) {
                 throw new BadRequestException("No realm name provided.");
             } else if (!realm.startsWith("/")) {
@@ -252,7 +253,7 @@ public final class RealmResource implements CollectionResourceProvider {
 
         boolean recursive = false;
         Resource resource = null;
-        String holdResourceId = resourceId;
+        String holdResourceId = checkForTopLevelRealm(resourceId);
 
         try {
             hasPermission(context);
@@ -357,7 +358,7 @@ public final class RealmResource implements CollectionResourceProvider {
 
         Resource resource = null;
         JsonValue jval = null;
-        String holdResourceId = resourceId;
+        String holdResourceId = checkForTopLevelRealm(resourceId);
 
         try {
             hasPermission(context);
@@ -584,6 +585,19 @@ public final class RealmResource implements CollectionResourceProvider {
     }
 
     /**
+     * Maps distinguished realm name to / for top level realm;
+     * returns realm if not top level realm
+     * @param realm realm to check whether top level or not
+     * @return
+     */
+    private String checkForTopLevelRealm(String realm) {
+        if(realm.equalsIgnoreCase(TOP_LEVEL_REALM)){
+            return FORWARD_SLASH;
+        } else {
+            return realm;
+        }
+    }
+    /**
      * {@inheritDoc}
      */
     @Override
@@ -599,7 +613,7 @@ public final class RealmResource implements CollectionResourceProvider {
         try {
 
             hasPermission(context);
-            realm = resourceId;
+            realm = checkForTopLevelRealm(resourceId);
             if (realm != null && !realm.startsWith("/")) {
                 realm = "/" + realm;
             }
@@ -615,16 +629,15 @@ public final class RealmResource implements CollectionResourceProvider {
             newServiceNames = realmDetails.get(SERVICE_NAMES).asList();
             if (newServiceNames == null || newServiceNames.isEmpty()) {
                 RestDispatcher.debug.error("RealmResource.updateInstance()" + "No Services defined.");
-                handler.handleError(new BadRequestException("No services have been defined."));
             } else {
                 assignServices(ocm, newServiceNames); //assign services to realm
-                // READ THE REALM
-                realmCreatedOcm = new OrganizationConfigManager(getSSOToken(), realm);
-                // create a resource for handler to return
-                resource = new Resource(realm, "0", createJsonMessage("realmUpdated",
-                    realmCreatedOcm.getOrganizationName()));
-                handler.handleResult(resource);
             }
+            // READ THE REALM
+            realmCreatedOcm = new OrganizationConfigManager(getSSOToken(), realm);
+            // create a resource for handler to return
+            resource = new Resource(realm, "0", createJsonMessage("realmUpdated",
+                    realmCreatedOcm.getOrganizationName()));
+            handler.handleResult(resource);
         } catch (SMSException e) {
             try {
                 configureErrorMessage(e);
