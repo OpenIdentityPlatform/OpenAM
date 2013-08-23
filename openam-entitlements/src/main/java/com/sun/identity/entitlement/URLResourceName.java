@@ -24,7 +24,7 @@
  *
  * $Id: URLResourceName.java,v 1.1 2009/08/19 05:40:34 veiming Exp $
  *
- * Portions Copyrighted 2012-2013 ForgeRock AS
+ * Portions Copyrighted 2011-2013 ForgeRock AS
  */
 package com.sun.identity.entitlement;
 
