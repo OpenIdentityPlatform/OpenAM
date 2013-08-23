@@ -35,7 +35,7 @@ require.config({
         mustache: "libs/mustache-0.7.0",
         i18next: "libs/i18next-1.5.8-min",
         backbone: "libs/backbone-0.9.2-min",
-        underscore: "libs/underscore-1.3.3-min",
+        underscore: "libs/underscore-1.4.4-min",
         js2form: "libs/js2form-1.0",
         form2js: "libs/form2js-1.0",
         contentflow: "libs/contentflow",
