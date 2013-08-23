@@ -102,7 +102,6 @@ public class LDAPAuthUtils {
     private String userNamingValue = null;
     private String userNamingAttr = null;
     private String baseDN;
-    private String configName;
     private Set<String> primaryServers;
     private Set<String> secondaryServers;
     //only used for logging
@@ -225,9 +224,8 @@ public class LDAPAuthUtils {
      * @param debug Debug object.
      * @throws LDAPUtilException If the provided search base was invalid.
      */
-    public LDAPAuthUtils(String configName, Set<String> primaryServers, Set<String> secondaryServers,
-            boolean ldapSSL, ResourceBundle bundle, String baseDN) throws LDAPUtilException {
-        this.configName = configName;
+    public LDAPAuthUtils(Set<String> primaryServers, Set<String> secondaryServers, boolean ldapSSL,
+            ResourceBundle bundle, String baseDN) throws LDAPUtilException {
         this.primaryServers = primaryServers;
         this.secondaryServers = secondaryServers;
         servers = new LinkedHashSet<String>(primaryServers);
@@ -248,6 +246,7 @@ public class LDAPAuthUtils {
         ConnectionFactory connPool = null;
 
         try {
+            String configName = servers.toString() + ":" + bindingUser;
             connPool = connectionPools.get(configName);
             if (connPool == null) {
                 synchronized(connectionPools) {

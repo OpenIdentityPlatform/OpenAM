@@ -237,8 +237,7 @@ public class LDAP extends AMLoginModule {
 
             isProfileCreationEnabled = isDynamicProfileCreationEnabled();
             // set the optional attributes here
-            ldapUtil = new LDAPAuthUtils(getRequestOrg() + "|" + currentConfigName, primaryServers, secondaryServers,
-                    sslEnabled, bundle, baseDN);
+            ldapUtil = new LDAPAuthUtils(primaryServers, secondaryServers, sslEnabled, bundle, baseDN);
             ldapUtil.setScope(searchScope);
             ldapUtil.setFilter(searchFilter);
             ldapUtil.setUserNamingAttribute(userNamingAttr);
