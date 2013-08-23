@@ -253,13 +253,13 @@
   </step>
   <step>
    <para>In the OpenAM console, browse to Configuration &gt; Servers and Sites
-   &gt; <replaceable>Server Name</replaceable> &gt; Default Server Settings,
-   and then make these changes:</para>
+   &gt; Default Server Settings &gt; Advanced, and then make the necessary
+   changes.</para>
    <substeps>
     <step>
-     <para>Set the property
+     <para>Change the setting for the property
      <literal>com.sun.identity.enableUniqueSSOTokenCookie</literal> to
-     <literal>true</literal>.</para>
+     <literal>true</literal>, from the default <literal>false</literal>.</para>
     </step>
     <step>
      <para>Make sure that the property
@@ -268,14 +268,17 @@
      that authenticated the user.</para>
      <para>The default name is <literal>sunIdentityServerAuthNServer</literal>.</para>
     </step>
-    <step>
-     <para>Add the property
-     <literal>com.sun.identity.authentication.uniqueCookieDomain</literal>,
-     setting the value to the fully-qualified domain name of the OpenAM
-     server, such as <literal>openam.example.com</literal>.</para>
-    </step>
    </substeps>
    <para>Save your work.</para>
+  </step>
+  <step>
+   <para>Browse to Configuration &gt; Servers and Sites &gt; <replaceable>Server
+   Name</replaceable> &gt; Advanced, and add the property
+   <literal>com.sun.identity.authentication.uniqueCookieDomain</literal>,
+   setting the value to the fully-qualified domain name of the current OpenAM
+   server, such as <literal>openam.example.com</literal>.</para>
+
+   <para>Then Save your work.</para>
   </step>
   <step performance="optional">
    <para>For each Java EE policy agent, browse in the OpenAM console to Access
