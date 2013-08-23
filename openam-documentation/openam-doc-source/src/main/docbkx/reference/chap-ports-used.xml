@@ -34,98 +34,72 @@
  
  <indexterm><primary>Ports used</primary></indexterm>
  <indexterm><primary>Default ports</primary></indexterm>
- <para>OpenAM software uses the following TCP/IP ports by default.</para>
- 
- <!-- Protocol, port number, description (what for), on by default? -->
- <variablelist>
-  <varlistentry>
-   <term>HTTP: 80, 8080, etc.</term>
-   <listitem>
-    <para>Web application container port number for HTTP. Port number depends
-    on the container configuration.</para>
-    <para>HTTP is enabled when you configure OpenAM.</para>
-   </listitem>
-  </varlistentry>
-  <varlistentry>
-   <term>HTTPS: 443, 8443, etc.</term>
-   <listitem>
-    <para>Web application container port number for HTTPS. Port number depends
-    on the container configuration.</para>
-    <para>HTTPS is enabled when you configure OpenAM, and is the recommended
-    protocol for production deployments.</para>
-   </listitem>
-  </varlistentry>
-  <varlistentry>
-   <term>LDAP: 389, 1389, 50389, etc.</term>
-   <listitem>
-    <para>Lightweight Directory Access Protocol for use with LDAP configuration
-    and identity data stores. OpenAM can connect to the LDAP port using
-    Start TLS to secure the connection. The port number for external
-    LDAP directories depends on your deployment. When you use the embedded
-    LDAP configuration or data store, the default port number is
-    50389.</para>
-    <para>LDAP is enabled when you configure OpenAM.</para>
-   </listitem>
-  </varlistentry>
-  <varlistentry>
-   <term>LDAPS: 636, 1636, 50636, etc.</term>
-   <listitem>
-    <para>LDAP over SSL for use with configuration and identity data stores.
-    The LDAPS port number for external LDAP directories depends on your
-    deployment. When you connect to the embedded LDAP configuration or data
-    store over SSL, the default port number is 50636.</para>
-    <para>LDAPS is enabled when you configure OpenAM.</para>
-   </listitem>
-  </varlistentry>
-  <varlistentry>
-   <term>Embedded configuration store, JMX: 1689</term>
-   <listitem>
-    <para>The embedded LDAP directory server listens for Java Management
-    eXtension traffic on port 1689 by default. JMX is enabled when you
-    configure OpenAM.</para>
-   </listitem>
-  </varlistentry>
-  <varlistentry>
-   <term>Embedded configuration store, administrative connections: 5444</term>
-   <listitem>
-    <para>The embedded LDAP directory server listens for administrative traffic
-    on port 5444 by default. The administration connector is enabled when you
-    configure OpenAM.</para>
-   </listitem>
-  </varlistentry>
-  <varlistentry>
-   <term>Session failover service, message queue: 7777</term>
-   <listitem>
-    <para>The session failover service communicates by default on port 7777.
-    You set up the session failover service separately from OpenAM.</para>
-   </listitem>
-  </varlistentry>
-  <varlistentry>
-   <term>Embedded configuration store, data replication: 8989</term>
-   <listitem>
-    <para>The embedded LDAP directory server replicates data with other
-    embedded configuration stores on port 8989 by default. Replication is
-    enabled when you configure OpenAM as part of a site, pointing to an
-    existing server to share configuration data.</para>
-   </listitem>
-  </varlistentry>
-  <varlistentry>
-   <term>Monitoring, HTTP port: 8082</term>
-   <listitem>
-    <para>The HTTP port for OpenAM monitoring is not enabled by default.</para>
-   </listitem>
-  </varlistentry>
-  <varlistentry>
-   <term>Monitoring, RMI port: 9999</term>
-   <listitem>
-    <para>The RMI port for OpenAM monitoring is not enabled by default.</para>
-   </listitem>
-  </varlistentry>
-  <varlistentry>
-   <term>Monitoring, SNMP port: 8085</term>
-   <listitem>
-    <para>The SNMP port for OpenAM monitoring is not enabled by default.</para>
-   </listitem>
-  </varlistentry>
- </variablelist>
+ <para>OpenAM software uses the following TCP/IP ports by default. Sometimes multiple
+ services are configured on a single system with slightly different port numbers. For
+ example, while the default port number for a servlet container such as Tomcat is 8080,
+ a second instance of Tomcat might be configured with a port number of 18080. In
+ all cases shown, communications proceed using TCP.</para>
+
+ <para>When you configure a firewall for OpenAM, make sure to include open ports for any
+ installed and related components, including web services (80, 443), servlet
+ containers (8009, 8080, 8443), and external applications such as a Remote Access Dial In
+ User Service (1645).</para>
+
+ <para>Additional ports may be used, depending on other components of your deployment. If
+ you are using external OpenDJ servers, refer to the <link xlink:show="new"
+ xlink:href="http://docs.forgerock.org/en/opendj/2.6.0/admin-guide/#appendix-ports-used"
+ xlink:role="http://docbook.org/xlink/role/olink"><citetitle>Ports Used</citetitle></link>
+ appendix of the OpenDJ Administration Guide.</para>
+
+ <table xml:id="openam-default-ports">
+     <title>Default TCP/IP Ports Used by OpenAM</title>
+     <tgroup cols="2">
+         <colspec colnum="1" colwidth="1*" />
+         <colspec colnum="2" colwidth="4*" />
+         <thead>
+             <row>
+                 <entry>Port Number</entry>
+                 <entry>Description</entry>
+             </row>
+         </thead>
+         <tbody>
+             <row>
+                 <entry>1689</entry>
+                 <entry>Port for Java Management eXtension traffic, disabled by default</entry>
+             </row>
+             <row>
+                 <entry>4444</entry>
+                 <entry>Port for the embedded administration connector, enabled by default.</entry>
+             </row>
+             <row>
+                 <entry>8080</entry>
+                 <entry>Web application container port number</entry>
+             </row>
+             <row>
+                 <entry>8082</entry>
+                 <entry>HTTP port for monitoring OpenAM, disabled by default</entry>
+             </row>
+             <row>
+                 <entry>8085</entry>
+                 <entry>SNMP port for monitoring OpenAM, disabled by default</entry>
+             </row>
+             <row>
+                 <entry>9999</entry>
+                 <entry>RMI port for monitoring OpenAM, disabled by default.</entry>
+             </row>
+             <row>
+                 <entry>50389, 50899, 58989</entry>
+                 <entry>Supports LDAP communication between embedded OpenAM data stores.</entry>
+             </row>
+             <row>
+                 <entry>57943, 58943</entry>
+                 <entry>Used by the <link xlink:show="new" xlink:href="admin-guide#securid-module-conf-hints"
+                 xlink:role="http://docbook.org/xlink/role/olink"><citetitle>SecurID Authentication
+                 Module</citetitle></link>.</entry>
+             </row>
+         </tbody>
+
+     </tgroup>
+ </table>
+
 </chapter>

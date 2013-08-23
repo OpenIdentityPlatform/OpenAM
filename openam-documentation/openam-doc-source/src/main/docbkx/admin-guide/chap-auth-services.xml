@@ -3709,6 +3709,23 @@
       <para><command>ssoadm</command> attribute:
      <literal>iplanet-am-auth-securid-auth-level</literal></para></listitem>
     </varlistentry>
+    <varlistentry>
+           <term>Helper Authentication Port</term>
+           <listitem>
+               <para>Configures the module to listen for authentication requests; the default port
+                   number is 57943.</para>
+               <para><command>ssoadm</command> attribute:
+                   <literal>iplanet-am-auth-securid-helper-port</literal></para></listitem>
+     </varlistentry>
+     <varlistentry>
+           <term>Helper Configuration Port</term>
+           <listitem>
+               <para>Configures the module to listen for information associated with the
+                   Helper Authentication Port. The default port
+                   number is 58943.</para>
+               <para><command>ssoadm</command> attribute:
+                   <literal>iplanet-am-auth-securid-config-port</literal></para></listitem>
+     </varlistentry>
    </variablelist>
   </section>
   
