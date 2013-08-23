@@ -39,6 +39,7 @@ import com.sun.identity.policy.ResBundleUtils;
 import com.sun.identity.policy.Syntax;
 import com.iplanet.sso.SSOToken;
 import com.iplanet.sso.SSOException;
+import com.sun.identity.policy.plugins.IPCondition;
 import com.sun.identity.shared.debug.Debug;
 import org.forgerock.openam.utils.ValidateIPaddress;
 
@@ -233,12 +234,11 @@ public class IPv4Condition implements Condition {
      * @see #DNS_NAME
      * @see #REQUEST_IP
      * @see #REQUEST_DNS_NAME
-     * @see com.sun.identity.policy.
      */
     public ConditionDecision getConditionDecision(SSOToken token, Map env)
             throws PolicyException, SSOException {
         boolean allowed = false;
-        String ip = (String) env.get(REQUEST_IP);
+        String ip = IPCondition.getRequestIp(env);
         if(ValidateIPaddress.isIPv6(ip)){
             return new ConditionDecision(allowed);
         }

@@ -284,6 +284,52 @@ public class IPCondition implements Condition {
     }
 
     /**
+     * Helper method to extract REQUEST_IP
+     *
+     * @param env map containing environment description. Note that the type of the value corresponding to REQUEST_IP
+     * parameter differs depending upon invocation path. It will be a String when invoked by the agents, but it will be
+     * a Set<String> when invoked via the DecisionResource (GET ws/1/entitlement/entitlements).
+     * @return the IP that was used
+     */
+    public static String getRequestIp(Map env) {
+        Object requestIpObject = env.get(REQUEST_IP);
+        if (requestIpObject instanceof Set) {
+            Set requestIpSet = (Set)requestIpObject;
+            if ((requestIpSet != null) && (!requestIpSet.isEmpty())) {
+                if (requestIpSet.size() > 1) {
+                    DEBUG.warning("Set cardinality in environment map corresponding to " + REQUEST_IP +
+                    " key >1. Returning first value. The set: " + requestIpSet);
+                }
+                Object ip = requestIpSet.iterator().next();
+                if (ip != null) { // Set implementations can permit null values
+                    if (ip instanceof String) {
+                        return (String)ip;
+                    } else {
+                        DEBUG.warning("ip value in environment map not String, but type " + ip.getClass().getCanonicalName() +
+                            ". The value: " + ip);
+                        return ip.toString();
+                    }
+                } else {
+                    DEBUG.warning("In IPCondition, no value in Set corresponding to " + REQUEST_IP + " key contained environment map.");
+                    return null;
+                }
+            } else {
+                DEBUG.warning("In IPCondition, Set corresponding to " + REQUEST_IP + " key in environment map is null or empty.");
+                return null;
+            }
+        } else if (requestIpObject instanceof String) {
+            return (String)requestIpObject;
+        } else if (requestIpObject == null) {
+            DEBUG.warning("In IPCondition, no value corresponding to " + REQUEST_IP + " key in environment map.");
+            return null;
+        } else {
+            DEBUG.error("Unexpected type of value corresponding to  " + REQUEST_IP + " key in environment map. The type: " +
+                    requestIpObject.getClass().getCanonicalName() + " and the value: " + requestIpObject);
+            return requestIpObject.toString();
+        }
+    }
+
+    /**
      * Determine whether IPv4 or IPv6
      * @param env map containing environment description
      */
@@ -293,7 +339,7 @@ public class IPCondition implements Condition {
         if(holdMap.keySet().contains(REQUEST_IP)){
             try {
                 // Get IP_Version
-                ipVer = holdMap.get(REQUEST_IP).toString();
+                ipVer = getRequestIp(env);
                 if(ValidateIPaddress.isIPv6(ipVer)){
                     ipv6 = true;
                 } else {
