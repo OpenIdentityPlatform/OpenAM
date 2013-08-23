@@ -78,7 +78,8 @@
    <title>To Set Up the Password Reset Service</title>
 
    <para>You can configure the password reset service for OpenAM, letting
-   each realm inherit the global settings.</para>
+   each realm inherit the global settings. Alternatively, you can choose to
+   configure the service only for an individual realm.</para>
 
    <step performance="optional">
     <para>When OpenAM is configured with default settings, it uses the
@@ -112,8 +113,23 @@
     <literal>http://openam.example.com:8080/openam/console</literal>.</para>
    </step>
    <step>
-    <para>In the OpenAM console, browse to Configuration &gt; Global &gt;
-    Password Reset in the Global Properties list.</para>
+    <para>Configure the Password Reset service in one of the following ways.</para>
+
+    <para>I</para>
+    <stepalternatives>
+     <step>
+      <para>To configure the service globally for all realms, login to OpenAM
+      Console as administrator and browse to Configuration &gt; Global &gt;
+      Password Reset in the Global Properties list.</para>
+     </step>
+
+     <step>
+      <para>To configure the service for a particular realm, login to OpenAM
+      console as the realm administrator and browse to Access Control &gt;
+      <replaceable>Realm Name</replaceable> &gt; Services, then click Add...
+      to add a new Password Reset service configuration.</para>
+     </step>
+    </stepalternatives>
    </step>
    <step>
     <para>In the Password Reset page, use the following hints to adjust
@@ -133,18 +149,30 @@
       <term>Secret Question</term>
       <listitem>
        <para>This list corresponds to property values held in the file
-       <filename>WEB-INF/classes/amPasswordReset.properties</filename> under
-       the directory where OpenAM is deployed.</para>
-       <para>For localized versions of this file, copy
-       <filename>WEB-INF/classes/amPasswordReset.properties</filename> to
-       <filename>WEB-INF/classes/amPasswordReset_<replaceable>locale</replaceable>.properties</filename>,
-       and localize only the values of the questions. For example if the
-       default properties file contains:</para>
+       <filename>amPasswordReset.properties</filename> inside
+       <filename><?eval ${coreLibrary}?></filename>, which you can find
+       under <filename>WEB-INF/lib/</filename> where OpenAM is installed.</para>
+
+       <para>To make changes, extract a version from
+       <filename><?eval ${coreLibrary}?></filename>, copy it to
+       <filename>WEB-INF/classes/</filename> where OpenAM is deployed, and
+       then edit
+       <filename>WEB-INF/classes/amPasswordReset.properties</filename>.</para>
+
+       <para>Localized versions of this file are named
+       <filename>amPasswordReset_<replaceable>locale</replaceable>.properties</filename>.
+       You should localize only the questions at the end, leaving the rest of
+       the localized file as is. For example if the default properties file
+       contains:</para>
+
        <literallayout class="monospaced">favourite-restaurant=What is your favorite restaurant?</literallayout>
+
        <para>Then <filename>WEB-INF/classes/amPasswordReset_fr.properties</filename>
        ought to contain:</para>
+
        <literallayout class="monospaced">favourite-restaurant=Quel est votre restaurant préféré ?</literallayout>
-       <para>If you change these files, you must restart OpenAM.</para>
+
+       <para>After changing these files, you must restart OpenAM.</para>
       </listitem>
      </varlistentry>
      <varlistentry>
@@ -177,17 +205,21 @@
       </listitem>
      </varlistentry>
      <varlistentry>
-      <term>Password Reset Option</term>
+      <term>Reset Password Creator</term>
       <listitem>
        <para>Classname of a plugin that implements the
        <literal>PasswordGenerator</literal> interface.</para>
+
+       <para>Default: <literal>com.sun.identity.password.plugins.RandomPasswordGenerator</literal></para>
       </listitem>
      </varlistentry>
      <varlistentry>
-      <term>Password Change Notification Option</term>
+      <term>Password Reset Notification Class</term>
       <listitem>
        <para>Classname of a plugin that implements the
        <literal>NotifyPassword</literal> interface.</para>
+
+       <para>Default: <literal>com.sun.identity.password.plugins.EmailPassword</literal></para>
       </listitem>
      </varlistentry>
      <varlistentry>
@@ -286,6 +318,15 @@
        Failure Lockout Duration is <literal>0</literal>.</para>
       </listitem>
      </varlistentry>
+
+     <varlistentry>
+      <term>Password Reset E-mail Attribute Name</term>
+      <listitem>
+       <para>Identity attribute that holds the user's email address.</para>
+
+       <para>Default: <literal>mail</literal></para>
+      </listitem>
+     </varlistentry>
     </variablelist>
    </step>
    <step>
@@ -312,6 +353,23 @@
    </step>
    <step>
     <para>Save your work.</para>
+   </step>
+
+   <step>
+    <para>By default, OpenAM sends password reset notifications from
+    <literal>&lt;Password-Administrator&gt;</literal>.</para>
+
+    <para>To set a valid from address, extract
+    <filename>amPasswordResetModuleMsgs.properties</filename> from
+    <filename><?eval ${coreLibrary}?></filename>, copy it to
+    <filename>WEB-INF/classes/</filename> where OpenAM is deployed, and then
+    edit the file to change the <literal>fromAddress.label</literal> property
+    value, as in the following example.</para>
+
+    <literallayout class="monospaced">fromAddress.label=no-reply@example.com</literallayout>
+
+    <para>Save your work, and then restart OpenAM for the properties file change
+    to take effect.</para>
    </step>
   </procedure>
   
