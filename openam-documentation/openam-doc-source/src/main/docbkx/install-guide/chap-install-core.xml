@@ -520,6 +520,9 @@ Using CLASSPATH:
     <textobject><para>The home page for OpenAM when logged in as the OpenAM
     Administrator, <literal>amadmin</literal></para></textobject>
    </mediaobject>
+
+   <para>You can also access OpenAM Console by browsing to the Console URL, such
+   as <literal>http://openam.example.com:8080/openam/console</literal>.</para>
   </step>
   <step>
    <para>Restrict permissions to the configuration directory (by default
