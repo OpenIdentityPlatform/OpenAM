@@ -97,6 +97,39 @@
    </listitem>
 
    <listitem>
+    <itemizedlist>
+     <para>The fix for <link xlink:show="new"
+     xlink:href="https://bugster.forgerock.org/jira/browse/OPENAM-1630"
+     >OPENAM-1630</link> changes SAML metadata signing in OpenAM to better
+     conform with the SAML 2.0 standard.</para>
+
+     <listitem>
+      <para>Metadata for hosted entities is signed using the
+      <literal>metadataSigningKey</literal> configured for the realm, or
+      inherited from the global configuration for the server.</para>
+     </listitem>
+
+     <listitem>
+      <para>OpenAM now signs the <literal>EntityDescriptor</literal> element
+      that contains child <literal>SPSSODescriptor</literal> or
+      <literal>IDPSSODescriptor</literal> elements.</para>
+     </listitem>
+
+     <listitem>
+      <para>When importing remote entity metadata with signatures, OpenAM does
+      not modify the signatures, but instead returns them as they were when they
+      were imported.</para>
+     </listitem>
+
+     <listitem>
+      <para>When OpenAM imports remote entity metadata that has no signature and
+      signed metadata is requested on export, OpenAM signs the metadata with
+      the <literal>metadataSigningKey</literal>.</para>
+     </listitem>
+    </itemizedlist>
+   </listitem>
+
+   <listitem>
     <para>The default policy evaluation mode for new policy agent profiles is
     now self rather than subtree, in order to better scale for large numbers of
     policy rules.</para>
