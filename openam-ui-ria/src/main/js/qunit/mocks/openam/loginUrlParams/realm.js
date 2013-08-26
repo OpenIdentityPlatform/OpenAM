@@ -40,7 +40,7 @@ define(function () {
     
         server.respondWith(
             "GET",   
-            "/openam/json/auth/1/authenticate?realm=%2F%252Ftest%252F&realm=%2Ftest%2F&locale=en-US",
+            "/openam/json/auth/1/authenticate?realm=%2Ftest%2F&realm=%2Ftest%2F&locale=en-US",
             [
                 200, 
                 { 
