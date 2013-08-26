@@ -1160,8 +1160,6 @@
    </varlistentry>
   </variablelist>
 
-
-
   <variablelist xml:id="dashboard-configuration">
    <title>Dashboard Configuration</title>
    
@@ -1235,7 +1233,131 @@
 
   </variablelist>
 
+  <variablelist xml:id="email-service-configuration">
+   <title>Email Service</title>
 
+   <para><command>ssoadm</command> service name:
+   <literal>ForgeRockSendEmailService</literal></para>
+
+   <varlistentry>
+    <term>Email Message Implementation Class</term>
+    <listitem>
+     <para>Specifies the class that sends email notifications, such as those
+     sent for user registration and forgotten passwords.</para>
+
+     <para>Default: <literal>org.forgerock.openam.services.email.MailServerImpl</literal></para>
+
+     <para><command>ssoadm</command> attribute:
+     <literal>forgerockMailServerImplClassName</literal></para>
+    </listitem>
+   </varlistentry>
+
+   <varlistentry>
+    <term>Mail Server Host Name</term>
+    <listitem>
+     <para>Specifies the fully qualified domain name of the SMTP mail server
+     through which to send email notifications.</para>
+
+     <para>Default: <literal>smtp.gmail.com</literal></para>
+
+     <para><command>ssoadm</command> attribute:
+     <literal>forgerockEmailServiceSMTPHostName</literal></para>
+    </listitem>
+   </varlistentry>
+
+   <varlistentry>
+    <term>Mail Server Host Port</term>
+    <listitem>
+     <para>Specifies the port number for the SMTP mail server.</para>
+
+     <para>Default: 465</para>
+
+     <para><command>ssoadm</command> attribute:
+     <literal>forgerockEmailServiceSMTPHostPort</literal></para>
+    </listitem>
+   </varlistentry>
+
+   <varlistentry>
+    <term>Mail Server Authentication Username</term>
+    <listitem>
+     <para>Specifies the user name for the SMTP mail server.</para>
+
+     <para>Default: <literal>forgerocksmtp</literal></para>
+
+     <para><command>ssoadm</command> attribute:
+     <literal>forgerockEmailServiceSMTPUserName</literal></para>
+    </listitem>
+   </varlistentry>
+
+   <varlistentry>
+    <term>Mail Server Authentication Password</term>
+    <listitem>
+     <para>Specifies the password for the SMTP user name.</para>
+
+     <para><command>ssoadm</command> attribute:
+     <literal>forgerockEmailServiceSMTPUserPassword</literal></para>
+    </listitem>
+   </varlistentry>
+
+   <varlistentry>
+    <term>Mail Server Secure Connection</term>
+    <listitem>
+     <para>Specifies whether to connect to the SMTP mail server using SSL.</para>
+
+     <para>Default: use SSL (<literal>true</literal>)</para>
+
+     <para><command>ssoadm</command> attribute:
+     <literal>forgerockEmailServiceSMTPSSLEnabled</literal></para>
+    </listitem>
+   </varlistentry>
+
+   <varlistentry>
+    <term>Email From Address</term>
+    <listitem>
+     <para>Specifies the address from which to send email notifications.</para>
+
+     <para>Default: <literal>no-reply@openam.org</literal></para>
+
+     <para><command>ssoadm</command> attribute:
+     <literal>forgerockEmailServiceSMTPFromAddress</literal></para>
+    </listitem>
+   </varlistentry>
+
+   <varlistentry>
+    <term>Email Attribute Name</term>
+    <listitem>
+     <para>Specifies the profile attribute from which to retrieve the end user's
+     email address.</para>
+
+     <para>Default: <literal>mail</literal></para>
+
+     <para><command>ssoadm</command> attribute:
+     <literal>openamEmailAttribute</literal></para>
+    </listitem>
+   </varlistentry>
+
+   <varlistentry>
+    <term>Email Subject</term>
+    <listitem>
+     <para>Specifies a subject for notification messages. If you do not set this
+     OpenAM does not set the subject for notification messages.</para>
+
+     <para><command>ssoadm</command> attribute:
+     <literal>forgerockEmailServiceSMTPSubject</literal></para>
+    </listitem>
+   </varlistentry>
+
+   <varlistentry>
+    <term>Email Content</term>
+    <listitem>
+     <para>Specifies content for notification messages. If you do not set this
+     OpenAM includes only the confirmation URL in the mail body.</para>
+
+     <para><command>ssoadm</command> attribute:
+     <literal>forgerockEmailServiceSMTPMessage</literal></para>
+    </listitem>
+   </varlistentry>
+  </variablelist>
 
   <variablelist xml:id="liberty-id-ff-service-configuration">
    <title>Liberty ID-FF Service Configuration</title>
@@ -1955,6 +2077,50 @@
 
      <para><command>ssoadm</command> attribute:
      <literal>sun-am-policy-dynamic-response-attributes</literal></para>
+    </listitem>
+   </varlistentry>
+  </variablelist>
+
+  <variablelist xml:id="rest-security-configuation">
+   <title>REST Security</title>
+
+   <para><command>ssoadm</command> service name:
+   <literal>RestSecurity</literal></para>
+
+   <varlistentry>
+    <term>Self-Registration for Users</term>
+    <listitem>
+     <para>If enabled, new users can sign up using a REST API client.</para>
+     <para>Default: not enabled</para>
+
+     <para><command>ssoadm</command> attribute:
+     <literal>forgerockRestSecurityServiceSelfRegistration</literal></para>
+    </listitem>
+   </varlistentry>
+
+   <varlistentry>
+    <term>Self-Registration Token LifeTime (seconds)</term>
+    <listitem>
+     <para>Maximum life time for the token allowing user self-registration using
+     the REST API.</para>
+
+     <para>Default: 900 (seconds)</para>
+
+     <para><command>ssoadm</command> attribute:
+     <literal>forgerockRestSecuirtySerivceSelfRegTokenTTL</literal></para>
+    </listitem>
+   </varlistentry>
+
+   <varlistentry>
+    <term>Forgot Password Token LifeTime (seconds)</term>
+    <listitem>
+     <para>Maximum life time for the token allowing user to process a forgotten
+     passowrd using the REST API.</para>
+
+     <para>Default: 900 (seconds)</para>
+
+     <para><command>ssoadm</command> attribute:
+     <literal>forgerockRestSecuirtySerivceForgotPassTokenTTL</literal></para>
     </listitem>
    </varlistentry>
   </variablelist>

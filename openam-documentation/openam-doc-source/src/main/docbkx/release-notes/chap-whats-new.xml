@@ -38,6 +38,17 @@
   <title>Major New Features</title>
 
    <listitem>
+    <para>New, more modern RESTful web services are available for
+    authentication, identity management, profile management, session management,
+    Integrated Windows Authentication, and more. New endpoints are available
+    under the URI <literal>/json</literal> where OpenAM is deployed, and are
+    demonstrated in the <citetitle>Developer Guide</citetitle> chapter on <link
+    xlink:href="dev-guide#chap-rest" xlink:role="http://docbook.org/xlink/role/olink"
+    xlink:show="new"><citetitle>Using RESTful Web Services</citetitle></link>
+    in OpenAM.</para>
+   </listitem>
+
+   <listitem>
     <para>All of the web policy agents have been updated to include support for Internet
     Protocol version 6 (IPv6) support, in addition to support for IPv4. <!--include in the notes when 
     AME-1134 is closed, which includes removing unused libraries.--></para>
@@ -47,29 +58,12 @@
    </listitem>
 
   <listitem>
-   <para>REST Authentication Service has been updated to handle Integrated Windows
-   Authentication. IWA is now available through the REST interface by using the new endpoint, 
-   <filename>http://&lt;OpenAM Host&gt;:&lt;Port&gt;/&lt;deploy_uri&gt;/json/auth/1/authenticate</filename>.
-   The legacy REST authentication interface is still available.</para>
-  </listitem>
-
-  <listitem>
    <para>The policy tree index has been updated so that resources first check the root
    level of a realm first. The tree will be created from this level, and any subsequent
    referrals will create another tree specific to the realm where the referral was
    retrieved. This conserves memory and reduces the amount of time required to load
    the tree. An intelligent indexing model now assists with quickly identifying relevant
    policy rules for the resource being authorized.</para>
-  </listitem>
-
-  <listitem>
-   <para>Users and realms can be created, read, edited, and deleted using an 
-   HTTP POST of the JSON representation. See <link
-   xlink:href="dev-guide#rest-api-crud-identity"
-   xlink:role="http://docbook.org/xlink/role/olink"><citetitle>Identity Management</citetitle></link>
-   and <link xlink:href="dev-guide#rest-api-crud-realm"
-   xlink:role="http://docbook.org/xlink/role/olink"><citetitle>Realm Management</citetitle>
-   </link> for explanations, instructions, and examples.</para>
   </listitem>
 
   <listitem>

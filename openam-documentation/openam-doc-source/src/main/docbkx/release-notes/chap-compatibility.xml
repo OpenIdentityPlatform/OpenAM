@@ -179,35 +179,111 @@
     <simplelist type="vert" columns="2">
      <member>/identity/attributes</member>
      <member>/identity/authenticate</member>
-     <member>/identity/authorize</member>
+     <!-- Pending replacement <member>/identity/authorize</member> -->
      <member>/identity/create</member>
      <member>/identity/delete</member>
-     <member>/identity/isTokenValid</member>
-     <member>/identity/log</member>
+     <!-- Pending replacement <member>/identity/isTokenValid</member>
+     <member>/identity/log</member> -->
      <member>/identity/logout</member>
      <member>/identity/read</member>
      <member>/identity/search</member>
      <member>/identity/update</member>
-     <member>/ws/1/entitlement/decision</member>
+     <!-- Pending replacement <member>/ws/1/entitlement/decision</member>
      <member>/ws/1/entitlement/decisions</member>
-     <member>/ws/1/entitlement/entitlement</member>
+     <member>/ws/1/entitlement/entitlement</member> -->
     </simplelist>
 
-    <important><!-- Remove this with the fix for AME-969 -->
-     <para>As seen in the nightly builds of OpenAM, a number of new REST
-     endpoints have already been included to replace the older endpoints
-     listed above.</para>
+    <para>The following table shows how legacy and newer end points
+    correspond.</para>
 
-     <para>Documentation for these new endpoints is currently in progress, and
-     will be developed as an update to the <citetitle>Developer Guide</citetitle>
-     chapter on <link xlink:href="dev-guide#chap-rest" xlink:show="new"
-     xlink:role="http://docbook.org/xlink/role/olink"><citetitle>Using RESTful
-     Web Services</citetitle></link> in OpenAM.</para>
-    </important>
+    <table>
+     <title>REST End Points</title>
 
-    <para>Support for these older REST services is likely to be removed in a
-    future release as the older services are supplanted with newer REST
-    services.</para>
+     <tgroup cols="2">
+      <colspec colnum="1" colwidth="1*"/>
+      <colspec colnum="2" colwidth="1*"/>
+
+      <thead>
+       <row>
+        <entry><link xlink:show="new" xlink:href="admin-guide#interface-stability"
+        xlink:role="http://docbook.org/xlink/role/olink">Deprecated</link> URIs</entry>
+        <entry>Newer <link xlink:show="new" xlink:href="admin-guide#interface-stability"
+        xlink:role="http://docbook.org/xlink/role/olink">Evolving</link> URIs</entry>
+       </row>
+      </thead>
+
+      <tbody>
+       <row>
+        <entry>/identity/attributes</entry>
+        <entry>/json/users</entry>
+       </row>
+
+       <row>
+        <entry>/identity/authenticate</entry>
+        <entry>/json/auth/1/authenticate</entry>
+       </row>
+
+       <!--
+       <row>
+        <entry>/identity/authorize</entry>
+        <entry>Pending replacement</entry>
+       </row>
+       -->
+
+       <row>
+        <entry>/identity/create, /identity/delete, /identity/read,
+        /identity/search, /identity/update</entry>
+        <entry>/json/agents, /json/groups, /json/realms, /json/users</entry>
+       </row>
+
+       <!--
+       <row>
+        <entry>/identity/isTokenValid</entry>
+        <entry>Pending replacement</entry>
+       </row>
+       -->
+
+       <!--
+       <row>
+        <entry>/identity/log</entry>
+        <entry>Pending replacement</entry>
+       </row>
+       -->
+
+       <row>
+        <entry>/identity/logout</entry>
+        <entry>/json/sessions/?_action=logout</entry>
+       </row>
+
+       <!--
+       <row>
+        <entry>/ws/1/entitlement/decision, /ws/1/entitlement/decisions,
+        /ws/1/entitlement/entitlement</entry>
+        <entry>Pending replacement</entry>
+       </row>
+       -->
+
+       <row>
+        <entry>N/A</entry>
+        <entry>/json/dashboard</entry>
+       </row>
+
+       <row>
+        <entry>N/A</entry>
+        <entry>/json/serverinfo</entry>
+       </row>
+      </tbody>
+     </tgroup>
+    </table>
+
+    <para>Find examples in the <citetitle>Developer Guide</citetitle> chapter on <link
+    xlink:href="dev-guide#chap-rest" xlink:role="http://docbook.org/xlink/role/olink"
+    xlink:show="new"><citetitle>Using RESTful Web Services</citetitle></link> in
+    OpenAM.</para>
+
+    <para>Support for the older REST services is likely to be removed in a
+    future release in favor of the newer REST services, but not before
+    replacement REST services are introduced.</para>
    </listitem>
   </itemizedlist>
  </section>
