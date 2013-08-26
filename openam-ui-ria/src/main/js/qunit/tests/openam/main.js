@@ -1,8 +1,9 @@
 /*global require, define, module, $, QUnit, window*/
 define([
     "tests/openam/login",
-    "tests/openam/theme"
-], function (login,theme) {
+    "tests/openam/theme",
+    "tests/openam/loginUrlParams"
+], function (login,theme,loginUrlParams) {
 
     return {
         executeAll: function (server) {
@@ -16,9 +17,13 @@ define([
                console.log("QUNIT DONE");
             });
 
+            $.ajaxSetup({async: false});
+
             login.executeAll(server);
 
             theme.executeAll(server);
+            
+            loginUrlParams.executeAll(server);
         }
     };
 
