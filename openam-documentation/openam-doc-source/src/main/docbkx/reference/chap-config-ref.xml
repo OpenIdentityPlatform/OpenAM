@@ -2081,7 +2081,7 @@
    </varlistentry>
   </variablelist>
 
-  <variablelist xml:id="rest-security-configuation">
+  <variablelist xml:id="rest-security-configuration">
    <title>REST Security</title>
 
    <para><command>ssoadm</command> service name:
