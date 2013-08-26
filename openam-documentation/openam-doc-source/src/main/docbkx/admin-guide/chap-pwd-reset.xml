@@ -115,7 +115,6 @@
    <step>
     <para>Configure the Password Reset service in one of the following ways.</para>
 
-    <para>I</para>
     <stepalternatives>
      <step>
       <para>To configure the service globally for all realms, login to OpenAM
