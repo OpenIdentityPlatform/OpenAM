@@ -51,10 +51,12 @@ public class ServerInfoResource implements CollectionResourceProvider{
         JsonValue result = new JsonValue(new LinkedHashMap<String, Object>(1));
         Set<String> cookieDomains;
         Resource resource;
+        int rev;
         try {
             cookieDomains = AuthClientUtils.getCookieDomains();
+            rev = cookieDomains.hashCode();
             result.put("domains", cookieDomains);
-            resource = new Resource(resourceId, "0", result);
+            resource = new Resource(resourceId, Integer.toString(rev), result);
             handler.handleResult(resource);
         } catch (Exception e) {
             RestDispatcher.debug.error("ServerInforResource.getCookieDomains:: Cannot retrieve cookie domains." + e);
