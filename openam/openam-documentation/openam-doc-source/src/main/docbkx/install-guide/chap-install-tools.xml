@@ -20,7 +20,7 @@
   !
   ! CCPL HEADER END
   !
-  !      Copyright 2011-2012 ForgeRock AS
+  !      Copyright 2011-2013 ForgeRock AS
   !    
 -->
 <chapter xml:id='chap-install-tools'
@@ -35,15 +35,21 @@
   <primary>Installing</primary>
   <secondary>Tools (ssoadm, etc.)</secondary>
  </indexterm>
- <para>OpenAM tools are found in three <filename>.zip</filename> files where you 
-  unpacked the archive of the entire package, such as 
-  <filename>~/Downloads/openam</filename>.</para>
+
+ <para>OpenAM tools are found in three <filename>.zip</filename> files inside
+ the archive of the entire OpenAM zip download package,
+ <filename><?eval ${coreDirectoryFile}?></filename>. When you unpack the full
+ zip package, you find these files.</para>
+
  <variablelist>
   <varlistentry>
    <term><filename><?eval ${ssoadminZipFile}?></filename></term>
    <listitem>
     <para>Administration tools: <command>ampassword</command>,
     <command>ssoadm</command> and <command>amverifyarchive</command></para>
+
+    <para>This administration tools package can be downloaded separately as
+    <filename>ssoAdminTools_10.1.0.zip</filename>.</para>
    </listitem>
   </varlistentry>
   <varlistentry>
@@ -51,9 +57,13 @@
    <listitem>
     <para>Tool to check for command line installation, upgrade, and initial
     configuration, as well as serving as a command line alternative to using
-    the GUI configuration wizard </para>
+    the GUI configuration wizard</para>
+
+    <para>This configurator package can be downloaded separately as
+    <filename>ssoconfiguratortools_10.1.0.zip</filename>.</para>
    </listitem>
   </varlistentry>
+  <!-- Does not seem to be available for download on download.forgerock.com -->
   <varlistentry>
    <term><filename><?eval ${diagnosticsZipFile}?></filename></term>
    <listitem>
@@ -200,7 +210,6 @@ Archive:  ~/Downloads/openam/<?eval ${ssoadminZipFile}?>
     ><command>configurator.jar</command></link>.</para>
   </step>
  </procedure>
- 
  <procedure xml:id="install-openam-diagnostic-tool">
   <title>To Set Up Diagnostic Tool</title>
   <para>The diagnostic tool, <command>ssodtool.sh</command>

@@ -6,6 +6,11 @@ the changes here reflect the published updates.
 
 Changes since the original tag:
 
+For Aug 26, 2013
+
+openam-doc-source/src/main/docbkx/install-guide/chap-install-tools.xml
+    Fix for OPENAM-2870
+
 For Apr 4, 2013
 
 openam-doc-source/src/main/docbkx/agent-release-notes/chap-web-agents.xml
