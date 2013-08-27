@@ -1688,6 +1688,53 @@
      <literal>forgerock-oauth2-provider-saved-consent-attribute</literal></para>
     </listitem>
    </varlistentry>
+
+   <varlistentry>
+    <term>JSON Web Key URL</term>
+    <listitem>
+     <para>The URL where the OpenID Connect provider's JSON Web Key can be
+     retrieved.</para>
+
+     <para><command>ssoadm</command> attribute:
+     <literal>forgerock-oauth2-provider-jkws-uri</literal></para>
+    </listitem>
+   </varlistentry>
+
+   <!--
+   <varlistentry>
+    <term>Subject Types supported</term>
+    <listitem>
+     <para>List of OpenID Connect subject types supported. Values are
+     <literal>pairwise</literal> and <literal>public</literal>, and both are
+     supported by default. Pairwise is the same as confidential.</para>
+
+     <para><command>ssoadm</command> attribute:
+     <literal>forgerock-oauth2-provider-subject-types-supported</literal></para>
+    </listitem>
+   </varlistentry>
+   -->
+
+   <varlistentry>
+    <term>ID Token Signing Algorithms supported</term>
+    <listitem>
+     <para>Algorithms supported to sign OpenID Connect
+     <literal>id_tokens</literal>.</para>
+
+     <para><command>ssoadm</command> attribute:
+     <literal>forgerock-oauth2-provider-id-token-signing-algorithms-supported</literal></para>
+    </listitem>
+   </varlistentry>
+
+   <varlistentry>
+    <term>Supported Claims</term>
+    <listitem>
+     <para>List of claims supported by the OpenID Connect
+     <literal>/oauth2/userinfo</literal> endpoint.</para>
+
+     <para><command>ssoadm</command> attribute:
+     <literal>forgerock-oauth2-provider-supported-claims</literal></para>
+    </listitem>
+   </varlistentry>
   </variablelist>
 
   <variablelist xml:id="password-reset-configuration">

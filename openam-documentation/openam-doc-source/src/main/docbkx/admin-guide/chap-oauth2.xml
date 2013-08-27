@@ -475,7 +475,7 @@
       <para>In the OpenAM console under Access Control &gt; <replaceable>Realm
       Name</replaceable> &gt; Agents &gt; OAuth 2.0 Client &gt; Agent, click
       New..., then provide the client identifier and client password, and
-      finally click create to create the profile.</para>
+      finally click Create to create the profile.</para>
       <para>This page requires that you perform additional configuration
       separately.</para>
      </step>
@@ -497,10 +497,10 @@
    </step>
    <step>
     <para>Adjust the configuration as needed using the inline help for hints,
-    and also the documentation section <link
+    and also the documentation section <link xlink:show="new"
     xlink:href="admin-guide#configure-oauth2-client"
     xlink:role="http://docbook.org/xlink/role/olink"><citetitle>Configuring
-    OAuth 2.0 Clients</citetitle></link>.</para>
+    OAuth 2.0 &amp; OpenID Connect 1.0 Clients</citetitle></link>.</para>
 
     <para>An important decision to make at this point is whether your client
     is a confidential client or a public client. This depends on whether your

@@ -67,6 +67,9 @@
     <para><link linkend="rest-api-oauth2">OAuth 2.0 Authorization</link></para>
    </listitem>
    <listitem>
+    <para><link linkend="rest-api-openid-connect">OpenID Connect 1.0</link></para>
+   </listitem>
+   <listitem>
     <para><link linkend="rest-api-logging">Logging</link></para>
    </listitem>
    <listitem>
@@ -1255,6 +1258,127 @@ $ curl --request POST --header "iplanetDirectoryPro: AQIC5wM...3MTYxOA..*"
  --header "iplanetDirectoryPro: AQIC5wM...3MTYxOA..*"
  https://openam.example.com:8443/openam/frrest/oauth2/client/testClient
 {"success":"true"}</screen>
+  </section>
+ </section>
+
+ <section xml:id="rest-api-openid-connect">
+  <title>OpenID Connect 1.0</title>
+  <indexterm>
+   <primary>OpenID Connect 1.0</primary>
+   <secondary>REST API</secondary>
+  </indexterm>
+
+  <para>OpenID Connect 1.0 extends OAuth 2.0 so the client can verify claims
+  about the identity of the end user, get profile information about the end
+  user, and log the user out at the end of the OpenAM session.</para>
+
+  <itemizedlist>
+   <para>OpenAM exposes the following REST endpoints for <link xlink:show="new"
+   xlink:href="http://openid.net/connect/">OpenID Connect 1.0</link>
+   purposes.</para>
+
+   <listitem>
+    <para>Endpoints for <link linkend="rest-api-openid-connect-discovery"
+    >discovering information</link>.</para>
+   </listitem>
+
+   <listitem>
+    <para>An endpoint for <link linkend="rest-api-openid-connect-dynamic-registration"
+    >registering client applications</link>.</para>
+   </listitem>
+
+   <listitem>
+    <para>Endpoints for <link linkend="rest-api-openid-connect-authorization"
+    >client authorization</link>.</para>
+   </listitem>
+
+   <listitem>
+    <para>Endpoints for <link linkend="rest-api-openid-connect-session"
+    >session management</link>.</para>
+   </listitem>
+  </itemizedlist>
+
+  <section xml:id="rest-api-openid-connect-discovery">
+   <title>Discovering OpenID Connect 1.0 Configuration</title>
+
+   <para>OpenAM exposes endpoints for discovering information about the provider
+   configuration, and about the provider for a given end user.</para>
+
+   <itemizedlist>
+    <listitem>
+     <para><literal>/.well-known/openid-configuration</literal> allows clients
+     to retrieve OpenID Provider configuration by HTTP GET as specified by
+     OpenID Connect Discovery 1.0.</para>
+    </listitem>
+
+    <listitem>
+     <para><literal>/.well-known/webfinger</literal> allows clients to retrieve
+     the provider URL for an end user by HTTP GET as specified by OpenID Connect
+     Discovery 1.0.</para>
+    </listitem>
+   </itemizedlist>
+
+   <para>For examples, see <link xlink:show="new"
+   xlink:href="admin-guide#configure-openid-connect-discovery"
+   xlink:role="http://docbook.org/xlink/role/olink"><citetitle>Configuring
+   OpenAM For OpenID Connect Discovery</citetitle></link>.</para>
+  </section>
+
+  <section xml:id="rest-api-openid-connect-dynamic-registration">
+   <title>Registering OpenID Connect 1.0 Clients</title>
+
+   <para>OpenAM allows both static and dynamic registration of OpenID Connect
+   client applications. For dynamic registration according to the OpenID Connect
+   Dynamic Client Registration 1.0 specification, the endpoint is
+   <literal>/oauth2/connect/register</literal>. See <link xlink:show="new"
+   xlink:href="admin-guide#register-openid-connect-client-dynamic"
+   xlink:role="http://docbook.org/xlink/role/olink"><citetitle>To Register a
+   Client Dynamically</citetitle></link> for details.</para>
+  </section>
+
+  <section xml:id="rest-api-openid-connect-authorization">
+   <title>Performing OpenID Connect 1.0 Client Authorization</title>
+
+   <para>Registered clients can request authorization through OpenAM.</para>
+
+   <para>OpenID Connect 1.0 supports both a Basic Client Profile using the
+   OAuth 2.0 authorization code grant, and an Implicit Client Profile using the
+   OAuth 2.0 implicit grant. These client profiles rely on the OAuth 2.0
+   endpoints for authorization. Those endpoints are described in
+   <xref linkend="rest-api-oauth2-client-endpoints" />.</para>
+
+   <para>In addition, authorized clients can access end user information through
+   the OpenID Connect 1.0 specific endpoint
+   <literal>/oauth2/userinfo</literal>.</para>
+
+   <para>For examples, see <link xlink:show="new"
+   xlink:href="admin-guide#openid-connect-examples"
+   xlink:role="http://docbook.org/xlink/role/olink"><citetitle>Client
+   Examples</citetitle></link>.</para>
+  </section>
+
+  <section xml:id="rest-api-openid-connect-session">
+   <title>Managing OpenID Connect 1.0 Sessions</title>
+
+   <para>Registered clients can use OpenID Connect Session Management 1.0 to
+   handle end user logout actions.</para>
+
+   <itemizedlist>
+    <listitem>
+     <para><literal>/oauth2/connect/checkSession</literal> allows clients
+     to retrieve session status notifications.</para>
+    </listitem>
+
+    <listitem>
+     <para><literal>/oauth2/connect/endSession</literal> allows clients to
+     terminate end user sessions.</para>
+    </listitem>
+   </itemizedlist>
+
+   <para>For an example, see <link xlink:show="new"
+   xlink:href="admin-guide#manage-sessions-openid-connect"
+   xlink:role="http://docbook.org/xlink/role/olink"><citetitle>Managing User
+   Sessions</citetitle></link>.</para>
   </section>
  </section>
 

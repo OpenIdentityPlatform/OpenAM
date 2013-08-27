@@ -4312,20 +4312,45 @@ com.sun.identity.agents.config.cdsso.cookie.domain[1]=.example.net</literallayou
  </section>
 
  <section xml:id="configure-oauth2-client">
-  <title>Configuring OAuth 2.0 Clients</title>
+  <title>Configuring OAuth 2.0 &amp; OpenID Connect 1.0 Clients</title>
   <indexterm>
    <primary>Policy agents</primary>
    <secondary>Configuring</secondary>
   </indexterm>
+  <indexterm>
+   <primary>OAuth 2.0</primary>
+  </indexterm>
+  <indexterm>
+   <primary>OpenID Connect 1.0</primary>
+  </indexterm>
 
   <para>When you want to register an OAuth 2.0 client with OpenAM as the
-  OAuth 2.0 authorization server, create an OAuth 2.0 Client agent profile.
+  OAuth 2.0 authorization server, or register an OpenID Connect 1.0 client
+  through OpenAM console, then create an OAuth 2.0 Client agent profile.
   After creating the agent profile, you can further configure the properties
   in the OpenAM console under Access Control &gt; <replaceable>Realm
   Name</replaceable> &gt; Agents &gt; OAuth 2.0 Client &gt; <replaceable>Client
   Name</replaceable>.</para>
 
-  <variablelist>
+  <itemizedlist>
+   <para>The topmost configuration fields are for both OAuth 2.0 and OpenID
+   Connect 1.0, whereas others are specifically for OpenID Connect 1.0.</para>
+
+   <listitem>
+    <para><xref linkend="configure-oauth2-client-common" /></para>
+   </listitem>
+
+   <listitem>
+    <para><xref linkend="configure-oauth2-client-openid-connect" /></para>
+   </listitem>
+  </itemizedlist>
+
+  <variablelist xml:id="configure-oauth2-client-common">
+   <title>Common Client Configuration</title>
+
+   <para>The following configuration fields are common to OAuth 2.0 and OpenID
+   Connect 1.0 clients.</para>
+
    <varlistentry>
     <term>Group</term>
     <listitem>
@@ -4373,6 +4398,8 @@ com.sun.identity.agents.config.cdsso.cookie.domain[1]=.example.net</literallayou
      authorization code grant process. If your client has more than one
      redirection URI, then it must specify the redirection URI to use in
      the authorization request.</para>
+
+     <para>Redirection URIs are required for OpenID Connect 1.0 clients.</para>
     </listitem>
    </varlistentry>
 
@@ -4420,6 +4447,292 @@ com.sun.identity.agents.config.cdsso.cookie.domain[1]=.example.net</literallayou
      >locale</replaceable>|<replaceable>localized
      description</replaceable></literal> format. These scopes are set
      automatically when tokens are issued.</para>
+    </listitem>
+   </varlistentry>
+  </variablelist>
+
+  <variablelist xml:id="configure-oauth2-client-openid-connect">
+   <title>OpenID Connect 1.0 Client Configuration</title>
+
+   <para>The following optional configuration fields are for OpenID Connect 1.0
+   clients.</para>
+
+   <!--
+   <varlistentry>
+    <term>Grant Types</term>
+    <listitem>
+     <para>Grant types this client supports and uses. Default:
+     <literal>authorization_code</literal>, <literal>implicit</literal>,
+     <literal>refresh_token</literal>,
+     <literal>urn:ietf:params:oauth:grant-type:jwt-bearer</literal></para>
+
+     <para>The grant types are described in <citetitle>OpenID Connect Dynamic
+     Client Registration 1.0</citetitle>: <link xlink:show="new"
+     xlink:href="http://openid.net/specs/openid-connect-registration-1_0.html#client-metadata"
+     ><citetitle>Client Metadata</citetitle></link>.</para>
+    </listitem>
+   </varlistentry>
+
+   <varlistentry>
+    <term>Response Types</term>
+    <listitem>
+     <para>Response types this client supports and uses. Default:
+     <literal>code</literal>, <literal>token</literal>,
+     <literal>id_token</literal></para>
+
+     <para>The response types are described in <citetitle>OpenID Connect Dynamic
+     Client Registration 1.0</citetitle>: <link xlink:show="new"
+     xlink:href="http://openid.net/specs/openid-connect-registration-1_0.html#client-metadata"
+     ><citetitle>Client Metadata</citetitle></link>.</para>
+    </listitem>
+   </varlistentry>
+
+   <varlistentry>
+    <term>Contacts</term>
+    <listitem>
+     <para>Email addresses for the users who administer this client</para>
+    </listitem>
+   </varlistentry>
+
+   <varlistentry>
+    <term>Logo URI</term>
+    <listitem>
+     <para>URI to the logo of this client</para>
+    </listitem>
+   </varlistentry>
+
+   <varlistentry>
+    <term>Token Endpoint Authentication Method</term>
+    <listitem>
+     <para>Authentication method that the token endpoint should use with this
+     client. One of <literal>client_secret_basic</literal> (default),
+     <literal>client_secret_jwt</literal>, <literal>client_secret_post</literal>,
+     <literal>private_key_jwt</literal></para>
+
+     <para>These methods are described in <citetitle>OpenID Connect Messages
+     1.0</citetitle>: <link xlink:show="new"
+     xlink:href="http://openid.net/specs/openid-connect-messages-1_0.html#client_authentication"
+     ><citetitle>Client Authentication</citetitle></link>.</para>
+    </listitem>
+   </varlistentry>
+
+   <varlistentry>
+    <term>Policy URI</term>
+    <listitem>
+     <para>URI to the policy for this client, which explains to the end user
+     how the user's profile data is used</para>
+    </listitem>
+   </varlistentry>
+
+   <varlistentry>
+    <term>Terms of Service URI</term>
+    <listitem>
+     <para>URI to the terms of service for this client, which describes the
+     client's terms of service to the end user</para>
+    </listitem>
+   </varlistentry>
+
+   <varlistentry>
+    <term>Json Web Key URI</term>
+    <listitem>
+     <para>URI to the client's public keys as a JSON Web Key Set document,
+     corresponding to keys used when signing requests to OpenAM</para>
+    </listitem>
+   </varlistentry>
+
+   <varlistentry>
+    <term>Sector Identifier URI</term>
+    <listitem>
+     <para>URI to a JSON array of Redirect URIs registered for the client. This
+     URI is used by OpenAM to calculate Pseudonymous Identifiers.</para>
+    </listitem>
+   </varlistentry>
+   -->
+
+   <!--
+   <varlistentry>
+    <term>Subject Type</term>
+    <listitem>
+     <para>Subject type added to responses for this client. One of: Pairwise
+     (default), Public</para>
+
+     <para>Pairwise means each client gets different values for the
+     <literal>sub</literal> (subject), preventing correlation of the user's
+     activities without the user's consent. When this option subject type is
+     selected, the client should provide a sector identifier URI.</para>
+
+     <para>Public means all clients get the same values for
+     <literal>sub</literal>.</para>
+    </listitem>
+   </varlistentry>
+
+   <varlistentry>
+    <term>Request Object Signing Algorithm</term>
+    <listitem>
+     <para>Algorithm that request objects for this client must be signed with</para>
+
+     <para>Valid values are listed in <citetitle>JSON Web Algorithms
+     (JWA)</citetitle>: <link xlink:show="new"
+     xlink:href="http://tools.ietf.org/html/draft-ietf-jose-json-web-algorithms#section-3.1"
+     ><citetitle>"alg" (Algorithm) Header Parameter Values for JWS</citetitle></link></para>
+    </listitem>
+   </varlistentry>
+
+   <varlistentry>
+    <term>Userinfo Signed Response Algorithm</term>
+    <listitem>
+     <para>Algorithm that responses from the UserInfo endpoint should be signed with</para>
+
+     <para>Valid values are listed in <citetitle>JSON Web Algorithms
+     (JWA)</citetitle>: <link xlink:show="new"
+     xlink:href="http://tools.ietf.org/html/draft-ietf-jose-json-web-algorithms#section-3.1"
+     ><citetitle>"alg" (Algorithm) Header Parameter Values for JWS</citetitle></link></para>
+    </listitem>
+   </varlistentry>
+
+   <varlistentry>
+    <term>Userinfo Encrypted Response Algorithm</term>
+    <listitem>
+     <para>Algorithm that responses from the UserInfo endpoint should be encrypted with</para>
+
+     <para>Valid values are listed in <citetitle>JSON Web Algorithms
+     (JWA)</citetitle>: <link xlink:show="new"
+     xlink:href="http://tools.ietf.org/html/draft-ietf-jose-json-web-algorithms#section-4.1"
+     ><citetitle>"alg" (Algorithm) Header Parameter Values for JWE</citetitle></link></para>
+    </listitem>
+   </varlistentry>
+
+   <varlistentry>
+    <term>Userinfo Encrypted Response Encryption Algorithm</term>
+    <listitem>
+     <para>Algorithm that responses from the UserInfo endpoint should be
+     encrypted and signed with</para>
+
+     <para>Valid values are listed in <citetitle>JSON Web Algorithms
+     (JWA)</citetitle>: <link xlink:show="new"
+     xlink:href="http://tools.ietf.org/html/draft-ietf-jose-json-web-algorithms#section-4.2"
+     ><citetitle>"enc" (Encryption Method) Header Parameter Values for JWE</citetitle></link></para>
+    </listitem>
+   </varlistentry>
+   -->
+
+   <varlistentry>
+    <term>ID Token Signed Response Algorithm</term>
+    <listitem>
+     <para>Algorithm that the ID Token for this client must be signed with</para>
+
+     <para>Default: <literal>HmacSHA256</literal></para>
+
+     <para>Valid values are listed in <citetitle>JSON Web Algorithms
+     (JWA)</citetitle>: <link xlink:show="new"
+     xlink:href="http://tools.ietf.org/html/draft-ietf-jose-json-web-algorithms#section-3.1"
+     ><citetitle>"alg" (Algorithm) Header Parameter Values for JWS</citetitle></link>.
+     OpenAM supports <literal>HmacSHA256</literal>,
+     <literal>HmacSHA384</literal>, and <literal>HmacSHA512</literal>.</para>
+    </listitem>
+   </varlistentry>
+
+   <!--
+   <varlistentry>
+    <term>ID Token Encrypted Response Algorithm</term>
+    <listitem>
+     <para>Algorithm that the ID Token for this client must be encrypted with</para>
+
+     <para>Valid values are listed in <citetitle>JSON Web Algorithms
+     (JWA)</citetitle>: <link xlink:show="new"
+     xlink:href="http://tools.ietf.org/html/draft-ietf-jose-json-web-algorithms#section-4.1"
+     ><citetitle>"alg" (Algorithm) Header Parameter Values for JWE</citetitle></link></para>
+    </listitem>
+   </varlistentry>
+
+   <varlistentry>
+    <term>ID Token Encrypted Response Encryption Algorithm</term>
+    <listitem>
+     <para>Algorithm that the ID Token for this client must be signed and encrypted with</para>
+
+     <para>Valid values are listed in <citetitle>JSON Web Algorithms
+     (JWA)</citetitle>: <link xlink:show="new"
+     xlink:href="http://tools.ietf.org/html/draft-ietf-jose-json-web-algorithms#section-4.2"
+     ><citetitle>"enc" (Encryption Method) Header Parameter Values for JWE</citetitle></link></para>
+    </listitem>
+   </varlistentry>
+
+   <varlistentry>
+    <term>Default Max Age</term>
+    <listitem>
+     <para>Maximum time in seconds that a user can be authenticated. If the user
+     was last authenticated earlier than this value, then the user must be
+     authenticated again. If specified, the request parameter
+     <literal>max_age</literal> overrides this setting.</para>
+    </listitem>
+   </varlistentry>
+
+   <varlistentry>
+    <term>Require Auth Time</term>
+    <listitem>
+     <para>Whether to include auth time in the ID Token. Default: not enabled</para>
+
+     <para>The request parameter <literal>auth_time</literal> overrides this
+     setting.</para>
+    </listitem>
+   </varlistentry>
+
+   <varlistentry>
+    <term>Default ACR Values</term>
+    <listitem>
+     <para>Default Authentication Context Class Reference values that the
+     Authorization Server must used when processing requests from this client</para>
+
+     <para>The discovery element <literal>acr_values_supported</literal> lists
+     the values supported by OpenAM.</para>
+    </listitem>
+   </varlistentry>
+
+   <varlistentry>
+    <term>Initiate Login URI</term>
+    <listitem>
+     <para>URI to initiate login for this client</para>
+
+     <para>This URI must accept both HTTP GET and HTTP POST, and the client
+     must understand the <literal>login_hint</literal> and <literal>iss</literal>
+     parameters.</para>
+    </listitem>
+   </varlistentry>
+   -->
+
+   <varlistentry>
+    <term>Post Logout Redirect URI</term>
+    <listitem>
+     <para>URI to which to redirect the user-agent after the client logout
+      process</para>
+    </listitem>
+   </varlistentry>
+
+   <!--
+   <varlistentry>
+    <term>Request URIs</term>
+    <listitem>
+     <para>List of request URIs registered for this client, used for passing
+     a (pre-registered) request by reference rather than by value</para>
+    </listitem>
+   </varlistentry>
+   -->
+
+   <varlistentry>
+    <term>The access token used to update the client</term>
+    <listitem>
+     <para>The <literal>registration_access_token</literal> value that you
+     provide when registering the client, and then subsequently when reading
+     or updating the client profile.</para>
+    </listitem>
+   </varlistentry>
+
+   <varlistentry>
+    <term>Client Session URI</term>
+    <listitem>
+     <para>The relying party (client) URI to which the OpenID Connect Provider
+     sends session changed notification messages using the HTML 5 postMessage
+     API.</para>
     </listitem>
    </varlistentry>
   </variablelist>

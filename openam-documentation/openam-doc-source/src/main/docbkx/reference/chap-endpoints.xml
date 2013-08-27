@@ -4797,18 +4797,56 @@ to a runtime exception with messages that I think suggest that it needed to be c
         </variablelist>
     </section>
 
-    <!-- Commented out until XACML 3 is included in OpenAM
-    <section xml:id="xacml3-rest-endpoints">
-        <title>XACML 3 REST Endpoints</title>
-        <indexterm>
-            <primary>Endpoints</primary>
-            <secondary>XACML 3</secondary>
-            <tertiary>REST</tertiary>
-        </indexterm>
+    <section xml:id="well-known-endpoints">
+     <title>Well-Known Endpoints</title>
+     <indexterm>
+      <primary>Endpoints</primary>
+      <secondary>Well-Known</secondary>
+     </indexterm>
+     <indexterm>
+      <primary>OpenID Connect</primary>
+     </indexterm>
 
-        <para>The endpoints described in this section, document the work that has been done to this time for XACML 3
-            REST endpoints. The descriptions are different from other endpoints in this chapter.</para>
-         -->
+     <para>The endpoints described in this section are <link
+     xlink:show="new" xlink:href="http://tools.ietf.org/html/rfc5785">Well-Known
+     URIs</link> supported by OpenAM.</para>
+
+     <variablelist>
+      <varlistentry>
+       <term><literal>/.well-known/openid-configuration</literal></term>
+       <listitem>
+        <para>Exposes OpenID Provider configuration by HTTP GET as specified by
+        OpenID Connect Discovery 1.0. No query string parameters are
+        required.</para>
+       </listitem>
+      </varlistentry>
+      <varlistentry>
+       <term><literal>/.well-known/webfinger</literal></term>
+       <listitem>
+        <para>Allows a client to retrieve the provider URL for an end user by
+        HTTP GET as specified by OpenID Connect Discovery 1.0.</para>
+
+        <para>For an example, see <link xlink:show="new"
+        xlink:href="admin-guide#configure-openid-connect-discovery"
+        xlink:role="http://docbook.org/xlink/role/olink"><citetitle>Configuring
+        OpenAM For OpenID Connect Discovery</citetitle></link>.</para>
+       </listitem>
+      </varlistentry>
+     </variablelist>
+    </section>
+
+ <!-- Commented out until XACML 3 is included in OpenAM
+ <section xml:id="xacml3-rest-endpoints">
+     <title>XACML 3 REST Endpoints</title>
+     <indexterm>
+         <primary>Endpoints</primary>
+         <secondary>XACML 3</secondary>
+         <tertiary>REST</tertiary>
+     </indexterm>
+
+     <para>The endpoints described in this section, document the work that has been done to this time for XACML 3
+         REST endpoints. The descriptions are different from other endpoints in this chapter.</para>
+      -->
         <!-- Given the state of development of these endpoints, I would not object if we delete this section.
         The "other XACML endpoints" are a reference to Jeff Schenk's notes on AME-928.
          In addition, Jeff says that he's planning to set up a toggle to deactivate / activate XACML

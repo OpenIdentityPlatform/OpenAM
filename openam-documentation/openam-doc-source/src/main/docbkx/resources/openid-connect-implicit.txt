@@ -1,0 +1,57 @@
+@startuml openid-connect-implicit.png
+
+/'
+    CCPL HEADER START
+
+    This work is licensed under the Creative Commons
+    Attribution-NonCommercial-NoDerivs 3.0 Unported License.
+    To view a copy of this license, visit
+    http://creativecommons.org/licenses/by-nc-nd/3.0/
+    or send a letter to Creative Commons, 444 Castro Street,
+    Suite 900, Mountain View, California, 94041, USA.
+
+    You can also obtain a copy of the license at
+    src/main/resources/legal-notices/CC-BY-NC-ND.txt.
+    See the License for the specific language governing permissions
+    and limitations under the License.
+
+    If applicable, add the following below this CCPL HEADER, with the fields
+    enclosed by brackets "[]" replaced with your own identifying information:
+         Portions Copyright [yyyy] [name of copyright owner]
+
+    CCPL HEADER END
+
+         Copyright 2013 ForgeRock AS
+
+    To generate a sequence diagram from this file, process
+    it with PlantUML, http://plantuml.sourceforge.net/sequence.html
+'/
+
+title OpenID Connect Implicit Flow
+autonumber
+
+participant "Client" as Client
+participant "End-User" as User
+box "OpenAM" #FAFAFA
+	participant "Authorization Server" as AuthzServer
+	participant "UserInfo Endpoint" as UserInfo
+end box
+
+Client->Client: Prepare Authorization Request
+
+Client->AuthzServer: Authorization Request
+
+AuthzServer->User: Authenticate End-User
+
+User->AuthzServer: Consent/authorization
+
+AuthzServer->User: Redirect with ...
+
+User->Client: ... Access Token and ID Token
+
+Client->Client: Validate ID Token and get End-User subject ID
+
+Client->UserInfo: (<i>Optional</i>) Access Token
+
+UserInfo->Client: (<i>Optional</i>) UserInfo Response
+@enduml

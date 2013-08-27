@@ -79,6 +79,7 @@
  <xinclude:include href='chap-dashboard.xml' />
  <xinclude:include href='chap-federation.xml' />
  <xinclude:include href='chap-oauth2.xml' />
+ <xinclude:include href='chap-openid-connect.xml' />
  <xinclude:include href='chap-backup-restore.xml' />
  <xinclude:include href='chap-certs-keystores.xml' />
  <xinclude:include href='chap-monitoring.xml' />

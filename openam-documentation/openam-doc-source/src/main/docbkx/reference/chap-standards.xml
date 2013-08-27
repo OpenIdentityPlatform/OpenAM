@@ -54,8 +54,52 @@
     <para><link xlink:show="new" xlink:href="http://tools.ietf.org/html/draft-ietf-oauth-saml2-bearer"
     >SAML 2.0 Bearer Assertion Profiles for OAuth 2.0</link>, which is an
     Internet-Draft.</para>
+    <para><link xlink:show="new" xlink:href="http://tools.ietf.org/html/draft-ietf-oauth-jwt-bearer"
+    >JSON Web Token (JWT) Profile for OAuth 2.0 Client Authentication and
+    Authorization Grants</link>, which is an Internet-Draft.</para>
    </listitem>
   </varlistentry>
+
+  <varlistentry xml:id="openid-connect-1">
+   <term><link xlink:href="http://openid.net/connect/">OpenID Connect 1.0</link></term>
+   <listitem>
+    <indexterm>
+     <primary>Supported standards</primary>
+     <secondary>OpenID Connect 1.0</secondary>
+    </indexterm>
+    <para>OpenAM plays the role of OpenID provider. The OpenID Connect
+    specifications also depend on OAuth 2.0, JSON Web Token, and Simple Web
+    Discovery and related specifications. The following descriptions are from
+    the OpenID Connect 1.0 web site.</para>
+
+    <para><link xlink:show="new" xlink:href="http://openid.net/specs/openid-connect-basic-1_0.html"
+    >Basic Client Profile</link>. Lightweight simple self-contained
+    specification for a web-based Relying Party using the OAuth code flow.</para>
+    <para><link xlink:show="new" xlink:href="http://openid.net/specs/openid-connect-implicit-1_0.html"
+    >Implicit Client Profile</link>. Lightweight simple self-contained
+    specification for a web-based Relying Party using the OAuth implicit flow.</para>
+    <para><link xlink:show="new" xlink:href="http://openid.net/specs/openid-connect-discovery-1_0.html"
+    >Discovery</link>. Defines how user and provider endpoints are dynamically
+    discovered.</para>
+    <para><link xlink:show="new" xlink:href="http://openid.net/specs/openid-connect-registration-1_0.html"
+    >Dynamic Registration</link>. Defines how clients dynamically register with
+    OpenID Providers.</para>
+    <para><link xlink:show="new" xlink:href="http://openid.net/specs/openid-connect-standard-1_0.html"
+    >Standard</link>. Full HTTP binding specification, for both clients and
+    OpenID Providers; references Messages.</para>
+    <para><link xlink:show="new" xlink:href="http://openid.net/specs/openid-connect-messages-1_0.html"
+    >Messages</link>. Lists all the messages that are used in OpenID Connect.
+    You can use this to create additional bindings for Connect, such as an
+    OpenID Connect binding for XMPP.</para>
+    <para><link xlink:show="new" xlink:href="http://openid.net/specs/openid-connect-session-1_0.html"
+    >Session Management</link>. Defines how to manage OpenID Connect sessions.</para>
+    <para><link xlink:show="new" xlink:href="http://openid.net/specs/oauth-v2-multiple-response-types-1_0.html"
+    >OAuth 2.0 Multiple Response Types</link>. Registration document for several
+    specific new response types, in accordance with the stipulations of the
+    OAuth Parameters Registry.</para>
+   </listitem>
+  </varlistentry>
+
   <varlistentry xml:id="rest">
    <term><link
    xlink:href="http://en.wikipedia.org/wiki/Representational_state_transfer"

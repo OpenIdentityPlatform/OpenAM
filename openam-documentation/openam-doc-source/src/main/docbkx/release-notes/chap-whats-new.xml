@@ -77,6 +77,15 @@
   </listitem>
 
   <listitem>
+   <para>OpenAM supports OpenID Connect 1.0, which extends OAuth 2.0 such that
+   the client can verify claims about the identity of the end user, get profile
+   information for the end user, and manage end user sessions. OpenAM plays the
+   role of OpenID Provider. See <link xlink:href="admin-guide#chap-openid-connect"
+   xlink:role="http://docbook.org/xlink/role/olink"><citetitle>Managing OpenID
+   Connect 1.0 Authorization</citetitle></link> for details.</para>
+  </listitem>
+
+  <listitem>
    <para>Session failover has been modified to be simpler to deploy (<link
    xlink:href="https://bugster.forgerock.org/jira/browse/OPENAM-625"
    xlink:show="new">OPENAM-625</link>). OpenAM 10.0.1 and earlier required the
@@ -163,10 +172,6 @@
 
  <itemizedlist>
   <title>Additional New Features</title>
-
-  <listitem>
-    <para>OpenID now adds support for OpenID Connect 1.0.</para>
-  </listitem>
 
   <listitem>
    <para>The zero page login has been modified so that administrators can disable the
