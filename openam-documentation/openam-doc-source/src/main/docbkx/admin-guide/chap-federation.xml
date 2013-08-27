@@ -2439,7 +2439,7 @@ CookieWriterServlet.doGetPost: Redirect to
 
    <programlisting language="none"
    >http://www.sp.example:8080/sp/saml2/jsp/spSingleLogoutInit.jsp?metaAlias=/sp
-&amp;idpEntityID=http%3A%2F%2Fdesktop.example.example%3A8080%2Fopenam
+&amp;idpEntityID=http%3A%2F%2Fwww.idp.example%3A8080%2Fopenam
 &amp;RelayState=http%3A%2F%2Fopenam.forgerock.org</programlisting>
   </example>
 
@@ -3006,7 +3006,7 @@ CookieWriterServlet.doGetPost: Redirect to
 
    <para>To understand the relationships between accounts, consider an example
    where the identity provider is at <literal>idp.example.org</literal> and the
-   service provider is at <literal>sp.example</literal>. A demo user
+   service provider is at <literal>sp.example.com</literal>. A demo user
    account has the Universal ID,
    <literal>id=demo,ou=user,dc=example,dc=org</literal>, on the identity
    provider. That maps to the Universal ID,
