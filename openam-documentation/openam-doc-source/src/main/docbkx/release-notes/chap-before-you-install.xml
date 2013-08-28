@@ -42,8 +42,9 @@
   of Java 6 or 7 to ensure you have the latest security fixes.</para>
   
   <para>ForgeRock has tested this release of OpenAM primarily with Oracle
-  Java SE JDK.</para>
+  Java SE JDK, and also tested OpenAM on WebSphere with IBM JDK.</para>
 
+  <!-- TODO: Are we doing to deprecate use of JDK 5? -->
   <para>OpenAM Java SDK requires Java Development Kit 5, 6 or 7.</para>
  </section>
 
@@ -64,10 +65,11 @@
     <para>IBM WebSphere 8.0, 8.5</para>
    </listitem>
    <listitem>
+    <!-- TODO: Deprecate 4.x? -->
     <para>JBoss Enterprise Application Platform 4.x, 5.x</para>
     <para>JBoss Application Server 7.x</para>
    </listitem>
-<!--
+<!-- This still doesn't work for me, see OPENAM-2853
    <listitem>
     <para>Jetty 7</para>
    </listitem>
@@ -100,6 +102,7 @@
    </listitem>
    <listitem>
     <para>External Sun OpenDS data store, version 2 or later</para>
+    <para>External Oracle Unified Directory 11g or later</para>
    </listitem>
    <listitem>
     <para>External Oracle Directory Server Enterprise Edition data store,
@@ -189,10 +192,10 @@
     <para>Linux 2.6, 3.0</para>
    </listitem>
    <listitem>
-    <para>Microsoft Windows Server 2003, 2008 R2</para>
+    <para>Microsoft Windows Server 2008 R2, 2012</para>
    </listitem>
    <listitem>
-    <para>Oracle Solaris 10</para>
+    <para>Oracle Solaris 10, 11</para>
    </listitem>
   </itemizedlist>
  </section>

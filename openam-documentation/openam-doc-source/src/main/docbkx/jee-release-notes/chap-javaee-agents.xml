@@ -120,16 +120,16 @@
      <para><?eval ${agentGlassFishSupport}?></para>
     </listitem>
     <listitem>
-     <para><?eval ${agentWebSphereSupport}?></para>
+     <para><?eval ${agentWebSphereSupport}?></para><!-- TODO: Deprecate 7.x? -->
     </listitem>
     <listitem>
-     <para><?eval ${agentJBossSupport}?></para>
+     <para><?eval ${agentJBossSupport}?></para><!-- TODO: Deprecate 4.x? -->
     </listitem>
     <listitem>
-     <para><?eval ${agentJettySupport}?></para>
+     <para><?eval ${agentJettySupport}?></para><!-- TODO: what about 8, 9? -->
     </listitem>
     <listitem>
-     <para><?eval ${agentWebLogicSupport}?></para>
+     <para><?eval ${agentWebLogicSupport}?></para><!-- TODO: Deprecate 10g? (11g or later only?) -->
     </listitem>
    </itemizedlist>
   </section>
@@ -138,7 +138,7 @@
    <title>Java EE Agents Platform Requirements</title>
 
    <para>Apache Tomcat Java EE policy agents have been tested on Linux 2.6 or
-   later, and on Microsoft Windows Server 2008 R2.</para>
+   later, and on Microsoft Windows Server 2008 R2 and 2012.</para>
 
    <para>GlassFish Java EE policy agents have been tested on Oracle Solaris 10
    or later.</para>

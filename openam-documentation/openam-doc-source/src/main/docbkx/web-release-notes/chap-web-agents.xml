@@ -41,8 +41,8 @@
    <listitem>
     <para>A new web policy agent, Varnish, has been added. Varnish is a unique policy
     agent that does not require the Java environment and it has a unique set of 
-    instructions for the agentadmin command. Varnish also uses a directory
-    called vmods. This is the location where you will need to handle any required
+    instructions for the <command>agentadmin</command> command. Varnish also uses a directory
+    called <filename>vmods</filename>. This is the location where you will need to handle any required
     installation or Varnish updates, and it requires the user to have administrative 
     rights to update this directory for changes to take effect.</para>
    </listitem>
@@ -228,7 +228,7 @@
     <para>Web policy agents support the following web servers.</para>
 
     <listitem>
-     <para><?eval ${agentApacheSupport}?></para>
+     <para><?eval ${agentApacheSupport}?></para><!-- TODO: Deprecate Apache 2.0 support? -->
     </listitem>
     <listitem>
      <para><?eval ${agentIISSupport}?></para>
@@ -259,6 +259,10 @@
      <listitem>
       <para><?eval ${agentSunProxyServerSupport}?></para>
      </listitem>
+
+     <listitem>
+      <para><?eval ${agentVarnishCacheSupport}?></para>
+     </listitem>
     </itemizedlist>
    </section>
 
@@ -277,6 +281,12 @@
 
     <para>The Microsoft IIS 7 web policy agent has been tested on Windows Server
     2008 R2.</para>
+
+    <para>The Microsoft IIS 8 web policy agent has been tested on Windows Server
+    2012.</para>
+
+    <para>The Varnish Cache web policy agents have been tested on Linux 2.6 or
+    later<!--, and on Oracle Solaris 10 or later-->.</para>
 
     <para>Before installing web policy agents on Solaris 10, make sure you have
     applied the latest shared library patch for C++, at least 119963-16 on SPARC,

@@ -67,7 +67,7 @@
   </listitem>
 
   <listitem>
-   <para>OpenAM now provides further support for OAuth 2.0. In addition
+   <para>OpenAM now fully supports for OAuth 2.0. In addition
    to playing the role of client and resource server, OpenAM can now also
    play the role of OAuth 2.0 authorization server. See <link
    xlink:href="admin-guide#chap-oauth2"
@@ -96,15 +96,15 @@
    for single OpenAM servers. The current implementation requires that you use
    OpenDJ for the configuration data store.</para>
 
+   <!-- TODO: can we remove the WAN restriction? Very important question. -->
    <para>This new implementation is designed to operate on a local site network.
    Cross-site session failover and session failover across wide area networks
    (WANs) are not supported.</para>
   </listitem>
 
   <listitem>
-   <para>IBM<superscript>®</superscript> WebSphere<superscript>®</superscript>
-   8.0 is now a supported platform. See <link
-   xlink:href="install-guide#prepare-ibm-websphere"
+   <para>IBM WebSphere 8 is now a supported platform. See <link
+   xlink:show="new" xlink:href="install-guide#prepare-ibm-websphere"
    xlink:role="http://docbook.org/xlink/role/olink"><citetitle>Preparing IBM
    WebSphere</citetitle></link> in the <citetitle>Installation Guide</citetitle>
    for details on how to setup WebSphere 8.0 and 8.5 before deploying 
@@ -136,23 +136,23 @@
    device. Devices can range from a smartphone to a dedicated device, such as
    YubiKey or any other OATH compliant device.</para>
 
-   <para>With OATH, OpenAM now supports YubiKey<superscript>®</superscript>
-   authentication. The YubiKey simplifies the process of logging in with a One
-   Time Password token as it does not require the user to re-type long pass
-   codes from a display device into the login field of the computer. The
-   YubiKey is inserted in the USB-port of any computer and the OTP is generated
-   and automatically entered with a simple touch of a button on the YubiKey,
-   and without the need of any client software or drivers.</para>
+   <para>With OATH, OpenAM now supports YubiKey authentication. The YubiKey
+   simplifies the process of logging in with a One Time Password token as it
+   does not require the user to re-type long pass codes from a display device
+   into the login field of the computer. The YubiKey is inserted in the USB-port
+   of any computer and the OTP is generated and automatically entered with a
+   simple touch of a button on the YubiKey, and without the need of any client
+   software or drivers.</para>
   </listitem>
 
   <listitem>
     <para>OpenAM now supports (<link
-                 xlink:href="https://bugster.forgerock.org/jira/browse/OPENAM-1375"
-                 xlink:show="new">OPENAM-1375</link>)the Device Print adaptive authentication module.
-             The module can use various characteristics of a system, including installed
-             fonts, screen resolution, timezone, and geolocation to uniquely identify a
-             system. The Device Print module includes all of the functionality associated
-             with the HOTP authentication module.</para>
+    xlink:href="https://bugster.forgerock.org/jira/browse/OPENAM-1375"
+    xlink:show="new">OPENAM-1375</link>)the Device Print adaptive authentication module.
+    The module can use various characteristics of a system, including installed
+    fonts, screen resolution, timezone, and geolocation to uniquely identify a
+    system. The Device Print module includes all of the functionality associated
+    with the HOTP authentication module.</para>
   </listitem>
 
   <listitem>
@@ -163,9 +163,12 @@
   </listitem>
 
   <listitem>
-    <para>The C SDK for OpenAM has been simplified. The packages are all available as
+    <para>The C SDK for OpenAM has been simplified. Nightly builds are all available as
     ZIP files, for Linux, Solaris x86, Solaris SPARC, and Windows operating systems, for
     both 32- and 64-bit varieties.</para>
+
+    <para>For C SDK product versions and support offerings, contact
+    <link xlink:href="mailto:info@forgerock.com">info@forgerock.com</link>.</para>
   </listitem>
 
  </itemizedlist>
@@ -191,6 +194,61 @@
   <listitem>
    <!-- AME-1652: Update DJ from 2.4.6 to 2.6 -->
    <para>OpenAM now bundles OpenDJ 2.6.</para>
+  </listitem>
+
+  <listitem>
+   <para>Remote clients that register notification URLs with OpenAM can now
+   successfully deregister on shutdown (<link xlink:show="new"
+   xlink:href="https://bugster.forgerock.org/jira/browse/OPENAM-2766"
+   >OPENAM-2766</link>, <link xlink:show="new"
+   xlink:href="https://bugster.forgerock.org/jira/browse/OPENAM-2765"
+   >OPENAM-2765</link>), preventing OpenAM from trying to notify applications
+   that are no longer running.</para>
+  </listitem>
+
+  <listitem>
+   <para>OpenAM now lets you configure the profile attribute name for email
+   used by the password reset module (<link xlink:show="new"
+   xlink:href="https://bugster.forgerock.org/jira/browse/OPENAM-2604"
+   >OPENAM-2604</link>).</para>
+  </listitem>
+
+  <listitem>
+   <para>OpenAM now provides a mechanism for Identity Providers to use private
+   key passwords that differ from the password stored in OpenAM's
+   <filename>.keypass</filename> file (<link xlink:show="new"
+   xlink:href="https://bugster.forgerock.org/jira/browse/OPENAM-2306"
+   >OPENAM-2306</link>).</para>
+  </listitem>
+
+  <listitem>
+   <para>OpenAM Java Fedlet <literal>SPACSUtils</literal> can now find the
+   <literal>metaAlias</literal> in either the URI or the query string
+   parameters (<link xlink:show="new"
+   xlink:href="https://bugster.forgerock.org/jira/browse/OPENAM-2258"
+   >OPENAM-2258</link>).</para>
+  </listitem>
+
+  <listitem>
+   <para>OpenAM now provides a mechanism to supply static values when setting up
+   attribute mapping for a SAML 2.0 Identity Provider or Service
+   Provider (<link xlink:show="new"
+   xlink:href="https://bugster.forgerock.org/jira/browse/OPENAM-2184"
+   >OPENAM-2184</link>).</para>
+  </listitem>
+
+  <listitem>
+   <para>OpenAM's LDAP authentication module now supports Samba 4 LDAP response
+   codes (<link xlink:show="new"
+   xlink:href="https://bugster.forgerock.org/jira/browse/OPENAM-1826"
+   >OPENAM-1826</link>).</para>
+  </listitem>
+
+  <listitem>
+   <para>OpenAM's OATH authentication module's minimum password length is now
+   configurable (<link xlink:show="new"
+   xlink:href="https://bugster.forgerock.org/jira/browse/OPENAM-1765"
+   >OPENAM-1765</link>).</para>
   </listitem>
 
   <listitem>
