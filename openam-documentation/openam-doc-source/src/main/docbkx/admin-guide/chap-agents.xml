@@ -220,6 +220,74 @@
     on the agent profile page.</para>
    </step>
   </procedure>
+
+  <procedure xml:id="create-agent-profile-cli">
+   <title>To Create an Agent Profile Using the Command Line</title>
+
+   <para>You can create a policy agent profile in OpenAM using the
+   <command>ssoadm</command> command-line tool. You do so by specifying
+   the agent properties either as a list of attributes, or by using an
+   agent properties file as shown below. Export an existing policy
+   agent configuration before you start to see what properties you
+   want to set when creating the agent profile.</para>
+
+   <para>The following procedure demonstrates creating a web policy agent
+   profile using the <command>ssoadm</command> command.</para>
+
+   <step>
+    <para>Make sure the <command>ssoadm</command> command is installed as
+    described in the <citetitle>Installation Guide</citetitle> procedure,
+    <link xlink:show="new" xlink:href="install-guide#install-openam-admin-tools"
+    xlink:role="http://docbook.org/xlink/role/olink"><citetitle>To Set Up
+    Administration Tools</citetitle></link>.</para>
+   </step>
+
+   <step>
+    <para>Determine the list of properties to set in the agent profile.</para>
+
+    <para>The following properties file shows a minimal configuration for a
+    web policy agent profile.</para>
+
+    <informalexample><?dbfo pgwide="1"?>
+    <screen>$ cat myWebAgent.properties
+com.sun.identity.agents.config.agenturi.prefix=http://www.example.com:80/amagent
+com.sun.identity.agents.config.cdsso.cdcservlet.url[0]=https://openam.example.com:8443/openam/cdcservlet
+com.sun.identity.agents.config.fqdn.default=www.example.com
+com.sun.identity.agents.config.login.url[0]=http://openam.example.com:8443/openam/UI/Login
+com.sun.identity.agents.config.logout.url[0]=http://openam.example.com:8443/openam/UI/Logout
+com.sun.identity.agents.config.remote.logfile=amAgent_www_example_com_80.log
+com.sun.identity.agents.config.repository.location=centralized
+com.sun.identity.client.notification.url=http://www.example.com:80/UpdateAgentCacheServlet?shortcircuit=false
+com.sun.identity.client.notification.url=http://www.example.com:80/UpdateAgentCacheServlet?shortcircuit=false
+sunIdentityServerDeviceKeyValue[0]=agentRootURL=http://www.example.com:80/
+sunIdentityServerDeviceStatus=Active
+userpassword=password
+
+</screen>
+    </informalexample>
+   </step>
+
+   <step>
+    <para>Set up a password file used when authenticating to OpenAM.</para>
+
+    <screen>$ echo password > /tmp/pwd.txt
+$ chmod 400 /tmp/pwd.txt</screen>
+   </step>
+
+   <step>
+    <para>Create the profile in OpenAM.</para>
+
+    <screen>$ ssoadm create-agent --realm /
+ --agentname myWebAgent --agenttype WebAgent --adminid amadmin
+ --password-file /tmp/pwd.txt --datafile myWebAgent.properties
+
+Agent configuration was created.</screen>
+
+    <para>At this point you can view the profile in OpenAM Console under
+    Access Control > <replaceable>Realm Name</replaceable> > Agents to make
+    sure the configuration is what you expect.</para>
+   </step>
+  </procedure>
  </section>
 
  <section xml:id="delegate-agent-profile-creation">
