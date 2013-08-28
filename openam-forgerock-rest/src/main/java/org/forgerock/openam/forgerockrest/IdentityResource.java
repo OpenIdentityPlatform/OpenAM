@@ -456,7 +456,7 @@ public final class IdentityResource implements CollectionResourceProvider {
                 }
             }
             if(email == null || email.isEmpty()){
-                throw new NotFoundException("No email provided in profile.");
+                throw new InternalServerErrorException("No email provided in profile.");
             }
 
             // Get full deployment URL
@@ -508,7 +508,11 @@ public final class IdentityResource implements CollectionResourceProvider {
             RestDispatcher.debug.error("IdentityResource.generateNewPasswordEmail(): Cannot send email to : " + username
                     + cte.getMessage());
             handler.handleError(new NotFoundException("Email not sent"));
-        } catch (Exception e){
+        } catch (InternalServerErrorException ise){
+            RestDispatcher.debug.error("IdentityResource.generateNewPasswordEmail(): Cannot send email to : " + username
+                    + ise.getMessage());
+            handler.handleError(ise);
+        }catch (Exception e){
             RestDispatcher.debug.error("IdentityResource.generateNewPasswordEmail(): Cannot send email to : " + username
                     + e.getMessage());
             handler.handleError(new NotFoundException("Email not sent"));
