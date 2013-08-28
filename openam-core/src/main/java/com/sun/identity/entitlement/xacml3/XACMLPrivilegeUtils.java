@@ -25,7 +25,8 @@
  * $Id: XACMLPrivilegeUtils.java,v 1.4 2010/01/10 06:39:42 dillidorai Exp $
  */
 /**
- * Portions Copyrighted 2011-2012 ForgeRock Inc
+ * Portions Copyrighted 2011-2013 ForgeRock AS
+ * Portions Copyrighted 2013 Nomura Research Institute, Ltd
  */
 package com.sun.identity.entitlement.xacml3;
 
@@ -586,7 +587,7 @@ public class XACMLPrivilegeUtils {
 
     public static Match resourceNameToMatch(String resourceName,
             String applicationName) {
-        if (resourceName == null | resourceName.length() == 0) {
+        if (resourceName == null || resourceName.length() == 0) {
             return null;
         }
 
@@ -620,7 +621,7 @@ public class XACMLPrivilegeUtils {
 
     public static Match resourceNameToNotMatch(String resourceName,
             String applicationName) {
-        if (resourceName == null | resourceName.length() == 0) {
+        if (resourceName == null || resourceName.length() == 0) {
             return null;
         }
 
@@ -654,7 +655,7 @@ public class XACMLPrivilegeUtils {
 
     public static Match actionNameToMatch(String actionName,
             String applicationName) {
-        if (actionName == null | actionName.length() == 0) {
+        if (actionName == null || actionName.length() == 0) {
             return null;
         }
 
@@ -687,7 +688,7 @@ public class XACMLPrivilegeUtils {
     }
 
     public static Match applicationNameToMatch(String applicationName) {
-        if (applicationName == null | applicationName.length() == 0) {
+        if (applicationName == null || applicationName.length() == 0) {
             return null;
         }
 
