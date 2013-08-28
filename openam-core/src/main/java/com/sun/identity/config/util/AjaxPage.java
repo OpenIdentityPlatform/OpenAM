@@ -48,7 +48,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import org.apache.click.Page;
 import org.apache.click.control.ActionLink;
-import jp.co.osstech.regdom4j.RegDomain;
+import org.publicsuffix.PSS;
 
 
 public abstract class AjaxPage extends Page {
@@ -77,14 +77,6 @@ public abstract class AjaxPage extends Page {
     
     public String responseString = "true";
     public static Debug debug = Debug.getInstance("amConfigurator");
-    static protected RegDomain regdom = null;
-    static {
-        try {
-            regdom = new RegDomain();
-        } catch (IOException ioe) {
-            Debug.getInstance(SetupConstants.DEBUG_NAME).error("Unable to load public suffix database");
-        }
-    }
     
     public AjaxPage() {
     }
@@ -275,26 +267,25 @@ public abstract class AjaxPage extends Page {
     }
     
     public String getCookieDomain() {
-        String fqdn = getHostName();
-        if (regdom == null) {
+        String hostname = getHostName();
+
+        try {
+            PSS pss = new PSS();
+            int idx = pss.getEffectiveTLDLength(hostname);
+            int lastidx = hostname.lastIndexOf('.', idx - 1);
+            if (lastidx == -1) {
+                if (hostname.indexOf('.', idx + 1) != -1) {
+                    return "." + hostname;
+                } else {
+                    return "";
+                }
+            } else {
+                return hostname.substring(lastidx);
+            }
+        } catch (IOException ioe) {
+            debug.error("Unable to load public suffix database", ioe);
             return "";
         }
-        int index = fqdn.indexOf('.');
-        if (index < 0) {
-            return "." + fqdn;
-        }
-        String subDomain = fqdn.substring(index);
-        String registerdDomain = regdom.getRegisteredDomain(fqdn);
-        if(registerdDomain == null){
-            return null;
-        }
-        String minimumCookieDomain = "." + registerdDomain;
-        if(subDomain.length() > minimumCookieDomain.length()){
-            return subDomain;
-        }else{
-            return minimumCookieDomain;
-        }
-
     }
 
     public boolean validateInput() {
