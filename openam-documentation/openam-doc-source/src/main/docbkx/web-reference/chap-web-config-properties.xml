@@ -401,6 +401,12 @@
      <para>Set this to the user name of the agent authenticator.</para>
     </listitem>
    </varlistentry>
+   <varlistentry>
+          <term><literal>com.forgerock.agents.instance.id</literal></term>
+          <listitem>
+              <para>When there are multiple agents on a single system, set this to a unique numeric value.</para>
+          </listitem>
+   </varlistentry>
 <!--
       <varlistentry>
           <term><literal>com.forgerock.agents.config.cert.key.password</literal></term>

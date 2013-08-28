@@ -146,5 +146,28 @@ ServerName www.localhost.example:8080</programlisting>
     you observed.</para>
    </answer>
   </qandaentry>
+
+  <qandaentry xml:id="install-multiple-agents">
+    <question>
+       <para>I have multiple web servers on a single system, and want to protect each of them with a policy agent.</para>
+    </question>
+
+     <answer>
+       <para>Once both web policy agents are installed, navigate to the <filename>/path/to/Agent_00x</filename>
+       directory, and then open the <filename>OpenSSOAgentBootstrap.properties</filename> file. Near the
+       end of the file, you should see the following attribute:</para>
+
+       <screen>com.forgerock.agents.instance.id=</screen>
+
+       <para>Set that attribute to an appropriate unique value such as <literal>1</literal> or
+       <literal>2</literal>. Restart the web service that is being protected by the agent.
+       If successful, you should see related shared memory files, with time stamps updated for
+       the restarted web services. On a Linux system, you may see these files in the
+       <filename>/dev/shm</filename> directory. On a Solaris system, you may see these files
+       in the <filename>/tmp</filename> directory.</para>
+
+      </answer>
+     </qandaentry>
+
  </qandaset>
 </chapter>
