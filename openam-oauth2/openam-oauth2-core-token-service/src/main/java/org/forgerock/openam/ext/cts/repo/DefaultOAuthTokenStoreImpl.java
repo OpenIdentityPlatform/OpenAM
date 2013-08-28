@@ -86,7 +86,7 @@ public class DefaultOAuthTokenStoreImpl implements OAuth2TokenStore {
      * {@inheritDoc}
      */
     public CoreToken createAuthorizationCode(Set<String> scope, String realm, String uuid,
-            SessionClient client) {
+            SessionClient client, String nonce) {
         if (OAuth2Utils.DEBUG.messageEnabled()){
             OAuth2Utils.DEBUG.message("DefaultOAuthTokenStoreImpl::Creating Authorization code");
         }
@@ -94,7 +94,7 @@ public class DefaultOAuthTokenStoreImpl implements OAuth2TokenStore {
         String id = UUID.randomUUID().toString();
         long expiresIn = AUTHZ_CODE_LIFETIME;
 
-        final BearerToken code = new BearerToken(id, uuid, client, realm, scope, expiresIn, "false");
+        final BearerToken code = new BearerToken(id, uuid, client, realm, scope, expiresIn, "false", nonce);
 
         // Store in CTS
         try {

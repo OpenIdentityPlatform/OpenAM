@@ -60,7 +60,7 @@ public class BearerToken extends CoreToken {
      */
     public BearerToken(String id, String parent, String userID, SessionClient client,
                        String realm, Set<String> scope, long expireTime) {
-        super(id, userID, realm, expireTime, OAuth2Constants.Bearer.BEARER, OAuth2Constants.Token.OAUTH_ACCESS_TOKEN);
+        super(id, userID, realm, expireTime, OAuth2Constants.Bearer.BEARER, OAuth2Constants.Token.OAUTH_ACCESS_TOKEN, null);
         super.put(OAuth2Constants.CoreTokenParams.SCOPE, scope);
         super.put(OAuth2Constants.CoreTokenParams.CLIENT_ID, OAuth2Utils.stringToSet(client.getClientId()));
         super.put(OAuth2Constants.CoreTokenParams.REDIRECT_URI, OAuth2Utils.stringToSet(client.getRedirectUri()));
@@ -84,8 +84,8 @@ public class BearerToken extends CoreToken {
      *            The amount of time in seconds this token will expire in
      */
     public BearerToken(String id, String userID, SessionClient client,
-                       String realm, Set<String> scope, long expireTime, String issued) {
-        super(id, userID, realm, expireTime, OAuth2Constants.Bearer.BEARER, OAuth2Constants.Token.OAUTH_CODE_TYPE);
+                       String realm, Set<String> scope, long expireTime, String issued, String nonce) {
+        super(id, userID, realm, expireTime, OAuth2Constants.Bearer.BEARER, OAuth2Constants.Token.OAUTH_CODE_TYPE, nonce);
         super.put(OAuth2Constants.CoreTokenParams.SCOPE, scope);
         super.put(OAuth2Constants.CoreTokenParams.CLIENT_ID, OAuth2Utils.stringToSet(client.getClientId()));
         super.put(OAuth2Constants.CoreTokenParams.REDIRECT_URI, OAuth2Utils.stringToSet(client.getRedirectUri()));
@@ -113,7 +113,7 @@ public class BearerToken extends CoreToken {
      */
     public BearerToken(String id, String parent, String userID, SessionClient client,
                        String realm, Set<String> scope, long expireTime, String tokenType) {
-        super(id, userID, realm, expireTime, OAuth2Constants.Bearer.BEARER, tokenType);
+        super(id, userID, realm, expireTime, OAuth2Constants.Bearer.BEARER, tokenType, null);
         super.put(OAuth2Constants.CoreTokenParams.SCOPE, scope);
         super.put(OAuth2Constants.CoreTokenParams.CLIENT_ID, OAuth2Utils.stringToSet(client.getClientId()));
         super.put(OAuth2Constants.CoreTokenParams.REDIRECT_URI, OAuth2Utils.stringToSet(client.getRedirectUri()));
@@ -143,7 +143,7 @@ public class BearerToken extends CoreToken {
      */
     public BearerToken(String id, String parent, String userID, SessionClient client,
                        String realm, Set<String> scope, long expireTime, String refreshToken, String tokenType) {
-        super(id, userID, realm, expireTime, OAuth2Constants.Bearer.BEARER, tokenType);
+        super(id, userID, realm, expireTime, OAuth2Constants.Bearer.BEARER, tokenType, null);
         super.put(OAuth2Constants.CoreTokenParams.SCOPE, scope);
         super.put(OAuth2Constants.CoreTokenParams.CLIENT_ID, OAuth2Utils.stringToSet(client.getClientId()));
         super.put(OAuth2Constants.CoreTokenParams.REDIRECT_URI, OAuth2Utils.stringToSet(client.getRedirectUri()));

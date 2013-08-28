@@ -144,7 +144,7 @@ public class AbstractFlowTest {
         // Mock createAuthorizationCode
         when(
                 realm.getTokenStore().createAuthorizationCode(anySet(), anyString(), anyString(),
-                        any(SessionClient.class))).then(new Answer<AuthorizationCode>() {
+                        any(SessionClient.class), anyString())).then(new Answer<AuthorizationCode>() {
             @Override
             public AuthorizationCode answer(InvocationOnMock invocation) throws Throwable {
                 AuthorizationCode authorizationCode = mock(AuthorizationCode.class);

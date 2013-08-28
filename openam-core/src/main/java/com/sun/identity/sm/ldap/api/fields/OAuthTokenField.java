@@ -41,7 +41,8 @@ public enum OAuthTokenField {
     REALM(OAuth2Constants.CoreTokenParams.REALM, CoreTokenField.STRING_EIGHT),
     ID(OAuth2Constants.CoreTokenParams.ID, CoreTokenField.TOKEN_ID),
     CLIENT_ID(OAuth2Constants.CoreTokenParams.CLIENT_ID, CoreTokenField.STRING_NINE),
-    TOKEN_NAME(OAuth2Constants.CoreTokenParams.TOKEN_NAME, CoreTokenField.STRING_TEN);
+    TOKEN_NAME(OAuth2Constants.CoreTokenParams.TOKEN_NAME, CoreTokenField.STRING_TEN),
+    NONCE(OAuth2Constants.Custom.NONCE, CoreTokenField.STRING_ELEVEN);
 
     private final String oAuthField;
     private final CoreTokenField coreTokenField;

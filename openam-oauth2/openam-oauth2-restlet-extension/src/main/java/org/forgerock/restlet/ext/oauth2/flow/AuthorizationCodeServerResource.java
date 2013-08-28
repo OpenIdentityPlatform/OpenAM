@@ -117,7 +117,7 @@ public class AuthorizationCodeServerResource extends AbstractFlow {
 
             //execute post token creation pre return scope plugin for extra return data.
             Map<String, String> data = new HashMap<String, String>();
-            String nonce = OAuth2Utils.getRequestParameter(getRequest(), OAuth2Constants.Custom.NONCE, String.class);
+            String nonce = code.getNonce();
             data.put(OAuth2Constants.Custom.NONCE, nonce);
             data.put(OAuth2Constants.Custom.SSO_TOKEN_ID, getRequest().getCookies().getValues(
                     SystemProperties.get("com.iplanet.am.cookie.name")));

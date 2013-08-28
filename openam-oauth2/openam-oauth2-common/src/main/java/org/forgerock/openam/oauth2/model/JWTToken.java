@@ -266,7 +266,7 @@ public class JWTToken extends CoreToken implements Token {
      * Adds the request nonce to the JWT
      * @param nonce
      */
-    private void setNonce(String nonce){
+    protected void setNonce(String nonce){
         if (nonce == null || nonce.isEmpty()){
             return;
         }

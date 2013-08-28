@@ -42,7 +42,8 @@ public class CoreToken extends JsonValue implements Token {
 
     }
 
-    public CoreToken(String id, String userName, String realm, long expireTime, String tokenType, String tokenName){
+    public CoreToken(String id, String userName, String realm, long expireTime, String tokenType, String tokenName,
+                     String nonce){
         super(new HashMap<String, Object>());
         setTokenID(id);
         setUserName(userName);
@@ -50,6 +51,7 @@ public class CoreToken extends JsonValue implements Token {
         setExpireTime(expireTime);
         setTokenType(tokenType);
         setTokenName(tokenName);
+        setNonce(nonce);
     }
 
     /**
@@ -95,6 +97,10 @@ public class CoreToken extends JsonValue implements Token {
         this.put(OAuth2Constants.CoreTokenParams.EXPIRE_TIME, OAuth2Utils.stringToSet(String.valueOf((expireTime * 1000) + System.currentTimeMillis())));
     }
 
+    protected void setNonce(String nonce){
+        this.put(OAuth2Constants.Custom.NONCE, OAuth2Utils.stringToSet(nonce));
+    }
+
     protected void setTokenType(String tokenType) {
         this.put(OAuth2Constants.CoreTokenParams.TOKEN_TYPE, OAuth2Utils.stringToSet(tokenType));
     }
@@ -115,6 +121,14 @@ public class CoreToken extends JsonValue implements Token {
                 id = val.asString();
                 return val.asString();
             }
+        }
+        return null;
+    }
+
+    public String getNonce(){
+        Set<String> value = this.getParameter(OAuth2Constants.Custom.NONCE);
+        if (value != null && !value.isEmpty()){
+            return value.iterator().next();
         }
         return null;
     }

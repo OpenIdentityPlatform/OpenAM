@@ -155,6 +155,9 @@ public class OAuthAdapter implements TokenAdapter<JsonValue> {
      * was not an instance of a Map.
      */
     public JsonValue fromToken(Token token) {
+        if (token == null){
+            return null;
+        }
         String data = blobUtils.getBlobAsString(token);
         
         JsonValue r;

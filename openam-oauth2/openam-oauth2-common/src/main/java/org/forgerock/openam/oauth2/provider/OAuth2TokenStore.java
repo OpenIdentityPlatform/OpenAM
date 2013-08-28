@@ -53,7 +53,7 @@ public interface OAuth2TokenStore {
      * 
      */
     public CoreToken createAuthorizationCode(Set<String> scopes, String realm, String uuid,
-            SessionClient client) throws OAuthProblemException;
+            SessionClient client, String nonce) throws OAuthProblemException;
 
     /**
      * Updates an authorization code.
