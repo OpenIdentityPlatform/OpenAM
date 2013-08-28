@@ -42,22 +42,15 @@ import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
 import org.apache.click.control.ActionLink;
-import org.publicsuffix.PSS;
 
 public class Step2 extends AjaxPage {
     public ActionLink validateConfigDirLink = 
         new ActionLink("validateConfigDir", this, "validateConfigDir");
     public ActionLink validateCookieDomainLink = 
         new ActionLink("validateCookieDomain", this, "validateCookieDomain");
-    private PSS publicSuffixies = null;
-    
+
     public Step2() {
-        try {
-            publicSuffixies = new PSS();
-        } catch (IOException ioe) {
-            Debug.getInstance(SetupConstants.DEBUG_NAME).error(
-                    "Unable to load public suffix database");
-        }   
+
     }
     
     @Override
@@ -184,12 +177,22 @@ public class Step2 extends AjaxPage {
         if (serverUrl == null || domain == null) {
             return false;
         }
-        
-        return !serverUrl.contains(domain);
+
+        URL url = null;
+        try {
+            url = new URL(serverUrl);
+        } catch (MalformedURLException mue) {
+            return false;
+        }
+        if (url == null) {
+            return false;
+        }
+        String dotFqdn = "." + url.getHost();
+        return !dotFqdn.endsWith(domain);
     }
     
     private boolean invalidCookieDomain(String serverUrl, String domain) {
-        if (publicSuffixies == null) {
+        if (regdom == null) {
             return false;
         }
         
@@ -205,24 +208,19 @@ public class Step2 extends AjaxPage {
             return false;
         }
         
-        if (url != null) {
-            String tld = getTLDFromFQDN(url.getHost());
-            
-            if (domain.equals(tld)) {
-                return true;
-            }
+        if (url == null) {
+            return false;
         }
-        
-        return false;
-    }
-    
-    private String getTLDFromFQDN(String fqdn) {        
-        if (publicSuffixies == null) {
-            return null;
+
+        String registeredDomain = regdom.getRegisteredDomain(url.getHost());
+        if (registeredDomain == null) {
+            return false;
         }
-        
-        int tldLength = publicSuffixies.getEffectiveTLDLength(fqdn);
-        return fqdn.substring(tldLength); 
+        String minimumDomainCookie = "." + registeredDomain;
+        if (domain.equals(registeredDomain) || domain.endsWith(minimumDomainCookie)) {
+            return false;
+        }
+        return true;
     }
 
     private String getServerURL() {        

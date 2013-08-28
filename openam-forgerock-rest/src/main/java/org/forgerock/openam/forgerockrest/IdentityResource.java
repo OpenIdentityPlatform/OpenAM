@@ -834,7 +834,7 @@ public final class IdentityResource implements CollectionResourceProvider {
     private JsonValue identityDetailsToJsonValue(IdentityDetails details) {
         JsonValue result = new JsonValue(new LinkedHashMap<String, Object>(1));
         try {
-            result.put("name", details.getName());
+            result.put("username", details.getName());
             result.put("realm", details.getRealm());
             Attribute[] attrs = details.getAttributes();
 
@@ -861,7 +861,7 @@ public final class IdentityResource implements CollectionResourceProvider {
         try {
             identity.setType(userType); //set type ex. user
             identity.setRealm(realm); //set realm
-            identity.setName(jVal.get("name").asString());//set name from JsonValue object
+            identity.setName(jVal.get("username").asString());//set name from JsonValue object
 
             try {
                 for (String s : jVal.keys()) {
