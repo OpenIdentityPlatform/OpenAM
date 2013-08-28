@@ -24,10 +24,7 @@
  *
  * $Id: URLResourceName.java,v 1.5 2009/05/07 19:02:15 dillidorai Exp $
  *
- */
-
-/*
- * Portions Copyrighted [2011] [ForgeRock AS]
+ * Portions Copyrighted 2011-2013 ForgeRock AS
  */
 package com.sun.identity.policy.plugins;
 
@@ -35,8 +32,8 @@ import java.util.StringTokenizer;
 import java.util.Comparator;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.net.URL;
-import java.net.MalformedURLException;
+import java.util.regex.Pattern;
+
 import com.sun.identity.shared.debug.Debug;
 import com.sun.identity.policy.PolicyManager;
 import com.sun.identity.policy.PolicyException;
@@ -59,6 +56,13 @@ public class URLResourceName
     private static final String SECURE_WEB_PROTOCOL = "https";
     private static final String DEFAULT_PORT = "80";
     private static final String SECURE_PORT = "443";
+    private static final Pattern ACCEPTABLE_URLS;
+
+    static {
+        // This resource name implementation only concerns
+        // itself with URLs that start with http(*) or https(*).
+        ACCEPTABLE_URLS = Pattern.compile("^(http|https)\\**://.*$");
+    }
 
     /**
      * This method is used to canonicalize a url string.
@@ -82,11 +86,11 @@ public class URLResourceName
          * to validate the wildcard usage and
          * remove extra delimiters.
          */
-        if ((!urlStr.startsWith(DEFAULT_WEB_PROTOCOL + "://")) 
-             && (!urlStr.startsWith(SECURE_WEB_PROTOCOL + "://"))) {
+        if (!ACCEPTABLE_URLS.matcher(urlStr).matches()) {
             return super.canonicalize(urlStr);
         }
-        int index = urlStr.indexOf("://"); 
+
+        int index = urlStr.indexOf("://");
         String proto = urlStr.substring(0, index);
         String resource = urlStr.substring(index + 3); // host.sample.com...
 
@@ -110,6 +114,7 @@ public class URLResourceName
         }
         String hostName = "";
         String port = "";
+        String query = null;
         if (resource != null && resource.length() != 0) {
             index = resource.indexOf('/');
             if (index == -1) {
@@ -126,28 +131,22 @@ public class URLResourceName
                 port = hostAndPort.substring(index + 1);
                 validatePort(port);
             }
+            index = urlPath.indexOf('?');
+            if (index != -1) {
+                query = urlPath.substring(index + 1);
+            }
 
-            /* there is no port specified in the url, add default port
-             * based on the url protocol.
-             */
+            // If no port has been specified set a default port value based on the protocol.
+            // Should the protocol contain a wildcard, set the port to be a wildcard also.
             if ( port.length() == 0) {
                 if (proto.equals(DEFAULT_WEB_PROTOCOL)) {
                     port = DEFAULT_PORT;
-                } else {
+                } else if (proto.equals(SECURE_WEB_PROTOCOL)) {
                     port = SECURE_PORT;
+                } else {
+                    port = wildcard;
                 }
             }
-        }
-        // construct a new url based on the url but without port    
-        String newUrl = proto + "://" + hostName + urlPath;
-
-        // validate the new url with java.net.URL
-
-        URL url = null;
-        try {
-            url = new URL(newUrl);
-        } catch (MalformedURLException me) {
-            throw (new PolicyException(me));
         }
 
         StringBuilder sb = new StringBuilder(100);
@@ -159,7 +158,6 @@ public class URLResourceName
             sb.append(port);
         }
 
-        String query = url.getQuery();
         if (debug.messageEnabled()) {
             debug.message("URLResourceName: url query=" + query);
         }
@@ -216,7 +214,6 @@ public class URLResourceName
      * @param o2 a url query parameter to be compared  
      * @return -1 if o1 < o2; 0 if o1 = o2; 1 if o1 > o2
      */
-
     public int compare(Object o1, Object o2)
     {
        String s1 = (String)o1; 

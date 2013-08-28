@@ -11,9 +11,9 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2013 ForgeRock AS.
+ * Copyright 2013 ForgeRock Inc.
  */
-package com.sun.identity.entitlement;
+package com.sun.identity.shared.whitelist;
 
 import org.fest.assertions.ComparisonFailureFactory;
 import org.testng.annotations.BeforeMethod;

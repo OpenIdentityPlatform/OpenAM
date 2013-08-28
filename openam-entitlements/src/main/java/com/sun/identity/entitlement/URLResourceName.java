@@ -32,9 +32,8 @@ import java.util.StringTokenizer;
 import java.util.Comparator;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.net.URL;
-import java.net.MalformedURLException;
 import java.util.Map;
+import java.util.regex.Pattern;
 
 /**
  * This plugin extends the functionality provided in
@@ -52,6 +51,13 @@ public class URLResourceName
     private static final String SECURE_WEB_PROTOCOL = "https";
     private static final String DEFAULT_PORT = "80";
     private static final String SECURE_PORT = "443";
+    private static final Pattern ACCEPTABLE_URLS;
+
+    static {
+        // This resource name implementation only concerns
+        // itself with URLs that start with http(*) or https(*).
+        ACCEPTABLE_URLS = Pattern.compile("^(http|https)\\**://.*$");
+    }
 
     @Override
     public void initialize(Map configParams) {
@@ -80,12 +86,11 @@ public class URLResourceName
          * to validate the wildcard usage and
          * remove extra delimiters.
          */
-        if ((!urlStr.startsWith(DEFAULT_WEB_PROTOCOL + "://"))
-             && (!urlStr.startsWith(SECURE_WEB_PROTOCOL + "://"))) {
+        if (!ACCEPTABLE_URLS.matcher(urlStr).matches()) {
             return super.canonicalize(urlStr);
         }
-        
-        int index = urlStr.indexOf("://"); 
+
+        int index = urlStr.indexOf("://");
         String proto = urlStr.substring(0, index);
         String resource = urlStr.substring(index + 3); // host.sample.com...
 
@@ -105,14 +110,15 @@ public class URLResourceName
             while (j < len) {
                 newchars[i++] = oldchars[j++];
             }
-            resource =  String.valueOf(newchars, 0, i);         
+            resource = String.valueOf(newchars, 0, i);
         }
         String hostName = "";
         String port = "";
+        String query = null;
         if (resource != null && resource.length() != 0) {
             index = resource.indexOf('/');
             if (index == -1) {
-               index = resource.indexOf('?');
+                index = resource.indexOf('?');
             }
             if (index != -1) {
                 hostAndPort = resource.substring(0, index);
@@ -125,29 +131,22 @@ public class URLResourceName
                 port = hostAndPort.substring(index + 1);
                 validatePort(port);
             }
+            index = urlPath.indexOf('?');
+            if (index != -1) {
+                query = urlPath.substring(index + 1);
+            }
 
-            /* there is no port specified in the url, add default port
-             * based on the url protocol.
-             */
-            if ( port.length() == 0) {
+            // If no port has been specified set a default port value based on the protocol.
+            // Should the protocol contain a wildcard, set the port to be a wildcard also.
+            if (port.length() == 0) {
                 if (proto.equals(DEFAULT_WEB_PROTOCOL)) {
                     port = DEFAULT_PORT;
-                } else {
+                } else if (proto.equals(SECURE_WEB_PROTOCOL)) {
                     port = SECURE_PORT;
+                } else {
+                    port = wildcard;
                 }
             }
-        }
-        // construct a new url based on the url but without port    
-        String newUrl = proto + "://" + hostName + urlPath;
-
-        // validate the new url with java.net.URL
-
-        URL url = null;
-        try {
-            url = new URL(newUrl);
-        } catch (MalformedURLException me) {
-            Object[] param = {newUrl};
-            throw new EntitlementException(302, param);
         }
 
         StringBuilder sb = new StringBuilder(100);
@@ -159,23 +158,21 @@ public class URLResourceName
             sb.append(port);
         }
 
-        String query = url.getQuery();
-        
         if (query != null) {
-            int indexQuery = urlPath.lastIndexOf(query); 
+            int indexQuery = urlPath.lastIndexOf(query);
             String prefix = super.canonicalize(
-                urlPath.substring(0, indexQuery - 1));
+                    urlPath.substring(0, indexQuery - 1));
             sb.append(prefix);
             sb.append('?');
             // check if there are more than one query parameters
             int indexAmp = query.indexOf(QUERY_PARAMETER_DELIMITER);
             if (indexAmp != -1) {
                 // there are more than query parameters in the url
-                String suffix= urlPath.substring(
-                                   indexQuery + query.length());
+                String suffix = urlPath.substring(
+                        indexQuery + query.length());
                 ArrayList al = new ArrayList();
-                StringTokenizer st = new StringTokenizer(query, 
-                                        QUERY_PARAMETER_DELIMITER);
+                StringTokenizer st = new StringTokenizer(query,
+                        QUERY_PARAMETER_DELIMITER);
                 while (st.hasMoreTokens()) {
                     al.add(st.nextToken());
                 }
@@ -185,11 +182,11 @@ public class URLResourceName
                 int size = al.size();
                 // reconstruct the url in canonicalized form
                 for (int i = 0; i < size; i++) {
-                   if (i < (size-1)) {
-                        sb.append((String) al.get(i)).append(QUERY_PARAMETER_DELIMITER);
-                   } else {
-                       sb.append((String)al.get(i));
-                   }
+                    if (i < (size - 1)) {
+                        sb.append((String)al.get(i)).append(QUERY_PARAMETER_DELIMITER);
+                    } else {
+                        sb.append((String)al.get(i));
+                    }
                 }
                 sb.append(suffix);
             } else {
@@ -198,9 +195,9 @@ public class URLResourceName
             }
         } else {
             // there is no query string in the url
-            sb.append(super.canonicalize(urlPath)); 
+            sb.append(super.canonicalize(urlPath));
         }
-            
+
         return sb.toString();
     }
 
