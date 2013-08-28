@@ -19,6 +19,7 @@ import com.sun.identity.sm.ldap.api.CoreTokenConstants;
 import com.sun.identity.sm.ldap.exceptions.QueryFailedException;
 import com.sun.identity.sm.ldap.utils.TokenAttributeConversion;
 import org.forgerock.openam.sm.DataLayerConnectionFactory;
+import org.forgerock.openam.utils.IOUtils;
 import org.forgerock.opendj.ldap.Connection;
 import org.forgerock.opendj.ldap.Entry;
 import org.forgerock.opendj.ldap.ErrorResultException;
@@ -102,9 +103,7 @@ public class LDAPSearchHandler {
         } catch (ErrorResultException e) {
             throw new QueryFailedException(connection, constants.getTokenDN(), filter, e);
         } finally {
-            if (connection != null) {
-                connection.close();
-            }
+            IOUtils.closeIfNotNull(connection);
         }
         return entries;
     }

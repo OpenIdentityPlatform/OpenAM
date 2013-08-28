@@ -17,7 +17,6 @@ package com.sun.identity.sm.ldap.utils;
 
 import com.iplanet.dpro.session.service.SessionService;
 import com.sun.identity.shared.debug.Debug;
-import com.sun.identity.sm.ldap.api.CoreTokenConstants;
 import org.codehaus.jackson.annotate.JsonAutoDetect;
 import org.codehaus.jackson.map.DeserializationConfig;
 import org.codehaus.jackson.map.ObjectMapper;
@@ -83,17 +82,6 @@ public class JSONSerialisation {
      * @return Non null JSON text.
      */
     public <T> String serialise(T object) {
-        if (DEBUG != null && DEBUG.messageEnabled()) {
-            DEBUG.message(MessageFormat.format(
-                    CoreTokenConstants.DEBUG_HEADER +
-                    "Serialising:\n" +
-                    "Class: {0}:\n" +
-                    "{1}",
-                    object.getClass().getSimpleName(),
-                    object
-            ));
-        }
-
         try {
             String value = mapper.writeValueAsString(object);
             return value;
@@ -116,14 +104,6 @@ public class JSONSerialisation {
      * @return Non null object of type T.
      */
     public <T> T deserialise(String text, Class<T> clazz) {
-        if (DEBUG != null && DEBUG.messageEnabled()) {
-            DEBUG.message(MessageFormat.format(
-                    CoreTokenConstants.DEBUG_HEADER +
-                    "Deserialsiaing:\n" +
-                    "Class: {0}",
-                    clazz.getSimpleName()
-            ));
-        }
         try {
             T value = mapper.readValue(text, clazz);
             return value;

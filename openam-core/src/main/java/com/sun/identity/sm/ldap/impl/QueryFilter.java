@@ -16,7 +16,6 @@
 package com.sun.identity.sm.ldap.impl;
 
 import com.google.inject.Inject;
-import com.sun.identity.sm.ldap.api.CoreTokenConstants;
 import com.sun.identity.sm.ldap.api.fields.CoreTokenField;
 import com.sun.identity.sm.ldap.api.fields.CoreTokenFieldTypes;
 import com.sun.identity.sm.ldap.utils.LDAPDataConversion;
@@ -38,7 +37,7 @@ import java.util.LinkedList;
  * @author robert.wapshott@forgerock.com
  */
 public class QueryFilter {
-    private LDAPDataConversion dataConversion;
+    private final LDAPDataConversion dataConversion;
 
     @Inject
     public QueryFilter(LDAPDataConversion dataConversion) {
@@ -60,18 +59,6 @@ public class QueryFilter {
 
         public QueryFilterBuilder(boolean and) {
             this.and = and;
-            filters.add(Filter.equality(CoreTokenConstants.OBJECT_CLASS, CoreTokenConstants.FR_CORE_TOKEN));
-        }
-
-        /**
-         * A ldapFilter that will only return tokens with a matching token id.
-         *
-         * @param tokenId Token Id to ldapFilter against.
-         * @return The QueryBuilder for subsequent calls.
-         */
-        public QueryFilterBuilder tokenId(String tokenId) {
-            attribute(CoreTokenField.TOKEN_ID, tokenId);
-            return this;
         }
 
         /**

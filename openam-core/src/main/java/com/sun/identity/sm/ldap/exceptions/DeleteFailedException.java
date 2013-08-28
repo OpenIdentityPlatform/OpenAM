@@ -15,9 +15,8 @@
  */
 package com.sun.identity.sm.ldap.exceptions;
 
-import com.sun.identity.sm.ldap.impl.QueryBuilder;
 import com.sun.identity.sm.ldap.api.CoreTokenConstants;
-import org.forgerock.opendj.ldap.DN;
+import com.sun.identity.sm.ldap.impl.QueryBuilder;
 
 import java.text.MessageFormat;
 
@@ -27,12 +26,12 @@ import java.text.MessageFormat;
  * @author robert.wapshott@forgerock.com
  */
 public class DeleteFailedException extends CoreTokenException {
-    public DeleteFailedException(DN dn, Throwable e) {
+    public DeleteFailedException(String tokenId, Throwable e) {
         super(MessageFormat.format(
                     "\n" +
                     CoreTokenConstants.DEBUG_HEADER +
                     "Failed to delete DN: {0}",
-                    dn),
+                    tokenId),
                 e);
     }
 

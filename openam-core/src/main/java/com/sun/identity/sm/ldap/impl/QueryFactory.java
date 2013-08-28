@@ -15,6 +15,7 @@
  */
 package com.sun.identity.sm.ldap.impl;
 
+import com.google.inject.Inject;
 import com.sun.identity.sm.ldap.api.CoreTokenConstants;
 import com.sun.identity.sm.ldap.utils.LDAPDataConversion;
 import com.sun.identity.sm.ldap.utils.TokenAttributeConversion;
@@ -27,20 +28,32 @@ import org.forgerock.openam.sm.DataLayerConnectionFactory;
  * @author robert.wapshott@forgerock.com
  */
 public class QueryFactory {
+    // Injected
+    private final CoreTokenConstants constants;
+    private final DataLayerConnectionFactory connectionFactory;
+
+    @Inject
+    public QueryFactory(CoreTokenConstants constants, DataLayerConnectionFactory connectionFactory) {
+        this.constants = constants;
+        this.connectionFactory = connectionFactory;
+    }
+
     /**
      * Generate an instance of the QueryBuilder.
      *
-     *
-     * @param connectionFactory The connectionFactory required for LDAP queries.
-     * @param constants The system constants required to perform the query.
      * @return A non null instance of the QueryBuilder.
      */
-    public QueryBuilder createInstance(DataLayerConnectionFactory connectionFactory, CoreTokenConstants constants) {
+    public QueryBuilder createInstance() {
         LDAPDataConversion conversion = new LDAPDataConversion();
         TokenAttributeConversion attributeConversion = new TokenAttributeConversion(constants, conversion);
         return new QueryBuilder(connectionFactory, attributeConversion, constants);
     }
 
+    /**
+     * Generate an instance of the QueryFilter for use with the QueryBuilder.
+     *
+     * @return A non null QueryFilter instance.
+     */
     public QueryFilter createFilter() {
         return new QueryFilter(new LDAPDataConversion());
     }

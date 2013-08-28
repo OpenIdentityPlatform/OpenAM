@@ -28,12 +28,14 @@ import com.sun.identity.common.ShutdownListener;
 import com.sun.identity.common.ShutdownManager;
 import com.sun.identity.security.AdminTokenAction;
 import com.sun.identity.sm.DNMapper;
+import com.sun.identity.sm.SMSEntry;
 import com.sun.identity.sm.ServiceManagementDAO;
 import com.sun.identity.sm.ServiceManagementDAOWrapper;
 import com.sun.identity.sm.ldap.CTSPersistentStore;
 import com.sun.identity.sm.ldap.CoreTokenConfig;
 import com.sun.identity.sm.ldap.adapters.OAuthAdapter;
 import com.sun.identity.sm.ldap.adapters.TokenAdapter;
+import com.sun.identity.sm.ldap.api.CoreTokenConstants;
 import org.forgerock.json.fluent.JsonValue;
 import org.forgerock.openam.entitlement.indextree.IndexChangeHandler;
 import org.forgerock.openam.entitlement.indextree.IndexChangeManager;
@@ -99,6 +101,11 @@ public class CoreGuiceModule extends AbstractModule {
                 return CoreTokenServiceFactory.getInstance();
             }
         });
+        bind(CoreTokenConstants.class).toProvider(new Provider<CoreTokenConstants>() {
+            public CoreTokenConstants get() {
+                return new CoreTokenConstants(SMSEntry.getRootSuffix());
+            }
+        }).in(Singleton.class);
 
         /**
          * Session related dependencies.

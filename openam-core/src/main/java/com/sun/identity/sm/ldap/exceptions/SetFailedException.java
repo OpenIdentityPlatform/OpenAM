@@ -39,4 +39,13 @@ public class SetFailedException extends CoreTokenException {
                     diff),
                 e);
     }
+
+    public SetFailedException(Token token, Throwable e) {
+        super(MessageFormat.format(
+                    "\n" +
+                    CoreTokenConstants.DEBUG_HEADER +
+                    "Failed to set Token:\n" +
+                    "{0}", token),
+                e);
+    }
 }

@@ -38,7 +38,7 @@ import com.sun.identity.sm.ldap.api.fields.CoreTokenFieldTypes;
 import com.sun.identity.sm.ldap.api.tokens.Token;
 import com.sun.identity.sm.ldap.exceptions.CoreTokenException;
 import com.sun.identity.sm.ldap.exceptions.DeleteFailedException;
-import com.sun.identity.sm.ldap.impl.CoreTokenLDAPAdapter;
+import com.sun.identity.sm.ldap.impl.CoreTokenAdapter;
 import com.sun.identity.sm.ldap.impl.QueryBuilder;
 import com.sun.identity.sm.ldap.impl.QueryFilter;
 import com.sun.identity.sm.ldap.utils.LDAPDataConversion;
@@ -46,7 +46,6 @@ import com.sun.identity.sm.ldap.utils.blob.TokenBlobStrategy;
 import com.sun.identity.sm.ldap.utils.blob.TokenStrategyFailedException;
 import com.sun.identity.tools.objects.MapFormat;
 import org.forgerock.openam.guice.InjectorHolder;
-import org.forgerock.openam.sm.DataLayerConnectionFactory;
 import org.forgerock.opendj.ldap.Attribute;
 import org.forgerock.opendj.ldap.Entry;
 import org.forgerock.opendj.ldap.Filter;
@@ -88,11 +87,10 @@ public class CTSPersistentStore extends GeneralTaskRunnable {
     private static volatile CTSPersistentStore instance = null;
 
     private static Thread storeThread;
-    private CoreTokenLDAPAdapter adapter = null;
     private final CoreTokenConfig coreTokenConfig;
     private final LDAPDataConversion dataConversion;
     private final TokenBlobStrategy strategy;
-    private final DataLayerConnectionFactory connectionFactory;
+    private final CoreTokenAdapter adapter;
 
     /**
      * Globals private Constants, so not to pollute entire product.
@@ -183,11 +181,11 @@ public class CTSPersistentStore extends GeneralTaskRunnable {
      */
     @Inject
     public CTSPersistentStore(CoreTokenConfig coreTokenConfig, LDAPDataConversion dataConversion,
-                              DataLayerConnectionFactory connectionFactory, TokenBlobStrategy strategy) {
+                              TokenBlobStrategy strategy, CoreTokenAdapter adapter) {
         this.coreTokenConfig = coreTokenConfig;
         this.dataConversion = dataConversion;
         this.strategy = strategy;
-        this.connectionFactory = connectionFactory;
+        this.adapter = adapter;
         this.DEBUG = SessionService.sessionDebug;
     }
 
@@ -204,8 +202,8 @@ public class CTSPersistentStore extends GeneralTaskRunnable {
                 instance = new CTSPersistentStore(
                         InjectorHolder.getInstance(CoreTokenConfig.class),
                         InjectorHolder.getInstance(LDAPDataConversion.class),
-                        InjectorHolder.getInstance(DataLayerConnectionFactory.class),
-                        InjectorHolder.getInstance(TokenBlobStrategy.class));
+                        InjectorHolder.getInstance(TokenBlobStrategy.class),
+                        InjectorHolder.getInstance(CoreTokenAdapter.class));
 
                 // Proceed With Initialization of Service.
                 try {
@@ -295,26 +293,6 @@ public class CTSPersistentStore extends GeneralTaskRunnable {
     }
 
     /**
-     * Provides an instance of the CoreTokenAdapter the first time this function is called.
-     * Otherwise returns the same instance for all subsequent calls.
-     *
-     * @return Non null instance of the CoreTokenAdapter.
-     * @throws IllegalStateException If the connection to the LDAP database could not be established.
-     */
-    private CoreTokenLDAPAdapter getAdapter() {
-        if (adapter == null) {
-            synchronized (this) {
-                if (adapter == null) {
-                    LDAPDataConversion conversion = new LDAPDataConversion();
-                    CoreTokenConstants constants = new CoreTokenConstants(SMSEntry.getRootSuffix());
-                    adapter = new CoreTokenLDAPAdapter(connectionFactory, conversion, constants);
-                }
-            }
-        }
-        return adapter;
-    }
-
-    /**
      * Create a Token in the persistent store. If the Token already exists in the store then this
      * function will throw a CoreTokenException. Instead it is recommended to use the update function.
      *
@@ -330,7 +308,7 @@ public class CTSPersistentStore extends GeneralTaskRunnable {
         } catch (TokenStrategyFailedException e) {
             throw new CoreTokenException("Failed to perform Token Blob strategy.", e);
         }
-        getAdapter().create(token);
+        adapter.create(token);
     }
 
     /**
@@ -341,7 +319,7 @@ public class CTSPersistentStore extends GeneralTaskRunnable {
      * @throws CoreTokenException If there was a non-recoverable error during the operation.
      */
     public Token read(String tokenId) throws CoreTokenException {
-        Token token = getAdapter().read(tokenId);
+        Token token = adapter.read(tokenId);
         try {
             strategy.reverse(token);
         } catch (TokenStrategyFailedException e) {
@@ -369,7 +347,7 @@ public class CTSPersistentStore extends GeneralTaskRunnable {
             throw new CoreTokenException("Failed to perform Token Blob strategy.", e);
         }
 
-        getAdapter().update(token);
+        adapter.updateOrCreate(token);
 
         if (DEBUG.messageEnabled()) {
             DEBUG.message(MessageFormat.format(
@@ -399,7 +377,7 @@ public class CTSPersistentStore extends GeneralTaskRunnable {
      * @throws CoreTokenException If there was a non-recoverable error during the operation.
      */
     public void delete(String tokenId) throws DeleteFailedException {
-        getAdapter().delete(tokenId);
+        adapter.delete(tokenId);
         if (DEBUG.messageEnabled()) {
             DEBUG.message(MessageFormat.format(
                     CoreTokenConstants.DEBUG_HEADER +
@@ -422,14 +400,14 @@ public class CTSPersistentStore extends GeneralTaskRunnable {
      * @throws DeleteFailedException If the delete failed for any reason.
      */
     public int delete(Map<CoreTokenField, Object> query) throws DeleteFailedException {
-        QueryFilter.QueryFilterBuilder queryFilter = getAdapter().buildFilter().and();
+        QueryFilter.QueryFilterBuilder queryFilter = adapter.buildFilter().and();
         for (Map.Entry<CoreTokenField, Object> entry : query.entrySet()) {
             CoreTokenField key = entry.getKey();
             Object value = entry.getValue();
             queryFilter = queryFilter.attribute(key, value);
         }
 
-        QueryBuilder builder = getAdapter()
+        QueryBuilder builder = adapter
                 .query()
                 .withFilter(queryFilter.build())
                 .returnTheseAttributes(CoreTokenField.TOKEN_ID);
@@ -440,7 +418,7 @@ public class CTSPersistentStore extends GeneralTaskRunnable {
             for (Entry entry : entries) {
                 Attribute attribute = entry.getAttribute(CoreTokenField.TOKEN_ID.toString());
                 String tokenId = attribute.firstValueAsString();
-                getAdapter().delete(tokenId);
+                adapter.delete(tokenId);
             }
             if (DEBUG.messageEnabled()) {
                 DEBUG.message(MessageFormat.format(
@@ -468,8 +446,8 @@ public class CTSPersistentStore extends GeneralTaskRunnable {
         // Verify all types are safe to cast.
         CoreTokenFieldTypes.validateTypes(query);
 
-        QueryBuilder builder = getAdapter().query();
-        QueryFilter.QueryFilterBuilder filterBuilder = getAdapter().buildFilter().and();
+        QueryBuilder builder = adapter.query();
+        QueryFilter.QueryFilterBuilder filterBuilder = adapter.buildFilter().and();
 
         for (Map.Entry<CoreTokenField, Object> entry : query.entrySet()) {
             CoreTokenField key = entry.getKey();
@@ -502,7 +480,7 @@ public class CTSPersistentStore extends GeneralTaskRunnable {
      * @throws CoreTokenException If there was an unrecoverable error.
      */
     public Collection<Token> list(Filter filter) throws CoreTokenException {
-        Collection<Token> tokens = getAdapter().query().withFilter(filter).execute();
+        Collection<Token> tokens = adapter.query().withFilter(filter).execute();
         decryptTokens(tokens);
         return tokens;
     }
@@ -620,8 +598,8 @@ public class CTSPersistentStore extends GeneralTaskRunnable {
      */
     public Map<String, Long> getTokensByUUID(String uuid) throws CoreTokenException {
         Collection<Entry> entries;
-        Filter filter = getAdapter().buildFilter().and().userId(uuid).build();
-        entries = getAdapter().query()
+        Filter filter = adapter.buildFilter().and().userId(uuid).build();
+        entries = adapter.query()
                 .withFilter(filter)
                 .returnTheseAttributes(CoreTokenField.TOKEN_ID, CoreTokenField.EXPIRY_DATE)
                 .executeRawResults();
@@ -742,8 +720,8 @@ public class CTSPersistentStore extends GeneralTaskRunnable {
     private boolean deleteExpired() throws CoreTokenException {
         Calendar nowTimestamp = Calendar.getInstance();
 
-        Filter filter = getAdapter().buildFilter().and().beforeDate(nowTimestamp).build();
-        Collection<Entry> entries = getAdapter().query()
+        Filter filter = adapter.buildFilter().and().beforeDate(nowTimestamp).build();
+        Collection<Entry> entries = adapter.query()
                 .withFilter(filter)
                 .limitResultsTo(coreTokenConfig.getExpiredSessionsSearchLimit())
                 .returnTheseAttributes(CoreTokenField.TOKEN_ID)

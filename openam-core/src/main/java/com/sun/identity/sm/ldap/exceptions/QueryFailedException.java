@@ -28,6 +28,14 @@ import java.text.MessageFormat;
  * @author robert.wapshott@forgerock.com
  */
 public class QueryFailedException extends CoreTokenException {
+    /**
+     * Creates a formatted exception based on the values provided.
+     *
+     * @param connection Connection used to make the query.
+     * @param dn May be null. DN which was used in the query.
+     * @param filter May be null. Filter used in query.
+     * @param e Reason for the exception.
+     */
     public QueryFailedException(Connection connection, DN dn, Filter filter, Throwable e) {
         super(MessageFormat.format(
                     "\n" +

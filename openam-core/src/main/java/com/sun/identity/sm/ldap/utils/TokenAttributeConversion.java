@@ -15,6 +15,7 @@
  */
 package com.sun.identity.sm.ldap.utils;
 
+import com.google.inject.Inject;
 import com.sun.identity.sm.ldap.api.CoreTokenConstants;
 import com.sun.identity.sm.ldap.api.TokenType;
 import com.sun.identity.sm.ldap.api.fields.CoreTokenField;
@@ -50,9 +51,11 @@ public class TokenAttributeConversion {
      */
     static final String EMPTY = "-empty-";
 
-    private CoreTokenConstants constants;
-    private LDAPDataConversion conversion;
+    // Injected
+    private final CoreTokenConstants constants;
+    private final LDAPDataConversion conversion;
 
+    @Inject
     public TokenAttributeConversion(CoreTokenConstants constants, LDAPDataConversion conversion) {
         this.constants = constants;
         this.conversion = conversion;
