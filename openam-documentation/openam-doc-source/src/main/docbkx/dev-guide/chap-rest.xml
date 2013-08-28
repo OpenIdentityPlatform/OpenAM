@@ -70,6 +70,12 @@
     <para><link linkend="rest-api-openid-connect">OpenID Connect 1.0</link></para>
    </listitem>
    <listitem>
+    <para><link linkend="rest-api-self-registration">User self-registration</link></para>
+   </listitem>
+   <listitem>
+    <para><link linkend="rest-api-password-reset">Resetting forgotten passwords</link></para>
+   </listitem>
+   <listitem>
     <para><link linkend="rest-api-logging">Logging</link></para>
    </listitem>
    <listitem>
@@ -1382,6 +1388,265 @@ $ curl --request POST --header "iplanetDirectoryPro: AQIC5wM...3MTYxOA..*"
   </section>
  </section>
 
+ <section xml:id="rest-api-self-registration">
+  <title>User Self-Registration</title>
+  <indexterm><primary>Self-registration</primary></indexterm>
+
+  <para>The OpenAM REST API for users provides an action for
+  self-registration.</para>
+
+  <para>The feature works by sending an email to the user in response to RESTful
+  HTTP POST requesting registration with an email address. When the user clicks
+  the link received by mail, an application intercepts the HTTP GET,
+  transforms the query string values into an HTTP POST to confirm the operation.
+  OpenAM responds to the application with a JSON object that the application
+  can further use to request creation of the user account to complete the
+  transaction.</para>
+
+  <orderedlist>
+   <para>An example follows, showing the steps in more detail.</para>
+
+   <listitem>
+    <para>Configure the Email Service and Rest Security.</para>
+
+    <para>In particular, you must configure the Email Service to send mail
+    to users who self-register, and you must enable self-registration in the
+    Rest Security service.</para>
+
+    <para>You can configure these globally in OpenAM Console at Configuration >
+    Global > Email Service for notifications and Configuration > Global >
+    Rest Security to allow self-registration.</para>
+
+    <para>Alternatively, you can configure them for an individual realm under
+    Access Control > <replaceable>Realm Name</replaceable> > Services.</para>
+   </listitem>
+
+   <listitem>
+    <para>Perform an HTTP POST on <literal>/json/users?_action=register</literal>
+    with the new user's mail.</para>
+
+    <para>Notice that authentication is not required.</para>
+
+    <screen>$ curl
+ --request POST --header "Content-Type: application/json"
+ --data '{"email":"newuser@example.com"}'
+ https://openam.example.com:8443/openam/json/users?_action=register
+{}</screen>
+
+    <para>On success, the response is an empty JSON object <literal>{}</literal>
+    as shown in the example.</para>
+   </listitem>
+
+   <listitem>
+    <para>The user receives an email message that includes a URL as in the
+    following example.</para>
+
+    <literallayout class="monospaced"
+    >https://openam.example.com:8443/openam/json/confirmation/register?confirmationId=P23PK5kyAgNdqeNJpAvq1ebcpcg=&amp;email=newuser@example.com&amp;tokenId=+8rWf5O8KG0rfz3Pa+WwDLkH9Ac=</literallayout>
+   </listitem>
+
+   <listitem>
+    <para>Intercept the HTTP GET request to this URL when the user clicks the
+    link.</para>
+
+    <para>Your application must use the confirmation link to construct an HTTP
+    POST to <literal>/json/users?_action=confirm</literal> from the query string
+    parameters as shown in the following example.</para>
+
+    <screen>$ curl --request POST --header "Content-Type: application/json"
+ --data '{"email":"newuser@example.com",
+     "tokenId":"+8rWf5O8KG0rfz3Pa+WwDLkH9Ac=",
+     "confirmationId":"P23PK5kyAgNdqeNJpAvq1ebcpcg="}'
+ https://openam.example.com:8443/openam/json/users?_action=confirm
+{
+    "email": "newuser@example.com",
+    "tokenId": "+8rWf5O8KG0rfz3Pa+WwDLkH9Ac=",
+    "confirmationId": "P23PK5kyAgNdqeNJpAvq1ebcpcg="
+}</screen>
+
+    <para>The response is a further confirmation that the account can be
+    created.</para>
+   </listitem>
+
+   <listitem>
+    <para>Using the confirmation, your application must make an authenticated
+    HTTP POST to <literal>/json/users?_action=anonymousCreate</literal> to
+    create the user as shown in the following example.</para>
+
+    <screen>$ curl --request POST --header "iPlanetDirectoryPro: AQIC5wM...3MTYxOA..*"
+ --header "Content-Type: application/json"
+ --data '{"email":"newuser@example.com",
+     "tokenId":"+8rWf5O8KG0rfz3Pa+WwDLkH9Ac=",
+     "confirmationId":"P23PK5kyAgNdqeNJpAvq1ebcpcg=",
+     "name":"newuser","userpassword":"password"}'
+ https://openam.example.com:8443/openam/json/users?_action=anonymousCreate
+{
+    "name": "mark",
+    "realm": "/",
+    "uid": [
+        "newuser"
+    ],
+    "mail": [
+        "newuser@example.com"
+    ],
+    "sn": [
+        "newuser"
+    ],
+    "userPassword": [
+        "{SSHA}dAiONYMxqFiNilXeLXUQoDpHlePYtiJcjYw8Dw=="
+    ],
+    "cn": [
+        "newuser"
+    ],
+    "inetUserStatus": [
+        "Active"
+    ],
+    "dn": [
+        "uid=newuser,ou=people,dc=openam,dc=forgerock,dc=org"
+    ],
+    "objectClass": [
+        "devicePrintProfilesContainer",
+        "person",
+        "sunIdentityServerLibertyPPService",
+        "inetorgperson",
+        "sunFederationManagerDataStore",
+        "iPlanetPreferences",
+        "iplanet-am-auth-configuration-service",
+        "organizationalperson",
+        "sunFMSAML2NameIdentifier",
+        "inetuser",
+        "forgerock-am-dashboard-service",
+        "iplanet-am-managed-person",
+        "iplanet-am-user-service",
+        "sunAMAuthAccountLockout",
+        "top"
+    ],
+    "universalid": [
+        "id=newuser,ou=user,dc=openam,dc=forgerock,dc=org"
+    ]
+}</screen>
+   </listitem>
+  </orderedlist>
+
+  <para>At this point the user is registered, active, and can authenticate
+  with OpenAM.</para>
+ </section>
+
+ <section xml:id="rest-api-password-reset">
+  <title>Resetting Forgotten Passwords</title>
+  <indexterm><primary>Password reset</primary></indexterm>
+
+  <para>The OpenAM REST API for users provides an action for handling forgotten
+  passwords as long as the user has a valid email address in their profile.</para>
+
+  <orderedlist>
+   <para>An example follows, showing the steps in more detail.</para>
+
+   <listitem>
+    <para>Configure the Email Service.</para>
+
+    <para>In particular, you must configure the Email Service to send mail
+    allowing the user to reset the forgotten password.</para>
+
+    <para>You can configure the service globally in OpenAM Console at
+    Configuration > Global > Email Service.</para>
+
+    <para>Alternatively, you can configure it for an individual realm under
+    Access Control > <replaceable>Realm Name</replaceable> > Services.</para>
+   </listitem>
+
+   <listitem>
+    <para>Perform an HTTP POST on <literal>/json/users?_action=forgotPassword</literal>
+    with the user's ID.</para>
+
+    <para>Notice that authentication is not required.</para>
+
+    <screen>curl --request POST --header "Content-Type: application/json"
+ --data '{"username":"demo"}'
+ https://openam.example.com:8443/openam/json/users?_action=forgotPassword
+{}</screen>
+
+    <para>On success, the response is an empty JSON object <literal>{}</literal>
+    as shown in the example.</para>
+   </listitem>
+
+   <listitem>
+    <para>OpenAM looks up the email address in the user profile, and sends an
+    email message that includes a URL as in the following example.</para>
+
+    <literallayout class="monospaced"
+    >https://openam.example.com:8443/openam/json/confirmation/forgotPassword?confirmationId=jrUZ3E7CK4UQJM5jnDHGNKH1UaQ=&amp;tokenId=M8cVqWqbKtCtpd/UqEAr0x25fxA=&amp;username=demo</literallayout>
+   </listitem>
+
+   <listitem>
+    <para>Intercept the HTTP GET request to this URL when the user clicks the
+    link.</para>
+
+    <para>Your application must use the confirmation link to construct an HTTP
+    POST to <literal>/json/users?_action=forgotPasswordReset</literal> from the
+    query string parameters as shown in the following example.</para>
+
+    <para>Your POST includes the new password as the value of the "userpassword"
+    field in the JSON payload.</para>
+
+    <screen>$ curl --request POST --header "Content-Type: application/json"
+ --data '{"username":"demo",
+     "userpassword":"password",
+     "tokenId":"M8cVqWqbKtCtpd/UqEAr0x25fxA=",
+     "confirmationId":"jrUZ3E7CK4UQJM5jnDHGNKH1UaQ="}'
+ https://openam.example.com:8443/openam/json/users?_action=forgotPasswordReset
+{
+    "name": "demo",
+    "realm": "/",
+    "uid": [
+        "demo"
+    ],
+    "mail": [
+        "demo@example.com"
+    ],
+    "sn": [
+        "demo"
+    ],
+    "userPassword": [
+        "{SSHA}zgeBu4yOAy1i9QAgnldMCzW8LWX36ViVj9leig=="
+    ],
+    "cn": [
+        "demo"
+    ],
+    "inetUserStatus": [
+        "Active"
+    ],
+    "objectClass": [
+        "devicePrintProfilesContainer",
+        "person",
+        "sunIdentityServerLibertyPPService",
+        "inetorgperson",
+        "sunFederationManagerDataStore",
+        "iPlanetPreferences",
+        "iplanet-am-auth-configuration-service",
+        "organizationalperson",
+        "sunFMSAML2NameIdentifier",
+        "inetuser",
+        "forgerock-am-dashboard-service",
+        "iplanet-am-managed-person",
+        "iplanet-am-user-service",
+        "sunAMAuthAccountLockout",
+        "top"
+    ],
+    "universalid": [
+        "id=demo,ou=user,dc=openam,dc=forgerock,dc=org"
+    ]
+}</screen>
+
+    <para>On success, the response is the JSON representation of the user
+    profile with the new password hashed according to the password storage
+    scheme for the identity repository.</para>
+   </listitem>
+  </orderedlist>
+
+  <para>At this point the user can authenticate with the new password.</para>
+ </section>
+
  <section xml:id="rest-api-logging">
   <title>Logging</title>
 
@@ -2236,7 +2501,7 @@ $ curl --request PUT --header "If-None-Match: *"
  --data '{"name":"myGroup","realm":"/",
     "uniquemember":["uid=demo,ou=people,dc=openam,dc=forgerock,dc=org"],
     "cn":["myGroup"],"description":["Updated the group"]}'
-    http://openam.example.com:8080/openam/json/groups/myGroup
+    https://openam.example.com:8443/openam/json/groups/myGroup
 {
     "name": "myGroup",
     "realm": "/",
