@@ -572,11 +572,6 @@
         </dependency>
 
         <dependency>
-            <groupId>org.forgerock.openam</groupId>
-            <artifactId>openam-oauth2-rest</artifactId>
-        </dependency>
-
-        <dependency>
             <groupId>org.freemarker</groupId>
             <artifactId>freemarker</artifactId>
         </dependency>

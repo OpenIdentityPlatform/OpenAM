@@ -610,11 +610,6 @@
             </dependency>
             <dependency>
                 <groupId>org.forgerock.openam</groupId>
-                <artifactId>openam-oauth2-rest</artifactId>
-                <version>${project.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.forgerock.openam</groupId>
                 <artifactId>openam-oauth2-restlet-extension</artifactId>
                 <version>${project.version}</version>
             </dependency>
