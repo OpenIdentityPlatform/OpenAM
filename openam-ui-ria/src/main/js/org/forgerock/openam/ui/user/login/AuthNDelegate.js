@@ -26,15 +26,16 @@
  * "Portions Copyrighted 2011-2013 ForgeRock Inc"
  */
 
-/*global document, $, define, _ */
+/*global document, $, define, _, window */
 
 define("org/forgerock/openam/ui/user/login/AuthNDelegate", [
     "org/forgerock/commons/ui/common/util/Constants",
     "org/forgerock/commons/ui/common/main/AbstractDelegate",
     "org/forgerock/commons/ui/common/main/Configuration",
     "org/forgerock/commons/ui/common/main/EventManager",
-    "org/forgerock/commons/ui/common/util/CookieHelper"
-], function(constants, AbstractDelegate, configuration, eventManager, cookieHelper) {
+    "org/forgerock/commons/ui/common/util/CookieHelper",
+    "org/forgerock/commons/ui/common/main/Router"
+], function(constants, AbstractDelegate, configuration, eventManager, cookieHelper, router) {
 
     var obj = new AbstractDelegate(constants.host + "/"+ constants.context + "/json/auth/1/authenticate"),
         requirementList = [],
@@ -111,7 +112,7 @@ define("org/forgerock/openam/ui/user/login/AuthNDelegate", [
                     // only resolve the auth promise when we know the cookie name
                     $.when(cookiePromise,cookieDomainsPromise).then(function () {
                         var tokenCookie = cookieHelper.getCookie(cookieName);
-                        if(configuration.loggedUser && tokenCookie){
+                        if(configuration.loggedUser && tokenCookie && window.location.hash.replace(/^#/, '').match(router.configuration.routes.login.url)){
                             requirements.tokenId = tokenCookie;
                         }
                         promise.resolve(requirements);
@@ -164,60 +165,60 @@ define("org/forgerock/openam/ui/user/login/AuthNDelegate", [
                 promise.reject(failedStage);
             };
             
-        obj.serviceCall({
-            type: "POST",
-            data: JSON.stringify(requirements),
-            url: "",
-            errorsHandlers: {
-                "unauthorized": { status: "401"},
-                "timeout": { status: "500" }
-            }
-        })
-        .then(processSucceeded,
-              function (jqXHR) {
-                var oldReqs,errorBody,currentStage = requirementList.length;
-                if (jqXHR.status === 500) {
-                    // we timed out, so let's try again with a fresh session
-                    oldReqs = requirementList[0];
-                    obj.resetProcess();
-                    obj.begin()
-                        .done(function (requirements) {
-                            
-                            obj.handleRequirements(requirements);
-                            
-                            if (requirements.hasOwnProperty("authId")) {
-                                if (currentStage === 1) {
-                                    // if we were at the first stage when the timeout occurred, try to do it again immediately.
-                                    oldReqs.authId = requirements.authId;
-                                    obj.submitRequirements(oldReqs)
-                                        .done(processSucceeded)
-                                        .fail(processFailed);
+            obj.serviceCall({
+                type: "POST",
+                data: JSON.stringify(requirements),
+                url: "",
+                errorsHandlers: {
+                    "unauthorized": { status: "401"},
+                    "timeout": { status: "408" }
+                }
+            })
+            .then(processSucceeded,
+                  function (jqXHR) {
+                    var oldReqs,errorBody,currentStage = requirementList.length;
+                    if (jqXHR.status === 408) {
+                        // we timed out, so let's try again with a fresh session
+                        oldReqs = requirementList[0];
+                        obj.resetProcess();
+                        obj.begin()
+                            .done(function (requirements) {
+                                
+                                obj.handleRequirements(requirements);
+                                
+                                if (requirements.hasOwnProperty("authId")) {
+                                    if (currentStage === 1) {
+                                        // if we were at the first stage when the timeout occurred, try to do it again immediately.
+                                        oldReqs.authId = requirements.authId;
+                                        obj.submitRequirements(oldReqs)
+                                            .done(processSucceeded)
+                                            .fail(processFailed);
+                                    } else {
+                                        // restart the process at the beginning
+                                        eventManager.sendEvent(constants.EVENT_DISPLAY_MESSAGE_REQUEST, "loginTimeout");
+                                        promise.resolve(requirements);
+                                    }
                                 } else {
-                                    // restart the process at the beginning
-                                    eventManager.sendEvent(constants.EVENT_DISPLAY_MESSAGE_REQUEST, "loginTimeout");
                                     promise.resolve(requirements);
                                 }
-                            } else {
-                                promise.resolve(requirements);
-                            }
-                        })
-                        .fail(processFailed); // this is very unlikely, since it would require a call to .begin() to fail after having succeeded once before
-                } else { // we have a 401 unauthorized response
-                    errorBody = $.parseJSON(jqXHR.responseText);
-                    
-                    // if the error body has an authId property, then we may be 
-                    // able to advance beyond this error
-                    if (errorBody.hasOwnProperty("authId")) {
+                            })
+                            .fail(processFailed); // this is very unlikely, since it would require a call to .begin() to fail after having succeeded once before
+                    } else { // we have a 401 unauthorized response
+                        errorBody = $.parseJSON(jqXHR.responseText);
                         
-                        obj.submitRequirements(errorBody)
-                           .done(processSucceeded)
-                           .fail(processFailed);
-                        
-                    } else {
-                        processFailed();
+                        // if the error body has an authId property, then we may be 
+                        // able to advance beyond this error
+                        if (errorBody.hasOwnProperty("authId")) {
+                            
+                            obj.submitRequirements(errorBody)
+                               .done(processSucceeded)
+                               .fail(processFailed);
+                            
+                        } else {
+                            processFailed();
+                        }
                     }
-                }
-            });
+                });
         
         return promise;
     };
