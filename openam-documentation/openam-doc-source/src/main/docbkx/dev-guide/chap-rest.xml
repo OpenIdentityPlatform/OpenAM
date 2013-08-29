@@ -210,21 +210,148 @@
    the authentication context to OpenAM, and so must also be sent back with the
    requests.</para>
 
-   <!-- AME-2421
-   <para>TODO example using the callback</para>
+   <para>To respond to the callback, send back the JSON object with the missing
+   values filled, as in this case where the user name is <literal>demo</literal>
+   and the password is <literal>changeit</literal>.</para>
 
-   <screen>TODO</screen>
+   <informalexample><?dbfo pgwide="1"?>
+   <screen>$ curl --request POST --header "Content-Type: application/json"
+ --data '{ "authId": "...jwt-value...", "template": "", "stage": "DataStore1",
+   "callbacks": [ { "type": "NameCallback", "output": [ { "name": "prompt",
+   "value": " User Name: " } ], "input": [ { "name": "IDToken1", "value": "demo" } ] },
+   { "type": "PasswordCallback", "output": [ { "name": "prompt", "value": " Password: " } ],
+   "input": [ { "name": "IDToken2", "value": "changeit" } ] } ] }'
+   http://openam.example.com:8080/openam/json/auth/1/authenticate
+{ "tokenId": "AQIC5wM2...U3MTE4NA..*" }</screen>
+   </informalexample>
 
-   <para>TODO Explain use of query string parameters for logging into
-   a particular realm, with a particular module, etc.</para>
-   -->
+   <para>The response is a token ID holding the SSO Token value.</para>
+
+   <para>Alternatively, you can authenticate without requesting a session
+   using the <literal>noSession</literal> query string parameter.</para>
+
+   <informalexample><?dbfo pgwide="1"?>
+   <screen>$ curl --request POST --header "Content-Type: application/json"
+ --data '{ "authId": "...jwt-value...", "template": "", "stage": "DataStore1",
+   "callbacks": [ { "type": "NameCallback", "output": [ { "name": "prompt",
+   "value": " User Name: " } ], "input": [ { "name": "IDToken1", "value": "demo" } ] },
+   { "type": "PasswordCallback", "output": [ { "name": "prompt", "value": " Password: " } ],
+   "input": [ { "name": "IDToken2", "value": "changeit" } ] } ] }'
+   http://openam.example.com:8080/openam/json/auth/1/authenticate?noSession=true
+{ "message": "Authentication Successful" }</screen>
+   </informalexample>
+
+   <para>You can set the realm by using the realm query string parameter as
+   in <literal>?realm=myRealm</literal>.</para>
+
+   <variablelist>
+    <para>You can use the <literal>authIndexType</literal> and
+    <literal>authIndexValue</literal> query string parameters as a pair
+    to provide additional information about how you are authenticating.
+    The <literal>authIndexType</literal> can be one of the following
+    types.</para>
+
+    <varlistentry>
+     <term>composite</term>
+     <listitem>
+      <para>Set the value to a composite advice string.</para>
+     </listitem>
+    </varlistentry>
+
+    <varlistentry>
+     <term>level</term>
+     <listitem>
+      <para>Set the value to the authentication level.</para>
+     </listitem>
+    </varlistentry>
+
+    <varlistentry>
+     <term>module</term>
+     <listitem>
+      <para>Set the value to the name of an authentication module.</para>
+     </listitem>
+    </varlistentry>
+
+    <varlistentry>
+     <term>resource</term>
+     <listitem>
+      <para>Set the value to a URL protected by an OpenAM policy.</para>
+     </listitem>
+    </varlistentry>
+
+    <varlistentry>
+     <term>role</term>
+     <listitem>
+      <para>Set the value to an OpenAM role.</para>
+     </listitem>
+    </varlistentry>
+
+    <varlistentry>
+     <term>service</term>
+     <listitem>
+      <para>Set the value to the name of an authentication chain.</para>
+     </listitem>
+    </varlistentry>
+
+    <varlistentry>
+     <term>user</term>
+     <listitem>
+      <para>Set the value to an OpenAM user ID.</para>
+     </listitem>
+    </varlistentry>
+   </variablelist>
+
+   <itemizedlist>
+    <para>OpenAM uses the following callback types depending on the
+    authentication module in use.</para>
+
+    <listitem>
+     <para>ChoiceCallback</para>
+    </listitem>
+
+    <listitem>
+     <para>ConfirmationCallback</para>
+    </listitem>
+
+    <listitem>
+     <para>HttpCallback</para>
+    </listitem>
+
+    <listitem>
+     <para>LanguageCallback</para>
+    </listitem>
+
+    <listitem>
+     <para>NameCallback</para>
+    </listitem>
+
+    <listitem>
+     <para>PasswordCallback</para>
+    </listitem>
+
+    <listitem>
+     <para>RedirectCallback</para>
+    </listitem>
+
+    <listitem>
+     <para>TextInputCallback</para>
+    </listitem>
+
+    <listitem>
+     <para>TextOutputCallback</para>
+    </listitem>
+
+    <listitem>
+     <para>X509CertificateCallback</para>
+    </listitem>
+   </itemizedlist>
 
    <para>Authenticated users can log out with the token cookie value and an HTTP
    POST to <literal>/json/sessions/?_action=logout</literal>.</para>
 
    <screen>$ curl
  --request POST
- --header "iplanetDirectoryPro: AQIC5w...NTcy*"
+ --header "iplanetDirectoryPro: AQIC5wM2...U3MTE4NA..*"
  "https://openam.example.com:8443/openam/json/sessions/?_action=logout"
 {"result":"Successfully logged out"}</screen>
   </section>
