@@ -1084,10 +1084,7 @@ $ curl https://openam.example.com:8443/openam/oauth2/tokeninfo
    <literal>/frrest/oauth2/token/<replaceable>token-id</replaceable></literal>,
    as in the following example.</para>
 
-   <screen>$ curl "https://openam.example.com:8443/openam/identity/authenticate?
-username=amadmin&amp;password=password"
-token.id=AQIC5wM2LY4Sfcxs...EwNDU2NjE0*
-$ curl
+   <screen>$ curl
  --request POST
  --user "myClientID:password"
  --data "grant_type=password&amp;username=demo&amp;password=changeit&amp;scope=cn%20mail"
@@ -1274,10 +1271,7 @@ $ curl
    with a JSON object fully specifying the client, as in the following
    example.</para>
 
-   <screen>$ curl --request POST --data "username=amadmin&amp;password=password"
- https://openam.example.com:8443/openam/identity/authenticate
-token.id=AQIC5wM...3MTYxOA..*
-$ curl --request POST --header "iplanetDirectoryPro: AQIC5wM...3MTYxOA..*"
+   <screen>$ curl --request POST --header "iplanetDirectoryPro: AQIC5wM...3MTYxOA..*"
  --header "Content-Type: application/json"
  --data '{"client_id":["testClient"],
           "realm":["/"]
@@ -1785,10 +1779,7 @@ $ curl --request POST --header "iplanetDirectoryPro: AQIC5wM...3MTYxOA..*"
   <para>You can send OpenAM messages to log, specifying the message content
   and the log file in which to write your message.</para>
   
-  <screen>$ curl --request POST --data "username=amadmin&amp;password=password"
-  https://openam.example.com:8443/openam/identity/authenticate
-token.id=AQIC5wM2LY4SfcwyCZkk-1JXzx6q1EzgagabHfBjMidb5jI.*AAJTSQACMDE.*
-$ curl "https://openam.example.com:8443/openam/identity/log?
+  <screen>$ curl "https://openam.example.com:8443/openam/identity/log?
  appid=AQIC5wM2LY4SfcwyCZkk-1JXzx6q1EzgagabHfBjMidb5jI.*AAJTSQACMDE.*
  &amp;subjectid=AQIC5wM2LY4SfcxuxIP0VnP2lVjs7ypEM6VDx6srk56CN1Q.*AAJTSQACMDE.*
  &amp;logname=rest.access
@@ -2783,10 +2774,7 @@ $ curl --request PUT --header "If-None-Match: *"
     </varlistentry>
    </variablelist>
    
-    <screen>$ curl --request POST --data "username=amadmin&amp;password=password"
- https://openam.example.com:8443/openam/identity/authenticate
-token.id=AQIC5wM2LY4SfcxSYA8eG-vrNHb_W7nG8XkfAGyRyuaebDY.*AAJTSQACMDE.*
-$ curl "https://openam.example.com:8443/openam/identity/create?
+    <screen>$ curl "https://openam.example.com:8443/openam/identity/create?
  admin=AQIC5wM2LY4SfcxSYA8eG-vrNHb_W7nG8XkfAGyRyuaebDY.*AAJTSQACMDE.*
  &amp;identity_name=testuser
  &amp;identity_attribute_names=cn
@@ -3035,10 +3023,7 @@ string=bjensen</screen>
     the following example. The only required field is <literal>realm</literal>, 
     but the realm will not be active if the status is not set.</para>
    
-     <screen>$ curl --request POST --data "username=amadmin&amp;password=password"
- https://openam.example.com:8443/openam/identity/authenticate
-token.id=AQIC5w...2NzEz*
-$ curl --request POST --header "iplanetDirectoryPro: AQIC5w...2NzEz*"
+     <screen>$ curl --request POST --header "iplanetDirectoryPro: AQIC5w...2NzEz*"
  --header "Content-Type: application/json"
  --data '{ "realm": "testRealm" }'
  https://openam.example.com:8443/openam/json/realms/?_action=create
@@ -3054,10 +3039,7 @@ $ curl --request POST --header "iplanetDirectoryPro: AQIC5w...2NzEz*"
     <literal>/json/realms/<replaceable>realm-id</replaceable></literal>, as
     shown in the following example.</para>
    
-     <screen>$ curl --request POST --data "username=amadmin&amp;password=password"
- https://openam.example.com:8443/openam/identity/authenticate
-token.id=AQIC5w...2NzEz*
-$ curl --request PUT --header "iplanetDirectoryPro: AQIC5w...2NzEz*"
+     <screen>$ curl --request PUT --header "iplanetDirectoryPro: AQIC5w...2NzEz*"
  --header "Content-Type: application/json"
  --data '{ "sunOrganizationStatus": "Active" }'
  https://openam.example.com:8443/openam/json/realms/testRealm
@@ -3083,10 +3065,7 @@ $ curl --request PUT --header "iplanetDirectoryPro: AQIC5w...2NzEz*"
     <para>The following example shows an administrator receiving information about
     the <literal>testRealm</literal>.</para>
 
-    <screen>$ curl --request POST --data "username=amadmin&amp;password=password"
- https://openam.example.com:8443/openam/identity/authenticate
- token.id=AQIC5w...2NzEz*
- $ curl --header "iplanetDirectoryPro: AQIC5w...2NzEz*"
+    <screen>$ curl --header "iplanetDirectoryPro: AQIC5w...2NzEz*"
  https://openam.example.com:8443/openam/json/realms/testRealm
 {
     "serviceNames":[
@@ -3121,10 +3100,7 @@ $ curl --request PUT --header "iplanetDirectoryPro: AQIC5w...2NzEz*"
 
     <para>The following example shows how to update a realm.</para>
    
-     <screen>$ curl --request POST --data "username=amadmin&amp;password=password"
- https://openam.example.com:8443/openam/identity/authenticate
- token.id=AQIC5...Y3MTAx*
- $ curl --request PUT --header "iplanetDirectoryPro: AQIC5...Y3MTAx*"
+     <screen>$ curl --request PUT --header "iplanetDirectoryPro: AQIC5...Y3MTAx*"
  --header "Content-Type: application/json"
  --data '{ "sunOrganizationStatus": "Active" }'
  https://openam.example.com:8443/openam/json/realms/testRealm</screen>
@@ -3149,10 +3125,7 @@ $ curl --request PUT --header "iplanetDirectoryPro: AQIC5w...2NzEz*"
     before deleting it. Once a realm is deleted, the only way to restore it is 
     to return to a backed up deployment of OpenAM.</para>
 
-    <screen>$ curl --request POST --data "username=amadmin&amp;password=password"
- https://openam.example.com:8443/openam/identity/authenticate
- token.id=AQIC5w...2NzEz*
- $ curl --request DELETE --header "iplanetDirectoryPro: AQIC5w...2NzEz*"
+    <screen>$ curl --request DELETE --header "iplanetDirectoryPro: AQIC5w...2NzEz*"
  https://openam.example.com:8443/openam/json/realms/testRealm
  {"success":"true"}</screen>
 
@@ -3179,10 +3152,7 @@ $ curl --request PUT --header "iplanetDirectoryPro: AQIC5w...2NzEz*"
       <listitem>
        <para>This endpoint retrieves the list of applications assigned to the 
        authenticated user.</para>
-      <screen>$ curl --request POST --data "username=amadmin&amp;password=password"
- https://openam.example.com:8443/openam/identity/authenticate
-token.id=AQIC5w...2NzEz*
-$ curl --header "iplanetDirectoryPro: AQIC5w...2NzEz*"
+      <screen>$ curl --header "iplanetDirectoryPro: AQIC5w...2NzEz*"
  https://openam.example.com:8443/openam/json/dashboard/assigned
 {
   "google": {
@@ -3215,10 +3185,7 @@ $ curl --header "iplanetDirectoryPro: AQIC5w...2NzEz*"
        <para>This endpoint retrieves the list of applications available in the
        authenticated user's realm. The example is based on two of the default 
        Dashboard applications: Google and Salesforce.</para>
-      <screen>$ curl --request POST --data "username=amadmin&amp;password=password"
- https://openam.example.com:8443/openam/identity/authenticate
-token.id=AQIC5w...2NzEz*
-$ curl --header "iplanetDirectoryPro: AQIC5w...2NzEz*"
+      <screen>$ curl --header "iplanetDirectoryPro: AQIC5w...2NzEz*"
  https://openam.example.com:8443/openam/json/dashboard/available
 {
   "google": {
@@ -3271,10 +3238,7 @@ $ curl --header "iplanetDirectoryPro: AQIC5w...2NzEz*"
        <para>This endpoint retrieves the list of all applications available defined
        for the OpenAM Dashboard service. The example is based on the three default 
        Dashboard applications: Google, Salesforce, and Zendesk.</para>
-      <screen>$ curl --request POST --data "username=amadmin&amp;password=password"
- https://openam.example.com:8443/openam/identity/authenticate
-token.id=AQIC5w...2NzEz*
-$ curl --header "iplanetDirectoryPro: AQIC5w...2NzEz*"
+      <screen>$ curl --header "iplanetDirectoryPro: AQIC5w...2NzEz*"
  https://openam.example.com:8443/openam/json/dashboard/available
 {
   "google": {
