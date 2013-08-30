@@ -89,7 +89,7 @@ public class XUIFilter implements Filter, ServiceListener {
             }
         }
 
-        if (xuiEnabled && request.getPathInfo() != null) {
+        if (xuiEnabled && request.getRequestURI() != null) {
             String query = request.getQueryString();
 
             // prepare query
@@ -102,9 +102,9 @@ public class XUIFilter implements Filter, ServiceListener {
             }
 
             // redirect to correct location
-            if (request.getPathInfo().contains("UI/Logout")) {
+            if (request.getRequestURI().contains("UI/Logout")) {
                 response.sendRedirect(xuiLogoutPath + query);
-            } else if (request.getPathInfo().contains("idm/EndUser")) {
+            } else if (request.getRequestURI().contains("idm/EndUser")) {
                 response.sendRedirect(profilePage + query);
             } else {
                 response.sendRedirect(xuiLoginPath + query);

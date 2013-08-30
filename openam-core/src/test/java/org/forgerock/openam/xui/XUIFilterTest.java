@@ -20,11 +20,15 @@ import javax.servlet.FilterConfig;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.ServletContext;
+
 import static org.fest.assertions.Assertions.*;
+
 import org.mockito.ArgumentCaptor;
+
 import static org.mockito.BDDMockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.BDDMockito.when;
+
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
@@ -60,7 +64,7 @@ public class XUIFilterTest {
         HttpServletResponse responseLogin = mock(HttpServletResponse.class);
         FilterChain filterChain = mock(FilterChain.class);
 
-        when(request.getPathInfo()).thenReturn(pathInfo);
+        when(request.getRequestURI()).thenReturn(pathInfo);
         when(request.getQueryString()).thenReturn(query);
 
         filter.doFilter(request, responseLogin, filterChain);
@@ -80,7 +84,7 @@ public class XUIFilterTest {
         HttpServletResponse responseLogout = mock(HttpServletResponse.class);
         FilterChain filterChain = mock(FilterChain.class);
 
-        when(request.getPathInfo()).thenReturn(logoutPath);
+        when(request.getRequestURI()).thenReturn(logoutPath);
         when(request.getQueryString()).thenReturn(null);
 
         filter.doFilter(request, responseLogout, filterChain);
@@ -98,7 +102,7 @@ public class XUIFilterTest {
         HttpServletResponse responseEndUser = mock(HttpServletResponse.class);
         FilterChain filterChain = mock(FilterChain.class);
 
-        when(request.getPathInfo()).thenReturn(endUserPath);
+        when(request.getRequestURI()).thenReturn(endUserPath);
         when(request.getQueryString()).thenReturn(null);
 
         filter.doFilter(request, responseEndUser, filterChain);
