@@ -3239,68 +3239,68 @@ string=bjensen</screen>
        for the OpenAM Dashboard service. The example is based on the three default 
        Dashboard applications: Google, Salesforce, and Zendesk.</para>
       <screen>$ curl --header "iplanetDirectoryPro: AQIC5w...2NzEz*"
- https://openam.example.com:8443/openam/json/dashboard/available
+ https://openam.example.com:8443/openam/json/dashboard/defined
 {
-  "google": {
-      "dashboardIcon": [
-          "Google.gif"
-      ],
-      "dashboardName": [
-          "Google"
-      ],
-      "dashboardLogin": [
-          "http://www.google.com"
-      ],
-      "ICFIdentifier": [
-          ""
-      ],
-      "dashboardDisplayName": [
-          "Google"
-      ],
-      "dashboardClassName": [
-          "SAML2ApplicationClass"
-      ]
-  }
-  "salesforce": {
-      "dashboardIcon": [
-          "salesforce.gif"
-      ],
-      "dashboardName": [
-          "Salesforce"
-      ],
-      "dashboardLogin": [
-          "http://salesforce.com"
-      ],
-      "ICFIdentifier": [
-          ""
-      ],
-      "dashboardDisplayName": [
-          "Salesforce"
-      ],
-      "dashboardClassName": [
-          "SAML2ApplicationClass"
-      ]
-  }
-  "zendesk": {
-      "dashboardIcon": [
-          "Zendesk.gif"
-      ],
-      "dashboardName": [
-          "Zendesk"
-      ],
-      "dashboardLogin": [
-          "http://Zendesk.com"
-      ],
-      "ICFIdentifier": [
-          ""
-      ],
-      "dashboardDisplayName": [
-          "Zendesk"
-      ],
-      "dashboardClassName": [
-          "SAML2ApplicationClass"
-      ]
-  }
+    "google": {
+        "dashboardIcon": [
+            "Google.gif"
+        ],
+        "dashboardName": [
+            "Google"
+        ],
+        "dashboardLogin": [
+            "http://www.google.com"
+        ],
+        "ICFIdentifier": [
+            "idm magic 34"
+        ],
+        "dashboardDisplayName": [
+            "Google"
+        ],
+        "dashboardClassName": [
+            "SAML2ApplicationClass"
+        ]
+    },
+    "salesforce": {
+        "dashboardIcon": [
+            "salesforce.gif"
+        ],
+        "dashboardName": [
+            "SalesForce"
+        ],
+        "dashboardLogin": [
+            "http://www.salesforce.com"
+        ],
+        "ICFIdentifier": [
+            "idm magic 12"
+        ],
+        "dashboardDisplayName": [
+            "Salesforce"
+        ],
+        "dashboardClassName": [
+            "SAML2ApplicationClass"
+        ]
+    },
+    "zendesk": {
+        "dashboardIcon": [
+            "ZenDesk.gif"
+        ],
+        "dashboardName": [
+            "ZenDesk"
+        ],
+        "dashboardLogin": [
+            "http://www.ZenDesk.com"
+        ],
+        "ICFIdentifier": [
+            "idm magic 56"
+        ],
+        "dashboardDisplayName": [
+            "ZenDesk"
+        ],
+        "dashboardClassName": [
+            "SAML2ApplicationClass"
+        ]
+    }
 }</screen>
       </listitem>
      </varlistentry>
