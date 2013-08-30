@@ -17,9 +17,9 @@
 package org.forgerock.openam.forgerockrest.authn.core;
 
 import com.sun.identity.authentication.client.AuthClientUtils;
-import com.sun.identity.authentication.service.LoginState;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 
 /**
  * Contains all the configuration required to start or continue a login process.
@@ -27,13 +27,14 @@ import javax.servlet.http.HttpServletRequest;
 public class LoginConfiguration {
 
     private HttpServletRequest httpRequest;
+    private HttpServletResponse httpResponse;
     private AuthIndexType indexType;
     private String indexValue;
     private String sessionId = "";
     private String ssoTokenId = "";
 
     /**
-     * Sets the HttpServletRequest which initiated the login process.
+     * Sets the HttpServletRequest which initiated/continued the login process.
      *
      * @param httpRequest The HttpServletRequest.
      * @return This LoginConfiguration object.
@@ -44,12 +45,32 @@ public class LoginConfiguration {
     }
 
     /**
-     * Returns the HttpServletRequest which initiated the login process.
+     * Returns the HttpServletRequest which initiated/continued the login process.
      *
      * @return The HttpServletRequest.
      */
     public HttpServletRequest getHttpRequest() {
         return httpRequest;
+    }
+
+    /**
+     * Sets the HttpServletResponse which initiated/continued the login process.
+     *
+     * @param httpResponse The HttpServletResponse.
+     * @return This LoginConfiguration object.
+     */
+    public LoginConfiguration httpResponse(HttpServletResponse httpResponse) {
+        this.httpResponse = httpResponse;
+        return this;
+    }
+
+    /**
+     * Returns the HttpServletResponse which initiated/continued the login process.
+     *
+     * @return The HttpServletResponse.
+     */
+    public HttpServletResponse getHttpResponse() {
+        return httpResponse;
     }
 
     /**
