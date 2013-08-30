@@ -31,6 +31,7 @@ import org.forgerock.openam.forgerockrest.authn.exceptions.RestAuthException;
 
 import javax.inject.Inject;
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import java.util.Map;
 import java.util.Set;
 
@@ -157,6 +158,7 @@ public class LoginAuthenticator {
             AuthLoginException, SSOException {
 
         HttpServletRequest request = loginConfiguration.getHttpRequest();
+        HttpServletResponse response = loginConfiguration.getHttpResponse();
         SessionID sessionID = new SessionID(loginConfiguration.getSessionId());
         boolean isSessionUpgrade = false;
         if (loginConfiguration.isSessionUpgradeRequest() && sessionID.isNull()) {
@@ -167,7 +169,7 @@ public class LoginAuthenticator {
                     loginConfiguration.getIndexValue());
         }
         boolean isBackPost = false;
-        return coreServicesWrapper.getAuthContext(request, null, sessionID, isSessionUpgrade, isBackPost);
+        return coreServicesWrapper.getAuthContext(request, response, sessionID, isSessionUpgrade, isBackPost);
     }
 
     /**

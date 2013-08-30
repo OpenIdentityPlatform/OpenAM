@@ -156,6 +156,7 @@ public class RestAuthenticationHandler {
 
             LoginConfiguration loginConfiguration = new LoginConfiguration()
                     .httpRequest(request)
+                    .httpResponse(response)
                     .indexType(indexType)
                     .indexValue(indexValue)
                     .sessionId(sessionId)
