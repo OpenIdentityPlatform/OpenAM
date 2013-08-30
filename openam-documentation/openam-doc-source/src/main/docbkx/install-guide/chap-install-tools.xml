@@ -196,19 +196,19 @@ http://openam.example.com:8080/openam</screen>
   <step>
    <para>Unpack the tools from where you unzipped OpenAM.</para>
    <screen>$ cd /path/to/openam-tools/config
-$ unzip ~/Downloads/openam/
-  <?eval ${ssoadminZipFile}?>
-Archive:  ~/Downloads/openam/<?eval ${ssoadminZipFile}?>
-  inflating: ssoadm.template
-  inflating: ssoadm.bat.template
-  inflating: ampassword.template
-  inflating: ampassword.bat.template
-  inflating: amverifyarchive.template</screen>
+$ unzip ~/Downloads/openam/<?eval ${ssoconfigZipFile}?>
+Archive:  ~/Downloads/openam/<?eval ${ssoconfigZipFile}?>
+  inflating: README
+  inflating: sampleconfiguration
+  inflating: sampleupgrade
+ extracting: <?eval ${ssoconfigJarFile}?>
+ extracting: <?eval ${ssoconfigUpgradeJarFile}?>
+  inflating: license.txt</screen>
    <para>Set up configuration files based on the
    <filename>sampleconfiguration</filename> example, and then apply the
    configuration to a deployed OpenAM .war file using the following
    command.</para>
-   <screen>$ java -jar configurator.jar -f <replaceable>config.file</replaceable></screen>
+   <screen>$ java -jar <?eval ${ssoconfigJarFile}?> -f <replaceable>config.file</replaceable></screen>
    <para>The <replaceable>config.file</replaceable> is set up by default to
    use the embedded data store with OpenAM installed on
    <literal>server1.example.com</literal>. You must edit the file before using

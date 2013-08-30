@@ -115,8 +115,13 @@
 
   <step>
    <para>For the first instance, follow the instructions in the Upgrade Wizard. 
-   If you prefer, you can use the upgrade.jar from the command line to complete 
-   the upgrade process.</para>
+   If you prefer, you can use the
+   <filename><?eval ${ssoconfigUpgradeJarFile}?></filename> command line tool to
+   complete the upgrade process. See the procedure, <link xlink:show="new"
+   xlink:href="install-guide#install-openam-config-tools"
+   xlink:role="http://docbook.org/xlink/role/olink"><citetitle>To Set Up
+   Configuration Tools</citetitle></link>, for instructions on installing the
+   tool.</para>
   </step>
 
   <step>

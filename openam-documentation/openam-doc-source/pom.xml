@@ -123,6 +123,8 @@
         <sharedLibrary><![CDATA[openam-shared-${project.version}.jar]]></sharedLibrary>
         <ssoadminZipFile><![CDATA[openam-distribution-ssoadmintools-${project.version}.zip]]></ssoadminZipFile>
         <ssoconfigZipFile><![CDATA[openam-distribution-ssoconfiguratortools-${project.version}.zip]]></ssoconfigZipFile>
+        <ssoconfigJarFile><![CDATA[openam-configurator-tool-${project.version}.jar]]></ssoconfigJarFile>
+        <ssoconfigUpgradeJarFile><![CDATA[openam-upgrade-tool-${project.version}.jar]]></ssoconfigUpgradeJarFile>
         <serveronlyWarFile><![CDATA[openam-server-only-${project.version}.war]]></serveronlyWarFile>
         <configJarFile><![CDATA[openam-distribution-configurator-${project.version}.jar]]></configJarFile>
         <oauth2JarFile><![CDATA[openam-oauth2-common-${project.version}.jar]]></oauth2JarFile>
