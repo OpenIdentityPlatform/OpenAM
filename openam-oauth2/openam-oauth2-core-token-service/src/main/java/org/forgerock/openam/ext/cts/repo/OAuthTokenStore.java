@@ -82,6 +82,10 @@ public class OAuthTokenStore {
 
     public JsonValue read(String id) throws CoreTokenException {
         Token token = cts.read(tokenIdFactory.getOAuthTokenId(id));
+        //The CTS will not throw exception, but return null when read does not return a value
+        if (token == null) {
+            return null;
+        }
         return tokenAdapter.fromToken(token);
     }
 

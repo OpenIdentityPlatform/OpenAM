@@ -116,6 +116,9 @@ public class TokenResource implements CollectionResourceProvider {
             JsonValue response = null;
             try {
                 response = oAuthTokenStore.read(resourceId);
+                if (response == null){
+                    throw new NotFoundException("Token Not Found", null);
+                }
                 Set<String> usernameSet = (Set<String>)response.get(OAuth2Constants.CoreTokenParams.USERNAME).getObject();
                 String username= null;
                 if (usernameSet != null && !usernameSet.isEmpty()){
