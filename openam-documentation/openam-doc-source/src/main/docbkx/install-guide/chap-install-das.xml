@@ -72,7 +72,15 @@
    <para>Firewall configuration is not described here.</para>
   </listitem>
  </orderedlist>
- 
+
+ <important><!-- Pending fix for OPENAM-2808 -->
+  <para>The DAS relies on the classic OpenAM UI. If you customize the end
+  user pages, follow the procedures for the classic UI described in
+  <link xlink:show="new" xlink:href="install-guide#chap-custom-ui"
+  xlink:role="http://docbook.org/xlink/role/olink"><citetitle>Customizing the
+  OpenAM End User Pages</citetitle></link>.</para>
+ </important>
+
  <procedure xml:id="deploy-distributed-auth-on-tomcat">
   <title>To Deploy the DAS on Tomcat</title>
  
