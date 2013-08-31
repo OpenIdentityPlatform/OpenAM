@@ -24,7 +24,7 @@ with the fields enclosed by brackets [] replaced by
 your own identifying information:
 "Portions Copyrighted [year] [name of copyright owner]"
 
-Portions Copyright 2012 ForgeRock AS
+Portions Copyright 2012-2013 ForgeRock AS
 
 
 %% Contents:
@@ -95,12 +95,12 @@ Portions Copyright 2012 ForgeRock AS
       c) Copy the edited files above to your application's App_Data/ folder.
       d) Obtain the standard metadata XML file from your IDP, name it idp.xml,
          and place in your application's App_Data/ folder.  If your IDP is
-         an OpenSSO deployment, this can be exported by accessing the export
+         an OpenAM deployment, this can be exported by accessing the export
          URL.  For example:
-         http://idp.example.com:8080/opensso/saml2/jsp/exportmetadata.jsp
+         http://idp.example.com:8080/openam/saml2/jsp/exportmetadata.jsp
       e) Provide the Fedlet metadata XML file "sp.xml" to your IDP.  The
          metadata must be imported to the IDP machine and must be associated
-         with the same Circle of Trust as the IDP. If your IDP is an OpenSSO
+         with the same Circle of Trust as the IDP. If your IDP is an OpenAM
          deployment, use the Register Remote Service Provider workflow
          available from the Common Tasks page to import your Fedlet's
          metadata.
@@ -121,16 +121,16 @@ Portions Copyright 2012 ForgeRock AS
    the identity provider but any modifications made to sp-extended.xml should
    be conveyed to the identity provider using a different method. Once the
    identity provider receives the appropriate standard and extended metadata
-   values, it can make the changes using the OpenSSO console. Information on
-   customizing SAMLv2 providers using the OpenSSO console is available in the
-   OpenSSO Enterprise 8.0 documentation.
+   values, it can make the changes using the OpenAM console. Information on
+   customizing SAMLv2 providers using the OpenAM console is available in the
+   OpenAM documentation.
 
    * SAMLv2 Service Provider Customization link:
      http://openam.forgerock.org/doc/admin-guide/index.html#configure-sp
    * SAMLv2 Identity Provider Customization link:
      http://openam.forgerock.org/doc/admin-guide/index.html#configure-idp
 
-   If the identity provider is using a product other than OpenSSO Enterprise,
+   If the identity provider is using a product other than OpenAM,
    they would make the changes according to their product's documentation.
 
 %% 4. How to use the Sample Application to test your deployment
@@ -249,34 +249,34 @@ Portions Copyright 2012 ForgeRock AS
 
    In order to leverage this functionality, you first need to have the Identity
    Provider Discovery Service set up and deployed before performing the steps
-   listed below.  If you installed the OpenSSO WAR, the IDP Discovery Service is
+   listed below.  If you installed the OpenAM WAR, the IDP Discovery Service is
    already bundled with the product.  Alternately, you could follow the
    documented process in creating a separate WAR for just the IDP Discovery
-   Service.  Please refer to the OpenSSO documentation on how to set up and use
+   Service.  Please refer to the OpenAM documentation on how to set up and use
    the IDP Discovery Service.  After configuring this service, take note of the
    reader service URL (URL to find out the preferred IDP) and the writer service
    URL (URL to write the preferred IDP), they are needed in the steps below. If
-   you are using OpenSSO, the reader service URL is typically:
+   you are using OpenAM, the reader service URL is typically:
 
      <protocol>://<host>:<port>/deploy_uri/saml2reader
-     (for example: http://discovery.common.com/opensso/saml2reader)
+     (for example: http://discovery.common.com/openam/saml2reader)
 
    Likewise, the writer service URL is typically:
 
      <protocol>://<host>:<port>/deploy_uri/saml2writer
-     (for example: http://discovery.common.com/opensso/saml2writer)
+     (for example: http://discovery.common.com/openam/saml2writer)
 
    To configure the .NET Fedlet to support IDP discovery:
 
       a) Edit the COT file (e.g. "fedlet.cot"), and set the value for attribute
          "sun-fm-saml2-readerservice-url" to the SAML2 reader service URL
-         (e.g. http://discovery.common.com/opensso/saml2reader), set the value
+         (e.g. http://discovery.common.com/openam/saml2reader), set the value
          for attribute "sun-fm-saml2-writerservice-url" to the SAML2 writer
-         service URL (e.g. http://discovery.common.com/opensso/saml2writer).
+         service URL (e.g. http://discovery.common.com/openam/saml2writer).
       b) Restart the Application Pool associated with your .NET application to
          make the change effective.
       c) Setup IDP discovery on each of your remote IDPs. If the IDP is an
-         OpenSSO server instance, you need go to the administration console,
+         OpenAM server instance, you need go to the administration console,
          find the COT for the IDP and .NET Fedlet, and specify the SAML2 reader
          service URL and SAML2 writer service URL, and Save.
       d) If you have performed the above with the Sample Application and have

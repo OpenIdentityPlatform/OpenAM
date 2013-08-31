@@ -107,7 +107,7 @@ Portions Copyright 2012-2013 ForgeRock AS
         Also copy FederationConfig.properties under "conf" to the fedlet 
         home directory.
      e) Get your IDP standard metadata XML file and copy to the fedlet home 
-        directory. For example, if the remote IDP is a OpenSSO
+        directory. For example, if the remote IDP is a OpenAM
         instance, you could use "ssoadm" CLI to export the IDP metadata to a
         XML file. The XML file for IDP standard metadata must be named as
         "idp.xml" when copied to the fedlet home directory.
@@ -125,16 +125,16 @@ Portions Copyright 2012-2013 ForgeRock AS
      the identity provider but any modifications made to sp-extended.xml should
      be conveyed to the identity provider using a different method. Once the 
      identity provider receives the appropriate standard and extended metadata 
-     values, it can make the changes using the OpenSSO console. Information on 
-     customizing SAMLv2 providers using the OpenSSO console is available in the
-     OpenSSO Enterprise 8.0 documentation.
+     values, it can make the changes using the OpenAM console. Information on
+     customizing SAMLv2 providers using the OpenAM console is available in the
+     OpenAM documentation.
 
      * SAMLv2 Service Provider Customization link-
        http://openam.forgerock.org/doc/admin-guide/index.html#configure-sp
      * SAMLv2 Identity Provider Customization link-
        http://openam.forgerock.org/doc/admin-guide/index.html#configure-idp
 
-     If the identity provider is using a product other than OpenSSO Enterprise,
+     If the identity provider is using a product other than OpenAM,
      they would make the changes according to their product's documentation.
 
    2.2 Test your Fedlet setup
@@ -257,30 +257,30 @@ try {
     configured to use IDP Discovery service to find out the preferred IDP.
 
     You need to have the Identity Provider Discovery service set up before
-    performing following steps. If you installed the OpenSSO WAR, the 
+    performing following steps. If you installed the OpenAM WAR, the
     IDP discovery service is bundled in the products already. Or you could
     follow the document to create a separate WAR for the IDP discovery 
-    service  using the OpenSSO WAR. Please refer to the OpenSSO
+    service  using the OpenAM WAR. Please refer to the OpenAM
     document set on how to setup and use the Identity Provider
     Discovery service. After set up the IDP discovery service, have the
     reader service URL (URL to find out preferred IDP) and writer service
     URL (URL to write the preferred IDP) ready, they are needed in step
-    a) and c) below. If you are using OpenSSO server instance
+    a) and c) below. If you are using OpenAM server instance
     or the IDP discovery only WAR instance, the reader service URL is:
     <protocol>://<host>:<port>/<deploy_uri>/saml2reader  
-    (e.g :  http://discovery.common.com/opensso/saml2reader)
+    (e.g :  http://discovery.common.com/openam/saml2reader)
     the writer service URL is :
     <protocol>://<host>:<port>/<deploy_uri>/saml2writer
-    (e.g :  http://discovery.common.com/opensso/saml2writer)
+    (e.g :  http://discovery.common.com/openam/saml2writer)
 
     To setup IDP discovery in Fedlet:
     a) edit the COT file (e.g. "fedlet.cot"), and set the value for attribute 
        "sun-fm-saml2-readerservice-url" to the SAML2 reader service URL 
-       (e.g. http://discovery.common.com/opensso/saml2reader), set the value 
+       (e.g. http://discovery.common.com/openam/saml2reader), set the value
        for attribute "sun-fm-saml2-writerservice-url" to the SAML2 writer 
-       service URL (e.g. http://discovery.common.com/opensso/saml2writer).
+       service URL (e.g. http://discovery.common.com/openam/saml2writer).
     b) Restart your Fedlet web container to make the change to be effective. 
-    c) Setup IDP discovery on each of your remote IDPs. If the IDP is an OpenSSO
+    c) Setup IDP discovery on each of your remote IDPs. If the IDP is an OpenAM
        server instance, you need go to the administration console, 
        find the COT for the IDP and Fedlet, and specify the SAML2 reader 
        service URL and SAML2 writer service URL, and Save.
@@ -356,7 +356,7 @@ I. Signing
       d) Goto Step (1) (Fedlet side)
 
       e) Get your IDP standard metadata XML file and copy to the fedlet home 
-         directory. For example, if the remote IDP is a OpenSSO instance, 
+         directory. For example, if the remote IDP is a OpenAM instance,
          you could use "ssoadm" CLI to export the IDP metadata to a XML file. 
          The XML file for IDP standard metadata must be named as "idp.xml" 
          when copied to the fedlet home directory.
@@ -437,7 +437,7 @@ II. Signing and Encryption
       e) Goto Step (1) (Fedlet side)
 
       f) Get your IDP standard metadata XML file and copy to the fedlet home 
-         directory. For example, if the remote IDP is a OpenSSO instance, 
+         directory. For example, if the remote IDP is a OpenAM instance,
          you could use "ssoadm" CLI to export the IDP metadata to a XML file. 
          The XML file for IDP standard metadata must be named as "idp.xml" 
          when copied to the fedlet home directory.
@@ -485,7 +485,7 @@ XACML Query. Signing and Encryption are optional.
         a) When creating the IDP entity metadata, make sure that you specify that
            particular entity with XACML PDP role. 
         b) Need to specify the Request Handler for SAMLv2 SOAP Binding. Log into 
-	   the OpenSSO console.
+	   the OpenAM console.
 	   Configuration tab -> Global -> SAMLv2 SOAP Binding -> New
 	     Key = /pdp (This should be the same metaAlias specified while 
                          creating the IDP)
@@ -497,7 +497,7 @@ XACML Query. Signing and Encryption are optional.
 	     policy decisions for the resoruce.
 	       Access Control -> Realm Name -> Policies -> New Policy
         d) Get your IDP standard metadata XML file and copy to the fedlet home 
-           directory. For example, if the remote IDP is a OpenSSO instance, 
+           directory. For example, if the remote IDP is a OpenAM instance,
            you could use "ssoadm" CLI to export the IDP metadata to a XML file. 
            The XML file for IDP standard metadata must be named as "idp.xml" 
            when copied to the fedlet home directory.  issuing a XACML query.

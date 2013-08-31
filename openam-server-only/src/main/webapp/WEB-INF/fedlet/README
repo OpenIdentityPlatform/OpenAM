@@ -190,30 +190,30 @@ try {
     configured to use IDP Discovery service to find out the preferred IDP.
 
     You need to have the Identity Provider Discovery service set up before
-    performing following steps. If you installed the OpenSSO WAR, the 
+    performing following steps. If you installed the OpenAM WAR, the
     IDP discovery service is bundled in the products already. Or you could
     follow the document to create a separate WAR for the IDP discovery 
-    service  using the OpenSSO WAR. Please refer to the OpenSSO
+    service  using the OpenAM WAR. Please refer to the OpenAM
     document set on how to setup and use the Identity Provider
     Discovery service. After set up the IDP discovery service, have the
     reader service URL (URL to find out preferred IDP) and writer service
     URL (URL to write the preferred IDP) ready, they are needed in step
-    a) and c) below. If you are using OpenSSO server instance
+    a) and c) below. If you are using OpenAM server instance
     or the IDP discovery only WAR instance, the reader service URL is:
     <protocol>://<host>:<port>/<deploy_uri>/saml2reader  
-    (e.g :  http://discovery.common.com/opensso/saml2reader)
+    (e.g :  http://discovery.common.com/openam/saml2reader)
     the writer service URL is :
     <protocol>://<host>:<port>/<deploy_uri>/saml2writer
-    (e.g :  http://discovery.common.com/opensso/saml2writer)
+    (e.g :  http://discovery.common.com/openam/saml2writer)
 
     To setup IDP discovery in the Fedlet:
     a) edit the COT file (e.g. "fedlet.cot"), and set the value for attribute 
        "sun-fm-saml2-readerservice-url" to the SAML2 reader service URL 
-       (e.g. http://discovery.common.com/opensso/saml2reader), set the value 
+       (e.g. http://discovery.common.com/openam/saml2reader), set the value
        for attribute "sun-fm-saml2-writerservice-url" to the SAML2 writer 
-       service URL (e.g. http://discovery.common.com/opensso/saml2writer).
+       service URL (e.g. http://discovery.common.com/openam/saml2writer).
     b) Restart your Fedlet web container to make the change to be effective. 
-    c) Setup IDP discovery on each of your IDPs. If your IDP is an OpenSSO
+    c) Setup IDP discovery on each of your IDPs. If your IDP is an OpenAM
        server instance, need to goto console, find the COT for
        the IDP and Fedlet, and specify the SAML2 reader service URL and
        SAML2 writer service URL. 
@@ -411,7 +411,7 @@ XACML Query. Signing and Encryption are optional.
           a) When creating the IDP entity metadata, make sure that you specify that
              particular entity with XACML PDP role. 
           b) Specify the Request Handler for SAMLv2 SOAP Binding. Log into 
-	     the OpenSSO console.
+	     the OpenAM console.
 	       Configuration tab -> Global -> SAMLv2 SOAP Binding -> New
                Key = /pdp (This should be the same metaAlias specified while 
                          creating the IDP)
