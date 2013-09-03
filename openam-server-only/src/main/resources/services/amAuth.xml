@@ -121,7 +121,7 @@
                                  syntax="boolean"
                                  i18nKey="a154">
                     <DefaultValues>
-                        <Value>true</Value>
+                        <Value>false</Value>
                     </DefaultValues>
                 </AttributeSchema>
             </Global>
