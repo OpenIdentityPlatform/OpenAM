@@ -89,6 +89,7 @@
  <xinclude:include href='chap-l10n.xml' />
  <xinclude:include href='chap-standards.xml' />
  <xinclude:include href='chap-endpoints.xml' />
+ <xinclude:include href='chap-xui-parameters.xml' />
 
     <index />
 </book>

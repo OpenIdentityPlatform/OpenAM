@@ -1,0 +1,329 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  ! CCPL HEADER START
+  !
+  ! This work is licensed under the Creative Commons
+  ! Attribution-NonCommercial-NoDerivs 3.0 Unported License.
+  ! To view a copy of this license, visit
+  ! http://creativecommons.org/licenses/by-nc-nd/3.0/
+  ! or send a letter to Creative Commons, 444 Castro Street,
+  ! Suite 900, Mountain View, California, 94041, USA.
+  !
+  ! You can also obtain a copy of the license at
+  ! src/main/resources/legal-notices/CC-BY-NC-ND.txt.
+  ! See the License for the specific language governing permissions
+  ! and limitations under the License.
+  !
+  ! If applicable, add the following below this CCPL HEADER, with the fields
+  ! enclosed by brackets "[]" replaced with your own identifying information:
+  !      Portions Copyright [yyyy] [name of copyright owner]
+  !
+  ! CCPL HEADER END
+  !
+  !      Copyright 2013 ForgeRock AS
+  !
+-->
+<chapter xml:id='chap-xui-parameters'
+         xmlns='http://docbook.org/ns/docbook'
+         version='5.0' xml:lang='en'
+         xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance'
+         xsi:schemaLocation='http://docbook.org/ns/docbook http://docbook.org/xml/5.0/xsd/docbook.xsd'
+         xmlns:xlink='http://www.w3.org/1999/xlink'
+         xmlns:xinclude='http://www.w3.org/2001/XInclude'>
+
+    <title>XUI Configuration Parameters</title>
+
+    <para>The configuration of the XUI is based on settings in the <filename>themeConfig.json</filename>
+    file. When OpenAM is installed, this file can be found in the <filename>/path/to/webapps/XUI</filename>
+    directory.</para>
+
+    <!-- Placeholder for the definition of X in XUI -->
+
+    <para>The following table depicts the parameters found in this file. All color codes are standard
+    CSS Hex colors. If there is more than one theme, they may inherit parameters from the
+    <literal>default</literal> theme.</para>
+
+    <variablelist>
+        <varlistentry>
+            <term><literal>themes</literal></term>
+            <listitem>
+                <para>Title</para>
+            </listitem>
+        </varlistentry>
+        <varlistentry>
+            <term><literal>name</literal></term>
+            <listitem>
+                <para>Theme title</para>
+            </listitem>
+        </varlistentry>
+        <varlistentry>
+            <term><literal>path</literal></term>
+            <listitem>
+                <para>Relative path to CSS files</para>
+            </listitem>
+        </varlistentry>
+        <varlistentry>
+            <term><literal>realms</literal></term>
+            <listitem>
+                <para>For a realm named test, enter <literal>["test.*"]</literal></para>
+            </listitem>
+        </varlistentry>
+        <varlistentry>
+            <term><literal>regex</literal></term>
+            <listitem>
+                <para>true or false</para>
+            </listitem>
+        </varlistentry>
+        <varlistentry>
+            <term><literal>icon</literal></term>
+            <listitem>
+                <para>Filename of icon</para>
+            </listitem>
+        </varlistentry>
+        <varlistentry>
+            <term><literal>settings</literal></term>
+            <listitem>
+                <para>Includes <literal>logo</literal>, <literal>lessVars</literal>,<literal>footer</literal></para>
+            </listitem>
+        </varlistentry>
+        <varlistentry>
+            <term><literal>logo</literal></term>
+            <listitem>
+                <para>Parameters for the logo, including <literal>src</literal>, <literal>title</literal>,
+                <literal>alt</literal>, <literal>height</literal>, <literal>width</literal></para>
+            </listitem>
+        </varlistentry>
+        <varlistentry>
+            <term><literal>src</literal></term>
+            <listitem>
+                <para>Filename with logo</para>
+            </listitem>
+        </varlistentry>
+        <varlistentry>
+            <term><literal>title</literal></term>
+            <listitem>
+                <para>Title attribute, shown behind the graphic</para>
+            </listitem>
+        </varlistentry>
+        <varlistentry>
+            <term><literal>alt</literal></term>
+            <listitem>
+                <para>Text that appears upon cursor hover</para>
+            </listitem>
+        </varlistentry>
+        <varlistentry>
+            <term><literal>height</literal></term>
+            <listitem>
+                <para>Logo height</para>
+            </listitem>
+        </varlistentry>
+        <varlistentry>
+            <term><literal>width</literal></term>
+            <listitem>
+                <para>Logo width</para>
+            </listitem>
+        </varlistentry>
+        <varlistentry>
+            <term><literal>lessVars</literal></term>
+            <listitem>
+                <para>Settings for variables used in LESS CSS stylesheets</para>
+            </listitem>
+        </varlistentry>
+        <varlistentry>
+            <term><literal>background-color</literal></term>
+            <listitem>
+                <para>Standard background color; use hex or standard color words.</para>
+            </listitem>
+        </varlistentry>
+        <varlistentry>
+            <term><literal>background-image</literal></term>
+            <listitem>
+                <para>URL or relative path to file image</para>
+            </listitem>
+        </varlistentry>
+        <varlistentry>
+            <term><literal>background-repeat</literal></term>
+            <listitem>
+                <para>If set to <literal>repeat</literal>, fills screen with multiple copies of the image.</para>
+            </listitem>
+        </varlistentry>
+        <varlistentry>
+            <term><literal>background-position</literal></term>
+            <listitem>
+                <para>Position of the background image, in a format such as <literal>left top</literal>
+                or <literal>right bottom</literal></para>
+            </listitem>
+        </varlistentry>
+        <varlistentry>
+            <term><literal>footer-background-color</literal></term>
+            <listitem>
+                <para>Background color of the footer area; hex or standard color words accepted.</para>
+            </listitem>
+        </varlistentry>
+        <varlistentry>
+            <term><literal>column-padding</literal></term>
+            <listitem>
+                <para>Distance between columns</para>
+            </listitem>
+        </varlistentry>
+        <varlistentry>
+            <term><literal>login-container-width</literal></term>
+            <listitem>
+                <para>Width of view box with login text boxes</para>
+            </listitem>
+        </varlistentry>
+        <varlistentry>
+            <term><literal>login-container-label-align</literal></term>
+            <listitem>
+                <para>Alignment of labels in the login container, such as <literal>left</literal>,
+                <literal>right</literal>, or <literal>center</literal>.</para>
+            </listitem>
+        </varlistentry>
+        <varlistentry>
+            <term><literal>message-background-color</literal></term>
+            <listitem>
+                <para>Login message background color</para>
+            </listitem>
+        </varlistentry>
+        <varlistentry>
+            <term><literal>content-background</literal></term>
+            <listitem>
+                <para>Login container background color</para>
+            </listitem>
+        </varlistentry>
+        <varlistentry>
+            <term><literal>font-color</literal></term>
+            <listitem>
+                <para>Login container font color</para>
+            </listitem>
+        </varlistentry>
+        <!-- Assumption: will be deleted from default version of themeConfig.json, per CR-2251
+        <varlistentry>
+            <term><literal>font-size</literal></term>
+            <listitem>
+                <para>Despite the name, this is the distance between login labels and text boxes</para>
+            </listitem>
+        </varlistentry>        -->
+        <varlistentry>
+            <term><literal>font-family</literal></term>
+            <listitem>
+                <para>Available fonts</para>
+            </listitem>
+        </varlistentry>
+        <varlistentry>
+            <term><literal>site-width</literal></term>
+            <listitem>
+                <para>Total width available for the login screen</para>
+            </listitem>
+        </varlistentry>
+        <varlistentry>
+            <term><literal>line-height</literal></term>
+            <listitem>
+                <para>Height of text lines</para>
+            </listitem>
+        </varlistentry>
+        <varlistentry>
+            <term><literal>color-active</literal></term>
+            <listitem>
+                <para>Border color of active text box and menu option</para>
+            </listitem>
+        </varlistentry>
+        <varlistentry>
+            <term><literal>color-inactive</literal></term>
+            <listitem>
+                <para>Border color of inactive text box</para>
+            </listitem>
+        </varlistentry>
+        <varlistentry>
+            <term><literal>active-menu-color</literal></term>
+            <listitem>
+                <para>Color of active menu option</para>
+            </listitem>
+        </varlistentry>
+        <varlistentry>
+            <term><literal>inactive-menu-color</literal></term>
+            <listitem>
+                <para>Color of inactive menu options</para>
+            </listitem>
+        </varlistentry>
+        <varlistentry>
+            <term><literal>button-hover-lightness</literal></term>
+            <listitem>
+                <para>Reduction in color, in percent</para>
+            </listitem>
+        </varlistentry>
+        <varlistentry>
+            <term><literal>href-color</literal></term>
+            <listitem>
+                <para>Color of text links</para>
+            </listitem>
+        </varlistentry>
+        <varlistentry>
+            <term><literal>color-error</literal></term>
+            <listitem>
+                <para>Color of error text</para>
+            </listitem>
+        </varlistentry>
+        <varlistentry>
+            <term><literal>color-warning</literal></term>
+            <listitem>
+                <para>Color of warning text</para>
+            </listitem>
+        </varlistentry>
+        <varlistentry>
+            <term><literal>color-success</literal></term>
+            <listitem>
+                <para>Color of text for a success message</para>
+            </listitem>
+        </varlistentry>
+        <varlistentry>
+            <term><literal>color-info</literal></term>
+            <listitem>
+                <para>Color of information message</para>
+            </listitem>
+        </varlistentry>
+        <varlistentry>
+            <term><literal>color-inactive</literal></term>
+            <listitem>
+                <para>Text color of inactive messages</para>
+            </listitem>
+        </varlistentry>
+        <varlistentry>
+            <term><literal>input-border-basic</literal></term>
+            <listitem>
+                <para>Border color of active input text box</para>
+            </listitem>
+        </varlistentry>
+        <varlistentry>
+            <term><literal>header-border-color</literal></term>
+            <listitem>
+                <para>Border color of the header</para>
+            </listitem>
+        </varlistentry>
+        <varlistentry>
+            <term><literal>footer-height</literal></term>
+            <listitem>
+                <para>Height of footer</para>
+            </listitem>
+        </varlistentry>
+        <varlistentry>
+            <term><literal>footer</literal></term>
+            <listitem>
+                <para>Parameters in the footer, typically <literal>mailto</literal> and <literal>phone</literal></para>
+            </listitem>
+        </varlistentry>
+        <varlistentry>
+            <term><literal>mailto</literal></term>
+            <listitem>
+                <para>Email address</para>
+            </listitem>
+        </varlistentry>
+        <varlistentry>
+            <term><literal>phone</literal></term>
+            <listitem>
+                <para>Telephone number</para>
+            </listitem>
+        </varlistentry>
+    </variablelist>
+
+</chapter>
