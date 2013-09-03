@@ -1602,7 +1602,7 @@ $ curl
      "name":"newuser","userpassword":"password"}'
  https://openam.example.com:8443/openam/json/users?_action=anonymousCreate
 {
-    "name": "mark",
+    "username": "mark",
     "realm": "/",
     "uid": [
         "newuser"
@@ -1878,18 +1878,18 @@ $ curl
    To add a user to the Top Level Realm, you do not need to specify the realm.</para>
 
    <para>The following example shows an administrator creating a new user. The
-   only required fields are <literal>name</literal> and
+   only required fields are <literal>username</literal> and
    <literal>userpassword</literal>. If no other name is provided, the entry
-   you make for <literal>name</literal> defaults to both the user id and the
+   you make for <literal>username</literal> defaults to both the user id and the
    user's last name.</para>
 
    <screen>$ curl --request POST --header "iplanetDirectoryPro: AQIC5w...2NzEz*"
  --header "Content-Type: application/json"
- --data '{ "name": "bjensen", "userpassword": "secret12",
+ --data '{ "username": "bjensen", "userpassword": "secret12",
            "mail": "bjensen@example.com" }'
  https://openam.example.com:8443/openam/json/users/?_action=create
 {
-    "name": "bjensen",
+    "username": "bjensen",
     "realm": "/",
     "uid": [
         "bjensen"
@@ -2365,7 +2365,7 @@ $ curl --request PUT --header "If-None-Match: *"
     <screen>$ curl --header "iplanetDirectoryPro: AQIC5w...2NzEz*"
  https://openam.example.com:8443/openam/json/users/demo
 {
-    "name": "demo",
+    "username": "demo",
     "realm": "/",
     "uid": [
         "demo"
@@ -2504,7 +2504,7 @@ $ curl --request PUT --header "If-None-Match: *"
  --data '{ "mail": "demo@example.com" }'
  https://openam.example.com:8443/openam/json/users/demo
 {
-    "name": "demo",
+    "username": "demo",
     "realm": "/",
     "uid": [
         "demo"
