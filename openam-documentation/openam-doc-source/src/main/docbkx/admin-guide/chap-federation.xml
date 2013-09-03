@@ -138,8 +138,19 @@
   remote providers, connecting to other providers by importing their
   metadata.</para>
   
-   <para>In OpenAM terms, a hosted provider is one served by the current
-   OpenAM server, whereas a remote provider is one hosted elsewhere.</para>
+  <para>In OpenAM terms, a hosted provider is one served by the current
+  OpenAM server, whereas a remote provider is one hosted elsewhere.</para>
+
+  <itemizedlist>
+   <para>This section covers the following topics.</para>
+
+   <listitem><para><xref linkend="create-hosted-idp" /></para></listitem>
+   <listitem><para><xref linkend="create-hosted-sp" /></para></listitem>
+   <listitem><para><xref linkend="create-remote-idp" /></para></listitem>
+   <listitem><para><xref linkend="create-remote-sp" /></para></listitem>
+   <listitem><para><xref linkend="create-fedlet" /></para></listitem>
+   <listitem><para><xref linkend="deploy-idp-discovery" /></para></listitem>
+  </itemizedlist>
 
   <procedure xml:id="create-hosted-idp">
    <title>To Create a Hosted Identity Provider</title>
@@ -169,6 +180,17 @@
     <para>For the attributes you share, map service provider attribute names
     (Name in Assertion), to user profile names from your identity repository
     (Local Attribute Name).</para>
+
+    <para>The default IDP mapping implementation allows you to add static values
+    in addition to values taken from the user profile. You add a static value
+    by enclosing the profile attribute name in double quotes
+    (<literal>"</literal>), as in the following examples.</para>
+
+    <para>To add a static SAML attribute called <literal>partnerID</literal>
+    with a value of <literal>staticPartnerIDValue</literal>, add
+    <literal>partnerID</literal> as the Name in Assertion with
+    <literal>"staticPartnerIDValue"</literal> as the Local Attribute
+    Name.</para>
    </step>
    <step>
     <para>Click Configure to save your configuration.</para>
@@ -861,12 +883,27 @@ CookieWriterServlet.doGetPost: Redirect to
      <term>Attribute Mapper</term>
      <listitem>
       <para>Specifies a class that implements the attribute mapping.</para>
+
+      <para>Default: <literal>com.sun.identity.saml2.plugins.DefaultIDPAttributeMapper</literal></para>
      </listitem>
     </varlistentry>
     <varlistentry>
      <term>Attribute Map</term>
      <listitem>
       <para>Maps SAML attributes to user profile attributes.</para>
+
+      <para>The default IDP mapping implementation allows you to add static values
+      in addition to values taken from the user profile. You add a static value
+      by enclosing the profile attribute name in double quotes
+      (<literal>"</literal>), as in the following examples.</para>
+
+      <para>To add a static SAML attribute called <literal>nameID</literal>
+      with a value of <literal>staticNameIDValue</literal> with a name format of
+      <literal>urn:oasis:names:tc:SAML:2.0:attrname-format:uri</literal>, add
+      the following mapping.</para>
+
+      <literallayout class="monospaced"
+      >urn:oasis:names:tc:SAML:2.0:attrname-format:uri|nameID="staticNameIDValue"</literallayout>
      </listitem>
     </varlistentry>
    </variablelist>
