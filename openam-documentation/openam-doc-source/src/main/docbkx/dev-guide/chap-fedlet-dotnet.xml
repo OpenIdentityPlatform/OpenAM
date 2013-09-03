@@ -51,6 +51,16 @@
  keys the .NET Fedlet needs. Also prepare Windows to allow the .NET Fedlet to
  log messages to Windows Event Log.</para>
 
+ <itemizedlist>
+  <para>This chapter covers the following topics.</para>
+
+  <listitem><para><xref linkend="prepare-iis-for-fedlet" /></para></listitem>
+  <listitem><para><xref linkend="import-fedlet-key-pairs-windows" /></para></listitem>
+  <listitem><para><xref linkend="prepare-windows-dotnet-fedlet-event-log" /></para></listitem>
+  <listitem><para><xref linkend="install-dotnet-fedlet" /></para></listitem>
+  <listitem><para><xref linkend="try-dotnet-fedlet-attribute-query" /></para></listitem>
+ </itemizedlist>
+
  <procedure xml:id="prepare-iis-for-fedlet">
   <title>To Prepare IIS For Installing the .NET Fedlet</title>
 
@@ -877,6 +887,27 @@ Finished installing ASP.NET (4.0.30319).</screen>
       </mediaobject>
      </step>
    </substeps>
+  </step>
+
+  <step performance="optional">
+   <para>Adapt the SSL/TLS protocol version used by the .NET Fedlet client to
+   the needs of your deployment. The default setting for .NET v4 is to use
+   either SSLv3 or TLSv1 depending on what the remote peer supports.</para>
+
+   <para>For IIS 6 on Windows Server 2003, see the Windows Server
+   documentation on <link xlink:show="new"
+   xlink:href="http://technet.microsoft.com/en-us/library/cc776467%28WS.10%29.aspx"
+   ><citetitle>TLS/SSL Tools and Settings</citetitle></link>.</para>
+
+   <para>For IIS 7.5 on Windows Server 2008 R2, also consider the explanation
+   in an online article, <link xlink:show="new"
+   xlink:href="http://www.derekseaman.com/2010/06/enable-tls-12-aes-256-and-sha-256-in.html"
+   ><citetitle>Enable TLS 1.2 Ciphers in IIS 7.5, Server 2008 R2</citetitle></link>.</para>
+
+   <para>For reference, Microsoft Developer Network has an article describing
+   <link xlink:show="new"
+   xlink:href="http://msdn.microsoft.com/en-us/library/aa374757(VS.85).aspx"
+   ><citetitle>Cipher Suites in Schannel</citetitle></link>.</para>
   </step>
  </procedure>
 </chapter>
