@@ -2791,6 +2791,31 @@ CookieWriterServlet.doGetPost: Redirect to
     </varlistentry>
 
     <varlistentry>
+     <term><literal>binding</literal></term>
+     <listitem>
+      <para>(Optional) Use this parameter to indicate what binding to use for
+      the operation. The full, long name format is required for this parameter
+      to work.</para>
+
+      <itemizedlist>
+       <para>The value must be one of the following.</para>
+
+       <listitem>
+        <para><literal>urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST</literal></para>
+       </listitem>
+
+       <listitem>
+        <para><literal>urn:oasis:names:tc:SAML:2.0:bindings:HTTP-Redirect</literal></para>
+       </listitem>
+
+       <listitem>
+        <para><literal>urn:oasis:names:tc:SAML:2.0:bindings:SOAP</literal></para>
+       </listitem>
+      </itemizedlist>
+     </listitem>
+    </varlistentry>
+
+    <varlistentry>
      <term><literal>relayState</literal></term>
      <listitem>
       <para>(Optional) Use this parameter to specify where to redirect the user
@@ -2849,6 +2874,31 @@ CookieWriterServlet.doGetPost: Redirect to
      <listitem>
       <para>(Optional) Use this parameter to specify a SAML affiliation
       identifier.</para>
+     </listitem>
+    </varlistentry>
+
+    <varlistentry>
+     <term><literal>binding</literal></term>
+     <listitem>
+      <para>(Optional) Use this parameter to indicate what binding to use for
+      the operation. The full, long name format is required for this parameter
+      to work.</para>
+
+      <itemizedlist>
+       <para>The value must be one of the following.</para>
+
+       <listitem>
+        <para><literal>urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST</literal></para>
+       </listitem>
+
+       <listitem>
+        <para><literal>urn:oasis:names:tc:SAML:2.0:bindings:HTTP-Redirect</literal></para>
+       </listitem>
+
+       <listitem>
+        <para><literal>urn:oasis:names:tc:SAML:2.0:bindings:SOAP</literal></para>
+       </listitem>
+      </itemizedlist>
      </listitem>
     </varlistentry>
 
