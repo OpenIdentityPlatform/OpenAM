@@ -76,6 +76,16 @@ public class SSOTokenFactory {
     }
 
     /**
+     * Checks if the given token is valid.
+     *
+     * @param token The SSOToken.
+     * @return <code>true</code> if SSOToken is valid.
+     */
+    public boolean isTokenValid(SSOToken token) {
+        return manager.isValidToken(token);
+    }
+
+    /**
      * Gets a SSOToken for the Super User.
      *
      * @return The Admin users SSOToken.

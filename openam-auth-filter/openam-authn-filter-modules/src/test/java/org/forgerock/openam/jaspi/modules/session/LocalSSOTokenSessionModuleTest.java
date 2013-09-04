@@ -189,6 +189,49 @@ public class LocalSSOTokenSessionModuleTest {
     }
 
     @Test
+    public void shouldValidateRequestWithApplicationRequesterToken() throws AuthException, SSOException {
+
+        //Given
+        String tokenName = "SSO_TOKEN_ID";
+
+        MessageInfo messageInfo = mock(MessageInfo.class);
+        Subject clientSubject = new Subject();
+        Subject serviceSubject = new Subject();
+        HttpServletRequest request = mock(HttpServletRequest.class);
+        SSOToken ssoToken = mock(SSOToken.class);
+
+        Principal principal = mock(Principal.class);
+        Map<String, Object> map = new HashMap<String, Object>();
+        Map<String, Object> context = new HashMap<String, Object>();
+        given(ssoToken.getPrincipal()).willReturn(principal);
+        given(principal.getName()).willReturn("PRINCIPAL");
+
+        given(messageInfo.getRequestMessage()).willReturn(request);
+        map.put("org.forgerock.authentication.context", context);
+        given(messageInfo.getMap()).willReturn(map);
+
+        given(messageInfo.getRequestMessage()).willReturn(request);
+        given(request.getParameter("requester")).willReturn("APPLICATION_TOKEN_ID");
+
+        given(mockFactory.getTokenFromId("APPLICATION_TOKEN_ID")).willReturn(ssoToken);
+        given((mockFactory.isTokenValid(ssoToken))).willReturn(true);
+
+        given(request.getCookies()).willReturn(new Cookie[]{new Cookie("2", "2"),
+                new Cookie(AuthnRequestUtils.SSOTOKEN_COOKIE_NAME, tokenName), new Cookie("1", "1")});
+        given(mockUtils.getTokenId(eq(request))).willReturn(tokenName);
+        given(mockFactory.getTokenFromId(eq(tokenName))).willReturn(ssoToken);
+
+        CallbackHandler handler = mock(CallbackHandler.class);
+        localSSOTokenSessionModule.initialize(null, null, handler, null);
+
+        //When
+        AuthStatus authStatus = localSSOTokenSessionModule.validateRequest(messageInfo, clientSubject, serviceSubject);
+
+        //Then
+        assertEquals(authStatus, AuthStatus.SUCCESS);
+    }
+
+    @Test
     public void shouldSecureResponse() {
 
         //Given

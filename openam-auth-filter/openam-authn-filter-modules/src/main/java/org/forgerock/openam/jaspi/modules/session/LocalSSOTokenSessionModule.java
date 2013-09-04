@@ -18,6 +18,9 @@ package org.forgerock.openam.jaspi.modules.session;
 
 import com.iplanet.sso.SSOException;
 import com.iplanet.sso.SSOToken;
+import com.iplanet.sso.SSOTokenManager;
+import com.sun.identity.session.util.RestrictedTokenAction;
+import com.sun.identity.session.util.RestrictedTokenContext;
 import org.apache.commons.lang.StringUtils;
 import org.forgerock.openam.auth.shared.AuthnRequestUtils;
 import org.forgerock.openam.auth.shared.SSOTokenFactory;
@@ -51,6 +54,7 @@ import java.util.Map;
 public class LocalSSOTokenSessionModule implements ServerAuthModule {
 
     private static final String COOKIE_HEADER_KEY = "iPlanetDirectoryPro";
+    private static final String REQUESTER_URL_PARAM = "requester";
 
     private AuthnRequestUtils requestUtils;
     private SSOTokenFactory factory;
@@ -111,10 +115,10 @@ public class LocalSSOTokenSessionModule implements ServerAuthModule {
     }
 
     /**
-     * Validates the request by attempting to retrieve the SSOToken ID from the cookies on the request.
-     * If the SSOToken ID cookie is not present then the method returns AuthStatus.SEND_FAILURE, otherwise if it is
-     * present it is then used to retrieve the actual SSOToken from the SSOTokenManager, if valid then
-     * AuthStatus.SUCCESS will be returned, otherwise AuthStatus.SEND_FAILURE will be returned.
+     * Validates the request by checking the validity of the SSOToken ID from the AM cookie.
+     * <p>
+     * If the SSOToken ID is a restricted token then the request must also contain a url parameter "requester" which
+     * must contain the application SSOToken ID of the application the restricted token was issued for.
      *
      * @param messageInfo {@inheritDoc}
      * @param clientSubject {@inheritDoc}
@@ -123,13 +127,50 @@ public class LocalSSOTokenSessionModule implements ServerAuthModule {
      * @throws AuthException If there is a problem validating the request.
      */
     @Override
-    public AuthStatus validateRequest(MessageInfo messageInfo, Subject clientSubject, Subject serviceSubject)
-            throws AuthException {
+    public AuthStatus validateRequest(final MessageInfo messageInfo, final Subject clientSubject,
+            Subject serviceSubject) throws AuthException {
         if (!isInitialised()) {
             initDependencies();
         }
 
-        HttpServletRequest request = (HttpServletRequest) messageInfo.getRequestMessage();
+        final HttpServletRequest request = (HttpServletRequest) messageInfo.getRequestMessage();
+
+        String requester = request.getParameter(REQUESTER_URL_PARAM);
+        if (requester != null) {
+            try {
+                SSOToken requesterToken = getFactory().getTokenFromId(requester);
+                if (getFactory().isTokenValid(requesterToken)) {
+                    Object o = RestrictedTokenContext.doUsing(requesterToken, new RestrictedTokenAction() {
+                        public Object run() throws Exception {
+                            return validate(request, messageInfo, clientSubject);
+                        }
+                    });
+                    return (AuthStatus) o;
+                }
+            } catch (Exception ex) {
+                throw new AuthException("An error occurred whilst trying to use restricted token.");
+            }
+        }
+        return validate(request, messageInfo, clientSubject);
+    }
+
+    /**
+     * Validates the request by attempting to retrieve the SSOToken ID from the cookies on the request.
+     * If the SSOToken ID cookie is not present then the method returns AuthStatus.SEND_FAILURE, otherwise if it is
+     * present it is then used to retrieve the actual SSOToken from the SSOTokenManager, if valid then
+     * AuthStatus.SUCCESS will be returned, otherwise AuthStatus.SEND_FAILURE will be returned.
+     *
+     * @param request The HttpServletRequest.
+     * @param messageInfo A contextual object that encapsulates the client request and server response objects, and
+     *                    that may be used to save state across a sequence of calls made to the methods of this
+     *                    interface for the purpose of completing a secure message exchange.
+     * @param clientSubject A Subject that represents the source of the service request. It is used by the method
+     *                      implementation to store Principals and credentials validated in the request.
+     * @return AuthStatus.SUCCESS if the SSOToken ID is valid, otherwise AuthStatus.SEND_FAILURE.
+     * @throws AuthException If there is a problem validating the request.
+     */
+    private AuthStatus validate(HttpServletRequest request, MessageInfo messageInfo, Subject clientSubject)
+            throws AuthException {
 
         String tokenId = getRequestUtils().getTokenId(request);
         if (StringUtils.isEmpty(tokenId)) {
