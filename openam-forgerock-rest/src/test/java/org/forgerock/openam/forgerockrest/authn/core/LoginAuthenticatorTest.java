@@ -90,7 +90,6 @@ public class LoginAuthenticatorTest {
 
         //Then
         verify(authContextLocalWrapper).login();
-        verifyNoMoreInteractions(authContextLocalWrapper);
         verify(coreServicesWrapper).getAuthContext(eq(request), eq((HttpServletResponse) null), (SessionID) anyObject(),
                 eq(false), eq(false));
         assertNotNull(loginProcess);
@@ -123,7 +122,6 @@ public class LoginAuthenticatorTest {
 
         //Then
         verify(authContextLocalWrapper).login(AuthContext.IndexType.MODULE_INSTANCE, "INDEX_VALUE");
-        verifyNoMoreInteractions(authContextLocalWrapper);
         verify(coreServicesWrapper).getAuthContext(eq(request), eq((HttpServletResponse) null), (SessionID) anyObject(),
                 eq(false), eq(false));
         assertNotNull(loginProcess);
@@ -158,7 +156,6 @@ public class LoginAuthenticatorTest {
 
         //Then
         verify(authContextLocalWrapper).login(AuthContext.IndexType.RESOURCE, "INDEX_VALUE", false, envMap, null);
-        verifyNoMoreInteractions(authContextLocalWrapper);
         verify(coreServicesWrapper).getAuthContext(eq(request), eq((HttpServletResponse) null), (SessionID) anyObject(),
                 eq(false), eq(false));
         assertNotNull(loginProcess);
@@ -231,7 +228,6 @@ public class LoginAuthenticatorTest {
 
         //Then
         verify(authContextLocalWrapper).login();
-        verifyNoMoreInteractions(authContextLocalWrapper);
         assertNotNull(loginProcess);
     }
 
@@ -267,7 +263,6 @@ public class LoginAuthenticatorTest {
 
         //Then
         verify(authContextLocalWrapper).login(AuthContext.IndexType.USER, "INDEX_VALUE");
-        verifyNoMoreInteractions(authContextLocalWrapper);
         assertNotNull(loginProcess);
     }
 
@@ -305,7 +300,6 @@ public class LoginAuthenticatorTest {
 
         //Then
         verify(authContextLocalWrapper).login(AuthContext.IndexType.ROLE, "INDEX_VALUE");
-        verifyNoMoreInteractions(authContextLocalWrapper);
         assertNotNull(loginProcess);
     }
 
@@ -343,7 +337,6 @@ public class LoginAuthenticatorTest {
 
         //Then
         verify(authContextLocalWrapper).login(AuthContext.IndexType.SERVICE, "INDEX_VALUE");
-        verifyNoMoreInteractions(authContextLocalWrapper);
         assertNotNull(loginProcess);
     }
 
@@ -381,7 +374,6 @@ public class LoginAuthenticatorTest {
 
         //Then
         verify(authContextLocalWrapper).login(AuthContext.IndexType.MODULE_INSTANCE, "INDEX_VALUE");
-        verifyNoMoreInteractions(authContextLocalWrapper);
         assertNotNull(loginProcess);
     }
 
@@ -419,7 +411,6 @@ public class LoginAuthenticatorTest {
 
         //Then
         verify(authContextLocalWrapper).login(AuthContext.IndexType.LEVEL, "5");
-        verifyNoMoreInteractions(authContextLocalWrapper);
         assertNotNull(loginProcess);
     }
 
@@ -455,7 +446,6 @@ public class LoginAuthenticatorTest {
 
         //Then
         verify(authContextLocalWrapper).login(AuthContext.IndexType.USER, "INDEX_VALUE_NEW");
-        verifyNoMoreInteractions(authContextLocalWrapper);
         assertNotNull(loginProcess);
     }
 
@@ -493,7 +483,6 @@ public class LoginAuthenticatorTest {
 
         //Then
         verify(authContextLocalWrapper).login(AuthContext.IndexType.ROLE, "INDEX_VALUE_NEW");
-        verifyNoMoreInteractions(authContextLocalWrapper);
         assertNotNull(loginProcess);
     }
 
@@ -531,7 +520,6 @@ public class LoginAuthenticatorTest {
 
         //Then
         verify(authContextLocalWrapper).login(AuthContext.IndexType.SERVICE, "INDEX_VALUE_NEW");
-        verifyNoMoreInteractions(authContextLocalWrapper);
         assertNotNull(loginProcess);
     }
 
@@ -569,7 +557,6 @@ public class LoginAuthenticatorTest {
 
         //Then
         verify(authContextLocalWrapper).login(AuthContext.IndexType.MODULE_INSTANCE, "INDEX_VALUE_NEW");
-        verifyNoMoreInteractions(authContextLocalWrapper);
         assertNotNull(loginProcess);
     }
 
@@ -607,7 +594,6 @@ public class LoginAuthenticatorTest {
 
         //Then
         verify(authContextLocalWrapper).login(AuthContext.IndexType.LEVEL, "15");
-        verifyNoMoreInteractions(authContextLocalWrapper);
         assertNotNull(loginProcess);
     }
 
@@ -643,7 +629,6 @@ public class LoginAuthenticatorTest {
 
         //Then
         verify(authContextLocalWrapper).login(AuthContext.IndexType.COMPOSITE_ADVICE, "INDEX_VALUE");
-        verifyNoMoreInteractions(authContextLocalWrapper);
         assertNotNull(loginProcess);
     }
 
@@ -679,7 +664,6 @@ public class LoginAuthenticatorTest {
 
         //Then
         verify(authContextLocalWrapper).login(AuthContext.IndexType.COMPOSITE_ADVICE, "INDEX_VALUE");
-        verifyNoMoreInteractions(authContextLocalWrapper);
         assertNotNull(loginProcess);
     }
 
