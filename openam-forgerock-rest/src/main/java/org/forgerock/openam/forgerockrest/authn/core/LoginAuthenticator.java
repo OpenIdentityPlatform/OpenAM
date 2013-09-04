@@ -30,6 +30,7 @@ import org.forgerock.openam.forgerockrest.authn.core.wrappers.CoreServicesWrappe
 import org.forgerock.openam.forgerockrest.authn.exceptions.RestAuthException;
 
 import javax.inject.Inject;
+import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.util.Map;
@@ -133,6 +134,14 @@ public class LoginAuthenticator {
             authContext.login(indexType.getIndexType(), indexValue);
         } else {
             authContext.login();
+        }
+
+        // When starting a new login process, add the load balancer cookies to the response.
+        try {
+            HttpServletResponse response = loginConfiguration.getHttpResponse();
+            coreServicesWrapper.setLbCookie(authContext.getAuthContext(), request, response);
+        } catch (AuthException e) {
+            throw new AuthLoginException(e);
         }
 
         return loginProcess;

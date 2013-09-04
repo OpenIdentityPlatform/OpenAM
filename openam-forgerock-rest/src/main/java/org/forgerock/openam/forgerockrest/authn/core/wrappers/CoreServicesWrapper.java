@@ -28,14 +28,17 @@ import com.sun.identity.authentication.service.AuthUtils;
 import com.sun.identity.authentication.util.AMAuthUtils;
 import com.sun.identity.idm.IdRepoException;
 import com.sun.identity.idm.IdUtils;
+import com.sun.identity.saml2.idpdiscovery.CookieUtils;
 import com.sun.identity.security.AdminTokenAction;
 import com.sun.identity.sm.DNMapper;
 import com.sun.identity.sm.SMSException;
 import com.sun.identity.sm.ServiceConfigManager;
 
+import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.security.AccessController;
+import java.util.HashSet;
 import java.util.Hashtable;
 import java.util.Map;
 import java.util.Set;
@@ -237,5 +240,18 @@ public class CoreServicesWrapper {
      */
     public boolean isOrganizationActive(String orgDN) throws IdRepoException, SSOException {
         return IdUtils.isOrganizationActive(getAdminToken(), orgDN);
+    }
+
+    /**
+     * Creates and sets the load balancer cookies on the response.
+     *
+     * @param authContext The AuthContextLocal object.
+     * @param request The HttpServletRequest.
+     * @param response The HttpServletResponse.
+     * @throws AuthException If there is a problem setting the load balancer cookies.
+     */
+    public void setLbCookie(AuthContextLocal authContext, HttpServletRequest request, HttpServletResponse response)
+            throws AuthException {
+        AuthUtils.setlbCookie(authContext, request, response);
     }
 }
