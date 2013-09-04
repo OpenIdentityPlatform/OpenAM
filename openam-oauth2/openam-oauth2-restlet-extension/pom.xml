@@ -3,7 +3,7 @@
 <!--
   ~ DO NOT REMOVE COPYRIGHT NOTICES OR THIS HEADER.
   ~
-  ~ Copyright (c) 2012-2013 ForgeRock Inc. All rights reserved.
+  ~ Copyright (c) 2012-2013 ForgeRock AS. All rights reserved.
   ~
   ~ The contents of this file are subject to the terms
   ~ of the Common Development and Distribution License
@@ -29,7 +29,7 @@
     <parent>
         <groupId>org.forgerock.openam</groupId>
         <artifactId>openam-oauth2</artifactId>
-        <version>10.2.0-SNAPSHOT</version>
+        <version>11.0.0-SNAPSHOT</version>
     </parent>
     <groupId>org.forgerock.openam</groupId>
     <artifactId>openam-oauth2-restlet-extension</artifactId>

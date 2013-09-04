@@ -26,6 +26,9 @@
  *
  */
 
+/**
+ * Portions Copyrighted 2013 ForgeRock AS
+ */
 package com.sun.identity.classloader;
 
 import java.net.URL;
@@ -178,19 +181,19 @@ public class FAMClassLoader {
         "xml-apis-2.11.0.jar",
         "xml-resolver-2.11.0.jar",
         "xml-serializer-2.11.0.jar",
-        "openam-shared-10.2.0-SNAPSHOT.jar",            // "opensso.jar",
-        "openam-dtd-schema-10.2.0-SNAPSHOT.jar",
-        "openam-entitlements-10.2.0-SNAPSHOT.jar",
-        "openam-idsvcs-schema-10.2.0-SNAPSHOT.jar",
-        "openam-jaxrpc-schema-10.2.0-SNAPSHOT.jar",
-        "openam-liberty-schema-10.2.0-SNAPSHOT.jar",
-        "openam-rest-10.2.0-SNAPSHOT.jar",
-        "openam-saml2-schema-10.2.0-SNAPSHOT.jar",
-        "openam-wsfederation-schema-10.2.0-SNAPSHOT.jar",
-        "openam-xacml3-schema-10.2.0-SNAPSHOT.jar",
+        "openam-shared-11.0.0-SNAPSHOT.jar",            // "opensso.jar",
+        "openam-dtd-schema-11.0.0-SNAPSHOT.jar",
+        "openam-entitlements-11.0.0-SNAPSHOT.jar",
+        "openam-idsvcs-schema-11.0.0-SNAPSHOT.jar",
+        "openam-jaxrpc-schema-11.0.0-SNAPSHOT.jar",
+        "openam-liberty-schema-11.0.0-SNAPSHOT.jar",
+        "openam-rest-11.0.0-SNAPSHOT.jar",
+        "openam-saml2-schema-11.0.0-SNAPSHOT.jar",
+        "openam-wsfederation-schema-11.0.0-SNAPSHOT.jar",
+        "openam-xacml3-schema-11.0.0-SNAPSHOT.jar",
         "xalan-2.7.1.jar",                               // "xalan.jar",
-        "openam-federation-library-10.2.0-SNAPSHOT.jar", // "openfedlib.jar"
-        "OpenFM-10.2.0-SNAPSHOT.jar"
+        "openam-federation-library-11.0.0-SNAPSHOT.jar", // "openfedlib.jar"
+        "OpenFM-11.0.0-SNAPSHOT.jar"
     };
 
     /**
