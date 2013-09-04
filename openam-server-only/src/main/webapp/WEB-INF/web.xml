@@ -100,6 +100,7 @@
         <filter-name>XUIFilter</filter-name>
         <url-pattern>/UI/*</url-pattern>
         <dispatcher>FORWARD</dispatcher>
+        <dispatcher>REQUEST</dispatcher>
     </filter-mapping>
     <filter-mapping>
         <filter-name>XUIFilter</filter-name>
