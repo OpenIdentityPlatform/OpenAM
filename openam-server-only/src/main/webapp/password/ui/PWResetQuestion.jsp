@@ -26,89 +26,108 @@
 
 --%>
 <%--
-   Portions Copyrighted 2011-2012 ForgeRock Inc
+   Portions Copyrighted 2011-2013 ForgeRock AS
    Portions Copyrighted 2012 Open Source Solution Technology Corporation
 --%>
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 
 <html xmlns="http://www.w3.org/1999/xhtml">
-    <%@include file="../ui/PWResetBase.jsp" %>
-    <%@page info="PWResetQuestion" language="java" pageEncoding="UTF-8" %>
-    <%@taglib uri="/WEB-INF/jato.tld" prefix="jato"%>
-    <jato:useViewBean className="com.sun.identity.password.ui.PWResetQuestionViewBean" fireChildDisplayEvents="true">
-        <head>
-            <title><jato:text name="titleHtmlPage" /></title>
-            <link href="<%= ServiceURI%>/css/new_style.css" rel="stylesheet" type="text/css" />
-            <!--[if IE 9]> <link href="<%= ServiceURI %>/css/ie9.css" rel="stylesheet" type="text/css"> <![endif]-->
-            <!--[if lte IE 7]> <link href="<%= ServiceURI %>/css/ie7.css" rel="stylesheet" type="text/css"> <![endif]-->
-            <script language="javascript">
-                <!-- set the focus for a given field and form -->
-                function setFocus(frmName,field) {
-                    var frm = document.forms[frmName];
-                    if (frm != null) {
-                        var elm = frm.elements[field];
-                        if (elm != null) {
-                            elm.focus();
-                            elm.select();
-                        }
+<%@include file="../ui/PWResetBase.jsp" %>
+<%@page info="PWResetQuestion" language="java" pageEncoding="UTF-8" %>
+<%@taglib uri="/WEB-INF/jato.tld" prefix="jato" %>
+<jato:useViewBean className="com.sun.identity.password.ui.PWResetQuestionViewBean" fireChildDisplayEvents="true">
+    <head>
+        <title><jato:text name="titleHtmlPage"/></title>
+        <link href="<%= ServiceURI%>/css/new_style.css" rel="stylesheet" type="text/css"/>
+        <!--[if IE 9]>
+        <link href="<%= ServiceURI %>/css/ie9.css" rel="stylesheet" type="text/css"> <![endif]-->
+        <!--[if lte IE 7]>
+        <link href="<%= ServiceURI %>/css/ie7.css" rel="stylesheet" type="text/css"> <![endif]-->
+        <script language="javascript">
+            <!--
+            set
+            the
+            focus
+            for a given
+            field
+            and
+            form -->
+            function setFocus(frmName, field) {
+                var frm = document.forms[frmName];
+                if (frm != null) {
+                    var elm = frm.elements[field];
+                    if (elm != null) {
+                        elm.focus();
+                        elm.select();
                     }
                 }
-            </script>
-        </head>
-        <body class="LogBdy" onLoad="setFocus('PWResetQuestion','PWResetQuestion.passResetTileView[0].tfAnswer');">
-            <div class="container_12">
-                <div class="grid_4 suffix_8">
-                    <a class="logo" href="<%= ServiceURI%>"></a>
-                </div>
-                <div class="box box-spaced clear-float">
-                    <div class="grid_3">
-                        <div class="product-logo"></div>
-                    </div>
-                    <div class="grid_9 left-seperator">
-                        <div class="box-content clear-float">
-                            <h1><jato:text name="pwQuestionTitle"/></h1>          
-                            <jato:content name="errorBlock">
-                                <div class="message">
-                                    <span class="icon error"></span>
-                                    <h3><jato:text name="errorTitle"/></h3>
-                                    <h4><jato:text name="errorMsg"/></h4>
-                                </div>    
-                            </jato:content>
-                            <jato:content name="infoBlock">
-                                <div class="message">
-                                    <span class="icon info"></span>
-                                    <h3><jato:text name="infoMsg"/></h3>
-                                </div>     
-                            </jato:content>
-                            <jato:content name ="resetPage">
-                                <jato:form name="PWResetQuestion" method="post" defaultCommandChild="/btnOK">
-                                    <fieldset>
-                                        <jato:tiledView name="passResetTileView"
-                                                        type="com.sun.identity.password.ui.PWResetQuestionTiledView">
-                                            <jato:hidden name="fldAttrName"/>
-                                            <div class="row">
-                                                <label for="PWResetQuestion.tfAnswer">
-                                                    <jato:text name="lblQuestion" />:
-                                                </label>
-                                                <jato:textField name="tfAnswer" styleClass="textbox"/>
-                                            </div>
-                                        </jato:tiledView>
-                                        <div class="row">
-                                            <input name="PWResetQuestion.btnOK" type="submit" class="button primary" value="<jato:text name="btnOK" />"/>
-                                            <input name="PWResetQuestion.btnPrevious" type="submit" class="button" value="<jato:text name="btnPrevious" />"/>
-                                        </div>
-                                    </fieldset>
-                                </jato:form>
-                            </jato:content>
+            }
+        </script>
+    </head>
+    <body class="LogBdy" onLoad="setFocus('PWResetQuestion','PWResetQuestion.passResetTileView[0].tfAnswer');">
+    <div class="container_12">
+        <div class="grid_4 suffix_8">
+            <a class="logo" href="<%= ServiceURI%>"></a>
+        </div>
+        <div class="box box-spaced clear-float">
+            <div class="grid_3">
+                <div class="product-logo"></div>
+            </div>
+            <div class="grid_9 left-seperator">
+                <div class="box-content clear-float">
+                    <h1><jato:text name="pwQuestionTitle"/></h1>
+                    <jato:content name="errorBlock">
+                        <div class="message">
+                            <span class="icon error"></span>
+
+                            <h3><jato:text name="errorTitle"/></h3>
+                            <h4><jato:text name="errorMsg"/></h4>
                         </div>
-                    </div>
-                </div>
-                <div class="footer alt-color">
-                    <div class="grid_6 suffix_3">
-                        <p>Copyright &copy; 2012 ForgeRock AS, Philip Pedersens vei 1, 1366 Lysaker, Norway. All rights reserved. Licensed for use under the Common Development and Distribution License (CDDL), see <a href="http://www.forgerock.com/license/CDDLv1.0.html">http://www.forgerock.com/license/CDDLv1.0.html</a> for details. This software is based on the OpenSSO/OpenAM open source project and the source includes the copyright works of other authors, granted for use under the CDDL. This distribution may include other materials developed by third parties. All Copyrights and Trademarks are property of their owners.</p>
-                    </div>
+                    </jato:content>
+                    <jato:content name="infoBlock">
+                        <div class="message">
+                            <span class="icon info"></span>
+
+                            <h3><jato:text name="infoMsg"/></h3>
+                        </div>
+                    </jato:content>
+                    <jato:content name="resetPage">
+                        <jato:form name="PWResetQuestion" method="post" defaultCommandChild="/btnOK">
+                            <fieldset>
+                                <jato:tiledView name="passResetTileView"
+                                                type="com.sun.identity.password.ui.PWResetQuestionTiledView">
+                                    <jato:hidden name="fldAttrName"/>
+                                    <div class="row">
+                                        <label for="PWResetQuestion.tfAnswer">
+                                            <jato:text name="lblQuestion"/>:
+                                        </label>
+                                        <jato:textField name="tfAnswer" styleClass="textbox"/>
+                                    </div>
+                                </jato:tiledView>
+                                <div class="row">
+                                    <input name="PWResetQuestion.btnOK" type="submit" class="button primary"
+                                           value="<jato:text name="btnOK" />"/>
+                                    <input name="PWResetQuestion.btnPrevious" type="submit" class="button"
+                                           value="<jato:text name="btnPrevious" />"/>
+                                </div>
+                            </fieldset>
+                        </jato:form>
+                    </jato:content>
                 </div>
             </div>
-        </body>
-    </jato:useViewBean>
+        </div>
+        <div class="footer alt-color">
+            <div class="grid_6 suffix_3">
+                <p>Copyright &copy; 2012-2013 ForgeRock AS, Lysaker torg 2, 1366 Lysaker, Norway. All rights reserved.
+                    Licensed for use under the Common Development and Distribution License (CDDL), see <a
+                            href="http://www.forgerock.org/license/CDDLv1.0.html">http://www.forgerock.org/license/CDDLv1.0.html</a>
+                    for details. This software is based on the OpenSSO/OpenAM open source project and the source
+                    includes the copyright works of other authors, granted for use under the CDDL. This distribution may
+                    include other materials developed by third parties. All Copyrights and Trademarks are property of
+                    their owners.</p>
+            </div>
+        </div>
+    </div>
+    </body>
+</jato:useViewBean>
 </html>

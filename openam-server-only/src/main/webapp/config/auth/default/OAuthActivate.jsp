@@ -1,7 +1,7 @@
 <%--
    DO  NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
   
-   Copyright � 2011-2012 ForgeRock Inc. All rights reserved.
+   Copyright (c) 2011-2013 ForgeRock AS. All rights reserved.
   
    The contents of this file are subject to the terms
    of the Common Development and Distribution License
@@ -25,9 +25,9 @@
 
 
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
-    "http://www.w3.org/TR/html4/loose.dtd">
+"http://www.w3.org/TR/html4/loose.dtd">
 
-<%@ page  language="java"%>
+<%@ page language="java" %>
 <%@ page import="org.owasp.esapi.ESAPI" %>
 <%@ page import="com.iplanet.am.util.SystemProperties" %>
 <%@ page import="com.sun.identity.shared.Constants" %>
@@ -38,123 +38,137 @@
 <%@ page import="org.forgerock.openam.authentication.modules.oauth2.OAuthUtil" %>
 
 <%
-   // Internationalization stuff. This is just an example. You can use any i18n framework
-   // as long as you use amAuthOAuth as the resource bundle.
-   String ServiceURI = SystemProperties.get(Constants.AM_SERVICES_DEPLOYMENT_DESCRIPTOR); 
-   String lang = request.getParameter("lang");
-   ResourceBundle resources;
-   Locale locale = null;
-   try {
+    // Internationalization stuff. This is just an example. You can use any i18n framework
+    // as long as you use amAuthOAuth as the resource bundle.
+    String ServiceURI = SystemProperties.get(Constants.AM_SERVICES_DEPLOYMENT_DESCRIPTOR);
+    String lang = request.getParameter("lang");
+    ResourceBundle resources;
+    Locale locale = null;
+    try {
         if (lang != null && lang.length() != 0) {
-           locale = new Locale(lang);
+            locale = new Locale(lang);
         } else {
-           locale = request.getLocale();
+            locale = request.getLocale();
         }
         resources = ResourceBundle.getBundle("amAuthOAuth", locale);
         OAuthUtil.debugMessage("OAuthActivate: obtained resource bundle with locale " + locale);
-   } catch (MissingResourceException mr) {
+    } catch (MissingResourceException mr) {
         OAuthUtil.debugError("OAuthActivate:: Resource Bundle not found", mr);
         resources = ResourceBundle.getBundle("amAuthOAuth");
-   } 
+    }
 
-   String logoutURL = request.getParameter(PARAM_GOTO); 
-   if (logoutURL == null) {
-      logoutURL = ServiceURI;
-   } else {
-       boolean isValidURL = ESAPI.validator().
-               isValidInput("URLContext", logoutURL, "URL", 255, false); 
-       if (!isValidURL) {   
-           OAuthUtil.debugError("OAuthPwd: wrong logoutURL URL attempted to be used "
-                   + "in the OAuthPwd page: " + logoutURL);
-           logoutURL = ServiceURI;
-       } 
-   }
-   
-   String activationTitle = resources.getString("activationTitle");
-   String emptyCode = ESAPI.encoder().encodeForHTML(resources.getString("emptyCode"));
-   String errInvalidCode = ESAPI.encoder().encodeForHTML(resources.getString("errInvalidCode"));
-   String activation = ESAPI.encoder().encodeForHTML(PARAM_ACTIVATION);
-   String activationLabel = resources.getString("activationLabel");
-   String activationCodeMsg = resources.getString("activationCodeMsg");
-   String submitValue = ESAPI.encoder().encodeForHTML(resources.getString("submit"));
-   String submitButton = ESAPI.encoder().encodeForHTML("Submit");
-   String cancelValue = ESAPI.encoder().encodeForHTML(resources.getString("cancel"));
-   String outputField = ESAPI.encoder().encodeForHTML("output");
-   String emptyField = ESAPI.encoder().encodeForHTML(""); 
+    String logoutURL = request.getParameter(PARAM_GOTO);
+    if (logoutURL == null) {
+        logoutURL = ServiceURI;
+    } else {
+        boolean isValidURL = ESAPI.validator().
+                isValidInput("URLContext", logoutURL, "URL", 255, false);
+        if (!isValidURL) {
+            OAuthUtil.debugError("OAuthPwd: wrong logoutURL URL attempted to be used "
+                    + "in the OAuthPwd page: " + logoutURL);
+            logoutURL = ServiceURI;
+        }
+    }
+
+    String activationTitle = resources.getString("activationTitle");
+    String emptyCode = ESAPI.encoder().encodeForHTML(resources.getString("emptyCode"));
+    String errInvalidCode = ESAPI.encoder().encodeForHTML(resources.getString("errInvalidCode"));
+    String activation = ESAPI.encoder().encodeForHTML(PARAM_ACTIVATION);
+    String activationLabel = resources.getString("activationLabel");
+    String activationCodeMsg = resources.getString("activationCodeMsg");
+    String submitValue = ESAPI.encoder().encodeForHTML(resources.getString("submit"));
+    String submitButton = ESAPI.encoder().encodeForHTML("Submit");
+    String cancelValue = ESAPI.encoder().encodeForHTML(resources.getString("cancel"));
+    String outputField = ESAPI.encoder().encodeForHTML("output");
+    String emptyField = ESAPI.encoder().encodeForHTML("");
 %>
 
 <html xmlns="http://www.w3.org/1999/xhtml">
-    <head>
-        <meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
-        <link href="<%= ServiceURI%>/css/new_style.css" rel="stylesheet" type="text/css" />
-        <!--[if IE 9]> <link href="<%= ServiceURI%>/css/ie9.css" rel="stylesheet" type="text/css"> <![endif]-->
-        <!--[if lte IE 7]> <link href="<%= ServiceURI%>/css/ie7.css" rel="stylesheet" type="text/css"> <![endif]-->
-        <script language="JavaScript" src="<%= ServiceURI %>/js/auth.js"></script>
-        <script language="JavaScript">
-            
-            function validateEntry(form, activation, submit) {
-                var out = document.getElementById("msgcnt");
-                out.innerHTML = "";
-                if(form.elements[submit].value == '<%= cancelValue %>') {
-                    return false;
-                }
-                if(form.elements[activation].value == '') {
-                    out.innerHTML = "<%= emptyCode %>";
-                    form.elements[activation].focus();
-                    return false;
-                }
-                var re = /^[a-zA-Z0-9.\\-\\/+=_ ]*$/
-                if(!re.test(form.elements[activation].value)) {
-                    out.innerHTML = "<%= errInvalidCode %>";
-                    form.elements[activation].focus();
-                    return false;
-                }
-                out.innerHTML = "<%= ESAPI.encoder().encodeForHTML("") %>";
-                return true;
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
+    <link href="<%= ServiceURI%>/css/new_style.css" rel="stylesheet" type="text/css"/>
+    <!--[if IE 9]>
+    <link href="<%= ServiceURI%>/css/ie9.css" rel="stylesheet" type="text/css"> <![endif]-->
+    <!--[if lte IE 7]>
+    <link href="<%= ServiceURI%>/css/ie7.css" rel="stylesheet" type="text/css"> <![endif]-->
+    <script language="JavaScript" src="<%= ServiceURI %>/js/auth.js"></script>
+    <script language="JavaScript">
+
+        function validateEntry(form, activation, submit) {
+            var out = document.getElementById("msgcnt");
+            out.innerHTML = "";
+            if (form.elements[submit].value == '<%= cancelValue %>') {
+                return false;
             }
-        
-            function adios() { 
-                window.location = "<%= logoutURL %>";
+            if (form.elements[activation].value == '') {
+                out.innerHTML = "<%= emptyCode %>";
+                form.elements[activation].focus();
+                return false;
             }
-        
-        </script>
-        <title><%= activationTitle %></title>
-    </head>
-    <body>
-        <div class="container_12">
-            <div class="grid_4 suffix_8">
-                <a class="logo" href="<%= ServiceURI%>"></a>
-            </div>
-            <div class="box clear-float">
-                <div class="grid_3">
-                    <div class="product-logo"></div>
-                </div>
-                <div class="grid_9 left-seperator">
-                    <div class="box-content clear-float">
-                        <h1>Activation Code</h1>
-                        <p class="message"><span class="icon info"></span><span id="msgcnt"><%= activationCodeMsg %></span></p>
-                        <form name="Login" method="POST" action="<%= emptyField %>" 
-                              onsubmit="return validateEntry(this,'<%= activation %>' ,
-                                  '<%= submitButton %>');" >
-                            <fieldset>
-                                <div class="row"><label for="<%= activation %>"><%=activationLabel%></label><input class="textbox" type="text" id="<%= activation %>" name="<%= activation %>"/></div>
-                                <div class="row">
-                                    <input type="submit" class="button primary" value="<%= submitValue %>" name="<%= submitButton %>"/>
-                                    <input type="button" class="button" value="<%= cancelValue %>" name="<%= submitButton %>" onclick="adios(); return false;"/>
-                                </div>
-                            </fieldset>
-                        </form> 
-                    </div>
-                </div>
-            </div>
-            <div class="footer alt-color">
-                <div class="grid_3">
-                    <p>Copyright &copy; 2010 ForgeRock AS,<br />Philip Pedersens vei 1,<br />1366 Lysaker,<br />Norway.<br />All rights reserved.</p>
-                </div>
-                <div class="grid_6 suffix_3">
-                    <p>Licensed for use under the Common Development and Distribution License (CDDL), see <a href="http://www.forgerock.com/license/CDDLv1.0.html">http://www.forgerock.com/license/CDDLv1.0.html</a> for details. This software is based on the OpenAM/OpenAM open source project and the source includes the copyright works of other authors, granted for use under the CDDL. This distribution may include other materials developed by third parties. All Copyrights and Trademarks are property of their owners.</p>
-                </div>
+            var re = /^[a-zA-Z0-9.\\-\\/+=_ ]*$/
+            if (!re.test(form.elements[activation].value)) {
+                out.innerHTML = "<%= errInvalidCode %>";
+                form.elements[activation].focus();
+                return false;
+            }
+            out.innerHTML = "<%= ESAPI.encoder().encodeForHTML("") %>";
+            return true;
+        }
+
+        function adios() {
+            window.location = "<%= logoutURL %>";
+        }
+
+    </script>
+    <title><%= activationTitle %>
+    </title>
+</head>
+<body>
+<div class="container_12">
+    <div class="grid_4 suffix_8">
+        <a class="logo" href="<%= ServiceURI%>"></a>
+    </div>
+    <div class="box clear-float">
+        <div class="grid_3">
+            <div class="product-logo"></div>
+        </div>
+        <div class="grid_9 left-seperator">
+            <div class="box-content clear-float">
+                <h1>Activation Code</h1>
+
+                <p class="message"><span class="icon info"></span><span id="msgcnt"><%= activationCodeMsg %></span></p>
+
+                <form name="Login" method="POST" action="<%= emptyField %>"
+                      onsubmit="return validateEntry(this,'<%= activation %>' ,
+                              '<%= submitButton %>');">
+                    <fieldset>
+                        <div class="row"><label for="<%= activation %>"><%=activationLabel%>
+                        </label><input class="textbox" type="text" id="<%= activation %>" name="<%= activation %>"/>
+                        </div>
+                        <div class="row">
+                            <input type="submit" class="button primary" value="<%= submitValue %>"
+                                   name="<%= submitButton %>"/>
+                            <input type="button" class="button" value="<%= cancelValue %>" name="<%= submitButton %>"
+                                   onclick="adios(); return false;"/>
+                        </div>
+                    </fieldset>
+                </form>
             </div>
         </div>
-    </body>
+    </div>
+    <div class="footer alt-color">
+        <div class="grid_3">
+            <p>Copyright &copy; 2010-2013 ForgeRock AS,<br/>Lysaker torg 2,<br/>1366 Lysaker,<br/>Norway.<br/>All rights
+                reserved.</p>
+        </div>
+        <div class="grid_6 suffix_3">
+            <p>Licensed for use under the Common Development and Distribution License (CDDL), see <a
+                    href="http://www.forgerock.org/license/CDDLv1.0.html">http://www.forgerock.org/license/CDDLv1.0.html</a>
+                for details. This software is based on the OpenAM/OpenAM open source project and the source includes the
+                copyright works of other authors, granted for use under the CDDL. This distribution may include other
+                materials developed by third parties. All Copyrights and Trademarks are property of their owners.</p>
+        </div>
+    </div>
+</div>
+</body>
 </html>
