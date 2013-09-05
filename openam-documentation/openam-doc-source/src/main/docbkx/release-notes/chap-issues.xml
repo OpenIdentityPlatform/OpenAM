@@ -73,6 +73,10 @@
   <literal>openam.session.useLocalSessionsInMultiServerMode=true</literal>.
   You can set this property in OpenAM console under Configuration &gt; Servers
   and Sites &gt; Servers &gt; Server Name &gt; Advanced.</para>
+
+  <para>The XUI is experimental and not supported for production use. The only
+  language locale available for the XUI at this time is US English, in the
+  <filename>/path/to/openam/webapps/XUI/locales</filename> directory.</para>
  </section>
 
  <section xml:id="known-issues">

@@ -47,7 +47,7 @@
         <varlistentry>
             <term><literal>themes</literal></term>
             <listitem>
-                <para>Title</para>
+                <para>Title; also represents an array of theme objects.</para>
             </listitem>
         </varlistentry>
         <varlistentry>

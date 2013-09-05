@@ -46,6 +46,18 @@
  You might want to have different page customizations for different realms as
  well. This chapter address how to get started customizing OpenAM end user
  pages for your organizations and supported locales.</para>
+
+ <para>There is an alternative UI available for OpenAM, known informally as the XUI. It is
+ based on Backbone.js, a JavaScript Model-View-Controller (MVC) framework, Handlebars.js,
+ for templating the "View" in the MVC framework, Underscore.js, for the JavaScript-related
+ utility functions, and a programmable LESS CSS, working with the OpenAM REST API.</para>
+
+ <para>The main XUI configuration file is based on LESS CSS; for more information, see <link xlink:show="new"
+ xlink:href="http://lesscss.org/"><citetitle>LESS, the Dynamic Stylesheet Language</citetitle></link>.
+ If desired, you should be able to incorporate additional LESS CSS features in the XUI,
+ above and beyond what is shown in the <filename>themeConfig.json</filename> file to be
+ described in the <link linkend="basic-xui-configuration"><citetitle>Configuring the XUI</citetitle>
+ </link> section.</para>
  
  <para>First you extract the pages to customize from the appropriate .jar files,
  and copy the pages to the proper location, and then you customize the files
@@ -57,28 +69,41 @@
   directories. All of the default directories are already lowercase.</para>
  </note>
  
- <para>Images in this example are located in
+ <para>Default UI images described in this chapter are located in
  <filename>/path/to/tomcat/webapps/openam/images/</filename>, and CSS in
  <filename>/path/to/tomcat/webapps/openam/css/</filename>. If you choose
  to modify images for your deployment, you can maintain the sizes to avoid
  having to customize page layout extensively.</para>
- 
- <tip>
-  <para>The procedures below describe how to update a deployed version of
-  OpenAM, so that you can see your changes without redeploying the application.
-  This approach works for development as long as your web container does
-  not overwrite changes. When developing with a web container that deploys
-  OpenAM in a temporary location, such as JBoss or Jetty, restarting the
-  container can overwrite your changes with the deployable .war content. For
-  those web containers, you should also prepare a deployable .war containing
-  your changes, and redeploy that file to check your work.</para>
-  <para>For production deployment you must package your changes in a custom
-  OpenAM deployable .war file. To create a deployable .war, unpack the
-  OpenAM .war file from <filename>~/Downloads/openam</filename>
-  into a staging directory, apply your changes in the staging directory, and
-  use the <command>jar</command> command  to prepare the deployable .war.</para>
- </tip>
- 
+
+ <para>If you are testing the unsupported XUI, corresponding images and configuration files
+ are located in various <filename>/path/to/tomcat/webapps/openam/XUI</filename> subdirectories.</para>
+
+ <section xml:id="update-classic-ui">
+     <title>Updating the Classic UI</title>
+
+     <para>When developing with a web container that deploys
+         OpenAM in a temporary location, such as JBoss or Jetty, restarting the
+         container can overwrite your changes with the deployable .war content. For
+         those web containers, you should also prepare a deployable .war containing
+         your changes, and redeploy that file to check your work.</para>
+
+     <tip><para>For production deployment you must package your changes in a custom
+         OpenAM deployable .war file. To create a deployable .war, unpack the
+         OpenAM .war file from <filename>~/Downloads/openam</filename>
+         into a staging directory, apply your changes in the staging directory, and
+         use the <command>jar</command> command  to prepare the deployable .war.</para></tip>
+
+     <itemizedlist>
+         <para>The procedures below describe how to update a deployed version of
+             OpenAM, so that you can see your changes without redeploying the application.
+             This approach works for development as long as your web container does
+             not overwrite changes.</para>
+
+         <listitem><para><xref linkend="copy-ui-to-customize-top-level-realm" /></para></listitem>
+         <listitem><para><xref linkend="copy-ui-to-customize-subrealm" /></para></listitem>
+         <listitem><para><xref linkend="customize-ui-copy" /></para></listitem>
+     </itemizedlist>
+
  <procedure xml:id="copy-ui-to-customize-top-level-realm">
   <title>To Copy the Pages to Customize For the Top-Level Realm</title>
 
@@ -127,7 +152,8 @@ $ cp -r /tmp/config/auth/default_fr/* openam_fr/html</screen>
    UI files</citetitle></link> for details.</para>
   </step>
  </procedure>
- 
+
+
  <procedure xml:id="copy-ui-to-customize-subrealm">
   <title>To Copy the Pages to Customize For Another Realm</title>
   <para>As for the top-level realm, customize your copy of the default pages.</para>
@@ -195,6 +221,8 @@ $ cp -r /tmp/config/auth/default_fr/* openam_fr/services/ventes/html</screen>
    </mediaobject>
   </step>
  </procedure>
+
+ </section>
 
  <section xml:id="lookup-for-ui-files">
   <title>How OpenAM Looks Up UI Files</title>
@@ -356,4 +384,134 @@ default/html/Login.jsp
 default/Login.jsp</programlisting>
   </example>
  </section>
+
+ <section xml:id="basic-xui-configuration">
+     <title>Configuring the XUI</title>
+
+     <para>If you want to test the XUI, the first step is to enable it on the login screen. To do so, login
+     to the OpenAM console as the administrator, and browse to Configuration &gt; Authentication &gt;
+     Core &gt; XUI Interface &gt; Enabled. The next time you start OpenAM, you will see the following screen:</para>
+
+     <mediaobject xml:id="xui-login-screen">
+         <alt>The XUI Login Screen</alt>
+         <imageobject>
+             <imagedata fileref="images/xui-login.png" format="PNG" />
+         </imageobject>
+         <textobject><para>The XUI Login Screen</para></textobject>
+     </mediaobject>
+
+     <!-- Depends on OPENAM-2759, a "must-fix". If not fixed, will have to include instructions on how to
+     get back to the admin console. -->
+
+     <para>The look and feel of this login screen and user profile page are defined by the main XUI configuration
+     file, <filename>themeConfig.json</filename>. You can find this file in the
+     <filename>/path/to/openam/webapps/XUI</filename> directory.</para>
+
+     <para>You can customize the settings in the <filename>themeConfig.json</filename> file. For
+     more information on each parameter in this file, see the Reference Guide chapter on <link xlink:show="new"
+     xlink:href="reference#chap-xui-parameters" xlink:role="http://docbook.org/xlink/role/olink">
+     <citetitle>XUI Configuration Parameters</citetitle></link>.</para>
+
+     <para>If desired, you can create themes for different realms. This assumes that you have already
+     configured a realm named <literal>realm1</literal>. For more information, see <link xlink:show="new"
+     xlink:href="admin-guide#chap-realms" xlink:role="http://docbook.org/xlink/role/olink">
+     <citetitle>Configuring Realms</citetitle></link> in the OpenAM Administration Guide.</para>
+
+     <para>Now to create a theme for the second realm, open the
+     <filename>themeConfig.json</filename> file in a text editor. Make a copy of all lines between the
+     left curly bracket <literal>{</literal> after the <literal>themes</literal> parameter, and the corresponding
+     right curly bracket <literal>}</literal> towards the end of the file.</para>
+
+     <screen>{
+     "themes": [
+        {
+            "name": "default",
+            "path": "",
+            "realms": [".*"],
+            "regex": true,
+
+        . . .
+
+                "footer": {
+                    "mailto": "info@forgerock.com",
+                    "phone": "+47 2150108"
+                }
+            }
+        }
+     ]
+}</screen>
+
+     <para>For a new realm named <literal>realm1</literal>, the revised <filename>themeConfig.json</filename> file
+     should look similar to:</para>
+
+     <screen>{
+     "themes": [
+         {
+            "name": "default",
+            "path": "",
+            "realms": [".*"],
+            "regex"" true,
+
+         . . .
+
+                 "footer": {
+                    "mailto": "info@forgerock.com",
+                    "phone": "+47 2150108"
+                 }
+             }
+         },
+         {
+            "name": "realm1",
+            "path": "path/to/realm1/",
+            "realms": ["realm1.*"],
+            "regex": true,
+
+         . . .
+
+                "footer": {
+                    "mailto": "info@example.com",
+                    "phone": "+1 555 555 5555"
+                }
+            }
+         }
+     ]
+}</screen>
+
+     <para>Be careful with the syntax. Do not forget the comma between realms. If in doubt about your JSON syntax,
+     refer to a validation tool such as <link xlink:show="new" xlink:href="http://jsonlint.com"><citetitle>The
+     JSON Validator</citetitle></link>.</para>
+
+     <para>If you want to keep a parameter used in the default realm, just delete it from the later realm. Except
+     for the following parameters, realm parameters inherit values from the default: <literal>name</literal>,
+     <literal>path</literal>, <literal>realms</literal>, and <literal>regex</literal>.</para>
+
+     <para>When configuring new or revised parameters, keep the following tips in mind:</para>
+
+     <itemizedlist>
+         <listitem>
+             <para>The <literal>path</literal> to the directory with custom realm settings require a
+             trailing forward slash <literal>/</literal>.</para>
+         </listitem>
+         <listitem>
+             <para>Logos may require custom height and width parameters.</para>
+         </listitem>
+         <listitem>
+             <para>Each of the <literal>lessVars</literal> parameters are based on variables defined in files
+             in the <filename>/path/to/webapps/openam/XUI/css/user</filename> directory.</para>
+         </listitem>
+         <listitem>
+             <para>After making changes, use available tools to make sure the file uses correct JSON syntax.</para>
+         </listitem>
+         <listitem>
+             <para>Each realm after the default requires at least the <literal>name</literal>,
+             <literal>path</literal>, <literal>realms</literal>, and <literal>regex</literal>
+             parameters.</para>
+         </listitem>
+     </itemizedlist>
+
+     <para>When testing different options, make sure to clear the browser cache on a regular basis. Otherwise, changes
+     that you have made may not be shown in your browser.</para>
+
+ </section>
+
 </chapter>

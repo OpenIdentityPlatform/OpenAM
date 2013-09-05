@@ -171,6 +171,11 @@
     <link xlink:href="mailto:info@forgerock.com">info@forgerock.com</link>.</para>
   </listitem>
 
+  <listitem>
+      <para>A new UI is available for experimental, non-production use. Informally known as the XUI,
+      it uses LESS CSS for UI configuration.</para>
+  </listitem>
+
  </itemizedlist>
 
  <itemizedlist>
