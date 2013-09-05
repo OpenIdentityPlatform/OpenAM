@@ -766,13 +766,38 @@ $ cat WEB-INF/jboss-web.xml</screen>
     </step>
 
     <step>
-     <para>Add the Sun x509 security module path to the JBoss 7
-     configuration (<literal>sun/security/x509</literal>).</para>
-     <para>The following example uses JBoss 7.1.1.</para>
-     <screen>$ vi /path/to/jboss7/modules/sun/jdk/main/module.xml
- &lt;path name="com/sun/security/auth"/&gt;
- &lt;path name="com/sun/security/auth/module"/&gt;
- + &lt;path name ="sun/security/x509"/&gt;</screen>
+     <para>Update the container's <filename>module.xml</filename> file, such as
+     <filename>/path/to/jboss7/modules/sun/jdk/main/module.xml</filename>.</para>
+
+     <substeps>
+      <step>
+       <para>Add the Sun x509 security module path to the JBoss 7
+       configuration (<literal>sun/security/x509</literal>).</para>
+
+       <para>The following example shows the change for JBoss 7.1.1.</para>
+
+       <programlisting language="xml">&lt;path name="com/sun/security/auth"/&gt;
+&lt;path name="com/sun/security/auth/module"/&gt;
+&lt;path name ="sun/security/x509"/&gt; &lt;!-- path added here -->
+&lt;path name="sun/misc"/></programlisting>
+      </step>
+
+      <step>
+       <para>When using <command>ssoadm</command> or the distributed
+       authentication service (DAS), also add the following path.</para>
+
+       <literallayout class="monospaced"
+       >&lt;path name="com/sun/org/apache/xerces/internal/dom" /></literallayout>
+      </step>
+
+      <step>
+       <para>For JBoss 7.1.3.Final (WildFly), remove the following line to avoid
+       clashes with XML classes included in OpenAM.</para>
+
+       <literallayout class="monospaced"
+       >&lt;path name="com/sun/org/apache/xml/internal/security/transforms/implementations" /></literallayout>
+      </step>
+     </substeps>
     </step>
 
     <step>
