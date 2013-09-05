@@ -67,6 +67,8 @@ public class IPCondition implements Condition {
             = Debug.getInstance(PolicyManager.POLICY_DEBUG_NAME);
 
     public static final String IP_VERSION = "IpVersion";
+    public static final String IPV4 = "IPv4";
+    public static final String IPV6 = "IPv6";
     private IPv6Condition iPv6ConditionInstance = null;
     private IPv4Condition iPv4ConditionInstance = null;
     boolean ipv4 = false;
@@ -181,36 +183,13 @@ public class IPCondition implements Condition {
     }
 
     private void checkIpVersion(Map properties) throws PolicyException{
-        // validate START_IP
-        Set startIpSet = (Set) properties.get(START_IP);
-        validateStartIp(startIpSet);
-    }
-
-    /**
-     * validates if the value of property START_IP
-     * is correct and adheres to the expected
-     * format
-     * @see #START_IP
-     */
-    private void validateStartIp(Set ipSet)
-            throws PolicyException {
-        if ( ipSet.size() != 1 ) {
-            String args[] = { START_IP };
-            throw new PolicyException(ResBundleUtils.rbName,
-                    "multiple_values_not_allowed_for_property", args, null);
-        }
-        Iterator startIpIter = ipSet.iterator();
-        try {
-            String startIpString = (String) startIpIter.next();
-            if(ValidateIPaddress.isIPv4(startIpString)){  // check if starting IP is IPv4
-                ipv4 = true;
-            } else if(ValidateIPaddress.isIPv6(startIpString)){  //check if starting IP is IPv6
-                ipv6 = true;
-            }
-        } catch(ClassCastException ce) {
-            String args[] = { START_IP };
-            throw new PolicyException( ResBundleUtils.rbName,
-                    "property_is_not_a_String", args, ce);
+        Set ipVersion = (Set) properties.get(IP_VERSION);
+        Iterator ipVerItr = ipVersion.iterator();
+        String ip = (String) ipVerItr.next();
+        if(ip.equalsIgnoreCase(IPV4)){
+            ipv4 = true;
+        } else if(ip.equalsIgnoreCase(IPV6)){
+            ipv6 = true;
         }
     }
 

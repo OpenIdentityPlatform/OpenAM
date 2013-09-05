@@ -26,6 +26,9 @@
 
 -->
 
+<!--
+Portions Copyrighted [2013] [ForgeRock AS]
+-->
 
 <!DOCTYPE propertysheet SYSTEM "propertysheet.dtd">
 
@@ -119,139 +122,19 @@
         </property>
         <!-- IPv6 -->
         <property>
-            <label name="lblStartIp" defaultValue="policy.condition.attribute.label.startIP" labelFor="StartIp1" />
-            <cc name="StartIp1" tagclass="com.sun.web.ui.taglib.html.CCTextFieldTag">
+            <label name="lblStartIp" defaultValue="policy.condition.attribute.label.startIP" labelFor="StartIp" />
+            <cc name="StartIp" tagclass="com.sun.web.ui.taglib.html.CCTextFieldTag">
                 <attribute name="autoSubmit" value="false" />
-                <attribute name="size" value="4" />
-                <attribute name="maxLength" value="4" />
-            </cc>
-            <label name="lblNotation" defaultValue="policy.condition.attribute.option.colon" labelFor="Notation1" />
-            <cc name="Notation1" tagclass="com.sun.web.ui.taglib.html.CCStaticTextFieldTag">
-                <attribute name="defaultValue" value=":" />
-            </cc>
-            <cc name="StartIp2" tagclass="com.sun.web.ui.taglib.html.CCTextFieldTag">
-                <attribute name="autoSubmit" value="false" />
-                <attribute name="size" value="4" />
-                <attribute name="maxLength" value="4" />
-            </cc>
-            <cc name="Notation2" tagclass="com.sun.web.ui.taglib.html.CCStaticTextFieldTag">
-                <attribute name="defaultValue" value=":" />
-            </cc>
-            <cc name="StartIp3" tagclass="com.sun.web.ui.taglib.html.CCTextFieldTag">
-                <attribute name="autoSubmit" value="false" />
-                <attribute name="size" value="4" />
-                <attribute name="maxLength" value="4" />
-            </cc>
-            <cc name="Notation3" tagclass="com.sun.web.ui.taglib.html.CCStaticTextFieldTag">
-                <attribute name="defaultValue" value=":" />
-            </cc>
-            <cc name="StartIp4" tagclass="com.sun.web.ui.taglib.html.CCTextFieldTag">
-                <attribute name="autoSubmit" value="false" />
-                <attribute name="size" value="4" />
-                <attribute name="maxLength" value="4" />
-            </cc>
-            <cc name="Notation4" tagclass="com.sun.web.ui.taglib.html.CCStaticTextFieldTag">
-                <attribute name="defaultValue" value=":" />
-            </cc>
-            <cc name="StartIp5" tagclass="com.sun.web.ui.taglib.html.CCTextFieldTag">
-                <attribute name="autoSubmit" value="false" />
-                <attribute name="size" value="4" />
-                <attribute name="maxLength" value="4" />
-            </cc>
-            <cc name="Notation5" tagclass="com.sun.web.ui.taglib.html.CCDropDownMenuTag">
-                <option label="policy.condition.attribute.option.colon" value=":" />
-                <option label="policy.condition.attribute.option.dot" value="." />
-            </cc>
-            <cc name="StartIp6" tagclass="com.sun.web.ui.taglib.html.CCTextFieldTag">
-                <attribute name="autoSubmit" value="false" />
-                <attribute name="size" value="4" />
-                <attribute name="maxLength" value="4" />
-            </cc>
-            <cc name="Notation6" tagclass="com.sun.web.ui.taglib.html.CCDropDownMenuTag">
-                <option label="policy.condition.attribute.option.colon" value=":" />
-                <option label="policy.condition.attribute.option.dot" value="." />
-            </cc>
-            <cc name="StartIp7" tagclass="com.sun.web.ui.taglib.html.CCTextFieldTag">
-                <attribute name="autoSubmit" value="false" />
-                <attribute name="size" value="4" />
-                <attribute name="maxLength" value="4" />
-            </cc>
-            <cc name="Notation7" tagclass="com.sun.web.ui.taglib.html.CCDropDownMenuTag">
-                <option label="policy.condition.attribute.option.colon" value=":" />
-                <option label="policy.condition.attribute.option.dot" value="." />
-            </cc>
-            <cc name="StartIp8" tagclass="com.sun.web.ui.taglib.html.CCTextFieldTag">
-                <attribute name="autoSubmit" value="false" />
-                <attribute name="size" value="4" />
-                <attribute name="maxLength" value="4" />
+                <attribute name="size" value="45" />
+                <attribute name="maxLength" value="45" />
             </cc>
         </property>
         <property>
-            <label name="lblEndIp" defaultValue="policy.condition.attribute.label.endIP" labelFor="EndIp1" />
-            <cc name="EndIp1" tagclass="com.sun.web.ui.taglib.html.CCTextFieldTag">
+            <label name="lblEndIp" defaultValue="policy.condition.attribute.label.endIP" labelFor="EndIp" />
+            <cc name="EndIp" tagclass="com.sun.web.ui.taglib.html.CCTextFieldTag">
                 <attribute name="autoSubmit" value="false" />
-                <attribute name="size" value="4" />
-                <attribute name="maxLength" value="4" />
-            </cc>
-            <label name="lblNotation" defaultValue="policy.condition.attribute.option.colon" labelFor="Notation1" />
-            <cc name="Notation1" tagclass="com.sun.web.ui.taglib.html.CCStaticTextFieldTag">
-                <attribute name="defaultValue" value=":" />
-            </cc>
-            <cc name="EndIp2" tagclass="com.sun.web.ui.taglib.html.CCTextFieldTag">
-                <attribute name="autoSubmit" value="false" />
-                <attribute name="size" value="4" />
-                <attribute name="maxLength" value="4" />
-            </cc>
-            <cc name="Notation2" tagclass="com.sun.web.ui.taglib.html.CCStaticTextFieldTag">
-                <attribute name="defaultValue" value=":" />
-            </cc>
-            <cc name="EndIp3" tagclass="com.sun.web.ui.taglib.html.CCTextFieldTag">
-                <attribute name="autoSubmit" value="false" />
-                <attribute name="size" value="4" />
-                <attribute name="maxLength" value="4" />
-            </cc>
-            <cc name="Notation3" tagclass="com.sun.web.ui.taglib.html.CCStaticTextFieldTag">
-                <attribute name="defaultValue" value=":" />
-            </cc>
-            <cc name="EndIp4" tagclass="com.sun.web.ui.taglib.html.CCTextFieldTag">
-                <attribute name="autoSubmit" value="false" />
-                <attribute name="size" value="4" />
-                <attribute name="maxLength" value="4" />
-            </cc>
-            <cc name="Notation4" tagclass="com.sun.web.ui.taglib.html.CCStaticTextFieldTag">
-                <attribute name="defaultValue" value=":" />
-            </cc>
-            <cc name="EndIp5" tagclass="com.sun.web.ui.taglib.html.CCTextFieldTag">
-                <attribute name="autoSubmit" value="false" />
-                <attribute name="size" value="4" />
-                <attribute name="maxLength" value="4" />
-            </cc>
-            <cc name="Notation5" tagclass="com.sun.web.ui.taglib.html.CCDropDownMenuTag">
-                <option label="policy.condition.attribute.option.colon" value=":" />
-                <option label="policy.condition.attribute.option.dot" value="." />
-            </cc>
-            <cc name="EndIp6" tagclass="com.sun.web.ui.taglib.html.CCTextFieldTag">
-                <attribute name="autoSubmit" value="false" />
-                <attribute name="size" value="4" />
-                <attribute name="maxLength" value="4" />
-            </cc>
-            <cc name="Notation6" tagclass="com.sun.web.ui.taglib.html.CCDropDownMenuTag">
-                <option label="policy.condition.attribute.option.colon" value=":" />
-                <option label="policy.condition.attribute.option.dot" value="." />
-            </cc>
-            <cc name="EndIp7" tagclass="com.sun.web.ui.taglib.html.CCTextFieldTag">
-                <attribute name="autoSubmit" value="false" />
-                <attribute name="size" value="4" />
-                <attribute name="maxLength" value="4" />
-            </cc>
-            <cc name="Notation7" tagclass="com.sun.web.ui.taglib.html.CCDropDownMenuTag">
-                <option label="policy.condition.attribute.option.colon" value=":" />
-                <option label="policy.condition.attribute.option.dot" value="." />
-            </cc>
-            <cc name="EndIp8" tagclass="com.sun.web.ui.taglib.html.CCTextFieldTag">
-                <attribute name="autoSubmit" value="false" />
-                <attribute name="size" value="4" />
-                <attribute name="maxLength" value="4" />
+                <attribute name="size" value="45" />
+                <attribute name="maxLength" value="45" />
             </cc>
         </property>
     </section>

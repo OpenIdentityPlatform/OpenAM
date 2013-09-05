@@ -390,13 +390,18 @@ public class IPv6Condition implements Condition {
                     "multiple_values_not_allowed_for", args, null);
         }
         Iterator endIpIter = ipSet.iterator();
+        String endIpString = null;
         try {
-            String endIpString = (String) endIpIter.next();
+            endIpString = (String) endIpIter.next();
             endIP = IPv6Address.fromString(endIpString);
         } catch(ClassCastException ce) {
             String args[] = { END_IP };
             throw new PolicyException( ResBundleUtils.rbName,
                     "property_is_not_a_String", args, ce);
+        } catch (IllegalArgumentException iae){
+            String args[] = {"ip", endIpString};
+            throw new PolicyException(ResBundleUtils.rbName,
+                    "invalid_property_value", args, null);
         }
         if (startIP.compareTo(endIP) > 0 ) {
             throw new PolicyException( ResBundleUtils.rbName,
@@ -419,17 +424,18 @@ public class IPv6Condition implements Condition {
                     "multiple_values_not_allowed_for_property", args, null);
         }
         Iterator startIpIter = ipSet.iterator();
+        String startIpString = null;
         try {
-            String startIpString = (String) startIpIter.next();
+            startIpString = (String) startIpIter.next();
             startIP = IPv6Address.fromString(startIpString);
         } catch(ClassCastException ce) {
             String args[] = { START_IP };
             throw new PolicyException( ResBundleUtils.rbName,
                     "property_is_not_a_String", args, ce);
         } catch (IllegalArgumentException iae){
-            String args[] = { START_IP };
-            throw new PolicyException( ResBundleUtils.rbName,
-                    "property_cannot_be_parsed", args, iae);
+            String args[] = {"ip", startIpString};
+            throw new PolicyException(ResBundleUtils.rbName,
+                    "invalid_property_value", args, null);
         }
         return true;
     }

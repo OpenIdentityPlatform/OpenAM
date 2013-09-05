@@ -27,7 +27,7 @@
  */
 
 /*
- * Portions Copyrighted [2011-2013] [ForgeRock Inc]
+ * Portions Copyrighted [2011-2013] [ForgeRock AS]
  */
 package com.sun.identity.console.policy;
 
@@ -215,21 +215,14 @@ public class IPConditionHelper {
     }
 
     private String getIPv6Address( String propName, AMPropertySheetModel propertySheetModel) {
-        StringBuilder buff = new StringBuilder(36);
-        for (int i = 1; i < 9; i++) {
-            if (i > 1 && i <= 5) {
-                buff.append(":");
-            } else if(i > 5 ){
-                buff.append((String)propertySheetModel.getValue(NOTATION + (i-1))); // :: or . depending if IPv6 hybrid notation
-            }
-            String node = (String)propertySheetModel.getValue(propName +i);
+        String node = (String)propertySheetModel.getValue(propName);
+
+        if (node == null || node.isEmpty()) {
+            node = "0:0:0:0:0:0:0:0";
+        } else {
             node = node.trim();
-            if (node.length() == 0) {
-                node = "0";
-            }
-            buff.append(node);
         }
-        return buff.toString();
+        return node;
     }
 
     private String getIPv4Address(
@@ -256,14 +249,8 @@ public class IPConditionHelper {
     }
 
     private void setIPv6Address(String propName, String value, AMPropertySheetModel propertySheetModel) {
-        // TODO add difference between hybrid and normal ipv6 notation for display
-        StringTokenizer st = new StringTokenizer(value, ".:");
-        if (st.countTokens() == 8) {
-            int i = 1;
-            while (st.hasMoreTokens()) {
-                propertySheetModel.setValue(propName + i, st.nextToken());
-                i++;
-            }
+        if(value != null && !value.isEmpty()) {
+            propertySheetModel.setValue(propName , value);
         }
     }
 
