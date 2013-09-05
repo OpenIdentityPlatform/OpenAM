@@ -2238,7 +2238,7 @@ public class DJLDAPv3Repo extends IdRepo {
             SearchResultEntry entry = conn.searchSingleEntry(searchRequest);
             dn = entry.getName().toString();
         } catch (EntryNotFoundException enfe) {
-            DEBUG.error("Unable to find entry with name: " + name + " under searchbase: " + searchBase
+            DEBUG.message("Unable to find entry with name: " + name + " under searchbase: " + searchBase
                     + " with scope: " + defaultScope);
             throw newIdRepoException("223", name, type.getName());
         } catch (ErrorResultException ere) {
