@@ -217,11 +217,11 @@ public class LDAPUtils {
             }
         }
         ConnectionFactory cf = new LDAPConnectionFactory(ldapurl.getHost(), ldapurl.getPort(), ldapOptions);
-        if (username != null) {
-            cf = Connections.newAuthenticatedConnectionFactory(cf, Requests.newSimpleBindRequest(username, password));
-        }
         if (heartBeatInterval > 0) {
             cf = Connections.newHeartBeatConnectionFactory(cf, heartBeatInterval, TimeUnit.valueOf(heartBeatTimeUnit));
+        }
+        if (username != null) {
+            cf = Connections.newAuthenticatedConnectionFactory(cf, Requests.newSimpleBindRequest(username, password));
         }
         return cf;
     }
