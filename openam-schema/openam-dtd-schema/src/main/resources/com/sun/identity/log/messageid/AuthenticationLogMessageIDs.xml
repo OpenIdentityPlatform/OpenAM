@@ -27,1480 +27,1520 @@
 -->
 
 <!DOCTYPE logmessages
-    PUBLIC "OpenSSO Log Message DTD/EN"
-    "jar://com/sun/identity/log/messageid/amLogMessage.dtd"
->
+        PUBLIC "OpenSSO Log Message DTD/EN"
+        "jar://com/sun/identity/log/messageid/amLogMessage.dtd"
+        >
 
 <logmessages prefix="AUTHENTICATION">
     <logmessage name="LOGIN_SUCCESS" id="100"
-	loglevel="LL_INFO"
-	description="Authentication is Successful">
-	<datainfo>
-	    <item>message</item>
-	</datainfo>
-	<triggers>
-	    <item>User authenticated with valid credentials</item>
-	</triggers>
-	<actions />
+                loglevel="LL_INFO"
+                description="Authentication is Successful">
+        <datainfo>
+            <item>message</item>
+            <item>no session</item>
+        </datainfo>
+        <triggers>
+            <item>User authenticated with valid credentials</item>
+        </triggers>
+        <actions/>
     </logmessage>
     <logmessage name="LOGIN_SUCCESS_USER" id="101"
-	loglevel="LL_INFO"
-	description="User based authentication is successful">
-	<datainfo>
-	    <item>message</item>
-	    <item>authentication type</item>
-	    <item>user name</item>
-	</datainfo>
-	<triggers>
-	    <item>User authenticated with valid credentials</item>
-	</triggers>
-	<actions />
+                loglevel="LL_INFO"
+                description="User based authentication is successful">
+        <datainfo>
+            <item>message</item>
+            <item>authentication type</item>
+            <item>user name</item>
+            <item>no session</item>
+        </datainfo>
+        <triggers>
+            <item>User authenticated with valid credentials</item>
+        </triggers>
+        <actions/>
     </logmessage>
     <logmessage name="LOGIN_SUCCESS_ROLE" id="102"
-	loglevel="LL_INFO"
-	description="Role based authentication is successful">
-	<datainfo>
-	    <item>message</item>
-	    <item>authentication type</item> 
-	    <item>role name</item>
-	</datainfo>
-	<triggers>
-	    <item>User belonging to role authenticated with valid credentials
+                loglevel="LL_INFO"
+                description="Role based authentication is successful">
+        <datainfo>
+            <item>message</item>
+            <item>authentication type</item>
+            <item>role name</item>
+            <item>no session</item>
+        </datainfo>
+        <triggers>
+            <item>User belonging to role authenticated with valid credentials
             </item>
-	</triggers>
-	<actions />
+        </triggers>
+        <actions/>
     </logmessage>
     <logmessage name="LOGIN_SUCCESS_SERVICE" id="103"
-	loglevel="LL_INFO"
-	description="Service based authentication is successful">
-	<datainfo>
-	    <item>message</item>
-	    <item>authentication type</item>
-	    <item>service name</item>
-	</datainfo>
-	<triggers>
-	    <item>User authenticated with valid credentials to a configured 
-            service under realm</item>
-	</triggers>
-	<actions />
+                loglevel="LL_INFO"
+                description="Service based authentication is successful">
+        <datainfo>
+            <item>message</item>
+            <item>authentication type</item>
+            <item>service name</item>
+            <item>no session</item>
+        </datainfo>
+        <triggers>
+            <item>User authenticated with valid credentials to a configured
+                service under realm
+            </item>
+        </triggers>
+        <actions/>
     </logmessage>
     <logmessage name="LOGIN_SUCCESS_LEVEL" id="104"
-	loglevel="LL_INFO"
-	description="Authentication level based authentication is successful">
-	<datainfo>
-	    <item>message</item>
-	    <item>authentication type</item>
-	    <item>authentication level value</item>
-	</datainfo>
-	<triggers>
-	    <item>User authenticated with valid credentials to one or more 
-            authentication modules having authentication level value greater 
-            than or equal to specified authentication level</item>
-	</triggers>
-	<actions />
+                loglevel="LL_INFO"
+                description="Authentication level based authentication is successful">
+        <datainfo>
+            <item>message</item>
+            <item>authentication type</item>
+            <item>authentication level value</item>
+            <item>no session</item>
+        </datainfo>
+        <triggers>
+            <item>User authenticated with valid credentials to one or more
+                authentication modules having authentication level value greater
+                than or equal to specified authentication level
+            </item>
+        </triggers>
+        <actions/>
     </logmessage>
     <logmessage name="LOGIN_SUCCESS_MODULE_INSTANCE" id="105"
-	loglevel="LL_INFO"
-	description="Module based authentication is successful">
-	<datainfo>
-	    <item>message</item>
-	    <item>authentication type</item>
-	    <item>module name</item>
-	</datainfo>
-	<triggers>
-	    <item>User authenticated with valid credentials to authentication 
-            module under realm</item>
-	</triggers>
-	<actions />
+                loglevel="LL_INFO"
+                description="Module based authentication is successful">
+        <datainfo>
+            <item>message</item>
+            <item>authentication type</item>
+            <item>module name</item>
+            <item>no session</item>
+        </datainfo>
+        <triggers>
+            <item>User authenticated with valid credentials to authentication
+                module under realm
+            </item>
+        </triggers>
+        <actions/>
     </logmessage>
     <logmessage name="LOGIN_FAILED" id="200"
-	loglevel="LL_INFO"
-	description="Authentication Failed">
-	<datainfo>
-	    <item>error message</item>
-	</datainfo>
-	<triggers>
-	    <item>Incorrect/invalid credentials presented</item>
+                loglevel="LL_INFO"
+                description="Authentication Failed">
+        <datainfo>
+            <item>error message</item>
+        </datainfo>
+        <triggers>
+            <item>Incorrect/invalid credentials presented</item>
             <item>User locked out/not active</item>
-	</triggers>
-	<actions>
-            <item>Enter correct/valid credentials to required authentication 
-            module</item>
+        </triggers>
+        <actions>
+            <item>Enter correct/valid credentials to required authentication
+                module
+            </item>
         </actions>
     </logmessage>
     <logmessage name="LOGIN_FAILED_INVALIDPASSWORD" id="201"
-	loglevel="LL_INFO"
-	description="Authentication Failed">
-	<datainfo>
-	    <item>error message</item>
-	</datainfo>
-	<triggers>
-	    <item>Invalid credentials entered.
+                loglevel="LL_INFO"
+                description="Authentication Failed">
+        <datainfo>
+            <item>error message</item>
+        </datainfo>
+        <triggers>
+            <item>Invalid credentials entered.
             </item>
-            </triggers>
-	<actions>
+        </triggers>
+        <actions>
             <item>Enter the correct password.</item>
         </actions>
     </logmessage>
     <logmessage name="LOGIN_FAILED_NOCONFIG" id="202"
-	loglevel="LL_INFO"
-	description="Authentication Failed">
-	<datainfo>
-	    <item>error message</item>
-	</datainfo>
-	<triggers>
-	    <item>Named Configuration (Auth Chain) does not exist.
+                loglevel="LL_INFO"
+                description="Authentication Failed">
+        <datainfo>
+            <item>error message</item>
+        </datainfo>
+        <triggers>
+            <item>Named Configuration (Auth Chain) does not exist.
             </item>
-            </triggers>
-	<actions>
+        </triggers>
+        <actions>
             <item>Create and configure a named config for this org.</item>
         </actions>
     </logmessage>
     <logmessage name="LOGIN_FAILED_NOUSERPROFILE" id="203"
-	loglevel="LL_INFO"
-	description="Authentication Failed">
-	<datainfo>
-	    <item>error message</item>
-	</datainfo>
-	<triggers>
-	    <item>No user profile found for this user.
+                loglevel="LL_INFO"
+                description="Authentication Failed">
+        <datainfo>
+            <item>error message</item>
+        </datainfo>
+        <triggers>
+            <item>No user profile found for this user.
             </item>
-            </triggers>
-	<actions>
-            <item>User does not exist in the datastore plugin configured and 
-            hence configure the datastore plugin for this realm/org correctly.
+        </triggers>
+        <actions>
+            <item>User does not exist in the datastore plugin configured and
+                hence configure the datastore plugin for this realm/org correctly.
             </item>
         </actions>
     </logmessage>
     <logmessage name="LOGIN_FAILED_USERINACTIVE" id="204"
-	loglevel="LL_INFO"
-	description="Authentication Failed">
-	<datainfo>
-	    <item>error message</item>
-	</datainfo>
-	<triggers>
-	    <item>This user is not active.
+                loglevel="LL_INFO"
+                description="Authentication Failed">
+        <datainfo>
+            <item>error message</item>
+        </datainfo>
+        <triggers>
+            <item>This user is not active.
             </item>
-            </triggers>
-	<actions>
+        </triggers>
+        <actions>
             <item>Activate the user.</item>
         </actions>
     </logmessage>
     <logmessage name="LOGIN_FAILED_LOCKEDOUT" id="205"
-	loglevel="LL_INFO"
-	description="Authentication Failed">
-	<datainfo>
-	    <item>error message</item>
-	</datainfo>
-	<triggers>
-	    <item>Max number of failure attempts exceeded. User is Locked out.
+                loglevel="LL_INFO"
+                description="Authentication Failed">
+        <datainfo>
+            <item>error message</item>
+        </datainfo>
+        <triggers>
+            <item>Max number of failure attempts exceeded. User is Locked out.
             </item>
-            </triggers>
-	<actions>
+        </triggers>
+        <actions>
             <item>Contact system administrator.</item>
         </actions>
     </logmessage>
     <logmessage name="LOGIN_FAILED_ACCOUNTEXPIRED" id="206"
-	loglevel="LL_INFO"
-	description="Authentication Failed">
-	<datainfo>
-	    <item>error message</item>
-	</datainfo>
-	<triggers>
-	    <item>User account has expired.
+                loglevel="LL_INFO"
+                description="Authentication Failed">
+        <datainfo>
+            <item>error message</item>
+        </datainfo>
+        <triggers>
+            <item>User account has expired.
             </item>
-            </triggers>
-	<actions>
+        </triggers>
+        <actions>
             <item>Contact system administrator.</item>
         </actions>
     </logmessage>
     <logmessage name="LOGIN_FAILED_LOGINTIMEOUT" id="207"
-	loglevel="LL_INFO"
-	description="Authentication Failed">
-	<datainfo>
-	    <item>error message</item>
-	</datainfo>
-	<triggers>
-	    <item>Login timed out.
+                loglevel="LL_INFO"
+                description="Authentication Failed">
+        <datainfo>
+            <item>error message</item>
+        </datainfo>
+        <triggers>
+            <item>Login timed out.
             </item>
-            </triggers>
-	<actions>
+        </triggers>
+        <actions>
             <item>Try to login again.</item>
         </actions>
     </logmessage>
     <logmessage name="LOGIN_FAILED_MODULEDENIED" id="208"
-	loglevel="LL_INFO"
-	description="Authentication Failed">
-	<datainfo>
-	    <item>error message</item>
-	</datainfo>
-	<triggers>
-	    <item>Authentication module is denied.
+                loglevel="LL_INFO"
+                description="Authentication Failed">
+        <datainfo>
+            <item>error message</item>
+        </datainfo>
+        <triggers>
+            <item>Authentication module is denied.
             </item>
-            </triggers>
-	<actions>
+        </triggers>
+        <actions>
             <item>Configure this module or use some other module.</item>
         </actions>
     </logmessage>
     <logmessage name="LOGIN_FAILED_MAXSESSIONREACHED" id="209"
-	loglevel="LL_INFO"
-	description="Authentication Failed">
-	<datainfo>
-	    <item>error message</item>
-	</datainfo>
-	<triggers>
-	    <item>Limit for maximum number of allowed session has been reached.
+                loglevel="LL_INFO"
+                description="Authentication Failed">
+        <datainfo>
+            <item>error message</item>
+        </datainfo>
+        <triggers>
+            <item>Limit for maximum number of allowed session has been reached.
             </item>
-            </triggers>
-	<actions>
+        </triggers>
+        <actions>
             <item>Logout of a session or increase the limit.</item>
         </actions>
     </logmessage>
     <logmessage name="LOGIN_FAILED_INVALIDDOMAIN" id="210"
-	loglevel="LL_INFO"
-	description="Authentication Failed">
-	<datainfo>
-	    <item>error message</item>
-	</datainfo>
-	<triggers>
-	    <item>Org/Realm does not exists.
+                loglevel="LL_INFO"
+                description="Authentication Failed">
+        <datainfo>
+            <item>error message</item>
+        </datainfo>
+        <triggers>
+            <item>Org/Realm does not exists.
             </item>
-            </triggers>
-	<actions>
+        </triggers>
+        <actions>
             <item>Use a valid Org/Realm.</item>
         </actions>
     </logmessage>
     <logmessage name="LOGIN_FAILED_ORGINACTIVE" id="211"
-	loglevel="LL_INFO"
-	description="Authentication Failed">
-	<datainfo>
-	    <item>error message</item>
-	</datainfo>
-	<triggers>
-	    <item>Org/Realm is not active.
+                loglevel="LL_INFO"
+                description="Authentication Failed">
+        <datainfo>
+            <item>error message</item>
+        </datainfo>
+        <triggers>
+            <item>Org/Realm is not active.
             </item>
-            </triggers>
-	<actions>
+        </triggers>
+        <actions>
             <item>Activate the Org/Realm.</item>
         </actions>
     </logmessage>
     <logmessage name="LOGIN_FAILED_SESSIONCREATEERROR" id="212"
-	loglevel="LL_INFO"
-	description="Authentication Failed">
-	<datainfo>
-	    <item>error message</item>
-	</datainfo>
-	<triggers>
-	    <item>Cannot create a session.
+                loglevel="LL_INFO"
+                description="Authentication Failed">
+        <datainfo>
+            <item>error message</item>
+        </datainfo>
+        <triggers>
+            <item>Cannot create a session.
             </item>
-            </triggers>
-	<actions>
-            <item>Ensure that session service is configured and maxsession is 
-            not reached.</item>
+        </triggers>
+        <actions>
+            <item>Ensure that session service is configured and maxsession is
+                not reached.
+            </item>
         </actions>
     </logmessage>
     <logmessage name="LOGIN_FAILED_USER" id="213"
-	loglevel="LL_INFO"
-	description="User based authentication failed">
-	<datainfo>
-	    <item>error message</item>
-	    <item>authentication type</item>
-	    <item>user name</item>
-	</datainfo>
-	<triggers>
-            <item>No authentication configuration (chain of one or more 
-            authentication modules) configured for user</item>
-	    <item>Incorrect/invalid credentials presented</item>
+                loglevel="LL_INFO"
+                description="User based authentication failed">
+        <datainfo>
+            <item>error message</item>
+            <item>authentication type</item>
+            <item>user name</item>
+        </datainfo>
+        <triggers>
+            <item>No authentication configuration (chain of one or more
+                authentication modules) configured for user
+            </item>
+            <item>Incorrect/invalid credentials presented</item>
             <item>User locked out/not active</item>
-	</triggers>
-	<actions>
-            <item>Configure authentication configuration (chain of one or more 
-            authentication modules) for user</item>
-	    <item>Enter correct/valid credentials to required authentication 
-            module</item>
+        </triggers>
+        <actions>
+            <item>Configure authentication configuration (chain of one or more
+                authentication modules) for user
+            </item>
+            <item>Enter correct/valid credentials to required authentication
+                module
+            </item>
         </actions>
     </logmessage>
     <logmessage name="LOGIN_FAILED_USER_INVALIDPASSWORD" id="214"
-	loglevel="LL_INFO"
-	description="Authentication Failed">
-	<datainfo>
-	    <item>error message</item>
+                loglevel="LL_INFO"
+                description="Authentication Failed">
+        <datainfo>
+            <item>error message</item>
             <item>authentication type</item>
-	    <item>user name</item>
-	</datainfo>
-	<triggers>
-	    <item>User based Auth. Invalid credentials entered.
+            <item>user name</item>
+        </datainfo>
+        <triggers>
+            <item>User based Auth. Invalid credentials entered.
             </item>
-            </triggers>
-	<actions>
+        </triggers>
+        <actions>
             <item>Enter the correct password.</item>
         </actions>
     </logmessage>
     <logmessage name="LOGIN_FAILED_USER_NOCONFIG" id="215"
-	loglevel="LL_INFO"
-	description="Authentication Failed">
-	<datainfo>
-	    <item>error message</item>
+                loglevel="LL_INFO"
+                description="Authentication Failed">
+        <datainfo>
+            <item>error message</item>
             <item>authentication type</item>
-	    <item>user name</item>
-	</datainfo>
-	<triggers>
-	    <item>Named Configuration (Auth Chain) does not exist for this user
+            <item>user name</item>
+        </datainfo>
+        <triggers>
+            <item>Named Configuration (Auth Chain) does not exist for this user
             </item>
-            </triggers>
-	<actions>
+        </triggers>
+        <actions>
             <item>Create and configure a named config for this user</item>
         </actions>
     </logmessage>
     <logmessage name="LOGIN_FAILED_USER_NOUSERPROFILE" id="216"
-	loglevel="LL_INFO"
-	description="Authentication Failed">
-	<datainfo>
-	    <item>error message</item>
+                loglevel="LL_INFO"
+                description="Authentication Failed">
+        <datainfo>
+            <item>error message</item>
             <item>authentication type</item>
-	    <item>user name</item>
-	</datainfo>
-	<triggers>
-	    <item>User based Auth. No user profile found for this user.
+            <item>user name</item>
+        </datainfo>
+        <triggers>
+            <item>User based Auth. No user profile found for this user.
             </item>
-            </triggers>
-	<actions>
-            <item>User does not exist in the datastore plugin configured and 
-            hence configure the datastore plugin for this realm/org correctly.
+        </triggers>
+        <actions>
+            <item>User does not exist in the datastore plugin configured and
+                hence configure the datastore plugin for this realm/org correctly.
             </item>
         </actions>
     </logmessage>
     <logmessage name="LOGIN_FAILED_USER_USERINACTIVE" id="217"
-	loglevel="LL_INFO"
-	description="Authentication Failed">
-	<datainfo>
-	    <item>error message</item>
+                loglevel="LL_INFO"
+                description="Authentication Failed">
+        <datainfo>
+            <item>error message</item>
             <item>authentication type</item>
-	    <item>user name</item>
-	</datainfo>
-	<triggers>
-	    <item>User based Auth. This user is not active.
+            <item>user name</item>
+        </datainfo>
+        <triggers>
+            <item>User based Auth. This user is not active.
             </item>
-            </triggers>
-	<actions>
+        </triggers>
+        <actions>
             <item>Activate the user.</item>
         </actions>
     </logmessage>
     <logmessage name="LOGIN_FAILED_USER_LOCKEDOUT" id="218"
-	loglevel="LL_INFO"
-	description="Authentication Failed">
-	<datainfo>
-	    <item>error message</item>
+                loglevel="LL_INFO"
+                description="Authentication Failed">
+        <datainfo>
+            <item>error message</item>
             <item>authentication type</item>
-	    <item>user name</item>
-	</datainfo>
-	<triggers>
-	    <item>User based Auth. Max number of failure attempts exceeded. 
-            User is Locked out.</item>
-            </triggers>
-	<actions>
+            <item>user name</item>
+        </datainfo>
+        <triggers>
+            <item>User based Auth. Max number of failure attempts exceeded.
+                User is Locked out.
+            </item>
+        </triggers>
+        <actions>
             <item>Contact system administrator.</item>
         </actions>
     </logmessage>
     <logmessage name="LOGIN_FAILED_USER_ACCOUNTEXPIRED" id="219"
-	loglevel="LL_INFO"
-	description="Authentication Failed">
-	<datainfo>
-	    <item>error message</item>
+                loglevel="LL_INFO"
+                description="Authentication Failed">
+        <datainfo>
+            <item>error message</item>
             <item>authentication type</item>
-	    <item>user name</item>
-	</datainfo>
-	<triggers>
-	    <item>User based Auth. User account has expired.
+            <item>user name</item>
+        </datainfo>
+        <triggers>
+            <item>User based Auth. User account has expired.
             </item>
-            </triggers>
-	<actions>
+        </triggers>
+        <actions>
             <item>Contact system administrator.</item>
         </actions>
     </logmessage>
     <logmessage name="LOGIN_FAILED_USER_LOGINTIMEOUT" id="220"
-	loglevel="LL_INFO"
-	description="Authentication Failed">
-	<datainfo>
-	    <item>error message</item>
+                loglevel="LL_INFO"
+                description="Authentication Failed">
+        <datainfo>
+            <item>error message</item>
             <item>authentication type</item>
-	    <item>user name</item>
-	</datainfo>
-	<triggers>
-	    <item>User based Auth. Login timed out.
+            <item>user name</item>
+        </datainfo>
+        <triggers>
+            <item>User based Auth. Login timed out.
             </item>
-            </triggers>
-	<actions>
+        </triggers>
+        <actions>
             <item>Try to login again.</item>
         </actions>
     </logmessage>
     <logmessage name="LOGIN_FAILED_USER_MODULEDENIED" id="221"
-	loglevel="LL_INFO"
-	description="Authentication Failed">
-	<datainfo>
-	    <item>error message</item>
+                loglevel="LL_INFO"
+                description="Authentication Failed">
+        <datainfo>
+            <item>error message</item>
             <item>authentication type</item>
-	    <item>user name</item>
-	</datainfo>
-	<triggers>
-	    <item>User based Auth. Authentication module is denied.
+            <item>user name</item>
+        </datainfo>
+        <triggers>
+            <item>User based Auth. Authentication module is denied.
             </item>
-            </triggers>
-	<actions>
+        </triggers>
+        <actions>
             <item>Configure this module or use some other module.</item>
         </actions>
     </logmessage>
     <logmessage name="LOGIN_FAILED_USER_MAXSESSIONREACHED" id="222"
-	loglevel="LL_INFO"
-	description="Authentication Failed">
-	<datainfo>
-	    <item>error message</item>
+                loglevel="LL_INFO"
+                description="Authentication Failed">
+        <datainfo>
+            <item>error message</item>
             <item>authentication type</item>
-	    <item>user name</item>
-	</datainfo>
-	<triggers>
-	    <item>User based auth. Limit for maximum number of allowed session 
-            has been reached.</item>
-            </triggers>
-	<actions>
+            <item>user name</item>
+        </datainfo>
+        <triggers>
+            <item>User based auth. Limit for maximum number of allowed session
+                has been reached.
+            </item>
+        </triggers>
+        <actions>
             <item>Logout of a session or increase the limit.</item>
         </actions>
     </logmessage>
     <logmessage name="LOGIN_FAILED_USER_INVALIDDOMAIN" id="223"
-	loglevel="LL_INFO"
-	description="Authentication Failed">
-	<datainfo>
-	    <item>error message</item>
+                loglevel="LL_INFO"
+                description="Authentication Failed">
+        <datainfo>
+            <item>error message</item>
             <item>authentication type</item>
-	    <item>user name</item>
-	</datainfo>
-	<triggers>
-	    <item>User based auth. Org/Realm does not exists.
+            <item>user name</item>
+        </datainfo>
+        <triggers>
+            <item>User based auth. Org/Realm does not exists.
             </item>
-            </triggers>
-	<actions>
+        </triggers>
+        <actions>
             <item>Use a valid Org/Realm.</item>
         </actions>
     </logmessage>
     <logmessage name="LOGIN_FAILED_USER_ORGINACTIVE" id="224"
-	loglevel="LL_INFO"
-	description="Authentication Failed">
-	<datainfo>
-	    <item>error message</item>
+                loglevel="LL_INFO"
+                description="Authentication Failed">
+        <datainfo>
+            <item>error message</item>
             <item>authentication type</item>
-	    <item>user name</item>
-	</datainfo>
-	<triggers>
-	    <item>User based auth. Org/Realm is not active.
+            <item>user name</item>
+        </datainfo>
+        <triggers>
+            <item>User based auth. Org/Realm is not active.
             </item>
-            </triggers>
-	<actions>
+        </triggers>
+        <actions>
             <item>Activate the Org/Realm.</item>
         </actions>
     </logmessage>
     <logmessage name="LOGIN_FAILED_USER_SESSIONCREATEERROR" id="225"
-	loglevel="LL_INFO"
-	description="Authentication Failed">
-	<datainfo>
-	    <item>error message</item>
+                loglevel="LL_INFO"
+                description="Authentication Failed">
+        <datainfo>
+            <item>error message</item>
             <item>authentication type</item>
-	    <item>user name</item>
-	</datainfo>
-	<triggers>
-	    <item>User based auth. Cannot create a session.
+            <item>user name</item>
+        </datainfo>
+        <triggers>
+            <item>User based auth. Cannot create a session.
             </item>
-            </triggers>
-	<actions>
-            <item>Ensure that session service is configured and maxsession is 
-            not reached.</item>
+        </triggers>
+        <actions>
+            <item>Ensure that session service is configured and maxsession is
+                not reached.
+            </item>
         </actions>
     </logmessage>
     <logmessage name="LOGIN_FAILED_ROLE" id="226"
-	loglevel="LL_INFO"
-	description="Role based authentication failed">
-	<datainfo>
-	    <item>error message</item>
-	    <item>authentication type</item>
-	    <item>role name</item>
-	</datainfo>
-	<triggers>
-            <item>No authentication configuration (chain of one or more 
-            authentication modules) configured for role</item>
-	    <item>Incorrect/invalid credentials presented</item>
+                loglevel="LL_INFO"
+                description="Role based authentication failed">
+        <datainfo>
+            <item>error message</item>
+            <item>authentication type</item>
+            <item>role name</item>
+        </datainfo>
+        <triggers>
+            <item>No authentication configuration (chain of one or more
+                authentication modules) configured for role
+            </item>
+            <item>Incorrect/invalid credentials presented</item>
             <item>User does not belong to this role</item>
             <item>User locked out/not active</item>
-	</triggers>
-	<actions>
-            <item>Configure authentication configuration (chain of one or more 
-            authentication modules) for role</item>
-	    <item>Enter correct/valid credentials to required authentication 
-            module</item>
+        </triggers>
+        <actions>
+            <item>Configure authentication configuration (chain of one or more
+                authentication modules) for role
+            </item>
+            <item>Enter correct/valid credentials to required authentication
+                module
+            </item>
             <item>Assign this role to the authenticating user</item>
         </actions>
     </logmessage>
     <logmessage name="LOGIN_FAILED_ROLE_INVALIDPASSWORD" id="227"
-	loglevel="LL_INFO"
-	description="Authentication Failed">
-	<datainfo>
-	    <item>error message</item>
+                loglevel="LL_INFO"
+                description="Authentication Failed">
+        <datainfo>
+            <item>error message</item>
             <item>authentication type</item>
-	    <item>role name</item>
-	</datainfo>
-	<triggers>
-	    <item>Role based Auth. Invalid credentials entered.
+            <item>role name</item>
+        </datainfo>
+        <triggers>
+            <item>Role based Auth. Invalid credentials entered.
             </item>
-            </triggers>
-	<actions>
+        </triggers>
+        <actions>
             <item>Enter the correct password.</item>
         </actions>
     </logmessage>
     <logmessage name="LOGIN_FAILED_ROLE_NOCONFIG" id="228"
-	loglevel="LL_INFO"
-	description="Authentication Failed">
-	<datainfo>
-	    <item>error message</item>
+                loglevel="LL_INFO"
+                description="Authentication Failed">
+        <datainfo>
+            <item>error message</item>
             <item>authentication type</item>
-	    <item>role name</item>
-	</datainfo>
-	<triggers>
-	    <item>Named Configuration (Auth Chain) does not exist for this 
-            role.</item>
-            </triggers>
-	<actions>
+            <item>role name</item>
+        </datainfo>
+        <triggers>
+            <item>Named Configuration (Auth Chain) does not exist for this
+                role.
+            </item>
+        </triggers>
+        <actions>
             <item>Create and configure a named config for this role.</item>
         </actions>
     </logmessage>
     <logmessage name="LOGIN_FAILED_ROLE_NOUSERPROFILE" id="229"
-	loglevel="LL_INFO"
-	description="Authentication Failed">
-	<datainfo>
-	    <item>error message</item>
+                loglevel="LL_INFO"
+                description="Authentication Failed">
+        <datainfo>
+            <item>error message</item>
             <item>authentication type</item>
-	    <item>role name</item>
-	</datainfo>
-	<triggers>
-	    <item>Role based Auth. No user profile found for this user.
+            <item>role name</item>
+        </datainfo>
+        <triggers>
+            <item>Role based Auth. No user profile found for this user.
             </item>
-            </triggers>
-	<actions>
-            <item>User does not exist in the datastore plugin configured and 
-            hence configure the datastore plugin for this realm/org correctly.
+        </triggers>
+        <actions>
+            <item>User does not exist in the datastore plugin configured and
+                hence configure the datastore plugin for this realm/org correctly.
             </item>
         </actions>
     </logmessage>
     <logmessage name="LOGIN_FAILED_ROLE_USERINACTIVE" id="230"
-	loglevel="LL_INFO"
-	description="Authentication Failed">
-	<datainfo>
-	    <item>error message</item>
+                loglevel="LL_INFO"
+                description="Authentication Failed">
+        <datainfo>
+            <item>error message</item>
             <item>authentication type</item>
-	    <item>role name</item>
-	</datainfo>
-	<triggers>
-	    <item>Role based Auth. This user is not active.
+            <item>role name</item>
+        </datainfo>
+        <triggers>
+            <item>Role based Auth. This user is not active.
             </item>
-            </triggers>
-	<actions>
+        </triggers>
+        <actions>
             <item>Activate the user.</item>
         </actions>
     </logmessage>
     <logmessage name="LOGIN_FAILED_ROLE_LOCKEDOUT" id="231"
-	loglevel="LL_INFO"
-	description="Authentication Failed">
-	<datainfo>
-	    <item>error message</item>
+                loglevel="LL_INFO"
+                description="Authentication Failed">
+        <datainfo>
+            <item>error message</item>
             <item>authentication type</item>
-	    <item>role name</item>
-	</datainfo>
-	<triggers>
-	    <item>Role based Auth. Max number of failure attempts exceeded. 
-            User is Locked out.</item>
-            </triggers>
-	<actions>
+            <item>role name</item>
+        </datainfo>
+        <triggers>
+            <item>Role based Auth. Max number of failure attempts exceeded.
+                User is Locked out.
+            </item>
+        </triggers>
+        <actions>
             <item>Contact system administrator.</item>
         </actions>
     </logmessage>
     <logmessage name="LOGIN_FAILED_ROLE_ACCOUNTEXPIRED" id="232"
-	loglevel="LL_INFO"
-	description="Authentication Failed">
-	<datainfo>
-	    <item>error message</item>
+                loglevel="LL_INFO"
+                description="Authentication Failed">
+        <datainfo>
+            <item>error message</item>
             <item>authentication type</item>
-	    <item>role name</item>
-	</datainfo>
-	<triggers>
-	    <item>Role based Auth. User account has expired.
+            <item>role name</item>
+        </datainfo>
+        <triggers>
+            <item>Role based Auth. User account has expired.
             </item>
-            </triggers>
-	<actions>
+        </triggers>
+        <actions>
             <item>Contact system administrator.</item>
         </actions>
     </logmessage>
     <logmessage name="LOGIN_FAILED_ROLE_LOGINTIMEOUT" id="233"
-	loglevel="LL_INFO"
-	description="Authentication Failed">
-	<datainfo>
-	    <item>error message</item>
+                loglevel="LL_INFO"
+                description="Authentication Failed">
+        <datainfo>
+            <item>error message</item>
             <item>authentication type</item>
-	    <item>role name</item>
-	</datainfo>
-	<triggers>
-	    <item>Role based Auth. Login timed out.
+            <item>role name</item>
+        </datainfo>
+        <triggers>
+            <item>Role based Auth. Login timed out.
             </item>
-            </triggers>
-	<actions>
+        </triggers>
+        <actions>
             <item>Try to login again.</item>
         </actions>
     </logmessage>
     <logmessage name="LOGIN_FAILED_ROLE_MODULEDENIED" id="234"
-	loglevel="LL_INFO"
-	description="Authentication Failed">
-	<datainfo>
-	    <item>error message</item>
+                loglevel="LL_INFO"
+                description="Authentication Failed">
+        <datainfo>
+            <item>error message</item>
             <item>authentication type</item>
-	    <item>role name</item>
-	</datainfo>
-	<triggers>
-	    <item>Role based Auth. Authentication module is denied.
+            <item>role name</item>
+        </datainfo>
+        <triggers>
+            <item>Role based Auth. Authentication module is denied.
             </item>
-            </triggers>
-	<actions>
+        </triggers>
+        <actions>
             <item>Configure this module or use some other module.</item>
         </actions>
     </logmessage>
     <logmessage name="LOGIN_FAILED_ROLE_MAXSESSIONREACHED" id="235"
-	loglevel="LL_INFO"
-	description="Authentication Failed">
-	<datainfo>
-	    <item>error message</item>
+                loglevel="LL_INFO"
+                description="Authentication Failed">
+        <datainfo>
+            <item>error message</item>
             <item>authentication type</item>
-	    <item>role name</item>
-	</datainfo>
-	<triggers>
-	    <item>Role based auth. Limit for maximum number of allowed session 
-            has been reached.</item>
-            </triggers>
-	<actions>
+            <item>role name</item>
+        </datainfo>
+        <triggers>
+            <item>Role based auth. Limit for maximum number of allowed session
+                has been reached.
+            </item>
+        </triggers>
+        <actions>
             <item>Logout of a session or increase the limit.</item>
         </actions>
     </logmessage>
     <logmessage name="LOGIN_FAILED_ROLE_INVALIDDOMAIN" id="236"
-	loglevel="LL_INFO"
-	description="Authentication Failed">
-	<datainfo>
-	    <item>error message</item>
+                loglevel="LL_INFO"
+                description="Authentication Failed">
+        <datainfo>
+            <item>error message</item>
             <item>authentication type</item>
-	    <item>role name</item>
-	</datainfo>
-	<triggers>
-	    <item>Role based auth. Org/Realm does not exists.
+            <item>role name</item>
+        </datainfo>
+        <triggers>
+            <item>Role based auth. Org/Realm does not exists.
             </item>
-            </triggers>
-	<actions>
+        </triggers>
+        <actions>
             <item>Use a valid Org/Realm.</item>
         </actions>
     </logmessage>
     <logmessage name="LOGIN_FAILED_ROLE_ORGINACTIVE" id="237"
-	loglevel="LL_INFO"
-	description="Authentication Failed">
-	<datainfo>
-	    <item>error message</item>
+                loglevel="LL_INFO"
+                description="Authentication Failed">
+        <datainfo>
+            <item>error message</item>
             <item>authentication type</item>
-	    <item>role name</item>
-	</datainfo>
-	<triggers>
-	    <item>Role based auth. Org/Realm is not active.
+            <item>role name</item>
+        </datainfo>
+        <triggers>
+            <item>Role based auth. Org/Realm is not active.
             </item>
-            </triggers>
-	<actions>
+        </triggers>
+        <actions>
             <item>Activate the Org/Realm.</item>
         </actions>
     </logmessage>
     <logmessage name="LOGIN_FAILED_ROLE_SESSIONCREATEERROR" id="238"
-	loglevel="LL_INFO"
-	description="Authentication Failed">
-	<datainfo>
-	    <item>error message</item>
+                loglevel="LL_INFO"
+                description="Authentication Failed">
+        <datainfo>
+            <item>error message</item>
             <item>authentication type</item>
-	    <item>role name</item>
-	</datainfo>
-	<triggers>
-	    <item>Role based auth. Cannot create a session.
+            <item>role name</item>
+        </datainfo>
+        <triggers>
+            <item>Role based auth. Cannot create a session.
             </item>
-            </triggers>
-	<actions>
-            <item>Ensure that session service is configured and maxsession is 
-            not reached.</item>
+        </triggers>
+        <actions>
+            <item>Ensure that session service is configured and maxsession is
+                not reached.
+            </item>
         </actions>
     </logmessage>
     <logmessage name="LOGIN_FAILED_ROLE_USERNOTFOUND" id="239"
-	loglevel="LL_INFO"
-	description="Authentication Failed">
-	<datainfo>
-	    <item>error message</item>
+                loglevel="LL_INFO"
+                description="Authentication Failed">
+        <datainfo>
+            <item>error message</item>
             <item>authentication type</item>
-	    <item>role name</item>
-	</datainfo>
-	<triggers>
-	    <item>Role based auth. User does not belong to this role.
+            <item>role name</item>
+        </datainfo>
+        <triggers>
+            <item>Role based auth. User does not belong to this role.
             </item>
-            </triggers>
-	<actions>
+        </triggers>
+        <actions>
             <item>Add the user to this role.</item>
         </actions>
     </logmessage>
     <logmessage name="LOGIN_FAILED_SERVICE" id="240"
-	loglevel="LL_INFO"
-	description="Service based authentication failed">
-	<datainfo>
-	    <item>error message</item>
-	    <item>authentication type</item>
-	    <item>service name</item>
-	</datainfo>
-	<triggers>
-            <item>No authentication configuration (chain of one or more 
-            authentication modules) configured for service</item>
-	    <item>Incorrect/invalid credentials presented</item>
+                loglevel="LL_INFO"
+                description="Service based authentication failed">
+        <datainfo>
+            <item>error message</item>
+            <item>authentication type</item>
+            <item>service name</item>
+        </datainfo>
+        <triggers>
+            <item>No authentication configuration (chain of one or more
+                authentication modules) configured for service
+            </item>
+            <item>Incorrect/invalid credentials presented</item>
             <item>User locked out/not active</item>
         </triggers>
-	<actions>
-            <item>Configure authentication configuration (chain of one or more 
-            authentication modules) for service</item>
-	    <item>Enter correct/valid credentials to required authentication 
-            module</item>            
+        <actions>
+            <item>Configure authentication configuration (chain of one or more
+                authentication modules) for service
+            </item>
+            <item>Enter correct/valid credentials to required authentication
+                module
+            </item>
         </actions>
     </logmessage>
     <logmessage name="LOGIN_FAILED_SERVICE_INVALIDPASSWORD" id="241"
-	loglevel="LL_INFO"
-	description="Authentication Failed">
-	<datainfo>
-	    <item>error message</item>
+                loglevel="LL_INFO"
+                description="Authentication Failed">
+        <datainfo>
+            <item>error message</item>
             <item>authentication type</item>
-	    <item>service name</item>
-	</datainfo>
-	<triggers>
-	    <item>Service based Auth. Invalid credentials entered.
+            <item>service name</item>
+        </datainfo>
+        <triggers>
+            <item>Service based Auth. Invalid credentials entered.
             </item>
-            </triggers>
-	<actions>
+        </triggers>
+        <actions>
             <item>Enter the correct password.</item>
         </actions>
     </logmessage>
     <logmessage name="LOGIN_FAILED_SERVICE_NOCONFIG" id="242"
-	loglevel="LL_INFO"
-	description="Authentication Failed">
-	<datainfo>
-	    <item>error message</item>
+                loglevel="LL_INFO"
+                description="Authentication Failed">
+        <datainfo>
+            <item>error message</item>
             <item>authentication type</item>
-	    <item>service name</item>
-	</datainfo>
-	<triggers>
-	    <item>Named Configuration (Auth Chain) does not exist with this
-            service name.
+            <item>service name</item>
+        </datainfo>
+        <triggers>
+            <item>Named Configuration (Auth Chain) does not exist with this
+                service name.
             </item>
-            </triggers>
-	<actions>
+        </triggers>
+        <actions>
             <item>Create and configure a named config.</item>
         </actions>
     </logmessage>
     <logmessage name="LOGIN_FAILED_SERVICE_NOUSERPROFILE" id="243"
-	loglevel="LL_INFO"
-	description="Authentication Failed">
-	<datainfo>
-	    <item>error message</item>
+                loglevel="LL_INFO"
+                description="Authentication Failed">
+        <datainfo>
+            <item>error message</item>
             <item>authentication type</item>
-	    <item>service name</item>
-	</datainfo>
-	<triggers>
-	    <item>Service based Auth. No user profile found for this user.
+            <item>service name</item>
+        </datainfo>
+        <triggers>
+            <item>Service based Auth. No user profile found for this user.
             </item>
-            </triggers>
-	<actions>
-            <item>User does not exist in the datastore plugin configured and 
-            hence configure the datastore plugin for this realm/org correctly.
+        </triggers>
+        <actions>
+            <item>User does not exist in the datastore plugin configured and
+                hence configure the datastore plugin for this realm/org correctly.
             </item>
         </actions>
     </logmessage>
     <logmessage name="LOGIN_FAILED_SERVICE_USERINACTIVE" id="244"
-	loglevel="LL_INFO"
-	description="Authentication Failed">
-	<datainfo>
-	    <item>error message</item>
+                loglevel="LL_INFO"
+                description="Authentication Failed">
+        <datainfo>
+            <item>error message</item>
             <item>authentication type</item>
-	    <item>service name</item>
-	</datainfo>
-	<triggers>
-	    <item>Service based Auth. This user is not active.
+            <item>service name</item>
+        </datainfo>
+        <triggers>
+            <item>Service based Auth. This user is not active.
             </item>
-            </triggers>
-	<actions>
+        </triggers>
+        <actions>
             <item>Activate the user.</item>
         </actions>
     </logmessage>
     <logmessage name="LOGIN_FAILED_SERVICE_LOCKEDOUT" id="245"
-	loglevel="LL_INFO"
-	description="Authentication Failed">
-	<datainfo>
-	    <item>error message</item>
+                loglevel="LL_INFO"
+                description="Authentication Failed">
+        <datainfo>
+            <item>error message</item>
             <item>authentication type</item>
-	    <item>service name</item>
-	</datainfo>
-	<triggers>
-	    <item>Service based Auth. Max number of failure attempts exceeded. 
-            User is Locked out.</item>
-            </triggers>
-	<actions>
+            <item>service name</item>
+        </datainfo>
+        <triggers>
+            <item>Service based Auth. Max number of failure attempts exceeded.
+                User is Locked out.
+            </item>
+        </triggers>
+        <actions>
             <item>Contact system administrator.</item>
         </actions>
     </logmessage>
     <logmessage name="LOGIN_FAILED_SERVICE_ACCOUNTEXPIRED" id="246"
-	loglevel="LL_INFO"
-	description="Authentication Failed">
-	<datainfo>
-	    <item>error message</item>
+                loglevel="LL_INFO"
+                description="Authentication Failed">
+        <datainfo>
+            <item>error message</item>
             <item>authentication type</item>
-	    <item>service name</item>
-	</datainfo>
-	<triggers>
-	    <item>Service based Auth. User account has expired.
+            <item>service name</item>
+        </datainfo>
+        <triggers>
+            <item>Service based Auth. User account has expired.
             </item>
-            </triggers>
-	<actions>
+        </triggers>
+        <actions>
             <item>Contact system administrator.</item>
         </actions>
     </logmessage>
     <logmessage name="LOGIN_FAILED_SERVICE_LOGINTIMEOUT" id="247"
-	loglevel="LL_INFO"
-	description="Authentication Failed">
-	<datainfo>
-	    <item>error message</item>
+                loglevel="LL_INFO"
+                description="Authentication Failed">
+        <datainfo>
+            <item>error message</item>
             <item>authentication type</item>
-	    <item>service name</item>
-	</datainfo>
-	<triggers>
-	    <item>Service based Auth. Login timed out.
+            <item>service name</item>
+        </datainfo>
+        <triggers>
+            <item>Service based Auth. Login timed out.
             </item>
-            </triggers>
-	<actions>
+        </triggers>
+        <actions>
             <item>Try to login again.</item>
         </actions>
     </logmessage>
     <logmessage name="LOGIN_FAILED_SERVICE_MODULEDENIED" id="248"
-	loglevel="LL_INFO"
-	description="Authentication Failed">
-	<datainfo>
-	    <item>error message</item>
+                loglevel="LL_INFO"
+                description="Authentication Failed">
+        <datainfo>
+            <item>error message</item>
             <item>authentication type</item>
-	    <item>service name</item>
-	</datainfo>
-	<triggers>
-	    <item>Service based Auth. Authentication module is denied.
+            <item>service name</item>
+        </datainfo>
+        <triggers>
+            <item>Service based Auth. Authentication module is denied.
             </item>
-            </triggers>
-	<actions>
+        </triggers>
+        <actions>
             <item>Configure this module or use some other module.</item>
         </actions>
     </logmessage>
     <logmessage name="LOGIN_FAILED_SERVICE_NOSERVICE" id="249"
-	loglevel="LL_INFO"
-	description="Authentication Failed">
-	<datainfo>
-	    <item>error message</item>
+                loglevel="LL_INFO"
+                description="Authentication Failed">
+        <datainfo>
+            <item>error message</item>
             <item>authentication type</item>
-	    <item>service name</item>
-	</datainfo>
-	<triggers>
-	    <item>Service based Auth. Service does not exist.
+            <item>service name</item>
+        </datainfo>
+        <triggers>
+            <item>Service based Auth. Service does not exist.
             </item>
-            </triggers>
-	<actions>
+        </triggers>
+        <actions>
             <item>Please use only valid Service.</item>
         </actions>
     </logmessage>
     <logmessage name="LOGIN_FAILED_SERVICE_MAXSESSIONREACHED" id="250"
-	loglevel="LL_INFO"
-	description="Authentication Failed">
-	<datainfo>
-	    <item>error message</item>
+                loglevel="LL_INFO"
+                description="Authentication Failed">
+        <datainfo>
+            <item>error message</item>
             <item>authentication type</item>
-	    <item>service name</item>
-	</datainfo>
-	<triggers>
-	    <item>Service based auth. Limit for maximum number of allowed 
-            session has been reached.</item>
-            </triggers>
-	<actions>
+            <item>service name</item>
+        </datainfo>
+        <triggers>
+            <item>Service based auth. Limit for maximum number of allowed
+                session has been reached.
+            </item>
+        </triggers>
+        <actions>
             <item>Logout of a session or increase the limit.</item>
         </actions>
     </logmessage>
     <logmessage name="LOGIN_FAILED_SERVICE_INVALIDDOMAIN" id="251"
-	loglevel="LL_INFO"
-	description="Authentication Failed">
-	<datainfo>
-	    <item>error message</item>
+                loglevel="LL_INFO"
+                description="Authentication Failed">
+        <datainfo>
+            <item>error message</item>
             <item>authentication type</item>
-	    <item>service name</item>
-	</datainfo>
-	<triggers>
-	    <item>Service based auth. Org/Realm does not exists.
+            <item>service name</item>
+        </datainfo>
+        <triggers>
+            <item>Service based auth. Org/Realm does not exists.
             </item>
-            </triggers>
-	<actions>
+        </triggers>
+        <actions>
             <item>Use a valid Org/Realm.</item>
         </actions>
     </logmessage>
     <logmessage name="LOGIN_FAILED_SERVICE_ORGINACTIVE" id="252"
-	loglevel="LL_INFO"
-	description="Authentication Failed">
-	<datainfo>
-	    <item>error message</item>
+                loglevel="LL_INFO"
+                description="Authentication Failed">
+        <datainfo>
+            <item>error message</item>
             <item>authentication type</item>
-	    <item>service name</item>
-	</datainfo>
-	<triggers>
-	    <item>Service based auth. Org/Realm is not active.
+            <item>service name</item>
+        </datainfo>
+        <triggers>
+            <item>Service based auth. Org/Realm is not active.
             </item>
-            </triggers>
-	<actions>
+        </triggers>
+        <actions>
             <item>Activate the Org/Realm.</item>
         </actions>
     </logmessage>
     <logmessage name="LOGIN_FAILED_SERVICE_SESSIONCREATEERROR" id="253"
-	loglevel="LL_INFO"
-	description="Authentication Failed">
-	<datainfo>
-	    <item>error message</item>
+                loglevel="LL_INFO"
+                description="Authentication Failed">
+        <datainfo>
+            <item>error message</item>
             <item>authentication type</item>
-	    <item>service name</item>
-	</datainfo>
-	<triggers>
-	    <item>Service based auth. Cannot create a session.
+            <item>service name</item>
+        </datainfo>
+        <triggers>
+            <item>Service based auth. Cannot create a session.
             </item>
-            </triggers>
-	<actions>
-            <item>Ensure that session service is configured and maxsession is 
-            not reached.</item>
+        </triggers>
+        <actions>
+            <item>Ensure that session service is configured and maxsession is
+                not reached.
+            </item>
         </actions>
     </logmessage>
     <logmessage name="LOGIN_FAILED_LEVEL" id="254"
-	loglevel="LL_INFO"
-	description="Authentication level based authentication failed">
-	<datainfo>
-	    <item>error message</item>
-	    <item>authentication type</item>
-	    <item>authentication level value</item>
-	</datainfo>
-	<triggers>
-	    <item>There are no authentication module(s) having authentication 
-            level value greater than or equal to specified authentication level
+                loglevel="LL_INFO"
+                description="Authentication level based authentication failed">
+        <datainfo>
+            <item>error message</item>
+            <item>authentication type</item>
+            <item>authentication level value</item>
+        </datainfo>
+        <triggers>
+            <item>There are no authentication module(s) having authentication
+                level value greater than or equal to specified authentication level
             </item>
-            <item>Incorrect/invalid credentials presented to one or more 
-            authentication modules having authentication level greater than or 
-            equal to specified authentication level</item>
-            <item>User locked out/not active</item> 
-	</triggers>
-	<actions>
-            <item>Configure one or more authentication modules having 
-            authentication level value greater than or equal to required 
-            authentication level</item>
-	    <item>Enter correct/valid credentials to one or more authentication
-            modules having authentication level greater than or equal to 
-            specified authentication level</item>   
+            <item>Incorrect/invalid credentials presented to one or more
+                authentication modules having authentication level greater than or
+                equal to specified authentication level
+            </item>
+            <item>User locked out/not active</item>
+        </triggers>
+        <actions>
+            <item>Configure one or more authentication modules having
+                authentication level value greater than or equal to required
+                authentication level
+            </item>
+            <item>Enter correct/valid credentials to one or more authentication
+                modules having authentication level greater than or equal to
+                specified authentication level
+            </item>
         </actions>
     </logmessage>
     <logmessage name="LOGIN_FAILED_LEVEL_INVALIDPASSWORD" id="255"
-	loglevel="LL_INFO"
-	description="Authentication Failed">
-	<datainfo>
-	    <item>error message</item>
+                loglevel="LL_INFO"
+                description="Authentication Failed">
+        <datainfo>
+            <item>error message</item>
             <item>authentication type</item>
-	    <item>authentication level value</item>
-	</datainfo>
-	<triggers>
-	    <item>Level based Auth. Invalid credentials entered.
+            <item>authentication level value</item>
+        </datainfo>
+        <triggers>
+            <item>Level based Auth. Invalid credentials entered.
             </item>
-            </triggers>
-	<actions>
+        </triggers>
+        <actions>
             <item>Enter the correct password.</item>
         </actions>
     </logmessage>
     <logmessage name="LOGIN_FAILED_LEVEL_NOCONFIG" id="256"
-	loglevel="LL_INFO"
-	description="Authentication Failed">
-	<datainfo>
-	    <item>error message</item>
+                loglevel="LL_INFO"
+                description="Authentication Failed">
+        <datainfo>
+            <item>error message</item>
             <item>authentication type</item>
-	    <item>authentication level value</item>
-	</datainfo>
-	<triggers>
-	    <item>Level based Auth. No Auth Configuration available.
+            <item>authentication level value</item>
+        </datainfo>
+        <triggers>
+            <item>Level based Auth. No Auth Configuration available.
             </item>
-            </triggers>
-	<actions>
+        </triggers>
+        <actions>
             <item>Create an auth configuration.</item>
         </actions>
     </logmessage>
     <logmessage name="LOGIN_FAILED_LEVEL_NOUSERPROFILE" id="257"
-	loglevel="LL_INFO"
-	description="Authentication Failed">
-	<datainfo>
-	    <item>error message</item>
+                loglevel="LL_INFO"
+                description="Authentication Failed">
+        <datainfo>
+            <item>error message</item>
             <item>authentication type</item>
-	    <item>authentication level value</item>
-	</datainfo>
-	<triggers>
-	    <item>Level based Auth. No user profile found for this user.
+            <item>authentication level value</item>
+        </datainfo>
+        <triggers>
+            <item>Level based Auth. No user profile found for this user.
             </item>
-            </triggers>
-	<actions>
-            <item>User does not exist in the datastore plugin configured and 
-            hence configure the datastore plugin for this realm/org correctly.
+        </triggers>
+        <actions>
+            <item>User does not exist in the datastore plugin configured and
+                hence configure the datastore plugin for this realm/org correctly.
             </item>
         </actions>
     </logmessage>
     <logmessage name="LOGIN_FAILED_LEVEL_USERINACTIVE" id="258"
-	loglevel="LL_INFO"
-	description="Authentication Failed">
-	<datainfo>
-	    <item>error message</item>
+                loglevel="LL_INFO"
+                description="Authentication Failed">
+        <datainfo>
+            <item>error message</item>
             <item>authentication type</item>
-	    <item>authentication level value</item>
-	</datainfo>
-	<triggers>
-	    <item>Level based Auth. This user is not active.
+            <item>authentication level value</item>
+        </datainfo>
+        <triggers>
+            <item>Level based Auth. This user is not active.
             </item>
-            </triggers>
-	<actions>
+        </triggers>
+        <actions>
             <item>Activate the user.</item>
         </actions>
     </logmessage>
     <logmessage name="LOGIN_FAILED_LEVEL_LOCKEDOUT" id="259"
-	loglevel="LL_INFO"
-	description="Authentication Failed">
-	<datainfo>
-	    <item>error message</item>
+                loglevel="LL_INFO"
+                description="Authentication Failed">
+        <datainfo>
+            <item>error message</item>
             <item>authentication type</item>
-	    <item>authentication level value</item>
-	</datainfo>
-	<triggers>
-	    <item>Level based Auth. Max number of failure attempts exceeded. 
-            User is Locked out.</item>
-            </triggers>
-	<actions>
+            <item>authentication level value</item>
+        </datainfo>
+        <triggers>
+            <item>Level based Auth. Max number of failure attempts exceeded.
+                User is Locked out.
+            </item>
+        </triggers>
+        <actions>
             <item>Contact system administrator.</item>
         </actions>
     </logmessage>
     <logmessage name="LOGIN_FAILED_LEVEL_ACCOUNTEXPIRED" id="260"
-	loglevel="LL_INFO"
-	description="Authentication Failed">
-	<datainfo>
-	    <item>error message</item>
+                loglevel="LL_INFO"
+                description="Authentication Failed">
+        <datainfo>
+            <item>error message</item>
             <item>authentication type</item>
-	    <item>authentication level value</item>
-	</datainfo>
-	<triggers>
-	    <item>Level based Auth. User account has expired.
+            <item>authentication level value</item>
+        </datainfo>
+        <triggers>
+            <item>Level based Auth. User account has expired.
             </item>
-            </triggers>
-	<actions>
+        </triggers>
+        <actions>
             <item>Contact system administrator.</item>
         </actions>
     </logmessage>
     <logmessage name="LOGIN_FAILED_LEVEL_LOGINTIMEOUT" id="261"
-	loglevel="LL_INFO"
-	description="Authentication Failed">
-	<datainfo>
-	    <item>error message</item>
+                loglevel="LL_INFO"
+                description="Authentication Failed">
+        <datainfo>
+            <item>error message</item>
             <item>authentication type</item>
-	    <item>authentication level value</item>
-	</datainfo>
-	<triggers>
-	    <item>Level based Auth. Login timed out.
+            <item>authentication level value</item>
+        </datainfo>
+        <triggers>
+            <item>Level based Auth. Login timed out.
             </item>
-            </triggers>
-	<actions>
+        </triggers>
+        <actions>
             <item>Try to login again.</item>
         </actions>
     </logmessage>
     <logmessage name="LOGIN_FAILED_LEVEL_MODULEDENIED" id="262"
-	loglevel="LL_INFO"
-	description="Authentication Failed">
-	<datainfo>
-	    <item>error message</item>
+                loglevel="LL_INFO"
+                description="Authentication Failed">
+        <datainfo>
+            <item>error message</item>
             <item>authentication type</item>
-	    <item>authentication level value</item>
-	</datainfo>
-	<triggers>
-	    <item>Level based Auth. Authentication module is denied.
+            <item>authentication level value</item>
+        </datainfo>
+        <triggers>
+            <item>Level based Auth. Authentication module is denied.
             </item>
-            </triggers>
-	<actions>
+        </triggers>
+        <actions>
             <item>Configure this module or use some other module.</item>
         </actions>
     </logmessage>
     <logmessage name="LOGIN_FAILED_LEVEL_INCORRECTLEVEL" id="263"
-	loglevel="LL_INFO"
-	description="Authentication Failed">
-	<datainfo>
-	    <item>error message</item>
+                loglevel="LL_INFO"
+                description="Authentication Failed">
+        <datainfo>
+            <item>error message</item>
             <item>authentication type</item>
-	    <item>authentication level value</item>
-	</datainfo>
-	<triggers>
-	    <item>Level based Auth. Invalid Authg Level.
+            <item>authentication level value</item>
+        </datainfo>
+        <triggers>
+            <item>Level based Auth. Invalid Authg Level.
             </item>
-            </triggers>
-	<actions>
+        </triggers>
+        <actions>
             <item>Please specify valid auth level.</item>
         </actions>
     </logmessage>
     <logmessage name="LOGIN_FAILED_LEVEL_MAXSESSIONREACHED" id="264"
-	loglevel="LL_INFO"
-	description="Authentication Failed">
-	<datainfo>
-	    <item>error message</item>
+                loglevel="LL_INFO"
+                description="Authentication Failed">
+        <datainfo>
+            <item>error message</item>
             <item>authentication type</item>
-	    <item>authentication level value</item>
-	</datainfo>
-	<triggers>
-	    <item>Level based auth. Limit for maximum number of allowed 
-            session has been reached.</item>
-            </triggers>
-	<actions>
+            <item>authentication level value</item>
+        </datainfo>
+        <triggers>
+            <item>Level based auth. Limit for maximum number of allowed
+                session has been reached.
+            </item>
+        </triggers>
+        <actions>
             <item>Logout of a session or increase the limit.</item>
         </actions>
     </logmessage>
     <logmessage name="LOGIN_FAILED_LEVEL_INVALIDDOMAIN" id="265"
-	loglevel="LL_INFO"
-	description="Authentication Failed">
-	<datainfo>
-	    <item>error message</item>
+                loglevel="LL_INFO"
+                description="Authentication Failed">
+        <datainfo>
+            <item>error message</item>
             <item>authentication type</item>
-	    <item>authentication level value</item>
-	</datainfo>
-	<triggers>
-	    <item>Level based auth. Org/Realm does not exists.
+            <item>authentication level value</item>
+        </datainfo>
+        <triggers>
+            <item>Level based auth. Org/Realm does not exists.
             </item>
-            </triggers>
-	<actions>
+        </triggers>
+        <actions>
             <item>Use a valid Org/Realm.</item>
         </actions>
     </logmessage>
     <logmessage name="LOGIN_FAILED_LEVEL_ORGINACTIVE" id="266"
-	loglevel="LL_INFO"
-	description="Authentication Failed">
-	<datainfo>
-	    <item>error message</item>
+                loglevel="LL_INFO"
+                description="Authentication Failed">
+        <datainfo>
+            <item>error message</item>
             <item>authentication type</item>
-	    <item>authentication level value</item>
-	</datainfo>
-	<triggers>
-	    <item>Level based auth. Org/Realm is not active.
+            <item>authentication level value</item>
+        </datainfo>
+        <triggers>
+            <item>Level based auth. Org/Realm is not active.
             </item>
-            </triggers>
-	<actions>
+        </triggers>
+        <actions>
             <item>Activate the Org/Realm.</item>
         </actions>
     </logmessage>
     <logmessage name="LOGIN_FAILED_LEVEL_SESSIONCREATEERROR" id="267"
-	loglevel="LL_INFO"
-	description="Authentication Failed">
-	<datainfo>
-	    <item>error message</item>
+                loglevel="LL_INFO"
+                description="Authentication Failed">
+        <datainfo>
+            <item>error message</item>
             <item>authentication type</item>
-	    <item>authentication level value</item>
-	</datainfo>
-	<triggers>
-	    <item>Level based auth. Cannot create a session.
+            <item>authentication level value</item>
+        </datainfo>
+        <triggers>
+            <item>Level based auth. Cannot create a session.
             </item>
-            </triggers>
-	<actions>
-            <item>Ensure that session service is configured and maxsession is 
-            not reached.</item>
+        </triggers>
+        <actions>
+            <item>Ensure that session service is configured and maxsession is
+                not reached.
+            </item>
         </actions>
     </logmessage>
     <logmessage name="LOGIN_FAILED_MODULE_INSTANCE" id="268"
-	loglevel="LL_INFO"
-	description="Module based authentication failed">
-	<datainfo>
-	    <item>error message</item>
-	    <item>authentication type</item>
-	    <item>module name</item>
-	</datainfo>
-	<triggers>
+                loglevel="LL_INFO"
+                description="Module based authentication failed">
+        <datainfo>
+            <item>error message</item>
+            <item>authentication type</item>
+            <item>module name</item>
+        </datainfo>
+        <triggers>
             <item>Module is not registered/configured under realm</item>
-	    <item>Incorrect/invalid credentials presented</item>            
+            <item>Incorrect/invalid credentials presented</item>
             <item>User locked out/not active</item>
-	</triggers>
-	<actions>
+        </triggers>
+        <actions>
             <item>Register/configure authentication module under realm</item>
-	    <item>Enter correct/valid credentials to authentication module
-            </item>            
+            <item>Enter correct/valid credentials to authentication module
+            </item>
         </actions>
     </logmessage>
     <logmessage name="LOGIN_FAILED_MODULE_INSTANCE_INVALIDPASSWORD" id="269"
-	loglevel="LL_INFO"
-	description="Authentication Failed">
-	<datainfo>
-	    <item>error message</item>
+                loglevel="LL_INFO"
+                description="Authentication Failed">
+        <datainfo>
+            <item>error message</item>
             <item>authentication type</item>
-	    <item>module name</item>
-	</datainfo>
-	<triggers>
-	    <item>Module based Auth. Invalid credentials entered.
+            <item>module name</item>
+        </datainfo>
+        <triggers>
+            <item>Module based Auth. Invalid credentials entered.
             </item>
-            </triggers>
-	<actions>
+        </triggers>
+        <actions>
             <item>Enter the correct password.</item>
         </actions>
     </logmessage>
     <logmessage name="LOGIN_FAILED_MODULE_INSTANCE_NOUSERPROFILE" id="270"
-	loglevel="LL_INFO"
-	description="Authentication Failed">
-	<datainfo>
-	    <item>error message</item>
+                loglevel="LL_INFO"
+                description="Authentication Failed">
+        <datainfo>
+            <item>error message</item>
             <item>authentication type</item>
-	    <item>module name</item>
-	</datainfo>
-	<triggers>
-	    <item>Module based Auth. No user profile found for this user.
+            <item>module name</item>
+        </datainfo>
+        <triggers>
+            <item>Module based Auth. No user profile found for this user.
             </item>
-            </triggers>
-	<actions>
-            <item>User does not exist in the datastore plugin configured and 
-            hence configure the datastore plugin for this realm/org correctly.
+        </triggers>
+        <actions>
+            <item>User does not exist in the datastore plugin configured and
+                hence configure the datastore plugin for this realm/org correctly.
             </item>
         </actions>
     </logmessage>
     <logmessage name="LOGIN_FAILED_MODULE_INSTANCE_USERINACTIVE" id="271"
-	loglevel="LL_INFO"
-	description="Authentication Failed">
-	<datainfo>
-	    <item>error message</item>
+                loglevel="LL_INFO"
+                description="Authentication Failed">
+        <datainfo>
+            <item>error message</item>
             <item>authentication type</item>
-	    <item>module name</item>
-	</datainfo>
-	<triggers>
-	    <item>Module based Auth. This user is not active.
+            <item>module name</item>
+        </datainfo>
+        <triggers>
+            <item>Module based Auth. This user is not active.
             </item>
-            </triggers>
-	<actions>
+        </triggers>
+        <actions>
             <item>Activate the user.</item>
         </actions>
     </logmessage>
     <logmessage name="LOGIN_FAILED_MODULE_INSTANCE_LOCKEDOUT" id="272"
-	loglevel="LL_INFO"
-	description="Authentication Failed">
-	<datainfo>
-	    <item>error message</item>
+                loglevel="LL_INFO"
+                description="Authentication Failed">
+        <datainfo>
+            <item>error message</item>
             <item>authentication type</item>
-	    <item>module name</item>
-	</datainfo>
-	<triggers>
-	    <item>Module based Auth. Max number of failure attempts exceeded. 
-            User is Locked out.</item>
-            </triggers>
-	<actions>
+            <item>module name</item>
+        </datainfo>
+        <triggers>
+            <item>Module based Auth. Max number of failure attempts exceeded.
+                User is Locked out.
+            </item>
+        </triggers>
+        <actions>
             <item>Contact system administrator.</item>
         </actions>
     </logmessage>
     <logmessage name="LOGIN_FAILED_MODULE_INSTANCE_ACCOUNTEXPIRED" id="273"
-	loglevel="LL_INFO"
-	description="Authentication Failed">
-	<datainfo>
-	    <item>error message</item>
+                loglevel="LL_INFO"
+                description="Authentication Failed">
+        <datainfo>
+            <item>error message</item>
             <item>authentication type</item>
-	    <item>module name</item>
-	</datainfo>
-	<triggers>
-	    <item>Module based Auth. User account has expired.
+            <item>module name</item>
+        </datainfo>
+        <triggers>
+            <item>Module based Auth. User account has expired.
             </item>
-            </triggers>
-	<actions>
+        </triggers>
+        <actions>
             <item>Contact system administrator.</item>
         </actions>
     </logmessage>
     <logmessage name="LOGIN_FAILED_MODULE_INSTANCE_LOGINTIMEOUT" id="274"
-	loglevel="LL_INFO"
-	description="Authentication Failed">
-	<datainfo>
-	    <item>error message</item>
+                loglevel="LL_INFO"
+                description="Authentication Failed">
+        <datainfo>
+            <item>error message</item>
             <item>authentication type</item>
-	    <item>module name</item>
-	</datainfo>
-	<triggers>
-	    <item>Module based Auth. Login timed out.
+            <item>module name</item>
+        </datainfo>
+        <triggers>
+            <item>Module based Auth. Login timed out.
             </item>
-            </triggers>
-	<actions>
+        </triggers>
+        <actions>
             <item>Try to login again.</item>
         </actions>
     </logmessage>
     <logmessage name="LOGIN_FAILED_MODULE_INSTANCE_MODULEDENIED" id="275"
-	loglevel="LL_INFO"
-	description="Authentication Failed">
-	<datainfo>
-	    <item>error message</item>
+                loglevel="LL_INFO"
+                description="Authentication Failed">
+        <datainfo>
+            <item>error message</item>
             <item>authentication type</item>
-	    <item>module name</item>
-	</datainfo>
-	<triggers>
-	    <item>Module based Auth. Authentication module is denied.
+            <item>module name</item>
+        </datainfo>
+        <triggers>
+            <item>Module based Auth. Authentication module is denied.
             </item>
-            </triggers>
-	<actions>
+        </triggers>
+        <actions>
             <item>Configure this module or use some other module.</item>
         </actions>
     </logmessage>
     <logmessage name="LOGIN_FAILED_MODULE_INSTANCE_MAXSESSIONREACHED" id="276"
-	loglevel="LL_INFO"
-	description="Authentication Failed">
-	<datainfo>
-	    <item>error message</item>
+                loglevel="LL_INFO"
+                description="Authentication Failed">
+        <datainfo>
+            <item>error message</item>
             <item>authentication type</item>
-	    <item>module name</item>
-	</datainfo>
-	<triggers>
-	    <item>Module based auth. Limit for maximum number of allowed 
-            session has been reached.</item>
-            </triggers>
-	<actions>
+            <item>module name</item>
+        </datainfo>
+        <triggers>
+            <item>Module based auth. Limit for maximum number of allowed
+                session has been reached.
+            </item>
+        </triggers>
+        <actions>
             <item>Logout of a session or increase the limit.</item>
         </actions>
     </logmessage>
     <logmessage name="LOGIN_FAILED_MODULE_INSTANCE_INVALIDDOMAIN" id="277"
-	loglevel="LL_INFO"
-	description="Authentication Failed">
-	<datainfo>
-	    <item>error message</item>
+                loglevel="LL_INFO"
+                description="Authentication Failed">
+        <datainfo>
+            <item>error message</item>
             <item>authentication type</item>
-	    <item>module name</item>
-	</datainfo>
-	<triggers>
-	    <item>Module based auth. Org/Realm does not exists.
+            <item>module name</item>
+        </datainfo>
+        <triggers>
+            <item>Module based auth. Org/Realm does not exists.
             </item>
-            </triggers>
-	<actions>
+        </triggers>
+        <actions>
             <item>Use a valid Org/Realm.</item>
         </actions>
     </logmessage>
     <logmessage name="LOGIN_FAILED_MODULE_INSTANCE_ORGINACTIVE" id="278"
-	loglevel="LL_INFO"
-	description="Authentication Failed">
-	<datainfo>
-	    <item>error message</item>
+                loglevel="LL_INFO"
+                description="Authentication Failed">
+        <datainfo>
+            <item>error message</item>
             <item>authentication type</item>
-	    <item>module name</item>
-	</datainfo>
-	<triggers>
-	    <item>Module based auth. Org/Realm is not active.
+            <item>module name</item>
+        </datainfo>
+        <triggers>
+            <item>Module based auth. Org/Realm is not active.
             </item>
-            </triggers>
-	<actions>
+        </triggers>
+        <actions>
             <item>Activate the Org/Realm.</item>
         </actions>
     </logmessage>
     <logmessage name="LOGIN_FAILED_MODULE_INSTANCE_SESSIONCREATEERROR" id="279"
-	loglevel="LL_INFO"
-	description="Authentication Failed">
-	<datainfo>
-	    <item>error message</item>
+                loglevel="LL_INFO"
+                description="Authentication Failed">
+        <datainfo>
+            <item>error message</item>
             <item>authentication type</item>
-	    <item>module name</item>
-	</datainfo>
-	<triggers>
-	    <item>Module based auth. Cannot create a session.
+            <item>module name</item>
+        </datainfo>
+        <triggers>
+            <item>Module based auth. Cannot create a session.
             </item>
-            </triggers>
-	<actions>
-            <item>Ensure that session service is configured and maxsession is 
-            not reached.</item>
+        </triggers>
+        <actions>
+            <item>Ensure that session service is configured and maxsession is
+                not reached.
+            </item>
         </actions>
     </logmessage>
     <logmessage name="LOGOUT" id="300"
-	loglevel="LL_INFO"
-	description="User logout is Successful">
-	<datainfo>
-	    <item>message</item>
-	</datainfo>
-	<triggers>
-	    <item>User logged out</item>
-	</triggers>
-	<actions />
+                loglevel="LL_INFO"
+                description="User logout is Successful">
+        <datainfo>
+            <item>message</item>
+        </datainfo>
+        <triggers>
+            <item>User logged out</item>
+        </triggers>
+        <actions/>
     </logmessage>
     <logmessage name="LOGOUT_USER" id="301"
-	loglevel="LL_INFO"
-	description="User logout is successful from user based authentication">
-	<datainfo>
-	    <item>message</item>
-	    <item>authentication type</item>
-	    <item>user name</item>
-	</datainfo>
-	<triggers>
-	    <item>User logged out</item>
-	</triggers>
-	<actions />
+                loglevel="LL_INFO"
+                description="User logout is successful from user based authentication">
+        <datainfo>
+            <item>message</item>
+            <item>authentication type</item>
+            <item>user name</item>
+        </datainfo>
+        <triggers>
+            <item>User logged out</item>
+        </triggers>
+        <actions/>
     </logmessage>
     <logmessage name="LOGOUT_ROLE" id="302"
-	loglevel="LL_INFO"
-	description="User logout is successful from role based authentication">
-	<datainfo>
-	    <item>message</item>
-	    <item>authentication type</item>
-	    <item>role name</item>
-	</datainfo>
-	<triggers>
-	    <item>User belonging to this role logged out</item>
-	</triggers>
-	<actions />
+                loglevel="LL_INFO"
+                description="User logout is successful from role based authentication">
+        <datainfo>
+            <item>message</item>
+            <item>authentication type</item>
+            <item>role name</item>
+        </datainfo>
+        <triggers>
+            <item>User belonging to this role logged out</item>
+        </triggers>
+        <actions/>
     </logmessage>
     <logmessage name="LOGOUT_SERVICE" id="303"
-	loglevel="LL_INFO"
-	description="User logout is successful from service based 
+                loglevel="LL_INFO"
+                description="User logout is successful from service based
         authentication">
-	<datainfo>
-	    <item>message</item>
-	    <item>authentication type</item>
-	    <item>service name</item>
-	</datainfo>
-	<triggers>
-	    <item>User logged out of a configured service under realm</item>
-	</triggers>
-	<actions />
+        <datainfo>
+            <item>message</item>
+            <item>authentication type</item>
+            <item>service name</item>
+        </datainfo>
+        <triggers>
+            <item>User logged out of a configured service under realm</item>
+        </triggers>
+        <actions/>
     </logmessage>
     <logmessage name="LOGOUT_LEVEL" id="304"
-	loglevel="LL_INFO"
-	description="User logout is successful from authentication level based 
+                loglevel="LL_INFO"
+                description="User logout is successful from authentication level based
         authentication">
-	<datainfo>
-	    <item>message</item>
-	    <item>authentication type</item>
-	    <item>authentication level value</item>
-	</datainfo>
-	<triggers>
-	    <item>User logged out of one or more authentication modules having 
-            authentication level value greater than or equal to specified 
-            authentication level</item>
-	</triggers>
-	<actions />
+        <datainfo>
+            <item>message</item>
+            <item>authentication type</item>
+            <item>authentication level value</item>
+        </datainfo>
+        <triggers>
+            <item>User logged out of one or more authentication modules having
+                authentication level value greater than or equal to specified
+                authentication level
+            </item>
+        </triggers>
+        <actions/>
     </logmessage>
     <logmessage name="LOGOUT_MODULE_INSTANCE" id="305"
-	loglevel="LL_INFO"
-	description="User logout is successful from module based 
+                loglevel="LL_INFO"
+                description="User logout is successful from module based
         authentication">
-	<datainfo>
-	    <item>message</item>
-	    <item>authentication type</item>
-	    <item>module name</item>
-	</datainfo>
-	<triggers>
-	    <item>User logged out of authentication module under realm</item>
-	</triggers>
-	<actions />
+        <datainfo>
+            <item>message</item>
+            <item>authentication type</item>
+            <item>module name</item>
+        </datainfo>
+        <triggers>
+            <item>User logged out of authentication module under realm</item>
+        </triggers>
+        <actions/>
     </logmessage>
     <logmessage name="CHANGE_USER_PASSWORD_FAILED" id="306"
-        loglevel="LL_INFO"
-        description="Change user password failed">
+                loglevel="LL_INFO"
+                description="Change user password failed">
         <datainfo>
             <item>error message</item>
             <item>authentication type</item>
@@ -1509,36 +1549,36 @@
         <triggers>
             <item>Change user password in authentication screen due to directory server password policy.
             </item>
-            </triggers>
+        </triggers>
         <actions>
             <item>Enter password which meets directory server password policy</item>
         </actions>
     </logmessage>
     <logmessage name="CHANGE_USER_PASSWORD_SUCCEEDED" id="307"
-        loglevel="LL_INFO"
-        description="Changing user password succeeded">
+                loglevel="LL_INFO"
+                description="Changing user password succeeded">
         <datainfo>
             <item>message</item>
         </datainfo>
         <triggers>
             <item>Change user password in authentication screen due to directory server password policy.
             </item>
-            </triggers>
-        <actions />
+        </triggers>
+        <actions/>
     </logmessage>
     <logmessage name="CREATE_USER_PROFILE_FAILED" id="308"
-        loglevel="LL_INFO"
-        description="Create user password failed">
+                loglevel="LL_INFO"
+                description="Create user password failed">
         <datainfo>
             <item>error message</item>
             <item>user name</item>
         </datainfo>
         <triggers>
-            <item>Create new user in Membership module 
+            <item>Create new user in Membership module
             </item>
-            </triggers>
+        </triggers>
         <actions>
             <item>Make sure password entered meets directory server password policy</item>
         </actions>
     </logmessage>
-  </logmessages>
+</logmessages>
