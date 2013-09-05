@@ -2296,14 +2296,14 @@ public class DJLDAPv3Repo extends IdRepo {
         return dn;
     }
 
-    private Filter constructFilter(int operation, Map<String, Set<String>> attributes) {
+    protected Filter constructFilter(int operation, Map<String, Set<String>> attributes) {
         if (attributes == null || attributes.isEmpty()) {
             return null;
         }
         Set<Filter> filters = new LinkedHashSet<Filter>(attributes.size());
         for (Map.Entry<String, Set<String>> entry : attributes.entrySet()) {
             for (String value : entry.getValue()) {
-                filters.add(Filter.equality(entry.getKey(), value));
+                filters.add(Filter.valueOf(entry.getKey() + "=" + partiallyEscapeAssertionValue(value)));
             }
         }
         Filter filter;
@@ -2318,7 +2318,30 @@ public class DJLDAPv3Repo extends IdRepo {
                 //falling back to AND
                 filter = Filter.and(filters);
         }
+        if (DEBUG.messageEnabled()) {
+            DEBUG.message("constructFilter returned filter: " + filter.toString());
+        }
         return filter;
+    }
+
+    /**
+     * Escapes the provided assertion value according to the LDAP standard. As a special case this method does not
+     * escape the '*' character, in order to be able to use wildcards in filters.
+     *
+     * @param assertionValue The filter assertionValue that needs to be escaped.
+     * @return The escaped assertionValue.
+     */
+    private String partiallyEscapeAssertionValue(String assertionValue) {
+        StringBuilder sb = new StringBuilder(assertionValue.length());
+        for (int j = 0; j < assertionValue.length(); j++) {
+            char c = assertionValue.charAt(j);
+            if (c == '*') {
+                sb.append(c);
+            } else {
+                sb.append(Filter.escapeAssertionValue(String.valueOf(c)));
+            }
+        }
+        return sb.toString();
     }
 
     protected Schema getSchema() throws IdRepoException {

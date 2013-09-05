@@ -34,7 +34,8 @@ import javax.security.auth.callback.Callback;
 import javax.security.auth.callback.NameCallback;
 import javax.security.auth.callback.PasswordCallback;
 import static org.fest.assertions.Assertions.*;
-import static org.forgerock.openam.utils.CollectionUtils.asSet;
+import static org.forgerock.openam.utils.CollectionUtils.*;
+import org.forgerock.opendj.ldap.Filter;
 import org.forgerock.opendj.ldap.ResultCode;
 import org.forgerock.opendj.ldif.LDIFEntryReader;
 import org.mockito.ArgumentCaptor;
@@ -579,6 +580,30 @@ public class GenericRepoTest extends IdRepoTestBase {
         idrepo.unassignService(null, IdType.REALM, null, "iPlanetAMSessionService", null);
         assignedServices = idrepo.getAssignedServices(null, IdType.REALM, null, null);
         assertThat(assignedServices).isNotNull().isEmpty();
+    }
+
+    @Test
+    public void testConstructFilterWithSpecialCharactersWithoutWildcards() throws Exception {
+        Map<String, Set<String>> attrs = new HashMap<String, Set<String>>(1);
+        attrs.put("cn", asSet("()\\\0"));
+        Filter filter = idrepo.constructFilter(IdRepo.AND_MOD, attrs);
+        assertThat(filter.toString()).isEqualTo("(&(cn=\\28\\29\\5C\\00))");
+    }
+
+    @Test
+    public void testConstructFilterWithMultipleAssertions() throws Exception {
+        Map<String, Set<String>> attrs = new HashMap<String, Set<String>>(1);
+        attrs.put("cn", asOrderedSet("()\\\0", "hello"));
+        Filter filter = idrepo.constructFilter(IdRepo.AND_MOD, attrs);
+        assertThat(filter.toString()).isEqualTo("(&(cn=\\28\\29\\5C\\00)(cn=hello))");
+    }
+
+    @Test
+    public void testConstructFilterWithWildcards() throws Exception {
+        Map<String, Set<String>> attrs = new HashMap<String, Set<String>>(1);
+        attrs.put("cn", asOrderedSet("()\\\0", "*w(o)rld*"));
+        Filter filter = idrepo.constructFilter(IdRepo.OR_MOD, attrs);
+        assertThat(filter.toString()).isEqualTo("(|(cn=\\28\\29\\5C\\00)(cn=*w\\28o\\29rld*))");
     }
 
     private Callback[] getCredentials(String username, String password) {
