@@ -76,9 +76,6 @@ public class OAuth2Application extends Application {
         //go to token info endpoint
         root.attach(OAuth2Utils.getTokenInfoPath(getContext()), ValidationServerResource.class);
 
-        //go to register client endpoint
-        root.attach("/register_client", RegisterClient.class);
-
         //connect client register
         Reference validationServerRef = new Reference(OAuth2Utils.getDeploymentURL(Request.getCurrent())+ "/oauth2" + OAuth2Utils.getTokenInfoPath(getContext()));
         AccessTokenValidator<BearerToken> validator =
