@@ -27,7 +27,7 @@
  */
 
 /*
- * Portions Copyrighted 2011 ForgeRock AS
+ * Portions Copyrighted 2011-2013 ForgeRock AS
  */
 
 package com.sun.identity.entitlement;
@@ -304,7 +304,7 @@ public class PrefixResourceName implements ResourceName {
         if (endIndex2 >= strlen2 - 1) {
             return (ResourceMatch.WILDCARD_MATCH);
         }
-        beginIndex2 = endIndex2 + 1; 
+        beginIndex2 = endIndex2 + 1;
 
         // if there are more wildcards in the targetResource
         while ((endIndex2 = 
@@ -323,10 +323,58 @@ public class PrefixResourceName implements ResourceName {
             }
             beginIndex2 = endIndex2 + 1;
         }
-                
+
+        /**
+         * targetArray and requestArray will contain the targetResource and requestResource tokenized by
+         * delimiter.  in the case of a string like: http://example.forgerock.com/hello/world
+         * we'll see an array like [0] = http://example.forgerock.com, [1] = hello, [2] = world
+         *
+         * If our requestArray has more than one element, then let's find out where
+         * the last element of requestArray exists in the targetResource.  If that element does not
+         * exist in the targetResource then let's find the last position of the wildcard and use that
+         * Once we have that location we can create a substring and make it regex compatible.  If that string
+         * matches our requestResource then our targetResource is a SUB_RESOURCE of
+         * our requestResource and we can return that, if not, then let's see if the last element
+         * of the requestArray exists again in our targetResource and check it again.  If we do have
+         * a match, then we need to check that we aren't matching against the entire targetResource string
+         * if that is the case, then we have a wildcard match and not a subresource match.
+         *
+         * If we only have a single element in our requestArray then we make a regex compatible string out
+         * of the first element in the targetArray and compare that to requestResource.
+         *
+         * We'll only be concerned with SUB_RESOURCE matches in this logic, any other types of matches are
+         * left for the pre-existing code.
+         */
+
+        String[] targetArray = split(targetResource);
+        String[] requestArray = split(requestResource);
+        String targetRegex;
+        int truncateIndex = 0;
+
+        if (requestArray.length > 1) {
+            String lastRequestToken = requestArray[requestArray.length - 1];
+            if (!targetResource.contains(lastRequestToken)) {
+                 lastRequestToken = "*";
+            }
+            while ((truncateIndex = targetResource.indexOf(lastRequestToken, truncateIndex)) != - 1) {
+                truncateIndex += lastRequestToken.length();
+                targetRegex = targetResource.substring(0, truncateIndex).replace("*", ".*");
+                if (requestResource.matches(targetRegex) && (targetResource.length()
+                        != targetResource.substring(0, truncateIndex).length())) {
+                    return (ResourceMatch.SUB_RESOURCE_MATCH);
+                }
+            }
+        } else {
+            targetRegex = targetArray[0].replace("*", ".*");
+            if (requestResource.matches(targetRegex) && targetArray.length > 1) {
+                return (ResourceMatch.SUB_RESOURCE_MATCH);
+            }
+        }
+
         // we just pass the last wildcard in targetResource
         substr = targetResource.substring(beginIndex2, strlen2);
-        if ((endIndex1 = requestResource.lastIndexOf(substr, strlen1 - 1)) 
+
+        if ((endIndex1 = requestResource.lastIndexOf(substr, strlen1 - 1))
             == -1)
         {
             return (ResourceMatch.NO_MATCH);
@@ -348,7 +396,8 @@ public class PrefixResourceName implements ResourceName {
         }
         
         return (ResourceMatch.SUB_RESOURCE_MATCH);
-    }    
+    }
+
     /**
      * Compares two resources containing one level wild card(s).
      *
