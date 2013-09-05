@@ -38,8 +38,8 @@
     <Service name="AgentService" version="1.0">
         <Schema i18nFileName="agentService" revisionNumber="10">
             <Organization>
-              
-	      <SubSchema name="OAuth2Client" inheritance="multiple">
+
+	      <SubSchema name="OAuth2Client" inheritance="multiple" i18nKey="a7001">
                    <AttributeSchema
                             name="userpassword"
                             type="single"
@@ -233,7 +233,7 @@
                           <Value></Value>
                       </DefaultValues>
                   </AttributeSchema>
-                  -->
+
                   <AttributeSchema name="com.forgerock.openam.oauth2provider.subjectType"
                                    type="single_choice"
                                    syntax="string"
@@ -246,7 +246,7 @@
                           <Value>Pairwise</Value>
                       </DefaultValues>
                   </AttributeSchema>
-              <!--
+
                   <AttributeSchema
                           name="com.forgerock.openam.oauth2provider.requestObjectSigningAlg"
                           type="single"

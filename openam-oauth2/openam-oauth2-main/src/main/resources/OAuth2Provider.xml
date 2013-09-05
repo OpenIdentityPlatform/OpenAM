@@ -144,7 +144,6 @@
                         syntax="string"
                         i18nKey="a110">
                     <DefaultValues>
-                        <Value>pairwise</Value>
                         <Value>public</Value>
                     </DefaultValues>
                 </AttributeSchema>
@@ -307,7 +306,6 @@
                             syntax="string"
                             i18nKey="a110">
                         <DefaultValues>
-                            <Value>pairwise</Value>
                             <Value>public</Value>
                         </DefaultValues>
                     </AttributeSchema>
