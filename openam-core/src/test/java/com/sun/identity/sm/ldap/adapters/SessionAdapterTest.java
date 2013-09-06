@@ -158,7 +158,9 @@ public class SessionAdapterTest {
     public void shouldFilterLatestAccessTime() throws CoreTokenException {
         // Given
         Token token = new Token("badger", TokenType.SESSION);
-        String someJSONLikeText = "{\"clientDomain\":null,\"creationTime\":1376307674,\"isISStored\":true,\"latestAccessTime\":1376308558,\"maxCachingTime\":3}";
+        String latestAccessTime = "\"latestAccessTime\":1376308558,";
+        String someJSONLikeText = "{\"clientDomain\":null,\"creationTime\":1376307674,\"isISStored\":true,"
+                + latestAccessTime + "\"maxCachingTime\":3}";
         token.setBlob(someJSONLikeText.getBytes());
         TokenBlobUtils utils = new TokenBlobUtils();
 
@@ -167,7 +169,10 @@ public class SessionAdapterTest {
 
         // Then
         String contents = utils.getBlobAsString(token);
-        assertFalse(contents.contains(SessionTokenField.LATEST_ACCESS_TIME.getInternalSessionFieldName()));
+        // Present in the original json text.
+        assertTrue(someJSONLikeText.contains(latestAccessTime));
+        // Removed in the treated json text.
+        assertFalse(contents.contains(latestAccessTime));
     }
 
     @Test

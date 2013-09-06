@@ -39,6 +39,7 @@ import java.util.regex.Pattern;
  * @author robert.wapshott@forgerock.com
  */
 public class SessionAdapter implements TokenAdapter<InternalSession> {
+
     // Injected
     private final TokenIdFactory tokenIdFactory;
     private final CoreTokenConfig config;
@@ -181,6 +182,6 @@ public class SessionAdapter implements TokenAdapter<InternalSession> {
         return Pattern.compile(
                 JSONSerialisation.jsonAttributeName(
                         SessionTokenField.LATEST_ACCESS_TIME.getInternalSessionFieldName())
-                        + "\\s*?([0-9]+),??");
+                        + "\\s*([0-9]+),?");
     }
 }
