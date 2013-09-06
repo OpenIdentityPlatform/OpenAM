@@ -4190,12 +4190,20 @@
    <para>OpenAM accepts the following parameters in the query string. With
    the exception of <literal>IDToken</literal> parameters, use no more than
    one occurrence of each.</para>
+
+   <note><para>The way you enter parameters depends on whether you are using the
+   classic UI or the XUI. For example, if you want to request that OpenAM end the
+   user's current session and start a new session in the classic UI, you might enter
+   a URL similar to: <literal>http://openam.example.com:8080/openam/UI/Login?locale=fr</literal>.
+   Alternatively, for the JavaScript-based XUI, the corresponding URL would be subtly different:
+   <literal>http://openam.example.com:8080/openam/XUI/#login/&amp;arg=newsession</literal>.
+   </para></note>
+
    <varlistentry>
     <term>arg=newsession</term>
     <listitem>
      <para>Request that OpenAM end the user's current session and start a
      new session.</para>
-     <para>Example: <literal>http://openam.example.com:8080/openam/UI/Login?arg=newsession</literal></para>
     </listitem>
    </varlistentry>
    <varlistentry>
@@ -4206,7 +4214,6 @@
      <para>As this parameter determines authentication module selection, do
      not use it with <literal>module</literal>, <literal>service</literal>,
      or <literal>user</literal>.</para>
-     <para>Example: <literal>http://openam.example.com:8080/openam/UI/Login?authlevel=1</literal></para>
     </listitem>
    </varlistentry>
    <varlistentry>
@@ -4215,7 +4222,6 @@
      <para>If <literal>ForceAuth=true</literal>, request that OpenAM force the
      user to authenticate even if she already has a valid session. On
      successful authentication, OpenAM updates the session token.</para>
-     <para>Example: <literal>http://openam.example.com:8080/openam/UI/Login?ForceAuth=true</literal></para>
     </listitem>
    </varlistentry>
    <varlistentry>
@@ -4224,7 +4230,6 @@
      <para>On successful authentication, or successful logout, request that
      OpenAM redirect the user to the specified location. Values must be
      URL encoded.</para>
-     <para>Example: <literal>http://openam.example.com:8080/openam/UI/Login?goto=http%3A%2F%2Fwww.example.com%2Fsuccess.html</literal></para>
     </listitem>
    </varlistentry>
    <varlistentry>
@@ -4232,7 +4237,6 @@
     <listitem>
      <para>On authentication failure, request that OpenAM redirect the user to
      the specified location. Values must be URL encoded.</para>
-     <para>Example: <literal>http://openam.example.com:8080/openam/UI/Login?goto=http%3A%2F%2Fwww.example.com%2Ffailure.html</literal></para>
     </listitem>
    </varlistentry>
    <varlistentry>
@@ -4246,7 +4250,6 @@
      depends on the callbacks in login page for the module;
      <literal>IDTokenN</literal> represents the N<superscript>th</superscript>
      callback of the login page.</para>
-     <para>Example: <literal>http://openam.example.com:8080/openam/UI/Login?IDToken1=bjensen&amp;IDToken2=hifalutin</literal></para>
     </listitem>
    </varlistentry>
    <varlistentry>
@@ -4257,7 +4260,6 @@
      without being prompted for credentials. This only works if you have
      configured persistent cookie mode for the realm where the user logs
      in.</para>
-     <para>Example: <literal>http://openam.example.com:8080/openam/UI/Login?iPSPCookie=yes</literal></para>
      <para>OpenAM sets an <literal>DProPCookie</literal> that persists until
      expiry. The following screen shot shows an example.</para>
      <mediaobject xml:id="figure-persistent-dpropcookie">
@@ -4292,6 +4294,7 @@
      Then, to request the cookie, use
      <literal>openam.session.persist_am_cookie=Yes</literal> as one of the
      query string parameters in the login URL.</para>
+     <note><para>The XUI does not support <literal>iPSPCookie</literal>.</para></note>
     </listitem>
    </varlistentry>
    <varlistentry>
@@ -4300,7 +4303,6 @@
      <para>Request that OpenAM display the user interface in the specified,
      supported locale. Locale can also be set in the user's profile, in
      the HTTP header from her browser, configured in OpenAM, and so on.</para>
-     <para>Example: <literal>http://openam.example.com:8080/openam/UI/Login?locale=fr</literal></para>
     </listitem>
    </varlistentry>
    <varlistentry>
@@ -4311,7 +4313,6 @@
      <para>As this parameter determines authentication module selection, do
      not use it with <literal>authlevel</literal>, <literal>service</literal>,
      or <literal>user</literal>.</para>
-     <para>Example: <literal>http://openam.example.com:8080/openam/UI/Login?module=DataStore</literal></para>
     </listitem>
    </varlistentry>
 <!-- 
@@ -4329,7 +4330,6 @@
     <term>realm</term>
     <listitem>
      <para>Request that OpenAM authenticate the user to the specified realm.</para>
-     <para>Example: <literal>http://openam.example.com:8080/openam/UI/Login?realm=sales</literal></para>
     </listitem>
    </varlistentry>
    <varlistentry>
@@ -4340,7 +4340,6 @@
      <para>As this parameter determines authentication module selection, do
      not use it with <literal>authlevel</literal>, <literal>module</literal>,
      or <literal>user</literal>.</para>
-     <para>Example: <literal>http://openam.example.com:8080/openam/UI/Login?service=ExternalChain</literal></para>
     </listitem>
    </varlistentry>
    <varlistentry>
@@ -4351,7 +4350,6 @@
      <para>As this parameter determines authentication module selection, do
      not use it with <literal>authlevel</literal>, <literal>module</literal>,
      or <literal>service</literal>.</para>
-     <para>Example: <literal>http://openam.example.com:8080/openam/UI/Login?user=admin</literal></para>
     </listitem>
    </varlistentry>
   </variablelist>
