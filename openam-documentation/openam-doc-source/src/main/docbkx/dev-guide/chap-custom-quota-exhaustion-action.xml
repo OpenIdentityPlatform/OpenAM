@@ -123,8 +123,8 @@ import java.util.Map;
   <screen width="86">$ mkdir classes
 $ javac
  -d classes
- -cp /path/to/tomcat/webapps/openam/WEB-INF/lib/openam-core-10.2.0-SNAPSHOT.jar:
-  /path/to/tomcat/webapps/openam/WEB-INF/lib/openam-shared-10.2.0-SNAPSHOT.jar:
+ -cp /path/to/tomcat/webapps/openam/WEB-INF/lib/openam-core-11.0.0-SNAPSHOT.jar:
+  /path/to/tomcat/webapps/openam/WEB-INF/lib/openam-shared-11.0.0-SNAPSHOT.jar:
   /path/to/tomcat/lib/servlet-api.jar
  org/forgerock/openam/examples/quotaexhaustionaction/SampleQuotaExhaustionAction.java
 $ cd classes

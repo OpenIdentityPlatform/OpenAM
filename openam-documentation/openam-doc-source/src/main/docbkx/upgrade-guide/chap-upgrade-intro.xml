@@ -122,16 +122,18 @@
   help you identify which type of upgrade you are considering.</para>
   
   <para>To better understand the numbering, we will look at a future release,
-  OpenAM 10.2.1. Each of the numbers tells you something about the release.</para>
+  OpenAM 11.0.1. Each of the numbers tells you something about the release.</para>
   
-  <para><emphasis>10.2.1</emphasis></para>
+  <para><emphasis>11.1.2</emphasis></para>
   
-  <para>The first part of the version number (10.x.x) is the major version of 
-  the release. If your instance is OpenAM 9.5, then you are missing out on some
-  major new features included in OpenAM 10.</para>
+  <para>The first part of the version number (11.x.x) is the major version of
+  the release. If your instance is OpenAM 10.0, then you are missing out on some
+  major new features included in OpenAM 11.</para>
 
-  <para>The second part of the version number (x.2.x) is the minor version of
-   the release. If your instance is OpenAM 10.0.1, then you have missed some
+     <!-- I'm not sure how to avoid hard-coding here -->
+
+  <para>The second part of the version number (x.1.x) is the minor version of
+   the release. If your instance is OpenAM 11.0.1, then you have missed some
    changes, like new functionality, enhancement, and bug fixes. Check out 
    the Release Notes for the OpenAM version you are considering. Links to 
    Release Notes for archived versions are available on the 
@@ -140,7 +142,7 @@
    10.0.0 and later are available on the <link xlink:show="new" xlink:href="http://docs.forgerock.org/en/openam/"
      ><citetitle>OpenAM Access Management page</citetitle></link>.</para>
    
-  <para>The third part of the version number (x.x.1) indicates the version is a 
+  <para>The third part of the version number (x.x.2) indicates the version is a
   maintenance release. These are designed to fix issues and provide very minor
   enhancements. ForgeRock encourages upgrading maintenance releases as soon 
   as reasonably possible.</para>
@@ -164,7 +166,7 @@
     <listitem>
      <para>Starting with OpenAM 10.0.0, OpenAM releases include the
      Upgrade Wizard, simplifying the upgrade process. All examples in this 
-     guide are for upgrades to OpenAM 10.2.0 where the Upgrade Wizard is 
+     guide are for upgrades to OpenAM 11.0.0 where the Upgrade Wizard is
      available. All releases after OpenAM 10.0.0 (including maintenance
      releases) follow the same procedure for basic upgrades; however, starting
      with OpenAM 10.1.0, session failover has been significantly changed, so
@@ -176,7 +178,7 @@
    <itemizedlist>
     <listitem>
      <para>All OpenAM 9.5 releases have a similar upgrade process as OpenAM 10.0.0
-     and later releases, but the administator must complete a few extra steps since
+     and later releases, but the administrator must complete a few extra steps since
      the Upgrade Wizard was not available for these releases. Visit the Wikis for 
      specific examples of upgrading to an OpenAM 9.5 release.</para>
     </listitem>

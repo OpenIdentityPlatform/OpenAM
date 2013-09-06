@@ -72,8 +72,8 @@
   </listitem>
  </itemizedlist>
  
- <para>For example, the artifact <literal>openam-core-10.2.0-SNAPSHOT_nightly_20130424.jar</literal> 
- is the core artifact of the nightly build from 24 April 2013. The artifact
+ <para>For example, the artifact <literal>openam-core-11.0.0-SNAPSHOT_nightly_20130905.jar</literal>
+ is the core artifact of the nightly build from 5 September 2013. The artifact
  <literal>openam-core-10.1.0.jar</literal> is the core artifact file for the released
  OpenAM 10.1.0.</para>
  

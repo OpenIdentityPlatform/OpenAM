@@ -214,9 +214,8 @@ Archive:  /path/apache_v22_Linux_64_agent_3.1.0-Xpress.zip
    </procedure>
           
    <example xml:id="upgrading-das-101-example">
-    <title>Upgrading to DAS 10.2.0</title>
+    <title>Upgrading to DAS <?eval ${serverDocTargetVersion}?></title>
 
-<!--Update with 10.2.0 when it is near complete -->      
      <para>This example applies to any OpenAM deployment from 10.1.0 and later.</para>
 
       <orderedlist numeration="arabic">

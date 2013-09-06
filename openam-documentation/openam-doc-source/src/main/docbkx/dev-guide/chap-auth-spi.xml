@@ -171,7 +171,8 @@
      </orderedlist>
    </section>  
  </section>
- 
+
+    <!--
  <procedure>
   <title>Creating a Build Area</title>
   
@@ -182,7 +183,7 @@
    <para></para>
   </step>
  </procedure>
-
+        -->
  <section xml:id="properties-sample-auth-module">
   <title>The Sample Auth Properties</title>
   
@@ -833,8 +834,8 @@ public class SampleAuthPrincipal implements Principal, Serializable
 
           <screen>$ mkdir classes
           $ javac -d classes -cp lib/servlet-api.jar:
-          /var/lib/tomcat6/webapps/openam/WEB-INF/lib/openam-core-10.2.0-SNAPSHOT.jar:
-          /var/lib/tomcat6/webapps/openam/WEB-INF/lib/openam-shared-10.2.0-SNAPSHOT.jar
+          /var/lib/tomcat6/webapps/openam/WEB-INF/lib/<?eval ${coreLibrary}?>:
+          /var/lib/tomcat6/webapps/openam/WEB-INF/lib/<?eval ${sharedLibrary}?>
           /home/user/SampleAuth*.java
           </screen>
 
