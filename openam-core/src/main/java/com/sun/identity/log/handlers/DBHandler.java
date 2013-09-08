@@ -27,7 +27,7 @@
  */
 
 /*
- * Portions Copyrighted 2011-2013 ForgeRock, Inc.
+ * Portions Copyrighted 2011-2013 ForgeRock AS.
  */
 package com.sun.identity.log.handlers;
 
@@ -628,10 +628,9 @@ public class DBHandler extends Handler {
      * assigned varchar 255. In case we had idea about whether the field is
      * time or ipaddress or whatever... we could have assigned space
      * accordingly. The trade off is b/w the ability to keep DBHandler
-     * indpendent of the fields(we need not hard core the fields) and space.
+     * independent of the fields(we need not hard core the fields) and space.
      */
-    private void createTable(String tableName)
-        throws SQLException, UnsupportedEncodingException
+    private void createTable(String tableName) throws SQLException, UnsupportedEncodingException
     {
         StringBuffer sbuffer = new StringBuffer();
         // form a query string to check if the table exists.
@@ -660,31 +659,32 @@ public class DBHandler extends Handler {
                        .append("'");
             }
 
-            Statement stmt = conn.createStatement();
-            ResultSet rs = stmt.executeQuery(sbuffer.toString());
             boolean foundTable = false;
-            if(isMySQL) {
-                String result = null;
-                while (rs.next()) {
-                    result = rs.getString(1);
+            Statement stmt = null;
+            ResultSet rs = null;
+            try {
+                stmt = conn.createStatement();
+                rs = stmt.executeQuery(sbuffer.toString());
+                if(isMySQL) {
+                    String result = null;
+                    while (rs.next()) {
+                        result = rs.getString(1);
+                    }
+                    if (result != null && result.equalsIgnoreCase(tableName)) {
+                        foundTable = true;
+                    }
+                } else {
+                    int result = 0;
+                    while (rs.next()) {
+                        result = rs.getInt(1);
+                    }
+                    if (result == 1) {
+                        foundTable = true;
+                    }
                 }
-                if (result != null && result.equalsIgnoreCase(tableName)) {
-                    foundTable = true;
-                }
-            } else {
-                int result = 0;
-                while (rs.next()) {
-                    result = rs.getInt(1);
-                }
-                if (result == 1) {
-                    foundTable = true;
-                }
-            }
-            try{
-                stmt.close();
-                rs.close();
-            } catch(SQLException ex){
-                Debug.error("DBHandler:createTable: " + ex.getMessage());
+            } finally {
+                closeResultSet(rs);
+                closeStatement(stmt);
             }
 
             /*
@@ -701,48 +701,45 @@ public class DBHandler extends Handler {
                     getColNames = "SELECT column_name FROM USER_TAB_COLUMNS WHERE Table_Name = '" + oracleTableName + "'";
                 }
 
-                stmt = conn.createStatement();
-                try {
-                    rs = stmt.executeQuery(getColNames);
-                } catch (SQLException sqe) {
-                    Debug.error("DBHandler:createTable: '" + getColNames +
-                        "'; error (" + sqe.getErrorCode() + "); msg = " +
-                        sqe.getMessage());
-                    /*
-                     *  guess we'll have to just return here, and
-                     *  let the flush handle the error...
-                     */
-                    return;
-                }
-                ResultSetMetaData rsmd = rs.getMetaData();
-                int numCols = rsmd.getColumnCount();
-
-                String colName = null;
-                int tempj = 0;
                 Set<String> colSet = new HashSet<String>();
-
-                /*
-                 *  Oracle appears to return column names in
-                 *  all uppercase, 1 per cursor position.
-                 *  MySQL returns column names in the case created,
-                 *  also 1 per cursor position, but also information
-                 *  about the column (type ['varchar(255)'], and
-                 *  | Null | Key | Default | Extra).  the column name
-                 *  is in the first column (#1) of the row.
-                 */
-
-                while (rs.next()) {
-                    colName = rs.getString(1);
-                    colSet.add(colName);
-                    for (int i = 0; i < numCols; i++) {
-                        colName = rs.getString(i+1);
-                    }
-                    tempj++;
-                }
                 try {
-                    stmt.close();
-                } catch(SQLException ex){
-                    Debug.error("DBHandler:createTable: " + ex.getMessage());
+                    stmt = conn.createStatement();
+                    try {
+                        rs = stmt.executeQuery(getColNames);
+                    } catch (SQLException sqe) {
+                        Debug.error("DBHandler:createTable: '" + getColNames +
+                            "'; error (" + sqe.getErrorCode() + "); msg = " +
+                            sqe.getMessage());
+                        /*
+                         *  guess we'll have to just return here, and
+                         *  let the flush handle the error...
+                         */
+                        return;
+                    }
+                    ResultSetMetaData rsmd = rs.getMetaData();
+                    int numCols = rsmd.getColumnCount();
+
+                    String colName = null;
+                    /*
+                     *  Oracle appears to return column names in
+                     *  all uppercase, 1 per cursor position.
+                     *  MySQL returns column names in the case created,
+                     *  also 1 per cursor position, but also information
+                     *  about the column (type ['varchar(255)'], and
+                     *  | Null | Key | Default | Extra).  the column name
+                     *  is in the first column (#1) of the row.
+                     */
+
+                    while (rs.next()) {
+                        colName = rs.getString(1);
+                        colSet.add(colName);
+                        for (int i = 0; i < numCols; i++) {
+                            colName = rs.getString(i+1);
+                        }
+                    }
+                } finally {
+                    closeResultSet(rs);
+                    closeStatement(stmt);
                 }
                 
                 /*
@@ -778,7 +775,6 @@ public class DBHandler extends Handler {
                     try {
                         stmt = conn.createStatement();
                         stmt.execute(altStr);
-                        stmt.close();
                     } catch (SQLException sqle) {
                         Debug.error("DBHandler:createTable: '" + altStr + "'; error ("
                                 + sqle.getErrorCode() + "); msg = " + sqle.getMessage());
@@ -789,6 +785,8 @@ public class DBHandler extends Handler {
                          *  there's a return right after this, so just
                          *  fall through.
                          */
+                    } finally {
+                        closeStatement(stmt);
                     }
                 }
                 return;
@@ -842,13 +840,13 @@ public class DBHandler extends Handler {
         }
         sbuffer.append(allFields[i]).append(" ").append(varCharX).append(" (255)) ");
         String createString = sbuffer.toString();
+        Statement stmt = null;
         try {
-            Statement stmt = conn.createStatement();
+             stmt = conn.createStatement();
             if (Debug.messageEnabled()) {
                 Debug.message(tableName + ":DBHandler: the query string for creating is " + createString);
             }
             stmt.executeUpdate(createString);
-            stmt.close();
         } catch (SQLException sqe) {
             Debug.error(tableName +
                 ":DBHandler:createTable:Execute:SQLEx (" + sqe.getErrorCode() + "): " + sqe.getMessage());
@@ -856,6 +854,8 @@ public class DBHandler extends Handler {
             //  rethrow the exception
             //
             throw sqe;
+        } finally {
+            closeStatement(stmt);
         }
     }
 
@@ -874,16 +874,16 @@ public class DBHandler extends Handler {
             //
             try {
                 reconnectToDatabase();
-                Debug.error (tableName + ":DBHandler:flush:reconnectToDatabase successful.");
+                Debug.error (tableName + ":DBHandler:logRecords:reconnectToDatabase successful.");
             } catch (DriverLoadException dle) {
-                Debug.error(tableName + ":DBHandler:flush:reconnectToDatabase:DLE: " + dle.getMessage());
+                Debug.error(tableName + ":DBHandler:logRecords:reconnectToDatabase:DLE: " + dle.getMessage());
                 //
                 //  if the max mem buffer is exceeded, dump the records
                 //
                 clearBuffer(records);
                 throw new AMLogException(AMLogException.LOG_DB_DRIVER + "'" + driver + "'");
             } catch (ConnectionException ce) {
-                Debug.error(tableName + ":DBHandler:flush:reconnectToDatabase:CE: " + ce.getMessage());
+                Debug.error(tableName + ":DBHandler:logRecords:reconnectToDatabase:CE: " + ce.getMessage());
                 //
                 //  if the max mem buffer is exceeded, dump the records
                 //
@@ -906,12 +906,12 @@ public class DBHandler extends Handler {
                 createTable (tableName);
             } catch (SQLException se) {
                 if (Debug.messageEnabled()) {
-                    Debug.message(tableName + ":DBHandler:flush:reconnect:cTable:SQLE ("
+                    Debug.message(tableName + ":DBHandler:logRecords:reconnect:cTable:SQLE ("
                             + se.getErrorCode() + "): " + se.getMessage());
                 }
             } catch (UnsupportedEncodingException usee) {
                 if (Debug.messageEnabled()) {
-                    Debug.message(tableName + ":DBHandler:flush:reconnect:cTable:UE: " + usee.getMessage());
+                    Debug.message(tableName + ":DBHandler:logRecords:reconnect:cTable:UE: " + usee.getMessage());
                 }
             }
         }
@@ -934,36 +934,38 @@ public class DBHandler extends Handler {
             //  observed that when Oracle's down, it's detected here.
             //  error code 1034.
             //
-            Debug.error(tableName + ":DBHandler:flush:cStatement:SQLE (" + se.getErrorCode() + "): " + se.getMessage());
+            Debug.error(tableName + ":DBHandler:logRecords:cStatement:SQLE (" + se.getErrorCode() + "): " + se.getMessage());
 
             //
             // try reconnecting to DB once.  if can't, dump the record
             // and wait for the next attempt.
             //
             try {
-                conn.close();
+                if (conn != null) {
+                    conn.close();
+                }
             } catch (SQLException ex) {
                 //
                 //  ignore exception and continue
                 //
                 if (Debug.messageEnabled()) {
-                    Debug.error (tableName + ":DBHandler:flush:cStatement:close:SQLE (" + ex.getErrorCode() + ")" + ex.getMessage());
+                    Debug.error (tableName + ":DBHandler:logRecords:cStatement:close:SQLE (" + ex.getErrorCode() + ")" + ex.getMessage());
                 }
             }
 
             connectionToDBLost = true;
             try {
                 reconnectToDatabase();
-                Debug.error (tableName + ":DBHandler:flush:cStatement:reconnect successful.");
+                Debug.error (tableName + ":DBHandler:logRecords:cStatement:reconnect successful.");
             } catch (DriverLoadException dle) {
-                Debug.error(tableName + ":DBHandler:flush:cStatement:reconnect:DLE: " + dle.getMessage());
+                Debug.error(tableName + ":DBHandler:logRecords:cStatement:reconnect:DLE: " + dle.getMessage());
                 //
                 //  if the max mem buffer is exceeded, dump the records
                 //
                 clearBuffer(records);
                 throw new AMLogException(AMLogException.LOG_DB_DRIVER +  "'" + driver + "'");
             } catch (ConnectionException ce) {
-                Debug.error(tableName + ":DBHandler:flush:cStatement:reconnect:CE: " + ce.getMessage());
+                Debug.error(tableName + ":DBHandler:logRecords:cStatement:reconnect:CE: " + ce.getMessage());
                 //
                 //  if the max mem buffer is exceeded, dump the records
                 //
@@ -980,12 +982,12 @@ public class DBHandler extends Handler {
             } catch (SQLException sqle) {
                 if (Debug.messageEnabled()) {
                     Debug.message(tableName +
-                        ":DBHandler:flush:cStatement:reconnect:cTable:SQLE (" + sqle.getErrorCode() + "): " +
+                        ":DBHandler:logRecords:cStatement:reconnect:cTable:SQLE (" + sqle.getErrorCode() + "): " +
                         sqle.getMessage());
                 }
             } catch (UnsupportedEncodingException usee) {
                 if (Debug.messageEnabled()) {
-                    Debug.message(tableName + ":DBHandler:flush:cStatement:reconnect: cTable:UE: " + usee.getMessage());
+                    Debug.message(tableName + ":DBHandler:logRecords:cStatement:reconnect: cTable:UE: " + usee.getMessage());
                 }
             }
 
@@ -998,21 +1000,12 @@ public class DBHandler extends Handler {
                 //  log the error message, and continue on (for now)
                 //
                 Debug.error(tableName +
-                    ":DBHandler:flush:cStatement:reconnect:cSt:SQLE ("
+                    ":DBHandler:logRecords:cStatement:reconnect:cSt:SQLE ("
                     + sqle.getErrorCode() + "): " + sqle.getMessage());
                 throw new AMLogException(AMLogException.LOG_DB_CSTATEMENT);
             }
         } finally {
-            try {
-                if (testConnectionStatement != null) {
-                    testConnectionStatement.close();
-                }
-            } catch (SQLException se) {
-                if (Debug.warningEnabled()) {
-                    Debug.warning(tableName + ":DBHandler:closing test connection statement:" +
-                        "SQLException (" + se.getErrorCode() + "): ", se);
-                }
-            }
+            closeStatement(testConnectionStatement);
         }
 
         PreparedStatement insertStatement = null;
@@ -1028,16 +1021,8 @@ public class DBHandler extends Handler {
                 //Monit end
             } catch (SQLException sqle) {
                 // Attempt to close this just in case it is holding resources.
-                try {
-                    if (insertStatement != null) {
-                        insertStatement.close();
-                    }
-                } catch (SQLException se) {
-                    if (Debug.warningEnabled()) {
-                        Debug.warning(tableName + ":DBHandler:closing insert statement: SQLException ("
-                                + se.getErrorCode() + "): ", se);
-                    }
-                }
+                closeStatement(insertStatement);
+                insertStatement = null;
 
                 /*
                  *  as mentioned above, connection errors to oracle
@@ -1051,7 +1036,7 @@ public class DBHandler extends Handler {
                 boolean tableDoesNotExist = false;
                 if (Debug.messageEnabled()) {
                     Debug.message(tableName +
-                        ":DBHandler:execute:SQLException (" + sqleErrCode + "): " + sqle.getMessage());
+                        ":DBHandler:logRecords:SQLException (" + sqleErrCode + "): " + sqle.getMessage());
                 }
 
                 /*
@@ -1072,11 +1057,11 @@ public class DBHandler extends Handler {
                         createTable(tableName);
                     } catch (SQLException se) {
                         //  just log the message and continue, for now
-                        Debug.error(tableName + ":DBHandler:flush:execUpdate:cTable:SQLE ("
+                        Debug.error(tableName + ":DBHandler:logRecords:execUpdate:cTable:SQLE ("
                             + se.getErrorCode() + "): " + se.getMessage());
                     } catch (UnsupportedEncodingException usee) {
                         //  just log the message and continue, for now
-                        Debug.error(tableName + ":DBHandler:flush:execUpdate:cTable:UE: " + usee.getMessage());
+                        Debug.error(tableName + ":DBHandler:logRecords:execUpdate:cTable:UE: " + usee.getMessage());
                     }
 
                     try {
@@ -1085,20 +1070,12 @@ public class DBHandler extends Handler {
                     } catch (SQLException sqle2) {
                         //  guess NOW it's an error
                         Debug.error(tableName +
-                            ":DBHandler:flush:execUpdate:exUpdate:SQLE (" + sqle2.getErrorCode() + "): " +
+                            ":DBHandler:flush:logRecords:exUpdate:SQLE (" + sqle2.getErrorCode() + "): " +
                             sqle2.getMessage());
                         throw new AMLogException (AMLogException.LOG_DB_EXECUPDATE);
                     } finally {
-                        try {
-                            if (insertStatement != null) {
-                                insertStatement.close();
-                            }
-                        } catch (SQLException se) {
-                            if (Debug.warningEnabled()) {
-                                Debug.warning(tableName + ":DBHandler:closing insert statement :" +
-                                    "SQLException (" + se.getErrorCode() + "): ", se);
-                            }
-                        }
+                        closeStatement(insertStatement);
+                        insertStatement = null;
                     }
                 } else if ((isMySQL && (sqleErrCode == 0))
                         || (!isMySQL && ((sqleErrCode == 17002) || (sqleErrCode == 17410)))) {
@@ -1115,7 +1092,7 @@ public class DBHandler extends Handler {
                         //  log and continue
                         if (Debug.messageEnabled()) {
                             Debug.message(tableName +
-                                ":DBHandler:flush:execUpdate:close:SQLE (" + ex.getErrorCode() + "): " +
+                                ":DBHandler:logRecords:execUpdate:close:SQLE (" + ex.getErrorCode() + "): " +
                                 ex.getMessage());
                         }
                     }
@@ -1123,10 +1100,10 @@ public class DBHandler extends Handler {
                     connectionToDBLost = true;
                     try {
                         reconnectToDatabase();
-                        Debug.error (tableName + ":DBHandler:flush:execUpdate:reconnect successful.");
+                        Debug.error (tableName + ":DBHandler:logRecords:execUpdate:reconnect successful.");
                     } catch (DriverLoadException dle) {
                         if (Debug.messageEnabled()) {
-                            Debug.message(tableName + ":DBHandler:flush:execUpdate:reconnect:DLE: " + dle.getMessage());
+                            Debug.message(tableName + ":DBHandler:logRecords:execUpdate:reconnect:DLE: " + dle.getMessage());
                         }
                         /*
                          * if the max mem buffer is exceeded,
@@ -1136,7 +1113,7 @@ public class DBHandler extends Handler {
                         throw new AMLogException (AMLogException.LOG_DB_RECONNECT_FAILED);
                     } catch (ConnectionException ce) {
                         if (Debug.messageEnabled()) {
-                            Debug.message(tableName + ":DBHandler:flush:execUpdate:reconnect:CE: " + ce.getMessage());
+                            Debug.message(tableName + ":DBHandler:logRecords:execUpdate:reconnect:CE: " + ce.getMessage());
                         }
                         /*
                          * if the max mem buffer is exceeded,
@@ -1145,16 +1122,8 @@ public class DBHandler extends Handler {
                         clearBuffer(records);
                         throw new AMLogException (AMLogException.LOG_DB_RECONNECT_FAILED);
                     } finally {
-                        try {
-                            if (insertStatement != null) {
-                                insertStatement.close();
-                            }
-                        } catch (SQLException se) {
-                            if (Debug.warningEnabled()) {
-                                Debug.warning(tableName + ":DBHandler:closing insert statement :" +
-                                    "SQLException (" + se.getErrorCode() + "): ", se);
-                            }
-                        }
+                        closeStatement(insertStatement);
+                        insertStatement = null;
                     }
                     connectionToDBLost = false;
 
@@ -1174,7 +1143,7 @@ public class DBHandler extends Handler {
                         //Monit end
                     } catch (SQLException sqe) {
                         Debug.error (tableName +
-                            ":DBHandler:flush:executeUpd:reconnect:stmt:SQE: (" + sqe.getErrorCode() + "): "
+                            ":DBHandler:logRecords:executeUpd:reconnect:stmt:SQE: (" + sqe.getErrorCode() + "): "
                             + sqe.getMessage());
                         /*
                          *  if the max mem buffer is exceeded,
@@ -1183,7 +1152,7 @@ public class DBHandler extends Handler {
                         clearBuffer(records);
                         throw new AMLogException (AMLogException.LOG_DB_EXECUPDATE);
                     } catch (UnsupportedEncodingException usee) {
-                        Debug.error (tableName + ":DBHandler:flush:execUpd:reconnect:stmt:UE: " + usee.getMessage());
+                        Debug.error (tableName + ":DBHandler:logRecords:execUpd:reconnect:stmt:UE: " + usee.getMessage());
                         /*
                          *  if the max mem buffer is exceeded,
                          *  dump the records
@@ -1191,16 +1160,8 @@ public class DBHandler extends Handler {
                         clearBuffer(records);
                         throw new AMLogException (AMLogException.LOG_DB_EXECUPDATE);
                     } finally {
-                        try {
-                            if (insertStatement != null) {
-                                insertStatement.close();
-                            }
-                        } catch (SQLException se) {
-                            if (Debug.warningEnabled()) {
-                                Debug.warning(tableName + ":DBHandler:closing insert statement :" +
-                                    "SQLException (" + se.getErrorCode() + "): ", se);
-                            }
-                        }
+                        closeStatement(insertStatement);
+                        insertStatement = null;
                     }
                 } else {
                     /*
@@ -1220,6 +1181,37 @@ public class DBHandler extends Handler {
                     // records
                     clearBuffer(records);
                     throw new AMLogException (AMLogException.LOG_DB_EXECUPDATE);
+                }
+            } finally {
+                closeStatement(insertStatement);
+                insertStatement = null;
+            }
+        }
+    }
+
+    private void closeResultSet(ResultSet resultSet) {
+
+        if (resultSet != null) {
+            try {
+                resultSet.close();
+            } catch (SQLException se) {
+                if (Debug.warningEnabled()) {
+                    Debug.warning(tableName + ":DBHandler:closeResultSet:error closing resultSet: SQLException ("
+                            + se.getErrorCode() + "): ", se);
+                }
+            }
+        }
+    }
+
+    private void closeStatement(Statement statement) {
+
+        if (statement != null) {
+            try {
+                statement.close();
+            } catch (SQLException se) {
+                if (Debug.warningEnabled()) {
+                    Debug.warning(tableName + ":DBHandler:closeStatement:error closing statement: SQLException ("
+                            + se.getErrorCode() + "): ", se);
                 }
             }
         }
