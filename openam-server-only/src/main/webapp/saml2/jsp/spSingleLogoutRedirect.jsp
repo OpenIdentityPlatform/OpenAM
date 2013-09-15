@@ -26,10 +26,10 @@
 
 --%>
 
+<%--
+   Portions Copyrighted 2013 ForgeRock AS
+--%>
 
-
-
-<%@ page import="com.sun.identity.shared.debug.Debug" %>
 <%@ page import="com.sun.identity.sae.api.SecureAttrs" %>
 <%@ page import="com.sun.identity.saml.common.SAMLUtils" %>
 <%@ page import="com.sun.identity.saml2.common.SAML2Utils" %>
@@ -42,14 +42,12 @@
 <%@ page import="com.sun.identity.saml2.profile.SPCache" %>
 <%@ page import="com.sun.identity.saml2.profile.SPSingleLogout" %>
 <%@ page import="com.sun.identity.saml2.profile.IDPCache" %>
-<%@ page import="com.sun.identity.saml2.profile.IDPSingleLogout" %>
 <%@ page import="com.sun.identity.saml2.protocol.LogoutRequest" %>
-<%@ page import="com.sun.identity.saml2.assertion.Issuer" %>
 <%@ page import="com.sun.identity.saml2.profile.IDPProxyUtil" %>
-<%@ page import="com.sun.identity.saml2.protocol.ProtocolFactory" %>
 <%@ page import="java.util.HashMap" %>
 <%@ page import="java.util.Map" %>
 <%@ page import="java.util.Properties" %>
+<%@ page import="org.owasp.esapi.ESAPI" %>
 
 
 <%--
@@ -91,7 +89,9 @@
             relayState = (String) tmpRs.getObject();
         }
     }
-    
+    if (!ESAPI.validator().isValidInput("HTTP Parameter Value: " + relayState, relayState, "URL", 2000, true)) {
+        relayState = null;
+    }
     String samlResponse = request.getParameter(SAML2Constants.SAML_RESPONSE);
     if (samlResponse != null) {
         try {
@@ -139,7 +139,8 @@
             return;
         }
 
-        if (relayState != null && relayState.length() != 0) {
+        if (relayState != null && !relayState.isEmpty() &&
+                        SAML2Utils.isRelayStateURLValid(request, relayState, SAML2Constants.SP_ROLE)) {
             try {
                  response.sendRedirect(relayState);
             } catch (java.io.IOException ioe) {

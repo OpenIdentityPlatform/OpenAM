@@ -27,8 +27,10 @@
 --%>
 
 <%--
-   Portions Copyrighted 2013 ForgeRock Inc.
+   Portions Copyrighted 2013 ForgeRock AS
 --%>
+
+<%@ page import="org.owasp.esapi.ESAPI"%>
 <%@ page info="CreateSalesForce" language="java" %>
 <%@taglib uri="/WEB-INF/jato.tld" prefix="jato" %>
 <%@taglib uri="/WEB-INF/cc.tld" prefix="cc" %>
@@ -407,18 +409,24 @@
 
 <%
     String cot = request.getParameter("cot");
-    String idp = request.getParameter("entityId");   
+    if (!ESAPI.validator().isValidInput("HTTP Parameter Value: " + cot, cot,
+        "HTTPParameterValue", 2000, true)){
+            cot = null;
+    }
+    String idp = request.getParameter("entityId");
+    if (!ESAPI.validator().isValidInput("HTTP Parameter Value: " + idp, idp,
+        "HTTPParameterValue", 2000, false)){
+            idp = "";
+    }
     if ((cot != null) && (cot.trim().length() > 0)) {
         out.println("hideRealmObjs();");
         out.println("hideIDPObjs();");       
-        out.println("presetcot = \"" + cot + "\";");
+        out.println("presetcot = \"" + ESAPI.encoder().encodeForHTML(cot) + "\";");
         out.println("document.getElementById('cotfld').style.display = 'none';");
-        out.println("document.getElementById('cottxt').innerHTML = \"" +
-            cot + "\";");
+        out.println("document.getElementById('cottxt').innerHTML = \"" + ESAPI.encoder().encodeForHTML(cot) + "\";");
         out.println("document.getElementById('idpfld').style.display = 'none';");
         out.println("document.getElementById('idplbl').style.display = '';");
-        out.println("document.getElementById('idptxt').innerHTML = \"" +
-            idp + "\";");      
+        out.println("document.getElementById('idptxt').innerHTML = \"" + ESAPI.encoder().encodeForHTML(idp) + "\";");
     } else {
         out.println("hideRealm();");
     }

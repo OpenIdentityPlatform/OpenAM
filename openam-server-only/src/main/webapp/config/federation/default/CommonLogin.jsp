@@ -26,10 +26,15 @@
 
 --%>
 
+<%--
+    Portions Copyrighted 2013 ForgeRock AS
+ --%>
+
 <%@ page language="java" import="java.util.*,
 com.sun.identity.saml.common.SAMLUtils,
 com.sun.identity.shared.encode.Base64,
-com.sun.liberty.LibertyManager"
+com.sun.liberty.LibertyManager,
+org.owasp.esapi.ESAPI"
 %>
 
 <%@ include file="Header.jsp"%>
@@ -44,8 +49,16 @@ com.sun.liberty.LibertyManager"
     Set providerSet = null;
     String metaAliasKey = LibertyManager.getMetaAliasKey();
     String metaAlias = request.getParameter(metaAliasKey);
+    if (!ESAPI.validator().isValidInput("HTTP Parameter Value: " + metaAlias, metaAlias,
+        "HTTPParameterValue", 2000, false)) {
+             metaAlias = "";
+    }
     String requestIDKey = LibertyManager.getRequestIDKey();
     String requestID = request.getParameter(requestIDKey);
+    if (!ESAPI.validator().isValidInput("HTTP Parameter Value: " + requestID, requestID,
+        "HTTPParameterValue", 2000, false)) {
+             metaAlias = "";
+    }
     String providerIDKey = LibertyManager.getProviderIDKey();
     String loginURL = LibertyManager.getLoginURL(request);
     String intersiteServletUrl = LibertyManager.getInterSiteURL(request);

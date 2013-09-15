@@ -23,7 +23,6 @@
                                                               
 --%>
 
-
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
 "http://www.w3.org/TR/html4/loose.dtd">
 
@@ -36,6 +35,7 @@
 <%@ page import="java.util.MissingResourceException" %>
 <%@ page import="java.util.Locale" %>
 <%@ page import="org.forgerock.openam.authentication.modules.oauth2.OAuthUtil" %>
+<%@ page import="org.owasp.esapi.ESAPI" %>
 
 <%
     // Internationalization stuff. This is just an example. You can use any i18n framework

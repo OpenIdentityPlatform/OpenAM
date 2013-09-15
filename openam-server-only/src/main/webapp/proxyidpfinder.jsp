@@ -1,7 +1,7 @@
 <%--
   DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  
-  Copyright (c) 2010 ForgeRock AS. All Rights Reserved.
+  Copyright (c) 2010-2013 ForgeRock AS. All Rights Reserved.
  
   The contents of this file are subject to the terms
   of the Common Development and Distribution License
@@ -23,7 +23,9 @@
 --%>
 
 <%@ page import="com.sun.identity.shared.encode.Base64" %>
+<%@ page import="com.sun.identity.saml2.common.SAML2Constants" %>
 <%@ page import="com.sun.identity.saml2.common.SAML2Utils" %>
+<%@ page import="org.owasp.esapi.ESAPI"%>
 <%@ page import="java.util.List" %>
 
 <html>
@@ -58,12 +60,8 @@
             }
 
             relayState = (String) hts.getAttribute("_RELAYSTATE_");
-            if (relayState == null) {
-        %>
-            <jsp:forward page="<%= errorURL %>" />
-        <%
-            }
-            if (relayState.isEmpty()) {
+            if (relayState == null || relayState.isEmpty() ||
+                    !SAML2Utils.isRelayStateURLValid(request, relayState, SAML2Constants.IDP_ROLE)) {
         %>
             <jsp:forward page="<%= errorURL %>" />
         <%
@@ -86,6 +84,11 @@
             if (spRequester.isEmpty()) response.sendRedirect(errorURL);
 
             samlIdP = request.getParameter("_saml_idp");
+            if (!ESAPI.validator().isValidInput("HTTP Parameter Value: " + samlIdP, samlIdP,
+                "HTTPParameterValue", 2000, true)){
+                samlIdP = null;
+            }
+
             if (samlIdP != null && !samlIdP.isEmpty()) {
                 hts.removeAttribute("_IDPLIST_");
                 hts.removeAttribute("_RELAYSTATE_");

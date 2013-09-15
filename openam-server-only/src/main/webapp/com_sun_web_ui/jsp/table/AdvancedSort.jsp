@@ -6,20 +6,33 @@
  * Use is subject to license terms.
  */
 --%>
-<%@ page language="java" %> 
-<%@ page import="com.sun.web.ui.common.CCI18N" %>
-<%@ page import="com.iplanet.jato.view.ViewBean" %>
+
+<%--
+   Portions Copyrighted 2013 ForgeRock AS
+--%>
+
+<%@ page language="java" %>
+<%@ page import="org.owasp.esapi.ESAPI" %>
 <%@taglib uri="/WEB-INF/tld/com_iplanet_jato/jato.tld" prefix="jato"%> 
 <%@taglib uri="/WEB-INF/tld/com_sun_web_ui/cc.tld" prefix="cc"%>
 
 <%
     // Get query parameters.
-    String pageTitle = (request.getParameter("pageTitle") != null)
-	? request.getParameter("pageTitle") : "";
-    String baseName = (request.getParameter("baseName") != null)
-	? request.getParameter("baseName") : "";
-    String formName = (request.getParameter("formName") != null)
-	? request.getParameter("formName") : "";
+    String pageTitle = (request.getParameter("pageTitle") != null) ? request.getParameter("pageTitle") : "";
+    if (!ESAPI.validator().isValidInput("HTTP Parameter Value: " + pageTitle, pageTitle,
+            "HTTPParameterValue", 2000, false)) {
+        pageTitle = "";
+    }
+    String baseName = (request.getParameter("baseName") != null) ? request.getParameter("baseName") : "";
+    if (!ESAPI.validator().isValidInput("HTTP Parameter Value: " + baseName, baseName,
+            "HTTPParameterValue", 2000, false)) {
+        baseName = "";
+    }
+    String formName = (request.getParameter("formName") != null) ? request.getParameter("formName") : "";
+    if (!ESAPI.validator().isValidInput("HTTP Parameter Value: " + formName, formName,
+            "HTTPParameterValue", 2000, false)) {
+        formName = "";
+    }
 %>
 
 <jato:pagelet>
@@ -120,7 +133,7 @@ function submitValues() {
 <cc:form name="sortForm" method="post">
 
 <cc:pagetitle name="PageTitle"
- pageTitleText="<%=pageTitle %>"
+ pageTitleText="<%=ESAPI.encoder().encodeForHTML(pageTitle) %>"
  showPageButtonsTop="false"
  bundleID="tagBundle">
 

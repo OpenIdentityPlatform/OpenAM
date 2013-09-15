@@ -28,11 +28,12 @@
 
 
 <%--
-   Portions Copyrighted 2010-2011 ForgeRock AS
+   Portions Copyrighted 2010-2013 ForgeRock AS
 --%>
 
 
-<%@ page import="com.sun.identity.shared.debug.Debug" %>
+<%@ page import="com.iplanet.am.util.SystemProperties" %>
+<%@ page import="com.sun.identity.plugin.session.SessionException" %>
 <%@ page import="com.sun.identity.plugin.session.SessionManager" %>
 <%@ page import="com.sun.identity.saml2.common.SAML2Utils" %>
 <%@ page import="com.sun.identity.saml.common.SAMLUtils" %>
@@ -42,8 +43,7 @@
 <%@ page import="com.sun.identity.saml2.profile.IDPSingleLogout" %>
 <%@ page import="com.sun.identity.saml2.profile.LogoutUtil" %>
 <%@ page import="java.util.HashMap" %>
-<%@ page import="com.sun.identity.plugin.session.SessionException" %>
-<%@ page import="com.iplanet.am.util.SystemProperties" %>
+<%@ page import="org.owasp.esapi.ESAPI" %>
 
 <%--
     idpSingleLogoutInit.jsp
@@ -75,11 +75,13 @@
     // binding - binding used for this request
 
     try {
-        String RelayState = request.getParameter(SAML2Constants.RELAY_STATE);
-        if ((RelayState == null) || (RelayState.length() == 0)) {
-            RelayState = request.getParameter(SAML2Constants.GOTO);
+        String relayState = request.getParameter(SAML2Constants.RELAY_STATE);
+        if ((relayState == null) || (relayState.length() == 0)) {
+            relayState = request.getParameter(SAML2Constants.GOTO);
         }
-
+        if (!ESAPI.validator().isValidInput("HTTP Parameter Value: " + relayState, relayState, "URL", 2000, true)) {
+            relayState = null;
+        }
         Object ssoToken = null;
         try {
               ssoToken = SessionManager.getProvider().getSession(request);
@@ -88,14 +90,13 @@
                     "openam.idpsloinit.nosession.intermmediate.page", "");
 
             if ( intermmediatePage.length() != 0 ) {
-               if (RelayState != null) {
-                   intermmediatePage = intermmediatePage + "?RelayState=" +
-                         RelayState;
+               if (relayState != null) {
+                   intermmediatePage = intermmediatePage + "?RelayState=" + relayState;
                } 
                response.sendRedirect(intermmediatePage);
             } else {
-               if (RelayState != null) {
-                   response.sendRedirect(RelayState);
+                if (relayState != null && SAML2Utils.isRelayStateURLValid(request, relayState, SAML2Constants.IDP_ROLE)) {
+                   response.sendRedirect(relayState);
                } else {
                    %>
                      <jsp:forward
@@ -117,10 +118,9 @@
             metaAlias = values[0];
         }
         if (metaAlias == null) {
-            SessionManager.getProvider().invalidateSession(
-                ssoToken, request, response);
-            if (RelayState != null) {
-                response.sendRedirect(RelayState);
+            SessionManager.getProvider().invalidateSession(ssoToken, request, response);
+            if (relayState != null && SAML2Utils.isRelayStateURLValid(request, relayState, SAML2Constants.IDP_ROLE)) {
+                response.sendRedirect(relayState);
             } else {
                 %>
                 <jsp:forward
@@ -172,8 +172,8 @@
         paramsMap.put("Destination", request.getParameter("Destination"));
         paramsMap.put("Consent", request.getParameter("Consent"));
         paramsMap.put("Extension", request.getParameter("Extension"));
-        if (RelayState != null) {
-            paramsMap.put(SAML2Constants.RELAY_STATE, RelayState);
+        if (relayState != null) {
+            paramsMap.put(SAML2Constants.RELAY_STATE, relayState);
         }
 
         if (logoutAll != null) {
@@ -183,8 +183,8 @@
         IDPSingleLogout.initiateLogoutRequest(request,response,
             binding,paramsMap);
         if (binding.equalsIgnoreCase(SAML2Constants.SOAP)) {
-            if (RelayState != null) {
-                response.sendRedirect(RelayState);
+            if (relayState != null && SAML2Utils.isRelayStateURLValid(request, relayState, SAML2Constants.IDP_ROLE)) {
+                response.sendRedirect(relayState);
             } else {
                 %>
                 <jsp:forward

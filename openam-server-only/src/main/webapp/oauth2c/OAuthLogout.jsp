@@ -1,7 +1,7 @@
 <%--
    DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
 
-   Copyright (c) 2011 ForgeRock Inc. All rights reserved.
+   Copyright (c) 2011-2013 ForgeRock AS. All rights reserved.
 
    The contents of this file are subject to the terms
    of the Common Development and Distribution License
@@ -34,7 +34,6 @@
 <%@ page import="com.iplanet.am.util.SystemProperties" %>
 <%@ page import="com.sun.identity.shared.Constants" %>
 <%@ page import="static org.forgerock.openam.authentication.modules.oauth2.OAuthParam.*" %>
-<%@ page import="java.io.IOException" %>
 <%@ page import="java.util.ResourceBundle" %>
 <%@ page import="java.util.Locale" %>
 <%@ page import="java.util.MissingResourceException" %>
@@ -42,6 +41,10 @@
 <%
    // Internationalization stuff. You can use any internationalization framework
    String lang = request.getParameter("lang");
+   if (!ESAPI.validator().isValidInput("HTTP Parameter Value: " + lang, lang,
+        "HTTPParameterValue", 2000, true)){
+            lang = null;
+   }
    ResourceBundle resources;
    Locale locale = null;
    try {
@@ -88,7 +91,7 @@
        } 
    }
    
-   String logoutURL = request.getParameter(PARAM_LOGOUT_URL); 
+   String logoutURL = request.getParameter(PARAM_LOGOUT_URL);
    if (logoutURL == null) {
       logoutURL = "";
    } else {

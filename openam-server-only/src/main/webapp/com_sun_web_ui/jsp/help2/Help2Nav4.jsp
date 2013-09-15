@@ -6,20 +6,27 @@
  * Use is subject to license terms.
  */
 --%>
+
+<%--
+   Portions Copyrighted 2013 ForgeRock AS
+--%>
+
 <%@page language="java" %>
 <%@page import="com.sun.web.ui.common.CCI18N" %>
-<%@page import="com.sun.web.ui.common.CCSystem" %>
 <%@page import="com.iplanet.jato.util.NonSyncStringBuffer" %>
-<%@page import="java.net.URL" %>
 <%@page import="java.net.URLEncoder" %>
+<%@ page import="org.owasp.esapi.ESAPI" %>
 
 <%@taglib uri="/WEB-INF/tld/com_iplanet_jato/jato.tld" prefix="jato"%>
 <%@taglib uri="/WEB-INF/tld/com_sun_web_ui/cc.tld" prefix="cc"%>
 
 <%
   // Params from the URL.
-  String appName = (request.getParameter("appName") != null)
-    ? request.getParameter("appName") : "";
+  String appName = (request.getParameter("appName") != null) ? request.getParameter("appName") : "";
+    if (!ESAPI.validator().isValidInput("HTTP Parameter Value: " + appName, appName,
+            "HTTPParameterValue", 2000, false)) {
+        appName = "";
+    }
   if (appName == null || appName.equals("")) {
     appName = request.getContextPath();
     if (appName == null) {
@@ -30,22 +37,46 @@
   }
 
   // Get query parameters.
-  String windowTitle = (request.getParameter("windowTitle") != null)
-    ? request.getParameter("windowTitle") : "";
-  String mastheadTitle = (request.getParameter("mastheadTitle") != null)
-    ? request.getParameter("mastheadTitle") : "";
-  String mastheadAlt = (request.getParameter("mastheadAlt") != null)
-    ? request.getParameter("mastheadAlt") : "";
-  String helpFile = (request.getParameter("helpFile") != null)
-    ? request.getParameter("helpFile") : "";
-  String helpLogoHeight= (request.getParameter("helpLogoHeight") != null)
-    ? request.getParameter("helpLogoHeight") : "";
-  String helpLogoWidth = (request.getParameter("helpLogoWidth") != null)
-    ? request.getParameter("helpLogoWidth") : "";
-  String firstLoad = (request.getParameter("firstLoad") != null)
-    ? request.getParameter("firstLoad") : "false";
-  String pathPrefix = (request.getParameter("pathPrefix") != null)
-    ? request.getParameter("pathPrefix") : "";
+    String windowTitle = (request.getParameter("windowTitle") != null) ? request.getParameter("windowTitle") : "";
+      if (!ESAPI.validator().isValidInput("HTTP Parameter Value: " + windowTitle, windowTitle,
+              "HTTPParameterValue", 2000, false)) {
+          windowTitle = "";
+      }
+    String mastheadTitle = (request.getParameter("mastheadTitle") != null) ? request.getParameter("mastheadTitle") : "";
+      if (!ESAPI.validator().isValidInput("HTTP Parameter Value: " + mastheadTitle, mastheadTitle,
+              "HTTPParameterValue", 2000, false)) {
+          mastheadTitle = "";
+      }
+    String mastheadAlt = (request.getParameter("mastheadAlt") != null) ? request.getParameter("mastheadAlt") : "";
+      if (!ESAPI.validator().isValidInput("HTTP Parameter Value: " + mastheadAlt, mastheadAlt,
+              "HTTPParameterValue", 2000, false)) {
+          mastheadAlt = "";
+      }
+    String helpFile = (request.getParameter("helpFile") != null) ? request.getParameter("helpFile") : "";
+      if (!ESAPI.validator().isValidInput("HTTP Parameter Value: " + helpFile, helpFile,
+              "HTTPParameterValue", 2000, false)) {
+          helpFile = "";
+      }
+    String helpLogoHeight= (request.getParameter("helpLogoHeight") != null) ? request.getParameter("helpLogoHeight") : "";
+      if (!ESAPI.validator().isValidInput("HTTP Parameter Value: " + helpLogoHeight, helpLogoHeight,
+              "HTTPParameterValue", 2000, false)) {
+          helpLogoHeight = "";
+      }
+    String helpLogoWidth = (request.getParameter("helpLogoWidth") != null) ? request.getParameter("helpLogoWidth") : "";
+      if (!ESAPI.validator().isValidInput("HTTP Parameter Value: " + helpLogoWidth, helpLogoWidth,
+              "HTTPParameterValue", 2000, false)) {
+          helpLogoWidth = "";
+      }
+    String firstLoad = (request.getParameter("firstLoad") != null) ? request.getParameter("firstLoad") : "false";
+      if (!ESAPI.validator().isValidInput("HTTP Parameter Value: " + firstLoad, firstLoad,
+              "HTTPParameterValue", 2000, false)) {
+          firstLoad = "false";
+      }
+    String pathPrefix = (request.getParameter("pathPrefix") != null) ? request.getParameter("pathPrefix") : "";
+      if (!ESAPI.validator().isValidInput("HTTP Parameter Value: " + pathPrefix, pathPrefix,
+              "HTTPParameterValue", 2000, false)) {
+          pathPrefix = "";
+      }
 
   // This param is used in several places; use a var rather than encoding it
   // multiple times.
@@ -88,7 +119,7 @@
 
 <html>
 <head>
-  <title><%=windowTitle %></title>
+  <title><%=ESAPI.encoder().encodeForHTML(windowTitle) %></title>
   <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
   <meta name="Copyright" content="Copyright &copy; 2004 by Sun Microsystems, Inc. All Rights Reserved." />
   <cc:stylesheet />

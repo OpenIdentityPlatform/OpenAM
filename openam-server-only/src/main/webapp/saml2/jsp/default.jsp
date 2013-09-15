@@ -26,14 +26,14 @@
 
 --%>
 
-
-
-
+<%--
+      Portions Copyrighted 2013 ForgeRock AS
+--%>
 
 <%@page
 import="com.sun.identity.saml2.common.SAML2Constants,
-com.sun.identity.saml2.common.SAML2Utils
-"
+com.sun.identity.saml2.common.SAML2Utils,
+org.owasp.esapi.ESAPI"
 %>
 
 <html>
@@ -45,13 +45,17 @@ com.sun.identity.saml2.common.SAML2Utils
 <body>
 <%
     String messageParam = request.getParameter(SAML2Constants.MESSAGE);
+    if (!ESAPI.validator().isValidInput("HTTP Parameter Value" + messageParam, messageParam,
+        "HTTPParameterValue", 2000, true)) {
+            messageParam = null;
+    }
     if (messageParam != null && messageParam.length() != 0) {
 	%>
-	<%= SAML2Utils.bundle.getString(messageParam) %>
+	<%= ESAPI.encoder().encodeForHTML(SAML2Utils.bundle.getString(messageParam)) %>
 	<%
     } else {
 	%>
-	<%= SAML2Utils.bundle.getString("missingMessageParam") %>
+	<%= ESAPI.encoder().encodeForHTML(SAML2Utils.bundle.getString("missingMessageParam")) %>
 	<%
     }
 %>

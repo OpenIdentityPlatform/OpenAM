@@ -26,6 +26,10 @@
 
 --%>
 
+<%--
+   Portions Copyrighted 2013 ForgeRock AS
+--%>
+
 <%@ page pageEncoding="UTF-8"%>
 <%@ page import="com.sun.identity.common.SystemConfigurationUtil" %>
 <%@ page import="com.sun.identity.shared.Constants" %>
@@ -36,7 +40,7 @@
 <%@ page import="java.net.URLEncoder" %>
 <%@ page import="java.text.MessageFormat" %>
 <%@ page import="java.util.Locale" %>
-<%@ page import="java.util.ResourceBundle" %>
+<%@ page import="org.owasp.esapi.ESAPI" %>
 
 <html>
 <head>
@@ -71,10 +75,25 @@
 
     request.setCharacterEncoding("UTF-8");
     String realm = request.getParameter("realm");
+    if (!ESAPI.validator().isValidInput("HTTP Parameter Value: " + realm, realm, "HTTPParameterValue", 2000, false)) {
+        realm = "";
+    }
     String cot = request.getParameter("cot");
+    if (!ESAPI.validator().isValidInput("HTTP Parameter Value: " + cot, cot, "HTTPParameterValue", 2000, false)) {
+        cot = "";
+    }
     String idp = request.getParameter("idp");
+    if (!ESAPI.validator().isValidInput("HTTP Parameter Value: " + idp, idp, "HTTPParameterValue", 2000, false)) {
+        idp = "";
+    }
     String sp = request.getParameter("sp");
+    if (!ESAPI.validator().isValidInput("HTTP Parameter Value: " + sp, sp, "HTTPParameterValue", 2000, false)) {
+        sp = "";
+    }
     String locale = request.getParameter("locale");
+    if (!ESAPI.validator().isValidInput("HTTP Parameter Value: " + locale, locale, "HTTPParameterValue", 2000, false)) {
+            locale = "";
+    }
     String setupFailedTitle = "";
     String setupError = "";
 
@@ -489,7 +508,7 @@ function accTermination() {
         <td><span class="ProgressFailedTitle" id="ErrorTitle"><%= setupFailedTitle %></span></td>
         </tr>
         <tr><td></td>
-        <td><span class="ProgressText" id="ErrorText"><%= setupError %></span>
+        <td><span class="ProgressText" id="ErrorText"><%= ESAPI.encoder().encodeForHTML(setupError) %></span>
         </tr>
         </table>
         </div>
@@ -497,7 +516,7 @@ function accTermination() {
         <div id="authIdpProcessing" style="display:none">
         <table border=0 cellpadding=0 cellspacing=2>
         <tr><td><img src="<%= deployuri %>/console/images/progresspointer.gif" width="33" height="33" /></td>
-        <td><span class="ProgressTitle"><%=authIDPTitle %></span></td>
+        <td><span class="ProgressTitle"><%=ESAPI.encoder().encodeForHTML(authIDPTitle) %></span></td>
         </tr>
         </table>
         </div>
@@ -505,7 +524,7 @@ function accTermination() {
         <div id="authIdpPassed" style="display:none">
         <table border=0 cellpadding=0 cellspacing=2>
         <tr><td><img src="<%= deployuri %>/console/images/progresspassed.gif" width="28" height="26" /></td>
-        <td><span class="ProgressDoneTitle"><%=authIDPPassed %></span></td>
+        <td><span class="ProgressDoneTitle"><%=ESAPI.encoder().encodeForHTML(authIDPPassed) %></span></td>
         </tr>
         </table>
         </div>
@@ -513,7 +532,7 @@ function accTermination() {
         <div id="authIdpFailed" style="display:none">
         <table border=0 cellpadding=0 cellspacing=2>
         <tr><td><img src="<%= deployuri %>/console/images/progressfailed.gif" width="28" height="26" /></td>
-        <td><span class="ProgressFailedTitle"><%= authIDPFailed %></span></td>
+        <td><span class="ProgressFailedTitle"><%= ESAPI.encoder().encodeForHTML(authIDPFailed) %></span></td>
         </tr>
         </table>
         </div>
@@ -521,7 +540,7 @@ function accTermination() {
         <div id="authSp" style="display:none">
         <table border=0 cellpadding=0 cellspacing=2>
         <tr><td><div><img src="<%= deployuri %>/com_sun_web_ui/images/other/dot.gif" alt="" border="0" height="10" width="30" /></div></td>
-        <td><span class="ProgressText"><%=authSPTitle %></span></td>
+        <td><span class="ProgressText"><%=ESAPI.encoder().encodeForHTML(authSPTitle) %></span></td>
         </tr>
         </table>
         </div>
@@ -529,7 +548,7 @@ function accTermination() {
         <div id="authSpProcessing" style="width:100%;display:none">
         <table border=0 cellpadding=0 cellspacing=2>
         <tr><td><img src="<%= deployuri %>/console/images/progresspointer.gif" width="33" height="33" /></td>
-        <td><span class="ProgressTitle"><%= authSPTitle %></span><br /></td>
+        <td><span class="ProgressTitle"><%= ESAPI.encoder().encodeForHTML(authSPTitle) %></span><br /></td>
         </tr>
         </table>
         </div>
@@ -537,7 +556,7 @@ function accTermination() {
         <div id="authSpPassed" style="display:none">
         <table border=0 cellpadding=0 cellspacing=2>
         <tr><td><img src="<%= deployuri %>/console/images/progresspassed.gif" width="28" height="26" /></td>
-        <td><span class="ProgressDoneTitle"><%=authSPPassed %></span></td>
+        <td><span class="ProgressDoneTitle"><%=ESAPI.encoder().encodeForHTML(authSPPassed) %></span></td>
         </tr>
         </table>
         </div>
@@ -545,7 +564,7 @@ function accTermination() {
         <div id="authSpFailed" style="display:none">
         <table border=0 cellpadding=0 cellspacing=2>
         <tr><td><img src="<%= deployuri %>/console/images/progressfailed.gif" width="28" height="26" /></td>
-        <td><span class="ProgressFailedTitle"><%=authSPFailed %></span></td>
+        <td><span class="ProgressFailedTitle"><%=ESAPI.encoder().encodeForHTML(authSPFailed) %></span></td>
         </tr>
         </table>
         </div>
@@ -553,7 +572,7 @@ function accTermination() {
         <div id="accLink" style="display:none">
         <table border=0 cellpadding=0 cellspacing=2>
         <tr><td><div><img src="<%= deployuri %>/com_sun_web_ui/images/other/dot.gif" alt="" border="0" height="10" width="30" /></div></td>
-        <td><span class="ProgressText"><%= accLinkTitle %></span></td>
+        <td><span class="ProgressText"><%= ESAPI.encoder().encodeForHTML(accLinkTitle) %></span></td>
         </tr>
         </table>
         </div>
@@ -561,7 +580,7 @@ function accTermination() {
         <div id="accLinkProcessing" style="display:none">
         <table border=0 cellpadding=0 cellspacing=2>
         <tr><td><img src="<%= deployuri %>/console/images/progresspointer.gif" width="33" height="33" /></td>
-        <td><span class="ProgressTitle"><%= accLinkTitle %></span><br /></td>
+        <td><span class="ProgressTitle"><%= ESAPI.encoder().encodeForHTML(accLinkTitle) %></span><br /></td>
         </tr>
         </table>
         </div>
@@ -569,7 +588,7 @@ function accTermination() {
         <div id="accLinkPassed" style="display:none">
         <table border=0 cellpadding=0 cellspacing=2>
         <tr><td><img src="<%= deployuri %>/console/images/progresspassed.gif" width="28" height="26" /></td>
-        <td><span class="ProgressDoneTitle"><%=accLinkPassed %></span></td>
+        <td><span class="ProgressDoneTitle"><%=ESAPI.encoder().encodeForHTML(accLinkPassed) %></span></td>
         </tr>
         </table>
         </div>
@@ -577,7 +596,7 @@ function accTermination() {
         <div id="accLinkFailed" style="display:none">
         <table border=0 cellpadding=0 cellspacing=2>
         <tr><td><img src="<%= deployuri %>/console/images/progressfailed.gif" width="28" height="26" /></td>
-        <td><span class="ProgressFailedTitle"><%=accLinkFailed %></span></td>
+        <td><span class="ProgressFailedTitle"><%=ESAPI.encoder().encodeForHTML(accLinkFailed) %></span></td>
         </tr>
         </table>
         </div>
@@ -585,7 +604,7 @@ function accTermination() {
         <div id="slo" style="display:none">
         <table border=0 cellpadding=0 cellspacing=2>
         <tr><td><div><img src="<%= deployuri %>/com_sun_web_ui/images/other/dot.gif" alt="" border="0" height="10" width="30" /></div></td>
-        <td><span class="ProgressText"><%= sloTitle %></span></td>
+        <td><span class="ProgressText"><%= ESAPI.encoder().encodeForHTML(sloTitle) %></span></td>
         </tr>
         </table>
         </div>
@@ -593,7 +612,7 @@ function accTermination() {
         <div id="sloProcessing" style="display:none">
         <table border=0 cellpadding=0 cellspacing=2>
         <tr><td><img src="<%= deployuri %>/console/images/progresspointer.gif" width="33" height="33" /></td>
-        <td><span class="ProgressTitle"><%= sloTitle %></span><br /></td>
+        <td><span class="ProgressTitle"><%= ESAPI.encoder().encodeForHTML(sloTitle) %></span><br /></td>
         </tr>
         </table>
         </div>
@@ -601,7 +620,7 @@ function accTermination() {
         <div id="sloPassed" style="display:none">
         <table border=0 cellpadding=0 cellspacing=2>
         <tr><td><img src="<%= deployuri %>/console/images/progresspassed.gif" width="28" height="26" /></td>
-        <td><span class="ProgressDoneTitle"><%=sloPassed %></span></td>
+        <td><span class="ProgressDoneTitle"><%=ESAPI.encoder().encodeForHTML(sloPassed) %></span></td>
         </tr>
         </table>
         </div>
@@ -609,7 +628,7 @@ function accTermination() {
         <div id="sloFailed" style="display:none">
         <table border=0 cellpadding=0 cellspacing=2>
         <tr><td><img src="<%= deployuri %>/console/images/progressfailed.gif" width="28" height="26" /></td>
-        <td><span class="ProgressFailedTitle"><%=sloFailed %></span></td>
+        <td><span class="ProgressFailedTitle"><%=ESAPI.encoder().encodeForHTML(sloFailed) %></span></td>
         </tr>
         </table>
         </div>
@@ -618,7 +637,7 @@ function accTermination() {
         <div id="sso" style="display:none">
         <table border=0 cellpadding=0 cellspacing=2>
         <tr><td><div><img src="<%= deployuri %>/com_sun_web_ui/images/other/dot.gif" alt="" border="0" height="10" width="30" /></div></td>
-        <td><span class="ProgressText"><%= ssoTitle %></span></td>
+        <td><span class="ProgressText"><%= ESAPI.encoder().encodeForHTML(ssoTitle) %></span></td>
         </tr>
         </table>
         </div>
@@ -626,7 +645,7 @@ function accTermination() {
         <div id="ssoProcessing" style="display:none">
         <table border=0 cellpadding=0 cellspacing=2>
         <tr><td><img src="<%= deployuri %>/console/images/progresspointer.gif" width="33" height="33" /></td>
-        <td><span class="ProgressTitle"><%= ssoTitle %></span><br /></td>
+        <td><span class="ProgressTitle"><%= ESAPI.encoder().encodeForHTML(ssoTitle) %></span><br /></td>
         </tr>
         </table>
         </div>
@@ -634,7 +653,7 @@ function accTermination() {
         <div id="ssoPassed" style="display:none">
         <table border=0 cellpadding=0 cellspacing=2>
         <tr><td><img src="<%= deployuri %>/console/images/progresspassed.gif" width="28" height="26" /></td>
-        <td><span class="ProgressDoneTitle"><%=ssoPassed %></span></td>
+        <td><span class="ProgressDoneTitle"><%=ESAPI.encoder().encodeForHTML(ssoPassed) %></span></td>
         </tr>
         </table>
         </div>
@@ -642,7 +661,7 @@ function accTermination() {
         <div id="ssoFailed" style="display:none">
         <table border=0 cellpadding=0 cellspacing=2>
         <tr><td><img src="<%= deployuri %>/console/images/progressfailed.gif" width="28" height="26" /></td>
-        <td><span class="ProgressFailedTitle"><%=ssoFailed %></span></td>
+        <td><span class="ProgressFailedTitle"><%=ESAPI.encoder().encodeForHTML(ssoFailed) %></span></td>
         </tr>
         </table>
         </div>
@@ -650,7 +669,7 @@ function accTermination() {
         <div id="accTerm" style="display:none">
         <table border=0 cellpadding=0 cellspacing=2>
         <tr><td><div><img src="<%= deployuri %>/com_sun_web_ui/images/other/dot.gif" alt="" border="0" height="10" width="30" /></div></td>
-        <td><span class="ProgressText"><%= accTermTitle %></span></td>
+        <td><span class="ProgressText"><%= ESAPI.encoder().encodeForHTML(accTermTitle) %></span></td>
         </tr>
         </table>
         </div>
@@ -658,7 +677,7 @@ function accTermination() {
         <div id="accTermProcessing" style="display:none">
         <table border=0 cellpadding=0 cellspacing=2>
         <tr><td><img src="<%= deployuri %>/console/images/progresspointer.gif" width="33" height="33" /></td>
-        <td><span class="ProgressTitle"><%= accTermTitle %></span><br /></td>
+        <td><span class="ProgressTitle"><%= ESAPI.encoder().encodeForHTML(accTermTitle) %></span><br /></td>
         </tr>
         </table>
         </div>
@@ -666,7 +685,7 @@ function accTermination() {
         <div id="accTermPassed" style="display:none">
         <table border=0 cellpadding=0 cellspacing=2>
         <tr><td><img src="<%= deployuri %>/console/images/progresspassed.gif" width="28" height="26" /></td>
-        <td><span class="ProgressDoneTitle"><%=accTermPassed %></span></td>
+        <td><span class="ProgressDoneTitle"><%=ESAPI.encoder().encodeForHTML(accTermPassed) %></span></td>
         </tr>
         </table>
         </div>
@@ -674,7 +693,7 @@ function accTermination() {
         <div id="accTermFailed" style="display:none">
         <table border=0 cellpadding=0 cellspacing=2>
         <tr><td><img src="<%= deployuri %>/console/images/progressfailed.gif" width="28" height="26" /></td>
-        <td><span class="ProgressFailedTitle"><%=accTermFailed %></span></td>
+        <td><span class="ProgressFailedTitle"><%=ESAPI.encoder().encodeForHTML(accTermFailed) %></span></td>
         </tr>
         </table>
         </div>

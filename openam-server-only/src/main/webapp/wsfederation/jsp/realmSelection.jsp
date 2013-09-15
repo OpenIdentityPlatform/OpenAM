@@ -26,6 +26,10 @@
 
 --%>
 
+<%--
+    Portions Copyrighted 2013 ForgeRock AS
+--%>
+
 <%@page
     import="java.util.*"
     import="com.sun.identity.shared.debug.Debug"
@@ -35,12 +39,21 @@
     import="com.sun.identity.wsfederation.meta.WSFederationMetaUtils"
     import="com.sun.identity.wsfederation.jaxb.entityconfig.IDPSSOConfigElement"
     import="com.sun.identity.wsfederation.jaxb.wsfederation.FederationElement"
+    import="org.owasp.esapi.ESAPI"
 %>
 <% 
     Debug debug = WSFederationUtils.debug;
     String jspFile = "realmSelection.jsp: ";
     String wreply = (String)request.getParameter("wreply");
+    if (!ESAPI.validator().isValidInput("HTTP Parameter Value: " + wreply, wreply,
+        "URL", 2000, false)){
+            wreply = "";
+    }
     String wctx = (String)request.getParameter("wctx");
+    if (!ESAPI.validator().isValidInput("HTTP Parameter Value: " + wctx, wctx,
+        "HTTPParameterValue", 2000, true)){
+            wctx = null;
+    }
     
     if (debug.messageEnabled()) {
         debug.message(jspFile + "wreply: "+wreply);
@@ -66,6 +79,10 @@
         spConfig.get(WSFederationConstants.ACCOUNT_REALM_COOKIE_NAME).get(0);
                 
     String selectedRealm = (String)request.getParameter("realm_list");
+    if (!ESAPI.validator().isValidInput("HTTP Parameter Value: " + selectedRealm,
+        selectedRealm, "HTTPParameterValue", 2000, true)){
+            selectedRealm = null;
+    }
     if (debug.messageEnabled()) {
         debug.message(jspFile + "Selected realm: " + selectedRealm);
     }

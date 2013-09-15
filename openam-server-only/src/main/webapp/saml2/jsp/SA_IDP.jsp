@@ -27,12 +27,11 @@
 --%>
 
 <%--
-   Portions Copyrighted 2013 ForgeRock, Inc.
+   Portions Copyrighted 2013 ForgeRock AS.
 --%>
 
 <%@ page language="java" 
 import="java.util.*,
-java.io.*,
 java.net.URL,
 java.util.logging.Level,
 com.sun.identity.plugin.session.SessionProvider,
@@ -49,8 +48,8 @@ com.sun.identity.saml2.logging.LogUtil,
 com.sun.identity.saml2.meta.SAML2MetaManager,
 com.sun.identity.saml2.meta.SAML2MetaUtils,
 com.sun.identity.saml2.meta.SAML2MetaException,
-com.sun.identity.shared.debug.Debug,
-org.forgerock.openam.utils.ClientUtils"
+org.forgerock.openam.utils.ClientUtils,
+org.owasp.esapi.ESAPI"
 %>
 
 <%-- functions --%>
@@ -161,6 +160,10 @@ org.forgerock.openam.utils.ClientUtils"
 
     // retrieve sun.data parameter first.
     String sunData = request.getParameter(SecureAttrs.SAE_PARAM_DATA);
+    if (!ESAPI.validator().isValidInput("HTTP Parameter Value: " + sunData, sunData,
+        "HTTPParameterValue", 2000, true)){
+            sunData = null;
+    }
     String idpAppUrl =  request.getParameter(SecureAttrs.SAE_PARAM_IDPAPPURL);
     if (sunData == null) {
         String errStr = errorUrl+"?errorcode=IDP_1&errorstring=Null_sun.data";

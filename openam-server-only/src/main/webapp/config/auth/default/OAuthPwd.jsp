@@ -36,6 +36,7 @@
 <%@ page import="java.util.MissingResourceException" %>
 <%@ page import="java.util.Locale" %>
 <%@ page import="org.forgerock.openam.authentication.modules.oauth2.OAuthUtil" %>
+<%@ page import="org.owasp.esapi.ESAPI" %>
 
 <% // Internationalization
     String ServiceURI = SystemProperties.get(Constants.AM_SERVICES_DEPLOYMENT_DESCRIPTOR);

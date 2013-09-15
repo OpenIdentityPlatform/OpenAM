@@ -33,6 +33,7 @@
     import="com.sun.identity.shared.encode.URLEncDec"
     import="com.sun.identity.multiprotocol.MultiProtocolUtils"
     import="com.sun.identity.multiprotocol.SingleLogoutManager"
+    import="org.owasp.esapi.ESAPI"
 %>
 <%
     String displayName = 
@@ -148,7 +149,7 @@
                     {
                   %>
                         <script>
-                            document.write("<p id=\"logoutPrompt\">Signing out of <%=displayName%></p>");
+                            document.write("<p id=\"logoutPrompt\">Signing out of <%=ESAPI.encoder().encodeForHTML(displayName)%></p>");
                         </script>
                         <noscript>
                             <p><a href="<%=wreply%>">Click here</a> to continue</p>
@@ -160,7 +161,7 @@
                     for ( String url : providerList.keySet() )
                     {
                   %>
-                        <p>Signing out from <%=providerList.get(url)%></p>
+                        <p>Signing out from <%=ESAPI.encoder().encodeForHTML(providerList.get(url))%></p>
                         <iframe width="500" src="<%=url%>"></iframe>
                   <%
                     }

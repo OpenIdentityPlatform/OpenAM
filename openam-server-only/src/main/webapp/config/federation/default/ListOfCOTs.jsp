@@ -26,10 +26,17 @@
 
 --%>
 
+ <%--
+     Portions Copyrighted 2013 ForgeRock AS
+  --%>
+
 
 <%@ page language="java" import="java.util.*,
-    com.sun.liberty.LibertyManager"
+    com.sun.liberty.LibertyManager,
+    org.owasp.esapi.ESAPI"
  %>
+<%@ page import="com.sun.identity.authentication.service.AuthUtils" %>
+<%@ page import="com.sun.identity.authentication.service.AuthD" %>
 
 <%@ include file="Header.jsp"%>
 
@@ -50,19 +57,38 @@
     String LRURLKey = LibertyManager.getLRURLKey();
     String COTKey = LibertyManager.getCOTKey();
     String metaAlias = request.getParameter(metaAliasKey);
+    if (!ESAPI.validator().isValidInput("HTTP Parameter Value: " + metaAlias, metaAlias,
+        "HTTPParameterValue", 2000, false)){
+            metaAlias = "";
+    }
     String LRURL = request.getParameter(LRURLKey);
+    if (!ESAPI.validator().isValidInput("URL Value: " + LRURL, LRURL, "URL", 2000, true)){
+        LRURL = null;
+    }
     String actionURL = LibertyManager.getConsentHandlerURL(request);
     String providerID = LibertyManager.getEntityID(metaAlias);
     String providerRole = LibertyManager.getProviderRole(metaAlias);
-    if(providerID != null){
+    if (providerID != null){
         cotSet = LibertyManager.getListOfCOTs(providerID, providerRole);
-    }else {
+    } else {
         response.sendError(response.SC_INTERNAL_SERVER_ERROR,"Not able to get Provider ID");
     }
-    if(LRURL == null || LRURL.length() <= 0)
+    if(LRURL == null || LRURL.length() <= 0) {
         LRURL = LibertyManager.getHomeURL(providerID, providerRole);
-    if(cotSet == null) {
-        response.sendRedirect(LRURL);
+    }
+    if (LRURL != null) {
+        String orgDN = AuthUtils.getDomainNameByRequest(request, new Hashtable(0));
+        AuthD authD = AuthD.getAuth();
+        if (authD.isGotoUrlValid(LRURL, orgDN)) {
+            LRURL = null;
+        }
+    }
+    if (cotSet == null) {
+        if (LRURL != null) {
+            response.sendRedirect(LRURL);
+        } else {
+            response.sendError(response.SC_INTERNAL_SERVER_ERROR, "Not able to validate the RelayState URL");
+        }
         return;
     }
 %>

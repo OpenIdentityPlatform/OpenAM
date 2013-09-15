@@ -26,12 +26,14 @@
 
 --%>
 
+<%--
+   Portions Copyrighted 2013 ForgeRock AS
+--%>
+
 <%@ page import="com.sun.identity.common.SystemConfigurationUtil" %>
 <%@ page import="com.sun.identity.shared.Constants" %>
 <%@ page import="com.sun.identity.workflow.ValidateSAML2" %>
-<%@ page import="com.sun.identity.workflow.WorkflowException" %>
-<%@ page import="java.net.URLEncoder" %>
-<%@ page import="java.text.MessageFormat" %>
+<%@ page import="org.owasp.esapi.ESAPI" %>
 <%@ page contentType="text/html; charset=utf-8" language="java" %>
 
 <html>
@@ -41,8 +43,17 @@
     String deployuri = SystemConfigurationUtil.getProperty(
         Constants.AM_SERVICES_DEPLOYMENT_DESCRIPTOR);
     String idp = request.getParameter("idp");
+    if (!ESAPI.validator().isValidInput("HTTP Parameter Value: " + idp, idp,"HTTPParameterValue", 2000, false)) {
+            idp = "";
+    }
     String sp = request.getParameter("sp");
+    if (!ESAPI.validator().isValidInput("HTTP Parameter Value: " + sp, sp, "HTTPParameterValue", 2000, false)) {
+            sp = "";
+    }
     String fedlet = request.getParameter("fedlet");
+    if (!ESAPI.validator().isValidInput("HTTP Parameter Value: " + fedlet, fedlet, "HTTPParameterValue", 2000, true)) {
+            fedlet = null;
+    }
     boolean bFedlet = (fedlet != null);
 
     String authidp = request.getParameter("authidp");

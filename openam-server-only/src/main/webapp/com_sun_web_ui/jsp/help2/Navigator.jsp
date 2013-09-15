@@ -6,29 +6,48 @@
  * Use is subject to license terms.
  */
 --%>
+
+ <%--
+     Portions Copyrighted 2013 ForgeRock AS
+  --%>
+
 <%@page language="java" %>
 <%@page import="java.lang.String" %>
-<%@page import="com.sun.web.ui.common.CCI18N" %>
+<%@page import="org.owasp.esapi.ESAPI" %>
 <%@taglib uri="/WEB-INF/tld/com_iplanet_jato/jato.tld" prefix="jato"%>
 <%@taglib uri="/WEB-INF/tld/com_sun_web_ui/cc.tld" prefix="cc"%>
 
 <%
     // Get query parameters.
-    String windowTitle = (request.getParameter("windowTitle") != null)
-	? request.getParameter("windowTitle") : "";
-    String appName = (request.getParameter("appName") != null)
-	? request.getParameter("appName") : request.getContextPath().substring(1);
-    String helpFile = (request.getParameter("helpFile") != null)
-	? request.getParameter("helpFile") : "";
-    String firstLoad = (request.getParameter("firstLoad") != null)
-	? request.getParameter("firstLoad") : "false";
+    String windowTitle = (request.getParameter("windowTitle") != null) ? request.getParameter("windowTitle") : "";
+    if (!ESAPI.validator().isValidInput("HTTP Parameter Value: " + windowTitle, windowTitle,
+   	    "HTTPParameterValue", 2000, false)){
+        windowTitle = "";
+    }
+    String appName = (request.getParameter("appName") != null) ?
+            request.getParameter("appName") : request.getContextPath().substring(1);
+    if (!ESAPI.validator().isValidInput("HTTP Parameter Value: " + appName, appName,
+   	    "HTTPParameterValue", 2000, false)){
+        appName = "";
+    }
+    String helpFile = (request.getParameter("helpFile") != null) ? request.getParameter("helpFile") : "";
+    if (!ESAPI.validator().isValidInput("HTTP Parameter Value: " + helpFile, helpFile,
+   	    "HTTPParameterValue", 2000, false)){
+        helpFile = "";
+    }
+    String firstLoad = (request.getParameter("firstLoad") != null) ? request.getParameter("firstLoad") : "false";
+	if (!ESAPI.validator().isValidInput("HTTP Parameter Value: " + firstLoad, firstLoad,
+	    "HTTPParameterValue", 2000, false)){
+            firstLoad = "false";
+    }
+
 %>
 
 <jato:useViewBean className="com.sun.web.ui.servlet.help2.NavigatorViewBean">
 
 <!-- Header -->
 <cc:header name="Header"
- pageTitle="<%=windowTitle %>"
+ pageTitle="<%=ESAPI.encoder().encodeForHTML(windowTitle) %>"
  baseName="com.sun.web.ui.resources.Resources"
  bundleID="help2Bundle"
  onLoad="performLoadUtilities();">

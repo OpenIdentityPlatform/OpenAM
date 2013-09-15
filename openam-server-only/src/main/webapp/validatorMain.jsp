@@ -26,10 +26,15 @@
 
 --%>
 
+<%--
+   Portions Copyrighted 2013 ForgeRock AS
+--%>
+
 <%@ page import="com.sun.identity.common.SystemConfigurationUtil" %>
 <%@ page import="com.sun.identity.shared.Constants" %>
 <%@ page import="com.sun.identity.workflow.ValidateSAML2" %>
 <%@ page import="java.net.URLEncoder" %>
+<%@ page import="org.owasp.esapi.ESAPI" %>
 <%@ page contentType="text/html; charset=utf-8" language="java" %>
 
 <%
@@ -38,6 +43,9 @@
         Constants.AM_SERVICES_DEPLOYMENT_DESCRIPTOR);
 
     String locale = request.getParameter("locale");
+    if (!ESAPI.validator().isValidInput("HTTP Parameter Value: " + locale, locale, "HTTPParameterValue", 20, false)) {
+            locale = "";
+    }
     String pageTitle = ValidateSAML2.getMessage(
         "federation.connectivity.test", locale);
     String cancelButton = ValidateSAML2.getMessage("button.cancel", locale);
@@ -72,7 +80,7 @@
 <td nowrap="nowrap" valign="bottom">
 <div class="TtlTxtDiv">
 
-<h1 class="TaskTitle"><%= pageTitle %></h1>
+<h1 class="TaskTitle"><%= ESAPI.encoder().encodeForHTML(pageTitle) %></h1>
 </div>
 </td>
 <td align="right" nowrap="nowrap" valign="bottom">
@@ -122,9 +130,21 @@ function errorOccured() {
 function onLoad() {
 <%
     String realm = request.getParameter("realm");
+    if (!ESAPI.validator().isValidInput("HTTP Parameter Value: " + realm, realm, "HTTPParameterValue", 2000, false)) {
+            realm = "";
+    }
     String cot = request.getParameter("cot");
+    if (!ESAPI.validator().isValidInput("HTTP Parameter Value: " + cot, cot, "HTTPParameterValue", 2000, false)) {
+            cot = "";
+    }
     String idp = request.getParameter("idp");
+    if (!ESAPI.validator().isValidInput("HTTP Parameter Value: " + idp, idp, "HTTPParameterValue", 2000, false)) {
+            idp = "";
+    }
     String sp = request.getParameter("sp");
+    if (!ESAPI.validator().isValidInput("HTTP Parameter Value: " + sp, sp, "HTTPParameterValue", 2000, false)) {
+            sp = "";
+    }
     out.println("frames['worker'].location = 'validateWait.jsp?locale=" +
         locale + "&m=" + URLEncoder.encode("validate.initializing") + "';");
 %>

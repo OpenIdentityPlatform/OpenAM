@@ -23,29 +23,20 @@
 --%>
 
 <%--
+     Portions Copyrighted 2013 ForgeRock AS
+--%>
+
+<%--
   fedletXACMLQuery.jsp
   This JSP used by the Fedlet to get the Resource URL. Fedlet uses XACML
   to determine whether right policy has been defined for the Resource URL
 --%>
 
-<%@ page import="com.sun.identity.saml2.common.SAML2Exception" %>
-<%@ page import="com.sun.identity.saml2.jaxb.metadata.IDPSSODescriptorElement" %>
-<%@ page import="com.sun.identity.saml2.jaxb.metadata.SingleSignOnServiceElement" %>
-<%@ page import="com.sun.identity.saml2.meta.SAML2MetaException" %>
-<%@ page import="com.sun.identity.saml2.meta.SAML2MetaManager" %>
 <%@ page import="com.sun.identity.shared.encode.URLEncDec" %>
-<%@ page import="java.io.IOException" %>
 <%@ page import="java.io.File" %>
-<%@ page import="java.io.InputStream" %>
-<%@ page import="java.io.FileOutputStream" %>
-<%@ page import="java.util.ArrayList" %>
-<%@ page import="java.util.Iterator" %>
-<%@ page import="java.util.List" %>
-<%@ page import="java.util.Map" %>
 <%@ page import="java.util.Set" %>
-
 <%@ page import="com.sun.identity.cot.CircleOfTrustManager" %>
-<%@ page import="com.sun.identity.saml2.jaxb.entityconfig.EntityConfigElement" %>
+<%@ page import="org.owasp.esapi.ESAPI"%>
 
 <script>
 function checkEmptyResource() {
@@ -128,8 +119,20 @@ function checkEmptyResource() {
 	<h1> XACML Query </h1>
 	<%
             String idpEntityID = request.getParameter("idpEntityID");
+            if (!ESAPI.validator().isValidInput("HTTP Parameter Value: " + idpEntityID, idpEntityID,
+                "HTTPParameterValue", 2000, false)){
+                    idpEntityID = "";
+            }
             String spEntityID = request.getParameter("spEntityID");
+            if (!ESAPI.validator().isValidInput("HTTP Parameter Value: " + spEntityID, spEntityID,
+                "HTTPParameterValue", 2000, false)){
+                    spEntityID = "";
+            }
             String nameIDValue = request.getParameter("nameIDValue");
+            if (!ESAPI.validator().isValidInput("HTTP Parameter Value: " + nameIDValue, nameIDValue,
+                "HTTPParameterValue", 2000, false)){
+                nameIDValue = "";
+            }
             String newNameIDValue = URLEncDec.encode(nameIDValue);
     	%>
 	<p>

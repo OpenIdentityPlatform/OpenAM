@@ -25,7 +25,7 @@
  */
 
 /*
- * Portions Copyrighted 2010-2013 ForgeRock, Inc.
+ * Portions Copyrighted 2010-2013 ForgeRock AS
  */
 
 package com.sun.identity.saml2.common;
@@ -4506,6 +4506,43 @@ public class SAML2Utils extends SAML2SDKUtils {
             debug.message("get SSOConfig failed:", e);
         }
         return null;
+    }
+
+    /**
+     * Convenience method to validate a SAML2 relay state (goto) URL, often called from a JSP.
+     * @param request Used to help establish the realm and hostEntityID
+     * @param relayState The URL to validate
+     * @param role The role of the caller
+     * @return true if the relayState is valid
+     */
+    public static boolean isRelayStateURLValid(HttpServletRequest request, String relayState, String role) {
+
+        boolean result = false;
+
+        String metaAlias = SAML2MetaUtils.getMetaAliasByUri(request.getRequestURI());
+        if (metaAlias != null) {
+            String realm = SAML2MetaUtils.getRealmByMetaAlias(metaAlias);
+            try {
+                String hostEntityID = saml2MetaManager.getEntityByMetaAlias(metaAlias);
+                if (hostEntityID != null) {
+                    SAML2Utils.validateRelayStateURL(realm, hostEntityID, relayState, role);
+                    result = true;
+                }
+            } catch (SAML2Exception e) {
+                if (debug.messageEnabled()) {
+                    debug.message("SAML2Utils.isRelayStateURLValid(): relayState " + relayState +
+                            " for role " + role + " triggered an exception: " + e.getMessage(), e);
+                }
+                result = false;
+            }
+        }
+
+        if (debug.messageEnabled()) {
+            debug.message("SAML2Utils.isRelayStateURLValid(): relayState " + relayState +
+                    " for role " + role + " was valid? " + result);
+        }
+
+        return result;
     }
 
     /**

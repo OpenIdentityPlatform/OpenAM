@@ -27,12 +27,11 @@
 --%>
 
 <%--
-   Portions Copyrighted 2013 ForgeRock, Inc.
+   Portions Copyrighted 2013 ForgeRock AS
 --%>
 
 <%@ page language="java" 
 import="java.util.*,
-java.io.*,
 java.util.logging.Level,
 com.sun.identity.plugin.session.SessionProvider,
 com.sun.identity.plugin.session.SessionManager,
@@ -48,7 +47,8 @@ com.sun.identity.saml2.meta.SAML2MetaException,
 com.sun.identity.saml2.meta.SAML2MetaUtils,
 com.sun.identity.sae.api.SecureAttrs,
 com.sun.identity.sae.api.Utils,
-org.forgerock.openam.utils.ClientUtils"
+org.forgerock.openam.utils.ClientUtils,
+org.owasp.esapi.ESAPI"
 %>
 
 <%
@@ -132,11 +132,13 @@ org.forgerock.openam.utils.ClientUtils"
         response.sendRedirect(errStr);
         return;
     }
-    String spApp = (String) request.getParameter(
-                                      SecureAttrs.SAE_PARAM_SPAPPURL);
+    String spApp = (String) request.getParameter(SecureAttrs.SAE_PARAM_SPAPPURL);
+    if (!ESAPI.validator().isValidInput("HTTP Parameter Value: " + spApp, spApp, "URL", 2000, true)) {
+            spApp = null;
+    }
     if (spApp == null ) {
         String errStr = errorUrl+"?errorcode=6&errorstring=SP_NOSPAppURL";
-	SAML2Utils.debug.error(errStr);
+	    SAML2Utils.debug.error(errStr);
         String data[] = {errStr};
         SAML2Utils.logError(Level.INFO, LogUtil.SAE_SP_ERROR, 
                    data, token, ipaddr, userid, realm, "SAE", null);
@@ -270,7 +272,11 @@ org.forgerock.openam.utils.ClientUtils"
     // Comment this redirect and uncomment the below href for debugging. 
     // The href at the bottom will take effect
     try {
-        Utils.redirect(response, spApp, sParams, action);
+        if (spApp != null && SAML2Utils.isRelayStateURLValid(request, spApp, SAML2Constants.SP_ROLE)) {
+            Utils.redirect(response, spApp, sParams, action);
+        } else {
+            throw new Exception("Redirect URL was not valid " + spApp);
+        }
     } catch (Exception ex) {
        String errStr = errorUrl
                        +"?errorcode=7&errorstring=Couldnt_redirect:"+ex

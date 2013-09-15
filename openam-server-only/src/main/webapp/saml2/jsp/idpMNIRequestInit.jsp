@@ -26,10 +26,10 @@
 
 --%>
 
+<%--
+   Portions Copyrighted 2013 ForgeRock AS
+--%>
 
-
-
-<%@ page import="com.sun.identity.shared.debug.Debug" %>
 <%@ page import="com.sun.identity.federation.common.FSUtils" %>
 <%@ page import="com.sun.identity.saml.common.SAMLUtils" %>
 <%@ page import="com.sun.identity.saml2.common.SAML2Constants" %>
@@ -38,6 +38,7 @@
 <%@ page import="com.sun.identity.saml2.meta.SAML2MetaUtils" %>
 <%@ page import="com.sun.identity.saml2.profile.DoManageNameID" %>
 <%@ page import="java.util.HashMap" %>
+<%@ page import="org.owasp.esapi.ESAPI" %>
 
 <%--
     idpMNIRequestInit.jsp initiates the ManageNameIDRequest at
@@ -108,8 +109,10 @@
             return;
         }
 
-        String RelayState = request.getParameter(SAML2Constants.RELAY_STATE);
-
+        String relayState = request.getParameter(SAML2Constants.RELAY_STATE);
+        if (!ESAPI.validator().isValidInput("HTTP Parameter Value: " + relayState, relayState, "URL", 2000, true)) {
+            relayState = null;
+        }
         String affiliationID =
             request.getParameter(SAML2Constants.AFFILIATION_ID);
 
@@ -120,8 +123,8 @@
         paramsMap.put(SAML2Constants.ROLE, SAML2Constants.IDP_ROLE);
         paramsMap.put(SAML2Constants.BINDING, binding);
 
-        if (RelayState != null) {
-            paramsMap.put(SAML2Constants.RELAY_STATE, RelayState);
+        if (relayState != null) {
+            paramsMap.put(SAML2Constants.RELAY_STATE, relayState);
         }
 
         if (affiliationID != null) {
@@ -138,8 +141,8 @@
                                           metaAlias, spEntityID, paramsMap);
 
         if (binding.equalsIgnoreCase(SAML2Constants.SOAP)) {
-            if (RelayState != null) {
-                response.sendRedirect(RelayState);
+            if (relayState != null && SAML2Utils.isRelayStateURLValid(request, relayState, SAML2Constants.IDP_ROLE)) {
+                response.sendRedirect(relayState);
             } else {
                 %>
                 <jsp:forward page="/saml2/jsp/default.jsp?message=mniSuccess" />

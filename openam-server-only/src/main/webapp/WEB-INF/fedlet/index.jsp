@@ -26,14 +26,12 @@
 
 --%>
 
-
+ <%--
+    Portions Copyrighted 2013 ForgeRock AS
+ --%>
 
 
 <%@ page import="com.sun.identity.saml2.common.SAML2Exception" %>
-<%@ page import="com.sun.identity.saml2.jaxb.metadata.IDPSSODescriptorElement" %>
-<%@ page import="com.sun.identity.saml2.jaxb.metadata.SPSSODescriptorElement" %>
-<%@ page import="com.sun.identity.saml2.jaxb.metadata.AssertionConsumerServiceElement" %>
-<%@ page import="com.sun.identity.saml2.jaxb.metadata.SingleSignOnServiceElement" %>
 <%@ page import="com.sun.identity.saml2.meta.SAML2MetaException" %>
 <%@ page import="com.sun.identity.saml2.meta.SAML2MetaManager" %>
 <%@ page import="java.io.IOException" %>
@@ -41,10 +39,9 @@
 <%@ page import="java.io.InputStream" %>
 <%@ page import="java.io.FileOutputStream" %>
 <%@ page import="java.util.ArrayList" %>
-<%@ page import="java.util.Iterator" %>
 <%@ page import="java.util.List" %>
 <%@ page import="java.util.Map" %>
-<%@ page import="java.util.HashMap" %>
+<%@ page import="org.owasp.esapi.ESAPI" %>
 
 <%@ include file="header.jspf" %>
 <%--
@@ -204,6 +201,10 @@
 
                 List trustedIDPs = new ArrayList();
                 idpEntityID = request.getParameter("idpEntityID");
+                if (!ESAPI.validator().isValidInput("HTTP Parameter Value: " +
+                    idpEntityID, idpEntityID, "HTTPParameterValue", 2000, true)){
+                        idpEntityID = null;
+                }
                 if ((idpEntityID == null) || (idpEntityID.length() == 0)) {
                     // find out all trusted IDPs
                     List idpEntities = 

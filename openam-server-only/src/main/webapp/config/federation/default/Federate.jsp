@@ -26,8 +26,15 @@
 
 --%>
 
-<%@ page language="java" import="java.util.*,java.io.*,com.sun.liberty.LibertyManager"
- %>
+ <%--
+    Portions Copyrighted 2013 ForgeRock AS
+ --%>
+
+<%@ page language="java" import="java.util.*,
+    java.io.*,
+    com.sun.liberty.LibertyManager,
+    org.owasp.esapi.ESAPI"
+%>
 <%
 boolean bLECP = LibertyManager.isLECPProfile(request);
 if(bLECP) {
@@ -45,6 +52,10 @@ if(bLECP) {
 <%
     String metaAliasKey = LibertyManager.getMetaAliasKey();
     String metaAlias = request.getParameter(metaAliasKey);
+    if (!ESAPI.validator().isValidInput("HTTP Parameter Value: " + metaAlias,
+        metaAlias,"HTTPParameterValue", 2000, false)) {
+            metaAlias = "";
+    }
 %>
 
 <%@ include file="Header.jsp"%>
@@ -64,10 +75,18 @@ if(bLECP) {
     String LRURLKey = LibertyManager.getLRURLKey();
     String selectedProvider = LibertyManager.getSelectedProviderKey();
     String LRURL = request.getParameter(LRURLKey);
+    if (!ESAPI.validator().isValidInput("HTTP Parameter Value: " + LRURL,
+            LRURL, "HTTPURI", 2000, false)){
+        LRURL = "";
+    }
     String userDN = LibertyManager.getUser(request);
     String realm = LibertyManager.getRealmByMetaAlias(metaAlias);
     String providerID = LibertyManager.getEntityID(metaAlias);
     String providerRole = LibertyManager.getProviderRole(metaAlias);
+    if (!ESAPI.validator().isValidInput("HTTP Parameter Value: " + providerRole,
+        providerRole, "HTTPParameterValue", 2000, false)){
+            providerRole = "";
+    }
     String HOME_URL = LibertyManager.getHomeURL(realm, providerID, providerRole);
     if (userDN == null) {
         String gotoUrl = HttpUtils.getRequestURL(request).toString()

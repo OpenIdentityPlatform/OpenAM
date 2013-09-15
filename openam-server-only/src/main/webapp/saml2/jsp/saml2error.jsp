@@ -24,7 +24,13 @@
 
    $Id: saml2error.jsp,v 1.3 2009/06/17 03:10:28 exu Exp $
 
---%><%--
+--%>
+
+<%--
+   Portions Copyrighted 2013 ForgeRock AS
+--%>
+
+<%--
    This is the default error display page.
    There are three parameters passed down to this URL:
      1. errorcode : Error code, this is the I18n key of the error message.
@@ -120,12 +126,21 @@
      * invalidResponse
 --%><%@ page language="java" 
         import="com.sun.identity.saml.common.SAMLConstants,                
-                com.sun.identity.saml2.common.SAML2Utils"
+                com.sun.identity.saml2.common.SAML2Utils,
+                org.owasp.esapi.ESAPI"
 %><%
     String errorCode = request.getParameter(SAMLConstants.ERROR_CODE);
+    if (!ESAPI.validator().isValidInput("HTTP Parameter Value: " + errorCode,
+        errorCode, "HTTPParameterValue", 2000, true)){
+            errorCode = null;
+    }
     String httpStatusCode = 
         request.getParameter(SAMLConstants.HTTP_STATUS_CODE);
     String errorMessage = request.getParameter(SAMLConstants.ERROR_MESSAGE);
+    if (!ESAPI.validator().isValidInput("HTTP Parameter Value: " + errorMessage,
+        errorMessage, "HTTPParameterValue", 2000, true)){
+            errorMessage = null;
+    }
     if (((errorMessage == null) || (errorMessage.length() == 0)) &&
         (errorCode != null)) {
         errorMessage = SAML2Utils.bundle.getString(errorCode);

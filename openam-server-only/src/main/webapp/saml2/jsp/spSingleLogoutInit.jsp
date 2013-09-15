@@ -26,10 +26,9 @@
 
 --%>
 <%--
-   Portions Copyrighted 2012 ForgeRock Inc
+   Portions Copyrighted 2012-2013 ForgeRock AS
 --%>
 
-<%@ page import="com.sun.identity.shared.debug.Debug" %>
 <%@ page import="com.sun.identity.plugin.session.SessionManager" %>
 <%@ page import="com.sun.identity.plugin.session.SessionException" %>
 <%@ page import="com.sun.identity.saml.common.SAMLUtils" %>
@@ -45,6 +44,7 @@
 <%@ page import="java.util.HashMap" %>
 <%@ page import="java.util.List" %>
 <%@ page import="org.owasp.esapi.ESAPI" %>
+
 
 
 <%--
@@ -82,6 +82,10 @@
 
     try {
         String RelayState = request.getParameter(SAML2Constants.RELAY_STATE);
+        if (!ESAPI.validator().isValidInput("HTTP URL: " + RelayState,
+            RelayState, "HTTPURL", 2000, true)){
+                RelayState = null;
+        }
         if (RelayState == null || RelayState.isEmpty()) {
             RelayState = request.getParameter(SAML2Constants.GOTO);
         }
@@ -107,7 +111,8 @@
             if (ssoToken == null) {
                 //There is no local session, so we can't perform the logout on the IdP,
                 //let's just return with HTTP 200
-                if (RelayState != null && !RelayState.isEmpty()) {
+                if (RelayState != null && !RelayState.isEmpty() &&
+                                    SAML2Utils.isRelayStateURLValid(request, RelayState, SAML2Constants.SP_ROLE)) {
                     response.sendRedirect(RelayState);
                 } else {
                     %>
@@ -147,7 +152,7 @@
                     SAML2Utils.debug.message("No session.");
                 }
             }
-            if (RelayState != null) {
+            if (RelayState != null && SAML2Utils.isRelayStateURLValid(request, RelayState, SAML2Constants.SP_ROLE)) {
                 response.sendRedirect(RelayState);
             } else {
                 %>
@@ -251,7 +256,8 @@
             binding,paramsMap);
         
         if (binding.equalsIgnoreCase(SAML2Constants.SOAP)) {
-            if (RelayState != null && !RelayState.isEmpty()) {
+            if (RelayState != null && !RelayState.isEmpty() &&
+                                SAML2Utils.isRelayStateURLValid(request, RelayState, SAML2Constants.SP_ROLE)) {
                 response.sendRedirect(RelayState);
             } else {
                 %>

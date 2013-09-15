@@ -26,7 +26,7 @@
 
 --%>
 <%--
-   Portions Copyrighted 2012 ForgeRock Inc
+   Portions Copyrighted 2012-2013 ForgeRock AS
    Portions Copyrighted 2012 Open Source Solution Technology Corporation
 --%>
 
@@ -34,8 +34,9 @@
 <%@page import="com.iplanet.sso.SSOToken"%>
 <%@page import="com.iplanet.sso.SSOTokenManager"%>
 <%@page import="java.io.*" %>
-<%@page import="java.net.*" %>
 <%@page import="java.util.*" %>
+<%@ page import="org.owasp.esapi.ESAPI" %>
+
 
 <%
         request.setCharacterEncoding("UTF-8");
@@ -87,8 +88,8 @@
                 rb = ResourceBundle.getBundle(RB_NAME, resLocale);
                 String data = com.sun.identity.shared.locale.Locale.getString(
                         rb, "file.upload.size.limit.exceeded", debug);
-                out.println("<div id=\"data\">" + "Error: " + data + "</div>");
-            } else {               
+                out.println("<div id=\"data\">" + "Error: " + ESAPI.encoder().encodeForHTML(data) + "</div>");
+            } else {
                 // Parses a content-type String for the boundary.
                 String contentType = request.getContentType();
                 if (contentType == null) {
@@ -110,7 +111,7 @@
                 data = data.substring(0, idx);
                 data = data.replace("<", "&lt;");
                 data = data.replace(">", "&gt;");
-                out.println("<div id=\"data\">" + data + "</div>");
+                out.println("<div id=\"data\">" + ESAPI.encoder().encodeForHTML(data) + "</div>");
             }
         } catch (IOException e) {
         } finally {

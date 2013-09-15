@@ -24,10 +24,17 @@
 
    $Id: multi.jsp,v 1.1 2009/07/02 22:00:17 exu Exp $
 
---%><%@page
+--%>
+
+<%--
+ Portions Copyrighted 2013 ForgeRock AS
+--%>
+
+<%@page
     import="com.sun.identity.wsfederation.common.WSFederationConstants"
     import="com.sun.identity.plugin.session.SessionManager"
     import="com.sun.identity.wsfederation.common.WSFederationUtils"
+    import="org.owasp.esapi.ESAPI"
 %><%
     // handle multi-federation protocol case
     Object uSession = null;
@@ -37,20 +44,36 @@
     }
     
     if ((uSession == null) || !SessionManager.getProvider().isValid(uSession)) {
-        String wreply = request.getParameter(
-            WSFederationConstants.LOGOUT_WREPLY);
+        String wreply = request.getParameter(WSFederationConstants.LOGOUT_WREPLY);
+        if (!ESAPI.validator().isValidInput("HTTP Parameter Value: " + wreply,
+            wreply, "URL", 2000, true)){
+                wreply = null;
+        }
         if ((wreply != null) && (wreply.length() != 0)) {
             response.sendRedirect(wreply);
         }
     } else {
-        request.setAttribute(WSFederationConstants.LOGOUT_WREPLY,
-            request.getParameter(WSFederationConstants.LOGOUT_WREPLY));
-        request.setAttribute(WSFederationConstants.REALM_PARAM,
-            request.getParameter(WSFederationConstants.REALM_PARAM));
-        request.setAttribute(WSFederationConstants.ENTITYID_PARAM,
-            request.getParameter(WSFederationConstants.ENTITYID_PARAM));
+        String logout = request.getParameter(WSFederationConstants.LOGOUT_WREPLY);
+        if (!ESAPI.validator().isValidInput("HTTP Parameter Value: " + logout,
+            logout, "URL", 2000, true)){
+                logout = null;
+        }
+        request.setAttribute(WSFederationConstants.LOGOUT_WREPLY, logout);
+        String realm = request.getParameter(
+            WSFederationConstants.REALM_PARAM);
+        if (!ESAPI.validator().isValidInput("HTTP Parameter Value: " + realm,
+            realm, "HTTPParameterValue", 2000, true)){
+                realm = null;
+        }
+        request.setAttribute(WSFederationConstants.REALM_PARAM, realm);
+        String entityID = request.getParameter(
+            WSFederationConstants.ENTITYID_PARAM);
+        if (!ESAPI.validator().isValidInput("HTTP Parameter Value: " + entityID,
+            entityID, "HTTPParameterValue", 2000, true)){
+                entityID = null;
+        }
+        request.setAttribute(WSFederationConstants.ENTITYID_PARAM, entityID);
 
-        WSFederationUtils.processMultiProtocolLogout(
-            request, response, uSession);
+        WSFederationUtils.processMultiProtocolLogout(request, response, uSession);
     }
 %>

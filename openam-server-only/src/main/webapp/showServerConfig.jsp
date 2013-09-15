@@ -36,21 +36,17 @@
 <%@ page import="com.iplanet.sso.SSOToken" %>
 <%@ page import="com.iplanet.sso.SSOTokenManager" %>
 <%@ page import="com.sun.identity.common.configuration.ServerConfiguration" %>
-<%@ page import="com.sun.identity.security.EncodeAction" %>
 <%@ page import="com.sun.identity.idm.IdConstants" %>
 <%@ page import="com.sun.identity.sm.SMSEntry" %>
 <%@ page import="com.sun.identity.sm.ServiceConfig" %>
 <%@ page import="com.sun.identity.sm.ServiceConfigManager" %>
-<%@ page import="java.security.AccessController" %>
 <%@ page import="java.io.File" %>
 <%@ page import="java.net.URL" %>
-<%@ page import="java.util.ResourceBundle" %>
 <%@ page import="java.util.Properties" %>
-<%@ page import="java.util.Enumeration" %>
 <%@ page import="java.util.Set" %>
 <%@ page import="java.util.StringTokenizer" %>
 <%@ page import="java.util.Iterator" %>
-<%@ page import="com.iplanet.am.util.SystemProperties" %>
+<%@ page import="org.owasp.esapi.ESAPI"%>
 
 
 <html xmlns="http://www.w3.org/1999/xhtml">
@@ -96,7 +92,7 @@
                   </td>
                   <td>
               <%
-                  out.println(propDef.getProperty("com.iplanet.am.version"));
+                  out.println(ESAPI.encoder().encodeForHTML(propDef.getProperty("com.iplanet.am.version")));
               %>
                   </td>
                   </tr>
@@ -131,10 +127,10 @@
                   </td>
                   <td>
               <%
-                  out.println(prop.getProperty("com.iplanet.am.server.protocol").trim() + "://" +
+                  out.println(ESAPI.encoder().encodeForHTML(prop.getProperty("com.iplanet.am.server.protocol").trim() + "://" +
                   prop.getProperty("com.iplanet.am.server.host").trim() + ":" +
                   prop.getProperty("com.iplanet.am.server.port").trim() +
-                  prop.getProperty("com.iplanet.am.services.deploymentDescriptor"));
+                  prop.getProperty("com.iplanet.am.services.deploymentDescriptor")));
               %>
                   </td>
                   </tr>
@@ -147,7 +143,7 @@
                   </td>
                   <td>
               <%
-                  out.println(sctx.getServerInfo());
+                  out.println(ESAPI.encoder().encodeForHTML(sctx.getServerInfo()));
               %>
                   </td>
                   </tr>
@@ -159,11 +155,11 @@
                   </td>
                   <td>
               <%
-                  out.println(System.getProperty("os.name"));
+                  out.println(ESAPI.encoder().encodeForHTML(System.getProperty("os.name")));
                   out.println(" ");
-                  out.println(System.getProperty("os.version"));
+                  out.println(ESAPI.encoder().encodeForHTML(System.getProperty("os.version")));
                   out.println(" ");
-                  out.println(System.getProperty("os.arch"));
+                  out.println(ESAPI.encoder().encodeForHTML(System.getProperty("os.arch")));
               %>
                   </td>
                   </tr>
@@ -175,7 +171,7 @@
                   </td>
                   <td>
               <%
-                  out.println(System.getProperty("java.version"));
+                  out.println(ESAPI.encoder().encodeForHTML(System.getProperty("java.version")));
               %>
                   </td>
                   </tr>
@@ -187,7 +183,7 @@
                   </td>
                   <td>
               <%
-                  out.println(request.getHeader("user-agent"));
+                  out.println(ESAPI.encoder().encodeForHTML(request.getHeader("user-agent")));
               %>
                   </td>
                   </tr>
@@ -232,7 +228,7 @@
                   </td>
                   <td>
               <%
-                  out.println(System.getProperty("java.home"));
+                  out.println(ESAPI.encoder().encodeForHTML(System.getProperty("java.home")));
               %>
                   </td>
                   </tr>
@@ -244,7 +240,7 @@
                   </td>
                   <td>
               <%
-                  out.println(ServerConfiguration.getServers(ssoToken));
+                  out.println(ESAPI.encoder().encodeForHTML(ServerConfiguration.getServers(ssoToken).toString()));
               %>
                   </td>
                   </tr>
@@ -256,7 +252,7 @@
                   </td>
                   <td>
               <%
-                  out.println(strConfigDir);
+                  out.println(ESAPI.encoder().encodeForHTML(strConfigDir));
               %>
                   </td>
                   </tr>
@@ -276,9 +272,9 @@
                       String dsname = (String)i.next();
                       ServiceConfig subConfig = svcfg.getSubConfig(dsname);
                       if (j == dsSet.size())
-                          out.println(dsname + " (" + subConfig.getSchemaID() + ")");
+                          out.println(ESAPI.encoder().encodeForHTML(dsname + " (" + subConfig.getSchemaID() + ")"));
                       else
-                          out.println(dsname + " (" + subConfig.getSchemaID() + "), ");
+                          out.println(ESAPI.encoder().encodeForHTML(dsname + " (" + subConfig.getSchemaID() + "), "));
                       j++;
                   }
               %>
@@ -292,7 +288,7 @@
                   </td>
                   <td>
               <%
-                  out.println(System.getProperty("java.runtime.name"));
+                  out.println(ESAPI.encoder().encodeForHTML(System.getProperty("java.runtime.name")));
               %>
                   </td>
                   </tr>
@@ -304,7 +300,7 @@
                   </td>
                   <td>
               <%
-                  out.println(System.getProperty("java.vm.name"));
+                  out.println(ESAPI.encoder().encodeForHTML(System.getProperty("java.vm.name")));
               %>
                   </td>
                   </tr>
@@ -316,7 +312,7 @@
                   </td>
                   <td>
               <%
-                  out.println(System.getProperty("java.vm.version"));
+                  out.println(ESAPI.encoder().encodeForHTML(System.getProperty("java.vm.version")));
               %>
                   </td>
                   </tr>
@@ -328,7 +324,7 @@
                   </td>
                   <td>
               <%
-                  out.println(System.getProperty("sun.arch.data.model") + " bit");
+                  out.println(ESAPI.encoder().encodeForHTML(System.getProperty("sun.arch.data.model")) + " bit");
               %>
                   </td>
                   </tr>
@@ -340,7 +336,7 @@
                   </td>
                   <td>
               <%
-                  out.println(System.getProperty("user.language"));
+                  out.println(ESAPI.encoder().encodeForHTML(System.getProperty("user.language")));
               %>
                   </td>
                   </tr>
@@ -356,7 +352,7 @@
                   StringTokenizer st = new StringTokenizer(strCP, ":");
                   while (st.hasMoreTokens()) {
                       String token = st.nextToken();
-                      out.println(token + "\n");
+                      out.println(ESAPI.encoder().encodeForHTML(token) + "\n");
                   }
               %>
                   </td>
@@ -369,7 +365,7 @@
                   </td>
                   <td>
               <%
-                  out.println(System.getProperty("java.vm.specification.vendor"));
+                  out.println(ESAPI.encoder().encodeForHTML(System.getProperty("java.vm.specification.vendor")));
               %>
                   </td>
                   </tr>

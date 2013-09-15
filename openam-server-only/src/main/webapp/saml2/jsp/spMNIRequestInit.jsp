@@ -26,10 +26,10 @@
 
 --%>
 
+<%--
+   Portions Copyrighted 2013 ForgeRock AS
+--%>
 
-
-
-<%@ page import="com.sun.identity.shared.debug.Debug" %>
 <%@ page import="com.sun.identity.federation.common.FSUtils" %>
 <%@ page import="com.sun.identity.saml2.common.SAML2Constants" %>
 <%@ page import="com.sun.identity.saml2.common.SAML2Utils" %>
@@ -39,6 +39,7 @@
 <%@ page import="com.sun.identity.saml2.meta.SAML2MetaUtils" %>
 <%@ page import="com.sun.identity.saml2.profile.DoManageNameID" %>
 <%@ page import="java.util.HashMap" %>
+<%@ page import="org.owasp.esapi.ESAPI" %>
 
 <%--
     idpMNIRequestInit.jsp initiates the ManageNameIDRequest at
@@ -109,11 +110,14 @@
             return;
         }
 
-        String RelayState = request.getParameter(SAML2Constants.RELAY_STATE);
+        String relayState = request.getParameter(SAML2Constants.RELAY_STATE);
+        if (!ESAPI.validator().isValidInput("HTTP Parameter Value: " + relayState, relayState, "URL", 2000, true)) {
+            relayState = null;
+        }
         
         
-        if ((RelayState == null) || (RelayState.equals(""))) {
-            RelayState = SAML2Utils.getAttributeValueFromSSOConfig(
+        if ((relayState == null) || (relayState.isEmpty())) {
+            relayState = SAML2Utils.getAttributeValueFromSSOConfig(
                 realm, hostEntity, SAML2Constants.SP_ROLE,
                 SAML2Constants.DEFAULT_RELAY_STATE);
         } 
@@ -128,8 +132,8 @@
         paramsMap.put(SAML2Constants.ROLE, SAML2Constants.SP_ROLE);
         paramsMap.put(SAML2Constants.BINDING, binding);
 
-        if (RelayState != null && !RelayState.equals("")) {
-            paramsMap.put(SAML2Constants.RELAY_STATE, RelayState);
+        if (relayState != null && !relayState.isEmpty()) {
+            paramsMap.put(SAML2Constants.RELAY_STATE, relayState);
         }
 
         if (affiliationID != null) {
@@ -146,8 +150,9 @@
                                           metaAlias, idpEntityID, paramsMap);
 
         if (binding.equalsIgnoreCase(SAML2Constants.SOAP)) {
-            if (RelayState != null && !RelayState.equals("")) {
-                response.sendRedirect(RelayState);
+            if (relayState != null && !relayState.isEmpty() &&
+                    SAML2Utils.isRelayStateURLValid(request, relayState, SAML2Constants.SP_ROLE)) {
+                response.sendRedirect(relayState);
             } else {
                 %>
                 <jsp:forward page="/saml2/jsp/default.jsp?message=mniSuccess" />
