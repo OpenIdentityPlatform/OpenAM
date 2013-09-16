@@ -4048,7 +4048,7 @@
     credentials with the second module, successfully authenticating the user
     without prompting again for her credentials, unless the credentials for
     the first module do not successfully authenticate here to the second
-    module.</para>
+    module. Just be sure to separate the options with a space and not a comma.</para>
    </step>
    <step>
     <para>Save your work.</para>
