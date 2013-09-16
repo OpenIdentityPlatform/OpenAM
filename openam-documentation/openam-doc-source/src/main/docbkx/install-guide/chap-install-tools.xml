@@ -233,7 +233,7 @@ Archive:  ~/Downloads/openam/<?eval ${ssoconfigZipFile}?>
   <step>
    <para>Unpack the tools from where you unzipped OpenAM.</para>
    <screen>$ cd /path/to/openam-tools/diagnostic
-$ unzip ~/Downloads/openam/<?eval ${ssoadminZipFile}?>
+$ unzip ~/Downloads/openam/<?eval ${diagnosticsZipFile}?>
 ...
   inflating: services/webcontainer/service.xml
   inflating: ssodtool.bat
