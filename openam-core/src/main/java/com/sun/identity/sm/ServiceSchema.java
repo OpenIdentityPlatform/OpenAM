@@ -27,9 +27,8 @@
  */
 
 /*
- * Portions Copyrighted 2011 ForgeRock AS
+ * Portions Copyrighted 2011-2013 ForgeRock AS
  */
-
 package com.sun.identity.sm;
 
 import com.iplanet.sso.SSOException;
@@ -465,7 +464,7 @@ public class ServiceSchema {
                         "sms-attributeschema-already-exists", args));
             }
         }
-        appendChildNode(nl);
+        appendAttributeSchema(nl);
     }
 
     /**
@@ -652,7 +651,7 @@ public class ServiceSchema {
             }
         }
 
-        appendChildNode(doc);
+        appendSubSchema(doc);
     }
 
     /**
@@ -736,22 +735,7 @@ public class ServiceSchema {
         return (node);
     }
 
-    // -----------------------------------------------------------
-    // Protected methods
-    // -----------------------------------------------------------
-    void appendChildNode(InputStream in, String nodeName) throws SSOException,
-            SMSException {
-        if (debug.messageEnabled()) {
-            debug.message("ServiceSchema::appendChildNode called for: "
-                    + getServiceName() + "(" + ssm.getVersion() + ") "
-                    + componentName + " + " + nodeName);
-        }
-        Document doc = SMSSchema.getXMLDocument(in, false);
-        NodeList nodes = doc.getElementsByTagName(nodeName);
-        appendChildNode(nodes);
-    }
-
-    void appendChildNode(NodeList nodes) throws SSOException, SMSException {
+    private void appendAttributeSchema(NodeList nodes) throws SSOException, SMSException {
         if (nodes == null || nodes.getLength() == 0) {
             throw (new SMSException(IUMSConstants.UMS_BUNDLE_NAME,
                     IUMSConstants.SMS_SMSSchema_no_schema_element, null));
@@ -759,20 +743,28 @@ public class ServiceSchema {
         Document schemaDoc = ssm.getDocumentCopy();
         try {
             Node schemaNode = getSchemaNode(schemaDoc);
+            NodeList childrens = schemaNode.getChildNodes();
+            Node nextSibling = null;
+            for (int i = 0; i < childrens.getLength(); i++) {
+                Node child = childrens.item(i);
+                if (Node.ELEMENT_NODE == child.getNodeType()
+                        && !SMSUtils.SCHEMA_ATTRIBUTE.equals(child.getNodeName())) {
+                    nextSibling = child;
+                    break;
+                }
+            }
             for (int i = 0; i < nodes.getLength(); i++) {
                 Node node = nodes.item(i);
                 Node iNode = schemaDoc.importNode(node, true);
-                schemaNode.appendChild(iNode);
+                schemaNode.insertBefore(iNode, nextSibling);
             }
         } catch (Exception e) {
-            throw (new SMSException(e.getMessage(), e, 
-                    "sms-cannot_append_NODE"));
+            throw (new SMSException(e.getMessage(), e, "sms-cannot_append_NODE"));
         }
         ssm.replaceSchema(schemaDoc);
     }
-    
-    void appendChildNode(Document doc)
-    throws SSOException, SMSException {
+
+    private void appendSubSchema(Document doc) throws SSOException, SMSException {
         if (doc == null) {
             throw (new SMSException(IUMSConstants.UMS_BUNDLE_NAME,
                     IUMSConstants.SMS_SMSSchema_no_schema_element, null));
@@ -783,17 +775,32 @@ public class ServiceSchema {
         try {
             Node schemaNode = getSchemaNode(schemaDoc);
             Node node = XMLUtils.getRootNode(doc, SMSUtils.SUB_SCHEMA);
-            System.out.println(XMLUtils.print(node));
+            NodeList childrens = schemaNode.getChildNodes();
+            Node nextSibling = null;
+            for (int i = 0; i < childrens.getLength(); i++) {
+                Node child = childrens.item(i);
+                if (Node.ELEMENT_NODE == child.getNodeType()
+                        && !SMSUtils.SCHEMA_ATTRIBUTE.equals(child.getNodeName())) {
+                    //In this case we've found an entry that is not an AttributeSchema, so this is definitely an
+                    //element before which we can place a SubSchema. (i.e. the found element was a SubSchema or
+                    //an OrganizationAttributeSchema). Note that this will change the order of the SubSchema
+                    //elements in the service description, however the order should not matter for SMS.
+                    nextSibling = child;
+                    break;
+                }
+            }
             Node iNode = schemaDoc.importNode(node, true);
-            schemaNode.appendChild(iNode);
+            schemaNode.insertBefore(iNode, nextSibling);
         } catch (Exception ex) {
-            throw (new SMSException(ex.getMessage(), ex, 
-                    "sms-cannot_append_NODE"));
+            throw (new SMSException(ex.getMessage(), ex, "sms-cannot_append_NODE"));
         }
        
         ssm.replaceSchema(schemaDoc);
     }
 
+    // -----------------------------------------------------------
+    // Protected methods
+    // -----------------------------------------------------------
     void removeChildNode(String nodeType, String nodeName) throws SSOException,
             SMSException {
         if (debug.messageEnabled()) {
