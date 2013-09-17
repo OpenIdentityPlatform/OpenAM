@@ -102,6 +102,9 @@ public final class IdentityResource implements CollectionResourceProvider {
     final static String MAIL_SUBJECT = "forgerockEmailServiceSMTPSubject";
     final static String MAIL_MESSAGE = "forgerockEmailServiceSMTPMessage";
 
+    final static private String UNIVERSAL_ID = "universalid";
+    final static private String MAIL = "mail";
+
     final static String EMAIL = "email";
     final static String TOKEN_ID = "tokenId";
     final static String CONFIRMATION_ID = "confirmationId";
@@ -422,6 +425,26 @@ public final class IdentityResource implements CollectionResourceProvider {
         }
     }
 
+    /**
+     * Uses an amAdmin SSOtoken to create an AMIdentity from the UID provided and checks
+     * whether the AMIdenity in context is active/inactive
+     * @param uid the universal identifier of the user
+     * @return true is the user is active;false otherwise
+     * @throws NotFoundException invalid SSOToken, invalid UID
+     */
+    private boolean isUserActive(String uid) throws NotFoundException {
+        try {
+            AMIdentity userIdentity = new AMIdentity(RestUtils.getToken(), uid);
+            return userIdentity.isActive();
+        } catch (IdRepoException idr) {
+            RestDispatcher.debug.error("IdentityResource.checkUserActive(): Invalid UID: " + uid + " Exception " + idr);
+            throw new NotFoundException("Invalid UID, could not retrived " + uid);
+        } catch (SSOException ssoe){
+            RestDispatcher.debug.error("IdentityResource.checkUserActive(): Invalid SSOToken" + " Exception " + ssoe);
+            throw new NotFoundException("Invalid SSOToken " + ssoe.getMessage());
+        }
+    }
+
     private void generateNewPasswordEmail(final ServerContext context, final ActionRequest request,
                                      final ResultHandler<JsonValue> handler){
         JsonValue result = new JsonValue(new LinkedHashMap<String, Object>(1));
@@ -448,13 +471,21 @@ public final class IdentityResource implements CollectionResourceProvider {
             dtls = idsvc.read(username, idSvcsAttrList, admin);
 
             String email = null;
+            String uid = null;
             Attribute[] attrs = dtls.getAttributes();
             for (Attribute attribute : attrs){
-                String tmp = attribute.getName();
-                if(tmp != null && !tmp.isEmpty() && tmp.equalsIgnoreCase("mail")){
+                String attributeName = attribute.getName();
+                if(MAIL.equalsIgnoreCase(attributeName)){
                     email = attribute.getValues()[0];
+                } else if(UNIVERSAL_ID.equalsIgnoreCase(attributeName)){
+                    uid = attribute.getValues()[0];
                 }
             }
+            // Check to see if user is Active/Inactive
+            if(!isUserActive(uid)){
+                throw new ForbiddenException("Request is forbidden for this user");
+            }
+            // Check if email is provided
             if(email == null || email.isEmpty()){
                 throw new InternalServerErrorException("No email provided in profile.");
             }
@@ -498,23 +529,27 @@ public final class IdentityResource implements CollectionResourceProvider {
             handler.handleResult(result);
         } catch (BadRequestException be) {
             RestDispatcher.debug.error("IdentityResource.generateNewPasswordEmail(): Cannot send email to : " + username
-                    + be.getMessage());
+                    + " Exception " + be);
             handler.handleError(be);
         } catch (NotFoundException nfe){
             RestDispatcher.debug.error("IdentityResource.generateNewPasswordEmail(): Cannot send email to : " + username
-                    + nfe.getMessage());
+                    + " Exception " + nfe);
             handler.handleError(nfe);
-        } catch (CoreTokenException cte){
+        } catch (ForbiddenException fe){
             RestDispatcher.debug.error("IdentityResource.generateNewPasswordEmail(): Cannot send email to : " + username
-                    + cte.getMessage());
+                    + " Exception " + fe);
+            handler.handleError(fe);
+        }catch (CoreTokenException cte){
+            RestDispatcher.debug.error("IdentityResource.generateNewPasswordEmail(): Cannot send email to : " + username
+                    + " Exception " + cte);
             handler.handleError(new NotFoundException("Email not sent"));
         } catch (InternalServerErrorException ise){
             RestDispatcher.debug.error("IdentityResource.generateNewPasswordEmail(): Cannot send email to : " + username
-                    + ise.getMessage());
+                    + " Exception " + ise);
             handler.handleError(ise);
         }catch (Exception e){
             RestDispatcher.debug.error("IdentityResource.generateNewPasswordEmail(): Cannot send email to : " + username
-                    + e.getMessage());
+                    + " Exception " + e);
             handler.handleError(new NotFoundException("Email not sent"));
         }
     }
