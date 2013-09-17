@@ -43,6 +43,7 @@ public class RestSecurity {
     private RestSecurityConfiguration restSecurityConfiguration;
 
     private final static String SELF_REGISTRATION = "forgerockRestSecurityServiceSelfRegistration";
+    private final static String FORGOT_PASSWORD = "forgerockRestSecurityServiceForgotPassword";
     private final static String SELF_REG_TOKEN_LIFE_TIME = "forgerockRestSecuirtySerivceSelfRegTokenTTL";
     private final static String FORGOT_PASSWORD_TOKEN_LIFE_TIME= "forgerockRestSecuirtySerivceForgotPassTokenTTL";
 
@@ -105,11 +106,13 @@ public class RestSecurity {
         final Long selfRegTokenLifeTime;
         final Long forgotPasswordTokenLifeTime;
         final Boolean selfRegistration;
+        final Boolean forgotPassword;
 
-        private RestSecurityConfiguration(Long selfRegTokenLifeTime, Long forgotPasswordLifeTime, Boolean selfRegistration) {
+        private RestSecurityConfiguration(Long selfRegTokenLifeTime, Long forgotPasswordLifeTime, Boolean selfRegistration, Boolean forgotPassword) {
             this.selfRegTokenLifeTime = selfRegTokenLifeTime;
             this.forgotPasswordTokenLifeTime = forgotPasswordLifeTime;
             this.selfRegistration = selfRegistration;
+            this.forgotPassword = forgotPassword;
         }
     }
 
@@ -117,12 +120,14 @@ public class RestSecurity {
         try {
             ServiceConfig serviceConfig = serviceConfigManager.getOrganizationConfig(realm, null);
             boolean selfRegistration = RestUtils.getBooleanAttribute(serviceConfig, SELF_REGISTRATION);
+            boolean forgotPassword = RestUtils.getBooleanAttribute(serviceConfig, FORGOT_PASSWORD);
             Long selfRegTokLifeTime = RestUtils.getLongAttribute(serviceConfig, SELF_REG_TOKEN_LIFE_TIME);
             Long forgotPassTokLifeTime = RestUtils.getLongAttribute(serviceConfig, FORGOT_PASSWORD_TOKEN_LIFE_TIME);
             RestSecurityConfiguration newRestSecuritySettings = new RestSecurityConfiguration(
                     selfRegTokLifeTime,
                     forgotPassTokLifeTime,
-                    selfRegistration);
+                    selfRegistration,
+                    forgotPassword);
 
             setProviderConfig(newRestSecuritySettings);
             if (RestDispatcher.debug.messageEnabled()) {
@@ -167,6 +172,15 @@ public class RestSecurity {
         }
     }
 
+    public boolean isForgotPassword() throws ServiceNotFoundException {
+        if ((restSecurityConfiguration != null) && (restSecurityConfiguration.forgotPassword != null)) {
+            return restSecurityConfiguration.forgotPassword;
+        } else {
+            String message = "RestSecurity::Unable to get provider setting for : "+ FORGOT_PASSWORD;
+            RestDispatcher.debug.error(message);
+            throw new ServiceNotFoundException(message);
+        }
+    }
     /**
      * Retrieves the Self-Registration CTS Token Life Time
      * @return Long representing the time that the Token shall be valid

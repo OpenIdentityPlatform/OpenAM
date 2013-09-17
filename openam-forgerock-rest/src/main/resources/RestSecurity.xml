@@ -48,16 +48,20 @@
                         <Value>false</Value>
                     </DefaultValues>
                 </AttributeSchema>
-                <AttributeSchema name="forgerockRestSecuirtySerivceSelfRegTokenTTL"
+                <AttributeSchema name="forgerockRestSecurityServiceForgotPassword"
                                  type="single"
-                                 syntax="number_range" rangeStart="0" rangeEnd="2147483647"
+                                 syntax="boolean"
                                  validator="RequiredValueValidator"
                                  i18nKey="a102">
+                    <BooleanValues>
+                        <BooleanTrueValue i18nKey="i18nTrue">true</BooleanTrueValue>
+                        <BooleanFalseValue i18nKey="i18nFalse">false</BooleanFalseValue>
+                    </BooleanValues>
                     <DefaultValues>
-                        <Value>900</Value>
+                        <Value>false</Value>
                     </DefaultValues>
                 </AttributeSchema>
-                <AttributeSchema name="forgerockRestSecuirtySerivceForgotPassTokenTTL"
+                <AttributeSchema name="forgerockRestSecuirtySerivceSelfRegTokenTTL"
                                  type="single"
                                  syntax="number_range" rangeStart="0" rangeEnd="2147483647"
                                  validator="RequiredValueValidator"
@@ -66,39 +70,15 @@
                         <Value>900</Value>
                     </DefaultValues>
                 </AttributeSchema>
-                <SubSchema name="serverconfig" inheritance="multiple">
-                    <AttributeSchema name="forgerockRestSecurityServiceSelfRegistration"
-                                     type="single"
-                                     syntax="boolean"
-                                     validator="RequiredValueValidator"
-                                     i18nKey="a101">
-                        <BooleanValues>
-                            <BooleanTrueValue i18nKey="i18nTrue">true</BooleanTrueValue>
-                            <BooleanFalseValue i18nKey="i18nFalse">false</BooleanFalseValue>
-                        </BooleanValues>
-                        <DefaultValues>
-                            <Value>false</Value>
-                        </DefaultValues>
-                    </AttributeSchema>
-                    <AttributeSchema name="forgerockRestSecuirtySerivceSelfRegTokenTTL"
-                                     type="single"
-                                     syntax="number_range" rangeStart="0" rangeEnd="2147483647"
-                                     validator="RequiredValueValidator"
-                                     i18nKey="a102">
-                        <DefaultValues>
-                            <Value>900</Value>
-                        </DefaultValues>
-                    </AttributeSchema>
-                    <AttributeSchema name="forgerockRestSecuirtySerivceForgotPassTokenTTL"
-                                     type="single"
-                                     syntax="number_range" rangeStart="0" rangeEnd="2147483647"
-                                     validator="RequiredValueValidator"
-                                     i18nKey="a103">
-                        <DefaultValues>
-                            <Value>900</Value>
-                        </DefaultValues>
-                    </AttributeSchema>
-                </SubSchema>
+                <AttributeSchema name="forgerockRestSecuirtySerivceForgotPassTokenTTL"
+                                 type="single"
+                                 syntax="number_range" rangeStart="0" rangeEnd="2147483647"
+                                 validator="RequiredValueValidator"
+                                 i18nKey="a104">
+                    <DefaultValues>
+                        <Value>900</Value>
+                    </DefaultValues>
+                </AttributeSchema>
             </Organization>
         </Schema>
     </Service>

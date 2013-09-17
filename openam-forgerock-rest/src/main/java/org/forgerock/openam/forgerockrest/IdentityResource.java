@@ -455,6 +455,19 @@ public final class IdentityResource implements CollectionResourceProvider {
         IdentityDetails dtls;
 
         try {
+
+            // Check to make sure forgotPassword enabled
+            if(restSecurity == null){
+                RestDispatcher.debug.warning("IdentityResource.generateNewPasswordEmail(): " +
+                        "Rest Security not created. restSecurity = " + restSecurity);
+                throw new NotFoundException("Rest Security Service not created" );
+            }
+            if(!restSecurity.isForgotPassword()){
+                RestDispatcher.debug.warning("IdentityResource.generateNewPasswordEmail(): Forgot Password set to : "
+                        + restSecurity.isForgotPassword());
+                throw new NotFoundException("Forgot password is not accessible.");
+            }
+
             // Generate Admin Token
             SSOToken tok = RestUtils.getToken();
             Token admin = new Token();

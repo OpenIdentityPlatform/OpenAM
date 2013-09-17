@@ -72,7 +72,7 @@
                                  syntax="password"
                                  i18nKey="a104">
                     <DefaultValues>
-                        <Value>ForgeRock2013!</Value>
+                        <Value>F0rgeRock2013!</Value>
                     </DefaultValues>
                 </AttributeSchema>
                 <AttributeSchema name="forgerockEmailServiceSMTPSSLEnabled"
@@ -151,7 +151,7 @@
                                      syntax="password"
                                      i18nKey="a104">
                         <DefaultValues>
-                            <Value>ForgeRock2013!</Value>
+                            <Value>F0rgeRock2013!</Value>
                         </DefaultValues>
                     </AttributeSchema>
                     <AttributeSchema name="forgerockEmailServiceSMTPSSLEnabled"
