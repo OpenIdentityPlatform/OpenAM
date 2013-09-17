@@ -22,7 +22,7 @@
  * "Portions Copyrighted [year] [name of copyright owner]"
  */
 
-/*global define, _ */
+/*global define, _, window, $ */
 
 define("org/forgerock/openam/ui/user/login/RESTLoginHelper", [
     "./AuthNDelegate",
@@ -51,8 +51,13 @@ define("org/forgerock/openam/ui/user/login/RESTLoginHelper", [
                 .submitRequirements(populatedRequirements)
                 .then(function (result) {
                         if (result.hasOwnProperty("tokenId")) {
-                            obj.getLoggedUser(successCallback, errorCallback);
-                            authNDelegate.resetProcess();
+                            obj.getLoggedUser(function(user){
+                                conf.setProperty('loggedUser', user);
+                                authNDelegate.setSuccessURL().then(function(){
+                                    successCallback(user);
+                                    authNDelegate.resetProcess();
+                                });
+                            }, errorCallback);
                         } else if (result.hasOwnProperty("authId")) {
                             // re-render login form for next set of required inputs
                             viewManager.refresh();
@@ -70,7 +75,11 @@ define("org/forgerock/openam/ui/user/login/RESTLoginHelper", [
     };
 
     obj.logout = function() {
-        authNDelegate.logout();
+        authNDelegate.getLoginUrlParams().done(function(p){
+            authNDelegate.logout().then(function(){
+                window.location.hash += obj.filterUrlParams(p);
+            });
+        });
     };
     
     obj.getLoggedUser = function(successCallback, errorCallback) {
@@ -95,5 +104,19 @@ define("org/forgerock/openam/ui/user/login/RESTLoginHelper", [
             errorCallback();
         }
     };
+    
+    obj.filterUrlParams = function(params){
+        var paramsToSave = ['arg','authIndexType','authIndexValue','goto','gotoOnFail','ForceAuth','locale'],
+            filteredParams = {};
+        
+        _.each(paramsToSave, function(p){
+            if(params[p]){
+                filteredParams[p] = params[p];
+            }
+        });
+        
+        return (!$.isEmptyObject(filteredParams)) ? '&' + $.param(filteredParams) : '';
+    };
+    
     return obj;
 });

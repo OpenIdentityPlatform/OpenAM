@@ -34,8 +34,9 @@ define("org/forgerock/openam/ui/user/login/AuthNDelegate", [
     "org/forgerock/commons/ui/common/main/Configuration",
     "org/forgerock/commons/ui/common/main/EventManager",
     "org/forgerock/commons/ui/common/util/CookieHelper",
-    "org/forgerock/commons/ui/common/main/Router"
-], function(constants, AbstractDelegate, configuration, eventManager, cookieHelper, router) {
+    "org/forgerock/commons/ui/common/main/Router",
+    "org/forgerock/commons/ui/common/util/UIUtils"
+], function(constants, AbstractDelegate, configuration, eventManager, cookieHelper, router, uiUtils) {
 
     var obj = new AbstractDelegate(constants.host + "/"+ constants.context + "/json/auth/1/authenticate"),
         requirementList = [],
@@ -277,6 +278,47 @@ define("org/forgerock/openam/ui/user/login/AuthNDelegate", [
                 "unauthorized": { status: "401"}
             }
         });
+    };
+    
+    obj.getLoginUrlParams = function() {
+        return obj.serviceCall({
+            type: "GET",
+            serviceUrl: constants.host + "/"+ constants.context + "/identity/json/attributes?attributenames=FullLoginURL",
+            url: "",
+            errorsHandlers: {
+                "unauthorized": { status: "401"}
+            }
+        }).then(function(p){
+            p = p.attributes[0].values[0];
+            return uiUtils.convertQueryParametersToJSON(p.substring(p.indexOf('?') + 1));
+        });
+       
+    };
+    
+    obj.setSuccessURL = function() {
+        return obj.serviceCall({
+            type: "GET",
+            serviceUrl: constants.host + "/"+ constants.context + "/identity/json/attributes?attributenames=successURL",
+            url: "",
+            errorsHandlers: {
+                "unauthorized": { status: "401"}
+            }
+        }).then(function(data){
+            var url = data.attributes[0].values[0];
+            if(url !== constants.CONSOLE_PATH || _.contains(_.map(constants.CONSOLE_USERS,function(u){return u.toLowerCase();}),configuration.loggedUser.username.toLowerCase())){
+                if(!configuration.globalData.auth.urlParams){
+                    configuration.globalData.auth.urlParams = {};
+                }
+                if(!configuration.globalData.auth.urlParams.goto){
+                    configuration.globalData.auth.urlParams.goto = url;
+                }
+            }
+            else{
+                url = "";
+            }
+            return url;
+        });
+        
     };
     
     return obj;
