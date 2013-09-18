@@ -90,6 +90,8 @@
     <para><link linkend="rest-dashboard">Displaying Dashboard Applications</link></para>
    </listitem>
   </itemizedlist>
+
+  <para>This chapter also includes a section on <xref linkend="rest-api-status-codes" />.</para>
   
   <para>For the examples in this chapter, OpenAM has c66Encode for cookies
   activated. The encoding ensures that OpenAM tokens need not be percent
@@ -221,7 +223,7 @@
    "value": " User Name: " } ], "input": [ { "name": "IDToken1", "value": "demo" } ] },
    { "type": "PasswordCallback", "output": [ { "name": "prompt", "value": " Password: " } ],
    "input": [ { "name": "IDToken2", "value": "changeit" } ] } ] }'
-   http://openam.example.com:8080/openam/json/auth/1/authenticate
+ https://openam.example.com:8443/openam/json/auth/1/authenticate
 { "tokenId": "AQIC5wM2...U3MTE4NA..*" }</screen>
    </informalexample>
 
@@ -237,7 +239,7 @@
    "value": " User Name: " } ], "input": [ { "name": "IDToken1", "value": "demo" } ] },
    { "type": "PasswordCallback", "output": [ { "name": "prompt", "value": " Password: " } ],
    "input": [ { "name": "IDToken2", "value": "changeit" } ] } ] }'
-   http://openam.example.com:8080/openam/json/auth/1/authenticate?noSession=true
+ https://openam.example.com:8443/openam/json/auth/1/authenticate?noSession=true
 { "message": "Authentication Successful" }</screen>
    </informalexample>
 
@@ -3310,5 +3312,179 @@ string=bjensen</screen>
     <para>If your application runs in a user-agent such as a browser, you can
     rely on OpenAM to handle authentication.</para>
    
-  </section> 
+  </section>
+
+  <section xml:id="rest-api-status-codes">
+   <title>REST Status Codes</title>
+
+   <para>OpenAM REST APIs respond to successful requests with HTTP status codes
+   in the 2xx range. OpenAM REST APIs respond to error conditions with HTTP
+   status codes in the 4xx and 5xx range. Status codes used are described in the
+   following list.</para>
+
+   <variablelist>
+    <varlistentry>
+     <term>200 OK</term>
+     <listitem>
+      <para>The request was successful and a resource returned, depending on the
+      request. For example, a successful HTTP GET on
+      <literal>/users/myUser</literal> returns a user profile and status code
+      200, whereas a successful HTTP DELETE returns
+      <literal>{"success","true"}</literal> and status code 200.</para>
+     </listitem>
+    </varlistentry>
+
+    <varlistentry>
+     <term>201 Created</term>
+     <listitem>
+      <para>The request succeeded and the resource was created.</para>
+     </listitem>
+    </varlistentry>
+
+    <varlistentry>
+     <term>400 Bad Request</term>
+     <listitem>
+      <para>The request was malformed as in the following example, which is
+      sending bad data in the payload for the action.</para>
+
+      <screen>$ curl --request POST --header "Content-Type: application/json"
+ --data '{"bad":"data"}'
+ https://openam.example.com:8443/openam/json/users?_action=forgotPassword
+{"code":400,"reason":"Bad Request","message":"Username not provided"}</screen>
+     </listitem>
+    </varlistentry>
+
+    <varlistentry>
+     <term>401 Unauthorized</term>
+     <listitem>
+      <para>The request requires user authentication as in the following
+      example, which is missing an SSO Token value.</para>
+
+      <screen>$ curl --request POST
+ https://openam.example.com:8443/openam/json/sessions?_action=logout
+{ "code": 401, "reason": "Unauthorized", "message": "Access denied" }</screen>
+     </listitem>
+    </varlistentry>
+
+    <varlistentry>
+     <term>403 Forbidden</term>
+     <listitem>
+      <para>Access was forbidden during an operation on a resource as in the
+      following example, which has a regular user trying to read the OpenAM
+      administrator profile.</para>
+
+      <screen>$ curl --request POST
+ "https://openam.example.com:8443/openam/json/auth/1/authenticate?username=demo
+  &amp;password=changeit"
+{ "tokenId": "AQIC5w...YyMA..*" }
+$ curl --header "iplanetDirectoryPro: AQIC5w...YyMA..*"
+ https://openam.example.com:8443/openam/json/users/amadmin
+{
+    "code": 403,
+    "reason": "Forbidden",
+    "message": "Permission to perform the read operation denied to
+                id=demo,ou=user,dc=openam,dc=forgerock,dc=org"
+}</screen>
+     </listitem>
+    </varlistentry>
+
+    <varlistentry>
+     <term>404 Not Found</term>
+     <listitem>
+      <para>The specified resource could not be found as in the following
+      example, which is attempting to read a nonexistent user's profile.</para>
+
+      <screen>$ curl --header "iplanetDirectoryPro: AQIC5w...NTcy*"
+   https://openam.example.com:8443/openam/json/users/missing
+  {"code":404,"reason":"Not Found","message":"Resource cannot be found."}</screen>
+     </listitem>
+    </varlistentry>
+
+    <varlistentry>
+     <term>405 Method Not Allowed</term>
+     <listitem>
+      <para>The HTTP method is not allowed for the requested resource.</para>
+     </listitem>
+    </varlistentry>
+
+    <varlistentry>
+     <term>409 Conflict</term>
+     <listitem>
+      <para>The request would have resulted in a conflict with the current
+      state of the resource.</para>
+     </listitem>
+    </varlistentry>
+
+    <!-- Object versioning does not seem to be used in OpenAM REST.
+    <varlistentry>
+     <term>412 Precondition Failed</term>
+     <listitem>
+      <para>The current version of the resource did not match the version
+      provided.</para>
+     </listitem>
+    </varlistentry>
+    -->
+
+    <varlistentry>
+     <term>415 Unsupported Media Type</term>
+     <listitem>
+      <para>The request is in a format not supported by the requested resource
+      for the requested method as in the following example, which is attempting
+      to pass basic authentication credentials as form-encoded data rather than
+      query string parameters.</para>
+
+      <screen>$ curl --request POST --data "username=demo&amp;password=changeit"
+ https://openam.example.com:8443/openam/json/auth/1/authenticate
+...
+HTTP Status 415
+...
+The server refused this request because the request entity is in a
+ format not supported by the requested resource for the requested method
+...</screen>
+     </listitem>
+    </varlistentry>
+
+    <!-- Object versioning does not seem to be used in OpenAM REST.
+    <varlistentry>
+     <term>428 Precondition Required</term>
+     <listitem>
+      <para>The resource requires a version, and no version was supplied with
+      the request.</para>
+     </listitem>
+    </varlistentry>
+    -->
+
+    <varlistentry>
+     <term>500 Internal Server Error</term>
+     <listitem>
+      <para>The server encountered an unexpected condition which prevented it
+      from fulfilling the request.</para>
+     </listitem>
+    </varlistentry>
+
+    <varlistentry>
+     <term>501 Not Implemented</term>
+     <listitem>
+      <para>The resource does not support the functionality required to fulfill
+      the request as in the following example, which is attempting to delete
+      an entry as a delete action instead of using an HTTP DELETE request.</para>
+
+      <screen>curl --request POST --header "iplanetDirectoryPro: AQIC5w...NTcy*"
+ https://openam.example.com:8443/openam/json/users/demo?_action=delete
+{
+    "code": 501,
+    "reason": "Not Implemented",
+    "message": "Actions are not supported for resource instances"
+}</screen>
+     </listitem>
+    </varlistentry>
+
+    <varlistentry>
+     <term>503 Service Unavailable</term>
+     <listitem>
+      <para>The requested resource was temporarily unavailable.</para>
+     </listitem>
+    </varlistentry>
+   </variablelist>
+  </section>
 </chapter>
