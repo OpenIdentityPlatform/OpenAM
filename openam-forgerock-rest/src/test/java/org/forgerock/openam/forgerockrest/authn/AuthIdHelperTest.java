@@ -22,11 +22,13 @@ import com.iplanet.sso.SSOToken;
 import com.sun.identity.sm.SMSException;
 import com.sun.identity.sm.ServiceConfig;
 import com.sun.identity.sm.ServiceConfigManager;
+import org.forgerock.json.fluent.JsonValue;
 import org.forgerock.json.jose.builders.JwsHeaderBuilder;
 import org.forgerock.json.jose.builders.JwtBuilderFactory;
 import org.forgerock.json.jose.builders.JwtClaimsSetBuilder;
 import org.forgerock.json.jose.builders.SignedJwtBuilder;
 import org.forgerock.json.jose.builders.SignedJwtBuilderImpl;
+import org.forgerock.json.jose.exceptions.JwtRuntimeException;
 import org.forgerock.json.jose.jws.JwsAlgorithm;
 import org.forgerock.json.jose.jws.SignedJwt;
 import org.forgerock.json.jose.jwt.Algorithm;
@@ -37,11 +39,13 @@ import org.forgerock.openam.forgerockrest.authn.core.wrappers.AuthContextLocalWr
 import org.forgerock.openam.forgerockrest.authn.core.wrappers.CoreServicesWrapper;
 import org.forgerock.openam.forgerockrest.authn.exceptions.RestAuthException;
 import org.forgerock.openam.utils.AMKeyProvider;
+import org.forgerock.openam.utils.JsonValueBuilder;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Matchers;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
+import javax.ws.rs.core.Response;
 import java.security.Key;
 import java.security.PrivateKey;
 import java.security.SignatureException;
@@ -283,6 +287,31 @@ public class AuthIdHelperTest {
     }
 
     @Test
+    public void shouldThrowRestAuthExceptionWhenReconstructingAuthIdFails() {
+
+        //Given
+        given(jwtBuilderFactory.reconstruct("AUTH_ID", SignedJwt.class)).willThrow(JwtRuntimeException.class);
+
+        //When
+        RestAuthException exception = null;
+        boolean exceptionCaught = false;
+        try {
+            authIdHelper.reconstructAuthId("AUTH_ID");
+            fail();
+        } catch (RestAuthException e) {
+            exception = e;
+            exceptionCaught = true;
+        }
+
+        //Then
+        assertTrue(exceptionCaught);
+        Response response = exception.getResponse();
+        assertEquals(response.getStatus(), 400);
+        JsonValue jsonValue = JsonValueBuilder.toJsonValue((String) response.getEntity());
+        assertTrue(jsonValue.isDefined("errorMessage"));
+    }
+
+    @Test
     public void shouldVerifyAuthId() throws SignatureException, SSOException, SMSException {
 
         //Given
@@ -321,7 +350,7 @@ public class AuthIdHelperTest {
         try {
             authIdHelper.verifyAuthId("REALM_DN", "AUTH_ID");
             fail();
-        } catch (SignatureException e) {
+        } catch (RestAuthException e) {
             exceptionCaught = true;
         }
 
@@ -329,5 +358,32 @@ public class AuthIdHelperTest {
         verify(jwtBuilderFactory).reconstruct("AUTH_ID", SignedJwt.class);
         verify(signedJwt).verify(privateKey);
         assertTrue(exceptionCaught);
+    }
+
+    @Test
+    public void shouldVerifyAuthIdAndFailWhenReconstructingJwt() throws SignatureException, SSOException, SMSException {
+
+        //Given
+        given(jwtBuilderFactory.reconstruct("AUTH_ID", SignedJwt.class)).willThrow(JwtRuntimeException.class);
+
+        mockGetKeyAliasMethod("REALM_DN", false);
+
+        //When
+        boolean exceptionCaught = false;
+        RestAuthException exception = null;
+        try {
+            authIdHelper.verifyAuthId("REALM_DN", "AUTH_ID");
+            fail();
+        } catch (RestAuthException e) {
+            exceptionCaught = true;
+            exception = e;
+        }
+
+        //Then
+        assertTrue(exceptionCaught);
+        Response response = exception.getResponse();
+        assertEquals(response.getStatus(), 400);
+        JsonValue jsonValue = JsonValueBuilder.toJsonValue((String) response.getEntity());
+        assertTrue(jsonValue.isDefined("errorMessage"));
     }
 }

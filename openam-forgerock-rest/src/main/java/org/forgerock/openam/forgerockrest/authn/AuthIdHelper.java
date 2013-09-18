@@ -23,6 +23,7 @@ import com.sun.identity.sm.SMSException;
 import com.sun.identity.sm.ServiceConfig;
 import com.sun.identity.sm.ServiceConfigManager;
 import org.forgerock.json.jose.builders.JwtBuilderFactory;
+import org.forgerock.json.jose.exceptions.JwtRuntimeException;
 import org.forgerock.json.jose.jws.JwsAlgorithm;
 import org.forgerock.json.jose.jws.SignedJwt;
 import org.forgerock.json.jose.jwt.JwtClaimsSet;
@@ -170,7 +171,12 @@ public class AuthIdHelper {
      * @return The JWT object.
      */
     public SignedJwt reconstructAuthId(String authId) {
-        return jwtBuilderFactory.reconstruct(authId, SignedJwt.class);
+        try {
+            return jwtBuilderFactory.reconstruct(authId, SignedJwt.class);
+        } catch (JwtRuntimeException e) {
+            throw new RestAuthException(Response.Status.BAD_REQUEST, "Failed to parse JWT, " + e.getLocalizedMessage(),
+                    e);
+        }
     }
 
     /**
@@ -178,17 +184,21 @@ public class AuthIdHelper {
      *
      * @param realmDN The DN for the realm being authenticated against.
      * @param authId The authentication id JWT.
-     * @throws SignatureException If there is a problem verifying the JWT.
      */
-    public void verifyAuthId(String realmDN, String authId) throws SignatureException {
+    public void verifyAuthId(String realmDN, String authId) {
 
         String keyAlias = getKeyAlias(realmDN);
 
         PrivateKey privateKey = amKeyProvider.getPrivateKey(keyAlias);
 
-        boolean verified = jwtBuilderFactory.reconstruct(authId, SignedJwt.class).verify(privateKey);
-        if (!verified) {
-            throw new SignatureException("AuthId JWT Signature not valid");
+        try {
+            boolean verified = jwtBuilderFactory.reconstruct(authId, SignedJwt.class).verify(privateKey);
+            if (!verified) {
+                throw new RestAuthException(Response.Status.BAD_REQUEST, "AuthId JWT Signature not valid");
+            }
+        } catch (JwtRuntimeException e) {
+            throw new RestAuthException(Response.Status.BAD_REQUEST, "Failed to parse JWT, " + e.getLocalizedMessage(),
+                    e);
         }
     }
 }
