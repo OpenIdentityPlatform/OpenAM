@@ -65,6 +65,7 @@
   <menu name="OpenAM Docs (in progress)">
    <item name="All Formats" href="docs.html"/>
    <item name="Release Notes" href="./openam-documentation/openam-doc-source/doc/release-notes/index.html" />
+   <item name="Getting Started" href="./openam-documentation/openam-doc-source/doc/getting-started/index.html" />
    <item name="Installation Guide" href="./openam-documentation/openam-doc-source/doc/install-guide/index.html" />
    <item name="Upgrade Guide" href="./openam-documentation/openam-doc-source/doc/upgrade-guide/index.html" />
    <item name="Admin Guide" href="./openam-documentation/openam-doc-source/doc/admin-guide/index.html" />

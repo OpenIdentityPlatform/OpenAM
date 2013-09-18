@@ -20,7 +20,7 @@
   !
   ! CCPL HEADER END
   !
-  !      Copyright 2011-2013 ForgeRock, Inc.
+  !      Copyright 2011-2013 ForgeRock AS
   !    
 -->
 <document
@@ -36,8 +36,7 @@
    <p>This core documentation is <strong>in progress</strong> as part of
    the OpenAM project.</p>
    <p>For completed, released documentation, see <a
-   href="http://docs.forgerock.org/en/index.html?product=openam"
-   >docs.forgerock.org</a>.</p>
+   href="http://docs.forgerock.org/en/openam/">docs.forgerock.org</a>.</p>
    <dl>
     <dt>OpenAM Release Notes</dt>
     <dd><a href="./openam-documentation/openam-doc-source/doc/OpenAM-Release-Notes.epub">EPUB</a>,
@@ -45,6 +44,13 @@
     <a href="./openam-documentation/openam-doc-source/doc/release-notes/index/index.html">HTML (1 page/chapter)</a>,
     <a href="./openam-documentation/openam-doc-source/doc/OpenAM-Release-Notes.pdf">PDF</a>,
     <a href="./openam-documentation/openam-doc-source/doc/OpenAM-Release-Notes.rtf">RTF</a></dd>
+
+    <dt>Getting Started With OpenAM</dt>
+    <dd><a href="./openam-documentation/openam-doc-source/doc/OpenAM-Getting-Started.epub">EPUB</a>,
+    <a href="./openam-documentation/openam-doc-source/doc/getting-started/index.html">HTML (single page)</a>,
+    <a href="./openam-documentation/openam-doc-source/doc/getting-started/index/index.html">HTML (1 page/chapter)</a>,
+    <a href="./openam-documentation/openam-doc-source/doc/OpenAM-Getting-Started.pdf">PDF</a>,
+    <a href="./openam-documentation/openam-doc-source/doc/OpenAM-Getting-Started.rtf">RTF</a></dd>
 
     <dt>OpenAM Installation Guide</dt>
     <dd><a href="./openam-documentation/openam-doc-source/doc/OpenAM-Install-Guide.epub">EPUB</a>,
