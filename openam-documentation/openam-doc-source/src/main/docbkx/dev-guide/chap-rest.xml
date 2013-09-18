@@ -1941,49 +1941,51 @@ $ curl
 
     <screen>$ curl --request PUT --header "iplanetDirectoryPro: AQIC5w...2NzEz*"
  --header "Content-Type: application/json" --header "If-None-Match: *"
- --data '{ "userpassword": "secret12", "mail": "bjensen@example.com" }'
- https://openam.example.com:8443/openam/json/users/bjensen
+ --data '{ "username": "janedoe" userpassword": "secret12", "mail": "janedoe@example.com" }'
+ https://openam.example.com:8443/openam/json/users/janedoe
 {
-    "name": "bjensen",
+    "username": "janedoe",
     "realm": "/",
     "uid": [
-        "bjensen"
+        "janedoe"
     ],
     "mail": [
-        "bjensen@example.com"
+        "janedoe@example.com"
     ],
     "sn": [
-        "bjensen"
+        "janedoe"
     ],
     "userpassword": [
         "{SSHA}e4DJoxvYVW/nsp62XJf29ZADE16YQgrxK+XuKA=="
     ],
     "cn": [
-        "bjensen"
+        "janedoe"
     ],
     "inetuserstatus": [
         "Active"
     ],
     "dn": [
-        "uid=bjensen,ou=people,dc=openam,dc=forgerock,dc=org"
+        "uid=janedoe,ou=people,dc=openam,dc=forgerock,dc=org"
     ],
     "objectclass": [
+        "devicePrintProfilesContainer",
         "person",
         "sunIdentityServerLibertyPPService",
-        "sunFederationManagerDataStore",
         "inetorgperson",
+        "sunFederationManagerDataStore",
         "iPlanetPreferences",
         "iplanet-am-auth-configuration-service",
         "organizationalperson",
         "sunFMSAML2NameIdentifier",
         "inetuser",
+        "forgerock-am-dashboard-service",
         "iplanet-am-managed-person",
-        "sunAMAuthAccountLockout",
         "iplanet-am-user-service",
+        "sunAMAuthAccountLockout",
         "top"
     ],
     "universalid": [
-        "id=bjensen,ou=user,dc=openam,dc=forgerock,dc=org"
+        "id=janedoe,ou=user,dc=openam,dc=forgerock,dc=org"
     ]
 }</screen>
 

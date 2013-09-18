@@ -51,6 +51,11 @@
      <firstname>Péter</firstname><surname>Major</surname>
     </personname>
    </author>
+      <author>
+          <personname>
+              <firstname>Mike</firstname><surname>Jang</surname>
+          </personname>
+      </author>
   </authorgroup>
   <xinclude:include href="../legal.xml" />
   <date><?dbtimestamp format="B d, Y"?></date>
