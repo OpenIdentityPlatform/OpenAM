@@ -39,6 +39,7 @@ import javax.security.auth.message.module.ServerAuthModule;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.security.Principal;
 import java.util.Map;
 
 /**
@@ -186,6 +187,8 @@ public class LocalSSOTokenSessionModule implements ServerAuthModule {
                     authLevel = ssoToken.getAuthLevel();
                     String name = ssoToken.getPrincipal().getName();
                     handler.handle(new Callback[]{new CallerPrincipalCallback(clientSubject, name)});
+
+                    clientSubject.getPrincipals().add(ssoToken.getPrincipal());
                 } catch (SSOException e) {
                     throw new AuthException(e.getMessage());
                 } catch (UnsupportedCallbackException e) {
@@ -197,6 +200,7 @@ public class LocalSSOTokenSessionModule implements ServerAuthModule {
                 Map<String, Object> context =
                         (Map<String, Object>) messageInfo.getMap().get("org.forgerock.authentication.context");
                 context.put("authLevel", authLevel);
+                context.put("tokenId", ssoToken.getTokenID().toString());
                 //TODO add more properties to context map
 
                 return AuthStatus.SUCCESS;

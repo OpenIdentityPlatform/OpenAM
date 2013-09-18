@@ -32,8 +32,10 @@ import com.sun.identity.idm.*;
 import com.sun.identity.security.AdminTokenAction;
 import com.sun.identity.shared.Constants;
 import org.forgerock.json.resource.InternalServerErrorException;
+import org.forgerock.json.resource.SecurityContext;
 import org.forgerock.json.resource.ServerContext;
 import org.forgerock.json.resource.servlet.HttpContext;
+import org.forgerock.openam.forgerockrest.RestUtils;
 
 import java.security.AccessController;
 import java.util.*;
@@ -107,45 +109,7 @@ public class ClientResourceManager {
      * @return String with TokenID
      */
     private String getCookieFromServerContext(ServerContext context) {
-        List<String> cookies = null;
-        String cookieName = null;
-        HttpContext header = null;
-        try {
-            cookieName = SystemProperties.get("com.iplanet.am.cookie.name");
-            if (cookieName == null || cookieName.isEmpty()) {
-                return null;
-            }
-            header = context.asContext(HttpContext.class);
-            if (header == null) {
-                return null;
-            }
-            //get the cookie from header directly   as the name of com.iplanet.am.cookie.am
-            cookies = header.getHeaders().get(cookieName.toLowerCase());
-            if (cookies != null && !cookies.isEmpty()) {
-                for (String s : cookies) {
-                    if (s == null || s.isEmpty()) {
-                        return null;
-                    } else {
-                        return s;
-                    }
-                }
-            } else {  //get cookie from header parameter called cookie
-                cookies = header.getHeaders().get("cookie");
-                if (cookies != null && !cookies.isEmpty()) {
-                    for (String cookie : cookies) {
-                        String cookieNames[] = cookie.split(";"); //Split parameter up
-                        for (String c : cookieNames) {
-                            if (c.contains(cookieName)) { //if com.iplanet.am.cookie.name exists in cookie param
-                                String amCookie = c.replace(cookieName + "=", "").trim();
-                                return amCookie; //return com.iplanet.am.cookie.name value
-                            }
-                        }
-                    }
-                }
-            }
-        } catch (Exception e) {
-        }
-        return null;
+        return RestUtils.getCookieFromServerContext(context);
     }
 
     private AMIdentity getUid(ServerContext context) throws SSOException, IdRepoException{

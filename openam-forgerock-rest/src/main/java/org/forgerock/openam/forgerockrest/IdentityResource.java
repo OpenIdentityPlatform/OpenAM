@@ -1072,34 +1072,8 @@ public final class IdentityResource implements CollectionResourceProvider {
         return false;
     }
 
-    private String getPasswordFromHeader(ServerContext context){
-        List<String> cookies;
-        String cookieName = "olduserpassword";
-        HttpContext header;
-
-        try {
-            header = context.asContext(HttpContext.class);
-            if (header == null) {
-                RestDispatcher.debug.error("IdentityResource.getPasswordFromHeader :: " +
-                        "Cannot retrieve ServerContext as HttpContext");
-                return null;
-            }
-            //get the cookie from header directly   as the name of com.iplanet.am.cookie.am
-            cookies = header.getHeaders().get(cookieName.toLowerCase());
-            if (cookies != null && !cookies.isEmpty()) {
-                for (String s : cookies) {
-                    if (s == null || s.isEmpty()) {
-                        return null;
-                    } else {
-                        return s;
-                    }
-                }
-            }
-        } catch (Exception e) {
-            RestDispatcher.debug.error("IdentityResource.getPasswordFromHeader :: " +
-                    "Cannot get cookie from ServerContext!" + e);
-        }
-        return null;
+    private String getPasswordFromHeader(ServerContext context) {
+        return RestUtils.getCookieFromServerContext(context);
     }
 
     /**

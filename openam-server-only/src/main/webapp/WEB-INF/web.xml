@@ -64,6 +64,11 @@
     </filter>
 
     <filter>
+        <filter-name>CommonsAuthnContextMapperFilter</filter-name>
+        <filter-class>org.forgerock.openam.jaspi.filter.RestSecurityContextMapper</filter-class>
+    </filter>
+
+    <filter>
         <filter-name>SessionAuthorizationFilter</filter-name>
         <filter-class>org.forgerock.authz.AuthZFilter</filter-class>
         <init-param>
@@ -120,6 +125,10 @@
     </filter-mapping>
     <filter-mapping>
         <filter-name>CommonsAuthenticationFilter</filter-name>
+        <url-pattern>/json/*</url-pattern>
+    </filter-mapping>
+    <filter-mapping>
+        <filter-name>CommonsAuthnContextMapperFilter</filter-name>
         <url-pattern>/json/*</url-pattern>
     </filter-mapping>
     <filter-mapping>

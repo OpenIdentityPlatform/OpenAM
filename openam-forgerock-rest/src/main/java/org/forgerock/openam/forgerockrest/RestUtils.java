@@ -30,6 +30,7 @@ import com.sun.identity.sm.ServiceConfig;
 import org.forgerock.json.resource.ForbiddenException;
 import org.forgerock.json.resource.NotSupportedException;
 import org.forgerock.json.resource.ResultHandler;
+import org.forgerock.json.resource.SecurityContext;
 import org.forgerock.json.resource.ServerContext;
 import org.forgerock.json.resource.servlet.HttpContext;
 
@@ -54,7 +55,7 @@ final public class  RestUtils {
     private static final AMIdentity adminUserId;
 
     static {
-        token = (SSOToken) AccessController.doPrivileged(AdminTokenAction.getInstance());
+        token = AccessController.doPrivileged(AdminTokenAction.getInstance());
         adminUser = SystemProperties.get(Constants.AUTHENTICATION_SUPER_USER);
 
         if (adminUser != null) {
@@ -73,49 +74,9 @@ final public class  RestUtils {
      * @return String with TokenID
      */
     static public String getCookieFromServerContext(ServerContext context) {
-        List<String> cookies = null;
-        String cookieName = null;
-        HttpContext header = null;
-        try {
-            cookieName = SystemProperties.get("com.iplanet.am.cookie.name");
-            if (cookieName == null || cookieName.isEmpty()) {
-                RestDispatcher.debug.error("IdentityResource.getCookieFromServerContext() :: " +
-                        "Cannot retrieve SystemProperty : com.iplanet.am.cookie.name");
-                return null;
-            }
-            header = context.asContext(HttpContext.class);
-            if (header == null) {
-                RestDispatcher.debug.error("IdentityResource.getCookieFromServerContext() :: " +
-                        "Cannot retrieve ServerContext as HttpContext");
-                return null;
-            }
-            //get the cookie from header directly   as the name of com.iplanet.am.cookie.am
-            cookies = header.getHeaders().get(cookieName.toLowerCase());
-            if (cookies != null && !cookies.isEmpty()) {
-                for (String s : cookies) {
-                    if (s == null || s.isEmpty()) {
-                        return null;
-                    } else {
-                        return s;
-                    }
-                }
-            } else {  //get cookie from header parameter called cookie
-                cookies = header.getHeaders().get("cookie");
-                if (cookies != null && !cookies.isEmpty()) {
-                    for (String cookie : cookies) {
-                        String cookieNames[] = cookie.split(";"); //Split parameter up
-                        for (String c : cookieNames) {
-                            if (c.contains(cookieName)) { //if com.iplanet.am.cookie.name exists in cookie param
-                                String amCookie = c.replace(cookieName + "=", "").trim();
-                                return amCookie; //return com.iplanet.am.cookie.name value
-                            }
-                        }
-                    }
-                }
-            }
-        } catch (Exception e) {
-            RestDispatcher.debug.error("IdentityResource.getCookieFromServerContext() :: " +
-                    "Cannot get cookie from ServerContext!" + e);
+        SecurityContext securityContext = context.asContext(SecurityContext.class);
+        if (securityContext.getAuthenticationId() != null) {
+            return (String) securityContext.getAuthorizationId().get("tokenId");
         }
         return null;
     }

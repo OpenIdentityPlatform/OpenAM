@@ -16,11 +16,8 @@
 
 package org.forgerock.openam.dashboard;
 
-import com.iplanet.am.util.SystemProperties;
+import org.forgerock.json.resource.SecurityContext;
 import org.forgerock.json.resource.ServerContext;
-import org.forgerock.json.resource.servlet.HttpContext;
-
-import java.util.List;
 
 /**
  * This class contains method that help with getting information out of ServerContexts objects.
@@ -34,44 +31,9 @@ public final class ServerContextHelper {
      * @return The cookie value or null.
      */
     public static String getCookieFromServerContext(ServerContext context) {
-
-        List<String> cookies = null;
-        String cookieName = null;
-        HttpContext header = null;
-        try {
-            cookieName = SystemProperties.get("com.iplanet.am.cookie.name");
-            if (cookieName == null || cookieName.isEmpty()) {
-                return null;
-            }
-            header = context.asContext(HttpContext.class);
-            if (header == null) {
-                return null;
-            }
-            //get the cookie from header directly   as the name of com.iplanet.am.cookie.am
-            cookies = header.getHeaders().get(cookieName.toLowerCase());
-            if (cookies != null && !cookies.isEmpty()) {
-                for (String s : cookies) {
-                    if (s == null || s.isEmpty()) {
-                        return null;
-                    } else {
-                        return s;
-                    }
-                }
-            } else {  //get cookie from header parameter called cookie
-                cookies = header.getHeaders().get("cookie");
-                if (cookies != null && !cookies.isEmpty()) {
-                    for (String cookie : cookies) {
-                        String cookieNames[] = cookie.split(";"); //Split parameter up
-                        for (String c : cookieNames) {
-                            if (c.contains(cookieName)) { //if com.iplanet.am.cookie.name exists in cookie param
-                                String amCookie = c.replace(cookieName + "=", "").trim();
-                                return amCookie; //return com.iplanet.am.cookie.name value
-                            }
-                        }
-                    }
-                }
-            }
-        } catch (Exception e) {
+        SecurityContext securityContext = context.asContext(SecurityContext.class);
+        if (securityContext.getAuthenticationId() != null) {
+            return (String) securityContext.getAuthorizationId().get("tokenId");
         }
         return null;
     }

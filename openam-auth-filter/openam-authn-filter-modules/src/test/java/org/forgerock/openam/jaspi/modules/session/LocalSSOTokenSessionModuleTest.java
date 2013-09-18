@@ -18,6 +18,7 @@ package org.forgerock.openam.jaspi.modules.session;
 
 import com.iplanet.sso.SSOException;
 import com.iplanet.sso.SSOToken;
+import com.iplanet.sso.SSOTokenID;
 import org.forgerock.openam.auth.shared.AuthnRequestUtils;
 import org.forgerock.openam.auth.shared.SSOTokenFactory;
 import org.testng.annotations.BeforeMethod;
@@ -40,6 +41,7 @@ import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.testng.Assert.assertEquals;
+import static org.testng.Assert.assertTrue;
 
 /**
  * @author phill.cunnington@forgerock.com
@@ -162,12 +164,16 @@ public class LocalSSOTokenSessionModuleTest {
         Subject serviceSubject = new Subject();
         HttpServletRequest request = mock(HttpServletRequest.class);
         SSOToken ssoToken = mock(SSOToken.class);
+        SSOTokenID ssoTokenID = mock(SSOTokenID.class);
 
         Principal principal = mock(Principal.class);
         Map<String, Object> map = new HashMap<String, Object>();
         Map<String, Object> context = new HashMap<String, Object>();
+        given(ssoToken.getTokenID()).willReturn(ssoTokenID);
+        given(ssoTokenID.toString()).willReturn(tokenName);
         given(ssoToken.getPrincipal()).willReturn(principal);
         given(principal.getName()).willReturn("PRINCIPAL");
+        given(ssoToken.getAuthLevel()).willReturn(23);
 
         given(messageInfo.getRequestMessage()).willReturn(request);
         map.put("org.forgerock.authentication.context", context);
@@ -186,6 +192,10 @@ public class LocalSSOTokenSessionModuleTest {
 
         //Then
         assertEquals(authStatus, AuthStatus.SUCCESS);
+        assertEquals(context.size(), 2);
+        assertEquals(context.get("authLevel"), 23);
+        assertEquals(context.get("tokenId"), tokenName);
+        assertTrue(clientSubject.getPrincipals().contains(principal));
     }
 
     @Test
@@ -199,12 +209,16 @@ public class LocalSSOTokenSessionModuleTest {
         Subject serviceSubject = new Subject();
         HttpServletRequest request = mock(HttpServletRequest.class);
         SSOToken ssoToken = mock(SSOToken.class);
+        SSOTokenID ssoTokenID = mock(SSOTokenID.class);
 
         Principal principal = mock(Principal.class);
         Map<String, Object> map = new HashMap<String, Object>();
         Map<String, Object> context = new HashMap<String, Object>();
+        given(ssoToken.getTokenID()).willReturn(ssoTokenID);
+        given(ssoTokenID.toString()).willReturn(tokenName);
         given(ssoToken.getPrincipal()).willReturn(principal);
         given(principal.getName()).willReturn("PRINCIPAL");
+        given(ssoToken.getAuthLevel()).willReturn(23);
 
         given(messageInfo.getRequestMessage()).willReturn(request);
         map.put("org.forgerock.authentication.context", context);
@@ -229,6 +243,10 @@ public class LocalSSOTokenSessionModuleTest {
 
         //Then
         assertEquals(authStatus, AuthStatus.SUCCESS);
+        assertEquals(context.size(), 2);
+        assertEquals(context.get("authLevel"), 23);
+        assertEquals(context.get("tokenId"), tokenName);
+        assertTrue(clientSubject.getPrincipals().contains(principal));
     }
 
     @Test
