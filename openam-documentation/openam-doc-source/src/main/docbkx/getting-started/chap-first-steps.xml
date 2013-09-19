@@ -387,11 +387,11 @@ CATALINA_OPTS="-Xmx1024m -XX:MaxPermSize=256m"</screen>
 
     <para>It might take Tomcat several seconds to start. When Tomcat has
     successfully started, you should see an informational message indicating
-    how long initialization took in the
+    how long startup took in the
     <filename>/path/to/tomcat/logs/catalina.out</filename> log file:</para>
 
     <literallayout class="monospaced"
-    >INFO: Initialization processed in 4655 ms</literallayout>
+    >INFO: Server startup in 4655 ms</literallayout>
    </step>
 
    <step>
