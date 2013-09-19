@@ -2961,7 +2961,7 @@
       takes TOTP to generate the next two passwords and display them. This prevents others from 
       being able to access the users account using the OTP they entered. The user's account can be
       accessed again after the generation of the third new OTP is generated and displayed on their
-      device.For this reason, the TOTP Time-Step Interval should not be so long as to
+      device. For this reason, the TOTP Time-Step Interval should not be so long as to
       lock users out, with a recommended time of 30 seconds.</para>
    <para>An authentication chain can be created to generate an OTP from 
       either HOTP or TOTP.</para>
