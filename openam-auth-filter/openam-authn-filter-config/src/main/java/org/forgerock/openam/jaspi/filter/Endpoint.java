@@ -91,7 +91,7 @@ public class Endpoint {
         Endpoint that = (Endpoint) o;
 
         if (!httpMethod.equals(that.httpMethod)) return false;
-        if (!uri.equals(that.uri)) return false;
+        if (!uri.startsWith(that.uri)) return false;
 
         return true;
     }
