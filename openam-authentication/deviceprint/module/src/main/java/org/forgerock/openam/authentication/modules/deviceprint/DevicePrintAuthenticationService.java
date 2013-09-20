@@ -143,7 +143,7 @@ public class DevicePrintAuthenticationService {
         if (!devicePrintService.hasRequiredAttributes(currentDevicePrint)) {
             // Skipping device print auth module as could not get enough data from the client browser
             DEBUG.warning("DevicePrintModule does not have all required attributes. Profile will not be stored");
-            return ISAuthConstants.LOGIN_SUCCEED;
+            return SEND_OTP;
         }
 
         if (hasValidProfile(currentDevicePrint)) {
@@ -172,6 +172,11 @@ public class DevicePrintAuthenticationService {
             return sendOTP();
         } else if (confirmationCallback.getSelectedIndex() == 0) {
             if (isOTPResponseValid(otpCallback)) {
+                // If could not get enough data from the client browser then don't give the user a chance to
+                // save profile.
+                if (!devicePrintService.hasRequiredAttributes(currentDevicePrint)) {
+                    return ISAuthConstants.LOGIN_SUCCEED;
+                }
                 return SAVE_PROFILE;
             } else {
                 // OTP code is not valid
