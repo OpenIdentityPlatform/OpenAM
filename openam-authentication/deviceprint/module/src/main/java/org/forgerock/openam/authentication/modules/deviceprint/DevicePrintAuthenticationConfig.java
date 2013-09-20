@@ -45,6 +45,7 @@ public class DevicePrintAuthenticationConfig {
 
     public static final String PROFILE_EXPIRATION_DAYS = "iplanet-am-auth-adaptive-device-print-profile-expiration-days";
     public static final String MAX_STORED_PROFILES = "iplanet-am-auth-adaptive-device-print-maximum-profiles-stored-quantity";
+    public static final String AUTO_STORE_PROFILES = "iplanet-am-auth-adaptive-device-print-store-profiles-without-confirmation";
 
     public static final String MAX_TOLERATED_PENALTY_POINTS = "iplanet-am-auth-adaptive-device-print-max-tolerated-penalty-points";
     public static final String SCREEN_COLOUR_DEPTH_PENALTY_POINTS = "iplanet-am-auth-adaptive-device-print-screen-color-depth-penalty-points";

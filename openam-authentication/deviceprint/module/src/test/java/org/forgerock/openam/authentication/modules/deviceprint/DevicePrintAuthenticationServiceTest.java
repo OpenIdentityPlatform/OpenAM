@@ -35,6 +35,7 @@ import com.sun.identity.authentication.spi.AuthLoginException;
 import com.sun.identity.authentication.util.ISAuthConstants;
 import org.forgerock.openam.authentication.modules.deviceprint.model.DevicePrint;
 import org.forgerock.openam.authentication.modules.deviceprint.model.UserProfile;
+import org.mockito.Matchers;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
@@ -58,6 +59,7 @@ public class DevicePrintAuthenticationServiceTest {
     private HttpServletRequest request;
     private HOTPService hotpService;
     private DevicePrintService devicePrintService;
+    private DevicePrintAuthenticationConfig devicePrintAuthenticationConfig;
 
     @BeforeMethod
     public void setUp() {
@@ -65,9 +67,10 @@ public class DevicePrintAuthenticationServiceTest {
         request = mock(HttpServletRequest.class);
         hotpService = mock(HOTPService.class);
         devicePrintService = mock(DevicePrintService.class);
+        devicePrintAuthenticationConfig = mock(DevicePrintAuthenticationConfig.class);
 
         devicePrintAuthenticationService = new DevicePrintAuthenticationService(request, hotpService,
-                devicePrintService);
+                devicePrintService, devicePrintAuthenticationConfig);
     }
 
     /*
@@ -87,10 +90,10 @@ public class DevicePrintAuthenticationServiceTest {
      */
 
     /**
-     * 1) first call ISAuthConstants.LOGIN_START - device print attr populated, device print info not sufficient - should return ISAuthConstants.LOGIN_SUCCEED
+     * 1) first call ISAuthConstants.LOGIN_START - device print attr populated, device print info not sufficient - should return 2 (SEND_OPT)
      */
     @Test
-    public void shouldLoginSuccessfullyWhenDevicePrintInfoNotSufficient() throws AuthLoginException {
+    public void shouldSendOTPWhenDevicePrintInfoNotSufficient() throws AuthLoginException {
 
         //Given
         Callback[] callbacks = new Callback[1];
@@ -107,7 +110,7 @@ public class DevicePrintAuthenticationServiceTest {
         int nextState = devicePrintAuthenticationService.process(callbacks, state);
 
         //Then
-        assertEquals(nextState, ISAuthConstants.LOGIN_SUCCEED);
+        assertEquals(nextState, 2);
     }
 
     /**
@@ -192,7 +195,34 @@ public class DevicePrintAuthenticationServiceTest {
      * 5) third call, using OPT, 2 - OPT code submitted, with correct code - should return 3
      */
     @Test
-    public void shouldGotoSaveProfilePageWhenSubmittedtOTPWithCorrectErrorCode() throws AuthLoginException {
+    public void shouldGotoSaveProfilePageWhenSubmittedOTPWithCorrectCode() throws AuthLoginException {
+
+        //Given
+        Callback[] callbacks = new Callback[2];
+        PasswordCallback smsOTPCallback = mock(PasswordCallback.class);
+        ConfirmationCallback confirmationCallback = mock(ConfirmationCallback.class);
+        int state = 2;
+        String otpCode = "OTPCODE";
+
+        callbacks[0] = smsOTPCallback;
+        callbacks[1] = confirmationCallback;
+        given(smsOTPCallback.getPassword()).willReturn(otpCode.toCharArray());
+        given(confirmationCallback.getSelectedIndex()).willReturn(0);
+        given(hotpService.isValidHOTP("OTPCODE")).willReturn(true);
+        given(devicePrintService.hasRequiredAttributes(Matchers.<DevicePrint>anyObject())).willReturn(true);
+
+        //When
+        int nextState = devicePrintAuthenticationService.process(callbacks, state);
+
+        //Then
+        assertEquals(nextState, 3);
+    }
+
+    /**
+     * 5a) third call, using OPT, 2 - OPT code submitted, with correct code - with Auth Save Profile prop set to "true"
+     */
+    @Test
+    public void shouldAutoSaveProfilePageWhenSubmittedOTPWithCorrectCodeWithAuthSaveProp() throws AuthLoginException {
 
         //Given
         Callback[] callbacks = new Callback[2];
@@ -207,11 +237,15 @@ public class DevicePrintAuthenticationServiceTest {
         given(confirmationCallback.getSelectedIndex()).willReturn(0);
         given(hotpService.isValidHOTP("OTPCODE")).willReturn(true);
 
+        given(devicePrintAuthenticationConfig.getBoolean(DevicePrintAuthenticationConfig.AUTO_STORE_PROFILES))
+                .willReturn(true);
+
         //When
         int nextState = devicePrintAuthenticationService.process(callbacks, state);
 
         //Then
-        assertEquals(nextState, 3);
+        assertEquals(nextState, ISAuthConstants.LOGIN_SUCCEED);
+        verify(devicePrintService).createNewProfile(Matchers.<DevicePrint>anyObject());
     }
 
     /**

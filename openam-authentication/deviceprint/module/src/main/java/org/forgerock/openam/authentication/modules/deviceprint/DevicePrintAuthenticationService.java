@@ -34,6 +34,7 @@ import com.sun.identity.authentication.modules.hotp.HOTPService;
 import com.sun.identity.authentication.spi.AuthLoginException;
 import com.sun.identity.authentication.util.ISAuthConstants;
 import com.sun.identity.shared.debug.Debug;
+import org.forgerock.openam.authentication.modules.deviceprint.exceptions.NotUniqueUserProfileException;
 import org.forgerock.openam.authentication.modules.deviceprint.model.DevicePrint;
 import org.forgerock.openam.authentication.modules.deviceprint.model.UserProfile;
 
@@ -60,6 +61,7 @@ public class DevicePrintAuthenticationService {
     private final HttpServletRequest request;
     private final HOTPService hotpService;
     private final DevicePrintService devicePrintService;
+    private final DevicePrintAuthenticationConfig devicePrintAuthenticationConfig;
 
     private DevicePrint currentDevicePrint;
     private UserProfile selectedUserProfile;
@@ -70,12 +72,14 @@ public class DevicePrintAuthenticationService {
      * @param request The HttpServletRequest that caused the Authentication request.
      * @param hotpService An instance of the HOTP Service.
      * @param devicePrintService An instance of the DevicePrintService.
+     * @param devicePrintAuthenticationConfig An instance of the DevicePrintAuthenticationConfig.
      */
     public DevicePrintAuthenticationService(HttpServletRequest request, HOTPService hotpService,
-            DevicePrintService devicePrintService) {
+            DevicePrintService devicePrintService, DevicePrintAuthenticationConfig devicePrintAuthenticationConfig) {
         this.request = request;
         this.hotpService = hotpService;
         this.devicePrintService = devicePrintService;
+        this.devicePrintAuthenticationConfig = devicePrintAuthenticationConfig;
     }
 
     /**
@@ -109,11 +113,7 @@ public class DevicePrintAuthenticationService {
                 ChoiceCallback choiceCallback = (ChoiceCallback) callbacks[0];
 
                 if (choiceCallback.getSelectedIndexes()[0] == 0) {
-                    if (selectedUserProfile != null) {
-                        devicePrintService.updateProfile(selectedUserProfile, currentDevicePrint);
-                    } else {
-                        devicePrintService.createNewProfile(currentDevicePrint);
-                    }
+                    saveProfile();
                 } else {
                     // no need to do anything as users doesn't want to save profile
                 }
@@ -131,6 +131,19 @@ public class DevicePrintAuthenticationService {
     }
 
     /**
+     * Saves the user's DevicePrint profile or updates, dependant on if the profile is new or existing.
+     *
+     * @throws NotUniqueUserProfileException If the Device print information's id is not unique.
+     */
+    private void saveProfile() throws NotUniqueUserProfileException {
+        if (selectedUserProfile != null) {
+            devicePrintService.updateProfile(selectedUserProfile, currentDevicePrint);
+        } else {
+            devicePrintService.createNewProfile(currentDevicePrint);
+        }
+    }
+
+    /**
      * Handles the parsing of the Device Print information from the client and verifying the information contains the
      * required attributes and if the information matches a stored user's profile.
      *
@@ -142,7 +155,8 @@ public class DevicePrintAuthenticationService {
 
         if (!devicePrintService.hasRequiredAttributes(currentDevicePrint)) {
             // Skipping device print auth module as could not get enough data from the client browser
-            DEBUG.warning("DevicePrintModule does not have all required attributes. Profile will not be stored");
+            DEBUG.warning("DevicePrintModule does not have all required attributes. OTP will be sent and " +
+                    "profile will not be stored");
             return SEND_OTP;
         }
 
@@ -172,9 +186,12 @@ public class DevicePrintAuthenticationService {
             return sendOTP();
         } else if (confirmationCallback.getSelectedIndex() == 0) {
             if (isOTPResponseValid(otpCallback)) {
-                // If could not get enough data from the client browser then don't give the user a chance to
-                // save profile.
-                if (!devicePrintService.hasRequiredAttributes(currentDevicePrint)) {
+                if (devicePrintAuthenticationConfig.getBoolean(DevicePrintAuthenticationConfig.AUTO_STORE_PROFILES)) {
+                    saveProfile();
+                    return ISAuthConstants.LOGIN_SUCCEED;
+                } else if (!devicePrintService.hasRequiredAttributes(currentDevicePrint)) {
+                    // If could not get enough data from the client browser then don't give the user a chance to
+                    // save profile.
                     return ISAuthConstants.LOGIN_SUCCEED;
                 }
                 return SAVE_PROFILE;

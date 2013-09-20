@@ -128,7 +128,7 @@ public class DevicePrintModuleInitialiser {
                 devicePrintComparator);
 
         DevicePrintAuthenticationService devicePrintAuthenticationService = new DevicePrintAuthenticationService(
-                httpServletRequest, hotpService, devicePrintService);
+                httpServletRequest, hotpService, devicePrintService, config);
 
         return devicePrintAuthenticationService;
     }
