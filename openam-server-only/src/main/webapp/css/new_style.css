@@ -1,39 +1,117 @@
 /* reset */
-html,body,div,span,applet,object,iframe,h1,h2,h3,h4,h5,h6,p,blockquote,pre,a,abbr,acronym,address,big,cite,code,del,dfn,em,font,img,ins,kbd,q,s,samp,small,strike,strong,sub,sup,tt,var,b,u,i,center,dl,dt,dd,ol,ul,li,fieldset,form,label,legend,table,caption,tbody,tfoot,thead,tr,th,td{margin:0;padding:0;border:0;outline:0;font-size:100%;vertical-align:baseline;background:transparent} body{line-height:18px;} ol,ul,li{list-style:none} blockquote,q{quotes:none} blockquote:before,blockquote:after,q:before,q:after{content:"";content:none} :focus{outline:0} ins{text-decoration:none} del{text-decoration:line-through} table{border-collapse:collapse;border-spacing:0} textarea{resize:none}
+html,body,div,span,applet,object,iframe,h1,h2,h3,h4,h5,h6,p,blockquote,pre,a,abbr,acronym,address,big,cite,code,del,dfn,em,font,img,ins,kbd,q,s,samp,small,strike,strong,sub,sup,tt,var,b,u,i,center,dl,dt,dd,ol,ul,li,fieldset,form,label,legend,table,caption,tbody,tfoot,thead,tr,th,td {
+    margin: 0;
+    padding: 0;
+    border: 0;
+    outline: 0;
+    font-size: 100%;
+    vertical-align: baseline;
+    background: transparent;
+} 
+
+body {
+    line-height: 18px;
+}
+
+ol,ul,li {
+    list-style: none
+}
+
+blockquote,q {
+    quotes:none
+} 
+
+blockquote:before,blockquote:after,q:before,q:after {
+    content: "";
+    content: none
+} 
+
+:focus{
+    outline: 0
+} 
+
+ins {
+    text-decoration: none
+} 
+
+del{
+    text-decoration: line-through
+} 
+
+table{
+    border-collapse: collapse;
+    border-spacing: 0
+} 
+
+textarea{
+    resize: none
+}
 
 /**** customisable elements ****/
+
+html, body {
+    min-height: 100%;
+}
+
 body
 {
-    background-image:url(../images/body-bg.png);   /* background gradient image - must be 100px * 1500px, .png is best */
-    background-color:#b3b7bb;              /* this colour must be set to the finishing colour (at the very bottom) of the gradient */
-    color:#363636; /* default font colour */
+    background: #ffffff; /* Old browsers */
+    background: url(data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiA/Pgo8c3ZnIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyIgd2lkdGg9IjEwMCUiIGhlaWdodD0iMTAwJSIgdmlld0JveD0iMCAwIDEgMSIgcHJlc2VydmVBc3BlY3RSYXRpbz0ibm9uZSI+CiAgPGxpbmVhckdyYWRpZW50IGlkPSJncmFkLXVjZ2ctZ2VuZXJhdGVkIiBncmFkaWVudFVuaXRzPSJ1c2VyU3BhY2VPblVzZSIgeDE9IjAlIiB5MT0iMCUiIHgyPSIwJSIgeTI9IjEwMCUiPgogICAgPHN0b3Agb2Zmc2V0PSIwJSIgc3RvcC1jb2xvcj0iI2ZmZmZmZiIgc3RvcC1vcGFjaXR5PSIxIi8+CiAgICA8c3RvcCBvZmZzZXQ9IjEwMCUiIHN0b3AtY29sb3I9IiNkYmRiZGIiIHN0b3Atb3BhY2l0eT0iMSIvPgogIDwvbGluZWFyR3JhZGllbnQ+CiAgPHJlY3QgeD0iMCIgeT0iMCIgd2lkdGg9IjEiIGhlaWdodD0iMSIgZmlsbD0idXJsKCNncmFkLXVjZ2ctZ2VuZXJhdGVkKSIgLz4KPC9zdmc+);
+    background: -moz-linear-gradient(top,  #ffffff 0%, #dbdbdb 100%); /* FF3.6+ */
+    background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,#ffffff), color-stop(100%,#dbdbdb)); /* Chrome,Safari4+ */
+    background: -webkit-linear-gradient(top,  #ffffff 0%,#dbdbdb 100%); /* Chrome10+,Safari5.1+ */
+    background: -o-linear-gradient(top,  #ffffff 0%,#dbdbdb 100%); /* Opera 11.10+ */
+    background: -ms-linear-gradient(top,  #ffffff 0%,#dbdbdb 100%); /* IE10+ */
+    background: linear-gradient(to bottom,  #ffffff 0%,#dbdbdb 100%); /* W3C */
+    filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#ffffff', endColorstr='#dbdbdb',GradientType=0 ); /* IE6-8 */
+    background-position: 0, 0;
+    /*background-position: 0, 0 !important;*/
+    color: #2a2f32;
+    font-family: sans-serif;
+    font-weight: 300;
+    line-height: 1.5;
+}
+
+::selection {
+    background: #5da192;
+    text-shadow: none;
+    color: #FFF;
+}
+
+li {
+    line-height: 1.5em;
 }
 
 .logo /* brand logo (make sure you set the width and height too) */
 {
     background-image:url(../images/forge-rock.png);
-    width:226px;
-    height:60px;
+    width: 226px;
+    height: 110px;
+    background-repeat:no-repeat;
+    display:block;
+    margin:30px 0;
 }
 
 .product-logo /* product logo (should be 50px in height, width to be set below - no wider than 220px) */
 {
-    background-image:url(../images/open-am.png);
-    width:161px;
+    background-image:url(../images/stack-am.png);
+    width:106px;
+    height:102px;
+    background-repeat:no-repeat;
+    display:block;
+    margin: 15px auto auto 20px;
+    float:right;
 }
 
 .box /* the main content box */
 {
-    background-color:#FFFFFF; /* solid colour alternative for browsers that do not support gradients */
-
-    /* choose the gradient-from and gradient-to colours and replace the hex values in EACH of the rules below */
-    background-image:-webkit-gradient(linear, left top, left bottom, from(#FFFFFF), to(#cdcdcd));
-    background-image:-webkit-linear-gradient(top, #FFFFFF, #cdcdcd);
-    background-image:-moz-linear-gradient(top, #FFFFFF, #cdcdcd);
-    background-image:-ms-linear-gradient(top, #FFFFFF, #cdcdcd);
-    background-image:-o-linear-gradient(top, #FFFFFF, #cdcdcd);
-    background-image:linear-gradient(top, #FFFFFF, #cdcdcd);
-    filter: progid:DXImageTransform.Microsoft.gradient(startColorStr='#FFFFFF', EndColorStr='#cdcdcd');
+    background: #ffffff url(../images/box-bg.png) 600px -300px no-repeat;
+    padding-top: 20px;
+    margin-bottom: 30px;
+    border-radius: 0;
+    -webkit-border-radius: 0;
+    -moz-border-radius: 0;
+    box-shadow: 0 0 1px #2e3437;
 }
 
 .button /* secondary buttons */
@@ -68,10 +146,32 @@ body
     filter: progid:DXImageTransform.Microsoft.gradient(startColorStr='#fbbc87', EndColorStr='#e76a00');
 }
 
-.box h1 { color:#363636; } /* heading font colour */
+.box h1 {
+    margin: 0 0 0.2em;
+    font-size: 60px;
+    line-height: 75px;
+    font-family: "proxima-nova",sans-serif;
+    font-weight: bold;
+}
 
-.footer { color:#c2c2c2; } /* footer font colour (need to change both values here) */
-.footer a { color:#c2c2c2; }
+.box h2 {
+    font-size: 50px;
+    line-height: 56px;
+    margin: 0 0 0.5em;
+    font-family: "proxima-nova",sans-serif;
+    font-weight: bold
+}
+
+.box h3 {
+    font-size: 30px;
+    /*line-height: 1.15;*/
+    margin: 0;
+    font-family: "proxima-nova",sans-serif;
+    font-weight: bold;
+}
+
+.footer { color:#2e3437; } /* footer font colour (need to change both values here) */
+.footer a { color:#2e3437; }
 
 .message /* info/error message */
 {
@@ -102,21 +202,28 @@ body { font-family:Arial,Helvetica,Sans-Serif; font-size:12px; line-height:14px;
 h1, h1 a { font-size:20px; line-height:20px; }
 h2, h2 a { font-size:18px; line-height:18px; }
 h3, h3 a { font-size:15px; line-height:15px; }
-a { text-decoration:underline; color:#363636; }
 
-.logo
-{
-    background-repeat:no-repeat;
-    display:block;
-    margin:30px 0;
+a {
+    color: #5da192;
+    font-weight: bold;
+    text-decoration: none;
+    -webkit-transition-property: color;
+    -moz-transition-property: color;
+    -o-transition-property: color;
+    transition-property: color;
+    -webkit-transition-duration: 0.1s;
+    -moz-transition-duration: 0.1s;
+    -o-transition-duration: 0.1s;
+    transition-duration: 0.1s;
+    -webkit-transition-timing-function: ease-in-out;
+    -moz-transition-timing-function: ease-in-out;
+    -o-transition-timing-function: ease-in-out;
+    transition-timing-function: ease-in-out;
 }
 
-.product-logo
-{
-    background-repeat:no-repeat;
-    display:block;
-    height:60px;
-    float:right;
+a:hover {
+    color: #5e887f;
+    text-decoration: none;
 }
 
 .footer { margin-top:20px; font-size:10px; line-height:12px; }
@@ -125,13 +232,6 @@ a { text-decoration:underline; color:#363636; }
 {
     clear:both;
     padding:40px 0;
-    -webkit-border-radius: 10px;
-    -moz-border-radius: 10px;
-    border-radius: 10px;
-    -moz-background-clip:padding;-webkit-background-clip:padding-box; background-clip:padding-box;
-    -webkit-box-shadow: 3px 3px 5px #333333;
-    -moz-box-shadow: 3px 3px 5px #333333;
-    box-shadow: 3px 3px 5px #333333;
 }
 
 .box-spaced { padding:150px 0; }
@@ -147,11 +247,8 @@ a { text-decoration:underline; color:#363636; }
 
 .left-seperator
 { 
-    border-left:1px solid #ececec;
+    border-left:0px solid #ececec;
     margin-left:9px;
-    -webkit-box-shadow:-4px 0 2px -3px #d9d9d9;
-    -moz-box-shadow:-4px 0 2px -3px #d9d9d9;
-    box-shadow:-4px 0 2px -3px #d9d9d9;
 }
 
 .box h1 { margin-bottom:20px; }
@@ -160,10 +257,19 @@ a { text-decoration:underline; color:#363636; }
 /* form styles */
 .box-content fieldset { margin-top:10px; display:block; float:left; }
 .box-content fieldset .row:last-child { margin-top:10px; }
-.row { clear:both; margin-bottom:10px; float:left; width:100%; }
-label { font-weight:bold; display:block; float:left; width:130px; clear:both; padding:7px 10px 7px 0; }
-input.textbox
-{
+.row { clear:both; margin-bottom:10px; float:left; width:100%; white-space: nowrap;}
+label {
+    color: #666666;
+    display: block;
+    font-family: sans-serif;
+    font-size: 16px;
+    line-height: 24px;
+    font-weight: normal;
+    float: none;
+    width: auto;
+    padding: 0;
+}
+input.textbox {
     width:250px;
     display:block;
     float:left;
@@ -179,6 +285,76 @@ input.textbox
     padding:2px;
 }
 input.short { width:100px; }
+input[type=text], input[type=password], select {
+    -moz-border-bottom-colors: none;
+    -moz-border-left-colors: none;
+    -moz-border-right-colors: none;
+    -moz-border-top-colors: none;
+    background: none repeat scroll 0 0 #CCCCCC;
+    border-color: #F00B4C;
+    border-image: none;
+    border-style: solid;
+    border-width: 0px;
+    box-shadow: 0 2px 2px 0 rgba(0, 0, 0, 0.1) inset;
+    color: #666666;
+    font-family: sans-serif;
+    font-size: 16px;
+    font-weight: 400;
+    line-height: 1;
+    padding: 0.2em 0.5em;
+    width: 320px;
+    /*margin-bottom: 15px;*/
+}
+
+input[type=submit], input[type=button] {
+    margin-left: 0;
+    /*margin-left: 0 !important;*/
+}
+
+input[type=button], input[type=submit], .button {
+    background: #80b7ab;
+    border: 0px;
+    color: #FFF;
+    cursor: pointer;
+    display: block;
+    height: 1.7em;
+    font-family: sans-serif;
+    font-size: 16px;
+    font-weight: bold;
+    line-height: 1.4;
+    margin: 0 1em 0 0;
+    padding: 0px 18px;
+    text-transform: uppercase;
+    border-radius: 0;
+    -webkit-border-radius: 0;
+    -moz-border-radius: 0;
+    text-shadow: none;
+    -webkit-text-shadow: none;
+    -moz-text-shadow: none;
+    box-shadow: none;
+    -webkit-box-shadow: none;
+    -moz-box-shadow: none;
+    -webkit-transition-property: background;
+    -moz-transition-property: background;
+    -o-transition-property: background;
+    transition-property: background;
+    -webkit-transition-duration: 0.1s;
+    -moz-transition-duration: 0.1s;
+    -o-transition-duration: 0.1s;
+    transition-duration: 0.1s;
+    -webkit-transition-timing-function: ease-in-out;
+    -moz-transition-timing-function: ease-in-out;
+    -o-transition-timing-function: ease-in-out;
+    transition-timing-function: ease-in-out;
+}
+
+input[type=button]:hover, input[type=submit]:hover, .button:hover {
+    background: #5e887f;
+}
+
+input:-webkit-autofill {
+    background: #cccccc !important;
+}
 .checkbox
 {
     width:488px;
@@ -217,6 +393,13 @@ input.short { width:100px; }
     box-shadow:2px 2px 5px -1px #999;
     cursor: pointer;
 }
+a.button {
+    height: 26px;
+}
+a.button:hover {
+    color: #FFF;
+}
+
 .disabled
 {
     text-shadow:none !important;
@@ -239,10 +422,20 @@ input.short { width:100px; }
 
 
 /* messages */
-.message { padding:10px 10px 10px 40px; margin-bottom:10px; line-height:20px; font-weight:bold; }
+.message { 
+    background: none;
+    color: #f00b4c;
+    padding: 10px 10px 10px 0;
+    margin-bottom:10px; 
+    line-height:20px; 
+    font-weight:bold; 
+}
 .message h3 { margin-bottom:5px; }
 .message a { font-weight:normal; }
 .message .icon { margin-left:-30px; }
+.message p {
+    padding-top: 10px;
+}
 .no-icon { padding-left:10px; }
 
 .icon { width:20px; height:20px; display:block; float:left; }
@@ -276,4 +469,5 @@ hr { border-top:1px solid #B3B3B3; border-bottom:1px solid #FFF; border-left:0; 
 #steps li.done a { cursor:pointer; }
 
 /* customization */
-div .row .button { margin-right:5px }
+div .row .button { margin: auto 5px auto 0 }
+.container_12 .grid_3{ width:auto }
