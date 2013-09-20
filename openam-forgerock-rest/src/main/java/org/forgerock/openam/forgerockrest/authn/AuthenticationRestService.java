@@ -17,8 +17,11 @@
 package org.forgerock.openam.forgerockrest.authn;
 
 import com.google.inject.Singleton;
+import org.forgerock.json.fluent.JsonValue;
 import org.forgerock.openam.forgerockrest.authn.core.HttpMethod;
+import org.forgerock.openam.forgerockrest.authn.exceptions.RestAuthException;
 import org.forgerock.openam.guice.InjectorHolder;
+import org.forgerock.openam.utils.JsonValueBuilder;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -32,12 +35,13 @@ import javax.ws.rs.core.Context;
 import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
+import java.util.List;
 
 /**
  * JAX-RS endpoint for version 1 RESTful authentication requests.
  */
 @Singleton
-@Path("/1")
+@Path("/")
 public class AuthenticationRestService {
 
     private final RestAuthenticationHandler restAuthenticationHandler;
@@ -82,7 +86,7 @@ public class AuthenticationRestService {
      * complete and return or a JSON object containing an exception message.
      */
     @GET
-    @Path("authenticate")
+    @Path("/")
     @Produces(MediaType.APPLICATION_JSON)
     public Response authenticate(@Context HttpHeaders headers, @Context HttpServletRequest request,
             @Context HttpServletResponse response, @QueryParam("authIndexType") String authIndexType,
@@ -115,13 +119,18 @@ public class AuthenticationRestService {
      * complete and return or a JSON object containing an exception message.
      */
     @POST
-    @Path("authenticate")
-    @Consumes(MediaType.APPLICATION_JSON)
+    @Path("/")
     @Produces(MediaType.APPLICATION_JSON)
     public Response authenticate(@Context HttpHeaders headers, @Context HttpServletRequest request,
             @Context HttpServletResponse response, @QueryParam("authIndexType") String authIndexType,
             @QueryParam("authIndexValue") String authIndexValue,
             @QueryParam("sessionUpgrade") String sessionUpgradeSSOTokenId, String postBody) {
+
+        List<String> contentTypeHeader = headers.getRequestHeader(HttpHeaders.CONTENT_TYPE);
+        if (contentTypeHeader == null || !contentTypeHeader.contains(MediaType.APPLICATION_JSON)) {
+            return new RestAuthException(Response.Status.UNSUPPORTED_MEDIA_TYPE, "Unsupported Media Type")
+                    .getResponse();
+        }
 
         if (postBody != null && !"".equals(postBody)) {
             //submitReqs

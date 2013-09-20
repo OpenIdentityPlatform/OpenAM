@@ -22,7 +22,7 @@ define(function () {
     
         server.respondWith(
             "GET",   
-            "/openam/json/auth/1/authenticate?user=demo&authIndexType=user&authIndexValue=demo&locale=en-US",
+            "/openam/json/authenticate?user=demo&authIndexType=user&authIndexValue=demo&locale=en-US",
             [
                 200, 
                 { 

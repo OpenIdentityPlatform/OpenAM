@@ -16,18 +16,25 @@
 
 package org.forgerock.openam.forgerockrest.authn;
 
+import org.forgerock.json.fluent.JsonValue;
 import org.forgerock.openam.forgerockrest.authn.core.HttpMethod;
+import org.forgerock.openam.utils.JsonValueBuilder;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.ws.rs.core.HttpHeaders;
+import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
+
+import java.util.ArrayList;
+import java.util.List;
 
 import static org.mockito.Mockito.*;
 import static org.mockito.BDDMockito.*;
 import static org.testng.Assert.assertEquals;
+import static org.testng.Assert.assertTrue;
 
 public class AuthenticationRestServiceTest {
 
@@ -79,6 +86,10 @@ public class AuthenticationRestServiceTest {
         String authIndexValue = "AUTH_INDEX_VALUE";
         Response jaxrsResponse = mock(Response.class);
         String sessionUpgradeSSOTokenId = "SSO_TOKEN_ID";
+        List<String> contentTypeHeader = new ArrayList<String>();
+        contentTypeHeader.add(MediaType.APPLICATION_JSON);
+
+        given(headers.getRequestHeader(HttpHeaders.CONTENT_TYPE)).willReturn(contentTypeHeader);
 
         given(restAuthenticationHandler.initiateAuthentication(headers, request, response, authIndexType,
                 authIndexValue, sessionUpgradeSSOTokenId, HttpMethod.POST)).willReturn(jaxrsResponse);
@@ -105,6 +116,10 @@ public class AuthenticationRestServiceTest {
         String postBody = "POST_BODY";
         Response jaxrsResponse = mock(Response.class);
         String sessionUpgradeSSOTokenId = "SSO_TOKEN_ID";
+        List<String> contentTypeHeader = new ArrayList<String>();
+        contentTypeHeader.add(MediaType.APPLICATION_JSON);
+
+        given(headers.getRequestHeader(HttpHeaders.CONTENT_TYPE)).willReturn(contentTypeHeader);
 
         given(restAuthenticationHandler.continueAuthentication(headers, request, response, postBody,
                 sessionUpgradeSSOTokenId)).willReturn(jaxrsResponse);
@@ -117,5 +132,20 @@ public class AuthenticationRestServiceTest {
         assertEquals(jaxrsResponse, resp);
         verify(restAuthenticationHandler).continueAuthentication(headers, request, response, postBody,
                 sessionUpgradeSSOTokenId);
+    }
+
+    @Test
+    public void shouldFailToAuthenticateViaPOSTWhenContentTypeHeaderNotSet() {
+
+        //Given
+        HttpHeaders headers = mock(HttpHeaders.class);
+
+        //When
+        Response resp = authenticationRestService.authenticate(headers, null, null, null, null, null, null);
+
+        //Then
+        assertEquals(resp.getStatus(), 415);
+        JsonValue jsonValue = JsonValueBuilder.toJsonValue((String) resp.getEntity());
+        assertTrue(jsonValue.isDefined("errorMessage"));
     }
 }

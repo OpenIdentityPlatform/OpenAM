@@ -5,7 +5,7 @@ define(function () {
     
         server.respondWith(
             "GET",   
-            "/openam/json/auth/1/authenticate?IDToken1=demo&IDToken2=changeit&locale=en-US",
+            "/openam/json/authenticate?IDToken1=demo&IDToken2=changeit&locale=en-US",
             [
                 200, 
                 { 
@@ -23,7 +23,7 @@ define(function () {
     
         server.respondWith(
             "POST",   
-            "/openam/json/auth/1/authenticate",
+            "/openam/json/authenticate",
             [
                 200, 
                 { 

@@ -22,7 +22,7 @@ define(function () {
     
         server.respondWith(
             "GET",   
-            "/openam/json/auth/1/authenticate?module=OATH&authIndexType=module&authIndexValue=OATH&locale=en-US",
+            "/openam/json/authenticate?module=OATH&authIndexType=module&authIndexValue=OATH&locale=en-US",
             [
                 200, 
                 { 
@@ -40,7 +40,7 @@ define(function () {
     
         server.respondWith(
             "GET",   
-            "/openam/json/auth/1/authenticate?module=OATH&authIndexType=module&authIndexValue=OATH",
+            "/openam/json/authenticate?module=OATH&authIndexType=module&authIndexValue=OATH",
             [
                 200, 
                 { 

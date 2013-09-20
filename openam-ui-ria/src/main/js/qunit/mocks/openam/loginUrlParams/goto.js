@@ -5,7 +5,7 @@ define(function () {
     
         server.respondWith(
             "GET",   
-            "/openam/json/auth/1/authenticate?goto=%23gotoTest&locale=en-US",
+            "/openam/json/authenticate?goto=%23gotoTest&locale=en-US",
             [
                 200, 
                 { 
@@ -23,7 +23,7 @@ define(function () {
     
         server.respondWith(
             "POST",   
-            "/openam/json/auth/1/authenticate",
+            "/openam/json/authenticate",
             [
                 200, 
                 { 
@@ -41,7 +41,7 @@ define(function () {
     
         server.respondWith(
             "POST",   
-            "/openam/json/auth/1/authenticate?",
+            "/openam/json/authenticate?",
             [
                 200, 
                 { 

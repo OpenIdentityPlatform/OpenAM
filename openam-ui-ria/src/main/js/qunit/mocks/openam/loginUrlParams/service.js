@@ -22,7 +22,7 @@ define(function () {
     
         server.respondWith(
             "GET",   
-            "/openam/json/auth/1/authenticate?service=ldapService&authIndexType=service&authIndexValue=ldapService&locale=en-US",
+            "/openam/json/authenticate?service=ldapService&authIndexType=service&authIndexValue=ldapService&locale=en-US",
             [
                 200, 
                 { 
@@ -40,7 +40,7 @@ define(function () {
     
         server.respondWith(
             "GET",   
-            "/openam/json/auth/1/authenticate?service=ldapService&authIndexType=service&authIndexValue=ldapService",
+            "/openam/json/authenticate?service=ldapService&authIndexType=service&authIndexValue=ldapService",
             [
                 200, 
                 { 

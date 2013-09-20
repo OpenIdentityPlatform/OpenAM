@@ -42,7 +42,7 @@ define(function () {
     
         server.respondWith(
             "GET",   
-            "/openam/json/auth/1/authenticate?locale=fr",
+            "/openam/json/authenticate?locale=fr",
             [
                 200, 
                 { 

@@ -38,7 +38,7 @@ define("org/forgerock/openam/ui/user/login/AuthNDelegate", [
     "org/forgerock/commons/ui/common/util/UIUtils"
 ], function(constants, AbstractDelegate, configuration, eventManager, cookieHelper, router, uiUtils) {
 
-    var obj = new AbstractDelegate(constants.host + "/"+ constants.context + "/json/auth/1/authenticate"),
+    var obj = new AbstractDelegate(constants.host + "/"+ constants.context + "/json/authenticate"),
         requirementList = [],
         cookieName = "",
         cookieDomains = [],

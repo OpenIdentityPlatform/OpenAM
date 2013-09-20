@@ -74,7 +74,7 @@ public class AMAuthNFilterTest {
         FilterChain filterChain = mock(FilterChain.class);
 
         given(request.getContextPath()).willReturn("/openam");
-        given(request.getRequestURI()).willReturn("/openam/json/auth/1/authenticate");
+        given(request.getRequestURI()).willReturn("/openam/json/authenticate");
         given(request.getMethod()).willReturn("GET");
 
         //When
@@ -93,7 +93,7 @@ public class AMAuthNFilterTest {
         FilterChain filterChain = mock(FilterChain.class);
 
         given(request.getContextPath()).willReturn("/openam");
-        given(request.getRequestURI()).willReturn("/openam/json/auth/1/authenticate");
+        given(request.getRequestURI()).willReturn("/openam/json/authenticate");
         given(request.getMethod()).willReturn("POST");
 
         //When

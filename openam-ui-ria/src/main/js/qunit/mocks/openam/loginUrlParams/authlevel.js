@@ -22,7 +22,7 @@ define(function () {
     
         server.respondWith(
             "GET",   
-            "/openam/json/auth/1/authenticate?locale=en-US",
+            "/openam/json/authenticate?locale=en-US",
             [
                 200, 
                 { 
@@ -40,7 +40,7 @@ define(function () {
     
         server.respondWith(
             "GET",   
-            "/openam/json/auth/1/authenticate?authlevel=2&authIndexType=level&authIndexValue=2&locale=en-US",
+            "/openam/json/authenticate?authlevel=2&authIndexType=level&authIndexValue=2&locale=en-US",
             [
                 400, 
                 { 

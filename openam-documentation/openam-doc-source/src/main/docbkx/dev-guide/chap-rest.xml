@@ -128,7 +128,7 @@
 
   <itemizedlist>
    <listitem>
-    <para>Under <literal>/json/auth/1/authenticate</literal> and
+    <para>Under <literal>/json/authenticate</literal> and
     <literal>/json/sessions</literal>, you find the newer JSON-based
     APIs.</para>
 
@@ -154,11 +154,11 @@
 
    <screen> $ curl
  --request POST
- "https://openam.example.com:8443/openam/json/auth/1/authenticate
+ "https://openam.example.com:8443/openam/json/authenticate
  ?username=demo&amp;password=password"
 { "tokenId": "AQIC5w...NTcy*" }</screen>
 
-   <para>The authentication service at <literal>/json/auth/1/authenticate</literal>
+   <para>The authentication service at <literal>/json/authenticate</literal>
    also supports callback mechanisms. The callbacks make it possible to perform
    other types of authentication in addition to simple user name/password
    login.</para>
@@ -169,7 +169,7 @@
    and input which is what the client must complete and send back to
    OpenAM. The default is still user name/password authentication.</para>
 
-   <screen>$ curl https://openam.example.com:8443/openam/json/auth/1/authenticate
+   <screen>$ curl https://openam.example.com:8443/openam/json/authenticate
 {
     "authId": "...jwt-value...",
     "template": "",
@@ -223,7 +223,7 @@
    "value": " User Name: " } ], "input": [ { "name": "IDToken1", "value": "demo" } ] },
    { "type": "PasswordCallback", "output": [ { "name": "prompt", "value": " Password: " } ],
    "input": [ { "name": "IDToken2", "value": "changeit" } ] } ] }'
- https://openam.example.com:8443/openam/json/auth/1/authenticate
+ https://openam.example.com:8443/openam/json/authenticate
 { "tokenId": "AQIC5wM2...U3MTE4NA..*" }</screen>
    </informalexample>
 
@@ -239,7 +239,7 @@
    "value": " User Name: " } ], "input": [ { "name": "IDToken1", "value": "demo" } ] },
    { "type": "PasswordCallback", "output": [ { "name": "prompt", "value": " Password: " } ],
    "input": [ { "name": "IDToken2", "value": "changeit" } ] } ] }'
- https://openam.example.com:8443/openam/json/auth/1/authenticate?noSession=true
+ https://openam.example.com:8443/openam/json/authenticate?noSession=true
 { "message": "Authentication Successful" }</screen>
    </informalexample>
 
@@ -3376,7 +3376,7 @@ string=bjensen</screen>
       administrator profile.</para>
 
       <screen>$ curl --request POST
- "https://openam.example.com:8443/openam/json/auth/1/authenticate?username=demo
+ "https://openam.example.com:8443/openam/json/authenticate?username=demo
   &amp;password=changeit"
 { "tokenId": "AQIC5w...YyMA..*" }
 $ curl --header "iplanetDirectoryPro: AQIC5w...YyMA..*"
@@ -3436,7 +3436,7 @@ $ curl --header "iplanetDirectoryPro: AQIC5w...YyMA..*"
       query string parameters.</para>
 
       <screen>$ curl --request POST --data "username=demo&amp;password=changeit"
- https://openam.example.com:8443/openam/json/auth/1/authenticate
+ https://openam.example.com:8443/openam/json/authenticate
 ...
 HTTP Status 415
 ...

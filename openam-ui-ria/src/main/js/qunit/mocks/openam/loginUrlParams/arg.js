@@ -5,7 +5,7 @@ define(function () {
     
         server.respondWith(
             "GET",   
-            "/openam/json/auth/1/authenticate?arg=newsession&locale=en-US",
+            "/openam/json/authenticate?arg=newsession&locale=en-US",
             [
                 200, 
                 { 
@@ -23,7 +23,7 @@ define(function () {
     
         server.respondWith(
             "GET",   
-            "/openam/json/auth/1/authenticate?",
+            "/openam/json/authenticate?",
             [
                 200, 
                 { 
@@ -41,7 +41,7 @@ define(function () {
     
         server.respondWith(
             "GET",   
-            "/openam/json/auth/1/authenticate?arg=newsession",
+            "/openam/json/authenticate?arg=newsession",
             [
                 200, 
                 { 
@@ -59,7 +59,7 @@ define(function () {
     
         server.respondWith(
             "GET",   
-            "/openam/json/auth/1/authenticate?arg=newsession&authIndexType=module&authIndexValue=Login Url Param Tests",
+            "/openam/json/authenticate?arg=newsession&authIndexType=module&authIndexValue=Login Url Param Tests",
             [
                 200, 
                 { 

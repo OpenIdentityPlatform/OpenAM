@@ -220,7 +220,7 @@
 
        <row>
         <entry>/identity/authenticate</entry>
-        <entry>/json/auth/1/authenticate</entry>
+        <entry>/json/authenticate</entry>
        </row>
 
        <!--

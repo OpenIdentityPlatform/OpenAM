@@ -4740,7 +4740,7 @@ to a runtime exception with messages that I think suggest that it needed to be c
                 </listitem>
             </varlistentry>
             <varlistentry>
-                <term>/json/auth/1/authenticate</term>
+                <term>/json/authenticate</term>
                 <listitem>
                     <para>Authentication: Supports HTTP GET and POST methods. Can handle Integrated Windows
                     Authentication.</para>
