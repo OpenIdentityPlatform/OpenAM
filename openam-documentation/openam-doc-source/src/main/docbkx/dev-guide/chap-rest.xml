@@ -153,8 +153,8 @@
    HTTP POST to prevent the web container from logging the credentials.</para>
 
    <screen> $ curl
- --request POST
- "https://openam.example.com:8443/openam/json/authenticate
+ --request POST --header "Content-Type: application/json"
+ "https://openam.example.com:8443/openam/json/auth/1/authenticate
  ?username=demo&amp;password=password"
 { "tokenId": "AQIC5w...NTcy*" }</screen>
 
@@ -169,7 +169,8 @@
    and input which is what the client must complete and send back to
    OpenAM. The default is still user name/password authentication.</para>
 
-   <screen>$ curl https://openam.example.com:8443/openam/json/authenticate
+   <screen>$ curl --request POST --header "Content-Type: application/json"
+       https://openam.example.com:8443/openam/json/auth/1/authenticate
 {
     "authId": "...jwt-value...",
     "template": "",

@@ -103,7 +103,8 @@ define("org/forgerock/openam/ui/user/login/AuthNDelegate", [
         }
         
         obj.serviceCall({
-                type: "GET",
+                type: "POST",
+                data: "",
                 url: url,
                 errorsHandlers: {
                     "unauthorized": { status: "401"}

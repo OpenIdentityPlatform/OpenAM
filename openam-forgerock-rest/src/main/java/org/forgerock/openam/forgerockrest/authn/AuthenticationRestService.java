@@ -67,40 +67,13 @@ public class AuthenticationRestService {
     }
 
     /**
-     * Handles the initial GET RESTful call from clients to authenticate. Using the query parameters from the URL the
-     * method starts the login process and either returns an SSOToken on successful authentication or a number of
-     * Callbacks needing to be completed before authentication can proceed or an exception if any problems occurred
-     * whilst trying to authenticate.
-     *
-     * Is to be used to initiate the authentication process but NOT for zero-page login. For providing all the
-     * required information for a zero-page login see the authenticate method for POST http requests.
-     *
-     * @param headers The HttpHeaders of the RESTful call.
-     * @param request The HttpServletRequest of the RESTful call.
-     * @param response The HttpServletResponse of the RESTful call.
-     * @param authIndexType The authentication index type from the url parameters.
-     * @param authIndexValue The authentication index value from the url parameters.
-     * @param sessionUpgradeSSOTokenId The SSO Token Id of the user's current session.
-     * @return A response to be sent back to the client. The response will contain either a JSON object containing the
-     * SSOToken id from a successful authentication, a JSON object containing a number of Callbacks for the client to
-     * complete and return or a JSON object containing an exception message.
-     */
-    @GET
-    @Path("/")
-    @Produces(MediaType.APPLICATION_JSON)
-    public Response authenticate(@Context HttpHeaders headers, @Context HttpServletRequest request,
-            @Context HttpServletResponse response, @QueryParam("authIndexType") String authIndexType,
-            @QueryParam("authIndexValue") String authIndexValue,
-            @QueryParam("sessionUpgrade") String sessionUpgradeSSOTokenId) {
-
-        return restAuthenticationHandler.initiateAuthentication(headers, request, response, authIndexType,
-                authIndexValue, sessionUpgradeSSOTokenId, HttpMethod.GET);
-    }
-
-    /**
      * Handles both initial and subsequent RESTful calls from clients submitting Callbacks for the authentication
      * process to continue. This is determined by checking if the POST body is empty or not. If it is empty then this
      * is initiating the authentication process otherwise it is a subsequent call submitting Callbacks.
+     *
+     * Initiating authentication request using the query parameters from the URL starts the login process and either
+     * returns an SSOToken on successful authentication or a number of Callbacks needing to be completed before
+     * authentication can proceed or an exception if any problems occurred whilst trying to authenticate.
      *
      * Using the body of the POST request the method continues the login process, submitting the given Callbacks and
      * then either returns an SSOToken on successful authentication or a number of additional Callbacks needing to be

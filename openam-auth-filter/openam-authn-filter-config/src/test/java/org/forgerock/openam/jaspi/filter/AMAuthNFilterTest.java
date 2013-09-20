@@ -66,25 +66,6 @@ public class AMAuthNFilterTest {
     }
 
     @Test
-    public void shouldAllowUnauthenticatedRestAuthEndpointWithGET() throws IOException, ServletException {
-
-        //Given
-        HttpServletRequest request = mock(HttpServletRequest.class);
-        HttpServletResponse response = mock(HttpServletResponse.class);
-        FilterChain filterChain = mock(FilterChain.class);
-
-        given(request.getContextPath()).willReturn("/openam");
-        given(request.getRequestURI()).willReturn("/openam/json/authenticate");
-        given(request.getMethod()).willReturn("GET");
-
-        //When
-        amAuthNFilter.doFilter(request, response, filterChain);
-
-        //Then
-        verify(filterChain).doFilter(request, response);
-    }
-
-    @Test
     public void shouldAllowUnauthenticatedRestAuthEndpointWithPOST() throws IOException, ServletException {
 
         //Given
@@ -95,12 +76,14 @@ public class AMAuthNFilterTest {
         given(request.getContextPath()).willReturn("/openam");
         given(request.getRequestURI()).willReturn("/openam/json/authenticate");
         given(request.getMethod()).willReturn("POST");
+        given(request.getRequestURL()).willReturn(new StringBuffer("http://example.com:8080/openam"));
+        given(request.getContextPath()).willReturn("/openam");
 
         //When
         amAuthNFilter.doFilter(request, response, filterChain);
 
         //Then
-        verify(filterChain).doFilter(request, response);
+        verify(filterChain, never()).doFilter(request, response);
     }
 
     @Test

@@ -51,31 +51,6 @@ public class AuthenticationRestServiceTest {
     }
 
     @Test
-    public void shouldInitiateAuthenticationViaGET() {
-
-        //Given
-        HttpHeaders headers = mock(HttpHeaders.class);
-        HttpServletRequest request = mock(HttpServletRequest.class);
-        HttpServletResponse response = mock(HttpServletResponse.class);
-        String authIndexType = "AUTH_INDEX_TYPE";
-        String authIndexValue = "AUTH_INDEX_VALUE";
-        Response jaxrsResponse = mock(Response.class);
-        String sessionUpgradeSSOTokenId = "SSO_TOKEN_ID";
-
-        given(restAuthenticationHandler.initiateAuthentication(headers, request, response, authIndexType,
-                authIndexValue, sessionUpgradeSSOTokenId, HttpMethod.GET)).willReturn(jaxrsResponse);
-
-        //When
-        Response resp = authenticationRestService.authenticate(headers, request, response, authIndexType,
-                authIndexValue, sessionUpgradeSSOTokenId);
-
-        //Then
-        assertEquals(jaxrsResponse, resp);
-        verify(restAuthenticationHandler).initiateAuthentication(headers, request, response, authIndexType,
-                authIndexValue, sessionUpgradeSSOTokenId, HttpMethod.GET);
-    }
-
-    @Test
     public void shouldInitiateAuthenticationViaPOST() {
 
         //Given
