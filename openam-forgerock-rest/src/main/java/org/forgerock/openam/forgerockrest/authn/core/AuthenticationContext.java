@@ -155,4 +155,18 @@ public interface AuthenticationContext {
      * @param orgDN The organisation DN.
      */
     void setOrgDN(String orgDN);
+
+    /**
+     * Returns the Successful Login URL for the authenticated user.
+     *
+     * @return The Successful Login URL.
+     */
+    String getSuccessURL();
+
+    /**
+     * Returns the Failure Login URL for the authenticating user.
+     *
+     * @return The Failure Login URL.
+     */
+    String getFailureURL();
 }

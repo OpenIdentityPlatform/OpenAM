@@ -83,7 +83,7 @@ public class AMAuthNFilterTest {
         amAuthNFilter.doFilter(request, response, filterChain);
 
         //Then
-        verify(filterChain, never()).doFilter(request, response);
+        verify(filterChain).doFilter(request, response);
     }
 
     @Test

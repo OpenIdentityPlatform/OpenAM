@@ -134,6 +134,7 @@ public class RestAuthenticationHandler {
             HttpMethod httpMethod) {
 
         Response.ResponseBuilder responseBuilder;
+        LoginProcess loginProcess = null;
         try {
             AuthIndexType indexType = getAuthIndexType(authIndexType);
 
@@ -162,14 +163,20 @@ public class RestAuthenticationHandler {
                     .sessionId(sessionId)
                     .sessionUpgrade(sessionUpgradeSSOTokenId);
 
-            LoginProcess loginProcess = loginAuthenticator.getLoginProcess(loginConfiguration);
+            loginProcess = loginAuthenticator.getLoginProcess(loginConfiguration);
 
             responseBuilder = processAuthentication(headers, request, response, postBody, httpMethod, authId,
                     loginProcess, loginConfiguration);
 
         } catch (RestAuthException e) {
             DEBUG.error(e.getMessage());
-            return e.getResponse();
+
+            if (loginProcess != null) {
+                String failureUrl = loginProcess.getAuthContext().getFailureURL();
+                return e.getResponse(failureUrl);
+            } else {
+                return e.getResponse();
+            }
         } catch (L10NMessageImpl e) {
             DEBUG.error(e.getMessage(), e);
             return new RestAuthException(amAuthErrorCodeResponseStatusMapping.getAuthLoginExceptionResponseStatus(
@@ -266,6 +273,9 @@ public class RestAuthenticationHandler {
                 } else {
                     jsonResponseObject.put("message", "Authentication Successful");
                 }
+
+                String successUrl = loginProcess.getAuthContext().getSuccessURL();
+                jsonResponseObject.put("successUrl", successUrl);
 
                 JsonValue jsonValue = jsonResponseObject.build();
 

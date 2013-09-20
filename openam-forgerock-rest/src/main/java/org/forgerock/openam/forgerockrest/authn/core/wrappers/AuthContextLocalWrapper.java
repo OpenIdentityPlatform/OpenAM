@@ -179,4 +179,20 @@ public class AuthContextLocalWrapper implements AuthenticationContext {
     public void setOrgDN(String orgDN) {
         authContextLocal.setOrgDN(orgDN);
     }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public String getSuccessURL() {
+        return authContextLocal.getSuccessURL();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public String getFailureURL() {
+        return authContextLocal.getFailureURL();
+    }
 }

@@ -111,8 +111,9 @@ public class RestAuthenticationHandlerTest {
         assertEquals(response.getStatus(), 200);
         ObjectMapper objectMapper = new ObjectMapper();
         JsonValue jsonValue = new JsonValue(objectMapper.readValue((String) response.getEntity(), Map.class));
-        assertEquals(jsonValue.size(), 1);
+        assertEquals(jsonValue.size(), 2);
         assertEquals(jsonValue.get("tokenId").asString(), "SSO_TOKEN_ID");
+        assertTrue(jsonValue.isDefined("successUrl"));
 
         ArgumentCaptor<LoginConfiguration> argumentCaptor = ArgumentCaptor.forClass(LoginConfiguration.class);
         verify(loginAuthenticator).getLoginProcess(argumentCaptor.capture());
@@ -273,8 +274,9 @@ public class RestAuthenticationHandlerTest {
         assertEquals(response.getStatus(), 200);
         ObjectMapper objectMapper = new ObjectMapper();
         JsonValue jsonValue = new JsonValue(objectMapper.readValue((String) response.getEntity(), Map.class));
-        assertEquals(jsonValue.size(), 1);
+        assertEquals(jsonValue.size(), 2);
         assertEquals(jsonValue.get("tokenId").asString(), "SSO_TOKEN_ID");
+        assertTrue(jsonValue.isDefined("successUrl"));
         verify(loginProcess).next(callbacks);
     }
 
@@ -405,8 +407,9 @@ public class RestAuthenticationHandlerTest {
         assertEquals(response.getStatus(), 200);
         ObjectMapper objectMapper = new ObjectMapper();
         JsonValue jsonValue = new JsonValue(objectMapper.readValue((String) response.getEntity(), Map.class));
-        assertEquals(jsonValue.size(), 1);
+        assertEquals(jsonValue.size(), 2);
         assertEquals(jsonValue.get("tokenId").asString(), "SSO_TOKEN_ID");
+        assertTrue(jsonValue.isDefined("successUrl"));
 
         verify(authIdHelper).verifyAuthId("REALM_DN", "AUTH_ID");
 

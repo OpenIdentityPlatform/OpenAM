@@ -92,6 +92,18 @@ public class RestAuthException extends RuntimeException {
      * @return A JAX-RS Response object.
      */
     public Response getResponse() {
+        return getResponse(null);
+    }
+
+    /**
+     * Creates a JAX-RS Response object with the HTTP response code the exception was created with and the error
+     * message as a JSON string in the body, including the given failureUrl, if not null.
+     *
+     * @param failureUrl The failureUrl for the request.
+     * @return A JAX-RS Response object.
+     */
+    public Response getResponse(String failureUrl) {
+
 
         if (responseStatus != null) {
             statusCode = responseStatus.getStatusCode();
@@ -102,6 +114,9 @@ public class RestAuthException extends RuntimeException {
         JsonValue jsonValue = JsonValueBuilder.jsonValue()
                 .put("errorMessage", getLocalizedMessage())
                 .build();
+        if (failureUrl != null) {
+            jsonValue.put("failureUrl", failureUrl);
+        }
         responseBuilder.type(MediaType.APPLICATION_JSON_TYPE);
         responseBuilder.entity(jsonValue.toString());
 

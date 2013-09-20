@@ -156,7 +156,7 @@
  --request POST --header "Content-Type: application/json"
  "https://openam.example.com:8443/openam/json/auth/1/authenticate
  ?username=demo&amp;password=password"
-{ "tokenId": "AQIC5w...NTcy*" }</screen>
+{ "tokenId": "AQIC5w...NTcy*", "successUrl": "/openam/console" }</screen>
 
    <para>The authentication service at <literal>/json/authenticate</literal>
    also supports callback mechanisms. The callbacks make it possible to perform
@@ -170,7 +170,7 @@
    OpenAM. The default is still user name/password authentication.</para>
 
    <screen>$ curl --request POST --header "Content-Type: application/json"
-       https://openam.example.com:8443/openam/json/auth/1/authenticate
+       https://openam.example.com:8443/openam/json/authenticate
 {
     "authId": "...jwt-value...",
     "template": "",
@@ -225,7 +225,7 @@
    { "type": "PasswordCallback", "output": [ { "name": "prompt", "value": " Password: " } ],
    "input": [ { "name": "IDToken2", "value": "changeit" } ] } ] }'
  https://openam.example.com:8443/openam/json/authenticate
-{ "tokenId": "AQIC5wM2...U3MTE4NA..*" }</screen>
+{ "tokenId": "AQIC5wM2...U3MTE4NA..*", "successUrl": "/openam/console" }</screen>
    </informalexample>
 
    <para>The response is a token ID holding the SSO Token value.</para>
@@ -241,7 +241,7 @@
    { "type": "PasswordCallback", "output": [ { "name": "prompt", "value": " Password: " } ],
    "input": [ { "name": "IDToken2", "value": "changeit" } ] } ] }'
  https://openam.example.com:8443/openam/json/authenticate?noSession=true
-{ "message": "Authentication Successful" }</screen>
+{ "message": "Authentication Successful", "successUrl": "/openam/console" }</screen>
    </informalexample>
 
    <para>You can set the realm by using the realm query string parameter as
