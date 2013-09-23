@@ -2134,6 +2134,13 @@
    <para><command>ssoadm</command> service name:
    <literal>RestSecurity</literal></para>
 
+   <para>The order of options that appear in the console may vary depending on whether you are running from
+   a new installation or an upgrade of OpenAM.</para>
+
+   <!-- May be affected by OPENAM-3027, where, in an upgrade situation,
+   the  Forgot Password Token LifeTime (seconds) label has
+   been incorrectly replaced with another instance of Forgot Password for Users -->
+
    <varlistentry>
     <term>Self-Registration for Users</term>
     <listitem>
@@ -2142,6 +2149,17 @@
 
      <para><command>ssoadm</command> attribute:
      <literal>forgerockRestSecurityServiceSelfRegistration</literal></para>
+    </listitem>
+   </varlistentry>
+
+   <varlistentry>
+    <term>Forgot Password for Users</term>
+    <listitem>
+      <para>If enabled, users can assign themselves a new password using a REST API client.</para>
+      <para>Default: not enabled</para>
+
+      <para><command>ssoadm</command> attribute:
+      <literal>forgerockRestSecurityServiceForgotPassword</literal></para>
     </listitem>
    </varlistentry>
 
@@ -2162,7 +2180,7 @@
     <term>Forgot Password Token LifeTime (seconds)</term>
     <listitem>
      <para>Maximum life time for the token allowing user to process a forgotten
-     passowrd using the REST API.</para>
+     password using the REST API.</para>
 
      <para>Default: 900 (seconds)</para>
 

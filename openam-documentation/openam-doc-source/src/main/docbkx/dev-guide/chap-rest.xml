@@ -1687,6 +1687,13 @@ $ curl
   <para>The OpenAM REST API for users provides an action for handling forgotten
   passwords as long as the user has a valid email address in their profile.</para>
 
+  <para>The option is disabled by default. You can enable it in the OpenAM Console
+  globally via Configuration > Global > REST Security.</para>
+
+  <para>Alternatively, you can enable it for an individual realm under
+  Access Control > <replaceable>Realm Name</replaceable> > Services > Add >
+  REST Security.</para>
+
   <orderedlist>
    <para>An example follows, showing the steps in more detail.</para>
 
@@ -1696,7 +1703,7 @@ $ curl
     <para>In particular, you must configure the Email Service to send mail
     allowing the user to reset the forgotten password.</para>
 
-    <para>You can configure the service globally in OpenAM Console at
+    <para>You can configure the service globally in the OpenAM Console via
     Configuration > Global > Email Service.</para>
 
     <para>Alternatively, you can configure it for an individual realm under
