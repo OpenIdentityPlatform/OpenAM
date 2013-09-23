@@ -244,6 +244,23 @@
 { "message": "Authentication Successful", "successUrl": "/openam/console" }</screen>
    </informalexample>
 
+   <para>OpenAM can be configured to return a failure URL value when
+   authentication fails. No failure URL is configured by default. The Default
+   Failure Login URL can be configured for the <link xlink:show="new"
+   xlink:href="admin-guide#core-module-conf-hints"
+   xlink:role="http://docbook.org/xlink/role/olink">Core</link> authentication
+   module. Alternatively, failure URLs can be configured per authentication
+   chain, which your client can specify using the <literal>service</literal>
+   parameter described below. On failure OpenAM then returns HTTP status
+   code 401 Unauthorized, and the JSON in the reply indicates the failure
+   URL.</para>
+
+   <screen>$ curl --request POST --header "Content-Type: application/json"
+ "http://openam.example.com:8080/openam/json/authenticate
+ ?username=demo&amp;password=badpassword"
+{ "errorMessage": "Invalid Password!!",
+  "failureUrl": "http://www.example.com/401.html" }</screen>
+
    <para>You can set the realm by using the realm query string parameter as
    in <literal>?realm=myRealm</literal>.</para>
 
