@@ -73,6 +73,7 @@
  <xinclude:include href='chap-entitlements.xml' />
  <xinclude:include href='chap-realms.xml' />
  <xinclude:include href='chap-agents.xml' />
+ <xinclude:include href='chap-mobile.xml' />
  <xinclude:include href='chap-pwd-reset.xml' />
  <xinclude:include href='chap-sso.xml' />
  <xinclude:include href='chap-cdsso.xml' />
