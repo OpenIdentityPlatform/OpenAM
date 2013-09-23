@@ -156,6 +156,7 @@
  --request POST --header "Content-Type: application/json"
  "https://openam.example.com:8443/openam/json/auth/1/authenticate
  ?username=demo&amp;password=password"
+
 { "tokenId": "AQIC5w...NTcy*", "successUrl": "/openam/console" }</screen>
 
    <para>The authentication service at <literal>/json/authenticate</literal>
@@ -171,6 +172,7 @@
 
    <screen>$ curl --request POST --header "Content-Type: application/json"
        https://openam.example.com:8443/openam/json/authenticate
+
 {
     "authId": "...jwt-value...",
     "template": "",
@@ -224,6 +226,7 @@
    "value": " User Name: " } ], "input": [ { "name": "IDToken1", "value": "demo" } ] },
    { "type": "PasswordCallback", "output": [ { "name": "prompt", "value": " Password: " } ],
    "input": [ { "name": "IDToken2", "value": "changeit" } ] } ] }'
+
  https://openam.example.com:8443/openam/json/authenticate
 { "tokenId": "AQIC5wM2...U3MTE4NA..*", "successUrl": "/openam/console" }</screen>
    </informalexample>
@@ -241,6 +244,7 @@
    { "type": "PasswordCallback", "output": [ { "name": "prompt", "value": " Password: " } ],
    "input": [ { "name": "IDToken2", "value": "changeit" } ] } ] }'
  https://openam.example.com:8443/openam/json/authenticate?noSession=true
+
 { "message": "Authentication Successful", "successUrl": "/openam/console" }</screen>
    </informalexample>
 
@@ -256,8 +260,9 @@
    URL.</para>
 
    <screen>$ curl --request POST --header "Content-Type: application/json"
- "http://openam.example.com:8080/openam/json/authenticate
+ "https://openam.example.com:8443/openam/json/authenticate
  ?username=demo&amp;password=badpassword"
+
 { "errorMessage": "Invalid Password!!",
   "failureUrl": "http://www.example.com/401.html" }</screen>
 
@@ -373,6 +378,7 @@
  --request POST
  --header "iplanetDirectoryPro: AQIC5wM2...U3MTE4NA..*"
  "https://openam.example.com:8443/openam/json/sessions/?_action=logout"
+
 {"result":"Successfully logged out"}</screen>
   </section>
 
@@ -388,6 +394,7 @@
 
     <screen>$ curl --request POST --data "username=bjensen&amp;password=hifalutin"
  https://openam.example.com:8443/openam/identity/authenticate
+
 token.id=AQIC5wM2LY4SfcxvdvHOXjtC_eWSs2RB54tgvgK8SuYi7aQ.*AAJTSQACMDE.*</screen>
 
     <para>If you must specify parameters as when authenticating to
