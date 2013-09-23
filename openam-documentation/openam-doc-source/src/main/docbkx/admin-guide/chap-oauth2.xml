@@ -762,9 +762,11 @@
        <listitem>
         <para>In this example, <literal>cn</literal>.</para>
         <para>The demo user has common name <literal>demo</literal> by default,
-        so by setting this to <literal>cn</literal> (Common Name), OpenAM
+        so by setting this to <literal>cn|Read your user name</literal>, OpenAM
         can get the value of the attribute without the need to create
-        additional subjects, or to update existing subjects.</para>
+        additional subjects, or to update existing subjects. The description,
+        <literal>Read your user name</literal>, is shown to the resource owner
+        in the consent page.</para>
        </listitem>
       </varlistentry>
       <varlistentry>
