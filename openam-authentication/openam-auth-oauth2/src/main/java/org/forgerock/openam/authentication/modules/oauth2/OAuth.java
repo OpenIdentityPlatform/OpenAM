@@ -110,6 +110,7 @@ public class OAuth extends AMLoginModule {
 
         switch (state) {
             case ISAuthConstants.LOGIN_START: {
+                config.validateConfiguration();
                 serverName = request.getServerName();
                 String requestedURL = request.getRequestURL().toString();
                 String requestedQuery = request.getQueryString();
@@ -200,8 +201,11 @@ public class OAuth extends AMLoginModule {
                     userNames = accountMapper.getAccount(
                             config.getAccountMapperConfig(),
                             profileSvcResponse);
-
-                    String user = getUser(realm, accountMapper, userNames);
+                    
+                    String user = null;
+                    if (!userNames.isEmpty()) {
+                      user = getUser(realm, accountMapper, userNames);
+                    }
 
                     if (user == null && !config.getCreateAccountFlag()) {
                         authenticatedUser = getDynamicUser(userNames);

@@ -101,9 +101,15 @@ public class DefaultAccountMapper implements AccountMapper {
     @Override
     public AMIdentity searchUser(AMIdentityRepository idrepo, Map<String, Set<String>> attr) {
         AMIdentity identity = null;
-        IdSearchControl ctrl = getSearchControl(IdSearchOpModifier.OR, attr);
-
-        IdSearchResults results;
+        IdSearchControl ctrl = null;
+        
+        if (attr == null || attr.isEmpty()) {
+            OAuthUtil.debugWarning("DefaultAccountMapper.searchUser: empty search");
+            return null;
+        }
+        
+        ctrl = getSearchControl(IdSearchOpModifier.OR, attr);
+        IdSearchResults results;       
         try {
             results = idrepo.searchIdentities(IdType.USER, "*", ctrl);
             Iterator<AMIdentity> iter = results.getSearchResults().iterator();
@@ -112,10 +118,10 @@ public class DefaultAccountMapper implements AccountMapper {
                 OAuthUtil.debugMessage("getUser: user found : " + identity.getName());
             }
         } catch (IdRepoException ex) {
-            OAuthUtil.debugError("DefaultAccountMapper.getAttributes: Problem while  "
+            OAuthUtil.debugError("DefaultAccountMapper.searchUser: Problem while  "
                     + "searching  for the user. IdRepo", ex);
         } catch (SSOException ex) {
-            OAuthUtil.debugError("DefaultAccountMapper.getAttributes: Problem while  "
+            OAuthUtil.debugError("DefaultAccountMapper.searchUser: Problem while  "
                     + "searching  for the user. SSOExc", ex);
         }
 

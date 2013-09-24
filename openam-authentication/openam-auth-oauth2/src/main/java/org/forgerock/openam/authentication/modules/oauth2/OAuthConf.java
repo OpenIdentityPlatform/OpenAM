@@ -286,4 +286,45 @@ public class OAuthConf {
     private String param(String key, String value) {
         return "&" + key + "=" + value;
     }
+    
+    public void validateConfiguration() throws AuthLoginException {
+        if (clientId == null || clientId.isEmpty()) {
+            OAuthUtil.debugError("The Client Id can not be empty");
+            throw new AuthLoginException("The Client Id can not be empty");
+        }
+        if (clientSecret == null || clientSecret.isEmpty()){
+            OAuthUtil.debugError("The Client Secret can not be empty");
+            throw new AuthLoginException("The Client Secret can not be empty");       
+        }
+        if (authServiceUrl==null || authServiceUrl.isEmpty() || 
+                tokenServiceUrl == null || tokenServiceUrl.isEmpty() ||
+                profileServiceUrl == null || profileServiceUrl.isEmpty()) {
+            OAuthUtil.debugError("One or more of the OAuth2 Provider endpoints "
+                    + "is empty");
+            throw new AuthLoginException("One or more of the OAuth2 Provider "
+                    + "endpoints is empty");
+        }
+        if (accountMapper == null || accountMapper.isEmpty() ||
+                attributeMapper == null || attributeMapper.isEmpty()) {
+            OAuthUtil.debugError("One or more of the Mappers is empty");
+            throw new AuthLoginException("One or more of the Mappers is empty");
+        }
+        if (getAccountMapperConfig().isEmpty()
+                && !getUseAnonymousUserFlag()) {
+            OAuthUtil.debugError("The account mapper configuration "
+                    + "is empty and anonymous mapping was not enabled");
+            throw new AuthLoginException("Aborting authentication, "
+                    + "Account Mapper configuration is empty and "
+                    + "anonymous mapping was not enabled!");
+        }
+        if (getUseAnonymousUserFlag()
+                && getCreateAccountFlag()) {
+            OAuthUtil.debugError("Map to anonymous user and "
+                    + "Create Account if does not exist can not be"
+                    + " selected at the same time");
+            throw new AuthLoginException("Map to anonymous user and "
+                    + "Create Account if does not exist can not be"
+                    + " selected at the same time");
+        }
+    }
 }
