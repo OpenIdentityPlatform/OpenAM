@@ -273,6 +273,10 @@ aci: (version 3.0;acl "Delete config entry"; allow (delete)(userdn = "ldap:///
                      <entry>equality</entry>
                  </row>
                  <row>
+                     <entry><literal>coreTokenExpirationDate</literal></entry>
+                     <entry>ordering</entry>
+                 </row>
+                 <row>
                      <entry><literal>coreTokenInteger01</literal></entry>
                      <entry>equality</entry>
                  </row>
@@ -312,16 +316,6 @@ aci: (version 3.0;acl "Delete config entry"; allow (delete)(userdn = "ldap:///
                      <entry><literal>coreTokenInteger10</literal></entry>
                      <entry>equality</entry>
                  </row>
-                 <row>
-                     <entry><literal>iplanet-am-user-federation-info-key</literal></entry>
-                     <entry>equality</entry>
-                 </row>
-                 <!-- not used
-                 <row>
-                  <entry><literal>memberof</literal></entry>
-                  <entry>equality, presence</entry>
-                 </row>
-                 -->
                  <row>
                      <entry><literal>coreTokenString01</literal></entry>
                      <entry>equality</entry>
@@ -383,20 +377,26 @@ aci: (version 3.0;acl "Delete config entry"; allow (delete)(userdn = "ldap:///
                      <entry>equality</entry>
                  </row>
                  <row>
+                     <entry><literal>coreTokenUserId</literal></entry>
+                     <entry>equality</entry>
+                 </row>
+                 <row>
+                     <entry><literal>iplanet-am-user-federation-info-key</literal></entry>
+                     <entry>equality</entry>
+                 </row>
+                 <!-- not used
+                 <row>
+                  <entry><literal>memberof</literal></entry>
+                  <entry>equality, presence</entry>
+                 </row>
+                 -->
+                 <row>
                      <entry><literal>sun-fm-saml2-nameid-infokey</literal></entry>
                      <entry>equality</entry>
                  </row>
                  <row>
                      <entry><literal>sunxmlkeyvalue</literal></entry>
                      <entry>equality, substring</entry>
-                 </row>
-                 <row>
-                     <entry><literal>coreTokenExpirationDate</literal></entry>
-                     <entry>ordering</entry>
-                 </row>
-                 <row>
-                     <entry><literal>coreTokenUserId</literal></entry>
-                     <entry>equality</entry>
                  </row>
              </tbody>
          </tgroup>
