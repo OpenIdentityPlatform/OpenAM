@@ -48,7 +48,7 @@ import com.sun.identity.console.session.model.SMProfileModelImpl;
 import com.sun.identity.console.session.model.SMSessionCache;
 import com.sun.identity.console.session.model.SMSessionData;
 import com.sun.identity.shared.configuration.SystemPropertiesManager;
-import com.sun.identity.sm.ldap.api.CoreTokenConstants;
+import org.forgerock.openam.cts.api.CoreTokenConstants;
 import com.sun.web.ui.model.CCActionTableModel;
 import com.sun.web.ui.model.CCNavNodeInterface;
 import com.sun.web.ui.model.CCPageTitleModel;

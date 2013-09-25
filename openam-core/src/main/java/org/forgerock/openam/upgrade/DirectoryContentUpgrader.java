@@ -19,8 +19,8 @@ import com.sun.identity.setup.AMSetupServlet;
 import com.sun.identity.setup.EmbeddedOpenDS;
 import com.sun.identity.setup.SetupConstants;
 import com.sun.identity.shared.debug.Debug;
-import com.sun.identity.sm.ldap.api.CoreTokenConstants;
-import com.sun.identity.sm.ldap.api.fields.CoreTokenField;
+import org.forgerock.openam.cts.api.CoreTokenConstants;
+import org.forgerock.openam.cts.api.fields.CoreTokenField;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.nio.charset.Charset;
@@ -29,6 +29,8 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+
+import org.forgerock.openam.cts.impl.LDAPConfig;
 import org.forgerock.openam.guice.InjectorHolder;
 import org.forgerock.openam.sm.DataLayerConnectionFactory;
 import org.forgerock.openam.utils.IOUtils;
@@ -36,7 +38,6 @@ import org.forgerock.opendj.ldap.Connection;
 import org.forgerock.opendj.ldap.DN;
 import org.forgerock.opendj.ldap.EntryNotFoundException;
 import org.forgerock.opendj.ldap.ErrorResultException;
-import org.forgerock.opendj.ldap.schema.ObjectClass;
 import org.forgerock.opendj.ldap.schema.Schema;
 import org.forgerock.opendj.ldif.ChangeRecordReader;
 import org.forgerock.opendj.ldif.ChangeRecordWriter;
@@ -268,7 +269,7 @@ public class DirectoryContentUpgrader {
 
         @Override
         public boolean isUpgradeNecessary(Connection conn, Schema schema) throws UpgradeException {
-            return !entryExists(conn, new CoreTokenConstants(baseDN).getTokenDN());
+            return !entryExists(conn, new LDAPConfig(baseDN).getTokenStoreRootSuffix());
         }
     }
 

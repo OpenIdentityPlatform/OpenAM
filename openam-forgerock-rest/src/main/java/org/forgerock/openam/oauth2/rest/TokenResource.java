@@ -34,7 +34,7 @@ import com.sun.identity.idm.IdUtils;
 import com.sun.identity.security.AdminTokenAction;
 import com.sun.identity.shared.Constants;
 import com.sun.identity.shared.OAuth2Constants;
-import com.sun.identity.sm.ldap.exceptions.CoreTokenException;
+import org.forgerock.openam.cts.exceptions.CoreTokenException;
 import org.forgerock.json.fluent.JsonValue;
 import org.forgerock.json.resource.ActionRequest;
 import org.forgerock.json.resource.CollectionResourceProvider;

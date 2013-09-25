@@ -32,7 +32,7 @@ import com.sun.identity.shared.ldap.LDAPException;
  *
  * @author jeff.schenk@forgerock.com
  */
-class CTSDataLayer {
+public class CTSDataLayer {
 
     /**
      * Debug Logging
@@ -58,7 +58,7 @@ class CTSDataLayer {
      *
      * @return CTSDataLayer - Wrapper Accessor Class for Shared SM Data Layer Instance.
      */
-    protected static CTSDataLayer getSharedSMDataLayerAccessor() {
+    public static CTSDataLayer getSharedSMDataLayerAccessor() {
         return instance;
     }
 
@@ -67,7 +67,7 @@ class CTSDataLayer {
      *
      * @return LDAPConnection - Obtained from Pool
      */
-    protected LDAPConnection getConnection() {
+    public LDAPConnection getConnection() {
         return sharedSMDataLayer.getConnection();
     }
 
@@ -76,7 +76,7 @@ class CTSDataLayer {
      *
      * @param ldapConnection
      */
-    protected void releaseConnection( LDAPConnection ldapConnection) {
+    public void releaseConnection( LDAPConnection ldapConnection) {
         sharedSMDataLayer.releaseConnection(ldapConnection);
     }
 
@@ -87,7 +87,7 @@ class CTSDataLayer {
      * @param ldapConnection
      * @param ldapErrorCode
      */
-    protected void releaseConnection(LDAPConnection ldapConnection, int ldapErrorCode ) {
+    public void releaseConnection(LDAPConnection ldapConnection, int ldapErrorCode ) {
         sharedSMDataLayer.releaseConnection(ldapConnection, ldapErrorCode);
     }
 
@@ -99,7 +99,7 @@ class CTSDataLayer {
      * @param lastLDAPException - Last up Stream LDAP Exception, can be null if no issues arose
      *                          with the connection or operations.
      */
-    protected void releaseConnection(LDAPConnection ldapConnection, LDAPException lastLDAPException ) {
+    public void releaseConnection(LDAPConnection ldapConnection, LDAPException lastLDAPException ) {
         if (lastLDAPException == null) {
             sharedSMDataLayer.releaseConnection(ldapConnection);
         } else {

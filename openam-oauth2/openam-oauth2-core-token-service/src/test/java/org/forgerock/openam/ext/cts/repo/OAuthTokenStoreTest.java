@@ -16,11 +16,11 @@
 
 package org.forgerock.openam.ext.cts.repo;
 
-import com.sun.identity.sm.ldap.CTSPersistentStore;
-import com.sun.identity.sm.ldap.adapters.TokenAdapter;
-import com.sun.identity.sm.ldap.api.tokens.Token;
-import com.sun.identity.sm.ldap.api.tokens.TokenIdFactory;
-import com.sun.identity.sm.ldap.exceptions.CoreTokenException;
+import org.forgerock.openam.cts.CTSPersistentStore;
+import org.forgerock.openam.cts.adapters.TokenAdapter;
+import org.forgerock.openam.cts.api.tokens.Token;
+import org.forgerock.openam.cts.api.tokens.TokenIdFactory;
+import org.forgerock.openam.cts.exceptions.CoreTokenException;
 import org.forgerock.json.fluent.JsonValue;
 import org.forgerock.opendj.ldap.Filter;
 import org.mockito.Matchers;

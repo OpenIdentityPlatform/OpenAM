@@ -23,10 +23,8 @@ import com.sun.identity.shared.debug.Debug;
 import org.forgerock.openam.ldap.LDAPUtils;
 import org.forgerock.openam.sm.exceptions.ConnectionCredentialsNotFound;
 import org.forgerock.openam.sm.exceptions.ServerConfigurationNotFound;
-import org.forgerock.opendj.ldap.Connection;
-import org.forgerock.opendj.ldap.ConnectionFactory;
-import org.forgerock.opendj.ldap.ErrorResultException;
-import org.forgerock.opendj.ldap.LDAPOptions;
+import org.forgerock.opendj.ldap.*;
+
 import static org.forgerock.openam.core.guice.CoreGuiceModule.ShutdownManagerWrapper;
 
 /**
@@ -36,8 +34,9 @@ import static org.forgerock.openam.core.guice.CoreGuiceModule.ShutdownManagerWra
  * class will use the OpenDJ LDAP SDK rather than the Netscape SDK.
  *
  * @author robert.wapshott@forgerock.com
+ * @author jonathan@forgerock.com
  */
-public class DataLayerConnectionFactory implements ShutdownListener {
+public class DataLayerConnectionFactory implements ConnectionFactory, ShutdownListener {
     // Injected
     private final Debug debug;
     private final ServerConfigurationFactory parser;
@@ -127,8 +126,23 @@ public class DataLayerConnectionFactory implements ShutdownListener {
     /**
      * Signal that the connection factory should shutdown and release any connections and resources.
      */
-    @Override
     public void shutdown() {
         factory.close();
+    }
+
+    /**
+     * Closes the underlying connection factory.
+     */
+    public void close() {
+        factory.close();
+    }
+
+    /**
+     * Returns an asynchronous connection from the underlying connection factory.
+     * @param resultHandler the result handler
+     * @return the FutureResult from the underlying factory.
+     */
+    public FutureResult<Connection> getConnectionAsync(ResultHandler<? super Connection> resultHandler) {
+        return getConnectionAsync(resultHandler);
     }
 }

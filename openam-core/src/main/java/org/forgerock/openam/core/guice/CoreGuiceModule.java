@@ -19,24 +19,30 @@ package org.forgerock.openam.core.guice;
 import com.google.inject.AbstractModule;
 import com.google.inject.Provider;
 import com.google.inject.TypeLiteral;
-import com.iplanet.dpro.session.service.CoreTokenServiceFactory;
+import com.google.inject.name.Names;
 import com.iplanet.dpro.session.service.SessionService;
 import com.iplanet.services.ldap.DSConfigMgr;
 import com.iplanet.services.ldap.LDAPServiceException;
 import com.iplanet.sso.SSOToken;
 import com.sun.identity.common.ShutdownListener;
 import com.sun.identity.common.ShutdownManager;
+import com.sun.identity.common.configuration.ConfigurationObserver;
 import com.sun.identity.security.AdminTokenAction;
+import com.sun.identity.shared.debug.Debug;
 import com.sun.identity.sm.DNMapper;
 import com.sun.identity.sm.SMSEntry;
 import com.sun.identity.sm.ServiceManagementDAO;
 import com.sun.identity.sm.ServiceManagementDAOWrapper;
-import com.sun.identity.sm.ldap.CTSPersistentStore;
-import com.sun.identity.sm.ldap.CoreTokenConfig;
-import com.sun.identity.sm.ldap.adapters.OAuthAdapter;
-import com.sun.identity.sm.ldap.adapters.TokenAdapter;
-import com.sun.identity.sm.ldap.api.CoreTokenConstants;
 import org.forgerock.json.fluent.JsonValue;
+import org.forgerock.openam.cts.CTSPersistentStore;
+import org.forgerock.openam.cts.CoreTokenConfig;
+import org.forgerock.openam.cts.ExternalTokenConfig;
+import org.forgerock.openam.cts.adapters.OAuthAdapter;
+import org.forgerock.openam.cts.adapters.TokenAdapter;
+import org.forgerock.openam.cts.api.CoreTokenConstants;
+import org.forgerock.openam.cts.impl.CTSConnectionFactory;
+import org.forgerock.openam.cts.impl.LDAPConfig;
+import org.forgerock.openam.cts.reaper.CTSReaper;
 import org.forgerock.openam.entitlement.indextree.IndexChangeHandler;
 import org.forgerock.openam.entitlement.indextree.IndexChangeManager;
 import org.forgerock.openam.entitlement.indextree.IndexChangeManagerImpl;
@@ -47,10 +53,13 @@ import org.forgerock.openam.entitlement.indextree.IndexTreeServiceImpl;
 import org.forgerock.openam.entitlement.indextree.events.IndexChangeObservable;
 import org.forgerock.openam.guice.AMGuiceModule;
 import org.forgerock.openam.sm.DataLayerConnectionFactory;
+import org.forgerock.opendj.ldap.ConnectionFactory;
 import org.forgerock.opendj.ldap.SearchResultHandler;
 
 import javax.inject.Singleton;
 import java.security.PrivilegedAction;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
 
 /**
  * Guice Module for configuring bindings for the OpenAM Core classes.
@@ -81,7 +90,6 @@ public class CoreGuiceModule extends AbstractModule {
          */
         bind(DataLayerConnectionFactory.class).in(Singleton.class);
         bind(DSConfigMgr.class).toProvider(new Provider<DSConfigMgr>() {
-            @Override
             public DSConfigMgr get() {
                 try {
                     return DSConfigMgr.getDSConfigMgr();
@@ -92,20 +100,31 @@ public class CoreGuiceModule extends AbstractModule {
         }).in(Singleton.class);
 
         /**
-         * Core Token Service bindings
-         * CTSPersistentStore using provider to delay initialisation.
+         * Core Token Service bindings are divided into a number of logical groups.
          */
+        // CTS General
+        bind(Debug.class).annotatedWith(Names.named(CoreTokenConstants.CTS_DEBUG)).toInstance(Debug.getInstance(CoreTokenConstants.CTS_DEBUG));
+        bind(Debug.class).annotatedWith(Names.named(CoreTokenConstants.CTS_REAPER_DEBUG)).toInstance(Debug.getInstance(CoreTokenConstants.CTS_REAPER_DEBUG));
+        bind(CoreTokenConstants.class).in(Singleton.class);
+        bind(CTSPersistentStore.class).in(Singleton.class);
         bind(CoreTokenConfig.class).in(Singleton.class);
-        bind(CTSPersistentStore.class).toProvider(new Provider<CTSPersistentStore>() {
-            public CTSPersistentStore get() {
-                return CoreTokenServiceFactory.getInstance();
-            }
-        });
-        bind(CoreTokenConstants.class).toProvider(new Provider<CoreTokenConstants>() {
-            public CoreTokenConstants get() {
-                return new CoreTokenConstants(SMSEntry.getRootSuffix());
+        // CTS Connection Management
+        bind(ConnectionFactory.class).to(CTSConnectionFactory.class).in(Singleton.class);
+        bind(LDAPConfig.class).toProvider(new Provider<LDAPConfig>() {
+            public LDAPConfig get() {
+                return new LDAPConfig(SMSEntry.getRootSuffix());
             }
         }).in(Singleton.class);
+        bind(ExternalTokenConfig.class).in(Singleton.class);
+        bind(ConfigurationObserver.class).toProvider(new Provider<ConfigurationObserver>() {
+            public ConfigurationObserver get() {
+                return ConfigurationObserver.getInstance();
+            }
+        }).in(Singleton.class);
+        // CTS Worker Thread Pools
+        bind(ScheduledExecutorService.class).annotatedWith(Names.named(CTSReaper.CTS_SCHEDULED_SERVICE))
+                .toInstance(Executors.newScheduledThreadPool(1));
+
 
         /**
          * Session related dependencies.
@@ -123,13 +142,10 @@ public class CoreGuiceModule extends AbstractModule {
 
     // Simple provider implementation to return the static instance of AdminTokenAction.
     private static class AdminTokenProvider implements Provider<PrivilegedAction<SSOToken>> {
-
-        @Override
         public PrivilegedAction<SSOToken> get() {
             // Provider used over bind(..).getInstance(..) to enforce a lazy loading approach.
             return AdminTokenAction.getInstance();
         }
-
     }
 
     /**

@@ -24,23 +24,21 @@
 
 package org.forgerock.openam.ext.cts.repo;
 
-import com.sun.identity.sm.ldap.CTSPersistentStore;
-import com.sun.identity.sm.ldap.adapters.TokenAdapter;
-import com.sun.identity.sm.ldap.api.fields.CoreTokenField;
-import com.sun.identity.sm.ldap.api.fields.OAuthTokenField;
-import com.sun.identity.sm.ldap.api.tokens.Token;
-import com.sun.identity.sm.ldap.api.tokens.TokenIdFactory;
-import com.sun.identity.sm.ldap.exceptions.CoreTokenException;
-import com.sun.identity.sm.ldap.exceptions.DeleteFailedException;
-import com.sun.identity.sm.ldap.impl.QueryFilter;
-import com.sun.identity.sm.ldap.utils.LDAPDataConversion;
+import org.forgerock.openam.cts.CTSPersistentStore;
+import org.forgerock.openam.cts.adapters.TokenAdapter;
+import org.forgerock.openam.cts.api.fields.OAuthTokenField;
+import org.forgerock.openam.cts.api.tokens.Token;
+import org.forgerock.openam.cts.api.tokens.TokenIdFactory;
+import org.forgerock.openam.cts.exceptions.CoreTokenException;
+import org.forgerock.openam.cts.exceptions.DeleteFailedException;
+import org.forgerock.openam.cts.impl.query.QueryFilter;
+import org.forgerock.openam.cts.utils.LDAPDataConversion;
 import org.forgerock.json.fluent.JsonValue;
 import org.forgerock.opendj.ldap.Filter;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;

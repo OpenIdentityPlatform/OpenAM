@@ -18,14 +18,12 @@ package org.forgerock.openam.forgerockrest;
 import java.lang.Exception;
 import java.lang.Object;
 import java.lang.String;
-import java.security.AccessController;
 import java.util.*;
 
 import com.sun.identity.sm.SMSException;
-import com.sun.identity.sm.ServiceNotFoundException;
-import com.sun.identity.sm.ldap.CTSPersistentStore;
-import com.sun.identity.sm.ldap.api.TokenType;
-import com.sun.identity.sm.ldap.exceptions.CoreTokenException;
+import org.forgerock.openam.cts.CTSPersistentStore;
+import org.forgerock.openam.cts.api.TokenType;
+import org.forgerock.openam.cts.exceptions.CoreTokenException;
 import org.apache.commons.lang.RandomStringUtils;
 
 import com.iplanet.am.util.SystemProperties;
@@ -33,7 +31,6 @@ import com.iplanet.services.util.Hash;
 import com.sun.identity.authentication.AuthContext;
 import com.sun.identity.idm.AMIdentity;
 import com.sun.identity.idm.IdRepoException;
-import com.sun.identity.idm.IdUtils;
 import com.sun.identity.idsvcs.AccessDenied;
 import com.sun.identity.idsvcs.AccountExpired;
 import com.sun.identity.idsvcs.CreateResponse;
@@ -57,7 +54,6 @@ import com.sun.identity.idsvcs.UserLocked;
 import com.sun.identity.idsvcs.UserNotFound;
 import com.sun.identity.idsvcs.TokenExpired;
 import com.sun.identity.idsvcs.Attribute;
-import com.sun.identity.security.AdminTokenAction;
 import com.sun.identity.sm.ServiceConfig;
 import com.sun.identity.sm.ServiceConfigManager;
 import org.forgerock.json.fluent.JsonValue;
@@ -184,10 +180,10 @@ public final class IdentityResource implements CollectionResourceProvider {
         return Hash.hash(resource + RandomStringUtils.randomAlphanumeric(32));
     }
 
-    private com.sun.identity.sm.ldap.api.tokens.Token generateToken(String resource, String userId,
+    private org.forgerock.openam.cts.api.tokens.Token generateToken(String resource, String userId,
                                                                     Long tokenLifeTimeSeconds) {
         Calendar ttl = Calendar.getInstance();
-        com.sun.identity.sm.ldap.api.tokens.Token ctsToken = new com.sun.identity.sm.ldap.api.tokens.Token(
+        org.forgerock.openam.cts.api.tokens.Token ctsToken = new org.forgerock.openam.cts.api.tokens.Token(
                 generateTokenID(resource), TokenType.REST);
         if(userId != null && !userId.isEmpty()) {
             ctsToken.setUserId(userId);
@@ -197,7 +193,7 @@ public final class IdentityResource implements CollectionResourceProvider {
         return ctsToken;
     }
     /**
-     * This method will create a confirmation email that contains a {@link com.sun.identity.sm.ldap.api.tokens.Token},
+     * This method will create a confirmation email that contains a {@link org.forgerock.openam.cts.api.tokens.Token},
      * confirmationId and email that was provided in the request.
      * @param context Current Server Context
      * @param request Request from client to retrieve id
@@ -243,7 +239,8 @@ public final class IdentityResource implements CollectionResourceProvider {
             Long tokenLifeTime = restSecurity.getSelfRegTLT();
 
             // Create CTS Token
-            com.sun.identity.sm.ldap.api.tokens.Token ctsToken = generateToken(emailAddress, "anonymous", tokenLifeTime);
+            org.forgerock.openam.cts.api.tokens.Token ctsToken = generateToken(emailAddress, "anonymous",
+                    tokenLifeTime);
 
             // Store token in datastore
             cts.create(ctsToken);
@@ -520,7 +517,7 @@ public final class IdentityResource implements CollectionResourceProvider {
             Long tokenLifeTime = restSecurity.getForgotPassTLT();
 
             // Generate Token
-            com.sun.identity.sm.ldap.api.tokens.Token ctsToken = generateToken(email, username, tokenLifeTime);
+            org.forgerock.openam.cts.api.tokens.Token ctsToken = generateToken(email, username, tokenLifeTime);
 
             // Store token in datastore
             cts.create(ctsToken);

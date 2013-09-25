@@ -24,11 +24,8 @@
 
    $Id: amConsoleConfig.xml,v 1.12 2008/09/09 18:13:57 veiming Exp $
 
--->
-
-<!--
-    Portions Copyrighted 2011-2012 ForgeRock Inc
-    Portions Copyrighted 2012 Open Source Solution Technology Corporation
+   Portions Copyrighted 2011-2013 ForgeRock AS
+   Portions Copyrighted 2012 Open Source Solution Technology Corporation
 -->
 
 <consoleconfig>
@@ -239,6 +236,13 @@
                  label="serverconfiguration.showmenu.label.advanced.properties"
                  tooltip="tab.serverconfiguration.showmenu.advanced.tooltip"
                  status="tab.serverconfiguration.showmenu.advanced.tooltip"
+                 permissions="iPlanetAMPlatformService"/>
+            <tab id="427"
+                 viewbean="com.sun.identity.console.service.ServerEditCTSViewBean"
+                 url="../service/ServerEditCTS"
+                 label="serverconfiguration.showmenu.label.cts.properties"
+                 tooltip="tab.serverconfiguration.showmenu.cts.tooltip"
+                 status="tab.serverconfiguration.showmenu.cts.tooltip"
                  permissions="iPlanetAMPlatformService"/>
         </profile>
 

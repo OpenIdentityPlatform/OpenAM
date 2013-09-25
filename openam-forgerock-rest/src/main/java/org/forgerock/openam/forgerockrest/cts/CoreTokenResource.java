@@ -15,10 +15,10 @@
  */
 package org.forgerock.openam.forgerockrest.cts;
 
-import com.sun.identity.sm.ldap.CTSPersistentStore;
-import com.sun.identity.sm.ldap.api.tokens.Token;
-import com.sun.identity.sm.ldap.exceptions.CoreTokenException;
-import com.sun.identity.sm.ldap.utils.JSONSerialisation;
+import org.forgerock.openam.cts.CTSPersistentStore;
+import org.forgerock.openam.cts.api.tokens.Token;
+import org.forgerock.openam.cts.exceptions.CoreTokenException;
+import org.forgerock.openam.cts.utils.JSONSerialisation;
 import org.forgerock.json.fluent.JsonValue;
 import org.forgerock.json.resource.ActionRequest;
 import org.forgerock.json.resource.CollectionResourceProvider;

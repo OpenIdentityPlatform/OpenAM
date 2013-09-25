@@ -45,7 +45,7 @@ import com.sun.identity.common.configuration.SiteConfiguration;
 import com.sun.identity.session.util.RestrictedTokenContext;
 import com.sun.identity.shared.Constants;
 import com.sun.identity.shared.debug.Debug;
-import com.sun.identity.sm.ldap.CTSPersistentStore;
+import org.forgerock.openam.cts.CTSPersistentStore;
 
 import java.net.URL;
 import java.util.Collections;

@@ -38,7 +38,7 @@ import com.sun.identity.common.AttributeStruct;
 import com.sun.identity.common.PropertiesFinder;
 import com.sun.identity.shared.Constants;
 import com.sun.identity.sm.SMSEntry;
-import com.sun.identity.sm.ldap.api.CoreTokenConstants;
+import org.forgerock.openam.cts.api.CoreTokenConstants;
 
 import java.io.ByteArrayOutputStream;
 import java.io.FileInputStream;

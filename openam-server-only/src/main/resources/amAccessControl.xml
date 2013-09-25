@@ -24,9 +24,7 @@
 
    $Id: amAccessControl.xml,v 1.22 2010/01/08 00:27:01 babysunil Exp $
 
--->
-<!--
-   Portions Copyrighted 2013 ForgeRock, Inc.
+   Portions Copyrighted 2013 ForgeRock AS.
 -->
 <accesscontrols>
     <!-- REALM -->
@@ -384,6 +382,7 @@
     <viewbean view="*" modify="*" classname="com.sun.identity.console.service.ServerConfigXMLViewBean" />
     <viewbean view="*" modify="*" classname="com.sun.identity.console.service.ServerEditGeneralViewBean" />
     <viewbean view="*" modify="*" classname="com.sun.identity.console.service.ServerEditSDKViewBean" />
+    <viewbean view="*" modify="*" classname="com.sun.identity.console.service.ServerEditCTSViewBean" />
     <viewbean view="*" modify="*" classname="com.sun.identity.console.service.ServerEditSessionViewBean" />
     <viewbean view="*" modify="*" classname="com.sun.identity.console.service.ServerEditSecurityViewBean" />
     <viewbean view="*" modify="*" classname="com.sun.identity.console.service.ServerEditAdvancedViewBean" />

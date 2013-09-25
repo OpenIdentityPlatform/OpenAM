@@ -23,18 +23,15 @@ import org.forgerock.openam.guice.InjectorHolder;
 
 import javax.servlet.ServletException;
 
-
+/**
+ * @author jason.lemay@forgerock.com
+ */
 public class RestTokenDispatcher {
-
-    public RestTokenDispatcher(){
-
-    }
-
     public static ConnectionFactory getConnectionFactory() throws ServletException {
         try {
             final Router router = new Router();
             router.addRoute("/token/", InjectorHolder.getInstance(TokenResource.class));
-            router.addRoute("/client/", new ClientResource());
+            router.addRoute("/client/", InjectorHolder.getInstance(ClientResource.class));
             final ConnectionFactory factory = Resources.newInternalConnectionFactory(router);
             return factory;
         } catch (final Exception e) {

@@ -21,7 +21,6 @@
 package com.sun.identity.saml2.common;
 
 import com.iplanet.dpro.session.SessionException;
-import com.iplanet.dpro.session.service.CoreTokenServiceFactory;
 import com.iplanet.dpro.session.service.SessionService;
 import com.iplanet.dpro.session.share.SessionBundle;
 import com.iplanet.services.naming.ServerEntryNotFoundException;
@@ -32,14 +31,14 @@ import com.sun.identity.coretoken.interfaces.AMTokenSAML2Repository;
 import com.sun.identity.shared.Constants;
 import com.sun.identity.shared.configuration.SystemPropertiesManager;
 import com.sun.identity.shared.debug.Debug;
-import com.sun.identity.sm.ldap.CTSPersistentStore;
-import com.sun.identity.sm.ldap.adapters.SAMLAdapter;
-import com.sun.identity.sm.ldap.adapters.TokenAdapter;
-import com.sun.identity.sm.ldap.api.fields.CoreTokenField;
-import com.sun.identity.sm.ldap.api.fields.SAMLTokenField;
-import com.sun.identity.sm.ldap.api.tokens.SAMLToken;
-import com.sun.identity.sm.ldap.api.tokens.Token;
-import com.sun.identity.sm.ldap.exceptions.CoreTokenException;
+import org.forgerock.openam.cts.CTSPersistentStore;
+import org.forgerock.openam.cts.adapters.SAMLAdapter;
+import org.forgerock.openam.cts.adapters.TokenAdapter;
+import org.forgerock.openam.cts.api.fields.CoreTokenField;
+import org.forgerock.openam.cts.api.fields.SAMLTokenField;
+import org.forgerock.openam.cts.api.tokens.SAMLToken;
+import org.forgerock.openam.cts.api.tokens.Token;
+import org.forgerock.openam.cts.exceptions.CoreTokenException;
 import org.forgerock.openam.guice.InjectorHolder;
 
 import java.util.Collection;
@@ -217,7 +216,7 @@ public class SAML2CTSPersistentStore extends GeneralTaskRunnable
     private static void initPersistSession() {
         try {
             // Obtain our AM Token Repository Instance to provide the Backend CRUD for Tokens.
-            persistentStore = CoreTokenServiceFactory.getInstance();
+            persistentStore = InjectorHolder.getInstance(CTSPersistentStore.class);
             if (persistentStore != null) {
                 isDatabaseUp = true;
             } else {

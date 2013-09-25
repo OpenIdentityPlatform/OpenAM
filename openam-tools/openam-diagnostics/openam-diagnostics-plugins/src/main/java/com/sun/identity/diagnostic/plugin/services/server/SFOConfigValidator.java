@@ -42,7 +42,7 @@ import com.sun.identity.shared.datastruct.CollectionHelper;
 import com.sun.identity.shared.debug.Debug;
 import com.sun.identity.sm.ServiceConfig;
 import com.sun.identity.sm.ServiceConfigManager;
-import com.sun.identity.sm.ldap.api.CoreTokenConstants;
+import org.forgerock.openam.cts.api.CoreTokenConstants;
 
 import java.net.URL;
 import java.util.HashMap;

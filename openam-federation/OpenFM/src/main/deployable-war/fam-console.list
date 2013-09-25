@@ -1751,6 +1751,7 @@
 ./console/service/ServerEditAdvanced.jsp
 ./console/service/ServerEditGeneral.jsp
 ./console/service/ServerEditSDK.jsp
+./console/service/ServerEditCTS.jsp
 ./console/service/ServerEditSecurity.jsp
 ./console/service/ServerEditSession.jsp
 ./console/service/ServerSite.jsp

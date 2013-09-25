@@ -15,14 +15,11 @@
  */
 package org.forgerock.openam.forgerockrest;
 
-import com.iplanet.dpro.session.service.CoreTokenServiceFactory;
 import com.iplanet.sso.SSOToken;
 import com.sun.identity.security.AdminTokenAction;
 import com.sun.identity.shared.debug.Debug;
 import com.sun.identity.sm.OrganizationConfigManager;
 import com.sun.identity.sm.SMSException;
-import com.sun.identity.sm.ldap.CTSPersistentStore;
-import com.sun.identity.sm.ldap.utils.JSONSerialisation;
 import org.apache.commons.lang.StringUtils;
 import org.forgerock.json.fluent.JsonValue;
 import org.forgerock.json.resource.ActionRequest;
@@ -43,10 +40,13 @@ import org.forgerock.json.resource.Router;
 import org.forgerock.json.resource.RoutingMode;
 import org.forgerock.json.resource.ServerContext;
 import org.forgerock.json.resource.UpdateRequest;
+import org.forgerock.openam.cts.CTSPersistentStore;
+import org.forgerock.openam.cts.utils.JSONSerialisation;
 import org.forgerock.openam.dashboard.DashboardResource;
 import org.forgerock.openam.forgerockrest.cts.CoreTokenResource;
 import org.forgerock.openam.forgerockrest.server.ServerInfoResource;
 import org.forgerock.openam.forgerockrest.session.SessionResource;
+import org.forgerock.openam.guice.InjectorHolder;
 
 import javax.servlet.ServletException;
 import java.security.AccessController;
@@ -136,7 +136,7 @@ public final class RestDispatcher {
             router.addRoute(endpoint, new SessionResource());
         } else if (endpoint.equalsIgnoreCase(TOKENS)) {
             JSONSerialisation serialisation = new JSONSerialisation();
-            CTSPersistentStore store = CoreTokenServiceFactory.getInstance();
+            CTSPersistentStore store = InjectorHolder.getInstance(CTSPersistentStore.class);
             CoreTokenResource resource = new CoreTokenResource(serialisation, store);
             router.addRoute(endpoint, resource);
         } else if (endpoint.equalsIgnoreCase(SERVER_INFO)){

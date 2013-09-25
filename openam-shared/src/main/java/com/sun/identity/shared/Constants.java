@@ -1261,4 +1261,44 @@ public interface Constants {
      * System property/service attribute name for CAS/DAS that should tell whether Zero Page Login is enabled or not.
      */
     public static final String ZERO_PAGE_LOGIN_ENABLED = "openam.auth.zero.page.login.enabled";
+
+    /**
+     * The CTS token store can be either embedded or external. If external then more information is needed to connect.
+     */
+    public static final String CTS_STORE_LOCATION = "org.forgerock.services.cts.store.location";
+
+    /**
+     * The fully qualified name of the suffix where the tokens will be created.
+     */
+    public static final String CTS_ROOT_SUFFIX = "org.forgerock.services.cts.root.suffix";
+
+    /**
+     * Enable/disable SSL for the CTS token store connections.
+     */
+    public static final String CTS_SSL_ENABLED = "org.forgerock.services.cts.store.ssl.enabled";
+
+    /**
+     * Hostname where the CTS token store may be reached. This may point to a load balancer.
+     */
+    public static final String CTS_STORE_HOSTNAME = "org.forgerock.services.cts.store.directory.name";
+
+    /**
+     * Port upon which to connect to the token store.
+     */
+    public static final String CTS_STORE_PORT = "org.forgerock.services.cts.store.port";
+
+    /**
+     * Username for the token store connection.
+     */
+    public static final String CTS_STORE_USERNAME = "org.forgerock.services.cts.store.loginid";
+
+    /**
+     * Password for connecting to the token store.
+     */
+    public static final String CTS_STORE_PASSWORD = "org.forgerock.services.cts.store.password";
+
+    /**
+     * Maximum number of connections to the token store.
+     */
+    public static final String CTS_MAX_CONNECTIONS = "org.forgerock.services.cts.store.max.connections";
 }

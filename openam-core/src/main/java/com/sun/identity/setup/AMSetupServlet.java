@@ -84,7 +84,7 @@ import com.sun.identity.sm.ServiceManager;
 import com.sun.identity.sm.ServiceSchema;
 import com.sun.identity.sm.ServiceSchemaManager;
 import com.sun.identity.sm.SessionHAFailoverSetupSubConfig;
-import com.sun.identity.sm.ldap.api.CoreTokenConstants;
+import org.forgerock.openam.cts.api.CoreTokenConstants;
 import org.forgerock.openam.upgrade.OpenDJUpgrader;
 import org.forgerock.openam.upgrade.UpgradeException;
 import org.forgerock.openam.upgrade.UpgradeServices;

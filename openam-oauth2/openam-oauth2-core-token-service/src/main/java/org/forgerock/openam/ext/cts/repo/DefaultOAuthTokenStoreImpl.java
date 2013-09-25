@@ -25,8 +25,8 @@
 package org.forgerock.openam.ext.cts.repo;
 
 import com.sun.identity.shared.OAuth2Constants;
-import com.sun.identity.sm.ldap.exceptions.CoreTokenException;
-import com.sun.identity.sm.ldap.exceptions.DeleteFailedException;
+import org.forgerock.openam.cts.exceptions.CoreTokenException;
+import org.forgerock.openam.cts.exceptions.DeleteFailedException;
 import org.forgerock.json.fluent.JsonValue;
 import org.forgerock.openam.oauth2.exceptions.OAuthProblemException;
 import org.forgerock.openam.oauth2.model.BearerToken;
