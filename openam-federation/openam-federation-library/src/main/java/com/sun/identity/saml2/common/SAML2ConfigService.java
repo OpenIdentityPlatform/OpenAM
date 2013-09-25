@@ -98,40 +98,50 @@ public class SAML2ConfigService implements ConfigurationListener {
      * This method reads values from service schema.
      */
     static private synchronized void setValues() {
-        String classMethod = "SAML2ConfigService.setValues:";
-        
         if (ci == null) {
-            attributes.put(SAML2_FAILOVER_ATTR, "false"); 
-            attributes.put(SAML2_BUFFER_LENGTH, "2048");             
+            attributes.put(SAML2_FAILOVER_ATTR, "false");
+            attributes.put(SAML2_BUFFER_LENGTH, "2048");
+            debug.warning("ConfigurationInstance is null, so default values for " +
+                    "failover (false) and buffer length (2048) will be set.");
         } else {
             Map attrMap = null; 
             try {
                attrMap = ci.getConfiguration(null, null);
             } catch (ConfigurationException ce) {
-               debug.error(classMethod, ce);
+               debug.error("Exception caught obtaining updated configuration. " + SAML2_FAILOVER_ATTR + " and " +
+                       SAML2_BUFFER_LENGTH + " will not be updated. Exception: " + ce, ce);
                return;
             }
             Map newAttributes = new HashMap();
             if (attrMap != null) {
+                if (debug.messageEnabled()) {
+                    debug.message("The updated configuration: " + attrMap);
+                }
                 Set values = (Set)attrMap.get(SAML2_FAILOVER_ATTR);
-                String value = "false" ; 
+                String value = "false" ;
                 if ((values != null) && (values.size() == 1)) {
                      value = (String) values.iterator().next(); 
-                } 
+                } else {
+                    debug.warning("Value for " + SAML2_FAILOVER_ATTR + " null or size!=1. Defaulting to false.");
+                }
                 newAttributes.put(SAML2_FAILOVER_ATTR, value); 
                 values = (Set)attrMap.get(SAML2_BUFFER_LENGTH);
                 value = "2048" ; 
                 if ((values != null) && (values.size() == 1)) {
                      value = (String) values.iterator().next(); 
-                } 
+                } else {
+                    debug.warning("Value for " + SAML2_BUFFER_LENGTH + " null or size!=1. Defaulting to 2048.");
+                }
                 newAttributes.put(SAML2_BUFFER_LENGTH, value);                 
+            } else {
+                debug.warning("Attribute map returned from ConfigurationInstance for the SAML2 config is null! " +
+                        "Default values for failover (false) and buffer length (2048) will be set.");
             }
             attributes = newAttributes;
         } 
         if (debug.messageEnabled()) {
-            debug.message("SAML2ConfigService.setValues : "
-                + "Failover attr = " + attributes.get(SAML2_FAILOVER_ATTR)
-                + "buffer length = " + attributes.get(SAML2_BUFFER_LENGTH));                
+            debug.message("Attributes in SAML2ConfigService updated to: "
+                + attributes);
         }
     }
     

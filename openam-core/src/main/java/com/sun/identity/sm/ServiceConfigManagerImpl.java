@@ -170,10 +170,15 @@ class ServiceConfigManagerImpl implements SMSObjectListener {
             StringBuilder sb = new StringBuilder(50);
             cacheName = sb.append(token.getTokenID().toString()).append(
                     groupName).toString().toLowerCase();
-            if ((answer = (ServiceConfigImpl) globalConfigs.get(cacheName)) 
-                != null) {
+            if (((answer = (ServiceConfigImpl) globalConfigs.get(cacheName))
+                != null) && answer.isValid() && !answer.isNewEntry()) {
                 return (answer);
+            } else {
+                // remove entry from cache
+                globalConfigs.remove(cacheName);
+                answer = null;
             }
+
         }
         
         // Not in cache, check global schema

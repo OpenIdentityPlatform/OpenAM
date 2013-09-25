@@ -144,7 +144,10 @@ public class ConfigurationInstanceImpl implements ConfigurationInstance {
      *     configuration for this components. 
      * @return Map of key/value pairs, key is the attribute name, value is
      *     a Set of attribute values or null if service configuration doesn't
-     *     doesn't exist.
+     *     doesn't exist. If the configName parameter is null or empty, and OrganizationalConfig state is present,
+     *     this state will be merged with the GlobalConfig attributes, with the OrganizationConfig attributes
+     *     over-writing the GlobalConfig attributes, in case GlobalConfig and OrganizationConfig attributes share the
+     *     same key.
      * @exception ConfigurationException if an error occurred while getting
      *     service configuration.
      */
@@ -159,15 +162,22 @@ public class ConfigurationInstanceImpl implements ConfigurationInstance {
 
         try {
             if (hasOrgSchema) {
-                ServiceConfig sc = null;
-                sc = scm.getOrganizationConfig(realm, null);
+                ServiceConfig organizationConfig = null;
+                organizationConfig = scm.getOrganizationConfig(realm, null);
 
-                if (sc == null) {
+                if (organizationConfig == null) {
                     return null;
                 }
 
                 if ((configName == null) || (configName.length() == 0)) {
-                    return sc.getAttributes();
+                    Map organizationAttributes = organizationConfig.getAttributes();
+                    ServiceConfig globalConfig = scm.getGlobalConfig(configName);
+                    if (globalConfig != null) {
+                        Map mergedAttributes = globalConfig.getAttributes();
+                        mergedAttributes.putAll(organizationAttributes);
+                        return mergedAttributes;
+                    }
+                    return organizationAttributes;
                 } else {
                     if (subConfigId == null) {
                         if (debug.messageEnabled()) {
@@ -179,12 +189,12 @@ public class ConfigurationInstanceImpl implements ConfigurationInstance {
                         throw new ConfigurationException(RESOURCE_BUNDLE,
                             "noSubConfig", data);
                     }
-                    sc = sc.getSubConfig(configName);
-                    if (sc == null) {
+                    organizationConfig = organizationConfig.getSubConfig(configName);
+                    if (organizationConfig == null) {
                         return null;
                     }
 
-                    return sc.getAttributes();
+                    return organizationConfig.getAttributes();
                 }
             } else {
                 if ((realm != null) && (!realm.equals("/"))) {
