@@ -42,20 +42,6 @@ import java.util.*;
 
 public class ClientResourceManager {
 
-    public boolean usersEqual(ServerContext context) throws SSOException, IdRepoException{
-        return getUid(context).equals(getAdminIdentity());
-    }
-
-    private AMIdentity getAdminIdentity(){
-        String adminUser = SystemProperties.get(Constants.AUTHENTICATION_SUPER_USER);
-        AMIdentity adminUserId = null;
-        if (adminUser != null) {
-            return new AMIdentity(getAdminToken(),
-                    adminUser, IdType.USER, "/", null);
-        }
-        return null;
-    }
-
     private SSOToken getAdminToken(){
         return (SSOToken) AccessController.doPrivileged(AdminTokenAction.getInstance());
     }
@@ -110,14 +96,6 @@ public class ClientResourceManager {
      */
     private String getCookieFromServerContext(ServerContext context) {
         return RestUtils.getCookieFromServerContext(context);
-    }
-
-    private AMIdentity getUid(ServerContext context) throws SSOException, IdRepoException{
-        String cookie = getCookieFromServerContext(context);
-        SSOTokenManager mgr = SSOTokenManager.getInstance();
-        SSOToken token = mgr.createSSOToken(cookie);
-        return IdUtils.getIdentity(token);
-
     }
 
     public void deleteIdentity(String id) throws SSOException, IdRepoException, InternalServerErrorException{

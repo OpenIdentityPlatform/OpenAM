@@ -163,6 +163,22 @@
         <filter-name>PassThroughAuthorizationFilter</filter-name>
         <url-pattern>/json/serverinfo/*</url-pattern>
     </filter-mapping>
+    <filter-mapping>
+        <filter-name>CommonsAuthenticationFilter</filter-name>
+        <url-pattern>/frrest/*</url-pattern>
+    </filter-mapping>
+    <filter-mapping>
+        <filter-name>CommonsAuthnContextMapperFilter</filter-name>
+        <url-pattern>/frrest/*</url-pattern>
+    </filter-mapping>
+    <filter-mapping>
+        <filter-name>AdminOnlyFilter</filter-name>
+        <url-pattern>/frrest/oauth2/client/*</url-pattern>
+    </filter-mapping>
+    <filter-mapping>
+        <filter-name>PassThroughAuthorizationFilter</filter-name>
+        <url-pattern>/frrest/oauth2/token/*</url-pattern>
+    </filter-mapping>
 
     <!-- filter mapping -->
 

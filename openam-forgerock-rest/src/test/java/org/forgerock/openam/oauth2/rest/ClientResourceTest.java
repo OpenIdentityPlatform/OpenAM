@@ -67,7 +67,6 @@ public class ClientResourceTest {
         ClientResourceManager mockManager = mock(ClientResourceManager.class);
 
         //setup mockManager
-        when(mockManager.usersEqual(any(ServerContext.class))).thenReturn(true);
         doNothing().when(mockManager).deleteIdentity(anyString());
         doNothing().when(mockManager).createIdentity(anyString(), anyString(),anyMap());
 
@@ -100,7 +99,6 @@ public class ClientResourceTest {
         ClientResourceManager mockManager = mock(ClientResourceManager.class);
 
         //setup mockManager
-        when(mockManager.usersEqual(any(ServerContext.class))).thenReturn(true);
         doNothing().when(mockManager).deleteIdentity(anyString());
         doNothing().when(mockManager).createIdentity(anyString(), anyString(),anyMap());
 

@@ -1,7 +1,7 @@
 /*
  * DO NOT REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright (c) 2012-2013 ForgeRock Inc. All rights reserved.
+ * Copyright (c) 2012-2013 ForgeRock AS. All rights reserved.
  *
  * The contents of this file are subject to the terms
  * of the Common Development and Distribution License
@@ -30,7 +30,6 @@ import com.iplanet.sso.SSOTokenManager;
 import com.sun.identity.idm.AMIdentity;
 import com.sun.identity.idm.IdRepoException;
 import com.sun.identity.idm.IdType;
-import com.sun.identity.idm.IdUtils;
 import com.sun.identity.security.AdminTokenAction;
 import com.sun.identity.shared.Constants;
 import com.sun.identity.shared.OAuth2Constants;
@@ -51,18 +50,16 @@ import org.forgerock.json.resource.ReadRequest;
 import org.forgerock.json.resource.Resource;
 import org.forgerock.json.resource.ResourceException;
 import org.forgerock.json.resource.ResultHandler;
-import org.forgerock.json.resource.SecurityContext;
 import org.forgerock.json.resource.ServerContext;
 import org.forgerock.json.resource.ServiceUnavailableException;
 import org.forgerock.json.resource.UpdateRequest;
-import org.forgerock.json.resource.servlet.HttpContext;
 import org.forgerock.openam.ext.cts.repo.OAuthTokenStore;
 import org.forgerock.openam.forgerockrest.RestUtils;
+import org.forgerock.openam.oauth2.utils.OAuth2Utils;
 
 import javax.inject.Inject;
 import java.security.AccessController;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -113,7 +110,6 @@ public class TokenResource implements CollectionResourceProvider {
         //only admin can delete
         AMIdentity uid = null;
         try {
-            uid = getUid(context);
 
             JsonValue response = null;
             try {
@@ -123,6 +119,14 @@ public class TokenResource implements CollectionResourceProvider {
                 }
                 Set<String> usernameSet = (Set<String>)response.get(OAuth2Constants.CoreTokenParams.USERNAME).getObject();
                 String username= null;
+
+                Set<String> realms = (Set<String>) response.get(OAuth2Constants.CoreTokenParams.REALM).getObject();
+                String realm = null;
+                if (realms != null && !realms.isEmpty()){
+                    realm = realms.iterator().next();
+                }
+                uid = getUid(context, realm);
+
                 if (usernameSet != null && !usernameSet.isEmpty()){
                     username = usernameSet.iterator().next();
                 }
@@ -130,7 +134,8 @@ public class TokenResource implements CollectionResourceProvider {
                     PermanentException ex = new PermanentException(404, "Not Found", null);
                     handler.handleError(ex);
                 }
-                if (uid.getName().equalsIgnoreCase(username) || uid.equals(adminUserId)) {
+                AMIdentity uid2 = OAuth2Utils.getIdentity(username, realm);
+                if (uid.equals(uid2) || uid.equals(adminUserId)) {
                     oAuthTokenStore.delete(resourceId);
                 } else {
                     PermanentException ex = new PermanentException(401, "Unauthorized", null);
@@ -173,7 +178,7 @@ public class TokenResource implements CollectionResourceProvider {
                 //get uid of submitter
                 AMIdentity uid;
                 try {
-                    uid = getUid(context);
+                    uid = getUid(context, null);
                     if (!uid.equals(adminUserId)){
                         query.put(OAuth2Constants.CoreTokenParams.USERNAME, uid.getName());
                     } else {
@@ -222,8 +227,6 @@ public class TokenResource implements CollectionResourceProvider {
         AMIdentity uid = null;
         String username = null;
         try {
-            uid = getUid(context);
-
             JsonValue response;
             Resource resource;
             try {
@@ -234,6 +237,12 @@ public class TokenResource implements CollectionResourceProvider {
             if (response == null){
                 throw new NotFoundException("Token Not Found", null);
             }
+            Set<String> realms = (Set<String>) response.get(OAuth2Constants.CoreTokenParams.REALM).getObject();
+            String realm = null;
+            if (realms != null && !realms.isEmpty()){
+                realm = realms.iterator().next();
+            }
+            uid = getUid(context, realm);
             Set<String> usernameSet = (Set<String>)response.get(OAuth2Constants.CoreTokenParams.USERNAME).getObject();
             if (usernameSet != null && !usernameSet.isEmpty()){
                 username = usernameSet.iterator().next();
@@ -242,7 +251,8 @@ public class TokenResource implements CollectionResourceProvider {
                 PermanentException ex = new PermanentException(404, "Not Found", null);
                 handler.handleError(ex);
             }
-            if (uid.equals(adminUserId) || username.equalsIgnoreCase(uid.getName())){
+            AMIdentity uid2 = OAuth2Utils.getIdentity(username, realm);
+            if (uid.equals(adminUserId) || uid.equals(uid2)){
                 resource = new Resource(OAuth2Constants.Params.ID, "1", response);
                 handler.handleResult(resource);
             } else {
@@ -275,12 +285,11 @@ public class TokenResource implements CollectionResourceProvider {
         return RestUtils.getCookieFromServerContext(context);
     }
 
-    private AMIdentity getUid(ServerContext context) throws SSOException, IdRepoException{
+    private AMIdentity getUid(ServerContext context, String realm) throws SSOException, IdRepoException{
         String cookie = getCookieFromServerContext(context);
         SSOTokenManager mgr = SSOTokenManager.getInstance();
         SSOToken token = mgr.createSSOToken(cookie);
-        return IdUtils.getIdentity(token);
+        return OAuth2Utils.getIdentity(token.getProperty("UserToken"), realm);
     }
-
 
 }
