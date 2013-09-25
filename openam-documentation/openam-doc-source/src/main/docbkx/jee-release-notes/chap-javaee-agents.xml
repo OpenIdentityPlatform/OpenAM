@@ -124,16 +124,16 @@
      <para><?eval ${agentGlassFishSupport}?></para>
     </listitem>
     <listitem>
-     <para><?eval ${agentWebSphereSupport}?></para><!-- TODO: Deprecate 7.x? -->
+     <para><?eval ${agentWebSphereSupport}?></para>
     </listitem>
     <listitem>
-     <para><?eval ${agentJBossSupport}?></para><!-- TODO: Deprecate 4.x? -->
+     <para><?eval ${agentJBossSupport}?></para>
     </listitem>
     <listitem>
-     <para><?eval ${agentJettySupport}?></para><!-- TODO: what about 8, 9? -->
+     <para><?eval ${agentJettySupport}?></para>
     </listitem>
     <listitem>
-     <para><?eval ${agentWebLogicSupport}?></para><!-- TODO: Deprecate 10g? (11g or later only?) -->
+     <para><?eval ${agentWebLogicSupport}?></para>
     </listitem>
    </itemizedlist>
   </section>

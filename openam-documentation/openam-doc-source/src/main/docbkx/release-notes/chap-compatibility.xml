@@ -290,6 +290,10 @@
 
   <itemizedlist>
    <listitem>
+    <para>OpenAM Java SDK no longer supports JDK 5.</para>
+   </listitem>
+
+   <listitem>
     <para>The <literal>iplanet-am-auth-ldap-server-check</literal> property for
     LDAP and Active Directory authentication modules has been removed and
     replaced with a heartbeat mechanism configurable through the LDAP Connection

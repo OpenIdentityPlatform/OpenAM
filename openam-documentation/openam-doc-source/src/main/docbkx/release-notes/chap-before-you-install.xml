@@ -44,8 +44,7 @@
   <para>ForgeRock has tested this release of OpenAM primarily with Oracle
   Java SE JDK, and also tested OpenAM on WebSphere with IBM JDK.</para>
 
-  <!-- TODO: Are we doing to deprecate use of JDK 5? -->
-  <para>OpenAM Java SDK requires Java Development Kit 5, 6 or 7.</para>
+  <para>OpenAM Java SDK requires Java Development Kit 6 or 7.</para>
  </section>
 
  <section xml:id="web-container-requirements">
@@ -55,25 +54,27 @@
    <para>This release of OpenAM runs in the following web application
    containers.</para>
    <listitem>
-    <para>Apache Tomcat 6.0.x, 7.0.x (ForgeRock's preferred web container for
-    OpenAM)</para>
+    <para>Apache Tomcat 6, 7 (ForgeRock's preferred web container for OpenAM)</para>
    </listitem>
+   <!-- To be confirmed...
    <listitem>
-    <para>GlassFish v2</para>
+    <para>GlassFish v2, v3</para>
    </listitem>
+   -->
    <listitem>
     <para>IBM WebSphere 8.0, 8.5</para>
    </listitem>
    <listitem>
-    <!-- TODO: Deprecate 4.x? -->
-    <para>JBoss Enterprise Application Platform 4.x, 5.x</para>
-    <para>JBoss Application Server 7.x</para>
+    <para>JBoss Enterprise Application Platform 5, 6</para>
+    <para>JBoss Application Server 7</para>
    </listitem>
-<!-- This still doesn't work for me, see OPENAM-2853
    <listitem>
+    <!-- Pending OPENAM-2853 and other testing
     <para>Jetty 7</para>
+    <para>Jetty 8</para>
+    -->
+    <para>Jetty 9</para>
    </listitem>
--->
    <listitem>
     <para>Oracle WebLogic Server 11g (10.3.5)</para>
     <para>Oracle WebLogic Server 12c (12.1.1)</para>
@@ -101,7 +102,6 @@
     <para>ForgeRock recommends updating to the latest stable release.</para>
    </listitem>
    <listitem>
-    <para>External Sun OpenDS data store, version 2 or later</para>
     <para>External Oracle Unified Directory 11g or later</para>
    </listitem>
    <listitem>

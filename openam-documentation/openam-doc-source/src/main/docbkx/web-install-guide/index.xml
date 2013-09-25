@@ -66,7 +66,6 @@
  
  <xinclude:include href="preface.xml" />
  <xinclude:include href='chap-about-web-agents.xml' />
- <xinclude:include href='chap-apache-20.xml' />
  <xinclude:include href='chap-apache-22.xml' />
  <xinclude:include href='chap-apache-24.xml' />
  <xinclude:include href='chap-msiis-6.xml' />
