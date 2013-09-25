@@ -48,7 +48,6 @@
                 <include>org.forgerock.openam:openam-distribution-fedlet-unconfigured:zip</include>
                 <include>org.forgerock.openam:openam-distribution-ssoadmintools:zip</include>
                 <include>org.forgerock.openam:openam-distribution-ssoconfiguratortools:zip</include>
-                <include>org.forgerock.openam:openam-distribution-diagnostics</include>
                 <include>org.forgerock.openam:openam-idpdiscovery-war:war</include>
             </includes>
         </dependencySet>
