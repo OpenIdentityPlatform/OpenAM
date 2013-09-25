@@ -94,8 +94,8 @@ li {
 
 .product-logo /* product logo (should be 50px in height, width to be set below - no wider than 220px) */
 {
-    background-image:url(../images/stack-am.png);
-    width:106px;
+    /*background-image:url(../images/open-am.png);*/
+    /*width:106px;*/
     height:102px;
     background-repeat:no-repeat;
     display:block;
