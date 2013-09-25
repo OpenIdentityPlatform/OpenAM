@@ -26,14 +26,17 @@
 
 package org.forgerock.openam.authentication.modules.oauth2;
 
+import com.iplanet.am.util.SystemProperties;
 import com.iplanet.sso.SSOException;
 import com.sun.identity.authentication.client.AuthClientUtils;
+import com.sun.identity.authentication.service.AuthUtils;
 import com.sun.identity.authentication.spi.AMLoginModule;
 import com.sun.identity.authentication.spi.AuthLoginException;
 import com.sun.identity.authentication.spi.RedirectCallback;
 import com.sun.identity.authentication.util.ISAuthConstants;
 import com.sun.identity.idm.AMIdentity;
 import com.sun.identity.idm.IdRepoException;
+import com.sun.identity.shared.Constants;
 import com.sun.identity.shared.encode.Base64;
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -115,7 +118,13 @@ public class OAuth extends AMLoginModule {
                 String requestedURL = request.getRequestURL().toString();
                 String requestedQuery = request.getQueryString();
 
+                String authCookieName = AuthUtils.getAuthCookieName();
+
                 if (requestedQuery != null) {
+                    if (requestedQuery.endsWith(authCookieName + "=")) {
+                        requestedQuery = requestedQuery.substring(0,
+                                requestedQuery.length() - authCookieName.length() - 1);
+                    }
                     requestedURL += "?" + requestedQuery;
                 }
 
