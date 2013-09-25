@@ -333,6 +333,11 @@ Install log file location:
   &lt;dispatcher&gt;FORWARD&lt;/dispatcher&gt;
   &lt;dispatcher&gt;ERROR&lt;/dispatcher&gt;
  &lt;/filter-mapping&gt;</programlisting>
+
+    <para>Applications without the filter configuration are not protected by
+    the policy agent. For example, if you add the filter for a particular
+    application but not for the root context, then the root context is not
+    protected by the policy agent.</para>
    </step>
    <step>
     <para>Start the GlassFish domain where you installed the agent.</para>
