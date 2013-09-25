@@ -39,21 +39,34 @@
 
   <itemizedlist>
    <listitem>
-    <para>A new web policy agent, Varnish, has been added. Varnish is a unique policy
-    agent that does not require the Java environment and it has a unique set of 
-    instructions for the <command>agentadmin</command> command. Varnish also uses a directory
-    called <filename>vmods</filename>. This is the location where you will need to handle any required
-    installation or Varnish updates, and it requires the user to have administrative 
-    rights to update this directory for changes to take effect.</para>
+    <para>All of the web policy agents have been updated to include support for
+    Internet Protocol version 6 (IPv6) support, in addition to support for
+    IPv4.</para>
    </listitem>
 
    <listitem>
-    <para>All of the web policy agents have been updated to include support for Internet
-    Protocol version 6 (IPv6) support, in addition to support for IPv4. <!--include in the notes when 
-    AME-1134 is closed, which includes removing unused libraries.--></para>
-    <para>IPv6 replaces IPv4 to fix the problems of IPv4 address exhaustion. The new 
-    protocol version increases the number of available internet addresses by using 
-    128-bit addresses instead of the 32-bit addresses of IPv4.</para>
+    <para>Web policy agents now encrypt the value of the
+    <literal>com.sun.identity.agents.config.certdb.password</literal> property
+    (<link xlink:href="https://bugster.forgerock.org/jira/browse/OPENAM-2479"
+    xlink:show="new">OPENAM-2479</link>).</para>
+   </listitem>
+
+   <listitem>
+    <para>Web policy agents debug logs now show the full REST URL accessed
+    during the bootstrap process (<link xlink:show="new"
+    xlink:href="https://bugster.forgerock.org/jira/browse/OPENAM-2397"
+    >OPENAM-2397</link>).</para>
+   </listitem>
+
+   <listitem>
+    <para>This release adds a new web policy agent for Varnish Cache (<link
+    xlink:href="https://bugster.forgerock.org/jira/browse/OPENAM-1362"
+    xlink:show="new">OPENAM-1362</link>). The Varnish Cache web policy agent
+    does not require a Java environment to use its <command>agentadmin</command>
+    command. The Varnish Cache policy agent also uses a directory called
+    <filename>vmods</filename>. This is the location used to handle any required
+    installation or Varnish Cache updates. The user running Varnish Cache must
+    have access to update the <filename>vmods</filename> directory.</para>
    </listitem>
 
    <listitem>
@@ -199,14 +212,12 @@
    <para> ForgeRock recommends the most recent update of the supported version of
    Java to ensure you have the latest security fixes.</para>
 
-      <para>All web policy agents except those associated with Varnish Cache and Microsoft IIS
-          require Java for installation. If Java is required, you must install a supported version of the
-          Java runtime environment. Please review the <link xlink:show="new"
-          xlink:href="http://openam.forgerock.org/openam-documentation/openam-doc-source/doc/release-notes/#java-requirements">
-              <citetitle>OpenAM Release Notes</citetitle></link> for the currently supported version
-              of Java and then set the <literal>JAVA_HOME</literal> environment variable accordingly.</para>
+   <para>All web policy agents except those associated with Varnish Cache and
+   Microsoft IIS require a Java 6 or 7 runtime environment for installation.
+   ForgeRock recommends the most recent update of Java 6 or 7 to ensure you
+   have the latest security fixes.</para>
 
-      <para>ForgeRock has tested this release with Oracle Java SE JDK.</para>
+   <para>ForgeRock has tested this release with Oracle Java SE JDK.</para>
   </section>
 
   <section xml:id="browser-requirements-web-agents">
@@ -351,7 +362,7 @@
       validation by default. Naming URL validation is now fully disabled by
       default. You can adjust this setting by using the bootstrap configuration
       property,
-      <literal>com.forgerock.agents.ext.url.validation.disable</literal>.</para>
+      <literal>com.forgerock.agents.ext.url.validation.level</literal>.</para>
      </listitem>
 
      <listitem>
@@ -386,8 +397,11 @@
 
    <section xml:id="web-agent-removed">
     <title>Removed Functionality</title>
-    <para>No functionality has been removed in OpenAM Web Policy Agents
-    <?eval ${webAgentsDocTargetVersion}?>.</para>
+
+    <para>The web policy agent bootstrap property
+    <literal>com.forgerock.agents.ext.url.validation.disable</literal>
+    introduced in release 3.1.0 has been superseded by the bootstrap property
+    <literal>com.forgerock.agents.ext.url.validation.level</literal>.</para>
    </section>
   </section>
 

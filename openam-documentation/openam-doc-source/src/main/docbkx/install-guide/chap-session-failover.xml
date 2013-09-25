@@ -47,14 +47,19 @@
  balancer fails client requests over to another OpenAM server. The other OpenAM
  server must then fail over the user session associated with the client.</para>
  
- <para>SFO uses a highly available data store for OpenAM
- session data, shared by OpenAM servers in a site configuration. When the
+ <para>SFO relies on a highly available Core Token Service (CTS) to store OpenAM
+ session data. The services is shared with other OpenAM servers. When the
  OpenAM server where a user authenticated goes down, other OpenAM servers can
- read the user session information from the highly available store, so the
- user does not have to authenticate again. When the original OpenAM server
- becomes available again, it can also read session information from the
- store, and carry on serving users with active sessions.</para>
- 
+ read the user session information from the CTS, so the user does not have to
+ authenticate again. When the original OpenAM server becomes available again,
+ it can also read session information from the CTS, and can carry on serving
+ users with active sessions.</para>
+
+ <important>
+  <para>After upgrading from versions earlier than OpenAM 11.0.0, all users
+  must login again as the OpenAM session representation has changed.</para>
+ </important>
+
  <para><link xlink:href="install-guide#additional-instance-config"
      xlink:role="http://docbook.org/xlink/role/olink"><citetitle>
      Configuring an Additional Instance</citetitle></link>
@@ -63,19 +68,7 @@
      server to use a load balancer for the first instance if it was not
      part of the initial configuration.</para>
 
- <note>
-  <para>Following an upgrade to OpenAM 10.1.0 XPress release, all users will
-  need to login again because OpenAM no longer uses Open Message Queue or 
-  Berkeley DB Java Edition for SFO. </para>
- </note>
- 
- <note>
-  <para>SFO is supported within a site or data center with a
-  shared local area network. SFO is not supported across sites
-  and data centers linked by wide area networks (WAN).</para>
- </note>
- 
-  <procedure xml:id="first-instance-load-balancer">
+ <procedure xml:id="first-instance-load-balancer">
   <title>Configure First OpenAM Instance Behind a Load Balancer</title>
   
   <para>Before you set up SFO, first configure OpenAM in a site
@@ -170,158 +163,4 @@
    <para>Save your changes.</para>
   </step>
  </procedure>
- <!--
- <procedure xml:id="prepare-site-session-data-service">
-  <title>To Prepare the Session Data Service</title>
-  
-  <para>The session data service relies on Open Message Queue and Berkeley DB
-  Java Edition. You set up the SFO service in a site cluster to
-  serve as the highly available session data store.</para>
-  
-  <step>
-   <para>Install the session tools from <filename>ssoSessionTools.zip</filename>
-   on at least two, and generally not more than four, servers where you run
-   OpenAM.<footnote><para>You install more than one instance of the session
-   tools in case an instance crashes and must fail over to another instance. At
-   the same time, SFO requires that messages be sent across the
-   network from one instance to another to stay in sync in case of failover. If
-   you install too many instances, however, then the increase in network
-   traffic for synchronization can impair performance.</para></footnote></para>
-   <para>For example, you can install the session tools in the OpenAM
-   configuration directory.</para>
-   <screen>$ cd $HOME/openam
-$ unzip ~/Downloads/opensso/tools/ssoSessionTools.zip
-...
-$ ./setup
-Name of the directory to install the scripts (example: sfoscripts):sfoscripts
-The scripts are properly setup under directory: /home/user/openam/sfoscripts
-JMQ is properly setup under directory /home/user/openam/jmq</screen>
-  </step>
-  <step>
-   <para>Start the Message Queue broker in order to configure user
-   accounts.</para>
-   <screen>$ cd jmq/imq/bin
-$ ./imqbrokerd -name aminstance -port 7777 &amp;</screen>
-  </step>
-  <step>
-   <para>Change the default admin password from <literal>admin</literal> to
-   something else.</para>
-   <screen>$ ./imqusermgr update -u admin -p password -i aminstance
-User repository for broker instance: aminstance
-Are you sure you want to update user admin? (y/n)[n] y
-User admin successfully updated.</screen>
-  </step>
-  <step>
-   <para>Disable the default <literal>guest</literal> account.</para>
-   <screen>$ ./imqusermgr update -u guest -a false -i aminstance
-User repository for broker instance: aminstance
-Are you sure you want to update user guest? (y/n)[n] y
-User guest successfully updated.</screen>
-  </step>
-  <step>
-   <para>Add a user for the SFO service.</para>
-   <screen>$ ./imqusermgr add -u openamuser -g admin -p secret12 -i aminstance
-User repository for broker instance: aminstance
-User openamuser successfully added.</screen>
-  </step>
-  <step>
-   <para>Create a password file for the SFO service.</para>
-   <screen>$ cd ../../../sfoscripts/bin/
-$ ./amsfopassword -encrypt secret12 -passwordfile /home/user/openam/mqpwd.txt
-os.name=Linux
-SUCCESSFUL</screen>
-  </step>
-  <step>
-   <para>Stop the broker you started on port 7777.</para>
-   <screen>$ fg
-./imqbrokerd -name aminstance -port 7777 (wd: ~/openam/jmq/imq/bin)
-^C
-[05/Mar/2012:08:35:22 CET] [B1047]: Shutting down broker...
-[05/Mar/2012:08:35:22 CET] [B1077]: Broadcast good-bye to all connections ...
-[05/Mar/2012:08:35:22 CET] [B1078]: Flushing good-bye messages ...
-[05/Mar/2012:08:35:23 CET] [B1048]: Shutdown of broker complete.</screen>
-  </step>
-  <step>
-   <para>Configure the SFO service for the site.</para>
-   <para>For each session tools installation, edit the
-   <filename>/home/user/openam/sfoscripts/config/lib/amsfo.conf</filename>
-   configuration file to change at least the <literal>USER_NAME</literal>,
-   <literal>CLUSTER_LIST</literal>, and <literal>PASSWORDFILE</literal>
-   parameters.</para>
-   <para><literal>USER_NAME</literal> should match the user you created for the
-   SFO service.</para>
-   <screen>USER_NAME=openamuser</screen>
-   <para><literal>CLUSTER_LIST</literal> specifies the <literal><replaceable
-   >host</replaceable>:<replaceable>port</replaceable></literal> combinations
-   for all the SFO services you configure for the site.</para>
-   <screen>CLUSTER_LIST=openam.example.com:7777,openam2.example.com:7777</screen>
-   <para><literal>PASSWORDFILE</literal> specifies the path to the password
-   file you created.</para>
-   <screen>PASSWORDFILE=/home/user/openam/mqpwd.txt</screen>
-   <para>You can optionally set <literal>AMSESSIONDB_ARGS="-v"</literal> to log
-   additional information.</para>
-  </step>
- </procedure>
- 
- <procedure xml:id="enable-site-session-failover">
-  <title>To Enable SFO</title>
-  
-  <para>Enabling SFO at this point involves configuring OpenAM to
-  use the session data store, and then starting services. Examples in this
-  procedure show OpenAM running in Apache Tomcat.</para>
-  
-  <step>
-   <para>On one of the OpenAM servers in the site, login to the console, and
-   then select Configuration &gt; Global &gt; Session &gt; Instances &gt; New...
-   to set up session data store access.</para>
-
-   <para>Provide a user name for the Session Store User, such as
-   <literal>openamuser</literal>, with the same password you entered into the
-   password file, and the Database Url is the <literal><replaceable
-   >host</replaceable>:<replaceable>port</replaceable></literal> combination
-   that you entered for the <literal>CLUSTER_LIST</literal> parameter.</para>
-
-   <para>Be sure to Add the new instance, and then also Save your configuration
-   changes. The configuration changes take effect after you restart
-   OpenAM.</para>
-  </step>
-  <step>
-   <para>Stop each OpenAM server in the site.</para>
-   <screen>$ /etc/init.d/tomcat stop</screen>
-  </step>
-  <step>
-   <para>Start each session data service in the cluster.</para>
-   <screen>$ cd /home/user/openam/sfoscripts/bin
-$ ./amsfo start</screen>
-   <para>By default, the log and session data store are located under
-   <filename>/tmp/amsession/</filename>.</para>
-   <screen>$ tail -f /tmp/amsession/logs/amsessiondb.log
-...
-Initializing and connecting to the Message Queue server ...
-Successfully started.</screen>
-  </step>
-  <step>
-   <para>Start each OpenAM server in the site.</para>
-   <screen>$ /etc/init.d/tomcat start</screen>
-   <para>Wait for each OpenAM server to start before starting another.</para>
-   <screen>$ tail -f /path/to/tomcat/logs/catalina.out
-...
-INFO: Server startup in 26047 ms</screen>
-   <para>After OpenAM has started, you can test SFO.</para>
-   TODO: Cover how to troubleshoot when things go wrong, either here
-   or in the Admin Guide troubleshooting chapter.
-  </step>
- </procedure> -->
-
-<!--  <section xml:id="global-session-failover">
-  <title>Global SFO</title>
-  <para>OpenAM includes a new, multi-site SFO mechanism based on
-  OpenDJ.</para>
- </section>
- 
- <section xml:id="site-based-session-failover">
-  <title>Site Based SFO</title>
-  <para>OpenAM also provides the site-based SFO service available
-  in earlier versions.</para>
- </section> -->
 </chapter>

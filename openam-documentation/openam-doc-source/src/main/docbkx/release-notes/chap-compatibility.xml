@@ -87,13 +87,10 @@
    </listitem>
  -->
 
-   <!-- Fix for OPENAM-1578 -->
    <listitem>
-    <para>In earlier versions the default root suffix DN for OpenAM
-    configuration and profile data was
-    <literal>dc=opensso,dc=java,dc=net</literal>.
-    The default root suffix is now
-    <literal><?eval ${defaultRootSuffix}?></literal>.</para>
+    <para>In versions before OpenAM 10.1.0 the default root suffix DN for OpenAM
+    configuration and profile data was <literal>dc=opensso,dc=java,dc=net</literal>.
+    The default root suffix is now <literal><?eval ${defaultRootSuffix}?></literal>.</para>
    </listitem>
 
    <listitem>
@@ -282,8 +279,8 @@
     OpenAM.</para>
 
     <para>Support for the older REST services is likely to be removed in a
-    future release in favor of the newer REST services, but not before
-    replacement REST services are introduced.</para>
+    future release in favor of the newer REST services. Older REST services
+    will be removed only after replacement REST services are introduced.</para>
    </listitem>
   </itemizedlist>
  </section>
@@ -292,23 +289,6 @@
   <title>Removed Functionality</title>
 
   <itemizedlist>
-   <listitem>
-    <para>For OpenAM <?eval ${serverDocTargetVersion}?>, the use of the
-    previous session failover implementation has been removed.</para>
-   </listitem>
-
-   <listitem>
-    <para>With the updated session failover, SAML 2 and session persistence have
-    changed. The methods used prior to OpenAM 10.1.0 are no longer
-    available.</para>
-   </listitem>
-
-   <listitem>
-    <!-- Fix for OpenAM-837 -->
-    <para>Support for Liberty Identity Web Services Framework (ID-WSF) has been
-    removed.</para>
-   </listitem>
-
    <listitem>
     <para>The <literal>iplanet-am-auth-ldap-server-check</literal> property for
     LDAP and Active Directory authentication modules has been removed and
@@ -327,11 +307,6 @@
     <literal>openam.session.destroy_all_sessions</literal>, has been replaced
     by the built-in Global Session Service setting,
     <literal>DESTROY_OLD_SESSIONS</literal>.</para>
-   </listitem>
-
-   <listitem>
-    <para>Resources for integrating OpenAM with third-party access and identity
-    management software are not delivered with the distribution.</para>
    </listitem>
 
    <listitem>

@@ -40,12 +40,17 @@
 
   <itemizedlist>
    <listitem>
-    <para>A new Java EE policy agent for JBoss 7 has been added. The new agent simplifies 
-    integration with JBoss AS 7 (EAP 6) application servers by leveraging the module 
-    system introduced in JBoss 7.</para>
+    <para>A new Java EE policy agent for JBoss 7 has been added. The new agent
+    simplifies integration with JBoss AS 7 (EAP 6) application servers by
+    leveraging the module system introduced in JBoss 7 (<link xlink:show="new"
+    xlink:href="https://bugster.forgerock.org/jira/browse/OPENAM-1806"
+    >OPENAM-1806</link>, <link xlink:show="new"
+    xlink:href="https://bugster.forgerock.org/jira/browse/OPENAM-1735"
+    >OPENAM-1735</link>).</para>
    </listitem>
-  </itemizedlist>
-  <itemizedlist>
+   <listitem>
+    <para>Java EE policy agents now fully support Java 7 environments.</para>
+   </listitem>
    <listitem>
     <para>The Java EE agent goto URL can now be modified (<link
     xlink:href="https://bugster.forgerock.org/jira/browse/OPENAM-1299"
@@ -54,7 +59,9 @@
    <listitem>
     <para>The Apache Tomcat policy agent now supports Tomcat 7 as well (<link
     xlink:href="https://bugster.forgerock.org/jira/browse/OPENAM-1273"
-    xlink:show="new">OPENAM-1273</link>).</para>
+    xlink:show="new">OPENAM-1273</link>, <link
+    xlink:href="https://bugster.forgerock.org/jira/browse/OPENAM-591"
+    xlink:show="new">OPENAM-591</link>).</para>
    </listitem>
    <listitem>
     <para>Java EE policy agents can now conditionally redirect users based on
@@ -84,12 +91,9 @@
   <section xml:id="java-requirements-javaee-agents">
    <title>Java EE Agents Java Requirements</title>
 
-   <para>Java EE policy agents run in a Java EE Web container.
-       Please review the <link xlink:show="new"
-       xlink:href="http://openam.forgerock.org/openam-documentation/openam-doc-source/doc/release-notes/#java-requirements">
-           <citetitle>OpenAM Release Notes</citetitle></link> for the currently supported version
-       of Java. ForgeRock recommends the most recent update of the installed version of Java
-       to ensure you have the latest security fixes.</para>
+   <para>Java EE policy agents run in a Java EE Web container and require Java
+   Development Kit 6 or Java Development Kit 7. ForgeRock recommends the most
+   recent update of Java 6 or 7 to ensure you have the latest security fixes.</para>
 
    <para>ForgeRock has tested this release with Oracle Java SE JDK.</para>
   </section>
@@ -228,9 +232,7 @@
   <section xml:id="javaee-agent-limitations">
    <title>Limitations</title>
 
-   <para>Not all features of OpenAM Java EE policy agents work with IPv6.</para>
-
-   <!-- For OPENAM-1991 TODO: Remove when this is fixed after 3.1.0-Xpress -->
+   <!-- For OPENAM-1991 TODO: Remove when this is fixed -->
    <para>Apache Tomcat can fail to shut down properly when the Java EE policy
    agent for Tomcat is deployed. To work around this limitation, add the
    following to your Tomcat configuration in the <literal>&lt;Server port="8005"

@@ -37,6 +37,16 @@
  covers the status of key issues and limitations at release
  <?eval ${serverDocTargetVersion}?>.</para>
 
+ <!-- TODO: Note for the final release
+ <important>
+  <para>This release resolves a number of issues, including security issues in
+  OpenAM. It is strongly recommended that you update to this release to make
+  your deployment more secure, and to take advantage of important functional
+  fixes. ForgeRock customers can contact support for help and further
+  information.</para>
+ </important>
+ -->
+
  <section xml:id="fixes">
   <title>Key Fixes</title>
 
