@@ -129,8 +129,7 @@
   <itemizedlist>
    <listitem>
     <para>Under <literal>/json/authenticate</literal> and
-    <literal>/json/sessions</literal>, you find the newer JSON-based
-    APIs.</para>
+    <literal>/json/sessions</literal>, you find the newer JSON-based APIs.</para>
 
     <para>See <xref linkend="rest-api-auth-json" /> below.</para>
    </listitem>
