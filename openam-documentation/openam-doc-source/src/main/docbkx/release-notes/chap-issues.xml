@@ -71,7 +71,10 @@
   <para>Do not run different versions of OpenAM together in the same OpenAM
   site.</para>
 
-  <para>Not all features of OpenAM work with IPv6.</para>
+  <para>When deploying OpenAM components on Microsoft Windows in an IPv6 environment,
+  you must use the Java 7 Development Kit on Windows (due to <link xlink:show="new"
+  xlink:href="http://bugs.sun.com/view_bug.do?bug_id=6230761">JDK-6230761</link>,
+  which is fixed only in Java 7).</para>
 
   <para>The Database Repository type of data store is experimental and not
   supported for production use.</para>
