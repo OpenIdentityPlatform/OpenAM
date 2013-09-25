@@ -30,20 +30,21 @@
 
 /*global define, require*/
 
-define(["org/forgerock/libwrappers/JQueryWrapper"], 
+define(["org/forgerock/libwrappers/JQueryWrapper"],
         function($) {
 
     var obj = {};
-    
+
     obj.infoCollectorClasses = ["org/forgerock/openam/extensions/authmodules/adaptivedeviceprint/infocollectors/ScreenInfoCollector",
                                 "org/forgerock/openam/extensions/authmodules/adaptivedeviceprint/infocollectors/TimezoneCollector",
                                 "org/forgerock/openam/extensions/authmodules/adaptivedeviceprint/infocollectors/BrowserPluginsCollector",
-                                "org/forgerock/openam/extensions/authmodules/adaptivedeviceprint/infocollectors/GeolocationCollector"];
+                                "org/forgerock/openam/extensions/authmodules/adaptivedeviceprint/infocollectors/GeolocationCollector",
+                                "org/forgerock/openam/extensions/authmodules/adaptivedeviceprint/infocollectors/BrowserFontsCollector"];
 
     obj.collectInfo = function() {
         var i, j, result = {}, oneCollectorInfo;
         for(i = 0; i < obj.infoCollectorClasses.length; i++) {
-            oneCollectorInfo = require(obj.infoCollectorClasses[i]).gatherInformation(); 
+            oneCollectorInfo = require(obj.infoCollectorClasses[i]).gatherInformation();
             if(oneCollectorInfo) {
                 $.extend(result, oneCollectorInfo);
             }

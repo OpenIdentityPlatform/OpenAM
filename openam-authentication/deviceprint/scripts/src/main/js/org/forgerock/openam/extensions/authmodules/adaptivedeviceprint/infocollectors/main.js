@@ -33,4 +33,5 @@
 define(["./BrowserPluginsCollector", 
         "./ScreenInfoCollector", 
         "./TimezoneCollector", 
-        "./GeolocationCollector"]);
+        "./GeolocationCollector",
+        "./BrowserFontsCollector"]);
