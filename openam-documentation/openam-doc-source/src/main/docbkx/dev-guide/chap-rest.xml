@@ -154,7 +154,7 @@
 
    <screen> $ curl
  --request POST --header "Content-Type: application/json"
- "https://openam.example.com:8443/openam/json/auth/1/authenticate
+ "https://openam.example.com:8443/openam/json/authenticate
  ?username=demo&amp;password=password"
 
 { "tokenId": "AQIC5w...NTcy*", "successUrl": "/openam/console" }</screen>
