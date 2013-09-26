@@ -1972,8 +1972,8 @@ public class AccessManager {
         optionAliases={},
         macro="authentication",
         optionalOptions={
-            "agentnames|s|m|Names of agent.",
-            "file|D|s|Name of file that contains the agent names to be deleted."},
+            "agentnames|s|m|Separate multiple agent names with spaces.",
+            "file|D|s|File containing agent names, with multiple agent names separated by spaces."},
         resourceStrings={
             "missing-agent-names=Agent names need to be provided either with --agentnames or --file option.",
             "delete-agent-succeeded=The following agents were deleted."
@@ -2118,8 +2118,8 @@ public class AccessManager {
         optionAliases={},
         macro="authentication",
         optionalOptions={
-            "agentgroupnames|s|m|Names of agent group.",
-            "file|D|s|Name of file that contains the agent group names to be deleted."},
+            "agentgroupnames|s|m|Separate multiple agent group names with spaces.",
+            "file|D|s|File containing agent group names, with multiple group names separated by spaces."},
         resourceStrings={
             "missing-agent-group-names=Agent group names need to be provided either with --agentgroupnames or --file option.",
             "delete-agent-group-succeeded=The following agent groups were deleted."
