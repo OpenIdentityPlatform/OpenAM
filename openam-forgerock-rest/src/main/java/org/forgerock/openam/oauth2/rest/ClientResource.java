@@ -89,7 +89,6 @@ public class ClientResource  implements CollectionResourceProvider {
         }
     }
 
-    @Inject
     public ClientResource(ClientResourceManager manager, CTSPersistentStore store, ServiceSchemaManager mgr) {
         this.store = store;
         this.manager = manager;
