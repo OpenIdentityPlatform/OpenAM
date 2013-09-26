@@ -160,6 +160,7 @@
      <literal>http://openam.example.com:8080/openam/services.jsp</literal>.</para>
     </listitem>
    </varlistentry>
+   <!--
    <varlistentry>
     <term><command>ssodtool.sh</command></term>
     <listitem>
@@ -170,6 +171,7 @@
      <para>Install this from <filename><?eval ${diagnosticsZipFile}?></filename>.</para>
     </listitem>
    </varlistentry>
+   -->
   </variablelist>
   
   <para>The commands access the OpenAM configuration over HTTP (or HTTPS).

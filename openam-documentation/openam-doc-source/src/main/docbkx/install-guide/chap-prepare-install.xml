@@ -595,11 +595,13 @@ $ unzip ~/Downloads/<?eval ${coreDirectoryFile}?>.zip</screen>
     <term><filename><?eval ${distauthWarFile}?></filename></term>
     <listitem><para>The deployable .war file for distributed authentication</para></listitem>
    </varlistentry>
+   <!--
    <varlistentry>
     <term><filename><?eval ${diagnosticsZipFile}?></filename></term>
     <listitem><para>The .zip file with the diagnostic tools to help troubleshoot 
     deployment issue.</para></listitem>
    </varlistentry>
+   -->
    <varlistentry>
     <term><filename><?eval ${fedletZipFile}?></filename></term>
     <listitem><para>The .zip that contains the lightweight service provider

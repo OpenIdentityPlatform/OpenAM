@@ -248,11 +248,13 @@
       <entry>openam-console</entry>
       <entry>Contains all of the administrative console components</entry>
      </row>
+     <!--
      <row>
       <entry>Centralized from several different locations</entry>
       <entry>openam-diagnostics-plugins</entry>
       <entry>Contains the components for the diagnostic plugin elements</entry>
      </row>
+     -->
      <row>
       <entry>openfedlib</entry>
       <entry>openam-federation-library</entry>
@@ -325,6 +327,7 @@
       <entry>openam-dashboard</entry>
       <entry>Contains the components for the Dashboard service</entry>
      </row>
+     <!--
      <row>
       <entry>openam-diagnostics-schema</entry>
       <entry>Generated classes based on the diagnostics XML schema</entry>
@@ -333,6 +336,7 @@
       <entry>openam-distribution-diagnostics</entry>
       <entry>Contains the OpenAM diagnostics tools</entry>
      </row>
+     -->
      <row>
       <entry>openam-distribution-fedlet-unconfigured</entry>
       <entry>Contains the OpenAM fedlet</entry>
@@ -569,6 +573,7 @@
       <entry>New</entry>
       <entry>Contains the components for the Dashboard service</entry>
      </row>
+     <!--
      <row>
       <entry>openam-diagnostics-base</entry>
       <entry>base</entry>
@@ -584,16 +589,19 @@
       <entry>New</entry>
       <entry>Generated classes based on the diagnostics XML schema</entry>
      </row>
+     -->
      <row>
       <entry>openam-distauth</entry>
       <entry>amserver</entry>
       <entry>Contains the distributed authorization service</entry>
      </row>
+     <!--
      <row>
       <entry>openam-distribution-diagnostics</entry>
       <entry>New</entry>
       <entry>Contains the OpenAM diagnostics tools</entry>
      </row>
+     -->
      <row>
       <entry>openam-distribution-fedlet-unconfigured</entry>
       <entry>New</entry>

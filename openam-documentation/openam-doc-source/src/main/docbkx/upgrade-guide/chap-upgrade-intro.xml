@@ -351,7 +351,7 @@
      </listitem>
 
      <listitem>
-      <para>Tools - OpenAM tools include ssoAdmin, Diagnostics, and ssoConfigurator 
+      <para>Tools - OpenAM tools include ssoAdmin, and ssoConfigurator
       tools. These tools help administrators work with OpenAM. With the OpenAM 10.1.0 
       release, the ssoSession tools were deprecated because session failover 
       was simplified.</para>

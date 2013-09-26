@@ -54,6 +54,7 @@
     the GUI configuration wizard </para>
    </listitem>
   </varlistentry>
+  <!--
   <varlistentry>
    <term><filename><?eval ${diagnosticsZipFile}?></filename></term>
    <listitem>
@@ -61,6 +62,7 @@
     configuration</para>
    </listitem>
   </varlistentry>
+  -->
  </variablelist>
  
  <procedure xml:id="install-openam-admin-tools">
@@ -218,7 +220,8 @@ Archive:  ~/Downloads/openam/<?eval ${ssoconfigZipFile}?>
     ><command>configurator.jar</command></link>.</para>
   </step>
  </procedure>
- 
+
+ <!--
  <procedure xml:id="install-openam-diagnostic-tool">
   <title>To Set Up Diagnostic Tool</title>
   <para>The diagnostic tool, <command>ssodtool.sh</command>
@@ -239,8 +242,9 @@ $ unzip ~/Downloads/openam/<?eval ${diagnosticsZipFile}?>
   inflating: ssodtool.bat
   inflating: ssodtool.sh</screen>
  <para>You can start the graphical user interface by using the tools without
- options, or in console mode using the <command>ssodtool.sh --console</command>
+ options, or in console mode using the <command>ssodtool.sh - -console</command>
  command.</para>
   </step>
  </procedure>
+ -->
 </chapter>
