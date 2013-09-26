@@ -20,7 +20,7 @@
   !
   ! CCPL HEADER END
   !
-  !      Copyright 2011-2012 ForgeRock AS
+  !      Copyright 2011-2013 ForgeRock AS
   !    
 -->
 <refentry xml:id='man-configurator-jar-1'
@@ -30,7 +30,7 @@
  xsi:schemaLocation='http://docbook.org/ns/docbook http://docbook.org/xml/5.0/xsd/docbook.xsd'
  xmlns:xlink='http://www.w3.org/1999/xlink'
  xmlns:xinclude='http://www.w3.org/2001/XInclude'>
- <info><copyright><year>2011-2012</year><holder>ForgeRock AS</holder></copyright></info>
+ <info><copyright><year>2011-2013</year><holder>ForgeRock AS</holder></copyright></info>
  <refmeta>
   <refentrytitle>configurator.jar</refentrytitle><manvolnum>1</manvolnum>
   <refmiscinfo class="software">OpenAM</refmiscinfo>
@@ -48,9 +48,9 @@
  </refsynopsisdiv>
  <refsect1>
   <title>Description</title>
-  <para>This executable .jar file lets you perform silent installation,
-  configuring a deployed OpenAM server by applying settings from a configuration
-  file.</para>
+  <para>This executable .jar file, <?eval ${ssoconfigJarFile}?>, lets you
+  perform silent installation, configuring a deployed OpenAM server by applying
+  settings from a configuration file.</para>
  </refsect1>
  <refsect1>
   <title>Options</title>
@@ -336,6 +336,13 @@
     <listitem>
      <para>The load balancer URL for the site, such as
      <literal>http://lb.example.com:80/openam</literal>.</para>
+    </listitem>
+   </varlistentry>
+   <varlistentry>
+    <term>LB_SESSION_HA_SFO</term>
+    <listitem>
+     <para>Whether to enable session persistence and failover for the site.
+     Default: <literal>false</literal></para>
     </listitem>
    </varlistentry>
    <varlistentry>
