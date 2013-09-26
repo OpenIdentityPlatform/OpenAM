@@ -27,7 +27,7 @@
  */
 
 /**
- * Portions Copyrighted 2010-2013 ForgeRock Inc
+ * Portions Copyrighted 2010-2013 ForgeRock AS
  */
 
 package com.sun.identity.setup;
@@ -507,6 +507,7 @@ public class AMSetupServlet extends HttpServlet {
         String loadBalancerHost = 
             request.getParameter("LB_SITE_NAME");
         String primaryURL = request.getParameter("LB_PRIMARY_URL");
+        String sfoEnabled = request.getParameter("LB_SESSION_HA_SFO");
         
         if (loadBalancerHost != null) {     
             // site configuration is passed as a map of the site 
@@ -514,6 +515,7 @@ public class AMSetupServlet extends HttpServlet {
             Map siteConfig = new HashMap(5);
             siteConfig.put(SetupConstants.LB_SITE_NAME, loadBalancerHost);
             siteConfig.put(SetupConstants.LB_PRIMARY_URL, primaryURL);
+            siteConfig.put(SetupConstants.LB_SESSION_HA_SFO, sfoEnabled);
             req.addParameter(
                 SetupConstants.CONFIG_VAR_SITE_CONFIGURATION, siteConfig);
         }
