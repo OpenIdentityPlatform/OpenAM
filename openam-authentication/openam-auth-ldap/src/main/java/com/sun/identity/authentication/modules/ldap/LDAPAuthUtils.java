@@ -112,7 +112,7 @@ public class LDAPAuthUtils {
     private char[] authPassword;
     private String expiryTime;
     private SearchScope searchScope;
-    private int heartBeatInterval = 1;
+    private int heartBeatInterval = 10;
     private String heartBeatTimeUnit;
     private ModuleState screenState;
     private int graceLogins;

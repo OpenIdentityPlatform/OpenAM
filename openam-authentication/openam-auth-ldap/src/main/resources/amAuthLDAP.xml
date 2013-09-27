@@ -195,7 +195,7 @@
                     syntax="number"
                     i18nKey="a118">
                     <DefaultValues>
-                        <Value>1</Value>
+                        <Value>10</Value>
                     </DefaultValues>
                 </AttributeSchema>
                 <AttributeSchema name="openam-auth-ldap-heartbeat-timeunit"
@@ -208,7 +208,7 @@
                         <ChoiceValue i18nKey="a1193">HOURS</ChoiceValue>
                     </ChoiceValues>
                     <DefaultValues>
-                        <Value>MINUTES</Value>
+                        <Value>SECONDS</Value>
                     </DefaultValues>
                 </AttributeSchema>
                 <SubSchema name="serverconfig" inheritance="multiple">
@@ -362,7 +362,7 @@
                         syntax="number"
                         i18nKey="a118">
                         <DefaultValues>
-                            <Value>1</Value>
+                            <Value>10</Value>
                         </DefaultValues>
                     </AttributeSchema>
                     <AttributeSchema name="openam-auth-ldap-heartbeat-timeunit"
@@ -375,7 +375,7 @@
                             <ChoiceValue i18nKey="a1193">HOURS</ChoiceValue>
                         </ChoiceValues>
                         <DefaultValues>
-                            <Value>MINUTES</Value>
+                            <Value>SECONDS</Value>
                         </DefaultValues>
                     </AttributeSchema>
                 </SubSchema>

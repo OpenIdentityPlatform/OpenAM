@@ -231,9 +231,9 @@ public class LDAP extends AMLoginModule {
                 currentConfig, "iplanet-am-auth-ldap-ssl-trust-all", "false")
                 ).booleanValue();
             int heartBeatInterval = CollectionHelper.getIntMapAttr(currentConfig,
-                    "openam-auth-ldap-heartbeat-interval", 1, debug);
+                    "openam-auth-ldap-heartbeat-interval", 10, debug);
             String heartBeatTimeUnit = CollectionHelper.getMapAttr(currentConfig,
-                    "openam-auth-ldap-heartbeat-timeunit", "MINUTES");
+                    "openam-auth-ldap-heartbeat-timeunit", "SECONDS");
 
             isProfileCreationEnabled = isDynamicProfileCreationEnabled();
             // set the optional attributes here

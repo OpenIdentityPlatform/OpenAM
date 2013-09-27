@@ -267,7 +267,7 @@
                         syntax="number"
                         i18nKey="a20091">
                         <DefaultValues>
-                            <Value>1</Value>
+                            <Value>10</Value>
                         </DefaultValues>
                     </AttributeSchema>
                     <AttributeSchema name="openam-idrepo-ldapv3-heartbeat-timeunit"
@@ -280,7 +280,7 @@
                             <ChoiceValue i18nKey="a200923">HOURS</ChoiceValue>
                         </ChoiceValues>
                         <DefaultValues>
-                            <Value>MINUTES</Value>
+                            <Value>SECONDS</Value>
                         </DefaultValues>
                     </AttributeSchema>
 
@@ -790,7 +790,7 @@
                         syntax="number"
                         i18nKey="a20091">
                         <DefaultValues>
-                            <Value>1</Value>
+                            <Value>10</Value>
                         </DefaultValues>
                     </AttributeSchema>
                     <AttributeSchema name="openam-idrepo-ldapv3-heartbeat-timeunit"
@@ -803,7 +803,7 @@
                             <ChoiceValue i18nKey="a200923">HOURS</ChoiceValue>
                         </ChoiceValues>
                         <DefaultValues>
-                            <Value>MINUTES</Value>
+                            <Value>SECONDS</Value>
                         </DefaultValues>
                     </AttributeSchema>
                     <AttributeSchema name="sun-idrepo-ldapv3-config-organization_name"
@@ -1414,7 +1414,7 @@
                         syntax="number"
                         i18nKey="a20091">
                         <DefaultValues>
-                            <Value>1</Value>
+                            <Value>10</Value>
                         </DefaultValues>
                     </AttributeSchema>
                     <AttributeSchema name="openam-idrepo-ldapv3-heartbeat-timeunit"
@@ -1427,7 +1427,7 @@
                             <ChoiceValue i18nKey="a200923">HOURS</ChoiceValue>
                         </ChoiceValues>
                         <DefaultValues>
-                            <Value>MINUTES</Value>
+                            <Value>SECONDS</Value>
                         </DefaultValues>
                     </AttributeSchema>
 
@@ -1904,7 +1904,7 @@
                         syntax="number"
                         i18nKey="a20091">
                         <DefaultValues>
-                            <Value>1</Value>
+                            <Value>10</Value>
                         </DefaultValues>
                     </AttributeSchema>
                     <AttributeSchema name="openam-idrepo-ldapv3-heartbeat-timeunit"
@@ -1917,7 +1917,7 @@
                             <ChoiceValue i18nKey="a200923">HOURS</ChoiceValue>
                         </ChoiceValues>
                         <DefaultValues>
-                            <Value>MINUTES</Value>
+                            <Value>SECONDS</Value>
                         </DefaultValues>
                     </AttributeSchema>
 
@@ -2402,7 +2402,7 @@
                         syntax="number"
                         i18nKey="a20091">
                         <DefaultValues>
-                            <Value>1</Value>
+                            <Value>10</Value>
                         </DefaultValues>
                     </AttributeSchema>
                     <AttributeSchema name="openam-idrepo-ldapv3-heartbeat-timeunit"
@@ -2415,7 +2415,7 @@
                             <ChoiceValue i18nKey="a200923">HOURS</ChoiceValue>
                         </ChoiceValues>
                         <DefaultValues>
-                            <Value>MINUTES</Value>
+                            <Value>SECONDS</Value>
                         </DefaultValues>
                     </AttributeSchema>
 
@@ -2889,7 +2889,7 @@
                         syntax="number"
                         i18nKey="a20091">
                         <DefaultValues>
-                            <Value>1</Value>
+                            <Value>10</Value>
                         </DefaultValues>
                     </AttributeSchema>
                     <AttributeSchema name="openam-idrepo-ldapv3-heartbeat-timeunit"
@@ -2902,7 +2902,7 @@
                             <ChoiceValue i18nKey="a200923">HOURS</ChoiceValue>
                         </ChoiceValues>
                         <DefaultValues>
-                            <Value>MINUTES</Value>
+                            <Value>SECONDS</Value>
                         </DefaultValues>
                     </AttributeSchema>
 

@@ -118,7 +118,7 @@ public class DJLDAPv3Repo extends IdRepo {
     private IdRepoListener idRepoListener;
     private Map<IdType, Set<IdOperation>> supportedTypesAndOperations;
     private Map<String, String> creationAttributeMapping;
-    private int heartBeatInterval = 1;
+    private int heartBeatInterval = 10;
     private String heartBeatTimeUnit;
     private String rootSuffix;
     private String userStatusAttr;
@@ -204,9 +204,9 @@ public class DJLDAPv3Repo extends IdRepo {
 
         String username = CollectionHelper.getMapAttr(configParams, LDAP_SERVER_USER_NAME);
         char[] password = CollectionHelper.getMapAttr(configParams, LDAP_SERVER_PASSWORD, "").toCharArray();
-        heartBeatInterval = CollectionHelper.getIntMapAttr(configParams, LDAP_SERVER_HEARTBEAT_INTERVAL, "1",
+        heartBeatInterval = CollectionHelper.getIntMapAttr(configParams, LDAP_SERVER_HEARTBEAT_INTERVAL, "10",
                 DEBUG);
-        heartBeatTimeUnit = CollectionHelper.getMapAttr(configParams, LDAP_SERVER_HEARTBEAT_TIME_UNIT, "minutes");
+        heartBeatTimeUnit = CollectionHelper.getMapAttr(configParams, LDAP_SERVER_HEARTBEAT_TIME_UNIT, "SECONDS");
         bindConnectionFactory = createConnectionFactory(null, null, maxPoolSize);
         connectionFactory = createConnectionFactory(username, password, maxPoolSize);
 
