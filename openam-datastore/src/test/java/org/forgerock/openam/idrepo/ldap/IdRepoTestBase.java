@@ -16,6 +16,7 @@
 package org.forgerock.openam.idrepo.ldap;
 
 import com.iplanet.services.naming.WebtopNaming;
+import com.sun.identity.idm.IdRepoBundle;
 import com.sun.identity.idm.IdRepoException;
 import com.sun.identity.idm.IdRepoListener;
 import org.forgerock.opendj.ldap.Connection;
@@ -42,6 +43,8 @@ public abstract class IdRepoTestBase extends PowerMockTestCase {
     protected static final String TEST1_GROUP_DN = "cn=test1,ou=groups,dc=openam,dc=forgerock,dc=org";
     protected static final String TEST_USER1 = "testuser1";
     protected static final String DEMO = "demo";
+    protected static final String USER0 = "user.0";
+    protected static final String USER0_DN = "uid=user.0,ou=people,dc=openam,dc=forgerock,dc=org";
     protected static final String DEMO_DN = "uid=demo,ou=people,dc=openam,dc=forgerock,dc=org";
     protected MemoryBackend memoryBackend;
     protected IdRepoListener idRepoListener;
@@ -97,5 +100,9 @@ public abstract class IdRepoTestBase extends PowerMockTestCase {
         public Connection getConnection() throws ErrorResultException {
             return cf.getConnection();
         }
+    }
+
+    protected String getIdRepoExceptionMessage(String code, Object... args) {
+        return new IdRepoException(IdRepoBundle.BUNDLE_NAME, code, args).getMessage();
     }
 }

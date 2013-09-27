@@ -16,6 +16,7 @@
 package org.forgerock.openam.idrepo.ldap;
 
 import com.sun.identity.idm.IdRepo;
+import com.sun.identity.idm.IdRepoException;
 import com.sun.identity.idm.IdType;
 import java.util.Map;
 import java.util.Set;
@@ -23,6 +24,7 @@ import static org.fest.assertions.Assertions.*;
 import static org.forgerock.openam.idrepo.ldap.LDAPConstants.*;
 import static org.forgerock.openam.utils.CollectionUtils.*;
 import org.forgerock.opendj.ldif.LDIFEntryReader;
+import static org.testng.Assert.fail;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
@@ -32,6 +34,8 @@ public class DSEERepoTest extends IdRepoTestBase {
     private static final String DSEE_LDIF = "/ldif/dsee.ldif";
     private static final String ACCOUNTANT = "Accountant";
     private static final String ACCOUNTANT_DN = "cn=Accountant,dc=openam,dc=forgerock,dc=org";
+    private static final String MANAGER = "Manager";
+    private static final String MANAGER_DN = "cn=Manager,dc=openam,dc=forgerock,dc=org";
 
     @BeforeClass
     public void setUp() throws Exception {
@@ -54,6 +58,9 @@ public class DSEERepoTest extends IdRepoTestBase {
         assertThat(attrs.get(ROLE_DN_ATTR)).isNotNull().containsOnly(ACCOUNTANT_DN);
         roleMemberships = idrepo.getMemberships(null, IdType.USER, DEMO, IdType.ROLE);
         assertThat(roleMemberships).hasSize(1).containsOnly(ACCOUNTANT_DN);
+        //retrieving filtered roles should also return managed roles
+        roleMemberships = idrepo.getMemberships(null, IdType.USER, DEMO, IdType.FILTEREDROLE);
+        assertThat(roleMemberships).hasSize(1).containsOnly(ACCOUNTANT_DN);
     }
 
     @Test(dependsOnMethods = "addingRoleToUserSuccessful")
@@ -64,5 +71,35 @@ public class DSEERepoTest extends IdRepoTestBase {
         assertThat(idrepo.getAttributes(null, IdType.USER, DEMO, asSet(ROLE_DN_ATTR))).isEmpty();
         roleMemberships = idrepo.getMemberships(null, IdType.USER, DEMO, IdType.ROLE);
         assertThat(roleMemberships).isNotNull().isEmpty();
+    }
+
+    @Test(dependsOnMethods = "removingRoleFromUserSuccessful")
+    public void retrievingNonExistentFilteredRoleMembershipsDoesNotFail() throws Exception {
+        Set<String> filteredRoles = idrepo.getMemberships(null, IdType.USER, DEMO, IdType.FILTEREDROLE);
+        assertThat(filteredRoles).isNotNull().isEmpty();
+    }
+
+    @Test
+    public void retrievingFilteredRoleIsSuccessful() throws Exception {
+        Set<String> filteredRoles = idrepo.getMemberships(null, IdType.USER, USER0, IdType.FILTEREDROLE);
+        assertThat(filteredRoles).hasSize(1).containsOnly(MANAGER_DN);
+    }
+
+    @Test
+    public void retrievingFilteredRoleMembershipsIsSuccessful() throws Exception {
+        Set<String> members = idrepo.getMembers(null, IdType.FILTEREDROLE, MANAGER, IdType.USER);
+        assertThat(members).hasSize(1).containsOnly(USER0_DN);
+    }
+
+    @Test
+    public void removingFilteredRoleFails() throws Exception {
+        try {
+            idrepo.modifyMemberShip(null, IdType.FILTEREDROLE, MANAGER, asSet(USER0), IdType.USER,
+                    IdRepo.REMOVEMEMBER);
+            fail();
+        } catch (IdRepoException ire) {
+            assertThat(ire).hasMessage(getIdRepoExceptionMessage("209", DJLDAPv3Repo.class.getName(),
+                    IdType.FILTEREDROLE.getName()));
+        }
     }
 }

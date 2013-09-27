@@ -33,3 +33,23 @@ objectclass: inetuser
 objectclass: top
 objectclass: person
 l: DemoLand
+
+dn: cn=Manager,dc=openam,dc=forgerock,dc=org
+objectClass: nscomplexroledefinition
+objectClass: ldapsubentry
+objectClass: nsfilteredroledefinition
+objectClass: top
+objectClass: nsroledefinition
+cn: Manager
+nsRoleFilter: (uid=user.*)
+
+dn: uid=user.0,ou=people,dc=openam,dc=forgerock,dc=org
+uid: user.0
+sn: Aaccf
+userpassword: password
+objectclass: inetorgperson
+objectclass: organizationalPerson
+objectclass: inetuser
+objectclass: top
+objectclass: person
+nsrole: cn=Manager,dc=openam,dc=forgerock,dc=org

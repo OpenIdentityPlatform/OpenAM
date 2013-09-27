@@ -1527,7 +1527,9 @@ public class DJLDAPv3Repo extends IdRepo {
             conn = connectionFactory.getConnection();
             SearchResultEntry entry = conn.readEntry(dn, roleAttr);
             Attribute attr = entry.getAttribute(roleAttr);
-            results.addAll(LDAPUtils.getAttributeValuesAsStringSet(attr));
+            if (attr != null) {
+                results.addAll(LDAPUtils.getAttributeValuesAsStringSet(attr));
+            }
         } catch (ErrorResultException ere) {
             DEBUG.error("An error occurred while trying to retrieve filtered role memberships for " + dn
                     + " using " + roleAttr + " attribute", ere);

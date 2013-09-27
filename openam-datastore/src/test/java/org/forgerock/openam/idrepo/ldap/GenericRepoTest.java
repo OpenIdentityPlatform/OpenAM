@@ -19,7 +19,6 @@ import com.sun.identity.authentication.spi.InvalidPasswordException;
 import com.sun.identity.common.CaseInsensitiveHashMap;
 import com.sun.identity.common.CaseInsensitiveHashSet;
 import com.sun.identity.idm.IdRepo;
-import com.sun.identity.idm.IdRepoBundle;
 import com.sun.identity.idm.IdRepoException;
 import com.sun.identity.idm.IdType;
 import com.sun.identity.idm.RepoSearchResults;
@@ -615,9 +614,5 @@ public class GenericRepoTest extends IdRepoTestBase {
         credentials[0] = nc;
         credentials[1] = pc;
         return credentials;
-    }
-
-    private String getIdRepoExceptionMessage(String code, Object... args) {
-        return new IdRepoException(IdRepoBundle.BUNDLE_NAME, code, args).getMessage();
     }
 }
