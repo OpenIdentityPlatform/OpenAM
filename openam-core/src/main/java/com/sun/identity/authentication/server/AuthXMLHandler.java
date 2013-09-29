@@ -388,10 +388,12 @@ public class AuthXMLHandler implements RequestHandler {
         
         AuthContext.Status loginStatus = AuthContext.Status.IN_PROGRESS;
         HttpServletRequest clientRequest = authXMLRequest.getClientRequest();
-        loginState.setHttpServletRequest(clientRequest);
-        loginState.setHttpServletResponse(authXMLRequest.getClientResponse());
-        if (clientRequest != null) {
-            loginState.setParamHash(AuthUtils.parseRequestParameters(clientRequest));
+        if (loginState != null) {
+            loginState.setHttpServletRequest(clientRequest);
+            loginState.setHttpServletResponse(authXMLRequest.getClientResponse());
+            if (clientRequest != null) {
+                loginState.setParamHash(AuthUtils.parseRequestParameters(clientRequest));
+            }
         }
         switch (requestType) {
             case AuthXMLRequest.NewAuthContext:
