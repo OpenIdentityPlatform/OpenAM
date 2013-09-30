@@ -88,7 +88,19 @@ public abstract class AbstractUpgradeHelper implements UpgradeHelper {
             throws UpgradeException {
         return newAttr;
     }
-    
+
+    /**
+     * Implement this method to perform modifications to an existing attribute based on custom logic. In order to
+     * create a hook for a certain attribute, during upgradehelper initialization the attribute name should be
+     * captured in {@link AbstractUpgradeHelper#attributes}.
+     *
+     * @param oldAttr The attribute schema definition currently specified.
+     * @param newAttr The attribute schema definition we are planning to upgrade to.
+     * @return If there is nothing to upgrade (i.e. there is no real difference between old and new attribute),
+     * implementations MUST return <code>null</code>, otherwise either the amended attribute or the newAttr can be
+     * returned directly.
+     * @throws UpgradeException If there was an error while performing the attribute upgrade.
+     */
     public abstract AttributeSchemaImpl upgradeAttribute(AttributeSchemaImpl oldAttr, AttributeSchemaImpl newAttr)
     throws UpgradeException;
 

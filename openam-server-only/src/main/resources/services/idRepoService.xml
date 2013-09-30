@@ -2,20 +2,20 @@
 
 <!--
    DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
-  
+
    Copyright (c) 2006 Sun Microsystems Inc. All Rights Reserved
-  
+
    The contents of this file are subject to the terms
    of the Common Development and Distribution License
    (the License). You may not use this file except in
    compliance with the License.
-  
+
    You can obtain a copy of the License at
    https://opensso.dev.java.net/public/CDDLv1.0.html or
    opensso/legal/CDDLv1.0.txt
    See the License for the specific language governing
    permission and limitations under the License.
-  
+
    When distributing Covered Code, include this CDDL
    Header Notice in each file and include the License file
    at opensso/legal/CDDLv1.0.txt.
@@ -23,9 +23,9 @@
    with the fields enclosed by brackets [] replaced by
    your own identifying information:
    "Portions Copyrighted [year] [name of copyright owner]"
-  
+
    $Id: idRepoService.xml,v 1.37 2009/11/10 01:50:57 hengming Exp $
-  
+
 -->
 <!--
    Portions Copyrighted 2012-2013 ForgeRock AS
@@ -41,7 +41,7 @@
             i18nFileName="amIdRepoService"
             revisionNumber="30"
             i18nKey="">
-            
+
             <Global>
                 <AttributeSchema name="coexistenceMode"
                     type="single" syntax="string">
@@ -137,7 +137,7 @@
                             i18nKey="telephoneNumber" />
                         <AttributeSchema name="roles" i18nKey="roles" />
                     </SubSchema>
-                </SubSchema>        
+                </SubSchema>
             </Global>
             <Organization>
                 <AttributeSchema name="sunIdRepoAttributeCombiner"
@@ -208,7 +208,7 @@
                         syntax="string"
                         i18nKey="a20131">
                      </AttributeSchema>
-            
+
                     <AttributeSchema name="sunIdRepoSupportedOperations"
                         type="list"
                         syntax="string"
@@ -255,7 +255,7 @@
                         syntax="string"
                         i18nKey="a2003">
                     </AttributeSchema>
-                    
+
                     <AttributeSchema name="sun-idrepo-ldapv3-config-authpw"
                         type="single"
                         syntax="password"
@@ -294,7 +294,7 @@
                             <Value>@NORMALIZED_ORGBASE@</Value>
                         </DefaultValues>
                     </AttributeSchema>
-                    
+
                     <AttributeSchema name="sun-idrepo-ldapv3-config-ssl-enabled"
                         type="single"
                         syntax="boolean"
@@ -303,7 +303,16 @@
                             <Value>false</Value>
                         </DefaultValues>
                     </AttributeSchema>
-                    
+
+                    <AttributeSchema name="sun-idrepo-ldapv3-config-connection_pool_min_size"
+                        type="single"
+                        syntax="number"
+                        i18nKey="">
+                        <DefaultValues>
+                            <Value>1</Value>
+                        </DefaultValues>
+                    </AttributeSchema>
+
                     <AttributeSchema name="sun-idrepo-ldapv3-config-connection_pool_max_size"
                         type="single"
                         syntax="number"
@@ -362,14 +371,14 @@
                             <Value>(objectclass=inetorgperson)</Value>
                         </DefaultValues>
                     </AttributeSchema>
-                    
+
                     <AttributeSchema name="sun-idrepo-ldapv3-config-user-objectclass"
                         type="list"
                         syntax="string"
                         i18nKey="a2017">
                         <DefaultValues>
                             <Value>organizationalPerson</Value>
-                            <Value>inetorgperson</Value>                          
+                            <Value>inetorgperson</Value>
                             <Value>person</Value>
                             <Value>top</Value>
                             <Value>inetUser</Value>
@@ -458,7 +467,7 @@
                             <Value>(objectclass=groupOfUniqueNames)</Value>
                         </DefaultValues>
                     </AttributeSchema>
-                    
+
                     <AttributeSchema name="sun-idrepo-ldapv3-config-group-container-name"
                         type="single"
                         syntax="string"
@@ -548,7 +557,7 @@
                             <Value>(&amp;(objectclass=ldapsubentry)(objectclass=nsmanagedroledefinition))</Value>
                         </DefaultValues>
                     </AttributeSchema>
-                    
+
                     <AttributeSchema name="sun-idrepo-ldapv3-config-role-search-scope"
                         type="single_choice"
                         syntax="string"
@@ -725,7 +734,7 @@
                         syntax="string"
                         i18nKey="a20131">
                      </AttributeSchema>
-            
+
                     <AttributeSchema name="sunIdRepoSupportedOperations"
                         type="list"
                         syntax="string"
@@ -778,7 +787,7 @@
                             <Value>cn=dsameuser,ou=DSAME Users,@NORMALIZED_ORGBASE@</Value>
                         </DefaultValues>
                     </AttributeSchema>
-                    
+
                     <AttributeSchema name="sun-idrepo-ldapv3-config-authpw"
                         type="single"
                         syntax="password"
@@ -816,13 +825,22 @@
                             <Value>@NORMALIZED_ORGBASE@</Value>
                         </DefaultValues>
                     </AttributeSchema>
-                    
+
                     <AttributeSchema name="sun-idrepo-ldapv3-config-ssl-enabled"
                         type="single"
                         syntax="boolean"
                         i18nKey="a2007">
                         <DefaultValues>
                             <Value>false</Value>
+                        </DefaultValues>
+                    </AttributeSchema>
+
+                    <AttributeSchema name="sun-idrepo-ldapv3-config-connection_pool_min_size"
+                        type="single"
+                        syntax="number"
+                        i18nKey="">
+                        <DefaultValues>
+                            <Value>1</Value>
                         </DefaultValues>
                     </AttributeSchema>
 
@@ -884,7 +902,7 @@
                             <Value>(objectclass=inetorgperson)</Value>
                         </DefaultValues>
                     </AttributeSchema>
-                    
+
                     <AttributeSchema name="sun-idrepo-ldapv3-config-user-objectclass"
                         type="list"
                         syntax="string"
@@ -1057,7 +1075,7 @@
                             <Value>(objectclass=groupOfUniqueNames)</Value>
                         </DefaultValues>
                     </AttributeSchema>
-                    
+
                     <AttributeSchema name="sun-idrepo-ldapv3-config-group-container-name"
                         type="single"
                         syntax="string"
@@ -1143,7 +1161,7 @@
                             <Value>(&amp;(objectclass=ldapsubentry)(objectclass=nsmanagedroledefinition))</Value>
                         </DefaultValues>
                     </AttributeSchema>
-                    
+
                     <AttributeSchema name="sun-idrepo-ldapv3-config-role-search-scope"
                         type="single_choice"
                         syntax="string"
@@ -1354,7 +1372,7 @@
                         syntax="string"
                         i18nKey="a20131">
                      </AttributeSchema>
-            
+
                     <AttributeSchema name="sunIdRepoSupportedOperations"
                         type="list"
                         syntax="string"
@@ -1402,7 +1420,7 @@
                         syntax="string"
                         i18nKey="a2003">
                     </AttributeSchema>
-                    
+
                     <AttributeSchema name="sun-idrepo-ldapv3-config-authpw"
                         type="single"
                         syntax="password"
@@ -1441,7 +1459,7 @@
                             <Value>@NORMALIZED_ORGBASE@</Value>
                         </DefaultValues>
                     </AttributeSchema>
-                    
+
                     <AttributeSchema name="sun-idrepo-ldapv3-config-ssl-enabled"
                         type="single"
                         syntax="boolean"
@@ -1450,7 +1468,16 @@
                             <Value>false</Value>
                         </DefaultValues>
                     </AttributeSchema>
-                    
+
+                    <AttributeSchema name="sun-idrepo-ldapv3-config-connection_pool_min_size"
+                        type="single"
+                        syntax="number"
+                        i18nKey="">
+                        <DefaultValues>
+                            <Value>1</Value>
+                        </DefaultValues>
+                    </AttributeSchema>
+
                     <AttributeSchema name="sun-idrepo-ldapv3-config-connection_pool_max_size"
                         type="single"
                         syntax="number"
@@ -1509,7 +1536,7 @@
                             <Value>(objectclass=inetorgperson)</Value>
                         </DefaultValues>
                     </AttributeSchema>
-                    
+
                     <AttributeSchema name="sun-idrepo-ldapv3-config-user-objectclass"
                         type="list"
                         syntax="string"
@@ -1680,7 +1707,7 @@
                             <Value>(objectclass=groupOfUniqueNames)</Value>
                         </DefaultValues>
                     </AttributeSchema>
-                    
+
                     <AttributeSchema name="sun-idrepo-ldapv3-config-group-container-name"
                         type="single"
                         syntax="string"
@@ -1844,7 +1871,7 @@
                         syntax="string"
                         i18nKey="a20131">
                      </AttributeSchema>
-            
+
                     <AttributeSchema name="sunIdRepoSupportedOperations"
                         type="list"
                         syntax="string"
@@ -1892,7 +1919,7 @@
                         syntax="string"
                         i18nKey="a2003">
                     </AttributeSchema>
-                    
+
                     <AttributeSchema name="sun-idrepo-ldapv3-config-authpw"
                         type="single"
                         syntax="password"
@@ -1931,13 +1958,22 @@
                             <Value>@NORMALIZED_ORGBASE@</Value>
                         </DefaultValues>
                     </AttributeSchema>
-                    
+
                     <AttributeSchema name="sun-idrepo-ldapv3-config-ssl-enabled"
                         type="single"
                         syntax="boolean"
                         i18nKey="a2007">
                         <DefaultValues>
                             <Value>false</Value>
+                        </DefaultValues>
+                    </AttributeSchema>
+
+                    <AttributeSchema name="sun-idrepo-ldapv3-config-connection_pool_min_size"
+                        type="single"
+                        syntax="number"
+                        i18nKey="">
+                        <DefaultValues>
+                            <Value>1</Value>
                         </DefaultValues>
                     </AttributeSchema>
 
@@ -1999,7 +2035,7 @@
                             <Value>(objectclass=inetorgperson)</Value>
                         </DefaultValues>
                     </AttributeSchema>
-                    
+
                     <AttributeSchema name="sun-idrepo-ldapv3-config-user-objectclass"
                         type="list"
                         syntax="string"
@@ -2170,7 +2206,7 @@
                             <Value>(objectclass=groupOfNames)</Value>
                         </DefaultValues>
                     </AttributeSchema>
-                    
+
                     <AttributeSchema name="sun-idrepo-ldapv3-config-group-container-name"
                         type="single"
                         syntax="string"
@@ -2339,7 +2375,7 @@
                             <Value>userPassword=unicodePwd</Value>
                         </DefaultValues>
                      </AttributeSchema>
-            
+
                     <AttributeSchema name="sunIdRepoSupportedOperations"
                         type="list"
                         syntax="string"
@@ -2390,7 +2426,7 @@
                             <Value>CN=Administrator,CN=Users,@NORMALIZED_ORGBASE@</Value>
                         </DefaultValues>
                     </AttributeSchema>
-                    
+
                     <AttributeSchema name="sun-idrepo-ldapv3-config-authpw"
                         type="single"
                         syntax="password"
@@ -2429,13 +2465,22 @@
                             <Value>@NORMALIZED_ORGBASE@</Value>
                         </DefaultValues>
                     </AttributeSchema>
-                    
+
                     <AttributeSchema name="sun-idrepo-ldapv3-config-ssl-enabled"
                         type="single"
                         syntax="boolean"
                         i18nKey="a2007">
                         <DefaultValues>
                             <Value>false</Value>
+                        </DefaultValues>
+                    </AttributeSchema>
+
+                    <AttributeSchema name="sun-idrepo-ldapv3-config-connection_pool_min_size"
+                        type="single"
+                        syntax="number"
+                        i18nKey="">
+                        <DefaultValues>
+                            <Value>1</Value>
                         </DefaultValues>
                     </AttributeSchema>
 
@@ -2655,7 +2700,7 @@
                             <Value>(objectclass=group)</Value>
                         </DefaultValues>
                     </AttributeSchema>
-                    
+
                     <AttributeSchema name="sun-idrepo-ldapv3-config-group-container-name"
                         type="single"
                         syntax="string"
@@ -2826,7 +2871,7 @@
                             <Value>userPassword=unicodePwd</Value>
                         </DefaultValues>
                      </AttributeSchema>
-            
+
                     <AttributeSchema name="sunIdRepoSupportedOperations"
                         type="list"
                         syntax="string"
@@ -2877,7 +2922,7 @@
                             <Value>CN=Administrator,CN=Users,@NORMALIZED_ORGBASE@</Value>
                         </DefaultValues>
                     </AttributeSchema>
-                    
+
                     <AttributeSchema name="sun-idrepo-ldapv3-config-authpw"
                         type="single"
                         syntax="password"
@@ -2916,13 +2961,22 @@
                             <Value>@NORMALIZED_ORGBASE@</Value>
                         </DefaultValues>
                     </AttributeSchema>
-                    
+
                     <AttributeSchema name="sun-idrepo-ldapv3-config-ssl-enabled"
                         type="single"
                         syntax="boolean"
                         i18nKey="a2007">
                         <DefaultValues>
                             <Value>false</Value>
+                        </DefaultValues>
+                    </AttributeSchema>
+
+                    <AttributeSchema name="sun-idrepo-ldapv3-config-connection_pool_min_size"
+                        type="single"
+                        syntax="number"
+                        i18nKey="">
+                        <DefaultValues>
+                            <Value>1</Value>
                         </DefaultValues>
                     </AttributeSchema>
 
@@ -2984,7 +3038,7 @@
                             <Value>(objectclass=person)</Value>
                         </DefaultValues>
                     </AttributeSchema>
-                    
+
                     <AttributeSchema name="sun-idrepo-ldapv3-config-user-objectclass"
                         type="list"
                         syntax="string"
@@ -3151,7 +3205,7 @@
                             <Value>(objectclass=group)</Value>
                         </DefaultValues>
                     </AttributeSchema>
-                    
+
                     <AttributeSchema name="sun-idrepo-ldapv3-config-group-container-name"
                         type="single"
                         syntax="string"
@@ -3985,7 +4039,7 @@
                         i18nKey="a3060">
                     </AttributeSchema>
                 </SubSchema>
-                
+
                 <SubSchema name="Database"
                     inheritance="multiple"
                     i18nKey="a4000">
@@ -4026,7 +4080,7 @@
                               <Value>iplanet-am-user-password-reset-question-answer=iplanet_am_user_password_reset_question_answer</Value>
                               <Value>iplanet-am-user-password-reset-force-reset=iplanet_am_user_password_reset_force_reset</Value>
                             </DefaultValues>
-                     </AttributeSchema>                  
+                     </AttributeSchema>
                     <AttributeSchema name="sun-opensso-database-sunIdRepoSupportedOperations"
                         type="list"
                         syntax="string"
@@ -4040,15 +4094,15 @@
                                etc., and the operations are limited to create,
                                read, edit and modify. The values are case
                                insenstive. -->
-                            <!-- Unlike the other LDAP repos, which specify a 
+                            <!-- Unlike the other LDAP repos, which specify a
                                 lot of IdTypes and operations for the property
                                 sunIdRepoSupportedOperations, for now I will
-                                just support allowing read of users data.  
+                                just support allowing read of users data.
                              -->
                              <!--  for read only, still need service to authn
                                   <Value>user=read,service</Value>
                              -->
-                             <Value>user=read,create,edit,delete,service</Value>                            
+                             <Value>user=read,create,edit,delete,service</Value>
                              <Value>group=read,create,edit,delete</Value>
                         </DefaultValues>
                     </AttributeSchema>
@@ -4067,7 +4121,7 @@
                         syntax="string"
                         i18nKey="a4018">
                         <ChoiceValues>
-                            <ChoiceValue i18nKey="a4018choiceJNDI">JNDI</ChoiceValue> 
+                            <ChoiceValue i18nKey="a4018choiceJNDI">JNDI</ChoiceValue>
                             <ChoiceValue i18nKey="a4018choiceURL">JDBC</ChoiceValue>
                         </ChoiceValues>
                         <DefaultValues>
@@ -4128,7 +4182,7 @@
                         any="required"
                         validator="RequiredValueValidator"
                         i18nKey="a4100">
-                        <DefaultValues>                                                        
+                        <DefaultValues>
                             <Value>uid</Value>
                             <Value>givenname</Value>
                             <Value>sn</Value>
@@ -4150,7 +4204,7 @@
                             <Value>iplanet_am_user_password_resetoptions</Value>
                             <Value>iplanet_am_user_password_reset_question_answer</Value>
                             <Value>iplanet_am_user_password_reset_force_reset</Value>
-                            <Value>sunIdentityMSISDNNumber</Value>                            
+                            <Value>sunIdentityMSISDNNumber</Value>
                         </DefaultValues>
                     </AttributeSchema>
                     <AttributeSchema name="sun-opensso-database-UserPasswordAttr"
@@ -4246,7 +4300,7 @@
                         </DefaultValues>
                     </AttributeSchema>
                 </SubSchema>
-                
+
                 <OrganizationAttributeSchema>
                     <AttributeSchema name="sunOrganizationStatus"
                         type = "single_choice"
