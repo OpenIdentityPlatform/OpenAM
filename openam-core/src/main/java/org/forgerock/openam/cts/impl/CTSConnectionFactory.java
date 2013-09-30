@@ -15,6 +15,7 @@
  */
 package org.forgerock.openam.cts.impl;
 
+import com.google.inject.Singleton;
 import com.google.inject.name.Named;
 import com.sun.identity.common.ShutdownListener;
 import com.sun.identity.shared.debug.Debug;
@@ -48,6 +49,7 @@ import java.util.Set;
  * @author robert.wapshott@forgerock.com
  * @author jonathan.scudder@forgerock.com
  */
+@Singleton
 public class CTSConnectionFactory implements ConnectionFactory, ShutdownListener {
 
     private static final String DEBUG_CONNECTION_CHANGED =
