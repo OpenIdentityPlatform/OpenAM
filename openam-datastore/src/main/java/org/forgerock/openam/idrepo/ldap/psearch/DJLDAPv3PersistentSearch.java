@@ -352,7 +352,7 @@ public class DJLDAPv3PersistentSearch {
             } catch (Exception ex) {
                 long now = System.currentTimeMillis();
                 if (now - lastLogged > 60000) {
-                    DEBUG.error("Unable to start persistent search: + " + ex.getMessage());
+                    DEBUG.error("Unable to start persistent search: " + ex.getMessage());
                     lastLogged = now;
                 }
                 IOUtils.closeIfNotNull(conn);
