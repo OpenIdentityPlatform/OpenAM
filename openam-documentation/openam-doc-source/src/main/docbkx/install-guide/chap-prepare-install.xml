@@ -707,6 +707,46 @@ esac
   <xref linkend="prepare-java" />. The settings are accessible in the
   administration console under Application Server &gt; JVM Settings &gt;
   JVM Options.</para>
+
+  <orderedlist>
+   <para>In addition, after downloading the OpenAM server .war file, edit the
+   application configuration to make sure that classes from OpenAM libraries
+   are loaded before GlassFish bundled libraries.</para>
+
+   <listitem>
+    <para>Extract the OpenAM server .war file content to a working
+    directory.</para>
+
+    <screen>$ mkdir /tmp/openam ; cd /tmp/openam
+$ jar -xf ~/Downloads/openam.war</screen>
+   </listitem>
+
+   <listitem>
+    <para>Add a <filename>WEB-INF/sun-web.xml</filename> file to set
+    class-loading delegation to false.</para>
+
+    <screen>$ vi WEB-INF/sun-web.xml
+$ cat WEB-INF/sun-web.xml
+&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?&gt;
+&lt;!DOCTYPE sun-web-app PUBLIC
+ &quot;-//Sun Microsystems, Inc.//DTD Application Server 9.0 Servlet 2.5//EN&quot;
+ &quot;http://www.sun.com/software/appserver/dtds/sun-web-app_2_5-0.dtd&quot;&gt;
+&lt;sun-web-app error-url=&quot;&quot;&gt;
+  &lt;class-loader delegate=&quot;false&quot;/&gt;
+&lt;/sun-web-app&gt;</screen>
+   </listitem>
+
+   <listitem>
+    <para>Pack the updated .war file to deploy.</para>
+
+    <screen>$ jar -cf ../openam.war *</screen>
+   </listitem>
+
+   <listitem>
+    <para>Deploy the updated .war file in place of the server .war file
+    delivered with the release.</para>
+   </listitem>
+  </orderedlist>
  </section>
 
  <section xml:id="prepare-jboss-5">
@@ -911,10 +951,36 @@ $ java -server -Xmx1024m -XX:MaxPermSize=256m -jar start.jar</screen>
  </section>
 
  <section xml:id="prepare-ibm-websphere">
-  <title>Preparing IBM<superscript>®</superscript> WebSphere<superscript>®</superscript></title>
+  <title>Preparing IBM WebSphere</title>
 
   <para>Before you deploy OpenAM, use the Administrator console to update
   JVM options as described in <xref linkend="prepare-java" />.</para>
+
+  <orderedlist>
+   <para>In addition, configure WebSphere to load classes from OpenAM bundled
+   libraries before loading classes from libraries delivered with WebSphere.
+   The following steps must be completed after you deploy OpenAM into
+   WebSphere.</para>
+
+   <listitem>
+    <para>In WebSphere administration console, browse to Application >
+    Application Type > WebSphere enterprise applications > <replaceable>OpenAM
+    Name</replaceable> > Class loading and update detection.</para>
+   </listitem>
+
+   <listitem>
+    <para>Set Class loader order > Classes loaded with local class loader first
+    (parent last).</para>
+   </listitem>
+
+   <listitem>
+    <para>Set WAR class loader policy > Single class loader for application.</para>
+   </listitem>
+
+   <listitem>
+    <para>Save your work.</para>
+   </listitem>
+  </orderedlist>
  </section>
 
 </chapter>
