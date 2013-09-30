@@ -52,12 +52,15 @@ public class LocalSSOTokenSessionModuleTest {
     private LocalSSOTokenSessionModule localSSOTokenSessionModule;
     private AuthnRequestUtils mockUtils;
     private SSOTokenFactory mockFactory;
+    private AuthUtilsWrapper authUtilsWrapper;
 
     @BeforeMethod
     public void setUpMethod() {
         mockUtils = mock(AuthnRequestUtils.class);
         mockFactory = mock(SSOTokenFactory.class);
-        localSSOTokenSessionModule = new LocalSSOTokenSessionModule(mockUtils, mockFactory);
+        authUtilsWrapper = mock(AuthUtilsWrapper.class);
+
+        localSSOTokenSessionModule = new LocalSSOTokenSessionModule(mockUtils, mockFactory, authUtilsWrapper);
     }
 
     @Test

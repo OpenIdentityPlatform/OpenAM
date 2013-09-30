@@ -18,7 +18,7 @@ package org.forgerock.openam.jaspi.modules.session;
 
 import com.iplanet.sso.SSOException;
 import com.iplanet.sso.SSOToken;
-import com.iplanet.sso.SSOTokenManager;
+import com.sun.identity.authentication.service.AuthUtils;
 import com.sun.identity.session.util.RestrictedTokenAction;
 import com.sun.identity.session.util.RestrictedTokenContext;
 import org.apache.commons.lang.StringUtils;
@@ -39,7 +39,6 @@ import javax.security.auth.message.module.ServerAuthModule;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
-import java.security.Principal;
 import java.util.Map;
 
 /**
@@ -54,8 +53,9 @@ import java.util.Map;
  */
 public class LocalSSOTokenSessionModule implements ServerAuthModule {
 
-    private static final String COOKIE_HEADER_KEY = "iPlanetDirectoryPro";
     private static final String REQUESTER_URL_PARAM = "requester";
+
+    private final AuthUtilsWrapper authUtilsWrapper;
 
     private AuthnRequestUtils requestUtils;
     private SSOTokenFactory factory;
@@ -65,16 +65,21 @@ public class LocalSSOTokenSessionModule implements ServerAuthModule {
      * Default constructor is initialised by the framework.
      */
     public LocalSSOTokenSessionModule() {
+        authUtilsWrapper = new AuthUtilsWrapper();
     }
 
     /**
      * Test constructor exposes required dependencies.
+     *
      * @param requestUtils Required for processing ServletRequests.
      * @param factory Required for generation of SSOTokens.
+     * @param authUtilsWrapper Required for getting cookie name.
      */
-    public LocalSSOTokenSessionModule(AuthnRequestUtils requestUtils, SSOTokenFactory factory) {
+    public LocalSSOTokenSessionModule(AuthnRequestUtils requestUtils, SSOTokenFactory factory,
+            AuthUtilsWrapper authUtilsWrapper) {
         this.requestUtils = requestUtils;
         this.factory = factory;
+        this.authUtilsWrapper = authUtilsWrapper;
     }
 
     /**
@@ -156,6 +161,15 @@ public class LocalSSOTokenSessionModule implements ServerAuthModule {
     }
 
     /**
+     * Gets the AM cookie name, as set by AM.
+     *
+     * @return The AM cookie name.
+     */
+    private String getCookieHeaderName() {
+        return authUtilsWrapper.getCookieName();
+    }
+
+    /**
      * Validates the request by attempting to retrieve the SSOToken ID from the cookies on the request.
      * If the SSOToken ID cookie is not present then the method returns AuthStatus.SEND_FAILURE, otherwise if it is
      * present it is then used to retrieve the actual SSOToken from the SSOTokenManager, if valid then
@@ -175,7 +189,7 @@ public class LocalSSOTokenSessionModule implements ServerAuthModule {
 
         String tokenId = getRequestUtils().getTokenId(request);
         if (StringUtils.isEmpty(tokenId)) {
-            tokenId = request.getHeader(COOKIE_HEADER_KEY);
+            tokenId = request.getHeader(getCookieHeaderName());
         }
         if (!StringUtils.isEmpty(tokenId)) {
             SSOToken ssoToken = getFactory().getTokenFromId(tokenId);
