@@ -2475,7 +2475,7 @@ CookieWriterServlet.doGetPost: Redirect to
    leaving the user at <literal>http://openam.forgerock.org</literal>.</para>
 
    <programlisting language="none"
-   >http://www.sp.example:8080/sp/saml2/jsp/spSingleLogoutInit.jsp?metaAlias=/sp
+   >http://www.sp.example:8080/openam/saml2/jsp/spSingleLogoutInit.jsp?
 &amp;idpEntityID=http%3A%2F%2Fwww.idp.example%3A8080%2Fopenam
 &amp;RelayState=http%3A%2F%2Fopenam.forgerock.org</programlisting>
   </example>
