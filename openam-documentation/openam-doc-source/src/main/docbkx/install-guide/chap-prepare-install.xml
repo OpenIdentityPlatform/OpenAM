@@ -800,145 +800,289 @@ $ cat WEB-INF/jboss-web.xml</screen>
   <xref linkend="prepare-java" />.</para>
  </section>
 
- <section xml:id="prepare-jboss-7">
-  <title>Preparing OpenAM &amp; JBoss 7</title>
 
-    <para>JBoss 7 requires some preparation prior to deploying OpenAM. The following
-    instructions provide guidance for both standalone and domain deployments.
-    OpenAM must be able to store its configuration between restarts.</para>
+<section xml:id="prepare-jboss-7">
+  <title>Preparing OpenAM &amp; JBoss AS 7 / EAP 6</title>
 
-   <procedure>
-    <title>To Prepare JBoss 7</title>
+    <para>Some preparation is required to deploy OpenAM on JBoss AS 7 / EAP 6. </para>
 
-    <step>
-     <para>Stop JBoss.</para>
-    </step>
+    <para>The following instructions provide guidance for both standalone and domain deployments.
+    OpenAM must be able to store its configuration between restarts. The procedures listed here are
+    workarounds for JBoss AS 7.1.2 / 7.1.3, and the corresponding versions of JBoss EAP (6.0.0, 6.0.1).
+    The intent of the configuration changes to JBoss AS 7 / EAP 6 described here have already been
+    incorporated into JBoss EAP 6.1.x, which is built from JBoss AS 7.2.x.
+    To identify the versions of JBoss EAP that have been built from JBoss
+    AS, see the following article on <link xlink:href="https://access.redhat.com/site/articles/112673"
+    xlink:show="new"><citetitle>JBoss Enterprise Application Platform Component Details</citetitle></link>.</para>
 
-    <step>
-     <para>Update the container's <filename>module.xml</filename> file, such as
-     <filename>/path/to/jboss7/modules/sun/jdk/main/module.xml</filename>.</para>
+    <para>Once JBoss has been configured, you can then prepare OpenAM for deployment, by making a few changes
+    to the contents of the OpenAM <filename>.war</filename> archive.</para>
 
-     <substeps>
-      <step>
-       <para>Add the Sun x509 security module path to the JBoss 7
-       configuration (<literal>sun/security/x509</literal>).</para>
+        <itemizedlist>
+            <listitem><para><xref linkend="prep-jboss-710-711" /></para></listitem>
+            <listitem><para><xref linkend="prep-jboss-600-601" /></para></listitem>
+            <listitem><para><xref linkend="prep-jboss-61x" /></para></listitem>
+            <listitem><para><xref linkend="prep-jboss-for-openam" /></para></listitem>
+            <listitem><para><xref linkend="prep-openam-for-jboss" /></para></listitem>
+        </itemizedlist>
 
-       <para>The following example shows the change for JBoss 7.1.1.</para>
+        <procedure xml:id="prep-jboss-710-711">
+            <title>To Prepare JBoss AS 7.1.0 / 7.1.1</title>
 
-       <programlisting language="xml">&lt;path name="com/sun/security/auth"/&gt;
+            <para>For JBoss AS 7.1.0 / 7.1.1, you need to make changes to the <filename>module.xml</filename>
+                file in the <filename>/path/to/jboss/modules/sun/jdk/main</filename> directory, as well as changes
+                to a configuration file associated with JBoss standalone or domain modes.</para>
+
+            <step>
+                <para>Stop JBoss</para>
+            </step>
+
+            <step>
+                <para>Update the <filename>module.xml</filename> file associated with the container. You can
+                    find this file a directory such as <filename>/path/to/jboss/modules/sun/jdk/main</filename>.</para>
+            </step>
+
+            <step>
+                <para>In the same <filename>module.xml</filename> file, add the Sun x509 security module path
+                    (<literal>sun/security/x509</literal>).</para>
+                <para>The following example shows an excerpt of the revised file for JBoss AS 7.1.0.</para>
+
+                <programlisting language="xml">&lt;path name="com/sun/security/auth"/&gt;
+&lt;path name="com/sun/security/auth/login"/&gt;
 &lt;path name="com/sun/security/auth/module"/&gt;
 &lt;path name ="sun/security/x509"/&gt; &lt;!-- path added here -->
 &lt;path name="sun/misc"/></programlisting>
-      </step>
+            </step>
 
-      <step>
-       <para>When using <command>ssoadm</command> or the distributed
-       authentication service (DAS), also add the following path.</para>
+            <step>
+                <para>When using <command>ssoadm</command> or the distributed
+                    authentication service (DAS), also add the following path to the aforementioned
+                    <filename>module.xml</filename> file.</para>
 
-       <literallayout class="monospaced"
-       >&lt;path name="com/sun/org/apache/xerces/internal/dom" /></literallayout>
-      </step>
+                <literallayout class="monospaced"
+                        >&lt;path name="com/sun/org/apache/xerces/internal/dom" /></literallayout>
+            </step>
 
-      <step>
-       <para>For JBoss 7.1.3.Final (WildFly), remove the following line to avoid
-       clashes with XML classes included in OpenAM.</para>
+            <step>
+                <para>Disable modules that conflict with OpenAM REST libraries. All jaxrs
+                    references need to be removed from the configuration. The file that you modify
+                    depends on whether you are running JBoss in standalone or domain mode.</para>
 
-       <literallayout class="monospaced"
-       >&lt;path
-  name="com/sun/org/apache/xml/internal/security/transforms/implementations" /></literallayout>
-      </step>
-     </substeps>
-    </step>
-
-    <step>
-     <para>Disable modules that conflict with OpenAM REST libraries. All JAX-RS
-     references need to be removed from the configuration.</para>
-     
-     <note>
-      <para>For JBoss 7.1.0 Final, in addition to removing the following references,
-      remove all <literal>org.jboss.as.webservices</literal> references. You will need
-      to remove the extension and all related subsystem tags.</para>
-     </note>
-
-     <stepalternatives>
-      <step>
-       <para>The following example uses JBoss 7.1.1 standalone. Remember to
-       remove all subsystems and extension tags associated with <literal>urn:jboss:domain:jaxrs:1.0</literal>.</para>
-       <screen>$ vi /path/to/jboss7/standalone/configuration/standalone.xml
- &lt;extension module="org.jboss.as.ejb3"/&gt;
+                <stepalternatives>
+                    <step>
+                        <para>The following example is based on JBoss 7.1.0 standalone mode. Remember to
+                            remove all subsystems and extension tags associated with <literal>urn:jboss:domain:jaxrs:1.0</literal>.</para>
+                        <screen>$ vi /path/to/jboss/standalone/configuration/standalone.xml
+&lt;extension module="org.jboss.as.ejb3"/&gt;
 -  &lt;extension module="org.jboss.as.jaxrs"/&gt;
 ....
 -  &lt;subsystem xmlns="urn:jboss:domain:jaxrs:1.0"/&gt;
- &lt;subsystem xmlns="urn:jboss:domain:jca:1.1"&gt;</screen>
-     </step> 
-     <step>
-      <para>The following example uses JBoss 7.1.1 for a managed domain.</para>
-      <screen>$ cp /path/to/jboss7/domain/configuration/
- $vi domain.xml
- &lt;extension module="org.jboss.as.ejb3"/&gt;
+&lt;subsystem xmlns="urn:jboss:domain:jca:1.1"&gt;</screen>
+                    </step>
+                    <step>
+                        <para>The following example is based on JBoss 7.1.0 for a managed domain.</para>
+                        <screen>$ vi /path/to/jboss7/domain/configuration/domain.xml
+&lt;extension module="org.jboss.as.ejb3"/&gt;
 -  &lt;extension module="org.jboss.as.jaxrs"/&gt;
 ....
 -  &lt;subsystem xmlns="urn:jboss:domain:jaxrs:1.0"/&gt;
- &lt;subsystem xmlns="urn:jboss:domain:jca:1.1"&gt;</screen>
-      </step>
-     </stepalternatives>
-    </step>
+&lt;subsystem xmlns="urn:jboss:domain:jca:1.1"&gt;</screen>
+                    </step>
+                </stepalternatives>
+            </step>
 
-    <step>
-     <para>Update the <filename>openam.war</filename> before deploying OpenAM.</para>
-     <para>JBoss will deploy applications from different temporary directories 
-     every time you restart the server, forcing you to reconfigure OpenAM. Updating 
-     or expanding the <filename>openam.war</filename> will anchor the configuration.</para>
+            <step>
+                <para>In either the <filename>standalone.xml</filename> or <filename>domain.xml</filename>
+                    files, you will also need to delete <literal>org.jboss.as.webservices</literal> references.
+                    Depending on the file, this includes one or more groups of <literal>subsystem</literal> lines
+                    such as:</para>
+                <screen>&lt;subsystem xmlns="urn:jboss:domain:webservices:1.1"/&gt;
+....
+&lt;/subsystem&gt;</screen>
+            </step>
 
-      <orderedlist numeration="arabic">
-        <listitem>
-         <para>Create a temporary directory and expand the <filename>openam.war</filename>.</para>
-         <screen> $ cd /temp
- $ mkdir openamtemp ; cd openamtemp
- $ jar xvf ~/Downloads/<?eval ${coreWarFile}?></screen>
-        </listitem>
-        <listitem>
-         <para>Update the <literal># configuration.dir=</literal> line in the 
-         <filename>bootstrap.properties</filename> file so that it appears as follows, 
-         and save the change.</para>
-         <screen>$ vi WEB-INF/classes/bootstrap.properties
-  # This property should also be used when the system user that 
-  # is running the web/application server process does not have
-  # a home directory. i.e. System.getProperty("user.home") returns
-  # null.
-  
-  configuration.dir=$HOME/openamJboss</screen>
-        </listitem>
-        <listitem>
-         <para>Rebuild the <filename>openam.war</filename> file.</para>
-         <screen>$ jar cvf ../openam.war *</screen>
-        </listitem>
-        </orderedlist>
-   </step>
-   <step>
-    <para>Set the following JVM options before deploying the <filename>openam.war</filename>
-    file.</para>
-     <variablelist>
-      <varlistentry>
-       <term><literal>-Dorg.apache.tomcat.util.http.ServerCookie.ALWAYS_ADD_EXPIRES=true</literal></term>
-       <listitem>
-        <para>Make sure that headers include the <literal>Expires</literal>
-        attribute rather than only <literal>Max-Age</literal>, as some versions
-        of Internet Explorer do not support <literal>Max-Age</literal>.</para>
-       </listitem>
-      </varlistentry>
-      <varlistentry>
-       <term>Additional Options</term>
-       <listitem>
-        <para>See <xref linkend="prepare-java" /> for details.</para>
-       </listitem>
-      </varlistentry>
-     </variablelist>
-    </step> 
-   </procedure>
- </section>
+            <step>
+                <para>You are now ready to prepare OpenAM as described in <xref linkend="prep-openam-for-jboss" />.</para>
+            </step>
 
- <section xml:id="prepare-jetty-7">
+        </procedure>
+
+        <procedure xml:id="prep-jboss-600-601">
+            <title>Alternative Method: To Prepare JBoss EAP 6.0.0 and 6.0.1</title>
+
+            <para>JBoss EAP 6.0.0 and 6.0.1 are built from JBoss AS 7.1.2 and 7.1.3, respectively. The same techniques
+                described in the <xref linkend="prep-jboss-710-711" /> section work here as well. One alternative
+                method is available, as described in this section.</para>
+
+            <step>
+                <para>Stop JBoss.</para>
+            </step>
+
+            <step>
+                <para>Update the <filename>openam.war</filename> before deploying OpenAM.</para>
+
+                <orderedlist numeration="arabic">
+                    <listitem>
+                        <para>Create a temporary directory and expand the <filename>openam.war</filename>.</para>
+                        <screen> $ mkdir /tmp/openam ; cd /tmp/openam
+                            $ jar xvf /path/to/<?eval ${coreWarFile}?></screen>
+                    </listitem>
+                    <listitem>
+                        <para>Create a new <filename>jboss-deployment-structure.xml</filename> file in the
+                            <filename>WEB-INF</filename> subdirectory so that it appears as follows, and save
+                            the change.</para>
+                        <screen>$ vi WEB-INF/jboss-deployment-structure.xml</screen>
+                        <programlisting language="xml">&lt;?xml version="1.0" encoding="UTF-8"?&gt;
+ &lt;jboss-deployment-structure xmlns="urn:jboss:deployment-structure:1.2"&gt;
+  &lt;deployment&gt;
+   &lt;exclusions&gt;
+    &lt;module name="sun.jdk" /&gt;
+   &lt;/exclusions&gt;
+   &lt;exclude-subsystems&gt;
+    &lt;subsystem name="jaxrs" /&gt;
+    &lt;subsystem name="webservices" /&gt;
+   &lt;/exclude-subsystems&gt;
+  &lt;dependencies&gt;
+   &lt;module name="sun.jdk" &gt;
+    &lt;imports&gt;
+     &lt;exclude-set&gt;
+&lt;path name="com/sun/org/apache/xml/internal/security/transforms/implementations"/&gt;
+     &lt;/exclude-set&gt;
+    &lt;/imports&gt;
+   &lt;/module&gt;
+   &lt;system&gt;
+    &lt;paths&gt;
+     &lt;path name="sun/security/x509" /&gt;
+     &lt;path name="com/sun/org/apache/xpath/internal" /&gt;
+     &lt;path name="com/sun/org/apache/xerces/internal/dom" /&gt;
+     &lt;path name="com/sun/org/apache/xml/internal/utils" /&gt;
+    &lt;/paths&gt;
+   &lt;/system&gt;
+  &lt;/dependencies&gt;
+ &lt;/deployment&gt;
+&lt;/jboss-deployment-structure&gt;</programlisting>
+                    </listitem>
+                    <listitem>
+                        <para>Rebuild the <filename>openam.war</filename> file.</para>
+                        <screen>$ jar cvf ../openam.war *</screen>
+                    </listitem>
+                </orderedlist>
+
+            </step>
+            <step>
+                <para>You will want to make at least one more change to the <filename>openam.war</filename> file before
+                    deployment, as described in <xref linkend="prep-openam-for-jboss" />.</para>
+            </step>
+
+            <step>
+                <para>You do not need to make any of the other changes to XML files described in this section.
+                    As JBoss EAP 6.0.0 and 6.0.1 was built from JBoss AS 7.1.2 and AS 7.1.3, respectively, this
+                    procedure may also work on those versions of JBoss.</para>
+            </step>
+
+        </procedure>
+
+        <procedure xml:id="prep-jboss-61x">
+            <title>To Prepare JBoss 6.1.x</title>
+
+            <step>
+                <para>For JBoss 6.1.0 and above, no special changes are required to the main JBoss
+                    configuration files.</para>
+            </step>
+
+            <step>
+                <para>However, you still need to review <xref linkend="prep-jboss-for-openam" /> and
+                    <xref linkend="prep-openam-for-jboss" /> to make sure the JVM and directories are
+                    configured appropriately.</para>
+            </step>
+
+        </procedure>
+
+        <procedure xml:id="prep-jboss-for-openam">
+            <title>To Prepare JBoss for OpenAM</title>
+
+            <para>The default JBoss settings for JVM do not give sufficient memory to OpenAM. This procedure
+                documents one method that you can use to modify JBoss. Other methods described in <link xlink:show="new"
+                                                                                                        xlink:href="http://www.jboss.org/jbossas/docs">
+                    <citetitle>JBoss Main Documentation Page</citetitle></link>.</para>
+
+            <step>
+                <para>Stop JBoss.</para>
+            </step>
+
+            <step>
+                <para>Open an appropriate JBoss configuration file. This procedure describes the use of the
+                    <filename>standalone.conf</filename> file in the <filename>/path/to/jboss/bin</filename>
+                    directory for JBoss in standalone mode.</para>
+            </step>
+
+            <step>
+                <para>Check the JVM settings associated with <literal>JAVA_OPTS</literal>. For JBoss AS 7.1.0 and AS 7.1.1,
+                    you should change the JVM heap size to <literal>-Xmx1024m</literal>. The default JVM heap size and permanent
+                    generation settings for later versions of JBoss may already exceed recommended values (-Xmx1024m,
+                    -XX:MaxPermSize=256m).</para>
+            </step>
+            <step>
+                <para>Set the following JVM <literal>JAVA_OPTS</literal> setting in the same file.</para>
+                <programlisting>-Dorg.apache.tomcat.util.http.ServerCookie.ALWAYS_ADD_EXPIRES=true</programlisting>
+                <para>Make sure that headers include the <literal>Expires</literal>
+                    attribute rather than only <literal>Max-Age</literal>, as some versions
+                    of Internet Explorer do not support <literal>Max-Age</literal>.</para>
+            </step>
+
+            <step>
+                <para>Now deploy the <filename>openam.war</filename> file into the appropriate JBoss deployment directory.
+                    The directory varies depending on whether you are running in standalone or domain mode.</para>
+            </step>
+
+            <step>
+                <para>You do not need to make any of the other changes to XML files described in this section.
+                    As JBoss EAP 6.0.0 and 6.0.1 was built from JBoss AS 7.1.2 and AS 7.1.3, respectively, this
+                    procedure may also work on those versions of JBoss.</para>
+            </step>
+
+        </procedure>
+
+        <procedure xml:id="prep-openam-for-jboss">
+            <title>To Prepare OpenAM for JBoss</title>
+
+            <para>To take full advantage of JBoss with OpenAM, you should make a couple of changes to the
+                OpenAM <filename>war</filename> file. One problem is that JBoss will deploy applications from
+                different temporary directories every time you restart the container, which would require
+                reconfiguring OpenAM. To avoid this issue, take the following steps:</para>
+
+            <step>
+                <para>If you have not already done so, create a temporary directory and
+                    expand the <filename>openam.war</filename>.</para>
+                <screen> $ cd /tmp
+$ mkdir /tmp/openam ; cd /tmp/openam
+$ jar xvf ~/Downloads/<?eval ${coreWarFile}?></screen>
+            </step>
+
+            <step>
+                <para>Update the <literal># configuration.dir=</literal> line in the
+                    <filename>bootstrap.properties</filename> file so that it appears as follows,
+                    and save the change.</para>
+                <screen>$ vi WEB-INF/classes/bootstrap.properties
+# This property should also be used when the system user that
+# is running the web/application server process does not have
+# a home directory. i.e. System.getProperty("user.home") returns
+# null.
+
+configuration.dir=$HOME/openamJboss</screen>
+            </step>
+
+            <step>
+                <para>Rebuild the <filename>openam.war</filename> file.</para>
+                <screen>$ jar cvf ../openam.war *</screen>
+            </step>
+
+        </procedure>
+
+</section>
+
+
+<section xml:id="prepare-jetty-7">
   <title>Preparing Jetty 7</title>
 
   <para>When you deploy OpenAM, make sure you start Jetty with enough
