@@ -33,10 +33,12 @@ import org.forgerock.opendj.ldap.ByteString;
 import org.forgerock.opendj.ldap.ConnectionFactory;
 import org.forgerock.opendj.ldap.Connections;
 import org.forgerock.opendj.ldap.DN;
+import org.forgerock.opendj.ldap.ErrorResultException;
 import org.forgerock.opendj.ldap.FailoverLoadBalancingAlgorithm;
 import org.forgerock.opendj.ldap.Filter;
 import org.forgerock.opendj.ldap.LDAPConnectionFactory;
 import org.forgerock.opendj.ldap.LDAPOptions;
+import org.forgerock.opendj.ldap.LoadBalancerEventListener;
 import org.forgerock.opendj.ldap.SSLContextBuilder;
 import org.forgerock.opendj.ldap.SearchScope;
 import org.forgerock.opendj.ldap.requests.Requests;
@@ -230,7 +232,8 @@ public class LDAPUtils {
     }
 
     private static ConnectionFactory loadBalanceFactories(List<ConnectionFactory> factories) {
-        return Connections.newLoadBalancer(new FailoverLoadBalancingAlgorithm(factories));
+        return Connections.newLoadBalancer(new FailoverLoadBalancingAlgorithm(factories,
+                new LoggingLBEventListener()));
     }
 
     /**
@@ -389,6 +392,17 @@ public class LDAPUtils {
                 ret.add(LDAPURL.valueOf(server));
             }
             return ret;
+        }
+    }
+
+    private static class LoggingLBEventListener implements LoadBalancerEventListener {
+
+        public void handleConnectionFactoryOffline(ConnectionFactory factory, ErrorResultException error) {
+            DEBUG.error("Connection factory became offline: " + factory, error);
+        }
+
+        public void handleConnectionFactoryOnline(ConnectionFactory factory) {
+            DEBUG.error("Connection factory became online: " + factory);
         }
     }
 }
