@@ -23,29 +23,26 @@
  */
 package org.forgerock.openam.services;
 
-import com.iplanet.sso.SSOToken;
 import com.sun.identity.security.AdminTokenAction;
-import com.sun.identity.shared.datastruct.CollectionHelper;
-import com.sun.identity.sm.*;
-import org.forgerock.json.resource.InternalServerErrorException;
+import com.sun.identity.sm.DNMapper;
+import com.sun.identity.sm.ServiceConfig;
+import com.sun.identity.sm.ServiceConfigManager;
+import com.sun.identity.sm.ServiceListener;
+import com.sun.identity.sm.ServiceNotFoundException;
 import org.forgerock.openam.forgerockrest.RestDispatcher;
 import org.forgerock.openam.forgerockrest.RestUtils;
 
 import java.security.AccessController;
-import java.util.Collections;
-import java.util.Map;
-import java.util.Set;
 
 public class RestSecurity {
 
-    private static ServiceConfig scm;
     private static ServiceConfigManager mgr;
     private RestSecurityConfiguration restSecurityConfiguration;
 
-    private final static String SELF_REGISTRATION = "forgerockRestSecurityServiceSelfRegistration";
-    private final static String FORGOT_PASSWORD = "forgerockRestSecurityServiceForgotPassword";
-    private final static String SELF_REG_TOKEN_LIFE_TIME = "forgerockRestSecuirtySerivceSelfRegTokenTTL";
-    private final static String FORGOT_PASSWORD_TOKEN_LIFE_TIME= "forgerockRestSecuirtySerivceForgotPassTokenTTL";
+    private final static String SELF_REGISTRATION = "forgerockRESTSecuritySelfRegistrationEnabled";
+    private final static String FORGOT_PASSWORD = "forgerockRESTSecurityForgotPasswordEnabled";
+    private final static String SELF_REG_TOKEN_LIFE_TIME = "forgerockRESTSecuritySelfRegTokenTTL";
+    private final static String FORGOT_PASSWORD_TOKEN_LIFE_TIME= "forgerockRESTSecurityForgotPassTokenTTL";
 
     private final static String SERVICE_NAME = "RestSecurity";
     private final static String SERVICE_VERSION = "1.0";
@@ -210,5 +207,4 @@ public class RestSecurity {
             throw new ServiceNotFoundException(message);
         }
     }
-
 }

@@ -35,7 +35,7 @@
                 i18nKey="forgerock-restSecurity-service-description">
 
             <Organization>
-                <AttributeSchema name="forgerockRestSecurityServiceSelfRegistration"
+                <AttributeSchema name="forgerockRESTSecuritySelfRegistrationEnabled"
                                  type="single"
                                  syntax="boolean"
                                  validator="RequiredValueValidator"
@@ -48,7 +48,7 @@
                         <Value>false</Value>
                     </DefaultValues>
                 </AttributeSchema>
-                <AttributeSchema name="forgerockRestSecurityServiceForgotPassword"
+                <AttributeSchema name="forgerockRESTSecurityForgotPasswordEnabled"
                                  type="single"
                                  syntax="boolean"
                                  validator="RequiredValueValidator"
@@ -61,7 +61,7 @@
                         <Value>false</Value>
                     </DefaultValues>
                 </AttributeSchema>
-                <AttributeSchema name="forgerockRestSecuirtySerivceSelfRegTokenTTL"
+                <AttributeSchema name="forgerockRESTSecuritySelfRegTokenTTL"
                                  type="single"
                                  syntax="number_range" rangeStart="0" rangeEnd="2147483647"
                                  validator="RequiredValueValidator"
@@ -70,7 +70,7 @@
                         <Value>900</Value>
                     </DefaultValues>
                 </AttributeSchema>
-                <AttributeSchema name="forgerockRestSecuirtySerivceForgotPassTokenTTL"
+                <AttributeSchema name="forgerockRESTSecurityForgotPassTokenTTL"
                                  type="single"
                                  syntax="number_range" rangeStart="0" rangeEnd="2147483647"
                                  validator="RequiredValueValidator"
