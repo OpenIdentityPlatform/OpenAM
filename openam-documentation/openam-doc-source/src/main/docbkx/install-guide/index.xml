@@ -20,7 +20,7 @@
   !
   ! CCPL HEADER END
   !
-  !      Copyright 2011-2013 ForgeRock, Inc.
+  !      Copyright 2011-2013 ForgeRock AS
   !    
 -->
 <book xml:id='install-guide'
@@ -37,7 +37,7 @@
   </abstract>
   <copyright>
    <year>2011-2013</year>
-   <holder>ForgeRock, Inc</holder>
+   <holder>ForgeRock AS</holder>
   </copyright>
   <authorgroup>
    <author>

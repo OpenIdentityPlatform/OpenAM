@@ -20,14 +20,13 @@
   !
   ! CCPL HEADER END
   !
-  !      Copyright 2011-2013 ForgeRock, Inc.
+  !      Copyright 2011-2013 ForgeRock AS
   !    
 -->
 <book xml:id='upgrade-guide'
  xmlns='http://docbook.org/ns/docbook' version='5.0' xml:lang='en'
  xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance'
  xsi:schemaLocation='http://docbook.org/ns/docbook http://docbook.org/xml/5.0/xsd/docbook.xsd'
- xmlns:xlink='http://www.w3.org/1999/xlink'
  xmlns:xinclude='http://www.w3.org/2001/XInclude'>
  <info>
   <title>OpenAM <?eval ${serverDocTargetVersion}?> Upgrade Guide</title>
@@ -37,7 +36,7 @@
   </abstract>
   <copyright>
    <year>2011-2013</year>
-   <holder>ForgeRock, Inc.</holder>
+   <holder>ForgeRock AS</holder>
   </copyright>
   <authorgroup>
    <author>
@@ -65,13 +64,9 @@
  <toc />
  
  <xinclude:include href="preface.xml" />
- <xinclude:include href="chap-upgrade-intro.xml" />
- <xinclude:include href="chap-upgrade.xml" />
-<!-- <xinclude:include href="chap-upgrade-server-only.xml" /> -->
- <xinclude:include href="chap-legacy.xml" />
+
+ <xinclude:include href="chap-about-upgrades.xml" />
+ <xinclude:include href="chap-upgrade-servers.xml" />
+ <xinclude:include href="chap-legacy-servers.xml" />
  <xinclude:include href="chap-upgrade-components.xml" />
- <xinclude:include href="appendix-best-practices.xml" />
- <xinclude:include href="appendix-troubleshooting.xml" />
- <xinclude:include href="appendix-maven-artifacts.xml" /> 
- <index />
 </book>

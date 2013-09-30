@@ -143,6 +143,22 @@ PING openam-ter (192.168.56.2) 56(84) bytes of data.
     </answer>
    </qandaentry>
   </qandadiv>
+
+  <qandadiv xml:id="troubleshooting-openam-upgrades">
+   <title>OpenAM Upgrades</title>
+
+   <qandaentry xml:id="general-tools-upgrade">
+    <question>
+     <para>I have upgraded OpenAM, now my tools are not working properly. What
+     happened?</para>
+    </question>
+    <answer>
+     <para>Every OpenAM component must be upgraded, not just the main
+     OpenAM <filename>.war</filename> file. If you did not upgrade the tools
+     too, they may not work as intended.</para>
+    </answer>
+   </qandaentry>
+  </qandadiv>
   
   <qandadiv xml:id="troubleshooting-openam-administration">
    <title>OpenAM Administration</title>

@@ -28,30 +28,33 @@
  version='5.0' xml:lang='en'
  xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance'
  xsi:schemaLocation='http://docbook.org/ns/docbook http://docbook.org/xml/5.0/xsd/docbook.xsd'
- xmlns:xlink='http://www.w3.org/1999/xlink'
- xmlns:xinclude='http://www.w3.org/2001/XInclude'>
+ xmlns:xlink='http://www.w3.org/1999/xlink'>
  <title>Installing OpenAM Tools</title>
  <indexterm>
   <primary>Installing</primary>
   <secondary>Tools (ssoadm, etc.)</secondary>
  </indexterm>
- <para>OpenAM tools are found in three <filename>.zip</filename> files where you 
-  unpacked the archive of the entire package, such as 
-  <filename>~/Downloads/openam</filename>.</para>
+ <para>OpenAM tools are found in <filename>.zip</filename> files where you
+ unpacked the archive of the entire package, such as
+ <filename>~/Downloads/openam</filename>.</para>
+
  <variablelist>
   <varlistentry>
    <term><filename><?eval ${ssoadminZipFile}?></filename></term>
    <listitem>
     <para>Administration tools: <command>ampassword</command>,
     <command>ssoadm</command> and <command>amverifyarchive</command></para>
+
+    <para>See <xref linkend="install-openam-admin-tools" />.</para>
    </listitem>
   </varlistentry>
   <varlistentry>
    <term><filename><?eval ${ssoconfigZipFile}?></filename></term>
    <listitem>
-    <para>Tool to check for command line installation, upgrade, and initial
-    configuration, as well as serving as a command line alternative to using
-    the GUI configuration wizard </para>
+    <para>Configuration and upgrade tools, alternatives to using
+    the GUI configuration wizard</para>
+
+    <para>See <xref linkend="install-openam-config-tools" />.</para>
    </listitem>
   </varlistentry>
   <!--
@@ -121,25 +124,40 @@ http://openam.example.com:8080/openam</screen>
     xlink:href="admin-guide#openam-ssoadm-jsp-overview"
     xlink:role="http://docbook.org/xlink/role/olink">OpenAM ssoadm.jsp</link>
     in the <citetitle>Administration Guide</citetitle>.</para>
-  <para>Not all the commands are available on ssoadm.jsp, however this
-  limitation is not present for the command line tool.</para>
+  <para>Not all of the sub-commands available through the <command>ssoadm</command>
+  command are available on the <literal>ssoadm.jsp</literal> web page.</para>
   </step>
   <step performance="optional">
-   <para>If you connect to OpenAM over SSL (HTTPS), and the SSL certificate was
-   not signed by a CA whose certificate is found in the Java cacerts truststore
-   (for example, you used a self-signed certificate as described in the
+   <para>If you connect to OpenAM over SSL (HTTPS), the <command>ssoadm</command>
+   by default tries to trust the certificate based on the CA certificates in
+   the Java <literal>cacerts</literal> truststore. This might not work for your
+   deployment.</para>
+
+   <para >If the SSL certificate configured for the container where you deployed
+   OpenAM was not signed by a recognized CA then the SSL connection process
+   fails. For example, if you used a self-signed certificate as described in the
    <citetitle>Administration Guide</citetitle> procedure, <link
    xlink:href="admin-guide#openam-with-https-on-tomcat"
    xlink:role="http://docbook.org/xlink/role/olink"><citetitle>To Set Up OpenAM
-   With HTTPS on Tomcat</citetitle></link>), then edit the
-   <command>ssoadm</command> (<command>ssoadm.bat</command> on Windows) script
-   such that <command>ssoadm</command> recognizes the certificate.</para>
+   With HTTPS on Tomcat</citetitle></link>, then the <command>ssoadm</command>
+   command cannot trust that certificate by default. To allow the
+   <command>ssoadm</command> command to trust the certificate, edit the
+   <command>ssoadm</command> (<command>ssoadm.bat</command> on Windows)
+   script as follows.</para>
+
    <para>Add two additional options to the <command>java</command> command in
-   the script to identify the proper truststore and truststore password,
-   depending on how you set up SSL.</para>
+   the script to identify the proper trust store and trust store password,
+   depending on how you set up SSL. The following example points to the key
+   store in which Tomcat holds the self-signed certificate that it presents
+   when establishing an HTTPS connection.</para>
+
    <literallayout class="monospaced"
    >-D"javax.net.ssl.trustStore=/path/to/tomcat/conf/keystore.jks"
  -D"javax.net.ssl.trustStorePassword=changeit"</literallayout>
+
+   <para>If the <command>ssoadm</command> command cannot access the server
+   key store in this way, set up your own trust store and import the server
+   certificate using the Java <command>keytool</command> command.</para>
   </step>
 
   <step>
@@ -197,6 +215,7 @@ http://openam.example.com:8080/openam</screen>
   </step>
   <step>
    <para>Unpack the tools from where you unzipped OpenAM.</para>
+   <informalexample><?dbfo pgwide="1"?>
    <screen>$ cd /path/to/openam-tools/config
 $ unzip ~/Downloads/openam/<?eval ${ssoconfigZipFile}?>
 Archive:  ~/Downloads/openam/<?eval ${ssoconfigZipFile}?>
@@ -206,6 +225,7 @@ Archive:  ~/Downloads/openam/<?eval ${ssoconfigZipFile}?>
  extracting: <?eval ${ssoconfigJarFile}?>
  extracting: <?eval ${ssoconfigUpgradeJarFile}?>
   inflating: license.txt</screen>
+   </informalexample>
    <para>Set up configuration files based on the
    <filename>sampleconfiguration</filename> example, and then apply the
    configuration to a deployed OpenAM .war file using the following
@@ -215,9 +235,9 @@ Archive:  ~/Downloads/openam/<?eval ${ssoconfigZipFile}?>
    use the embedded data store with OpenAM installed on
    <literal>server1.example.com</literal>. You must edit the file before using
    it, as described in the <citetitle>OpenAM Reference</citetitle> for
-   <link xlink:href="reference#man-configurator-jar-1"
-    xlink:role="http://docbook.org/xlink/role/olink"
-    ><command>configurator.jar</command></link>.</para>
+   <link xlink:show="new" xlink:href="reference#man-configurator-jar-1"
+   xlink:role="http://docbook.org/xlink/role/olink"
+   ><command>configurator.jar</command></link>.</para>
   </step>
  </procedure>
 

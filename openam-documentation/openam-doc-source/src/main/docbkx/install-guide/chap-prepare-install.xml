@@ -20,7 +20,7 @@
   !
   ! CCPL HEADER END
   !
-  !      Copyright 2011-2013 ForgeRock, Inc.
+  !      Copyright 2011-2013 ForgeRock AS
   !    
 -->
 <chapter xml:id='chap-prepare-install'
@@ -56,6 +56,12 @@
   <filename>%SystemRoot%\system32\drivers\etc\hosts</filename> on Windows. For
   deployment, make sure the FQDN is properly assigned for example using
   DNS.</para>
+
+  <para>Do not use the <literal>localhost</literal> domain for OpenAM, not even
+  for testing purposes. OpenAM relies on browser cookies, which are returned
+  based on domain name. Furthermore, use a domain name that contains at least 2
+  <literal>.</literal> (dot) characters, such
+  <literal>openam.example.com</literal>.</para>
  </section>
 
  <section xml:id="prepare-java">
@@ -506,7 +512,7 @@ aci: (version 3.0;acl "Delete identity"; allow (delete)(userdn = "ldap:///
   should index the following attributes used by OpenAM.</para>
 
   <table xml:id="prepare-identity-repository-indexes">
-   <title>Configuration Data Store Indexes</title>
+   <title>Identity Repository Indexes</title>
 
    <tgroup cols="2">
      <colspec colnum="1" colwidth="1*"/>
@@ -565,10 +571,11 @@ aci: (version 3.0;acl "Delete identity"; allow (delete)(userdn = "ldap:///
     </listitem>
     <listitem>
      <para><link xlink:show="new" xlink:href="http://forgerock.org/openam-archive.html"
-     ><citetitle>Archives</citetitle></link> has all versions of OpenAM, from 9.5.1 to 10.0.1. It includes
-     the <filename>.zip</filename> file with all of the OpenAM components, the 
-     <filename>.war</filename> file, OpenAM tools, the configurator, policy agents, 
-     the WSS policy agents, and the .NET Fedlet for all previous releases.</para>
+     ><citetitle>Archives</citetitle></link> has old versions of OpenAM and
+     policy agents. It includes the full <filename>.zip</filename> file with all
+     of the OpenAM components, the server <filename>.war</filename> file,
+     OpenAM tools, the configurator, policy agents,  the WSS policy agents, and
+     the .NET Fedlet for all previous releases.</para>
     </listitem>
    </itemizedlist>
          
@@ -680,7 +687,7 @@ CATALINA_HOME="/path/to/tomcat"
 export CATALINA_HOME
 JAVA_HOME=/path/to/jdk
 export JAVA_HOME
-CATALINA_OPTS="-Xmx1024m -XX:MaxPermSize=256m"
+CATALINA_OPTS="-server -Xmx1024m -XX:MaxPermSize=256m"
 export CATALINA_OPTS
 
 case "${1}" in
@@ -801,7 +808,7 @@ $ cat WEB-INF/jboss-web.xml</screen>
     OpenAM must be able to store its configuration between restarts.</para>
 
    <procedure>
-    <title>Preparing JBoss 7</title>
+    <title>To Prepare JBoss 7</title>
 
     <step>
      <para>Stop JBoss.</para>
@@ -837,13 +844,14 @@ $ cat WEB-INF/jboss-web.xml</screen>
        clashes with XML classes included in OpenAM.</para>
 
        <literallayout class="monospaced"
-       >&lt;path name="com/sun/org/apache/xml/internal/security/transforms/implementations" /></literallayout>
+       >&lt;path
+  name="com/sun/org/apache/xml/internal/security/transforms/implementations" /></literallayout>
       </step>
      </substeps>
     </step>
 
     <step>
-     <para>Disable modules that conflict with OpenAM REST libraries. All jaxrs 
+     <para>Disable modules that conflict with OpenAM REST libraries. All JAX-RS
      references need to be removed from the configuration.</para>
      
      <note>

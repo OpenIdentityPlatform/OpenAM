@@ -20,7 +20,7 @@
   !
   ! CCPL HEADER END
   !
-  !      Copyright 2011-2013 ForgeRock, Inc.
+  !      Copyright 2011-2013 ForgeRock AS
   !    
 -->
 <chapter xml:id='chap-session-failover'
@@ -28,8 +28,7 @@
  version='5.0' xml:lang='en'
  xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance'
  xsi:schemaLocation='http://docbook.org/ns/docbook http://docbook.org/xml/5.0/xsd/docbook.xsd'
- xmlns:xlink='http://www.w3.org/1999/xlink'
- xmlns:xinclude='http://www.w3.org/2001/XInclude'>
+ xmlns:xlink='http://www.w3.org/1999/xlink'>
  <title>Setting Up OpenAM Session Failover</title>
  <indexterm>
   <primary>Installing</primary>
@@ -47,78 +46,92 @@
  balancer fails client requests over to another OpenAM server. The other OpenAM
  server must then fail over the user session associated with the client.</para>
  
- <para>SFO relies on a highly available Core Token Service (CTS) to store OpenAM
- session data. The services is shared with other OpenAM servers. When the
- OpenAM server where a user authenticated goes down, other OpenAM servers can
- read the user session information from the CTS, so the user does not have to
- authenticate again. When the original OpenAM server becomes available again,
- it can also read session information from the CTS, and can carry on serving
- users with active sessions.</para>
+ <para>SFO relies on a shared, highly available Core Token Service (CTS) to
+ store user session data. The service is shared with other OpenAM servers in the
+ same OpenAM site. When the OpenAM server where a user authenticated goes down,
+ other servers in the site read user session information from the CTS, so the
+ user with a valid session does not have to login again. When the original
+ OpenAM server becomes available again, it can also read session information
+ from the CTS, and can carry on serving users with active sessions.</para>
 
- <important>
-  <para>After upgrading from versions earlier than OpenAM 11.0.0, all users
-  must login again as the OpenAM session representation has changed.</para>
- </important>
+ <itemizedlist>
+  <para>This chapter includes these procedures.</para>
 
- <para><link xlink:href="install-guide#additional-instance-config"
-     xlink:role="http://docbook.org/xlink/role/olink"><citetitle>
-     Configuring an Additional Instance</citetitle></link>
-     provides the steps to configure each instance of OpenAM.
-     The following procedure describes how to configure an OpenAM
-     server to use a load balancer for the first instance if it was not
-     part of the initial configuration.</para>
+  <listitem><para><xref linkend="configure-site-after-installation" /></para></listitem>
+  <listitem><para><xref linkend="configure-site-load-balancing" /></para></listitem>
+  <listitem><para><xref linkend="enable-session-failover" /></para></listitem>
+ </itemizedlist>
 
- <procedure xml:id="first-instance-load-balancer">
-  <title>Configure First OpenAM Instance Behind a Load Balancer</title>
+ <procedure xml:id="configure-site-after-installation">
+  <title>To Configure a Site with a First OpenAM Server</title>
   
-  <para>Before you set up SFO, first configure OpenAM in a site
-  configuration with a load balancer as the entry point to the site. The most 
-  expedient way to configure the site is to set it up during the initial OpenAM
-  configuration, where OpenAM can manage and replicate server configuration for 
-  availability. However, you may already have a working instance before realizing that 
+  <para>Before you set up SFO, first configure OpenAM in a site configuration
+  with a load balancer as the entry point to the site. The most expedient way
+  to configure the site is to set it up during the initial OpenAM configuration.
+  However, you may already have a working instance before realizing that
   multiple instances are necessary. The following steps walk you through setting
-  up the load balancer for the first instance.</para>
+  up the site configuration for the first OpenAM server.</para>
+
+  <para>Once you have set up a site for the first OpenAM server, see <link
+  xlink:href="install-guide#add-servers-to-site" xlink:show="new"
+  xlink:role="http://docbook.org/xlink/role/olink"><citetitle>To Add a Server
+  to a Site</citetitle></link> for instructions on configuring subsequent
+  servers in the site.</para>
   
   <step>
-   <para>In the OpenAM console for the first instance of the site, select
-   <literal> Configuration &gt; Servers and Sites</literal> and click on
-   the first server under <literal>Servers</literal>.</para>
+   <para>Login to OpenAM Console as <literal>amadmin</literal>, and then browse
+   to Configuration > Servers and Sites > Sites.</para>
   </step>
   <step>
-   <para>Under site <literal>Site</literal> click on <literal>Parent 
-   Site</literal> and select the load balancer.</para>
+   <para>Click New, and on the New Site page enter the site name, and set the
+   Primary URL to the load balancer URL that is the entry point for the site,
+   such as <literal>https://lb.example.com/openam</literal>.</para>
+
+   <para>The site URL is the URL to the load balancer in front of your OpenAM
+   servers in the site. For example, if your load balancer listens for HTTPS on
+   host <literal>lb.example.com</literal> and port <literal>443</literal>,
+   with OpenAM under <literal>/openam</literal>, then your site URL is
+   <literal>https://lb.example.com/openam</literal>.</para>
   </step>
   <step>
-   <para>Click on <literal>Save</literal>.</para>
+   <para>Click Save to keep the site configuration.</para>
+  </step>
+  <step>
+   <para>Under Configuration > Servers and Sites > Server, click the link
+   to the server configuration.</para>
+  </step>
+  <step>
+   <para>On the server configuration General tab page, set the Parent Site to
+   the name of the site you just created, and then click Save to keep your
+   changes.</para>
+
+   <para>At this point the server is part of the site you have configured.</para>
   </step>
  </procedure>
 
- <procedure xml:id="before-you-start-site-failover">
-  <title>Setting a Load Balancer on Existing Configurations</title>
+ <procedure xml:id="configure-site-load-balancing">
+  <title>To Configure Site Load Balancing</title>
   
   <para>If you did not set up the site during initial configuration,
-  then follow all the steps below.</para>
+  first follow the instructions in <xref
+  linkend="configure-site-after-installation" />, and then follow all the
+  steps below.</para>
   
-  <step>
-   <para>In the OpenAM console for one of the servers in the site, select
-   Configuration &gt; Servers and Sites &gt; Sites &gt; New..., and then
-   create a new site.</para>
-   <para>The site URL is the URL to the load balancer in front of your OpenAM
-   servers in the site. For example, if your load balancer listens on host
-   <literal>lb.example.com</literal> and port <literal>8080</literal>,
-   with OpenAM under <literal>/openam</literal>, then your site URL is
-   <literal>http://lb.example.com:8080/openam</literal>.</para>
-  </step>
   <step>
    <para>For each OpenAM server in the site, select Configuration &gt;
    Servers and Sites &gt; Servers &gt; <replaceable>Server Name</replaceable>,
    and then set Parent Site to the site you created before saving your
    work.</para>
   </step>
-  <step performance="optional">
-   <para>If you want to use sticky load balancing, configure your load balancer
-   to inspect the value of the <literal>amlbcookie</literal> to determine which
+
+  <step>
+   <para>In an OpenAM site, the server that authenticated a user is the server
+   that continues to manage that user's session, unless the server is no longer
+   available. Therefore, you should use sticky load balancing. To do so,
+   configure your load balancer to inspect the value of the
+   <literal>amlbcookie</literal> so that it can determine which
    OpenAM server should receive the client request.</para>
+
    <para>As your load balancer depends on the <literal>amlbcookie</literal>
    value, on each OpenAM server console in the site, select Configuration &gt;
    Servers and Sites &gt; Servers &gt; <replaceable>Server Name</replaceable>
@@ -126,41 +139,58 @@
    <literal>com.iplanet.am.lbcookie.value</literal> is unique. By default
    the value of the <literal>amlbcookie</literal> is set to the server ID
    for the OpenAM instance.</para>
+
    <note>
     <para>When using SSL, the approach requires that you either terminate SSL
-    on the load balancer, or that you re-encrypt traffic from the load balancer
+    on the load balancer and re-encrypt traffic from the load balancer
     to the OpenAM servers.</para>
    </note>
+
    <para>If you must change <literal>amlbcookie</literal> values to make them
    unique, then your changes take effect after you restart the OpenAM server.
    (To check, login to the console and check the cookie value in your
    browser.)</para>
   </step>
+
   <step>
    <para>Restart each OpenAM server or the web containers where the OpenAM
    servers run so that all configuration changes take effect.</para>
   </step>
  </procedure>
  
- <procedure>
-  <title>Configuring Session Failover after Installation</title>
+ <procedure xml:id="enable-session-failover">
+  <title>To Configure Session Failover After Installation</title>
   
-  <para>Enabling session failover in  OpenAM requires a site configuration with one or
-  more servers and OpenDJ as a configuration store (embedded or external). If these are 
-  not setup before you begin the process, the New... button will be greyed out.</para>
-    
-  <para>The following steps walk you through configuring an additional instance.</para>
-  <step> 
-   <para>In the OpenAM console for one of the servers in the site, select
-   Configuration &gt; Global &gt; Session &gt; and New... for the Secondary 
-   Configuration Instance.</para>
-  </step>
+  <para>Session failover requires a site configuration with one or more servers
+  and OpenDJ as a configuration store (embedded or external).</para>
+
+  <para>If you did not configure session persistence and availability during
+  initial configuration, first complete the steps in <xref
+  linkend="configure-site-load-balancing" />, and then follow these steps.</para>
+
   <step>
-   <para>Verify that the additional instance appears in the Name text box and that
-   Session Persistence and High Availability Failover Enabled is checked.</para>
+   <para>In the OpenAM console for one of the servers in the site, under
+   Configuration > Global, click Session.</para>
   </step>
+
   <step>
-   <para>Save your changes.</para>
+   <para>Under Secondary Configuration Instance, click New.</para>
+
+   <para>If the server is not part of a site, or if you are not using OpenDJ
+   server, the New button is grayed out.</para>
+  </step>
+
+  <step>
+   <para>In the Add Sub Configuration page, check that the Name is set to the
+   name of the site.</para>
+  </step>
+
+  <step>
+   <para>Activate the Session Persistence and High Availability Failover Enabled option.</para>
+  </step>
+
+  <step>
+   <para>Click Add to save your work.</para>
   </step>
  </procedure>
 </chapter>

@@ -28,8 +28,7 @@
  version='5.0' xml:lang='en'
  xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance'
  xsi:schemaLocation='http://docbook.org/ns/docbook http://docbook.org/xml/5.0/xsd/docbook.xsd'
- xmlns:xlink='http://www.w3.org/1999/xlink'
- xmlns:xinclude='http://www.w3.org/2001/XInclude'>
+ xmlns:xlink='http://www.w3.org/1999/xlink'>
  <title>Customizing the OpenAM End User Pages</title>
  
  <indexterm>
@@ -47,20 +46,16 @@
  well. This chapter address how to get started customizing OpenAM end user
  pages for your organizations and supported locales.</para>
 
- <para>There is an alternative UI available for OpenAM, known informally as the XUI. It is
- based on Backbone.js, a JavaScript Model-View-Controller (MVC) framework, Handlebars.js,
- for templating the "View" in the MVC framework, Underscore.js, for the JavaScript-related
- utility functions, and a programmable LESS CSS, working with the OpenAM REST API.</para>
-
- <para>The main XUI configuration file is based on LESS CSS; for more information, see <link xlink:show="new"
- xlink:href="http://lesscss.org/"><citetitle>LESS, the Dynamic Stylesheet Language</citetitle></link>.
- If desired, you should be able to incorporate additional LESS CSS features in the XUI,
- above and beyond what is shown in the <filename>themeConfig.json</filename> file to be
- described in the <link linkend="basic-xui-configuration"><citetitle>Configuring the XUI</citetitle>
- </link> section.</para>
+ <note>
+  <para>There is an evolving alternative UI available for OpenAM, known
+  informally as the XUI. You can enable XUI in OpenAM Console under
+  Configuration > Authentication > Core > Global Attributes, by selecting XUI
+  Interface Enabled and saving your work. See <xref
+  linkend="basic-xui-configuration" /> for more.</para>
+ </note>
  
- <para>First you copy the pages to customize to the proper location, and then
- you customize the files themselves.</para>
+ <para>To customize the classic UI, first you copy the pages to customize to the
+ proper location, and then you customize the files themselves.</para>
  
  <note>
   <para>Case mismatch can cause failures in the UI lookup for some systems. To ensure
@@ -68,14 +63,11 @@
   directories. All of the default directories are already lowercase.</para>
  </note>
  
- <para>Default UI images described in this chapter are located in
+ <para>Classic UI images described in this chapter are located in
  <filename>/path/to/tomcat/webapps/openam/images/</filename>, and CSS in
  <filename>/path/to/tomcat/webapps/openam/css/</filename>. If you choose
  to modify images for your deployment, you can maintain the sizes to avoid
  having to customize page layout extensively.</para>
-
- <para>If you are testing the unsupported XUI, corresponding images and configuration files
- are located in various <filename>/path/to/tomcat/webapps/openam/XUI</filename> subdirectories.</para>
 
  <section xml:id="update-classic-ui">
      <title>Updating the Classic UI</title>
@@ -133,7 +125,6 @@ $ cp -r default_fr/* openam_fr/html</screen>
    UI files</citetitle></link> for details.</para>
   </step>
  </procedure>
-
 
  <procedure xml:id="copy-ui-to-customize-subrealm">
   <title>To Copy the Pages to Customize For Another Realm</title>
@@ -369,16 +360,31 @@ default/Login.jsp</programlisting>
  <section xml:id="basic-xui-configuration">
      <title>Configuring the XUI</title>
 
+     <para>XUI is a new, still evolving UI for OpenAM, based on the Backbone.js
+     JavaScript Model-View-Controller (MVC) framework, Handlebars.js for
+     templating the "View" in the MVC framework, Underscore.js for the
+     JavaScript-related utility functions, and a programmable LESS CSS, working
+     with the OpenAM REST API.</para>
+
+     <para>The main XUI configuration file is based on LESS CSS; for more
+     information, see <link xlink:show="new" xlink:href="http://lesscss.org/"
+     ><citetitle>LESS, the Dynamic Stylesheet Language</citetitle></link>.
+     If desired, you can incorporate additional LESS CSS features in the XUI,
+     above and beyond what is shown in the <filename>themeConfig.json</filename>
+     file described in this section.</para>
+
      <para>If you want to test the XUI, the first step is to enable it on the login screen. To do so, login
      to the OpenAM console as the administrator, and browse to Configuration &gt; Authentication &gt;
      Core &gt; XUI Interface &gt; Enabled. The next time you start OpenAM, you will see the following screen:</para>
 
-     <mediaobject xml:id="xui-login-screen">
+     <mediaobject xml:id="figure-xui-login">
          <alt>The XUI Login Screen</alt>
          <imageobject>
              <imagedata fileref="images/xui-login.png" format="PNG" />
          </imageobject>
-         <textobject><para>The XUI Login Screen</para></textobject>
+         <textobject>
+          <para>The XUI is built with JavaScript rather than JATO.</para>
+         </textobject>
      </mediaobject>
 
      <!-- Depends on OPENAM-2759, a "must-fix". If not fixed, will have to include instructions on how to
