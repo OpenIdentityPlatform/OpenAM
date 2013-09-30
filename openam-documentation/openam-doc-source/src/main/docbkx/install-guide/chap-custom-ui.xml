@@ -59,9 +59,8 @@
  described in the <link linkend="basic-xui-configuration"><citetitle>Configuring the XUI</citetitle>
  </link> section.</para>
  
- <para>First you extract the pages to customize from the appropriate .jar files,
- and copy the pages to the proper location, and then you customize the files
- themselves.</para>
+ <para>First you copy the pages to customize to the proper location, and then
+ you customize the files themselves.</para>
  
  <note>
   <para>Case mismatch can cause failures in the UI lookup for some systems. To ensure
@@ -107,25 +106,7 @@
  <procedure xml:id="copy-ui-to-customize-top-level-realm">
   <title>To Copy the Pages to Customize For the Top-Level Realm</title>
 
-  <para>You customize copies of the default pages, which are located inside
-  authentication module .jar files.</para>
-
-  <step>
-   <para>Extract the XML files from the authentication module .jar files to
-   a temporary directory.</para>
-
-   <para>The authentication module .jar files have names matching
-   <filename>WEB-INF/lib/openam-auth-*.jar</filename> under the directory
-   where OpenAM is deployed.</para>
-
-   <para>The following command shows an example of how you might extract all
-   such XML files from the authentication module .jars.</para>
-
-   <screen>$ cd /tmp
-$ for file in `ls /path/to/tomcat/webapps/openam/WEB-INF/lib/openam-auth-*.jar`;
- do jar -tf $file | grep "xml$" | grep "config/auth" > files ;
- jar -xf $file `cat files` ; rm files ; done</screen>
-  </step>
+  <para>Rather than changing the default pages, customize your own copy.</para>
 
   <step>
    <para>Change to the <filename>config/auth</filename> directory where
@@ -145,9 +126,9 @@ $ for file in `ls /path/to/tomcat/webapps/openam/WEB-INF/lib/openam-auth-*.jar`;
    <para>The following example copies the files for the Top-Level Realm
    (<literal>/</literal>) for a custom French locale.</para>
    <screen>$ mkdir -p openam/html
-$ cp -r /tmp/config/auth/default/* openam/html
+$ cp -r default/* openam/html
 $ mkdir -p openam_fr/html
-$ cp -r /tmp/config/auth/default_fr/* openam_fr/html</screen>
+$ cp -r default_fr/* openam_fr/html</screen>
    <para>See <link linkend="lookup-for-ui-files"><citetitle>How OpenAM Looks Up
    UI files</citetitle></link> for details.</para>
   </step>
@@ -156,13 +137,9 @@ $ cp -r /tmp/config/auth/default_fr/* openam_fr/html</screen>
 
  <procedure xml:id="copy-ui-to-customize-subrealm">
   <title>To Copy the Pages to Customize For Another Realm</title>
-  <para>As for the top-level realm, customize your copy of the default pages.</para>
 
-  <step>
-   <para>Extract the XML files from the authentication module .jar files to
-   a temporary directory, as described in
-   <xref linkend="copy-ui-to-customize-top-level-realm" />.</para>
-  </step>
+  <para>As for the top-level realm, customize your own copy rather than the
+  default pages.</para>
 
   <step>
    <para>Change to the <filename>config/auth</filename> directory where
@@ -173,13 +150,17 @@ $ cp -r /tmp/config/auth/default_fr/* openam_fr/html</screen>
    <para>Depending on which locale you want to customize, copy the default
    files and optionally the localized files to
    <filename><replaceable>suffix</replaceable>[_<replaceable>locale</replaceable
-   >]/services/<replaceable>realm</replaceable>/html</filename>.</para>
+   >]/services/<replaceable>realm</replaceable>/html</filename>, where
+   <replaceable>suffix</replaceable> is the value of the RDN of the
+   configuration suffix, which is <literal>openam</literal> if you use the
+   default configuration suffix <literal><?eval ${defaultRootSuffix}?></literal>.</para>
    <para>The following example copies the files for a custom French locale and
    a realm named <literal>ventes</literal>.</para>
+
    <screen>$ mkdir -p openam/html/ventes/html
-$ cp -r /tmp/config/auth/default/* openam/services/ventes/html
+$ cp -r default/* openam/services/ventes/html
 $ mkdir -p openam_fr/services/ventes/html
-$ cp -r /tmp/config/auth/default_fr/* openam_fr/services/ventes/html</screen>
+$ cp -r default_fr/* openam_fr/services/ventes/html</screen>
   </step>
  </procedure>
  
