@@ -1270,7 +1270,7 @@ public interface Constants {
     /**
      * The fully qualified name of the suffix where the tokens will be created.
      */
-    public static final String CTS_ROOT_SUFFIX = "org.forgerock.services.cts.root.suffix";
+    public static final String CTS_ROOT_SUFFIX = "org.forgerock.services.cts.store.root.suffix";
 
     /**
      * Enable/disable SSL for the CTS token store connections.

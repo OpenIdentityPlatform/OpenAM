@@ -2,10 +2,10 @@
     The contents of this file are subject to the terms of the Common Development and
     Distribution License (the License). You may not use this file except in compliance with the
     License.
-        
+
     You can obtain a copy of the License at legal/CDDLv1.0.txt. See the License for the
     specific language governing permission and limitations under the License.
-        
+
     When distributing Covered Software, include this CDDL Header Notice in each file and include
     the License file at legal/CDDLv1.0.txt. If applicable, add the following below the CDDL
     Header, with the fields enclosed by brackets [] replaced by your own identifying
@@ -25,34 +25,34 @@
             </cc>
         </property>
         <property required="true">
-            <label name="rootSuffixLabel" defaultValue="amconfig.org.forgerock.services.cts.store.root.suffix" labelFor="cscorg-forgerock-services-cts-root-suffix" />
-            <cc name="cscorg-forgerock-services-cts-root-suffix" tagclass="com.sun.web.ui.taglib.html.CCTextFieldTag" />
+            <label name="rootSuffixLabel" defaultValue="amconfig.org.forgerock.services.cts.store.root.suffix" labelFor="cscorg-forgerock-services-cts-store-root-suffix" />
+            <cc name="cscorg-forgerock-services-cts-store-root-suffix" tagclass="com.sun.web.ui.taglib.html.CCTextFieldTag"></cc>
         </property>
     </section>
     <section name="external-section" defaultValue="amconfig.org.forgerock.services.cts.store.external.section">
         <property required="true">
             <label name="sslLabel" defaultValue="amconfig.org.forgerock.services.cts.store.ssl.enabled" labelFor="cscorg-forgerock-services-cts-store-ssl-enabled" />
-            <cc name="cscorg-forgerock-services-cts-store-ssl-enabled" tagclass="com.sun.web.ui.taglib.html.CCCheckBoxTag" />
+            <cc name="cscorg-forgerock-services-cts-store-ssl-enabled" tagclass="com.sun.web.ui.taglib.html.CCCheckBoxTag"></cc>
         </property>
         <property required="true">
             <label name="directoryNameLabel" defaultValue="amconfig.org.forgerock.services.cts.store.directory.name" labelFor="cscorg-forgerock-services-cts-store-directory-name" />
-            <cc name="cscorg-forgerock-services-cts-store-directory-name" tagclass="com.sun.web.ui.taglib.html.CCTextFieldTag" />
+            <cc name="cscorg-forgerock-services-cts-store-directory-name" tagclass="com.sun.web.ui.taglib.html.CCTextFieldTag"></cc>
         </property>
         <property required="true">
             <label name="portLabel" defaultValue="amconfig.org.forgerock.services.cts.store.port" labelFor="cscorg-forgerock-services-cts-store-port" />
-            <cc name="cscorg-forgerock-services-cts-store-port" tagclass="com.sun.web.ui.taglib.html.CCTextFieldTag" />
+            <cc name="cscorg-forgerock-services-cts-store-port" tagclass="com.sun.web.ui.taglib.html.CCTextFieldTag"></cc>
         </property>
         <property required="true">
             <label name="loginIdLabel" defaultValue="amconfig.org.forgerock.services.cts.store.loginid" labelFor="cscorg-forgerock-services-cts-store-loginid" />
-            <cc name="cscorg-forgerock-services-cts-store-loginid" tagclass="com.sun.web.ui.taglib.html.CCTextFieldTag" />
+            <cc name="cscorg-forgerock-services-cts-store-loginid" tagclass="com.sun.web.ui.taglib.html.CCTextFieldTag"></cc>
         </property>
         <property required="true">
             <label name="passwordLabel" defaultValue="amconfig.org.forgerock.services.cts.store.password" labelFor="cscorg-forgerock-services-cts-store-password" />
-            <cc name="cscorg-forgerock-services-cts-store-password" tagclass="com.sun.web.ui.taglib.html.CCPasswordTag" />
+            <cc name="cscorg-forgerock-services-cts-store-password" tagclass="com.sun.web.ui.taglib.html.CCPasswordTag"></cc>
         </property>
         <property required="true">
             <label name="maxConnectionsLabel" defaultValue="amconfig.org.forgerock.services.cts.store.max.connections" labelFor="cscorg-forgerock-services-cts-store-max-connections" />
-            <cc name="cscorg-forgerock-services-cts-store-max-connections" tagclass="com.sun.web.ui.taglib.html.CCTextFieldTag" />
+            <cc name="cscorg-forgerock-services-cts-store-max-connections" tagclass="com.sun.web.ui.taglib.html.CCTextFieldTag"></cc>
         </property>
     </section>
 </propertysheet>

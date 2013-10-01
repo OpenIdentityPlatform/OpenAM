@@ -90,6 +90,13 @@
 
             <%-- PAGE CONTENT --------------------------------------------------------- --%>
             <cc:pagetitle name="pgtitleThreeBtns" bundleID="amConsole" pageTitleText="page.title.server.edit" showPageTitleSeparator="true" viewMenuLabel="" pageTitleHelpMessage="" showPageButtonsTop="true" showPageButtonsBottom="false" />
+
+            <table border="0" cellpadding="10" cellspacing="0" width="100%">
+                <tr><td>
+                    <cc:button name="btnInherit" bundleID="amConsole" defaultValue="serverconfig.button.inherit" type="primary" />
+                </td></tr>
+            </table>
+
             <cc:propertysheet name="propertyAttributes" bundleID="amConsole" showJumpLinks="true"/>
 
         </cc:form>
