@@ -2148,7 +2148,7 @@
      <para>Default: not enabled</para>
 
      <para><command>ssoadm</command> attribute:
-     <literal>forgerockRestSecurityServiceSelfRegistration</literal></para>
+     <literal>forgerockRESTSecuritySelfRegistrationEnabled</literal></para>
     </listitem>
    </varlistentry>
 
@@ -2159,7 +2159,7 @@
       <para>Default: not enabled</para>
 
       <para><command>ssoadm</command> attribute:
-      <literal>forgerockRestSecurityServiceForgotPassword</literal></para>
+      <literal>forgerockRESTSecurityForgotPasswordEnabled</literal></para>
     </listitem>
    </varlistentry>
 
@@ -2172,7 +2172,7 @@
      <para>Default: 900 (seconds)</para>
 
      <para><command>ssoadm</command> attribute:
-     <literal>forgerockRestSecuirtySerivceSelfRegTokenTTL</literal></para>
+     <literal>forgerockRESTSecuritySelfRegTokenTTL</literal></para>
     </listitem>
    </varlistentry>
 
@@ -2185,7 +2185,7 @@
      <para>Default: 900 (seconds)</para>
 
      <para><command>ssoadm</command> attribute:
-     <literal>forgerockRestSecuirtySerivceForgotPassTokenTTL</literal></para>
+     <literal>forgerockRestSecurityForgotPassTokenTTL</literal></para>
     </listitem>
    </varlistentry>
   </variablelist>
