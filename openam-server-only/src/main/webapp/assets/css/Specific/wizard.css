@@ -29,7 +29,7 @@
 }
 
 .LastTab {
-	color: #2651a6;
+	color: #5e887f;
 	font-weight: bold;
 	font-size: 123.1%;			
 }
@@ -72,7 +72,7 @@
 }
 
 #title{
-	background: url(../../images/wizard/background2.png) repeat-x;
+	background-color: #80b7ab;
 	color:#FFFFFF;
 	font-size:1.2em;
 	font-weight:bold;

@@ -1,27 +1,26 @@
 /* CSS Document */
 #options div {
-	width: 230px;
-	float: left;
-	padding-right: 20px;
-	height:200px;
+    width: 290px;
+    float: left;
+    height:200px;
 
 }
 
 .borderRight {
-	border-right: 1px solid #999999;
-	margin-right: 20px;
+    padding-right: 10px
 }
 
 h4 {
-	background: #FF9933;
-	border: 1px solid;
-	border-color: #FF9933;
-	font-size: 14px;
-	color: #FFFFFF;
-	font-weight: bold;
-	padding-left: 10px;
-	padding-right: 10px;
+    background: #eeea07;
+    border: 1px solid;
+    border-color: #eeea07;
+    font-size: 14px;
+    color: #333333;
+    font-weight: bold;
+    padding: 5px;
+    margin-left: -5px;
+    margin-bottom: 5px;
 }
-p{
-	text-align:justify;
+p {
+    text-align:justify;
 }
