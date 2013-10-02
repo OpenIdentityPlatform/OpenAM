@@ -17,6 +17,7 @@ package org.forgerock.openam.cts;
 
 import com.iplanet.am.util.SystemProperties;
 import com.sun.identity.shared.Constants;
+import org.apache.commons.lang.StringUtils;
 import org.forgerock.openam.utils.ModifiedProperty;
 
 import javax.inject.Inject;
@@ -135,7 +136,7 @@ public class ExternalTokenConfig {
         sslMode.set(SystemProperties.getAsBoolean(Constants.CTS_SSL_ENABLED, false));
 
         String mode = SystemProperties.get(Constants.CTS_STORE_LOCATION);
-        if (mode != null) {
+        if (StringUtils.isNotEmpty(mode)) {
             storeMode.set(StoreMode.valueOf(mode.toUpperCase()));
         } else {
             storeMode.set(StoreMode.DEFAULT);

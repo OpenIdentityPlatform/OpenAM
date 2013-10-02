@@ -58,4 +58,28 @@ public class ExternalTokenConfigTest extends PowerMockTestCase {
         // Then
         assertThat(config.hasChanged()).isTrue();
     }
+
+    @Test
+    public void shouldSelectDefaultIfNullStoreMode() {
+        PowerMockito.mockStatic(SystemProperties.class);
+        given(SystemProperties.get(eq(Constants.CTS_STORE_LOCATION))).willReturn(null);
+
+        ExternalTokenConfig config = new ExternalTokenConfig();
+        // When
+        config.update();
+        // Then
+        assertThat(config.getStoreMode()).isEqualTo(ExternalTokenConfig.StoreMode.DEFAULT);
+    }
+
+    @Test
+    public void shouldSelectDefaultIfEmptyStoreMode() {
+        PowerMockito.mockStatic(SystemProperties.class);
+        given(SystemProperties.get(eq(Constants.CTS_STORE_LOCATION))).willReturn("");
+
+        ExternalTokenConfig config = new ExternalTokenConfig();
+        // When
+        config.update();
+        // Then
+        assertThat(config.getStoreMode()).isEqualTo(ExternalTokenConfig.StoreMode.DEFAULT);
+    }
 }
