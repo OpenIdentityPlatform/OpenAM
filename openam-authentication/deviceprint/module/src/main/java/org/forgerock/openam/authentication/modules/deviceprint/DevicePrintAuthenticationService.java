@@ -186,12 +186,12 @@ public class DevicePrintAuthenticationService {
             return sendOTP();
         } else if (confirmationCallback.getSelectedIndex() == 0) {
             if (isOTPResponseValid(otpCallback)) {
-                if (devicePrintAuthenticationConfig.getBoolean(DevicePrintAuthenticationConfig.AUTO_STORE_PROFILES)) {
-                    saveProfile();
-                    return ISAuthConstants.LOGIN_SUCCEED;
-                } else if (!devicePrintService.hasRequiredAttributes(currentDevicePrint)) {
+                if (!devicePrintService.hasRequiredAttributes(currentDevicePrint)) {
                     // If could not get enough data from the client browser then don't give the user a chance to
                     // save profile.
+                    return ISAuthConstants.LOGIN_SUCCEED;
+                } else if (devicePrintAuthenticationConfig.getBoolean(DevicePrintAuthenticationConfig.AUTO_STORE_PROFILES)) {
+                    saveProfile();
                     return ISAuthConstants.LOGIN_SUCCEED;
                 }
                 return SAVE_PROFILE;

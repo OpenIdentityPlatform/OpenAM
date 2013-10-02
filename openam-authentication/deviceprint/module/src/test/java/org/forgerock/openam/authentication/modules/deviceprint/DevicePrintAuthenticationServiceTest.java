@@ -237,6 +237,7 @@ public class DevicePrintAuthenticationServiceTest {
         given(confirmationCallback.getSelectedIndex()).willReturn(0);
         given(hotpService.isValidHOTP("OTPCODE")).willReturn(true);
 
+        given(devicePrintService.hasRequiredAttributes(Matchers.<DevicePrint>anyObject())).willReturn(true);
         given(devicePrintAuthenticationConfig.getBoolean(DevicePrintAuthenticationConfig.AUTO_STORE_PROFILES))
                 .willReturn(true);
 
@@ -246,6 +247,34 @@ public class DevicePrintAuthenticationServiceTest {
         //Then
         assertEquals(nextState, ISAuthConstants.LOGIN_SUCCEED);
         verify(devicePrintService).createNewProfile(Matchers.<DevicePrint>anyObject());
+    }
+
+    @Test
+    public void shouldNotSaveProfileIfRequiredAttributesNotSet() throws AuthLoginException {
+
+        //Given
+        Callback[] callbacks = new Callback[2];
+        PasswordCallback smsOTPCallback = mock(PasswordCallback.class);
+        ConfirmationCallback confirmationCallback = mock(ConfirmationCallback.class);
+        int state = 2;
+        String otpCode = "OTPCODE";
+
+        callbacks[0] = smsOTPCallback;
+        callbacks[1] = confirmationCallback;
+        given(smsOTPCallback.getPassword()).willReturn(otpCode.toCharArray());
+        given(confirmationCallback.getSelectedIndex()).willReturn(0);
+        given(hotpService.isValidHOTP("OTPCODE")).willReturn(true);
+
+        given(devicePrintService.hasRequiredAttributes(Matchers.<DevicePrint>anyObject())).willReturn(false);
+        given(devicePrintAuthenticationConfig.getBoolean(DevicePrintAuthenticationConfig.AUTO_STORE_PROFILES))
+                .willReturn(true);
+
+        //When
+        int nextState = devicePrintAuthenticationService.process(callbacks, state);
+
+        //Then
+        assertEquals(nextState, ISAuthConstants.LOGIN_SUCCEED);
+        verify(devicePrintService, never()).createNewProfile(Matchers.<DevicePrint>anyObject());
     }
 
     /**
