@@ -83,7 +83,6 @@ import com.sun.identity.sm.ServiceConfigManager;
 import com.sun.identity.sm.ServiceManager;
 import com.sun.identity.sm.ServiceSchema;
 import com.sun.identity.sm.ServiceSchemaManager;
-import com.sun.identity.sm.SessionHAFailoverSetupSubConfig;
 import org.forgerock.openam.cts.api.CoreTokenConstants;
 import org.forgerock.openam.upgrade.OpenDJUpgrader;
 import org.forgerock.openam.upgrade.UpgradeException;
@@ -146,6 +145,7 @@ import java.util.Set;
 import java.util.StringTokenizer;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
+import static org.forgerock.openam.utils.CollectionUtils.*;
 
 /**
  * This class is the first class to get loaded by the Servlet 
@@ -723,19 +723,11 @@ public class AMSetupServlet extends HttpServlet {
                                 adminToken, serverInstanceName, site);
                         }
 
-                        /**
-                         * Now create the SubSchema for Global Session to automate
-                         * setting the Session HA Failover property.
-                         * @since 10.1.0
-                         */
-                        Map values = new HashMap(1);
-                        Set innerValues = new HashSet(1);
-                        innerValues.add(isSessionHASFOEnabled.toString());
-                        values.put(CoreTokenConstants.IS_SFO_ENABLED, innerValues);
-                        SessionHAFailoverSetupSubConfig.getInstance().
-                                createSessionHAFOSubConfigEntry(adminToken, site,
-                                        SessionHAFailoverSetupSubConfig.AM_SESSION_SERVICE, values);
-                    } // End of site map check.
+                        //configure SFO (enabled/disabled) by creating a subconfiguration for the site
+                        Map<String, Set<String>> values = new HashMap<String, Set<String>>(1);
+                        values.put(CoreTokenConstants.IS_SFO_ENABLED, asSet(isSessionHASFOEnabled.toString()));
+                        createSFOSubConfig(adminToken, site, values);
+                    }
                     if (EmbeddedOpenDS.isMultiServer(map)) {
                         // Setup Replication port in SMS for each server
                         updateReplPortInfo(map);
@@ -1104,7 +1096,30 @@ public class AMSetupServlet extends HttpServlet {
         }
         return configured;
     }
-    
+
+    /**
+     * Creates a SubConfiguration in the Session service that should enable/disable SFO based on the provided values.
+     *
+     * @param adminToken The admin token to use when adding the SubConfiguration.
+     * @param siteName The name of the site that has been provided for the configurator.
+     * @param values Valid values for the session subconfiguration containing the SFO settings.
+     * @throws SMSException If there was an error while creating the new SubConfiguration.
+     * @throws SSOException If the provided admin token wasn't valid.
+     */
+    private static void createSFOSubConfig(SSOToken adminToken, String siteName, Map<String, Set<String>> values)
+            throws SMSException, SSOException {
+        ServiceConfigManager scm = new ServiceConfigManager("iPlanetAMSessionService", adminToken);
+        ServiceConfig sc = scm.getGlobalConfig(null);
+        if (sc == null) {
+            throw new SMSException("Global config does not exist for iPlanetAMSessionService");
+        }
+        ServiceConfig existingSubConfig = sc.getSubConfig(siteName);
+        //if the subconfig already exists, then we shouldn't try to create it for the second time
+        if (existingSubConfig == null) {
+            sc.addSubConfig(siteName, "Site", 0, values);
+        }
+    }
+
     public static String getErrorMessage() {
         return (errorMessage != null) ? errorMessage : ""; 
     }
