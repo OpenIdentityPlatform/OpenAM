@@ -11,7 +11,7 @@
     <!-- Single Files -->
     <files>
         <file>
-            <source>${project.build.directory}/openam-distribution-fedlet-unconfigured-${project.version}.war</source>
+            <source>${project.build.directory}/${project.build.finalName}.war</source>
             <outputDirectory></outputDirectory>
         </file>
         <file>

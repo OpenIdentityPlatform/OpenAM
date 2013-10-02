@@ -68,7 +68,6 @@
                             <goal>single</goal>
                         </goals>
                         <configuration>
-                            <finalName>Fedlet-${project.version}</finalName>
                             <appendAssemblyId>false</appendAssemblyId>
                             <tarLongFileMode>gnu</tarLongFileMode>
                             <descriptors>
