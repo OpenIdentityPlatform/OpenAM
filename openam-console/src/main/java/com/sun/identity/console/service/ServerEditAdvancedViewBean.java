@@ -97,6 +97,7 @@ public class ServerEditAdvancedViewBean
         set.add("propertyServerEditSession.xml");
         set.add("propertyServerEditAdvanced.xml");
         set.add("propertyServerEditSDK.xml");
+        set.add("propertyServerEditCTS.xml");
         set.add("propertyServerEditGeneral.xml");
         getDealtWithProperties(set);
         getHiddenProperties();

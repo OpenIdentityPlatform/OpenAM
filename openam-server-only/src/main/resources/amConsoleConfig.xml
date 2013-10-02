@@ -231,18 +231,18 @@
                  status="tab.serverconfiguration.showmenu.serverconfigxml.tooltip"
                  permissions="iPlanetAMPlatformService"/>
             <tab id="426"
-                 viewbean="com.sun.identity.console.service.ServerEditAdvancedViewBean"
-                 url="../service/ServerEditAdvanced"
-                 label="serverconfiguration.showmenu.label.advanced.properties"
-                 tooltip="tab.serverconfiguration.showmenu.advanced.tooltip"
-                 status="tab.serverconfiguration.showmenu.advanced.tooltip"
-                 permissions="iPlanetAMPlatformService"/>
-            <tab id="427"
                  viewbean="com.sun.identity.console.service.ServerEditCTSViewBean"
                  url="../service/ServerEditCTS"
                  label="serverconfiguration.showmenu.label.cts.properties"
                  tooltip="tab.serverconfiguration.showmenu.cts.tooltip"
                  status="tab.serverconfiguration.showmenu.cts.tooltip"
+                 permissions="iPlanetAMPlatformService"/>
+            <tab id="427"
+                 viewbean="com.sun.identity.console.service.ServerEditAdvancedViewBean"
+                 url="../service/ServerEditAdvanced"
+                 label="serverconfiguration.showmenu.label.advanced.properties"
+                 tooltip="tab.serverconfiguration.showmenu.advanced.tooltip"
+                 status="tab.serverconfiguration.showmenu.advanced.tooltip"
                  permissions="iPlanetAMPlatformService"/>
         </profile>
 
