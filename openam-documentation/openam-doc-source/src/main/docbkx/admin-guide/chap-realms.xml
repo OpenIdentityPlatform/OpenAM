@@ -56,7 +56,15 @@
  and to delegate management of sub-realms. For example, your organization
  might require separate realms for payroll, human resources, and IT management
  domains and their applications.</para>
- 
+
+ <itemizedlist>
+  <listitem><para><xref linkend="create-new-realm" /></para></listitem>
+  <listitem><para><xref linkend="delegate-realm-administration" /></para></listitem>
+  <listitem><para><xref linkend="delegate-policy-to-realm" /></para></listitem>
+  <listitem><para><xref linkend="realm-data-store" /></para></listitem>
+  <listitem><para><xref linkend="agent-redirect-login-to-realm" /></para></listitem>
+ </itemizedlist>
+
  <procedure xml:id="create-new-realm">
   <title>To Create a New Realm</title>
   <indexterm>
@@ -116,6 +124,81 @@
   <step>
    <para>Select the administrative privileges to delegate for the realm,
    and then save your work.</para>
+
+   <variablelist>
+    <para>When using the <command>ssoadm add-privileges</command> command,
+    the privilege names are as follow.</para>
+
+    <varlistentry>
+     <term><literal>AgentAdmin</literal></term>
+     <listitem>
+      <para>Read and write access to all configured Agents</para>
+     </listitem>
+    </varlistentry>
+
+    <varlistentry>
+     <term><literal>EntitlementRestAccess</literal></term>
+     <listitem>
+      <para>REST calls for Policy Evaluation</para>
+     </listitem>
+    </varlistentry>
+
+    <varlistentry>
+     <term><literal>FederationAdmin</literal></term>
+     <listitem>
+      <para>Read and write access to all federation metadata configurations</para>
+     </listitem>
+    </varlistentry>
+
+    <varlistentry>
+     <term><literal>LogAdmin</literal></term>
+     <listitem>
+      <para>Read and write access to all log files</para>
+     </listitem>
+    </varlistentry>
+
+    <varlistentry>
+     <term><literal>LogRead</literal></term>
+     <listitem>
+      <para>Read access to all log files</para>
+     </listitem>
+    </varlistentry>
+
+    <varlistentry>
+     <term><literal>LogWrite</literal></term>
+     <listitem>
+      <para>Write access to all log files</para>
+     </listitem>
+    </varlistentry>
+
+    <varlistentry>
+     <term><literal>PolicyAdmin</literal></term>
+     <listitem>
+      <para>Read and write access only for policy properties</para>
+     </listitem>
+    </varlistentry>
+
+    <varlistentry>
+     <term><literal>PrivilegeRestAccess</literal></term>
+     <listitem>
+      <para>REST calls for managing entitlements</para>
+     </listitem>
+    </varlistentry>
+
+    <varlistentry>
+     <term><literal>PrivilegeRestReadAccess</literal></term>
+     <listitem>
+      <para>REST calls for searching entitlements</para>
+     </listitem>
+    </varlistentry>
+
+    <varlistentry>
+     <term><literal>RealmAdmin</literal></term>
+     <listitem>
+      <para>Read and write access to all realm and policy properties</para>
+     </listitem>
+    </varlistentry>
+   </variablelist>
   </step>
  </procedure>
  
