@@ -176,15 +176,37 @@ public class CoreTokenAdapter {
      * multiple tokens present in the store that have the same id.
      */
     public void updateOrCreate(Token token) throws CoreTokenException {
-        // Start off by fetching the previous entry.
-        Token previous = read(token.getTokenId());
 
         Connection connection = null;
+
         try {
             connection = connectionFactory.getConnection();
+
+            // Start off by fetching the previous entry.
+            Token previous = ldapAdapter.read(connection, token.getTokenId());
+
+            if (debug.messageEnabled()) {
+                debug.message(MessageFormat.format(
+                        CoreTokenConstants.DEBUG_HEADER +
+                                "Read: {0} successfully.",
+                        token.getTokenId()));
+            }
+
+
             // Handle create case
             if (previous == null) {
-                create(token);
+                ldapAdapter.create(connection, token);
+
+                if (debug.messageEnabled()) {
+                    debug.message(MessageFormat.format(
+                            CoreTokenConstants.DEBUG_HEADER +
+                                    "Create: Created {0} Token {1}\n" +
+                                    "{2}",
+                            token.getType(),
+                            token.getTokenId(),
+                            token));
+                }
+
                 return;
             }
 

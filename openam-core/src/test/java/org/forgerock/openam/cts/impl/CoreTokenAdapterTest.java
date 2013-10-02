@@ -155,28 +155,28 @@ public class CoreTokenAdapterTest {
         // Given
         Token token = new Token("badger", TokenType.SESSION);
 
-        given(mockLDAPAdapter.update(any(Connection.class), any(Token.class), any(Token.class))).willReturn(true);
-        given(mockLDAPAdapter.read(any(Connection.class), anyString())).willReturn(mock(Token.class));
+        given(mockLDAPAdapter.update(eq(mockConnection), any(Token.class), any(Token.class))).willReturn(true);
+        given(mockLDAPAdapter.read(eq(mockConnection), anyString())).willReturn(mock(Token.class));
 
         // When
         adapter.updateOrCreate(token);
 
         // Then
-        verify(mockLDAPAdapter).update(any(Connection.class), any(Token.class), eq(token));
+        verify(mockLDAPAdapter).update(eq(mockConnection), any(Token.class), eq(token));
     }
 
     @Test
     public void shouldPerformCreateWhenPreviousMissingDuringUpdate() throws ErrorResultException, CoreTokenException {
         // Given
         Token token = new Token("badger", TokenType.SESSION);
-        given(mockLDAPAdapter.read(any(Connection.class), anyString())).willReturn(null);
+        given(mockLDAPAdapter.read(eq(mockConnection), anyString())).willReturn(null);
 
         // When
         adapter.updateOrCreate(token);
 
         // Then
-        verify(mockLDAPAdapter, never()).update(any(Connection.class), any(Token.class), eq(token));
-        verify(mockLDAPAdapter).create(any(Connection.class), eq(token));
+        verify(mockLDAPAdapter, never()).update(eq(mockConnection), any(Token.class), eq(token));
+        verify(mockLDAPAdapter).create(eq(mockConnection), eq(token));
     }
 
     @Test
