@@ -41,6 +41,7 @@
 
     <!-- Build -->
     <build>
+        <finalName>ClientSDK-${project.version}</finalName>
         <resources>
             <resource>
                 <directory>${project.build.directory}/generated-resources</directory>

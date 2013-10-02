@@ -41,6 +41,7 @@
 
     <!-- Build -->
     <build>
+        <finalName>SSOConfiguratorTools-${project.version}</finalName>
         <plugins>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
@@ -53,7 +54,6 @@
                             <goal>single</goal>
                         </goals>
                         <configuration>
-                            <finalName>openam-distribution-ssoconfiguratortools-${project.version}</finalName>
                             <appendAssemblyId>false</appendAssemblyId>
                             <tarLongFileMode>gnu</tarLongFileMode>
                             <descriptors>

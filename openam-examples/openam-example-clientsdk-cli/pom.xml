@@ -41,6 +41,7 @@
 
     <!-- Build -->
     <build>
+        <finalName>ExampleClientSDK-CLI-${project.version}</finalName>
         <plugins>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>

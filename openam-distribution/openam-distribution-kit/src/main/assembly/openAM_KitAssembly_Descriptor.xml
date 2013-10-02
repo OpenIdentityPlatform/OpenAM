@@ -32,11 +32,11 @@
     <formats>
         <format>zip</format>
     </formats>
-    <includeBaseDirectory>false</includeBaseDirectory>
+    <baseDirectory>openam</baseDirectory>
     <!-- Library Dependency -->
     <dependencySets>
         <dependencySet>
-            <outputDirectory></outputDirectory>
+            <outputFileNameMapping>${artifact.build.finalName}.${artifact.extension}</outputFileNameMapping>
             <!-- Include fully packaged Modules -->
             <includes>
                 <include>org.forgerock.openam:openam-server:war</include>

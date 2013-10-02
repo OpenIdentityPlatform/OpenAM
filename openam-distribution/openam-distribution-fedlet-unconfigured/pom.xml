@@ -41,6 +41,7 @@
 
     <!-- Build -->
     <build>
+        <finalName>Fedlet-${project.version}</finalName>
         <plugins>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
@@ -53,7 +54,6 @@
                             <goal>single</goal>
                         </goals>
                         <configuration>
-                            <finalName>openam-distribution-fedlet-unconfigured-${project.version}</finalName>
                             <appendAssemblyId>false</appendAssemblyId>
                             <tarLongFileMode>gnu</tarLongFileMode>
                             <descriptors>
@@ -68,7 +68,7 @@
                             <goal>single</goal>
                         </goals>
                         <configuration>
-                            <finalName>openam-distribution-fedlet-unconfigured-${project.version}</finalName>
+                            <finalName>Fedlet-${project.version}</finalName>
                             <appendAssemblyId>false</appendAssemblyId>
                             <tarLongFileMode>gnu</tarLongFileMode>
                             <descriptors>

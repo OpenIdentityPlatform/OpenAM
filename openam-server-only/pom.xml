@@ -41,6 +41,7 @@
 
     <!-- Build -->
     <build>
+        <finalName>OpenAM-ServerOnly-${project.version}</finalName>
         <plugins>
             <!-- Pre-Packaging step for WAR elements. -->
             <plugin>

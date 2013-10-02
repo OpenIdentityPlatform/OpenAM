@@ -42,6 +42,7 @@
 
     <!-- Build -->
     <build>
+        <finalName>SSOAdminTools-${project.version}</finalName>
         <plugins>
             <!-- Pre-Packaging step for Zip Elements. -->
             <plugin>
@@ -96,7 +97,6 @@
                             <goal>single</goal>
                         </goals>
                         <configuration>
-                            <finalName>openam-distribution-ssoAdminTools-${project.version}</finalName>
                             <appendAssemblyId>false</appendAssemblyId>
                             <tarLongFileMode>gnu</tarLongFileMode>
                             <descriptors>

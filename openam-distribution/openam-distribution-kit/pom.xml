@@ -54,7 +54,7 @@
                             <goal>single</goal>
                         </goals>
                         <configuration>
-                            <finalName>openam-distribution-kit-${project.version}</finalName>
+                            <finalName>OpenAM-${project.version}</finalName>
                             <appendAssemblyId>false</appendAssemblyId>
                             <tarLongFileMode>gnu</tarLongFileMode>
                             <descriptors>
