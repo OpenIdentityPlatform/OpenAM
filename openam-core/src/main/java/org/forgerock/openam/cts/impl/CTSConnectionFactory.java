@@ -38,6 +38,7 @@ import javax.inject.Inject;
 import java.text.MessageFormat;
 import java.util.HashSet;
 import java.util.Set;
+import java.util.concurrent.TimeUnit;
 
 /**
  * Provides connections to the token store, which based on the state of the CTS configuration
@@ -60,7 +61,8 @@ public class CTSConnectionFactory implements ConnectionFactory, ShutdownListener
             "   Hostname: {0}\n" +
             "       Port: {1}\n" +
             "    Bind DN: {2}\n" +
-            "Connections: {3}";
+            "Connections: {3}\n" +
+            "  Heartbeat: {4}\n";
 
     // Injected
     private final Debug debug;
@@ -136,7 +138,8 @@ public class CTSConnectionFactory implements ConnectionFactory, ShutdownListener
                                 external.getHostname(),
                                 external.getPort(),
                                 external.getUsername(),
-                                external.getMaxConnections());
+                                external.getMaxConnections(),
+                                external.getHeartbeat());
 
                         debug.message(message + "\n" + details);
                     }
@@ -198,8 +201,8 @@ public class CTSConnectionFactory implements ConnectionFactory, ShutdownListener
                 external.getUsername(),
                 external.getPassword().toCharArray(),
                 maxConnections,
-                -1,
-                null,
+                external.getHeartbeat(),
+                TimeUnit.SECONDS.toString(),
                 new LDAPOptions());
     }
 

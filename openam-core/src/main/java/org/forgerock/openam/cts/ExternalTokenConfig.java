@@ -54,6 +54,7 @@ public class ExternalTokenConfig {
     private ModifiedProperty<String> password = new ModifiedProperty<String>();
     private ModifiedProperty<String> maxConnections = new ModifiedProperty<String>();
     private ModifiedProperty<Boolean> sslMode = new ModifiedProperty<Boolean>();
+    private ModifiedProperty<Integer> heartbeat = new ModifiedProperty<Integer>();
 
     @Inject
     public ExternalTokenConfig() {
@@ -106,6 +107,13 @@ public class ExternalTokenConfig {
     }
 
     /**
+     * @return The External Token Store heartbeat value. Value 0 or negetive indicates no heartbeat used.
+     */
+    public int getHeartbeat(){
+        return heartbeat.get().intValue();
+    }
+
+    /**
      * @return True indicates the External Token Store should use SSL for its connection.
      */
     public boolean isSslMode() {
@@ -119,7 +127,8 @@ public class ExternalTokenConfig {
                username.hasChanged() ||
                password.hasChanged() ||
                maxConnections.hasChanged() ||
-               sslMode.hasChanged();
+               sslMode.hasChanged() ||
+               heartbeat.hasChanged();
     }
 
     /**
@@ -134,6 +143,17 @@ public class ExternalTokenConfig {
         password.set(SystemProperties.get(Constants.CTS_STORE_PASSWORD));
         maxConnections.set(SystemProperties.get(Constants.CTS_MAX_CONNECTIONS));
         sslMode.set(SystemProperties.getAsBoolean(Constants.CTS_SSL_ENABLED, false));
+
+        String heartbeatStr = SystemProperties.get(Constants.LDAP_HEARTBEAT);
+        if (StringUtils.isNotEmpty(heartbeatStr)) {
+            try {
+                heartbeat.set(Integer.parseInt(heartbeatStr));
+            } catch (NumberFormatException e) {
+                heartbeat.set(new Integer(-1));
+            }
+        } else {
+            heartbeat.set(new Integer(-1));
+        }
 
         String mode = SystemProperties.get(Constants.CTS_STORE_LOCATION);
         if (StringUtils.isNotEmpty(mode)) {

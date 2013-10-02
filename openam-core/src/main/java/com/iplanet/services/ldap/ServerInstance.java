@@ -209,6 +209,10 @@ public class ServerInstance {
             return defVal;
     }
 
+    public synchronized int getLdapHeatbeat() {
+        return serverGroup.getLdapHeartbeat();
+    }
+
     ServerGroup serverGroup = null;
 
     Server server = null;

@@ -1301,4 +1301,9 @@ public interface Constants {
      * Maximum number of connections to the token store.
      */
     public static final String CTS_MAX_CONNECTIONS = "org.forgerock.services.cts.store.max.connections";
+
+    /**
+     * Heartbeat in seconds of the LDAP Store
+     */
+    public static final String LDAP_HEARTBEAT = "org.forgerock.services.cts.store.heartbeat";
 }

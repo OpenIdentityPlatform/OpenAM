@@ -54,5 +54,9 @@
             <label name="maxConnectionsLabel" defaultValue="amconfig.org.forgerock.services.cts.store.max.connections" labelFor="cscorg-forgerock-services-cts-store-max-connections" />
             <cc name="cscorg-forgerock-services-cts-store-max-connections" tagclass="com.sun.web.ui.taglib.html.CCTextFieldTag"></cc>
         </property>
+        <property required="true">
+            <label name="heartbeatLabel" defaultValue="amconfig.org.forgerock.services.cts.store.heartbeat" labelFor="cscorg-forgerock-services-cts-store-heartbeat" />
+            <cc name="cscorg-forgerock-services-cts-store-heartbeat" tagclass="com.sun.web.ui.taglib.html.CCTextFieldTag"></cc>
+        </property>
     </section>
 </propertysheet>

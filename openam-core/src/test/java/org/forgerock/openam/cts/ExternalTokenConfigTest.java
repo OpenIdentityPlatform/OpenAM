@@ -40,7 +40,7 @@ public class ExternalTokenConfigTest extends PowerMockTestCase {
         // When
         config.update();
         // Then
-        PowerMockito.verifyStatic(times(6));
+        PowerMockito.verifyStatic(times(7));
         SystemProperties.get(anyString());
 
         PowerMockito.verifyStatic();
@@ -81,5 +81,41 @@ public class ExternalTokenConfigTest extends PowerMockTestCase {
         config.update();
         // Then
         assertThat(config.getStoreMode()).isEqualTo(ExternalTokenConfig.StoreMode.DEFAULT);
+    }
+
+    @Test
+    public void shouldBeNegetiveHeartbeatForNullInput() {
+        PowerMockito.mockStatic(SystemProperties.class);
+        given(SystemProperties.get(eq(Constants.LDAP_HEARTBEAT))).willReturn(null);
+
+        ExternalTokenConfig config = new ExternalTokenConfig();
+        // When
+        config.update();
+        // Then
+        assertThat(config.getHeartbeat()).isEqualTo(-1);
+    }
+
+    @Test
+    public void shouldBeNegetiveHeartbeatForEmptyInput() {
+        PowerMockito.mockStatic(SystemProperties.class);
+        given(SystemProperties.get(eq(Constants.LDAP_HEARTBEAT))).willReturn("");
+
+        ExternalTokenConfig config = new ExternalTokenConfig();
+        // When
+        config.update();
+        // Then
+        assertThat(config.getHeartbeat()).isEqualTo(-1);
+    }
+
+    @Test
+    public void shouldBeNegetiveHeartbeatForNonNumberInput() {
+        PowerMockito.mockStatic(SystemProperties.class);
+        given(SystemProperties.get(eq(Constants.LDAP_HEARTBEAT))).willReturn("String");
+
+        ExternalTokenConfig config = new ExternalTokenConfig();
+        // When
+        config.update();
+        // Then
+        assertThat(config.getHeartbeat()).isEqualTo(-1);
     }
 }

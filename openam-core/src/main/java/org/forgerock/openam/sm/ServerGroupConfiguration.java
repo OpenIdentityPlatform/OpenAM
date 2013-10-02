@@ -64,6 +64,13 @@ public class ServerGroupConfiguration {
     }
 
     /**
+     * @return The heartbeat of the LDAP connection. May return -1 which indicates do not use a heartbeat
+     */
+    public int getLdapHeartbeat() {
+        return instance.getLdapHeatbeat();
+    }
+
+    /**
      * Creates a list of {@link LDAPURL} instances based on the server instances available in the servergroup.
      *
      * @return A non null, but possibly empty list of {@link LDAPURL} instances based on the configured server

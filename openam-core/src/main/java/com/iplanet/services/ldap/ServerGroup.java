@@ -42,6 +42,7 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.Hashtable;
 import java.util.Vector;
+import com.sun.identity.shared.Constants;
 import com.sun.identity.shared.ldap.LDAPDN;
 import com.sun.identity.shared.ldap.util.DN;
 import java.util.List;
@@ -149,6 +150,16 @@ public class ServerGroup implements ParseOutput {
                 minConnPool = 1;
             }
 
+            String ldapHeartbeatStr = System.getProperty(Constants.LDAP_HEARTBEAT);
+            if (ldapHeartbeatStr == null)
+                ldapHeartbeatStr = (String) atts.get(Constants.LDAP_HEARTBEAT);
+
+            try {
+                ldapHeartbeat = Integer.parseInt(ldapHeartbeatStr);
+            } catch (NumberFormatException ex) {
+                ldapHeartbeat = 10;
+            }
+
         } else {
             throw new XMLException(DSConfigMgr
                     .getString(IUMSConstants.DSCFG_SERVERGROUP_NODE_EXPECTED));
@@ -223,6 +234,10 @@ public class ServerGroup implements ParseOutput {
         return servers;
     }
 
+    public int getLdapHeartbeat() {
+        return ldapHeartbeat;
+    }
+
     String baseDN = null;
 
     int maxConnPool = -1;
@@ -236,4 +251,6 @@ public class ServerGroup implements ParseOutput {
     HashMap miscConfig = null;
 
     private String groupName;
+
+    private int ldapHeartbeat;
 }

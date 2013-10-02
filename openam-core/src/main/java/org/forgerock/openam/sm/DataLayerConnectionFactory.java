@@ -25,6 +25,8 @@ import org.forgerock.openam.sm.exceptions.ConnectionCredentialsNotFound;
 import org.forgerock.openam.sm.exceptions.ServerConfigurationNotFound;
 import org.forgerock.opendj.ldap.*;
 
+import java.util.concurrent.TimeUnit;
+
 import static org.forgerock.openam.core.guice.CoreGuiceModule.ShutdownManagerWrapper;
 
 /**
@@ -106,10 +108,8 @@ public class DataLayerConnectionFactory implements ConnectionFactory, ShutdownLi
      * @return A non null LoadBalancingAlgorithm implementation.
      */
     private synchronized ConnectionFactory initialiseBalancer(ServerGroupConfiguration config) {
-        //At the moment heartbeat interval/timeunit is not configurable for configuration stores, so for now, let's
-        //disable heartbeat feature.
         return LDAPUtils.newFailoverConnectionPool(config.getLDAPURLs(), config.getBindDN(), config.getBindPassword(),
-                config.getMaxConnections(), -1, null, new LDAPOptions());
+                config.getMaxConnections(), config.getLdapHeartbeat(), TimeUnit.SECONDS.toString(), new LDAPOptions());
     }
 
     /**

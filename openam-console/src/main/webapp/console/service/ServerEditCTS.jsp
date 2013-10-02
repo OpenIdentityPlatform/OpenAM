@@ -29,6 +29,7 @@
             var loginIdFieldName = 'ServerEditCTS.cscorg-forgerock-services-cts-store-loginid';
             var passwordFieldName = 'ServerEditCTS.cscorg-forgerock-services-cts-store-password';
             var maxConnectionsFieldName = 'ServerEditCTS.cscorg-forgerock-services-cts-store-max-connections';
+            var heartbeat = 'ServerEditCTS.cscorg-forgerock-services-cts-store-heartbeat';
 
             window.onload = function() {
                 // Set the initial state of the fields.
@@ -57,6 +58,7 @@
                 toggleField(loginIdFieldName, disabled);
                 toggleField(passwordFieldName, disabled);
                 toggleField(maxConnectionsFieldName, disabled);
+                toggleField(heartbeat, disabled);
             }
 
             // Toggles the status of a given field.
