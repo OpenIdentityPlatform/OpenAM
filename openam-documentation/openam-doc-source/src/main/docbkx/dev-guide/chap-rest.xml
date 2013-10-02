@@ -149,19 +149,27 @@
    <para>The simplest user name/password authentication returns a
    <literal>tokenId</literal> that applications can present as a cookie
    value for other operations that require authentication. In this case use
-   HTTP POST to prevent the web container from logging the credentials.</para>
+   HTTP POST to prevent the web container from logging the credentials.
+   Pass the user name in an <literal>X-OpenAM-Username</literal> header, and
+   the password in an <literal>X-OpenAM-Password</literal> header.</para>
 
-   <screen> $ curl
- --request POST --header "Content-Type: application/json"
- "https://openam.example.com:8443/openam/json/authenticate
- ?username=demo&amp;password=password"
+   <screen>$ curl --request POST
+ --header "X-OpenAM-Username: demo" --header "X-OpenAM-Password: changeit"
+ --header "Content-Type: application/json" --data "{}"
+ https://openam.example.com:8443/openam/json/authenticate
 
 { "tokenId": "AQIC5w...NTcy*", "successUrl": "/openam/console" }</screen>
 
+   <para>This "zero page login" mechanism works only for name/password
+   authentication. If you include a POST body with the request, it must
+   be an empty JSON string as shown in the example. Alternatively, you can
+   leave the POST body empty. Otherwise, OpenAM interprets the body as a
+   continuation of an existing authentication attempt, one that uses a
+   supported callback mechanism.</para>
+
    <para>The authentication service at <literal>/json/authenticate</literal>
-   also supports callback mechanisms. The callbacks make it possible to perform
-   other types of authentication in addition to simple user name/password
-   login.</para>
+   supports callback mechanisms that make it possible to perform other types of
+   authentication in addition to simple user name/password login.</para>
 
    <para>Callbacks that are not completed based on the content of the client
    HTTP request are returned in JSON as a response to the request. Each
@@ -170,7 +178,7 @@
    OpenAM. The default is still user name/password authentication.</para>
 
    <screen>$ curl --request POST --header "Content-Type: application/json"
-       https://openam.example.com:8443/openam/json/authenticate
+ https://openam.example.com:8443/openam/json/authenticate
 
 {
     "authId": "...jwt-value...",
@@ -225,8 +233,8 @@
    "value": " User Name: " } ], "input": [ { "name": "IDToken1", "value": "demo" } ] },
    { "type": "PasswordCallback", "output": [ { "name": "prompt", "value": " Password: " } ],
    "input": [ { "name": "IDToken2", "value": "changeit" } ] } ] }'
-
  https://openam.example.com:8443/openam/json/authenticate
+
 { "tokenId": "AQIC5wM2...U3MTE4NA..*", "successUrl": "/openam/console" }</screen>
    </informalexample>
 
@@ -259,8 +267,8 @@
    URL.</para>
 
    <screen>$ curl --request POST --header "Content-Type: application/json"
- "https://openam.example.com:8443/openam/json/authenticate
- ?username=demo&amp;password=badpassword"
+ --header "X-OpenAM-Username: demo" --header "X-OpenAM-Password: badpassword"
+ https://openam.example.com:8443/openam/json/authenticate
 
 { "errorMessage": "Invalid Password!!",
   "failureUrl": "http://www.example.com/401.html" }</screen>
@@ -3383,6 +3391,7 @@ string=bjensen</screen>
       <screen>$ curl --request POST --header "Content-Type: application/json"
  --data '{"bad":"data"}'
  https://openam.example.com:8443/openam/json/users?_action=forgotPassword
+
 {"code":400,"reason":"Bad Request","message":"Username not provided"}</screen>
      </listitem>
     </varlistentry>
@@ -3395,6 +3404,7 @@ string=bjensen</screen>
 
       <screen>$ curl --request POST
  https://openam.example.com:8443/openam/json/sessions?_action=logout
+
 { "code": 401, "reason": "Unauthorized", "message": "Access denied" }</screen>
      </listitem>
     </varlistentry>
@@ -3407,9 +3417,11 @@ string=bjensen</screen>
       administrator profile.</para>
 
       <screen>$ curl --request POST
- "https://openam.example.com:8443/openam/json/authenticate?username=demo
-  &amp;password=changeit"
+ --header "X-OpenAM-Username: demo" --header "X-OpenAM-Password: changeit"
+ https://openam.example.com:8443/openam/json/authenticate
+
 { "tokenId": "AQIC5w...YyMA..*" }
+
 $ curl --header "iplanetDirectoryPro: AQIC5w...YyMA..*"
  https://openam.example.com:8443/openam/json/users/amadmin
 {
@@ -3428,7 +3440,8 @@ $ curl --header "iplanetDirectoryPro: AQIC5w...YyMA..*"
       example, which is attempting to read a nonexistent user's profile.</para>
 
       <screen>$ curl --header "iplanetDirectoryPro: AQIC5w...NTcy*"
-   https://openam.example.com:8443/openam/json/users/missing
+ https://openam.example.com:8443/openam/json/users/missing
+
   {"code":404,"reason":"Not Found","message":"Resource cannot be found."}</screen>
      </listitem>
     </varlistentry>
@@ -3504,6 +3517,7 @@ The server refused this request because the request entity is in a
 
       <screen>curl --request POST --header "iplanetDirectoryPro: AQIC5w...NTcy*"
  https://openam.example.com:8443/openam/json/users/demo?_action=delete
+
 {
     "code": 501,
     "reason": "Not Implemented",
