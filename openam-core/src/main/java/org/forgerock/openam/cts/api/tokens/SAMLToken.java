@@ -35,8 +35,10 @@ public class SAMLToken {
      *
      * @param primaryKey Primary key used as the Token ID.
      * @param secondaryKey Secondary key, used for searching over SAML Tokens.
-     * @param expiryTime Expiry time mapped to Token Expiry Time.
+     * @param expiryTime Expiry time mapped to Token Expiry Time in seconds from epoch.
      * @param token Object to be stored.
+     *
+     * @see org.forgerock.openam.cts.utils.LDAPDataConversion
      */
     public SAMLToken(String primaryKey, String secondaryKey, long expiryTime, Object token) {
         this.primaryKey = primaryKey;

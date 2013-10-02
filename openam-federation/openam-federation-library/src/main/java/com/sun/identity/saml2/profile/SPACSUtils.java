@@ -27,7 +27,7 @@
  */
 
 /*
- * Portions Copyrighted 2010-2013 ForgeRock, Inc.
+ * Portions Copyrighted 2010-2013 ForgeRock AS
  */
 
 package com.sun.identity.saml2.profile;
@@ -1450,10 +1450,11 @@ public class SPACSUtils {
             SPCache.assertionByIDCache.put(assertionID, SAML2Constants.ONETIME);
             try {
                 if (SAML2Utils.isSAML2FailOverEnabled()) {
-                    SAML2RepositoryFactory.getInstance().saveSAML2Token(assertionID,
-                    SAML2Constants.ONETIME, 
-                    ((Long) smap.get(SAML2Constants.NOTONORAFTER)).longValue(),
-                    null);
+                    SAML2RepositoryFactory.getInstance().saveSAML2Token(
+                            assertionID,
+                            SAML2Constants.ONETIME,
+                            ((Long) smap.get(SAML2Constants.NOTONORAFTER)).longValue() / 1000,
+                            null);
                 }
             } catch (StoreException se) {
                 SAML2Utils.debug.error(classMethod + "DB error!", se);

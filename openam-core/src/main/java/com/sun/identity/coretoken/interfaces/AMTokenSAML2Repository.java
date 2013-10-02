@@ -71,11 +71,12 @@ public interface AMTokenSAML2Repository {
     public void deleteExpiredSAML2Tokens() throws StoreException;
 
    /**
-    * Saves SAML2 data into the SAML2 Repository
-    * @param samlKey primary key 
-    * @param samlObj saml object such as Response, IDPSession
-    * @param expirationTime expiration time 
-    * @param secKey Secondary Key 
+    * Saves SAML2 data into the SAML2 Repository.
+    *
+    * @param samlKey Primary key.
+    * @param samlObj SAML object such as Response, IDPSession.
+    * @param expirationTime Expiration time in seconds from epoch.
+    * @param secKey Secondary Key.
     */
     public void saveSAML2Token(String samlKey, Object samlObj, long expirationTime,
         String secKey) throws StoreException;

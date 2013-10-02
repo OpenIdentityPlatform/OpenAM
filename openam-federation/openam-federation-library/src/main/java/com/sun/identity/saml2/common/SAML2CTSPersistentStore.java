@@ -340,13 +340,9 @@ public class SAML2CTSPersistentStore extends GeneralTaskRunnable
     public void deleteExpiredSAML2Tokens()  {
     }
 
-   /**
-    * Saves SAML2 data into the SAML2 Repository
-    * @param samlKey primary key 
-    * @param samlObj saml object such as Response, IDPSession
-    * @param expirationTime expiration time 
-    * @param secKey Secondary Key 
-    */
+    /**
+     * {@inheritDoc}
+     */
     public void saveSAML2Token(String samlKey, Object samlObj, long expirationTime,
         String secKey) {
         // Is our Token Repository Available?
