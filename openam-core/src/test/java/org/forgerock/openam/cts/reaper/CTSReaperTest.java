@@ -25,6 +25,7 @@ import org.forgerock.openam.cts.impl.query.QueryFilter;
 import org.forgerock.openam.cts.utils.LDAPDataConversion;
 import org.forgerock.opendj.ldap.Attribute;
 import org.forgerock.opendj.ldap.Entry;
+import org.forgerock.opendj.ldap.ErrorResultException;
 import org.forgerock.opendj.ldap.Filter;
 import org.forgerock.opendj.ldap.ResultHandler;
 import org.mockito.invocation.InvocationOnMock;
@@ -34,6 +35,7 @@ import org.testng.annotations.Test;
 
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
@@ -96,7 +98,7 @@ public class CTSReaperTest {
     }
 
     @Test (timeOut = 5000)
-    public void shouldDeleteResultsOfQuery() throws CoreTokenException {
+    public void shouldDeleteResultsOfQuery() throws CoreTokenException, ErrorResultException {
         // Given
         String one = "one";
         String two = "two";
@@ -132,6 +134,24 @@ public class CTSReaperTest {
 
         // Then
         verify(mockTokenDeletion).deleteBatch(any(Collection.class), any(ResultHandler.class));
+    }
+
+    @Test
+    public void shouldCloseTokenDeletionWhenComplete() throws CoreTokenException {
+        // Given
+        given(mockBuilder.executeRawResults()).willReturn(Collections.EMPTY_LIST);
+        given(mockBuilder.getPagingCookie()).willReturn(QueryBuilder.getEmptyPagingCookie());
+        given(mockBuilder.withFilter(any(Filter.class))).willReturn(mockBuilder);
+        given(mockBuilder.returnTheseAttributes(any(CoreTokenField.class))).willReturn(mockBuilder);
+
+        QueryFilter queryFilter = new QueryFilter(new LDAPDataConversion());
+        given(mockQueryFactory.createFilter()).willReturn(queryFilter);
+
+        // When
+        reaper.run();
+
+        // Then
+        verify(mockTokenDeletion).close();
     }
 
     private static Entry generateEntry(String id) {

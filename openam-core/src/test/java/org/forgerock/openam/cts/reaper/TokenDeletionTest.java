@@ -15,7 +15,6 @@
  */
 package org.forgerock.openam.cts.reaper;
 
-import com.sun.identity.shared.debug.Debug;
 import org.forgerock.openam.cts.impl.LDAPAdapter;
 import org.forgerock.opendj.ldap.Attribute;
 import org.forgerock.opendj.ldap.Connection;
@@ -28,7 +27,6 @@ import org.testng.annotations.Test;
 
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.Collections;
 
 import static org.mockito.BDDMockito.given;
 import static org.mockito.BDDMockito.mock;
@@ -54,20 +52,46 @@ public class TokenDeletionTest {
 
         mockAdapter = mock(LDAPAdapter.class);
 
-        deletion = new TokenDeletion(mockAdapter, mockFactory, mock(Debug.class));
+        deletion = new TokenDeletion(mockAdapter, mockFactory);
+    }
+
+    @Test
+    public void shouldOpenConnectionOnFirstCall() throws ErrorResultException {
+        // Given
+        Collection<Entry> entries = Arrays.asList(generateEntry("one"));
+        // When
+        deletion.deleteBatch(entries, mock(ResultHandler.class));
+        // Then
+        verify(mockFactory).getConnection();
     }
 
     @Test
     public void shouldCloseConnectionWhenComplete() throws ErrorResultException {
         // Given
+        Collection<Entry> entries = Arrays.asList(generateEntry("one"));
+        deletion.deleteBatch(entries, mock(ResultHandler.class));
         // When
-        deletion.deleteBatch(Collections.EMPTY_LIST, mock(ResultHandler.class));
+        deletion.close();
         // Then
         verify(mockConnection).close();
     }
 
     @Test
-    public void shouldDeleteEntries() {
+    public void shouldReopenConnectionOnNextCall() throws ErrorResultException {
+        // Given
+        Collection<Entry> entries = Arrays.asList(generateEntry("one"));
+        deletion.deleteBatch(entries, mock(ResultHandler.class));
+        deletion.close();
+
+        // When
+        deletion.deleteBatch(entries, mock(ResultHandler.class));
+
+        // Then
+        verify(mockFactory, times(2)).getConnection();
+    }
+
+    @Test
+    public void shouldDeleteEntries() throws ErrorResultException {
         // Given
         Collection<Entry> entries = Arrays.asList(
                 generateEntry("one"),generateEntry("two"),generateEntry("three"));

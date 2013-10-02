@@ -24,6 +24,7 @@ import org.forgerock.openam.cts.api.fields.CoreTokenField;
 import org.forgerock.openam.cts.impl.query.QueryBuilder;
 import org.forgerock.openam.cts.impl.query.QueryFactory;
 import org.forgerock.openam.cts.impl.query.QueryPageIterator;
+import org.forgerock.openam.utils.IOUtils;
 import org.forgerock.opendj.ldap.Entry;
 import org.forgerock.opendj.ldap.ErrorResultException;
 import org.forgerock.opendj.ldap.Filter;
@@ -53,9 +54,8 @@ import java.util.concurrent.TimeUnit;
  * as such simplifies the implementation to one that queries the results and queues them
  * for deletion.
  *
- * The final stage in the search is to wait to ensure that the results of the deletion process
- * have completed before allowing the runnable task to complete. This ensures that the next
- * time this query runs, it will cover the next valid set of expired tokens.
+ * Once the search is complete, we need to wait for all asynchronous delete operations to
+ * complete before we close the connection to the Directory.
  *
  * This scheduled task can be shutdown using the shutdown command.
  *
@@ -136,57 +136,68 @@ public class CTSReaper implements Runnable {
         query.start();
         long total = 0;
 
-        // Iterate over the result pages
-        while (iterator.hasNext()) {
-            Collection<Entry> entries = iterator.next();
-            total += entries.size();
+        try {
+            // Iterate over the result pages
+            while (iterator.hasNext()) {
+                Collection<Entry> entries = iterator.next();
+                total += entries.size();
 
-            // If the thread has been interrupted, exit all processing.
-            if (Thread.interrupted()) return;
+                // If the thread has been interrupted, exit all processing.
+                if (Thread.interrupted()) {
+                    return;
+                }
 
-            // Latch will track the deletions of the page
-            CountDownLatch latch = new CountDownLatch(entries.size());
-            DeleteComplete complete = new DeleteComplete(latch);
-            latches.add(latch);
+                // Latch will track the deletions of the page
+                CountDownLatch latch = new CountDownLatch(entries.size());
+                DeleteComplete complete = new DeleteComplete(latch);
+                latches.add(latch);
 
-            // Delete the tokens.
-            tokenDeletion.deleteBatch(entries, complete);
+                // Delete the tokens.
+                try {
+                    tokenDeletion.deleteBatch(entries, complete);
+                } catch (ErrorResultException e) {
+                    debug.error("Failed to get a connection, will retry later", e);
+                    return;
+                }
+
+                if (debug.messageEnabled()) {
+                    debug.message(MessageFormat.format(
+                            CoreTokenConstants.DEBUG_HEADER +
+                            "Reaper: Queried {0} Tokens",
+                            total));
+                }
+            }
+
+            query.stop();
+            waiting.start();
 
             if (debug.messageEnabled()) {
                 debug.message(MessageFormat.format(
                         CoreTokenConstants.DEBUG_HEADER +
-                        "Reaper2: Queried {0} Tokens",
-                        total));
+                        "Reaper: Expired Token Query Time: {0}ms",
+                        query.getTime()));
             }
-        }
 
-        query.stop();
-        waiting.start();
-
-        if (debug.messageEnabled()) {
-            debug.message(MessageFormat.format(
-                    CoreTokenConstants.DEBUG_HEADER +
-                    "Reaper2: Expired Token Query Time: {0}ms",
-                    query.getTime()));
-        }
-
-        // Wait stage
-        while (!latches.isEmpty()) {
-            CountDownLatch latch = latches.remove(0);
-            try {
-                latch.await();
-            } catch (InterruptedException e) {
-                throw new IllegalStateException(e);
+            // Wait stage
+            for (CountDownLatch latch : latches) {
+                try {
+                    latch.await();
+                } catch (InterruptedException e) {
+                    Thread.currentThread().interrupt();
+                }
             }
-        }
 
-        waiting.stop();
+            waiting.stop();
 
-        if (debug.messageEnabled()) {
-            debug.message(MessageFormat.format(
-                    CoreTokenConstants.DEBUG_HEADER +
-                    "Reaper2: Worker threads Time: {0}ms",
-                    waiting.getTime()));
+            if (debug.messageEnabled()) {
+                debug.message(MessageFormat.format(
+                        CoreTokenConstants.DEBUG_HEADER +
+                                "Reaper: Worker threads Time: {0}ms",
+                        waiting.getTime()));
+            }
+        } finally {
+            // Once all latches are complete, close the TokenDeletion
+            IOUtils.closeIfNotNull(tokenDeletion);
         }
     }
 
