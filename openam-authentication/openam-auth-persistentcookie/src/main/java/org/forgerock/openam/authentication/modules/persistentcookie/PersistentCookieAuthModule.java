@@ -118,8 +118,8 @@ public class PersistentCookieAuthModule extends JaspiAuthModuleWrapper<JwtSessio
             DEBUG.warning("Cookie Max Life not set. Defaulting to 0");
             maxLifeString = "0";
         }
-        tokenIdleTime = Integer.parseInt(idleTimeString) * MINUTES_IN_HOUR * SECONDS_IN_MINUTE;
-        maxTokenLife = Integer.parseInt(maxLifeString) * MINUTES_IN_HOUR * SECONDS_IN_MINUTE;
+        tokenIdleTime = Integer.parseInt(idleTimeString) * MINUTES_IN_HOUR;
+        maxTokenLife = Integer.parseInt(maxLifeString) * MINUTES_IN_HOUR;
 
         try {
             return initialize(tokenIdleTime.toString(), maxTokenLife.toString(), getRequestOrg());
