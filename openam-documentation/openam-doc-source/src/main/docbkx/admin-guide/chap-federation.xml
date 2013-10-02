@@ -2072,8 +2072,8 @@ CookieWriterServlet.doGetPost: Redirect to
     <listitem>
      <para>(Optional) Use this parameter to specify where to redirect the user
      when the process is complete. Make sure you URL encode the value. For
-     example, <literal>RelayState=http%3A%2F%2Fopenam.forgerock.org</literal>
-     takes the user to <literal>http://openam.forgerock.org</literal>.</para>
+     example, <literal>RelayState=http%3A%2F%2Fforgerock.com</literal>
+     takes the user to <literal>http://forgerock.com</literal>.</para>
     </listitem>
    </varlistentry>
 
@@ -2082,9 +2082,9 @@ CookieWriterServlet.doGetPost: Redirect to
     <listitem>
      <para>(Optional) Use this parameter to specify the parameter to use as the
      <literal>RelayState</literal>. For example, if your query string has
-     <literal>target=http%3A%2F%2Fopenam.forgerock.org&amp;RelayStateAlias=target</literal>,
+     <literal>target=http%3A%2F%2Fforgerock.com&amp;RelayStateAlias=target</literal>,
      this is like setting
-     <literal>RelayState=http%3A%2F%2Fopenam.forgerock.org</literal>.</para>
+     <literal>RelayState=http%3A%2F%2Fforgerock.com</literal>.</para>
     </listitem>
    </varlistentry>
   </variablelist>
@@ -2250,8 +2250,8 @@ CookieWriterServlet.doGetPost: Redirect to
     <listitem>
      <para>(Optional) Use this parameter to specify where to redirect the user
      when the process is complete. Make sure you URL encode the value. For
-     example, <literal>RelayState=http%3A%2F%2Fopenam.forgerock.org</literal>
-     takes the user to <literal>http://openam.forgerock.org</literal>.</para>
+     example, <literal>RelayState=http%3A%2F%2Fforgerock.com</literal>
+     takes the user to <literal>http://forgerock.com</literal>.</para>
     </listitem>
    </varlistentry>
 
@@ -2260,9 +2260,9 @@ CookieWriterServlet.doGetPost: Redirect to
     <listitem>
      <para>(Optional) Use this parameter to specify the parameter to use as the
      <literal>RelayState</literal>. For example, if your query string has
-     <literal>target=http%3A%2F%2Fopenam.forgerock.org&amp;RelayStateAlias=target</literal>,
+     <literal>target=http%3A%2F%2Fforgerock.com&amp;RelayStateAlias=target</literal>,
      this is like setting
-     <literal>RelayState=http%3A%2F%2Fopenam.forgerock.org</literal>.</para>
+     <literal>RelayState=http%3A%2F%2Fforgerock.com</literal>.</para>
     </listitem>
    </varlistentry>
 
@@ -2356,8 +2356,8 @@ CookieWriterServlet.doGetPost: Redirect to
     <listitem>
      <para>(Optional) Use this parameter to specify where to redirect the user
      when the process is complete. Make sure you URL encode the value. For
-     example, <literal>RelayState=http%3A%2F%2Fopenam.forgerock.org</literal>
-     takes the user to <literal>http://openam.forgerock.org</literal>.</para>
+     example, <literal>RelayState=http%3A%2F%2Fforgerock.com</literal>
+     takes the user to <literal>http://forgerock.com</literal>.</para>
     </listitem>
    </varlistentry>
   </variablelist>
@@ -2443,8 +2443,8 @@ CookieWriterServlet.doGetPost: Redirect to
     <listitem>
      <para>(Optional) Use this parameter to specify where to redirect the user
      when the process is complete. Make sure you URL encode the value. For
-     example, <literal>RelayState=http%3A%2F%2Fopenam.forgerock.org</literal>
-     takes the user to <literal>http://openam.forgerock.org</literal>.</para>
+     example, <literal>RelayState=http%3A%2F%2Fforgerock.com</literal>
+     takes the user to <literal>http://forgerock.com</literal>.</para>
     </listitem>
    </varlistentry>
 
@@ -2472,12 +2472,12 @@ CookieWriterServlet.doGetPost: Redirect to
 &amp;RelayState=http%3A%2F%2Fwww.sp.example%3A8080%2Fopenam%2Fidm%2FEndUser</programlisting>
 
    <para>The following URL initiates SLO from the service provider side,
-   leaving the user at <literal>http://openam.forgerock.org</literal>.</para>
+   leaving the user at <literal>http://forgerock.com</literal>.</para>
 
    <programlisting language="none"
    >http://www.sp.example:8080/openam/saml2/jsp/spSingleLogoutInit.jsp?
 &amp;idpEntityID=http%3A%2F%2Fwww.idp.example%3A8080%2Fopenam
-&amp;RelayState=http%3A%2F%2Fopenam.forgerock.org</programlisting>
+&amp;RelayState=http%3A%2F%2Fforgerock.com</programlisting>
   </example>
 
   <procedure xml:id="show-saml2-sso-login-progress">
@@ -2583,15 +2583,15 @@ CookieWriterServlet.doGetPost: Redirect to
     <term><literal>RelayState</literal></term>
     <listitem>
      <para>This specifies the resource the client aims to access such as
-     <literal>RelayState=http%3A%2F%2Fopenam.forgerock.org%2Findex.html</literal>.</para>
+     <literal>RelayState=http%3A%2F%2Fforgerock.org%2Findex.html</literal>.</para>
     </listitem>
    </varlistentry>
   </variablelist>
 
   <para>For example, the URL to access the service provider and finally
-  the resource at <literal>http://openam.forgerock.org/index.html</literal>
+  the resource at <literal>http://forgerock.org/index.html</literal>
   could be
-  <literal>http://www.sp.example:8080/openam/SPECP?metaAlias=/sp&amp;RelayState=http%3A%2F%2Fopenam.forgerock.org%2Findex.html</literal>.</para>
+  <literal>http://www.sp.example:8080/openam/SPECP?metaAlias=/sp&amp;RelayState=http%3A%2F%2Fforgerock.org%2Findex.html</literal>.</para>
  </section>
 
  <section xml:id="federation-linking-accounts">
@@ -2820,8 +2820,8 @@ CookieWriterServlet.doGetPost: Redirect to
      <listitem>
       <para>(Optional) Use this parameter to specify where to redirect the user
       when the process is complete. Make sure you URL encode the value. For
-      example, <literal>relayState=http%3A%2F%2Fopenam.forgerock.org</literal>
-      takes the user to <literal>http://openam.forgerock.org</literal>.</para>
+      example, <literal>relayState=http%3A%2F%2Fforgerock.com</literal>
+      takes the user to <literal>http://forgerock.com</literal>.</para>
      </listitem>
     </varlistentry>
    </variablelist>
@@ -2907,8 +2907,8 @@ CookieWriterServlet.doGetPost: Redirect to
      <listitem>
       <para>(Optional) Use this parameter to specify where to redirect the user
       when the process is complete. Make sure you URL encode the value. For
-      example, <literal>relayState=http%3A%2F%2Fopenam.forgerock.org</literal>
-      takes the user to <literal>http://openam.forgerock.org</literal>.</para>
+      example, <literal>relayState=http%3A%2F%2Fforgerock.com</literal>
+      takes the user to <literal>http://forgerock.com</literal>.</para>
      </listitem>
     </varlistentry>
    </variablelist>

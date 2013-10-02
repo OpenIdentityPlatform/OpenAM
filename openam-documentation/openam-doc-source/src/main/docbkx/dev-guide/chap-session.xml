@@ -252,8 +252,8 @@ Property: County: SantaClara</screen>
   <para>The above configuration to access the notification service also applies
   for other types of listeners, such as <literal>ServiceListener</literal>, and
   <literal>IdEventListener</literal> implementations. See the <link
-  xlink:href="http://openam.forgerock.org/apidocs/" xlink:show="new"
-  ><citetitle>OpenAM Public API JavaDoc</citetitle></link> for details
-  on the available listener interfaces.</para>
+  xlink:href="${javadocBase}" xlink:show="new"><citetitle>OpenAM Java SDK API
+  Specification</citetitle></link> for details on the available listener
+  interfaces.</para>
  </section>
 </chapter>

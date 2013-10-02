@@ -62,7 +62,8 @@
   -->
      <para>You must install a supported version of the Java runtime environment.
          Please review the <link xlink:show="new"
-         xlink:href="http://openam.forgerock.org/openam-documentation/openam-doc-source/doc/release-notes/#java-requirements">
+         xlink:href="release-notes#java-requirements"
+         xlink:role="http://docbook.org/xlink/role/olink">
              <citetitle>OpenAM Release Notes</citetitle></link> for the currently supported version
          of Java, and set the <literal>JAVA_HOME</literal> environment
          variable accordingly. The policy agent installer requires Java.</para>

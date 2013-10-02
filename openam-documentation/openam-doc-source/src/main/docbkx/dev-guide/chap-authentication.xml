@@ -86,8 +86,8 @@
  callbacks for choices, confirmations, locales, names, passwords, text input,
  and text output.</para>
  
- <para>See the <link xlink:href="http://openam.forgerock.org/apidocs/"
- xlink:show="new"><citetitle>OpenAM Public API JavaDoc</citetitle></link> for
+ <para>See the <link xlink:href="${javadocBase}" xlink:show="new"
+ ><citetitle>OpenAM Public API JavaDoc</citetitle></link> for
  reference.</para>
  
  <para>As the sample client gets the realm (called organization in the sample),

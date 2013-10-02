@@ -327,27 +327,27 @@
    pair.</para>
 
     <listitem>
-     <para><link xlink:href="http://openam.forgerock.org/dotnet-fedlet/fedlet.cot"
+     <para><link xlink:href="${dotnetFedletBase}/fedlet.cot"
      xlink:show="new">fedlet.cot</link></para>
     </listitem>
 
     <listitem>
-     <para><link xlink:href="http://openam.forgerock.org/dotnet-fedlet/idp.xml"
+     <para><link xlink:href="${dotnetFedletBase}/idp.xml"
      xlink:show="new">idp.xml</link></para>
     </listitem>
 
     <listitem>
-     <para><link xlink:href="http://openam.forgerock.org/dotnet-fedlet/idp-extended.xml"
+     <para><link xlink:href="${dotnetFedletBase}/idp-extended.xml"
      xlink:show="new">idp-extended.xml</link></para>
     </listitem>
 
     <listitem>
-     <para><link xlink:href="http://openam.forgerock.org/dotnet-fedlet/sp.xml"
+     <para><link xlink:href="${dotnetFedletBase}/sp.xml"
      xlink:show="new">sp.xml</link></para>
     </listitem>
 
     <listitem>
-     <para><link xlink:href="http://openam.forgerock.org/dotnet-fedlet/sp-extended.xml"
+     <para><link xlink:href="${dotnetFedletBase}/sp-extended.xml"
      xlink:show="new">sp-extended.xml</link></para>
     </listitem>
    </itemizedlist>
@@ -774,27 +774,27 @@ cGy/F2Zuj8XJJpuQRSE6PtQqBuDEHjjmOQJ0rV/r8mO1ZCtHRhpZ5zYRjhRC9eCbjx9VrFax0JDC
 
      <itemizedlist>
       <listitem>
-       <para><link xlink:href="http://openam.forgerock.org/dotnet-fedlet/fedlet.cot"
+       <para><link xlink:href="${dotnetFedletBase}/fedlet.cot"
        xlink:show="new">fedlet.cot</link></para>
       </listitem>
 
       <listitem>
-       <para><link xlink:href="http://openam.forgerock.org/dotnet-fedlet/idp.xml"
+       <para><link xlink:href="${dotnetFedletBase}/idp.xml"
        xlink:show="new">idp.xml</link></para>
       </listitem>
 
       <listitem>
-       <para><link xlink:href="http://openam.forgerock.org/dotnet-fedlet/idp-extended.xml"
+       <para><link xlink:href="${dotnetFedletBase}/idp-extended.xml"
        xlink:show="new">idp-extended.xml</link></para>
       </listitem>
 
       <listitem>
-       <para><link xlink:href="http://openam.forgerock.org/dotnet-fedlet/sp.xml"
+       <para><link xlink:href="${dotnetFedletBase}/sp.xml"
        xlink:show="new">sp.xml</link></para>
       </listitem>
 
       <listitem>
-       <para><link xlink:href="http://openam.forgerock.org/dotnet-fedlet/sp-extended.xml"
+       <para><link xlink:href="${dotnetFedletBase}/sp-extended.xml"
        xlink:show="new">sp-extended.xml</link></para>
       </listitem>
      </itemizedlist>

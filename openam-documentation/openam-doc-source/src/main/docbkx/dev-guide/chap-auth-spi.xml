@@ -302,8 +302,7 @@ sampleauth-error-2=Error 2 occurred during the authentication</programlisting>
   <literal>com.sun.identity.authentication.spi.AMLoginModule</literal> abstract
   class, and must implement the methods shown below.</para>
   
-  <para>See the <link
-  xlink:href="http://openam.forgerock.org/apidocs/index.html"
+  <para>See the <link xlink:href="${javadocBase}" xlink:show="new"
   ><citetitle>OpenAM Java SDK API Specification</citetitle></link> for
   reference.</para>
   

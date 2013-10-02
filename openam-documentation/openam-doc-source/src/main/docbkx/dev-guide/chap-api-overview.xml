@@ -70,7 +70,7 @@
     Java and Java EE applications call on OpenAM for authentication, and
     authorization in both OpenAM and federated environments.</para>
     <para>Detailed reference information is provided in the <link
-    xlink:href="http://openam.forgerock.org/apidocs/index.html"
+    xlink:href="${javadocBase}" xlink:show="new"
     ><citetitle>OpenAM Java SDK API Specification</citetitle></link>.</para>
 
    </listitem>

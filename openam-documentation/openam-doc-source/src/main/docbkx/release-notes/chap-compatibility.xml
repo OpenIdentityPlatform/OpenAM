@@ -316,7 +316,7 @@
    <listitem>
     <para>Javadoc for the client SDK is no longer delivered with the
     distribution, but instead is <link xlink:show="new"
-    xlink:href="http://openam.forgerock.org/apidocs/">available online</link>.</para>
+    xlink:href="${javadocBase}">available online</link>.</para>
    </listitem>
   </itemizedlist>
  </section>

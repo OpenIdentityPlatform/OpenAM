@@ -81,8 +81,7 @@ public void onLogout(
   <literal>onLogout()</literal> method only when the user actively logs out,
   not when a user's session times out.</para>
   
-  <para>See the <link
-  xlink:href="http://openam.forgerock.org/apidocs/index.html"
+  <para>See the <link xlink:href="${javadocBase}" xlink:show="new"
   ><citetitle>OpenAM Java SDK API Specification</citetitle></link> for
   reference.</para>
 

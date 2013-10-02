@@ -49,9 +49,9 @@
   samples for use on the command line in
   <filename><?eval ${clientSDKExamplesCliFile}?></filename>, and samples in a
   web application, <filename><?eval ${clientSDKExamplesWarFile}?></filename>.
-  The <link xlink:href="http://openam.forgerock.org/apidocs/index.html"
-  xlink:show="new"><citetitle>OpenAM Public API JavaDoc</citetitle></link>
-  provides a reference to the public APIs.</para>
+  The <link xlink:href="${javadocBase}" xlink:show="new"><citetitle>OpenAM Java
+  SDK API Specification</citetitle></link> provides a reference to the public
+  APIs.</para>
 
   <procedure xml:id="deploy-client-sdk-war">
    <title>To Deploy the Sample Web Application</title>

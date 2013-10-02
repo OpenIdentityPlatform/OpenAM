@@ -34,7 +34,7 @@
     </parent>
 
     <!-- Documentation Module -->
-    <groupId>org.forgerock.openam</groupId>
+    <!-- Redundant: <groupId>org.forgerock.openam</groupId> -->
     <artifactId>openam-doc-source</artifactId>
 
     <name>OpenAM Core Documentation Sources</name>
@@ -143,7 +143,10 @@
         <agentWebLogicSupport>Oracle WebLogic Server 10g or later</agentWebLogicSupport>
         <agentWebSphereSupport>IBM WebSphere Application Server 7, 8, 8.5</agentWebSphereSupport>
 
+        <docbkxSourceDirectory>${basedir}/target/docbkx-filtered</docbkxSourceDirectory>
         <site-out>${project.build.outputDirectory}/site</site-out>
+        <javadocBase>http://openam.forgerock.org/apidocs/</javadocBase>
+        <dotnetFedletBase>http://openam.forgerock.org/dotnet-fedlet</dotnetFedletBase>
 
         <products-basedir>${basedir}</products-basedir>
         <gaId>UA-23412190-7</gaId>
@@ -307,12 +310,48 @@
             </plugin>
 
             <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-resources-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>filter-docbkx-resources</id>
+                        <phase>pre-site</phase>
+                        <goals>
+                            <goal>copy-resources</goal>
+                        </goals>
+                        <inherited>false</inherited>
+                        <configuration>
+                            <!-- Filter XML to allow ${property} in attribute values. -->
+                            <outputDirectory>${docbkxSourceDirectory}</outputDirectory>
+                            <resources>
+                                <resource>
+                                    <directory>src/main/docbkx</directory>
+                                    <filtering>true</filtering>
+                                    <includes>
+                                        <include>**/*.xml</include>
+                                    </includes>
+                                </resource>
+                                <resource>
+                                    <directory>src/main/docbkx</directory>
+                                    <filtering>false</filtering>
+                                    <excludes>
+                                        <exclude>**/*.xml</exclude>
+                                    </excludes>
+                                </resource>
+                            </resources>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+
+            <plugin>
                 <groupId>org.forgerock.commons</groupId>
                 <artifactId>forgerock-doc-maven-plugin</artifactId>
                 <configuration>
                     <projectName>OpenAM</projectName>
                     <googleAnalyticsId>${gaId}</googleAnalyticsId>
                     <runLinkTester>false</runLinkTester>
+                    <docbkxSourceDirectory>${docbkxSourceDirectory}</docbkxSourceDirectory> <!-- Use filtered XML -->
                 </configuration>
                 <executions>
                     <execution>
