@@ -18,7 +18,6 @@ package org.forgerock.openam.forgerockrest.authn.callbackhandlers;
 
 import com.sun.identity.authentication.spi.HttpCallback;
 import org.forgerock.json.fluent.JsonValue;
-import org.forgerock.openam.forgerockrest.authn.core.HttpMethod;
 import org.forgerock.openam.forgerockrest.authn.exceptions.RestAuthException;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
@@ -68,7 +67,6 @@ public class RestAuthHttpCallbackHandlerTest {
         HttpHeaders headers = mock(HttpHeaders.class);
         HttpServletRequest request = mock(HttpServletRequest.class);
         HttpServletResponse response = mock(HttpServletResponse.class);
-        JsonValue jsonPostBody = mock(JsonValue.class);
         HttpCallback httpCallback = mock(HttpCallback.class);
 
         given(httpCallback.getAuthorizationHeader()).willReturn("AUTHORIZATION");
@@ -76,7 +74,7 @@ public class RestAuthHttpCallbackHandlerTest {
 
         //When
         boolean updated = restAuthHttpCallbackHandler.updateCallbackFromRequest(headers, request, response,
-                jsonPostBody, httpCallback, HttpMethod.POST);
+                httpCallback);
 
         //Then
         verify(httpCallback).setAuthorization("HTTP_AUTHZ");
@@ -91,7 +89,6 @@ public class RestAuthHttpCallbackHandlerTest {
         HttpHeaders headers = mock(HttpHeaders.class);
         HttpServletRequest request = mock(HttpServletRequest.class);
         HttpServletResponse response = mock(HttpServletResponse.class);
-        JsonValue jsonPostBody = mock(JsonValue.class);
         HttpCallback httpCallback = mock(HttpCallback.class);
 
         given(request.getParameter("httpAuthorization")).willReturn(null);
@@ -103,7 +100,7 @@ public class RestAuthHttpCallbackHandlerTest {
         RestAuthCallbackHandlerResponseException exception = null;
         try {
             restAuthHttpCallbackHandler.updateCallbackFromRequest(headers, request, response,
-                    jsonPostBody, httpCallback, HttpMethod.POST);
+                    httpCallback);
         } catch (RestAuthCallbackHandlerResponseException e) {
             exceptionCaught = true;
             exception = e;
@@ -127,7 +124,6 @@ public class RestAuthHttpCallbackHandlerTest {
         HttpHeaders headers = mock(HttpHeaders.class);
         HttpServletRequest request = mock(HttpServletRequest.class);
         HttpServletResponse response = mock(HttpServletResponse.class);
-        JsonValue jsonPostBody = mock(JsonValue.class);
         HttpCallback httpCallback = mock(HttpCallback.class);
 
         given(request.getParameter("httpAuthorization")).willReturn("");
@@ -139,7 +135,7 @@ public class RestAuthHttpCallbackHandlerTest {
         RestAuthCallbackHandlerResponseException exception = null;
         try {
             restAuthHttpCallbackHandler.updateCallbackFromRequest(headers, request, response,
-                    jsonPostBody, httpCallback, HttpMethod.POST);
+                    httpCallback);
         } catch (RestAuthCallbackHandlerResponseException e) {
             exceptionCaught = true;
             exception = e;

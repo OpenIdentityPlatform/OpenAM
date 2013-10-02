@@ -32,32 +32,20 @@ import java.util.Locale;
  * Defines methods to update a LanguageCallback from the headers and request of a Rest call and methods to convert a
  * Callback to and from a JSON representation.
  */
-public class RestAuthLanguageCallbackHandler extends AbstractRestAuthCallbackHandler<LanguageCallback>
-        implements RestAuthCallbackHandler<LanguageCallback> {
+public class RestAuthLanguageCallbackHandler extends AbstractRestAuthCallbackHandler<LanguageCallback> {
 
     private static final Debug DEBUG = Debug.getInstance("amAuthREST");
 
     private static final String CALLBACK_NAME = "LanguageCallback";
 
     /**
-     * Checks the request for the presence of a parameter name "localeLanguage" and "localeCountry", and uses them to
-     * create a Locale instance and sets it on the Callback and returns true. Otherwise does nothing and returns false.
+     * LanguageCallback not supported to be updated from request headers.
      *
      * {@inheritDoc}
      */
     boolean doUpdateCallbackFromRequest(HttpHeaders headers, HttpServletRequest request, HttpServletResponse response,
-            JsonValue postBody, LanguageCallback callback) throws RestAuthCallbackHandlerResponseException {
-
-        String localeLanguage = request.getParameter("localeLanguage");
-        String localeCountry = request.getParameter("localeCountry");
-
-        if (localeLanguage == null || "".equals(localeLanguage)) {
-            DEBUG.message("localeLanguage not set in request.");
-            return false;
-        }
-
-        callback.setLocale(createLocale(localeLanguage, localeCountry));
-        return true;
+            LanguageCallback callback) throws RestAuthCallbackHandlerResponseException {
+        return false;
     }
 
     /**

@@ -17,7 +17,6 @@
 package org.forgerock.openam.forgerockrest.authn.callbackhandlers;
 
 import org.forgerock.json.fluent.JsonValue;
-import org.forgerock.openam.forgerockrest.authn.core.HttpMethod;
 
 import javax.security.auth.callback.Callback;
 import javax.servlet.http.HttpServletRequest;
@@ -44,15 +43,13 @@ public interface RestAuthCallbackHandler<T extends Callback> extends JsonCallbac
      * @param headers The HttpHeaders from the request.
      * @param request The HttpServletRequest from the request.
      * @param response The HttpServletResponse for the request.
-     * @param postBody The POST body from the request.
      * @param callback The Callback to update with its required values from the headers and request.
-     * @param httpMethod The HTTP method of the request.
      * @return Whether or not the Callback was successfully updated.
      * @throws RestAuthCallbackHandlerResponseException Thrown if the Callback Handler has a Response to send to the
      *          client.
      */
     boolean updateCallbackFromRequest(HttpHeaders headers, HttpServletRequest request, HttpServletResponse response,
-            JsonValue postBody, T callback, HttpMethod httpMethod) throws RestAuthCallbackHandlerResponseException;
+            T callback) throws RestAuthCallbackHandlerResponseException;
 
     /**
      * Handles the processing of the JSON given in the request and updates the Callback objects from it.

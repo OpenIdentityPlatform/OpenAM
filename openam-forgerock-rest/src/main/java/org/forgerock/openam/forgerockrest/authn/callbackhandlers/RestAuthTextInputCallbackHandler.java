@@ -30,31 +30,20 @@ import javax.ws.rs.core.HttpHeaders;
  * Defines methods to update a TextInputCallback from the headers and request of a Rest call and methods to convert a
  * Callback to and from a JSON representation.
  */
-public class RestAuthTextInputCallbackHandler extends AbstractRestAuthCallbackHandler<TextInputCallback>
-        implements RestAuthCallbackHandler<TextInputCallback> {
+public class RestAuthTextInputCallbackHandler extends AbstractRestAuthCallbackHandler<TextInputCallback> {
 
     private static final Debug DEBUG = Debug.getInstance("amAuthREST");
 
     private static final String CALLBACK_NAME = "TextInputCallback";
 
     /**
-     * Checks the request for the presence of a parameter name "text", if present and not an empty string then
-     * sets this on the Callback and returns true. Otherwise does nothing and returns false.
+     * TextInputCallback not supported to be updated from request headers.
      *
      * {@inheritDoc}
      */
     boolean doUpdateCallbackFromRequest(HttpHeaders headers, HttpServletRequest request, HttpServletResponse response,
-            JsonValue postBody, TextInputCallback callback) throws RestAuthCallbackHandlerResponseException {
-
-        String text = request.getParameter("text");
-
-        if (text == null || "".equals(text)) {
-            DEBUG.message("text not set in request.");
-            return false;
-        }
-
-        callback.setText(text);
-        return true;
+            TextInputCallback callback) throws RestAuthCallbackHandlerResponseException {
+        return false;
     }
 
     /**

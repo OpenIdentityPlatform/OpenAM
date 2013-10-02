@@ -17,7 +17,6 @@
 package org.forgerock.openam.forgerockrest.authn.callbackhandlers;
 
 import org.forgerock.json.fluent.JsonValue;
-import org.forgerock.openam.forgerockrest.authn.core.HttpMethod;
 import org.forgerock.openam.forgerockrest.authn.exceptions.RestAuthException;
 import org.forgerock.openam.utils.JsonValueBuilder;
 import org.mockito.Matchers;
@@ -28,6 +27,8 @@ import javax.security.auth.callback.ChoiceCallback;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.ws.rs.core.HttpHeaders;
+
+import java.util.Arrays;
 
 import static junit.framework.Assert.assertNotNull;
 import static junit.framework.Assert.fail;
@@ -57,67 +58,19 @@ public class RestAuthChoiceCallbackHandlerTest {
     }
 
     @Test
-    public void shouldUpdateCallbackFromRequest() throws RestAuthCallbackHandlerResponseException {
+    public void shouldNotUpdateCallbackFromRequest() throws RestAuthCallbackHandlerResponseException {
 
         //Given
         HttpHeaders headers = mock(HttpHeaders.class);
         HttpServletRequest request = mock(HttpServletRequest.class);
         HttpServletResponse response = mock(HttpServletResponse.class);
-        JsonValue jsonPostBody = mock(JsonValue.class);
         ChoiceCallback choiceCallback = mock(ChoiceCallback.class);
-
-        given(request.getParameter("choices")).willReturn("63");
 
         //When
         boolean updated = restAuthChoiceCallbackHandler.updateCallbackFromRequest(headers, request, response,
-                jsonPostBody, choiceCallback, HttpMethod.POST);
+                choiceCallback);
 
         //Then
-        verify(choiceCallback).setSelectedIndex(63);
-        assertTrue(updated);
-    }
-
-    @Test
-    public void shouldFailToUpdateCallbackFromRequestWhenChoicesIsNull()
-            throws RestAuthCallbackHandlerResponseException {
-
-        //Given
-        HttpHeaders headers = mock(HttpHeaders.class);
-        HttpServletRequest request = mock(HttpServletRequest.class);
-        HttpServletResponse response = mock(HttpServletResponse.class);
-        JsonValue jsonPostBody = mock(JsonValue.class);
-        ChoiceCallback choiceCallback = mock(ChoiceCallback.class);
-
-        given(request.getParameter("choices")).willReturn(null);
-
-        //When
-        boolean updated = restAuthChoiceCallbackHandler.updateCallbackFromRequest(headers, request, response,
-                jsonPostBody, choiceCallback, HttpMethod.POST);
-
-        //Then
-        verify(choiceCallback, never()).setSelectedIndexes(Matchers.<int[]>anyObject());
-        assertFalse(updated);
-    }
-
-    @Test
-    public void shouldFailToUpdateCallbackFromRequestWhenChoicesIsEmptyString()
-            throws RestAuthCallbackHandlerResponseException {
-
-        //Given
-        HttpHeaders headers = mock(HttpHeaders.class);
-        HttpServletRequest request = mock(HttpServletRequest.class);
-        HttpServletResponse response = mock(HttpServletResponse.class);
-        JsonValue jsonPostBody = mock(JsonValue.class);
-        ChoiceCallback choiceCallback = mock(ChoiceCallback.class);
-
-        given(request.getParameter("choices")).willReturn("");
-
-        //When
-        boolean updated = restAuthChoiceCallbackHandler.updateCallbackFromRequest(headers, request, response,
-                jsonPostBody, choiceCallback, HttpMethod.POST);
-
-        //Then
-        verify(choiceCallback, never()).setSelectedIndexes(Matchers.<int[]>anyObject());
         assertFalse(updated);
     }
 

@@ -18,7 +18,6 @@ package org.forgerock.openam.forgerockrest.authn.callbackhandlers;
 
 import com.sun.identity.authentication.spi.X509CertificateCallback;
 import org.forgerock.json.fluent.JsonValue;
-import org.forgerock.openam.forgerockrest.authn.core.HttpMethod;
 import org.forgerock.openam.forgerockrest.authn.exceptions.RestAuthException;
 
 import javax.servlet.http.HttpServletRequest;
@@ -31,8 +30,7 @@ import java.security.cert.X509Certificate;
  * Defines methods to update a X509CertificateCallback from the headers and request of a Rest call and methods to
  * convert a Callback to and from a JSON representation.
  */
-public class RestAuthX509CallbackHandler extends AbstractRestAuthCallbackHandler<X509CertificateCallback>
-        implements RestAuthCallbackHandler<X509CertificateCallback> {
+public class RestAuthX509CallbackHandler extends AbstractRestAuthCallbackHandler<X509CertificateCallback> {
 
     private static final String CALLBACK_NAME = "X509CertificateCallback";
 
@@ -44,7 +42,7 @@ public class RestAuthX509CallbackHandler extends AbstractRestAuthCallbackHandler
      * {@inheritDoc}
      */
     public boolean updateCallbackFromRequest(HttpHeaders headers, HttpServletRequest request,
-            HttpServletResponse response, JsonValue postBody, X509CertificateCallback callback, HttpMethod httpMethod) {
+            HttpServletResponse response, X509CertificateCallback callback) {
 
         X509Certificate[] certificates = (X509Certificate[]) request.getAttribute(
                 "javax.servlet.request.X509Certificate");
@@ -63,7 +61,7 @@ public class RestAuthX509CallbackHandler extends AbstractRestAuthCallbackHandler
      * {@inheritDoc}
      */
     boolean doUpdateCallbackFromRequest(HttpHeaders headers, HttpServletRequest request, HttpServletResponse response,
-            JsonValue postBody, X509CertificateCallback callback) throws RestAuthCallbackHandlerResponseException {
+            X509CertificateCallback callback) throws RestAuthCallbackHandlerResponseException {
         return false;
     }
 

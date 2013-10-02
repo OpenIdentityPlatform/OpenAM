@@ -18,7 +18,6 @@ package org.forgerock.openam.forgerockrest.authn.callbackhandlers;
 
 import com.sun.identity.shared.debug.Debug;
 import org.forgerock.json.fluent.JsonValue;
-import org.forgerock.openam.forgerockrest.authn.core.HttpMethod;
 import org.forgerock.openam.forgerockrest.authn.exceptions.RestAuthException;
 import org.forgerock.openam.utils.JsonArray;
 import org.forgerock.openam.utils.JsonObject;
@@ -36,7 +35,7 @@ import java.text.MessageFormat;
  *
  * @param <T> Callback type.
  */
-public abstract class AbstractRestAuthCallbackHandler<T extends Callback> {
+public abstract class AbstractRestAuthCallbackHandler<T extends Callback> implements RestAuthCallbackHandler<T> {
 
     private static final Debug DEBUG = Debug.getInstance("amAuthREST");
 
@@ -47,15 +46,15 @@ public abstract class AbstractRestAuthCallbackHandler<T extends Callback> {
      * {@inheritDoc}
      */
     public boolean updateCallbackFromRequest(HttpHeaders headers, HttpServletRequest request,
-            HttpServletResponse response, JsonValue postBody, T callback, HttpMethod httpMethod)
+            HttpServletResponse response, T callback)
             throws RestAuthCallbackHandlerResponseException {
 
-        // If HttMethod is GET then by default callbacks should not be handled internally/
-        if (HttpMethod.GET.equals(httpMethod)) {
+        // If Http Method is GET then by default callbacks should not be handled internally/
+        if ("GET".equals(request.getMethod())) {
             return false;
         }
 
-        return doUpdateCallbackFromRequest(headers, request, response, postBody, callback);
+        return doUpdateCallbackFromRequest(headers, request, response, callback);
     }
 
     /**
@@ -70,14 +69,12 @@ public abstract class AbstractRestAuthCallbackHandler<T extends Callback> {
      * @param headers The HttpHeaders from the request.
      * @param request The HttpServletRequest from the request.
      * @param response The HttpServletResponse for the request.
-     * @param postBody The POST body from the request.
      * @param callback The Callback to update with its required values from the headers and request.
      * @return Whether or not the Callback was successfully updated.
      * @throws RestAuthCallbackHandlerResponseException If one of the CallbackHandlers has its own response to be sent.
      */
     abstract boolean doUpdateCallbackFromRequest(HttpHeaders headers, HttpServletRequest request,
-            HttpServletResponse response, JsonValue postBody, T callback)
-            throws RestAuthCallbackHandlerResponseException;
+            HttpServletResponse response, T callback) throws RestAuthCallbackHandlerResponseException;
 
     /**
      * Creates a JSON input field for a callback.

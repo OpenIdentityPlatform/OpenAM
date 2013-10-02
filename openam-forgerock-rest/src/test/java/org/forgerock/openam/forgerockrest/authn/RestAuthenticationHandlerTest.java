@@ -27,12 +27,12 @@ import org.forgerock.json.jose.jws.SignedJwt;
 import org.forgerock.json.jose.jwt.JwtClaimsSet;
 import org.forgerock.openam.forgerockrest.authn.callbackhandlers.RestAuthCallbackHandlerResponseException;
 import org.forgerock.openam.forgerockrest.authn.core.AuthIndexType;
-import org.forgerock.openam.forgerockrest.authn.core.HttpMethod;
 import org.forgerock.openam.forgerockrest.authn.core.LoginAuthenticator;
 import org.forgerock.openam.forgerockrest.authn.core.LoginConfiguration;
 import org.forgerock.openam.forgerockrest.authn.core.LoginProcess;
 import org.forgerock.openam.forgerockrest.authn.core.LoginStage;
 import org.forgerock.openam.forgerockrest.authn.core.wrappers.AuthContextLocalWrapper;
+import org.forgerock.openam.utils.JsonValueBuilder;
 import org.json.JSONException;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Matchers;
@@ -105,7 +105,7 @@ public class RestAuthenticationHandlerTest {
 
         //When
         Response response = restAuthenticationHandler.initiateAuthentication(headers, request, httpResponse,
-                authIndexType, indexValue, sessionUpgradeSSOTokenId, HttpMethod.GET);
+                authIndexType, indexValue, sessionUpgradeSSOTokenId);
 
         //Then
         assertEquals(response.getStatus(), 200);
@@ -150,7 +150,7 @@ public class RestAuthenticationHandlerTest {
 
         //When
         Response response = restAuthenticationHandler.initiateAuthentication(headers, request, httpResponse,
-                authIndexType, indexValue, sessionUpgradeSSOTokenId, HttpMethod.GET);
+                authIndexType, indexValue, sessionUpgradeSSOTokenId);
 
         //Then
         assertEquals(response.getStatus(), 401);
@@ -202,14 +202,14 @@ public class RestAuthenticationHandlerTest {
         jsonCallbacks.add("KEY", "VALUE");
 
         given(loginAuthenticator.getLoginProcess(Matchers.<LoginConfiguration>anyObject())).willReturn(loginProcess);
-        given(restAuthCallbackHandlerManager.handleCallbacks(headers, request, httpResponse, null, callbacks,
-                HttpMethod.GET)).willReturn(jsonCallbacks);
+        given(restAuthCallbackHandlerManager.handleCallbacks(headers, request, httpResponse, callbacks))
+                .willReturn(jsonCallbacks);
         given(authIdHelper.createAuthId(Matchers.<LoginConfiguration>anyObject(), eq(authContextLocalWrapper)))
                 .willReturn("AUTH_ID");
 
         //When
         Response response = restAuthenticationHandler.initiateAuthentication(headers, request, httpResponse,
-                authIndexType, indexValue, sessionUpgradeSSOTokenId, HttpMethod.GET);
+                authIndexType, indexValue, sessionUpgradeSSOTokenId);
 
         //Then
         assertEquals(response.getStatus(), 200);
@@ -261,14 +261,14 @@ public class RestAuthenticationHandlerTest {
         JsonValue jsonCallbacks = new JsonValue(new HashMap<String, Object>());
 
         given(loginAuthenticator.getLoginProcess(Matchers.<LoginConfiguration>anyObject())).willReturn(loginProcess);
-        given(restAuthCallbackHandlerManager.handleCallbacks(headers, request, httpResponse, null, callbacks,
-                HttpMethod.GET)).willReturn(jsonCallbacks);
+        given(restAuthCallbackHandlerManager.handleCallbacks(headers, request, httpResponse, callbacks))
+                .willReturn(jsonCallbacks);
         given(authIdHelper.createAuthId(Matchers.<LoginConfiguration>anyObject(), eq(authContextLocalWrapper)))
                 .willReturn("AUTH_ID");
 
         //When
         Response response = restAuthenticationHandler.initiateAuthentication(headers, request, httpResponse,
-                authIndexType, indexValue, sessionUpgradeSSOTokenId, HttpMethod.GET);
+                authIndexType, indexValue, sessionUpgradeSSOTokenId);
 
         //Then
         assertEquals(response.getStatus(), 200);
@@ -317,14 +317,14 @@ public class RestAuthenticationHandlerTest {
                 new RestAuthCallbackHandlerResponseException(Response.Status.ACCEPTED, responseHeaders, jsonResponse);
 
         given(loginAuthenticator.getLoginProcess(Matchers.<LoginConfiguration>anyObject())).willReturn(loginProcess);
-        given(restAuthCallbackHandlerManager.handleCallbacks(headers, request, httpResponse, null, callbacks,
-                HttpMethod.GET)).willThrow(restAuthCallbackHandlerResponseException);
+        given(restAuthCallbackHandlerManager.handleCallbacks(headers, request, httpResponse, callbacks))
+                .willThrow(restAuthCallbackHandlerResponseException);
         given(authIdHelper.createAuthId(Matchers.<LoginConfiguration>anyObject(), eq(authContextLocalWrapper)))
                 .willReturn("AUTH_ID");
 
         //When
         Response response = restAuthenticationHandler.initiateAuthentication(headers, request, httpResponse,
-                authIndexType, indexValue, sessionUpgradeSSOTokenId, HttpMethod.GET);
+                authIndexType, indexValue, sessionUpgradeSSOTokenId);
 
         //Then
         assertEquals(response.getStatus(), 202);
@@ -350,7 +350,7 @@ public class RestAuthenticationHandlerTest {
 
         //When
         Response response = restAuthenticationHandler.initiateAuthentication(headers, request, httpResponse,
-                authIndexType, indexValue, sessionUpgradeSSOTokenId, HttpMethod.GET);
+                authIndexType, indexValue, sessionUpgradeSSOTokenId);
 
         //Then
         assertEquals(response.getStatus(), 400);
@@ -368,7 +368,7 @@ public class RestAuthenticationHandlerTest {
         HttpHeaders headers = mock(HttpHeaders.class);
         HttpServletRequest request = mock(HttpServletRequest.class);
         HttpServletResponse httpResponse = mock(HttpServletResponse.class);
-        String postBody = "{ \"authId\": \"AUTH_ID\" }";
+        JsonValue postBody = JsonValueBuilder.toJsonValue("{ \"authId\": \"AUTH_ID\" }");
         String sessionUpgradeSSOTokenId = "SSO_TOKEN_ID";
 
         SSOTokenID ssoTokenID = mock(SSOTokenID.class);

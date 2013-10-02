@@ -17,7 +17,6 @@
 package org.forgerock.openam.forgerockrest.authn.callbackhandlers;
 
 import org.forgerock.json.fluent.JsonValue;
-import org.forgerock.openam.forgerockrest.authn.core.HttpMethod;
 import org.forgerock.openam.forgerockrest.authn.exceptions.RestAuthException;
 import org.forgerock.openam.utils.JsonValueBuilder;
 import org.testng.annotations.BeforeClass;
@@ -27,6 +26,8 @@ import javax.security.auth.callback.TextInputCallback;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.ws.rs.core.HttpHeaders;
+
+import java.util.Arrays;
 
 import static junit.framework.Assert.assertNotNull;
 import static junit.framework.Assert.fail;
@@ -48,7 +49,7 @@ public class RestAuthTextInputCallbackHandlerTest {
         restAuthTextInputCallbackHandler = new RestAuthTextInputCallbackHandler();
     }
 
-    @Test    //TODO
+    @Test
     public void shouldGetCallbackClassName() {
 
         //Given
@@ -61,67 +62,19 @@ public class RestAuthTextInputCallbackHandlerTest {
     }
 
     @Test
-    public void shouldUpdateCallbackFromRequest() throws RestAuthCallbackHandlerResponseException {
+    public void shouldNotUpdateCallbackFromRequest() throws RestAuthCallbackHandlerResponseException {
 
         //Given
         HttpHeaders headers = mock(HttpHeaders.class);
         HttpServletRequest request = mock(HttpServletRequest.class);
         HttpServletResponse response = mock(HttpServletResponse.class);
-        JsonValue jsonPostBody = mock(JsonValue.class);
         TextInputCallback textInputCallback = mock(TextInputCallback.class);
-
-        given(request.getParameter("text")).willReturn("TEXT");
 
         //When
         boolean updated = restAuthTextInputCallbackHandler.updateCallbackFromRequest(headers, request, response,
-                jsonPostBody, textInputCallback, HttpMethod.POST);
+                textInputCallback);
 
         //Then
-        verify(textInputCallback).setText("TEXT");
-        assertTrue(updated);
-    }
-
-    @Test
-    public void shouldFailToUpdateCallbackFromRequestWhenUsernameIsNull()
-            throws RestAuthCallbackHandlerResponseException {
-
-        //Given
-        HttpHeaders headers = mock(HttpHeaders.class);
-        HttpServletRequest request = mock(HttpServletRequest.class);
-        HttpServletResponse response = mock(HttpServletResponse.class);
-        JsonValue jsonPostBody = mock(JsonValue.class);
-        TextInputCallback textInputCallback = mock(TextInputCallback.class);
-
-        given(request.getParameter("text")).willReturn(null);
-
-        //When
-        boolean updated = restAuthTextInputCallbackHandler.updateCallbackFromRequest(headers, request, response,
-                jsonPostBody, textInputCallback, HttpMethod.POST);
-
-        //Then
-        verify(textInputCallback, never()).setText(anyString());
-        assertFalse(updated);
-    }
-
-    @Test
-    public void shouldFailToUpdateCallbackFromRequestWhenPasswordIsEmptyString()
-            throws RestAuthCallbackHandlerResponseException {
-
-        //Given
-        HttpHeaders headers = mock(HttpHeaders.class);
-        HttpServletRequest request = mock(HttpServletRequest.class);
-        HttpServletResponse response = mock(HttpServletResponse.class);
-        JsonValue jsonPostBody = mock(JsonValue.class);
-        TextInputCallback textInputCallback = mock(TextInputCallback.class);
-
-        given(request.getParameter("text")).willReturn("");
-
-        //When
-        boolean updated = restAuthTextInputCallbackHandler.updateCallbackFromRequest(headers, request, response,
-                jsonPostBody, textInputCallback, HttpMethod.POST);
-
-        //Then
-        verify(textInputCallback, never()).setText(anyString());
         assertFalse(updated);
     }
 

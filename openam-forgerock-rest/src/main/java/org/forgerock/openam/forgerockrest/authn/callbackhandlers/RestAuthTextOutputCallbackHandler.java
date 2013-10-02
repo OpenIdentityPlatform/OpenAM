@@ -27,8 +27,7 @@ import javax.ws.rs.core.HttpHeaders;
 /**
  * Defines methods to convert a TextOutputCallback to a JSON representation.
  */
-public class RestAuthTextOutputCallbackHandler extends AbstractRestAuthCallbackHandler<TextOutputCallback>
-        implements RestAuthCallbackHandler<TextOutputCallback> {
+public class RestAuthTextOutputCallbackHandler extends AbstractRestAuthCallbackHandler<TextOutputCallback>  {
 
     private static final String CALLBACK_NAME = "TextOutputCallback";
 
@@ -39,7 +38,7 @@ public class RestAuthTextOutputCallbackHandler extends AbstractRestAuthCallbackH
      * {@inheritDoc}
      */
     boolean doUpdateCallbackFromRequest(HttpHeaders headers, HttpServletRequest request, HttpServletResponse response,
-            JsonValue postBody, TextOutputCallback callback) throws RestAuthCallbackHandlerResponseException {
+            TextOutputCallback callback) throws RestAuthCallbackHandlerResponseException {
         return false;
     }
 

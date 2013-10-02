@@ -22,23 +22,19 @@ import com.iplanet.sso.SSOException;
 import com.iplanet.sso.SSOToken;
 import com.sun.identity.authentication.client.AuthClientUtils;
 import com.sun.identity.authentication.server.AuthContextLocal;
-import com.sun.identity.authentication.service.AuthD;
 import com.sun.identity.authentication.service.AuthException;
 import com.sun.identity.authentication.service.AuthUtils;
 import com.sun.identity.authentication.util.AMAuthUtils;
 import com.sun.identity.idm.IdRepoException;
 import com.sun.identity.idm.IdUtils;
-import com.sun.identity.saml2.idpdiscovery.CookieUtils;
 import com.sun.identity.security.AdminTokenAction;
 import com.sun.identity.sm.DNMapper;
 import com.sun.identity.sm.SMSException;
 import com.sun.identity.sm.ServiceConfigManager;
 
-import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.security.AccessController;
-import java.util.HashSet;
 import java.util.Hashtable;
 import java.util.Map;
 import java.util.Set;
@@ -54,7 +50,7 @@ public class CoreServicesWrapper {
     /**
      * Gets the Session Id from the HttpServletRequest.
      *
-     * {@link com.sun.identity.authentication.service.AuthUtils.getSessionIDFromRequest(
+     * {@link com.sun.identity.authentication.service.AuthUtils#getSessionIDFromRequest(
      *      javax.servlet.http.HttpServletRequest)}
      *
      * @param request The HttpServletRequest.
@@ -67,8 +63,8 @@ public class CoreServicesWrapper {
     /**
      * Will either create or retrieve an existing AuthContextLocal.
      *
-     * {@link com.sun.identity.authentication.service.AuthUtils.getAuthContext(
-     *      com.sun.identity.authentication.server.AuthContextLocal)}
+     * {@link com.sun.identity.authentication.service.AuthUtils#getAuthContext(javax.servlet.http.HttpServletRequest,
+     * javax.servlet.http.HttpServletResponse, com.iplanet.dpro.session.SessionID, boolean, boolean)} (
      *
      * @param request The HttpServletRequest.
      * @param response The HttpServletResponse.
@@ -84,14 +80,14 @@ public class CoreServicesWrapper {
         AuthContextLocal authContextLocal = AuthUtils.getAuthContext(request, response, sessionID, isSessionUpgrade,
                 isBackPost);
         String orgDN = AuthClientUtils.getDomainNameByRequest(request, AuthClientUtils.parseRequestParameters(request));
-        authContextLocal.setOrgDN(orgDN); //TODO not sure if this is right, will it get right orgDN when using sub realm
+        authContextLocal.setOrgDN(orgDN);
         return new AuthContextLocalWrapper(authContextLocal);
     }
 
     /**
      * Checks to see if an AuthContextLocal is a new or an existing login process.
      *
-     * {@link com.sun.identity.authentication.service.AuthUtils.isNewRequest(
+     * {@link com.sun.identity.authentication.service.AuthUtils#isNewRequest(
      *      com.sun.identity.authentication.server.AuthContextLocal)}
      *
      * @param authContextLocalWrapper The AuthContextLocal wrapped as a AuthContextLocalWrapper.
@@ -104,7 +100,7 @@ public class CoreServicesWrapper {
     /**
      * Gets the environment map from a HttpServletRequest.
      *
-     * {@link com.sun.identity.authentication.client.AuthClientUtils.getEnvMap(javax.servlet.http.HttpServletRequest)}
+     * {@link com.sun.identity.authentication.client.AuthClientUtils#getEnvMap(javax.servlet.http.HttpServletRequest)}
      *
      * @param request The HttpServletRequest.
      * @return The environment map.
@@ -116,7 +112,7 @@ public class CoreServicesWrapper {
     /**
      * Gets the admin SSO Token.
      *
-     * {@link java.security.AccessController.doPrivileged(com.sun.identity.security.AdminTokenAction)}
+     * {@link java.security.AccessController#doPrivileged(java.security.PrivilegedAction)}
      *
      * @return The SSOToken.
      */
@@ -143,7 +139,7 @@ public class CoreServicesWrapper {
     /**
      * Checks to see if the given value contains the given key. The value being a concatenated array.
      *
-     * {@link com.sun.identity.authentication.client.AuthClientUtils.isContain(String, String)}
+     * {@link com.sun.identity.authentication.client.AuthClientUtils#isContain(String, String)}
      *
      * @param value The value.
      * @param key The key.
@@ -218,7 +214,7 @@ public class CoreServicesWrapper {
     /**
      * This method determines the organization parameter and determines the organization DN based on query parameters.
      *
-     * {@link com.sun.identity.authentication.client.AuthClientUtils.getDomainNameByRequest(HttpServletRequest,
+     * {@link com.sun.identity.authentication.client.AuthClientUtils#getDomainNameByRequest(HttpServletRequest,
      *          Hashtable)}
      *
      * @param request The HTTP Servlet Request.
@@ -231,7 +227,7 @@ public class CoreServicesWrapper {
     /**
      * Checks to see if the Organization is active.
      *
-     * {@link com.sun.identity.idm.IdUtils.isOrganizationActive(SSOToken, String)}
+     * {@link com.sun.identity.idm.IdUtils#isOrganizationActive(SSOToken, String)}
      *
      * @param orgDN The organization DN to check the status of.
      * @return True if organization is active, otherwise false.

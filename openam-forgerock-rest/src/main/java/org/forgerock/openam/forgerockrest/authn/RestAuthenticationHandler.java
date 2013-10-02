@@ -27,7 +27,6 @@ import org.forgerock.json.jose.jws.SignedJwt;
 import org.forgerock.openam.forgerockrest.authn.callbackhandlers.RestAuthCallbackHandlerResponseException;
 import org.forgerock.openam.forgerockrest.authn.core.AuthIndexType;
 import org.forgerock.openam.forgerockrest.authn.core.AuthenticationContext;
-import org.forgerock.openam.forgerockrest.authn.core.HttpMethod;
 import org.forgerock.openam.forgerockrest.authn.core.LoginAuthenticator;
 import org.forgerock.openam.forgerockrest.authn.core.LoginConfiguration;
 import org.forgerock.openam.forgerockrest.authn.core.LoginProcess;
@@ -86,14 +85,11 @@ public class RestAuthenticationHandler {
      * @param indexValue The authentication index value.
      * @param sessionUpgradeSSOTokenId The SSO Token Id of the user's current session, null if not performing a session
      *                                 upgrade.
-     * @param httpMethod The HTTP method used to make the request.
      * @return The Response of the authentication request.
      */
     public Response initiateAuthentication(HttpHeaders headers, HttpServletRequest request,
-            HttpServletResponse response, String authIndexType, String indexValue, String sessionUpgradeSSOTokenId,
-            HttpMethod httpMethod) {
-        return authenticate(headers, request, response, null, authIndexType, indexValue, sessionUpgradeSSOTokenId,
-                httpMethod);
+            HttpServletResponse response, String authIndexType, String indexValue, String sessionUpgradeSSOTokenId) {
+        return authenticate(headers, request, response, null, authIndexType, indexValue, sessionUpgradeSSOTokenId);
     }
 
     /**
@@ -103,15 +99,14 @@ public class RestAuthenticationHandler {
      * @param headers The HttpHeaders of the request.
      * @param request The HttpServletRequest.
      * @param response The HttpServletResponse.
-     * @param postBody The post body of the request.
+     * @param postBody The JsonValue post body of the request.
      * @param sessionUpgradeSSOTokenId The SSO Token Id of the user's current session, null if not performing a session
      *                                 upgrade.
      * @return The Response of the authentication request.
      */
     public Response continueAuthentication(HttpHeaders headers, HttpServletRequest request,
-            HttpServletResponse response, String postBody, String sessionUpgradeSSOTokenId) {
-        return authenticate(headers, request, response, JsonValueBuilder.toJsonValue(postBody), null, null,
-                sessionUpgradeSSOTokenId, HttpMethod.POST);
+            HttpServletResponse response, JsonValue postBody, String sessionUpgradeSSOTokenId) {
+        return authenticate(headers, request, response, postBody, null, null, sessionUpgradeSSOTokenId);
     }
 
     /**
@@ -126,12 +121,10 @@ public class RestAuthenticationHandler {
      * @param indexValue The authentication index value.
      * @param sessionUpgradeSSOTokenId The SSO Token Id of the user's current session, null if not performing a session
      *                                 upgrade.
-     * @param httpMethod The HTTP method used to make the request.
      * @return The Response of the authentication request.
      */
     private Response authenticate(HttpHeaders headers, HttpServletRequest request, HttpServletResponse response,
-            JsonValue postBody, String authIndexType, String indexValue, String sessionUpgradeSSOTokenId,
-            HttpMethod httpMethod) {
+            JsonValue postBody, String authIndexType, String indexValue, String sessionUpgradeSSOTokenId) {
 
         Response.ResponseBuilder responseBuilder;
         LoginProcess loginProcess = null;
@@ -165,7 +158,7 @@ public class RestAuthenticationHandler {
 
             loginProcess = loginAuthenticator.getLoginProcess(loginConfiguration);
 
-            responseBuilder = processAuthentication(headers, request, response, postBody, httpMethod, authId,
+            responseBuilder = processAuthentication(headers, request, response, postBody, authId,
                     loginProcess, loginConfiguration);
 
         } catch (RestAuthException e) {
@@ -215,7 +208,6 @@ public class RestAuthenticationHandler {
      * @param request The HttpServletRequest.
      * @param response The HttpServletResponse.
      * @param postBody The post body of the request.
-     * @param httpMethod The HTTP method used to make the request.
      * @param loginProcess The LoginProcess used to track the login.
      * @param loginConfiguration The LoginConfiguration used to configure the login process.
      * @return A ResponseBuilder which contains the contents of the response to return to the client.
@@ -224,7 +216,7 @@ public class RestAuthenticationHandler {
      * @throws SignatureException If there is a problem creating the JWT to use in the response to the client.
      */
     private Response.ResponseBuilder processAuthentication(HttpHeaders headers, HttpServletRequest request,
-            HttpServletResponse response, JsonValue postBody, HttpMethod httpMethod, String authId,
+            HttpServletResponse response, JsonValue postBody, String authId,
             LoginProcess loginProcess, LoginConfiguration loginConfiguration)
             throws RestAuthCallbackHandlerResponseException, AuthLoginException, SignatureException {
 
@@ -237,7 +229,7 @@ public class RestAuthenticationHandler {
 
             JsonValue jsonCallbacks;
             try {
-                jsonCallbacks = handleCallbacks(headers, request, response, postBody, httpMethod, callbacks);
+                jsonCallbacks = handleCallbacks(headers, request, response, postBody, callbacks);
             } catch (RestAuthCallbackHandlerResponseException e) {
                 // Include the authId in the JSON response.
                 if (authId == null) {
@@ -255,7 +247,7 @@ public class RestAuthenticationHandler {
 
             } else {
                 loginProcess = loginProcess.next(callbacks);
-                responseBuilder = processAuthentication(headers, request, response, null, httpMethod, authId,
+                responseBuilder = processAuthentication(headers, request, response, null, authId,
                         loginProcess, loginConfiguration);
             }
             break;
@@ -298,13 +290,12 @@ public class RestAuthenticationHandler {
     }
 
     private JsonValue handleCallbacks(HttpHeaders headers, HttpServletRequest request, HttpServletResponse response,
-            JsonValue postBody, HttpMethod httpMethod, Callback[] callbacks)
+            JsonValue postBody, Callback[] callbacks)
             throws RestAuthCallbackHandlerResponseException {
 
         JsonValue jsonCallbacks = null;
-        if (postBody == null) {
-            jsonCallbacks = restAuthCallbackHandlerManager.handleCallbacks(headers, request, response,
-                    postBody, callbacks, httpMethod);
+        if (postBody == null || postBody.size() == 0) {
+            jsonCallbacks = restAuthCallbackHandlerManager.handleCallbacks(headers, request, response, callbacks);
 
         } else if (!postBody.get("callbacks").isNull()) {
             JsonValue jCallbacks = postBody.get("callbacks");

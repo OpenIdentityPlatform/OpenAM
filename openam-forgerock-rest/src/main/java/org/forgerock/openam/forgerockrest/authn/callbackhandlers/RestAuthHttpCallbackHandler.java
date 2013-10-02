@@ -19,7 +19,6 @@ package org.forgerock.openam.forgerockrest.authn.callbackhandlers;
 import com.sun.identity.authentication.spi.HttpCallback;
 import com.sun.identity.shared.debug.Debug;
 import org.forgerock.json.fluent.JsonValue;
-import org.forgerock.openam.forgerockrest.authn.core.HttpMethod;
 import org.forgerock.openam.forgerockrest.authn.exceptions.RestAuthException;
 import org.forgerock.openam.utils.JsonValueBuilder;
 
@@ -34,8 +33,7 @@ import java.util.Map;
  * Defines methods to update a HttpCallback from the headers and request of a Rest call and methods to convert a
  * Callback to and from a JSON representation.
  */
-public class RestAuthHttpCallbackHandler extends AbstractRestAuthCallbackHandler<HttpCallback>
-        implements RestAuthCallbackHandler<HttpCallback> {
+public class RestAuthHttpCallbackHandler extends AbstractRestAuthCallbackHandler<HttpCallback> {
 
     private static final Debug DEBUG = Debug.getInstance("amAuthREST");
 
@@ -51,7 +49,7 @@ public class RestAuthHttpCallbackHandler extends AbstractRestAuthCallbackHandler
      * {@inheritDoc}
      */
     public boolean updateCallbackFromRequest(HttpHeaders headers, HttpServletRequest request,
-            HttpServletResponse response, JsonValue postBody, HttpCallback callback, HttpMethod httpMethod) throws
+            HttpServletResponse response, HttpCallback callback) throws
             RestAuthCallbackHandlerResponseException {
 
         String httpAuthorization = request.getHeader(callback.getAuthorizationHeader());
@@ -80,7 +78,7 @@ public class RestAuthHttpCallbackHandler extends AbstractRestAuthCallbackHandler
      * {@inheritDoc}
      */
     boolean doUpdateCallbackFromRequest(HttpHeaders headers, HttpServletRequest request, HttpServletResponse response,
-            JsonValue postBody, HttpCallback callback) throws RestAuthCallbackHandlerResponseException {
+            HttpCallback callback) throws RestAuthCallbackHandlerResponseException {
         return false;
     }
 

@@ -17,7 +17,6 @@
 package org.forgerock.openam.forgerockrest.authn.callbackhandlers;
 
 import org.forgerock.json.fluent.JsonValue;
-import org.forgerock.openam.forgerockrest.authn.core.HttpMethod;
 import org.forgerock.openam.forgerockrest.authn.exceptions.RestAuthException;
 import org.forgerock.openam.utils.JsonValueBuilder;
 import org.testng.annotations.BeforeClass;
@@ -27,6 +26,8 @@ import javax.security.auth.callback.ConfirmationCallback;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.ws.rs.core.HttpHeaders;
+
+import java.util.Arrays;
 
 import static junit.framework.Assert.assertNotNull;
 import static junit.framework.Assert.fail;
@@ -61,67 +62,19 @@ public class RestAuthConfirmationCallbackHandlerTest {
     }
 
     @Test
-    public void shouldUpdateCallbackFromRequest() throws RestAuthCallbackHandlerResponseException {
+    public void shouldNotUpdateCallbackFromRequest() throws RestAuthCallbackHandlerResponseException {
 
         //Given
         HttpHeaders headers = mock(HttpHeaders.class);
         HttpServletRequest request = mock(HttpServletRequest.class);
         HttpServletResponse response = mock(HttpServletResponse.class);
-        JsonValue jsonPostBody = mock(JsonValue.class);
         ConfirmationCallback confirmationCallback = mock(ConfirmationCallback.class);
-
-        given(request.getParameter("selectedIndex")).willReturn("9");
 
         //When
         boolean updated = restAuthConfirmationCallbackHandler.updateCallbackFromRequest(headers, request, response,
-                jsonPostBody, confirmationCallback, HttpMethod.POST);
+                confirmationCallback);
 
         //Then
-        verify(confirmationCallback).setSelectedIndex(9);
-        assertTrue(updated);
-    }
-
-    @Test
-    public void shouldFailToUpdateCallbackFromRequestWhenSelectedIndexIsNull()
-            throws RestAuthCallbackHandlerResponseException {
-
-        //Given
-        HttpHeaders headers = mock(HttpHeaders.class);
-        HttpServletRequest request = mock(HttpServletRequest.class);
-        HttpServletResponse response = mock(HttpServletResponse.class);
-        JsonValue jsonPostBody = mock(JsonValue.class);
-        ConfirmationCallback confirmationCallback = mock(ConfirmationCallback.class);
-
-        given(request.getParameter("selectedIndex")).willReturn(null);
-
-        //When
-        boolean updated = restAuthConfirmationCallbackHandler.updateCallbackFromRequest(headers, request, response,
-                jsonPostBody, confirmationCallback, HttpMethod.POST);
-
-        //Then
-        verify(confirmationCallback, never()).setSelectedIndex(anyInt());
-        assertFalse(updated);
-    }
-
-    @Test
-    public void shouldFailToUpdateCallbackFromRequestWhenSelectedIndexIsEmptyString()
-            throws RestAuthCallbackHandlerResponseException {
-
-        //Given
-        HttpHeaders headers = mock(HttpHeaders.class);
-        HttpServletRequest request = mock(HttpServletRequest.class);
-        HttpServletResponse response = mock(HttpServletResponse.class);
-        JsonValue jsonPostBody = mock(JsonValue.class);
-        ConfirmationCallback confirmationCallback = mock(ConfirmationCallback.class);
-
-        given(request.getParameter("selectedIndex")).willReturn("");
-
-        //When
-        boolean updated = restAuthConfirmationCallbackHandler.updateCallbackFromRequest(headers, request, response,
-                jsonPostBody, confirmationCallback, HttpMethod.POST);
-
-        //Then
-        verify(confirmationCallback, never()).setSelectedIndex(anyInt());
         assertFalse(updated);
     }
 

@@ -47,9 +47,25 @@ public class AbstractRestAuthCallbackHandlerTest {
         abstractRestAuthCallbackHandler = new AbstractRestAuthCallbackHandler<Callback>() {
             @Override
             boolean doUpdateCallbackFromRequest(HttpHeaders headers, HttpServletRequest request,
-                    HttpServletResponse response, JsonValue postBody, Callback callback)
+                    HttpServletResponse response, Callback callback)
                     throws RestAuthCallbackHandlerResponseException {
                 return false;
+            }
+
+            public Callback handle(HttpHeaders headers, HttpServletRequest request, HttpServletResponse response, JsonValue postBody, Callback originalCallback) {
+                return null;  //To change body of implemented methods use File | Settings | File Templates.
+            }
+
+            public String getCallbackClassName() {
+                return null;  //To change body of implemented methods use File | Settings | File Templates.
+            }
+
+            public JsonValue convertToJson(Callback callback, int index) {
+                return null;  //To change body of implemented methods use File | Settings | File Templates.
+            }
+
+            public Callback convertFromJson(Callback callback, JsonValue jsonObject) {
+                return null;  //To change body of implemented methods use File | Settings | File Templates.
             }
         };
     }

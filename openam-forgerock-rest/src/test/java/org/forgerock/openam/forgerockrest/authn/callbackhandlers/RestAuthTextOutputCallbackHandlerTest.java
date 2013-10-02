@@ -17,7 +17,6 @@
 package org.forgerock.openam.forgerockrest.authn.callbackhandlers;
 
 import org.forgerock.json.fluent.JsonValue;
-import org.forgerock.openam.forgerockrest.authn.core.HttpMethod;
 import org.forgerock.openam.forgerockrest.authn.exceptions.RestAuthException;
 import org.forgerock.openam.utils.JsonValueBuilder;
 import org.testng.annotations.BeforeClass;
@@ -62,12 +61,11 @@ public class RestAuthTextOutputCallbackHandlerTest {
         HttpHeaders headers = mock(HttpHeaders.class);
         HttpServletRequest request = mock(HttpServletRequest.class);
         HttpServletResponse response = mock(HttpServletResponse.class);
-        JsonValue jsonPostBody = mock(JsonValue.class);
         TextOutputCallback textOutputCallback = mock(TextOutputCallback.class);
 
         //When
         boolean updated = testOutputRestAuthCallbackHandler.updateCallbackFromRequest(headers, request, response,
-                jsonPostBody, textOutputCallback, HttpMethod.POST);
+                textOutputCallback);
 
         //Then
         assertTrue(!updated);

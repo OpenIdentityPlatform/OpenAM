@@ -21,7 +21,6 @@ import com.sun.identity.authentication.share.RedirectCallbackHandler;
 import com.sun.identity.authentication.spi.RedirectCallback;
 import com.sun.identity.shared.debug.Debug;
 import org.forgerock.json.fluent.JsonValue;
-import org.forgerock.openam.forgerockrest.authn.core.HttpMethod;
 import org.forgerock.openam.forgerockrest.authn.exceptions.RestAuthException;
 
 import javax.servlet.http.HttpServletRequest;
@@ -33,8 +32,7 @@ import java.io.IOException;
 /**
  * Defines methods to handle a RedirectCallback.
  */
-public class RestAuthRedirectCallbackHandler extends AbstractRestAuthCallbackHandler<RedirectCallback>
-        implements RestAuthCallbackHandler<RedirectCallback> {
+public class RestAuthRedirectCallbackHandler extends AbstractRestAuthCallbackHandler<RedirectCallback> {
 
     private static final Debug DEBUG = Debug.getInstance("amAuthREST");
 
@@ -57,7 +55,7 @@ public class RestAuthRedirectCallbackHandler extends AbstractRestAuthCallbackHan
      * {@inheritDoc}
      */
     public boolean updateCallbackFromRequest(HttpHeaders headers, HttpServletRequest request,
-            HttpServletResponse response, JsonValue postBody, RedirectCallback callback, HttpMethod httpMethod) {
+            HttpServletResponse response, RedirectCallback callback) {
 
         try {
             String contextPath = request.getContextPath();
@@ -83,7 +81,7 @@ public class RestAuthRedirectCallbackHandler extends AbstractRestAuthCallbackHan
      * {@inheritDoc}
      */
     boolean doUpdateCallbackFromRequest(HttpHeaders headers, HttpServletRequest request, HttpServletResponse response,
-            JsonValue postBody, RedirectCallback callback) throws RestAuthCallbackHandlerResponseException {
+            RedirectCallback callback) throws RestAuthCallbackHandlerResponseException {
         return false;
     }
 

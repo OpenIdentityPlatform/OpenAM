@@ -17,6 +17,7 @@
 package org.forgerock.openam.forgerockrest.authn.callbackhandlers;
 
 import com.sun.identity.shared.debug.Debug;
+import org.apache.commons.lang.StringUtils;
 import org.forgerock.json.fluent.JsonException;
 import org.forgerock.json.fluent.JsonValue;
 import org.forgerock.openam.utils.JsonValueBuilder;
@@ -25,17 +26,18 @@ import javax.security.auth.callback.NameCallback;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.ws.rs.core.HttpHeaders;
+import java.util.List;
 
 /**
  * Defines methods to update a NameCallback from the headers and request of a Rest call and methods to convert a
  * Callback to and from a JSON representation.
  */
-public class RestAuthNameCallbackHandler extends AbstractRestAuthCallbackHandler<NameCallback>
-        implements RestAuthCallbackHandler<NameCallback> {
+public class RestAuthNameCallbackHandler extends AbstractRestAuthCallbackHandler<NameCallback> {
 
     private static final Debug DEBUG = Debug.getInstance("amAuthREST");
 
     private static final String CALLBACK_NAME = "NameCallback";
+    private static final String USERNAME_HEADER_KEY = "X-OpenAM-Username";
 
     /**
      * {@inheritDoc}
@@ -45,17 +47,18 @@ public class RestAuthNameCallbackHandler extends AbstractRestAuthCallbackHandler
     }
 
     /**
-     * Checks the request for the presence of a parameter name "username", if present and not an empty string then
-     * sets this on the Callback and returns true. Otherwise does nothing and returns false.
+     * Checks the request for the presence of a header "X-OpenAM-Username", if set and not an empty string then
+     * sets the header value on the Callback and returns true. Otherwise does nothing and returns false.
      *
      * {@inheritDoc}
      */
     boolean doUpdateCallbackFromRequest(HttpHeaders headers, HttpServletRequest request, HttpServletResponse response,
-            JsonValue postBody, NameCallback callback) throws RestAuthCallbackHandlerResponseException {
+            NameCallback callback) throws RestAuthCallbackHandlerResponseException {
 
-        String username = request.getParameter("username");
+        List<String> nameHeader = headers.getRequestHeader(USERNAME_HEADER_KEY);
+        String username = nameHeader != null && nameHeader.size() > 0 ? nameHeader.get(0) : null;
 
-        if (username == null || "".equals(username)) {
+        if (StringUtils.isEmpty(username)) {
             DEBUG.message("username not set in request.");
             return false;
         }

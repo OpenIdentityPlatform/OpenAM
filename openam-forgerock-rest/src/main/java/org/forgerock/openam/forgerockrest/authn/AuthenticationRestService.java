@@ -17,16 +17,14 @@
 package org.forgerock.openam.forgerockrest.authn;
 
 import com.google.inject.Singleton;
+import org.apache.commons.lang.StringUtils;
 import org.forgerock.json.fluent.JsonValue;
-import org.forgerock.openam.forgerockrest.authn.core.HttpMethod;
 import org.forgerock.openam.forgerockrest.authn.exceptions.RestAuthException;
 import org.forgerock.openam.guice.InjectorHolder;
 import org.forgerock.openam.utils.JsonValueBuilder;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import javax.ws.rs.Consumes;
-import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
@@ -105,14 +103,19 @@ public class AuthenticationRestService {
                     .getResponse();
         }
 
-        if (postBody != null && !"".equals(postBody)) {
+        JsonValue jsonBody = null;
+        if (StringUtils.isNotEmpty(postBody)) {
+            jsonBody = JsonValueBuilder.toJsonValue(postBody);
+        }
+
+        if (jsonBody != null && jsonBody.size() > 0) {
             //submitReqs
-            return restAuthenticationHandler.continueAuthentication(headers, request, response, postBody,
+            return restAuthenticationHandler.continueAuthentication(headers, request, response, jsonBody,
                     sessionUpgradeSSOTokenId);
         } else {
             //initiate
             return restAuthenticationHandler.initiateAuthentication(headers, request, response, authIndexType,
-                    authIndexValue, sessionUpgradeSSOTokenId, HttpMethod.POST);
+                    authIndexValue, sessionUpgradeSSOTokenId);
         }
     }
 }

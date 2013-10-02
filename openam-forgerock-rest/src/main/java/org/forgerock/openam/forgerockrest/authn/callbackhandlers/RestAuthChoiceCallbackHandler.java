@@ -25,36 +25,26 @@ import javax.security.auth.callback.ChoiceCallback;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.ws.rs.core.HttpHeaders;
+import java.util.List;
 
 /**
  * Defines methods to update a ChoiceCallback from the headers and request of a Rest call and methods to convert a
  * Callback to and from a JSON representation.
  */
-public class RestAuthChoiceCallbackHandler extends AbstractRestAuthCallbackHandler<ChoiceCallback>
-        implements RestAuthCallbackHandler<ChoiceCallback> {
+public class RestAuthChoiceCallbackHandler extends AbstractRestAuthCallbackHandler<ChoiceCallback> {
 
     private static final Debug DEBUG = Debug.getInstance("amAuthREST");
 
     private static final String CALLBACK_NAME = "ChoiceCallback";
 
     /**
-     * Checks the request for the presence of a parameter name "choices", if present and not an empty string then
-     * sets this on the Callback and returns true. Otherwise does nothing and returns false.
+     * ChoiceCallback not supported to be updated from request headers.
      *
      * {@inheritDoc}
      */
     boolean doUpdateCallbackFromRequest(HttpHeaders headers, HttpServletRequest request, HttpServletResponse response,
-            JsonValue postBody, ChoiceCallback callback) throws RestAuthCallbackHandlerResponseException {
-
-        String choiceString = request.getParameter("choices");
-
-        if (choiceString == null || "".equals(choiceString)) {
-            DEBUG.message("choices not set in request.");
-            return false;
-        }
-
-        callback.setSelectedIndex(Integer.parseInt(choiceString));
-        return true;
+            ChoiceCallback callback) throws RestAuthCallbackHandlerResponseException {
+        return false;
     }
 
     /**

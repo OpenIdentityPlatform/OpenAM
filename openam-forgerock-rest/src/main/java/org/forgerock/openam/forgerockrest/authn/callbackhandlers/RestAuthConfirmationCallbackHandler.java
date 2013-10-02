@@ -25,36 +25,26 @@ import javax.security.auth.callback.ConfirmationCallback;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.ws.rs.core.HttpHeaders;
+import java.util.List;
 
 /**
  * Defines methods to update a ConfirmationCallback from the headers and request of a Rest call and methods to convert a
  * Callback to and from a JSON representation.
  */
-public class RestAuthConfirmationCallbackHandler extends AbstractRestAuthCallbackHandler<ConfirmationCallback>
-        implements RestAuthCallbackHandler<ConfirmationCallback> {
+public class RestAuthConfirmationCallbackHandler extends AbstractRestAuthCallbackHandler<ConfirmationCallback> {
 
     private static final Debug DEBUG = Debug.getInstance("amAuthREST");
 
     private static final String CALLBACK_NAME = "ConfirmationCallback";
 
     /**
-     * Checks the request for the presence of a parameter name "selectedIndex", if present and not an empty string
-     * then sets this on the Callback and returns true. Otherwise does nothing and returns false.
+     * ConfirmationCallback not supported to be updated from request headers.
      *
      * {@inheritDoc}
      */
     boolean doUpdateCallbackFromRequest(HttpHeaders headers, HttpServletRequest request, HttpServletResponse response,
-            JsonValue postBody, ConfirmationCallback callback) throws RestAuthCallbackHandlerResponseException {
-
-        String selectedIndex = request.getParameter("selectedIndex");
-
-        if (selectedIndex == null || "".equals(selectedIndex)) {
-            DEBUG.message("selectedIndex not set in request.");
-            return false;
-        }
-
-        callback.setSelectedIndex(Integer.parseInt(selectedIndex));
-        return true;
+            ConfirmationCallback callback) throws RestAuthCallbackHandlerResponseException {
+        return false;
     }
 
     /**

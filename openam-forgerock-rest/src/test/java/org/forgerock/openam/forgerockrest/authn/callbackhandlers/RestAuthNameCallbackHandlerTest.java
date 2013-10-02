@@ -18,7 +18,6 @@ package org.forgerock.openam.forgerockrest.authn.callbackhandlers;
 
 import junit.framework.Assert;
 import org.forgerock.json.fluent.JsonValue;
-import org.forgerock.openam.forgerockrest.authn.core.HttpMethod;
 import org.forgerock.openam.forgerockrest.authn.exceptions.RestAuthException;
 import org.forgerock.openam.utils.JsonValueBuilder;
 import org.testng.annotations.BeforeClass;
@@ -28,6 +27,8 @@ import javax.security.auth.callback.NameCallback;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.ws.rs.core.HttpHeaders;
+
+import java.util.Arrays;
 
 import static junit.framework.Assert.assertNotNull;
 import static junit.framework.Assert.fail;
@@ -68,14 +69,13 @@ public class RestAuthNameCallbackHandlerTest {
         HttpHeaders headers = mock(HttpHeaders.class);
         HttpServletRequest request = mock(HttpServletRequest.class);
         HttpServletResponse response = mock(HttpServletResponse.class);
-        JsonValue jsonPostBody = mock(JsonValue.class);
         NameCallback nameCallback = mock(NameCallback.class);
 
-        given(request.getParameter("username")).willReturn("USERNAME");
+        given(headers.getRequestHeader("X-OpenAM-Username")).willReturn(Arrays.asList("USERNAME"));
 
         //When
         boolean updated = restAuthNameCallbackHandler.updateCallbackFromRequest(headers, request, response,
-                jsonPostBody, nameCallback, HttpMethod.POST);
+                nameCallback);
 
         //Then
         verify(nameCallback).setName("USERNAME");
@@ -90,14 +90,13 @@ public class RestAuthNameCallbackHandlerTest {
         HttpHeaders headers = mock(HttpHeaders.class);
         HttpServletRequest request = mock(HttpServletRequest.class);
         HttpServletResponse response = mock(HttpServletResponse.class);
-        JsonValue jsonPostBody = mock(JsonValue.class);
         NameCallback nameCallback = mock(NameCallback.class);
 
         given(request.getParameter("username")).willReturn(null);
 
         //When
         boolean updated = restAuthNameCallbackHandler.updateCallbackFromRequest(headers, request, response,
-                jsonPostBody, nameCallback, HttpMethod.POST);
+                nameCallback);
 
         //Then
         verify(nameCallback, never()).setName(anyString());
@@ -112,14 +111,13 @@ public class RestAuthNameCallbackHandlerTest {
         HttpHeaders headers = mock(HttpHeaders.class);
         HttpServletRequest request = mock(HttpServletRequest.class);
         HttpServletResponse response = mock(HttpServletResponse.class);
-        JsonValue jsonPostBody = mock(JsonValue.class);
         NameCallback nameCallback = mock(NameCallback.class);
 
         given(request.getParameter("username")).willReturn("");
 
         //When
         boolean updated = restAuthNameCallbackHandler.updateCallbackFromRequest(headers, request, response,
-                jsonPostBody, nameCallback, HttpMethod.POST);
+                nameCallback);
 
         //Then
         verify(nameCallback, never()).setName(anyString());

@@ -17,7 +17,6 @@
 package org.forgerock.openam.forgerockrest.authn.callbackhandlers;
 
 import org.forgerock.json.fluent.JsonValue;
-import org.forgerock.openam.forgerockrest.authn.core.HttpMethod;
 import org.forgerock.openam.forgerockrest.authn.exceptions.RestAuthException;
 import org.forgerock.openam.utils.JsonValueBuilder;
 import org.mockito.Matchers;
@@ -29,6 +28,7 @@ import javax.security.auth.callback.LanguageCallback;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.ws.rs.core.HttpHeaders;
+import java.util.Arrays;
 import java.util.Locale;
 
 import static junit.framework.Assert.assertNotNull;
@@ -64,114 +64,19 @@ public class RestAuthLanguageCallbackHandlerTest {
     }
 
     @Test
-    public void shouldUpdateCallbackFromRequest() throws RestAuthCallbackHandlerResponseException {
+    public void shouldNotUpdateCallbackFromRequest() throws RestAuthCallbackHandlerResponseException {
 
         //Given
         HttpHeaders headers = mock(HttpHeaders.class);
         HttpServletRequest request = mock(HttpServletRequest.class);
         HttpServletResponse response = mock(HttpServletResponse.class);
-        JsonValue jsonPostBody = mock(JsonValue.class);
         LanguageCallback languageCallback = mock(LanguageCallback.class);
-
-        given(request.getParameter("localeLanguage")).willReturn("LANGUAGE");
-        given(request.getParameter("localeCountry")).willReturn("COUNTRY");
 
         //When
         boolean updated = restAuthLanguageCallbackHandler.updateCallbackFromRequest(headers, request, response,
-                jsonPostBody, languageCallback, HttpMethod.POST);
+                languageCallback);
 
         //Then
-        verify(languageCallback).setLocale(eq(new Locale("LANGUAGE", "COUNTRY")));
-        assertTrue(updated);
-    }
-
-    @Test
-    public void shouldUpdateCallbackFromRequestWhenLocaleCountryIsNull()
-            throws RestAuthCallbackHandlerResponseException {
-
-        //Given
-        HttpHeaders headers = mock(HttpHeaders.class);
-        HttpServletRequest request = mock(HttpServletRequest.class);
-        HttpServletResponse response = mock(HttpServletResponse.class);
-        JsonValue jsonPostBody = mock(JsonValue.class);
-        LanguageCallback languageCallback = mock(LanguageCallback.class);
-
-        given(request.getParameter("localeLanguage")).willReturn("LANGUAGE");
-        given(request.getParameter("localeCountry")).willReturn(null);
-
-        //When
-        boolean updated = restAuthLanguageCallbackHandler.updateCallbackFromRequest(headers, request, response,
-                jsonPostBody, languageCallback, HttpMethod.POST);
-
-        //Then
-        verify(languageCallback).setLocale(eq(new Locale("LANGUAGE")));
-        assertTrue(updated);
-    }
-
-    @Test
-    public void shouldUpdateCallbackFromRequestWhenLocaleCountryIsEmptyString()
-            throws RestAuthCallbackHandlerResponseException {
-
-        //Given
-        HttpHeaders headers = mock(HttpHeaders.class);
-        HttpServletRequest request = mock(HttpServletRequest.class);
-        HttpServletResponse response = mock(HttpServletResponse.class);
-        JsonValue jsonPostBody = mock(JsonValue.class);
-        LanguageCallback languageCallback = mock(LanguageCallback.class);
-
-        given(request.getParameter("localeLanguage")).willReturn("LANGUAGE");
-        given(request.getParameter("localeCountry")).willReturn("");
-
-        //When
-        boolean updated = restAuthLanguageCallbackHandler.updateCallbackFromRequest(headers, request, response,
-                jsonPostBody, languageCallback, HttpMethod.POST);
-
-        //Then
-        verify(languageCallback).setLocale(eq(new Locale("LANGUAGE")));
-        assertTrue(updated);
-    }
-
-    @Test
-    public void shouldFailToUpdateCallbackFromRequestWhenLocaleLanguageIsNull()
-            throws RestAuthCallbackHandlerResponseException {
-
-        //Given
-        HttpHeaders headers = mock(HttpHeaders.class);
-        HttpServletRequest request = mock(HttpServletRequest.class);
-        HttpServletResponse response = mock(HttpServletResponse.class);
-        JsonValue jsonPostBody = mock(JsonValue.class);
-        LanguageCallback languageCallback = mock(LanguageCallback.class);
-
-        given(request.getParameter("localeLanguage")).willReturn(null);
-
-        //When
-        boolean updated = restAuthLanguageCallbackHandler.updateCallbackFromRequest(headers, request, response,
-                jsonPostBody, languageCallback, HttpMethod.POST);
-
-        //Then
-        verify(languageCallback, never()).setLocale(Matchers.<Locale>anyObject());
-        assertFalse(updated);
-    }
-
-    @Test
-    public void shouldFailToUpdateCallbackFromRequestWhenLocaleLanguageIsEmptyString()
-            throws RestAuthCallbackHandlerResponseException {
-
-        //Given
-        HttpHeaders headers = mock(HttpHeaders.class);
-        HttpServletRequest request = mock(HttpServletRequest.class);
-        HttpServletResponse response = mock(HttpServletResponse.class);
-        JsonValue jsonPostBody = mock(JsonValue.class);
-        LanguageCallback languageCallback = mock(LanguageCallback.class);
-
-        given(request.getParameter("localeLanguage")).willReturn("");
-
-        //When
-        boolean updated = restAuthLanguageCallbackHandler.updateCallbackFromRequest(headers, request, response,
-                jsonPostBody, languageCallback, HttpMethod.POST);
-
-        //Then
-        verify(languageCallback, never()).setLocale(Matchers.<Locale>anyObject());
         assertFalse(updated);
     }
 

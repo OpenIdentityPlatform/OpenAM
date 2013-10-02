@@ -17,6 +17,7 @@
 package org.forgerock.openam.forgerockrest.authn.callbackhandlers;
 
 import com.sun.identity.shared.debug.Debug;
+import org.apache.commons.lang.StringUtils;
 import org.forgerock.json.fluent.JsonException;
 import org.forgerock.json.fluent.JsonValue;
 import org.forgerock.openam.utils.JsonValueBuilder;
@@ -25,30 +26,32 @@ import javax.security.auth.callback.PasswordCallback;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.ws.rs.core.HttpHeaders;
+import java.util.List;
 
 /**
  * Defines methods to update a PasswordCallback from the headers and request of a Rest call and methods to convert a
  * Callback to and from a JSON representation.
  */
-public class RestAuthPasswordCallbackHandler extends AbstractRestAuthCallbackHandler<PasswordCallback>
-        implements RestAuthCallbackHandler<PasswordCallback> {
+public class RestAuthPasswordCallbackHandler extends AbstractRestAuthCallbackHandler<PasswordCallback> {
 
     private static final Debug DEBUG = Debug.getInstance("amAuthREST");
 
     private static final String CALLBACK_NAME = "PasswordCallback";
+    private static final String PASSWORD_HEADER_KEY = "X-OpenAM-Password";
 
     /**
-     * Checks the request for the presence of a parameter name "password", if present and not an empty string then
-     * sets this on the Callback and returns true. Otherwise does nothing and returns false.
+     * Checks the request for the presence of a header "X-OpenAM-Password", if set and not an empty string then
+     * sets the header value on the Callback and returns true. Otherwise does nothing and returns false.
      *
      * {@inheritDoc}
      */
     boolean doUpdateCallbackFromRequest(HttpHeaders headers, HttpServletRequest request, HttpServletResponse response,
-            JsonValue postBody, PasswordCallback callback) throws RestAuthCallbackHandlerResponseException {
+            PasswordCallback callback) throws RestAuthCallbackHandlerResponseException {
 
-        String password = request.getParameter("password");
+        List<String> passwordHeader = headers.getRequestHeader(PASSWORD_HEADER_KEY);
+        String password = passwordHeader != null && passwordHeader.size() > 0 ? passwordHeader.get(0) : null;
 
-        if (password == null || "".equals(password)) {
+        if (StringUtils.isEmpty(password)) {
             DEBUG.message("password not set in request.");
             return false;
         }

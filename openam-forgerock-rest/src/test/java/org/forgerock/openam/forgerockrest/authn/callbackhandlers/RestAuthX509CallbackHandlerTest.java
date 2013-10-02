@@ -18,7 +18,6 @@ package org.forgerock.openam.forgerockrest.authn.callbackhandlers;
 
 import com.sun.identity.authentication.spi.X509CertificateCallback;
 import org.forgerock.json.fluent.JsonValue;
-import org.forgerock.openam.forgerockrest.authn.core.HttpMethod;
 import org.forgerock.openam.forgerockrest.authn.exceptions.RestAuthException;
 import org.mockito.Matchers;
 import org.testng.annotations.BeforeClass;
@@ -65,7 +64,6 @@ public class RestAuthX509CallbackHandlerTest {
         HttpHeaders headers = mock(HttpHeaders.class);
         HttpServletRequest request = mock(HttpServletRequest.class);
         HttpServletResponse response = mock(HttpServletResponse.class);
-        JsonValue jsonPostBody = mock(JsonValue.class);
         X509CertificateCallback x509CertificateCallback = mock(X509CertificateCallback.class);
         X509Certificate x509Certificate = mock(X509Certificate.class);
         X509Certificate[] x509Certificates = new X509Certificate[]{x509Certificate};
@@ -74,7 +72,7 @@ public class RestAuthX509CallbackHandlerTest {
 
         //When
         boolean updated = restAuthX509CallbackHandler.updateCallbackFromRequest(headers, request, response,
-                jsonPostBody, x509CertificateCallback, HttpMethod.POST);
+                x509CertificateCallback);
 
         //Then
         verify(x509CertificateCallback).setCertificate(x509Certificate);
@@ -89,7 +87,6 @@ public class RestAuthX509CallbackHandlerTest {
         HttpHeaders headers = mock(HttpHeaders.class);
         HttpServletRequest request = mock(HttpServletRequest.class);
         HttpServletResponse response = mock(HttpServletResponse.class);
-        JsonValue jsonPostBody = mock(JsonValue.class);
         X509CertificateCallback x509CertificateCallback = mock(X509CertificateCallback.class);
         X509Certificate x509Certificate = mock(X509Certificate.class);
         X509Certificate x509Certificate2 = mock(X509Certificate.class);
@@ -99,7 +96,7 @@ public class RestAuthX509CallbackHandlerTest {
 
         //When
         boolean updated = restAuthX509CallbackHandler.updateCallbackFromRequest(headers, request, response,
-                jsonPostBody, x509CertificateCallback, HttpMethod.POST);
+                x509CertificateCallback);
 
         //Then
         verify(x509CertificateCallback).setCertificate(x509Certificate);
@@ -114,7 +111,6 @@ public class RestAuthX509CallbackHandlerTest {
         HttpHeaders headers = mock(HttpHeaders.class);
         HttpServletRequest request = mock(HttpServletRequest.class);
         HttpServletResponse response = mock(HttpServletResponse.class);
-        JsonValue jsonPostBody = mock(JsonValue.class);
         X509CertificateCallback x509CertificateCallback = mock(X509CertificateCallback.class);
         X509Certificate[] x509Certificates = new X509Certificate[]{};
 
@@ -122,7 +118,7 @@ public class RestAuthX509CallbackHandlerTest {
 
         //When
         boolean updated = restAuthX509CallbackHandler.updateCallbackFromRequest(headers, request, response,
-                jsonPostBody, x509CertificateCallback, HttpMethod.POST);
+                x509CertificateCallback);
 
         //Then
         verify(x509CertificateCallback, never()).setCertificate(Matchers.<X509Certificate>anyObject());
