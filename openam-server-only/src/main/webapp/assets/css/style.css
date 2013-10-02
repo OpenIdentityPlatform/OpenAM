@@ -358,7 +358,7 @@ button{
     font-weight:bold;
 }
 button:disabled{
-
+    opacity: 0.3;
 }
 
 .blue{
@@ -548,9 +548,9 @@ div.borderPopUpGray{
     border: 1px solid #80b7ab;
     border-bottom: none;
 }
-input.text, input[type="text"] {
+input.text, input[type="text"], input[type="checkbox"] {
     padding: 2px;
-
+    margin-left: 10px;
 }
 /*Corners bottom*/
 .xbGray1, .xbGray2, .xbGray3, .xbGray4 { display: block; overflow: hidden; height: 1px; border-left:1px solid #80b7ab; border-right:1px solid #80b7ab;}
@@ -561,7 +561,7 @@ input.text, input[type="text"] {
 /*.xb1, .xb2, .xb3{background:#e5e9ed;}*/
 
 .header{
-    background: #333333;
+    background: #5e887f;
     color:#FFFFFF;
     font-size:1.0em;
     font-weight:bold;
@@ -620,12 +620,11 @@ button, button.buttonblue {
     cursor: pointer;
     height: 1.7em;
     font-family: sans-serif;
-    font-size: 16px;
+    font-size: 14px;
     font-weight: bold;
     line-height: 1.4;
     margin: 0 1em 0 0;
     padding: 0px 18px;
-    text-transform: uppercase;
     border-radius: 0;
     -webkit-border-radius: 0;
     -moz-border-radius: 0;
@@ -653,12 +652,20 @@ button:hover {
     background: #5e887f;
 }
 
+button:disabled:hover {
+    background: #80b7ab;
+}
+
 button.buttonblue {
     background: #5e887f;
 }
 
 button.buttonblue:hover {
     background: #333333;
+}
+
+button.buttonblue:disabled:hover {
+    background: #5e887f;
 }
 
 #wizard_c {
