@@ -11,15 +11,15 @@
                         "src": "images/logo.png",
                         "title": "ForgeRock",
                         "alt": "ForgeRock",
-                        "height": "60",
-                        "width": "226"
+                        "height": "80",
+                        "width": "120"
                     },
                     "lessVars": {
-                        "background-color": "#f2f2f2",
-                        "background-image": "url('')",
+                        "background-color": "#eee",
+                        "background-image": "url('images/box-bg.png')",
                         "background-repeat": "no-repeat",
-                        "background-position": "left top",
-                        "footer-background-color": "#f2f2f2",
+                        "background-position": "950px -100px",
+                        "footer-background-color": "#eee",
                         "background-font-color": "#5a646d",
                         "column-padding": "160px",
                         
@@ -27,24 +27,27 @@
                         "login-container-label-align": "right",
             
                         "message-background-color": "#F9F9F9",
-                        "content-background": "#ffffff",
+                        "content-background": "#f9f9f9",
                         "font-color": "#5a646d",
                         "font-size": "14px",
                         "font-family": "Arial, Helvetica, sans-serif",
                         "site-width": "960px",
                         "line-height": "18px",
             
-                        "color-active": "#f36e09",
+                        "color-active": "#80b7ab",
                         "color-inactive": "#626d75",
             
-                        "active-menu-color": "#fc8a28",
+                        "active-menu-color": "#80b7ab",
+                        "active-menu-font-color": "#f9f9f9",
                         "inactive-menu-color": "#5d6871",
+                        "inactive-menu-font-color": "#f9f9f9",
                         "button-hover-lightness": "4%",   
             
-                        "href-color": "#0e99b8",
-                        "color-error": "red",
+                        "href-color": "#80b7ab",
+                        "href-color-hover": "#5e887f",
+                        "color-error": "#d97986",
                         "color-warning": "yellow",
-                        "color-success": "green",
+                        "color-success": "#71bd71",
                         "color-info": "blue",
                         "color-inactive": "gray",
             
