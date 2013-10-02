@@ -109,7 +109,7 @@ public class PersistentCookieAuthModuleTest {
         assertEquals(config.get(JwtSessionModule.KEYSTORE_FILE_KEY), "KEYSTORE_FILE_PATH");
         assertEquals(config.get(JwtSessionModule.KEYSTORE_PASSWORD_KEY), "KEYSTORE_PASS");
         assertEquals(config.get(JwtSessionModule.TOKEN_IDLE_TIME_CLAIM_KEY), "0");
-        assertEquals(config.get(JwtSessionModule.MAX_TOKEN_LIFE_KEY), "18000");
+        assertEquals(config.get(JwtSessionModule.MAX_TOKEN_LIFE_KEY), "300");
     }
 
     @Test
@@ -135,7 +135,7 @@ public class PersistentCookieAuthModuleTest {
         assertEquals(config.get(JwtSessionModule.KEYSTORE_TYPE_KEY), "KEYSTORE_TYPE");
         assertEquals(config.get(JwtSessionModule.KEYSTORE_FILE_KEY), "KEYSTORE_FILE_PATH");
         assertEquals(config.get(JwtSessionModule.KEYSTORE_PASSWORD_KEY), "KEYSTORE_PASS");
-        assertEquals(config.get(JwtSessionModule.TOKEN_IDLE_TIME_CLAIM_KEY), "3600");
+        assertEquals(config.get(JwtSessionModule.TOKEN_IDLE_TIME_CLAIM_KEY), "60");
         assertEquals(config.get(JwtSessionModule.MAX_TOKEN_LIFE_KEY), "0");
     }
 
@@ -164,8 +164,8 @@ public class PersistentCookieAuthModuleTest {
         assertEquals(config.get(JwtSessionModule.KEYSTORE_TYPE_KEY), "KEYSTORE_TYPE");
         assertEquals(config.get(JwtSessionModule.KEYSTORE_FILE_KEY), "KEYSTORE_FILE_PATH");
         assertEquals(config.get(JwtSessionModule.KEYSTORE_PASSWORD_KEY), "KEYSTORE_PASS");
-        assertEquals(config.get(JwtSessionModule.TOKEN_IDLE_TIME_CLAIM_KEY), "3600");
-        assertEquals(config.get(JwtSessionModule.MAX_TOKEN_LIFE_KEY), "18000");
+        assertEquals(config.get(JwtSessionModule.TOKEN_IDLE_TIME_CLAIM_KEY), "60");
+        assertEquals(config.get(JwtSessionModule.MAX_TOKEN_LIFE_KEY), "300");
     }
 
     @Test
@@ -211,8 +211,8 @@ public class PersistentCookieAuthModuleTest {
         }
 
         //Then
-        verify(amLoginModuleBinder).setUserSessionProperty(JwtSessionModule.TOKEN_IDLE_TIME_CLAIM_KEY, "3600");
-        verify(amLoginModuleBinder).setUserSessionProperty(JwtSessionModule.MAX_TOKEN_LIFE_KEY, "18000");
+        verify(amLoginModuleBinder).setUserSessionProperty(JwtSessionModule.TOKEN_IDLE_TIME_CLAIM_KEY, "60");
+        verify(amLoginModuleBinder).setUserSessionProperty(JwtSessionModule.MAX_TOKEN_LIFE_KEY, "300");
         verify(jwtSessionModule).validateJwtSessionCookie(Matchers.<MessageInfo>anyObject());
         assertTrue(exceptionCaught);
         assertEquals(exception.getErrorCode(), "cookieNotValid");
@@ -245,8 +245,8 @@ public class PersistentCookieAuthModuleTest {
         }
 
         //Then
-        verify(amLoginModuleBinder).setUserSessionProperty(JwtSessionModule.TOKEN_IDLE_TIME_CLAIM_KEY, "3600");
-        verify(amLoginModuleBinder).setUserSessionProperty(JwtSessionModule.MAX_TOKEN_LIFE_KEY, "18000");
+        verify(amLoginModuleBinder).setUserSessionProperty(JwtSessionModule.TOKEN_IDLE_TIME_CLAIM_KEY, "60");
+        verify(amLoginModuleBinder).setUserSessionProperty(JwtSessionModule.MAX_TOKEN_LIFE_KEY, "300");
         verify(jwtSessionModule).validateJwtSessionCookie(Matchers.<MessageInfo>anyObject());
         assertTrue(exceptionCaught);
         assertEquals(exception.getErrorCode(), "authFailedDiffRealm");
@@ -273,8 +273,8 @@ public class PersistentCookieAuthModuleTest {
         int returnedState = persistentCookieAuthModule.process(callbacks, state);
 
         //Then
-        verify(amLoginModuleBinder).setUserSessionProperty(JwtSessionModule.TOKEN_IDLE_TIME_CLAIM_KEY, "3600");
-        verify(amLoginModuleBinder).setUserSessionProperty(JwtSessionModule.MAX_TOKEN_LIFE_KEY, "18000");
+        verify(amLoginModuleBinder).setUserSessionProperty(JwtSessionModule.TOKEN_IDLE_TIME_CLAIM_KEY, "60");
+        verify(amLoginModuleBinder).setUserSessionProperty(JwtSessionModule.MAX_TOKEN_LIFE_KEY, "300");
         verify(jwtSessionModule).validateJwtSessionCookie(Matchers.<MessageInfo>anyObject());
         verify(amLoginModuleBinder).setUserSessionProperty("jwtValidated", "true");
         assertEquals(returnedState, ISAuthConstants.LOGIN_SUCCEED);
