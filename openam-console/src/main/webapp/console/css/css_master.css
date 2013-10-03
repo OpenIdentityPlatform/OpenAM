@@ -41,17 +41,17 @@ a.TskPgeTxtBgOvr { color:#FFF !important; background-image: url(../images/tasks/
 div.TskPgeFllPge {background-color:#FFFFFF; }
 div.TskPgeInfPnl {border: 1px solid #AABCC8; background-color: #F4F6F7;}
 span.TskPgeHdr {color:#666666;}
-span.TskPgeTskLftBtm {background-image: url(../images/tasks/leftBottom.gif); }     
-span.TskPgeTskLftTp {background-image: url(../images/tasks/leftTop.gif); }             
-span.TskPgeTskRghtBtm {background-image: url(../images/tasks/rightBottom.gif);}     
-span.TskPgeTskRghtTp {background-image: url(../images/tasks/rightTop.gif);} 
+span.TskPgeTskLftBtm {background-image: url(../images/tasks/leftBottom.gif); }
+span.TskPgeTskLftTp {background-image: url(../images/tasks/leftTop.gif); }
+span.TskPgeTskRghtBtm {background-image: url(../images/tasks/rightBottom.gif);}
+span.TskPgeTskRghtTp {background-image: url(../images/tasks/rightTop.gif);}
 span.TskPgeTskRghtBrdr {background-color: #AABCC8;}
-span.TskPgeSbHdr {color: #E76F00;}
+span.TskPgeSbHdr {color: #5DA192;}
 
 /*<<<<<<<<<<<<<<<<<<<<------------>>>>>>>>>>>>>>>>>>>>*/
 body#TskPge {padding:0px;}
 body#TskPge table {empty-cells: show;}
-body#TskPge td a span {font-size: 11px;} 
+body#TskPge td a span {font-size: 11px;}
 table.TskPgeBtmSpc {margin-bottom:5px;}
 tr.TskPgeBtmTr {height:220px;}
 td.TskPgeTpBx h1 {font-size:18px; margin: 20px 0px 0px 0px; margin-top: 20px; padding: 0px; font-weight: bold;}
@@ -69,11 +69,12 @@ span.TskPgeHdr {font-size:12px;}
 span.TskPgeSbHdr {font-size: 13px; font-weight: bold; padding-bottom: 5px; padding-top: 20px; display: block}
 span.TskPgeTskPdng {font-size:11px;padding: 0px 7px; display: block; padding-top: 4px; padding-bottom: 3px;}
 span.TskPgeTskLftBtm, span.TskPgeTskLftTp, span.TskPgeTskRghtBtm, span.TskPgeTskRghtTp {position: absolute; width: 8px; height: 11px;cursor: pointer; background-position: top left; background-repeat: no-repeat;}
-span.TskPgeTskLftBtm {bottom: -1px; left: -1px; }     
-span.TskPgeTskLftTp {top: -1px; left: -1px;}             
-span.TskPgeTskRghtBtm {bottom: -1px; right: 0px;z-index:1;}     
-span.TskPgeTskRghtTp {position: absolute; top: -1px; right: 0px;_right:-1px; z-index:1;} 
+span.TskPgeTskLftBtm {bottom: -1px; left: -1px; }
+span.TskPgeTskLftTp {top: -1px; left: -1px;}
+span.TskPgeTskRghtBtm {bottom: -1px; right: 0px;z-index:1;}
+span.TskPgeTskRghtTp {position: absolute; top: -1px; right: 0px;_right:-1px; z-index:1;}
 span.TskPgeTskRghtBrdr {display: block; position: absolute; height: 100%; right: 0px; width: 1px; cursor: pointer;}
 /*---*/
 
 
+img[name="Home.mhCommon.ProdName"] {width: auto;height: auto;}

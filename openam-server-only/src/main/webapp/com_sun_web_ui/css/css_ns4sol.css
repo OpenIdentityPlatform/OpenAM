@@ -642,3 +642,4 @@ a.date-time-mark-link:active {color:#F00;text-decoration:underline}
 select.chooser-list {font-family:monospace}
 option.chooser-folder-text {color:#000;font-family:monospace}
 option.chooser-file-text {color:#666;font-family:monospace}
+img[name="Home.mhCommon.ProdName"] {width: auto;height: auto;}

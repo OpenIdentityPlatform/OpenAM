@@ -261,3 +261,4 @@ a.help-toc-link:active { color: #F00; text-decoration: underline; }
 a.help-return-link:link, a.help-return-link:visited { color: #669; text-decoration: underline; font-size: .9em; }
 a.help-return-link:active { color: #F00; text-decoration: underline; font-size: .9em; }
 
+img[name="Home.mhCommon.ProdName"] {width: auto;height: auto;}
