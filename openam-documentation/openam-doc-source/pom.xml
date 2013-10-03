@@ -109,23 +109,22 @@
         <javaEEAgentsDocTargetVersion>${agentsDocTargetVersion}</javaEEAgentsDocTargetVersion>
         <agentsBootstrapFile>OpenSSOAgentBootstrap.properties</agentsBootstrapFile>
         <agentsConfigurationFile>OpenSSOAgentConfiguration.properties</agentsConfigurationFile>
-        <coreDirectoryFile><![CDATA[openam-distribution-kit-${project.version}]]></coreDirectoryFile>
+        <coreDirectoryFile><![CDATA[OpenAM-${project.version}.zip]]></coreDirectoryFile>
         <coreLibrary><![CDATA[openam-core-${project.version}.jar]]></coreLibrary>
-        <coreWarFile><![CDATA[openam-server-${project.version}.war]]></coreWarFile>
-        <clientsdkJarFile><![CDATA[openam-clientsdk-${project.version}.jar]]></clientsdkJarFile>
-        <clientSDKExamplesCliFile><![CDATA[openam-example-clientsdk-cli-${project.version}.zip]]></clientSDKExamplesCliFile>
-        <clientSDKExamplesWarFile><![CDATA[openam-example-clientsdk-war-${project.version}.war]]></clientSDKExamplesWarFile>
-        <ipdiscoWarFile><![CDATA[openam-idpdiscovery-war-${project.version}.war]]></ipdiscoWarFile>
-        <distauthWarFile><![CDATA[openam-distauth-${project.version}.war]]></distauthWarFile>
-        <diagnosticsZipFile><![CDATA[openam-distribution-diagnostics-${project.version}.zip]]></diagnosticsZipFile>
-        <fedletZipFile><![CDATA[openam-distribution-fedlet-unconfigured-${project.version}.zip]]></fedletZipFile>
-        <libraryZipFile><![CDATA[openam-distribution-library-${project.version}.zip]]></libraryZipFile>
+        <coreWarFile><![CDATA[OpenAM-${project.version}.war]]></coreWarFile>
+        <clientsdkJarFile><![CDATA[ClientSDK-${project.version}.jar]]></clientsdkJarFile>
+        <clientSDKExamplesCliFile><![CDATA[ExampleClientSDK-CLI-${project.version}.zip]]></clientSDKExamplesCliFile>
+        <clientSDKExamplesWarFile><![CDATA[ExampleClientSDK-WAR-${project.version}.war]]></clientSDKExamplesWarFile>
+        <ipdiscoWarFile><![CDATA[IDPDiscovery-${project.version}.war]]></ipdiscoWarFile>
+        <distauthWarFile><![CDATA[OpenAM-DistAuth-${project.version}.war]]></distauthWarFile>
+        <diagnosticsZipFile><![CDATA[SSODiagnosticTools-${project.version}.zip]]></diagnosticsZipFile>
+        <fedletZipFile><![CDATA[Fedlet-${project.version}.zip]]></fedletZipFile>
         <sharedLibrary><![CDATA[openam-shared-${project.version}.jar]]></sharedLibrary>
-        <ssoadminZipFile><![CDATA[openam-distribution-ssoadmintools-${project.version}.zip]]></ssoadminZipFile>
-        <ssoconfigZipFile><![CDATA[openam-distribution-ssoconfiguratortools-${project.version}.zip]]></ssoconfigZipFile>
+        <ssoadminZipFile><![CDATA[SSOAdminTools-${project.version}.zip]]></ssoadminZipFile>
+        <ssoconfigZipFile><![CDATA[SSOConfiguratorTools-${project.version}.zip]]></ssoconfigZipFile>
         <ssoconfigJarFile><![CDATA[openam-configurator-tool-${project.version}.jar]]></ssoconfigJarFile>
         <ssoconfigUpgradeJarFile><![CDATA[openam-upgrade-tool-${project.version}.jar]]></ssoconfigUpgradeJarFile>
-        <serveronlyWarFile><![CDATA[openam-server-only-${project.version}.war]]></serveronlyWarFile>
+        <serveronlyWarFile><![CDATA[OpenAM-ServerOnly-${project.version}.war]]></serveronlyWarFile>
         <configJarFile><![CDATA[openam-distribution-configurator-${project.version}.jar]]></configJarFile>
         <oauth2JarFile><![CDATA[openam-oauth2-common-${project.version}.jar]]></oauth2JarFile>
 
