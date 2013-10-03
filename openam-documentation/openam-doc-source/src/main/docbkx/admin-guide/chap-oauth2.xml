@@ -28,8 +28,7 @@
  version='5.0' xml:lang='en'
  xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance'
  xsi:schemaLocation='http://docbook.org/ns/docbook http://docbook.org/xml/5.0/xsd/docbook.xsd'
- xmlns:xlink='http://www.w3.org/1999/xlink'
- xmlns:xinclude='http://www.w3.org/2001/XInclude'>
+ xmlns:xlink='http://www.w3.org/1999/xlink'>
  <title>Managing OAuth 2.0 Authorization</title>
  <indexterm>
   <primary>Authorization</primary>
@@ -474,7 +473,7 @@
      <step>
       <para>In the OpenAM console under Access Control &gt; <replaceable>Realm
       Name</replaceable> &gt; Agents &gt; OAuth 2.0 Client &gt; Agent, click
-      New..., then provide the client identifier and client password, and
+      New, then provide the client identifier and client password, and
       finally click Create to create the profile.</para>
       <para>This page requires that you perform additional configuration
       separately.</para>
@@ -502,12 +501,12 @@
     xlink:role="http://docbook.org/xlink/role/olink"><citetitle>Configuring
     OAuth 2.0 &amp; OpenID Connect 1.0 Clients</citetitle></link>.</para>
 
-    <para>An important decision to make at this point is whether your client
-    is a confidential client or a public client. This depends on whether your
-    client can keep its credentials confidential, or whether its credentials
-    can be exposed to the resource owner or other parties. If your client is a
-    web-based application running on a server, such as the OpenAM OAuth 2.0
-    client, then you can keep its credentials confidential. If your client is
+    <para>Examine the client type option. An important decision to make at this
+    point is whether your client is a confidential client or a public client.
+    This depends on whether your client can keep its credentials confidential,
+    or whether its credentials can be exposed to the resource owner or other parties.
+    If your client is a web-based application running on a server, such as the OpenAM
+    OAuth 2.0 client, then you can keep its credentials confidential. If your client is
     a user-agent based client, such as a JavaScript client running in a browser,
     or a native application installed on a device used by the resource owner,
     then yours is a public client.</para>
@@ -768,6 +767,13 @@
         <literal>Read your user name</literal>, is shown to the resource owner
         in the consent page.</para>
        </listitem>
+      </varlistentry>
+      <varlistentry>
+          <term>OAuth2 Access Token Profile Service Parameter name</term>
+          <listitem>
+              <para>Identifies the parameter that contains the access token value, which
+              in this example is <literal>access_token</literal>.</para>
+          </listitem>
       </varlistentry>
       <varlistentry>
        <term>Proxy URL</term>
