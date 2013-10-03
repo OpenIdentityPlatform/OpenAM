@@ -107,23 +107,5 @@ Using CLASSPATH:       /path/to/tomcat/bin/bootstrap.jar:
    <screen>$ cd /path/to/tomcat/webapps/
 $ rm -rf openam.war openam/</screen>
   </step>
-  <step>
-   <para>If you have stored a download or unpacked version of OpenAM software
-   on your system, you can now remove the files.</para>
-   <para>If you cannot find the original .zip, search for files named
-   <filename>openam-*.zip</filename>.</para>
-   <screen>$ find . -name "openam-*.zip"
-./Downloads/openam
-$ rm ./Downloads/openam</screen>
-
-<!-- Since the wrapper is setup by the user, this step may not be necessary.
-   <para>If you cannot find the unpacked version, you might search for the
-   directory named <filename>openam</filename>.</para>
-   <screen>$ locate <?eval ${coreDirectoryFile}?>/
-~/Downloads/<?eval ${coreDirectoryFile}?>/
-...
-$ rm -rf ~/Downloads/<?eval ${coreDirectoryFile}?>/</screen>
--->
-  </step>
  </procedure>
 </chapter>

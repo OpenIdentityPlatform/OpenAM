@@ -589,7 +589,7 @@ aci: (version 3.0;acl "Delete identity"; allow (delete)(userdn = "ldap:///
   openam folder, and unzip the <filename>.zip</filename> file to access the content:</para>
   <screen>$ cd ~/Downloads
 $ mkdir openam ; cd openam
-$ unzip ~/Downloads/<?eval ${coreDirectoryFile}?>.zip</screen>
+$ unzip ~/Downloads/<?eval ${coreDirectoryFile}?></screen>
 
   <variablelist>
    <para>When you unzip the archive of the entire package, you get ldif, license, and 
@@ -597,33 +597,6 @@ $ unzip ~/Downloads/<?eval ${coreDirectoryFile}?>.zip</screen>
    <varlistentry>
     <term><filename><?eval ${clientsdkJarFile}?></filename></term>
     <listitem><para>The OpenAM Java client SDK library</para></listitem>
-   </varlistentry>
-   <varlistentry>
-    <term><filename><?eval ${distauthWarFile}?></filename></term>
-    <listitem><para>The deployable .war file for distributed authentication</para></listitem>
-   </varlistentry>
-   <!--
-   <varlistentry>
-    <term><filename><?eval ${diagnosticsZipFile}?></filename></term>
-    <listitem><para>The .zip file with the diagnostic tools to help troubleshoot 
-    deployment issue.</para></listitem>
-   </varlistentry>
-   -->
-   <varlistentry>
-    <term><filename><?eval ${fedletZipFile}?></filename></term>
-    <listitem><para>The .zip that contains the lightweight service provider
-    implementations that you can embed in your Java EE or ASP.NET applications
-    to enable it to use federated access management</para></listitem>
-   </varlistentry>
-   <varlistentry>
-    <term><filename><?eval ${ssoadminZipFile}?></filename></term>
-    <listitem><para>The .zip file that contains tools to manage OpenAM from 
-    the command line</para></listitem>
-   </varlistentry>
-   <varlistentry>
-    <term><filename><?eval ${ssoconfigZipFile}?></filename></term>
-    <listitem><para>The .zip file that contains tools to configure OpenAM from 
-    the command line</para></listitem>
    </varlistentry>
    <varlistentry>
     <term><filename><?eval ${clientSDKExamplesCliFile}?></filename></term>
@@ -652,14 +625,41 @@ $ unzip ~/Downloads/<?eval ${coreDirectoryFile}?>.zip</screen>
     </listitem>
    </varlistentry>
    <varlistentry>
+    <term><filename><?eval ${fedletZipFile}?></filename></term>
+    <listitem><para>The .zip that contains the lightweight service provider
+    implementations that you can embed in your Java EE or ASP.NET applications
+    to enable it to use federated access management</para></listitem>
+   </varlistentry>
+   <varlistentry>
     <term><filename><?eval ${coreWarFile}?></filename></term>
     <listitem><para>The deployable .war file</para></listitem>
+   </varlistentry>
+   <varlistentry>
+    <term><filename><?eval ${distauthWarFile}?></filename></term>
+    <listitem><para>The deployable .war file for distributed authentication</para></listitem>
    </varlistentry>
    <varlistentry>
     <term><filename><?eval ${serveronlyWarFile}?></filename></term>
     <listitem><para>The deployable .war file when you want to deploy OpenAM
     server without the OpenAM console</para></listitem>
    </varlistentry>
+   <varlistentry>
+    <term><filename><?eval ${ssoadminZipFile}?></filename></term>
+    <listitem><para>The .zip file that contains tools to manage OpenAM from 
+    the command line</para></listitem>
+   </varlistentry>
+   <varlistentry>
+    <term><filename><?eval ${ssoconfigZipFile}?></filename></term>
+    <listitem><para>The .zip file that contains tools to configure OpenAM from 
+    the command line</para></listitem>
+   </varlistentry>
+   <!--
+   <varlistentry>
+    <term><filename><?eval ${diagnosticsZipFile}?></filename></term>
+    <listitem><para>The .zip file with the diagnostic tools to help troubleshoot
+    deployment issue.</para></listitem>
+   </varlistentry>
+   -->
   </variablelist>
  </section>
 
