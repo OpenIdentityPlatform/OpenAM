@@ -27,8 +27,7 @@
  xmlns='http://docbook.org/ns/docbook' version='5.0' xml:lang='en'
  xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance'
  xsi:schemaLocation='http://docbook.org/ns/docbook http://docbook.org/xml/5.0/xsd/docbook.xsd'
- xmlns:xlink='http://www.w3.org/1999/xlink'
- xmlns:xinclude='http://www.w3.org/2001/XInclude'>
+ xmlns:xlink='http://www.w3.org/1999/xlink'>
  <title>Administration Interfaces &amp; Tools</title>
 
  <para>This chapter provides a brief introduction to the web-based OpenAM
@@ -40,12 +39,11 @@
   <indexterm><primary>Console overview</primary></indexterm>
   <para>After you install OpenAM, login to the web-based console as OpenAM
   Administrator, <literal>amadmin</literal> with the password you set during
-  installation. The URL to visit in your browser is something like
-  <literal>http://openam.example.com:8080/openam/console</literal>, depending
-  on the protocol (HTTP or HTTPS), host name (in this case
-  <literal>openam.example.com</literal>), port number on which the web
-  containers listens (in this case 8080), and deployment URI (in this case
-  <literal>/openam</literal>).</para>
+  installation. Navigate to a URL such as
+  <literal>http://openam.example.com:8080/openam</literal>. In this case,
+  communications proceed over the HTTP protocol to a FQDN
+  (<literal>openam.example.com</literal>), over a standard Java EE web container
+  port number (8080), to a specific deployment URI (<literal>/openam</literal>).</para>
   
   <mediaobject xml:id="figure-console-as-amadmin">
    <alt>How the console looks to amadmin</alt>
@@ -56,18 +54,17 @@
    console.</para></textobject>
   </mediaobject>
   
-  <para>The OpenAM Administrator has access rights to perform all
-  administrative operations. Therefore, when you login as
-  <literal>amadmin</literal>, you see the complete OpenAM console. In the
-  background, OpenAM has set a cookie in your browser that lasts until the
-  session expires, you logout, or you close your browser.<footnote>
-  <para>Technically speaking, persistent cookies can remain valid when you
+  <para>When you login as the OpenAM Administrator, <literal>amadmin</literal>,
+  you have access to the complete OpenAM console. In addition, OpenAM has set a
+  cookie in your browser that lasts until the session expires, you logout, or
+  you close your browser.<footnote>
+  <para>Persistent cookies can remain valid when you
   close your browser. This section reflects OpenAM default behavior before
   you configure additional functionality.</para></footnote></para>
   
-  <para>When you login to the OpenAM console as an end user, a user without
-  any access to perform administrative operations, then instead of the OpenAM
-  console, you see a page to view and update your account information.</para>
+  <para>When you login to the OpenAM console as a non-administrative end user,
+  you do not have access to the administrative console. Your access is limited
+  to a configuration page with your account information.</para>
   
   <mediaobject xml:id="figure-console-as-bjensen">
    <alt>How the console looks to an end user</alt>
@@ -131,32 +128,29 @@
    <varlistentry>
     <term><command><?eval ${configJarFile}?></command></term>
     <listitem>
-     <para>This executable .jar file lets you perform silent installation,
-     configuring a deployed OpenAM server by applying settings from a
-     configuration file, using the <command>java -jar configurator.jar -f
-     config.file</command>. The <filename>.jar</filename>
-     is provided with a sample configuration file.</para>
-     <para>The <replaceable>config.file</replaceable>, based on the <filename>sampleconfiguration</filename> 
-     file provided with the tool, must be adapted for your environment.</para>
+     <para>This executable .jar file lets you perform a silent installation of an OpenAM
+     server with a configuration file. For example, the <command>java -jar configurator.jar -f
+     config.file</command> command couples the <filename>configurator.jar</filename> archive
+     with the <replaceable>config.file</replaceable>. The <filename>sampleconfiguration</filename>
+     file provided with the tool is set up with the format for the <filename>config.file</filename>,
+     and it must be adapted for your environment.</para>
      <para>Install this from <filename><?eval ${ssoconfigZipFile}?></filename>.</para>
     </listitem>
    </varlistentry>
    <varlistentry>
     <term><command>ssoadm</command></term>
     <listitem>
-     <para>This tool provides a rich command-line interface for configuration
+     <para>This tool provides a rich command-line interface for the configuration
      of OpenAM core services.</para>
      <para>In a test environment you can activate
      <filename>ssoadm.jsp</filename> to access the same functionality in your
-     browser. To access many features of the <command>ssoadm</command>
-     command through the OpenAM console, visit the
-     <filename>ssoadm.jsp</filename> page in your browser after activating it
-     when you installed OpenAM, for example
+     browser. Once active, you can use many features of the <command>ssoadm</command>
+     command, by navigating to the <filename>ssoadm.jsp</filename> URI, in a URL such as
      <literal>http://openam.example.com:8080/openam/ssoadm.jsp</literal>.</para>
      <para>Install this from <filename><?eval ${ssoadminZipFile}?></filename>.</para>
      <para>To translate settings applied in OpenAM console to service attributes
      for use with <command>ssoadm</command>, login to the OpenAM console
-     as <literal>amadmin</literal> and access the services page, such as
+     as <literal>amadmin</literal> and access the services page, in a URL such as
      <literal>http://openam.example.com:8080/openam/services.jsp</literal>.</para>
     </listitem>
    </varlistentry>
@@ -220,13 +214,13 @@ http://server2.example.com:8080/openam"</programlisting>
     <para>Login as OpenAM administrator, <literal>amadmin</literal>.</para>
    </step>
    <step>
-    <para>Click Configuration &gt; Servers and Sites tabs, then in the
-    Servers list, click the link to configure your server.</para>
+    <para>Click Configuration &gt; Servers and Sites &gt;
+    Servers &gt; <replaceable>URL of your server</replaceable>.</para>
    </step>
    <step>
-    <para>Click the Advanced tab to display the Advanced Properties table,
-    and then click Add to include the property that enables
-    <command>ssoadm.jsp</command> before saving your change.</para>
+    <para>Click Advanced to display the Advanced Properties table,
+    and then click Add. In the text boxes that appear, include the following
+    information, and then click Save.</para>
     <variablelist>
      <varlistentry>
       <term>Property Name</term>
@@ -239,11 +233,9 @@ http://server2.example.com:8080/openam"</programlisting>
     </variablelist>
    </step>
    <step>
-    <para>Browse to <command>ssoadm.jsp</command> to check that it is
-    enabled.</para>
-    <para>The URL is something like
-    <literal>http://openam.example.com:8080/openam/ssoadm.jsp</literal>,
-    depending on your installation.</para>
+    <para>To see if the change worked, navigate to the URL of OpenAM with the
+    <literal>/ssoadm.jsp</literal> URI. For the aforementioned URL, you would
+    navigate to <literal>http://openam.example.com:8080/openam/ssoadm.jsp</literal>.</para>
    </step>
   </procedure>
  </section>

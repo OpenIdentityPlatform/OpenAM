@@ -28,8 +28,7 @@
  version='5.0' xml:lang='en'
  xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance'
  xsi:schemaLocation='http://docbook.org/ns/docbook http://docbook.org/xml/5.0/xsd/docbook.xsd'
- xmlns:xlink='http://www.w3.org/1999/xlink'
- xmlns:xinclude='http://www.w3.org/2001/XInclude'>
+ xmlns:xlink='http://www.w3.org/1999/xlink'>
  <title>Configuring Realms</title>
  
  <indexterm><primary>Realms</primary></indexterm>
@@ -84,7 +83,7 @@
    the New Realm page, where you configure the realm.</para>
    <para>If you configure the realm to be inactive, then users cannot use
    it to authenticate or be granted access to protected resources.</para>
-   <para>Realm/DNS aliases must be meaningful in DNS terms, such as
+   <para>Realm/DNS aliases must follow standard FQDN conventions, such as
    <literal>hr.example.com</literal> or
    <literal>pay.example.com</literal>.</para>
   </step>
@@ -257,7 +256,7 @@
   
   <step>
    <para>In the OpenAM console, browse to Access Control &gt;
-   <replaceable>Realm Name</replaceable> &gt; Data Store.</para>
+   <replaceable>Realm Name</replaceable> &gt; Data Stores.</para>
   </step>
   <step>
    <para>Click New... in the Data Stores table to create a data store
