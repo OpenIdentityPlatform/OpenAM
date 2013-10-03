@@ -1,4 +1,4 @@
-document.write("[<a href=\"http://download.forgerock.org/downloads/openam/openam-distribution-kit-@BUILD_VERSION@_@ZIPNAME@.zip\">Nightly Build</a>]");
-document.write("[<a href=\"http://download.forgerock.org/downloads/openam/openam-distribution-kit-@BUILD_VERSION@_@ZIPNAME@.zip.sha\">SHA</a>]");
-document.write("[<a href=\"http://download.forgerock.org/downloads/openam/openam-server-@BUILD_VERSION@_@BUILD_DATE@.war\">WAR</a>]");
-document.write("[<a href=\"http://download.forgerock.org/downloads/openam/openam-distribution-ssoAdminTools-@BUILD_VERSION@_@BUILD_DATE@.zip\">TOOLS</a>]");
+document.write("[<a href=\"http://download.forgerock.org/downloads/openam/OpenAM-@BUILD_VERSION@_@ZIPNAME@.zip\">Nightly Build</a>]");
+document.write("[<a href=\"http://download.forgerock.org/downloads/openam/OpenAM-@BUILD_VERSION@_@ZIPNAME@.zip.sha\">SHA</a>]");
+document.write("[<a href=\"http://download.forgerock.org/downloads/openam/OpenAM-@BUILD_VERSION@_@BUILD_DATE@.war\">WAR</a>]");
+document.write("[<a href=\"http://download.forgerock.org/downloads/openam/SSOAdminTools-@BUILD_VERSION@_@BUILD_DATE@.zip\">TOOLS</a>]");
