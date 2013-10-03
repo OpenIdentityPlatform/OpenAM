@@ -77,4 +77,4 @@ span.TskPgeTskRghtBrdr {display: block; position: absolute; height: 100%; right:
 /*---*/
 
 
-img[name="Home.mhCommon.ProdName"] {width: auto;height: auto;}
+img[name*="mhCommon.ProdName"] {width: auto;height: auto;}
