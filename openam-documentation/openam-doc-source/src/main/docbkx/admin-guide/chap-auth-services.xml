@@ -28,8 +28,7 @@
  version='5.0' xml:lang='en'
  xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance'
  xsi:schemaLocation='http://docbook.org/ns/docbook http://docbook.org/xml/5.0/xsd/docbook.xsd'
- xmlns:xlink='http://www.w3.org/1999/xlink'
- xmlns:xinclude='http://www.w3.org/2001/XInclude'>
+ xmlns:xlink='http://www.w3.org/1999/xlink'>
  <title>Defining Authentication Services</title>
  
  <para>An <firstterm>authentication</firstterm> service confirms the identity
@@ -54,32 +53,27 @@
   handles access management at the airport.</para>
   
   <para>OpenAM is most frequently used to protect web-accessible resources.
-  Users browse to a protected web application page. Rather than have the
-  web application manage user access itself, an agent in the server where the
-  web application runs redirects the user to OpenAM for access management.
+  Users browse to a protected web application page. An agent installed on the
+  server with the web application redirects the user to OpenAM for access management.
   OpenAM determines who the user is, and whether the user has the right to
   access the protected page. OpenAM then redirects the user back to the
-  protected page, this time with authorization that the agent can check.
-  The agent enforces the authorization from OpenAM, letting through the user
-  with the right to access the page. Thus, OpenAM handles access management
-  to web resources.</para>
+  protected page, with authorization credentials that can be verified by the agent.
+  The agent allows OpenAM authorized users access the page.</para>
   
   <para>Notice that OpenAM basically needs to determine two things for
-  access management: who the user is; whether the user has access to the
-  protected page. <firstterm>Authentication</firstterm> is the term meaning
-  the determination of who a user is. This chapter covers how to set up the
-  authentication process. <firstterm>Authorization</firstterm> is the term
-  meaning determination whether a user has access to a protected resource.
-  Authorization is covered later.</para>
+  access management: the identity of the user, and whether the user has access rights
+  to the protected page. <firstterm>Authentication</firstterm> is how OpenAM identifies
+  the user. This chapter covers how to set up the
+  authentication process. <firstterm>Authorization</firstterm> is how OpenAM determines
+  whether a user has access to a protected resource. Authorization is covered later.</para>
   
-  <para>To process authentication, OpenAM obtains credentials from the user or
-  client application authenticating, based on the mechanisms defined to
-  validate credentials and complete the authentication. In other words, how a
-  user authenticates differs depending on the situation. Passengers for
-  international flights authenticate with passports and visas. Passengers for
-  domestic flights might authenticate with an identity card or a driver's
-  license. Customers withdrawing cash from an ATM authenticate with a
-  card and a PIN. </para>
+  <para>For authentication, OpenAM uses credentials from the user or
+  client application. It then uses defined mechanisms to
+  validate credentials and complete the authentication. The authentication
+  methods can vary. For example, passengers travelling on international flights authenticate
+  with passports and visas. In contrast, passengers travelling on domestic flights might
+  authenticate with an identity card or a driver's license. Customers withdrawing
+  cash from an ATM authenticate with a card and a PIN. </para>
   
   <indexterm>
    <primary>Authentication</primary>
@@ -89,18 +83,18 @@
    <primary>Authentication</primary>
    <secondary>Chains</secondary>
   </indexterm>
-  <para>As the authentication process depends on the situation, OpenAM allows
-  you to configure authentication processes and then configure how they are
-  applied depending on the situation. OpenAM uses <firstterm>authentication
+  <para>OpenAM allows you to configure authentication processes and then customize
+  how they are applied. OpenAM uses <firstterm>authentication
   modules</firstterm> to handle different ways of authenticating. Basically,
   each authentication module handles one way of obtaining and verifying
-  credentials. When a single set of credentials is not enough, or alternate
-  sets of credentials can be used, you can choose to chain modules together.
+  credentials. You can chain different authentication modules together.
   In OpenAM, this is called <firstterm>authentication chaining</firstterm>.
-  When you chain authentication modules, you can configure each module as
-  required, optional, requisite, or sufficient.<footnote><para>The four terms,
-  required, optional, requisite, and sufficient, come from JAAS, the Java
-  standard for authentication and authorization.</para></footnote></para>
+  Each authentication module can be configured to specify the continuation and
+  failure semantics with one of the following four flags:
+  required, optional, requisite, or sufficient.<footnote>
+  <para>The four flags, required, optional, requisite, and sufficient, come from
+  the standards created for the Java Authentication and Authorization Service
+  (JAAS).</para></footnote></para>
   
   <itemizedlist>
    <listitem>
@@ -180,19 +174,18 @@
    </listitem>
   </orderedlist>
   
-  <para>Individual module configuration depends completely on what the module
-  does. Configuring the module that connects to Active Directory over LDAP to
-  authenticate a user using user name and password requires connection
-  information and details about where to search for users, whereas configuring
-  the HOTP module for OTP authentication requires information
-  about the password length and the mail server or SMS gateway for sending the
-  password during authentication.</para>
+  <para>The configuration of individual modules depend on its function.
+  The configuration of an Active Directory over LDAP user authentication module
+  requires connection information and details about where to search for users.
+  In contrast, the configuration of the HOTP module for OTP authentication
+  requires data about the password length and the mail server or SMS gateway for
+  to send the password during authentication.</para>
     
   <section xml:id="ad-module-conf-hints">
    <title>Hints For the Active Directory Authentication Module</title>
    <para>OpenAM connects to Active Directory over Lightweight Directory Access
    Protocol (LDAP). OpenAM provides separate Active Directory and LDAP
-   modules to make it easier for you to use both Active Directory and also
+   modules to support the use of both Active Directory and
    another directory service in an authentication chain.</para>
    <indexterm>
     <primary>Authentication</primary>
@@ -259,9 +252,10 @@
      </listitem>
     </varlistentry>
     <varlistentry>
-     <term>Attributes Used to Search for a User to be Authenticated</term>
-     <term>User Search Filter</term>
-     <term>Search Scope</term>
+        <term>Attributes Used to Retrieve User Profile</term>
+        <term>Attributes Used to Search for a User to be Authenticated</term>
+        <term>User Search Filter</term>
+        <term>Search Scope</term>
      <listitem>
       <para>LDAP searches for user entries return entries with attribute
       values matching the filter you provide. For example if you search under
@@ -933,7 +927,7 @@
     <varlistentry>
      <term>Case Sensitive User IDs</term>
      <listitem>
-      <para>Whether case matters for anonymous user IDs.</para>
+      <para>Determines whether case matters for anonymous user IDs.</para>
       <para><command>ssoadm</command> attribute:
       <literal>iplanet-am-auth-anonymous-case-sensitive</literal></para>
      </listitem>
@@ -1040,6 +1034,22 @@
      </listitem>
     </varlistentry>
     <varlistentry>
+           <term>Cache CRLs in Memory</term>
+           <listitem>
+               <para>When enabled, CRLs will be cached.</para>
+               <para><command>ssoadm</command> attribute:
+                   <literal>openam-am-auth-cert-attr-cache-crl</literal></para>
+           </listitem>
+    </varlistentry>
+    <varlistentry>
+           <term>Update CA CRLs from CRLDistributionPoint</term>
+           <listitem>
+               <para>When enabled, OpenAM updates CRLs from the LDAP directory store.</para>
+               <para><command>ssoadm</command> attribute:
+                   <literal>openam-am-auth-cert-update-crl</literal></para>
+           </listitem>
+    </varlistentry>
+    <varlistentry>
      <term>OCSP Validation</term>
      <listitem>
       <para>Enable this to use Online Certificate Status Protocol (OCSP)
@@ -1055,9 +1065,9 @@
     <varlistentry>
      <term>LDAP Server Where Certificates are Stored</term>
      <listitem>
-      <para>The default port for LDAP is 389. If you are connecting to the
-      directory service over SSL, the default port for LDAP/SSL is 636.
-      When a secure connection, scroll down to enable Use SSL/TLS for LDAP
+      <para>Identifies the LDAP server with certificates. Remember to specify URLs
+      with appropriate port numbers (389 for unencrypted LDAP, 636 for LDAP over SSL).
+      When configuring a secure connection, scroll down to enable Use SSL/TLS for LDAP
       Access.</para>
       <para><command>ssoadm</command> attribute:
       <literal>iplanet-am-auth-cert-ldap-provider-url</literal></para>
@@ -1156,7 +1166,7 @@
 
   <section xml:id="core-module-conf-hints">
    <title>Hints For the Core Authentication Module</title>
-   <para>The Core module is a sort of meta-module.</para>
+   <para>The Core module is a meta-module.</para>
    <para>The Core module lets you set up the list of modules available,
    and specify what types of client applications can authenticate with which
    modules. It also lets you configure connection pools for access to
@@ -1167,74 +1177,58 @@
     <primary>Authentication</primary>
     <secondary>Core</secondary>
    </indexterm>
+
+      <!-- Relatively major changes here, definitions taken from elsewhere in the doc -->
    
       <itemizedlist>
-      <para>The Core Authentication module has two configurable screens:</para>
-       <listitem>
-        <para><xref linkend="auth-core-main-page" /></para>
-       </listitem>
-       <listitem>
-        <para><xref linkend="auth-all-core" /></para>
-       </listitem>
+      <para>The Core Authentication module is divided into five sections:</para>
+          <listitem>
+              <para><xref linkend="auth-core-global" /></para>
+          </listitem>
+          <listitem>
+              <para><xref linkend="auth-core-realm-attributes" /></para>
+          </listitem>
+          <listitem>
+              <para><xref linkend="auth-core-persistent-cookie" /></para>
+          </listitem>
+          <listitem>
+              <para><xref linkend="auth-core-account-lockout" /></para>
+          </listitem>
+          <listitem>
+              <para><xref linkend="auth-core-general" /></para>
+          </listitem>
+          <listitem>
+              <para><xref linkend="auth-core-security" /></para>
+          </listitem>
+          <listitem>
+              <para><xref linkend="auth-core-post-auth" /></para>
+          </listitem>
       </itemizedlist>
 
    
    <para><command>ssoadm</command> service name:
    <literal>iPlanetAMAuthService</literal></para>
-   
-   <variablelist xml:id="auth-core-main-page">
-    <title>Core - Authentication Main Page</title>
-    <para>This section of the Core Authentication module is on the main authentication 
-    page before the Module Instances Table.</para>
-    <varlistentry>
-     <term>Organization Authentication Configuration</term>
-     <listitem>
-      <para>Defines the default authentication chain used by the realm's users.
-      The authentication chain must first be created before it is displayed as
-      an option in this attribute's drop down list. Default: ldapService</para>
-      <para><command>ssoadm</command> attribute:
-      <literal>iplanet-am-auth-org-config</literal></para>
-     </listitem>
-    </varlistentry>
-    <varlistentry>
-     <term>Administrator Authentication Configuration</term>
-     <listitem>
-      <para>Defines the authentication chain used by administrators when the
-      process needs to be different from the authentication chain defined
-      for end users. The authentication chain must first be created before
-      it is displayed as an option in this attribute's drop down list.
-      Default: ldapService</para>
-      <para><command>ssoadm</command> attribute:
-      <literal>iplanet-am-auth-admin-auth-module</literal></para>
-     </listitem>
-    </varlistentry>
-    <varlistentry>
-     <term>Organization Authentication Keystore Alias</term>
-     <listitem>
-      <para>Defines the alias for public and private keys used in the Keystore for 
-      RESTful authentication. Default: test</para>
-      <para><command>ssoadm</command> attribute:
-      <literal>iplanet-am-auth-key-alias</literal></para>
-     </listitem>
-    </varlistentry>
-    <varlistentry>
-     <term>Default Success Login URL</term>
-     <listitem>
-      <para>Accepts a list of values that specifies where users are directed
-      after successful authentication. The format of this attribute is
-      <literal><replaceable>client-type</replaceable>|<replaceable>URL</replaceable></literal>
-      although the only value you can specify at this time is a URL
-      which assumes the type HTML. The default value is
-      <literal>/openam/console</literal>. Values that do not specify HTTP have
-      that appended to the deployment URI.</para>
-      <para><command>ssoadm</command> attribute:
-      <literal>iplanet-am-auth-login-success-url</literal></para>
-     </listitem>
-    </varlistentry>
-   </variablelist>
-    
-   <variablelist xml:id="auth-all-core">
-    <title>Core - All Core Settings Page</title>
+
+    <section xml:id="auth-core-global">
+        <title>Core - Global Attributes</title>
+
+        <para>The Global Attributes includes the list of available modules, LDAP connection
+            settings, authentication process options, and an option to make the XUI the
+            default interface. The Global Attributes are defined in the
+            <link xlink:href="reference#authentication-configuration" xlink:show="new"
+                  xlink:role="http://docbook.org/xlink/role/olink">
+                <citetitle>Authentication Configuration</citetitle></link> section of the
+            OpenAM Reference Guide.</para>
+        <!-- This was the only way I could keep the other variablelist's from errors -->
+
+        <!-- New "XUI Interface" option added to that section of the Reference Guide -->
+    </section>
+
+    <section xml:id="auth-core-realm-attributes">
+    <title>Core - Realm Attributes</title>
+    <para>This section of the Core Authentication module is on the Realm Attributes section
+    page before options for Persistent Cookies.</para>
+    <variablelist>
     <varlistentry>
     <term><emphasis>User Profile</emphasis></term>
      <term>User Profile</term>
@@ -1309,8 +1303,16 @@
       <literal>iplanet-am-auth-alias-attr-name</literal></para>
      </listitem>
     </varlistentry>
+
+    </variablelist>
+    </section>
+
+    <section xml:id="auth-core-persistent-cookie">
+          <title>Core - Persistent Cookie</title>
+          <para>This section of the Core Authentication module covers the Persistent Cookie section.</para>
+
+    <variablelist>
     <varlistentry>
-    <term><emphasis>Persistent Cookie</emphasis></term>
      <term>Persistent Cookie Mode</term>
      <listitem>
       <para>Determines whether users can return to their authenticated session
@@ -1339,7 +1341,25 @@
      </listitem>
     </varlistentry>
     <varlistentry>
-    <term><emphasis>Account Lockout</emphasis></term>
+      <term>Persistent Cookie Authentication Level</term>
+        <listitem>
+          <para>Sets the authentication level used to indicate the level of security
+          associated with the module. The value can range from 0 to any positive integer.</para>
+          <para><command>ssoadm</command> attribute:
+          <literal>openam-auth-pcookie-auth-level</literal></para>
+        </listitem>
+    </varlistentry>
+
+    </variablelist>
+    </section>
+
+    <section xml:id="auth-core-account-lockout">
+          <title>Core - Account Lockout</title>
+          <para>This section of the Core Authentication module
+          includes details on how account lockouts can be configured.</para>
+
+    <variablelist>
+    <varlistentry>
      <term>Login Failure Lockout Mode</term>
      <listitem>
       <para>Selecting this attribute enables a physical lockout. Physical
@@ -1469,8 +1489,16 @@
       <literal>sunStoreInvalidAttemptsInDS</literal></para>
      </listitem>
     </varlistentry>
+
+    </variablelist>
+    </section>
+
+    <section xml:id="auth-core-general">
+          <title>Core - General</title>
+          <para>This section of the Core Authentication module includes general options.</para>
+
+    <variablelist>
     <varlistentry>
-    <term><emphasis>General</emphasis></term>
      <term>Default Authentication Locale</term>
      <listitem>
       <para>Specifies the default language subtype to be used by the
@@ -1550,8 +1578,17 @@
       <literal>iplanet-am-auth-default-auth-level</literal></para>
      </listitem>
     </varlistentry>
+
+    </variablelist>
+    </section>
+
+    <section xml:id="auth-core-security">
+          <title>Core - Security</title>
+          <para>This section of the Core Authentication module
+              includes basic security options.</para>
+
+    <variablelist>
     <varlistentry>
-    <term><emphasis>Security</emphasis></term>
      <term>Module Based Authentication</term>
      <listitem>
       <para>Enables users to authenticate using module-based authentication.
@@ -1584,8 +1621,17 @@
       <literal>openam.auth.zero.page.login.enabled</literal></para>
      </listitem>
     </varlistentry>
+
+    </variablelist>
+    </section>
+
+    <section xml:id="auth-core-post-auth">
+          <title>Core - Post Authentication Processing</title>
+          <para>This section of the Core Authentication module
+              specifies options for post authentication processing.</para>
+
+    <variablelist>
     <varlistentry>
-    <term><emphasis>Post Authentication Processing</emphasis></term>
      <term>Default Success Login URL</term>
      <listitem>
       <para>Accepts a list of values that specifies where users are directed
@@ -1682,6 +1728,7 @@
      </listitem>
     </varlistentry>
    </variablelist>
+   </section>
 
   </section>
   
@@ -1721,9 +1768,22 @@
     <section xml:id="device-print-auth-module-conf-hints">
         <title>Hints For the Device Print Authentication Module</title>
         <para>The Device Print module is a device fingerprinter. It supports the risk-based identification
-        of the variety of devices used to connect to SPs. This module does not stand on its own, as it
-        uses authentication information from a service to validate a username. The Device Print module then
-        validates other characteristics of the user's system.</para>
+        of different devices through the variety of browsers used to connect to SPs. This module does not
+        stand on its own, as it uses authentication information from a service to validate a username.
+        The Device Print module then validates other characteristics of the user's system.</para>
+
+        <para>If no device print profile is stored for a user, then the user is prompted to fill in an
+        HMAC One-Time Password (HOTP),
+        sent by email or text. The user can then save that device print profile. On subsequent requests
+        the user's device profile is recalled. Each of the device print attributes from the client
+        are compared against each of the stored attributes. If the differences exceed a configured
+        number of penalty points, the user is asked for another HOTP.</para>
+
+        <!-- change here addresses OPENAM-3058, OPENAM-3069 -->
+
+        <para>If you know the HOTP module, some of the attributes in this section may seem familiar. That
+        is intentional, as the Device Print module includes all HOTP attributes, though not in the same
+        order.</para>
 
         <note><para>The following example
         assumes that the Device Print module comes after LDAP authentication. Alternatively, you could
@@ -2354,7 +2414,8 @@
     <varlistentry>
      <term>Backend Module Name</term>
      <listitem>
-      <para>Specifies the module that checks the user credentials.</para>
+      <para>Specifies the module that checks the user credentials. The credentials are
+      then supplied to either a Data Store or other identity repository module for authentication.</para>
       <para><command>ssoadm</command> attribute:
       <literal>iplanet-am-auth-http-basic-module-configured</literal></para>
      </listitem>
@@ -2520,8 +2581,6 @@
       identifies the directory server.</para>
       <para>When authenticating users from a directory service that is remote
       from OpenAM, set both the primary and secondary server values.</para>
-      <para>The default port for LDAP is 389. If you are connecting to
-      the directory over SSL, the default port for LDAP/SSL is 636.</para>
       <para>If you want to use SSL or TLS for security, then scroll down to
       enable SSL/TLS Access to LDAP Server. Make sure that OpenAM
       can trust the servers' certificates when using this option.</para>
@@ -2566,8 +2625,9 @@
      </listitem>
     </varlistentry>
     <varlistentry>
-     <term>Attributes Used to Search for a User to be Authenticated</term>
-     <term>User Search Filter</term>
+        <term>Attributes Used to Retrieve User Profile</term>
+        <term>Attributes Used to Search for a User to be Authenticated</term>
+        <term>User Search Filter</term>
      <term>Search Scope</term>
      <listitem>
       <para>LDAP searches for user entries return entries with attribute
@@ -2791,7 +2851,7 @@
      <listitem>
       <para>Specifies a list of IP addresses of trusted clients that can access
       MSIDSN modules. Either restrict the clients allowed to access the MSISDN
-      module by add each IPv4 or IPv6 address here, or leave the list empty to allow
+      module by adding each IPv4 or IPv6 address here, or leave the list empty to allow
       all clients to access the module. If you specify the value
       <literal>none</literal>, no clients are allowed access.</para>
       <para><command>ssoadm</command> attribute:
@@ -2813,8 +2873,6 @@
     <varlistentry>
      <term>LDAP Server and Port</term>
      <listitem>
-      <para>The default port for LDAP is 389. If you are connecting to
-      the directory over SSL, the default port for LDAP/SSL is 636.</para>
       <para>If you want to use SSL or TLS for security, then scroll down to
       enable SSL/TLS Access to LDAP. Make sure that OpenAM can trust the
       servers' certificates when using this option.</para>
@@ -2862,7 +2920,7 @@
     <varlistentry>
      <term>SSL/TLS for LDAP Access</term>
      <listitem>
-      <para>If you choose to use SSL or TLS for security, then make sure that
+      <para>If you choose to enable SSL or TLS, then make sure that
       OpenAM can trust the servers' certificates.</para>
       <para><command>ssoadm</command> attribute:
       <literal>sunAMAuthMSISDNUseSsl</literal></para>
@@ -2947,9 +3005,9 @@
       user may be further in the counter on their device than on their account. OpenAM will resynchronize
       the counter when the user finally logs in. To accommodate this, you set the number of 
       passwords a user can generate before their device cannot be resynchronized. For example, if 
-      you set the number of HOTP Window Size to 50 and a two-year old presses the button 30 on the
+      you set the number of HOTP Window Size to 50 and someone presses the button 30 on the
       user's device to generate a new OTP, the counter in OpenAM will review the OTPs until
-      it reaches the OTP entered by the user. If the two-year old presses the button 51 times,
+      it reaches the OTP entered by the user. If someone presses the button 51 times,
       you will need to reset the counter to match the number on the device's counter before the
       user can login to OpenAM. HOTP authentication does not check earlier passwords, so if the 
       user attempts to reset the counter on their device, they will not be able to login until
@@ -3575,6 +3633,41 @@
 -->
   </section>
 
+  <section xml:id="persistent-cookie">
+      <title>Hints for the Persistent Cookie Module</title>
+      <para>The Persistent Cookie module supports configuration of cookie lifetimes, based
+      on requests and a maximum time.</para>
+
+      <indexterm>
+          <primary>Cookie</primary>
+          <secondary>Persistent</secondary>
+      </indexterm>
+
+      <para><command>ssoadm</command> service name:
+      <literal>iPlanetAMAuthPersistentCookieService</literal></para>
+
+      <variablelist>
+          <varlistentry>
+              <term>Idle Timeout</term>
+              <listitem>
+                  <para>Specify the maximum idle time between requests, in hours. If
+                  that time is exceeded, the cookie is no longer valid.</para>
+                  <para><command>ssoadm</command> attribute:
+                  <literal>openam-auth-persistent-cookie-idle-time</literal></para>
+              </listitem>
+          </varlistentry>
+          <varlistentry>
+              <term>Max Life</term>
+              <listitem>
+                  <para>Specify the maximum life of the cookie in hours.</para>
+                  <para><command>ssoadm</command> attribute:
+                  <literal>openam-auth-persistent-cookie-max-life</literal></para>
+              </listitem>
+          </varlistentry>
+      </variablelist>
+
+  </section>
+
   <section xml:id="radius-module-conf-hints">
    <title>Hints For the RADIUS Authentication Module</title>
    <para>The Remote Authentication Dial-In User Service (RADIUS) module lets
@@ -3709,23 +3802,6 @@
       <para><command>ssoadm</command> attribute:
      <literal>iplanet-am-auth-securid-auth-level</literal></para></listitem>
     </varlistentry>
-    <varlistentry>
-           <term>Helper Authentication Port</term>
-           <listitem>
-               <para>Configures the module to listen for authentication requests; the default port
-                   number is 57943.</para>
-               <para><command>ssoadm</command> attribute:
-                   <literal>iplanet-am-auth-securid-helper-port</literal></para></listitem>
-     </varlistentry>
-     <varlistentry>
-           <term>Helper Configuration Port</term>
-           <listitem>
-               <para>Configures the module to listen for information associated with the
-                   Helper Authentication Port. The default port
-                   number is 58943.</para>
-               <para><command>ssoadm</command> attribute:
-                   <literal>iplanet-am-auth-securid-config-port</literal></para></listitem>
-     </varlistentry>
    </variablelist>
   </section>
   
@@ -3994,7 +4070,7 @@
     modules to use in the chain.</para>
    </step>
    <step>
-    <para>Assign at least criteria (optional, required, requisite, sufficient)
+    <para>Assign appropriate criteria (optional, required, requisite, sufficient)
     as described above in <xref linkend="what-is-authn" />. You can also
     configure where OpenAM redirects the user upon successful and failed
     authentication, and plug in your post-authentication processing classes
@@ -4104,10 +4180,10 @@
   request header to the protected application.</para>
 
   <para>In the OpenAM console, you add post authentication plugins to an
-  authentication chain by adding their class names to the Post Authentication
-  Processing Class list under Access Control &gt; <replaceable>Realm
+  authentication chain. Navigate to Access Control &gt; <replaceable>Realm
   Name</replaceable> &gt; Authentication &gt; Authentication Chaining &gt;
-  <replaceable>Auth Chain Name</replaceable>.</para>
+  <replaceable>Auth Chain Name</replaceable>. Scroll down to the Post Authentication
+  Processing Class list.</para>
 
   <variablelist>
    <title>Standard Post Authentication Plugins</title>
@@ -4402,8 +4478,8 @@
    </listitem>
    <listitem>
     <para>You can set up email notification upon lockout to an administrator
-    if OpenAM is configured to send mail. (Servers and Sites &gt; <replaceable
-    >Server Name</replaceable> &gt; General &gt; Mail Server.)</para>
+    if OpenAM is configured to send mail. (Configuration &gt; Servers and Sites &gt;
+    Default Server Settings &gt; General &gt; Mail Server.)</para>
    </listitem>
    <listitem>
     <para>For persistent lockout, OpenAM sets the value of the user's
