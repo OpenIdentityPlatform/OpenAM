@@ -764,6 +764,14 @@ CookieWriterServlet.doGetPost: Redirect to
      <listitem>
       <para>Specifies aliases for certificates in the OpenAM key store that are
       used to handle digital signatures, and to handle encrypted messages.</para>
+
+      <para>Specify a Key Pass if the private key password is different from
+      the key store password, which is stored encrypted in the
+      <filename>.keypass</filename> file for the server. For instructions
+      on working with key pairs, also see <link xlink:show="new"
+      xlink:href="admin-guide#change-signing-key"
+      xlink:role="http://docbook.org/xlink/role/olink"><citetitle>To Change the
+      Signing Key for Federation</citetitle></link>.</para>
      </listitem>
     </varlistentry>
    </variablelist>
