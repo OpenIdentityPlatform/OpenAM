@@ -878,6 +878,21 @@ CookieWriterServlet.doGetPost: Redirect to
      <listitem>
       <para>Maps SAML attributes to user profile attributes.</para>
 
+      <para>The user profile attributes used here must both be allowed in user
+      profiles, and also be specified for the identity repository. See the
+      <citetitle>Developer's Guide</citetitle> chapter, <link xlink:show="new"
+      xlink:href="dev-guide#chap-custom-attr"
+      xlink:role="http://docbook.org/xlink/role/olink"><citetitle>Customizing
+      Profile Attributes</citetitle></link>, for instructions on allowing
+      additional attributes in user profiles.</para>
+
+      <para>To specify the list of profile attributes for an LDAP identity
+      repository, login to OpenAM Console as administrator and browse to
+      Access Control > <replaceable>Realm Name</replaceable> > Data Stores, and
+      click the data store name to open the configuration page. Scroll down to
+      User Configuration, and edit the LDAP User Attributes list, and then
+      click Save to keep your work.</para>
+
       <para>The default IDP mapping implementation allows you to add static values
       in addition to values taken from the user profile. You add a static value
       by enclosing the profile attribute name in double quotes
