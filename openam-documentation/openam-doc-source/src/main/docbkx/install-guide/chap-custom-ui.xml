@@ -366,6 +366,11 @@ default/Login.jsp</programlisting>
      JavaScript-related utility functions, and a programmable LESS CSS, working
      with the OpenAM REST API.</para>
 
+     <para>Interface Stability: <link xlink:show="new"
+     xlink:href="admin-guide#interface-stability"
+     xlink:role="http://docbook.org/xlink/role/olink">Internal</link> (not supported)</para>
+     <para>XUI is not supported for production use.</para>
+
      <para>The main XUI configuration file is based on LESS CSS; for more
      information, see <link xlink:show="new" xlink:href="http://lesscss.org/"
      ><citetitle>LESS, the Dynamic Stylesheet Language</citetitle></link>.
