@@ -37,7 +37,12 @@
     file. When OpenAM is installed, this file can be found in the <filename>/path/to/webapps/XUI</filename>
     directory.</para>
 
-    <!-- Placeholder for the definition of X in XUI -->
+    <para>Interface Stability: <link xlink:show="new"
+    xlink:href="admin-guide#interface-stability"
+    xlink:role="http://docbook.org/xlink/role/olink">Internal</link></para>
+    <para>XUI is not supported for production use.</para>
+
+ <!-- Placeholder for the definition of X in XUI -->
 
     <para>The following table depicts the parameters found in this file. All color codes are standard
     CSS Hex colors. If there is more than one theme, they may inherit parameters from the
