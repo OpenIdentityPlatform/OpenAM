@@ -1767,8 +1767,8 @@
 
     <section xml:id="device-print-auth-module-conf-hints">
         <title>Hints For the Device Print Authentication Module</title>
-        <para>The Device Print module is a device fingerprinter. It supports the risk-based identification
-        of different devices through the variety of browsers used to connect to SPs. This module does not
+        <para>The Device Print module is a device fingerprinter. It collects information about client
+        device locations, fonts, plugins, and more through their browsers. This module does not
         stand on its own, as it uses authentication information from a service to validate a username.
         The Device Print module then validates other characteristics of the user's system.</para>
 
