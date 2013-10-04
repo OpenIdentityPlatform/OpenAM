@@ -616,9 +616,9 @@ tr.TreWhtSelRow td {background-color:#CBDCAF}
 .VrsTxt {color:#000;margin:0px 25px 10px}
 .VrsBtnAryDiv {text-align:right;margin:20px 15px 0px 0px}
  /* New Styles */
-.VrsMstBdy {background-color:#FFF;background-image:url(../images/version/version_brand.jpg);background-repeat:no-repeat}
+.VrsMstBdy {background-color:#FFF;background-image:none;background-repeat:no-repeat}
 .VrsBtnBdy {background-color:#D4DCE1}
-.VrsPrdDiv {padding:30px 0px 0px 195px}
+.VrsPrdDiv {padding:25px 0px 0px 20px}
 .VrsLgoTd {text-align:right;vertical-align:top;padding:5px 10px 0px 10px}
 .VrsPrdTd {vertical-align:top}
 /* Archived Version Styles */
