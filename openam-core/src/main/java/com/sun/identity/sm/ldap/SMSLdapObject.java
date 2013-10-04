@@ -27,7 +27,7 @@
  */
 
 /*
- * Portions Copyrighted [2011] [ForgeRock AS]
+ * Portions Copyrighted [2011-2013] [ForgeRock AS]
  */
 package com.sun.identity.sm.ldap;
 
@@ -755,7 +755,7 @@ public class SMSLdapObject extends SMSObjectDB implements SMSObjectListener {
             SMSEntry.ATTR_XML_KEYVAL };
         LDAPConnection conn = null;
         LDAPSearchRequest request = LDAPRequestParser.parseSearchRequest(
-            getNormalizedName(token, startDN), LDAPConnection.SCOPE_ONE, filter,
+            getNormalizedName(token, startDN), LDAPConnection.SCOPE_SUB, filter,
             smsAttrs, false, timeLimit, LDAPRequestParser.DEFAULT_DEREFERENCE,
             numOfEntries);
         while (retry <= connNumRetry) {
