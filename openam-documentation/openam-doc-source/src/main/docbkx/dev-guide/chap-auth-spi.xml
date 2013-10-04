@@ -35,8 +35,12 @@
   <secondary>Custom module</secondary>
  </indexterm>
 
- <!-- Mostly purloined from Steve Ferris's work on the OpenAM wiki at
- https://wikis.forgerock.org/confluence/display/openam/Write+a+custom+authentication+module-->
+ <!--
+      Based on Steve Ferris's work on the OpenAM wiki at
+      https://wikis.forgerock.org/confluence/display/openam/Write+a+custom+authentication+module
+
+      This version uses Maven to simplify the build process for developers.
+ -->
 
  <para>This chapter shows how to customize authentication with a sample custom
  authentication module. For deployments with particular requirements not met by
@@ -52,144 +56,91 @@
   you integrate an authentication module into OpenAM such that you can
   configure the module through OpenAM console, and also localize the user
   interface.</para>
-  
-  <para>Following the mavenization of OpenAM (release OpenAM 10.1.0 and later), all
-  authentication modules are contained within their own .jar file.</para>
-  
-   <section xml:id="auth-module-structure">
-    <title>Authentication Module Structure</title>
-     <para>Before creating and building a sample authentication module, it is
-     necessary to understand how the default authentication modules are designed.</para>
-     <itemizedlist>
-     <para>The default authentication modules all have a similar structure after they
-     are built:</para>
-       <listitem>
-        <para>Module properties file - this file map localized strings to identifies 
-        used by the module.</para>
-       </listitem>
-       <listitem>
-        <para>Config directory - the module callbacks are stored in this directory, 
-        including the different xml files for the eight supported languages.</para>
-       </listitem>
-       <listitem>
-        <para>META-INF directory - the files required for the maven build are stored
-        in this directory, including pom information, index list, and the manifest file.</para>
-       </listitem>
-       <listitem>
-        <para>Domain identifies directory - the directory is named for the top level domain
-        (e.g., com, org, and net). The majority of the files providing specifics for the
-        module are stored in this directory, including the logic, principals, and service
-        configuration files.</para>
-       </listitem>
-     </itemizedlist>
 
-     <para>A similar structure should be used for the sample module, and any subsequent
-     customized modules, to make it easier to track changes and to keep the modules
-     consistent.</para>
-     
-     <para>At a minimum an OpenAM authentication module has five required components.
-     These components are covered in the next section with the corresponding Sample
-     Authentication file.</para>
-    </section>
-     
-    <section xml:id="sample-module-structure">
-     <title>Sample Authentication Module Structure</title>
-     <para>The sample authentication module is going to follow a similar design as the 
-     existing modules. Comparable directories will be designed to make it easier to 
-     locate and update the sample module should you wish to run your own tests on it.
-     If you find that you want to make similar changes to the default modules, it will
-     be easier for you to locate the files you need to change since you will already be
-     familiar with the structure.</para>
-     <para>The name for the sample authentication module is
-     <literal>SampleAuth</literal>. Notice how this name is used to form module
-     component names according to OpenAM conventions.</para>
-    
-     <para>The five required components for an authentication module are stored
-     within the different directories of the .jar file. You can expand one of the
-     default modules to get a good idea of how the .jar files are structured. The 
-     following provides the  name, purpose, and location of each of the components, 
-     as well as the name of the file for the Sample Authentication Module.</para>
-     
-     <para>When you generate the Sample Authentication Module files, create a new 
-     section under <literal>openam-authentication/openam-auth-sample/src</literal>.</para>
-      
-     <orderedlist numeration="arabic">
-      <listitem>
-       <para>The properties file for the module, which map localized strings
-       to identifiers used elsewhere in the module. When you generate the file, save it
-       under a directory <literal>main/java</literal></para>
-       <para>The Sample Authentication Module <filename>amAuthSampleAuth.properties</filename>. 
-       file contains the required information. See
-       <xref linkend="properties-sample-auth-module" /> for details on
-       the properties file.</para>
-      </listitem>
-      <listitem>
-       <para>The callbacks XML file, which describes the states of authentication
-       logic and the user input needed for each state. The callbacks XML file is 
-       stored under the domain identifier directory.</para>
-       <para>The Sample Authentication Module <filename>SampleAuth.xml</filename>
-       file contains the required information. See
-       <xref linkend="callbacks-file-sample-auth-module"/> for details on
-       the callbacks file. The section includes two example callback files with 
-       and explanation of the differences between them.</para>
-      </listitem>
-      <listitem>
-       <para>The authentication logic, which is a class that extends the
-       <literal>com.sun.identity.authentication.spi.AMLoginModule</literal>
-       class. The logic file is stored under the domain identifier directory. When
-       you generate the file, you will create a file with a .java extension, which
-       will be translated to a .class file during the build.</para>
-       <para>The Sample Authentication Module <filename>SampleAuth.java</filename> 
-       file contains the required information. See
-       <xref linkend="authentication-logic-sample-auth-module" /> for details on
-       the requirements of the file.</para>
-      </listitem>
-      <listitem>
-       <para>The principal, which is a class that implements the <literal>java.security. 
-       Principal</literal> interface. The principal file is stored under the domain
-       identifier directory. When you generate the file, you will create a file with 
-       a .java extension, which will be translated to a .class file during the build.</para>
-       <para>The Sample Authentication Module <filename>SampleAuthPrincipal.java</filename>
-       file contains the required information. See
-       <xref linkend="principal-sample-auth-module" /> for details on
-       the requirements of the file.</para>
-      </listitem>
-      <listitem>
-       <para>The service configuration XML file, which defines how the authentication 
-       module is configured in OpenAM. The file is stored under the domain identifier
-       directory.</para>
-       <para>The Sample Authentication Module <filename>amAuthSampleAuth.xml</filename>
-       file contains the required information. See
-       <xref linkend="service-conf-sample-auth-module"/> for details on
-       the requirements of the file.</para>
-      </listitem> 
-     </orderedlist>
-   </section>  
+  <variablelist>
+   <!-- Perhaps this could be stored on a ForgeRock git server at some point. -->
+   <para>The <link xlink:href="https://github.com/markcraig/openam-auth-sample"
+   xlink:show="new">sample authentication module source</link> is available
+   online. Get a local clone so that you can try the sample on your system.
+   In the sources you find the following files.</para>
+
+   <varlistentry>
+    <term><filename>pom.xml</filename></term>
+    <listitem>
+     <para>Apache Maven project file for the module</para>
+
+     <para>This file specifies how to build the sample authentication module,
+     and also specifies its dependencies on OpenAM components and on the
+     Java Servlet API.</para>
+    </listitem>
+   </varlistentry>
+
+   <varlistentry>
+    <term><filename>src/main/java/org/forgerock/openam/examples/SampleAuth.java</filename></term>
+    <listitem>
+     <para>Core class for the sample authentication module</para>
+
+     <para>This class is called by OpenAM to initialize the module and to
+     process authentication. See
+     <xref linkend="authentication-logic-sample-auth-module" /> for details.</para>
+    </listitem>
+   </varlistentry>
+
+   <varlistentry>
+    <term><filename>src/main/java/org/forgerock/openam/examples/SampleAuthPrincipal.java</filename></term>
+    <listitem>
+     <para>Class implementing <literal>java.security.Principal</literal>
+     interface that defines how to map credentials to identities</para>
+
+     <para>This class is used to process authentication. See
+     <xref linkend="principal-sample-auth-module" /> for details.</para>
+    </listitem>
+   </varlistentry>
+
+   <varlistentry>
+    <term><filename>src/main/resources/amAuthSampleAuth.properties</filename></term>
+    <listitem>
+     <para>Properties file mapping UI strings to property values</para>
+
+     <para>This file makes it easier to localize the UI. See
+     <xref linkend="properties-sample-auth-module" /> for details.</para>
+    </listitem>
+   </varlistentry>
+
+   <varlistentry>
+    <term><filename>src/main/resources/amAuthSampleAuth.xml</filename></term>
+    <listitem>
+     <para>Configuration file for the sample authentication service</para>
+
+     <para>This file is used when registering the authentication module with
+     OpenAM. See <xref linkend="service-conf-sample-auth-module"/> for details.</para>
+    </listitem>
+   </varlistentry>
+
+   <varlistentry>
+    <term><filename>src/main/resources/config/auth/default/SampleAuth.xml</filename></term>
+    <listitem>
+     <para>Callback file for OpenAM classic UI authentication pages</para>
+
+     <para>The sample authentication module does not include localized versions
+     of this file. See <xref linkend="callbacks-file-sample-auth-module"/> for
+     details.</para>
+    </listitem>
+   </varlistentry>
+  </variablelist>
  </section>
 
-    <!--
- <procedure>
-  <title>Creating a Build Area</title>
-  
-  <para>You will need to setup an area where you can generate the files and create the
-  .jar from which the module will be deployed.</para>
-  
-  <step>
-   <para></para>
-  </step>
- </procedure>
-        -->
  <section xml:id="properties-sample-auth-module">
-  <title>The Sample Auth Properties</title>
+  <title>Sample Auth Properties</title>
   
   <para>OpenAM uses a Java properties file per locale to retrieve the
-  appropriate, localized strings for the authentication module. The properties file
-  is stored in the top level directory with the other directories.</para>
+  appropriate, localized strings for the authentication module.</para>
   
   <para>The following is the Sample Authentication Module properties file,
   <filename>amAuthSampleAuth.properties</filename>.</para>
   
-  <programlisting language="java">sampleauth-service-description=Sample Authentication Module
+  <programlisting language="java"
+  >sampleauth-service-description=Sample Authentication Module
 a500=Authentication Level
 a501=Service Specific Attribute
 
@@ -202,68 +153,37 @@ sampleauth-error-2=Error 2 occurred during the authentication</programlisting>
  </section>
 
  <section xml:id="callbacks-file-sample-auth-module">
-  <title>The Sample Auth Callbacks</title>
+  <title>Sample Auth Callbacks</title>
   
-  <para>OpenAM callbacks XML files prompt the user for identity information
-  needed to process the authentication. The document type for a callback XML
-  file is described in
-  <filename><replaceable>war-file-name</replaceable>/WEB-INF/Auth_Module_Properties.dtd</filename>.</para>
-  
-  <tip>
-   <para>Callback files for built-in modules are in their respective <filename>.jar</filename>
-   files under <filename><replaceable>war-file-name</replaceable>/WEB-INF/lib/</filename>;
-   extension modules are stored in the OpenAM source tree.</para>
-  </tip>
-  
-  <example xml:id="simplified-callbacks-file">
-   <title>Simplified Callbacks File</title>
-  
-   <para>This example shows a simplified sample auth callbacks XML file without
-   error handling. The file specifies only one state (order="1"), and
-   prompts the user for two pieces of information: user name and password. All
-   strings for the user interface are hard coded into the file.</para>
-   
-   <programlisting language="xml">
-&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?&gt;
-&lt;!DOCTYPE ModuleProperties PUBLIC
- &quot;=//iPlanet//Authentication Module Properties XML Interface 1.0 DTD//EN&quot;
-        &quot;jar://com/sun/identity/authentication/Auth_Module_Properties.dtd&quot;&gt;
-
-&lt;ModuleProperties moduleName=&quot;SampleAuth&quot; version=&quot;1.0&quot; &gt;
-    &lt;Callbacks length=&quot;2&quot; order=&quot;1&quot; timeout=&quot;600&quot; header=&quot;Please Login&quot; &gt;
-        &lt;NameCallback isRequired=&quot;true&quot;&gt;
-            &lt;Prompt&gt; User Name: &lt;/Prompt&gt;
-        &lt;/NameCallback&gt;
-        &lt;PasswordCallback echoPassword=&quot;false&quot; &gt;
-            &lt;Prompt&gt; Password: &lt;/Prompt&gt;
-        &lt;/PasswordCallback&gt;
-    &lt;/Callbacks&gt;
-&lt;/ModuleProperties&gt;</programlisting>
-  </example>
+  <para>OpenAM callbacks XML files are used to build the classic UI to prompt
+  the user for identity information needed to process the authentication.
+  The document type for a callback XML file is described in
+  <filename>WEB-INF/Auth_Module_Properties.dtd</filename> where OpenAM is
+  deployed.</para>
   
   <example xml:id="full-callbacks-file">
-   <title>Full Callbacks File</title>
+   <title>Sample Auth Callbacks File</title>
    
-   <para>This example shows a full callbacks file with dynamic text and error
-   handling. Use this as your <filename>SampleAuth.xml</filename> file.</para>
+   <para>The following is the <filename>SampleAuth.xml</filename> callbacks
+   file.</para>
    
-   <programlisting language="xml">&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?&gt;
+   <programlisting language="xml">&lt;?xml version="1.0" encoding="UTF-8"?&gt;
 &lt;!DOCTYPE ModuleProperties PUBLIC
- &quot;=//iPlanet//Authentication Module Properties XML Interface 1.0 DTD//EN&quot;
-        &quot;jar://com/sun/identity/authentication/Auth_Module_Properties.dtd&quot;&gt;
+ "=//iPlanet//Authentication Module Properties XML Interface 1.0 DTD//EN"
+        "jar://com/sun/identity/authentication/Auth_Module_Properties.dtd"&gt;
 
-&lt;ModuleProperties moduleName=&quot;SampleAuth&quot; version=&quot;1.0&quot; &gt;
-    &lt;Callbacks length=&quot;0&quot; order=&quot;1&quot; timeout=&quot;600&quot; header=&quot;#NOT SHOWN#&quot; /&gt;
-    &lt;Callbacks length=&quot;2&quot; order=&quot;2&quot; timeout=&quot;600&quot; header=&quot;#TO BE SUBSTITUTED#&quot;&gt;
-        &lt;NameCallback isRequired=&quot;true&quot;&gt;
+&lt;ModuleProperties moduleName="SampleAuth" version="1.0" &gt;
+    &lt;Callbacks length="0" order="1" timeout="600" header="#NOT SHOWN#" /&gt;
+    &lt;Callbacks length="2" order="2" timeout="600" header="#TO BE SUBSTITUTED#"&gt;
+        &lt;NameCallback isRequired="true"&gt;
             &lt;Prompt&gt;#USERNAME#&lt;/Prompt&gt;
         &lt;/NameCallback&gt;
-        &lt;PasswordCallback echoPassword=&quot;false&quot; &gt;
+        &lt;PasswordCallback echoPassword="false" &gt;
             &lt;Prompt&gt;#PASSWORD#&lt;/Prompt&gt;
         &lt;/PasswordCallback&gt;
     &lt;/Callbacks&gt;
-    &lt;Callbacks length=&quot;1&quot; order=&quot;3&quot; timeout=&quot;600&quot; header=&quot;#TO BE SUBSTITUTED#&quot;
-        error=&quot;true&quot; &gt;
+    &lt;Callbacks length="1" order="3" timeout="600" header="#TO BE SUBSTITUTED#"
+        error="true" &gt;
         &lt;NameCallback&gt;
             &lt;Prompt&gt;#THE DUMMY WILL NEVER BE SHOWN#&lt;/Prompt&gt;
         &lt;/NameCallback&gt;
@@ -326,11 +246,15 @@ public Principal getPrincipal()</programlisting>
   
   <para>The implementation, <filename>SampleAuth.java</filename>, is shown
   below.</para>
-  
-  <programlisting language="java">/**
+
+  <!--
+       Using JCite would be nice here. At present the source is copy/pasted.
+  -->
+  <informalexample><?dbfo pgwide="1"?><?dbfo keep-together="auto"?>
+   <programlisting language="java">/**
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright (c) 2011 ForgeRock AS. All Rights Reserved
+ * Copyright (c) 2011-2013 ForgeRock AS. All Rights Reserved
  *
  * The contents of this file are subject to the terms
  * of the Common Development and Distribution License
@@ -352,7 +276,7 @@ public Principal getPrincipal()</programlisting>
  *
  */
 
-package com.forgerock.openam.examples;
+package org.forgerock.openam.examples;
 
 import java.security.Principal;
 import java.util.Map;
@@ -376,143 +300,147 @@ import com.sun.identity.shared.debug.Debug;
 public class SampleAuth extends AMLoginModule
 {
 
-  // Name for the debug-log
-  private final static String DEBUG_NAME = "SampleAuth";
+    // Name for the debug-log
+    private final static String DEBUG_NAME = "SampleAuth";
 
-  // Name of the resource bundle
-  private final static String amAuthSampleAuth = "amAuthSampleAuth";
+    // Name of the resource bundle
+    private final static String amAuthSampleAuth = "amAuthSampleAuth";
 
-  // User names for authentication logic
-  private final static String USERNAME = "test";
-  private final static String ERROR_1_NAME = "test1";
-  private final static String ERROR_2_NAME = "test2";
+    // User names for authentication logic
+    private final static String USERNAME = "demo";
+    private final static String ERROR_1_NAME = "test1";
+    private final static String ERROR_2_NAME = "test2";
 
-  // Orders defined in the callbacks file
-  private final static int STATE_BEGIN = 1;
-  private final static int STATE_AUTH = 2;
-  private final static int STATE_ERROR = 3;
+    // Orders defined in the callbacks file
+    private final static int STATE_BEGIN = 1;
+    private final static int STATE_AUTH = 2;
+    private final static int STATE_ERROR = 3;
 
-  private final static Debug debug = Debug.getInstance(DEBUG_NAME);
+    private final static Debug debug = Debug.getInstance(DEBUG_NAME);
 
-  private Map options;
-  private ResourceBundle bundle;
-
-
-
-  public SampleAuth()
-  {
-    super();
-  }
+    private Map options;
+    private ResourceBundle bundle;
 
 
 
-  @Override
-  // This method stores service attributes and localized properties
-  // for later use.
-  public void init(Subject subject, Map sharedState, Map options)
-  {
-    if (debug.messageEnabled())
+    public SampleAuth()
     {
-      debug.message("SampleAuth::init");
-    }
-    this.options = options;
-    bundle = amCache.getResBundle(amAuthSampleAuth, getLoginLocale());
-  }
-
-
-
-  @Override
-  public int process(Callback[] callbacks, int state) throws LoginException
-  {
-
-    if (debug.messageEnabled())
-    {
-      debug.message("SampleAuth::process state: " + state);
+        super();
     }
 
-    switch (state)
+
+
+    @Override
+    // This method stores service attributes and localized properties
+    // for later use.
+    public void init(Subject subject, Map sharedState, Map options)
+    {
+        if (debug.messageEnabled())
+        {
+            debug.message("SampleAuth::init");
+        }
+        this.options = options;
+        bundle = amCache.getResBundle(amAuthSampleAuth, getLoginLocale());
+    }
+
+
+
+    @Override
+    public int process(Callback[] callbacks, int state) throws LoginException
     {
 
-    case STATE_BEGIN:
-      // No time wasted here - simply modify the UI and
-      // proceed to next state
-      substituteUIStrings();
-      return STATE_AUTH;
+        if (debug.messageEnabled())
+        {
+            debug.message("SampleAuth::process state: " + state);
+        }
 
-    case STATE_AUTH:
-      // Get data from callbacks. Refer to callbacks XML file.
-      NameCallback nc = (NameCallback) callbacks[0];
-      PasswordCallback pc = (PasswordCallback) callbacks[1];
-      String username = nc.getName();
-      String password = new String(pc.getPassword());
+        switch (state)
+        {
 
-      // First errorstring is stored in "sampleauth-error-1" property.
-      if (username.equals(ERROR_1_NAME))
-      {
-        setErrorText("sampleauth-error-1");
-        return STATE_ERROR;
-      }
+            case STATE_BEGIN:
+                // No time wasted here - simply modify the UI and
+                // proceed to next state
+                substituteUIStrings();
+                return STATE_AUTH;
 
-      // Second errorstring is stored in "sampleauth-error-2" property.
-      if (username.equals(ERROR_2_NAME))
-      {
-        setErrorText("sampleauth-error-2");
-        return STATE_ERROR;
-      }
+            case STATE_AUTH:
+                // Get data from callbacks. Refer to callbacks XML file.
+                NameCallback nc = (NameCallback) callbacks[0];
+                PasswordCallback pc = (PasswordCallback) callbacks[1];
+                String username = nc.getName();
+                String password = new String(pc.getPassword());
 
-      if (username.equals(USERNAME) &amp;&amp; password.equals("password"))
-      {
-        return ISAuthConstants.LOGIN_SUCCEED;
-      }
+                // First errorstring is stored in "sampleauth-error-1" property.
+                if (username.equals(ERROR_1_NAME))
+                {
+                    setErrorText("sampleauth-error-1");
+                    return STATE_ERROR;
+                }
 
-      throw new InvalidPasswordException("password is wrong", USERNAME);
+                // Second errorstring is stored in "sampleauth-error-2" property.
+                if (username.equals(ERROR_2_NAME))
+                {
+                    setErrorText("sampleauth-error-2");
+                    return STATE_ERROR;
+                }
 
-    case STATE_ERROR:
-      return STATE_ERROR;
-    default:
-      throw new AuthLoginException("invalid state");
+                if (username.equals(USERNAME) &amp;&amp; password.equals("changeit"))
+                {
+                    return ISAuthConstants.LOGIN_SUCCEED;
+                }
 
+                throw new InvalidPasswordException("password is wrong", USERNAME);
+
+            case STATE_ERROR:
+                return STATE_ERROR;
+            default:
+                throw new AuthLoginException("invalid state");
+
+        }
     }
-  }
 
 
 
-  @Override
-  public Principal getPrincipal()
-  {
-    return new SampleAuthPrincipal(USERNAME);
-  }
+    @Override
+    public Principal getPrincipal()
+    {
+        return new SampleAuthPrincipal(USERNAME);
+    }
 
 
 
-  private void setErrorText(String err) throws AuthLoginException
-  {
-    // Receive correct string from properties and substitute the
-    // header in callbacks order 3.
-    substituteHeader(STATE_ERROR, bundle.getString(err));
-  }
+    private void setErrorText(String err) throws AuthLoginException
+    {
+        // Receive correct string from properties and substitute the
+        // header in callbacks order 3.
+        substituteHeader(STATE_ERROR, bundle.getString(err));
+    }
 
 
 
-  private void substituteUIStrings() throws AuthLoginException
-  {
-    // Get service specific attribute configured in OpenAM
-    String ssa = CollectionHelper.getMapAttr(options,
-        "sampleauth-service-specific-attribute");
+    private void substituteUIStrings() throws AuthLoginException
+    {
+        // Get service specific attribute configured in OpenAM
+        String ssa = CollectionHelper.getMapAttr(options,
+                "sampleauth-service-specific-attribute");
 
-    // Get property from bundle
-    String new_hdr = ssa + " "
-        + bundle.getString("sampleauth-ui-login-header");
-    substituteHeader(STATE_AUTH, new_hdr);
+        // Get property from bundle
+        String new_hdr = ssa + " "
+                + bundle.getString("sampleauth-ui-login-header");
+        substituteHeader(STATE_AUTH, new_hdr);
 
-    replaceCallback(STATE_AUTH, 0, new NameCallback(bundle
-      .getString("sampleauth-ui-username-prompt")));
+        Callback[] cbs_phone = getCallback(STATE_AUTH);
 
-    replaceCallback(STATE_AUTH, 1, new PasswordCallback(bundle
-            .getString("sampleauth-ui-password-prompt"), false));
-  }
+        replaceCallback(STATE_AUTH, 0, new NameCallback(bundle
+                .getString("sampleauth-ui-username-prompt")));
 
-}</programlisting>
+        replaceCallback(STATE_AUTH, 1, new PasswordCallback(bundle
+                .getString("sampleauth-ui-password-prompt"), false));
+    }
+
+}
+</programlisting>
+  </informalexample>
  </section>
 
  <section xml:id="principal-sample-auth-module">
@@ -520,11 +448,15 @@ public class SampleAuth extends AMLoginModule
   
   <para>The implementation, <filename>SampleAuthPrincipal.java</filename>, is
   shown below.</para>
-  
-  <programlisting language="java">/**
+
+  <!--
+       Using JCite would be nice here. At present the source is copy/pasted.
+  -->
+  <informalexample><?dbfo pgwide="1"?><?dbfo keep-together="auto"?>
+   <programlisting language="java">/**
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright (c) 2011 ForgeRock AS. All Rights Reserved
+ * Copyright (c) 2011-2013 ForgeRock AS. All Rights Reserved
  *
  * The contents of this file are subject to the terms
  * of the Common Development and Distribution License
@@ -546,7 +478,7 @@ public class SampleAuth extends AMLoginModule
  *
  */
 
-package com.forgerock.openam.examples;
+package org.forgerock.openam.examples;
 
 
 
@@ -557,102 +489,104 @@ import java.security.Principal;
 
 public class SampleAuthPrincipal implements Principal, Serializable
 {
-  private final String name;
-  private final static String CLASSNAME = "SampleAuthPrincipal";
-  private final static String COLON = " : ";
+    private final String name;
+    private final static String CLASSNAME = "SampleAuthPrincipal";
+    private final static String COLON = " : ";
 
 
 
-  public SampleAuthPrincipal(String name)
-  {
-    if (name == null)
+    public SampleAuthPrincipal(String name)
     {
-      throw new NullPointerException("illegal null input");
+        if (name == null)
+        {
+            throw new NullPointerException("illegal null input");
+        }
+
+        this.name = name;
     }
 
-    this.name = name;
-  }
 
 
-
-  /**
-   * Return the LDAP username for this &lt;code&gt; SampleAuthPrincipal &lt;/code&gt;.
-   *
-   * @return the LDAP username for this &lt;code&gt; SampleAuthPrincipal &lt;/code&gt;
-   */
-  @Override
-  public String getName()
-  {
-    return name;
-  }
-
-
-
-  /**
-   * Return a string representation of this &lt;code&gt; SampleAuthPrincipal &lt;/code&gt;.
-   *
-   * @return a string representation of this
-   *         &lt;code&gt;TestAuthModulePrincipal&lt;/code&gt;.
-   */
-  @Override
-  public String toString()
-  {
-    return new StringBuilder().append(CLASSNAME).append(COLON)
-        .append(name).toString();
-  }
-
-
-
-  /**
-   * Compares the specified Object with this &lt;code&gt; SampleAuthPrincipal &lt;/code&gt;
-   * for equality. Returns true if the given object is also a
-   * &lt;code&gt; SampleAuthPrincipal &lt;/code&gt; and the two SampleAuthPrincipal have
-   * the same username.
-   *
-   * @param o Object to be compared for equality with this
-   *          &lt;code&gt; SampleAuthPrincipal &lt;/code&gt;.
-   * @return true if the specified Object is equal equal to this
-   *         &lt;code&gt; SampleAuthPrincipal &lt;/code&gt;.
-   */
-  @Override
-  public boolean equals(Object o)
-  {
-    if (o == null)
+    /**
+     * Return the LDAP username for this &lt;code&gt; SampleAuthPrincipal &lt;/code&gt;.
+     *
+     * @return the LDAP username for this &lt;code&gt; SampleAuthPrincipal &lt;/code&gt;
+     */
+    @Override
+    public String getName()
     {
-      return false;
+        return name;
     }
 
-    if (this == o)
+
+
+    /**
+     * Return a string representation of this &lt;code&gt; SampleAuthPrincipal &lt;/code&gt;.
+     *
+     * @return a string representation of this
+     *         &lt;code&gt;TestAuthModulePrincipal&lt;/code&gt;.
+     */
+    @Override
+    public String toString()
     {
-      return true;
+        return new StringBuilder().append(CLASSNAME).append(COLON)
+                .append(name).toString();
     }
 
-    if (!(o instanceof SampleAuthPrincipal))
+
+
+    /**
+     * Compares the specified Object with this &lt;code&gt; SampleAuthPrincipal &lt;/code&gt;
+     * for equality. Returns true if the given object is also a
+     * &lt;code&gt; SampleAuthPrincipal &lt;/code&gt; and the two SampleAuthPrincipal have
+     * the same username.
+     *
+     * @param o Object to be compared for equality with this
+     *          &lt;code&gt; SampleAuthPrincipal &lt;/code&gt;.
+     * @return true if the specified Object is equal equal to this
+     *         &lt;code&gt; SampleAuthPrincipal &lt;/code&gt;.
+     */
+    @Override
+    public boolean equals(Object o)
     {
-      return false;
-    }
-    SampleAuthPrincipal that = (SampleAuthPrincipal) o;
+        if (o == null)
+        {
+            return false;
+        }
 
-    if (this.getName().equals(that.getName()))
+        if (this == o)
+        {
+            return true;
+        }
+
+        if (!(o instanceof SampleAuthPrincipal))
+        {
+            return false;
+        }
+        SampleAuthPrincipal that = (SampleAuthPrincipal) o;
+
+        if (this.getName().equals(that.getName()))
+        {
+            return true;
+        }
+        return false;
+    }
+
+
+
+    /**
+     * Return a hash code for this &lt;code&gt; SampleAuthPrincipal &lt;/code&gt;.
+     *
+     * @return a hash code for this &lt;code&gt; SampleAuthPrincipal &lt;/code&gt;.
+     */
+    @Override
+    public int hashCode()
     {
-      return true;
+        return name.hashCode();
     }
-    return false;
-  }
-
-
-
-  /**
-   * Return a hash code for this &lt;code&gt; SampleAuthPrincipal &lt;/code&gt;.
-   *
-   * @return a hash code for this &lt;code&gt; SampleAuthPrincipal &lt;/code&gt;.
-   */
-  @Override
-  public int hashCode()
-  {
-    return name.hashCode();
-  }
-}</programlisting>
+}
+</programlisting>
+  </informalexample>
  </section>
 
  <section xml:id="service-conf-sample-auth-module">
@@ -669,7 +603,7 @@ public class SampleAuthPrincipal implements Principal, Serializable
    list below.</para>
    <listitem>
     <para>The document type for a service configuration file is described in
-    <filename><replaceable>war-file-name</replaceable>/WEB-INF/sms.dtd</filename>.</para>
+    <filename>WEB-INF/sms.dtd</filename> where OpenAM is deployed.</para>
    </listitem>
    <listitem>
     <para>The service name is taken from the module name:
@@ -704,7 +638,7 @@ public class SampleAuthPrincipal implements Principal, Serializable
   <para>The service configuration file,
   <filename>amAuthSampleAuth.xml</filename>, is shown below.</para>
   
-  <programlisting language="xml">&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?&gt;
+  <programlisting language="xml">&lt;?xml version="1.0" encoding="UTF-8"?&gt;
 &lt;!--
    DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
 
@@ -726,45 +660,45 @@ public class SampleAuthPrincipal implements Principal, Serializable
    If applicable, add the following below the CDDL Header,
    with the fields enclosed by brackets [] replaced by
    your own identifying information:
-   &quot;Portions Copyrighted [year] [name of copyright owner]&quot;
+   "Portions Copyrighted [year] [name of copyright owner]"
 --&gt;
 &lt;!DOCTYPE ServicesConfiguration
-    PUBLIC &quot;=//iPlanet//Service Management Services (SMS) 1.0 DTD//EN&quot;
-    &quot;jar://com/sun/identity/sm/sms.dtd&quot;&gt;
+    PUBLIC "=//iPlanet//Service Management Services (SMS) 1.0 DTD//EN"
+    "jar://com/sun/identity/sm/sms.dtd"&gt;
 
 &lt;ServicesConfiguration&gt;
- &lt;Service name=&quot;iPlanetAMAuthSampleAuthService&quot; version=&quot;1.0&quot;&gt;
+ &lt;Service name="iPlanetAMAuthSampleAuthService" version="1.0"&gt;
   &lt;Schema
-   serviceHierarchy=&quot;/DSAMEConfig/authentication/iPlanetAMAuthSampleAuthService&quot;
-   i18nFileName=&quot;amAuthSampleAuth&quot; revisionNumber=&quot;10&quot;
-   i18nKey=&quot;sampleauth-service-description&quot;&gt;
+   serviceHierarchy="/DSAMEConfig/authentication/iPlanetAMAuthSampleAuthService"
+   i18nFileName="amAuthSampleAuth" revisionNumber="10"
+   i18nKey="sampleauth-service-description"&gt;
    &lt;Organization&gt;
-    &lt;AttributeSchema name=&quot;iplanet-am-auth-sampleauth-auth-level&quot;
-     type=&quot;single&quot; syntax=&quot;number_range&quot; rangeStart=&quot;0&quot; rangeEnd=&quot;2147483647&quot;
-     i18nKey=&quot;a500&quot;&gt;
+    &lt;AttributeSchema name="iplanet-am-auth-sampleauth-auth-level"
+     type="single" syntax="number_range" rangeStart="0" rangeEnd="2147483647"
+     i18nKey="a500"&gt;
      &lt;DefaultValues&gt;
       &lt;Value&gt;1&lt;/Value&gt;
      &lt;/DefaultValues&gt;
     &lt;/AttributeSchema&gt;
 
-    &lt;AttributeSchema name=&quot;sampleauth-service-specific-attribute&quot;
-     type=&quot;single&quot; syntax=&quot;string&quot; validator=&quot;no&quot; i18nKey=&quot;a501&quot;&gt;
+    &lt;AttributeSchema name="sampleauth-service-specific-attribute"
+     type="single" syntax="string" validator="no" i18nKey="a501"&gt;
      &lt;DefaultValues&gt;
       &lt;Value&gt;&lt;/Value&gt;
      &lt;/DefaultValues&gt;
     &lt;/AttributeSchema&gt;
 
-    &lt;SubSchema name=&quot;serverconfig&quot; inheritance=&quot;multiple&quot;&gt;
-     &lt;AttributeSchema name=&quot;iplanet-am-auth-sampleauth-auth-level&quot;
-      type=&quot;single&quot; syntax=&quot;number_range&quot; rangeStart=&quot;0&quot; rangeEnd=&quot;2147483647&quot;
-      i18nKey=&quot;a500&quot;&gt;
+    &lt;SubSchema name="serverconfig" inheritance="multiple"&gt;
+     &lt;AttributeSchema name="iplanet-am-auth-sampleauth-auth-level"
+      type="single" syntax="number_range" rangeStart="0" rangeEnd="2147483647"
+      i18nKey="a500"&gt;
       &lt;DefaultValues&gt;
        &lt;Value&gt;1&lt;/Value&gt;
       &lt;/DefaultValues&gt;
      &lt;/AttributeSchema&gt;
 
-     &lt;AttributeSchema name=&quot;sampleauth-service-specific-attribute&quot;
-      type=&quot;single&quot; syntax=&quot;string&quot; validator=&quot;no&quot; i18nKey=&quot;a501&quot;&gt;
+     &lt;AttributeSchema name="sampleauth-service-specific-attribute"
+      type="single" syntax="string" validator="no" i18nKey="a501"&gt;
       &lt;DefaultValues&gt;
        &lt;Value&gt;&lt;/Value&gt;
       &lt;/DefaultValues&gt;
@@ -780,149 +714,154 @@ public class SampleAuthPrincipal implements Principal, Serializable
  <section xml:id="build-config-sample-auth-module">
   <title>Building &amp; Installing the Sample Auth Module</title>
   
-  <para>Once you have the files for the sample authentication module, prepare the web archive, copy the sample
-  authentication module files in the directories specified, rebuild the web archive,
-      and then set up the module into OpenAM.</para>
+  <para>Build the module with Apache Maven, and install the module in
+  OpenAM.</para>
   
   <section xml:id="building-sample-auth-module">
    <title>Building the Module</title>
 
-      <para>The sample authentication module code relies on three .jar files, two of which are deployed with OpenAM,
-          and the third which is provided by your web application container. The names of OpenAM .jar files may vary, as
-          they may include release version numbers. If you are testing the nightly release, the file may include the
-      word SNAPSHOT in the name.</para>
+   <para>Build the module using Apache Maven.</para>
 
-      <variablelist>
+   <screen>$ cd /path/to/openam-auth-sample
+$ mvn install
+[INFO] Scanning for projects...
+[INFO]
+[INFO] ------------------------------------------------------------------------
+[INFO] Building openam-auth-sample 1.0.0-SNAPSHOT
+[INFO] ------------------------------------------------------------------------
+...
 
-         <varlistentry>
-           <term><filename>openam-core.jar</filename></term>
-             <listitem>
-                 <para>When you deploy OpenAM, the file is
-                   <filename><replaceable>war-file-name</replaceable>/WEB-INF/lib/openam-core.jar</filename>.</para>
-             </listitem>
-         </varlistentry>
+[INFO]
+[INFO] --- maven-jar-plugin:2.3.1:jar (default-jar) @ openam-auth-sample ---
+[INFO] Building jar: ...target/openam-auth-sample-1.0.0-SNAPSHOT.jar
+...
+[INFO] ------------------------------------------------------------------------
+[INFO] BUILD SUCCESS
+[INFO] ------------------------------------------------------------------------
+[INFO] Total time: 3.651s
+[INFO] Finished at: Thu Oct 03 11:19:07 CEST 2013
+[INFO] Final Memory: 20M/226M
+[INFO] ------------------------------------------------------------------------</screen>
 
-          <varlistentry>
-            <term><filename>openam-shared.jar</filename></term>
-              <listitem>
-                  <para>When you deploy OpenAM, the file is
-                  <filename><replaceable>war-file-name</replaceable>/WEB-INF/lib/openam-shared.jar</filename>.</para>
-               </listitem>
-          </varlistentry>
-
-          <varlistentry>
-              <term><filename>servlet-api.jar</filename></term>
-              <listitem>
-                  <para>This .jar file provides the Java EE Servlet API. If you use Apache Tomcat as your web
-                      application container, you can find this file in <filename>/path/to/tomcat/lib/servlet-api.jar
-                      </filename>.</para>
-              </listitem>
-          </varlistentry>
-
-      </variablelist>
-
-          <para>In the following commands, you'll create a classes directory. You can then process the .java files
-          into .classes. You can cite the full path to each of these .jar files. The following commands present just
-          one example; substitute for the directory paths shown as appropriate. (You may need to run these commands as
-          the administrative user.)</para>
-
-          <screen>$ mkdir classes
-          $ javac -d classes -cp lib/servlet-api.jar:
-          /var/lib/tomcat6/webapps/openam/WEB-INF/lib/<?eval ${coreLibrary}?>:
-          /var/lib/tomcat6/webapps/openam/WEB-INF/lib/<?eval ${sharedLibrary}?>
-          /home/user/SampleAuth*.java
-          </screen>
-
-          <para>You can then find the compiled .class files in the classes/com/forgerock/openam/examples subdirectory.
-              You also need to copy the other files created (amAuthSampleAuth.xml, amAuthSampleAuth.properties, and
-              SampleAuth.xml) to the classes subdirectory.
-          You can then collect all of these files in a new .jar archive. The following command sets up that
-          archive in a file named <literal>sampleauth.jar</literal>.</para>
-
-          <screen>
-              $ cd classes/
-              $ jar cf /home/user/sampleauth.jar .
-          </screen>
-
+   <para>After you successfully build the module, you find the .jar in
+   the <filename>target/</filename> directory of the project.</para>
   </section>
   
   <section xml:id="installing-sample-auth-module">
    <title>Installing the Module</title>
    
-   <para>Installing the sample authentication module consists of putting the configured
-   .jar and other files in the right places, registering the module with OpenAM,
-   and then restarting the web application or the web application
-   container.</para>
-   
-   <para>Copy the <filename>sampleauth.jar</filename> file to
-   <filename><replaceable>war-file-name</replaceable>/WEB-INF/lib/</filename>
-   where OpenAM is deployed.</para>
-   <screen>$ cp sampleauth.jar /path/to/tomcat/webapps/openam/WEB-INF/lib/</screen>
+   <para>Installing the sample authentication module consists of copying the
+   .jar to OpenAM's <filename>WEB-INF/lib/</filename> directory, registering
+   the module with OpenAM, and then restarting OpenAM or the web application
+   container where it runs.</para>
 
-   <para>Register the module with OpenAM using the <command>ssoadm</command>
-   command.</para>
-   <screen>$ ssoadm
+   <orderedlist>
+    <listitem>
+     <para>Copy the sample authentication module .jar file to
+     <filename>WEB-INF/lib/</filename> where OpenAM is deployed.</para>
+
+     <screen>$ cp target/openam-auth-sample*.jar /path/to/tomcat/webapps/openam/WEB-INF/lib/</screen>
+    </listitem>
+
+    <listitem>
+     <para>Register the module with OpenAM using the <command>ssoadm</command>
+     command.</para>
+
+     <screen>$ ssoadm
  create-svc
  --adminid amadmin
  --password-file /tmp/pwd.txt
- --xmlfile amAuthSampleAuth.xml 
+ --xmlfile amAuthSampleAuth.xml
 
 Service was added.
 $ ssoadm
  register-auth-module
  --adminid amadmin
  --password-file /tmp/pwd.txt
- --authmodule com.forgerock.openam.examples.SampleAuth
+ --authmodule org.forgerock.openam.examples.SampleAuth
 
 Authentication module was registered.</screen>
 
-  <para>See the <link xlink:href="reference#ssoadm-1"
-  xlink:role="http://docbook.org/xlink/role/olink"><command>ssoadm</command>
-  reference</link> a full list of Authentication Service Management
-  subcommands.</para>
-   
-   <para>Restart the web applications container associated with your OpenAM installation. The following commands
-   are based on the generic Tomcat container:</para>
-   <screen>$ /path/to/tomcat/bin/shutdown.sh
+     <para>See the <link xlink:href="reference#ssoadm-1" xlink:show="new"
+     xlink:role="http://docbook.org/xlink/role/olink"><command>ssoadm</command>
+     reference</link> a full list of Authentication Service Management
+     subcommands.</para>
+    </listitem>
+
+    <listitem>
+     <para>Restart OpenAM or the container in which it runs.</para>
+
+     <para>For example if you deployed OpenAM in Apache Tomcat, then you shut
+     down Tomcat and start it again.</para>
+
+     <screen>$ /path/to/tomcat/bin/shutdown.sh
 $ /path/to/tomcat/bin/startup.sh
 $ tail -1 /path/to/tomcat/logs/catalina.out
-INFO: Server startup in 32746 ms</screen>
+INFO: Server startup in 14736 ms</screen>
+    </listitem>
+   </orderedlist>
   </section>
  </section>
 
  <section xml:id="configuring-testing-sample-auth-module">
   <title>Configuring &amp; Testing the Sample Auth Module</title>
   
-  <para>Login to the console as OpenAM administrator,
-  <literal>amadmin</literal>, and browse to Access Control &gt;
-  <replaceable>Realm Name</replaceable> &gt; Authentication &gt; Module
-  Instances. Click New, and then create an instance of your Sample
-  Authentication Module.</para>
+  <para>Authentication modules are registered as services with OpenAM globally,
+  and then set up for use in a particular realm. In this example, you set up
+  the sample authentication module for use in the realm / (Top Level Realm).</para>
+
+  <para>Login to OpenAM Console as OpenAM administrator,
+  <literal>amadmin</literal>, and browse to Access Control
+  &gt; / (Top Level Realm) &gt; Authentication &gt; Module Instances.
+  Then click New, and create an instance of the Sample Authentication Module.
+  Name the module <literal>Sample</literal>.</para>
   
+  <mediaobject xml:id="figure-register-sample-auth">
+   <alt>Sample authentication module registration</alt>
+   <imageobject>
+    <imagedata fileref="images/register-sample-auth.png" format="PNG"/>
+   </imageobject>
+   <textobject>
+    <para>The module type is Sample Authentication Module.</para>
+   </textobject>
+  </mediaobject>
+
   <para>After creating the module, click the name in the Module Instances
-  list, and configure as appropriate. Click Back To Authentication when complete.</para>
+  list, and configure as appropriate.</para>
   
   <mediaobject xml:id="figure-sampleauth-conf">
-   <alt>SampleAuth module configuration</alt>
+   <alt>Sample authentication module configuration</alt>
    <imageobject>
     <imagedata fileref="images/sampleauth-conf.png" format="PNG"/>
    </imageobject>
-   <textobject><para>Recall that your module has two configurable
-   properties.</para></textobject>
+   <textobject>
+    <para>The module has two configurable properties, Authentication Level and
+    Service Specific Attribute.</para>
+   </textobject>
   </mediaobject>
   
-  <para>Under the authentication tab, scroll down to the Authentication Chaining window. Create a new Authentication
-      chain (if one doesn't already exist). Configure the module with an Instance that corresponds to the module
-      that you just created. Set the acceptance criteria to Required. Click Save, and then click
-      Back to Authentication.</para>
-  
-  <para>Now that your module is configured, logout of OpenAM console, to return to the login page.</para>
+  <para>Now that the module is configured, logout of OpenAM console.</para>
 
-  <para>Unless you create a
-  <literal>test</literal> subject with a user profile in OpenAM or set User
-  Profile creation to Dynamic for the login realm, successful login results
-  in an "User has no profile in this organization" error. This is because
-  OpenAM attempts to redirect the authenticated test user to a profile page
-  that does not exist.</para>
+  <para>Finally, try the module by specifying the <literal>Sample</literal>
+  module using a query string parameter. Browse to the login URL such as
+  <literal>http://openam.example.com:8080/openam/UI/Login?module=Sample</literal>,
+  and then authenticate with user name <literal>demo</literal> and password
+  <literal>changeit</literal>.</para>
+
+  <mediaobject xml:id="figure-openam-auth-sample-login">
+   <alt>Sample authentication module login page</alt>
+   <imageobject>
+    <imagedata fileref="images/openam-auth-sample-login.png" format="PNG" />
+   </imageobject>
+   <textobject>
+    <para>On the login page, you can see the string you set as the value of
+    Service Specific Attribute.</para>
+   </textobject>
+  </mediaobject>
+
+  <para>After authentication you are redirected to the end user page for
+  the demo user. You can logout of OpenAM console, and then try the
+  authentication as users <literal>test1</literal> or <literal>test2</literal>
+  to see what the error handling looks like to the user.</para>
  </section>
 </chapter>
