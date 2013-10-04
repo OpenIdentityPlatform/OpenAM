@@ -15,7 +15,6 @@
  */
 package org.forgerock.openam.cts.impl;
 
-import javax.inject.Inject;
 import com.google.inject.name.Named;
 import com.sun.identity.common.configuration.ConfigurationObserver;
 import com.sun.identity.shared.debug.Debug;
@@ -34,9 +33,9 @@ import org.forgerock.openam.utils.IOUtils;
 import org.forgerock.opendj.ldap.Connection;
 import org.forgerock.opendj.ldap.ConnectionFactory;
 import org.forgerock.opendj.ldap.ErrorResultException;
-import org.forgerock.opendj.ldap.ResultCode;
 import org.forgerock.opendj.ldap.responses.Result;
 
+import javax.inject.Inject;
 import java.text.MessageFormat;
 
 /**
@@ -116,6 +115,16 @@ public class CoreTokenAdapter {
             connection = connectionFactory.getConnection();
             Token token = ldapAdapter.read(connection, tokenId);
 
+            if (token == null) {
+                if (debug.messageEnabled()) {
+                    debug.message(MessageFormat.format(
+                            CoreTokenConstants.DEBUG_HEADER +
+                            "Read: {0} not found.",
+                            tokenId));
+                }
+                return null;
+            }
+
             if (debug.messageEnabled()) {
                 debug.message(MessageFormat.format(
                         CoreTokenConstants.DEBUG_HEADER +
@@ -126,19 +135,6 @@ public class CoreTokenAdapter {
             return token;
         } catch (ErrorResultException e) {
             Result result = e.getResult();
-
-            // Check for NO_SUCH_OBJECT
-            if (ResultCode.NO_SUCH_OBJECT.equals(result.getResultCode())) {
-                if (debug.messageEnabled()) {
-                    debug.message(MessageFormat.format(
-                            CoreTokenConstants.DEBUG_HEADER +
-                            "Read: {0} failed.",
-                            tokenId));
-                }
-                return null;
-            }
-
-            // Any other error is unexpected.
             throw new LDAPOperationFailedException(result);
         } finally {
             IOUtils.closeIfNotNull(connection);
@@ -186,12 +182,18 @@ public class CoreTokenAdapter {
             Token previous = ldapAdapter.read(connection, token.getTokenId());
 
             if (debug.messageEnabled()) {
-                debug.message(MessageFormat.format(
-                        CoreTokenConstants.DEBUG_HEADER +
-                                "Read: {0} successfully.",
-                        token.getTokenId()));
+                if (previous == null) {
+                    debug.message(MessageFormat.format(
+                            CoreTokenConstants.DEBUG_HEADER +
+                            "Read: {0} not found.",
+                            token.getTokenId()));
+                } else {
+                    debug.message(MessageFormat.format(
+                            CoreTokenConstants.DEBUG_HEADER +
+                            "Read: {0} successfully.",
+                            token.getTokenId()));
+                }
             }
-
 
             // Handle create case
             if (previous == null) {
@@ -200,8 +202,8 @@ public class CoreTokenAdapter {
                 if (debug.messageEnabled()) {
                     debug.message(MessageFormat.format(
                             CoreTokenConstants.DEBUG_HEADER +
-                                    "Create: Created {0} Token {1}\n" +
-                                    "{2}",
+                            "Create: Created {0} Token {1}\n" +
+                            "{2}",
                             token.getType(),
                             token.getTokenId(),
                             token));
@@ -243,7 +245,7 @@ public class CoreTokenAdapter {
     /**
      * Deletes a token from the store based on its token id.
      * @param tokenId Non null token id.
-     * @throws CoreTokenException If there was any problem deleting the token.
+     * @throws CoreTokenException If there was an unexpected error during deletion.
      */
     public void delete(String tokenId) throws DeleteFailedException {
         Connection connection = null;
@@ -259,14 +261,6 @@ public class CoreTokenAdapter {
             }
 
         } catch (ErrorResultException e) {
-            ResultCode resultCode = e.getResult().getResultCode();
-            /**
-             * If the object does not exist, that will also conclude this delete operation.
-             */
-            if (ResultCode.NO_SUCH_OBJECT.equals(resultCode)) {
-                return;
-            }
-
             throw new DeleteFailedException(tokenId, e);
         } catch (LDAPOperationFailedException e) {
             throw new DeleteFailedException(tokenId, e);

@@ -15,7 +15,6 @@
  */
 package org.forgerock.openam.cts.impl;
 
-import javax.inject.Inject;
 import org.forgerock.openam.cts.api.tokens.Token;
 import org.forgerock.openam.cts.exceptions.LDAPOperationFailedException;
 import org.forgerock.openam.cts.utils.TokenAttributeConversion;
@@ -30,6 +29,8 @@ import org.forgerock.opendj.ldap.requests.ModifyRequest;
 import org.forgerock.opendj.ldap.requests.Requests;
 import org.forgerock.opendj.ldap.responses.Result;
 import org.forgerock.opendj.ldap.responses.SearchResultEntry;
+
+import javax.inject.Inject;
 
 /**
  * Responsible adapting the LDAP SDK Connection and its associated domain
@@ -75,8 +76,17 @@ public class LDAPAdapter {
      */
     public Token read(Connection connection,  String tokenId) throws ErrorResultException {
         DN dn = conversion.generateTokenDN(tokenId);
-        SearchResultEntry resultEntry = connection.readEntry(dn);
-        return conversion.tokenFromEntry(resultEntry);
+        try {
+            SearchResultEntry resultEntry = connection.readEntry(dn);
+            return conversion.tokenFromEntry(resultEntry);
+        } catch (ErrorResultException e) {
+            Result result = e.getResult();
+            // Check for NO_SUCH_OBJECT
+            if (result != null && ResultCode.NO_SUCH_OBJECT.equals(result.getResultCode())) {
+                return null;
+            }
+            throw e;
+        }
     }
 
     /**
@@ -110,8 +120,6 @@ public class LDAPAdapter {
     /**
      * Performs a delete against the Token ID provided.
      *
-     * Note: Token ID's must be unique and thus only one token will be deleted if found.
-     *
      * @param connection Non null connection to call.
      * @param tokenId The non null Token ID to delete.
      * @throws ErrorResultException If there was an unexpected LDAP error during the process.
@@ -119,7 +127,16 @@ public class LDAPAdapter {
      */
     public void delete(Connection connection, String tokenId) throws LDAPOperationFailedException, ErrorResultException {
         String dn = String.valueOf(conversion.generateTokenDN(tokenId));
-        processResult(connection.delete(dn));
+        try {
+            processResult(connection.delete(dn));
+        } catch (ErrorResultException e) {
+            Result result = e.getResult();
+            // Check for NO_SUCH_OBJECT
+            if (e.getResult() != null && ResultCode.NO_SUCH_OBJECT.equals(result.getResultCode())) {
+                return;
+            }
+            throw e;
+        }
     }
 
     /**
