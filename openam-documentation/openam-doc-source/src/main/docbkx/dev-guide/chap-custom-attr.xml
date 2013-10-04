@@ -20,7 +20,7 @@
   !
   ! CCPL HEADER END
   !
-  !      Copyright 2011 ForgeRock AS
+  !      Copyright 2011-2013 ForgeRock AS
   !    
 -->
 <chapter xml:id='chap-custom-attr'
@@ -44,6 +44,14 @@
  repository schema to hold the new attribute. Furthermore, to allow users
  to update the attribute in their own profiles, you must also update the
  OpenAM policy configuration stored in the configuration directory.</para>
+
+ <itemizedlist>
+  <para>This chapter includes the following procedures.</para>
+
+  <listitem><para><xref linkend="add-attr-to-service-description" /></para></listitem>
+  <listitem><para><xref linkend="add-attr-to-identity-repository" /></para></listitem>
+  <listitem><para><xref linkend="allow-users-to-update-attr" /></para></listitem>
+ </itemizedlist>
 
  <procedure xml:id="add-attr-to-service-description">
   <title>To Update the AMUser Service For the New Attribute</title>
@@ -90,14 +98,19 @@ Service was added.</screen>
 
  <procedure xml:id="add-attr-to-identity-repository">
   <title>To Update the Identity Repository For the New Attribute</title>
+
   <para>Follow the steps below to update the identity repository LDAP schema
   for the custom attribute, and then update OpenAM to use the custom attribute
   and object class.</para>
+
+  <para>If you are adding an existing attribute that is already allowed on
+  user profile entries, you can skip this procedure.</para>
+
   <tip>
    <para>If you are using OpenDJ as the identity repository, you can update the
    schema through OpenDJ Control Panel &gt; Schema &gt; Manage Schema, as
-   described in the <link  xlink:show="new"
-   xlink:href="http://opendj.forgerock.org/doc/admin-guide/index.html#update-schema"
+   described in the <link xlink:show="new"
+   xlink:href="http://docs.forgerock.org/en/opendj/2.6.0/admin-guide/#update-schema"
    >OpenDJ documentation</link>.</para>
   </tip>
 
