@@ -28,8 +28,7 @@
  version='5.0' xml:lang='en'
  xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance'
  xsi:schemaLocation='http://docbook.org/ns/docbook http://docbook.org/xml/5.0/xsd/docbook.xsd'
- xmlns:xlink='http://www.w3.org/1999/xlink'
- xmlns:xinclude='http://www.w3.org/2001/XInclude'>
+ xmlns:xlink='http://www.w3.org/1999/xlink'>
  <title>Defining Entitlements</title>
  
  <para>This chapter covers how to define entitlements for fine-grained
@@ -106,11 +105,11 @@
   subcommands for managing entitlements in addition to those shown here.</para>
   
   <procedure xml:id="export-entitlements-policy-cli">
-   <title>To Export Policies</title>
+   <title>To List Current Policies</title>
    
    <step>
-    <para>Use the <command>ssoadm list-xacml</command> command to export
-    policies.</para>
+    <para>Use the <command>ssoadm list-xacml</command> command to list current
+    policies, ready for export.</para>
     <screen>$ ssoadm list-xacml --realm / --adminid amadmin --password-file /tmp/pwd.txt
 
 &lt;?xml version="1.0" encoding="UTF-8" standalone="yes"?&gt;

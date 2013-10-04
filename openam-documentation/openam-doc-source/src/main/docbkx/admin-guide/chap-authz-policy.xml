@@ -28,8 +28,7 @@
  version='5.0' xml:lang='en'
  xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance'
  xsi:schemaLocation='http://docbook.org/ns/docbook http://docbook.org/xml/5.0/xsd/docbook.xsd'
- xmlns:xlink='http://www.w3.org/1999/xlink'
- xmlns:xinclude='http://www.w3.org/2001/XInclude'>
+ xmlns:xlink='http://www.w3.org/1999/xlink'>
  <title>Defining Authorization Policies</title>
 
  <para><firstterm>Authorization</firstterm> is determining whether to grant or
@@ -141,7 +140,7 @@
        <row>
         <entry>Wildcard <footnote><para>All reserved and unreserved characters within 
         the URI follow the guidelines provided in 
-        <link xlink:show="new" xlink:href="http://tools.ietf.org/html/rfc2396section-2.2">sections 2.2 and 2.3 of RFC 2396</link>.</para></footnote></entry>
+        <link xlink:show="new" xlink:href="http://tools.ietf.org/html/rfc2396#section-2.2">sections 2.2 and 2.3 of RFC 2396</link>.</para></footnote></entry>
         <entry>Level</entry>
         <entry>Behavior</entry>
        </row>
@@ -261,7 +260,7 @@
    
    <step>
     <para>In the OpenAM console, select Access Control &gt; <replaceable>Realm
-    Name</replaceable> &gt; Policies, then click New Policy...</para>
+    Name</replaceable> &gt; Policies, then click New Policy.</para>
    </step>
    <step>
     <para>Provide at minimum a name for the policy.</para>
@@ -430,8 +429,8 @@
          </listitem>
          <listitem>
           <para>For IPv6, fill in the fields for the From and To with eight sets of
-          four hexadecimal characters. The default is colons, which indicates an IPv6
-          only address.</para>
+          four hexadecimal characters. The default separator between each set of
+          IPv6 hexidecimal characters is a colon.</para>
          </listitem>
          <listitem>
           <para>For a hybrid address, select IPv6. Fill in the first four fields for the 
@@ -470,7 +469,7 @@
     </substeps>
    </step>
    <step performance="optional">
-    <para>In the Response Providers table, click New... to set up a response
+    <para>In the Response Providers table, click New to set up a response
     provider that adds attributes retrieved from the user entry in the identity
     repository into the headers of the request at policy decision time.</para>
     <substeps>

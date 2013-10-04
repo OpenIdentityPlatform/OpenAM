@@ -28,8 +28,7 @@
  version='5.0' xml:lang='en'
  xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance'
  xsi:schemaLocation='http://docbook.org/ns/docbook http://docbook.org/xml/5.0/xsd/docbook.xsd'
- xmlns:xlink='http://www.w3.org/1999/xlink'
- xmlns:xinclude='http://www.w3.org/2001/XInclude'>
+ xmlns:xlink='http://www.w3.org/1999/xlink'>
  <title>Monitoring OpenAM Services</title>
 
  <para>This chapter covers how to monitor OpenAM services to ensure
@@ -171,7 +170,7 @@ demo AQICvSe+tXEg8TUUT8ekzHb8IRzVSvm1Lc2u</screen>
  </section>
  
  <section xml:id="is-openam-alive">
-  <title>Is OpenAM Up?</title>
+  <title>Is OpenAM Running?</title>
    <indexterm>
     <primary>Monitoring</primary>
     <secondary>Health check</secondary>
@@ -183,7 +182,7 @@ demo AQICvSe+tXEg8TUUT8ekzHb8IRzVSvm1Lc2u</screen>
   <literal>http://openam.example.com:8080/openam/isAlive.jsp</literal>.</para>
   
   <para>If you get a success code (with <literal>Server is ALIVE:</literal> in
-  the body of the page returned), then OpenAM is up.</para>
+  the body of the page returned), then OpenAM is in operation.</para>
  </section>
  
  <section xml:id="log-mgmt">

@@ -28,8 +28,7 @@
  version='5.0' xml:lang='en'
  xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance'
  xsi:schemaLocation='http://docbook.org/ns/docbook http://docbook.org/xml/5.0/xsd/docbook.xsd'
- xmlns:xlink='http://www.w3.org/1999/xlink'
- xmlns:xinclude='http://www.w3.org/2001/XInclude'>
+ xmlns:xlink='http://www.w3.org/1999/xlink'>
  <title>Backing Up and Restoring OpenAM Configurations</title>
  
  <para>This chapter shows how to backup and restore OpenAM configuration
@@ -67,7 +66,7 @@ Service Configuration was exported.</screen>
    directory.</para>
    <para>This file is named after the instance location, such as
    <filename>$HOME/.openamcfg/AMConfig_path_to_tomcat_webapps_openam_</filename>,
-   where $HOME is that of the user running the web container where OpenAM
+   where $HOME is the home directory of the user running the web container where OpenAM
    is deployed.</para>
   </step>
   <step>

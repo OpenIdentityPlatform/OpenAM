@@ -28,8 +28,7 @@
  version='5.0' xml:lang='en'
  xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance'
  xsi:schemaLocation='http://docbook.org/ns/docbook http://docbook.org/xml/5.0/xsd/docbook.xsd'
- xmlns:xlink='http://www.w3.org/1999/xlink'
- xmlns:xinclude='http://www.w3.org/2001/XInclude'>
+ xmlns:xlink='http://www.w3.org/1999/xlink'>
  <title>Configuring Cross-Domain Single Sign On</title>
 
  <para>This chapter shows you how to configure cross-domain single sign on
@@ -92,7 +91,7 @@
    <replaceable>Agent Name</replaceable> &gt; SSO.</para>
   </step>
   <step>
-   <para>Select Enable Cross Domain SSO.</para>
+   <para>Scroll down and enable Cross Domain SSO.</para>
   </step>
   <step>
    <para>Check that the CDSSO Redirect URI is set.</para>
@@ -151,7 +150,7 @@
    <replaceable>Agent Name</replaceable> &gt; SSO.</para>
   </step>
   <step>
-   <para>Select Enable Cross Domain SSO.</para>
+   <para>Enable Cross Domain SSO.</para>
   </step>
   <step>
    <para>Set the list of URLs for CDSSO Servlet URL to the Cross Domain

@@ -107,10 +107,7 @@
     Core &gt; Organization Authentication Configuration to use your
     <literal>LDAP</literal> based authentication chain for users, let the
     Administrator Authentication Configuration continue to use the
-    <literal>DataStore</literal> based authentication chain. To login to the
-    OpenAM console as <literal>amadmin</literal>, access the administrator
-    console service instead of the UI login service endpoint. For example:
-    <literal>http://openam.example.com:8080/openam/console</literal>.</para>
+    <literal>DataStore</literal> based authentication chain.</para>
    </step>
    <step>
     <para>Configure the Password Reset service in one of the following ways.</para>

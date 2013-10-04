@@ -133,6 +133,14 @@
       <literal>sunAMAuthKeepAuthModuleIntances</literal></para>
      </listitem>
     </varlistentry>
+    <varlistentry>
+        <term>XUI Interface</term>
+        <listitem>
+            <para>When enabled, the initial login screen uses the XUI.</para>
+            <para><command>ssoadm</command> attribute:
+            <literal>openam-xui-interface-enabled</literal></para>
+        </listitem>
+    </varlistentry>
    </variablelist>
   
  </section>

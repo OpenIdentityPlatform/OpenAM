@@ -28,8 +28,7 @@
  version='5.0' xml:lang='en'
  xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance'
  xsi:schemaLocation='http://docbook.org/ns/docbook http://docbook.org/xml/5.0/xsd/docbook.xsd'
- xmlns:xlink='http://www.w3.org/1999/xlink'
- xmlns:xinclude='http://www.w3.org/2001/XInclude'>
+ xmlns:xlink='http://www.w3.org/1999/xlink'>
  <title>Configuring Policy Agent Profiles</title>
  <indexterm><primary>Policy agents</primary></indexterm>
  <para>You install policy agents in web servers and web application containers
@@ -58,11 +57,9 @@
   users and the protected applications. Policy agents are installed into the
   servers where applications run, intercepting requests in that context.</para>
   
-  <para>The Identity Gateway works well with applications where you
-  want to protect access, but you cannot install a policy agent.
-  For example, you might have a web application running in a server for
-  which no policy agent has been developed. Or you might be protecting an
-  application where you simply cannot install a policy agent.</para>
+  <para>The Identity Gateway allows you to protect access to applications not
+  suited for a policy agent. Not all web servers and Java EE applications have
+  policy agents. Not all operating systems work with policy agents.</para>
   
   <para>Policy agents have the advantage, where you can install them,
   of sitting within your existing server infrastructure. Once you have
@@ -78,7 +75,7 @@
  <section xml:id="kinds-of-agent-profiles">
   <title>Kinds of Agent Profiles</title>
   <para>When you open the OpenAM console to configure agents for the top level
-  realm, you see a number of different kinds to choose. Web and J2EE policy
+  realm, you can choose from a number of different types of agents. Web and J2EE policy
   agents are the most common, requiring the least integration effort.</para>
   <indexterm>
    <primary>Policy agents</primary>
@@ -823,7 +820,7 @@ Agent configuration was created.</screen>
          192.168.1.1 to 192.168.1.255, use the following setting.</para>
          <literallayout class="monospaced"
          >com.sun.identity.agents.config.notenforced.ip = 192.168.1.1/24</literallayout>
-         <para>The following example shows a configuration using IPv6.</para>
+         <para>The following example shows an IPv6 address with a corresponding network mask.</para>
          <literallayout class="monospaced"
          >com.sun.identity.agents.config.notenforced.ip = 2001:5c0:9168:0:0:0:0:2/128</literallayout>
          <para>Currently the policy agent stops evaluating properties after
@@ -837,7 +834,7 @@ Agent configuration was created.</screen>
          192.168.1.1 to 192.168.4.3 inclusive, use the following setting.</para>
          <literallayout class="monospaced"
          >com.sun.identity.agents.config.notenforced.ip = 192.168.1.1-192.168.4.3</literallayout>
-         <para>The following example shows a configuration using IPv6.</para>
+         <para>The following example shows a range of IPv6 addresses.</para>
          <literallayout class="monospaced"
          >com.sun.identity.agents.config.notenforced.ip = 2001:5c0:9168:0:0:0:0:1-2001:5c0:9168:0:0:0:0:2</literallayout>
         </listitem>
@@ -2009,8 +2006,7 @@ com.sun.identity.agents.config.cdsso.cookie.domain[1]=.example.net</literallayou
      <term>Agent Debug Level</term>
      <listitem>
       <para>Default is <literal>Error</literal>. Increase to
-      <literal>Message</literal> or even <literal>All</literal> for
-      fine-grained detail.</para>
+      <literal>Message</literal> for fine-grained detail.</para>
       <para>Property: <literal>com.iplanet.services.debug.level</literal></para>
      </listitem>
     </varlistentry>
@@ -2459,7 +2455,7 @@ com.sun.identity.agents.config.cdsso.cookie.domain[1]=.example.net</literallayou
      <term>Cookie Separator Character</term>
      <listitem>
       <para>Specifies the separator for multiple values of the same attribute
-      when it is set as a cookie. Default: <literal>|</literal>.</para>
+      when it is set as a cookie. Default: <literal>|</literal> (also known as the vertical bar character).</para>
       <para>Property: <literal>com.sun.identity.agents.config.attribute.cookie.separator</literal></para>
      </listitem>
     </varlistentry>
@@ -3164,7 +3160,7 @@ com.sun.identity.agents.config.cdsso.cookie.domain[1]=.example.net</literallayou
    </variablelist>
    
    <variablelist xml:id="j2ee-agent-deprecated-properties">
-    <title>Deprecated Agent Properties properties</title>
+    <title>Deprecated Client Browser User Agent Properties</title>
     <varlistentry>
      <term>Goto Parameter Name</term>
      <listitem>
@@ -3787,14 +3783,14 @@ com.sun.identity.agents.config.cdsso.cookie.domain[1]=.example.net</literallayou
     <term>STS Configuration</term>
     <listitem>
      <para>Specifies the agent used to secure requests to the Security Token
-     Service.</para>
+     Service. Associated with the STSSecurity Security Mechanism.</para>
     </listitem>
    </varlistentry>
    <varlistentry>
     <term>Discovery Configuration</term>
     <listitem>
      <para>Specifies the agent used to secure requests to the Discovery
-     Service.</para>
+     Service. Associated with the LibertyDiscoverySecurity Security Mechanism.</para>
     </listitem>
    </varlistentry>
    <varlistentry>
@@ -4002,68 +3998,7 @@ com.sun.identity.agents.config.cdsso.cookie.domain[1]=.example.net</literallayou
    </varlistentry>
   </variablelist>
  </section>
- 
- <section xml:id="configure-disco-policy-agent">
-  <title>Configuring Discovery Service Client Policy Agents</title>
-  <indexterm>
-   <primary>Policy agents</primary>
-   <secondary>Configuring</secondary>
-  </indexterm>
-  <para>This section covers Discover Service Client properties. Discovery
-  Service clients get Liberty security tokens from a Liberty Discovery
-  Service.</para>
- 
-  <para>After creating a Discovery Client profile, you access Discovery agent
-  properties in the OpenAM console under Access Control &gt; <replaceable>Realm
-  Name</replaceable> &gt; Agents &gt; STS Client &gt; <replaceable>Agent
-  Name</replaceable>.</para>
- 
- <variablelist>
-  <varlistentry>
-   <term>Group</term>
-   <listitem>
-    <para>For assigning the agent to a previously configured agent group in
-    order to inherit selected properties from the group.</para>
-   </listitem>
-  </varlistentry>
-  <varlistentry>
-   <term>Password</term>
-   <listitem>
-    <para>Agent password used when creating the password file and when
-    installing the agent.</para>
-   </listitem>
-  </varlistentry>
-  <varlistentry>
-   <term>Status</term>
-   <listitem>
-    <para>Status of the agent configuration.</para>
-   </listitem>
-  </varlistentry>
-  <varlistentry>
-   <term>Private Key Alias</term>
-   <listitem>
-    <para>Specifies the alias of the private key used to sign requests and
-    decrypt responses.</para>
-   </listitem>
-  </varlistentry>
-  <varlistentry>
-   <term>Discovery Service End Point</term>
-   <listitem>
-    <para>Specifies the end point with which the trust authority client
-    communicates for service registration and service lookups.</para>
-   </listitem>
-  </varlistentry>
-  <varlistentry>
-   <term>Authentication Web Service End Point</term>
-   <listitem>
-    <para>Specifies the end point with which the web services client
-    communicates to get end user SSOTokens and Discover Service resource
-    offerings.</para>
-   </listitem>
-  </varlistentry>
- </variablelist>
- </section>
- 
+
  <section xml:id="configure-sts-policy-agent">
   <title>Configuring Security Token Service Client Policy Agents</title>
   <indexterm>
@@ -4796,7 +4731,7 @@ com.sun.identity.agents.config.cdsso.cookie.domain[1]=.example.net</literallayou
    </varlistentry>
 
    <varlistentry>
-    <term>Client Session URI</term>
+    <term>URI of the Client Application</term>
     <listitem>
      <para>The relying party (client) URI to which the OpenID Connect Provider
      sends session changed notification messages using the HTML 5 postMessage

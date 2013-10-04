@@ -28,8 +28,7 @@
  version='5.0' xml:lang='en'
  xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance'
  xsi:schemaLocation='http://docbook.org/ns/docbook http://docbook.org/xml/5.0/xsd/docbook.xsd'
- xmlns:xlink='http://www.w3.org/1999/xlink'
- xmlns:xinclude='http://www.w3.org/2001/XInclude'>
+ xmlns:xlink='http://www.w3.org/1999/xlink'>
  <title>Troubleshooting</title>
  <indexterm><primary>Troubleshooting</primary></indexterm>
  <para>This chapter covers how to get debugging information and troubleshoot
@@ -211,7 +210,7 @@ PING openam-ter (192.168.56.2) 56(84) bytes of data.
      <para>When you set up a New Data Store to use OpenDJ as an identity
      repository under Access Control &gt; <replaceable>Realm Name</replaceable>
      &gt; Data Stores &gt; New..., you need to check the Load schema when
-     finished box if you want OpenAM to add the schema to OpenDJ. The box is
+     saved box if you want OpenAM to add the schema to OpenDJ. The box is
      not selected by default.</para>
      <para>The full version of OpenAM includes directory server schema in the
      <filename>~/Downloads/openam/ldif/</filename> directory. To add the schema

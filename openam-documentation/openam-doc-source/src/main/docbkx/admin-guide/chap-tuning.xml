@@ -28,8 +28,7 @@
  version='5.0' xml:lang='en'
  xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance'
  xsi:schemaLocation='http://docbook.org/ns/docbook http://docbook.org/xml/5.0/xsd/docbook.xsd'
- xmlns:xlink='http://www.w3.org/1999/xlink'
- xmlns:xinclude='http://www.w3.org/2001/XInclude'>
+ xmlns:xlink='http://www.w3.org/1999/xlink'>
  <title>Tuning OpenAM</title>
  <indexterm><primary>Performance</primary></indexterm>
  <para>This chapter covers key OpenAM tunings to ensure smoothly performing
@@ -128,6 +127,7 @@
         <para>(<literal>sun-idrepo-ldapv3-config-connection_pool_max_size</literal>)</para>
        </entry>
       </row>
+         <!-- no longer included in the console
       <row>
        <entry>Caching</entry>
        <entry>False</entry>
@@ -153,6 +153,7 @@
         <para>(<literal>sun-idrepo-ldapv3-config-cache-size</literal>)</para>
        </entry>
       </row>
+      -->
      </tbody>
     </tgroup>
    </table>
@@ -599,6 +600,8 @@
      <literal>com.sun.identity.client.notification.url</literal>.</para>
     </step>
 
+  <!-- Options not shown
+
     <step>
      <para>On the OpenAM Services tab, check that Enable Notification of User
      Data Caches is enabled.</para>
@@ -617,7 +620,7 @@
      <para>The corresponding property is
      <literal>com.iplanet.am.sdk.remote.pollingTime</literal>.</para>
     </step>
-
+                                                 -->
     <step>
      <para>For any changes you make, Save your work.</para>
 

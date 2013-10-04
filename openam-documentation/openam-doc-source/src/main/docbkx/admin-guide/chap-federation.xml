@@ -28,8 +28,7 @@
  version='5.0' xml:lang='en'
  xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance'
  xsi:schemaLocation='http://docbook.org/ns/docbook http://docbook.org/xml/5.0/xsd/docbook.xsd'
- xmlns:xlink='http://www.w3.org/1999/xlink'
- xmlns:xinclude='http://www.w3.org/2001/XInclude'>
+ xmlns:xlink='http://www.w3.org/1999/xlink'>
  <title>Managing SAML 2.0 Federation</title>
 
  <para>This chapter addresses how to set up and manage SAML 2.0 SSO for
@@ -100,19 +99,16 @@
     <para>Know which providers participate in the circle of trust.</para>
    </listitem>
    <listitem>
-    <para>Know how your OpenAM installations act as identity providers, or
+    <para>Know how OpenAM installations act as identity providers, or
     service providers.</para>
    </listitem>
    <listitem>
-    <para>Agree with other providers on a synchronized clock or time service
-    to share for provider systems.</para>
-    <para>Processing messages you exchange requires synchronized time
-    keeping.</para>
+    <para>Agree with other providers on a synchronized time service.</para>
    </listitem>
    <listitem>
     <para>For identity information exchanged with other participants in a
-    circle of trust, define how to map user attributes you share. Your user
-    profile attribute names map to user profile attribute names at other
+    circle of trust, define how to map shared user attributes. Local user
+    profile attribute names should map to user profile attribute names at other
     providers.</para>
     <para>For example, if you exchange user identifiers with your partners, and
     you call it <literal>uid</literal> whereas another partner calls it
@@ -594,7 +590,7 @@
     </step>
     <step>
      <para>On the service provider console, under Federation &gt; Circle of
-     Trust Configuration &gt; <replaceable>Circle of Trust Name</replaceable>
+     Trust &gt; <replaceable>Circle of Trust Name</replaceable>
      add SAML2 Writer and Reader Service URLs for the identity provider
      discovery service endpoints, and Save your work.</para>
 
@@ -858,17 +854,7 @@ CookieWriterServlet.doGetPost: Redirect to
      </listitem>
     </varlistentry>
    </variablelist>
-   
-   <variablelist xml:id="idp-bootstrapping">
-    <title>Bootstrapping</title>
-    <varlistentry>
-     <term>Discovery Bootstrapping</term>
-     <listitem>
-      <para>When enabled, generate a Discovery Service Resource Offering
-      during the Liberty-based single sign on.</para>
-     </listitem>
-    </varlistentry>
-   </variablelist>
+
   </section>
   
   <section xml:id="idp-assertion-processing">
@@ -926,6 +912,12 @@ CookieWriterServlet.doGetPost: Redirect to
      <listitem>
       <para>URL where users are redirected to authenticate.</para>
      </listitem>
+    </varlistentry>
+    <varlistentry>
+        <term>Reverse Proxy URL</term>
+        <listitem>
+            <para>When a reverse proxy is used for SAML endpoints, it is specified here.</para>
+        </listitem>
     </varlistentry>
     <varlistentry>
      <term>External Application Logout URL</term>
@@ -1722,16 +1714,16 @@ CookieWriterServlet.doGetPost: Redirect to
    </step>
 
    <step>
-    <para>Enter the EntityID for your Salesforce service provider.</para>
-    
-    <para>This ID is used as the persistent EntityDescriptor metadata
-    element so that users can have multiple service provider instances.
-    This field is used for the EntityDescriptor on the next page.</para>
+    <para>On the OpenAM console Common Tasks page, click Configure Salesforce
+    CRM.</para>
    </step>
 
    <step>
-    <para>On the OpenAM console Common Tasks page, click Configure Salesforce
-    CRM.</para>
+     <para>Enter the EntityID for your Salesforce service provider.</para>
+
+     <para>This ID is used as the persistent EntityDescriptor metadata
+              element so that users can have multiple service provider instances.
+              This field is used for the EntityDescriptor on the next page.</para>
    </step>
 
    <step>
@@ -2301,13 +2293,27 @@ CookieWriterServlet.doGetPost: Redirect to
     <term><literal>binding</literal></term>
     <listitem>
      <para>(Required) Use this parameter to indicate what binding to use for the
-     operation. The full, long name format is required for this parameter to work.
-     For example, specify <literal>urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST</literal>
-     to use HTTP POST binding with a self-submitting form rather than the default
-     HTTP redirect binding. In addition, you can use 
-     <literal>urn:oasis:names:tc:SAML:2.0:bindings:HTTP-Artifact</literal>.</para>
+     operation. The full, long name format is required for this parameter to work.</para>
+     <itemizedlist>
+         <para>The value must be one of the following.</para>
+
+         <listitem>
+             <para><literal>urn:oasis:names:tc:SAML:2.0:bindings:HTTP-Redirect</literal> (default)</para>
+         </listitem>
+
+         <listitem>
+             <para><literal>urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST</literal></para>
+         </listitem>
+
+         <listitem>
+             <para><literal>urn:oasis:names:tc:SAML:2.0:bindings:SOAP</literal></para>
+         </listitem>
+     </itemizedlist>
+
     </listitem>
    </varlistentry>
+
+      <!-- Above addresses OPENAM-3061 / OPENAM-3078 -->
    
    <varlistentry>
     <term><literal>Consent</literal></term>
@@ -3145,7 +3151,7 @@ provider.</screen>
     <listitem>
      <para>Copy the name ID mapping output file to the other provider.</para>
 
-     <screen>$ scp /tmp/name-map.txt idp.example.org:/tmp/name-map.txt
+     <screen>$ scp /tmp/name-map.txt openam@idp.example.org:/tmp/name-map.txt
 openam@idp.example.org's password:
 name-map.txt                     100%  177     0.2KB/s   00:00</screen>
     </listitem>
