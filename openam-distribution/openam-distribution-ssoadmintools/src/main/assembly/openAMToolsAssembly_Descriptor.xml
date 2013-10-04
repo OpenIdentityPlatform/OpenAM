@@ -10,7 +10,7 @@
     <!-- Library Dependency -->
     <dependencySets>
         <dependencySet>
-            <outputFileNameMapping>${artifact.artifactId}-${artifact.baseVersion}.${artifact.extension}</outputFileNameMapping>
+            <outputFileNameMapping>${artifact.build.finalName}.${artifact.extension}</outputFileNameMapping>
             <outputDirectory>lib</outputDirectory>
             <includes>
                 <include>org.forgerock.openam:openam-shared</include>
@@ -57,8 +57,8 @@
     <fileSets>
 
         <fileSet>
-            <outputDirectory></outputDirectory>
-            <directory>${project.basedir}/../../license</directory>
+            <outputDirectory>legal-notices</outputDirectory>
+            <directory>${project.build.directory}/legal-notices</directory>
             <includes>
                 <include>**/**</include>
             </includes>

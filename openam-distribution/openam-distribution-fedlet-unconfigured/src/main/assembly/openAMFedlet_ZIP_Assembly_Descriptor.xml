@@ -8,6 +8,16 @@
     </formats>
     <includeBaseDirectory>false</includeBaseDirectory>
 
+    <fileSets>
+        <fileSet>
+            <outputDirectory>legal-notices</outputDirectory>
+            <directory>${project.build.directory}/legal-notices</directory>
+            <includes>
+                <include>**/**</include>
+            </includes>
+        </fileSet>
+    </fileSets>
+
     <!-- Single Files -->
     <files>
         <file>
@@ -45,6 +55,7 @@
             <destName>sp.xml-template</destName>
         </file>
     </files>
+
 
 </assembly>
 

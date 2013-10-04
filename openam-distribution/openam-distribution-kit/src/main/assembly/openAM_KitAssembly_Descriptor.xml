@@ -54,12 +54,19 @@
     </dependencySets>
     <fileSets>
         <fileSet>
-            <outputDirectory>legal</outputDirectory>
+            <outputDirectory>legal-notices</outputDirectory>
             <directory>../../legal</directory>
         </fileSet>
         <fileSet>
-            <outputDirectory>license</outputDirectory>
+            <outputDirectory>legal-notices</outputDirectory>
             <directory>../../license</directory>
+        </fileSet>
+        <fileSet>
+            <outputDirectory>legal-notices</outputDirectory>
+            <directory>${project.build.directory}/legal-notices</directory>
+            <includes>
+                <include>**/**</include>
+            </includes>
         </fileSet>
         <fileSet>
             <outputDirectory>ldif</outputDirectory>

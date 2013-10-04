@@ -57,6 +57,13 @@
     <fileSets>
 
         <fileSet>
+            <outputDirectory>legal-notices</outputDirectory>
+            <directory>${project.build.directory}/legal-notices</directory>
+            <includes>
+                <include>**/**</include>
+            </includes>
+        </fileSet>
+        <fileSet>
             <outputDirectory>com_sun_web_ui/css</outputDirectory>
             <directory>${project.basedir}/../../openam-server-only/src/main/webapp/com_sun_web_ui/css</directory>
             <includes>
@@ -221,5 +228,6 @@
             <destName>index.html</destName>
         </file>
     </files>
+
 </assembly>
 
