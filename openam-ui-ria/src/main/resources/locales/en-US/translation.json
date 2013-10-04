@@ -181,7 +181,7 @@
             "submit" : "Submit",
             "actions" : "Actions",
             "complete" : "Complete",
-            "copyright" : "Copyright (c) 2010-12 ForgeRock, all rights reserved.",
+            "copyright" : "Copyright (c) 2010-13 ForgeRock, all rights reserved.",
             "sessionExpired" : "Session Expired",
             "deleteSelected" : "Delete Selected",
             "validation" : {
