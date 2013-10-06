@@ -26,6 +26,9 @@
  *
  */
 
+/**
+ * Portions Copyrighted 2013 ForgeRock AS
+ */
 package com.sun.identity.sm;
 
 import com.iplanet.sso.SSOException;
@@ -136,7 +139,7 @@ public class CachedSubEntries {
                cachedEntry.getDN() + " pattern: " + pattern);
         }
         return (cachedEntry.getSMSEntry().subEntries(
-            token, pattern, 0, true, true));
+            token, pattern, 0, false, true));
     }
 
     /**
