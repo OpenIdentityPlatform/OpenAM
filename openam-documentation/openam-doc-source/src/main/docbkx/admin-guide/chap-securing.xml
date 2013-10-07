@@ -299,8 +299,8 @@
             <step>
                 <para>You'll also need to change the password for the administrator on the directory server. If you are
                     using OpenDJ, refer to the <link xlink:show="new"
-                    xlink:href="admin-guide#troubleshoot-reset-admin-passwords"
-                    xlink:role="http://docbook.org/xlink/role/olink"><citetitle>OpenDJ Administration Guide</citetitle> section on Resetting Administrator
+                    xlink:href="http://docs.forgerock.org/en/opendj/2.6.0/admin-guide#troubleshoot-reset-admin-passwords"
+                    ><citetitle>OpenDJ Administration Guide</citetitle> section on Resetting Administrator
                     Passwords</link>. If you are using a different directory server, you will have to refer to the
                 documentation for that server.</para>
             </step>
@@ -350,8 +350,8 @@
                 <para>As noted earlier, you'll also need to make sure that the corresponding account on the directory server
                 has at least CN=Directory Manager  privileges. If you're using OpenDJ, refer to the chapter on
                     <citetitle>Configuring Privileges &amp; Access Control</citetitle> in the
-                    <link xlink:role="http://docbook.org/xlink/role/olink"
-                    xlink:href="admin-guide#chap-privileges-acls" xlink:show="new">
+                    <link xlink:show="new"
+                    xlink:href="http://docs.forgerock.org/en/opendj/2.6.0/admin-guide#chap-privileges-acls">
                     <citetitle>OpenDJ Administration Guide</citetitle></link>.</para>
             </step>
         </procedure>
