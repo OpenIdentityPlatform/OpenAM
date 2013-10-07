@@ -2009,7 +2009,8 @@ CookieWriterServlet.doGetPost: Redirect to
      <para>Used to initiate SLO from the service provider side, so call this
      on the service provider not the identity provider.</para>
      <para>Example:
-     <literal>http://www.sp.example:8080/sp/saml2/jsp/spSingleLogoutInit.jsp</literal></para>
+     <literal>http://www.sp.example:8080/openam/saml2/jsp/spSingleLogoutInit.jsp</literal>,
+     <literal>http://www.sp.example:8080/openam/SPSloInit</literal></para>
     </listitem>
    </varlistentry>
 
@@ -2019,7 +2020,8 @@ CookieWriterServlet.doGetPost: Redirect to
      <para>Used to initiate SLO from the identity provider side, so call this
      on the identity provider not the service provider.</para>
      <para>Example:
-     <literal>http://www.idp.example:8080/idp/saml2/jsp/idpSingleLogoutInit.jsp</literal></para>
+     <literal>http://www.idp.example:8080/openam/saml2/jsp/idpSingleLogoutInit.jsp</literal>,
+     <literal>http://www.idp.example:8080/openam/IDPSloInit</literal></para>
     </listitem>
    </varlistentry>
   </variablelist>
@@ -2757,6 +2759,9 @@ CookieWriterServlet.doGetPost: Redirect to
  &amp;requestType=NewID
  &amp;IDPProvidedID=XyfFEsr6Vixbnt0BSqIglLFMGjR2</literallayout>
 
+   <para>If desired, you can substitute <literal>openam/SPMniInit</literal>
+   for <literal>openam/saml2/jsp/spMNIRequestInit.jsp</literal></para>
+
    <para>You can also initiate the change request from the identity provider
    as in the following example.</para>
 
@@ -2766,6 +2771,10 @@ CookieWriterServlet.doGetPost: Redirect to
  &amp;metaAlias=/idp
  &amp;requestType=NewID
  &amp;SPProvidedID=XyfFEsr6Vixbnt0BSqIglLFMGjR2</literallayout>
+
+
+   <para>If desired, you can substitute <literal>openam/IDPMniInit</literal>
+   for <literal>openam/saml2/jsp/idpMNIRequestInit.jsp</literal></para>
 
    <variablelist xml:id="idpmnirequestinit-parameters">
     <title><filename>idpMNIRequestInit.jsp</filename> Parameters</title>
