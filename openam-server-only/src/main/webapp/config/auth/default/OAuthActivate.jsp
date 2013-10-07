@@ -158,15 +158,8 @@
     </div>
     <div class="footer alt-color">
         <div class="grid_3">
-            <p>Copyright &copy; 2010-2013 ForgeRock AS,<br/>Lysaker torg 2,<br/>1366 Lysaker,<br/>Norway.<br/>All rights
-                reserved.</p>
-        </div>
-        <div class="grid_6 suffix_3">
-            <p>Licensed for use under the Common Development and Distribution License (CDDL), see <a
-                    href="http://www.forgerock.org/license/CDDLv1.0.html">http://www.forgerock.org/license/CDDLv1.0.html</a>
-                for details. This software is based on the OpenAM/OpenAM open source project and the source includes the
-                copyright works of other authors, granted for use under the CDDL. This distribution may include other
-                materials developed by third parties. All Copyrights and Trademarks are property of their owners.</p>
+            <p>Copyright &copy; 208-2013, ForgeRock AS. <br/>All Rights Reserved. Use of this software is subject to the
+                terms and conditions of the ForgeRock&trade; License and Subscription Agreement.</p>
         </div>
     </div>
 </div>
