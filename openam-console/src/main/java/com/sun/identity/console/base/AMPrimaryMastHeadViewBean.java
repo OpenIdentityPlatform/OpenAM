@@ -243,8 +243,8 @@ public abstract class AMPrimaryMastHeadViewBean
             "../" + consoleDirectory + "/images/PrimaryProductName.png";
 
         mm.setSrc(logo);
-        mm.setWidth("78");
-        mm.setHeight("40");
+        mm.setWidth("");
+        mm.setHeight("");
         mm.setVersionProductNameSrc(logo);
 
         /*
