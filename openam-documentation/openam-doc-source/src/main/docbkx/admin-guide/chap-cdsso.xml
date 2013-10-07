@@ -82,6 +82,16 @@
   </textobject>
  </mediaobject>
 
+ <itemizedlist>
+   <para>This chapter includes the following procedures.</para>
+
+   <listitem><para><xref linkend="enable-cdsso-jee-agent" /></para></listitem>
+   <listitem><para><xref linkend="enable-cdsso-web-agent" /></para></listitem>
+   <listitem><para><xref linkend="show-cdsso-login-progress" /></para></listitem>
+   <listitem><para><xref linkend="enable-cdsso-cookie-hijacking-protection" /></para></listitem>
+   <listitem><para><xref linkend="using-saml2-with-policy-agents" /></para></listitem>
+ </itemizedlist>
+
  <procedure xml:id="enable-cdsso-jee-agent">
   <title>To Enable CDSSO For a Java EE Policy Agent</title>
 
@@ -293,5 +303,56 @@
    <para>Restart OpenAM or the container in which it runs for the configuration
    changes to take effect.</para>
   </step>
+ </procedure>
+
+ <procedure xml:id="using-saml2-with-policy-agents">
+   <title>Using SAML 2.0 With Policy Agents</title>
+
+   <para>The federation mechanism associated with SAML can be used as an alternative to
+   CDSSO for both Web and Java EE policy agents. This assumes OpenAM is configured as an
+   IDP on one domain, and the desired policy agent protects resources on behalf of a second
+   instance of OpenAM, where that instance acts as an SP on a second domain.</para>
+
+   <para>While using SAML 2.0 adds complexity, it supports attribute
+   mapping, which may be useful when the two domains are associated with datastores
+   with different attributes.</para>
+
+   <step>
+    <para>Install a policy agent. The basic process for installing policy agents is available in the
+    <link xlink:href="web-install-guide" xlink:show="new"
+    xlink:role="http://docbook.org/xlink/role/olink"><citetitle>OpenAM Web Policy Agent
+    Installation Guide</citetitle></link> and the <link xlink:href="jee-install-guide" xlink:show="new"
+    xlink:role="http://docbook.org/xlink/role/olink"><citetitle>OpenAM Java EE Policy Agent
+    Installation Guide</citetitle></link>.</para>
+   </step>
+
+   <step>
+    <para>Now you can replace the given OpenAM Login URL and OpenAM Logout URLs with SAML2 URLs
+    configured in the section on <link xlink:href="admin-guide#chap-federation" xlink:show="new"
+    xlink:role="http://docbook.org/xlink/role/olink"><citetitle>Managing SAML 2.0 Federation</citetitle>
+    </link>.</para>
+   </step>
+
+   <step>
+    <stepalternatives>
+     <step>
+      <para>If you have configured the Web policy agents to store their properties centralized on an
+       OpenAM server, navigate to the URL for the OpenAM console.
+       Select Access Control &gt; <replaceable>Realm Name</replaceable> &gt; Agents &gt; Web &gt;
+       <replaceable>Agent Name</replaceable> &gt; OpenAM Services. </para>
+       <para>For the Web Agent, under the OpenAM Services tab, in the Agent Logout URL section, set up a
+       list of application logout URLs. In the Logout Redirect URL text box, enter an appropriate URL to
+       redirect the user after logout.</para>
+      </step>
+      <step>
+       <para>Alternatively, if the Web policy agents are set up to store properties on local systems, find
+       the <filename>OpenSSOAgentConfiguration.properties</filename> file in the
+       <filename>/path/to/agent/config/</filename> directory. You can specify OpenAM Login and Logout URLs
+       with the <literal>com.sun.identity.agents.config.login.url</literal> and
+       <literal>com.sun.identity.agents.config.logout.url</literal> attributes, respectively.</para>
+      </step>
+     </stepalternatives>
+   </step>
+
  </procedure>
 </chapter>
