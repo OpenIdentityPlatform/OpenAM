@@ -66,7 +66,7 @@
    <listitem>
     <para>Set valid goto URL domains for OpenAM in the core authentication
     module configuration. The parameter is described in the section providing
-    <link xlink:href="admin-guide#core-module-conf-hints"
+    <link xlink:show="new" xlink:href="admin-guide#core-module-conf-hints"
     xlink:role="http://docbook.org/xlink/role/olink"><citetitle>Hints For the
     Core Authentication Module</citetitle></link> (<literal
     >iplanet-am-auth-valid-goto-domains</literal>).</para>
@@ -102,8 +102,8 @@
     <para>To minimize risks, deploy only the core OpenAM server on systems directly connected
         through a firewall. As a start, deploy only the core server (and the protected web application)
         on Internet-facing servers. For instructions, see the following section from the
-        OpenAM Installation Guide: <link xlink:href="install-guide#which-war-to-deploy"
-        xlink:role="http://docbook.org/xlink/role/olink"><citetitle>Determine Which
+        OpenAM Installation Guide, <link xlink:href="install-guide#which-war-to-deploy"
+        xlink:show="new" xlink:role="http://docbook.org/xlink/role/olink"><citetitle>Determine Which
         War File to Deploy</citetitle></link>.</para>
 
     <para>You can further limit what is exposed through the firewall by using one of two strategies:</para>
@@ -115,13 +115,13 @@
             just enough login logic to receive user authentication requests. Those requests are forwarded
             to the core OpenAM servers.</para>
             <para>See <link xlink:href="install-guide#chap-install-das"
-                      xlink:role="http://docbook.org/xlink/role/olink"><citetitle>Installing
+                  xlink:show="new" xlink:role="http://docbook.org/xlink/role/olink"><citetitle>Installing
                     OpenAM Distributed Authentication</citetitle></link> for installation
                 instructions. The following figure shows the recommended architecture.</para>
             <mediaobject xml:id="figure-securing-openam-daui">
                 <alt>Exposing only the Distributed Authentication UI to the Internet</alt>
                 <imageobject>
-                    <imagedata fileref="images/secure-daui-diagram.png" format="PNG" />
+                    <imagedata fileref="images/securing-openam-daui.png" format="PNG" />
                 </imageobject>
                 <textobject><para>The OpenAM Distributed Authentication UI can hide many
                     OpenAM administrative capabilities from the Internet. Notice that OpenAM
@@ -137,7 +137,7 @@
             <mediaobject xml:id="figure-securing-openam-rp">
                 <alt>Exposing only a reverse proxy to the Internet</alt>
                 <imageobject>
-                    <imagedata fileref="images/secure-reverse-proxy.png" format="PNG" />
+                    <imagedata fileref="images/securing-openam-rp.png" format="PNG" />
                 </imageobject>
                 <textobject><para>By placing a reverse proxy between OpenAM and the
                     Internet, you expose only the necessary endpoints outside your
@@ -181,7 +181,7 @@
    <listitem>
     <para>Create realms for your organization(s) and separate administrative
     users from end users. For instructions, see <link
-    xlink:href="admin-guide#chap-realms"
+    xlink:href="admin-guide#chap-realms" xlink:show="new"
     xlink:role="http://docbook.org/xlink/role/olink"><citetitle>Configuring
     Realms</citetitle></link>. You must then either:</para>
     <itemizedlist>
@@ -205,7 +205,7 @@
 
    <listitem>
     <para>Create a policy agent profile for each policy agent. See <link
-    xlink:href="admin-guide#chap-agents"
+    xlink:href="admin-guide#chap-agents" xlink:show="new"
     xlink:role="http://docbook.org/xlink/role/olink"><citetitle>Configuring
     Policy Agent Profiles</citetitle></link> for instructions.</para>
    </listitem>
@@ -238,7 +238,7 @@
    <listitem>
     <para>Use cookie hijacking protection with restricted tokens, where each
     policy agent uses different SSO tokens for the same user. See <link
-    xlink:href="admin-guide#enable-cdsso-cookie-hijacking-protection"
+    xlink:show="new" xlink:href="admin-guide#enable-cdsso-cookie-hijacking-protection"
     xlink:role="http://docbook.org/xlink/role/olink"><citetitle>To Protect
     Against CDSSO Cookie Hijacking</citetitle></link> for instructions.</para>
    </listitem>
@@ -299,8 +299,8 @@
             <step>
                 <para>You'll also need to change the password for the administrator on the directory server. If you are
                     using OpenDJ, refer to the <link xlink:show="new"
-                    xlink:href='http://opendj.forgerock.org/doc/admin-guide/index.html#troubleshoot-reset-admin-passwords'
-                            ><citetitle>OpenDJ Administration Guide</citetitle> section on Resetting Administrator
+                    xlink:href="admin-guide#troubleshoot-reset-admin-passwords"
+                    xlink:role="http://docbook.org/xlink/role/olink"><citetitle>OpenDJ Administration Guide</citetitle> section on Resetting Administrator
                     Passwords</link>. If you are using a different directory server, you will have to refer to the
                 documentation for that server.</para>
             </step>
@@ -350,7 +350,8 @@
                 <para>As noted earlier, you'll also need to make sure that the corresponding account on the directory server
                 has at least CN=Directory Manager  privileges. If you're using OpenDJ, refer to the chapter on
                     <citetitle>Configuring Privileges &amp; Access Control</citetitle> in the
-                    <link xlink:href="http://opendj.forgerock.org/doc/admin-guide/index.html#chap-privileges-acls" xlink:show="new">
+                    <link xlink:role="http://docbook.org/xlink/role/olink"
+                    xlink:href="admin-guide#chap-privileges-acls" xlink:show="new">
                     <citetitle>OpenDJ Administration Guide</citetitle></link>.</para>
             </step>
         </procedure>
