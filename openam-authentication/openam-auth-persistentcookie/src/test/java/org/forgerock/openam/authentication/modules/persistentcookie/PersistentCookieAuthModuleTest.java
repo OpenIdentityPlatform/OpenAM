@@ -219,7 +219,7 @@ public class PersistentCookieAuthModuleTest {
     }
 
     @Test
-    public void shouldProcessCallbacksWhenJwtRealmIsDifferent() throws LoginException {
+    public void shouldProcessCallbacksWhenJASPIContextNotFound() throws LoginException {
 
         //Given
         Callback[] callbacks = new Callback[0];
@@ -230,7 +230,43 @@ public class PersistentCookieAuthModuleTest {
         given(jwtSessionModule.validateJwtSessionCookie(Matchers.<MessageInfo>anyObject())).willReturn(jwt);
 
         given(jwt.getClaimsSet()).willReturn(claimsSet);
-        given(claimsSet.getClaim("openam.rlm", String.class)).willReturn("REALM");
+        given(claimsSet.getClaim("org.forgerock.authentication.context", Map.class)).willReturn(null);
+        shouldInitialiseAuthModule();
+
+        //When
+        boolean exceptionCaught = false;
+        AuthLoginException exception = null;
+        try {
+            persistentCookieAuthModule.process(callbacks, state);
+        } catch (AuthLoginException e) {
+            exceptionCaught = true;
+            exception = e;
+        }
+
+        //Then
+        verify(amLoginModuleBinder).setUserSessionProperty(JwtSessionModule.TOKEN_IDLE_TIME_CLAIM_KEY, "60");
+        verify(amLoginModuleBinder).setUserSessionProperty(JwtSessionModule.MAX_TOKEN_LIFE_KEY, "300");
+        verify(jwtSessionModule).validateJwtSessionCookie(Matchers.<MessageInfo>anyObject());
+        assertTrue(exceptionCaught);
+        assertEquals(exception.getErrorCode(), "jaspiContextNotFound");
+    }
+
+
+    @Test
+    public void shouldProcessCallbacksWhenJwtRealmIsDifferent() throws LoginException {
+
+        //Given
+        Callback[] callbacks = new Callback[0];
+        int state = ISAuthConstants.LOGIN_START;
+        Jwt jwt = mock(Jwt.class);
+        JwtClaimsSet claimsSet = mock(JwtClaimsSet.class);
+        Map<String, Object> internalMap = mock(HashMap.class);
+
+        given(jwtSessionModule.validateJwtSessionCookie(Matchers.<MessageInfo>anyObject())).willReturn(jwt);
+
+        given(jwt.getClaimsSet()).willReturn(claimsSet);
+        given(claimsSet.getClaim("org.forgerock.authentication.context", Map.class)).willReturn(internalMap);
+        given(internalMap.get("openam.rlm")).willReturn("REALM");
         given(amLoginModuleBinder.getRequestOrg()).willReturn("OTHER_REALM");
         shouldInitialiseAuthModule();
 
@@ -261,12 +297,15 @@ public class PersistentCookieAuthModuleTest {
         Jwt jwt = mock(Jwt.class);
         JwtClaimsSet claimsSet = mock(JwtClaimsSet.class);
 
+        Map<String, Object> internalMap = mock(HashMap.class);
+
         given(jwtSessionModule.validateJwtSessionCookie(Matchers.<MessageInfo>anyObject())).willReturn(jwt);
 
         given(jwt.getClaimsSet()).willReturn(claimsSet);
-        given(claimsSet.getClaim("openam.rlm", String.class)).willReturn("REALM");
+        given(claimsSet.getClaim("org.forgerock.authentication.context", Map.class)).willReturn(internalMap);
         given(amLoginModuleBinder.getRequestOrg()).willReturn("REALM");
-        given(claimsSet.getClaim("openam.usr", String.class)).willReturn("USER");
+        given(internalMap.get("openam.rlm")).willReturn("REALM");
+        given(internalMap.get("openam.usr")).willReturn("USER");
         shouldInitialiseAuthModule();
 
         //When
@@ -311,11 +350,24 @@ public class PersistentCookieAuthModuleTest {
     public void shouldCallOnLoginSuccessWhenJwtNotValidated() throws AuthenticationException, SSOException {
 
         //Given
+        persistentCookieAuthModule = new PersistentCookieAuthModule(new JwtSessionModule(), amKeyProvider) {
+            @Override
+            protected String getKeyAlias(String orgName) throws SSOException, SMSException {
+                return "KEY_ALIAS";
+            }
+        };
+
         MessageInfo messageInfo = mock(MessageInfo.class);
         Map requestParamsMap = new HashMap();
         HttpServletRequest request = mock(HttpServletRequest.class);
         HttpServletResponse response = mock(HttpServletResponse.class);
         SSOToken ssoToken = mock(SSOToken.class);
+
+        Map<String, Object> internalMap = new HashMap<String, Object>();
+        internalMap.put("openam.usr", "PRINCIPAL_NAME");
+        internalMap.put("openam.aty", "AUTH_TYPE");
+        internalMap.put("openam.sid", "SSO_TOKEN_ID");
+        internalMap.put("openam.rlm", "ORGANISATION");
 
         Map<String, Object> map = new HashMap<String, Object>();
         given(messageInfo.getMap()).willReturn(map);
@@ -335,17 +387,21 @@ public class PersistentCookieAuthModuleTest {
         persistentCookieAuthModule.onLoginSuccess(messageInfo, requestParamsMap, request, response, ssoToken);
 
         //Then
-        assertEquals(map.size(), 4);
-        assertEquals(map.get("openam.usr"), "PRINCIPAL_NAME");
-        assertEquals(map.get("openam.aty"), "AUTH_TYPE");
-        assertEquals(map.get("openam.sid"), "SSO_TOKEN_ID");
-        assertEquals(map.get("openam.rlm"), "ORGANISATION");
+        assertEquals(map.size(), 1);
+        assertEquals(map.get("org.forgerock.authentication.context"), internalMap);
     }
 
     @Test
     public void shouldCallOnLoginSuccess() throws AuthenticationException, SSOException {
 
         //Given
+        persistentCookieAuthModule = new PersistentCookieAuthModule(new JwtSessionModule(), amKeyProvider) {
+            @Override
+            protected String getKeyAlias(String orgName) throws SSOException, SMSException {
+                return "KEY_ALIAS";
+            }
+        };
+
         MessageInfo messageInfo = mock(MessageInfo.class);
         Map requestParamsMap = new HashMap();
         HttpServletRequest request = mock(HttpServletRequest.class);
@@ -354,6 +410,12 @@ public class PersistentCookieAuthModuleTest {
 
         Map<String, Object> map = new HashMap<String, Object>();
         given(messageInfo.getMap()).willReturn(map);
+
+        Map<String, Object> internalMapResult = new HashMap<String, Object>();
+        internalMapResult.put("openam.usr", "PRINCIPAL_NAME");
+        internalMapResult.put("openam.aty", "AUTH_TYPE");
+        internalMapResult.put("openam.sid", "SSO_TOKEN_ID");
+        internalMapResult.put("openam.rlm", "ORGANISATION");
 
         Principal principal = mock(Principal.class);
         given(principal.getName()).willReturn("PRINCIPAL_NAME");
@@ -371,11 +433,9 @@ public class PersistentCookieAuthModuleTest {
         persistentCookieAuthModule.onLoginSuccess(messageInfo, requestParamsMap, request, response, ssoToken);
 
         //Then
-        assertEquals(map.size(), 5);
-        assertEquals(map.get("openam.usr"), "PRINCIPAL_NAME");
-        assertEquals(map.get("openam.aty"), "AUTH_TYPE");
-        assertEquals(map.get("openam.sid"), "SSO_TOKEN_ID");
-        assertEquals(map.get("openam.rlm"), "ORGANISATION");
+        assertEquals(map.size(), 2);
         assertEquals(map.get("jwtValidated"), true);
+        assertEquals(map.get("org.forgerock.authentication.context"), internalMapResult);
+
     }
 }

@@ -28,6 +28,7 @@ import com.sun.identity.sm.SMSException;
 import com.sun.identity.sm.ServiceConfig;
 import com.sun.identity.sm.ServiceConfigManager;
 import org.apache.commons.lang.StringUtils;
+import org.forgerock.jaspi.filter.AuthNFilter;
 import org.forgerock.jaspi.modules.session.jwt.JwtSessionModule;
 import org.forgerock.json.jose.jwt.Jwt;
 import org.forgerock.openam.authentication.modules.common.JaspiAuthModuleWrapper;
@@ -207,14 +208,19 @@ public class PersistentCookieAuthModule extends JaspiAuthModuleWrapper<JwtSessio
         } else {
             //GOOD
 
+            Map<String, Object> claimsSetContext = jwt.getClaimsSet().getClaim(AuthNFilter.ATTRIBUTE_AUTH_CONTEXT, Map.class);
+            if(claimsSetContext == null) {
+                throw new AuthLoginException(AUTH_RESOURCE_BUNDLE_NAME, "jaspiContextNotFound", null);
+            }
+
             // Need to check realm
-            String jwtRealm = jwt.getClaimsSet().getClaim(OPENAM_REALM_CLAIM_KEY, String.class);
+            String jwtRealm = (String) claimsSetContext.get(OPENAM_REALM_CLAIM_KEY);
             if (!getRequestOrg().equals(jwtRealm)) {
                 throw new AuthLoginException(AUTH_RESOURCE_BUNDLE_NAME, "authFailedDiffRealm", null);
             }
 
             // Need to get user from jwt to use in Principal
-            final String username = jwt.getClaimsSet().getClaim(OPENAM_USER_CLAIM_KEY, String.class);
+            final String username = (String) claimsSetContext.get(OPENAM_USER_CLAIM_KEY);
             principal = new Principal() {
                 public String getName() {
                     return username;
@@ -280,16 +286,16 @@ public class PersistentCookieAuthModule extends JaspiAuthModuleWrapper<JwtSessio
             HttpServletResponse response, SSOToken ssoToken) throws AuthenticationException {
 
         try {
-            Map<String, Object> map = messageInfo.getMap();
+            Map<String, Object> contextMap = getServerAuthModule().getContextMap(messageInfo);
 
-            map.put(OPENAM_USER_CLAIM_KEY, ssoToken.getPrincipal().getName());
-            map.put(OPENAM_AUTH_TYPE_CLAIM_KEY, ssoToken.getAuthType());
-            map.put(OPENAM_SESSION_ID_CLAIM_KEY, ssoToken.getTokenID().toString());
-            map.put(OPENAM_REALM_CLAIM_KEY, ssoToken.getProperty(SSO_TOKEN_ORGANIZATION_PROPERTY_KEY));
+            contextMap.put(OPENAM_USER_CLAIM_KEY, ssoToken.getPrincipal().getName());
+            contextMap.put(OPENAM_AUTH_TYPE_CLAIM_KEY, ssoToken.getAuthType());
+            contextMap.put(OPENAM_SESSION_ID_CLAIM_KEY, ssoToken.getTokenID().toString());
+            contextMap.put(OPENAM_REALM_CLAIM_KEY, ssoToken.getProperty(SSO_TOKEN_ORGANIZATION_PROPERTY_KEY));
 
             String jwtString = ssoToken.getProperty(JwtSessionModule.JWT_VALIDATED_KEY);
             if (jwtString != null) {
-                map.put(JwtSessionModule.JWT_VALIDATED_KEY, Boolean.parseBoolean(jwtString));
+                messageInfo.getMap().put(JwtSessionModule.JWT_VALIDATED_KEY, Boolean.parseBoolean(jwtString));
             }
 
         } catch (SSOException e) {
