@@ -31,10 +31,13 @@ import org.mockito.ArgumentCaptor;
 import org.testng.annotations.Test;
 
 import static junit.framework.Assert.assertEquals;
+import static org.fest.assertions.Assertions.assertThat;
+import static org.fest.assertions.Fail.fail;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.BDDMockito.mock;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyString;
+import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 
@@ -85,6 +88,28 @@ public class LDAPAdapterTest {
     }
 
     @Test
+    public void shouldReturnNullWhenObjectNotFound() throws ErrorResultException {
+        // Given
+        String tokenId = "badger";
+        DN testDN = DN.rootDN();
+
+        Connection mockConnection = mock(Connection.class);
+        ErrorResultException exception = ErrorResultException.newErrorResult(ResultCode.NO_SUCH_OBJECT);
+        given(mockConnection.readEntry(eq(testDN))).willThrow(exception);
+
+        TokenAttributeConversion mockConversion = mock(TokenAttributeConversion.class);
+        given(mockConversion.generateTokenDN(anyString())).willReturn(testDN);
+
+        LDAPAdapter adapter = new LDAPAdapter(mockConversion);
+
+        // When
+        Token result = adapter.read(mockConnection, tokenId);
+
+        // Then
+        assertThat(result).isNull();
+    }
+
+    @Test
     public void shouldUseConnectionForDelete() throws ErrorResultException, LDAPOperationFailedException {
         // Given
         String tokenId = "badger";
@@ -106,6 +131,47 @@ public class LDAPAdapterTest {
         ArgumentCaptor<String> captor = ArgumentCaptor.forClass(String.class);
         verify(mockConnection).delete(captor.capture());
         assertEquals(String.valueOf(testDN), captor.getValue());
+    }
+
+    @Test
+    public void shouldDoNothingIfObjectNotFoundDuringDelete() throws LDAPOperationFailedException, ErrorResultException {
+        // Given
+        String tokenId = "badger";
+        DN testDN = DN.rootDN();
+
+        Connection mockConnection = mock(Connection.class);
+        ErrorResultException exception = ErrorResultException.newErrorResult(ResultCode.NO_SUCH_OBJECT);
+        given(mockConnection.delete(anyString())).willThrow(exception);
+
+        TokenAttributeConversion mockConversion = mock(TokenAttributeConversion.class);
+        given(mockConversion.generateTokenDN(anyString())).willReturn(testDN);
+
+        LDAPAdapter adapter = new LDAPAdapter(mockConversion);
+
+        // When / Then
+        adapter.delete(mockConnection, tokenId);
+    }
+
+    @Test
+    public void shouldThrowAllOtherExceptionsDuringDelete() throws LDAPOperationFailedException, ErrorResultException {
+        // Given
+        String tokenId = "badger";
+        DN testDN = DN.rootDN();
+
+        Connection mockConnection = mock(Connection.class);
+        ErrorResultException exception = ErrorResultException.newErrorResult(ResultCode.OTHER);
+        given(mockConnection.delete(anyString())).willThrow(exception);
+
+        TokenAttributeConversion mockConversion = mock(TokenAttributeConversion.class);
+        given(mockConversion.generateTokenDN(anyString())).willReturn(testDN);
+
+        LDAPAdapter adapter = new LDAPAdapter(mockConversion);
+
+        // When / Then
+        try {
+            adapter.delete(mockConnection, tokenId);
+            fail();
+        } catch (ErrorResultException e) {}
     }
 
     @Test

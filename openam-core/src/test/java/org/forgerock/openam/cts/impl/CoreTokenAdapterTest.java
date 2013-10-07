@@ -27,7 +27,6 @@ import org.forgerock.openam.cts.impl.query.QueryFactory;
 import org.forgerock.opendj.ldap.Connection;
 import org.forgerock.opendj.ldap.ConnectionFactory;
 import org.forgerock.opendj.ldap.ErrorResultException;
-import org.forgerock.opendj.ldap.ResultCode;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
@@ -37,7 +36,6 @@ import static org.mockito.BDDMockito.mock;
 import static org.mockito.Matchers.*;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
-import static org.testng.AssertJUnit.assertNull;
 
 /**
  * @author robert.wapshott@forgerock.com
@@ -111,33 +109,6 @@ public class CoreTokenAdapterTest {
 
         // Then
         assertThat(result.getTokenId()).isEqualTo(tokenId);
-    }
-
-    @Test (expectedExceptions = CoreTokenException.class)
-    public void shouldFailReadIfOtherExceptionIsEncountered() throws CoreTokenException, ErrorResultException {
-        // Given
-        String tokenId = "badger";
-
-        ErrorResultException exception = ErrorResultException.newErrorResult(ResultCode.ADMIN_LIMIT_EXCEEDED);
-        given(mockLDAPAdapter.read(any(Connection.class), anyString())).willThrow(exception);
-
-        // When / Then
-        adapter.read(tokenId);
-    }
-
-    @Test
-    public void shouldReturnNullIfNoTokenFoundWhenRead() throws ErrorResultException, CoreTokenException {
-        // Given
-        String tokenId = "badger";
-
-        ErrorResultException exception = ErrorResultException.newErrorResult(ResultCode.NO_SUCH_OBJECT, "test");
-        given(mockLDAPAdapter.read(any(Connection.class), eq(tokenId))).willThrow(exception);
-
-        // When
-        Token result = adapter.read(tokenId);
-
-        // Then
-        assertNull(result);
     }
 
     @Test
