@@ -351,7 +351,7 @@
                 has at least CN=Directory Manager  privileges. If you're using OpenDJ, refer to the chapter on
                     <citetitle>Configuring Privileges &amp; Access Control</citetitle> in the
                     <link xlink:show="new"
-                    xlink:href="http://docs.forgerock.org/en/opendj/2.6.0/admin-guide#chap-privileges-acls">
+                    xlink:href="http://docs.forgerock.org/en/opendj/2.6.0/admin-guide#chap-privileges-acis">
                     <citetitle>OpenDJ Administration Guide</citetitle></link>.</para>
             </step>
         </procedure>
