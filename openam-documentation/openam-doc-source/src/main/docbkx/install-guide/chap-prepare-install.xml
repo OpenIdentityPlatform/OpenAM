@@ -1082,8 +1082,8 @@ configuration.dir=$HOME/openamJboss</screen>
 </section>
 
 
-<section xml:id="prepare-jetty-7">
-  <title>Preparing Jetty 7</title>
+<section xml:id="prepare-jetty">
+  <title>Preparing Jetty</title>
 
   <para>When you deploy OpenAM, make sure you start Jetty with enough
   memory.</para>

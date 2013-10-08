@@ -69,11 +69,9 @@
     <para>JBoss Application Server 7</para>
    </listitem>
    <listitem>
-    <!-- Pending OPENAM-2853 and other testing
-    <para>Jetty 7</para>
-    <para>Jetty 8</para>
-    -->
-    <para>Jetty 9</para>
+    <para>Jetty 7 (7.6.13 or later)</para>
+    <para>Jetty 8 (8.1.13 or later)</para>
+    <!-- Pending OPENAM-3015 <para>Jetty 9</para> -->
    </listitem>
    <listitem>
     <para>Oracle WebLogic Server 11g (10.3.5)</para>
