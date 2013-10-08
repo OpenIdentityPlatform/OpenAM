@@ -28,8 +28,7 @@
  version='5.0' xml:lang='en'
  xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance'
  xsi:schemaLocation='http://docbook.org/ns/docbook http://docbook.org/xml/5.0/xsd/docbook.xsd'
- xmlns:xlink='http://www.w3.org/1999/xlink'
- xmlns:xinclude='http://www.w3.org/2001/XInclude'>
+ xmlns:xlink='http://www.w3.org/1999/xlink'>
  <title>Configuration Reference</title>
 
  <indexterm><primary>Configuration</primary></indexterm>
@@ -3658,6 +3657,93 @@
      servers.</para>
     </listitem>
    </varlistentry>
+  </variablelist>
+
+  <variablelist xml:id="servers-cts">
+    <title>Servers &gt; CTS</title>
+
+    <para>The Core Token Service (CTS) does not need to be configured in the same LDAP storage as the
+    external or embedded user store. The CTS can instead be configured on its own external directory server.
+    There are some specific requirements for indexing and replication which need to be accounted for.
+    In particular, WAN replication is an important consideration which needs to be handled carefully for
+    optimum performance.</para>
+
+    <varlistentry>
+        <term>Default Token Store</term>
+        <listitem>
+            <para>If selected, CTS tokens are stored in the same external or embedded datastore as is
+            used on an OpenAM configuration store.</para>
+        </listitem>
+    </varlistentry>
+
+    <varlistentry>
+        <term>External Token Store</term>
+        <listitem>
+            <para>If you use OpenDJ, you can separate the CTS from the configuration on different external servers.
+            On the external CTS server, you would also need to configure token schema and indexes.</para>
+        </listitem>
+    </varlistentry>
+
+    <varlistentry>
+        <term>Root Suffix</term>
+        <listitem>
+            <para>For either external or embedded stores, enter the base DN for CTS storage information in
+            LDAP format, such as <literal>dc=cts,dc=forgerock,dc=com.</literal>.</para>
+        </listitem>
+    </varlistentry>
+
+    <varlistentry>
+        <term>SSL/TLS Enabled</term>
+        <listitem>
+            <para>Access the directory service using StartTLS or LDAPS.</para>
+        </listitem>
+    </varlistentry>
+
+    <varlistentry>
+        <term>Directory Name</term>
+        <listitem>
+            <para>The hostname of the external server.</para>
+        </listitem>
+    </varlistentry>
+
+    <varlistentry>
+        <term>Port</term>
+        <listitem>
+            <para>Specifies the TCP/IP port number used for communication to to external datastore,
+            such as 389 for LDAP.</para>
+        </listitem>
+    </varlistentry>
+
+    <varlistentry>
+        <term>Login Id</term>
+        <listitem>
+            <para>"Specifies the user, in DN format, needed to authenticate. The user needs sufficient
+                privileges to read and write to the root suffix of the external datastore.".</para>
+        </listitem>
+    </varlistentry>
+
+    <varlistentry>
+        <term>Password</term>
+        <listitem>
+            <para>Specifies the password associated with the Login Id.</para>
+        </listitem>
+    </varlistentry>
+
+    <varlistentry>
+        <term>Max Connections</term>
+        <listitem>
+            <para>Notes the maximum number of remote connections to the external datastore.</para>
+        </listitem>
+    </varlistentry>
+      
+    <varlistentry>
+        <term>Heartbeat</term>
+        <listitem>
+            <para>Specifies how often OpenAM should send a heartbeat request to the directory server
+            to ensure that the connection does not remain idle, in seconds. Default: 10.</para>
+        </listitem>
+    </varlistentry>  
+
   </variablelist>
 
   <variablelist xml:id="servers-advanced-configuration">
