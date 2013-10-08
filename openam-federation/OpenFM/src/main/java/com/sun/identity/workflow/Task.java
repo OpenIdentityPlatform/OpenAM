@@ -27,7 +27,7 @@
  */
 
 /*
- * Portions Copyrighted 2010-2011 ForgeRock AS
+ * Portions Copyrighted 2010-2013 ForgeRock AS
  */
 
 package com.sun.identity.workflow;
@@ -38,6 +38,8 @@ import com.sun.identity.saml2.meta.SAML2MetaManager;
 import com.sun.identity.shared.Constants;
 import com.sun.identity.shared.datastruct.CollectionHelper;
 import com.sun.identity.shared.debug.Debug;
+import com.sun.identity.shared.xml.XMLUtils;
+
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
@@ -113,12 +115,18 @@ public abstract class Task
 
     public static String getContent(String resName, Locale locale)
         throws WorkflowException {
+
+        if (resName == null) {
+            return resName;
+        }
+
         if (resName.startsWith("http://") ||
             resName.startsWith("https://")
         ) {
             return getWebContent(resName, locale);
         } else {
-            return resName;
+            // XML content that is posted directly is escaped, un-escape before returning
+            return XMLUtils.unescapeSpecialCharacters(resName);
         }
     }
     
