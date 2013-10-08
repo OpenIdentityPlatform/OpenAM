@@ -1181,7 +1181,7 @@
       <!-- Relatively major changes here, definitions taken from elsewhere in the doc -->
    
       <itemizedlist>
-      <para>The Core Authentication module is divided into five sections:</para>
+      <para>The Core Authentication module is divided into seven sections:</para>
           <listitem>
               <para><xref linkend="auth-core-global" /></para>
           </listitem>
