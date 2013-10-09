@@ -993,6 +993,9 @@
      <listitem>
       <para>Indicates which attribute and value in the certificate Subject DN
       is used to find the LDAP entry holding the certificate.</para>
+
+      <para>Default: CN</para>
+
       <para><command>ssoadm</command> attribute:
       <literal>iplanet-am-auth-cert-attr-check-ldap</literal></para>
      </listitem>
@@ -1011,6 +1014,36 @@
      <listitem>
       <para>Indicates which attribute and value in the certificate Issuer DN
       is used to find the CRL in the LDAP directory.</para>
+
+      <para>Default: CN</para>
+
+      <para>If only one attribute is specified, the LDAP search filter used to
+      find the CRL based on the Subject DN of the CA certificate is
+      <literal>(<replaceable>attr-name</replaceable>=<replaceable
+      >attr-value-in-subject-DN</replaceable>)</literal>.</para>
+
+      <para>For example, if the subject DN of the issuer certificate is
+      <literal>C=US, CN=Some CA, serialNumber=123456</literal>, and the
+      attribute specified is <literal>CN</literal>, then the LDAP search filter
+      used to find the CRL is <literal>(CN=Some CA)</literal>.</para>
+
+      <para>In order to distinguish among different CRLs for the same CA issuer,
+      specify multiple attributes separated by commas (<literal>,</literal>) in
+      the same order they occur in the subject DN. When multiple attribute names
+      are provided in a comma-separated list, the LDAP search filter used is
+      <literal>(cn=<replaceable>attr1</replaceable>=<replaceable
+      >attr1-value-in-subject-DN</replaceable>,<replaceable
+      >attr2</replaceable>=<replaceable
+      >attr2-value-in-subject-DN</replaceable
+      >,...,<replaceable>attrN</replaceable
+      >=<replaceable>attrN-value-in-subject-DN</replaceable>)</literal>.</para>
+
+      <para>For example, if the subject DN of the issuer certificate is
+      <literal>C=US, CN=Some CA, serialNumber=123456</literal>, and the
+      attributes specified are <literal>CN,serialNumber</literal>, then
+      the LDAP search filter used to find the CRL is
+      <literal>(cn=CN=Some CA,serialNumber=123456)</literal>.</para>
+
       <para><command>ssoadm</command> attribute:
       <literal>iplanet-am-auth-cert-attr-check-crl</literal></para>
      </listitem>
