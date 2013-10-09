@@ -146,13 +146,13 @@
 
                                 <delete dir="${classes.dir}/qunit" />
                                 <delete dir="${dependency.dir}/qunit" />
-                                
-                                 <copy todir="${xui.dir}">
-                                  <fileset dir="${classes.dir}" includes="**/*" />
-                                 </copy>
                                  
                                  <copy todir="${xui.dir}">
                                   <fileset dir="${dependency.dir}" includes="**/*" />
+                                 </copy>
+                                
+                                 <copy todir="${xui.dir}" overwrite="true">
+                                  <fileset dir="${classes.dir}" includes="**/*" />
                                  </copy>
                                 
                                 <java classname="org.mozilla.javascript.tools.shell.Main"
