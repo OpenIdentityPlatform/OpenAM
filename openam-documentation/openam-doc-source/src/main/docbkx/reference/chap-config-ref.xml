@@ -3688,7 +3688,7 @@
         <term>Root Suffix</term>
         <listitem>
             <para>For either external or embedded stores, enter the base DN for CTS storage information in
-            LDAP format, such as <literal>dc=cts,dc=forgerock,dc=com.</literal>.</para>
+            LDAP format, such as <literal>dc=cts,dc=forgerock,dc=com</literal>.</para>
         </listitem>
     </varlistentry>
 
