@@ -20,7 +20,7 @@
   !
   ! CCPL HEADER END
   !
-  !      Copyright 2013 ForgeRock, Inc.
+  !      Copyright 2013 ForgeRock AS
   !    
 -->
 <chapter xml:id='chap-dashboard'
@@ -100,16 +100,10 @@
      <literal>amadmin</literal>.</para>
     </step>
     <step>
-     <para>On the Configuration tab &gt; Global &gt; Dashboard click  New...
+     <para>On the Configuration tab &gt; Global &gt; Dashboard click New
      to add a new application to the Dashboard service and to provide the information
      needed to connect to the app. </para>
-     <mediaobject xml:id="figure-dashboard-new-app">
-      <alt>New application configuration screen</alt>
-      <imageobject>
-       <imagedata fileref="images/dashboard-new-app.png" format="PNG" />
-      </imageobject>
-      <textobject><para>Configure applications on the Dashboard.</para></textobject>
-     </mediaobject>
+
     </step>
     <step>
      <para>Provide a unique name for the application.</para>
@@ -128,9 +122,8 @@
     </step>
     <step>
      <para>Add the Dashboard Icon you would like the end user to see for the application. 
-     Make sure to include the file type, for example Google.gif or Facebook.png. Please
-     note this should be a fully-qualified URL so that the icon is rendered properly
-     on the user Dashboard.</para>
+     Either use a fully-qualified URL or an appropriate relative URL so that the
+     icon is rendered properly on the user Dashboard.</para>
     </step>
     <step>
      <para>Add the Dashboard Login URL to point to the location the end user
@@ -150,7 +143,7 @@
  <section xml:id="dashboard-realms">
   <title>Configuring Dashboard Service for a Realm</title>
  
-   <procedure xml:id="dashboard-singel-realm">
+   <procedure xml:id="dashboard-single-realm">
     <title>To Add the Application Dashboard Service to a Realm</title>
 
     <para>You must add the Dashboard service to a realm before it will be available. 

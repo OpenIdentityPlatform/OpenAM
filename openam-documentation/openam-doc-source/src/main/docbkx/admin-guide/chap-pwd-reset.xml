@@ -449,13 +449,10 @@
      </imageobject>
      <textobject><para>OpenAM prompts with secret questions.</para></textobject>
     </mediaobject>
-    <mediaobject xml:id="figure-console-reset-confirmation">
-     <alt>The page confirming password reset</alt>
-     <imageobject>
-      <imagedata fileref="images/console-reset-confirmation.png" format="PNG" />
-     </imageobject>
-     <textobject><para>OpenAM confirms password reset.</para></textobject>
-    </mediaobject>
+
+    <para>When the user clicks OK, OpenAM sends the email and shows a
+    confirmation message.</para>
+
     <para>The user receives the email with a line such as the following.</para>
     <literallayout class="monospaced">Your OpenAM password was changed to:  647bWluw</literallayout>
    </step>
