@@ -46,6 +46,11 @@
             <type>zip</type>
             <classifier>www</classifier>
         </dependency>
+        <dependency>
+            <groupId>org.apache.servicemix.bundles</groupId>
+            <artifactId>org.apache.servicemix.bundles.rhino</artifactId>
+            <version>1.7R2_3</version>
+        </dependency>
     </dependencies>
 
     <build>
@@ -121,6 +126,61 @@
                                 </artifactItem>
                             </artifactItems>
                         </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-antrun-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>js optimization</id>
+                        <phase>package</phase>
+
+                        <configuration>
+                            <target name="optimize">
+                                <property name="requirejs.dir" value="${basedir}/src/main/optimization" />
+                                <property name="classes.dir" value="${basedir}/target/classes" />
+                                <property name="dependency.dir" value="${basedir}/target/dependency" />
+                                <property name="xui.dir" value="${basedir}/target/xui" />
+
+                                <delete dir="${classes.dir}/qunit" />
+                                <delete dir="${dependency.dir}/qunit" />
+                                
+                                 <copy todir="${xui.dir}">
+                                  <fileset dir="${classes.dir}" includes="**/*" />
+                                 </copy>
+                                 
+                                 <copy todir="${xui.dir}">
+                                  <fileset dir="${dependency.dir}" includes="**/*" />
+                                 </copy>
+                                
+                                <java classname="org.mozilla.javascript.tools.shell.Main"
+                                    failonerror="true">
+                                    <classpath refid="maven.compile.classpath" />
+                                    <arg value="${requirejs.dir}/r.js" />
+                                    <arg value="-o" />
+                                    <arg value="${requirejs.dir}/app.build.js" />
+                                </java>
+                                
+                                <concat destfile="${xui.dir}_minified/main_with_licenses.js">
+                                    <fileset file="${requirejs.dir}/license" />
+                                    <fileset file="${xui.dir}_minified/main.js" />
+                                </concat>
+                                
+                                <move   file="${xui.dir}_minified/main_with_licenses.js" 
+                                        tofile="${xui.dir}_minified/main.js" />
+
+                                <delete dir="${xui.dir}" />
+
+                                <move   file="${xui.dir}_minified" 
+                                        tofile="${xui.dir}" />
+
+                            </target>
+                        </configuration>
+                        <goals>
+                            <goal>run</goal>
+                        </goals>
                     </execution>
                 </executions>
             </plugin>

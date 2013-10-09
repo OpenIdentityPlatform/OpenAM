@@ -1,7 +1,7 @@
-/**
+/** 
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright (c) 2011-2012 ForgeRock AS. All rights reserved.
+ * Copyright (c) 2012 ForgeRock AS. All Rights Reserved
  *
  * The contents of this file are subject to the terms
  * of the Common Development and Distribution License
@@ -21,16 +21,13 @@
  * your own identifying information:
  * "Portions Copyrighted [year] [name of copyright owner]"
  */
-
-/*global define*/
-
-define("org/forgerock/openam/ui/user/main", [
-    "./profile/UserProfileView",
-    "./profile/ChangeSecurityDataDialog",
-    //"./oauth2/TokensView",
-    "./delegates/TokenDelegate",
-    "./login/AuthNDelegate",
-    "./login/RESTLoginHelper",
-    "./login/RESTLoginView",
-    "./login/RESTLoginDialog"
-]);
+({
+	appDir : "../../../target/xui",
+	baseUrl : ".",
+	dir : "../../../target/xui_minified",
+	mainConfigFile : '../../../target/xui/main.js',
+	preserveLicenseComments: false,
+	modules : [ {
+		name : "main"
+	} ]
+})
