@@ -131,15 +131,14 @@
         <agentApacheSupport>Apache HTTP Server 2.2, 2.4</agentApacheSupport>
         <agentIISSupport>Microsoft IIS 6, 7, 8</agentIISSupport>
         <agentNginxSupport>Nginx 1</agentNginxSupport>
-        <agentSunProxyServerSupport>Sun Proxy Server 4.0 (deprecated)</agentSunProxyServerSupport>
         <agentSunWebServerSupport>Oracle iPlanet Web Server 7.0 (also known as Sun Web Server)<!-- (deprecated)--></agentSunWebServerSupport>
         <agentVarnishCacheSupport>Varnish Cache 3.0.3</agentVarnishCacheSupport>
 
-        <agentGlassFishSupport>GlassFish <!-- v2, --> v3</agentGlassFishSupport>
+        <agentGlassFishSupport>GlassFish v3</agentGlassFishSupport>
         <agentJBossSupport>JBoss Enterprise Application Platform 5 and 6, JBoss Application Server 7</agentJBossSupport>
-        <agentJettySupport>Jetty 7, 8<!--, 9--></agentJettySupport>
+        <agentJettySupport>Jetty 7, 8</agentJettySupport>
         <agentTomcatSupport>Apache Tomcat 6, 7</agentTomcatSupport>
-        <agentWebLogicSupport>Oracle WebLogic Server 10g or later</agentWebLogicSupport>
+        <agentWebLogicSupport>Oracle WebLogic Server 10g, 12c</agentWebLogicSupport>
         <agentWebSphereSupport>IBM WebSphere Application Server 7, 8, 8.5</agentWebSphereSupport>
 
         <docbkxSourceDirectory>${basedir}/target/docbkx-filtered</docbkxSourceDirectory>

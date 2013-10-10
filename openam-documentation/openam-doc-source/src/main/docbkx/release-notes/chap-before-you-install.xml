@@ -56,11 +56,9 @@
    <listitem>
     <para>Apache Tomcat 6, 7 (ForgeRock's preferred web container for OpenAM)</para>
    </listitem>
-   <!-- To be confirmed...
    <listitem>
     <para>GlassFish v2, v3</para>
    </listitem>
-   -->
    <listitem>
     <para>IBM WebSphere 8.0, 8.5</para>
    </listitem>
