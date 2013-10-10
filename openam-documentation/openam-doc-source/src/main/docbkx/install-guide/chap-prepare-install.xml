@@ -809,8 +809,7 @@ $ cat WEB-INF/jboss-web.xml</screen>
     <para>The following instructions provide guidance for both standalone and domain deployments.
     OpenAM must be able to store its configuration between restarts. The procedures listed here are
     workarounds for JBoss AS 7.1.2 / 7.1.3, and the corresponding versions of JBoss EAP (6.0.0, 6.0.1).
-    The intent of the configuration changes to JBoss AS 7 / EAP 6 described here have already been
-    incorporated into JBoss EAP 6.1.x, which is built from JBoss AS 7.2.x.
+    Workarounds are also needed for JBoss EAP 6.1.0/6.1.1.
     To identify the versions of JBoss EAP that have been built from JBoss
     AS, see the following article on <link xlink:href="https://access.redhat.com/site/articles/112673"
     xlink:show="new"><citetitle>JBoss Enterprise Application Platform Component Details</citetitle></link>.</para>
@@ -863,7 +862,7 @@ $ cat WEB-INF/jboss-web.xml</screen>
                         >&lt;path name="com/sun/org/apache/xerces/internal/dom" /></literallayout>
             </step>
 
-            <step>
+            <step xml:id="jboss711-disable-conflicts">
                 <para>Disable modules that conflict with OpenAM REST libraries. All jaxrs
                     references need to be removed from the configuration. The file that you modify
                     depends on whether you are running JBoss in standalone or domain mode.</para>
@@ -891,7 +890,7 @@ $ cat WEB-INF/jboss-web.xml</screen>
                 </stepalternatives>
             </step>
 
-            <step>
+            <step xml:id="jboss711-delete-webservices">
                 <para>In either the <filename>standalone.xml</filename> or <filename>domain.xml</filename>
                     files, you will also need to delete <literal>org.jboss.as.webservices</literal> references.
                     Depending on the file, this includes one or more groups of <literal>subsystem</literal> lines
@@ -983,11 +982,12 @@ $ cat WEB-INF/jboss-web.xml</screen>
         </procedure>
 
         <procedure xml:id="prep-jboss-61x">
-            <title>To Prepare JBoss 6.1.x</title>
+            <title>To Prepare JBoss EAP 6.1.0 and 6.1.1</title>
 
             <step>
-                <para>For JBoss 6.1.0 and above, no special changes are required to the main JBoss
-                    configuration files.</para>
+                <para>For JBoss EAP 6.1.0 / 6.1.1, follow <xref linkend="jboss711-disable-conflicts" />
+                and <xref linkend="jboss711-delete-webservices" /> from
+                    <xref linkend="prep-jboss-710-711" />.</para>
             </step>
 
             <step>
@@ -1003,8 +1003,8 @@ $ cat WEB-INF/jboss-web.xml</screen>
 
             <para>The default JBoss settings for JVM do not give sufficient memory to OpenAM. This procedure
                 documents one method that you can use to modify JBoss. Other methods described in <link xlink:show="new"
-                                                                                                        xlink:href="http://www.jboss.org/jbossas/docs">
-                    <citetitle>JBoss Main Documentation Page</citetitle></link>.</para>
+               xlink:href="http://www.jboss.org/jbossas/docs">
+               <citetitle>JBoss Main Documentation Page</citetitle></link>.</para>
 
             <step>
                 <para>Stop JBoss.</para>
