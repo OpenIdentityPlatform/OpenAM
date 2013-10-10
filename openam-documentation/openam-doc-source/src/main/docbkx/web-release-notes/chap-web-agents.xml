@@ -114,7 +114,7 @@
      </varlistentry>
     </variablelist>
 
-    <para>See <link
+    <para>See <link xlink:show="new"
     xlink:href="agent-install-guide#web-bootstrap-configuration-properties"
     xlink:role="http://docbook.org/xlink/role/olink"><citetitle>Bootstrap
     Configuration Properties</citetitle></link> for details.</para>
@@ -251,24 +251,6 @@
   -->
      <listitem>
       <para><?eval ${agentSunWebServerSupport}?></para>
-
-      <para>In this release, this web policy agent is not at feature parity with
-      the other web policy agents and is lacking some fixes. In particular,
-      this policy agent has the following known issues.</para>
-      <!-- List generated at 09:21:20 20130215 using http://bugster.forgerock.org/jira/rest/api/2/search?jql=id%20in%20%28%22OPENAM-2180%22%2C%20%22OPENAM-2178%22%2C%20%22OPENAM-2177%22%2C%20%22OPENAM-1889%22%2C%20%22OPENAM-1701%22%2C%20%22OPENAM-1523%22%29&startAt=0&maxResults=500&fields=summary-->
-      <itemizedlist>
-       <listitem><para><link xlink:href="https://bugster.forgerock.org/jira/browse/OPENAM-2180" xlink:show="new">OPENAM-2180</link>: Missing bootstrap file in WPA for SJSWS 7 should indicate this in error message</para></listitem>
-       <listitem><para><link xlink:href="https://bugster.forgerock.org/jira/browse/OPENAM-2178" xlink:show="new">OPENAM-2178</link>: SJSWS 7 agent debug log size parameter does not behave correctly for values below 3000</para></listitem>
-       <listitem><para><link xlink:href="https://bugster.forgerock.org/jira/browse/OPENAM-2177" xlink:show="new">OPENAM-2177</link>: SJSWS does not handle PDP cache expiration correctly</para></listitem>
-       <listitem><para><link xlink:href="https://bugster.forgerock.org/jira/browse/OPENAM-1889" xlink:show="new">OPENAM-1889</link>: Wrong password in combination with naming service failover causes internal error on OpenAM</para></listitem>
-       <listitem><para><link xlink:href="https://bugster.forgerock.org/jira/browse/OPENAM-1701" xlink:show="new">OPENAM-1701</link>: Internal exception is thrown upon login to WPA when c66encode is set to false</para></listitem>
-       <listitem><para><link xlink:href="https://bugster.forgerock.org/jira/browse/OPENAM-1523" xlink:show="new">OPENAM-1523</link>: Policy Agent fails to locate OpenAM server cookie value</para></listitem>
-      </itemizedlist>
-      <para>This web policy agent has been tested only on 64-bit versions of
-      Solaris.</para>
-     </listitem>
-     <listitem>
-      <para><?eval ${agentSunProxyServerSupport}?></para>
      </listitem>
 
      <listitem>
@@ -297,7 +279,7 @@
     2012.</para>
 
     <para>The Varnish Cache web policy agents have been tested on Linux 2.6 or
-    later<!--, and on Oracle Solaris 10 or later-->.</para>
+    later, and on Oracle Solaris 10 or later.</para>
 
     <para>Before installing web policy agents on Solaris 10, make sure you have
     applied the latest shared library patch for C++, at least 119963-16 on SPARC,
@@ -310,7 +292,8 @@
     <para>You can deploy OpenAM web policy agents on any hardware supported for
     the combination of software required.</para>
 
-    <para>ForgeRock has tested this release on x86 and x64 based systems.</para>
+    <para>ForgeRock has tested this release on x86 and x64 based systems,
+    and also on Solaris SPARC systems.</para>
    </section>
   </section>
 
@@ -382,26 +365,28 @@
 
    <section xml:id="web-agent-deprecated">
     <title>Deprecated Functionality</title>
-    <para>The following functionality is deprecated in OpenAM Web Policy Agents
-    <?eval ${webAgentsDocTargetVersion}?>, and is likely to be removed in a
-    future release.</para>
 
-    <itemizedlist>
-     <listitem>
-      <para>Web policy agent support for Sun Proxy Server <!--and Sun Web Server-->
-      is deprecated. Support for <!--these web servers--> Sun Proxy Server is likely to be removed in a
-      future release.</para>
-     </listitem>
-    </itemizedlist>
+    <para>No functionality has been deprecated in this release.</para>
    </section>
 
    <section xml:id="web-agent-removed">
     <title>Removed Functionality</title>
 
-    <para>The web policy agent bootstrap property
-    <literal>com.forgerock.agents.ext.url.validation.disable</literal>
-    introduced in release 3.1.0 has been superseded by the bootstrap property
-    <literal>com.forgerock.agents.ext.url.validation.level</literal>.</para>
+    <itemizedlist>
+     <listitem>
+      <para>The web policy agent bootstrap property
+      <literal>com.forgerock.agents.ext.url.validation.disable</literal>
+      introduced in release 3.1.0 has been superseded by the bootstrap property
+      <literal>com.forgerock.agents.ext.url.validation.level</literal>.</para>
+     </listitem>
+
+     <listitem>
+      <para>Web policy agent support for Oracle iPlanet Web Proxy Server
+      (formerly Sun Java System Web Sun Proxy Server) is no longer provided
+      in this release.</para>
+     </listitem>
+    </itemizedlist>
+
    </section>
   </section>
 
