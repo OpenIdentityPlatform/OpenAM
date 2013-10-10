@@ -3231,31 +3231,4 @@ Bulk Federation for this host was completed.</screen>
    &amp;metaAlias=/sp
    &amp;binding=HTTP-Artifact</literallayout>
  </section>
-
-
-    <section xml:id="using-saml2-with-policy-agents">
-        <title>Using SAML 2.0 With Policy Agents</title>
-
-        <para>The federation mechanism associated with SAML can be used as an alternative to
-            CDSSO for both Web and Java EE policy agents. This assumes OpenAM is configured as an
-            IDP on one domain, and the desired policy agent is configured in a second domain.</para>
-
-        <para>The basic process for installing policy agents is available in the
-            <link xlink:href="web-install-guide" xlink:show="new"
-                  xlink:role="http://docbook.org/xlink/role/olink"><citetitle>OpenAM Web Policy Agent
-                Installation Guide</citetitle></link> and the <link xlink:href="jee-install-guide" xlink:show="new"
-                                                                    xlink:role="http://docbook.org/xlink/role/olink"><citetitle>OpenAM Java EE Policy Agent
-                Installation Guide</citetitle></link>.</para>
-
-        <para>Once you have installed the policy agents, navigate to the URL for the OpenAM console.
-            Select Access Control &gt; <replaceable>Realm Name</replaceable> &gt; Agents &gt; Web &gt;
-            <replaceable>Agent Name</replaceable> &gt; OpenAM Services.</para>
-
-        <para>Now you can replace the given OpenAM Login URL and OpenAM Logout URLs with SAML2 URLs
-            configured in the section on <xref linkend="using-saml2-sso-slo" />.</para>
-
-        <para>For the Web Agent, in the Agent Logout URL section, set up a list of application logout URLs.
-            In the Logout Redirect URL text box, enter an appropriate URL to redirect the user after logout.</para>
-
-    </section>
 </chapter>
