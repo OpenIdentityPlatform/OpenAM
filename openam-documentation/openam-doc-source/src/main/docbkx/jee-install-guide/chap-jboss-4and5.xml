@@ -28,8 +28,7 @@
  version='5.0' xml:lang='en'
  xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance'
  xsi:schemaLocation='http://docbook.org/ns/docbook http://docbook.org/xml/5.0/xsd/docbook.xsd'
- xmlns:xlink='http://www.w3.org/1999/xlink'
- xmlns:xinclude='http://www.w3.org/2001/XInclude'>
+ xmlns:xlink='http://www.w3.org/1999/xlink'>
  <title>Installing the JBoss 4 and 5 Application Server Policy Agent</title>
  <indexterm><primary>JBoss Application Server</primary></indexterm>
  <para>This chapter covers installation of the policy agent for JBoss
@@ -263,7 +262,10 @@ Install log file location:
     <filename>JBOSS_HOME/bin/setAgentClasspathdefault.sh</filename> script,
     added the agent web application under
     <filename>JBOSS_HOME/server/default/deploy/</filename>, and also set up
-    configuration and log directories for the agent.</para>
+    configuration and log directories for the agent. The name of the
+    script may vary; for example, if you installed the agent using the
+    <filename>/path/to/jboss/server/web/conf</filename> configuration directory,
+    the script would be named <filename>setAgentClasspathweb.sh</filename>.</para>
     <note>
      <para>If the agent is in a different domain than the server, refer to <citetitle>Administration Guide</citetitle> procedure, <link
    xlink:href="admin-guide#chap-cdsso"
