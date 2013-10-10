@@ -239,12 +239,12 @@
     <para>Web policy agents support the following web servers.</para>
 
     <listitem>
-     <para><?eval ${agentApacheSupport}?></para><!-- TODO: Deprecate Apache 2.0 support? -->
+     <para><?eval ${agentApacheSupport}?></para>
     </listitem>
     <listitem>
      <para><?eval ${agentIISSupport}?></para>
     </listitem>
- <!-- Pending doc and testing
+ <!-- Pending OPENAM-1182
     <listitem>
      <para><?eval ${agentNginxSupport}?></para>
     </listitem>
@@ -411,18 +411,25 @@
   <section xml:id="web-agent-limitations">
       <title>Limitations</title>
 
-      <para>OpenAM web policy agents do not currently support IPv6.</para>
+   <itemizedlist>
 
-      <para>If you are running an Apache Web agent on RHEL 6 (CentOS 6), and are also
-          running SELinux in enforcing mode, Apache may fail to restart with a 'Permission
-          denied' message, with a pointer to a file in the
-          <filename>/path/to/web_agents/apache2x_agent/lib</filename> directory. SELinux
-          expects most library files to be configured with a
-          <literal>lib_t</literal> label; you can set that up with the
-          <command>chcon -t lib_t /path/to/web_agents/apache2x_agent/lib/*.so</command> and
-          <command>semanage fcontext -a -t lib_t /path/to/web_agents/apache2x_agent/lib/*.so</command>
-          commands.</para>
+    <listitem>
+      <para>Web policy agents for IIS do not support Web gardens nor
+      multi-process mode.</para>
+    </listitem>
 
+    <listitem>
+      <para>If you are running an Apache Web agent on RHEL 6 (CentOS 6), and
+      are also running SELinux in enforcing mode, Apache may fail to restart
+      with a 'Permission denied' message, with a pointer to a file in the
+      <filename>/path/to/web_agents/apache2x_agent/lib</filename> directory.
+      SELinux expects most library files to be configured with a
+      <literal>lib_t</literal> label; you can set that up with the
+      <command>chcon -t lib_t /path/to/web_agents/apache2x_agent/lib/*.so</command>
+      and <command>semanage fcontext -a -t lib_t /path/to/web_agents/apache2x_agent/lib/*.so</command>
+      commands.</para>
+    </listitem>
+   </itemizedlist>
   </section>
 
   <section xml:id="web-agent-known-issues">
