@@ -57,7 +57,7 @@
   <literal>http://win2003.example.com:80/</literal>. Furthermore, you
   must reset IIS 6 after installing the policy agent.</para>
   
-  <para>>Go to <link xlink:href="install-guide#download-openam-software"
+  <para>Go to <link xlink:href="install-guide#download-openam-software"
   xlink:role="http://docbook.org/xlink/role/olink"><citetitle>Obtaining OpenAM Software</citetitle></link>
   to determine which version of the agent to download and download the agent.
   Also verify the checksum of the file you download against the checksum
