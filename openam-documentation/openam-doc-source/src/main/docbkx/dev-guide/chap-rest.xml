@@ -646,7 +646,7 @@ boolean=true</screen>
 
    <screen>$ curl
  --request GET
- --header "X-Query-Parameters: ssotoken:AQIC5...DU3*"
+ --cookie "iPlanetDirectoryPro=AQIC5...DU3*"
  "https://openam.example.com:8443/openam/ws/1/entitlement/decision
  ?subject=MJ3QFTr4ZV2QrtlJvXlg0Q2dMRM=&amp;action=GET
  &amp;application=iPlanetAMWebAgentService
