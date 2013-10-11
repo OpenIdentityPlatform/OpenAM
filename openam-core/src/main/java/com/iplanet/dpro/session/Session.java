@@ -46,6 +46,7 @@ import com.iplanet.services.comm.client.PLLClient;
 import com.iplanet.services.comm.share.Request;
 import com.iplanet.services.comm.share.RequestSet;
 import com.iplanet.services.comm.share.Response;
+import com.iplanet.services.naming.ServerEntryNotFoundException;
 import com.iplanet.services.naming.WebtopNaming;
 import com.sun.identity.common.GeneralTaskRunnable;
 import com.sun.identity.common.SearchResults;
@@ -1310,6 +1311,22 @@ public class Session extends GeneralTaskRunnable {
                     return getSessionServiceURL(ss.getCurrentHostServer(sid));
                 } else {
                     primary_id = sid.getExtension(SessionID.PRIMARY_ID);
+                    if (ss.isLocalSite(primary_id)) {
+                        String serverUrl = null;
+                        try {
+                            serverUrl = WebtopNaming.getServerFromID(primary_id);
+                        } catch (ServerEntryNotFoundException e) {
+                            sessionDebug.error("Exception caught getting serverUrl " +
+                                    "from WebtopNaming in exception case: " + e);
+                        }
+                        sessionDebug.error("In getSessionServiceURL, the " + SessionID.PRIMARY_ID + " extension of the presented " +
+                                "token, " + primary_id + ", corresponds to a site in the local deployment. This indicates that a " +
+                                "iPlanetDirectoryPro (or equivalent) cookie is being presented across sites, with a " +
+                                "combination of SITE_ID and PRIMARY_ID values which would have created a PLL SessionRequest loop. The " +
+                                "URL corresponding to this PRIMARY_ID:" + serverUrl + ". Throwing SessionException.");
+                        throw new SessionException("SessionID state invalid: " + primary_id +
+                                " corresponds to site in local deployment.");
+                    }
                     return getSessionServiceURL(primary_id);
                 }
             }

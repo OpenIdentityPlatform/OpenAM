@@ -88,7 +88,7 @@ public class NamingService implements RequestHandler, ServiceListener {
 
     public static final String NAMING_SERVICE = "com.iplanet.am.naming";
 
-    private static Hashtable namingTable = null;
+    private static volatile Hashtable namingTable = null;
 
     private static Properties platformProperties = null;
 
@@ -196,10 +196,23 @@ public class NamingService implements RequestHandler, ServiceListener {
 
     /**
      * This method updates the naming table especially whenever a new server
-     * added/deleted into platform server list
+     * added/deleted into platform server list.
+     * Note that WebtopNaming maintains a reference to the namingTable Hashtable in this class, and thus state in this hash
+     * must be updated in-place, or else the reference in WebtopNaming will point to Hashtables with stale state. Note also
+     * that this update should preclude concurrent references to this Hashtable - thus the update will synchronize on the
+     * Hashtable reference itself, as this will exclude concurrent get operations on the Hashtable while state in the Hashtable
+     * is being updated.
      */
     private static void updateNamingTable() throws SMSException {
-        namingTable = updateNamingTable(false);
+        Hashtable updatedNamingTable = updateNamingTable(false);
+        if (namingTable != null) {
+            synchronized (namingTable) {
+                namingTable.clear();
+                namingTable.putAll(updatedNamingTable);
+            }
+        } else {
+            namingTable = updatedNamingTable;
+        }
     }
 
     /**
@@ -662,7 +675,7 @@ public class NamingService implements RequestHandler, ServiceListener {
     private static Set getServers(Map platformAttrs, Set sites)
             throws Exception {
         Set servers = ServerConfiguration.getServerInfo(sso);
-        
+
         if ((sites != null) && (serviceRevNumber < SERVICE_REV_NUMBER_70)) {
             servers = getServersFromSessionConfig(sites, servers);
         }

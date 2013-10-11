@@ -904,13 +904,20 @@ public class SessionService {
      * @return true if serverID is the same as local instance, false otherwise
      */
     public boolean isLocalSite(SessionID sid) {
-        String siteID = sid.getSessionServerID();
+        return isLocalSite(sid.getSessionServerID());
+    }
 
-        if (sessionServerID.equals(siteID) || secondaryServerIDs.contains(siteID)) {
-            return true;
-        } else {
-            return false;
-        }
+    /**
+     * This method is called by Session.getSessionServiceURL, when routing a request to an individual session host. In
+     * this case, the SessionID.PRIMARY_ID extension is obtained from the SessionID instance (which corresponds to the
+     * AM-instance host of the session). WebtopNaming will then be called to turn this serverId (01,02, etc) into a
+     * URL which will point a PLL client GetSession request. Calling this method is part of insuring that the PLL GetSession
+     * request does not get routed to a site (load-balancer).
+     * @param serverId the server id (PRIMARY_ID) pulled from a presented cookie.
+     * @return true if the specified serverId is actually a site identifier for the current deployment
+     */
+    public boolean isLocalSite(String serverId) {
+        return sessionServerID.equals(serverId) || ((secondaryServerIDs != null) && secondaryServerIDs.contains(serverId));
     }
 
     /**
