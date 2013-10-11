@@ -74,7 +74,9 @@
      <para>Web policy agents can perform naming URL validation during the
      bootstrap phase, and can fail over from one OpenAM service to another
      (<link xlink:href="https://bugster.forgerock.org/jira/browse/OPENAM-1258"
-     xlink:show="new">OPENAM-1258</link>). Configure these capabilities by
+     xlink:show="new">OPENAM-1258</link>, <link xlink:show="new"
+     xlink:href="https://bugster.forgerock.org/jira/browse/OPENAM-1270"
+     >OPENAM-1270</link>). Configure these capabilities by
      using the following bootstrap properties.</para>
 
      <varlistentry>
@@ -192,6 +194,17 @@
     xlink:href="https://bugster.forgerock.org/jira/browse/OPENAM-772"
     xlink:show="new">OPENAM-772</link>). In addition, regular expressions are
     supported for logout URLs and for rejecting access to invalid URLs.</para>
+   </listitem>
+   <listitem>
+    <para>Web policy agents can now forward injected attributes to Not
+    Enforced URLs (<link
+    xlink:href="https://bugster.forgerock.org/jira/browse/OPENAM-770"
+    xlink:show="new">OPENAM-770</link>). Set
+    <literal>com.sun.identity.agents.config.notenforced.url.attributes.enable=true</literal>
+    in the web policy agent profile as described in <link xlink:show="new"
+    xlink:href="web-reference#appendix-web-config-properties"
+    xlink:role="http://docbook.org/xlink/role/olink"><citetitle>Agent
+    Configuration Properties</citetitle></link>.</para>
    </listitem>
   </itemizedlist>
  </section>
