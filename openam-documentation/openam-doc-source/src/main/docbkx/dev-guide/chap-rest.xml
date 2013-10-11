@@ -727,10 +727,6 @@ allow</screen>
    deployment URI. The API lets you create, read, update, delete, and query
    policies.</para>
 
-   <para>Interface Stability: <link xlink:show="new"
-   xlink:href="admin-guide#interface-stability"
-   xlink:role="http://docbook.org/xlink/role/olink">Deprecated</link></para>
-
    <para>Authentication for these interfaces uses cookies, so if your
    application is not running in a browser, first authenticate as described in
    <xref linkend="rest-api-auth" />.</para>
