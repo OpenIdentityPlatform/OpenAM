@@ -88,6 +88,10 @@ define("UserDelegate", [
         } else {
             headers["If-Match"] = '"' + "*" + '"';
         }
+        
+        if(objectParam.oldPassword) {
+            headers[constants.OPENAM_HEADER_PARAM_OLD_PASSWORD] = objectParam.oldPassword;
+        }
 
         this.serviceCall({url: realm + "/users/" +user,
             type: "PUT",

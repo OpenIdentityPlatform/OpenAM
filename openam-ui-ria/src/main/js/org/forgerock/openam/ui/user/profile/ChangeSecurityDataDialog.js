@@ -60,13 +60,17 @@ define("org/forgerock/openam/ui/user/profile/ChangeSecurityDataDialog", [
             event.preventDefault();
             
             if(validatorsManager.formValidated(this.$el.find("#passwordChange"))) {            
-                data = form2js("content", '.', false);
+                data.username = form2js("content", '.', false).username;
                 $.extend(data, form2js("passwordChange", '.', false));
                 data.userpassword = data.password;
                 this.delegate.updateUser(data.username, conf.globalData.auth.realm, data, _.bind(function() {
                     eventManager.sendEvent(constants.EVENT_DISPLAY_MESSAGE_REQUEST, "securityDataChanged");
                     this.close();
-                }, this));
+                }, this), function(e) {
+                    if(JSON.parse(e.responseText).message === "Invalid Password"){
+                        eventManager.sendEvent(constants.EVENT_DISPLAY_MESSAGE_REQUEST, "invalidOldPassword");
+                    }
+                });
 
             }
             

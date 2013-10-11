@@ -1069,8 +1069,30 @@ public final class IdentityResource implements CollectionResourceProvider {
         return false;
     }
 
-    private String getPasswordFromHeader(ServerContext context) {
-        return RestUtils.getCookieFromServerContext(context);
+    private String getPasswordFromHeader(ServerContext context){
+        List<String> headerList = null;
+        String oldUserPasswordHeaderName = "olduserpassword";
+        HttpContext header = null;
+
+        try {
+            header = context.asContext(HttpContext.class);
+            if (header == null) {
+                RestDispatcher.debug.error("IdentityResource.getPasswordFromHeader :: " +
+                        "Cannot retrieve ServerContext as HttpContext");
+                return null;
+            }
+            //get the oldusername from header directly
+            headerList = header.getHeaders().get(oldUserPasswordHeaderName.toLowerCase());
+            if (headerList != null && !headerList.isEmpty()) {
+                for (String s : headerList) {
+                	return (s != null && !s.isEmpty()) ? s : null;
+                }
+            }
+        } catch (Exception e) {
+            RestDispatcher.debug.error("IdentityResource.getPasswordFromHeader :: " +
+                    "Cannot get olduserpassword from ServerContext!" + e);
+        }
+        return null;
     }
 
     /**
@@ -1108,7 +1130,7 @@ public final class IdentityResource implements CollectionResourceProvider {
                     if(strPass != null && !strPass.isEmpty() && checkValidPassword(resourceId, strPass.toCharArray(), realm)){
                         //continue will allow password change
                     } else{
-                        throw new ForbiddenException("Access Denied", null);
+                    	throw new BadRequestException("Invalid Password");
                     }
                 }
             }
@@ -1140,10 +1162,10 @@ public final class IdentityResource implements CollectionResourceProvider {
             RestDispatcher.debug.error("IdentityResource.updateInstance() :: Cannot UPDATE " +
                     generalFailure);
             handler.handleError(new BadRequestException(generalFailure.getMessage(), generalFailure));
-        } catch (ForbiddenException fe){
+        } catch (BadRequestException bre){
             RestDispatcher.debug.error("IdentityResource.updateInstance() :: Cannot UPDATE! "
-                    + resourceId + ":" + fe);
-            handler.handleError(fe);
+                    + resourceId + ":" + bre);
+            handler.handleError(bre);
         } catch (final Exception exception) {
             RestDispatcher.debug.error("IdentityResource.updateInstance() :: Cannot UPDATE! " +
                     exception);

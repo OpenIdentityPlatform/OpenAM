@@ -9,6 +9,7 @@
         "messages" : {
             "UserMessages" : {
                 "invalidCredentials" : "Login/password combination is invalid.",
+                "invalidOldPassword" : "Old password is invalid.",
                 "serviceUnavailable" : "Service unavailable",
                 "changedPassword" : "Password has been changed",
                 "unknown" : "Unknown error. Please contact with administrator",

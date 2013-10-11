@@ -37,6 +37,8 @@ define("org/forgerock/openam/ui/common/util/Constants", [
     
     commonConstants.CONSOLE_USERS = ['amadmin']; 
     
+    commonConstants.OPENAM_HEADER_PARAM_OLD_PASSWORD = "olduserpassword";
+    
     
     return commonConstants;
 });
