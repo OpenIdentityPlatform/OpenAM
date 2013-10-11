@@ -104,7 +104,7 @@
     </licenses>
     <properties>
         <serverDocTargetVersion>${project.version}</serverDocTargetVersion>
-        <agentsDocTargetVersion>3.2.0-SNAPSHOT</agentsDocTargetVersion>
+        <agentsDocTargetVersion>4.0.0-SNAPSHOT</agentsDocTargetVersion>
         <webAgentsDocTargetVersion>${agentsDocTargetVersion}</webAgentsDocTargetVersion>
         <javaEEAgentsDocTargetVersion>${agentsDocTargetVersion}</javaEEAgentsDocTargetVersion>
         <agentsBootstrapFile>OpenSSOAgentBootstrap.properties</agentsBootstrapFile>
