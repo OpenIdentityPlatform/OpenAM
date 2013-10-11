@@ -379,7 +379,8 @@
    <section xml:id="web-agent-deprecated">
     <title>Deprecated Functionality</title>
 
-    <para>No functionality has been deprecated in this release.</para>
+    <para>Support for Microsoft IIS 6 is deprecated, and likely to be removed in
+    a future release.</para>
    </section>
 
    <section xml:id="web-agent-removed">
@@ -391,6 +392,11 @@
       <literal>com.forgerock.agents.ext.url.validation.disable</literal>
       introduced in release 3.1.0 has been superseded by the bootstrap property
       <literal>com.forgerock.agents.ext.url.validation.level</literal>.</para>
+     </listitem>
+
+     <listitem>
+      <para>Web policy agent support for Apache HTTP Server 2.0 is no longer
+      provided in this release.</para>
      </listitem>
 
      <listitem>

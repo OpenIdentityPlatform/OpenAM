@@ -187,27 +187,15 @@
 
   <section xml:id="javaee-agent-deprecated">
    <title>Deprecated Functionality</title>
-   <para>No functionality has been deprecated in this release.</para>
 
-<!-- Keep the wording here for use in a future release:
-
-   <para>The following functionality is deprecated in OpenAM Java EE Policy
-   Agents <?eval ${javaEEAgentsDocTargetVersion}?>, and is likely to be removed
-   in a future release.</para>
-
-   <itemizedlist>
-    <listitem>
-     <para>Functionality, description...</para>
-    </listitem>
-   </itemizedlist>
-
--->
+   <para>Support for Oracle WebLogic 10g is deprecated and is likely to be
+   removed in a future release.</para>
   </section>
 
   <section xml:id="javaee-agent-removed">
    <title>Removed Functionality</title>
-   <para>No functionality has been removed in OpenAM Java EE Policy Agents
-   <?eval ${javaEEAgentsDocTargetVersion}?>.</para>
+
+   <para>No functionality has been removed in this release.</para>
   </section>
  </section>
 
