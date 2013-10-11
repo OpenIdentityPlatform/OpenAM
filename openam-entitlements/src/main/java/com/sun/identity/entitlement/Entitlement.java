@@ -305,12 +305,7 @@ public class Entitlement {
      * @param actionValues Action values.
      */
     public void setActionValues(Map<String, Boolean> actionValues) {
-        this.actionValues = new HashMap<String, Boolean>();
-        for (String s : actionValues.keySet()) {
-            Boolean b = (actionValues.get(s).booleanValue()) ?
-                Boolean.TRUE : Boolean.FALSE;
-            this.actionValues.put(s, b);
-        }
+        this.actionValues = new HashMap<String, Boolean>(actionValues);
     }
 
     /**
@@ -365,6 +360,13 @@ public class Entitlement {
      */
     public Map<String, Set<String>> getAdvices() {
         return advices;
+    }
+
+    /**
+     * @return Whether this entitlement has any advice.
+     */
+    public boolean hasAdvice() {
+        return advices != null && !advices.isEmpty();
     }
 
     /**

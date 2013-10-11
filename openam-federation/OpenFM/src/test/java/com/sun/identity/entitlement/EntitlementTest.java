@@ -1,4 +1,4 @@
-/** 
+/**
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
  * Copyright (c) 2009 Sun Microsystems Inc. All Rights Reserved
@@ -23,19 +23,23 @@
  * "Portions Copyrighted [year] [name of copyright owner]"
  *
  * $Id: EntitlementTest.java,v 1.1 2009/08/19 05:41:00 veiming Exp $
+ *
+ * Portions copyright 2013 ForgeRock AS.
  */
 package com.sun.identity.entitlement;
 
 
+import org.forgerock.openam.utils.CollectionUtils;
+import org.testng.annotations.Test;
 
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
-import org.testng.annotations.Test;
+
+import static org.fest.assertions.Assertions.assertThat;
 
 /**
- *
  * @author dillidorai
  */
 public class EntitlementTest {
@@ -60,16 +64,30 @@ public class EntitlementTest {
 
         if (ent.equals(ent1)) {
             throw new Exception("EntitlementTest.testConstruction(): " +
-                "equality test for false failed.");
+                    "equality test for false failed.");
         }
         ent1.setExcludedResourceNames(excludedResourceNames);
         ent1.setName("entitlement1");
 
         if (!ent.equals(ent1)) {
             throw new Exception("EntitlementTest.testConstruction(): " +
-                "equality test for true failed.");
+                    "equality test for true failed.");
         }
-        
-
     }
+
+    @Test
+    public void verifyAdvicePopulation() {
+        Entitlement entitlement = new Entitlement("http://test.example.com/*", CollectionUtils.asSet("GET", "POST"));
+
+        assertThat(entitlement.getAdvices()).isNull();
+        assertThat(entitlement.hasAdvice()).isFalse();
+
+        Map<String, Set<String>> advices = new HashMap<String, Set<String>>();
+        advices.put("someAdvice", CollectionUtils.asSet("property1", "property2"));
+        entitlement.setAdvices(advices);
+
+        assertThat(entitlement.getAdvices()).isEqualTo(advices);
+        assertThat(entitlement.hasAdvice()).isTrue();
+    }
+
 }

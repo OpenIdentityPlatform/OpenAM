@@ -23,12 +23,9 @@
  * "Portions Copyrighted [year] [name of copyright owner]"
  *
  * $Id: EntitlementCombiner.java,v 1.4 2009/12/07 19:46:45 veiming Exp $
+ *
+ * Portions copyright 2010-2013 ForgeRock AS.
  */
-
-/*
- * Portions Copyrighted [2010] [ForgeRock AS]
- */
-
 package com.sun.identity.entitlement;
 
 import com.sun.identity.entitlement.interfaces.ResourceName;
@@ -48,7 +45,7 @@ import javax.security.auth.Subject;
  * <code>init</code> needs to be called after it is created.
  */
 public abstract class EntitlementCombiner {
-    private String resourceName;
+
     private Set<String> actions;
     private boolean isDone;
     private boolean isRecursive;
@@ -65,33 +62,37 @@ public abstract class EntitlementCombiner {
     /**
      * Initializes the combiner.
      *
-     * @param adminSubject Admin Subject.
      * @param realm Realm name.
      * @param applicationName Application Name.
      * @param resourceName Resource name to be evaluated.
      * @param actions Action names to be evaluated.
-     * @param isRecursive <code>true<</code> for sub stree evaluation.
+     * @param isRecursive <code>true<</code> for subtree evaluation.
      */
-    public void init(
-        Subject adminSubject,
-        String realm,
-        String applicationName,
-        String resourceName,
-        Set<String> actions,
-        boolean isRecursive
-    ) throws EntitlementException {
-        this.resourceName = resourceName;
+    public void init(String realm, String applicationName, String resourceName, Set<String> actions,
+                     boolean isRecursive) throws EntitlementException {
+        Application application = ApplicationManager.getApplication(
+                PrivilegeManager.superAdminSubject, realm, applicationName);
+        init(resourceName, actions, isRecursive, application);
+    }
+
+    /**
+     * Initializes the combiner.
+     *
+     * @param resourceName Resource name to be evaluated.
+     * @param actions Action names to be evaluated.
+     * @param isRecursive <code>true<</code> for subtree evaluation.
+     * @param application The defining application.
+     */
+    public void init(String resourceName, Set<String> actions, boolean isRecursive,
+                     Application application) throws EntitlementException {
         this.isRecursive = isRecursive;
         this.actions = new HashSet<String>();
 
-        Application application = ApplicationManager.getApplication(
-            PrivilegeManager.superAdminSubject, realm, applicationName);
-        rootE = new Entitlement(applicationName, resourceName,
-            Collections.EMPTY_MAP);
+        rootE = new Entitlement(application.getName(), resourceName, Collections.EMPTY_MAP);
         resourceComparator = application.getResourceComparator();
 
         if (!isRecursive) { // single level
-            if ((actions != null) && !actions.isEmpty()) {
+            if (actions != null && !actions.isEmpty()) {
                 this.actions.addAll(actions);
             } else {
                 this.actions.addAll(application.getActions().keySet());
@@ -99,8 +100,8 @@ public abstract class EntitlementCombiner {
         } else {
             this.actions.addAll(application.getActions().keySet());
         }
-        results.add(rootE);
 
+        results.add(rootE);
     }
 
     /**
@@ -170,34 +171,40 @@ public abstract class EntitlementCombiner {
      * @param e2 Entitlement.
      */
     protected void mergeActionValues(Entitlement e1, Entitlement e2) {
-        Map<String, Boolean> result = new HashMap<String, Boolean>();
-        Map<String, Boolean> a1 = e1.getActionValues();
-        if (a1 == null) {
-            a1 = Collections.EMPTY_MAP;
-        }
-        Map<String, Boolean> a2 = e2.getActionValues();
-        if (a2 == null) {
-            a2 = Collections.EMPTY_MAP;
-        }
-
-        Set<String> actionNames = new HashSet<String>();
-        actionNames.addAll(a1.keySet());
-        actionNames.addAll(a2.keySet());
-
-        for (String n : actionNames) {
-            Boolean b1 = a1.get(n);
-            Boolean b2 = a2.get(n);
-
-            if (b1 == null) {
-                result.put(n, b2);
-            } else if (b2 == null) {
-                result.put(n, b1);
-            } else {
-                Boolean b = Boolean.valueOf(combine(b1, b2));
-                result.put(n, b);
+        if (!e1.hasAdvice() && !e2.hasAdvice()) {
+            Map<String, Boolean> result = new HashMap<String, Boolean>();
+            Map<String, Boolean> a1 = e1.getActionValues();
+            if (a1 == null) {
+                a1 = Collections.EMPTY_MAP;
             }
+            Map<String, Boolean> a2 = e2.getActionValues();
+            if (a2 == null) {
+                a2 = Collections.EMPTY_MAP;
+            }
+
+            Set<String> actionNames = new HashSet<String>();
+            actionNames.addAll(a1.keySet());
+            actionNames.addAll(a2.keySet());
+
+            for (String n : actionNames) {
+                Boolean b1 = a1.get(n);
+                Boolean b2 = a2.get(n);
+
+                if (b1 == null) {
+                    result.put(n, b2);
+                } else if (b2 == null) {
+                    result.put(n, b1);
+                } else {
+                    Boolean b = Boolean.valueOf(combine(b1, b2));
+                    result.put(n, b);
+                }
+            }
+            e1.setActionValues(result);
+        } else {
+            // Advice is present and therefore more data is needed before any actions can be taken.
+            e1.setActionNames(Collections.EMPTY_SET);
         }
-        e1.setActionValues(result);
+
         isDone = isCompleted();
     }
 
