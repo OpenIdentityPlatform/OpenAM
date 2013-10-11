@@ -34,6 +34,14 @@
  <para>OpenAM <?eval ${serverDocTargetVersion}?> fixes a number of issues, and
  provides the following additional features.</para>
 
+ <important>
+  <para>This release contains fixes that resolve security issues within OpenAM.
+  Older versions of OpenAM contain these security issues. It is strongly
+  recommended that you update to this release to make your deployment more
+  secure, and to take advantage of important functional fixes. ForgeRock
+  customers can contact support for help and further information.</para>
+ </important>
+
  <itemizedlist>
   <title>Major New Features</title>
 
