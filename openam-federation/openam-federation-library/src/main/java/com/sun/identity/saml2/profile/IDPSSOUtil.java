@@ -27,7 +27,7 @@
  */
 
 /*
- * Portions Copyrighted 2010-2013 ForgeRock, Inc
+ * Portions Copyrighted 2010-2013 ForgeRock AS
  */
 
 package com.sun.identity.saml2.profile;
@@ -1396,7 +1396,7 @@ public class IDPSSOUtil {
                 // this will take care of affiliation
                 allowCreate = nameIDPolicy.isAllowCreate();
                 spNameQualifier = nameIDPolicy.getSPNameQualifier();
-                if (spNameQualifier != null) {
+                if (spNameQualifier != null && !spNameQualifier.isEmpty()) {
                     AffiliationDescriptorType affiDesc = metaManager.
                             getAffiliationDescriptor(realm, spNameQualifier);
 
