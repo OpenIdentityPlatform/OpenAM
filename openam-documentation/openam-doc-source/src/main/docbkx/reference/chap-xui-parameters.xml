@@ -246,9 +246,21 @@
             </listitem>
         </varlistentry>
         <varlistentry>
+            <term><literal>active-menu-font-color</literal></term>
+            <listitem>
+                <para>Color of the font used in the active menu option</para>
+            </listitem>
+        </varlistentry>
+        <varlistentry>
             <term><literal>inactive-menu-color</literal></term>
             <listitem>
                 <para>Color of inactive menu options</para>
+            </listitem>
+        </varlistentry>
+        <varlistentry>
+            <term><literal>inactive-menu-font-color</literal></term>
+            <listitem>
+                <para>Color of the font used in the inactive menu option</para>
             </listitem>
         </varlistentry>
         <varlistentry>
@@ -261,6 +273,12 @@
             <term><literal>href-color</literal></term>
             <listitem>
                 <para>Color of text links</para>
+            </listitem>
+        </varlistentry>
+        <varlistentry>
+            <term><literal>href-color-hover</literal></term>
+            <listitem>
+                <para>Color of text links of the option currently being hovered over by the pointer</para>
             </listitem>
         </varlistentry>
         <varlistentry>
