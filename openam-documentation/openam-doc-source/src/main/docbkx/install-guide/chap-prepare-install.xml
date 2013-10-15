@@ -1133,6 +1133,41 @@ $ java -server -Xmx1024m -XX:MaxPermSize=256m -jar start.jar</screen>
     <para>Save your work.</para>
    </listitem>
   </orderedlist>
- </section>
 
+  <orderedlist>
+   <para>Furthermore when using IBM Java, add the JAXP Reference Implementation
+   .jar into the OpenAM .war file before deploying the .war into WebSphere as
+   this required library is missing otherwise.</para>
+
+   <listitem>
+    <para>Unpack the OpenAM .war file.</para>
+
+    <screen>$ mkdir /tmp/openam
+$ cd /tmp/openam/
+$ jar -xf ~/Downloads/openam/<?eval ${coreWarFile}?></screen>
+   </listitem>
+
+   <listitem>
+    <para>Add the JAXP Reference Implementation .jar in
+    <filename>WEB-INF/lib/</filename>.</para>
+
+    <screen width="89"
+    >$ wget http://repo1.maven.org/maven2/com/sun/xml/parsers/jaxp-ri/1.4.5/jaxp-ri-1.4.5.jar
+$ mv jaxp-ri-1.4.5.jar WEB-INF/lib/</screen>
+   </listitem>
+
+   <listitem>
+    <para>Pack up the OpenAM .war file to deploy in WebSphere.</para>
+
+    <screen>$ jar -cf ../openam.war *</screen>
+   </listitem>
+
+   <listitem>
+    <para>Deploy the new .war file.</para>
+
+    <para>In this case the .war file to deploy is
+    <filename>/tmp/openam.war</filename>.</para>
+   </listitem>
+  </orderedlist>
+ </section>
 </chapter>

@@ -109,24 +109,24 @@
         <javaEEAgentsDocTargetVersion>${agentsDocTargetVersion}</javaEEAgentsDocTargetVersion>
         <agentsBootstrapFile>OpenSSOAgentBootstrap.properties</agentsBootstrapFile>
         <agentsConfigurationFile>OpenSSOAgentConfiguration.properties</agentsConfigurationFile>
-        <coreDirectoryFile><![CDATA[OpenAM-${project.version}.zip]]></coreDirectoryFile>
-        <coreLibrary><![CDATA[openam-core-${project.version}.jar]]></coreLibrary>
-        <coreWarFile><![CDATA[OpenAM-${project.version}.war]]></coreWarFile>
-        <clientsdkJarFile><![CDATA[ClientSDK-${project.version}.jar]]></clientsdkJarFile>
-        <clientSDKExamplesCliFile><![CDATA[ExampleClientSDK-CLI-${project.version}.zip]]></clientSDKExamplesCliFile>
-        <clientSDKExamplesWarFile><![CDATA[ExampleClientSDK-WAR-${project.version}.war]]></clientSDKExamplesWarFile>
-        <ipdiscoWarFile><![CDATA[IDPDiscovery-${project.version}.war]]></ipdiscoWarFile>
-        <distauthWarFile><![CDATA[OpenAM-DistAuth-${project.version}.war]]></distauthWarFile>
-        <diagnosticsZipFile><![CDATA[SSODiagnosticTools-${project.version}.zip]]></diagnosticsZipFile>
-        <fedletZipFile><![CDATA[Fedlet-${project.version}.zip]]></fedletZipFile>
-        <sharedLibrary><![CDATA[openam-shared-${project.version}.jar]]></sharedLibrary>
-        <ssoadminZipFile><![CDATA[SSOAdminTools-${project.version}.zip]]></ssoadminZipFile>
-        <ssoconfigZipFile><![CDATA[SSOConfiguratorTools-${project.version}.zip]]></ssoconfigZipFile>
-        <ssoconfigJarFile><![CDATA[openam-configurator-tool-${project.version}.jar]]></ssoconfigJarFile>
-        <ssoconfigUpgradeJarFile><![CDATA[openam-upgrade-tool-${project.version}.jar]]></ssoconfigUpgradeJarFile>
-        <serveronlyWarFile><![CDATA[OpenAM-ServerOnly-${project.version}.war]]></serveronlyWarFile>
-        <configJarFile><![CDATA[openam-distribution-configurator-${project.version}.jar]]></configJarFile>
-        <oauth2JarFile><![CDATA[openam-oauth2-common-${project.version}.jar]]></oauth2JarFile>
+        <coreDirectoryFile><![CDATA[OpenAM-${serverDocTargetVersion}.zip]]></coreDirectoryFile>
+        <coreLibrary><![CDATA[openam-core-${serverDocTargetVersion}.jar]]></coreLibrary>
+        <coreWarFile><![CDATA[OpenAM-${serverDocTargetVersion}.war]]></coreWarFile>
+        <clientsdkJarFile><![CDATA[ClientSDK-${serverDocTargetVersion}.jar]]></clientsdkJarFile>
+        <clientSDKExamplesCliFile><![CDATA[ExampleClientSDK-CLI-${serverDocTargetVersion}.zip]]></clientSDKExamplesCliFile>
+        <clientSDKExamplesWarFile><![CDATA[ExampleClientSDK-WAR-${serverDocTargetVersion}.war]]></clientSDKExamplesWarFile>
+        <ipdiscoWarFile><![CDATA[IDPDiscovery-${serverDocTargetVersion}.war]]></ipdiscoWarFile>
+        <distauthWarFile><![CDATA[OpenAM-DistAuth-${serverDocTargetVersion}.war]]></distauthWarFile>
+        <diagnosticsZipFile><![CDATA[SSODiagnosticTools-${serverDocTargetVersion}.zip]]></diagnosticsZipFile>
+        <fedletZipFile><![CDATA[Fedlet-${serverDocTargetVersion}.zip]]></fedletZipFile>
+        <sharedLibrary><![CDATA[openam-shared-${serverDocTargetVersion}.jar]]></sharedLibrary>
+        <ssoadminZipFile><![CDATA[SSOAdminTools-${serverDocTargetVersion}.zip]]></ssoadminZipFile>
+        <ssoconfigZipFile><![CDATA[SSOConfiguratorTools-${serverDocTargetVersion}.zip]]></ssoconfigZipFile>
+        <ssoconfigJarFile><![CDATA[openam-configurator-tool-${serverDocTargetVersion}.jar]]></ssoconfigJarFile>
+        <ssoconfigUpgradeJarFile><![CDATA[openam-upgrade-tool-${serverDocTargetVersion}.jar]]></ssoconfigUpgradeJarFile>
+        <serveronlyWarFile><![CDATA[OpenAM-ServerOnly-${serverDocTargetVersion}.war]]></serveronlyWarFile>
+        <configJarFile><![CDATA[openam-distribution-configurator-${serverDocTargetVersion}.jar]]></configJarFile>
+        <oauth2JarFile><![CDATA[openam-oauth2-common-${serverDocTargetVersion}.jar]]></oauth2JarFile>
 
         <agentApacheSupport>Apache HTTP Server 2.2, 2.4</agentApacheSupport>
         <agentIISSupport>Microsoft IIS 6, 7, 8</agentIISSupport>
