@@ -878,6 +878,11 @@ CookieWriterServlet.doGetPost: Redirect to
      <listitem>
       <para>Specifies a class that implements the attribute mapping.</para>
 
+      <para>The default implementation attempts to retrieve the mapped attribute
+      values from the user profile first. If the attribute values are not
+      present in the user's profile, then it attempts to retrieve them from the
+      user's session.</para>
+
       <para>Default: <literal>com.sun.identity.saml2.plugins.DefaultIDPAttributeMapper</literal></para>
      </listitem>
     </varlistentry>
