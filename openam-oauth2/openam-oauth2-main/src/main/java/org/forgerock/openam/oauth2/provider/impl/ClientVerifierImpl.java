@@ -99,7 +99,7 @@ public class ClientVerifierImpl implements ClientVerifier{
                 responseHeaders.add(new Header("WWW-Authenticate", "Basic realm=\"" + OAuth2Utils.getRealm(request) + "\""));
                 throw OAuthProblemException.OAuthError.INVALID_CLIENT_401.handle(null, "Client authentication failed");
             }
-        } else if (clientSecret != null && clientId != null && !clientId.isEmpty()) {
+        } else if (clientId != null && !clientId.isEmpty()) {
                 client = verify(clientId, clientSecret, realm);
         } else {
             throw OAuthProblemException.OAuthError.INVALID_CLIENT.handle(null, "Client authentication failed");
@@ -119,21 +119,32 @@ public class ClientVerifierImpl implements ClientVerifier{
     private ClientApplication verify(ChallengeResponse challengeResponse, String realm)
             throws OAuthProblemException{
         String clientId = challengeResponse.getIdentifier();
-        String clientSecret = String.valueOf(challengeResponse.getSecret());
+        String clientSecret = null;
+        if (challengeResponse.getSecret() != null && challengeResponse.getSecret().length > 0){
+            clientSecret = String.valueOf(challengeResponse.getSecret());
+        } else {
+            clientSecret = "";
+        }
         return verify(clientId, clientSecret, realm);
     }
 
     private ClientApplication verify(String clientId, String clientSecret, String realm)
             throws OAuthProblemException{
         ClientApplication user = null;
+        if (clientSecret == null) {
+            clientSecret = "";
+        }
         try {
-            AMIdentity ret = authenticate(clientId, clientSecret.toCharArray(), realm);
-            if (ret == null){
+            AMIdentity client = getIdentity(clientId, realm);
+            user = new ClientApplicationImpl(client);
+
+            //authenticate confidential clients
+            if (user.getClientType() != null &&
+                    user.getClientType().equals(ClientApplication.ClientType.CONFIDENTIAL) &&
+                    authenticate(clientId, clientSecret.toCharArray(), realm) == false){
                 OAuth2Utils.DEBUG.error("ClientVerifierImpl::Unable to verify password for: " +
                         clientId);
                 throw OAuthProblemException.OAuthError.INVALID_CLIENT.handle(null, "Client authentication failed");
-            } else {
-                user = new ClientApplicationImpl(ret);
             }
         } catch (Exception e){
             OAuth2Utils.DEBUG.error("ClientVerifierImpl::Unable to verify client", e);
@@ -142,9 +153,7 @@ public class ClientVerifierImpl implements ClientVerifier{
         return user;
     }
 
-    private AMIdentity authenticate(String username, char[] password, String realm) {
-
-        AMIdentity ret = null;
+    private boolean authenticate(String username, char[] password, String realm) {
         try {
             AuthContext lc = new AuthContext(realm);
             lc.login(AuthContext.IndexType.MODULE_INSTANCE, "Application");
@@ -174,26 +183,16 @@ public class ClientVerifierImpl implements ClientVerifier{
 
             // validate the password..
             if (lc.getStatus() == AuthContext.Status.SUCCESS) {
-                try {
-                    ret = OAuth2Utils.getClientIdentity(username, realm);
-                } catch (Exception e) {
-                    OAuth2Utils.DEBUG.error( "ClientVerifierImpl::authContext: "
-                            + "Unable to get SSOToken", e);
-                    // we're going to throw a generic error
-                    // because the system is likely down..
-                    lc.logout();
-                    throw new ResourceException(Status.SERVER_ERROR_INTERNAL, e);
-                }
+                lc.logout();
+                return true;
             } else {
                 lc.logout();
                 throw new ResourceException(Status.CLIENT_ERROR_UNAUTHORIZED);
             }
-            lc.logout();
         } catch (AuthLoginException le) {
             OAuth2Utils.DEBUG.error("ClientVerifierImpl::authContext AuthException", le);
             throw new ResourceException(Status.SERVER_ERROR_INTERNAL, le);
         }
-        return ret;
     }
 
     /**

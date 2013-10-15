@@ -30,6 +30,8 @@ import java.util.Map;
 import java.util.Set;
 
 import com.sun.identity.shared.OAuth2Constants;
+import org.forgerock.openam.oauth2.exceptions.OAuthProblemException;
+import org.forgerock.openam.oauth2.model.ClientApplication;
 import org.forgerock.openam.oauth2.model.CoreToken;
 import org.forgerock.openam.oauth2.utils.OAuth2Utils;
 import org.restlet.ext.jackson.JacksonRepresentation;
@@ -49,6 +51,11 @@ public class ClientCredentialsServerResource extends AbstractFlow {
     public Representation represent(Representation entity) {
         Representation rep = null;
         client = getAuthenticatedClient();
+        if (client.getClient().getClientType().equals(ClientApplication.ClientType.PUBLIC)) {
+            OAuth2Utils.DEBUG.warning("Public clients can't use client credentials grant.");
+            throw OAuthProblemException.OAuthError.INVALID_CLIENT.handle(getRequest(),
+                    "Public clients can't use client credentials grant.");
+        }
 
         // Get the requested scope
         String scope_before =
