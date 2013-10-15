@@ -80,15 +80,43 @@
    <screen>$ echo $JAVA_HOME
 /path/to/jdk</screen>
   </step>
+
   <step>
-   <para>Unpack the tools from where you unzipped OpenAM.</para>
-   <screen>$ cd /path/to/openam-tools/admin
-$ unzip ~/Downloads/openam/
-  <?eval ${ssoadminZipFile}?>
-...
-  inflating: template/windows/bin/amverifyarchive.bat.template
-  inflating: template/windows/bin/ssoadm.bat.template</screen>
+   <para>Create a file system directory to unpack the tools.</para>
+
+   <screen>$ mkdir -p /path/to/openam-tools/admin</screen>
   </step>
+
+  <step>
+   <para>Unpack the tools.</para>
+
+   <screen>$ cd /path/to/openam-tools/admin
+$ unzip ~/Downloads/openam/<?eval ${ssoadminZipFile}?></screen>
+  </step>
+
+  <step performance="optional">
+   <para>If you use IBM Java, add
+   <literal>-D"amCryptoDescriptor.provider=IBMJCE"</literal> and
+   <literal>-D"amKeyGenDescriptor.provider=IBMJCE"</literal> options to the
+   <command>setup</command> or <command>setup.bat</command> script before
+   you install the tools.</para>
+
+   <para>The options should be set for the <command>java</command> command
+   at the end of the script.</para>
+
+   <screen>$ tail setup
+CLASSPATH="$CLASSPATH:resources"
+
+$JAVA_HOME/bin/java -D"load.config=yes" -D"help.print=$help_print" \
+                      -D"path.AMConfig=$path_AMConfig" \
+                      -D"path.debug=$path_debug" \
+                      -D"path.log=$path_log" \
+                      -D"amCryptoDescriptor.provider=IBMJCE" \
+                      -D"amKeyGenDescriptor.provider=IBMJCE" \
+                      -cp "$CLASSPATH" \
+                      com.sun.identity.tools.bundles.Main</screen>
+  </step>
+
   <step>
    <para>Run the <command>setup</command> utility (<command>setup.bat</command>
    on Windows), providing the path to the directory where OpenAM configuration
@@ -110,11 +138,30 @@ The version of your server instance is: OpenAM <replaceable>version and date</re
 ampassword  amverifyarchive  ssoadm</screen>
    <para>On Windows, these files are .bat scripts.</para>
   </step>
+
+  <step performance="optional">
+   <para>If you use IBM Java, add
+   <literal>-D"amCryptoDescriptor.provider=IBMJCE"</literal> and
+   <literal>-D"amKeyGenDescriptor.provider=IBMJCE"</literal> options to the
+   <command>ssoadm</command> or <command>ssoadm.bat</command> script before
+   using the script.</para>
+
+   <para>The options should be set before the call to
+   <literal>com.sun.identity.cli.CommandManager</literal> at the end of the
+   script.</para>
+
+   <screen>$ tail -3 /path/to/openam-tools/admin/openam/bin/ssoadm
+    -D"amCryptoDescriptor.provider=IBMJCE" \
+    -D"amKeyGenDescriptor.provider=IBMJCE" \
+    com.sun.identity.cli.CommandManager "$@"</screen>
+  </step>
+
   <step>
    <para>Check that <command>ssoadm</command> works properly.</para>
-   <screen>$ umask 366
-$ echo password > /tmp/pwd.txt
-$ openam/bin/ssoadm list-servers -u amadmin -f /tmp/pwd.txt
+   <screen>$ echo password > /tmp/pwd.txt
+$ chmod 400 /tmp/pwd.txt
+$ cd /path/to/openam-tools/admin/openam/bin/
+$ ./ssoadm list-servers -u amadmin -f /tmp/pwd.txt
 
 http://openam.example.com:8080/openam</screen>
    <para>The <command>ssoadm</command> commands can also be run from
