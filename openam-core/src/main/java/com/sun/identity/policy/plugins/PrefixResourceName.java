@@ -24,10 +24,8 @@
  *
  * $Id: PrefixResourceName.java,v 1.4 2008/12/15 20:53:41 dillidorai Exp $
  *
+ * Portions Copyrighted 2013 ForgeRock AS
  */
-
-
-
 package com.sun.identity.policy.plugins;
 
 import java.util.Map;
@@ -192,17 +190,15 @@ public class PrefixResourceName implements ResourceName {
      * specifies if the resources are exact match, or
      * otherwise.
      */
-    public ResourceMatch compare(String requestResource, 
-                                 String targetResource, 
-                                 boolean wildcardCompare) 
-    {
+    public ResourceMatch compare(String requestResource, String targetResource, boolean wildcardCompare) {
+
         // if both strings are null, we consider them exact match
-        if ((requestResource == null) && (targetResource == null)) {
+        if (requestResource == null && targetResource == null) {
             return (ResourceMatch.EXACT_MATCH);
         }
 
         // if only one of the strings is null, they are not match
-        if (((requestResource == null) || (targetResource == null))) {
+        if (requestResource == null || targetResource == null) {
             return (ResourceMatch.NO_MATCH);
         }
 
@@ -213,7 +209,7 @@ public class PrefixResourceName implements ResourceName {
             requestResource = requestResource.toLowerCase();
             targetResource = targetResource.toLowerCase();
         }
-      
+
         // get rid of ending delimiters if any from requestResource
         while (requestResource.endsWith(delimiter)) {
             int len = requestResource.length();
@@ -231,16 +227,10 @@ public class PrefixResourceName implements ResourceName {
          * resource contains only one level wild card and hence call the
          * oneLevelWildcardCompare() method.
          */
-        if (oneLevelWildcardEmbedded && targetResource.indexOf(wildcard) 
-            == -1) 
-        {
-            if (targetResource.indexOf(oneLevelWildcard) != -1 
-                && wildcardCompare) 
-            {
-                debug.message("PrefixResourceName:compare():invoking one level "
-                    +"compare");
-                return oneLevelWildcardCompare(requestResource,
-                    targetResource, wildcardCompare);
+        if (oneLevelWildcardEmbedded && targetResource.indexOf(wildcard) == -1) {
+            if (targetResource.indexOf(oneLevelWildcard) != -1 && wildcardCompare) {
+                debug.message("PrefixResourceName:compare():invoking one level compare");
+                return oneLevelWildcardCompare(requestResource, targetResource, wildcardCompare);
             }
         }
         /** if wild card is embedded or
@@ -249,33 +239,26 @@ public class PrefixResourceName implements ResourceName {
          * Then checks if one level wild card pattern exists in resource
          * if yes, call oneLevelWildcardCompare() method.
          */
-        if (wildcardEmbedded || 
-            !(wildcardEmbedded || oneLevelWildcardEmbedded))
-        {
-            if (targetResource.indexOf(oneLevelWildcard) != -1 
-                && wildcardCompare) 
-            {
-                debug.message("PrefixResourceName:compare():invoking one level "
-                    +"compare");
-                return oneLevelWildcardCompare(requestResource,
-                    targetResource, wildcardCompare);
+        if (wildcardEmbedded || !(wildcardEmbedded || oneLevelWildcardEmbedded)) {
+            if (targetResource.indexOf(oneLevelWildcard) != -1 && wildcardCompare) {
+                debug.message("PrefixResourceName:compare():invoking one level compare");
+                return oneLevelWildcardCompare(requestResource, targetResource, wildcardCompare);
             }
         }
-            
 
-        int beginIndex1 = 0; // index pointer for requestResource
-        int endIndex1 = 0;   // index pointer for requestResource
-        int beginIndex2 = 0; // index pointer for targetResource
-        int endIndex2 = 0;   // index pointer for targetResource
-        int strlen1 = 0;
-        int strlen2 = 0;
-        String substr = null;
+        int reqBegin = 0; // index pointer for requestResource
+        int reqEnd = 0;   // index pointer for requestResource
+        int tarBegin = 0; // index pointer for targetResource
+        int tarEnd = 0;   // index pointer for targetResource
+        int reqLen = 0;
+        int tarLen = 0;
+        String subString = null;
 
-        strlen1 = requestResource.length();
-        strlen2 = targetResource.length();
-        endIndex2 = targetResource.indexOf(wildcard, beginIndex2);
+        reqLen = requestResource.length();
+        tarLen = targetResource.length();
+        tarEnd = targetResource.indexOf(wildcard, tarBegin);
 
-        if ((!wildcardCompare) || (endIndex2 == -1)) {
+        if (!wildcardCompare || tarEnd == -1) {
             // non-wildcard comparison
             // Compare for equality
             if (requestResource.equals(targetResource)) {
@@ -283,82 +266,89 @@ public class PrefixResourceName implements ResourceName {
             }
 
             if (targetResource.startsWith(requestResource + delimiter)) {
-                 return (ResourceMatch.SUB_RESOURCE_MATCH);
+                return (ResourceMatch.SUB_RESOURCE_MATCH);
             }
 
-                if (requestResource.startsWith(targetResource + delimiter)) {
+            if (requestResource.startsWith(targetResource + delimiter)) {
                 return (ResourceMatch.SUPER_RESOURCE_MATCH);
             }
+
             return (ResourceMatch.NO_MATCH);
         }
 
         // now we have to do wildcard comparison
         // get the sub string prior to the first wildcard char 
-        substr = targetResource.substring(beginIndex2, endIndex2);
-        
+        subString = targetResource.substring(tarBegin, tarEnd);
+
         // checks if the first char in targetResource is the wildcard, i.e. 
         // the substr is null
-        if (endIndex2 > beginIndex2) {
+        if (tarEnd > tarBegin) {
             // check if requestResource starts with the substr
-            if (!(requestResource.startsWith(substr))) {
-                if (substr.startsWith(requestResource + delimiter)) {
+            if (!(requestResource.startsWith(subString))) {
+                if (subString.startsWith(requestResource + delimiter)) {
                     return (ResourceMatch.SUB_RESOURCE_MATCH);
                 }
                 return (ResourceMatch.NO_MATCH);
             }
-        } 
+        }
+
         // yes, requestResource does start with substr
         // move the pointers to the next char after the substring
         // which is already matched
-        beginIndex1 = beginIndex1 + (endIndex2 - beginIndex2);
-        if (endIndex2 >= strlen2 - 1) {
+        reqBegin = tarEnd;
+
+        if (tarEnd >= tarLen - 1) {
             return (ResourceMatch.WILDCARD_MATCH);
         }
-        beginIndex2 = endIndex2 + 1; 
+
+        tarBegin = tarEnd + 1;
 
         // if there are more wildcards in the targetResource
-        while ((endIndex2 = 
-             targetResource.indexOf(wildcard, beginIndex2)) != -1) {
-            substr = targetResource.substring(beginIndex2, endIndex2);
-            if (endIndex2 > beginIndex2) {
-                if ((beginIndex1 = 
-               requestResource.indexOf(substr, beginIndex1)) == -1) {
+        while ((tarEnd = targetResource.indexOf(wildcard, tarBegin)) != -1) {
+
+            subString = targetResource.substring(tarBegin, tarEnd);
+
+            if (tarEnd > tarBegin) {
+                if ((reqBegin = requestResource.indexOf(subString, reqBegin)) == -1) {
                     return (ResourceMatch.SUB_RESOURCE_MATCH);
                 }
-            }   
+            }
 
-            beginIndex1 = beginIndex1 + (endIndex2 - beginIndex2);
-            if (endIndex2 >= strlen2 - 1) {
+            if (tarEnd >= tarLen - 1) {
                 return (ResourceMatch.WILDCARD_MATCH);
             }
-            beginIndex2 = endIndex2 + 1;
+
+            reqBegin = reqBegin + (tarEnd - tarBegin);
+            tarBegin = tarEnd + 1;
         }
-                
+
         // we just pass the last wildcard in targetResource
-        substr = targetResource.substring(beginIndex2, strlen2);
-        if ((endIndex1 = requestResource.lastIndexOf(substr, strlen1 - 1)) 
-            == -1) 
-        {
-            return (ResourceMatch.SUB_RESOURCE_MATCH);
-        }
-        
-        if (beginIndex1 > endIndex1) {
+        subString = targetResource.substring(tarBegin, tarLen);
+
+        if ((reqEnd = requestResource.lastIndexOf(subString, reqLen - 1)) == -1) {
             return (ResourceMatch.SUB_RESOURCE_MATCH);
         }
 
-        beginIndex1 = endIndex1;
-        if ((strlen1 - beginIndex1) == (strlen2 - beginIndex2)) {
+        if (reqBegin > reqEnd) {
+            return (ResourceMatch.SUB_RESOURCE_MATCH);
+        }
+
+        reqBegin = reqEnd;
+
+        if ((reqLen - reqBegin) == (tarLen - tarBegin)) {
             return (ResourceMatch.WILDCARD_MATCH);
         }
 
-        beginIndex1 = beginIndex1 + (strlen2 - beginIndex2);
-        substr = requestResource.substring(beginIndex1, beginIndex1 + 1);
-        if (substr.equals(delimiter)) { 
+        reqBegin = reqBegin + (tarLen - tarBegin);
+        subString = requestResource.substring(reqBegin, reqBegin + 1);
+
+        if (subString.equals(delimiter)) {
             return (ResourceMatch.SUPER_RESOURCE_MATCH);
         }
-        
+
         return (ResourceMatch.SUB_RESOURCE_MATCH);
-    }    
+    }
+
     /**
      * Compares two resources containing one level wild card(s).
      *
