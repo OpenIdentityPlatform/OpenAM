@@ -15,7 +15,6 @@
  */
 package org.forgerock.openam.cts.adapters;
 
-import javax.inject.Inject;
 import com.iplanet.dpro.session.service.InternalSession;
 import org.forgerock.openam.cts.CoreTokenConfig;
 import org.forgerock.openam.cts.api.TokenType;
@@ -27,6 +26,7 @@ import org.forgerock.openam.cts.utils.LDAPDataConversion;
 import org.forgerock.openam.cts.utils.blob.TokenBlobUtils;
 import org.forgerock.openam.cts.utils.blob.strategies.AttributeCompressionStrategy;
 
+import javax.inject.Inject;
 import java.lang.reflect.Field;
 import java.util.Calendar;
 import java.util.regex.Matcher;
@@ -58,7 +58,7 @@ public class SessionAdapter implements TokenAdapter<InternalSession> {
      * @param tokenIdFactory Non null.
      * @param config Non null.
      * @param serialisation Non null.
-     * @param blobUtils
+     * @param blobUtils A collection of Binary Object utilities.
      */
     @Inject
     public SessionAdapter(TokenIdFactory tokenIdFactory, CoreTokenConfig config,
