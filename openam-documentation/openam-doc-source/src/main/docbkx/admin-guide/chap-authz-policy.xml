@@ -430,7 +430,7 @@
          <listitem>
           <para>For IPv6, fill in the fields for the From and To with eight sets of
           four hexadecimal characters. The default separator between each set of
-          IPv6 hexidecimal characters is a colon.</para>
+          IPv6 hexadecimal characters is a colon.</para>
          </listitem>
          <listitem>
           <para>For a hybrid address, select IPv6. Fill in the first four fields for the 
