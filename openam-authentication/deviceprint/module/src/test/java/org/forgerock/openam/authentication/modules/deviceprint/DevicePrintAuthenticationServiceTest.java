@@ -403,14 +403,6 @@ public class DevicePrintAuthenticationServiceTest {
         given(devicePrintService.getDevicePrint(request)).willReturn(devicePrint);
         given(devicePrintService.hasRequiredAttributes(devicePrint)).willReturn(true);
         given(devicePrintService.getBestMatchingUserProfile(devicePrint)).willReturn(selectedUserProfile);
-        devicePrintAuthenticationService.process(callbacks, state);
-
-        callbacks = new Callback[1];
-        ChoiceCallback choiceCallback = mock(ChoiceCallback.class);
-        state = 3;
-
-        callbacks[0] = choiceCallback;
-        given(choiceCallback.getSelectedIndexes()).willReturn(new int[]{0});
 
         //When
         int nextState = devicePrintAuthenticationService.process(callbacks, state);
