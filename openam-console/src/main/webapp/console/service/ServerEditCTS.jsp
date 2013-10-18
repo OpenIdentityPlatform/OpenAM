@@ -51,23 +51,28 @@
 
             // Toggles the status of the external configuration fields.
             function toggleExternalConfig(storeLocationRadioButton) {
-                var disabled = storeLocationRadioButton.value == 'default';
-                toggleField(sslEnableCheckBoxName, disabled);
-                toggleField(directoryNameFieldName, disabled);
-                toggleField(portFieldName, disabled);
-                toggleField(loginIdFieldName, disabled);
-                toggleField(passwordFieldName, disabled);
-                toggleField(maxConnectionsFieldName, disabled);
-                toggleField(heartbeat, disabled);
+                var readonly = storeLocationRadioButton.value == 'default';
+                toggleField(sslEnableCheckBoxName, readonly);
+                toggleField(directoryNameFieldName, readonly);
+                toggleField(portFieldName, readonly);
+                toggleField(loginIdFieldName, readonly);
+                toggleField(passwordFieldName, readonly);
+                toggleField(maxConnectionsFieldName, readonly);
+                toggleField(heartbeat, readonly);
             }
 
             // Toggles the status of a given field.
-            function toggleField(fieldName, disabled) {
+            function toggleField(fieldName, readonly) {
                 var field = getFirstElementByName(fieldName);
 
                 if (field != null) {
-                    field.disabled = disabled;
-                    field.className = (disabled) ? 'TxtFldDis' : 'TxtFld';
+                    if (readonly) {
+                        field.setAttribute('readonly', 'readonly');
+                        field.className = 'TxtFldDis';
+                    } else {
+                        field.removeAttribute('readonly');
+                        field.className = 'TxtFld';
+                    }
                 }
             }
         </script>
