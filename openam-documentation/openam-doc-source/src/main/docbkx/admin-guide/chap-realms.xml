@@ -226,11 +226,26 @@
    referral.</para>
   </step>
   <step>
-   <para>Set up rules to identify the resources to which the referral
-   applies.</para>
-   <para>You specify only a rule Name, and a Resource Name for the resource to
-   manage, so that the realm administrator has access to set up the policy
-   for the specified resource.</para>
+   <para>
+    Set up Rules to identify the resources that the Referral applies to.
+   </para>
+
+   <para>
+    When defining Rules to match resources,
+    specify Resource Names as you would for Policies.
+   </para>
+
+   <para>
+    For example, you specify a URL Policy Agent rule to create policies
+    for all resources under <literal>http://example.com/</literal>
+    by creating rules for <literal>http://example.com/</literal>,
+    for <literal>http://example.com/*</literal>,
+    and also for <literal>http://example.com/*?*</literal>.
+
+    When used at the end of a rule
+    <literal>*</literal> matches one or more characters,
+    rather than zero or more characters.
+   </para>
   </step>
   <step>
    <para>Set up referrals to identify the realms <emphasis>to which</emphasis>

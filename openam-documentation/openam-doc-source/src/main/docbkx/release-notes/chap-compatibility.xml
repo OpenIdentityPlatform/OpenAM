@@ -141,6 +141,28 @@
     <para>For web policy agents, set
     <literal>com.sun.identity.agents.config.fetch.from.root.resource=false</literal>.</para>
    </listitem>
+
+   <listitem>
+    <para>
+     You now specify rules for referrals in the same way as rules for policies.
+    </para>
+
+    <para>
+     For example, with previous releases a referral rule for
+     <literal>http://example.com/</literal> matched everything underneath.
+     Now you would need three rules, <literal>http://example.com/</literal>,
+     <literal>http://example.com/*</literal>,
+     and <literal>http://example.com/*?*</literal>.
+
+     When used at the end of a rule
+     <literal>*</literal> matches one or more characters,
+     rather than zero or more characters.
+    </para>
+
+    <para>
+     When you upgrade OpenAM, the upgrade tool converts existing referral rules.
+    </para>
+   </listitem>
   </itemizedlist>
  </section>
 
