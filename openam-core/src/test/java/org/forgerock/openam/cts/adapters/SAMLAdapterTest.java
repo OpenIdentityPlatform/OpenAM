@@ -94,7 +94,7 @@ public class SAMLAdapterTest {
         Token result = adapter.toToken(adapter.fromToken(token));
 
         // Then
-        TokenTestUtils.compareTokens(result, token);
+        TokenTestUtils.assertTokenEquals(result, token);
     }
 
     @Test

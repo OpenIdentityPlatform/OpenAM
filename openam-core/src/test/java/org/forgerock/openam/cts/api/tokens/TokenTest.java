@@ -120,7 +120,7 @@ public class TokenTest {
         Token result = new Token(token);
 
         // Then
-        TokenTestUtils.compareTokens(result, token);
+        TokenTestUtils.assertTokenEquals(result, token);
     }
 
     @Test (expectedExceptions = IllegalArgumentException.class)

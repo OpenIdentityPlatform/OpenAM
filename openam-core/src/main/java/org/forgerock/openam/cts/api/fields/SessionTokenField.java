@@ -21,7 +21,9 @@ package org.forgerock.openam.cts.api.fields;
  * @author robert.wapshott@forgerock.com
  */
 public enum SessionTokenField {
-    LATEST_ACCESS_TIME("latestAccessTime", CoreTokenField.STRING_ONE);
+    LATEST_ACCESS_TIME("latestAccessTime", CoreTokenField.STRING_ONE),
+    SESSION_ID("sessionID", CoreTokenField.STRING_TWO);
+
     private final String sessionFieldName;
     private final CoreTokenField field;
 

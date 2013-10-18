@@ -78,7 +78,7 @@ public class JSONSerialisationTest {
         Token result = serialisation.deserialise(serialisation.serialise(token), Token.class);
 
         // Then
-        TokenTestUtils.compareTokens(result, token);
+        TokenTestUtils.assertTokenEquals(result, token);
     }
 
     @Test
@@ -90,7 +90,7 @@ public class JSONSerialisationTest {
         String text = serialisation.serialise(token);
         Token result = serialisation.deserialise(text, Token.class);
         // Then
-        TokenTestUtils.compareTokens(result, token);
+        TokenTestUtils.assertTokenEquals(result, token);
     }
 
     @Test

@@ -95,6 +95,9 @@ public class SessionAdapter implements TokenAdapter<InternalSession> {
         Calendar expiryTimeStamp = dataConversion.fromEpochedSeconds(epochedTimeInSeconds);
         token.setExpiryTimestamp(expiryTimeStamp);
 
+        // SessionID
+        token.setAttribute(SessionTokenField.SESSION_ID.getField(), session.getID().toString());
+
         // Binary data
         String jsonBlob = serialisation.serialise(session);
         blobUtils.setBlobFromString(token, jsonBlob);

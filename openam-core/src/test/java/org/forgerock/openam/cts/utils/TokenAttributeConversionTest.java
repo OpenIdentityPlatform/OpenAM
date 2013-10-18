@@ -131,7 +131,7 @@ public class TokenAttributeConversionTest {
         Token result = conversion.tokenFromEntry(entry);
 
         // Then
-        TokenTestUtils.compareTokens(token, result);
+        TokenTestUtils.assertTokenEquals(token, result);
     }
 
     @Test
