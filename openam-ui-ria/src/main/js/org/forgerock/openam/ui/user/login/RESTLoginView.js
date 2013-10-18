@@ -125,27 +125,35 @@ define("org/forgerock/openam/ui/user/login/RESTLoginView", [
                 
                 // if simply by asking for the requirements, we end up with a token, then we must have auto-logged-in somehow
                 if (reqs.hasOwnProperty("tokenId") && urlParams.ForceAuth !== 'true') {
+                        //set a variable for the realm passed into the browser so there can be a check to make sure it is the same as the current user's realm
+                        conf.globalData.auth.passedInRealm = conf.globalData.auth.realm;
                         // if we have a token, let's see who we are logged in as....
                         sessionManager.getLoggedUser(function(user) {
-                            conf.setProperty('loggedUser', user);
-                            authNDelegate.setSuccessURL().then(function(){
-                                //eventManager.sendEvent(constants.EVENT_DISPLAY_MESSAGE_REQUEST, "loggedIn");
-                                if(conf.globalData.auth.urlParams && conf.globalData.auth.urlParams.goto){
-                                    window.location.href = decodeURIComponent(conf.globalData.auth.urlParams.goto);
-                                    $('body').empty();
-                                    return false;
-                                }
-                                eventManager.sendEvent(constants.EVENT_AUTHENTICATION_DATA_CHANGED, { anonymousMode: false});
-                                
-                                // copied from EVENT_LOGIN_REQUEST handler
-                                if(conf.gotoURL && _.indexOf(["#","","#/","/#"], conf.gotoURL) === -1) {
-                                    console.log("Auto redirect to " + conf.gotoURL);
-                                    router.navigate(conf.gotoURL, {trigger: true});
-                                    delete conf.gotoURL;
-                                } else {
-                                    router.navigate("", {trigger: true});
-                                }
-                            });
+                            if(conf.globalData.auth.passedInRealm === conf.globalData.auth.realm){
+                                conf.setProperty('loggedUser', user);
+                                delete conf.globalData.auth.passedInRealm;
+                                authNDelegate.setSuccessURL().then(function(){
+                                    //eventManager.sendEvent(constants.EVENT_DISPLAY_MESSAGE_REQUEST, "loggedIn");
+                                    if(conf.globalData.auth.urlParams && conf.globalData.auth.urlParams.goto){
+                                        window.location.href = decodeURIComponent(conf.globalData.auth.urlParams.goto);
+                                        $('body').empty();
+                                        return false;
+                                    }
+                                    eventManager.sendEvent(constants.EVENT_AUTHENTICATION_DATA_CHANGED, { anonymousMode: false});
+                                    
+                                    // copied from EVENT_LOGIN_REQUEST handler
+                                    if(conf.gotoURL && _.indexOf(["#","","#/","/#"], conf.gotoURL) === -1) {
+                                        console.log("Auto redirect to " + conf.gotoURL);
+                                        router.navigate(conf.gotoURL, {trigger: true});
+                                        delete conf.gotoURL;
+                                    } else {
+                                        router.navigate("", {trigger: true});
+                                    }
+                                });
+                            }
+                            else{
+                                location.href = "#confirmLogin/";
+                            }
                         },function(){
                             //there is a tokenId but it is invalid so kill it
                             sessionManager.logout();
