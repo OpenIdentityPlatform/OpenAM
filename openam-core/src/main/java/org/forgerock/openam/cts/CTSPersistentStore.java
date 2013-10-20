@@ -85,7 +85,7 @@ public class CTSPersistentStore {
     @Inject
     public CTSPersistentStore(LDAPDataConversion dataConversion, TokenBlobStrategy strategy,
                               CoreTokenAdapter adapter, final CTSReaper reaper,
-                              @Named(CTSReaper.CTS_SCHEDULED_SERVICE) ScheduledExecutorService executorService,
+                              final @Named(CTSReaper.CTS_SCHEDULED_SERVICE) ScheduledExecutorService executorService,
                               CoreGuiceModule.ShutdownManagerWrapper wrapper,
                               @Named(CoreTokenConstants.CTS_DEBUG) Debug debug) {
 
@@ -99,6 +99,7 @@ public class CTSPersistentStore {
         wrapper.addShutdownListener(new ShutdownListener() {
             public void shutdown() {
                 reaper.shutdown();
+                executorService.shutdown();
             }
         });
     }
