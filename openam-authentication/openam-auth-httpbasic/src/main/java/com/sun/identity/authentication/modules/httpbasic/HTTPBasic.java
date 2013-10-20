@@ -27,7 +27,7 @@
  */
 
 /**
- * Portions Copyrighted 2011 ForgeRock AS
+ * Portions Copyrighted 2011-2013 ForgeRock AS
  */
 package com.sun.identity.authentication.modules.httpbasic;
 
@@ -166,7 +166,8 @@ public class HTTPBasic extends AMLoginModule {
     public java.security.Principal getPrincipal() {
         if (userPrincipal != null) {
             return userPrincipal;
-        } else if (validatedUserID != null) {
+        } else if (amLoginModule != null ) {
+            validatedUserID = amLoginModule.getPrincipal().getName();
             userPrincipal = new HTTPBasicPrincipal(validatedUserID);
             return userPrincipal;
         } else {
