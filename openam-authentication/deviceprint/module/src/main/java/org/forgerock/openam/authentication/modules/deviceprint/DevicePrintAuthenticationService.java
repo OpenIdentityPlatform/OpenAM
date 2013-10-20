@@ -54,7 +54,7 @@ public class DevicePrintAuthenticationService {
     private static final int SEND_OTP = 2;
     private static final int SAVE_PROFILE = 3;
 
-    private static final String BUNDLE_NAME = "amAuthDevcePrintModule";
+    private static final String BUNDLE_NAME = "amAuthDevicePrintModule";
     private static final String DEBUG_NAME = "amAuthDevicePrint";
     private static final Debug DEBUG = Debug.getInstance(DEBUG_NAME);
 
