@@ -148,8 +148,9 @@ public class DevicePrintAuthenticationService {
      * required attributes and if the information matches a stored user's profile.
      *
      * @return The next authentication state.
+     * @throws AuthLoginException If an error occurs when saving the user's profile
      */
-    private int handleDevicePrintCallback() {
+    private int handleDevicePrintCallback() throws AuthLoginException {
 
         currentDevicePrint = devicePrintService.getDevicePrint(request);
 
@@ -161,7 +162,9 @@ public class DevicePrintAuthenticationService {
         }
 
         if (hasValidProfile(currentDevicePrint)) {
-            //Profile OK!
+            //update the latest login time & num times accessed
+            devicePrintService.updateProfile(selectedUserProfile, currentDevicePrint);
+
             return ISAuthConstants.LOGIN_SUCCEED;
         } else {
             //so no profile or no matching profile
