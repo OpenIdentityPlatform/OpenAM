@@ -53,7 +53,7 @@ public class ClientCredentialsServerResource extends AbstractFlow {
         client = getAuthenticatedClient();
         if (client.getClient().getClientType().equals(ClientApplication.ClientType.PUBLIC)) {
             OAuth2Utils.DEBUG.warning("Public clients can't use client credentials grant.");
-            throw OAuthProblemException.OAuthError.INVALID_CLIENT.handle(getRequest(),
+            throw OAuthProblemException.OAuthError.UNAUTHORIZED_CLIENT.handle(getRequest(),
                     "Public clients can't use client credentials grant.");
         }
 
