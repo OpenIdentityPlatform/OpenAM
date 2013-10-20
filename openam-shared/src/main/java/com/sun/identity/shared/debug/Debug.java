@@ -24,6 +24,8 @@
  *
  * $Id: Debug.java,v 1.6 2009/08/19 05:41:17 veiming Exp $
  *
+ * Portions Copyrighted 2013 Forgerock AS.
+ *
  */
 
 package com.sun.identity.shared.debug;
@@ -271,7 +273,7 @@ public class Debug {
                     ResourceBundle bundle =com.sun.identity.shared.locale.Locale
                             .getInstallResourceBundle("amUtilMsgs");
                     System.err.println(bundle.getString(
-                            "com.iplanet.services.debug.invlaidprovider"));
+                            "com.iplanet.services.debug.invalidprovider"));
                 }
                 provider = new DebugProviderImpl();
             }
