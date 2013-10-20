@@ -32,6 +32,8 @@
 
 package com.iplanet.dpro.session.service;
 
+import com.google.inject.Key;
+import com.google.inject.name.Names;
 import com.iplanet.am.util.SystemProperties;
 import com.iplanet.am.util.ThreadPool;
 import com.iplanet.am.util.ThreadPoolException;
@@ -96,12 +98,10 @@ import com.sun.identity.sm.ServiceSchemaManager;
 import org.forgerock.openam.cts.CTSPersistentStore;
 import org.forgerock.openam.cts.CoreTokenConfig;
 import org.forgerock.openam.cts.adapters.SessionAdapter;
-import org.forgerock.openam.cts.adapters.TokenAdapter;
 import org.forgerock.openam.cts.api.CoreTokenConstants;
 import org.forgerock.openam.cts.api.tokens.Token;
 import org.forgerock.openam.cts.api.tokens.TokenIdFactory;
 import org.forgerock.openam.cts.exceptions.CoreTokenException;
-import org.forgerock.openam.cts.utils.KeyConversion;
 import org.forgerock.openam.guice.InjectorHolder;
 import org.forgerock.openam.session.service.SessionTimeoutHandler;
 
@@ -376,7 +376,7 @@ public class SessionService {
 
     private TokenIdFactory tokenIdFactory;
     private CoreTokenConfig coreTokenConfig;
-    private TokenAdapter<InternalSession> tokenAdapter;
+    private SessionAdapter tokenAdapter;
 
     /**
      * Static initialisation section will be called the first time the SessionService is initailised.
@@ -384,7 +384,9 @@ public class SessionService {
      * Note: This function depends on the singleton pattern that the SessionService follows.
      */
     private static void initialiseStatic() {
-        sessionDebug = Debug.getInstance("amSession");
+        Key<Debug> key = Key.get(Debug.class, Names.named(SessionConstants.SESSION_DEBUG));
+        sessionDebug = InjectorHolder.getInstance(key);
+
         stats = Stats.getInstance("amMasterSessionTableStats");
 
         int poolSize = DEFAULT_POOL_SIZE;
@@ -745,7 +747,7 @@ public class SessionService {
      * @param sid Session ID
      */
     InternalSession removeInternalSession(SessionID sid) {
-        boolean isSessionStored = true;
+        boolean isSessionStored = false;
         if (sid == null)
             return null;
         InternalSession session = (InternalSession) sessionTable.remove(sid);
@@ -1755,7 +1757,6 @@ public class SessionService {
      */
     private SessionService() {
         // Initialise all CTS fields.
-        KeyConversion keyConversion = new KeyConversion();
         tokenIdFactory = InjectorHolder.getInstance(TokenIdFactory.class);
         coreTokenConfig = InjectorHolder.getInstance(CoreTokenConfig.class);
         tokenAdapter = InjectorHolder.getInstance(SessionAdapter.class);
@@ -2857,7 +2858,16 @@ public class SessionService {
                     return sess;
                 }
 
+                /**
+                 * As a side effect of deserialising an InternalSession, we must trigger
+                 * the InternalSession to reschedule its timing task to ensure it
+                 * maintains the session expiry function.
+                 */
                 sess = tokenAdapter.fromToken(token);
+                sess.setDebug(sessionDebug);
+                sess.setSessionService(this);
+                sess.scheduleExpiry();
+
                 updateSessionMaps(sess);
             } catch (CoreTokenException e) {
                 sessionDebug.error("Failed to retrieve new session", e);

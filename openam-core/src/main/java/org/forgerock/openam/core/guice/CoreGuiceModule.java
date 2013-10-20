@@ -20,6 +20,7 @@ import com.google.inject.AbstractModule;
 import com.google.inject.Provider;
 import com.google.inject.TypeLiteral;
 import com.google.inject.name.Names;
+import com.iplanet.dpro.session.service.SessionConstants;
 import com.iplanet.dpro.session.service.SessionService;
 import com.iplanet.services.ldap.DSConfigMgr;
 import com.iplanet.services.ldap.LDAPServiceException;
@@ -134,6 +135,9 @@ public class CoreGuiceModule extends AbstractModule {
                 return SessionService.getSessionService();
             }
         }).in(Singleton.class);
+        bind(Debug.class)
+                .annotatedWith(Names.named(SessionConstants.SESSION_DEBUG))
+                .toInstance(Debug.getInstance(SessionConstants.SESSION_DEBUG));
     }
 
     // Implementation exists to capture the generic type of the PrivilegedAction.

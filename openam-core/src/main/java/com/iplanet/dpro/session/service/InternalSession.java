@@ -51,8 +51,6 @@ import com.sun.identity.shared.debug.Debug;
 
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
-import java.io.IOException;
-import java.io.ObjectInputStream;
 import java.io.Serializable;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
@@ -84,7 +82,7 @@ import java.util.StringTokenizer;
 public class InternalSession implements TaskRunnable, Serializable {
 
     // Debug should not be serialised.
-    private transient Debug DEBUG;
+    private transient Debug debug;
 
     // Session Service should not be serialised.
     private transient SessionService ss;
@@ -346,7 +344,7 @@ public class InternalSession implements TaskRunnable, Serializable {
     public InternalSession(SessionID sid, SessionService service, Debug debug) {
         sessionID = sid;
         ss = service;
-        DEBUG = debug;
+        this.debug = debug;
 
         maxIdleTime = maxDefaultIdleTime;
         maxSessionTime = maxDefaultIdleTime;
@@ -372,7 +370,22 @@ public class InternalSession implements TaskRunnable, Serializable {
      * Default constructor required for deserialisation.
      */
     public InternalSession() {
-        this(null, SessionService.getSessionService(), SessionService.sessionDebug);
+    }
+
+    /**
+     * The debug instance is not restored during deserialisation.
+     * @param debug Non null debug instance.
+     */
+    public void setDebug(Debug debug) {
+        this.debug = debug;
+    }
+
+    /**
+     * The SessionService is not restored during deserialisation.
+     * @param service Non null SessionService.
+     */
+    public void setSessionService(SessionService service) {
+        this.ss = service;
     }
 
     /**
@@ -485,10 +498,8 @@ public class InternalSession implements TaskRunnable, Serializable {
      */
     public void run() {
         if (!isTimedOut()) {
-            if (sessionState == Session.INVALID) {
-                setState(Session.DESTROYED);
-                ss.removeInternalSession(sessionID);
-                ss.sendEvent(this, SessionEvent.DESTROY);
+            if (isInvalid()) {
+                removeSession();
             } else {
                 long timeLeft = getTimeLeft();
                 if (timeLeft == 0) {
@@ -520,10 +531,7 @@ public class InternalSession implements TaskRunnable, Serializable {
                 }        
             }
         } else {
-            ss.logEvent(this, SessionEvent.DESTROY);
-            setState(Session.DESTROYED);
-            ss.removeInternalSession(sessionID);
-            ss.sendEvent(this, SessionEvent.DESTROY);
+            removeSession();
         }
     }
     
@@ -899,8 +907,8 @@ public class InternalSession implements TaskRunnable, Serializable {
 			throw se;
 		}
         internalPutProperty(key,value);
-        if (DEBUG.messageEnabled()) {
-            DEBUG.message("Updated protected property"
+        if (debug.messageEnabled()) {
+            debug.message("Updated protected property"
                 + " after validating client identity and permissions");
         }
     }
@@ -944,7 +952,7 @@ public class InternalSession implements TaskRunnable, Serializable {
                     sessionProperties.put(HOST_NAME, hostName);
                     sessionProperties.put(HOST, value);
                 } catch (UnknownHostException uhe) {
-                    DEBUG.error(
+                    debug.error(
                             "InternalSession.internalputProperty():"
                                     + "Unable to get HostName for:" + value
                                     + " SessionException: ", uhe);
@@ -1060,8 +1068,8 @@ public class InternalSession implements TaskRunnable, Serializable {
                 && !shouldIgnoreSessionQuotaChecking(userDN)) {
 
             if (SessionConstraint.checkQuotaAndPerformAction(this)) {
-                if (DEBUG.messageEnabled()) {
-                    DEBUG.message("Session Quota "
+                if (debug.messageEnabled()) {
+                    debug.message("Session Quota "
                             + "exhausted!");
                 }
                 SessionService.getSessionService().logEvent(this,
@@ -1150,7 +1158,7 @@ public class InternalSession implements TaskRunnable, Serializable {
         }
 
         if (!isTimedOut()) {
-            if (sessionState == Session.INVALID) {
+            if (isInvalid()) {
                 if (checkInvalidSessionDefaultIdleTime()) {
                     setState(Session.DESTROYED);
                     ss.sendEvent(this, SessionEvent.DESTROY);
@@ -1237,7 +1245,7 @@ public class InternalSession implements TaskRunnable, Serializable {
             info.timeleft = Long.toString(Long.MAX_VALUE / 60);
         }
 
-        if (sessionState == Session.INVALID) {
+        if (isInvalid()) {
             info.state = "invalid";
         } else if (sessionState == Session.VALID) {
             info.state = "valid";
@@ -1470,8 +1478,8 @@ public class InternalSession implements TaskRunnable, Serializable {
     public String encodeURL(String url, short encodingScheme, boolean escape,
             String cookieName) {
 
-        if (DEBUG.messageEnabled()) {
-            DEBUG.message("Session: url: " + url);
+        if (debug.messageEnabled()) {
+            debug.message("Session: url: " + url);
         }
         String encodedURL = url;
 
@@ -1489,8 +1497,8 @@ public class InternalSession implements TaskRunnable, Serializable {
                 }
             }
         }
-        if (DEBUG.messageEnabled()) {
-            DEBUG.message("Returning encoded "
+        if (debug.messageEnabled()) {
+            debug.message("Returning encoded "
                     + "Session: url: " + encodedURL);
         }
 
@@ -1512,12 +1520,12 @@ public class InternalSession implements TaskRunnable, Serializable {
                 cookieSupport = this.cookieMode.booleanValue();
             }
         } catch (Exception ex) {
-            DEBUG.error(
+            debug.error(
                     "Error getting cookieSupport value: ", ex);
             cookieSupport = true;
         }
-        if (DEBUG.messageEnabled()) {
-            DEBUG.message("InternalSession: getCookieSupport: "
+        if (debug.messageEnabled()) {
+            debug.message("InternalSession: getCookieSupport: "
                             + cookieSupport);
         }
         return cookieSupport;
@@ -1597,7 +1605,7 @@ public class InternalSession implements TaskRunnable, Serializable {
      */
 
     public void setCookieMode(Boolean cookieMode) {
-        DEBUG.message("CookieMode is:" + cookieMode);
+        debug.message("CookieMode is:" + cookieMode);
         if (cookieMode != null) {
             this.cookieMode = cookieMode;
         }
@@ -1633,13 +1641,11 @@ public class InternalSession implements TaskRunnable, Serializable {
     /**
      * Correctly read and reschedule this session when it is read.
      */
-    private void readObject(ObjectInputStream oin) throws IOException,
-        ClassNotFoundException {
-        oin.defaultReadObject();
+    public void scheduleExpiry() {
         if (willExpireFlag) {
             timerPool = SystemTimerPool.getTimerPool();   
             if (!isTimedOut()) {
-                if (sessionState == Session.INVALID) {
+                if (isInvalid()) {
                     long expectedTime = creationTime +
                         (maxDefaultIdleTime * 60);
                     if (expectedTime > (System.currentTimeMillis() / 1000)) {
@@ -1648,9 +1654,7 @@ public class InternalSession implements TaskRunnable, Serializable {
                                 1000));
                         }
                     } else {
-                        setState(Session.DESTROYED);
-                        ss.removeInternalSession(sessionID);
-                        ss.sendEvent(this, SessionEvent.DESTROY);
+                        removeSession();
                     }
                 } else {
                     long timeLeft = getTimeLeft();
@@ -1687,12 +1691,28 @@ public class InternalSession implements TaskRunnable, Serializable {
                             1000));
                     }
                 } else {
-                    ss.logEvent(this, SessionEvent.DESTROY);
-                    setState(Session.DESTROYED);
-                    ss.removeInternalSession(sessionID);
-                    ss.sendEvent(this, SessionEvent.DESTROY);
+                    removeSession();
                 }
             }
         }
     }
+
+    /**
+     * @return True if the Session has reached an invalid state.
+     */
+    public boolean isInvalid() {
+        return sessionState == Session.INVALID;
+    }
+
+    /**
+     * Signals the Session for removal.
+     */
+    private void removeSession() {
+        ss.logEvent(this, SessionEvent.DESTROY);
+        setState(Session.DESTROYED);
+        ss.removeInternalSession(sessionID);
+        ss.sendEvent(this, SessionEvent.DESTROY);
+    }
+
+
 }
