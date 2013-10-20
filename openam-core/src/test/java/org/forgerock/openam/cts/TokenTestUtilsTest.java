@@ -40,7 +40,7 @@ public class TokenTestUtilsTest {
         result.setAttribute(field, "ferret");
 
         // When / Then
-        TokenTestUtils.compareTokens(result, expected);
+        TokenTestUtils.assertTokenEquals(result, expected);
     }
 
     @Test (expectedExceptions = AssertionError.class)
@@ -55,7 +55,7 @@ public class TokenTestUtilsTest {
         result.setExpiryTimestamp(resultCal);
 
         // When / Then
-        TokenTestUtils.compareTokens(result, expected);
+        TokenTestUtils.assertTokenEquals(result, expected);
     }
 
     @Test (expectedExceptions = AssertionError.class)
@@ -72,6 +72,6 @@ public class TokenTestUtilsTest {
         result.setExpiryTimestamp(resultCal);
 
         // When / Then
-        TokenTestUtils.compareTokens(result, expected);
+        TokenTestUtils.assertTokenEquals(result, expected);
     }
 }

@@ -41,7 +41,7 @@ public class TokenTestUtils {
      * @param result Non null.
      * @param expected Non null.
      */
-    public static void compareTokens(Token result, Token expected) {
+    public static void assertTokenEquals(Token result, Token expected) {
         assertEquals(result.getAttributeNames().size(), expected.getAttributeNames().size());
         for (CoreTokenField field : result.getAttributeNames()) {
 

@@ -27,6 +27,7 @@ import org.forgerock.openam.core.guice.CoreGuiceModule;
 import org.forgerock.openam.cts.api.CoreTokenConstants;
 import org.forgerock.openam.cts.api.fields.CoreTokenField;
 import org.forgerock.openam.cts.api.fields.CoreTokenFieldTypes;
+import org.forgerock.openam.cts.api.fields.SessionTokenField;
 import org.forgerock.openam.cts.api.tokens.Token;
 import org.forgerock.openam.cts.exceptions.CoreTokenException;
 import org.forgerock.openam.cts.exceptions.DeleteFailedException;
@@ -327,7 +328,9 @@ public class CTSPersistentStore {
         Filter filter = adapter.buildFilter().and().userId(uuid).build();
         entries = adapter.query()
                 .withFilter(filter)
-                .returnTheseAttributes(CoreTokenField.TOKEN_ID, CoreTokenField.EXPIRY_DATE)
+                .returnTheseAttributes(
+                        SessionTokenField.SESSION_ID.getField(),
+                        CoreTokenField.EXPIRY_DATE)
                 .executeRawResults();
 
         if (debug.messageEnabled()) {
@@ -341,7 +344,7 @@ public class CTSPersistentStore {
 
         Map<String, Long> sessions = new HashMap<String, Long>();
         for (Entry entry : entries) {
-            String sessionId = entry.getAttribute(CoreTokenField.TOKEN_ID.toString()).firstValueAsString();
+            String sessionId = entry.getAttribute(SessionTokenField.SESSION_ID.getField().toString()).firstValueAsString();
             String dateString = entry.getAttribute(CoreTokenField.EXPIRY_DATE.toString()).firstValueAsString();
 
             Calendar timestamp = dataConversion.fromLDAPDate(dateString);

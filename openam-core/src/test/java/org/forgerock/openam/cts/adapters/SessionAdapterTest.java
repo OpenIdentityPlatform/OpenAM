@@ -15,6 +15,7 @@
  */
 package org.forgerock.openam.cts.adapters;
 
+import com.iplanet.dpro.session.SessionID;
 import com.iplanet.dpro.session.service.InternalSession;
 import org.forgerock.openam.cts.CoreTokenConfig;
 import org.forgerock.openam.cts.TokenTestUtils;
@@ -32,16 +33,13 @@ import org.testng.annotations.Test;
 import java.io.UnsupportedEncodingException;
 import java.util.Calendar;
 
+import static org.fest.assertions.Assertions.assertThat;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.BDDMockito.mock;
-import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.anyString;
-import static org.mockito.Matchers.eq;
+import static org.mockito.Matchers.*;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
-import static org.testng.AssertJUnit.assertEquals;
-import static org.testng.AssertJUnit.assertFalse;
-import static org.testng.AssertJUnit.assertTrue;
+import static org.testng.AssertJUnit.*;
 
 /**
  * @author robert.wapshott@forgerock.com
@@ -85,6 +83,10 @@ public class SessionAdapterTest {
         // Ensure expiry date is now based on the epoched time in seconds format.
         given(session.getExpirationTime()).willReturn(dataConversion.toEpochedSeconds(now));
 
+        SessionID mockSessionID = mock(SessionID.class);
+        given(mockSessionID.toString()).willReturn(sessionId);
+        given(session.getID()).willReturn(mockSessionID);
+
         // Avoid serialisation when using mock InternalSessions
         given(jsonSerialisation.deserialise(anyString(), eq(InternalSession.class))).willReturn(session);
         given(jsonSerialisation.serialise(any())).willReturn(new String(mockByteData));
@@ -99,12 +101,13 @@ public class SessionAdapterTest {
         token.setUserId(userId);
         token.setExpiryTimestamp(now);
         token.setBlob(mockByteData);
+        token.setAttribute(SessionTokenField.SESSION_ID.getField(), "badger");
 
         // When
         Token result = adapter.toToken(adapter.fromToken(token));
 
         // Then
-        TokenTestUtils.compareTokens(result, token);
+        TokenTestUtils.assertTokenEquals(result, token);
     }
 
     @Test
@@ -136,23 +139,50 @@ public class SessionAdapterTest {
     @Test
     public void shouldAssignAttributeFromSessionLatestAccessTime() {
         // Given
-        String latestAccessTime = "12345";
+        long timestamp = 12345l;
 
-        // start by making an IntenalSession that has latestAccessTime set.
-        JSONSerialisation serialisation = new JSONSerialisation();
-        String serialisedSession = "{\"latestAccessTime\":" + latestAccessTime + "}";
-        InternalSession session = serialisation.deserialise(serialisedSession, InternalSession.class);
+        InternalSession mockSession = mock(InternalSession.class);
+        SessionID mockSessionID = mock(SessionID.class);
+
+        given(mockSessionID.toString()).willReturn("badger");
+        given(jsonSerialisation.deserialise(anyString(), any(Class.class))).willReturn(mockSession);
+        given(mockSession.getExpirationTime()).willReturn(timestamp);
+        given(mockSession.getID()).willReturn(mockSessionID);
 
         // some additional required mocking
-        given(tokenIdFactory.toSessionTokenId(eq(session))).willReturn("badger");
-        given(jsonSerialisation.serialise(any())).willReturn(serialisedSession);
+        given(tokenIdFactory.toSessionTokenId(eq(mockSession))).willReturn("badger");
+        given(jsonSerialisation.serialise(any())).willReturn("");
 
         // When
-        Token token = adapter.toToken(session);
+        adapter.toToken(mockSession);
 
         // Then
-        String value = token.getValue(SessionTokenField.LATEST_ACCESS_TIME.getField());
-        assertEquals(value, latestAccessTime);
+        verify(ldapDataConversion).fromEpochedSeconds(eq(timestamp));
+    }
+
+    @Test
+    public void shouldAssignSessionID() {
+        // Given
+        long timestamp = 12345l;
+
+        InternalSession mockSession = mock(InternalSession.class);
+        SessionID mockSessionID = mock(SessionID.class);
+
+        String sessionId = "badger";
+        given(mockSessionID.toString()).willReturn(sessionId);
+        given(jsonSerialisation.deserialise(anyString(), any(Class.class))).willReturn(mockSession);
+        given(mockSession.getExpirationTime()).willReturn(timestamp);
+        given(mockSession.getID()).willReturn(mockSessionID);
+
+        // some additional required mocking
+        given(tokenIdFactory.toSessionTokenId(eq(mockSession))).willReturn(sessionId);
+        given(jsonSerialisation.serialise(any())).willReturn("");
+
+        // When
+        Token token = adapter.toToken(mockSession);
+
+        // Then
+        assertThat(token.getValue(SessionTokenField.SESSION_ID.getField())).isEqualTo(sessionId);
     }
 
     @Test
