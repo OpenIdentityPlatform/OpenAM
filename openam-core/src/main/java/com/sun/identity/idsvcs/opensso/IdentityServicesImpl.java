@@ -672,7 +672,7 @@ public class IdentityServicesImpl
 
         if ((objList != null) && !objList.isEmpty()) {
             for (AMIdentity identity : objList) {
-                if (identityExists(identity)) {
+                if (identity != null) {
                     names.add(identity.getName());
                 }
             }
@@ -853,7 +853,7 @@ public class IdentityServicesImpl
                             AMIdentity role = fetchAMIdentity(repo, IdType.ROLE,
                                 roleNames[i], false);
 
-                            if (identityExists(role)) {
+                            if (role != null) {
                                 role.addMember(amIdentity);
                                 role.store();
                             }
@@ -875,7 +875,7 @@ public class IdentityServicesImpl
                         for (int i = 0; i < groupNames.length; i++) {
                             AMIdentity group = fetchAMIdentity(repo,
                                 IdType.GROUP, groupNames[i], false);
-                            if (identityExists(group)) {
+                            if (group != null) {
                                 group.addMember(amIdentity);
                                 group.store();
                             }
@@ -906,7 +906,7 @@ public class IdentityServicesImpl
                         for (int i = 0; i < memberNames.length; i++) {
                             AMIdentity user = fetchAMIdentity(repo, IdType.USER,
                                 memberNames[i], false);
-                            if (identityExists(user)) {
+                            if (user != null) {
                                 amIdentity.addMember(user);
                             }
                         }
@@ -957,6 +957,11 @@ public class IdentityServicesImpl
         GeneralFailure, AccessDenied
     {
         List attrList = null;
+        
+        if (name == null ||  name.isEmpty() || name.equals("null")) {
+            debug.error("IdentityServicesImpl:read identity not found");
+            throw new ObjectNotFound(name);
+        }
 
         if ((attributes != null) && (attributes.length > 0)) {
             attrList = new ArrayList();
@@ -1017,7 +1022,7 @@ public class IdentityServicesImpl
             AMIdentity amIdentity = getAMIdentity(admin, identityType, name,
                                                   repoRealm);
 
-            if (!identityExists(amIdentity)) {
+            if (amIdentity == null) {
                 debug.error("IdentityServicesImpl:read identity not found");
                 throw new ObjectNotFound(name);
             }
@@ -1092,7 +1097,7 @@ public class IdentityServicesImpl
             AMIdentity amIdentity = getAMIdentity(getSSOToken(admin),
                 repo, idType, idName);
 
-            if (!identityExists(amIdentity)) {
+            if (amIdentity == null) {
                 String msg = "Object \'" + idName + "\' of type \'" +
                     idType + "\' not found.'";
                 throw new ObjectNotFound(msg);
@@ -1255,7 +1260,7 @@ public class IdentityServicesImpl
             AMIdentity amIdentity = getAMIdentity(admin, identityType, name,
                                                   realm);
 
-            if (identityExists(amIdentity)) {
+            if (amIdentity != null) {
                 if (isSpecialUser(amIdentity)) {
                     throw new AccessDenied("Cannot delete user.");
                 }
@@ -1492,12 +1497,11 @@ public class IdentityServicesImpl
             // First assume id is a universal id
             rv = getAMIdentity(ssoToken, repo, id, idType);
 
-            if (!identityExists(rv)) {
+            if (rv == null) {
                 // Not found through id lookup, try name lookup
                 rv = fetchAMIdentity(repo, idType, id, true);
             }
-        } else {
-        }
+        } 
 
     	return rv;
     }
