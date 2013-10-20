@@ -159,8 +159,7 @@ class PrivilegeEvaluator {
         }
 
         entitlementCombiner = appl.getEntitlementCombiner();
-        entitlementCombiner.init(adminSubject, realm, applicationName,
-            resourceName, this.actionNames, recursive);
+        entitlementCombiner.init(realm, applicationName, resourceName, this.actionNames, recursive);
         this.recursive = recursive;
 
         if (PrivilegeManager.debug.messageEnabled()) {

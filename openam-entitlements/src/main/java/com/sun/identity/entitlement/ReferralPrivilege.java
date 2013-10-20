@@ -431,8 +431,7 @@ public final class ReferralPrivilege implements IPrivilege, Cloneable {
             PrivilegeManager.superAdminSubject, realm, applicationName);
         EntitlementCombiner entitlementCombiner =
             application.getEntitlementCombiner();
-        entitlementCombiner.init(adminSubject, "/",
-            applicationName, resourceName, actionNames, recursive);
+        entitlementCombiner.init("/", applicationName, resourceName, actionNames, recursive);
         for (String rlm : realms) {
             EntitlementConfiguration ec = EntitlementConfiguration.getInstance(
                 PrivilegeManager.superAdminSubject, rlm);
