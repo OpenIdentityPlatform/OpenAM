@@ -138,6 +138,81 @@
   </section>
  </section>
 
+ <section xml:id="prerequisites-file-descriptors">
+  <title>Setting Maximum File Descriptors</title>
+
+  <indexterm>
+   <primary>Directory service requirements</primary>
+  </indexterm>
+
+  <para>
+   If you use the embedded OpenDJ directory, make sure OpenDJ has enough
+   file descriptors. OpenDJ needs to be able to open many files,
+   especially when handling many client connections.
+
+   Linux systems in particular often set a limit of 1024 per user,
+   which is too low for OpenDJ.
+  </para>
+
+  <para>
+   OpenDJ should have access to use at least 64K (65536) file descriptors.
+   The embedded OpenDJ directory runs inside the OpenAM process space.
+
+   When running OpenAM as user <literal>openam</literal> on a Linux system
+   that uses <filename>/etc/security/limits.conf</filename> to set user limits,
+   you can set soft and hard limits by adding these lines to the file.
+  </para>
+
+  <programlisting language="none">
+openam soft nofile 65536
+openam hard nofile 131072
+  </programlisting>
+
+  <screen>$ ulimit -n
+65536</screen>
+
+  <para>
+   The example above assumes the system has enough file descriptors overall.
+
+   You can verify the new soft limit the next time you log in as user
+   <literal>openam</literal> with the <command>ulimit -n</command> command.
+  </para>
+
+  <para>
+   You can check the Linux system overall maximum as follows.
+  </para>
+
+  <screen>$ cat /proc/sys/fs/file-max
+204252</screen>
+
+  <orderedlist>
+   <para>
+    If the overall maximum is too low, you can increase it as follows.
+   </para>
+
+  <listitem>
+   <para>
+    As superuser, edit <filename>/etc/sysctl.conf</filename> to set
+    the kernel parameter <literal>fs.file-max</literal> to a higher maximum.
+   </para>
+  </listitem>
+
+  <listitem>
+   <para>
+    Run the <command>sysctl -p</command> command to reload
+    the settings in <filename>/etc/sysctl.conf</filename>.
+   </para>
+  </listitem>
+
+  <listitem>
+   <para>
+    Read <filename>/proc/sys/fs/file-max</filename> again to confirm
+    that it now corresponds to the new maximum.
+   </para>
+  </listitem>
+  </orderedlist>
+ </section>
+
  <section xml:id="prepare-configuration-store">
   <title>Preparing a Configuration Data Store</title>
 
