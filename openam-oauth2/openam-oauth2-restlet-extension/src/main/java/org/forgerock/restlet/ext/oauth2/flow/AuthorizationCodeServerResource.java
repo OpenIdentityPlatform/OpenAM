@@ -87,6 +87,9 @@ public class AuthorizationCodeServerResource extends AbstractFlow {
             throw OAuthProblemException.OAuthError.INVALID_GRANT.handle(getRequest());
         }
 
+        String redirect_uri =
+                OAuth2Utils.getRequestParameter(getRequest(), OAuth2Constants.Params.REDIRECT_URI, String.class);
+
         if (null == code) {
             OAuth2Utils.DEBUG.error("AuthorizationCodeServerResource::Authorization code doesn't exist.");
             throw OAuthProblemException.OAuthError.INVALID_REQUEST.handle(getRequest(),
@@ -95,6 +98,9 @@ public class AuthorizationCodeServerResource extends AbstractFlow {
             invalidateTokens(code_p);
             getTokenStore().deleteAuthorizationCode(code_p);
             OAuth2Utils.DEBUG.error("AuthorizationCodeServerResource::Authorization code has been used");
+            throw OAuthProblemException.OAuthError.INVALID_GRANT.handle(getRequest());
+        } else if (!code.getRedirectURI().equalsIgnoreCase(redirect_uri)) {
+            OAuth2Utils.DEBUG.error("AuthorizationCodeServerResource::Authorization code redirect URI doesnt match redirect_uri supplied");
             throw OAuthProblemException.OAuthError.INVALID_GRANT.handle(getRequest());
         } else {
             if (code.isExpired()) {
