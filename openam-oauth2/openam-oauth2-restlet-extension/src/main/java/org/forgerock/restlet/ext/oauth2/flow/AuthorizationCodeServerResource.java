@@ -100,7 +100,10 @@ public class AuthorizationCodeServerResource extends AbstractFlow {
             OAuth2Utils.DEBUG.error("AuthorizationCodeServerResource::Authorization code has been used");
             throw OAuthProblemException.OAuthError.INVALID_GRANT.handle(getRequest());
         } else if (!code.getRedirectURI().equalsIgnoreCase(redirect_uri)) {
-            OAuth2Utils.DEBUG.error("AuthorizationCodeServerResource::Authorization code redirect URI doesnt match redirect_uri supplied");
+            OAuth2Utils.DEBUG.error("AuthorizationCodeServerResource::Authorization code redirect URI doesn't match redirect_uri supplied");
+            throw OAuthProblemException.OAuthError.INVALID_GRANT.handle(getRequest());
+        } else if (!code.getClientID().equalsIgnoreCase(client.getClient().getClientId())) {
+            OAuth2Utils.DEBUG.error("AuthorizationCodeServerResource::Authorization code client_id doesn't match authorized client_id");
             throw OAuthProblemException.OAuthError.INVALID_GRANT.handle(getRequest());
         } else {
             if (code.isExpired()) {
