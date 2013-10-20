@@ -97,8 +97,7 @@ public class AuthenticationRestService {
             @QueryParam("authIndexValue") String authIndexValue,
             @QueryParam("sessionUpgrade") String sessionUpgradeSSOTokenId, String postBody) {
 
-        List<String> contentTypeHeader = headers.getRequestHeader(HttpHeaders.CONTENT_TYPE);
-        if (contentTypeHeader == null || !contentTypeHeader.contains(MediaType.APPLICATION_JSON)) {
+        if (!isJsonContentType(headers)) {
             return new RestAuthException(Response.Status.UNSUPPORTED_MEDIA_TYPE, "Unsupported Media Type")
                     .getResponse();
         }
@@ -117,5 +116,22 @@ public class AuthenticationRestService {
             return restAuthenticationHandler.initiateAuthentication(headers, request, response, authIndexType,
                     authIndexValue, sessionUpgradeSSOTokenId);
         }
+    }
+
+    /**
+     * Check if the Http Headers contains the 'application/json' content type.
+     *
+     * @param headers The HttpHeaders.
+     * @return <code>true</code> if the Content-Type header contains 'application/json'
+     */
+    private boolean isJsonContentType(HttpHeaders headers) {
+
+        for (String contentType : headers.getRequestHeader(HttpHeaders.CONTENT_TYPE)) {
+            if (contentType != null && contentType.startsWith(MediaType.APPLICATION_JSON)) {
+                return true;
+            }
+        }
+
+        return false;
     }
 }
