@@ -83,7 +83,12 @@ define("org/forgerock/openam/ui/user/profile/UserProfileView", [
         },
         
         reloadData: function() {
-            js2form(document.getElementById(this.$el.find("#UserProfileForm").attr("id")), conf.loggedUser);
+            //the following two lines masks issue with "json/users/a_username"rest call intermittently passing back some object keys camelCased 
+            //(i.e. "givenName" and "telephoneNumber") which was causing those fields not to be displayed
+            var usr_data = {};
+            _.each(conf.loggedUser,function(val,key){ usr_data[key.toLowerCase()] = val;});
+            
+            js2form(document.getElementById(this.$el.find("#UserProfileForm").attr("id")), usr_data);
             this.$el.find("input[name=saveButton]").val($.t("common.form.update"));
             this.$el.find("input[name=resetButton]").val($.t("common.form.reset"));
             validatorsManager.validateAllFields(this.$el);
