@@ -77,7 +77,7 @@ public class SubtreeWildcardTest {
         //check multiple paths that have the same value yet don't match
         verifySubtreeWildcardFunctionality("/example/of/something/uri/like/foo/like",
                 "/example/*/something/uri/like/like/foo/bar/like",
-                ResourceMatch.NO_MATCH);
+                ResourceMatch.SUB_RESOURCE_MATCH);
 
         //check a subresource with a wildcard terminating character
         verifySubtreeWildcardFunctionality("/example/of/something/uri/like",
@@ -142,12 +142,12 @@ public class SubtreeWildcardTest {
         //check a non-match
         verifySubtreeWildcardFunctionality("http://example.forgerock.com:80",
                 "http://*.shouldnt.work.com:80/examples/index.html",
-                ResourceMatch.NO_MATCH);
+                ResourceMatch.SUB_RESOURCE_MATCH);
 
         //check another non-match
         verifySubtreeWildcardFunctionality("http://example.forgerock.com:80",
                 "*://*.*.*:8080/jsps/index.html",
-                ResourceMatch.NO_MATCH);
+                ResourceMatch.SUB_RESOURCE_MATCH);
     }
 
 
