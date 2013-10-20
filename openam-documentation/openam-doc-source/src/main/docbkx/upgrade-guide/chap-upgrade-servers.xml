@@ -103,6 +103,13 @@
    tool.</para>
   </step>
 
+  <step performance="optional">
+   <para>If you want to configure the upgraded system with a different
+   directory service for the Core Token Service (CTS), read <link xlink:show="new"
+   xlink:href="install-guide#chap-cts" xlink:role="http://docbook.org/xlink/role/olink">
+   <citetitle>Configuring the Core Token Service</citetitle></link>.</para>
+  </step>
+
   <step>
    <para>Validate that the service is performing as expected.</para>
   </step>
@@ -169,6 +176,14 @@ objectClasses: ( 1.3.6.1.4.1.36733.2.2.2.3.1 NAME
 $ ./ldapmodify -p 50389 -D "cn=Directory Manager" -w password -f ./dash.ldif
 Processing MODIFY request for cn=schema
 MODIFY operation successful for DN cn=schema</screen>
+  </step>
+
+
+  <step performance="optional">
+   <para>If you want to configure the upgraded system with a different
+   directory service for the Core Token Service (CTS), read <link xlink:show="new"
+   xlink:href="install-guide#chap-cts" xlink:role="http://docbook.org/xlink/role/olink">
+   <citetitle>Configuring the Core Token Service</citetitle></link>.</para>
   </step>
  </procedure>
 </chapter>
