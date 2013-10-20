@@ -143,7 +143,7 @@ public class HOTPService {
      */
     public boolean isValidHOTP(String enteredHOTPCode) {
 
-        if (sentHOTPCode.equals(enteredHOTPCode)) {
+        if (sentHOTPCode != null && sentHOTPCode.equals(enteredHOTPCode)) {
             long timePassed = System.currentTimeMillis() - sentHOTPCodeTime;
             if (timePassed <= (codeValidityDuration * 60000)) {
                 // one time use only
