@@ -94,7 +94,10 @@
     <logmessage name="AUTHENTICATED_CLIENT" id="15"
                 loglevel="LL_INFO"
                 description="Authenticated an oauth 2.0 client">
-        <datainfo />
+        <datainfo>
+            <item>message</item>
+            <item>client id</item>
+        </datainfo>
         <triggers>
             <item>Authenticating a oauth 2.0 client</item>
         </triggers>
