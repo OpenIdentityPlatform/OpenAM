@@ -57,6 +57,12 @@ define("config/routes/AMRoutesConfig", [
             url: "profile/" ,
             forceUpdate: true
         },
+        "confirmLogin": {
+            view: "org/forgerock/openam/ui/user/login/RESTConfirmLoginView",
+            role: "authenticated",
+            url: "confirmLogin/" ,
+            forceUpdate: true
+        },
         "changeSecurityData": {
             base: "profile",
             dialog: "org/forgerock/openam/ui/user/profile/ChangeSecurityDataDialog",

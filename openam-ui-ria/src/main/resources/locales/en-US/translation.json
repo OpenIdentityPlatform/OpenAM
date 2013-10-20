@@ -156,6 +156,8 @@
     },
     "common" : {
          "form" : {
+            "yes" : "Yes",
+            "no" : "No",
             "true" : "True",
             "false" : "False",
             "update" : "Update",
@@ -221,6 +223,7 @@
          "user" : {
             "user" : "User",
             "login" : "Login",
+            "loginConfirm" : "You have already logged in. Do you want to log out and then login to a different organization?",
             "profile" : "Profile",
             "myProfile" : "My Profile",
             "userProfile" : "User profile",
