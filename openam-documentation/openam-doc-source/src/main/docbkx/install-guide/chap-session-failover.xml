@@ -38,7 +38,7 @@
   <primary>Installing</primary>
   <secondary>Load Balancer</secondary>
  </indexterm>
- <para>This chapter covers setting up session failover (SFO) when using multiple
+ <para>This chapter covers setting up SFO when using multiple
  instances of OpenAM in a site configuration for high availability. The basic
  idea followed here is that you configure load balancing to be sticky, based
  on the value of an OpenAM cookie, <literal>amlbcookie</literal>, different

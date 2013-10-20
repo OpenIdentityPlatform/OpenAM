@@ -60,7 +60,7 @@
   <para>The Core Authentication module includes some fields under this tab that are not 
   available through the realm changes under the <literal>Access Control</literal> tab. 
   Because attributes set under the <literal>Configuration</literal> tab apply on a 
-  server level, the changes you make here will apply to all realms. Attributes 
+  server level, the changes you make here will apply to all realms. Attributes
   set under the <literal>Access Control</literal> tab only apply to the realms that
   you specify. The Authentication table under the <literal>Configuration</literal> tab
   lists all existing types of modules available for configuration, including any
@@ -1132,6 +1132,7 @@
    </varlistentry>
   </variablelist>
 
+<!-- Commenting out, assuming the corresponding screen is also commented out, per OPENAM-3164
   <variablelist xml:id="core-token-service-configuration">
    <title>Core Token Service</title>
 
@@ -1166,7 +1167,7 @@
     </listitem>
    </varlistentry>
   </variablelist>
-
+                                                          -->
   <variablelist xml:id="dashboard-configuration">
    <title>Dashboard Configuration</title>
    
@@ -3668,11 +3669,19 @@
     In particular, WAN replication is an important consideration which needs to be handled carefully for
     optimum performance.</para>
 
-    <varlistentry>
+    <para>You may also choose to set advanced properties related to token size, including
+    <literal>com.sun.identity.session.repository.enableEncryption</literal>,
+    <literal>com.sun.identity.session.repository.enableCompression</literal>, and
+    <literal>com.sun.identity.session.repository.enableAttributeCompression</literal>. For more information,
+    identify these variables in the following section: <xref linkend="servers-advanced-configuration" />.</para>
+
+      <varlistentry>
         <term>Default Token Store</term>
         <listitem>
             <para>If selected, CTS tokens are stored in the same external or embedded datastore as is
-            used on an OpenAM configuration store.</para>
+            used on an OpenAM configuration store. If you use the default token store, you can only
+            configure the <literal>Root Suffix</literal>. Associated with the <literal>Directory Configuration</literal>
+            tab associated with individual servers.</para>
         </listitem>
     </varlistentry>
 
@@ -3680,15 +3689,16 @@
         <term>External Token Store</term>
         <listitem>
             <para>If you use OpenDJ, you can separate the CTS from the configuration on different external servers.
-            On the external CTS server, you would also need to configure token schema and indexes.</para>
+            On the external CTS server, you can also configure token schema and indexes.</para>
         </listitem>
     </varlistentry>
 
     <varlistentry>
         <term>Root Suffix</term>
         <listitem>
-            <para>For either external or embedded stores, enter the base DN for CTS storage information in
-            LDAP format, such as <literal>dc=cts,dc=forgerock,dc=com</literal>.</para>
+            <para>For either the default or external token stores, enter the base DN for CTS storage information in
+            LDAP format, such as <literal>dc=cts,dc=forgerock,dc=com</literal>. The <literal>Root Suffix</literal>
+            would be a database that can be maintained and replicated separately from tha standard user datastore.</para>
         </listitem>
     </varlistentry>
 
@@ -3717,8 +3727,8 @@
     <varlistentry>
         <term>Login Id</term>
         <listitem>
-            <para>"Specifies the user, in DN format, needed to authenticate. The user needs sufficient
-                privileges to read and write to the root suffix of the external datastore.".</para>
+            <para>Specifies the user, in DN format, needed to authenticate. The user needs sufficient
+                privileges to read and write to the root suffix of the external datastore.</para>
         </listitem>
     </varlistentry>
 
@@ -4202,6 +4212,30 @@
     <listitem>
      <para>Whether to perform a Java security permissions check for OpenAM.</para>
      <para>Default: <literal>false</literal></para>
+    </listitem>
+   </varlistentry>
+
+   <varlistentry>
+    <term><literal>com.sun.identity.session.repository.enableEncryption</literal></term>
+    <listitem>
+     <para>For CTS token encryption, if desired.</para>
+     <para>Default: false</para>
+    </listitem>
+   </varlistentry>
+
+   <varlistentry>
+    <term><literal>com.sun.identity.session.repository.enableCompression</literal></term>
+    <listitem>
+     <para>For GZip-based compression of CTS tokens, if desired.</para>
+     <para>Default: false</para>
+    </listitem>
+   </varlistentry>
+
+   <varlistentry>
+    <term><literal>com.sun.identity.session.repository.enableAttributeCompression</literal></term>
+    <listitem>
+     <para>For additional compression of CTS token JSON binaries, beyond GZip, if desired.</para>
+     <para>Default: false</para>
     </listitem>
    </varlistentry>
 

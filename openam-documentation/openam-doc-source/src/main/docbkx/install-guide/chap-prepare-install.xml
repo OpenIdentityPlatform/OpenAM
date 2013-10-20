@@ -28,8 +28,7 @@
  version='5.0' xml:lang='en'
  xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance'
  xsi:schemaLocation='http://docbook.org/ns/docbook http://docbook.org/xml/5.0/xsd/docbook.xsd'
- xmlns:xlink='http://www.w3.org/1999/xlink'
- xmlns:xinclude='http://www.w3.org/2001/XInclude'>
+ xmlns:xlink='http://www.w3.org/1999/xlink'>
  <title>Preparing For Installation</title>
 
  <indexterm><primary>Prerequisites</primary></indexterm>
@@ -242,7 +241,14 @@ openam hard nofile 131072
 
   <para>With the embedded OpenDJ directory and the default configuration
   settings, OpenAM connects as directory super user, bypassing access control
-  evaluation because OpenAM manages the directory as its private store.</para>
+  evaluation because OpenAM manages the directory as its private store. Be aware
+  that failover and replication can not be controlled when using the embedded store.</para>
+
+  <para>OpenAM now supports the use of the Core Token Service (CTS), with tokens
+  that can be stored in the local or external directory store. For more information,
+  see the chapter on <link xlink:show="new" xlink:href="install-guide#chap-cts"
+  xlink:role="http://docbook.org/xlink/role/olink">
+  <citetitle>Configuring the Core Token Service</citetitle></link>.</para>
 
   <itemizedlist>
    <para>With an external directory service, the directory administrator can
