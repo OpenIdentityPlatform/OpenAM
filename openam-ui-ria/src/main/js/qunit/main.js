@@ -38,7 +38,6 @@ require.config({
         underscore: "libs/underscore-1.4.4-min",
         js2form: "libs/js2form-1.0",
         form2js: "libs/form2js-1.0",
-        contentflow: "libs/contentflow",
         spin: "libs/spin-1.2.5-min",
         dataTable: "libs/datatables-1.9.3-min",
         jqueryui: "libs/jquery-ui-1.8.23.custom-min",
@@ -67,9 +66,6 @@ require.config({
         },
         form2js: {
             exports: "form2js"
-        },
-        contentflow: {
-            exports: "contentflow"
         },
         spin: {
             exports: "spin"
@@ -112,7 +108,6 @@ require([
     "backbone",
     "form2js",
     "js2form",
-    "contentflow",
     "spin",
     "dataTable",
     "jqueryui",
