@@ -2607,11 +2607,15 @@
       <literal><replaceable>host</replaceable>:<replaceable>port</replaceable></literal>
       combination. For other OpenAM servers in the deployment, you can specify
       each directory server as
-      <literal><replaceable>server-name</replaceable>|<replaceable>host</replaceable>:<replaceable>port</replaceable></literal>,
-      where <replaceable>server-name</replaceable> is the Server Name of the
+<literal><replaceable>server-name</replaceable>|<replaceable>host</replaceable>:<replaceable>port</replaceable></literal>,
+      where <replaceable>server-name</replaceable> is the FQDN portion of the
       OpenAM server from the list under Configuration &gt; Servers and
       Sites, and <replaceable>host</replaceable>:<replaceable>port</replaceable>
       identifies the directory server.</para>
+      <para>For example, if the <replaceable>server-name</replaceable>
+      that is listed is <literal>http://openam.example.com:8080/openam</literal>
+      and the directory server is accessible at <literal>opendj.example.com:1389</literal>,
+      you would enter <literal>openam.example.com:8080/openam|opendj.example.com:1389</literal>.</para>
       <para>When authenticating users from a directory service that is remote
       from OpenAM, set both the primary and secondary server values.</para>
       <para>If you want to use SSL or TLS for security, then scroll down to
