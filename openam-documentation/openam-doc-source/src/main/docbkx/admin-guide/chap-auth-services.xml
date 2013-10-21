@@ -2615,7 +2615,8 @@
       <para>For example, if the <replaceable>server-name</replaceable>
       that is listed is <literal>http://openam.example.com:8080/openam</literal>
       and the directory server is accessible at <literal>opendj.example.com:1389</literal>,
-      you would enter <literal>openam.example.com:8080|opendj.example.com:1389</literal>.</para>
+      you would enter <literal>openam.example.com|opendj.example.com:1389</literal>.</para>
+         <!-- Possible future change per OPENAM-1361 -->
       <para>When authenticating users from a directory service that is remote
       from OpenAM, set both the primary and secondary server values.</para>
       <para>If you want to use SSL or TLS for security, then scroll down to
