@@ -17,6 +17,7 @@
 package org.forgerock.openam.authz.filter.session;
 
 import com.iplanet.dpro.session.service.SessionService;
+import org.forgerock.openam.auth.shared.AuthUtilsWrapper;
 import org.forgerock.openam.auth.shared.AuthnRequestUtils;
 import org.forgerock.openam.auth.shared.SSOTokenFactory;
 import org.testng.annotations.BeforeMethod;
@@ -39,14 +40,17 @@ public class SessionResourceAuthzFilterTest {
     private AuthnRequestUtils requestUtils;
     private SessionService sessionService;
     private SSOTokenFactory ssoTokenFactory;
+    private AuthUtilsWrapper authUtilsWrapper;
 
     @BeforeMethod
     public void setUp() {
         requestUtils = mock(AuthnRequestUtils.class);
         sessionService = mock(SessionService.class);
         ssoTokenFactory = mock(SSOTokenFactory.class);
+        authUtilsWrapper = mock(AuthUtilsWrapper.class);
 
-        sessionResourceAuthzFilter = new SessionResourceAuthzFilter(ssoTokenFactory, requestUtils, sessionService);
+        sessionResourceAuthzFilter = new SessionResourceAuthzFilter(ssoTokenFactory, requestUtils, sessionService,
+                authUtilsWrapper);
     }
 
     @Test

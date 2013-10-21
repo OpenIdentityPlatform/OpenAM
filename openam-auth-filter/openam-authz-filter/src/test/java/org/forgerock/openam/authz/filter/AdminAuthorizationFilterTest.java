@@ -21,8 +21,10 @@ import com.iplanet.sso.SSOException;
 import com.iplanet.sso.SSOToken;
 import com.sun.identity.shared.Constants;
 import org.forgerock.auth.common.DebugLogger;
+import org.forgerock.openam.auth.shared.AuthUtilsWrapper;
 import org.forgerock.openam.auth.shared.AuthnRequestUtils;
 import org.forgerock.openam.auth.shared.SSOTokenFactory;
+import org.forgerock.openam.authz.filter.session.SessionResourceAuthzFilter;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
@@ -45,6 +47,7 @@ public class AdminAuthorizationFilterTest {
     private AuthnRequestUtils requestUtils;
     private SessionService sessionService;
     private SSOTokenFactory ssoTokenFactory;
+    private AuthUtilsWrapper authUtilsWrapper;
 
     private DebugLogger debugLogger;
 
@@ -53,7 +56,9 @@ public class AdminAuthorizationFilterTest {
         requestUtils = mock(AuthnRequestUtils.class);
         sessionService = mock(SessionService.class);
         ssoTokenFactory = mock(SSOTokenFactory.class);
-        filter = new AdminAuthorizationFilter(ssoTokenFactory, requestUtils, sessionService);
+        authUtilsWrapper = mock(AuthUtilsWrapper.class);
+
+        filter = new AdminAuthorizationFilter(ssoTokenFactory, requestUtils, sessionService, authUtilsWrapper);
 
         debugLogger = mock(DebugLogger.class);
         filter.initialise(null, null, debugLogger);

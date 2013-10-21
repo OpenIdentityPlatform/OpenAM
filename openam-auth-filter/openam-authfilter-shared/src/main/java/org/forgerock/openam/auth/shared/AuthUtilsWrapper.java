@@ -14,7 +14,7 @@
  * Copyright 2013 ForgeRock AS. All rights reserved.
  */
 
-package org.forgerock.openam.jaspi.modules.session;
+package org.forgerock.openam.auth.shared;
 
 import com.sun.identity.authentication.service.AuthUtils;
 

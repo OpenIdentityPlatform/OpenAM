@@ -19,6 +19,7 @@ package org.forgerock.openam.jaspi.modules.session;
 import com.iplanet.sso.SSOException;
 import com.iplanet.sso.SSOToken;
 import com.iplanet.sso.SSOTokenID;
+import org.forgerock.openam.auth.shared.AuthUtilsWrapper;
 import org.forgerock.openam.auth.shared.AuthnRequestUtils;
 import org.forgerock.openam.auth.shared.SSOTokenFactory;
 import org.testng.annotations.BeforeMethod;

@@ -24,6 +24,7 @@ import org.forgerock.auth.common.AuditLogger;
 import org.forgerock.auth.common.DebugLogger;
 import org.forgerock.auth.common.LoggingConfigurator;
 import org.forgerock.authz.AuthorizationFilter;
+import org.forgerock.openam.auth.shared.AuthUtilsWrapper;
 import org.forgerock.openam.auth.shared.AuthnRequestUtils;
 import org.forgerock.openam.auth.shared.SSOTokenFactory;
 
@@ -48,6 +49,7 @@ public class AdminAuthorizationFilter implements AuthorizationFilter {
     private final SSOTokenFactory ssoTokenFactory;
     private final AuthnRequestUtils requestUtils;
     private final SessionService sessionService;
+    private final AuthUtilsWrapper authUtilsWrapper;
 
     private DebugLogger debugLogger;
 
@@ -57,13 +59,15 @@ public class AdminAuthorizationFilter implements AuthorizationFilter {
      * @param ssoTokenFactory An instance of the SSOTokenFactory.
      * @param requestUtils An instance of the AuthnRequestUtils.
      * @param sessionService An instance of the SessionService.
+     * @param authUtilsWrapper An instance of the AuthUtilWrapper.
      */
     @Inject
     public AdminAuthorizationFilter(SSOTokenFactory ssoTokenFactory, AuthnRequestUtils requestUtils,
-            SessionService sessionService) {
+            SessionService sessionService, AuthUtilsWrapper authUtilsWrapper) {
         this.ssoTokenFactory = ssoTokenFactory;
         this.requestUtils = requestUtils;
         this.sessionService = sessionService;
+        this.authUtilsWrapper = authUtilsWrapper;
     }
 
     /**
@@ -87,7 +91,7 @@ public class AdminAuthorizationFilter implements AuthorizationFilter {
         // Request must contain the TokenID of the user.
         String tokenId = requestUtils.getTokenId(servletRequest);
         if (StringUtils.isEmpty(tokenId)) {
-            tokenId = servletRequest.getHeader(COOKIE_HEADER_KEY);
+            tokenId = servletRequest.getHeader(getCookieHeaderName());
         }
         if (StringUtils.isEmpty(tokenId)) {
             return false;
@@ -109,5 +113,14 @@ public class AdminAuthorizationFilter implements AuthorizationFilter {
         }
 
         return sessionService.isSuperUser(userId);
+    }
+
+    /**
+     * Gets the AM cookie name, as set by AM.
+     *
+     * @return The AM cookie name.
+     */
+    private String getCookieHeaderName() {
+        return authUtilsWrapper.getCookieName();
     }
 }
