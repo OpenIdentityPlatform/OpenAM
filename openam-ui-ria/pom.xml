@@ -28,7 +28,7 @@
     <parent>
         <groupId>org.forgerock.openam</groupId>
         <artifactId>openam</artifactId>
-        <version>11.0.0-SNAPSHOT</version>
+        <version>11.0.0-RC3</version>
     </parent>
 
     <artifactId>openam-ui-ria</artifactId>
@@ -158,6 +158,7 @@
                                 <java classname="org.mozilla.javascript.tools.shell.Main"
                                     failonerror="true">
                                     <classpath refid="maven.compile.classpath" />
+                                    <jvmarg value="-Xss1024k" />
                                     <arg value="${requirejs.dir}/r.js" />
                                     <arg value="-o" />
                                     <arg value="${requirejs.dir}/app.build.js" />
