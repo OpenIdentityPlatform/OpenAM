@@ -1095,12 +1095,18 @@ $ curl https://openam.example.com:8443/openam/oauth2/tokeninfo
    administrators read, list, and delete OAuth 2.0 tokens. OAuth 2.0 clients
    can also manage their own tokens.</para>
 
+   <!--
+       Fix for AME-2414 requires recompilation of XUI sources
+       so the following is no longer possible with a binary release:
+
    <para>Resource owners can manage OAuth 2.0 tokens that they authorized by
    using the web-based OAuth 2 Token Manager. See the <citetitle>Administration
    Guide</citetitle> section on <link
    xlink:href="admin-guide#oauth2-manage-tokens"
    xlink:role="http://docbook.org/xlink/role/olink"
    ><citetitle>Managing OAuth 2.0 Tokens</citetitle></link> for details.</para>
+
+   -->
 
    <para>OpenAM exposes the token administration endpoint at
    <literal>/frrest/oauth2/token</literal>, such as

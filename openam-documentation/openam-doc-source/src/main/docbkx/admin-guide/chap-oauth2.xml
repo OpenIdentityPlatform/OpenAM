@@ -528,6 +528,10 @@
   xlink:role="http://docbook.org/xlink/role/olink"><citetitle>OAuth 2.0 Token
   Administration Endpoint</citetitle></link> for details.</para>
 
+  <!--
+       Fix for AME-2414 requires recompilation of XUI sources
+       so the following is no longer possible with a binary release:
+
   <para>OpenAM also lets resource owners browse and delete OAuth 2.0 tokens
   that they authorized. Resource owners can do this from the OAuth 2 Token
   Manager page. The OAuth 2 Token Manager page is not visible by default,
@@ -572,6 +576,8 @@
    <textobject><para>The resource owner can browse and delete tokens issued to
    clients.</para></textobject>
   </mediaobject>
+
+  -->
  </section>
 
  <section xml:id="oauth2-client-plus-authz">
