@@ -175,6 +175,7 @@
                         <!-- See: http://en.wikipedia.org/wiki/List_of_file_formats -->
                     </nonFilteredFileExtensions>
                     <webResources>
+<!--
                         <webResource>
                             <directory>${project.build.directory}/XUI/</directory>
                             <includes>
@@ -183,6 +184,7 @@
                             <targetPath>XUI</targetPath>
                             <filtering>true</filtering>
                         </webResource>
+-->
                         <webResource>
                             <directory>${basedir}/src/main/webapp</directory>
                             <includes>
