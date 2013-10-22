@@ -27,7 +27,7 @@
 */
 
 /*
- * Portions Copyrighted [2011] [ForgeRock AS]
+ * Portions Copyrighted 2011-2013 ForgeRock AS
  */
 package com.sun.identity.idm.server;
 
@@ -446,9 +446,9 @@ public class IdServicesImpl implements IdServices {
 
                Map cMap = idRepo.getConfiguration(); // do stuff to map attr
                // names.
-               attrMap = mapAttributeNames(attrMap, cMap);
+               Map mappedAttributes = mapAttributeNames(attrMap, cMap);
                String representation = idRepo.create(token, type, name,
-                       attrMap);
+                       mappedAttributes);
                if (idRepo.getClass().getName()
                        .equals(IdConstants.AMSDK_PLUGIN)) {
                    amsdkdn = representation;
@@ -675,24 +675,24 @@ public class IdServicesImpl implements IdServices {
            try {
                Map cMap = idRepo.getConfiguration();
                // do stuff to map attr names.
-               attrNames = mapAttributeNames(attrNames, cMap);
+               Set mappedAttributeNames = mapAttributeNames(attrNames, cMap);
                Map aMap = null;
                if (idRepo.getClass().getName()
                    .equals(IdConstants.AMSDK_PLUGIN) && amsdkDN != null) {
                    if (isString) {
                        aMap = idRepo.getAttributes(token, type, amsdkDN,
-                               attrNames);
+                               mappedAttributeNames);
                    } else {
                        aMap = idRepo.getBinaryAttributes(token, type, amsdkDN,
-                               attrNames);
+                               mappedAttributeNames);
                    }
                } else {
                    if (isString) {
                        aMap = idRepo.getAttributes(token, type, name,
-                               attrNames);
+                               mappedAttributeNames);
                    } else {
                        aMap = idRepo.getBinaryAttributes(token, type, name,
-                               attrNames);
+                               mappedAttributeNames);
                    }
                }
                aMap = reverseMapAttributeNames(aMap, cMap);
@@ -1401,12 +1401,12 @@ public class IdServicesImpl implements IdServices {
            try {
                Map cMap = idRepo.getConfiguration();
                // do stuff to map attr names.
-               attrNames = mapAttributeNames(attrNames, cMap);
+               Set mappedAttributeNames = mapAttributeNames(attrNames, cMap);
                if (idRepo.getClass().getName().equals(
                    IdConstants.AMSDK_PLUGIN) && (amsdkDN != null)) {
-                   idRepo.removeAttributes(token, type, amsdkDN, attrNames);
+                   idRepo.removeAttributes(token, type, amsdkDN, mappedAttributeNames);
                } else {
-                   idRepo.removeAttributes(token, type, name, attrNames);
+                   idRepo.removeAttributes(token, type, name, mappedAttributeNames);
                }
            } catch (IdRepoUnsupportedOpException ide) {
                if (idRepo != null && getDebug().warningEnabled()) {
@@ -1694,23 +1694,23 @@ public class IdServicesImpl implements IdServices {
            try {
                Map cMap = idRepo.getConfiguration();
                // do stuff to map attr names.
-               attributes = mapAttributeNames(attributes, cMap);
+               Map mappedAttributes = mapAttributeNames(attributes, cMap);
                if (idRepo.getClass().getName()
                    .equals(IdConstants.AMSDK_PLUGIN) && amsdkDN != null) {
                    if (isString) {
-                       idRepo.setAttributes(token, type, amsdkDN, attributes,
+                       idRepo.setAttributes(token, type, amsdkDN, mappedAttributes,
                                isAdd);
                    } else {
                        idRepo.setBinaryAttributes(token, type, amsdkDN,
-                               attributes, isAdd);
+                               mappedAttributes, isAdd);
                    }
                } else {
                    if (isString) {
-                       idRepo.setAttributes(token, type, name, attributes,
+                       idRepo.setAttributes(token, type, name, mappedAttributes,
                                isAdd);
                    } else {
                        idRepo.setBinaryAttributes(token, type, name,
-                               attributes, isAdd);
+                               mappedAttributes, isAdd);
                    }
                }
            } catch (IdRepoUnsupportedOpException ide) {
@@ -1798,9 +1798,9 @@ public class IdServicesImpl implements IdServices {
        while (it.hasNext()) {
            idRepo = (IdRepo) it.next();
            Map cMap = idRepo.getConfiguration();
-           attrNames = mapAttributeNames(attrNames, cMap);
-           if ((attrNames != null) && (!attrNames.isEmpty())) {
-               attrName = (String)attrNames.iterator().next();
+           Set mappedAttributeNames = mapAttributeNames(attrNames, cMap);
+           if ((mappedAttributeNames != null) && (!mappedAttributeNames.isEmpty())) {
+               attrName = (String)mappedAttributeNames.iterator().next();
            }
 
            try {
@@ -1966,14 +1966,14 @@ public class IdServicesImpl implements IdServices {
            IdRepo repo = (IdRepo) it.next();
            Map cMap = repo.getConfiguration();
            try {
-               attrMap = mapAttributeNames(attrMap, cMap);
+               Map mappedAttributes= mapAttributeNames(attrMap, cMap);
                if (repo.getClass().getName().equals(IdConstants.AMSDK_PLUGIN)
                        && amsdkDN != null) {
                    repo.assignService(token, type, amsdkDN, serviceName,
-                           stype, attrMap);
+                           stype, mappedAttributes);
                } else {
                    repo.assignService(token, type, name, serviceName, stype,
-                           attrMap);
+                           mappedAttributes);
                }
            } catch (IdRepoUnsupportedOpException ide) {
                if (idRepo != null && getDebug().messageEnabled()) {
@@ -2039,14 +2039,14 @@ public class IdServicesImpl implements IdServices {
            IdRepo repo = (IdRepo) it.next();
            Map cMap = repo.getConfiguration();
            try {
-               attrMap = mapAttributeNames(attrMap, cMap);
+               Map mappedAttributes = mapAttributeNames(attrMap, cMap);
                if (repo.getClass().getName().equals(IdConstants.AMSDK_PLUGIN)
                        && amsdkDN != null) {
                    repo.unassignService(token, type, amsdkDN, serviceName,
-                           attrMap);
+                           mappedAttributes);
                } else {
                    repo.unassignService(token, type, name, serviceName,
-                           attrMap);
+                           mappedAttributes);
                }
            } catch (IdRepoUnsupportedOpException ide) {
                if (idRepo != null && getDebug().messageEnabled()) {
@@ -2392,14 +2392,14 @@ public class IdServicesImpl implements IdServices {
            IdRepo repo = (IdRepo) it.next();
            Map cMap = repo.getConfiguration();
            try {
-               attrMap = mapAttributeNames(attrMap, cMap);
+               Map mappedAttributes = mapAttributeNames(attrMap, cMap);
                if (repo.getClass().getName().equals(IdConstants.AMSDK_PLUGIN)
                        && amsdkDN != null) {
                    repo.modifyService(token, type, amsdkDN, serviceName,
-                           stype, attrMap);
+                           stype, mappedAttributes);
                } else {
                    repo.modifyService(token, type, name, serviceName, stype,
-                           attrMap);
+                           mappedAttributes);
                }
            } catch (IdRepoUnsupportedOpException ide) {
                if (idRepo != null && getDebug().messageEnabled()) {
