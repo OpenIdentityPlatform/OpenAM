@@ -28,8 +28,7 @@
  version='5.0' xml:lang='en'
  xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance'
  xsi:schemaLocation='http://docbook.org/ns/docbook http://docbook.org/xml/5.0/xsd/docbook.xsd'
- xmlns:xlink='http://www.w3.org/1999/xlink'
- xmlns:xinclude='http://www.w3.org/2001/XInclude'>
+ xmlns:xlink='http://www.w3.org/1999/xlink'>
  <title>Installing the Apache Tomcat Policy Agent</title>
  <indexterm><primary>Apache Tomcat Server</primary></indexterm>
  <para>This chapter covers installation of the policy agent for Apache
@@ -88,8 +87,8 @@ $ which java
    <para>When you unzip the policy agent, you find the following directories
    under the <filename>j2ee_agents/tomcat_v6_agent</filename> directory.</para>
 
-   <para>Despite the directory name, the policy agent supports
-   <?eval ${agentTomcatSupport}?>.</para>
+   <para>Despite the directory name, <filename>/path/to/j2ee_agents/tomcat_v6_agent</filename>,
+   the policy agent supports <?eval ${agentTomcatSupport}?>.</para>
    <varlistentry>
     <term><filename>bin</filename></term>
     <listitem>
@@ -142,12 +141,30 @@ $ which java
     </listitem>
    </varlistentry>
   </variablelist>
+
+  <para>The <filename>web.xml</filename> file is the basic Java configuration file for web
+  applications. As such, you may find significantly different versions of this file in
+  various directories. For the purpose of installing the Tomcat policy agent, you should be
+  concerned with the Tomcat <filename>web.xml</filename> file, which you can find in the
+  <filename>/path/to/tomcat/conf</filename> directory, along with the <filename>web.xml</filename>
+  file associated with the actual web application. This section refers to a sample Web application
+  <filename>web.xml</filename> file in the <filename>/path/to/j2ee_agents/tomcat_v6_agent/sampleapp/etc</filename>
+  directory.</para>
+
  </section>
  
  <section xml:id="install-tomcat-agent">
   <title>Installing the Tomcat Policy Agent</title>
   
   <para>Complete the following procedures to install the policy agent.</para>
+
+    <itemizedlist>
+      <listitem><para><xref linkend="create-tomcat-agent-profile" /></para></listitem>
+      <listitem><para><xref linkend="create-tomcat-agent-pwdfile" /></para></listitem>
+      <listitem><para><xref linkend="install-agent-into-tomcat6" /></para></listitem>
+      <listitem><para><xref linkend="install-agent-into-tomcat7" /></para></listitem>
+      <listitem><para><xref linkend="check-tomcat-agent-installation" /></para></listitem>
+    </itemizedlist>
   
   <procedure xml:id="create-tomcat-agent-profile">
    <title>To Create the Tomcat Agent Profile</title>
@@ -220,10 +237,127 @@ $ which java
     <screen>$ chmod 400 /tmp/pwd.txt</screen>
    </step>
   </procedure>
-  
-  <procedure xml:id="install-agent-into-tomcat">
-   <title>To Install the Policy Agent into Tomcat</title>
-   
+
+  <procedure xml:id="install-agent-into-tomcat6">
+   <title>To Install the Policy Agent into Tomcat 6</title>
+
+     <para>The steps required for policy agent installation into Tomcat 6 are subtly different from those
+     required for Tomcat 7. For Tomcat 6, you should include the associated global <filename>web.xml</filename>
+     file during the installation process, and do not need to include the agent application war archive,
+     <filename>agentapp.war</filename>.</para>
+
+      <step>
+          <para>Shut down the Tomcat server where you plan to install the agent.</para>
+          <screen>$ /path/to/tomcat/bin/shutdown.sh</screen>
+      </step>
+      <step>
+          <para>Make sure OpenAM is running.</para>
+      </step>
+      <step>
+          <para>Run <command>agentadmin --install</command> to install the agent. For Tomcat 6,
+          do accept the option to install the global <filename>web.xml</filename> filter.</para>
+          <screen>$ /path/to/j2ee_agents/tomcat_v6_agent/bin/agentadmin --install
+...
+-----------------------------------------------
+SUMMARY OF YOUR RESPONSES
+-----------------------------------------------
+Tomcat Server Config Directory : /path/to/tomcat/conf
+OpenAM server URL : http://openam.example.com:8080/openam
+$CATALINA_HOME environment variable : /path/to/tomcat
+Tomcat global web.xml filter install : true
+Agent URL : http://www.example.com:8080/agentapp
+Agent Profile name : Tomcat Agent
+Agent Profile Password file name : /tmp/pwd.txt
+
+...
+SUMMARY OF AGENT INSTALLATION
+-----------------------------
+Agent instance name: Agent_001
+Agent Bootstrap file location:
+/path/to/j2ee_agents/tomcat_v6_agent/Agent_001/config/
+<?eval ${agentsBootstrapFile}?>
+Agent Configuration file location
+/path/to/j2ee_agents/tomcat_v6_agent/Agent_001/config/
+<?eval ${agentsConfigurationFile}?>
+Agent Audit directory location:
+/path/to/j2ee_agents/tomcat_v6_agent/Agent_001/logs/audit
+Agent Debug directory location:
+/path/to/j2ee_agents/tomcat_v6_agent/Agent_001/logs/debug
+
+Install log file location:
+/path/to/j2ee_agents/tomcat_v6_agent/installer-logs/audit/install.log
+...</screen>
+          <para>Upon successful completion, the installer has added the agent
+              configuration to the Tomcat 6 configuration, and also set up configuration
+              and log directories for the agent.</para>
+          <note>
+              <para>If the agent is in a different domain than the server, refer to
+              <citetitle>Administration Guide</citetitle> procedure, <link xlink:href="admin-guide#chap-cdsso"
+              xlink:role="http://docbook.org/xlink/role/olink"><citetitle>Configuring Cross-Domain
+              Single Sign On</citetitle></link>.</para>
+          </note>
+      </step>
+      <step>
+          <para>Take note of the configuration files and log locations.</para>
+          <para>Each agent instance that you install on the system has its own
+              numbered configuration and logs directory. The first agent's configuration
+              and logs are thus located under the directory
+              <filename>j2ee_agents/tomcat_v6_agent/Agent_001/</filename>.</para>
+          <variablelist>
+              <varlistentry>
+                  <term><filename>config/<?eval ${agentsBootstrapFile}?></filename></term>
+                  <listitem>
+                      <para>Used to bootstrap the J2EE policy agent, allowing the agent to
+                          connect to OpenAM and download its configuration</para>
+                  </listitem>
+              </varlistentry>
+              <varlistentry>
+                  <term><filename>config/<?eval ${agentsConfigurationFile}?></filename></term>
+                  <listitem>
+                      <para>Only used if you configured the J2EE policy agent to use local
+                          configuration</para>
+                  </listitem>
+              </varlistentry>
+              <varlistentry>
+                  <term><filename>logs/audit/</filename></term>
+                  <listitem>
+                      <para>Operational audit log directory, only used if remote logging
+                          to OpenAM is disabled</para>
+                  </listitem>
+              </varlistentry>
+              <varlistentry>
+                  <term><filename>logs/debug/</filename></term>
+                  <listitem>
+                      <para>Debug directory where the <filename>debug.out</filename> debug
+                          file resides. Useful in troubleshooting policy agent issues.</para>
+                  </listitem>
+              </varlistentry>
+          </variablelist>
+      </step>
+      <step>
+          <para>If your policy agent configuration is not in the top-level realm (/),
+              then you must edit config/<?eval ${agentsBootstrapFile}?> to identify
+              the sub-realm that has your policy agent configuration.
+              Find com.sun.identity.agents.config.organization.name and change
+              the / to the path to your policy agent profile. This allows the policy agent
+              to properly identify itself to the OpenAM server. </para>
+      </step>
+      <step>
+          <para>Start the Tomcat server where you installed the agent.</para>
+          <screen>$ /path/to/tomcat/bin/startup.sh</screen>
+      </step>
+
+  </procedure>
+
+  <procedure xml:id="install-agent-into-tomcat7">
+   <title>To Install the Policy Agent into Tomcat 7</title>
+
+   <para>The steps required for policy agent installation into Tomcat 7 are subtly different from those
+   required for Tomcat 6. For Tomcat 7, you should not install the global <filename>web.xml</filename>
+   file, but configure the application-specific <filename>web.xml</filename> file
+   after basic installation is complete. You will also need to include the
+   agent application war archive, <filename>agentappp.war</filename>.</para>
+
    <step>
     <para>Shut down the Tomcat server where you plan to install the
     agent.</para>
@@ -242,7 +376,7 @@ SUMMARY OF YOUR RESPONSES
 Tomcat Server Config Directory : /path/to/tomcat/conf
 OpenAM server URL : http://openam.example.com:8080/openam
 $CATALINA_HOME environment variable : /path/to/tomcat
-Tomcat global web.xml filter install : true
+Tomcat global web.xml filter install : false
 Agent URL : http://www.example.com:8080/agentapp
 Agent Profile name : Tomcat Agent
 Agent Profile Password file name : /tmp/pwd.txt
@@ -270,10 +404,11 @@ Install log file location:
     configuration to Tomcat's configuration, and also set up configuration
     and log directories for the agent.</para>
     <note>
-     <para>If the agent is in a different domain than the server, refer to <citetitle>Administration Guide</citetitle> procedure, <link
+     <para>If the agent is in a different domain than the server, refer to
+     <citetitle>Administration Guide</citetitle> procedure, <link
    xlink:href="admin-guide#chap-cdsso"
-   xlink:role="http://docbook.org/xlink/role/olink"><citetitle>Configuring Cross-Domain
-   Single Sign On</citetitle></link>.</para>
+   xlink:role="http://docbook.org/xlink/role/olink">
+   <citetitle>Configuring Cross-Domain Single Sign On</citetitle></link>.</para>
     </note>
    </step>
    <step>
@@ -321,9 +456,9 @@ Install log file location:
        the / to the path to your policy agent profile. This allows the policy agent
        to properly identify itself to the OpenAM server. </para>
    </step>
-   <step performance="optional">
-    <para>If you choose not to let the installer install a global filter in
-    Tomcat's <filename>web.xml</filename>, then you must add the filter
+   <step>
+    <para>Since you did not install a global filter in the Tomcat 7
+    <filename>web.xml</filename>, then you must add the filter
     manually for each protected application's <filename>web.xml</filename>
     configuration, following the opening &lt;web-app&gt; tag. The file for  
     the sample application delivered with the agent is 
