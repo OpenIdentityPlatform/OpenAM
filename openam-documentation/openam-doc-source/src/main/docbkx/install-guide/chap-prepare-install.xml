@@ -1181,6 +1181,51 @@ $ java -server -Xmx1024m -XX:MaxPermSize=256m -jar start.jar</screen>
 
   <para>Before you deploy OpenAM, update the JVM options as described in
   <xref linkend="prepare-java" />.</para>
+
+  <orderedlist>
+   <para>
+    In addition, edit the WebLogic domain configuration
+    to allow basic authentication credentials to be passed back to OpenAM.
+   </para>
+
+   <para>
+    By default WebLogic attempts to resolve authentication credentials itself.
+    When you change the WebLogic domain configuration, you make sure that
+    OpenAM OAuth 2.0 providers receive basic authentication credentials
+    for OAuth 2.0 grants that rely on basic authentication.
+   </para>
+
+   <listitem>
+    <para>
+     Stop WebLogic server.
+    </para>
+   </listitem>
+
+   <listitem>
+    <para>
+     Edit the WebLogic domain configuration,
+     <filename>/path/to/wlsdomain/config/config.xml</filename>,
+     setting <literal>&lt;enforce-valid-basic-auth-credentials></literal>
+     to <literal>false</literal> in the
+     <literal>&lt;security-configuration</literal> element.
+    </para>
+
+    <informalexample>
+     <?dbfo pgwide="1"?>
+     <programlisting language="xml">
+  &lt;security-configuration>
+    &lt;enforce-valid-basic-auth-credentials>false&lt;/enforce-valid-basic-auth-credentials>
+  &lt;/security-configuration>
+     </programlisting>
+    </informalexample>
+   </listitem>
+
+   <listitem>
+    <para>
+     Start WebLogic server.
+    </para>
+   </listitem>
+  </orderedlist>
  </section>
 
  <section xml:id="prepare-ibm-websphere">
