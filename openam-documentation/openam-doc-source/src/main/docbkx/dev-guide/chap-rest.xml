@@ -95,8 +95,7 @@
   
   <para>For the examples in this chapter, OpenAM has c66Encode for cookies
   activated. The encoding ensures that OpenAM tokens need not be percent
-  encoded before being submitted with a request. Thus, an example token
-  looks like this.</para>
+  encoded before being submitted with a request.</para>
   
   <literallayout class="monospaced">AQIC5wM2LY4SfczntBbXvEAOuECbqMY3J4NW3byH6xwgkGE.*AAJTSQACMDE.*</literallayout>
   
@@ -108,6 +107,16 @@
   xlink:href="http://en.wikipedia.org/wiki/Percent-encoding">percent
   encode</link> the <literal>=</literal>, <literal>@</literal>, and
   <literal>#</literal> characters in your requests.</para>
+
+  <para><emphasis>C66Encode</emphasis> Cookie URIs are translated into an
+  c66Encode format. As such, certain characters are substituted for others:</para>
+  <programlisting language="none">+ is replaced with -
+/ is replaced with _
+= is replaced with .
+@ is replaced with *
+# is repalced with *
+* (first instance) is replaced with @
+* (subsequent instances) is replaced with #</programlisting>
   
   <para>In this chapter, long URLs are wrapped to fit the printed page, as some
   of the output is formatted for easier reading.</para>

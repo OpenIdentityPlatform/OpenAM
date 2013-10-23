@@ -194,9 +194,9 @@ MODIFY operation successful for DN cn=schema</screen>
    \"customAttribute\"\n</literal>.</para>
   </step>
   <step>
-   <para>Restart OpenAM or the web container where it runs.</para>
-   <screen>$ /etc/init.d/tomcat stop
-$ /etc/init.d/tomcat start</screen>
+   <para>Restart OpenAM or the web container where it runs. The following example applies to Tomcat.</para>
+   <screen>$ /path/to/tomcat/bin/shutdown.sh
+$ /path/to/tomcat/bin/startup.sh</screen>
   </step>
   <step>
    <para>Login to OpenAM console as a user to check that a user can save a

@@ -47,6 +47,16 @@
   installation alongside your application, but instead can redirect to OpenAM
   for single sign on, and to retrieve SAML assertions.</para>
 
+  <para>The process for creating and installing a Java Fedlet is divided into several procedures.</para>
+
+  <itemizedlist>
+    <listitem><para><xref linkend="create-a-java-fedlet" /></para></listitem>
+    <listitem><para><xref linkend="install-fedlet-as-demo" /></para></listitem>
+    <listitem><para><xref linkend="try-fedlet-attribute-query" /></para></listitem>
+    <listitem><para><xref linkend="try-fedlet-xacml-query" /></para></listitem>
+  </itemizedlist>
+
+
   <procedure xml:id="create-a-java-fedlet">
    <title>To Create a Fedlet</title>
    <para>The OpenAM administrator running the identity provider server creates
