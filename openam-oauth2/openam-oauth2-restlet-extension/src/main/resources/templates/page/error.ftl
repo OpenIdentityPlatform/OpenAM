@@ -35,7 +35,7 @@
 <p><b>Error: </b>
 <#if error??>
     <#if error_uri??>
-        <a href="${error_uri}">${error}</a>
+        <a href="${error_uri?html}">${error?html}</a>
     <#else>
     ${error}
     </#if>
@@ -43,7 +43,7 @@
 </p>
 
 <p><b>Description: </b>
-<#if error_description??>${error_description}</#if>
+<#if error_description??>${error_description?html}</#if>
 </p>
 </body>
 </html>

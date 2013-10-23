@@ -41,6 +41,7 @@ import org.forgerock.openam.oauth2.provider.ClientVerifier;
 import org.forgerock.restlet.ext.oauth2.provider.OAuth2Client;
 import org.forgerock.openam.oauth2.provider.OAuth2TokenStore;
 import org.forgerock.restlet.ext.oauth2.representation.TemplateFactory;
+import org.owasp.esapi.ESAPI;
 import org.restlet.Context;
 import org.restlet.Request;
 import org.restlet.Response;
@@ -420,7 +421,7 @@ public abstract class AbstractFlow extends ServerResource {
         String locale = OAuth2Utils.getLocale(getRequest());
         String displayName = "";
         String displayDescription = "";
-        List<String> displayScope = new ArrayList<String>();
+        List<String> displayScope = null;
 
         //get the localized display name
         displayName = getDisplayParameter(locale, displayNames);
@@ -429,10 +430,20 @@ public abstract class AbstractFlow extends ServerResource {
         //get the scope descriptions
         displayScope = getScopeDescriptionsForLocale(scopes, allScopes, locale);
 
-        data.put("display_name", displayName);
-        data.put("display_description", displayDescription);
-        data.put("display_scope", displayScope);
+        data.put("display_name", ESAPI.encoder().encodeForHTML(displayName));
+        data.put("display_description", ESAPI.encoder().encodeForHTML(displayDescription));
+        data.put("display_scope", encodeListForHTML(displayScope));
         return data;
+    }
+
+    private List<String> encodeListForHTML(final List<String> dirtyList){
+        List<String> htmlEncodedList = new ArrayList<String>();
+
+        for (String scope : dirtyList){
+            htmlEncodedList.add(ESAPI.encoder().encodeForHTML(scope));
+        }
+
+        return htmlEncodedList;
     }
 
     private String getDisplayParameter(String locale, Set<String> displayNames){

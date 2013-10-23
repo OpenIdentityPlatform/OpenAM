@@ -50,31 +50,22 @@
                 <b>${r}</b><br/>
             </#list>
         </#if>
-        <#if grantedScopes??>
-            <#if grantedScopes?has_content>
-                <hr/>
-                <h4>Previously approved scopes</h4>
-                <#list grantedScopes as g>
-                    <b>${g}</b><br/>
-                </#list>
-            </#if>
-        </#if>
             <br/>
             <!-- Optional parameters -->
         <#if realm??>
-            <input type="hidden" name="realm" value="${realm}"/>
+            <input type="hidden" name="realm" value="${realm?html}"/>
         </#if>
         <#if redirect_uri??>
-            <input type="hidden" name="redirect_uri" value="${redirect_uri}"/>
+            <input type="hidden" name="redirect_uri" value="${redirect_uri?html}"/>
         </#if>
         <#if scope??>
-            <input type="hidden" name="scope" value="${scope}"/>
+            <input type="hidden" name="scope" value="${scope?html}"/>
         </#if>
         <#if state??>
-            <input type="hidden" name="state" value="${state}"/>
+            <input type="hidden" name="state" value="${state?html}"/>
         </#if>
         <#if nonce??>
-            <input type="hidden" name="state" value="${nonce}"/>
+            <input type="hidden" name="nonce" value="${nonce?html}"/>
         </#if>
             <!-- Required parameters -->
             <input type="hidden" name="response_type" value="${response_type}"/>
