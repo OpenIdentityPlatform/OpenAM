@@ -28,7 +28,8 @@
  version='5.0' xml:lang='en'
  xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance'
  xsi:schemaLocation='http://docbook.org/ns/docbook http://docbook.org/xml/5.0/xsd/docbook.xsd'
- xmlns:xlink='http://www.w3.org/1999/xlink'>
+ xmlns:xlink='http://www.w3.org/1999/xlink'
+ xmlns:xinclude='http://www.w3.org/2001/XInclude'>
  <title>Configuring Policy Agent Profiles</title>
  <indexterm><primary>Policy agents</primary></indexterm>
  <para>You install policy agents in web servers and web application containers
@@ -1023,7 +1024,7 @@ Agent configuration was created.</screen>
      <listitem>
       <para>List of URLs of the available CDSSO controllers that the agent can
       use for CDSSO processing. For example,
-      <literal>http://openam.example.com:8080/openam/cdcservelet</literal>.</para>
+      <literal>http://openam.example.com:8080/openam/cdcservlet</literal>.</para>
       <para>Property: <literal>com.sun.identity.agents.config.cdsso.cdcservlet.url</literal></para>
      </listitem>
     </varlistentry>
@@ -1105,32 +1106,9 @@ com.sun.identity.agents.config.cdsso.cookie.domain[1]=.example.net</literallayou
      <!-- OPENAM-849: Policy Agent needs conditional redirect to a login URL
      based on incoming request URL -->
      <term>OpenAM Conditional Login URL (Not yet in OpenAM console)</term>
-     <listitem>
-      <para>To conditionally redirect users based on the incoming request URL,
-      set this property.</para>
 
-      <para>This takes the incoming request domain to match, a vertical bar
-      ( <literal>|</literal> ), and then a comma-separated list of URLs to
-      which to redirect incoming users.</para>
+     <xinclude:include href='../shared/listitem-conditional-login-url.xml' />
 
-      <para>If the domain before the vertical bar matches an incoming request
-      URL, then the policy agent uses the list of URLs to determine how to
-      redirect the user-agent. If the global property FQDN Check
-      (<literal>com.sun.identity.agents.config.fqdn.check.enable</literal>)
-      is enabled for the policy agent, then the policy agent iterates through
-      the list until it finds an appropriate redirect URL that matches the
-      FQDN check. Otherwise, the policy agent redirects the user-agent to the
-      first URL in the list.</para>
-
-      <para>Property: <literal>com.forgerock.agents.conditional.login.url</literal></para>
-
-      <para>Examples: <literal>com.forgerock.agents.conditional.login.url[0]=
-      login.example.com|http://openam1.example.com/openam/UI/Login,
-      http://openam2.example.com/openam/UI/Login</literal>,
-      <literal>com.forgerock.agents.conditional.login.url[1]=
-      signin.example.com|http://openam3.example.com/openam/UI/Login,
-      http://openam4.example.com/openam/UI/Login</literal></para>
-     </listitem>
     </varlistentry>
     <varlistentry>
      <term>Agent Connection Timeout</term>
@@ -2659,7 +2637,7 @@ com.sun.identity.agents.config.cdsso.cookie.domain[1]=.example.net</literallayou
      <listitem>
       <para>List of URLs of the available CDSSO controllers that the agent can
       use for CDSSO processing. For example,
-      <literal>http://openam.example.com:8080/openam/cdcservelet</literal>.</para>
+      <literal>http://openam.example.com:8080/openam/cdcservlet</literal>.</para>
       <para>Property: <literal>com.sun.identity.agents.config.cdsso.cdcservlet.url</literal></para>
      </listitem>
     </varlistentry>
@@ -2757,32 +2735,9 @@ com.sun.identity.agents.config.cdsso.cookie.domain[1]=.example.net</literallayou
     </varlistentry>
     <varlistentry>
      <term>OpenAM Conditional Login URL (Not yet in OpenAM console)</term>
-     <listitem>
-      <para>To conditionally redirect users based on the incoming request URL,
-      set this property.</para>
 
-      <para>This takes the incoming request domain to match, a vertical bar
-      ( <literal>|</literal> ), and then a comma-separated list of URLs to
-      which to redirect incoming users.</para>
+     <xinclude:include href='../shared/listitem-conditional-login-url.xml' />
 
-      <para>If the domain before the vertical bar matches an incoming request
-      URL, then the policy agent uses the list of URLs to determine how to
-      redirect the user-agent. If the global property FQDN Check
-      (<literal>com.sun.identity.agents.config.fqdn.check.enable</literal>)
-      is enabled for the policy agent, then the policy agent iterates through
-      the list until it finds an appropriate redirect URL that matches the
-      FQDN check. Otherwise, the policy agent redirects the user-agent to the
-      first URL in the list.</para>
-
-      <para>Property: <literal>com.sun.identity.agents.config.conditional.login.url</literal></para>
-
-      <para>Examples: <literal>com.sun.identity.agents.config.conditional.login.url[0]=
-      login.example.com|http://openam1.example.com/openam/UI/Login,
-      http://openam2.example.com/openam/UI/Login</literal>,
-      <literal>com.sun.identity.agents.config.conditional.login.url[1]=
-      signin.example.com|http://openam3.example.com/openam/UI/Login,
-      http://openam4.example.com/openam/UI/Login</literal></para>
-     </listitem>
     </varlistentry>
     <varlistentry>
      <term>Login URL Prioritized</term>
