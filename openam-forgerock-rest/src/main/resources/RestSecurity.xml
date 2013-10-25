@@ -48,11 +48,28 @@
                         <Value>false</Value>
                     </DefaultValues>
                 </AttributeSchema>
+                <AttributeSchema name="forgerockRESTSecuritySelfRegTokenTTL"
+                                 type="single"
+                                 syntax="number_range" rangeStart="0" rangeEnd="2147483647"
+                                 validator="RequiredValueValidator"
+                                 i18nKey="a102">
+                    <DefaultValues>
+                        <Value>900</Value>
+                    </DefaultValues>
+                </AttributeSchema>
+                <AttributeSchema name="forgerockRESTSecuritySelfRegConfirmationUrl"
+                                 type="single"
+                                 syntax="url"
+                                 i18nKey="a103">
+                    <DefaultValues>
+                        <Value>@SERVER_PROTO@://@SERVER_HOST@:@SERVER_PORT@/@SERVER_URI@/XUI/confirm.html</Value>
+                    </DefaultValues>
+                </AttributeSchema>
                 <AttributeSchema name="forgerockRESTSecurityForgotPasswordEnabled"
                                  type="single"
                                  syntax="boolean"
                                  validator="RequiredValueValidator"
-                                 i18nKey="a102">
+                                 i18nKey="a104">
                     <BooleanValues>
                         <BooleanTrueValue i18nKey="i18nTrue">true</BooleanTrueValue>
                         <BooleanFalseValue i18nKey="i18nFalse">false</BooleanFalseValue>
@@ -61,22 +78,21 @@
                         <Value>false</Value>
                     </DefaultValues>
                 </AttributeSchema>
-                <AttributeSchema name="forgerockRESTSecuritySelfRegTokenTTL"
-                                 type="single"
-                                 syntax="number_range" rangeStart="0" rangeEnd="2147483647"
-                                 validator="RequiredValueValidator"
-                                 i18nKey="a103">
-                    <DefaultValues>
-                        <Value>900</Value>
-                    </DefaultValues>
-                </AttributeSchema>
                 <AttributeSchema name="forgerockRESTSecurityForgotPassTokenTTL"
                                  type="single"
                                  syntax="number_range" rangeStart="0" rangeEnd="2147483647"
                                  validator="RequiredValueValidator"
-                                 i18nKey="a104">
+                                 i18nKey="a105">
                     <DefaultValues>
                         <Value>900</Value>
+                    </DefaultValues>
+                </AttributeSchema>
+                <AttributeSchema name="forgerockRESTSecurityForgotPassConfirmationUrl"
+                                 type="single"
+                                 syntax="url"
+                                 i18nKey="a106">
+                    <DefaultValues>
+                        <Value>@SERVER_PROTO@://@SERVER_HOST@:@SERVER_PORT@/@SERVER_URI@/XUI/confirm.html</Value>
                     </DefaultValues>
                 </AttributeSchema>
             </Organization>
