@@ -1573,15 +1573,15 @@ $ curl
    <para>An example follows, showing the steps in more detail.</para>
 
    <listitem>
-    <para>Configure the Email Service and Rest Security.</para>
+    <para>Configure the Email Service and REST Security.</para>
 
     <para>In particular, you must configure the Email Service to send mail
     to users who self-register, and you must enable self-registration in the
-    Rest Security service.</para>
+    REST Security service.</para>
 
     <para>You can configure these globally in OpenAM Console at Configuration >
     Global > Email Service for notifications and Configuration > Global >
-    Rest Security to allow self-registration.</para>
+    REST Security to allow self-registration.</para>
 
     <para>Alternatively, you can configure them for an individual realm under
     Access Control > <replaceable>Realm Name</replaceable> > Services.</para>
