@@ -135,7 +135,7 @@ define("org/forgerock/openam/ui/user/login/RESTLoginView", [
                                 authNDelegate.setSuccessURL().then(function(){
                                     //eventManager.sendEvent(constants.EVENT_DISPLAY_MESSAGE_REQUEST, "loggedIn");
                                     if(conf.globalData.auth.urlParams && conf.globalData.auth.urlParams.goto){
-                                        window.location.href = decodeURIComponent(conf.globalData.auth.urlParams.goto);
+                                        window.location.href = conf.globalData.auth.urlParams.goto;
                                         $('body').empty();
                                         return false;
                                     }
