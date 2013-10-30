@@ -27,10 +27,6 @@ import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.HttpMethod;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
 
 /**
  * Adds a check to see if the REST endpoint being hit is the authentication endpoint and if is then will skip
@@ -51,6 +47,7 @@ public class AMAuthNFilter extends AuthNFilter {
      * allow the anonymous user access.
      */
     static {
+        ENDPOINT_MATCHER.endpoint("/json/authenticate", HttpMethod.GET);
         ENDPOINT_MATCHER.endpoint("/json/authenticate", HttpMethod.POST);
         ENDPOINT_MATCHER.endpoint("/json/users", HttpMethod.POST, "_action", "register", "confirm", "forgotPassword",
                 "forgotPasswordReset", "anonymousCreate");
