@@ -1878,7 +1878,7 @@
                     <para>Sets the authentication level used to indicate the level of security
                         associated with the module. The value can range from 0 to any positive integer.</para>
                     <para><command>ssoadm</command> attribute:
-                        <literal>sunAMAuthHOTPAuthLevel</literal></para>
+                        <literal>openam-auth-adaptive-auth-level</literal></para>
                 </listitem>
             </varlistentry>
             <varlistentry>
@@ -1951,7 +1951,7 @@
                 <term>Screen color depth penalty points</term>
                 <listitem>
                     <para>Most client devices are connected to a color monitor, or at least have settings related to
-                        such a device. If the <literal>Screen parameters</literal>feature is enabled, and a change in
+                        such a device. If the <literal>Screen parameters</literal> feature is enabled, and a change in
                         color depth is detected, a fixed number of penalty points is added. Default: 35.</para>
                     <para><command>ssoadm</command> attribute:
                     <literal>iplanet-am-auth-adaptive-device-print-screen-color-depth-penalty-points</literal></para>
