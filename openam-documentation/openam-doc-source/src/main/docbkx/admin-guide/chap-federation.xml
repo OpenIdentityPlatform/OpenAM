@@ -484,7 +484,7 @@
     <step>
      <para>Copy the <filename><?eval ${ipdiscoWarFile}?></filename> file to
      the <filename>webapps/</filename> directory.</para>
-     <screen>$ ~/Downloads/openam/<?eval ${ipdiscoWarFile}?> /path/to/tomcat/webapps/disco.war</screen>
+     <screen>$ cp ~/Downloads/openam/<?eval ${ipdiscoWarFile}?> /path/to/tomcat/webapps/disco.war</screen>
     </step>
     <step>
      <para>Access the configuration screen through your browser.</para>
