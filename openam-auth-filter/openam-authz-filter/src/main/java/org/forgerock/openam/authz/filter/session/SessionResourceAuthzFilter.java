@@ -17,6 +17,7 @@
 package org.forgerock.openam.authz.filter.session;
 
 import com.iplanet.dpro.session.service.SessionService;
+import org.forgerock.openam.auth.shared.AuthUtilsWrapper;
 import org.forgerock.openam.auth.shared.AuthnRequestUtils;
 import org.forgerock.openam.auth.shared.SSOTokenFactory;
 import org.forgerock.openam.authz.filter.AdminAuthorizationFilter;
@@ -42,11 +43,12 @@ public class SessionResourceAuthzFilter extends AdminAuthorizationFilter {
      * @param ssoTokenFactory An instance of the SSOTokenFactory.
      * @param requestUtils An instance of the AuthnRequestUtils.
      * @param sessionService An instance of the SessionService.
+     * @param authUtilsWrapper An instance of the AuthUtilWrapper.
      */
     @Inject
     public SessionResourceAuthzFilter(SSOTokenFactory ssoTokenFactory, AuthnRequestUtils requestUtils,
-            SessionService sessionService) {
-        super(ssoTokenFactory, requestUtils, sessionService);
+            SessionService sessionService, AuthUtilsWrapper authUtilsWrapper) {
+        super(ssoTokenFactory, requestUtils, sessionService, authUtilsWrapper);
     }
 
     /**
