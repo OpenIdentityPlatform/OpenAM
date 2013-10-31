@@ -262,6 +262,12 @@ define("org/forgerock/openam/ui/user/login/RESTLoginView", [
                 }
             });
             
+            //special case for SSORedirect
+            if(urlParams.goto && urlParams.goto.indexOf('/SSORedirect') === 0){
+                urlParams.goto = "/" + constants.context + urlParams.goto;
+                conf.globalData.auth.additional.replace("&goto=","&goto=" + "/" + constants.context);
+            }
+            
             conf.globalData.auth.urlParams = urlParams;
             return urlParams;
         }
