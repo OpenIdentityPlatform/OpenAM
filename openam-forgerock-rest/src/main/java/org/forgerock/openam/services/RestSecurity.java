@@ -40,9 +40,11 @@ public class RestSecurity {
     private RestSecurityConfiguration restSecurityConfiguration;
 
     private final static String SELF_REGISTRATION = "forgerockRESTSecuritySelfRegistrationEnabled";
+    private final static String SELF_REG_CONFIRMATION_URL = "forgerockRESTSecuritySelfRegConfirmationUrl";
     private final static String FORGOT_PASSWORD = "forgerockRESTSecurityForgotPasswordEnabled";
     private final static String SELF_REG_TOKEN_LIFE_TIME = "forgerockRESTSecuritySelfRegTokenTTL";
     private final static String FORGOT_PASSWORD_TOKEN_LIFE_TIME= "forgerockRESTSecurityForgotPassTokenTTL";
+    private final static String FORGOT_PASSWORD_CONFIRMATION_URL = "forgerockRESTSecurityForgotPassConfirmationUrl";
 
     private final static String SERVICE_NAME = "RestSecurity";
     private final static String SERVICE_VERSION = "1.0";
@@ -101,13 +103,17 @@ public class RestSecurity {
 
     private static class RestSecurityConfiguration {
         final Long selfRegTokenLifeTime;
+        final String selfRegistrationConfirmationUrl;
         final Long forgotPasswordTokenLifeTime;
+        final String forgotPasswordConfirmationUrl;
         final Boolean selfRegistration;
         final Boolean forgotPassword;
 
-        private RestSecurityConfiguration(Long selfRegTokenLifeTime, Long forgotPasswordLifeTime, Boolean selfRegistration, Boolean forgotPassword) {
+        private RestSecurityConfiguration(Long selfRegTokenLifeTime, String selfRegistrationConfirmationUrl, Long forgotPasswordLifeTime, String forgotPasswordConfirmationUrl, Boolean selfRegistration, Boolean forgotPassword) {
             this.selfRegTokenLifeTime = selfRegTokenLifeTime;
+            this.selfRegistrationConfirmationUrl = selfRegistrationConfirmationUrl;
             this.forgotPasswordTokenLifeTime = forgotPasswordLifeTime;
+            this.forgotPasswordConfirmationUrl = forgotPasswordConfirmationUrl;
             this.selfRegistration = selfRegistration;
             this.forgotPassword = forgotPassword;
         }
@@ -117,12 +123,16 @@ public class RestSecurity {
         try {
             ServiceConfig serviceConfig = serviceConfigManager.getOrganizationConfig(realm, null);
             boolean selfRegistration = RestUtils.getBooleanAttribute(serviceConfig, SELF_REGISTRATION);
+            String selfRegistrationConfirmationUrl = RestUtils.getStringAttribute(serviceConfig, SELF_REG_CONFIRMATION_URL);
             boolean forgotPassword = RestUtils.getBooleanAttribute(serviceConfig, FORGOT_PASSWORD);
+            String forgotPasswordConfirmationUrl = RestUtils.getStringAttribute(serviceConfig, FORGOT_PASSWORD_CONFIRMATION_URL);
             Long selfRegTokLifeTime = RestUtils.getLongAttribute(serviceConfig, SELF_REG_TOKEN_LIFE_TIME);
             Long forgotPassTokLifeTime = RestUtils.getLongAttribute(serviceConfig, FORGOT_PASSWORD_TOKEN_LIFE_TIME);
             RestSecurityConfiguration newRestSecuritySettings = new RestSecurityConfiguration(
                     selfRegTokLifeTime,
+                    selfRegistrationConfirmationUrl,
                     forgotPassTokLifeTime,
+                    forgotPasswordConfirmationUrl,
                     selfRegistration,
                     forgotPassword);
 
@@ -168,6 +178,10 @@ public class RestSecurity {
             throw new ServiceNotFoundException(message);
         }
     }
+    
+    public String getSelfRegistrationConfirmationUrl() {
+    	return restSecurityConfiguration.selfRegistrationConfirmationUrl;
+    }
 
     public boolean isForgotPassword() throws ServiceNotFoundException {
         if ((restSecurityConfiguration != null) && (restSecurityConfiguration.forgotPassword != null)) {
@@ -177,6 +191,10 @@ public class RestSecurity {
             RestDispatcher.debug.error(message);
             throw new ServiceNotFoundException(message);
         }
+    }
+    
+    public String getForgotPasswordConfirmationUrl() {
+    	return restSecurityConfiguration.forgotPasswordConfirmationUrl;
     }
     /**
      * Retrieves the Self-Registration CTS Token Life Time

@@ -249,8 +249,15 @@ public final class IdentityResource implements CollectionResourceProvider {
             String confirmationId = Hash.hash(tokenID + emailAddress + SystemProperties.get("am.encryption.pwd"));
 
             // Build Confirmation URL
-            confirmationLink = deploymentURL.append("/json/confirmation/register?")
-                    .append("confirmationId=").append(confirmationId)
+            String confURL = restSecurity.getSelfRegistrationConfirmationUrl();
+            StringBuilder confURLBuilder = new StringBuilder(100);
+            if(confURL == null || confURL.isEmpty()) {
+                confURLBuilder.append(deploymentURL.append("/json/confirmation/register").toString());
+            } else {
+                confURLBuilder.append(confURL);
+            }
+
+            confirmationLink = confURLBuilder.append("?confirmationId=").append(confirmationId)
                     .append("&email=").append(emailAddress)
                     .append("&tokenId=").append(tokenID)
                     .toString();
@@ -527,11 +534,17 @@ public final class IdentityResource implements CollectionResourceProvider {
 
             String confirmationLink;
             // Build Confirmation URL
-            confirmationLink = deploymentURL.append("/json/confirmation/forgotPassword?")
-                    .append("confirmationId=").append(confirmationId)
+            String confURL = restSecurity.getForgotPasswordConfirmationUrl();
+            StringBuilder confURLBuilder = new StringBuilder(100);
+            if(confURL == null || confURL.isEmpty()) {
+                confURLBuilder.append(deploymentURL.append("/json/confirmation/forgotPassword").toString());
+            } else {
+                confURLBuilder.append(confURL);
+            }
+
+            confirmationLink = confURLBuilder.append("?confirmationId=").append(confirmationId)
                     .append("&tokenId=").append(ctsToken.getTokenId())
                     .append("&username=").append(username)
-                    .toString()
                     .toString();
 
             // Send Registration
