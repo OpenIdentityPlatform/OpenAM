@@ -25,6 +25,7 @@ import org.forgerock.openam.utils.JsonValueBuilder;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
@@ -33,7 +34,6 @@ import javax.ws.rs.core.Context;
 import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
-import java.util.List;
 
 /**
  * JAX-RS endpoint for version 1 RESTful authentication requests.
@@ -62,6 +62,21 @@ public class AuthenticationRestService {
      */
     public AuthenticationRestService(RestAuthenticationHandler restAuthenticationHandler) {
         this.restAuthenticationHandler = restAuthenticationHandler;
+    }
+
+    /**
+     * HTTP GETs are not supported.
+     * <p>
+     * As JAX-RS has not direct way of defining a method type as not supported, here we define a method to be called
+     * on all GET requests, that will return a 405 response "Method Not Allowed" back to the client.
+     *
+     * @return A HTTP 405 response to be sent back to the client.
+     */
+    @GET
+    @Path("/")
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response getMethodNotSupported() {
+        return new RestAuthException(405, "Method Not Allowed").getResponse();
     }
 
     /**
