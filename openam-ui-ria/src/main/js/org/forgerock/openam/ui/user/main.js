@@ -27,7 +27,7 @@
 define("org/forgerock/openam/ui/user/main", [
     "./profile/UserProfileView",
     "./profile/ChangeSecurityDataDialog",
-    //"./oauth2/TokensView",
+    "./oauth2/TokensView",
     "./delegates/TokenDelegate",
     "./login/AuthNDelegate",
     "./login/RESTLoginHelper",

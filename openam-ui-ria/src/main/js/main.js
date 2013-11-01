@@ -31,23 +31,26 @@
 
 require.config({
     paths: {
+        mustache: "libs/mustache-0.7.0",
         i18next: "libs/i18next-1.5.8-min",
         backbone: "libs/backbone-0.9.2-min",
         underscore: "libs/underscore-1.4.4-min",
         js2form: "libs/js2form-1.0",
         form2js: "libs/form2js-1.0",
+        contentflow: "libs/contentflow",
         spin: "libs/spin-1.2.5-min",
-        //dataTable: "libs/datatables-1.9.3-min",
-        //jqueryui: "libs/jquery-ui-1.8.23.custom-min",
+        dataTable: "libs/datatables-1.9.3-min",
+        jqueryui: "libs/jquery-ui-1.8.23.custom-min",
         xdate: "libs/xdate-0.7-min",
         doTimeout: "libs/jquery.ba-dotimeout-1.0-min",
         handlebars: "libs/handlebars-1.0.rc.1",
-        moment: "libs/moment-1.7.2-min",
-        ThemeManager: "org/forgerock/openam/ui/common/util/ThemeManager",
-        UserDelegate: "org/forgerock/openam/ui/user/delegates/UserDelegate"
+        moment: "libs/moment-1.7.2-min"
     },
 
     shim: {
+        mustache: {
+            exports: "Mustache"
+        },
         underscore: {
             exports: "_"
         },
@@ -61,15 +64,18 @@ require.config({
         form2js: {
             exports: "form2js"
         },
+        contentflow: {
+            exports: "contentflow"
+        },
         spin: {
             exports: "spin"
         },
-        /*dataTable: {
+        dataTable: {
             exports: "dataTable"
         },
         jqueryui: {
             exports: "jqueryui"
-        }, */
+        }, 
         xdate: {
             exports: "xdate"
         },
@@ -94,30 +100,32 @@ require.config({
  * required synchronously
  */
 require([
-    "org/forgerock/commons/ui/common/util/Constants", 
-    "org/forgerock/commons/ui/common/main/EventManager",
+    "mustache",
     "underscore",
     "backbone",
     "form2js",
     "js2form",
+    "contentflow",
     "spin",
-    //"dataTable",
-    //"jqueryui",
+    "dataTable",
+    "jqueryui",
     "xdate",
     "moment",
     "doTimeout",
     "handlebars",
     "i18next",
     "org/forgerock/commons/ui/common/main/i18nManager",
+    "org/forgerock/commons/ui/common/util/Constants", 
+    "org/forgerock/commons/ui/common/main/EventManager",
     "config/main",
     "org/forgerock/openam/ui/common/util/Constants", 
     "org/forgerock/openam/ui/user/main",
     "org/forgerock/openam/ui/dashboard/main",
-    "UserDelegate",
-    "ThemeManager",
+    "org/forgerock/openam/ui/user/delegates/UserDelegate",
+    "org/forgerock/openam/ui/common/util/ThemeManager",
     "org/forgerock/commons/ui/user/main",
     "org/forgerock/commons/ui/common/main"
-], function(constants, eventManager) {
+], function(a, b, c, d, e, f, g, h, i, j, k, l, m, n, i18n, constants, eventManager) {
     eventManager.sendEvent(constants.EVENT_DEPENDECIES_LOADED);
 });
 
