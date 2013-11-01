@@ -114,7 +114,7 @@ public class IndexChangeHandler implements SearchResultHandler {
 
     @Override
     public void handleErrorResult(ErrorResultException erE) {
-        DEBUG.error("Index change persistence search has failed.", erE);
+        DEBUG.error("Index change persistence search has failed", erE);
         // Notify all observers of the error.
         observable.notifyObservers(ErrorEventType.SEARCH_FAILURE.createEvent());
     }
