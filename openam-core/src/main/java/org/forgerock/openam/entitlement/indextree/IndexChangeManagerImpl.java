@@ -59,15 +59,12 @@ public class IndexChangeManagerImpl implements IndexChangeManager, Runnable, Ind
     }
 
     @Override
-    public void init() {
+    public  void init() {
         if (schedulerStatus == null || schedulerStatus.isDone()) {
 
             if (DEBUG.messageEnabled()) {
                 DEBUG.message("Initialising monitor to listen for policy path index modifications.");
             }
-
-            // Before initiating the monitor, ensure it is not currently running.
-            monitor.shutdown();
 
             // Kick of the scheduler to attempt to initiate the listener every second.
             schedulerStatus = scheduler.scheduleWithFixedDelay(this, 0L, 1000L, TimeUnit.MILLISECONDS);
@@ -77,6 +74,9 @@ public class IndexChangeManagerImpl implements IndexChangeManager, Runnable, Ind
     @Override
     public void run() {
         try {
+            // Before starting the monitor, ensure it is not currently running.
+            monitor.shutdown();
+
             // Initiate the monitor.
             monitor.start();
 
