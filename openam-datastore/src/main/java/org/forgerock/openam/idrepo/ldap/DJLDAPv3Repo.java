@@ -932,7 +932,7 @@ public class DJLDAPv3Repo extends IdRepo {
                 }
             }
             if (attr.isEmpty()) {
-                modifyRequest.addModification(new Modification(ModificationType.DELETE, attr));
+                modifyRequest.addModification(new Modification(ModificationType.REPLACE, attr));
             } else {
                 modifyRequest.addModification(
                         new Modification(isAdd ? ModificationType.ADD : ModificationType.REPLACE, attr));
