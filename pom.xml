@@ -256,7 +256,7 @@
 
         <module>openam-server-auth-ui</module>
 
-        <!--module>openam-ui-ria</module-->
+        <module>openam-ui-ria</module>
 
         <module>openam-server-only</module>
 
