@@ -44,8 +44,6 @@ import javax.servlet.http.HttpServletResponse;
 @Singleton
 public class AdminAuthorizationFilter implements AuthorizationFilter {
 
-    private static final String COOKIE_HEADER_KEY = "iPlanetDirectoryPro";
-
     private final SSOTokenFactory ssoTokenFactory;
     private final AuthnRequestUtils requestUtils;
     private final SessionService sessionService;
