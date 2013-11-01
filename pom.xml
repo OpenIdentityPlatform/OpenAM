@@ -120,12 +120,12 @@
 
         <!-- Version Properties -->
         <opendj.server.version>2.6.0</opendj.server.version>
-        <opendj.sdk.version>2.6.3-SNAPSHOT</opendj.sdk.version>
+        <opendj.sdk.version>2.6.4-SNAPSHOT</opendj.sdk.version>
 
         <commons.forgerock-util.version>1.1.0</commons.forgerock-util.version>
         <commons.json-resource.version>1.2.2</commons.json-resource.version>
         <commons.json-patch.version>1.0.0</commons.json-patch.version>
-        <forgerock.json.version>2.0.1</forgerock.json.version>
+        <forgerock.json.version>2.0.2</forgerock.json.version>
         <commons.authfilter.version>1.2.0</commons.authfilter.version>
         <forgerock-ui.version>1.0.1-SNAPSHOT</forgerock-ui.version>
         <restlet.version>2.1.1</restlet.version>
@@ -1371,7 +1371,7 @@
             <dependency>
                 <groupId>org.forgerock.commons</groupId>
                 <artifactId>json-web-token</artifactId>
-                <version>2.0.1-SNAPSHOT</version>
+                <version>${forgerock.json.version}</version>
             </dependency>
             <dependency>
                 <groupId>org.forgerock.commons</groupId>
