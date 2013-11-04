@@ -103,7 +103,6 @@
                                     <outputDirectory>${project.build.directory}/unpacked</outputDirectory>
                                     <includes>jaxrpc/IdentityManagementServices.wsdl</includes>
                                 </artifactItem>
-<!--
                                 <artifactItem>
                                     <groupId>org.forgerock.openam</groupId>
                                     <artifactId>openam-ui-ria</artifactId>
@@ -113,7 +112,6 @@
                                     <outputDirectory>${project.build.directory}/XUI</outputDirectory>
                                     <includes>**/*</includes>
                                 </artifactItem>
--->
                             </artifactItems>
                         </configuration>
                     </execution>
@@ -346,14 +344,12 @@
 
 
     <dependencies>
-<!--
         <dependency>
             <groupId>org.forgerock.openam</groupId>
             <artifactId>openam-ui-ria</artifactId>
             <type>zip</type>
             <classifier>www</classifier>
         </dependency>
--->
 
         <dependency>
             <groupId>org.forgerock.openam</groupId>
