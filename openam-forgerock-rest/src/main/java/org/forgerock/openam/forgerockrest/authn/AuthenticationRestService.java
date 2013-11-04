@@ -76,7 +76,15 @@ public class AuthenticationRestService {
     @Path("/")
     @Produces(MediaType.APPLICATION_JSON)
     public Response getMethodNotSupported() {
-        return new RestAuthException(405, "Method Not Allowed").getResponse();
+
+        JsonValue jsonValue = JsonValue.json(
+                JsonValue.object(
+                        JsonValue.field("code", 405),
+                        JsonValue.field("reason", "Method Not Allowed"),
+                        JsonValue.field("message", "HTTP method is not allowed.")
+                )
+        );
+        return Response.status(405).entity(jsonValue.toString()).build();
     }
 
     /**
