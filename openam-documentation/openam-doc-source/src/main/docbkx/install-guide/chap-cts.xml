@@ -54,6 +54,8 @@
   <section xml:id="cts-config">
     <title>CTS Configuration Parameters</title>
 
+      <!--  Option for "hot" updates may be in work -->
+
     <para>If you have previously configured CTS, be prepared. Before making any changes, disable client
     access to OpenAM. The actions taken in this screen may eliminate existing CTS session, OAuth 2.0,
     and SAML tokens.</para>
@@ -61,9 +63,10 @@
     <para>To access the main CTS configuration page from the console, select Configuration &gt; Servers and Sites &gt;
     Default Server Settings &gt; CTS. The options that appear in the screenshot that follows are detailed in the
     <link xlink:show="new" xlink:href="reference#servers-cts" xlink:role="http://docbook.org/xlink/role/olink">
-    <citetitle>Reference</citetitle></link> document. You can set a root suffix for CTS tokens for
-    either the default embedded or an external token store. If you select <literal>Default Token Store</literal>,
-    OpenAM will use the embedded configuration data store for CTS tokens."</para>
+    <citetitle>Reference</citetitle></link> document. You can set a root suffix for CTS tokens. If you select
+    <literal>Default Token Store</literal>, CTS tokens are stored in the same external or embedded data store
+    as is used for other LDAP information usef for the configuration. If you select <literal>External Token
+    Store</literal>, that assumes you have configured separate external CTS servers.</para>
 
     <note><para>If desired, you could make these changes from the command line with the <link xlink:show="new"
     xlink:href="reference#ssoadm-update-server-cfg" xlink:role="http://docbook.org/xlink/role/olink">
@@ -120,12 +123,6 @@
     <para>Navigate to Configuration &gt; Servers and Sites &gt; Default Server Settings &gt; CTS. Any options that
     you change under this tab are inherited as defaults by individual servers. To confirm, make a change, and then
     navigate to Configuration &gt; Servers and Sites &gt; [Server Name] &gt; CTS.</para>
-
-      <!--    Please address OPENAM-3164 so I can delete this comment
-    <note><para>Some of you may have seen the Global Core Token Service screen, accessible via
-    Configuration &gt; Global &gt; Core Token Service. The options in this screen are not related
-    the Core Token Service implemented for OpenAM 11.0.0. It provides a REST-based token management
-    interface designed for OAuth version 1 tokens.</para></note>           -->
 
   </section>
 
@@ -373,8 +370,8 @@ aci: (targetcontrol="2.16.840.1.113730.3.4.3")(version 3.0;acl "Allow
   <section xml:id="cts-token-size">
     <title>Managing CTS Tokens</title>
 
-   <para>There are five properties associated with token encryption, compression, and token lifetimes.
-   The three that are associated with encryption and compression are disabled by default.
+   <para>There are five properties associated with token encryption, compression, and token
+   cleanup frequency. The three that are associated with encryption and compression are disabled by default.
    The properties are as follows:</para>
 
    <itemizedlist>
@@ -393,8 +390,7 @@ aci: (targetcontrol="2.16.840.1.113730.3.4.3")(version 3.0;acl "Allow
        <listitem>
            <para><literal>com.sun.identity.session.repository.cleanupRunPeriod</literal></para>
            <para>Specifies a minimum CTS token lifetime. If there is no activity in the specified
-           time period, the token is erased. Default: 300 seconds. (Under Default Server Settings &gt; Advanced,
-           this property is set to 400 seconds.)</para>
+           time period, the token is erased. Default: 300 seconds.</para>
        </listitem>
        <listitem>
            <para><literal>com.sun.identity.session.repository.healthCheckRunPeriod</literal></para>
@@ -403,16 +399,25 @@ aci: (targetcontrol="2.16.840.1.113730.3.4.3")(version 3.0;acl "Allow
        </listitem>
    </itemizedlist>
 
+   <!-- May be addressed with AME-2540
+
+   <note><para>The current run frequency for the CTS reaper, which cleans up expired tokens,
+   is the minimum of the <literal>com.sun.identity.session.repository.cleanupRunPeriod</literal> and
+   the <literal>com.sun.identity.session.repository.healthCheckRunPeriod</literal>.</para></note>
+
+   -->
+
    <para>To enable the encryption / compression options, navigate to Configuration &gt; Servers and Sites &gt;
    Default Server Settings &gt; Advanced. In the Advanced Properties window, you should see these entries
    in the <literal>Property Name</literal> column with the
    corresponding value in the <literal>Property Value</literal> column. To enable them, change <literal>false</literal>
    to <literal>true</literal> in the Property Value column associated with the desired property, and click Save.</para>
 
-   <note><para>If you choose to enable compression, set both
-   <literal>com.sun.identity.session.repository.enableCompression</literal>
-   and <literal>com.sun.identity.session.repository.enableAttributeCompression</literal> to <literal>true</literal>
-   They work well together.</para></note>
+   <note><para>If you are using SFO, or if you are using an external CTS directory, be careful with these options.
+   If you want to enable compression or encryption, you will then have to enable all three on every instance of OpenAM
+   within a deployment or replication group: <literal>com.sun.identity.session.repository.enableEncryption</literal>,
+   <literal>com.sun.identity.session.repository.enableCompression</literal>, and
+   <literal>com.sun.identity.session.repository.enableAttributeCompression</literal>.</para></note>
 
   </section>
 
