@@ -65,7 +65,7 @@
     <link xlink:show="new" xlink:href="reference#servers-cts" xlink:role="http://docbook.org/xlink/role/olink">
     <citetitle>Reference</citetitle></link> document. You can set a root suffix for CTS tokens. If you select
     <literal>Default Token Store</literal>, CTS tokens are stored in the same external or embedded data store
-    as is used for other LDAP information usef for the configuration. If you select <literal>External Token
+    as is used for other LDAP information used for the configuration. If you select <literal>External Token
     Store</literal>, that assumes you have configured separate external CTS servers.</para>
 
     <note><para>If desired, you could make these changes from the command line with the <link xlink:show="new"
