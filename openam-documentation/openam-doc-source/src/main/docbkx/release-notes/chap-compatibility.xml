@@ -27,8 +27,7 @@
  xmlns='http://docbook.org/ns/docbook' version='5.0' xml:lang='en'
  xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance'
  xsi:schemaLocation='http://docbook.org/ns/docbook http://docbook.org/xml/5.0/xsd/docbook.xsd'
- xmlns:xlink='http://www.w3.org/1999/xlink'
- xmlns:xinclude='http://www.w3.org/2001/XInclude'>
+ xmlns:xlink='http://www.w3.org/1999/xlink'>
  <title>OpenAM Changes &amp; Deprecated Functionality</title>
 
  <para>This chapter covers both major changes to existing functionality, and
@@ -189,6 +188,12 @@
    <listitem>
     <para>OpenAM currently uses Sun Java System Application Framework (JATO).
     JATO is deprecated and is likely to be replaced in a future release.</para>
+   </listitem>
+
+   <listitem>
+    <para>With the implementation of the Persistent Cookie authentication module, the
+    Core Authentication module persistent cookie options are deprecated and are
+    likely to be removed in a future release.</para>
    </listitem>
 
    <listitem>
