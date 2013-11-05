@@ -38,6 +38,8 @@ import com.sun.identity.idm.AMIdentity;
 import com.sun.identity.idm.IdRepoException;
 import com.sun.identity.shared.Constants;
 import com.sun.identity.shared.encode.Base64;
+import com.sun.identity.shared.encode.CookieUtils;
+
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
@@ -61,6 +63,7 @@ import javax.security.auth.login.LoginException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import static org.forgerock.openam.authentication.modules.oauth2.OAuthParam.*;
+
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.owasp.esapi.ESAPI;
@@ -139,13 +142,13 @@ public class OAuth extends AMLoginModule {
                 // parameters in the query. OAuth2 requires an identical URL 
                 // when retrieving the token
                 for (String domain : domains) {
-                   response.addCookie(OAuthUtil.setCookie(COOKIE_PROXY_URL,
-                        proxyURL, domain, "/"));                
-                   response.addCookie(OAuthUtil.setCookie(COOKIE_ORIG_URL,
-                        requestedURL, domain, "/")); 
+                   CookieUtils.addCookieToResponse(response,
+                           CookieUtils.newCookie(COOKIE_PROXY_URL, proxyURL, "/", domain));
+                    CookieUtils.addCookieToResponse(response,
+                            CookieUtils.newCookie(COOKIE_ORIG_URL, requestedURL, "/", domain));
                    if (ProviderLogoutURL != null && !ProviderLogoutURL.isEmpty()) {
-                        response.addCookie(OAuthUtil.setCookie(COOKIE_LOGOUT_URL,
-                                ProviderLogoutURL, domain, "/"));
+                       CookieUtils.addCookieToResponse(response,
+                               CookieUtils.newCookie(COOKIE_LOGOUT_URL, ProviderLogoutURL, "/", domain));
                    }
                 }
 
