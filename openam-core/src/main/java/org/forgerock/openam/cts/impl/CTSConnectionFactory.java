@@ -39,6 +39,9 @@ import java.text.MessageFormat;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReadWriteLock;
+import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 /**
  * Provides connections to the token store, which based on the state of the CTS configuration
@@ -46,6 +49,9 @@ import java.util.concurrent.TimeUnit;
  *
  * Note: This class delegates its connection behaviour to the DataLayerConnectionFactory in the
  * default case.
+ *
+ * The locking strategy used allows for concurrent requests for new connections, but when the
+ * underlying factory is changed all additional requests are blocked until the new factory is in place.
  *
  * @author robert.wapshott@forgerock.com
  * @author jonathan.scudder@forgerock.com
@@ -69,6 +75,10 @@ public class CTSConnectionFactory implements ConnectionFactory, ShutdownListener
     private final DataLayerConnectionFactory dlcf;
     private final LDAPConfig ldapConfig;
     private final ExternalTokenConfig external;
+
+    private final ReadWriteLock lock = new ReentrantReadWriteLock();
+    private final Lock writeLock = lock.writeLock();
+    private final Lock readLock = lock.readLock();
 
     private ConnectionFactory factory = null;
 
@@ -101,9 +111,15 @@ public class CTSConnectionFactory implements ConnectionFactory, ShutdownListener
      * Synchronized because we want to avoid CTS operations happening at the same time
      * as the connection reconfiguration.
      */
-    public synchronized void updateConnection() {
-        if (ldapConfig.hasChanged() || external.hasChanged()) {
-            reconfigureConnection();
+    public void updateConnection() {
+        try {
+            writeLock.lock();
+
+            if (ldapConfig.hasChanged() || external.hasChanged()) {
+                reconfigureConnection();
+            }
+        } finally {
+            writeLock.unlock();
         }
     }
 
@@ -112,7 +128,7 @@ public class CTSConnectionFactory implements ConnectionFactory, ShutdownListener
      *
      * If there was a previous connection open, this is then closed.
      */
-    private synchronized void reconfigureConnection() {
+    private void reconfigureConnection() {
         // Save the old factory temporarily
         ConnectionFactory previous = factory;
 
@@ -237,8 +253,13 @@ public class CTSConnectionFactory implements ConnectionFactory, ShutdownListener
      * @return a connection to the token store.
      * @throws ErrorResultException unable to provide a connection.
      */
-    public synchronized Connection getConnection() throws ErrorResultException {
-        return factory.getConnection();
+    public Connection getConnection() throws ErrorResultException {
+        try {
+            readLock.lock();
+            return factory.getConnection();
+        } finally {
+            readLock.unlock();
+        }
     }
 
     /**
@@ -247,7 +268,12 @@ public class CTSConnectionFactory implements ConnectionFactory, ShutdownListener
      * @return an asynchronous connection.
      */
     public FutureResult<Connection> getConnectionAsync(ResultHandler<? super Connection> resultHandler) {
-        return factory.getConnectionAsync(resultHandler);
+        try {
+            readLock.lock();
+            return factory.getConnectionAsync(resultHandler);
+        } finally {
+            readLock.unlock();
+        }
     }
 
     /**
