@@ -1210,8 +1210,6 @@
     <primary>Authentication</primary>
     <secondary>Core</secondary>
    </indexterm>
-
-      <!-- Relatively major changes here, definitions taken from elsewhere in the doc -->
    
       <itemizedlist>
       <para>The Core Authentication module is divided into seven sections:</para>
@@ -1341,8 +1339,13 @@
     </section>
 
     <section xml:id="auth-core-persistent-cookie">
-          <title>Core - Persistent Cookie</title>
-          <para>This section of the Core Authentication module covers the Persistent Cookie section.</para>
+     <title>Core - Persistent Cookie (Legacy)</title>
+     <para>This section of the Core Authentication module covers the Persistent Cookie options.</para>
+
+     <note><para>Two methods are available in OpenAM to configure persistent cookies. The options described
+     here and in <xref linkend="authn-from-browser" /> specify one method. There is also a new module,
+     described in <xref linkend="persistent-cookie" />. If you want to set up persistent cookies, you are
+     encouraged to use the new module. The options described here have no effect on that module.</para></note>
 
     <variablelist>
     <varlistentry>
@@ -3674,7 +3677,9 @@
   <section xml:id="persistent-cookie">
       <title>Hints for the Persistent Cookie Module</title>
       <para>The Persistent Cookie module supports configuration of cookie lifetimes, based
-      on requests and a maximum time.</para>
+      on requests and a maximum time. It is the preferred method for creating a persistent cookie.
+      If you choose this method, be aware that it does not interact with the persistent cookie
+      options associated with the Core Authentication module.</para>
 
       <indexterm>
           <primary>Cookie</primary>
@@ -3683,6 +3688,10 @@
 
       <para><command>ssoadm</command> service name:
       <literal>iPlanetAMAuthPersistentCookieService</literal></para>
+
+      <para>To configure the Persistent Cookie Module globally in the console, navigate to
+      Configuration &gt; Authentication &gt; Persistent Cookie. In the window that appears
+      you should see the following attributes:</para>
 
       <variablelist>
           <varlistentry>
@@ -3703,6 +3712,39 @@
               </listitem>
           </varlistentry>
       </variablelist>
+
+      <para>The Persistent Cookie module belongs with a second module in an authentication chain. To see how
+      this works, navigate to Access Control &gt; <replaceable>Realm Name</replaceable> &gt; Authentication &gt; New.
+      Enter a name for the chain and add modules as shown in the figure. The following example shows how a
+      Persistent Cookie module is sufficient; if that cookie does not yet exist, authentication in this case
+      relies on a data store module such as LDAP.</para>
+
+      <mediaobject xml:id="figure-persistent-cookie">
+          <alt>Including the Persistent Cookie module in an authentication chain</alt>
+          <imageobject>
+              <imagedata fileref="images/persistent-cookie-mod.png" format="PNG" />
+          </imageobject>
+          <textobject><para>When placed before an LDAP module, the Persistent Cookie module can authenticate
+              before referring to an LDAP data store such as OpenDJ.
+          </para></textobject>
+      </mediaobject>
+
+      <para>Scroll down in the properties page for the chain. You should set the
+      <literal>PersistentCookieAuthModule</literal> as shown in the following figure:</para>
+
+      <mediaobject xml:id="figure-persistent-cookie-class">
+          <alt>Including the Persistent Cookie attribute in the post processing class</alt>
+          <imageobject>
+              <imagedata fileref="images/persistent-cookie-class.png" format="PNG" />
+          </imageobject>
+          <textobject><para>The Persistent Cookie in a post processing class</para></textobject>
+      </mediaobject>
+
+      <para>You should now be able to authenticate automatically, as long as the cookie exists
+      for the associated domain.</para>
+
+      <note><para>Unlike the legacy Core Authentication module, the Persistent Cookie module does not
+      support the iPSPCookie option described in <xref linkend="authn-from-browser" /></para></note>
 
   </section>
 
@@ -4369,6 +4411,8 @@
    <varlistentry>
     <term>iPSPCookie=yes</term>
     <listitem>
+     <para>Applicable only if you configure persistent cookies based on
+     <xref linkend="auth-core-persistent-cookie" /></para>
      <para>Request that OpenAM return a persistent cookie that remains in the
      browser after the browser is closed, allowing the user to login again
      without being prompted for credentials. This only works if you have
@@ -4408,7 +4452,8 @@
      Then, to request the cookie, use
      <literal>openam.session.persist_am_cookie=Yes</literal> as one of the
      query string parameters in the login URL.</para>
-     <note><para>The XUI does not support <literal>iPSPCookie</literal>.</para></note>
+     <note><para>Neither the XUI nor the Persistent Cookie
+     module supports the deprecated <literal>iPSPCookie</literal>.</para></note>
     </listitem>
    </varlistentry>
    <varlistentry>
