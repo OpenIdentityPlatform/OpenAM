@@ -1226,6 +1226,41 @@ $ java -server -Xmx1024m -XX:MaxPermSize=256m -jar start.jar</screen>
     </para>
    </listitem>
   </orderedlist>
+
+   <para>
+    When deploying OpenAM on WebLogic 11g (version 10.3.x),
+    use the SOAP with Attachments API for Java (SAAJ) implementation
+    from the Java Runtime Environment, rather than the WebLogic implementation.
+
+    The WebLogic implementation can cause OpenAM to throw exceptions with the
+    message <literal>java.lang.UnsupportedOperationException:
+    This class does not support SAAJ 1.1</literal>,
+    and to fail to authenticate users in some cases.
+
+    No change is necessary when deploying OpenAM on WebLogic 12c.
+   </para>
+
+   <para>
+    To use the Sun/Oracle Java SAAJ implementation,
+    edit the WebLogic start up script for the domain where OpenAM runs, such as
+    <filename>/path/to/weblogic/user_projects/domains/wlsdomain/bin/startWebLogic.sh</filename>.
+
+    Change the following line:
+
+    <programlisting language="shell"
+    >${DOMAIN_HOME}/bin/startWebLogic.sh $*</programlisting>
+
+    To set the <literal>javax.xml.soap.MessageFactory</literal> property:
+
+    <programlisting language="shell"
+    >${DOMAIN_HOME}/bin/startWebLogic.sh \
+-Djavax.xml.soap.MessageFactory=\
+com.sun.xml.internal.messaging.saaj.soap.ver1_1.SOAPMessageFactory1_1Impl $*</programlisting>
+   </para>
+
+   <para>
+    Restart WebLogic for the change to take effect.
+   </para>
  </section>
 
  <section xml:id="prepare-ibm-websphere">
