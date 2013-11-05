@@ -1107,7 +1107,7 @@ com.sun.identity.agents.config.cdsso.cookie.domain[1]=.example.net</literallayou
      based on incoming request URL -->
      <term>OpenAM Conditional Login URL (Not yet in OpenAM console)</term>
 
-     <xinclude:include href='../shared/listitem-conditional-login-url.xml' />
+     <xinclude:include href="../shared/listitem-conditional-login-url-web.xml" />
 
     </varlistentry>
     <varlistentry>
@@ -2736,7 +2736,7 @@ com.sun.identity.agents.config.cdsso.cookie.domain[1]=.example.net</literallayou
     <varlistentry>
      <term>OpenAM Conditional Login URL (Not yet in OpenAM console)</term>
 
-     <xinclude:include href='../shared/listitem-conditional-login-url.xml' />
+     <xinclude:include href="../shared/listitem-conditional-login-url-jee.xml" />
 
     </varlistentry>
     <varlistentry>
@@ -2784,8 +2784,8 @@ com.sun.identity.agents.config.cdsso.cookie.domain[1]=.example.net</literallayou
       <para>The values take the incoming request URL to match and a
       comma-separated list of URLs to which to redirect users logging
       out.</para>
-      <para>Property: <literal>com.forgerock.agents.conditional.logout.url</literal></para>
-      <para>Example: <literal>com.forgerock.agents.conditional.logout.url[0]=
+      <para>Property: <literal>com.sun.identity.agents.config.conditional.logout.url</literal></para>
+      <para>Example: <literal>com.sun.identity.agents.config.conditional.logout.url[0]=
       logout.example.com|http://openam1.example.com/openam/UI/Logout,
       http://openam2.example.com/openam/UI/Logout</literal></para>
      </listitem>

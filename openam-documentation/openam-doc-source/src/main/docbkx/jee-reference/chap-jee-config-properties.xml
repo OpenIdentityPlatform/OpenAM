@@ -510,9 +510,28 @@
    <varlistentry>
     <term><literal>com.sun.identity.agents.config.conditional.login.url</literal></term>
 
-     <xinclude:include href='../shared/listitem-conditional-login-url.xml' />
+     <xinclude:include href="../shared/listitem-conditional-login-url-jee.xml" />
 
    </varlistentry>
+
+   <varlistentry>
+    <term><literal>com.sun.identity.agents.config.conditional.logout.url</literal></term>
+
+    <listitem>
+     <para>
+      The values take the incoming request URL to match
+      and a comma-separated list of URLs to which to redirect users logging out.
+     </para>
+
+     <para>
+      Example:
+      <literal>com.sun.identity.agents.config.conditional.logout.url[0]=
+      logout.example.com|http://openam1.example.com/openam/UI/Logout,
+      http://openam2.example.com/openam/UI/Logout</literal>
+     </para>
+    </listitem>
+   </varlistentry>
+
    <varlistentry>
     <term><literal>com.sun.identity.agents.config.cookie.reset.domain</literal></term>
     <listitem>
