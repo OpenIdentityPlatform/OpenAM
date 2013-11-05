@@ -488,7 +488,7 @@
    <varlistentry>
     <term><literal>com.forgerock.agents.conditional.login.url</literal></term>
 
-     <xinclude:include href='../shared/listitem-conditional-login-url.xml' />
+     <xinclude:include href="../shared/listitem-conditional-login-url-web.xml" />
 
    </varlistentry>
 
