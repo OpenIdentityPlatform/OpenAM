@@ -17,6 +17,8 @@
 package org.forgerock.openam.jaspi.filter;
 
 import org.forgerock.jaspi.container.AuthConfigFactoryImpl;
+import org.forgerock.json.resource.NotFoundException;
+import org.forgerock.openam.forgerockrest.RestDispatcher;
 import org.mockito.Matchers;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
@@ -34,6 +36,8 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
 
 import static org.mockito.Mockito.*;
 import static org.mockito.BDDMockito.*;
@@ -42,9 +46,14 @@ public class AMAuthNFilterTest {
 
     private AMAuthNFilter amAuthNFilter;
 
+    private RestDispatcher restDispatcher;
+
     @BeforeMethod
     public void setUp() throws AuthException {
-        amAuthNFilter = spy(new AMAuthNFilter());
+
+        restDispatcher = mock(RestDispatcher.class);
+
+        amAuthNFilter = spy(new AMAuthNFilter(restDispatcher));
 
         //Set up underlying AuthNFilter to always fail so if the AMAuthNFilter lets the request through we can confirm
         // FilterChain.doFilter() is never called.
@@ -66,7 +75,8 @@ public class AMAuthNFilterTest {
     }
 
     @Test
-    public void shouldAllowUnauthenticatedRestAuthEndpointWithPOST() throws IOException, ServletException {
+    public void shouldAllowUnauthenticatedRestAuthEndpointWithPOST() throws IOException, ServletException,
+            NotFoundException {
 
         //Given
         HttpServletRequest request = mock(HttpServletRequest.class);
@@ -79,6 +89,10 @@ public class AMAuthNFilterTest {
         given(request.getRequestURL()).willReturn(new StringBuffer("http://example.com:8080/openam"));
         given(request.getContextPath()).willReturn("/openam");
 
+        Map<String, String> details = new HashMap<String, String>();
+        details.put("resourceName", "/authenticate");
+        given(restDispatcher.getRequestDetails("/authenticate")).willReturn(details);
+
         //When
         amAuthNFilter.doFilter(request, response, filterChain);
 
@@ -88,7 +102,7 @@ public class AMAuthNFilterTest {
 
     @Test
     public void shouldAllowUnauthenticatedRestUsersEndpointWithPOSTAndActionRegister() throws IOException,
-            ServletException {
+            ServletException, NotFoundException {
 
         //Given
         HttpServletRequest request = mock(HttpServletRequest.class);
@@ -100,6 +114,10 @@ public class AMAuthNFilterTest {
         given(request.getQueryString()).willReturn("other1=valueA&_action=register&other2=valueb");
         given(request.getMethod()).willReturn("POST");
 
+        Map<String, String> details = new HashMap<String, String>();
+        details.put("resourceName", "/users");
+        given(restDispatcher.getRequestDetails("/users")).willReturn(details);
+
         //When
         amAuthNFilter.doFilter(request, response, filterChain);
 
@@ -109,7 +127,7 @@ public class AMAuthNFilterTest {
 
     @Test
     public void shouldAllowUnauthenticatedRestUsersEndpointWithPOSTAndActionConfirm() throws IOException,
-            ServletException {
+            ServletException, NotFoundException {
 
         //Given
         HttpServletRequest request = mock(HttpServletRequest.class);
@@ -121,6 +139,10 @@ public class AMAuthNFilterTest {
         given(request.getQueryString()).willReturn("other1=valueA&_action=confirm&other2=valueb");
         given(request.getMethod()).willReturn("POST");
 
+        Map<String, String> details = new HashMap<String, String>();
+        details.put("resourceName", "/users");
+        given(restDispatcher.getRequestDetails("/users")).willReturn(details);
+
         //When
         amAuthNFilter.doFilter(request, response, filterChain);
 
@@ -130,7 +152,7 @@ public class AMAuthNFilterTest {
 
     @Test
     public void shouldAllowUnauthenticatedRestUsersEndpointWithPOSTAndActionForgotPassword() throws IOException,
-            ServletException {
+            ServletException, NotFoundException {
 
         //Given
         HttpServletRequest request = mock(HttpServletRequest.class);
@@ -142,6 +164,10 @@ public class AMAuthNFilterTest {
         given(request.getQueryString()).willReturn("other1=valueA&_action=forgotPassword&other2=valueb");
         given(request.getMethod()).willReturn("POST");
 
+        Map<String, String> details = new HashMap<String, String>();
+        details.put("resourceName", "/users");
+        given(restDispatcher.getRequestDetails("/users")).willReturn(details);
+
         //When
         amAuthNFilter.doFilter(request, response, filterChain);
 
@@ -151,7 +177,7 @@ public class AMAuthNFilterTest {
 
     @Test
     public void shouldAllowUnauthenticatedRestUsersEndpointWithPOSTAndActionForgotPasswordReset() throws IOException,
-            ServletException {
+            ServletException, NotFoundException {
 
         //Given
         HttpServletRequest request = mock(HttpServletRequest.class);
@@ -163,6 +189,10 @@ public class AMAuthNFilterTest {
         given(request.getQueryString()).willReturn("other1=valueA&_action=forgotPasswordReset&other2=valueb");
         given(request.getMethod()).willReturn("POST");
 
+        Map<String, String> details = new HashMap<String, String>();
+        details.put("resourceName", "/users");
+        given(restDispatcher.getRequestDetails("/users")).willReturn(details);
+
         //When
         amAuthNFilter.doFilter(request, response, filterChain);
 
@@ -172,7 +202,7 @@ public class AMAuthNFilterTest {
 
     @Test
     public void shouldANotllowUnauthenticatedRestUsersEndpointWithPOSTAndActionForgotIdFromSession() throws IOException,
-            ServletException {
+            ServletException, NotFoundException {
 
         //Given
         HttpServletRequest request = mock(HttpServletRequest.class);
@@ -185,6 +215,10 @@ public class AMAuthNFilterTest {
         given(request.getMethod()).willReturn("POST");
         given(request.getRequestURL()).willReturn(new StringBuffer("http://www.example.com"));
 
+        Map<String, String> details = new HashMap<String, String>();
+        details.put("resourceName", "/users");
+        given(restDispatcher.getRequestDetails("/users")).willReturn(details);
+
         //When
         amAuthNFilter.doFilter(request, response, filterChain);
 
@@ -194,7 +228,7 @@ public class AMAuthNFilterTest {
 
     @Test
     public void shouldNotAllowUnauthenticatedRestUsersEndpointWithGET() throws IOException,
-            ServletException {
+            ServletException, NotFoundException {
 
         //Given
         HttpServletRequest request = mock(HttpServletRequest.class);
@@ -205,6 +239,10 @@ public class AMAuthNFilterTest {
         given(request.getRequestURI()).willReturn("/openam/json/users");
         given(request.getMethod()).willReturn("GET");
         given(request.getRequestURL()).willReturn(new StringBuffer("http://www.example.com"));
+
+        Map<String, String> details = new HashMap<String, String>();
+        details.put("resourceName", "/users");
+        given(restDispatcher.getRequestDetails("/users")).willReturn(details);
 
         //When
         amAuthNFilter.doFilter(request, response, filterChain);
