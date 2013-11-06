@@ -92,24 +92,25 @@
   </itemizedlist>
 
   <para>This chapter also includes a section on <xref linkend="rest-api-status-codes" />.</para>
-  
-  <para>For the examples in this chapter, OpenAM has c66Encode for cookies
-  activated. The encoding ensures that OpenAM tokens need not be percent
-  encoded before being submitted with a request.</para>
-  
-  <literallayout class="monospaced">AQIC5wM2LY4SfczntBbXvEAOuECbqMY3J4NW3byH6xwgkGE.*AAJTSQACMDE.*</literallayout>
-  
-  <para>Without c66Encode activated, the same token might look like this.</para>
-  
-  <literallayout class="monospaced">AQIC5wM2LY4SfczntBbXvEAOuECbqMY3J4NW3byH6xwgkGE=@AAJTSQACMDE=#</literallayout>
-  
-  <para>In the latter example, you would have to <link
-  xlink:href="http://en.wikipedia.org/wiki/Percent-encoding">percent
-  encode</link> the <literal>=</literal>, <literal>@</literal>, and
-  <literal>#</literal> characters in your requests.</para>
 
-  <para><emphasis>C66Encode</emphasis> Cookie URIs are translated into an
-  c66Encode format. As such, certain characters are substituted for others:</para>
+  <para>In this chapter, long URLs are wrapped to fit the printed page, as some
+  of the output is formatted for easier reading.</para>
+ </section>
+
+ <section xml:id="c66-encoding">
+  <title>Token Encoding</title>
+
+  <para>Valid tokens in OpenAM requires configuration either in percent encoding or in <emphasis>C66Encode</emphasis>
+  format. C66Encode format is encouraged. It is the default token format for OpenAM, and is used in this chapter.
+  The following is an example token that has not been encoded:</para>
+
+  <literallayout class="monospaced">AQIC5wM2LY4SfczntBbXvEAOuECbqMY3J4NW3byH6xwgkGE=@AAJTSQACMDE=#</literallayout>
+
+  <para>This token includes reserved characters such as <literal>+</literal>, <literal>/</literal>,
+  and <literal>=</literal> (The <literal>@</literal>, <literal>#</literal>, and <literal>*</literal> are not
+  reserved characters per se, but substitutions are still required). To c66encode this token,
+  you would substitute certain characters for others, as follows:</para>
+
   <programlisting language="none">+ is replaced with -
 / is replaced with _
 = is replaced with .
@@ -117,9 +118,11 @@
 # is repalced with *
 * (first instance) is replaced with @
 * (subsequent instances) is replaced with #</programlisting>
-  
-  <para>In this chapter, long URLs are wrapped to fit the printed page, as some
-  of the output is formatted for easier reading.</para>
+
+  <para>In this case, the translated token would appear as shown here:</para>
+
+  <literallayout class="monospaced">AQIC5wM2LY4SfczntBbXvEAOuECbqMY3J4NW3byH6xwgkGE.*AAJTSQACMDE.*</literallayout>
+
  </section>
  
  <section xml:id="rest-api-auth">
