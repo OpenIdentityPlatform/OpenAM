@@ -2161,17 +2161,6 @@
    </varlistentry>
 
    <varlistentry>
-    <term>Forgot Password for Users</term>
-    <listitem>
-      <para>If enabled, users can assign themselves a new password using a REST API client.</para>
-      <para>Default: not enabled</para>
-
-      <para><command>ssoadm</command> attribute:
-      <literal>forgerockRESTSecurityForgotPasswordEnabled</literal></para>
-    </listitem>
-   </varlistentry>
-
-   <varlistentry>
     <term>Self-Registration Token LifeTime (seconds)</term>
     <listitem>
      <para>Maximum life time for the token allowing user self-registration using
@@ -2181,6 +2170,37 @@
 
      <para><command>ssoadm</command> attribute:
      <literal>forgerockRESTSecuritySelfRegTokenTTL</literal></para>
+    </listitem>
+   </varlistentry>
+
+   <varlistentry>
+    <term>Self-Registration Confirmation Email URL</term>
+    <listitem>
+     <para>
+      This page handles the HTTP GET request
+      when the user clicks the link sent by email in the confirmation request.
+     </para>
+
+     <para>
+      Default:
+      <literal><replaceable>deployment-base-url</replaceable>/XUI/confirm.html</literal>
+      where <replaceable>deployment-base-url</replaceable> is something like
+      <literal>https://openam.example.com:8443/openam</literal>
+     </para>
+
+     <para><command>ssoadm</command> attribute:
+     <literal>forgerockRESTSecuritySelfRegConfirmationUrl</literal></para>
+    </listitem>
+   </varlistentry>
+
+   <varlistentry>
+    <term>Forgot Password for Users</term>
+    <listitem>
+      <para>If enabled, users can assign themselves a new password using a REST API client.</para>
+      <para>Default: not enabled</para>
+
+      <para><command>ssoadm</command> attribute:
+      <literal>forgerockRESTSecurityForgotPasswordEnabled</literal></para>
     </listitem>
    </varlistentry>
 
@@ -2196,6 +2216,27 @@
      <literal>forgerockRestSecurityForgotPassTokenTTL</literal></para>
     </listitem>
    </varlistentry>
+
+   <varlistentry>
+    <term>Forgot Password Confirmation Email URL</term>
+    <listitem>
+     <para>
+      This page handles the HTTP GET request
+      when the user clicks the link sent by email in the confirmation request.
+     </para>
+
+     <para>
+      Default:
+      <literal><replaceable>deployment-base-url</replaceable>/XUI/confirm.html</literal>
+      where <replaceable>deployment-base-url</replaceable> is something like
+      <literal>https://openam.example.com:8443/openam</literal>
+     </para>
+
+     <para><command>ssoadm</command> attribute:
+     <literal>forgerockRESTSecurityForgotPassConfirmationUrl</literal></para>
+    </listitem>
+   </varlistentry>
+
   </variablelist>
 
   <variablelist xml:id="saml2-service-configuration">
