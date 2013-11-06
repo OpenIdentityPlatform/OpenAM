@@ -69,7 +69,13 @@ public class CoreTokenAdapter {
         this.ldapAdapter = ldapAdapter;
 
         // Register the listener to respond to configuration changes which will trigger an update to the connection
-        observer.addListener(listener);
+        /*
+            Commented-out due to OPENAM-3213. If we wish to support on-the-fly manipulation of CTS LDAP connectivity state,
+            then re-initializing this context may have to take place at a layer lower than the CTSConnectionFactory. If
+            we don't require this support, then the CoreTokenConfigListener and related functionality in the CTSConnectionFactory
+            can be removed.
+         */
+//        observer.addListener(listener);
     }
 
     /**

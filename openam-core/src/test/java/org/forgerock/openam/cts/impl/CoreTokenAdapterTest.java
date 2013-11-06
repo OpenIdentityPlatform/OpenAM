@@ -76,7 +76,7 @@ public class CoreTokenAdapterTest {
                 mockDebug);
     }
 
-    @Test
+//    @Test
     public void shouldAddListenerToObserver() {
         // Given
         // When
