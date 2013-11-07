@@ -35,43 +35,59 @@
     <primary>Core Token Service</primary>
   </indexterm>
 
-  <para>The Core Token Service (CTS) provides token storage for a several components within OpenAM, including
-  sessions, OAuth and SAML. CTS tokens for sessions represent an authenticated user. The CTS is set up in
-  a generalized token storage format, suitable for sessions, as well as persistence in OAuth 2.0 and SAML
-  tokens.</para>
+  <para>The Core Token Service (CTS) provides persistent and highly available token storage for a several
+  components within OpenAM, including sessions, as well as OAuth 2.0 and SAML 2.0 tokens. The CTS is set up in
+  a generalized token storage format. That format is always used for OAuth 2.0 tokens. If so configured,
+  it is also used to ensure persistence of session and SAML 2.0 tokens.</para>
 
-  <para>The CTS relies on a directory service such as OpenDJ to store tokens. By default, the CTS uses the same
-  directory service as is set up for OpenAM's configuration data store. The configuration and policy data
-  in the configuration data store normally change slowly. In contrast, CTS tokens are as volatile as the
-  user sessions they represent. This chapter describes how to set up the CTS in a separate data store within
-  the OpenDJ directory service.</para>
+  <para>The CTS relies on OpenDJ to store and replicate tokens. No other directory service
+  is supported for CTS. By default, the CTS uses the same embedded or external directory service as is
+  configured for OpenAM's configuration data store.</para>
 
-  <para>To set up CTS in a separate data store, you have to set up indexes to allow OpenAM to search the
-  data in an efficient manner, Access Control Instructions (ACIs) to give a user Create, Read, Update, and
-  Delete (CRUD) privileges, and schema definitions that prevent OpenDJ from rejecting the data as invalid.
-  But first, you should configure basic parameters for the CTS token data store.</para>
+  <para>CTS tokens may change frequently. Other data stored in an OpenDJ server is considerably more static.
+  The relative performance tuning requirements are quite different. If your deployment is large, that may justify
+  going beyond the default configuration. Nevertheless, it is easier to configure CTS if you can stick with
+  the OpenDJ server embedded in an OpenAM installation.</para>
+
+  <para>If you use the OpenDJ service embedded within OpenAM, CTS schema is automatically included. But
+  the capabilities of the embedded OpenDJ instance is limited.</para>
+
+  <para>This chapter describes how to set up the CTS in a separate backend, also known as a
+  subtree. You can configure that backend in an embedded or an external instance of OpenDJ. When you
+  configure a subtree for CTS, you can customize performance tuning requirements appropriately.</para>
+
+  <para>If you choose to set up CTS in an external instance of OpenDJ, you will have to install OpenDJ
+  separately. For more information, see the <link xlink:show="new"
+  xlink:href="http://docs.forgerock.org/en/opendj/2.6.0/install-guide/"
+  xlink:role="http://docbook.org/xlink/role/olink"><citetitle>OpenDJ Installation Guide</citetitle></link>.</para>
+
+  <para>Once you have installed OpenDJ on an external server, you can set up schema definitions,
+  specify tokens in a valid LDAP format, configure indexes to allow OpenAM to retrieve tokens,
+  and quite possibly Access Control Instructions (ACIs) to give an appropriate user Create, Read,
+  Update, and Delete (CRUD) privileges. But first, you should configure basic parameters for the CTS token
+  data store in the OpenAM console.</para>
 
   <section xml:id="cts-config">
     <title>CTS Configuration Parameters</title>
 
-      <!--  Option for "hot" updates may be in work -->
-
-    <para>If you have previously configured CTS, be prepared. Before making any changes, disable client
-    access to OpenAM. The actions taken in this screen may eliminate existing CTS session, OAuth 2.0,
-    and SAML tokens.</para>
+    <para>If you want to reconfigure an existing implementation of CTS, be prepared. Any reconfiguration
+    will orphan any tokens that are currently stored. To keep this from happening, disable client access
+    to OpenAM before making any changes. Any changes require a server restart to put them into
+    effect.</para>
 
     <para>To access the main CTS configuration page from the console, select Configuration &gt; Servers and Sites &gt;
     Default Server Settings &gt; CTS. The options that appear in the screenshot that follows are detailed in the
     <link xlink:show="new" xlink:href="reference#servers-cts" xlink:role="http://docbook.org/xlink/role/olink">
-    <citetitle>Reference</citetitle></link> document. You can set a root suffix for CTS tokens. If you select
-    <literal>Default Token Store</literal>, CTS tokens are stored in the same external or embedded data store
-    as is used for other LDAP information used for the configuration. If you select <literal>External Token
-    Store</literal>, that assumes you have configured separate external CTS servers.</para>
+    <citetitle>Reference</citetitle></link> document. You can set a root suffix for CTS tokens in either the
+    configuration store or an external token store.</para>
 
-    <note><para>If desired, you could make these changes from the command line with the <link xlink:show="new"
-    xlink:href="reference#ssoadm-update-server-cfg" xlink:role="http://docbook.org/xlink/role/olink">
-    <command>ssoadm update-server-cfg</command></link> command, as described in the
-    Reference Guide.</para></note>
+    <para>If you select <literal>Default Token Store</literal>, OpenAM will use the embedded configuration
+    store for CTS tokens.</para>
+
+    <note><para>If desired, you could make these changes from the command line with variations on the
+    <link xlink:show="new" xlink:href="reference#ssoadm-update-server-cfg"
+    xlink:role="http://docbook.org/xlink/role/olink"><command>ssoadm update-server-cfg</command></link>
+    command, as described in the OpenAM Reference document.</para></note>
 
     <mediaobject xml:id="cts-default-store">
         <alt>Configuring Default Server CTS Options</alt>
@@ -83,17 +99,21 @@
         </textobject>
     </mediaobject>
 
-    <para>Plausible options have been entered in the figure. If the <literal>External Token Store</literal>
+    <para>Possible options have been entered in the figure. If the <literal>External Token Store</literal>
     is selected, entries are required in all text boxes. The options shown in the figure are:</para>
 
       <itemizedlist>
        <listitem>
         <para><literal>Root Suffix</literal></para>
-        <para><literal>ou=tokenex,dc=openam,dc=forgerock,dc=org</literal></para>
+        <para><literal>ou=ctsData,dc=openam,dc=example,dc=com</literal></para>
+        <para>It is helpful to have a unique value in this text box, as it allows CTS to be stored in
+        a unique container. If configured on an external OpenDJ server,
+        it allows you to set up unique values for backup and replication for that CTS token store. Other
+        references will be made to this <literal>ctsData</literal> root suffix.</para>
        </listitem>
        <listitem>
         <para><literal>SSL/TLS Enabled</literal></para>
-        <para>enabled (assumes communications using StartTLS over port 389)</para>
+        <para>disabled</para>
        </listitem>           
        <listitem>
         <para><literal>Directory Name</literal></para>
@@ -105,7 +125,9 @@
        </listitem>
        <listitem>
         <para><literal>Login Id</literal></para>
-        <para><literal>cn=Directory Manager</literal></para>
+        <para><literal>uid=openam,ou=admins,dc=example,dc=com</literal></para>
+        <para>It may be easier to substitute the standard <literal>cn=Directory Manager</literal> administrative
+        user in this text box.</para>
        </listitem>
        <listitem>
         <para><literal>Password</literal></para>
@@ -129,13 +151,28 @@
  <section xml:id="cts-schema">
     <title>Preparing an OpenDJ Directory Service for CTS</title>
 
-    <para>OpenAM stores volatile CTS token data in an LDAP directory service. To make that possible, you need
-    to set up the associated data store indexes, which allow OpenAM to search CTS token data in an efficient
+    <para>OpenAM stores volatile CTS token data in an instance of OpenDJ. To make that possible, OpenDJ needs
+    the associated configuration store indexes, which allow OpenAM to search CTS token data in an efficient
     manner.</para>
 
-    <para>You can add the CTS schema with a command such as the following:</para>
-    <screen>$ /path/to/opendj/bin/ldapmodify --port 389 --bindDN "cn=Directory Manager" \
---bindPassword password --filename cts-add-schema.ldif</screen>
+    <para>Different schema files are available in the
+    <filename>/path/to/webapps/openam/WEB-INF/template/ldif/sfha</filename> directory. If you install OpenAM
+    with the embedded version of OpenDJ, the schema from the <filename>cts-add-schema.ldif</filename>,
+    <filename>cts-container.ldif</filename>, and <filename>cts-indicies.ldif</filename> files are installed.
+    If you upgrade to OpenAM <?eval ${serverDocTargetVersion}?> from a previous version with embedded OpenDJ,
+    the schema from the <filename>99-cts-add-schema-backport.ldif</filename> file is incorporated in your
+    upgrade.</para>
+
+    <para>However, if you are configuring an external CTS server, you may need to add schema from
+    the CTS Data Store Indexes table shown below. To do so, you can use the <command>dsconfig</command>
+    command depicted in the OpenDJ Administration Guide chapter on <link xlink:show="new"
+    xlink:href="http://docs.forgerock.org/en/opendj/2.6.0/admin-guide/#configure-indexes"
+    xlink:role="http://docbook.org/xlink/role/olink"><citetitle>Configuring a Standard Index</citetitle></link>.</para>
+
+    <para>If you do create indexes for an external OpenDJ CTS server, you need to "rebuild" the indexes with
+    the <command>rebuild-index</command> command described in the OpenDJ Administration Guide
+    chapter on <link xlink:show="new" xlink:href="http://docs.forgerock.org/en/opendj/2.6.0/admin-guide/#rebuild-index"
+    xlink:role="http://docbook.org/xlink/role/olink"><citetitle>Rebuilding Indexes</citetitle></link>.</para>
 
     <table xml:id="cts-configuration-store-indexes">
           <title>CTS Data Store Indexes</title>
@@ -289,21 +326,21 @@
   <section xml:id="cts-acis">
     <title>CTS Access Control Instructions</title>
 
-    <para>Now you can set up a user with access to CTS tokens in the data store. Specifically, you will need
-    to configure a user such as <literal>openam</literal> with Create, Read, Update, and Delete (CRUD) privileges.
+    <para>At least the first time you try CTS, do so with a login ID of <literal>cn=Directory Manager</literal>.
+    It can simplify configuration. You can use these instructions to set up a privileged user later.</para>
+
+    <para>When ready, you can set up a user with access to CTS tokens in the data store. To do so,
+    configure a user such as <literal>openam</literal> with Create, Read, Update, and Delete (CRUD) privileges.
     For the given Root Suffix and user name, you might have a User DN of
     <literal>uid=openam,ou=admins,dc=example,dc=org</literal>. In brief, ACI attributes are formatted with the
     following syntax:</para>
 
     <literallayout class="monospaced">
-    <replaceable>targets</replaceable>(version 3.0;acl "<replaceable>name</replaceable>";<replaceable>permissions subjects</replaceable>;)
+<replaceable>targets</replaceable>(version 3.0;acl "<replaceable>name</replaceable>";<replaceable>permissions subjects</replaceable>;)
     </literallayout>
 
     <para>The following entries give an <literal>openam</literal> user CRUD privileges with the noted User DN,
     for an external directory service:</para>
-
-    <!-- Ordering changed from the "Preparing a Configuration Data Store" section to match CRUD;
-    I'm assuming a "Create" ACI is not needed, as the tokens to manage are already there? (tell me if I'm mistaken) -->
 
     <programlisting language="ldif">aci: (version 3.0;acl "Add config entry"; allow (add)(userdn = "ldap:///
   uid=openam,ou=admins,dc=example,dc=org");)
@@ -317,40 +354,114 @@ aci: (targetcontrol="2.16.840.1.113730.3.4.3")(version 3.0;acl "Allow
   persistent search"; allow (search, read)(userdn = "ldap:///uid=openam,
   ou=admins,dc=example,dc=org");)</programlisting>
 
-    <para>For detailed information on ACIs, with details on how you can use the <command>ldapmodify</command>
-    and <command>dsconfig</command> commands to manage them, see the OpenDJ chapter on <link xlink:show="new"
-    xlink:href="http://docs.forgerock.org/en/opendj/2.6.0/admin-guide/#chap-privileges-acis"
+    <para>For detailed information on ACIs, with details on how you can use the <command>dsconfig</command>,
+    as well as various <command>ldap*</command> commands to configure them, see the OpenDJ chapter on
+    <link xlink:show="new" xlink:href="http://docs.forgerock.org/en/opendj/2.6.0/admin-guide/#chap-privileges-acis"
     xlink:role="http://docbook.org/xlink/role/olink">
     <citetitle>Configuring Privileges &amp; Access Control</citetitle></link>.</para>
+
+  </section>
+
+    <!-- Liberally copied from OpenDJ docs -->
+
+  <section xml:id="cts-replication">
+    <title>CTS and OpenDJ Replication</title>
+
+    <para>Replication in this context is the process of copying updates between directory servers to help all servers
+    converge to identical copies of directory, token, and session / SAML 2.0 / OAuth 2.0 data. OpenDJ uses advanced
+    data replication methods to ensure that directory services remain available in the event of a server crash or
+    network interruption.</para>
+
+    <para>The historical information needed to resolve the latest changes is periodically purged to avoid
+    growing to unmanageable sizes. The age at which the information is purged is known as the
+    <literal>replication-purge-delay</literal>.</para>
+
+    <para>With CTS, the default <literal>replication-purge-delay</literal> for OpenDJ is 3 days. Unless you have
+    configured a separate OpenDJ server for CTS data, you may have to balance the needs for backups, the requirements
+    for replication, disk space, and different useful lifetimes for CTS tokens and other OpenDJ data. So adjustments
+    may be required. One way to set a new period for <literal>replication-purge-delay</literal> of
+    <replaceable>n</replaceable> hours is with the following command:</para>
+
+    <screen>$ dsconfig
+set-replication-server-prop
+--port 4444
+--hostname opendj-cts.example.org
+--bindDN "cn=Directory Manager"
+--bindPassword password
+--provider-name "Multimaster Synchronization"
+--set replication-purge-delay:<replaceable>n</replaceable>h
+--no-prompt
+--trustStorePath /path/to/truststore</screen>
+
+     <para>At this point, you need to understand whether CTS data backups are important in your deployment.
+     Session, SAML 2.0, and OAuth 2.0 token data is often short-lived. In some deployments, the "worst-case"
+     scenario is that users have to log in again.</para>
+
+     <para>If CTS data backups are important in your deployment, be warned. OpenDJ backups that are older
+     than the <literal>replication-purge-delay</literal> are useless and must be discarded. You can use the
+     OpenDJ <command>backup</command> to schedule backups. For example, the following command uses
+     <literal>crontab</literal> format to configure daily backups
+     for a hypothetical Base DN of <literal>ctsData</literal> at x minutes after every hour:</para>
+
+     <screen> $ backup
+--port 4444
+--bindDN "cn="Directory Manager"
+--bindPassword password
+--backendID ctsData
+--backupDirectory /path/to/opendj/backup
+--recurringTask "x * * * *"
+--completionNotify backupadmin@example.org
+--errorNotify backupadmin@example.org</screen>
+
+   <para>Unless you have configured a separate instance of OpenDJ dedicated to CTS token storage, avoid using the
+   <command>--backupAll</command> option. CTS tokens are generally more volatile than other data stored in
+   an OpenDJ server, so it may be appropriate to set up different Base DNs with different
+   <command>backup</command> commands.</para>
+
+    <para>While you may choose to adjust the time periods associated with
+    <literal>replication-purge-frequency</literal> and backups, be sure that backups are performed more frequently.
+    Otherwise, change log records that are required to restore data may be lost.</para>
 
   </section>
 
   <section xml:id="cts-deployment">
     <title>CTS Deployment Scenario</title>
 
-    <para>One objective with CTS deployments is to avoid single points of failure (SPOF). Options to avoid
-    SPOFs include:</para>
+    <para>When properly configured, CTS can help your deployment avoid single points of failure (SPOF). Session
+    and SAML 2.0 tokens which are normally stored only in the memory of a single server are also written to the
+    CTS as a secondary token store. If the OpenAM instance that owns the session or SAML 2.0 token fails, a second
+    instance of OpenAM can allow access to the session or token. To reduce the impact of any given failure,
+    consider the following options:</para>
 
     <itemizedlist>
         <listitem>
-            <para>Isolating the directory service from OpenAM in separate external servers such as OpenDJ.</para>
+            <para>Start your implementation, if possible, with the CTS options available with the
+            OpenDJ instance embedded in OpenAM. You can still set up a different backend on the embedded
+            OpenDJ server. If the embedded OpenDJ server can handle your requirements, it
+            will simplify implementation of CTS.</para>
         </listitem>
         <listitem>
-            <para>Configuring multiple directory stores for CTS, set up with load balancer(s).</para>
+            <para>Isolate the user, configuration, and session stores from OpenAM in separate
+            external OpenDJ servers.</para>
         </listitem>
         <listitem>
-            <para>Adding separate servers for data store replication. For more information on how this is done
+            <para>Configure multiple directory stores for CTS, set up with load balancer(s).</para>
+        </listitem>
+        <listitem>
+            <para>Add separate servers for data store replication. For more information on how this is done
             with OpenDJ, see the OpenDJ documentation on <link xlink:show="new"
             xlink:href="http://docs.forgerock.org/en/opendj/2.6.0/admin-guide/#repl-dedicated-servers">
             <citetitle>Stand-alone Replication Servers</citetitle></link>.</para>
         </listitem>
         <listitem>
-            <para>Setting up redundancy in the load balancer connections between OpenAM and the external
+            <para>Set up redundancy in the load balancer connections between OpenAM and the external
             data store.</para>
         </listitem>
     </itemizedlist>
 
-    <para>A relatively simplified method for configuring a CTS deployment is depicted here:</para>
+    <para>Deployment is easier if your requirements can be handled by the embedded instance of OpenDJ. But that
+    may not be a viable for all situations. A relatively simplified method for configuring a more complex
+    CTS deployment is depicted here:</para>
 
     <mediaobject xml:id="cts-deploy">
         <alt>A Simplified CTS Deployment</alt>
@@ -363,7 +474,7 @@ aci: (targetcontrol="2.16.840.1.113730.3.4.3")(version 3.0;acl "Allow
     </mediaobject>
 
     <para>For clarity, the diagram does not include options that may be appropriate for a production deployment
-    such as firewalls and OpenAM agents.</para>
+    such as firewalls and OpenAM agents. It also does not include options required for multiple data centers.</para>
 
   </section>
 
@@ -413,8 +524,8 @@ aci: (targetcontrol="2.16.840.1.113730.3.4.3")(version 3.0;acl "Allow
    corresponding value in the <literal>Property Value</literal> column. To enable them, change <literal>false</literal>
    to <literal>true</literal> in the Property Value column associated with the desired property, and click Save.</para>
 
-   <note><para>If you are using SFO, or if you are using an external CTS directory, be careful with these options.
-   If you want to enable compression or encryption, you will then have to enable all three on every instance of OpenAM
+   <note><para>If you are using SFO, or if you are using an external CTS directory, be consistent with these options.
+   If you want to enable compression or encryption, you should enable all three on every instance of OpenAM
    within a deployment or replication group: <literal>com.sun.identity.session.repository.enableEncryption</literal>,
    <literal>com.sun.identity.session.repository.enableCompression</literal>, and
    <literal>com.sun.identity.session.repository.enableAttributeCompression</literal>.</para></note>
@@ -424,16 +535,15 @@ aci: (targetcontrol="2.16.840.1.113730.3.4.3")(version 3.0;acl "Allow
   <section xml:id="cts-general-recommend">
         <title>General Recommendations for CTS Configuration</title>
 
-        <para>As might be expected, the biggest driver in CTS replication is the bandwidth between data stores. When
-        data stores are connected via a WAN, that bandwidth may be insufficient to replicate updated tokens
-        without delay. With that in mind, OpenAM supports options for token compression that can minimize
-        the the load from CTS.</para>
+        <para>When configuring CTS, start with the OpenDJ server embedded with an installation of OpenAM. As
+        it already has required CTS indexes included, that simplifies your tasks.</para>
 
         <para>If you are deploying on a single site, and want CTS replication limited to that site, the
-        default configuration store may be sufficient. If your needs go beyond a higher-level performance
-        threshold, you may want to move the CTS token storage to one or more dedicated systems. Alternatively,
-        if you need global replication of user session CTS tokens, that also justifies a move to dedicated systems
-        as you need that extra level of control over how much replication is taking place.</para>
+        default configuration store may be sufficient for your particular needs. If your needs go beyond a
+        higher-level performance threshold, you may want to move the CTS token storage to one or more dedicated
+        systems. Alternatively, if you need global replication of session, SAML 2.0, and OAuth 2.0 tokens,
+        that would also justify a move to dedicated systems as it can help to have
+        that extra level of control over how much replication is taking place.</para>
 
         <para>CTS generally cause much more replication traffic than less volatile configuration data.
         Therefore, in high volume deployments you can move CTS data to dedicated, properly sized
