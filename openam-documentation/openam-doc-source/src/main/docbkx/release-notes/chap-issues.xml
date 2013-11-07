@@ -45,14 +45,16 @@
   xlink:show="new" xlink:href="https://bugster.forgerock.org/jira/browse/OPENAM"
   >OpenAM issue tracker</link>.</para>
 
-  <!-- List generated at 09:32:53 20131025 using http://bugster.forgerock.org/jira/rest/api/2/search?jql=project+%3D+OpenAM+AND+fixVersion+%3D+"11.0.0"+AND+resolution+%3D+Fixed+AND+labels+%3D+release-notes&startAt=0&maxResults=500&fields=summary-->
+  <!-- List generated at 17:27:53 20131107 using http://bugster.forgerock.org/jira/rest/api/2/search?jql=project+%3D+OpenAM+AND+fixVersion+%3D+"11.0.0"+AND+resolution+%3D+Fixed+AND+labels+%3D+release-notes&startAt=0&maxResults=500&fields=summary-->
   <itemizedlist>
    <listitem><para><link xlink:href="https://bugster.forgerock.org/jira/browse/OPENAM-3112" xlink:show="new">OPENAM-3112</link>: REST authenticate resource should cope with charset provided with Content-Type header</para></listitem>
+   <listitem><para><link xlink:href="https://bugster.forgerock.org/jira/browse/OPENAM-3105" xlink:show="new">OPENAM-3105</link>: CachedSubEntries.getSubEntries() shouldn't sort LDAPSearchResults</para></listitem>
    <listitem><para><link xlink:href="https://bugster.forgerock.org/jira/browse/OPENAM-3057" xlink:show="new">OPENAM-3057</link>: DAS /UI/Logout does not work. </para></listitem>
    <listitem><para><link xlink:href="https://bugster.forgerock.org/jira/browse/OPENAM-3050" xlink:show="new">OPENAM-3050</link>: Revisit default HBCF settings</para></listitem>
    <listitem><para><link xlink:href="https://bugster.forgerock.org/jira/browse/OPENAM-2989" xlink:show="new">OPENAM-2989</link>: Auth REST endpoint shows HTTP 500 for invalid JWT</para></listitem>
    <listitem><para><link xlink:href="https://bugster.forgerock.org/jira/browse/OPENAM-2982" xlink:show="new">OPENAM-2982</link>: AuthLoginException should call super constructor</para></listitem>
    <listitem><para><link xlink:href="https://bugster.forgerock.org/jira/browse/OPENAM-2953" xlink:show="new">OPENAM-2953</link>: After upgrade export-svc-cfg + import-svc-cfg stops working</para></listitem>
+   <listitem><para><link xlink:href="https://bugster.forgerock.org/jira/browse/OPENAM-2948" xlink:show="new">OPENAM-2948</link>: RESTful read performance:  identityExists() is called twice before searching user entry</para></listitem>
    <listitem><para><link xlink:href="https://bugster.forgerock.org/jira/browse/OPENAM-2947" xlink:show="new">OPENAM-2947</link>: Missing statement close in DBHandler can lead to database resource issues.</para></listitem>
    <listitem><para><link xlink:href="https://bugster.forgerock.org/jira/browse/OPENAM-2875" xlink:show="new">OPENAM-2875</link>: Invalid group name error when group does not exist in LDAP</para></listitem>
    <listitem><para><link xlink:href="https://bugster.forgerock.org/jira/browse/OPENAM-2806" xlink:show="new">OPENAM-2806</link>: Resource leak in IOUtils implementation</para></listitem>
@@ -198,22 +200,33 @@
   xlink:href="https://bugster.forgerock.org/jira/browse/OPENAM">OpenAM issue
   tracker</link>.</para>
 
-  <!-- List generated at 09:37:04 20131025 using http://bugster.forgerock.org/jira/rest/api/2/search?jql=project+%3D+OpenAM+AND+%28component+not+in+%28"j2ee+agents"%2C+"web+agents"%29+OR+component+is+EMPTY%29+AND+%28resolution+%3D+Unresolved+OR+%28affectedVersion+%3D+"11.0.0"+AND+fixVersion+%21%3D+"11.0.0"%29%29+AND+labels+%3D+release-notes&startAt=0&maxResults=500&fields=summary-->
+  <!-- List generated at 17:28:56 20131107 using http://bugster.forgerock.org/jira/rest/api/2/search?jql=project+%3D+OpenAM+AND+%28component+not+in+%28"j2ee+agents"%2C+"web+agents"%29+OR+component+is+EMPTY%29+AND+%28resolution+%3D+Unresolved+OR+%28affectedVersion+%3D+"11.0.0"+AND+fixVersion+%21%3D+"11.0.0"%29%29+AND+labels+%3D+release-notes&startAt=0&maxResults=500&fields=summary-->
   <itemizedlist>
+   <listitem><para><link xlink:href="https://bugster.forgerock.org/jira/browse/OPENAM-3243" xlink:show="new">OPENAM-3243</link>: The Core Auth Module persistent cookie options are different from the Persistent Cookie Module</para></listitem>
+   <listitem><para><link xlink:href="https://bugster.forgerock.org/jira/browse/OPENAM-3239" xlink:show="new">OPENAM-3239</link>: OAuth 2 client properties randomly disappears after upgrade from OpenAM 10.1 to OpenAM 11</para></listitem>
+   <listitem><para><link xlink:href="https://bugster.forgerock.org/jira/browse/OPENAM-3230" xlink:show="new">OPENAM-3230</link>: When I make Upgrade from AM 955 to AM 11 upgrade report show me incorrect version of an existing instance</para></listitem>
+   <listitem><para><link xlink:href="https://bugster.forgerock.org/jira/browse/OPENAM-3227" xlink:show="new">OPENAM-3227</link>: OAuth2 Authentication Module does not utilise com.sun.identity.shared.encode.CookieUtils when creating new cookies.</para></listitem>
+   <listitem><para><link xlink:href="https://bugster.forgerock.org/jira/browse/OPENAM-3223" xlink:show="new">OPENAM-3223</link>: Policy Wildcard Matches doesn't work after OpenAM upgrade with an ODSEE</para></listitem>
+   <listitem><para><link xlink:href="https://bugster.forgerock.org/jira/browse/OPENAM-3216" xlink:show="new">OPENAM-3216</link>: CTS Token timeout incorrect after changing token idle time</para></listitem>
    <listitem><para><link xlink:href="https://bugster.forgerock.org/jira/browse/OPENAM-3210" xlink:show="new">OPENAM-3210</link>: In CDSSO scenario no  Logout is triggered when choosing 'yes' on 'new_org.jsp'</para></listitem>
    <listitem><para><link xlink:href="https://bugster.forgerock.org/jira/browse/OPENAM-3207" xlink:show="new">OPENAM-3207</link>: PLLRequestServlet should log an errror if the configured maximum request size is exceeded</para></listitem>
    <listitem><para><link xlink:href="https://bugster.forgerock.org/jira/browse/OPENAM-3205" xlink:show="new">OPENAM-3205</link>: Missing labels in OAuth2 "Register a Client" page</para></listitem>
    <listitem><para><link xlink:href="https://bugster.forgerock.org/jira/browse/OPENAM-3204" xlink:show="new">OPENAM-3204</link>: Goto URL validation can choke on relative URLs</para></listitem>
+   <listitem><para><link xlink:href="https://bugster.forgerock.org/jira/browse/OPENAM-3202" xlink:show="new">OPENAM-3202</link>: RelayState is validated as a URL</para></listitem>
    <listitem><para><link xlink:href="https://bugster.forgerock.org/jira/browse/OPENAM-3184" xlink:show="new">OPENAM-3184</link>: Insufficient error logging when 'agent profile' can not be found by CDCServlet</para></listitem>
    <listitem><para><link xlink:href="https://bugster.forgerock.org/jira/browse/OPENAM-3166" xlink:show="new">OPENAM-3166</link>: Need better control for cookies when using postToAppLogout feature</para></listitem>
    <listitem><para><link xlink:href="https://bugster.forgerock.org/jira/browse/OPENAM-3165" xlink:show="new">OPENAM-3165</link>: NPE during export-svc-cfg</para></listitem>
    <listitem><para><link xlink:href="https://bugster.forgerock.org/jira/browse/OPENAM-3160" xlink:show="new">OPENAM-3160</link>: AuthContext failover doesn't work</para></listitem>
    <listitem><para><link xlink:href="https://bugster.forgerock.org/jira/browse/OPENAM-3113" xlink:show="new">OPENAM-3113</link>: DJLDAPv3Repo should properly set the LDAP error codes on IdRepoException</para></listitem>
    <listitem><para><link xlink:href="https://bugster.forgerock.org/jira/browse/OPENAM-3109" xlink:show="new">OPENAM-3109</link>: Token conflicts can occur if OpenDJ servers are replicated</para></listitem>
+   <listitem><para><link xlink:href="https://bugster.forgerock.org/jira/browse/OPENAM-3065" xlink:show="new">OPENAM-3065</link>: Misconfiguring CTS causes issues with IDRepo unable to read realms</para></listitem>
    <listitem><para><link xlink:href="https://bugster.forgerock.org/jira/browse/OPENAM-3056" xlink:show="new">OPENAM-3056</link>: Retrieving roles may fail when using more than one data store</para></listitem>
    <listitem><para><link xlink:href="https://bugster.forgerock.org/jira/browse/OPENAM-3048" xlink:show="new">OPENAM-3048</link>: RESTful authentication using curl doesn't work on the WebLogic 12c (12.1.1.0) </para></listitem>
    <listitem><para><link xlink:href="https://bugster.forgerock.org/jira/browse/OPENAM-2922" xlink:show="new">OPENAM-2922</link>: SP initiated SLO can fail with IllegalStateException</para></listitem>
+   <listitem><para><link xlink:href="https://bugster.forgerock.org/jira/browse/OPENAM-2874" xlink:show="new">OPENAM-2874</link>: The OAuth2 client registration endpoint does not set idTokenSignedResponseAlg to its default</para></listitem>
+   <listitem><para><link xlink:href="https://bugster.forgerock.org/jira/browse/OPENAM-2846" xlink:show="new">OPENAM-2846</link>: The REST auth API should provide a way to set the client IP address in a secure way</para></listitem>
    <listitem><para><link xlink:href="https://bugster.forgerock.org/jira/browse/OPENAM-2760" xlink:show="new">OPENAM-2760</link>: Validation of gotoOnFail URLs</para></listitem>
+   <listitem><para><link xlink:href="https://bugster.forgerock.org/jira/browse/OPENAM-2715" xlink:show="new">OPENAM-2715</link>: Mandatory OAuth2 Provider settings not enforced in the UI</para></listitem>
    <listitem><para><link xlink:href="https://bugster.forgerock.org/jira/browse/OPENAM-2712" xlink:show="new">OPENAM-2712</link>: Adaptive.getIdentity prints 'More than one user found' when no user was found</para></listitem>
    <listitem><para><link xlink:href="https://bugster.forgerock.org/jira/browse/OPENAM-2705" xlink:show="new">OPENAM-2705</link>: People container name/value configs are not always correctly used - backport</para></listitem>
    <listitem><para><link xlink:href="https://bugster.forgerock.org/jira/browse/OPENAM-2656" xlink:show="new">OPENAM-2656</link>: PrefixResourceName#compare() strips off trailing backslash in PathInfo</para></listitem>
@@ -224,6 +237,8 @@
    <listitem><para><link xlink:href="https://bugster.forgerock.org/jira/browse/OPENAM-2460" xlink:show="new">OPENAM-2460</link>: Policy evaluation may hang with large number of matching referral privileges</para></listitem>
    <listitem><para><link xlink:href="https://bugster.forgerock.org/jira/browse/OPENAM-2409" xlink:show="new">OPENAM-2409</link>: Special characters in alternative naming attribute are unescaped</para></listitem>
    <listitem><para><link xlink:href="https://bugster.forgerock.org/jira/browse/OPENAM-2404" xlink:show="new">OPENAM-2404</link>: new_org.jsp is displayed from the original realm in case of session upgrade</para></listitem>
+   <listitem><para><link xlink:href="https://bugster.forgerock.org/jira/browse/OPENAM-2262" xlink:show="new">OPENAM-2262</link>: Configure OAuth2 wizard always enables refresh tokens</para></listitem>
+   <listitem><para><link xlink:href="https://bugster.forgerock.org/jira/browse/OPENAM-2170" xlink:show="new">OPENAM-2170</link>: Configure OAuth2 wizard fails to create policy in sub-realm</para></listitem>
    <listitem><para><link xlink:href="https://bugster.forgerock.org/jira/browse/OPENAM-2168" xlink:show="new">OPENAM-2168</link>: Authentication Success Rate and Authentication Failure Rate are always 0</para></listitem>
    <listitem><para><link xlink:href="https://bugster.forgerock.org/jira/browse/OPENAM-2155" xlink:show="new">OPENAM-2155</link>: Non printable characters in some files.  Looks like most should be copyright 0xA9</para></listitem>
    <listitem><para><link xlink:href="https://bugster.forgerock.org/jira/browse/OPENAM-2137" xlink:show="new">OPENAM-2137</link>: DSConfigMgr can hide exception root causes</para></listitem>
