@@ -100,8 +100,10 @@
     <varlistentry>
      <term><literal>-Xmx1024m</literal> (minimum)</term>
      <listitem>
-      <para>OpenAM requires at least a 1 GB heap. Higher volume and higher
-      performance deployments require additional heap space.</para>
+      <para>OpenAM requires at least a 1 GB heap. If you are including the embedded
+      OpenDJ directory, OpenAM requires at least a 2 GB heap, as 50% of that space
+      is allocated to OpenDJ. Higher volume and higher performance
+      deployments require additional heap space.</para>
      </listitem>
     </varlistentry>
    </variablelist>
@@ -129,7 +131,9 @@
     <varlistentry>
      <term><literal>-Xmx1024m</literal> (minimum)</term>
      <listitem>
-      <para>OpenAM requires at least a 1 GB heap. Higher volume and higher
+      <para>OpenAM requires at least a 1 GB heap. If you are including the embedded
+      OpenDJ directory, OpenAM requires at least a 2 GB heap, as 50% of that space
+      is allocated to OpenDJ. Higher volume and higher
       performance deployments require additional heap space.</para>
      </listitem>
     </varlistentry>
@@ -755,7 +759,9 @@ $ unzip ~/Downloads/<?eval ${coreDirectoryFile}?></screen>
   <literal>openam</literal>.</para>
 
   <para>OpenAM core services require a minimum JVM heap size of 1 GB, and a
-  permanent generation size of 256 MB. See <xref linkend="prepare-java" /> for
+  permanent generation size of 256 MB. If you are including the embedded
+  OpenDJ directory, OpenAM requires at least a 2 GB heap, as 50% of that space
+  is allocated to OpenDJ. See <xref linkend="prepare-java" /> for
   details.</para>
 
   <programlisting language="shell">#!/bin/sh
@@ -768,7 +774,7 @@ CATALINA_HOME="/path/to/tomcat"
 export CATALINA_HOME
 JAVA_HOME=/path/to/jdk
 export JAVA_HOME
-CATALINA_OPTS="-server -Xmx1024m -XX:MaxPermSize=256m"
+CATALINA_OPTS="-server -Xmx2048m -XX:MaxPermSize=256m"
 export CATALINA_OPTS
 
 case "${1}" in
@@ -1165,7 +1171,8 @@ $ cat WEB-INF/jboss-web.xml</screen>
                 <para>Check the JVM settings associated with <literal>JAVA_OPTS</literal>. For JBoss AS 7.1.0 and AS 7.1.1,
                     you should change the JVM heap size to <literal>-Xmx1024m</literal>. The default JVM heap size and permanent
                     generation settings for later versions of JBoss may already exceed recommended values (-Xmx1024m,
-                    -XX:MaxPermSize=256m).</para>
+                    -XX:MaxPermSize=256m). If you are using the embedded version of OpenDJ, the minimum heap size may
+                    be higher. For details on the JVM options to use, see <xref linkend="prepare-java" />.</para>
             </step>
             <step>
                 <para>Set the following JVM <literal>JAVA_OPTS</literal> setting in the same file.</para>
@@ -1236,7 +1243,8 @@ configuration.dir=$HOME/openamJboss</screen>
   <screen>$ cd /path/to/jetty
 $ java -server -Xmx1024m -XX:MaxPermSize=256m -jar start.jar</screen>
 
-  <para>For details on the JVM options to use, see
+  <para>If you are using the embedded version of OpenDJ, the required
+  JVM memory may be higher. For details on the JVM options to use, see
   <xref linkend="prepare-java" />.</para>
  </section>
 
