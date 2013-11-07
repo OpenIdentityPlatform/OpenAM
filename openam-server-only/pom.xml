@@ -211,6 +211,14 @@
                             <filtering>true</filtering>
                         </webResource>
                         <webResource>
+                            <directory>${project.parent.build.directory}/legal-notices</directory>
+                            <includes>
+                                <include>**/**</include>
+                            </includes>
+                            <targetPath>WEB-INF/legal-notices</targetPath>
+                            <filtering>true</filtering>
+                        </webResource>
+                        <webResource>
                             <directory>
                                 ${project.basedir}/../openam-federation/openam-federation-library/src/main/resources/xml
                             </directory>
