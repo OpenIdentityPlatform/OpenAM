@@ -70,7 +70,7 @@ public class AMAuthNFilter extends AuthNFilter {
         endpointMatcher.endpoint("/authenticate", HttpMethod.POST);
         endpointMatcher.endpoint("/users", HttpMethod.POST, "_action", "register", "confirm", "forgotPassword",
                 "forgotPasswordReset", "anonymousCreate");
-        endpointMatcher.endpoint("/serverinfo/cookieDomains", HttpMethod.GET);
+        endpointMatcher.endpoint("/serverinfo", HttpMethod.GET);
     }
 
     /**

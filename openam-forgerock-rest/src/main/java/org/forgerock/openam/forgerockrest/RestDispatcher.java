@@ -147,7 +147,8 @@ public class RestDispatcher {
             CoreTokenResource resource = new CoreTokenResource(serialisation, store);
             router.addRoute(endpoint, resource);
         } else if (endpoint.equalsIgnoreCase(SERVER_INFO)){
-            router.addRoute(endpoint, new ServerInfoResource());
+            router.addRoute(endpoint, new ServerInfoResource(realmPath));
+            router.addRoute(RoutingMode.STARTS_WITH, "/{serverInfo}", subrealms(parsedDetails, path));
         }
         return router;
     }

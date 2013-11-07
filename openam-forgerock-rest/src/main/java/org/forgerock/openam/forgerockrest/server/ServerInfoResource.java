@@ -28,6 +28,9 @@ import org.forgerock.json.fluent.JsonValue;
 import org.forgerock.json.resource.*;
 import org.forgerock.openam.forgerockrest.RestDispatcher;
 import org.forgerock.openam.forgerockrest.RestUtils;
+import org.forgerock.openam.services.RestSecurity;
+import com.iplanet.am.util.SystemProperties;
+import com.sun.identity.shared.Constants;
 
 import java.util.LinkedHashMap;
 import java.util.Set;
@@ -39,7 +42,13 @@ import java.util.Set;
  * @author alin.brici@forgerock.com
  */
 public class ServerInfoResource implements CollectionResourceProvider{
-
+    
+    private String realm;
+    
+    public ServerInfoResource(String realm) {
+        this.realm = realm;
+    }
+    
     /**
      * Retrieves the cookie domains set on the server
      * @param context Current Server Context
@@ -60,6 +69,33 @@ public class ServerInfoResource implements CollectionResourceProvider{
             handler.handleResult(resource);
         } catch (Exception e) {
             RestDispatcher.debug.error("ServerInforResource.getCookieDomains:: Cannot retrieve cookie domains." + e);
+            handler.handleError(new NotFoundException(e.getMessage()));
+        }
+    }
+    /**
+     * Retrieves all server info set on the server
+     * @param context Current Server Context
+     * @param request Request from client to retrieve id
+     * @param handler Result handler which handles error or success
+     */
+    private void getAllServerInfo(ServerContext context, String resourceId,  ReadRequest request,
+                                  ResultHandler<Resource> handler) {
+        JsonValue result = new JsonValue(new LinkedHashMap<String, Object>(1));
+        Set<String> cookieDomains;
+        Resource resource;
+        int rev;
+        RestSecurity restSecurity = new RestSecurity(realm);
+        try {
+            cookieDomains = AuthClientUtils.getCookieDomains();
+            rev = cookieDomains.hashCode();
+            result.put("domains", cookieDomains);
+            result.put("cookieName", SystemProperties.get(Constants.AM_COOKIE_NAME,"iPlanetDirectoryPro"));
+            result.put("forgotPassword", String.valueOf(restSecurity.isForgotPassword()));
+            result.put("selfRegistration", String.valueOf(restSecurity.isSelfRegistration()));
+            resource = new Resource(resourceId, Integer.toString(rev), result);
+            handler.handleResult(resource);
+        } catch (Exception e) {
+            RestDispatcher.debug.error("ServerInforResource.getAllServerInfo:: Cannot retrieve all server info. " + e);
             handler.handleError(new NotFoundException(e.getMessage()));
         }
     }
@@ -118,6 +154,8 @@ public class ServerInfoResource implements CollectionResourceProvider{
                              ResultHandler<Resource> handler) {
         if(s.equalsIgnoreCase("cookieDomains")){
             getCookieDomains(context, s, request, handler);
+        } else if (s.equalsIgnoreCase("*")) { 
+            getAllServerInfo(context, s, request, handler);
         } else { // for now this is the only case coming in, so fail if otherwise
             final ResourceException e =
                     new NotSupportedException("ResourceId not supported: " + s);
