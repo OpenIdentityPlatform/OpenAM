@@ -18,10 +18,15 @@
                     {{/if}}
                     
                     <div class="field {{#if isSubmit}}field-submit{{/if}}">
-                        {{callbackRender}}
+                        {{callbackRender}} 
+                        {{#if isSubmit}}
+                            {{#if ../../showForgotPassword}}
+                            <br/><br/><a href="#" id="forgotPasswordButton">{{t "common.user.forgotPassword" }}</a>
+                            {{/if}}
+                        {{/if}}
                     </div>
                     {{/each}}
-    
+                    
                 </fieldset>
             </form>
         </div>

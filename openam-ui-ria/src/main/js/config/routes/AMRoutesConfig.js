@@ -57,6 +57,12 @@ define("config/routes/AMRoutesConfig", [
             url: "profile/" ,
             forceUpdate: true
         },
+        "forgotPassword": {
+            view: "org/forgerock/openam/ui/user/profile/ForgotPasswordView",
+            url: /forgotPassword(.*)?/,
+            pattern: "forgotPassword?",
+            defaults: ["/"]
+        },
         "confirmLogin": {
             view: "org/forgerock/openam/ui/user/login/RESTConfirmLoginView",
             role: "authenticated",

@@ -33,5 +33,6 @@ define("org/forgerock/openam/ui/user/main", [
     "./login/RESTLoginHelper",
     "./login/RESTLoginView",
     "./login/RESTConfirmLoginView",
-    "./login/RESTLoginDialog"
+    "./login/RESTLoginDialog",
+    "./profile/ForgotPasswordView"
 ]);

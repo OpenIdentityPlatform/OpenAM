@@ -102,6 +102,39 @@ define("UserDelegate", [
         });
 
     };
+
+
+    obj.forgotPassword = function(postData, successCallback, errorCallback, errorsHandlers) {
+        var realm = configuration.globalData.auth.realm;
+        if(realm === "/"){
+            realm = "";
+        }
+        return obj.serviceCall({
+            url: realm + "/users/?_action=forgotPassword",
+            data: JSON.stringify(postData),
+            type: "POST",
+            success: function (data) {
+                successCallback(data);
+            },
+            error: errorCallback,
+            errorsHandlers: errorsHandlers
+        });
+    };
+
+    obj.forgotPasswordReset = function(postData, successCallback) {
+        var realm = configuration.globalData.auth.realm;
+        if(realm === "/"){
+            realm = "";
+        }
+        return obj.serviceCall({
+            url: realm + "/users/?_action=forgotPasswordReset",
+            data: JSON.stringify(postData),
+            type: "POST",
+            success: function (data) {
+                successCallback(data);
+            }
+        });
+    };
     
     return obj;
 });

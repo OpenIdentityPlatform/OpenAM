@@ -10,6 +10,8 @@
             "UserMessages" : {
                 "invalidCredentials" : "Login/password combination is invalid.",
                 "invalidOldPassword" : "Old password is invalid.",
+                "usernameNotFound" : "Username not found",
+                "noEmailProvided" : "No email provided in profile",
                 "serviceUnavailable" : "Service unavailable",
                 "changedPassword" : "Password has been changed",
                 "unknown" : "Unknown error. Please contact with administrator",
@@ -99,7 +101,12 @@
             },
             "ForgottenPasswordTemplate" : {
                 "forgottenPasswordQuestion" : "Forgotten password?",
-                "enterLogin" : "Please enter your login in the field below to continue."
+                "enterLogin" : "Please enter your username, we will send you an email containing instructions on how to reset your password.",
+                "changeForgottenPassword" : "Change forgotten password",
+                "emailSubject" : "OpenAM: You have requested a password reset",
+                "emailMessage" : "Hello from OpenAM, \n\nYou have requested to have your ForgeRock account's password reset.\n\nIf you want to reset your password then follow the link below.\n\n**Note: If you encounter an error message when you click on this link, please copy the url and paste it into your browser instead.\n\n",
+                "emailSent" : "We have sent you an e-mail, please follow the link in the e-mail to complete your password reset process.",
+                "proceedToLogin" : "proceed to login"
             },
             "TermsOfUseTemplate" : {
                 "termsOfUse" : "Terms of use",
@@ -232,6 +239,7 @@
             "givenName" : "First Name",
             "familyName" : "Last Name",
             "changePassword" : "Change password",
+            "forgotPassword" : "Forgot password",
             "accountStatus" : "Account status",
             "active" : "Active",
             "inactive" : "Inactive",

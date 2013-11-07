@@ -67,6 +67,7 @@ define("org/forgerock/openam/ui/user/login/RESTLoginDialog", [
             loginView.formSubmit.call(this,e);
         },
         events: loginView.events,
+        forgotPasswordClick: loginView.forgotPasswordClick,
         reloadData: loginView.reloadData
     });
 

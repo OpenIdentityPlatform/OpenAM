@@ -48,30 +48,16 @@ define("org/forgerock/openam/ui/user/login/AuthNDelegate", [
         var url,
             args = {},
             promise = $.Deferred(),
-            cookiePromise = $.Deferred(),
-            cookieDomainsPromise = $.Deferred(),
+            serverInfoPromise = $.Deferred(),
             i18nCookie = cookieHelper.getCookie('i18next');
         
-        if (cookieName === "") {
-            cookiePromise = obj.serviceCall({
-                    serviceUrl: constants.host + "/"+ constants.context + "/identity/json/getcookienamefortoken",
-                    url: ""
-                })
-                .done(function (foundCookieName) {
-                    cookieName = foundCookieName.string;
-                });
-        } else {
-            cookiePromise.resolve();
-        }
-        
-        if (!cookieDomains.length) {
-            cookieDomainsPromise = obj.getCookieDomains()
-                .done(function (d) {
-                    cookieDomains = d.domains;
-                });
-        } else {
-            cookieDomainsPromise.resolve();
-        }
+        serverInfoPromise = obj.getServerInfo()
+            .done(function (d) {
+                cookieName = d.cookieName;
+                cookieDomains = d.domains;
+                configuration.globalData.auth.forgotPassword = d.forgotPassword;
+                configuration.globalData.auth.selfRegistration = d.selfRegistration;
+            });
         
         if (configuration.globalData.auth.realm !== "/") {
             args.realm = configuration.globalData.auth.realm;
@@ -112,7 +98,7 @@ define("org/forgerock/openam/ui/user/login/AuthNDelegate", [
             })
         .done(function (requirements) {
                     // only resolve the auth promise when we know the cookie name
-                    $.when(cookiePromise,cookieDomainsPromise).then(function () {
+                    $.when(serverInfoPromise).then(function () {
                         var tokenCookie = cookieHelper.getCookie(cookieName);
                         if(configuration.loggedUser && tokenCookie && window.location.hash.replace(/^#/, '').match(router.configuration.routes.login.url)){
                             requirements.tokenId = tokenCookie;
@@ -252,7 +238,7 @@ define("org/forgerock/openam/ui/user/login/AuthNDelegate", [
     
     obj.logout = function () {
         obj.resetProcess();
-        return obj.getCookieDomains().then(function(d){
+        return obj.getServerInfo().then(function(d){
             cookieDomains = d.domains;
             return obj.serviceCall({
                     type: "POST",
@@ -270,10 +256,14 @@ define("org/forgerock/openam/ui/user/login/AuthNDelegate", [
         });
     };
     
-    obj.getCookieDomains = function() {
+    obj.getServerInfo = function() {
+        var realm = configuration.globalData.auth.realm;
+        if(realm === "/"){
+            realm = "";
+        }
         return obj.serviceCall({
             type: "GET",
-            serviceUrl: constants.host + "/"+ constants.context + "/json/serverinfo/cookieDomains",
+            serviceUrl: constants.host + "/"+ constants.context + "/json" + realm + "/serverinfo/*",
             url: "",
             errorsHandlers: {
                 "unauthorized": { status: "401"}

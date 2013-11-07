@@ -35,8 +35,9 @@ define("org/forgerock/openam/ui/user/login/RESTLoginView", [
     "org/forgerock/commons/ui/common/main/Router",
     "org/forgerock/commons/ui/common/util/CookieHelper",
     "org/forgerock/commons/ui/common/util/UIUtils",
-    "org/forgerock/commons/ui/common/main/i18nManager"
-], function(AbstractView, authNDelegate, validatorsManager, eventManager, constants, conf, sessionManager, router, cookieHelper, uiUtils,i18nManager) {
+    "org/forgerock/commons/ui/common/main/i18nManager",
+    "org/forgerock/openam/ui/user/login/RESTLoginHelper"
+], function(AbstractView, authNDelegate, validatorsManager, eventManager, constants, conf, sessionManager, router, cookieHelper, uiUtils,i18nManager,restLoginHelper) {
     
     var LoginView = AbstractView.extend({
         template: "templates/openam/RESTLoginTemplate.html",
@@ -46,7 +47,19 @@ define("org/forgerock/openam/ui/user/login/RESTLoginView", [
         
         data: {},
         events: {
-            "click input[type=submit]": "formSubmit"
+            "click input[type=submit]": "formSubmit",
+            "click #forgotPasswordButton": "forgotPasswordClick"
+        },
+        forgotPasswordClick: function(e) {
+            e.preventDefault();
+            //save the login params in a cookie for use with the cancel button on forgotPassword page 
+            //and also the "proceed to login" link once password has been successfully changed
+            var cookieVal = conf.globalData.auth.realm;
+            if(conf.globalData.auth.urlParams){
+                cookieVal += restLoginHelper.filterUrlParams(conf.globalData.auth.urlParams);
+            }
+            cookieHelper.setCookie("loginUrlParams",cookieVal);
+            location.href = "#forgotPassword/";
         },
         autoLogin: function() {
               var index,
@@ -85,6 +98,8 @@ define("org/forgerock/openam/ui/user/login/RESTLoginView", [
         },
         render: function(args, callback) {
             var urlParams = {};//deserialized querystring params
+            
+            cookieHelper.deleteCookie("loginUrlParams");
             
             if (args && args.length) {
                 conf.globalData.auth.realm = args[0];
@@ -218,7 +233,12 @@ define("org/forgerock/openam/ui/user/login/RESTLoginView", [
                                     } else {
                                         this.template = this.genericTemplate;
                                     }
+
+                                    this.data.showForgotPassword = false;
                                     
+                                    if(conf.globalData.auth.forgotPassword === "true"){
+                                        this.data.showForgotPassword = true;
+                                    }
                                     this.parentRender(_.bind(function() {
                                         this.reloadData();
                                     }, this));
