@@ -200,8 +200,9 @@
   xlink:href="https://bugster.forgerock.org/jira/browse/OPENAM">OpenAM issue
   tracker</link>.</para>
 
-  <!-- List generated at 17:28:56 20131107 using http://bugster.forgerock.org/jira/rest/api/2/search?jql=project+%3D+OpenAM+AND+%28component+not+in+%28"j2ee+agents"%2C+"web+agents"%29+OR+component+is+EMPTY%29+AND+%28resolution+%3D+Unresolved+OR+%28affectedVersion+%3D+"11.0.0"+AND+fixVersion+%21%3D+"11.0.0"%29%29+AND+labels+%3D+release-notes&startAt=0&maxResults=500&fields=summary-->
+  <!-- List generated at 18:39:58 20131107 using http://bugster.forgerock.org/jira/rest/api/2/search?jql=project+%3D+OpenAM+AND+%28component+not+in+%28"j2ee+agents"%2C+"web+agents"%29+OR+component+is+EMPTY%29+AND+%28resolution+%3D+Unresolved+OR+%28affectedVersion+%3D+"11.0.0"+AND+fixVersion+%21%3D+"11.0.0"%29%29+AND+labels+%3D+release-notes&startAt=0&maxResults=500&fields=summary-->
   <itemizedlist>
+   <listitem><para><link xlink:href="https://bugster.forgerock.org/jira/browse/OPENAM-3270" xlink:show="new">OPENAM-3270</link>: openam/.version not updated after upgrade</para></listitem>
    <listitem><para><link xlink:href="https://bugster.forgerock.org/jira/browse/OPENAM-3243" xlink:show="new">OPENAM-3243</link>: The Core Auth Module persistent cookie options are different from the Persistent Cookie Module</para></listitem>
    <listitem><para><link xlink:href="https://bugster.forgerock.org/jira/browse/OPENAM-3239" xlink:show="new">OPENAM-3239</link>: OAuth 2 client properties randomly disappears after upgrade from OpenAM 10.1 to OpenAM 11</para></listitem>
    <listitem><para><link xlink:href="https://bugster.forgerock.org/jira/browse/OPENAM-3230" xlink:show="new">OPENAM-3230</link>: When I make Upgrade from AM 955 to AM 11 upgrade report show me incorrect version of an existing instance</para></listitem>
