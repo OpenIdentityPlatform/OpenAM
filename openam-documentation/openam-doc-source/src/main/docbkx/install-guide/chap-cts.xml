@@ -562,7 +562,7 @@ set-replication-server-prop
         Therefore, in high volume deployments you can move CTS data to dedicated, properly sized
         directory servers to improve performance. In addition, token compression as discussed in
         <xref linkend="cts-token-size" />, is disabled by default. When enabled, token compression can reduce
-        load requiremehttp://openam.forgerock.org/openam-documentation/openam-doc-source/doc/admin-guide/#tuning-jvm-for-openamnts on the network connection between data stores.</para>
+        load requirements on the network connection between data stores.</para>
 
         <para>While not recommended for high volume deployments, it is possible to use CTS in production within
         the default internal OpenDJ configuration store. That assumes a small scale deployment with a relatively
