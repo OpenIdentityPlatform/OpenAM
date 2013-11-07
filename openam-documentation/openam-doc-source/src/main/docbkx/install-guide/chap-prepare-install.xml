@@ -891,6 +891,11 @@ domain  Location: /path/to/glassfish3/glassfish/domains/domain1
 Log File: /path/to/glassfish3/glassfish/domains/domain1/logs/server.log
 Admin Port: 4848
 Command start-domain executed successfully.</screen>
+
+     <para>
+      If the domain fails to start the first time you run the command,
+      then run the <command>asadmin start-domain</command> command again.
+     </para>
     </listitem>
    </orderedlist>
   </section>
