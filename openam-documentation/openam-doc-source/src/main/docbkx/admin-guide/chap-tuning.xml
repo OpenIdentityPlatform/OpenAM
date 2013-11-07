@@ -340,9 +340,9 @@
      <row>
       <entry><para><literal>-Xms</literal> &amp;
       <literal>-Xmx</literal></para></entry>
-      <entry><para>At least 1024m, production environments 2048m to 3072m.
-      This setting depends on the available physical memory, and on whether a
-      32 or 64-bit JVM is used.</para></entry>
+      <entry><para>At least 1024m (2048m with embedded OpenDJ), in production
+      environments at least 2048m to 3072m. This setting depends on the available
+      physical memory, and on whether a 32 or 64-bit JVM is used.</para></entry>
       <entry><para>-</para></entry>
      </row>
      <row>
