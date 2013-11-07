@@ -145,7 +145,7 @@
        </listitem>
        <listitem>
         <para><literal>Heartbeat</literal></para>
-        <para><literal>10</literal> (default)</para>
+        <para><literal>10</literal> (default, in seconds)</para>
        </listitem>
       </itemizedlist>
 
@@ -562,14 +562,14 @@ set-replication-server-prop
         Therefore, in high volume deployments you can move CTS data to dedicated, properly sized
         directory servers to improve performance. In addition, token compression as discussed in
         <xref linkend="cts-token-size" />, is disabled by default. When enabled, token compression can reduce
-        load requirements on the network connection between data stores.</para>
+        load requiremehttp://openam.forgerock.org/openam-documentation/openam-doc-source/doc/admin-guide/#tuning-jvm-for-openamnts on the network connection between data stores.</para>
 
         <para>While not recommended for high volume deployments, it is possible to use CTS in production within
         the default internal OpenDJ configuration store. That assumes a small scale deployment with a relatively
         simple topology.</para>
 
         <para>The CTS is configured to work with a single OpenDJ directory server. That is a potential SPOF.
-        to address that issue, set up a load balancer between OpenAM and the OpenDJ directory service used for
+        To address that issue, set up a load balancer between OpenAM and the OpenDJ directory service used for
         the CTS. Redundant load balancers are preferred. If one instance of OpenDJ fails, the load balancer would
         redirect CTS requests to another instance of OpenDJ with a copy of the CTS tokens.</para>
 
