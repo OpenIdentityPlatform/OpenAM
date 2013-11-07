@@ -86,12 +86,24 @@
   <title>Data Store Requirements</title>
 
   <itemizedlist>
+   <para>This release of OpenAM works with the following CTS data stores.</para>
+    <listitem>
+     <para>Embedded (using ForgeRock OpenDJ for the data store)</para>
+    </listitem>
+    <listitem>
+     <para>External ForgeRock OpenDJ data store</para>
+     <para>The CTS is supported on OpenDJ versions 2.6.3 and above.</para>
+    </listitem>
+  </itemizedlist>
+
+  <itemizedlist>
    <para>This release of OpenAM works with the following configuration data
    stores.</para>
    <listitem>
     <para>Embedded (using ForgeRock OpenDJ for the data store)</para>
-    <para>When using the embedded configuration store, you must deploy OpenAM
-    on a local file system and not on an NFS-mounted file system.</para>
+    <para>When using the embedded configuration store for CTS or configuration,
+    you must deploy OpenAM on a local file system and not on an NFS-mounted file
+    system.</para>
    </listitem>
    <listitem>
     <para>External ForgeRock OpenDJ data store</para>
