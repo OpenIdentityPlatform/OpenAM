@@ -39,10 +39,12 @@ import java.util.HashMap;
 import java.util.Map;
 
 import static org.mockito.BDDMockito.given;
+import static org.mockito.Matchers.anyObject;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.fail;
 
@@ -327,6 +329,38 @@ public class RestAuthorizationDispatcherFilterTest {
         assertEquals(filterConfigCaptor.getValue().getInitParameter("configurator"),
                 PassthrouhgAuthzClass.class.getName());
         verify(authZFilter).doFilter(request, response, filterChain);
+    }
+
+    @Test
+    public void shouldFilterAuthorizationForOtherEndpoints() throws ServletException, IOException, NotFoundException {
+
+        //Given
+        FilterConfig filterConfig = mock(FilterConfig.class);
+        given(filterConfig.getInitParameter("realmsAuthzConfigurator")).willReturn(AdminAuthzClass.class.getName());
+        given(filterConfig.getInitParameter("usersAuthzConfigurator"))
+                .willReturn(PassthrouhgAuthzClass.class.getName());
+        given(filterConfig.getInitParameter("groupsAuthzConfigurator"))
+                .willReturn(PassthrouhgAuthzClass.class.getName());
+        given(filterConfig.getInitParameter("agentsAuthzConfigurator"))
+                .willReturn(PassthrouhgAuthzClass.class.getName());
+
+        restAuthorizationDispatcherFilter.init(filterConfig);
+
+        HttpServletRequest request = mock(HttpServletRequest.class);
+        ServletResponse response = mock(ServletResponse.class);
+        FilterChain filterChain = mock(FilterChain.class);
+
+        Map<String, String> details = new HashMap<String, String>();
+        details.put("resourceName", "/other");
+        given(restDispatcher.getRequestDetails(anyString())).willReturn(details);
+
+        //When
+        restAuthorizationDispatcherFilter.doFilter(request, response, filterChain);
+
+        //Then
+        verify(authZFilter, never()).init(Matchers.<FilterConfig>anyObject());
+        verify(authZFilter, never()).doFilter(request, response, filterChain);
+        verify(filterChain).doFilter(request, response);
     }
 
     @Test

@@ -137,6 +137,8 @@ public class RestAuthorizationDispatcherFilter implements Filter {
                 authorize(groupsAuthzConfiguratorClassName, request, servletResponse, chain);
             } else if (RestDispatcher.AGENTS.equalsIgnoreCase(endpoint)) {
                 authorize(agentsAuthzConfiguratorClassName, request, servletResponse, chain);
+            } else {
+                chain.doFilter(servletRequest, servletResponse);
             }
         } catch (NotFoundException e) {
             // Endpoint not found so cannot perform any authorization
