@@ -92,7 +92,7 @@
     </listitem>
     <listitem>
      <para>External ForgeRock OpenDJ data store</para>
-     <para>The CTS is supported on OpenDJ versions 2.6.3 and above.</para>
+     <para>The CTS is supported on OpenDJ versions 2.6.0 and later.</para>
     </listitem>
   </itemizedlist>
 
