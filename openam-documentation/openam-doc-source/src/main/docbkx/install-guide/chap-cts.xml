@@ -49,17 +49,15 @@
   going beyond the default configuration. Nevertheless, it is easier to configure CTS if you can stick with
   the OpenDJ server embedded in an OpenAM installation.</para>
 
-  <para>If you use the OpenDJ service embedded within OpenAM, CTS schema is automatically included. But
-  the capabilities of the embedded OpenDJ instance is limited.</para>
-
-  <para>This chapter describes how to set up the CTS in a separate backend, also known as a
-  subtree. You can configure that backend in an embedded or an external instance of OpenDJ. When you
-  configure a subtree for CTS, you can customize performance tuning requirements appropriately.</para>
+  <para>
+   If you use the OpenDJ service embedded within OpenAM, CTS schema is automatically included.
+   You can choose, however, to manage CTS data in an external instance of OpenDJ.
+  </para>
 
   <para>If you choose to set up CTS in an external instance of OpenDJ, you will have to install OpenDJ
   separately. For more information, see the <link xlink:show="new"
   xlink:href="http://docs.forgerock.org/en/opendj/2.6.0/install-guide/"
-  xlink:role="http://docbook.org/xlink/role/olink"><citetitle>OpenDJ Installation Guide</citetitle></link>.</para>
+  ><citetitle>OpenDJ Installation Guide</citetitle></link>.</para>
 
   <para>Once you have installed OpenDJ on an external server, you can set up schema definitions,
   specify tokens in a valid LDAP format, configure indexes to allow OpenAM to retrieve tokens,
@@ -106,10 +104,12 @@
        <listitem>
         <para><literal>Root Suffix</literal></para>
         <para><literal>ou=ctsData,dc=openam,dc=example,dc=com</literal></para>
-        <para>It is helpful to have a unique value in this text box, as it allows CTS to be stored in
-        a unique container. If configured on an external OpenDJ server,
-        it allows you to set up unique values for backup and replication for that CTS token store. Other
-        references will be made to this <literal>ctsData</literal> root suffix.</para>
+        <para>
+         When you configure a new OpenDJ suffix for the CTS,
+         also consider creating a dedicated OpenDJ backend for the suffix.
+
+         This allows you to manage CTS data separately from less volatile data.
+        </para>
        </listitem>
        <listitem>
         <para><literal>SSL/TLS Enabled</literal></para>
@@ -126,8 +126,15 @@
        <listitem>
         <para><literal>Login Id</literal></para>
         <para><literal>uid=openam,ou=admins,dc=example,dc=com</literal></para>
-        <para>It may be easier to substitute the standard <literal>cn=Directory Manager</literal> administrative
-        user in this text box.</para>
+        <para>
+         This is the DN of a user with administrative access to CTS data.
+
+         The value here corresponds to the DN used in the examples in
+         <xref linkend="cts-acis" />.
+
+         You can bypass access control by binding with a root DN such as
+         <literal>cn=Directory Manager</literal>.
+        </para>
        </listitem>
        <listitem>
         <para><literal>Password</literal></para>
@@ -155,24 +162,35 @@
     the associated configuration store indexes, which allow OpenAM to search CTS token data in an efficient
     manner.</para>
 
-    <para>Different schema files are available in the
-    <filename>/path/to/webapps/openam/WEB-INF/template/ldif/sfha</filename> directory. If you install OpenAM
+    <para>Different schema files are available in the OpenAM
+    <filename>WEB-INF/template/ldif/sfha</filename> directory. If you install OpenAM
     with the embedded version of OpenDJ, the schema from the <filename>cts-add-schema.ldif</filename>,
     <filename>cts-container.ldif</filename>, and <filename>cts-indicies.ldif</filename> files are installed.
     If you upgrade to OpenAM <?eval ${serverDocTargetVersion}?> from a previous version with embedded OpenDJ,
     the schema from the <filename>99-cts-add-schema-backport.ldif</filename> file is incorporated in your
     upgrade.</para>
 
-    <para>However, if you are configuring an external CTS server, you may need to add schema from
-    the CTS Data Store Indexes table shown below. To do so, you can use the <command>dsconfig</command>
-    command depicted in the OpenDJ Administration Guide chapter on <link xlink:show="new"
-    xlink:href="http://docs.forgerock.org/en/opendj/2.6.0/admin-guide/#configure-indexes"
-    xlink:role="http://docbook.org/xlink/role/olink"><citetitle>Configuring a Standard Index</citetitle></link>.</para>
+    <para>
+     However, if you are configuring an external OpenDJ CTS server,
+     you must add schema manually.
 
-    <para>If you do create indexes for an external OpenDJ CTS server, you need to "rebuild" the indexes with
-    the <command>rebuild-index</command> command described in the OpenDJ Administration Guide
-    chapter on <link xlink:show="new" xlink:href="http://docs.forgerock.org/en/opendj/2.6.0/admin-guide/#rebuild-index"
-    xlink:role="http://docbook.org/xlink/role/olink"><citetitle>Rebuilding Indexes</citetitle></link>.</para>
+     You must also configure the indexes in the table shown below.
+
+     To do so, you can use the <command>dsconfig</command>
+     command depicted in the <citetitle>OpenDJ Administration Guide</citetitle>
+     chapter on <link xlink:show="new"
+     xlink:href="http://docs.forgerock.org/en/opendj/2.6.0/admin-guide/#configure-indexes"
+     ><citetitle>Configuring a Standard Index</citetitle></link>.
+    </para>
+
+    <para>
+     After creating indexes for the external OpenDJ CTS server,
+     rebuild the indexes with the <command>rebuild-index</command> command
+     described in the <citetitle>OpenDJ Administration Guide</citetitle>
+     chapter on <link xlink:show="new"
+     xlink:href="http://docs.forgerock.org/en/opendj/2.6.0/admin-guide/#rebuild-index"
+     ><citetitle>Rebuilding Indexes</citetitle></link>.
+    </para>
 
     <table xml:id="cts-configuration-store-indexes">
           <title>CTS Data Store Indexes</title>
@@ -326,39 +344,39 @@
   <section xml:id="cts-acis">
     <title>CTS Access Control Instructions</title>
 
-    <para>At least the first time you try CTS, do so with a login ID of <literal>cn=Directory Manager</literal>.
-    It can simplify configuration. You can use these instructions to set up a privileged user later.</para>
+    <para>
+     If you bind to the OpenDJ CTS server as a root DN user,
+     such <literal>cn=Directory Manager</literal>, you can skip this section.
+    </para>
 
-    <para>When ready, you can set up a user with access to CTS tokens in the data store. To do so,
-    configure a user such as <literal>openam</literal> with Create, Read, Update, and Delete (CRUD) privileges.
-    For the given Root Suffix and user name, you might have a User DN of
-    <literal>uid=openam,ou=admins,dc=example,dc=org</literal>. In brief, ACI attributes are formatted with the
-    following syntax:</para>
+    <para>
+     If you bind as a regular administrative user,
+     you must give the user appropriate access to the CTS data.
 
-    <literallayout class="monospaced">
-<replaceable>targets</replaceable>(version 3.0;acl "<replaceable>name</replaceable>";<replaceable>permissions subjects</replaceable>;)
-    </literallayout>
+     Give the regular administrative user access to
+     add, delete, modify, read, and search CTS data,
+     by setting access control instructions on the Root Suffix entry for CTS data.
 
-    <para>The following entries give an <literal>openam</literal> user CRUD privileges with the noted User DN,
-    for an external directory service:</para>
+     The user in examples shown here has DN
+     <literal>uid=openam,ou=admins,dc=example,dc=com</literal>.
+    </para>
 
     <programlisting language="ldif">aci: (version 3.0;acl "Add config entry"; allow (add)(userdn = "ldap:///
-  uid=openam,ou=admins,dc=example,dc=org");)
+ uid=openam,ou=admins,dc=example,dc=com");)
 aci: (targetattr="*")(version 3.0;acl "Allow entry search"; allow (
-  search, read)(userdn = "ldap:///uid=openam,ou=admins,dc=example,dc=org");)
-aci: (targetattr="*")(version 3.0;acl "Modify config entry"; allow (write)(
-  userdn = "ldap:///uid=openam,ou=admins,dc=example,dc=org");)
-aci: (version 3.0;acl "Delete config entry"; allow (delete)(userdn = "ldap:///
-  uid=openam,ou=admins,dc=example,dc=org");)
+ search, read)(userdn = "ldap:///uid=openam,ou=admins,dc=example,dc=com");)
+aci: (targetattr="*")(version 3.0;acl "Modify entries"; allow (write)(
+ userdn = "ldap:///uid=openam,ou=admins,dc=example,dc=com");)
+aci: (version 3.0;acl "Delete entries"; allow (delete)(userdn = "ldap:///
+ uid=openam,ou=admins,dc=example,dc=com");)
 aci: (targetcontrol="2.16.840.1.113730.3.4.3")(version 3.0;acl "Allow
   persistent search"; allow (search, read)(userdn = "ldap:///uid=openam,
-  ou=admins,dc=example,dc=org");)</programlisting>
+ ou=admins,dc=example,dc=com");)</programlisting>
 
-    <para>For detailed information on ACIs, with details on how you can use the <command>dsconfig</command>,
+    <para>For detailed information on ACIs, with examples showing how you can use the <command>dsconfig</command>,
     as well as various <command>ldap*</command> commands to configure them, see the OpenDJ chapter on
     <link xlink:show="new" xlink:href="http://docs.forgerock.org/en/opendj/2.6.0/admin-guide/#chap-privileges-acis"
-    xlink:role="http://docbook.org/xlink/role/olink">
-    <citetitle>Configuring Privileges &amp; Access Control</citetitle></link>.</para>
+    ><citetitle>Configuring Privileges &amp; Access Control</citetitle></link>.</para>
 
   </section>
 
@@ -410,16 +428,11 @@ set-replication-server-prop
 --backendID ctsData
 --backupDirectory /path/to/opendj/backup
 --recurringTask "x * * * *"
---completionNotify backupadmin@example.org
---errorNotify backupadmin@example.org</screen>
-
-   <para>Unless you have configured a separate instance of OpenDJ dedicated to CTS token storage, avoid using the
-   <command>--backupAll</command> option. CTS tokens are generally more volatile than other data stored in
-   an OpenDJ server, so it may be appropriate to set up different Base DNs with different
-   <command>backup</command> commands.</para>
+--completionNotify backupadmin@example.com
+--errorNotify backupadmin@example.com</screen>
 
     <para>While you may choose to adjust the time periods associated with
-    <literal>replication-purge-frequency</literal> and backups, be sure that backups are performed more frequently.
+    <literal>replication-purge-delay</literal> and backups, be sure that backups are performed more frequently.
     Otherwise, change log records that are required to restore data may be lost.</para>
 
   </section>
