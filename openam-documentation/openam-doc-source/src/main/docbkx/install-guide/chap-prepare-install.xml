@@ -788,32 +788,42 @@ esac
 </programlisting>
  </section>
 
- <section xml:id="prepare-glassfish-v2">
-  <title>Preparing GlassFish v2</title>
+ <section xml:id="prepare-glassfish">
+  <title>Preparing GlassFish</title>
 
-  <para>Before you deploy OpenAM, update the JVM options as described in
-  <xref linkend="prepare-java" />. The settings are accessible in the
-  administration console under Application Server &gt; JVM Settings &gt;
-  JVM Options.</para>
+  <para>
+   Before you deploy OpenAM, update the JVM options as described in
+   <xref linkend="prepare-java" />.
 
-  <orderedlist>
-   <para>In addition, after downloading the OpenAM server .war file, edit the
-   application configuration to make sure that classes from OpenAM libraries
-   are loaded before GlassFish bundled libraries.</para>
+   The settings are accessible in the administration console
+   under Application Server > JVM Settings > JVM Options for v2, or
+   under Configurations > server-config > JVM Settings > JVM Options for v3.
+  </para>
 
-   <listitem>
-    <para>Extract the OpenAM server .war file content to a working
-    directory.</para>
+  <section xml:id="prepare-glassfish-v2">
+   <title>Preparing GlassFish v2</title>
 
-    <screen>$ mkdir /tmp/openam ; cd /tmp/openam
+   <orderedlist>
+    <para>
+     In addition to setting JVM options,
+     after downloading the OpenAM server .war file,
+     edit the application configuration to make sure that
+     classes from OpenAM libraries are loaded before GlassFish bundled libraries.
+    </para>
+
+    <listitem>
+     <para>Extract the OpenAM server .war file content to a working
+     directory.</para>
+
+     <screen>$ mkdir /tmp/openam ; cd /tmp/openam
 $ jar -xf ~/Downloads/openam.war</screen>
-   </listitem>
+    </listitem>
 
-   <listitem>
-    <para>Add a <filename>WEB-INF/sun-web.xml</filename> file to set
-    class-loading delegation to false.</para>
+    <listitem>
+     <para>Add a <filename>WEB-INF/sun-web.xml</filename> file to set
+     class-loading delegation to false.</para>
 
-    <screen>$ vi WEB-INF/sun-web.xml
+     <screen>$ vi WEB-INF/sun-web.xml
 $ cat WEB-INF/sun-web.xml
 &lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?&gt;
 &lt;!DOCTYPE sun-web-app PUBLIC
@@ -822,19 +832,68 @@ $ cat WEB-INF/sun-web.xml
 &lt;sun-web-app error-url=&quot;&quot;&gt;
   &lt;class-loader delegate=&quot;false&quot;/&gt;
 &lt;/sun-web-app&gt;</screen>
-   </listitem>
+    </listitem>
 
-   <listitem>
-    <para>Pack the updated .war file to deploy.</para>
+    <listitem>
+     <para>Pack the updated .war file to deploy.</para>
 
-    <screen>$ jar -cf ../openam.war *</screen>
-   </listitem>
+     <screen>$ jar -cf ../openam.war *</screen>
+    </listitem>
 
-   <listitem>
-    <para>Deploy the updated .war file in place of the server .war file
-    delivered with the release.</para>
-   </listitem>
-  </orderedlist>
+    <listitem>
+     <para>Deploy the updated .war file in place of the server .war file
+     delivered with the release.</para>
+    </listitem>
+   </orderedlist>
+  </section>
+
+  <section xml:id="prepare-glassfish-v3">
+   <title>Preparing GlassFish v3</title>
+
+   <orderedlist>
+    <para>
+     In addition to setting JVM options,
+     remove the <literal>glassfish-full-profile</literal>
+     and <literal>metro</literal> packages
+     to resolve library conflicts before you deploy OpenAM.
+    </para>
+
+    <listitem>
+     <para>
+      Stop GlassFish if it is running.
+     </para>
+
+     <screen>$ /path/to/glassfish3/bin/asadmin stop-domain domain1
+Waiting for the domain to stop ....
+Command stop-domain executed successfully.</screen>
+    </listitem>
+
+    <listitem>
+     <para>
+      Remove the packages by using the <command>pkg</command> command.
+     </para>
+
+     <screen>$ cd /path/to/glassfish3/bin/
+./pkg uninstall glassfish-full-profile metro
+PHASE                                        ACTIONS
+Removal Phase                                  56/56</screen>
+    </listitem>
+
+    <listitem>
+     <para>
+      Start GlassFish.
+     </para>
+
+     <screen>$ /path/to/glassfish3/bin/asadmin start-domain domain1
+Waiting for domain1 to start ...
+Successfully started the domain : domain1
+domain  Location: /path/to/glassfish3/glassfish/domains/domain1
+Log File: /path/to/glassfish3/glassfish/domains/domain1/logs/server.log
+Admin Port: 4848
+Command start-domain executed successfully.</screen>
+    </listitem>
+   </orderedlist>
+  </section>
  </section>
 
  <section xml:id="prepare-jboss-5">
