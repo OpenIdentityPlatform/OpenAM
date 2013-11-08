@@ -55,18 +55,18 @@
     <fileSets>
         <fileSet>
             <outputDirectory>legal-notices</outputDirectory>
+            <directory>${project.basedir}/../../target/legal-notices</directory>
+            <includes>
+                <include>**/**</include>
+            </includes>
+        </fileSet>
+        <fileSet>
+            <outputDirectory>legal-notices</outputDirectory>
             <directory>../../legal</directory>
         </fileSet>
         <fileSet>
             <outputDirectory>legal-notices</outputDirectory>
             <directory>../../license</directory>
-        </fileSet>
-        <fileSet>
-            <outputDirectory>legal-notices</outputDirectory>
-            <directory>${project.basedir}/../../target/legal-notices</directory>
-            <includes>
-                <include>**/**</include>
-            </includes>
         </fileSet>
         <fileSet>
             <outputDirectory>ldif</outputDirectory>
