@@ -449,7 +449,7 @@ namespace Sun.Identity.Saml2
             signedXml.ComputeSignature();
 
             XmlElement xmlSignature = signedXml.GetXml();
-
+ 
             XmlNamespaceManager nsMgr = new XmlNamespaceManager(xml.NameTable);
             nsMgr.AddNamespace("ds", SignedXml.XmlDsigNamespaceUrl);
             nsMgr.AddNamespace("saml", Saml2Constants.NamespaceSamlAssertion);
@@ -471,10 +471,9 @@ namespace Sun.Identity.Saml2
         /// <summary>
         /// Encrypts the NameID attribute of the AttributeQuery request.
         /// </summary>
-        /// <param name="certFriendlyName">
-        /// Friendly Name of the X509Certificate to be retrieved
-        /// from the LocalMachine keystore and used to encrypt generated symmetric key.
-        /// Be sure to have appropriate permissions set on the keystore.
+        /// <param name="certValue">
+        /// Encoded X509 certificate retrieved from the identity provider's metadata
+        /// and used to encrypt generated symmetric key.
         /// </param>
         /// <param name="xmlDoc">
         /// XML document to be encrypted.
@@ -482,11 +481,11 @@ namespace Sun.Identity.Saml2
         /// <param name="symmetricAlgorithmUri">
         /// Symmetric algorithm uri used for encryption.
         /// </param>
-        public static void EncryptAttributeQueryNameID(string certFriendlyName, string symmetricAlgorithmUri, XmlDocument xmlDoc)
+        public static void EncryptAttributeQueryNameID(string certValue, string symmetricAlgorithmUri, XmlDocument xmlDoc)
         {
-            if (string.IsNullOrWhiteSpace(certFriendlyName))
+            if (string.IsNullOrWhiteSpace(certValue))
             {
-                throw new Saml2Exception(Resources.EncryptedXmlInvalidCertFriendlyName);
+                throw new Saml2Exception(Resources.EncryptedXmlCertNotFound);
             }
 
             if (string.IsNullOrWhiteSpace(symmetricAlgorithmUri))
@@ -499,7 +498,8 @@ namespace Sun.Identity.Saml2
                 throw new Saml2Exception(Resources.SignedXmlInvalidXml);
             }
 
-            X509Certificate2 cert = FedletCertificateFactory.GetCertificateByFriendlyName(certFriendlyName);
+            byte[] byteArray = Encoding.UTF8.GetBytes(certValue);
+            X509Certificate2 cert = new X509Certificate2(byteArray);
             if (cert == null)
             {
                 throw new Saml2Exception(Resources.EncryptedXmlCertNotFound);

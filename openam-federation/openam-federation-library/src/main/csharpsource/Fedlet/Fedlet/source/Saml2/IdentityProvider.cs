@@ -137,11 +137,57 @@ namespace Sun.Identity.Saml2
         {
             get
             {
-                string xpath = "/md:EntityDescriptor/md:IDPSSODescriptor/md:KeyDescriptor[@use='signing']/ds:KeyInfo/ds:X509Data/ds:X509Certificate";
+                string xpath = "/md:EntityDescriptor/md:IDPSSODescriptor/md:KeyDescriptor[@use='signing' or (not(@use) and count(../KeyDescriptor[@use='signing']) = 0)][1]/ds:KeyInfo/ds:X509Data/ds:X509Certificate";
                 XmlNode root = this.metadata.DocumentElement;
                 XmlNode node = root.SelectSingleNode(xpath, this.metadataNsMgr);
-                string value = node.InnerText.Trim(); // Regex.Replace(node.InnerText.Trim(), @"[\r\t]", "");
-                return value;
+                if (node != null)
+                {
+                    return node.InnerText.Trim();
+                }
+                return null;
+            }
+        }
+
+        /// <summary>
+        /// Gets the encoded X509 certificate located within the identity
+        /// provider's metadata. Attribute Authority role use only.
+        /// </summary>
+        public string EncodedEncryptionCertificate
+        {
+            get
+            {
+                string xpath = "/md:EntityDescriptor/md:AttributeAuthorityDescriptor/md:KeyDescriptor[@use='encryption' or (not(@use) and count(../KeyDescriptor[@use='encryption']) = 0)][1]/ds:KeyInfo/ds:X509Data/ds:X509Certificate";
+                XmlNode root = this.metadata.DocumentElement;
+                XmlNode node = root.SelectSingleNode(xpath, this.metadataNsMgr);
+                if (node != null)
+                {
+                    return node.InnerText.Trim();
+                }
+                return null;
+            }
+        }
+
+        /// <summary>
+        /// Gets the encryption algorithm, installed on this identity provider.
+        /// Attribute Authority role use only.
+        /// </summary>
+        public string EncryptionMethodAlgorithm
+        {
+            get
+            {
+                string aes128cbc = "http://www.w3.org/2001/04/xmlenc#aes128-cbc";
+                string xpath = "/md:EntityDescriptor/md:AttributeAuthorityDescriptor/md:KeyDescriptor[@use='encryption' or (not(@use) and count(../KeyDescriptor[@use='encryption']) = 0)][1]/md:EncryptionMethod";
+                XmlNode root = this.metadata.DocumentElement;
+                XmlNode node = root.SelectSingleNode(xpath, this.metadataNsMgr);
+                if (node != null)
+                {
+                    string value = node.Attributes["Algorithm"].Value;
+                    if (!string.IsNullOrWhiteSpace(value))
+                    {
+                       return value;
+                    }
+                }
+                return aes128cbc;
             }
         }
 

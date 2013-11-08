@@ -1379,19 +1379,19 @@ namespace Sun.Identity.Saml2
 
                 if (this.ServiceProvider.WantNameIDEncryptedAttributeQuery)
                 {
-                    if (string.IsNullOrWhiteSpace(this.ServiceProvider.AttributeQueryEncryptionCertificateAlias))
+                    if (string.IsNullOrWhiteSpace(idp.EncodedEncryptionCertificate))
                     {
-                        throw new ServiceProviderUtilityException(Resources.ServiceProviderUtilityEncryptFailedNoCertAlias);
+                        throw new ServiceProviderUtilityException(Resources.EncryptedXmlCertNotFound);
                     }
 
-                    if (string.IsNullOrWhiteSpace(this.ServiceProvider.EncryptionMethodAlgorithm))
+                    if (string.IsNullOrWhiteSpace(idp.EncryptionMethodAlgorithm))
                     {
-                        throw new ServiceProviderUtilityException(Resources.ServiceProviderUtilityEncryptFailedNoEncrAlgorithm);
+                        throw new ServiceProviderUtilityException(Resources.EncryptedXmlInvalidEncrAlgorithm);
                     }
 
                     Saml2Utils.EncryptAttributeQueryNameID(
-                        this.ServiceProvider.AttributeQueryEncryptionCertificateAlias,
-                        this.ServiceProvider.EncryptionMethodAlgorithm,
+                        idp.EncodedEncryptionCertificate,
+                        idp.EncryptionMethodAlgorithm,
                         attrQueryRequestXml);
                 }
 
