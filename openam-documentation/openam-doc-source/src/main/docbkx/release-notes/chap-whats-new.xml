@@ -37,16 +37,13 @@
   <title>Major New Features</title>
 
   <listitem>
-    <para>This release uses the new OpenAM Core Token Service (CTS) internally,
-    with a more generalized token storage format for sessions, SAML Tokens, and
-    OAuth Tokens. The LDAP schema have been extended for the CTS objects.</para>
-  </listitem>
+    <para>
+     This release uses the new OpenAM Core Token Service (CTS),
+     with a more generalized token storage format
+     for sessions, SAML Tokens, and OAuth Tokens.
 
-  <listitem>
-   <para>OpenAM now includes a preview of the cloud Dashboard service, part of
-   allowing user self-management of web based applications. (<link
-   xlink:show="new" xlink:href="https://bugster.forgerock.org/jira/browse/OPENAM-2019"
-   >OPENAM-2019</link>).</para>
+     The LDAP schema have been extended for the CTS objects.
+    </para>
   </listitem>
 
   <listitem>
@@ -133,12 +130,23 @@
   </listitem>
 
   <listitem>
+   <para>OpenAM now includes a preview of the cloud Dashboard service, part of
+   allowing user self-management of web based applications. (<link
+   xlink:show="new" xlink:href="https://bugster.forgerock.org/jira/browse/OPENAM-2019"
+   >OPENAM-2019</link>).</para>
+  </listitem>
+
+  <listitem>
    <!-- AME-1652: Update DJ from 2.4.6 to 2.6 -->
    <para>OpenAM now bundles OpenDJ 2.6.</para>
   </listitem>
   <listitem>
-      <para>A new UI is available for experimental, non-production use. Informally known as the XUI,
-      it uses LESS CSS for UI configuration.</para>
+      <para>
+       A new UI is available for experimental, non-production use.
+
+       Informally known as the XUI, this JavaScript based UI uses
+       LESS CSS for UI configuration.
+      </para>
   </listitem>
 
  </itemizedlist>

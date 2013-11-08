@@ -90,6 +90,14 @@
   <para>The XUI is experimental and not supported for production use. The only
   language locale available for the XUI at this time is US English, in the
   <filename>/path/to/openam/webapps/XUI/locales</filename> directory.</para>
+
+  <para>
+   On hosts with pure IPv6 networks, OpenAM configuration has been seen to fail
+   while starting the embedded OpenDJ directory server
+   (<link xlink:show="new"
+   xlink:href="https://bugster.forgerock.org/jira/browse/OPENAM-3008"
+   >OPENAM-3008</link>).
+  </para>
  </section>
 
  <section xml:id="known-issues">
