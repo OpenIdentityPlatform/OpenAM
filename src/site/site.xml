@@ -58,6 +58,7 @@
   </menu>
   
   <menu name="Released Documentation">
+   <item name="OpenAM 11.0.0" href="http://docs.forgerock.org/en/openam/11.0.0"/>
    <item name="OpenAM 10.1.0" href="http://docs.forgerock.org/en/openam/10.1.0"/>
    <item name="OpenAM 10.0.0" href="http://docs.forgerock.org/en/openam/10.0.0"/>
   </menu>
