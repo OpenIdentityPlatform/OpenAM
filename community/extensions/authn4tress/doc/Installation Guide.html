@@ -1,0 +1,228 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<head>
+  <meta content="text/html; charset=ISO-8859-1"
+ http-equiv="content-type">
+  <title>Installation Guide</title>
+</head>
+<body>
+<h2><span style="font-weight: bold;">Installation and Configuration
+Guide for the 4Tress OTP Authentication Module OpenSSO Extension.</span></h2>
+<h3>Introduction</h3>
+This document covers how to install and configure the 4Tress OTP
+Authentication Module into an existing OpenSSO deployment. <br>
+<span style="font-weight: bold;"><br>
+</span>
+<h3><span style="font-weight: bold;">4Tress Authentication Module
+Components</span></h3>
+<h3><span style="font-weight: bold;"></span></h3>
+The module has the following components:<br>
+<br>
+1. The 4TressAuthModule.jar under the lib directory of this OpenSSO
+extension.<br>
+2. A set of locale .properties files with prefix,
+'amAuthFortressUserOTP'.<br>
+3. A Module Properties XML file, FortressAuthUserOTPModule.xml that
+specifies the JAAS Callbacks.<br>
+4. A Service Configuration file for the module,
+amAuthFortressAuthUserOTP.xml. This is used to register the service
+into OpenSSO.<br>
+<span style="font-weight: bold;"><br>
+</span>
+<h3><span style="font-weight: bold;">Software Requirements</span></h3>
+OpenSSO deployed on a Java-based web container e.g. Glassfish.<br>
+Java SE 1.4.2 or above.<br>
+Apache Axis 1.2 Library files - axis.jar, commons-discovery-0.2.jar,
+commons-logging-1.0.4.jar, wsdl4j-1.5.1.jar and log4j-1.2.8.jar.<br>
+<br>
+<h3>Installation Steps</h3>
+<br>
+1. Install the 4TressAuthModule code into OpenSSO. You can either
+checkout the code, build and package the source files as a library file
+using the build.xml included or use the
+pre-compiled jar file under lib
+directory. Place the jar file and all the Apache Axis 1.2 files
+mentioned in Software Requirements in the
+&lt;OPENSSO_HOME&gt;/WEB-INF/lib directory of the opensso war file.<br>
+<br>
+2. Place the FortressAuthUserOTPModule.xml under the
+&lt;OPENSSO_HOME&gt;/config/auth/default directory<br>
+<br>
+3. Place the local .properties files in the
+&lt;OPENSSO_HOME&gt;/WEB-INF/classes directory.<br>
+<br>
+4. Next load the configuration file into OpenSSO deployment. This
+requires that you have installed the FAM tools:<br>
+<br>
+&lt;FAM_TOOLS_HOME&gt;/bin/famadm create-service -X
+amAuthFortressAuthUserOTP.xml -u &lt;ADMIN_USER&gt; -f &lt;PWD_FILE&gt;.<br>
+<br>
+5. Next register the module as a valid authenticator for the opensso
+deployment. A sample data file, <span style="font-style: italic;">FortressAuthnRegistration</span>
+can be found under the config directory.<br>
+<br>
+&lt;FAM_TOOLS_HOME&gt;/bin/famadm add-attribute-defaults -s
+iPlanetAMAuthService -t Global -u &lt;ADMIN_USER&gt; -f
+&lt;PASS_FILE&gt; -D FortressAuthnRegistration<br>
+<br>
+6. Restart the web container hosting Access Manager.<br>
+<br>
+<br>
+<h3>Configuration Steps</h3>
+If all has been installed successfully, then once you log into the
+OpenSSO Web console using the administration credentials, you should
+see 4Tress/OTP Authentication Module
+listed under Authentication Section of the global configuration tab.<br>
+<br>
+In order to configure the module against a 4Tress Server deployment do
+the following:<br>
+<br>
+Under the Access Control tab, click on the realm that has the 4Tress
+module service installed.&nbsp; You will then see a page with tabs.
+Click on the 'Authentication' tab. Go to the section under Modules and
+click the 'New...' button. You will be presented with a form to enter a
+name for the module instance and click on the radio button for
+4Tress/OTP Authentication Module. Click 'Finish'. You will be returned
+to the Authentication tab. Click on the reference to the module
+instance you just created.&nbsp; The page
+should look be similar to screenshot below.<img
+ style="width: 1271px; height: 860px;" alt="4Tress Configuration Page"
+ src="4TressConfig.png"><br>
+<br>
+All configuration parameters are required in order for the
+authentication module to work.<br>
+<br>
+The configuration parameters required to connect with a 4Tress
+Authentication Server deployment are documented below. The references
+to the demonstration 4Tress deployment are related to the 4Tress&nbsp;
+On-line service which is described later in this section.<br>
+<br style="font-weight: bold;">
+<span style="font-weight: bold;">4Tress URL Endpoint </span>points to
+the
+web service endpoint for the 4Tress Authenticator 1.1 Web Service. The
+format of the URL is expected to be:
+http://&lt;4TRESS_HOST&gt;:&lt;4TRESS_PORT&gt;/4TRESSSoap/services/Authenticator-11<br>
+<br style="font-weight: bold;">
+<span style="font-weight: bold;">4Tress Channel Code</span> refers to
+the service channel that the end user is using to<span
+ style="font-family: monospace;"> </span>interact with the
+organisation. For example, if OpenSSO is being used to protect access
+to an internet banking site then the channel would be<span
+ style="font-family: monospace;"> </span>'Internet Banking'. For the
+demonstration, a generic channel<span style="font-family: monospace;"> </span>representing
+the Web is used. (CH_WEB). Non web channels might include IVR or Call
+Centre Agent. 4TRESS enables the configuration of<span
+ style="font-family: monospace;"> </span>authentication policies
+specific to particular channels.<br>
+<br>
+<span style="font-weight: bold;">4Tress Authentication Type Code</span>
+is a reference to an authentication type<span
+ style="font-family: monospace;"> </span>configured on a 4Tress
+Server. Examples of different Authentication Types could be 'One Time
+Password' or 'Static password'. For the demo a code<span
+ style="font-family: monospace;"> </span>of 'DYNMC_AUTH' is used. This
+instructs the 4TRESS server to dynamically select the correct
+authentication type based on the end user's profile. Hence the demo is
+able to support authentication using either a static<span
+ style="font-family: monospace;"></span>passsword or a one time
+password.
+<br>
+<br>
+<span style="font-weight: bold;">4Tress Authentication Mode Synchronous
+</span>is applicable only to authentication<span
+ style="font-family: monospace;"> </span>types that use a one time
+password. There are two modes:1(=SYNCHRONOUS) and 2 (=ASYNCHRONOUS). In
+synchronous authentication the<span style="font-family: monospace;"> </span>OTP
+is generated based on variables such as (time or a counter) which<span
+ style="font-family: monospace;"> </span>are synchronised between the
+physical device (i.e. token) and the authentication server. In
+asynchronous mode the OTP is generated as a<span
+ style="font-family: monospace;"> </span>function of a challenge
+issued by the server. The challenge may also be<span
+ style="font-family: monospace;"> </span>a parameter of a transaction,
+enabling a simple transaction signing mechanism. 4TRESS supports both
+synchronous and asynchronous<span style="font-family: monospace;"> </span>authentication.
+For the purpose of the demo, the value 1(=SYNCHRONOUS)<span
+ style="font-family: monospace;"> </span>should be used.
+<br>
+<br>
+<span style="color: rgb(0, 0, 0);" lang="en-us"><font face="Arial"
+ size="2"><big><span style="font-family: Times;">Within a single 4TRESS
+deployment it is possible to support multiple
+concurrent configurations, each with its own discrete set of user
+credentials and audit logs. Each configuration is referred to as a
+Security
+domain. The demo is set up with only a single domain called 'DOMAIN1',
+hence<span style="font-weight: bold;"> 4Tress Security Domain</span>
+should have a value of DOMAIN1</span></big></font></span><br>
+<p><big><span lang="en-us"><font size="2"><big>The last
+configuration parameter, <span style="font-weight: bold;">4Tress User
+OTP Module Authentication Level </span>is relevant for OpenSSO only.
+It indicates what
+authentication level you wish to set for this module instance. The
+Authentication level can be used in OpenSSO policy conditions. Usually
+a 'stronger' authentication scheme is assigned a high numeric value.<span
+ style="font-family: Times;"><br>
+<br>
+</span>ActivIdentity
+provides an online service that you may use to evaluate the Sun OpenSSO
+integration with ActivIdentity 4TRESS Authentication Server. In
+such case make sure your platform has access to Internet, then you can
+use the following settings:</big></font></span></big></p>
+<ul style="font-family: Times;">
+  <p><big><span lang="en-us"><font size="2"><big>4Tress URL Endpoint: </big></font></span><a
+ href="http://66.126.185.111:9090/4TRESSSoap/services/Authenticator-11"><span
+ lang="en-us"><u><font color="#0000ff" size="2"><big>http://66.126.185.111:9090/4TRESSSoap/services/Authenticator-11</big></font></u></span></a><span
+ lang="en-us"></span>
+  </big></p>
+  <p><big><span lang="en-us"><font size="2"><big>4Tress Channel Code:
+CH_WEB</big></font></span>
+  </big></p>
+  <p><big><span lang="en-us"><font size="2"><big>4Tress Authentication
+Type Code: DYNMC_AUTH</big></font></span>
+  </big></p>
+  <p><big><span lang="en-us"><font size="2"><big>4Tress Authentication
+Mode Synchronous : SYNCH<br>
+  </big></font></span></big></p>
+  <p><big><span lang="en-us"><font size="2"><big>4Tress Security
+Domain: DOMAIN1<br>
+  </big></font></span></big></p>
+</ul>
+<big><span style="font-weight: bold; font-family: Times;"></span></big><br>
+You will have to log out of AM as the administrator before you can test
+the login module.<br>
+<br>
+To test the login Module, use the URL&nbsp;
+http://&lt;FAM_HOST&gt;:&lt;FAM_PORT&gt;/opensso/UI/Login?module=&lt;MODULE_NAME&gt;.&nbsp;
+You should see the following login page:<img
+ style="width: 1270px; height: 860px;" alt="4Tress LoginPage"
+ src="4TRESSOTPDiagramFigure3.png"><br>
+<span lang="en-us"><font size="2"><big><br>
+If you use ActivIdentity 4TRESS Online service you can use the
+following credentials to test user authentication:</big></font></span>
+<p><big> </big></p>
+<p><big><span lang="en-us"><font size="2"><big>Username: CUSTOMER</big></font></span>
+<br>
+<span lang="en-us"><font size="2"><big>Password: OpenSSO</big></font></span>
+</big></p>
+<p><big><span lang="en-us"><font size="2"><big>You may want to
+evaluate Sun Access Manager authentication using Strong Authentication.
+Send an email to OpenSSO@ActivIdentity with the following information:</big></font></span></big></p>
+<p><big><span lang="en-us"><font size="2"><big>Company</big></font></span>
+<br>
+<span lang="en-us"><font size="2"><big>First Name</big></font></span> <br>
+<span lang="en-us"><font size="2"><big>Last Name</big></font></span> <br>
+<span lang="en-us"><font size="2"><big>Email</big></font></span> <br>
+<span lang="en-us"><font size="2"><big>Telephone</big></font></span> <br>
+<span lang="en-us"><font size="2"><big>Country</big></font></span> </big></p>
+<p><big><span lang="en-us"><font size="2"><big>ActivIdentity will
+provide you a personal user account and a list of One Time Passwords.
+You may use these pre-generated One Time Password to have an overview
+of the end user experience and the associated security.</big></font></span></big></p>
+<big><br style="font-family: Times;">
+</big><br>
+<br>
+<br>
+<br>
+</body>
+</html>

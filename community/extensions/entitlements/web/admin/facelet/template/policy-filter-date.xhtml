@@ -1,0 +1,83 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!--
+   DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
+
+   Copyright (c) 2009 Sun Microsystems Inc. All Rights Reserved
+
+   The contents of this file are subject to the terms
+   of the Common Development and Distribution License
+   (the License). You may not use this file except in
+   compliance with the License.
+
+   You can obtain a copy of the License at
+   https://opensso.dev.java.net/public/CDDLv1.0.html or
+   opensso/legal/CDDLv1.0.txt
+   See the License for the specific language governing
+   permission and limitations under the License.
+
+   When distributing Covered Code, include this CDDL
+   Header Notice in each file and include the License file
+   at opensso/legal/CDDLv1.0.txt.
+   If applicable, add the following below the CDDL Header,
+   with the fields enclosed by brackets [] replaced by
+   your own identifying information:
+   "Portions Copyrighted [year] [name of copyright owner]"
+
+   $Id: policy-filter-date.xhtml,v 1.8 2009/06/23 18:43:49 farble1670 Exp $
+
+-->
+
+<span
+    xmlns="http://www.w3.org/1999/xhtml"
+    xmlns:ui="http://java.sun.com/jsf/facelets"
+    xmlns:f="http://java.sun.com/jsf/core"
+    xmlns:ice="http://www.icesoft.com/icefaces/component"
+    xmlns:c="http://java.sun.com/jstl/core"
+    xmlns:o="http://opensso.dev.java.net">
+
+    <ice:panelGrid
+        styleClass="inline-input"
+        columns="4">
+        <ice:outputText
+            value="#{resources['policy-filter-pattern.is']}"/>
+        <ice:panelGroup>
+            <ice:selectOneMenu
+                valueChangeListener="#{handler.policyFilterChangedListener}"
+                value="#{policyFilter.verbString}">
+                <f:selectItems
+                    value="#{policyFilter.verb.items}"/>
+            </ice:selectOneMenu>
+        </ice:panelGroup>
+        <ice:panelGroup
+            rendered="#{policyFilter.valueShown}">
+            <ice:panelGrid
+                columns="2">
+                <ice:panelGroup>
+                    <ice:inputText
+                        size="3"
+                        valueChangeListener="#{handler.policyFilterChangedListener}"
+                        onkeyup="submitNow(this);"
+                        value="#{policyFilter.value}"/>
+                </ice:panelGroup>
+                <ice:panelGroup>
+                    <ice:selectOneMenu
+                        valueChangeListener="#{handler.policyFilterChangedListener}"
+                        value="#{policyFilter.unitString}">
+                        <f:selectItems
+                            value="#{policyFilter.unit.items}"/>
+                    </ice:selectOneMenu>
+                </ice:panelGroup>
+            </ice:panelGrid>
+        </ice:panelGroup>
+        <ice:panelGroup
+            rendered="#{policyFilter.dateShown}">
+            <ice:selectInputDate
+                valueChangeListener="#{handler.policyFilterChangedListener}"
+                value="#{policyFilter.date}"
+                renderAsPopup="true">
+                <f:convertDateTime
+                    timeZone="#{timeZoneBean.timeZone.ID}"/>
+            </ice:selectInputDate>
+        </ice:panelGroup>
+    </ice:panelGrid>
+</span>

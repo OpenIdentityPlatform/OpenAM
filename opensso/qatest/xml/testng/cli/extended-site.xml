@@ -1,0 +1,521 @@
+    <test name="CLI_site-test01">
+        <parameter name="testName" value="site-test1"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.cli.CLISiteTests"/>
+        </classes>
+    </test>     
+    <test name="CLI_site-test02">
+        <parameter name="testName" value="site-test2"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.cli.CLISiteTests"/>
+        </classes>
+    </test>     
+    <test name="CLI_site-test03">
+        <parameter name="testName" value="site-test3"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.cli.CLISiteTests"/>
+        </classes>
+    </test>     
+    <test name="CLI_site-test04">
+        <parameter name="testName" value="site-test4"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.cli.CLISiteTests"/>
+        </classes>
+    </test>     
+    <test name="CLI_site-test05">
+        <parameter name="testName" value="site-test5"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.cli.CLISiteTests"/>
+        </classes>
+    </test>     
+    <test name="CLI_site-test06">
+        <parameter name="testName" value="site-test6"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.cli.CLISiteTests"/>
+        </classes>
+    </test>     
+    <test name="CLI_site-test07">
+        <parameter name="testName" value="site-test7"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.cli.CLISiteTests"/>
+        </classes>
+    </test>     
+    <test name="CLI_site-test08">
+        <parameter name="testName" value="site-test8"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.cli.CLISiteTests"/>
+        </classes>
+    </test>     
+    <test name="CLI_site-test09">
+        <parameter name="testName" value="site-test9"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.cli.CLISiteTests"/>
+        </classes>
+    </test>     
+    <test name="CLI_site-test10">
+        <parameter name="testName" value="site-test10"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.cli.CLISiteTests"/>
+        </classes>
+    </test>     
+    <test name="CLI_site-test11">
+        <parameter name="testName" value="site-test11"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.cli.CLISiteTests"/>
+        </classes>
+    </test>     
+    <test name="CLI_site-test12">
+        <parameter name="testName" value="site-test12"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.cli.CLISiteTests"/>
+        </classes>
+    </test>     
+    <test name="CLI_site-test13">
+        <parameter name="testName" value="site-test13"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.cli.CLISiteTests"/>
+        </classes>
+    </test>     
+    <test name="CLI_site-test14">
+        <parameter name="testName" value="site-test14"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.cli.CLISiteTests"/>
+        </classes>
+    </test>     
+    <test name="CLI_site-test15">
+        <parameter name="testName" value="site-test15"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.cli.CLISiteTests"/>
+        </classes>
+    </test>     
+    <test name="CLI_site-test16">
+        <parameter name="testName" value="site-test16"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.cli.CLISiteTests"/>
+        </classes>
+    </test>     
+    <test name="CLI_site-test17">
+        <parameter name="testName" value="site-test17"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.cli.CLISiteTests"/>
+        </classes>
+    </test>     
+    <test name="CLI_site-test18">
+        <parameter name="testName" value="site-test18"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.cli.CLISiteTests"/>
+        </classes>
+    </test>     
+    <test name="CLI_site-test19">
+        <parameter name="testName" value="site-test19"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.cli.CLISiteTests"/>
+        </classes>
+    </test>     
+    <test name="CLI_site-test21">
+        <parameter name="testName" value="site-test21"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.cli.CLISiteTests"/>
+        </classes>
+    </test>     
+    <test name="CLI_site-test22">
+        <parameter name="testName" value="site-test22"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.cli.CLISiteTests"/>
+        </classes>
+    </test>     
+    <test name="CLI_site-test23">
+        <parameter name="testName" value="site-test23"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.cli.CLISiteTests"/>
+        </classes>
+    </test>     
+    <test name="CLI_site-test24">
+        <parameter name="testName" value="site-test24"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.cli.CLISiteTests"/>
+        </classes>
+    </test>     
+    <test name="CLI_site-test25">
+        <parameter name="testName" value="site-test25"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.cli.CLISiteTests"/>
+        </classes>
+    </test>     
+    <test name="CLI_site-member-test01">
+        <parameter name="testName" value="site-member-test1"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.cli.CLISiteMemberTests"/>
+        </classes>
+    </test>    
+    <test name="CLI_site-member-test02">
+        <parameter name="testName" value="site-member-test2"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.cli.CLISiteMemberTests"/>
+        </classes>
+    </test>    
+    <test name="CLI_site-member-test03">
+        <parameter name="testName" value="site-member-test3"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.cli.CLISiteMemberTests"/>
+        </classes>
+    </test>    
+    <test name="CLI_site-member-test04">
+        <parameter name="testName" value="site-member-test4"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.cli.CLISiteMemberTests"/>
+        </classes>
+    </test>    
+    <test name="CLI_site-member-test05">
+        <parameter name="testName" value="site-member-test5"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.cli.CLISiteMemberTests"/>
+        </classes>
+    </test>    
+    <test name="CLI_site-member-test06">
+        <parameter name="testName" value="site-member-test6"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.cli.CLISiteMemberTests"/>
+        </classes>
+    </test>    
+    <test name="CLI_site-member-test07">
+        <parameter name="testName" value="site-member-test7"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.cli.CLISiteMemberTests"/>
+        </classes>
+    </test>    
+    <test name="CLI_site-member-test08">
+        <parameter name="testName" value="site-member-test8"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.cli.CLISiteMemberTests"/>
+        </classes>
+    </test>    
+    <test name="CLI_site-member-test09">
+        <parameter name="testName" value="site-member-test9"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.cli.CLISiteMemberTests"/>
+        </classes>
+    </test>    
+    <test name="CLI_site-member-test10">
+        <parameter name="testName" value="site-member-test10"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.cli.CLISiteMemberTests"/>
+        </classes>
+    </test>    
+    <test name="CLI_site-member-test11">
+        <parameter name="testName" value="site-member-test11"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.cli.CLISiteMemberTests"/>
+        </classes>
+    </test>    
+    <test name="CLI_site-url-test01">
+        <parameter name="testName" value="site-url-test1"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.cli.CLISiteUrlTests"/>
+        </classes>
+    </test>     
+    <test name="CLI_site-url-test02">
+        <parameter name="testName" value="site-url-test2"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.cli.CLISiteUrlTests"/>
+        </classes>
+    </test>     
+    <test name="CLI_site-url-test03">
+        <parameter name="testName" value="site-url-test3"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.cli.CLISiteUrlTests"/>
+        </classes>
+    </test>     
+    <test name="CLI_site-url-test04">
+        <parameter name="testName" value="site-url-test4"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.cli.CLISiteUrlTests"/>
+        </classes>
+    </test>     
+    <test name="CLI_site-url-test05">
+        <parameter name="testName" value="site-url-test5"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.cli.CLISiteUrlTests"/>
+        </classes>
+    </test>     
+    <test name="CLI_site-url-test06">
+        <parameter name="testName" value="site-url-test6"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.cli.CLISiteUrlTests"/>
+        </classes>
+    </test>     
+    <test name="CLI_site-url-test07">
+        <parameter name="testName" value="site-url-test7"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.cli.CLISiteUrlTests"/>
+        </classes>
+    </test>     
+    <test name="CLI_site-url-test08">
+        <parameter name="testName" value="site-url-test8"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.cli.CLISiteUrlTests"/>
+        </classes>
+    </test>     
+    <test name="CLI_site-url-test09">
+        <parameter name="testName" value="site-url-test9"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.cli.CLISiteUrlTests"/>
+        </classes>
+    </test>     
+    <test name="CLI_site-url-test10">
+        <parameter name="testName" value="site-url-test10"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.cli.CLISiteUrlTests"/>
+        </classes>
+    </test>     
+    <test name="CLI_site-url-test12">
+        <parameter name="testName" value="site-url-test12"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.cli.CLISiteUrlTests"/>
+        </classes>
+    </test>     
+    <test name="CLI_site-url-test11">
+        <parameter name="testName" value="site-url-test11"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.cli.CLISiteUrlTests"/>
+        </classes>
+    </test>     
+    
+    
+    
+    

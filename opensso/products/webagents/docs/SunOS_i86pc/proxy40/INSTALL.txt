@@ -1,0 +1,293 @@
+#
+# DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
+#
+# Copyright (c) 2009 Sun Microsystems Inc. All Rights Reserved
+#
+# The contents of this file are subject to the terms
+# of the Common Development and Distribution License
+# (the License). You may not use this file except in
+# compliance with the License.
+#
+# You can obtain a copy of the License at
+# https://opensso.dev.java.net/public/CDDLv1.0.html or
+# opensso/legal/CDDLv1.0.txt
+# See the License for the specific language governing
+# permission and limitations under the License.
+# 
+# When distributing Covered Code, include this CDDL
+# Header Notice in each file and include the License file
+# at opensso/legal/CDDLv1.0.txt.
+# If applicable, add the following below the CDDL Header,
+# with the fields enclosed by brackets [] replaced by
+# your own identifying information:
+# "Portions Copyrighted [year] [name of copyright owner]"
+#
+# $Id: INSTALL.txt,v 1.1 2009/03/05 23:28:20 subbae Exp $
+#
+#
+#
+------------------------------------------------------------------------------
+Installation instructions Open Web Single Sign-On - Web Agents
+------------------------------------------------------------------------------
+
+%% Contents:
+    %% 1. Agent Installation
+    %% 2. Agent Uninstallation
+
+%% 1. Agent Installation
+
+Please make sure that the Sun Proxy Server 4.0 is installed and running. Also
+make sure that the Sun Proxy Server Agent is compiled with steps indicated in README.txt.
+
+Installation does the following:
+
+    - Creates the Sun Proxy Server Agent Instance Directory
+    - Tag Swapping in OpenSSOAgentBootstrap.properties file
+    - Updating Sun Proxy Server's obj.conf files
+
+%% 1.1 Steps
+
+1.1.1 Extract proxy_v40_SunOS_x86_agent_3.zip installation bits.
+1.1.2 Goto web_agents/proxy40_agent/bin
+1.1.3 Execute agentadmin --install
+1.1.4 Accept the license agreement terms
+1.1.5 Follow the installation interactions and provide these details:
+
+    - Sun Proxy Server Config Directory
+    - OpenAM Services Hos
+    - OpenAM Services port
+    - OpenAM Services Protocol
+    - OpenAM Services Deployment URI
+    - Agent Host name
+    - Agent Host port
+    - Agent Host protocol
+    - Agent Profile name
+    - Agent Profile's plain text password file
+
+1.1.6 Restart the server
+
+
+Here is the sample of the above steps with Proxy Server 4.0 :
+
+[/opt]> unzip proxy_v40_SunOS_x86_agent_3.zip
+Archive:  proxy_v40_SunOS_x86_agent_3.zip
+   creating: web_agents/
+   creating: web_agents/proxy40_agent/
+   creating: web_agents/proxy40_agent/config/
+   creating: web_agents/proxy40_agent/data/
+   creating: web_agents/proxy40_agent/etc/
+   creating: web_agents/proxy40_agent/installer-logs/
+   creating: web_agents/proxy40_agent/lib/
+   creating: web_agents/proxy40_agent/locale/
+  inflating: web_agents/proxy40_agent/README  
+  inflating: web_agents/proxy40_agent/RELEASE_NOTES  
+  inflating: web_agents/proxy40_agent/config/OpenSSOAgentBootstrap.template  
+  inflating: web_agents/proxy40_agent/config/OpenSSOAgentConfiguration.template  
+  inflating: web_agents/proxy40_agent/config/OpenSSOAgentMigration.properties  
+  inflating: web_agents/proxy40_agent/config/OpenSSOInstallerConfig.properties  
+  inflating: web_agents/proxy40_agent/config/configure.xml  
+  inflating: web_agents/proxy40_agent/lib/libampxy4.so  
+  inflating: web_agents/proxy40_agent/lib/libfreebl3.chk  
+  inflating: web_agents/proxy40_agent/lib/libfreebl3.so  
+  inflating: web_agents/proxy40_agent/lib/libjss4.so  
+  inflating: web_agents/proxy40_agent/lib/libnspr4.so  
+  inflating: web_agents/proxy40_agent/lib/libnss3.so  
+  inflating: web_agents/proxy40_agent/lib/libnssckbi.so  
+  inflating: web_agents/proxy40_agent/lib/libplc4.so  
+  inflating: web_agents/proxy40_agent/lib/libplds4.so  
+  inflating: web_agents/proxy40_agent/lib/libsmime3.so  
+  inflating: web_agents/proxy40_agent/lib/libsoftokn3.chk  
+  inflating: web_agents/proxy40_agent/lib/libsoftokn3.so  
+  inflating: web_agents/proxy40_agent/lib/libssl3.so  
+  inflating: web_agents/proxy40_agent/lib/libxml2.so.2  
+  inflating: web_agents/proxy40_agent/lib/opensso-installtools-launcher.jar  
+  inflating: web_agents/proxy40_agent/lib/opensso-installtools.jar  
+  inflating: web_agents/proxy40_agent/lib/proxy40_agent.jar  
+  inflating: web_agents/proxy40_agent/license.txt  
+  inflating: web_agents/proxy40_agent/locale/amToolsMessages.properties  
+  inflating: web_agents/proxy40_agent/locale/proxy40Tools.properties  
+   creating: web_agents/proxy40_agent/bin/
+  inflating: web_agents/proxy40_agent/bin/agentadmin  
+  inflating: web_agents/proxy40_agent/bin/certutil  
+  inflating: web_agents/proxy40_agent/bin/crypt_util  
+
+[/opt]> cd web_agents/proxy40_agent/bin/
+
+[/opt/web_agents/proxy40_agent/bin/]> ./agentadmin --install
+
+Do you completely agree with all the terms and conditions of this License
+Agreement (yes/no): [no]: yes
+
+Enter the complete path to the directory which is used by Sun Java System Proxy
+Server to store its configuration Files. This directory uniquely
+identifies the Sun Java System Proxy Server instance that is secured by this
+Agent.
+[ ? : Help, ! : Exit ]
+Enter the Sun Java System Proxy Server Config Directory Path
+[/opt/sun/proxyserver40/proxy-server1/config]:
+
+
+Enter the URL where the OpenAM server is running. Please include the
+deployment URI also as shown below:
+(http://opensso.sample.com:58080/opensso)
+[ ? : Help, < : Back, ! : Exit ]
+OpenAM server URL: http://am.host.com:58080/opensso
+
+Enter the Agent URL as shown below: (http://agent1.sample.com:1234)
+[ ? : Help, < : Back, ! : Exit ]
+Agent URL: http://agent.host.com:1234
+
+Enter the Agent profile name
+[ ? : Help, < : Back, ! : Exit ]
+Enter the Agent Profile name:  webagent-1
+
+
+Enter the path to a file that contains the password to be used for identifying
+the Agent.
+[ ? : Help, < : Back, ! : Exit ]
+Enter the path to the password file: /opt/password
+
+
+WARNING:
+Agent profile/User: webagent-1 does not exist in OpenAM server! Either
+"Hit the Back button, and re-enter the correct agent profile name/user
+name", or "Create this agent profile when asked(available only in
+custom-install)", or "Continue without validating it because agent
+profile is in sub realm", or "Continue without validating/creating it, and
+manually validate/create it in OpenAM server after installation".
+
+
+-----------------------------------------------
+SUMMARY OF YOUR RESPONSES
+-----------------------------------------------
+Sun Java System Proxy Server Config Directory :
+/opt/sun/proxyserver40/proxy-server1/config
+
+OpenAM server URL : http://am.host.com:58080/opensso 
+Agent URL : http://agent.host.com:1234 
+Agent Profile name : webagent-1 
+Agent Profile Password file name :
+/opt/password
+
+
+Verify your settings above and decide from the choices below.
+1. Continue with Installation
+2. Back to the last interaction
+3. Start Over
+4. Exit
+Please make your selection [1]: 
+
+Creating directory layout and configuring Agent file for Agent_001
+instance ...DONE.
+
+Reading data from file
+/opt/password
+and encrypting it ...DONE.
+
+Generating audit log file name ...DONE.
+
+Creating tag swapped OpenSSOAgentBootstrap.properties file for instance
+Agent_001 ...DONE.
+
+Creating a backup for file
+/opt/sun/proxyserver40/proxy-server1/config/obj.conf
+...DONE.
+
+Adding Agent parameters to
+/opt/sun/proxyserver40/proxy-server1/config/obj.conf
+file ...DONE.
+
+
+SUMMARY OF AGENT INSTALLATION
+-----------------------------
+Agent instance name: Agent_001
+Agent Bootstrap file location:
+/opt/web_agents/proxy40_agent/Agent_001/config/OpenSSOAgentBootstrap.properties
+Agent Configuration Tag file location
+/opt/web_agents/proxy40_agent/Agent_001/config/OpenSSOAgentConfiguration.properties
+Agent Audit directory location:
+/opt/web_agents/proxy40_agent/Agent_001/logs/audit
+Agent Debug directory location:
+/opt/web_agents/proxy40_agent/Agent_001/logs/debug
+
+
+Install log file location:
+/opt/web_agents/proxy40_agent/logs/audit/install.log
+
+Thank you for using OpenAM Policy Agent. INSTALL NOTE: Installer modifies
+obj.conf file in the config directory you specified. UNINSTALL NOTE:
+Uninstall removes agent settings from obj.conf file in the config directory
+you specified. If there are multiple obj.conf files configured manually in
+the same config directory, then please remove them manually. For more
+information, please refer agent documentation.
+
+
+%% 2. Agent Uninstallation
+
+Use agentadmin --uninstall option to uninstall the agent. Uninstallation does
+the following:
+
+    - Unconfigures obj.conf files.
+    - Removes agent instance's config directory.
+
+To completely remove the agent installation files, go back to web_agents and
+simply remove the directory.
+
+
+Here is the sample:
+
+
+[/opt/web_agents/proxy40_agent/bin]> ./agentadmin --uninstall
+
+
+************************************************************************
+Welcome to the OpenAM Policy Agent for Sun Java System Proxy Server.
+
+************************************************************************
+
+
+Removing Agent Instance ...
+
+
+
+Enter the complete path to the directory which is used by Sun Java System Proxy
+Server to store its configuration Files. This directory uniquely
+identifies the Sun Java System Proxy Server instance that is secured by this
+Agent.
+[ ? : Help, ! : Exit ]
+Enter the Sun Java System Proxy Server Config Directory Path
+[/opt/sun/proxyserver40/proxy-server1/config]: 
+
+
+-----------------------------------------------
+SUMMARY OF YOUR RESPONSES
+-----------------------------------------------
+Sun Java System Proxy Server Config Directory :
+/opt/sun/proxyserver40/proxy-server1/config
+
+Verify your settings above and decide from the choices below.
+1. Continue with Uninstallation
+2. Back to the last interaction
+3. Start Over
+4. Exit
+Please make your selection [1]: 
+
+Deleting the config directory
+/opt/web_agents/proxy40_agent/Agent_001/config
+...DONE.
+
+Removing Agent parameters from
+/opt/sun/proxyserver40/proxy-server1/config
+file ...DONE.
+
+
+Uninstall log file location:
+/opt/web_agents/proxy40_agent/logs/audit/uninstall.log
+
+Thank you for using OpenAM Policy Agent. INSTALL NOTE: Installer modifies
+obj.conf file in the config directory you specified. UNINSTALL NOTE:
+Uninstall removes agent settings from obj.conf file in the config directory
+you specified. If there are multiple obj.conf files configured manually in
+the same config directory, then please remove them manually. For more
+information, please refer agent documentation. 
+

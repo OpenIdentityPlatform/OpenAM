@@ -1,0 +1,43 @@
+<xacml-samlp:XACMLAuthzDecisionQuery
+        xmlns:ds="http://www.w3.org/2000//09/xmldsig#"
+        xmlns:pds="urn:sesgg:sc:security:1.0:spec:PolicyDecisionService"
+        xmlns:saml="urn:oasis:names:tc:SAML:2.0:assertion"
+        xmlns:samlp="urn:oasis:names:tc:SAML:2.0:protocol"
+        xmlns:xacml="urn:oasis:names:tc:xacml:2.0:policy:schema:os"
+        xmlns:xacml-context="urn:oasis:names:tc:xacml:2.0:context:schema:os"
+        xmlns:xacml-samlp="urn:oasis:xacml:2.0:saml:protocol:schema:os"
+        ID="ID_1e469be0-ecc4-11da-8ad9-0800200c9a66"
+        Version="2.0"
+        IssueInstant="2001-12-17T09:30:47.0Z"
+        >
+    <xacml-context:Request>
+        <xacml-context:Subject SubjectCategory="urn:oasis:names:tc:xacml:1.0:subject-category:access-subject">
+            <xacml-context:Attribute
+                    AttributeId="urn:oasis:names:tc:xacml:1.0:subject:subject-id"
+                    DataType="http://www.w3.org/2001/XMLSchema#string"
+                    Issuer="PKI">
+                <xacml-context:AttributeValue>E=john.doe@ugov.gov,CN=John Doe,OU=...</xacml-context:AttributeValue>
+            </xacml-context:Attribute>
+        </xacml-context:Subject>
+        <xacml-context:Resource>
+            <xacml-context:Attribute
+                    AttributeId="urn:oasis:names:tc:xacml:1.0:resource:resource-id"
+                    DataType="http://www.w3.org/2001/XMLSchema#string">
+                <xacml-context:AttributeValue>SearchService</xacml-context:AttributeValue>
+            </xacml-context:Attribute>
+        </xacml-context:Resource>
+        <xacml-context:Action>
+            <xacml-context:Attribute
+                    AttributeId="urn:oasis:names:tc:xacml:1.0:action:action-id"
+                    DataType="http://www.w3.org/2001/XMLSchema#string">
+                <xacml-context:AttributeValue>Search</xacml-context:AttributeValue>
+            </xacml-context:Attribute>
+        </xacml-context:Action>
+    </xacml-context:Request>
+    <saml:Evidence>
+        <saml:Assertion>
+            <saml:Issuer>Portal</saml:Issuer>
+            <saml:AuthnStatement AuthnInstant="2001-12-17T09:20:47.0Z"></saml:AuthnStatement>
+        </saml:Assertion>
+    </saml:Evidence>
+</xacml-samlp:XACMLAuthzDecisionQuery>

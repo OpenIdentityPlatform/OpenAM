@@ -1,0 +1,188 @@
+/*
+ * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
+ *
+ * Copyright © 2012 ForgeRock Inc. All rights reserved.
+ *
+ * The contents of this file are subject to the terms
+ * of the Common Development and Distribution License
+ * (the License). You may not use this file except in
+ * compliance with the License.
+ *
+ * You can obtain a copy of the License at
+ * http://forgerock.org/license/CDDLv1.0.html
+ * See the License for the specific language governing
+ * permission and limitations under the License.
+ *
+ * When distributing Covered Code, include this CDDL
+ * Header Notice in each file and include the License file
+ * at http://forgerock.org/license/CDDLv1.0.html
+ * If applicable, add the following below the CDDL Header,
+ * with the fields enclosed by brackets [] replaced by
+ * your own identifying information:
+ * "Portions Copyrighted [2012] [Forgerock AS]"
+ */
+
+BODY { 
+	background: #EEE url('../images/background.gif') repeat-y center;
+	color: #000000;
+	font-family: Arial, Helvetica, sans-serif;
+	font-size: 80%;
+	line-height: 1.2;
+	/* Fallback (IE and Opera < 9) */
+	background: #b9cee6;
+	/* Firefox >= 3.6 */
+	background: -moz-linear-gradient(top, #dce7f2, #97b6d9) no-repeat fixed;
+	/* Webkit */
+	background: -webkit-gradient(linear, left top, left bottom, from(#dce7f2), to(#97b6d9)) no-repeat fixed;     
+	/* Full CSS 3 (maybe) */
+	background: gradient(linear, left top, left bottom, from(#dce7f2), to(#97b6d9)) no-repeat fixed;     
+	/* Internet Explorer >= 5 */
+	filter: progid:DXImageTransform.Microsoft.Gradient(StartColorStr='#ffffff', EndColorStr='#f0f0f0', GradientType=0);
+}
+A:link {
+	color: #0000FF;
+	text-decoration: none;
+}
+A:hover
+{
+	text-decoration: underline;
+}
+DIV#box {
+	padding: 10px;
+
+	/* Center the box on the page */
+	position: absolute;
+	width: 500px;
+	height: 300px;
+	left: 50%;
+	top: 50%;
+	margin-left: -250px;
+	margin-top: -150px;
+
+	border: 1px solid #9e9ea1;
+
+	/* Round the corners if the browser can do it */
+	-moz-border-radius: 10px;
+	-webkit-border-radius: 10px;
+	border-radius: 10px;
+
+	/* Fallback (IE < 5 and Opera < 9) */
+	background: #f3f3f3;
+	/* Firefox >= 3.6 */
+	background: -moz-linear-gradient(top, #ffffff, #e7e7e7) no-repeat fixed;
+	/* Webkit */
+	background: -webkit-gradient(linear, left top, left bottom, from(#ffffff), to(#e7e7e7)) no-repeat fixed;
+	/* Full CSS 3 (maybe) */
+	background: gradient(linear, left top, left bottom, from(#ffffff), to(#e7e7e7)) no-repeat fixed;
+	/* Internet Explorer >= 5 */
+	filter: progid:DXImageTransform.Microsoft.Gradient(StartColorStr='#ffffff', EndColorStr='#e7e7e7', GradientType=0);
+}
+DIV#innerbox {
+	margin: 15px 0 0 60px;
+}
+FORM {
+	margin: 0;
+	padding: 0;
+}
+DIV.row {
+	margin: 0;
+	padding: 4px 0;
+	clear: left;
+}
+DIV.row LABEL {
+	width: 6em;
+	float: left;
+	padding-top: 0.2em;
+}
+INPUT {
+	border: 1px solid #a1a3a6;
+	width: 200px;
+}
+INPUT.smalltextbox {
+	width: 22px;
+}
+DIV.buttons {
+	margin-left: 6em;
+}
+INPUT.button {
+	border: 1px solid #0065a6;
+	background: #66a3c9 url('../images/button-background.gif') repeat-x left top;
+	color: #ffffff;
+	text-shadow: 0.1em 0.1em 0.05em #000000;
+	width: 66px;
+	height: 25px;
+	border: none;
+	cursor: pointer;
+	cursor: hand; /* fallback for Internet Explorer < 6 */
+}
+INPUT[type=text]:focus, INPUT[type=password]:focus, SELECT:focus
+{
+	outline: thin solid #0065a6;
+}
+DIV.indent {
+	margin: 0;
+	margin-left: 6em;
+}
+/* Allow for wider questions */ 
+FORM.width20em DIV.row LABEL {
+	width: 19em;
+}
+FORM.width20em DIV.buttons {
+	margin-left: 20em;
+}
+FORM.width25em DIV.row LABEL {
+	width: 25em;
+}
+FORM.width25em DIV.buttons {
+	margin-left: 25em;
+}
+
+DIV.width20em DIV.row LABEL {
+	width: 20em;
+}
+DIV.width20em DIV.buttons {
+	margin-left: 20em;
+}
+DIV.width25em DIV.row LABEL {
+	width: 25em;
+}
+DIV.width25em DIV.buttons {
+	margin-left: 25em;
+}
+
+/* Message box stuff */ 
+DIV#messagebox {
+	border: 1px solid #a1a3a6;
+	position: absolute;
+	width: 400px;
+	height: 120px;
+	left: 50%;
+	top: 50%;
+	margin-left: -200px;
+	margin-top: -50px;
+}
+DIV#message {
+	position: absolute;
+	width: 400px;
+	height: 60px;
+	left: 0;
+	top: 50%;
+	margin-top: -40px;
+}
+DIV#message SPAN {
+	display: block;
+	text-align: center;
+}
+DIV#message SPAN#title {
+	margin: 0 0 1em 0;
+	font-size: 110%;
+	font-weight: bold;
+}
+
+DIV.password-reset{
+	height:350px !Important;
+}
+
+DIV.passphrase-reset{
+	height:350px !Important;
+}

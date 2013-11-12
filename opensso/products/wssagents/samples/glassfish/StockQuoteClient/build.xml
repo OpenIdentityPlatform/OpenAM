@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+   DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
+  
+   Copyright (c) 2007 Sun Microsystems Inc. All Rights Reserved
+  
+   The contents of this file are subject to the terms
+   of the Common Development and Distribution License
+   (the License). You may not use this file except in
+   compliance with the License.
+
+   You can obtain a copy of the License at
+   https://opensso.dev.java.net/public/CDDLv1.0.html or
+   opensso/legal/CDDLv1.0.txt
+   See the License for the specific language governing
+   permission and limitations under the License.
+
+   When distributing Covered Code, include this CDDL
+   Header Notice in each file and include the License file
+   at opensso/legal/CDDLv1.0.txt.
+   If applicable, add the following below the CDDL Header,
+   with the fields enclosed by brackets [] replaced by
+   your own identifying information:
+   "Portions Copyrighted [year] [name of copyright owner]"
+
+   $Id: build.xml,v 1.9 2009/07/24 22:03:11 huacui Exp $
+
+-->
+
+<project name="StockQuoteClient" default="all" basedir=".">
+    <description>Builds, tests, and runs the project stockclient.</description>
+    <property file="../glassfish.properties"/>
+    <condition property="wsimport-script-suffix" value=".bat">
+        <os family="windows"/>
+    </condition>
+    <condition property="wsimport-script-suffix" value="">
+        <not>
+           <os family="windows"/>
+        </not>
+    </condition>
+    <path id="build.class.path">
+      <pathelement location="build/classes"/>
+      <fileset dir="${glassfish.home}/lib">
+          <include name="**/*.jar"/>
+      </fileset>
+    </path>
+    <target name="-pre-compile">
+        <mkdir dir="build/classes"/>
+        <mkdir dir="web/WEB-INF/classes"/>
+        <exec executable="${glassfish.home}/bin/wsimport${wsimport-script-suffix}">
+            <arg line="-verbose -p com.samples -d build/classes -keep web/WEB-INF/wsdl/client/StockService/StockService.wsdl"/>
+        </exec>
+        <copy file="src/java/handlers.xml" todir="web/WEB-INF/classes"/>
+    </target>
+    <target name="compile" depends="-pre-compile">
+       <javac fork="true" destdir="build/classes" srcdir="src/java" debug="on">
+           <classpath refid="build.class.path" />
+       </javac>
+    </target>
+    <target name ="war" depends="compile">
+      <mkdir dir="dist"/>
+      <copy todir="web/WEB-INF/classes">
+         <fileset dir="build/classes" />
+      </copy>
+      <war destfile="dist/StockQuoteClient.war" webxml="web/WEB-INF/web.xml">
+         <zipfileset dir="web" />
+      </war>
+    </target>
+    <target name="deploy">
+      <exec executable="${glassfish.home}/bin/asadmin${wsimport-script-suffix}">
+         <arg line=" deploy "/>
+         <arg line="--user admin"/>
+         <arg line="--passwordfile ${glassfish.passwordfile}"/>
+         <arg line="--host ${glassfish.host}"/>
+	 <arg line="--port ${glassfish.adminport} "/>
+         <arg line=" dist/StockQuoteClient.war" />
+       </exec>
+    </target>
+    <target name="all">
+        <antcall target="war" />
+        <antcall target="deploy" />
+    </target>
+</project>

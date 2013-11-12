@@ -1,0 +1,167 @@
+<!--
+   DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
+  
+   Copyright (c) 2006 Sun Microsystems Inc. All Rights Reserved
+  
+   The contents of this file are subject to the terms
+   of the Common Development and Distribution License
+   (the License). You may not use this file except in
+   compliance with the License.
+
+   You can obtain a copy of the License at
+   https://opensso.dev.java.net/public/CDDLv1.0.html or
+   opensso/legal/CDDLv1.0.txt
+   See the License for the specific language governing
+   permission and limitations under the License.
+
+   When distributing Covered Code, include this CDDL
+   Header Notice in each file and include the License file
+   at opensso/legal/CDDLv1.0.txt.
+   If applicable, add the following below the CDDL Header,
+   with the fields enclosed by brackets [] replaced by
+   your own identifying information:
+   "Portions Copyrighted [year] [name of copyright owner]"
+
+   $Id: binding.xjb,v 1.3 2008/06/25 05:48:42 qcheng Exp $
+
+-->
+
+<!--
+    Portions Copyrighted 2010 ForgeRock AS
+-->
+
+<jxb:bindings version="1.0"
+               xmlns:jxb="http://java.sun.com/xml/ns/jaxb"
+               xmlns:xs="http://www.w3.org/2001/XMLSchema">
+
+  <jxb:bindings schemaLocation="../xsd/xenc-schema.xsd" node="/xs:schema">
+    <jxb:schemaBindings>
+      <jxb:package name="com.sun.identity.saml2.jaxb.xmlenc">
+         <jxb:javadoc>
+     <![CDATA[<body> Package level documentation for generated package com.sun.identity.liberty.ws.common.jaxb.xmlenc. </body>]]>
+         </jxb:javadoc>
+      </jxb:package>
+      <jxb:nameXmlTransform>
+          <jxb:elementName suffix="Element"/>
+      </jxb:nameXmlTransform>
+    </jxb:schemaBindings>
+  </jxb:bindings>
+
+  <jxb:bindings schemaLocation="../xsd/xmldsig-core-schema.xsd" node="/xs:schema">
+    <jxb:schemaBindings>
+      <jxb:package name="com.sun.identity.saml2.jaxb.xmlsig">
+         <jxb:javadoc>
+     <![CDATA[<body> Package level documentation for generated package com.sun.identity.liberty.ws.common.jaxb.xmlsig. </body>]]>
+         </jxb:javadoc>
+      </jxb:package>
+      <jxb:nameXmlTransform>
+          <jxb:elementName suffix="Element"/>
+      </jxb:nameXmlTransform>
+    </jxb:schemaBindings>
+  </jxb:bindings>
+
+  <jxb:bindings schemaLocation="../xsd/saml-schema-assertion-2.0.xsd" node="/xs:schema">
+    <jxb:schemaBindings>
+      <jxb:package name="com.sun.identity.saml2.jaxb.assertion">
+         <jxb:javadoc>
+     <![CDATA[<body> Package level documentation for generated package com.sun.identity.saml2.jaxb.assertion. </body>]]>
+         </jxb:javadoc>
+      </jxb:package>
+      <jxb:nameXmlTransform>
+          <jxb:elementName suffix="Element"/>
+      </jxb:nameXmlTransform>
+    </jxb:schemaBindings>
+  </jxb:bindings>
+
+  <jxb:bindings schemaLocation="../xsd/saml-schema-metadata-2.0.xsd" node="/xs:schema">
+    <jxb:schemaBindings>
+      <jxb:package name="com.sun.identity.saml2.jaxb.metadata">
+         <jxb:javadoc>
+     <![CDATA[<body> Package level documentation for generated package com.sun.identity.saml2.jaxb.metadata. </body>]]>
+         </jxb:javadoc>
+      </jxb:package>
+      <jxb:nameXmlTransform>
+          <jxb:elementName suffix="Element"/>
+      </jxb:nameXmlTransform>
+    </jxb:schemaBindings>
+  </jxb:bindings>
+
+  <jxb:bindings schemaLocation="../xsd/sstc-saml-metadata-ext-query.xsd" node="/xs:schema">
+    <jxb:schemaBindings>
+      <jxb:package name="com.sun.identity.saml2.jaxb.metadataextquery">
+         <jxb:javadoc>
+     <![CDATA[<body> Package level documentation for generated package com.sun.identity.saml2.jaxb.metadata. </body>]]>
+         </jxb:javadoc>
+      </jxb:package>
+      <jxb:nameXmlTransform>
+          <jxb:elementName suffix="Element"/>
+      </jxb:nameXmlTransform>
+    </jxb:schemaBindings>
+  </jxb:bindings>
+
+  <jxb:bindings schemaLocation="../xsd/sstc-saml-metadata-x509-query.xsd" node="/xs:schema">
+    <jxb:schemaBindings>
+      <jxb:package name="com.sun.identity.saml2.jaxb.metadatax509query">
+         <jxb:javadoc>
+     <![CDATA[<body> Package level documentation for generated package com.sun.identity.saml2.jaxb.metadata. </body>]]>
+         </jxb:javadoc>
+      </jxb:package>
+      <jxb:nameXmlTransform>
+          <jxb:elementName suffix="Element"/>
+      </jxb:nameXmlTransform>
+    </jxb:schemaBindings>
+  </jxb:bindings>
+
+  <jxb:bindings schemaLocation="../xsd/entity-config-schema.xsd" node="/xs:schema">
+    <jxb:schemaBindings>
+      <jxb:package name="com.sun.identity.saml2.jaxb.entityconfig">
+         <jxb:javadoc>
+     <![CDATA[<body> Package level documentation for generated package com.sun.identity.saml2.jaxb.entityconfig. </body>]]>
+         </jxb:javadoc>
+      </jxb:package>
+      <jxb:nameXmlTransform>
+          <jxb:elementName suffix="Element"/>
+      </jxb:nameXmlTransform>
+    </jxb:schemaBindings>
+  </jxb:bindings>
+
+  <jxb:bindings schemaLocation="../xsd/sstc-metadata-attr.xsd" node="/xs:schema">
+    <jxb:schemaBindings>
+      <jxb:package name="com.sun.identity.saml2.jaxb.metadataattr">
+         <jxb:javadoc>
+     <![CDATA[<body> Package level documentation for generated package com.sun.identity.saml2.jaxb.metadata. </body>]]>
+         </jxb:javadoc>
+      </jxb:package>
+      <jxb:nameXmlTransform>
+          <jxb:elementName suffix="Element"/>
+      </jxb:nameXmlTransform>
+    </jxb:schemaBindings>
+  </jxb:bindings>
+
+  <jxb:bindings schemaLocation="../xsd/sstc-saml-attribute-ext.xsd" node="/xs:schema">
+    <jxb:schemaBindings>
+      <jxb:package name="com.sun.identity.saml2.jaxb.metadataattrext">
+         <jxb:javadoc>
+     <![CDATA[<body> Package level documentation for generated package com.sun.identity.saml2.jaxb.metadataattrext. </body>]]>
+         </jxb:javadoc>
+      </jxb:package>
+      <jxb:nameXmlTransform>
+          <jxb:elementName suffix="Element"/>
+      </jxb:nameXmlTransform>
+    </jxb:schemaBindings>
+  </jxb:bindings>
+
+  <jxb:bindings schemaLocation="../xsd/sstc-saml-idp-discovery.xsd" node="/xs:schema">
+    <jxb:schemaBindings>
+      <jxb:package name="com.sun.identity.saml2.jaxb.metadataidpdiscovery">
+         <jxb:javadoc>
+     <![CDATA[<body> Package level documentation for generated package com.sun.identity.saml2.jaxb.metadataidpdiscovery. </body>]]>
+         </jxb:javadoc>
+      </jxb:package>
+      <jxb:nameXmlTransform>
+          <jxb:elementName suffix="Element"/>
+      </jxb:nameXmlTransform>
+    </jxb:schemaBindings>
+  </jxb:bindings>
+
+</jxb:bindings>

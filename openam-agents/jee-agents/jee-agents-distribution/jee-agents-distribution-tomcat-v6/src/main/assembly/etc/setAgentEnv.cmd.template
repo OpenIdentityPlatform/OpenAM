@@ -1,0 +1,39 @@
+\\@echo off
+\\@rem
+\\@rem DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
+\\@rem  
+\\@rem Copyright (c) 2008 Sun Microsystems Inc. All Rights Reserved
+\\@rem  
+\\@rem The contents of this file are subject to the terms
+\\@rem of the Common Development and Distribution License
+\\@rem (the License). You may not use this file except in
+\\@rem compliance with the License.
+\\@rem 
+\\@rem You can obtain a copy of the License at
+\\@rem https://opensso.dev.java.net/public/CDDLv1.0.html or
+\\@rem opensso/legal/CDDLv1.0.txt
+\\@rem See the License for the specific language governing
+\\@rem permission and limitations under the License.
+\\@rem 
+\\@rem When distributing Covered Code, include this CDDL
+\\@rem Header Notice in each file and include the License file
+\\@rem at opensso/legal/CDDLv1.0.txt.
+\\@rem If applicable, add the following below the CDDL Header,
+\\@rem with the fields enclosed by brackets [] replaced by
+\\@rem your own identifying information:
+\\@rem "Portions Copyrighted [year] [name of copyright owner]"
+\\@rem 
+\\@rem $Id: setAgentEnv.cmd.template,v 1.3 2009/03/11 00:01:01 subbae Exp $
+\\@rem
+\\@rem Portions Copyrighted 2013 ForgeRock AS.
+\\@rem
+\\@rem *************************************************************************
+\\@rem This script is used to set up your environment for OpenAM
+\\@rem Tomcat 6.0 policy agent. 
+
+\\@rem Append AGENT_CLASSPATH to the Tomcat system classpath
+
+set AGENT_CLASSPATH=@AGENT_LOCALE_DIR@;@AGENT_CONFIG_DIR@;@AGENT_LIB_DIR@\agent.jar;@AGENT_LIB_DIR@\openssoclientsdk.jar
+set AGENT_CLASSPATH=%AGENT_CLASSPATH%;@TOMCAT_SERVER_LIB@\catalina.jar;@TOMCAT_SERVER_LIB@\catalina-ha.jar;@TOMCAT_SERVER_LIB@\annotations-api.jar;@TOMCAT_SERVER_LIB@\catalina-ant.jar;@TOMCAT_SERVER_LIB@\catalina-tribes.jar;@TOMCAT_SERVER_LIB@\tomcat-coyote.jar;@TOMCAT_SERVER_LIB@\tomcat-dbcp.jar;@TOMCAT_SERVER_LIB@\tomcat-i18n-es.jar;@CATALINA_HOME@\bin\tomcat-i18n-fr.jar;@TOMCAT_SERVER_LIB@\tomcat-i18n-ja.jar
+set AGENT_CLASSPATH=%AGENT_CLASSPATH%;@TOMCAT_COMMON_LIB@\jasper-el.jar;@TOMCAT_COMMON_LIB@\jsp-api.jar;@TOMCAT_COMMON_LIB@\servlet-api.jar;@TOMCAT_COMMON_LIB@\jasper-jdt.jar;@TOMCAT_COMMON_LIB@\jasper.jar;@TOMCAT_COMMON_LIB@\el-api.jar
+set CLASSPATH=%CLASSPATH%;%AGENT_CLASSPATH%

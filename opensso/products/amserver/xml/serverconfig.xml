@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="ISO-8859-1" standalone="yes"?>
+
+<!--
+   DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
+  
+   Copyright (c) 2005 Sun Microsystems Inc. All Rights Reserved
+  
+   The contents of this file are subject to the terms
+   of the Common Development and Distribution License
+   (the License). You may not use this file except in
+   compliance with the License.
+  
+   You can obtain a copy of the License at
+   https://opensso.dev.java.net/public/CDDLv1.0.html or
+   opensso/legal/CDDLv1.0.txt
+   See the License for the specific language governing
+   permission and limitations under the License.
+  
+   When distributing Covered Code, include this CDDL
+   Header Notice in each file and include the License file
+   at opensso/legal/CDDLv1.0.txt.
+   If applicable, add the following below the CDDL Header,
+   with the fields enclosed by brackets [] replaced by
+   your own identifying information:
+   "Portions Copyrighted [year] [name of copyright owner]"
+
+   $Id: serverconfig.xml,v 1.15 2008/11/06 05:31:02 veiming Exp $
+
+-->
+
+
+<iPlanetDataAccessLayer>
+    <ServerGroup name="default" minConnPool="1" maxConnPool="10">
+        <Server name="Server1" host="@DIRECTORY_SERVER@" port="@DIRECTORY_PORT@" type="@DIRECTORY_SSL@" />
+        <User name="User1" type="proxy">
+            <DirDN>
+                cn=puser,ou=DSAME Users,@NORMALIZED_ORGBASE@
+            </DirDN>
+            <DirPassword>
+                @ENCADMINPASSWD@
+            </DirPassword>
+        </User>
+        <User name="User2" type="admin">
+            <DirDN>
+                cn=dsameuser,ou=DSAME Users,@NORMALIZED_ORGBASE@
+            </DirDN>
+            <DirPassword>
+                @ENCADMINPASSWD@
+            </DirPassword>
+        </User>
+        <BaseDN>
+            @ORG_BASE@
+        </BaseDN>                
+    </ServerGroup>
+
+    <!--
+    Datastore for storing configuration and policy data in different Directory.
+    For SMS to use this configuration, OpenSSO must be installed in
+    REALM mode and the property "com.sun.identity.sm.ldap.enableProxy" must be
+    set to "false".
+    -->
+    <ServerGroup name="sms" minConnPool="1" maxConnPool="10">
+        <Server name="Server1" host="@DIRECTORY_SERVER@" port="@DIRECTORY_PORT@"
+             type="@DIRECTORY_SSL@" />
+             <User name="User2" type="admin">
+                <DirDN>@DS_DIRMGRDN@</DirDN>
+                <DirPassword>@ENCDSDIRMGRPASSWD@</DirPassword>
+             </User>
+             <BaseDN>@SM_CONFIG_BASEDN@</BaseDN>
+    </ServerGroup>
+
+</iPlanetDataAccessLayer>

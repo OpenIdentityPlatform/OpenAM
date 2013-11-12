@@ -1,0 +1,114 @@
+<!--
+   DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
+
+   Copyright (c) 2009 Sun Microsystems Inc. All Rights Reserved
+
+   The contents of this file are subject to the terms
+   of the Common Development and Distribution License
+   (the License). You may not use this file except in
+   compliance with the License.
+
+
+   You can obtain a copy of the License at
+   https://opensso.dev.java.net/public/CDDLv1.0.html or
+   opensso/legal/CDDLv1.0.txt
+   See the License for the specific language governing
+   permission and limitations under the License.
+
+
+   When distributing Covered Code, include this CDDL
+   Header Notice in each file and include the License file
+   at opensso/legal/CDDLv1.0.txt.
+   If applicable, add the following below the CDDL Header,
+   with the fields enclosed by brackets [] replaced by
+   your own identifying information:
+   "Portions Copyrighted [year] [name of copyright owner]"
+
+   $Id: header.jspf,v 1.1 2009/06/09 20:28:30 exu Exp $
+
+--><%@ page import="com.sun.identity.saml2.common.SAML2Utils,
+com.sun.identity.saml2.jaxb.metadata.AssertionConsumerServiceElement,
+com.sun.identity.saml2.jaxb.metadata.IDPSSODescriptorElement,
+com.sun.identity.saml2.jaxb.metadata.SPSSODescriptorElement,
+com.sun.identity.saml2.jaxb.metadata.SingleSignOnServiceElement,
+com.sun.identity.saml2.meta.SAML2MetaManager,
+java.util.List,
+java.util.Iterator"
+%><%!
+    public Map getIDPBaseUrlAndMetaAlias(String idpEntityID, String deployuri)
+    {
+        Map returnMap = new HashMap();
+        if (idpEntityID == null) {
+            return returnMap;
+        }
+        String idpBaseUrl = null;
+        try {
+            // find out IDP meta alias
+            SAML2MetaManager manager = new SAML2MetaManager();
+            IDPSSODescriptorElement idp =
+                manager.getIDPSSODescriptor("/", idpEntityID);
+            List ssoServiceList = idp.getSingleSignOnService();
+            if ((ssoServiceList != null)
+                && (!ssoServiceList.isEmpty())) {
+                Iterator i = ssoServiceList.iterator();
+                while (i.hasNext()) {
+                    SingleSignOnServiceElement sso =
+                        (SingleSignOnServiceElement) i.next();
+                    if ((sso != null) && (sso.getBinding() != null)) {
+                        String ssoURL = sso.getLocation();
+                        int loc = ssoURL.indexOf("/metaAlias/");
+                        if (loc == -1) {
+                            continue;
+                        } else {
+                            returnMap.put("idpMetaAlias",
+                                ssoURL.substring(loc + 10));
+                            String tmp = ssoURL.substring(0, loc);
+                            loc = tmp.lastIndexOf("/");
+                            returnMap.put("idpBaseUrl", tmp.substring(0, loc));
+                            break;
+                        }
+                    }
+                }
+            }
+        } catch (Exception e) {
+            SAML2Utils.debug.error("header.jspf: couldn't get IDP base url:",e);
+        }
+        return returnMap;
+    }
+%><%!
+    public String getFedletBaseUrl(String spEntityID, String deployuri)
+    {
+        if (spEntityID == null) {
+            return null;
+        }
+        String fedletBaseUrl = null;
+        try {
+            SAML2MetaManager manager = new SAML2MetaManager();
+            SPSSODescriptorElement sp =
+                manager.getSPSSODescriptor("/", spEntityID);
+            List acsList = sp.getAssertionConsumerService();
+            if ((acsList != null) && (!acsList.isEmpty())) {
+                Iterator j = acsList.iterator();
+                while (j.hasNext()) {
+                    AssertionConsumerServiceElement acs =
+                        (AssertionConsumerServiceElement) j.next();
+                    if ((acs != null) && (acs.getBinding() != null)) {
+                        String acsURL = acs.getLocation();
+                        int loc = acsURL.indexOf(deployuri + "/");
+                        if (loc == -1) {
+                            continue;
+                        } else {
+                            fedletBaseUrl = acsURL.substring(
+                                0, loc + deployuri.length());
+                            break;
+                        }
+                    }
+                }
+            }
+        } catch (Exception e) {
+            SAML2Utils.debug.error(
+                "header.jspf: couldn't get fedlet base url:",e);
+        }
+        return fedletBaseUrl;
+    }
+%>

@@ -1,0 +1,178 @@
+<!--
+   DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
+  
+    Copyright (c) 2006 Sun Microsystems Inc. All Rights Reserved
+  
+    The contents of this file are subject to the terms
+    of the Common Development and Distribution License
+    (the License). You may not use this file except in
+    compliance with the License.
+
+    You can obtain a copy of the License at
+    https://opensso.dev.java.net/public/CDDLv1.0.html or
+    opensso/legal/CDDLv1.0.txt
+    See the License for the specific language governing
+    permission and limitations under the License.
+
+    When distributing Covered Code, include this CDDL
+    Header Notice in each file and include the License file
+    at opensso/legal/CDDLv1.0.txt.
+    If applicable, add the following below the CDDL Header,
+    with the fields enclosed by brackets [] replaced by
+    your own identifying information:
+    "Portions Copyrighted [year] [name of copyright owner]"
+
+    $Id: SessionLogMessageIDs.xml,v 1.5 2008/08/19 19:10:55 veiming Exp $
+
+-->
+
+<!DOCTYPE logmessages
+    PUBLIC "OpenSSO Log Message DTD/EN"
+    "jar://com/sun/identity/log/messageid/amLogMessage.dtd"
+>
+
+<logmessages prefix="SESSION">
+    <logmessage name="SESSION_CREATED" id="1"
+	loglevel="LL_INFO"
+	description="Session is Created">
+	<datainfo>
+	    <item>User ID</item>
+	</datainfo>
+	<triggers>
+	    <item>User is authenticated.</item>
+	</triggers>
+	<actions />
+    </logmessage>
+    <logmessage name="SESSION_IDLE_TIMED_OUT" id="2"
+	loglevel="LL_INFO"
+	description="Session has idle timedout">
+	<datainfo>
+	    <item>User ID</item>
+	</datainfo>
+	<triggers>
+	    <item>User session idle for long time.</item>
+	</triggers>
+	<actions />
+    </logmessage>
+    <logmessage name="SESSION_MAX_TIMEOUT" id="3"
+	loglevel="LL_INFO"
+	description="Session has Expired">
+	<datainfo>
+	    <item>User ID</item>
+	</datainfo>
+	<triggers>
+	    <item>User session has reached its maximun time limit.</item>
+	</triggers>
+	<actions />
+    </logmessage>
+    <logmessage name="SESSION_LOGOUT" id="4"
+	loglevel="LL_INFO"
+	description="User has Logged out">
+	<datainfo>
+	    <item>User ID</item>
+	</datainfo>
+	<triggers>
+	    <item>User has logged out of the system.</item>
+	</triggers>
+	<actions />
+    </logmessage>
+    <logmessage name="SESSION_REACTIVATION" id="5"
+	loglevel="LL_INFO"
+	description="Session is Reactivated">
+	<datainfo>
+	    <item>User ID</item>
+	</datainfo>
+	<triggers>
+	    <item>User session state is active.</item>
+	</triggers>
+	<actions />
+    </logmessage>
+    <logmessage name="SESSION_DESTROYED" id="6"
+	loglevel="LL_INFO"
+	description="Session is Destroyed">
+	<datainfo>
+	    <item>User ID</item>
+	</datainfo>
+	<triggers>
+	    <item>User session is destroyed and cannot be referenced.</item>
+	</triggers>
+	<actions />
+    </logmessage>
+    <logmessage name="SESSION_PROPERTY_CHANGED" id="7"
+	loglevel="LL_INFO"
+	description="Session's property is changed.">
+	<datainfo>
+	    <item>User ID</item>
+	</datainfo>
+	<triggers>
+	    <item>User changed session's unprotected property.</item>
+	</triggers>
+	<actions />
+    </logmessage>
+    <logmessage name="SESSION_UNKNOWN_EVENT" id="8"
+	loglevel="LL_INFO"
+	description="Session received Unknown Event">
+	<datainfo>
+	    <item>User ID</item>
+	</datainfo>
+	<triggers>
+	    <item>Unknown session event</item>
+	</triggers>
+	<actions />
+    </logmessage>
+    <logmessage name="SESSION_PROTECTED_PROPERTY_ERROR" id="9"
+	loglevel="LL_INFO"
+	description="Attempt to set protected property">
+	<datainfo>
+	    <item>User ID</item>
+	</datainfo>
+	<triggers>
+	    <item>Attempt to set protected property</item>
+	</triggers>
+	<actions />
+    </logmessage>
+    <logmessage name="SESSION_QUOTA_EXHAUSTED" id="10"
+        loglevel="LL_INFO"
+        description="User's session quota has been exhausted.">
+        <datainfo>
+            <item>User ID</item>
+        </datainfo>
+        <triggers>
+            <item>Session quota exhausted</item>
+        </triggers>
+        <actions />
+    </logmessage>
+    <logmessage name="SESSION_DATABASE_UNAVAILABLE" id="11"
+        loglevel="LL_INFO"
+        description="Session database used for session failover and session constraint is not available.">
+        <datainfo>
+            <item>User ID</item>
+        </datainfo>
+        <triggers>
+            <item>Unable to reach the session database.</item>
+        </triggers>
+        <actions />
+    </logmessage>
+    <logmessage name="SESSION_DATABASE_BACK_ONLINE" id="12"
+        loglevel="LL_INFO"
+        description="Session database is back online.">
+        <datainfo>
+            <item>User ID</item>
+        </datainfo>
+        <triggers>
+            <item>Session database is back online..</item>
+        </triggers>
+        <actions />
+    </logmessage>
+    <logmessage name="SESSION_MAX_LIMIT_REACHED" id="13"
+        loglevel="LL_INFO"
+        description="The total number of valid sessions hosted on the AM server has reached the max limit.">
+        <datainfo>
+            <item>User ID</item>
+        </datainfo>
+        <triggers>
+            <item>Session max limit reached.</item>
+        </triggers>
+        <actions />
+    </logmessage>
+</logmessages>

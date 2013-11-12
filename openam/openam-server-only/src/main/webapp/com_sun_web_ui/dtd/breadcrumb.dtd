@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+/*
+ * ident "@(#)breadcrumb.dtd 1.4 04/03/23 SMI"
+ *
+ * Copyright 2002-2003 Sun Microsystems, Inc. All rights reserved.
+ * Use is subject to license terms.
+ */
+-->
+
+<!-- This is the descriptor for a breadcrumb. -->
+<!ELEMENT breadcrumb (link*, page)>
+
+<!-- This is the XML description for a breadcrumb link -->
+<!ELEMENT link (#PCDATA)>
+<!ATTLIST link
+	href        CDATA #REQUIRED
+	mouseOver   CDATA #REQUIRED
+	onClick	    CDATA #IMPLIED
+	target      CDATA #IMPLIED	
+	hrefValue   CDATA #IMPLIED
+>
+
+<!-- This is the XML description for the breadcrumb current page -->
+<!ELEMENT page (#PCDATA)>

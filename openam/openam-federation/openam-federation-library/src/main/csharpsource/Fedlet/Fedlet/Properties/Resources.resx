@@ -1,0 +1,471 @@
+<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <!-- 
+    Microsoft ResX Schema 
+    
+    Version 2.0
+    
+    The primary goals of this format is to allow a simple XML format 
+    that is mostly human readable. The generation and parsing of the 
+    various data types are done through the TypeConverter classes 
+    associated with the data types.
+    
+    Example:
+    
+    ... ado.net/XML headers & schema ...
+    <resheader name="resmimetype">text/microsoft-resx</resheader>
+    <resheader name="version">2.0</resheader>
+    <resheader name="reader">System.Resources.ResXResourceReader, System.Windows.Forms, ...</resheader>
+    <resheader name="writer">System.Resources.ResXResourceWriter, System.Windows.Forms, ...</resheader>
+    <data name="Name1"><value>this is my long string</value><comment>this is a comment</comment></data>
+    <data name="Color1" type="System.Drawing.Color, System.Drawing">Blue</data>
+    <data name="Bitmap1" mimetype="application/x-microsoft.net.object.binary.base64">
+        <value>[base64 mime encoded serialized .NET Framework object]</value>
+    </data>
+    <data name="Icon1" type="System.Drawing.Icon, System.Drawing" mimetype="application/x-microsoft.net.object.bytearray.base64">
+        <value>[base64 mime encoded string representing a byte array form of the .NET Framework object]</value>
+        <comment>This is a comment</comment>
+    </data>
+                
+    There are any number of "resheader" rows that contain simple 
+    name/value pairs.
+    
+    Each data row contains a name, and value. The row also contains a 
+    type or mimetype. Type corresponds to a .NET class that support 
+    text/value conversion through the TypeConverter architecture. 
+    Classes that don't support this are serialized and stored with the 
+    mimetype set.
+    
+    The mimetype is used for serialized objects, and tells the 
+    ResXResourceReader how to depersist the object. This is currently not 
+    extensible. For a given mimetype the value must be set accordingly:
+    
+    Note - application/x-microsoft.net.object.binary.base64 is the format 
+    that the ResXResourceWriter will generate, however the reader can 
+    read any of the formats listed below.
+    
+    mimetype: application/x-microsoft.net.object.binary.base64
+    value   : The object must be serialized with 
+            : System.Runtime.Serialization.Formatters.Binary.BinaryFormatter
+            : and then encoded with base64 encoding.
+    
+    mimetype: application/x-microsoft.net.object.soap.base64
+    value   : The object must be serialized with 
+            : System.Runtime.Serialization.Formatters.Soap.SoapFormatter
+            : and then encoded with base64 encoding.
+
+    mimetype: application/x-microsoft.net.object.bytearray.base64
+    value   : The object must be serialized into a byte array 
+            : using a System.ComponentModel.TypeConverter
+            : and then encoded with base64 encoding.
+    -->
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="metadata">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" />
+              </xsd:sequence>
+              <xsd:attribute name="name" use="required" type="xsd:string" />
+              <xsd:attribute name="type" type="xsd:string" />
+              <xsd:attribute name="mimetype" type="xsd:string" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="assembly">
+            <xsd:complexType>
+              <xsd:attribute name="alias" type="xsd:string" />
+              <xsd:attribute name="name" type="xsd:string" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1" />
+              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
+              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="CircleOfTrustDirNotFound" xml:space="preserve">
+    <value>Specified home folder for the circle of trusts could not be found.</value>
+  </data>
+  <data name="CircleOfTrustFileNotFound" xml:space="preserve">
+    <value>The circle of trust file could not be found.</value>
+  </data>
+  <data name="CircleOfTrustUnhandledException" xml:space="preserve">
+    <value>An exception occurred in acquiring circle of trust information.</value>
+  </data>
+  <data name="ServiceProviderUtilityIdentityProvidersNotFound" xml:space="preserve">
+    <value>No identity provider metadata files were found in the home folder.</value>
+  </data>
+  <data name="ServiceProviderUtiltyCircleOfTrustsNotFound" xml:space="preserve">
+    <value>No circle of trust configuration files were found in the home folder.</value>
+  </data>
+  <data name="IdentityProviderDirNotFound" xml:space="preserve">
+    <value>Specified home folder for the identity provider could not be found.</value>
+  </data>
+  <data name="IdentityProviderFileNotFound" xml:space="preserve">
+    <value>Metadata for the identity provider could not be found.</value>
+  </data>
+  <data name="IdentityProviderXmlException" xml:space="preserve">
+    <value>Specified metadata for the identity provider threw an XML exception.</value>
+  </data>
+  <data name="ServiceProviderDirNotFound" xml:space="preserve">
+    <value>Specified home folder for the service provider could not be found.</value>
+  </data>
+  <data name="ServiceProviderFileNotFound" xml:space="preserve">
+    <value>Metadata for the service provider could not be found.</value>
+  </data>
+  <data name="ServiceProviderUtilityHomeFolderNotFound" xml:space="preserve">
+    <value>Specified home folder could not be found.</value>
+  </data>
+  <data name="ServiceProviderXmlException" xml:space="preserve">
+    <value>Specified metadata for the service provider threw an XML exception.</value>
+  </data>
+  <data name="AuthnResponseNullArgument" xml:space="preserve">
+    <value>Specified SAML response was null.</value>
+  </data>
+  <data name="AuthnResponseXmlException" xml:space="preserve">
+    <value>Specified SAML response threw an XML exception.</value>
+  </data>
+  <data name="AuthnResponseInvalidConditionTime" xml:space="preserve">
+    <value>AuthnResponse failed validation due to an invalid condition related to time.</value>
+  </data>
+  <data name="AuthnResponseInvalidSignature" xml:space="preserve">
+    <value>AuthnResponse failed validation due to an invalid signature.</value>
+  </data>
+  <data name="ServiceProviderUtilityNoSamlResponseReceived" xml:space="preserve">
+    <value>No SAML Response was received.</value>
+  </data>
+  <data name="AuthnResponseInvalidConditionAudience" xml:space="preserve">
+    <value>AuthnResponse failed validation due to an invalid condition related to the target audience.</value>
+  </data>
+  <data name="AuthnResponseInvalidSignatureCertsDontMatch" xml:space="preserve">
+    <value>AuthnResponse failed validation due to the signature in the response not matching the signature in the IDP metadata.</value>
+  </data>
+  <data name="ArtifactResolutionWebException" xml:space="preserve">
+    <value>An error occurred in resolving the SAML artifact.</value>
+  </data>
+  <data name="AuthnRequestAssertionConsumerServiceNotDefined" xml:space="preserve">
+    <value>AssertionConsumerService not defined (binding nor index).</value>
+  </data>
+  <data name="AuthnResponseInvalidSignatureMissing" xml:space="preserve">
+    <value>AuthnResponse failed validation due to missing signature.</value>
+  </data>
+  <data name="ServiceProviderUtilityIdentityProviderNotFound" xml:space="preserve">
+    <value>Specified IDP EntityID was not found in the available metadata.</value>
+  </data>
+  <data name="ServiceProviderUtilityIdpArtifactResSvcLocNotDefined" xml:space="preserve">
+    <value>Artifact Resolution Service Location not defined for the specified IDP.</value>
+  </data>
+  <data name="ServiceProviderUtilityIdpNotDeterminedFromArtifact" xml:space="preserve">
+    <value>Could not determine IDP from the obtained artifact.</value>
+  </data>
+  <data name="ServiceProviderUtilityIdpSingleSignOnSvcLocNotDefined" xml:space="preserve">
+    <value>Single Sign On Service Location not defined for the specified IDP.</value>
+  </data>
+  <data name="RequestedAuthnContextClassRefOrDeclRefNotDefined" xml:space="preserve">
+    <value>Neither AuthnContextClassRef or AuthnContextDeclRef defined.</value>
+  </data>
+  <data name="RequestedAuthnContextInvalidComparison" xml:space="preserve">
+    <value>An invalid comparison was specified for the RequestedAuthnContext.</value>
+  </data>
+  <data name="ArtifactFailedConversion" xml:space="preserve">
+    <value>Specified artifact could not be convered from base64.</value>
+  </data>
+  <data name="ArtifactInvalidLength" xml:space="preserve">
+    <value>Specified artifact did not have the correct unencoded length.</value>
+  </data>
+  <data name="ArtifactNullOrEmpty" xml:space="preserve">
+    <value>Specified artifact was null or empty.</value>
+  </data>
+  <data name="AuthnRequestIsNull" xml:space="preserve">
+    <value>AuthnRequest was null.</value>
+  </data>
+  <data name="AuthnResponseInvalidSignatureReference" xml:space="preserve">
+    <value>AuthnResponse failed validation due to invalid signature reference.</value>
+  </data>
+  <data name="AuthnResponseInvalidSignatureMissingOnArtifactResponse" xml:space="preserve">
+    <value>AuthnResponse failed validation due to missing signature on the ArtifactResponse element.</value>
+  </data>
+  <data name="AuthnResponseInvalidSignatureMissingOnResponse" xml:space="preserve">
+    <value>AuthnResponse failed validation due to missing signature on the Response element.</value>
+  </data>
+  <data name="ArtifactResponseNullArgument" xml:space="preserve">
+    <value>Specified SAML artifact response was null.</value>
+  </data>
+  <data name="ArtifactResponseXmlException" xml:space="preserve">
+    <value>Specified SAML artifact response threw an XML exception.</value>
+  </data>
+  <data name="SignedXmlInvalidReference" xml:space="preserve">
+    <value>Signed XML did not have the desired reference ID.</value>
+  </data>
+  <data name="SignedXmlCheckSignatureFailed" xml:space="preserve">
+    <value>Signed XML did not have the correct signature.</value>
+  </data>
+  <data name="ArtifactResolutionInvalidInResponseTo" xml:space="preserve">
+    <value>ArtifactResponse failed due to invalid InResponseTo ID.</value>
+  </data>
+  <data name="LogoutRequestIsNull" xml:space="preserve">
+    <value>LogoutRequest was null.</value>
+  </data>
+  <data name="LogoutRequestNullArgument" xml:space="preserve">
+    <value>Specified SAML logout request was null.</value>
+  </data>
+  <data name="LogoutRequestXmlException" xml:space="preserve">
+    <value>Specified SAML logout request threw an XML exception.</value>
+  </data>
+  <data name="ServiceProviderUtilityIdpSingleLogoutSvcLocNotDefined" xml:space="preserve">
+    <value>Single Logout Service Location not defined for the specified IDP.</value>
+  </data>
+  <data name="LogoutRequestSessionIndexNotDefined" xml:space="preserve">
+    <value>SessionIndex was not defined.</value>
+  </data>
+  <data name="LogoutRequestSubjectNameIdNotDefined" xml:space="preserve">
+    <value>SubjectNameId was not defined.</value>
+  </data>
+  <data name="ServiceProviderUtilityUnsupportedLogoutBinding" xml:space="preserve">
+    <value>Specified logout binding is not supported.</value>
+  </data>
+  <data name="ServiceProviderUtilityLogoutRequestIsNull" xml:space="preserve">
+    <value>LogoutRequest was null.</value>
+  </data>
+  <data name="LogoutResponseInvalidInResponseTo" xml:space="preserve">
+    <value>LogoutResponse failed validation due to unknown InResponseTo ID.</value>
+  </data>
+  <data name="LogoutRequestWebException" xml:space="preserve">
+    <value>An error occurred in sending the LogoutRequest SOAP message.</value>
+  </data>
+  <data name="LogoutResponseInvalidStatusCode" xml:space="preserve">
+    <value>LogoutResponse failed validation due to an invalid status code.</value>
+  </data>
+  <data name="LogoutRequestIdentityProviderIsNull" xml:space="preserve">
+    <value>Identity Provider was null.</value>
+  </data>
+  <data name="LogoutRequestServiceProviderIsNull" xml:space="preserve">
+    <value>Service Provider was null.</value>
+  </data>
+  <data name="LogoutResponseLogoutRequestIsNull" xml:space="preserve">
+    <value>Logout Request was null.</value>
+  </data>
+  <data name="ServiceProviderUtilityIdpNotDeterminedFromLogoutRequest" xml:space="preserve">
+    <value>Could not determine IDP from the logout request.</value>
+  </data>
+  <data name="ServiceProviderUtilityIdpSingleLogoutSvcResLocNotDefined" xml:space="preserve">
+    <value>Single Logout Service Response Location not defined for the specified IDP.</value>
+  </data>
+  <data name="ServiceProviderUtilityLogoutResponseIsNull" xml:space="preserve">
+    <value>LogoutResponse was null.</value>
+  </data>
+  <data name="ServiceProviderUtilityNoSamlRequestReceived" xml:space="preserve">
+    <value>No SAML Request was received.</value>
+  </data>
+  <data name="LogoutResponseIdentityProviderIsNull" xml:space="preserve">
+    <value>Identity Provider was null.</value>
+  </data>
+  <data name="LogoutResponseServiceProviderIsNull" xml:space="preserve">
+    <value>Service Provider was null.</value>
+  </data>
+  <data name="ArtifactResponseMissingResponse" xml:space="preserve">
+    <value>Specified SAML artifact response did not have the Response element.</value>
+  </data>
+  <data name="AuthnResponseInvalidInResponseTo" xml:space="preserve">
+    <value>AuthnResponse failed validation due to unknown InResponseTo ID.</value>
+  </data>
+  <data name="InvalidIdpEntityIdNotInCircleOfTrust" xml:space="preserve">
+    <value>Validation failed due to the IDP and SP not being in the same circle of trust.</value>
+  </data>
+  <data name="InvalidInResponseTo" xml:space="preserve">
+    <value>Validation failed due to an invalid InResponseTo ID.</value>
+  </data>
+  <data name="InvalidIssuer" xml:space="preserve">
+    <value>Validation failed due to an invalid Issuer.</value>
+  </data>
+  <data name="InvalidStatusCode" xml:space="preserve">
+    <value>Validation failed due to an invalid StatusCode.</value>
+  </data>
+  <data name="LogoutResponseInvalidIssuer" xml:space="preserve">
+    <value>LogoutResponse failed validatione due to invalid Issuer.</value>
+  </data>
+  <data name="LogoutRequestInvalidSignatureMissing" xml:space="preserve">
+    <value>LogoutRequest failed validation due to missing signature.</value>
+  </data>
+  <data name="SignedQueryStringCertIsNull" xml:space="preserve">
+    <value>Certifcate not provided for checking query string signature.</value>
+  </data>
+  <data name="SignedQueryStringIsNull" xml:space="preserve">
+    <value>Query string not provided for checking signature.</value>
+  </data>
+  <data name="SignedQueryStringMissingSigAlg" xml:space="preserve">
+    <value>Query string did not have the SigAlg parameter used for query string validation.</value>
+  </data>
+  <data name="SignedQueryStringMissingSignature" xml:space="preserve">
+    <value>Query string did not have the Signature parameter used for query string validation.</value>
+  </data>
+  <data name="SignedQueryStringVerifyDataFailed" xml:space="preserve">
+    <value>Signed query string did not have the correct signature.</value>
+  </data>
+  <data name="SignedQueryStringUnsupportedSigAlg" xml:space="preserve">
+    <value>Signed query string specified an unsupported signature algorithm.</value>
+  </data>
+  <data name="LogoutResponseNullArgument" xml:space="preserve">
+    <value>Specified SAML logout response was null.</value>
+  </data>
+  <data name="LogoutResponseXmlException" xml:space="preserve">
+    <value>Specified SAML logout response threw an XML exception.</value>
+  </data>
+  <data name="FedletCertificateFactoryGetByFriendlyNameFailed" xml:space="preserve">
+    <value>An error occurred in retrieving the certificate by friendly name.</value>
+  </data>
+  <data name="ServiceProviderCantSignMetadataWithoutCertificateAlias" xml:space="preserve">
+    <value>Can not sign metadata since service provider's signing certificate alias was not found or not present.</value>
+  </data>
+  <data name="ServiceProviderSpSsoDescriptorNodeNotFound" xml:space="preserve">
+    <value>SPSSODescriptor element could not be found in the metadata.</value>
+  </data>
+  <data name="ServiceProviderCertNotFound" xml:space="preserve">
+    <value>Certificate could not be found for the specified metadata value.</value>
+  </data>
+  <data name="SignedQueryStringCertHasNoPrivateKey" xml:space="preserve">
+    <value>Specified certificate does not have a private key.</value>
+  </data>
+  <data name="SignedQueryStringCertNotFound" xml:space="preserve">
+    <value>Signing certificate not found based on provided alias.</value>
+  </data>
+  <data name="SignedQueryStringInvalidCertFriendlyName" xml:space="preserve">
+    <value>Invalid certificate friendly name specified.</value>
+  </data>
+  <data name="SignedQueryStringInvalidQueryString" xml:space="preserve">
+    <value>Invalid query string specified.</value>
+  </data>
+  <data name="SignedQueryStringSigAlgMissing" xml:space="preserve">
+    <value>Signature algorithm parameter not found in the query string.</value>
+  </data>
+  <data name="SignedQueryStringSigAlgNotSupported" xml:space="preserve">
+    <value>Specified signature algorithm currently not supported for signing query strings.</value>
+  </data>
+  <data name="SignedXmlCertNotFound" xml:space="preserve">
+    <value>Specified certificate not found based on provided alias.</value>
+  </data>
+  <data name="SignedXmlInvalidCertFriendlyName" xml:space="preserve">
+    <value>Invalid certificate friendly name specified.</value>
+  </data>
+  <data name="SignedXmlInvalidTargetRefId" xml:space="preserve">
+    <value>Invalid target reference ID specified.</value>
+  </data>
+  <data name="SignedXmlInvalidXml" xml:space="preserve">
+    <value>Invalid XML specified.</value>
+  </data>
+  <data name="ServiceProviderEntityDescriptorNodeNotFound" xml:space="preserve">
+    <value>EntityDescriptor element could not be found in the metadata.</value>
+  </data>
+  <data name="ServiceProviderUtilitySignFailedNoCertAlias" xml:space="preserve">
+    <value>XML can not be signed due to either empty or unknown signature certificate alias in extended metadata.</value>
+  </data>
+  <data name="InvalidRelayState" xml:space="preserve">
+    <value>Invalid relay state specified.</value>
+  </data>
+  <data name="MalformedRelayState" xml:space="preserve">
+    <value>RelayState is not a valid URI.</value>
+  </data>
+  <data name="DecryptionKeyNotFound" xml:space="preserve">
+    <value>Decryption key not found based on provided alias.</value>
+  </data>
+  <data name="DecryptionFailed" xml:space="preserve">
+    <value>Unable to decrypt the received SAML response.</value>
+  </data>
+  <data name="AttributeQueryRequestNullArgument" xml:space="preserve">
+    <value>Specified SAML attribute query request was null.</value>
+  </data>
+  <data name="AttributeQueryRequestXmlException" xml:space="preserve">
+    <value>Specified SAML attribute query request threw an XML exception.</value>
+  </data>
+  <data name="AttributeQueryRequestIdentityProviderIsNull" xml:space="preserve">
+    <value>IdentityProvider was null.</value>
+  </data>
+  <data name="AttributeQueryRequestIsEmpty" xml:space="preserve">
+    <value>AttributeQuery request is empty</value>
+  </data>
+  <data name="AttributeQueryRequestServiceProviderIsNull" xml:space="preserve">
+    <value>Service Provider was null.</value>
+  </data>
+  <data name="AttributeQueryRequestSubjectNameIdNotDefined" xml:space="preserve">
+    <value>SubjectNameId was not defined.</value>
+  </data>
+  <data name="AttributeQueryResponseNullArgument" xml:space="preserve">
+    <value>Specified SAML response was null.</value>
+  </data>
+  <data name="AttributeQueryResponseXmlException" xml:space="preserve">
+    <value>Specified SAML response threw an XML exception.</value>
+  </data>
+  <data name="EncryptedXmlCertNotFound" xml:space="preserve">
+    <value>Specified certificate not found based on provided alias.</value>
+  </data>
+  <data name="EncryptedXmlInvalidCertFriendlyName" xml:space="preserve">
+    <value>Invalid certificate friendly name specified.</value>
+  </data>
+  <data name="EncryptedXmlInvalidEncrAlgorithm" xml:space="preserve">
+    <value>Invalid encryption algorithm name specified.</value>
+  </data>
+  <data name="EncryptedXmlInvalidXml" xml:space="preserve">
+    <value>Invalid XML specified.</value>
+  </data>
+  <data name="ServiceProviderUtilityAttributeQueryRequestIsNull" xml:space="preserve">
+    <value>AttributeQueryRequest was null.</value>
+  </data>
+  <data name="ServiceProviderUtilityEncryptFailedNoCertAlias" xml:space="preserve">
+    <value>XML can not be encrypted due to either empty or unknown encryption certificate alias in extended metadata.</value>
+  </data>
+  <data name="ServiceProviderUtilityEncryptFailedNoEncrAlgorithm" xml:space="preserve">
+    <value>XML can not be encrypted due to either empty or unknown encryption algorithm in extended metadata.</value>
+  </data>
+  <data name="ServiceProviderUtilityIdpSingleAttributeQuerySvcLocNotDefined" xml:space="preserve">
+    <value>Single AttributeQuery Service Location not defined for the specified IDP.</value>
+  </data>
+  <data name="AttributeQueryRequestWebException" xml:space="preserve">
+    <value>An error occurred in sending the AttributeQuery SOAP message.</value>
+  </data>
+  <data name="AttributeQueryResponseInvalidInResponseTo" xml:space="preserve">
+    <value>Attribute Query invalid responseTo</value>
+  </data>
+  <data name="ServiceProviderUtilityAttributeQueryResponseIsNull" xml:space="preserve">
+    <value>Attribute Query validation response is null</value>
+  </data>
+  <data name="ServiceProviderUtilitySoapFault" xml:space="preserve">
+    <value>SOAP Request returned Fault message.</value>
+  </data>
+  <data name="ServiceProviderUtilityErrorSamlResponseReceived" xml:space="preserve">
+    <value>Received Error in SAML Response.</value>
+  </data>
+</root>

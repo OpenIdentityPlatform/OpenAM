@@ -1,0 +1,198 @@
+<!--
+   DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
+  
+   Copyright (c) 2008 Sun Microsystems Inc. All Rights Reserved
+  
+   The contents of this file are subject to the terms
+   of the Common Development and Distribution License
+   (the License). You may not use this file except in
+   compliance with the License.
+
+   You can obtain a copy of the License at
+   https://opensso.dev.java.net/public/CDDLv1.0.html or
+   opensso/legal/CDDLv1.0.txt
+   See the License for the specific language governing
+   permission and limitations under the License.
+
+   When distributing Covered Code, include this CDDL
+   Header Notice in each file and include the License file
+   at opensso/legal/CDDLv1.0.txt.
+   If applicable, add the following below the CDDL Header,
+   with the fields enclosed by brackets [] replaced by
+   your own identifying information:
+   "Portions Copyrighted [year] [name of copyright owner]"
+
+   $Id: propertySAMLv2SPAdvancedHosted.xml,v 1.7 2009/11/24 21:48:05 madan_ranganath Exp $
+
+-->
+
+<!DOCTYPE propertysheet SYSTEM "propertysheet.dtd">
+
+<propertysheet>
+    <section name="SAE" defaultValue="samlv2sp.attribute.label.sae">
+        <property>
+            <label name="lblSAESPUrl" defaultValue="samlv2sp.attribute.label.sae.saeSPUrl" labelFor="saeSPUrl" />
+            <cc name="saeSPUrl" tagclass="com.sun.web.ui.taglib.html.CCTextFieldTag">
+                <attribute name="size" value="95" />
+                <attribute name="autoSubmit" value="false" />
+                <attribute name="localizeDisplayFieldValue" value="false" />
+            </cc>
+            <fieldhelp name="helpSAESPUrl" defaultValue="samlv2sp.attribute.help.SAESPUrl" />
+        </property>       
+        <property>
+            <label name="lblSAESPLogoutUrl" defaultValue="samlv2sp.attribute.label.sae.saeSPLogoutUrl" labelFor="saeSPLogoutUrl" />
+            <cc name="saeSPLogoutUrl" tagclass="com.sun.web.ui.taglib.html.CCTextFieldTag">
+                <attribute name="size" value="95" />
+                <attribute name="autoSubmit" value="false" />
+                <attribute name="localizeDisplayFieldValue" value="false" />
+            </cc>
+            <fieldhelp name="helpsaeSPLogoutUrl" defaultValue="samlv2sp.attribute.help.saeSPLogoutUrl" />
+        </property>           
+        <subsection name="elistSAEAppSecretList" defaultValue="" >
+            <property>
+                <label name="lblSAEAppSecretList" 
+                       defaultValue="samlv2sp.attribute.label.sae.saeAppSecretList" 
+                       labelFor="saeAppSecretList" />
+                <ccgroup>
+                    <property>
+                        <cc name="saeAppSecretList"
+                            tagclass="com.sun.web.ui.taglib.editablelist.CCEditableListTag" >
+                            <attribute name="name" value="list" />
+                            <attribute name="listboxLabel" value="label.current.value" />
+                            <attribute name="textboxLabel" value="label.new.value" />
+                        </cc>
+                        <fieldhelp name="helpsaeAppSecretList0" defaultValue="samlv2sp.attribute.help.saeAppSecretList.0" />
+                        <fieldhelp name="helpsaeAppSecretList1" defaultValue="samlv2sp.attribute.help.saeAppSecretList.1" />
+                        <fieldhelp name="helpsaeAppSecretList2" defaultValue="samlv2sp.attribute.help.saeAppSecretList.2" />
+                        <fieldhelp name="helpsaeAppSecretList3" defaultValue="samlv2sp.attribute.help.saeAppSecretList.3" />
+                        <fieldhelp name="helpsaeAppSecretList4" defaultValue="samlv2sp.attribute.help.saeAppSecretList.4" />
+                        <fieldhelp name="helpsaeAppSecretList5" defaultValue="samlv2sp.attribute.help.saeAppSecretList.5" />
+                    </property>
+                </ccgroup>                
+            </property>
+        </subsection>                
+    </section>
+    
+    <section name="ECP" defaultValue="samlv2sp.attribute.label.ecp">
+        <property>
+            <label name="lblECPRequestIDPListFinderImpl" defaultValue="samlv2sp.attribute.label.ecp.ECPRequestIDPListFinderImpl" labelFor="ECPRequestIDPListFinderImpl" />
+            <cc name="ECPRequestIDPListFinderImpl" tagclass="com.sun.web.ui.taglib.html.CCTextFieldTag">
+                <attribute name="size" value="75" />
+                <attribute name="autoSubmit" value="false" />
+                <attribute name="localizeDisplayFieldValue" value="false" />
+            </cc>
+            <fieldhelp name="helpECPRequestIDPListFinderImpl" defaultValue="samlv2sp.attribute.help.SPECPRequestIDPListFinderImpl" />
+        </property>                        
+        <property>
+            <label name="lblECPRequestIDPListGetComplete" defaultValue="samlv2sp.attribute.label.ecp.ECPRequestIDPListGetComplete" labelFor="ECPRequestIDPListGetComplete" />
+            <cc name="ECPRequestIDPListGetComplete" tagclass="com.sun.web.ui.taglib.html.CCTextFieldTag">
+                <attribute name="size" value="75" />
+                <attribute name="autoSubmit" value="false" />
+                <attribute name="localizeDisplayFieldValue" value="false" />
+            </cc>
+            <fieldhelp name="helpECPRequestIDPListGetComplete" defaultValue="samlv2sp.attribute.help.SPECPRequestIDPListGetComplete" />
+        </property>               
+        <subsection name="elistECPRequestIDPList" defaultValue="" >
+            <property>
+                <label name="lblECPRequestIDPList" 
+                       defaultValue="samlv2sp.attribute.label.ecp.ECPRequestIDPList" 
+                       labelFor="ECPRequestIDPList" />
+                <ccgroup>
+                    <property>
+                        <cc name="ECPRequestIDPList"
+                            tagclass="com.sun.web.ui.taglib.editablelist.CCEditableListTag" >
+                            <attribute name="name" value="list" />
+                            <attribute name="listboxLabel" value="label.current.value" />
+                            <attribute name="textboxLabel" value="label.new.value" />
+                        </cc>
+                        <fieldhelp name="helpECPRequestIDPList" defaultValue="samlv2sp.attribute.help.SPECPRequestIDPList" />
+                    </property>
+                </ccgroup>                
+            </property>
+        </subsection>        
+    </section>
+    
+     <section name="idpproxy" defaultValue="samlv2sp.provider.section.title.idpproxy" >
+        <property>
+            <label name="lblenableIDPProxy"
+                   defaultValue=
+                   "samlv2sp.attribute.label.idpproxy" 
+                   labelFor="enableIDPProxy" />
+            <cc name="enableIDPProxy" 
+                tagclass="com.sun.web.ui.taglib.html.CCCheckBoxTag" >
+                <attribute name="label" value="label.Enable" />
+            </cc>
+            <fieldhelp name="helpenableIDPProxy" defaultValue="samlv2sp.attribute.help.SPenableIDPProxy" />
+        </property>
+        <property>
+            <label name="lbluseIntroForIDPProxy"
+                   defaultValue=
+                   "samlv2sp.attribute.label.introidpproxy" 
+                   labelFor="useIntroductionForIDPProxy" />
+            <cc name="useIntroductionForIDPProxy" 
+                tagclass="com.sun.web.ui.taglib.html.CCCheckBoxTag" >
+                <attribute name="label" value="label.Enable" />
+            </cc>
+        </property>
+        <property>
+            <label name="lblidpProxyCount"
+                   defaultValue=
+                   "samlv2sp.attribute.label.idpProxyCount"
+                   labelFor="idpProxyCount" />
+            <cc name="idpProxyCount" 
+                tagclass="com.sun.web.ui.taglib.html.CCTextFieldTag" >
+                <attribute name="size" value="5" />
+                <attribute name="autoSubmit" value="false" />
+                <attribute name="localizeDisplayFieldValue" value="false" />
+            </cc>
+            <fieldhelp name="helpidpProxyCount" defaultValue="samlv2sp.attribute.help.SPidpProxyCount" />
+        </property>
+        <property>
+            <label name="lblidpProxyList"
+                   defaultValue="samlv2sp.attribute.label.idpProxyList"
+                   labelFor="idpProxyList" />
+            <ccgroup>
+                <property>
+                    <cc name="idpProxyList" 
+                        tagclass=
+                        "com.sun.web.ui.taglib.editablelist.CCEditableListTag" >
+                        <attribute name="name" value="list" />
+                        <attribute name="listboxLabel" 
+                                   value="label.current.value" />
+                        <attribute name="textboxLabel"
+                                   value="label.new.value" />
+                    </cc>
+                    <fieldhelp name="helpidpProxyList" defaultValue="samlv2sp.attribute.help.SPidpProxyList" />
+                </property>
+            </ccgroup>                    
+        </property>  
+    </section>
+        <section name="SessionSyncEnabled" defaultValue="samlv2.attribute.label.SessionSyncEnabled" >
+        <property>
+            <cc name="spSessionSyncEnabled"
+                tagclass="com.sun.web.ui.taglib.html.CCCheckBoxTag" >
+                <attribute name="label" value="label.Enable" />
+            </cc>
+            <fieldhelp name="helpSpSessionSyncEnabled" defaultValue="samlv2.attribute.label.help.spSessionSyncEnabled" />
+        </property>
+    </section>
+    <section name="RelayStateUrlList" defaultValue="samlv2sp.attribute.label.relayState">
+        <subsection name="elistRelayStateUrlList" defaultValue="" >
+            <property>
+                <label name="lblRelayStateUrlList" 
+                       defaultValue="samlv2sp.attribute.label.relayState.relayStateUrlList" 
+                       labelFor="relayStateUrlList" />
+                <ccgroup>
+                    <property>
+                        <cc name="relayStateUrlList"
+                            tagclass="com.sun.web.ui.taglib.editablelist.CCEditableListTag" >
+                            <attribute name="name" value="list" />
+                            <attribute name="listboxLabel" value="label.current.value" />
+                            <attribute name="textboxLabel" value="label.new.value" />
+                        </cc>
+                    </property>
+                </ccgroup>                
+            </property>
+        </subsection>                
+    </section>
+</propertysheet>

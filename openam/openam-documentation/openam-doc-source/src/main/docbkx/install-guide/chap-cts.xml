@@ -1,0 +1,455 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  ! CCPL HEADER START
+  !
+  ! This work is licensed under the Creative Commons
+  ! Attribution-NonCommercial-NoDerivs 3.0 Unported License.
+  ! To view a copy of this license, visit
+  ! http://creativecommons.org/licenses/by-nc-nd/3.0/
+  ! or send a letter to Creative Commons, 444 Castro Street,
+  ! Suite 900, Mountain View, California, 94041, USA.
+  !
+  ! You can also obtain a copy of the license at
+  ! src/main/resources/legal-notices/CC-BY-NC-ND.txt.
+  ! See the License for the specific language governing permissions
+  ! and limitations under the License.
+  !
+  ! If applicable, add the following below this CCPL HEADER, with the fields
+  ! enclosed by brackets "[]" replaced with your own identifying information:
+  !      Portions Copyright [yyyy] [name of copyright owner]
+  !
+  ! CCPL HEADER END
+  !
+  !      Copyright 2013 ForgeRock AS
+  !
+-->
+<chapter xml:id='chap-cts'
+         xmlns='http://docbook.org/ns/docbook'
+         version='5.0' xml:lang='en'
+         xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance'
+         xsi:schemaLocation='http://docbook.org/ns/docbook http://docbook.org/xml/5.0/xsd/docbook.xsd'
+         xmlns:xlink='http://www.w3.org/1999/xlink'>
+  <title>Configuring the Core Token Service (CTS)</title>
+
+  <indexterm>
+    <primary>Core Token Service</primary>
+  </indexterm>
+
+  <para>The Core Token Service (CTS) provides token storage for a several components within OpenAM, including
+  sessions, OAuth and SAML. CTS tokens for sessions represent an authenticated user. The CTS is set up in
+  a generalized token storage format, suitable for sessions, as well as persistence in OAuth 2.0 and SAML
+  tokens.</para>
+
+  <para>The CTS relies on a directory service such as OpenDJ to store tokens. By default, the CTS uses the same
+  directory service as is set up for OpenAM's configuration data store. The configuration and policy data
+  in the configuration data store normally change slowly. In contrast, CTS tokens are as volatile as the
+  user sessions they represent. This chapter describes how to set up the CTS in a separate data store within
+  the OpenDJ directory service.</para>
+
+  <para>To set up CTS in a separate data store, you have to set up indexes to allow OpenAM to search the
+  data in an efficient manner, Access Control Instructions (ACIs) to give a user Create, Read, Update, and
+  Delete (CRUD) privileges, and schema definitions that prevent OpenDJ from rejecting the data as invalid.
+  But first, you should configure basic parameters for the CTS token data store.</para>
+
+  <section xml:id="cts-config">
+    <title>CTS Configuration Parameters</title>
+
+    <para>If you have previously configured CTS, be prepared. Before making any changes, disable client
+    access to OpenAM. The actions taken in this screen may eliminate existing CTS session, OAuth 2.0,
+    and SAML tokens.</para>
+
+    <para>To access the main CTS configuration page from the console, select Configuration &gt; Servers and Sites &gt;
+    Default Server Settings &gt; CTS. The options that appear in the screenshot that follows are detailed in the
+    <link xlink:show="new" xlink:href="reference#servers-cts" xlink:role="http://docbook.org/xlink/role/olink">
+    <citetitle>Reference</citetitle></link> document. You can set a root suffix for CTS tokens for
+    either the default embedded or an external token store. If you select <literal>Default Token Store</literal>,
+    OpenAM will use the embedded configuration data store for CTS tokens."</para>
+
+    <note><para>If desired, you could make these changes from the command line with the <link xlink:show="new"
+    xlink:href="reference#ssoadm-update-server-cfg" xlink:role="http://docbook.org/xlink/role/olink">
+    <command>ssoadm update-server-cfg</command></link> command, as described in the
+    Reference Guide.</para></note>
+
+    <mediaobject xml:id="cts-default-store">
+        <alt>Configuring Default Server CTS Options</alt>
+        <imageobject>
+            <imagedata fileref="images/cts-default-store.png" format="PNG" />
+        </imageobject>
+        <textobject>
+            <para>Shows the page used to customize CTS default and external token stores</para>
+        </textobject>
+    </mediaobject>
+
+    <para>Plausible options have been entered in the figure. If the <literal>External Token Store</literal>
+    is selected, entries are required in all text boxes. The options shown in the figure are:</para>
+
+      <itemizedlist>
+       <listitem>
+        <para><literal>Root Suffix</literal></para>
+        <para><literal>ou=tokenex,dc=openam,dc=forgerock,dc=org</literal></para>
+       </listitem>
+       <listitem>
+        <para><literal>SSL/TLS Enabled</literal></para>
+        <para>enabled (assumes communications using StartTLS over port 389)</para>
+       </listitem>           
+       <listitem>
+        <para><literal>Directory Name</literal></para>
+        <para><literal>opendj-cts.example.org</literal></para>
+       </listitem>
+       <listitem>
+        <para><literal>Port</literal></para>
+        <para><literal>389</literal></para>
+       </listitem>
+       <listitem>
+        <para><literal>Login Id</literal></para>
+        <para><literal>cn=Directory Manager</literal></para>
+       </listitem>
+       <listitem>
+        <para><literal>Password</literal></para>
+       </listitem>
+       <listitem>
+        <para><literal>Max Connections</literal></para>
+        <para><literal>20</literal> (arbitrary number)</para>
+       </listitem>
+       <listitem>
+        <para><literal>Heartbeat</literal></para>
+        <para><literal>10</literal> (default)</para>
+       </listitem>
+      </itemizedlist>
+
+    <para>Navigate to Configuration &gt; Servers and Sites &gt; Default Server Settings &gt; CTS. Any options that
+    you change under this tab are inherited as defaults by individual servers. To confirm, make a change, and then
+    navigate to Configuration &gt; Servers and Sites &gt; [Server Name] &gt; CTS.</para>
+
+      <!--    Please address OPENAM-3164 so I can delete this comment
+    <note><para>Some of you may have seen the Global Core Token Service screen, accessible via
+    Configuration &gt; Global &gt; Core Token Service. The options in this screen are not related
+    the Core Token Service implemented for OpenAM 11.0.0. It provides a REST-based token management
+    interface designed for OAuth version 1 tokens.</para></note>           -->
+
+  </section>
+
+ <section xml:id="cts-schema">
+    <title>Preparing an OpenDJ Directory Service for CTS</title>
+
+    <para>OpenAM stores volatile CTS token data in an LDAP directory service. To make that possible, you need
+    to set up the associated data store indexes, which allow OpenAM to search CTS token data in an efficient
+    manner.</para>
+
+    <para>You can add the CTS schema with a command such as the following:</para>
+    <screen>$ /path/to/opendj/bin/ldapmodify --port 389 --bindDN "cn=Directory Manager" \
+--bindPassword password --filename cts-add-schema.ldif</screen>
+
+    <table xml:id="cts-configuration-store-indexes">
+          <title>CTS Data Store Indexes</title>
+
+          <tgroup cols="2">
+              <colspec colnum="1" colwidth="1*"/>
+              <colspec colnum="2" colwidth="1*"/>
+
+              <thead>
+                  <row>
+                      <entry>Attribute</entry>
+                      <entry>Indexes Required</entry>
+                  </row>
+              </thead>
+
+              <tbody>
+                  <row>
+                      <entry><literal>coreTokenDate01</literal></entry>
+                      <entry>equality</entry>
+                  </row>
+                  <row>
+                      <entry><literal>coreTokenDate02</literal></entry>
+                      <entry>equality</entry>
+                  </row>
+                  <row>
+                      <entry><literal>coreTokenDate03</literal></entry>
+                      <entry>equality</entry>
+                  </row>
+                  <row>
+                      <entry><literal>coreTokenDate04</literal></entry>
+                      <entry>equality</entry>
+                  </row>
+                  <row>
+                      <entry><literal>coreTokenDate05</literal></entry>
+                      <entry>equality</entry>
+                  </row>
+                  <row>
+                      <entry><literal>coreTokenExpirationDate</literal></entry>
+                      <entry>ordering</entry>
+                  </row>
+                  <row>
+                      <entry><literal>coreTokenInteger01</literal></entry>
+                      <entry>equality</entry>
+                  </row>
+                  <row>
+                      <entry><literal>coreTokenInteger02</literal></entry>
+                      <entry>equality</entry>
+                  </row>
+                  <row>
+                      <entry><literal>coreTokenInteger03</literal></entry>
+                      <entry>equality</entry>
+                  </row>
+                  <row>
+                      <entry><literal>coreTokenInteger04</literal></entry>
+                      <entry>equality</entry>
+                  </row>
+                  <row>
+                      <entry><literal>coreTokenInteger05</literal></entry>
+                      <entry>equality</entry>
+                  </row>
+                  <row>
+                      <entry><literal>coreTokenInteger06</literal></entry>
+                      <entry>equality</entry>
+                  </row>
+                  <row>
+                      <entry><literal>coreTokenInteger07</literal></entry>
+                      <entry>equality</entry>
+                  </row>
+                  <row>
+                      <entry><literal>coreTokenInteger08</literal></entry>
+                      <entry>equality</entry>
+                  </row>
+                  <row>
+                      <entry><literal>coreTokenInteger09</literal></entry>
+                      <entry>equality</entry>
+                  </row>
+                  <row>
+                      <entry><literal>coreTokenInteger10</literal></entry>
+                      <entry>equality</entry>
+                  </row>
+                  <row>
+                      <entry><literal>coreTokenString01</literal></entry>
+                      <entry>equality</entry>
+                  </row>
+                  <row>
+                      <entry><literal>coreTokenString02</literal></entry>
+                      <entry>equality</entry>
+                  </row>
+                  <row>
+                      <entry><literal>coreTokenString03</literal></entry>
+                      <entry>equality</entry>
+                  </row>
+                  <row>
+                      <entry><literal>coreTokenString04</literal></entry>
+                      <entry>equality</entry>
+                  </row>
+                  <row>
+                      <entry><literal>coreTokenString05</literal></entry>
+                      <entry>equality</entry>
+                  </row>
+                  <row>
+                      <entry><literal>coreTokenString06</literal></entry>
+                      <entry>equality</entry>
+                  </row>
+                  <row>
+                      <entry><literal>coreTokenString07</literal></entry>
+                      <entry>equality</entry>
+                  </row>
+                  <row>
+                      <entry><literal>coreTokenString08</literal></entry>
+                      <entry>equality</entry>
+                  </row>
+                  <row>
+                      <entry><literal>coreTokenString09</literal></entry>
+                      <entry>equality</entry>
+                  </row>
+                  <row>
+                      <entry><literal>coreTokenString10</literal></entry>
+                      <entry>equality</entry>
+                  </row>
+                  <row>
+                      <entry><literal>coreTokenString11</literal></entry>
+                      <entry>equality</entry>
+                  </row>
+                  <row>
+                      <entry><literal>coreTokenString12</literal></entry>
+                      <entry>equality</entry>
+                  </row>
+                  <row>
+                      <entry><literal>coreTokenString13</literal></entry>
+                      <entry>equality</entry>
+                  </row>
+                  <row>
+                      <entry><literal>coreTokenString14</literal></entry>
+                      <entry>equality</entry>
+                  </row>
+                  <row>
+                      <entry><literal>coreTokenString15</literal></entry>
+                      <entry>equality</entry>
+                  </row>
+                  <row>
+                      <entry><literal>coreTokenUserId</literal></entry>
+                      <entry>equality</entry>
+                  </row>
+              </tbody>
+          </tgroup>
+      </table>
+
+  </section>
+
+  <section xml:id="cts-acis">
+    <title>CTS Access Control Instructions</title>
+
+    <para>Now you can set up a user with access to CTS tokens in the data store. Specifically, you will need
+    to configure a user such as <literal>openam</literal> with Create, Read, Update, and Delete (CRUD) privileges.
+    For the given Root Suffix and user name, you might have a User DN of
+    <literal>uid=openam,ou=admins,dc=example,dc=org</literal>. In brief, ACI attributes are formatted with the
+    following syntax:</para>
+
+    <literallayout class="monospaced">
+    <replaceable>targets</replaceable>(version 3.0;acl "<replaceable>name</replaceable>";<replaceable>permissions subjects</replaceable>;)
+    </literallayout>
+
+    <para>The following entries give an <literal>openam</literal> user CRUD privileges with the noted User DN,
+    for an external directory service:</para>
+
+    <!-- Ordering changed from the "Preparing a Configuration Data Store" section to match CRUD;
+    I'm assuming a "Create" ACI is not needed, as the tokens to manage are already there? (tell me if I'm mistaken) -->
+
+    <programlisting language="ldif">aci: (version 3.0;acl "Add config entry"; allow (add)(userdn = "ldap:///
+  uid=openam,ou=admins,dc=example,dc=org");)
+aci: (targetattr="*")(version 3.0;acl "Allow entry search"; allow (
+  search, read)(userdn = "ldap:///uid=openam,ou=admins,dc=example,dc=org");)
+aci: (targetattr="*")(version 3.0;acl "Modify config entry"; allow (write)(
+  userdn = "ldap:///uid=openam,ou=admins,dc=example,dc=org");)
+aci: (version 3.0;acl "Delete config entry"; allow (delete)(userdn = "ldap:///
+  uid=openam,ou=admins,dc=example,dc=org");)
+aci: (targetcontrol="2.16.840.1.113730.3.4.3")(version 3.0;acl "Allow
+  persistent search"; allow (search, read)(userdn = "ldap:///uid=openam,
+  ou=admins,dc=example,dc=org");)</programlisting>
+
+    <para>For detailed information on ACIs, with details on how you can use the <command>ldapmodify</command>
+    and <command>dsconfig</command> commands to manage them, see the OpenDJ chapter on <link xlink:show="new"
+    xlink:href="http://docs.forgerock.org/en/opendj/2.6.0/admin-guide/#chap-privileges-acis"
+    xlink:role="http://docbook.org/xlink/role/olink">
+    <citetitle>Configuring Privileges &amp; Access Control</citetitle></link>.</para>
+
+  </section>
+
+  <section xml:id="cts-deployment">
+    <title>CTS Deployment Scenario</title>
+
+    <para>One objective with CTS deployments is to avoid single points of failure (SPOF). Options to avoid
+    SPOFs include:</para>
+
+    <itemizedlist>
+        <listitem>
+            <para>Isolating the directory service from OpenAM in separate external servers such as OpenDJ.</para>
+        </listitem>
+        <listitem>
+            <para>Configuring multiple directory stores for CTS, set up with load balancer(s).</para>
+        </listitem>
+        <listitem>
+            <para>Adding separate servers for data store replication. For more information on how this is done
+            with OpenDJ, see the OpenDJ documentation on <link xlink:show="new"
+            xlink:href="http://docs.forgerock.org/en/opendj/2.6.0/admin-guide/#repl-dedicated-servers">
+            <citetitle>Stand-alone Replication Servers</citetitle></link>.</para>
+        </listitem>
+        <listitem>
+            <para>Setting up redundancy in the load balancer connections between OpenAM and the external
+            data store.</para>
+        </listitem>
+    </itemizedlist>
+
+    <para>A relatively simplified method for configuring a CTS deployment is depicted here:</para>
+
+    <mediaobject xml:id="cts-deploy">
+        <alt>A Simplified CTS Deployment</alt>
+        <imageobject>
+            <imagedata fileref="images/cts-deploy.png" format="PNG" />
+        </imageobject>
+        <textobject>
+            <para>Depicts a Simplified Configuration for CTS</para>
+        </textobject>
+    </mediaobject>
+
+    <para>For clarity, the diagram does not include options that may be appropriate for a production deployment
+    such as firewalls and OpenAM agents.</para>
+
+  </section>
+
+  <section xml:id="cts-token-size">
+    <title>Managing CTS Tokens</title>
+
+   <para>There are five properties associated with token encryption, compression, and token lifetimes.
+   The three that are associated with encryption and compression are disabled by default.
+   The properties are as follows:</para>
+
+   <itemizedlist>
+       <listitem>
+           <para><literal>com.sun.identity.session.repository.enableEncryption</literal></para>
+           <para>Supports encryption of CTS tokens.</para>
+       </listitem>
+       <listitem>
+           <para><literal>com.sun.identity.session.repository.enableCompression</literal></para>
+           <para>Enables GZip-based compression of CTS tokens.</para>
+       </listitem>
+       <listitem>
+           <para><literal>com.sun.identity.session.repository.enableAttributeCompression</literal></para>
+           <para>Supports compression over and above the GZip-based compression of CTS tokens.</para>
+       </listitem>
+       <listitem>
+           <para><literal>com.sun.identity.session.repository.cleanupRunPeriod</literal></para>
+           <para>Specifies a minimum CTS token lifetime. If there is no activity in the specified
+           time period, the token is erased. Default: 300 seconds. (Under Default Server Settings &gt; Advanced,
+           this property is set to 400 seconds.)</para>
+       </listitem>
+       <listitem>
+           <para><literal>com.sun.identity.session.repository.healthCheckRunPeriod</literal></para>
+           <para>Sets a period of time when requests are sent to make sure the current instance of
+           OpenAM is running. Default: 60 seconds.</para>
+       </listitem>
+   </itemizedlist>
+
+   <para>To enable the encryption / compression options, navigate to Configuration &gt; Servers and Sites &gt;
+   Default Server Settings &gt; Advanced. In the Advanced Properties window, you should see these entries
+   in the <literal>Property Name</literal> column with the
+   corresponding value in the <literal>Property Value</literal> column. To enable them, change <literal>false</literal>
+   to <literal>true</literal> in the Property Value column associated with the desired property, and click Save.</para>
+
+   <note><para>If you choose to enable compression, set both
+   <literal>com.sun.identity.session.repository.enableCompression</literal>
+   and <literal>com.sun.identity.session.repository.enableAttributeCompression</literal> to <literal>true</literal>
+   They work well together.</para></note>
+
+  </section>
+
+  <section xml:id="cts-general-recommend">
+        <title>General Recommendations for CTS Configuration</title>
+
+        <para>As might be expected, the biggest driver in CTS replication is the bandwidth between data stores. When
+        data stores are connected via a WAN, that bandwidth may be insufficient to replicate updated tokens
+        without delay. With that in mind, OpenAM supports options for token compression that can minimize
+        the the load from CTS.</para>
+
+        <para>If you are deploying on a single site, and want CTS replication limited to that site, the
+        default configuration store may be sufficient. If your needs go beyond a higher-level performance
+        threshold, you may want to move the CTS token storage to one or more dedicated systems. Alternatively,
+        if you need global replication of user session CTS tokens, that also justifies a move to dedicated systems
+        as you need that extra level of control over how much replication is taking place.</para>
+
+        <para>CTS generally cause much more replication traffic than less volatile configuration data.
+        Therefore, in high volume deployments you can move CTS data to dedicated, properly sized
+        directory servers to improve performance. In addition, token compression as discussed in
+        <xref linkend="cts-token-size" />, is disabled by default. When enabled, token compression can reduce
+        load requirements on the network connection between data stores.</para>
+
+        <para>While not recommended for high volume deployments, it is possible to use CTS in production within
+        the default internal OpenDJ configuration store. That assumes a small scale deployment with a relatively
+        simple topology.</para>
+
+        <para>The CTS is configured to work with a single OpenDJ directory server. That is a potential SPOF.
+        to address that issue, set up a load balancer between OpenAM and the OpenDJ directory service used for
+        the CTS. Redundant load balancers are preferred. If one instance of OpenDJ fails, the load balancer would
+        redirect CTS requests to another instance of OpenDJ with a copy of the CTS tokens.</para>
+
+        <para>Once configured, the OpenDJ directory service replicates CTS data transmitted from OpenAM servers
+        to connected OpenDJ servers. The amount of replication traffic can be significant, especially if
+        replication proceeds over a WAN. You can limit this replication traffic by separating OpenDJ instances
+        into directory and replication servers.</para>
+
+    </section>
+
+</chapter>

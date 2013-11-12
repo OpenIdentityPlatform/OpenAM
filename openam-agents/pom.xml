@@ -1,0 +1,571 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ *
+ * Copyright 2013 ForgeRock AS.
+ *
+ * The contents of this file are subject to the terms of the Common Development and
+ * Distribution License (the License). You may not use this file except in compliance with the
+ * License.
+ *
+ * You can obtain a copy of the License at legal/CDDLv1.0.txt. See the License for the
+ * specific language governing permission and limitations under the License.
+ *
+ * When distributing Covered Software, include this CDDL Header Notice in each file and include
+ * the License file at legal/CDDLv1.0.txt. If applicable, add the following below the CDDL
+ * Header, with the fields enclosed by brackets [] replaced by your own identifying
+ * information: "Portions copyright [year] [name of copyright owner]".
+ *
+-->
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <!-- Build Notes:
+
+         To Build all of the OpenAM Agents use the following Maven Command:
+         cd to agents top level directory.
+         mvn clean package
+
+         To Build only a specify Module: (This will pull existing modules whichever is newest local or remote).
+         mvn clean package -pl <module Name>
+
+         To Build only specific Module and Dependencies
+         mvn clean package -pl <module Name> -am
+
+         Skipping Tests add:
+         -DskipTests=true
+
+    -->
+
+    <!-- Parent Project -->
+    <parent>
+        <groupId>org.forgerock</groupId>
+        <artifactId>forgerock-parent</artifactId>
+        <version>1.1.0</version>
+    </parent>
+
+    <!-- Component Definition -->
+    <name>OpenAM Policy Agents Project</name>
+    <groupId>org.forgerock.openam.agents</groupId>
+    <artifactId>openam-agents</artifactId>
+    <version>3.3.0</version>
+    <packaging>pom</packaging>
+
+    <description>OpenAM Policy Agents</description>
+    <inceptionYear>2010</inceptionYear>
+
+    <organization>
+        <name>ForgeRock</name>
+        <url>http://www.forgerock.org</url>
+    </organization>
+    <url>http://www.forgerock.org</url>
+
+    <issueManagement>
+        <system>Jira</system>
+        <url>https://bugster.forgerock.org/jira/browse/OPENAM</url>
+    </issueManagement>
+
+    <licenses>
+        <license>
+            <name>CDDL-1.0</name>
+            <url>http://www.opensource.org/licenses/cddl1.php</url>
+            <comments>Common Development and Distribution License (CDDL) 1.0.
+                This license applies to OpenAM source code as indicated in the
+                sources themselves.
+            </comments>
+            <distribution>repo</distribution>
+        </license>
+        <license>
+            <name>CC BY-NC-ND 3.0</name>
+            <url>http://creativecommons.org/licenses/by-nc-nd/3.0/</url>
+            <comments>Creative Commons Attribution-NonCommercial-NoDerivs 3.0
+                Unported. This license applies to the site content, and to the
+                documentation as indicated in the documentation source code.
+            </comments>
+            <distribution>repo</distribution>
+        </license>
+    </licenses>
+
+    <!-- Component Properties -->
+    <properties>
+        <!-- **************************************************************** -->
+        <maven.build.timestamp.format>yyyy-MMM-dd HH:mm:ss</maven.build.timestamp.format>
+        <!-- **************************************************************** -->
+
+        <!-- Java Properties -->
+
+        <java.source.version>1.5</java.source.version>
+
+        <java.target.version>1.5</java.target.version>
+
+        <!-- Surefire Argument Line -->
+        <java.surefire.options>-Xms2g -Xmx2g -XX:MaxPermSize=512m</java.surefire.options>
+
+        <!-- JavaDoc Setting Properties -->
+        <javadoc.options>-J-Xms2g -J-Xmx2g -J-XX:MaxPermSize=512m</javadoc.options>
+
+        <!-- Project Encoding -->
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+
+        <!-- Product Properties File Inclusion during Build -->
+        <openam-agents.properties>openam-agents.properties</openam-agents.properties>
+
+        <!--  Project web site -->
+        <siteDistributionURL>scp://forgerock.org/var/www/vhosts/openam.forgerock.org/httpdocs</siteDistributionURL>
+    </properties>
+
+    <!-- Profiles -->
+    <profiles>
+        <!-- Place Default Profiles here to override and determine Environment. -->
+
+        <profile>
+            <id>default-profile</id>
+            <!-- This profile gets activated for WINDOWS and LINUX Systems -->
+            <activation>
+                <file>
+                    <exists>${env.JAVA_HOME}/lib/tools.jar</exists>
+                </file>
+            </activation>
+            <properties>
+                <toolsjar>${env.JAVA_HOME}/lib/tools.jar</toolsjar>
+            </properties>
+            <dependencies>
+                <dependency>
+                    <groupId>com.sun</groupId>
+                    <artifactId>tools</artifactId>
+                    <version>${java.target.version}</version>
+                    <scope>system</scope>
+                    <optional>true</optional>
+                    <systemPath>${toolsjar}</systemPath>
+                </dependency>
+            </dependencies>
+        </profile>
+        <profile>
+            <id>release</id>
+            <activation>
+                <property>
+                    <name>performRelease</name>
+                    <value>true</value>
+                </property>
+            </activation>
+        </profile>
+    </profiles>
+
+    <!-- OpenAM Agent Child Modules -->
+    <!-- Build order will be determined by the Maven Reactor. -->
+    <modules>
+
+        <module>jee-agents</module>
+        <!-- Enable when these have been migrated -->
+        <!--
+        <module>wss-agents</module>
+        <module>web-agents</module>
+        -->
+    </modules>
+
+    <!-- Mailing Lists -->
+    <mailingLists>
+        <mailingList>
+            <name>OpenAM Users List</name>
+            <subscribe>https://lists.forgerock.org/mailman/listinfo/openam/</subscribe>
+            <unsubscribe>https://lists.forgerock.org/mailman/listinfo/openam/</unsubscribe>
+            <post>openam@forgerock.org</post>
+            <archive>http://lists.forgerock.org/pipermail/openam/</archive>
+        </mailingList>
+        <mailingList>
+            <name>OpenAM Developers List</name>
+            <subscribe>https://lists.forgerock.org/mailman/listinfo/openam-dev/</subscribe>
+            <unsubscribe>https://lists.forgerock.org/mailman/listinfo/openam-dev/</unsubscribe>
+            <post>openam-dev@forgerock.org</post>
+            <archive>http://lists.forgerock.org/pipermail/openam-dev/</archive>
+        </mailingList>
+        <mailingList>
+            <name>OpenAM Commit Notifications</name>
+            <subscribe>https://lists.forgerock.org/mailman/listinfo/commitopenam/</subscribe>
+            <unsubscribe>https://lists.forgerock.org/mailman/listinfo/commitopenam/</unsubscribe>
+            <post>commitopenam@forgerock.org</post>
+            <archive>http://lists.forgerock.org/pipermail/commitopenam/</archive>
+        </mailingList>
+    </mailingLists>
+
+    <!-- Maven Repositories -->
+    <repositories>
+        <!-- ForgeRock Common Internal Project Repositories -->
+        <repository>
+            <id>forgerock-staging-repo</id>
+            <name>ForgeRock Release Repository</name>
+            <url>http://maven.forgerock.org/repo/releases</url>
+            <snapshots>
+                <enabled>false</enabled>
+            </snapshots>
+        </repository>
+
+        <repository>
+            <id>forgerock-snapshots-repo</id>
+            <name>ForgeRock Snapshot Repository</name>
+            <url>http://maven.forgerock.org/repo/snapshots</url>
+            <releases>
+                <enabled>false</enabled>
+            </releases>
+            <snapshots>
+                <enabled>true</enabled>
+            </snapshots>
+        </repository>
+
+        <!-- ForgeRock Internal Project Repository -->
+        <repository>
+            <id>maven.forgerock.org</id>
+            <name>maven.forgerock.org-openam-dependencies</name>
+            <url>http://maven.forgerock.org/repo/openam-dependencies</url>
+            <releases>
+                <enabled>true</enabled>
+            </releases>
+            <snapshots>
+                <enabled>true</enabled>
+            </snapshots>
+        </repository>
+
+        <!-- ForgeRock.org Project Repository -->
+        <repository>
+            <id>forgerock-staging-repository</id>
+            <name>ForgeRock Release Repository</name>
+            <url>http://maven.forgerock.org/repo/openam-releases</url>
+            <releases>
+                <enabled>true</enabled>
+            </releases>
+            <snapshots>
+                <enabled>false</enabled>
+            </snapshots>
+        </repository>
+
+        <repository>
+            <id>forgerock-snapshots-repository</id>
+            <name>ForgeRock Snapshot Repository</name>
+            <url>http://maven.forgerock.org/repo/openam-snapshots</url>
+            <releases>
+                <enabled>false</enabled>
+            </releases>
+            <snapshots>
+                <enabled>true</enabled>
+            </snapshots>
+        </repository>
+
+        <repository>
+            <id>maven-central</id>
+            <url>http://maven.forgerock.org/repo/maven-central</url>
+            <releases>
+                <enabled>true</enabled>
+            </releases>
+            <snapshots>
+                <enabled>true</enabled>
+            </snapshots>
+        </repository>
+    </repositories>
+
+    <pluginRepositories>
+        <pluginRepository>
+            <id>forgerock-openam-plugin-releases</id>
+            <name>openam-releases</name>
+            <url>http://maven.forgerock.org/repo/openam-releases</url>
+            <snapshots>
+                <enabled>false</enabled>
+            </snapshots>
+        </pluginRepository>
+
+        <pluginRepository>
+            <id>forgerock-openam-plugin-snapshots</id>
+            <name>openam-snapshots</name>
+            <url>http://maven.forgerock.org/repo/openam-snapshots</url>
+            <snapshots>
+                <enabled>true</enabled>
+            </snapshots>
+        </pluginRepository>
+
+        <pluginRepository>
+            <id>maven-central-plugins</id>
+            <url>http://maven.forgerock.org/repo/maven-central</url>
+            <releases>
+                <enabled>true</enabled>
+            </releases>
+            <snapshots>
+                <enabled>true</enabled>
+            </snapshots>
+        </pluginRepository>
+
+        <pluginRepository>
+            <id>maven-instant-ws-repo</id>
+            <name>maven-instant-ws repository</name>
+            <url>http://maven-instant-ws.googlecode.com/svn/repo/</url>
+            <releases>
+                <enabled>true</enabled>
+            </releases>
+            <snapshots>
+                <enabled>true</enabled>
+            </snapshots>
+        </pluginRepository>
+    </pluginRepositories>
+
+
+    <!-- For Deployment to ForgeRock Maven Repository -->
+    <distributionManagement>
+        <repository>
+            <id>maven.forgerock.org</id>
+            <name>maven.forgerock.org-releases</name>
+            <url>http://maven.forgerock.org/repo/openam-releases</url>
+        </repository>
+        <snapshotRepository>
+            <id>maven.forgerock.org</id>
+            <name>maven.forgerock.org-snapshots</name>
+            <url>http://maven.forgerock.org/repo/openam-snapshots</url>
+        </snapshotRepository>
+        <site>
+            <id>forgerock.org</id>
+            <name>OpenAM Agents Project</name>
+            <url>${siteDistributionURL}</url>
+        </site>
+    </distributionManagement>
+
+    <!-- Source Control -->
+    <scm>
+        <connection>scm:svn:https://svn.forgerock.org/openam/trunk/</connection>
+        <developerConnection>scm:svn:https://svn.forgerock.org/openam/trunk/</developerConnection>
+        <url>http://sources.forgerock.org/browse/commons/forgerock-parent/trunk/openam</url>
+    </scm>
+
+    <!-- Build -->
+    <build>
+        <plugins>
+            <!-- Make SVN properties available -->
+            <plugin>
+                <groupId>com.google.code.maven-svn-revision-number-plugin</groupId>
+                <artifactId>maven-svn-revision-number-plugin</artifactId>
+                <version>1.6</version>
+                <inherited>true</inherited>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>revision</goal>
+                        </goals>
+                    </execution>
+                </executions>
+                <configuration>
+                    <entries>
+                        <entry>
+                            <prefix>svn-revision</prefix>
+                        </entry>
+                    </entries>
+                </configuration>
+            </plugin>
+
+            <!-- Inject Specified Build Properties-->
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>properties-maven-plugin</artifactId>
+                <version>1.0-alpha-2</version>
+                <inherited>false</inherited>
+                <executions>
+                    <execution>
+                        <phase>initialize</phase>
+                        <goals>
+                            <goal>read-project-properties</goal>
+                        </goals>
+                        <configuration>
+                            <files>
+                                <file>${openam-agents.properties}</file>
+                            </files>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <version>2.5.1</version>
+                <inherited>true</inherited>
+                <configuration>
+                    <source>${java.source.version}</source>
+                    <target>${java.target.version}</target>
+                    <encoding>UTF-8</encoding>
+                    <!-- Override Enforcer Rules for OpenAM Compilation -->
+                    <compilerArgument>-Xlint:none</compilerArgument>
+                    <showDeprecation>false</showDeprecation>
+                </configuration>
+            </plugin>
+
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-dependency-plugin</artifactId>
+                <version>2.6</version>
+                <inherited>true</inherited>
+                <executions>
+                    <execution>
+                        <id>analyze</id>
+                        <goals>
+                            <goal>analyze-only</goal>
+                        </goals>
+                        <configuration>
+                            <failOnWarning>false</failOnWarning>
+                            <ignoreNonCompile>true</ignoreNonCompile>
+                            <scriptableOutput>false</scriptableOutput>
+                            <outputXML>false</outputXML>
+                            <verbose>true</verbose>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-release-plugin</artifactId>
+                <version>2.4</version>
+                <inherited>true</inherited>
+                <configuration>
+                    <autoVersionSubmodules>true</autoVersionSubmodules>
+                    <updateBranchVersions>true</updateBranchVersions>
+                </configuration>
+            </plugin>
+
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-surefire-plugin</artifactId>
+                <version>2.13</version>
+                <inherited>true</inherited>
+                <configuration>
+                    <argLine>${java.surefire.options}</argLine>
+                    <redirectTestOutputToFile>true</redirectTestOutputToFile>
+                    <disableXmlReport>false</disableXmlReport>
+                    <forkMode>once</forkMode>
+                    <systemPropertyVariables>
+                        <system_config>${openam-agents.properties}</system_config>
+                    </systemPropertyVariables>
+                    <testNGArtifactName>org.testng:testng</testNGArtifactName>
+                </configuration>
+                <executions>
+                    <execution>
+                        <phase>test</phase>
+                    </execution>
+                </executions>
+            </plugin>
+
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-resources-plugin</artifactId>
+                <version>2.6</version>
+                <inherited>true</inherited>
+                <configuration>
+                    <encoding>UTF-8</encoding>
+                    <nonFilteredFileExtensions>
+                        <!-- Exclude any binary files based upon File Types. -->
+                        <nonFilteredFileExtension>bin</nonFilteredFileExtension>
+                        <nonFilteredFileExtension>bkf</nonFilteredFileExtension>
+                        <nonFilteredFileExtension>bmp</nonFilteredFileExtension>
+                        <nonFilteredFileExtension>bz2</nonFilteredFileExtension>
+                        <nonFilteredFileExtension>deb</nonFilteredFileExtension>
+                        <nonFilteredFileExtension>dll</nonFilteredFileExtension>
+                        <nonFilteredFileExtension>dmg</nonFilteredFileExtension>
+                        <nonFilteredFileExtension>ear</nonFilteredFileExtension>
+                        <nonFilteredFileExtension>exe</nonFilteredFileExtension>
+                        <nonFilteredFileExtension>gif</nonFilteredFileExtension>
+                        <nonFilteredFileExtension>gz</nonFilteredFileExtension>
+                        <nonFilteredFileExtension>gzip</nonFilteredFileExtension>
+                        <nonFilteredFileExtension>ico</nonFilteredFileExtension>
+                        <nonFilteredFileExtension>jar</nonFilteredFileExtension>
+                        <nonFilteredFileExtension>jks</nonFilteredFileExtension>
+                        <nonFilteredFileExtension>jpg</nonFilteredFileExtension>
+                        <nonFilteredFileExtension>jpeg</nonFilteredFileExtension>
+                        <nonFilteredFileExtension>lz</nonFilteredFileExtension>
+                        <nonFilteredFileExtension>png</nonFilteredFileExtension>
+                        <nonFilteredFileExtension>pdf</nonFilteredFileExtension>
+                        <nonFilteredFileExtension>rar</nonFilteredFileExtension>
+                        <nonFilteredFileExtension>rpm</nonFilteredFileExtension>
+                        <nonFilteredFileExtension>tar</nonFilteredFileExtension>
+                        <nonFilteredFileExtension>tgz</nonFilteredFileExtension>
+                        <nonFilteredFileExtension>war</nonFilteredFileExtension>
+                        <nonFilteredFileExtension>zip</nonFilteredFileExtension>
+                        <nonFilteredFileExtension>7z</nonFilteredFileExtension>
+                        <!-- See: http://en.wikipedia.org/wiki/List_of_file_formats -->
+                    </nonFilteredFileExtensions>
+                </configuration>
+            </plugin>
+
+            <plugin>
+                <groupId>net.ju-n.maven.plugins</groupId>
+                <artifactId>checksum-maven-plugin</artifactId>
+                <version>1.0.1</version>
+                <inherited>true</inherited>
+                <executions>
+                    <execution>
+                        <id>generate-checksum</id>
+                        <phase>verify</phase>
+                        <goals>
+                            <goal>artifacts</goal>
+                        </goals>
+                    </execution>
+                </executions>
+                <configuration>
+                    <failOnError>false</failOnError>
+                    <csvSummary>true</csvSummary>
+                    <csvSummaryFile>OpenAM-Agents-artifact-${project.build.finalName}-R${svn-revision.revision}-checksums.csv
+                    </csvSummaryFile>
+                    <xmlSummary>true</xmlSummary>
+                    <xmlSummaryFile>OpenAM-Agents-artifact-${project.build.finalName}-R${svn-revision.revision}-checksums.xml
+                    </xmlSummaryFile>
+                    <algorithms>
+                        <algorithm>SHA</algorithm>
+                    </algorithms>
+                    <individualFiles>true</individualFiles>
+                    <quiet>true</quiet>
+                </configuration>
+            </plugin>
+        </plugins>
+
+        <pluginManagement>
+            <plugins>
+                <plugin>
+                    <groupId>org.forgerock.commons</groupId>
+                    <artifactId>i18n-maven-plugin</artifactId>
+                    <version>1.4.0</version>
+                </plugin>
+                <plugin>
+                    <groupId>org.codehaus.mojo</groupId>
+                    <artifactId>properties-maven-plugin</artifactId>
+                    <version>1.0-alpha-2</version>
+                </plugin>
+
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-checkstyle-plugin</artifactId>
+                    <version>2.9.1</version>
+                </plugin>
+            </plugins>
+        </pluginManagement>
+    </build>
+
+    <reporting>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-checkstyle-plugin</artifactId>
+                <version>2.9.1</version>
+            </plugin>
+
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-project-info-reports-plugin</artifactId>
+                <version>2.4</version>
+                <reportSets>
+                    <reportSet>
+                        <reports>
+                            <report>index</report>
+                            <report>mailing-list</report>
+                            <report>issue-tracking</report>
+                            <report>license</report>
+                            <report>scm</report>
+                        </reports>
+                    </reportSet>
+                </reportSets>
+            </plugin>
+        </plugins>
+    </reporting>
+</project>

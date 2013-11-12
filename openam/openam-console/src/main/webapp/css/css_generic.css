@@ -1,0 +1,264 @@
+/* The contents of this file are subject to the terms
+ * of the Common Development and Distribution License
+ * (the License). You may not use this file except in
+ * compliance with the License.
+ *
+ * You can obtain a copy of the License at
+ * https://opensso.dev.java.net/public/CDDLv1.0.html or
+ * opensso/legal/CDDLv1.0.txt
+ * See the License for the specific language governing
+ * permission and limitations under the License.
+ *
+ * When distributing Covered Code, include this CDDL
+ * Header Notice in each file and include the License file
+ * at opensso/legal/CDDLv1.0.txt.
+ * If applicable, add the following below the CDDL Header,
+ * with the fields enclosed by brackets [] replaced by
+ * your own identifying information:
+ * "Portions Copyrighted [year] [name of copyright owner]"
+ *
+ * $Id: css_generic.css,v 1.1 2006/01/28 09:18:49 veiming Exp $
+ *
+ * Copyright 2005 Sun Microsystems Inc. All Rights Reserved
+ */
+
+
+
+
+/* GENERIC STYLE SHEET */
+/* Last Updated 04/02/2002 */
+/* See readme.txt for modification history */
+
+/* GENERAL STYLES */
+BODY, TH, TD, P, DIV, SPAN, INPUT, SELECT, TEXTAREA, FORM, B, STRONG, I, U, H1, H2, H3, H4, H5, H6, 
+ DL, DD, DT, UL, LI, OL, OPTION { font-family: verdana, geneva, helvetica, arial, sans-serif;}
+.default-body { background-color: #FFF; color: #000; }
+th { text-align: left; }
+
+
+/* MASTHEAD */
+.masthead-body { background-color: #669; }
+.masthead-background { background-color: #669; }
+.masthead-title-row { background-color: #000; }
+.masthead-separator-row { background-color: #FFF; }
+.masthead-bottom-row { background-color: #669; }
+.masthead-text { color: #FFF; }
+.masthead-role-text { color: #FFF; font-weight: bold; }
+.masthead-server-text { color: #FFF; font-weight: bold; }
+a.masthead-link:link, a.masthead-link:visited { color: #FFF;  text-decoration: none; }
+a.masthead-link:hover { color: #FFF; text-decoration: underline; }
+a.masthead-link:active { color: #F00; text-decoration: underline; }
+.masthead-link-divider { color: #F90; }
+.secondary-masthead-title { color:#FFF; font-size:1.1em; font-weight: bold; margin: 5px 10px;}
+
+
+/* CONSOLE-SPECIFIC STYLES  */
+.copyright-text { color: #999; font-size: .9em; }
+.copyright-separator { background-color: #CCC; }
+a.plugin-link:link, a.plugin-link:visited { font-weight: bold; color: #669;  text-decoration: underline; }
+a.plugin-link:active { font-weight: bold; color: #F00; text-decoration: underline; }
+.plugin-description-text { color: #000 }
+
+
+/* NAVIGATION TREE  */
+.tree-body { background-color: #FFF; color: #000; } 
+a.tree-node-link:link, a.tree-node-link:visited, a.tree-node-link:active { color: #000; text-decoration: none; }
+
+
+/* GLOBAL TAB NAVIGATION STYLES */
+
+/* Primary Tabs */
+.global-tab-unselected { background-color: #99C; text-align: center; }
+a.global-tab-link:link, a.global-tab-link:visited { color: #FFF; font-weight: bold; text-decoration: none; background-color: #99C; }
+a.global-tab-link:hover { color: #FFF; font-weight: bold; text-decoration: underline; background-color: #99C; }
+a.global-tab-link:active { color: #F00; text-decoration: underline; }
+.global-tab-selected { background-color: #FFC; text-align: center; }
+.global-tab-text { color: #000; font-weight: bold; background-color: #FFC; }
+
+/* Secondary Navigation */
+.global-tab-sec-back  { background-color: #FFC;  }
+.global-tab-sec-divider { color: #F90; margin: 2px 0px; }
+a.global-tab-sec-link:link, a.global-tab-sec-link:visited { margin: 2px 0px;  color: #000; background-color: #FFC; text-decoration: none; }
+a.global-tab-sec-link:hover { margin: 2px 0px;  color: #000; background-color: #FFC; text-decoration: underline; }
+a.global-tab-sec-link:active { margin: 2px 0px;  color: #F00; text-decoration: underline; }
+.global-tab-sec-text { margin: 2px 0px;  color: #000; background-color: #FFC; font-weight: bold; }
+
+
+/* LOCAL TAB NAVIGATION STYLES */
+
+/* Primary Tabs */
+.local-tab-back  { background-color: #CCC; }
+.local-tab-unselected { background-color: #999; text-align: center;  }
+a.local-tab-link:link, a.local-tab-link:visited { color: #000; font-weight: bold; text-decoration: none; background-color: #999; }
+a.local-tab-link:hover { color: #000; font-weight: bold; text-decoration: underline; background-color: #999; }
+a.local-tab-link:active { color: #F00; text-decoration: underline; }
+.local-tab-selected { background-color: #FFF; text-align: center;  }
+.local-tab-text { color: #000; font-weight: bold; background-color: #FFF; }
+
+/* Secondary Navigation */
+.local-tab-sec-back  { background-color: #FFF;  }
+.local-tab-sec-divider { color: #000; margin: 4px 0px; }
+a.local-tab-sec-link:link, a.local-tab-sec-link:visited { margin: 4px 0px; color: #000; background-color: #FFF; text-decoration: underline; }
+a.local-tab-sec-link:hover { margin: 4px 0px; color: #000; background-color: #FFF; text-decoration: underline; }
+a.local-tab-sec-link:active { margin: 4px 0px; color: #F00; text-decoration: underline; }
+.local-tab-sec-text { margin: 4px 0px; color: #000; background-color: #FFF; font-weight: bold; }
+
+
+/* BREADCRUMBS */
+.breadcrumb-row  { background-color: #CCC; }
+.breadcrumb-text  { color: #000; font-weight: bold; margin: 3px 10px; }
+a.breadcrumb-link:link, a.breadcrumb-link:visited { color: #000; font-weight: normal; text-decoration: underline; }
+a.breadcrumb-link:active { color: #F00; text-decoration: underline; }
+
+
+/* CONTENT AREA */
+.content-layout { margin: 0px 10px; }
+
+
+/* BUTTONS */
+
+/* Regular Button - Enabled */
+.button-frame-enabled { background-color: #000; }
+.button-content-enabled { background-color: #CCC; }
+.button-link-enabled-text { color: #000; margin: 1px 0px; font-weight: bold; }
+a.button-link:link, a.button-link:visited { color: #000; background-color: #CCC; text-decoration: none; }
+a.button-link:active { color: #000; background-color: #999; text-decoration: none;}
+
+/* Regular Button - Disabled */
+.button-frame-disabled { background-color: #999; }
+.button-content-disabled { background-color: #CCC; }
+.button-link-disabled-text { color: #999; margin: 1px 0px; font-weight: bold; }
+
+/* Mini Button - Enabled */
+.mini-button-frame-enabled { background-color: #000; }
+.mini-button-content-enabled { background-color: #CCC; }
+.mini-button-link-enabled-text { color: #000; font-size: .9em; margin: 1px 0px; font-weight: bold; }
+a.mini-button-link:link, a.mini-button-link:visited { color: #000; background-color: #CCC; text-decoration: none; }
+a.mini-button-link:active { color: #000; background-color: #999; text-decoration: none;}
+
+/* Mini Button - Disabled */
+.mini-button-frame-disabled { background-color: #999; }
+.mini-button-content-disabled { background-color: #CCC; }
+.mini-button-link-disabled-text { color: #999; font-size: .9em; margin: 1px 0px; font-weight: bold; }
+
+
+/* TABLES */
+
+/* Table Title */
+.table-title-text { color: #000; font-weight: bold; margin: 0px 5px 2px 0px; }
+
+/* Table Colors */
+.table-frame { background-color: #99C; }
+.table-content { background-color: #FFF; }
+.table-header-row { background-color: #99C;  }
+.table-sort-row { background-color: #CCF; }
+.table-separator-row { background-color: #CCC; }
+
+/* Table text styles  */
+.table-header-text   { color: #FFF; font-weight: bold; margin: 0px 0px 1px 0px; }
+.table-label-text   {  color: #000; margin: 3px 0px;   }
+.table-normal-text   { color: #000;  margin: 3px 0px; }
+.table-status-ok-text   { color: #000;  margin: 3px 0px; }
+.table-status-critical-text   { color: #000;  margin: 3px 0px; }
+.table-status-major-text   { color: #000;  margin: 3px 0px; }
+.table-status-minor-text   { color: #000;  margin: 3px 0px; }
+.table-strong-text   { color: #000;  margin: 3px 0px; font-weight: bold;}
+
+/* Table hyperlinks that navigate users to other pages */
+.table-navlink-text   { color: #669; margin: 3px 0px; }
+a.table-navlink:link, a.table-navlink:visited { color: #669;  text-decoration: underline; }
+a.table-navlink:active { color: #F00; text-decoration: underline; }
+
+/* Table hyperlinks that invoke actions */
+.table-actlink-text   { color: #99C; margin: 3px 0px; font-weight: bold;}
+a.table-actlink:link, a.table-actlink:visited { font-weight: normal; color: #669;  text-decoration: underline; }
+a.table-actlink:active { font-weight: normal; color: #F00; text-decoration: underline; }
+
+/* Vertical Pagination Text */
+.table-vertpag-label-text { color: #000; font-weight: bold;}
+.table-vertpag-pages-text { color: #000; }
+.table-vertpag-title-text { color: #000; font-weight: normal; }
+
+
+/* ALERTS */
+
+/* Inline Alert Frame and Contents */ 
+.alert-error-frame { background-color: #C00; }
+.alert-error-content { background-color: #FFF; }
+.alert-warning-frame { background-color: #FC0; }
+.alert-warning-content { background-color: #FFF; }
+.alert-info-frame { background-color: #99C; }
+.alert-info-content { background-color: #FFF; }
+
+/* Alert Text */
+.alert-header-text { color: #000; font-weight: bold; margin: 0px 0px 5px 0px; }
+.alert-normal-text { color: #000; }
+.alert-mono-text { color: #000; font-family: monospace; }
+.alert-strong-text { color: #000; font-weight: bold; }
+a.alert-link:link, a.alert-link:visited { color: #669; text-decoration: underline; }
+a.alert-link:active { color: #F00; text-decoration: underline; }
+
+
+/* PROPERTY SHEETS */
+.properties-jumpto-text { color: #000; }
+.properties-level1-label-text { color: #000; margin: 20px 0px 0px 0px; font-weight: bold }
+.properties-level2-label-text { color: #000; margin: 20px 0px 5px 20px; font-weight: bold }
+.properties-level3-label-text { color: #000; margin: 0px 0px 0px 40px; }
+.properties-separator {background-color: #CCC; }
+.properties-normal-text { color: #000; }
+.properties-required { color:#00F; }
+
+
+/* WIZARDS */
+
+/* Title and Frame Body Colors */
+.wizard-title-text { color: #FFF; margin: 5px; font-size:1.1em; font-weight: bold;}
+.wizard-steps-body  { background-color: #FFF; color: #000; }
+.wizard-contents-body { background-color: #FFF; color: #000; }
+.wizard-navigation-body { background-color: #FFF; color: #000; }
+
+/* Steps & Help Area */
+.wizard-steps-title-text { color: #000; font-weight: bold; }
+.wizard-steps-divider { background-color: #000 }
+.wizard-step-text { color: #000; }
+.wizard-help-text { color: #000; margin: 3px 0px;}
+.wizard-step-current-text { color: #000; font-weight: bold; }
+a.wizard-step-link:link, a.wizard-step-link:visited { color: #669;  text-decoration: underline; }
+a.wizard-step-link:active { color: #F00; text-decoration: underline; }
+
+/* Content Area */
+.wizard-content-title-text { color: #000; font-weight: bold; margin: 3px 5px; }
+.wizard-content-title-row  { background-color: #CCC; }
+.wizard-content-instr-text { color: #000; }
+.wizard-content-label-text { color: #000; }
+
+/* Wizard Tabs */
+.wizard-tab-frame-forward { background-color: #000; }
+.wizard-tab-content-forward { background-color: #FFF; }
+.wizard-tab-link-forward-text { color: #000; font-weight: bold; text-decoration: none; }
+.wizard-tab-frame-back { background-color: #666; }
+.wizard-tab-content-back { background-color: #CCC; }
+a.wizard-tab-link:link, a.wizard-tab-link:visited { color: #000; font-weight: bold;  text-decoration: none; }
+a.wizard-tab-link:active  { color: #000; font-weight: bold; background-color: #999; text-decoration: none; }
+
+
+/* HELP */
+
+/* Inline Help */
+.help-text { color: #000; } 
+a.help-link:link, a.help-link:visited { color: #000; text-decoration: underline; }
+a.help-link:active { color: #F00; text-decoration: underline; } 
+.help-small-text { color: #000; font-size: .9em; } 
+a.help-small-link:link, a.help-link:visited { color: #000; text-decoration: underline; }
+a.help-small-link:active { color: #F00; text-decoration: underline; } 
+
+/* Online Help */
+.help-body { background-color: #FFF; color: #000; }
+.help-header-1 { color: #669; font-weight: bold; font-size: 1.1em; }
+.help-table-header-row { background-color: #CCC; }
+a.help-toc-link:link, a.help-toc-link:visited { color: #669; text-decoration: underline; }
+a.help-toc-link:active { color: #F00; text-decoration: underline; }
+a.help-return-link:link, a.help-return-link:visited { color: #669; text-decoration: underline; font-size: .9em; }
+a.help-return-link:active { color: #F00; text-decoration: underline; font-size: .9em; }
+
+img[name*="mhCommon.ProdName"] {width: auto;height: auto;}

@@ -1,0 +1,44 @@
+    <test name="CLI_create-datastore05">
+        <parameter name="testName" value="createdatastore-test5"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.cli.CreateDatastoreTest"/>
+        </classes>
+    </test>    
+    <test name="CLI_create-datastore06">
+        <parameter name="testName" value="createdatastore-test6"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.cli.CreateDatastoreTest"/>
+        </classes>
+    </test>    
+    <test name="CLI_delete-datastores03">
+        <parameter name="testName" value="deletedatastores-test3"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.cli.DeleteDatastoresTest"/>
+        </classes>
+    </test>
+    <test name="CLI_delete-datastores07">
+        <parameter name="testName" value="deletedatastores-test7"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.cli.DeleteDatastoresTest"/>
+        </classes>
+    </test>

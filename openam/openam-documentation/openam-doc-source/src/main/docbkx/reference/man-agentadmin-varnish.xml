@@ -1,0 +1,127 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  ! CCPL HEADER START
+  !
+  ! This work is licensed under the Creative Commons
+  ! Attribution-NonCommercial-NoDerivs 3.0 Unported License.
+  ! To view a copy of this license, visit
+  ! http://creativecommons.org/licenses/by-nc-nd/3.0/
+  ! or send a letter to Creative Commons, 444 Castro Street,
+  ! Suite 900, Mountain View, California, 94041, USA.
+  !
+  ! You can also obtain a copy of the license at
+  ! src/main/resources/legal-notices/CC-BY-NC-ND.txt.
+  ! See the License for the specific language governing permissions
+  ! and limitations under the License.
+  !
+  ! If applicable, add the following below this CCPL HEADER, with the fields
+  ! enclosed by brackets "[]" replaced with your own identifying information:
+  !      Portions Copyright [yyyy] [name of copyright owner]
+  !
+  ! CCPL HEADER END
+  !
+  !      Copyright 2013 ForgeRock, Inc.
+  !    
+-->
+<refentry xml:id='agentadmin-varnish'
+ xmlns='http://docbook.org/ns/docbook'
+ version='5.0' xml:lang='en'
+ xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance'
+ xsi:schemaLocation='http://docbook.org/ns/docbook http://docbook.org/xml/5.0/xsd/docbook.xsd'
+ xmlns:xlink='http://www.w3.org/1999/xlink'
+ xmlns:xinclude='http://www.w3.org/2001/XInclude'>
+ <info><copyright><year>2013</year><holder>ForgeRock, Inc.</holder></copyright></info>
+ <refmeta>
+  <refentrytitle>agentadmin</refentrytitle><manvolnum>1</manvolnum>
+  <refmiscinfo class="software">OpenAM</refmiscinfo>
+  <refmiscinfo class="version"><?eval ${serverDocTargetVersion}?></refmiscinfo>
+ </refmeta>
+ <refnamediv>
+  <refname>agentadmin</refname>
+  <refpurpose>manage OpenAM policy agent installation for the Varnish policy agent</refpurpose>
+ </refnamediv>
+ <refsynopsisdiv>
+  <cmdsynopsis>
+   <command>agentadmin</command>
+   <arg choice="req">options</arg>
+  </cmdsynopsis>
+ </refsynopsisdiv>
+ <refsect1>
+  <title>Description</title>
+  <para>This command manages OpenAM policy agent installations. Varnish is the only
+  policy agent where the <command>agentadmin</command> command does not require a 
+  Java runtime environment.</para>
+ </refsect1>
+ <refsect1>
+  <title>Options</title>
+  <para>The following options are supported.</para>
+  <variablelist>
+   <varlistentry>
+    <term><option>-l</option></term>
+    <listitem>
+     <para>Lists existing agent instances.</para>
+    </listitem>
+   </varlistentry>
+   <varlistentry>
+    <term><option>-r <replaceable>agent_instance</replaceable></option></term>
+    <listitem>
+     <para>Removes the specified instance</para>
+    </listitem>
+   </varlistentry>
+   <varlistentry>
+    <term><option>-e password</option></term>
+    <listitem>
+     <para>Encrypt the password with a base64 output file</para>
+    </listitem>
+   </varlistentry>
+   <varlistentry>
+    <term><option>-o <replaceable>OpenAM-URL</replaceable></option></term> 
+    <listitem>
+     <para>Creates an agent instance based on the information you specific</para>
+    </listitem>
+   </varlistentry>
+   <varlistentry>
+   <term><option>-a <replaceable>agenturl</replaceable></option></term>
+    <listitem>
+     <para>Display the agent URL</para>
+    </listitem>
+   </varlistentry>
+   <varlistentry>
+   <term><option>-i <replaceable>agent</replaceable></option></term>
+    <listitem>
+     <para>Displays information about the agent</para>
+    </listitem>
+   </varlistentry>
+   <varlistentry>
+   <term><option>-profile_id</option></term>
+    <listitem>
+     <para>Displays the profile id for the agent</para>
+    </listitem>
+   </varlistentry>
+   <varlistentry>
+   <term><option>-p /path/to/passwordfile</option></term>
+    <listitem>
+     <para>Shows the path to the passwordfile</para>
+    </listitem>
+   </varlistentry>
+   <varlistentry>
+    <term><option>-c /path/to/varnish/vmods</option></term>
+    <listitem>
+     <para>Displays the path to the Varnish vmods directory</para>
+    </listitem>
+   </varlistentry>
+   <varlistentry>
+    <term><option>agentadmin -v</option></term>
+    <listitem>
+     <para>View version data</para>
+    </listitem>
+   </varlistentry>
+   <varlistentry>
+    <term><option>-?</option></term>
+    <listitem>
+     <para>Displays all possible commands</para>
+    </listitem>
+   </varlistentry>
+  </variablelist>
+ </refsect1>
+</refentry>

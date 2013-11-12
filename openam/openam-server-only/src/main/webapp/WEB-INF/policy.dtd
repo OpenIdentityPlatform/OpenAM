@@ -1,0 +1,224 @@
+<!--
+   DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
+  
+    Copyright (c) 2006 Sun Microsystems Inc. All Rights Reserved
+  
+    The contents of this file are subject to the terms
+    of the Common Development and Distribution License
+    (the License). You may not use this file except in
+    compliance with the License.
+
+    You can obtain a copy of the License at
+    https://opensso.dev.java.net/public/CDDLv1.0.html or
+    opensso/legal/CDDLv1.0.txt
+    See the License for the specific language governing
+    permission and limitations under the License.
+
+    When distributing Covered Code, include this CDDL
+    Header Notice in each file and include the License file
+    at opensso/legal/CDDLv1.0.txt.
+    If applicable, add the following below the CDDL Header,
+    with the fields enclosed by brackets [] replaced by
+    your own identifying information:
+    "Portions Copyrighted [year] [name of copyright owner]"
+
+    $Id: policy.dtd,v 1.3 2009/08/19 05:40:39 veiming Exp $
+
+-->
+
+<!-- This DTD defines the data structure that will be used to
+define policies for servers and services.
+
+Unique Declaration name for DOCTYPE tag:
+	"iPlanet Policy Management 1.0 DTD"
+-->
+
+<!-- Policy is the root element that defines a named policy rule.
+The attribute "name" provides the policy name, "description" gives
+a brief description for the policy, "active" specifies the
+fact whether this policy is currently active or not. Default
+value is "true". If this value is set to "true" only then 
+this policy is considered during policy evaluation.  and 
+"serviceName" identifies the service name for which the policy 
+is applicable. 
+The attribute "referralPolicy" is used to flag the 
+policy as a referral policy. A referral policy is used for 
+delegation. All action/values defined in the referral policy are
+ignored during policy evaluation. Conversely, all referrals 
+defined in a non referral policy are ignored during policy
+evaluation.
+The policy element can have one or more rules (Rule)
+and subjects (Subject) to whom the policy is applied. If the
+subject is empty, the policy does not apply any users. 
+Referrals is collection of Referral(s). Referral is used 
+to facilitate delegating policy definition and/or policy evaluation 
+to a different point such as PeerOrg, SubOrg or a custom plugin.
+Conditions is collection of Condition(s). Condition is used 
+to specify restrictions such as time range, auth levels 
+for which the policy applies. ResponseProviders are a collection
+of ResponseProvider(s). ResponseProvider is used to specify the
+response attributes which would be returned as part of the PolicyDecision
+provided the policy applies for the given Subject, ResourceName under
+the specified Conditions(s). Conditions, Subjects ResponseProviders 
+and Referrals are containers.They can have 0 or more elements. 
+It enables modifying the policies such as removing one elment 
+and adding another element to that container in the policy.
+ -->
+
+<!ELEMENT	Policy		( Rule+, Subjects?, Conditions?, Referrals?, ResponseProviders?) >
+<!ATTLIST	Policy
+	name		CDATA		#REQUIRED
+	description	CDATA		#IMPLIED
+	version		CDATA		"3.0"
+        createdby       CDATA           #IMPLIED
+        lastmodifiedby  CDATA           #IMPLIED
+        creationdate    CDATA           #IMPLIED
+        lastmodifieddate CDATA          #IMPLIED 
+	referralPolicy	(true | false)		"false"
+	active		(true | false)		"true"
+>
+
+<!-- Rule element defines a policy rule that contains a service
+name, resource name and its action names and corresponding action
+values. The attribute "name" provides a user friendly name for
+the rule. The sub-element "ServiceName" gives the name of the
+service, "ResourceName" give the resource name, and "AttributeValuePair"
+provides the action names and corresponding action values. A rule can be
+defined without any actions. A referral policy rule doesn't have any actions.
+ -->
+<!ELEMENT	Rule		( ServiceName, ApplicationName?, ResourceName*,
+                                  ExcludedResourceName*, AttributeValuePair*  ) >
+<!ATTLIST	Rule
+	name		CDATA		#REQUIRED
+>
+
+<!-- Application provides the name of the application for which a
+     rule has been created. The attribute "name" provides the application
+      name. -->
+<!ELEMENT    ApplicationName        EMPTY>
+<!ATTLIST    ApplicationName
+	name		CDATA		#REQUIRED
+>
+
+<!-- ServiceName provides the name of the service for which a
+rule has been created. The attribute "name" provides the service
+name. -->
+<!ELEMENT	ServiceName		EMPTY>
+<!ATTLIST	ServiceName
+	name		CDATA		#REQUIRED
+>
+
+<!-- ResourceName provides the name of the resource for which
+a rule has been created. If the service does not have resource,
+this element will not be there for the rule. The attribute "name"
+provides the resoruce name. -->
+<!ELEMENT	ResourceName		EMPTY>
+<!ATTLIST	ResourceName
+	name		CDATA		#REQUIRED
+>
+
+<!-- ExcludedResourceName provides the name of the excluded resource for which
+a rule has been created. -->
+<!ELEMENT	ExcludedResourceName	EMPTY>
+<!ATTLIST	ExcludedResourceName
+	name		CDATA		#REQUIRED
+>
+
+<!-- AttributeValuePair provides the means to specify values for
+an atrribute name. The values can be empty. -->
+<!ELEMENT	AttributeValuePair	( Attribute, Value* ) >
+
+<!-- Attribute element provides the attribute name. -->
+<!ELEMENT	Attribute		EMPTY >
+<!ATTLIST	Attribute
+	name	NMTOKEN			#REQUIRED
+>
+
+<!-- Value element provides a value for an attribute. -->
+<!ELEMENT	Value		( #PCDATA ) >
+
+<!-- Subjects element identifies a collection of users, identified
+based on their roles, group membership or by listing individual
+users. The attribute "name" gives a user friendly name for this
+collection of users. The attribute "includeType" is ignored at 
+present.  The policies can be defined without a Subject. 
+For example, referral policy doesn't have a Subject -->
+<!ELEMENT	Subjects	( Subject*, RealmSubject* ) >
+<!ATTLIST	Subjects
+	name		CDATA		#IMPLIED
+	description	CDATA		#IMPLIED
+	includeType	(inclusive | exclusive)  "inclusive"
+>
+
+<!-- Subject element identifies a user collection plugin
+written by the customer, in which the attribute "type" giving
+the plugin name. The attribute "name" gives a user friendly
+name for this instance of the plugin.
+The attribue "includeType" indicates whether the subject is
+a normal (non exclusive) subject or exclusive subject.
+If subject is exclusive, policy applies to users who are not
+members of the  subject.  Otherwise, policy applies to users
+who are members of the subject.   -->
+<!ELEMENT	Subject		( AttributeValuePair? ) >
+<!ATTLIST	Subject
+	name		CDATA		#IMPLIED
+	type		CDATA		#REQUIRED
+        includeType     (inclusive | exclusive)  "inclusive"
+>
+
+<!-- RealmSubject element is a reference to a Subject object 
+defined at the realm level.
+The attribue "name" is the name of the Subject object defined
+at the realm.
+The attribue "includeType" indicates whether the subject is
+a normal (non exclusive) subject or exclusive subject.
+If subject is exclusive, policy applies to users who are not
+members of the  subject.  Otherwise, policy applies to users
+who are members of the subject.   -->
+<!ELEMENT	RealmSubject		( EMPTY ) >
+<!ATTLIST	RealmSubject
+	name		CDATA		#REQUIRED
+	includeType	(inclusive | exclusive)  "inclusive"
+>
+
+<!-- Referrals element identifies a collection of referrals. A policy can
+be defined without a referral. This facilitates modification of a referral 
+policy such as removing one referral and adding another referral. -->
+<!ELEMENT	Referrals	( Referral* ) >
+<!ATTLIST	Referrals
+	name		CDATA		#IMPLIED
+	description	CDATA		#IMPLIED
+>
+
+<!-- Referral element identifies a referral. Referral is used 
+to facilitate delegating policy definition and/or policy evaluation 
+to a different point such as PeerOrg, SubOrg or a custom plugin -->
+<!ELEMENT	Referral		( AttributeValuePair ) >
+<!ATTLIST	Referral
+	name		CDATA		#IMPLIED
+	type		CDATA		#REQUIRED
+>
+
+<!-- Conditions element identifies a collection of conditions. The policy can
+be defined without a Condition. For example, referral policy doesn't have 
+condition. -->
+<!ELEMENT	Conditions	( Condition* ) >
+<!ATTLIST	Conditions
+	name		CDATA		#IMPLIED
+	description	CDATA		#IMPLIED
+>
+
+<!-- ResponseProviders element identifies a collection of responseprovider(s). The policy can
+be defined without a ResponseProvider. -->
+<!ELEMENT	ResponseProviders	( ResponseProvider* ) >
+<!ATTLIST	ResponseProviders
+	name		CDATA		#IMPLIED
+	description	CDATA		#IMPLIED
+>
+
+<!-- ResponseProvider element identifies a ResponseProvider. ResponseProvider providers response attributes to be returned in the policy decision if the policy applies given the Subject, Resource and Conditions. -->
+<!ELEMENT	ResponseProvider		( AttributeValuePair* ) >
+<!ATTLIST	ResponseProvider
+	name		CDATA		#IMPLIED
+	type		CDATA		#REQUIRED
+>

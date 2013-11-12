@@ -1,0 +1,484 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+
+<!--
+   DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
+  
+    Copyright (c) 2006 Sun Microsystems Inc. All Rights Reserved
+  
+    The contents of this file are subject to the terms
+    of the Common Development and Distribution License
+    (the License). You may not use this file except in
+    compliance with the License.
+
+    You can obtain a copy of the License at
+    https://opensso.dev.java.net/public/CDDLv1.0.html or
+    opensso/legal/CDDLv1.0.txt
+    See the License for the specific language governing
+    permission and limitations under the License.
+
+    When distributing Covered Code, include this CDDL
+    Header Notice in each file and include the License file
+    at opensso/legal/CDDLv1.0.txt.
+    If applicable, add the following below the CDDL Header,
+    with the fields enclosed by brackets [] replaced by
+    your own identifying information:
+    "Portions Copyrighted [year] [name of copyright owner]"
+
+    $Id: amAdminConsole.xml,v 1.5 2009/09/28 19:02:12 babysunil Exp $
+
+-->
+
+
+<!DOCTYPE ServicesConfiguration
+    PUBLIC "=//iPlanet//Service Management Services (SMS) 1.0 DTD//EN"
+    "jar://com/sun/identity/sm/sms.dtd">
+
+<ServicesConfiguration>
+    <Service name="iPlanetAMAdminConsoleService" version="1.0">
+        <Schema
+            serviceHierarchy="/DSAMEConfig/iPlanetAMAdminConsoleService"
+            i18nFileName="amAdminConsole"
+            revisionNumber="40"
+            i18nKey="iplanet-am-admin-console-service-description">
+
+	    <Global>
+                <AttributeSchema name="iplanet-am-admin-console-liberty-enabled"
+                    type="single"
+                    syntax="boolean"
+                    i18nKey="g100">
+                    <BooleanValues>
+                         <BooleanTrueValue i18nKey="i18nTrue">true</BooleanTrueValue>
+                         <BooleanFalseValue i18nKey="i18nFalse">false</BooleanFalseValue>
+                    </BooleanValues>
+                    <DefaultValues>
+                        <Value>true</Value>
+                    </DefaultValues>
+                </AttributeSchema>
+                <AttributeSchema name="iplanet-am-admin-console-um-enabled"
+                    type="single"
+                    syntax="boolean"
+                    i18nKey="g101">
+                    <BooleanValues>
+                         <BooleanTrueValue i18nKey="i18nTrue">true</BooleanTrueValue>
+                         <BooleanFalseValue i18nKey="i18nFalse">false</BooleanFalseValue>
+                    </BooleanValues>
+                    <DefaultValues>
+                        <Value>UM_ENABLED</Value>
+                    </DefaultValues>
+                </AttributeSchema>
+                <AttributeSchema name="iplanet-am-admin-console-pc-display"
+                    type="single"
+                    syntax="boolean"
+                    i18nKey="g102">
+                    <BooleanValues>
+                         <BooleanTrueValue i18nKey="i18nTrue">true</BooleanTrueValue>
+                         <BooleanFalseValue i18nKey="i18nFalse">false</BooleanFalseValue>
+                    </BooleanValues>
+		    <DefaultValues>
+			<Value>false</Value>
+		    </DefaultValues>
+                </AttributeSchema>
+                <AttributeSchema name="iplanet-am-admin-console-ou-display"
+                    type="single"
+                    syntax="boolean"
+                    i18nKey="g103">
+                    <BooleanValues>
+                         <BooleanTrueValue i18nKey="i18nTrue">true</BooleanTrueValue>
+                         <BooleanFalseValue i18nKey="i18nFalse">false</BooleanFalseValue>
+                    </BooleanValues>
+		    <DefaultValues>
+			<Value>false</Value>
+		    </DefaultValues>
+                </AttributeSchema>
+                <AttributeSchema name="iplanet-am-admin-console-gc-display"
+                    type="single"
+                    syntax="boolean"
+                    i18nKey="g104">
+                    <BooleanValues>
+                         <BooleanTrueValue i18nKey="i18nTrue">true</BooleanTrueValue>
+                         <BooleanFalseValue i18nKey="i18nFalse">false</BooleanFalseValue>
+                    </BooleanValues>
+		    <DefaultValues>
+			<Value>false</Value>
+		    </DefaultValues>
+                </AttributeSchema>
+                <AttributeSchema name="iplanet-am-admin-console-group-type"
+                    type="single_choice"
+                    syntax="string"
+                    i18nKey="g105">
+                    <ChoiceValues>
+                        <ChoiceValue i18nKey="u101">Static</ChoiceValue>
+                        <ChoiceValue i18nKey="u102">Dynamic</ChoiceValue>
+                    </ChoiceValues>
+		    <DefaultValues>
+			<Value>Dynamic</Value>	
+		    </DefaultValues>
+                </AttributeSchema>
+                <AttributeSchema name="iplanet-am-admin-console-dctree"
+                    type="single"
+                    syntax="boolean"
+                    i18nKey="g108">
+                    <BooleanValues>
+                         <BooleanTrueValue i18nKey="i18nTrue">true</BooleanTrueValue>
+                         <BooleanFalseValue i18nKey="i18nFalse">false</BooleanFalseValue>
+                    </BooleanValues>
+		    <DefaultValues>
+			<Value>false</Value>
+		    </DefaultValues>
+                </AttributeSchema>
+		<AttributeSchema name="iplanet-am-admin-console-dctree-attr-list"
+		    type="list"
+		    i18nKey="g115">
+		    <DefaultValues>
+			<Value>objectclass=maildomain</Value>
+			<Value>maildomainstatus</Value>
+			<Value>preferredmailhost</Value>
+			<Value>mailroutinghosts</Value>
+			<Value>mailroutingsmarthost</Value>
+			<Value>preferredmailmessagestore</Value>
+			<Value>mailaccessproxypreauth</Value>
+			<Value>mailaccessproxyreplay</Value>
+			<Value>maildomainallowedserviceaccess</Value>
+			<Value>maildomainwelcomemessage</Value>
+			<Value>maildomaindiskquota</Value>
+			<Value>maildomainmsgquota</Value>
+			<Value>mailclientattachmentquota</Value>
+			<Value>mailquota</Value>
+			<Value>preferredlanguage</Value>
+			<Value>domainuidseparator</Value>
+		    </DefaultValues>
+		</AttributeSchema>
+		<AttributeSchema name="iplanet-am-admin-console-special-search-filters"
+		    type="list"
+		    i18nKey="g116">
+		    <DefaultValues>
+			<Value>Organization=(&amp;(sunPreferredDomain=%V)(inetDomainStatus=deleted))</Value>
+			<Value>User=(inetUserStatus=deleted)</Value>
+			<Value>Group=(inetGroupStatus=deleted)</Value>
+			<Value>Resource=(icsStatus=deleted)</Value>
+			<Value>Misc=(&amp;(objectclass=sunManagedOrganization)(inetDomainStatus=deleted))</Value>
+		    </DefaultValues>
+		</AttributeSchema>
+                <AttributeSchema name="iplanet-am-admin-console-compliance-admin-groups"
+                    type="single"
+                    syntax="boolean"
+                    i18nKey="g109">
+                    <BooleanValues>
+                         <BooleanTrueValue i18nKey="i18nTrue">true</BooleanTrueValue>
+                         <BooleanFalseValue i18nKey="i18nFalse">false</BooleanFalseValue>
+                    </BooleanValues>
+		    <DefaultValues>
+			<Value>false</Value>
+		    </DefaultValues>
+                </AttributeSchema>
+                <AttributeSchema name="iplanet-am-admin-console-compliance-user-deletion"
+                    type="single"
+                    syntax="boolean"
+                    i18nKey="g110">
+                    <BooleanValues>
+                         <BooleanTrueValue i18nKey="i18nTrue">true</BooleanTrueValue>
+                         <BooleanFalseValue i18nKey="i18nFalse">false</BooleanFalseValue>
+                    </BooleanValues>
+		    <DefaultValues>
+			<Value>false</Value>
+		    </DefaultValues>
+                </AttributeSchema>
+                <AttributeSchema name="iplanet-am-admin-console-role-display-options"
+                    type="list"
+                    syntax="string" >
+                    <DefaultValues>
+			<Value>No Permission|No Permission Description|</Value>
+                        <Value>Organization Admin|Organization Admin Description|</Value>
+                        <Value>Organization Help Desk Admin|Organization Help Desk Admin Description|actionroleproperties=viewproperties actionorganizationalunitproperties=viewproperties actionserviceproperties=viewproperties actionorganizationproperties=viewproperties actionpeoplecontainerproperties=viewproperties actiongroupproperties=viewproperties actiongroupcontainerproperties=viewproperties actionuserproperties=fullaccessobject actionpolicyproperties=viewproperties actionentityproperties=viewproperties userprofilemenu=iplanetamuserservice,resourceoffering</Value>
+                        <Value>Organization Policy Admin|Organization Policy Admin Description|actionroleproperties=viewproperties actionorganizationalunitproperties=viewproperties actionserviceproperties=fullaccessobject actionorganizationproperties=viewproperties actionpeoplecontainerproperties=viewproperties actiongroupproperties=viewproperties actiongroupcontainerproperties=viewproperties actionuserproperties=modifyproperties actionpolicyproperties=fullaccessobject actionentityproperties=viewproperties</Value>
+                        <Value>Container Help Desk Admin|Container Help Desk Admin Description|actionroleproperties=viewproperties actionorganizationalunitproperties=viewproperties actionserviceproperties=viewproperties actionorganizationproperties=viewproperties actionpeoplecontainerproperties=viewproperties actiongroupproperties=viewproperties actiongroupcontainerproperties=viewproperties actionuserproperties=fullaccessobject actionpolicyproperties=viewproperties actionentityproperties=viewproperties userprofilemenu=iplanetamuserservice,resourceoffering</Value>
+                        <Value>Group Admin|Group Admin Description|actionroleproperties=noaccessobject actionorganizationalunitproperties=noaccessobject actionserviceproperties=noaccessobject actionorganizationproperties=noaccessobject actionpeoplecontainerproperties=noaccessobject actiongroupproperties=fullaccessobject actiongroupcontainerproperties=noaccessobject actionuserproperties=fullaccessobject actionpolicyproperties=noaccessobject actionentityproperties=noaccessobject</Value>
+                        <Value>People Container Admin|People Container Admin Description|organizationnavmenu=organizations,organizationalunits,peoplecontainers,users rootnavmenu=organizations,organizationalunits,peoplecontainers,users organizationalunitnavmenu=organizations,organizationalunits,peoplecontainers,users actionorganizationproperties=noaccessobject actionorganizationalunitproperties=noaccessobject actionuserproperties=fullaccessobject actionroleproperties=viewproperties actionpeoplecontainerproperties=fullaccessobject actionserviceproperties=viewproperties actiongroupproperties=viewproperties actionpolicyproperties=noaccessobject actiongroupcontainerproperties=viewproperties actionentityproperties=noaccessobject userprofilemenu=iplanetamuserservice,resourceoffering</Value>
+                        <Value>Container Admin|Container Admin Description|</Value>
+                    </DefaultValues>
+                </AttributeSchema>
+                <AttributeSchema name="iplanet-am-admin-console-role-default-acis"
+                    type="list"
+                    syntax="string"
+                    i18nKey="g107">
+                    <DefaultValues>
+			<Value>No Permission|No Permission Description|</Value>
+                        <Value>Organization Admin|Organization Admin Description|ORGANIZATION:aci: (target="ldap:///ORGANIZATION")(targetfilter=(!(|(nsroledn=cn=Top-level Help Desk Admin Role,@NORMALIZED_RS@))))(targetattr != "nsroledn")(version 3.0; acl "S1IS Organization Admin Role access allow all"; allow (all) roledn = "ldap:///ROLENAME";)##ORGANIZATION:aci: (target="ldap:///ROLENAME")(targetattr="*")(version 3.0; acl "S1IS Organization Admin Role access deny"; deny (write,add,delete,compare,proxy) roledn = "ldap:///ROLENAME";)##ORGANIZATION:aci: (target="ldap:///ORGANIZATION")(targetfilter=(!(|(nsroledn=cn=Top-level Help Desk Admin Role,@NORMALIZED_RS@))))(targetattr = "nsroledn")(targattrfilters="add=nsroledn:(nsroledn=*,ORGANIZATION),del=nsroledn:(nsroledn=*,ORGANIZATION)")(version 3.0; acl "S1IS Organization Admin Role access allow"; allow (all) roledn = "ldap:///ROLENAME";)</Value>
+                        <Value>Organization Help Desk Admin|Organization Help Desk Admin Description|ORGANIZATION:aci: (target="ldap:///ORGANIZATION")(targetfilter=(!(|(nsroledn=cn=Top-level Help Desk Admin Role,@NORMALIZED_RS@)(nsroledn=cn=Organization Admin Role,ORGANIZATION))))(targetattr = "*") (version 3.0; acl "Organization Help Desk Admin access allow"; allow (read,search) roledn = "ldap:///ROLENAME";)##ORGANIZATION:aci: (target="ldap:///ORGANIZATION")(targetfilter=(!(|(nsroledn=cn=Organization Admin Role,ORGANIZATION))))(targetattr = "userPassword") (version 3.0; acl "Organization Help Desk Admin access allow"; allow (write) roledn = "ldap:///ROLENAME";)</Value>
+                        <Value>Organization Policy Admin|Organization Policy Admin Description|ORGANIZATION:aci: (target="ldap:///ORGANIZATION")(targetfilter=(!(|(nsroledn=cn=Top-level Help Desk Admin Role,@NORMALIZED_RS@)(nsroledn=cn=Organization Admin Role,ORGANIZATION))))(targetattr = "*")(version 3.0; acl "Organization Policy Admin access allow"; allow (read,search) roledn = "ldap:///ROLENAME";)##ORGANIZATION:aci: (target="ldap:///ORGANIZATION")(targetfilter="(objectclass=@ORG_OBJECT_CLASS@)")(targetattr = "sunRegisteredServiceName") (version 3.0; acl "Organization Policy Admin Role access allow"; allow (read,write,search) roledn = "ldap:///ROLENAME";)##ORGANIZATION:aci: (target="ldap:///ou=iPlanetAMAuthService,ou=services,*ORGANIZATION")(targetattr = "*") (version 3.0; acl "Organization Policy Admin Role access Auth Service deny"; deny (add,write,delete) roledn = "ldap:///ROLENAME";)##ORGANIZATION:aci: (target="ldap:///ou=services,*ORGANIZATION")(targetattr = "*") (version 3.0; acl "Organization Policy Admin Role access allow"; allow (all) roledn = "ldap:///ROLENAME";)</Value>
+                    </DefaultValues>
+                </AttributeSchema>
+                <AttributeSchema name="iplanet-am-admin-console-dynamic-aci-list"
+                    type="list"
+                    syntax="string"
+                    i18nKey="g111">
+		    <DefaultValues>
+                        <Value>Top-level Admin|Top-level Admin Description|@NORMALIZED_RS@:aci: (target="ldap:///@NORMALIZED_RS@")(targetattr="*")(version 3.0; acl "Proxy user rights"; allow (all) roledn = "ldap:///ROLENAME";)</Value>
+                        <Value>Organization Admin|Organization Admin Description|@NORMALIZED_RS@:aci: (target="ldap:///($dn),@NORMALIZED_RS@")(targetfilter=(!(|(nsroledn=cn=Top-level Help Desk Admin Role,@NORMALIZED_RS@))))(targetattr != "nsroledn")(version 3.0; acl "S1IS Organization Admin Role access allow all"; allow (all) roledn = "ldap:///cn=Organization Admin Role,[$dn],@NORMALIZED_RS@";)##@NORMALIZED_RS@:aci: (target="ldap:///cn=Organization Admin Role,($dn),@NORMALIZED_RS@")(targetattr="*")(version 3.0; acl "S1IS Organization Admin Role access deny"; deny (write,add,delete,compare,proxy) roledn = "ldap:///cn=Organization Admin Role,($dn),@NORMALIZED_RS@";)##ORGANIZATION:aci: (target="ldap:///ORGANIZATION")(targetfilter=(!(|(nsroledn=cn=Top-level Help Desk Admin Role,@NORMALIZED_RS@))))(targetattr = "nsroledn")(targattrfilters="add=nsroledn:(nsroledn=*,ORGANIZATION),del=nsroledn:(nsroledn=*,ORGANIZATION)")(version 3.0; acl "S1IS Organization Admin Role access allow"; allow (all) roledn = "ldap:///ROLENAME";)</Value>
+                        <Value>Organization Help Desk Admin|Organization Help Desk Admin Description|ORGANIZATION:aci: (target="ldap:///ORGANIZATION")(targetfilter=(!(|(nsroledn=cn=Top-level Help Desk Admin Role,@NORMALIZED_RS@)(nsroledn=cn=Organization Admin Role,ORGANIZATION))))(targetattr = "*") (version 3.0; acl "S1IS Organization Help Desk Admin Role access allow"; allow (read,search) roledn = "ldap:///ROLENAME";)##ORGANIZATION:aci: (target="ldap:///ORGANIZATION")(targetfilter=(!(|(nsroledn=cn=Organization Admin Role,ORGANIZATION))))(targetattr = "userPassword") (version 3.0; acl "S1IS Organization Help Desk Admin Role access allow"; allow (write) roledn = "ldap:///ROLENAME";)</Value>
+                        <Value>Container Admin|Container Admin Description|@NORMALIZED_RS@:aci: (target="ldap:///($dn),@NORMALIZED_RS@")(targetfilter=(!(|(nsroledn=cn=Top-level Help Desk Admin Role,@NORMALIZED_RS@))))(targetattr != "nsroledn")(version 3.0; acl "Container Admin Role access allow"; allow (all) roledn = "ldap:///cn=Container Admin Role,[$dn],@NORMALIZED_RS@";)##@NORMALIZED_RS@:aci: (target="ldap:///cn=Container Admin Role,($dn),@NORMALIZED_RS@")(targetattr="*")(version 3.0; acl "Container Admin Role access deny"; deny (write,add,delete,compare,proxy) roledn = "ldap:///cn=Container Admin Role,($dn),@NORMALIZED_RS@";)##ORGANIZATION:aci: (target="ldap:///ORGANIZATION")(targetfilter=(!(|(nsroledn=cn=Top-level Help Desk Admin Role,@NORMALIZED_RS@))))(targetattr = "nsroledn")(targattrfilters="add=nsroledn:(nsroledn=*,ORGANIZATION),del=nsroledn:(nsroledn=*,ORGANIZATION)")(version 3.0; acl "S1IS Organization Admin Role access allow"; allow (all) roledn = "ldap:///ROLENAME";)</Value>
+                        <Value>Container Help Desk Admin|Container Help Desk Admin Description|ORGANIZATION:aci: (target="ldap:///ORGANIZATION")(targetfilter=(!(|(nsroledn=cn=Top-level Help Desk Admin Role,@NORMALIZED_RS@)(nsroledn=cn=Container Admin Role,ORGANIZATION))))(targetattr = "*") (version 3.0; acl "Container Help Desk Admin Role access allow"; allow (read,search) roledn = "ldap:///ROLENAME";)##ORGANIZATION:aci: (target="ldap:///ORGANIZATION")(targetfilter=(!(|(nsroledn=cn=Container Admin Role,ORGANIZATION))))(targetattr = "userPassword") (version 3.0; acl "Container Help Desk Admin Role access allow"; allow (write) roledn = "ldap:///ROLENAME";)</Value>
+                        <Value>Group Admin|Group Admin Description|ORGANIZATION:aci: (target="ldap:///GROUPNAME")(targetattr = "*") (version 3.0; acl "Group and people container admin role"; allow (all) roledn = "ldap:///ROLENAME";)##ORGANIZATION:aci: (target="ldap:///ORGANIZATION")(targetfilter=(&amp;FILTER(!(|(nsroledn=cn=Top-level Help Desk Admin Role,@NORMALIZED_RS@)(nsroledn=cn=Top-level Policy Admin Role,@NORMALIZED_RS@)(nsroledn=cn=Organization Admin Role,ORGANIZATION)(nsroledn=cn=Container Admin Role,ORGANIZATION)(nsroledn=cn=Organization Policy Admin Role,ORGANIZATION)))))(targetattr != "iplanet-am-web-agent-access-allow-list || iplanet-am-web-agent-access-not-enforced-list || iplanet-am-domain-url-access-allow || iplanet-am-web-agent-access-deny-list || nsroledn")(version 3.0; acl "Group admin's right to the members"; allow (read,write,search) roledn = "ldap:///ROLENAME";)</Value>
+                        <Value>People Container Admin|People Container Admin Description|ORGANIZATION:aci: (target="ldap:///PCNAME")(targetfilter=(!(|(nsroledn=cn=Top-level Help Desk Admin Role,@NORMALIZED_RS@)(nsroledn=cn=Organization Admin Role,ORGANIZATION)(nsroledn=cn=Container Admin Role,ORGANIZATION))))(targetattr != "iplanet-am-web-agent-access-allow-list || iplanet-am-web-agent-access-not-enforced-list || iplanet-am-domain-url-access-allow || iplanet-am-web-agent-access-deny-list || nsroledn") (version 3.0; acl "People container admin role"; allow (all) roledn = "ldap:///ROLENAME";)</Value>
+                        <Value>Organization Policy Admin|Organization Policy Admin Description|ORGANIZATION:aci: (target="ldap:///ORGANIZATION")(targetfilter=(!(|(nsroledn=cn=Top-level Help Desk Admin Role,@NORMALIZED_RS@)(nsroledn=cn=Organization Admin Role,ORGANIZATION))))(targetattr = "*")(version 3.0; acl "Organization Policy Admin access allow"; allow (read,search) roledn = "ldap:///ROLENAME";)##ORGANIZATION:aci: (target="ldap:///ORGANIZATION")(targetfilter="(objectclass=@ORG_OBJECT_CLASS@)")(targetattr = "sunRegisteredServiceName") (version 3.0; acl "Organization Policy Admin Role access allow"; allow (read,write,search) roledn = "ldap:///ROLENAME";)##ORGANIZATION:aci: (target="ldap:///ou=iPlanetAMAuthService,ou=services,*ORGANIZATION")(targetattr = "*") (version 3.0; acl "Organization Policy Admin Role access Auth Service deny"; deny (add,write,delete) roledn = "ldap:///ROLENAME";)##ORGANIZATION:aci: (target="ldap:///ou=services,*ORGANIZATION")(targetattr = "*") (version 3.0; acl "Organization Policy Admin Role access allow"; allow (all) roledn = "ldap:///ROLENAME";)</Value>
+		    </DefaultValues>
+                </AttributeSchema>
+                <AttributeSchema name="iplanet-am-console-service-view-bean"
+                    type="list"
+                    syntax="string"
+                    i18nKey="g112">
+                </AttributeSchema>
+		<AttributeSchema name="iplanet-am-admin-console-default-pc"
+                    type="single"
+                    syntax="string"
+                    i18nKey="g117">
+                    <DefaultValues>
+                        <Value>People</Value>
+                    </DefaultValues>
+                </AttributeSchema>
+                <AttributeSchema name="iplanet-am-admin-console-default-gc"
+                    type="single"
+                    syntax="string"
+                    i18nKey="g118">
+                    <DefaultValues>
+                        <Value>Groups</Value>
+                    </DefaultValues>
+                </AttributeSchema>
+                <AttributeSchema name="iplanet-am-admin-console-default-ac"
+                    type="single"
+                    syntax="string"
+                    i18nKey="g119">
+                    <DefaultValues>
+                        <Value>Agents</Value>
+                    </DefaultValues>
+                </AttributeSchema>
+	    </Global>
+
+	    <Organization>
+                <AttributeSchema name="iplanet-am-admin-console-password-reset-enabled"
+                    type="single"
+                    syntax="boolean"
+                    i18nKey="d99">
+                    <BooleanValues>
+                         <BooleanTrueValue i18nKey="i18nTrue">true</BooleanTrueValue>
+                         <BooleanFalseValue i18nKey="i18nFalse">false</BooleanFalseValue>
+                    </BooleanValues>
+                    <DefaultValues>
+                        <Value>false</Value>
+                    </DefaultValues>
+                </AttributeSchema>
+                <AttributeSchema name="iplanet-am-admin-console-group-default-pc"
+                    type="single"
+                    syntax="dn"
+                    i18nKey="d100">
+                </AttributeSchema>
+                <AttributeSchema name="iplanet-am-admin-console-group-pclist"
+                    type="list"
+                    syntax="string"
+                    i18nKey="d101">
+                </AttributeSchema>
+                <AttributeSchema name="iplanet-am-admin-console-user-profile-class"
+                    type="single"
+                    syntax="string"
+                    i18nKey="d102">
+                    <DefaultValues>
+                        <Value>com.iplanet.am.console.user.UMUserProfileViewBean</Value>
+		    </DefaultValues>
+                </AttributeSchema>
+                <AttributeSchema name="iplanet-am-admin-console-user-role-display"
+                    type="single"
+                    syntax="boolean"
+                    i18nKey="d103">
+                    <BooleanValues>
+                         <BooleanTrueValue i18nKey="i18nTrue">true</BooleanTrueValue>
+                         <BooleanFalseValue i18nKey="i18nFalse">false</BooleanFalseValue>
+                    </BooleanValues>
+		    <DefaultValues>
+			<Value>false</Value>
+		    </DefaultValues>
+                </AttributeSchema>
+                <AttributeSchema name="iplanet-am-admin-console-user-groups-display"
+                    type="single"
+                    syntax="boolean"
+                    i18nKey="d105">
+                    <BooleanValues>
+                         <BooleanTrueValue i18nKey="i18nTrue">true</BooleanTrueValue>
+                         <BooleanFalseValue i18nKey="i18nFalse">false</BooleanFalseValue>
+                    </BooleanValues>
+		    <DefaultValues>
+			<Value>false</Value>
+		    </DefaultValues>
+                </AttributeSchema>
+                <AttributeSchema name="iplanet-am-admin-console-user-groups-subscribe"
+                    type="single"
+                    syntax="boolean"
+                    i18nKey="d106">
+                    <BooleanValues>
+                         <BooleanTrueValue i18nKey="i18nTrue">true</BooleanTrueValue>
+                         <BooleanFalseValue i18nKey="i18nFalse">false</BooleanFalseValue>
+                    </BooleanValues>
+		    <DefaultValues>
+			<Value>false</Value>
+		    </DefaultValues>
+                </AttributeSchema>
+                <AttributeSchema name="iplanet-am-admin-console-user-service-display"
+                    type="single_choice"
+                    syntax="string"
+                    i18nKey="d107">
+                    <ChoiceValues>
+                        <ChoiceValue i18nKey="u103">UserOnly</ChoiceValue>
+                        <ChoiceValue i18nKey="u104">Combined</ChoiceValue>
+                    </ChoiceValues>
+		    <DefaultValues>
+                        <Value>UserOnly</Value>
+		    </DefaultValues>
+                </AttributeSchema> 
+                <AttributeSchema name="iplanet-am-admin-console-default-roles"
+                    type="list"
+                    syntax="dn"
+                    i18nKey="d108">
+                </AttributeSchema>
+                <!-- AttributeSchema name="iplanet-am-admin-console-view-menu" 
+                    type="list"
+                    syntax="string"
+                    i18nKey="d109">
+                    <DefaultValues>
+                        <Value>module101_identity|@SERVER_URI@/user/UMHome</Value>
+                        <Value>module102_service|@SERVER_URI@/service/SMHome</Value>
+                        <Value>module103_session|@SERVER_URI@/session/SMHome</Value>
+		    </DefaultValues>
+                </AttributeSchema -->
+                <AttributeSchema name="iplanet-am-admin-console-search-limit"
+                    type="single"
+                    syntax="number_range"
+                    rangeStart="0" rangeEnd="2147483647"
+                    i18nKey="d110">
+		    <DefaultValues>
+			<Value>100</Value>
+		    </DefaultValues>
+                </AttributeSchema>
+                <AttributeSchema name="iplanet-am-admin-console-search-timeout"
+                    type="single"
+                    syntax="number_range"
+                    rangeStart="0" rangeEnd="2147483647"
+                    i18nKey="d111">
+		    <DefaultValues>
+			<Value>5</Value>
+		    </DefaultValues>
+                </AttributeSchema>
+                <AttributeSchema name="iplanet-am-admin-console-custom-jsp-dir"
+                    type="single"
+                    syntax="string"
+                    i18nKey="d112">
+		    <DefaultValues>
+			<Value>console</Value>
+		    </DefaultValues>
+                </AttributeSchema>
+                <AttributeSchema name="iplanet-am-admin-console-online-help"
+                    type="list"
+                    syntax="string"
+                    i18nKey="d113">
+		    <DefaultValues>
+                        <Value>DSAME Help|/contents.html|amAdminModuleMsgs</Value>
+		    </DefaultValues>
+                </AttributeSchema>
+                <AttributeSchema name="iplanet-am-required-services"
+                    type="list"
+                    syntax="string"
+                    i18nKey="d114">
+                </AttributeSchema>
+                <AttributeSchema name="iplanet-am-admin-console-user-search-key"
+                    type="single"
+                    syntax="string"
+                    i18nKey="d115">
+                    <DefaultValues>
+                        <Value>cn</Value>
+		    </DefaultValues>
+                </AttributeSchema>
+                <AttributeSchema name="iplanet-am-admin-console-user-return-attribute"
+                    type="single"
+                    syntax="string"
+                    i18nKey="d116">
+                    <DefaultValues>
+                        <Value>uid cn</Value>
+                    </DefaultValues>
+                </AttributeSchema>
+                <AttributeSchema name="iplanet-am-user-create-notification-list"
+                    type="list"
+                    syntax="string"
+                    i18nKey="d117">
+                </AttributeSchema>
+                <AttributeSchema name="iplanet-am-user-delete-notification-list"
+                    type="list"
+                    syntax="string"
+                    i18nKey="d118">
+                </AttributeSchema>
+                <AttributeSchema name="iplanet-am-user-modify-notification-list"
+                    type="list"
+                    syntax="string"
+                    i18nKey="d119">
+                </AttributeSchema>
+                <AttributeSchema name="iplanet-am-admin-console-paging-size"
+                    type="single"
+                    syntax="number_range"
+		    rangeStart="1" rangeEnd="2147483647"
+                    i18nKey="d121">
+                    <DefaultValues>
+                        <Value>25</Value>
+                    </DefaultValues>
+                </AttributeSchema>
+                <AttributeSchema name="iplanet-am-admin-console-display-options"
+                    type="list"
+                    syntax="string"
+                    i18nKey="">
+                </AttributeSchema>
+                <AttributeSchema name="iplanet-am-admin-console-enduser-profile-class"
+                    type="single"
+                    syntax="string"
+                    i18nKey="d1021">
+                    <DefaultValues>
+                        <Value>com.iplanet.am.console.user.UMUserProfileViewBean</Value>
+                    </DefaultValues>
+                </AttributeSchema>
+                <AttributeSchema name="iplanet-am-console-service-listeners"
+                    type="list"
+                    syntax="string"
+                    i18nKey="d123">
+                </AttributeSchema>
+                <AttributeSchema name="iplanet-am-admin-console-pre-post-processing-modules"
+                    type="list"
+                    syntax="string"
+                    i18nKey="d124"> 
+                </AttributeSchema> 
+                <AttributeSchema name="iplanet-am-admin-console-external-attribute-fetch-enabled"
+                    type="single"
+                    syntax="boolean"
+                    i18nKey="d125">
+                    <BooleanValues>
+                         <BooleanTrueValue i18nKey="i18nTrue">true</BooleanTrueValue>
+                         <BooleanFalseValue i18nKey="i18nFalse">false</BooleanFalseValue>
+                    </BooleanValues>
+                    <DefaultValues>
+                         <Value>false</Value>
+                    </DefaultValues>
+                </AttributeSchema>
+                <AttributeSchema name="iplanet-am-admin-console-invalid-chars"
+                    type="single"
+                    syntax="string"
+                    i18nKey="d1251">
+                    <DefaultValues>
+                        <Value>*|(|)|&amp;|!</Value>
+                    </DefaultValues>
+                </AttributeSchema>
+                <AttributeSchema name="iplanet-am-admin-console-user-password-validation-class"
+                    type="single"
+                    syntax="string"
+                    i18nKey="d126">
+                    <DefaultValues>
+                        <Value>com.sun.identity.common.AMUserPasswordValidationPlugin</Value>
+		    </DefaultValues>
+                </AttributeSchema>				
+	    </Organization>
+        </Schema>
+    </Service>
+</ServicesConfiguration>

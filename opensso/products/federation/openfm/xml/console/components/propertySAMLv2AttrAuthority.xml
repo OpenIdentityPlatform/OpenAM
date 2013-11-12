@@ -1,0 +1,228 @@
+<!--
+   DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
+  
+   Copyright (c) 2008 Sun Microsystems Inc. All Rights Reserved
+  
+   The contents of this file are subject to the terms
+   of the Common Development and Distribution License
+   (the License). You may not use this file except in
+   compliance with the License.
+
+   You can obtain a copy of the License at
+   https://opensso.dev.java.net/public/CDDLv1.0.html or
+   opensso/legal/CDDLv1.0.txt
+   See the License for the specific language governing
+   permission and limitations under the License.
+
+   When distributing Covered Code, include this CDDL
+   Header Notice in each file and include the License file
+   at opensso/legal/CDDLv1.0.txt.
+   If applicable, add the following below the CDDL Header,
+   with the fields enclosed by brackets [] replaced by
+   your own identifying information:
+   "Portions Copyrighted [year] [name of copyright owner]"
+
+   $Id: propertySAMLv2AttrAuthority.xml,v 1.5 2008/06/25 05:51:05 qcheng Exp $
+
+-->
+
+<!DOCTYPE propertysheet SYSTEM "propertysheet.dtd">
+
+<propertysheet>
+    <section name="signAttributeAuthority" defaultValue="samlv2idp.attribute.label.signandencrypt" >
+        <property>
+            <ccgroup> 
+                <property>
+                    <label name="lblEncryptionKeySize" 
+                           defaultValue="samlv2.attributeauth.attribute.label.keysize" 
+                           labelFor="keySize" />
+                    <cc name="keySize" 
+                        tagclass="com.sun.web.ui.taglib.html.CCStaticTextFieldTag" />
+                </property>                
+                <property>
+                    <label name="lblEncryptionAlgorithm" 
+                           defaultValue="samlv2.attributeauth.attribute.label.algorithm" 
+                           labelFor="Algorithm" />
+                    <cc name="Algorithm" 
+                        tagclass="com.sun.web.ui.taglib.html.CCStaticTextFieldTag" />
+                </property>      
+            </ccgroup>
+        </property>
+    </section>
+    <section name="attributeServices" defaultValue="samlv2idp.attribute.label.attributeservice" > 
+        <property>
+            <label name="lblAttributeServiceloc" defaultValue="samlv2idp.attribute.label.defattrserviceloc" /> 
+            <ccgroup>
+                <property>
+                    <label name="lbldeafultAttributeService" defaultValue="samlv2idp.attribute.label.deafultattrservicelocation" 
+                           labelFor="attrSerdefaultLocation" />
+                    <cc name="attrSerdefaultLocation" tagclass="com.sun.web.ui.taglib.html.CCTextFieldTag" >
+                        <attribute name="size" value="115" />
+                        <attribute name="autoSubmit" value="false" />
+                        <attribute name="localizeDisplayFieldValue" value="false" />
+                    </cc>
+                </property>
+                <property>
+                    <label name="lbldefaultattributeAuthorityMapper" 
+                           defaultValue="samlv2idp.attribute.label.idpdefattriAuthMapper"
+                           labelFor="default_attributeAuthorityMapper" />
+                    <cc name="default_attributeAuthorityMapper" 
+                        tagclass="com.sun.web.ui.taglib.html.CCTextFieldTag" >
+                        <attribute name="size" value="75" />
+                        <attribute name="autoSubmit" value="false" />
+                        <attribute name="localizeDisplayFieldValue" value="false" />
+                    </cc>
+                </property>           
+            </ccgroup>            
+        </property>
+        
+        <property>
+            <label name="lblAttributeServiceloc" defaultValue="samlv2idp.attribute.label.attrserviceloc" /> 
+            <ccgroup>
+                <property>
+                    <label name="lblsupportsx509"
+                           defaultValue="samlv2sp.attribute.label.supportsx"
+                           labelFor="supportsx" />
+                    <cc name="supportsx" 
+                        tagclass="com.sun.web.ui.taglib.html.CCCheckBoxTag" />
+                </property>
+                <property>
+                    <label name="lblattrserviceloc"
+                           defaultValue="samlv2idp.attribute.label.attrservicelocation"
+                           labelFor="attrSerLocation" />
+                    <cc name="attrSerLocation" tagclass="com.sun.web.ui.taglib.html.CCTextFieldTag" >
+                        <attribute name="size" value="115" />
+                        <attribute name="autoSubmit" value="false" />
+                        <attribute name="localizeDisplayFieldValue" value="false" />
+                    </cc>
+                </property>
+                <property>
+                    <label name="lblx509attributeAuthorityMapper" 
+                           defaultValue="samlv2idp.attribute.label.idpx509attrAuthMapper"
+                           labelFor="x509Subject_attributeAuthorityMapper" />
+                    <cc name="x509Subject_attributeAuthorityMapper" 
+                        tagclass="com.sun.web.ui.taglib.html.CCTextFieldTag" >
+                        <attribute name="size" value="75" />
+                        <attribute name="autoSubmit" value="false" />
+                        <attribute name="localizeDisplayFieldValue" value="false" />
+                    </cc>
+                </property>    
+            </ccgroup>
+        </property>
+    </section>
+    <section name="assertionIDRequestService" defaultValue="samlv2idp.attribute.label.assertionIDRequestService" > 
+        <property>
+            <label name="lblSoapAssertionIDRequest" defaultValue="samlv2idp.attribute.label.soapAssertionIDRequest" /> 
+            <ccgroup>
+                <property>
+                    <label name="lblsoapAssertIDService" defaultValue="samlv2idp.attribute.label.soaplocation" 
+                           labelFor="soapAssertionidrequest" />
+                    <cc name="soapAssertionidrequest" tagclass="com.sun.web.ui.taglib.html.CCTextFieldTag" >
+                        <attribute name="size" value="115" />
+                        <attribute name="autoSubmit" value="false" />
+                        <attribute name="localizeDisplayFieldValue" value="false" />
+                    </cc>
+                </property>
+            </ccgroup>            
+        </property>
+        
+        <property>
+            <label name="lbluriAssertionIDRequest" defaultValue="samlv2idp.attribute.label.uriAssertionIDRequest" /> 
+            <ccgroup>
+                <property>
+                    <label name="lbluriassertionIDRequest"
+                           defaultValue="samlv2idp.attribute.label.urilocation"
+                           labelFor="uriAssertionIDRequest" />
+                    <cc name="uriAssertionIDRequest" tagclass="com.sun.web.ui.taglib.html.CCTextFieldTag" >
+                        <attribute name="size" value="115" />
+                        <attribute name="autoSubmit" value="false" />
+                        <attribute name="localizeDisplayFieldValue" value="false" />
+                    </cc>
+                </property>
+            </ccgroup>
+        </property>
+        
+        <property>
+            <label name="lbluriAssertionIDRequest" defaultValue="samlv2idp.attribute.label.assertionIDrequestMapper" /> 
+            <ccgroup> 
+                <property>
+                    <cc name="assertionIDRequestMapper" 
+                        tagclass="com.sun.web.ui.taglib.html.CCTextFieldTag" >
+                        <attribute name="size" value="95" />
+                        <attribute name="autoSubmit" value="false" />
+                        <attribute name="localizeDisplayFieldValue" value="false" />
+                    </cc>
+                    <fieldhelp name="helpuriAssertionIDRequest" defaultValue="samlv2.attributeauth.help.uriAssertionIDRequest" />
+                </property>               
+            </ccgroup>
+        </property>
+        
+    </section>   
+    
+    <section name="lblAttributeProfile" defaultValue="samlv2idp.attribute.label.idpattributeProfile" >      
+        <property>                  
+            <cc name="AttributeProfile" 
+                tagclass="com.sun.web.ui.taglib.html.CCTextFieldTag" >
+                <attribute name="size" value="75" />
+                <attribute name="autoSubmit" value="false" />
+                <attribute name="localizeDisplayFieldValue" value="false" />
+            </cc>
+            <fieldhelp name="helpAttributeProfile" defaultValue="samlv2.attributeauth.help.AttributeProfile" />
+        </property>           
+    </section>
+    <section name="signnencrypt" defaultValue="samlv2idp.provider.section.title.certalias" >
+        <property>
+                <label name="lblSigncertAlias"
+                       defaultValue="samlv2idp.attribute.label.signcertAlias"
+                       labelFor="signingCertAlias" />
+                
+                <cc name="signingCertAlias" 
+                    tagclass="com.sun.web.ui.taglib.html.CCTextFieldTag" >
+                    <attribute name="size" value="75" />
+                    <attribute name="autoSubmit" value="false" />
+                    <attribute name="localizeDisplayFieldValue" value="false" />
+                </cc>
+            </property>                
+            <property>
+                <label name="lblEncryptioncertAlias"
+                       defaultValue="samlv2idp.attribute.label.encryptionCertAlias"
+                       labelFor="encryptionCertAlias" />
+                <cc name="encryptionCertAlias" 
+                    tagclass="com.sun.web.ui.taglib.html.CCTextFieldTag" >
+                    <attribute name="size" value="75" />
+                    <attribute name="autoSubmit" value="false" />
+                    <attribute name="localizeDisplayFieldValue" value="false" />
+                </cc>
+            </property>
+            <property>
+                <label name="lblEncrptionKeySize" 
+                       defaultValue="samlv2.attributeauth.attribute.label.keysize" 
+                       labelFor="keySize" />
+                <cc name="keySize" 
+                    tagclass="com.sun.web.ui.taglib.html.CCStaticTextFieldTag" />
+            </property>                
+            <property>
+                <label name="lblEncrptionAlgorithm" 
+                       defaultValue="samlv2.attributeauth.attribute.label.algorithm" 
+                       labelFor="Algorithm" />
+                <cc name="Algorithm" 
+                    tagclass="com.sun.web.ui.taglib.html.CCStaticTextFieldTag" />
+            </property>       
+    </section>
+    
+    <section name="secSubjectDataStoreAttrName" defaultValue="samlv2idp.attribute.label.idpx509SubjectDataStoreAttrName" >
+        <property> 
+            <ccgroup> 
+                <property>
+                    <cc name="x509SubjectDataStoreAttrName" 
+                        tagclass="com.sun.web.ui.taglib.html.CCTextFieldTag" >
+                        <attribute name="size" value="75" />
+                        <attribute name="autoSubmit" value="false" />
+                        <attribute name="localizeDisplayFieldValue" value="false" />
+                    </cc>
+                    <fieldhelp name="helpx509SubjectDataStoreAttrName" defaultValue="samlv2.attributeauth.help.SubjectDataStoreAttrName" />
+                </property>               
+            </ccgroup>
+        </property>
+    </section>   
+</propertysheet>

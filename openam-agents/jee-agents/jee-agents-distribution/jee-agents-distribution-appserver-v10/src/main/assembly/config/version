@@ -1,0 +1,6 @@
+--------------------------------------------------------------------------
+OpenAM Policy Agent for:
+Sun Java(TM) System Application Server 8.1/8.2/9.0/9.1/10.0
+--------------------------------------------------------------------------
+Version: ${project.version}
+Build Date: ${build.timestamp}

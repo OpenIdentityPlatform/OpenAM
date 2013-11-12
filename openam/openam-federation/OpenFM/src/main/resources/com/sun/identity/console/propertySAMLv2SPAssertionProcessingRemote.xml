@@ -1,0 +1,63 @@
+<!--
+   DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
+  
+   Copyright (c) 2008 Sun Microsystems Inc. All Rights Reserved
+  
+   The contents of this file are subject to the terms
+   of the Common Development and Distribution License
+   (the License). You may not use this file except in
+   compliance with the License.
+
+   You can obtain a copy of the License at
+   https://opensso.dev.java.net/public/CDDLv1.0.html or
+   opensso/legal/CDDLv1.0.txt
+   See the License for the specific language governing
+   permission and limitations under the License.
+
+   When distributing Covered Code, include this CDDL
+   Header Notice in each file and include the License file
+   at opensso/legal/CDDLv1.0.txt.
+   If applicable, add the following below the CDDL Header,
+   with the fields enclosed by brackets [] replaced by
+   your own identifying information:
+   "Portions Copyrighted [year] [name of copyright owner]"
+
+   $Id: propertySAMLv2SPAssertionProcessingRemote.xml,v 1.5 2008/07/24 17:53:51 babysunil Exp $
+
+-->
+
+<!DOCTYPE propertysheet SYSTEM "propertysheet.dtd">
+
+<propertysheet>
+    <section name="AttributeMapper" defaultValue="samlv2sp.attribute.label.spAttributeMapper" >
+        <property>
+            <label name="lblSPAttributeMap"
+                   defaultValue="samlv2sp.attribute.label.spattributeMap"
+                   labelFor="attributeMap" />
+            <ccgroup>
+                <property>
+                    <cc name="attributeMap" 
+                        tagclass=
+                        "com.sun.web.ui.taglib.editablelist.CCEditableListTag" >
+                        <attribute name="name" value="list" />
+                        <attribute name="listboxLabel" 
+                                   value="label.current.value" />
+                        <attribute name="textboxLabel"
+                                   value="label.new.value" />
+                    </cc>
+                    <fieldhelp name="helpSPAttributeMap" defaultValue="samlv2sp.attribute.help.SPAttributeMap" />
+                </property>
+            </ccgroup>
+        </property>            
+    </section>
+    <section name="ArtMsgEncoding" defaultValue="samlv2sp.attribute.label.spArtMsgEncoding" >
+         <property>
+                    <label name="lblArtMsgEncoding" defaultValue="samlv2sp.attribute.label.artifactmessageEncoding"
+                           labelFor="responseArtifactMessageEncoding" />
+                    <cc name="responseArtifactMessageEncoding" tagclass="com.sun.web.ui.taglib.html.CCDropDownMenuTag">
+                        <option label="samlv2idp.attribute.label.uri" value="URI" />
+                        <option label="samlv2idp.attribute.label.form" value="FORM" />
+                    </cc>
+        </property>
+    </section>
+</propertysheet>

@@ -1,0 +1,208 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  ~ DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
+  ~
+  ~ Copyright (c) 2011-2013 ForgeRock AS. All Rights Reserved
+  ~
+  ~ The contents of this file are subject to the terms
+  ~ of the Common Development and Distribution License
+  ~ (the License). You may not use this file except in
+  ~ compliance with the License.
+  ~
+  ~ You can obtain a copy of the License at
+  ~ http://forgerock.org/license/CDDLv1.0.html
+  ~ See the License for the specific language governing
+  ~ permission and limitations under the License.
+  ~
+  ~ When distributing Covered Code, include this CDDL
+  ~ Header Notice in each file and include the License file
+  ~ at http://forgerock.org/license/CDDLv1.0.html
+  ~ If applicable, add the following below the CDDL Header,
+  ~ with the fields enclosed by brackets [] replaced by
+  ~ your own identifying information:
+  ~ "Portions Copyrighted [year] [name of copyright owner]"
+  -->
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <parent>
+        <groupId>org.forgerock.openam</groupId>
+        <artifactId>openam</artifactId>
+        <version>11.0.0-RC3</version>
+    </parent>
+
+    <artifactId>openam-ui-ria</artifactId>
+    <name>OpenAM RIA Web UI</name>
+    <packaging>pom</packaging>
+
+    <properties>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    </properties>
+
+    <dependencies>
+        <dependency>
+            <groupId>org.forgerock.commons.ui</groupId>
+            <artifactId>forgerock-ui-user</artifactId>
+            <type>zip</type>
+            <classifier>www</classifier>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.servicemix.bundles</groupId>
+            <artifactId>org.apache.servicemix.bundles.rhino</artifactId>
+            <version>1.7R2_3</version>
+        </dependency>
+    </dependencies>
+
+    <build>
+        <resources>
+            <resource>
+                <directory>${basedir}/src/main/js</directory>
+            </resource>
+            <resource>
+                <directory>${basedir}/src/main/resources</directory>
+            </resource>
+        </resources>
+        <testResources>
+            <testResource>
+                <directory>${basedir}/src/test/js</directory>
+            </testResource>
+            <testResource>
+                <directory>${basedir}/src/test/resources</directory>
+            </testResource>
+        </testResources>
+
+        <plugins>
+            <plugin>
+               <groupId>org.codehaus.mojo</groupId>
+               <artifactId>jslint-maven-plugin</artifactId>
+               <configuration>
+                   <disallowInsecureCharsInRegExp>false</disallowInsecureCharsInRegExp>
+                   <assumeConsoleAlertEtc>true</assumeConsoleAlertEtc>
+                   <excludes>
+                       <exclude>**/libs/*.js</exclude>
+                       <exclude>**/*Test.js</exclude>
+                   </excludes>
+               </configuration>
+               <executions>
+                   <execution>
+                       <phase>package</phase>
+                       <goals>
+                           <goal>jslint</goal>
+                       </goals>
+                   </execution>
+               </executions>
+           </plugin>
+
+            <plugin>
+                <artifactId>maven-resources-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>resources</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-dependency-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>unpack</id>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>unpack</goal>
+                        </goals>
+                        <configuration>
+                            <artifactItems>
+                                <artifactItem>
+                                    <groupId>org.forgerock.commons.ui</groupId>
+                                    <artifactId>forgerock-ui-user</artifactId>
+                                    <version>${forgerock-ui.version}</version>
+                                    <type>zip</type>
+                                    <classifier>www</classifier>
+                                </artifactItem>
+                            </artifactItems>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+            <!--<plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-antrun-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>js optimization</id>
+                        <phase>package</phase>
+
+                        <configuration>
+                            <target name="optimize">
+                                <property name="requirejs.dir" value="${basedir}/src/main/optimization" />
+                                <property name="classes.dir" value="${basedir}/target/classes" />
+                                <property name="dependency.dir" value="${basedir}/target/dependency" />
+                                <property name="xui.dir" value="${basedir}/target/xui" />
+
+                                <delete dir="${classes.dir}/qunit" />
+                                <delete dir="${dependency.dir}/qunit" />
+                                 
+                                 <copy todir="${xui.dir}">
+                                  <fileset dir="${dependency.dir}" includes="**/*" />
+                                 </copy>
+                                
+                                 <copy todir="${xui.dir}" overwrite="true">
+                                  <fileset dir="${classes.dir}" includes="**/*" />
+                                 </copy>
+                                
+                                <java classname="org.mozilla.javascript.tools.shell.Main"
+                                    failonerror="true">
+                                    <classpath refid="maven.compile.classpath" />
+                                    <jvmarg value="-Xss1024k" />
+                                    <arg value="${requirejs.dir}/r.js" />
+                                    <arg value="-o" />
+                                    <arg value="${requirejs.dir}/app.build.js" />
+                                </java>
+                                
+                                <concat destfile="${xui.dir}_minified/main_with_licenses.js">
+                                    <fileset file="${requirejs.dir}/license" />
+                                    <fileset file="${xui.dir}_minified/main.js" />
+                                </concat>
+                                
+                                <move   file="${xui.dir}_minified/main_with_licenses.js" 
+                                        tofile="${xui.dir}_minified/main.js" />
+
+                                <delete dir="${xui.dir}" />
+
+                                <move   file="${xui.dir}_minified" 
+                                        tofile="${xui.dir}" />
+
+                            </target>
+                        </configuration>
+                        <goals>
+                            <goal>run</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>-->
+
+            <plugin>
+                <artifactId>maven-assembly-plugin</artifactId>
+                <configuration>
+                    <descriptors>
+                        <descriptor>src/main/assembly/zip.xml</descriptor>
+                    </descriptors>
+                </configuration>
+                <executions>
+                    <execution>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>single</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
+    </build>
+</project>
+

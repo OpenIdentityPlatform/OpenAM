@@ -1,0 +1,74 @@
+<SOAP-ENV:Envelope xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope/">
+    <SOAP-ENV:Header/>
+    <SOAP-ENV:Body>
+        <xsp:XACMLAuthzDecisionQuery xmlns:xsp="urn:oasis:names:tc:xacml:3.0:profile:saml2.0:v2:schema:protocol:wd-13"
+                                     ID="I" Version="2.0"
+                                     IssueInstant="2010-11-22T12:00:00Z">
+            <Request ReturnPolicyIdList="true" CombinedDecision="false" xmlns="urn:oasis:names:tc:xacml:3.0:core:schema:wd-17">
+                <Attributes Category="urn:oasis:names:tc:xacml:1.0:subject-category:access-subject">
+                    <Attribute AttributeId="urn:oasis:names:tc:xacml:3.0:ipc:subject:organization" IncludeInResult="true">
+                        <AttributeValue DataType="http://www.w3.org/2001/XMLSchema#string">Curtiss</AttributeValue>
+                    </Attribute>
+                    <Attribute AttributeId="urn:oasis:names:tc:xacml:3.0:ipc:subject:subject-to-organization-relationship" IncludeInResult="true">
+                        <AttributeValue DataType="http://www.w3.org/2001/XMLSchema#anyURI">urn:oasis:names:tc:xacml:3.0:ipc:subject:subject-to-organization-relationship:employee</AttributeValue>
+                    </Attribute>
+                    <Attribute AttributeId="urn:oasis:names:tc:xacml:3.0:ec-us:subject:nationality" IncludeInResult="true">
+                        <AttributeValue DataType="http://www.w3.org/2001/XMLSchema#string">US</AttributeValue>
+                    </Attribute>
+                    <Attribute AttributeId="urn:oasis:names:tc:xacml:3.0:ec-us:subject:current-nationality" IncludeInResult="true">
+                        <AttributeValue DataType="http://www.w3.org/2001/XMLSchema#string">US</AttributeValue>
+                    </Attribute>
+                    <Attribute AttributeId="urn:oasis:names:tc:xacml:3.0:ec-us:subject:location" IncludeInResult="true">
+                        <AttributeValue DataType="http://www.w3.org/2001/XMLSchema#string">US</AttributeValue>
+                    </Attribute>
+                    <Attribute AttributeId="urn:oasis:names:tc:xacml:3.0:ec-us:subject:organization" IncludeInResult="true">
+                        <AttributeValue DataType="http://www.w3.org/2001/XMLSchema#string">Curtiss</AttributeValue>
+                    </Attribute>
+                    <Attribute AttributeId="urn:oasis:names:tc:xacml:3.0:ec-us:subject:us-person" IncludeInResult="true">
+                        <AttributeValue DataType="http://www.w3.org/2001/XMLSchema#boolean">true</AttributeValue>
+                    </Attribute>
+                </Attributes>
+                <Attributes Category="urn:oasis:names:tc:xacml:3.0:attribute-category:resource">
+                    <Attribute AttributeId="urn:oasis:names:tc:xacml:3.0:ipc:resource:proprietary" IncludeInResult="true">
+                        <AttributeValue DataType="http://www.w3.org/2001/XMLSchema#boolean">true</AttributeValue>
+                    </Attribute>
+                    <Attribute AttributeId="urn:oasis:names:tc:xacml:3.0:ipc:resource:ip-owner" IncludeInResult="true">
+                        <AttributeValue DataType="http://www.w3.org/2001/XMLSchema#string">Curtiss</AttributeValue>
+                    </Attribute>
+                    <Attribute AttributeId="urn:oasis:names:tc:xacml:3.0:ipc:resource:work-effort" IncludeInResult="true">
+                        <AttributeValue DataType="http://www.w3.org/2001/XMLSchema#string">Excelsior engines</AttributeValue>
+                    </Attribute>
+                    <Attribute AttributeId="urn:oasis:names:tc:xacml:3.0:ipc:resource:authorized-end-use" IncludeInResult="true">
+                        <AttributeValue DataType="http://www.w3.org/2001/XMLSchema#anyURI">urn:oasis:names:tc:xacml:3.0:ipc:resource:authorized-end-use:manufacture</AttributeValue>
+                    </Attribute>
+                    <Attribute AttributeId="urn:oasis:names:tc:xacml:3.0:ec-us:resource:jurisdiction" IncludeInResult="true">
+                        <AttributeValue DataType="http://www.w3.org/2001/XMLSchema#string">EAR</AttributeValue>
+                    </Attribute>
+                    <Attribute AttributeId="urn:oasis:names:tc:xacml:3.0:ec-us:resource:eccn" IncludeInResult="true">
+                        <AttributeValue DataType="http://www.w3.org/2001/XMLSchema#string">9A001</AttributeValue>
+                    </Attribute>
+                    <Attribute AttributeId="urn:oasis:names:tc:xacml:3.0:ec-us:resource:authority-to-export" IncludeInResult="true">
+                        <AttributeValue DataType="http://www.w3.org/2001/XMLSchema#string">EAR-1</AttributeValue>
+                    </Attribute>
+                    <Attribute AttributeId="urn:oasis:names:tc:xacml:3.0:ec-us:resource:effective-date" IncludeInResult="true">
+                        <AttributeValue DataType="http://www.w3.org/2001/XMLSchema#date">2013-01-01</AttributeValue>
+                    </Attribute>
+                    <Attribute AttributeId="urn:oasis:names:tc:xacml:3.0:ec-us:resource:expiration-date" IncludeInResult="true">
+                        <AttributeValue DataType="http://www.w3.org/2001/XMLSchema#date">2014-12-31</AttributeValue>
+                    </Attribute>
+                    <Attribute AttributeId="urn:oasis:names:tc:xacml:3.0:ec-us:resource:work-effort" IncludeInResult="true">
+                        <AttributeValue DataType="http://www.w3.org/2001/XMLSchema#string">Excelsior engines</AttributeValue>
+                    </Attribute>
+                </Attributes>
+                <Attributes Category="urn:oasis:names:tc:xacml:3.0:attribute-category:environment">
+                    <Attribute AttributeId="urn:oasis:names:tc:xacml:1.0:environment:current-dateTime" IncludeInResult="true">
+                        <AttributeValue DataType="http://www.w3.org/2001/XMLSchema#dateTime">2013-01-25T00:00:00</AttributeValue>
+                    </Attribute>
+                    <Attribute AttributeId="urn:oasis:names:tc:xacml:1.0:environment:current-date" IncludeInResult="true">
+                        <AttributeValue DataType="http://www.w3.org/2001/XMLSchema#date">2013-01-25</AttributeValue>
+                    </Attribute>
+                </Attributes>
+            </Request>
+        </xsp:XACMLAuthzDecisionQuery>
+    </SOAP-ENV:Body>
+</SOAP-ENV:Envelope>

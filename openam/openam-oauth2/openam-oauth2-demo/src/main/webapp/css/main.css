@@ -1,0 +1,591 @@
+/*
+ * DO NOT REMOVE COPYRIGHT NOTICES OR THIS HEADER.
+ *
+ * Copyright (c) 2012 ForgeRock Inc. All rights reserved.
+ *
+ * The contents of this file are subject to the terms
+ * of the Common Development and Distribution License
+ * (the License). You may not use this file except in
+ * compliance with the License.
+ *
+ * You can obtain a copy of the License at
+ * http://forgerock.org/license/CDDLv1.0.html
+ * See the License for the specific language governing
+ * permission and limitations under the License.
+ *
+ * When distributing Covered Code, include this CDDL
+ * Header Notice in each file and include the License file
+ * at http://forgerock.org/license/CDDLv1.0.html
+ * If applicable, add the following below the CDDL Header,
+ * with the fields enclosed by brackets [] replaced by
+ * your own identifying information:
+ * "Portions Copyrighted [2012] [ForgeRock Inc]"
+ */
+body, form, fieldset, p, ul, li, h1, h2 {
+    border: 0;
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    font-family: Arial, Helvetica, sans-serif;
+    font-size: 14px;
+    background-color: #f2f2f2;
+}
+
+h1 {
+    color: #626d75;
+    font-size: 20px;
+}
+
+h2 {
+    color: #626d75;
+    font-size: 17px;
+}
+
+img a {
+    border: 0;
+}
+
+a, a:link, a:visited {
+    color: #000;
+    text-decoration: none;
+}
+
+a:hover {
+    text-decoration: underline;
+}
+
+a.bold {
+    font-weight: 700;
+}
+
+a.orange {
+    color: #f36e09;
+}
+
+a.gray {
+    color: #626d75;
+}
+
+a.ice {
+    color: #0e99b8;
+}
+
+a.nodecorate {
+    text-decoration: none;
+}
+
+a.hrefInput {
+    float: left;
+    padding: 9px 0 0 12px;
+}
+
+input, select {
+    float: left;
+    border: 1px solid #dbdbdb;
+    height: 30px;
+    background: #fff;
+    border-radius: 5px;
+    -webkit-border-radius: 5px;
+    -moz-border-radius: 5px;
+    font-size: 17px;
+    color: #5a646d;
+    width: 192px;
+    padding: 0 10px 0 10px;
+}
+
+input:hover, select:hover {
+    border: 1px solid #f36e09;
+}
+
+input:focus {
+    /*background-color: #f36e09;
+     border: 0;*/
+}
+
+select {
+    width: 243px;
+}
+
+input[type=checkbox] {
+    height: 20px;
+}
+
+input.readOnly {
+    padding: 2px 10px 0 11px;
+    border: none;
+}
+
+select[disabled] {
+    color: #93A4B6;
+    border: #fff;
+    -webkit-appearance: none;
+}
+
+.nonvisible {
+    color: #fff;
+}
+
+input.button {
+    height: 31px;
+    border: 0;
+    font-size: 11px;
+    font-weight: 700;
+    width: auto;
+    color: #FFF;
+    padding: 0 10px 1px;
+}
+
+input.orange {
+    background-color: #f36e09;
+    margin-right: 1px;
+}
+
+input.gray {
+    background-color: #5a646d;
+    margin-right: 1px;
+}
+
+input.ashy {
+    background-color: #C2C2C2;
+    margin-right: 1px;
+}
+
+input.textFieldGray {
+    color: #b6b8bc;
+}
+
+form.form {
+    padding: 20px;
+}
+
+form label {
+    display: block;
+    width: 200px;
+    float: left;
+    text-align: right;
+    color: #626d75;
+    font-weight: 700;
+    font-size: 17px;
+    padding: 7px 10px 0 0;
+}
+
+form label.light {
+    font-weight: normal;
+}
+
+form span.ok {
+    color: #75a929;
+    font-weight: 700;
+    padding: 7px 0 0 10px;
+}
+
+form span.error {
+    color: #f3851e;
+    font-weight: 700;
+    padding: 7px 0 0 13px;
+}
+
+form div.validationMessage {
+    color: #f3851e;
+    padding-top: 8px;
+    margin: 0 0 10px 463px;
+}
+
+form div.fields {
+    clear: both;
+}
+
+form div.field {
+    height: 50px;
+    clear: both;
+}
+
+form div.groupField {
+
+}
+
+form div.groupFieldInputs {
+
+}
+
+form div.groupFieldErrors {
+    padding: 6px;
+    border: 1px solid #a6a8ad;
+    width: 230px;
+}
+
+form div.groupFieldErrorsRule {
+    clear: both;
+}
+
+form div.groupFieldErrors span {
+    float: left;
+    padding: 0 7px 0 5px;
+}
+
+form div.groupFieldErrors label {
+    float: left;
+    font-size: 13px;
+    text-align: left;
+    width: 205px;
+    margin: 0;
+    padding: 0;
+}
+
+#container {
+    width: 1024px;
+    margin: 0 auto;
+}
+
+#bg {
+    background-color: #f9f9f9;
+}
+
+#header {
+    margin: 5px 0 10px 10px;
+}
+
+#footer {
+    margin: 10px 0 10px 0;
+    background: url(../images/footer_bg.png) repeat-x #f2f2f2;
+}
+
+#footer-content {
+    padding: 45px 0 45px 0;
+    width: 1024px;
+    margin: 0 auto;
+    text-align: center;
+    font-size: 11px;
+    color: #696e72;
+}
+
+#loginBox {
+    position: absolute;
+    margin-left: 430px;
+    width: 593px;
+    margin-top: 24px;
+}
+
+#loginForm {
+    float: left;
+    width: 498px;
+    padding: 5px 3px 0;
+}
+
+#loginForm input {
+    margin-right: 5px;
+    font-weight: 700;
+}
+
+.login_toggle {
+    background-color: #fff;
+    border-radius: 5px;
+    -webkit-border-radius: 5px;
+    -moz-box-shadow: 0 0 5px #888;
+    -webkit-box-shadow: 0 0 5px;
+    box-shadow: 0 0 5px #888;
+}
+
+#loginRemember {
+    clear: both;
+    display: none;
+    height: 25px;
+    padding: 15px 5px 2px;
+}
+
+#loginForm input.checkbox {
+    width: auto;
+    height: auto;
+}
+
+#loginContent {
+    float: right;
+    display: none;
+    margin: 40px 25px 0 0;
+}
+
+#loginRegister {
+    margin-left: 8px;
+    padding-top: 5px;
+    float: left;
+}
+
+#menu {
+    height: 40px;
+    background: url(../images/menu_bg.png) repeat-x;
+    font-size: 16px;
+    border-radius: 5px;
+    -webkit-border-radius: 5px;
+    -moz-border-radius: 5px;
+}
+
+#menu ul, #menu ul li {
+    display: block;
+    list-style: none;
+    margin: 0;
+    padding: 0;
+}
+
+#menu ul li {
+    background: url(../images/menu-next.png) no-repeat right;
+    height: 40px;
+}
+
+#menu ul a:link, #menu ul a:visited {
+    display: block;
+    width: 110px;
+    text-align: center;
+    color: #f9f9f9;
+    padding-top: 10px;
+}
+
+#menu ul li.active {
+    background: url(../images/menu-bg-orange.png) repeat-x;
+    border-radius: 5px;
+    -webkit-border-radius: 5px;
+    -moz-border-radius: 5px;
+}
+
+#menu ul li.active-first {
+    background: url(../images/menu-bg-orange.png) repeat-x;
+    -webkit-border-top-left-radius: 5px;
+    -webkit-border-bottom-left-radius: 5px;
+    -moz-border-radius-topleft: 5px;
+    -moz-border-radius-bottomleft: 5px;
+    border-top-left-radius: 5px;
+    border-bottom-left-radius: 5px;
+}
+
+#navi {
+    height: 45px;
+    border-bottom: 1px solid #e6e6e6;
+    margin-bottom: 30px;
+    font-size: 11px;
+}
+
+#nav-content {
+    color: #5a646d;
+    font-size: 14px;
+    float: left;
+    margin: 15px 0 0 15px;
+}
+
+img.navi-next {
+    margin: 0 12px 0 12px;
+}
+
+#content {
+    margin: 15px 15px 25px 0;
+    display: none;
+}
+
+#registration {
+    width: 760px;
+    color: #5a646d;
+    margin: auto;
+}
+
+#registration form {
+    padding: 15px;
+}
+
+#registration form input {
+    display: block;
+    width: 200px;
+    font-size: 15px;
+}
+
+#registration form input.check {
+    margin-left: 210px;
+    width: auto;
+    border: 0;
+}
+
+#registration form input.button {
+    margin-left: 210px;
+    font-size: 11px;
+    width: auto;
+}
+
+#registration form label.check {
+    width: auto;
+    padding: 3px 0 0 5px;
+}
+
+#registration form select {
+    width: 222px;
+}
+
+#profile {
+    width: 890px;
+}
+
+#profile img {
+    display: block;
+    margin: 10px 0 10px 0;
+}
+
+#profile h2 {
+    width: 200px;
+    text-align: right;
+    margin-bottom: 15px;
+}
+
+#profile input[type=text] {
+    width: 220px;
+}
+
+#actions {
+    display: none;
+}
+
+#profileData {
+    width: 670px;
+    margin-top: 50px;
+}
+
+#messages {
+    text-align: center;
+    font-size: 12px;
+    float: right;
+    margin: 7px 350px 35px 0;
+}
+
+#messages div {
+    border: 1px solid #a6a8ad;
+    color: #5a646d;
+    width: 300px;
+    margin: 5px auto;
+    padding: 5px;
+}
+
+.confirmMessage {
+    background-color: #f6e37a;
+    display: none;
+}
+
+.errorMessage {
+    background-color: #F9A9B4;
+    display: none;
+}
+
+.clear {
+    clear: both;
+}
+
+.hide {
+    display: none;
+}
+
+.floatRight {
+    float: right;
+}
+
+.alignRight {
+    text-align: right;
+}
+
+.alignLeft {
+    text-align: left;
+}
+
+.center {
+    margin: auto;
+}
+
+.border {
+    border: 1px solid red;
+}
+
+.marginLeft {
+    margin-left: 5px;
+}
+
+.marginRight {
+    margin-right: 5px;
+}
+
+.shadowFrame {
+    margin-top: 10px;
+    background-color: #fff;
+    border-radius: 5px;
+    -webkit-border-radius: 5px;
+    -moz-border-radius: 5px;
+    -moz-box-shadow: 5px 5px 15px #5a646d;
+    -webkit-box-shadow: 5px 5px 15px #5a646d;
+    box-shadow: 5px 5px 15px #5a646d;
+    padding: 5px;
+}
+
+.radious {
+    border-radius: 5px;
+    -webkit-border-radius: 5px;
+    -moz-border-radius: 5px;
+}
+
+form span, #logo, #menu ul li, .floatLeft {
+    float: left;
+}
+
+#dialog {
+    display: none;
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 1;
+    background-image: url('../images/overlay.png');
+}
+
+#dialogFrame {
+    position: absolute;
+    width: 100%;
+    z-index: 2;
+    top: 200px;
+}
+
+#dialogContainer {
+    position: relative;
+    width: 600px;
+    height: 400px;
+    margin: 0 auto;
+    border: 1px solid #5a646d;
+    background-color: #fff;
+    padding: 10px 15px 10px 15px;
+}
+
+#dialogContent {
+    height: 350px;
+    overflow: auto;
+    padding: 0 10px 0 0;
+}
+
+#dialogContent form {
+    padding: 15px;
+}
+
+#dialogContent p {
+    padding: 8px 0 8px 0;
+}
+
+#dialogActions {
+    margin-top: 12px;
+    text-align: right;
+}
+
+.orange {
+    color: #f36e09;
+}
+
+.gray {
+    color: #626d75;
+}
+
+.bold {
+    font-weight: bold;
+}
+
+

@@ -1,0 +1,104 @@
+<div class="content-bg">
+
+    <h3>{{t "common.user.userProfile"}}</h3>
+
+    <form class="form two-columns" id="UserProfileForm">
+        <input type="hidden" name="dn">
+        <div class="column-layout">
+            <div class="column2">
+                <div class="field">
+                    <label class="light">{{t "common.user.username"}}</label>
+                    <input type="text" name="username"  data-validator="required" readonly/>
+                    <span></span>
+                    <div class="validation-message"></div>
+                </div>
+                
+                <div class="field">
+                    <label class="light">{{t "common.user.givenName"}}</label>
+                    <input type="text" name="givenname" data-validator="required" />
+                    <span></span>
+                    <div class="validation-message"></div>
+                </div>
+                
+                <div class="field">
+                    <label class="light">{{t "common.user.emailAddress"}}</label> 
+                    <input type="text" name="mail" /> 
+                    <span></span>
+                    <div class="validation-message"></div>
+                </div>
+            
+                <div class="field">
+                    <label class="light">{{t "common.user.address1"}}</label>
+                    <input type="text" name="postaladdress" />
+                    <span></span>
+                    <div class="validation-message"></div>
+                </div>
+<!--                 
+                <div class="field">
+                    <label class="light">{{t "common.user.country"}}</label>
+                    <select name="country"></select>
+                    <span></span>
+                    <div class="validation-message"></div>
+                </div>
+                
+                <div class="field">
+                    <label class="light">{{t "common.user.stateProvince"}}</label>
+                    <select name="stateProvince"></select>
+                    <span></span>
+                    <div class="validation-message"></div>
+                </div>
+                
+ -->
+            </div>
+            <div class="column2">
+                <div class="field">
+                    <label class="light"></label> 
+                    <a href="{{url 'changeSecurityData'}}" id="securityDialogLink" class="ice hrefInput">
+                        {{t "templates.user.UserProfileTemplate.changeSecurityData"}}
+                    </a>
+                </div>
+                
+                <div class="field">
+                    <label class="light">{{t "common.user.familyName"}}</label>
+                    <input type="text" name="sn" data-validator="required" />
+                    <span></span>
+                    <div class="validation-message"></div>
+                </div>
+                
+                <div class="field">
+                    <label class="light">{{t "common.user.phoneNumber"}}</label>
+                    <input type="text" name="telephonenumber" data-validator="required" />
+                    <span></span>
+                    <div class="validation-message"></div>
+                </div>
+                <!-- 
+                <div class="field">
+                    <label class="light">{{t "common.user.address2"}}</label>
+                    <input type="text" name="address2" />
+                    <span></span>
+                    <div class="validation-message"></div>
+                </div>
+                
+                <div class="field">
+                    <label class="light">{{t "common.user.city"}}</label>
+                    <input type="text" name="city" />
+                    <span></span>
+                    <div class="validation-message"></div>
+                </div>
+                
+                <div class="field">
+                    <label class="light">{{t "common.user.postalCode"}}</label>
+                    <input type="text" name="postalCode" />
+                    <span></span>
+                    <div class="validation-message"></div>
+                </div>
+                  -->
+                <div class="field" style="margin-left: 240px; margin-top: 30px; height: auto">
+                    <input type="submit" name="saveButton" value="{{t "common.form.update"}}" class="button active" />
+                    <input type="button" name="resetButton" value="{{t "common.form.reset"}}" class="button gray"/>
+                </div>
+            </div>
+        </div>
+    </form>
+
+</div>

@@ -1,0 +1,155 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  The contents of this file are subject to the terms of the Common Development and
+  Distribution License (the License). You may not use this file except in compliance with the
+  License.
+
+  You can obtain a copy of the License at legal/CDDLv1.0.txt. See the License for the
+  specific language governing permission and limitations under the License.
+
+  When distributing Covered Software, include this CDDL Header Notice in each file and include
+  the License file at legal/CDDLv1.0.txt. If applicable, add the following below the CDDL
+  Header, with the fields enclosed by brackets [] replaced by your own identifying
+  information: "Portions Copyrighted [year] [name of copyright owner]".
+
+  Copyright 2011-2013 ForgeRock AS. All rights reserved.
+-->
+<!--
+  Portions Copyrighted 2013 Syntegrity.
+-->
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <parent>
+        <groupId>org.forgerock.openam</groupId>
+        <artifactId>openam-auth-deviceprint</artifactId>
+        <version>11.0.0-RC3</version>
+    </parent>
+
+    <name>OpenAM Auth Device Print Module Scripts</name>
+    <description>
+        OpenAM Authentication Device Print Module Scripts.
+        A set of JS collectors to gather user device print.
+    </description>
+    <artifactId>openam-auth-deviceprint-scripts</artifactId>
+    <packaging>js</packaging>
+
+    <dependencies>
+        <dependency>
+            <groupId>org.codehaus.mojo</groupId>
+            <artifactId>jquery-amd</artifactId>
+            <type>js</type>
+        </dependency>
+        <dependency>
+            <groupId>org.codehaus.jstestrunner</groupId>
+            <artifactId>jstestrunner-junit</artifactId>
+        </dependency>
+    </dependencies>
+
+    <build>
+        <resources>
+            <resource>
+                <directory>${basedir}/src/main/js</directory>
+            </resource>
+            <resource>
+                <directory>${basedir}/src/main/resources</directory>
+            </resource>
+        </resources>
+        <testResources>
+            <testResource>
+                <directory>${basedir}/src/test/js</directory>
+            </testResource>
+            <testResource>
+                <directory>${basedir}/src/test/resources</directory>
+            </testResource>
+        </testResources>
+        <extensions>
+            <extension>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>javascript-maven-plugin</artifactId>
+                <version>2.0.0-alpha-1</version>
+            </extension>
+        </extensions>
+
+        <plugins>
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>jslint-maven-plugin</artifactId>
+                <configuration>
+                    <assumeConsoleAlertEtc>true</assumeConsoleAlertEtc>
+                    <strictWhiteSpace>false</strictWhiteSpace>
+                    <excludes>
+                        <exclude>**/libs/*.js</exclude>
+                        <exclude>**/*Test.js</exclude>
+                    </excludes>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>webminifier-maven-plugin</artifactId>
+                <configuration>
+                    <splitDependencies>false</splitDependencies>
+                </configuration>
+                <executions>
+                    <execution>
+                        <id>default-minify-js</id>
+                        <phase>none</phase>
+                        <goals>
+                            <goal>minify-js</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-surefire-plugin</artifactId>
+                <configuration>
+                    <skipTests>true</skipTests>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-assembly-plugin</artifactId>
+                <configuration>
+                    <appendAssemblyId>false</appendAssemblyId>
+                    <descriptors>
+                        <descriptor>src/main/assembly/zip.xml</descriptor>
+                    </descriptors>
+                </configuration>
+                <executions>
+                    <execution>
+                        <id>zip-assembly</id>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>single</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.mortbay.jetty</groupId>
+                <artifactId>jetty-maven-plugin</artifactId>
+            </plugin>
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>js-import-maven-plugin</artifactId>
+            </plugin>
+            <plugin>
+                <groupId>com.github.mcheely</groupId>
+                <artifactId>requirejs-maven-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>optimize</goal>
+                        </goals>
+                    </execution>
+                </executions>
+                <configuration>
+                    <configFile>${basedir}/src/main/requirejs/app.build.js</configFile>
+                    <optimizerFile>${basedir}/src/main/requirejs/r.js</optimizerFile>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
+</project>

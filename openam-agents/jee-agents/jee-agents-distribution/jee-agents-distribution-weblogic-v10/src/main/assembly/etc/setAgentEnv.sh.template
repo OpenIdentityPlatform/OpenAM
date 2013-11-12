@@ -1,0 +1,51 @@
+#!/bin/sh
+
+# DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
+#
+# Copyright (c) 2008 Sun Microsystems Inc. All Rights Reserved
+#
+# The contents of this file are subject to the terms
+# of the Common Development and Distribution License
+# (the License). You may not use this file except in
+# compliance with the License.
+#
+# You can obtain a copy of the License at
+# https://opensso.dev.java.net/public/CDDLv1.0.html or
+# opensso/legal/CDDLv1.0.txt
+# See the License for the specific language governing
+# permission and limitations under the License.
+#
+# When distributing Covered Code, include this CDDL
+# Header Notice in each file and include the License file
+# at opensso/legal/CDDLv1.0.txt.
+# If applicable, add the following below the CDDL Header,
+# with the fields enclosed by brackets [] replaced by
+# your own identifying information:
+# "Portions Copyrighted [year] [name of copyright owner]"
+#
+# Portions Copyrighted 2013 ForgeRock AS.
+#
+
+# *************************************************************************
+# This script is used to set up your environment for OpenAM
+# Policy Agent 3.0 for WebLogic 10.0.
+# Copy the server startup script to a server specific script. 
+# e.g startWeblogic.sh
+# Include this file in the server startup script after the 
+# setDomainEnv.sh script inclusion. 
+# Append AGENT_CLASSPATH and AGENT_JAVA_OPTIONS to the WebLogic server in 
+# the startup script
+# Please refer to 3.0 WebLogic 10.0 Agent Guide - Post-installation steps 
+# for detailed instructions.
+# *************************************************************************
+
+# Append AGENT_CLASSPATH to the WebLogic server classpath
+AGENT_CLASSPATH="@AGENT_CLASSPATH@"
+CLASSPATH="${CLASSPATH}${CLASSPATHSEP}${AGENT_CLASSPATH}"
+export CLASSPATH
+
+# Append AGENT_JAVA_OPTIONS to the WebLogic server JAVA_OPTIONS in the WebLogic 
+# server startup script
+AGENT_JAVA_OPTIONS="@AGENT_JAVA_OPTIONS@"
+JAVA_OPTIONS="${JAVA_OPTIONS} ${AGENT_JAVA_OPTIONS}"
+export JAVA_OPTIONS

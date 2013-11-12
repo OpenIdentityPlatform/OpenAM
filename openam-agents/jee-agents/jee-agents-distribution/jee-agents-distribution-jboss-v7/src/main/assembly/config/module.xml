@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<module xmlns="urn:jboss:module:1.1" name="org.forgerock.openam.agent">
+
+    <dependencies>
+      <module name="javax.servlet.api" />
+      <module name="javax.api" />
+      <module name="javax.xml.bind.api" />
+      <module name="javax.ejb.api" />
+      <module name="org.picketbox" />
+    </dependencies>
+
+    <resources>
+      <resource-root path="locale"/>
+      <resource-root path="agent.jar"/>
+      <resource-root path="openssoclientsdk.jar"/>
+    </resources>
+</module>

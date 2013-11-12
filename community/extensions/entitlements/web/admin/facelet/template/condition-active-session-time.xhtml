@@ -1,0 +1,71 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!--
+   DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
+  
+   Copyright (c) 2009 Sun Microsystems Inc. All Rights Reserved
+  
+   The contents of this file are subject to the terms
+   of the Common Development and Distribution License
+   (the License). You may not use this file except in
+   compliance with the License.
+
+   You can obtain a copy of the License at
+   https://opensso.dev.java.net/public/CDDLv1.0.html or
+   opensso/legal/CDDLv1.0.txt
+   See the License for the specific language governing
+   permission and limitations under the License.
+
+   When distributing Covered Code, include this CDDL
+   Header Notice in each file and include the License file
+   at opensso/legal/CDDLv1.0.txt.
+   If applicable, add the following below the CDDL Header,
+   with the fields enclosed by brackets [] replaced by
+   your own identifying information:
+   "Portions Copyrighted [year] [name of copyright owner]"
+
+   $Id: condition-active-session-time.xhtml,v 1.7 2009/08/09 06:04:22 farble1670 Exp $
+
+-->
+
+<span
+    xmlns="http://www.w3.org/1999/xhtml"
+    xmlns:ui="http://java.sun.com/jsf/facelets"
+    xmlns:f="http://java.sun.com/jsf/core"
+    xmlns:ice="http://www.icesoft.com/icefaces/component"
+    xmlns:c="http://java.sun.com/jstl/core"
+    xmlns:o="http://opensso.dev.java.net">
+    <ice:panelGroup>
+        <ice:panelGrid
+            columns="3">
+            <ice:outputLabel
+                for="maximum-session-time-input"
+                value="#{resources['condition-active-session-time.maximumSessionTimeLabel']}"/>
+            <ice:inputText 
+                id="maximum-session-time-input"
+                value="#{viewCondition.timeCount}" size="8"/>
+            <ice:selectOneMenu
+                value="#{viewCondition.timeMultiplier}">
+                <f:selectItem 
+                    itemLabel="#{resources['condition-active-session-time.hours']}"
+                    itemValue="1"/>
+                <f:selectItem 
+                    itemLabel="#{resources['condition-active-session-time.minutes']}"
+                    itemValue="60"/>
+                <f:selectItem 
+                    itemLabel="#{resources['condition-active-session-time.seconds']}"
+                    itemValue="3600"/>
+            </ice:selectOneMenu>
+            <ice:outputText
+                value="Terminate session?"/>
+            <ice:selectOneMenu
+                value="#{viewCondition.terminateSession}">
+                <f:selectItem 
+                    itemLabel="#{resources['condition-active-session-time.yes']}"
+                    itemValue="true"/>
+                <f:selectItem 
+                    itemLabel="#{resources['condition-active-session-time.no']}"
+                    itemValue="false"/>
+            </ice:selectOneMenu>
+        </ice:panelGrid>
+    </ice:panelGroup>
+</span>

@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+   DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
+  
+   Copyright (c) 2008 Sun Microsystems Inc. All Rights Reserved
+  
+   The contents of this file are subject to the terms
+   of the Common Development and Distribution License
+   (the License). You may not use this file except in
+   compliance with the License.
+
+   You can obtain a copy of the License at
+   https://opensso.dev.java.net/public/CDDLv1.0.html or
+   opensso/legal/CDDLv1.0.txt
+   See the License for the specific language governing
+   permission and limitations under the License.
+
+   When distributing Covered Code, include this CDDL
+   Header Notice in each file and include the License file
+   at opensso/legal/CDDLv1.0.txt.
+   If applicable, add the following below the CDDL Header,
+   with the fields enclosed by brackets [] replaced by
+   your own identifying information:
+   "Portions Copyrighted [year] [name of copyright owner]"
+
+   $Id: ibm-application-bnd.xmi,v 1.1 2008/11/21 22:21:52 leiming Exp $
+
+-->
+<applicationbnd:ApplicationBinding xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:applicationbnd="applicationbnd.xmi" xmlns:application="application.xmi" xmi:id="ApplicationBinding_1">
+  <authorizationTable xmi:id="AuthorizationTable_1">
+    <authorizations xmi:id="RoleAssignment_1">
+      <role href="META-INF/application.xml#SR_MANAGER_ROLE"/>
+      <groups xmi:id="Group_1" name="id=manager,ou=group,dc=opensso,dc=java,dc=net"/>
+    </authorizations>
+    <authorizations xmi:id="RoleAssignment_2">
+      <role href="META-INF/application.xml#SR_EMPLOYEE_ROLE"/>
+      <groups xmi:id="Group_2" name="id=employee,ou=group,dc=opensso,dc=java,dc=net"/>
+    </authorizations>
+  </authorizationTable>
+  <application href="META-INF/application.xml#Application_ID"/>
+</applicationbnd:ApplicationBinding>

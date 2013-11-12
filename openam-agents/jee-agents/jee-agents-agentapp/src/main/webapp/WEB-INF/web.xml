@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ *
+ * Copyright 2013 ForgeRock AS.
+ *
+ * The contents of this file are subject to the terms of the Common Development and
+ * Distribution License (the License). You may not use this file except in compliance with the
+ * License.
+ *
+ * You can obtain a copy of the License at legal/CDDLv1.0.txt. See the License for the
+ * specific language governing permission and limitations under the License.
+ *
+ * When distributing Covered Software, include this CDDL Header Notice in each file and include
+ * the License file at legal/CDDLv1.0.txt. If applicable, add the following below the CDDL
+ * Header, with the fields enclosed by brackets [] replaced by your own identifying
+ * information: "Portions copyright [year] [name of copyright owner]".
+ *
+-->
+<web-app version="2.4"
+	 xmlns="http://java.sun.com/xml/ns/j2ee"
+	 xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	 xsi:schemaLocation="http://java.sun.com/xml/ns/j2ee http://java.sun.com/xml/ns/j2ee/web-app_2_4.xsd">
+    <display-name>agentapp</display-name>
+    <listener>
+        <listener-class>com.sun.identity.common.ShutdownServletContextListener</listener-class>
+    </listener>
+    <filter>
+        <description>OpenAM JavaEE Policy Agent Filter</description>
+        <display-name>Agent</display-name>
+        <filter-name>Agent</filter-name>
+        <filter-class>com.sun.identity.agents.filter.AmAgentFilter</filter-class>
+    </filter>
+    <filter-mapping>
+        <filter-name>Agent</filter-name>
+        <url-pattern>/*</url-pattern>
+    </filter-mapping>
+    <servlet>
+        <description>A resource for handling notifications</description>
+        <display-name>NotificationServlet</display-name>
+        <servlet-name>NotificationServlet</servlet-name>
+        <jsp-file>/notification.jsp</jsp-file>
+    </servlet>
+    <servlet>
+        <description>A resource for handling legacy browser support</description>
+        <display-name>LegacySupportURIServlet</display-name>
+        <servlet-name>LegacySupportURIServlet</servlet-name>
+        <jsp-file>/legacy_support_uri.jsp</jsp-file>
+    </servlet>
+    <servlet>
+        <description>A resource for handling CDSSO authentication responses</description>
+        <display-name>SunwCDSSORedirectURIServlet</display-name>
+        <servlet-name>SunwCDSSORedirectURIServlet</servlet-name>
+        <jsp-file>/sunwCDSSORedirectURI.jsp</jsp-file>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>NotificationServlet</servlet-name>
+        <url-pattern>/notification</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>LegacySupportURIServlet</servlet-name>
+        <url-pattern>/legacy_support_uri</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>SunwCDSSORedirectURIServlet</servlet-name>
+        <url-pattern>/sunwCDSSORedirectURI</url-pattern>
+    </servlet-mapping>
+</web-app>

@@ -1,0 +1,926 @@
+#
+# DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
+#
+# Copyright (c) 2008 Sun Microsystems Inc. All Rights Reserved
+#
+# The contents of this file are subject to the terms
+# of the Common Development and Distribution License
+# (the License). You may not use this file except in
+# compliance with the License.
+#
+# You can obtain a copy of the License at
+# https://opensso.dev.java.net/public/CDDLv1.0.html or
+# opensso/legal/CDDLv1.0.txt
+# See the License for the specific language governing
+# permission and limitations under the License.
+#
+# When distributing Covered Code, include this CDDL
+# Header Notice in each file and include the License file
+# at opensso/legal/CDDLv1.0.txt.
+# If applicable, add the following below the CDDL Header,
+# with the fields enclosed by brackets [] replaced by
+# your own identifying information:
+# "Portions Copyrighted [year] [name of copyright owner]"
+#
+# $Id: OpenSSOAgentConfiguration.template,v 1.2 2009/10/15 23:35:42 leiming Exp $
+#
+# Portions Copyrighted 2013 ForgeRock AS.
+
+
+#------------------------------------------------------------------------------
+# Configuration Property File
+#
+# OpenAM Policy Agent for:
+# Tomcat 6.0.x
+#
+# Version: 3.0
+#------------------------------------------------------------------------------
+#
+# THIS FILE PROVIDES THE CONFIGURATION SETTINGS NECESSARY FOR THE AGENT
+# TO FUNCTION CORRECTLY. PLEASE REFER TO THE DOCUMENTATION BEFORE 
+# MODIFYING ANY OF THE VALUES IN THIS FILE.
+#
+# Note:
+#   Data present in this file provides the necessary configuration
+#   settings needed by Agent to work correctly. Invalid configuration 
+#   data present in this file can lead to malfunction of the Agent, the
+#   application, and the Application Server.
+#
+# WARNING: The contents of this file are classified as an UNSTABLE
+# interface by Sun Microsystems, Inc.  As such, they are subject to
+# significant, incompatible changes in any future release of the
+# software.
+#
+# INVALID CONFIGURATION SETTINGS MAY RESULT IN MALFUNCTION OF THE ENTIRE
+# SYSTEM.
+#------------------------------------------------------------------------------
+
+#------------------------------------------------------------------------------
+# General Notes about the Agent Configuration
+# -------------------------------------------
+#
+# HOT-SWAP MECHANISM:
+#   Certain property keys in this configuration are hot-swap enabled. 
+#   The  value for these keys when altered are dynamically loaded by the 
+#   Agent such that it is not necessary to restart the Application 
+#   Server in order for  these changes to take effect. However, in cases 
+#   where the key is explicitly  identified as not enabled for hot-swap 
+#   or in cases when the hot-swap mechanism is disabled on the system, 
+#   the Application Server must be restarted for the changes to take 
+#   effect. Please refer to the Agent documentation to further learn 
+#   about hot-swap configuration of the Agent.
+#
+# LIST CONSTRUCTS:
+#   Certain property keys in this configuration are specified as lists. 
+#   A list construct is defined as follows:
+#
+#   Format:
+#   <key>[<index>]=<value>
+#
+#   Where:
+#      key   : is the configuration key
+#      index : is a positive number starting from 0 that increments by 1
+#              for every value specified in this list.
+#      value : is one of the values specified in this list.
+#
+#   Notes:
+#   - Please refer the Agent documentation for full details on usage.
+#
+#   Example:
+#     com.sun.identity.agents.config.example[0] = value0
+#     com.sun.identity.agents.config.example[1] = value1
+#     com.sun.identity.agents.config.example[2] = value2
+#
+# MAP CONSTRUCTS:
+#   Certain property keys in this configuration are specified as Maps. 
+#   A Map construct is defined as follows:
+#
+#   Format:
+#   <key>[<name>]=<value>
+#
+#   Where:
+#      key   : is the configuration key
+#      name  : is a string that forms the lookup key as available in the 
+#              Map
+#      value : is the value associated with the name in the Map
+#
+#   Notes:
+#   - Please refer the Agent documentation for full details on usage.
+#
+#   Example:
+#      com.sun.identity.agents.config.example[AL] = ALABAMA
+#      com.sun.identity.agents.config.example[AK] = ALASKA
+#      com.sun.identity.agents.config.example[AZ] = ARIZONA
+#
+# APPLICATION SPECIFIC/GLOBAL CONFIGURATION:
+#   Certain property keys in this configuration can be specified per 
+#   protected application. This implies that the Agent will use 
+#   different values of the same configuration key for different 
+#   applications as defined in this configuration file. Properties 
+#   which are not specified per protected applications are called Global 
+#   properties. Application specific properties are defined as follows:
+#
+#   Format:
+#   <key>[<appname>]=<value>
+#
+#   Where:
+#      key     : is the configuration key
+#      appname : is the Application name to which this configuration 
+#                belongs. The application name is the context path of 
+#                the application without the leading forward slash 
+#                character. In case when the application has been 
+#                deployed at the root-context of the server, the 
+#                application name should be specified as
+#                'DefaultWebApp'. 
+#      value   : the value that will be used by the Agent when 
+#                protecting the application identified by the given 
+#                application name.
+#
+#   Notes:
+#   - When an application specific configuration is not present, the 
+#     Agent uses different mechanisms to identify a default value. There 
+#     could be configurations where the default value is used as the 
+#     value specified for the same key without any application specific 
+#     suffix '[<appname>]'. For example, if the following configuration 
+#     keys are present:
+#
+#         com.sun.identity.agents.config.example[Portal] = value1
+#         com.sun.identity.agents.config.example[DefaultWebApp] = value2
+#         com.sun.identity.agents.config.example = value3
+#
+#     then, for applications other than the ones deployed on the root 
+#     context and the context '/Portal', the value of this key will 
+#     default to 'value3'. 
+#
+#   - Application Specific configuration properties must follow the 
+#     rules and syntax of the MAP construct of configuration entries as 
+#     defined above.
+#
+#   Example:
+#     com.sun.identity.agents.config.example[Portal] = value1
+#     com.sun.identity.agents.config.example[BankApp] = value2
+#     com.sun.identity.agents.config.example[DefaultWebApp] = value3
+#------------------------------------------------------------------------------
+
+#
+# FILTER OPERATION MODE
+#   Specifies the mode of operation of the Filter. Valid value is one of:
+#   NONE, SSO_ONLY, URL_POLICY, J2EE_POLICY, ALL. This property can also be
+#   specified as an application specific property. However, the global 
+#   property must always be present.
+# WARNING:
+#   WHEN THIS PROPERTY IS SET TO 'NONE', THE AGENT WILL GRANT ACCESS TO 
+#   ALL PROTECTED RESOURCES. THIS MODE OF OPERATION SHOULD NOT BE USED 
+#   IN DEPLOYED PRODUCTION SYSTEMS AT ANY TIME AS IT CAN RESULT IN 
+#   UNAUTHORIZED ACCESS TO PROTECTED SYSTEM RESOURCES. THIS MODE OF 
+#   OPERATION IS PROVIDED ONLY TO FACILITATE TROUBLESHOOTING OF THE 
+#   APPLICATION IN A WELL CONTROLLED DEVELOPMENT AND TEST ENVIRONMENT 
+#   AND SHOULD NOT BE USED IN ANY OTHER ENVIRONMENT.
+# Hot-Swap Enabled: No
+# Example:
+#   com.sun.identity.agents.config.filter.mode = ALL  
+#   com.sun.identity.agents.config.filter.mode[BankApp] = URL_POLICY
+#
+com.sun.identity.agents.config.filter.mode = ALL
+
+#
+# USER MAPPING PROPERTIES
+#   - user.mapping.mode: Specifies the mechanism by which the user-ID 
+#     to be used on the protected server for the authenticated user is 
+#     determined by the Agent. Value of this is one of: USER_ID, 
+#     PROFILE_ATTRIBUTE, HTTP_HEADER, SESSION_PROPERTY.
+#   - user.attribute.name: Specifies the name of the profile attribute,
+#     or HTTP header, or Session property which contains the user-ID to
+#     be used on the protected server for the authenticated user. This
+#     property is not used if the value of user.mapping.mode is set to
+#     USER_ID.
+#   - user.principal: A flag that indicates that the principal of the 
+#     authenticated user be used instead of just the user-ID for 
+#     authenticating the user on the protected server. This property is 
+#     applicable if the user.mapping.mode is set to USER_ID.
+#   - user.token: Specifies a session property name which contains the
+#     user-ID of the authenticated user in session. This property is used
+#     when the user.mapping.mode is set to USER_ID and the user.principal 
+#     flag is set to false.
+# Hot-Swap Enabled: Yes
+# Examples:
+#    com.sun.identity.agents.config.user.mapping.mode = PROFILE_ATTRIBUTE
+#    com.sun.identity.agents.config.user.attribute.name = employeenumber
+#    
+com.sun.identity.agents.config.user.mapping.mode = USER_ID
+com.sun.identity.agents.config.user.attribute.name = employeenumber
+com.sun.identity.agents.config.user.principal = false
+com.sun.identity.agents.config.user.token = UserToken
+
+#
+# CLIENT IDENTIFICATION PROPERTIES
+#   - client.ip.header: Specifies a HTTP header name that holds the IP 
+#     address of the client. May be left blank if not used.
+#   - client.hostname.header: Specifies a HTTP header name that holds the
+#     Hostname of the client. May be left blank if not used.
+# Hot-Swap Enabled: Yes
+# Example:
+#   com.sun.identity.agents.config.client.ip.header = X-Proxy-Client-IP
+#   com.sun.identity.agents.config.client.hostname.header = X-Proxy-Client-Host
+#
+com.sun.identity.agents.config.client.ip.header =
+com.sun.identity.agents.config.client.hostname.header =
+
+#
+# CONFIGURATION RELOAD INTERVAL
+#   Specifies the interval in seconds between configuration reloads. When
+#   set to 0, the hot-swap mechanism will be disabled.
+# Hot-Swap Enabled: Yes
+#
+com.sun.identity.agents.config.load.interval = 0
+
+#
+# LOCALE IDENTIFICATION PROPERTIES
+#   - locale.language: Specifies the language code for identifying the Locale
+#     of operation. 
+#   - locale.country: Specifies the country code for identifying the Locale of
+#     operation.
+# Hot-Swap Enabled: No
+#
+com.sun.identity.agents.config.locale.language = en
+com.sun.identity.agents.config.locale.country = US
+
+#
+# AUDIT LOG PROPERTIES
+#   - audit.accesstype: Specifies the access type which will be logged by the
+#     Agent. Valid value is one of: LOG_NONE, LOG_ALLOW, LOG_DENY, LOG_BOTH.
+#   - log.disposition: Specifies the audit log mode that the Agent will use
+#     when writing audit log messages. Valid value is one of: LOCAL, REMOTE, 
+#     ALL.
+#   - remote.logfile: Specifies the file name to be used on the remote server
+#     if the log.disposition is set to REMOTE or ALL.
+#   - local.log.rotate: A flag that indicates if the rotation of audit log
+#     local file is enabled or disabled.
+#   - local.log.size: The size in bytes of the local audit log file, beyond
+#     which the Agent should rotate the log file.
+# Hot-Swap Enabled: Yes
+#
+com.sun.identity.agents.config.audit.accesstype = LOG_NONE
+com.sun.identity.agents.config.log.disposition = REMOTE
+com.sun.identity.agents.config.remote.logfile = @AUDIT_LOG_FILENAME@
+com.sun.identity.agents.config.local.log.rotate = false
+com.sun.identity.agents.config.local.log.size = 52428800
+
+#
+# WEB SERVICE PROCESSING PROPERTIES
+#   - webservice.enable: A flag that specifies if Web Service processing is 
+#     enabled or disabled.
+#   - webservice.endpoint: A list of Web Application end points that represent
+#     Web Services.
+#   - webservice.process.get.enable: A flag that indicates if the processing
+#     of HTTP GET requests for Web Service endpoints is enabled or disabled.
+#   - webservice.authenticator: An implementation class that can be used to
+#     authenticate web-service requests.
+#   - webservice.internalerror.content: The name of file that contains content
+#     used by the Agent to generate an internal error fault for clients.
+#   - webservice.autherror.content: The name of file that contains content
+#     used by the Agent to generate an authorization error fault for clients.
+#   - webservice.responseprocessor: An implementation class that is used to do
+#     web-service response processing.
+# Hot-Swap Enabled: Yes
+#
+com.sun.identity.agents.config.webservice.enable = false
+com.sun.identity.agents.config.webservice.endpoint[0] = 
+com.sun.identity.agents.config.webservice.process.get.enable = true
+com.sun.identity.agents.config.webservice.authenticator =
+com.sun.identity.agents.config.webservice.internalerror.content = WSInternalErrorContent.txt
+com.sun.identity.agents.config.webservice.autherror.content  = WSAuthErrorContent.txt
+com.sun.identity.agents.config.webservice.responseprocessor =
+
+#
+# ACCESS DENIED URI
+#   An application specific (MAP) property that specifies the URI used by
+#   the Agent to block unauthorized access requests. May be left unspecified
+#   if not available. A global value can also be specified.
+# Example:
+#   com.sun.identity.agents.config.access.denied.uri[BankApp] = /BankApp/accessdenied.html
+#   com.sun.identity.agents.config.access.denied.uri = /accessdenied.html
+# Hot-Swap Enabled: Yes
+#
+com.sun.identity.agents.config.access.denied.uri[] =
+
+#
+# FORM LOGIN PROCESSING PROPERTIES
+#   - login.form: A LIST property used by the Agent to identify login 
+#     request and take appropriate action. Each entry should be the
+#     absolute URI of the resource specified in the web.xml deployment
+#     descriptor of the protected application in the element
+#     form-login-page.
+#   - login.error.uri: A LIST property used by the Agent to identify
+#     error page request and take appropriate action. Each entry should 
+#     be the absolute URI of the resource specified in the web.xml 
+#     deployment descriptor of the protected application in the element
+#     form-error-page.
+#   - login.use.internal: A flag that specifies if the Agent should use
+#     internal content for handling form login requests.
+#   - login.content.file: Specifies the name or complete path of the file
+#     that will be used by the Agent for handling form login requests if
+#     the login.use.internal flag is set to true.
+# Hot-Swap Enabled: Yes
+# Examples:
+#   com.sun.identity.agents.config.login.form[0] = /BankApp/jsp/login.jsp
+#   com.sun.identity.agents.config.login.error.uri[0] = /BankApp/jsp/error.jsp
+#
+com.sun.identity.agents.config.login.form[0] =
+com.sun.identity.agents.config.login.error.uri[0] =
+com.sun.identity.agents.config.login.use.internal = true
+com.sun.identity.agents.config.login.content.file = FormLoginContent.txt
+
+#
+# LOCAL AUTHENTICATION PROCESSING PROPERTIES
+#   - auth.handler: A MAP property that specifies application 
+#     specific Authentication Handler to be used by the the 
+#     Agent in order to authenticate the logged on user with the 
+#     Application server for the particular application.
+#   - logout.handler: A MAP property that specifies the application 
+#     specific Logout Handler to be used by the Agent in order to logout 
+#     the logged on user within the Application server for the 
+#     particular application. 
+#   - verification.handler: A MAP property that specifies the application 
+#     specific local verification  handler used by the agent to validate 
+#     the user credentials with the local repository. 
+# Hot-Swap Enabled: Yes
+# Example:
+#   com.sun.identity.agents.config.auth.handler[BankApp] = BankAuthHandler
+#   com.sun.identity.agents.config.logout.handler[BankApp] = BankLogoutHandler
+#   com.sun.identity.agents.config.verification.handler[BankApp] = BankVerificationHandler
+#
+com.sun.identity.agents.config.auth.handler[] =     
+com.sun.identity.agents.config.logout.handler[] =
+com.sun.identity.agents.config.verification.handler[] =
+
+#
+# HTTP SESSION BINDING
+#   Its default value is false so the agent will not invalidate http session,
+#   and session data will be maintained.
+#   If its value is true, then the agent will invalidate the http session when
+#   the agent identifies that login has failed, user does not have SSO session
+#   or pincipal user name does not match SSO user name.
+# Hot-Swap Enabled: Yes
+com.sun.identity.agents.config.httpsession.binding = true
+
+#
+# GOTO PARAMETER NAME
+#   This property has been deprecated.
+#   Specifies the goto Parameter name to be used by the Agent when 
+#   redirecting the user to the appropriate authentication service. The 
+#   value of this parameter is used by the authentication service to 
+#   redirect the user to the original requested destination.
+# Valid Values:
+#   A string value that represents the goto parameter name.
+# Hot-Swap Enabled: Yes
+#
+com.sun.identity.agents.config.redirect.param = goto
+
+#
+# LOGIN URL
+#   Specifies the login URLs to be used by the Agent to redirect 
+#   incoming users without sufficient credentials to the OpenAM
+#   authentication service.
+# Hot-Swap Enabled: Yes
+#
+com.sun.identity.agents.config.login.url[0] = @AM_SERVICES_PROTO@://@AM_SERVICES_HOST@:@AM_SERVICES_PORT@@AM_SERVICES_DEPLOY_URI@/UI/Login
+
+#
+# LOGOUT URL
+#   Specifies the logout URLs to be used by the Agent to log out 
+#   the authenticated users from the OpenAM authentication service.
+# Hot-Swap Enabled: Yes
+#
+com.sun.identity.agents.config.logout.url[0] = @AM_SERVICES_PROTO@://@AM_SERVICES_HOST@:@AM_SERVICES_PORT@@AM_SERVICES_DEPLOY_URI@/UI/Logout
+
+#
+# LOGIN URL, LOGOUT URL, or CDSSO URLs PROPERTIES
+#   - login.url.prioritized: specifies if the failover sequence for Login URLs 
+#     or CDSSO URLs should be prioritized as defined in the list with the lowest 
+#     index having the highest priority.
+#   - login.url.probe.enabled: specifies if agent will check the availability 
+#     of these urls before redirecting to them. 
+#     Default value is true for backward compability, but suggests to set it
+#     to false (server will not be checked) in production deployment where agent
+#     often can not access login url directly.
+#   - login.url.probe.timeout: this is the connect timeout value in milliseconds 
+#     when login.url.probe.enabled is set to true (or server will be checked).
+#   - logout.url.prioritized: specifies if the failover sequence for Logout 
+#     URLs should be prioritized as defined in the list with the lowest 
+#     index having the highest priority.
+#   - logout.url.probe.enabled: specifies if agent will check the availability 
+#     of these urls before redirecting to them. 
+#     Default value is true for backward compability, but suggests to set it
+#     to false (server will not be checked) in production deployment where agent
+#     often can not access logout url directly.
+#   - logout.url.probe.timeout: this is the connect timeout value in milliseconds 
+#     when logout.url.probe.enabled is set to true (or server will be checked).
+# Hot-Swap Enabled: Yes
+#
+com.sun.identity.agents.config.login.url.prioritized = true
+com.sun.identity.agents.config.login.url.probe.enabled = true
+com.sun.identity.agents.config.login.url.probe.timeout = 2000
+com.sun.identity.agents.config.logout.url.prioritized = true
+com.sun.identity.agents.config.logout.url.probe.enabled = true
+com.sun.identity.agents.config.logout.url.probe.timeout = 2000
+
+#
+# AGENT SERVER PROPERTIES
+#   - agent.host: The host name identifying the Agent protected server to
+#     the client browsers if different from the actual host name. May be
+#     left blank if not used.
+#   - agent.port: The port number identifying the Agent protected server 
+#     listening port to the client browsers if different from the actual
+#     listening port. May be left blank if not used.
+#   - agent.protocol: The protocol being used (http/https) by the client
+#     browsers to communicate with the Agent protected server if different
+#     from the actual protocol used by the server.
+# Hot-Swap Enabled: Yes
+#
+com.sun.identity.agents.config.agent.host = 
+com.sun.identity.agents.config.agent.port =
+com.sun.identity.agents.config.agent.protocol =
+
+#
+# LOGIN ATTEMPT LIMIT
+#   Specifies the number of login attempts that a user can make without 
+#   success using a single browser session which will trigger the 
+#   blocking of the user request. Setting this value to 0 disables this
+#   feature.
+# Hot-Swap Enabled: Yes
+#
+com.sun.identity.agents.config.login.attempt.limit = 0
+
+# SSO Cache Enable Flag:
+#   This property specifies if the SSO Cache is active for the agent. This cache
+#   is used through public APIs exposed by the agent SDK.
+# Valid Values: true, false
+# Hot-Swap Enabled:  Yes
+com.sun.identity.agents.config.amsso.cache.enable = true
+
+#
+# COOKIE RESET PROCESSING PROPERTIES
+#   - cookie.reset.enable: A flag that specifies if cookie reset processing
+#     is enabled or disabled.
+#   - cookie.reset.name: A list of cookie names that will be reset by the
+#     Agent if cookie reset processing is enabled.
+#   - cookie.reset.domain: A MAP property with the key being the cookie name
+#     specified in cookie.reset.name property and the value being the domain
+#     of this cookie to be used when a reset event occurs.
+#   - cookie.reset.path: A MAP property with the key being the cookie name
+#     specified in cookie.reset.name property and the value being the path
+#     of this cookie to be used when a reset event occurs.
+# Hot-Swap Enabled: Yes
+#
+com.sun.identity.agents.config.cookie.reset.enable = false
+com.sun.identity.agents.config.cookie.reset.name[0] = 
+com.sun.identity.agents.config.cookie.reset.domain[] =  
+com.sun.identity.agents.config.cookie.reset.path[] =
+
+#
+# CDSSO PROCESSING PROPERTIES
+#   - cdsso.enable: A flag that specifies if CDSSO processing is 
+#     enabled or disabled.
+#   - cdsso.redirect.uri: An intermediate URI that is used by the 
+#     Agent for processing CDSSO requests.
+#   - cdsso.cdcservlet.url: A LIST of URLs of the available CDSSO controllers
+#     that may be used by the Agent for CDSSO processing.
+#   - cdsso.clock.skew: Specifies a time in seconds to be used by the 
+#     Agent to determine the validity of the CDSSO AuthnResponse assertion.
+#   - cdsso.trusted.id.providers: This property specifies the OpenAM
+#     Server/ID providers that should be trusted by the agent, when evaluating
+#     the CDC Liberty Responses. Used when a Load Balancer/Firewall is between 
+#     the agent & server.
+#   - cdsso.secure.enable: A flag that specifies if the SSO Token cookie
+#     set by the agent in the different domains in CDSSO mode will be marked
+#     secure. When the property is set to true the SSO Token cookie will only
+#     be transmitted if the communications channel with the host is a secure one.
+#   - cdsso.domain: This property specifies the domains for which cookies have
+#     to be set in a CDSSO scenario. If this property is left blank then the 
+#     fully qualified cookie domain for the agent server will be used for 
+#     setting the cookie domain. In such case it is a host cookie instead of 
+#     a domain cookie.
+#     Example:
+#        com.sun.identity.agents.config.cdsso.domain[0] = .sun.com
+# Hot-Swap Enabled: Yes
+#
+com.sun.identity.agents.config.cdsso.enable = false
+com.sun.identity.agents.config.cdsso.redirect.uri = @AGENT_APP_URI@/sunwCDSSORedirectURI
+com.sun.identity.agents.config.cdsso.cdcservlet.url[0] = @AM_SERVICES_PROTO@://@AM_SERVICES_HOST@:@AM_SERVICES_PORT@@AM_SERVICES_DEPLOY_URI@/cdcservlet
+com.sun.identity.agents.config.cdsso.clock.skew = 0
+com.sun.identity.agents.config.cdsso.trusted.id.provider[0] = @AM_SERVICES_PROTO@://@AM_SERVICES_HOST@:@AM_SERVICES_PORT@@AM_SERVICES_DEPLOY_URI@/cdcservlet
+com.sun.identity.agents.config.cdsso.secure.enable = false
+#com.sun.identity.agents.config.cdsso.domain[0] = 
+
+# 
+# LOGOUT PROCESSING PROPERTIES
+#   - logout.application.handler: An application specific (MAP) property
+#     that identifies a handler to be used for logout processing.
+#   - logout.uri: An application specific (MAP) property that identifies
+#     a request URI which indicates a logout event.
+#   - logout.request.param: An application specific (MAP) property that
+#     identifies a parameter which when present in the HTTP request
+#     indicates a logout event.
+#   - logout.introspect.enabled: A flag that when set allows the Agent
+#     to search HTTP request body to locate logout parameter.
+#   - logout.entry.uri: An application specific (MAP) property that identifies
+#     a URI to be used as an entry point after successful logout and 
+#     subsequent successful authentication if applicable.
+# Hot-Swap Enabled: Yes
+#
+com.sun.identity.agents.config.logout.application.handler[] =
+com.sun.identity.agents.config.logout.uri[] = 
+com.sun.identity.agents.config.logout.request.param[] = 
+com.sun.identity.agents.config.logout.introspect.enabled = false
+com.sun.identity.agents.config.logout.entry.uri[] = 
+
+#
+# FQDN PROCESSING PROPERTIES
+#   - fqdn.check.enable: A flag that indicates if FQDN checking is enabled
+#     or not.
+#   - fqdn.default: A hostname that represents the default FQDN to be
+#     used by the Agent when necessary.
+#   - fqdn.mapping: A MAP property that specifies a mapping from an invalid
+#     FQDN entry specified as the key to a valid FQDN entry specified as
+#     its value.
+# Hot-Swap Enabled: Yes
+# Examples of fqdn.mapping:
+#     com.sun.identity.agents.config.fqdn.mapping[myserver]=myserver.mydomain.com
+#
+com.sun.identity.agents.config.fqdn.check.enable = true
+com.sun.identity.agents.config.fqdn.default = @AGENT_HOST@
+com.sun.identity.agents.config.fqdn.mapping[] = 
+
+#
+# LEGACY USER AGENT PROCESSING PROPERTIES
+#   These three properties have been deprecated:
+#   - legacy.support.enable: A flag that specifies if legacy user agent
+#     support is enabled or disabled.
+#   - legacy.user.agent: A LIST of user agent header values that identify
+#     legacy browsers. Entries in this list can have wild card character '*'.
+#   - legacy.redirect.uri: An intermediate URI used by the Agent to 
+#     redirect legacy user agent requests.
+# Hot-Swap Enabled: Yes
+#
+com.sun.identity.agents.config.legacy.support.enable = false
+com.sun.identity.agents.config.legacy.user.agent[0] = Mozilla/4.7*
+com.sun.identity.agents.config.legacy.redirect.uri = @AGENT_APP_URI@/sunwLegacySupportURI
+
+#
+# CUSTOM RESPONSE HEADERS
+#   A MAP property that specifies the custom headers that are set by
+#   the Agent on the client browser. The key is the header name and the
+#   value represents the header value.
+# Hot-Swap Enabled: Yes
+# Example:
+#   com.sun.identity.agents.config.response.header[Cache-Control] = no-cache
+#
+com.sun.identity.agents.config.response.header[] =
+
+#
+# REDIRECT ATTEMPT LIMIT
+#   Specifies the number of successive single point redirects that a 
+#   user can make using a single browser session which will trigger the 
+#   blocking of the user request. When set to 0 this feature is disabled.
+# Hot-Swap Enabled: Yes
+#
+com.sun.identity.agents.config.redirect.attempt.limit = 0
+
+#
+# PORT CHECK PROCESSING PROPERTIES
+#   - port.check.enable: A flag that indicates if port check functionality
+#     is enabled or disabled.
+#   - port.check.file: Specifies the name or complete path of a file that
+#     has the necessary content needed to handle requests that need port
+#     correction.
+#   - port.check.setting: A MAP of port versus protocol entries with the
+#     key being the listening port number and value being the listening
+#     protocol to be used by the Agent to identify requests with invalid
+#     port numbers.
+# Hot-Swap Enabled: Yes
+# Example of port.check.setting:
+#   com.sun.identity.agents.config.port.check.setting[80] = http
+#   com.sun.identity.agents.config.port.check.setting[443] = https
+#
+com.sun.identity.agents.config.port.check.enable = false
+com.sun.identity.agents.config.port.check.file = PortCheckContent.txt
+com.sun.identity.agents.config.port.check.setting[@AGENT_PREF_PORT@] = @AGENT_PREF_PROTO@
+
+#
+# NOT-ENFORCED URI PROCESSING PROPERTIES
+#   - notenforced.uri: A LIST of URIs for which protection is not enforced
+#     by the Agent.
+#   - notenforced.uri.invert: A flag that specifies if the list of URIs 
+#     specified by the property notenforced.uri should be inverted. When
+#     set to true, it indicates that the URIs specified should be enforced
+#     and all other URIs should be not enforced by the Agent. Entries in 
+#     this list can have wild card character '*'.
+#   - notenforced.uri.cache.enable: A flag that specifies if the caching of
+#     of not-enforced URI list evaluation results is enabled or disabled.
+#   - notenforced.uri.cache.size: The size of the cache to be used if 
+#     caching of not-enforced URI list evaluation results is enabled.
+#   - notenforced.refresh.session.idletime: A flag that specifies if the OpenAM
+#     session idle time is reset or not when accessing the not enforced URIs.
+# Hot-Swap Enabled: Yes
+# Example of notenforced.uri:
+#   com.sun.identity.agents.config.notenforced.uri[0]=*.gif
+#   com.sun.identity.agents.config.notenforced.uri[1]=/public/*
+#   com.sun.identity.agents.config.notenforced.uri[2]=/images/*
+#
+com.sun.identity.agents.config.notenforced.uri[0] =
+com.sun.identity.agents.config.notenforced.uri.invert = false
+com.sun.identity.agents.config.notenforced.uri.cache.enable = true
+com.sun.identity.agents.config.notenforced.uri.cache.size = 1000
+com.sun.identity.agents.config.notenforced.refresh.session.idletime = false
+
+#
+# NOT-ENFORCED CLIENT IP PROCESSING PROPERTIES
+#   - notenforced.ip: A LIST of client IP addresses for which protection is 
+#     not enforced by the Agent.
+#   - notenforced.ip.invert: A flag that specifies if the list of client IP
+#     addresses specified by the property notenforced.ip should be inverted. 
+#     When set to true, it indicates that the client IP addresses specified 
+#     should be enforced and all other client IPs should be not enforced by 
+#     the Agent. Entries in this list can have wild card character '*'.
+#   - notenforced.ip.cache.enable: A flag that specifies if the caching of
+#     of not-enforced IP list evaluation results is enabled or disabled.
+#   - notenforced.ip.cache.size: The size of the cache to be used if 
+#     caching of not-enforced IP list  evaluation results is enabled.
+# Hot-Swap Enabled: Yes
+# Example of notenforced.ip:
+#   com.sun.identity.agents.config.notenforced.ip[0]=192.18.145.*
+#   com.sun.identity.agents.config.notenforced.ip[1]=192.18.146.123
+#
+com.sun.identity.agents.config.notenforced.ip[0] =
+com.sun.identity.agents.config.notenforced.ip.invert = false
+com.sun.identity.agents.config.notenforced.ip.cache.enable = true
+com.sun.identity.agents.config.notenforced.ip.cache.size = 1000
+
+#
+# COMMON ATTRIBUTE FETCH PROCESSING PROPERTIES
+#   - attribute.cookie.separator: A character that will be used to separate
+#     multiple values of the same attribute when it is being set as a cookie.
+#   - attribute.cookie.encode: A flag that indicates if the value of the 
+#     attribute should be URL encoded before being set as a cookie.
+#   - attribute.date.format: The format of date attribute values to be used
+#     when the attribute is being set as HTTP header. This format is based
+#     on the definition as provided in java.text.SimpleDateFormat.
+# Hot-Swap Enabled: Yes  
+#  
+com.sun.identity.agents.config.attribute.cookie.separator = |
+com.sun.identity.agents.config.attribute.date.format = EEE, d MMM yyyy hh:mm:ss z
+com.sun.identity.agents.config.attribute.cookie.encode = true
+
+#
+# PROFILE ATTRIBUTE PROCESSING PROPERTIES
+#   - profile.attribute.fetch.mode: The mode of fetching profile attributes.
+#     This value is one of: NONE, HTTP_HEADER, REQUEST_ATTRIBUTE, HTTP_COOKIE
+#   - profile.attribute.mapping: A MAP that specifies the profile attributes to 
+#     be populated under specific names for the currently authenticated user.
+#     The key is the profile attribute name and the value is the name under
+#     which that attribute will be made available.
+# Hot-Swap Enabled: Yes
+# Example of profile.attribute.mapping:
+#   com.sun.identity.agents.config.profile.attribute.mapping[cn]=CUSTOM-Common-Name
+#   com.sun.identity.agents.config.profile.attribute.mapping[mail]=CUSTOM-Email
+#
+com.sun.identity.agents.config.profile.attribute.fetch.mode = NONE
+com.sun.identity.agents.config.profile.attribute.mapping[] = 
+
+#
+# SESSION ATTRIBUTE PROCESSING PROPERTIES
+#   - session.attribute.fetch.mode: The mode of fetching session attributes.
+#     This value is one of: NONE, HTTP_HEADER, REQUEST_ATTRIBUTE, HTTP_COOKIE
+#   - session.attribute.mapping: A MAP that specifies the session attributes to 
+#     be populated under specific names for the currently authenticated user.
+#     The key is the session attribute name and the value is the name under
+#     which that attribute will be made available.
+# Hot-Swap Enabled: Yes
+# Example of session.attribute.mapping:
+#    com.sun.identity.agents.config.session.attribute.mapping[UserToken]=CUSTOM-userid
+#
+com.sun.identity.agents.config.session.attribute.fetch.mode = NONE
+com.sun.identity.agents.config.session.attribute.mapping[] =
+
+#
+# RESPONSE ATTRIBUTE PROCESSING PROPERTIES
+#   - response.attribute.fetch.mode: The mode of fetching policy response
+#     attributes. This value is one of: NONE, HTTP_HEADER, REQUEST_ATTRIBUTE, 
+#     HTTP_COOKIE
+#   - response.attribute.mapping: A MAP that specifies the policy response
+#     attributes to be populated under specific names for the currently
+#     authenticated user. The key is the policy response attribute name and
+#     the value is the name under which that attribute will be made available.
+# Hot-Swap Enabled: Yes
+#
+com.sun.identity.agents.config.response.attribute.fetch.mode = NONE
+com.sun.identity.agents.config.response.attribute.mapping[] =
+
+#
+# BYPASS PRINCIPAL LIST
+#   This property specifies a list of principals that is bypassed by the
+#   Agent for authentication and search purposes.
+# Hot-Swap Enabled: Yes
+# Example:
+#   com.sun.identity.agents.config.bypass.principal[0] = guest
+#   com.sun.identity.agents.config.bypass.principal[1] = testuser
+#
+com.sun.identity.agents.config.bypass.principal[0] =
+
+#
+# PRIVILEGED ATTRIBUTE PROCESSING PROPERTIES
+#   - default.privileged.attribute: A list of privileged attributes that will
+#     be granted to all users who have a valid OpenAM session.
+#   - privileged.attribute.type: A list of privileged attribute types that will
+#     be fetched for each user.
+#   - privileged.attribute.tolowercase : A MAP property that specifies if the 
+#     privileged attribute types should be converted to lowercase.
+#   - privileged.session.attribute: A list of session property names which 
+#     hold privileged attributes for the authenticated user.
+#   - privileged.attribute.mapping.enable: A flag to specify whether 
+#     a mapping from an attibute's original value to another value is
+#     enabled. This mapping may be necessary to satisfy container-specific
+#     restrictions on character set being used in certain configuration files.
+#   - privileged.attribute.mapping: A map property that specifies the above
+#     mentioned mapping; Note that if a key contains "=" or ":", then these
+#     special character needs to be escaped by "\".
+#
+# Hot-Swap Enabled: Yes
+# Examples:
+#   com.sun.identity.agents.config.default.privileged.attribute[0] = AUTHENTICATED_USERS
+#   com.sun.identity.agents.config.privileged.attribute.type[0] = Group
+#   com.sun.identity.agents.config.privileged.attribute.tolowercase[Group] = false
+#   com.sun.identity.agents.config.privileged.session.attribute[0] = UserToken
+#   com.sun.identity.agents.config.privileged.attribute.mapping.enable=true
+#   com.sun.identity.agents.config.privileged.attribute.mapping[id\=manager,ou\=group,dc\=opensso,dc\=java,dc\=net] = am_manager_role
+#   com.sun.identity.agents.config.privileged.attribute.mapping[id\=employee,ou\=group,dc\=opensso,dc\=java,dc\=net] = am_employee_role
+
+com.sun.identity.agents.config.default.privileged.attribute[0] = AUTHENTICATED_USERS
+com.sun.identity.agents.config.privileged.attribute.type[0] = Group
+com.sun.identity.agents.config.privileged.attribute.type[1] = Role
+com.sun.identity.agents.config.privileged.attribute.tolowercase[Group] = false
+com.sun.identity.agents.config.privileged.attribute.tolowercase[Role] = false
+com.sun.identity.agents.config.privileged.session.attribute[0] = 
+com.sun.identity.agents.config.privileged.attribute.mapping.enable = true
+com.sun.identity.agents.config.privileged.attribute.mapping[] =
+
+#
+# SSO TOKEN COOKIE NAME
+#   The name of the SSO Token cookie used between the OpenAM server and
+#   the Agent.
+# Hot-Swap Enabled: No
+com.iplanet.am.cookie.name=iPlanetDirectoryPro
+
+#
+# SESSION CLIENT PROPERTIES
+#   - com.iplanet.am.session.client.polling.enable: A flag that specifies if
+#     the session client must use polling for updating session information
+#     and not depend upon server notifications.
+#   - com.iplanet.am.session.client.polling.period: Specifies the time in 
+#     seconds after which the session client will request update of cached
+#     session information from the server.
+#
+#     Note: the notification url to be used by the Agent to receive session
+#     notifications is com.sun.identity.client.notification.url
+# Hot-Swap Enabled: No
+#
+com.iplanet.am.session.client.polling.enable=false
+com.iplanet.am.session.client.polling.period=180
+
+#
+# ENCRYPTION PROVIDER
+#   Specifies the encryption provider implementation to be used by the Agent.
+# Hot-Swap Enabled: No
+#
+com.iplanet.security.encryptor=com.iplanet.services.util.JCEEncryption
+ 
+#
+# USER DATA CACHE PROPERTIES
+#   - com.sun.identity.idm.remote.notification.enabled: A flag that is used to
+#     enable/disable the notifications for amsdk and IdRepo Caches. If set to
+#     true notifications are enabled and disabled if set to false.
+#   - com.iplanet.am.sdk.remote.pollingTime: Cache update time in minutes for
+#     user management data. If set to '0' no updates happen. This property
+#     takes effect only if no notification url is provided by
+#     'com.sun.identity.client.notification.url' or if notifications are
+#     disabled. (i.e., com.sun.identity.idm.remote.notification.enabled=false)
+# Hot-Swap Enabled: No
+#
+com.sun.identity.idm.remote.notification.enabled=true
+com.iplanet.am.sdk.remote.pollingTime=1
+
+#
+# SERVICE DATA CACHE PROPERTIES
+#   - com.sun.identity.sm.notification.enabled: A flag that is used to
+#     enable/disable the notifications for service management caches. If set to
+#     true notifications are enabled and disabled if set to false.
+#   - com.sun.identity.sm.cacheTime: Cache update time in minutes for service
+#     configuration data. If set to '0' no updates happen. This property
+#     takes effect only if no notification url is provided by
+#     'com.sun.identity.client.notification.url' or if notifications are
+#      disabled. (i.e., com.sun.identity.sm.notification.enabled=false).
+# Hot-Swap Enabled: No
+#
+com.sun.identity.sm.notification.enabled=true
+com.sun.identity.sm.cacheTime=1
+
+#
+# AUTHENTICATION SERVICE PROPERTIES
+#  Server protocol, host and port to be used by Authentication Service.
+# Hot-Swap Enabled: No
+#
+com.iplanet.am.server.protocol=@AM_SERVICES_PROTO@
+com.iplanet.am.server.host=@AM_SERVICES_HOST@
+com.iplanet.am.server.port=@AM_SERVICES_PORT@
+
+#
+# POLICY CLIENT PROPERTIES
+#   - com.sun.identity.agents.notification.enabled: A flag that specifies 
+#     if notifications are enabled or disabled for remote policy client.
+#   - com.sun.identity.agents.polling.interval: The duration in minutes 
+#     after which the cached entries are refreshed by remote policy client.
+#   - com.sun.identity.policy.client.cacheMode: The mode of caching to be
+#     used by remote policy client. Valid value is one of: subtree, self.
+#     Cache mode subtree is recommended for a small number of policy rules
+#     In all other cases, cacheMode self is recommended.
+#   - com.sun.identity.policy.client.booleanActionValues :  boolean action 
+#     values for policy action names. 
+#     format : serviceName|actionName|trueValue|falseValue
+#   - com.sun.identity.policy.client.resourceComparators: Resource Comparators 
+#     to be used for different service names. 
+#   - com.sun.identity.policy.client.clockSkew: Specifies time in seconds
+#     which is allowed to accommodate the time difference between the 
+#     OpenAM server machine and the remote policy client machine.
+#
+#     Note: the Notification URL for remote policy client is set by the 
+#     property com.sun.identity.client.notification.url.
+# Hot-Swap Enabled: No
+#
+com.sun.identity.agents.notification.enabled=true
+com.sun.identity.agents.polling.interval=3
+com.sun.identity.policy.client.cacheMode=subtree
+com.sun.identity.policy.client.booleanActionValues=iPlanetAMWebAgentService|GET|allow|deny:iPlanetAMWebAgentService|POST|allow|deny
+com.sun.identity.policy.client.resourceComparators=serviceType=iPlanetAMWebAgentService|class=com.sun.identity.policy.plugins.HttpURLResourceName|wildcard=*|delimiter=/|caseSensitive=false
+com.sun.identity.policy.client.clockSkew=10
+
+#
+# URL POLICY ENVIRONMENT VARIABLE PROPERTIES
+#    - com.sun.identity.agents.config.policy.env.get.param: A list of HTTP GET
+#      request parameters whose names and values will be set in the environment
+#      map for URL policy evaluation at AM server. The key in the map is in the
+#      format of GET.<parameter-name>, the map value is a set of string values
+#      of the parameter.
+#    - com.sun.identity.agents.config.policy.env.post.param: A list of HTTP POST
+#      request parameters whose names and values will be set in the environment
+#      map for URL policy evaluation at AM server. The key in the map is in the
+#      format of POST.<parameter-name>, the map value is a set of string values
+#      of the parameter.
+#    - com.sun.identity.agents.config.policy.env.jsession.param: A list of
+#      HTTP SESSION attributes whose names and values will be set in the
+#      environment map for URL policy evaluation at AM server. The key in the
+#      map is in the format of JSESSION.<parameter-name>, the map value is a
+#      set that contains the string value of the parameter.
+# Hot-Swap Enabled: Yes
+#
+# Examples:
+#   com.sun.identity.agents.config.policy.env.get.param[0]=name
+#   com.sun.identity.agents.config.policy.env.get.param[1]=phonenumber
+#   com.sun.identity.agents.config.policy.env.jsession.param[0]=cardnumber
+#   Assuming HTTP GET request parameters "name" and "phonenumber" have their
+#   values as "bob" and "1-800-123-4567" respectively. There is a HTTP Session
+#   attribute "cardnumber" with its value as "12345678".
+#   In the map, the following will be set:
+#     GET.name => [bob]
+#     GET.phonenumber => [1-800-123-4567]
+#     JSESSION.cardnumber => [12345678]
+#
+com.sun.identity.agents.config.policy.env.get.param[0]=
+com.sun.identity.agents.config.policy.env.post.param[0]=
+com.sun.identity.agents.config.policy.env.jsession.param[0]=
+
+# AGENT NOTIFICATION URL PROPERTY
+#  -com.sun.identity.client.notification.url: URL for agent to receive
+#   notifications from the OpenAM server for session, policy, and
+#   configuration changes.
+# Hot-Swap Enabled: No
+#
+com.sun.identity.client.notification.url=@AGENT_PREF_PROTO@://@AGENT_HOST@:@AGENT_PREF_PORT@@AGENT_APP_URI@/notification
+
+#
+# DEBUG SERVICE PROPERTY
+#   - com.iplanet.services.debug.level: Specifies the debug level to be used.
+#     The value is one of: off, error, warning, message.
+# Hot-Swap Enabled: Yes
+#
+com.iplanet.services.debug.level=@DEBUG_LEVEL@
+
+#
+# IGNORE REQUEST URL PATH INFO
+#  The path info will be stripped from the request URL while doing Not Enforced
+#  List check and url policy evaluation if the value is set to true.
+#
+# Hot-Swap Enabled: Yes
+#
+com.sun.identity.agents.config.ignore.path.info = false
+

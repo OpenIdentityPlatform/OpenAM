@@ -1,0 +1,637 @@
+    <test name="CLI_crlide-ROOTREALMCOT1">
+        <parameter name="testName" value="cot-test1"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.cli.COTTests"/>
+        </classes>
+    </test>
+    <test name="CLI_crlide-rootrealmcot2">
+        <parameter name="testName" value="cot-test2"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.cli.COTTests"/>
+        </classes>
+    </test>
+    <test name="CLI_crlide-RootRealmCOT3">
+        <parameter name="testName" value="cot-test3"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.cli.COTTests"/>
+        </classes>
+    </test>
+    <test name="CLI_crlide-RootRealmCOT4-alreadyexist">
+        <parameter name="testName" value="cot-test4"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.cli.COTTests"/>
+        </classes>
+    </test>
+    <test name="CLI_crlide-ROOTREALMCOT5-longoption">
+        <parameter name="testName" value="cot-test5"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.cli.COTTests"/>
+        </classes>
+    </test>
+    <test name="CLI_crlide-rootrealmcot6-longoption">
+        <parameter name="testName" value="cot-test6"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.cli.COTTests"/>
+        </classes>
+    </test>
+    <test name="CLI_crlide-RootRealmCOT7-longoption">
+        <parameter name="testName" value="cot-test7"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.cli.COTTests"/>
+        </classes>
+    </test>
+    <test name="CLI_crlide-RootRealmCOT8-alreadyexist-longoption">
+        <parameter name="testName" value="cot-test8"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.cli.COTTests"/>
+        </classes>
+    </test>
+    <test name="CLI_crlide-subRealmCOT1">
+        <parameter name="testName" value="cot-test9"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.cli.COTTests"/>
+        </classes>
+    </test>
+    <test name="CLI_crlide-subRealmCOT2-longoption">
+        <parameter name="testName" value="cot-test10"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.cli.COTTests"/>
+        </classes>
+    </test>
+    <test name="CLI_crlide-subRealmCOT3-alreadyexist">
+        <parameter name="testName" value="cot-test11"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.cli.COTTests"/>
+        </classes>
+    </test>
+    <test name="CLI_crlide-subRealmCOT4-alreadyexist-longoption">
+        <parameter name="testName" value="cot-test12"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.cli.COTTests"/>
+        </classes>
+    </test>
+    <test name="CLI_crlide-RootRealmCOT9-Prefix">
+        <parameter name="testName" value="cot-test13"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.cli.COTTests"/>
+        </classes>
+    </test>
+    <test name="CLI_crlide-RootRealmCOT10-Prefix-alreadyexist">
+        <parameter name="testName" value="cot-test14"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.cli.COTTests"/>
+        </classes>
+    </test>
+    <test name="CLI_crlide-RootRealmCOT11-Prefix-longoption">
+        <parameter name="testName" value="cot-test15"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.cli.COTTests"/>
+        </classes>
+    </test>
+    <test name="CLI_crlide-RootRealmCOT12-Prefix-alreadyexist-longoption">
+        <parameter name="testName" value="cot-test16"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.cli.COTTests"/>
+        </classes>
+    </test>
+    <test name="CLI_crlide-subRealmCOT5-Prefix">
+        <parameter name="testName" value="cot-test17"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.cli.COTTests"/>
+        </classes>
+    </test>
+    <test name="CLI_crlide-subRealmCOT6-Prefix-alreadyexist">
+        <parameter name="testName" value="cot-test18"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.cli.COTTests"/>
+        </classes>
+    </test>
+    <test name="CLI_crlide-subRealmCOT7-Prefix-longoption">
+        <parameter name="testName" value="cot-test19"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.cli.COTTests"/>
+        </classes>
+    </test>
+    <test name="CLI_crlide-subRealmCOT8-Prefix-alreadyexist-longoption">
+        <parameter name="testName" value="cot-test20"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.cli.COTTests"/>
+        </classes>
+    </test>
+    <test name="CLI_crlide-RootRealmCOT13-Prefix-VerboseDebug">
+        <parameter name="testName" value="cot-test21"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.cli.COTTests"/>
+        </classes>
+    </test>
+    <test name="CLI_crlide-RootRealmCOT14-Prefix-alreadyexist-VerboseDebug">
+        <parameter name="testName" value="cot-test22"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.cli.COTTests"/>
+        </classes>
+    </test>
+    <test name="CLI_crlide-RootRealmCOT15-Prefix-longoption-VerboseDebug">
+        <parameter name="testName" value="cot-test23"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.cli.COTTests"/>
+        </classes>
+    </test>
+    <test name="CLI_crlide-RootRealmCOT16-Prefix-alreadyexist-longoption-VerboseDebug">
+        <parameter name="testName" value="cot-test24"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.cli.COTTests"/>
+        </classes>
+    </test>
+    <test name="CLI_crlide-subRealmCOT9-Prefix-VerboseDebug">
+        <parameter name="testName" value="cot-test25"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.cli.COTTests"/>
+        </classes>
+    </test>
+    <test name="CLI_crlide-subRealmCOT10-Prefix-alreadyexist-VerboseDebug">
+        <parameter name="testName" value="cot-test26"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.cli.COTTests"/>
+        </classes>
+    </test>
+    <test name="CLI_crlide-subRealmCOT11-Prefix-longoption-VerboseDebug">
+        <parameter name="testName" value="cot-test27"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.cli.COTTests"/>
+        </classes>
+    </test>
+    <test name="CLI_crlide-subRealmCOT12-Prefix-alreadyexist-longoption-VerboseDebug">
+        <parameter name="testName" value="cot-test28"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.cli.COTTests"/>
+        </classes>
+    </test>
+    <test name="CLI_lide-nonexistingCOT">
+        <parameter name="testName" value="cot-test29"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.cli.COTTests">
+                <methods>
+                    <include name="testLists"/>
+                    <include name="testDelete"/>
+                </methods>
+            </class>
+        </classes>
+    </test>
+    <test name="CLI_lide-nonexistingCOT-longoption">
+        <parameter name="testName" value="cot-test30"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.cli.COTTests">
+                <methods>
+                    <include name="testLists"/>
+                    <include name="testDelete"/>
+                </methods>
+            </class>
+        </classes>
+    </test>
+    <test name="CLI_lide-nonexistingCOT-VerboseDebug">
+        <parameter name="testName" value="cot-test31"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.cli.COTTests">
+                <methods>
+                    <include name="testLists"/>
+                    <include name="testDelete"/>
+                </methods>
+            </class>
+        </classes>
+    </test>
+    <test name="CLI_lide-nonexistingCOT-longoption-VerboseDebug">
+        <parameter name="testName" value="cot-test32"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.cli.COTTests">
+                <methods>
+                    <include name="testLists"/>
+                    <include name="testDelete"/>
+                </methods>
+            </class>
+        </classes>
+    </test>
+    <test name="CLI_crlide-RootRealmCOT16$">
+        <parameter name="testName" value="cot-test33"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.cli.COTTests"/>
+        </classes>
+    </test>
+    <test name="CLI_crlide-RootRealmCOT17$-longoption">
+        <parameter name="testName" value="cot-test34"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.cli.COTTests"/>
+        </classes>
+    </test>
+    <test name="CLI_crlide-RootRealmCOT18$-VerboseDebug">
+        <parameter name="testName" value="cot-test35"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.cli.COTTests"/>
+        </classes>
+    </test>
+    <test name="CLI_crlide-RootRealmCOT19$-longoption-VerboseDebug">
+        <parameter name="testName" value="cot-test36"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.cli.COTTests"/>
+        </classes>
+    </test>
+    <test name="CLI_crlide-subRealmCOT13$">
+        <parameter name="testName" value="cot-test37"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.cli.COTTests"/>
+        </classes>
+    </test>
+    <test name="CLI_crlide-subRealmCOT14$-longoption">
+        <parameter name="testName" value="cot-test38"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.cli.COTTests"/>
+        </classes>
+    </test>
+    <test name="CLI_crlide-subRealmCOT15$-VerboseDebug">
+        <parameter name="testName" value="cot-test39"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.cli.COTTests"/>
+        </classes>
+    </test>
+    <test name="CLI_crlide-subRealmCOT16$-longoption-VerboseDebug">
+        <parameter name="testName" value="cot-test40"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.cli.COTTests"/>
+        </classes>
+    </test>
+    <test name="CLI_crlide-RootRealmCOT20$$">
+        <parameter name="testName" value="cot-test41"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>            
+            <class name="com.sun.identity.qatest.cli.COTTests"/>
+        </classes>
+    </test>
+    <test name="CLI_crlide-RootRealmCOT21$$-longoption">
+        <parameter name="testName" value="cot-test42"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.cli.COTTests"/>
+        </classes>
+    </test>
+    <test name="CLI_crlide-RootRealmCOT22$$-VerboseDebug">
+        <parameter name="testName" value="cot-test43"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.cli.COTTests"/>
+        </classes>
+    </test>
+    <test name="CLI_crlide-RootRealmCOT23$$-longoption-VerboseDebug">
+        <parameter name="testName" value="cot-test44"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.cli.COTTests"/>
+        </classes>
+    </test>
+    <test name="CLI_crlide-subRealmCOT17$$">
+        <parameter name="testName" value="cot-test45"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.cli.COTTests"/>
+        </classes>
+    </test>
+    <test name="CLI_crlide-subRealmCOT18$$-longoption">
+        <parameter name="testName" value="cot-test46"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.cli.COTTests"/>
+        </classes>
+    </test>
+    <test name="CLI_crlide-subRealmCOT19$$-VerboseDebug">
+        <parameter name="testName" value="cot-test47"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.cli.COTTests"/>
+        </classes>
+    </test>
+    <test name="CLI_crlide-subRealmCOT20$$-longoption-VerboseDebug">
+        <parameter name="testName" value="cot-test48"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.cli.COTTests"/>
+        </classes>
+    </test>
+    <test name="CLI_crlide-RootRealmCOT24-SpecCharacters">
+        <parameter name="testName" value="cot-test49"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.cli.COTTests"/>
+        </classes>
+    </test>
+    <test name="CLI_crlide-RootRealmCOT25-SpecCharacters-longoption">
+        <parameter name="testName" value="cot-test50"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.cli.COTTests"/>
+        </classes>
+    </test>
+    <test name="CLI_crlide-RootRealmCOT26-SpecCharacters-VerboseDebug">
+        <parameter name="testName" value="cot-test51"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.cli.COTTests"/>
+        </classes>
+    </test>
+    <test name="CLI_crlide-RootRealmCOT27-SpecCharacters-longoption-VerboseDebug">
+        <parameter name="testName" value="cot-test52"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.cli.COTTests"/>
+        </classes>
+    </test>
+    <test name="CLI_crlide-subRealmCOT21-SpecCharacters">
+        <parameter name="testName" value="cot-test53"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.cli.COTTests"/>
+        </classes>
+    </test>
+    <test name="CLI_crlide-subRealmCOT22-SpecCharacters-longoption">
+        <parameter name="testName" value="cot-test54"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.cli.COTTests"/>
+        </classes>
+    </test>
+    <test name="CLI_crlide-subRealmCOT23-SpecCharacters-VerboseDebug">
+        <parameter name="testName" value="cot-test55"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.cli.COTTests"/>
+        </classes>
+    </test>
+    <test name="CLI_crlide-subRealmCOT24-SpecCharacters-longoption-VerboseDebug">
+        <parameter name="testName" value="cot-test56"/>
+        <groups>
+            <run>
+                <include name="@mode@"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.qatest.cli.COTTests"/>
+        </classes>
+    </test>
+    

@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration
+    xmlns="http://java.sun.com/xml/ns/jax-rpc/ri/config">
+        <wsdl location="[PROTOCOL]://[HOST]:[PORT]/[DEPLOY_URI]/identityservices/IdentityServices?WSDL" packageName="com.sun.identity.qatest.idsvcs" />
+</configuration>

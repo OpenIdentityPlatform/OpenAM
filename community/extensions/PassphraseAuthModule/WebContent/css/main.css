@@ -1,0 +1,306 @@
+/*
+ * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
+ *
+ * Copyright © 2012 ForgeRock Inc. All rights reserved.
+ *
+ * The contents of this file are subject to the terms
+ * of the Common Development and Distribution License
+ * (the License). You may not use this file except in
+ * compliance with the License.
+ *
+ * You can obtain a copy of the License at
+ * http://forgerock.org/license/CDDLv1.0.html
+ * See the License for the specific language governing
+ * permission and limitations under the License.
+ *
+ * When distributing Covered Code, include this CDDL
+ * Header Notice in each file and include the License file
+ * at http://forgerock.org/license/CDDLv1.0.html
+ * If applicable, add the following below the CDDL Header,
+ * with the fields enclosed by brackets [] replaced by
+ * your own identifying information:
+ * "Portions Copyrighted [2012] [Forgerock AS]"
+ */
+
+* {margin:0;padding:0}
+/* mac hide \*/
+html,body {
+	height: 100%;
+	width: 100%;
+}
+/* end hide */
+BODY
+{
+	/* #019bdb to #25548c */
+	background: #25548c url(../images/background.jpg) no-repeat scroll top center; /* Fallback */
+	background: -webkit-radial-gradient(50% 400px, circle, #019bdb 1px, #25548c 825px); /* Webkit */
+	background: -moz-radial-gradient(50% 400px, circle, #019bdb 1px, #25548c 825px); /* Mozilla */
+	background: -o-radial-gradient(50% 400px, circle, #019bdb 1px, #25548c 825px); /* Opera (12+) */
+	background: radial-gradient(50% 400px, circle, #019bdb 1px, #25548c 825px); /* Full spec (nothing at present */
+	color: #FFF;
+
+	margin: 0;
+	font-family: arial, sans-serif, verdana, tahoma !Important;
+	font-size: 80% !Important;
+	line-height: 1.3 !Important;
+	min-width: 973px !Important;
+}
+
+/****Footer CSS for all the page except Login and password, passphrase Reset pages *****/
+#footer
+{
+	clear: both;
+	margin-top: 13px;
+	background: transparent url(../images/bottom-shadow-narrow.png) no-repeat scroll top center;
+	height: 40px;
+	color: #FFF;
+	font-size: 90%;
+	padding-top: 20px;
+}
+
+/*** Login page Footer css ****/
+#loginfooter
+{
+	clear: both;
+	margin-top: 13px;
+	background: transparent url(../images/bottom-shadow-narrow.png) no-repeat scroll top center;
+	height: 40px;
+	color: #FFF;
+	font-size: 90%;
+	padding-top: 20px;
+}
+
+/*** Password Reset page Footer css ****/
+#footerPR
+{
+	clear: both;
+	margin-top: 13px;
+	background: transparent url(../images/bottom-shadow-narrow.png) no-repeat scroll top center;
+	height: 40px;
+	color: #FFF;
+	font-size: 90%;
+	padding-top: 20px;
+}
+
+#footer IMG
+{
+	display: none;
+}
+IMG
+{
+	border: none;
+}
+INPUT
+{
+	border: none;
+	height: 20px;
+}
+INPUT:focus {
+	outline: none;
+}
+INPUT.submit, INPUT[type=submit]
+{
+	background-image: url(../images/button-background.gif);
+	width: 5.5em;
+	font-weight: bold;
+	font-size: 90%;
+	text-shadow: -1px 1px 1px #FFF;
+}
+INPUT.center {
+	text-align: center;
+}
+INPUT.single {
+	margin: 0 1em;
+	width: 4em;
+}
+INPUT.single.first {
+	margin-left: 0;
+}
+INPUT.single.last {
+	margin-right: 2em;
+}
+BODY { 
+	text-align: center;
+	/* for good browsers */
+	min-height: 150px;
+	min-width: 552px;
+}
+#outer{
+	height: 100%;
+	width: 100%;
+	display: table;
+	vertical-align: middle;
+}
+#container {
+	text-align: center;
+	position: relative;
+	vertical-align: middle;
+	display: table-cell;
+	height: 120px;
+} 
+
+/*** Inner content CSS ****/
+#inner {
+	width: 552px;
+	height: 120px;
+	text-align: left;
+	margin-left: auto;
+	margin-right: auto;
+}
+
+/*** Inner content CSS for PasswordReset.jsp page ****/
+#innerPR {
+	width: 552px;	
+	text-align: left;
+	margin-left: auto;
+	margin-right: auto;
+}
+
+/*** Inner content CSS for PassphraseReset.jsp page ****/
+#innerPAR {
+	width: 552px;	
+	text-align: left;
+	margin-left: auto;
+	margin-right: auto;
+}
+
+/*** Inner content CSS for Login page ****/
+#logininner {
+	width: 582px;	
+	text-align: left;
+	margin-left: auto;
+	margin-right: auto;
+}
+
+#inner P {
+	color: #FFF;
+	text-shadow: -1px 1px 1px #444;
+}
+FORM {
+	margin-top: 10px;
+}
+
+
+#footer {
+	background-image: url(../images/bottom-shadow-narrow.png);
+}
+
+/*** Footer CSS for Login page ****/
+#loginfooter {
+	background-image: url(../images/bottom-shadow-narrow.png);
+}
+
+#logo {
+	float: left;
+	margin-top: 8px;
+}
+.indented {
+	margin-left: 180px;
+}
+
+HR.clear {
+	clear: left;
+	margin: 16px 0;
+}
+HR.loginclear {
+	clear: left;
+	margin: 16px 0;
+}
+
+/**** Intended Hyper Link CSS *****/
+.indented a:link{
+	color: #FFF !important;	
+	font-family: arial, sans-serif, verdana, tahoma !important;
+	font-size: 100% !important;
+}
+
+/**** Intended CSS for Login.jsp page username Input field *****/
+.indented1 {
+	margin-left:30px;
+	margin-top:10px;
+}
+
+/**** Intended CSS for Login.jsp page password Input field *****/
+.indented2 {
+	margin-left:5px;	
+}
+
+/**** Intended CSS for Login.jsp page submit button *****/
+.indented3 {
+	margin-left:5px;	
+}
+
+/**** Intended CSS for Login.jsp page ForgotUsername and ForgotPassword  *****/
+.indented4 {
+	margin-left: 30px;
+}
+
+/**** Intended CSS for PasswordReset.jsp page username Input field *****/
+.indentedPR1 {
+	margin-left: 30px;
+    margin-top: 15px;
+    width: 130px;
+}
+
+/**** Intended CSS for PasswordReset.jsp page password Input field *****/
+.indentedPR2 {		
+	margin-left: 315px !important;
+    margin-top: -20px;
+    width: 130px;
+}
+
+/**** Intended CSS for PasswordReset.jsp page submit button *****/
+.indentedPR3 {
+	margin-left: 450px !important;
+    margin-top: -20px;	
+}
+
+/**** Intended CSS for PasswordReset.jsp page ForgotUsername and ForgotPassword  *****/
+.indentedPR4 {	
+	margin-left: 30px;
+}
+
+/**** Intended CSS for PassphraseReset.jsp page username Input field *****/
+.indentedPAR1 {
+	margin-left: 30px;    
+    width: 130px;
+}
+
+/**** Intended CSS for PassphraseReset.jsp page password Input field *****/
+.indentedPAR2 {		
+	margin-left: 315px !important;
+    margin-top: -20px;
+    width: 130px;
+}
+
+/**** Intended CSS for PassphraseReset.jsp page submit button *****/
+.indentedPAR3 {
+	margin-left: 300px !important;
+    margin-top: -20px;	
+}
+
+/**** Intended CSS for PassphraseReset.jsp page ForgotUsername and ForgotPassword  *****/
+.indentedPAR4 {	
+	margin-left: 30px;
+}
+
+/**** Intended CSS for Login.jsp page ForgotUsername and ForgotPassword field *****/
+.loginindented4 {
+	margin-left: 30px;
+}
+
+/**** Intended CSS for Login.jsp page ForgotUsername and ForgotPassword Anchor Link *****/
+.indented4 a:link{
+	color: #FFF !important;	
+	font-family: arial, sans-serif, verdana, tahoma !important;	
+}
+
+/**** Intended CSS for Login.jsp page ForgotUsername and ForgotPassword Anchor Link *****/
+.loginindented4 a:link{
+	color: #FFF !important;	
+	font-family: arial, sans-serif, verdana, tahoma !important;	
+}
+
+DIV {
+	font-family: arial, sans-serif, verdana, tahoma !Important;		
+}

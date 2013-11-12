@@ -1,0 +1,13 @@
+<html>
+   <head>
+      <title>Composite Advice</title>
+   </head>
+
+   <body onLoad="document.composite_advice_form.submit()">
+      <form name="composite_advice_form" action="am.filter.advice.action" method="POST">
+         <input type="hidden" name="am.filter.advice.name" value="am.filter.advice.value"/>
+      </form>
+   </body>
+</html>
+
+

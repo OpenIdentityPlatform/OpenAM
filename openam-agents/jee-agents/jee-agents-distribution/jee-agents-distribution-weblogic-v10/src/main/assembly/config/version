@@ -1,0 +1,6 @@
+--------------------------------------------------------------------------
+OpenAM Policy Agent for:
+BEA WebLogic(TM) Server/Portal 10
+--------------------------------------------------------------------------
+Version: ${project.version}
+Build Date: ${build.timestamp}

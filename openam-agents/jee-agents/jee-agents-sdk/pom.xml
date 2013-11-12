@@ -1,0 +1,110 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ *
+ * Copyright 2013 ForgeRock AS.
+ *
+ * The contents of this file are subject to the terms of the Common Development and
+ * Distribution License (the License). You may not use this file except in compliance with the
+ * License.
+ *
+ * You can obtain a copy of the License at legal/CDDLv1.0.txt. See the License for the
+ * specific language governing permission and limitations under the License.
+ *
+ * When distributing Covered Software, include this CDDL Header Notice in each file and include
+ * the License file at legal/CDDLv1.0.txt. If applicable, add the following below the CDDL
+ * Header, with the fields enclosed by brackets [] replaced by your own identifying
+ * information: "Portions copyright [year] [name of copyright owner]".
+ *
+-->
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <!-- Parent Project -->
+    <parent>
+        <groupId>org.forgerock.openam.agents</groupId>
+        <artifactId>jee-agents</artifactId>
+        <version>3.3.0</version>
+    </parent>
+
+    <!-- Component Definition -->
+    <name>OpenAM JavaEE Policy Agents AgentSDK</name>
+    <description>OpenAM JavaEE Policy Agents AgentSDK</description>
+    <artifactId>jee-agents-sdk</artifactId>
+    <packaging>jar</packaging>
+    <properties>
+        <version.template.file>src/main/java/org/forgerock/openam/util/Version.java.template</version.template.file>
+        <version.file>src/main/java/org/forgerock/openam/util/Version.java</version.file>
+        <jee-agents.properties>../jee-agents.properties</jee-agents.properties>
+    </properties>
+
+    <!-- Build -->
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>com.google.code.maven-replacer-plugin</groupId>
+                <artifactId>maven-replacer-plugin</artifactId>
+                <version>1.4.0</version>
+                <executions>
+                    <execution>
+                        <phase>process-sources</phase>
+                        <goals>
+                            <goal>replace</goal>
+                        </goals>
+                    </execution>
+                </executions>
+                <configuration>
+                    <file>${version.template.file}</file>
+                    <outputFile>${version.file}</outputFile>
+                    <replacements>
+                        <replacement>
+                            <token>@BUILD_REVISION@</token>
+                            <value>${svn-revision.revision}</value>
+                        </replacement>
+                        <replacement>
+                            <token>@BUILD_DATE@</token>
+                            <value>${maven.build.timestamp}</value>
+                        </replacement>
+                        <replacement>
+                            <token>@BUILD_VERSION@</token>
+                            <value>${project.version}</value>
+                        </replacement>
+                        <replacement>
+                            <token>@BUILD_MACHINE@</token>
+                            <value>${jee-agents.build.machine}</value>
+                        </replacement>
+                    </replacements>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-jar-plugin</artifactId>
+                <configuration>
+                    <archive>
+                        <index>true</index>
+                        <manifest>
+                            <addClasspath>false</addClasspath>
+                        </manifest>
+                        <manifestEntries>
+                            <Specification-Title>OpenAM JavaEE Policy Agents AgentSDK</Specification-Title>
+                            <Specification-Version>${project.version} - ${maven.build.timestamp}</Specification-Version>
+                            <Specification-Vendor>ForgeRock</Specification-Vendor>
+                            <Implementation-Title>OpenAM JavaEE Policy Agents AgentSDK</Implementation-Title>
+                            <Implementation-Version>${project.version} - ${maven.build.timestamp}
+                            </Implementation-Version>
+                            <Implementation-Vendor>ForgeRock</Implementation-Vendor>
+                            <Built-By>${user.name}</Built-By>
+                            <Build-Jdk>${java.version}</Build-Jdk>
+                            <Build-Time>${maven.build.timestamp}</Build-Time>
+                            <Version>${project.version}</Version>
+                            <Create-On>${maven.build.timestamp}</Create-On>
+                            <SVN-Revision>${svn-revision.revision}</SVN-Revision>
+                            <!-- TODO Add License to Manifest -->
+                            <License/>
+                        </manifestEntries>
+                    </archive>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
+</project>

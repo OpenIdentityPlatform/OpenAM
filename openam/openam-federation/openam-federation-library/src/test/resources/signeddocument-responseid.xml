@@ -1,0 +1,42 @@
+<DocumentToSign ResponseID="signme">
+    <SubElement>
+    </SubElement>
+<ds:Signature xmlns:ds="http://www.w3.org/2000/09/xmldsig#">
+<ds:SignedInfo>
+<ds:CanonicalizationMethod Algorithm="http://www.w3.org/2001/10/xml-exc-c14n#"/>
+<ds:SignatureMethod Algorithm="http://www.w3.org/2000/09/xmldsig#rsa-sha1"/>
+<ds:Reference URI="#signme">
+<ds:Transforms>
+<ds:Transform Algorithm="http://www.w3.org/2000/09/xmldsig#enveloped-signature"/>
+<ds:Transform Algorithm="http://www.w3.org/2001/10/xml-exc-c14n#"/>
+</ds:Transforms>
+<ds:DigestMethod Algorithm="http://www.w3.org/2000/09/xmldsig#sha1"/>
+<ds:DigestValue>M0vnYQPaGQhAS+c44wFdrU/SuaM=</ds:DigestValue>
+</ds:Reference>
+</ds:SignedInfo>
+<ds:SignatureValue>
+CI7nyP+zIQGkWbPJWfoeHOsGtzyDQ03VTVOkbXeM6Zdd4LSq3PErwLmv3zszUdPf5PMUaxEGguJP
+3Typkeb/X+P+el6535Z/8qeGRdxTxhmnVSutANe0zjKjizuMXEX2gGglnoCuiy7Rdu3uB9lte9Wz
+/GsDhG3XUc9E82ulfKJzidAOis9R5Mt+hTAZjapyPz8jLSitR9rYJI162+8vATAHTnj8Yc4tbkx+
+gmb1JSjaNhN4jG0dfOd846mw0HULlYdgmYoCtxpm5XuKwHPVNd6rAFpMv1kx+bcfWVoTKNEgwx1E
+VzhlHqn9cRhK3VdkAX0lk2Ft/oxWmJQcQM6EjA==
+</ds:SignatureValue>
+<ds:KeyInfo>
+<ds:X509Data>
+<ds:X509Certificate>
+MIICpjCCAY6gAwIBAgIEUYrX0DANBgkqhkiG9w0BAQIFADAVMRMwEQYDVQQDDApkZWZhdWx0a2V5
+MB4XDTEzMDUwODIyNTYxMloXDTQzMDUwODIyNTYxMlowFTETMBEGA1UEAwwKZGVmYXVsdGtleTCC
+ASIwDQYJKoZIhvcNAQEBBQADggEPADCCAQoCggEBAJHzhGGL5JqZyMMuh09HJCWU4uNbOb10icw4
+VuqgpHBc3A8v4sFOmiEQIf+CxWpPXhY+8THf+HWsXlrQ/UDUAQMOYQ998Mw1Er1fKrBosa0n0FRJ
++y8VVFc+uViykbGeLTjxkFJinLuQ1yBWuW+XCHXKP5HgFo9YnhPr/DZ/dF3wFRMQKzmJhp2j18VD
+x20MNSWMyfL2hZRg1HnCES8ar/P4Qu7m2qn2YRLFdGMqs6OUrjbhLSgFX6sbmvbFVuNcmndQECoY
+KLxJFcvW5fD430NbMsXeOXNqfGnTXE8Z5CGZNQxPe0KUtvQNSvb+hozj6AFeP/iOO1PZwD3h7wGY
+1t0CAwEAATANBgkqhkiG9w0BAQIFAAOCAQEAg5ZyHyNFH6KIbSLRx67sHYS+rWCXoJogXFI7NyBx
+ynZijN8tLjmZcQQPp94z9vSyx9U90EwfRtVMl632aD1ntc1LBMUKdZoz6hBubKrr7gB38aBh+VMY
+iQ6c9BfbD6XqxMS9Vv3w58Mfpgi9Cqr3P6AXJz490LA6t+etgmzqOz3V6piiFwysaAeYQ3GQTaAI
+mmsyj6++AlcJXHsOMc63oaKnziG3al/gfheUtp/KG0GT8X9UZdRNsWrfcpopp7+wHTaTO6U863FJ
+WuNuk5ljTo5xk+DQQQfKmnGUO3y6Sb0IE7sgZn6/TvnoF4Es+xb8V6bL9q24lkm4mCdp3m7PhA==
+</ds:X509Certificate>
+</ds:X509Data>
+</ds:KeyInfo>
+</ds:Signature></DocumentToSign>

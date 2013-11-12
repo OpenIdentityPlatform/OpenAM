@@ -1,0 +1,345 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  ! CCPL HEADER START
+  !
+  ! This work is licensed under the Creative Commons
+  ! Attribution-NonCommercial-NoDerivs 3.0 Unported License.
+  ! To view a copy of this license, visit
+  ! http://creativecommons.org/licenses/by-nc-nd/3.0/
+  ! or send a letter to Creative Commons, 444 Castro Street,
+  ! Suite 900, Mountain View, California, 94041, USA.
+  !
+  ! You can also obtain a copy of the license at
+  ! src/main/resources/legal-notices/CC-BY-NC-ND.txt.
+  ! See the License for the specific language governing permissions
+  ! and limitations under the License.
+  !
+  ! If applicable, add the following below this CCPL HEADER, with the fields
+  ! enclosed by brackets "[]" replaced with your own identifying information:
+  !      Portions Copyright [yyyy] [name of copyright owner]
+  !
+  ! CCPL HEADER END
+  !
+  !      Copyright 2011-2013 ForgeRock AS
+  !    
+-->
+<chapter xml:id='chap-compatibility'
+ xmlns='http://docbook.org/ns/docbook' version='5.0' xml:lang='en'
+ xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance'
+ xsi:schemaLocation='http://docbook.org/ns/docbook http://docbook.org/xml/5.0/xsd/docbook.xsd'
+ xmlns:xlink='http://www.w3.org/1999/xlink'
+ xmlns:xinclude='http://www.w3.org/2001/XInclude'>
+ <title>OpenAM Changes &amp; Deprecated Functionality</title>
+
+ <para>This chapter covers both major changes to existing functionality, and
+ also deprecated and removed functionality.</para>
+
+ <section xml:id="changes">
+  <title>Important Changes to Existing Functionality</title>
+
+  <itemizedlist>
+
+   <!-- OPENAM-2051: Document the OpenAM suffix configuration changes -->
+   <listitem>
+    <para>When you create a new OpenAM custom configuration that uses an
+    external LDAP directory server for the configuration data store, you must
+    use a root suffix DN with at least two domain components, such as
+    <literal>dc=example,dc=com</literal>.</para>
+   </listitem>
+
+     <listitem>
+      <para>The advanced server property used to set the HTTP header name,
+      <literal>com.sun.identity.authentication.client.ipAddressHeader</literal>,
+      has replaced the legacy OpenSSO property
+      <literal>com.sun.identity.session.httpClientIPHeader</literal> (<link
+      xlink:href="https://bugster.forgerock.org/jira/browse/OPENAM-1879"
+      xlink:show="new">OPENAM-1879</link>).</para>
+     </listitem>
+
+   <listitem>
+    <para>Legacy naming conventions have been changed to conform to the
+    current product name, OpenAM.</para>
+
+    <para><filename>$HOME/.openamcfg/</filename> is the new name for
+    <filename>$HOME/.openssocfg/</filename>. If you upgrade, OpenAM still
+    supports use of <filename>$HOME/.openssocfg/</filename>, and does not
+    rename the folder. For new OpenAM installs, OpenAM creates the directory
+    with the new name, <filename>$HOME/.openamcfg/</filename>, at configuration
+    time.</para>
+
+    <para>Other files, such as the <filename>openam.war</filename> file, and
+    paths have been modified to ensure consistency with the naming
+    conventions.</para>
+   </listitem>
+
+   <listitem>
+    <para>OpenAM now ships with multiple .war files. You no longer have to
+    build custom .war files for core server-only or distributed authentication
+    UI installations for example.</para>
+   </listitem>
+
+<!-- Fix for OpenAM-699
+   <listitem>
+    <para>RSA has marked the RSA Authentication API used in earlier versions of
+    OpenAM as End of Life. The current API version used in OpenAM is now 8.1.
+    As a result, OpenAM now supports RSA Authentication Manager versions 6.1.2
+    and 7.1.</para>
+   </listitem>
+ -->
+
+   <listitem>
+    <para>In versions before OpenAM 10.1.0 the default root suffix DN for OpenAM
+    configuration and profile data was <literal>dc=opensso,dc=java,dc=net</literal>.
+    The default root suffix is now <literal><?eval ${defaultRootSuffix}?></literal>.</para>
+   </listitem>
+
+   <listitem>
+    <itemizedlist>
+     <para>The fix for <link xlink:show="new"
+     xlink:href="https://bugster.forgerock.org/jira/browse/OPENAM-1630"
+     >OPENAM-1630</link> changes SAML metadata signing in OpenAM to better
+     conform with the SAML 2.0 standard.</para>
+
+     <listitem>
+      <para>Metadata for hosted entities is signed using the
+      <literal>metadataSigningKey</literal> configured for the realm, or
+      inherited from the global configuration for the server.</para>
+     </listitem>
+
+     <listitem>
+      <para>OpenAM now signs the <literal>EntityDescriptor</literal> element
+      that contains child <literal>SPSSODescriptor</literal> or
+      <literal>IDPSSODescriptor</literal> elements.</para>
+     </listitem>
+
+     <listitem>
+      <para>When importing remote entity metadata with signatures, OpenAM does
+      not modify the signatures, but instead returns them as they were when they
+      were imported.</para>
+     </listitem>
+
+     <listitem>
+      <para>When OpenAM imports remote entity metadata that has no signature and
+      signed metadata is requested on export, OpenAM signs the metadata with
+      the <literal>metadataSigningKey</literal>.</para>
+     </listitem>
+    </itemizedlist>
+   </listitem>
+
+   <listitem>
+    <para>The default policy evaluation mode for new policy agent profiles is
+    now self rather than subtree, in order to better scale for large numbers of
+    policy rules.</para>
+
+    <para>Upgrade does not change existing policy agent profile configurations,
+    however. If you want to adopt the new default setting for existing policy
+    agents, you must change the setting manually.</para>
+
+    <para>To do so for Java EE policy agents, set
+    <literal>com.sun.identity.policy.client.cacheMode=self</literal>.</para>
+
+    <para>For web policy agents, set
+    <literal>com.sun.identity.agents.config.fetch.from.root.resource=false</literal>.</para>
+   </listitem>
+
+   <listitem>
+    <para>
+     You now specify rules for referrals in the same way as rules for policies.
+    </para>
+
+    <para>
+     For example, with previous releases a referral rule for
+     <literal>http://example.com/</literal> matched everything underneath.
+     Now you would need three rules, <literal>http://example.com/</literal>,
+     <literal>http://example.com/*</literal>,
+     and <literal>http://example.com/*?*</literal>.
+
+     When used at the end of a rule
+     <literal>*</literal> matches one or more characters,
+     rather than zero or more characters.
+    </para>
+
+    <para>
+     When you upgrade OpenAM, the upgrade tool converts existing referral rules.
+    </para>
+   </listitem>
+  </itemizedlist>
+ </section>
+
+ <section xml:id="deprecated">
+  <title>Deprecated Functionality</title>
+  
+  <para>The following functionality is deprecated in OpenAM
+  <?eval ${serverDocTargetVersion}?>, and is likely to be removed in a future
+  release.</para>
+
+  <itemizedlist>
+
+   <listitem>
+    <para>With the implementation of OAuth 2.0 in this release, OAuth 1.0 has been 
+    deprecated. OAuth 1.0 support was originally provided in OpenAM 9.</para>
+   </listitem>
+
+   <listitem>
+    <para>The Netscape LDAP API is to be removed from OpenAM, with OpenAM
+    using the OpenDJ LDAP SDK instead. This affects all classes in
+    <literal>com.sun.identity.shared.ldap.*</literal> packages.</para>
+   </listitem>
+
+   <listitem>
+    <para>OpenAM currently uses Sun Java System Application Framework (JATO).
+    JATO is deprecated and is likely to be replaced in a future release.</para>
+   </listitem>
+
+   <listitem>
+    <para>Older REST services relying on the following end points are
+    deprecated.</para>
+
+    <simplelist type="vert" columns="2">
+     <member>/identity/attributes</member>
+     <member>/identity/authenticate</member>
+     <!-- Pending replacement <member>/identity/authorize</member> -->
+     <member>/identity/create</member>
+     <member>/identity/delete</member>
+     <!-- Pending replacement <member>/identity/isTokenValid</member>
+     <member>/identity/log</member> -->
+     <member>/identity/logout</member>
+     <member>/identity/read</member>
+     <member>/identity/search</member>
+     <member>/identity/update</member>
+     <!-- Pending replacement <member>/ws/1/entitlement/decision</member>
+     <member>/ws/1/entitlement/decisions</member>
+     <member>/ws/1/entitlement/entitlement</member> -->
+    </simplelist>
+
+    <para>The following table shows how legacy and newer end points
+    correspond.</para>
+
+    <table>
+     <title>REST End Points</title>
+
+     <tgroup cols="2">
+      <colspec colnum="1" colwidth="1*"/>
+      <colspec colnum="2" colwidth="1*"/>
+
+      <thead>
+       <row>
+        <entry><link xlink:show="new" xlink:href="admin-guide#interface-stability"
+        xlink:role="http://docbook.org/xlink/role/olink">Deprecated</link> URIs</entry>
+        <entry>Newer <link xlink:show="new" xlink:href="admin-guide#interface-stability"
+        xlink:role="http://docbook.org/xlink/role/olink">Evolving</link> URIs</entry>
+       </row>
+      </thead>
+
+      <tbody>
+       <row>
+        <entry>/identity/attributes</entry>
+        <entry>/json/users</entry>
+       </row>
+
+       <row>
+        <entry>/identity/authenticate</entry>
+        <entry>/json/authenticate</entry>
+       </row>
+
+       <!--
+       <row>
+        <entry>/identity/authorize</entry>
+        <entry>Pending replacement</entry>
+       </row>
+       -->
+
+       <row>
+        <entry>/identity/create, /identity/delete, /identity/read,
+        /identity/search, /identity/update</entry>
+        <entry>/json/agents, /json/groups, /json/realms, /json/users</entry>
+       </row>
+
+       <!--
+       <row>
+        <entry>/identity/isTokenValid</entry>
+        <entry>Pending replacement</entry>
+       </row>
+       -->
+
+       <!--
+       <row>
+        <entry>/identity/log</entry>
+        <entry>Pending replacement</entry>
+       </row>
+       -->
+
+       <row>
+        <entry>/identity/logout</entry>
+        <entry>/json/sessions/?_action=logout</entry>
+       </row>
+
+       <!--
+       <row>
+        <entry>/ws/1/entitlement/decision, /ws/1/entitlement/decisions,
+        /ws/1/entitlement/entitlement</entry>
+        <entry>Pending replacement</entry>
+       </row>
+       -->
+
+       <row>
+        <entry>N/A</entry>
+        <entry>/json/dashboard</entry>
+       </row>
+
+       <row>
+        <entry>N/A</entry>
+        <entry>/json/serverinfo</entry>
+       </row>
+      </tbody>
+     </tgroup>
+    </table>
+
+    <para>Find examples in the <citetitle>Developer Guide</citetitle> chapter on <link
+    xlink:href="dev-guide#chap-rest" xlink:role="http://docbook.org/xlink/role/olink"
+    xlink:show="new"><citetitle>Using RESTful Web Services</citetitle></link> in
+    OpenAM.</para>
+
+    <para>Support for the older REST services is likely to be removed in a
+    future release in favor of the newer REST services. Older REST services
+    will be removed only after replacement REST services are introduced.</para>
+   </listitem>
+  </itemizedlist>
+ </section>
+
+ <section xml:id="removed">
+  <title>Removed Functionality</title>
+
+  <itemizedlist>
+   <listitem>
+    <para>OpenAM Java SDK no longer supports JDK 5.</para>
+   </listitem>
+
+   <listitem>
+    <para>The <literal>iplanet-am-auth-ldap-server-check</literal> property for
+    LDAP and Active Directory authentication modules has been removed and
+    replaced with a heartbeat mechanism configurable through the LDAP Connection
+    Heartbeat Interval (<literal>openam-auth-ldap-heartbeat-interval</literal>)
+    and LDAP Connection Heartbeat Time Unit
+    (<literal>openam-auth-ldap-heartbeat-interval</literal>) properties for the
+    modules.</para>
+
+    <para>Set these new properties as necessary when you have firewalls or
+    load balancers that drop connections that remain idle for too long.</para>
+   </listitem>
+
+   <listitem>
+    <para>The advanced server property,
+    <literal>openam.session.destroy_all_sessions</literal>, has been replaced
+    by the built-in Global Session Service setting,
+    <literal>DESTROY_OLD_SESSIONS</literal>.</para>
+   </listitem>
+
+   <listitem>
+    <para>Javadoc for the client SDK is no longer delivered with the
+    distribution, but instead is <link xlink:show="new"
+    xlink:href="${javadocBase}">available online</link>.</para>
+   </listitem>
+  </itemizedlist>
+ </section>
+</chapter>

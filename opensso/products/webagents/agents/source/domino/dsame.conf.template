@@ -1,0 +1,2 @@
+Agent_Config_File=@AGENTCONFIG@
+Agent_Bootstrap_File=@AGENTBOOTSTRAP@

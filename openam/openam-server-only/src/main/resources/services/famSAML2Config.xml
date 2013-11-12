@@ -1,0 +1,180 @@
+<?xml version='1.0' encoding="ISO-8859-1"?>
+                                                                                
+<!--
+   DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
+  
+   Copyright (c) 2007 Sun Microsystems Inc. All Rights Reserved
+  
+   The contents of this file are subject to the terms
+   of the Common Development and Distribution License
+   (the License). You may not use this file except in
+   compliance with the License.
+                                                                                
+   You can obtain a copy of the License at
+   https://opensso.dev.java.net/public/CDDLv1.0.html or
+   opensso/legal/CDDLv1.0.txt
+   See the License for the specific language governing
+   permission and limitations under the License.
+                                                                                
+   When distributing Covered Code, include this CDDL
+   Header Notice in each file and include the License file
+   at opensso/legal/CDDLv1.0.txt.
+   If applicable, add the following below the CDDL Header,
+   with the fields enclosed by brackets [] replaced by
+   your own identifying information:
+   "Portions Copyrighted [year] [name of copyright owner]"
+                                                                                
+   $Id: famSAML2Config.xml,v 1.8 2009/06/12 22:21:43 mallas Exp $
+                                                                                
+-->
+<!--
+   Portions Copyrighted 2013 ForgeRock Inc
+-->
+
+<!DOCTYPE ServicesConfiguration 
+    PUBLIC "=//iPlanet//Service Management Services (SMS) 1.0 DTD//EN" 
+    "jar://com/sun/identity/sm/sms.dtd"> 
+
+<ServicesConfiguration> 
+    <Service name="sunFAMSAML2Configuration" version="1.0"> 
+        <Schema 
+            serviceHierarchy="/DSAMEConfig/sunFAMSAML2Configuration"
+            i18nFileName="famSAML2Configuration" 
+            revisionNumber="20"
+            i18nKey="sunFAMSAML2Configuration">
+
+            <Global> 
+                <AttributeSchema name="CacheCleanupInterval"
+                    type="single" 
+                    syntax="number" 
+                    i18nKey="a100">
+                    <DefaultValues>
+                        <Value>600</Value>
+                    </DefaultValues>
+                </AttributeSchema>
+                <AttributeSchema name="NameIDInfoAttribute" 
+                    type="single" 
+                    syntax="string" 
+                    i18nKey="a101">
+                    <DefaultValues>
+                        <Value>sun-fm-saml2-nameid-info</Value>
+                    </DefaultValues>
+                </AttributeSchema>
+                <AttributeSchema name="NameIDInfoKeyAttribute" 
+                    type="single" 
+                    syntax="string" 
+                    i18nKey="a102">
+                    <DefaultValues>
+                        <Value>sun-fm-saml2-nameid-infokey</Value>
+                    </DefaultValues>
+                </AttributeSchema>
+                <AttributeSchema name="IDPDiscoveryCookieDomain"
+                    type="single" 
+                    syntax="string" 
+                    i18nKey="a103">
+                    <DefaultValues>
+                        <Value>@COOKIE_DOMAIN@</Value>
+                    </DefaultValues>
+                </AttributeSchema>
+                <AttributeSchema name="IDPDiscoveryCookieType"
+                    type="single_choice" 
+                    syntax="string" 
+                    i18nKey="a104">
+                    <ChoiceValues>
+                        <ChoiceValue i18nKey="PERSISTENT">PERSISTENT</ChoiceValue>
+                        <ChoiceValue i18nKey="SESSION">SESSION</ChoiceValue>
+                    </ChoiceValues>
+                    <DefaultValues>
+                        <Value>PERSISTENT</Value>
+                    </DefaultValues>
+                </AttributeSchema>
+                <AttributeSchema name="IDPDiscoveryURLScheme"
+                    type="single_choice" 
+                    syntax="string" 
+                    i18nKey="a105">
+                    <ChoiceValues>
+                        <ChoiceValue i18nKey="http">http</ChoiceValue>
+                        <ChoiceValue i18nKey="https">https</ChoiceValue>
+                    </ChoiceValues>
+                    <DefaultValues>
+                        <Value>https</Value>
+                    </DefaultValues>
+                </AttributeSchema>
+                <AttributeSchema name="XMLEncryptionClass" 
+                    type="single" 
+                    syntax="string" 
+                    i18nKey="a106">
+                    <DefaultValues>
+                        <Value>com.sun.identity.saml2.xmlenc.FMEncProvider</Value>
+                    </DefaultValues>
+                </AttributeSchema>
+                <AttributeSchema name="EncryptedKeyInKeyInfo" 
+                    type="single" 
+                    syntax="boolean" 
+                    i18nKey="a107">
+                    <DefaultValues>
+                        <Value>true</Value>
+                    </DefaultValues>
+                </AttributeSchema>
+                <AttributeSchema name="XMLSigningClass" 
+                    type="single" 
+                    syntax="string" 
+                    i18nKey="a108">
+                    <DefaultValues>
+                        <Value>com.sun.identity.saml2.xmlsig.FMSigProvider</Value>
+                    </DefaultValues>
+                </AttributeSchema>
+                <AttributeSchema name="SigningCertValidation" 
+                    type="single" 
+                    syntax="boolean" 
+                    i18nKey="a109">
+                    <DefaultValues>
+                        <Value>false</Value>
+                    </DefaultValues>
+                </AttributeSchema>
+                <AttributeSchema name="CACertValidation" 
+                    type="single" 
+                    syntax="boolean" 
+                    i18nKey="a110">
+                    <DefaultValues>
+                        <Value>false</Value>
+                    </DefaultValues>
+                </AttributeSchema>     
+                <AttributeSchema name="failOverEnabled" 
+                    type="single" 
+                    syntax="boolean" 
+                    i18nKey="a111">
+                    <DefaultValues>
+                        <Value>false</Value>
+                    </DefaultValues>
+                </AttributeSchema>    
+                <AttributeSchema name="bufferLength" 
+                    type="single" 
+                    syntax="number" 
+                    i18nKey="a112">
+                    <DefaultValues>
+                        <Value>2048</Value>
+                    </DefaultValues>
+                </AttributeSchema>              
+            </Global> 
+            <Organization>
+                <AttributeSchema name="metadataSigningKey"
+                    type="single"
+                    syntax="string"
+                    i18nKey="a113">
+                    <DefaultValues>
+                        <Value>test</Value>
+                    </DefaultValues>
+                </AttributeSchema>
+                <AttributeSchema name="metadataSigningKeyPass"
+                    type="single"
+                    syntax="password"
+                    i18nKey="a114">
+                    <DefaultValues>
+                        <Value>changeit</Value>
+                    </DefaultValues>
+                </AttributeSchema>
+            </Organization>
+        </Schema> 
+    </Service> 
+</ServicesConfiguration> 

@@ -1,0 +1,162 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ *
+ * Copyright 2013 ForgeRock AS.
+ *
+ * The contents of this file are subject to the terms of the Common Development and
+ * Distribution License (the License). You may not use this file except in compliance with the
+ * License.
+ *
+ * You can obtain a copy of the License at legal/CDDLv1.0.txt. See the License for the
+ * specific language governing permission and limitations under the License.
+ *
+ * When distributing Covered Software, include this CDDL Header Notice in each file and include
+ * the License file at legal/CDDLv1.0.txt. If applicable, add the following below the CDDL
+ * Header, with the fields enclosed by brackets [] replaced by your own identifying
+ * information: "Portions copyright [year] [name of copyright owner]".
+ *
+-->
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <!-- Parent Project -->
+    <parent>
+        <groupId>org.forgerock.openam.agents</groupId>
+        <artifactId>openam-agents</artifactId>
+        <version>3.3.0</version>
+    </parent>
+
+    <!-- Component Definition -->
+    <name>OpenAM JavaEE Policy Agents</name>
+    <description>OpenAM JavaEE Policy Agents</description>
+    <artifactId>jee-agents</artifactId>
+    <packaging>pom</packaging>
+    <properties>
+        <jee-agents.properties>jee-agents.properties</jee-agents.properties>
+        <openam.version>11.0.0</openam.version>
+    </properties>
+
+    <profiles>
+        <profile>
+            <id>binary-licensing</id>
+            <build>
+                <plugins>
+                    <plugin>
+                        <artifactId>maven-scm-plugin</artifactId>
+                        <inherited>false</inherited>
+                        <executions>
+                            <execution>
+                                <id>Grab binary license</id>
+                                <phase>validate</phase>
+                                <goals>
+                                    <goal>checkout</goal>
+                                </goals>
+                                <configuration>
+                                    <connectionUrl>scm:svn:https://svn.forgerock.org/internal/trunk/QA/OpenDJ/builds/b2.6/license/</connectionUrl>
+                                    <checkoutDirectory>${project.build.directory}/legal-notices</checkoutDirectory>
+                                </configuration>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+    </profiles>
+
+    <modules>
+        <!-- OpenAM JavaEE Policy Agent Modules -->
+        <module>jee-agents-sdk</module>
+        <module>jee-agents-agentapp</module>
+        <module>jee-agents-tomcat</module>
+        <module>jee-agents-jboss</module>
+        <module>jee-agents-jetty</module>
+        <module>jee-agents-appserver</module>
+        <module>jee-agents-weblogic</module>
+        <module>jee-agents-websphere</module>
+        <module>jee-agents-jsr196</module>
+        <module>jee-agents-sampleapp</module>
+        <module>jee-agents-distribution</module>
+    </modules>
+
+    <build>
+        <plugins>
+            <!-- Inject Specified Build Properties-->
+             <plugin>
+                 <groupId>org.codehaus.mojo</groupId>
+                 <artifactId>properties-maven-plugin</artifactId>
+                 <version>1.0-alpha-2</version>
+                 <inherited>true</inherited>
+                 <executions>
+                     <execution>
+                         <phase>initialize</phase>
+                         <goals>
+                             <goal>read-project-properties</goal>
+                         </goals>
+                         <configuration>
+                             <files>
+                                 <file>${jee-agents.properties}</file>
+                             </files>
+                         </configuration>
+                     </execution>
+                 </executions>
+             </plugin>
+        </plugins>
+        <pluginManagement>
+            <plugins>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-ear-plugin</artifactId>
+                    <version>2.8</version>
+                </plugin>
+            </plugins>
+        </pluginManagement>
+    </build>
+
+     <dependencies>
+         <!-- External dependencies -->
+         <dependency>
+             <groupId>javax.servlet</groupId>
+             <artifactId>servlet-api</artifactId>
+             <version>2.5</version>
+             <scope>provided</scope>
+         </dependency>
+         <dependency>
+             <groupId>javax.servlet.jsp</groupId>
+             <artifactId>jsp-api</artifactId>
+             <version>2.1</version>
+             <scope>provided</scope>
+         </dependency>
+         <dependency>
+             <groupId>javaee</groupId>
+             <artifactId>javaee-api</artifactId>
+             <version>5</version>
+             <scope>provided</scope>
+         </dependency>
+         <dependency>
+         	<groupId>commons-io</groupId>
+         	<artifactId>commons-io</artifactId>
+         	<version>1.4</version>
+            <scope>provided</scope>
+         </dependency>
+         <!-- OpenAM project dependencies -->
+         <dependency>
+             <groupId>org.forgerock.openam</groupId>
+             <artifactId>openam-clientsdk</artifactId>
+             <version>${openam.version}</version>
+             <scope>provided</scope>
+         </dependency>
+         <dependency>
+             <groupId>org.forgerock.openam</groupId>
+             <artifactId>openam-installtools</artifactId>
+             <version>${openam.version}</version>
+             <scope>provided</scope>
+         </dependency>
+         <dependency>
+             <groupId>org.forgerock.openam</groupId>
+             <artifactId>openam-installtools-launcher</artifactId>
+             <version>${openam.version}</version>
+             <scope>provided</scope>
+         </dependency>
+     </dependencies>
+</project>
+

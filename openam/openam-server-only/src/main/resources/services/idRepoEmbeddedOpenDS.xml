@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<!--
+   DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
+  
+   Copyright (c) 2008 Sun Microsystems Inc. All Rights Reserved
+  
+   The contents of this file are subject to the terms
+   of the Common Development and Distribution License
+   (the License). You may not use this file except in
+   compliance with the License.
+  
+   You can obtain a copy of the License at
+   https://opensso.dev.java.net/public/CDDLv1.0.html or
+   opensso/legal/CDDLv1.0.txt
+   See the License for the specific language governing
+   permission and limitations under the License.
+  
+   When distributing Covered Code, include this CDDL
+   Header Notice in each file and include the License file
+   at opensso/legal/CDDLv1.0.txt.
+   If applicable, add the following below the CDDL Header,
+   with the fields enclosed by brackets [] replaced by
+   your own identifying information:
+   "Portions Copyrighted [year] [name of copyright owner]"
+  
+   $Id: idRepoEmbeddedOpenDS.xml,v 1.12 2009/12/24 03:55:03 qcheng Exp $
+  
+-->
+
+<!DOCTYPE ServicesConfiguration
+    PUBLIC "=//iplanet//Service Management Services (SMS) 1.0 DTD//EN"
+    "jar://com/sun/identity/sm/sms.dtd">
+
+<ServicesConfiguration>
+  <Service name="sunIdentityRepositoryService" version="1.0">
+    <Configuration>
+      <OrganizationConfiguration name="@UM_CONFIG_ROOT_SUFFIX@">
+        <SubConfiguration name="embedded" id="LDAPv3ForOpenDS">
+          <AttributeValuePair>
+            <Attribute name="sun-idrepo-ldapv3-config-ldap-server"/>
+            <Value>@UM_DIRECTORY_SERVER@:@UM_DIRECTORY_PORT@</Value>
+          </AttributeValuePair>
+          <AttributeValuePair>
+            <Attribute name="sun-idrepo-ldapv3-config-authid"/>
+            <Value>@UM_DS_DIRMGRDN@</Value>
+          </AttributeValuePair>
+          <AttributeValuePair>
+            <Attribute name="sun-idrepo-ldapv3-config-authpw"/>
+            <Value>@UM_DS_DIRMGRPASSWD@</Value>
+          </AttributeValuePair>
+          <AttributeValuePair>
+            <Attribute name="sun-idrepo-ldapv3-config-organization_name"/>
+            <Value>@UM_CONFIG_ROOT_SUFFIX@</Value>
+          </AttributeValuePair>
+          <AttributeValuePair>
+             <Attribute name="sun-idrepo-ldapv3-config-psearchbase"/>
+             <Value>@UM_CONFIG_ROOT_SUFFIX@</Value>
+          </AttributeValuePair>
+          <AttributeValuePair>
+             <Attribute name="sun-idrepo-ldapv3-config-psearch-filter"/>
+             <Value>(&amp;(objectclass=*)(!(ou:dn:=services))(!(ou:dn:=tokens)))</Value>
+          </AttributeValuePair>
+        </SubConfiguration>
+      </OrganizationConfiguration>
+    </Configuration>
+  </Service>
+</ServicesConfiguration>

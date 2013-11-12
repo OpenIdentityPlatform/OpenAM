@@ -1,0 +1,39 @@
+<h1>{{t "templates.user.ChangeSecurityDataDialogTemplate.securityDataChange"}}</h1>
+<form id="passwordChange" action="" class="form large center no-margin" method="post" onsubmit="return false">
+    <fieldset>
+            <div class="field">
+                <label>{{t "common.user.oldPassword"}}</label> 
+                <input type="password" name="oldPassword" value=""  data-validator="required"/>
+                <span class="error">x</span>
+            </div>
+            <p>{{t "templates.user.ChangeSecurityDataDialogTemplate.enterNewPasswordToChange"}}</p>
+            <div class="group-field" style="height: 100px;">
+                <div class="group-field">
+                    <div class="group-field-inputs">
+                        <div class="field">
+                            <label>{{t "common.user.newPassword"}}</label> 
+                            <input type="password" name="password" value=""  data-validator="minLength" minLength="8"  data-validator-event="keyup change"/>
+                            <span class="error">x</span>
+                        </div>
+
+                        <div class="field">
+                            <label>{{t "common.user.confirmPassword"}}</label> 
+                            <input type="password" name="passwordConfirm" value="" data-validator="passwordConfirm" data-validator-event="keyup change" />
+                            <span class="error">x</span>
+                        </div>                        
+                    </div>
+                    <div class="group-field-errors validationRules" data-for-validator="password passwordConfirm">
+                        <div class="field-rule">
+                            <span class="error">x</span> 
+                            <span data-for-validator="minLength">At least 8 characters</span>
+                        </div> 
+                        <div class="field-rule">
+                            <span class="error">x</span> 
+                            <span data-for-validator="passwordConfirm">{{t "common.form.validation.confirmationMatchesPassword"}}</span>
+                        </div> 
+                    </div>
+                </div>
+                <div class="clear"></div>
+            </div>
+    </fieldset>
+</form>            

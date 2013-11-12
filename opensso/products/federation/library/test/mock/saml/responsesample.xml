@@ -1,0 +1,62 @@
+<!--
+   DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
+  
+   Copyright (c) 2006 Sun Microsystems Inc. All Rights Reserved
+  
+   The contents of this file are subject to the terms
+   of the Common Development and Distribution License
+   (the License). You may not use this file except in
+   compliance with the License.
+                                                                                
+   You can obtain a copy of the License at
+   https://opensso.dev.java.net/public/CDDLv1.0.html or
+   opensso/legal/CDDLv1.0.txt
+   See the License for the specific language governing
+   permission and limitations under the License.
+                                                                                
+   When distributing Covered Code, include this CDDL
+   Header Notice in each file and include the License file
+   at opensso/legal/CDDLv1.0.txt.
+   If applicable, add the following below the CDDL Header,
+   with the fields enclosed by brackets [] replaced by
+   your own identifying information:
+   "Portions Copyrighted [year] [name of copyright owner]"
+                                                                                
+   $Id: responsesample.xml,v 1.2 2008/06/25 05:48:21 qcheng Exp $
+                                                                                
+-->
+
+<samlp:Response
+xmlns="urn:oasis:names:tc:SAML:1.0:protocol"
+
+xmlns:ds="http://www.w3.org/2000/09/xmldsig#"
+
+xmlns:saml="urn:oasis:names:tc:SAML:1.0:assertion"
+
+xmlns:samlp="http://www.w3.org/2001/XMLSchema-instance"
+
+samlp:schemaLocation='urn:oasis:names:tc:SAML:1.0:protocol file:schema/cs-sstc-schema-protocol-00.xsd'
+
+ResponseID="toSM-54321" InResponseTo="toDSAME-54321" MajorVersion="1"
+MinorVersion="0" IssueInstant="2001-11-05T17:23:00-02:00">
+    <Status>
+	<StatusCode Value="samlp:Sender">
+	    <StatusCode Value="subvalue">
+		<StatusCode Value="subsubvalue" />
+	    </StatusCode>
+	</StatusCode>
+	<StatusMessage>
+	    Message1
+	</StatusMessage>
+	<StatusDetail>
+	    <AssertionArtifact>ksfjeioj</AssertionArtifact>
+	</StatusDetail>
+    </Status>
+    <saml:Assertion MajorVersion="1" MinorVersion="0" AssertionID="random-182726" Issuer="neuhome.red.iplanet.com" IssueInstant="2001-11-05T17:23:00-02:00" xmlns:saml="urn:oasis:names:tc:SAML:1.0:assertion">
+	<saml:AuthenticationStatement AuthenticationMethod="ldap" AuthenticationInstant="2001-11-05T17:22:00-02:00">
+	    <saml:Subject>
+		<saml:NameIdentifier NameQualifier="sun.com">Emily Xu</saml:NameIdentifier>
+	    </saml:Subject>
+	</saml:AuthenticationStatement>
+    </saml:Assertion>
+</samlp:Response>

@@ -1,0 +1,317 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<web-app version="2.4" xmlns="http://java.sun.com/xml/ns/j2ee" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://java.sun.com/xml/ns/j2ee http://java.sun.com/xml/ns/j2ee/web-app_2_4.xsd">
+<display-name>OpenSSO Services</display-name>
+<distributable/>
+
+    <!-- context param -->
+
+    <filter>
+        <filter-name>amSetupFilter</filter-name>
+        <filter-class>com.sun.identity.setup.AMSetupFilter</filter-class>
+    </filter>
+    <filter>
+        <filter-name>ResponseValidationFilter</filter-name>
+        <filter-class>org.forgerock.openam.validation.ResponseValidationFilter</filter-class>
+    </filter>
+    <filter>
+        <filter-name>AuthNFilter</filter-name>
+        <filter-class>com.sun.identity.rest.AuthNFilter</filter-class>
+    </filter>
+    <filter>
+        <filter-name>AuthZFilter</filter-name>
+        <filter-class>com.sun.identity.rest.AuthZFilter</filter-class>
+    </filter>
+
+
+    <!-- filter declaration -->
+
+    <filter-mapping>
+        <filter-name>amSetupFilter</filter-name>
+        <url-pattern>/*</url-pattern>
+    </filter-mapping>
+    <filter-mapping>
+        <filter-name>ResponseValidationFilter</filter-name>
+        <url-pattern>/*</url-pattern>
+    </filter-mapping>
+    <filter-mapping>
+        <filter-name>AuthNFilter</filter-name>
+        <url-pattern>/ws/*</url-pattern>
+    </filter-mapping>
+    <filter-mapping>
+        <filter-name>AuthZFilter</filter-name>
+        <url-pattern>/ws/*</url-pattern>
+    </filter-mapping>
+    
+    <!-- filter mapping -->
+
+    <listener>
+        <listener-class>com.sun.identity.common.ShutdownServletContextListener</listener-class>
+    </listener>
+    <listener>
+        <listener-class>com.sun.identity.monitoring.AgentShutdownServletContextListener</listener-class>
+    </listener>
+    <listener>
+        <listener-class>com.sun.identity.authentication.service.AuthServletContextListener</listener-class>
+    </listener>
+
+    <!-- listener declaration -->
+
+    <servlet>
+        <servlet-name>LoginServlet</servlet-name>
+        <servlet-class>com.sun.identity.authentication.UI.LoginServlet</servlet-class>
+    </servlet>
+    <servlet>
+        <servlet-name>setSetupProgress</servlet-name>
+        <servlet-class>com.sun.identity.setup.SetSetupProgress</servlet-class>
+    </servlet>
+    <servlet>
+        <servlet-name>setUpgradeProgress</servlet-name>
+        <servlet-class>org.forgerock.openam.upgrade.SetUpgradeProgress</servlet-class>
+    </servlet>
+    <servlet>
+        <servlet-name>GatewayServlet</servlet-name>
+        <servlet-class>com.sun.identity.policy.util.Gateway</servlet-class>
+    </servlet>
+    <servlet>
+        <servlet-name>MonitoringConfiguration</servlet-name>
+        <servlet-class>com.sun.identity.common.MonitoringConfiguration</servlet-class>
+        <load-on-startup>20</load-on-startup>
+    </servlet>
+    <servlet>
+        <servlet-name>LoginLogoutMapping</servlet-name>
+        <servlet-class>com.sun.identity.authentication.UI.LoginLogoutMapping</servlet-class>
+        <load-on-startup>10</load-on-startup>
+    </servlet>
+    <servlet>
+        <servlet-name>AMSetupServlet</servlet-name>
+        <servlet-class>com.sun.identity.setup.AMSetupServlet</servlet-class>
+        <load-on-startup>5</load-on-startup>
+    </servlet>    
+    <servlet>
+        <description>GetHttpSession</description>
+        <servlet-name>GetHttpSession</servlet-name>
+        <servlet-class>com.iplanet.dpro.session.service.GetHttpSession</servlet-class>
+    </servlet>
+    <servlet>
+        <description>pllservice</description>
+        <servlet-name>pllservice</servlet-name>
+        <servlet-class>com.iplanet.services.comm.server.PLLRequestServlet</servlet-class>
+    </servlet>
+    <servlet>
+        <description>jaxrpc</description>
+        <servlet-name>jaxrpc</servlet-name>
+        <servlet-class>com.sun.xml.rpc.server.http.JAXRPCServlet</servlet-class>
+        </servlet>
+    <servlet>
+        <servlet-name>SMSServlet</servlet-name>
+        <servlet-class>com.sun.identity.sm.SMServlet</servlet-class>
+    </servlet>
+    <servlet>
+        <servlet-name>WebCLI</servlet-name>
+        <servlet-class>com.sun.identity.cli.WebCLI</servlet-class>
+    </servlet>
+    <servlet>
+        <servlet-name>PWResetServlet</servlet-name>
+        <servlet-class>com.sun.identity.password.ui.PWResetServlet</servlet-class>
+    </servlet>
+    <servlet>
+        <description>notificationservice</description>
+        <servlet-name>notificationservice</servlet-name>
+        <servlet-class>com.iplanet.services.comm.client.PLLNotificationServlet</servlet-class>
+    </servlet>
+    <servlet>
+        <description>Web Service Endpoint - Identity Services</description>
+        <display-name>IdentityServices</display-name>
+        <servlet-name>IdentityServices</servlet-name>
+        <servlet-class>com.sun.identity.idsvcs.IdentityServicesServlet</servlet-class>
+    </servlet>
+    <servlet>
+        <description>REST Endpoint - Identity Services</description>
+        <display-name>IdentityServicesHandler</display-name>
+        <servlet-name>IdentityServicesHandler</servlet-name>
+        <servlet-class>com.sun.identity.idsvcs.rest.IdentityServicesHandler</servlet-class>
+        <init-param>
+            <description>Default security provider</description>
+            <param-name>provider</param-name>
+            <param-value>com.sun.identity.idsvcs.opensso.IdentityServicesImpl</param-value>
+        </init-param>
+    </servlet>
+
+    <servlet>
+        <servlet-name>notificationservlet</servlet-name>
+        <servlet-class>com.sun.identity.entitlement.opensso.NotificationServlet</servlet-class>
+    </servlet>
+    <servlet>
+        <servlet-name>entitlementmonitor</servlet-name>
+        <servlet-class>com.sun.identity.entitlement.util.NetworkMonitor</servlet-class>
+    </servlet>
+    <servlet>
+        <servlet-name>ws</servlet-name>
+        <servlet-class>com.sun.jersey.spi.container.servlet.ServletContainer</servlet-class>
+        <init-param>
+            <param-name>javax.ws.rs.Application</param-name>
+            <param-value>com.sun.identity.rest.RestService</param-value>
+        </init-param>
+        <load-on-startup>1</load-on-startup>
+    </servlet>
+
+    <servlet>
+        <servlet-name>oauth</servlet-name>
+        <servlet-class>com.sun.jersey.spi.container.servlet.ServletContainer</servlet-class>
+        <init-param>
+            <param-name>javax.ws.rs.Application</param-name>
+            <param-value>com.sun.identity.oauth.service.RestService</param-value>
+        </init-param>
+        <load-on-startup>1</load-on-startup>
+    </servlet>
+
+    <!-- servlet declaration -->
+
+    <servlet-mapping>
+        <servlet-name>LoginLogoutMapping</servlet-name>
+        <url-pattern>/login</url-pattern>
+    </servlet-mapping>    
+    <servlet-mapping>
+        <servlet-name>LoginLogoutMapping</servlet-name>
+        <url-pattern>/logout</url-pattern>
+    </servlet-mapping>    
+    <servlet-mapping>
+        <servlet-name>LoginServlet</servlet-name>
+        <url-pattern>/UI/*</url-pattern>
+    </servlet-mapping>    
+    <servlet-mapping>
+        <servlet-name>AMSetupServlet</servlet-name>
+        <url-pattern>/config/configurator</url-pattern>
+    </servlet-mapping>      
+    <servlet-mapping>
+        <servlet-name>setSetupProgress</servlet-name>
+        <url-pattern>/setup/setSetupProgress</url-pattern>
+    </servlet-mapping>    
+    <servlet-mapping>
+        <servlet-name>setUpgradeProgress</servlet-name>
+        <url-pattern>/upgrade/setUpgradeProgress</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>PWResetServlet</servlet-name>
+        <url-pattern>/ui/*</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>GatewayServlet</servlet-name>
+        <url-pattern>/gateway</url-pattern>
+    </servlet-mapping>    
+    <servlet-mapping>
+        <servlet-name>GetHttpSession</servlet-name>
+        <url-pattern>/GetHttpSession</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>pllservice</servlet-name>
+        <url-pattern>/sessionservice</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>pllservice</servlet-name>
+        <url-pattern>/profileservice</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>pllservice</servlet-name>
+        <url-pattern>/policyservice</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>pllservice</servlet-name>
+        <url-pattern>/namingservice</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>pllservice</servlet-name>
+        <url-pattern>/loggingservice</url-pattern>
+    </servlet-mapping>
+        <servlet-mapping>
+        <servlet-name>pllservice</servlet-name>
+        <url-pattern>/authservice</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>jaxrpc</servlet-name>
+        <url-pattern>/jaxrpc/*</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>WebCLI</servlet-name>
+        <url-pattern>/webcli</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>SMSServlet</servlet-name>
+        <url-pattern>/SMSServlet</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>notificationservice</servlet-name>
+        <url-pattern>/notificationservice</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>IdentityServices</servlet-name>
+        <url-pattern>/identityservices/*</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>IdentityServicesHandler</servlet-name>
+        <url-pattern>/identity/*</url-pattern>
+    </servlet-mapping>
+
+    <servlet-mapping>
+        <servlet-name>notificationservlet</servlet-name>
+        <url-pattern>/notification/*</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>entitlementmonitor</servlet-name>
+        <url-pattern>/entitlementmonitor/*</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>ws</servlet-name>
+        <url-pattern>/ws/*</url-pattern>
+    </servlet-mapping>
+
+    <servlet-mapping>
+        <servlet-name>oauth</servlet-name>
+        <url-pattern>/resources/*</url-pattern>
+    </servlet-mapping>
+
+    <!-- servlet mapping -->
+
+    <mime-mapping>
+        <extension>ico</extension>
+        <mime-type>image/x-icon</mime-type>
+    </mime-mapping>
+    <!-- This tag is for the welcome files such as index.html -->
+    <welcome-file-list>
+        <welcome-file>
+            index.html
+        </welcome-file>
+    </welcome-file-list>
+
+    <!-- The taglib is only specified once -->
+    <jsp-config>
+        <taglib>
+            <taglib-uri>/WEB-INF/jato.tld</taglib-uri>
+            <taglib-location>/WEB-INF/jato.tld</taglib-location>
+        </taglib>
+        <taglib>
+            <taglib-uri>/WEB-INF/cc.tld</taglib-uri>
+            <taglib-location>/WEB-INF/com_sun_web_ui/cc.tld</taglib-location>
+        </taglib>
+
+        <!-- workarounds for lockart 2.x -->
+        <taglib>
+            <taglib-uri>/WEB-INF/tld/com_iplanet_jato/jato.tld</taglib-uri>
+            <taglib-location>/WEB-INF/jato.tld</taglib-location>
+        </taglib>
+        <taglib>
+            <taglib-uri>/WEB-INF/tld/com_sun_web_ui/cc.tld</taglib-uri>
+            <taglib-location>/WEB-INF/com_sun_web_ui/cc.tld</taglib-location>
+        </taglib>
+    <!-- taglib definition -->
+    </jsp-config>
+    <!-- comment it out due to issue 4891 in WAS/JBOSS/Geronimo
+    <resource-ref>
+        <description>mysql db idrepo</description>
+        <res-ref-name>jdbc/openssousersdb</res-ref-name>
+        <res-type>javax.sql.DataSource</res-type>
+        <res-auth>Container</res-auth>
+        <res-sharing-scope>Shareable</res-sharing-scope>
+    </resource-ref>
+    -->
+</web-app>

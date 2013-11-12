@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  ! CCPL HEADER START
+  !
+  ! This work is licensed under the Creative Commons
+  ! Attribution-NonCommercial-NoDerivs 3.0 Unported License.
+  ! To view a copy of this license, visit
+  ! http://creativecommons.org/licenses/by-nc-nd/3.0/
+  ! or send a letter to Creative Commons, 444 Castro Street,
+  ! Suite 900, Mountain View, California, 94041, USA.
+  !
+  ! You can also obtain a copy of the license at
+  ! src/main/resources/legal-notices/CC-BY-NC-ND.txt.
+  ! See the License for the specific language governing permissions
+  ! and limitations under the License.
+  !
+  ! If applicable, add the following below this CCPL HEADER, with the fields
+  ! enclosed by brackets "[]" replaced with your own identifying information:
+  !      Portions Copyright [yyyy] [name of copyright owner]
+  !
+  ! CCPL HEADER END
+  !
+  !      Copyright 2011-2013 ForgeRock AS
+  !    
+-->
+<chapter xml:id='chap-legacy-servers'
+ xmlns='http://docbook.org/ns/docbook'
+ version='5.0' xml:lang='en'
+ xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance'
+ xsi:schemaLocation='http://docbook.org/ns/docbook http://docbook.org/xml/5.0/xsd/docbook.xsd'
+ xmlns:xlink='http://www.w3.org/1999/xlink'>
+ <title>Migrating Legacy Servers</title>
+
+ <para>Rather than upgrade legacy servers (OpenAM 9.0, OpenSSO and Sun Access
+ Manager servers), you instead migrate from your existing deployment to a new
+ deployment.</para>
+ 
+ <para>For complex legacy deployments, ForgeRock can assist you in the
+ migration process. Send mail to <link xlink:href="mailto:info@forgerock.com"
+ >info@forgerock.com</link> for more information.</para>
+
+ <procedure xml:id="upgrade-legacy">
+  <title>To Upgrade A Legacy Deployment</title>
+
+  <step>
+   <para>Prepare your customized OpenAM server .war file.</para>
+  </step>
+
+  <step>
+   <para>Prepare a new deployment, installing servers from the new, customized
+   .war file as described in the <citetitle>Installation Guide</citetitle>,
+   starting with the instructions in <link xlink:show="new"
+   xlink:href="install-guide#chap-install-core"
+   xlink:role="http://docbook.org/xlink/role/olink"><citetitle>Installing OpenAM
+   Core Services</citetitle></link>.</para>
+  </step>
+
+  <step>
+   <para>After installation, configure the new servers in the same way as the
+   old servers, adapting as necessary.</para>
+
+   <para>You can use the <command>ssoadm do-batch</command> command to apply
+   multiple changes with one command.</para>
+  </step>
+
+  <step>
+   <para>Validate that the new service is performing as expected.</para>
+  </step>
+
+  <step>
+   <para>Redirect client application traffic from the old deployment to the new
+   deployment.</para>
+  </step>
+ </procedure>
+</chapter>

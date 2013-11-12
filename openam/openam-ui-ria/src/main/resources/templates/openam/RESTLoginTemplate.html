@@ -1,0 +1,22 @@
+<style>
+#header{
+    width: {{theme.settings.lessVars.login-container-width}};
+}
+</style>
+<div class="container-shadow" id="login-container">
+    <div class="column-layout" style="padding-top: 30px;">
+        <div>
+            <form action="" method="post" class="form">
+                <fieldset>
+    
+                    {{#each reqs.callbacks}}
+                    <div class="field {{#if isSubmit}}field-submit{{/if}}">
+                        {{callbackRender}}
+                    </div>
+                    {{/each}}
+    
+                </fieldset>
+            </form>
+        </div>
+    </div>
+</div>

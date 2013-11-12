@@ -1,0 +1,172 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+   DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
+  
+   Copyright (c) 2006 Sun Microsystems Inc. All Rights Reserved
+  
+   The contents of this file are subject to the terms
+   of the Common Development and Distribution License
+   (the License). You may not use this file except in
+   compliance with the License.
+
+   You can obtain a copy of the License at
+   https://opensso.dev.java.net/public/CDDLv1.0.html or
+   opensso/legal/CDDLv1.0.txt
+   See the License for the specific language governing
+   permission and limitations under the License.
+
+   When distributing Covered Code, include this CDDL
+   Header Notice in each file and include the License file
+   at opensso/legal/CDDLv1.0.txt.
+   If applicable, add the following below the CDDL Header,
+   with the fields enclosed by brackets [] replaced by
+   your own identifying information:
+   "Portions Copyrighted [year] [name of copyright owner]"
+
+   $Id: lib-arch-security-fmwk.xsd,v 1.2 2008/06/25 05:48:41 qcheng Exp $
+
+-->
+
+
+
+<xs:schema targetNamespace="urn:liberty:sec:2003-08"
+           xmlns:xenc="http://www.w3.org/2001/04/xmlenc#"
+           xmlns:saml="urn:oasis:names:tc:SAML:1.0:assertion"
+           xmlns:ac="urn:liberty:ac:2003-08"
+           xmlns:lib="urn:liberty:iff:2003-08"
+           xmlns:disco="urn:liberty:disco:2003-08"
+           xmlns:md="urn:liberty:metadata:2003-08"
+           xmlns:xs="http://www.w3.org/2001/XMLSchema"
+           xmlns:sec="urn:liberty:sec:2003-08"
+           xmlns:ds="http://www.w3.org/2000/09/xmldsig#"
+           elementFormDefault="qualified"
+           attributeFormDefault="unqualified">
+    <xs:import namespace="urn:oasis:names:tc:SAML:1.0:assertion"
+               schemaLocation="cs-sstc-schema-assertion-01.xsd"/>
+    <xs:import namespace="urn:liberty:iff:2003-08"
+               schemaLocation="lib-arch-protocols-schema.xsd"/>
+    <xs:import namespace="urn:liberty:disco:2003-08"
+               schemaLocation="lib-arch-disco-svc.xsd"/>
+    <xs:import namespace="urn:liberty:ac:2003-08"
+               schemaLocation="lib-arch-authentication-context.xsd"/>
+    <xs:import namespace="urn:liberty:metadata:2003-08"
+               schemaLocation="lib-arch-metadata.xsd"/>
+    <xs:import namespace="http://www.w3.org/2001/04/xmlenc#"
+               schemaLocation="xenc-schema.xsd"/>
+    <xs:import namespace="http://www.w3.org/2000/09/xmldsig#"
+               schemaLocation="xmldsig-core-schema.xsd"/>
+    <xs:annotation>
+        <xs:documentation>Liberty ID-WSF Security Mechanisms Specification XSD</xs:documentation>
+        <xs:documentation>
+The source code in this XSD file was excerpted verbatim from:
+
+Liberty ID-WSF Security Mechanisms Specification
+Version 1.0
+12th November 2003
+
+Copyright (c) 2003 Liberty Alliance participants, see
+http://www.projectliberty.org/specs/idwsf_copyrights.html
+
+        </xs:documentation>
+    </xs:annotation>
+
+    <xs:element name="MessageAuthentication" type="xs:QName"/>
+    <xs:element name="RequesterAuthorization" type="xs:QName"/>
+
+    <xs:element name="ValidityRestrictionCondition" type="sec:ValidityRestrictionConditionType"/>
+    <xs:complexType name="ValidityRestrictionConditionType">
+        <xs:complexContent>
+            <xs:extension base="saml:ConditionAbstractType">
+              <xs:sequence>
+                 <xs:element name="NumberOfUses" type="xs:integer"/>
+              </xs:sequence>
+            </xs:extension>
+        </xs:complexContent>
+    </xs:complexType>
+    <xs:element name="ProxySubject" substitutionGroup="saml:Subject"
+                type="saml:SubjectType"/>
+    <xs:annotation>
+        <xs:documentation>ProxyTransitedStatement is a
+        SubjectStatement which MAY carry specific subject confirmation
+        data </xs:documentation>
+    </xs:annotation>
+    <xs:element name="ProxyTransitedStatement"
+		type="saml:SubjectStatementAbstractType"/>
+
+    <xs:annotation>
+        <xs:documentation>
+          ProxyInfoConfirmationData may be relied upon to
+          corroborate the path information carried in a
+          ProxyTransitedStatement
+	</xs:documentation>
+    </xs:annotation>
+    <xs:element name="ProxyInfoConfirmationData"
+                type="sec:ProxyInfoConfirmationType"/>
+    <xs:complexType name="ProxyInfoConfirmationType">
+      <xs:sequence>
+        <xs:element ref="saml:AssertionIDReference"/>
+        <xs:element name="Issuer" type="xs:string"/>
+        <xs:element name="IssueInstant" type="xs:dateTime"/>
+        <xs:element ref="ds:Signature" minOccurs="0" maxOccurs="1"/>
+      </xs:sequence>
+      <xs:attribute name="id" type="xs:ID"/>
+   </xs:complexType>
+
+    <xs:element name="SessionContext" type="sec:SessionContextType"/>
+    <xs:complexType name="SessionContextType">
+        <xs:sequence>
+            <xs:element name="SessionSubject" type="lib:SubjectType"/>
+            <xs:element name="ProviderID" type="md:entityIDType"/>
+            <xs:element ref="lib:AuthnContext" minOccurs="0" maxOccurs="1"/>
+            <!-- The system entity for which this context applies
+	     is privacy protect by the SessionSubject -->
+        </xs:sequence>
+        <xs:attribute name="AuthenticationInstant" type="xs:dateTime" use="required"/>
+        <xs:attribute name="AssertionIssueInstant" type="xs:dateTime" use="required"/>
+    </xs:complexType>
+
+    <xs:element name="SessionContextStatement"
+                type="sec:SessionContextStatementType"
+                substitutionGroup="saml:SubjectStatement"/>
+
+    <xs:complexType name="SessionContextStatementType">
+        <xs:complexContent>
+            <xs:extension base="saml:SubjectStatementAbstractType">
+                <xs:sequence>
+                    <!-- This is the name of the proxy and it SHOULD carry
+                         SubjectConfirmation information to authorize the
+                         ProxySubject to act on behalf of the
+                         Subject inherited from
+                         SubjectStatementAbstractType -->
+                    <xs:element name="ProxySubject"
+                                type="saml:SubjectType"  minOccurs="0"/>
+                    <xs:element ref="sec:SessionContext"/>
+                </xs:sequence>
+            </xs:extension>
+        </xs:complexContent>
+    </xs:complexType>
+
+    <xs:element name="ResourceAccessStatement"
+		type="sec:ResourceAccessStatementType"
+		substitutionGroup="saml:SubjectStatement"/>
+
+    <xs:complexType name="ResourceAccessStatementType">
+        <xs:complexContent>
+            <xs:extension base="saml:SubjectStatementAbstractType">
+                <xs:sequence>
+                    <xs:group ref="disco:ResourceIDGroup"/>
+                    <xs:sequence minOccurs="0">
+                    <!-- This is the name of the proxy and it SHOULD carry
+                         SubjectConfirmation information to authorize the
+                         ProxySubject to act on behalf of the
+                         Subject inherited from
+                         SubjectStatementAbstractType -->
+                        <xs:element name="ProxySubject" type="saml:SubjectType"/>
+                        <xs:element ref="sec:SessionContext" minOccurs="0"/>
+                    </xs:sequence>
+                </xs:sequence>
+            </xs:extension>
+        </xs:complexContent>
+    </xs:complexType>
+
+</xs:schema>

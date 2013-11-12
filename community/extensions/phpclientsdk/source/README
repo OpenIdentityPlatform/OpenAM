@@ -1,0 +1,41 @@
+# The contents of this file are subject to the terms
+# of the Common Development and Distribution License
+# (the License). You may not use this file except in
+# compliance with the License.
+#
+# You can obtain a copy of the License at
+# https://opensso.dev.java.net/public/CDDLv1.0.html or
+# opensso/legal/CDDLv1.0.txt
+# See the License for the specific language governing
+# permission and limitations under the License.
+#
+# When distributing Covered Code, include this CDDL
+# Header Notice in each file and include the License file
+# at opensso/legal/CDDLv1.0.txt.
+# If applicable, add the following below the CDDL Header,
+# with the fields enclosed by brackets [] replaced by
+# your own identifying information:
+# "Portions Copyrighted [year] [name of copyright owner]"
+#
+# $Id: README,v 1.1 2007/03/09 21:13:07 chicchiricco Exp $
+#
+# Copyright 2007 Sun Microsystems Inc. All Rights Reserved
+
+##########################################################
+PHPClientSDK - Current status
+##########################################################
+
+* code works for extracting token from http request, validating against an OpenSSO server, getting (some) properties - not all methods are actually implemented
+
+* setting properties on token seems to make trouble: investigate why
+
+##########################################################
+PHPClientSDK - How to test
+##########################################################
+
+* working OpenSSO server deployed somewhere (only localhost tested)
+* working apache web server with php 5 support (only localhost tested)
+* change AMConfig.properties location in test.php around line 66
+* first login to OpenSSO
+* then visit test.php: token id should be displayed along with principal name
+

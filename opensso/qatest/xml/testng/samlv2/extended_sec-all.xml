@@ -1,0 +1,1385 @@
+<parameter name="groupName" value="@mode@"/>
+<test name="SAMLv2WantAuthnRequestsSigned">
+<parameter name="attribute" value="WantAuthnRequestsSigned"/>
+<parameter name="metadata" value="both"/>
+    <groups>
+        <run>
+            <include name="@mode@"/>
+        </run>
+    </groups>
+    <classes>
+        <class name="com.sun.identity.qatest.samlv2.SAMLv2SigningEncryptionTests"/>
+    </classes>
+</test>
+<test name="SAMLv2WantAuthnRequestsSigned_IDP">
+<parameter name="attribute" value="WantAuthnRequestsSigned"/>
+<parameter name="metadata" value="idp"/>
+    <groups>
+        <run>
+            <include name="@mode@"/>
+        </run>
+    </groups>
+    <classes>
+        <class name="com.sun.identity.qatest.samlv2.SAMLv2SigningEncryptionTests"/>
+    </classes>
+</test>
+<test name="SAMLv2AuthnRequestsSigned_SP">
+<parameter name="attribute" value="WantAuthnRequestsSigned"/>
+<parameter name="metadata" value="sp"/>
+    <groups>
+        <run>
+            <include name="@mode@"/>
+        </run>
+    </groups>
+    <classes>
+        <class name="com.sun.identity.qatest.samlv2.SAMLv2SigningEncryptionTests"/>
+    </classes>
+</test> 
+<test name="SAMLv2WantAssertionsSigned_SP">
+<parameter name="attribute" value="WantAssertionsSigned"/>
+<parameter name="metadata" value="sp"/>
+    <groups>
+        <run>
+            <include name="@mode@"/>
+        </run>
+    </groups>
+    <classes>
+        <class name="com.sun.identity.qatest.samlv2.SAMLv2SigningEncryptionTests"/>
+    </classes>
+</test> 
+<test name="SAMLv2wantLogoutRequestSigned">
+<parameter name="attribute" value="wantLogoutRequestSigned"/>
+<parameter name="metadata" value="both"/>
+    <groups>
+        <run>
+            <include name="@mode@"/>
+        </run>
+    </groups>
+    <classes>
+        <class name="com.sun.identity.qatest.samlv2.SAMLv2SigningEncryptionTests"/>
+    </classes>
+</test>
+<test name="SAMLv2wantLogoutRequestSigned_IDP">
+<parameter name="attribute" value="wantLogoutRequestSigned"/>
+<parameter name="metadata" value="idp"/>
+    <groups>
+        <run>
+            <include name="@mode@"/>
+        </run>
+    </groups>
+    <classes>
+        <class name="com.sun.identity.qatest.samlv2.SAMLv2SigningEncryptionTests"/>
+    </classes>
+</test>
+<test name="SAMLv2wantLogoutRequestSigned_SP">
+<parameter name="attribute" value="wantLogoutRequestSigned"/>
+<parameter name="metadata" value="sp"/>
+    <groups>
+        <run>
+            <include name="@mode@"/>
+        </run>
+    </groups>
+    <classes>
+        <class name="com.sun.identity.qatest.samlv2.SAMLv2SigningEncryptionTests"/>
+    </classes>
+</test> 
+<test name="SAMLv2wantLogoutResponseSigned">
+<parameter name="attribute" value="wantLogoutResponseSigned"/>
+<parameter name="metadata" value="both"/>
+    <groups>
+        <run>
+            <include name="@mode@"/>
+        </run>
+    </groups>
+    <classes>
+        <class name="com.sun.identity.qatest.samlv2.SAMLv2SigningEncryptionTests"/>
+    </classes>
+</test>
+<test name="SAMLv2wantLogoutResponseSigned_IDP">
+<parameter name="attribute" value="wantLogoutResponseSigned"/>
+<parameter name="metadata" value="idp"/>
+    <groups>
+        <run>
+            <include name="@mode@"/>
+        </run>
+    </groups>
+    <classes>
+        <class name="com.sun.identity.qatest.samlv2.SAMLv2SigningEncryptionTests"/>
+    </classes>
+</test>
+<test name="SAMLv2wantLogoutResponseSigned_SP">
+<parameter name="attribute" value="wantLogoutResponseSigned"/>
+<parameter name="metadata" value="sp"/>
+    <groups>
+        <run>
+            <include name="@mode@"/>
+        </run>
+    </groups>
+    <classes>
+        <class name="com.sun.identity.qatest.samlv2.SAMLv2SigningEncryptionTests"/>
+    </classes>
+</test> 
+<test name="SAMLv2wantMNIRequestSigned">
+<parameter name="attribute" value="wantMNIRequestSigned"/>
+<parameter name="metadata" value="both"/>
+    <groups>
+        <run>
+            <include name="@mode@"/>
+        </run>
+    </groups>
+    <classes>
+        <class name="com.sun.identity.qatest.samlv2.SAMLv2SigningEncryptionTests"/>
+    </classes>
+</test>
+<test name="SAMLv2wantMNIRequestSigned_IDP">
+<parameter name="attribute" value="wantMNIRequestSigned"/>
+<parameter name="metadata" value="idp"/>
+    <groups>
+        <run>
+            <include name="@mode@"/>
+        </run>
+    </groups>
+    <classes>
+        <class name="com.sun.identity.qatest.samlv2.SAMLv2SigningEncryptionTests"/>
+    </classes>
+</test>
+<test name="SAMLv2wantMNIRequestSigned_SP">
+<parameter name="attribute" value="wantMNIRequestSigned"/>
+<parameter name="metadata" value="sp"/>
+    <groups>
+        <run>
+            <include name="@mode@"/>
+        </run>
+    </groups>
+    <classes>
+        <class name="com.sun.identity.qatest.samlv2.SAMLv2SigningEncryptionTests"/>
+    </classes>
+</test> 
+<test name="SAMLv2wantMNIResponseSigned">
+<parameter name="attribute" value="wantMNIResponseSigned"/>
+<parameter name="metadata" value="both"/>
+    <groups>
+        <run>
+            <include name="@mode@"/>
+        </run>
+    </groups>
+    <classes>
+        <class name="com.sun.identity.qatest.samlv2.SAMLv2SigningEncryptionTests"/>
+    </classes>
+</test>
+<test name="SAMLv2wantMNIResponseSigned_IDP">
+<parameter name="attribute" value="wantMNIResponseSigned"/>
+<parameter name="metadata" value="idp"/>
+    <groups>
+        <run>
+            <include name="@mode@"/>
+        </run>
+    </groups>
+    <classes>
+        <class name="com.sun.identity.qatest.samlv2.SAMLv2SigningEncryptionTests"/>
+    </classes>
+</test>
+<test name="SAMLv2wantMNIResponseSigned_SP">
+<parameter name="attribute" value="wantMNIResponseSigned"/>
+<parameter name="metadata" value="sp"/>
+    <groups>
+        <run>
+            <include name="@mode@"/>
+        </run>
+    </groups>
+    <classes>
+        <class name="com.sun.identity.qatest.samlv2.SAMLv2SigningEncryptionTests"/>
+    </classes>
+</test> 
+<test name="SAMLv2wantNameIDEncrypted">
+<parameter name="attribute" value="wantNameIDEncrypted"/>
+<parameter name="metadata" value="both"/>
+    <groups>
+        <run>
+            <include name="@mode@"/>
+        </run>
+    </groups>
+    <classes>
+        <class name="com.sun.identity.qatest.samlv2.SAMLv2SigningEncryptionTests"/>
+    </classes>
+</test>
+<test name="SAMLv2wantNameIDEncrypted_IDP">
+<parameter name="attribute" value="wantNameIDEncrypted"/>
+<parameter name="metadata" value="idp"/>
+    <groups>
+        <run>
+            <include name="@mode@"/>
+        </run>
+    </groups>
+    <classes>
+        <class name="com.sun.identity.qatest.samlv2.SAMLv2SigningEncryptionTests"/>
+    </classes>
+</test>
+<test name="SAMLv2wantNameIDEncrypted_SP">
+<parameter name="attribute" value="wantNameIDEncrypted"/>
+<parameter name="metadata" value="sp"/>
+    <groups>
+        <run>
+            <include name="@mode@"/>
+        </run>
+    </groups>
+    <classes>
+        <class name="com.sun.identity.qatest.samlv2.SAMLv2SigningEncryptionTests"/>
+    </classes>
+</test> 
+<test name="SAMLv2wantArtifactResolveSigned_IDP">
+<parameter name="attribute" value="wantArtifactResolveSigned"/>
+<parameter name="metadata" value="idp"/>
+    <groups>
+        <run>
+            <include name="@mode@"/>
+        </run>
+    </groups>
+    <classes>
+        <class name="com.sun.identity.qatest.samlv2.SAMLv2SigningEncryptionTests"/>
+    </classes>
+</test>
+<test name="SAMLv2wantArtifactResponseSigned_SP">
+<parameter name="attribute" value="wantArtifactResponseSigned"/>
+<parameter name="metadata" value="sp"/>
+    <groups>
+        <run>
+            <include name="@mode@"/>
+        </run>
+    </groups>
+    <classes>
+        <class name="com.sun.identity.qatest.samlv2.SAMLv2SigningEncryptionTests"/>
+    </classes>
+</test> 
+<test name="SAMLv2wantAssertionEncrypted_SP">
+<parameter name="attribute" value="wantAssertionEncrypted"/>
+<parameter name="metadata" value="sp"/>
+    <groups>
+        <run>
+            <include name="@mode@"/>
+        </run>
+    </groups>
+    <classes>
+        <class name="com.sun.identity.qatest.samlv2.SAMLv2SigningEncryptionTests"/>
+    </classes>
+</test> 
+<test name="SAMLv2wantAttributeEncrypted_SP">
+<parameter name="attribute" value="wantAttributeEncrypted"/>
+<parameter name="metadata" value="sp"/>
+    <groups>
+        <run>
+            <include name="@mode@"/>
+        </run>
+    </groups>
+    <classes>
+        <class name="com.sun.identity.qatest.samlv2.SAMLv2SigningEncryptionTests"/>
+    </classes>
+</test>
+<test name="NameIdMngtSPHttpSPSoapTest">
+    <parameter name="groupName" value="@mode@"/>
+    <parameter name="ptestName" value="NameIdMngtSPHttpSPSoapTest"/>
+    <parameter name="tinitor" value="SP"/>
+    <parameter name="tbind" value="HTTP"/>
+    <parameter name="nidInitor" value="SP"/>
+    <parameter name="nidBind" value="SOAP"/>
+    <groups>
+        <run>
+            <include name="@mode@"/>
+        </run>
+    </groups>
+    <classes>
+        <class name="com.sun.identity.qatest.samlv2.SAMLv2NameIdMngtTests"/>
+    </classes>
+</test>
+<test name="NameIdMngtSPHttpIDPSoapTest">
+    <parameter name="groupName" value="@mode@"/>
+    <parameter name="ptestName" value="NameIdMngtSPHttpIDPSoapTest"/>
+    <parameter name="tinitor" value="SP"/>
+    <parameter name="tbind" value="HTTP"/>
+    <parameter name="nidInitor" value="IDP"/>
+    <parameter name="nidBind" value="SOAP"/>
+    <groups>
+        <run>
+            <include name="@mode@"/>
+        </run>
+    </groups>
+    <classes>
+        <class name="com.sun.identity.qatest.samlv2.SAMLv2NameIdMngtTests"/>
+    </classes>
+</test>
+  <test name="NameIdMngtSPSoapSPHttpTest">
+    <parameter name="groupName" value="@mode@"/>
+    <parameter name="ptestName" value="NameIdMngtSPSoapSPHttpTest"/>
+    <parameter name="tinitor" value="SP"/>
+    <parameter name="tbind" value="SOAP"/>
+    <parameter name="nidInitor" value="SP"/>
+    <parameter name="nidBind" value="HTTP"/>
+    <groups>
+        <run>
+            <include name="@mode@"/>
+        </run>
+    </groups>
+    <classes>
+        <class name="com.sun.identity.qatest.samlv2.SAMLv2NameIdMngtTests"/>
+    </classes>
+</test>
+<test name="NameIdMngtSPSoapIDPHttpTest">
+    <parameter name="groupName" value="@mode@"/>
+    <parameter name="ptestName" value="NameIdMngtSPSoapIDPHttpTest"/>
+    <parameter name="tinitor" value="SP"/>
+    <parameter name="tbind" value="SOAP"/>
+    <parameter name="nidInitor" value="IDP"/>
+    <parameter name="nidBind" value="HTTP"/>
+    <groups>
+        <run>
+            <include name="@mode@"/>
+        </run>
+    </groups>
+    <classes>
+        <class name="com.sun.identity.qatest.samlv2.SAMLv2NameIdMngtTests"/>
+    </classes>
+</test>
+<test name="NameIdMngtSPSoapSPSoapTest">
+    <parameter name="groupName" value="@mode@"/>
+    <parameter name="ptestName" value="NameIdMngtSPSoapSPSoapTest"/>
+    <parameter name="tinitor" value="SP"/>
+    <parameter name="tbind" value="SOAP"/>
+    <parameter name="nidInitor" value="SP"/>
+    <parameter name="nidBind" value="SOAP"/>
+    <groups>
+        <run>
+            <include name="@mode@"/>
+        </run>
+    </groups>
+    <classes>
+        <class name="com.sun.identity.qatest.samlv2.SAMLv2NameIdMngtTests"/>
+    </classes>
+</test>
+<test name="NameIdMngtSPSoapIDPSoapTest">
+    <parameter name="groupName" value="@mode@"/>
+    <parameter name="ptestName" value="NameIdMngtSPSoapIDPSoapTest"/>
+    <parameter name="tinitor" value="SP"/>
+    <parameter name="tbind" value="SOAP"/>
+    <parameter name="nidInitor" value="IDP"/>
+    <parameter name="nidBind" value="SOAP"/>
+    <groups>
+        <run>
+            <include name="@mode@"/>
+        </run>
+    </groups>
+    <classes>
+        <class name="com.sun.identity.qatest.samlv2.SAMLv2NameIdMngtTests"/>
+    </classes>
+</test>
+<test name="NameIdMngtIDPHttpSPSoapTest">
+    <parameter name="groupName" value="@mode@"/>
+    <parameter name="ptestName" value="NameIdMngtIDPHttpSPSoapTest"/>
+    <parameter name="tinitor" value="IDP"/>
+    <parameter name="tbind" value="HTTP"/>
+    <parameter name="nidInitor" value="SP"/>
+    <parameter name="nidBind" value="SOAP"/>
+    <groups>
+        <run>
+            <include name="@mode@"/>
+        </run>
+    </groups>
+    <classes>
+        <class name="com.sun.identity.qatest.samlv2.SAMLv2NameIdMngtTests"/>
+    </classes>
+</test>
+<test name="NameIdMngtIDPHttpIDPSoapTest">
+    <parameter name="groupName" value="@mode@"/>
+    <parameter name="ptestName" value="NameIdMngtIDPHttpIDPSoapTest"/>
+    <parameter name="tinitor" value="IDP"/>
+    <parameter name="tbind" value="HTTP"/>
+    <parameter name="nidInitor" value="IDP"/>
+    <parameter name="nidBind" value="SOAP"/>
+    <groups>
+        <run>
+            <include name="@mode@"/>
+        </run>
+    </groups>
+    <classes>
+        <class name="com.sun.identity.qatest.samlv2.SAMLv2NameIdMngtTests"/>
+    </classes>
+</test>
+  <test name="NameIdMngtIDPSoapSPHttpTest">
+    <parameter name="groupName" value="@mode@"/>
+    <parameter name="ptestName" value="NameIdMngtIDPSoapSPHttpTest"/>
+    <parameter name="tinitor" value="IDP"/>
+    <parameter name="tbind" value="SOAP"/>
+    <parameter name="nidInitor" value="SP"/>
+    <parameter name="nidBind" value="HTTP"/>
+    <groups>
+        <run>
+            <include name="@mode@"/>
+        </run>
+    </groups>
+    <classes>
+        <class name="com.sun.identity.qatest.samlv2.SAMLv2NameIdMngtTests"/>
+    </classes>
+</test>
+<test name="NameIdMngtIDPSoapIDPHttpTest">
+    <parameter name="groupName" value="@mode@"/>
+    <parameter name="ptestName" value="NameIdMngtIDPSoapIDPHttpTest"/>
+    <parameter name="tinitor" value="IDP"/>
+    <parameter name="tbind" value="SOAP"/>
+    <parameter name="nidInitor" value="IDP"/>
+    <parameter name="nidBind" value="HTTP"/>
+    <groups>
+        <run>
+            <include name="@mode@"/>
+        </run>
+    </groups>
+    <classes>
+        <class name="com.sun.identity.qatest.samlv2.SAMLv2NameIdMngtTests"/>
+    </classes>
+</test>
+<test name="NameIdMngtIDPSoapSPSoapTest">
+    <parameter name="groupName" value="@mode@"/>
+    <parameter name="ptestName" value="NameIdMngtIDPSoapSPSoapTest"/>
+    <parameter name="tinitor" value="IDP"/>
+    <parameter name="tbind" value="SOAP"/>
+    <parameter name="nidInitor" value="SP"/>
+    <parameter name="nidBind" value="SOAP"/>
+    <groups>
+        <run>
+            <include name="@mode@"/>
+        </run>
+    </groups>
+    <classes>
+        <class name="com.sun.identity.qatest.samlv2.SAMLv2NameIdMngtTests"/>
+    </classes>
+</test>
+<test name="NameIdMngtIDPSoapIDPSoapTest">
+    <parameter name="groupName" value="@mode@"/>
+    <parameter name="ptestName" value="NameIdMngtIDPSoapIDPSoapTest"/>
+    <parameter name="tinitor" value="IDP"/>
+    <parameter name="tbind" value="SOAP"/>
+    <parameter name="nidInitor" value="IDP"/>
+    <parameter name="nidBind" value="SOAP"/>
+    <groups>
+        <run>
+            <include name="@mode@"/>
+        </run>
+    </groups>
+    <classes>
+        <class name="com.sun.identity.qatest.samlv2.SAMLv2NameIdMngtTests"/>
+    </classes>
+</test>
+<test name="AttributeQueryTestNoAttrSN">
+    <parameter name="ptestName" value="attrqNASNUser"/>
+    <parameter name="ptestType" value="noAttr"/>
+    <parameter name="pAttribute" value="sn"/>
+    <parameter name="pnsRoleType" value=""/>
+    <parameter name="pnsRoleexist" value=""/>
+    <groups>
+        <run>
+            <include name="@mode@"/>
+        </run>
+    </groups>
+    <classes>
+        <class name="com.sun.identity.qatest.samlv2.SAMLv2AttributeQueryTests"/>
+    </classes>
+</test> 
+<test name="AttributeQueryTestNoAttrCN">
+    <parameter name="ptestName" value="attrqNACN"/>
+    <parameter name="ptestType" value="noAttr"/>
+    <parameter name="pAttribute" value="cn"/>
+    <parameter name="pnsRoleType" value=""/>
+    <parameter name="pnsRoleexist" value=""/>
+    <groups>
+        <run>
+            <include name="@mode@"/>
+        </run>
+    </groups>
+    <classes>
+        <class name="com.sun.identity.qatest.samlv2.SAMLv2AttributeQueryTests"/>
+    </classes>
+</test> 
+<test name="AttributeQueryTestNoAttrGN">
+    <parameter name="ptestName" value="attrqNAGN"/>
+    <parameter name="ptestType" value="noAttr"/>
+    <parameter name="pAttribute" value="givenname"/>
+    <parameter name="pnsRoleType" value=""/>
+    <parameter name="pnsRoleexist" value=""/>
+    <groups>
+        <run>
+            <include name="@mode@"/>
+        </run>
+    </groups>
+    <classes>
+        <class name="com.sun.identity.qatest.samlv2.SAMLv2AttributeQueryTests"/>
+    </classes>
+</test>
+<test name="AttributeQueryTestNoAttrMail">
+    <parameter name="ptestName" value="attrqNAMail"/>
+    <parameter name="ptestType" value="noAttr"/>
+    <parameter name="pAttribute" value="mail"/>
+    <parameter name="pnsRoleType" value=""/>
+    <parameter name="pnsRoleexist" value=""/>
+    <groups>
+        <run>
+            <include name="@mode@"/>
+        </run>
+    </groups>
+    <classes>
+        <class name="com.sun.identity.qatest.samlv2.SAMLv2AttributeQueryTests"/>
+    </classes>
+</test>
+<test name="AttributeQueryTestNoAttrEMP">
+    <parameter name="ptestName" value="attrqNAEmp"/>
+    <parameter name="ptestType" value="noAttr"/>
+    <parameter name="pAttribute" value="employee"/>
+    <parameter name="pnsRoleType" value=""/>
+    <parameter name="pnsRoleexist" value=""/>
+    <groups>
+        <run>
+            <include name="@mode@"/>
+        </run>
+    </groups>
+    <classes>
+        <class name="com.sun.identity.qatest.samlv2.SAMLv2AttributeQueryTests"/>
+    </classes>
+</test>
+<test name="AttributeQueryTestNoAttrPostal">
+    <parameter name="ptestName" value="attrqNAPostal"/>
+    <parameter name="ptestType" value="noAttr"/>
+    <parameter name="pAttribute" value="postal"/>
+    <parameter name="pnsRoleType" value=""/>
+    <parameter name="pnsRoleexist" value=""/>
+    <groups>
+        <run>
+            <include name="@mode@"/>
+        </run>
+    </groups>
+    <classes>
+        <class name="com.sun.identity.qatest.samlv2.SAMLv2AttributeQueryTests"/>
+    </classes>
+</test>
+<test name="AttributeQueryTestNoAttrTele">
+    <parameter name="ptestName" value="attrqNATel"/>
+    <parameter name="ptestType" value="noAttr"/>
+    <parameter name="pAttribute" value="tele"/>
+    <parameter name="pnsRoleType" value=""/>
+    <parameter name="pnsRoleexist" value=""/>
+    <groups>
+        <run>
+            <include name="@mode@"/>
+        </run>
+    </groups>
+    <classes>
+        <class name="com.sun.identity.qatest.samlv2.SAMLv2AttributeQueryTests"/>
+    </classes>
+</test>
+<test name="AttributeQueryTestNoAttrHomePhone">
+    <parameter name="ptestName" value="attrqNAhomephone"/>
+    <parameter name="ptestType" value="noAttr"/>
+    <parameter name="pAttribute" value="homephone"/>
+    <parameter name="pnsRoleType" value=""/>
+    <parameter name="pnsRoleexist" value=""/>
+    <groups>
+        <run>
+            <include name="@mode@"/>
+        </run>
+    </groups>
+    <classes>
+        <class name="com.sun.identity.qatest.samlv2.SAMLv2AttributeQueryTests"/>
+    </classes>
+</test>
+<test name="AttributeQueryTestNoAttrHomePostal">
+    <parameter name="ptestName" value="attrqNAHomepost"/>
+    <parameter name="ptestType" value="noAttr"/>
+    <parameter name="pAttribute" value="homepostal"/>
+    <parameter name="pnsRoleType" value=""/>
+    <parameter name="pnsRoleexist" value=""/>
+    <groups>
+        <run>
+            <include name="@mode@"/>
+        </run>
+    </groups>
+    <classes>
+        <class name="com.sun.identity.qatest.samlv2.SAMLv2AttributeQueryTests"/>
+    </classes>
+</test>
+<test name="AttributeQueryTestNoAttrMobile">
+    <parameter name="ptestName" value="attrqNAMobile"/>
+    <parameter name="ptestType" value="noAttr"/>
+    <parameter name="pAttribute" value="mobile"/>
+    <parameter name="pnsRoleType" value=""/>
+    <parameter name="pnsRoleexist" value=""/>
+    <groups>
+        <run>
+            <include name="@mode@"/>
+        </run>
+    </groups>
+    <classes>
+        <class name="com.sun.identity.qatest.samlv2.SAMLv2AttributeQueryTests"/>
+    </classes>
+</test>
+<test name="AttributeQueryTestNoAttrTelephone">
+    <parameter name="ptestName" value="attrqNAtelephone"/>
+    <parameter name="ptestType" value="noAttr"/>
+    <parameter name="pAttribute" value="telephone"/>
+    <parameter name="pnsRoleType" value=""/>
+    <parameter name="pnsRoleexist" value=""/>
+    <groups>
+        <run>
+            <include name="@mode@"/>
+        </run>
+    </groups>
+    <classes>
+        <class name="com.sun.identity.qatest.samlv2.SAMLv2AttributeQueryTests"/>
+    </classes>
+</test>
+<test name="AttributeQueryTestNoAttrPager">
+    <parameter name="ptestName" value="attrqNApage"/>
+    <parameter name="ptestType" value="noAttr"/>
+    <parameter name="pAttribute" value="pager"/>
+    <parameter name="pnsRoleType" value=""/>
+    <parameter name="pnsRoleexist" value=""/>
+    <groups>
+        <run>
+            <include name="@mode@"/>
+        </run>
+    </groups>
+    <classes>
+        <class name="com.sun.identity.qatest.samlv2.SAMLv2AttributeQueryTests"/>
+    </classes>
+</test>
+<test name="AttributeQueryTestNoAttrTitle">
+    <parameter name="ptestName" value="attrqNATitle"/>
+    <parameter name="ptestType" value="noAttr"/>
+    <parameter name="pAttribute" value="title"/>
+    <parameter name="pnsRoleType" value=""/>
+    <parameter name="pnsRoleexist" value=""/>
+    <groups>
+        <run>
+            <include name="@mode@"/>
+        </run>
+    </groups>
+    <classes>
+        <class name="com.sun.identity.qatest.samlv2.SAMLv2AttributeQueryTests"/>
+    </classes>
+</test>
+<test name="AttributeQueryTestNoAttrMSI">
+    <parameter name="ptestName" value="attrqNAMSI"/>
+    <parameter name="ptestType" value="noAttr"/>
+    <parameter name="pAttribute" value="msi"/>
+    <parameter name="pnsRoleType" value=""/>
+    <parameter name="pnsRoleexist" value=""/>
+    <groups>
+        <run>
+            <include name="@mode@"/>
+        </run>
+    </groups>
+    <classes>
+        <class name="com.sun.identity.qatest.samlv2.SAMLv2AttributeQueryTests"/>
+    </classes>
+</test>
+<test name="AttributeQueryTestValAttrSN">
+    <parameter name="ptestName" value="attrqValSNUser"/>
+    <parameter name="ptestType" value="attrVal"/>
+    <parameter name="pAttribute" value="sn"/>
+    <parameter name="pnsRoleType" value=""/>
+    <parameter name="pnsRoleexist" value=""/>
+    <groups>
+        <run>
+            <include name="@mode@"/>
+        </run>
+    </groups>
+    <classes>
+        <class name="com.sun.identity.qatest.samlv2.SAMLv2AttributeQueryTests"/>
+    </classes>
+</test> 
+<test name="AttributeQueryTestValAttrCN">
+    <parameter name="ptestName" value="attrqValCNUser"/>
+    <parameter name="ptestType" value="attrVal"/>
+    <parameter name="pAttribute" value="cn"/>
+    <parameter name="pnsRoleType" value=""/>
+    <parameter name="pnsRoleexist" value=""/>
+    <groups>
+        <run>
+            <include name="@mode@"/>
+        </run>
+    </groups>
+    <classes>
+        <class name="com.sun.identity.qatest.samlv2.SAMLv2AttributeQueryTests"/>
+    </classes>
+</test>               
+<test name="AttributeQueryTestValAttrHomePhone">
+    <parameter name="ptestName" value="attrqValhomephone"/>
+    <parameter name="ptestType" value="attrVal"/>
+    <parameter name="pAttribute" value="homephone"/>
+    <parameter name="pnsRoleType" value=""/>
+    <parameter name="pnsRoleexist" value=""/>
+    <groups>
+        <run>
+            <include name="@mode@"/>
+        </run>
+    </groups>
+    <classes>
+        <class name="com.sun.identity.qatest.samlv2.SAMLv2AttributeQueryTests"/>
+    </classes>
+</test>
+<test name="AttributeQueryTestValAttrHomePostal">
+    <parameter name="ptestName" value="attrqValHomepost"/>
+    <parameter name="ptestType" value="attrVal"/>
+    <parameter name="pAttribute" value="homepostal"/>
+    <parameter name="pnsRoleType" value=""/>
+    <parameter name="pnsRoleexist" value=""/>
+    <groups>
+        <run>
+            <include name="@mode@"/>
+        </run>
+    </groups>
+    <classes>
+        <class name="com.sun.identity.qatest.samlv2.SAMLv2AttributeQueryTests"/>
+    </classes>
+</test>
+<test name="AttributeQueryTestValAttrMobile">
+    <parameter name="ptestName" value="attrqValMobile"/>
+    <parameter name="ptestType" value="attrVal"/>
+    <parameter name="pAttribute" value="mobile"/>
+    <parameter name="pnsRoleType" value=""/>
+    <parameter name="pnsRoleexist" value=""/>
+    <groups>
+        <run>
+            <include name="@mode@"/>
+        </run>
+    </groups>
+    <classes>
+        <class name="com.sun.identity.qatest.samlv2.SAMLv2AttributeQueryTests"/>
+    </classes>
+</test>
+<test name="AttributeQueryTestValAttrTelephone">
+    <parameter name="ptestName" value="attrqValtelephone"/>
+    <parameter name="ptestType" value="attrVal"/>
+    <parameter name="pAttribute" value="telephone"/>
+    <parameter name="pnsRoleType" value=""/>
+    <parameter name="pnsRoleexist" value=""/>
+    <groups>
+        <run>
+            <include name="@mode@"/>
+        </run>
+    </groups>
+    <classes>
+        <class name="com.sun.identity.qatest.samlv2.SAMLv2AttributeQueryTests"/>
+    </classes>
+</test>
+<test name="AttributeQueryTestValAttrPager">
+    <parameter name="ptestName" value="attrqValpage"/>
+    <parameter name="ptestType" value="attrVal"/>
+    <parameter name="pAttribute" value="pager"/>
+    <parameter name="pnsRoleType" value=""/>
+    <parameter name="pnsRoleexist" value=""/>
+    <groups>
+        <run>
+            <include name="@mode@"/>
+        </run>
+    </groups>
+    <classes>
+       <class name="com.sun.identity.qatest.samlv2.SAMLv2AttributeQueryTests"/>
+    </classes>
+</test>    
+<test name="AttributeQueryTestValAttrGN">
+    <parameter name="ptestName" value="attrqValGN"/>
+    <parameter name="ptestType" value="attrVal"/>
+    <parameter name="pAttribute" value="givenname"/>
+    <parameter name="pnsRoleType" value=""/>
+    <parameter name="pnsRoleexist" value=""/>
+    <groups>
+        <run>
+            <include name="@mode@"/>
+        </run>
+    </groups>
+    <classes>
+        <class name="com.sun.identity.qatest.samlv2.SAMLv2AttributeQueryTests"/>
+    </classes>
+</test>
+<test name="AttributeQueryTestValAttrMail">
+    <parameter name="ptestName" value="attrqValMail"/>
+    <parameter name="ptestType" value="attrVal"/>
+    <parameter name="pAttribute" value="mail"/>
+    <parameter name="pnsRoleType" value=""/>
+    <parameter name="pnsRoleexist" value=""/>
+    <groups>
+        <run>
+            <include name="@mode@"/>
+        </run>
+    </groups>
+    <classes>
+        <class name="com.sun.identity.qatest.samlv2.SAMLv2AttributeQueryTests"/>
+    </classes>
+</test>
+<test name="AttributeQueryTestValAttrEMP">
+    <parameter name="ptestName" value="attrqValEmp"/>
+    <parameter name="ptestType" value="attrVal"/>
+    <parameter name="pAttribute" value="employee"/>
+    <parameter name="pnsRoleType" value=""/>
+    <parameter name="pnsRoleexist" value=""/>
+    <groups>
+        <run>
+            <include name="@mode@"/>
+        </run>
+    </groups>
+    <classes>
+        <class name="com.sun.identity.qatest.samlv2.SAMLv2AttributeQueryTests"/>
+    </classes>
+</test>
+<test name="AttributeQueryTestValAttrPostal">
+    <parameter name="ptestName" value="attrqValPostal"/>
+    <parameter name="ptestType" value="attrVal"/>
+    <parameter name="pAttribute" value="postal"/>
+    <parameter name="pnsRoleType" value=""/>
+    <parameter name="pnsRoleexist" value=""/>
+    <groups>
+        <run>
+            <include name="@mode@"/>
+        </run>
+    </groups>
+    <classes>
+        <class name="com.sun.identity.qatest.samlv2.SAMLv2AttributeQueryTests"/>
+    </classes>
+</test>
+<test name="AttributeQueryTestValAttrTele">
+    <parameter name="ptestName" value="attrqValTel"/>
+    <parameter name="ptestType" value="attrVal"/>
+    <parameter name="pAttribute" value="tele"/>
+    <parameter name="pnsRoleType" value=""/>
+    <parameter name="pnsRoleexist" value=""/>
+    <groups>
+        <run>
+            <include name="@mode@"/>
+        </run>
+    </groups>
+    <classes>
+        <class name="com.sun.identity.qatest.samlv2.SAMLv2AttributeQueryTests"/>
+    </classes>
+</test>                
+<test name="AttributeQueryTestValAttrTitle">
+    <parameter name="ptestName" value="attrqValTitle"/>
+    <parameter name="ptestType" value="attrVal"/>
+    <parameter name="pAttribute" value="title"/>
+    <parameter name="pnsRoleType" value=""/>
+    <parameter name="pnsRoleexist" value=""/>
+    <groups>
+        <run>
+            <include name="@mode@"/>
+        </run>
+    </groups>
+    <classes>
+        <class name="com.sun.identity.qatest.samlv2.SAMLv2AttributeQueryTests"/>
+    </classes>
+</test>
+<test name="AttributeQueryTestValAttrMSI">
+    <parameter name="ptestName" value="attrqValMSI"/>
+    <parameter name="ptestType" value="attrVal"/>
+    <parameter name="pAttribute" value="msi"/>
+    <parameter name="pnsRoleType" value=""/>
+    <parameter name="pnsRoleexist" value=""/>
+    <groups>
+        <run>
+            <include name="@mode@"/>
+        </run>
+    </groups>
+    <classes>
+        <class name="com.sun.identity.qatest.samlv2.SAMLv2AttributeQueryTests"/>
+    </classes>
+</test>
+<test name="AttributeQueryTestValAttrStreet">
+    <parameter name="ptestName" value="attrqValSt"/>
+    <parameter name="ptestType" value="attrVal"/>
+    <parameter name="pAttribute" value="street"/>
+    <parameter name="pnsRoleType" value=""/>
+    <parameter name="pnsRoleexist" value=""/>
+    <groups>
+        <run>
+            <include name="@mode@"/>
+        </run>
+    </groups>
+    <classes>
+        <class name="com.sun.identity.qatest.samlv2.SAMLv2AttributeQueryTests"/>
+    </classes>
+</test>
+<test name="AttributeQueryTestNamedAttrSN">
+    <parameter name="ptestName" value="attrqNMDSN"/>
+    <parameter name="ptestType" value="attrNamed"/>
+    <parameter name="pAttribute" value="sn"/>
+    <parameter name="pnsRoleType" value=""/>
+    <parameter name="pnsRoleexist" value=""/>
+    <groups>
+        <run>
+            <include name="@mode@"/>
+        </run>
+    </groups>
+    <classes>
+        <class name="com.sun.identity.qatest.samlv2.SAMLv2AttributeQueryTests"/>
+    </classes>
+</test>
+<test name="AttributeQueryTestNamedAttrCN">
+    <parameter name="ptestName" value="attrqNMDCN"/>
+    <parameter name="ptestType" value="attrNamed"/>
+    <parameter name="pAttribute" value="cn"/>
+    <parameter name="pnsRoleType" value=""/>
+    <parameter name="pnsRoleexist" value=""/>
+    <groups>
+        <run>
+            <include name="@mode@"/>
+        </run>
+    </groups>
+    <classes>
+        <class name="com.sun.identity.qatest.samlv2.SAMLv2AttributeQueryTests"/>
+    </classes>
+</test> 
+<test name="AttributeQueryTestNamedAttrGN">
+    <parameter name="ptestName" value="attrqNMDGN"/>
+    <parameter name="ptestType" value="attrNamed"/>
+    <parameter name="pAttribute" value="givenname"/>
+    <parameter name="pnsRoleType" value=""/>
+    <parameter name="pnsRoleexist" value=""/>
+    <groups>
+        <run>
+            <include name="@mode@"/>
+        </run>
+    </groups>
+    <classes>
+        <class name="com.sun.identity.qatest.samlv2.SAMLv2AttributeQueryTests"/>
+    </classes>
+</test>
+<test name="AttributeQueryTestNamedAttrMail">
+    <parameter name="ptestName" value="attrqNMDMail"/>
+    <parameter name="ptestType" value="attrNamed"/>
+    <parameter name="pAttribute" value="mail"/>
+    <parameter name="pnsRoleType" value=""/>
+    <parameter name="pnsRoleexist" value=""/>
+    <groups>
+        <run>
+            <include name="@mode@"/>
+        </run>
+    </groups>
+    <classes>
+        <class name="com.sun.identity.qatest.samlv2.SAMLv2AttributeQueryTests"/>
+    </classes>
+</test>
+<test name="AttributeQueryTestNamedAttrEMP">
+    <parameter name="ptestName" value="attrqNMDEmp"/>
+    <parameter name="ptestType" value="attrNamed"/>
+    <parameter name="pAttribute" value="employeenumber"/>
+    <parameter name="pnsRoleType" value=""/>
+    <parameter name="pnsRoleexist" value=""/>
+    <groups>
+        <run>
+            <include name="@mode@"/>
+        </run>
+    </groups>
+    <classes>
+        <class name="com.sun.identity.qatest.samlv2.SAMLv2AttributeQueryTests"/>
+    </classes>
+</test>
+<test name="AttributeQueryTestNamedAttrPostal">
+    <parameter name="ptestName" value="attrqNMDPostal"/>
+    <parameter name="ptestType" value="attrNamed"/>
+    <parameter name="pAttribute" value="postaladdress"/>
+    <parameter name="pnsRoleType" value=""/>
+    <parameter name="pnsRoleexist" value=""/>
+    <groups>
+        <run>
+            <include name="@mode@"/>
+        </run>
+    </groups>
+    <classes>
+        <class name="com.sun.identity.qatest.samlv2.SAMLv2AttributeQueryTests"/>
+    </classes>
+</test>
+<test name="AttributeQueryTestNamedAttrTele">
+    <parameter name="ptestName" value="attrqNMDTel"/>
+    <parameter name="ptestType" value="attrNamed"/>
+    <parameter name="pAttribute" value="facsimileTelephoneNumber"/>
+    <parameter name="pnsRoleType" value=""/>
+    <parameter name="pnsRoleexist" value=""/>
+    <groups>
+        <run>
+            <include name="@mode@"/>
+        </run>
+    </groups>
+    <classes>
+        <class name="com.sun.identity.qatest.samlv2.SAMLv2AttributeQueryTests"/>
+    </classes>
+</test> 
+<test name="AttributeQueryTestNamedAttrHomePhone">
+    <parameter name="ptestName" value="attrqNMDhomephone"/>
+    <parameter name="ptestType" value="attrNamed"/>
+    <parameter name="pAttribute" value="homePhone"/>
+    <parameter name="pnsRoleType" value=""/>
+    <parameter name="pnsRoleexist" value=""/>
+    <groups>
+        <run>
+            <include name="@mode@"/>
+        </run>
+    </groups>
+    <classes>
+        <class name="com.sun.identity.qatest.samlv2.SAMLv2AttributeQueryTests"/>
+    </classes>
+</test>
+<test name="AttributeQueryTestNamedAttrHomePostal">
+    <parameter name="ptestName" value="attrqNMDHomepost"/>
+    <parameter name="ptestType" value="attrNamed"/>
+    <parameter name="pAttribute" value="homePostalAddress"/>
+    <parameter name="pnsRoleType" value=""/>
+    <parameter name="pnsRoleexist" value=""/>
+    <groups>
+        <run>
+            <include name="@mode@"/>
+        </run>
+    </groups>
+    <classes>
+        <class name="com.sun.identity.qatest.samlv2.SAMLv2AttributeQueryTests"/>
+    </classes>
+</test>
+<test name="AttributeQueryTestNamedAttrMobile">
+    <parameter name="ptestName" value="attrqNMDMobile"/>
+    <parameter name="ptestType" value="attrNamed"/>
+    <parameter name="pAttribute" value="mobile"/>
+    <parameter name="pnsRoleType" value=""/>
+    <parameter name="pnsRoleexist" value=""/>
+    <groups>
+        <run>
+            <include name="@mode@"/>
+        </run>
+    </groups>
+    <classes>
+        <class name="com.sun.identity.qatest.samlv2.SAMLv2AttributeQueryTests"/>
+    </classes>
+</test>
+<test name="AttributeQueryTestNamedAttrTelephone">
+    <parameter name="ptestName" value="attrqNMDtelephone"/>
+    <parameter name="ptestType" value="attrNamed"/>
+    <parameter name="pAttribute" value="telephonenumber"/>
+    <parameter name="pnsRoleType" value=""/>
+    <parameter name="pnsRoleexist" value=""/>
+    <groups>
+        <run>
+            <include name="@mode@"/>
+        </run>
+    </groups>
+    <classes>
+        <class name="com.sun.identity.qatest.samlv2.SAMLv2AttributeQueryTests"/>
+    </classes>
+</test>
+<test name="AttributeQueryTestNamedAttrPager">
+    <parameter name="ptestName" value="attrqNMDpage"/>
+    <parameter name="ptestType" value="attrNamed"/>
+    <parameter name="pAttribute" value="pager"/>
+    <parameter name="pnsRoleType" value=""/>
+    <parameter name="pnsRoleexist" value=""/>
+    <groups>
+        <run>
+            <include name="@mode@"/>
+        </run>
+    </groups>
+    <classes>
+        <class name="com.sun.identity.qatest.samlv2.SAMLv2AttributeQueryTests"/>
+    </classes>
+</test>
+<test name="AttributeQueryTestNamedAttrTitle">
+    <parameter name="ptestName" value="attrqNMDTitle"/>
+    <parameter name="ptestType" value="attrNamed"/>
+    <parameter name="pAttribute" value="title"/>
+    <parameter name="pnsRoleType" value=""/>
+    <parameter name="pnsRoleexist" value=""/>
+    <groups>
+        <run>
+            <include name="@mode@"/>
+        </run>
+    </groups>
+    <classes>
+        <class name="com.sun.identity.qatest.samlv2.SAMLv2AttributeQueryTests"/>
+    </classes>
+</test>
+<test name="AttributeQueryTestNamedAttrMSI">
+    <parameter name="ptestName" value="attrqNMDMSI"/>
+    <parameter name="ptestType" value="attrNamed"/>
+    <parameter name="pAttribute" value="sunIdentityMSISDNNumber"/>
+    <parameter name="pnsRoleType" value=""/>
+    <parameter name="pnsRoleexist" value=""/>
+    <groups>
+        <run>
+            <include name="@mode@"/>
+        </run>
+    </groups>
+    <classes>
+        <class name="com.sun.identity.qatest.samlv2.SAMLv2AttributeQueryTests"/>
+    </classes>
+</test>
+<test name="AttributeQueryTestNamedAttrStreet">
+    <parameter name="ptestName" value="attrqNMDSt"/>
+    <parameter name="ptestType" value="attrNamed"/>
+    <parameter name="pAttribute" value="street"/>
+    <parameter name="pnsRoleType" value=""/>
+    <parameter name="pnsRoleexist" value=""/>
+    <groups>
+        <run>
+            <include name="@mode@"/>
+        </run>
+    </groups>
+    <classes>
+        <class name="com.sun.identity.qatest.samlv2.SAMLv2AttributeQueryTests"/>
+    </classes>
+</test>
+<test name="SAMLv2AuthNArtPasswordExact">
+    <parameter name="ptestName" value="acexactpassart"/>
+    <parameter name="ptestType" value="minimum"/>
+    <parameter name="pAttribute" value="artifact"/>
+    <parameter name="ptestModule" value="ldap"/>
+    <parameter name="pACClassType" value="Password"/>
+    <parameter name="pACCompareType" value="exact"/>
+    <groups>
+        <run>
+            <include name="@mode@"/>
+        </run>
+    </groups>
+    <classes>
+        <class name="com.sun.identity.qatest.samlv2.SAMLv2AuthNAuthorityTests"/>
+    </classes>
+</test>
+<test name="SAMLv2AuthNArtPasswordMinimum">
+    <parameter name="ptestName" value="acminimumpassart"/>
+    <parameter name="ptestType" value="minimum"/>
+    <parameter name="pAttribute" value="artifact"/>
+    <parameter name="ptestModule" value="ldap"/>
+    <parameter name="pACClassType" value="Password"/>
+    <parameter name="pACCompareType" value="minimum"/>
+    <groups>
+        <run>
+            <include name="@mode@"/>
+        </run>
+    </groups>
+    <classes>
+        <class name="com.sun.identity.qatest.samlv2.SAMLv2AuthNAuthorityTests"/>
+    </classes>
+</test>
+<test name="SAMLv2AuthNArtPasswordMaximum">
+    <parameter name="ptestName" value="acmaxpassart"/>
+    <parameter name="ptestType" value="minimum"/>
+    <parameter name="pAttribute" value="artifact"/>
+    <parameter name="ptestModule" value="ldap"/>
+    <parameter name="pACClassType" value="Password"/>
+    <parameter name="pACCompareType" value="maximum"/>
+    <groups>
+        <run>
+            <include name="@mode@"/>
+        </run>
+    </groups>
+    <classes>
+        <class name="com.sun.identity.qatest.samlv2.SAMLv2AuthNAuthorityTests"/>
+    </classes>
+</test>
+<test name="SAMLv2AuthNArtPasswordBetter">
+    <parameter name="ptestName" value="acbetterpassart"/>
+    <parameter name="ptestType" value="minimum"/>
+    <parameter name="pAttribute" value="artifact"/>
+    <parameter name="ptestModule" value="ldap"/>
+    <parameter name="pACClassType" value="Password"/>
+    <parameter name="pACCompareType" value="better"/>
+    <groups>
+        <run>
+            <include name="@mode@"/>
+        </run>
+    </groups>
+    <classes>
+        <class name="com.sun.identity.qatest.samlv2.SAMLv2AuthNAuthorityTests"/>
+    </classes>
+</test>
+<test name="SAMLv2AuthNPostPasswordExact">
+    <parameter name="ptestName" value="acexactpasspost"/>
+    <parameter name="ptestType" value="minimum"/>
+    <parameter name="pAttribute" value="post"/>
+    <parameter name="ptestModule" value="ldap"/>
+    <parameter name="pACClassType" value="Password"/>
+    <parameter name="pACCompareType" value="exact"/>
+    <groups>
+        <run>
+            <include name="@mode@"/>
+        </run>
+    </groups>
+    <classes>
+        <class name="com.sun.identity.qatest.samlv2.SAMLv2AuthNAuthorityTests"/>
+    </classes>
+</test>
+<test name="SAMLv2AuthNPostPasswordMinimum">
+    <parameter name="ptestName" value="acminimumpasspost"/>
+    <parameter name="ptestType" value="minimum"/>
+    <parameter name="pAttribute" value="post"/>
+    <parameter name="ptestModule" value="ldap"/>
+    <parameter name="pACClassType" value="Password"/>
+    <parameter name="pACCompareType" value="minimum"/>
+    <groups>
+        <run>
+            <include name="@mode@"/>
+        </run>
+    </groups>
+    <classes>
+        <class name="com.sun.identity.qatest.samlv2.SAMLv2AuthNAuthorityTests"/>
+    </classes>
+</test>
+<test name="SAMLv2AuthPostPasswordMaximum">
+    <parameter name="ptestName" value="acmaxpasspost"/>
+    <parameter name="ptestType" value="minimum"/>
+    <parameter name="pAttribute" value="post"/>
+    <parameter name="ptestModule" value="ldap"/>
+    <parameter name="pACClassType" value="Password"/>
+    <parameter name="pACCompareType" value="maximum"/>
+    <groups>
+        <run>
+            <include name="@mode@"/>
+        </run>
+    </groups>
+    <classes>
+        <class name="com.sun.identity.qatest.samlv2.SAMLv2AuthNAuthorityTests"/>
+    </classes>
+</test>
+<test name="SAMLv2AuthNPostPasswordBetter">
+    <parameter name="ptestName" value="acbetterpasspost"/>
+    <parameter name="ptestType" value="minimum"/>
+    <parameter name="pAttribute" value="post"/>
+    <parameter name="ptestModule" value="ldap"/>
+    <parameter name="pACClassType" value="Password"/>
+    <parameter name="pACCompareType" value="better"/>
+    <groups>
+        <run>
+            <include name="@mode@"/>
+        </run>
+    </groups>
+    <classes>
+        <class name="com.sun.identity.qatest.samlv2.SAMLv2AuthNAuthorityTests"/>
+    </classes>
+</test>
+<test name="SAMLv2AuthNArtPasswordproExact">
+    <parameter name="ptestName" value="acexactpassproart"/>
+    <parameter name="ptestType" value="minimum"/>
+    <parameter name="pAttribute" value="artifact"/>
+    <parameter name="ptestModule" value="ldap"/>
+    <parameter name="pACClassType" value="PasswordProtectedTransport"/>
+    <parameter name="pACCompareType" value="exact"/>
+    <groups>
+        <run>
+            <include name="@mode@"/>
+        </run>
+    </groups>
+    <classes>
+        <class name="com.sun.identity.qatest.samlv2.SAMLv2AuthNAuthorityTests"/>
+    </classes>
+</test>
+<test name="SAMLv2AuthNArtPasswordproMinimum">
+    <parameter name="ptestName" value="acminimumpassproart"/>
+    <parameter name="ptestType" value="minimum"/>
+    <parameter name="pAttribute" value="artifact"/>
+    <parameter name="ptestModule" value="ldap"/>
+    <parameter name="pACClassType" value="PasswordProtectedTransport"/>
+    <parameter name="pACCompareType" value="minimum"/>
+    <groups>
+        <run>
+            <include name="@mode@"/>
+        </run>
+    </groups>
+    <classes>
+        <class name="com.sun.identity.qatest.samlv2.SAMLv2AuthNAuthorityTests"/>
+    </classes>
+</test>
+<test name="SAMLv2AuthNArtPasswordproMaximum">
+    <parameter name="ptestName" value="acmaxpassproart"/>
+    <parameter name="ptestType" value="minimum"/>
+    <parameter name="pAttribute" value="artifact"/>
+    <parameter name="ptestModule" value="ldap"/>
+    <parameter name="pACClassType" value="PasswordProtectedTransport"/>
+    <parameter name="pACCompareType" value="maximum"/>
+    <groups>
+        <run>
+            <include name="@mode@"/>
+        </run>
+    </groups>
+    <classes>
+        <class name="com.sun.identity.qatest.samlv2.SAMLv2AuthNAuthorityTests"/>
+    </classes>
+</test>
+<test name="SAMLv2AuthNArtPasswordproBetter">
+    <parameter name="ptestName" value="acbetterpassproart"/>
+    <parameter name="ptestType" value="minimum"/>
+    <parameter name="pAttribute" value="artifact"/>
+    <parameter name="ptestModule" value="ldap"/>
+    <parameter name="pACClassType" value="PasswordProtectedTransport"/>
+    <parameter name="pACCompareType" value="better"/>
+    <groups>
+        <run>
+            <include name="@mode@"/>
+        </run>
+    </groups>
+    <classes>
+        <class name="com.sun.identity.qatest.samlv2.SAMLv2AuthNAuthorityTests"/>
+    </classes>
+</test>
+<test name="SAMLv2AuthNPostPasswordproExact">
+    <parameter name="ptestName" value="acexactpasspropost"/>
+    <parameter name="ptestType" value="minimum"/>
+    <parameter name="pAttribute" value="post"/>
+    <parameter name="ptestModule" value="ldap"/>
+    <parameter name="pACClassType" value="PasswordProtectedTransport"/>
+    <parameter name="pACCompareType" value="exact"/>
+    <groups>
+        <run>
+            <include name="@mode@"/>
+        </run>
+    </groups>
+    <classes>
+        <class name="com.sun.identity.qatest.samlv2.SAMLv2AuthNAuthorityTests"/>
+    </classes>
+</test>
+<test name="SAMLv2AuthNPostPasswordproMinimum">
+    <parameter name="ptestName" value="acminimumpasspropost"/>
+    <parameter name="ptestType" value="minimum"/>
+    <parameter name="pAttribute" value="post"/>
+    <parameter name="ptestModule" value="ldap"/>
+    <parameter name="pACClassType" value="PasswordProtectedTransport"/>
+    <parameter name="pACCompareType" value="minimum"/>
+    <groups>
+        <run>
+            <include name="@mode@"/>
+        </run>
+    </groups>
+    <classes>
+        <class name="com.sun.identity.qatest.samlv2.SAMLv2AuthNAuthorityTests"/>
+    </classes>
+</test>
+<test name="SAMLv2AuthPostPasswordproMaximum">
+    <parameter name="ptestName" value="acmaxpasspropost"/>
+    <parameter name="ptestType" value="minimum"/>
+    <parameter name="pAttribute" value="post"/>
+    <parameter name="ptestModule" value="ldap"/>
+    <parameter name="pACClassType" value="PasswordProtectedTransport"/>
+    <parameter name="pACCompareType" value="maximum"/>
+    <groups>
+        <run>
+            <include name="@mode@"/>
+        </run>
+    </groups>
+    <classes>
+        <class name="com.sun.identity.qatest.samlv2.SAMLv2AuthNAuthorityTests"/>
+    </classes>
+</test>
+<test name="SAMLv2AuthNPostPasswordproBetter">
+    <parameter name="ptestName" value="acbetterpasspropost"/>
+    <parameter name="ptestType" value="minimum"/>
+    <parameter name="pAttribute" value="post"/>
+    <parameter name="ptestModule" value="ldap"/>
+    <parameter name="pACClassType" value="PasswordProtectedTransport"/>
+    <parameter name="pACCompareType" value="better"/>
+    <groups>
+        <run>
+            <include name="@mode@"/>
+        </run>
+    </groups>
+    <classes>
+        <class name="com.sun.identity.qatest.samlv2.SAMLv2AuthNAuthorityTests"/>
+    </classes>
+</test>

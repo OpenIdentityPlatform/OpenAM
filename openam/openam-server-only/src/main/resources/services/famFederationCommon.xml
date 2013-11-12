@@ -1,0 +1,231 @@
+<?xml version='1.0' encoding="ISO-8859-1"?>
+                                                                                
+<!--
+   DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
+  
+   Copyright (c) 2007 Sun Microsystems Inc. All Rights Reserved
+  
+   The contents of this file are subject to the terms
+   of the Common Development and Distribution License
+   (the License). You may not use this file except in
+   compliance with the License.
+                                                                                
+   You can obtain a copy of the License at
+   https://opensso.dev.java.net/public/CDDLv1.0.html or
+   opensso/legal/CDDLv1.0.txt
+   See the License for the specific language governing
+   permission and limitations under the License.
+                                                                                
+   When distributing Covered Code, include this CDDL
+   Header Notice in each file and include the License file
+   at opensso/legal/CDDLv1.0.txt.
+   If applicable, add the following below the CDDL Header,
+   with the fields enclosed by brackets [] replaced by
+   your own identifying information:
+   "Portions Copyrighted [year] [name of copyright owner]"
+                                                                                
+   $Id: famFederationCommon.xml,v 1.4 2010/01/08 22:41:43 exu Exp $
+                                                                                
+-->
+
+
+<!DOCTYPE ServicesConfiguration 
+    PUBLIC "=//iPlanet//Service Management Services (SMS) 1.0 DTD//EN" 
+    "jar://com/sun/identity/sm/sms.dtd"> 
+
+<ServicesConfiguration> 
+    <Service name="sunFAMFederationCommon" version="1.0"> 
+        <Schema 
+            serviceHierarchy="/DSAMEConfig/sunFAMFederationCommon"
+            i18nFileName="famFederationCommon" 
+            revisionNumber="30"
+            i18nKey="sunFAMFederationCommon">
+
+            <Global> 
+                <AttributeSchema name="DatastoreClass"
+                    type="single" 
+                    syntax="string" 
+                    i18nKey="a101">
+                    <DefaultValues>
+                        <Value>com.sun.identity.plugin.datastore.impl.IdRepoDataStoreProvider</Value>
+                    </DefaultValues>
+                </AttributeSchema>
+                <AttributeSchema name="ConfigurationClass" 
+                    type="single" 
+                    syntax="string" 
+                    i18nKey="a102">
+                    <DefaultValues>
+                        <Value>com.sun.identity.plugin.configuration.impl.ConfigurationInstanceImpl</Value>
+                    </DefaultValues>
+                </AttributeSchema>
+                <AttributeSchema name="LoggerClass" 
+                    type="single" 
+                    syntax="string" 
+                    i18nKey="a103">
+                    <DefaultValues>
+                        <Value>com.sun.identity.plugin.log.impl.LogProvider</Value>
+                    </DefaultValues>
+                </AttributeSchema>
+                <AttributeSchema name="SessionProviderClass"
+                    type="single" 
+                    syntax="string" 
+                    i18nKey="a104">
+                    <DefaultValues>
+                        <Value>com.sun.identity.plugin.session.impl.FMSessionProvider</Value>
+                    </DefaultValues>
+                </AttributeSchema>
+                <AttributeSchema name="MaxContentLength"
+                    type="single" 
+                    syntax="number" 
+                    i18nKey="a105">
+                    <DefaultValues>
+                        <Value>20480</Value>
+                    </DefaultValues>
+                </AttributeSchema>
+                <AttributeSchema name="PasswordDecoderClass" 
+                    type="single" 
+                    syntax="string" 
+                    i18nKey="a110">
+                    <DefaultValues>
+                        <Value>com.sun.identity.saml.xmlsig.FMPasswordDecoder</Value>
+                    </DefaultValues>
+                </AttributeSchema>
+                <AttributeSchema name="SignatureProviderClass" 
+                    type="single" 
+                    syntax="string" 
+                    i18nKey="a111">
+                    <DefaultValues>
+                        <Value>com.sun.identity.saml.xmlsig.AMSignatureProvider</Value>
+                    </DefaultValues>
+                </AttributeSchema>
+                <AttributeSchema name="KeyProviderClass" 
+                    type="single" 
+                    syntax="string" 
+                    i18nKey="a112">
+                    <DefaultValues>
+                        <Value>com.sun.identity.saml.xmlsig.JKSKeyProvider</Value>
+                    </DefaultValues>
+                </AttributeSchema>
+                <AttributeSchema name="CheckCert" 
+                    type="single_choice" 
+                    syntax="string" 
+                    i18nKey="a113">
+                    <ChoiceValues>
+                        <ChoiceValue i18nKey="off">off</ChoiceValue>
+                        <ChoiceValue i18nKey="on">on</ChoiceValue>
+                    </ChoiceValues>
+                    <DefaultValues>
+                        <Value>on</Value>
+                    </DefaultValues>
+                </AttributeSchema>
+                <AttributeSchema name="CannonicalizationAlgorithm" 
+                    type="single_choice" 
+                    syntax="string" 
+                    i18nKey="a114">
+                    <ChoiceValues>
+                        <ChoiceValue i18nKey="http://www.w3.org/2001/10/xml-exc-c14n#">http://www.w3.org/2001/10/xml-exc-c14n#</ChoiceValue>
+                        <ChoiceValue i18nKey="http://www.w3.org/2001/10/xml-exc-c14n#WithComments">http://www.w3.org/2001/10/xml-exc-c14n#WithComments</ChoiceValue>
+                        <ChoiceValue i18nKey="http://www.w3.org/TR/2001/REC-xml-c14n-20010315">http://www.w3.org/TR/2001/REC-xml-c14n-20010315</ChoiceValue>
+                        <ChoiceValue i18nKey="http://www.w3.org/TR/2001/REC-xml-c14n-20010315#WithComments">http://www.w3.org/TR/2001/REC-xml-c14n-20010315#WithComments</ChoiceValue>
+                    </ChoiceValues>
+                    <DefaultValues>
+                        <Value>http://www.w3.org/2001/10/xml-exc-c14n#</Value>
+                    </DefaultValues>
+                </AttributeSchema>
+                <AttributeSchema name="SignatureAlgorithm" 
+                    type="single_choice" 
+                    syntax="string" 
+                    i18nKey="a115">
+                    <ChoiceValues>
+                        <ChoiceValue i18nKey="http://www.w3.org/2000/09/xmldsig#rsa-sha1">http://www.w3.org/2000/09/xmldsig#rsa-sha1</ChoiceValue>
+                        <ChoiceValue i18nKey="http://www.w3.org/2000/09/xmldsig#hmac-sha1">http://www.w3.org/2000/09/xmldsig#hmac-sha1</ChoiceValue>
+                        <ChoiceValue i18nKey="http://www.w3.org/2000/09/xmldsig#dsa-sha1">http://www.w3.org/2000/09/xmldsig#dsa-sha1</ChoiceValue>
+                        <ChoiceValue i18nKey="http://www.w3.org/2001/04/xmldsig-more#rsa-md5">http://www.w3.org/2001/04/xmldsig-more#rsa-md5</ChoiceValue>
+                        <ChoiceValue i18nKey="http://www.w3.org/2001/04/xmldsig-more#rsa-ripemd160">http://www.w3.org/2001/04/xmldsig-more#rsa-ripemd160</ChoiceValue>
+                        <ChoiceValue i18nKey="http://www.w3.org/2001/04/xmldsig-more#rsa-sha256">http://www.w3.org/2001/04/xmldsig-more#rsa-sha256</ChoiceValue>
+                        <ChoiceValue i18nKey="http://www.w3.org/2001/04/xmldsig-more#rsa-sha384">http://www.w3.org/2001/04/xmldsig-more#rsa-sha384</ChoiceValue>
+                        <ChoiceValue i18nKey="http://www.w3.org/2001/04/xmldsig-more#rsa-sha512">http://www.w3.org/2001/04/xmldsig-more#rsa-sha512</ChoiceValue>
+                        <ChoiceValue i18nKey="http://www.w3.org/2001/04/xmldsig-more#hmac-md5">http://www.w3.org/2001/04/xmldsig-more#hmac-md5</ChoiceValue>
+                        <ChoiceValue i18nKey="http://www.w3.org/2001/04/xmldsig-more#hmac-ripemd160">http://www.w3.org/2001/04/xmldsig-more#hmac-ripemd160</ChoiceValue>
+                        <ChoiceValue i18nKey="http://www.w3.org/2001/04/xmldsig-more#hmac-sha256">http://www.w3.org/2001/04/xmldsig-more#hmac-sha256</ChoiceValue>
+                        <ChoiceValue i18nKey="http://www.w3.org/2001/04/xmldsig-more#hmac-sha384">http://www.w3.org/2001/04/xmldsig-more#hmac-sha384</ChoiceValue>
+                        <ChoiceValue i18nKey="http://www.w3.org/2001/04/xmldsig-more#hmac-sha512">http://www.w3.org/2001/04/xmldsig-more#hmac-sha512</ChoiceValue>
+                    </ChoiceValues>
+                    <DefaultValues>
+                        <Value>http://www.w3.org/2000/09/xmldsig#rsa-sha1</Value>
+                    </DefaultValues>
+                </AttributeSchema>
+                <AttributeSchema name="TransformationAlgorithm" 
+                    type="single_choice" 
+                    syntax="string" 
+                    i18nKey="a116">
+                    <ChoiceValues>
+                        <ChoiceValue i18nKey="http://www.w3.org/2001/10/xml-exc-c14n#">http://www.w3.org/2001/10/xml-exc-c14n#</ChoiceValue>
+                        <ChoiceValue i18nKey="http://www.w3.org/2001/10/xml-exc-c14n#WithComments">http://www.w3.org/2001/10/xml-exc-c14n#WithComments</ChoiceValue>
+                        <ChoiceValue i18nKey="http://www.w3.org/TR/2001/REC-xml-c14n-20010315">http://www.w3.org/TR/2001/REC-xml-c14n-20010315</ChoiceValue>
+                        <ChoiceValue i18nKey="http://www.w3.org/TR/2001/REC-xml-c14n-20010315#WithComments">http://www.w3.org/TR/2001/REC-xml-c14n-20010315#WithComments</ChoiceValue>
+                        <ChoiceValue i18nKey="http://www.w3.org/TR/1999/REC-xslt-19991116">http://www.w3.org/TR/1999/REC-xslt-19991116</ChoiceValue>
+                        <ChoiceValue i18nKey="http://www.w3.org/2000/09/xmldsig#base64">http://www.w3.org/2000/09/xmldsig#base64</ChoiceValue>
+                        <ChoiceValue i18nKey="http://www.w3.org/TR/1999/REC-xpath-19991116">http://www.w3.org/TR/1999/REC-xpath-19991116</ChoiceValue>
+                        <ChoiceValue i18nKey="http://www.w3.org/2000/09/xmldsig#enveloped-signature">http://www.w3.org/2000/09/xmldsig#enveloped-signature</ChoiceValue>
+                        <ChoiceValue i18nKey="http://www.w3.org/TR/2001/WD-xptr-20010108">http://www.w3.org/TR/2001/WD-xptr-20010108</ChoiceValue>
+                        <ChoiceValue i18nKey="http://www.w3.org/2002/04/xmldsig-filter2">http://www.w3.org/2002/04/xmldsig-filter2</ChoiceValue>
+                        <ChoiceValue i18nKey="http://www.w3.org/2002/06/xmldsig-filter2">http://www.w3.org/2002/06/xmldsig-filter2</ChoiceValue>
+                        <ChoiceValue i18nKey="http://www.nue.et-inf.uni-siegen.de/~geuer-pollmann/#xpathFilter">http://www.nue.et-inf.uni-siegen.de/~geuer-pollmann/#xpathFilter</ChoiceValue>
+                    </ChoiceValues>
+                    <DefaultValues>
+                        <Value>http://www.w3.org/2001/10/xml-exc-c14n#</Value>
+                    </DefaultValues>
+                </AttributeSchema>
+                <AttributeSchema name="SAMLErrorPageURL"
+                    type="single"
+                    syntax="string"
+                    i18nKey="a117">
+                    <DefaultValues>
+                        <Value>/saml2/jsp/saml2error.jsp</Value>
+                    </DefaultValues>
+                </AttributeSchema>
+                <AttributeSchema name="SAMLErrorPageHTTPBinding"
+                    type="single"
+                    syntax="string"
+                    i18nKey="a118">
+                    <DefaultValues>
+                        <Value>HTTP-POST</Value>
+                    </DefaultValues>
+                </AttributeSchema>
+                <AttributeSchema name="MonAgentClass"
+                    type="single"
+                    syntax="string"
+                    i18nKey="a119">
+                    <DefaultValues>
+                        <Value>com.sun.identity.plugin.monitoring.impl.AgentProvider</Value>
+                    </DefaultValues>
+                </AttributeSchema>
+                <AttributeSchema name="MonSAML1Class"
+                    type="single"
+                    syntax="string"
+                    i18nKey="a120">
+                    <DefaultValues>
+                        <Value>com.sun.identity.plugin.monitoring.impl.FedMonSAML1SvcProvider</Value>
+                    </DefaultValues>
+                </AttributeSchema>
+                <AttributeSchema name="MonSAML2Class"
+                    type="single"
+                    syntax="string"
+                    i18nKey="a121">
+                    <DefaultValues>
+                        <Value>com.sun.identity.plugin.monitoring.impl.FedMonSAML2SvcProvider</Value>
+                    </DefaultValues>
+                </AttributeSchema>
+                <AttributeSchema name="MonIDFFClass"
+                    type="single"
+                    syntax="string"
+                    i18nKey="a122">
+                    <DefaultValues>
+                        <Value>com.sun.identity.plugin.monitoring.impl.FedMonIDFFSvcProvider</Value>
+                    </DefaultValues>
+                </AttributeSchema>
+            </Global> 
+        </Schema> 
+    </Service> 
+</ServicesConfiguration> 

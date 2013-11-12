@@ -1,0 +1,182 @@
+<!DOCTYPE suite SYSTEM "http://testng.org/testng-1.0.dtd" >
+
+<!--
+   DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
+  
+   Copyright (c) 2006 Sun Microsystems Inc. All Rights Reserved
+  
+   The contents of this file are subject to the terms
+   of the Common Development and Distribution License
+   (the License). You may not use this file except in
+   compliance with the License.
+ 
+   You can obtain a copy of the License at
+   https://opensso.dev.java.net/public/CDDLv1.0.html or
+   opensso/legal/CDDLv1.0.txt
+   See the License for the specific language governing
+   permission and limitations under the License.
+ 
+   When distributing Covered Code, include this CDDL
+   Header Notice in each file and include the License file
+   at opensso/legal/CDDLv1.0.txt.
+   If applicable, add the following below the CDDL Header,
+   with the fields enclosed by brackets [] replaced by
+   your own identifying information:
+   "Portions Copyrighted [year] [name of copyright owner]"
+ 
+   $Id: idm-testng.xml,v 1.4 2008/06/25 05:44:24 qcheng Exp $
+ 
+-->
+<!--
+   Portions Copyrighted 2012 ForgeRock Inc
+-->
+
+<suite name="OpenAM_API_IdRepo" verbose="1">
+    <parameter name="parent-realms" value="/idpoUnitTest,/idpoUnitTest/subrealm" />
+
+    <test name="IdRepo_Agent">
+        <parameter name="parent-realm" value="/idpoUnitTest" />
+        <parameter name="entity-type" value="agent" />
+        <parameter name="entity-name" value="agent" />
+        <parameter name="entity-creation-attributes" value="userpassword=password;sunIdentityServerDeviceStatus=Active" />
+        <parameter name="entity-modify-attributes" value="sunIdentityServerDeviceStatus=Inactive" />
+        <parameter name="entity-required-attributes" value="sunIdentityServerDeviceStatus" />
+        <parameter name="entity-modify-service1-name" value="" />
+        <parameter name="entity-modify-service1-attributes" value="" />
+        <parameter name="entity-binary-attributes" value="" />
+        <groups>
+            <run>
+                <include name="api" />
+                <exclude name="service" />
+                <include name="ldap" />
+                <exclude name="memberships" />
+                <exclude name="user-base" />
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.idm.AMIdentityTestBase"/>
+        </classes>
+    </test>
+
+    <test name="IdRepo_Group">
+        <parameter name="parent-realm" value="/idpoUnitTest" />
+        <parameter name="entity-type" value="group" />
+        <parameter name="entity-name" value="mygroup" />
+        <parameter name="entity-creation-attributes" value="" />
+        <parameter name="entity-modify-attributes" value="" />
+        <parameter name="entity-required-attributes" value="cn" />
+        <parameter name="entity-modify-service1-name" value="" />
+        <parameter name="entity-modify-service1-attributes" value="" />
+        <parameter name="entity-binary-attributes" value="" />
+        <groups>
+            <run>
+                <include name="api" />
+                <include name="ldap" />
+                <exclude name="service" />
+                <include name="memberships" />
+                <exclude name="user-base" />
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.idm.AMIdentityTestBase"/>
+        </classes>
+    </test>
+
+    <test name="IdRepo_User">
+        <parameter name="parent-realm" value="/idpoUnitTest" />
+        <parameter name="entity-type" value="user" />
+        <parameter name="entity-name" value="bob" />
+        <parameter name="entity-creation-attributes" value="sn=Best;cn=Robert;userpassword=password;inetuserstatus=Active" />
+        <parameter name="entity-modify-attributes" value="sn=BestX;cn=RobertX" />
+        <parameter name="entity-required-attributes" value="sn,cn" />
+        <parameter name="entity-modify-service1-name" value="iPlanetAMSessionService" />
+        <parameter name="entity-modify-service1-attributes" value="iplanet-am-session-quota-limit=10;iplanet-am-session-max-session-time=30;iplanet-am-session-max-idle-time=120;iplanet-am-session-max-caching-time=3" />
+        <parameter name="entity-binary-attributes" value="mock/idm/logo_sun_small.gif" />
+        <groups>
+            <run>
+                <include name="api" />
+                <include name="service" />
+                <include name="ldap" />
+                <exclude name="memberships" />
+                <include name="user-base" />
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.idm.AMIdentityTestBase"/>
+        </classes>
+    </test>
+    
+    <test name="IdRepo_subRealm_Agent">
+        <parameter name="parent-realm" value="/idpoUnitTest/subrealm" />
+        <parameter name="entity-type" value="agent" />
+        <parameter name="entity-name" value="sub-agent" />
+        <parameter name="entity-creation-attributes" value="userpassword=password;sunIdentityServerDeviceStatus=Active" />
+        <parameter name="entity-modify-attributes" value="sunIdentityServerDeviceStatus=Inactive" />
+        <parameter name="entity-required-attributes" value="sunIdentityServerDeviceStatus" />
+        <parameter name="entity-modify-service1-name" value="" />
+        <parameter name="entity-modify-service1-attributes" value="" />
+        <parameter name="entity-binary-attributes" value="" />
+        <groups>
+            <run>
+                <include name="api" />
+                <exclude name="service" />
+                <include name="ldap" />
+                <exclude name="memberships" />
+                <exclude name="user-base" />
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.idm.AMIdentityTestBase"/>
+        </classes>
+    </test>
+
+    <test name="IdRepo_subRealm_Group">
+        <parameter name="parent-realm" value="/idpoUnitTest/subrealm" />
+        <parameter name="entity-type" value="group" />
+        <parameter name="entity-name" value="sub-mygroup" />
+        <parameter name="entity-creation-attributes" value="" />
+        <parameter name="entity-modify-attributes" value="" />
+        <parameter name="entity-required-attributes" value="cn" />
+        <parameter name="entity-modify-service1-name" value="" />
+        <parameter name="entity-modify-service1-attributes" value="" />
+        <parameter name="entity-binary-attributes" value="" />
+        <groups>
+            <run>
+                <include name="api" />
+                <include name="ldap" />
+                <exclude name="service" />
+                <include name="memberships" />
+                <exclude name="user-base" />
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.idm.AMIdentityTestBase"/>
+        </classes>
+    </test>
+
+    <test name="IdRepo_subRealm_User">
+        <parameter name="parent-realm" value="/idpoUnitTest/subrealm" />
+        <parameter name="entity-type" value="user" />
+        <parameter name="entity-name" value="sub-bob" />
+        <parameter name="entity-creation-attributes" value="sn=Best;cn=Robert;userpassword=password;inetuserstatus=Active" />
+        <parameter name="entity-modify-attributes" value="sn=BestX;cn=RobertX" />
+        <parameter name="entity-required-attributes" value="sn,cn" />
+        <parameter name="entity-modify-service1-name" value="iPlanetAMSessionService" />
+        <parameter name="entity-modify-service1-attributes" value="iplanet-am-session-quota-limit=10;iplanet-am-session-max-session-time=30;iplanet-am-session-max-idle-time=120;iplanet-am-session-max-caching-time=3" />
+        <parameter name="entity-binary-attributes" value="mock/idm/logo_sun_small.gif" />
+        <groups>
+            <run>
+                <include name="api" />
+                <include name="service" />
+                <include name="ldap" />
+                <exclude name="memberships" />
+                <include name="user-base" />
+            </run>
+        </groups>
+        <classes>
+            <class name="com.sun.identity.idm.AMIdentityTestBase"/>
+        </classes>
+    </test>
+
+</suite>
+
