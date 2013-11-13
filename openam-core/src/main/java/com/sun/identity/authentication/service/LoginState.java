@@ -27,9 +27,8 @@
  */
 
 /**
- * Portions Copyrighted 2010-2013 ForgeRock, Inc.
+ * Portions Copyrighted 2010-2013 ForgeRock AS
  */
-
 package com.sun.identity.authentication.service;
 
 import com.iplanet.am.sdk.AMException;
@@ -4161,16 +4160,7 @@ public class LoginState {
             failureLoginURL = moduleFailureLoginURL;
             return;
         }
-        
-        
-        /*
-         * if gotoOnFail parameter was specified  then return the gotoOnFailURL
-         */
-        if ( (gotoOnFailURL != null) && (gotoOnFailURL.length() != 0) ) {
-            failureLoginURL = gotoOnFailURL;
-            return;
-        }
-        
+
         if (messageEnabled) {
             debug.message("failureTokenId in setFailureLoginURL = "
             + failureTokenId);
@@ -4277,10 +4267,19 @@ public class LoginState {
         if (postProcessURL != null) {
             return postProcessURL;
         }
-        /* this method for UI called from AuthUtils */
-        if ((fqdnFailureLoginURL == null) || (fqdnFailureLoginURL.length() == 0)
-        ) {
-            fqdnFailureLoginURL = ad.processURL(failureLoginURL,servletRequest);
+        if (gotoOnFailURL != null && !gotoOnFailURL.isEmpty()) {
+            if (!gotoOnFailURL.startsWith("/") && !ad.isGotoUrlValid(gotoOnFailURL, getOrgDN())) {
+                if (AuthD.debug.messageEnabled()) {
+                    AuthD.debug.message("LoginState.getFailureLoginURL(): Original gotoOnFail URL is " + gotoOnFailURL
+                            + " which is invalid");
+                }
+	        gotoOnFailURL = null;
+            }
+        }
+        if (gotoOnFailURL != null && !gotoOnFailURL.isEmpty() && !gotoOnFailURL.equalsIgnoreCase("null")) {
+            fqdnFailureLoginURL = ad.processURL(gotoOnFailURL, servletRequest);
+        } else if (fqdnFailureLoginURL == null || !fqdnFailureLoginURL.isEmpty()) {
+            fqdnFailureLoginURL = ad.processURL(failureLoginURL, servletRequest);
         }
         return fqdnFailureLoginURL;
     }
