@@ -27,7 +27,7 @@
  */
 
 /**
- * Portions Copyrighted 2010-2012 ForgeRock Inc
+ * Portions Copyrighted 2010-2013 ForgeRock AS
  */
 
 package com.sun.identity.saml2.profile;
@@ -81,6 +81,7 @@ import com.sun.identity.plugin.session.SessionManager;
 import com.sun.identity.plugin.session.SessionProvider;
 import com.sun.identity.plugin.session.SessionException;
 import com.sun.identity.saml2.common.SAML2RepositoryFactory;
+import com.sun.identity.saml2.plugins.SAML2ServiceProviderAdapter;
 import com.sun.identity.saml2.protocol.IDPList;
 import org.w3c.dom.Element;
 
@@ -149,21 +150,24 @@ public class IDPProxyUtil {
      * @exception SAML2Exception for any SAML2 failure.
      * @exception IOException if there is a failure in redirection.
      */
-    public static void sendProxyAuthnRequest (
-         AuthnRequest authnRequest,
-         String preferredIDP,
-         SPSSODescriptorElement spSSODescriptor,
-         String hostedEntityId,
-         HttpServletRequest request,
-         HttpServletResponse response, 
-         String realm, 
-         String relayState,
-         String binding)
-         throws SAML2Exception, IOException 
-    {
+    public static void sendProxyAuthnRequest(
+            AuthnRequest authnRequest,
+            String preferredIDP,
+            SPSSODescriptorElement spSSODescriptor,
+            String hostedEntityId,
+            HttpServletRequest request,
+            HttpServletResponse response,
+            String realm,
+            String relayState,
+            String binding)
+            throws SAML2Exception, IOException {
          String classMethod = "IDPProxyUtil.sendProxyAuthnRequest: ";
-         AuthnRequest newAuthnRequest = getNewAuthnRequest(hostedEntityId,
-             preferredIDP, realm, authnRequest);
+         AuthnRequest newAuthnRequest = getNewAuthnRequest(hostedEntityId, preferredIDP, realm, authnRequest);
+         // invoke SP Adapter class if registered
+         SAML2ServiceProviderAdapter spAdapter = SAML2Utils.getSPAdapterClass(hostedEntityId, realm);
+         if (spAdapter != null) {
+             spAdapter.preSingleSignOnRequest(hostedEntityId, preferredIDP, realm, request, response, newAuthnRequest);
+         }
          if (SAML2Utils.debug.messageEnabled()) {
              SAML2Utils.debug.message(classMethod +
                  "New Authentication request:" +
