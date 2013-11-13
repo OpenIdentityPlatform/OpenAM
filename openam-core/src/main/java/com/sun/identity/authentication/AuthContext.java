@@ -1925,6 +1925,9 @@ public class AuthContext extends Object implements java.io.Serializable {
                     XMLUtils.getRootNode(receivedDocument, AuthXMLTags.REMOTE_REQUEST_RESPONSE));
             }
         } else {
+            //since there was no error, we should reset the loginException, to handle the case when the first auth
+            //server was not available.
+            loginException = null;
             // Get the status attribute
             String status = XMLUtils.getNodeAttributeValue(
             loginStatusNode, AuthXMLTags.STATUS);
