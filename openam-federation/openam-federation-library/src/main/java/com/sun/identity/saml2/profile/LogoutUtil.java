@@ -84,6 +84,7 @@ import com.sun.identity.saml2.protocol.SessionIndex;
 import com.sun.identity.saml2.protocol.Status;
 import com.sun.identity.saml2.protocol.StatusDetail;
 import com.sun.identity.plugin.session.SessionException;
+import java.util.HashMap;
 
 /**
  * This class constructs the <code>LogoutRequest</code> and executes
@@ -134,48 +135,77 @@ public class LogoutUtil {
      * @throws SessionException if error initiating request to IDP.
      */
     public static StringBuffer doLogout(
-        String metaAlias,
-        String recipientEntityID,
-        List recipientSLOList,
-        List extensionsList,
-        String binding,
-        String relayState,
-        String sessionIndex,
-        NameID nameID,
-        HttpServletRequest request,
-        HttpServletResponse response,
-        Map paramsMap,
-        BaseConfigType config) throws SAML2Exception, SessionException {
+            String metaAlias,
+            String recipientEntityID,
+            List<SingleLogoutServiceElement> recipientSLOList,
+            List extensionsList,
+            String binding,
+            String relayState,
+            String sessionIndex,
+            NameID nameID,
+            HttpServletRequest request,
+            HttpServletResponse response,
+            Map paramsMap,
+            BaseConfigType config) throws SAML2Exception, SessionException {
+        SingleLogoutServiceElement logoutEndpoint = null;
+        for (SingleLogoutServiceElement endpoint : recipientSLOList) {
+            if (binding.equals(endpoint.getBinding())) {
+                logoutEndpoint = endpoint;
+                break;
+            }
+        }
+        return doLogout(metaAlias, recipientEntityID, extensionsList, logoutEndpoint, relayState, sessionIndex, nameID,
+                request, response, paramsMap, config);
+    }
+
+    public static StringBuffer doLogout(
+            String metaAlias,
+            String recipientEntityID,
+            List extensionsList,
+            SingleLogoutServiceElement logoutEndpoint,
+            String relayState,
+            String sessionIndex,
+            NameID nameID,
+            HttpServletRequest request,
+            HttpServletResponse response,
+            Map paramsMap,
+            BaseConfigType config) throws SAML2Exception, SessionException {
         StringBuffer logoutRequestID = new StringBuffer();
 
         String classMethod = "LogoutUtil.doLogout: ";
         String requesterEntityID = metaManager.getEntityByMetaAlias(metaAlias);
-        String realm = SAML2MetaUtils.getRealmByMetaAlias(metaAlias); 
+        String realm = SAML2MetaUtils.getRealmByMetaAlias(metaAlias);
         String hostEntityRole = SAML2Utils.getHostEntityRole(paramsMap);
-        
+        String location = null;
+        String binding = null;
+        if (logoutEndpoint != null) {
+            location = logoutEndpoint.getLocation();
+            binding = logoutEndpoint.getBinding();
+        } else {
+            debug.error(classMethod + "Unable to find the recipient's single logout service with the binding "
+                    + binding);
+            throw new SAML2Exception(SAML2Utils.bundle.getString("sloServiceNotfound"));
+        }
+
         if (debug.messageEnabled()) {
-            debug.message(
-                classMethod + "Entering ..." +
-                "\nrequesterEntityID=" + requesterEntityID +
-                "\nrecipientEntityID=" + recipientEntityID +
-                "\nbinding=" + binding +
-                "\nrelayState=" + relayState +
-                "\nsessionIndex=" + sessionIndex);
+            debug.message(classMethod + "Entering ..."
+                    + "\nrequesterEntityID=" + requesterEntityID
+                    + "\nrecipientEntityID=" + recipientEntityID
+                    + "\nbinding=" + binding
+                    + "\nrelayState=" + relayState
+                    + "\nsessionIndex=" + sessionIndex);
         }
 
         // generate unique request ID
         String requestID = SAML2Utils.generateID();
         if ((requestID == null) || (requestID.length() == 0)) {
-            throw new SAML2Exception(
-                SAML2Utils.bundle.getString("cannotGenerateID"));
+            throw new SAML2Exception(SAML2Utils.bundle.getString("cannotGenerateID"));
         }
 
         // retrieve data from the params map
         // destinationURI required if message is signed.
-        String destinationURI = SAML2Utils.getParameter(paramsMap,
-            SAML2Constants.DESTINATION);
-        String consent = SAML2Utils.getParameter(
-            paramsMap,SAML2Constants.CONSENT);
+        String destinationURI = SAML2Utils.getParameter(paramsMap, SAML2Constants.DESTINATION);
+        String consent = SAML2Utils.getParameter(paramsMap, SAML2Constants.CONSENT);
         Extensions extensions = createExtensions(extensionsList);
         Issuer issuer = SAML2Utils.createIssuer(requesterEntityID);
 
@@ -184,49 +214,41 @@ public class LogoutUtil {
         try {
             logoutReq = ProtocolFactory.getInstance().createLogoutRequest();
         } catch (Exception e) {
-            debug.error(
-                classMethod +
-                "Unable to create LogoutRequest : ", e);
-            throw new SAML2Exception(
-                SAML2Utils.bundle.getString("errorCreatingLogoutRequest"));
+            debug.error(classMethod + "Unable to create LogoutRequest : ", e);
+            throw new SAML2Exception(SAML2Utils.bundle.getString("errorCreatingLogoutRequest"));
         }
 
         // set required attributes / elements
         logoutReq.setID(requestID);
         logoutReq.setVersion(SAML2Constants.VERSION_2_0);
         logoutReq.setIssueInstant(new Date());
-        setNameIDForSLORequest(logoutReq, nameID, realm, requesterEntityID,
-                               hostEntityRole, recipientEntityID);
+        setNameIDForSLORequest(logoutReq, nameID, realm, requesterEntityID, hostEntityRole, recipientEntityID);
 
         // set optional attributes / elements
-        logoutReq.setDestination(XMLUtils.escapeSpecialCharacters(
-            destinationURI));
+        logoutReq.setDestination(XMLUtils.escapeSpecialCharacters(destinationURI));
         logoutReq.setConsent(consent);
-        logoutReq.setIssuer(issuer);  
+        logoutReq.setIssuer(issuer);
         if (hostEntityRole.equals(SAML2Constants.IDP_ROLE)) {
             // use the assertion effective time (in seconds)
             int effectiveTime = SAML2Constants.ASSERTION_EFFECTIVE_TIME;
-            String effectiveTimeStr = SAML2Utils.getAttributeValueFromSSOConfig(
-                realm, requesterEntityID, SAML2Constants.IDP_ROLE,
-                SAML2Constants.ASSERTION_EFFECTIVE_TIME_ATTRIBUTE);
+            String effectiveTimeStr = SAML2Utils.getAttributeValueFromSSOConfig(realm, requesterEntityID,
+                    SAML2Constants.IDP_ROLE, SAML2Constants.ASSERTION_EFFECTIVE_TIME_ATTRIBUTE);
             if (effectiveTimeStr != null) {
                 try {
                     effectiveTime = Integer.parseInt(effectiveTimeStr);
                     if (SAML2Utils.debug.messageEnabled()) {
-                        SAML2Utils.debug.message(classMethod +
-                            "got effective time from config:" + effectiveTime);
+                        SAML2Utils.debug.message(classMethod + "got effective time from config:" + effectiveTime);
                     }
                 } catch (NumberFormatException nfe) {
-                    SAML2Utils.debug.error(classMethod +
-                        "Failed to get assertion effective time from " +
-                        "IDP SSO config: ", nfe);
+                    SAML2Utils.debug.error(classMethod + "Failed to get assertion effective time from "
+                            + "IDP SSO config: ", nfe);
                     effectiveTime = SAML2Constants.ASSERTION_EFFECTIVE_TIME;
                 }
             }
             Date date = new Date();
             date.setTime(date.getTime() + effectiveTime * 1000);
             logoutReq.setNotOnOrAfter(date);
-        }    
+        }
         if (extensions != null) {
             logoutReq.setExtensions(extensions);
         }
@@ -237,76 +259,53 @@ public class LogoutUtil {
             logoutReq.setSessionIndex(list);
         }
 
-        // get recipient's logout service location
-        // based on binding
-        String location = getSLOServiceLocation(recipientSLOList,binding);
-        if (location == null || location.length() == 0) {
-            debug.error(classMethod +
-                "Unable to find the recipient's single logout " +
-                "service with the binding " + binding);
-            throw new SAML2Exception(
-                SAML2Utils.bundle.getString("sloServiceNotfound"));
-        } else {
-            debug.message(classMethod +
-                "Recipient's single logout service location = " +
-                location);
-            if (destinationURI == null || (destinationURI.length() == 0)) { 
-                logoutReq.setDestination(XMLUtils.escapeSpecialCharacters(
-                    location));
-            }  
+        debug.message(classMethod + "Recipient's single logout service location = " + location);
+        if (destinationURI == null || destinationURI.isEmpty()) {
+            logoutReq.setDestination(XMLUtils.escapeSpecialCharacters(location));
         }
 
         if (debug.messageEnabled()) {
             debug.message(classMethod + "SLO Request before signing : ");
-            debug.message(logoutReq.toXMLString(true,true));
+            debug.message(logoutReq.toXMLString(true, true));
         }
-        
+
         if (binding.equals(SAML2Constants.HTTP_REDIRECT)) {
-            try { 
+            try {
                 doSLOByHttpRedirect(logoutReq.toXMLString(true, true),
-                                    location,
-                                    relayState,
-                                    realm, 
-                                    requesterEntityID,
-                                    hostEntityRole, 
-                                    recipientEntityID,        
-                                    response);
+                        location,
+                        relayState,
+                        realm,
+                        requesterEntityID,
+                        hostEntityRole,
+                        recipientEntityID,
+                        response);
                 logoutRequestID.append(requestID);
                 String[] data = {location};
-                LogUtil.access(Level.INFO,LogUtil.REDIRECT_TO_IDP, data,
-                    null);
+                LogUtil.access(Level.INFO, LogUtil.REDIRECT_TO_IDP, data, null);
             } catch (Exception e) {
-                debug.error("Exception :",e);
-                throw new SAML2Exception(
-                    SAML2Utils.bundle.getString(
-                    "errorRedirectingLogoutRequest"));
+                debug.error("Exception :", e);
+                throw new SAML2Exception(SAML2Utils.bundle.getString("errorRedirectingLogoutRequest"));
             }
         } else if (binding.equals(SAML2Constants.SOAP)) {
             logoutRequestID.append(requestID);
-            signSLORequest(logoutReq, realm, requesterEntityID, 
-                hostEntityRole, recipientEntityID);
+            signSLORequest(logoutReq, realm, requesterEntityID, hostEntityRole, recipientEntityID);
             if (debug.messageEnabled()) {
                 debug.message(classMethod + "SLO Request after signing : ");
-                debug.message(logoutReq.toXMLString(true,true));
+                debug.message(logoutReq.toXMLString(true, true));
             }
-            location = SAML2Utils.fillInBasicAuthInfo(
-                config, location);
-            
-            doSLOBySOAP(requestID, logoutReq,
-                location, realm, requesterEntityID, hostEntityRole, 
-                request, response); 
+            location = SAML2Utils.fillInBasicAuthInfo(config, location);
+
+            doSLOBySOAP(requestID, logoutReq, location, realm, requesterEntityID, hostEntityRole, request, response);
         } else if (binding.equals(SAML2Constants.HTTP_POST)) {
             logoutRequestID.append(requestID);
-            signSLORequest(logoutReq, realm, requesterEntityID, 
-                hostEntityRole, recipientEntityID);
+            signSLORequest(logoutReq, realm, requesterEntityID, hostEntityRole, recipientEntityID);
             if (debug.messageEnabled()) {
                 debug.message(classMethod + "SLO Request after signing : ");
-                debug.message(logoutReq.toXMLString(true,true));
+                debug.message(logoutReq.toXMLString(true, true));
             }
-            doSLOByPOST(requestID, logoutReq.toXMLString(true,true),
-                location, relayState,realm, requesterEntityID, hostEntityRole, 
-                response); 
-	}
+            doSLOByPOST(requestID, logoutReq.toXMLString(true, true), location, relayState, realm, requesterEntityID,
+                    hostEntityRole, response);
+        }
         SPCache.logoutRequestIDHash.put(logoutRequestID.toString(), logoutReq);
         return logoutRequestID;
     }
@@ -575,6 +574,54 @@ public class LogoutUtil {
             debug.error("LogoutUtil.setSessionIndex: ", e);
         }
 
+    }
+
+    /**
+     * Based on the preferred SAML binding this method tries to choose the most appropriate
+     * {@link SingleLogoutServiceElement} that can be used to send the logout request to. The algorithm itself is
+     * simple:
+     * <ul>
+     *  <li>When asynchronous binding was used with the initial logout request, it is preferred to use asynchronous
+     *      bindings, but if they are not available, a synchronous binding should be used.</li>
+     *  <li>When synchronous binding is used with the initial request, only synchronous bindings can be used for the
+     *      rest of the entities.</li>
+     * </ul>
+     *
+     * @param sloList The list of SLO endpoints for a given entity.
+     * @param preferredBinding The binding that was used to initiate the logout request.
+     * @return The most appropriate SLO service location that can be used for sending the logout request. If there is
+     * no appropriate logout endpoint, null is returned.
+     */
+    public static SingleLogoutServiceElement getMostAppropriateSLOServiceLocation(
+            List<SingleLogoutServiceElement> sloList, String preferredBinding) {
+        //shortcut for the case when SLO isn't supported at all
+        if (sloList.isEmpty()) {
+            return null;
+        }
+
+        Map<String, SingleLogoutServiceElement> sloBindings =
+                new HashMap<String, SingleLogoutServiceElement>(sloList.size());
+        for (SingleLogoutServiceElement sloEndpoint : sloList) {
+            sloBindings.put(sloEndpoint.getBinding(), sloEndpoint);
+        }
+
+        SingleLogoutServiceElement endpoint = sloBindings.get(preferredBinding);
+        if (endpoint == null) {
+            //if the requested binding isn't supported let's try to find the most appropriate SLO endpoint
+            if (preferredBinding.equals(SAML2Constants.HTTP_POST)) {
+                endpoint = sloBindings.get(SAML2Constants.HTTP_REDIRECT);
+            } else if (preferredBinding.equals(SAML2Constants.HTTP_REDIRECT)) {
+                endpoint = sloBindings.get(SAML2Constants.HTTP_POST);
+            }
+
+            if (endpoint == null) {
+                //we ran out of asynchronous bindings, so our only chance is to try to use SOAP binding
+                //in case the preferred binding was SOAP from the beginning, then this code will just return null again
+                endpoint = sloBindings.get(SAML2Constants.SOAP);
+            }
+        }
+
+        return endpoint;
     }
 
     /**

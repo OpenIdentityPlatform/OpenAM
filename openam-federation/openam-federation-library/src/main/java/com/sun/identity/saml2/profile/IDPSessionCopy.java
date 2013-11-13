@@ -27,9 +27,8 @@
  */
 
 /**
- * Portions copyright 2013 ForgeRock, Inc.
+ * Portions copyright 2013 ForgeRock AS
  */
-
 package com.sun.identity.saml2.profile;
 
 import com.sun.identity.plugin.session.SessionException;
@@ -52,8 +51,9 @@ import java.util.List;
 public class IDPSessionCopy implements Serializable {
 
     private String ssoTokenID = null;
-    private List nameIDandSPpairs = null;
+    private List<NameIDandSPpair> nameIDandSPpairs = null;
     private String pendingLogoutRequestID = null;
+    private String originatingLogoutRequestBinding = null;
     private String originatingLogoutRequestID = null;
     private String originatingLogoutSPEntityID = null;
     private boolean doLogoutAll = false;
@@ -67,25 +67,21 @@ public class IDPSessionCopy implements Serializable {
      */ 
     public IDPSessionCopy(String ssoToken) {
         this.ssoTokenID = ssoToken;
-        nameIDandSPpairs = new ArrayList();
+        nameIDandSPpairs = new ArrayList<NameIDandSPpair>();
     }
     
     public IDPSessionCopy(IDPSession idpSession) {
-        SessionProvider sessionProvider = null;   
         try {
-            sessionProvider = SessionManager.getProvider();
+            SessionProvider sessionProvider = SessionManager.getProvider();
+            ssoTokenID = sessionProvider.getSessionID(idpSession.getSession());
         } catch (SessionException se) {
             SAML2Utils.debug.error("Error retrieving session provider.", se);
-        }   
-        ssoTokenID = sessionProvider.getSessionID(idpSession.getSession());
-        nameIDandSPpairs = new ArrayList(); 
-        nameIDandSPpairs.addAll(idpSession.getNameIDandSPpairs());
-        pendingLogoutRequestID = 
-            idpSession.getPendingLogoutRequestID(); 
-        originatingLogoutRequestID =  
-            idpSession.getOriginatingLogoutRequestID();
-        originatingLogoutSPEntityID =
-            idpSession.getOriginatingLogoutSPEntityID();   
+        }
+        nameIDandSPpairs = new ArrayList<NameIDandSPpair>(idpSession.getNameIDandSPpairs());
+        pendingLogoutRequestID = idpSession.getPendingLogoutRequestID();
+        originatingLogoutRequestBinding = idpSession.getOriginatingLogoutRequestBinding();
+        originatingLogoutRequestID = idpSession.getOriginatingLogoutRequestID();
+        originatingLogoutSPEntityID = idpSession.getOriginatingLogoutSPEntityID();
         doLogoutAll = idpSession.getLogoutAll();
         metaAlias = idpSession.getMetaAlias();
     }
@@ -106,7 +102,7 @@ public class IDPSessionCopy implements Serializable {
      * @return the list of <code>NameID</code> and 
      *    <code>SPEntityID</code> pair of the session      
      */ 
-    public List getNameIDandSPpairs() {
+    public List<NameIDandSPpair> getNameIDandSPpairs() {
         return nameIDandSPpairs;
     }
    
@@ -127,7 +123,25 @@ public class IDPSessionCopy implements Serializable {
     public String getPendingLogoutRequestID() {
         return pendingLogoutRequestID;
     }
-    
+
+    /**
+     * Sets the original logout request binding.
+     *
+     * @param originatingLogoutRequestBinding The original logout request binding.
+     */
+    public void setOriginatingLogoutRequestBinding(String originatingLogoutRequestBinding) {
+        this.originatingLogoutRequestBinding = originatingLogoutRequestBinding;
+    }
+
+    /**
+     * Returns the original logout request binding.
+     *
+     * @return The original logout request binding.
+     */
+    public String getOriginatingLogoutRequestBinding() {
+        return originatingLogoutRequestBinding;
+    }
+
     /**
      * Sets the original log out request id of the session
      *

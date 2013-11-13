@@ -26,7 +26,9 @@
  *
  */
 
-
+/**
+ * Portions Copyrighted 2013 ForgeRock AS
+ */
 package com.sun.identity.saml2.profile;
 
 import com.sun.identity.saml2.assertion.NameID;
@@ -68,5 +70,10 @@ public class NameIDandSPpair implements Serializable {
      */ 
     public NameID getNameID() {
         return nameID;
+    }
+
+    @Override
+    public String toString() {
+        return "NameIDandSPpair{" + "nameID=" + nameID + ", spEntityID=" + spEntityID + '}';
     }
 }

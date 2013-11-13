@@ -27,7 +27,7 @@
  */
 
 /*
- * Portions Copyrighted 2010-2012 ForgeRock AS
+ * Portions Copyrighted 2010-2013 ForgeRock AS
  */
 
 package com.sun.identity.saml2.profile;
@@ -63,6 +63,7 @@ import com.sun.identity.saml2.jaxb.entityconfig.BaseConfigType;
 import com.sun.identity.saml2.jaxb.entityconfig.SPSSOConfigElement;
 import com.sun.identity.saml2.jaxb.metadata.SPSSODescriptorElement;
 import com.sun.identity.saml2.jaxb.metadata.IDPSSODescriptorElement;
+import com.sun.identity.saml2.jaxb.metadata.SingleLogoutServiceElement;
 import com.sun.identity.saml2.logging.LogUtil;
 import com.sun.identity.saml2.meta.SAML2MetaException;
 import com.sun.identity.saml2.meta.SAML2MetaManager;
@@ -95,7 +96,7 @@ public class IDPSingleLogout {
         SAML2Utils.bundle.getString("partialLogout"));
     static final Status ALREADY_LOGGEDOUT =
         SAML2Utils.generateStatus(SAML2Constants.SUCCESS,
-         SAML2Utils.bundle.getString("sloAlreadyLoggedout"));   
+         SAML2Utils.bundle.getString("sloAlreadyLoggedout"));
     private final static String QUESTION_MARK = "?";
     private static FedMonAgent agent;
     private static FedMonSAML2Svc saml2Svc;
@@ -129,15 +130,12 @@ public class IDPSingleLogout {
      *                       which the request has been sent.
      *       "Consent" - Specifies a URI a SAML defined identifier
      *                   known as Consent Identifiers.
-     *       "Extension" - Specifies a list of Extensions as list of 
+     *       "Extension" - Specifies a list of Extensions as list of
      *                   String objects.
      * @throws SAML2Exception if error initiating request to SP.
      */
-    public static void initiateLogoutRequest(HttpServletRequest request,
-        HttpServletResponse response,
-        String binding,
-        Map paramsMap)
-    throws SAML2Exception {
+    public static void initiateLogoutRequest(HttpServletRequest request, HttpServletResponse response, String binding,
+            Map paramsMap) throws SAML2Exception {
 
         if (debug.messageEnabled()) {
             debug.message("in initiateLogoutRequest");
@@ -146,7 +144,7 @@ public class IDPSingleLogout {
                             (String) paramsMap.get(SAML2Constants.LOGOUT_ALL));
             debug.message("paramsMap : " + paramsMap);
         }
-        
+
         boolean logoutall = false;
         String logoutAllValue = 
                    (String)paramsMap.get(SAML2Constants.LOGOUT_ALL);
@@ -154,7 +152,7 @@ public class IDPSingleLogout {
                         logoutAllValue.equalsIgnoreCase("true")) {
             logoutall = true;
         }
-        
+
         String metaAlias = (String)paramsMap.get(SAML2Constants.IDP_META_ALIAS);
         try {
             Object session = sessionProvider.getSession(request);
@@ -166,7 +164,7 @@ public class IDPSingleLogout {
             if (metaAlias == null) {
                 String[] values = sessionProvider.
                     getProperty(session, SAML2Constants.IDP_META_ALIAS);
-                if (values != null && values.length != 0) {            
+                if (values != null && values.length != 0) {
                     metaAlias = values[0];
                 }
             }
@@ -175,7 +173,7 @@ public class IDPSingleLogout {
                         SAML2Utils.bundle.getString("nullIDPMetaAlias"));
             }
             paramsMap.put(SAML2Constants.METAALIAS, metaAlias);
-            
+
             String realm = SAML2Utils.
                     getRealm(SAML2MetaUtils.getRealmByMetaAlias(metaAlias));
 
@@ -194,14 +192,14 @@ public class IDPSingleLogout {
                 if (debug.messageEnabled()) {
                     debug.message("No SP session participant(s)");
                 }
-                MultiProtocolUtils.invalidateSession(session, request, 
+                MultiProtocolUtils.invalidateSession(session, request,
                     response, SingleLogoutManager.SAML2);
                 return;
             }
 
             // If request has been misrouted and we don't  have SAML2 Failover
             // then send the request to the original server
-            if (!SAML2Utils.isSAML2FailOverEnabled() && 
+            if (!SAML2Utils.isSAML2FailOverEnabled() &&
                    isMisroutedRequest(request, response, session)) {
                    return;
             } else {
@@ -209,16 +207,15 @@ public class IDPSingleLogout {
                     debug.message("IDPSingleLogout.initiateLogoutRequest: "
                         + "SAML2 Failover will be attempted. Be sure SFO is "
                             + "properly configured or the attempt will fail");
-                } 
+                }
             }
 
-            IDPSession idpSession = (IDPSession)IDPCache.
-                idpSessionsByIndices.get(idpSessionIndex);
-            
+            IDPSession idpSession = IDPCache.idpSessionsByIndices.get(idpSessionIndex);
+
             if (idpSession == null) {
                 if (debug.messageEnabled()) {
                     debug.message("IDPSLO.initiateLogoutRequest: "
-                        + "IDP Session with session index " 
+                        + "IDP Session with session index "
                         + idpSessionIndex + " already removed.");
                 }
                 try {
@@ -240,8 +237,7 @@ public class IDPSingleLogout {
             if (debug.messageEnabled()) {
                 debug.message("idpSessionIndex=" + idpSessionIndex);
             }
-
-            List list = idpSession.getNameIDandSPpairs();
+            List<NameIDandSPpair> list = idpSession.getNameIDandSPpairs();
             int n = list.size();
             if (debug.messageEnabled()) {
                 debug.message("IDPSingleLogout.initiateLogoutReq:" +
@@ -274,7 +270,7 @@ public class IDPSingleLogout {
                 return;
             }
 
-            String relayState = 
+            String relayState =
                 (String)paramsMap.get(SAML2Constants.RELAY_STATE);
 
             // Validate the RelayState URL.
@@ -284,96 +280,37 @@ public class IDPSingleLogout {
                                              SAML2Constants.IDP_ROLE);
 
             int soapFailCount = 0;
+            idpSession.setOriginatingLogoutRequestBinding(binding);
             for (int i = 0; i < n; i++) {
-                NameIDandSPpair pair = null;
-                if (binding.equals(SAML2Constants.HTTP_POST)) {
-                    pair = (NameIDandSPpair) list.remove(0);
-                    removeTransientNameIDFromCache(pair.getNameID());
-                } else if (binding.equals(SAML2Constants.HTTP_REDIRECT)) {
-                    pair = (NameIDandSPpair) list.remove(0);
-                    removeTransientNameIDFromCache(pair.getNameID());
-                } else if (binding.equals(SAML2Constants.SOAP)) {
-                    pair = (NameIDandSPpair) list.get(i);
-                } else {
-                    // not supported
-                    debug.error("IDPSingleLogout. unsuported binding"
-                        + binding);
-                    throw new SAML2Exception(
-                        SAML2Utils.bundle.getString("unsupportedSloBinding"));
-                }
+                NameIDandSPpair pair = list.remove(0);
+                removeTransientNameIDFromCache(pair.getNameID());
+
                 String spEntityID = pair.getSPEntityID();
                 if (debug.messageEnabled()) {
-                    debug.message("IDPSingleLogout.initLogoutReq:" +
-                        " processing spEntityID " + spEntityID);
+                    debug.message("IDPSingleLogout.initLogoutReq: processing spEntityID " + spEntityID);
                 }
 
-                // get SPSSODescriptor
-                SPSSODescriptorElement spsso =
-                    sm.getSPSSODescriptor(realm,spEntityID);
-
-                if (spsso == null) {
-                    String[] data = { spEntityID};
-                    LogUtil.error(Level.INFO,LogUtil.SP_METADATA_ERROR,data,
-                        null);
-                    throw new SAML2Exception(
-                        SAML2Utils.bundle.getString("metaDataError"));
-                }
                 List extensionsList = LogoutUtil.getExtensionsList(paramsMap);
+                List<SingleLogoutServiceElement> slosList = getSPSLOServiceEndpoints(realm, spEntityID);
 
-                List slosList = spsso.getSingleLogoutService();
-                if (slosList == null) {
-                    String[] data = { idpEntityID};
-                    LogUtil.error(Level.INFO,LogUtil.SLO_NOT_FOUND,data,
-                        null);
-                    throw new SAML2Exception(
-                        SAML2Utils.bundle.getString("sloServiceListNotfound"));
-                }
-
-                 // get IDP entity config in case of SOAP, for basic auth info
-                SPSSOConfigElement spConfig = null;
-                if (binding.equals(SAML2Constants.SOAP)) {
-                     spConfig = sm.getSPSSOConfig(
-                         realm,
-                         spEntityID
-                     );
-                     // destroy the session
-                     if (i==0) {
-                         if (logoutall == true) {
-                             String userID = sessionProvider.
-                                 getPrincipalName(idpSession.getSession());
-                             destroyAllTokenForUser(
-                                 userID,request,response);
-                         } else {
-                             MultiProtocolUtils.invalidateSession(
-                                 idpSession.getSession(), request, response,
-                                 SingleLogoutManager.SAML2);
-                             IDPCache.idpSessionsByIndices.
-                                 remove(idpSessionIndex);
-                             if ((agent != null) &&
-                                 agent.isRunning() &&
-                                 (saml2Svc != null))
-                             {
-                                 saml2Svc.setIdpSessionCount(
-		                     (long)IDPCache.
-					 idpSessionsByIndices.size());
-                             }
-                             IDPCache.authnContextCache.remove(idpSessionIndex);
-                         }
-                     }
-                }
+                // get IDP entity config in case of SOAP, for basic auth info
+                SPSSOConfigElement spConfig = sm.getSPSSOConfig(realm, spEntityID);
 
                 if (logoutall == true) {
                     idpSessionIndex = null;
                 }
-                
+
+                SingleLogoutServiceElement logoutEndpoint = LogoutUtil.getMostAppropriateSLOServiceLocation(slosList,
+                        idpSession.getOriginatingLogoutRequestBinding());
+                if (logoutEndpoint == null) {
+                    continue;
+                }
                 StringBuffer requestID = null;
                 try {
-                    requestID = LogoutUtil.doLogout(metaAlias, spEntityID,
-                        slosList, extensionsList, binding, relayState,
-                        idpSessionIndex, pair.getNameID(), request,
-                        response, paramsMap, spConfig);
+                    requestID = LogoutUtil.doLogout(metaAlias, spEntityID, extensionsList, logoutEndpoint, relayState,
+                        idpSessionIndex, pair.getNameID(), request, response, paramsMap, spConfig);
                 } catch (SAML2Exception ex) {
-                    if (binding.equals(SAML2Constants.SOAP)) {
+                    if (logoutEndpoint.getBinding().equals(SAML2Constants.SOAP)) {
                         debug.error(
                             "IDPSingleLogout.initiateLogoutRequest:" , ex);
                         soapFailCount++;
@@ -384,80 +321,83 @@ public class IDPSingleLogout {
                 }
 
                 String requestIDStr = requestID.toString();
+                String bindingUsed = logoutEndpoint.getBinding();
                 if (debug.messageEnabled()) {
-                    debug.message(
-                        "\nIDPSLO.requestIDStr = " + requestIDStr +
-                        "\nbinding = " + binding);
+                    debug.message("\nIDPSLO.requestIDStr = " + requestIDStr + "\nbinding = " + bindingUsed);
                 }
 
-                if ((requestIDStr != null) && (requestIDStr.length() != 0) &&
-                    (binding.equals(SAML2Constants.HTTP_REDIRECT) ||
-                    binding.equals(SAML2Constants.HTTP_POST))) {
+                if (!requestIDStr.isEmpty() && (bindingUsed.equals(SAML2Constants.HTTP_REDIRECT)
+                        || bindingUsed.equals(SAML2Constants.HTTP_POST))) {
                     idpSession.setPendingLogoutRequestID(requestIDStr);
                     idpSession.setLogoutAll(logoutall);
-                    Map logoutMap = (Map) paramsMap.get("LogoutMap"); 
-                    if (logoutMap != null && !logoutMap.isEmpty()) { 
-                       IDPCache.logoutResponseCache.put(requestIDStr, 
-                           (Map) paramsMap.get("LogoutMap"));
-                    }        
-                    break;
+                    Map logoutMap = (Map) paramsMap.get("LogoutMap");
+                    if (logoutMap != null && !logoutMap.isEmpty()) {
+                       IDPCache.logoutResponseCache.put(requestIDStr, (Map) paramsMap.get("LogoutMap"));
+                    }
+                    return;
                 }
             }
 
-            if (binding.equals(SAML2Constants.SOAP)) {
-                int logoutStatus = SingleLogoutManager.LOGOUT_SUCCEEDED_STATUS;
-                boolean isMultiProtocol = 
-                    MultiProtocolUtils.isMultipleProtocolSession(request,
-                    SingleLogoutManager.SAML2);
-                if (soapFailCount == n) {
-                    if (isMultiProtocol) {
-                        logoutStatus = SingleLogoutManager.LOGOUT_FAILED_STATUS;
-                    } else {
-                        throw new SAML2Exception(
-                            SAML2Utils.bundle.getString("sloFailed"));
-                    }
-                } else if (soapFailCount > 0) {
-                    if (isMultiProtocol) {
-                        logoutStatus = 
-                            SingleLogoutManager.LOGOUT_PARTIAL_STATUS;
-                    } else {
-                        throw new SAML2Exception(
-                            SAML2Utils.bundle.getString("partialLogout"));
-                    }
+            //This code only runs if the logout process didn't redirect away, so either none of the SPs supported the
+            //requested binding, or SOAP was used for the logout (or the mixture of this two).
+            if (logoutall == true) {
+                String userID = sessionProvider.getPrincipalName(idpSession.getSession());
+                destroyAllTokenForUser(userID, request, response);
+            } else {
+                MultiProtocolUtils.invalidateSession(idpSession.getSession(), request, response,
+                        SingleLogoutManager.SAML2);
+                IDPCache.idpSessionsByIndices.remove(idpSessionIndex);
+                if (agent != null && agent.isRunning() && saml2Svc != null) {
+                    saml2Svc.setIdpSessionCount((long) IDPCache.idpSessionsByIndices.size());
                 }
-                // processing multi-federation protocol session
+                IDPCache.authnContextCache.remove(idpSessionIndex);
+            }
+            //handling the case when the auth was initiated with HTTP-Redirect, but only SOAP or no SLO endpoint was
+            //available, and also the case when the whole logout process was using SOAP binding from the beginning
+            int logoutStatus = SingleLogoutManager.LOGOUT_SUCCEEDED_STATUS;
+            boolean isMultiProtocol = MultiProtocolUtils.isMultipleProtocolSession(request, SingleLogoutManager.SAML2);
+            //TODO: would be nice to actually return the correct message in idpSingleLogoutInit.jsp
+            if (soapFailCount == n) {
                 if (isMultiProtocol) {
-                    Set set = new HashSet();
-                    set.add(session);
-                    boolean isSOAPInitiated = 
-                        binding.equals(SAML2Constants.SOAP) ? true : false;
-                    int retStat = SingleLogoutManager.LOGOUT_SUCCEEDED_STATUS;
-                    try {
-                        debug.message("IDPSingleLogout.initLogReq: MP");
+                    logoutStatus = SingleLogoutManager.LOGOUT_FAILED_STATUS;
+                }
+            } else if (soapFailCount > 0) {
+                if (isMultiProtocol) {
+                    logoutStatus = SingleLogoutManager.LOGOUT_PARTIAL_STATUS;
+                }
+            }
+            // processing multi-federation protocol session
+            if (isMultiProtocol) {
+                Set set = new HashSet();
+                set.add(session);
+                boolean isSOAPInitiated =
+                    binding.equals(SAML2Constants.SOAP) ? true : false;
+                int retStat = SingleLogoutManager.LOGOUT_SUCCEEDED_STATUS;
+                try {
+                    debug.message("IDPSingleLogout.initLogReq: MP");
                         retStat = SingleLogoutManager.getInstance().
                             doIDPSingleLogout(set, sessUser, request, response,
                             isSOAPInitiated, true, SingleLogoutManager.SAML2,
                             realm, idpEntityID, null, relayState, null, null,
                             logoutStatus);
-                    } catch (Exception ex) {
+                } catch (Exception ex) {
                         debug.warning("IDPSingleLogout.initiateLoogutReq: MP", 
                             ex);
-                        throw new SAML2Exception(ex.getMessage());
-                    }
-                    if (debug.messageEnabled()) {
+                    throw new SAML2Exception(ex.getMessage());
+                }
+                if (debug.messageEnabled()) {
                         debug.message("IDPSingleLogout.initLogoutRequest: "
                             + "SLOManager return status = " + retStat);
-                    }
-                    switch (retStat) {
-                        case SingleLogoutManager.LOGOUT_FAILED_STATUS:
+                }
+                switch (retStat) {
+                    case SingleLogoutManager.LOGOUT_FAILED_STATUS:
                             throw new SAML2Exception(
                                     SAML2Utils.bundle.getString("sloFailed"));
-                        case SingleLogoutManager.LOGOUT_PARTIAL_STATUS:
+                    case SingleLogoutManager.LOGOUT_PARTIAL_STATUS:
                             throw new SAML2Exception(
                                     SAML2Utils.bundle.getString("partialLogout"));
-                        default:
-                            break;
-                    }
+                    default:
+                        break;
                 }
             }
         } catch (SAML2MetaException sme) {
@@ -513,8 +453,8 @@ public class IDPSingleLogout {
                 " is not supported for " + idpEntityID);
             throw new SAML2Exception(
                 SAML2Utils.bundle.getString("unsupportedBinding"));
-        }    
-        
+        }
+
         LogoutRequest logoutReq = null;
         if (rmethod.equals("POST")) {
             logoutReq = LogoutUtil.getLogoutRequestFromPost(samlRequest,
@@ -535,11 +475,11 @@ public class IDPSingleLogout {
             }
            return;
         }
-        
+
         String spEntityID = logoutReq.getIssuer().getValue();
-             
-        boolean needToVerify = 
-            SAML2Utils.getWantLogoutRequestSigned(realm, idpEntityID, 
+
+        boolean needToVerify =
+            SAML2Utils.getWantLogoutRequestSigned(realm, idpEntityID,
                             SAML2Constants.IDP_ROLE);
         if (debug.messageEnabled()) {
             debug.message(classMethod + "metaAlias : " + metaAlias);
@@ -547,7 +487,7 @@ public class IDPSingleLogout {
             debug.message(classMethod + "idpEntityID : " + idpEntityID);
             debug.message(classMethod + "spEntityID : " + spEntityID);
         }
-        
+
         if (needToVerify) {
             boolean valid = false;
             if (binding.equals(SAML2Constants.HTTP_REDIRECT)) {
@@ -565,7 +505,7 @@ public class IDPSingleLogout {
             }
             IDPSSODescriptorElement idpsso =
                 sm.getIDPSSODescriptor(realm, idpEntityID);
-            String loc = null; 
+            String loc = null;
             if (idpsso != null) {
                 List sloList = idpsso.getSingleLogoutService();
                 if ((sloList != null) && (!sloList.isEmpty())) {
@@ -575,17 +515,17 @@ public class IDPSingleLogout {
                         loc = LogoutUtil.getSLOServiceLocation(
                              sloList, binding);
                     }
-                }                   
+                }
             }
             if (!SAML2Utils.verifyDestination(logoutReq.getDestination(),
                 loc)) {
                 throw new SAML2Exception(
                     SAML2Utils.bundle.getString("invalidDestination"));
-            }   
+            }
         }
 
         // Get the local session, if it does not exist send a succesful
-        // Logout Response with a status message of "Already Logout" 
+        // Logout Response with a status message of "Already Logout"
         Object session = null;
         try {
             session = sessionProvider.getSession(request);
@@ -594,9 +534,9 @@ public class IDPSingleLogout {
                              realm, idpEntityID, spEntityID, binding);
             return;
         }
-        
+
         // If the request has been misrouted and we don't  have SAML2 Failover
-        // then send the request to the original server 
+        // then send the request to the original server
         if (session != null && !SAML2Utils.isSAML2FailOverEnabled()
                 && isMisroutedRequest(request, response, session)) {
             return;
@@ -607,7 +547,7 @@ public class IDPSingleLogout {
                         + "properly configured or the attempt will fail");
             }
         }
-        
+
         LogoutResponse logoutRes = processLogoutRequest(
             logoutReq, request, response, binding, relayState,
             idpEntityID, realm, true);
@@ -620,10 +560,10 @@ public class IDPSingleLogout {
         }
         // this is the case where there is no more SP session
         // participant
-       
-        String location = getSingleLogoutLocation(spEntityID, realm, binding); 
-        logoutRes.setDestination(XMLUtils.escapeSpecialCharacters(location)); 
-        
+
+        String location = getSingleLogoutLocation(spEntityID, realm, binding);
+        logoutRes.setDestination(XMLUtils.escapeSpecialCharacters(location));
+
         // call multi-federation protocol processing
         // this is SP initiated HTTP based single logout
         boolean isMultiProtocolSession = false;
@@ -634,14 +574,14 @@ public class IDPSingleLogout {
                     SingleLogoutManager.SAML2)) {
                 isMultiProtocolSession = true;
                 // call Multi-Federation protocol SingleLogoutManager
-                SingleLogoutManager sloManager = 
+                SingleLogoutManager sloManager =
                     SingleLogoutManager.getInstance();
                 Set set = new HashSet();
                 set.add(session);
                 String uid =  sessionProvider.getPrincipalName(session);
                 debug.message("IDPSingleLogout.processLogReq: MP/SPinit/Http");
-                retStatus = sloManager.doIDPSingleLogout(set, uid, request, 
-                    response, false, false, SingleLogoutManager.SAML2, realm, 
+                retStatus = sloManager.doIDPSingleLogout(set, uid, request,
+                    response, false, false, SingleLogoutManager.SAML2, realm,
                     idpEntityID, spEntityID, relayState, logoutReq.toString(),
                     logoutRes.toXMLString(), getLogoutStatus(logoutRes));
             }
@@ -653,7 +593,7 @@ public class IDPSingleLogout {
             retStatus = SingleLogoutManager.LOGOUT_FAILED_STATUS;
         }
 
-        if (!isMultiProtocolSession || 
+        if (!isMultiProtocolSession ||
             (retStatus != SingleLogoutManager.LOGOUT_REDIRECTED_STATUS)) {
             logoutRes = updateLogoutResponse(logoutRes, retStatus);
             List partners = IDPProxyUtil.getSessionPartners(request);
@@ -661,10 +601,10 @@ public class IDPSingleLogout {
                 IDPProxyUtil.sendProxyLogoutRequest(request, response,
                     logoutReq, partners, binding, relayState);
             } else {
-                LogoutUtil.sendSLOResponse(response, logoutRes, location, 
+                LogoutUtil.sendSLOResponse(response, logoutRes, location,
                     relayState, realm, idpEntityID, SAML2Constants.IDP_ROLE,
                     spEntityID, binding);
-            }    
+            }
         }
     }
 
@@ -672,21 +612,11 @@ public class IDPSingleLogout {
     /**
      * Returns single logout location for the service provider.
      */
-    public static String getSingleLogoutLocation(String spEntityID,
-        String realm, String binding) throws SAML2Exception {
-        SPSSODescriptorElement spsso = sm.getSPSSODescriptor(realm,spEntityID);
+    public static String getSingleLogoutLocation(String spEntityID, String realm, String binding)
+            throws SAML2Exception {
+        List<SingleLogoutServiceElement> slosList = getSPSLOServiceEndpoints(realm, spEntityID);
 
-        if (spsso == null) {
-            String[] data = { spEntityID};
-            LogUtil.error(Level.INFO,LogUtil.SP_METADATA_ERROR,data,
-                null);
-            throw new SAML2Exception(
-                SAML2Utils.bundle.getString("metaDataError"));
-        }
-        List slosList = spsso.getSingleLogoutService();
-
-        String location = 
-            LogoutUtil.getSLOResponseServiceLocation(slosList, binding);
+        String location = LogoutUtil.getSLOResponseServiceLocation(slosList, binding);
 
         if (location == null || location.length() == 0) {
             location = LogoutUtil.getSLOServiceLocation(slosList, binding);
@@ -796,15 +726,15 @@ public class IDPSingleLogout {
             }
            return false;
         }
-    
+
         String spEntityID = logoutRes.getIssuer().getValue();
         Issuer resIssuer = logoutRes.getIssuer();
         String requestId = logoutRes.getInResponseTo();
         SAML2Utils.verifyResponseIssuer(
                             realm, idpEntityID, resIssuer, requestId);
-        
-        boolean needToVerify = 
-             SAML2Utils.getWantLogoutResponseSigned(realm, idpEntityID, 
+
+        boolean needToVerify =
+             SAML2Utils.getWantLogoutResponseSigned(realm, idpEntityID,
                              SAML2Constants.IDP_ROLE);
         if (debug.messageEnabled()) {
             debug.message(method + "metaAlias : " + metaAlias);
@@ -812,12 +742,12 @@ public class IDPSingleLogout {
             debug.message(method + "idpEntityID : " + idpEntityID);
             debug.message(method + "spEntityID : " + spEntityID);
         }
-        
+
         if (needToVerify) {
             boolean valid = false;
             if (rmethod.equals("POST")) {
                 valid = LogoutUtil.verifySLOResponse(logoutRes, realm,
-                    spEntityID, idpEntityID, SAML2Constants.IDP_ROLE);        
+                    spEntityID, idpEntityID, SAML2Constants.IDP_ROLE);
 
             } else {
                 String queryString = request.getQueryString();
@@ -831,7 +761,7 @@ public class IDPSingleLogout {
             }
             IDPSSODescriptorElement idpsso =
                 sm.getIDPSSODescriptor(realm, idpEntityID);
-            String loc = null; 
+            String loc = null;
             if (idpsso != null) {
                 List sloList = idpsso.getSingleLogoutService();
                 if (sloList != null && !sloList.isEmpty()) {
@@ -847,7 +777,7 @@ public class IDPSingleLogout {
                 loc)) {
                 throw new SAML2Exception(
                     SAML2Utils.bundle.getString("invalidDestination"));
-            }  
+            }
         }
 
         boolean doRelayState = processLogoutResponse(request, response,
@@ -857,14 +787,14 @@ public class IDPSingleLogout {
         // IDPProxy
         Map logoutResponseMap = (Map)IDPCache.logoutResponseCache.get(
             requestId);
-        if ((logoutResponseMap != null) && (!logoutResponseMap.isEmpty())) { 
+        if ((logoutResponseMap != null) && (!logoutResponseMap.isEmpty())) {
             LogoutResponse logoutResp = (LogoutResponse)
-                logoutResponseMap.get("LogoutResponse");     
+                logoutResponseMap.get("LogoutResponse");
             String location = (String) logoutResponseMap.get("Location");
-            String spEntity = (String) logoutResponseMap.get("spEntityID"); 
-            String idpEntity = (String) logoutResponseMap.get("idpEntityID"); 
-            if (logoutResp != null && location != null && 
-                spEntity != null && idpEntity !=null) { 
+            String spEntity = (String) logoutResponseMap.get("spEntityID");
+            String idpEntity = (String) logoutResponseMap.get("idpEntityID");
+            if (logoutResp != null && location != null &&
+                spEntity != null && idpEntity !=null) {
                 LogoutUtil.sendSLOResponse(response, logoutResp, location,
                     relayState, "/", spEntity, SAML2Constants.SP_ROLE,
                     idpEntity, binding);
@@ -900,14 +830,13 @@ public class IDPSingleLogout {
                 response, SingleLogoutManager.SAML2);
             return false;
         }
-        
-        IDPSession idpSession = (IDPSession) 
-            IDPCache.idpSessionsByIndices.get(idpSessionIndex);
-        
+
+        IDPSession idpSession = IDPCache.idpSessionsByIndices.get(idpSessionIndex);
+
         if (idpSession == null) {
             if (debug.messageEnabled()) {
                 debug.message("IDPSLO.processLogoutResponse : "
-                    + "IDP Session with session index " 
+                    + "IDP Session with session index "
                     + idpSessionIndex + " already removed.");
             }
             try {
@@ -926,282 +855,63 @@ public class IDPSingleLogout {
                 response, SingleLogoutManager.SAML2);
             return false;
         }
-        
+
         if (debug.messageEnabled()) {
             debug.message("idpSessionIndex=" + idpSessionIndex);
         }
 
-        List list = idpSession.getNameIDandSPpairs();
+        List<NameIDandSPpair> list = idpSession.getNameIDandSPpairs();
         debug.message("idpSession.getNameIDandSPpairs()=" + list);
 
-        if (list.size() == 0) {
-            // this is the last response
-            // correlate inResponseTo to request ID
-            String requestID = idpSession.getPendingLogoutRequestID();
-            String inResponseTo = logoutRes.getInResponseTo();
-            if (inResponseTo != null && requestID != null &&
-                inResponseTo.equals(requestID)) {
-                if (debug.messageEnabled()) {
-                    debug.message(
-                        "LogoutRespone's inResponseTo matches "+
-                        "the previous LogoutRequest's ID.");
+        if (list.isEmpty()) {
+            return sendLastResponse(idpSession, logoutRes, request, response, idpSessionIndex, session, realm,
+                    idpEntityID, relayState);
+        } else {
+            // send Next Requests
+            Iterator<NameIDandSPpair> it = list.iterator();
+            while (it.hasNext()) {
+                NameIDandSPpair pair = it.next();
+                it.remove();
+                spEntityID = pair.getSPEntityID();
+                removeTransientNameIDFromCache(pair.getNameID());
+
+                Map paramsMap = new HashMap(request.getParameterMap());
+                paramsMap.put(SAML2Constants.ROLE, SAML2Constants.IDP_ROLE);
+
+                List<SingleLogoutServiceElement> slosList = getSPSLOServiceEndpoints(realm, spEntityID);
+                List extensionsList = LogoutUtil.getExtensionsList(request.getParameterMap());
+                SPSSOConfigElement spConfig = sm.getSPSSOConfig(realm, spEntityID);
+                //When processing a logout response we must ensure that we try to use the original logout request
+                //binding to make sure asynchronous bindings have precedence over synchronous bindings.
+                SingleLogoutServiceElement logoutEndpoint = LogoutUtil.getMostAppropriateSLOServiceLocation(slosList,
+                        idpSession.getOriginatingLogoutRequestBinding());
+                if (logoutEndpoint == null) {
+                    continue;
                 }
-            }
-            String originatingRequestID = 
-                idpSession.getOriginatingLogoutRequestID();
-            String originatingLogoutSPEntityID = 
-                idpSession.getOriginatingLogoutSPEntityID();
-            if (originatingRequestID == null) {
-                // this is IDP initiated SLO
-                if (idpSession.getLogoutAll() == true) {
-                    String userID = sessionProvider.
-                        getPrincipalName(idpSession.getSession());
-                    destroyAllTokenForUser(
-                        userID, request, response);
-                } else {
-                    IDPCache.idpSessionsByIndices.remove(idpSessionIndex);
-                    if ((agent != null) &&
-                        agent.isRunning() &&
-                        (saml2Svc != null))
-                    {
-                        saml2Svc.setIdpSessionCount(
-		            (long)IDPCache.idpSessionsByIndices.
-				size());
-                    }
-                    try {
-                        if (SAML2Utils.isSAML2FailOverEnabled()) {
-                            SAML2RepositoryFactory.getInstance().deleteSAML2Token(idpSessionIndex);
-                        }
-                    } catch (SAML2Exception e) {
-                        debug.error("Error while deleting idpSessionIndex"
-                        + " from Persistent DB.", e);
-                    } catch (StoreException se) {
-                        debug.error("Error while deleting idpSessionIndex"
-                                + " from Persistent DB.", se);
-                    }
-                    IDPCache.authnContextCache.remove(idpSessionIndex);
-                    if (!MultiProtocolUtils.isMultipleProtocolSession(
-                        idpSession.getSession(), SingleLogoutManager.SAML2)) {
-                        sessionProvider.invalidateSession(
-                            idpSession.getSession(), request, response);
-                    } else {
-                        MultiProtocolUtils.removeFederationProtocol(
-                            idpSession.getSession(), SingleLogoutManager.SAML2);
-                        // call Multi-Federation protocol SingleLogoutManager
-                        SingleLogoutManager sloManager =
-                            SingleLogoutManager.getInstance();
-                        Set set = new HashSet();
-                        set.add(session);
-                        SessionProvider provider = 
-                            SessionManager.getProvider();
-                        String uid = provider.getPrincipalName(session);
-                        debug.message("IDPSingleLogout.processLogRes: MP/Http");
-                        int retStatus = 
-                            SingleLogoutManager.LOGOUT_SUCCEEDED_STATUS;
-                        try {
-                            retStatus = sloManager.doIDPSingleLogout(set, uid, 
-                                request, response, false, true, 
-                                SingleLogoutManager.SAML2, realm, idpEntityID, 
-                                originatingLogoutSPEntityID, relayState, null, null, 
-                                getLogoutStatus(logoutRes));
-                        } catch (SAML2Exception ex) {
-                            throw ex;
-                        } catch (Exception ex) {
-                            debug.error("IDPSIngleLogout.processLogoutResponse:"
-                                 + " MP/IDP initiated HTTP", ex);
-                            throw new SAML2Exception(ex.getMessage());
-                        }
-                        if (retStatus == 
-                            SingleLogoutManager.LOGOUT_REDIRECTED_STATUS) {
-                            return true;
-                        }
-                    }
-                }
-                debug.message("IDP initiated SLO Success");
-                return false;
-            }
-
-            SPSSODescriptorElement spsso = null;
-            // get SPSSODescriptor
-            spsso =
-                sm.getSPSSODescriptor(realm,originatingLogoutSPEntityID);
-
-            if (spsso == null) {
-                String[] data = { originatingLogoutSPEntityID};
-                LogUtil.error(Level.INFO,LogUtil.SP_METADATA_ERROR,data,
-                    null);
-                throw new SAML2Exception(
-                    SAML2Utils.bundle.getString("metaDataError"));
-            }
-            List slosList = spsso.getSingleLogoutService();
-
-            String location = LogoutUtil.getSLOResponseServiceLocation(
-                slosList, binding);
-
-            if (location == null || location.length() == 0) {
-                location = LogoutUtil.getSLOServiceLocation(slosList, binding);
-                if (location == null || location.length() == 0) {
-                    debug.error(
-                        "Unable to find the IDP's single logout "+
-                        "response service with the HTTP-Redirect binding");
-                    throw new SAML2Exception(
-                        SAML2Utils.bundle.getString(
-                        "sloResponseServiceLocationNotfound"));
-                } else {
+                StringBuffer requestID = LogoutUtil.doLogout(metaAlias, spEntityID, extensionsList, logoutEndpoint,
+                        relayState, idpSessionIndex, pair.getNameID(), request, response, paramsMap, spConfig);
+                String bindingUsed = logoutEndpoint.getBinding();
+                if (bindingUsed.equals(SAML2Constants.HTTP_REDIRECT) || bindingUsed.equals(SAML2Constants.HTTP_POST)) {
+                    String requestIDStr = requestID.toString();
                     if (debug.messageEnabled()) {
-                        debug.message(
-                            "SP's single logout response service location = "+
-                            location);
+                        debug.message("IDPSingleLogout.processLogoutRequest: requestIDStr = " + requestIDStr
+                                + "\nbinding = " + bindingUsed);
                     }
-                }
-            } else {
-                if (debug.messageEnabled()) {
-                    debug.message(
-                        "IDP's single logout response service location = "+
-                        location);
-                }
-            }
 
-            Status status = destroyTokenAndGenerateStatus(
-                idpSessionIndex, idpSession.getSession(),
-                request, response, true);
-            
-            logoutRes = LogoutUtil.generateResponse(status, 
-                originatingRequestID, SAML2Utils.createIssuer(idpEntityID),
-                realm, SAML2Constants.IDP_ROLE, 
-                logoutRes.getIssuer().getValue());
-            
-            if (location != null && logoutRes != null) {
-                logoutRes.setDestination(XMLUtils.escapeSpecialCharacters(
-                    location)); 
-                IDPCache.idpSessionsByIndices.remove(idpSessionIndex);
-                if ((agent != null) && agent.isRunning() && (saml2Svc != null)){
-                    saml2Svc.setIdpSessionCount(
-		        (long)IDPCache.idpSessionsByIndices.size());
-                }
-                try {
-                    if (SAML2Utils.isSAML2FailOverEnabled()) {
-                        SAML2RepositoryFactory.getInstance().deleteSAML2Token(idpSessionIndex);
+                    if (requestIDStr != null && requestIDStr.length() != 0) {
+                        idpSession.setPendingLogoutRequestID(requestIDStr);
                     }
-                } catch (SAML2Exception e) {
-                    debug.error("Error while deleting idpSessionIndex"
-                        + " from Persistent DB.", e);
-                } catch (StoreException se) {
-                    debug.error("Error while deleting idpSessionIndex"
-                            + " from Persistent DB.", se);
-                }
-                IDPCache.authnContextCache.remove(idpSessionIndex);
-                
-                // call multi-federation protocol processing
-                // this is the SP initiated HTTP binding case
-                boolean isMultiProtocolSession = false;
-                int retStatus = SingleLogoutManager.LOGOUT_SUCCEEDED_STATUS;
-                try {
-                    SessionProvider provider = SessionManager.getProvider();
-                    session = idpSession.getSession();
-                    if ((session != null) && (provider.isValid(session)) &&
-                        MultiProtocolUtils.isMultipleProtocolSession(session,
-                           SingleLogoutManager.SAML2)) {
-                        isMultiProtocolSession = true;
-                        // call Multi-Federation protocol SingleLogoutManager
-                        SingleLogoutManager sloManager =
-                            SingleLogoutManager.getInstance();
-                        Set set = new HashSet();
-                        set.add(session);
-                        String uid = provider.getPrincipalName(session);
-                        debug.message("IDPSingleLogout.processLogRes: MP/Http");
-                        retStatus = sloManager.doIDPSingleLogout(set, uid, 
-                            request, response, false, true, 
-                            SingleLogoutManager.SAML2, realm, idpEntityID, 
-                            spEntityID, relayState, null, 
-                            logoutRes.toXMLString(), 
-                            getLogoutStatus(logoutRes));
-                    }
-                } catch (SessionException e) {
-                    // ignore as session might not be valid
-                    debug.message("IDPSingleLogout.processLogoutRequest: session",e);
-                } catch (Exception e) {
-                    debug.message("IDPSingleLogout.processLogoutRequest: MP2",e);
-                    retStatus = SingleLogoutManager.LOGOUT_FAILED_STATUS;
-                }
-
-                if (!isMultiProtocolSession || (retStatus != 
-                    SingleLogoutManager.LOGOUT_REDIRECTED_STATUS)) {
-                    logoutRes = updateLogoutResponse(logoutRes, retStatus);
-
-                    LogoutUtil.sendSLOResponse(response, logoutRes,
-                        location, relayState, realm, idpEntityID, 
-                        SAML2Constants.IDP_ROLE, originatingLogoutSPEntityID, binding);
 
                     return true;
-                } else {
-                    return false;
                 }
             }
-            
-            IDPCache.idpSessionsByIndices.remove(idpSessionIndex);
-            if ((agent != null) && agent.isRunning() && (saml2Svc != null)) {
-                saml2Svc.setIdpSessionCount(
-		    (long)IDPCache.idpSessionsByIndices.size());
-            }
-            try {
-                if (SAML2Utils.isSAML2FailOverEnabled()) {
-                    SAML2RepositoryFactory.getInstance().deleteSAML2Token(idpSessionIndex);
-                }
-            } catch (SAML2Exception e) {
-                debug.error("Error while deleting idpSessionIndex"
-                    + " from Persistent DB.", e);
-            } catch (StoreException se) {
-                debug.error("Error while deleting idpSessionIndex"
-                        + " from Persistent DB.", se);
-            }
-            IDPCache.authnContextCache.remove(idpSessionIndex);
-            return false;
-        } else {
-            // send Next Request
-            NameIDandSPpair pair = (NameIDandSPpair)list.remove(0);
-            spEntityID = pair.getSPEntityID();
-            removeTransientNameIDFromCache(pair.getNameID());
-
-            SPSSODescriptorElement spsso = null;
-            // get SPSSODescriptor
-            spsso =
-                sm.getSPSSODescriptor(realm,spEntityID);
-
-            if (spsso == null) {
-                String[] data = {spEntityID};
-                LogUtil.error(Level.INFO,LogUtil.SP_METADATA_ERROR,data,
-                    null);
-                throw new SAML2Exception(
-                    SAML2Utils.bundle.getString("metaDataError"));
-            }
-            List slosList = spsso.getSingleLogoutService(); 
-            List extensionsList = 
-                LogoutUtil.getExtensionsList(request.getParameterMap());
-
-            HashMap paramsMap = new HashMap(request.getParameterMap());
-            paramsMap.put(SAML2Constants.ROLE, SAML2Constants.IDP_ROLE);
-            StringBuffer requestID = LogoutUtil.doLogout(metaAlias, spEntityID,
-                slosList, extensionsList, binding,
-                relayState, idpSessionIndex, pair.getNameID(), request,
-                response, paramsMap, null);
-
-            String requestIDStr = requestID.toString();
-            if (debug.messageEnabled()) {
-                debug.message("IDPSingleLogout.processLogoutRequest: " +
-                    "requestIDStr = " + requestIDStr + "\nbinding = " +
-                    binding);
-            }
-
-            if (requestIDStr != null &&
-                requestIDStr.length() != 0) {
-                idpSession.setPendingLogoutRequestID(requestIDStr);
-            }
-            
-            return true;
+            //seems like there were only SOAP endpoints left for SPs, so now we should just send back the logout
+            //response.
+            return sendLastResponse(idpSession, logoutRes, request, response, idpSessionIndex, session, realm,
+                    idpEntityID, relayState);
         }
     }
-    
+
     /**
      * Gets and processes the Single <code>LogoutRequest</code> from SP
      * and return <code>LogoutResponse</code>.
@@ -1227,7 +937,7 @@ public class IDPSingleLogout {
         String relayState,
         String idpEntityID,
         String realm, boolean isVerified) throws SAML2Exception {
-      
+
         Status status = null;
         String spEntity = logoutReq.getIssuer().getValue();
         Object session = null;
@@ -1239,7 +949,7 @@ public class IDPSingleLogout {
                 String requestId = logoutReq.getID();
                 SAML2Utils.verifyRequestIssuer(
                          realm, idpEntityID, logoutReq.getIssuer(), requestId);
-                    
+
                 List siList = logoutReq.getSessionIndex();
                 if(siList == null) {
                     debug.error("IDPSingleLogout.processLogoutRequest: " +
@@ -1258,7 +968,7 @@ public class IDPSingleLogout {
 
                 if (debug.messageEnabled()) {
                     debug.message("IDPLogoutUtil.processLogoutRequest: " +
-                        "idpEntityID=" + idpEntityID + ", sessionIndex=" 
+                        "idpEntityID=" + idpEntityID + ", sessionIndex="
                         + sessionIndex);
                 }
 
@@ -1266,14 +976,14 @@ public class IDPSingleLogout {
                     // this case won't happen
                     // according to the spec: SP has to send at least
                     // one sessionIndex, could be multiple (TODO: need
-                    // to handle that above; but when IDP sends out 
+                    // to handle that above; but when IDP sends out
                     // logout request, it could omit sessionIndex list,
                     // which means all sessions on SP side, so SP side
                     // needs to care about this case
                     debug.error("IDPLogoutUtil.processLogoutRequest: " +
-                        "No session index in logout request");      
+                        "No session index in logout request");
 
-                    status = 
+                    status =
                         SAML2Utils.generateStatus(SAML2Constants.REQUESTER, "");
                     break;
                 }
@@ -1291,9 +1001,8 @@ public class IDPSingleLogout {
                    remoteServiceURL = SAML2Utils.getRemoteServiceURL(serverId);
                 }
 
-                IDPSession idpSession = (IDPSession)
-                    IDPCache.idpSessionsByIndices.get(sessionIndex);
-                    
+                IDPSession idpSession = IDPCache.idpSessionsByIndices.get(sessionIndex);
+
                 if ((idpSession == null) &&
                     (SAML2Utils.isSAML2FailOverEnabled())) {
                     // Read from CTS Repository
@@ -1310,7 +1019,7 @@ public class IDPSingleLogout {
                     } else {
                         SAML2Utils.debug.error("IDPSessionCopy is NULL!!!");
                     }
-                }    
+                }
                 if (idpSession == null) {
                     // If the IDP session does not find locally for a given
                     // session index and if the IDP is behind a lb with another
@@ -1354,7 +1063,7 @@ public class IDPSingleLogout {
                         debug.error("IDPLogoutUtil.processLogoutRequest: " +
                         "IDP no longer has this session index "+ sessionIndex);
                         status = SAML2Utils.generateStatus(
-                            SAML2Constants.RESPONDER, 
+                            SAML2Constants.RESPONDER,
                             SAML2Utils.bundle.getString("invalidSessionIndex"));
                         break;
                     }
@@ -1373,7 +1082,7 @@ public class IDPSingleLogout {
                 session = idpSession.getSession();
                 // handle external application logout if configured
                 BaseConfigType idpConfig = SAML2Utils.getSAML2MetaManager()
-                    .getIDPSSOConfig(realm, idpEntityID);  
+                    .getIDPSSOConfig(realm, idpEntityID);
                 List appLogoutURL = (List) SAML2MetaUtils.getAttributes(
                     idpConfig).get(SAML2Constants.APP_LOGOUT_URL);
                 if (debug.messageEnabled()) {
@@ -1381,11 +1090,11 @@ public class IDPSingleLogout {
                         "external app logout URL= " + appLogoutURL);
                 }
                 if ((appLogoutURL != null) && (appLogoutURL.size() != 0)) {
-                    SAML2Utils.postToAppLogout(request, 
+                    SAML2Utils.postToAppLogout(request,
                         (String) appLogoutURL.get(0), session);
                 }
 
-                List list = (List)idpSession.getNameIDandSPpairs();
+                List<NameIDandSPpair> list = idpSession.getNameIDandSPpairs();
                 int n = list.size();
                 if (debug.messageEnabled()) {
                     debug.message("IDPLogoutUtil.processLogoutRequest: " +
@@ -1393,12 +1102,12 @@ public class IDPSingleLogout {
                         ", size=" + n);
                 }
 
-                
+
                 NameIDandSPpair pair = null;
                 // remove sending SP from the list
                 String spIssuer = logoutReq.getIssuer().getValue();
                 for (int i=0; i<n; i++) {
-                    pair = (NameIDandSPpair) list.get(i);
+                    pair = list.get(i);
                     if (pair.getSPEntityID().equals(spIssuer)) {
                         list.remove(i);
                         removeTransientNameIDFromCache(pair.getNameID());
@@ -1406,10 +1115,10 @@ public class IDPSingleLogout {
                     }
                 }
                 List partners = idpSession.getSessionPartners();
-                boolean cleanUp = true; 
+                boolean cleanUp = true;
                 if (partners != null && !partners.isEmpty()) {
-                    cleanUp = false; 
-                }    
+                    cleanUp = false;
+                }
 
                 n = list.size();
                 if (n == 0) {
@@ -1418,7 +1127,7 @@ public class IDPSingleLogout {
                     status = destroyTokenAndGenerateStatus(
                         sessionIndex, idpSession.getSession(),
                         request, response, cleanUp);
-                    if (cleanUp) {    
+                    if (cleanUp) {
                        IDPCache.idpSessionsByIndices.remove(sessionIndex);
                        if ((agent != null) &&
                            agent.isRunning() &&
@@ -1433,10 +1142,13 @@ public class IDPSingleLogout {
                            }
                        }
                        IDPCache.authnContextCache.remove(sessionIndex);
-                    }   
+                    }
                     break;
                 }
 
+                //We should save the originally used request binding to make sure the response is sent back using the
+                //correct binding.
+                idpSession.setOriginatingLogoutRequestBinding(binding);
                 // there are other SPs to be logged out
                 if (binding.equals(SAML2Constants.HTTP_REDIRECT) ||
                     binding.equals(SAML2Constants.HTTP_POST)) {
@@ -1447,44 +1159,35 @@ public class IDPSingleLogout {
 
                 int soapFailCount = 0;
                 for (int i = 0; i < n; i++) {
-                    if (binding.equals(SAML2Constants.HTTP_REDIRECT) ||
-                        binding.equals(SAML2Constants.HTTP_POST)) {
-                        pair = (NameIDandSPpair)list.remove(0);
-                        removeTransientNameIDFromCache(pair.getNameID());
-                    } else {
-                        // for SOAP binding
-                        pair = (NameIDandSPpair) list.get(i);
-                    }
-            
+                    pair = list.remove(0);
+                    removeTransientNameIDFromCache(pair.getNameID());
+
                     String spEntityID = pair.getSPEntityID();
                     if (debug.messageEnabled()) {
-                        debug.message("IDPLogoutUtil.processLogoutRequest: "
-                             + "SP for " + sessionIndex + " is " + spEntityID);
+                        debug.message("IDPSingleLogout.processLogoutRequest: SP for " + sessionIndex + " is "
+                                + spEntityID);
                     }
-                    SPSSODescriptorElement sp = null;
-                    sp = SAML2Utils.getSAML2MetaManager().
-                                     getSPSSODescriptor(realm, spEntityID);
-                    List slosList = sp.getSingleLogoutService();
-                    
+                    List<SingleLogoutServiceElement> slosList = getSPSLOServiceEndpoints(realm, spEntityID);
+
                     // get IDP entity config in case of SOAP,for basic auth info
                     SPSSOConfigElement spConfig = null;
-                    if (binding.equals(SAML2Constants.SOAP)) {
-                        spConfig = SAML2Utils.
-                            getSAML2MetaManager().getSPSSOConfig(
-                                realm, spEntityID);
-                    }
+                    spConfig = SAML2Utils.getSAML2MetaManager().getSPSSOConfig(realm, spEntityID);
                     String uri = request.getRequestURI();
                     String metaAlias = SAML2MetaUtils.getMetaAliasByUri(uri);
                     HashMap paramsMap = new HashMap();
                     paramsMap.put(SAML2Constants.ROLE, SAML2Constants.IDP_ROLE);
-                    StringBuffer requestID = null; 
+                    StringBuffer requestID = null;
+                    SingleLogoutServiceElement logoutEndpoint =
+                            LogoutUtil.getMostAppropriateSLOServiceLocation(slosList,
+                            idpSession.getOriginatingLogoutRequestBinding());
+                    if (logoutEndpoint == null) {
+                        continue;
+                    }
                     try {
-                        requestID = LogoutUtil.doLogout(metaAlias,
-                            spEntityID, slosList, null, binding, relayState,
-                            sessionIndex, pair.getNameID(), request, response,
-                            paramsMap, spConfig);
+                        requestID = LogoutUtil.doLogout(metaAlias, spEntityID, null, logoutEndpoint, relayState,
+                                sessionIndex, pair.getNameID(), request, response, paramsMap, spConfig);
                     } catch (SAML2Exception ex) {
-                        if (binding.equals(SAML2Constants.SOAP)) {
+                        if (logoutEndpoint.getBinding().equals(SAML2Constants.SOAP)) {
                             debug.error(
                                 "IDPSingleLogout.initiateLogoutRequest:" , ex);
                             soapFailCount++;
@@ -1494,54 +1197,58 @@ public class IDPSingleLogout {
                         }
                     }
 
-                    if (binding.equals(SAML2Constants.HTTP_REDIRECT) ||
-                        binding.equals(SAML2Constants.HTTP_POST)) {
+                    String bindingUsed = logoutEndpoint.getBinding();
+                    if (bindingUsed.equals(SAML2Constants.HTTP_REDIRECT) || bindingUsed.equals(SAML2Constants.HTTP_POST)) {
                         String requestIDStr = requestID.toString();
-                        if (requestIDStr != null 
-                                        && requestIDStr.length() != 0) {
+                        if (requestIDStr != null && requestIDStr.length() != 0) {
                             idpSession.setPendingLogoutRequestID(requestIDStr);
                         }
                         return null;
                     }
-
                 }
 
                 if (soapFailCount == n) {
-                    throw new SAML2Exception(
-                        SAML2Utils.bundle.getString("sloFailed"));
+                    throw new SAML2Exception(SAML2Utils.bundle.getString("sloFailed"));
                 } else if (soapFailCount > 0) {
-                    throw new SAML2Exception(
-                        SAML2Utils.bundle.getString("partialLogout"));
+                    throw new SAML2Exception(SAML2Utils.bundle.getString("partialLogout"));
                 }
-                // binding is SOAP, generate logout response 
-                // and send to initiating SP
-                status = destroyTokenAndGenerateStatus(
-                    sessionIndex, idpSession.getSession(),
-                    request, response, true);
-                if (cleanUp) {    
-                    IDPCache.idpSessionsByIndices.remove(sessionIndex);
-                    if ((agent != null) &&
-                        agent.isRunning() &&
-                        (saml2Svc != null))
-                    {
-                        saml2Svc.setIdpSessionCount(
-		            (long)IDPCache.idpSessionsByIndices.
-			        size());
-                    }
-                    if (SAML2Utils.isSAML2FailOverEnabled()) {
-                        try {
-                            SAML2RepositoryFactory.getInstance().deleteSAML2Token(sessionIndex);
-                        } catch (StoreException se) {
-                            SAML2Utils.debug.error("Store Exception deleting SAML2 Token using Session Index: "+sessionIndex+", "+se.getMessage(),se);
+                spEntity = idpSession.getOriginatingLogoutSPEntityID();
+                if (binding.equals(SAML2Constants.HTTP_REDIRECT) || binding.equals(SAML2Constants.HTTP_POST)) {
+                    sendLastResponse(idpSession, null, request, response, sessionIndex, session, realm, idpEntityID,
+                            relayState);
+                    return null;
+                } else {
+                    // binding is SOAP, generate logout response
+                    // and send to initiating SP
+                    status = destroyTokenAndGenerateStatus(
+                        sessionIndex, idpSession.getSession(),
+                        request, response, true);
+                    if (cleanUp) {
+                        IDPCache.idpSessionsByIndices.remove(sessionIndex);
+                        if ((agent != null) &&
+                            agent.isRunning() &&
+                            (saml2Svc != null))
+                        {
+                            saml2Svc.setIdpSessionCount(
+                                (long)IDPCache.idpSessionsByIndices.
+                                    size());
                         }
+                        if (SAML2Utils.isSAML2FailOverEnabled()) {
+                            try {
+                                SAML2RepositoryFactory.getInstance().deleteSAML2Token(sessionIndex);
+                            } catch (StoreException se) {
+                                SAML2Utils.debug.error("Store Exception deleting SAML2 Token using Session Index: "
+                                        + sessionIndex + ", " + se.getMessage(), se);
+                            }
+                        }
+                        IDPCache.authnContextCache.remove(sessionIndex);
                     }
-                    IDPCache.authnContextCache.remove(sessionIndex);
-                }    
+                }
             } while (false);
-            
+
         } catch (SessionException ssoe) {
             debug.error("IDPLogoutUtil : unable to get meta for ", ssoe);
-            status = SAML2Utils.generateStatus(idpEntityID, ssoe.toString()); 
+            status = SAML2Utils.generateStatus(idpEntityID, ssoe.toString());
         } catch (SAML2Exception e) {
              // show throw exception
              e.printStackTrace();
@@ -1550,7 +1257,7 @@ public class IDPSingleLogout {
         // process multi-federation protocol
         boolean isMultiProtocol = false;
         try {
-            SessionProvider provider = SessionManager.getProvider(); 
+            SessionProvider provider = SessionManager.getProvider();
             if ((session != null) && (provider.isValid(session)) &&
                 MultiProtocolUtils.isMultipleProtocolSession(session,
                 SingleLogoutManager.SAML2)) {
@@ -1559,26 +1266,26 @@ public class IDPSingleLogout {
         } catch (SessionException ex) {
             //ignore
         }
-        LogoutResponse logRes = LogoutUtil.generateResponse(status, 
-            logoutReq.getID(), SAML2Utils.createIssuer(idpEntityID), realm, 
-            SAML2Constants.IDP_ROLE, spEntity);
+        //here we are providing null for remote entity, because it's an unused variable in the method...
+        LogoutResponse logRes = LogoutUtil.generateResponse(status, logoutReq.getID(),
+                SAML2Utils.createIssuer(idpEntityID), realm, SAML2Constants.IDP_ROLE, null);
         if (!isMultiProtocol) {
             return logRes;
         } else {
             try {
                 Set set = new HashSet();
                 set.add(session);
-                String sessUser = 
+                String sessUser =
                     SessionManager.getProvider().getPrincipalName(session);
-                boolean isSOAPInitiated = binding.equals(SAML2Constants.SOAP) 
+                boolean isSOAPInitiated = binding.equals(SAML2Constants.SOAP)
                     ? true : false;
                 logRes.setDestination(XMLUtils.escapeSpecialCharacters(
                     getSingleLogoutLocation(spEntity, realm, binding)));
                 debug.message("IDPSingleLogout.processLogReq : call MP");
                 int retStat = SingleLogoutManager.getInstance().
-                    doIDPSingleLogout(set, sessUser, request, response, 
-                    isSOAPInitiated, false, SingleLogoutManager.SAML2, 
-                    realm, idpEntityID, spEntity, relayState, 
+                    doIDPSingleLogout(set, sessUser, request, response,
+                    isSOAPInitiated, false, SingleLogoutManager.SAML2,
+                    realm, idpEntityID, spEntity, relayState,
                     logoutReq.toXMLString(true, true),
                     logRes.toXMLString(true, true),
                     SingleLogoutManager.LOGOUT_SUCCEEDED_STATUS);
@@ -1599,7 +1306,7 @@ public class IDPSingleLogout {
             }
         }
     }
-    
+
     private static LogoutResponse updateLogoutResponse(LogoutResponse logRes,
         int retStat) throws SAML2Exception {
         if (debug.messageEnabled()) {
@@ -1618,12 +1325,12 @@ public class IDPSingleLogout {
     }
 
     /**
-     * Destroys the Single SignOn token and generates 
+     * Destroys the Single SignOn token and generates
      * the <code>Status</code>.
      *
      * @param sessionIndex IDP's session index.
      * @param session the Single Sign On session.
-     *  
+     *
      * @return <code>Status</code>.
      * @throws SAML2Exception if error generating
      *          <code>Status</code>.
@@ -1632,7 +1339,7 @@ public class IDPSingleLogout {
         String sessionIndex,
         Object session,
         HttpServletRequest request,
-        HttpServletResponse response, 
+        HttpServletResponse response,
         boolean cleanUp) throws SAML2Exception {
 
         Status status = null;
@@ -1642,7 +1349,7 @@ public class IDPSingleLogout {
                     MultiProtocolUtils.invalidateSession(session, request,
                         response, SingleLogoutManager.SAML2);
                 }
-                        
+
                 if (debug.messageEnabled()) {
                     debug.message("IDPLogoutUtil.destroyTAGR: "
                         + "Local session destroyed.");
@@ -1654,39 +1361,38 @@ public class IDPSingleLogout {
             }
         } else {
             if (debug.messageEnabled()) {
-                debug.message("IDPLogoutUtil.destroyTAGR: " + 
+                debug.message("IDPLogoutUtil.destroyTAGR: " +
                     "No such session with index " + sessionIndex + " exists.");
             }
             // TODO : should this be success?
             status = SAML2Utils.generateStatus(SAML2Constants.SUCCESS, "");
         }
         return status;
-    }       
+    }
 
     private static void destroyAllTokenForUser(
         String  userToLogout, HttpServletRequest request,
         HttpServletResponse response) {
-        
+
         Enumeration keys = IDPCache.idpSessionsByIndices.keys();
         String idpSessionIndex = null;
         IDPSession idpSession = null;
         Object idpToken = null;
         if (debug.messageEnabled()) {
-                debug.message("IDPLogoutUtil.destroyAllTokenForUser: " + 
+                debug.message("IDPLogoutUtil.destroyAllTokenForUser: " +
                     "User to logoutAll : " + userToLogout);
         }
-        
+
         while (keys.hasMoreElements()) {
-            idpSessionIndex = (String)keys.nextElement();   
-            idpSession = (IDPSession)IDPCache.
-                idpSessionsByIndices.get(idpSessionIndex);
+            idpSessionIndex = (String)keys.nextElement();
+            idpSession = IDPCache.idpSessionsByIndices.get(idpSessionIndex);
             if (idpSession != null) {
                 idpToken = idpSession.getSession();
                 if (idpToken != null) {
                     try {
                         String userID = sessionProvider.getPrincipalName(idpToken);
                         if (userToLogout.equalsIgnoreCase(userID)) {
-                            MultiProtocolUtils.invalidateSession(idpToken, 
+                            MultiProtocolUtils.invalidateSession(idpToken,
                                 request, response, SingleLogoutManager.SAML2);
                             IDPCache.
                                 idpSessionsByIndices.remove(idpSessionIndex);
@@ -1723,7 +1429,7 @@ public class IDPSingleLogout {
                 SAML2Utils.debug.error("Store Exception deleting idpSessionIndex using Session Index: "+idpSessionIndex+", "+se.getMessage(),se);
                 }
                 IDPCache.authnContextCache.remove(idpSessionIndex);
-            }       
+            }
         }
     }
 
@@ -1785,26 +1491,26 @@ public class IDPSingleLogout {
            }
         }
     }
-    
+
      /**
-     * Checks if a SAML2 request has been misrouted, if so, it send the 
+     * Checks if a SAML2 request has been misrouted, if so, send the
      * request to  the original server, gets the response and redirects it
      * or posts it back
      *
      * @param request the Servlet request
      * @param response the Servlet response
      * @param session the Single Sign On session.
-     *  
-     * @return true if the request was misrouted and ti was forwarded to 
+     *
+     * @return true if the request was misrouted and it was forwarded to
      * the original server
-     * @throws SAML2Exception, SessionException 
+     * @throws SAML2Exception, SessionException
      */
     private static boolean isMisroutedRequest(HttpServletRequest request,
             HttpServletResponse response, Object session)
             throws SAML2Exception, SessionException {
 
         String classMethod = "IDPSingleLogout.isMisroutedRequest : ";
-        
+
         // Check that the request has not been missrouted
         String idpSessionIndex = IDPSSOUtil.getSessionIndex(session);
         if (idpSessionIndex == null) {
@@ -1812,16 +1518,16 @@ public class IDPSingleLogout {
                 debug.message(classMethod + "No SP session participant(s)");
             }
             MultiProtocolUtils.invalidateSession(session, request,
-                response, SingleLogoutManager.SAML2);    
+                response, SingleLogoutManager.SAML2);
             return true;
         }
         String serverId =
                 idpSessionIndex.substring(idpSessionIndex.length() - 2);
         if (debug.messageEnabled()) {
-            debug.message(classMethod + "idpSessionIndex=" + idpSessionIndex + 
+            debug.message(classMethod + "idpSessionIndex=" + idpSessionIndex +
                     ", id=" + serverId);
         }
-        
+
         // If misrouted, route it to the proper server
         if (!serverId.equals(SAML2Utils.getLocalServerID())) {
             if (debug.warningEnabled()) {
@@ -1878,30 +1584,28 @@ public class IDPSingleLogout {
                             + ioe.toString());
                 }
             }
-        } 
+        }
         return false;
     }
 
     /**
-     * Checks if a SAML2 request has been misrouted, if so, it send the 
-     * request to  the original server, gets the response and redirects it
-     * or posts it back
+     * Generates a new Logout Response with Success Status saying that the user has already logged out.
      *
-     * @param response the Servlet response
-     * @param logoutReq the SAML 2.0 Logout Request
-     * @param relayState the original relay state that came with the request
-     * @param realm the realm where the hosted entity has been defined
-     * @param idpEntityID The entity id of the hosted IdP
-     * @param spEntityID The entity id of the remote SP
-     * @param binding The binding that the IdP should reply with to the SP
-     * 
-     * @throws SAML2Exception
+     * @param response The Servlet response.
+     * @param logoutReq The SAML 2.0 Logout Request.
+     * @param relayState The original relay state that came with the request.
+     * @param realm The realm where the hosted entity has been defined.
+     * @param idpEntityID The entity id of the hosted IdP.
+     * @param spEntityID The entity id of the remote SP.
+     * @param binding The binding that the IdP should reply with to the SP.
+     *
+     * @throws SAML2Exception If there was a problem while constructing/sending the Logout Response.
      */
     private static void sendAlreadyLogedOutResp(HttpServletResponse response,
             LogoutRequest logoutReq, String relayState,
             String realm, String idpEntityID, String spEntityID,
             String binding) throws SAML2Exception {
-        
+
         String classMethod = "IDPSingleLogout.sendAlreadyLogedOutResp";
         debug.message(classMethod + "No session in the IdP. "
                 + "We are already logged out. Generating success logout");
@@ -1917,5 +1621,170 @@ public class IDPSingleLogout {
         LogoutUtil.sendSLOResponse(response, logRes, location,
                 relayState, realm, idpEntityID, SAML2Constants.IDP_ROLE,
                 spEntityID, binding);
+    }
+
+    private static boolean sendLastResponse(IDPSession idpSession, LogoutResponse logoutRes, HttpServletRequest request,
+            HttpServletResponse response, String idpSessionIndex, Object session, String realm, String idpEntityID,
+            String relayState) throws SAML2Exception, SessionException, SAML2MetaException {
+        String binding;
+        //resetting the binding to the original value so the response is sent back with the correct binding
+        binding = idpSession.getOriginatingLogoutRequestBinding();
+        String originatingRequestID = idpSession.getOriginatingLogoutRequestID();
+        String originatingLogoutSPEntityID = idpSession.getOriginatingLogoutSPEntityID();
+        if (originatingRequestID == null) {
+            // this is IDP initiated SLO
+            if (idpSession.getLogoutAll()) {
+                String userID = sessionProvider.getPrincipalName(idpSession.getSession());
+                destroyAllTokenForUser(userID, request, response);
+            } else {
+                IDPCache.idpSessionsByIndices.remove(idpSessionIndex);
+                if (agent != null && agent.isRunning() && saml2Svc != null) {
+                    saml2Svc.setIdpSessionCount((long) IDPCache.idpSessionsByIndices.size());
+                }
+                try {
+                    if (SAML2Utils.isSAML2FailOverEnabled()) {
+                        SAML2RepositoryFactory.getInstance().deleteSAML2Token(idpSessionIndex);
+                    }
+                } catch (SAML2Exception e) {
+                    debug.error("Error while deleting idpSessionIndex from Persistent DB.", e);
+                } catch (StoreException se) {
+                    debug.error("Error while deleting idpSessionIndex from Persistent DB.", se);
+                }
+                IDPCache.authnContextCache.remove(idpSessionIndex);
+                if (!MultiProtocolUtils.isMultipleProtocolSession(idpSession.getSession(), SingleLogoutManager.SAML2)) {
+                    sessionProvider.invalidateSession(idpSession.getSession(), request, response);
+                } else {
+                    MultiProtocolUtils.removeFederationProtocol(idpSession.getSession(), SingleLogoutManager.SAML2);
+                    // call Multi-Federation protocol SingleLogoutManager
+                    SingleLogoutManager sloManager = SingleLogoutManager.getInstance();
+                    Set<Object> set = new HashSet<Object>(1);
+                    set.add(session);
+                    SessionProvider provider = SessionManager.getProvider();
+                    String uid = provider.getPrincipalName(session);
+                    debug.message("IDPSingleLogout.processLogRes: MP/Http");
+                    int retStatus = SingleLogoutManager.LOGOUT_SUCCEEDED_STATUS;
+                    try {
+                        retStatus = sloManager.doIDPSingleLogout(set, uid, request, response, false, true,
+                                SingleLogoutManager.SAML2, realm, idpEntityID, originatingLogoutSPEntityID, relayState,
+                                null, null, getLogoutStatus(logoutRes));
+                    } catch (SAML2Exception ex) {
+                        throw ex;
+                    } catch (Exception ex) {
+                        debug.error("IDPSIngleLogout.processLogoutResponse: MP/IDP initiated HTTP", ex);
+                        throw new SAML2Exception(ex.getMessage());
+                    }
+                    if (retStatus == SingleLogoutManager.LOGOUT_REDIRECTED_STATUS) {
+                        return true;
+                    }
+                }
+            }
+            debug.message("IDP initiated SLO Success");
+            return false;
+        }
+        List<SingleLogoutServiceElement> slosList = getSPSLOServiceEndpoints(realm, originatingLogoutSPEntityID);
+        String location = LogoutUtil.getSLOResponseServiceLocation(slosList, binding);
+        if (location == null || location.isEmpty()) {
+            location = LogoutUtil.getSLOServiceLocation(slosList, binding);
+            if (location == null || location.length() == 0) {
+                debug.error("Unable to find the IDP's single logout response service with the HTTP-Redirect binding");
+                throw new SAML2Exception(SAML2Utils.bundle.getString("sloResponseServiceLocationNotfound"));
+            } else {
+                if (debug.messageEnabled()) {
+                    debug.message("SP's single logout response service location = " + location);
+                }
+            }
+        } else {
+            if (debug.messageEnabled()) {
+                debug.message("IDP's single logout response service location = " + location);
+            }
+        }
+        Status status = destroyTokenAndGenerateStatus(idpSessionIndex, idpSession.getSession(), request, response,
+                true);
+        //here we are providing null for remote entity, because it's an unused variable in the method...
+        logoutRes = LogoutUtil.generateResponse(status, originatingRequestID, SAML2Utils.createIssuer(idpEntityID),
+                realm, SAML2Constants.IDP_ROLE, null);
+        if (logoutRes != null) {
+            logoutRes.setDestination(XMLUtils.escapeSpecialCharacters(location));
+            IDPCache.idpSessionsByIndices.remove(idpSessionIndex);
+            if (agent != null && agent.isRunning() && saml2Svc != null) {
+                saml2Svc.setIdpSessionCount((long) IDPCache.idpSessionsByIndices.size());
+            }
+            try {
+                if (SAML2Utils.isSAML2FailOverEnabled()) {
+                    SAML2RepositoryFactory.getInstance().deleteSAML2Token(idpSessionIndex);
+                }
+            } catch (SAML2Exception e) {
+                debug.error("Error while deleting idpSessionIndex from Persistent DB.", e);
+            } catch (StoreException se) {
+                debug.error("Error while deleting idpSessionIndex from Persistent DB.", se);
+            }
+            IDPCache.authnContextCache.remove(idpSessionIndex);
+
+            // call multi-federation protocol processing
+            // this is the SP initiated HTTP binding case
+            boolean isMultiProtocolSession = false;
+            int retStatus = SingleLogoutManager.LOGOUT_SUCCEEDED_STATUS;
+            try {
+                SessionProvider provider = SessionManager.getProvider();
+                session = idpSession.getSession();
+                if (session != null && provider.isValid(session)
+                        && MultiProtocolUtils.isMultipleProtocolSession(session, SingleLogoutManager.SAML2)) {
+                    isMultiProtocolSession = true;
+                    // call Multi-Federation protocol SingleLogoutManager
+                    SingleLogoutManager sloManager = SingleLogoutManager.getInstance();
+                    Set set = new HashSet();
+                    set.add(session);
+                    String uid = provider.getPrincipalName(session);
+                    debug.message("IDPSingleLogout.processLogRes: MP/Http");
+                    retStatus = sloManager.doIDPSingleLogout(set, uid, request, response, false, true,
+                            SingleLogoutManager.SAML2, realm, idpEntityID, originatingLogoutSPEntityID, relayState,
+                            null, logoutRes.toXMLString(), getLogoutStatus(logoutRes));
+                }
+            } catch (SessionException e) {
+                // ignore as session might not be valid
+                debug.message("IDPSingleLogout.processLogoutRequest: session",e);
+            } catch (Exception e) {
+                debug.message("IDPSingleLogout.processLogoutRequest: MP2",e);
+                retStatus = SingleLogoutManager.LOGOUT_FAILED_STATUS;
+            }
+
+            if (!isMultiProtocolSession || (retStatus != SingleLogoutManager.LOGOUT_REDIRECTED_STATUS)) {
+                logoutRes = updateLogoutResponse(logoutRes, retStatus);
+                LogoutUtil.sendSLOResponse(response, logoutRes, location, relayState, realm, idpEntityID,
+                        SAML2Constants.IDP_ROLE, originatingLogoutSPEntityID, binding);
+                return true;
+            } else {
+                return false;
+            }
+        }
+        IDPCache.idpSessionsByIndices.remove(idpSessionIndex);
+        if (agent != null && agent.isRunning() && saml2Svc != null) {
+            saml2Svc.setIdpSessionCount((long) IDPCache.idpSessionsByIndices.size());
+        }
+        try {
+            if (SAML2Utils.isSAML2FailOverEnabled()) {
+                SAML2RepositoryFactory.getInstance().deleteSAML2Token(idpSessionIndex);
+            }
+        } catch (SAML2Exception e) {
+            debug.error("Error while deleting idpSessionIndex from Persistent DB.", e);
+        } catch (StoreException se) {
+            debug.error("Error while deleting idpSessionIndex from Persistent DB.", se);
+        }
+        IDPCache.authnContextCache.remove(idpSessionIndex);
+        return false;
+    }
+
+    private static List<SingleLogoutServiceElement> getSPSLOServiceEndpoints(String realm, String spEntityID)
+            throws SAML2Exception {
+        // get SPSSODescriptor
+        SPSSODescriptorElement spsso = sm.getSPSSODescriptor(realm, spEntityID);
+
+        if (spsso == null) {
+            String[] data = {spEntityID};
+            LogUtil.error(Level.INFO, LogUtil.SP_METADATA_ERROR, data, null);
+            throw new SAML2Exception(SAML2Utils.bundle.getString("metaDataError"));
+        }
+
+        return spsso.getSingleLogoutService();
     }
 }
