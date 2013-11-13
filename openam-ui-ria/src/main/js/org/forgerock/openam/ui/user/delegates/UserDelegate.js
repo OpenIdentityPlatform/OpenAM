@@ -104,13 +104,13 @@ define("UserDelegate", [
     };
 
 
-    obj.forgotPassword = function(postData, successCallback, errorCallback, errorsHandlers) {
+    obj.doAction = function(action, postData, successCallback, errorCallback, errorsHandlers) {
         var realm = configuration.globalData.auth.realm;
         if(realm === "/"){
             realm = "";
         }
         return obj.serviceCall({
-            url: realm + "/users/?_action=forgotPassword",
+            url: realm + "/users/?_action=" + action,
             data: JSON.stringify(postData),
             type: "POST",
             success: function (data) {
@@ -118,21 +118,6 @@ define("UserDelegate", [
             },
             error: errorCallback,
             errorsHandlers: errorsHandlers
-        });
-    };
-
-    obj.forgotPasswordReset = function(postData, successCallback) {
-        var realm = configuration.globalData.auth.realm;
-        if(realm === "/"){
-            realm = "";
-        }
-        return obj.serviceCall({
-            url: realm + "/users/?_action=forgotPasswordReset",
-            data: JSON.stringify(postData),
-            type: "POST",
-            success: function (data) {
-                successCallback(data);
-            }
         });
     };
     

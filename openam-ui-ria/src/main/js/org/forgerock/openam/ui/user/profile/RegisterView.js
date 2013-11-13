@@ -24,7 +24,7 @@
 
 /*global define, $, form2js, _, js2form, Handlebars, window */
 
-define("org/forgerock/openam/ui/user/profile/ForgotPasswordView", [
+define("org/forgerock/openam/ui/user/profile/RegisterView", [
     "org/forgerock/commons/ui/common/main/AbstractView",
     "org/forgerock/commons/ui/common/main/ValidatorsManager",
     "UserDelegate",
@@ -35,14 +35,14 @@ define("org/forgerock/openam/ui/user/profile/ForgotPasswordView", [
     "org/forgerock/commons/ui/common/util/UIUtils"
 ], function(AbstractView, validatorsManager, userDelegate, conf, cookieHelper, eventManager, constants, uiUtils) {
     
-    var ForgottenPasswordView = AbstractView.extend({
-        template: "templates/openam/ForgotPasswordTemplate.html",
+    var RegisterView = AbstractView.extend({
+        template: "templates/openam/RegisterTemplate.html",
         baseTemplate: "templates/user/LoginBaseTemplate.html",
         
         data: {},
         events: {
             "click #continue": "continueProcess",
-            "click #changePasswordButton" : "changePassword",
+            "click #registerButton" : "register",
             "onValidate": "onValidate",
             "customValidate": "customValidate",
             "click .cancelButton": "cancel"
@@ -54,7 +54,6 @@ define("org/forgerock/openam/ui/user/profile/ForgotPasswordView", [
                 this.data.isStageOne = false;
             }
             this.parentRender(function() {
-               this.$el.find("input[type=submit]").addClass('inactive').removeClass('active');
                validatorsManager.bindValidators(this.$el);
             });
         },
@@ -62,40 +61,51 @@ define("org/forgerock/openam/ui/user/profile/ForgotPasswordView", [
             e.preventDefault();
             var _this = this,
                 postData = {
-                        username: $('#username').val(),
-                        subject: $.t("templates.user.ForgottenPasswordTemplate.emailSubject"),
-                        message: $.t("templates.user.ForgottenPasswordTemplate.emailMessage")
+                        email: $('#email').val(),
+                        subject: $.t("templates.user.UserRegistrationTemplate.emailSubject"),
+                        message: $.t("templates.user.UserRegistrationTemplate.emailMessage")
                 },
                 success = function() {
-                    $("#step1").hide();
-                    $("#emailSent").show();
+                    _this.$el.find("#step1").hide();
+                    _this.$el.find("#emailSent").show();
                 },
                 error = function(e) {
                     var response = JSON.parse(e.responseText);
                     _this.$el.find("input[type=submit]").removeClass('inactive').addClass('active');
-                    if(response.message.indexOf("No email provided in profile.") === 0) {
-                        eventManager.sendEvent(constants.EVENT_DISPLAY_MESSAGE_REQUEST, "noEmailProvided");
+                    if(response.message.indexOf("Email not sent") === 0) {
+                        eventManager.sendEvent(constants.EVENT_DISPLAY_MESSAGE_REQUEST, "emailNotSent");
                     }
-                    else if(response.reason.indexOf("Not Found") === 0) {
-                        eventManager.sendEvent(constants.EVENT_DISPLAY_MESSAGE_REQUEST, "usernameNotFound");
-                    } 
                 };
             
             this.$el.find("input[type=submit]").addClass('inactive').removeClass('active');
-            userDelegate.doAction("forgotPassword",postData,success,error);
+            userDelegate.doAction("register",postData,success,error);
         },
-        changePassword: function(e) {
+        register: function(e) {
             e.preventDefault();
-            var postData = {
-                    userpassword: $('#password').val()
-            },
+            var confirmParams,
+            _this = this,
+            postData = _.extend(
+                    form2js(this.$el.find("#registration")[0]),
+                    {userpassword:this.$el.find("#password").val()}
+                    ),
             success = function() {
-                $("#step2").hide();
-                $("#passwordChangeSuccess").show();
+                _this.$el.find("#step2").hide();
+                _this.$el.find("#registerSuccess").show();
+            },
+            error = function(e) {
+                var response = JSON.parse(e.responseText);
+                _this.$el.find("input[type=submit]").removeClass('inactive').addClass('active');
+                if(response.message.indexOf("ldap exception") > -1) {
+                    eventManager.sendEvent(constants.EVENT_DISPLAY_MESSAGE_REQUEST, "userAlreadyExists");
+                }
             };
-            _.extend(postData,this.data.urlParams);
+            
             this.$el.find("input[type=submit]").addClass('inactive').removeClass('active');
-            userDelegate.doAction("forgotPasswordReset",postData,success);
+            
+            userDelegate.doAction("confirm",this.data.urlParams,function(d){
+                _.extend(postData,d);
+                userDelegate.doAction("anonymousCreate",postData,success,error);
+            });
         },
         cancel: function(e) {
             e.preventDefault();
@@ -104,7 +114,7 @@ define("org/forgerock/openam/ui/user/profile/ForgotPasswordView", [
             location.href = "#login" + ((loginUrlParams) ? loginUrlParams : "");
         },
         customValidate: function () {
-            if(validatorsManager.formValidated(this.$el.find("#passwordChange")) || validatorsManager.formValidated(this.$el.find("#forgotPassword"))) {
+            if(validatorsManager.formValidated(this.$el.find("#registration")) || validatorsManager.formValidated(this.$el.find("#forgotPassword"))) {
                 this.$el.find("input[type=submit]").removeClass('inactive').addClass('active');
             }
             else {
@@ -113,7 +123,7 @@ define("org/forgerock/openam/ui/user/profile/ForgotPasswordView", [
         }
     }); 
     
-    return new ForgottenPasswordView();
+    return new RegisterView();
 });
 
 

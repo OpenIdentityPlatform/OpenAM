@@ -12,6 +12,7 @@
                 "invalidOldPassword" : "Old password is invalid.",
                 "usernameNotFound" : "Username not found",
                 "noEmailProvided" : "No email provided in profile",
+                "emailNotSent" : "Email not sent",
                 "serviceUnavailable" : "Service unavailable",
                 "changedPassword" : "Password has been changed",
                 "unknown" : "Unknown error. Please contact with administrator",
@@ -120,7 +121,11 @@
                 "registerYourAccount" : "Register your account",
                 "logIn" : "Log in",
                 "haveAccoutQuestion" : "Already have an account?",
-                "agreeToTerms" : "I agree to the %sterms of use%s"
+                "agreeToTerms" : "I agree to the %sterms of use%s",
+                "emailSubject" : "OpenAM Registration",
+                "emailMessage" : "Please goto the link below to continue the registration process:",
+                "emailSent" : "We have sent you an e-mail, please follow the link in the e-mail to complete the registration process.",
+                "registrationComplete" : "Registration complete"
             }
         },
         "admin" : {

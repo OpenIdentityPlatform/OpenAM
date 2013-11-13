@@ -6,15 +6,14 @@
 <div class="container-shadow" style="width:550px;padding:10px;">
     {{#if isStageOne}}
         <form id="forgotPassword" action="" class="form" method="post" onsubmit="return false">
-            <h1>{{t "templates.user.ForgottenPasswordTemplate.forgottenPasswordQuestion"}}</h1><br/>
+            <h1>{{t "templates.user.UserRegistrationTemplate.registerYourAccount"}}</h1><br/>
             <div id="step1">
                 <fieldset>
-                        <p>{{t "templates.user.ForgottenPasswordTemplate.enterLogin"}}</p><br/>
                         <table class="group-field">
                             <tr class="field">
-                                <td><label>{{t "common.user.username"}}</label></td>
+                                <td><label>{{t "common.user.emailAddress"}}</label></td>
                                 <td> 
-                                    <input type="text" id="username" name="username" value=""  data-validator="required"  data-validator-event="keyup change"/>
+                                    <input type="text" id="email" name="email" value=""  data-validator="required"  data-validator-event="keyup change"/>
                                     <span class="error">x</span>
                                 </td>
                             </tr>
@@ -22,7 +21,7 @@
                                 <td></td>
                                 <td>
                                     <br/>
-                                    <input type="submit" id="continue" value="{{t "common.form.submit"}}" class="button active" />
+                                    <input type="submit" id="continue" value="{{t "common.form.submit"}}" class="button inactive" />
                                     <input type="button" value="{{t "common.form.cancel"}}" class="button gray cancelButton"/>
                                 </td>
                             </tr>
@@ -30,19 +29,47 @@
                 </fieldset>
             </div>
             <div id="emailSent" style="display:none">
-                {{t "templates.user.ForgottenPasswordTemplate.emailSent"}}
+                {{t "templates.user.UserRegistrationTemplate.emailSent"}}
             </div>
         </form>
     {{else}}
-        <form id="passwordChange" action="" class="form" method="post" onsubmit="return false">
-            <h1>{{t "templates.user.ForgottenPasswordTemplate.changeForgottenPassword"}}</h1><br/>
+        <form id="registration" action="" class="form" method="post" onsubmit="return false">
+            <h1>{{t "templates.user.UserRegistrationTemplate.registerYourAccount"}}</h1><br/>
             <div id="step2">
                 <fieldset>
-                        <p>{{t "templates.user.ChangeSecurityDataDialogTemplate.enterNewPasswordToChange"}}</p><br/>
                             <div class="group-field">
                                 <table class="group-field-inputs">
                                     <tr class="field">
-                                        <td><label>{{t "common.user.newPassword"}}</label></td>
+                                        <td><label>{{t "common.user.username"}}</label></td>
+		                                <td> 
+		                                    <input type="text" id="username" name="username" value=""  data-validator="required"  data-validator-event="keyup change"/>
+                                            <span class="error">x</span>
+		                                </td>
+                                    </tr>
+                                    <tr class="field">
+                                        <td><label>{{t "common.user.givenName"}}</label></td>
+                                        <td> 
+                                            <input type="text" id="givenname" name="givenname" value=""  data-validator="required"  data-validator-event="keyup change"/>
+                                            <span class="error">x</span>
+                                        </td>
+                                    </tr>
+                                    <tr class="field">
+                                        <td><label>{{t "common.user.familyName"}}</label></td>
+                                        <td> 
+                                            <input type="text" id="sn" name="sn" value=""  data-validator="required"  data-validator-event="keyup change"/>
+                                            <span class="error">x</span>
+                                        </td>
+                                    </tr>
+                                    <tr class="field">
+                                        <td><label>{{t "common.user.phoneNumber"}}</label></td>
+                                        <td> 
+                                            <input type="text" id="telephonenumber" name="telephonenumber" value=""  data-validator="required"  data-validator-event="keyup change"/>
+                                            <span class="error">x</span>
+                                            <br/><br/>
+                                        </td>
+                                    </tr>
+                                    <tr class="field">
+                                        <td><label>{{t "common.user.password"}}</label></td>
                                         <td>
                                             <input type="password" id="password" name="password" value=""  data-validator="minLength" minLength="8"  data-validator-event="keyup change"/>
                                             <div class="field-rule">
@@ -64,7 +91,7 @@
                                     <tr class="field">
                                         <td></td>
                                         <td style="padding-top:20px;">
-                                            <input type="submit" id="changePasswordButton" value="{{t "common.form.submit"}}" class="button active" />
+                                            <input type="submit" id="registerButton" value="{{t "common.form.submit"}}" class="button inactive" />
                                             <input type="button" id="cancel" value="{{t "common.form.cancel"}}" class="button gray cancelButton"/>
                                         </td>
                                     </tr>
@@ -72,8 +99,8 @@
                             </div>
                 </fieldset>
             </div>
-            <div id="passwordChangeSuccess" style="display:none">
-                {{t "config.messages.UserMessages.changedPassword"}} <a href="#" class="cancelButton">{{t "templates.user.ForgottenPasswordTemplate.proceedToLogin"}}</a>
+            <div id="registerSuccess" style="display:none">
+                {{t "config.messages.UserMessages.afterRegistration"}} <a href="#" class="cancelButton">{{t "templates.user.ForgottenPasswordTemplate.proceedToLogin"}}</a>
             </div>
         </form>
     {{/if}}

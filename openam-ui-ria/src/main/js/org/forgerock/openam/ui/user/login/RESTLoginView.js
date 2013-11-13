@@ -48,18 +48,20 @@ define("org/forgerock/openam/ui/user/login/RESTLoginView", [
         data: {},
         events: {
             "click input[type=submit]": "formSubmit",
-            "click #forgotPasswordButton": "forgotPasswordClick"
+            "click .SelfService": "selfServiceClick"
         },
-        forgotPasswordClick: function(e) {
+        selfServiceClick: function(e) {
             e.preventDefault();
-            //save the login params in a cookie for use with the cancel button on forgotPassword page 
-            //and also the "proceed to login" link once password has been successfully changed
-            var cookieVal = conf.globalData.auth.realm;
+            //save the login params in a cookie for use with the cancel button on forgotPassword/register page 
+            //and also the "proceed to login" link once password has been successfully changed or registration is complete
+            var expire = new Date(),
+                cookieVal = conf.globalData.auth.realm;
             if(conf.globalData.auth.urlParams){
                 cookieVal += restLoginHelper.filterUrlParams(conf.globalData.auth.urlParams);
             }
-            cookieHelper.setCookie("loginUrlParams",cookieVal);
-            location.href = "#forgotPassword/";
+            expire.setDate(expire.getDate() + 1);
+            cookieHelper.setCookie("loginUrlParams",cookieVal,expire);
+            location.href = e.target.href;
         },
         autoLogin: function() {
               var index,
@@ -98,8 +100,6 @@ define("org/forgerock/openam/ui/user/login/RESTLoginView", [
         },
         render: function(args, callback) {
             var urlParams = {};//deserialized querystring params
-            
-            cookieHelper.deleteCookie("loginUrlParams");
             
             if (args && args.length) {
                 conf.globalData.auth.realm = args[0];
@@ -235,9 +235,17 @@ define("org/forgerock/openam/ui/user/login/RESTLoginView", [
                                     }
 
                                     this.data.showForgotPassword = false;
-                                    
+                                    this.data.showRegister = false;
+                                    this.data.showSpacer = false;
+
                                     if(conf.globalData.auth.forgotPassword === "true"){
                                         this.data.showForgotPassword = true;
+                                    }
+                                    if(conf.globalData.auth.selfRegistration === "true"){
+                                        if(this.data.showForgotPassword){
+                                            this.data.showSpacer = true;
+                                        }
+                                        this.data.showRegister = true;
                                     }
                                     this.parentRender(_.bind(function() {
                                         this.reloadData();

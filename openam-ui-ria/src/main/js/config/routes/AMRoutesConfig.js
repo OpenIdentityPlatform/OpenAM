@@ -59,9 +59,25 @@ define("config/routes/AMRoutesConfig", [
         },
         "forgotPassword": {
             view: "org/forgerock/openam/ui/user/profile/ForgotPasswordView",
-            url: /forgotPassword(.*)?/,
-            pattern: "forgotPassword?",
-            defaults: ["/"]
+            url: "forgotPassword/",
+            forceUpdate: true
+        },
+        "forgotPasswordChange": {
+            view: "org/forgerock/openam/ui/user/profile/ForgotPasswordView",
+            url: /forgotPasswordChange(.*)?/,
+            pattern: "forgotPasswordChange?",
+            forceUpdate: true
+        },
+        "selfRegister": {
+            view: "org/forgerock/openam/ui/user/profile/RegisterView",
+            url: "register/",
+            forceUpdate: true
+        },
+        "continueSelfRegister": {
+            view: "org/forgerock/openam/ui/user/profile/RegisterView",
+            url: /continueRegister(.*)?/,
+            pattern: "continueRegister?",
+            forceUpdate: true
         },
         "confirmLogin": {
             view: "org/forgerock/openam/ui/user/login/RESTConfirmLoginView",

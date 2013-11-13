@@ -20,8 +20,15 @@
                     <div class="field {{#if isSubmit}}field-submit{{/if}}">
                         {{callbackRender}} 
                         {{#if isSubmit}}
+                            <br/><br/>
                             {{#if ../../showForgotPassword}}
-                            <br/><br/><a href="#" id="forgotPasswordButton">{{t "common.user.forgotPassword" }}</a>
+                            <a href="#forgotPassword/" class="SelfService">{{t "common.user.forgotPassword" }}</a>
+                            {{/if}}
+                            {{#if ../../showSpacer}}
+                            &nbsp;|&nbsp;
+                            {{/if}}
+                            {{#if ../../showRegister}}
+                            <a href="#register/" class="SelfService">{{t "common.form.register" }}</a>
                             {{/if}}
                         {{/if}}
                     </div>

@@ -6,10 +6,10 @@
             function doConfirm() {
                 var url = context;
                 if(window.location.search.indexOf('username=') > -1) {
-                    url += "#forgotPassword/&" + params;
+                    url += "#forgotPasswordChange/&" + params;
                 }
                 else if(window.location.search.indexOf('email=') > -1) {
-                    url += "#register/&" + params;
+                    url += "#continueRegister/&" + params;
                 }
                 else {
                     url += "#login/";
