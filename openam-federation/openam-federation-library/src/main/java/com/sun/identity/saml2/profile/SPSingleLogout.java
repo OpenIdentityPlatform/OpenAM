@@ -26,12 +26,13 @@
  *
  */
 
-
+/**
+ * Portions Copyrighted 2013 ForgeRock AS
+ */
 package com.sun.identity.saml2.profile;
 
 import javax.xml.soap.SOAPMessage;
 import com.sun.identity.federation.common.FSUtils;
-import com.sun.identity.saml.common.SAMLConstants;
 import com.sun.identity.saml2.common.SAML2Constants;
 import com.sun.identity.saml2.common.SAML2Exception;
 import com.sun.identity.saml2.common.SAML2Utils;
@@ -63,8 +64,6 @@ import com.sun.identity.plugin.session.SessionException;
 import com.sun.identity.shared.debug.Debug;
 import com.sun.identity.shared.xml.XMLUtils;
 
-
-import java.security.AccessController;
 import java.io.IOException;
 import java.util.logging.Level;
 import java.util.ArrayList;
@@ -314,16 +313,19 @@ public class SPSingleLogout {
                 }
                 return;
             }
-            StringTokenizer st =
-                new StringTokenizer(infoKeyString,SAML2Constants.SECOND_DELIM);
+            StringTokenizer st = new StringTokenizer(infoKeyString, SAML2Constants.SECOND_DELIM);
             String requestID = null; 
-            if (st != null && st.hasMoreTokens()) {
-                while (st.hasMoreTokens()) {
-                    String tmpInfoKeyString = (String)st.nextToken();
-                    requestID = prepareForLogout(realm, tokenID, metaAlias,
-                        extensionsList, binding, relayState, request, response,
-                        paramsMap, tmpInfoKeyString, origLogoutRequest, 
-                        msg);
+            while (st.hasMoreTokens()) {
+                String tmpInfoKeyString = st.nextToken();
+                NameIDInfoKey nameIdInfoKey = NameIDInfoKey.parse(tmpInfoKeyString);
+                //only try to perform the logout for the SP entity who is currently assigned to the session, this is
+                //to cover the case when there are multiple hosted SPs authenticating against the same IdP. In this
+                //scenario the sp metaalias will always be the SP who authenticated last, so we must ensure that we
+                //send out the LogoutRequest to the single IdP correctly. Once that's done the IdP will send the
+                //logout request to the other SP instance, invalidating the session for both SPs.
+                if (nameIdInfoKey.getHostEntityID().equals(spEntityID)) {
+                    requestID = prepareForLogout(realm, tokenID, metaAlias, extensionsList, binding, relayState, request,
+                            response, paramsMap, tmpInfoKeyString, origLogoutRequest, msg);
                 }
             }
             // IDP Proxy 
@@ -651,10 +653,13 @@ public class SPSingleLogout {
         infoMap.put("inResponseTo" , inResponseTo);                         
         infoMap.put(SAML2Constants.RELAY_STATE, relayState);
         // destroy session
-        SessionProvider sessionProvider = SessionManager.getProvider();
-        Object session = sessionProvider.getSession(request);
-        if ((session != null) && sessionProvider.isValid(session)) {
-            sessionProvider.invalidateSession(session, request, response);
+        try {
+            Object session = sessionProvider.getSession(request);
+            if ((session != null) && sessionProvider.isValid(session)) {
+                sessionProvider.invalidateSession(session, request, response);
+            }
+        } catch (SessionException se) {
+            debug.message("SPSingleLogout.processLogoutResponse() : Unable to invalidate session: " + se.getMessage());
         }
         if (!SPCache.isFedlet) {
             if (isSuccess(logoutRes)) {
@@ -704,11 +709,9 @@ public class SPSingleLogout {
         if (spAdapter != null) {
             if (userID == null) {
                 try {
-                    Object session = 
-                        SessionManager.getProvider().getSession(request);
+                    Object session = sessionProvider.getSession(request);
                     if (session != null) {
-                        userID = SessionManager.getProvider()
-                            .getPrincipalName(session);
+                        userID = sessionProvider.getPrincipalName(session);
                     }
                 } catch (SessionException ex) {
                     if (SAML2Utils.debug.messageEnabled()) {
