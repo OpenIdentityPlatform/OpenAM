@@ -182,7 +182,7 @@
 
         IDPSingleLogout.initiateLogoutRequest(request,response,
             binding,paramsMap);
-        if (binding.equalsIgnoreCase(SAML2Constants.SOAP)) {
+        if (!response.isCommitted()) {
             if (relayState != null && SAML2Utils.isRelayStateURLValid(request, relayState, SAML2Constants.IDP_ROLE)) {
                 response.sendRedirect(relayState);
             } else {

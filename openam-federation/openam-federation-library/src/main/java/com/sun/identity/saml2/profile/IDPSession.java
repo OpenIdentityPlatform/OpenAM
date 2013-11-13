@@ -26,13 +26,14 @@
  *
  */
 
-
+/**
+ * Portions Copyrighted 2013 ForgeRock AS
+ */
 package com.sun.identity.saml2.profile;
 
 import com.sun.identity.plugin.session.SessionManager;
 import com.sun.identity.plugin.session.SessionProvider;
 import com.sun.identity.plugin.session.SessionException;
-import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Iterator;
@@ -46,8 +47,9 @@ import com.sun.identity.saml2.common.SAML2Utils;
 public class IDPSession {
 
     private Object session = null;
-    private List nameIDandSPpairs = null;
+    private List<NameIDandSPpair> nameIDandSPpairs = null;
     private String pendingLogoutRequestID = null; 
+    private String originatingLogoutRequestBinding = null;
     private String originatingLogoutRequestID = null;
     private String originatingLogoutSPEntityID = null;
     private boolean doLogoutAll = false;  
@@ -64,7 +66,7 @@ public class IDPSession {
      */ 
     public IDPSession(Object session) {
         this.session = session;
-        nameIDandSPpairs = new ArrayList();
+        nameIDandSPpairs = new ArrayList<NameIDandSPpair>();
         sessionPartners = new ArrayList(); 
     }
     
@@ -84,7 +86,7 @@ public class IDPSession {
      * @return the list of <code>NameID</code> and 
      *    <code>SPEntityID</code> pair of the session      
      */ 
-    public List getNameIDandSPpairs() {
+    public List<NameIDandSPpair> getNameIDandSPpairs() {
         return nameIDandSPpairs;
     }
     
@@ -105,7 +107,25 @@ public class IDPSession {
     public String getPendingLogoutRequestID() {
         return pendingLogoutRequestID;
     }
-    
+
+    /**
+     * Sets the original logout request binding.
+     *
+     * @param originatingLogoutRequestBinding the original logout request binding.
+     */
+    public void setOriginatingLogoutRequestBinding(String originatingLogoutRequestBinding) {
+        this.originatingLogoutRequestBinding = originatingLogoutRequestBinding;
+    }
+
+    /**
+     * Returns the original logout request binding.
+     *
+     * @return The original logout request binding.
+     */
+    public String getOriginatingLogoutRequestBinding() {
+        return originatingLogoutRequestBinding;
+    }
+
     /**
      * Sets the original log out request id of the session.
      *
@@ -235,24 +255,25 @@ public class IDPSession {
     
     public IDPSession(IDPSessionCopy idpSessionCopy)  {
         try {
-            nameIDandSPpairs = new ArrayList();
             SessionProvider sessionProvider = SessionManager.getProvider();
             session = sessionProvider.getSession(
                  idpSessionCopy.getSSOToken());
-            nameIDandSPpairs = new ArrayList();
-            nameIDandSPpairs.addAll(
-                idpSessionCopy.getNameIDandSPpairs());
-            String  tmp = idpSessionCopy.getPendingLogoutRequestID();
-            if (tmp != null && !tmp.equals("")) {
-                pendingLogoutRequestID = new String(tmp);
+            nameIDandSPpairs = new ArrayList<NameIDandSPpair>(idpSessionCopy.getNameIDandSPpairs());
+            String tmp = idpSessionCopy.getPendingLogoutRequestID();
+            if (tmp != null && !tmp.isEmpty()) {
+                pendingLogoutRequestID = tmp;
             }
-            tmp =  idpSessionCopy.getOriginatingLogoutRequestID();
-            if (tmp != null && !tmp.equals("")) {
-                originatingLogoutRequestID = new String(tmp);
+            tmp = idpSessionCopy.getOriginatingLogoutRequestID();
+            if (tmp != null && !tmp.isEmpty()) {
+                originatingLogoutRequestID = tmp;
             }
-            tmp =idpSessionCopy.getOriginatingLogoutSPEntityID();
-            if (tmp != null && !tmp.equals("")) {
-                originatingLogoutSPEntityID = new String(tmp);
+            tmp = idpSessionCopy.getOriginatingLogoutSPEntityID();
+            if (tmp != null && !tmp.isEmpty()) {
+                originatingLogoutSPEntityID = tmp;
+            }
+            tmp = idpSessionCopy.getOriginatingLogoutRequestBinding();
+            if (tmp != null && !tmp.isEmpty()) {
+                originatingLogoutRequestBinding = tmp;
             }
             doLogoutAll = idpSessionCopy.getLogoutAll();
             metaAlias = idpSessionCopy.getMetaAlias();

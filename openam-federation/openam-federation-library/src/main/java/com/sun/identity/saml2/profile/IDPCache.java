@@ -26,18 +26,15 @@
  *
  */
 
- /*
- * Portions Copyrighted [2010] [ForgeRock AS]
+/*
+ * Portions Copyrighted 2010-2013 ForgeRock AS
  */
-
 package com.sun.identity.saml2.profile;
 
 import com.sun.identity.common.PeriodicCleanUpMap;
-import com.sun.identity.saml2.common.SAML2Utils;
 import java.util.Collections;
 import java.util.Hashtable;
 import java.util.HashSet;
-import java.util.Map;
 import java.util.Set;
 
 /**
@@ -104,7 +101,7 @@ public class IDPCache {
      * IDP: used in SingleSignOnService and SingleLogoutService
      *      to invalidate a specific session
      */
-    public static Hashtable idpSessionsByIndices = new Hashtable();
+    public static Hashtable<String, IDPSession> idpSessionsByIndices = new Hashtable<String, IDPSession>();
 
     /**
      * Cache saves Responses to be used by ArtifactResolutionService.
