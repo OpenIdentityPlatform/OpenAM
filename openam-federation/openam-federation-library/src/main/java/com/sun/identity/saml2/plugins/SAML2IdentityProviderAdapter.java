@@ -1,7 +1,7 @@
 /**
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright (c) 2010-2012 ForgeRock Inc. All Rights Reserved.
+ * Copyright (c) 2010-2013 ForgeRock AS. All Rights Reserved.
  *
  * The contents of this file are subject to the terms
  * of the Common Development and Distribution License
@@ -27,6 +27,7 @@ package com.sun.identity.saml2.plugins;
 
 import com.sun.identity.saml2.common.SAML2Exception;
 import com.sun.identity.saml2.protocol.AuthnRequest;
+import com.sun.identity.saml2.protocol.Response;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -100,9 +101,9 @@ public interface SAML2IdentityProviderAdapter {
             throws SAML2Exception;
 
     /**
-     * This method is invoked immediately before sending a non-error SAML2 Response.
+     * This method is invoked before sending a non-error SAML2 Response, but before the SAML Response object is
+     * constructed.
      * Called after successful authentication (including session upgrade) or if a valid session already exists.
-     * This method is not triggered in the case of a proxied request.
      *
      * @param authnRequest original authnrequest
      * @param hostProviderID hosted providerID.
@@ -127,6 +128,31 @@ public interface SAML2IdentityProviderAdapter {
             throws SAML2Exception;
 
     /**
+     * Called after the SAML Response object is created, but before the Response is signed/encrypted. When artifact
+     * binding is being used, this method is invoked when the response object is created, and not when the artifact
+     * is actually resolved.
+     * This extension point's purpose is to make it possible to adjust the content of the SAML response (for example by
+     * adding custom SAML extensions), hence this method does not provide a way to abort the SAML flow.
+     *
+     * @param authnRequest The original SAML Authentication Request (may be null if this was an IdP initiated SSO).
+     * @param res The SAML Response.
+     * @param hostProviderID The entity ID of the IdP.
+     * @param realm The realm the IdP belongs to.
+     * @param request The HttpServletRequest object.
+     * @param session The user session or null if the user has no session.
+     * @param relayState The relayState that will be used in the redirect
+     * @throws SAML2Exception If an error occurs. The federation process will continue.
+     */
+    public void preSignResponse(
+            AuthnRequest authnRequest,
+            Response res,
+            String hostProviderID,
+            String realm,
+            HttpServletRequest request,
+            Object session,
+            String relayState) throws SAML2Exception;
+
+    /**
      * Called before a SAML error message is returned.
      * This method is not triggered during IDP initiated SSO.
      *
@@ -142,5 +168,4 @@ public interface SAML2IdentityProviderAdapter {
             String faultCode,
             String faultDetail)
             throws SAML2Exception;
-
 }

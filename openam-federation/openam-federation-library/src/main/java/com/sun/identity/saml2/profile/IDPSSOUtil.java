@@ -465,6 +465,16 @@ public class IDPSSOUtil {
                 SAML2Utils.debug.message("IDPSSOUtil.sendResponseToACS:" +
                         " Response is:  " + res.toXMLString());
             }
+            try {
+                SAML2Utils.debug.message("IDPSSOUtil.sendResponseToACS: Invoking the IDP Adapter");
+                SAML2IdentityProviderAdapter idpAdapter = IDPSSOUtil.getIDPAdapterClass(realm, idpEntityID);
+                if (idpAdapter != null) {
+                    idpAdapter.preSignResponse(authnReq, res, idpEntityID, realm, request, session, relayState);
+                }
+            } catch (SAML2Exception se) {
+                SAML2Utils.debug.error("IDPSSOUtil.sendResponseToACS: There was a problem when invoking the "
+                        + "preSendResponse of the IDP Adapter: ", se);
+            }
             sendResponse(request, response, acsBinding, spEntityID, idpEntityID,
                     idpMetaAlias, realm, relayState, acsURL, res, session);
         } else {
