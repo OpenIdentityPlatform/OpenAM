@@ -510,16 +510,16 @@ public class OAuth2Utils {
      * @return
      */
     public static String getRealm(Request request) {
-        Object realm = request.getAttributes().get(OAuth2Constants.Custom.REALM);
+        HttpServletRequest httpRequest = ServletUtils.getRequest(request);
+        return getRealm(httpRequest);
+    }
+
+    public static String getRealm(HttpServletRequest request) {
+        Object realm = request.getParameter(OAuth2Constants.Custom.REALM);
         if (realm instanceof String) {
             return (String) realm;
         }
-        String ret = getRequestParameter(request, OAuth2Constants.Custom.REALM, String.class);
-        if (ret == null){
-            return "/";
-        } else {
-            return ret;
-        }
+        return "/";
     }
 
     public static String getModuleName(Request request) {
@@ -716,7 +716,16 @@ public class OAuth2Utils {
      */
     public static String getDeploymentURL(Request request){
         HttpServletRequest httpRequest = ServletUtils.getRequest(request);
-        String uri = httpRequest.getRequestURI();
+        return getDeploymentURL(httpRequest);
+    }
+
+    /**
+     * Gets the depoyment URI of the OAuth2 authorization server
+     * @param request the request to get the deployment uri of
+     * @return
+     */
+    public static String getDeploymentURL(HttpServletRequest request){
+        String uri = request.getRequestURI();
         String deploymentURI = uri;
         int firstSlashIndex = uri.indexOf("/");
         int secondSlashIndex = uri.indexOf("/", firstSlashIndex + 1);
@@ -724,9 +733,9 @@ public class OAuth2Utils {
             deploymentURI = uri.substring(0, secondSlashIndex);
         }
         StringBuffer sb = new StringBuffer(100);
-        sb.append(httpRequest.getScheme()).append("://")
-                .append(httpRequest.getServerName()).append(":")
-                .append(httpRequest.getServerPort())
+        sb.append(request.getScheme()).append("://")
+                .append(request.getServerName()).append(":")
+                .append(request.getServerPort())
                 .append(deploymentURI);
         return sb.toString();
     }
@@ -876,7 +885,12 @@ public class OAuth2Utils {
         return decodedPassword == null ? password : decodedPassword;
     }
 
-    public static KeyPair getServerKeyPair(Request request){
+    public static KeyPair getServerKeyPair(org.restlet.Request request){
+        HttpServletRequest httpRequest = ServletUtils.getRequest(request);
+        return getServerKeyPair(httpRequest);
+    }
+
+    public static KeyPair getServerKeyPair(javax.servlet.http.HttpServletRequest request){
         OAuth2ProviderSettings settings = getSettingsProvider(request);
         String alias = settings.getKeyStoreAlias();
 
@@ -937,7 +951,15 @@ public class OAuth2Utils {
     /*
      * This method is called from multiple threads, and must initialize a new OAuth2ProviderSettings instance atomically.
      */
-    public static OAuth2ProviderSettings getSettingsProvider(Request request){
+    public static OAuth2ProviderSettings getSettingsProvider(org.restlet.Request request){
+        HttpServletRequest httpRequest = ServletUtils.getRequest(request);
+        return getSettingsProvider(httpRequest);
+    }
+
+    /*
+     * This method is called from multiple threads, and must initialize a new OAuth2ProviderSettings instance atomically.
+     */
+    public static OAuth2ProviderSettings getSettingsProvider(javax.servlet.http.HttpServletRequest request){
         synchronized (settingsProviderMap) {
             String realm = OAuth2Utils.getRealm(request);
             OAuth2ProviderSettings setting = settingsProviderMap.get(realm);

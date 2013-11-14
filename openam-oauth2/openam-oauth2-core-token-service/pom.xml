@@ -37,18 +37,16 @@
 
 
     <dependencies>
-        
+
+        <!-- OpenAM -->
         <dependency>
             <groupId>org.forgerock.openam</groupId>
             <artifactId>openam-shared</artifactId>
         </dependency>
-
         <dependency>
             <groupId>org.forgerock.openam</groupId>
             <artifactId>openam-oauth2-common</artifactId>
         </dependency>
-
-        <!-- OpenAM -->
         <dependency>
             <groupId>org.forgerock.openam</groupId>
             <artifactId>openam-core</artifactId>
@@ -58,15 +56,21 @@
             <artifactId>openam-rest</artifactId>
         </dependency>
         <dependency>
-            <groupId>org.forgerock.commons</groupId>
-            <artifactId>json-fluent</artifactId>
-        </dependency>
-        <dependency>
             <groupId>org.forgerock.openam</groupId>
             <artifactId>openam-idsvcs-schema</artifactId>
         </dependency>
 
         <!-- Commons -->
+        <dependency>
+            <groupId>org.forgerock.commons</groupId>
+            <artifactId>json-fluent</artifactId>
+        </dependency>
+
+        <!-- External -->
+        <dependency>
+            <groupId>javax.servlet</groupId>
+            <artifactId>servlet-api</artifactId>
+        </dependency>
         
         <!-- Test Dependencies -->
         <dependency>

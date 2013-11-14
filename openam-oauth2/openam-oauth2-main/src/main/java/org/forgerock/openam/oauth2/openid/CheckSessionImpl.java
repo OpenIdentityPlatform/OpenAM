@@ -33,6 +33,7 @@ import org.forgerock.json.jose.jws.SignedJwt;
 import org.forgerock.openam.oauth2.model.ClientApplication;
 import org.forgerock.openam.oauth2.model.impl.ClientApplicationImpl;
 import org.forgerock.openam.oauth2.utils.OAuth2Utils;
+import org.restlet.ext.servlet.ServletUtils;
 
 import javax.servlet.http.HttpServletRequest;
 import java.net.URI;
@@ -67,7 +68,7 @@ public class CheckSessionImpl implements CheckSession {
      */
     public String getClientSessionURI(HttpServletRequest request){
         SignedJwt jwt = getIDToken(request);
-        if (jwt == null){
+        if (jwt == null || !jwt.verify(OAuth2Utils.getServerKeyPair(request).getPublic())){
             return "";
         }
         List<String> clients = jwt.getClaimsSet().getAudience();
@@ -87,7 +88,7 @@ public class CheckSessionImpl implements CheckSession {
      */
     public boolean getValidSession(HttpServletRequest request){
         SignedJwt jwt = getIDToken(request);
-        if (jwt == null){
+        if (jwt == null || !jwt.verify(OAuth2Utils.getServerKeyPair(request).getPublic())){
             return false;
         }
         try {
