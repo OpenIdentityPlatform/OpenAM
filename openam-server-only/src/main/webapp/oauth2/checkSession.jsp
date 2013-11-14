@@ -27,6 +27,7 @@
 <%@ page pageEncoding="UTF-8" %>
 <%@ page import="org.forgerock.openam.oauth2.openid.CheckSessionImpl" %>
 <%@ page import="org.forgerock.openam.oauth2.openid.CheckSession" %>
+<%@ page import="org.owasp.esapi.ESAPI" %>
 <%
     CheckSession checkSession = new CheckSessionImpl();
     String cookieName = checkSession.getCookieName();
@@ -46,12 +47,13 @@
     window.addEventListener("message", receiveMessage, false);
     var client_id;
     function receiveMessage(e){
-        client_id = e.data.split(' ')[0]
-        var clientURI = "<%=clientSessionURI%>";
+        data = e.data.split(' ');
+        client_id = data[0];
+        var clientURI = "<%=ESAPI.encoder().encodeForJavaScript(clientSessionURI)%>";
         if (e.origin !== clientURI){
             return;
         }
-        var session_state = e.data.split(' ')[1];
+        var session_state = data[1];
         var opbs = getBrowserState();
         var ss = CryptoJS.SHA256(client_id + e.origin  + opbs);
         if (session_state == ss) {
@@ -68,7 +70,7 @@
         if (!validSession){
             return "";
         }
-        var cookieName = "<%=cookieName%>" + "=";
+        var cookieName = "<%=ESAPI.encoder().encodeForJavaScript(cookieName)%>" + "=";
         var cookies = document.cookie+";";
         var cookieStart = cookies.indexOf(cookieName);
         if (cookieStart != -1) {
