@@ -57,7 +57,7 @@
       Come discuss your work on the <a
       href="https://lists.forgerock.org/mailman/listinfo/openam-dev">dev mailing
       list</a>. <a
-      href="https://idp.forgerock.org/openam/UI/Login?service=register">Join
+      href="https://sso.forgerock.com/openam/UI/Login">Join
       the project</a>, too.
     </p>
    </answer>
@@ -66,10 +66,23 @@
    <question>I want to help test OpenAM. How do I get started?</question>
    <answer>
     <p>
-      <a href="https://idp.forgerock.org/openam/UI/Login?service=register">Join
+      <a href="https://sso.forgerock.com/openam/UI/Login">Join
       the project</a>. Come discuss your work on the <a
       href="https://lists.forgerock.org/mailman/listinfo/openam-dev">dev mailing
       list</a>. 
+    </p>
+   </answer>
+  </faq>
+  <faq id="community">
+   <question>I want to get involved with the OpenAM community, what public
+   channels can I use?</question>
+   <answer>
+    <p>
+      You can reach out to the community either via e-mail (
+      <a href="https://lists.forgerock.org/mailman/listinfo/openam">user</a> and
+      <a href="https://lists.forgerock.org/mailman/listinfo/openam-dev">dev</a>
+      mailing lists) or by connecting to irc.freenode.net and joining the
+      #openam channel.
     </p>
    </answer>
   </faq>
