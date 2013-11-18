@@ -27,7 +27,7 @@
  */
 
 /*
- * Portions Copyrighted 2010-2011 ForgeRock AS
+ * Portions Copyrighted 2010-2013 ForgeRock AS
  */
 package com.iplanet.services.naming;
 
@@ -108,8 +108,11 @@ public class WebtopNaming {
 
     private static Hashtable serverIdTable = null;
 
-    private static Hashtable siteIdTable = null;
-    
+    private static Hashtable<String, String> siteIdTable = null;
+
+    private static Set<String> serverIDs = null;
+    private static Set<String> siteIDs = null;
+    private static Set<String> secondarySiteIDs = null;
     private static Map<String, String> siteNameToIdTable = null;
 
     //This is created for storing server id and lbcookievalue mapping
@@ -204,6 +207,36 @@ public class WebtopNaming {
     }
 
     /**
+     * Tells whether the provided ID belongs to a server or not.
+     *
+     * @param serverID The ID that needs to be checked.
+     * @return <code>true</code> if the ID corresponds to a server.
+     */
+    public static boolean isServer(String serverID) {
+        return serverIDs.contains(serverID);
+    }
+
+    /**
+     * Tells whether the provided ID belongs to a site or not.
+     *
+     * @param siteID The ID that needs to be checked.
+     * @return <code>true</code> if the ID corresponds to a site.
+     */
+    public static boolean isSite(String siteID) {
+        return siteIDs.contains(siteID);
+    }
+
+    /**
+     * Tells whether the provided ID belongs to a secondary site or not.
+     *
+     * @param secondarySiteID The ID that needs to be checked.
+     * @return <code>true</code> if the ID corresponds to a secondary site.
+     */
+    public static boolean isSecondarySite(String secondarySiteID) {
+        return secondarySiteIDs.contains(secondarySiteID);
+    }
+
+    /**
      * Determines whether Site is enabled for the given server instance.
      *
      * @param protocol protocol of the server instance
@@ -237,7 +270,7 @@ public class WebtopNaming {
      * @throws Exception if the given server ID is null
      */
     public static boolean isSiteEnabled(String serverid) throws Exception {
-        String siteid = (String) siteIdTable.get(serverid);
+        String siteid = siteIdTable.get(serverid);
         return (!serverid.equals(siteid));
     }
 
@@ -992,7 +1025,7 @@ public class WebtopNaming {
             return null;
         }
 
-        sitelist = (String) siteIdTable.get(serverid);
+        sitelist = siteIdTable.get(serverid);
         if (sitelist == null) {
             return null;
         }
@@ -1225,6 +1258,7 @@ public class WebtopNaming {
         updateSiteNameToIDMappings();
         updatePlatformServerIDs();
         updateLBCookieValueMappings();
+        updatePlatformSets();
                 
         if (debug.messageEnabled()) {
             debug.message("Naming table -> " + namingTable.toString());
@@ -1266,7 +1300,7 @@ public class WebtopNaming {
     }
 
     private static void updateSiteIdMappings() {
-        Hashtable siteIdTbl = new Hashtable();
+        Hashtable<String, String> siteIdTbl = new Hashtable<String, String>();
         String serverSet = (String) namingTable.get(Constants.SITE_ID_LIST);
 
         if ((serverSet == null) || (serverSet.length() == 0)) {
@@ -1336,6 +1370,30 @@ public class WebtopNaming {
         }
 
         return;
+    }
+
+    private static void updatePlatformSets() {
+        Set<String> siteIDSet = new HashSet<String>(siteNameToIdTable.values());
+        Set<String> secondarySiteIDSet = new HashSet<String>();
+        Set<String> serverIDSet = new HashSet<String>(platformServerIDs);
+
+        for (Map.Entry<String, String> entry : siteIdTable.entrySet()) {
+            String siteId = entry.getValue();
+            if (siteId.indexOf(NODE_SEPARATOR) != -1) {
+                StringTokenizer tokenizer = new StringTokenizer(siteId, NODE_SEPARATOR);
+                //the first one is always the primary site ID, which we don't need now
+                tokenizer.nextToken();
+                while (tokenizer.hasMoreTokens()) {
+                    secondarySiteIDSet.add(tokenizer.nextToken());
+                }
+            }
+        }
+        serverIDSet.removeAll(siteIDSet);
+        serverIDSet.removeAll(secondarySiteIDSet);
+
+        siteIDs = siteIDSet;
+        secondarySiteIDs = secondarySiteIDSet;
+        serverIDs = serverIDSet;
     }
 
     private static void validate(
