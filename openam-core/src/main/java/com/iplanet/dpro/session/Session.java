@@ -27,7 +27,7 @@
  */
 
 /*
- * Portions Copyrighted 2010-2013 ForgeRock Inc
+ * Portions Copyrighted 2010-2013 ForgeRock AS
  */
 
 package com.iplanet.dpro.session;
@@ -46,7 +46,6 @@ import com.iplanet.services.comm.client.PLLClient;
 import com.iplanet.services.comm.share.Request;
 import com.iplanet.services.comm.share.RequestSet;
 import com.iplanet.services.comm.share.Response;
-import com.iplanet.services.naming.ServerEntryNotFoundException;
 import com.iplanet.services.naming.WebtopNaming;
 import com.sun.identity.common.GeneralTaskRunnable;
 import com.sun.identity.common.SearchResults;
@@ -1304,6 +1303,8 @@ public class Session extends GeneralTaskRunnable {
             throws SessionException {
         String primary_id = null;
 
+        validateSessionID(sid);
+
         if (isServerMode()) {
             SessionService ss = SessionService.getSessionService();
             if (ss.isSiteEnabled() && ss.isLocalSite(sid)) {
@@ -1311,22 +1312,6 @@ public class Session extends GeneralTaskRunnable {
                     return getSessionServiceURL(ss.getCurrentHostServer(sid));
                 } else {
                     primary_id = sid.getExtension(SessionID.PRIMARY_ID);
-                    if (ss.isLocalSite(primary_id)) {
-                        String serverUrl = null;
-                        try {
-                            serverUrl = WebtopNaming.getServerFromID(primary_id);
-                        } catch (ServerEntryNotFoundException e) {
-                            sessionDebug.error("Exception caught getting serverUrl " +
-                                    "from WebtopNaming in exception case: " + e);
-                        }
-                        sessionDebug.error("In getSessionServiceURL, the " + SessionID.PRIMARY_ID + " extension of the presented " +
-                                "token, " + primary_id + ", corresponds to a site in the local deployment. This indicates that a " +
-                                "iPlanetDirectoryPro (or equivalent) cookie is being presented across sites, with a " +
-                                "combination of SITE_ID and PRIMARY_ID values which would have created a PLL SessionRequest loop. The " +
-                                "URL corresponding to this PRIMARY_ID:" + serverUrl + ". Throwing SessionException.");
-                        throw new SessionException("SessionID state invalid: " + primary_id +
-                                " corresponds to site in local deployment.");
-                    }
                     return getSessionServiceURL(primary_id);
                 }
             }
@@ -2066,6 +2051,68 @@ public class Session extends GeneralTaskRunnable {
      */
     static boolean isServerMode() {
         return SystemProperties.isServerMode();
+    }
+
+    /**
+     * This method validates that the received session ID points to an existing server ID, and the site ID also
+     * corresponds to the server ID found in the session. Within this method two "extensions" are of interest: SITE_ID
+     * and PRIMARY_ID. The PRIMARY_ID extension contains the hosting server's ID, but only if the given server belongs
+     * to a site. The SITE_ID extension contains either the primary site's ID (if the hosting server belongs to a site)
+     * or the hosting server's ID. This method will look at the extensions and make sure that they match up with the
+     * naming table of this environment. If there is a problem with the session ID (e.g. the server ID actually points
+     * to a primary or secondary site, or if the server ID doesn't actually correlate with the site ID), then a
+     * SessionException is thrown in order to prevent forwarding of the received session request. A possible scenario
+     * for having such an incorrect session ID would be having multiple OpenAM environments using the same cookie
+     * domain and cookie name settings.
+     *
+     * @param sid The session ID that needs to be validated.
+     * @throws SessionException If the validation failed, possibly because the provided session ID was malformed or not
+     * created within this OpenAM deployment.
+     */
+    private static void validateSessionID(SessionID sid) throws SessionException {
+        String siteID = sid.getExtension(SessionID.SITE_ID);
+        String primaryID = sid.getExtension(SessionID.PRIMARY_ID);
+        if (primaryID == null) {
+            //In this case by definition the server is not assigned to a site, so we want to ensure that the
+            //SITE_ID points to a server
+            if (!WebtopNaming.isServer(siteID)) {
+                if (sessionDebug.warningEnabled()) {
+                    sessionDebug.warning("Invalid session ID: Site ID=" + siteID
+                            + " does not map to an actual server");
+                }
+                throw new SessionException("Invalid session ID, primary ID \"" + siteID + "\" either points"
+                        + " to a non-existent server, or to a site");
+            }
+        } else {
+            //PRIMARY_ID is not null, hence this session belongs to a site, we need to verify that the PRIMARY_ID
+            //and the SITE_ID are both correct, and they actually correspond to each other
+            if (!WebtopNaming.isServer(primaryID)) {
+                if (sessionDebug.warningEnabled()) {
+                    sessionDebug.warning("Invalid session ID: Primary ID=" + primaryID
+                            + " does not map to an actual server");
+                }
+                throw new SessionException("Invalid session ID, primary ID \"" + siteID + "\" either points"
+                        + " to a non-existent server, or to a site");
+            }
+            String realSiteID = WebtopNaming.getSiteID(primaryID);
+            if (realSiteID == null || realSiteID.equals(primaryID)) {
+                //The server from the session doesn't actually belong to a site
+                if (sessionDebug.warningEnabled()) {
+                    sessionDebug.warning("Invalid session ID: Primary ID=" + primaryID
+                            + " is not member of Site ID=" + siteID);
+                }
+                throw new SessionException("Invalid session ID, the \"" + primaryID + "\" server doesn't belong to "
+                        + "a site");
+            } else if (!realSiteID.equals(siteID)) {
+                //The server from the session actually belongs to a different site
+                if (sessionDebug.warningEnabled()) {
+                    sessionDebug.warning("Invalid session ID: Primary ID=" + primaryID
+                            + " is not member of Site ID=" + siteID);
+                }
+                throw new SessionException("Invalid session ID, the \"" + primaryID + "\" server doesn't belong to "
+                        + "\"" + siteID + "\" site ID");
+            }
+        }
     }
 
     /**
