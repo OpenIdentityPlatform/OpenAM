@@ -26,6 +26,9 @@
  *
  */
 
+/**
+ * Portions Copyrighted 2013 ForgeRock AS
+ */
 
 package com.sun.identity.saml2.key;
 
@@ -52,7 +55,6 @@ import com.sun.identity.saml2.jaxb.xmlsig.*;
 import com.sun.identity.saml2.jaxb.xmlenc.*;
 
 import com.sun.identity.saml.common.SAMLConstants;
-import com.sun.identity.saml.common.SAMLUtils;
 import com.sun.identity.saml.xmlsig.KeyProvider;
 import com.sun.identity.saml2.jaxb.metadata.XACMLAuthzDecisionQueryDescriptorElement;
 import com.sun.identity.saml2.jaxb.metadata.XACMLPDPDescriptorElement;
@@ -327,8 +329,8 @@ public class KeyUtil {
             if ((use == null) || (use.trim().length() == 0)) {
 		if (noUsageKD == null) {
                     noUsageKD = kd;
-                    continue;
                 }
+                continue;
             }
             if (use.trim().toLowerCase().equals(usage)) {
                 break;
