@@ -26,6 +26,9 @@
  *
  */
 
+/**
+ * Portions Copyrighted 2013 ForgeRock AS
+ */
 
 package com.sun.identity.federation.key;
 
@@ -51,7 +54,6 @@ import com.sun.identity.liberty.ws.common.jaxb.xmlsig.X509DataElement;
 import com.sun.identity.liberty.ws.meta.jaxb.ProviderDescriptorType;
 import com.sun.identity.liberty.ws.meta.jaxb.KeyDescriptorType;
 import com.sun.identity.saml.common.SAMLConstants;
-import com.sun.identity.saml.common.SAMLUtils;
 import com.sun.identity.saml.xmlsig.KeyProvider;
 
 /**
@@ -292,8 +294,8 @@ public class KeyUtil {
             if ((use == null) || (use.trim().length() == 0)) {
 		if (noUsageKD == null) {
                     noUsageKD = kd;
-                    continue;
                 }
+                continue;
             }
             if (use.trim().toLowerCase().equals(usage)) {
                 break;
