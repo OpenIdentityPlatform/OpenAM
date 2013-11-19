@@ -276,11 +276,7 @@
     <title>Web Agents Platform Requirements</title>
 
     <para>Apache HTTP web policy agents have been tested on Linux 2.6 or later,
-    and on Oracle Solaris 10 or later. Apache HTTP web policy agents require
-    Apache Portable Runtime 1.3.x or later. You can check your installation by
-    running <command>httpd -v</command>. On some systems, the packaged version of
-    Apache HTTP server uses earlier versions of APR that are not compatible with
-    the current policy web agents.</para>
+    and on Oracle Solaris 10 or later.</para>
 
     <para>The Microsoft IIS 6 web policy agent has been tested on Windows Server
     2003.</para>
@@ -320,6 +316,15 @@
     <title>Important Changes to Web Policy Agent Functionality</title>
 
     <itemizedlist>
+     <listitem>
+      <para>
+       Apache policy agents no longer require APR 1.3.x or later.
+
+       The implementation that previously relied on APR 1.3.x or later
+       now uses POSIX on UNIX and Linux and native calls on Windows.
+      </para>
+     </listitem>
+
      <listitem>
       <para>IIS web policy agents no longer rely on the Windows registry to
       determine where to find configuration settings. Instead, IIS agents
