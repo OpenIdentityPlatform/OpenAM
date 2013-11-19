@@ -20,7 +20,7 @@
   !
   ! CCPL HEADER END
   !
-  !      Copyright 2011-2012 ForgeRock AS
+  !      Copyright 2011-2013 ForgeRock AS
   !    
 -->
 <chapter xml:id='chap-about-jee-agents'
@@ -58,6 +58,18 @@
   authentication. After the user has successfully authenticated, OpenAM
   sets a session token in a browser cookie, and redirects her browser back to
   the page she tried to access initially.</para>
+
+  <important>
+   <para>
+    Do not install the J2EE policy agent in the same container as OpenAM.
+
+    OpenAM must be up and running before the J2EE policy agent starts.
+    This cannot be guaranteed when both run in the same container.
+
+    ForgeRock does not support configurations where
+    OpenAM and the J2EE policy agent are installed in the same container.
+   </para>
+  </important>
   
   <para>When the user's browser reiterates the request, the policy agent again
   checks that the request has a session token, finds a session token this
