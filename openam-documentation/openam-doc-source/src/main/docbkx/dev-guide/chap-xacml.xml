@@ -336,7 +336,7 @@ $ ssoadm
  --adminid amadmin
  --password-file /tmp/pwd.txt
  --entityid xacmlPdpEntity
- --xacmlpep /xacmlPdpEntity
+ --xacmlpdp /xacmlPdpEntity
  --meta-data-file xacmlPdp.xml
  --extended-data-file xacmlPdp-extended.xml
 
