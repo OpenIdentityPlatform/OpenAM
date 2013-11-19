@@ -3226,7 +3226,7 @@ com.sun.identity.agents.config.cdsso.cookie.domain[1]=.example.net</literallayou
       <para>Specifies a class implementing
       <literal>com.sun.identity.agents.filter.IWebServiceAuthenticator</literal>,
       used to authenticate web service requests.</para>
-      <para>Property: <literal>com.sun.identity.agents.config.webservice.responseprocessor</literal></para>
+      <para>Property: <literal>com.sun.identity.agents.config.webservice.authenticator</literal></para>
      </listitem>
     </varlistentry>
     <varlistentry>
