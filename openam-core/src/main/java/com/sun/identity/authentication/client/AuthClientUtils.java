@@ -1572,27 +1572,18 @@ public class AuthClientUtils {
      * @param requestHash Hashtable containing the query parameters
      * @return organization name.
      */
-    public static String getOrgParam(Hashtable requestHash) {
+    public static String getOrgParam(Hashtable<String, String> requestHash) {
         String orgParam = null;
-        if ((requestHash != null) && !requestHash.isEmpty()) {
-            orgParam = (String) requestHash.get(ISAuthConstants.DOMAIN_PARAM);
-            if ((orgParam == null) || (orgParam.length() == 0)) {
-                orgParam = (String)requestHash.get(ISAuthConstants.ORG_PARAM);
+        if (requestHash != null && !requestHash.isEmpty()) {
+            orgParam = requestHash.get(ISAuthConstants.DOMAIN_PARAM);
+            if (orgParam == null || orgParam.length() == 0) {
+                orgParam = requestHash.get(ISAuthConstants.ORG_PARAM);
             }
-            if ((orgParam == null) || (orgParam.length() == 0)) {
-                orgParam = 
-                    (String)requestHash.get(ISAuthConstants.REALM_PARAM);
-            }
-            if ((orgParam != null) && (orgParam.length() != 0)) {
-                String encoded = (String) requestHash.get("encoded");
-                String new_org = (String) requestHash.get("new_org");
-                if ((new_org != null && new_org.equals("true")) &&
-                    (encoded != null && encoded.equals("true"))) {
-                    orgParam = getBase64DecodedValue(orgParam);
-                }
+            if (orgParam == null || orgParam.length() == 0) {
+                orgParam = requestHash.get(ISAuthConstants.REALM_PARAM);
             }
         }
-        return (orgParam);
+        return orgParam;
     }
 
     static String stripPort(String in) {
