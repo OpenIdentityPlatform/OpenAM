@@ -110,7 +110,7 @@
         }
 
         String relayState = request.getParameter(SAML2Constants.RELAY_STATE);
-        if (!ESAPI.validator().isValidInput("HTTP Parameter Value: " + relayState, relayState, "URL", 2000, true)) {
+        if (!ESAPI.validator().isValidInput("HTTP Query String: " + relayState, relayState, "HTTPQueryString", 2000, true)) {
             relayState = null;
         }
         String affiliationID =
@@ -141,7 +141,8 @@
                                           metaAlias, spEntityID, paramsMap);
 
         if (binding.equalsIgnoreCase(SAML2Constants.SOAP)) {
-            if (relayState != null && SAML2Utils.isRelayStateURLValid(request, relayState, SAML2Constants.IDP_ROLE)) {
+            if (relayState != null && SAML2Utils.isRelayStateURLValid(request, relayState, SAML2Constants.IDP_ROLE) &&
+                ESAPI.validator().isValidInput("HTTP URL Value: " + relayState, relayState, "URL", 2000, true)) {
                 response.sendRedirect(relayState);
             } else {
                 %>
