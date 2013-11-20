@@ -73,6 +73,8 @@ define("UserDelegate", [
             data: "{}",
             type: "POST",
             success: function (data) {
+                configuration.globalData.auth.successURL = data.successURL;
+                configuration.globalData.auth.fullLoginURL = data.fullLoginURL;
                 successCallback({userid: {id : data.id, realm: data.realm}, username: data.dn});
             },
             error: errorCallback,

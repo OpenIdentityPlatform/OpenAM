@@ -30,12 +30,14 @@ define("org/forgerock/openam/ui/user/login/RESTLoginHelper", [
     "org/forgerock/commons/ui/common/main/ViewManager",
     "org/forgerock/commons/ui/common/main/AbstractConfigurationAware",
     "org/forgerock/commons/ui/common/main/Router",
-    "org/forgerock/commons/ui/common/main/Configuration"
-], function (authNDelegate, userDelegate, viewManager, AbstractConfigurationAware, router, conf) {
+    "org/forgerock/commons/ui/common/main/Configuration",
+    "org/forgerock/commons/ui/common/util/UIUtils",
+    "org/forgerock/commons/ui/common/util/Constants"
+], function (authNDelegate, userDelegate, viewManager, AbstractConfigurationAware, router, conf, uiUtils, constants) {
     var obj = new AbstractConfigurationAware();
 
     obj.login = function(params, successCallback, errorCallback) {
-        
+        var _this = this;
         authNDelegate.getRequirements().done(function (requirements) {
         
             // populate the current set of requirements with the values we have from params
@@ -53,10 +55,9 @@ define("org/forgerock/openam/ui/user/login/RESTLoginHelper", [
                         if (result.hasOwnProperty("tokenId")) {
                             obj.getLoggedUser(function(user){
                                 conf.setProperty('loggedUser', user);
-                                authNDelegate.setSuccessURL().then(function(){
-                                    successCallback(user);
-                                    authNDelegate.resetProcess();
-                                });
+                                _this.setSuccessURL();
+                                successCallback(user);
+                                authNDelegate.resetProcess();
                             }, errorCallback);
                         } else if (result.hasOwnProperty("authId")) {
                             // re-render login form for next set of required inputs
@@ -75,10 +76,9 @@ define("org/forgerock/openam/ui/user/login/RESTLoginHelper", [
     };
 
     obj.logout = function() {
-        authNDelegate.getLoginUrlParams().done(function(p){
-            authNDelegate.logout().then(function(){
-                window.location.hash += obj.filterUrlParams(p);
-            });
+        var _this = this;
+        authNDelegate.logout().then(function(){
+            window.location.hash += obj.filterUrlParams(_this.getLoginUrlParams());
         });
     };
     
@@ -103,6 +103,28 @@ define("org/forgerock/openam/ui/user/login/RESTLoginHelper", [
             console.log(e);
             errorCallback();
         }
+    };
+    
+    obj.getLoginUrlParams = function() {
+        var url = conf.globalData.auth.fullLoginURL;
+        return uiUtils.convertQueryParametersToJSON(url.substring(url.indexOf('?') + 1));
+       
+    };
+    
+    obj.setSuccessURL = function() {
+        var url = conf.globalData.auth.successURL;
+        if(url !== constants.CONSOLE_PATH || _.contains(_.map(constants.CONSOLE_USERS,function(u){return u.toLowerCase();}),conf.loggedUser.username.toLowerCase())){
+            if(!conf.globalData.auth.urlParams){
+                conf.globalData.auth.urlParams = {};
+            }
+            if(!conf.globalData.auth.urlParams.goto){
+                conf.globalData.auth.urlParams.goto = url;
+            }
+        }
+        else{
+            url = "";
+        }
+        return url;
     };
     
     obj.filterUrlParams = function(params){

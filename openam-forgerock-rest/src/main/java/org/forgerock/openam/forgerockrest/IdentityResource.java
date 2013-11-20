@@ -29,6 +29,7 @@ import org.apache.commons.lang.RandomStringUtils;
 import com.iplanet.am.util.SystemProperties;
 import com.iplanet.services.util.Hash;
 import com.sun.identity.authentication.AuthContext;
+import com.sun.identity.authentication.util.ISAuthConstants;
 import com.sun.identity.idm.AMIdentity;
 import com.sun.identity.idm.IdRepoException;
 import com.sun.identity.idsvcs.AccessDenied;
@@ -157,6 +158,8 @@ public final class IdentityResource implements CollectionResourceProvider {
             result.put("id", amIdentity.getName());
             result.put("realm", com.sun.identity.sm.DNMapper.orgNameToRealmName(amIdentity.getRealm()));
             result.put("dn", amIdentity.getUniversalId());
+            result.put("successURL", ssotok.getProperty(ISAuthConstants.SUCCESS_URL,false));
+            result.put("fullLoginURL", ssotok.getProperty(ISAuthConstants.FULL_LOGIN_URL,false));
             handler.handleResult(result);
 
         } catch (SSOException e) {
