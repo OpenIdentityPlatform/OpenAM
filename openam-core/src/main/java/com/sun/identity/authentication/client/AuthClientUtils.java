@@ -27,7 +27,7 @@
  */
 
 /*
- * Portions Copyrighted 2010-2013 ForgeRock, Inc.
+ * Portions Copyrighted 2010-2013 ForgeRock AS
  */
 package com.sun.identity.authentication.client;
 
@@ -2322,8 +2322,19 @@ public class AuthClientUtils {
         return (templateFile);
     }
 
-    public static String getAuthCookieValue(HttpServletRequest req) {
-        return (CookieUtils.getCookieValueFromReq(req,getAuthCookieName()));
+    public static String getAuthCookieValue(HttpServletRequest request) {
+        //Let's check the URL first in case this is a forwarded request from Federation. URL should have precedence
+        //over the actual cookie value, so this way a new federated auth can always start with a clear auth session.
+        String isForward = (String) request.getAttribute(Constants.FORWARD_PARAM);
+        if (utilDebug.messageEnabled()) {
+            utilDebug.message("AuthClientUtils.getAuthCookieValue: is forward = " + isForward);
+        }
+        String ret = null;
+        if (Constants.FORWARD_YES_VALUE.equals(isForward)) {
+            ret = SessionEncodeURL.getSidFromURL(request, getAuthCookieName());
+        }
+
+        return ret == null ? CookieUtils.getCookieValueFromReq(request, getAuthCookieName()) : ret;
     }
 
     /**

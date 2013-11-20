@@ -24,8 +24,8 @@
  *
  */
 
- /*
- * Portions Copyrighted 2010-2013 ForgeRock, Inc.
+/*
+ * Portions Copyrighted 2010-2013 ForgeRock AS
  */
 
 package com.sun.identity.saml2.profile;
@@ -1379,6 +1379,7 @@ public class IDPSSOFederate {
             newURL.append('=');
             SAML2Utils.debug.message("forward to " + newURL.toString());
             try {
+                request.setAttribute(Constants.FORWARD_PARAM, Constants.FORWARD_YES_VALUE);
                 request.getRequestDispatcher(newURL.toString()).
                         forward(request, response);
             } catch (ServletException se) {
