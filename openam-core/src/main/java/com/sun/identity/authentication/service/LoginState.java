@@ -3490,7 +3490,16 @@ public class LoginState {
             OrganizationConfigManager orgConfigMgr = ad.getOrgConfigManager(orgDN);
             ServiceConfig svcConfig = orgConfigMgr.getServiceConfig(ISAuthConstants.AUTH_SERVICE_NAME);
 
-            Map attrs = svcConfig.getAttributes();
+            Map<String, Set<String>> attrs = svcConfig.getAttributes();
+            persistentCookieMode = Boolean.valueOf(
+                    CollectionHelper.getMapAttr(attrs, ISAuthConstants.PERSISTENT_COOKIE_MODE));
+            if (!persistentCookieMode) {
+                //The authentication was started in a realm where persistent cookie was enabled, however the cookie
+                //points to a different realm where pcookie is not enabled, so we should reject the cookie here right
+                //away.
+                return null;
+            }
+
             persistentCookieTime = CollectionHelper.getMapAttr(attrs, ISAuthConstants.PERSISTENT_COOKIE_TIME);
             int value = -1;
             try {
