@@ -976,12 +976,10 @@ public class LoginViewBean extends AuthViewBeanBase {
                            	authD.destroySession(oldSession.getID());
                     }
                     ac = null;
-                    forwardTo(null);
+                    handleAuthLoginException(le);
                 }
             } else {
-                LoginFail = true;
-                setErrorMessage(le);
-                ResultVal = ErrorMessage;
+                handleAuthLoginException(le);
             }
             return;
         }
@@ -1083,9 +1081,7 @@ public class LoginViewBean extends AuthViewBeanBase {
                         }
                     }
                 } else if (ac.getStatus() == AuthContext.Status.FAILED) {
-                    LoginFail = true;
-                    setErrorMessage(null);
-                    ResultVal = ErrorMessage;
+                    handleAuthLoginException(null);
                     
                     /*
                      * redirect to 'goto' parameter or SPI hook or default
@@ -1456,9 +1452,7 @@ public class LoginViewBean extends AuthViewBeanBase {
                             }
                         }
                     } else if (ac.getStatus() == AuthContext.Status.FAILED) {
-                        LoginFail = true;
-                        setErrorMessage(null);
-                        ResultVal = ErrorMessage;
+                        handleAuthLoginException(null);
                         
                         /*
                          * redirect to 'goto' parameter or SPI hook or default
@@ -1851,9 +1845,7 @@ public class LoginViewBean extends AuthViewBeanBase {
                             response.addCookie(cookie);
                         }
                     }
-                    LoginFail = true;
-                    setErrorMessage(null);
-                    ResultVal = ErrorMessage;
+                    handleAuthLoginException(null);
                 }
             }
         }
@@ -2025,7 +2017,13 @@ public class LoginViewBean extends AuthViewBeanBase {
         }
         AuthUtils.destroySession(ac);
     }
-    
+
+    private void handleAuthLoginException(AuthLoginException ale) {
+        LoginFail = true;
+        setErrorMessage(ale);
+        ResultVal = ErrorMessage;
+    }
+
     ////////////////////////////////////////////////////////////////////////////
     // Display cycle events:
     // If the fireDisplayEvents attribute in a display field tag is set to true,
