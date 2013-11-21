@@ -136,7 +136,7 @@ public interface AuthnRequest extends RequestAbstract {
     /** 
      * Returns value of <code>isForceAuthn</code> attribute.
      *
-     * @return value of <code>isForceAuthn</code> attribute.
+     * @return value of <code>isForceAuthn</code> attribute, or null if the attribute is not present.
      */
     public Boolean isForceAuthn();
     
@@ -152,7 +152,7 @@ public interface AuthnRequest extends RequestAbstract {
     /** 
      * Returns the value of the <code>isPassive</code> attribute.
      *
-     * @return value of <code>isPassive</code> attribute.
+     * @return value of <code>isPassive</code> attribute, or null if the attribute is not present.
      */
     public Boolean isPassive();
     
