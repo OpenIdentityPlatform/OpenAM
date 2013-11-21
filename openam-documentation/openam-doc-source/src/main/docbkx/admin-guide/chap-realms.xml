@@ -85,7 +85,12 @@
    it to authenticate or be granted access to protected resources.</para>
    <para>Realm/DNS aliases must follow standard FQDN conventions, such as
    <literal>hr.example.com</literal> or
-   <literal>pay.example.com</literal>.</para>
+   <literal>pay.example.com</literal>.<footnote><para>The Realm/DNS Alias option
+   refers to an FQDN that can be used to represent the realm. It is not related
+   to the CNAME record used in DNS database zones. In other words, the Realm/DNS Alias
+   option shown in the console does not conform to the definition of DNS Aliases shown
+   in <link xlink:href="http://tools.ietf.org/html/rfc2219" xlink:show="new">RFC 2219</link>.
+   </para></footnote></para>
   </step>
   <step>
    <para>Save your work after defining the configuration for the new realm.</para>
