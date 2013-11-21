@@ -21,9 +21,7 @@
 package org.forgerock.openam.cts;
 
 import com.google.inject.name.Named;
-import com.sun.identity.common.ShutdownListener;
 import com.sun.identity.shared.debug.Debug;
-import org.forgerock.openam.core.guice.CoreGuiceModule;
 import org.forgerock.openam.cts.api.CoreTokenConstants;
 import org.forgerock.openam.cts.api.fields.CoreTokenField;
 import org.forgerock.openam.cts.api.fields.CoreTokenFieldTypes;
@@ -34,7 +32,7 @@ import org.forgerock.openam.cts.exceptions.DeleteFailedException;
 import org.forgerock.openam.cts.impl.CoreTokenAdapter;
 import org.forgerock.openam.cts.impl.query.QueryBuilder;
 import org.forgerock.openam.cts.impl.query.QueryFilter;
-import org.forgerock.openam.cts.reaper.CTSReaper;
+import org.forgerock.openam.cts.reaper.CTSReaperWatchDog;
 import org.forgerock.openam.cts.utils.LDAPDataConversion;
 import org.forgerock.openam.cts.utils.blob.TokenBlobStrategy;
 import org.forgerock.openam.cts.utils.blob.TokenStrategyFailedException;
@@ -48,7 +46,6 @@ import java.util.Calendar;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.concurrent.ScheduledExecutorService;
 
 /**
  * Core Token Service Persistent Store is responsible for the storage and retrieval of
@@ -85,9 +82,7 @@ public class CTSPersistentStore {
      */
     @Inject
     public CTSPersistentStore(LDAPDataConversion dataConversion, TokenBlobStrategy strategy,
-                              CoreTokenAdapter adapter, final CTSReaper reaper,
-                              final @Named(CTSReaper.CTS_SCHEDULED_SERVICE) ScheduledExecutorService executorService,
-                              CoreGuiceModule.ShutdownManagerWrapper wrapper,
+                              CoreTokenAdapter adapter, CTSReaperWatchDog watchDog,
                               @Named(CoreTokenConstants.CTS_DEBUG) Debug debug) {
 
         this.dataConversion = dataConversion;
@@ -95,14 +90,8 @@ public class CTSPersistentStore {
         this.adapter = adapter;
         this.debug = debug;
 
-        // Start the CTS Reaper and schedule shutdown for when system shutdown is signalled.
-        reaper.startup(executorService);
-        wrapper.addShutdownListener(new ShutdownListener() {
-            public void shutdown() {
-                reaper.shutdown();
-                executorService.shutdown();
-            }
-        });
+        // Start the CTS Reaper watch dog which will monitor the CTS Reaper
+        watchDog.startReaper();
     }
 
     /**

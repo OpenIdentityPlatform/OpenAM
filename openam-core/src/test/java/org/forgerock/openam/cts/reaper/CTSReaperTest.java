@@ -36,16 +36,10 @@ import org.testng.annotations.Test;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.ScheduledFuture;
-import java.util.concurrent.TimeUnit;
 
 import static org.mockito.BDDMockito.*;
 import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.anyBoolean;
-import static org.mockito.Matchers.anyLong;
 import static org.mockito.Matchers.anyString;
-import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.verify;
 
 /**
@@ -69,32 +63,6 @@ public class CTSReaperTest {
         mockTokenDeletion = mock(TokenDeletion.class);
 
         reaper = new CTSReaper(mockQueryFactory, mockConfig, mockTokenDeletion, mock(Debug.class));
-    }
-
-    @Test
-    public void shouldStartup() {
-        // Given
-        ScheduledExecutorService mockService = mock(ScheduledExecutorService.class);
-
-        // When
-        reaper.startup(mockService);
-
-        // Then
-        verify(mockService).scheduleAtFixedRate(eq(reaper), anyLong(), anyLong(), any(TimeUnit.class));
-    }
-
-    @Test
-    public void shouldShutdown() {
-        ScheduledExecutorService mockService = mock(ScheduledExecutorService.class);
-        ScheduledFuture mockFuture = mock(ScheduledFuture.class);
-        given(mockService.scheduleAtFixedRate(any(Runnable.class), anyLong(), anyLong(), any(TimeUnit.class))).willReturn(mockFuture);
-        reaper.startup(mockService);
-
-        // When
-        reaper.shutdown();
-
-        // Then
-        verify(mockFuture).cancel(anyBoolean());
     }
 
     @Test (timeOut = 5000)

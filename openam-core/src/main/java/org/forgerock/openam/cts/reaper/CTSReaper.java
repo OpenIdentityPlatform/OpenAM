@@ -38,31 +38,27 @@ import java.util.Calendar;
 import java.util.Collection;
 import java.util.List;
 import java.util.concurrent.CountDownLatch;
-import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.ScheduledFuture;
-import java.util.concurrent.TimeUnit;
 
 /**
- * Responsible for managing the scheduled deletion of expired Tokens.
+ * Responsible for the scheduled deletion of expired Tokens.
  *
- * This implementation consists of a runnable task which can be scheduled to run at a regular
- * interval. A paged query (that is, one where results are returned in pages) is performed
- * against the Directory and the results are scheduled for deletion using the SDK provided
- * asynchronous call.
+ * This implementation consists a paged query (that is, one where results are returned
+ * in pages) which is performed against the Directory and the results are scheduled for
+ * deletion using the SDK provided asynchronous call.
  *
  * The LDAP SDK is responsible for managing the scheduling around asynchronous tasks and
- * as such simplifies the implementation to one that queries the results and queues them
- * for deletion.
+ * as such simplifies the implementation to one that queries the results and delegates the
+ * responsibility of deletion to the SDK.
  *
  * Once the search is complete, we need to wait for all asynchronous delete operations to
- * complete before we close the connection to the Directory.
+ * complete before we close the connection to the Directory. Otherwise we risk closing a
+ * connection that has pending operations on it.
  *
- * This scheduled task can be shutdown using the shutdown command.
+ * This class is not responsible for scheduling. See the {@link CTSReaperWatchDog} instead.
  *
  * @author robert.wapshott@forgerock.com
  */
 public class CTSReaper implements Runnable {
-    public static final String CTS_SCHEDULED_SERVICE = "CTSScheduledService";
 
     // Injected
     private final QueryFactory factory;
@@ -71,7 +67,6 @@ public class CTSReaper implements Runnable {
     private final Debug debug;
 
     private final Calendar calendar = Calendar.getInstance();
-    private ScheduledFuture<?> scheduledFuture;
 
     /**
      * Create an instance, but do not schedule the instance for execution.
@@ -87,29 +82,6 @@ public class CTSReaper implements Runnable {
         this.config = config;
         this.tokenDeletion = tokenDeletion;
         this.debug = debug;
-    }
-
-    /**
-     * Schedule the runnable task with the executor service.
-     *
-     * @param service Non null ScheduledExecutorService.
-     */
-    public void startup(ScheduledExecutorService service) {
-        if (scheduledFuture != null) {
-            throw new IllegalStateException("Previous scheduling has not been shutdown.");
-        }
-
-        scheduledFuture = service.scheduleAtFixedRate(this, 0, config.getRunPeriod(), TimeUnit.MILLISECONDS);
-    }
-
-    /**
-     * Signal that the running task should be cancelled. If it is running, it will be interrupted.
-     */
-    public void shutdown() {
-        if (scheduledFuture != null) {
-            scheduledFuture.cancel(true);
-            scheduledFuture = null;
-        }
     }
 
     /**
