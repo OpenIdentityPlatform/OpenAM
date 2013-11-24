@@ -225,6 +225,78 @@ MODIFY operation successful for DN CN=schema</screen>
     </answer>
    </qandaentry>
 
+   <qandaentry xml:id="turn-off-oauth2-logging">
+    <question>
+     <para>
+      My container log file is filling up with messages from OpenAM's
+      OAuth authorization service and OpenID Connect provider.
+     </para>
+
+     <para>
+      What can I do to prevent all these messages from being logged?
+     </para>
+    </question>
+
+    <answer>
+     <para>
+      This behavior is governed by the log settings for RESTlet,
+      which is used by OpenAM for OAuth 2.0 and OpenID Connect 1.0.
+     </para>
+
+     <para>
+      Use log configuration settings to turn off logging from RESTlet.
+     </para>
+
+     <para>
+      For example, if your container is Apache Tomcat, follow these steps.
+     </para>
+
+     <orderedlist>
+      <listitem>
+       <para>
+        Stop Tomcat.
+       </para>
+
+       <screen>$ /path/to/tomcat/bin/shutdown.sh</screen>
+      </listitem>
+
+      <listitem>
+       <para>
+        Edit the Tomcat settings script,
+        <filename>catalina.sh</filename> or <filename>catalina.bat</filename>,
+        to use the logging configuration file.
+       </para>
+
+       <para>
+        For example, in <filename>/path/to/tomcat/bin/catalina.sh</filename>,
+        uncomment the following line, and then save your work:
+       </para>
+
+       <programlisting language="ini" width="88"
+>LOGGING_CONFIG="-Djava.util.logging.config.file=$CATALINA_BASE/conf/logging.properties"</programlisting>
+      </listitem>
+
+      <listitem>
+       <para>
+        In <filename>$CATALINA_BASE/conf/logging.properties</filename>,
+        add the following line, and then save your work:
+       </para>
+
+       <programlisting language="ini"
+>org.restlet.level=OFF</programlisting>
+      </listitem>
+
+      <listitem>
+       <para>
+        Start Tomcat.
+       </para>
+
+       <screen>$ /path/to/tomcat/bin/startup.sh</screen>
+      </listitem>
+     </orderedlist>
+    </answer>
+   </qandaentry>
+
    <qandaentry xml:id="openam-sfo-time-wait">
     <question>
      <para>I have session failover configured for an OpenAM site. I see many
