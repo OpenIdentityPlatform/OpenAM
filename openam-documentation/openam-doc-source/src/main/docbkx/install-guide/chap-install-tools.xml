@@ -71,6 +71,15 @@
  <procedure xml:id="install-openam-admin-tools">
   <title>To Set Up Administration Tools</title>
 
+  <para>
+   The <command>ssoadm</command> administration tool
+   requires access to OpenAM configuration files,
+   and therefore must be installed on the same host as OpenAM core services.
+
+   The <command>ssoadm</command> tool is not designed to run on a host
+   where only the distributed authentication service (DAS) is installed.
+  </para>
+
   <step>
    <para>Make sure OpenAM is installed and running before proceeding.</para>
   </step>
