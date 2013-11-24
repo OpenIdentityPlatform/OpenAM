@@ -1561,8 +1561,14 @@ $ curl
   <title>User Self-Registration</title>
   <indexterm><primary>Self-registration</primary></indexterm>
 
-  <para>The OpenAM REST API for users provides an action for
-  self-registration.</para>
+  <para>
+   The OpenAM REST API for users provides an action for self-registration.
+   This is an alternative to the Membership module described in
+   the <citetitle>Administration Guide</citetitle> section,
+   <link xlink:show="new" xlink:href="admin-guide#membership-module-conf-hints"
+   xlink:role="http://docbook.org/xlink/role/olink"><citetitle>Hints For
+   the Membership Authentication Module</citetitle></link>.
+  </para>
 
   <para>The feature works by sending an email to the user in response to RESTful
   HTTP POST requesting registration with an email address. When the user clicks
@@ -1594,12 +1600,27 @@ $ curl
     <para>Perform an HTTP POST on <literal>/json/users?_action=register</literal>
     with the new user's mail.</para>
 
-    <para>Notice that authentication is not required.</para>
+    <para>
+     To use a subject and message other than those configured in the Email Service,
+     you can optionally set the mail subject and message content
+     by including "subject" and "message" strings in the JSON data.
 
-    <screen>$ curl
- --request POST --header "Content-Type: application/json"
- --data '{"email":"newuser@example.com"}'
- https://openam.example.com:8443/openam/json/users?_action=register
+     For example, the following POST results in a mail with
+     subject <literal>Confirm registration with OpenAM</literal>
+     and content <literal>Follow this link to confirm your registration</literal>
+     in addition to the confirmation link.
+    </para>
+
+    <para>
+     Notice that authentication is not required.
+    </para>
+
+    <screen>$ curl --request POST --header "Content-Type: application/json"
+ --data '{
+    "email": "newuser@example.com",
+    "subject": "Confirm registration with OpenAM",
+    "message": "Follow this link to confirm your registration"
+ }' https://openam.example.com:8443/openam/json/users/?_action=register
 {}</screen>
 
     <para>On success, the response is an empty JSON object <literal>{}</literal>
@@ -1607,8 +1628,10 @@ $ curl
    </listitem>
 
    <listitem>
-    <para>The user receives an email message that includes a URL as in the
-    following example.</para>
+    <para>
+     The user receives an email message that includes a URL
+     similar to the following example.
+    </para>
 
     <literallayout class="monospaced"
     >https://openam.example.com:8443/openam/json/confirmation/register?confirmationId=P23PK5kyAgNdqeNJpAvq1ebcpcg=&amp;email=newuser@example.com&amp;tokenId=+8rWf5O8KG0rfz3Pa+WwDLkH9Ac=</literallayout>
@@ -1705,8 +1728,16 @@ $ curl
   <title>Resetting Forgotten Passwords</title>
   <indexterm><primary>Password reset</primary></indexterm>
 
-  <para>The OpenAM REST API for users provides an action for handling forgotten
-  passwords as long as the user has a valid email address in their profile.</para>
+  <para>
+   The OpenAM REST API for users provides an action
+   for handling forgotten passwords
+   as long as the user has a valid email address in their profile.
+   This is an alternative to the password reset capability described in
+   the <citetitle>Administration Guide</citetitle> chapter,
+   <link xlink:show="new" xlink:href="admin-guide#chap-pwd-reset"
+   xlink:role="http://docbook.org/xlink/role/olink"><citetitle
+   >Configuring Password Reset</citetitle></link>.
+  </para>
 
   <para>The option is disabled by default. You can enable it in the OpenAM Console
   globally via Configuration > Global > REST Security.</para>
@@ -1732,14 +1763,32 @@ $ curl
    </listitem>
 
    <listitem>
-    <para>Perform an HTTP POST on <literal>/json/users?_action=forgotPassword</literal>
-    with the user's ID.</para>
+    <para>
+     Perform an HTTP POST on <literal>/json/users?_action=forgotPassword</literal>
+     with the user's ID.
+    </para>
 
-    <para>Notice that authentication is not required.</para>
+    <para>
+     To use a subject and message other than those configured in the Email Service,
+     you can optionall set the mail subject and message content
+     by including "subject" and "message" strings in the JSON data.
 
-    <screen>curl --request POST --header "Content-Type: application/json"
- --data '{"username":"demo"}'
- https://openam.example.com:8443/openam/json/users?_action=forgotPassword
+     For example, the following POST results in a mail with
+     subject <literal>Reset your forgotten password with OpenAM</literal>
+     and content <literal>Follow this link to reset your password</literal>
+     in addition to the confirmation link.
+    </para>
+
+    <para>
+     Notice that authentication is not required.
+    </para>
+
+    <screen>$ curl --request POST --header "Content-Type: application/json"
+ --data '{
+    "username": "demo",
+    "subject": "Reset your forgotten password with OpenAM",
+    "message": "Follow this link to reset your password"
+ }' https://openam.example.com:8443/openam/json/users/?_action=forgotPassword
 {}</screen>
 
     <para>On success, the response is an empty JSON object <literal>{}</literal>
