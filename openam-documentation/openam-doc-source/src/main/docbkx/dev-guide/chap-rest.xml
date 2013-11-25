@@ -1726,7 +1726,10 @@ $ curl
 
  <section xml:id="rest-api-password-reset">
   <title>Resetting Forgotten Passwords</title>
-  <indexterm><primary>Password reset</primary></indexterm>
+  <indexterm>
+   <primary>Passwords</primary>
+   <secondary>Reset</secondary>
+  </indexterm>
 
   <para>
    The OpenAM REST API for users provides an action
@@ -1737,6 +1740,11 @@ $ curl
    <link xlink:show="new" xlink:href="admin-guide#chap-pwd-reset"
    xlink:role="http://docbook.org/xlink/role/olink"><citetitle
    >Configuring Password Reset</citetitle></link>.
+  </para>
+
+  <para>
+   If you know the current password, you can change it as described in
+   <xref linkend="rest-api-change-password" />.
   </para>
 
   <para>The option is disabled by default. You can enable it in the OpenAM Console
@@ -1956,6 +1964,7 @@ $ curl
      <listitem><para><xref linkend="rest-api-update-identity" /></para></listitem>
      <listitem><para><xref linkend="rest-api-delete-identity" /></para></listitem>
      <listitem><para><xref linkend="rest-api-query-identity" /></para></listitem>
+     <listitem><para><xref linkend="rest-api-change-password" /></para></listitem>
     </itemizedlist>
    </listitem>
 
@@ -2828,6 +2837,102 @@ $ curl --request PUT --header "If-None-Match: *"
    representation of the error including the
    <link xlink:href="http://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html"
    xlink:show="new">HTTP status code</link>.</para>
+  </section>
+
+  <section xml:id="rest-api-change-password">
+   <title>Changing Passwords</title>
+   <indexterm>
+    <primary>Passwords</primary>
+    <secondary>Reset</secondary>
+   </indexterm>
+   <indexterm>
+    <primary>Passwords</primary>
+    <secondary>Change</secondary>
+   </indexterm>
+
+   <para>
+    OpenAM administrator, by default <literal>amadmin</literal>,
+    can reset a user's password or a user can change their own password
+    with an HTTP PUT to <literal>/json/<replaceable>subrealm</replaceable
+    >/users/<replaceable>username</replaceable></literal>
+    including the new password as the value of "userpassword" in the request data.
+
+    OpenAM administrator can reset the password without the old password.
+
+    A user must provide the current password, which is set in the request
+    as the value of the <literal>olduserpassword</literal> header.
+    For the case where the user has forgotten their password, see
+    <xref linkend="rest-api-password-reset" /> instead.
+   </para>
+
+   <para>
+    The following example shows a successful request to change the demo user's
+    password to <literal>password</literal>.
+   </para>
+
+   <screen>$ curl
+ --request PUT
+ --header "iPlanetDirectoryPro: AQIC5w...NTcy*"
+ --header "Content-Type: application/json"
+ --header "olduserpassword: changeit"
+ --data '{"userpassword":"newpassword"}'
+ http://openam.example.com:8080/openam/json/users/demo
+{
+    "username": "demo",
+    "realm": "/",
+    "uid": [
+        "demo"
+    ],
+    "mail": [
+        "demo@example.com"
+    ],
+    "sn": [
+        "demo"
+    ],
+    "userPassword": [
+        "{SSHA}OrBR9VdMLs95iMq/VKYLwJkr4fTOfGS91+9grg=="
+    ],
+    "cn": [
+        "demo"
+    ],
+    "inetUserStatus": [
+        "Active"
+    ],
+    "dn": [
+        "uid=demo,ou=people,dc=openam,dc=forgerock,dc=org"
+    ],
+    "objectClass": [
+        "devicePrintProfilesContainer",
+        "person",
+        "sunIdentityServerLibertyPPService",
+        "inetorgperson",
+        "sunFederationManagerDataStore",
+        "iPlanetPreferences",
+        "iplanet-am-auth-configuration-service",
+        "organizationalperson",
+        "sunFMSAML2NameIdentifier",
+        "inetuser",
+        "forgerock-am-dashboard-service",
+        "iplanet-am-managed-person",
+        "iplanet-am-user-service",
+        "sunAMAuthAccountLockout",
+        "top"
+    ],
+    "universalid": [
+        "id=demo,ou=user,dc=openam,dc=forgerock,dc=org"
+    ]
+}</screen>
+
+   <para>
+    As shown in the examples, OpenAM returns
+    the JSON representation of the resource list if successful.
+
+    On failure, OpenAM returns a JSON representation of the error including the
+    <link xlink:href="http://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html"
+    xlink:show="new">HTTP status code</link>.
+
+    See also <xref linkend="rest-api-status-codes" /> for more information.
+   </para>
   </section>
 
   <section xml:id="rest-api-create-legacy">
