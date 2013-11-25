@@ -187,6 +187,18 @@
    deploying in Tomcat so that the deployment URI is
    <literal>/openam</literal>.</para>
 
+   <note>
+    <para>
+     In order to be properly configured, OpenAM requires a deployment URI
+     with a non-empty string after <literal>/</literal>.
+
+     Do not deploy OpenAM at the root context.
+
+     Do not rename the .war file to <filename>ROOT.war</filename>
+     before deploying on Tomcat, for example.
+    </para>
+   </note>
+
    <para>It can take several seconds for OpenAM to be deployed in your
    container.</para>
   </step>
