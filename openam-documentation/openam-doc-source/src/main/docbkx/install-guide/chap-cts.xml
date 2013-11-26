@@ -165,7 +165,7 @@
     <para>Different schema files are available in the OpenAM
     <filename>WEB-INF/template/ldif/sfha</filename> directory. If you install OpenAM
     with the embedded version of OpenDJ, the schema from the <filename>cts-add-schema.ldif</filename>,
-    <filename>cts-container.ldif</filename>, and <filename>cts-indicies.ldif</filename> files are installed.
+    <filename>cts-container.ldif</filename>, and <filename>cts-indices.ldif</filename> files are installed.
     If you upgrade to OpenAM <?eval ${serverDocTargetVersion}?> from a previous version with embedded OpenDJ,
     the schema from the <filename>99-cts-add-schema-backport.ldif</filename> file is incorporated in your
     upgrade.</para>
