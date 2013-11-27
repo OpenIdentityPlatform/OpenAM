@@ -371,6 +371,17 @@
   <procedure xml:id="common-task-oauth2-authz">
    <title>To Set Up the OAuth 2.0 Authorization Service</title>
 
+   <important>
+    <para>
+     If your resource owners log in with a user name that is not their user ID,
+     notice that the steps in this procedure to use some other profile attribute
+     do remove the DataStore module from the default authentication chain.
+     That change is not recommended for / (Top Level Realm)
+     where the OpenAM administrator <literal>amadmin</literal> profile is held,
+     because the OpenAM administrator relies on the DataStore module to log in.
+    </para>
+   </important>
+
    <para>Follow these steps.</para>
 
    <step>
@@ -413,14 +424,121 @@
    </step>
 
    <step performance="optional">
-    <para>If resource owners log in with a user name that is not their user ID,
-    but instead their mail address or some other profile attribute, then add the
-    profile attribute name to the list that can be used for authentication.</para>
+    <para>
+     If resource owners log in with a user name that is not their user ID,
+     but instead their mail address or some other profile attribute,
+     then complete the following steps.
+    </para>
 
-    <para>To make the change, browse to Access Control &gt; <replaceable>Realm
-    Name</replaceable> &gt; Services &gt; OAuth2 Provider, add the profile
-    attributes to the list titled User Profile Attribute(s) the Resource Owner
-    is Authenticated On.</para>
+    <para>
+     The following steps describe how to use the LDAP profile attribute,
+     <literal>mail</literal>,
+     and the <literal>ldapService</literal> authentication chain.
+    </para>
+
+    <substeps>
+     <step>
+      <para>
+       Add the profile attribute name to the list
+       of attributes that can be used for authentication.
+      </para>
+
+      <para>
+       To make the change, browse to Access Control &gt; <replaceable>Realm
+       Name</replaceable> &gt; Services &gt; OAuth2 Provider, add the profile
+       attributes to the list titled User Profile Attribute(s)
+       the Resource Owner is Authenticated On, and then click Save.
+      </para>
+     </step>
+
+     <step>
+      <para>
+       Edit the LDAP authentication module settings.
+      </para>
+
+      <substeps>
+       <step>
+        <para>
+         In OpenAM Console under Access Control > <replaceable>Realm
+         Name</replaceable> > Authentication > Module Instances,
+         click the <literal>LDAP</literal> link.
+        </para>
+       </step>
+
+       <step>
+        <para>
+         In the Attribute Used to Retrieve User Profile field,
+         change the attribute to <literal>mail</literal>.
+        </para>
+       </step>
+
+       <step>
+        <para>
+         In the Attributes Used to Search for a User to be Authenticated list,
+         remove the existing attribute
+         and add the <literal>mail</literal> attribute.
+        </para>
+       </step>
+
+       <step>
+        <para>
+         Click Save.
+        </para>
+       </step>
+      </substeps>
+     </step>
+
+     <step>
+      <para>
+       Edit the <literal>ldapService</literal> authentication chain settings.
+      </para>
+
+      <substeps>
+       <step>
+        <para>
+         In OpenAM Console under Access Control > <replaceable>Realm
+         Name</replaceable> > Authentication > Authentication Chaining,
+         click the <literal>ldapService</literal> link.
+        </para>
+       </step>
+
+       <step>
+        <para>
+         Choose the LDAP module in the Instance drop-down list,
+         making sure criteria is set to REQUIRED.
+        </para>
+       </step>
+
+       <step>
+        <para>
+         Click Save.
+        </para>
+       </step>
+      </substeps>
+     </step>
+    </substeps>
+
+    <!--
+         This capability was tested by setting up a realm under /, "realm",
+         with an external data store, "OpenDJ external",
+         that points to an OpenDJ server containing Example.ldif data.
+
+         The realm had an OAuth 2.0 provider initially with default settings,
+         and a client myClientID:password with mail as the scope.
+
+         After following all the steps, it seemed to work:
+
+$ curl -X POST -u "myClientID:password" \
+-d "grant_type=password&username=bjensen@example.com&password=hifalutin&scope=mail" \
+http://openam.example.com:8080/openam/oauth2/access_token?realm=realm
+{
+    "scope": "mail",
+    "expires_in": 59,
+    "token_type": "Bearer",
+    "refresh_token": "3413f35a-4829-4302-aa69-2d8b34c6def0",
+    "access_token": "4fc13e46-0ed6-4279-bc69-b474f67bc3a0"
+}
+    -->
    </step>
 
    <step>
