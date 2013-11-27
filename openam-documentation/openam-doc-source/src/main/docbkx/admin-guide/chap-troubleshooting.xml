@@ -342,6 +342,27 @@ MODIFY operation successful for DN CN=schema</screen>
  -a com.iplanet.am.session.failover.cluster.stateCheck.timeout=2000</screen>
     </answer>
    </qandaentry>
+   <qandaentry xml:id="change-app-password">
+    <question>
+     <para>I want to change the password for the <literal>UrlAccessAgent</literal> that
+     was assigned during the OpenAM Installation process.</para>
+    </question>
+    <answer>
+     <para>To change the <literal>UrlAccessAgent</literal> password, you can use
+     the <command>ssoadm</command> that is installed with the OpenAM Administration tools,
+     as described in the <link xlink:href="install-guide#chap-install-tools" xlink:show="new"
+     xlink:role="http://docbook.org/xlink/role/olink"><citetitle>Installing OpenAM Tools</citetitle>
+     Chapter of the Installation Guide.</link>
+     </para>
+     <para>You can then change the password for the <literal>UrlAccessAgent</literal> for
+     the root realm (/) with the following commands:</para>
+     <screen># cd /path/to/SSOAdminTools/bin
+# ./ssoadm set-identity-attrs -e / -i amService-UrlAccessAgent -t user -u amadmin -f /tmp/passwd -a userpassword=changeit</screen>
+     <para>If the command works, you will see the following response:</para>
+     <screen>Attribute values of identity, amService-UrlAccessAgent of type, user in realm, / was modified.</screen>
+     <para>The new password will take effect the next time you start OpenAM.</para>
+    </answer>
+   </qandaentry>
   </qandadiv>
  </qandaset>
 </chapter>
