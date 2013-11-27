@@ -20,14 +20,15 @@
   !
   ! CCPL HEADER END
   !
-  !      Copyright 2011, 2013 ForgeRock AS
+  !      Copyright 2011-2013 ForgeRock AS
   !    
 -->
 <chapter xml:id='chap-policy-spi'
  xmlns='http://docbook.org/ns/docbook'
  version='5.0' xml:lang='en'
  xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance'
- xsi:schemaLocation='http://docbook.org/ns/docbook http://docbook.org/xml/5.0/xsd/docbook.xsd'
+ xsi:schemaLocation='http://docbook.org/ns/docbook
+                     http://docbook.org/xml/5.0/xsd/docbook.xsd'
  xmlns:xlink='http://www.w3.org/1999/xlink'
  xmlns:xinclude='http://www.w3.org/2001/XInclude'>
  <title>Customizing Policy Evaluation</title>
@@ -47,114 +48,147 @@
  <!-- Inspired by the sample plugin provided with OpenAM and Sam's wiki work at
       https://wikis.forgerock.org/confluence/display/openam/Install+Custom+Policy+Plug-in -->
  
- <para>OpenAM comes with sample plugins that demonstrate how to customize
- policy evaluation. This chapter shows how to compile the samples, and how
- to configure OpenAM to use one of the plugins.</para>
+ <para>
+  This chapter shows how to build sample plugins,
+  and how to configure OpenAM to use one of the plugins.
+ </para>
 
  <section xml:id="about-sample-policy-plugins">
   <title>About the Sample Plugins</title>
   
-  <para>The OpenAM policy framework lets you build plugins to extend subjects,
-  conditions, and response providers for policies, and also extend referrals
-  for policy delegation. You can find Java code for sample
-  policy evaluation plugins in the <link xlink:show="new"
-  xlink:href="http://sources.forgerock.org/browse/~br=trunk/openam/trunk/openam/openam-distribution/src/main/amserver/samples/server/source/com/sun/identity/samples/policy"
-  >OpenAM project source code</link>. Download the sample Java class
-  files into a suitable location, such as
-  <filename>~/Downloads/com/sun/identity/samples/policy/</filename>.</para>
+  <para>
+   The OpenAM policy framework lets you build plugins
+   to extend subjects, conditions, and response providers for policies,
+   and also extend referrals for policy delegation.
+   The <link xlink:href="https://github.com/markcraig/openam-policy-eval-sample"
+   xlink:show="new">sample policy evaluation plugin source</link>
+   is available online.
+   Get a local clone so that you can read the source and try the sample on your system.
+   In the sources you find the following files.
+  </para>
   
   <variablelist>
    <varlistentry>
-    <term><filename>SampleCondition.java</filename></term>
+    <term><filename>pom.xml</filename></term>
     <listitem>
-     <para>Extends the <literal>Condition</literal> interface. Shows an
-     implementation of a condition to base the policy decision on the length
-     of the user name.</para>
+     <para>
+      Apache Maven project file for the module
+     </para>
+
+     <para>
+      This file specifies how to build the sample post authentication plugin,
+      and also specifies its dependencies on OpenAM components.
+     </para>
     </listitem>
    </varlistentry>
+
    <varlistentry>
-    <term><filename>SampleReferral.java</filename></term>
+    <term><filename>src/main/java/org/forgerock/openam/examples/SampleCondition.java</filename></term>
     <listitem>
-     <para>Extends the <literal>Referral</literal> interface. Shows an
-     implementation of a policy referral for delegation.</para>
+     <para>
+      Extends the <literal>Condition</literal> interface,
+      and shows an implementation of a condition
+      to base the policy decision on the length of the user name
+     </para>
     </listitem>
    </varlistentry>
+
    <varlistentry>
-    <term><filename>SampleResponseProvider.java</filename></term>
+    <term><filename>src/main/java/org/forgerock/openam/examples/SampleReferral.java</filename></term>
     <listitem>
-     <para>Extends the <literal>ResponseProvider</literal> interface. Shows an
-     implementation of a response provider to send an attribute from the user
-     profile with the response.</para>
+     <para>
+      Extends the <literal>Referral</literal> interface,
+      and shows an implementation of a policy referral for delegation
+     </para>
     </listitem>
    </varlistentry>
+
    <varlistentry>
-    <term><filename>SampleSubject.java</filename></term>
+    <term><filename>src/main/java/org/forgerock/openam/examples/SampleResponseProvider.java</filename></term>
     <listitem>
-     <para>Extends the <literal>Subject</literal> interface. Shows an
-     implementation that defines the users to whom the policy applies, in this
-     case all authenticated users.</para>
+     <para>
+      Extends the <literal>ResponseProvider</literal> interface,
+      and shows an implementation of a response provider
+      to send an attribute from the user profile with the response
+     </para>
+    </listitem>
+   </varlistentry>
+
+   <varlistentry>
+    <term><filename>src/main/java/org/forgerock/openam/examples/SampleSubject.java</filename></term>
+    <listitem>
+     <para>
+      Extends the <literal>Subject</literal> interface,
+      and shows an implementation
+      that defines the users to whom the policy applies,
+      in this case all authenticated users
+     </para>
     </listitem>
    </varlistentry>
   </variablelist>
   
-  <para>Before including the plugins in OpenAM, you compile the four files, and
-  package the classes into a .jar for deployment.</para>
-  
-  <para>The sample policy evaluation code relies on two .jar files deployed
-  with OpenAM.</para>
-   <variablelist>
-    <varlistentry>
-     <term><filename><?eval ${coreLibrary}?></filename></term>
-     <listitem>
-      <para>When you deploy OpenAM, the file is
-      <filename><replaceable>war-file-name</replaceable>/WEB-INF/lib/<?eval ${coreLibrary}?></filename>.</para>
-     </listitem>
-    </varlistentry>
-    <varlistentry>
-     <term><filename><?eval ${sharedLibrary}?></filename></term>
-     <listitem>
-      <para>When you deploy OpenAM, the file is
-      <filename><replaceable>war-file-name</replaceable>/WEB-INF/lib/<?eval ${sharedLibrary}?></filename>.</para>
-     </listitem>
-    </varlistentry>
-   </variablelist>
-  
-  <screen>$ cd /path/to/tomcat/webapps/openam/
-$ mkdir classes
-$ javac -d classes
- -classpath /path/to/tomcat/webapps/openam/WEB-INF/lib/<?eval ${coreLibrary}?>:
-  /path/to/tomcat/webapps/openam/WEB-INF/lib/<?eval ${sharedLibrary}?>
-  ~/Downloads/com/sun/identity/samples/policy/Sample*.java
-$ cd classes/
-$ jar cf ../policy-plugins.jar .</screen>
-  
-  <para>The .jar belongs under
-  <filename><replaceable>war-file-name</replaceable>/WEB-INF/lib/</filename>.</para>
-  
-  <screen>$ cp ../policy-plugins.jar /path/to/tomcat/webapps/openam/WEB-INF/lib</screen>
-  
-  <para>Alternatively, you can add individual classes under
-  <filename><replaceable>war-file-name</replaceable>/WEB-INF/classes/</filename>.</para>
+  <para>
+   Build the module using Apache Maven.
+  </para>
+
+  <screen>$ cd /path/to/openam-post-auth-sample
+$ mvn install
+[INFO] Scanning for projects...
+[INFO]
+[INFO] ------------------------------------------------------------------------
+[INFO] Building openam-policy-eval-sample 1.0.0-SNAPSHOT
+[INFO] ------------------------------------------------------------------------
+
+...
+
+[INFO] --- maven-jar-plugin:2.3.1:jar (default-jar) @ openam-policy-eval-sample
+[INFO] Building jar: .../target/openam-policy-eval-sample-1.0.0-SNAPSHOT.jar
+[INFO]
+
+...
+
+[INFO] ------------------------------------------------------------------------
+[INFO] BUILD SUCCESS
+[INFO] ------------------------------------------------------------------------
+[INFO] Total time: 3.827s
+[INFO] Finished at: Mon Nov 25 19:07:15 CET 2013
+[INFO] Final Memory: 21M/228M
+[INFO] ------------------------------------------------------------------------</screen>
+
+  <para>
+   Copy the .jar to the <filename>WEB-INF/lib</filename> directory
+   where you deployed OpenAM.
+  </para>
+
+  <screen>$ cp target/*.jar /path/to/tomcat/webapps/openam/WEB-INF/lib/</screen>
+
+  <para>
+   Restart OpenAM or the container in which it runs.
+  </para>
  </section>
  
  <section xml:id="configure-sample-policy-plugin">
   <title>Configuring A Sample Policy Plugin</title>
   
-  <para>This section shows how to configure the sample custom policy condition
-  that you built. Configuration involves defining the strings that describe
-  the policy condition, and plugging the policy condition into the
-  <literal>iPlanetAMPolicyService</literal>, and then restarting OpenAM
-  to be able to add the condition to your policies.</para>
+  <para>
+   This section shows how to configure the sample custom policy condition.
+   Configuration involves defining the strings that describe the policy condition,
+   and plugging the policy condition into the <literal>iPlanetAMPolicyService</literal>,
+   and then restarting OpenAM to be able to add the condition to your policies.</para>
   
-  <para>You need to update two files where the strings describing your plugin are
-  included as properties values.</para>
-  <para>In <filename><replaceable>war-file-name</replaceable>/WEB-INF/classes/amPolicy.properties</filename>
-  add this property:</para>
+  <para>
+   You need to update two files under your OpenAM deployment
+   where the strings describing your plugin are included as properties values.
+  </para>
+
+  <para>
+   In <filename>WEB-INF/classes/amPolicy.properties</filename> add this property:
+  </para>
   
   <literallayout class="monospaced">samplecondition-policy-name=Sample Condition</literallayout>
  
-  <para>In <filename><replaceable>war-file-name</replaceable>/WEB-INF/classes/amPolicyConfig.properties</filename>
-  add this property:</para>
+  <para>
+   In <filename>WEB-INF/classes/amPolicyConfig.properties</filename> add this property:</para>
   
   <literallayout class="monospaced">x100=Sample Condition</literallayout>
   
@@ -169,12 +203,14 @@ $ jar cf ../policy-plugins.jar .</screen>
  --pluginname SampleCondition
  --i18nname amPolicy
  --i18nkey samplecondition-policy-name
- --classname com.sun.identity.samples.policy.SampleCondition
+ --classname org.forgerock.openam.examples.SampleCondition
 
 Plug-in schema, Condition was added to service, iPlanetAMPolicyService.</screen>
   
-  <para>Set the choice values of the schema to include your plugin with other
-  policy conditions in the policy service.</para>
+  <para>
+   Set the choice values of the schema to include your plugin
+   with other policy conditions in the policy service.
+  </para>
   
   <screen>$ ssoadm
  set-attr-choicevals
@@ -188,8 +224,10 @@ Plug-in schema, Condition was added to service, iPlanetAMPolicyService.</screen>
 
 Choice Values were set.</screen>
   
-  <para>Set the plugin policy condition as one of the default attibutes of the
-  policy service.</para>
+  <para>
+   Set the plugin policy condition as one of the default attributes
+   of the policy service.
+  </para>
   
   <screen>$ ssoadm
  add-attr-defs
@@ -201,30 +239,16 @@ Choice Values were set.</screen>
 
 Schema attribute defaults were added.</screen>
   
-  <para>After completing configuration, restart OpenAM or the web application
-  container.</para>
-  
-  <screen>$ /etc/init.d/tomcat stop
-Password: 
-Using CATALINA_BASE:   /path/to/tomcat
-Using CATALINA_HOME:   /path/to/tomcat
-Using CATALINA_TMPDIR: /path/to/tomcat/temp
-Using JRE_HOME:        /path/to/jdk/jre
-Using CLASSPATH:       /path/to/tomcat/bin/bootstrap.jar:
- /path/to/tomcat/bin/tomcat-juli.jar
-$ /etc/init.d/tomcat start
-Password: 
-Using CATALINA_BASE:   /path/to/tomcat
-Using CATALINA_HOME:   /path/to/tomcat
-Using CATALINA_TMPDIR: /path/to/tomcat/temp
-Using JRE_HOME:        /path/to/jdk/jre
-Using CLASSPATH:       /path/to/tomcat/bin/bootstrap.jar:
- /path/to/tomcat/bin/tomcat-juli.jar</screen>
-  
-  <para>In OpenAM console, browse to Access Control &gt; <replaceable>Realm
-  Name</replaceable> &gt; Policies &gt; <replaceable>Policy Name</replaceable>
-  &gt; Conditions &gt; New... Notice in the list of conditions that you can
-  now apply your Sample Condition.</para>
+  <para>
+   After completing configuration, restart OpenAM or the container in which it runs.
+  </para>
+
+  <para>
+   In OpenAM Console, browse to Access Control &gt; <replaceable>Realm
+   Name</replaceable> &gt; Policies &gt; <replaceable>Policy Name</replaceable>
+   &gt; Conditions &gt; New.
+   Notice in the list of conditions that you can now apply your Sample Condition.
+  </para>
   
   <mediaobject xml:id="figure-sample-condition">
    <alt>Sample Condition in list of conditions</alt>
@@ -232,8 +256,9 @@ Using CLASSPATH:       /path/to/tomcat/bin/bootstrap.jar:
     <imagedata fileref="images/sample-condition.png" format="PNG"/>
    </imageobject>
    <textobject>
-    <para>The sample condition you added is present in the list of
-    conditions.</para>
+    <para>
+     The sample condition you added is present in the list of conditions.
+    </para>
    </textobject>
   </mediaobject>
  </section>

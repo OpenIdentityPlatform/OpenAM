@@ -27,7 +27,8 @@
  xmlns='http://docbook.org/ns/docbook'
  version='5.0' xml:lang='en'
  xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance'
- xsi:schemaLocation='http://docbook.org/ns/docbook http://docbook.org/xml/5.0/xsd/docbook.xsd'
+ xsi:schemaLocation='http://docbook.org/ns/docbook
+                     http://docbook.org/xml/5.0/xsd/docbook.xsd'
  xmlns:xlink='http://www.w3.org/1999/xlink'
  xmlns:xinclude='http://www.w3.org/2001/XInclude'>
  <title>Creating a Post Authentication Plugin</title>
@@ -113,119 +114,143 @@ import com.sun.identity.shared.debug.Debug;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-public class SamplePAP implements AMPostAuthProcessInterface
-{
-  private final static String PROP_NAME = "MyProperty";
-  private final static String PROP_VALUE = "MyValue";
-  private final static String DEBUG_FILE = "SamplePAP";
+public class SamplePAP implements AMPostAuthProcessInterface {
+    private final static String PROP_NAME = "MyProperty";
+    private final static String PROP_VALUE = "MyValue";
+    private final static String DEBUG_FILE = "SamplePAP";
 
-  protected Debug debug = Debug.getInstance(DEBUG_FILE);
+    protected Debug debug = Debug.getInstance(DEBUG_FILE);
 
-  public void onLoginSuccess(
-    Map requestParamsMap, 
-    HttpServletRequest request,
-    HttpServletResponse response,
-    SSOToken token
-  ) throws AuthenticationException
-  {
-    try {
-      token.setProperty(PROP_NAME, PROP_VALUE);
-    } catch (SSOException ssoe) {
-      debug.error("Unable to set property");
+    public void onLoginSuccess(
+            Map requestParamsMap,
+            HttpServletRequest request,
+            HttpServletResponse response,
+            SSOToken token
+    ) throws AuthenticationException {
+        try {
+            token.setProperty(PROP_NAME, PROP_VALUE);
+        } catch (SSOException e) {
+            debug.error("Unable to set property");
+        }
     }
-  }
 
-  public void onLoginFailure(
-    Map requestParamsMap, 
-    HttpServletRequest request,
-    HttpServletResponse response
-  ) throws AuthenticationException
-  {
-    ; // Not used
-  }
+    public void onLoginFailure(
+            Map requestParamsMap,
+            HttpServletRequest request,
+            HttpServletResponse response
+    ) throws AuthenticationException {
+        // Not used
+    }
 
-  public void onLogout(
-    HttpServletRequest request, 
-    HttpServletResponse response,
-    SSOToken token
-  ) throws AuthenticationException
-  {
-    ; // Not used
-  }
-}</programlisting>
+    public void onLogout(
+            HttpServletRequest request,
+            HttpServletResponse response,
+            SSOToken token
+    ) throws AuthenticationException {
+        // Not used
+    }
+}
+</programlisting>
   
-  <para>A post authentication plugin code relies on three .jar files, two
-  of which are deployed with OpenAM, and the third which is provided by your
-  web application container.</para>
+  <para>
+   The <link xlink:href="https://github.com/markcraig/openam-post-auth-sample"
+   xlink:show="new">sample post authentication plugin source</link>
+   is available online.
+   Get a local clone so that you can try the sample on your system.
+   In the sources you find the following files.
+  </para>
+
   <variablelist>
    <varlistentry>
-    <term><filename><?eval ${coreLibrary}?></filename></term>
+    <term><filename>pom.xml</filename></term>
     <listitem>
-     <para>When you deploy OpenAM, the file is
-     <filename><replaceable>war-file-name</replaceable>/WEB-INF/lib/<?eval ${coreLibrary}?></filename>.</para>
+     <para>
+      Apache Maven project file for the module
+     </para>
+
+     <para>
+      This file specifies how to build the sample post authentication plugin,
+      and also specifies its dependencies on OpenAM components
+      and on the Servlet API.
+     </para>
     </listitem>
    </varlistentry>
+
    <varlistentry>
-    <term><filename><?eval ${sharedLibrary}?></filename></term>
+    <term><filename>src/main/java/com/forgerock/openam/examples/SamplePAP.java</filename></term>
     <listitem>
-     <para>When you deploy OpenAM, the file is
-     <filename><replaceable>war-file-name</replaceable>/WEB-INF/lib/<?eval ${sharedLibrary}?></filename>.</para>
-    </listitem>
-   </varlistentry>
-   <varlistentry>
-    <term><filename>servlet-api.jar</filename></term>
-    <listitem>
-     <para>This .jar provides the Java EE Servlet API.</para>
-     <para>If you use Apache Tomcat as your web application container, the file
-     is <filename>/path/to/tomcat/lib/servlet-api.jar</filename>.</para>
+     <para>
+      Core class for the sample post authentication plugin
+     </para>
     </listitem>
    </varlistentry>
   </variablelist>
+
+  <para>
+   Build the module using Apache Maven.
+  </para>
+
+  <screen>$ cd /path/to/openam-post-auth-sample
+$ mvn install
+[INFO] Scanning for projects...
+[INFO]
+[INFO] ------------------------------------------------------------------------
+[INFO] Building openam-post-auth-sample 1.0.0-SNAPSHOT
+[INFO] ------------------------------------------------------------------------
+
+...
+
+[INFO]
+[INFO] --- maven-jar-plugin:2.3.1:jar (default-jar) @ openam-post-auth-sample --
+[INFO] Building jar: .../target/openam-post-auth-sample-1.0.0-SNAPSHOT.jar
+
+...
+
+[INFO] ------------------------------------------------------------------------
+[INFO] BUILD SUCCESS
+[INFO] ------------------------------------------------------------------------
+[INFO] Total time: 6.727s
+[INFO] Finished at: Mon Nov 25 17:07:23 CET 2013
+[INFO] Final Memory: 20M/227M
+[INFO] ------------------------------------------------------------------------</screen>
   
-  <para>Put the sample plugin in
-  <filename>src/com/forgerock/openam/examples/SamplePAP.java</filename>,
-  and compile the class.</para>
+  <para>
+   Copy the .jar to the <filename>WEB-INF/lib</filename> directory
+   where you deployed OpenAM.
+  </para>
   
-  <screen>$ cd src
-$ mkdir ../classes
-$ javac
- -d ../classes
- -classpath /path/to/tomcat/webapps/openam/WEB-INF/lib/<?eval ${coreLibrary}?>:
- /path/to/tomcat/webapps/openam/WEB-INF/lib/<?eval ${sharedLibrary}?>:
- /path/to/tomcat/lib/servlet-api.jar
- com/forgerock/openam/examples/SamplePAP.java</screen>
+  <screen>$ cp target/*.jar /path/to/tomcat/webapps/openam/WEB-INF/lib/</screen>
   
-  <para>Copy the classes to the <filename>WEB-INF/classes</filename> directory
-  where you deployed OpenAM.</para>
-  
-  <screen>$ cp -r ../classes/* /path/to/tomcat/webapps/openam/WEB-INF/classes/</screen>
-  
-  <para>Restart OpenAM or your web container to ensure the post authentication
-  plugin class is loaded.</para>
-  
-  <screen>$ /etc/init.d/tomcat stop
-$ /etc/init.d/tomcat start
-$ tail -1 /path/to/tomcat/logs/catalina.out
-INFO: Server startup in 32070 ms</screen>
+  <para>
+   Restart OpenAM or the container in which it runs.
+  </para>
  </section>
 
  <section xml:id="configure-post-authentication-plugin">
   <title>Configuring Your Post Authentication Plugin</title>
   
-  <para>You can configure the post authentication plugin for a realm, for a
-  service (authentication chain), or for a role. Where you configure the plugin
-  depends on the scope to which the plugin should apply. Configuring the plugin
-  at the realm level as shown here, for example, ensures that OpenAM calls your
-  plugin for all authentications to the realm.</para>
+  <para>
+   You can configure the post authentication plugin for a realm,
+   for a service (authentication chain), or for a role.
+   Where you configure the plugin depends on the scope
+   to which the plugin should apply.
+   Configuring the plugin at the realm level as shown here, for example,
+   ensures that OpenAM calls your plugin for all authentications to the realm.
+  </para>
   
-  <para>In the OpenAM console, browse to Access Control &gt; <replaceable>Realm
-  Name</replaceable> &gt; Authentication &gt; All Core Settings... In the
-  Authentication Post Processing Classes list, add the sample plugin class,
-  <literal>com.forgerock.openam.examples.SamplePAP</literal>, and then click
-  Save.</para>
+  <para>
+   In OpenAM Console, browse to Access Control &gt; <replaceable>Realm
+   Name</replaceable> &gt; Authentication &gt; All Core Settings.
+   In the Authentication Post Processing Classes list,
+   add the sample plugin class,
+   <literal>com.forgerock.openam.examples.SamplePAP</literal>,
+   and then click Save.
+  </para>
   
-  <para>Alternatively, you can configure sample plugin for the realm by using
-  the <command>ssoadm</command> command.</para>
+  <para>
+   Alternatively, you can configure sample plugin for the realm
+   by using the <command>ssoadm</command> command.
+  </para>
   
   <screen>$ ssoadm
  set-svc-attrs
@@ -242,15 +267,20 @@ iPlanetAMAuthService under /realm was modified.</screen>
  <section xml:id="test-post-authentication-plugin">
   <title>Testing Your Post Authentication Plugin</title>
   
-  <para>To test the sample post authentication plugin, login successfully to
-  OpenAM in the scope where the plugin is configured. For example, if you
-  configured your plugin for the realm, <literal>/realm</literal>, specify the
-  realm in the login URL.</para>
+  <para>
+   To test the sample post authentication plugin,
+   login successfully to OpenAM in the scope where the plugin is configured.
+   For example, if you configured your plugin for the realm,
+   <literal>/realm</literal>, specify the realm in the login URL.
+  </para>
   
   <literallayout class="monospaced">http://openam.example.com:8080/openam/UI/Login?realm=realm</literallayout>
   
-  <para>Although as a user you do not notice anywhere in the user interface
-  that OpenAM calls your plugin, a policy agent or custom client code could
-  retrieve the session property your plugin added to the user session.</para>
+  <para>
+   Although as a user you do not notice anywhere in the user interface
+   that OpenAM calls your plugin,
+   a policy agent or custom client code could retrieve the session property
+   that your plugin added to the user session.
+  </para>
  </section>
 </chapter>

@@ -20,14 +20,14 @@
   !
   ! CCPL HEADER END
   !
-  !      Copyright 2012 ForgeRock AS
+  !      Copyright 2012-2013 ForgeRock AS
   !    
 -->
 <chapter xml:id='chap-oauth2-scopes'
- xmlns='http://docbook.org/ns/docbook'
- version='5.0' xml:lang='en'
+ xmlns='http://docbook.org/ns/docbook' version='5.0' xml:lang='en'
  xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance'
- xsi:schemaLocation='http://docbook.org/ns/docbook http://docbook.org/xml/5.0/xsd/docbook.xsd'
+ xsi:schemaLocation='http://docbook.org/ns/docbook
+                     http://docbook.org/xml/5.0/xsd/docbook.xsd'
  xmlns:xlink='http://www.w3.org/1999/xlink'
  xmlns:xinclude='http://www.w3.org/2001/XInclude'>
  <title>Customizing OAuth 2.0 Scope Handling</title>
@@ -35,59 +35,85 @@
   <primary>OAuth 2.0</primary>
  </indexterm>
 
- <para>RFC 6749, <link xlink:href="http://tools.ietf.org/html/rfc6749"
- xlink:show="new"><citetitle>The OAuth 2.0 Authorization Framework</citetitle></link>,
- describes access token scopes as a set of case-sensitive strings defined by
- the authorization server. Clients can request scopes, and resource owners can
- authorize them.</para>
+ <para>
+  RFC 6749, <link xlink:href="http://tools.ietf.org/html/rfc6749"
+  xlink:show="new"><citetitle>The OAuth 2.0 Authorization Framework</citetitle></link>,
+  describes access token scopes as a set of case-sensitive strings
+  defined by the authorization server.
+  Clients can request scopes, and resource owners can authorize them.
+ </para>
 
- <para>The default scopes implementation in OpenAM treats scopes as profile
- attributes for the resource owner. When a resource server or other entity uses
- the access token to get token information from OpenAM, OpenAM populates the
- scopes with profile attribute values. For example, if one of the scopes
- is <literal>mail</literal>, OpenAM sets <literal>mail</literal> to the
- resource owner's email address in the token information returned.</para>
+ <para>
+  The default scopes implementation in OpenAM treats scopes
+  as profile attributes for the resource owner.
+  When a resource server or other entity uses the access token
+  to get token information from OpenAM,
+  OpenAM populates the scopes with profile attribute values.
+  For example, if one of the scopes is <literal>mail</literal>,
+  OpenAM sets <literal>mail</literal> to the resource owner's email address
+  in the token information returned.
+ </para>
 
- <para>You can change this behavior by writing your own scopes plugin. This
- chapter shows how to write a custom OAuth 2.0 scopes plugin for use in an
- OAuth 2.0 provider (authorization server) configuration.</para>
+ <para>
+  You can change this behavior by writing your own scopes plugin.
+  This chapter shows how to write a custom OAuth 2.0 scopes plugin
+  for use in an OAuth 2.0 provider (authorization server) configuration.
+ </para>
 
  <section xml:id="design-oauth2-scopes-plugin">
   <title>Designing an OAuth 2.0 Scopes Plugin</title>
 
-  <para>A scopes plugin implements the
-  <literal>org.forgerock.openam.oauth2.provider.Scope</literal> interface. The
-  <literal>Scope</literal> interface has four methods that your plugin
-  overrides.</para>
+  <para>
+   A scopes plugin implements the
+   <literal>org.forgerock.openam.oauth2.provider.Scope</literal> interface.
+   As described in the API specification, the
+   <link xlink:href="${javadocBase}?org/forgerock/openam/oauth2/provider/Scope.html"
+   xlink:show="new"><literal>Scope</literal> interface</link> has seven methods
+   that your plugin overrides.
+  </para>
 
   <programlisting language="java"
-  >public Set&lt;String> scopeToPresentOnAuthorizationPage(
-        Set&lt;String> requestedScope,
-        Set&lt;String> availableScopes,
-        Set&lt;String> defaultScopes);
+  >/** Set values for scopes returned when token information is requested. */
+public Map evaluateScope(CoreToken token);
 
-public Set&lt;String> scopeRequestedForAccessToken(
-        Set&lt;String> requestedScope,
-        Set&lt;String> availableScopes,
-        Set&lt;String> defaultScopes);
+/** Called before the authorize end point returns a response. */
+public Map extraDataToReturnForAuthorizeEndpoint(
+        Map parameters,
+        Map tokens);
 
-public Set&lt;String> scopeRequestedForRefreshToken(
-        Set&lt;String> requestedScope,
-        Set&lt;String> availableScopes,
-        Set&lt;String> allScopes,
-        Set&lt;String> defaultScopes);
+/** Called before the access_token end point returns a response. */
+public Map extraDataToReturnForTokenEndpoint(
+        Map parameters,
+        CoreToken token);
 
-public Map&lt;String, Object> evaluateScope(AccessToken token);</programlisting>
+/** Get user profile attribute values based on the scope values in the token. */
+public Map getUserInfo(CoreToken token);
 
-  <para>The first three methods return the scopes to display when the resource
-  owner makes the authorization decision, or when an access token or refresh
-  token is granted, respectively. The fourth method,
-  <literal>evaluateScope</literal> can be used to set values for scopes
-  returned when token information is requested.</para>
+/** Called on token creation, and called when token scope is requested. */
+public Set scopeRequestedForAccessToken(
+        Set requestedScope,
+        Set availableScopes,
+        Set defaultScopes);
 
-  <para>The following example plugin sets whether <literal>read</literal> and
-  <literal>write</literal> permissions were granted.</para>
+/** Called on request to refresh an access token. */
+public Set scopeRequestedForRefreshToken(
+        Set requestedScope,
+        Set availableScopes,
+        Set allScopes,
+        Set defaultScopes);
 
+/** Called to determine the scopes to appear on the authorization page. */
+public Set scopeToPresentOnAuthorizationPage(
+        Set requestedScope,
+        Set availableScopes,
+        Set defaultScopes);</programlisting>
+
+  <para>
+   The following example plugin sets whether <literal>read</literal>
+   and <literal>write</literal> permissions were granted.
+  </para>
+
+  <!-- See also org.forgerock.openam.oauth2.provider.impl.ScopeImpl.java -->
   <programlisting language="java"
   >package org.forgerock.openam.examples;
 
@@ -96,31 +122,75 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
-import org.forgerock.openam.oauth2.model.AccessToken;
+import org.forgerock.openam.oauth2.model.CoreToken;
 import org.forgerock.openam.oauth2.provider.Scope;
 
 /**
  * Custom scope providers implement the
  * {@link org.forgerock.openam.oauth2.provider.Scope} interface.
  *
- * This custom scope implementation follows the OpenAM default scope
- * implementation for all methods except {@link #evaluateScope}.
+ * This custom scope implementation does not support OpenID Connect 1.0,
+ * and implements the default mechanisms for the three {@code scope*} methods.
  *
- * The {@code evaluateScope} method is called when a client accesses
- * the {@code /tokeninfo} endpoint to retrieve token information.
+ * This custom scope plugin instead implements simple versions
+ * of {@link #evaluateScope(org.forgerock.openam.oauth2.model.CoreToken)}
+ * and of {@link #getUserInfo(org.forgerock.openam.oauth2.model.CoreToken)}.
  *
- * In this example, the method populates scope values returned in the
+ * The {@code evaluateScope} method populates scope values returned in the
  * JSON with the token information.
+ *
+ * The {@code getUserInfo} method populates scope values and the user ID
+ * returned in the JSON.
  */
 public class CustomScope implements Scope {
+
+    private Map&lt;String,Object> mapScopes(CoreToken token) {
+        Set&lt;String> scopes = token.getScope();
+        Map&lt;String, Object> map = new HashMap&lt;String, Object>();
+        final String[] permissions = {"read", "write"};
+
+        for (String scope : permissions) {
+            if (scopes.contains(scope)) {
+                map.put(scope, true);
+            } else {
+                map.put(scope, false);
+            }
+        }
+        return map;
+    }
+
+    @Override
+    public Map&lt;String, Object> evaluateScope(CoreToken token) {
+        return mapScopes(token);
+    }
+
+    @Override
+    public Map&lt;String, String> extraDataToReturnForAuthorizeEndpoint(
+            Map parameters,
+            Map tokens) {
+        return new HashMap&lt;String, String>(); // No special handling
+    }
+
+    @Override
+    public Map&lt;String, Object> extraDataToReturnForTokenEndpoint(
+            Map parameters,
+            CoreToken token) {
+        return new HashMap&lt;String, Object>(); // No special handling
+    }
+
+    @Override
+    public Map&lt;String, Object> getUserInfo(CoreToken token) {
+        Map&lt;String, Object> response = mapScopes(token);
+        response.put("sub", token.getUserID());
+        return response;
+    }
 
     @Override
     public Set&lt;String> scopeToPresentOnAuthorizationPage(
             Set&lt;String> requestedScope,
             Set&lt;String> availableScopes,
             Set&lt;String> defaultScopes) {
-
-        if (requestedScope == null) {
+        if (requestedScope == null || requestedScope.isEmpty()) {
             return defaultScopes;
         }
 
@@ -134,8 +204,7 @@ public class CustomScope implements Scope {
             Set&lt;String> requestedScope,
             Set&lt;String> availableScopes,
             Set&lt;String> defaultScopes) {
-
-        if (requestedScope == null){
+        if (requestedScope == null || requestedScope.isEmpty()) {
             return defaultScopes;
         }
 
@@ -150,101 +219,174 @@ public class CustomScope implements Scope {
             Set&lt;String> availableScopes,
             Set&lt;String> allScopes,
             Set&lt;String> defaultScopes) {
-
-        if (requestedScope == null){
-            return defaultScopes;
+        if (requestedScope == null || requestedScope.isEmpty()) {
+            return availableScopes;
         }
 
         Set&lt;String> scopes = new HashSet&lt;String>(availableScopes);
         scopes.retainAll(requestedScope);
         return scopes;
     }
-
-    @Override
-    public Map&lt;String, Object> evaluateScope(AccessToken token) {
-        Set&lt;String> scopes = token.getScope();
-
-        Map&lt;String, Object> map = new HashMap&lt;String, Object>();
-        String[] permissions = {"read", "write"};
-
-        for (String scope : permissions) {
-            if (scopes.contains(scope)) {
-               map.put(scope, true);
-            } else {
-                map.put(scope, false);
-            }
-        }
-
-        return map;
-    }
 }</programlisting>
  </section>
 
  <section xml:id="build-oauth2-scopes-plugin">
-  <title>Building an OAuth 2.0 Scopes Plugin</title>
+  <title>Building the OAuth 2.0 Scopes Sample Plugin</title>
 
-  <para>As the plugin imports at least
-  <literal>org.forgerock.openam.oauth2.model.AccessToken</literal>
-  and <literal>org.forgerock.openam.oauth2.provider.Scope</literal>, add
-  <filename><?eval ${oauth2JarFile}?></filename> to
-  the classpath.</para>
+  <para>
+   The <link xlink:href="https://github.com/markcraig/openam-scope-sample"
+   xlink:show="new">sample scopes plugin source</link> is available online.
+   Get a local clone so that you can try the sample on your system.
+   In the sources you find the following files.
+  </para>
 
-  <para>After compiling, put it in a .jar file that you can deploy with
-  OpenAM.</para>
+  <variablelist>
+   <varlistentry>
+    <term><filename>pom.xml</filename></term>
+    <listitem>
+     <para>
+      Apache Maven project file for the module
+     </para>
 
-  <screen>$ mkdir classes
-$ javac -d classes
- -cp /path/to/.../openam/WEB-INF/lib/<?eval ${oauth2JarFile}?>
- CustomScope.java
-$ cd classes/
-$ jar cf ../CustomScope.jar</screen>
+     <para>
+      This file specifies how to build the sample OAuth 2.0 scopes plugin,
+      and also specifies its dependencies on OpenAM components.
+     </para>
+    </listitem>
+   </varlistentry>
+
+   <varlistentry>
+    <term><filename>src/main/java/org/forgerock/openam/examples/CustomScope.java</filename></term>
+    <listitem>
+     <para>
+      Core class for the sample OAuth 2.0 scopes plugin
+     </para>
+
+     <para>
+      See <xref linkend="design-oauth2-scopes-plugin" /> for a listing.
+     </para>
+    </listitem>
+   </varlistentry>
+  </variablelist>
+
+  <para>
+   Build the module using Apache Maven.
+  </para>
+
+  <screen>$ cd /path/to/openam-scope-sample
+$ mvn install
+[INFO] Scanning for projects...
+[INFO]
+[INFO] ------------------------------------------------------------------------
+[INFO] Building openam-scope-sample 1.0.0-SNAPSHOT
+[INFO] ------------------------------------------------------------------------
+
+...
+
+[INFO]
+[INFO] --- maven-jar-plugin:2.3.1:jar (default-jar) @ openam-scope-sample ---
+[INFO] Building jar: .../target/openam-scope-sample-1.0.0-SNAPSHOT.jar
+
+...
+
+[INFO] ------------------------------------------------------------------------
+[INFO] BUILD SUCCESS
+[INFO] ------------------------------------------------------------------------
+[INFO] Total time: 10.799s
+[INFO] Finished at: Mon Nov 25 13:43:37 CET 2013
+[INFO] Final Memory: 20M/162M
+[INFO] ------------------------------------------------------------------------</screen>
+
+  <para>
+   After you successfully build the module,
+   you find the .jar in the <filename>target/</filename> directory of the project.
+  </para>
  </section>
 
  <section xml:id="configure-oauth2-scopes-plugin">
   <title>Configuring OpenAM to Use the Plugin</title>
 
-  <para>After building your plugin jar file, add the file under
-  <filename>WEB-INF/lib/</filename> where you deployed OpenAM.</para>
+  <para>
+   After building your plugin .jar file, copy the .jar file
+   under <filename>WEB-INF/lib/</filename> where you deployed OpenAM.
+  </para>
 
-  <para>Restart OpenAM.</para>
+  <para>
+   Restart OpenAM or the container in which it runs.
+  </para>
 
-  <para>In OpenAM console, you can either configure a specific OAuth 2.0
-  provider to use your plugin, or configure your plugin as the default for new
-  OAuth 2.0 providers. To configure a specific OAuth 2.0 provider to use your
-  plugin, add the class name of your scopes plugin under Access Control &gt;
-  <replaceable>Realm Name</replaceable> &gt; Services &gt; <replaceable>OAuth2
-  Provider Name</replaceable> &gt; Scope Implementation Class. To configure your
-  plugin as the default for new providers, add the class name of your scopes
-  plugin under Configuration &gt; Global &gt; OAuth2 Provider &gt; Scope
-  Implementation Class.</para>
+  <para>
+   In OpenAM console, you can either
+   configure a specific OAuth 2.0 provider to use your plugin,
+   or configure your plugin as the default for new OAuth 2.0 providers.
+   In either case, you need the class name of your plugin.
+   The class name for the sample plugin is
+   <literal>org.forgerock.openam.examples.CustomScope</literal>.
+  </para>
+
+  <itemizedlist>
+   <listitem>
+    <para>
+     To configure a specific OAuth 2.0 provider to use your plugin,
+     add the class name of your scopes plugin under Access Control &gt;
+     <replaceable>Realm Name</replaceable> &gt; Services &gt; <replaceable
+     >OAuth2 Provider Name</replaceable> &gt; Scope Implementation Class.
+    </para>
+   </listitem>
+
+   <listitem>
+    <para>
+     To configure your plugin as the default for new OAuth 2.0 providers,
+     add the class name of your scopes plugin under Configuration &gt;
+     Global &gt; OAuth2 Provider &gt; Scope Implementation Class.
+    </para>
+   </listitem>
+  </itemizedlist>
  </section>
 
  <section xml:id="try-oauth2-scopes-plugin">
-  <title>Trying the Example Plugin</title>
- 
-  <para>If you build the example plugin shown above in
-  <xref linkend="design-oauth2-scopes-plugin"/>, and then create an OAuth 2.0
-  client that takes scopes <literal>read</literal> and <literal>write</literal>,
-  you can configure OpenAM to use the plugin, and then try it as shown in the
-  following example.</para>
+  <title>Trying the Sample Plugin</title>
 
-  <screen>$ curl
- -d "grant_type=client_credentials&amp;username=demo&amp;password=changeit
- &amp;client_id=myClientID&amp;client_secret=password&amp;scope=read"
- http://oauth2.example.com:8080/openam/oauth2/access_token
+  <para>
+   In order to try the sample plugin,
+   make sure you have configured an OAuth 2.0 provider to use the sample plugin.
+   Also, set up an OAuth 2.0 client of the provider
+   that takes scopes <literal>read</literal> and <literal>write</literal>.
+  </para>
+
+  <para>
+   Next try the provider as shown in the following example.
+  </para>
+
+  <screen>$ curl --request POST
+ --data "grant_type=client_credentials&amp;username=demo&amp;password=changeit
+         &amp;client_id=myClientID&amp;client_secret=password&amp;scope=read"
+ https://openam.example.com:8443/openam/oauth2/access_token
+
 {
-  "expires_in": 599,
-  "token_type": "Bearer",
-  "access_token": "84122d5e-0462-4d81-93c3-7bc58bd416b3"
+    "scope": "read",
+    "expires_in": 59,
+    "token_type": "Bearer",
+    "access_token": "0d492486-11a7-4175-b116-2fc1cbff6d78"
 }
-$ curl http://oauth2.example.com:8080/openam/oauth2/tokeninfo
- ?access_token=84122d5e-0462-4d81-93c3-7bc58bd416b3
+
+$ curl https://openam.example.com:8443/openam/oauth2/tokeninfo
+ ?access_token=0d492486-11a7-4175-b116-2fc1cbff6d78
 {
-  "write": false,
-  "read": true,
-  "token_type": "Bearer",
-  "expires_in": 539,
-  "access_token": "84122d5e-0462-4d81-93c3-7bc58bd416b3"
+    "scope": [
+        "read"
+    ],
+    "realm": "/",
+    "write": false,
+    "read": true,
+    "token_type": "Bearer",
+    "expires_in": 22,
+    "access_token": "0d492486-11a7-4175-b116-2fc1cbff6d78"
 }</screen>
+
+  <para>
+   As seen in this example, the requested scope <literal>read</literal> is
+   authorized, but the <literal>write</literal> scope has not been authorized.
+  </para>
  </section>
 </chapter>
