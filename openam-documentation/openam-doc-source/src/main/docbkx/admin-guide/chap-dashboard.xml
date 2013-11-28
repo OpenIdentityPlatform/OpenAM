@@ -24,19 +24,17 @@
   !    
 -->
 <chapter xml:id='chap-dashboard'
- xmlns='http://docbook.org/ns/docbook'
- version='5.0' xml:lang='en'
+ xmlns='http://docbook.org/ns/docbook' version='5.0' xml:lang='en'
  xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance'
- xsi:schemaLocation='http://docbook.org/ns/docbook http://docbook.org/xml/5.0/xsd/docbook.xsd'
- xmlns:xlink='http://www.w3.org/1999/xlink'
- xmlns:xinclude='http://www.w3.org/2001/XInclude'>
+ xsi:schemaLocation='http://docbook.org/ns/docbook
+                     http://docbook.org/xml/5.0/xsd/docbook.xsd'>
  <title>Configuring the Dashboard Service</title>
  
  <indexterm>
   <primary>Dashboard service</primary>
  </indexterm>
  
- <para>This chapter shows how to configure the OpenAM <firstterm>Dashboard</firstterm>.</para>
+ <para>This chapter shows how to configure the OpenAM Dashboard service.</para>
 
  <section xml:id="about-the-dashboard">
   <title>About the Dashboard Service</title>
@@ -60,7 +58,7 @@
    <para>The Dashboard service is meant to give users a single place to access their
    applications. Keep in mind that this does not limit user access, only what appears
    on the user Dashboard.</para>
- 
+
    <itemizedlist>
     <para>There are three stages to setting up the Dashboard service.</para>
     <listitem>
@@ -74,7 +72,23 @@
      This can be done manually or through a provisioning solution.</para>
     </listitem>
    </itemizedlist>
-   
+
+  <para>
+   User Dashboard pages require the XUI,
+   which can be enabled by logging in to OpenAM Console as administrator
+   and making sure that XUI is enabled
+   under Configuration > Authentication > Core > XUI Interface > Enabled.
+   OpenAM does not provide a Dashboard out of the box for the classic UI.
+  </para>
+
+  <para>
+   Once the Dashboard service is configured for a user,
+   the user can access their Dashboard after logging in through the XUI
+   under <literal>/XUI/#dashboard/</literal>.
+   For example, the full URL depending on the deployment might be
+   at <literal>https://openam.example.com:8443/openam/XUI/#dashboard/</literal>.
+  </para>
+
  </section>
  
  <section xml:id="dashboard-setup">
