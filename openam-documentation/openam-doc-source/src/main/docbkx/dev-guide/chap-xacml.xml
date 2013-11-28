@@ -27,9 +27,9 @@
  xmlns='http://docbook.org/ns/docbook'
  version='5.0' xml:lang='en'
  xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance'
- xsi:schemaLocation='http://docbook.org/ns/docbook http://docbook.org/xml/5.0/xsd/docbook.xsd'
- xmlns:xlink='http://www.w3.org/1999/xlink'
- xmlns:xinclude='http://www.w3.org/2001/XInclude'>
+ xsi:schemaLocation='http://docbook.org/ns/docbook
+                     http://docbook.org/xml/5.0/xsd/docbook.xsd'
+ xmlns:xlink='http://www.w3.org/1999/xlink'>
  <title>Requesting a XACML Policy Decision Using OpenAM Java SDK</title>
 
  <para>This chapter shows how to request a XACML policy decision with OpenAM
@@ -242,6 +242,28 @@ public class XACMLClientSample {
 
  <itemizedlist>
   <listitem>
+   <para>
+    Check <filename>resources/AMConfig.properties</filename>
+    to see which OpenAM server the SDK is configured to use.
+   </para>
+
+   <para>
+    The relevant settings from <filename>resources/AMConfig.properties</filename>
+    specify the server protocol, host, port and deployment URI.
+   </para>
+
+   <programlisting language="ini">com.iplanet.am.server.protocol=http
+com.iplanet.am.server.host=openam.example.com
+com.iplanet.am.server.port=8080
+com.iplanet.am.services.deploymentDescriptor=openam</programlisting>
+
+   <para>
+    For the purpose of this example, the XACML policy decision point (PEP)
+    and the XACML policy enforcement point (PEP) are configured on this server.
+   </para>
+  </listitem>
+
+  <listitem>
    <para>Edit <filename>resources/xacmlClientSample.properties</filename>
    and <filename>resources/policyEvaluationSample.properties</filename>
    to set up the configuration for the sample client.</para>
@@ -271,6 +293,17 @@ user.password=changeit
 service.name=iPlanetAMWebAgentService
 resource.name=http://www.example.com:80/banner.html
 action.name=GET</programlisting>
+
+   <para>
+    These settings use the default <literal>demo</literal> user as the subject,
+    who has ID <literal>id=demo,ou=user,<?eval ${defaultRootSuffix}?></literal>,
+    and password <literal>changeit</literal>.
+    If you choose a different subject, then change
+    the <literal>subject.id</literal> value
+    in <filename>resources/xacmlClientSample.properties</filename>,
+    and the <literal>user.name</literal> and <literal>user.password</literal> values
+    in <filename>resources/policyEvaluationSample.properties</filename>.
+   </para>
   </listitem>
 
   <listitem>
