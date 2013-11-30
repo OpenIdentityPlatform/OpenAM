@@ -569,7 +569,7 @@ public class EventService implements Runnable {
 
                         // Catch special error codition in
                         // LDAPSearchListener.getResponse
-                        String msg = ex.getLDAPErrorMessage();
+                        String msg = ex.getMessage();
                         if ((resultCode == LDAPException.OTHER) &&
                             (msg != null) && msg.equals("Invalid response")) {
                             // We should not try to resetError and retry
