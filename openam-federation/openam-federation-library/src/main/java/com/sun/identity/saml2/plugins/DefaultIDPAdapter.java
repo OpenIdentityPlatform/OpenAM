@@ -1,7 +1,7 @@
 /**
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright (c) 2010-2012 ForgeRock AS. All Rights Reserved.
+ * Copyright (c) 2010-2013 ForgeRock AS. All Rights Reserved.
  *
  * The contents of this file are subject to the terms
  * of the Common Development and Distribution License
@@ -27,6 +27,7 @@ package com.sun.identity.saml2.plugins;
 
 import com.sun.identity.saml2.common.SAML2Exception;
 import com.sun.identity.saml2.protocol.AuthnRequest;
+import com.sun.identity.saml2.protocol.Response;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -100,6 +101,12 @@ public class DefaultIDPAdapter implements SAML2IdentityProviderAdapter {
             HttpServletResponse response,
             String faultCode,
             String faultDetail) throws SAML2Exception {
+        // Do nothing
+    }
+
+    @Override
+    public void preSignResponse(AuthnRequest authnRequest, Response res, String hostProviderID, String realm,
+        HttpServletRequest request, Object session, String relayState) throws SAML2Exception {
         // Do nothing
     }
 }
