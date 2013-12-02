@@ -27,7 +27,7 @@
  */
 
 /*
- * Portions Copyrighted [2011] [ForgeRock AS]
+ * Portions Copyrighted 2011-2013 ForgeRock AS
  */
 package com.sun.identity.sm;
 
@@ -35,6 +35,8 @@ import com.iplanet.sso.SSOException;
 import com.iplanet.sso.SSOToken;
 import com.iplanet.ums.IUMSConstants;
 import com.sun.identity.shared.debug.Debug;
+import com.sun.identity.shared.ldap.util.DN;
+
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -143,14 +145,20 @@ class ServiceInstanceImpl {
     // ----------------------------------------------------------
     static ServiceInstanceImpl getInstance(SSOToken token, String serviceName,
             String version, String iName) throws SMSException, SSOException {
+    	//construct instance DN using default realm
+    	return getInstance(token, serviceName, version, iName, null);
+    }
+    	
+    static ServiceInstanceImpl getInstance(SSOToken token, String serviceName,
+            String version, String iName, String oName) throws SMSException, SSOException {  
         if (debug.messageEnabled()) {
             debug.message("ServiceInstanceImpl::getInstance: called: " +
                  serviceName + "(" + version + ")" + " Instance: " + iName);
-        }
-        String cName = getCacheName(serviceName, version, iName);
+        } 
+        String cName = getCacheName(serviceName, version, iName, oName);
         // Check the cache
         ServiceInstanceImpl answer = getFromCache(cName, serviceName, version,
-                iName, token);
+                iName, oName, token);
         if (answer != null) {
             // Check if the entry has to be updated
             if (!SMSEntry.cacheSMSEntries || answer.smsEntry.isDirty()) {
@@ -164,10 +172,10 @@ class ServiceInstanceImpl {
         synchronized (serviceInstances) {
             // Check cache again, in case it was added by another thread
             if ((answer = getFromCache(cName, serviceName, version, iName,
-                token)) == null) {
+                    oName, token)) == null) {
                 // Still not present in cache, create and add to cache
                 CachedSMSEntry entry = checkAndUpdatePermission(cName,
-                        serviceName, version, iName, token);
+                        serviceName, version, iName, oName, token);
                 answer = new ServiceInstanceImpl(iName, entry);
                 serviceInstances.put(cName, answer);
             }
@@ -191,14 +199,14 @@ class ServiceInstanceImpl {
         }
     }
 
-    static String getCacheName(String sName, String version, String ins) {
+    static String getCacheName(String sName, String version, String ins, String oName) {
         StringBuilder sb = new StringBuilder(100);
-        sb.append(sName).append(version).append(ins);
+        sb.append(sName).append(version).append(ins).append(oName);
         return (sb.toString().toLowerCase());
     }
 
     static ServiceInstanceImpl getFromCache(String cacheName, String sName,
-            String version, String iName, SSOToken t) throws SMSException,
+            String version, String iName, String oName, SSOToken t) throws SMSException,
             SSOException {
         ServiceInstanceImpl answer = (ServiceInstanceImpl) serviceInstances
                 .get(cacheName);
@@ -212,7 +220,7 @@ class ServiceInstanceImpl {
             Set principals = (Set) userPrincipals.get(cacheName);
             if (!principals.contains(t.getTokenID().toString())) {
                 // Check if Principal has permission to read entry
-                checkAndUpdatePermission(cacheName, sName, version, iName, t);
+                checkAndUpdatePermission(cacheName, sName, version, iName, oName, t);
             }
         }
         return (answer);
@@ -220,10 +228,14 @@ class ServiceInstanceImpl {
 
     static synchronized CachedSMSEntry checkAndUpdatePermission(
             String cacheName, String serviceName, String version, String iName,
-            SSOToken t) throws SMSException, SSOException {
+            String oName, SSOToken t) throws SMSException, SSOException {
         // Construct the DN
-        String dn = "ou=" + iName + "," + CreateServiceConfig.INSTANCES_NODE
-                + ServiceManager.getServiceNameDN(serviceName, version);
+        // OPENAM-3269
+        // commenting out since it always construct DN with default realm
+        // String dn = "ou=" + iName + "," + CreateServiceConfig.INSTANCES_NODE
+        //         + ServiceManager.getServiceNameDN(serviceName, version);
+    	
+        String dn = constructServiceInstanceDN(serviceName, version, iName, oName);
         CachedSMSEntry entry = CachedSMSEntry.getInstance(t, dn);
         if (entry.isDirty()) {
             entry.refresh();
@@ -242,6 +254,29 @@ class ServiceInstanceImpl {
         return (entry);
     }
 
+    private static String constructServiceInstanceDN(String serviceName, String version, 
+    		String instanceName, String orgName) throws SMSException {
+        StringBuilder sb = new StringBuilder(100);
+        sb.append("ou=").append(instanceName).append(SMSEntry.COMMA).append(
+        		CreateServiceConfig.INSTANCES_NODE).append("ou=").append(version)
+                .append(SMSEntry.COMMA).append("ou=").append(serviceName)
+                .append(SMSEntry.COMMA).append(SMSEntry.SERVICES_RDN).append(
+                        SMSEntry.COMMA);
+        if (orgName.isEmpty()) {
+            orgName = SMSEntry.baseDN;
+        } else if (DN.isDN(orgName)) {
+            // Do nothing
+        } else if (orgName.startsWith("/")) {
+            orgName = DNMapper.orgNameToDN(orgName);
+        } else {
+            String[] args = { orgName };
+            throw (new SMSException(IUMSConstants.UMS_BUNDLE_NAME,
+                    "sms-invalid-org-name", args));
+        }
+        sb.append(orgName);
+        return sb.toString();
+    }
+    
     private static Map serviceInstances = Collections.synchronizedMap(
         new HashMap());
 
