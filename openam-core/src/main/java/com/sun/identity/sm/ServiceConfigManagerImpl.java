@@ -160,9 +160,13 @@ class ServiceConfigManagerImpl implements SMSObjectListener {
     ServiceConfigImpl getGlobalConfig(SSOToken token, String instanceName)
             throws SMSException, SSOException {
         // Get group name
-        String groupName = ((instanceName == null) ||
-            instanceName.equals(SMSUtils.DEFAULT)) ? SMSUtils.DEFAULT
-                : getInstance(token, instanceName).getGroup();
+    	String groupName = SMSUtils.DEFAULT;
+        if ((instanceName != null) && !instanceName.equals(SMSUtils.DEFAULT)) {
+            groupName = ServiceInstanceImpl.getInstance(token, 
+            		serviceName, version,instanceName, null).getGroup();
+        }
+        
+        
         String cacheName = null;
         ServiceConfigImpl answer = null;
         // Check the cache
@@ -210,9 +214,11 @@ class ServiceConfigManagerImpl implements SMSObjectListener {
     ServiceConfigImpl getOrganizationConfig(SSOToken token, String orgName,
             String instanceName) throws SMSException, SSOException {
         // Construct the group name
-        String groupName = ((instanceName == null) ||
-            instanceName.equals(SMSUtils.DEFAULT)) ? SMSUtils.DEFAULT
-                : getInstance(token, instanceName).getGroup();
+    	String groupName = SMSUtils.DEFAULT;
+        if ((instanceName != null) && !instanceName.equals(SMSUtils.DEFAULT)) {
+            groupName = ServiceInstanceImpl.getInstance(token, 
+            		serviceName, version, instanceName, orgName).getGroup();
+        }
         String cacheName = null;
         ServiceConfigImpl answer = null;
         // Check the cache
