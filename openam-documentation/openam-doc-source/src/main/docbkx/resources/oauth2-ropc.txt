@@ -21,7 +21,7 @@
    
     CCPL HEADER END
    
-         Copyright 2012 ForgeRock AS
+         Copyright 2012-2013 ForgeRock AS
 
     To generate a sequence diagram from this file, process
     it with PlantUML, http://plantuml.sourceforge.net/sequence.html
@@ -42,6 +42,10 @@ Client->AuthzServer: Authenticate
 AuthzServer->Client: If credentials are valid, return access token
 
 Client->ResourceServer: Request resource with access token
+
+ResourceServer->AuthzServer: Request access token validation and information
+
+AuthzServer->ResourceServer: If access token is valid, respond with information
 
 ResourceServer->Client: If access token is valid, return protected resource
 @enduml

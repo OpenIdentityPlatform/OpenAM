@@ -40,7 +40,7 @@ Client->Owner: Redirect...
 
 Owner->AuthzServer: ...with client_id, scope, state, redirect_uri
 
-Owner->AuthzServer: Authenticate resource owner and\nconfirm resource access
+Owner<->AuthzServer: Authenticate resource owner and\nconfirm resource access
 
 AuthzServer->Owner: Redirect with redirect_uri, access token in URI fragment...
 
@@ -53,6 +53,10 @@ Owner->Owner: Execute script to retrieve access token
 Owner->Client: Return access token
 
 Client->ResourceServer: Request resource with access token
+
+ResourceServer->AuthzServer: Request access token validation and information
+
+AuthzServer->ResourceServer: If access token is valid, respond with information
 
 ResourceServer->Client: If access token is valid, return protected resource
 @enduml

@@ -32,7 +32,7 @@ autonumber
 
 participant "Client" as Client
 participant "Issuer" as Issuer
-participant "Authorization Server\nRelying Party" as AuthzServer
+participant "OpenAM\nAuthorization Server" as AuthzServer
 participant "Resource Server" as ResourceServer
 
 Client->Issuer: Request SAML 2.0 assertion

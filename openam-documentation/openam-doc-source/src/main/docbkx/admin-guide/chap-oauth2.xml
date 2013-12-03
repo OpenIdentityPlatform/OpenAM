@@ -79,9 +79,13 @@
    obtains their authorization in order to return access tokens to
    clients.</para>
 
-   <para>When using OpenAM as authorization server, you register clients with
-   OpenAM by using OAuth 2.0 policy agent profiles. OpenAM supports both
-   confidential and public clients.</para>
+   <para>
+    When using OpenAM as authorization server,
+    you can register clients in OpenAM Console alongside policy agent profiles
+    under the OAuth 2.0 Client tab.
+
+    OpenAM supports both confidential and public clients.
+   </para>
 
    <para>OpenAM supports the four main grants for obtaining authorization
    described in RFC 6749: the authorization code grant, the implicit grant,
@@ -250,10 +254,16 @@
     <title>OpenAM OAuth 2.0 Endpoints</title>
     <xinclude:include href="../shared/variablelist-oauth2-endpoints.xml" />
 
-    <para>For examples, see the <citetitle>Developer's Guide</citetitle> section,
-    <link xlink:href="dev-guide#rest-api-oauth2"
-    xlink:role="http://docbook.org/xlink/role/olink"><citetitle>OAuth 2.0
-    Authorization</citetitle></link>.</para>
+    <para>
+     For examples, see the <citetitle>Developer's Guide</citetitle> section,
+     <link xlink:href="dev-guide#rest-api-oauth2" xlink:show="new"
+     xlink:role="http://docbook.org/xlink/role/olink"><citetitle>OAuth 2.0
+     Authorization</citetitle></link>.
+
+     This section of the <citetitle>Developer's Guide</citetitle> also covers
+     OAuth 2.0 token administration and client administration endpoints
+     that are specific to OpenAM.
+    </para>
    </section>
   </section>
 
@@ -336,7 +346,7 @@
    >token-id</replaceable></literal>, OpenAM populates the
    <literal>mail</literal> and <literal>cn</literal> scopes with the email
    address (<literal>demo@example.com</literal>) and common name
-   (<literal>demo</literal>) from the demo user's profile. The result is a
+   (<literal>demo</literal>) from the demo user's profile. The result is
    something like the following token information response.</para>
 
    <programlisting language="javascript">{

@@ -27,19 +27,19 @@
     it with PlantUML, http://plantuml.sourceforge.net/sequence.html
 '/
 
-title OAuth 2.0 OpenAM Authorization Server and Client
+title OAuth 2.0 Authorization Server and OpenAM Client
 autonumber
 
 participant "Resource Owner\nUser-Agent" as Owner
 participant "Client\nOpenAM OAuth 2.0 Auth Module" as Client
-participant "OpenAM\nAuthorization Server" as AuthzServer
-participant "Resource Server\nProtected with Policy Agent" as ResourceServer
+participant "Authorization Server" as AuthzServer
+participant "Resource Server\nProtected with OpenAM Policy Agent" as ResourceServer
 
 Client->Owner: Redirect... 
 
 Owner->AuthzServer: ...to OpenAM OAuth 2.0 authorization server
 
-Owner->AuthzServer: Authenticate, and confirm authorization grant
+Owner<->AuthzServer: Authenticate, and confirm authorization grant
 
 AuthzServer->Owner: Redirect...
 
@@ -57,5 +57,5 @@ Client->Owner: Redirect...
 
 Owner->ResourceServer: ...with SSO token to protected resource
 
-ResourceServer->Client: Return protected resource
+ResourceServer->Client: If authorized by OpenAM (not shown), return protected resource
 @enduml
