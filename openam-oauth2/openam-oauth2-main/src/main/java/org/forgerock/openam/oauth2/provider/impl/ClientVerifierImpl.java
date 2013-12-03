@@ -86,7 +86,7 @@ public class ClientVerifierImpl implements ClientVerifier{
         String realm = OAuth2Utils.getRealm(request);
         if (request.getChallengeResponse() != null && clientId != null){
             OAuth2Utils.DEBUG.error("ClientVerifierImpl::Client (" + clientId + ") using multiple authentication methods");
-            throw OAuthProblemException.OAuthError.INVALID_CLIENT.handle(null, "Client authentication failed");
+            throw OAuthProblemException.OAuthError.INVALID_REQUEST.handle(null, "Client authentication failed");
         } else if (request.getChallengeResponse() != null) {
             try {
                 client = verify(request.getChallengeResponse(), realm);
