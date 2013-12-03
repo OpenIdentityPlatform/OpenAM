@@ -262,4 +262,34 @@
   xlink:href="http://forgerock.com/what-we-offer/open-identity-stack/opendj/"
   >OpenDJ for highly available data</link>.</para>
  </section>
+
+ <section xml:id="get-mobile-sample-apps">
+  <title>Getting Source Code for Sample Mobile Applications</title>
+
+  <para>
+   You can get source code for sample mobile applications
+   from ForgeRock's public source code repository under
+   <literal>https://svn.forgerock.org/commons/samples/mobile</literal>.
+  </para>
+
+  <para>
+   For example, if you have a Mac running OS X 10.8 or later
+   with Xcode installed, try the <link xlink:show="new"
+   xlink:href="http://commons.forgerock.org/samples/mobile/ios/openam-ios-oauth2-sample-app/"
+   >OpenAM OAuth 2.0 iOS Sample App</link>.
+  </para>
+
+  <mediaobject xml:id="figure-ios-auth2-sample-app">
+   <alt>OpenAM OAuth 2.0 iOS Sample App</alt>
+   <imageobject>
+    <imagedata fileref="images/ios-auth2-sample-app.png" format="PNG" />
+   </imageobject>
+   <textobject>
+    <para>
+     The OAuth 2.0 iOS Sample App demonstrates use of OpenAM server's standard
+     OAuth 2.0 REST API to authorize OAuth 2.0 client access.
+    </para>
+   </textobject>
+  </mediaobject>
+ </section>
 </chapter>
