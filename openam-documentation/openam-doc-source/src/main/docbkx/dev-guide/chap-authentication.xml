@@ -28,8 +28,7 @@
  version='5.0' xml:lang='en'
  xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance'
  xsi:schemaLocation='http://docbook.org/ns/docbook http://docbook.org/xml/5.0/xsd/docbook.xsd'
- xmlns:xlink='http://www.w3.org/1999/xlink'
- xmlns:xinclude='http://www.w3.org/2001/XInclude'>
+ xmlns:xlink='http://www.w3.org/1999/xlink'>
  <title>Authenticating Using OpenAM Java SDK</title>
  <indexterm>
   <primary>Authentication</primary>
@@ -42,6 +41,11 @@
  name, and password. This is the sample you ran to test installation of the
  command-line SDK samples. The class shown in this chapter is
  <literal>com.sun.identity.samples.authentication.Login</literal>.</para>
+
+ <para>Before you continue, make sure that the packages described in the
+  <link xlink:show="new" xlink:href="dev-guide#chap-jdk"
+  xlink:role="http://docbook.org/xlink/role/olink">Using the OpenAM Java SDK</link>
+  chapter are installed.</para>
  
  <orderedlist>
   <para>With OpenAM, your client application performs the following steps

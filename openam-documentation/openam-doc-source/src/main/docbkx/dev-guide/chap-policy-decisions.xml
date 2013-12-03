@@ -28,8 +28,7 @@
  version='5.0' xml:lang='en'
  xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance'
  xsi:schemaLocation='http://docbook.org/ns/docbook http://docbook.org/xml/5.0/xsd/docbook.xsd'
- xmlns:xlink='http://www.w3.org/1999/xlink'
- xmlns:xinclude='http://www.w3.org/2001/XInclude'>
+ xmlns:xlink='http://www.w3.org/1999/xlink'>
  <title>Requesting Policy Decisions Using OpenAM Java SDK</title>
  <indexterm>
   <primary>Policy</primary>
@@ -41,6 +40,11 @@
  <filename>source/samples/policy/PolicyEvaluationSample.java</filename>, which
  demonstrates making a request to OpenAM for a policy decision about access to
  a web resource.</para>
+
+ <para>Before you continue, make sure that the packages described in the
+   <link xlink:show="new" xlink:href="dev-guide#chap-jdk"
+   xlink:role="http://docbook.org/xlink/role/olink">Using the OpenAM Java SDK</link>
+   chapter are installed.</para>
 
  <para>OpenAM centralizes policy administration, policy evaluation, and policy
  decision making so that your applications do not have to do so. In many

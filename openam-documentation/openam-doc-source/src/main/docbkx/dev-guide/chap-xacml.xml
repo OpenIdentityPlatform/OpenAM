@@ -37,7 +37,13 @@
  <filename>source/samples/xacml/XACMLClientSample.java</filename>.
  The sample client relies on an OpenAM server acting as a policy decision point
  and another OpenAM server acting as a policy enforcement point.</para>
- 
+
+ <para>Before you continue, make sure that the packages described in the
+   <link xlink:show="new" xlink:href="dev-guide#chap-jdk"
+   xlink:role="http://docbook.org/xlink/role/olink">Using the OpenAM Java SDK</link>
+   chapter are installed.</para>
+
+
  <para>The sample client uses the XACML <literal>ContextFactory</literal> to
  create the XACML request. It then uses the
  <literal>XACMLRequestProcessor</literal> to get a decision as XACML
