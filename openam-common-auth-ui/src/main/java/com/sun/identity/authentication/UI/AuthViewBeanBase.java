@@ -28,6 +28,7 @@
 
 /*
  * Portions Copyrighted 2011 ForgeRock AS
+ * Portions Copyrighted 2013 Nomura Research Institute, Ltd
  */
 package com.sun.identity.authentication.UI;
 
@@ -40,8 +41,10 @@ import com.iplanet.jato.view.html.StaticTextField;
 import com.sun.identity.authentication.client.AuthClientUtils;
 import com.sun.identity.common.ISLocaleContext;
 import com.sun.identity.shared.encode.Base64;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.ResourceBundle;
+import java.util.Map;
 import java.util.Set;
 import java.util.Enumeration;
 import javax.servlet.http.HttpServletRequest;
@@ -122,33 +125,57 @@ public abstract class AuthViewBeanBase extends ViewBeanBase {
      */
     public String getEncodedQueryParams(HttpServletRequest request)
     {
+        // create a map to exclude the duplication of the SunQueryParamsString
+        Map<String, String> tmpMap = new HashMap<String, String>();
+
         String returnQueryParams = "";
         StringBuilder queryParams = new StringBuilder();
         queryParams.append("");
         Enumeration parameters = request.getParameterNames();
-        for ( ; parameters.hasMoreElements() ;) {
+        for (; parameters.hasMoreElements();) {
             boolean ignore = false;
-            String parameter = (String)parameters.nextElement();
+            String parameter = (String) parameters.nextElement();
             for (int i = 0; i < ignoreList.length; i++) {
                 if (parameter.equalsIgnoreCase(ignoreList[i])) {
                     ignore = true;
                     break;
                 }
             }
-            if  (loginDebug.messageEnabled()) {
-                loginDebug.message("getEncodedQueryParams: parameter  is:"+
-                    parameter);
+            if (loginDebug.messageEnabled()) {
+                loginDebug.message("getEncodedQueryParams: parameter is:"
+                        + parameter);
             }
-            if(!ignore) {
-                queryParams.append(parameter);
+            if (!ignore) {
                 String value = request.getParameter(parameter);
-                queryParams.append('=');
-                if  (loginDebug.messageEnabled()) {
-                    loginDebug.message("getEncodedQueryParams: parameter  "+
-                        "value:"+ value);
+                if ("SunQueryParamsString".equalsIgnoreCase(parameter)) {
+                    try {
+                        value = new String(Base64.decode(value), "UTF-8");
+                        String[] splitParams = value.split("&");
+                        for (String param: splitParams) {
+                            String[] keyAndValue = param.split("=", 0);
+                            tmpMap.put(keyAndValue[0], keyAndValue[1]);
+                        }
+                    } catch (Exception e) {
+                        loginDebug.message("getEncodedQueryParams: "
+                                + "failed to decode SunQueryParamsString. ", e);
+                    }
+                } else {
+                    tmpMap.put(parameter, value);
                 }
-                queryParams.append(value);
-                if (parameters.hasMoreElements()) {
+            }
+        }
+        if (!tmpMap.isEmpty()) {
+            int cnt = 0;
+            for (Map.Entry<String, String> entrySet : tmpMap.entrySet()) {
+                cnt++;
+                queryParams.append(entrySet.getKey());
+                queryParams.append('=');
+                if (loginDebug.messageEnabled()) {
+                    loginDebug.message("getEncodedQueryParams: parameter "
+                            + "value:" + entrySet.getValue());
+                }
+                queryParams.append(entrySet.getValue());
+                if (tmpMap.size() > cnt) {
                     queryParams.append('&');
                 }
             }
