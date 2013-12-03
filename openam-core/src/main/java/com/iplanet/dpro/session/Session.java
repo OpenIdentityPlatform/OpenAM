@@ -574,7 +574,6 @@ public class Session extends GeneralTaskRunnable {
         }
 
         session.cancel();
-        session.setState(Session.DESTROYED);
         sessionTable.remove(session.getID());
     }
     
