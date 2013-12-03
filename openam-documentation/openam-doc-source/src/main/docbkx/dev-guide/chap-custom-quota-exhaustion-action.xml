@@ -225,9 +225,21 @@ $ mvn install
 Choice Values were set.</screen>
 
   <para>
-   Add the following line to
-   <filename>WEB-INF/classes/amSession.properties</filename>
-   where OpenAM is deployed.
+   Extract <filename>amSession.properties</filename>
+   and if necessary the localized versions of this file
+   from <filename>${coreLibrary}</filename>
+   to <filename>WEB-INF/classes/</filename> where OpenAM is deployed.
+   For example, if OpenAM is deployed under
+   <filename>/path/to/tomcat/webapps/openam</filename>,
+   then you could run the following commands.
+  </para>
+
+  <screen>$ cd /path/to/tomcat/webapps/openam/WEB-INF/classes/
+$ jar -xvf ../lib/${coreLibrary} amSession.properties
+ inflated: amSession.properties</screen>
+
+  <para>
+   Add the following line to <filename>amSession.properties</filename>.
   </para>
 
   <programlisting language="ini">myKey=Randomly Destroy Session</programlisting>

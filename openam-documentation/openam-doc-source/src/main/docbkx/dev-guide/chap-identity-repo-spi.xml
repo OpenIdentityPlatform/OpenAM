@@ -299,14 +299,18 @@ public void setActiveStatus(
  <section xml:id="idrepo-plugin-deployment">
   <title>Identity Repository Plugin Deployment</title>
 
-  <para>Your IdRepo plugin must link to <filename><?eval ${coreLibrary}?></filename>,
-  which when you deploy OpenAM is
-  <filename><replaceable>war-file-name</replaceable>/WEB-INF/lib/<?eval ${coreLibrary}?></filename>.</para>
+  <para>
+   When you build your IdRepo plugin,
+   include <filename>${coreLibrary}</filename> in the classpath.
+   This file is found under <filename>WEB-INF/lib/</filename>
+   where OpenAM is deployed.
+  </para>
   
-  <para>You can either package your plugin as a .jar, and then add it to
-  <filename><replaceable>war-file-name</replaceable>/WEB-INF/lib/</filename>,
-  or add the classes under
-  <filename><replaceable>war-file-name</replaceable>/WEB-INF/classes/</filename>.</para>
+  <para>
+   You can either package your plugin as a .jar,
+   and then add it to <filename>WEB-INF/lib/</filename>,
+   or add the classes under <filename>WEB-INF/classes/</filename>.
+  </para>
   
   <para>To register your plugin with OpenAM, you add a
   <literal>SubSchema</literal> to the
@@ -341,16 +345,33 @@ public void setActiveStatus(
   
   <para>Also include the <literal>AttributeSchema</literal> required to
   configure your IdRepo plugin.</para>
-  
-  <para>Notice the <literal>i18nKey</literal> attributes on
-  <literal>SubSchema</literal> elements. The <literal>i18nKey</literal>
-  attribute values correspond to properties in the
-  <filename>amIdRepoService.properties</filename> file, stored under
-  <filename><replaceable>war-file-name</replaceable>/WEB-INF/classes/</filename>.
-  OpenAM console displays the label for the configuration user interface that
-  it retrieves from the value of the <literal>i18nKey</literal> property in the
-  <filename>amIdRepoService.properties</filename> file.</para>
-  
+
+  <para>
+   Notice the <literal>i18nKey</literal> attributes
+   on <literal>SubSchema</literal> elements.
+   The <literal>i18nKey</literal> attribute values correspond to properties in
+   the <filename>amIdRepoService.properties</filename> file
+   under <filename>WEB-INF/classes/</filename> where OpenAM is deployed.
+   OpenAM console displays the label for the configuration user interface
+   that it retrieves from the value of the <literal>i18nKey</literal> property
+   in the <filename>amIdRepoService.properties</filename> file.
+  </para>
+
+  <para>
+   To make changes to the properties,
+   first extract <filename>amIdRepoService.properties</filename>
+   and if necessary the localized versions of this file
+   from <filename>${coreLibrary}</filename>
+   to <filename>WEB-INF/classes/</filename> where OpenAM is deployed.
+   For example, if OpenAM is deployed under
+   <filename>/path/to/tomcat/webapps/openam</filename>,
+   then you could run the following commands.
+  </para>
+
+  <screen>$ cd /path/to/tomcat/webapps/openam/WEB-INF/classes/
+$ jar -xvf ../lib/${coreLibrary} amIdRepoService.properties
+ inflated: amIdRepoService.properties</screen>
+
   <para>Register your plugin using the <command>ssoadm</command> command after
   copy the files into place.</para>
   

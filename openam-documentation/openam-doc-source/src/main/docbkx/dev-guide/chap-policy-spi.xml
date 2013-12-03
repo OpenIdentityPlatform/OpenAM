@@ -182,13 +182,30 @@ $ mvn install
   </para>
 
   <para>
-   In <filename>WEB-INF/classes/amPolicy.properties</filename> add this property:
+   Extract <filename>amPolicy.properties</filename>,
+   <filename>amPolicyConfig.properties</filename>,
+   and if necessary the localized versions of this file
+   from <filename>${coreLibrary}</filename>
+   to <filename>WEB-INF/classes/</filename> where OpenAM is deployed.
+   For example, if OpenAM is deployed under
+   <filename>/path/to/tomcat/webapps/openam</filename>,
+   then you could run the following commands.
+  </para>
+
+  <screen>$ cd /path/to/tomcat/webapps/openam/WEB-INF/classes/
+$ jar -xvf ../lib/${coreLibrary} amPolicy.properties \
+ amPolicyConfig.properties
+ inflated: amPolicyConfig.properties
+ inflated: amPolicy.properties</screen>
+
+  <para>
+   In <filename>amPolicy.properties</filename> add this property:
   </para>
   
   <literallayout class="monospaced">samplecondition-policy-name=Sample Condition</literallayout>
  
   <para>
-   In <filename>WEB-INF/classes/amPolicyConfig.properties</filename> add this property:</para>
+   In <filename>amPolicyConfig.properties</filename> add this property:</para>
   
   <literallayout class="monospaced">x100=Sample Condition</literallayout>
   
