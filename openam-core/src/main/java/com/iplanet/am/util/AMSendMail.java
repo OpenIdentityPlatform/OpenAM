@@ -26,7 +26,7 @@
  *
  */
 /**
- * Portions Copyrighted [2011] [ForgeRock AS]
+ * Portions Copyrighted 2011-2013 ForgeRock AS
  */
 package com.iplanet.am.util;
 
@@ -153,19 +153,23 @@ public class AMSendMail {
         Properties moduleProps = new Properties();
 
         moduleProps.put("mail.smtp.host", host);
-        moduleProps.put("mail.smtp.auth", "true");
         moduleProps.put("mail.debug", "true");
         moduleProps.put("mail.smtp.port", port);
         moduleProps.put("mail.smtp.socketFactory.port", port);
-        if (ssl == true) {
+        if (ssl) {
             moduleProps.put("mail.smtp.socketFactory.class",
                     "javax.net.ssl.SSLSocketFactory");
         }
         moduleProps.put("mail.smtp.socketFactory.fallback", "false");
 
-           // create some properties and get the default mail Session
-        Session session = Session.getInstance(moduleProps,
-                new AMUserNamePasswordAuthenticator(user, password));
+        Session session;
+        // create some properties and get the mail Session
+        if (user == null) {
+            session = Session.getInstance(moduleProps);
+        } else {
+            moduleProps.put("mail.smtp.auth", "true");
+            session = Session.getInstance(moduleProps, new AMUserNamePasswordAuthenticator(user, password));
+        }
 
         session.setDebug(debug);
 

@@ -26,7 +26,7 @@
  *
  */
 /**
- * Portions Copyrighted 2011 ForgeRock AS
+ * Portions Copyrighted 2011-2013 ForgeRock AS
  */
 package com.sun.identity.authentication.modules.hotp;
 
@@ -78,9 +78,7 @@ public class DefaultSMSGatewayImpl implements SMSGateway {
             tos[0] = to;
             AMSendMail sendMail = new AMSendMail();
 
-            if (smtpHostName == null || smtpHostPort == null ||
-                    smtpUserName == null || smtpUserPassword == null ||
-                    smtpSSLEnabled == null) {
+            if (smtpHostName == null || smtpHostPort == null) {
                 sendMail.postMail(tos, subject, msg, from);
             } else {
                 sendMail.postMail(tos, subject, msg, from, "UTF-8", smtpHostName,
