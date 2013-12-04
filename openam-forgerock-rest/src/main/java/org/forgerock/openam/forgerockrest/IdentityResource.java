@@ -790,23 +790,33 @@ public final class IdentityResource implements CollectionResourceProvider {
         admin.setId(getCookieFromServerContext(context));
 
         final JsonValue jVal = request.getContent();
-        //createInstance(admin, jVal, handler);
         IdentityDetails dtls, identity;
         Resource resource;
         IdentityServicesImpl idsvc;
-        String resourceId = null;
+        String resourceId = request.getNewResourceId();
 
         try {
             idsvc = new IdentityServicesImpl();
             identity = jsonValueToIdentityDetails(jVal);
-            resourceId = identity.getName();
+            // check to see if request has included resource ID
+            if(resourceId != null ){
+                if(identity.getName() != null){
+                    if(!resourceId.equalsIgnoreCase(identity.getName())){
+                        throw new BadRequestException("id in path does not match id in request body");
+                    }
+                }
+                identity.setName(resourceId);
+            } else {
+                resourceId = identity.getName();
+            }
+
 
             // Create the resource
             CreateResponse success = idsvc.create(identity, admin);
             // Read created resource
-            dtls = idsvc.read(identity.getName(), idSvcsAttrList, admin);
+            dtls = idsvc.read(resourceId, idSvcsAttrList, admin);
 
-            resource = new Resource(identity.getName(), "0", identityDetailsToJsonValue(dtls));
+            resource = new Resource(resourceId, "0", identityDetailsToJsonValue(dtls));
             handler.handleResult(resource);
         } catch (final ObjectNotFound notFound) {
             RestDispatcher.debug.error("IdentityResource.createInstance() :: Cannot READ " +
@@ -824,6 +834,10 @@ public final class IdentityResource implements CollectionResourceProvider {
             RestDispatcher.debug.error("IdentityResource.createInstance() :: Cannot CREATE " +
                     needMoreCredentials);
             handler.handleError(new ForbiddenException("Token is not authorized", needMoreCredentials));
+        } catch(BadRequestException be) {
+            RestDispatcher.debug.error("IdentityResource.createInstance() :: Cannot CREATE " +
+                    be);
+            handler.handleError(be);
         } catch (final Exception exception) {
             RestDispatcher.debug.error("IdentityResource.createInstance() :: Cannot CREATE! " +
                     exception);
