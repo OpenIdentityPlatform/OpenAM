@@ -879,7 +879,7 @@ public class IDPSSOUtil {
                     (SAML2Utils.isSAML2FailOverEnabled())) {
                 // Read from DataBase
                 IDPSessionCopy idpSessionCopy = (IDPSessionCopy)
-                    SAML2Repository.getInstance().retrieve(sessionIndex);
+                    SAML2RepositoryFactory.getInstance().retrieveSAML2Token(sessionIndex);
                 // Copy back to IDPSession
                 if (idpSessionCopy != null) {
                     idpSession = new IDPSession(idpSessionCopy);
