@@ -878,8 +878,13 @@ public class IDPSSOUtil {
             if ((idpSession == null) &&
                     (SAML2Utils.isSAML2FailOverEnabled())) {
                 // Read from DataBase
-                IDPSessionCopy idpSessionCopy = (IDPSessionCopy)
-                    SAML2RepositoryFactory.getInstance().retrieveSAML2Token(sessionIndex);
+                IDPSessionCopy idpSessionCopy = null;
+                try {
+                    idpSessionCopy = (IDPSessionCopy)
+                            SAML2RepositoryFactory.getInstance().retrieveSAML2Token(sessionIndex);
+                } catch (StoreException se) {
+                    SAML2Utils.debug.error("Unable to obtain the IDPSessionCopy from the CTS Repository: " + se.getMessage(), se);
+                }
                 // Copy back to IDPSession
                 if (idpSessionCopy != null) {
                     idpSession = new IDPSession(idpSessionCopy);
