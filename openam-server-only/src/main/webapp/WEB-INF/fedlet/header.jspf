@@ -26,14 +26,19 @@
 
    $Id: header.jspf,v 1.1 2009/06/09 20:28:30 exu Exp $
 
---><%@ page import="com.sun.identity.saml2.common.SAML2Utils,
+-->
+<%--
+   Portions Copyrighted 2013 ForgeRock AS
+--%>
+<%@ page import="com.sun.identity.saml2.common.SAML2Utils,
 com.sun.identity.saml2.jaxb.metadata.AssertionConsumerServiceElement,
 com.sun.identity.saml2.jaxb.metadata.IDPSSODescriptorElement,
 com.sun.identity.saml2.jaxb.metadata.SPSSODescriptorElement,
 com.sun.identity.saml2.jaxb.metadata.SingleSignOnServiceElement,
 com.sun.identity.saml2.meta.SAML2MetaManager,
-java.util.List,
-java.util.Iterator"
+java.util.HashMap,
+java.util.Iterator,
+java.util.List"
 %><%!
     public Map getIDPBaseUrlAndMetaAlias(String idpEntityID, String deployuri)
     {
