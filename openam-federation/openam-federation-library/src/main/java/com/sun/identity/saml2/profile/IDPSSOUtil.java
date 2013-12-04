@@ -28,6 +28,7 @@
 
 /*
  * Portions Copyrighted 2010-2013 ForgeRock AS
+ * Portions Copyrighted 2013 Nomura Research Institute, Ltd
  */
 
 package com.sun.identity.saml2.profile;
@@ -822,85 +823,86 @@ public class IDPSSOUtil {
         List statementList = new ArrayList();
 
         NewBoolean isNewSessionIndex = new NewBoolean();
-        AuthnStatement authnStatement = getAuthnStatement(
+        AuthnStatement authnStatement = null;
+        IDPSession idpSession = null;
+        String sessionIndex = null;
+        String sessionID = sessionProvider.getSessionID(session);
+        synchronized (sessionID) {
+            authnStatement = getAuthnStatement(
                 session, isNewSessionIndex, authnReq, idpEntityID, realm,
                 matchingAuthnContext);
-        if (authnStatement == null) {
-            return null;
-        }
+            if (authnStatement == null) {
+                return null;
+            }
 
-        String sessionIndex = authnStatement.getSessionIndex();
-        IDPSession idpSession = null;
-        if (isNewSessionIndex.getValue()) {
-            if (SAML2Utils.debug.messageEnabled()) {
-                SAML2Utils.debug.message(classMethod +
+            sessionIndex = authnStatement.getSessionIndex();
+            if (isNewSessionIndex.getValue()) {
+                if (SAML2Utils.debug.messageEnabled()) {
+                    SAML2Utils.debug.message(classMethod +
                         "This is a new IDP session with sessionIndex=" +
                         sessionIndex + ", and sessionID=" +
-                        sessionProvider.getSessionID(session));
-            }
-            idpSession = (IDPSession) IDPCache.idpSessionsBySessionID.
+                        sessionID);
+                }
+                idpSession = (IDPSession) IDPCache.idpSessionsBySessionID.
                     get(sessionProvider.getSessionID(session));
-            if (idpSession == null) {
-                idpSession = new IDPSession(session);
+                if (idpSession == null) {
+                    idpSession = new IDPSession(session);
+                }
+                // Set the metaAlias in the IDP session object
+                idpSession.setMetaAlias(idpMetaAlias);
+
+                IDPCache.idpSessionsByIndices.put(sessionIndex, idpSession);
+
+                if ((agent != null) && agent.isRunning() && (saml2Svc != null)) {
+                    saml2Svc.setIdpSessionCount(
+    		    (long)IDPCache.idpSessionsByIndices.size());
+                }
+            } else {
+                idpSession = (IDPSession)IDPCache.idpSessionsByIndices.
+                                                  get(sessionIndex);
             }
-            // Set the metaAlias in the IDP session object
-            idpSession.setMetaAlias(idpMetaAlias);
-
-            IDPCache.idpSessionsByIndices.put(sessionIndex, idpSession);
-
-            if ((agent != null) && agent.isRunning() && (saml2Svc != null)) {
-                saml2Svc.setIdpSessionCount(
-                        (long) IDPCache.idpSessionsByIndices.size());
-            }
-
+		}
+		if (isNewSessionIndex.getValue()) {
             if (SAML2Utils.debug.messageEnabled()) {
                 SAML2Utils.debug.message(classMethod +
-                        "a new IDP session has been saved in cache, " +
-                        "with sessionIndex=" + sessionIndex);
+                    "a new IDP session has been saved in cache, " +
+                    "with sessionIndex=" + sessionIndex);
             }
             try {
                 sessionProvider.addListener(session, sessionListener);
             } catch (SessionException e) {
                 SAML2Utils.debug.error(classMethod +
-                        "Unable to add session listener.");
+                    "Unable to add session listener.");
             }
-        } else {
-            idpSession = (IDPSession) IDPCache.idpSessionsByIndices.
-                    get(sessionIndex);
+		} else {
             if ((idpSession == null) &&
                     (SAML2Utils.isSAML2FailOverEnabled())) {
                 // Read from DataBase
-                IDPSessionCopy idpSessionCopy = null;
-                try {
-                    idpSessionCopy = (IDPSessionCopy)
-                            SAML2RepositoryFactory.getInstance().retrieveSAML2Token(sessionIndex);
-                } catch (StoreException se) {
-                    SAML2Utils.debug.error("Unable to obtain the IDPSessionCopy from the CTS Repository: " + se.getMessage(), se);
-                }
+                IDPSessionCopy idpSessionCopy = (IDPSessionCopy)
+                    SAML2Repository.getInstance().retrieve(sessionIndex);
                 // Copy back to IDPSession
                 if (idpSessionCopy != null) {
                     idpSession = new IDPSession(idpSessionCopy);
                 } else {
                     SAML2Utils.debug.error("IDPSessionCopy is null");
                     throw new SAML2Exception(
-                            SAML2Utils.bundle.getString("IDPSessionIsNULL"));
+                        SAML2Utils.bundle.getString("IDPSessionIsNULL"));
                 }
             } else if ((idpSession == null) &&
                     (!SAML2Utils.isSAML2FailOverEnabled())) {
                 SAML2Utils.debug.error("IDPSession is null; SAML2 failover" +
                         "is disabled");
                 throw new SAML2Exception(
-                        SAML2Utils.bundle.getString("IDPSessionIsNULL"));
+                   SAML2Utils.bundle.getString("IDPSessionIsNULL"));
             } else {
                 if (SAML2Utils.debug.messageEnabled()) {
                     SAML2Utils.debug.message(classMethod +
-                            "This is an existing IDP session with sessionIndex="
-                            + sessionIndex + ", and sessionID=" +
-                            sessionProvider.getSessionID(idpSession.getSession()));
+                        "This is an existing IDP session with sessionIndex="
+                        + sessionIndex + ", and sessionID=" +
+                        sessionProvider.getSessionID(idpSession.getSession()));
                 }
             }
         }
-
         statementList.add(authnStatement);
 
         AttributeStatement attrStatement = getAttributeStatement(
