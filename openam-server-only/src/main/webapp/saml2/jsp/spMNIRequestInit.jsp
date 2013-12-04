@@ -111,7 +111,7 @@
         }
 
         String relayState = request.getParameter(SAML2Constants.RELAY_STATE);
-        if (!ESAPI.validator().isValidInput("HTTP Parameter Value: " + relayState, relayState, "URL", 2000, true)) {
+        if (!ESAPI.validator().isValidInput("HTTP Query String: " + relayState, relayState, "HTTPQueryString", 2000, true)) {
             relayState = null;
         }
         
@@ -151,7 +151,8 @@
 
         if (binding.equalsIgnoreCase(SAML2Constants.SOAP)) {
             if (relayState != null && !relayState.isEmpty() &&
-                    SAML2Utils.isRelayStateURLValid(request, relayState, SAML2Constants.SP_ROLE)) {
+                    SAML2Utils.isRelayStateURLValid(request, relayState, SAML2Constants.SP_ROLE) &&
+                    ESAPI.validator().isValidInput("HTTP URL Value: " + relayState, relayState, "URL", 2000, true)) {
                 response.sendRedirect(relayState);
             } else {
                 %>

@@ -76,6 +76,9 @@
             relayState = tmpRs;
         }
     }
+    if (!ESAPI.validator().isValidInput("HTTP Query String: " + relayState, relayState, "HTTPQueryString", 2000, true)) {
+        relayState = null;
+    }
     String samlResponse = request.getParameter(SAML2Constants.SAML_RESPONSE);
     if (samlResponse != null) {
         boolean doRelayState = true;
@@ -114,7 +117,8 @@
         }
 
         if (!doRelayState) {
-            if (relayState != null && SAML2Utils.isRelayStateURLValid(request, relayState, SAML2Constants.IDP_ROLE)) {
+            if (relayState != null && SAML2Utils.isRelayStateURLValid(request, relayState, SAML2Constants.IDP_ROLE) &&
+                ESAPI.validator().isValidInput("HTTP URL Value: " + relayState, relayState, "URL", 2000, true)) {
                 if (relayState.indexOf("?") != -1) {
                     response.sendRedirect(relayState 
                         + "&logoutStatus=logoutSuccess");

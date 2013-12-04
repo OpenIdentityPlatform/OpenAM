@@ -82,14 +82,14 @@
 
     try {
         String RelayState = request.getParameter(SAML2Constants.RELAY_STATE);
-        if (!ESAPI.validator().isValidInput("HTTP URL: " + RelayState,
-            RelayState, "HTTPURL", 2000, true)){
+        if (!ESAPI.validator().isValidInput("HTTP Query String: " + RelayState,
+            RelayState, "HTTPQueryString", 2000, true)){
                 RelayState = null;
         }
         if (RelayState == null || RelayState.isEmpty()) {
             RelayState = request.getParameter(SAML2Constants.GOTO);
         }
-        if (!ESAPI.validator().isValidInput("RelayState", RelayState, "HTTPURI", 1024, true)) {
+        if (!ESAPI.validator().isValidInput("HTTP Query String: " + RelayState, RelayState, "HTTPQueryString", 1024, true)) {
             RelayState = null;
         }
 
@@ -112,7 +112,8 @@
                 //There is no local session, so we can't perform the logout on the IdP,
                 //let's just return with HTTP 200
                 if (RelayState != null && !RelayState.isEmpty() &&
-                                    SAML2Utils.isRelayStateURLValid(request, RelayState, SAML2Constants.SP_ROLE)) {
+                    SAML2Utils.isRelayStateURLValid(request, RelayState, SAML2Constants.SP_ROLE) &&
+                    ESAPI.validator().isValidInput("HTTP URL Parameter: " + RelayState, RelayState, "URL", 2000, true)) {
                     response.sendRedirect(RelayState);
                 } else {
                     %>
@@ -152,7 +153,8 @@
                     SAML2Utils.debug.message("No session.");
                 }
             }
-            if (RelayState != null && SAML2Utils.isRelayStateURLValid(request, RelayState, SAML2Constants.SP_ROLE)) {
+            if (RelayState != null && SAML2Utils.isRelayStateURLValid(request, RelayState, SAML2Constants.SP_ROLE) &&
+                ESAPI.validator().isValidInput("HTTP URL Parameter: " + RelayState, RelayState, "URL", 2000, true)) {
                 response.sendRedirect(RelayState);
             } else {
                 %>
@@ -257,7 +259,8 @@
         
         if (binding.equalsIgnoreCase(SAML2Constants.SOAP)) {
             if (RelayState != null && !RelayState.isEmpty() &&
-                                SAML2Utils.isRelayStateURLValid(request, RelayState, SAML2Constants.SP_ROLE)) {
+                SAML2Utils.isRelayStateURLValid(request, RelayState, SAML2Constants.SP_ROLE) &&
+                ESAPI.validator().isValidInput("HTTP URL: " + RelayState, RelayState, "URL", 2000, true)) {
                 response.sendRedirect(RelayState);
             } else {
                 %>

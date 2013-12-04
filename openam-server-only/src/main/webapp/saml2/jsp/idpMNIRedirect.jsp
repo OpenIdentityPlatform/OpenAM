@@ -68,7 +68,7 @@
                                               request, response, paramsMap);
             if (success == true) {
                 String relayState = request.getParameter(SAML2Constants.RELAY_STATE);
-                if (!ESAPI.validator().isValidInput("HTTP Parameter Value: " + relayState, relayState, "URL", 2000, true)) {
+                if (!ESAPI.validator().isValidInput("HTTP URL: " + relayState, relayState, "URL", 2000, true)) {
                     relayState = null;
                 }
                 if (relayState != null && SAML2Utils.isRelayStateURLValid(request, relayState, SAML2Constants.IDP_ROLE)) {
