@@ -27,7 +27,7 @@
  */
 
 /*
- * Portions Copyrighted 2012 ForgeRock Inc
+ * Portions Copyrighted 2012-2013 ForgeRock AS
  */
 
 package com.sun.identity.sm;
@@ -1127,17 +1127,20 @@ public class ServiceManager {
                             encValue = (String)AccessController.doPrivileged(
                                 new EncodeAction(value));
                         } else {
-                            encValue = (String)AccessController.doPrivileged(
-                                new DecodeAction(value));
-                            
-                            try {
-                                //this is catch the whitespace for password
-                                byte[] b = encValue.getBytes("ISO-8859-1");
-                                if ((b.length == 1) && (b[0] == -96)) {
-                                    encValue = "&amp;#160;";
+                            encValue = AccessController.doPrivileged(new DecodeAction(value));
+
+                            if (encValue == null) {
+                                encValue = "&amp;#160;";
+                            } else {
+                                try {
+                                    //this is catch the whitespace for password
+                                    byte[] b = encValue.getBytes("ISO-8859-1");
+                                    if ((b.length == 1) && (b[0] == -96)) {
+                                        encValue = "&amp;#160;";
+                                    }
+                                } catch (UnsupportedEncodingException e) {
+                                    //ignore
                                 }
-                            } catch (UnsupportedEncodingException e) {
-                                //ignore
                             }
                             if (encryptObj != null) {
                                 encValue = (String)AccessController
