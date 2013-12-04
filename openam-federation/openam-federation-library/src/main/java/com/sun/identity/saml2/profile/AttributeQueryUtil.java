@@ -27,7 +27,7 @@
  */
 
 /*
- * Portions copyright 2010-2013 ForgeRock, Inc.
+ * Portions copyright 2010-2013 ForgeRock AS
  */
 
 package com.sun.identity.saml2.profile;
@@ -42,7 +42,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.security.PrivateKey;
-import java.security.PublicKey;
 import java.security.cert.X509Certificate;
 import javax.crypto.SecretKey;
 import javax.servlet.http.HttpServletRequest;
@@ -53,8 +52,6 @@ import org.w3c.dom.Element;
 
 import com.sun.identity.plugin.datastore.DataStoreProviderException;
 import com.sun.identity.plugin.datastore.DataStoreProvider;
-import com.sun.identity.plugin.session.SessionException;
-import com.sun.identity.plugin.session.SessionManager;
 import com.sun.identity.saml.xmlsig.KeyProvider;
 import com.sun.identity.saml2.assertion.Assertion;
 import com.sun.identity.saml2.assertion.AssertionFactory;
@@ -66,7 +63,6 @@ import com.sun.identity.saml2.assertion.Issuer;
 import com.sun.identity.saml2.assertion.NameID;
 import com.sun.identity.saml2.assertion.EncryptedID;
 import com.sun.identity.saml2.assertion.Subject;
-import com.sun.identity.saml2.common.AccountUtils;
 import com.sun.identity.saml2.common.SAML2Constants;
 import com.sun.identity.saml2.common.SAML2Exception;
 import com.sun.identity.saml2.common.SAML2Utils;
@@ -77,8 +73,6 @@ import com.sun.identity.saml2.jaxb.entityconfig.AttributeQueryConfigElement;
 import com.sun.identity.saml2.jaxb.entityconfig.IDPSSOConfigElement;
 import com.sun.identity.saml2.jaxb.metadata.AttributeAuthorityDescriptorElement;
 import com.sun.identity.saml2.jaxb.metadata.AttributeServiceElement;
-import com.sun.identity.saml2.jaxb.metadata.IDPSSODescriptorElement;
-import com.sun.identity.saml2.jaxb.metadata.NameIDMappingServiceElement;
 import com.sun.identity.saml2.jaxb.metadataextquery.AttributeQueryDescriptorElement;
 import com.sun.identity.saml2.key.EncInfo;
 import com.sun.identity.saml2.key.KeyUtil;
@@ -1104,7 +1098,21 @@ public class AttributeQueryUtil {
         Element respElem = SAML2Utils.getSamlpElement(resMsg, "Response");
         Response response =
             ProtocolFactory.getInstance().createResponse(respElem);
-        
+
+        Status status = response.getStatus();
+        if (!SAML2Constants.SUCCESS.equals(status.getStatusCode().getValue())) {
+            String message = status.getStatusMessage() == null ? "" : status.getStatusMessage();
+            String detail = status.getStatusDetail() == null ? "" : status.getStatusDetail().toXMLString();
+
+            SAML2Utils.debug.error(
+                "AttributeQueryUtil.sendAttributeQuerySOAP: " +
+                "Non-Success status " + status.getStatusCode().getValue() +
+                    ", message: " + message + ", detail: " + detail);
+
+            Object[] args = { status.getStatusCode().getValue(), message, detail };
+            throw new SAML2Exception(SAML2Utils.BUNDLE_NAME, "failureStatusAttributeQuery", args);
+        }
+
         if (SAML2Utils.debug.messageEnabled()) {
             SAML2Utils.debug.message(
                 "AttributeQueryUtil.sendAttributeQuerySOAP: " +
