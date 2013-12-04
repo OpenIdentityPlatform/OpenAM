@@ -872,7 +872,7 @@
             <dependency>
                 <groupId>external</groupId>
                 <artifactId>esapiport</artifactId>
-                <version>2009-26-07</version>
+                <version>2013-12-04</version>
             </dependency>
 
             <!--
