@@ -20,22 +20,30 @@
   !
   ! CCPL HEADER END
   !
-  !      Copyright 2012 ForgeRock AS
+  !      Copyright 2012-2013 ForgeRock AS
   !    
 -->
 <chapter xml:id='chap-change-hosts'
  xmlns='http://docbook.org/ns/docbook'
  version='5.0' xml:lang='en'
  xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance'
- xsi:schemaLocation='http://docbook.org/ns/docbook http://docbook.org/xml/5.0/xsd/docbook.xsd'
+ xsi:schemaLocation='http://docbook.org/ns/docbook
+                     http://docbook.org/xml/5.0/xsd/docbook.xsd'
  xmlns:xlink='http://www.w3.org/1999/xlink'
  xmlns:xinclude='http://www.w3.org/2001/XInclude'>
  <title>Changing Host Names</title>
 
- <para>When you change the OpenAM host name, you must make manual changes
- to the configuration. This chapter describes what to do. If you also must
- move an embedded configuration directory from one host to another, see the
- OpenDJ documentation on <citetitle>Moving Servers</citetitle>.</para>
+ <para>
+  When you change the OpenAM host name,
+  you must make manual changes to the configuration.
+  This chapter describes what to do.
+  If you must also
+  move an embedded configuration directory from one host to another,
+  see the OpenDJ <citetitle>Administration Guide</citetitle> chapter,
+  <link xlink:show="new"
+  xlink:href="http://docs.forgerock.org/en/opendj/2.6.0/admin-guide/index/chap-mv-servers.html"
+  ><citetitle>Moving Servers</citetitle></link>.
+ </para>
 
  <itemizedlist>
   <para>Changing OpenAM host names involves the following high level
@@ -45,11 +53,13 @@
   </listitem>
   <listitem>
    <para>Exporting, editing, then importing the configuration</para>
-   <para>This step relies on the <command>ssoadm</command> command, which you
-   install separately from OpenAM as described in <link
-   xlink:href="install-guide#install-openam-admin-tools"
-   xlink:role="http://docbook.org/xlink/role/olink"><citetitle>To Set Up
-   Administration Tools</citetitle></link>.</para>
+   <para>
+    This step relies on the <command>ssoadm</command> command,
+    which you install separately from OpenAM as described in the procedure,
+    <link xlink:show="new" xlink:href="install-guide#install-openam-admin-tools"
+    xlink:role="http://docbook.org/xlink/role/olink"><citetitle>To Set Up
+    Administration Tools</citetitle></link>.
+   </para>
   </listitem>
   <listitem>
    <para>Stopping OpenAM and editing configuration files</para>
@@ -59,10 +69,14 @@
   </listitem>
  </itemizedlist>
 
- <para>Before you start, make sure you have a current backup of your current
- installation. See <link xlink:href="admin-guide#chap-backup-restore"
- xlink:role="http://docbook.org/xlink/role/olink"><citetitle>Backing Up and
- Restoring OpenAM Configurations</citetitle></link> for instructions.</para>
+ <para>
+  Before you start,
+  make sure you have a current backup of your current installation.
+  See <link xlink:show="new" xlink:href="admin-guide#chap-backup-restore"
+  xlink:role="http://docbook.org/xlink/role/olink"><citetitle
+  >Backing Up and Restoring OpenAM Configurations</citetitle></link>
+  for instructions.
+ </para>
 
  <procedure xml:id="add-new-alias">
   <title>To Add the New Host Name As an Alias</title>
