@@ -87,7 +87,7 @@ define("org/forgerock/openam/ui/user/login/RESTLoginView", [
             // known to be used by DataStore1.html
             if (this.$el.find("[name=loginRemember]:checked").length !== 0) {
                 expire = new Date();
-                expire.setDate(expire.getDate + 365*20);
+                expire.setDate(expire.getDate() + 20);
                 // cheesy assumption that the login name is the first text input box
                 cookieHelper.setCookie("login", this.$el.find("input[type=text]:first").val(), expire);
             } else if (this.$el.find("[name=loginRemember]").length !== 0) {
