@@ -26,7 +26,9 @@
  *
  */
 
-
+/*
+ * Portions Copyrighted 2013 ForgeRock AS
+ */
 
 package com.sun.identity.authentication.service;
 
@@ -341,7 +343,10 @@ class AMAccountLockout {
             AMIdentity amIdentity =
             AuthD.getAuth().getIdentity(
                 IdType.USER, aUserName, loginState.getOrgDN());
-            String userDN = normalizeDN(IdUtils.getDN(amIdentity));
+            String userDN = normalizeDN(aUserName);
+            if (isAccountLockout.getStoreInvalidAttemptsInDS()) {
+                userDN = normalizeDN(IdUtils.getDN(amIdentity));
+            } 
             if (acInfo == null) {
                 acInfo = isAccountLockout.getAcInfo(userDN, amIdentity);
             }
