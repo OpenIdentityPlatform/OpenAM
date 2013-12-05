@@ -40,6 +40,7 @@ import com.sun.identity.idm.IdSearchControl;
 import com.sun.identity.idm.IdSearchResults;
 import com.sun.identity.idm.IdType;
 import com.sun.identity.shared.debug.Debug;
+import org.apache.commons.lang.StringUtils;
 
 import javax.security.auth.Subject;
 import javax.security.auth.callback.Callback;
@@ -47,6 +48,7 @@ import javax.security.auth.login.LoginException;
 import java.security.Principal;
 import java.util.Collections;
 import java.util.Map;
+import java.util.ResourceBundle;
 import java.util.Set;
 
 /**
@@ -76,6 +78,11 @@ public class DevicePrintModule extends AMLoginModule {
     public void init(Subject subject, Map sharedState, Map options) {
 
         userName = (String) sharedState.get(getUserKey());
+
+        if (StringUtils.isEmpty(userName)) {
+            ResourceBundle bundle = amCache.getResBundle(AUTH_MODULE_NAME, getLoginLocale());
+            DEBUG.warning(bundle.getString("authModuleNotSetUpWithUsername"));
+        }
 
         AMIdentityRepository amIdentityRepository = getAMIdentityRepository(getRequestOrg());
         AMIdentity amIdentity = getIdentity(userName);
