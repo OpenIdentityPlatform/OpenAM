@@ -126,7 +126,7 @@
         <commons.json-resource.version>1.2.2</commons.json-resource.version>
         <commons.json-patch.version>1.0.0</commons.json-patch.version>
         <forgerock.json.version>2.0.2</forgerock.json.version>
-        <commons.authfilter.version>1.2.0</commons.authfilter.version>
+        <commons.authfilter.version>1.2.1-SNAPSHOT</commons.authfilter.version>
         <forgerock-ui.version>1.0.1</forgerock-ui.version>
         <restlet.version>2.1.1</restlet.version>
         <xercesj.version>2.11.0</xercesj.version>

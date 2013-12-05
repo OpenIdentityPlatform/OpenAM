@@ -95,6 +95,27 @@
         </init-param>
     </filter>
 
+    <filter>
+        <filter-name>RestAuthorizationDispatcherFilter</filter-name>
+        <filter-class>org.forgerock.openam.authz.filter.RestAuthorizationDispatcherFilter</filter-class>
+        <init-param>
+            <param-name>realmsAuthzConfigurator</param-name>
+            <param-value>org.forgerock.openam.authz.filter.AdminAuthorizationConfigurator</param-value>
+        </init-param>
+        <init-param>
+            <param-name>usersAuthzConfigurator</param-name>
+            <param-value>org.forgerock.openam.authz.filter.PassThroughAuthorizationConfigurator</param-value>
+        </init-param>
+        <init-param>
+            <param-name>groupsAuthzConfigurator</param-name>
+            <param-value>org.forgerock.openam.authz.filter.PassThroughAuthorizationConfigurator</param-value>
+        </init-param>
+        <init-param>
+            <param-name>agentsAuthzConfigurator</param-name>
+            <param-value>org.forgerock.openam.authz.filter.PassThroughAuthorizationConfigurator</param-value>
+        </init-param>
+    </filter>
+
     <!-- filter declaration -->
 
     <filter-mapping>
@@ -132,28 +153,16 @@
         <url-pattern>/json/*</url-pattern>
     </filter-mapping>
     <filter-mapping>
+        <filter-name>RestAuthorizationDispatcherFilter</filter-name>
+        <url-pattern>/json/*</url-pattern>
+    </filter-mapping>
+    <filter-mapping>
         <filter-name>SessionAuthorizationFilter</filter-name>
         <url-pattern>/json/sessions/*</url-pattern>
     </filter-mapping>
     <filter-mapping>
         <filter-name>AdminOnlyFilter</filter-name>
-        <url-pattern>/json/realms/*</url-pattern>
-    </filter-mapping>
-    <filter-mapping>
-        <filter-name>AdminOnlyFilter</filter-name>
         <url-pattern>/json/tokens/*</url-pattern>
-    </filter-mapping>
-    <filter-mapping>
-        <filter-name>PassThroughAuthorizationFilter</filter-name>
-        <url-pattern>/json/users/*</url-pattern>
-    </filter-mapping>
-    <filter-mapping>
-        <filter-name>PassThroughAuthorizationFilter</filter-name>
-        <url-pattern>/json/groups/*</url-pattern>
-    </filter-mapping>
-    <filter-mapping>
-        <filter-name>PassThroughAuthorizationFilter</filter-name>
-        <url-pattern>/json/agents/*</url-pattern>
     </filter-mapping>
     <filter-mapping>
         <filter-name>PassThroughAuthorizationFilter</filter-name>

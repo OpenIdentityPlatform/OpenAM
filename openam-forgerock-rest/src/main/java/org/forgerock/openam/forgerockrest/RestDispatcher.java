@@ -59,19 +59,26 @@ import java.util.StringTokenizer;
 /**
  * A simple {@code Map} based collection resource provider.
  */
-public final class RestDispatcher {
+public class RestDispatcher {
 
     public static Debug debug = Debug.getInstance("frRest");
 
-    /* Endpoints for forgerock-rest */
-    final static private String REALMS = "/realms";          // Protected by AdminAuthorizationFilter
-    final static private String USERS = "/users";            // Protected by PassThroughAuthorizationFilter-Just logging
-    final static private String GROUPS = "/groups";          // Protected by PassThroughAuthorizationFilter-Just logging
-    final static private String AGENTS = "/agents";          // Protected by PassThroughAuthorizationFilter-Just logging
-    final static private String DASHBOARD = "/dashboard";    // Protected by PassThroughAuthorizationFilter-Just logging
-    final static private String SESSIONS = "/sessions";      // Protected by SessionResourceAuthZFilter - Admin + custom
-    final static private String TOKENS = "/tokens";          // Protected by AdminAuthorizationFilter
-    final static private String SERVER_INFO = "/serverinfo"; // Protected by PassThroughAuthorizationFilter-Just logging
+    /** Rest endpoint for realms. */
+    public static final String REALMS = "/realms";          // Protected by AdminAuthorizationFilter
+    /** Rest endpoint for users. */
+    public static final String USERS = "/users";            // Protected by PassThroughAuthorizationFilter-Just logging
+    /** Rest endpoint for groups. */
+    public static final String GROUPS = "/groups";          // Protected by PassThroughAuthorizationFilter-Just logging
+    /** Rest endpoint for agents. */
+    public static final String AGENTS = "/agents";          // Protected by PassThroughAuthorizationFilter-Just logging
+    /** Rest endpoint for dashboard. */
+    public static final String DASHBOARD = "/dashboard";    // Protected by PassThroughAuthorizationFilter-Just logging
+    /** Rest endpoint for sessions. */
+    public static final String SESSIONS = "/sessions";      // Protected by SessionResourceAuthZFilter - Admin + custom
+    /** Rest endpoint for tokens. */
+    public static final String TOKENS = "/tokens";          // Protected by AdminAuthorizationFilter
+    /** Rest endpoint for server info. */
+    public static final String SERVER_INFO = "/serverinfo"; // Protected by PassThroughAuthorizationFilter-Just logging
 
     private static RestDispatcher instance = null;
     private ConnectionFactory factory = null;
@@ -93,7 +100,7 @@ public final class RestDispatcher {
      * @return a Set containing al the valid reserved endpoints
      */
     private static Set<String> getEndpointList() {
-        Set<String> endpoints = new HashSet<String>(2);
+        Set<String> endpoints = new HashSet<String>(8);
         endpoints.add(USERS);
         endpoints.add(GROUPS);
         endpoints.add(AGENTS);
@@ -329,7 +336,7 @@ public final class RestDispatcher {
      * @return Map containing realmPath, resourceName, and resourceID
      * @throws NotFoundException when configuration manager cannot retrieve a realm
      */
-    private Map<String, String> getRequestDetails(String resourceName) throws NotFoundException {
+    public Map<String, String> getRequestDetails(String resourceName) throws NotFoundException {
         Map<String, String> details = new HashMap<String, String>(3);
         if (StringUtils.isBlank(resourceName)) {
             return null;

@@ -46,6 +46,10 @@
             <groupId>org.forgerock.commons</groupId>
             <artifactId>forgerock-authz-filter</artifactId>
         </dependency>
+        <dependency>
+            <groupId>org.forgerock.openam</groupId>
+            <artifactId>openam-forgerock-rest</artifactId>
+        </dependency>
     </dependencies>
 
 </project>
