@@ -27,7 +27,7 @@
  */
 
 /*
- * Portions Copyrighted [2011] [ForgeRock AS]
+ * Portions Copyrighted 2011-2013 ForgeRock AS
  */
 package com.sun.identity.delegation;
 
@@ -132,40 +132,9 @@ public class SMServiceListener implements ServiceListener {
                 SystemTimer.getTimer().schedule(task, 0);
             } else if (type == ServiceListener.ADDED) {
                 // Create the delegation policies
-                SSOToken token = (SSOToken) AccessController.doPrivileged(
-                    AdminTokenAction.getInstance());
-                try {
-                    if (debug.messageEnabled()) {
-                        debug.message("SMServiceListener.occ creating " +
-                            "policies for the org: " + orgName +
-                            " GN: " + groupName + " SC: " + serviceComponent);
-                    }
-                    if (ServiceManager.isCoexistenceMode()) {
-                        DelegationUtils.createRealmPrivileges(token, orgName);
-                    } else {
-                        OrganizationConfigManager ocm =
-                            new OrganizationConfigManager(token, orgName);
-                        OrganizationConfigManager parentOrg =
-                            ocm.getParentOrgConfigManager();
-                        DelegationUtils.copyRealmPrivilegesFromParent(
-                            token, parentOrg, ocm);
-                    }
-                } catch (SSOException ssoe) {
-                    if (debug.messageEnabled()) {
-                        debug.message("Creating delegation permissions for: " +
-                            orgName + " failed", ssoe);
-                    }
-                } catch (SMSException smse) {
-                    if (debug.messageEnabled()) {
-                        debug.message("Creating delegation permissions for: " +
-                            orgName + " failed", smse);
-                    }
-                } catch (DelegationException de) {
-                    if (debug.messageEnabled()) {
-                        debug.message("Creating delegation permissions for: " +
-                            orgName + " failed", de);
-                    }
-                }
+                // OPENAM-3226
+                // delegation policies are now created in OrganizationConfigManager
+                // to avoid datastore replication conflicts
             }
         }
     }

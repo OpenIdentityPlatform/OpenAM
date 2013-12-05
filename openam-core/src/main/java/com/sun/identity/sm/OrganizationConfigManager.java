@@ -27,7 +27,7 @@
  */
 
 /*
- * Portions Copyrighted 2011-2013 ForgeRock Inc
+ * Portions Copyrighted 2011-2013 ForgeRock AS
  */
 package com.sun.identity.sm;
 
@@ -48,6 +48,8 @@ import com.iplanet.sso.SSOToken;
 import com.iplanet.ums.IUMSConstants;
 import com.sun.identity.authentication.util.ISAuthConstants;
 import com.sun.identity.common.CaseInsensitiveHashSet;
+import com.sun.identity.delegation.DelegationException;
+import com.sun.identity.delegation.DelegationUtils;
 import com.sun.identity.idm.IdConstants;
 import com.sun.identity.idm.IdRepoException;
 import com.sun.identity.idm.plugins.internal.AgentsRepo;
@@ -404,6 +406,34 @@ public class OrganizationConfigManager {
                 }
             }
         }
+
+        if (realmEnabled) {
+            try {
+                if (coexistMode) {
+                    DelegationUtils.createRealmPrivileges(token, orgName);
+                } else {
+                    OrganizationConfigManager parentOrg =
+                        getParentOrgConfigManager();
+                    DelegationUtils.copyRealmPrivilegesFromParent(
+                        token, parentOrg, ocm);
+                }
+            } catch (SSOException ssoe) {
+                if (SMSEntry.debug.messageEnabled()) {
+                	SMSEntry.debug.message("Creating delegation permissions for: " +
+                        orgName + " failed", ssoe);
+                }
+            } catch (SMSException smse) {
+                if (SMSEntry.debug.messageEnabled()) {
+                	SMSEntry.debug.message("Creating delegation permissions for: " +
+                        orgName + " failed", smse);
+                }
+            } catch (DelegationException de) {
+                if (SMSEntry.debug.messageEnabled()) {
+                	SMSEntry.debug.message("Creating delegation permissions for: " +
+                        orgName + " failed", de);
+                }
+            }
+        } 
 
         // Return the newly created organization config manager
         return (ocm);
