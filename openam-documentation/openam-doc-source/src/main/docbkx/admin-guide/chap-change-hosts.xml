@@ -114,23 +114,51 @@ Service Configuration was exported.</screen>
      <literal>openam.example.com</literal>, throughout the file.</para>
     </listitem>
     <listitem>
-     <para>If you are changing the deployment descriptor, such as
-     <literal>/openam</literal>, then change the value of
-     <literal>com.iplanet.am.services.deploymentDescriptor</literal>.</para>
-     <para>Also change the deployment descriptor in the
-     <literal>propertiesViewBeanURL="<replaceable
-     >deployment-descriptor</replaceable>/auth/ACServiceInstanceList"</literal>
-     attribute.</para>
-     <para>Also change the deployment descriptor in the
-     <literal>propertiesViewBeanURL="<replaceable
-     >deployment-descriptor</replaceable>/auth/ACModuleList"</literal>
-     attribute.</para>
-     <para>Also change the deployment descriptor in a &lt;Value&gt; element
-     that is a child of an &lt;AttributeValuePair&gt; element.</para>
-     <para>Also change the deployment descriptor where it occurs throughout
-     the file in the full URL to OpenAM, such as
-     <literal>http:&amp;#47;&amp;#47;openam.example.com:8080&amp;#47;<replaceable
-     >deployment-descriptor</replaceable></literal>.</para>
+     <para>
+      If you are changing the context path, such as <literal>/openam</literal>,
+      then make the following changes.
+     </para>
+
+     <itemizedlist>
+      <listitem>
+       <para>
+        Change the value of
+        <literal>com.iplanet.am.services.deploymentDescriptor</literal>.
+       </para>
+      </listitem>
+
+      <listitem>
+       <para>
+        Change <replaceable>contextPath</replaceable> in the value of the
+        <literal>propertiesViewBeanURL="<replaceable
+        >contextPath</replaceable>/auth/ACServiceInstanceList"</literal>.
+       </para>
+      </listitem>
+
+      <listitem>
+       <para>
+        Change <replaceable>contextPath</replaceable> in the value of
+        <literal>propertiesViewBeanURL="<replaceable
+        >contextPath</replaceable>/auth/ACModuleList"</literal>.
+       </para>
+      </listitem>
+
+      <listitem>
+       <para>
+        Change the context path in a &lt;Value&gt; element
+        that is a child of an &lt;AttributeValuePair&gt; element.
+       </para>
+      </listitem>
+
+      <listitem>
+       <para>
+        Change the context path where it occurs throughout the file
+        in the full URL to OpenAM, such as
+        <literal>http:&amp;#47;&amp;#47;openam.example.com:8080&amp;#47;<replaceable
+        >contextPath</replaceable></literal>.
+       </para>
+      </listitem>
+     </itemizedlist>
     </listitem>
     <listitem>
      <para>If you are changing the port number, then change the value of
@@ -161,29 +189,43 @@ Service Configuration was imported.</screen>
   <title>To Edit OpenAM Configuration Files For the New Host Name</title>
 
   <step>
-   <para>Stop the web container where OpenAM runs.</para>
+   <para>
+    Stop OpenAM or the web container where it runs.
+   </para>
   </step>
   <step>
-   <para>Edit the bootstrap file, such as
-   <filename>/home/user/openam/bootstrap</filename>, changing the FQDN, port,
-   and deployment descriptor for OpenAM as necessary.</para>
+   <para>
+    Edit the bootstrap file, such as <filename>/home/user/openam/bootstrap</filename>,
+    changing the FQDN, port, and context path for OpenAM as necessary.
+   </para>
   </step>
   <step>
-   <para>If you are changing the deployment descriptor, then move the folder
-   containing OpenAM configuration, such as
-   <filename>/home/user/openam/</filename>, to match the new deployment
-   descriptor, such as <filename>/home/user/openam2/</filename>.</para>
+   <para>
+    If you are changing the context path,
+    then move the folder containing OpenAM configuration,
+    such as <filename>/home/user/openam/</filename>,
+    to match the new context path,
+    such as <filename>/home/user/openam2/</filename>.
+   </para>
   </step>
   <step>
-   <para>If you are changing the location or deployment descriptor, change the
-   name of the file in the <filename>/home/user/.openamcfg</filename> folder,
-   such as <filename>AMConfig_path_to_tomcat_webapps_openam_</filename>
-   to match the new location and deployment descriptor.</para>
-   <para>Also edit the path name in the file to match the change you made when
-   moving the folder.</para>
+   <para>
+    If you are changing the location or context path,
+    change the name of the file
+    in the <filename>/home/user/.openamcfg</filename> folder,
+    such as <filename>AMConfig_path_to_tomcat_webapps_openam_</filename>,
+    to match the new location and context path.
+   </para>
+
+   <para>
+    Also edit the path name in the file
+    to match the change you made when moving the folder.
+   </para>
   </step>
   <step>
-   <para>Restart the web container where OpenAM runs.</para>
+   <para>
+    Restart OpenAM or the web container where it runs.
+   </para>
   </step>
  </procedure>
 
