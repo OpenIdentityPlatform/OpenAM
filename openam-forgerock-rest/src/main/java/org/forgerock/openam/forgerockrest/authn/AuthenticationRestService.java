@@ -34,6 +34,7 @@ import javax.ws.rs.core.Context;
 import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
+import java.util.List;
 
 /**
  * JAX-RS endpoint for version 1 RESTful authentication requests.
@@ -149,7 +150,13 @@ public class AuthenticationRestService {
      */
     private boolean isJsonContentType(HttpHeaders headers) {
 
-        for (String contentType : headers.getRequestHeader(HttpHeaders.CONTENT_TYPE)) {
+        List<String> requestHeader = headers.getRequestHeader(HttpHeaders.CONTENT_TYPE);
+
+        if (requestHeader == null) {
+            return false;
+        }
+
+        for (String contentType : requestHeader) {
             if (contentType != null && contentType.startsWith(MediaType.APPLICATION_JSON)) {
                 return true;
             }
