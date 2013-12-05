@@ -27,7 +27,8 @@
  */
 
 /**
- * Portions Copyrighted [2011] [ForgeRock AS]
+ * Portions Copyrighted 2011-2013 ForgeRock AS
+ * Portions Copyrighted 2013 Nomura Research Institute, Ltd
  */
 package com.iplanet.services.naming;
 
@@ -76,9 +77,9 @@ public class SiteStatusCheckThreadImpl implements SiteStatusCheck {
             String deployuri = SystemProperties.get
                 (Constants.AM_SERVICES_DEPLOYMENT_DESCRIPTOR, "/openam");
             hcPath = deployuri + "/namingservice";
-            if (!hcPath.startsWith("/")) {
-                hcPath += "/" + hcPath;
-            }
+        }
+        if (!hcPath.startsWith("/")) {
+            hcPath = "/" + hcPath;
         }
     }
 
