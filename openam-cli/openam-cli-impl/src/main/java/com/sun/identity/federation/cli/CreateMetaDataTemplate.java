@@ -25,7 +25,9 @@
  * $Id: CreateMetaDataTemplate.java,v 1.38 2009/10/29 00:03:50 exu Exp $
  *
  */
-
+/**
+ * Portions Copyrighted 2013 ForgeRock AS
+ */
 package com.sun.identity.federation.cli;
 
 import com.sun.identity.shared.configuration.SystemPropertiesManager;
@@ -484,9 +486,6 @@ public class CreateMetaDataTemplate extends AuthenticatedCommand {
     throws CLIException {
         Writer pw = null;
         try {
-            // check privilege
-            SAML2MetaManager metaManager = new SAML2MetaManager(ssoToken);
-            metaManager.getEntityDescriptor("/", "");
             boolean writeToFile = !isWebBased && (metadata != null) &&
                 (metadata.length() > 0);
             if (writeToFile) {
@@ -533,9 +532,6 @@ public class CreateMetaDataTemplate extends AuthenticatedCommand {
         throws CLIException {
         Writer pw = null;
         try {
-            // check privilege
-            SAML2MetaManager metaManager = new SAML2MetaManager(ssoToken);
-            metaManager.getEntityConfig("/", "");
             boolean writeToFile = !isWebBased && (extendedData != null) &&
                 (extendedData.length() > 0);
 
@@ -558,9 +554,6 @@ public class CreateMetaDataTemplate extends AuthenticatedCommand {
                     "create-meta-template-created-configuration-template"),
                     objs));
             }
-        } catch (SAML2MetaException e) {
-            throw new CLIException(e.getMessage(),
-                    ExitCodes.REQUEST_CANNOT_BE_PROCESSED);
         } catch (IOException ex) {
             Object[] objs = { extendedData };
             throw new CLIException(MessageFormat.format(
@@ -580,9 +573,6 @@ public class CreateMetaDataTemplate extends AuthenticatedCommand {
     throws CLIException {
         Writer pw = null;
         try {
-            // check privilege
-            IDFFMetaManager metaManager = new IDFFMetaManager(ssoToken);
-            metaManager.getEntityConfig("/", "");
             boolean writeToFile = !isWebBased && (extendedData != null) && 
                 (extendedData.length() > 0);
 
@@ -603,9 +593,6 @@ public class CreateMetaDataTemplate extends AuthenticatedCommand {
                     "create-meta-template-created-configuration-template"),
                     objs));
             }
-        } catch (IDFFMetaException ime) {
-            throw new CLIException(ime.getMessage(),
-                    ExitCodes.REQUEST_CANNOT_BE_PROCESSED);
         } catch (IOException ex) {
             Object[] objs = { extendedData };
             throw new CLIException(MessageFormat.format(
@@ -625,9 +612,6 @@ public class CreateMetaDataTemplate extends AuthenticatedCommand {
         throws CLIException {
         Writer pw = null;
         try {
-            // check privilege
-            IDFFMetaManager metaManager = new IDFFMetaManager(ssoToken);
-            metaManager.getEntityDescriptor("/", "");
             boolean writeToFile = !isWebBased && (metadata != null) &&
                 (metadata.length() > 0);
 
@@ -670,10 +654,6 @@ public class CreateMetaDataTemplate extends AuthenticatedCommand {
     throws CLIException {
         Writer pw = null;
         try {
-            // check privilege
-            WSFederationMetaManager metaManager = new WSFederationMetaManager(
-                ssoToken);
-            metaManager.getEntityDescriptor("/", "");
             boolean writeToFile = !isWebBased && (metadata != null) &&
                 (metadata.length() > 0);
 
@@ -694,9 +674,6 @@ public class CreateMetaDataTemplate extends AuthenticatedCommand {
                     getResourceString(
                     "create-meta-template-created-descriptor-template"), objs));
             }
-        } catch (WSFederationMetaException e) {
-            throw new CLIException(e.getMessage(),
-                    ExitCodes.REQUEST_CANNOT_BE_PROCESSED);
         } catch (IOException e) {
             Object[] objs = { metadata };
             throw new CLIException(MessageFormat.format(
@@ -722,10 +699,6 @@ public class CreateMetaDataTemplate extends AuthenticatedCommand {
     throws CLIException {
         Writer pw = null;
         try {
-            // check privilege
-            WSFederationMetaManager metaManager = new WSFederationMetaManager(
-                ssoToken);
-            metaManager.getEntityConfig("/", "");
             boolean writeToFile = !isWebBased && (extendedData != null) &&
                 (extendedData.length() > 0);
 
@@ -746,9 +719,6 @@ public class CreateMetaDataTemplate extends AuthenticatedCommand {
                     "create-meta-template-created-configuration-template"),
                     objs));
             }
-        } catch (WSFederationMetaException e) {
-            throw new CLIException(e.getMessage(),
-                    ExitCodes.REQUEST_CANNOT_BE_PROCESSED);
         } catch (IOException ex) {
             Object[] objs = { extendedData };
             throw new CLIException(MessageFormat.format(
