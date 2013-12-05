@@ -18,6 +18,7 @@ package org.forgerock.openam.jaspi.filter;
 
 import com.sun.identity.shared.debug.Debug;
 import org.forgerock.jaspi.filter.AuthNFilter;
+import org.forgerock.openam.forgerockrest.RestDispatcher;
 
 import javax.servlet.FilterChain;
 import javax.servlet.FilterConfig;
@@ -39,19 +40,37 @@ public class AMAuthNFilter extends AuthNFilter {
 
     private static final Debug DEBUG = Debug.getInstance("amAuthREST");
 
-    private final static EndpointMatcher ENDPOINT_MATCHER = new EndpointMatcher();
+    private final EndpointMatcher endpointMatcher;
 
     /**
-     * Only the REST Authentication Endpoint is unprotected. Other endpoints that don't need to be authenticated
-     * as a "real" user can use the anonymous use to authenticate first, then use an Authorization Filter to
-     * allow the anonymous user access.
+     * Constructs an instance of the AMAuthNFilter.
      */
-    static {
-        ENDPOINT_MATCHER.endpoint("/json/authenticate", HttpMethod.GET);
-        ENDPOINT_MATCHER.endpoint("/json/authenticate", HttpMethod.POST);
-        ENDPOINT_MATCHER.endpoint("/json/users", HttpMethod.POST, "_action", "register", "confirm", "forgotPassword",
+    public AMAuthNFilter() {
+        this(RestDispatcher.getInstance());
+    }
+
+    /**
+     * Constructs an instance of the AMAuthNFilter.
+     * <p>
+     * Used by tests.
+     *
+     * @param restDispatcher An instance of the RestDispatcher.
+     */
+    public AMAuthNFilter(RestDispatcher restDispatcher) {
+        endpointMatcher = new EndpointMatcher("/json", restDispatcher);
+
+        /*
+         * Only the REST Authentication Endpoint is unprotected. Other endpoints that don't need to be authenticated
+         * as a "real" user can use the anonymous use to authenticate first, then use an Authorization Filter to
+         * allow the anonymous user access.
+         * <p>
+         * Only need to specific the actual endpoint for the root path that this filter is registered against.
+         */
+        endpointMatcher.endpoint("/authenticate", HttpMethod.GET);
+        endpointMatcher.endpoint("/authenticate", HttpMethod.POST);
+        endpointMatcher.endpoint("/users", HttpMethod.POST, "_action", "register", "confirm", "forgotPassword",
                 "forgotPasswordReset", "anonymousCreate");
-        ENDPOINT_MATCHER.endpoint("/json/serverinfo/cookieDomains", HttpMethod.GET);
+        endpointMatcher.endpoint("/serverinfo/cookieDomains", HttpMethod.GET);
     }
 
     /**
@@ -81,7 +100,7 @@ public class AMAuthNFilter extends AuthNFilter {
         String requestURI = request.getRequestURI();
         String path = requestURI.substring(contextPath.length());
 
-        if (ENDPOINT_MATCHER.match(request)) {
+        if (endpointMatcher.match(request)) {
             DEBUG.message("Path: " + path + " Method: " + request.getMethod() + " Added as exception. Not protected.");
             filterChain.doFilter(servletRequest, servletResponse);
         } else {

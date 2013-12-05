@@ -16,10 +16,15 @@
 
 package org.forgerock.openam.jaspi.filter;
 
+import org.forgerock.json.resource.NotFoundException;
+import org.forgerock.openam.forgerockrest.RestDispatcher;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
 import javax.servlet.http.HttpServletRequest;
+
+import java.util.HashMap;
+import java.util.Map;
 
 import static org.mockito.Mockito.*;
 import static org.mockito.BDDMockito.*;
@@ -30,17 +35,23 @@ public class EndpointMatcherTest {
 
     private EndpointMatcher endpointMatcher;
 
+    private RestDispatcher restDispatcher;
+
     @BeforeMethod
     public void setUp() {
-        endpointMatcher = new EndpointMatcher();
+
+        restDispatcher = mock(RestDispatcher.class);
+
+        endpointMatcher = new EndpointMatcher("", restDispatcher);
 
         endpointMatcher.endpoint("/URI_A", "GET");
         endpointMatcher.endpoint("/URI_B", "POST");
         endpointMatcher.endpoint("/URI_C", "PUT", "QUERY_PARAM", "VALUEA", "VALUEB");
+        endpointMatcher.endpoint("/URI_B/URI_A", "GET");
     }
 
     @Test
-    public void shouldMatchEndpointWithNoQueryParams() {
+    public void shouldMatchEndpointWithNoQueryParams() throws NotFoundException {
 
         //Given
         HttpServletRequest request = mock(HttpServletRequest.class);
@@ -48,6 +59,9 @@ public class EndpointMatcherTest {
         given(request.getContextPath()).willReturn("/openam");
         given(request.getRequestURI()).willReturn("/openam/URI_A");
         given(request.getMethod()).willReturn("GET");
+        Map<String, String> details = new HashMap<String, String>();
+        details.put("resourceName", "/URI_A");
+        given(restDispatcher.getRequestDetails("/URI_A")).willReturn(details);
 
         //When
         boolean matches = endpointMatcher.match(request);
@@ -57,7 +71,7 @@ public class EndpointMatcherTest {
     }
 
     @Test
-    public void shouldNotMatchEndpointWithNoQueryParams() {
+    public void shouldNotMatchEndpointWithNoQueryParams() throws NotFoundException {
 
         //Given
         HttpServletRequest request = mock(HttpServletRequest.class);
@@ -65,6 +79,9 @@ public class EndpointMatcherTest {
         given(request.getContextPath()).willReturn("/openam");
         given(request.getRequestURI()).willReturn("/openam/URI_B");
         given(request.getMethod()).willReturn("GET");
+        Map<String, String> details = new HashMap<String, String>();
+        details.put("resourceName", "/URI_B");
+        given(restDispatcher.getRequestDetails("/URI_B")).willReturn(details);
 
         //When
         boolean matches = endpointMatcher.match(request);
@@ -74,7 +91,7 @@ public class EndpointMatcherTest {
     }
 
     @Test
-    public void shouldMatchEndpointWithQueryParams() {
+    public void shouldMatchEndpointWithQueryParams() throws NotFoundException {
 
         //Given
         HttpServletRequest request = mock(HttpServletRequest.class);
@@ -83,6 +100,9 @@ public class EndpointMatcherTest {
         given(request.getRequestURI()).willReturn("/openam/URI_C");
         given(request.getMethod()).willReturn("PUT");
         given(request.getQueryString()).willReturn("other1=valueA&QUERY_PARAM=VALUEA&other2=valueb");
+        Map<String, String> details = new HashMap<String, String>();
+        details.put("resourceName", "/URI_C");
+        given(restDispatcher.getRequestDetails("/URI_C")).willReturn(details);
 
         //When
         boolean matches = endpointMatcher.match(request);
@@ -92,7 +112,7 @@ public class EndpointMatcherTest {
     }
 
     @Test
-    public void shouldNotMatchEndpointWithQueryParams() {
+    public void shouldNotMatchEndpointWithQueryParams() throws NotFoundException {
 
         //Given
         HttpServletRequest request = mock(HttpServletRequest.class);
@@ -100,7 +120,49 @@ public class EndpointMatcherTest {
         given(request.getContextPath()).willReturn("/openam");
         given(request.getRequestURI()).willReturn("/openam/URI_C");
         given(request.getMethod()).willReturn("PUT");
-        given(request.getQueryString()).willReturn("other1=valueA&QUERY_PARAM=VALUEB&other2=valueb");
+        given(request.getQueryString()).willReturn("other1=valueA&QUERY_PARAM=VALUEC&other2=valueb");
+        Map<String, String> details = new HashMap<String, String>();
+        details.put("resourceName", "/URI_C");
+        given(restDispatcher.getRequestDetails("/URI_C")).willReturn(details);
+
+        //When
+        boolean matches = endpointMatcher.match(request);
+
+        //Then
+        assertFalse(matches);
+    }
+
+    @Test
+    public void shouldMatchEndpointWithPathInfo() throws NotFoundException {
+
+        //Given
+        HttpServletRequest request = mock(HttpServletRequest.class);
+
+        given(request.getPathInfo()).willReturn("/URI_A");
+        given(request.getMethod()).willReturn("GET");
+        Map<String, String> details = new HashMap<String, String>();
+        details.put("resourceName", "/URI_A");
+        given(restDispatcher.getRequestDetails("/URI_A")).willReturn(details);
+
+        //When
+        boolean matches = endpointMatcher.match(request);
+
+        //Then
+        assertTrue(matches);
+    }
+
+    @Test
+    public void shouldMatchEndpointWithResourceNameAndId() throws NotFoundException {
+
+        //Given
+        HttpServletRequest request = mock(HttpServletRequest.class);
+
+        given(request.getPathInfo()).willReturn("/URI_A");
+        given(request.getMethod()).willReturn("GET");
+        Map<String, String> details = new HashMap<String, String>();
+        details.put("resourceId", "URI_A");
+        details.put("resourceName", "/URI_B");
+        given(restDispatcher.getRequestDetails("/URI_A")).willReturn(details);
 
         //When
         boolean matches = endpointMatcher.match(request);

@@ -16,9 +16,14 @@
 
 package org.forgerock.openam.jaspi.filter;
 
+import com.sun.identity.shared.debug.Debug;
+import org.forgerock.json.resource.NotFoundException;
+import org.forgerock.openam.forgerockrest.RestDispatcher;
+
 import javax.servlet.http.HttpServletRequest;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 /**
@@ -32,23 +37,46 @@ import java.util.Set;
  */
 public class EndpointMatcher {
 
+    private static final Debug DEBUG = Debug.getInstance("amAuthREST");
+
+    private final RestDispatcher restDispatcher;
+    private final String rootPath;
+
     private final List<Endpoint> endpoints = new ArrayList<Endpoint>();
 
     /**
      * Constructs a new EndpointMatcher.
+     *
+     * @param rootPath The path at which the filter is registered at.
+     * @param restDispatcher An instance of the RestDispatcher.
      */
-    public EndpointMatcher() {
+    public EndpointMatcher(String rootPath, RestDispatcher restDispatcher) {
+        this.restDispatcher = restDispatcher;
+        this.rootPath = rootPath;
     }
 
     /**
      * Matches the given HttpServletRequest against the configured endpoints.
      *
      * @param request The HttpServletRequest to match against the endpoints.
-     * @return
+     * @return <code>true</code> if the request matches against one of the predefined endpoints.
      */
     public boolean match(HttpServletRequest request) {
 
         String path = getRequestPath(request);
+
+        try {
+            Map<String, String> details = restDispatcher.getRequestDetails(path);
+            if (details.get("resourceId") != null) {
+                path = details.get("resourceName") + "/" + details.get("resourceId");
+            } else {
+                path = details.get("resourceName");
+            }
+        } catch (NotFoundException e) {
+            // Endpoint not found so return false
+            DEBUG.message("Resource " + request.getPathInfo() + " not found.");
+            return false;
+        }
 
         Endpoint requestEndpoint = new Endpoint(path, request.getMethod());
         if (endpoints.contains(requestEndpoint)) {
@@ -70,11 +98,17 @@ public class EndpointMatcher {
      */
     private String getRequestPath(HttpServletRequest request) {
 
+        String path = request.getPathInfo();
+
+        if (path != null) {
+            return path;
+        }
+
         String contextPath = request.getContextPath();
 
         String requestURI = request.getRequestURI();
 
-        return requestURI.substring(contextPath.length());
+        return requestURI.substring(contextPath.length()).replace(rootPath, "");
     }
 
     /**
