@@ -198,6 +198,7 @@
             "complete" : "Complete",
             "copyright" : "Copyright (c) 2010-13 ForgeRock, all rights reserved.",
             "sessionExpired" : "Session Expired",
+            "enableCookies" : "Cookies must be enabled to login",
             "deleteSelected" : "Delete Selected",
             "validation" : {
                 "VALID_PHONE_FORMAT": "Contains invalid characters",

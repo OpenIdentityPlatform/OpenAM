@@ -189,3 +189,36 @@ function clearFormElms(frm) {
         }
     }
 }
+/**
+*
+* does a check to see that cookies are enabled
+* @return boolean
+*
+*/
+function cookiesEnabled(){
+    document.cookie = "cookieTest=true";
+    if(!getCookieByName("cookieTest")){
+        return false;
+    }
+    var exp = new Date();
+    exp.setDate(exp.getDate() - 1);
+    document.cookie = "cookieTest=;expires=" + exp;
+    return true;
+}
+/**
+*
+* gets cookie value by cookie name
+* @return string
+*
+*/
+function getCookieByName(c_name) {
+    var i, x, y, ARRcookies = document.cookie.split(";");
+    for (i=0; i < ARRcookies.length; i++) {
+        x = ARRcookies[i].substr(0,ARRcookies[i].indexOf("="));
+        y = ARRcookies[i].substr(ARRcookies[i].indexOf("=")+1);
+        x = x.replace(/^\s+|\s+$/g,"");
+        if ( x === c_name) {
+            return unescape(y);
+        }
+    }
+}

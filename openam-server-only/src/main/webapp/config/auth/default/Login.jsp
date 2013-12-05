@@ -59,7 +59,7 @@
                     <!--
                     var defaultBtn = 'Submit';
                     var elmCount = 0;
-
+                    
                     /**
                      * submit form with given button value
                      *
@@ -94,7 +94,8 @@
                         <div class="product-logo"></div>
                     </div>
                     <div class="grid_9 left-seperator">
-                        <div class="box-content clear-float">
+                        <div id="enableCookies" style="display:none;"><h3><auth:resBundle bundleName="amAuthUI" resourceKey="enableCookies" /></h3></div>
+                        <div id="loginContent" class="box-content clear-float">
                             <jato:content name="ContentStaticTextHeader">
                                 <h1><jato:getDisplayFieldValue name='StaticTextHeader' defaultValue='Authentication' fireDisplayEvents='true' escape='false'/></h1>
                             </jato:content>
@@ -210,6 +211,11 @@
                                         if (elmCount != null) {
                                             document.write("<input name=\"IDButton"  + "\" type=\"hidden\">");
                                         }
+
+                                        if(!cookiesEnabled()){
+                                            document.getElementById('enableCookies').style.display = '';
+                                            document.getElementById('loginContent').style.display = 'none';
+                                        } 
                                         -->
                                     </script>
                                     <input type="hidden" name="goto" value="<%= gotoURL%>" />
