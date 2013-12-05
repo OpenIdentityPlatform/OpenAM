@@ -552,15 +552,39 @@ http://openam.example.com:8080/openam/oauth2/access_token?realm=realm
    </step>
 
    <step>
-    <para>Set a multi-valued profile attribute where OpenAM can store a resource
-    owner's decisions to authorize clients without further interaction in the
-    Shared Consent Attribute Name field.</para>
+    <para>
+     Set a multi-valued, string syntax profile attribute
+     where OpenAM can store a resource owner's decisions to authorize clients
+     without further interaction
+     in the Shared Consent Attribute Name field.
+    </para>
 
-    <para>If no profile attribute is available for this purpose, you can add
-    an attribute as described in <link xlink:href="dev-guide#chap-custom-attr"
-    xlink:show="new" xlink:role="http://docbook.org/xlink/role/olink"><citetitle
-    >Customizing Profile Attributes</citetitle></link> in the <citetitle
-    >Developer's Guide</citetitle>.</para>
+    <para>
+     You are not likely to find a standard profile attribute for this.
+     For evaluation purposes only,
+     you might try an unused existing profile attribute
+     such as <literal>description</literal>.
+    </para>
+
+    <para>
+     When moving to production, however, use
+     a dedicated, multi-valued, string syntax profile attribute
+     that clearly is not used for other purposes. For example,
+     you might call the attribute <literal>oAuth2SharedConsent</literal>.
+    </para>
+
+    <para>
+     Adding a profile attribute involves
+     updating the identity repository to support use of the attribute,
+     updating the AMUser Service for the attribute,
+     and optionally allowing users to edit the attribute.
+     The process is described in the <citetitle>Developer's Guide</citetitle>
+     chapter, <link xlink:show="new" xlink:href="dev-guide#chap-custom-attr"
+     xlink:role="http://docbook.org/xlink/role/olink"><citetitle
+     >Customizing Profile Attributes</citetitle></link>,
+     which demonstrates adding a custom attribute
+     when using OpenDJ directory services to store user profiles.
+    </para>
    </step>
 
    <step>
