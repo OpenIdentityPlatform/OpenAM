@@ -1140,13 +1140,15 @@ public final class IdentityResource implements CollectionResourceProvider {
         IdentityDetails dtls, newDtls;
         IdentityServicesImpl idsvc = new IdentityServicesImpl();;
         Resource resource;
-
         try {
             // Retrieve details about user to be updated
             dtls = idsvc.read(resourceId, idSvcsAttrList, admin);
             // Continue modifying the identity if read success
 
             newDtls = jsonValueToIdentityDetails(jVal);
+            if(newDtls.getName() != null && !resourceId.equalsIgnoreCase(newDtls.getName())){
+                throw new BadRequestException("id in path does not match id in request body");
+            }
             newDtls.setName(resourceId);
             String userpass = jVal.get("userpassword").asString();
             // Check that the attribute userpassword is in the json object
