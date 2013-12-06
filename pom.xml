@@ -178,6 +178,11 @@
         </profile>
         <profile>
             <id>binary-licensing</id>
+            <activation>
+                <property>
+                    <name>!skipBinaryLicensing</name>
+                </property>
+            </activation>
             <build>
                 <plugins>
                     <plugin>
