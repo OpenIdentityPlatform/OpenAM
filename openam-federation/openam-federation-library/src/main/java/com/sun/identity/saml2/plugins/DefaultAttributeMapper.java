@@ -26,6 +26,9 @@
  *
  */
 
+/**
+ * Portions Copyrighted 2013 ForgeRock AS
+ */
 
 package com.sun.identity.saml2.plugins;
 
@@ -76,7 +79,7 @@ public class DefaultAttributeMapper {
      *        is the local attribute. 
      * @exception <code>SAML2Exception</code> if any failured.
      */
-    public Map getConfigAttributeMap(String realm, String hostEntityID,
+    public Map<String, String> getConfigAttributeMap(String realm, String hostEntityID,
         String role) throws SAML2Exception {
 
         return SAML2Utils.getConfigAttributeMap(realm, hostEntityID, role);
