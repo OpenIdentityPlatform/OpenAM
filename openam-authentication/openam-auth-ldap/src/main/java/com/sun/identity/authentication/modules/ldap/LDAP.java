@@ -68,6 +68,8 @@ public class LDAP extends AMLoginModule {
     private static final String AM_AUTH = "amAuth";
     private boolean sslTrustAll = false;
     private boolean sslEnabled = false;
+    
+    private static final String OPERATION_TIMEOUT_ATTR = "openam-auth-ldap-operation-timeout";
 
     // local variables
     ResourceBundle bundle = null;
@@ -234,6 +236,8 @@ public class LDAP extends AMLoginModule {
                     "openam-auth-ldap-heartbeat-interval", 10, debug);
             String heartBeatTimeUnit = CollectionHelper.getMapAttr(currentConfig,
                     "openam-auth-ldap-heartbeat-timeunit", "SECONDS");
+            
+            final int operationTimeout = CollectionHelper.getIntMapAttr(currentConfig, OPERATION_TIMEOUT_ATTR , 0 , debug);
 
             isProfileCreationEnabled = isDynamicProfileCreationEnabled();
             // set the optional attributes here
@@ -252,6 +256,7 @@ public class LDAP extends AMLoginModule {
             ldapUtil.setBeheraEnabled(beheraEnabled);
             ldapUtil.setHeartBeatInterval(heartBeatInterval);
             ldapUtil.setHeartBeatTimeUnit(heartBeatTimeUnit);
+            ldapUtil.setOperationTimeout(operationTimeout);
 
             if (debug.messageEnabled()) {
                 debug.message("bindDN-> " + bindDN
@@ -270,6 +275,7 @@ public class LDAP extends AMLoginModule {
                         + "\nsecondaryServers-> " + secondaryServers
                         + "\nheartBeatInterval-> " + heartBeatInterval
                         + "\nheartBeatTimeUnit-> " + heartBeatTimeUnit
+                        + "\noperationTimeout-> " + operationTimeout
                         + "\nPattern : " + regEx);
             }
             return true;
