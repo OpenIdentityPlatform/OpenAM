@@ -8,7 +8,7 @@
         },
         "messages" : {
             "UserMessages" : {
-                "invalidCredentials" : "Login/password combination is invalid.",
+                "authenticationFailed" : "Authentication Failed.",
                 "invalidOldPassword" : "Old password is invalid.",
                 "usernameNotFound" : "Username not found",
                 "noEmailProvided" : "No email provided in profile",
