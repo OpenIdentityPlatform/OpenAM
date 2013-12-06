@@ -25,7 +25,7 @@
                 "errorFetchingData" : "Error fetching user data",
                 "loggedOut" : "You have been logged out.",
                 "siteIdentificationChanged" : "Site identification image has been changed",
-                "securityDataChanged" : "Security data has been changed",
+                "securityDataChanged" : "Password was changed",
                 "unauthorized" : "Unauthorized access or session timeout",
                 "userAlreadyExists" : "User already exists",
                 "internalError" : "Internal server error",
