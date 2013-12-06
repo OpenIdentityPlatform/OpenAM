@@ -211,6 +211,14 @@
                         <Value>SECONDS</Value>
                     </DefaultValues>
                 </AttributeSchema>
+                <AttributeSchema name="openam-auth-ldap-operation-timeout"
+                    type="single"
+                    syntax="number"
+                    i18nKey="a120">
+                    <DefaultValues>
+                        <Value>0</Value>
+                    </DefaultValues>
+                </AttributeSchema>                 
                 <SubSchema name="serverconfig" inheritance="multiple">
                     <AttributeSchema name="iplanet-am-auth-ldap-server"
                         type="list"
@@ -378,6 +386,14 @@
                             <Value>SECONDS</Value>
                         </DefaultValues>
                     </AttributeSchema>
+                    <AttributeSchema name="openam-auth-ldap-operation-timeout"
+                        type="single"
+                        syntax="number"
+                        i18nKey="a120">
+                        <DefaultValues>
+                            <Value>0</Value>
+                        </DefaultValues>
+                    </AttributeSchema>                    
                 </SubSchema>
             </Organization>
         </Schema>

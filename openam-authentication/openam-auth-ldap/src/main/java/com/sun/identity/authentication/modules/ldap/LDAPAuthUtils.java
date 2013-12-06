@@ -32,6 +32,7 @@
 
 package com.sun.identity.authentication.modules.ldap;
 
+import com.iplanet.am.util.SystemProperties;
 import com.iplanet.sso.SSOToken;
 import com.sun.identity.authentication.util.ISAuthConstants;
 import com.sun.identity.common.ShutdownListener;
@@ -56,6 +57,7 @@ import java.util.Collections;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.TimeUnit;
 import javax.net.ssl.SSLContext;
 import org.forgerock.openam.ldap.LDAPURL;
 import static org.forgerock.openam.ldap.LDAPUtils.*;
@@ -116,6 +118,7 @@ public class LDAPAuthUtils {
     private String heartBeatTimeUnit;
     private ModuleState screenState;
     private int graceLogins;
+    private int operationsTimeout = 0;
     private static final Debug debug = Debug.getInstance("amAuthLDAP");
     // JSS integration
     private boolean ldapSSL = false;
@@ -252,6 +255,8 @@ public class LDAPAuthUtils {
                 synchronized(connectionPools) {
                     connPool = connectionPools.get(configName);
                     LDAPOptions options = new LDAPOptions();
+                    
+                    options.setTimeout(operationsTimeout, TimeUnit.SECONDS);                  
 
                     if (connPool == null) {
                         if (debug.messageEnabled()) {
@@ -517,7 +522,8 @@ public class LDAPAuthUtils {
                 }
             } else if (ere.getResult().getResultCode().equals(ResultCode.CLIENT_SIDE_CONNECT_ERROR) ||
                 ere.getResult().getResultCode().equals(ResultCode.CLIENT_SIDE_SERVER_DOWN) ||
-                ere.getResult().getResultCode().equals(ResultCode.UNAVAILABLE)) {
+                ere.getResult().getResultCode().equals(ResultCode.UNAVAILABLE) ||
+                ere.getResult().getResultCode().equals(ResultCode.CLIENT_SIDE_TIMEOUT)) {
                 if (debug.messageEnabled()) {
                     debug.message("changepassword:Cannot connect to " + servers + ": ", ere);
                 }
@@ -768,12 +774,13 @@ public class LDAPAuthUtils {
 
             if (erio.getCause().getResult().getResultCode().equals(ResultCode.CLIENT_SIDE_CONNECT_ERROR) ||
                 erio.getCause().getResult().getResultCode().equals(ResultCode.CLIENT_SIDE_SERVER_DOWN) ||
-                erio.getCause().getResult().getResultCode().equals(ResultCode.UNAVAILABLE)) {
+                erio.getCause().getResult().getResultCode().equals(ResultCode.UNAVAILABLE) ||
+                erio.getCause().getResult().getResultCode().equals(ResultCode.CLIENT_SIDE_TIMEOUT)) {
                 if (debug.warningEnabled()) {
                     debug.warning("Cannot connect to " + servers, erio);
-                    setState(ModuleState.SERVER_DOWN);
-                    return;
                 }
+                setState(ModuleState.SERVER_DOWN);
+                return;
             }
 
             throw new LDAPUtilException(erio);
@@ -788,7 +795,8 @@ public class LDAPAuthUtils {
 
             if (ere.getResult().getResultCode().equals(ResultCode.CLIENT_SIDE_CONNECT_ERROR) ||
                 ere.getResult().getResultCode().equals(ResultCode.CLIENT_SIDE_SERVER_DOWN) ||
-                ere.getResult().getResultCode().equals(ResultCode.UNAVAILABLE)) {
+                ere.getResult().getResultCode().equals(ResultCode.UNAVAILABLE) ||
+                ere.getResult().getResultCode().equals(ResultCode.CLIENT_SIDE_TIMEOUT)) {
                 if (debug.warningEnabled()) {
                     debug.warning("Cannot connect to " + servers, ere);
                 }
@@ -919,7 +927,8 @@ public class LDAPAuthUtils {
                     ResultCode.NO_SUCH_OBJECT, null);
             } else if (ere.getResult().getResultCode().equals(ResultCode.CLIENT_SIDE_CONNECT_ERROR) ||
                 ere.getResult().getResultCode().equals(ResultCode.CLIENT_SIDE_SERVER_DOWN) ||
-                ere.getResult().getResultCode().equals(ResultCode.UNAVAILABLE)) {
+                ere.getResult().getResultCode().equals(ResultCode.UNAVAILABLE) ||
+                ere.getResult().getResultCode().equals(ResultCode.CLIENT_SIDE_TIMEOUT)) {
                 if (debug.messageEnabled()) {
                     debug.message("Cannot connect to " + servers, ere);
                 }
@@ -1405,7 +1414,16 @@ public class LDAPAuthUtils {
     public void setHeartBeatTimeUnit(String heartBeatTimeUnit) {
         this.heartBeatTimeUnit = heartBeatTimeUnit;
     }
-
+     
+    /**
+     * Sets the ldap operation timeout.
+     *
+     * @param timeout The operation timeout in seconds.
+     */
+    public void setOperationTimeout(int timeout) {
+        this.operationsTimeout = timeout;
+    }
+    
     /**
      * Sets if the directory is Active Directory
      *
