@@ -26,6 +26,9 @@
  *
  */
 
+/**
+ * Portions Copyrighted 2013 ForgeRock AS
+ */
 
 package com.sun.identity.plugin.datastore.impl;
 
@@ -33,9 +36,7 @@ import com.sun.identity.plugin.datastore.DataStoreProvider;
 import com.sun.identity.plugin.datastore.DataStoreProviderException;
 import com.sun.identity.shared.debug.Debug;
 
-import java.util.HashMap;
 import java.util.Map;
-import java.util.ResourceBundle;
 import java.util.Set;
 
 /**
@@ -74,7 +75,7 @@ public class FedletDataStoreProvider implements DataStoreProvider {
      * @return Set of the values for the attribute.
      * @throws DataStoreProviderException if unable to retrieve the attribute. 
      */
-    public Set getAttribute(String userID, String attrName)
+    public Set<String> getAttribute(String userID, String attrName)
         throws DataStoreProviderException
     {
         debug.message("FedletDataStoreProvider.getAttribute(String, String)");
@@ -89,10 +90,39 @@ public class FedletDataStoreProvider implements DataStoreProvider {
      *  attribute name, value is a Set of values. 
      * @throws DataStoreProviderException if unable to retrieve the values. 
      */
-    public Map getAttributes(String userID, Set attrNames)
+    public Map<String, Set<String>> getAttributes(String userID, Set<String> attrNames)
         throws DataStoreProviderException
     {
         debug.message("FedletDataStoreProvider.getAttribute(String, Set)");
+        return null;
+    }
+
+    /**
+     * Returns values for a given attribute.
+     * @param userID Universal identifier of the user.
+     * @param attrName Name of the attribute whose value to be retrieved.
+     * @return Set of the values for the attribute.
+     * @throws DataStoreProviderException if unable to retrieve the attribute.
+     */
+    public byte[][] getBinaryAttribute(String userID, String attrName)
+        throws DataStoreProviderException
+    {
+        debug.message("FedletDataStoreProvider.getBinaryAttribute(String, String)");
+        return null;
+    }
+
+    /**
+     * Returns attribute values for a user.
+     * @param userID Universal identifier of the user.
+     * @param attrNames Set of attributes whose values are to be retrieved.
+     * @return Map containing attribute key/value pair, key is the
+     *  attribute name, value is a Set of values.
+     * @throws DataStoreProviderException if unable to retrieve the values.
+     */
+    public Map<String, byte[][]> getBinaryAttributes(String userID, Set<String> attrNames)
+        throws DataStoreProviderException
+    {
+        debug.message("FedletDataStoreProvider.getBinaryAttributes(String, Set)");
         return null;
     }
 
@@ -103,7 +133,7 @@ public class FedletDataStoreProvider implements DataStoreProvider {
      *  attribute name and value is a Set containing the attribute values.
      * @throws DataStoreProviderException if unable to set values. 
      */
-    public void setAttributes(String userID, Map attrMap)
+    public void setAttributes(String userID, Map<String, Set<String>> attrMap)
         throws DataStoreProviderException
     {
         debug.message("FedletDataStoreProvider.setAttribute(String, Map)");
@@ -121,7 +151,7 @@ public class FedletDataStoreProvider implements DataStoreProvider {
      * @throws DataStoreProviderException if error occurs during search or
      *  multiple matching users found.
      */
-    public String getUserID(String orgDN, Map avPairs)
+    public String getUserID(String orgDN, Map<String, Set<String>> avPairs)
         throws DataStoreProviderException
     {
         debug.message("FedletDataStoreProvider.getUserID(String, Map)");

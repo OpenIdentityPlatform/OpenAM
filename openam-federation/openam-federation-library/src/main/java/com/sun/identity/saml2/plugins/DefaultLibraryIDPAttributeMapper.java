@@ -26,14 +26,13 @@
  */
 
 /**
- * Portions Copyrighted 2013 ForgeRock, Inc.
+ * Portions Copyrighted 2013 ForgeRock AS
  */
 
 package com.sun.identity.saml2.plugins;
 
 import java.util.List;
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
 import java.util.StringTokenizer;
@@ -47,6 +46,8 @@ import com.sun.identity.plugin.session.SessionException;
 import com.sun.identity.saml2.common.SAML2Exception;
 import com.sun.identity.saml2.assertion.AssertionFactory;
 import com.sun.identity.saml2.assertion.Attribute;
+import org.forgerock.openam.utils.CollectionUtils;
+import org.forgerock.util.encode.Base64;
 
 /**
  * This class <code>DefaultLibraryIDPAttributeMapper</code> implements the
@@ -59,11 +60,14 @@ import com.sun.identity.saml2.assertion.Attribute;
  * <p>
  * Supports attribute mappings defined as:
  *
- * [NameFormatURI|]SAML ATTRIBUTE NAME=["]LOCAL NAME["]
+ * [NameFormatURI|]SAML ATTRIBUTE NAME=["]LOCAL NAME["][;binary]
  *
  * where [] elements are optional.
  *
  * Using "" (double quotes) around the LOCAL NAME will turn it into a static value.
+ *
+ * Adding ;binary at the end of the LOCAL NAME will indicate that this attribute should be treated as binary and Base64
+ * encoded.
  * <p>
  * Examples:
  * <p>
@@ -88,12 +92,23 @@ import com.sun.identity.saml2.assertion.Attribute;
  * </code>
  * will add a static SAML attribute called nameID with a value of staticNameIDValue
  * with a name format of urn:oasis:names:tc:SAML:2.0:attrname-format:uri
- *
+ *<p>
+ *<code>
+ * objectGUID=objectGUID;binary
+ *</code>
+ * will map the local binary attribute called objectGUID onto a SAML attribute called objectGUID Base64 encoded.
+ *<p>
+ *<code>
+ * urn:oasis:names:tc:SAML:2.0:attrname-format:uri|objectGUID=objectGUID;binary
+ *</code>
+ * will map the local binary attribute called objectGUID onto a SAML attribute called objectGUID Base64 encoded with a
+ * name format of urn:oasis:names:tc:SAML:2.0:attrname-format:uri.
  */
 public class DefaultLibraryIDPAttributeMapper extends DefaultAttributeMapper 
     implements IDPAttributeMapper {
 
     private static final String STATIC_QUOTE = "\"";
+    private static final String BINARY_FLAG = ";binary";
 
     /**
      * Constructor
@@ -111,9 +126,8 @@ public class DefaultLibraryIDPAttributeMapper extends DefaultAttributeMapper
      * @param realm name of the realm.
      * @exception SAML2Exception if any failure.
      */
-    public List getAttributes(Object session, String hostEntityID,
-        String remoteEntityID, String realm) throws SAML2Exception
-    {
+    public List getAttributes(Object session, String hostEntityID, String remoteEntityID, String realm)
+            throws SAML2Exception {
  
         if (hostEntityID == null) {
             throw new SAML2Exception(bundle.getString("nullHostEntityID"));
@@ -136,14 +150,14 @@ public class DefaultLibraryIDPAttributeMapper extends DefaultAttributeMapper
                 return null;
             }
 
-            Map configMap = getConfigAttributeMap(realm, remoteEntityID, SP);
+            Map<String, String> configMap = getConfigAttributeMap(realm, remoteEntityID, SP);
             if (debug.messageEnabled()) {
                 debug.message("DefaultLibraryIDPAttributeMapper." +
                     "getAttributes: remote SP attribute map = " + configMap);
             }
-            if ((configMap == null) || (configMap.isEmpty())) {
+            if (configMap == null || configMap.isEmpty()) {
                 configMap = getConfigAttributeMap(realm, hostEntityID, IDP);
-                if ((configMap == null) || (configMap.isEmpty())) {
+                if (configMap == null || configMap.isEmpty()) {
                     if (debug.messageEnabled()) {
                         debug.message("DefaultLibraryIDPAttributeMapper." +
                             "getAttributes: Configuration map is not defined.");
@@ -156,24 +170,34 @@ public class DefaultLibraryIDPAttributeMapper extends DefaultAttributeMapper
                 }
             }
 
-            List attributes = new ArrayList();
-            
-            Set localAttributes = new HashSet();
-            localAttributes.addAll(configMap.values());
-            Map valueMap = null;
+            List<Attribute> attributes = new ArrayList<Attribute>();
+
+            Map<String, Set<String>> stringValueMap = null;
+            Map<String, byte[][]> binaryValueMap = null;
 
             if (!isDynamicalOrIgnoredProfile(realm)) {
                 try {
-                    // Remove any static attributes before querying the datastore
-                    for (Iterator i = localAttributes.iterator(); i.hasNext();) {
-                        String localAttribute = (String)i.next();
+                    // Resolve attributes to be read from the datastore.
+                    Set<String> stringAttributes = new HashSet<String>(configMap.size());
+                    Set<String> binaryAttributes = new HashSet<String>(configMap.size());
+                    for (String localAttribute : configMap.values()) {
                         if (isStaticAttributeValue(localAttribute)) {
-                            i.remove();
+                            // skip over, handled directly in next step
+                        } else if (isBinaryAttributeValue(localAttribute)) {
+                            // add it to the list of attributes to treat as being binary
+                            binaryAttributes.add(removeBinaryFlag(localAttribute));
+                        } else {
+                            stringAttributes.add(localAttribute);
                         }
                     }
-                    valueMap = dsProvider.getAttributes(
-                        SessionManager.getProvider().getPrincipalName(session),
-                        localAttributes); 
+                    if (!stringAttributes.isEmpty()) {
+                        stringValueMap = dsProvider.getAttributes(
+                            SessionManager.getProvider().getPrincipalName(session), stringAttributes);
+                    }
+                    if (!binaryAttributes.isEmpty()) {
+                        binaryValueMap = dsProvider.getBinaryAttributes(
+                                SessionManager.getProvider().getPrincipalName(session), binaryAttributes);
+                    }
                 } catch (DataStoreProviderException dse) {
                     if (debug.warningEnabled()) {
                         debug.warning("DefaultLibraryIDPAttributeMapper." +
@@ -183,74 +207,74 @@ public class DefaultLibraryIDPAttributeMapper extends DefaultAttributeMapper
                 }
             }
 
-            Iterator iter = configMap.keySet().iterator();
-            while(iter.hasNext()) {
-                String samlAttribute = (String)iter.next();
-                String localAttribute = (String)configMap.get(samlAttribute);
+            for (Map.Entry<String, String> entry : configMap.entrySet()) {
+
+                String samlAttribute =  entry.getKey();
+                String localAttribute = entry.getValue();
                 String nameFormat = null;
-                // if samlAttribute has format nameFormat|samlAttribute
-                StringTokenizer tokenizer =
-                    new StringTokenizer(samlAttribute, "|");
+                // check if samlAttribute has format nameFormat|samlAttribute
+                StringTokenizer tokenizer = new StringTokenizer(samlAttribute, "|");
                 if (tokenizer.countTokens() > 1) {
                     nameFormat = tokenizer.nextToken();
                     samlAttribute = tokenizer.nextToken();
                 }
-                String[] localAttributeValues = null;
-                if ((valueMap != null) && (!valueMap.isEmpty())) {
-                    if (isStaticAttributeValue(localAttribute)) {
-                        // Treat the localAttribute as a static value
-                        // The localAttribute is enclosed in quotes so remove them before using it as the value
-                        localAttribute = localAttribute.substring(STATIC_QUOTE.length(),
-                                localAttribute.length() - STATIC_QUOTE.length());
-                        // The localAttribute becomes the static value
-                        localAttributeValues = new String[]{localAttribute};
-                        if (debug.messageEnabled()) {
-                            debug.message("DefaultLibraryIDPAttributeMapper." +
-                                    "getAttribute: adding static " +
-                                    "value " + localAttribute +
-                                    " for attribute named " + samlAttribute);
-                        }
-                    } else {
-                        Set values = (Set)valueMap.get(localAttribute);
-                        if ((values == null) || (values.isEmpty())) {
-                            if (debug.messageEnabled()) {
-                                debug.message("DefaultLibraryIDPAttributeMapper." +
-                                    "getAttribute: user profile does not have " +
-                                    "value for " + localAttribute +
-                                    " but is going to check ssotoken:");
-                            }
-                        } else {
-                            localAttributeValues = (String[])values.toArray(
-                                new String[values.size()]);
-                        }
-                    }
-                } 
-                if (localAttributeValues == null) {
-                    localAttributeValues = SessionManager.
-                        getProvider().getProperty(session, localAttribute);
-                }
 
-                if ((localAttributeValues == null) ||
-                    (localAttributeValues.length == 0)) {
-
+                Set<String> attributeValues = null;
+                if (isStaticAttributeValue(localAttribute)) {
+                    localAttribute = removeStaticFlag(localAttribute);
+                    // Remove the static flag before using it as the static value
+                    attributeValues = CollectionUtils.asSet(localAttribute);
                     if (debug.messageEnabled()) {
                         debug.message("DefaultLibraryIDPAttributeMapper." +
-                            "getAttribute: user does not have " +
-                            localAttribute);
+                                "getAttribute: adding static " +
+                                "value " + localAttribute +
+                                " for attribute named " + samlAttribute);
                     }
-                    continue;
-                }
+                } else {
+                    if (isBinaryAttributeValue(localAttribute)) {
+                        // Remove the flag as not used for lookup
+                        localAttribute = removeBinaryFlag(localAttribute);
+                        attributeValues = getBinaryAttributeValues(samlAttribute, localAttribute, binaryValueMap);
+                    } else {
+                        if (stringValueMap != null && !stringValueMap.isEmpty()) {
+                            attributeValues = stringValueMap.get(localAttribute);
+                        } else {
+                            if (debug.messageEnabled()) {
+                                debug.message("DefaultLibraryIDPAttributeMapper." +
+                                        "getAttribute: " + localAttribute +
+                                        " string value map was empty or null");
+                            }
+                        }
+                    }
 
-                attributes.add(getSAMLAttribute(samlAttribute, nameFormat,
-                    localAttributeValues, hostEntityID, remoteEntityID, realm));
+                    // If all else fails, try to get the value from the users ssoToken
+                    if (attributeValues == null || attributeValues.isEmpty()) {
+                        if (debug.messageEnabled()) {
+                            debug.message("DefaultLibraryIDPAttributeMapper." +
+                                    "getAttribute: user profile does not have " +
+                                    "value for " + localAttribute + ", checking SSOToken");
+                        }
+                        attributeValues =
+                               CollectionUtils.asSet(SessionManager.getProvider().getProperty(session, localAttribute));
+                    }
+                }
+                if (attributeValues == null || attributeValues.isEmpty()) {
+                    if (debug.messageEnabled()) {
+                        debug.message("DefaultLibraryIDPAttributeMapper.getAttribute: " +
+                                "user profile does not have a value for " + localAttribute);
+                    }
+                } else {
+                    attributes.add(getSAMLAttribute(samlAttribute, nameFormat,
+                            attributeValues, hostEntityID, remoteEntityID, realm));
+                }
             }
+
             return attributes;      
 
         } catch (SessionException se) {
             debug.error("DefaultLibraryIDPAttribute.getAttributes: ", se);
             throw new SAML2Exception(se);
         }
-
     }
 
     /**
@@ -262,9 +286,7 @@ public class DefaultLibraryIDPAttributeMapper extends DefaultAttributeMapper
      * @return <code>true</code> if it should escape special characters for
      *   attribute values; <code>false</code> otherwise.
      */
-    protected boolean needToEscapeXMLSpecialCharacters(String hostEntityID,
-        String remoteEntityID, String realm)
-    {
+    protected boolean needToEscapeXMLSpecialCharacters(String hostEntityID, String remoteEntityID, String realm) {
         return true;
     }
 
@@ -281,9 +303,7 @@ public class DefaultLibraryIDPAttributeMapper extends DefaultAttributeMapper
      * @exception SAML2Exception if any failure.
      */
     protected Attribute getSAMLAttribute(String name, String nameFormat,
-         String[] values, String hostEntityID, String remoteEntityID,
-         String realm) 
-    throws SAML2Exception {
+         Set<String> values, String hostEntityID, String remoteEntityID, String realm) throws SAML2Exception {
 
         if (name == null) {
             throw new SAML2Exception(bundle.getString("nullInput"));
@@ -296,19 +316,19 @@ public class DefaultLibraryIDPAttributeMapper extends DefaultAttributeMapper
         if (nameFormat != null) {
             attribute.setNameFormat(nameFormat);
         }
-        if (values != null) {
-            boolean toEscape = needToEscapeXMLSpecialCharacters(
-                hostEntityID, remoteEntityID, realm);
-            List list = new ArrayList();
-            for (int i=0; i<values.length; i++) {
+        if (values != null && !values.isEmpty()) {
+            boolean toEscape = needToEscapeXMLSpecialCharacters(hostEntityID, remoteEntityID, realm);
+            List<String> list = new ArrayList<String>();
+            for (String value : values) {
                 if (toEscape) {
-                    list.add(XMLUtils.escapeSpecialCharacters(values[i]));
+                    list.add(XMLUtils.escapeSpecialCharacters(value));
                 } else {
-                    list.add(values[i]);
+                    list.add(value);
                 }
             }
             attribute.setAttributeValueString(list);
         }
+
         return attribute;
     }
 
@@ -322,7 +342,65 @@ public class DefaultLibraryIDPAttributeMapper extends DefaultAttributeMapper
         return true;
     }
 
+    /**
+     * Return a Set of Base64 encoded String values that represent the binary attribute values.
+     * @param localAttribute the attribute to find in the map.
+     * @param samlAttribute the SAML attribute that will be assigned these values
+     * @param binaryValueMap the map of binary values for the all binary attributes.
+     * @return Set of Base64 encoded String values for the given binary attribute values.
+     */
+    private Set<String> getBinaryAttributeValues(String samlAttribute, String localAttribute,
+                                                 Map<String, byte[][]> binaryValueMap) {
+
+        Set<String> result = null;
+
+        // Expect to find the value in the binary Map
+        if (binaryValueMap != null && !binaryValueMap.isEmpty()) {
+            byte[][] values = binaryValueMap.get(localAttribute);
+            if (values != null && values.length > 0) {
+                // Base64 encode the binary values before they are added as an attribute value
+                result = new HashSet<String>(values.length);
+                for (byte[] value : values) {
+                    result.add(Base64.encode(value));
+                }
+                if (debug.messageEnabled()) {
+                    debug.message("DefaultLibraryIDPAttributeMapper." +
+                            "getBinaryAttributeValues: adding " + localAttribute +
+                            " as binary for attribute named " + samlAttribute);
+                }
+            } else {
+                if (debug.messageEnabled()) {
+                    debug.message("DefaultLibraryIDPAttributeMapper." +
+                            "getBinaryAttributeValues: " + localAttribute +
+                            " was flagged as binary but no value was found");
+                }
+            }
+        } else {
+            if (debug.messageEnabled()) {
+                debug.message("DefaultLibraryIDPAttributeMapper." +
+                        "getBinaryAttributeValues: " + localAttribute +
+                        " was flagged as binary but binary value map was empty or null");
+            }
+        }
+
+        return result;
+    }
+
     private boolean isStaticAttributeValue(String attribute) {
-        return attribute.startsWith(STATIC_QUOTE) && attribute.endsWith(STATIC_QUOTE);
+        return attribute != null && attribute.startsWith(STATIC_QUOTE) && attribute.endsWith(STATIC_QUOTE);
+    }
+
+    private String removeStaticFlag(String attribute) {
+        return attribute.substring(STATIC_QUOTE.length(), attribute.length() - STATIC_QUOTE.length());
+    }
+
+    private boolean isBinaryAttributeValue(String attribute) {
+        return attribute != null && attribute.endsWith(BINARY_FLAG);
+    }
+
+    private String removeBinaryFlag(String attribute) {
+
+        int flagStart = attribute.lastIndexOf(BINARY_FLAG);
+        return attribute.substring(0, flagStart);
     }
 }

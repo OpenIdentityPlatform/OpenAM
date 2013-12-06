@@ -26,12 +26,14 @@
  *
  */
 
+/**
+ * Portions Copyrighted 2013 ForgeRock AS
+ */
 
 package com.sun.identity.plugin.datastore.impl;
 
 import com.sun.identity.shared.debug.Debug;
 import com.sun.identity.shared.locale.Locale;
-import com.sun.identity.shared.configuration.SystemPropertiesManager;
 import com.iplanet.sso.SSOException;
 import com.iplanet.sso.SSOToken;
 
@@ -48,9 +50,12 @@ import com.sun.identity.plugin.datastore.DataStoreProvider;
 import com.sun.identity.plugin.datastore.DataStoreProviderException;
 import com.sun.identity.security.AdminTokenAction;
 import com.sun.identity.sm.SMSEntry;
+import org.forgerock.openam.utils.CollectionUtils;
 
 import java.security.AccessController;
+import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
 import java.util.ResourceBundle;
 import java.util.Set;
@@ -96,9 +101,8 @@ public class IdRepoDataStoreProvider implements DataStoreProvider {
      * @return Set of the values for the attribute.
      * @throws DataStoreProviderException if unable to retrieve the attribute. 
      */
-    public Set getAttribute(String userID, String attrName)
-        throws DataStoreProviderException
-    {
+    public Set<String> getAttribute(String userID, String attrName) throws DataStoreProviderException {
+
         if (userID == null) {
             throw new DataStoreProviderException(bundle.getString(
                 "nullUserId"));
@@ -110,19 +114,17 @@ public class IdRepoDataStoreProvider implements DataStoreProvider {
         }
 
         try {
-            SSOToken adminToken = (SSOToken) AccessController.doPrivileged(
-                AdminTokenAction.getInstance());
-            adminToken.setProperty("Organization", SMSEntry.getRootSuffix());
+            SSOToken adminToken = AccessController.doPrivileged(AdminTokenAction.getInstance());
             AMIdentity amId = IdUtils.getIdentity(adminToken, userID);
             return amId.getAttribute(attrName);
         } catch (SSOException ssoe) {
             debug.error("IdRepoDataStoreProvider.getAttribute(1): "
                 + "invalid admin SSOtoken", ssoe);
-            throw new DataStoreProviderException(ssoe.getMessage());
+            throw new DataStoreProviderException(ssoe);
         } catch (IdRepoException ide) {
             debug.error("IdRepoDataStoreProvider.getAttribute(1): "
                 + "IdRepo exception", ide);
-            throw new DataStoreProviderException(ide.getMessage());
+            throw new DataStoreProviderException(ide);
         }
     }
 
@@ -134,9 +136,9 @@ public class IdRepoDataStoreProvider implements DataStoreProvider {
      *  attribute name, value is a Set of values. 
      * @throws DataStoreProviderException if unable to retrieve the values. 
      */
-    public Map getAttributes(String userID, Set attrNames)
-        throws DataStoreProviderException
-    {
+    public Map<String, Set<String>> getAttributes(String userID, Set<String> attrNames)
+            throws DataStoreProviderException {
+
         if (userID == null) {
             throw new DataStoreProviderException(bundle.getString(
                 "nullUserId"));
@@ -148,19 +150,73 @@ public class IdRepoDataStoreProvider implements DataStoreProvider {
         }
 
         try {
-            SSOToken adminToken = (SSOToken) AccessController.doPrivileged(
-                AdminTokenAction.getInstance());
-            adminToken.setProperty("Organization", SMSEntry.getRootSuffix());
+            SSOToken adminToken = AccessController.doPrivileged(AdminTokenAction.getInstance());
             AMIdentity amId = IdUtils.getIdentity(adminToken, userID);
             return amId.getAttributes(attrNames);
         } catch (SSOException ssoe) {
             debug.error("IdRepoDataStoreProvider.getAttribute(2): "
                 + "invalid admin SSOtoken", ssoe);
-            throw new DataStoreProviderException(ssoe.getMessage());
+            throw new DataStoreProviderException(ssoe);
         } catch (IdRepoException ide) {
             debug.error("IdRepoDataStoreProvider.getAttribute(2): "
                 + "IdRepo exception", ide);
-            throw new DataStoreProviderException(ide.getMessage());
+            throw new DataStoreProviderException(ide);
+        }
+    }
+
+    /**
+     * Returns binary values for a given attribute.
+     * @param userID Universal identifier of the user.
+     * @param attrName Name of the attribute whose value to be retrieved.
+     * @return A byte array of the byte values for the attribute.
+     * @throws DataStoreProviderException if unable to retrieve the attribute.
+     */
+    public byte[][] getBinaryAttribute(String userID, String attrName) throws DataStoreProviderException {
+
+        if (userID == null) {
+            throw new DataStoreProviderException(bundle.getString("nullUserId"));
+        }
+
+        if (attrName == null) {
+            throw new DataStoreProviderException(bundle.getString("nullAttrName"));
+        }
+
+        Set<String> attributes = CollectionUtils.asSet(attrName);
+
+        // There is currently no getBinaryAttribute in AMIdentity, leverage the getBinaryAttributes call
+        Map<String, byte[][]> results = getBinaryAttributes(userID, attributes);
+        return results.get(attrName);
+    }
+
+    /**
+     * Returns binary attribute values for a user.
+     * @param userID Universal identifier of the user.
+     * @param attrNames Set of attributes whose values are to be retrieved.
+     * @return Map containing attribute key/value pair, key is the
+     *  attribute name, value is a Set of byte[][] values.
+     * @throws DataStoreProviderException if unable to retrieve the values.
+     */
+    public Map<String, byte[][]> getBinaryAttributes(String userID, Set<String> attrNames)
+            throws DataStoreProviderException {
+
+        if (userID == null) {
+            throw new DataStoreProviderException(bundle.getString("nullUserId"));
+        }
+
+        if (attrNames == null) {
+            throw new DataStoreProviderException(bundle.getString("nullAttrSet"));
+        }
+
+        try {
+            SSOToken adminToken = AccessController.doPrivileged(AdminTokenAction.getInstance());
+            AMIdentity amId = IdUtils.getIdentity(adminToken, userID);
+            return amId.getBinaryAttributes(attrNames);
+        } catch (SSOException ssoe) {
+            debug.error("IdRepoDataStoreProvider.getBinaryAttributes(): invalid admin SSOToken", ssoe);
+            throw new DataStoreProviderException(ssoe);
+        } catch (IdRepoException ide) {
+            debug.error("IdRepoDataStoreProvider.getBinaryAttributes(): IdRepo exception", ide);
+            throw new DataStoreProviderException(ide);
         }
     }
 
@@ -171,8 +227,7 @@ public class IdRepoDataStoreProvider implements DataStoreProvider {
      *  attribute name and value is a Set containing the attribute values.
      * @throws DataStoreProviderException if unable to set values. 
      */
-    public void setAttributes(String userID, Map attrMap)
-        throws DataStoreProviderException
+    public void setAttributes(String userID, Map<String, Set<String>> attrMap) throws DataStoreProviderException
     {
         if (userID == null) {
             throw new DataStoreProviderException(bundle.getString(
@@ -184,20 +239,18 @@ public class IdRepoDataStoreProvider implements DataStoreProvider {
         }
 
         try {
-            SSOToken adminToken = (SSOToken) AccessController.doPrivileged(
-                AdminTokenAction.getInstance());
-            adminToken.setProperty("Organization", SMSEntry.getRootSuffix());
+            SSOToken adminToken = AccessController.doPrivileged(AdminTokenAction.getInstance());
             AMIdentity amId = IdUtils.getIdentity(adminToken, userID);
             amId.setAttributes(attrMap);
             amId.store();
         } catch (SSOException ssoe) {
             debug.error("IdRepoDataStoreProvider.setAttribute(): "
                 + "invalid admin SSOtoken", ssoe);
-            throw new DataStoreProviderException(ssoe.getMessage());
+            throw new DataStoreProviderException(ssoe);
         } catch (IdRepoException ide) {
             debug.error("IdRepoDataStoreProvider.setAttribute(): "
                 + "IdRepo exception", ide);
-            throw new DataStoreProviderException(ide.getMessage());
+            throw new DataStoreProviderException(ide);
         }
     }
     
@@ -213,33 +266,31 @@ public class IdRepoDataStoreProvider implements DataStoreProvider {
      * @throws DataStoreProviderException if error occurs during search or
      *  multiple matching users found.
      */
-    public String getUserID(String orgDN, Map avPairs)
+    public String getUserID(String orgDN, Map<String, Set<String>> avPairs)
         throws DataStoreProviderException
     {
         if (orgDN == null) {
             orgDN = SMSEntry.getRootSuffix();
         }
         
-        if ((avPairs == null) || (avPairs.size() == 0)) {
+        if (avPairs == null || avPairs.isEmpty()) {
             throw new DataStoreProviderException(bundle.getString(
                 "nullAvPair"));
         }
         Set amIdSet = null;
         try {
-            IdSearchControl searchControl = getIdSearchControl(
-                avPairs, IdSearchOpModifier.AND);
+            IdSearchControl searchControl = getIdSearchControl(avPairs, IdSearchOpModifier.AND);
             AMIdentityRepository idRepo = getAMIdentityRepository(orgDN);
-            IdSearchResults searchResults = idRepo.searchIdentities(
-                IdType.USER, "*", searchControl);
+            IdSearchResults searchResults = idRepo.searchIdentities(IdType.USER, "*", searchControl);
             amIdSet = searchResults.getSearchResults();
         } catch (IdRepoException ame) {
             debug.error("IdRepoDataStoreProvider.getUserID(): IdRepoException",
                 ame);
-            throw new DataStoreProviderException(ame.getMessage());
+            throw new DataStoreProviderException(ame);
         } catch (SSOException ssoe) {
             debug.error("IdRepoDataStoreProvider.getUserID() : SSOException", 
                 ssoe);
-            throw new DataStoreProviderException(ssoe.getMessage());
+            throw new DataStoreProviderException(ssoe);
         }
         if (amIdSet == null || amIdSet.isEmpty()) {
             debug.message("IdRepoDataStoreProvider.getUserID : user not found");
@@ -275,9 +326,7 @@ public class IdRepoDataStoreProvider implements DataStoreProvider {
         }
 
         try {
-            SSOToken adminToken = (SSOToken) AccessController.doPrivileged(
-                AdminTokenAction.getInstance());
-            adminToken.setProperty("Organization", SMSEntry.getRootSuffix());
+            SSOToken adminToken = AccessController.doPrivileged(AdminTokenAction.getInstance());
             AMIdentity amId = IdUtils.getIdentity(adminToken, userID);
             // treat inactive as user does not exist
             return amId.isActive();
@@ -287,7 +336,7 @@ public class IdRepoDataStoreProvider implements DataStoreProvider {
         } catch (SSOException ssoe) {
             debug.error("IdRepoDataStoreProvider.isUserExists() : SSOException",
                 ssoe);
-            throw new DataStoreProviderException(ssoe.getMessage());
+            throw new DataStoreProviderException(ssoe);
         }
     }
 
@@ -304,13 +353,10 @@ public class IdRepoDataStoreProvider implements DataStoreProvider {
     {
         AMIdentityRepository amIdentityRepository = null;
         try {
-            SSOToken adminToken = (SSOToken) AccessController.doPrivileged(
-                AdminTokenAction.getInstance());
-            adminToken.setProperty("Organization", SMSEntry.getRootSuffix());
+            SSOToken adminToken = AccessController.doPrivileged(AdminTokenAction.getInstance());
             amIdentityRepository = (AMIdentityRepository) idRepoMap.get(realm);
             if (amIdentityRepository == null) {
-                amIdentityRepository =
-                    new AMIdentityRepository(adminToken, realm);
+                amIdentityRepository = new AMIdentityRepository(adminToken, realm);
                 idRepoMap.put(realm, amIdentityRepository);
                 if (debug.messageEnabled()) {
                     debug.message("IdRepoDataStoreProvider.getAMIdRepo : " 
@@ -320,11 +366,11 @@ public class IdRepoDataStoreProvider implements DataStoreProvider {
         } catch (IdRepoException ie) {
             debug.error("IdRepoDataStoreProvider.getAMIdRepo : " + 
                 "IdRepoException: ", ie);
-            throw new DataStoreProviderException(ie.getMessage());
+            throw new DataStoreProviderException(ie);
         } catch (SSOException se) {
             debug.error("IdRepoDataStoreProvider.getAMIdRepo : " + 
                 "SSOException: ", se);
-            throw new DataStoreProviderException(se.getMessage());
+            throw new DataStoreProviderException(se);
         }
         return amIdentityRepository;
     } 

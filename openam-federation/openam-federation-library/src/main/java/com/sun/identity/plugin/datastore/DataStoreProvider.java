@@ -26,6 +26,10 @@
  *
  */
 
+/**
+ * Portions Copyrighted 2013 ForgeRock AS
+ */
+
 package com.sun.identity.plugin.datastore;
 
 import java.util.Map;
@@ -56,7 +60,7 @@ public interface DataStoreProvider {
      * @return Set of the values for the attribute.
      * @throws DataStoreProviderException if an error occurred.
      */
-    public Set getAttribute(String userID, String attrName)
+    public Set<String> getAttribute(String userID, String attrName)
         throws DataStoreProviderException;
 
     /**
@@ -67,17 +71,39 @@ public interface DataStoreProvider {
      *  name and value is the attribute value Set.
      * @throws DataStoreProviderException if an error occurred.
      */
-    public Map getAttributes(String userID, Set attrNames)
+
+    public Map<String, Set<String>> getAttributes(String userID, Set<String> attrNames)
         throws DataStoreProviderException;
 
     /**
-     * Sets user attrbiutes.
+     * Gets user binary attribute.
      * @param userID ID value for the user.
-     * @param attrMap Map of specified attrbibutes to be set. Map key is
+     * @param attrName Name of the attribute whose value to be retrieved.
+     * @return Set of the values for the attribute.
+     * @throws DataStoreProviderException if an error occurred.
+     */
+    public byte[][] getBinaryAttribute(String userID, String attrName)
+        throws DataStoreProviderException;
+
+    /**
+     * Gets user binary attributes.
+     * @param userID ID value for the user.
+     * @param attrNames The Set of attribute names.
+     * @return Map of specified attributes. Map key is the attribute
+     *  name and value is the attribute value Set.
+     * @throws DataStoreProviderException if an error occurred.
+     */
+    public Map<String, byte[][]> getBinaryAttributes(String userID, Set<String> attrNames)
+        throws DataStoreProviderException;
+
+    /**
+     * Sets user attributes.
+     * @param userID ID value for the user.
+     * @param attrMap Map of specified attributes to be set. Map key is
      *  the attribute name and value is the attribute value Set.
      * @throws DataStoreProviderException if an error occurred.
      */
-    public void setAttributes(String userID, Map attrMap)
+    public void setAttributes(String userID, Map<String, Set<String>> attrMap)
         throws DataStoreProviderException;
 
     /**
@@ -87,7 +113,7 @@ public interface DataStoreProvider {
      *  the user.
      * @throws DataStoreProviderException if an error occurred.
      */
-    public String getUserID(String orgDN, Map avPairs)
+    public String getUserID(String orgDN, Map<String, Set<String>> avPairs)
         throws DataStoreProviderException;
 
     /**
