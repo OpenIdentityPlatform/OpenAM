@@ -81,18 +81,17 @@ public class CollectionHelper {
      * @param defaultValue Default value if the integer value is not found.
      * @param debug Debug object.
      * @return integer value from a Map of String of Set of String.
-     * @throws NumberFormatException if the result is not an integer.
      */
     public static int getIntMapAttr(
         Map map, 
         String name,
         String defaultValue,
         Debug debug
-    ) throws NumberFormatException {
+    ) {
         try {
             return Integer.parseInt(getMapAttr(map, name, defaultValue));
-        } catch (Exception e) {
-            debug.error("CollectionHelper.getIntMapAttr", e);
+        } catch (NumberFormatException nfe) {
+            debug.error("CollectionHelper.getIntMapAttr", nfe);
             return Integer.parseInt(defaultValue);
         }
     }
@@ -105,7 +104,6 @@ public class CollectionHelper {
      * @param defaultValue Default value if the integer value is not found.
      * @param debug Debug object.
      * @return integer value from a Map of String of Set of String.
-     * @throws NumberFormatException if the result is not an integer.
      */
     public static int getIntMapAttr(
         Map map,
@@ -115,8 +113,8 @@ public class CollectionHelper {
     ) {
         try {
             return Integer.parseInt(getMapAttr(map, name));
-        } catch (Exception e) {
-            debug.error("CollectionHelper.getIntMapAttr", e);
+        } catch (NumberFormatException nfe) {
+            debug.error("CollectionHelper.getIntMapAttr", nfe);
             return defaultValue;
         }
     }
