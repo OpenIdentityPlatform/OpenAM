@@ -735,59 +735,132 @@ http://openam.example.com:8080/openam/oauth2/access_token?realm=realm
  <section xml:id="oauth2-client-plus-authz">
   <title>Configuring OpenAM as Authorization Server &amp; Client</title>
 
-  <para>This section takes a high-level look at how to set up OpenAM both as an
-  OAuth 2.0 authorization server and also as a client in order to protect
-  resources by using a policy agent. The high-level steps are as follows.</para>
+  <para>
+   This section takes a high-level look at how to set up OpenAM
+   both as an OAuth 2.0 authorization server and also as an OAuth 2.0 client
+   in order to protect resources on a resource server
+   by using an OpenAM policy agent.
+  </para>
+
+  <mediaobject xml:id="figure-oauth2-end-to-end-example">
+   <alt>OpenAM authorization server, OpenAM client, resource server</alt>
+   <imageobject>
+    <imagedata fileref="images/oauth2-end-to-end-example.png" format="PNG" />
+   </imageobject>
+   <textobject>
+    <para>
+     This example uses three servers,
+     an OAuth 2.0 authorization server configured in an OpenAM server,
+     an OAuth 2.0 client configured in another OpenAM server,
+     and an OAuth 2.0 resource server which is protected with a policy agent.
+    </para>
+   </textobject>
+  </mediaobject>
+
+  <para>
+   The example in this section uses three servers,
+   <literal>http://authz.example.com:8080/openam</literal> as the
+   OAuth 2.0 authorization server,
+   <literal>http://client.example.com:8080/openam</literal> as the
+   OAuth 2.0 client, which also handles policy,
+   <literal>http://www.example.com:8080/</literal> as the
+   OAuth 2.0 resource server protected with an OpenAM policy agent
+   where the resources to protect are deployed in Apache Tomcat.
+   The two OpenAM servers communicate using OAuth 2.0.
+   The policy agent on the resource server communicates with OpenAM
+   as policy agents normally do, using OpenAM specific requests.
+   The resource server in this example does not need to support OAuth 2.0.
+  </para>
+
+  <para>
+   The high-level configuration steps are as follows.
+  </para>
 
   <orderedlist>
    <listitem>
-    <para>Set up a policy agent or OpenIG to protect your web resources,
-    including the policy used to protect the resources.</para>
-    <para>Make sure you can access the resources using an authentication module
-    that you already know before working with OAuth 2.0.</para>
+    <para>
+     On the OpenAM server that you will configure to act as an OAuth 2.0 client,
+     configure a policy agent profile,
+     and the policy used to protect the resources.</para>
+
+    <para>
+     On the web server or application container
+     that will act as an OAuth 2.0 resource server,
+     install and configure the OpenAM policy agent.
+    </para>
+
+    <para>
+     Make sure that you can access the resources when you log in
+     through an authentication module that you know to be working,
+     such as the default DataStore authentication module.
+    </para>
+
+    <para>
+     In this example, you would try to access
+     <literal>http://www.example.com:8080/examples/</literal>.
+     The policy agent should redirect you to the OpenAM login page.
+     After you log in successfully as a user with access rights to the resource,
+     OpenAM should redirect you back to
+     <literal>http://www.example.com:8080/examples/</literal>,
+     and the policy agent should allow access.
+    </para>
+
+    <para>
+     Fix any problems you have in accessing the resources
+     before you try to set up access through the OAuth 2.0 authentication module.
+    </para>
    </listitem>
    <listitem>
-    <para>Configure OpenAM's OAuth 2.0 authorization service as described
-    in <xref linkend="configure-oauth2-authz" />.</para>
+    <para>
+     Configure one OpenAM server as an OAuth 2.0 authorization service,
+     which is described in <xref linkend="configure-oauth2-authz" />.
+    </para>
    </listitem>
    <listitem>
-    <para>Configure an OpenAM OAuth 2.0 authentication module instance using
-    the <link xlink:href="admin-guide#oauth2-module-conf-hints"
-    xlink:role="http://docbook.org/xlink/role/olink"><citetitle>Hints For the
-    OAuth 2.0 Authentication Module</citetitle></link> with the OpenAM
-    authorization service endpoints.</para>
+    <para>
+     Configure the other OpenAM server with the policy agent profile and policy
+     as an OAuth 2.0 client, by setting up an OAuth 2.0 authentication module
+     according to the <link xlink:show="new"
+     xlink:href="admin-guide#oauth2-module-conf-hints"
+     xlink:role="http://docbook.org/xlink/role/olink"><citetitle>Hints For the
+     OAuth 2.0 Authentication Module</citetitle></link>.
+    </para>
    </listitem>
    <listitem>
-    <para>Register the OAuth 2.0 authentication module as an OAuth 2.0
-    confidential client as described in <xref
-    linkend="register-oauth2-client" />.</para>
+    <para>
+     On the authorization server, register the OAuth 2.0 authentication module
+     as an OAuth 2.0 client, which is described in
+     <xref linkend="register-oauth2-client" />.
+    </para>
    </listitem>
    <listitem>
-    <para>Logout and access the protected resources to see the process in
-    action.</para>
+    <para>
+     Log out and access the protected resources to see the process in action.
+    </para>
    </listitem>
   </orderedlist>
 
   <example xml:id="protect-web-site-with-oauth2"><?dbfo keep-together="auto"?>
    <title>Web Site Protected With OAuth 2.0</title>
 
-   <para>This example pulls everything together (except security
-   considerations), using OpenAM as an OAuth 2.0 authorization server,
-   OAuth 2.0 client, and "resource server" by protecting web resources with
-   a policy agent.</para>
-
-   <para>This example uses two hosts, <literal>oauth2.example.com</literal>
-   where OpenAM is deployed at
-   <literal>http://oauth2.example.com:8080/openam</literal>, and
-   <literal>www.example.com</literal> where the resources to protect are
-   deployed in Apache Tomcat at
-   <literal>http://www.example.com:8080/examples</literal>.</para>
+   <para>
+    This example pulls everything together (except security considerations),
+    using OpenAM servers both as the OAuth 2.0 authorization server,
+    and also as the OAuth 2.0 client,
+    with an OpenAM policy agent on the resource server
+    requesting policy decisions from OpenAM as OAuth 2.0 client.
+    In this way any server protected by a policy agent
+    that is connected to an OpenAM OAuth 2.0 client
+    can act as an OAuth 2.0 resource server.
+   </para>
 
    <orderedlist>
     <listitem>
-     <para>Set up an OpenAM policy agent and policy in the top-level realm,
-     <literal>/</literal>, to protect resources. So far this is standard
-     OpenAM, unrelated to OAuth 2.0.</para>
+     <para>
+      On the OpenAM server that will be configured as an OAuth 2.0 client,
+      set up an OpenAM policy agent and policy in the top-level realm,
+      <literal>/</literal>, to protect resources.
+     </para>
 
      <para>See the <link xlink:href="web-install-guide#web-install-guide"
      xlink:role="http://docbook.org/xlink/role/olink"><citetitle>OpenAM Web Policy
@@ -828,16 +901,22 @@ http://openam.example.com:8080/openam/oauth2/access_token?realm=realm
     </listitem>
 
     <listitem>
-     <para>Configure OpenAM's OAuth 2.0 authorization service as described
-     in <xref linkend="configure-oauth2-authz" />.</para>
+     <para>
+      On the OpenAM server to be configured as an OAuth 2.0 authorization server,
+      configure OpenAM's OAuth 2.0 authorization service
+      as described in <xref linkend="configure-oauth2-authz" />.
+     </para>
 
      <para>The authorization endpoint to protect in this example is at
-     <literal>http://oauth2.example.com:8080/openam/oauth2/authorize</literal>.</para>
+     <literal>http://authz.example.com:8080/openam/oauth2/authorize</literal>.</para>
     </listitem>
 
     <listitem>
-     <para>Configure an OpenAM OAuth 2.0 authentication module instance for
-     the top-level realm.</para>
+     <para>
+      On the OpenAM server to be configured as an OAuth 2.0 client,
+      configure an OpenAM OAuth 2.0 authentication module instance
+      for the top-level realm.
+     </para>
 
      <para>Under Access Control &gt; / (Top-Level Realm) &gt; Authentication
      &gt; Module Instances, click New. Name the module
@@ -871,7 +950,7 @@ http://openam.example.com:8080/openam/oauth2/access_token?realm=realm
        <term>Authentication Endpoint URL</term>
        <listitem>
         <para>In this example,
-        <literal>http://oauth2.example.com:8080/openam/oauth2/authorize</literal>.</para>
+        <literal>http://authz.example.com:8080/openam/oauth2/authorize</literal>.</para>
 
         <para>This OpenAM endpoint can take additional parameters. In
         particular you must specify the realm if the OpenAM OAuth 2.0
@@ -880,7 +959,7 @@ http://openam.example.com:8080/openam/oauth2/access_token?realm=realm
 
         <para>For example, if the OAuth 2.0 provider is configured for the
         realm <literal>/customers</literal>, then use the following URL:
-        <literal>https://openam.example.com:8443/openam/oauth2/authorize?realm=/customers</literal></para>
+        <literal>http://authz.example.com:8080/openam/oauth2/authorize?realm=/customers</literal></para>
 
         <para>The <literal>/oauth2/authorize</literal> endpoint can also take
         <literal>module</literal> and <literal>service</literal> parameters. Use
@@ -896,7 +975,7 @@ http://openam.example.com:8080/openam/oauth2/access_token?realm=realm
        <term>Access Token Endpoint URL</term>
        <listitem>
         <para>In this example,
-        <literal>http://oauth2.example.com:8080/openam/oauth2/access_token</literal>.</para>
+        <literal>http://authz.example.com:8080/openam/oauth2/access_token</literal>.</para>
 
         <para>This OpenAM endpoint can take additional parameters. In
         particular you must specify the realm if the OpenAM OAuth 2.0
@@ -905,14 +984,14 @@ http://openam.example.com:8080/openam/oauth2/access_token?realm=realm
 
         <para>For example, if the OAuth 2.0 provider is configured for the
         realm <literal>/customers</literal>, then use the following URL:
-        <literal>https://openam.example.com:8443/openam/oauth2/access_token?realm=/customers</literal></para>
+        <literal>http://authz.example.com:8080/openam/oauth2/access_token?realm=/customers</literal></para>
        </listitem>
       </varlistentry>
       <varlistentry>
        <term>User Profile Service URL</term>
        <listitem>
         <para>In this example,
-        <literal>http://oauth2.example.com:8080/openam/oauth2/tokeninfo</literal>.</para>
+        <literal>http://authz.example.com:8080/openam/oauth2/tokeninfo</literal>.</para>
        </listitem>
       </varlistentry>
       <varlistentry>
@@ -938,10 +1017,10 @@ http://openam.example.com:8080/openam/oauth2/access_token?realm=realm
        <term>Proxy URL</term>
        <listitem>
         <para>The client redirect URL, which in this example is
-        <literal>http://oauth2.example.com:8080/openam/oauth2c/OAuthProxy.jsp</literal>.</para>
+        <literal>http://client.example.com:8080/openam/oauth2c/OAuthProxy.jsp</literal>.</para>
        </listitem></varlistentry>
       <varlistentry>
-       <term>Attribute Mapper</term>
+       <term>Account Mapper</term>
        <listitem>
         <para>In this example, 
         <literal>org.forgerock.openam.authentication.modules.oauth2.DefaultAccountMapper</literal>.</para>
@@ -954,27 +1033,36 @@ http://openam.example.com:8080/openam/oauth2/access_token?realm=realm
        </listitem>
       </varlistentry>
       <varlistentry>
+       <term>Attribute Mapper</term>
+       <listitem>
+        <para>In this example,
+        <literal>org.forgerock.openam.authentication.modules.oauth2.DefaultAttributeMapper</literal>.</para>
+       </listitem>
+      </varlistentry>
+      <varlistentry>
+       <term>Attribute Mapper Configuration</term>
+       <listitem>
+        <para>In this example, <literal>cn=cn</literal>.</para>
+       </listitem>
+      </varlistentry>
+      <varlistentry>
        <term>Create account if it does not exist</term>
        <listitem>
         <para>In this example, disable this functionality.</para>
         <para>OpenAM can create local accounts based on the account information
-        returned by the authorization server. For this example, map all users
-        to the anonymous account to keep it simple.</para>
-       </listitem>
-      </varlistentry>
-      <varlistentry>
-       <term>Map to anonymous user</term>
-       <listitem>
-        <para>In this example, enable this functionality.</para>
+        returned by the authorization server.</para>
        </listitem>
       </varlistentry>
      </variablelist>
     </listitem>
 
     <listitem>
-     <para>Register the OAuth 2.0 authentication module as an OAuth 2.0
-     confidential client as described in <xref
-     linkend="register-oauth2-client" />.</para>
+     <para>
+      On the OpenAM server configured to act as an OAuth 2.0 authorization server,
+      register the OAuth 2.0 authentication module
+      as an OAuth 2.0 confidential client,
+      which is described in <xref linkend="register-oauth2-client" />.
+     </para>
 
      <para>Under Access Control &gt; / (Top-Level Realm) &gt; Agents &gt;
      OAuth 2.0 Client &gt; Agents &gt; <literal>myClientID</literal>, adjust
@@ -993,7 +1081,7 @@ http://openam.example.com:8080/openam/oauth2/access_token?realm=realm
        <term>Redirection URIs</term>
        <listitem>
         <para>In this example,
-        <literal>http://oauth2.example.com:8080/openam/oauth2c/OAuthProxy.jsp</literal>.</para>
+        <literal>http://client.example.com:8080/openam/oauth2c/OAuthProxy.jsp</literal>.</para>
        </listitem>
       </varlistentry>
 
@@ -1007,8 +1095,11 @@ http://openam.example.com:8080/openam/oauth2/access_token?realm=realm
     </listitem>
 
     <listitem>
-     <para>Before you try it out, you must make the following additional
-     change to the configuration.</para>
+     <para>
+      Before you try it out,
+      on the OpenAM server configured to act as an OAuth 2.0 client,
+      you must make the following additional change to the configuration.
+     </para>
 
      <para>Your OpenAM OAuth 2.0 client authentication module is not part
      of the default chain, and therefore OpenAM does not call it unless
@@ -1019,9 +1110,9 @@ http://openam.example.com:8080/openam/oauth2/access_token?realm=realm
      authentication module explicitly, browse in OpenAM console to your
      <emphasis>policy agent profile configuration</emphasis>, in this case
      Access Control &gt; / (Top-Level Realm) &gt; Agents &gt; J2EE &gt;
-     Agents &gt; <literal>Tomcat</literal> &gt; OpenAM Services &gt; OpenAM
+     Agents > <replaceable>Agent Name</replaceable> > OpenAM Services > OpenAM
      Login URL, and add
-     <literal>http://oauth2.example.com:8080/openam/UI/Login?module=OAuth2</literal>,
+     <literal>http://client.example.com:8080/openam/UI/Login?module=OAuth2</literal>,
      moving it to the top of the list.</para>
 
      <para>Save your work.</para>
@@ -1036,7 +1127,7 @@ http://openam.example.com:8080/openam/oauth2/access_token?realm=realm
 
      <para>First make sure you are logged out of OpenAM, for example by
      browsing to the logout URL, in this case
-     <literal>http://oauth2.example.com:8080/openam/UI/Logout</literal>.</para>
+     <literal>http://client.example.com:8080/openam/UI/Logout</literal>.</para>
 
      <para>Next attempt to access the protected resource, in this case
      <literal>http://www.example.com:8080/examples/</literal>.</para>
