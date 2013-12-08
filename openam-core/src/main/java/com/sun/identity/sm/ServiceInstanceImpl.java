@@ -262,7 +262,7 @@ class ServiceInstanceImpl {
                 .append(SMSEntry.COMMA).append("ou=").append(serviceName)
                 .append(SMSEntry.COMMA).append(SMSEntry.SERVICES_RDN).append(
                         SMSEntry.COMMA);
-        if (orgName.isEmpty()) {
+        if (orgName == null || orgName.isEmpty()) {
             orgName = SMSEntry.baseDN;
         } else if (DN.isDN(orgName)) {
             // Do nothing
