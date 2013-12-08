@@ -27,9 +27,9 @@
     $Id: amAuthAD.xml,v 1.5 2008/06/25 05:45:41 qcheng Exp $
 
 -->
-
-
-
+<!--
+    Portions Copyrighted 2013 ForgeRock AS
+-->
 
 <!DOCTYPE ServicesConfiguration
     PUBLIC "=//iPlanet//Service Management Services (SMS) 1.0 DTD//EN"
@@ -170,6 +170,14 @@
                         <Value>MINUTES</Value>
                     </DefaultValues>
                 </AttributeSchema>
+                <AttributeSchema name="openam-auth-ldap-operation-timeout"
+                    type="single"
+                    syntax="number"
+                    i18nKey="a120">
+                    <DefaultValues>
+                        <Value>0</Value>
+                    </DefaultValues>
+                </AttributeSchema>
                 <SubSchema name="serverconfig" inheritance="multiple">
                     <AttributeSchema name="iplanet-am-auth-ldap-server"
                         type="list"
@@ -296,6 +304,14 @@
                     </ChoiceValues>
                     <DefaultValues>
                         <Value>MINUTES</Value>
+                    </DefaultValues>
+                </AttributeSchema>
+                <AttributeSchema name="openam-auth-ldap-operation-timeout"
+                    type="single"
+                    syntax="number"
+                    i18nKey="a120">
+                    <DefaultValues>
+                        <Value>0</Value>
                     </DefaultValues>
                 </AttributeSchema>
                 </SubSchema>
