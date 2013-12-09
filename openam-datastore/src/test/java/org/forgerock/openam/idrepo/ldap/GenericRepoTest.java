@@ -298,6 +298,16 @@ public class GenericRepoTest extends IdRepoTestBase {
         assertThat(attrs.get("givenName")).containsOnly(DEMO);
     }
 
+    @Test(description = "OPENAM-3376")
+    public void createEntryWithEmptyAttributes() throws Exception {
+        Map<String, Set<String>> attrs = MapHelper.readMap("/config/users/testuser1.properties");
+        attrs.put("mail", null);
+        idrepo.create(null, IdType.USER, TEST_USER1, attrs);
+        assertThat(idrepo.isExists(null, IdType.USER, TEST_USER1)).isTrue();
+        idrepo.delete(null, IdType.USER, TEST_USER1);
+        assertThat(idrepo.isExists(null, IdType.USER, TEST_USER1)).isFalse();
+    }
+
     @Test
     public void searchReturnsEmptyResultsIfNoMatch() throws Exception {
         RepoSearchResults results =

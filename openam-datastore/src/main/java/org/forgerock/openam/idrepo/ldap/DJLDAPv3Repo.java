@@ -612,8 +612,13 @@ public class DJLDAPv3Repo extends IdRepo {
         attrMap.put(getNamingAttribute(type), asSet(name));
 
         Entry entry = new LinkedHashMapEntry(dn);
+        Set<String> attributeValue;
         for (Map.Entry<String, Set<String>> attr : attrMap.entrySet()) {
-            entry.addAttribute(attr.getKey(), attr.getValue().toArray());
+            // Add only attributes whose values are not empty or null
+            attributeValue = attr.getValue();
+            if(attributeValue != null  && !attributeValue.isEmpty()) {
+                entry.addAttribute(attr.getKey(), attributeValue.toArray());
+            }
         }
 
         if (type.equals(IdType.GROUP) && defaultGroupMember != null) {
