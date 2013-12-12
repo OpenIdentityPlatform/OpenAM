@@ -104,10 +104,14 @@
   </step>
 
   <step performance="optional">
-   <para>If you want to configure the upgraded system with a different
-   directory service for the Core Token Service (CTS), read <link xlink:show="new"
+   <para>If you want to configure the upgraded system for the Core Token Service (CTS),
+   read <link xlink:show="new"
    xlink:href="install-guide#chap-cts" xlink:role="http://docbook.org/xlink/role/olink">
-   <citetitle>Configuring the Core Token Service</citetitle></link>.</para>
+   <citetitle>Configuring the Core Token Service</citetitle></link>. For a list of
+   supported directory services, see the <link xlink:show="new"
+   xlink:href="release-notes#data-store-requirements"
+   xlink:role="http://docbook.org/xlink/role/olink">
+   <citetitle>Data Store Requirements</citetitle> section of the Release Notes.</link></para>
   </step>
 
   <step>
