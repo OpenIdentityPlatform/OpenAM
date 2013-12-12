@@ -2052,7 +2052,7 @@ $ curl
 
     <screen>$ curl --request PUT --header "iplanetDirectoryPro: AQIC5w...2NzEz*"
  --header "Content-Type: application/json" --header "If-None-Match: *"
- --data '{ "username": "janedoe" userpassword": "secret12", "mail": "janedoe@example.com" }'
+ --data '{ "username": "janedoe", "userpassword": "secret12", "mail": "janedoe@example.com" }'
  https://openam.example.com:8443/openam/json/users/janedoe
 {
     "username": "janedoe",
