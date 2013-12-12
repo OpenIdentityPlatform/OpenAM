@@ -24,10 +24,10 @@
   !    
 -->
 <chapter xml:id='chap-federation'
- xmlns='http://docbook.org/ns/docbook'
- version='5.0' xml:lang='en'
+ xmlns='http://docbook.org/ns/docbook' version='5.0' xml:lang='en'
  xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance'
- xsi:schemaLocation='http://docbook.org/ns/docbook http://docbook.org/xml/5.0/xsd/docbook.xsd'
+ xsi:schemaLocation='http://docbook.org/ns/docbook
+                     http://docbook.org/xml/5.0/xsd/docbook.xsd'
  xmlns:xlink='http://www.w3.org/1999/xlink'>
  <title>Managing SAML 2.0 Federation</title>
 
@@ -187,6 +187,28 @@
     <literal>partnerID</literal> as the Name in Assertion with
     <literal>"staticPartnerIDValue"</literal> as the Local Attribute
     Name.</para>
+
+   <para>
+    The default IDP attribute mapper also allows you
+    to Base64 encode binary attributes when adding them to the SAML attributes.
+    Add <literal>;binary</literal> to the end of the attribute name,
+    as in the following example:
+   </para>
+
+   <literallayout class="monospaced">objectGUID=objectGUID;binary</literallayout>
+
+   <para>
+    This maps the local binary attribute <literal>objectGUID</literal>
+    to a SAML attribute called <literal>objectGUID</literal> that is Base64 encoded.
+   </para>
+
+   <para>
+    The default IDP attribute mapper also supports
+    <literal>NameFormatURI</literal> format as shown in the following example:
+   </para>
+
+   <literallayout class="monospaced"
+   >urn:oasis:names:tc:SAML:2.0:attrname-format:uri|objectGUID=objectGUID;binary</literallayout>
    </step>
    <step>
     <para>Click Configure to save your configuration.</para>
