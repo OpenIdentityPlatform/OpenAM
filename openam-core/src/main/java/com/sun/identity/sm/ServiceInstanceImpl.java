@@ -262,17 +262,8 @@ class ServiceInstanceImpl {
                 .append(SMSEntry.COMMA).append("ou=").append(serviceName)
                 .append(SMSEntry.COMMA).append(SMSEntry.SERVICES_RDN).append(
                         SMSEntry.COMMA);
-        if (orgName == null || orgName.isEmpty()) {
-            orgName = SMSEntry.baseDN;
-        } else if (DN.isDN(orgName)) {
-            // Do nothing
-        } else if (orgName.startsWith("/")) {
-            orgName = DNMapper.orgNameToDN(orgName);
-        } else {
-            String[] args = { orgName };
-            throw (new SMSException(IUMSConstants.UMS_BUNDLE_NAME,
-                    "sms-invalid-org-name", args));
-        }
+        //DNMapper will map null or empty string to baseDN
+        orgName = DNMapper.orgNameToDN(orgName);
         sb.append(orgName);
         return sb.toString();
     }
