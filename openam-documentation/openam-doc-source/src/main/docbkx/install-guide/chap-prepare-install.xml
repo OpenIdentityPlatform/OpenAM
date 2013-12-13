@@ -1331,6 +1331,27 @@ com.sun.xml.internal.messaging.saaj.soap.ver1_1.SOAPMessageFactory1_1Impl $*</pr
    </para>
 
    <para>
+    When using WebLogic 12.1.1 with Java 6,
+    if you plan to use the <command>ssoadm</command> command to configure OpenAM,
+    then make the following change to the start up script,
+    <filename>startWebLogic.sh</filename>,
+    to avoid exceptions and incorrect results.
+    Change the following line:
+   </para>
+
+   <literallayout class="monospaced"
+   >${DOMAIN_HOME}/startWebLogic.sh</literallayout>
+
+   <para>
+    To this:
+   </para>
+
+   <literallayout class="monospaced"
+   >${DOMAIN_HOME}/bin/startWebLogic.sh \
+-Djavax.xml.soap.MessageFactory=\
+com.sun.xml.internal.messaging.saaj.soap.ver1_1.SOAPMessageFactory1_1Impl $*</literallayout>
+
+   <para>
     Restart WebLogic for the change to take effect.
    </para>
  </section>

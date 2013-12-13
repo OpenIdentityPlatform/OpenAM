@@ -196,6 +196,26 @@ PING openam-ter (192.168.56.2) 56(84) bytes of data.
     </answer>
    </qandaentry>
 
+   <qandaentry xml:id="ssoadm-weblogic-1211-java6">
+    <question>
+     <para>
+      I have OpenAM deployed on WebLogic 12.1.1 and am running Java 6.
+      What can I do to fix the exceptions and strange results that I am seeing
+      when I use the <command>ssoadm</command> command?
+     </para>
+    </question>
+
+    <answer>
+     <para>
+      Edit the start up script for WebLogic as described in
+      the <citetitle>Installation Guide</citetitle> section,
+      <link xlink:href="install-guide#prepare-oracle-weblogic" xlink:show="new"
+      xlink:role="http://docbook.org/xlink/role/olink"><citetitle
+      >Preparing Oracle WebLogic</citetitle></link>, and then restart WebLogic.
+     </para>
+    </answer>
+   </qandaentry>
+
    <qandaentry xml:id="opendj-missing-schema">
     <question>
      <para>I added OpenDJ as a data store, and now I cannot add a user. OpenAM
