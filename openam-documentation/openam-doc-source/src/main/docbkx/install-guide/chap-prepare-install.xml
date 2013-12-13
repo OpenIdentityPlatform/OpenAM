@@ -1315,7 +1315,7 @@ $ java -server -Xmx1024m -XX:MaxPermSize=256m -jar start.jar</screen>
    <para>
     To use the Sun/Oracle Java SAAJ implementation,
     edit the WebLogic start up script for the domain where OpenAM runs, such as
-    <filename>/path/to/weblogic/user_projects/domains/wlsdomain/bin/startWebLogic.sh</filename>.
+    <filename>/path/to/weblogic/user_projects/domains/wlsdomain/startWebLogic.sh</filename>.
 
     Change the following line:
 
