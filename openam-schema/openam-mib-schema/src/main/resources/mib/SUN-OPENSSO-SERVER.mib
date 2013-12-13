@@ -4,7 +4,7 @@
 --
 
 --
--- Portions Copyrighted 2011 ForgeRock AS
+-- Portions Copyrighted 2011-2013 ForgeRock AS
 --
 
 SUN-OPENSSO-SERVER-MIB DEFINITIONS ::= BEGIN
@@ -33,13 +33,13 @@ IMPORTS
 
     ssoMIB MODULE-IDENTITY
        LAST-UPDATED "200904141212Z"
-       ORGANIZATION "OpenSSO Project, Sun Microsystems"
+       ORGANIZATION "OpenAM, ForgeRock AS"
        CONTACT-INFO
-               "Users EMail: users@opensso.dev.java.net
-		See also: https://opensso.dev.java.net"
+               "Users EMail: support@forgerock.com
+		See also: https://www.forgerock.com"
 
        DESCRIPTION
-               "The MIB module defines objects for OpenSSO."
+               "The MIB module defines objects for OpenAM."
        ::= { sso 1 }
 
 --
@@ -2612,6 +2612,367 @@ numConnReleased OBJECT-TYPE
             "Total number of connections returned to the pool"
     DEFVAL        { 0 }
     ::= { ssoServerConnPoolSvc 7 }
+
+--
+-- SSO CTS Monitoring
+--
+
+ssoServerCTSMonitoring OBJECT IDENTIFIER ::= { ssoServerInstance 25 }
+
+--
+-- Instance of TokenTableEntry
+--
+
+tokenTable			OBJECT-TYPE
+	SYNTAX			SEQUENCE OF TokenEntry
+	MAX-ACCESS		not-accessible
+	STATUS			current
+	DESCRIPTION     "Token Information"
+	::= { ssoServerCTSMonitoring 1 }
+
+TokenEntry ::=
+	SEQUENCE	{
+					tokenTableIndex		Unsigned32,
+					tokenType			SnmpAdminString
+				}
+
+tokenTableIndex OBJECT-TYPE
+    SYNTAX        	Unsigned32
+    MAX-ACCESS    	read-only
+    STATUS        	current
+    DESCRIPTION		"Token Table Index"
+    ::= { tokenEntry 1 }
+
+tokenType OBJECT-TYPE
+    SYNTAX        	SnmpAdminString
+    MAX-ACCESS    	read-only
+    STATUS        	current
+    DESCRIPTION		"Token Type"
+    ::= { tokenEntry 2 }
+
+--
+-- TokenTableEntry
+--
+
+tokenEntry OBJECT-TYPE
+	SYNTAX 			TokenEntry
+	MAX-ACCESS		not-accessible
+	STATUS			current
+	DESCRIPTION		"Information for a token"
+	INDEX			{ tokenTableIndex }
+	::= { tokenTable 1 }
+
+--
+-- OperationTable
+--
+
+operationTable OBJECT-TYPE
+	SYNTAX 			SEQUENCE OF OperationEntry
+	MAX-ACCESS		not-accessible
+	STATUS			current
+	DESCRIPTION		"Operation Information"
+	::= { ssoServerCTSMonitoring 2 }
+
+--
+-- OperationEntry
+--
+
+operationEntry	        OBJECT-TYPE
+	SYNTAX		    OperationEntry
+	MAX-ACCESS	    not-accessible
+	STATUS		    current
+	DESCRIPTION	    "Information regarding a specific operation type"
+	INDEX		    { operationTableIndex }
+	::= { operationTable 1 }
+
+OperationEntry ::=
+	SEQUENCE	{
+					operationTableIndex		Unsigned32,
+					operationType		SnmpAdminString
+				}
+
+operationTableIndex      OBJECT-TYPE
+	SYNTAX			Unsigned32
+	MAX-ACCESS		read-only
+	STATUS			current
+	DESCRIPTION     "Operation Table Index"
+	::= { operationEntry 1 }
+
+operationType OBJECT-TYPE
+	SYNTAX			SnmpAdminString
+	MAX-ACCESS		read-only
+	STATUS			current
+	DESCRIPTION     "Operation Operation Type"
+	::= { operationEntry 2 }
+
+--
+-- ctsTokenOperationsTable
+--
+
+ctsTokenOperationsTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF CTSTokenOperationsEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "Values associated with information about a specific token"
+    ::= { ssoServerCTSMonitoring 5 }
+
+--
+-- ctsTokenOperationsEntry
+--
+
+ctsTokenOperationsEntry OBJECT-TYPE
+    SYNTAX      CTSTokenOperationsEntry
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Information about a specific token, related to token index supplied"
+    INDEX { tokenTableIndex }
+    ::= { ctsTokenOperationsTable 1 }
+
+CTSTokenOperationsEntry ::=
+    SEQUENCE    {
+                        totalCount  Unsigned32
+                }
+
+--
+-- ctsCRUDOperationsTable
+--
+
+ctsCRUDOperationsTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF CTSCRUDOperationsEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "Rates accessed only through operation (no token type)"
+    ::= { ssoServerCTSMonitoring 3 }
+
+--
+-- CTSOperationsPerTokenTypeEntry
+--
+
+ctsCRUDOperationsEntry OBJECT-TYPE
+    SYNTAX      CTSCRUDOperationsEntry
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Rate information for operation-specific (no token type) rates"
+    INDEX       { operationTableIndex }
+    ::= { ctsCRUDOperationsTable 1 }
+
+CTSCRUDOperationsEntry ::=
+    SEQUENCE        {
+                        sCumulativeCount     Unsigned32,
+                        sAverage             Unsigned32,
+                        sMinimum             Unsigned32,
+                        sMaximum             Unsigned32
+                    }
+
+sCumulativeCount  	OBJECT-TYPE
+    SYNTAX      	Unsigned32
+    MAX-ACCESS  	read-only
+    STATUS      	current
+    DESCRIPTION     "Cumulative value"
+    DEFVAL    		{ 0 }
+	::= { ctsCRUDOperationsEntry 1 }
+
+sAverage  	OBJECT-TYPE
+    SYNTAX      	Unsigned32
+    MAX-ACCESS  	read-only
+    STATUS      	current
+    DESCRIPTION     "Average value"
+    DEFVAL    		{ 0 }
+	::= { ctsCRUDOperationsEntry 2 }
+
+sMinimum  	OBJECT-TYPE
+    SYNTAX      	Unsigned32
+    MAX-ACCESS  	read-only
+    STATUS      	current
+    DESCRIPTION     "Minimum value"
+    DEFVAL    		{ 0 }
+	::= { ctsCRUDOperationsEntry 3 }
+
+sMaximum  	OBJECT-TYPE
+    SYNTAX      	Unsigned32
+    MAX-ACCESS  	read-only
+    STATUS      	current
+    DESCRIPTION     "Maximum value"
+    DEFVAL    		{ 0 }
+	::= { ctsCRUDOperationsEntry 4 }
+
+--
+-- ctsCRUDOperationsPerTokenTypeTable
+--
+
+ctsCRUDOperationsPerTokenTypeTable OBJECT-TYPE
+    SYNTAX          SEQUENCE OF CTSCRUDOperationsPerTokenTypeEntry
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION     "Rates accessed through operation and token type"
+	::= { ssoServerCTSMonitoring 4 }
+
+--
+-- CTSCRUDOperationsPerTokenTypeEntry
+--
+
+ctsCRUDOperationsPerTokenTypeEntry     OBJECT-TYPE
+	SYNTAX			CTSCRUDOperationsPerTokenTypeEntry
+	MAX-ACCESS		not-accessible
+	STATUS			current
+	DESCRIPTION     "Rate information for a token & operation combination"
+	INDEX		    { tokenTableIndex, operationTableIndex }
+	::= { ctsCRUDOperationsPerTokenTypeTable 1 }
+
+CTSCRUDOperationsPerTokenTypeEntry ::=
+	SEQUENCE 		{
+	                    dCumulative         Unsigned32,
+						dAverage 		    Unsigned32,
+						dMinimum 		    Unsigned32,
+						dMaximum 		    Unsigned32
+			  		}
+
+dCumulativeCount  	OBJECT-TYPE
+    SYNTAX      	Unsigned32
+    MAX-ACCESS  	read-only
+    STATUS      	current
+    DESCRIPTION     "Cumulative value"
+    DEFVAL    		{ 0 }
+	::= { ctsCRUDOperationsPerTokenTypeEntry 1 }
+
+dAverage  	OBJECT-TYPE
+    SYNTAX      	Unsigned32
+    MAX-ACCESS  	read-only
+    STATUS      	current
+    DESCRIPTION     "Average value"
+    DEFVAL    		{ 0 }
+	::= { ctsCRUDOperationsPerTokenTypeEntry 2 }
+
+dMinimum  	OBJECT-TYPE
+    SYNTAX      	Unsigned32
+    MAX-ACCESS  	read-only
+    STATUS      	current
+    DESCRIPTION     "Minimum value"
+    DEFVAL    		{ 0 }
+	::= { ctsCRUDOperationsPerTokenTypeEntry 3 }
+
+dMaximum  	OBJECT-TYPE
+    SYNTAX      	Unsigned32
+    MAX-ACCESS  	read-only
+    STATUS      	current
+    DESCRIPTION     "Maximum value"
+    DEFVAL    		{ 0 }
+	::= { ctsCRUDOperationsPerTokenTypeEntry 4 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 --
 -- SSO Conformance
