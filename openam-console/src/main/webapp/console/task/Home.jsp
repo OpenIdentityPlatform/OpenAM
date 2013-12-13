@@ -26,8 +26,9 @@
 
 --%>
 <%--
-   Portions Copyrighted 2010-2012 ForgeRock Inc
+   Portions Copyrighted 2010-2013 ForgeRock Inc
    Portions Copyrighted 2012 Open Source Solution Technology Corporation
+   Portions Copyrighted 2013 Nomura Research Institute, Ltd
 --%>
 
 <%@ page info="Home" language="java" %>
@@ -67,6 +68,7 @@
 
 <div id="info4" onclick="showDiv(); event.cancelBubble = true;" class="TskPgeInfPnl">
     <div><a href="#" id="close4" onclick="closeAll(4); event.cancelBubble = true;return false;"><img alt="close remote sp" src="../console/images/tasks/close.gif" border="0" /></a></div><p><span class="TskPgeHdr"><cc:text name="txtHelpCreateRemoteSP" defaultValue="commontask.create.remote.sp" bundleID="amConsole" /></span></p></div>
+
 <div id="info5" onclick="showDiv(); event.cancelBubble = true;" class="TskPgeInfPnl">
     <div><a href="#" id="close5" onclick="closeAll(5); event.cancelBubble = true;return false;"><img alt="close create fedlet" src="../console/images/tasks/close.gif" border="0" /></a></div><p><span class="TskPgeHdr"><cc:text name="txtHelpCreateFedlet" defaultValue="commontask.create.fedlet" bundleID="amConsole" /></span></p></div>
 
@@ -84,6 +86,9 @@
 
 <div id="info12" onclick="showDiv(); event.cancelBubble = true;" class="TskPgeInfPnl">
     <div><a href="#" id="close12" onclick="closeAll(12); event.cancelBubble = true;return false;"><img alt="close register product" src="../console/images/tasks/close.gif" border="0" /></a></div><p><span class="TskPgeHdr"><cc:text name="txtRegisterProduct" defaultValue="commontask.register.product" bundleID="amConsole" /></span></p></div>
+
+<div id="info7" onclick="showDiv(); event.cancelBubble = true;" class="TskPgeInfPnl">
+    <div><a href="#" id="close7" onclick="closeAll(7); event.cancelBubble = true;return false;"><img alt="close configure oauth2" src="../console/images/tasks/close.gif" border="0" /></a></div><p><span class="TskPgeHdr"><cc:text name="txtHelpValidate" defaultValue="commontask.configure.oauth2" bundleID="amConsole" /></span></p></div>
 
 <div class="TskPgeFllPge" id="TskPge" onclick="hideAllMenus()">
     <table width="100%" border="0" cellspacing="0" cellpadding="0">
@@ -165,9 +170,9 @@
                     <tr><td class="TskPgeBckgrTd">
                         <table width="100%" border="0" cellspacing="0" cellpadding="0">
                             <tr>
-                                <td width="2%" valign="bottom" class="TskPgeTskLftTd"><img alt="spacer" id="gif6" src="../console/images/tasks/spacer.gif" width="12" height="8" /></td>
+                                <td width="2%" valign="bottom" class="TskPgeTskLftTd"><img alt="spacer" id="gif7" src="../console/images/tasks/spacer.gif" width="12" height="8" /></td>
                                 <td width="100%;" class="TskPgeTskCntrTd"><a href="../task/ConfigureOAuth2" class="TskPgeTxtBg" onmouseover="this.className='TskPgeTxtBgOvr'" onfocus="this.className='TskPgeTxtBgOvr'" onmouseout="this.className='TskPgeTxtBg'" onblur="this.className='TskPgeTxtBg'"><span class="TskPgeTskLftBtm"></span><span class="TskPgeTskLftTp"></span><span class="TskPgeTskRghtBtm"></span><span class="TskPgeTskRghtTp"></span><span class="TskPgeTskRghtBrdr"></span><span class="TskPgeTskPdng"><cc:text name="txtConfigureOAuth2" defaultValue="commontask.label.configure.oauth2" bundleID="amConsole" /></span></a></td>
-                                <td width="3%" class="TskPgeTskRghtTd" align="right" valign="top"><a href="#" onclick="test(6); event.cancelBubble = true; return false;"  onmouseover="hoverImg(6); event.cancelBubble = true;" onmouseout="outImg(6); event.cancelBubble = true;" onfocus="hoverImg(6); event.cancelBubble = true;" onblur="outImg(6); event.cancelBubble = true;" id="i6"><img alt="samlv2 validate" src="../console/images/tasks/rightToggle.gif" width="29" height="21" border="0" id="togImg6" /></a></td>
+                                <td width="3%" class="TskPgeTskRghtTd" align="right" valign="top"><a href="#" onclick="test(7); event.cancelBubble = true; return false;"  onmouseover="hoverImg(7); event.cancelBubble = true;" onmouseout="outImg(7); event.cancelBubble = true;" onfocus="hoverImg(7); event.cancelBubble = true;" onblur="outImg(7); event.cancelBubble = true;" id="i7"><img alt="samlv2 validate" src="../console/images/tasks/rightToggle.gif" width="29" height="21" border="0" id="togImg7" /></a></td>
                             </tr>
                         </table>
                     </td></tr>
