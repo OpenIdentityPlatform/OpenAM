@@ -273,6 +273,17 @@ public class GenericRepoTest extends IdRepoTestBase {
         assertThat(attrs.get("sn")).containsOnly(DEMO);
     }
 
+    @Test(description = "OPENAM-3237")
+    public void settingNonExistentAttributeWithEmptyValueDoesNotFail() throws Exception {
+        Map<String, Set<String>> attrs = new CaseInsensitiveHashMap(idrepo.getAttributes(null, IdType.USER, DEMO));
+        assertThat(attrs.get("cn")).isNull();
+        Map<String, Set<String>> changes = new HashMap<String, Set<String>>();
+        changes.put("cn", new HashSet<String>(0));
+        idrepo.setAttributes(null, IdType.USER, DEMO, changes, true);
+        attrs = new CaseInsensitiveHashMap(idrepo.getAttributes(null, IdType.USER, DEMO));
+        assertThat(attrs.get("cn")).isNull();
+    }
+
     @Test
     public void removeAttributesFailWithEmptyChangeset() throws Exception {
         try {
