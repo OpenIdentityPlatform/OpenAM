@@ -25,18 +25,18 @@
  * $Id: NameIdentifierMapper.java,v 1.4 2008/08/19 19:11:14 veiming Exp $
  *
  */
-
+/**
+ * Portions Copyrighted 2013 ForgeRock AS
+ */
 package com.sun.identity.saml.plugins;
 
-import com.sun.identity.plugin.session.SessionManager;
-import com.sun.identity.plugin.session.SessionException;
 import com.sun.identity.saml.assertion.NameIdentifier;
 import com.sun.identity.saml.common.SAMLException;
 
 /**
  * The class <code>NameIdentifierMapper</code> is an interface
  * that is implemented to map user account to name identifier in
- * assertion subject in OpenSSO.  
+ * assertion subject in OpenAM.
  *
  * @supported.all.api
  */
@@ -51,9 +51,10 @@ public interface NameIdentifierMapper {
      *        originated.
      * @param destID destination ID for the site for which the assertion will be
      *        created.
+     * @param nameIDFormat The NameID-Format.
      * @return a <code>NameIdentifier</code> for assertion subject.
      * @exception SAMLException if an error occurs
      */
     public NameIdentifier getNameIdentifier(Object session, String sourceID,
-        String destID) throws SAMLException;
+        String destID, String nameIDFormat) throws SAMLException;
 }

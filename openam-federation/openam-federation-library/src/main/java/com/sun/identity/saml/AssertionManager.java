@@ -25,7 +25,9 @@
  * $Id: AssertionManager.java,v 1.13 2010/01/09 19:41:06 qcheng Exp $
  *
  */
-
+/**
+ * Portions Copyrighted 2013 ForgeRock AS
+ */
 package com.sun.identity.saml;
 
 import java.util.Map;
@@ -794,19 +796,7 @@ public final class AssertionManager {
         String srcID =
             (String)SAMLServiceManager.getAttribute(SAMLConstants.SITE_ID);
 
-        if ((nameIDFormat != null) && (nameIDFormat.length() > 0)) {
-            String[] nameIDFormats = { nameIDFormat };
-            try {
-                sessionProvider.setProperty(token, SAMLConstants.NAME_ID_FORMAT,
-                    nameIDFormats);
-            } catch (SessionException ex) {
-                if (SAMLUtils.debug.warningEnabled()) {
-                    SAMLUtils.debug.warning(
-                        "AssertionManager.createAssertion:", ex);
-                }
-            }
-        }
-        NameIdentifier ni = niMapper.getNameIdentifier(token, srcID, destID);
+        NameIdentifier ni = niMapper.getNameIdentifier(token, srcID, destID, nameIDFormat);
         if (ni == null) {
             SAMLUtils.debug.error("AssertionManager.createAssertion(id): " +
                                   "name identifier is null.");
