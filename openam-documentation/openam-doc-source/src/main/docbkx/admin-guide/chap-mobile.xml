@@ -279,10 +279,10 @@
    >OpenAM OAuth 2.0 iOS Sample App</link>.
   </para>
 
-  <mediaobject xml:id="figure-ios-auth2-sample-app">
+  <mediaobject xml:id="figure-ios-oauth2-sample-app">
    <alt>OpenAM OAuth 2.0 iOS Sample App</alt>
    <imageobject>
-    <imagedata fileref="images/ios-auth2-sample-app.png" format="PNG" />
+    <imagedata fileref="images/ios-oauth2-sample-app.png" format="PNG" />
    </imageobject>
    <textobject>
     <para>
