@@ -2797,15 +2797,6 @@
                         </DefaultValues>
                     </AttributeSchema>
 
-                    <AttributeSchema name="sun-idrepo-ldapv3-config-psearch-filter"
-                        type="single"
-                        syntax="string"
-                        i18nKey="a20431">
-                        <DefaultValues>
-                            <Value>(objectclass=*)</Value>
-                        </DefaultValues>
-                    </AttributeSchema>
-
                     <AttributeSchema name="sun-idrepo-ldapv3-config-psearch-scope"
                         type="single_choice"
                         syntax="string"
@@ -3287,15 +3278,6 @@
                         i18nKey="a2043">
                         <DefaultValues>
                             <Value>@NORMALIZED_ORGBASE@</Value>
-                        </DefaultValues>
-                    </AttributeSchema>
-
-                    <AttributeSchema name="sun-idrepo-ldapv3-config-psearch-filter"
-                        type="single"
-                        syntax="string"
-                        i18nKey="a20431">
-                        <DefaultValues>
-                            <Value>(objectclass=*)</Value>
                         </DefaultValues>
                     </AttributeSchema>
 
