@@ -34,9 +34,11 @@ import org.forgerock.openam.utils.IOUtils;
 import org.forgerock.opendj.ldap.Attribute;
 import org.forgerock.opendj.ldap.Connection;
 import org.forgerock.opendj.ldap.ConnectionFactory;
+import org.forgerock.opendj.ldap.DN;
 import org.forgerock.opendj.ldap.DecodeException;
 import org.forgerock.opendj.ldap.DecodeOptions;
 import org.forgerock.opendj.ldap.ErrorResultException;
+import org.forgerock.opendj.ldap.Filter;
 import org.forgerock.opendj.ldap.FutureResult;
 import org.forgerock.opendj.ldap.RootDSE;
 import org.forgerock.opendj.ldap.SearchScope;
@@ -64,8 +66,8 @@ public class DJLDAPv3PersistentSearch {
     private final ConnectionFactory factory;
     private final Map<IdRepoListener, Set<IdType>> listenerMap = new ConcurrentHashMap<IdRepoListener, Set<IdType>>(1);
     private final int retryInterval;
-    private final String pSearchBaseDN;
-    private final String pSearchFilter;
+    private final DN pSearchBaseDN;
+    private final Filter pSearchFilter;
     private final SearchScope pSearchScope;
     private volatile boolean shutdown = false;
     private volatile Connection conn;
@@ -80,8 +82,9 @@ public class DJLDAPv3PersistentSearch {
 
     public DJLDAPv3PersistentSearch(Map<String, Set<String>> configMap, ConnectionFactory factory) {
         retryInterval = CollectionHelper.getIntMapAttr(configMap, LDAP_RETRY_INTERVAL, 3000, DEBUG);
-        pSearchBaseDN = CollectionHelper.getMapAttr(configMap, LDAP_PERSISTENT_SEARCH_BASE_DN);
-        pSearchFilter = CollectionHelper.getMapAttr(configMap, LDAP_PERSISTENT_SEARCH_FILTER);
+        pSearchBaseDN = DN.valueOf(CollectionHelper.getMapAttr(configMap, LDAP_PERSISTENT_SEARCH_BASE_DN));
+        pSearchFilter = LDAPUtils.parseFilter(CollectionHelper.getMapAttr(configMap, LDAP_PERSISTENT_SEARCH_FILTER),
+                Filter.objectClassPresent());
         pSearchScope = LDAPUtils.getSearchScope(
                 CollectionHelper.getMapAttr(configMap, LDAP_PERSISTENT_SEARCH_SCOPE), SearchScope.WHOLE_SUBTREE);
         this.factory = factory;
@@ -129,12 +132,9 @@ public class DJLDAPv3PersistentSearch {
      * Checks if there are any registered listeners for this persistent search connection.
      * The caller must ensure that calls to addListener/removeListener/hasListeners invocations are synchronized
      * correctly.
-     *
-     * @param idRepoListener The {@link IdRepoListener} instance that needs to be notified about changes.
-     * @param supportedTypes The supported {@link IdType}s for which events needs to be generated.
      */
     public boolean hasListeners() {
-        return listenerMap.size() > 0;
+        return !listenerMap.isEmpty();
     }
 
     /**
