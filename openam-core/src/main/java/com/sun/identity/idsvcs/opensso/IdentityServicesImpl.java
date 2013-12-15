@@ -1215,10 +1215,17 @@ public class IdentityServicesImpl
      */
     private void mapIdRepoException(IdRepoException exception) throws NeedMoreCredentials,
             ObjectNotFound, TokenExpired, GeneralFailure, AccessDenied {
-        if(exception.getErrorCode().equalsIgnoreCase("402")){
-            throw new AccessDenied(exception.getMessage());
-        } else{
-            throw new GeneralFailure(exception.getMessage());
+        String ldapErrCode = exception.getLDAPErrorCode();
+        String errorCode = exception.getErrorCode();
+        String msg = exception.getMessage();
+
+        if(errorCode.equals("402")){
+            throw new AccessDenied(msg);
+        } else if (errorCode.equals("223") || 
+            (ldapErrCode!=null && ldapErrCode.equals("32"))) {
+            throw new ObjectNotFound(msg);
+        } else {
+            throw new GeneralFailure(msg);
         } //Need to add other cases when found
 
     }
