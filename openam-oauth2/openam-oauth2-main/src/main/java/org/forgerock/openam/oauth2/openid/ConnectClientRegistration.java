@@ -22,6 +22,10 @@
  * "Portions Copyrighted [year] [name of copyright owner]"
  */
 
+/*
+ * Portions Copyrighted 2013 Nomura Research Institute, Ltd
+ */
+
 package org.forgerock.openam.oauth2.openid;
 
 import com.iplanet.sso.SSOToken;
@@ -209,7 +213,7 @@ public class ConnectClientRegistration extends ServerResource {
                 Set<String> set = new HashSet<String>();
                 for (int i = 0; i < temp.length(); i++){
                     try {
-                        set.add((String) temp.get(i));
+                        set.add("[" + i + "]=" + (String) temp.get(i));
                     } catch (JSONException e) {
                         OAuth2Utils.DEBUG.error("ConnectClientRegistration.Validate(): Unable to create client", e);
                         throw OAuthProblemException.OAuthError.INVALID_CLIENT_METADATA.handle(getRequest());
