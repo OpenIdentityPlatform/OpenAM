@@ -26,13 +26,14 @@
 /*
  * Portions Copyrighted 2013 Syntegrity.
  * Portions Copyrighted 2013 ForgeRock Inc.
+ * Portions Copyrighted 2013 Nomura Research Institute, Ltd
  */
 
 package org.forgerock.openam.authentication.modules.deviceprint.model;
 
 /**
  * Represents Device Print data gathered by JS collectors.
- * 
+ *
  * @author mbilski
  */
 public class DevicePrint {
@@ -307,7 +308,7 @@ public class DevicePrint {
 		if (getClass() != obj.getClass())
 			return false;
 		DevicePrint other = (DevicePrint) obj;
-		
+
 		if (installedFonts == null) {
 			if (other.installedFonts != null)
 				return false;
@@ -365,7 +366,7 @@ public class DevicePrint {
 				+ ", screenHeight=" + screenHeight + ", screenWidth="
 				+ screenWidth + ", installedPlugins=" + installedPlugins
 				+ ", installedFonts=" + installedFonts + ", timezone="
-				+ ", longitude="
+				+ timezone + ", longitude="
 				+ longitude + ", latitude=" + latitude + ", userAgent="
 				+ userAgent + "]";
 	}
