@@ -26,6 +26,10 @@
  *
  */
 
+/*
+ * Portions Copyrighted 2013 ForgeRock AS
+ * Portions Copyrighted 2013 Nomura Research Institute, Ltd
+ */
 package com.sun.identity.cli.schema;
 
 
@@ -188,6 +192,14 @@ public class ModifySubConfiguration extends SchemaCommand {
         for (int i = 1; i <= tokenCount; i++) {
             String scn = SMSSchema.unescapeName(st.nextToken());
             sc = sc.getSubConfig(scn);
+            if (sc == null) {
+                Object[] params = { subConfigName };
+                String msg = MessageFormat.format(
+                        getResourceString("modify-sub-configuration-does-not-exist"),
+                        params);
+                throw new CLIException(msg,
+                        ExitCodes.REQUEST_CANNOT_BE_PROCESSED);
+            }
         }
 
         if (operation.equals("set")) {

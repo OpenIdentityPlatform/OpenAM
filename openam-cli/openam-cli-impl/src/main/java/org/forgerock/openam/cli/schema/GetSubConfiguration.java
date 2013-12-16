@@ -22,6 +22,10 @@
  * "Portions Copyrighted [year] [name of copyright owner]"
  *
  */
+
+/*
+ * Portions Copyrighted 2013 Nomura Research Institute, Ltd
+ */
 package org.forgerock.openam.cli.schema;
 
 import com.iplanet.sso.SSOException;
@@ -154,6 +158,14 @@ public class GetSubConfiguration extends SchemaCommand {
         for (int i = 1; i <= tokenCount; i++) {
             String scn = SMSSchema.unescapeName(st.nextToken());
             sc = sc.getSubConfig(scn);
+            if (sc == null) {
+                Object[] params = { subConfigName };
+                String msg = MessageFormat.format(
+                        getResourceString("modify-sub-configuration-does-not-exist"),
+                        params);
+                throw new CLIException(msg,
+                        ExitCodes.REQUEST_CANNOT_BE_PROCESSED);
+            }
         }
 
         sc.getAttributes();
