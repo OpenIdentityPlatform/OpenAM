@@ -23,6 +23,10 @@
  *
  */
 
+/*
+ * Portions Copyrighted 2013 Nomura Research Institute, Ltd
+ */
+
 package org.forgerock.openam.authentication.modules.adaptive;
 
 import com.googlecode.ipv6.IPv6Address;
@@ -410,10 +414,13 @@ public class Adaptive extends AMLoginModule implements AMPostAuthProcessInterfac
         int retVal = 0;
 
         try {
-            if (0 == getFailCount(amAuthIdentity)) {
-                retVal = authFailureScore;
+            // Check if zero (or -1 if Account lockout is not enabled)
+            if (0 >= getFailCount(amAuthIdentity)) {
+                 retVal = authFailureScore;
             }
         } catch (AuthenticationException e) {
+            debug.error(ADAPTIVE
+                    + ".checkAuthFailure() : Failed to get fail count", e);
         }
 
         if (!authFailureInvert) {
