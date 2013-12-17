@@ -95,7 +95,7 @@ define(function () {
     
         server.respondWith(
             "GET",   
-            "templates/user/DefaultBaseTemplate.html",
+            "templates/common/DefaultBaseTemplate.html",
             [
                 200, 
                 { 

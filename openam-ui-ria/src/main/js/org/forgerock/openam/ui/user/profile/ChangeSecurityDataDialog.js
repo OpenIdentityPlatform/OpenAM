@@ -34,9 +34,8 @@ define("org/forgerock/openam/ui/user/profile/ChangeSecurityDataDialog", [
     "UserDelegate",
     "org/forgerock/commons/ui/common/util/UIUtils",
     "org/forgerock/commons/ui/common/main/EventManager",
-    "org/forgerock/commons/ui/common/util/Constants",
-    "org/forgerock/commons/ui/user/delegates/SecurityQuestionDelegate"
-], function(Dialog, validatorsManager, conf, userDelegate, uiUtils, eventManager, constants, securityQuestionDelegate) {
+    "org/forgerock/commons/ui/common/util/Constants"
+], function(Dialog, validatorsManager, conf, userDelegate, uiUtils, eventManager, constants) {
     var ChangeSecurityDataDialog = Dialog.extend({    
         contentTemplate: "templates/openam/ChangeSecurityDataDialogTemplate.html",
         

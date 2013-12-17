@@ -16,7 +16,7 @@
                     },
                     "lessVars": {
                         "background-color": "#eee",
-                        "background-image": "url('images/box-bg.png')",
+                        "background-image": "url('../images/box-bg.png')",
                         "background-repeat": "no-repeat",
                         "background-position": "950px -100px",
                         "footer-background-color": "#eee",

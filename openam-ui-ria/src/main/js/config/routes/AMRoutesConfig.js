@@ -1,7 +1,7 @@
 /** 
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright (c) 2011-2012 ForgeRock AS. All rights reserved.
+ * Copyright (c) 2011-2013 ForgeRock AS. All rights reserved.
  *
  * The contents of this file are subject to the terms
  * of the Common Development and Distribution License
@@ -35,26 +35,10 @@ define("config/routes/AMRoutesConfig", [
     
     var obj = {
         "login" : {
-            view: "org/forgerock/openam/ui/user/login/RESTLoginView",
+            view: "LoginView",
             url: /login([^\&]+)?(&.+)?/,
             pattern: "login??",
             defaults: ["/"],
-            forceUpdate: true
-        },
-        "loginDialog" : {
-            dialog: "org/forgerock/openam/ui/user/login/RESTLoginDialog",
-            url: "loginDialog/"
-        },
-        "": {
-            view: "org/forgerock/openam/ui/user/profile/UserProfileView",
-            role: "authenticated",
-            url: "",
-            forceUpdate: true
-        },
-        "profile": {
-            view: "org/forgerock/openam/ui/user/profile/UserProfileView",
-            role: "authenticated",
-            url: "profile/" ,
             forceUpdate: true
         },
         "forgotPassword": {
@@ -68,11 +52,6 @@ define("config/routes/AMRoutesConfig", [
             pattern: "forgotPasswordChange?",
             forceUpdate: true
         },
-        "selfRegister": {
-            view: "org/forgerock/openam/ui/user/profile/RegisterView",
-            url: "register/",
-            forceUpdate: true
-        },
         "continueSelfRegister": {
             view: "org/forgerock/openam/ui/user/profile/RegisterView",
             url: /continueRegister(.*)?/,
@@ -81,25 +60,19 @@ define("config/routes/AMRoutesConfig", [
         },
         "confirmLogin": {
             view: "org/forgerock/openam/ui/user/login/RESTConfirmLoginView",
-            role: "authenticated",
+            role: "ui-user",
             url: "confirmLogin/" ,
             forceUpdate: true
         },
-        "changeSecurityData": {
-            base: "profile",
-            dialog: "org/forgerock/openam/ui/user/profile/ChangeSecurityDataDialog",
-            role: "authenticated",
-            url: "profile/change_security_data/"
-        },
         "dashboard": {
             view: "org/forgerock/openam/ui/dashboard/DashboardView",
-            role: "authenticated",
+            role: "ui-user",
             url: "dashboard/",
             forceUpdate: true
         },
         "oauth2Tokens": {
             view: "org/forgerock/openam/ui/user/oauth2/TokensView",
-            role: "authenticated",
+            role: "ui-user",
             url: "oauth2/tokens",
             forceUpdate: true
         }

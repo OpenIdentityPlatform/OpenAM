@@ -137,7 +137,7 @@ define(function () {
     
         server.respondWith(
             "GET",   
-            "templates/user/LoginBaseTemplate.html",
+            "templates/common/LoginBaseTemplate.html",
             [
                 200, 
                 { 
@@ -215,7 +215,7 @@ define(function () {
     
         server.respondWith(
             "GET",   
-            "templates/user/404.html",
+            "templates/common/404.html",
             [
                 200, 
                 { 

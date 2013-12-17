@@ -1,7 +1,7 @@
 /**
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
  *
- * Copyright (c) 2011-2012 ForgeRock AS. All rights reserved.
+ * Copyright (c) 2011-2013 ForgeRock AS. All rights reserved.
  *
  * The contents of this file are subject to the terms
  * of the Common Development and Distribution License
@@ -53,9 +53,9 @@ define("UserDelegate", [
                     }
                 }
                 if (!user_cleaned.roles) {
-                    user_cleaned.roles = "authenticated";
+                    user_cleaned.roles = "ui-user";
                 } else {
-                    user_cleaned.roles += ",authenticated";
+                    user_cleaned.roles += ",ui-user";
                 }
                 
                 successCallback(user_cleaned);
