@@ -37,7 +37,7 @@ define("org/forgerock/openam/ui/user/login/RESTLoginView", [
     "org/forgerock/commons/ui/common/util/UIUtils",
     "org/forgerock/commons/ui/common/main/i18nManager",
     "org/forgerock/openam/ui/user/login/RESTLoginHelper"
-], function(AbstractView, authNDelegate, validatorsManager, eventManager, constants, conf, sessionManager, router, cookieHelper, uiUtils,i18nManager,restLoginHelper) {
+], function(AbstractView, authNDelegate, validatorsManager, eventManager, constants, conf, sessionManager, router, cookieHelper, uiUtils, i18nManager,restLoginHelper) {
     
     var LoginView = AbstractView.extend({
         template: "templates/openam/RESTLoginTemplate.html",
@@ -120,11 +120,7 @@ define("org/forgerock/openam/ui/user/login/RESTLoginView", [
                 //if there are IDTokens try to login with the provided credentials
                 if(urlParams.IDToken1 && !conf.globalData.auth.autoLoginAttempts){
                     this.autoLogin();
-                }
-                
-                if(urlParams.locale){
-                    i18nManager.setLanguage(urlParams.locale);
-                }
+                } 
             }
             
             authNDelegate.getRequirements()

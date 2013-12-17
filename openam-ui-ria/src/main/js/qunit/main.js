@@ -16,7 +16,7 @@
  * When distributing Covered Code, include this CDDL
  * Header Notice in each file and include the License file
  * at http://forgerock.org/license/CDDLv1.0.html
- * If applicable, add the following below the CDDL Header,
+ * If applicable, add the following below the CDDL Header,∂
  * with the fields enclosed by brackets [] replaced by
  * your own identifying information:
  * "Portions Copyrighted [year] [name of copyright owner]"
@@ -33,7 +33,7 @@ require.config({
     baseUrl: "..",
     paths: {
         mustache: "libs/mustache-0.7.0",
-        i18next: "libs/i18next-1.5.8-min",
+        i18next: "libs/i18next-1.7.1-min",
         backbone: "libs/backbone-0.9.2-min",
         underscore: "libs/underscore-1.4.4-min",
         js2form: "libs/js2form-1.0",

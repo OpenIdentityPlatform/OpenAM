@@ -30,8 +30,8 @@
  */
 
 require.config({
-    paths: {
-        i18next: "libs/i18next-1.5.8-min",
+    paths: { 
+        i18next: "libs/i18next-1.7.1-min",
         backbone: "libs/backbone-0.9.2-min",
         underscore: "libs/underscore-1.4.4-min",
         js2form: "libs/js2form-1.0",
@@ -120,6 +120,3 @@ require([
 ], function(constants, eventManager) {
     eventManager.sendEvent(constants.EVENT_DEPENDECIES_LOADED);
 });
-
-
-

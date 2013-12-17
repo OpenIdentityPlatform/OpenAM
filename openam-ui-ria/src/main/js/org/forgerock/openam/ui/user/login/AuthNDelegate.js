@@ -34,8 +34,9 @@ define("org/forgerock/openam/ui/user/login/AuthNDelegate", [
     "org/forgerock/commons/ui/common/main/Configuration",
     "org/forgerock/commons/ui/common/main/EventManager",
     "org/forgerock/commons/ui/common/util/CookieHelper",
-    "org/forgerock/commons/ui/common/main/Router"
-], function(constants, AbstractDelegate, configuration, eventManager, cookieHelper, router) {
+    "org/forgerock/commons/ui/common/main/Router",
+    "org/forgerock/commons/ui/common/main/i18nManager"
+], function(constants, AbstractDelegate, configuration, eventManager, cookieHelper, router, i18nManager) {
 
     var obj = new AbstractDelegate(constants.host + "/"+ constants.context + "/json/authenticate"),
         requirementList = [],
@@ -47,9 +48,8 @@ define("org/forgerock/openam/ui/user/login/AuthNDelegate", [
         var url,
             args = {},
             promise = $.Deferred(),
-            serverInfoPromise = $.Deferred(),
-            i18nCookie = cookieHelper.getCookie('i18next');
-        
+            serverInfoPromise = $.Deferred();
+
         serverInfoPromise = obj.getServerInfo()
             .done(function (d) {
                 cookieName = d.cookieName;
@@ -76,13 +76,13 @@ define("org/forgerock/openam/ui/user/login/AuthNDelegate", [
         }
         
         //always tack on the locale to the url params of the following rest call
-        if(i18nCookie){
+        if(i18nManager.locale){
             if(configuration.globalData.auth.urlParams && !configuration.globalData.auth.urlParams.locale){
                 if(args.realm || configuration.globalData.auth.additional){
-                    url += "&locale=" + i18nCookie;
+                    url += "&locale=" + i18nManager.locale;
                 }
                 else{
-                    url += "locale=" + i18nCookie;
+                    url += "locale=" + i18nManager.locale;
                 }
             }
         }
