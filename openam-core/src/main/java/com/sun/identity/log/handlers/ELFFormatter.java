@@ -27,7 +27,8 @@
  */
 
 /*
- * Portions Copyrighted [2011] [ForgeRock AS]
+ * Portions Copyrighted 2011-2013 ForgeRock AS
+ * Portions Copyrighted 2013 Nomura Research Institute, Ltd
  */
 package com.sun.identity.log.handlers;
 
@@ -95,11 +96,13 @@ public class ELFFormatter extends Formatter {
         }
         StringBuilder sbuffer = new StringBuilder();
         try {
-            String strTime;
-            if(secureTimestampGenerator != null) {
-                strTime = secureTimestampGenerator.getTimestamp();
-            } else {
-                strTime ="";
+            String strTime = (String) logInfoTable.get(LogConstants.TIME);
+            if (strTime == null) {
+                if (secureTimestampGenerator != null) {
+                    strTime = secureTimestampGenerator.getTimestamp();
+                } else {
+                    strTime = NOTAVAIL;
+                }
             }
             sbuffer.append("\"").append(strTime).append("\"\t");
             boolean escapeDone = false;
