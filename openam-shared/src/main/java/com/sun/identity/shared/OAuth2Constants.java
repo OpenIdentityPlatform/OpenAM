@@ -629,6 +629,26 @@ public class OAuth2Constants {
         public static final String INVALID_CLIENT_METADATA = "invalid_client_metadata";
 
         public static final String BAD_REQUEST = "bad_request";
+
+        /**
+         * OpenID Connect Consent error
+         */
+        public static final String CONSENT_REQUIRED = "consent_required";
+
+        /**
+         * OpenID Connect login required error
+         */
+        public static final String LOGIN_REQUIRED = "login_required";
+
+        /**
+         * OpenID Connect interaction required error
+         */
+        public static final String INTERACTION_REQUIRED = "interaction_required";
+
+        /**
+         * OAuth 2
+         */
+        public static final String REDIRECT_TEMPORARY = "redirection_temporary";
     }
 
     public class Custom {
@@ -644,6 +664,7 @@ public class OAuth2Constants {
          * particular set of scopes."
          */
         public static final String PROMPT = "prompt";
+        public static final String _PROMPT= "_prompt";
         public static final String APPROVAL_PROMPT = "approval_prompt";
         public static final String AUTO = "auto";
         public static final String FORCE = "force";

@@ -28,6 +28,7 @@ import com.iplanet.sso.SSOException;
 import com.iplanet.sso.SSOTokenManager;
 import com.sun.identity.shared.OAuth2Constants;
 import org.forgerock.openam.oauth2.exceptions.OAuthProblemException;
+import org.forgerock.openam.oauth2.openid.OpenIDPromptParameter;
 import org.forgerock.openam.oauth2.provider.AbstractIdentityVerifier;
 import org.forgerock.openam.oauth2.utils.OAuth2Utils;
 import com.iplanet.sso.SSOToken;
@@ -93,24 +94,11 @@ public class OpenAMIdentityVerifier extends AbstractIdentityVerifier<OpenAMUser>
 
     protected boolean authenticate(Request request, Response response) {
         String prompt = OAuth2Utils.getRequestParameter(request, OAuth2Constants.Custom.PROMPT,String.class);
-        String[] prompts = null;
-        Set<String> promptSet = null;
 
-        //put the space separated prompts into a Set collection
-        if (prompt != null && !prompt.isEmpty()){
-            prompts = prompt.split(" ");
-        }
-        if (prompts != null && prompts.length > 0){
-            promptSet = new HashSet<String>(Arrays.asList(prompts));
-        } else {
-            promptSet = new HashSet<String>();
-        }
+        OpenIDPromptParameter openIDPromptParameter = new OpenIDPromptParameter(prompt);
 
-        //if prompt contains values other than none and none error
-        if (promptSet != null && promptSet.contains("none") && promptSet.size() > 1){
-            // prompt has more than one value with none error
-            OAuth2Utils.DEBUG.error("Prompt parameter only allows none when none is present.");
-            throw OAuthProblemException.OAuthError.INVALID_REQUEST.handle(request);
+        if (!openIDPromptParameter.isValid()) {
+            throw OAuthProblemException.OAuthError.BAD_REQUEST.handle(request, "Invalid prompt parameter");
         }
 
         SSOToken token = null;
@@ -122,7 +110,7 @@ public class OpenAMIdentityVerifier extends AbstractIdentityVerifier<OpenAMUser>
 
         if (token != null){
 
-            if (promptSet != null && promptSet.contains("login")){
+            if (openIDPromptParameter.promptLogin()){
                 try {
                     SSOTokenManager mgr = SSOTokenManager.getInstance();
                     mgr.destroyToken(token);
@@ -137,18 +125,21 @@ public class OpenAMIdentityVerifier extends AbstractIdentityVerifier<OpenAMUser>
                 user = new OpenAMUser(token.getProperty("UserToken"), token);
             } catch (SSOException e) {
                 OAuth2Utils.DEBUG.error("Error authenticating user against OpenAM: ", e);
-                throw OAuthProblemException.OAuthError.ACCESS_DENIED.handle(request);
+                throw OAuthProblemException.OAuthError.LOGIN_REQUIRED.handle(request);
             }
             request.getClientInfo().setUser(user);
             return true;
         } else {
-            if (promptSet != null && promptSet.contains("none")){
+            if (openIDPromptParameter.noPrompts()){
                 OAuth2Utils.DEBUG.error("Not pre-authenticated and prompt parameter equals none.");
-                throw OAuthProblemException.OAuthError.ACCESS_DENIED.handle(request);
+                throw OAuthProblemException.OAuthError.INTERACTION_REQUIRED.handle(request);
+            } else if (openIDPromptParameter.promptConsent() && !openIDPromptParameter.promptLogin()){
+                OAuth2Utils.DEBUG.error("Prompt parameter doesn't allow the login prompt: ");
+                throw OAuthProblemException.OAuthError.LOGIN_REQUIRED.handle(request);
+            } else {
+                redirect(request, response);
             }
-            redirect(request, response);
         }
-        redirect(request, response);
 
         return false;
     }
@@ -187,21 +178,16 @@ public class OpenAMIdentityVerifier extends AbstractIdentityVerifier<OpenAMUser>
             amserver.addQueryParameter(OAuth2Constants.Custom.SERVICE, serviceName);
         }
         //TODO investigate more options for the LOGIN servlet
-
         //remove prompt parameter
         Form query = request.getResourceRef().getQueryAsForm();
-        Parameter p = query.getFirst("prompt");
-        if (p != null && p.getSecond().equalsIgnoreCase("login")){
-            query.remove(p);
+        Parameter p = query.getFirst(OAuth2Constants.Custom.PROMPT);
+        if (p != null){
+            p.setFirst(OAuth2Constants.Custom._PROMPT);
         }
         request.getResourceRef().setQuery(query.getQueryString());
 
         amserver.addQueryParameter(OAuth2Constants.Custom.GOTO, request.getResourceRef().toString());
-
-        Redirector redirector =
-                new Redirector(new Context(), amserver.toString(), Redirector.MODE_CLIENT_FOUND);
-        redirector.handle(request, response);
-        throw OAuthProblemException.OAuthError.ACCESS_DENIED.handle(request).redirectUri(amserver.toUri());
+        throw OAuthProblemException.OAuthError.REDIRECT_TEMPORARY.handle(request).redirectUri(amserver.toUri());
     }
 
     private String getAuthURL(Request request){

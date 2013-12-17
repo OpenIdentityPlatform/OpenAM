@@ -42,6 +42,26 @@ public class OAuthProblemException extends ResourceException {
     private static final long serialVersionUID = 1934721539808864898L;
 
     public enum OAuthError {
+        REDIRECT_TEMPORARY(
+                OAuth2Constants.Error.REDIRECT_TEMPORARY,
+                "The request requires a redirect.",
+                "", Status.REDIRECTION_TEMPORARY.getCode()
+        ),
+        INTERACTION_REQUIRED(
+                OAuth2Constants.Error.INTERACTION_REQUIRED,
+                "The request requires some interaction that is not allowed.",
+                "", 400
+        ),
+        LOGIN_REQUIRED(
+                OAuth2Constants.Error.LOGIN_REQUIRED,
+                "The request requires login.",
+                "", 400
+        ),
+        CONSENT_REQUIRED(
+                OAuth2Constants.Error.CONSENT_REQUIRED,
+                "The request requires consent.",
+                "", 400
+        ),
         METHOD_NOT_ALLOWED(
                 OAuth2Constants.Error.METHOD_NOT_ALLOWED,
                 "The Method is not allowed.",

@@ -29,8 +29,11 @@ import com.iplanet.am.util.SystemProperties;
 import com.sun.identity.idm.AMIdentity;
 import com.sun.identity.shared.OAuth2Constants;
 import java.util.Arrays;
+
+import org.apache.commons.lang.StringUtils;
 import org.forgerock.openam.oauth2.exceptions.OAuthProblemException;
 import org.forgerock.openam.oauth2.model.CoreToken;
+import org.forgerock.openam.oauth2.openid.OpenIDPromptParameter;
 import org.forgerock.openam.oauth2.provider.OAuth2ProviderSettings;
 import org.forgerock.openam.oauth2.provider.ResponseType;
 import org.forgerock.openam.oauth2.utils.OAuth2Utils;
@@ -88,12 +91,13 @@ public class AuthorizeServerResource extends AbstractFlow {
         String prompt =
                 OAuth2Utils.getRequestParameter(getRequest(), OAuth2Constants.Custom.PROMPT, String.class);
 
-        Set<String> promptSet = null;
-        if (prompt != null && !prompt.isEmpty()) {
-            String[] prompts = prompt.split(" ");
-            if (prompts != null && prompts.length > 0) {
-                promptSet = new HashSet<String>(Arrays.asList(prompts));
-            }
+        if (StringUtils.isBlank(prompt)){
+            prompt = OAuth2Utils.getRequestParameter(getRequest(), OAuth2Constants.Custom._PROMPT, String.class);
+        }
+
+        OpenIDPromptParameter openIDPromptParameter = new OpenIDPromptParameter(prompt);
+        if (!openIDPromptParameter.isValid()){
+            throw OAuthProblemException.OAuthError.BAD_REQUEST.handle(getRequest(), "Prompt parameter is invalid");
         }
 
         //check if there is an invalid response type
@@ -113,17 +117,22 @@ public class AuthorizeServerResource extends AbstractFlow {
         resourceOwner = getAuthenticatedResourceOwner();
 
         //check for saved consent
-        if (!savedConsent(resourceOwner.getIdentifier(), sessionClient.getClientId(), checkedScope) ||
-                (promptSet != null && promptSet.contains("consent"))) {
-            return getPage("authorize.ftl", getDataModel(checkedScope));
-        } else {
-            //skip consent age if consent is saved
+        boolean savedConsent = savedConsent(resourceOwner.getIdentifier(), sessionClient.getClientId(), checkedScope);
+
+        if (openIDPromptParameter.noPrompts() && !savedConsent){
+            throw OAuthProblemException.OAuthError.CONSENT_REQUIRED.handle(getRequest());
+        } else if (!openIDPromptParameter.promptConsent() && openIDPromptParameter.promptLogin() && !savedConsent) {
+            throw OAuthProblemException.OAuthError.CONSENT_REQUIRED.handle(getRequest());
+        } else if (savedConsent && !openIDPromptParameter.promptConsent()) {
             Map<String, Object> attrs = getRequest().getAttributes();
             attrs.put(OAuth2Constants.Custom.DECISION, OAuth2Constants.Custom.ALLOW);
             getRequest().setAttributes(attrs);
             Representation rep = new JsonRepresentation(new HashMap());
             return represent(rep);
+        } else if (!savedConsent || openIDPromptParameter.promptConsent()) {
+            return getPage("authorize.ftl", getDataModel(checkedScope));
         }
+        return getPage("authorize.ftl", getDataModel(checkedScope));
     }
 
     @Post("form:json")
