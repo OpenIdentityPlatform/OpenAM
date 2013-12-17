@@ -27,7 +27,7 @@
 
 -->
 <!--
-    Portions Copyrighted 2012 ForgeRock Inc
+    Portions Copyrighted 2012-2013 ForgeRock Inc
     Portions Copyrighted 2012 Nomura Research Institute, Ltd
 -->
 
@@ -39,16 +39,16 @@
     <Callbacks length="0" order="1" timeout="120" header="#WILL NOT BE SHOWN#" />
     <Callbacks length="2" order="2" timeout="120" header="本伺服器使用 HOTP 認證。" >
         <PasswordCallback echoPassword="false" >
-            <Prompt> 輸入 OTP 代碼: </Prompt>
+            <Prompt>輸入 OTP 代碼:</Prompt>
         </PasswordCallback>
         <ConfirmationCallback>
             <OptionValues>
                 <OptionValue>
-                    <Value> 提交 OTP 代碼 </Value>
+                    <Value>提交 OTP 代碼</Value>
 
                 </OptionValue>
                 <OptionValue>
-                    <Value> 請求 OTP 代碼 </Value>
+                    <Value>請求 OTP 代碼</Value>
                 </OptionValue>
              </OptionValues>
         </ConfirmationCallback>

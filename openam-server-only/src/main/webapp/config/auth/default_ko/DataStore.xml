@@ -28,7 +28,7 @@
 -->
 
 <!--
-    Portions Copyrighted 2010 ForgeRock AS
+    Portions Copyrighted 2010-2013 ForgeRock AS
 -->
 
 <!DOCTYPE ModuleProperties PUBLIC "=//iPlanet//Authentication Module Properties XML Interface 1.0 DTD//EN"
@@ -38,10 +38,10 @@
 <ModuleProperties moduleName="DataStore" version="1.0" >
     <Callbacks length="2" order="1" timeout="120" header="OpenAM에 로그인" >
         <NameCallback>
-            <Prompt> 사용자 이름: </Prompt>
+            <Prompt>사용자 이름:</Prompt>
         </NameCallback>
         <PasswordCallback echoPassword="false" >
-            <Prompt> 비밀번호: </Prompt>
+            <Prompt>비밀번호:</Prompt>
         </PasswordCallback>
     </Callbacks>
 </ModuleProperties>

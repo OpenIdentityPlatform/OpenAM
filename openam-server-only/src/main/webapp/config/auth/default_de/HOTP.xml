@@ -27,7 +27,7 @@
 
 -->
 <!--
-    Portions Copyrighted 2012 ForgeRock Inc
+    Portions Copyrighted 2012-2013 ForgeRock Inc
     Portions Copyrighted 2012 Nomura Research Institute, Ltd
 -->
 
@@ -39,16 +39,15 @@
     <Callbacks length="0" order="1" timeout="120" header="#WILL NOT BE SHOWN#" />
     <Callbacks length="2" order="2" timeout="120" header="Bei diesem Server wird die HOTP-Authentifizierung verwendet." >
         <PasswordCallback echoPassword="false" >
-            <Prompt> Geben Sie den OTP-Code ein: </Prompt>
+            <Prompt>Geben Sie den OTP-Code ein:</Prompt>
         </PasswordCallback>
         <ConfirmationCallback>
             <OptionValues>
                 <OptionValue>
-                    <Value> Senden Sie den OTP-Code </Value>
-
+                    <Value>Senden Sie den OTP-Code</Value>
                 </OptionValue>
                 <OptionValue>
-                    <Value> Fordern Sie den OTP-Code an </Value>
+                    <Value>Fordern Sie den OTP-Code an</Value>
                 </OptionValue>
              </OptionValues>
         </ConfirmationCallback>

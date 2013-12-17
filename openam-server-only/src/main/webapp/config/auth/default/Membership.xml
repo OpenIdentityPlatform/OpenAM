@@ -27,7 +27,7 @@
 -->
 
 <!--
-    Portions Copyrighted 2011-2012 ForgeRock Inc
+    Portions Copyrighted 2011-2013 ForgeRock Inc
 -->
 
 <!DOCTYPE ModuleProperties PUBLIC "=//iPlanet//Authentication Module Properties XML Interface 1.0 DTD//EN"
@@ -37,18 +37,18 @@
 
     <Callbacks length="3" order="1" timeout="120" header="Self Registration Module" template="membership.jsp" >
         <NameCallback>
-            <Prompt> User Name: </Prompt>
+            <Prompt>User Name:</Prompt>
         </NameCallback>
         <PasswordCallback echoPassword="false" >
-            <Prompt> Password: </Prompt>    
+            <Prompt>Password:</Prompt>    
         </PasswordCallback>
         <ConfirmationCallback>
             <OptionValues>
                 <OptionValue>
-                    <Value> Log In </Value>
+                    <Value>Log In</Value>
                 </OptionValue>
                 <OptionValue>
-                    <Value> New User </Value>
+                    <Value>New User</Value>
                 </OptionValue>
              </OptionValues>
         </ConfirmationCallback>
@@ -60,33 +60,33 @@
     
     <Callbacks length="8" order="4" timeout="300" header="Self Registration" template="register.jsp" >
         <NameCallback isRequired="true" attribute="uid" >
-            <Prompt> User Name: </Prompt>
+            <Prompt>User Name:</Prompt>
         </NameCallback>
         <PasswordCallback echoPassword="false" isRequired="true" attribute="userPassword" >
-            <Prompt> Password: </Prompt>    
+            <Prompt>Password:</Prompt>    
         </PasswordCallback>
         <PasswordCallback echoPassword="false" isRequired="true" >
-            <Prompt> Confirm Password: </Prompt>    
+            <Prompt>Confirm Password:</Prompt>    
         </PasswordCallback>
         <NameCallback isRequired="true" attribute="givenname" >
-            <Prompt> First Name: </Prompt>
+            <Prompt>First Name:</Prompt>
         </NameCallback>
         <NameCallback isRequired="true" attribute="sn" >
-            <Prompt> Last Name: </Prompt>
+            <Prompt>Last Name:</Prompt>
         </NameCallback>
         <NameCallback isRequired="true" attribute="cn" >
-            <Prompt> Full Name: </Prompt>
+            <Prompt>Full Name:</Prompt>
         </NameCallback>
         <NameCallback attribute="mail" >
-            <Prompt> Email Address: </Prompt>
+            <Prompt>Email Address:</Prompt>
         </NameCallback>
         <ConfirmationCallback>
             <OptionValues>
                 <OptionValue>
-                    <Value> Register </Value>
+                    <Value>Register</Value>
                 </OptionValue>
                 <OptionValue>
-                    <Value> Cancel </Value>
+                    <Value>Cancel</Value>
                 </OptionValue>
              </OptionValues>
         </ConfirmationCallback>
@@ -105,7 +105,7 @@ one&lt;br/&gt;of the following user names,&lt;br/&gt;or create your own:</Prompt
         <ConfirmationCallback>
             <OptionValues>
                 <OptionValue>
-                    <Value> Submit </Value>
+                    <Value>Submit</Value>
                 </OptionValue>
             </OptionValues>
         </ConfirmationCallback>
@@ -115,10 +115,10 @@ one&lt;br/&gt;of the following user names,&lt;br/&gt;or create your own:</Prompt
         <ConfirmationCallback>
             <OptionValues>
                 <OptionValue>
-                    <Value> Agree </Value>
+                    <Value>Agree</Value>
                 </OptionValue>
                 <OptionValue>
-                    <Value> Disagree </Value>
+                    <Value>Disagree</Value>
                 </OptionValue>
             </OptionValues>
         </ConfirmationCallback>

@@ -235,7 +235,7 @@
          },
          "user" : {
             "user" : "User",
-            "login" : "Login",
+            "login" : "Log in",
             "loginConfirm" : "You have already logged in. Do you want to log out and then login to a different organization?",
             "profile" : "Profile",
             "myProfile" : "My Profile",

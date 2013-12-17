@@ -28,7 +28,7 @@
 -->
 
 <!--
-    Portions Copyrighted 2011 ForgeRock AS
+    Portions Copyrighted 2011-2013 ForgeRock AS
 -->
 
 <!DOCTYPE ModuleProperties PUBLIC "=//iPlanet//Authentication Module Properties XML Interface 1.0 DTD//EN"
@@ -38,29 +38,29 @@
 <ModuleProperties moduleName="LDAP" version="1.0" >
     <Callbacks length="2" order="1" timeout="120" header="이 서버는 LDAP 인증을 사용합니다." >
         <NameCallback>
-            <Prompt> 사용자 이름: </Prompt>
+            <Prompt>사용자 이름:</Prompt>
         </NameCallback>
         <PasswordCallback echoPassword="false" >
-            <Prompt> 비밀번호: </Prompt>
+            <Prompt>비밀번호:</Prompt>
         </PasswordCallback>
     </Callbacks>
     <Callbacks length="4" order="2" timeout="120" header="비밀번호 변경&lt;BR&gt;&lt;/BR&gt;#REPLACE#&lt;BR&gt;&lt;/BR&gt;" >
         <PasswordCallback echoPassword="false" >
-            <Prompt>이전 비밀번호 </Prompt>
+            <Prompt>이전 비밀번호</Prompt>
         </PasswordCallback>
         <PasswordCallback echoPassword="false" >
-            <Prompt> 새 비밀번호 </Prompt>
+            <Prompt>새 비밀번호</Prompt>
         </PasswordCallback>
         <PasswordCallback echoPassword="false" >
-            <Prompt> 비밀번호 확인 </Prompt>
+            <Prompt>비밀번호 확인</Prompt>
         </PasswordCallback>
         <ConfirmationCallback>
             <OptionValues>
                 <OptionValue>
-                    <Value> 제출 </Value>
+                    <Value>제출</Value>
                 </OptionValue>
                 <OptionValue>
-                    <Value> 취소 </Value>
+                    <Value>취소</Value>
                 </OptionValue>
             </OptionValues>
         </ConfirmationCallback>

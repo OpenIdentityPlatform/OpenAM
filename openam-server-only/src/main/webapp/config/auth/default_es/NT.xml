@@ -27,6 +27,10 @@
 
 -->
 
+<!--
+    Portions Copyrighted 2013 ForgeRock AS
+-->
+
 <!DOCTYPE ModuleProperties PUBLIC "=//iPlanet//Authentication Module Properties XML Interface 1.0 DTD//EN"
         "jar://com/sun/identity/authentication/Auth_Module_Properties.dtd">
 
@@ -35,10 +39,10 @@
     <Callbacks length="2" order="1" timeout="120" header="Este servidor utiliza la autenticación de NT." >
         
         <NameCallback>
-            <Prompt> Nombre de usuario: </Prompt>
+            <Prompt>Nombre de usuario:</Prompt>
         </NameCallback>
         <PasswordCallback echoPassword="false" >
-            <Prompt> Contraseña: </Prompt>
+            <Prompt>Contraseña:</Prompt>
         </PasswordCallback>
 
     </Callbacks>

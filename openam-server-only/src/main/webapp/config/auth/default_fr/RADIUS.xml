@@ -26,6 +26,9 @@
     $Id: RADIUS.xml,v 1.9 2009/07/16 04:12:01 cbasha Exp $
 
 -->
+<!--
+    Portions Copyrighted 2013 ForgeRock AS
+-->
 
 <!DOCTYPE ModuleProperties PUBLIC "=//iPlanet//Authentication Module Properties XML Interface 1.0 DTD//EN"
 	"jar://com/sun/identity/authentication/Auth_Module_Properties.dtd">
@@ -34,15 +37,15 @@
 <ModuleProperties moduleName="RADIUS" version="1.0" >
     <Callbacks length="2" order="1" timeout="60" header="Ce serveur utilise l&apos;authentification RADIUS." >
         <NameCallback>
-            <Prompt> ID RADIUS </Prompt>
+            <Prompt>ID RADIUS</Prompt>
         </NameCallback>
         <PasswordCallback echoPassword="false" >
-            <Prompt> Mot de passe RADIUS </Prompt>
+            <Prompt>Mot de passe RADIUS</Prompt>
         </PasswordCallback>
     </Callbacks>
     <Callbacks length="1" order="2" timeout="60" header="Question/réponse pour la connexion RADIUS" >
         <PasswordCallback echoPassword="false" >
-            <Prompt> Mot de passe question/réponse RADIUS </Prompt>
+            <Prompt>Mot de passe question/réponse RADIUS</Prompt>
         </PasswordCallback>
     </Callbacks>
 </ModuleProperties>

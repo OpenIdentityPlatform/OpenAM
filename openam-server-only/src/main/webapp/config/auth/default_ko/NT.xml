@@ -27,6 +27,10 @@
 
 -->
 
+<!--
+    Portions Copyrighted 2013 ForgeRock AS
+-->
+
 <!DOCTYPE ModuleProperties PUBLIC "=//iPlanet//Authentication Module Properties XML Interface 1.0 DTD//EN"
         "jar://com/sun/identity/authentication/Auth_Module_Properties.dtd">
 
@@ -35,10 +39,10 @@
     <Callbacks length="2" order="1" timeout="120" header="이 서버는 NT 인증을 사용합니다." >
         
         <NameCallback>
-            <Prompt> 사용자 이름: </Prompt>
+            <Prompt>사용자 이름:</Prompt>
         </NameCallback>
         <PasswordCallback echoPassword="false" >
-            <Prompt> 비밀번호: </Prompt>
+            <Prompt>비밀번호:</Prompt>
         </PasswordCallback>
 
     </Callbacks>

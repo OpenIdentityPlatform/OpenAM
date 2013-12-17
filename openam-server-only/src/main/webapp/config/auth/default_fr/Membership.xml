@@ -28,7 +28,7 @@
 -->
 
 <!--
-Portions Copyrighted 2011 ForgeRock AS
+Portions Copyrighted 2011-2013 ForgeRock AS
 -->
 
 <!DOCTYPE ModuleProperties PUBLIC "=//iPlanet//Authentication Module Properties XML Interface 1.0 DTD//EN"
@@ -38,18 +38,18 @@ Portions Copyrighted 2011 ForgeRock AS
 
     <Callbacks length="3" order="1" timeout="120" header="Module d&apos;auto-enregistrement" template="membership.jsp" >
         <NameCallback>
-            <Prompt> Nom d&apos;utilisateur : </Prompt>
+            <Prompt>Nom d&apos;utilisateur :</Prompt>
         </NameCallback>
         <PasswordCallback echoPassword="false" >
-            <Prompt> Mot de passe : </Prompt>    
+            <Prompt>Mot de passe :</Prompt>    
         </PasswordCallback>
         <ConfirmationCallback>
             <OptionValues>
                 <OptionValue>
-                    <Value> Connexion </Value>
+                    <Value>Connexion</Value>
                 </OptionValue>
                 <OptionValue>
-                    <Value> Nouvel utilisateur </Value>
+                    <Value>Nouvel utilisateur</Value>
                 </OptionValue>
              </OptionValues>
         </ConfirmationCallback>
@@ -61,33 +61,33 @@ Portions Copyrighted 2011 ForgeRock AS
     
     <Callbacks length="8" order="4" timeout="300" header="Auto-enregistrement" template="register.jsp" >
         <NameCallback isRequired="true" attribute="uid" >
-            <Prompt> Nom d&apos;utilisateur : </Prompt>
+            <Prompt>Nom d&apos;utilisateur :</Prompt>
         </NameCallback>
         <PasswordCallback echoPassword="false" isRequired="true" attribute="userPassword" >
-            <Prompt> Mot de passe : </Prompt>    
+            <Prompt>Mot de passe :</Prompt>    
         </PasswordCallback>
         <PasswordCallback echoPassword="false" isRequired="true" >
-            <Prompt> Confirmation du mot de passe : </Prompt>    
+            <Prompt>Confirmation du mot de passe :</Prompt>    
         </PasswordCallback>
         <NameCallback isRequired="true" attribute="givenname" >
-            <Prompt> Prénom : </Prompt>
+            <Prompt>Prénom :</Prompt>
         </NameCallback>
         <NameCallback isRequired="true" attribute="sn" >
-            <Prompt> Nom : </Prompt>
+            <Prompt>Nom :</Prompt>
         </NameCallback>
         <NameCallback isRequired="true" attribute="cn" >
-            <Prompt> Nom complet : </Prompt>
+            <Prompt>Nom complet :</Prompt>
         </NameCallback>
         <NameCallback attribute="mail" >
-            <Prompt> Adresse e-mail : </Prompt>
+            <Prompt>Adresse e-mail :</Prompt>
         </NameCallback>
         <ConfirmationCallback>
             <OptionValues>
                 <OptionValue>
-                    <Value> Enregistrer </Value>
+                    <Value>Enregistrer</Value>
                 </OptionValue>
                 <OptionValue>
-                    <Value> Annuler </Value>
+                    <Value>Annuler</Value>
                 </OptionValue>
              </OptionValues>
         </ConfirmationCallback>
@@ -105,7 +105,7 @@ Portions Copyrighted 2011 ForgeRock AS
         <ConfirmationCallback>
             <OptionValues>
                 <OptionValue>
-                    <Value> Envoyer </Value>
+                    <Value>Envoyer</Value>
                 </OptionValue>
             </OptionValues>
         </ConfirmationCallback>
@@ -115,10 +115,10 @@ Portions Copyrighted 2011 ForgeRock AS
         <ConfirmationCallback>
             <OptionValues>
                 <OptionValue>
-                    <Value> Accepter </Value>
+                    <Value>Accepter</Value>
                 </OptionValue>
                 <OptionValue>
-                    <Value> Refuser </Value>
+                    <Value>Refuser</Value>
                 </OptionValue>
             </OptionValues>
         </ConfirmationCallback>

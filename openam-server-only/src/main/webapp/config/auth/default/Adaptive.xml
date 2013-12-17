@@ -21,6 +21,11 @@
   your own identifying information:
   "Portions Copyrighted [year] [name of copyright owner]"
 -->
+
+<!--
+    Portions Copyrighted 2013 ForgeRock AS
+ -->
+ 
 <!DOCTYPE ModuleProperties PUBLIC "=//iPlanet//Authentication Module Properties XML Interface 1.0 DTD//EN"
 	"jar://com/sun/identity/authentication/Auth_Module_Properties.dtd">
 <ModuleProperties moduleName="Adaptive" version="1.0" >

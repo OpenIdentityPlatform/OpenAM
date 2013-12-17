@@ -39,16 +39,16 @@
     <Callbacks length="0" order="1" timeout="120" header="#WILL NOT BE SHOWN#" />
     <Callbacks length="2" order="2" timeout="120" header="Please enter your One Time Password, or request a new one" >
         <PasswordCallback echoPassword="false" >
-            <Prompt> Enter OTP </Prompt>
+            <Prompt>Enter OTP</Prompt>
         </PasswordCallback>
         <ConfirmationCallback>
             <OptionValues>
                 <OptionValue>
-                    <Value> Submit OTP </Value>
+                    <Value>Submit OTP</Value>
 
                 </OptionValue>
                 <OptionValue>
-                    <Value> Request OTP </Value>
+                    <Value>Request OTP</Value>
                 </OptionValue>
              </OptionValues>
         </ConfirmationCallback>

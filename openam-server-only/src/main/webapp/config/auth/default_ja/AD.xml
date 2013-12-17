@@ -28,7 +28,7 @@
 -->
 
 <!--
-    Portions Copyrighted 2011 ForgeRock AS
+    Portions Copyrighted 2011-2013 ForgeRock AS
 -->
 
 <!DOCTYPE ModuleProperties PUBLIC "=//iPlanet//Authentication Module Properties XML Interface 1.0 DTD//EN"
@@ -38,29 +38,29 @@
 <ModuleProperties moduleName="AD" version="1.0" >
     <Callbacks length="2" order="1" timeout="120" header="このサーバーは Active Directory 認証を使用します" >
         <NameCallback>
-            <Prompt> ユーザー名:  </Prompt>
+            <Prompt>ユーザー名:</Prompt>
         </NameCallback>
         <PasswordCallback echoPassword="false" >
-            <Prompt> パスワード:  </Prompt>
+            <Prompt>パスワード:</Prompt>
         </PasswordCallback>
     </Callbacks>
     <Callbacks length="4" order="2" timeout="120" header="パスワードの変更&lt;BR&gt;&lt;/BR&gt;#REPLACE#&lt;BR&gt;&lt;/BR&gt;" >
         <PasswordCallback echoPassword="false" >
-            <Prompt>古いパスワード </Prompt>
+            <Prompt>古いパスワード</Prompt>
         </PasswordCallback>
         <PasswordCallback echoPassword="false" >
-            <Prompt> 新しいパスワード </Prompt>
+            <Prompt>新しいパスワード</Prompt>
         </PasswordCallback>
         <PasswordCallback echoPassword="false" >
-            <Prompt> パスワードの確認 </Prompt>
+            <Prompt>パスワードの確認</Prompt>
         </PasswordCallback>
         <ConfirmationCallback>
             <OptionValues>
                 <OptionValue>
-                    <Value> 送信 </Value>
+                    <Value>送信</Value>
                 </OptionValue>
                 <OptionValue>
-                    <Value> 取消し </Value>
+                    <Value>取消し</Value>
                 </OptionValue>
             </OptionValues>
         </ConfirmationCallback>

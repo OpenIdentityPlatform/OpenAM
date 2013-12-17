@@ -28,7 +28,7 @@
 -->
 
 <!--
-Portions Copyrighted 2011 ForgeRock AS
+    Portions Copyrighted 2011-2013 ForgeRock AS
 -->
 
 <!DOCTYPE ModuleProperties PUBLIC "=//iPlanet//Authentication Module Properties XML Interface 1.0 DTD//EN"
@@ -38,18 +38,18 @@ Portions Copyrighted 2011 ForgeRock AS
 
     <Callbacks length="3" order="1" timeout="120" header="자동 등록 모듈" template="membership.jsp" >
         <NameCallback>
-            <Prompt> 사용자 이름: </Prompt>
+            <Prompt>사용자 이름:</Prompt>
         </NameCallback>
         <PasswordCallback echoPassword="false" >
-            <Prompt> 비밀번호: </Prompt>    
+            <Prompt>비밀번호:</Prompt>    
         </PasswordCallback>
         <ConfirmationCallback>
             <OptionValues>
                 <OptionValue>
-                    <Value> 로그인 </Value>
+                    <Value>로그인</Value>
                 </OptionValue>
                 <OptionValue>
-                    <Value> 새 사용자 </Value>
+                    <Value>새 사용자</Value>
                 </OptionValue>
              </OptionValues>
         </ConfirmationCallback>
@@ -61,33 +61,33 @@ Portions Copyrighted 2011 ForgeRock AS
 
     <Callbacks length="8" order="4" timeout="300" header="자동 등록" template="register.jsp" >
         <NameCallback isRequired="true" attribute="uid" >
-            <Prompt> 사용자 이름: </Prompt>
+            <Prompt>사용자 이름:</Prompt>
         </NameCallback>
         <PasswordCallback echoPassword="false" isRequired="true" attribute="userPassword" >
-            <Prompt> 비밀번호: </Prompt>    
+            <Prompt>비밀번호:</Prompt>    
         </PasswordCallback>
         <PasswordCallback echoPassword="false" isRequired="true" >
-            <Prompt> 비밀번호 확인: </Prompt>    
+            <Prompt>비밀번호 확인:</Prompt>    
         </PasswordCallback>
         <NameCallback isRequired="true" attribute="givenname" >
-            <Prompt> 이름: </Prompt>
+            <Prompt>이름:</Prompt>
         </NameCallback>
         <NameCallback isRequired="true" attribute="sn" >
-            <Prompt> 성: </Prompt>
+            <Prompt>성:</Prompt>
         </NameCallback>
         <NameCallback isRequired="true" attribute="cn" >
-            <Prompt> 전체 이름: </Prompt>
+            <Prompt>전체 이름:</Prompt>
         </NameCallback>
         <NameCallback attribute="mail" >
-            <Prompt> 전자 메일 주소: </Prompt>
+            <Prompt>전자 메일 주소:</Prompt>
         </NameCallback>
         <ConfirmationCallback>
             <OptionValues>
                 <OptionValue>
-                    <Value> 등록 </Value>
+                    <Value>등록</Value>
                 </OptionValue>
                 <OptionValue>
-                    <Value> 취소 </Value>
+                    <Value>취소</Value>
                 </OptionValue>
              </OptionValues>
         </ConfirmationCallback>
@@ -105,7 +105,7 @@ Portions Copyrighted 2011 ForgeRock AS
         <ConfirmationCallback>
             <OptionValues>
                 <OptionValue>
-                    <Value> 제출 </Value>
+                    <Value>제출</Value>
                 </OptionValue>
             </OptionValues>
         </ConfirmationCallback>
@@ -115,10 +115,10 @@ Portions Copyrighted 2011 ForgeRock AS
         <ConfirmationCallback>
             <OptionValues>
                 <OptionValue>
-                    <Value> 동의함 </Value>
+                    <Value>동의함</Value>
                 </OptionValue>
                 <OptionValue>
-                    <Value> 동의 안 함 </Value>
+                    <Value>동의 안 함</Value>
                 </OptionValue>
             </OptionValues>
         </ConfirmationCallback>

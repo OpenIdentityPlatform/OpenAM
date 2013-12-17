@@ -28,7 +28,7 @@
 -->
 
 <!--
-    Portions Copyrighted 2011 ForgeRock AS
+    Portions Copyrighted 2011-2013 ForgeRock AS
 -->
 
 <!DOCTYPE ModuleProperties PUBLIC "=//iPlanet//Authentication Module Properties XML Interface 1.0 DTD//EN"
@@ -38,29 +38,29 @@
 <ModuleProperties moduleName="LDAP" version="1.0" >
     <Callbacks length="2" order="1" timeout="120" header="Auf diesem Server kommt die LDAP-Authentifizierung zum Einsatz." >
         <NameCallback>
-            <Prompt> Benutzername </Prompt>
+            <Prompt>Benutzername</Prompt>
         </NameCallback>
         <PasswordCallback echoPassword="false" >
-            <Prompt> Passwort: </Prompt>
+            <Prompt>Passwort:</Prompt>
         </PasswordCallback>
     </Callbacks>
     <Callbacks length="4" order="2" timeout="120" header="Passwort ändern&lt;BR&gt;&lt;/BR&gt;#REPLACE#&lt;BR&gt;&lt;/BR&gt;" >
         <PasswordCallback echoPassword="false" >
-            <Prompt>Altes Passwort </Prompt>
+            <Prompt>Altes Passwort</Prompt>
         </PasswordCallback>
         <PasswordCallback echoPassword="false" >
-            <Prompt> Neues Passwort </Prompt>
+            <Prompt>Neues Passwort</Prompt>
         </PasswordCallback>
         <PasswordCallback echoPassword="false" >
-            <Prompt> Passwort bestätigen </Prompt>
+            <Prompt>Passwort bestätigen</Prompt>
         </PasswordCallback>
         <ConfirmationCallback>
             <OptionValues>
                 <OptionValue>
-                    <Value> Senden </Value>
+                    <Value>Senden</Value>
                 </OptionValue>
                 <OptionValue>
-                    <Value> Abbrechen </Value>
+                    <Value>Abbrechen</Value>
                 </OptionValue>
             </OptionValues>
         </ConfirmationCallback>

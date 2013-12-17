@@ -28,7 +28,7 @@
 -->
 
 <!--
-    Portions Copyrighted 2011 ForgeRock AS
+    Portions Copyrighted 2011-2013 ForgeRock AS
 -->
 
 <!DOCTYPE ModuleProperties PUBLIC "=//iPlanet//Authentication Module Properties XML Interface 1.0 DTD//EN"
@@ -38,30 +38,30 @@
 <ModuleProperties moduleName="AD" version="1.0" >
     <Callbacks length="2" order="1" timeout="120" header="Dieser Server verwendet die Active Directory-Authentifizierung." >
         <NameCallback>
-            <Prompt> Benutzername </Prompt>
+            <Prompt>Benutzername</Prompt>
         </NameCallback>
         <PasswordCallback echoPassword="false" >
-            <Prompt> Passwort: </Prompt>
+            <Prompt>Passwort:</Prompt>
         </PasswordCallback>
     </Callbacks>
 
     <Callbacks length="4" order="2" timeout="120" header="Change Password&lt;BR&gt;&lt;/BR&gt;#REPLACE#&lt;BR&gt;&lt;/BR&gt;" >
         <PasswordCallback echoPassword="false" >
-            <Prompt>Old Password </Prompt>
+            <Prompt>Old Password</Prompt>
         </PasswordCallback>
         <PasswordCallback echoPassword="false" >
-            <Prompt> New Password </Prompt>
+            <Prompt>New Password</Prompt>
         </PasswordCallback>
         <PasswordCallback echoPassword="false" >
-            <Prompt> Confirm Password </Prompt>
+            <Prompt>Confirm Password</Prompt>
         </PasswordCallback>
         <ConfirmationCallback>
             <OptionValues>
                 <OptionValue>
-                    <Value> Submit </Value>
+                    <Value>Submit</Value>
                 </OptionValue>
                 <OptionValue>
-                    <Value> Cancel </Value>
+                    <Value>Cancel</Value>
                 </OptionValue>
             </OptionValues>
         </ConfirmationCallback>

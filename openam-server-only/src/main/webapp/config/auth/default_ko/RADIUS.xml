@@ -27,6 +27,10 @@
 
 -->
 
+<!--
+    Portions Copyrighted 2013 ForgeRock AS
+-->
+
 <!DOCTYPE ModuleProperties PUBLIC "=//iPlanet//Authentication Module Properties XML Interface 1.0 DTD//EN"
 	"jar://com/sun/identity/authentication/Auth_Module_Properties.dtd">
 
@@ -34,15 +38,15 @@
 <ModuleProperties moduleName="RADIUS" version="1.0" >
     <Callbacks length="2" order="1" timeout="60" header="이 서버는 RADIUS 인증을 사용합니다." >
         <NameCallback>
-            <Prompt> RADIUS 아이디 </Prompt>
+            <Prompt>RADIUS 아이디</Prompt>
         </NameCallback>
         <PasswordCallback echoPassword="false" >
-            <Prompt> RADIUS 비밀번호 </Prompt>
+            <Prompt>RADIUS 비밀번호</Prompt>
         </PasswordCallback>
     </Callbacks>
     <Callbacks length="1" order="2" timeout="60" header="RADIUS 로그인 시도" >
         <PasswordCallback echoPassword="false" >
-            <Prompt> RADIUS 시도 비밀번호 </Prompt>
+            <Prompt>RADIUS 시도 비밀번호</Prompt>
         </PasswordCallback>
     </Callbacks>
 </ModuleProperties>

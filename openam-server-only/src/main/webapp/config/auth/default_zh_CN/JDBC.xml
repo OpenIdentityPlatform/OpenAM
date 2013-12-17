@@ -27,6 +27,10 @@
 
 -->
 
+<!--
+    Portions Copyrighted 2013 ForgeRock AS
+-->
+
 
 
 <!DOCTYPE ModuleProperties PUBLIC "=//iPlanet//Authentication Module Properties XML Interface 1.0 DTD//EN"
@@ -36,10 +40,10 @@
     <Callbacks length="2" order="1" timeout="120" 
         header="此服务器使用 JDBC 验证" >
         <NameCallback> 
-            <Prompt> 用户名 </Prompt> 
+            <Prompt>用户名</Prompt> 
         </NameCallback>
         <PasswordCallback echoPassword="false" > 
-            <Prompt> 密码 </Prompt>
+            <Prompt>密码</Prompt>
         </PasswordCallback>
     </Callbacks>
 </ModuleProperties>

@@ -26,7 +26,9 @@
     $Id: NT.xml,v 1.10 2009/07/16 04:12:02 cbasha Exp $
 
 -->
-
+<!--
+    Portions Copyrighted 2013 ForgeRock AS
+-->
 <!DOCTYPE ModuleProperties PUBLIC "=//iPlanet//Authentication Module Properties XML Interface 1.0 DTD//EN"
         "jar://com/sun/identity/authentication/Auth_Module_Properties.dtd">
 
@@ -35,10 +37,10 @@
     <Callbacks length="2" order="1" timeout="120" header="このサーバーは NT 認証を使用します" >
         
         <NameCallback>
-            <Prompt> ユーザー名:  </Prompt>
+            <Prompt>ユーザー名:</Prompt>
         </NameCallback>
         <PasswordCallback echoPassword="false" >
-            <Prompt> パスワード:  </Prompt>
+            <Prompt>パスワード:</Prompt>
         </PasswordCallback>
 
     </Callbacks>

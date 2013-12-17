@@ -28,7 +28,7 @@
 -->
 
 <!--
-Portions Copyrighted 2011 ForgeRock AS
+Portions Copyrighted 2011-2013 ForgeRock AS
 -->
 
 <!DOCTYPE ModuleProperties PUBLIC "=//iPlanet//Authentication Module Properties XML Interface 1.0 DTD//EN"
@@ -38,18 +38,18 @@ Portions Copyrighted 2011 ForgeRock AS
 
     <Callbacks length="3" order="1" timeout="120" header="自己登録モジュール" template="membership.jsp" >
         <NameCallback>
-            <Prompt> ユーザー名:  </Prompt>
+            <Prompt>ユーザー名:</Prompt>
         </NameCallback>
         <PasswordCallback echoPassword="false" >
-            <Prompt> パスワード:  </Prompt>    
+            <Prompt>パスワード:</Prompt>    
         </PasswordCallback>
         <ConfirmationCallback>
             <OptionValues>
                 <OptionValue>
-                    <Value> ログイン </Value>
+                    <Value>ログイン</Value>
                 </OptionValue>
                 <OptionValue>
-                    <Value> 新規ユーザー </Value>
+                    <Value>新規ユーザー</Value>
                 </OptionValue>
              </OptionValues>
         </ConfirmationCallback>
@@ -61,33 +61,33 @@ Portions Copyrighted 2011 ForgeRock AS
    
     <Callbacks length="8" order="4" timeout="300" header="自己登録" template="register.jsp" >
         <NameCallback isRequired="true" attribute="uid" >
-            <Prompt> ユーザー名:  </Prompt>
+            <Prompt>ユーザー名:</Prompt>
         </NameCallback>
         <PasswordCallback echoPassword="false" isRequired="true" attribute="userPassword" >
-            <Prompt> パスワード:  </Prompt>    
+            <Prompt>パスワード:</Prompt>    
         </PasswordCallback>
         <PasswordCallback echoPassword="false" isRequired="true" >
-            <Prompt> パスワードの確認:  </Prompt>    
+            <Prompt>パスワードの確認:</Prompt>    
         </PasswordCallback>
         <NameCallback isRequired="true" attribute="givenname" >
-            <Prompt> 名:  </Prompt>
+            <Prompt>名:</Prompt>
         </NameCallback>
         <NameCallback isRequired="true" attribute="sn" >
-            <Prompt> 姓:  </Prompt>
+            <Prompt>姓:</Prompt>
         </NameCallback>
         <NameCallback isRequired="true" attribute="cn" >
-            <Prompt> フルネーム:  </Prompt>
+            <Prompt>フルネーム:</Prompt>
         </NameCallback>
         <NameCallback attribute="mail" >
-            <Prompt> 電子メールアドレス:  </Prompt>
+            <Prompt>電子メールアドレス:</Prompt>
         </NameCallback>
         <ConfirmationCallback>
             <OptionValues>
                 <OptionValue>
-                    <Value> 登録 </Value>
+                    <Value>登録</Value>
                 </OptionValue>
                 <OptionValue>
-                    <Value> 取消し </Value>
+                    <Value>取消し</Value>
                 </OptionValue>
              </OptionValues>
         </ConfirmationCallback>
@@ -105,7 +105,7 @@ Portions Copyrighted 2011 ForgeRock AS
         <ConfirmationCallback>
             <OptionValues>
                 <OptionValue>
-                    <Value> 送信 </Value>
+                    <Value>送信</Value>
                 </OptionValue>
             </OptionValues>
         </ConfirmationCallback>
@@ -115,10 +115,10 @@ Portions Copyrighted 2011 ForgeRock AS
         <ConfirmationCallback>
             <OptionValues>
                 <OptionValue>
-                    <Value> 同意する </Value>
+                    <Value>同意する</Value>
                 </OptionValue>
                 <OptionValue>
-                    <Value> 同意しない </Value>
+                    <Value>同意しない</Value>
                 </OptionValue>
             </OptionValues>
         </ConfirmationCallback>

@@ -28,7 +28,7 @@
 -->
 
 <!--
-Portions Copyrighted 2011 ForgeRock AS
+Portions Copyrighted 2011-2013 ForgeRock AS
 -->
 
 <!DOCTYPE ModuleProperties PUBLIC "=//iPlanet//Authentication Module Properties XML Interface 1.0 DTD//EN"
@@ -38,18 +38,18 @@ Portions Copyrighted 2011 ForgeRock AS
 
     <Callbacks length="3" order="1" timeout="120" header="自注册模块" template="membership.jsp" >
         <NameCallback>
-            <Prompt> 用户名: </Prompt>
+            <Prompt>用户名:</Prompt>
         </NameCallback>
         <PasswordCallback echoPassword="false" >
-            <Prompt> 密码: </Prompt>    
+            <Prompt>密码:</Prompt>    
         </PasswordCallback>
         <ConfirmationCallback>
             <OptionValues>
                 <OptionValue>
-                    <Value> 登录 </Value>
+                    <Value>登录</Value>
                 </OptionValue>
                 <OptionValue>
-                    <Value> 新建用户 </Value>
+                    <Value>新建用户</Value>
                 </OptionValue>
              </OptionValues>
         </ConfirmationCallback>
@@ -61,33 +61,33 @@ Portions Copyrighted 2011 ForgeRock AS
 
     <Callbacks length="8" order="4" timeout="300" header="自注册" template="register.jsp" >
         <NameCallback isRequired="true" attribute="uid" >
-            <Prompt> 用户名: </Prompt>
+            <Prompt>用户名:</Prompt>
         </NameCallback>
         <PasswordCallback echoPassword="false" isRequired="true" attribute="userPassword" >
-            <Prompt> 密码: </Prompt>    
+            <Prompt>密码:</Prompt>    
         </PasswordCallback>
         <PasswordCallback echoPassword="false" isRequired="true" >
-            <Prompt> 确认密码: </Prompt>    
+            <Prompt>确认密码:</Prompt>    
         </PasswordCallback>
         <NameCallback isRequired="true" attribute="givenname" >
-            <Prompt> 名字: </Prompt>
+            <Prompt>名字:</Prompt>
         </NameCallback>
         <NameCallback isRequired="true" attribute="sn" >
-            <Prompt> 姓氏: </Prompt>
+            <Prompt>姓氏:</Prompt>
         </NameCallback>
         <NameCallback isRequired="true" attribute="cn" >
-            <Prompt> 全名: </Prompt>
+            <Prompt>全名:</Prompt>
         </NameCallback>
         <NameCallback attribute="mail" >
-            <Prompt> 电子邮件地址: </Prompt>
+            <Prompt>电子邮件地址:</Prompt>
         </NameCallback>
         <ConfirmationCallback>
             <OptionValues>
                 <OptionValue>
-                    <Value> 注册 </Value>
+                    <Value>注册</Value>
                 </OptionValue>
                 <OptionValue>
-                    <Value> 取消 </Value>
+                    <Value>取消</Value>
                 </OptionValue>
              </OptionValues>
         </ConfirmationCallback>
@@ -105,7 +105,7 @@ Portions Copyrighted 2011 ForgeRock AS
         <ConfirmationCallback>
             <OptionValues>
                 <OptionValue>
-                    <Value> 提交 </Value>
+                    <Value>提交</Value>
                 </OptionValue>
             </OptionValues>
         </ConfirmationCallback>
@@ -115,10 +115,10 @@ Portions Copyrighted 2011 ForgeRock AS
         <ConfirmationCallback>
             <OptionValues>
                 <OptionValue>
-                    <Value> 同意 </Value>
+                    <Value>同意</Value>
                 </OptionValue>
                 <OptionValue>
-                    <Value> 不同意 </Value>
+                    <Value>不同意</Value>
                 </OptionValue>
             </OptionValues>
         </ConfirmationCallback>
