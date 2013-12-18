@@ -135,10 +135,10 @@
         </listitem>
     </itemizedlist>
 
-<mediaobject xml:id="figure-sso-web-sequence">
+<mediaobject xml:id="figure-sso-auth-flow">
     <alt>SSO with Policy Agent</alt>
     <imageobject>
-        <imagedata fileref="images/ssov3.png" format="PNG"/>
+        <imagedata fileref="images/sso-auth-flow.png" format="PNG"/>
     </imageobject>
     <textobject>
         <para>The sequence diagram illustrates events associated with SSO.</para>

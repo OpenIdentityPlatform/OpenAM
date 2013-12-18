@@ -1,4 +1,4 @@
-@startuml sso.png
+@startuml sso-auth-flow.png
 
 /'
     CCPL HEADER START
