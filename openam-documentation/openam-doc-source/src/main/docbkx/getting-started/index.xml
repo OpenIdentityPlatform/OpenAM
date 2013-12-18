@@ -50,9 +50,9 @@
    </author>
   </authorgroup>
   <xinclude:include href="../legal.xml" />
-  <date><?dbtimestamp format="B d, Y"?></date>
-  <pubdate>Publication date: <?dbtimestamp format="B d, Y"?></pubdate>
-  <releaseinfo><?eval ${softwareReleaseDate}?></releaseinfo>
+  <date>${publicationDate}</date>
+  <pubdate>${publicationDate}</pubdate>
+  <releaseinfo>${softwareReleaseDate}</releaseinfo>
  </info>
 
  <toc />
