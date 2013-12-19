@@ -390,6 +390,14 @@
      where the OpenAM administrator <literal>amadmin</literal> profile is held,
      because the OpenAM administrator relies on the DataStore module to log in.
     </para>
+
+    <para>
+     If you do remove the DataStore module from the default authentication chain
+     but it is still configured,
+     then you can use it to authenticate
+     by adding <literal>module=DataStore</literal> as a query string parameter
+     to the normal login URL.
+    </para>
    </important>
 
    <para>Follow these steps.</para>
