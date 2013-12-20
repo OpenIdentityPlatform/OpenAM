@@ -859,4 +859,5 @@ public class SUN_OPENSSO_SERVER_MIBImpl extends SUN_OPENSSO_SERVER_MIB implement
     protected SsoServerWSSAgentsImpl getWssAgentsGroup() {
         return wssAgentsGroup;
     }
+
 }

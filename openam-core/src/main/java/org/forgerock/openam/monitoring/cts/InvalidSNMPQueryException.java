@@ -1,5 +1,5 @@
-/**
- * Copyright 2013 ForgeRock, Inc.
+/*
+ * Copyright 2013 ForgeRock AS.
  *
  * The contents of this file are subject to the terms of the Common Development and
  * Distribution License (the License). You may not use this file except in compliance with the
@@ -12,23 +12,29 @@
  * the License file at legal/CDDLv1.0.txt. If applicable, add the following below the CDDL
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
+ *
  */
-package org.forgerock.openam.cts.api;
+package org.forgerock.openam.monitoring.cts;
 
 /**
- * Responsible for defining the available token types in the Core Token Service.
- *
- * If new tokens are added, this enum must be updated via APPENDING to the end of the enum list.
- *
- * Existing operations MUST STAY in the order they are defined. This is validated by TokenTypeTest.
- *
- * @author Robert Wapshott
+ * Thrown by the SNMP-exposed Monitoring Service.
  */
-public enum TokenType {
+public class InvalidSNMPQueryException extends RuntimeException {
 
-    SESSION(),
-    SAML2(),
-    OAUTH(),
-    REST()
+    public InvalidSNMPQueryException() {
+        super();
+    }
+
+    public InvalidSNMPQueryException(String message, Throwable throwable) {
+        super(message, throwable);
+    }
+
+    public InvalidSNMPQueryException(Throwable throwable) {
+        super(throwable);
+    }
+
+    public InvalidSNMPQueryException(String message) {
+        super(message);
+    }
 
 }

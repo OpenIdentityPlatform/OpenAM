@@ -107,6 +107,8 @@ public class CoreGuiceModule extends AbstractModule {
         // CTS General
         bind(Debug.class).annotatedWith(Names.named(CoreTokenConstants.CTS_DEBUG)).toInstance(Debug.getInstance(CoreTokenConstants.CTS_DEBUG));
         bind(Debug.class).annotatedWith(Names.named(CoreTokenConstants.CTS_REAPER_DEBUG)).toInstance(Debug.getInstance(CoreTokenConstants.CTS_REAPER_DEBUG));
+        bind(Debug.class).annotatedWith(Names.named(CoreTokenConstants.CTS_MONITOR_DEBUG)).toInstance(Debug.getInstance(CoreTokenConstants.CTS_MONITOR_DEBUG));
+
         bind(CoreTokenConstants.class).in(Singleton.class);
         bind(CTSPersistentStore.class).in(Singleton.class);
         bind(CoreTokenConfig.class).in(Singleton.class);

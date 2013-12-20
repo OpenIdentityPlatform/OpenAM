@@ -38,9 +38,6 @@ import com.sun.management.snmp.agent.SnmpMib;
 import javax.management.MBeanServer;
 import javax.management.ObjectName;
 
-
-
-
 /**
  * This class extends the "SsoServerEntitlementPolicyStatsEntry" class.
  */

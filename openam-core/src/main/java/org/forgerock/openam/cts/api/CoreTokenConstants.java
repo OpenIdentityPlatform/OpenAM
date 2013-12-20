@@ -31,6 +31,12 @@ public class CoreTokenConstants {
      * Debug instance name for all CTS debugging.
      */
     public static final String CTS_DEBUG = "amCoreTokenService";
+
+    /**
+     * Debug instance name for all CTS Monitor debugging
+     */
+    public static final String CTS_MONITOR_DEBUG = "amCoreTokenMonitorService";
+
     /**
      * Debug instance name for the CTS Reaper.
      */

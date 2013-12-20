@@ -22,6 +22,12 @@ package org.forgerock.openam.cts;
 
 import com.google.inject.name.Named;
 import com.sun.identity.shared.debug.Debug;
+import java.text.MessageFormat;
+import java.util.Calendar;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.Map;
+import javax.inject.Inject;
 import org.forgerock.openam.cts.api.CoreTokenConstants;
 import org.forgerock.openam.cts.api.fields.CoreTokenField;
 import org.forgerock.openam.cts.api.fields.CoreTokenFieldTypes;
@@ -39,13 +45,6 @@ import org.forgerock.openam.cts.utils.blob.TokenStrategyFailedException;
 import org.forgerock.opendj.ldap.Attribute;
 import org.forgerock.opendj.ldap.Entry;
 import org.forgerock.opendj.ldap.Filter;
-
-import javax.inject.Inject;
-import java.text.MessageFormat;
-import java.util.Calendar;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.Map;
 
 /**
  * Core Token Service Persistent Store is responsible for the storage and retrieval of
@@ -110,6 +109,7 @@ public class CTSPersistentStore {
         } catch (TokenStrategyFailedException e) {
             throw new CoreTokenException("Failed to perform Token Blob strategy.", e);
         }
+
         adapter.create(token);
     }
 

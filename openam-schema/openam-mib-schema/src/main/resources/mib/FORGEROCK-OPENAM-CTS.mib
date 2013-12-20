@@ -1,0 +1,303 @@
+--
+--  Copyright 2013 ForgeRock AS.
+--  The contents of this file are subject to the terms of the Common Development and
+--  Distribution License (the License). You may not use this file except in compliance with the
+--  License.
+--
+--  You can obtain a copy of the License at legal/CDDLv1.0.txt. See the License for the
+--  specific language governing permission and limitations under the License.
+--
+--  When distributing Covered Software, include this CDDL Header Notice in each file and include
+--  the License file at legal/CDDLv1.0.txt. If applicable, add the following below the CDDL
+--  Header, with the fields enclosed by brackets [] replaced by your own identifying
+--  information: "Portions copyright [year] [name of copyright owner]".
+--
+
+--
+-- MIB for CTS Monitoring
+-- Copyright (c) 2013, ForgeRock AS, All Rights Reserved.
+--
+
+FORGEROCK-OPENAM-CTS-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    OBJECT-TYPE, enterprises,
+    Integer32
+        FROM SNMPv2-SMI
+    SnmpAdminString
+        FROM SNMP-FRAMEWORK-MIB;
+
+--
+-- ForgeRock
+--
+
+forgerock OBJECT IDENTIFIER ::= {enterprises 36733}
+
+--
+-- SNMP
+--
+
+snmp OBJECT IDENTIFIER ::= { forgerock 1 }
+
+--
+-- openAM
+--
+
+openam OBJECT IDENTIFIER ::= { snmp 2 }
+
+--
+-- SSO CTS Monitoring
+--
+
+ctsMonitoring OBJECT IDENTIFIER ::= { openam 999 }
+
+--
+-- Instance of TokenTableEntry
+--
+
+tokenTable			OBJECT-TYPE
+    SYNTAX			SEQUENCE OF TokenEntry
+    MAX-ACCESS		not-accessible
+    STATUS			current
+    DESCRIPTION     "Token Information"
+    ::= { ctsMonitoring 1 }
+
+TokenEntry ::=
+    SEQUENCE	{
+                    tokenTableIndex		Counter64,
+                    tokenType			SnmpAdminString
+                }
+
+tokenTableIndex OBJECT-TYPE
+    SYNTAX        	Counter64
+    MAX-ACCESS    	read-only
+    STATUS        	current
+    DESCRIPTION		"Token Table Index"
+    ::= { tokenEntry 1 }
+
+tokenType OBJECT-TYPE
+    SYNTAX        	SnmpAdminString
+    MAX-ACCESS    	read-only
+    STATUS        	current
+    DESCRIPTION		"Token Type"
+    ::= { tokenEntry 2 }
+
+--
+-- TokenTableEntry
+--
+
+tokenEntry OBJECT-TYPE
+    SYNTAX 			TokenEntry
+    MAX-ACCESS		not-accessible
+    STATUS			current
+    DESCRIPTION		"Information for a token"
+    INDEX			{ tokenTableIndex }
+    ::= { tokenTable 1 }
+
+--
+-- OperationTable
+--
+
+operationTable OBJECT-TYPE
+    SYNTAX 			SEQUENCE OF OperationEntry
+    MAX-ACCESS		not-accessible
+    STATUS			current
+    DESCRIPTION		"Operation Information"
+    ::= { ctsMonitoring 2 }
+
+--
+-- OperationEntry
+--
+
+operationEntry	        OBJECT-TYPE
+    SYNTAX		    OperationEntry
+    MAX-ACCESS	    not-accessible
+    STATUS		    current
+    DESCRIPTION	    "Information regarding a specific operation type"
+    INDEX		    { operationTableIndex }
+    ::= { operationTable 1 }
+
+OperationEntry ::=
+    SEQUENCE	{
+                    operationTableIndex		Counter64,
+                    operationType		SnmpAdminString
+                }
+
+operationTableIndex      OBJECT-TYPE
+    SYNTAX			Counter64
+    MAX-ACCESS		read-only
+    STATUS			current
+    DESCRIPTION     "Operation Table Index"
+    ::= { operationEntry 1 }
+
+operationType OBJECT-TYPE
+    SYNTAX			SnmpAdminString
+    MAX-ACCESS		read-only
+    STATUS			current
+    DESCRIPTION     "Operation Operation Type"
+    ::= { operationEntry 2 }
+
+--
+-- ctsCRUDOperationsTable
+--
+
+ctsCRUDOperationsTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF CTSCRUDOperationsEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "Rates accessed only through operation (no token type)"
+    ::= { ctsMonitoring 3 }
+
+--
+-- CTSOperationsPerTokenTypeEntry
+--
+
+ctsCRUDOperationsEntry OBJECT-TYPE
+    SYNTAX      CTSCRUDOperationsEntry
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Rate information for operation-specific (no token type) rates"
+    INDEX       { operationTableIndex }
+    ::= { ctsCRUDOperationsTable 1 }
+
+CTSCRUDOperationsEntry ::=
+    SEQUENCE        {
+                        sCumulativeCount     Counter64,
+                        sAverage             Counter64,
+                        sMinimum             Counter64,
+                        sMaximum             Counter64
+                    }
+
+sCumulativeCount  	OBJECT-TYPE
+    SYNTAX      	Counter64
+    MAX-ACCESS  	read-only
+    STATUS      	current
+    DESCRIPTION     "Cumulative value"
+    DEFVAL    		{ 0 }
+    ::= { ctsCRUDOperationsEntry 1 }
+
+sAverage  	OBJECT-TYPE
+    SYNTAX      	Counter64
+    MAX-ACCESS  	read-only
+    STATUS      	current
+    DESCRIPTION     "Average value"
+    DEFVAL    		{ 0 }
+    ::= { ctsCRUDOperationsEntry 2 }
+
+sMinimum  	OBJECT-TYPE
+    SYNTAX      	Counter64
+    MAX-ACCESS  	read-only
+    STATUS      	current
+    DESCRIPTION     "Minimum value"
+    DEFVAL    		{ 0 }
+    ::= { ctsCRUDOperationsEntry 3 }
+
+sMaximum  	OBJECT-TYPE
+    SYNTAX      	Counter64
+    MAX-ACCESS  	read-only
+    STATUS      	current
+    DESCRIPTION     "Maximum value"
+    DEFVAL    		{ 0 }
+    ::= { ctsCRUDOperationsEntry 4 }
+
+--
+-- ctsCRUDOperationsPerTokenTypeTable
+--
+
+ctsCRUDOperationsPerTokenTypeTable OBJECT-TYPE
+    SYNTAX          SEQUENCE OF CTSCRUDOperationsPerTokenTypeEntry
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION     "Rates accessed through operation and token type"
+    ::= { ctsMonitoring 4 }
+
+--
+-- CTSCRUDOperationsPerTokenTypeEntry
+--
+
+ctsCRUDOperationsPerTokenTypeEntry     OBJECT-TYPE
+    SYNTAX			CTSCRUDOperationsPerTokenTypeEntry
+    MAX-ACCESS		not-accessible
+    STATUS			current
+    DESCRIPTION     "Rate information for a token & operation combination"
+    INDEX		    { tokenTableIndex, operationTableIndex }
+    ::= { ctsCRUDOperationsPerTokenTypeTable 1 }
+
+CTSCRUDOperationsPerTokenTypeEntry ::=
+    SEQUENCE 		{
+                        dCumulative         Counter64,
+                        dAverage 		    Counter64,
+                        dMinimum 		    Counter64,
+                        dMaximum 		    Counter64
+                    }
+
+dCumulativeCount  	OBJECT-TYPE
+    SYNTAX      	Counter64
+    MAX-ACCESS  	read-only
+    STATUS      	current
+    DESCRIPTION     "Cumulative value"
+    DEFVAL    		{ 0 }
+    ::= { ctsCRUDOperationsPerTokenTypeEntry 1 }
+
+dAverage  	OBJECT-TYPE
+    SYNTAX      	Counter64
+    MAX-ACCESS  	read-only
+    STATUS      	current
+    DESCRIPTION     "Average value"
+    DEFVAL    		{ 0 }
+    ::= { ctsCRUDOperationsPerTokenTypeEntry 2 }
+
+dMinimum  	OBJECT-TYPE
+    SYNTAX      	Counter64
+    MAX-ACCESS  	read-only
+    STATUS      	current
+    DESCRIPTION     "Minimum value"
+    DEFVAL    		{ 0 }
+    ::= { ctsCRUDOperationsPerTokenTypeEntry 3 }
+
+dMaximum  	OBJECT-TYPE
+    SYNTAX      	Counter64
+    MAX-ACCESS  	read-only
+    STATUS      	current
+    DESCRIPTION     "Maximum value"
+    DEFVAL    		{ 0 }
+    ::= { ctsCRUDOperationsPerTokenTypeEntry 4 }
+
+
+--
+-- ctsTokenOperationsTable
+--
+
+ctsTokenOperationsTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF CTSTokenOperationsEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "Values associated with information about a specific token"
+    ::= { ctsMonitoring 5 }
+
+--
+-- ctsTokenOperationsEntry
+--
+
+ctsTokenOperationsEntry OBJECT-TYPE
+    SYNTAX      CTSTokenOperationsEntry
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Information about a specific token, related to token index supplied"
+    INDEX { tokenTableIndex }
+    ::= { ctsTokenOperationsTable 1 }
+
+CTSTokenOperationsEntry ::=
+    SEQUENCE    {
+                        totalCount  Counter64
+                }
+
+totalCount OBJECT-TYPE
+    SYNTAX      	Counter64
+    MAX-ACCESS  	read-only
+    STATUS      	current
+    DESCRIPTION     "Value returned"
+    DEFVAL    		{ 0 }
+    ::= { ctsTokenOperationsEntry 1 }
+
+END
