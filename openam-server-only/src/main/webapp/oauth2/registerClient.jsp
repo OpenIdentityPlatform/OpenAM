@@ -242,8 +242,8 @@
         <input type="password" name="<%=OAuth2Constants.OAuth2Client.USERPASSWORD%>2" value="" id="<%=OAuth2Constants.OAuth2Client.USERPASSWORD%>2"/>
         <br><br>
 		Client Type:<br>
-        <input type="radio" name="<%=OAuth2Constants.OAuth2Client.CLIENT_TYPE%>" value="Confidential" checked /><br>
-	    <input type="radio" name="<%=OAuth2Constants.OAuth2Client.CLIENT_TYPE%>" value="Public"/>
+        <input type="radio" name="<%=OAuth2Constants.OAuth2Client.CLIENT_TYPE%>" value="Confidential" checked /><label>Confidential</label><br>
+	    <input type="radio" name="<%=OAuth2Constants.OAuth2Client.CLIENT_TYPE%>" value="Public"/><label>Public</label>
         <br><br>
 		Redirection URL(s):<br>
         <select id="<%=OAuth2Constants.OAuth2Client.REDIRECT_URI%>" multiple="single" name="<%=OAuth2Constants.OAuth2Client.REDIRECT_URI%>"></select>
