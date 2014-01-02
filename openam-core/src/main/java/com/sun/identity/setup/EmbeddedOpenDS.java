@@ -27,7 +27,7 @@
  */
 
 /*
- * Portions Copyrighted 2010-2013 ForgeRock, Inc.
+ * Portions Copyrighted 2010-2013 ForgeRock AS
  */
 
 package com.sun.identity.setup;
@@ -64,7 +64,6 @@ import java.io.BufferedOutputStream;
 import java.io.BufferedReader;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.FileReader;
@@ -74,8 +73,6 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.io.StringReader;
 import java.nio.ByteBuffer;
-import java.nio.channels.Channels;
-import java.nio.channels.FileChannel;
 import java.nio.channels.ReadableByteChannel;
 import java.nio.channels.WritableByteChannel;
 import java.security.NoSuchAlgorithmException;
@@ -92,13 +89,13 @@ import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 import org.forgerock.openam.utils.IOUtils;
 
-// OpenDS does not have APIs to install and setup replication yet
+// OpenDS, now OpenDJ, does not have APIs to install and setup replication yet
 
 /**
- * This class encapsulates all <code>OpenDS</code>  dependencies.
+ * This class encapsulates all <code>OpenDJ</code>  dependencies.
  * All the interfaces are invoked from <code>AMSetupServlet</code> class
  * at different points : initial installation, normal startup and
- * normal shutdown of the embedded <code>OpenDS</code> instance.
+ * normal shutdown of the embedded <code>OpenDJ</code> instance.
  */
 public class EmbeddedOpenDS {
     private static final String OPENDS_1x_VER = "5097";
@@ -117,9 +114,9 @@ public class EmbeddedOpenDS {
     }
 
     /**
-     * Sets up embedded opends during initial installation :
+     * Sets up embedded OpenDJ during initial installation :
      * <ul>
-     * <li>lays out the filesystem directory structure needed by opends
+     * <li>lays out the filesystem directory structure needed by OpenDJ
      * <li>sets up port numbers for ldap and replication
      * <li>invokes <code>EmbeddedUtils</code> to start the embedded server.
      * </ul>
@@ -244,7 +241,7 @@ public class EmbeddedOpenDS {
 
         SetupProgress.reportEnd("emb.opends.stop", null);
 
-        // now setup OpenDS
+        // now setup OpenDJ
         System.setProperty("org.opends.quicksetup.Root", odsRoot);
         System.setProperty(ServerConstants.PROPERTY_SERVER_ROOT, odsRoot);
         System.setProperty(ServerConstants.PROPERTY_INSTANCE_ROOT, odsRoot);
@@ -271,7 +268,6 @@ public class EmbeddedOpenDS {
                         "emb.creatingfamsuffix.failure");
             }
 
-            //EmbeddedOpenDS.startServer(odsRoot);
         } // End of single / first server check.
     }
 
@@ -348,7 +344,7 @@ public class EmbeddedOpenDS {
     }
 
     /**
-     * Runs the OpenDS setup command to create our instance
+     * Runs the OpenDJ setup command to create our instance
      *
      * @param map The map of configuration options
      * @throws Exception upon encountering errors.
@@ -374,7 +370,7 @@ public class EmbeddedOpenDS {
     }
 
     /**
-     * Runs the OpenDS setup command like this:
+     * Runs the OpenDJ setup command like this:
      * $ ./setup --cli --adminConnectorPort 4444
      * --baseDN dc=openam,dc=forgerock,dc=org --rootUserDN "cn=directory manager"
      * --doNotStart --ldapPort 50389 --skipPortCheck --rootUserPassword xxxxxxx
@@ -389,7 +385,7 @@ public class EmbeddedOpenDS {
                 "--adminConnectorPort",         // 1
                 "4444",                         // 2
                 "--baseDN",                     // 3
-                Constants.DEFAULT_ROOT_SUFFIX,    // 4
+                Constants.DEFAULT_ROOT_SUFFIX,  // 4
                 "--rootUserDN",                 // 5
                 "cn=Directory Manager",         // 6
                 "--ldapPort",                   // 7
@@ -433,9 +429,9 @@ public class EmbeddedOpenDS {
     }
 
     /**
-     * Starts the embedded <code>OpenDS</code> instance.
+     * Starts the embedded <code>OpenDJ</code> instance.
      *
-     * @param odsRoot File system directory where <code>OpenDS</code>
+     * @param odsRoot File system directory where <code>OpenDJ</code>
      *                is installed.
      * @throws Exception upon encountering errors.
      */
@@ -493,9 +489,9 @@ public class EmbeddedOpenDS {
 
 
     /**
-     * Gracefully shuts down the embedded opends instance.
+     * Gracefully shuts down the embedded OpenDJ instance.
      *
-     * @param reason string representing reasn why shutdown was called.
+     * @param reason string representing reason why shutdown was called.
      * @throws Exception on encountering errors.
      */
     public static void shutdownServer(String reason) throws Exception {
@@ -535,7 +531,7 @@ public class EmbeddedOpenDS {
     }
 
     /**
-     * Setups replication between two opends sms and user stores.
+     * Setups replication between two OpenDJ sms and user stores.
      * $ dsreplication enable
      * --no-prompt
      * --host1 host1 --port1 1389 --bindDN1 "cn=Directory Manager"
@@ -624,7 +620,7 @@ public class EmbeddedOpenDS {
     }
 
     /**
-     * Syncs replication data between two opends sms and user stores.
+     * Syncs replication data between two OpenDJ sms and user stores.
      * $ dsreplication initialize
      * --baseDN "dc=example,dc=com" --adminUID admin --adminPassword pass
      * --hostSource host1 --portSource 1389
@@ -639,7 +635,7 @@ public class EmbeddedOpenDS {
                 "initialize",                 // 0
                 "--no-prompt",                // 1
                 "--baseDN",                   // 2
-                Constants.DEFAULT_ROOT_SUFFIX,  // 3 Placeholder
+                Constants.DEFAULT_ROOT_SUFFIX,// 3 Placeholder
                 "--adminUID",                 // 4
                 "admin",                      // 5
                 "--adminPassword",            // 6
@@ -681,10 +677,10 @@ public class EmbeddedOpenDS {
     }
 
     /**
-     * Returns Replication Status by invoking opends <code>dsreplication</code>
+     * Returns Replication Status by invoking OpenDJ <code>dsreplication</code>
      * CLI
      *
-     * @param port   LDAP port number of embedded opends
+     * @param port   LDAP port number of embedded OpenDJ
      * @param passwd Directory Manager password
      * @param oo     Standard output
      * @param err    : Standard error
@@ -742,7 +738,7 @@ public class EmbeddedOpenDS {
      * Utility function to preload data in the embedded instance.
      * Must be called when the directory instance is shutdown.
      *
-     * @param odsRoot Local directory where <code>OpenDS</code> is installed.
+     * @param odsRoot Local directory where <code>OpenDJ</code> is installed.
      * @param ldif    Full path of the ldif file to be loaded.
      */
     public static int loadLDIF(Map map, String odsRoot, String ldif) {
@@ -861,7 +857,7 @@ public class EmbeddedOpenDS {
     }
 
     /**
-     * Get admin port of the OpenDS server
+     * Get admin port of the OpenDJ server
      *
      * @param username The username of the directory admin
      * @param password The password of the directory admin
@@ -914,7 +910,7 @@ public class EmbeddedOpenDS {
     }
 
     /**
-     * Synchronizes replication server info with current list of opensso servers.
+     * Synchronizes replication server info with current list of OpenAM servers.
      */
     public static boolean syncReplicatedServers(
             Set currServerSet, String port, String passwd) {
@@ -952,6 +948,14 @@ public class EmbeddedOpenDS {
             }
         }
 
+        /*
+             v2.6 output example
+
+             Replication Server : replication-server                           : replication-port
+             -------------------:----------------------------------------------:-----------------
+             replication-server : dj1.example.com:58989, dj2.example.com:50889 : 50889
+
+         */
         BufferedReader brd = new BufferedReader(new StringReader(str));
         String line = null;
         try {
@@ -967,7 +971,7 @@ public class EmbeddedOpenDS {
         }
         try {
             int lastcolon = line.lastIndexOf(':');
-            int stcolon = line.indexOf(':', line.indexOf(':') + 1);
+            int stcolon = line.indexOf(':');
             String replservers = line.substring(stcolon + 1, lastcolon);
 
             StringTokenizer stok = new StringTokenizer(replservers, ",");
@@ -1026,7 +1030,7 @@ public class EmbeddedOpenDS {
     }
 
     /**
-     * Synchronizes replication domain info with current list of opensso servers.
+     * Synchronizes replication domain info with current list of OpenAM servers.
      */
     public static boolean syncReplicatedDomains(
             Set currServerSet, String port, String passwd) {
@@ -1056,6 +1060,16 @@ public class EmbeddedOpenDS {
         if (stre.length() != 0) {
             debug.error("EmbeddedOpenDS:syncReplication:stderr:" + stre);
         }
+        /*
+            v2.6 output example
+
+            Replication Domain            : replication-server
+            ------------------------------:---------------------------------------------
+            cn=admin data                 : dj1.example.com:58989, dj2.example.com:50889
+            cn=schema                     : dj1.example.com:58989, dj2.example.com:50889
+            dc=openam,dc=forgerock,dc=org : dj1.example.com:58989, dj2.example.com:50889
+         */
+
         BufferedReader brd = new BufferedReader(new StringReader(str));
         String line = null;
         try {
@@ -1065,7 +1079,7 @@ public class EmbeddedOpenDS {
                 try {
                     int dcolon = line.indexOf(':');
                     String domainname = line.substring(0, dcolon).trim();
-                    int stcolon = line.indexOf(':', dcolon + 1);
+                    int stcolon = dcolon + 1;
                     String replservers = line.substring(stcolon + 1);
                     if (debug.messageEnabled()) {
                         debug.message("EmbeddedOpenDS:syncRepl:domain=" +
@@ -1135,7 +1149,7 @@ public class EmbeddedOpenDS {
     }
 
     /**
-     * Synchronizes replication domain info with current list of opensso servers.
+     * Synchronizes replication domain info with current list of OpenAM servers.
      */
     public static boolean syncReplicatedServerList(
             Set currServerSet, String port, String passwd) {
@@ -1166,7 +1180,7 @@ public class EmbeddedOpenDS {
     }
 
     /**
-     * Helper method to return Ldap connection to a embedded opends
+     * Helper method to return Ldap connection to a embedded OpenDJ
      * server.
      *
      * @return Ldap connection
@@ -1206,7 +1220,7 @@ public class EmbeddedOpenDS {
             "cn=all-servers,cn=Server Groups,cn=admin data";
 
     /**
-     * Removes host:port from opends replication
+     * Removes host:port from OpenDJ replication
      */
     public static void delOpenDSServer(
             LDAPConnection lc,
@@ -1218,7 +1232,7 @@ public class EmbeddedOpenDS {
         Debug debug = Debug.getInstance(SetupConstants.DEBUG_NAME);
         if (lc == null) {
             debug.error("EmbeddedOpenDS:syncOpenDSServer():" +
-                    "Could not connect to local opends instance." + replServerDN);
+                    "Could not connect to local OpenDJ instance." + replServerDN);
             return;
         }
         String trustKey = null;
@@ -1248,7 +1262,7 @@ public class EmbeddedOpenDS {
             lc.delete(replServerDN);
         } catch (Exception ex) {
             debug.error("EmbeddedOpenDS.syncOpenDSServer()." +
-                    " Error getting deleting server entrt:" + replServerDN, ex);
+                    " Error getting deleting server entry:" + replServerDN, ex);
 
         }
         try {
@@ -1265,7 +1279,7 @@ public class EmbeddedOpenDS {
     }
 
     /**
-     * Gets list of replicated servers from local opends directory.
+     * Gets list of replicated servers from local OpenDJ directory.
      */
     public static Set getServerSet(
             LDAPConnection lc
@@ -1303,8 +1317,8 @@ public class EmbeddedOpenDS {
         return null;
     }
 
-    // Programmatic way of rebuilding indexes in OpenDS.
-    // This method simulates the OpenDS cli command rebuild-index.
+    // Programmatic way of rebuilding indexes in OpenDJ.
+    // This method simulates the OpenDJ cli command rebuild-index.
     // eg., rebuild-index -b dc=example,dc=com -i uid -i mail
 
     public static int rebuildIndex(Map map) throws Exception {
@@ -1414,7 +1428,7 @@ public class EmbeddedOpenDS {
     }
 
     /**
-     * Initialises OpenDS for client use, used by the CLI tools
+     * Initialises OpenDJ for client use, used by the CLI tools
      */
     public static void initializeForClientUse() {
         EmbeddedUtils.initializeForClientUse();
