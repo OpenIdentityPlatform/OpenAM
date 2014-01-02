@@ -22,6 +22,7 @@ import org.forgerock.openam.cts.api.TokenType;
 import org.forgerock.openam.cts.api.tokens.Token;
 import org.forgerock.openam.cts.monitoring.impl.CTSMonitoringStoreImpl;
 import org.forgerock.openam.cts.monitoring.impl.operations.TokenOperationsStore;
+import org.forgerock.openam.cts.monitoring.impl.reaper.ReaperMonitor;
 import org.mockito.Matchers;
 import org.mockito.invocation.InvocationOnMock;
 import org.mockito.stubbing.Answer;
@@ -33,7 +34,6 @@ import java.util.concurrent.ExecutorService;
 
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Matchers.any;
-import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
@@ -43,8 +43,10 @@ import static org.testng.Assert.assertEquals;
 public class CTSMonitoringStoreImplTest {
 
     private CTSOperationsMonitoringStore ctsOperationsMonitoringStore;
+    private CTSReaperMonitoringStore ctsReaperMonitoringStore;
 
     private TokenOperationsStore tokenOperationsStore;
+    private ReaperMonitor reaperMonitor;
 
     @BeforeMethod
     public void setUp() {
@@ -52,8 +54,11 @@ public class CTSMonitoringStoreImplTest {
         tokenOperationsStore = mock(TokenOperationsStore.class);
         final ExecutorService executorService = mock(ExecutorService.class);
         final Debug debug = mock(Debug.class);
+        reaperMonitor = mock(ReaperMonitor.class);
 
-        ctsOperationsMonitoringStore = new CTSMonitoringStoreImpl(tokenOperationsStore, executorService, debug);
+        ctsOperationsMonitoringStore = new CTSMonitoringStoreImpl(debug, executorService, tokenOperationsStore,
+                reaperMonitor);
+        ctsReaperMonitoringStore = (CTSReaperMonitoringStore) ctsOperationsMonitoringStore;
 
         given(executorService.submit(any(Callable.class))).will(new Answer<Object>() {
             public Object answer(InvocationOnMock invocation) throws Throwable {
@@ -230,5 +235,33 @@ public class CTSMonitoringStoreImplTest {
 
         //Then
         assertEquals(result, 1);
+    }
+
+    @Test
+    public void shouldAddReaperRun() {
+
+        //Given
+        long startTime = 1000;
+        long endTime = 2000;
+        int numberOfDeletedSessions = 234;
+
+        //When
+        ctsReaperMonitoringStore.addReaperRun(startTime, endTime, numberOfDeletedSessions);
+
+        //Then
+        verify(reaperMonitor).add(startTime, endTime, numberOfDeletedSessions);
+    }
+
+    @Test
+    public void shouldGetRateOfDeletedSessions() {
+
+        //Given
+        given(reaperMonitor.getRateOfDeletion()).willReturn(2.0D);
+
+        //When
+        double result = ctsReaperMonitoringStore.getRateOfDeletedSessions();
+
+        //Then
+        assertEquals(result, 2.0D);
     }
 }

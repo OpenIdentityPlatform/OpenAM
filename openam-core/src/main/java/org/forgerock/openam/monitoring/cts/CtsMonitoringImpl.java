@@ -27,6 +27,8 @@ import java.util.EnumSet;
 import java.util.List;
 import org.forgerock.openam.cts.api.CoreTokenConstants;
 import org.forgerock.openam.cts.impl.query.QueryFactory;
+import org.forgerock.openam.cts.monitoring.CTSOperationsMonitoringStore;
+import org.forgerock.openam.cts.monitoring.CTSReaperMonitoringStore;
 import org.forgerock.openam.guice.InjectorHolder;
 
 /**
@@ -77,6 +79,8 @@ public class CtsMonitoringImpl<E extends Enum<E>, F extends Enum<F>> extends Cts
     private EnumSet<E> crudItems;
     private EnumSet<F> tokenItems;
 
+    private final CTSReaperMonitoringStore reaperMonitoringStore;
+
     /**
      * Constructor with the MBeanServer not being set to null. Generates and assigned the
      * tables to the implementations, complete with appropriate setup knowledge.
@@ -91,6 +95,7 @@ public class CtsMonitoringImpl<E extends Enum<E>, F extends Enum<F>> extends Cts
         setCrudItems(crudItemClass);
         setTokenItems(tokenItemClass);
         init(myMib);
+        this.reaperMonitoringStore = InjectorHolder.getInstance(CTSReaperMonitoringStore.class);
     }
 
     /**
@@ -241,5 +246,14 @@ public class CtsMonitoringImpl<E extends Enum<E>, F extends Enum<F>> extends Cts
 
     }
 
+    /**
+     * Gets the CTS Reapers current rate of deletion from the CTS monitoring store.
+     *
+     * @return The Rate at which the CTS Reaper is deleting sessions.
+     */
+    @Override
+    public Long getRateOfDeletedSessions() {
+        return (long) reaperMonitoringStore.getRateOfDeletedSessions();
+    }
 }
 

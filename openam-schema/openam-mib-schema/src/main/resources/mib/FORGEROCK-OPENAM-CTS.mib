@@ -300,4 +300,17 @@ totalCount OBJECT-TYPE
     DEFVAL    		{ 0 }
     ::= { ctsTokenOperationsEntry 1 }
 
+
+--
+-- ctsReaperOperationsTable
+--
+
+rateOfDeletedSessions OBJECT-TYPE
+    SYNTAX      	Counter64
+    MAX-ACCESS  	read-only
+    STATUS      	current
+    DESCRIPTION     "Rate of deleted sessions per reaper run"
+    DEFVAL    		{ 0 }
+	::= { ctsMonitoring 6 }
+
 END

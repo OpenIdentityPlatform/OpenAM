@@ -44,6 +44,7 @@ import org.forgerock.openam.cts.api.CoreTokenConstants;
 import org.forgerock.openam.cts.impl.CTSConnectionFactory;
 import org.forgerock.openam.cts.impl.LDAPConfig;
 import org.forgerock.openam.cts.monitoring.CTSOperationsMonitoringStore;
+import org.forgerock.openam.cts.monitoring.CTSReaperMonitoringStore;
 import org.forgerock.openam.cts.monitoring.impl.CTSMonitoringStoreImpl;
 import org.forgerock.openam.entitlement.indextree.IndexChangeHandler;
 import org.forgerock.openam.entitlement.indextree.IndexChangeManager;
@@ -160,6 +161,7 @@ public class CoreGuiceModule extends AbstractModule {
                 .toInstance(Debug.getInstance(SessionConstants.SESSION_DEBUG));
 
         bind(CTSOperationsMonitoringStore.class).to(CTSMonitoringStoreImpl.class);
+        bind(CTSReaperMonitoringStore.class).to(CTSMonitoringStoreImpl.class);
         bind(ExecutorService.class).annotatedWith(Names.named(CTSMonitoringStoreImpl.EXECUTOR_BINDING_NAME))
                 .toProvider(CTSMonitoringStoreExecutorServiceProvider.class);
     }

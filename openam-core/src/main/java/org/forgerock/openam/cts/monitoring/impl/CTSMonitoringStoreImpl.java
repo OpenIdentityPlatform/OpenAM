@@ -22,7 +22,9 @@ import org.forgerock.openam.cts.api.CoreTokenConstants;
 import org.forgerock.openam.cts.api.TokenType;
 import org.forgerock.openam.cts.api.tokens.Token;
 import org.forgerock.openam.cts.monitoring.CTSOperationsMonitoringStore;
+import org.forgerock.openam.cts.monitoring.CTSReaperMonitoringStore;
 import org.forgerock.openam.cts.monitoring.impl.operations.TokenOperationsStore;
+import org.forgerock.openam.cts.monitoring.impl.reaper.ReaperMonitor;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -38,32 +40,35 @@ import java.util.concurrent.RejectedExecutionException;
  * @since 12.0.0
  */
 @Singleton
-public class CTSMonitoringStoreImpl implements CTSOperationsMonitoringStore {
-
-    private Debug debug;
+public class CTSMonitoringStoreImpl implements CTSOperationsMonitoringStore, CTSReaperMonitoringStore {
 
     /**
      * Constant for binding an Executor for the CTS monitoring store to store CTS runtime data.
      */
     public static final String EXECUTOR_BINDING_NAME = "MONITORING_EXECUTOR";
 
+    private Debug debug;
+
     private final TokenOperationsStore tokenOperationsStore;
     private final ExecutorService executorService;
+    private final ReaperMonitor reaperMonitor;
 
     /**
      * Constructs an instance of the CTSMonitoringStoreImpl.
      *
-     * @param tokenOperationsStore An instance of the TokenOperationsStore.
-     * @param executorService An instance of an ExecutorService.
      * @param debug An instance of the debug logger.
+     * @param executorService An instance of an ExecutorService.
+     * @param tokenOperationsStore An instance of the TokenOperationsStore.
+     * @param reaperMonitor An instance of the ReaperMonitor.
      */
     @Inject
-    public CTSMonitoringStoreImpl(TokenOperationsStore tokenOperationsStore,
-            @Named(EXECUTOR_BINDING_NAME) ExecutorService executorService,
-            @com.google.inject.name.Named(CoreTokenConstants.CTS_DEBUG) Debug debug) {
-        this.tokenOperationsStore = tokenOperationsStore;
-        this.executorService = executorService;
+    public CTSMonitoringStoreImpl(@Named(CoreTokenConstants.CTS_DEBUG) Debug debug,
+            @Named(EXECUTOR_BINDING_NAME) ExecutorService executorService, TokenOperationsStore tokenOperationsStore,
+            final ReaperMonitor reaperMonitor) {
         this.debug = debug;
+        this.executorService = executorService;
+        this.tokenOperationsStore = tokenOperationsStore;
+        this.reaperMonitor = reaperMonitor;
     }
 
     /**
@@ -151,5 +156,21 @@ public class CTSMonitoringStoreImpl implements CTSOperationsMonitoringStore {
         } else {
             return tokenOperationsStore.getOperationsCumulativeCount(operation);
         }
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void addReaperRun(long startTime, long runTime, long numberOfDeletedSessions) {
+        reaperMonitor.add(startTime, runTime, numberOfDeletedSessions);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public double getRateOfDeletedSessions() {
+        return reaperMonitor.getRateOfDeletion();
     }
 }

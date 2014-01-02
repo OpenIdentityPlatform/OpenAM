@@ -152,7 +152,7 @@ public class CtsCRUDOperationsPerTokenTypeEntryImpl extends CtsCRUDOperationsPer
             throw new InvalidSNMPQueryException();
         }
 
-        return ((Double) monitoringStore.getAverageOperationsPerPeriod(getTokenType(), getCTSOperation())).longValue();
+        return (long) monitoringStore.getAverageOperationsPerPeriod(getTokenType(), getCTSOperation());
     }
 
     /**

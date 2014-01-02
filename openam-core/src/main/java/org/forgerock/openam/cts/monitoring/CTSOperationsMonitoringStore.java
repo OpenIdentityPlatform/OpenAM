@@ -21,11 +21,11 @@ import org.forgerock.openam.cts.api.TokenType;
 import org.forgerock.openam.cts.api.tokens.Token;
 
 /**
- * A data structure for storing monitoring information about the CTS.
+ * A data structure for storing monitoring information about CTS operations.
  * <br/>
- * The CTS will use an instance of this da=ta structure to store information about operations as and when they occur
- * and then the CTS monitoring timer will use the same instance to pull information out to send to the monitoring
- * frameworks.
+ * The CTS will use an instance of this data structure to store information about operations as and when they occur
+ * and then the CTS monitoring framework will us the same instance to pull information out to send to clients
+ * as monitoring requests are made.
  *
  * @since 12.0.0
  */

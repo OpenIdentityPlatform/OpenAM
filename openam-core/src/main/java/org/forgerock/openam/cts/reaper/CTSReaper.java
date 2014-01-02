@@ -24,6 +24,7 @@ import org.forgerock.openam.cts.api.fields.CoreTokenField;
 import org.forgerock.openam.cts.impl.query.QueryBuilder;
 import org.forgerock.openam.cts.impl.query.QueryFactory;
 import org.forgerock.openam.cts.impl.query.QueryPageIterator;
+import org.forgerock.openam.cts.monitoring.CTSReaperMonitoringStore;
 import org.forgerock.openam.utils.IOUtils;
 import org.forgerock.opendj.ldap.Entry;
 import org.forgerock.opendj.ldap.ErrorResultException;
@@ -65,6 +66,7 @@ public class CTSReaper implements Runnable {
     private final CoreTokenConfig config;
     private final TokenDeletion tokenDeletion;
     private final Debug debug;
+    private final CTSReaperMonitoringStore monitoringStore;
 
     private final Calendar calendar = Calendar.getInstance();
 
@@ -74,14 +76,17 @@ public class CTSReaper implements Runnable {
      * @param factory Required for generating queries against the directory.
      * @param config Required for providing runtime configuration.
      * @param tokenDeletion Required for deleting tokens.
+     * @param monitoringStore Required for monitoring reaper runs.
      */
     @Inject
-    public CTSReaper(QueryFactory factory, CoreTokenConfig config,
-                     TokenDeletion tokenDeletion, @Named(CoreTokenConstants.CTS_REAPER_DEBUG) Debug debug) {
+    public CTSReaper(final QueryFactory factory, final CoreTokenConfig config, final TokenDeletion tokenDeletion,
+            @Named(CoreTokenConstants.CTS_REAPER_DEBUG) final Debug debug,
+            final CTSReaperMonitoringStore monitoringStore) {
         this.factory = factory;
         this.config = config;
         this.tokenDeletion = tokenDeletion;
         this.debug = debug;
+        this.monitoringStore = monitoringStore;
     }
 
     /**
@@ -160,6 +165,7 @@ public class CTSReaper implements Runnable {
             }
 
             waiting.stop();
+            monitoringStore.addReaperRun(query.getStartTime(), query.getTime() + waiting.getTime(), total);
 
             if (debug.messageEnabled()) {
                 debug.message(MessageFormat.format(

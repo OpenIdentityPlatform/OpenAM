@@ -22,6 +22,7 @@ import org.forgerock.openam.cts.exceptions.CoreTokenException;
 import org.forgerock.openam.cts.impl.query.QueryBuilder;
 import org.forgerock.openam.cts.impl.query.QueryFactory;
 import org.forgerock.openam.cts.impl.query.QueryFilter;
+import org.forgerock.openam.cts.monitoring.CTSReaperMonitoringStore;
 import org.forgerock.openam.cts.utils.LDAPDataConversion;
 import org.forgerock.opendj.ldap.Attribute;
 import org.forgerock.opendj.ldap.Entry;
@@ -52,6 +53,7 @@ public class CTSReaperTest {
     private CTSReaper reaper;
     private QueryBuilder mockBuilder;
     private TokenDeletion mockTokenDeletion;
+    private CTSReaperMonitoringStore monitoringStore;
 
     @BeforeMethod
     public void setUp() throws Exception {
@@ -61,8 +63,10 @@ public class CTSReaperTest {
 
         mockConfig = mock(CoreTokenConfig.class);
         mockTokenDeletion = mock(TokenDeletion.class);
+        monitoringStore = mock(CTSReaperMonitoringStore.class);
 
-        reaper = new CTSReaper(mockQueryFactory, mockConfig, mockTokenDeletion, mock(Debug.class));
+        reaper = new CTSReaper(mockQueryFactory, mockConfig, mockTokenDeletion, mock(Debug.class),
+                monitoringStore);
     }
 
     @Test (timeOut = 5000)
@@ -102,6 +106,7 @@ public class CTSReaperTest {
 
         // Then
         verify(mockTokenDeletion).deleteBatch(any(Collection.class), any(ResultHandler.class));
+        verify(monitoringStore).addReaperRun(anyLong(), anyLong(), anyLong());
     }
 
     @Test
@@ -120,6 +125,7 @@ public class CTSReaperTest {
 
         // Then
         verify(mockTokenDeletion).close();
+        verify(monitoringStore).addReaperRun(anyLong(), anyLong(), anyLong());
     }
 
     private static Entry generateEntry(String id) {
