@@ -24,6 +24,7 @@ import org.forgerock.openam.cts.exceptions.CoreTokenException;
 import org.forgerock.openam.cts.exceptions.DeleteFailedException;
 import org.forgerock.openam.cts.exceptions.LDAPOperationFailedException;
 import org.forgerock.openam.cts.impl.query.QueryFactory;
+import org.forgerock.openam.cts.monitoring.CTSOperationsMonitoringStore;
 import org.forgerock.opendj.ldap.Connection;
 import org.forgerock.opendj.ldap.ConnectionFactory;
 import org.forgerock.opendj.ldap.ErrorResultException;
@@ -49,6 +50,7 @@ public class CoreTokenAdapterTest {
     private ConfigurationObserver mockObserver;
     private CoreTokenConfigListener mockListener;
     private CoreTokenAdapter adapter;
+    private CTSOperationsMonitoringStore monitoringStore;
 
     @BeforeMethod
     public void setup() {
@@ -67,13 +69,16 @@ public class CoreTokenAdapterTest {
         mockObserver = mock(ConfigurationObserver.class);
         mockListener = mock(CoreTokenConfigListener.class);
 
+        monitoringStore = mock(CTSOperationsMonitoringStore.class);
+
         adapter = new CoreTokenAdapter(
                 mockConnectionFactory,
                 mockQueryFactory,
                 mockLDAPAdapter,
                 mockObserver,
                 mockListener,
-                mockDebug);
+                mockDebug,
+                monitoringStore);
     }
 
 //    @Test

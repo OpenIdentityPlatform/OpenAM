@@ -43,6 +43,8 @@ import org.forgerock.openam.cts.adapters.TokenAdapter;
 import org.forgerock.openam.cts.api.CoreTokenConstants;
 import org.forgerock.openam.cts.impl.CTSConnectionFactory;
 import org.forgerock.openam.cts.impl.LDAPConfig;
+import org.forgerock.openam.cts.monitoring.CTSOperationsMonitoringStore;
+import org.forgerock.openam.cts.monitoring.impl.CTSMonitoringStoreImpl;
 import org.forgerock.openam.entitlement.indextree.IndexChangeHandler;
 import org.forgerock.openam.entitlement.indextree.IndexChangeManager;
 import org.forgerock.openam.entitlement.indextree.IndexChangeManagerImpl;
@@ -58,9 +60,11 @@ import org.forgerock.openam.utils.ExecutorServiceFactory;
 import org.forgerock.opendj.ldap.ConnectionFactory;
 import org.forgerock.opendj.ldap.SearchResultHandler;
 
+import javax.inject.Inject;
 import javax.inject.Singleton;
 import java.security.PrivilegedAction;
 import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 
 /**
@@ -154,6 +158,24 @@ public class CoreGuiceModule extends AbstractModule {
         bind(Debug.class)
                 .annotatedWith(Names.named(SessionConstants.SESSION_DEBUG))
                 .toInstance(Debug.getInstance(SessionConstants.SESSION_DEBUG));
+
+        bind(CTSOperationsMonitoringStore.class).to(CTSMonitoringStoreImpl.class);
+        bind(ExecutorService.class).annotatedWith(Names.named(CTSMonitoringStoreImpl.EXECUTOR_BINDING_NAME))
+                .toProvider(CTSMonitoringStoreExecutorServiceProvider.class);
+    }
+
+    private static class CTSMonitoringStoreExecutorServiceProvider implements Provider<ExecutorService> {
+
+        private final ExecutorServiceFactory executorServiceFactory;
+
+        @Inject
+        public CTSMonitoringStoreExecutorServiceProvider(final ExecutorServiceFactory executorServiceFactory) {
+            this.executorServiceFactory = executorServiceFactory;
+        }
+
+        public ExecutorService get() {
+            return executorServiceFactory.createThreadPool(5);
+        }
     }
 
     // Implementation exists to capture the generic type of the PrivilegedAction.

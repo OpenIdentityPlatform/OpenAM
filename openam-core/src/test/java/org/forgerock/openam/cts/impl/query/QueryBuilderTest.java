@@ -20,6 +20,7 @@ import org.forgerock.openam.cts.api.TokenType;
 import org.forgerock.openam.cts.api.tokens.Token;
 import org.forgerock.openam.cts.exceptions.CoreTokenException;
 import org.forgerock.openam.cts.impl.LDAPConfig;
+import org.forgerock.openam.cts.monitoring.CTSOperationsMonitoringStore;
 import org.forgerock.openam.cts.utils.TokenAttributeConversion;
 import org.forgerock.opendj.ldap.Entry;
 import org.forgerock.opendj.ldap.LinkedHashMapEntry;
@@ -48,6 +49,7 @@ public class QueryBuilderTest {
     private LDAPConfig constants;
     private TokenAttributeConversion attributeConversion;
     private LDAPSearchHandler searchHandler;
+    private CTSOperationsMonitoringStore monitoringStore;
     private QueryBuilder builder;
 
     @BeforeMethod
@@ -55,12 +57,14 @@ public class QueryBuilderTest {
         constants = new LDAPConfig("cn=test");
         attributeConversion = mock(TokenAttributeConversion.class);
         searchHandler = mock(LDAPSearchHandler.class);
+        monitoringStore = mock(CTSOperationsMonitoringStore.class);
 
         builder = new QueryBuilder(
                 attributeConversion,
                 constants,
                 searchHandler,
-                mock(Debug.class));
+                mock(Debug.class),
+                monitoringStore);
     }
 
     @Test
