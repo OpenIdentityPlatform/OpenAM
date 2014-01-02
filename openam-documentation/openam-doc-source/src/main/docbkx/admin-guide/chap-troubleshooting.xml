@@ -20,14 +20,15 @@
   !
   ! CCPL HEADER END
   !
-  !      Copyright 2011-2013 ForgeRock AS
+  !      Copyright 2011-2014 ForgeRock AS
   !    
 -->
 <chapter xml:id='chap-troubleshooting'
  xmlns='http://docbook.org/ns/docbook'
  version='5.0' xml:lang='en'
  xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance'
- xsi:schemaLocation='http://docbook.org/ns/docbook http://docbook.org/xml/5.0/xsd/docbook.xsd'
+ xsi:schemaLocation='http://docbook.org/ns/docbook
+                     http://docbook.org/xml/5.0/xsd/docbook.xsd'
  xmlns:xlink='http://www.w3.org/1999/xlink'>
  <title>Troubleshooting</title>
  <indexterm><primary>Troubleshooting</primary></indexterm>
@@ -242,6 +243,135 @@ PING openam-ter (192.168.56.2) 56(84) bytes of data.
  --filename ~/Downloads/openam/ldif/fam_sds_schema.ldif
 Processing MODIFY request for CN=schema
 MODIFY operation successful for DN CN=schema</screen>
+    </answer>
+   </qandaentry>
+
+   <qandaentry xml:id="websphere-smtp-ssl">
+    <question>
+     <para>
+      I have OpenAM installed in WebSphere application server with IBM Java.
+      I am doing REST-based user registration or forgotten password reset,
+      or setting up the HOTP authentication module,
+      sending mail to an SMTP server over SSL.
+     </para>
+
+     <para>
+      How come OpenAM cannot send mail over SSL?
+     </para>
+    </question>
+
+    <answer>
+     <para>
+      If you see in the OpenAM Authentication debug log
+      that the SSL handshake is failing when connecting to the mail server,
+      then it is likely that the SSL certificate presented by the mail server
+      is not trusted.
+     </para>
+
+     <para>
+      This is a WebSphere/IBM Java issue, rather than an OpenAM issue.
+     </para>
+
+     <para>
+      To work around the problem, follow these steps
+      to make sure that WebSphere trusts the mail server SSL certificate.
+     </para>
+
+     <orderedlist>
+      <listitem>
+       <para>Log in as administrator to WebSphere console.</para>
+      </listitem>
+
+      <listitem>
+       <para>
+        Browse to Security
+        > SSL certificate and key management
+        > Manage endpoint security configurations,
+        and then click the link for the node where OpenAM runs.
+       </para>
+      </listitem>
+
+      <listitem>
+       <para>
+        In the menu on the right, click SSL configuration.
+       </para>
+      </listitem>
+
+      <listitem>
+       <para>
+        Click NodeDefaultSSLSettings.
+       </para>
+      </listitem>
+
+      <listitem>
+       <para>
+        In the menu on the right, click Key stores and certificates.
+       </para>
+      </listitem>
+
+      <listitem>
+       <para>
+        Click NodeDefaultTrustStore.
+       </para>
+      </listitem>
+
+      <listitem>
+       <para>
+        In the menu on the right, click Signer certificates.
+       </para>
+      </listitem>
+
+      <listitem>
+       <para>
+        Click Retrieve from port.
+       </para>
+      </listitem>
+
+      <listitem>
+       <para>
+        Set Host, Port, and Alias, and then click Retrieve signer information.
+       </para>
+
+       <para>
+        The Host is the host name of the SMTP server.
+       </para>
+
+       <para>
+        The Port is the port number of the SMTP server, such as 465.
+       </para>
+
+       <para>
+        The certificate Alias can be set to the user name used
+        to authenticate to the mail server.
+       </para>
+
+       <para>
+        For example, if you are sending mail through Google mail as my.user,
+        then set Host to <literal>smtp.gmail.com</literal>,
+        set Port to <literal>465</literal>,
+        and set Alias to <literal>my.user</literal>.
+       </para>
+      </listitem>
+
+      <listitem>
+       <para>
+        After the information is retrieved,
+        click Apply, save your work, and then restart WebSphere.
+       </para>
+      </listitem>
+     </orderedlist>
+
+     <para>
+      After WebSphere restarts, it should trust the mail server SSL certificate.
+      OpenAM therefore should be able to connect to the mail server over SSL.
+     </para>
+
+     <para>
+      For more information, see the
+      <link xlink:show="new"
+      xlink:href="http://infolib.lotus.com/resources/portal/8.0.0/doc/en_us/PT800ACD001/index.html"
+      >WebSphere documentation</link>.
+     </para>
     </answer>
    </qandaentry>
 
