@@ -27,7 +27,7 @@
  */
 
 /*
- * Portions Copyrighted 2013 ForgeRock AS
+ * Portions Copyrighted 2013-2014 ForgeRock AS
  */
 package com.sun.identity.policy.client;
 
@@ -60,7 +60,7 @@ import java.security.AccessController;
  * for clients of policy service.
  * This class uses XML/HTTP protocol to 
  * communicate with the Policy Service.
- * Policy client API implementaion caches policy decision locally.
+ * Policy client API implementation caches policy decision locally.
  * The cache is updated through policy change notifications and/or
  * polling.
  *
@@ -127,7 +127,7 @@ public class PolicyEvaluator {
      * Creates an instance of client policy evaluator 
      *
      * @param serviceName name of the service for which to create 
-     *        policy evalautor.
+     *        policy evaluator.
      * @param appSSOTokenProvider an object where application single sign on
      *        token can be obtained.
      * @throws PolicyException if required properties cannot be retrieved.
@@ -156,7 +156,7 @@ public class PolicyEvaluator {
      * Initializes an instance of client policy evaluator object
      *
      * @param serviceName name of the service for which to create 
-     *        policy evalautor
+     *        policy evaluator
      * @param appSSOTokenProvider an object where application single sign on
      *        token can be obtained.
      *
@@ -632,7 +632,7 @@ public class PolicyEvaluator {
      *      the return value would be null. Otherwise, actionDecision contains
      *      advices. In this case, if the advices contains at least one advice
      *      name that could be handled by AM, the complete advices element is 
-     *      serealized to XML and the XML string is returned. Otherwise, null
+     *      serialized to XML and the XML string is returned. Otherwise, null
      *      is returned.
      *  @throws PolicyException for any abnormal condition encountered in
      *      policy module
@@ -705,7 +705,7 @@ public class PolicyEvaluator {
      * change notifications 
      *
      * @param appToken application sso token to use while registering with
-     * policy service to get notifcations
+     * policy service to get notifications
      *
      */
     void reRegisterRemotePolicyListener(SSOToken appToken)
