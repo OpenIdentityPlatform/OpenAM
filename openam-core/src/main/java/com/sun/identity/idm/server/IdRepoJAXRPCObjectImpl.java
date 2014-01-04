@@ -39,7 +39,6 @@ import java.rmi.RemoteException;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
-import java.util.LinkedList;
 import java.util.Map;
 import java.util.Set;
 
@@ -73,6 +72,9 @@ import com.sun.identity.shared.encode.Base64;
 import com.sun.identity.shared.xml.XMLUtils;
 import com.sun.identity.sm.SMSUtils;
 import com.sun.identity.sm.SchemaType;
+import java.util.Collections;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentSkipListMap;
 
 /**
  * Provides service side implementation of IdRepo for JAX-RPC interface
@@ -95,44 +97,37 @@ public abstract class IdRepoJAXRPCObjectImpl implements DirectoryManagerIF {
     
     // Cache of modifications for last 30 minutes & notification URLs
     protected static int cacheSize = -1;
-        
-    static LinkedList idrepoCacheIndices = new LinkedList();
-        
-    static HashMap idrepoCache = null;
+
+    private static final ConcurrentSkipListMap<Long, Set<String>> idrepoCache =
+            new ConcurrentSkipListMap<Long, Set<String>>();
     
-    protected static Map<String, URL> idRepoNotificationURLs = new HashMap<String, URL>();
+    protected static final Map<String, URL> idRepoNotificationURLs = new ConcurrentHashMap<String, URL>();
     
     protected static String serverURL ;
     protected static URL urlServer;
     
     protected static String serverPort;
-    
-    protected static void initialize_cacheSize() {
-        if (cacheSize > -1) {
-            return;
-        }
-        
-        // Obtain the cache size, if configured
-        String cacheSizeStr = SystemProperties.get(
-            "com.sun.am.event.notification.expire.time");
-        try {
-            cacheSize = Integer.parseInt(cacheSizeStr);
-            if (cacheSize < 0) {
-                cacheSize = 30;
-            }
-        } catch(NumberFormatException e) {
-            cacheSize = 30;
-        }
-        if (idRepoDebug.messageEnabled()) {
-            idRepoDebug.message("IdRepoJAXRPCObjectImpl.static " +
-                "EventNotification cache size is set to " + cacheSize);
-        }
-    }
 
-    private static void initialize_cache() {
-        initialize_cacheSize();
-        if (idrepoCache == null && cacheSize > 0) {
-            idrepoCache = new HashMap(cacheSize);
+    protected static void initializeCacheSize() {
+        if (cacheSize <= 0) {
+            // Obtain the cache size, if configured
+            String cacheSizeStr = SystemProperties.get(Constants.EVENT_LISTENER_REMOTE_CLIENT_BACKLOG_CACHE);
+            if (cacheSizeStr == null) {
+                cacheSize = 30;
+            } else {
+                try {
+                    cacheSize = Integer.parseInt(cacheSizeStr);
+                    if (cacheSize < 0) {
+                        cacheSize = 30;
+                    }
+                } catch (NumberFormatException nfe) {
+                    cacheSize = 30;
+                }
+            }
+            if (idRepoDebug.messageEnabled()) {
+                idRepoDebug.message("IdRepoJAXRPCObjectImpl.initialize_idrepo EventNotification cache size is set to "
+                        + cacheSize);
+            }
         }
     }
 
@@ -142,8 +137,7 @@ public abstract class IdRepoJAXRPCObjectImpl implements DirectoryManagerIF {
      * must call either getSSOToken() or initialize() directly.
      */
     protected static void initialize_idrepo() {
-        initialize_cache();
-
+        initializeCacheSize();
         // Construct serverURL
         serverPort = SystemProperties.get(Constants.AM_SERVER_PORT);
         serverURL = SystemProperties.get(Constants.AM_SERVER_PROTOCOL) +
@@ -704,26 +698,48 @@ public abstract class IdRepoJAXRPCObjectImpl implements DirectoryManagerIF {
             }
         }
     }
-    
-    public Set objectsChanged_idrepo(int time) throws RemoteException {
-        Set answer = new HashSet();
-        // Get the cache index for times upto time+2
-        initialize_cache();
-        long cacheIndex = System.currentTimeMillis() / 60000;
-        for (int i = 0; i < time + 3; i++) {
-            Set modDNs = (Set)idrepoCache.get(Long.toString(cacheIndex));
-            if (modDNs != null) {
+
+    /**
+     * Returns the notification event XMLs for changed objects in the past N+2 minutes.
+     *
+     * @param time The number of minutes we should retrieve the changed objects for.
+     * @return Returns the notification XMLs for the current minute, for the requested N minute, and also for 2
+     * additional minutes.
+     * @throws RemoteException If there was an error while collecting changed objects.
+     */
+    public Set<String> objectsChanged_idrepo(int time) throws RemoteException {
+        initializeCacheSize();
+        Set<String> answer = collectChangesFromCache(time, idrepoCache);
+
+        if (idRepoDebug.messageEnabled()) {
+            idRepoDebug.message("IdRepoJAXRPCObjectImpl.objectsChanged in time: " + time + "+2 minutes:\n" + answer);
+        }
+        return answer;
+    }
+
+    /**
+     * Collects the notification XMLs for a given time period from the provided cache.
+     *
+     * @param time The number of minutes we should retrieve the changed objects for.
+     * @param cache The cache we need to collect the notifications from.
+     * @return Returns the notification XMLs for the current minute, for the requested N minute, and also for 2
+     * additional minutes.
+     */
+    protected Set<String> collectChangesFromCache(int time, ConcurrentSkipListMap<Long, Set<String>> cache) {
+        Set<String> answer = new HashSet<String>();
+        if (cacheSize > 0) {
+
+            long cacheIndex = getCacheIndex();
+
+            //Return changes for the previous time + 2 minutes
+            for (Set<String> modDNs : idrepoCache.tailMap(cacheIndex - time - 2).values()) {
+                //This is safe since modDNs is backed by a ConcurrentHashMap
                 answer.addAll(modDNs);
             }
-            cacheIndex--;
         }
-        if (idRepoDebug.messageEnabled()) {
-            idRepoDebug.message("IdRepoJAXRPCObjectImpl.objectsChanged " +
-                "in time: " + time + " minutes:\n" + answer);
-        }
-        return (answer);
+        return answer;
     }
-    
+
     public String registerNotificationURL_idrepo(String url) throws RemoteException {
         return registerNotificationURL(url, idRepoNotificationURLs);
     }
@@ -740,7 +756,7 @@ public abstract class IdRepoJAXRPCObjectImpl implements DirectoryManagerIF {
                     // Don't add the URL again if we already have it registered
                     boolean alreadyRegistered = false;
                     for (Map.Entry<String, URL> entry : notificationURLs.entrySet()) {
-                        if (notificationUrl.equals(entry.getValue())) {
+                        if (notificationUrl.toExternalForm().equals(entry.getValue().toExternalForm())) {
                             // This allows us to return the existing entry ID to support clients being able to
                             // de-register the correct entry.
                             id = entry.getKey();
@@ -810,9 +826,9 @@ public abstract class IdRepoJAXRPCObjectImpl implements DirectoryManagerIF {
                 + "method processing method: " + method + " name: " + name +
                 " type: " + type + " attrName: " + attrNames);
         }
-        initialize_cache();
+        initializeCacheSize();
         // Return if cache size is 0 or there are no remote clients
-        if ((cacheSize == 0) && idRepoNotificationURLs.isEmpty()) {
+        if (cacheSize == 0 && idRepoNotificationURLs.isEmpty()) {
             if (idRepoDebug.messageEnabled()) {
                 idRepoDebug.message("IdRepoJAXRPCObjectImpl." +
                     "processEntryChaged No registered notification URLs: " +
@@ -850,19 +866,8 @@ public abstract class IdRepoJAXRPCObjectImpl implements DirectoryManagerIF {
         
         // Update cache for polling by remote clients
         if (cacheSize > 0) {
-            // Obtain the cache index
-            long currentTime = System.currentTimeMillis() / 60000;
-            String cacheIndex = Long.toString(currentTime);
-            Set modDNs = (Set)idrepoCache.get(cacheIndex);
-            if (modDNs == null) {
-                modDNs = new HashSet();
-                idrepoCache.put(cacheIndex, modDNs);
-                // Maintain cacheIndex
-                idrepoCacheIndices.addFirst(cacheIndex);
-                cleanupCache(idrepoCacheIndices, idrepoCache, currentTime);
-            }
+            Set<String> modDNs = getCachedValues(idrepoCache);
 
-            
             // Add to cache
             modDNs.add(sb.toString());
             if (idRepoDebug.messageEnabled()) {
@@ -907,33 +912,35 @@ public abstract class IdRepoJAXRPCObjectImpl implements DirectoryManagerIF {
             }
         }
     }
-    
-    protected static void cleanupCache(LinkedList cIndices, HashMap thisCache,
-            long currentTime) {
 
-        // remove the last cache entries
-        if (cIndices.size() > cacheSize) {
-            String removedIndex = (String)cIndices.removeLast();
-            thisCache.remove(removedIndex);
-            if (idRepoDebug.messageEnabled()) {
-                idRepoDebug.message("IdRepoJAXRPCObjectImpl:cleanupCache last "
-                        + removedIndex);
+    /**
+     * Returns the cached notification XMLs for the current cacheIndex. If there is nothing cached for this minute,
+     * this will create a new cache entry and return the corresponding Set.
+     *
+     * @param cache The cache that stores the notification XMLs per minute.
+     * @return A Set that corresponds to the current cacheIndex.
+     */
+    protected static Set<String> getCachedValues(ConcurrentSkipListMap<Long, Set<String>> cache) {
+        // Obtain the cache index
+        Long cacheIndex = getCacheIndex();
+        Set<String> modDNs = cache.get(cacheIndex);
+        if (modDNs == null) {
+            modDNs = Collections.newSetFromMap(new ConcurrentHashMap<String, Boolean>());
+            Set<String> previousValue = cache.putIfAbsent(cacheIndex, modDNs);
+            if (previousValue == null) {
+                //remove old entries from the map to prevent memory leak
+                cache.headMap(cacheIndex - cacheSize, true).clear();
+            } else {
+                modDNs = previousValue;
             }
         }
-
-        // remove expired cache entries
-        long lastIndex = Long.parseLong((String)cIndices.getLast());
-        while ((currentTime - cacheSize) > lastIndex) {
-            String removedIndex = (String)cIndices.removeLast();
-            thisCache.remove(removedIndex);
-            if (idRepoDebug.messageEnabled()) {
-                idRepoDebug.message("IdRepoJAXRPCObjectImpl:cleanupCache expired "
-                        + removedIndex);
-            }
-            lastIndex = Long.parseLong((String)cIndices.getLast());
-        }
+        return modDNs;
     }
- 
+
+    protected static long getCacheIndex() {
+        return System.currentTimeMillis() / 60000;
+    }
+
     private Map IdSearchResultsToMap(IdSearchResults res) {
         // TODO ..check if the Map gets properly populated and sent.
         Map answer = new HashMap();

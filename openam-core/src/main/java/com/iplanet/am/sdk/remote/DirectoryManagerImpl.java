@@ -31,13 +31,11 @@
  */
 package com.iplanet.am.sdk.remote;
 
-import java.net.MalformedURLException;
 import java.net.URL;
 import java.rmi.RemoteException;
 import java.security.AccessController;
 import java.util.Arrays;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
@@ -55,8 +53,6 @@ import com.iplanet.services.comm.server.PLLServer;
 import com.iplanet.services.comm.server.SendNotificationException;
 import com.iplanet.services.comm.share.Notification;
 import com.iplanet.services.comm.share.NotificationSet;
-import com.iplanet.services.naming.ServerEntryNotFoundException;
-import com.iplanet.services.naming.WebtopNaming;
 import com.iplanet.sso.SSOException;
 import com.iplanet.sso.SSOToken;
 import com.iplanet.sso.SSOTokenManager;
@@ -65,7 +61,8 @@ import com.iplanet.ums.SortKey;
 import com.sun.identity.idm.server.IdRepoJAXRPCObjectImpl;
 import com.sun.identity.security.AdminTokenAction;
 import com.sun.identity.shared.debug.Debug;
-import com.sun.identity.sm.SMSUtils;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentSkipListMap;
 
 
 public class DirectoryManagerImpl extends IdRepoJAXRPCObjectImpl implements
@@ -84,25 +81,13 @@ public class DirectoryManagerImpl extends IdRepoJAXRPCObjectImpl implements
     
     protected static IComplianceServices complianceServices;
     
-    // Cache of modifications for last 30 minutes & notification URLs    
-    static LinkedList cacheIndices = new LinkedList();
+    private static final ConcurrentSkipListMap<Long, Set<String>> cache =
+            new ConcurrentSkipListMap<Long, Set<String>>();
         
-    static HashMap cache = null;
-        
-    static Map<String, URL> notificationURLs = new HashMap<String, URL>();
+    private static final Map<String, URL> notificationURLs = new ConcurrentHashMap<String, URL>();
     
     public DirectoryManagerImpl() {
         // Empty constructor
-    }
-    
-    private static void initialize_cache() {
-        initialize_cacheSize();
-        if (cache == null && cacheSize > 0) {
-            if (debug.messageEnabled()) {
-                debug.message("DirectoryManagerImpl::initialize_cache EventNotification cache size is set to " + cacheSize);
-            }
-            cache = new HashMap(cacheSize);
-        }
     }
 
     protected void initialize() throws RemoteException {
@@ -951,25 +936,25 @@ public class DirectoryManagerImpl extends IdRepoJAXRPCObjectImpl implements
     }
     
     // Notification methods
-    public Set objectsChanged(int time) throws RemoteException {
+    /**
+     * Returns the notification event XMLs for changed objects in the past N+2 minutes.
+     *
+     * @param time The number of minutes we should retrieve the changed objects for.
+     * @return Returns the notification XMLs for the current minute, for the requested N minute, and also for 2
+     * additional minutes.
+     * @throws RemoteException If there was an error while collecting changed objects.
+     */
+    public Set<String> objectsChanged(int time) throws RemoteException {
         // Since clients tend to request for objects changed
         // donot initialize which might thrown an excpetion
         // initialize();
-        initialize_cache();
-        Set answer = new HashSet();
-        // Get the cache index for times upto time+2
-        long cacheIndex = System.currentTimeMillis() / 60000;
-        for (int i = 0; i < time + 3; i++) {
-            Set modDNs = (Set)cache.get(Long.toString(cacheIndex));
-            if (modDNs != null)
-                answer.addAll(modDNs);
-            cacheIndex--;
-        }
+        initializeCacheSize();
+        Set<String> answer = collectChangesFromCache(time, cache);
+
         if (debug.messageEnabled()) {
-            debug.message("DirectoryManagerImpl:objectsChanged in time: "
-                + time + " minutes:\n" + answer);
+            debug.message("DirectoryManagerImpl:objectsChanged in time: " + time + "+2 minutes:\n" + answer);
         }
-        return (answer);
+        return answer;
     }
     
     public String registerNotificationURL(String url) throws RemoteException {
@@ -987,25 +972,13 @@ public class DirectoryManagerImpl extends IdRepoJAXRPCObjectImpl implements
     }
     
     // Implementation to process entry changed events
-    protected static synchronized void processEntryChanged(String method,
+    protected static void processEntryChanged(String method,
         String name, int type, Set attrNames) {
         
         debug.message("DirectoryManagerImpl.processEntryChaged method "
                 + "processing");
-        initialize_cache();
-        
-        // Obtain the cache index
-        long currentTime = System.currentTimeMillis() / 60000;
-        String cacheIndex = Long.toString(currentTime);
-        Set modDNs = (Set) cache.get(cacheIndex);
-        if (modDNs == null) {
-            modDNs = new HashSet();
-            cache.put(cacheIndex, modDNs);
-            // Maintain cacheIndex
-            cacheIndices.addFirst(cacheIndex);
-            cleanupCache(cacheIndices, cache, currentTime);
-        }
-        
+        initializeCacheSize();
+
         // Construct the XML document for the event change
         StringBuilder sb = new StringBuilder(100);
         sb.append("<EventNotification><AttributeValuePair>").append(
@@ -1030,11 +1003,19 @@ public class DirectoryManagerImpl extends IdRepoJAXRPCObjectImpl implements
             }
         }
         sb.append("</EventNotification>");
-        // Add to cache
-        modDNs.add(sb.toString());
+
+        if (cacheSize > 0) {
+            Set<String> modDNs = getCachedValues(cache);
+
+            // Add to cache
+            modDNs.add(sb.toString());
+            if (debug.messageEnabled()) {
+                debug.message("DirectoryManagerImpl::processing entry change: "
+                        + sb.toString());
+            }
+        }
+
         if (debug.messageEnabled()) {
-            debug.message("DirectoryManagerImpl::processing entry change: "
-                + sb.toString());
             debug.message("DirectoryManagerImpl = notificationURLS" 
                     + notificationURLs.values());
 
