@@ -35,7 +35,6 @@
 <%@ page import="com.sun.identity.workflow.ValidateSAML2" %>
 <%@ page import="java.net.URLEncoder" %>
 <%@ page import="org.owasp.esapi.ESAPI" %>
-<%@ page import="org.apache.commons.lang.StringUtils" %>
 <%@ page contentType="text/html; charset=utf-8" language="java" %>
 
 <%
@@ -140,39 +139,12 @@ function onLoad() {
     }
 
     String idp = request.getParameter("idp");
-    String idpEntityID = null;
-    String idpMetaAlias = null;
-
-    int start = idp.indexOf("(");
-    int end = idp.indexOf(")");
-    if (start == -1 || end == -1 || start == end){
-        idpEntityID = null;
-        idpMetaAlias = null;
-    } else {
-        StringBuilder s = new StringBuilder();
-        s.append(idp.substring(0,start));
-        idpEntityID = s.toString();
-
-        s = new StringBuilder();
-        s.append(idp.substring(start+1, end));
-        idpMetaAlias = s.toString();
-    }
-
-    if (StringUtils.isBlank(idpEntityID) || StringUtils.isBlank(idpMetaAlias)){
-        if (!ESAPI.validator().isValidInput("HTTP Parameter Value: " + idp, idp, "HTTPParameterValue", 2000, false)) {
-            idp = "";
-        }
-    } else {
-        if (!ESAPI.validator().isValidInput("HTTP Parameter Value: " + idpEntityID, idpEntityID, "HTTPParameterValue", 2000, false) ||
-            !ESAPI.validator().isValidInput("HTTP Parameter Value: " + idpMetaAlias, idpMetaAlias, "HTTPParameterValue", 2000, false)) {
-
-            idp = "";
-        }
-
+    if (!ESAPI.validator().isValidInput("Invalid IdP entityID", idp, "HTTPQueryString", 2000, false)) {
+           idp = "";
     }
 
     String sp = request.getParameter("sp");
-    if (!ESAPI.validator().isValidInput("HTTP Parameter Value: " + sp, sp, "HTTPParameterValue", 2000, false)) {
+    if (!ESAPI.validator().isValidInput("Invalid SP entityID", sp, "HTTPQueryString", 2000, false)) {
             sp = "";
     }
     out.println("frames['worker'].location = 'validateWait.jsp?locale=" +
