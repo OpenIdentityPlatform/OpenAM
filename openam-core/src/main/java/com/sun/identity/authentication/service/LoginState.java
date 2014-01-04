@@ -27,7 +27,7 @@
  */
 
 /**
- * Portions Copyrighted 2010-2013 ForgeRock AS
+ * Portions Copyrighted 2010-2014 ForgeRock AS
  */
 package com.sun.identity.authentication.service;
 
@@ -1916,7 +1916,7 @@ public class LoginState {
      * @throws SSOException
      */
     public SSOToken getSSOToken() throws SSOException {
-        if ((session != null) && (session.getState() == Session.INACTIVE)) {
+        if (session == null || (session != null && session.getState() == Session.INACTIVE)) {
             return null;
         }
 
