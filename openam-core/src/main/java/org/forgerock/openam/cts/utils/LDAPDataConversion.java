@@ -76,4 +76,13 @@ public class LDAPDataConversion {
     public Calendar fromLDAPDate(String ldapDate) {
         return GeneralizedTime.valueOf(ldapDate).toCalendar();
     }
+
+    /**
+     * Generates a long of the number of seconds since the epoch.
+     *
+     * @return A positive long.
+     */
+    public long currentEpochedSeconds() {
+        return toEpochedSeconds(Calendar.getInstance());
+    }
 }

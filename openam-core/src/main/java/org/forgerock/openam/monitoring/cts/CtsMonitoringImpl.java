@@ -26,9 +26,8 @@ import java.util.ArrayList;
 import java.util.EnumSet;
 import java.util.List;
 import org.forgerock.openam.cts.api.CoreTokenConstants;
-import org.forgerock.openam.cts.impl.query.QueryFactory;
-import org.forgerock.openam.cts.monitoring.CTSOperationsMonitoringStore;
 import org.forgerock.openam.cts.monitoring.CTSReaperMonitoringStore;
+import org.forgerock.openam.cts.monitoring.impl.persistence.CtsPersistenceOperationsMonitor;
 import org.forgerock.openam.guice.InjectorHolder;
 
 /**
@@ -188,10 +187,10 @@ public class CtsMonitoringImpl<E extends Enum<E>, F extends Enum<F>> extends Cts
     private void createTokenOperationsTable(SnmpMib myMib, TableCtsTokenOperationsTable table,
                                             List<TokenEntry> tokenEntries) throws SnmpStatusException {
 
-        final QueryFactory factory = new QueryFactory();
+        CtsPersistenceOperationsMonitor ctsPersistenceOperationsMonitor = InjectorHolder.getInstance(CtsPersistenceOperationsMonitor.class);
 
         for (TokenEntry te : tokenEntries) {
-            final CtsTokenOperationsEntry entry = new CtsTokenOperationsEntryImpl(factory, myMib, debug);
+            final CtsTokenOperationsEntry entry = new CtsTokenOperationsEntryImpl(myMib, debug, ctsPersistenceOperationsMonitor);
             entry.TokenTableIndex = te.TokenTableIndex;
 
             table.addEntry(entry);
@@ -204,7 +203,7 @@ public class CtsMonitoringImpl<E extends Enum<E>, F extends Enum<F>> extends Cts
      * take one index - the operation type.
      *
      * @param myMib Mibfile from which the definition of these tables comes
-     * @param table Tghe table in to which we will write the endpoints
+     * @param table The table in to which we will write the endpoints
      * @param operationEntries The entries from which the table will be populated
      * @throws SnmpStatusException If anything goes wrong while writing to the table
      */
@@ -225,7 +224,7 @@ public class CtsMonitoringImpl<E extends Enum<E>, F extends Enum<F>> extends Cts
      * for this table take two indexes - the operation type and the token type.
      *
      * @param myMib Mibfile from which the definition of these tables comes
-     * @param table Tghe table in to which we will write the endpoints
+     * @param table The table in to which we will write the endpoints
      * @param operationEntries The operation entries from which the table will be populated
      * @param tokenEntries The token entries from which the table will be populated
      * @throws SnmpStatusException If anything goes wrong while writing to the table
@@ -255,5 +254,6 @@ public class CtsMonitoringImpl<E extends Enum<E>, F extends Enum<F>> extends Cts
     public Long getRateOfDeletedSessions() {
         return (long) reaperMonitoringStore.getRateOfDeletedSessions();
     }
+
 }
 

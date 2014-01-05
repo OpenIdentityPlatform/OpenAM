@@ -20,14 +20,10 @@ package org.forgerock.openam.monitoring.cts;
 import com.sun.identity.shared.debug.Debug;
 import com.sun.management.snmp.SnmpStatusException;
 import com.sun.management.snmp.agent.SnmpMib;
-import javax.inject.Named;
-import org.forgerock.openam.cts.api.CoreTokenConstants;
 import org.forgerock.openam.cts.api.TokenType;
-import org.forgerock.openam.cts.api.fields.CoreTokenField;
 import org.forgerock.openam.cts.exceptions.CoreTokenException;
-import org.forgerock.openam.cts.impl.query.QueryFactory;
+import org.forgerock.openam.cts.monitoring.impl.persistence.CtsPersistenceOperationsMonitor;
 import org.forgerock.openam.utils.Enums;
-import org.forgerock.opendj.ldap.Filter;
 
 /**
  * This class represents those operations which only take a token type as the input.
@@ -44,21 +40,21 @@ public class CtsTokenOperationsEntryImpl extends CtsTokenOperationsEntry {
     //on error
     private final Debug debug;
 
-    //for building up our query
-    private final QueryFactory factory;
+    //from which to retrieve the data
+    private final CtsPersistenceOperationsMonitor ctsPersistenceOperationsMonitor;
 
     /**
-     * Constructor allows us to pass in the QueryFactory as well as the
-     * appropriate debug system.
+     * Constructor allows us to pass in the CtsPersistenceOperationsMonitor as well as appropriate
+     * debugger.
      *
-     * @param factory Factory used to connect and query the CTS
      * @param myMib Mib file this Entry implementation is a member of
      */
-    public CtsTokenOperationsEntryImpl(QueryFactory factory, SnmpMib myMib,
-                                       @Named(CoreTokenConstants.CTS_MONITOR_DEBUG) Debug debug) {
+    public CtsTokenOperationsEntryImpl(SnmpMib myMib, Debug debug,
+                                       CtsPersistenceOperationsMonitor ctsPersistenceOperationsMonitor) {
         super(myMib);
-        this.factory = factory;
         this.debug = debug;
+        this.ctsPersistenceOperationsMonitor = ctsPersistenceOperationsMonitor;
+
     }
 
     /**
@@ -70,11 +66,19 @@ public class CtsTokenOperationsEntryImpl extends CtsTokenOperationsEntry {
     @Override
     public Long getTotalCount() {
         final long result;
-        final TokenType token;
 
         try {
-            // -1 as our indexes start at 1, instead of 0.
-            token = Enums.getEnumFromOrdinal(TokenType.class, getTokenTableIndex().intValue() - 1);
+
+            TokenType tokenType = Enums.getEnumFromOrdinal(TokenType.class, getTokenTableIndex().intValue() - 1);
+
+            result = ctsPersistenceOperationsMonitor.getTotalCount(tokenType);
+
+        } catch (CoreTokenException e) {
+            String message = "CTS Persistence did not return a valid result.";
+            if (debug.messageEnabled()) {
+                debug.error(message, e);
+            }
+            throw new InvalidSNMPQueryException(message, e);
         } catch (SnmpStatusException e) {
             String message = "Unable to determine token type from supplied index.";
             if (debug.messageEnabled()) {
@@ -83,26 +87,30 @@ public class CtsTokenOperationsEntryImpl extends CtsTokenOperationsEntry {
             throw new InvalidSNMPQueryException(message, e);
         }
 
-        if (token == null) {
-            String message = "Token type returned was null. Check supplied index.";
-            if (debug.messageEnabled()) {
-                debug.error(message);
-            }
-            throw new InvalidSNMPQueryException(message);
-        }
+        return result;
+    }
 
-        //create the filter to restrict by token type
-        final Filter filter = factory.createFilter().and().attribute(CoreTokenField.TOKEN_TYPE, token).build();
+    /**
+     * Returns the average (mean) duration of the length of a token type's lifetime
+     *
+     * @return the average (mean) length of time for all tokens of the supplied type since the epoch in seconds
+     */
+    public Long getAverageDuration() {
+        long result;
 
         try {
+            TokenType tokenType = Enums.getEnumFromOrdinal(TokenType.class, getTokenTableIndex().intValue() - 1);
 
-            result = factory.createInstance()
-                    .returnTheseAttributes(CoreTokenField.TOKEN_ID)
-                    .withFilter(filter)
-                    .executeRawResults().size();
+            result = ctsPersistenceOperationsMonitor.getAverageDuration(tokenType);
 
         } catch (CoreTokenException e) {
             String message = "CTS Persistence did not return a valid result.";
+            if (debug.messageEnabled()) {
+                debug.error(message, e);
+            }
+            throw new InvalidSNMPQueryException(message, e);
+        } catch (SnmpStatusException e) {
+            String message = "Unable to determine token type from supplied index.";
             if (debug.messageEnabled()) {
                 debug.error(message, e);
             }

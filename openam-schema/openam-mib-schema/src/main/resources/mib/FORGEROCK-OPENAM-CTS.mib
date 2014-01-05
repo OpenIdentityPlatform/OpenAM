@@ -289,17 +289,25 @@ ctsTokenOperationsEntry OBJECT-TYPE
 
 CTSTokenOperationsEntry ::=
     SEQUENCE    {
-                        totalCount  Counter64
+                        totalCount  Counter64,
+                        averageDuration	Counter64
                 }
 
 totalCount OBJECT-TYPE
     SYNTAX      	Counter64
     MAX-ACCESS  	read-only
     STATUS      	current
-    DESCRIPTION     "Value returned"
+    DESCRIPTION     "Total count of tokens of the specified type in OpenAM"
     DEFVAL    		{ 0 }
     ::= { ctsTokenOperationsEntry 1 }
 
+averageDuration OBJECT-TYPE
+    SYNTAX      	Counter64
+    MAX-ACCESS  	read-only
+    STATUS      	current
+    DESCRIPTION     "Average duration of tokens of the specified type in OpenAM"
+    DEFVAL    		{ 0 }
+    ::= { ctsTokenOperationsEntry 2 }
 
 --
 -- ctsReaperOperationsTable

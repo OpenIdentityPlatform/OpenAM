@@ -36,6 +36,7 @@ public enum CoreTokenField {
     TOKEN_ID("coreTokenId"),
     EXPIRY_DATE("coreTokenExpirationDate"),
     BLOB("coreTokenObject"),
+    CREATE_TIMESTAMP("createTimestamp"),
 
     // Generic indexed String fields
     STRING_ONE("coreTokenString01"),

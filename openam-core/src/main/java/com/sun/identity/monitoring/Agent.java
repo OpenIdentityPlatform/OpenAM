@@ -72,7 +72,7 @@ import javax.management.RuntimeOperationsException;
 import javax.management.remote.JMXConnectorServer;
 import javax.management.remote.JMXConnectorServerFactory;
 import javax.management.remote.JMXServiceURL;
-import org.forgerock.openam.monitoring.cts.CtsMonitoringImpl;
+import org.forgerock.openam.monitoring.cts.CtsMonitoring;
 import org.forgerock.openam.monitoring.cts.FORGEROCK_OPENAM_CTS_MIB;
 import org.forgerock.openam.monitoring.cts.FORGEROCK_OPENAM_CTS_MIBImpl;
 
@@ -983,7 +983,7 @@ public class Agent {
     /**
      *  Return the pointer to the CTSMonitor mbean
      */
-    public static CtsMonitoringImpl getCtsMonitoringMBean() {
+    public static CtsMonitoring getCtsMonitoringMBean() {
         return forgerockCtsMib == null ? null : forgerockCtsMib.getCtsMonitoringGroup();
     }
 

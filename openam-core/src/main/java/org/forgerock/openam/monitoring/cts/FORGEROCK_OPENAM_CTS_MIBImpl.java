@@ -29,7 +29,7 @@ import org.forgerock.openam.cts.api.TokenType;
 public class FORGEROCK_OPENAM_CTS_MIBImpl extends FORGEROCK_OPENAM_CTS_MIB implements Serializable {
 
     //CTS
-    private CtsMonitoringImpl ctsMonitoringGroup;
+    private CtsMonitoring ctsMonitoringGroup;
 
     /**
      * Default constructor. Initialize the Mib tree.
@@ -44,7 +44,7 @@ public class FORGEROCK_OPENAM_CTS_MIBImpl extends FORGEROCK_OPENAM_CTS_MIB imple
     // ------------------------------------------------------------
 
     /**
-     * Factory method for "SsoServerTopology" group MBean.
+     * Factory method for "CtsMonitoring" group MBean.
      *
      * You can redefine this method if you need to replace the default
      * generated MBean class with your own customized class.
@@ -55,10 +55,10 @@ public class FORGEROCK_OPENAM_CTS_MIBImpl extends FORGEROCK_OPENAM_CTS_MIB imple
      * @param server    MBeanServer for this group (may be null)
      *
      * @return An instance of the MBean class generated for the
-     *         "SsoServerTopology" group (SsoServerTopology)
+     *         "CtsMonitoring" group (CtsMonitoringImpl)
      *
      * Note that when using standard metadata,
-     * the returned object must implement the "SsoServerTopologyMBean"
+     * the returned object must implement the "CtsMonitoringMBean"
      * interface.
      **/
     @Override
@@ -73,7 +73,7 @@ public class FORGEROCK_OPENAM_CTS_MIBImpl extends FORGEROCK_OPENAM_CTS_MIB imple
         return ctsMonitoringGroup;
     }
 
-    public CtsMonitoringImpl getCtsMonitoringGroup() {
+    public CtsMonitoring getCtsMonitoringGroup() {
         return ctsMonitoringGroup;
     }
 
