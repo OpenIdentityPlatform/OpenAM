@@ -27,7 +27,7 @@
  */
 
 /*
- * Portions Copyrighted 2011-2013 ForgeRock, Inc.
+ * Portions Copyrighted 2011-2014 ForgeRock AS
  */
 
 package org.forgerock.openam.upgrade;
@@ -331,6 +331,11 @@ public class UpgradeUtils {
     }
 
     private static String[] parseVersion(String version) {
+        //Handle the special case when we were unable to determine the current or the new version, this can happen for
+        //example when the configuration store is not available and the current version cannot be retrieved.
+        if (version == null) {
+            return null;
+        }
         Matcher matcher = VERSION_FORMAT_PATTERN.matcher(version);
         if (matcher.matches()) {
             String ver = matcher.group(1);
