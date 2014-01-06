@@ -6,34 +6,36 @@
         <input type="hidden" name="dn">
         <div class="column-layout">
             <div class="column2">
+
+
                 <div class="field">
-                    <label class="light">{{t "common.user.username"}}</label>
-                    <input type="text" name="username"  data-validator="required" readonly/>
+                    <label for="userprofile-username"class="light">{{t "common.user.username"}}</label>
+                    <input  id="userprofile-username" type="text" name="username"  data-validator="required" readonly />
                     <span></span>
                     <div class="validation-message"></div>
                 </div>
                 
                 <div class="field">
-                    <label class="light">{{t "common.user.givenName"}}</label>
-                    <input type="text" name="givenname" data-validator="required" />
+                    <label for="userprofile-givenname" class="light">{{t "common.user.givenName"}}</label>
+                    <input  id="userprofile-givenname" type="text" name="givenname" data-validator="required" autofocus required />
                     <span></span>
                     <div class="validation-message"></div>
                 </div>
                 
                 <div class="field">
-                    <label class="light">{{t "common.user.emailAddress"}}</label> 
-                    <input type="text" name="mail" /> 
+                    <label for="userprofile-email" class="light">{{t "common.user.emailAddress"}}</label> 
+                    <input  id="userprofile-email" type="email" name="mail" /> 
                     <span></span>
                     <div class="validation-message"></div>
                 </div>
             
                 <div class="field">
-                    <label class="light">{{t "common.user.address1"}}</label>
-                    <input type="text" name="postaladdress" />
+                    <label for="userprofile-postaladdress" class="light">{{t "common.user.address1"}}</label>
+                    <input  id="userprofile-postaladdress" type="text" name="postaladdress" /> 
                     <span></span>
                     <div class="validation-message"></div>
                 </div>
-<!--                 
+                <!--                 
                 <div class="field">
                     <label class="light">{{t "common.user.country"}}</label>
                     <select name="country"></select>
@@ -47,8 +49,7 @@
                     <span></span>
                     <div class="validation-message"></div>
                 </div>
-                
- -->
+                -->
             </div>
             <div class="column2">
                 <div class="field">
@@ -59,15 +60,15 @@
                 </div>
                 
                 <div class="field">
-                    <label class="light">{{t "common.user.familyName"}}</label>
-                    <input type="text" name="sn" data-validator="required" />
+                    <label for="userprofile-sn" class="light">{{t "common.user.familyName"}}</label>
+                    <input  id="userprofile-sn" type="text" name="sn" data-validator="required" required /> 
                     <span></span>
                     <div class="validation-message"></div>
                 </div>
                 
                 <div class="field">
-                    <label class="light">{{t "common.user.phoneNumber"}}</label>
-                    <input type="text" name="telephonenumber" />
+                    <label for="userprofile-telephonenumber" class="light">{{t "common.user.phoneNumber"}}</label>
+                    <input  id="userprofile-telephonenumber" type="tel" name="telephonenumber" /> 
                     <span></span>
                     <div class="validation-message"></div>
                 </div>
@@ -92,7 +93,7 @@
                     <span></span>
                     <div class="validation-message"></div>
                 </div>
-                  -->
+                -->
                 <div class="field" style="margin-left: 240px; margin-top: 30px; height: auto">
                     <input type="submit" name="saveButton" value="{{t "common.form.update"}}" class="button active" />
                     <input type="button" name="resetButton" value="{{t "common.form.reset"}}" class="button gray"/>

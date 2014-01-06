@@ -2,8 +2,8 @@
 <form id="passwordChange" action="" class="form large center no-margin" method="post" onsubmit="return false">
     <fieldset>
             <div class="field">
-                <label>{{t "common.user.oldPassword"}}</label> 
-                <input type="password" name="oldPassword" value=""  data-validator="required"/>
+                <label for="csdd-oldPassword">{{t "common.user.oldPassword"}}</label> 
+                <input  id="csdd-oldPassword"  type="password" name="oldPassword" value=""  data-validator="required" required autofocus />
                 <span class="error">x</span>
             </div>
             <p>{{t "templates.user.ChangeSecurityDataDialogTemplate.enterNewPasswordToChange"}}</p>
@@ -11,14 +11,14 @@
                 <div class="group-field">
                     <div class="group-field-inputs">
                         <div class="field">
-                            <label>{{t "common.user.newPassword"}}</label> 
-                            <input type="password" name="password" value=""  data-validator="minLength" minLength="8"  data-validator-event="keyup change"/>
+                            <label for="csdd-password">{{t "common.user.newPassword"}}</label> 
+                            <input  id="csdd-password" type="password" name="password" value=""  data-validator="minLength" minLength="8" required data-validator-event="keyup change"/>
                             <span class="error">x</span>
                         </div>
 
                         <div class="field">
-                            <label>{{t "common.user.confirmPassword"}}</label> 
-                            <input type="password" name="passwordConfirm" value="" data-validator="passwordConfirm" data-validator-event="keyup change" />
+                            <label for="csdd-passwordConfirm">{{t "common.user.confirmPassword"}}</label> 
+                            <input  id="csdd-passwordConfirm" type="password" name="passwordConfirm" value="" data-validator="passwordConfirm" required data-validator-event="keyup change" />
                             <span class="error">x</span>
                         </div>                        
                     </div>
@@ -36,4 +36,7 @@
                 <div class="clear"></div>
             </div>
     </fieldset>
-</form>            
+</form>      
+
+
+
