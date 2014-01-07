@@ -27,7 +27,7 @@
  */
 
 /**
- * Portions Copyrighted 2010-2013 ForgeRock Inc
+ * Portions Copyrighted 2010-2014 ForgeRock AS
  * Portions Copyrighted 2012 Nomura Research Institute, Ltd
  */
 package com.sun.identity.authentication.UI;
@@ -387,34 +387,22 @@ public class LoginViewBean extends AuthViewBeanBase {
                     }
                     LoginSuccess = true;
                     boolean doForward = AuthUtils.forwardSuccessExists(request);
-                    if (doForward) {  
-                        if(loginDebug.messageEnabled()){
-                            loginDebug.message(
-                                "LoginViewBean.forwardRequest=true");
-                            loginDebug.message("LoginViewBean.forwardTo():" +
-                            "Forward URL before appending cookie is " + 
-                            redirect_url); 
+                    if (doForward || (redirect_url != null && (redirect_url.startsWith(SSO_REDIRECT)
+                            || redirect_url.startsWith(SSO_POST)))) {
+                        if (loginDebug.messageEnabled()) {
+                            loginDebug.message("LoginViewBean.forwardRequest=true");
+                            loginDebug.message("LoginViewBean.forwardTo():Forward URL before appending cookie is "
+                                    + redirect_url);
+                            loginDebug.message("LoginViewBean.forwardTo():Final Forward URL is " + redirect_url);
                         }
-                        if(loginDebug.messageEnabled()){
-                            loginDebug.message("LoginViewBean.forwardTo():" +
-                            "Final Forward URL is " + redirect_url); 
-                        }
-                        
+
                         RequestDispatcher dispatcher =
                         request.getRequestDispatcher(redirect_url);
                         request.setAttribute(Constants.FORWARD_PARAM,
                             Constants.FORWARD_YES_VALUE);
                         dispatcher.forward(request, response);
                     } else {            
-                        if (redirect_url.startsWith(SSO_REDIRECT)) {
-                            if (loginDebug.messageEnabled()) {
-                                loginDebug.message("LoginViewBean.forwardTo():" +
-                                    "Redirect to: " + redirect_url);
-                            }
-                            response.sendRedirect(serviceUri + redirect_url);
-                        } else {
-                            response.sendRedirect(redirect_url);
-                        }
+                        response.sendRedirect(redirect_url);
                     }
                     return;
                 }
@@ -608,7 +596,7 @@ public class LoginViewBean extends AuthViewBeanBase {
                     
                     Cookie appendCookie = AuthUtils.getCookieString(ac, null);
                     clearGlobals();
-                    if (doForward) {
+                    if (doForward || redirect_url.startsWith(SSO_REDIRECT) || redirect_url.startsWith(SSO_POST)) {
                         loginDebug.message("LoginViewBean.forwardRequest=true");
                         if(loginDebug.messageEnabled()){
                             loginDebug.message("LoginViewBean.forwardTo():" +
@@ -639,15 +627,7 @@ public class LoginViewBean extends AuthViewBeanBase {
                             Constants.FORWARD_YES_VALUE);
                         dispatcher.forward(request, response);
                     } else {
-                        if (redirect_url.startsWith(SSO_REDIRECT)) {
-                            if (loginDebug.messageEnabled()) {
-                                loginDebug.message("LoginViewBean.forwardTo():" +
-                                    "Redirect to: " + redirect_url);
-                            }
-                            response.sendRedirect(serviceUri + redirect_url);
-                        } else {
-                            response.sendRedirect(redirect_url);
-                        }
+                        response.sendRedirect(redirect_url);
                     }
                     forward = false;
                     
@@ -2476,7 +2456,7 @@ public class LoginViewBean extends AuthViewBeanBase {
     public static final String HTML_TITLE_MAXSESSIONS = "htmlTitle_MaxSessions";
 
     public static final String SSO_REDIRECT = "/SSORedirect";
-    
+    public static final String SSO_POST = "/SSOPOST";
     ////////////////////////////////////////////////////////////////////////////
     // Instance variables
     ////////////////////////////////////////////////////////////////////////////
