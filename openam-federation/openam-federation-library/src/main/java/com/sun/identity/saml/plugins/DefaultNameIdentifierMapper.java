@@ -25,7 +25,9 @@
  * $Id: DefaultNameIdentifierMapper.java,v 1.3 2008/12/10 20:13:48 hengming Exp $
  *
  */
-
+/**
+ * Portions Copyrighted 2013 ForgeRock AS
+ */
 package com.sun.identity.saml.plugins;
 
 import java.util.Map;
@@ -63,8 +65,8 @@ public class DefaultNameIdentifierMapper implements NameIdentifierMapper {
      * @return a <code>NameIdentifier</code> for assertion subject.
      * @exception SAMLException if an error occurs
      */
-    public NameIdentifier getNameIdentifier(Object session, String sourceID,
-         String destID) throws SAMLException {
+    public NameIdentifier getNameIdentifier(Object session, String sourceID, String destID, String nameIDFormat)
+            throws SAMLException {
 
         if (SAMLUtils.debug.messageEnabled()) {
             SAMLUtils.debug.message("DefaultNameIdentifierMapper." +
@@ -72,26 +74,10 @@ public class DefaultNameIdentifierMapper implements NameIdentifierMapper {
                 destID);
         }
 
-        String nameIDFormat = null;
-        try {
-            String[] nameIDFormats = SessionManager.getProvider().getProperty(
-                session, SAMLConstants.NAME_ID_FORMAT);
-            if ((nameIDFormats != null) && (nameIDFormats.length > 0)) {
-                nameIDFormat = nameIDFormats[0];
-            }
-        } catch (SessionException sx) {
-            if (SAMLUtils.debug.warningEnabled()) {
-                SAMLUtils.debug.warning("DefaultNameIdentifierMapper." +
-                    "getNameIdentifier:", sx);
-            }
-        }
-
-
         if (SAMLUtils.debug.messageEnabled()) {
             SAMLUtils.debug.message("DefaultNameIdentifierMapper." +
                 "getNameIdentifier: nameIDFormat = " + nameIDFormat);
         }
-
 
         try {
             String nameQualifier = XMLUtils.escapeSpecialCharacters(
