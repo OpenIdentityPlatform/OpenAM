@@ -1,22 +1,23 @@
 /*
-* The contents of this file are subject to the terms of the Common Development and
-* Distribution License (the License). You may not use this file except in compliance with the
-* License.
-*
-* You can obtain a copy of the License at legal/CDDLv1.0.txt. See the License for the
-* specific language governing permission and limitations under the License.
-*
-* When distributing Covered Software, include this CDDL Header Notice in each file and include
-* the License file at legal/CDDLv1.0.txt. If applicable, add the following below the CDDL
-* Header, with the fields enclosed by brackets [] replaced by your own identifying
-* information: "Portions copyright [year] [name of copyright owner]".
-*
-* Copyright 2013 ForgeRock Inc.
-*/
+ * The contents of this file are subject to the terms of the Common Development and
+ * Distribution License (the License). You may not use this file except in compliance with the
+ * License.
+ *
+ * You can obtain a copy of the License at legal/CDDLv1.0.txt. See the License for the
+ * specific language governing permission and limitations under the License.
+ *
+ * When distributing Covered Software, include this CDDL Header Notice in each file and include
+ * the License file at legal/CDDLv1.0.txt. If applicable, add the following below the CDDL
+ * Header, with the fields enclosed by brackets [] replaced by your own identifying
+ * information: "Portions copyright [year] [name of copyright owner]".
+ *
+ * Copyright 2013-2014 ForgeRock AS.
+ */
 
 package org.forgerock.openam.forgerockrest.authn.callbackhandlers;
 
 import org.forgerock.json.fluent.JsonValue;
+import org.forgerock.openam.forgerockrest.authn.exceptions.RestAuthResponseException;
 import org.forgerock.openam.forgerockrest.authn.exceptions.RestAuthException;
 import org.forgerock.openam.utils.JsonValueBuilder;
 import org.testng.annotations.BeforeClass;
@@ -25,7 +26,6 @@ import org.testng.annotations.Test;
 import javax.security.auth.callback.TextOutputCallback;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import javax.ws.rs.core.HttpHeaders;
 
 import static junit.framework.Assert.assertNotNull;
 import static junit.framework.Assert.fail;
@@ -55,16 +55,16 @@ public class RestAuthTextOutputCallbackHandlerTest {
     }
 
     @Test
-    public void shouldNotUpdateCallbackFromRequest() throws RestAuthCallbackHandlerResponseException {
+    public void shouldNotUpdateCallbackFromRequest() throws RestAuthResponseException,
+            RestAuthException {
 
         //Given
-        HttpHeaders headers = mock(HttpHeaders.class);
         HttpServletRequest request = mock(HttpServletRequest.class);
         HttpServletResponse response = mock(HttpServletResponse.class);
         TextOutputCallback textOutputCallback = mock(TextOutputCallback.class);
 
         //When
-        boolean updated = testOutputRestAuthCallbackHandler.updateCallbackFromRequest(headers, request, response,
+        boolean updated = testOutputRestAuthCallbackHandler.updateCallbackFromRequest(request, response,
                 textOutputCallback);
 
         //Then
@@ -75,14 +75,13 @@ public class RestAuthTextOutputCallbackHandlerTest {
     public void shouldHandleCallback() {
 
         //Given
-        HttpHeaders headers = mock(HttpHeaders.class);
         HttpServletRequest request = mock(HttpServletRequest.class);
         HttpServletResponse response = mock(HttpServletResponse.class);
         JsonValue jsonPostBody = mock(JsonValue.class);
         TextOutputCallback originalTextOutputCallback = mock(TextOutputCallback.class);
 
         //When
-        TextOutputCallback textOutputCallback = testOutputRestAuthCallbackHandler.handle(headers, request, response,
+        TextOutputCallback textOutputCallback = testOutputRestAuthCallbackHandler.handle(request, response,
                 jsonPostBody, originalTextOutputCallback);
 
         //Then
@@ -90,7 +89,7 @@ public class RestAuthTextOutputCallbackHandlerTest {
     }
 
     @Test
-    public void shouldConvertToJson() {
+    public void shouldConvertToJson() throws RestAuthException {
 
         //Given
         TextOutputCallback textOutputCallback = new TextOutputCallback(TextOutputCallback.INFORMATION, "MESSAGE");
@@ -108,7 +107,7 @@ public class RestAuthTextOutputCallbackHandlerTest {
     }
 
     @Test
-    public void shouldConvertFromJson() {
+    public void shouldConvertFromJson() throws RestAuthException {
 
         //Given
         TextOutputCallback textOutputCallback = new TextOutputCallback(TextOutputCallback.INFORMATION, "MESSAGE");
@@ -130,7 +129,7 @@ public class RestAuthTextOutputCallbackHandlerTest {
     }
 
     @Test (expectedExceptions = RestAuthException.class)
-    public void shouldFailToConvertFromJsonWithInvalidType() {
+    public void shouldFailToConvertFromJsonWithInvalidType() throws RestAuthException {
 
         //Given
         TextOutputCallback textOutputCallback = new TextOutputCallback(TextOutputCallback.INFORMATION, "MESSAGE");
@@ -150,7 +149,7 @@ public class RestAuthTextOutputCallbackHandlerTest {
     }
 
     @Test
-    public void shouldFailToConvertFromJsonWithTypeLowerCase() {
+    public void shouldFailToConvertFromJsonWithTypeLowerCase() throws RestAuthException {
 
         //Given
         TextOutputCallback textOutputCallback = new TextOutputCallback(TextOutputCallback.INFORMATION, "MESSAGE");

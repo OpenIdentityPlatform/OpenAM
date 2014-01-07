@@ -11,11 +11,13 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2013 ForgeRock Inc.
+ * Copyright 2013-2014 ForgeRock AS.
  */
+
 package org.forgerock.openam.forgerockrest.authn.callbackhandlers;
 
 import org.forgerock.json.fluent.JsonValue;
+import org.forgerock.openam.forgerockrest.authn.exceptions.RestAuthException;
 
 import javax.security.auth.callback.Callback;
 
@@ -69,7 +71,7 @@ public interface JsonCallbackParser<T extends Callback> {
      * @param index the position of this callback in the returned structure.
      * @return The JSON representation of the Callback.
      */
-    JsonValue convertToJson(T callback, int index);
+    JsonValue convertToJson(T callback, int index) throws RestAuthException;
 
     /**
      * Converts the JSONObject into a Callback, setting the values set in the JSONObject onto the given Callback.
@@ -81,5 +83,5 @@ public interface JsonCallbackParser<T extends Callback> {
      * @param jsonObject The JSON representation of the Callback.
      * @return The same Callback as in the parameters with the required values set.
      */
-    T convertFromJson(T callback, JsonValue jsonObject);
+    T convertFromJson(T callback, JsonValue jsonObject) throws RestAuthException;
 }

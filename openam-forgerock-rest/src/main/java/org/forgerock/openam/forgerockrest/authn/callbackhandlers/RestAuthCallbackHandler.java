@@ -11,17 +11,17 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2013 ForgeRock Inc.
+ * Copyright 2013-2014 ForgeRock AS.
  */
 
 package org.forgerock.openam.forgerockrest.authn.callbackhandlers;
 
 import org.forgerock.json.fluent.JsonValue;
+import org.forgerock.openam.forgerockrest.authn.exceptions.RestAuthException;
 
 import javax.security.auth.callback.Callback;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import javax.ws.rs.core.HttpHeaders;
 
 /**
  * Implementations of this interface define how to update a Callback from the headers and request of a Rest call,
@@ -40,16 +40,14 @@ public interface RestAuthCallbackHandler<T extends Callback> extends JsonCallbac
      * successfully. In this case no callbacks will be sent back to the client, only the success or failure of the
      * authentication.
      *
-     * @param headers The HttpHeaders from the request.
      * @param request The HttpServletRequest from the request.
      * @param response The HttpServletResponse for the request.
      * @param callback The Callback to update with its required values from the headers and request.
      * @return Whether or not the Callback was successfully updated.
-     * @throws RestAuthCallbackHandlerResponseException Thrown if the Callback Handler has a Response to send to the
      *          client.
      */
-    boolean updateCallbackFromRequest(HttpHeaders headers, HttpServletRequest request, HttpServletResponse response,
-            T callback) throws RestAuthCallbackHandlerResponseException;
+    boolean updateCallbackFromRequest(HttpServletRequest request, HttpServletResponse response,
+            T callback) throws RestAuthException;
 
     /**
      * Handles the processing of the JSON given in the request and updates the Callback objects from it.
@@ -57,13 +55,12 @@ public interface RestAuthCallbackHandler<T extends Callback> extends JsonCallbac
      * This is for special circumstances where the JSON from the request does not contain a "callback" attribute,
      * where the <code>handleJsonCallbacks()</code> method should be used.
      *
-     * @param headers The HttpHeaders from the request.
      * @param request The HttpServletRequest from the request.
      * @param response The HttpServletResponse for the request.
      * @param postBody The POST body from the request.
      * @param originalCallback The original Callbacks to update.
      * @return The updated originalCallbacks.
      */
-    T handle(HttpHeaders headers, HttpServletRequest request, HttpServletResponse response,
+    T handle(HttpServletRequest request, HttpServletResponse response,
              JsonValue postBody, T originalCallback);
 }

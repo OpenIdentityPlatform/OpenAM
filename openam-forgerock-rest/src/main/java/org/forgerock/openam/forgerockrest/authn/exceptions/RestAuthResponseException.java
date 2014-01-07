@@ -11,12 +11,13 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2013 ForgeRock Inc.
+ * Copyright 2013-2014 ForgeRock AS.
  */
 
-package org.forgerock.openam.forgerockrest.authn.callbackhandlers;
+package org.forgerock.openam.forgerockrest.authn.exceptions;
 
 import org.forgerock.json.fluent.JsonValue;
+import org.forgerock.openam.forgerockrest.authn.exceptions.RestAuthException;
 
 import javax.ws.rs.core.Response;
 import java.util.Map;
@@ -24,33 +25,29 @@ import java.util.Map;
 /**
  * This exception is thrown by any of the RestAuthCallbackHandlers for it to return its own Http Response.
  */
-public class RestAuthCallbackHandlerResponseException extends Exception {
+public class RestAuthResponseException extends RestAuthException {
 
-    private Response.StatusType responseStatus;
+    private final int statusCode;
     private Map<String, String> responseHeaders;
     private JsonValue jsonResponse;
 
     /**
-     * Constructs a RestAuthCallbackHandlerResponseException.
+     * Constructs a RestAuthResponseException.
      *
-     * @param responseStatus The Http Status of the response.
+     * @param statusCode The Http Status of the response.
      * @param responseHeaders A Map of the header key value pairs for the response.
      * @param jsonResponse The JSON object for the response body.
      */
-    public RestAuthCallbackHandlerResponseException(Response.StatusType responseStatus,
-            Map<String, String> responseHeaders, JsonValue jsonResponse) {
-        this.responseStatus = responseStatus;
+    public RestAuthResponseException(final int statusCode,
+            final Map<String, String> responseHeaders, final JsonValue jsonResponse) {
+        super(statusCode, jsonResponse.toString());
+        this.statusCode = statusCode;
         this.responseHeaders = responseHeaders;
         this.jsonResponse = jsonResponse;
     }
 
-    /**
-     * Gets the Http Status of the response.
-     *
-     * @return The Http response status.
-     */
-    public Response.StatusType getResponseStatus() {
-        return responseStatus;
+    public int getStatusCode() {
+        return statusCode;
     }
 
     /**

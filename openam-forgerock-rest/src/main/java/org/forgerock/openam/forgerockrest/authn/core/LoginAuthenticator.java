@@ -11,7 +11,7 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2013 ForgeRock AS.
+ * Copyright 2013-2014 ForgeRock AS.
  */
 
 package org.forgerock.openam.forgerockrest.authn.core;
@@ -74,7 +74,7 @@ public class LoginAuthenticator {
      * @throws SSOException If there is a problem starting the login process.
      */
     public LoginProcess getLoginProcess(LoginConfiguration loginConfiguration) throws AuthException, AuthLoginException,
-            SSOException {
+            SSOException, RestAuthException {
 
         verifyAuthenticationRealm(loginConfiguration.getHttpRequest());
 
@@ -97,7 +97,7 @@ public class LoginAuthenticator {
      * @throws com.iplanet.sso.SSOException If there is a problem verifying the realm.
      */
     private void verifyAuthenticationRealm(HttpServletRequest request) throws AuthLoginException,
-            SSOException {
+            SSOException, RestAuthException {
 
         String orgDN = coreServicesWrapper.getDomainNameByRequest(request);
 

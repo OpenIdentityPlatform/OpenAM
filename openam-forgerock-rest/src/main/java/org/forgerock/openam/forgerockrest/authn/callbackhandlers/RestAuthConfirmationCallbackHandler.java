@@ -11,7 +11,7 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2013 ForgeRock AS.
+ * Copyright 2013-2014 ForgeRock AS.
  */
 
 package org.forgerock.openam.forgerockrest.authn.callbackhandlers;
@@ -19,13 +19,13 @@ package org.forgerock.openam.forgerockrest.authn.callbackhandlers;
 import com.sun.identity.shared.debug.Debug;
 import org.forgerock.json.fluent.JsonException;
 import org.forgerock.json.fluent.JsonValue;
+import org.forgerock.openam.forgerockrest.authn.exceptions.RestAuthResponseException;
+import org.forgerock.openam.forgerockrest.authn.exceptions.RestAuthException;
 import org.forgerock.openam.utils.JsonValueBuilder;
 
 import javax.security.auth.callback.ConfirmationCallback;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import javax.ws.rs.core.HttpHeaders;
-import java.util.List;
 
 /**
  * Defines methods to update a ConfirmationCallback from the headers and request of a Rest call and methods to convert a
@@ -42,15 +42,15 @@ public class RestAuthConfirmationCallbackHandler extends AbstractRestAuthCallbac
      *
      * {@inheritDoc}
      */
-    boolean doUpdateCallbackFromRequest(HttpHeaders headers, HttpServletRequest request, HttpServletResponse response,
-            ConfirmationCallback callback) throws RestAuthCallbackHandlerResponseException {
+    boolean doUpdateCallbackFromRequest(HttpServletRequest request, HttpServletResponse response,
+            ConfirmationCallback callback) throws RestAuthResponseException {
         return false;
     }
 
     /**
      * {@inheritDoc}
      */
-    public ConfirmationCallback handle(HttpHeaders headers, HttpServletRequest request, HttpServletResponse response,
+    public ConfirmationCallback handle(HttpServletRequest request, HttpServletResponse response,
             JsonValue postBody, ConfirmationCallback originalCallback) {
         return originalCallback;
     }
@@ -92,7 +92,7 @@ public class RestAuthConfirmationCallbackHandler extends AbstractRestAuthCallbac
     /**
      * {@inheritDoc}
      */
-    public ConfirmationCallback convertFromJson(ConfirmationCallback callback, JsonValue jsonCallback) {
+    public ConfirmationCallback convertFromJson(ConfirmationCallback callback, JsonValue jsonCallback) throws RestAuthException {
 
         validateCallbackType(CALLBACK_NAME, jsonCallback);
 

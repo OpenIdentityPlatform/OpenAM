@@ -11,13 +11,15 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2013 ForgeRock AS.
+ * Copyright 2013-2014 ForgeRock AS.
  */
 
 package org.forgerock.openam.forgerockrest.authn.callbackhandlers;
 
 import com.sun.identity.shared.debug.Debug;
 import org.forgerock.json.fluent.JsonValue;
+import org.forgerock.json.resource.ResourceException;
+import org.forgerock.openam.forgerockrest.authn.exceptions.RestAuthResponseException;
 import org.forgerock.openam.forgerockrest.authn.exceptions.RestAuthException;
 import org.forgerock.openam.utils.JsonArray;
 import org.forgerock.openam.utils.JsonObject;
@@ -26,8 +28,6 @@ import org.forgerock.openam.utils.JsonValueBuilder;
 import javax.security.auth.callback.Callback;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import javax.ws.rs.core.HttpHeaders;
-import javax.ws.rs.core.Response;
 import java.text.MessageFormat;
 
 /**
@@ -45,16 +45,15 @@ public abstract class AbstractRestAuthCallbackHandler<T extends Callback> implem
      *
      * {@inheritDoc}
      */
-    public boolean updateCallbackFromRequest(HttpHeaders headers, HttpServletRequest request,
-            HttpServletResponse response, T callback)
-            throws RestAuthCallbackHandlerResponseException {
+    public boolean updateCallbackFromRequest(HttpServletRequest request, HttpServletResponse response, T callback)
+            throws RestAuthException {
 
         // If Http Method is GET then by default callbacks should not be handled internally/
         if ("GET".equals(request.getMethod())) {
             return false;
         }
 
-        return doUpdateCallbackFromRequest(headers, request, response, callback);
+        return doUpdateCallbackFromRequest(request, response, callback);
     }
 
     /**
@@ -66,15 +65,14 @@ public abstract class AbstractRestAuthCallbackHandler<T extends Callback> implem
      * successfully. In this case no callbacks will be sent back to the client, only the success or failure of the
      * authentication.
      *
-     * @param headers The HttpHeaders from the request.
      * @param request The HttpServletRequest from the request.
      * @param response The HttpServletResponse for the request.
      * @param callback The Callback to update with its required values from the headers and request.
      * @return Whether or not the Callback was successfully updated.
-     * @throws RestAuthCallbackHandlerResponseException If one of the CallbackHandlers has its own response to be sent.
+     * @throws RestAuthResponseException If one of the CallbackHandlers has its own response to be sent.
      */
-    abstract boolean doUpdateCallbackFromRequest(HttpHeaders headers, HttpServletRequest request,
-            HttpServletResponse response, T callback) throws RestAuthCallbackHandlerResponseException;
+    abstract boolean doUpdateCallbackFromRequest(HttpServletRequest request,
+            HttpServletResponse response, T callback) throws RestAuthResponseException;
 
     /**
      * Creates a JSON input field for a callback.
@@ -174,11 +172,11 @@ public abstract class AbstractRestAuthCallbackHandler<T extends Callback> implem
      * @param callbackName The required name of the callback.
      * @param jsonCallback The JSON callback object.
      */
-    final void validateCallbackType(String callbackName, JsonValue jsonCallback) {
+    final void validateCallbackType(String callbackName, JsonValue jsonCallback) throws RestAuthException {
         String type = jsonCallback.get("type").asString();
         if (!callbackName.equalsIgnoreCase(type)) {
             DEBUG.message(MessageFormat.format("Method called with invalid callback, {0}.", type));
-            throw new RestAuthException(Response.Status.BAD_REQUEST,
+            throw new RestAuthException(ResourceException.BAD_REQUEST,
                     MessageFormat.format("Invalid Callback, {0}, for handler", type));
         }
     }

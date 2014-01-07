@@ -11,7 +11,7 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2013 ForgeRock Inc.
+ * Copyright 2013-2014 ForgeRock AS.
  */
 
 package org.forgerock.openam.forgerockrest.authn;
@@ -21,17 +21,18 @@ import com.iplanet.sso.SSOTokenID;
 import com.sun.identity.authentication.spi.AuthLoginException;
 import com.sun.identity.authentication.spi.PagePropertiesCallback;
 import com.sun.identity.shared.locale.L10NMessageImpl;
-import org.codehaus.jackson.map.ObjectMapper;
 import org.forgerock.json.fluent.JsonValue;
 import org.forgerock.json.jose.jws.SignedJwt;
 import org.forgerock.json.jose.jwt.JwtClaimsSet;
-import org.forgerock.openam.forgerockrest.authn.callbackhandlers.RestAuthCallbackHandlerResponseException;
+import org.forgerock.openam.forgerockrest.authn.exceptions.RestAuthResponseException;
 import org.forgerock.openam.forgerockrest.authn.core.AuthIndexType;
 import org.forgerock.openam.forgerockrest.authn.core.LoginAuthenticator;
 import org.forgerock.openam.forgerockrest.authn.core.LoginConfiguration;
 import org.forgerock.openam.forgerockrest.authn.core.LoginProcess;
 import org.forgerock.openam.forgerockrest.authn.core.LoginStage;
 import org.forgerock.openam.forgerockrest.authn.core.wrappers.AuthContextLocalWrapper;
+import org.forgerock.openam.forgerockrest.authn.exceptions.RestAuthErrorCodeException;
+import org.forgerock.openam.forgerockrest.authn.exceptions.RestAuthException;
 import org.forgerock.openam.utils.JsonValueBuilder;
 import org.json.JSONException;
 import org.mockito.ArgumentCaptor;
@@ -42,17 +43,18 @@ import org.testng.annotations.Test;
 import javax.security.auth.callback.Callback;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import javax.ws.rs.core.HttpHeaders;
-import javax.ws.rs.core.Response;
 import java.io.IOException;
 import java.security.SignatureException;
 import java.util.HashMap;
 import java.util.Map;
 
 import static org.mockito.BDDMockito.given;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.eq;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertTrue;
+import static org.testng.Assert.fail;
 
 public class RestAuthenticationHandlerTest {
 
@@ -77,10 +79,9 @@ public class RestAuthenticationHandlerTest {
 
     @Test
     public void shouldInitiateAuthenticationViaGET() throws AuthLoginException, L10NMessageImpl,
-            JSONException, IOException {
+            JSONException, IOException, RestAuthException, RestAuthResponseException {
 
         //Given
-        HttpHeaders headers = mock(HttpHeaders.class);
         HttpServletRequest request = mock(HttpServletRequest.class);
         HttpServletResponse httpResponse = mock(HttpServletResponse.class);
         String authIndexType = null;
@@ -104,16 +105,13 @@ public class RestAuthenticationHandlerTest {
         given(loginAuthenticator.getLoginProcess(Matchers.<LoginConfiguration>anyObject())).willReturn(loginProcess);
 
         //When
-        Response response = restAuthenticationHandler.initiateAuthentication(headers, request, httpResponse,
+        JsonValue response = restAuthenticationHandler.initiateAuthentication(request, httpResponse,
                 authIndexType, indexValue, sessionUpgradeSSOTokenId);
 
         //Then
-        assertEquals(response.getStatus(), 200);
-        ObjectMapper objectMapper = new ObjectMapper();
-        JsonValue jsonValue = new JsonValue(objectMapper.readValue((String) response.getEntity(), Map.class));
-        assertEquals(jsonValue.size(), 2);
-        assertEquals(jsonValue.get("tokenId").asString(), "SSO_TOKEN_ID");
-        assertTrue(jsonValue.isDefined("successUrl"));
+        assertEquals(response.size(), 2);
+        assertEquals(response.get("tokenId").asString(), "SSO_TOKEN_ID");
+        assertTrue(response.isDefined("successUrl"));
 
         ArgumentCaptor<LoginConfiguration> argumentCaptor = ArgumentCaptor.forClass(LoginConfiguration.class);
         verify(loginAuthenticator).getLoginProcess(argumentCaptor.capture());
@@ -127,10 +125,9 @@ public class RestAuthenticationHandlerTest {
 
     @Test
     public void shouldInitiateAuthenticationViaGET1() throws AuthLoginException, L10NMessageImpl,
-            JSONException, IOException {
+            JSONException, IOException, RestAuthException, RestAuthResponseException {
 
         //Given
-        HttpHeaders headers = mock(HttpHeaders.class);
         HttpServletRequest request = mock(HttpServletRequest.class);
         HttpServletResponse httpResponse = mock(HttpServletResponse.class);
         String authIndexType = AuthIndexType.MODULE.toString();
@@ -149,32 +146,31 @@ public class RestAuthenticationHandlerTest {
         given(loginAuthenticator.getLoginProcess(Matchers.<LoginConfiguration>anyObject())).willReturn(loginProcess);
 
         //When
-        Response response = restAuthenticationHandler.initiateAuthentication(headers, request, httpResponse,
-                authIndexType, indexValue, sessionUpgradeSSOTokenId);
+        try {
+            restAuthenticationHandler.initiateAuthentication(request, httpResponse,
+                    authIndexType, indexValue, sessionUpgradeSSOTokenId);
+        } catch (RestAuthErrorCodeException e) {
+            assertEquals(e.getStatusCode(), 401);
+            ArgumentCaptor<LoginConfiguration> argumentCaptor = ArgumentCaptor.forClass(LoginConfiguration.class);
+            verify(loginAuthenticator).getLoginProcess(argumentCaptor.capture());
+            LoginConfiguration loginConfiguration = argumentCaptor.getValue();
+            assertEquals(loginConfiguration.getHttpRequest(), request);
+            assertEquals(loginConfiguration.getIndexType(), AuthIndexType.MODULE);
+            assertEquals(loginConfiguration.getIndexValue(), "INDEX_VALUE");
+            assertEquals(loginConfiguration.getSessionId(), "");
+            assertEquals(loginConfiguration.getSSOTokenId(), "");
+            return;
+        }
 
         //Then
-        assertEquals(response.getStatus(), 401);
-        ObjectMapper objectMapper = new ObjectMapper();
-        JsonValue jsonValue = new JsonValue(objectMapper.readValue((String) response.getEntity(), Map.class));
-        assertEquals(jsonValue.size(), 1);
-        assertEquals(jsonValue.get("errorMessage").asString(), "ERROR_MESSAGE");
-
-        ArgumentCaptor<LoginConfiguration> argumentCaptor = ArgumentCaptor.forClass(LoginConfiguration.class);
-        verify(loginAuthenticator).getLoginProcess(argumentCaptor.capture());
-        LoginConfiguration loginConfiguration = argumentCaptor.getValue();
-        assertEquals(loginConfiguration.getHttpRequest(), request);
-        assertEquals(loginConfiguration.getIndexType(), AuthIndexType.MODULE);
-        assertEquals(loginConfiguration.getIndexValue(), "INDEX_VALUE");
-        assertEquals(loginConfiguration.getSessionId(), "");
-        assertEquals(loginConfiguration.getSSOTokenId(), "");
+        fail();
     }
 
     @Test
     public void shouldInitiateAuthenticationViaGET2() throws AuthLoginException, L10NMessageImpl,
-            JSONException, IOException, RestAuthCallbackHandlerResponseException, SignatureException {
+            JSONException, IOException, RestAuthResponseException, SignatureException, RestAuthException {
 
         //Given
-        HttpHeaders headers = mock(HttpHeaders.class);
         HttpServletRequest request = mock(HttpServletRequest.class);
         HttpServletResponse httpResponse = mock(HttpServletResponse.class);
         String authIndexType = null;
@@ -202,32 +198,28 @@ public class RestAuthenticationHandlerTest {
         jsonCallbacks.add("KEY", "VALUE");
 
         given(loginAuthenticator.getLoginProcess(Matchers.<LoginConfiguration>anyObject())).willReturn(loginProcess);
-        given(restAuthCallbackHandlerManager.handleCallbacks(headers, request, httpResponse, callbacks))
+        given(restAuthCallbackHandlerManager.handleCallbacks(request, httpResponse, callbacks))
                 .willReturn(jsonCallbacks);
         given(authIdHelper.createAuthId(Matchers.<LoginConfiguration>anyObject(), eq(authContextLocalWrapper)))
                 .willReturn("AUTH_ID");
 
         //When
-        Response response = restAuthenticationHandler.initiateAuthentication(headers, request, httpResponse,
+        JsonValue response = restAuthenticationHandler.initiateAuthentication(request, httpResponse,
                 authIndexType, indexValue, sessionUpgradeSSOTokenId);
 
         //Then
-        assertEquals(response.getStatus(), 200);
-        ObjectMapper objectMapper = new ObjectMapper();
-        JsonValue jsonValue = new JsonValue(objectMapper.readValue((String) response.getEntity(), Map.class));
-        assertEquals(jsonValue.size(), 4);
-        assertEquals(jsonValue.get("authId").asString(), "AUTH_ID");
-        assertEquals(jsonValue.get("template").asString(), "TEMPLATE_NAME");
-        assertEquals(jsonValue.get("stage").asString(), "MODULE_NAMEPAGE_STATE");
-        assertEquals(jsonValue.get("callbacks").get("KEY").asString(), "VALUE");
+        assertEquals(response.size(), 4);
+        assertEquals(response.get("authId").asString(), "AUTH_ID");
+        assertEquals(response.get("template").asString(), "TEMPLATE_NAME");
+        assertEquals(response.get("stage").asString(), "MODULE_NAMEPAGE_STATE");
+        assertEquals(response.get("callbacks").get("KEY").asString(), "VALUE");
     }
 
     @Test
     public void shouldInitiateAuthenticationViaGET3() throws AuthLoginException, L10NMessageImpl,
-            JSONException, IOException, RestAuthCallbackHandlerResponseException, SignatureException {
+            JSONException, IOException, RestAuthResponseException, SignatureException, RestAuthException {
 
         //Given
-        HttpHeaders headers = mock(HttpHeaders.class);
         HttpServletRequest request = mock(HttpServletRequest.class);
         HttpServletResponse httpResponse = mock(HttpServletResponse.class);
         String authIndexType = null;
@@ -261,31 +253,27 @@ public class RestAuthenticationHandlerTest {
         JsonValue jsonCallbacks = new JsonValue(new HashMap<String, Object>());
 
         given(loginAuthenticator.getLoginProcess(Matchers.<LoginConfiguration>anyObject())).willReturn(loginProcess);
-        given(restAuthCallbackHandlerManager.handleCallbacks(headers, request, httpResponse, callbacks))
+        given(restAuthCallbackHandlerManager.handleCallbacks(request, httpResponse, callbacks))
                 .willReturn(jsonCallbacks);
         given(authIdHelper.createAuthId(Matchers.<LoginConfiguration>anyObject(), eq(authContextLocalWrapper)))
                 .willReturn("AUTH_ID");
 
         //When
-        Response response = restAuthenticationHandler.initiateAuthentication(headers, request, httpResponse,
+        JsonValue response = restAuthenticationHandler.initiateAuthentication(request, httpResponse,
                 authIndexType, indexValue, sessionUpgradeSSOTokenId);
 
         //Then
-        assertEquals(response.getStatus(), 200);
-        ObjectMapper objectMapper = new ObjectMapper();
-        JsonValue jsonValue = new JsonValue(objectMapper.readValue((String) response.getEntity(), Map.class));
-        assertEquals(jsonValue.size(), 2);
-        assertEquals(jsonValue.get("tokenId").asString(), "SSO_TOKEN_ID");
-        assertTrue(jsonValue.isDefined("successUrl"));
+        assertEquals(response.size(), 2);
+        assertEquals(response.get("tokenId").asString(), "SSO_TOKEN_ID");
+        assertTrue(response.isDefined("successUrl"));
         verify(loginProcess).next(callbacks);
     }
 
     @Test
     public void shouldInitiateAuthenticationViaGET4() throws AuthLoginException, L10NMessageImpl,
-            JSONException, IOException, RestAuthCallbackHandlerResponseException, SignatureException {
+            JSONException, IOException, RestAuthResponseException, SignatureException, RestAuthException {
 
         //Given
-        HttpHeaders headers = mock(HttpHeaders.class);
         HttpServletRequest request = mock(HttpServletRequest.class);
         HttpServletResponse httpResponse = mock(HttpServletResponse.class);
         String authIndexType = null;
@@ -313,35 +301,39 @@ public class RestAuthenticationHandlerTest {
         responseHeaders.put("HEADER_KEY", "HEADER_VALUE");
         JsonValue jsonResponse = new JsonValue(new HashMap<String, Object>());
         jsonResponse.add("KEY", "VALUE");
-        RestAuthCallbackHandlerResponseException restAuthCallbackHandlerResponseException =
-                new RestAuthCallbackHandlerResponseException(Response.Status.ACCEPTED, responseHeaders, jsonResponse);
+        RestAuthResponseException restAuthResponseException =
+                new RestAuthResponseException(999, responseHeaders, jsonResponse);
 
         given(loginAuthenticator.getLoginProcess(Matchers.<LoginConfiguration>anyObject())).willReturn(loginProcess);
-        given(restAuthCallbackHandlerManager.handleCallbacks(headers, request, httpResponse, callbacks))
-                .willThrow(restAuthCallbackHandlerResponseException);
+        given(restAuthCallbackHandlerManager.handleCallbacks(request, httpResponse, callbacks))
+                .willThrow(restAuthResponseException);
         given(authIdHelper.createAuthId(Matchers.<LoginConfiguration>anyObject(), eq(authContextLocalWrapper)))
                 .willReturn("AUTH_ID");
 
         //When
-        Response response = restAuthenticationHandler.initiateAuthentication(headers, request, httpResponse,
-                authIndexType, indexValue, sessionUpgradeSSOTokenId);
+        try {
+            restAuthenticationHandler.initiateAuthentication(request, httpResponse,
+                    authIndexType, indexValue, sessionUpgradeSSOTokenId);
+        } catch (RestAuthResponseException e) {
+            JsonValue response = e.getJsonResponse();
+            assertEquals(response.size(), 2);
+            assertEquals(response.get("authId").asString(), "AUTH_ID");
+            assertEquals(response.get("KEY").asString(), "VALUE");
+            Map<String, String> headers = e.getResponseHeaders();
+            assertEquals(headers.get("HEADER_KEY"), "HEADER_VALUE");
+            assertEquals(e.getStatusCode(), 999);
+            return;
+        }
 
         //Then
-        assertEquals(response.getStatus(), 202);
-        assertTrue(response.getMetadata().get("HEADER_KEY").contains("HEADER_VALUE"));
-        ObjectMapper objectMapper = new ObjectMapper();
-        JsonValue jsonValue = new JsonValue(objectMapper.readValue((String) response.getEntity(), Map.class));
-        assertEquals(jsonValue.size(), 2);
-        assertEquals(jsonValue.get("authId").asString(), "AUTH_ID");
-        assertEquals(jsonValue.get("KEY").asString(), "VALUE");
+        fail();
     }
 
     @Test
     public void shouldInitiateAuthenticationViaGET5() throws AuthLoginException, L10NMessageImpl,
-            JSONException, IOException {
+            JSONException, IOException, RestAuthException, RestAuthResponseException {
 
         //Given
-        HttpHeaders headers = mock(HttpHeaders.class);
         HttpServletRequest request = mock(HttpServletRequest.class);
         HttpServletResponse httpResponse = mock(HttpServletResponse.class);
         String authIndexType = "UNKNOWN";
@@ -349,23 +341,23 @@ public class RestAuthenticationHandlerTest {
         String sessionUpgradeSSOTokenId = null;
 
         //When
-        Response response = restAuthenticationHandler.initiateAuthentication(headers, request, httpResponse,
-                authIndexType, indexValue, sessionUpgradeSSOTokenId);
+        try {
+            restAuthenticationHandler.initiateAuthentication(request, httpResponse,
+                    authIndexType, indexValue, sessionUpgradeSSOTokenId);
+        } catch (RestAuthException e) {
+            assertEquals(e.getStatusCode(), 400);
+            return;
+        }
 
         //Then
-        assertEquals(response.getStatus(), 400);
-        ObjectMapper objectMapper = new ObjectMapper();
-        JsonValue jsonValue = new JsonValue(objectMapper.readValue((String) response.getEntity(), Map.class));
-        assertEquals(jsonValue.size(), 1);
-        assertTrue(jsonValue.isDefined("errorMessage"));
+        fail();
     }
 
     @Test
     public void shouldInitiateAuthenticationViaPOST() throws AuthLoginException, L10NMessageImpl,
-            JSONException, IOException, SignatureException {
+            JSONException, IOException, SignatureException, RestAuthException, RestAuthResponseException {
 
         //Given
-        HttpHeaders headers = mock(HttpHeaders.class);
         HttpServletRequest request = mock(HttpServletRequest.class);
         HttpServletResponse httpResponse = mock(HttpServletResponse.class);
         JsonValue postBody = JsonValueBuilder.toJsonValue("{ \"authId\": \"AUTH_ID\" }");
@@ -400,16 +392,13 @@ public class RestAuthenticationHandlerTest {
         given(authIdHelper.reconstructAuthId("AUTH_ID")).willReturn(signedJwt);
 
         //When
-        Response response = restAuthenticationHandler.continueAuthentication(headers, request, httpResponse,
+        JsonValue response = restAuthenticationHandler.continueAuthentication(request, httpResponse,
                 postBody, sessionUpgradeSSOTokenId);
 
         //Then
-        assertEquals(response.getStatus(), 200);
-        ObjectMapper objectMapper = new ObjectMapper();
-        JsonValue jsonValue = new JsonValue(objectMapper.readValue((String) response.getEntity(), Map.class));
-        assertEquals(jsonValue.size(), 2);
-        assertEquals(jsonValue.get("tokenId").asString(), "SSO_TOKEN_ID");
-        assertTrue(jsonValue.isDefined("successUrl"));
+        assertEquals(response.size(), 2);
+        assertEquals(response.get("tokenId").asString(), "SSO_TOKEN_ID");
+        assertTrue(response.isDefined("successUrl"));
 
         verify(authIdHelper).verifyAuthId("REALM_DN", "AUTH_ID");
 

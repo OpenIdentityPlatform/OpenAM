@@ -11,57 +11,23 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2013 ForgeRock Inc.
+ * Copyright 2013-2014 ForgeRock AS.
  */
 
 package org.forgerock.openam.forgerockrest.authn.exceptions;
 
-import org.forgerock.json.fluent.JsonValue;
-import org.forgerock.openam.utils.JsonValueBuilder;
-
-import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.Response;
-
 /**
  * This exception is designed to be thrown from RESTful authentication calls when an error occurs.
  */
-public class RestAuthException extends RuntimeException {
+public class RestAuthException extends Exception {
 
-    private Response.Status responseStatus;
+    /**
+     * Unauthorized HTTP Status Code.
+     */
+    public static final int UNAUTHORIZED = 401;
+
     private int statusCode;
-
-    /**
-     * Constructs a RestAuthException.
-     *
-     * @param responseStatus The HTTP response to code to send back to the client.
-     * @param errorMessage The error message relating to the exception.
-     */
-    public RestAuthException(Response.Status responseStatus, String errorMessage) {
-        super(errorMessage);
-        this.responseStatus = responseStatus;
-    }
-
-    /**
-     * Constructs a RestAuthException.
-     *
-     * @param responseStatus The HTTP response to code to send back to the client.
-     * @param errorMessage The error message relating to the exception.
-     * @param throwable The cause of the exception.
-     */
-    public RestAuthException(Response.Status responseStatus, String errorMessage, Throwable throwable) {
-        super(errorMessage, throwable);
-        this.responseStatus = responseStatus;
-    }
-
-    /**
-     * Constructs a RestAuthException.
-     *
-     * @param responseStatus The HTTP response to code to send back to the client.
-     * @param throwable The cause of the exception.
-     */
-    public RestAuthException(Response.Status responseStatus, Throwable throwable) {
-        this(responseStatus, throwable.getLocalizedMessage(), throwable);
-    }
+    private String failureUrl;
 
     /**
      * Constructs a RestAuthException.
@@ -86,40 +52,32 @@ public class RestAuthException extends RuntimeException {
     }
 
     /**
-     * Creates a JAX-RS Response object with the HTTP response code the exception was created with and the error
-     * message as a JSON string in the body.
+     * Constructs a RestAuthException.
      *
-     * @return A JAX-RS Response object.
+     * @param responseStatus The HTTP response to code to send back to the client.
+     * @param errorMessage The error message relating to the exception.
+     * @param throwable The cause of the exception.
      */
-    public Response getResponse() {
-        return getResponse(null);
+    public RestAuthException(int responseStatus, String errorMessage, Throwable throwable) {
+        super(errorMessage, throwable);
+        statusCode = responseStatus;
     }
 
     /**
-     * Creates a JAX-RS Response object with the HTTP response code the exception was created with and the error
-     * message as a JSON string in the body, including the given failureUrl, if not null.
+     * Sets the go to on failure url.
      *
-     * @param failureUrl The failureUrl for the request.
-     * @return A JAX-RS Response object.
+     * @param failureUrl The failure url.
      */
-    public Response getResponse(String failureUrl) {
+    public void setFailureUrl(final String failureUrl) {
+        this.failureUrl = failureUrl;
+    }
 
-
-        if (responseStatus != null) {
-            statusCode = responseStatus.getStatusCode();
-        }
-
-        Response.ResponseBuilder responseBuilder = Response.status(statusCode);
-
-        JsonValue jsonValue = JsonValueBuilder.jsonValue()
-                .put("errorMessage", getLocalizedMessage())
-                .build();
-        if (failureUrl != null) {
-            jsonValue.put("failureUrl", failureUrl);
-        }
-        responseBuilder.type(MediaType.APPLICATION_JSON_TYPE);
-        responseBuilder.entity(jsonValue.toString());
-
-        return responseBuilder.build();
+    /**
+     * Gets the status code.
+     *
+     * @return The status code.
+     */
+    public int getStatusCode() {
+        return statusCode;
     }
 }

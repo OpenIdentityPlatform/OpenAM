@@ -82,7 +82,15 @@
         </dependency>
         <dependency>
             <groupId>org.restlet.jse</groupId>
+            <artifactId>org.restlet</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.restlet.jse</groupId>
             <artifactId>org.restlet.ext.json</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.restlet.osgi</groupId>
+            <artifactId>org.restlet.ext.servlet</artifactId>
         </dependency>
 
         <!-- OpenAM-CLI -->
@@ -117,11 +125,6 @@
         <dependency>
             <groupId>org.forgerock.commons</groupId>
             <artifactId>json-web-token</artifactId>
-        </dependency>
-
-        <dependency>
-            <groupId>javax.ws.rs</groupId>
-            <artifactId>jsr311-api</artifactId>
         </dependency>
 
 

@@ -11,27 +11,10 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2013 ForgeRock Inc.
+ * Copyright 2013-2014 ForgeRock AS.
  */
-
-package org.forgerock.openam.forgerockrest.authn;
-
-import javax.ws.rs.core.Application;
-import java.util.HashSet;
-import java.util.Set;
 
 /**
- * Defines the list of JAX-RS endpoint classes for the RestAuthService uri mapping.
+ * This package contains restlet classes for the RESTful Authentication endpoint.
  */
-public class RestAuthService extends Application {
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public Set<Class<?>> getClasses() {
-        Set<Class<?>> classes = new HashSet<Class<?>>();
-        classes.add(AuthenticationRestService.class);
-        return classes;
-    }
-}
+package org.forgerock.openam.forgerockrest.authn.restlet;

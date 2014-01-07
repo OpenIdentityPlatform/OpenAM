@@ -1,32 +1,30 @@
 /*
-* The contents of this file are subject to the terms of the Common Development and
-* Distribution License (the License). You may not use this file except in compliance with the
-* License.
-*
-* You can obtain a copy of the License at legal/CDDLv1.0.txt. See the License for the
-* specific language governing permission and limitations under the License.
-*
-* When distributing Covered Software, include this CDDL Header Notice in each file and include
-* the License file at legal/CDDLv1.0.txt. If applicable, add the following below the CDDL
-* Header, with the fields enclosed by brackets [] replaced by your own identifying
-* information: "Portions copyright [year] [name of copyright owner]".
-*
-* Copyright 2013 ForgeRock Inc.
-*/
+ * The contents of this file are subject to the terms of the Common Development and
+ * Distribution License (the License). You may not use this file except in compliance with the
+ * License.
+ *
+ * You can obtain a copy of the License at legal/CDDLv1.0.txt. See the License for the
+ * specific language governing permission and limitations under the License.
+ *
+ * When distributing Covered Software, include this CDDL Header Notice in each file and include
+ * the License file at legal/CDDLv1.0.txt. If applicable, add the following below the CDDL
+ * Header, with the fields enclosed by brackets [] replaced by your own identifying
+ * information: "Portions copyright [year] [name of copyright owner]".
+ *
+ * Copyright 2013-2014 ForgeRock AS.
+ */
 
 package org.forgerock.openam.forgerockrest.authn.callbackhandlers;
 
 import com.sun.identity.authentication.spi.HttpCallback;
 import org.forgerock.json.fluent.JsonValue;
+import org.forgerock.openam.forgerockrest.authn.exceptions.RestAuthResponseException;
 import org.forgerock.openam.forgerockrest.authn.exceptions.RestAuthException;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import javax.ws.rs.core.HttpHeaders;
-import javax.ws.rs.core.Response;
-
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -61,10 +59,9 @@ public class RestAuthHttpCallbackHandlerTest {
     }
 
     @Test
-    public void shouldUpdateCallbackFromRequest() throws RestAuthCallbackHandlerResponseException {
+    public void shouldUpdateCallbackFromRequest() throws RestAuthResponseException, RestAuthException {
 
         //Given
-        HttpHeaders headers = mock(HttpHeaders.class);
         HttpServletRequest request = mock(HttpServletRequest.class);
         HttpServletResponse response = mock(HttpServletResponse.class);
         HttpCallback httpCallback = mock(HttpCallback.class);
@@ -73,8 +70,7 @@ public class RestAuthHttpCallbackHandlerTest {
         given(request.getHeader("AUTHORIZATION")).willReturn("HTTP_AUTHZ");
 
         //When
-        boolean updated = restAuthHttpCallbackHandler.updateCallbackFromRequest(headers, request, response,
-                httpCallback);
+        boolean updated = restAuthHttpCallbackHandler.updateCallbackFromRequest(request, response, httpCallback);
 
         //Then
         verify(httpCallback).setAuthorization("HTTP_AUTHZ");
@@ -83,10 +79,9 @@ public class RestAuthHttpCallbackHandlerTest {
 
     @Test
     public void shouldFailToUpdateCallbackFromRequestWhenHttpAuthorizationIsNull()
-            throws RestAuthCallbackHandlerResponseException {
+            throws RestAuthResponseException, RestAuthException {
 
         //Given
-        HttpHeaders headers = mock(HttpHeaders.class);
         HttpServletRequest request = mock(HttpServletRequest.class);
         HttpServletResponse response = mock(HttpServletResponse.class);
         HttpCallback httpCallback = mock(HttpCallback.class);
@@ -97,18 +92,17 @@ public class RestAuthHttpCallbackHandlerTest {
 
         //When
         boolean exceptionCaught = false;
-        RestAuthCallbackHandlerResponseException exception = null;
+        RestAuthResponseException exception = null;
         try {
-            restAuthHttpCallbackHandler.updateCallbackFromRequest(headers, request, response,
-                    httpCallback);
-        } catch (RestAuthCallbackHandlerResponseException e) {
+            restAuthHttpCallbackHandler.updateCallbackFromRequest(request, response, httpCallback);
+        } catch (RestAuthResponseException e) {
             exceptionCaught = true;
             exception = e;
         }
 
         //Then
         assertTrue(exceptionCaught);
-        assertEquals(exception.getResponseStatus(), Response.Status.UNAUTHORIZED);
+        assertEquals(exception.getStatusCode(), 401);
         assertEquals(exception.getResponseHeaders().size(), 1);
         assertTrue(exception.getResponseHeaders().containsKey("WWW-Authenticate"));
         assertTrue(exception.getResponseHeaders().containsValue("Negotiate"));
@@ -118,10 +112,9 @@ public class RestAuthHttpCallbackHandlerTest {
 
     @Test
     public void shouldFailToUpdateCallbackFromRequestWhenHttpAuthorizationIsEmptyString()
-            throws RestAuthCallbackHandlerResponseException {
+            throws RestAuthResponseException, RestAuthException {
 
         //Given
-        HttpHeaders headers = mock(HttpHeaders.class);
         HttpServletRequest request = mock(HttpServletRequest.class);
         HttpServletResponse response = mock(HttpServletResponse.class);
         HttpCallback httpCallback = mock(HttpCallback.class);
@@ -132,18 +125,17 @@ public class RestAuthHttpCallbackHandlerTest {
 
         //When
         boolean exceptionCaught = false;
-        RestAuthCallbackHandlerResponseException exception = null;
+        RestAuthResponseException exception = null;
         try {
-            restAuthHttpCallbackHandler.updateCallbackFromRequest(headers, request, response,
-                    httpCallback);
-        } catch (RestAuthCallbackHandlerResponseException e) {
+            restAuthHttpCallbackHandler.updateCallbackFromRequest(request, response, httpCallback);
+        } catch (RestAuthResponseException e) {
             exceptionCaught = true;
             exception = e;
         }
 
         //Then
         assertTrue(exceptionCaught);
-        assertEquals(exception.getResponseStatus(), Response.Status.UNAUTHORIZED);
+        assertEquals(exception.getStatusCode(), 401);
         assertEquals(exception.getResponseHeaders().size(), 1);
         assertTrue(exception.getResponseHeaders().containsKey("WWW-Authenticate"));
         assertTrue(exception.getResponseHeaders().containsValue("Negotiate"));
@@ -155,7 +147,6 @@ public class RestAuthHttpCallbackHandlerTest {
     public void shouldHandleCallbackAndSetHttpAuthFailedIfReasonInPostBody() {
 
         //Given
-        HttpHeaders headers = mock(HttpHeaders.class);
         HttpServletRequest request = mock(HttpServletRequest.class);
         HttpServletResponse response = mock(HttpServletResponse.class);
         HttpCallback originalHttpCallback = mock(HttpCallback.class);
@@ -164,7 +155,7 @@ public class RestAuthHttpCallbackHandlerTest {
         JsonValue jsonPostBody = new JsonValue(postBodyMap);
 
         //When
-        HttpCallback httpCallback = restAuthHttpCallbackHandler.handle(headers, request, response, jsonPostBody,
+        HttpCallback httpCallback = restAuthHttpCallbackHandler.handle(request, response, jsonPostBody,
                 originalHttpCallback);
 
         //Then
@@ -176,14 +167,13 @@ public class RestAuthHttpCallbackHandlerTest {
     public void shouldHandleCallbackWhereIWASuccessful() {
 
         //Given
-        HttpHeaders headers = mock(HttpHeaders.class);
         HttpServletRequest request = mock(HttpServletRequest.class);
         HttpServletResponse response = mock(HttpServletResponse.class);
         JsonValue jsonPostBody = new JsonValue(new HashMap<String, String>());
         HttpCallback originalHttpCallback = mock(HttpCallback.class);
 
         //When
-        HttpCallback httpCallback = restAuthHttpCallbackHandler.handle(headers, request, response, jsonPostBody,
+        HttpCallback httpCallback = restAuthHttpCallbackHandler.handle(request, response, jsonPostBody,
                 originalHttpCallback);
 
         //Then
@@ -192,7 +182,7 @@ public class RestAuthHttpCallbackHandlerTest {
     }
 
     @Test (expectedExceptions = RestAuthException.class)
-    public void shouldFailConvertToJson() {
+    public void shouldFailConvertToJson() throws RestAuthException {
 
         //Given
 
@@ -204,7 +194,7 @@ public class RestAuthHttpCallbackHandlerTest {
     }
 
     @Test (expectedExceptions = RestAuthException.class)
-    public void shouldFailToConvertFromJson() {
+    public void shouldFailToConvertFromJson() throws RestAuthException {
 
         //Given
 

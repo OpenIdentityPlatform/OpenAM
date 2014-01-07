@@ -11,7 +11,7 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2013 ForgeRock AS.
+ * Copyright 2013-2014 ForgeRock AS.
  */
 
 package org.forgerock.openam.forgerockrest.authn;
@@ -19,16 +19,14 @@ package org.forgerock.openam.forgerockrest.authn;
 import com.google.inject.Singleton;
 import com.sun.identity.shared.debug.Debug;
 import org.forgerock.json.fluent.JsonValue;
+import org.forgerock.json.resource.ResourceException;
 import org.forgerock.openam.forgerockrest.authn.callbackhandlers.RestAuthCallbackHandler;
-import org.forgerock.openam.forgerockrest.authn.callbackhandlers.RestAuthCallbackHandlerResponseException;
 import org.forgerock.openam.forgerockrest.authn.exceptions.RestAuthException;
 
 import javax.inject.Inject;
 import javax.security.auth.callback.Callback;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import javax.ws.rs.core.HttpHeaders;
-import javax.ws.rs.core.Response;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -56,22 +54,20 @@ public class RestAuthCallbackHandlerManager {
      * Handles Callbacks by either updating them with their required values from the headers and request or
      * converting them to JSON representations to be sent back to the client.
      *
-     * @param headers The HttpHeaders from the request.
      * @param request The HttpServletRequest from the request.
      * @param response The HttpServletResponse from the request.
      * @param callbacks The Callbacks to handle.
      * @return A JSONArray of Callbacks or empty if the Callbacks have been updated from the headers and request.
-     * @throws RestAuthCallbackHandlerResponseException If one of the CallbackHandlers has its own response to be sent.
      */
-    public JsonValue handleCallbacks(HttpHeaders headers, HttpServletRequest request,
+    public JsonValue handleCallbacks(HttpServletRequest request,
             HttpServletResponse response, Callback[] callbacks)
-            throws RestAuthCallbackHandlerResponseException {
+            throws RestAuthException {
 
         List<JsonValue> jsonCallbacks = new ArrayList<JsonValue>();
         int callbackIndex = 0;
         // check if can be completed by headers and/or request
         // if so then attempt it and response true if successful
-        boolean handledInternally = handleCallbacksInternally(headers, request, response, callbacks);
+        boolean handledInternally = handleCallbacksInternally(request, response, callbacks);
 
         // else or on false convert callback into json
         if (!handledInternally) {
@@ -94,23 +90,21 @@ public class RestAuthCallbackHandlerManager {
      * headers and request or the headers and request do not contain the required information the method returns
      * false.
      *
-     * @param headers The HttpHeaders from the request.
      * @param request The HttpServletRequest from the request.
      * @param response The HttpServletResponse from the request.
      * @param callbacks The Callbacks to update with their required values from the headers and request.
      * @return Whether or not the Callbacks were successfully updated.
-     * @throws RestAuthCallbackHandlerResponseException If one of the CallbackHandlers has its own response to be sent.
      */
-    private boolean handleCallbacksInternally(HttpHeaders headers, HttpServletRequest request,
+    private boolean handleCallbacksInternally(HttpServletRequest request,
             HttpServletResponse response, Callback[] callbacks)
-            throws RestAuthCallbackHandlerResponseException {
+            throws RestAuthException {
 
         for (Callback callback : callbacks) {
 
             RestAuthCallbackHandler restAuthCallbackHandler =
                     restAuthCallbackHandlerFactory.getRestAuthCallbackHandler(callback.getClass());
 
-            if (!restAuthCallbackHandler.updateCallbackFromRequest(headers, request, response, callback)) {
+            if (!restAuthCallbackHandler.updateCallbackFromRequest(request, response, callback)) {
                 return false;
             }
         }
@@ -132,7 +126,7 @@ public class RestAuthCallbackHandlerManager {
      * @param jsonCallbacks The JSON representation of the Callbacks.
      * @return The same Callbacks as in the parameters with the required values set.
      */
-    public Callback[] handleJsonCallbacks(Callback[] originalCallbacks, JsonValue jsonCallbacks) {
+    public Callback[] handleJsonCallbacks(Callback[] originalCallbacks, JsonValue jsonCallbacks) throws RestAuthException {
 
         for (int j = 0; j < originalCallbacks.length; j++) {
 
@@ -154,7 +148,7 @@ public class RestAuthCallbackHandlerManager {
 
             if (!foundParser) {
                 logger.error("Required callback not found in JSON response");
-                throw new RestAuthException(Response.Status.BAD_REQUEST,
+                throw new RestAuthException(ResourceException.BAD_REQUEST,
                         "Required callback not found in JSON response");
             }
         }
@@ -168,22 +162,21 @@ public class RestAuthCallbackHandlerManager {
      * This is for special circumstances where the JSON from the request does not contain a "callback" attribute,
      * where the <code>handleJsonCallbacks()</code> method should be used.
      *
-     * @param headers The HttpHeaders from the request.
      * @param request The HttpServletRequest from the request.
      * @param response The HttpServletResponse from the request.
      * @param originalCallbacks The Callbacks to set values from the JSONArray onto.
      * @param jsonRequestObject The JSON object that was sent in the POST of the request.
      * @return The updated originalCallbacks.
      */
-    public Callback[] handleResponseCallbacks(HttpHeaders headers, HttpServletRequest request,
-            HttpServletResponse response, Callback[] originalCallbacks, JsonValue jsonRequestObject) {
+    public Callback[] handleResponseCallbacks(HttpServletRequest request,
+            HttpServletResponse response, Callback[] originalCallbacks, JsonValue jsonRequestObject) throws RestAuthException {
 
         for (Callback originalCallback : originalCallbacks) {
 
             RestAuthCallbackHandler restAuthCallbackHandler =
                     restAuthCallbackHandlerFactory.getRestAuthCallbackHandler(originalCallback.getClass());
 
-            restAuthCallbackHandler.handle(headers, request, response, jsonRequestObject, originalCallback);
+            restAuthCallbackHandler.handle(request, response, jsonRequestObject, originalCallback);
         }
 
         return originalCallbacks;

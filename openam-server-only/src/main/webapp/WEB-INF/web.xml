@@ -310,15 +310,6 @@
         </init-param>
         <load-on-startup>1</load-on-startup>
     </servlet>
-    <servlet>
-        <servlet-name>rest-auth</servlet-name>
-        <servlet-class>com.sun.jersey.spi.container.servlet.ServletContainer</servlet-class>
-        <init-param>
-            <param-name>javax.ws.rs.Application</param-name>
-            <param-value>org.forgerock.openam.forgerockrest.authn.RestAuthService</param-value>
-        </init-param>
-        <load-on-startup>1</load-on-startup>
-    </servlet>
 
     <servlet>
         <servlet-name>oauth</servlet-name>
@@ -731,6 +722,14 @@
         <url-pattern>/ws/*</url-pattern>
     </servlet-mapping>
 
+    <servlet>
+        <servlet-name>rest-auth</servlet-name>
+        <servlet-class>org.restlet.ext.servlet.ServerServlet</servlet-class>
+        <init-param>
+            <param-name>org.restlet.application</param-name>
+            <param-value>org.forgerock.openam.forgerockrest.authn.restlet.RestAuthenticationApplication</param-value>
+        </init-param>
+    </servlet>
     <servlet-mapping>
         <servlet-name>rest-auth</servlet-name>
         <url-pattern>/json/authenticate/*</url-pattern>

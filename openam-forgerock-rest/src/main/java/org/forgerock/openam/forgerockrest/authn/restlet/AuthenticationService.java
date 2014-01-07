@@ -1,0 +1,239 @@
+/*
+ * The contents of this file are subject to the terms of the Common Development and
+ * Distribution License (the License). You may not use this file except in compliance with the
+ * License.
+ *
+ * You can obtain a copy of the License at legal/CDDLv1.0.txt. See the License for the
+ * specific language governing permission and limitations under the License.
+ *
+ * When distributing Covered Software, include this CDDL Header Notice in each file and include
+ * the License file at legal/CDDLv1.0.txt. If applicable, add the following below the CDDL
+ * Header, with the fields enclosed by brackets [] replaced by your own identifying
+ * information: "Portions copyright [year] [name of copyright owner]".
+ *
+ * Copyright 2013-2014 ForgeRock AS.
+ */
+
+package org.forgerock.openam.forgerockrest.authn.restlet;
+
+import com.sun.identity.shared.debug.Debug;
+import org.apache.commons.lang.StringUtils;
+import org.codehaus.jackson.map.ObjectMapper;
+import org.forgerock.json.fluent.JsonValue;
+import org.forgerock.openam.forgerockrest.authn.RestAuthenticationHandler;
+import org.forgerock.openam.forgerockrest.authn.exceptions.RestAuthException;
+import org.forgerock.openam.forgerockrest.authn.exceptions.RestAuthResponseException;
+import org.forgerock.openam.guice.InjectorHolder;
+import org.forgerock.openam.utils.JsonValueBuilder;
+import org.json.JSONException;
+import org.restlet.data.MediaType;
+import org.restlet.data.Status;
+import org.restlet.engine.header.Header;
+import org.restlet.ext.jackson.JacksonRepresentation;
+import org.restlet.ext.json.JsonRepresentation;
+import org.restlet.ext.servlet.ServletUtils;
+import org.restlet.representation.Representation;
+import org.restlet.resource.Post;
+import org.restlet.resource.ResourceException;
+import org.restlet.resource.ServerResource;
+import org.restlet.util.Series;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
+import java.util.Map;
+import java.util.regex.Pattern;
+
+/**
+ * Base Restlet class for server-side resources. It acts as a wrapper to a given call,
+ * including the incoming {@link org.restlet.Request} and the outgoing {@link org.restlet.Response}.
+ *
+ * @since 12.0.0
+ */
+public class AuthenticationService extends ServerResource {
+
+    private static final Debug DEBUG = Debug.getInstance("amAuthREST");
+
+    private static final Pattern CONTENT_TYPE_REGEX =
+            Pattern.compile("^application/json([ ]*;[ ]*charset=utf-8)?$", Pattern.CASE_INSENSITIVE);
+    private static final String RESTLET_HEADERS_KEY = "org.restlet.http.headers";
+    private static final String CACHE_CONTROL_HEADER_NAME = "Cache-Control";
+    private static final String NO_CACHE_CACHE_CONTROL_HEADER = "no-cache, no-store, must-revalidate";
+    private static final String PRAGMA_HEADER_NAME = "Pragma";
+    private static final String PRAGMA_NO_CACHE_HEADER = "no-cache";
+    private static final String EXPIRES_HEADER_NAME = "Expires";
+    private static final String ALWAYS_EXPIRE_HEADER = "0";
+    private static final String CONTENT_TYPE_HEADER_NAME = "Content-Type";
+
+    private final RestAuthenticationHandler restAuthenticationHandler;
+
+    /**
+     * Constructs an instance of the AuthenticationRestService.
+     *
+     * Used by the Restlet framework to create the instance.
+     */
+    public AuthenticationService() {
+        this.restAuthenticationHandler = InjectorHolder.getInstance(RestAuthenticationHandler.class);
+    }
+
+    /**
+     * Constructs an instance of the AuthenticationRestService.
+     *
+     * Used by tests to inject a mock RestAuthenticationHandler.
+     *
+     * @param restAuthenticationHandler An instance of the RestAuthenticationHandler.
+     */
+    public AuthenticationService(RestAuthenticationHandler restAuthenticationHandler) {
+        this.restAuthenticationHandler = restAuthenticationHandler;
+    }
+
+    /**
+     * Handles both initial and subsequent RESTful calls from clients submitting Callbacks for the authentication
+     * process to continue. This is determined by checking if the POST body is empty or not. If it is empty then this
+     * is initiating the authentication process otherwise it is a subsequent call submitting Callbacks.
+     *
+     * Initiating authentication request using the query parameters from the URL starts the login process and either
+     * returns an SSOToken on successful authentication or a number of Callbacks needing to be completed before
+     * authentication can proceed or an exception if any problems occurred whilst trying to authenticate.
+     *
+     * Using the body of the POST request the method continues the login process, submitting the given Callbacks and
+     * then either returns an SSOToken on successful authentication or a number of additional Callbacks needing to be
+     * completed before authentication can proceed or an exception if any problems occurred whilst trying to
+     * authenticate.
+     *
+     * @param entity The Json Representation of the post body of the request.
+     * @return A Json Representation of the response body. The response will contain either a JSON object containing the
+     * SSOToken id from a successful authentication, a JSON object containing a number of Callbacks for the client to
+     * complete and return or a JSON object containing an exception message.
+     * @throws ResourceException If there is an error processing the authentication request.
+     */
+    @Post
+    public Representation authenticate(JsonRepresentation entity) throws ResourceException {
+
+        if (!isJsonContentType()) {
+            throw new ResourceException(Status.CLIENT_ERROR_UNSUPPORTED_MEDIA_TYPE, "Unsupported Media Type");
+        }
+
+        final HttpServletRequest request = ServletUtils.getRequest(getRequest());
+        final HttpServletResponse response = ServletUtils.getResponse(getResponse());
+
+        final Map<String, String> queryString = getReference().getQueryAsForm().getValuesMap();
+        final String sessionUpgradeSSOTokenId = queryString.get("sessionUpgradeSSOTokenId");
+
+        try {
+            JsonValue jsonContent = getJsonContent(entity);
+
+            JsonValue jsonResponse;
+            if (jsonContent != null && jsonContent.size() > 0) {
+                // submit requirements
+                jsonResponse = restAuthenticationHandler.continueAuthentication(request, response, jsonContent,
+                        sessionUpgradeSSOTokenId);
+            } else {
+                // initiate
+                final String authIndexType = queryString.get("authIndexType");
+                final String authIndexValue = queryString.get("authIndexValue");
+                jsonResponse = restAuthenticationHandler.initiateAuthentication(request, response, authIndexType,
+                        authIndexValue, sessionUpgradeSSOTokenId);
+            }
+
+            return createResponse(jsonResponse);
+
+        } catch (RestAuthResponseException e) {
+            DEBUG.message("Exception from CallbackHandler", e);
+            return handleCallbackException(e);
+        } catch (RestAuthException e) {
+            DEBUG.error("Rest Authentication Exception", e);
+            throw new ResourceException(e.getStatusCode(), e);
+        } catch (Exception e) {
+            DEBUG.error("Internal Error", e);
+            throw new ResourceException(org.forgerock.json.resource.ResourceException.INTERNAL_ERROR, e);
+        }
+    }
+
+    /**
+     * Check if the Http Headers contains the 'application/json' content type.
+     *
+     * @return <code>true</code> if the Content-Type header contains 'application/json'
+     */
+    private boolean isJsonContentType() {
+        Series headers = (Series) getRequestAttributes().get("org.restlet.http.headers");
+        String contentType = headers.getFirstValue("Content-Type", true);
+        return contentType != null && CONTENT_TYPE_REGEX.matcher(contentType).matches();
+    }
+
+    /**
+     * Creates a JsonValue from the Restlet Json Representation of the request post body.
+     *
+     * @param representation The Json Representation.
+     * @return A JsonValue of the request posy body.
+     * @throws JSONException If there is a problem parsing the Json Representation.
+     */
+    private JsonValue getJsonContent(final JsonRepresentation representation) throws JSONException {
+
+        if (representation == null) {
+            return null;
+        }
+
+        final String jsonString = representation.getJsonObject().toString();
+        JsonValue jsonContent = null;
+        if (StringUtils.isNotEmpty(jsonString)) {
+            jsonContent = JsonValueBuilder.toJsonValue(jsonString);
+        }
+
+        return jsonContent;
+    }
+
+    /**
+     * Creates a Restlet response representation from the given JsonValue.
+     *
+     * @param jsonResponse The Json response body.
+     * @return a Restlet response representation.
+     * @throws IOException If there is a problem creating the Json Representation.
+     */
+    private Representation createResponse(final JsonValue jsonResponse) throws IOException {
+
+        addResponseHeader(CACHE_CONTROL_HEADER_NAME, NO_CACHE_CACHE_CONTROL_HEADER);
+        addResponseHeader(PRAGMA_HEADER_NAME, PRAGMA_NO_CACHE_HEADER);
+        addResponseHeader(EXPIRES_HEADER_NAME, ALWAYS_EXPIRE_HEADER);
+        addResponseHeader(CONTENT_TYPE_HEADER_NAME, MediaType.APPLICATION_JSON.getName());
+
+        final ObjectMapper mapper = new ObjectMapper();
+        return new JacksonRepresentation<Map>(mapper.readValue(jsonResponse.toString(), Map.class));
+    }
+
+    /**
+     * Adds a response header to the response.
+     *
+     * @param key The Http Header name.
+     * @param value The header value.
+     */
+    @SuppressWarnings("unchecked")
+    private void addResponseHeader(final String key, final String value) {
+        Series<Header> headers = (Series<Header>) getResponse().getAttributes().get(RESTLET_HEADERS_KEY);
+        if (headers == null) {
+            headers = new Series(Header.class);
+            getResponse().getAttributes().put(RESTLET_HEADERS_KEY, headers);
+        }
+        headers.add(new Header(key, value));
+    }
+
+    /**
+     * Processes the given RestAuthResponseException into a Restlet response representation and
+     * adds any response headers from the exception.
+     *
+     * @param e The RestAuthCallbackHandlerException.
+     * @return The Restlet Response Representation.
+     */
+    private Representation handleCallbackException(final RestAuthResponseException e) {
+        for (final String key : e.getResponseHeaders().keySet()) {
+            addResponseHeader(key, e.getResponseHeaders().get(key));
+        }
+
+        final ObjectMapper mapper = new ObjectMapper();
+        try {
+            return new JacksonRepresentation<Map>(mapper.readValue(e.getJsonResponse().toString(), Map.class));
+        } catch (IOException ioe) {
+            throw new ResourceException(org.forgerock.json.resource.ResourceException.INTERNAL_ERROR, ioe);
+        }
+    }
+}

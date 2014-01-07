@@ -11,19 +11,19 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2013 ForgeRock Inc.
+ * Copyright 2013-2014 ForgeRock AS.
  */
 
 package org.forgerock.openam.forgerockrest.authn.callbackhandlers;
 
 import com.sun.identity.authentication.spi.X509CertificateCallback;
 import org.forgerock.json.fluent.JsonValue;
+import org.forgerock.json.resource.ResourceException;
+import org.forgerock.openam.forgerockrest.authn.exceptions.RestAuthResponseException;
 import org.forgerock.openam.forgerockrest.authn.exceptions.RestAuthException;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import javax.ws.rs.core.HttpHeaders;
-import javax.ws.rs.core.Response;
 import java.security.cert.X509Certificate;
 
 /**
@@ -41,7 +41,7 @@ public class RestAuthX509CallbackHandler extends AbstractRestAuthCallbackHandler
      *
      * {@inheritDoc}
      */
-    public boolean updateCallbackFromRequest(HttpHeaders headers, HttpServletRequest request,
+    public boolean updateCallbackFromRequest(HttpServletRequest request,
             HttpServletResponse response, X509CertificateCallback callback) {
 
         X509Certificate[] certificates = (X509Certificate[]) request.getAttribute(
@@ -60,15 +60,15 @@ public class RestAuthX509CallbackHandler extends AbstractRestAuthCallbackHandler
      *
      * {@inheritDoc}
      */
-    boolean doUpdateCallbackFromRequest(HttpHeaders headers, HttpServletRequest request, HttpServletResponse response,
-            X509CertificateCallback callback) throws RestAuthCallbackHandlerResponseException {
+    boolean doUpdateCallbackFromRequest(HttpServletRequest request, HttpServletResponse response,
+            X509CertificateCallback callback) throws RestAuthResponseException {
         return false;
     }
 
     /**
      * {@inheritDoc}
      */
-    public X509CertificateCallback handle(HttpHeaders headers, HttpServletRequest request, HttpServletResponse response,
+    public X509CertificateCallback handle(HttpServletRequest request, HttpServletResponse response,
             JsonValue postBody, X509CertificateCallback originalCallback) {
         return originalCallback;
     }
@@ -86,8 +86,8 @@ public class RestAuthX509CallbackHandler extends AbstractRestAuthCallbackHandler
      *
      * {@inheritDoc}
      */
-    public JsonValue convertToJson(X509CertificateCallback callback, int index) {
-        throw new RestAuthException(Response.Status.BAD_REQUEST, new UnsupportedOperationException(
+    public JsonValue convertToJson(X509CertificateCallback callback, int index) throws RestAuthException {
+        throw new RestAuthException(ResourceException.BAD_REQUEST, new UnsupportedOperationException(
                 "X509Certificate must be specified in the initial request. Cannot be converted into a JSON "
                         + "representation."));
     }
@@ -98,8 +98,8 @@ public class RestAuthX509CallbackHandler extends AbstractRestAuthCallbackHandler
      *
      * {@inheritDoc}
      */
-    public X509CertificateCallback convertFromJson(X509CertificateCallback callback, JsonValue jsonCallback) {
-        throw new RestAuthException(Response.Status.BAD_REQUEST, new UnsupportedOperationException(
+    public X509CertificateCallback convertFromJson(X509CertificateCallback callback, JsonValue jsonCallback) throws RestAuthException {
+        throw new RestAuthException(ResourceException.BAD_REQUEST, new UnsupportedOperationException(
                 "X509Certificate must be specified in the initial request. Cannot be converted from a JSON "
                         + "representation."));
     }

@@ -11,7 +11,7 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2013 ForgeRock AS.
+ * Copyright 2013-2014 ForgeRock AS.
  */
 
 package org.forgerock.openam.forgerockrest.authn.callbackhandlers;
@@ -19,13 +19,13 @@ package org.forgerock.openam.forgerockrest.authn.callbackhandlers;
 import com.sun.identity.shared.debug.Debug;
 import org.forgerock.json.fluent.JsonException;
 import org.forgerock.json.fluent.JsonValue;
+import org.forgerock.openam.forgerockrest.authn.exceptions.RestAuthResponseException;
+import org.forgerock.openam.forgerockrest.authn.exceptions.RestAuthException;
 import org.forgerock.openam.utils.JsonValueBuilder;
 
 import javax.security.auth.callback.ChoiceCallback;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import javax.ws.rs.core.HttpHeaders;
-import java.util.List;
 
 /**
  * Defines methods to update a ChoiceCallback from the headers and request of a Rest call and methods to convert a
@@ -42,15 +42,15 @@ public class RestAuthChoiceCallbackHandler extends AbstractRestAuthCallbackHandl
      *
      * {@inheritDoc}
      */
-    boolean doUpdateCallbackFromRequest(HttpHeaders headers, HttpServletRequest request, HttpServletResponse response,
-            ChoiceCallback callback) throws RestAuthCallbackHandlerResponseException {
+    boolean doUpdateCallbackFromRequest(HttpServletRequest request, HttpServletResponse response,
+            ChoiceCallback callback) throws RestAuthResponseException {
         return false;
     }
 
     /**
      * {@inheritDoc}
      */
-    public ChoiceCallback handle(HttpHeaders headers, HttpServletRequest request, HttpServletResponse response,
+    public ChoiceCallback handle(HttpServletRequest request, HttpServletResponse response,
             JsonValue postBody, ChoiceCallback originalCallback) {
         return originalCallback;
     }
@@ -93,7 +93,7 @@ public class RestAuthChoiceCallbackHandler extends AbstractRestAuthCallbackHandl
     /**
      * {@inheritDoc}
      */
-    public ChoiceCallback convertFromJson(ChoiceCallback callback, JsonValue jsonCallback) {
+    public ChoiceCallback convertFromJson(ChoiceCallback callback, JsonValue jsonCallback) throws RestAuthException {
 
         validateCallbackType(CALLBACK_NAME, jsonCallback);
 

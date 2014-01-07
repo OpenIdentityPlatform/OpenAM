@@ -11,12 +11,13 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2013 ForgeRock Inc.
+ * Copyright 2013-2014 ForgeRock AS.
  */
 
 package org.forgerock.openam.forgerockrest.authn.callbackhandlers;
 
 import org.forgerock.json.fluent.JsonValue;
+import org.forgerock.openam.forgerockrest.authn.exceptions.RestAuthResponseException;
 import org.forgerock.openam.forgerockrest.authn.exceptions.RestAuthException;
 import org.json.JSONException;
 import org.testng.annotations.BeforeClass;
@@ -25,15 +26,12 @@ import org.testng.annotations.Test;
 import javax.security.auth.callback.Callback;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import javax.ws.rs.core.HttpHeaders;
-
 import java.util.LinkedHashMap;
 import java.util.Map;
 
+import static org.mockito.BDDMockito.given;
+import static org.mockito.Mockito.mock;
 import static org.testng.Assert.assertEquals;
-
-import static org.mockito.Mockito.*;
-import static org.mockito.BDDMockito.*;
 import static org.testng.Assert.assertFalse;
 import static org.testng.Assert.assertTrue;
 import static org.testng.Assert.fail;
@@ -46,13 +44,13 @@ public class AbstractRestAuthCallbackHandlerTest {
     public void setUp() {
         abstractRestAuthCallbackHandler = new AbstractRestAuthCallbackHandler<Callback>() {
             @Override
-            boolean doUpdateCallbackFromRequest(HttpHeaders headers, HttpServletRequest request,
-                    HttpServletResponse response, Callback callback)
-                    throws RestAuthCallbackHandlerResponseException {
+            boolean doUpdateCallbackFromRequest(HttpServletRequest request, HttpServletResponse response,
+                    Callback callback)
+                    throws RestAuthResponseException {
                 return false;
             }
 
-            public Callback handle(HttpHeaders headers, HttpServletRequest request, HttpServletResponse response, JsonValue postBody, Callback originalCallback) {
+            public Callback handle(HttpServletRequest request, HttpServletResponse response, JsonValue postBody, Callback originalCallback) {
                 return null;  //To change body of implemented methods use File | Settings | File Templates.
             }
 
@@ -195,7 +193,7 @@ public class AbstractRestAuthCallbackHandlerTest {
     }
 
     @Test
-    public void shouldValidateCallbackTypeSuccessfully() throws JSONException {
+    public void shouldValidateCallbackTypeSuccessfully() throws JSONException, RestAuthException {
 
         //Given
         String callbackName = "CALLBACK_NAME";
@@ -213,7 +211,7 @@ public class AbstractRestAuthCallbackHandlerTest {
     }
 
     @Test (expectedExceptions = RestAuthException.class)
-    public void shouldValidateCallbackTypeUnsuccessfully() throws JSONException {
+    public void shouldValidateCallbackTypeUnsuccessfully() throws JSONException, RestAuthException {
 
         //Given
         String callbackName = "CALLBACK_NAME";

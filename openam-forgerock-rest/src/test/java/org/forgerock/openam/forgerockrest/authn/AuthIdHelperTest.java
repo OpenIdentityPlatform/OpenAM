@@ -11,7 +11,7 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2013 ForgeRock Inc.
+ * Copyright 2013-2014 ForgeRock AS.
  */
 
 package org.forgerock.openam.forgerockrest.authn;
@@ -22,11 +22,9 @@ import com.iplanet.sso.SSOToken;
 import com.sun.identity.sm.SMSException;
 import com.sun.identity.sm.ServiceConfig;
 import com.sun.identity.sm.ServiceConfigManager;
-import org.forgerock.json.fluent.JsonValue;
 import org.forgerock.json.jose.builders.JwsHeaderBuilder;
 import org.forgerock.json.jose.builders.JwtBuilderFactory;
 import org.forgerock.json.jose.builders.JwtClaimsSetBuilder;
-import org.forgerock.json.jose.builders.SignedJwtBuilder;
 import org.forgerock.json.jose.builders.SignedJwtBuilderImpl;
 import org.forgerock.json.jose.exceptions.JwtRuntimeException;
 import org.forgerock.json.jose.jws.JwsAlgorithm;
@@ -39,25 +37,32 @@ import org.forgerock.openam.forgerockrest.authn.core.wrappers.AuthContextLocalWr
 import org.forgerock.openam.forgerockrest.authn.core.wrappers.CoreServicesWrapper;
 import org.forgerock.openam.forgerockrest.authn.exceptions.RestAuthException;
 import org.forgerock.openam.utils.AMKeyProvider;
-import org.forgerock.openam.utils.JsonValueBuilder;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Matchers;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
-import javax.ws.rs.core.Response;
 import java.security.Key;
 import java.security.PrivateKey;
 import java.security.SignatureException;
-import java.security.cert.X509Certificate;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
-import static org.mockito.Mockito.*;
-import static org.mockito.BDDMockito.*;
-import static org.testng.Assert.*;
+import static org.mockito.BDDMockito.given;
+import static org.mockito.Mockito.anyMap;
+import static org.mockito.Mockito.anyObject;
+import static org.mockito.Mockito.anyString;
+import static org.mockito.Mockito.eq;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.verify;
+import static org.testng.Assert.assertEquals;
+import static org.testng.Assert.assertFalse;
+import static org.testng.Assert.assertNotNull;
+import static org.testng.Assert.assertTrue;
+import static org.testng.Assert.fail;
 
 public class AuthIdHelperTest {
 
@@ -119,7 +124,7 @@ public class AuthIdHelperTest {
     }
 
     @Test
-    public void shouldCreateAuthId() throws SignatureException, SMSException, SSOException {
+    public void shouldCreateAuthId() throws SignatureException, SMSException, SSOException, RestAuthException {
 
         //Given
         LoginConfiguration loginConfiguration = mock(LoginConfiguration.class);
@@ -155,7 +160,7 @@ public class AuthIdHelperTest {
 
     @Test
     public void shouldCreateAuthIdIncludingAuthIndexTypeAndValue() throws SignatureException, SMSException,
-            SSOException {
+            SSOException, RestAuthException {
 
         //Given
         LoginConfiguration loginConfiguration = mock(LoginConfiguration.class);
@@ -243,7 +248,7 @@ public class AuthIdHelperTest {
 
         //Then
         assertTrue(exceptionCaught);
-        assertEquals(exception.getResponse().getStatus(), 500);
+        assertEquals(exception.getStatusCode(), 500);
         verify(amKeyProvider, never()).getPrivateKey(anyString());
     }
 
@@ -270,12 +275,12 @@ public class AuthIdHelperTest {
 
         //Then
         assertTrue(exceptionCaught);
-        assertEquals(exception.getResponse().getStatus(), 500);
+        assertEquals(exception.getStatusCode(), 500);
         verify(amKeyProvider, never()).getPrivateKey(anyString());
     }
 
     @Test
-    public void shouldReconstructAuthId() {
+    public void shouldReconstructAuthId() throws RestAuthException {
 
         //Given
 
@@ -305,14 +310,11 @@ public class AuthIdHelperTest {
 
         //Then
         assertTrue(exceptionCaught);
-        Response response = exception.getResponse();
-        assertEquals(response.getStatus(), 400);
-        JsonValue jsonValue = JsonValueBuilder.toJsonValue((String) response.getEntity());
-        assertTrue(jsonValue.isDefined("errorMessage"));
+        assertEquals(exception.getStatusCode(), 400);
     }
 
     @Test
-    public void shouldVerifyAuthId() throws SignatureException, SSOException, SMSException {
+    public void shouldVerifyAuthId() throws SignatureException, SSOException, SMSException, RestAuthException {
 
         //Given
         SignedJwt signedJwt = mock(SignedJwt.class);
@@ -381,9 +383,6 @@ public class AuthIdHelperTest {
 
         //Then
         assertTrue(exceptionCaught);
-        Response response = exception.getResponse();
-        assertEquals(response.getStatus(), 400);
-        JsonValue jsonValue = JsonValueBuilder.toJsonValue((String) response.getEntity());
-        assertTrue(jsonValue.isDefined("errorMessage"));
+        assertEquals(exception.getStatusCode(), 400);
     }
 }

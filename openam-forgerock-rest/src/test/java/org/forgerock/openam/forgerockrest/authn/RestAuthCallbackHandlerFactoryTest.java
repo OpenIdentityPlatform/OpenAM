@@ -11,7 +11,7 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2013 ForgeRock Inc.
+ * Copyright 2013-2014 ForgeRock AS.
  */
 
 package org.forgerock.openam.forgerockrest.authn;
@@ -19,6 +19,7 @@ package org.forgerock.openam.forgerockrest.authn;
 import org.forgerock.openam.forgerockrest.authn.callbackhandlers.RestAuthCallbackHandler;
 import org.forgerock.openam.forgerockrest.authn.callbackhandlers.RestAuthNameCallbackHandler;
 import org.forgerock.openam.forgerockrest.authn.callbackhandlers.RestAuthPasswordCallbackHandler;
+import org.forgerock.openam.forgerockrest.authn.exceptions.RestAuthException;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
@@ -39,7 +40,7 @@ public class RestAuthCallbackHandlerFactoryTest {
     }
 
     @Test
-    public void shouldGetNameRestAuthCallbackHandler() {
+    public void shouldGetNameRestAuthCallbackHandler() throws RestAuthException {
 
         //Given
 
@@ -52,7 +53,7 @@ public class RestAuthCallbackHandlerFactoryTest {
     }
 
     @Test
-    public void shouldGetPasswordRestAuthCallbackHandler() {
+    public void shouldGetPasswordRestAuthCallbackHandler() throws RestAuthException {
 
         //Given
 
@@ -64,8 +65,8 @@ public class RestAuthCallbackHandlerFactoryTest {
         assertEquals(restAuthCallbackHandler.getClass(), RestAuthPasswordCallbackHandler.class);
     }
 
-    @Test (expectedExceptions = RuntimeException.class)
-    public void shouldThrowExceptionWithUnknownCallback() {        //TODO check for specific exception and message??
+    @Test (expectedExceptions = RestAuthException.class)
+    public void shouldThrowExceptionWithUnknownCallback() throws RestAuthException {
 
         //Given
 

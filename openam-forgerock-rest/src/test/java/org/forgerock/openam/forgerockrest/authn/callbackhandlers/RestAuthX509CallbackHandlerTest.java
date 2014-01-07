@@ -1,23 +1,24 @@
 /*
-* The contents of this file are subject to the terms of the Common Development and
-* Distribution License (the License). You may not use this file except in compliance with the
-* License.
-*
-* You can obtain a copy of the License at legal/CDDLv1.0.txt. See the License for the
-* specific language governing permission and limitations under the License.
-*
-* When distributing Covered Software, include this CDDL Header Notice in each file and include
-* the License file at legal/CDDLv1.0.txt. If applicable, add the following below the CDDL
-* Header, with the fields enclosed by brackets [] replaced by your own identifying
-* information: "Portions copyright [year] [name of copyright owner]".
-*
-* Copyright 2013 ForgeRock Inc.
-*/
+ * The contents of this file are subject to the terms of the Common Development and
+ * Distribution License (the License). You may not use this file except in compliance with the
+ * License.
+ *
+ * You can obtain a copy of the License at legal/CDDLv1.0.txt. See the License for the
+ * specific language governing permission and limitations under the License.
+ *
+ * When distributing Covered Software, include this CDDL Header Notice in each file and include
+ * the License file at legal/CDDLv1.0.txt. If applicable, add the following below the CDDL
+ * Header, with the fields enclosed by brackets [] replaced by your own identifying
+ * information: "Portions copyright [year] [name of copyright owner]".
+ *
+ * Copyright 2013-2014 ForgeRock AS.
+ */
 
 package org.forgerock.openam.forgerockrest.authn.callbackhandlers;
 
 import com.sun.identity.authentication.spi.X509CertificateCallback;
 import org.forgerock.json.fluent.JsonValue;
+import org.forgerock.openam.forgerockrest.authn.exceptions.RestAuthResponseException;
 import org.forgerock.openam.forgerockrest.authn.exceptions.RestAuthException;
 import org.mockito.Matchers;
 import org.testng.annotations.BeforeClass;
@@ -25,7 +26,6 @@ import org.testng.annotations.Test;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import javax.ws.rs.core.HttpHeaders;
 import java.security.cert.X509Certificate;
 
 import static junit.framework.Assert.fail;
@@ -58,10 +58,9 @@ public class RestAuthX509CallbackHandlerTest {
     }
 
     @Test
-    public void shouldUpdateCallbackFromRequest() throws RestAuthCallbackHandlerResponseException {
+    public void shouldUpdateCallbackFromRequest() throws RestAuthResponseException, RestAuthException {
 
         //Given
-        HttpHeaders headers = mock(HttpHeaders.class);
         HttpServletRequest request = mock(HttpServletRequest.class);
         HttpServletResponse response = mock(HttpServletResponse.class);
         X509CertificateCallback x509CertificateCallback = mock(X509CertificateCallback.class);
@@ -71,7 +70,7 @@ public class RestAuthX509CallbackHandlerTest {
         given(request.getAttribute("javax.servlet.request.X509Certificate")).willReturn(x509Certificates);
 
         //When
-        boolean updated = restAuthX509CallbackHandler.updateCallbackFromRequest(headers, request, response,
+        boolean updated = restAuthX509CallbackHandler.updateCallbackFromRequest(request, response,
                 x509CertificateCallback);
 
         //Then
@@ -81,10 +80,9 @@ public class RestAuthX509CallbackHandlerTest {
 
     @Test
     public void shouldUpdateCallbackFromRequestWithMultipleX509Certificates()
-            throws RestAuthCallbackHandlerResponseException {
+            throws RestAuthResponseException, RestAuthException {
 
         //Given
-        HttpHeaders headers = mock(HttpHeaders.class);
         HttpServletRequest request = mock(HttpServletRequest.class);
         HttpServletResponse response = mock(HttpServletResponse.class);
         X509CertificateCallback x509CertificateCallback = mock(X509CertificateCallback.class);
@@ -95,7 +93,7 @@ public class RestAuthX509CallbackHandlerTest {
         given(request.getAttribute("javax.servlet.request.X509Certificate")).willReturn(x509Certificates);
 
         //When
-        boolean updated = restAuthX509CallbackHandler.updateCallbackFromRequest(headers, request, response,
+        boolean updated = restAuthX509CallbackHandler.updateCallbackFromRequest(request, response,
                 x509CertificateCallback);
 
         //Then
@@ -105,10 +103,9 @@ public class RestAuthX509CallbackHandlerTest {
 
     @Test
     public void shouldNotUpdateCallbackFromRequestWithNoX509Certificate()
-            throws RestAuthCallbackHandlerResponseException {
+            throws RestAuthResponseException, RestAuthException {
 
         //Given
-        HttpHeaders headers = mock(HttpHeaders.class);
         HttpServletRequest request = mock(HttpServletRequest.class);
         HttpServletResponse response = mock(HttpServletResponse.class);
         X509CertificateCallback x509CertificateCallback = mock(X509CertificateCallback.class);
@@ -117,7 +114,7 @@ public class RestAuthX509CallbackHandlerTest {
         given(request.getAttribute("javax.servlet.request.X509Certificate")).willReturn(x509Certificates);
 
         //When
-        boolean updated = restAuthX509CallbackHandler.updateCallbackFromRequest(headers, request, response,
+        boolean updated = restAuthX509CallbackHandler.updateCallbackFromRequest(request, response,
                 x509CertificateCallback);
 
         //Then
@@ -129,14 +126,13 @@ public class RestAuthX509CallbackHandlerTest {
     public void shouldHandleCallback() {
 
         //Given
-        HttpHeaders headers = mock(HttpHeaders.class);
         HttpServletRequest request = mock(HttpServletRequest.class);
         HttpServletResponse response = mock(HttpServletResponse.class);
         JsonValue jsonPostBody = mock(JsonValue.class);
         X509CertificateCallback originalX509CertificateCallback = mock(X509CertificateCallback.class);
 
         //When
-        X509CertificateCallback x509CertificateCallback = restAuthX509CallbackHandler.handle(headers, request, response,
+        X509CertificateCallback x509CertificateCallback = restAuthX509CallbackHandler.handle(request, response,
                 jsonPostBody, originalX509CertificateCallback);
 
         //Then
@@ -144,7 +140,7 @@ public class RestAuthX509CallbackHandlerTest {
     }
 
     @Test (expectedExceptions = RestAuthException.class)
-    public void shouldFailConvertToJson() {
+    public void shouldFailConvertToJson() throws RestAuthException {
 
         //Given
 
@@ -156,7 +152,7 @@ public class RestAuthX509CallbackHandlerTest {
     }
 
     @Test (expectedExceptions = RestAuthException.class)
-    public void shouldFailToConvertFromJson() {
+    public void shouldFailToConvertFromJson() throws RestAuthException {
 
         //Given
 

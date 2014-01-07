@@ -11,7 +11,7 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2013 ForgeRock Inc.
+ * Copyright 2013-2014 ForgeRock AS.
  */
 
 package org.forgerock.openam.forgerockrest.authn;
@@ -27,6 +27,7 @@ import org.forgerock.json.jose.exceptions.JwtRuntimeException;
 import org.forgerock.json.jose.jws.JwsAlgorithm;
 import org.forgerock.json.jose.jws.SignedJwt;
 import org.forgerock.json.jose.jwt.JwtClaimsSet;
+import org.forgerock.json.resource.ResourceException;
 import org.forgerock.openam.forgerockrest.authn.core.AuthenticationContext;
 import org.forgerock.openam.forgerockrest.authn.core.LoginConfiguration;
 import org.forgerock.openam.forgerockrest.authn.core.wrappers.CoreServicesWrapper;
@@ -81,7 +82,7 @@ public class AuthIdHelper {
      * @throws SignatureException If there is a problem signing or verifying the JWT.
      */
     public String createAuthId(LoginConfiguration loginConfiguration, AuthenticationContext authContext)
-            throws SignatureException {
+            throws SignatureException, RestAuthException {
 
         String keyAlias = getKeyAlias(authContext.getOrgDN());
 
@@ -103,7 +104,7 @@ public class AuthIdHelper {
      * @param orgName The organisation name for the realm being authenticated against.
      * @return The key alias.
      */
-    private String getKeyAlias(String orgName) {
+    private String getKeyAlias(String orgName) throws RestAuthException {
 
         SSOToken token = coreServicesWrapper.getAdminToken();
 
@@ -120,9 +121,9 @@ public class AuthIdHelper {
                 }
             }
         } catch (SMSException e) {
-            throw new RestAuthException(Response.Status.INTERNAL_SERVER_ERROR, e);
+            throw new RestAuthException(ResourceException.INTERNAL_ERROR, e);
         } catch (SSOException e) {
-            throw new RestAuthException(Response.Status.INTERNAL_SERVER_ERROR, e);
+            throw new RestAuthException(ResourceException.INTERNAL_ERROR, e);
         }
 
         return keyAlias;
@@ -136,12 +137,12 @@ public class AuthIdHelper {
      * @return The authentication id JWT.
      * @throws SignatureException If there is a problem signing the JWT.
      */
-    private String generateAuthId(String keyAlias, Map<String, Object> jwtValues) throws SignatureException {
+    private String generateAuthId(String keyAlias, Map<String, Object> jwtValues) throws SignatureException, RestAuthException {
 
         String keyStoreAlias = keyAlias;
 
         if (keyStoreAlias == null) {
-            throw new RestAuthException(Response.Status.INTERNAL_SERVER_ERROR,
+            throw new RestAuthException(ResourceException.INTERNAL_ERROR,
                     "Could not find Key Store with alias, " + keyStoreAlias);
         }
 
@@ -170,12 +171,12 @@ public class AuthIdHelper {
      * @param authId The Auth Id jwt string
      * @return The JWT object.
      */
-    public SignedJwt reconstructAuthId(String authId) {
+    public SignedJwt reconstructAuthId(String authId) throws RestAuthException {
         try {
             return jwtBuilderFactory.reconstruct(authId, SignedJwt.class);
         } catch (JwtRuntimeException e) {
-            throw new RestAuthException(Response.Status.BAD_REQUEST, "Failed to parse JWT, " + e.getLocalizedMessage(),
-                    e);
+            throw new RestAuthException(ResourceException.BAD_REQUEST, "Failed to parse JWT, "
+                    + e.getLocalizedMessage(), e);
         }
     }
 
@@ -185,7 +186,7 @@ public class AuthIdHelper {
      * @param realmDN The DN for the realm being authenticated against.
      * @param authId The authentication id JWT.
      */
-    public void verifyAuthId(String realmDN, String authId) {
+    public void verifyAuthId(String realmDN, String authId) throws RestAuthException {
 
         String keyAlias = getKeyAlias(realmDN);
 
@@ -194,11 +195,11 @@ public class AuthIdHelper {
         try {
             boolean verified = jwtBuilderFactory.reconstruct(authId, SignedJwt.class).verify(privateKey);
             if (!verified) {
-                throw new RestAuthException(Response.Status.BAD_REQUEST, "AuthId JWT Signature not valid");
+                throw new RestAuthException(ResourceException.BAD_REQUEST, "AuthId JWT Signature not valid");
             }
         } catch (JwtRuntimeException e) {
-            throw new RestAuthException(Response.Status.BAD_REQUEST, "Failed to parse JWT, " + e.getLocalizedMessage(),
-                    e);
+            throw new RestAuthException(ResourceException.BAD_REQUEST, "Failed to parse JWT, "
+                    + e.getLocalizedMessage(), e);
         }
     }
 }

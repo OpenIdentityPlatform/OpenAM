@@ -11,18 +11,19 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2013 ForgeRock Inc.
+ * Copyright 2013-2014 ForgeRock AS.
  */
 
 package org.forgerock.openam.forgerockrest.authn.callbackhandlers;
 
 import org.forgerock.json.fluent.JsonValue;
+import org.forgerock.openam.forgerockrest.authn.exceptions.RestAuthResponseException;
+import org.forgerock.openam.forgerockrest.authn.exceptions.RestAuthException;
 import org.forgerock.openam.utils.JsonValueBuilder;
 
 import javax.security.auth.callback.TextOutputCallback;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import javax.ws.rs.core.HttpHeaders;
 
 /**
  * Defines methods to convert a TextOutputCallback to a JSON representation.
@@ -37,15 +38,15 @@ public class RestAuthTextOutputCallbackHandler extends AbstractRestAuthCallbackH
      *
      * {@inheritDoc}
      */
-    boolean doUpdateCallbackFromRequest(HttpHeaders headers, HttpServletRequest request, HttpServletResponse response,
-            TextOutputCallback callback) throws RestAuthCallbackHandlerResponseException {
+    boolean doUpdateCallbackFromRequest(HttpServletRequest request, HttpServletResponse response,
+            TextOutputCallback callback) throws RestAuthResponseException {
         return false;
     }
 
     /**
      * {@inheritDoc}
      */
-    public TextOutputCallback handle(HttpHeaders headers, HttpServletRequest request, HttpServletResponse response,
+    public TextOutputCallback handle(HttpServletRequest request, HttpServletResponse response,
             JsonValue postBody, TextOutputCallback originalCallback) {
         return originalCallback;
     }
@@ -78,7 +79,7 @@ public class RestAuthTextOutputCallbackHandler extends AbstractRestAuthCallbackH
     /**
      * {@inheritDoc}
      */
-    public TextOutputCallback convertFromJson(TextOutputCallback callback, JsonValue jsonCallback) {
+    public TextOutputCallback convertFromJson(TextOutputCallback callback, JsonValue jsonCallback) throws RestAuthException {
 
         validateCallbackType(CALLBACK_NAME, jsonCallback);
 

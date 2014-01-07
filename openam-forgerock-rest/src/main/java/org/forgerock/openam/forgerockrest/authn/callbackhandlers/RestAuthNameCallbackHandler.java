@@ -11,7 +11,7 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2013 ForgeRock AS.
+ * Copyright 2013-2014 ForgeRock AS.
  */
 
 package org.forgerock.openam.forgerockrest.authn.callbackhandlers;
@@ -20,13 +20,13 @@ import com.sun.identity.shared.debug.Debug;
 import org.apache.commons.lang.StringUtils;
 import org.forgerock.json.fluent.JsonException;
 import org.forgerock.json.fluent.JsonValue;
+import org.forgerock.openam.forgerockrest.authn.exceptions.RestAuthResponseException;
+import org.forgerock.openam.forgerockrest.authn.exceptions.RestAuthException;
 import org.forgerock.openam.utils.JsonValueBuilder;
 
 import javax.security.auth.callback.NameCallback;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import javax.ws.rs.core.HttpHeaders;
-import java.util.List;
 
 /**
  * Defines methods to update a NameCallback from the headers and request of a Rest call and methods to convert a
@@ -52,11 +52,10 @@ public class RestAuthNameCallbackHandler extends AbstractRestAuthCallbackHandler
      *
      * {@inheritDoc}
      */
-    boolean doUpdateCallbackFromRequest(HttpHeaders headers, HttpServletRequest request, HttpServletResponse response,
-            NameCallback callback) throws RestAuthCallbackHandlerResponseException {
+    boolean doUpdateCallbackFromRequest(HttpServletRequest request, HttpServletResponse response,
+            NameCallback callback) throws RestAuthResponseException {
 
-        List<String> nameHeader = headers.getRequestHeader(USERNAME_HEADER_KEY);
-        String username = nameHeader != null && nameHeader.size() > 0 ? nameHeader.get(0) : null;
+        String username = request.getHeader(USERNAME_HEADER_KEY);
 
         if (StringUtils.isEmpty(username)) {
             DEBUG.message("username not set in request.");
@@ -70,7 +69,7 @@ public class RestAuthNameCallbackHandler extends AbstractRestAuthCallbackHandler
     /**
      * {@inheritDoc}
      */
-    public NameCallback handle(HttpHeaders headers, HttpServletRequest request, HttpServletResponse response,
+    public NameCallback handle(HttpServletRequest request, HttpServletResponse response,
             JsonValue postBody, NameCallback originalCallback) {
         return originalCallback;
     }
@@ -97,7 +96,7 @@ public class RestAuthNameCallbackHandler extends AbstractRestAuthCallbackHandler
     /**
      * {@inheritDoc}
      */
-    public NameCallback convertFromJson(NameCallback callback, JsonValue jsonCallback) {
+    public NameCallback convertFromJson(NameCallback callback, JsonValue jsonCallback) throws RestAuthException {
 
         validateCallbackType(CALLBACK_NAME, jsonCallback);
 

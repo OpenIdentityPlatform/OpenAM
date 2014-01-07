@@ -11,7 +11,7 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2013 ForgeRock Inc.
+ * Copyright 2013-2014 ForgeRock AS.
  */
 
 package org.forgerock.openam.forgerockrest.authn.core;
@@ -23,9 +23,6 @@ import com.sun.identity.authentication.AuthContext;
 import com.sun.identity.authentication.service.AuthException;
 import com.sun.identity.authentication.spi.AuthLoginException;
 import com.sun.identity.idm.IdRepoException;
-import org.codehaus.jackson.JsonParseException;
-import org.codehaus.jackson.map.ObjectMapper;
-import org.forgerock.json.fluent.JsonValue;
 import org.forgerock.openam.forgerockrest.authn.core.wrappers.AuthContextLocalWrapper;
 import org.forgerock.openam.forgerockrest.authn.core.wrappers.CoreServicesWrapper;
 import org.forgerock.openam.forgerockrest.authn.exceptions.RestAuthException;
@@ -35,16 +32,19 @@ import org.testng.annotations.Test;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import javax.ws.rs.core.HttpHeaders;
-import javax.ws.rs.core.Response;
-
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
-import static org.mockito.Mockito.*;
-import static org.mockito.BDDMockito.*;
+import static org.mockito.BDDMockito.given;
+import static org.mockito.Mockito.anyObject;
+import static org.mockito.Mockito.anyString;
+import static org.mockito.Mockito.eq;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoMoreInteractions;
+import static org.mockito.Mockito.verifyZeroInteractions;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertNotNull;
 import static org.testng.Assert.assertTrue;
@@ -65,7 +65,7 @@ public class LoginAuthenticatorTest {
 
     @Test
     public void shouldGetLoginProcessForInitialRequestWithNoAuthIndexType() throws AuthException, AuthLoginException,
-            SSOException {
+            SSOException, RestAuthException {
 
         //Given
         LoginConfiguration loginConfiguration = new LoginConfiguration();
@@ -97,7 +97,7 @@ public class LoginAuthenticatorTest {
 
     @Test
     public void shouldGetLoginProcessForInitialRequestWithAuthIndexType() throws AuthException, AuthLoginException,
-            SSOException {
+            SSOException, RestAuthException {
 
         //Given
         LoginConfiguration loginConfiguration = new LoginConfiguration();
@@ -129,7 +129,7 @@ public class LoginAuthenticatorTest {
 
     @Test
     public void shouldGetLoginProcessForInitialRequestWithResourceAuthIndexType() throws AuthException,
-            AuthLoginException, SSOException {
+            AuthLoginException, SSOException, RestAuthException {
 
         //Given
         LoginConfiguration loginConfiguration = new LoginConfiguration();
@@ -163,7 +163,7 @@ public class LoginAuthenticatorTest {
 
     @Test
     public void shouldGetLoginProcessForSubsequentRequest() throws AuthException, AuthLoginException, SSOException,
-            IdRepoException {
+            IdRepoException, RestAuthException {
 
         //Given
         LoginConfiguration loginConfiguration = new LoginConfiguration();
@@ -199,7 +199,7 @@ public class LoginAuthenticatorTest {
 
     @Test
     public void shouldGetLoginProcessForInitialRequestWithAuthIndexTypeNoneWithSessionUpgradeButNotRequired()
-            throws AuthException, AuthLoginException, SSOException {
+            throws AuthException, AuthLoginException, SSOException, RestAuthException {
 
         //Given
         LoginConfiguration loginConfiguration = new LoginConfiguration();
@@ -233,7 +233,7 @@ public class LoginAuthenticatorTest {
 
     @Test
     public void shouldGetLoginProcessForInitialRequestWithAuthIndexTypeUserWithSessionUpgradeButNotRequired()
-            throws AuthException, AuthLoginException, SSOException {
+            throws AuthException, AuthLoginException, SSOException, RestAuthException {
 
         //Given
         LoginConfiguration loginConfiguration = new LoginConfiguration();
@@ -268,7 +268,7 @@ public class LoginAuthenticatorTest {
 
     @Test
     public void shouldGetLoginProcessForInitialRequestWithAuthIndexTypeRoleWithSessionUpgradeButNotRequired()
-            throws AuthException, AuthLoginException, SSOException {
+            throws AuthException, AuthLoginException, SSOException, RestAuthException {
 
         //Given
         LoginConfiguration loginConfiguration = new LoginConfiguration();
@@ -305,7 +305,7 @@ public class LoginAuthenticatorTest {
 
     @Test
     public void shouldGetLoginProcessForInitialRequestWithAuthIndexTypeServiceWithSessionUpgradeButNotRequired()
-            throws AuthException, AuthLoginException, SSOException {
+            throws AuthException, AuthLoginException, SSOException, RestAuthException {
 
         //Given
         LoginConfiguration loginConfiguration = new LoginConfiguration();
@@ -342,7 +342,7 @@ public class LoginAuthenticatorTest {
 
     @Test
     public void shouldGetLoginProcessForInitialRequestWithAuthIndexTypeModuleWithSessionUpgradeButNotRequired()
-            throws AuthException, AuthLoginException, SSOException {
+            throws AuthException, AuthLoginException, SSOException, RestAuthException {
 
         //Given
         LoginConfiguration loginConfiguration = new LoginConfiguration();
@@ -379,7 +379,7 @@ public class LoginAuthenticatorTest {
 
     @Test
     public void shouldGetLoginProcessForInitialRequestWithAuthIndexTypeLevelWithSessionUpgradeButNotRequired()
-            throws AuthException, AuthLoginException, SSOException {
+            throws AuthException, AuthLoginException, SSOException, RestAuthException {
 
         //Given
         LoginConfiguration loginConfiguration = new LoginConfiguration();
@@ -416,7 +416,7 @@ public class LoginAuthenticatorTest {
 
     @Test
     public void shouldGetLoginProcessForInitialRequestWithAuthIndexTypeUserWithSessionUpgrade()
-            throws AuthException, AuthLoginException, SSOException {
+            throws AuthException, AuthLoginException, SSOException, RestAuthException {
 
         //Given
         LoginConfiguration loginConfiguration = new LoginConfiguration();
@@ -451,7 +451,7 @@ public class LoginAuthenticatorTest {
 
     @Test
     public void shouldGetLoginProcessForInitialRequestWithAuthIndexTypeRoleWithSessionUpgrade()
-            throws AuthException, AuthLoginException, SSOException {
+            throws AuthException, AuthLoginException, SSOException, RestAuthException {
 
         //Given
         LoginConfiguration loginConfiguration = new LoginConfiguration();
@@ -488,7 +488,7 @@ public class LoginAuthenticatorTest {
 
     @Test
     public void shouldGetLoginProcessForInitialRequestWithAuthIndexTypeServiceWithSessionUpgrade()
-            throws AuthException, AuthLoginException, SSOException {
+            throws AuthException, AuthLoginException, SSOException, RestAuthException {
 
         //Given
         LoginConfiguration loginConfiguration = new LoginConfiguration();
@@ -525,7 +525,7 @@ public class LoginAuthenticatorTest {
 
     @Test
     public void shouldGetLoginProcessForInitialRequestWithAuthIndexTypeModuleWithSessionUpgrade()
-            throws AuthException, AuthLoginException, SSOException {
+            throws AuthException, AuthLoginException, SSOException, RestAuthException {
 
         //Given
         LoginConfiguration loginConfiguration = new LoginConfiguration();
@@ -562,7 +562,7 @@ public class LoginAuthenticatorTest {
 
     @Test
     public void shouldGetLoginProcessForInitialRequestWithAuthIndexTypeLevelWithSessionUpgrade()
-            throws AuthException, AuthLoginException, SSOException {
+            throws AuthException, AuthLoginException, SSOException, RestAuthException {
 
         //Given
         LoginConfiguration loginConfiguration = new LoginConfiguration();
@@ -599,7 +599,7 @@ public class LoginAuthenticatorTest {
 
     @Test
     public void shouldGetLoginProcessForInitialRequestWithAuthIndexTypeCompositeWithSessionUpgrade()
-            throws AuthException, AuthLoginException, SSOException {
+            throws AuthException, AuthLoginException, SSOException, RestAuthException {
 
         //Given
         LoginConfiguration loginConfiguration = new LoginConfiguration();
@@ -634,7 +634,7 @@ public class LoginAuthenticatorTest {
 
     @Test
     public void shouldGetLoginProcessForSubsequentRequestWithAuthIndexTypeCompositeAndSessionUpgradeSet()
-            throws AuthException, AuthLoginException, SSOException {
+            throws AuthException, AuthLoginException, SSOException, RestAuthException {
 
         //Given
         LoginConfiguration loginConfiguration = new LoginConfiguration();
@@ -698,12 +698,7 @@ public class LoginAuthenticatorTest {
 
         //Then
         assertTrue(exceptionCaught);
-        Response response = exception.getResponse();
-        assertEquals(response.getStatus(), 400);
-        ObjectMapper objectMapper = new ObjectMapper();
-        JsonValue jsonValue = new JsonValue(objectMapper.readValue((String) response.getEntity(), Map.class));
-        assertEquals(jsonValue.size(), 1);
-        assertTrue(jsonValue.isDefined("errorMessage"));
+        assertEquals(exception.getStatusCode(), 400);
     }
 
     @Test
@@ -737,12 +732,7 @@ public class LoginAuthenticatorTest {
 
         //Then
         assertTrue(exceptionCaught);
-        Response response = exception.getResponse();
-        assertEquals(response.getStatus(), 400);
-        ObjectMapper objectMapper = new ObjectMapper();
-        JsonValue jsonValue = new JsonValue(objectMapper.readValue((String) response.getEntity(), Map.class));
-        assertEquals(jsonValue.size(), 1);
-        assertTrue(jsonValue.isDefined("errorMessage"));
+        assertEquals(exception.getStatusCode(), 400);
     }
 
     @Test
@@ -777,11 +767,6 @@ public class LoginAuthenticatorTest {
 
         //Then
         assertTrue(exceptionCaught);
-        Response response = exception.getResponse();
-        assertEquals(response.getStatus(), 400);
-        ObjectMapper objectMapper = new ObjectMapper();
-        JsonValue jsonValue = new JsonValue(objectMapper.readValue((String) response.getEntity(), Map.class));
-        assertEquals(jsonValue.size(), 1);
-        assertTrue(jsonValue.isDefined("errorMessage"));
+        assertEquals(exception.getStatusCode(), 400);
     }
 }

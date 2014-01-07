@@ -11,7 +11,7 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2013 ForgeRock AS.
+ * Copyright 2013-2014 ForgeRock AS.
  */
 
 package org.forgerock.openam.forgerockrest.authn;
@@ -22,6 +22,7 @@ import com.sun.identity.authentication.spi.HttpCallback;
 import com.sun.identity.authentication.spi.RedirectCallback;
 import com.sun.identity.authentication.spi.X509CertificateCallback;
 import com.sun.identity.shared.debug.Debug;
+import org.forgerock.json.resource.ResourceException;
 import org.forgerock.openam.forgerockrest.authn.callbackhandlers.RestAuthCallbackHandler;
 import org.forgerock.openam.forgerockrest.authn.callbackhandlers.RestAuthChoiceCallbackHandler;
 import org.forgerock.openam.forgerockrest.authn.callbackhandlers.RestAuthConfirmationCallbackHandler;
@@ -85,7 +86,7 @@ public class RestAuthCallbackHandlerFactory {
      * @param <T> A class which implements the Callback interface.
      * @return The RestAuthCallbackHandler for the given Callback class.
      */
-    public <T extends Callback> RestAuthCallbackHandler getRestAuthCallbackHandler(Class<T> callbackClass) {
+    public <T extends Callback> RestAuthCallbackHandler getRestAuthCallbackHandler(Class<T> callbackClass) throws RestAuthException {
 
         if (NameCallback.class.isAssignableFrom(callbackClass)) {
             return new RestAuthNameCallbackHandler();
@@ -110,7 +111,7 @@ public class RestAuthCallbackHandlerFactory {
         }
 
         DEBUG.error(MessageFormat.format("Unsupported Callback, {0}", callbackClass.getSimpleName()));
-        throw new RestAuthException(Response.Status.INTERNAL_SERVER_ERROR,
+        throw new RestAuthException(ResourceException.INTERNAL_ERROR,
                 MessageFormat.format("Unsupported Callback, {0}", callbackClass.getSimpleName()));
     }
 }

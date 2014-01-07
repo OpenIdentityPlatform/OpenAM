@@ -11,7 +11,7 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2013 ForgeRock AS.
+ * Copyright 2013-2014 ForgeRock AS.
  */
 
 package org.forgerock.openam.forgerockrest.authn.callbackhandlers;
@@ -19,13 +19,14 @@ package org.forgerock.openam.forgerockrest.authn.callbackhandlers;
 import com.sun.identity.shared.debug.Debug;
 import org.forgerock.json.fluent.JsonException;
 import org.forgerock.json.fluent.JsonValue;
+import org.forgerock.openam.forgerockrest.authn.exceptions.RestAuthResponseException;
+import org.forgerock.openam.forgerockrest.authn.exceptions.RestAuthException;
 import org.forgerock.openam.utils.JsonObject;
 import org.forgerock.openam.utils.JsonValueBuilder;
 
 import javax.security.auth.callback.LanguageCallback;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import javax.ws.rs.core.HttpHeaders;
 import java.util.Locale;
 
 /**
@@ -43,15 +44,15 @@ public class RestAuthLanguageCallbackHandler extends AbstractRestAuthCallbackHan
      *
      * {@inheritDoc}
      */
-    boolean doUpdateCallbackFromRequest(HttpHeaders headers, HttpServletRequest request, HttpServletResponse response,
-            LanguageCallback callback) throws RestAuthCallbackHandlerResponseException {
+    boolean doUpdateCallbackFromRequest(HttpServletRequest request, HttpServletResponse response,
+            LanguageCallback callback) throws RestAuthResponseException {
         return false;
     }
 
     /**
      * {@inheritDoc}
      */
-    public LanguageCallback handle(HttpHeaders headers, HttpServletRequest request, HttpServletResponse response,
+    public LanguageCallback handle(HttpServletRequest request, HttpServletResponse response,
             JsonValue postBody, LanguageCallback originalCallback) {
         return originalCallback;
     }
@@ -104,7 +105,7 @@ public class RestAuthLanguageCallbackHandler extends AbstractRestAuthCallbackHan
     /**
      * {@inheritDoc}
      */
-    public LanguageCallback convertFromJson(LanguageCallback callback, JsonValue jsonCallback) {
+    public LanguageCallback convertFromJson(LanguageCallback callback, JsonValue jsonCallback) throws RestAuthException {
 
         validateCallbackType(CALLBACK_NAME, jsonCallback);
 
