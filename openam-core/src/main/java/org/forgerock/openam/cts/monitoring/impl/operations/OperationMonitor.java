@@ -11,10 +11,14 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2013 ForgeRock AS.
+ * Copyright 2013-2014 ForgeRock AS.
  */
 
 package org.forgerock.openam.cts.monitoring.impl.operations;
+
+import java.util.concurrent.atomic.AtomicLong;
+import org.forgerock.openam.cts.monitoring.impl.RateTimer;
+import org.forgerock.openam.cts.monitoring.impl.RateWindow;
 
 /**
  * This class maintains a cumulative count and rate for a CTS operation.
@@ -26,16 +30,16 @@ class OperationMonitor {
     private static final long SAMPLE_RATE = 1000L;
     private static final int WINDOW_SIZE = 10;
 
-    private final Timer timerGetter;
-    private final OperationRateWindow rateWindow;
+    private final RateTimer timerGetter;
+    private final RateWindow rateWindow;
 
-    private long count = 0;
+    private AtomicLong count = new AtomicLong(0);
 
     /**
      * Constructs a new instance of the OperationMonitor.
      */
     public OperationMonitor() {
-        this(new Timer());
+        this(new RateTimer());
     }
 
     /**
@@ -43,16 +47,18 @@ class OperationMonitor {
      *
      * @param timer An instance of a Timer.
      */
-    private OperationMonitor(final Timer timer) {
-        this(timer, new OperationRateWindow(timer, WINDOW_SIZE, SAMPLE_RATE));
+    private OperationMonitor(final RateTimer timer) {
+        this(timer, new RateWindow(timer, WINDOW_SIZE, SAMPLE_RATE));
     }
 
     /**
-     * Constructs a new instance of the OperationMonitor, for test use.
+     * Constructs a new instance of the OperationMonitor
+     *
+     * Default scope allows testing.
      *
      * @param timer An instance of a Timer.
      */
-    OperationMonitor(final Timer timer, final OperationRateWindow rateWindow) {
+    OperationMonitor(final RateTimer timer, final RateWindow rateWindow) {
         this.timerGetter = timer;
         this.rateWindow = rateWindow;
     }
@@ -65,7 +71,7 @@ class OperationMonitor {
      */
     void increment() {
         synchronized (this) {
-            count++;
+            count.incrementAndGet();
         }
         rateWindow.recalculate(timerGetter.now());
     }
@@ -102,21 +108,7 @@ class OperationMonitor {
      * @return The cumulative count for an operation.
      */
     long getCount() {
-        return count;
+        return count.get();
     }
 
-    /**
-     * Abstracts for the call to System.currentTimeMillis, to allow a test to mock out this call.
-     */
-    static class Timer {
-
-        /**
-         * Gets the current millis from the System.
-         *
-         * @return The current milliseconds.
-         */
-        long now() {
-            return System.currentTimeMillis();
-        }
-    }
 }

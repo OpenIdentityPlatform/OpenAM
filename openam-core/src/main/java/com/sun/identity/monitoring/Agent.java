@@ -72,6 +72,8 @@ import javax.management.RuntimeOperationsException;
 import javax.management.remote.JMXConnectorServer;
 import javax.management.remote.JMXConnectorServerFactory;
 import javax.management.remote.JMXServiceURL;
+import org.forgerock.openam.monitoring.cts.CtsConnectionFailureRate;
+import org.forgerock.openam.monitoring.cts.CtsConnectionSuccessRate;
 import org.forgerock.openam.monitoring.cts.CtsMonitoring;
 import org.forgerock.openam.monitoring.cts.FORGEROCK_OPENAM_CTS_MIB;
 import org.forgerock.openam.monitoring.cts.FORGEROCK_OPENAM_CTS_MIBImpl;
@@ -99,7 +101,7 @@ public class Agent {
     private static SnmpAdaptorServer snmpAdaptor = null;
     private static HtmlAdaptorServer htmlAdaptor = null;
     private static Debug debug;
-    
+
     /**
      * This variable defines the number of traps this agent has to send.
      * If not specified in the command line arguments, the traps will be 
@@ -154,7 +156,7 @@ public class Agent {
     private static boolean isSessFOEnabled;
 
     private static SimpleDateFormat sdf =
-        new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+            new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 
     public static final int MON_CONFIG_DISABLED   =    -1;
     public static final int MON_MBEANSRVR_PROBLEM =    -2;
@@ -193,14 +195,14 @@ public class Agent {
                 } catch (InstanceNotFoundException ex) {
                     if (debug.warningEnabled()) {
                         debug.warning(
-                            "Agent.stopRMI: error unregistering MBean:" +
-                                ex.getMessage());
+                                "Agent.stopRMI: error unregistering MBean:" +
+                                        ex.getMessage());
                     }
                 } catch (MBeanRegistrationException ex) {
                     if (debug.warningEnabled()) {
                         debug.warning(
-                            "Agent.stopRMI: error unregistering MBean:" +
-                                ex.getMessage());
+                                "Agent.stopRMI: error unregistering MBean:" +
+                                        ex.getMessage());
                     }
                 }
             }
@@ -212,11 +214,11 @@ public class Agent {
                 debug.warning("Agent.stopRMI:rmi adaptor stopped.");
             } catch (Exception ex) {
                 debug.error("Agent.stopRMI: error stopping monitoring " +
-                    " agent RMI server: ", ex);
+                        " agent RMI server: ", ex);
             }
         } else {
             debug.warning("Agent.stopRMI: cs is null, or " +
-                "monitoring or RMI port not enabled.");
+                    "monitoring or RMI port not enabled.");
         }
         if (monitoringEnabled && monSnmpPortEnabled && (snmpAdaptor != null)) {
             snmpAdaptor.stop();
@@ -279,15 +281,15 @@ public class Agent {
          */
         if (debug.messageEnabled()) {
             StringBuilder sb =
-                new StringBuilder("Agent.startMonitoringAgent:ServerInfo:\n");
+                    new StringBuilder("Agent.startMonitoringAgent:ServerInfo:\n");
             sb.append("  ServerID = ").append(ssoServerID).append("\n").
-            append("  SiteID = ").append(ssoSiteID).append("\n").
-            append("  ServerProtocol = ").append(ssoProtocol).
-                append("\n").
-            append("  ServerName = ").append(ssoName).append("\n").
-            append("  ServerURI = ").append(ssoURI).append("\n").
-            append("  IsEmbeddedDS = ").append(dsIsEmbedded).append("\n").
-            append("\n");
+                    append("  SiteID = ").append(ssoSiteID).append("\n").
+                    append("  ServerProtocol = ").append(ssoProtocol).
+                    append("\n").
+                    append("  ServerName = ").append(ssoName).append("\n").
+                    append("  ServerURI = ").append(ssoURI).append("\n").
+                    append("  IsEmbeddedDS = ").append(dsIsEmbedded).append("\n").
+                    append("\n");
 
             /*
              *  can get this server's URL from the naming table, using
@@ -295,7 +297,7 @@ public class Agent {
              */
             String svrURL = namingTable.get(ssoServerID);
             sb.append("  Naming table entry for serverID ").
-                append(ssoServerID).append(" is ");
+                    append(ssoServerID).append(" is ");
             if ((svrURL != null) && (svrURL.length() > 0)) {
                 sb.append(svrURL).append("\n");
             } else {
@@ -303,7 +305,7 @@ public class Agent {
             }
             svrURL = namingTable.get(ssoSiteID);
             sb.append("  Naming table entry for siteID ").
-                append(ssoSiteID).append(" is ");
+                    append(ssoSiteID).append(" is ");
             if ((svrURL != null) && (svrURL.length() > 0)) {
                 sb.append(svrURL).append("\n");
             } else {
@@ -324,8 +326,8 @@ public class Agent {
                     String svrid = siteIdTable.get(siteid);
                     String sURL = namingTable.get(siteid);
                     sb.append("  ").append(siteid).append('(').
-                        append(sURL).append(')').append(" = ").
-                        append(svrid).append('\n');
+                            append(sURL).append(')').append(" = ").
+                            append(svrid).append('\n');
                 }
             } else {
                 sb.append("siteIdTable is null or empty");
@@ -340,7 +342,7 @@ public class Agent {
                 sb.append("Server ID Table:\n");
                 for (Map.Entry<String, String> entry : serverIDTable.entrySet()) {
                     sb.append("  server ").append(entry.getKey()).append(" ==> svrid ").
-                        append(entry.getValue()).append("\n");
+                            append(entry.getValue()).append("\n");
                 }
             } else {
                 sb.append("ServerIdTable is null or empty");
@@ -358,7 +360,7 @@ public class Agent {
                     String svr = (String)it.next();
                     String svrid = (String)namingTable.get(svr);
                     sb.append("  key ").append(svr).append(" ==> value ").
-                        append(svrid).append("\n");
+                            append(svrid).append("\n");
                 }
             } else {
                 sb.append("NamingTable is null or empty");
@@ -374,7 +376,7 @@ public class Agent {
      *  end of AMSetupServlet/configuration).  Since web-app startup
      *  is sensitive to exceptions in load-on-startup stuff, this has
      *  quite a few try/catch blocks.
-     * 
+     *
      *  If any of HTML, SNMP, or RMI adaptors has a problem getting created
      *  or started, attempts to create/start the others will be made; If
      *  at least one adaptor is started, monitoring will be "active"
@@ -423,16 +425,16 @@ public class Agent {
          */
         if (debug.messageEnabled()) {
             debug.message(classMethod + "entry:\n" +
-                "    htmlPort = " + monHtmlPort + "\n" +
-                "    authFilePath = " + monAuthFilePath + "\n" +
-                "    snmpPort = " + monSnmpPort + "\n" +
-                "    rmiPort = " + monRmiPort + "\n" +
-                "    monEna = " + monitoringEnabled + "\n" +
-                "    htmlEna = " + monHtmlPortEnabled + "\n" +
-                "    snmpEna = " + monSnmpPortEnabled + "\n" +
-                "    rmiEna = " + monRmiPortEnabled + "\n" +
-                "    serverPort = " + serverPort + "\n"
-                );
+                    "    htmlPort = " + monHtmlPort + "\n" +
+                    "    authFilePath = " + monAuthFilePath + "\n" +
+                    "    snmpPort = " + monSnmpPort + "\n" +
+                    "    rmiPort = " + monRmiPort + "\n" +
+                    "    monEna = " + monitoringEnabled + "\n" +
+                    "    htmlEna = " + monHtmlPortEnabled + "\n" +
+                    "    snmpEna = " + monSnmpPortEnabled + "\n" +
+                    "    rmiEna = " + monRmiPortEnabled + "\n" +
+                    "    serverPort = " + serverPort + "\n"
+            );
         }
 
         if (!monitoringEnabled) {
@@ -452,24 +454,24 @@ public class Agent {
 
             if (monRmiPort == sport) {
                 debug.error(classMethod +
-                    "RMI port conflicts with OpenSSO server port (" +
-                    sport + "); Monitoring disabled.");
+                        "RMI port conflicts with OpenSSO server port (" +
+                        sport + "); Monitoring disabled.");
                 return MON_RMICONNECTOR_PROBLEM;
             }
             if (monHtmlPort == sport) {
                 monHtmlPortEnabled = false;
                 if (debug.warningEnabled()) {
                     debug.warning(classMethod +
-                        "HTML port conflicts with OpenSSO server port (" +
-                        sport + "); Monitoring HTML port disabled.");
+                            "HTML port conflicts with OpenSSO server port (" +
+                            sport + "); Monitoring HTML port disabled.");
                 }
             }
             if (monSnmpPort == sport) {
                 monSnmpPortEnabled = false;
                 if (debug.warningEnabled()) {
                     debug.warning(classMethod +
-                        "SNMP port conflicts with OpenSSO server port (" +
-                        sport + "); Monitoring SNMP port disabled.");
+                            "SNMP port conflicts with OpenSSO server port (" +
+                            sport + "); Monitoring SNMP port disabled.");
                 }
             }
         } catch (NumberFormatException nfe) {
@@ -477,19 +479,19 @@ public class Agent {
              * odd.  if serverPort's not a valid int, then there'll be
              * other problems
              */
-            debug.error(classMethod + "Server port (" + serverPort + 
-            " is invalid: " + nfe.getMessage());
+            debug.error(classMethod + "Server port (" + serverPort +
+                    " is invalid: " + nfe.getMessage());
         }
 
         if (debug.messageEnabled()) {
             debug.message(classMethod + "config:\n" +
-                "    monitoring Enabled = " + monitoringEnabled + "\n" +
-                "    HTML Port = " + monHtmlPort +
-                ", enabled = " + monHtmlPortEnabled + "\n" +
-                "    SNMP Port = " + monSnmpPort +
-                ", enabled = " + monSnmpPortEnabled + "\n" +
-                "    RMI Port = " + monRmiPort +
-                ", enabled = " + monRmiPortEnabled + "\n");
+                    "    monitoring Enabled = " + monitoringEnabled + "\n" +
+                    "    HTML Port = " + monHtmlPort +
+                    ", enabled = " + monHtmlPortEnabled + "\n" +
+                    "    SNMP Port = " + monSnmpPort +
+                    ", enabled = " + monSnmpPortEnabled + "\n" +
+                    "    RMI Port = " + monRmiPort +
+                    ", enabled = " + monRmiPortEnabled + "\n");
         }
 
         /*
@@ -508,13 +510,13 @@ public class Agent {
              */
             if (debug.warningEnabled()) {
                 debug.warning(classMethod +
-                    "findMBeanServer permission error: " + ex.getMessage());
+                        "findMBeanServer permission error: " + ex.getMessage());
             }
         }
 
         if (debug.messageEnabled()) {
             debug.message(classMethod + "MBeanServer list is not empty: " +
-                ((servers != null) && !servers.isEmpty()));
+                    ((servers != null) && !servers.isEmpty()));
         }
 
         if ((servers != null) && !servers.isEmpty()) {
@@ -525,22 +527,22 @@ public class Agent {
             } catch (SecurityException ex) {
                 if (debug.warningEnabled()) {
                     debug.warning(classMethod +
-                        "createMBeanServer permission error: " +
-                        ex.getMessage());
+                            "createMBeanServer permission error: " +
+                            ex.getMessage());
                 }
                 return MON_MBEANSRVR_PROBLEM;
             } catch (JMRuntimeException ex) {
                 if (debug.warningEnabled()) {
                     debug.warning(classMethod +
-                        "createMBeanServer JMRuntime error: " +
-                        ex.getMessage());
+                            "createMBeanServer JMRuntime error: " +
+                            ex.getMessage());
                 }
                 return MON_MBEANSRVR_PROBLEM;
             } catch (ClassCastException ex) {
                 if (debug.warningEnabled()) {
                     debug.warning(classMethod +
-                        "createMBeanServer ClassCast error: " +
-                        ex.getMessage());
+                            "createMBeanServer ClassCast error: " +
+                            ex.getMessage());
                 }
                 return MON_MBEANSRVR_PROBLEM;
             }
@@ -557,13 +559,13 @@ public class Agent {
         // Create the MIB II (RFC 1213), add to the MBean server.
         try {
             sunMibObjName =
-                new ObjectName("snmp:class=SUN_OPENSSO_SERVER_MIB");
+                    new ObjectName("snmp:class=SUN_OPENSSO_SERVER_MIB");
             forgerockCtsMibObjName =
                     new ObjectName("snmp:class=FORGEROCK_OPENAM_CTS_MIB");
             if (debug.messageEnabled()) {
                 debug.message(classMethod +
-                    "Adding SUN_OPENSSO_SERVER_MIB to MBean server " +
-                    "with name '" + sunMibObjName + "'");
+                        "Adding SUN_OPENSSO_SERVER_MIB to MBean server " +
+                        "with name '" + sunMibObjName + "'");
                 debug.message(classMethod +
                         "Adding FORGEROCK_OPENAM_CTS_MIB to MBean server " +
                         "with name '" + forgerockCtsMibObjName + "'");
@@ -572,8 +574,8 @@ public class Agent {
             // from ObjectName
             if (debug.warningEnabled()) {
                 debug.warning(classMethod +
-                    "Error getting ObjectName for the MIB: " +
-                    ex.getMessage());
+                        "Error getting ObjectName for the MIB: " +
+                        ex.getMessage());
             }
             return MON_CREATEMIB_PROBLEM;
         }
@@ -597,32 +599,32 @@ public class Agent {
             // from registerMBean
             if (debug.warningEnabled()) {
                 debug.warning(classMethod +
-                    "Null parameter or no object name for MIB specified: " +
-                    ex.getMessage());
+                        "Null parameter or no object name for MIB specified: " +
+                        ex.getMessage());
             }
             return MON_CREATEMIB_PROBLEM;
         } catch (InstanceAlreadyExistsException ex) {
             // from registerMBean
             if (debug.warningEnabled()) {
                 debug.warning(classMethod +
-                    "Error registering MIB MBean: " +
-                    ex.getMessage());
+                        "Error registering MIB MBean: " +
+                        ex.getMessage());
             }
             // probably can just continue
         } catch (MBeanRegistrationException ex) {
             // from registerMBean
             if (debug.warningEnabled()) {
                 debug.warning(classMethod +
-                    "Error registering MIB MBean: " +
-                    ex.getMessage());
+                        "Error registering MIB MBean: " +
+                        ex.getMessage());
             }
             return MON_CREATEMIB_PROBLEM;
         } catch (NotCompliantMBeanException ex) {
             // from registerMBean
             if (debug.warningEnabled()) {
                 debug.warning(classMethod +
-                    "Error registering MIB MBean: " +
-                    ex.getMessage());
+                        "Error registering MIB MBean: " +
+                        ex.getMessage());
             }
             return MON_CREATEMIB_PROBLEM;
         }
@@ -639,14 +641,14 @@ public class Agent {
             // Create and start the HTML adaptor.
             try {
                 htmlObjName = new ObjectName(domain +
-                    ":class=HtmlAdaptorServer,protocol=html,port=" +
-                    monHtmlPort);
+                        ":class=HtmlAdaptorServer,protocol=html,port=" +
+                        monHtmlPort);
 
                 if (debug.messageEnabled()) {
                     debug.message(classMethod +
-                        "Adding HTML adaptor to MBean server with name '" +
-                        htmlObjName + "'\n    " +
-                        "HTML adaptor is bound on TCP port " + monHtmlPort);
+                            "Adding HTML adaptor to MBean server with name '" +
+                            htmlObjName + "'\n    " +
+                            "HTML adaptor is bound on TCP port " + monHtmlPort);
                 }
 
                 Map<String, String> users = MonitoringUtil.getMonAuthList(monAuthFilePath);
@@ -661,8 +663,8 @@ public class Agent {
                 } else {
                     if (debug.warningEnabled()) {
                         debug.warning(classMethod +
-                            "HTML monitoring interface disabled; no " +
-                            "authentication file found");
+                                "HTML monitoring interface disabled; no " +
+                                "authentication file found");
                     }
                     htmlAdaptor = null;
                 }
@@ -670,8 +672,8 @@ public class Agent {
                 if (htmlAdaptor == null) {
                     if (debug.warningEnabled()) {
                         debug.warning(classMethod + "HTTP port " +
-                            monHtmlPort + " unavailable or invalid. " +
-                            "Monitoring HTML adaptor not started.");
+                                monHtmlPort + " unavailable or invalid. " +
+                                "Monitoring HTML adaptor not started.");
                     }
                 } else {
                     server.registerMBean(htmlAdaptor, htmlObjName);
@@ -682,8 +684,8 @@ public class Agent {
                 // from ObjectName
                 if (debug.warningEnabled()) {
                     debug.warning(classMethod +
-                        "Error getting ObjectName for HTML adaptor: " +
-                        ex.getMessage());
+                            "Error getting ObjectName for HTML adaptor: " +
+                            ex.getMessage());
                 }
             } catch (NullPointerException ex) {
                 // from ObjectName
@@ -692,34 +694,34 @@ public class Agent {
 
                 if (debug.warningEnabled()) {
                     debug.warning(classMethod +
-                        "NPE getting ObjectName for HTML adaptor: " +
-                        ex.getMessage());
+                            "NPE getting ObjectName for HTML adaptor: " +
+                            ex.getMessage());
                 }
             } catch (InstanceAlreadyExistsException ex) {
                 // from registerMBean
                 if (debug.warningEnabled()) {
                     debug.warning(classMethod +
-                        "Error registering HTML adaptor MBean: " +
-                        ex.getMessage());
+                            "Error registering HTML adaptor MBean: " +
+                            ex.getMessage());
                 }
             } catch (MBeanRegistrationException ex) {
                 // from registerMBean
                 if (debug.warningEnabled()) {
                     debug.warning(classMethod +
-                        "Error registering HTML adaptor MBean: " +
-                        ex.getMessage());
+                            "Error registering HTML adaptor MBean: " +
+                            ex.getMessage());
                 }
             } catch (NotCompliantMBeanException ex) {
                 // from registerMBean
                 if (debug.warningEnabled()) {
                     debug.warning(classMethod +
-                        "Error registering HTML adaptor MBean: " +
-                        ex.getMessage());
+                            "Error registering HTML adaptor MBean: " +
+                            ex.getMessage());
                 }
             }
         } else {
             debug.warning(classMethod +
-                "Monitoring HTML port not enabled in configuration.");
+                    "Monitoring HTML port not enabled in configuration.");
         }
 
         // SNMP port adaptor
@@ -731,22 +733,22 @@ public class Agent {
              * The standard port for SNMP is 161.
              */
             try {
-                snmpObjName = new ObjectName(domain + 
-                    ":class=SnmpAdaptorServer,protocol=snmp,port=" +
-                    monSnmpPort);
+                snmpObjName = new ObjectName(domain +
+                        ":class=SnmpAdaptorServer,protocol=snmp,port=" +
+                        monSnmpPort);
 
                 if (debug.messageEnabled()) {
                     debug.message(classMethod +
-                        "Adding SNMP adaptor to MBean server with name '" +
-                        snmpObjName + "'\n    " +
-                        "SNMP Adaptor is bound on UDP port " + monSnmpPort);
+                            "Adding SNMP adaptor to MBean server with name '" +
+                            snmpObjName + "'\n    " +
+                            "SNMP Adaptor is bound on UDP port " + monSnmpPort);
                 }
 
                 snmpAdaptor = new SnmpAdaptorServer(monSnmpPort); // no exc
                 if (snmpAdaptor == null) {
                     if (debug.warningEnabled()) {
                         debug.warning(classMethod +
-                            "Unable to get SNMP adaptor.");
+                                "Unable to get SNMP adaptor.");
                     }
                 } else {
                     server.registerMBean(snmpAdaptor, snmpObjName);
@@ -758,8 +760,8 @@ public class Agent {
                      */
                     if (debug.messageEnabled()) {
                         debug.message(classMethod +
-                            "Sending a coldStart SNMP trap to each " +
-                            "destination defined in the ACL file...");
+                                "Sending a coldStart SNMP trap to each " +
+                                "destination defined in the ACL file...");
                     }
 
                     snmpAdaptor.setTrapPort(new Integer(monSnmpPort+1));
@@ -785,18 +787,18 @@ public class Agent {
             } catch (Exception ex) {
                 if (debug.warningEnabled()) {
                     debug.warning(classMethod +
-                        "Error while setting up SNMP adaptor " +
-                        ex.getMessage());
+                            "Error while setting up SNMP adaptor " +
+                            ex.getMessage());
                 }
                 if (ex instanceof IOException || ex instanceof SnmpStatusException) {
-                     // should be from the snmpV1Trap call, which
-                     //*shouldn't* affect the rest of snmp operations...
+                    // should be from the snmpV1Trap call, which
+                    //*shouldn't* affect the rest of snmp operations...
                     monSNMPStarted = true;
                 }
             }
         } else {
             debug.warning(classMethod +
-                "Monitoring SNMP port not enabled.");
+                    "Monitoring SNMP port not enabled.");
         }
 
         // RMI port adaptor
@@ -805,10 +807,10 @@ public class Agent {
             try {
                 registry = LocateRegistry.createRegistry(monRmiPort);
                 JMXServiceURL url = new JMXServiceURL(
-                    "service:jmx:rmi:///jndi/rmi://localhost:" +
-                    monRmiPort + "/server");
+                        "service:jmx:rmi:///jndi/rmi://localhost:" +
+                                monRmiPort + "/server");
                 cs = JMXConnectorServerFactory.newJMXConnectorServer(
-                    url, null, server);
+                        url, null, server);
                 cs.start();
 
                 monRMIStarted = true;
@@ -838,8 +840,8 @@ public class Agent {
                  */
                 if (debug.warningEnabled()) {
                     debug.warning(classMethod +
-                        "Error getting JMXServiceURL or JMXConnectorServer " +
-                        "for RMI adaptor: " + ex.getMessage());
+                            "Error getting JMXServiceURL or JMXConnectorServer " +
+                            "for RMI adaptor: " + ex.getMessage());
                 }
             } catch (NullPointerException ex) {
                 /*
@@ -848,8 +850,8 @@ public class Agent {
                  */
                 if (debug.warningEnabled()) {
                     debug.warning(classMethod +
-                        "Error getting JMXServiceURL or JMXConnectorServer " +
-                        "for RMI adaptor: " + ex.getMessage());
+                            "Error getting JMXServiceURL or JMXConnectorServer " +
+                            "for RMI adaptor: " + ex.getMessage());
                 }
             } catch (IOException ex) {
                 /*
@@ -858,15 +860,15 @@ public class Agent {
                  */
                 if (debug.warningEnabled()) {
                     debug.warning(classMethod +
-                        "Error getting JMXConnectorServer for, or starting " +
-                        "RMI adaptor: " + ex.getMessage());
+                            "Error getting JMXConnectorServer for, or starting " +
+                            "RMI adaptor: " + ex.getMessage());
                 }
             } catch (IllegalStateException ex) {
                 // from JMXConnectorServer.start
                 if (debug.warningEnabled()) {
                     debug.warning(classMethod +
-                        "Illegal State Error from JMXConnectorServer for " +
-                        "RMI adaptor: " + ex.getMessage());
+                            "Illegal State Error from JMXConnectorServer for " +
+                            "RMI adaptor: " + ex.getMessage());
                 }
             } catch (Exception ex) {
                 /*
@@ -874,8 +876,8 @@ public class Agent {
                  * NullPointerException already caught
                  */
                 debug.error(classMethod +
-                    "Error starting RMI: executing rmiregistry " +
-                    monRmiPort + ".", ex);
+                        "Error starting RMI: executing rmiregistry " +
+                        monRmiPort + ".", ex);
             }
         } else {
             debug.warning(classMethod + "Monitoring RMI port not enabled.");
@@ -888,7 +890,7 @@ public class Agent {
          */
         if (!monRMIStarted && !monSNMPStarted && !monHTMLStarted) {
             debug.warning(classMethod +
-                "No Monitoring interfaces started; monitoring disabled.");
+                    "No Monitoring interfaces started; monitoring disabled.");
             return MON_RMICONNECTOR_PROBLEM;
         } else {
             agentStarted = true;  // if all/enough has gone well
@@ -985,6 +987,20 @@ public class Agent {
      */
     public static CtsMonitoring getCtsMonitoringMBean() {
         return forgerockCtsMib == null ? null : forgerockCtsMib.getCtsMonitoringGroup();
+    }
+
+    /**
+     *  Return the pointer to the CtsConnectionFailureRate mbean
+     */
+    public static CtsConnectionFailureRate getCtsConnectionFailureRateMBean() {
+        return forgerockCtsMib == null ? null : forgerockCtsMib.getCtsConnectionFailureRate();
+    }
+
+    /**
+     *  Return the pointer to the CtsConnectionFailureRate mbean
+     */
+    public static CtsConnectionSuccessRate getCtsConnectionSuccessRateMBean() {
+        return forgerockCtsMib == null ? null : forgerockCtsMib.getCtsConnectionSuccessRate();
     }
 
     /**
@@ -1121,7 +1137,7 @@ public class Agent {
 
             for (Map.Entry<String, String> entry : sNames.entrySet()) {
                 sb.append("    siteName = ").append(entry.getKey()).
-                    append(", primary URL = ").append(entry.getValue()).append("\n");
+                        append(", primary URL = ").append(entry.getValue()).append("\n");
 
             }
             debug.message(classMethod + sb.toString());
@@ -1150,27 +1166,27 @@ public class Agent {
                     sid = Integer.valueOf(siteId);
                 } catch (NumberFormatException nfe) {
                     debug.error(classMethod + "invalid siteid (" +
-                        siteId + "): " + nfe.getMessage(), nfe);
+                            siteId + "): " + nfe.getMessage(), nfe);
                 }
                 ssse.SiteId = sid;
                 ssse.SiteName = escSiteName;
 
                 if (debug.messageEnabled()) {
                     debug.message(classMethod + "doing siteName " + siteName +
-                        ", svrURL = " + svrURL);
+                            ", svrURL = " + svrURL);
                 }
 
                 final ObjectName stName =
-                    ssse.createSsoServerSitesEntryObjectName(server);
+                        ssse.createSsoServerSitesEntryObjectName(server);
                 if (stName == null) {
                     debug.error(classMethod +
-                        "Error creating object for siteName '" + siteName +
-                        "'");
+                            "Error creating object for siteName '" + siteName +
+                            "'");
                     continue;
                 }
                 try {
                     TableSsoServerSitesTable stTbl =
-                        tg.accessSsoServerSitesTable();
+                            tg.accessSsoServerSitesTable();
                     stTbl.addEntry(ssse, stName);
                     if ((server != null) && (stName != null)) {
                         server.registerMBean(ssse, stName);
@@ -1180,7 +1196,7 @@ public class Agent {
                 }
             } else { // is a server
                 SsoServerSiteMapEntryImpl ssse =
-                    new SsoServerSiteMapEntryImpl(sunMib);
+                        new SsoServerSiteMapEntryImpl(sunMib);
                 ssse.MapServerURL = namingTable.get(svrId);
                 ssse.MapSiteName = escSiteName;
                 ssse.MapId = siteId;
@@ -1188,29 +1204,29 @@ public class Agent {
                     ssse.SiteMapId = Integer.valueOf(svrId);
                 } catch (NumberFormatException nfe) {
                     debug.error(classMethod + "invalid serverID (" +
-                        svrId + "): " + nfe.getMessage(), nfe);
+                            svrId + "): " + nfe.getMessage(), nfe);
                     continue;
                 }
                 ssse.SiteMapIndex = new Integer(i++);
                 final ObjectName smName =
-                    ssse.createSsoServerSiteMapEntryObjectName(server);
+                        ssse.createSsoServerSiteMapEntryObjectName(server);
 
                 if (smName == null) {
                     debug.error(classMethod +
-                        "Error creating object for server siteName '" +
-                        siteName + "'");
+                            "Error creating object for server siteName '" +
+                            siteName + "'");
                     continue;
                 }
 
                 if (debug.messageEnabled()) {
                     debug.message(classMethod +
-                        "doing servermap entry; sitemapid = " + svrId +
-                        ", mapid = " + siteId + ", siteName = " + siteName);
+                            "doing servermap entry; sitemapid = " + svrId +
+                            ", mapid = " + siteId + ", siteName = " + siteName);
                 }
 
                 try {
                     TableSsoServerSiteMapTable stTbl =
-                        tg.accessSsoServerSiteMapTable();
+                            tg.accessSsoServerSiteMapTable();
                     stTbl.addEntry(ssse, smName);
                     if ((server != null) && (smName != null)) {
                         server.registerMBean(ssse, smName);
@@ -1225,10 +1241,10 @@ public class Agent {
             String stDate = sdf.format(startDate);
             String endDate = sdf.format(stopDate);
             debug.message("Agent.siteNames:\n    Start Time = " +
-                stDate + "\n      End Time = " + endDate);
+                    stDate + "\n      End Time = " + endDate);
         }
     }
- 
+
     /**
      *  receive ordered list of realms
      */
@@ -1241,7 +1257,7 @@ public class Agent {
          */
         Date startDate = new Date();
         StringBuilder sb =
-            new StringBuilder("receiving list of realms (size = ");
+                new StringBuilder("receiving list of realms (size = ");
         sb.append(realmList.size()).append("):\n");
         SsoServerInstanceImpl sig = sunMib.getSvrInstanceGroup();
         TableSsoServerRealmTable rtab = null;
@@ -1251,7 +1267,7 @@ public class Agent {
             } catch (SnmpStatusException ex) {
                 debug.error(classMethod + "getting realm table: ", ex);
                 return -1;
-            } 
+            }
         }
         int realmsAdded = 0;
         for (int i = 0; i < realmList.size(); i++) {
@@ -1265,14 +1281,14 @@ public class Agent {
 
             if (oname == null) {
                 debug.error(classMethod + "Error creating object for realm '" +
-                   ss + "'");
+                        ss + "'");
                 continue;
             }
 
             String rlmToDN = DNMapper.orgNameToDN(ss);
 
             sb.append("  realm #").append(i).append(" = ").append(ss).
-                append(", DN = ").append(rlmToDN).append("\n");
+                    append(", DN = ").append(rlmToDN).append("\n");
             /*
              * each realm gets a realm-to-index, index-to-realm,
              * realm-to-DN and DN-to-realm map entry
@@ -1321,27 +1337,27 @@ public class Agent {
             if (esi != null) {
                 try {
                     TableSsoServerEntitlementExecStatsTable etab =
-                        esi.accessSsoServerEntitlementExecStatsTable();
+                            esi.accessSsoServerEntitlementExecStatsTable();
 
                     for (int i = 0; i < nms.length; i++) {
                         String str = nms[i];
                         SsoServerEntitlementExecStatsEntryImpl ssi =
-                            new SsoServerEntitlementExecStatsEntryImpl(sunMib);
+                                new SsoServerEntitlementExecStatsEntryImpl(sunMib);
                         ssi.EntitlementNetworkMonitorName = str;
                         ssi.EntitlementMonitorThruPut = 0L;
                         ssi.EntitlementMonitorTotalTime = 0L;
                         ssi.EntitlementNetworkMonitorIndex = Integer.valueOf(i+1);
 
                         ObjectName sname =
-                            ssi.
-                            createSsoServerEntitlementExecStatsEntryObjectName(
-                            server);
+                                ssi.
+                                        createSsoServerEntitlementExecStatsEntryObjectName(
+                                                server);
 
                         if (sname == null) {
                             debug.error(classMethod +
-                                "Error creating object for Entitlements " +
-                                "Network Monitor '" + str + "'");
-                                   continue;
+                                    "Error creating object for Entitlements " +
+                                    "Network Monitor '" + str + "'");
+                            continue;
                         }
 
                         try {
@@ -1351,43 +1367,43 @@ public class Agent {
                             }
                         } catch (JMException ex) {
                             debug.error(classMethod +
-                                "on Entitlements Network Monitor '" +
-                                str + "': ", ex);
+                                    "on Entitlements Network Monitor '" +
+                                    str + "': ", ex);
                         } catch (SnmpStatusException ex) {
                             debug.error(classMethod +
-                                "on Entitlements Network Monitor '" +
-                                str + "': ", ex);
+                                    "on Entitlements Network Monitor '" +
+                                    str + "': ", ex);
                         }
                     }
                 } catch (SnmpStatusException ex) {
                     debug.error(classMethod +
-                        "Can't get Network Monitor Table: " +
-                        ex.getMessage());
+                            "Can't get Network Monitor Table: " +
+                            ex.getMessage());
                 }
 
                 // now the realm-based policy stats
 
                 try {
                     TableSsoServerEntitlementPolicyStatsTable ptab =
-                        esi.accessSsoServerEntitlementPolicyStatsTable();
+                            esi.accessSsoServerEntitlementPolicyStatsTable();
                     for (int i = 0; i < realmList.size(); i++) {
                         String ss = realmList.get(i);
                         Integer Ii = Integer.valueOf(i+1);
                         SsoServerEntitlementPolicyStatsEntryImpl ssi =
-                            new SsoServerEntitlementPolicyStatsEntryImpl(sunMib);
+                                new SsoServerEntitlementPolicyStatsEntryImpl(sunMib);
                         ssi.EntitlementPolicyCaches = 0;
                         ssi.EntitlementReferralCaches = 0;
                         ssi.EntitlementPolicyStatsIndex = Integer.valueOf(i+1);
                         ssi.SsoServerRealmIndex = Ii;
                         ObjectName sname =
-                          ssi.
-                          createSsoServerEntitlementPolicyStatsEntryObjectName(
-                              server);
+                                ssi.
+                                        createSsoServerEntitlementPolicyStatsEntryObjectName(
+                                                server);
 
                         if (sname == null) {
                             debug.error(classMethod +
-                                "Error creating object for Entitlements " +
-                                "Policy Stats, realm = '" + ss + "'");
+                                    "Error creating object for Entitlements " +
+                                    "Policy Stats, realm = '" + ss + "'");
                             continue;
                         }
 
@@ -1398,22 +1414,22 @@ public class Agent {
                             }
                         } catch (JMException ex) {
                             debug.error(classMethod +
-                                "on Entitlements Policy Stats '" +
-                                ss + "': ", ex);
+                                    "on Entitlements Policy Stats '" +
+                                    ss + "': ", ex);
                         } catch (SnmpStatusException ex) {
                             debug.error(classMethod +
-                                "on Entitlements Policy Stats '" +
-                                ss + "': ", ex);
+                                    "on Entitlements Policy Stats '" +
+                                    ss + "': ", ex);
                         }
                     }
                 } catch (SnmpStatusException ex) {
                     debug.error(classMethod +
-                        "getting Entitlements Policy Stats table: ", ex);
+                            "getting Entitlements Policy Stats table: ", ex);
                 }
             }
         } else {
             debug.error(classMethod +
-                "Entitlement NetworkMonitor list empty.");
+                    "Entitlement NetworkMonitor list empty.");
         }
 
         Date stopDate = new Date();
@@ -1421,7 +1437,7 @@ public class Agent {
             String stDate = sdf.format(startDate);
             String endDate = sdf.format(stopDate);
             debug.message("Agent.realmsConfig:\n    Start Time = " +
-                stDate + "\n      End Time = " + endDate);
+                    stDate + "\n      End Time = " + endDate);
         }
         return 0;
     }
@@ -1437,7 +1453,7 @@ public class Agent {
         Integer realmIndex = realm2Index.get(realm);
         if (realmIndex == null) {
             debug.error(classMethod + "could not find realm " + realm +
-                " in realm2Index map");
+                    " in realm2Index map");
             return -1;
         }
         SsoServerAuthSvcImpl sig = sunMib.getAuthSvcGroup();
@@ -1448,14 +1464,14 @@ public class Agent {
             } catch (SnmpStatusException ex) {
                 debug.error(classMethod + "getting auth table: ", ex);
                 return -2;
-            } 
+            }
         }
 
         StringBuilder sb = new StringBuilder();
-        
+
         if (debug.messageEnabled()) {
             sb.append("receiving config info for realm = ").
-                append(realm).append(":\n  Authentication Modules:\n");
+                    append(realm).append(":\n  Authentication Modules:\n");
         }
         
         /*
@@ -1468,10 +1484,10 @@ public class Agent {
 
             if (debug.messageEnabled()) {
                 sb.append("    instance = ").append(modInst).
-                    append(", value(type) = ").append(modType).append("\n");
+                        append(", value(type) = ").append(modType).append("\n");
             }
             SsoServerAuthModulesEntryImpl aei =
-                new SsoServerAuthModulesEntryImpl(sunMib);
+                    new SsoServerAuthModulesEntryImpl(sunMib);
             aei.SsoServerRealmIndex = realmIndex;
             aei.AuthModuleIndex = new Integer(i++);
             aei.AuthModuleName = modInst;
@@ -1479,12 +1495,12 @@ public class Agent {
             aei.AuthModuleSuccessCount = 0L;
             aei.AuthModuleFailureCount = 0L;
             ObjectName aname =
-                aei.createSsoServerAuthModulesEntryObjectName(server);
+                    aei.createSsoServerAuthModulesEntryObjectName(server);
 
             if (aname == null) {
                 debug.error(classMethod +
-                    "Error creating object for auth module name '" +
-                    modInst + "', type '" + modType + "'");
+                        "Error creating object for auth module name '" +
+                        modInst + "', type '" + modType + "'");
                 continue;
             }
 
@@ -1557,7 +1573,7 @@ public class Agent {
         if ((agtAttrs == null) || agtAttrs.isEmpty()) {
             if (debug.messageEnabled()) {
                 debug.message(classMethod + "got null attr map for realm " +
-                    realm);
+                        realm);
             }
             return;
         }
@@ -1605,7 +1621,7 @@ public class Agent {
 
         if (debug.messageEnabled()) {
             sb.append("agents for realm ").append(realm).append(", # = ").
-                append(agtAttrs.size()).append("\n");
+                    append(agtAttrs.size()).append("\n");
         }
 
         int wai = 1;  // index for web agents
@@ -1623,7 +1639,7 @@ public class Agent {
          */
         if (ri == null) {
             debug.error(classMethod + "didn't find index for realm " +
-                realm);
+                    realm);
             return;
         }
 
@@ -1643,16 +1659,16 @@ public class Agent {
 
             if (debug.messageEnabled()) {
                 sb.append("  agent name = ").append(agtname).
-                    append(", type = ").append(atype).
-                    append(", membership = ").append(grpmem).append("\n");
+                        append(", type = ").append(atype).
+                        append(", membership = ").append(grpmem).append("\n");
             }
-        
+
             if (atype.equals("WebAgent")) {
                 String aurl = hm.get(
                         "com.sun.identity.agents.config.agenturi.prefix");
                 String lurl = hm.get("com.sun.identity.agents.config.login.url");
                 SsoServerPolicyWebAgentEntryImpl aei =
-                    new SsoServerPolicyWebAgentEntryImpl(sunMib);
+                        new SsoServerPolicyWebAgentEntryImpl(sunMib);
                 aei.SsoServerRealmIndex = ri;
                 aei.PolicyWebAgentIndex = new Integer(wai++);
                 aei.PolicyWebAgentName = agtname;
@@ -1660,12 +1676,12 @@ public class Agent {
                 aei.PolicyWebAgentAgentURL = aurl;
                 aei.PolicyWebAgentServerURL = lurl;
                 ObjectName aname =
-                    aei.createSsoServerPolicyWebAgentEntryObjectName(server);
-        
+                        aei.createSsoServerPolicyWebAgentEntryObjectName(server);
+
                 if (aname == null) {
                     debug.error(classMethod +
-                        "Error creating object for Policy WebAgent '" +
-                        agtname + "'");
+                            "Error creating object for Policy WebAgent '" +
+                            agtname + "'");
                     continue;
                 }
 
@@ -1681,18 +1697,18 @@ public class Agent {
                 }
             } else if (atype.equals("2.2_Agent")) {
                 SsoServerPolicy22AgentEntryImpl aei =
-                    new SsoServerPolicy22AgentEntryImpl(sunMib);
+                        new SsoServerPolicy22AgentEntryImpl(sunMib);
                 aei.SsoServerRealmIndex = ri;
                 aei.Policy22AgentIndex = new Integer(t22i++);
                 aei.Policy22AgentName = agtname;
 
                 ObjectName aname =
-                    aei.createSsoServerPolicy22AgentEntryObjectName(server);
+                        aei.createSsoServerPolicy22AgentEntryObjectName(server);
 
                 if (aname == null) {
                     debug.error(classMethod +
-                        "Error creating object for Policy 2.2 Agent '" +
-                        agtname + "'");
+                            "Error creating object for Policy 2.2 Agent '" +
+                            agtname + "'");
                     continue;
                 }
 
@@ -1708,14 +1724,14 @@ public class Agent {
                 }
             } else if (atype.equals("J2EEAgent")) {
                 SsoServerPolicyJ2EEAgentEntryImpl aei =
-                    new SsoServerPolicyJ2EEAgentEntryImpl(sunMib);
+                        new SsoServerPolicyJ2EEAgentEntryImpl(sunMib);
                 String aurl =
-                    hm.get("com.sun.identity.client.notification.url");
+                        hm.get("com.sun.identity.client.notification.url");
                 if (aurl == null) {
                     aurl = None;
                 }
                 String lurl =
-                    hm.get("com.sun.identity.agents.config.login.url");
+                        hm.get("com.sun.identity.agents.config.login.url");
                 aei.PolicyJ2EEAgentGroup = grpmem;
                 aei.PolicyJ2EEAgentAgentURL = aurl;
                 aei.PolicyJ2EEAgentServerURL = lurl;
@@ -1723,12 +1739,12 @@ public class Agent {
                 aei.PolicyJ2EEAgentIndex = new Integer(j2eei++);
                 aei.SsoServerRealmIndex = ri;
                 ObjectName aname =
-                    aei.createSsoServerPolicyJ2EEAgentEntryObjectName(server);
+                        aei.createSsoServerPolicyJ2EEAgentEntryObjectName(server);
 
                 if (aname == null) {
                     debug.error(classMethod +
-                        "Error creating object for Policy J2EE Agent '" +
-                        agtname + "'");
+                            "Error creating object for Policy J2EE Agent '" +
+                            agtname + "'");
                     continue;
                 }
 
@@ -1744,7 +1760,7 @@ public class Agent {
                 }
             } else if (atype.equals("WSPAgent")) {
                 SsoServerWSSAgentsWSPAgentEntryImpl aei =
-                    new SsoServerWSSAgentsWSPAgentEntryImpl(sunMib);
+                        new SsoServerWSSAgentsWSPAgentEntryImpl(sunMib);
                 String wep = hm.get("wsendpoint");
                 if (wep == null) {
                     wep = NotAvail;
@@ -1764,12 +1780,12 @@ public class Agent {
                 aei.SsoServerRealmIndex = ri;
                 // no entry for group membership...
                 ObjectName aname =
-                    aei.createSsoServerWSSAgentsWSPAgentEntryObjectName(server);
+                        aei.createSsoServerWSSAgentsWSPAgentEntryObjectName(server);
 
                 if (aname == null) {
                     debug.error(classMethod +
-                        "Error creating object for Policy WSP Agent '" +
-                        agtname + "'");
+                            "Error creating object for Policy WSP Agent '" +
+                            agtname + "'");
                     continue;
                 }
 
@@ -1781,9 +1797,9 @@ public class Agent {
                         }
                     } else {
                         debug.error(classMethod + "WSPAgent: agtname = " +
-                            agtname + ", wep = " + wep +
-                            ", wpep = " + wpep + ", mgrp = " + mgrp +
-                            ", realm = " + realm);
+                                agtname + ", wep = " + wep +
+                                ", wpep = " + wpep + ", mgrp = " + mgrp +
+                                ", realm = " + realm);
                     }
                 } catch (JMException ex) {
                     debug.error(classMethod + agtname + ": " + ex.getMessage());
@@ -1792,7 +1808,7 @@ public class Agent {
                 }
             } else if (atype.equals("WSCAgent")) {
                 SsoServerWSSAgentsWSCAgentEntryImpl aei =
-                    new SsoServerWSSAgentsWSCAgentEntryImpl(sunMib);
+                        new SsoServerWSSAgentsWSCAgentEntryImpl(sunMib);
                 String wep = hm.get("wsendpoint");
                 if (wep == null) {
                     wep = None;
@@ -1812,12 +1828,12 @@ public class Agent {
                 aei.SsoServerRealmIndex = ri;
                 // no entry for group membership...
                 ObjectName aname =
-                    aei.createSsoServerWSSAgentsWSCAgentEntryObjectName(server);
+                        aei.createSsoServerWSSAgentsWSCAgentEntryObjectName(server);
 
                 if (aname == null) {
                     debug.error(classMethod +
-                        "Error creating object for Policy WSC Agent '" +
-                        agtname + "'");
+                            "Error creating object for Policy WSC Agent '" +
+                            agtname + "'");
                     continue;
                 }
 
@@ -1833,7 +1849,7 @@ public class Agent {
                 }
             } else if (atype.equals("STSAgent")) {
                 SsoServerWSSAgentsSTSAgentEntryImpl aei =
-                    new SsoServerWSSAgentsSTSAgentEntryImpl(sunMib);
+                        new SsoServerWSSAgentsSTSAgentEntryImpl(sunMib);
                 String sep = hm.get("stsendpoint");
                 aei.WssAgentsSTSAgentName = agtname;
                 aei.WssAgentsSTSAgentSvcTokenEndPoint = sep;
@@ -1843,12 +1859,12 @@ public class Agent {
                 // no entry for group membership...
 
                 ObjectName aname =
-                    aei.createSsoServerWSSAgentsSTSAgentEntryObjectName(server);
+                        aei.createSsoServerWSSAgentsSTSAgentEntryObjectName(server);
 
                 if (aname == null) {
                     debug.error(classMethod +
-                        "Error creating object for Policy STS Agent '" +
-                        agtname + "'");
+                            "Error creating object for Policy STS Agent '" +
+                            agtname + "'");
                     continue;
                 }
 
@@ -1864,7 +1880,7 @@ public class Agent {
                 }
             } else if (atype.equals("DiscoveryAgent")) {
                 SsoServerWSSAgentsDSCAgentEntryImpl aei =
-                    new SsoServerWSSAgentsDSCAgentEntryImpl(sunMib);
+                        new SsoServerWSSAgentsDSCAgentEntryImpl(sunMib);
                 String dep = hm.get("discoveryendpoint");
                 if (dep == null) {
                     dep = NotAvail;
@@ -1880,12 +1896,12 @@ public class Agent {
                 aei.SsoServerRealmIndex = ri;
                 // no entry for group membership...
                 ObjectName aname =
-                    aei.createSsoServerWSSAgentsDSCAgentEntryObjectName(server);
+                        aei.createSsoServerWSSAgentsDSCAgentEntryObjectName(server);
 
                 if (aname == null) {
                     debug.error(classMethod +
-                        "Error creating object for Policy Discovery Agent '" +
-                        agtname + "'");
+                            "Error creating object for Policy Discovery Agent '" +
+                            agtname + "'");
                     continue;
                 }
 
@@ -1903,7 +1919,7 @@ public class Agent {
                 // SharedAgent type are agent authenticators
             } else {
                 debug.error(classMethod + "agent type = " + atype +
-                    ", agent name = " + agtname + " not supported.");
+                        ", agent name = " + agtname + " not supported.");
             }
         }
         if (debug.messageEnabled()) {
@@ -1945,7 +1961,7 @@ public class Agent {
         if ((agtAttrs == null) || agtAttrs.isEmpty()) {
             if (debug.messageEnabled()) {
                 debug.message(classMethod + "got null attr map for realm " +
-                    realm);
+                        realm);
             }
             return;
         }
@@ -1969,7 +1985,7 @@ public class Agent {
                 wgtab = sss.accessSsoServerPolicyWebGroupTable();
             } catch (SnmpStatusException ex) {
                 debug.error(classMethod +
-                    "getting Agent Groups tables: ", ex);
+                        "getting Agent Groups tables: ", ex);
                 return; // can't do anything without the tables
             }
         }
@@ -1981,7 +1997,7 @@ public class Agent {
                 dsctab = ssa.accessSsoServerWSSAgentsDSCAgtGrpTable();
             } catch (SnmpStatusException ex) {
                 debug.error(classMethod +
-                    "getting WSS Agent Groups tables: ", ex);
+                        "getting WSS Agent Groups tables: ", ex);
                 return; // can't do anything without the tables
             }
         }
@@ -1989,7 +2005,7 @@ public class Agent {
         StringBuilder sb = new StringBuilder(classMethod);
         if (debug.messageEnabled()) {
             sb.append("agents for realm ").append(realm).append(", # = ").
-                append(agtAttrs.size()).append("\n");
+                    append(agtAttrs.size()).append("\n");
         }
 
         int wai = 1;  // index for web agent groups
@@ -2006,7 +2022,7 @@ public class Agent {
          */
         if (ri == null) {
             debug.error(classMethod + "didn't find index for realm " +
-                realm);
+                    realm);
             return;
         }
 
@@ -2017,7 +2033,7 @@ public class Agent {
 
             if (debug.messageEnabled()) {
                 sb.append("  agent group name = ").append(agtname).
-                    append(", type = ").append(atype).append("\n");
+                        append(", type = ").append(atype).append("\n");
             }
 
             agtname = getEscapedString(agtname);
@@ -2027,20 +2043,20 @@ public class Agent {
                     continue;  // no table to put it into
                 }
                 String lurl =
-                    hm.get("com.sun.identity.agents.config.login.url");
+                        hm.get("com.sun.identity.agents.config.login.url");
                 SsoServerPolicyWebGroupEntryImpl aei =
-                    new SsoServerPolicyWebGroupEntryImpl(sunMib);
+                        new SsoServerPolicyWebGroupEntryImpl(sunMib);
                 aei.SsoServerRealmIndex = ri;
                 aei.PolicyWebGroupIndex = new Integer(wai++);
                 aei.PolicyWebGroupName = agtname;
                 aei.PolicyWebGroupServerURL = lurl;
                 ObjectName aname =
-                    aei.createSsoServerPolicyWebGroupEntryObjectName(server);
+                        aei.createSsoServerPolicyWebGroupEntryObjectName(server);
 
                 if (aname == null) {
                     debug.error(classMethod +
-                        "Error creating object for Policy Web Agent Group '" +
-                        agtname + "'");
+                            "Error creating object for Policy Web Agent Group '" +
+                            agtname + "'");
                     continue;
                 }
 
@@ -2059,20 +2075,20 @@ public class Agent {
                     continue;  // no table to put it into
                 }
                 SsoServerPolicyJ2EEGroupEntryImpl aei =
-                    new SsoServerPolicyJ2EEGroupEntryImpl(sunMib);
+                        new SsoServerPolicyJ2EEGroupEntryImpl(sunMib);
                 String lurl =
-                    hm.get("com.sun.identity.agents.config.login.url");
+                        hm.get("com.sun.identity.agents.config.login.url");
                 aei.PolicyJ2EEGroupServerURL = lurl;
                 aei.PolicyJ2EEGroupName = agtname;
                 aei.PolicyJ2EEGroupIndex = new Integer(j2eei++);
                 aei.SsoServerRealmIndex = ri;
                 ObjectName aname =
-                    aei.createSsoServerPolicyJ2EEGroupEntryObjectName(server);
+                        aei.createSsoServerPolicyJ2EEGroupEntryObjectName(server);
 
                 if (aname == null) {
                     debug.error(classMethod +
-                        "Error creating object for Policy J2EE Agent Group '" +
-                        agtname + "'");
+                            "Error creating object for Policy J2EE Agent Group '" +
+                            agtname + "'");
                     continue;
                 }
 
@@ -2091,7 +2107,7 @@ public class Agent {
                     continue;  // no table to put it into
                 }
                 SsoServerWSSAgentsWSPAgtGrpEntryImpl aei =
-                    new SsoServerWSSAgentsWSPAgtGrpEntryImpl(sunMib);
+                        new SsoServerWSSAgentsWSPAgtGrpEntryImpl(sunMib);
                 String wep = hm.get("wsendpoint");
                 if (wep == null) {
                     wep = NotAvail;
@@ -2106,13 +2122,13 @@ public class Agent {
                 aei.WssAgentsWSPAgtGrpIndex = new Integer(wspi++);
                 aei.SsoServerRealmIndex = ri;
                 ObjectName aname =
-                    aei.createSsoServerWSSAgentsWSPAgtGrpEntryObjectName(
-                        server);
+                        aei.createSsoServerWSSAgentsWSPAgtGrpEntryObjectName(
+                                server);
 
                 if (aname == null) {
                     debug.error(classMethod +
-                        "Error creating object for Policy WSP Agent Group '" +
-                        agtname + "'");
+                            "Error creating object for Policy WSP Agent Group '" +
+                            agtname + "'");
                     continue;
                 }
 
@@ -2131,7 +2147,7 @@ public class Agent {
                     continue;  // no table to put it into
                 }
                 SsoServerWSSAgentsWSCAgtGrpEntryImpl aei =
-                    new SsoServerWSSAgentsWSCAgtGrpEntryImpl(sunMib);
+                        new SsoServerWSSAgentsWSCAgtGrpEntryImpl(sunMib);
                 String wep = hm.get("wsendpoint");
                 if (wep == null) {
                     wep = NotAvail;
@@ -2146,13 +2162,13 @@ public class Agent {
                 aei.WssAgentsWSCAgtGrpIndex = new Integer(wsci++);
                 aei.SsoServerRealmIndex = ri;
                 ObjectName aname =
-                    aei.createSsoServerWSSAgentsWSCAgtGrpEntryObjectName(
-                        server);
+                        aei.createSsoServerWSSAgentsWSCAgtGrpEntryObjectName(
+                                server);
 
                 if (aname == null) {
                     debug.error(classMethod +
-                        "Error creating object for Policy WSC Agent Group '" +
-                        agtname + "'");
+                            "Error creating object for Policy WSC Agent Group '" +
+                            agtname + "'");
                     continue;
                 }
 
@@ -2171,7 +2187,7 @@ public class Agent {
                     continue;  // no table to put it into
                 }
                 SsoServerWSSAgentsSTSAgtGrpEntryImpl aei =
-                    new SsoServerWSSAgentsSTSAgtGrpEntryImpl(sunMib);
+                        new SsoServerWSSAgentsSTSAgtGrpEntryImpl(sunMib);
                 String sep = hm.get("stsendpoint");
                 if (sep == null) {
                     sep = NotAvail;
@@ -2183,13 +2199,13 @@ public class Agent {
                 aei.SsoServerRealmIndex = ri;
 
                 ObjectName aname =
-                    aei.createSsoServerWSSAgentsSTSAgtGrpEntryObjectName(
-                        server);
+                        aei.createSsoServerWSSAgentsSTSAgtGrpEntryObjectName(
+                                server);
 
                 if (aname == null) {
                     debug.error(classMethod +
-                        "Error creating object for Policy STS Agent Group '" +
-                        agtname + "'");
+                            "Error creating object for Policy STS Agent Group '" +
+                            agtname + "'");
                     continue;
                 }
 
@@ -2208,7 +2224,7 @@ public class Agent {
                     continue;  // no table to put it into
                 }
                 SsoServerWSSAgentsDSCAgtGrpEntryImpl aei =
-                    new SsoServerWSSAgentsDSCAgtGrpEntryImpl(sunMib);
+                        new SsoServerWSSAgentsDSCAgtGrpEntryImpl(sunMib);
                 String dep = hm.get("discoveryendpoint");
                 if (dep == null) {
                     dep = NotAvail;
@@ -2223,13 +2239,13 @@ public class Agent {
                 aei.WssAgentsDSCAgtGrpIndex = new Integer(dsci++);
                 aei.SsoServerRealmIndex = ri;
                 ObjectName aname =
-                    aei.createSsoServerWSSAgentsDSCAgtGrpEntryObjectName(
-                        server);
+                        aei.createSsoServerWSSAgentsDSCAgtGrpEntryObjectName(
+                                server);
 
                 if (aname == null) {
                     debug.error(classMethod +
-                        "Error creating object for Policy Discovery Agent " +
-                        "Group '" + agtname + "'");
+                            "Error creating object for Policy Discovery Agent " +
+                            "Group '" + agtname + "'");
                     continue;
                 }
 
@@ -2246,7 +2262,7 @@ public class Agent {
             } else if (atype.equals("SharedAgent")) {
             } else {
                 debug.error(classMethod + "agent group type = " + atype +
-                    ", agent group name = " + agtname + " not supported.");
+                        ", agent group name = " + agtname + " not supported.");
             }
         }
 
@@ -2267,7 +2283,7 @@ public class Agent {
         Date startDate = new Date();
         if (debug.messageEnabled()) {
             sb.append("number of SAML1 Trusted Partners = ").append(sz).
-                append("\n");
+                    append("\n");
         }
 
         if (server == null) {  // can't do anything without a server
@@ -2283,19 +2299,19 @@ public class Agent {
             }
 
             SsoServerSAML1TrustPrtnrsEntryImpl sstpe =
-                new SsoServerSAML1TrustPrtnrsEntryImpl(sunMib);
+                    new SsoServerSAML1TrustPrtnrsEntryImpl(sunMib);
             sstpe.SAML1TrustPrtnrIndex = new Integer(i+1);
             sstpe.SAML1TrustPrtnrName = getEscapedString(pName);
 
             SsoServerSAML1Svc sss =
-                (SsoServerSAML1SvcImpl) sunMib.getSaml1SvcGroup();
+                    (SsoServerSAML1SvcImpl) sunMib.getSaml1SvcGroup();
             TableSsoServerSAML1TrustPrtnrsTable tptab = null;
             if (sss != null) {
                 try {
                     tptab = sss.accessSsoServerSAML1TrustPrtnrsTable();
                 } catch (SnmpStatusException ex) {
                     debug.error(classMethod +
-                        "getting SAML1 trusted partner table: ", ex);
+                            "getting SAML1 trusted partner table: ", ex);
                     return -2; // can't do anything without the table
                 }
             }
@@ -2304,12 +2320,12 @@ public class Agent {
             }
 
             ObjectName aname =
-                sstpe.createSsoServerSAML1TrustPrtnrsEntryObjectName(server);
-        
+                    sstpe.createSsoServerSAML1TrustPrtnrsEntryObjectName(server);
+
             if (aname == null) {
                 debug.error(classMethod +
-                    "Error creating object for SAML1 Trusted Partner '" +
-                    pName + "'");
+                        "Error creating object for SAML1 Trusted Partner '" +
+                        pName + "'");
                 continue;
             }
 
@@ -2335,7 +2351,7 @@ public class Agent {
          *    SAML1 Endpoints for SOAPReceiver, POSTProfile,
          *      SAMLAware/ArtifactProfile
          */
-        
+
         // assertions
         SsoServerSAML1CacheEntryImpl ssce =
                 new SsoServerSAML1CacheEntryImpl(sunMib);
@@ -2360,11 +2376,11 @@ public class Agent {
             sss.assertCache = ssce;
 
             ObjectName aname =
-                ssce.createSsoServerSAML1CacheEntryObjectName(server);
-        
+                    ssce.createSsoServerSAML1CacheEntryObjectName(server);
+
             if (aname == null) {
                 debug.error(classMethod +
-                    "Error creating object for SAML1 Assertion Cache");
+                        "Error creating object for SAML1 Assertion Cache");
             } else {
                 try {
                     tptab.addEntry(ssce, aname);
@@ -2373,10 +2389,10 @@ public class Agent {
                     }
                 } catch (JMException ex) {
                     debug.error(classMethod +
-                        "SAML1 Assertion Cache table: " + ex.getMessage());
+                            "SAML1 Assertion Cache table: " + ex.getMessage());
                 } catch (SnmpStatusException ex) {
                     debug.error(classMethod +
-                        "SAML1 Assertion Cache table: " + ex.getMessage());
+                            "SAML1 Assertion Cache table: " + ex.getMessage());
                 }
             }
 
@@ -2392,7 +2408,7 @@ public class Agent {
             aname = ssce.createSsoServerSAML1CacheEntryObjectName(server);
             if (aname == null) {
                 debug.error(classMethod +
-                    "Error creating object for SAML1 Artifact Cache");
+                        "Error creating object for SAML1 Artifact Cache");
             } else {
                 try {
                     tptab.addEntry(ssce, aname);
@@ -2401,10 +2417,10 @@ public class Agent {
                     }
                 } catch (JMException ex) {
                     debug.error(classMethod + "SAML1 Artifact Cache table: " +
-                        ex.getMessage());
+                            ex.getMessage());
                 } catch (SnmpStatusException ex) {
                     debug.error(classMethod + "SAML1 Artifact Cache table: " +
-                        ex.getMessage());
+                            ex.getMessage());
                 }
                 sss.artifactCache = ssce;
             }
@@ -2412,116 +2428,116 @@ public class Agent {
 
         // SOAPReceiver endpoint
         if (!skipSAML1EndPoints) {
-        SsoServerSAML1EndPointEntryImpl ssee =
-                new SsoServerSAML1EndPointEntryImpl(sunMib);
-        ssee.SAML1EndPointIndex = Integer.valueOf(1);
-        ssee.SAML1EndPointName = "SOAPReceiver_EndPoint";
-        ssee.SAML1EndPointRqtFailed = 0L;
-        ssee.SAML1EndPointRqtOut = 0L;
-        ssee.SAML1EndPointRqtIn = 0L;
-        ssee.SAML1EndPointRqtAborted = 0L;
-        ssee.SAML1EndPointStatus = "operational";
-
-        TableSsoServerSAML1EndPointTable tetab = null;
-        if (sss != null) {
-            try {
-                tetab = sss.accessSsoServerSAML1EndPointTable();
-            } catch (SnmpStatusException ex) {
-                debug.error(classMethod +
-                    "getting SAML1 EndPoint table: ", ex);
-            }
-        }
-        if (tetab != null) {  // if sss is null, so will tetab
-            ObjectName aname =
-                ssee.createSsoServerSAML1EndPointEntryObjectName(server);
-
-            if (aname == null) {
-                debug.error(classMethod +
-                    "Error creating object for SAML1 SOAPReceiver_EndPoint");
-            } else {
-                try {
-                    tetab.addEntry(ssee, aname);
-                    if (ssee != null) {
-                        server.registerMBean(ssee, aname);
-                    }
-                } catch (JMException ex) {
-                    debug.error(classMethod +
-                        "SAML1 SOAPReceiver EndPoint table: " +
-                        ex.getMessage());
-                } catch (SnmpStatusException ex) {
-                    debug.error(classMethod +
-                        "SAML1 SOAPReceiver EndPoint table: " +
-                        ex.getMessage());
-                }
-                sss.soapEP = ssee;
-            }
-
-            // POSTProfile table
-            ssee = new SsoServerSAML1EndPointEntryImpl(sunMib);
-            ssee.SAML1EndPointIndex = Integer.valueOf(2);
-            ssee.SAML1EndPointName = "POSTProfile_EndPoint";
+            SsoServerSAML1EndPointEntryImpl ssee =
+                    new SsoServerSAML1EndPointEntryImpl(sunMib);
+            ssee.SAML1EndPointIndex = Integer.valueOf(1);
+            ssee.SAML1EndPointName = "SOAPReceiver_EndPoint";
             ssee.SAML1EndPointRqtFailed = 0L;
             ssee.SAML1EndPointRqtOut = 0L;
             ssee.SAML1EndPointRqtIn = 0L;
             ssee.SAML1EndPointRqtAborted = 0L;
             ssee.SAML1EndPointStatus = "operational";
 
-            aname = ssee.createSsoServerSAML1EndPointEntryObjectName(server);
-
-            if (aname == null) {
-                debug.error(classMethod +
-                    "Error creating object for SAML1 POSTProfile_EndPoint");
-            } else {
+            TableSsoServerSAML1EndPointTable tetab = null;
+            if (sss != null) {
                 try {
-                    tetab.addEntry(ssee, aname);
-                    if (ssee != null) {
-                        server.registerMBean(ssee, aname);
-                    }
-                } catch (JMException ex) {
-                    debug.error(classMethod +
-                        "SAML1 POSTProfile EndPoint table: " +
-                        ex.getMessage());
+                    tetab = sss.accessSsoServerSAML1EndPointTable();
                 } catch (SnmpStatusException ex) {
                     debug.error(classMethod +
-                        "SAML1 POSTProfile EndPoint table: " +
-                        ex.getMessage());
+                            "getting SAML1 EndPoint table: ", ex);
                 }
-                sss.pprofEP = ssee;
             }
+            if (tetab != null) {  // if sss is null, so will tetab
+                ObjectName aname =
+                        ssee.createSsoServerSAML1EndPointEntryObjectName(server);
 
-            // SAMLAware/ArtifactProfile table
-            ssee = new SsoServerSAML1EndPointEntryImpl(sunMib);
-            ssee.SAML1EndPointIndex = Integer.valueOf(3);
-            ssee.SAML1EndPointName = "SAMLAware_EndPoint";
-            ssee.SAML1EndPointRqtFailed = 0L;
-            ssee.SAML1EndPointRqtOut = 0L;
-            ssee.SAML1EndPointRqtIn = 0L;
-            ssee.SAML1EndPointRqtAborted = 0L;
-            ssee.SAML1EndPointStatus = "operational";
-
-            aname = ssee.createSsoServerSAML1EndPointEntryObjectName(server);
-
-            if (aname == null) {
-                debug.error(classMethod +
-                    "Error creating object for SAML1 SAMLAware_EndPoint");
-            } else {
-                try {
-                    tetab.addEntry(ssee, aname);
-                    if (ssee != null) {
-                        server.registerMBean(ssee, aname);
+                if (aname == null) {
+                    debug.error(classMethod +
+                            "Error creating object for SAML1 SOAPReceiver_EndPoint");
+                } else {
+                    try {
+                        tetab.addEntry(ssee, aname);
+                        if (ssee != null) {
+                            server.registerMBean(ssee, aname);
+                        }
+                    } catch (JMException ex) {
+                        debug.error(classMethod +
+                                "SAML1 SOAPReceiver EndPoint table: " +
+                                ex.getMessage());
+                    } catch (SnmpStatusException ex) {
+                        debug.error(classMethod +
+                                "SAML1 SOAPReceiver EndPoint table: " +
+                                ex.getMessage());
                     }
-                } catch (JMException ex) {
-                    debug.error(classMethod +
-                        "SAML1 SAMLAware/ArtifactProfile EndPoint table: " +
-                        ex.getMessage());
-                } catch (SnmpStatusException ex) {
-                    debug.error(classMethod +
-                        "SAML1 SAMLAware/ArtifactProfile EndPoint table: " +
-                        ex.getMessage());
+                    sss.soapEP = ssee;
                 }
-                sss.samlAwareEP = ssee;
+
+                // POSTProfile table
+                ssee = new SsoServerSAML1EndPointEntryImpl(sunMib);
+                ssee.SAML1EndPointIndex = Integer.valueOf(2);
+                ssee.SAML1EndPointName = "POSTProfile_EndPoint";
+                ssee.SAML1EndPointRqtFailed = 0L;
+                ssee.SAML1EndPointRqtOut = 0L;
+                ssee.SAML1EndPointRqtIn = 0L;
+                ssee.SAML1EndPointRqtAborted = 0L;
+                ssee.SAML1EndPointStatus = "operational";
+
+                aname = ssee.createSsoServerSAML1EndPointEntryObjectName(server);
+
+                if (aname == null) {
+                    debug.error(classMethod +
+                            "Error creating object for SAML1 POSTProfile_EndPoint");
+                } else {
+                    try {
+                        tetab.addEntry(ssee, aname);
+                        if (ssee != null) {
+                            server.registerMBean(ssee, aname);
+                        }
+                    } catch (JMException ex) {
+                        debug.error(classMethod +
+                                "SAML1 POSTProfile EndPoint table: " +
+                                ex.getMessage());
+                    } catch (SnmpStatusException ex) {
+                        debug.error(classMethod +
+                                "SAML1 POSTProfile EndPoint table: " +
+                                ex.getMessage());
+                    }
+                    sss.pprofEP = ssee;
+                }
+
+                // SAMLAware/ArtifactProfile table
+                ssee = new SsoServerSAML1EndPointEntryImpl(sunMib);
+                ssee.SAML1EndPointIndex = Integer.valueOf(3);
+                ssee.SAML1EndPointName = "SAMLAware_EndPoint";
+                ssee.SAML1EndPointRqtFailed = 0L;
+                ssee.SAML1EndPointRqtOut = 0L;
+                ssee.SAML1EndPointRqtIn = 0L;
+                ssee.SAML1EndPointRqtAborted = 0L;
+                ssee.SAML1EndPointStatus = "operational";
+
+                aname = ssee.createSsoServerSAML1EndPointEntryObjectName(server);
+
+                if (aname == null) {
+                    debug.error(classMethod +
+                            "Error creating object for SAML1 SAMLAware_EndPoint");
+                } else {
+                    try {
+                        tetab.addEntry(ssee, aname);
+                        if (ssee != null) {
+                            server.registerMBean(ssee, aname);
+                        }
+                    } catch (JMException ex) {
+                        debug.error(classMethod +
+                                "SAML1 SAMLAware/ArtifactProfile EndPoint table: " +
+                                ex.getMessage());
+                    } catch (SnmpStatusException ex) {
+                        debug.error(classMethod +
+                                "SAML1 SAMLAware/ArtifactProfile EndPoint table: " +
+                                ex.getMessage());
+                    }
+                    sss.samlAwareEP = ssee;
+                }
             }
-        }
         } // if (!skipSAML1EndPoints)
 
         Date stopDate = new Date();
@@ -2529,7 +2545,7 @@ public class Agent {
             String stDate = sdf.format(startDate);
             String endDate = sdf.format(stopDate);
             debug.message("Agent.saml1TPConfig:\n    Start Time = " +
-                stDate + "\n      End Time = " + endDate);
+                    stDate + "\n      End Time = " + endDate);
         }
 
         return 0;
@@ -2570,7 +2586,7 @@ public class Agent {
                 ftab = ssfc.accessSsoServerFedCOTsTable();
             } catch (SnmpStatusException ex) {
                 debug.error(classMethod +
-                    "getting fed COTs table: ", ex);
+                        "getting fed COTs table: ", ex);
             }
             if (ftab != null) {
                 int i = 1;
@@ -2578,21 +2594,21 @@ public class Agent {
                     ss = getEscapedString(ss);
 
                     if (debug.messageEnabled()) {
-                            sb.append("  #").append(i).append(": ").append(ss).
+                        sb.append("  #").append(i).append(": ").append(ss).
                                 append("\n");
                     }
 
                     SsoServerFedCOTsEntryImpl cei =
-                        new SsoServerFedCOTsEntryImpl(sunMib);
+                            new SsoServerFedCOTsEntryImpl(sunMib);
                     cei.SsoServerRealmIndex = ri;
                     cei.FedCOTName = ss;
                     cei.FedCOTIndex = new Integer(i++);
                     ObjectName oname =
-                        cei.createSsoServerFedCOTsEntryObjectName(server);
+                            cei.createSsoServerFedCOTsEntryObjectName(server);
 
                     if (oname == null) {
                         debug.error(classMethod +
-                            "Error creating object for Fed COT '" + ss + "'");
+                                "Error creating object for Fed COT '" + ss + "'");
                         continue;
                     }
 
@@ -2618,14 +2634,14 @@ public class Agent {
          *  the federation entities all go into the
          *  SsoServerFedEntitiesTable
          */
-        
+
         SsoServerFedEntities ssfe = getFedEntsMBean();
         TableSsoServerFedEntitiesTable ftab = null;
         try {
             ftab = ssfe.accessSsoServerFedEntitiesTable();
         } catch (SnmpStatusException ex) {
             debug.error(classMethod +
-                "getting FederationEntities table: ", ex);
+                    "getting FederationEntities table: ", ex);
             return -1;  // can't proceed without the table
         }
 
@@ -2636,7 +2652,7 @@ public class Agent {
              *      key="location"; value="hosted" or "remote"
              *      key="roles"; value=some combo of IDP;SP
              */
-        
+
             int tabinx = 1;  // increments for all entries
             if (debug.messageEnabled()) {
                 sb.append("\n  SAML2 entities map has ");
@@ -2651,7 +2667,7 @@ public class Agent {
                     sTab = ss2s.accessSsoServerSAML2SPTable();
                 } catch (SnmpStatusException ex) {
                     debug.error(classMethod +
-                        "getting SAML2 IDP and/or SP tables: ", ex);
+                            "getting SAML2 IDP and/or SP tables: ", ex);
                     return -1;  // can't proceed without the tables
                 }
 
@@ -2669,7 +2685,7 @@ public class Agent {
                     String roles = hm.get("roles");
 
                     SsoServerFedEntitiesEntryImpl cei =
-                        new SsoServerFedEntitiesEntryImpl(sunMib);
+                            new SsoServerFedEntitiesEntryImpl(sunMib);
                     cei.SsoServerRealmIndex = ri;
                     cei.FedEntityName = getEscapedString(entname);
                     cei.FedEntityIndex = new Integer(tabinx++);
@@ -2677,12 +2693,12 @@ public class Agent {
                     cei.FedEntityType = roles;
                     cei.FedEntityLoc = loc;
                     ObjectName oname =
-                        cei.createSsoServerFedEntitiesEntryObjectName(server);
+                            cei.createSsoServerFedEntitiesEntryObjectName(server);
 
                     if (oname == null) {
                         debug.error(classMethod +
-                            "Error creating object for SAML2 Entity '" +
-                            entname + "'");
+                                "Error creating object for SAML2 Entity '" +
+                                entname + "'");
                         continue;
                     }
 
@@ -2693,12 +2709,12 @@ public class Agent {
                         }
                     } catch (JMException ex) {
                         debug.error(classMethod +
-                            "JMEx adding SAMLv2 entity " +
-                            entname + " in realm " + realm, ex);
+                                "JMEx adding SAMLv2 entity " +
+                                entname + " in realm " + realm, ex);
                     } catch (SnmpStatusException ex) {
                         debug.error(classMethod +
-                            "SnmpEx adding SAMLv2 entity " +
-                            entname + " in realm " + realm, ex);
+                                "SnmpEx adding SAMLv2 entity " +
+                                entname + " in realm " + realm, ex);
                     }
 
                     /*
@@ -2706,14 +2722,14 @@ public class Agent {
                      * both if in both roles?) SAML2's IDP or SP table
                      */
                     if (((roles.indexOf("IDP")) >= 0) &&
-                        loc.equalsIgnoreCase("hosted"))
+                            loc.equalsIgnoreCase("hosted"))
                     {
                         if (iTab == null) {
                             continue;
                         }
 
                         SsoServerSAML2IDPEntryImpl sei =
-                            new SsoServerSAML2IDPEntryImpl(sunMib);
+                                new SsoServerSAML2IDPEntryImpl(sunMib);
                         sei.SAML2IDPArtifactsIssued = 0L;
                         sei.SAML2IDPAssertionsIssued = 0L;
                         sei.SAML2IDPInvalRqtsRcvd = 0L;
@@ -2725,7 +2741,7 @@ public class Agent {
                         sei.SsoServerRealmIndex = ri;
 
                         oname =
-                            sei.createSsoServerSAML2IDPEntryObjectName(server);
+                                sei.createSsoServerSAML2IDPEntryObjectName(server);
 
                         ss2s.incHostedIDPCount();
                         try {
@@ -2734,33 +2750,33 @@ public class Agent {
                                 server.registerMBean(sei, oname);
                             }
                            /* is a Map of realm/saml2idp to index needed? */
-                           String rai = realm + "|" + entname;
-                           // sei is this bean's instance
-                           realmSAML2IDPs.put(rai, sei);
+                            String rai = realm + "|" + entname;
+                            // sei is this bean's instance
+                            realmSAML2IDPs.put(rai, sei);
                         } catch (JMException ex) {
                             debug.error(classMethod +
-                                "JMEx adding SAMLv2 IDP entity " +
-                                entname + " in realm " + realm, ex);
+                                    "JMEx adding SAMLv2 IDP entity " +
+                                    entname + " in realm " + realm, ex);
                         } catch (SnmpStatusException ex) {
                             debug.error(classMethod +
-                                "SnmpEx adding SAMLv2 IDP entity " +
-                                entname + " in realm " + realm, ex);
+                                    "SnmpEx adding SAMLv2 IDP entity " +
+                                    entname + " in realm " + realm, ex);
                         }
                     }
                     if (((roles.indexOf("IDP")) >= 0) &&
-                        loc.equalsIgnoreCase("remote"))
+                            loc.equalsIgnoreCase("remote"))
                     {
                         ss2s.incRemoteIDPCount();
                     }
 
                     if (((roles.indexOf("SP")) >= 0) &&
-                        loc.equalsIgnoreCase("hosted"))
+                            loc.equalsIgnoreCase("hosted"))
                     {
                         if (sTab == null) {
                             continue;
                         }
                         SsoServerSAML2SPEntryImpl sei =
-                            new SsoServerSAML2SPEntryImpl(sunMib);
+                                new SsoServerSAML2SPEntryImpl(sunMib);
                         sei.SAML2SPInvalidArtifactsRcvd = 0L;
                         sei.SAML2SPValidAssertionsRcvd = 0L;
                         sei.SAML2SPRqtsSent = 0L;
@@ -2769,31 +2785,31 @@ public class Agent {
                         sei.SAML2SPIndex = new Integer(spi++);
 
                         oname =
-                            sei.createSsoServerSAML2SPEntryObjectName(server);
+                                sei.createSsoServerSAML2SPEntryObjectName(server);
                         try {
                             sTab.addEntry(sei, oname);
                             if (sei != null) {
                                 server.registerMBean(sei, oname);
                             }
                            /* is a Map of realm/saml2sp to index needed? */
-                           String rai = realm + "|" + entname;
-                           // sei is this bean's instance
-                               realmSAML2SPs.put(rai, sei);
+                            String rai = realm + "|" + entname;
+                            // sei is this bean's instance
+                            realmSAML2SPs.put(rai, sei);
                         } catch (JMException ex) {
                             debug.error(classMethod +
-                                "JMEx adding SAMLv2 SP entity " +
-                                entname + " in realm " + realm, ex);
+                                    "JMEx adding SAMLv2 SP entity " +
+                                    entname + " in realm " + realm, ex);
                         } catch (SnmpStatusException ex) {
                             debug.error(classMethod +
-                                "SnmpEx adding SAMLv2 SP entity " +
-                                entname + " in realm " + realm, ex);
+                                    "SnmpEx adding SAMLv2 SP entity " +
+                                    entname + " in realm " + realm, ex);
                         }
                     }
 
                     if (debug.messageEnabled()) {
                         sb.append("    name=").append(entname).
-                            append(", loc=").append(loc).append(", roles=").
-                            append(roles).append("\n");
+                                append(", loc=").append(loc).append(", roles=").
+                                append(roles).append("\n");
                     }
                 }
             } else {
@@ -2824,7 +2840,7 @@ public class Agent {
                     String roles = hm.get("roles");
 
                     SsoServerFedEntitiesEntryImpl cei =
-                        new SsoServerFedEntitiesEntryImpl(sunMib);
+                            new SsoServerFedEntitiesEntryImpl(sunMib);
                     cei.SsoServerRealmIndex = ri;
                     cei.FedEntityName = getEscapedString(entname);
                     cei.FedEntityIndex = new Integer(tabinx++);
@@ -2832,12 +2848,12 @@ public class Agent {
                     cei.FedEntityType = roles;
                     cei.FedEntityLoc = loc;
                     ObjectName oname =
-                        cei.createSsoServerFedEntitiesEntryObjectName(server);
+                            cei.createSsoServerFedEntitiesEntryObjectName(server);
 
                     if (oname == null) {
                         debug.error(classMethod +
-                            "Error creating object for WSFed Entity '" +
-                            entname + "'");
+                                "Error creating object for WSFed Entity '" +
+                                entname + "'");
                         continue;
                     }
 
@@ -2848,15 +2864,15 @@ public class Agent {
                         }
                     } catch (JMException ex) {
                         debug.error(classMethod + "JMEx adding WSFed entity " +
-                            entname + " in realm " + realm, ex);
+                                entname + " in realm " + realm, ex);
                     } catch (SnmpStatusException ex) {
                         debug.error(classMethod +
-                            "SnmpEx adding WSFed entity " +
-                            entname + " in realm " + realm, ex);
+                                "SnmpEx adding WSFed entity " +
+                                entname + " in realm " + realm, ex);
                     }
                     sb.append("    name=").append(entname).append(", loc=").
-                        append(loc).append(", roles=").append(roles).
-                        append("\n");
+                            append(loc).append(", roles=").append(roles).
+                            append("\n");
                 }
             } else {
                 if (debug.messageEnabled()) {
@@ -2887,7 +2903,7 @@ public class Agent {
                     String roles = hm.get("roles");
 
                     SsoServerFedEntitiesEntryImpl cei =
-                        new SsoServerFedEntitiesEntryImpl(sunMib);
+                            new SsoServerFedEntitiesEntryImpl(sunMib);
                     cei.SsoServerRealmIndex = ri;
                     cei.FedEntityName = getEscapedString(entname);
                     cei.FedEntityIndex = new Integer(tabinx++);
@@ -2895,12 +2911,12 @@ public class Agent {
                     cei.FedEntityType = roles;
                     cei.FedEntityLoc = loc;
                     ObjectName oname =
-                        cei.createSsoServerFedEntitiesEntryObjectName(server);
+                            cei.createSsoServerFedEntitiesEntryObjectName(server);
 
                     if (oname == null) {
                         debug.error(classMethod +
-                            "Error creating object for IDFF Entity '" +
-                            entname + "'");
+                                "Error creating object for IDFF Entity '" +
+                                entname + "'");
                         continue;
                     }
 
@@ -2911,16 +2927,16 @@ public class Agent {
                         }
                     } catch (JMException ex) {
                         debug.error(classMethod + "JMEx adding IDFF entity " +
-                            entname + " in realm " + realm, ex);
+                                entname + " in realm " + realm, ex);
                     } catch (SnmpStatusException ex) {
                         debug.error(classMethod +
-                            "SnmpEx adding IDFF entity " +
-                            entname + " in realm " + realm, ex);
+                                "SnmpEx adding IDFF entity " +
+                                entname + " in realm " + realm, ex);
                     }
                     if (debug.messageEnabled()) {
                         sb.append("    name=").append(entname).
-                            append(", loc=").append(loc).append(", roles=").
-                            append(roles).append("\n");
+                                append(", loc=").append(loc).append(", roles=").
+                                append(roles).append("\n");
                     }
                 }
             } else {
@@ -2930,7 +2946,7 @@ public class Agent {
             }
         } else {
             debug.error(classMethod +
-                "FederationEntities table is null");
+                    "FederationEntities table is null");
         }
 
         /*
@@ -2954,7 +2970,7 @@ public class Agent {
                 mtab = ssfc.accessSsoServerFedCOTMemberTable();
             } catch (SnmpStatusException ex) {
                 debug.error(classMethod +
-                    "getting fed COT members table: ", ex);
+                        "getting fed COT members table: ", ex);
             }
             for (Map.Entry<String, Map<String, Set<String>>> entry : cotMembs.entrySet()) {
                 String cotname = entry.getKey();
@@ -2963,7 +2979,7 @@ public class Agent {
 
                 if (debug.messageEnabled()) {
                     sb.append("  COT name = ").append(cotname).
-                        append(", SAML members = ");
+                            append(", SAML members = ");
                 }
 
                 Set<String> fset = hm.get("SAML");
@@ -2976,20 +2992,20 @@ public class Agent {
                         }
 
                         SsoServerFedCOTMemberEntryImpl cmi =
-                            new SsoServerFedCOTMemberEntryImpl(sunMib);
+                                new SsoServerFedCOTMemberEntryImpl(sunMib);
                         cmi.FedCOTMemberType = "SAMLv2";
                         cmi.FedCOTMemberName = getEscapedString(mbm);
                         cmi.FedCOTMemberIndex = new Integer(mi++);
                         cmi.SsoServerRealmIndex = ri;
                         cmi.FedCOTIndex = cotI;  // xxx - need to get from tbl
-                        ObjectName ceName = 
-                            cmi.createSsoServerFedCOTMemberEntryObjectName(
-                                server);
+                        ObjectName ceName =
+                                cmi.createSsoServerFedCOTMemberEntryObjectName(
+                                        server);
 
                         if (ceName == null) {
                             debug.error(classMethod +
-                                "Error creating object for SAMLv2 COT Member '"+
-                                mbm + "'");
+                                    "Error creating object for SAMLv2 COT Member '"+
+                                    mbm + "'");
                             continue;
                         }
 
@@ -3000,7 +3016,7 @@ public class Agent {
                             }
                         } catch (Exception ex) {
                             debug.error(classMethod + "cotmember = " +
-                                mbm, ex);
+                                    mbm, ex);
                         }
                     }
                 } else {
@@ -3019,20 +3035,20 @@ public class Agent {
                             sb.append("    ").append(mbm).append("\n");
                         }
                         SsoServerFedCOTMemberEntryImpl cmi =
-                            new SsoServerFedCOTMemberEntryImpl(sunMib);
+                                new SsoServerFedCOTMemberEntryImpl(sunMib);
                         cmi.FedCOTMemberType = "IDFF";
                         cmi.FedCOTMemberName = getEscapedString(mbm);
                         cmi.FedCOTMemberIndex = new Integer(mi++);
                         cmi.SsoServerRealmIndex = ri;
                         cmi.FedCOTIndex = cotI;  // xxx - need to get from tbl
-                        ObjectName ceName = 
-                            cmi.createSsoServerFedCOTMemberEntryObjectName(
-                                server);
+                        ObjectName ceName =
+                                cmi.createSsoServerFedCOTMemberEntryObjectName(
+                                        server);
 
                         if (ceName == null) {
                             debug.error(classMethod +
-                                "Error creating object for IDFF COT Member '" +
-                                mbm + "'");
+                                    "Error creating object for IDFF COT Member '" +
+                                    mbm + "'");
                             continue;
                         }
 
@@ -3043,7 +3059,7 @@ public class Agent {
                             }
                         } catch (Exception ex) {
                             debug.error(classMethod + "cotmember = " +
-                                mbm, ex);
+                                    mbm, ex);
                         }
                     }
                 } else {
@@ -3064,20 +3080,20 @@ public class Agent {
                             sb.append("    ").append(mbm).append("\n");
                         }
                         SsoServerFedCOTMemberEntryImpl cmi =
-                            new SsoServerFedCOTMemberEntryImpl(sunMib);
+                                new SsoServerFedCOTMemberEntryImpl(sunMib);
                         cmi.FedCOTMemberType = "WSFed";
                         cmi.FedCOTMemberName = getEscapedString(mbm);
                         cmi.FedCOTMemberIndex = new Integer(mi++);
                         cmi.SsoServerRealmIndex = ri;
                         cmi.FedCOTIndex = cotI;  // xxx - need to get from tbl
-                        ObjectName ceName = 
-                            cmi.createSsoServerFedCOTMemberEntryObjectName(
-                                server);
+                        ObjectName ceName =
+                                cmi.createSsoServerFedCOTMemberEntryObjectName(
+                                        server);
 
                         if (ceName == null) {
                             debug.error(classMethod +
-                                "Error creating object for WSFed Member '" +
-                                mbm + "'");
+                                    "Error creating object for WSFed Member '" +
+                                    mbm + "'");
                             continue;
                         }
 
@@ -3088,7 +3104,7 @@ public class Agent {
                             }
                         } catch (Exception ex) {
                             debug.error(classMethod + "cotmember = " +
-                                mbm, ex);
+                                    mbm, ex);
                         }
                     }
                 } else {
@@ -3115,12 +3131,12 @@ public class Agent {
                     String svr = sobj.getServerName();
                     int port = sobj.getPort();
                     sbp1.append("  svrname = ").append(svr).
-                        append(", port = ").append(port).append("\n");
+                            append(", port = ").append(port).append("\n");
                 }
                 debug.message(classMethod + sbp1.toString());
             } catch (Exception d) {
                 debug.message(classMethod +
-                    "trying to get Directory Server Config");
+                        "trying to get Directory Server Config");
             }
 
             Properties props = SystemProperties.getProperties();
@@ -3131,26 +3147,26 @@ public class Agent {
                 String val = (String) entry.getValue();
 
                 sbp.append("  key = ").append(entname).append(", val = ").
-                    append(val).append("\n");
+                        append(val).append("\n");
             }
             debug.message(classMethod + sbp.toString());
 
             String dirHost = SystemProperties.get(Constants.AM_DIRECTORY_HOST);
             String dirPort = SystemProperties.get(Constants.AM_DIRECTORY_PORT);
             String drSSL =
-                SystemProperties.get(Constants.AM_DIRECTORY_SSL_ENABLED);
+                    SystemProperties.get(Constants.AM_DIRECTORY_SSL_ENABLED);
             boolean dirSSL = SystemProperties.getAsBoolean(
                     Constants.AM_DIRECTORY_SSL_ENABLED);
 
             debug.message(classMethod + "SMS CONFIG:\n    host = " + dirHost +
-                "\n    port = " + dirPort + "\n    ssl = " + drSSL +
-                "\n    dirSSL = " + dirSSL);
+                    "\n    port = " + dirPort + "\n    ssl = " + drSSL +
+                    "\n    dirSSL = " + dirSSL);
 
             Date stopDate = new Date();
             String stDate = sdf.format(startDate);
             String endDate = sdf.format(stopDate);
             debug.message("Agent.federationConfig:\n    Start Time = " +
-                stDate + "\n      End Time = " + endDate);
+                    stDate + "\n      End Time = " + endDate);
         }
         return 0;
     }
@@ -3182,7 +3198,7 @@ public class Agent {
     }
 
     public static SsoServerAuthModulesEntryImpl getAuthModuleEntry (
-        String rlmAuthInst)
+            String rlmAuthInst)
     {
         return realmAuthInst.get(rlmAuthInst);
     }
@@ -3192,13 +3208,13 @@ public class Agent {
     }
 
     public static SsoServerSAML2IDPEntryImpl getSAML2IDPEntry (
-        String rlmSAMLIDP)
+            String rlmSAMLIDP)
     {
         return realmSAML2IDPs.get(rlmSAMLIDP);
     }
 
     public static SsoServerSAML2SPEntryImpl getSAML2SPEntry (
-        String rlmSAMLSP)
+            String rlmSAMLSP)
     {
         return realmSAML2SPs.get(rlmSAMLSP);
     }
@@ -3223,7 +3239,7 @@ public class Agent {
      * If not specified, the agent will send traps continuously.
      */
     public static void main(String args[]) {
-        
+
         final MBeanServer server;
         final ObjectName htmlObjName;
         final ObjectName snmpObjName;
@@ -3250,7 +3266,7 @@ public class Agent {
                 System.exit(1);
             }
         }
-    
+
         try {
             List<MBeanServer> servers = MBeanServerFactory.findMBeanServer(null);
             if ((servers != null) && !servers.isEmpty()) {
@@ -3263,18 +3279,18 @@ public class Agent {
             // Create and start the HTML adaptor.
             //
             htmlObjName = new ObjectName(domain +
-                   ":class=HtmlAdaptorServer,protocol=html,port=" + htmlPort);
+                    ":class=HtmlAdaptorServer,protocol=html,port=" + htmlPort);
             println("Adding HTML adaptor to MBean server with name \n    " +
                     htmlObjName);
             println("NOTE: HTML adaptor is bound on TCP port " + htmlPort);
             HtmlAdaptorServer htmlAdaptor = new HtmlAdaptorServer(htmlPort);
             server.registerMBean(htmlAdaptor, htmlObjName);
             htmlAdaptor.start();
-                  
+
             //
             // SNMP specific code:
             //
-      
+
             // Create and start the SNMP adaptor.
             // Specify the port to use in the constructor. 
             // If you want to use the standard port (161) comment out the 
@@ -3282,8 +3298,8 @@ public class Agent {
             //   snmpPort = 8085;
             //
             snmpPort = 11161;
-            snmpObjName = new ObjectName(domain + 
-                  ":class=SnmpAdaptorServer,protocol=snmp,port=" + snmpPort);
+            snmpObjName = new ObjectName(domain +
+                    ":class=SnmpAdaptorServer,protocol=snmp,port=" + snmpPort);
             println("Adding SNMP adaptor to MBean server with name \n    " +
                     snmpObjName);
             println("NOTE: SNMP Adaptor is bound on UDP port " + snmpPort);
@@ -3294,8 +3310,8 @@ public class Agent {
             // Send a coldStart SNMP Trap. 
             // Use port = snmpPort+1.
             //
-            print("NOTE: Sending a coldStart SNMP trap" + 
-                  " to each destination defined in the ACL file...");
+            print("NOTE: Sending a coldStart SNMP trap" +
+                    " to each destination defined in the ACL file...");
             snmpAdaptor.setTrapPort(new Integer(snmpPort+1));
             snmpAdaptor.snmpV1Trap(0, 0, null);
             println("Done.");
@@ -3303,23 +3319,23 @@ public class Agent {
             // Create an RMI connector and start it
             try {
                 JMXServiceURL url =
-                    new JMXServiceURL(
-                        "service:jmx:rmi:///jndi/rmi://localhost:9999/server");
+                        new JMXServiceURL(
+                                "service:jmx:rmi:///jndi/rmi://localhost:9999/server");
                 JMXConnectorServer cs =
-                    JMXConnectorServerFactory.newJMXConnectorServer(
-                        url, null, server);
+                        JMXConnectorServerFactory.newJMXConnectorServer(
+                                url, null, server);
                 cs.start();
             } catch (Exception ex) {
                 println(
-                    "Error starting RMI : execute rmiregistry 9999; ex="+ex);
+                        "Error starting RMI : execute rmiregistry 9999; ex="+ex);
             }
-      
+
             // Create the MIB II (RFC 1213) and add it to the MBean server.
             //
             sunMibObjName = new ObjectName("snmp:class=SUN_OPENSSO_SERVER_MIB");
             println(
-                "Adding SUN_OPENSSO_SERVER_MIB-MIB to MBean server with name" +
-                "\n    " + sunMibObjName);
+                    "Adding SUN_OPENSSO_SERVER_MIB-MIB to MBean server with name" +
+                            "\n    " + sunMibObjName);
 
             // Create an instance of the customized MIB
             //
@@ -3333,7 +3349,7 @@ public class Agent {
 
             FORGEROCK_OPENAM_CTS_MIB mib3 = new FORGEROCK_OPENAM_CTS_MIB();
             server.registerMBean(mib3, forgerockCtsMibObjName);
-      
+
             // Bind the SNMP adaptor to the MIB in order to make the MIB 
             // accessible through the SNMP protocol adaptor.
             // If this step is not performed, the MIB will still live in 
@@ -3346,10 +3362,10 @@ public class Agent {
             // Specify the ifIndex to use in the object name.
             //
             int ifIndex = 1;
-            trapGeneratorObjName = new ObjectName("trapGenerator" + 
-                              ":class=LinkTrapGenerator,ifIndex=" + ifIndex);
+            trapGeneratorObjName = new ObjectName("trapGenerator" +
+                    ":class=LinkTrapGenerator,ifIndex=" + ifIndex);
             println("Adding LinkTrapGenerator to MBean server with name" +
-                "\n    " + trapGeneratorObjName);
+                    "\n    " + trapGeneratorObjName);
             LinkTrapGenerator trapGenerator = new LinkTrapGenerator(nbTraps);
             server.registerMBean(trapGenerator, trapGeneratorObjName);
 
@@ -3357,9 +3373,9 @@ public class Agent {
             println("   -or-");
             println(">> Press <Ctrl-C> if you want to stop this agent.");
             System.in.read();
-            
+
             trapGenerator.start();
-            
+
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -3371,16 +3387,16 @@ public class Agent {
     public static SnmpAdaptorServer getSnmpAdaptor() {
         return snmpAdaptor;
     }
-    
+
     /**
      * Return usage of the program.
      */
     public static void  usage() {
         println("java Agent <nb_traps>");
         println("where");
-        println("    -nb_traps: " + 
+        println("    -nb_traps: " +
                 "number of traps the SNMP agent will send.");
-        println("              " + 
+        println("              " +
                 "If not specified, the agent will send traps continuously.");
     }
 

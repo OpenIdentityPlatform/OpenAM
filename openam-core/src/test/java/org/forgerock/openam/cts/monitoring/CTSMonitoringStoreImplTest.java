@@ -17,28 +17,27 @@
 package org.forgerock.openam.cts.monitoring;
 
 import com.sun.identity.shared.debug.Debug;
+import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutorService;
 import org.forgerock.openam.cts.CTSOperation;
 import org.forgerock.openam.cts.api.TokenType;
 import org.forgerock.openam.cts.api.tokens.Token;
 import org.forgerock.openam.cts.monitoring.impl.CTSMonitoringStoreImpl;
+import org.forgerock.openam.cts.monitoring.impl.connections.ConnectionStore;
 import org.forgerock.openam.cts.monitoring.impl.operations.TokenOperationsStore;
 import org.forgerock.openam.cts.monitoring.impl.reaper.ReaperMonitor;
-import org.mockito.Matchers;
-import org.mockito.invocation.InvocationOnMock;
-import org.mockito.stubbing.Answer;
-import org.testng.annotations.BeforeMethod;
-import org.testng.annotations.Test;
-
-import java.util.concurrent.Callable;
-import java.util.concurrent.ExecutorService;
-
 import static org.mockito.BDDMockito.given;
+import org.mockito.Matchers;
 import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
+import org.mockito.invocation.InvocationOnMock;
+import org.mockito.stubbing.Answer;
 import static org.testng.Assert.assertEquals;
+import org.testng.annotations.BeforeMethod;
+import org.testng.annotations.Test;
 
 public class CTSMonitoringStoreImplTest {
 
@@ -47,6 +46,7 @@ public class CTSMonitoringStoreImplTest {
 
     private TokenOperationsStore tokenOperationsStore;
     private ReaperMonitor reaperMonitor;
+    private ConnectionStore connectionStore;
 
     @BeforeMethod
     public void setUp() {
@@ -55,9 +55,10 @@ public class CTSMonitoringStoreImplTest {
         final ExecutorService executorService = mock(ExecutorService.class);
         final Debug debug = mock(Debug.class);
         reaperMonitor = mock(ReaperMonitor.class);
+        connectionStore = mock(ConnectionStore.class);
 
         ctsOperationsMonitoringStore = new CTSMonitoringStoreImpl(debug, executorService, tokenOperationsStore,
-                reaperMonitor);
+                reaperMonitor, connectionStore);
         ctsReaperMonitoringStore = (CTSReaperMonitoringStore) ctsOperationsMonitoringStore;
 
         given(executorService.submit(any(Callable.class))).will(new Answer<Object>() {

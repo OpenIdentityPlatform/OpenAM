@@ -17,21 +17,22 @@
 package org.forgerock.openam.cts.monitoring.impl;
 
 import com.sun.identity.shared.debug.Debug;
+import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.RejectedExecutionException;
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Singleton;
 import org.forgerock.openam.cts.CTSOperation;
 import org.forgerock.openam.cts.api.CoreTokenConstants;
 import org.forgerock.openam.cts.api.TokenType;
 import org.forgerock.openam.cts.api.tokens.Token;
+import org.forgerock.openam.cts.monitoring.CTSConnectionMonitoringStore;
 import org.forgerock.openam.cts.monitoring.CTSOperationsMonitoringStore;
 import org.forgerock.openam.cts.monitoring.CTSReaperMonitoringStore;
+import org.forgerock.openam.cts.monitoring.impl.connections.ConnectionStore;
 import org.forgerock.openam.cts.monitoring.impl.operations.TokenOperationsStore;
 import org.forgerock.openam.cts.monitoring.impl.reaper.ReaperMonitor;
-
-import javax.inject.Inject;
-import javax.inject.Named;
-import javax.inject.Singleton;
-import java.util.concurrent.Callable;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.RejectedExecutionException;
 
 /**
  * An implementation of the CTSOperationsMonitoringStore that stores the CTS monitoring information
@@ -40,7 +41,8 @@ import java.util.concurrent.RejectedExecutionException;
  * @since 12.0.0
  */
 @Singleton
-public class CTSMonitoringStoreImpl implements CTSOperationsMonitoringStore, CTSReaperMonitoringStore {
+public class CTSMonitoringStoreImpl implements CTSOperationsMonitoringStore, CTSReaperMonitoringStore,
+        CTSConnectionMonitoringStore {
 
     /**
      * Constant for binding an Executor for the CTS monitoring store to store CTS runtime data.
@@ -52,6 +54,7 @@ public class CTSMonitoringStoreImpl implements CTSOperationsMonitoringStore, CTS
     private final TokenOperationsStore tokenOperationsStore;
     private final ExecutorService executorService;
     private final ReaperMonitor reaperMonitor;
+    private final ConnectionStore connectionStore;
 
     /**
      * Constructs an instance of the CTSMonitoringStoreImpl.
@@ -63,12 +66,13 @@ public class CTSMonitoringStoreImpl implements CTSOperationsMonitoringStore, CTS
      */
     @Inject
     public CTSMonitoringStoreImpl(@Named(CoreTokenConstants.CTS_DEBUG) Debug debug,
-            @Named(EXECUTOR_BINDING_NAME) ExecutorService executorService, TokenOperationsStore tokenOperationsStore,
-            final ReaperMonitor reaperMonitor) {
+                                  @Named(EXECUTOR_BINDING_NAME) ExecutorService executorService, TokenOperationsStore tokenOperationsStore,
+                                  final ReaperMonitor reaperMonitor, final ConnectionStore connectionStore) {
         this.debug = debug;
         this.executorService = executorService;
         this.tokenOperationsStore = tokenOperationsStore;
         this.reaperMonitor = reaperMonitor;
+        this.connectionStore = connectionStore;
     }
 
     /**
@@ -172,5 +176,30 @@ public class CTSMonitoringStoreImpl implements CTSOperationsMonitoringStore, CTS
     @Override
     public double getRateOfDeletedSessions() {
         return reaperMonitor.getRateOfDeletion();
+    }
+
+    @Override
+    public void addConnection(boolean success) {
+        connectionStore.addConnection(success);
+    }
+
+    @Override
+    public double getAverageConnectionsPerPeriod(boolean success) {
+        return connectionStore.getAverageConnectionsPerPeriod(success);
+    }
+
+    @Override
+    public double getMinimumOperationsPerPeriod(boolean success) {
+        return connectionStore.getMinimumOperationsPerPeriod(success);
+    }
+
+    @Override
+    public double getMaximumOperationsPerPeriod(boolean success) {
+        return connectionStore.getMaximumOperationsPerPeriod(success);
+    }
+
+    @Override
+    public double getConnectionsCumulativeCount(boolean success) {
+        return connectionStore.getConnectionsCumulativeCount(success);
     }
 }

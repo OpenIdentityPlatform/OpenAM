@@ -1,5 +1,5 @@
 /*
- * Copyright 2013 ForgeRock AS.
+ * Copyright 2013-2014 ForgeRock AS.
  *
  * The contents of this file are subject to the terms of the Common Development and
  * Distribution License (the License). You may not use this file except in compliance with the
@@ -30,6 +30,9 @@ public class FORGEROCK_OPENAM_CTS_MIBImpl extends FORGEROCK_OPENAM_CTS_MIB imple
 
     //CTS
     private CtsMonitoring ctsMonitoringGroup;
+
+    private CtsConnectionSuccessRate ctsConnectionSuccessRate;
+    private CtsConnectionFailureRate ctsConnectionFailureRate;
 
     /**
      * Default constructor. Initialize the Mib tree.
@@ -75,6 +78,68 @@ public class FORGEROCK_OPENAM_CTS_MIBImpl extends FORGEROCK_OPENAM_CTS_MIB imple
 
     public CtsMonitoring getCtsMonitoringGroup() {
         return ctsMonitoringGroup;
+    }
+
+    public CtsConnectionSuccessRate getCtsConnectionSuccessRate() {
+        return ctsConnectionSuccessRate;
+    }
+
+    public CtsConnectionFailureRate getCtsConnectionFailureRate() {
+        return ctsConnectionFailureRate;
+    }
+
+    /**
+     * Factory method for "CtsConnectionSuccessRate" group MBean.
+     *
+     * You can redefine this method if you need to replace the default
+     * generated MBean class with your own customized class.
+     *
+     * @param groupName Name of the group ("CtsConnectionSuccessRate")
+     * @param groupOid  OID of this group
+     * @param groupObjname ObjectName for this group (may be null)
+     * @param server    MBeanServer for this group (may be null)
+     *
+     * @return An instance of the MBean class generated for the
+     *         "CtsConnectionSuccessRate" group (CtsConnectionSuccessRate)
+     *
+     * Note that when using standard metadata,
+     * the returned object must implement the "CtsConnectionSuccessRateMBean"
+     * interface.
+     **/
+    protected Object createCtsConnectionSuccessRateMBean(String groupName,
+                                                         String groupOid,
+                                                         ObjectName groupObjname, MBeanServer server)  {
+
+        ctsConnectionSuccessRate = new CtsConnectionSuccessRateImpl(this);
+
+        return ctsConnectionSuccessRate;
+    }
+
+    /**
+     * Factory method for "CtsConnectionFailureRate" group MBean.
+     *
+     * You can redefine this method if you need to replace the default
+     * generated MBean class with your own customized class.
+     *
+     * @param groupName Name of the group ("CtsConnectionFailureRate")
+     * @param groupOid  OID of this group
+     * @param groupObjname ObjectName for this group (may be null)
+     * @param server    MBeanServer for this group (may be null)
+     *
+     * @return An instance of the MBean class generated for the
+     *         "CtsConnectionFailureRate" group (CtsConnectionFailureRate)
+     *
+     * Note that when using standard metadata,
+     * the returned object must implement the "CtsConnectionFailureRateMBean"
+     * interface.
+     **/
+    protected Object createCtsConnectionFailureRateMBean(String groupName,
+                                                         String groupOid,
+                                                         ObjectName groupObjname, MBeanServer server)  {
+
+        ctsConnectionFailureRate = new CtsConnectionFailureRateImpl(this);
+
+        return ctsConnectionFailureRate;
     }
 
 }

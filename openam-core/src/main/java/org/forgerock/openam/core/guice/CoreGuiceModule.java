@@ -34,6 +34,11 @@ import com.sun.identity.sm.DNMapper;
 import com.sun.identity.sm.SMSEntry;
 import com.sun.identity.sm.ServiceManagementDAO;
 import com.sun.identity.sm.ServiceManagementDAOWrapper;
+import java.security.PrivilegedAction;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.ScheduledExecutorService;
+import javax.inject.Inject;
+import javax.inject.Singleton;
 import org.forgerock.json.fluent.JsonValue;
 import org.forgerock.openam.cts.CTSPersistentStore;
 import org.forgerock.openam.cts.CoreTokenConfig;
@@ -41,11 +46,12 @@ import org.forgerock.openam.cts.ExternalTokenConfig;
 import org.forgerock.openam.cts.adapters.OAuthAdapter;
 import org.forgerock.openam.cts.adapters.TokenAdapter;
 import org.forgerock.openam.cts.api.CoreTokenConstants;
-import org.forgerock.openam.cts.impl.CTSConnectionFactory;
 import org.forgerock.openam.cts.impl.LDAPConfig;
+import org.forgerock.openam.cts.monitoring.CTSConnectionMonitoringStore;
 import org.forgerock.openam.cts.monitoring.CTSOperationsMonitoringStore;
 import org.forgerock.openam.cts.monitoring.CTSReaperMonitoringStore;
 import org.forgerock.openam.cts.monitoring.impl.CTSMonitoringStoreImpl;
+import org.forgerock.openam.cts.monitoring.impl.connections.MonitoredCTSConnectionFactory;
 import org.forgerock.openam.entitlement.indextree.IndexChangeHandler;
 import org.forgerock.openam.entitlement.indextree.IndexChangeManager;
 import org.forgerock.openam.entitlement.indextree.IndexChangeManagerImpl;
@@ -60,13 +66,6 @@ import org.forgerock.openam.sm.DataLayerConnectionFactory;
 import org.forgerock.openam.utils.ExecutorServiceFactory;
 import org.forgerock.opendj.ldap.ConnectionFactory;
 import org.forgerock.opendj.ldap.SearchResultHandler;
-
-import javax.inject.Inject;
-import javax.inject.Singleton;
-import java.security.PrivilegedAction;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledExecutorService;
 
 /**
  * Guice Module for configuring bindings for the OpenAM Core classes.
@@ -118,7 +117,7 @@ public class CoreGuiceModule extends AbstractModule {
         bind(CTSPersistentStore.class).in(Singleton.class);
         bind(CoreTokenConfig.class).in(Singleton.class);
         // CTS Connection Management
-        bind(ConnectionFactory.class).to(CTSConnectionFactory.class).in(Singleton.class);
+        bind(ConnectionFactory.class).to(MonitoredCTSConnectionFactory.class).in(Singleton.class);
         bind(LDAPConfig.class).toProvider(new Provider<LDAPConfig>() {
             public LDAPConfig get() {
                 return new LDAPConfig(SMSEntry.getRootSuffix());
@@ -162,6 +161,7 @@ public class CoreGuiceModule extends AbstractModule {
 
         bind(CTSOperationsMonitoringStore.class).to(CTSMonitoringStoreImpl.class);
         bind(CTSReaperMonitoringStore.class).to(CTSMonitoringStoreImpl.class);
+        bind(CTSConnectionMonitoringStore.class).to(CTSMonitoringStoreImpl.class);
         bind(ExecutorService.class).annotatedWith(Names.named(CTSMonitoringStoreImpl.EXECUTOR_BINDING_NAME))
                 .toProvider(CTSMonitoringStoreExecutorServiceProvider.class);
     }

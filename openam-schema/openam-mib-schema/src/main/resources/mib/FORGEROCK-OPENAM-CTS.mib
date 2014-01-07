@@ -305,9 +305,10 @@ averageDuration OBJECT-TYPE
     SYNTAX      	Counter64
     MAX-ACCESS  	read-only
     STATUS      	current
-    DESCRIPTION     "Average duration of tokens of the specified type in OpenAM"
+    DESCRIPTION     "Average duration of tokens of the specified type in OpenAM in seconds"
     DEFVAL    		{ 0 }
     ::= { ctsTokenOperationsEntry 2 }
+
 
 --
 -- ctsReaperOperationsTable
@@ -320,5 +321,80 @@ rateOfDeletedSessions OBJECT-TYPE
     DESCRIPTION     "Rate of deleted sessions per reaper run"
     DEFVAL    		{ 0 }
 	::= { ctsMonitoring 6 }
+
+--
+-- ctsConnection
+--
+
+ctsConnection OBJECT IDENTIFIER ::= { ctsMonitoring 7 }
+
+ctsConnectionSuccessRate OBJECT IDENTIFIER ::= { ctsConnection 1 }
+
+successCumulative  	OBJECT-TYPE
+    SYNTAX      	Counter64
+    MAX-ACCESS  	read-only
+    STATUS      	current
+    DESCRIPTION     "Cumulative number of successful connections made by connection pool"
+    DEFVAL    		{ 0 }
+    ::= { ctsConnectionSuccessRate 1 }
+
+successAverage  	OBJECT-TYPE
+    SYNTAX      	Counter64
+    MAX-ACCESS  	read-only
+    STATUS      	current
+    DESCRIPTION     "Average rate of successful connections made by connection pool"
+    DEFVAL    		{ 0 }
+    ::= { ctsConnectionSuccessRate 2 }
+
+successMinimum  	OBJECT-TYPE
+    SYNTAX      	Counter64
+    MAX-ACCESS  	read-only
+    STATUS      	current
+    DESCRIPTION     "Minimum rate of successful connections made by connection pool"
+    DEFVAL    		{ 0 }
+    ::= { ctsConnectionSuccessRate 3 }
+
+successMaximum  	OBJECT-TYPE
+    SYNTAX      	Counter64
+    MAX-ACCESS  	read-only
+    STATUS      	current
+    DESCRIPTION     "Maximum rate of successful connections made by connection pool"
+    DEFVAL    		{ 0 }
+    ::= { ctsConnectionSuccessRate 4 }
+
+ctsConnectionFailureRate OBJECT IDENTIFIER ::= { ctsConnection 2 }
+
+failureCumulative  	OBJECT-TYPE
+    SYNTAX      	Counter64
+    MAX-ACCESS  	read-only
+    STATUS      	current
+    DESCRIPTION     "Cumulative number of failed connections made by connection pool"
+    DEFVAL    	 { 0 }
+    ::= { ctsConnectionFailureRate 1 }
+
+failureAverage  	OBJECT-TYPE
+    SYNTAX      	Counter64
+    MAX-ACCESS  	read-only
+    STATUS      	current
+    DESCRIPTION     "Average rate of failed connections made by connection pool"
+    DEFVAL    	 { 0 }
+    ::= { ctsConnectionFailureRate 2 }
+
+failureMinimum  	OBJECT-TYPE
+    SYNTAX      	Counter64
+    MAX-ACCESS  	read-only
+    STATUS      	current
+    DESCRIPTION     "Minimum rate of failed connections made by connection pool"
+    DEFVAL    	 { 0 }
+    ::= { ctsConnectionFailureRate 3 }
+
+failureMaximum  	OBJECT-TYPE
+    SYNTAX      	Counter64
+    MAX-ACCESS  	read-only
+    STATUS      	current
+    DESCRIPTION     "Maximum rate of failed connections made by connection pool"
+    DEFVAL    	 { 0 }
+    ::= { ctsConnectionFailureRate 4 }
+
 
 END

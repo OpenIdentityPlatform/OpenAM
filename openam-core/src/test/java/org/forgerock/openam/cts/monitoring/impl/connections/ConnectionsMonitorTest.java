@@ -11,10 +11,10 @@
 * Header, with the fields enclosed by brackets [] replaced by your own identifying
 * information: "Portions copyright [year] [name of copyright owner]".
 *
-* Copyright 2013-2014 ForgeRock AS.
+* Copyright 2014 ForgeRock AS.
 */
 
-package org.forgerock.openam.cts.monitoring.impl.operations;
+package org.forgerock.openam.cts.monitoring.impl.connections;
 
 import org.forgerock.openam.cts.monitoring.impl.RateTimer;
 import org.forgerock.openam.cts.monitoring.impl.RateWindow;
@@ -25,9 +25,9 @@ import static org.testng.Assert.assertEquals;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
-public class OperationMonitorTest {
+public class ConnectionsMonitorTest {
 
-    private OperationMonitor operationMonitor;
+    private ConnectionMonitor connectionMonitor;
 
     private RateWindow rateWindow;
 
@@ -37,7 +37,7 @@ public class OperationMonitorTest {
         RateTimer timer = mock(RateTimer.class);
         rateWindow = mock(RateWindow.class);
 
-        operationMonitor = new OperationMonitor(timer, rateWindow);
+        connectionMonitor = new ConnectionMonitor(timer, rateWindow);
     }
 
     @Test
@@ -46,7 +46,7 @@ public class OperationMonitorTest {
         //Given
 
         //When
-        long count = operationMonitor.getCount();
+        long count = connectionMonitor.getCumulativeCount();
 
         //Then
         assertEquals(count, 0);
@@ -61,7 +61,7 @@ public class OperationMonitorTest {
         given(rateWindow.getAverageRate()).willReturn(SOLUTION);
 
         //When
-        double rate = operationMonitor.getAverageRate();
+        double rate = connectionMonitor.getAverageRate();
 
         //Then
         assertEquals(rate, SOLUTION);
@@ -76,7 +76,7 @@ public class OperationMonitorTest {
         given(rateWindow.getMinRate()).willReturn(SOLUTION);
 
         //When
-        long rate = operationMonitor.getMinRate();
+        long rate = connectionMonitor.getMinimumRate();
 
         //Then
         assertEquals(rate, SOLUTION);
@@ -91,7 +91,7 @@ public class OperationMonitorTest {
         given(rateWindow.getMaxRate()).willReturn(SOLUTION);
 
         //When
-        long rate = operationMonitor.getMaxRate();
+        long rate = connectionMonitor.getMaximumRate();
 
         //Then
         assertEquals(rate, SOLUTION);
@@ -100,16 +100,14 @@ public class OperationMonitorTest {
     @Test
     public void shouldGetCountReturningOneAfterIncrement() {
 
-        final long SOLUTION = 1L;
-
         //Given
-        operationMonitor.increment();
+        connectionMonitor.add();
 
         //When
-        long count = operationMonitor.getCount();
+        long count = connectionMonitor.getCumulativeCount();
 
         //Then
-        assertEquals(count, SOLUTION);
+        assertEquals(count, 1);
     }
 
     @Test
@@ -119,11 +117,11 @@ public class OperationMonitorTest {
         final int NUM = 6;
 
         for(int i = 0; i < NUM; i++) {
-            operationMonitor.increment();
+            connectionMonitor.add();
         }
 
         //When
-        long count = operationMonitor.getCount();
+        long count = connectionMonitor.getCumulativeCount();
 
         //Then
         assertEquals(count, NUM);
@@ -136,12 +134,12 @@ public class OperationMonitorTest {
         RateTimer timer = new TestCurrentMillis();
         RateWindow rateWindow = new RateWindow(timer, 10, 1000L);
 
-        final OperationMonitor monitor = new OperationMonitor(timer, rateWindow);
+        final ConnectionMonitor monitor = new ConnectionMonitor(timer, rateWindow);
 
         //When
         new Thread(new Runnable() {
             public void run() {
-                monitor.increment();
+                monitor.add();
             }
         }).start();
 

@@ -36,6 +36,8 @@ public enum CoreTokenField {
     TOKEN_ID("coreTokenId"),
     EXPIRY_DATE("coreTokenExpirationDate"),
     BLOB("coreTokenObject"),
+
+    //LDAP optional attribute, added by OpenDJ/AD
     CREATE_TIMESTAMP("createTimestamp"),
 
     // Generic indexed String fields

@@ -11,10 +11,10 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2013 ForgeRock AS.
+ * Copyright 2014 ForgeRock AS.
  */
 
-package org.forgerock.openam.cts.monitoring.impl.operations;
+package org.forgerock.openam.cts.monitoring.impl;
 
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -23,9 +23,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
+import java.util.concurrent.atomic.AtomicLong;
 
 /**
- * This class maintains the rate of an operation for a sample rate over a window of a particular size.
+ * This class maintains the rate of an event for a sample rate over a window of a particular size.
  * <br/>
  * The window is constructed with a given size and sample rate and the window will move continuously at interval
  * defined by the sample rate. The min, max and average will always be of the current window position, ie as the window
@@ -34,38 +35,38 @@ import java.util.TreeSet;
  *
  * @since 12.0.0
  */
-class OperationRateWindow {
+public class RateWindow {
 
-    private final OperationMonitor.Timer timer;
+    private final RateTimer timer;
     private final int size;
     private final long sampleRate;
-    private final Map<Long, Rate> window;
-    private final Set<Rate> minMaxRate = new TreeSet<Rate>(new Comparator<Rate>() {
-        public int compare(Rate rate, Rate rate2) {
-            return (int) (rate.rate - rate2.rate);
+    private final LinkedHashMap<Long, AtomicLong> window;
+    private final Set<AtomicLong> minMaxRate = new TreeSet<AtomicLong>(new Comparator<AtomicLong>() {
+        public int compare(AtomicLong rate, AtomicLong rate2) {
+            return (int) (rate.get() - rate2.get());
         }
     });
 
     private long currentIndex = 0L;
 
     /**
-     * Constructs a new instance of the OperationRateWindow.
+     * Constructs a new instance of the RateWindow.
      *
      * @param timer An instance of a Timer.
      * @param size The size of the window.
      * @param sampleRate The sample rate for the window.
      */
-    public OperationRateWindow(final OperationMonitor.Timer timer, final int size, final long sampleRate) {
+    public RateWindow(final RateTimer timer, final int size, final long sampleRate) {
         this.timer = timer;
         this.size = size;
         this.sampleRate = sampleRate;
-        this.window = new LinkedHashMap<Long, Rate>(size);
+        this.window = new LinkedHashMap<Long, AtomicLong>(size);
     }
 
     /**
-     * Re-calculates the operation rate for an operation.
+     * Re-calculates the rate.
      *
-     * @param timestamp The millisecond timestamp of the operation.
+     * @param timestamp The millisecond timestamp of the event.
      */
     public synchronized void recalculate(final long timestamp) {
         long sample = toSampleRate(timestamp);
@@ -77,8 +78,8 @@ class OperationRateWindow {
         }
 
         if (isAtCurrentIndex(sample)) {
-            Rate rate = window.get(currentIndex);
-            rate.increment();
+            AtomicLong rate = window.get(currentIndex);
+            rate.incrementAndGet();
             return;
         }
 
@@ -104,8 +105,8 @@ class OperationRateWindow {
         }
 
         if (i == sample) {
-            Rate rate = window.get(i);
-            rate.increment();
+            AtomicLong rate = window.get(i);
+            rate.incrementAndGet();
             return;
         }
 
@@ -119,12 +120,12 @@ class OperationRateWindow {
      * @param oldestIndex The oldest index in the window.
      */
     private void updateMinAndMax(final long currentIndex, final long oldestIndex) {
-        final Rate oldestRate = window.get(oldestIndex);
+        final AtomicLong oldestRate = window.get(oldestIndex);
         if (!minMaxRate.isEmpty() && oldestRate != null) {
             minMaxRate.remove(oldestRate);
         }
 
-        final Rate currentRate = window.get(currentIndex);
+        final AtomicLong currentRate = window.get(currentIndex);
         minMaxRate.add(currentRate);
     }
 
@@ -136,7 +137,7 @@ class OperationRateWindow {
         final long oldestIndex = getPastIndex(nextIndex);
         updateMinAndMax(currentIndex, oldestIndex);
         currentIndex = nextIndex;
-        window.put(nextIndex, new Rate());
+        window.put(nextIndex, new AtomicLong(0));
         // Each time we add a new index, we move the window along by removing the oldest index.
         window.remove(oldestIndex);
     }
@@ -145,14 +146,19 @@ class OperationRateWindow {
      * Gets the average rate for the sample rate averaged across the whole window.
      * <br/>
      * Does not include the latest window slot if time has not passed beyond it yet as otherwise could skew the average
-     * as that time slot has not yet completed and may get more operations made in it.
+     * as that time slot has not yet completed and may get more events made in it.
      *
-     * @return The average operation rate.
+     * @return The average event rate.
      */
     public synchronized double getAverageRate() {
+
+        if(window.size()  == 0) {
+            return 0D;
+        }
+
         double averageRate = 0;
-        long now = toSampleRate(timer.now());
-        for (Map.Entry<Long, Rate> entry : window.entrySet()) {
+        final long now = toSampleRate(timer.now());
+        for (Map.Entry<Long, AtomicLong> entry : window.entrySet()) {
             if (isAtCurrentIndex(now) && entry.getKey().equals(currentIndex)) {
                 /*
                  * If this is true then the latest window slot has not completed so the rate in it will not be
@@ -160,15 +166,17 @@ class OperationRateWindow {
                  */
                 continue;
             }
-            averageRate += entry.getValue().rate;
+            averageRate += entry.getValue().get();
         }
+
         return averageRate / window.size();
+
     }
 
     /**
      * Gets the minimum rate.
      *
-     * @return The minimum operation rate.
+     * @return The minimum event rate.
      */
     public synchronized long getMinRate() {
         if (minMaxRate.isEmpty()) {
@@ -177,13 +185,13 @@ class OperationRateWindow {
         if (isAtCurrentIndex(toSampleRate(timer.now()))) {
             addNextSlot();
         }
-        return new ArrayList<Rate>(minMaxRate).get(0).rate;
+        return new ArrayList<AtomicLong>(minMaxRate).get(0).get();
     }
 
     /**
      * Gets the maximum rate.
      *
-     * @return The maximum operation rate.
+     * @return The maximum event rate.
      */
     public synchronized long getMaxRate() {
         if (minMaxRate.isEmpty()) {
@@ -192,8 +200,8 @@ class OperationRateWindow {
         if (isAtCurrentIndex(toSampleRate(timer.now()))) {
             addNextSlot();
         }
-        List<Rate> maxRate = new ArrayList<Rate>(minMaxRate);
-        return maxRate.get(maxRate.size() - 1).rate;
+        List<AtomicLong> maxRate = new ArrayList<AtomicLong>(minMaxRate);
+        return maxRate.get(maxRate.size() - 1).get();
     }
 
     /**
@@ -218,7 +226,7 @@ class OperationRateWindow {
         // If is first time the window has been used we need to first set the currentIndex to the given sample.
         if (currentIndex == 0L) {
             currentIndex = sample;
-            window.put(currentIndex, new Rate());
+            window.put(currentIndex, new AtomicLong(0));
             return true;
         }
 
@@ -244,25 +252,4 @@ class OperationRateWindow {
         return nextIndex - size;
     }
 
-    /**
-     * Encapsulates the rate as a Long object so it can be automatically removed from the min/max list.
-     */
-    private static class Rate {
-
-        private Long rate;
-
-        /**
-         * Constructs a new instance of Rate with a initial rate of 0.
-         */
-        public Rate() {
-            this.rate = 0L;
-        }
-
-        /**
-         * Increments the rate by one.
-         */
-        public void increment() {
-            rate++;
-        }
-    }
 }

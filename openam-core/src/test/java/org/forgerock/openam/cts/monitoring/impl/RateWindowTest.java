@@ -11,35 +11,34 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2013 ForgeRock AS.
+ * Copyright 2013-2014 ForgeRock AS.
  */
 
-package org.forgerock.openam.cts.monitoring.impl.operations;
-
-import org.testng.annotations.BeforeMethod;
-import org.testng.annotations.Test;
+package org.forgerock.openam.cts.monitoring.impl;
 
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.mock;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.fail;
+import org.testng.annotations.BeforeMethod;
+import org.testng.annotations.Test;
 
-public class OperationRateWindowTest {
+public class RateWindowTest {
 
     private static final long SAMPLE_RATE = 1000L;
 
-    private OperationMonitor.Timer timer;
+    private RateTimer timer;
 
     @BeforeMethod
     public void setUp() {
-        timer = mock(OperationMonitor.Timer.class);
+        timer = mock(RateTimer.class);
     }
 
-    private OperationRateWindow createRateWindow(final long sampleRate, final int windowSize) {
-        return new OperationRateWindow(timer, windowSize, sampleRate);
+    private RateWindow createRateWindow(final long sampleRate, final int windowSize) {
+        return new RateWindow(timer, windowSize, sampleRate);
     }
 
-    private OperationRateWindow createRateWindow(final int windowSize) {
+    private RateWindow createRateWindow(final int windowSize) {
         return createRateWindow(SAMPLE_RATE, windowSize);
     }
 
@@ -51,7 +50,7 @@ public class OperationRateWindowTest {
     public void shouldAddRateToFirstWindowSlot() {
 
         //Given
-        OperationRateWindow rateWindow = createRateWindow(1);
+        RateWindow rateWindow = createRateWindow(1);
         long timestamp = getNowTimestamp(SAMPLE_RATE);
 
         //When
@@ -65,7 +64,7 @@ public class OperationRateWindowTest {
     public void shouldThrowAssertionErrorWhenLatestTimestampBeforeCurrent() {
 
         //Given
-        OperationRateWindow rateWindow = createRateWindow(1);
+        RateWindow rateWindow = createRateWindow(1);
         long timestamp1 = getNowTimestamp(SAMPLE_RATE);
         long timestamp2 = timestamp1 - SAMPLE_RATE;
 
@@ -82,7 +81,7 @@ public class OperationRateWindowTest {
     public void shouldNotUpdatePastRateIfBeforeWindowStart() {
 
         //Given
-        OperationRateWindow rateWindow = createRateWindow(1);
+        RateWindow rateWindow = createRateWindow(1);
         long timestamp1 = getNowTimestamp(SAMPLE_RATE);
         long timestamp2 = timestamp1 - SAMPLE_RATE;
 
@@ -99,7 +98,7 @@ public class OperationRateWindowTest {
     public void shouldUpdatePreviousRate() {
 
         //Given
-        OperationRateWindow rateWindow = createRateWindow(4);
+        RateWindow rateWindow = createRateWindow(4);
         long timestamp1 = getNowTimestamp(SAMPLE_RATE);
         long timestamp2 = timestamp1 + SAMPLE_RATE;
         long timestamp3 = timestamp2 - SAMPLE_RATE;
@@ -118,7 +117,7 @@ public class OperationRateWindowTest {
     public void shouldUpdatePreviousPreviousRate() {
 
         //Given
-        OperationRateWindow rateWindow = createRateWindow(4);
+        RateWindow rateWindow = createRateWindow(4);
         long timestamp1 = getNowTimestamp(SAMPLE_RATE);
         long timestamp2 = timestamp1 + SAMPLE_RATE;
         long timestamp3 = timestamp2 + SAMPLE_RATE;
@@ -139,7 +138,7 @@ public class OperationRateWindowTest {
     public void shouldAddRatesToSameWindowSlotWithSameTimestamp() {
 
         //Given
-        OperationRateWindow rateWindow = createRateWindow(1);
+        RateWindow rateWindow = createRateWindow(1);
         long timestamp1 = getNowTimestamp(SAMPLE_RATE);
         long timestamp2 = timestamp1;
 
@@ -156,7 +155,7 @@ public class OperationRateWindowTest {
     public void shouldAddRatesToSameWindowSlotWithTimestampsAtEitherEndOfSampleRate() {
 
         //Given
-        OperationRateWindow rateWindow = createRateWindow(1);
+        RateWindow rateWindow = createRateWindow(1);
         long timestamp1 = getNowTimestamp(SAMPLE_RATE);
         long timestamp2 = timestamp1 + SAMPLE_RATE - 1;
 
@@ -173,7 +172,7 @@ public class OperationRateWindowTest {
     public void shouldAddRatesToDifferentWindowSlots() {
 
         //Given
-        OperationRateWindow rateWindow = createRateWindow(1);
+        RateWindow rateWindow = createRateWindow(1);
         long timestamp1 = getNowTimestamp(SAMPLE_RATE);
         long timestamp2 = timestamp1 + SAMPLE_RATE;
 
@@ -190,7 +189,7 @@ public class OperationRateWindowTest {
     public void shouldAddRatesToDifferentWindowSlotsWithAnEmptySlotBetween() {
 
         //Given
-        OperationRateWindow rateWindow = createRateWindow(2);
+        RateWindow rateWindow = createRateWindow(2);
         long timestamp1 = getNowTimestamp(SAMPLE_RATE);
         long timestamp2 = timestamp1 + (SAMPLE_RATE * 2);
 
@@ -207,7 +206,7 @@ public class OperationRateWindowTest {
     public void shouldGetAverageRateWhenTimeIsPassedLatestIndex() {
 
         //Given
-        OperationRateWindow rateWindow = createRateWindow(2);
+        RateWindow rateWindow = createRateWindow(2);
         long timestamp1 = getNowTimestamp(SAMPLE_RATE);
         long timestamp2 = timestamp1 + SAMPLE_RATE;
 
@@ -227,7 +226,7 @@ public class OperationRateWindowTest {
     public void shouldGetAverageRateWhenTimeIsInLatestIndex() {
 
         //Given
-        OperationRateWindow rateWindow = createRateWindow(2);
+        RateWindow rateWindow = createRateWindow(2);
         long timestamp1 = getNowTimestamp(SAMPLE_RATE);
         long timestamp2 = timestamp1 + SAMPLE_RATE;
 
@@ -247,7 +246,7 @@ public class OperationRateWindowTest {
     public void shouldGetAverageRateWhenTimeIsJustInLatestIndex() {
 
         //Given
-        OperationRateWindow rateWindow = createRateWindow(2);
+        RateWindow rateWindow = createRateWindow(2);
         long timestamp1 = getNowTimestamp(SAMPLE_RATE);
         long timestamp2 = timestamp1 + SAMPLE_RATE;
 
@@ -267,7 +266,7 @@ public class OperationRateWindowTest {
     public void shouldGetMinRateWhenNoRateSet() {
 
         //Given
-        OperationRateWindow rateWindow = createRateWindow(2);
+        RateWindow rateWindow = createRateWindow(2);
 
         //When
         long rate = rateWindow.getMinRate();
@@ -280,7 +279,7 @@ public class OperationRateWindowTest {
     public void shouldGetMinRate() {
 
         //Given
-        OperationRateWindow rateWindow = createRateWindow(3);
+        RateWindow rateWindow = createRateWindow(3);
         long timestamp1 = getNowTimestamp(SAMPLE_RATE);
         long timestamp2 = timestamp1 + SAMPLE_RATE;
         long timestamp3 = timestamp2 + SAMPLE_RATE;
@@ -304,7 +303,7 @@ public class OperationRateWindowTest {
     public void shouldGetMinRateWhenWindowMoves() {
 
         //Given
-        OperationRateWindow rateWindow = createRateWindow(2);
+        RateWindow rateWindow = createRateWindow(2);
         long timestamp1 = getNowTimestamp(SAMPLE_RATE);
         long timestamp2 = timestamp1 + SAMPLE_RATE;
         long timestamp3 = timestamp2 + SAMPLE_RATE;
@@ -327,7 +326,7 @@ public class OperationRateWindowTest {
     public void shouldGetMinRateWhenTimeHasPassedCurrentIndex() {
 
         //Given
-        OperationRateWindow rateWindow = createRateWindow(3);
+        RateWindow rateWindow = createRateWindow(3);
         long timestamp1 = getNowTimestamp(SAMPLE_RATE);
         long timestamp2 = timestamp1 + SAMPLE_RATE;
 
@@ -350,7 +349,7 @@ public class OperationRateWindowTest {
     public void shouldGetMinRateEvenWhenWindowHasMovedUnderIt() {
 
         //Given
-        OperationRateWindow rateWindow = createRateWindow(4);
+        RateWindow rateWindow = createRateWindow(4);
         long timestamp1 = getNowTimestamp(SAMPLE_RATE);
         long timestamp2 = timestamp1 + SAMPLE_RATE;
         long timestamp3 = timestamp2 + SAMPLE_RATE;
@@ -380,7 +379,7 @@ public class OperationRateWindowTest {
     public void shouldGetMinRateEvenWhenWindowHasMovedTwiceUnderIt() {
 
         //Given
-        OperationRateWindow rateWindow = createRateWindow(4);
+        RateWindow rateWindow = createRateWindow(4);
         long timestamp1 = getNowTimestamp(SAMPLE_RATE);
         long timestamp2 = timestamp1 + SAMPLE_RATE;
         long timestamp3 = timestamp2 + SAMPLE_RATE;
@@ -410,7 +409,7 @@ public class OperationRateWindowTest {
     public void shouldGetMaxRateWhenNoRateSet() {
 
         //Given
-        OperationRateWindow rateWindow = createRateWindow(2);
+        RateWindow rateWindow = createRateWindow(2);
 
         //When
         long rate = rateWindow.getMaxRate();
@@ -423,7 +422,7 @@ public class OperationRateWindowTest {
     public void shouldGetMaxRate() {
 
         //Given
-        OperationRateWindow rateWindow = createRateWindow(3);
+        RateWindow rateWindow = createRateWindow(3);
         long timestamp1 = getNowTimestamp(SAMPLE_RATE);
         long timestamp2 = timestamp1 + SAMPLE_RATE;
         long timestamp3 = timestamp2 + SAMPLE_RATE;
@@ -451,7 +450,7 @@ public class OperationRateWindowTest {
     public void shouldGetMaxRateWhenWindowMoves() {
 
         //Given
-        OperationRateWindow rateWindow = createRateWindow(2);
+        RateWindow rateWindow = createRateWindow(2);
         long timestamp1 = getNowTimestamp(SAMPLE_RATE);
         long timestamp2 = timestamp1 + SAMPLE_RATE;
         long timestamp3 = timestamp2 + SAMPLE_RATE;
@@ -478,7 +477,7 @@ public class OperationRateWindowTest {
     public void shouldGetMaxRateWhenTimeHasPassedCurrentIndex() {
 
         //Given
-        OperationRateWindow rateWindow = createRateWindow(3);
+        RateWindow rateWindow = createRateWindow(3);
         long timestamp1 = getNowTimestamp(SAMPLE_RATE);
         long timestamp2 = timestamp1 + SAMPLE_RATE;
         long timestamp3 = timestamp2 + SAMPLE_RATE;
@@ -508,7 +507,7 @@ public class OperationRateWindowTest {
     public void shouldGetMaxRateEvenWhenWindowHasMovedUnderIt() {
 
         //Given
-        OperationRateWindow rateWindow = createRateWindow(2);
+        RateWindow rateWindow = createRateWindow(2);
         long timestamp1 = getNowTimestamp(SAMPLE_RATE);
         long timestamp2 = timestamp1 + SAMPLE_RATE;
         long timestamp3 = timestamp2 + SAMPLE_RATE;
@@ -538,7 +537,7 @@ public class OperationRateWindowTest {
     public void shouldGetMaxRateEvenWhenWindowHasMovedTwiceUnderIt() {
 
         //Given
-        OperationRateWindow rateWindow = createRateWindow(4);
+        RateWindow rateWindow = createRateWindow(4);
         long timestamp1 = getNowTimestamp(SAMPLE_RATE);
         long timestamp2 = timestamp1 + SAMPLE_RATE;
         long timestamp3 = timestamp2 + SAMPLE_RATE;
