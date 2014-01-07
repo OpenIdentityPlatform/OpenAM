@@ -20,7 +20,7 @@
   !
   ! CCPL HEADER END
   !
-  !      Copyright 2011-2013 ForgeRock AS
+  !      Copyright 2011-2014 ForgeRock AS
   !    
 -->
 <chapter xml:id='chap-federation'
@@ -1635,6 +1635,104 @@ CookieWriterServlet.doGetPost: Redirect to
     </listitem>
    </varlistentry>
   </variablelist>
+ </section>
+
+ <section xml:id="saml2-failover">
+  <title>Configuring Providers for Failover</title>
+
+  <para>
+   OpenAM servers can function in a site configuration behind a load balancer,
+   as described in the <citetitle>Installation Guide</citetitle> chapter,
+   <link xlink:href="install-guide#chap-session-failover" xlink:show="new"
+   xlink:role="http://docbook.org/xlink/role/olink"><citetitle
+   >Setting Up OpenAM Session Failover</citetitle></link>.
+  </para>
+
+  <para>
+   When you set up the same SAML 2.0 Provider on multiple servers
+   behind a load balancer, however, you must ensure the metadata
+   points to the load balancer rather than the individual servers.
+  </para>
+
+  <orderedlist>
+   <listitem>
+    <para>
+     Before configuring the provider, follow the instructions
+     in the <citetitle>Installation Guide</citetitle> mentioned above,
+     and make sure that failover works through the load balancer
+     for normal OpenAM sessions.
+    </para>
+   </listitem>
+
+   <listitem>
+    <para>
+     Configure the provider on one of the servers
+     using the load balancer URL as the entity ID.
+    </para>
+   </listitem>
+
+   <listitem>
+    <para>
+     Export the metadata and extended metadata for the provider.
+     You can export metadata either by using the <command>ssoadm</command> command,
+     or by using the <filename>ssoadm.jsp</filename> page in OpenAM console
+     after setting <literal>ssoadm.disabled</literal> to <literal>false</literal>
+     under Servers and Sites > <replaceable>Server Name</replaceable> > Advanced.
+    </para>
+
+    <para>
+     With the <command>ssoadm</command> command, you can export the metadata
+     as shown in the following example for an Identity Provider,
+     where the entity ID is <literal>http://lb.example.com:80/openam</literal>.
+    </para>
+
+    <screen>$ ssoadm
+ export-entity
+ --entityid "http://lb.example.com:80/openam"
+ --adminid amadmin
+ --password-file /tmp/pwd.txt
+ --meta-data-file idp.xml
+ --extended-data-file idp-extended.xml</screen>
+   </listitem>
+
+   <listitem>
+    <para>
+     Edit both the metadata and the extended metadata,
+     changing all URLs in both files to use the load balancer URL.
+    </para>
+   </listitem>
+
+   <listitem>
+    <para>
+     Delete the provider configuration in OpenAM Console.
+    </para>
+   </listitem>
+
+   <listitem>
+    <para>
+     Import the edited provider configuration in OpenAM Console.
+    </para>
+   </listitem>
+
+   <listitem>
+    <para>
+     Enable SAMLv2 failover in OpenAM Console.
+    </para>
+
+    <para>
+     Under Configuration > Global, click SAMLv2 Service Configuration.
+    </para>
+
+    <para>
+     Select Enabled next to Enable SAMLv2 failover,
+     and then click Save.
+    </para>
+   </listitem>
+  </orderedlist>
+
+  <para>
+   At this point failover is operational for the provider you configured.
+  </para>
  </section>
 
  <section xml:id="google-apps-as-sp">
