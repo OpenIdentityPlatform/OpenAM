@@ -24,7 +24,6 @@ import org.forgerock.openam.entitlement.indextree.events.IndexChangeObserver;
 import javax.inject.Inject;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -36,100 +35,165 @@ import java.util.concurrent.TimeUnit;
  *
  * @author andrew.forrest@forgerock.com
  */
-public class IndexChangeManagerImpl implements IndexChangeManager, Runnable, IndexChangeObserver {
+public class IndexChangeManagerImpl implements IndexChangeManager, IndexChangeObserver {
 
     private static final Debug DEBUG = Debug.getInstance("amEntitlements");
+
+    private static final int LOG_DURATION = 10000;
+    private static final long INIT_DELAY = 0L;
+    private static final long RETRY_DELAY = 1L;
+    private static final TimeUnit DELAY_UNIT = TimeUnit.SECONDS;
 
     private final IndexChangeMonitor monitor;
     private final IndexChangeObservable observable;
 
     private final ScheduledExecutorService scheduler;
-    private volatile ScheduledFuture<?> schedulerStatus;
+    private final MonitorTask monitorTask;
+    private final TryAgainTask tryAgainTask;
 
-    private long lastLog;
+    private volatile boolean shutdown;
 
     @Inject
     public IndexChangeManagerImpl(IndexChangeMonitor monitor, IndexChangeObservable observable) {
         this.monitor = monitor;
         this.observable = observable;
 
+        // Associated tasks expect to be invoked by a single thread.
         scheduler = Executors.newScheduledThreadPool(1);
+        monitorTask = new MonitorTask();
+        tryAgainTask = new TryAgainTask();
+
         // Register to receive policy change events.
         observable.registerObserver(this);
+
+        // Attempt to start the monitor.
+        initiateMonitor();
     }
 
-    @Override
-    public  void init() {
-        if (schedulerStatus == null || schedulerStatus.isDone()) {
-
-            if (DEBUG.messageEnabled()) {
-                DEBUG.message("Initialising monitor to listen for policy path index modifications.");
-            }
-
-            // Kick of the scheduler to attempt to initiate the listener every second.
-            schedulerStatus = scheduler.scheduleWithFixedDelay(this, 0L, 1000L, TimeUnit.MILLISECONDS);
+    /**
+     * Initiates a task to immediately start the monitor.
+     */
+    private void initiateMonitor() {
+        if (DEBUG.messageEnabled()) {
+            DEBUG.message("Initialising monitor to listen for policy path index modifications.");
         }
+
+        scheduler.schedule(monitorTask, INIT_DELAY, DELAY_UNIT);
     }
 
-    @Override
-    public void run() {
-        try {
-            // Before starting the monitor, ensure it is not currently running.
-            monitor.shutdown();
-
-            // Initiate the monitor.
-            monitor.start();
-
-            // Listener has been established, no more attempts necessary.
-            schedulerStatus.cancel(false);
-
-            // Notify observers of potential data loss whilst the search has been initiated.
-            observable.notifyObservers(ErrorEventType.DATA_LOSS.createEvent());
-
-            lastLog = 0;
-
-        } catch (ChangeMonitorException sfE) {
-            long now = System.currentTimeMillis();
-
-            if (lastLog == 0 || now - lastLog > 60000) {
-                // Log every 60 seconds.
-                DEBUG.error("Error attempting to initiate index change monitor.", sfE);
-                lastLog = now;
-            }
-        }
-    }
-
-    @Override
+    /**
+     * {@inheritDoc}
+     */
     public void update(IndexChangeEvent event) {
         if (event.getType() == ErrorEventType.SEARCH_FAILURE) {
-            // Index change failure, re-initiate the monitor.
-            init();
+            // Index change rescheduled, re-initiate the monitor.
+            initiateMonitor();
         }
     }
 
-    @Override
+    /**
+     * {@inheritDoc}
+     */
     public void registerObserver(IndexChangeObserver observer) {
         // Delegate to the observable.
         observable.registerObserver(observer);
     }
 
-    @Override
+    /**
+     * {@inheritDoc}
+     */
     public void removeObserver(IndexChangeObserver observer) {
         // Delegate to the observable.
         observable.removeObserver(observer);
     }
 
-    @Override
+    /**
+     * {@inheritDoc}
+     */
     public void shutdown() {
+        shutdown = true;
         observable.removeObserver(this);
-
-        // Cleanup any outstanding scheduled task.
-        if (schedulerStatus != null) {
-            schedulerStatus.cancel(true);
-        }
-
         scheduler.shutdown();
         monitor.shutdown();
+    }
+
+    // The monitor task is responsible for ensuring the monitor is
+    // successfully started. Expected to be invoked by a single thread.
+    private final class MonitorTask implements Runnable {
+
+        private boolean firstRun;
+        private boolean rescheduled;
+        private long lastLog;
+
+        public MonitorTask() {
+            firstRun = true;
+        }
+
+        /**
+         * {@inheritDoc}
+         */
+        public void run() {
+            try {
+                if (rescheduled || shutdown) {
+                    return;
+                }
+
+                if (!firstRun) {
+                    // Ensure the monitor is cleaned up before re-initiating.
+                    monitor.shutdown();
+                }
+
+                // Initiate the monitor.
+                monitor.start();
+
+                if (shutdown) {
+                    monitor.shutdown();
+                    return;
+                }
+
+                firstRun = false;
+                lastLog = 0;
+
+                // Notify observers of potential data loss whilst the search has been firstRun.
+                observable.notifyObservers(ErrorEventType.DATA_LOSS.createEvent());
+
+            } catch (ChangeMonitorException cmE) {
+                rescheduled = true;
+
+                // Failed to start monitor, reschedule to try again.
+                scheduler.schedule(tryAgainTask, RETRY_DELAY, DELAY_UNIT);
+
+                long now = System.currentTimeMillis();
+
+                if (lastLog == 0 || now - lastLog > LOG_DURATION) {
+                    // Log every 60 seconds.
+                    DEBUG.error("Error attempting to initiate index change monitor.", cmE);
+                    lastLog = now;
+                }
+            }
+        }
+
+        /**
+         * Informs the monitor task that it's about to be rescheduled.
+         */
+        public void rescheduling() {
+            rescheduled = false;
+        }
+
+    }
+
+    // Try again task reschedules the monitor task.
+    private final class TryAgainTask implements Runnable {
+
+        /**
+         * {@inheritDoc}
+         */
+        public void run() {
+            // Delegate to the monitor task.
+            monitorTask.rescheduling();
+            monitorTask.run();
+        }
+
     }
 
 }

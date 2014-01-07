@@ -15,6 +15,7 @@
  */
 package org.forgerock.openam.entitlement.indextree;
 
+import com.sun.identity.shared.debug.Debug;
 import com.sun.identity.sm.ServiceManagementDAO;
 import org.forgerock.openam.sm.DataLayerConnectionFactory;
 import org.forgerock.opendj.ldap.Connection;
@@ -39,14 +40,15 @@ import javax.inject.Inject;
 public class IndexChangeMonitorImpl implements IndexChangeMonitor {
 
     private static final String PATH_INDEX_FILTER = "(&(sunserviceID=indexes)(sunxmlKeyValue=pathindex=*))";
+    private static final Debug DEBUG = Debug.getInstance("amEntitlements");
 
     private final SearchResultHandler handler;
     private final DataLayerConnectionFactory factory;
 
     private final SearchRequest request;
 
-    private volatile Connection connection;
-    private volatile FutureResult<Result> searchStatus;
+    private Connection connection;
+    private FutureResult<Result> searchStatus;
 
     @Inject
     public IndexChangeMonitorImpl(SearchResultHandler handler,
@@ -66,8 +68,10 @@ public class IndexChangeMonitorImpl implements IndexChangeMonitor {
                         PersistentSearchChangeType.MODIFY));
     }
 
-    @Override
-    public void start() throws ChangeMonitorException {
+    /**
+     * {@inheritDoc}
+     */
+    public synchronized void start() throws ChangeMonitorException {
         try {
             connection = factory.getConnection();
             // Start the persistence search.
@@ -82,16 +86,41 @@ public class IndexChangeMonitorImpl implements IndexChangeMonitor {
         }
     }
 
-    @Override
-    public void shutdown() {
-        // Kill of any remaining search listener.
-        if (searchStatus != null) {
-            searchStatus.cancel(true);
-        }
+    /**
+     * {@inheritDoc}
+     */
+    public synchronized void shutdown() {
+        closeSearch();
+        closeConnection();
+    }
 
-        // Ensure any connection is cleaned up before shutdown.
-        if (connection != null) {
-            connection.close();
+    /**
+     * Ensure the search is safely closed.
+     */
+    private void closeSearch() {
+        try {
+            // Kill of any remaining search listener.
+            if (searchStatus != null) {
+                searchStatus.cancel(true);
+                searchStatus = null;
+            }
+        } catch (Exception e) {
+            DEBUG.warning("Connection failed to close.", e);
+        }
+    }
+
+    /**
+     * Ensure the connection is safely closed.
+     */
+    private void closeConnection() {
+        try {
+            // Ensure any connection is cleaned up before shutdown.
+            if (connection != null) {
+                connection.close();
+                connection = null;
+            }
+        } catch (Exception e) {
+            DEBUG.warning("Connection failed to close.", e);
         }
     }
 

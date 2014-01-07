@@ -28,11 +28,6 @@ import org.forgerock.openam.entitlement.indextree.events.IndexChangeObservable;
 public interface IndexChangeManager {
 
     /**
-     * Initialise the manager.
-     */
-    public void init();
-
-    /**
      * @see IndexChangeObservable#registerObserver(IndexChangeObserver)
      */
     public void registerObserver(IndexChangeObserver observer);

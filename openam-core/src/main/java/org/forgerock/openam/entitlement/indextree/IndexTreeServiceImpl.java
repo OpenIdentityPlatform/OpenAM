@@ -80,13 +80,13 @@ public class IndexTreeServiceImpl implements IndexTreeService, IndexChangeObserv
         // Register to the shutdown to clean up appropriate resources.
         shutdownManager.addShutdownListener(this);
 
-        // Initiate the index change manager so that index changes are propagated to the
-        // cached index trees, ensuring the integrity and consistency of the data models.
+        // Register interest with the change manager so that this service is notified of changes.
         manager.registerObserver(this);
-        manager.init();
     }
 
-    @Override
+    /**
+     * {@inheritDoc}
+     */
     public Set<String> searchTree(String resource, String realm) throws EntitlementException {
         IndexRuleTree indexRuleTree = getIndexTree(realm);
 
@@ -186,7 +186,9 @@ public class IndexTreeServiceImpl implements IndexTreeService, IndexChangeObserv
         return indexTree;
     }
 
-    @Override
+    /**
+     * {@inheritDoc}
+     */
     public void update(IndexChangeEvent event) {
         EventType type = event.getType();
 
@@ -226,8 +228,9 @@ public class IndexTreeServiceImpl implements IndexTreeService, IndexChangeObserv
         }
     }
 
-
-    @Override
+    /**
+     * {@inheritDoc}
+     */
     public void shutdown() {
         manager.removeObserver(this);
         manager.shutdown();

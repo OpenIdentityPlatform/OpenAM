@@ -87,7 +87,6 @@ public class IndexTreeServiceImplTest {
 
         verify(shutdownManager).addShutdownListener(treeService);
         verify(manager).registerObserver(treeService);
-        verify(manager).init();
     }
 
     /**
@@ -185,7 +184,7 @@ public class IndexTreeServiceImplTest {
 
         // Set up mock objects for a search against some-other-test-realm.
         when(dnMapper.orgNameToDN(REALM2)).thenReturn(REALM_DN2);
-        when(privilegedAction.run()).thenReturn(ssoToken);
+        when(privilegedAction.run()).thenReturn(ssoToken);                                                              
         when(serviceManagementDAO.checkIfEntryExists(SERVICE_DN2, ssoToken)).thenReturn(true);
         when(serviceManagementDAO.search(ssoToken, SERVICE_DN2, FILTER, 0, 0, false, false, excludes))
                 .thenReturn(pathIndexes.iterator());
