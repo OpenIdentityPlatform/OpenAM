@@ -26,7 +26,9 @@
  *
  */
 
-
+/**
+ * Portions Copyrighted 2014 ForgeRock AS
+ */
 package com.sun.identity.saml.protocol;
 
 import com.sun.identity.common.SystemConfigurationUtil;
@@ -657,7 +659,7 @@ public class Response extends AbstractResponse {
 	    append(" MinorVersion=\"").append(minorVersion).append("\"").
 	    append(" IssueInstant=\"").append(instantString).append("\"");
 	if (recipient != null) {
-	    xml.append(" Recipient=\"").append(recipient).append("\"");
+	    xml.append(" Recipient=\"").append(XMLUtils.escapeSpecialCharacters(recipient)).append("\"");
 	}
 	xml.append(">\n");
 
