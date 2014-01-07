@@ -50,7 +50,7 @@ define("config/AppConfiguration", [
                    } 
                },
                {
-                   moduleClass: "org/forgerock/commons/ui/user/SiteConfigurator",
+                   moduleClass: "org/forgerock/commons/ui/common/SiteConfigurator",
                    configuration: {
                        selfRegistration: false,
                        enterprise: false
@@ -70,9 +70,9 @@ define("config/AppConfiguration", [
                    configuration: {
                        routes: {
                        },
-                       loader: [
-                                {"routes":"config/routes/CommonRoutesConfig"}, 
+                       loader: [ 
                                 {"routes":"config/routes/AMRoutesConfig"}, 
+                                {"routes":"config/routes/CommonRoutesConfig"},
                                 {"routes":"config/routes/UserRoutesConfig"}
                        ]
                    } 
