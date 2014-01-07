@@ -24,16 +24,13 @@
  *
  * $Id: SPACSUtils.java,v 1.48 2009/11/20 21:41:16 exu Exp $
  *
- */
-
-/*
  * Portions Copyrighted 2010-2013 ForgeRock AS
  */
-
 package com.sun.identity.saml2.profile;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
+import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashSet;
@@ -1026,6 +1023,7 @@ public class SPACSUtils {
      *
      * @param request HTTP Servlet request
      * @param response HTTP Servlet response.
+     * @param out the print writer for writing out presentation
      * @param metaAlias metaAlias for the service provider
      * @param session input session object. It could be null.
      * @param respInfo <code>ResponseInfo</code> to be verified.
@@ -1037,7 +1035,7 @@ public class SPACSUtils {
      * @throws SAML2Exception if the processing failed.
      */
     public static Object processResponse(
-        HttpServletRequest request, HttpServletResponse response,
+        HttpServletRequest request, HttpServletResponse response, PrintWriter out,
         String metaAlias, Object session, ResponseInfo respInfo,
         String realm, String hostEntityId, SAML2MetaManager metaManager
     ) throws SAML2Exception {
@@ -1427,7 +1425,7 @@ public class SPACSUtils {
         if (spAdapter != null) {
             boolean redirected = spAdapter.postSingleSignOnSuccess(
                 hostEntityId, realm, request, 
-                response, session, authnRequest, respInfo.getResponse(), 
+                response, out, session, authnRequest, respInfo.getResponse(),
                 respInfo.getProfileBinding(), writeFedInfo);
             String[] value = null;
             if (redirected) {
@@ -2035,6 +2033,7 @@ public class SPACSUtils {
      *
      * @param request HTTP Servlet request
      * @param response HTTP Servlet response.
+     * @param out the print writer for writing out presentation
      *
      * @return <code>Map</code> which holds result of the processing.
      * @throws SAML2Exception if the processing failed due to server error.
@@ -2045,7 +2044,7 @@ public class SPACSUtils {
      * @supported.api
      */  
     public static Map processResponseForFedlet (HttpServletRequest request,
-        HttpServletResponse response) throws SAML2Exception, IOException,
+        HttpServletResponse response, PrintWriter out) throws SAML2Exception, IOException,
         SessionException, ServletException {
         if ((request == null) || (response == null)) {
             throw new ServletException(
@@ -2113,7 +2112,7 @@ public class SPACSUtils {
         // The resulting exception has its redirectionDone flag set if
         // the SPAdapter issued a HTTP redirect.
         newSession = SPACSUtils.processResponse(
-                    request, response, metaAlias, null, respInfo,
+                    request, response, out, metaAlias, null, respInfo,
                     orgName, hostEntityId, metaManager);
         
         SAML2SDKUtils.debug.message("SSO SUCCESS");

@@ -170,9 +170,9 @@ implements HttpServletResponse, Serializable {
      * @throws IOException If the error code cannot be set.
      */
     public void sendError(int sc, String msg) throws IOException {
-	if (this._getHttpServletResponse() != null)
+	    if (this._getHttpServletResponse() != null)
             this._getHttpServletResponse().sendError(sc, msg);
-    }
+        }
 
     /**
      * The default behavior of this method is to call sendError(int sc)

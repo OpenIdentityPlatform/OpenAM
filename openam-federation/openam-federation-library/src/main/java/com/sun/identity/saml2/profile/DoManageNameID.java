@@ -24,8 +24,8 @@
  *
  * $Id: DoManageNameID.java,v 1.26 2009/11/24 21:53:27 madan_ranganath Exp $
  *
+ * Portions copyright 2013 ForgeRock AS
  */
-
 package com.sun.identity.saml2.profile;
 
 import java.io.ByteArrayInputStream;
@@ -306,7 +306,7 @@ public class DoManageNameID {
                     remoteEntityID);
                 mniRequestXMLString= mniRequest.toXMLString(true,true);
                 doMNIByPOST(mniRequestXMLString, mniURL, relayState, realm,
-                    hostEntityID, hostEntityRole, remoteEntityID, response);
+                    hostEntityID, hostEntityRole, remoteEntityID, response, request);
             }
         } catch (IOException ioe) {
             logError("errorCreatingMNIRequest", 
@@ -2170,10 +2170,10 @@ public class DoManageNameID {
     private static void doMNIByPOST(String mniXMLString, String mniURL,
         String relayState, String realm, String hostEntity,
         String hostEntityRole, String remoteEntity,
-        HttpServletResponse response) throws SAML2Exception, IOException {
+        HttpServletResponse response, HttpServletRequest request) throws SAML2Exception {
 
         String encMsg = SAML2Utils.encodeForPOST(mniXMLString);
-        SAML2Utils.postToTarget(response, "SAMLRequest", encMsg, "RelayState",
+        SAML2Utils.postToTarget(request, response, "SAMLRequest", encMsg, "RelayState",
             relayState, mniURL);
     }
 
@@ -2328,7 +2328,7 @@ public class DoManageNameID {
             String relayState = request.getParameter(SAML2Constants.RELAY_STATE);
 
             try {
-                SAML2Utils.postToTarget(response, "SAMLResponse", encMsg,
+                SAML2Utils.postToTarget(request, response, "SAMLResponse", encMsg,
                     "RelayState", relayState, mniURL);
             } catch (Exception e) {
                 debug.message("DoManageNameID.processPOSTRequest:", e);

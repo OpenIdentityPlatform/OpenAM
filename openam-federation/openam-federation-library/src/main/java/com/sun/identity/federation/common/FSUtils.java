@@ -24,46 +24,41 @@
  *
  * $Id: FSUtils.java,v 1.10 2009/11/20 23:52:57 ww203982 Exp $
  *
+ * Portions Copyrighted 2013 ForgeRock AS
  */
-
 package com.sun.identity.federation.common;
 
 import com.sun.identity.common.SystemConfigurationException;
 import com.sun.identity.common.SystemConfigurationUtil;
 import com.sun.identity.federation.meta.IDFFMetaManager;
-import com.sun.identity.plugin.session.SessionException;
 import com.sun.identity.plugin.session.SessionManager;
 import com.sun.identity.plugin.session.SessionProvider;
 import com.sun.identity.saml.common.SAMLUtils;
+import com.sun.identity.saml2.common.SAML2Exception;
 import com.sun.identity.shared.Constants;
 import com.sun.identity.shared.configuration.SystemPropertiesManager;
 import com.sun.identity.shared.debug.Debug;
 import com.sun.identity.shared.encode.Base64;
 import com.sun.identity.shared.encode.CookieUtils;
+import com.sun.identity.shared.ldap.util.DN;
+import com.sun.identity.shared.ldap.util.RDN;
 import com.sun.identity.shared.locale.Locale;
-import java.io.ByteArrayInputStream;
+
+import javax.servlet.RequestDispatcher;
+import javax.servlet.ServletException;
+import javax.servlet.http.Cookie;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
-import java.io.PrintWriter;
 import java.net.URL;
 import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
-import java.util.List;
-import java.util.Map;
 import java.util.MissingResourceException;
 import java.util.ResourceBundle;
 import java.util.StringTokenizer;
-import java.util.Vector;
-import javax.servlet.http.Cookie;
-import javax.servlet.RequestDispatcher;
-import javax.servlet.ServletException;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import com.sun.identity.shared.ldap.util.DN;
-import com.sun.identity.shared.ldap.util.RDN;
 
 /**
  * This class contain constants used in the SDK.
@@ -590,10 +585,10 @@ public class FSUtils {
                     return false;
                 }
                 String relayState = request.getParameter(
-                    IFSConstants.RELAY_STATE);
-                FSUtils.postToTarget(response, samlMessageName,
-                    samlMessage, IFSConstants.RELAY_STATE, relayState,
-                    reqURLSB.toString());
+                        IFSConstants.RELAY_STATE);
+                FSUtils.postToTarget(request, response, samlMessageName,
+                        samlMessage, IFSConstants.RELAY_STATE, relayState,
+                        reqURLSB.toString());
             } else if (reqMethod.equals("GET")) {
                 response.sendRedirect(reqURLSB.toString());
             } else {
@@ -602,6 +597,8 @@ public class FSUtils {
             return true;
         } catch (IOException ioe) {
             debug.error("FSUtils.needSetLBCookieAndRedirect: ", ioe);
+        } catch (SAML2Exception saml2E) {
+            debug.error("FSUtils.needSetLBCookieAndRedirect: ", saml2E);
         }
         return false;
     }
@@ -714,29 +711,40 @@ public class FSUtils {
         return loadBalanceCookieValue;
     }
 
-    public static void postToTarget(HttpServletResponse response,
+    public static void postToTarget(HttpServletRequest request, HttpServletResponse response,
         String SAMLmessageName, String SAMLmessageValue, String relayStateName,
-        String relayStateValue, String targetURL) throws IOException {
+        String relayStateValue, String targetURL) throws SAML2Exception {
 
-        PrintWriter out = response.getWriter();
+        request.setAttribute("TARGET_URL", targetURL);
+        request.setAttribute("SAML_MESSAGE_NAME", SAMLmessageName);
+        request.setAttribute("SAML_MESSAGE_VALUE", SAMLmessageValue);
+        request.setAttribute("RELAY_STATE_NAME", relayStateName);
+        request.setAttribute("RELAY_STATE_VALUE", relayStateValue);
+        request.setAttribute("SAML_POST_KEY", bundle.getString("samlPostKey"));
+
         response.setHeader("Pragma", "no-cache");
         response.setHeader("Cache-Control", "no-cache,no-store");
-        out.println("<HTML>");
-        out.println("<HEAD>\n");
-        out.println("<TITLE>Access rights validated</TITLE>\n");
-        out.println("</HEAD>\n");
-        out.println("<BODY Onload=\"document.forms[0].submit()\">");
 
-        out.println("<FORM METHOD=\"POST\" ACTION=\"" + targetURL + "\">");
-        out.println("<INPUT TYPE=\"HIDDEN\" NAME=\""+ SAMLmessageName
-            + "\" " + "VALUE=\"" + SAMLmessageValue + "\">");
-        if (relayStateValue != null && relayStateValue.length() != 0) {
-            out.println("<INPUT TYPE=\"HIDDEN\" NAME=\""+
-                relayStateName + "\" " +
-                "VALUE=\"" + relayStateValue + "\">");
+        try {
+            request.getRequestDispatcher("/saml2/jsp/autosubmitaccessrights.jsp").forward(request, response);
+        } catch (ServletException sE) {
+            handleForwardException(sE);
+        } catch (IOException ioE) {
+            handleForwardException(ioE);
         }
-        out.println("</FORM></BODY></HTML>");
-        out.close();
+    }
+
+    /**
+     * Handles any exception when attempting to forward.
+     *
+     * @param exception
+     *         Thrown and caught exception
+     * @throws SAML2Exception
+     *         Single general exception that is thrown on
+     */
+    private static void handleForwardException(Exception exception) throws SAML2Exception {
+        debug.error("Failed to forward to auto submitting JSP", exception);
+        throw new SAML2Exception(bundle.getString("postToTargetFailed"));
     }
 
 }

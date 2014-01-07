@@ -24,9 +24,8 @@
  *
  * $Id: IDPSingleSignOnServiceSOAP.java,v 1.3 2009/10/14 23:59:44 exu Exp $
  *
+ * Portions Copyrighted 2013 ForgeRock AS
  */
-
-
 package com.sun.identity.saml2.servlet;
 
 import com.sun.identity.saml.common.SAMLUtils;
@@ -52,7 +51,7 @@ public class IDPSingleSignOnServiceSOAP extends HttpServlet {
             
         // handle DOS attack
         SAMLUtils.checkHTTPContentLength(req);
-        IDPSSOFederate.doSSOFederate(req, resp, true, SAML2Constants.SOAP);
+        IDPSSOFederate.doSSOFederate(req, resp, resp.getWriter(), true, SAML2Constants.SOAP);
     }
 
     public void doGet(HttpServletRequest req, HttpServletResponse resp)
@@ -60,6 +59,6 @@ public class IDPSingleSignOnServiceSOAP extends HttpServlet {
             
         // handle DOS attack
         SAMLUtils.checkHTTPContentLength(req);
-        IDPSSOFederate.doSSOFederate(req, resp, true, SAML2Constants.SOAP);
+        IDPSSOFederate.doSSOFederate(req, resp, resp.getWriter(), true, SAML2Constants.SOAP);
     }
 }

@@ -22,12 +22,8 @@
  * your own identifying information:
  * "Portions Copyrighted [year] [name of copyright owner]"
  *
- */
-
-/*
  * Portions Copyrighted 2010-2013 ForgeRock AS
  */
-
 package com.sun.identity.saml2.profile;
 
 import com.sun.identity.federation.common.FSUtils;
@@ -70,6 +66,7 @@ import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.io.PrintWriter;
 import java.nio.charset.Charset;
 import java.security.cert.X509Certificate;
 import java.util.HashMap;
@@ -121,12 +118,13 @@ public class IDPSSOFederate {
      *
      * @param request the <code>HttpServletRequest</code> object
      * @param response the <code>HttpServletResponse</code> object
-     *
+     * @param out the print writer for writing out presentation
      */
     public static void doSSOFederate(HttpServletRequest request,
                                      HttpServletResponse response,
+                                     PrintWriter out,
                                      String reqBinding) {
-        doSSOFederate(request, response, false, reqBinding);
+        doSSOFederate(request, response, out, false, reqBinding);
     }
     /**
      * This method processes the <code>AuthnRequest</code> coming 
@@ -134,11 +132,12 @@ public class IDPSSOFederate {
      *
      * @param request the <code>HttpServletRequest</code> object
      * @param response the <code>HttpServletResponse</code> object
+     * @param out the print writer for writing out presentation
      * @param isFromECP true if the request comes from ECP
      *
      */
     public static void doSSOFederate(HttpServletRequest request,
-        HttpServletResponse response, boolean isFromECP, String reqBinding) {
+        HttpServletResponse response, PrintWriter out, boolean isFromECP, String reqBinding) {
 
         String classMethod = "IDPSSOFederate.doSSOFederate: ";
 
@@ -869,7 +868,7 @@ public class IDPSSOFederate {
                         String nameIDFormat =
                             (policy == null) ? null : policy.getFormat();
                         try {
-                            IDPSSOUtil.sendResponseToACS(request, response,
+                            IDPSSOUtil.sendResponseToACS(request, response, out,
                                 session, authnReq, spEntityID, idpEntityID,
                                 idpMetaAlias, realm, nameIDFormat, relayState,
                                 matchingAuthnContext);
@@ -1068,7 +1067,7 @@ public class IDPSSOFederate {
                 String nameIDFormat =
                     (policy == null) ? null : policy.getFormat();
                 try {
-                    IDPSSOUtil.sendResponseToACS(request, response, session,
+                    IDPSSOUtil.sendResponseToACS(request, response, out, session,
                         authnReq, spEntityID, idpEntityID, idpMetaAlias, realm,
                         nameIDFormat, relayState, matchingAuthnContext);
                 } catch (SAML2Exception se) {
@@ -1145,6 +1144,7 @@ public class IDPSSOFederate {
             SAMLUtils.sendError(request, response,
                 HttpServletResponse.SC_INTERNAL_SERVER_ERROR, rbKey,
                 SAML2Utils.bundle.getString(rbKey));
+            return;
         }
     }
 

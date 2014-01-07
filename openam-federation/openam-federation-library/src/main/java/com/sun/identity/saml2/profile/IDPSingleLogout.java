@@ -24,15 +24,12 @@
  *
  * $Id: IDPSingleLogout.java,v 1.28 2009/11/25 01:20:47 madan_ranganath Exp $
  *
- */
-
-/*
  * Portions Copyrighted 2010-2013 ForgeRock AS
  */
-
 package com.sun.identity.saml2.profile;
 
 import java.io.IOException;
+import java.io.PrintWriter;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -121,6 +118,7 @@ public class IDPSingleLogout {
      *
      * @param request the HttpServletRequest.
      * @param response the HttpServletResponse.
+     * @param out the print writer for writing out presentation
      * @param binding binding used for this request.
      * @param paramsMap Map of all other parameters.
      *       Following parameters names with their respective
@@ -134,8 +132,8 @@ public class IDPSingleLogout {
      *                   String objects.
      * @throws SAML2Exception if error initiating request to SP.
      */
-    public static void initiateLogoutRequest(HttpServletRequest request, HttpServletResponse response, String binding,
-            Map paramsMap) throws SAML2Exception {
+    public static void initiateLogoutRequest(HttpServletRequest request, HttpServletResponse response,
+            PrintWriter out, String binding, Map paramsMap) throws SAML2Exception {
 
         if (debug.messageEnabled()) {
             debug.message("in initiateLogoutRequest");
@@ -200,7 +198,7 @@ public class IDPSingleLogout {
             // If request has been misrouted and we don't  have SAML2 Failover
             // then send the request to the original server
             if (!SAML2Utils.isSAML2FailOverEnabled() &&
-                   isMisroutedRequest(request, response, session)) {
+                   isMisroutedRequest(request, response, out, session)) {
                    return;
             } else {
                if (debug.messageEnabled()) {
@@ -416,6 +414,7 @@ public class IDPSingleLogout {
      *
      * @param request the HttpServletRequest.
      * @param response the HttpServletResponse.
+     * @param out the print writer for writing out presentation
      * @param samlRequest <code>LogoutRequest</code> in the
      *          XML string format.
      * @param relayState the target URL on successful
@@ -428,6 +427,7 @@ public class IDPSingleLogout {
     public static void processLogoutRequest(
         HttpServletRequest request,
         HttpServletResponse response,
+        PrintWriter out,
         String samlRequest,
         String relayState) throws SAML2Exception, SessionException {
         String classMethod = "IDPSingleLogout.processLogoutRequest : ";
@@ -530,7 +530,7 @@ public class IDPSingleLogout {
         try {
             session = sessionProvider.getSession(request);
         } catch (SessionException ssoe) {
-            sendAlreadyLogedOutResp(response, logoutReq, relayState,
+            sendAlreadyLogedOutResp(response, request, logoutReq, relayState,
                              realm, idpEntityID, spEntityID, binding);
             return;
         }
@@ -538,7 +538,7 @@ public class IDPSingleLogout {
         // If the request has been misrouted and we don't  have SAML2 Failover
         // then send the request to the original server
         if (session != null && !SAML2Utils.isSAML2FailOverEnabled()
-                && isMisroutedRequest(request, response, session)) {
+                && isMisroutedRequest(request, response, out, session)) {
             return;
         } else {
             if (debug.messageEnabled()) {
@@ -601,7 +601,7 @@ public class IDPSingleLogout {
                 IDPProxyUtil.sendProxyLogoutRequest(request, response,
                     logoutReq, partners, binding, relayState);
             } else {
-                LogoutUtil.sendSLOResponse(response, logoutRes, location,
+                LogoutUtil.sendSLOResponse(response, request, logoutRes, location,
                     relayState, realm, idpEntityID, SAML2Constants.IDP_ROLE,
                     spEntityID, binding);
             }
@@ -795,7 +795,7 @@ public class IDPSingleLogout {
             String idpEntity = (String) logoutResponseMap.get("idpEntityID");
             if (logoutResp != null && location != null &&
                 spEntity != null && idpEntity !=null) {
-                LogoutUtil.sendSLOResponse(response, logoutResp, location,
+                LogoutUtil.sendSLOResponse(response, request, logoutResp, location,
                     relayState, "/", spEntity, SAML2Constants.SP_ROLE,
                     idpEntity, binding);
                 return true;
@@ -1499,6 +1499,7 @@ public class IDPSingleLogout {
      *
      * @param request the Servlet request
      * @param response the Servlet response
+     * @param out the print writer for writing out presentation
      * @param session the Single Sign On session.
      *
      * @return true if the request was misrouted and it was forwarded to
@@ -1506,7 +1507,7 @@ public class IDPSingleLogout {
      * @throws SAML2Exception, SessionException
      */
     private static boolean isMisroutedRequest(HttpServletRequest request,
-            HttpServletResponse response, Object session)
+            HttpServletResponse response, PrintWriter out, Object session)
             throws SAML2Exception, SessionException {
 
         String classMethod = "IDPSingleLogout.isMisroutedRequest : ";
@@ -1568,21 +1569,13 @@ public class IDPSingleLogout {
                 return true;
             }
             // no redirect, perhaps an error page, return the content
-            try {
-                if ((output_data != null) && (!output_data.equals(""))) {
-                    if (debug.messageEnabled()) {
-                        debug.message(classMethod + "Printing the forwarded response");
-                    }
-                    response.setContentType("text/html; charset=UTF-8");
-                    java.io.PrintWriter outP = response.getWriter();
-                    outP.println(output_data);
-                    return true;
-                }
-            } catch (IOException ioe) {
+            if ((output_data != null) && (!output_data.equals(""))) {
                 if (debug.messageEnabled()) {
-                    debug.message(classMethod + "IDPSingleLogout error in Request Routing : "
-                            + ioe.toString());
+                    debug.message(classMethod + "Printing the forwarded response");
                 }
+                response.setContentType("text/html; charset=UTF-8");
+                out.println(output_data);
+                return true;
             }
         }
         return false;
@@ -1601,7 +1594,7 @@ public class IDPSingleLogout {
      *
      * @throws SAML2Exception If there was a problem while constructing/sending the Logout Response.
      */
-    private static void sendAlreadyLogedOutResp(HttpServletResponse response,
+    private static void sendAlreadyLogedOutResp(HttpServletResponse response, HttpServletRequest request,
             LogoutRequest logoutReq, String relayState,
             String realm, String idpEntityID, String spEntityID,
             String binding) throws SAML2Exception {
@@ -1618,7 +1611,7 @@ public class IDPSingleLogout {
         debug.message(classMethod + "Location found: " + location
                 + " for binding " + binding);
         logRes.setDestination(XMLUtils.escapeSpecialCharacters(location));
-        LogoutUtil.sendSLOResponse(response, logRes, location,
+        LogoutUtil.sendSLOResponse(response, request, logRes, location,
                 relayState, realm, idpEntityID, SAML2Constants.IDP_ROLE,
                 spEntityID, binding);
     }
@@ -1750,7 +1743,7 @@ public class IDPSingleLogout {
 
             if (!isMultiProtocolSession || (retStatus != SingleLogoutManager.LOGOUT_REDIRECTED_STATUS)) {
                 logoutRes = updateLogoutResponse(logoutRes, retStatus);
-                LogoutUtil.sendSLOResponse(response, logoutRes, location, relayState, realm, idpEntityID,
+                LogoutUtil.sendSLOResponse(response, request, logoutRes, location, relayState, realm, idpEntityID,
                         SAML2Constants.IDP_ROLE, originatingLogoutSPEntityID, binding);
                 return true;
             } else {

@@ -24,9 +24,6 @@
  *
  * $Id: AttributeQueryUtil.java,v 1.11 2009/07/24 22:51:48 madan_ranganath Exp $
  *
- */
-
-/*
  * Portions copyright 2010-2013 ForgeRock AS
  */
 
@@ -228,12 +225,7 @@ public class AttributeQueryUtil {
         if (binding.equalsIgnoreCase(SAML2Constants.HTTP_POST)) {
             signAttributeQuery(attrQuery, realm, false);
             String encodedReqMsg = SAML2Utils.encodeForPOST(attrQuery.toXMLString(true, true));
-            try {
-                SAML2Utils.postToTarget(response, "SAMLRequest",
-                                encodedReqMsg, null, null, location);
-            } catch (IOException ptte) {
-                SAML2Utils.bundle.getBundle("errorSendingAttributeQuery");
-            }
+            SAML2Utils.postToTarget(request, response, "SAMLRequest", encodedReqMsg, null, null, location);
         } else {
             throw new SAML2Exception(
                 SAML2Utils.bundle.getString("unsupportedBinding"));

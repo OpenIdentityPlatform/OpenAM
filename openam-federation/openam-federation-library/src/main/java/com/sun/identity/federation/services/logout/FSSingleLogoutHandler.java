@@ -24,8 +24,9 @@
  *
  * $Id: FSSingleLogoutHandler.java,v 1.15 2009/11/04 00:06:11 exu Exp $
  *
+ * Portions Copyrighted 2013 ForgeRock AS
+ *
  */
-
 package com.sun.identity.federation.services.logout;
 
 import com.sun.identity.multiprotocol.MultiProtocolUtils;
@@ -70,6 +71,7 @@ import com.sun.identity.saml.xmlsig.XMLSignatureManager;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
+import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpServletRequest;
 import javax.xml.soap.SOAPMessage;
@@ -80,6 +82,10 @@ import org.w3c.dom.Document;
  * Work class that handles <code>ID-FF</code> single logout.
  */
 public class FSSingleLogoutHandler {
+
+    private static final String LOGOUT_JSP = "/saml2/jsp/autologout.jsp";
+    private static final String WML_LOGOUT_JSP = "/saml2/jsp/autologoutwml.jsp";
+
     private HttpServletResponse response = null;
     private HttpServletRequest request = null;
     private String locale = null;
@@ -731,68 +737,55 @@ public class FSSingleLogoutHandler {
      * @param providerId the first provider whose preferred profile is HTTP GET
      */
     private FSLogoutStatus doWMLGet(String providerId) {
-        try {
-            FSUtils.debug.message("In WML based response");
-            StringBuffer destination = new StringBuffer();
-            destination.append(hostedDescriptor.getSingleLogoutServiceURL());
-            if ((destination.toString()).indexOf(QUESTION_MARK) == -1) {
-                destination.append(QUESTION_MARK);
-            } else {
-                destination.append(AMPERSAND);
-            }
-            destination.append("logoutSource=logoutGet");
-            if (FSUtils.debug.messageEnabled()) {
-                FSUtils.debug.message(
-                    "Submit action : " + destination.toString());
-            }
-            // DO WML response
-            response.setContentType("text/vnd.wap.wml");
-            PrintWriter out = response.getWriter();
-            out.println("<!DOCTYPE wml PUBLIC \"-//WAPFORUM//DTD WML 1.1");
-            out.println("//EN\" \"http://www.wapforum.org/DTD/wml_1.1.xml\">");
-            out.println("<wml>");
-            out.println("<card id=\"redirect\" title=\"Log Out\">");
-            out.println("<onenterforward>");
-            out.println(
-                "<go method=\"post\" href=\"" + destination.toString() + "\">");
-            
-            FSUtils.debug.message("Calling getLogoutGETProviders");
-            HashMap providerMap = FSLogoutUtil.getLogoutGETProviders(
-                    userID, 
-                    providerId,
-                    sessionIndex,
-                    realm,
-                    metaAlias);
-            Vector providerGetList = (Vector)providerMap.get("Provider");
-            FSUtils.debug.message("Calling cleanSessionMapProviders");
-            FSLogoutUtil.cleanSessionMapProviders(userID,
-                providerGetList, metaAlias);
+        FSUtils.debug.message("In WML based response");
+        StringBuffer destination = new StringBuffer();
+        destination.append(hostedDescriptor.getSingleLogoutServiceURL());
+        if ((destination.toString()).indexOf(QUESTION_MARK) == -1) {
+            destination.append(QUESTION_MARK);
+        } else {
+            destination.append(AMPERSAND);
+        }
+        destination.append("logoutSource=logoutGet");
+        if (FSUtils.debug.messageEnabled()) {
+            FSUtils.debug.message(
+                "Submit action : " + destination.toString());
+        }
 
-            FSUtils.debug.message("Calling getMultiLogoutRequest");
-            String multiLogoutRequest = getMultiLogoutRequest(providerMap);
-            if (FSUtils.debug.messageEnabled()) {
-                FSUtils.debug.message(
-                    "Image Statements : " + multiLogoutRequest);
-            }
-            out.println(multiLogoutRequest);
-            out.println("</go>");
-            out.println("</onenterforward>");
-            out.println("<onenterbackward>");
-            out.println("<prev/>");
-            out.println("</onenterbackward>");
-            out.println("<onenterbackward>");
-            out.println("<p>");
-            out.println("logout initiated ...");
-            out.println("</p>");
-            out.println("</card>");
-            out.println("</wml>");
-            out.close();
-            return new FSLogoutStatus(IFSConstants.SAML_SUCCESS);
-        }catch(IOException e){
-            FSUtils.debug.error(
-                "Error in performing HTTP GET for WML agent:", e);
+        // DO WML response
+        FSUtils.debug.message("Calling getLogoutGETProviders");
+        HashMap providerMap = FSLogoutUtil.getLogoutGETProviders(
+                userID,
+                providerId,
+                sessionIndex,
+                realm,
+                metaAlias);
+        Vector providerGetList = (Vector)providerMap.get("Provider");
+        FSUtils.debug.message("Calling cleanSessionMapProviders");
+        FSLogoutUtil.cleanSessionMapProviders(userID,
+            providerGetList, metaAlias);
+
+        FSUtils.debug.message("Calling getMultiLogoutRequest");
+        String multiLogoutRequest = getMultiLogoutRequest(providerMap);
+        if (FSUtils.debug.messageEnabled()) {
+            FSUtils.debug.message(
+                "Image Statements : " + multiLogoutRequest);
+        }
+
+        request.setAttribute("DESTINATION_URL", destination.toString());
+        request.setAttribute("MULTI_LOGOUT_REQUEST", multiLogoutRequest);
+
+        try {
+            request.getRequestDispatcher(WML_LOGOUT_JSP).forward(request, response);
+
+        } catch (ServletException sE) {
+            FSUtils.debug.error("Error in performing HTTP GET for WML agent:", sE);
+            return new FSLogoutStatus(IFSConstants.SAML_RESPONDER);
+        } catch (IOException ioE) {
+            FSUtils.debug.error("Error in performing HTTP GET for WML agent:", ioE);
             return new FSLogoutStatus(IFSConstants.SAML_RESPONDER);
         }
+
+        return new FSLogoutStatus(IFSConstants.SAML_SUCCESS);
     }
     
     /**
@@ -801,69 +794,58 @@ public class FSSingleLogoutHandler {
      * @param providerId the first provider whose preferred profile is HTTP GET
      */
     private FSLogoutStatus doHTMLGet(String providerId) {
-        try {
-            // DO Normal HTML response
-            FSUtils.debug.message("In HTML based response");
-            StringBuffer destination = new StringBuffer();
-            destination.append(hostedDescriptor.getSingleLogoutServiceURL());
-            if ((destination.toString()).indexOf(QUESTION_MARK) == -1) {
-                destination.append(QUESTION_MARK);
-            } else {
-                destination.append(AMPERSAND);
-            }
-            destination.append("logoutSource=logoutGet");
-            
-            if (FSUtils.debug.messageEnabled()) {
-                FSUtils.debug.message("Submit action : " + 
-                    destination.toString());
-            }
-            PrintWriter out = response.getWriter();
-            response.setContentType("text/html");
-            out.println("<HTML>");
-            out.println("<HEAD>");
-            out.println("<TITLE>Logout in progress</TITLE></HEAD>");
-            out.println("<BODY Onload=\"document.forms[0].submit()\">");
-            // use locale?
-            out.println("<p><b> Logout in progress ...");
-            out.println("If you have JavaScript disabled, " +
-                "please press the Continue button.");
-            out.println("Otherwise, please wait.</p>");
-            out.println("<FORM METHOD=\"POST\" ACTION=\"" +
-                destination.toString() + "\">");
-            out.println("<P>");
-            FSUtils.debug.message("Calling getLogoutGETProviders");
-            HashMap providerMap = FSLogoutUtil.getLogoutGETProviders(
-                userID,
-                providerId, 
-                sessionIndex,
-                realm,
-                metaAlias);
-            Vector providerGetList =
-                (Vector)providerMap.get(IFSConstants.PROVIDER);
-            FSUtils.debug.message("Calling cleanSessionMapProviders");
+        // DO Normal HTML response
+        FSUtils.debug.message("In HTML based response");
+        StringBuffer destination = new StringBuffer();
+        destination.append(hostedDescriptor.getSingleLogoutServiceURL());
+        if ((destination.toString()).indexOf(QUESTION_MARK) == -1) {
+            destination.append(QUESTION_MARK);
+        } else {
+            destination.append(AMPERSAND);
+        }
+        destination.append("logoutSource=logoutGet");
 
-            FSLogoutUtil.cleanSessionMapProviders(
-                userID, 
-                providerGetList, 
-                metaAlias);
-            FSUtils.debug.message("Calling getMultiLogoutRequest");
-            String multiLogoutRequest = getMultiLogoutRequest(providerMap);
-            if (FSUtils.debug.messageEnabled()) {
-                FSUtils.debug.message("Image Statements : " +
-                    multiLogoutRequest);
-            }
-            out.println(multiLogoutRequest);
-            out.println("<P><BR>");
-            out.println("<input type=\"submit\" name=\"Continue\" ");
-            out.println("value=\"Continue logout\"/>");
-            out.println("</FORM></BODY></HTML>");
-            out.close();
-            return new FSLogoutStatus(IFSConstants.SAML_SUCCESS);
-        } catch(IOException e){
-            FSUtils.debug.error(
-                "Error in performing HTTP GET for regular agent");
+        if (FSUtils.debug.messageEnabled()) {
+            FSUtils.debug.message("Submit action : " +
+                destination.toString());
+        }
+        FSUtils.debug.message("Calling getLogoutGETProviders");
+        HashMap providerMap = FSLogoutUtil.getLogoutGETProviders(
+            userID,
+            providerId,
+            sessionIndex,
+            realm,
+            metaAlias);
+        Vector providerGetList =
+            (Vector)providerMap.get(IFSConstants.PROVIDER);
+        FSUtils.debug.message("Calling cleanSessionMapProviders");
+
+        FSLogoutUtil.cleanSessionMapProviders(
+            userID,
+            providerGetList,
+            metaAlias);
+        FSUtils.debug.message("Calling getMultiLogoutRequest");
+        String multiLogoutRequest = getMultiLogoutRequest(providerMap);
+        if (FSUtils.debug.messageEnabled()) {
+            FSUtils.debug.message("Image Statements : " +
+                multiLogoutRequest);
+        }
+
+        request.setAttribute("DESTINATION_URL", destination.toString());
+        request.setAttribute("MULTI_LOGOUT_REQUEST", multiLogoutRequest);
+
+        try {
+            request.getRequestDispatcher(LOGOUT_JSP).forward(request, response);
+
+        } catch (ServletException sE) {
+            FSUtils.debug.error("Error in performing HTTP GET for regular agent", sE);
+            return new FSLogoutStatus(IFSConstants.SAML_RESPONDER);
+        } catch (IOException ioE) {
+            FSUtils.debug.error("Error in performing HTTP GET for regular agent", ioE);
             return new FSLogoutStatus(IFSConstants.SAML_RESPONDER);
         }
+
+        return new FSLogoutStatus(IFSConstants.SAML_SUCCESS);
     }
     
     /**
@@ -946,7 +928,6 @@ public class FSSingleLogoutHandler {
      * Initiates SOAP profile logout. It iterates through all the providers in
      * a loop.
      * @param providerId the first provider with SOAP as logout profile.
-     * @param logout status.
      */
     private FSLogoutStatus doIDPSoapProfile(String providerId) {
         if (FSUtils.debug.messageEnabled()) {
@@ -1020,7 +1001,6 @@ public class FSSingleLogoutHandler {
     /**
      * Initiates SOAP proifle logout.
      * @param providerId the first provider with SOAP as logout profile
-     * @param logout status.
      */
     private FSLogoutStatus doSoapProfile(String providerId) {
         FSUtils.debug.message("Entered IDP's doSoapProfile");

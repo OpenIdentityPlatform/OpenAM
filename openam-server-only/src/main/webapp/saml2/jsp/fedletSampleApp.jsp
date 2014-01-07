@@ -24,6 +24,7 @@
 
    $Id: fedletSampleApp.jsp,v 1.15 2010/01/08 21:56:58 vimal_67 Exp $
 
+   Portions Copyrighted 2013 ForgeRock AS
 --%>
 
 
@@ -46,6 +47,7 @@ java.util.HashMap,
 java.util.HashSet,
 java.util.Set"
 %>
+<%@ page import="java.io.PrintWriter" %>
 <%@ include file="header.jspf" %>
 <%
     String deployuri = request.getRequestURI();
@@ -83,7 +85,7 @@ Inc." align="right" border="0" height="10" width="108" /></td></tr></tbody></tab
         // necessary processing conforming to SAMLv2 specifications,
         // such as XML signature validation, Audience and Recipient
         // validation etc.  
-        map = SPACSUtils.processResponseForFedlet(request, response);
+        map = SPACSUtils.processResponseForFedlet(request, response, new PrintWriter(out, true));
     } catch (SAML2Exception sme) {
         SAMLUtils.sendError(request, response,
             response.SC_INTERNAL_SERVER_ERROR, "failedToProcessSSOResponse",

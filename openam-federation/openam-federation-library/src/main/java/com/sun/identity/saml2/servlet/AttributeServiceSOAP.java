@@ -163,6 +163,7 @@ public class AttributeServiceSOAP extends HttpServlet {
             SAMLUtils.sendError(req, resp, 
                 HttpServletResponse.SC_INTERNAL_SERVER_ERROR, 
                 "soapError", soap.getMessage());
+            return;
         }
     }
 }

@@ -20,12 +20,9 @@
  * with the fields enclosed by brackets [] replaced by
  * your own identifying information:
  * "Portions copyright [year] [name of copyright owner]"
+ *
+ * Portions copyright 2012-2013 ForgeRock AC
  */
-
-/**
- * Portions copyright 2012-2013 ForgeRock Inc
- */
-
 package org.forgerock.restlet.ext.oauth2.flow;
 
 import com.sun.identity.saml2.assertion.impl.AssertionImpl;
@@ -89,6 +86,7 @@ public class OAuth2Saml2GrantSPAdapter extends SAML2ServiceProviderAdapter {
             String realm,
             HttpServletRequest request,
             HttpServletResponse response,
+            PrintWriter out,
             Object session,
             AuthnRequest authnRequest,
             Response ssoResponse,
@@ -121,8 +119,7 @@ public class OAuth2Saml2GrantSPAdapter extends SAML2ServiceProviderAdapter {
             sb.append("<script language=\"Javascript\">");
             sb.append("document.postForm.submit();");
             sb.append("</script>");
-            PrintWriter pw = response.getWriter();
-            pw.print(sb.toString());
+            out.print(sb.toString());
         } catch (UnsupportedEncodingException e) {
             SAML2Utils.debug.error("OAuth2Saml2GrantSPAdapter.postSingleSignOnSuccess: Unsuppored Encoding Exception: "
                     + e.getMessage());

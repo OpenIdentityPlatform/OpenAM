@@ -24,16 +24,16 @@
 
    $Id: exportmetadata.jsp,v 1.8 2009/12/23 23:13:23 exu Exp $
 
+   Portions Copyrighted 2013 ForgeRock AS
 
    NOTE : remove this JSP from the OpenAM WAR if you don't want to
      publically expose your hosted metadata, but some of the SAML2 metadata
-     workflows will not work anymore 
---%><%@ page 
-    import="com.sun.identity.saml2.common.SAML2Constants, 
-            com.sun.identity.saml2.meta.SAML2MetaManager,
-            com.sun.identity.saml2.meta.SAML2MetaUtils,
-            java.util.List"
-%><%@ page import="org.owasp.esapi.ESAPI" %><%@ page import="com.sun.identity.saml.common.SAMLUtils" %><%
+     workflows will not work anymore
+--%><%@ page import="com.sun.identity.saml2.meta.SAML2MetaManager" %><%@
+        page import="com.sun.identity.saml2.meta.SAML2MetaUtils" %><%@
+        page import="java.util.List" %><%@
+        page import="org.owasp.esapi.ESAPI" %><%@
+        page import="com.sun.identity.saml.common.SAMLUtils" %><%
     // This JSP is used to export standard entity metadata, 
     // there are three supported query parameters:
     //    * role     -- role of the entity: sp, idp or any
@@ -104,13 +104,10 @@
         errorMsg = e.getMessage();
     }
     if (errorMsg != null) {
-%>
-ERROR : <%= errorMsg %>
-<%
+        out.print("ERROR : " + errorMsg);
     } else {
         response.setContentType("text/xml");
         response.setHeader("Pragma", "no-cache");
         response.setContentType("text/xml; charset=utf-8");
-        response.getWriter().print(metaXML);
-    }
-%>
+        out.print(metaXML);
+    }%>

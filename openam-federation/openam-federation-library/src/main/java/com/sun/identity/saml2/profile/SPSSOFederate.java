@@ -24,12 +24,8 @@
  *
  * $Id: SPSSOFederate.java,v 1.29 2009/11/24 21:53:28 madan_ranganath Exp $
  *
+ * Portions Copyrighted 2011-2013 ForgeRock AS
  */
-
-/*
- * Portions Copyrighted 2011 ForgeRock AS
- */
-
 package com.sun.identity.saml2.profile;
 
 import com.iplanet.dpro.session.exceptions.StoreException;
@@ -319,7 +315,7 @@ public class SPSSOFederate {
                         "SAML Response content :\n" + authXMLString);
                 }
                 String encodedReqMsg = SAML2Utils.encodeForPOST(authXMLString);
-                SAML2Utils.postToTarget(response, "SAMLRequest",
+                SAML2Utils.postToTarget(request, response, "SAMLRequest",
                     encodedReqMsg, "RelayState", relayStateID, ssoURL);
 	    } else {
                 // encode the xml string

@@ -90,6 +90,7 @@ public class AssertionManagerServlet extends JAXRPCServlet {
                     "untrustedSite",
                     SAMLUtils.bundle.getString("untrustedSite")
                     + clientIP);
+            return;
         }
     }
 }

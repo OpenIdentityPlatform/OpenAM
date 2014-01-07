@@ -24,17 +24,13 @@
  *
  * $Id: SAMLUtils.java,v 1.16 2010/01/09 19:41:06 qcheng Exp $
  *
- */
-
-/**
- * Portions Copyrighted 2012 ForgeRock Inc
+ * Portions Copyrighted 2012-2013 ForgeRock AS
  */
 package com.sun.identity.saml.common;
 
 import java.util.Collections;
 import java.util.Date;
 import java.util.Map;
-import java.util.Vector;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
@@ -58,8 +54,6 @@ import java.net.MalformedURLException;
 
 import org.w3c.dom.*;
 
-import com.sun.identity.shared.ldap.util.DN;
-import com.sun.identity.shared.ldap.util.RDN;
 import com.sun.identity.common.PeriodicGroupRunnable;
 import com.sun.identity.common.ScheduleableGroupAction;
 import com.sun.identity.common.SystemConfigurationUtil;
@@ -70,16 +64,11 @@ import com.sun.identity.common.TimerPool;
 import com.sun.identity.shared.xml.XMLUtils;
 import com.sun.identity.shared.encode.URLEncDec;
 import com.sun.identity.shared.encode.Base64;
-import com.sun.identity.shared.encode.CookieUtils;
+
 import javax.servlet.ServletException;
-import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpServletRequest;
-import javax.servlet.RequestDispatcher;
 
-import javax.security.auth.callback.Callback;
-import javax.security.auth.callback.NameCallback;
-import javax.security.auth.callback.UnsupportedCallbackException;
 import javax.xml.soap.MimeHeaders;
 import javax.xml.soap.MimeHeader;
 
@@ -93,28 +82,19 @@ import com.sun.identity.saml.assertion.Condition;
 import com.sun.identity.saml.assertion.Conditions;
 import com.sun.identity.saml.assertion.Statement;
 import com.sun.identity.saml.assertion.SubjectStatement;
-import com.sun.identity.saml.common.SAMLConstants;
-import com.sun.identity.saml.common.SAMLServiceManager;
-import com.sun.identity.saml.xmlsig.XMLSignatureManager; 
+import com.sun.identity.saml.xmlsig.XMLSignatureManager;
 import com.sun.identity.saml.plugins.PartnerAccountMapper;
 import com.sun.identity.saml.protocol.*;
 import com.sun.identity.saml.servlet.POSTCleanUpRunnable;
-import com.sun.identity.shared.Constants;
 import com.sun.identity.plugin.session.SessionException;
 import com.sun.identity.plugin.session.SessionManager;
 import com.sun.identity.plugin.session.SessionProvider;
-import com.sun.identity.plugin.configuration.ConfigurationException;
-import com.sun.identity.plugin.configuration.ConfigurationInstance;
-import com.sun.identity.plugin.configuration.ConfigurationManager;
 import com.sun.identity.saml.assertion.Subject;
 import com.sun.identity.saml.SAMLClient;
-import com.sun.identity.plugin.session.SessionException;
-import com.sun.identity.plugin.session.SessionManager;
-import com.sun.identity.plugin.session.SessionProvider;
 import com.sun.identity.federation.common.FSUtils;
 
 import javax.xml.parsers.DocumentBuilder;
-import java.io.ByteArrayInputStream;
+
 import com.sun.org.apache.xml.internal.security.c14n.Canonicalizer;
 //import com.sun.org.apache.xml.internal.security.Init;
 
@@ -142,6 +122,8 @@ public class SAMLUtils  extends SAMLUtilsCommon {
      */
     public static final String DEFAULT_CONTENT_LENGTH =
     String.valueOf(defaultMaxLength);
+
+    private static final String ERROR_JSP = "/saml2/jsp/autosubmittingerror.jsp";
     
     private static int maxContentLength = 0;
     private static Map idTimeMap = Collections.synchronizedMap(new HashMap());
@@ -729,13 +711,13 @@ public class SAMLUtils  extends SAMLUtilsCommon {
      * multiple parameter names "assertion" with value being each of the 
      * <code>Assertion</code> in the passed Set.
      * @param response <code>HttpServletResponse</code> object
+     * @param out The print writer which for content is to be written too.
      * @param assertion List of <code>Assertion</code>s to be posted.
      * @param targeturl target url
      * @param attrMap Map of attributes to be posted to the target
      */
-    public static void postToTarget(HttpServletResponse response,
-    List assertion, String targeturl, Map attrMap) throws IOException {
-        PrintWriter out = response.getWriter();
+    public static void postToTarget(HttpServletResponse response, PrintWriter out,
+                                    List assertion, String targeturl, Map attrMap) throws IOException {
         out.println("<HTML>");
         out.println("<HEAD>\n");
         out.println("<TITLE>Access rights validated</TITLE>\n");
@@ -1779,33 +1761,7 @@ public class SAMLUtils  extends SAMLUtilsCommon {
                   + "&" + SAMLConstants.ERROR_MESSAGE + "="
                   + URLEncDec.encode(errorMsg);
 
-             RequestDispatcher dispatcher =
-                        request.getRequestDispatcher(newUrl);
-             try {
-                 dispatcher.forward(request, response);
-             } catch (ServletException e) {
-                 debug.error("SAMLUtils.sendError: Exception "
-                    + "occured while trying to forward to resource:"
-                    + newUrl , e);
-                try {
-                    response.sendError(
-                        HttpServletResponse.SC_INTERNAL_SERVER_ERROR,
-                        e.getMessage());
-                } catch (IOException ioe) {
-                  debug.error("SAMLUtils.sendError IOException", ioe);
-                }
-            } catch (IOException e) {
-                            debug.error("SAMLUtils.sendError: Exception "
-                    + "occured while trying to forward to resource:"
-                    + newUrl , e);
-                try {
-                    response.sendError(
-                        HttpServletResponse.SC_INTERNAL_SERVER_ERROR,
-                        e.getMessage());
-                } catch (IOException ioe) {
-                  debug.error("SAMLUtils.sendError IOException", ioe);
-                }
-            }
+             forwardRequest(newUrl, request, response);
          } else {
            String binding = SystemConfigurationUtil.getProperty(
                             SAMLConstants.ERROR_PAGE_HTTP_BINDING,
@@ -1824,33 +1780,60 @@ public class SAMLUtils  extends SAMLUtilsCommon {
 
               FSUtils.forwardRequest(request, response, newUrl) ;
            } else {
-              try {
-                  response.setContentType("text/html; charset=UTF-8");
-                  PrintWriter out = response.getWriter();
-                  out.println("<HTML>");
-                  out.println("<BODY Onload=\"document.forms[0].submit()\">");
-                  out.println("<FORM METHOD=\"POST\" ACTION=\""
-                              + errorUrl + "\">");
-                  out.println("<INPUT TYPE=\"HIDDEN\" NAME=\"" +
-                  SAMLConstants.ERROR_CODE + "\" ");
-                  out.println("VALUE=\"" + errorCode + "\">");
-                  out.println("<INPUT TYPE=\"HIDDEN\" NAME=\"" +
-                  SAMLConstants.ERROR_MESSAGE + "\" VALUE=\"" +
-                  URLEncDec.encode(errorMsg) + "\">");
-                  out.println("<INPUT TYPE=\"HIDDEN\" NAME=\"" +
-                  SAMLConstants.HTTP_STATUS_CODE + "\" VALUE=\"" +
-                  httpStatusCode +  "\">");
-                  out.println("<NOSCRIPT><CENTER>");
-                  out.println("<INPUT TYPE=\"SUBMIT\" VALUE=\"" +
-                  bundle.getString("samlErrorKey") +
-                  "\"/></CENTER></NOSCRIPT>");
-                  out.println("</FORM></BODY></HTML>");
-                  out.close(); 
-                  return;
-              } catch (IOException ie) {
-                  debug.error("SAMLUtils.sendError IOException", ie);
-              }
+               // Populate request attributes to be available for rendering.
+               request.setAttribute("ERROR_URL", errorUrl);
+               request.setAttribute("ERROR_CODE_NAME", SAMLConstants.ERROR_CODE);
+               request.setAttribute("ERROR_CODE", errorCode);
+               request.setAttribute("ERROR_MESSAGE_NAME", SAMLConstants.ERROR_MESSAGE);
+               request.setAttribute("ERROR_MESSAGE", URLEncDec.encode(errorMsg));
+               request.setAttribute("HTTP_STATUS_CODE_NAME", SAMLConstants.HTTP_STATUS_CODE);
+               request.setAttribute("HTTP_STATUS_CODE", httpStatusCode);
+               request.setAttribute("SAML_ERROR_KEY", bundle.getString("samlErrorKey"));
+               // Forward to auto-submitting form.
+               forwardRequest(ERROR_JSP, request, response);
            }
-         }         
+         }
      }
+
+    /**
+     * Forwards to the passed URL.
+     *
+     * @param url
+     *         Forward URL
+     * @param request
+     *         Request object
+     * @param response
+     *         Response object
+     */
+    private static void forwardRequest(String url, HttpServletRequest request, HttpServletResponse response) {
+        try {
+            request.getRequestDispatcher(url).forward(request, response);
+
+        } catch (ServletException sE) {
+            handleForwardError(url, sE, response);
+        } catch (IOException ioE) {
+            handleForwardError(url, ioE, response);
+        }
+    }
+
+    /**
+     * Handle any forward error.
+     *
+     * @param url
+     *         Attempted forward URL
+     * @param exception
+     *         Caught exception
+     * @param response
+     *         Response object
+     */
+    private static void handleForwardError(String url, Exception exception, HttpServletResponse response) {
+        debug.error("SAMLUtils.sendError: Exception occurred while trying to forward to resource: " + url, exception);
+
+        try {
+            response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, exception.getMessage());
+        } catch (IOException ioE) {
+            debug.error("Failed to inform the response of caught exception", ioE);
+        }
+    }
+
 }

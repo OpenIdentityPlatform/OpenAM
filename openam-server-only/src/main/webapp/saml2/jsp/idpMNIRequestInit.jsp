@@ -155,5 +155,6 @@
         SAMLUtils.sendError(request, response, response.SC_BAD_REQUEST,
             "requestProcessingMNIError",
             SAML2Utils.bundle.getString("requestProcessingMNIError"));
+        return;
     }
 %>

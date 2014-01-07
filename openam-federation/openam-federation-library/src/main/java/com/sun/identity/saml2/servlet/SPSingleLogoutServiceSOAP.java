@@ -133,11 +133,13 @@ public class SPSingleLogoutServiceSOAP extends HttpServlet {
             SAMLUtils.sendError(req, resp, 
                 HttpServletResponse.SC_INTERNAL_SERVER_ERROR,
                 "singleLogoutFailed", ex.getMessage());
+            return;
         } catch (SOAPException soap) {
             SAML2Utils.debug.error("SPSingleLogoutServiceSOAP", soap);
             SAMLUtils.sendError(req, resp, 
                 HttpServletResponse.SC_INTERNAL_SERVER_ERROR,
                 "singleLogoutFailed", soap.getMessage());
+            return;
         }
     }
 

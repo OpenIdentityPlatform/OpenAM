@@ -51,6 +51,7 @@ import="com.sun.liberty.LibertyManager"
     } else {
         response.sendError(response.SC_INTERNAL_SERVER_ERROR,
             "Not able to get Provider ID");
+        return;
     }
     if (LibertyManager.isFederationCancelled(request)) {
 %>

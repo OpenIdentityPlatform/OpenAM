@@ -63,11 +63,13 @@ public class IDPManageNameIDServiceSOAP extends HttpServlet {
             SAMLUtils.sendError(request, response, 
                 HttpServletResponse.SC_INTERNAL_SERVER_ERROR, 
                 "requestProcessingMNIError", ex.getMessage());
+            return;
         } catch (SOAPException se) {
             SAML2Utils.debug.error("IDPManageNameIDServiceSOAP.doPost:", se);
             SAMLUtils.sendError(request, response, 
                 HttpServletResponse.SC_INTERNAL_SERVER_ERROR, 
                 "requestProcessingMNIError", se.getMessage());
+            return;
         }
     }
 }

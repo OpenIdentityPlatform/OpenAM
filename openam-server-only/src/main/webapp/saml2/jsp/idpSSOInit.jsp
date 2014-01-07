@@ -24,6 +24,7 @@
 
    $Id: idpSSOInit.jsp,v 1.9 2009/06/24 23:05:30 mrudulahg Exp $
 
+   Portions Copyrighted 2013 ForgeRock AS
 --%>
 
 
@@ -37,6 +38,7 @@
 <%@ page import="com.sun.identity.saml2.common.SAML2Utils" %>
 <%@ page import="com.sun.identity.saml.common.SAMLUtils" %>
 <%@ page import="com.sun.identity.saml2.profile.IDPSSOUtil" %>
+<%@ page import="java.io.PrintWriter" %>
 
 <%--
     idpssoinit.jsp initiates Unsolicited SSO at the Identity Provider.
@@ -115,19 +117,21 @@
 	String nameIDFormat =
 		request.getParameter(SAML2Constants.NAMEID_POLICY_FORMAT);
 	String relayState = SAML2Utils.getRelayState(request);
-	IDPSSOUtil.doSSOFederate(request,response,null,spEntityID,
+	IDPSSOUtil.doSSOFederate(request,response,new PrintWriter(out, true),null,spEntityID,
 				 metaAlias, nameIDFormat,relayState);
     } catch (SAML2Exception sse) {
-	SAML2Utils.debug.error("Error processing request " , sse);
-	SAMLUtils.sendError(request, response, response.SC_BAD_REQUEST,
+	    SAML2Utils.debug.error("Error processing request " , sse);
+	    SAMLUtils.sendError(request, response, response.SC_BAD_REQUEST,
             "requestProcessingError", 
-	    SAML2Utils.bundle.getString("requestProcessingError") + " " +
+	        SAML2Utils.bundle.getString("requestProcessingError") + " " +
             sse.getMessage());
+        return;
     } catch (Exception e) {
         SAML2Utils.debug.error("Error processing request ",e);
-	SAMLUtils.sendError(request, response, response.SC_BAD_REQUEST,
+	    SAMLUtils.sendError(request, response, response.SC_BAD_REQUEST,
             "requestProcessingError",
-	    SAML2Utils.bundle.getString("requestProcessingError") + " " +
+	        SAML2Utils.bundle.getString("requestProcessingError") + " " +
             e.getMessage());
+        return;
     }
 %>

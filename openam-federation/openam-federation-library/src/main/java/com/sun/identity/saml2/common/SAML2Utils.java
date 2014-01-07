@@ -22,77 +22,11 @@
  * your own identifying information:
  * "Portions Copyrighted [year] [name of copyright owner]"
  *
- */
-
-/*
  * Portions Copyrighted 2010-2013 ForgeRock AS
  */
-
 package com.sun.identity.saml2.common;
 
-import java.io.BufferedReader;
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.OutputStream;
-import java.io.OutputStreamWriter;
-import java.io.PrintWriter;
-import java.io.UnsupportedEncodingException;
-import java.net.HttpURLConnection;
-import java.net.MalformedURLException;
-import java.net.URL;
-import java.net.URLDecoder;
-import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
-import java.security.PrivateKey;
-import java.security.SecureRandom;
-import java.security.cert.X509Certificate;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Date;
-import java.util.Enumeration;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.StringTokenizer;
-import java.util.logging.Level;
-import java.util.zip.DataFormatException;
-import java.util.zip.Deflater;
-import java.util.zip.Inflater;
-
-import javax.servlet.http.Cookie;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import javax.xml.soap.Detail;
-import javax.xml.soap.MessageFactory;
-import javax.xml.soap.MimeHeader;
-import javax.xml.soap.MimeHeaders;
-import javax.xml.soap.Name;
-import javax.xml.soap.SOAPBody;
-import javax.xml.soap.SOAPConnection;
-import javax.xml.soap.SOAPConnectionFactory;
-import javax.xml.soap.SOAPConstants;
-import javax.xml.soap.SOAPElement;
-import javax.xml.soap.SOAPEnvelope;
-import javax.xml.soap.SOAPException;
-import javax.xml.soap.SOAPFault;
-import javax.xml.soap.SOAPMessage;
-
 import com.iplanet.dpro.session.exceptions.StoreException;
-import com.sun.identity.saml2.plugins.*;
-import com.sun.identity.saml2.profile.*;
-import org.forgerock.openam.utils.IOUtils;
-import org.forgerock.openam.utils.StringUtils;
-import org.owasp.esapi.ESAPI;
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
-
 import com.sun.identity.common.HttpURLConnectionManager;
 import com.sun.identity.common.SystemConfigurationUtil;
 import com.sun.identity.cot.COTException;
@@ -135,6 +69,20 @@ import com.sun.identity.saml2.logging.LogUtil;
 import com.sun.identity.saml2.meta.SAML2MetaException;
 import com.sun.identity.saml2.meta.SAML2MetaManager;
 import com.sun.identity.saml2.meta.SAML2MetaUtils;
+import com.sun.identity.saml2.plugins.DefaultSPAuthnContextMapper;
+import com.sun.identity.saml2.plugins.FedletAdapter;
+import com.sun.identity.saml2.plugins.IDPAccountMapper;
+import com.sun.identity.saml2.plugins.SAML2IDPFinder;
+import com.sun.identity.saml2.plugins.SAML2IdentityProviderAdapter;
+import com.sun.identity.saml2.plugins.SAML2ServiceProviderAdapter;
+import com.sun.identity.saml2.plugins.SPAccountMapper;
+import com.sun.identity.saml2.plugins.SPAuthnContextMapper;
+import com.sun.identity.saml2.profile.AuthnRequestInfo;
+import com.sun.identity.saml2.profile.AuthnRequestInfoCopy;
+import com.sun.identity.saml2.profile.CacheCleanUpScheduler;
+import com.sun.identity.saml2.profile.IDPCache;
+import com.sun.identity.saml2.profile.IDPSSOUtil;
+import com.sun.identity.saml2.profile.SPCache;
 import com.sun.identity.saml2.protocol.AuthnRequest;
 import com.sun.identity.saml2.protocol.ProtocolFactory;
 import com.sun.identity.saml2.protocol.RequestAbstract;
@@ -150,6 +98,62 @@ import com.sun.identity.shared.encode.CookieUtils;
 import com.sun.identity.shared.encode.URLEncDec;
 import com.sun.identity.shared.whitelist.URLPatternMatcher;
 import com.sun.identity.shared.xml.XMLUtils;
+import org.owasp.esapi.ESAPI;
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
+
+import javax.servlet.ServletException;
+import javax.servlet.http.Cookie;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import javax.xml.soap.Detail;
+import javax.xml.soap.MessageFactory;
+import javax.xml.soap.MimeHeader;
+import javax.xml.soap.MimeHeaders;
+import javax.xml.soap.Name;
+import javax.xml.soap.SOAPBody;
+import javax.xml.soap.SOAPConnection;
+import javax.xml.soap.SOAPConnectionFactory;
+import javax.xml.soap.SOAPConstants;
+import javax.xml.soap.SOAPElement;
+import javax.xml.soap.SOAPEnvelope;
+import javax.xml.soap.SOAPException;
+import javax.xml.soap.SOAPFault;
+import javax.xml.soap.SOAPMessage;
+import java.io.BufferedReader;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.OutputStream;
+import java.io.OutputStreamWriter;
+import java.io.UnsupportedEncodingException;
+import java.net.HttpURLConnection;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.net.URLDecoder;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
+import java.security.PrivateKey;
+import java.security.SecureRandom;
+import java.security.cert.X509Certificate;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Date;
+import java.util.Enumeration;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.StringTokenizer;
+import java.util.logging.Level;
+import java.util.zip.DataFormatException;
+import java.util.zip.Deflater;
+import java.util.zip.Inflater;
 
 /**
  * The <code>SAML2Utils</code> contains utility methods for SAML 2.0
@@ -3949,31 +3953,40 @@ public class SAML2Utils extends SAML2SDKUtils {
          return attribute;
     }
 
-    public static void postToTarget(HttpServletResponse response,
+    public static void postToTarget(HttpServletRequest request, HttpServletResponse response,
         String SAMLmessageName, String SAMLmessageValue, String relayStateName,
-        String relayStateValue, String targetURL) throws IOException {
+        String relayStateValue, String targetURL) throws SAML2Exception {
          
-        response.setContentType("text/html;charset=UTF-8");
-        PrintWriter out = response.getWriter();
+        request.setAttribute("TARGET_URL", ESAPI.encoder().encodeForHTML(targetURL));
+        request.setAttribute("SAML_MESSAGE_NAME", ESAPI.encoder().encodeForHTML(SAMLmessageName));
+        request.setAttribute("SAML_MESSAGE_VALUE", ESAPI.encoder().encodeForHTML(SAMLmessageValue));
+        request.setAttribute("RELAY_STATE_NAME", ESAPI.encoder().encodeForHTML(relayStateName));
+        request.setAttribute("RELAY_STATE_VALUE", ESAPI.encoder().encodeForHTML(relayStateValue));
+        request.setAttribute("SAML_POST_KEY", bundle.getString("samlPostKey"));
+
         response.setHeader("Pragma", "no-cache");
         response.setHeader("Cache-Control", "no-cache,no-store");
 
-        String authnResponse;
-        Map<String, String> tagSwap = new HashMap<String, String>(6);
-        tagSwap.put("@TARGET_URL@", ESAPI.encoder().encodeForHTML(targetURL));
-        tagSwap.put("@SAML_MESSAGE_NAME@", ESAPI.encoder().encodeForHTML(SAMLmessageName));
-        tagSwap.put("@SAML_MESSAGE_VALUE@", ESAPI.encoder().encodeForHTML(SAMLmessageValue));
-        tagSwap.put("@SAML_POST_KEY@", bundle.getString("samlPostKey"));
-        if (relayStateValue != null && relayStateValue.length() != 0) {
-            tagSwap.put("@RELAY_STATE_NAME@", ESAPI.encoder().encodeForHTML(relayStateName));
-            tagSwap.put("@RELAY_STATE_VALUE@", ESAPI.encoder().encodeForHTML(relayStateValue));
-            authnResponse = IOUtils.getFileContentFromClassPath("/saml2loginwithrelay.template");
-        } else {
-            authnResponse = IOUtils.getFileContentFromClassPath("/saml2login.template");
+        try {
+            request.getRequestDispatcher("/saml2/jsp/autosubmitaccessrights.jsp").forward(request, response);
+        } catch (ServletException sE) {
+            handleForwardException(sE);
+        } catch (IOException ioE) {
+            handleForwardException(ioE);
         }
-        authnResponse = StringUtils.tagSwap(authnResponse, tagSwap);
-        out.println(authnResponse);
-        out.close();
+    }
+
+    /**
+     * Handles any exception when attempting to forward.
+     *
+     * @param exception
+     *         Thrown and caught exception
+     * @throws SAML2Exception
+     *         Single general exception that is thrown on
+     */
+    private static void handleForwardException(Exception exception) throws SAML2Exception {
+        debug.error("Failed to forward to auto submitting JSP", exception);
+        throw new SAML2Exception(bundle.getString("postToTargetFailed"));
     }
 
     /**

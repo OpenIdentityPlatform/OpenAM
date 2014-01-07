@@ -86,6 +86,7 @@ public class FSBrowserPostConsumerHandler extends FSAssertionArtifactHandler {
                     + "redirectToResource: Resource URL is null");
                 response.sendError (response.SC_INTERNAL_SERVER_ERROR,
                     FSUtils.bundle.getString ("nullInputParameter"));
+                return;
             }
             if (FSUtils.debug.messageEnabled()) {
                 FSUtils.debug.message (

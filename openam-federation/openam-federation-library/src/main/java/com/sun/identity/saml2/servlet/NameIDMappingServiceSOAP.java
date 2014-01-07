@@ -129,11 +129,13 @@ public class NameIDMappingServiceSOAP extends HttpServlet {
             SAMLUtils.sendError(req, resp, 
                  HttpServletResponse.SC_INTERNAL_SERVER_ERROR, 
                  "nameIDMappingFailed", ex.getMessage());
+            return;
         } catch (SOAPException soap) {
             SAML2Utils.debug.error("NameIDMappingServiceSOAP", soap);
             SAMLUtils.sendError(req, resp, 
                  HttpServletResponse.SC_INTERNAL_SERVER_ERROR, 
                  "nameIDMappingFailed", soap.getMessage());
+            return;
         }
     }
 }

@@ -24,11 +24,13 @@
  *
  * $Id: Utils.java,v 1.4 2008/11/10 22:57:00 veiming Exp $
  *
+ * Portions Copyrighted 2013 ForgeRock AS
  */
 
 package com.sun.identity.sae.api;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpServletRequest;
+import java.io.PrintWriter;
 import java.net.URL;
 import java.util.StringTokenizer;
 import java.util.HashMap;
@@ -58,11 +60,12 @@ public class Utils
      *  parameter.
      *
      *  @param hres HttpSevletResponse to be used for the redirect
+     *  @param out the print writer for writing out presentation
      *  @param redirectUrl URL to redirect to.
      *  @param pmap  http parameters to be sent as part of the redirect
      *  @param action http action to be executed : GET or POST
      */
-    public static void redirect(HttpServletResponse hres, String redirectUrl, 
+    public static void redirect(HttpServletResponse hres, PrintWriter out, String redirectUrl,
            Map pmap, String action)
        throws Exception
     {
@@ -85,7 +88,7 @@ public class Utils
              return;
         } else {
              String html = formFromMap(redirectUrl, pmap, true);
-             hres.getWriter().write(html);
+             out.write(html);
         }
     }
     /**

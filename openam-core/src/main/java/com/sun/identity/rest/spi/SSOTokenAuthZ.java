@@ -130,6 +130,7 @@ public class SSOTokenAuthZ implements IAuthorization {
         if (statusCode != HttpServletResponse.SC_OK) {
             ((HttpServletResponse)response).sendError(statusCode, 
                 statusMessage);
+            return;
         }
     }
 

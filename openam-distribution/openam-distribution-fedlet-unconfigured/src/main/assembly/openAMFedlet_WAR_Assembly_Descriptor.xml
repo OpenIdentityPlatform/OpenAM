@@ -124,6 +124,7 @@
                 <include>spSingleLogoutInit.jsp</include>
                 <include>spSingleLogoutPOST.jsp</include>
                 <include>spSingleLogoutRedirect.jsp</include>
+                <include>autosubmitaccessrights.jsp</include>
             </includes>
         </fileSet>
         <fileSet>

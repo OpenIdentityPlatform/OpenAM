@@ -24,14 +24,11 @@
  *
  * $Id: IDPProxyUtil.java,v 1.18 2009/11/20 21:41:16 exu Exp $
  *
- */
-
-/**
  * Portions Copyrighted 2010-2013 ForgeRock AS
  */
-
 package com.sun.identity.saml2.profile;
 
+import java.io.PrintWriter;
 import java.util.logging.Level;
 
 import com.iplanet.dpro.session.exceptions.StoreException;
@@ -161,115 +158,115 @@ public class IDPProxyUtil {
             String relayState,
             String binding)
             throws SAML2Exception, IOException {
-         String classMethod = "IDPProxyUtil.sendProxyAuthnRequest: ";
-         AuthnRequest newAuthnRequest = getNewAuthnRequest(hostedEntityId, preferredIDP, realm, authnRequest);
-         // invoke SP Adapter class if registered
-         SAML2ServiceProviderAdapter spAdapter = SAML2Utils.getSPAdapterClass(hostedEntityId, realm);
-         if (spAdapter != null) {
-             spAdapter.preSingleSignOnRequest(hostedEntityId, preferredIDP, realm, request, response, newAuthnRequest);
-         }
-         if (SAML2Utils.debug.messageEnabled()) {
-             SAML2Utils.debug.message(classMethod +
-                 "New Authentication request:" +
-                 newAuthnRequest.toXMLString());
-         }
-         String requestID = newAuthnRequest.getID();     
-            
-         // save the AuthnRequest in the IDPCache so that it can be
-         // retrieved later when the user successfully authenticates
-         IDPCache.authnRequestCache.put(requestID,
-             newAuthnRequest);
-         
-         // save the SP descriptor in IDPCache
-         IDPCache.proxySPDescCache.put(requestID,
-             spSSODescriptor);
-         
-         // save the original AuthnRequest 
-         IDPCache.proxySPAuthnReqCache.put(requestID,
-             authnRequest);
-         
-         String targetURL = null;
-         SPSSODescriptorElement localDescriptor = null;
-         SPSSOConfigElement localDescriptorConfig = null;
-         IDPSSODescriptorElement idpDescriptor = null;
-         try {
-             idpDescriptor = IDPSSOUtil.metaManager.
-                 getIDPSSODescriptor(realm, preferredIDP);
-             List ssoServiceList =
-                 idpDescriptor.getSingleSignOnService();
-             targetURL = SPSSOFederate.getSSOURL(ssoServiceList, binding);
-             
-             localDescriptor = IDPSSOUtil.metaManager.
-                 getSPSSODescriptor(realm, hostedEntityId);
-             localDescriptorConfig = IDPSSOUtil.metaManager.
-                 getSPSSOConfig(realm, hostedEntityId);
-         } catch (SAML2MetaException e) {
-             SAML2Utils.debug.error(classMethod, e);
-             throw new SAML2Exception(e.getMessage());
-         }
+        String classMethod = "IDPProxyUtil.sendProxyAuthnRequest: ";
+        AuthnRequest newAuthnRequest = getNewAuthnRequest(hostedEntityId, preferredIDP, realm, authnRequest);
+        // invoke SP Adapter class if registered
+        SAML2ServiceProviderAdapter spAdapter = SAML2Utils.getSPAdapterClass(hostedEntityId, realm);
+        if (spAdapter != null) {
+            spAdapter.preSingleSignOnRequest(hostedEntityId, preferredIDP, realm, request, response, newAuthnRequest);
+        }
+        if (SAML2Utils.debug.messageEnabled()) {
+            SAML2Utils.debug.message(classMethod +
+                    "New Authentication request:" +
+                    newAuthnRequest.toXMLString());
+        }
+        String requestID = newAuthnRequest.getID();
 
-         if (targetURL == null) {
-             SAML2Utils.debug.error(classMethod + "Single Sign-on service " +
-                 "is not found for the proxying IDP.");
-             throw new SAML2Exception(SAML2Utils.bundle.getString(
-                 "ssoServiceNotFoundIDPProxy"));
-         }
+        // save the AuthnRequest in the IDPCache so that it can be
+        // retrieved later when the user successfully authenticates
+        IDPCache.authnRequestCache.put(requestID,
+                newAuthnRequest);
 
-         boolean signingNeeded = ((idpDescriptor != null) &&
-             idpDescriptor.isWantAuthnRequestsSigned()) ||
-             ((localDescriptor != null) &&
-             localDescriptor.isAuthnRequestsSigned());
+        // save the SP descriptor in IDPCache
+        IDPCache.proxySPDescCache.put(requestID,
+                spSSODescriptor);
 
-         // check if relayState is present and get the unique
-         // id which will be appended to the SSO URL before
-         // redirecting 
+        // save the original AuthnRequest
+        IDPCache.proxySPAuthnReqCache.put(requestID,
+                authnRequest);
+
+        String targetURL = null;
+        SPSSODescriptorElement localDescriptor = null;
+        SPSSOConfigElement localDescriptorConfig = null;
+        IDPSSODescriptorElement idpDescriptor = null;
+        try {
+            idpDescriptor = IDPSSOUtil.metaManager.
+                    getIDPSSODescriptor(realm, preferredIDP);
+            List ssoServiceList =
+                    idpDescriptor.getSingleSignOnService();
+            targetURL = SPSSOFederate.getSSOURL(ssoServiceList, binding);
+
+            localDescriptor = IDPSSOUtil.metaManager.
+                    getSPSSODescriptor(realm, hostedEntityId);
+            localDescriptorConfig = IDPSSOUtil.metaManager.
+                    getSPSSOConfig(realm, hostedEntityId);
+        } catch (SAML2MetaException e) {
+            SAML2Utils.debug.error(classMethod, e);
+            throw new SAML2Exception(e.getMessage());
+        }
+
+        if (targetURL == null) {
+            SAML2Utils.debug.error(classMethod + "Single Sign-on service " +
+                    "is not found for the proxying IDP.");
+            throw new SAML2Exception(SAML2Utils.bundle.getString(
+                    "ssoServiceNotFoundIDPProxy"));
+        }
+
+        boolean signingNeeded = ((idpDescriptor != null) &&
+                idpDescriptor.isWantAuthnRequestsSigned()) ||
+                ((localDescriptor != null) &&
+                        localDescriptor.isAuthnRequestsSigned());
+
+        // check if relayState is present and get the unique
+        // id which will be appended to the SSO URL before
+        // redirecting
         String relayStateID = null;
         if (relayState != null && relayState.length()> 0) {
             relayStateID = SPSSOFederate.getRelayStateID(relayState,
-                authnRequest.getID());
+                    authnRequest.getID());
         }
 
         if (binding.equals(SAML2Constants.HTTP_POST)) {
             if (signingNeeded) {
                 String certAlias = SPSSOFederate.getParameter(
-                    SAML2MetaUtils.getAttributes(localDescriptorConfig),
-                    SAML2Constants.SIGNING_CERT_ALIAS);
+                        SAML2MetaUtils.getAttributes(localDescriptorConfig),
+                        SAML2Constants.SIGNING_CERT_ALIAS);
                 SPSSOFederate.signAuthnRequest(certAlias,newAuthnRequest);
-	    }
+            }
             String authXMLString = newAuthnRequest.toXMLString(true,true);
 
             String encodedReqMsg = SAML2Utils.encodeForPOST(authXMLString);
-            SAML2Utils.postToTarget(response, "SAMLRequest",
-                encodedReqMsg, "RelayState", relayStateID, targetURL);
-        } else { 
-        
+            SAML2Utils.postToTarget(request, response, "SAMLRequest",
+                    encodedReqMsg, "RelayState", relayStateID, targetURL);
+        } else {
+
             String authReqXMLString = newAuthnRequest.toXMLString(true,true);
 
             if (SAML2Utils.debug.messageEnabled()) {
                 SAML2Utils.debug.message(classMethod + " AuthnRequest: " +
-                    authReqXMLString);
+                        authReqXMLString);
             }
-             // encode the xml string
+            // encode the xml string
             String encodedXML = SAML2Utils.encodeForRedirect(authReqXMLString);
             StringBuffer queryString =
-                new StringBuffer().append(SAML2Constants.SAML_REQUEST)
-                    .append(SAML2Constants.EQUAL)
-                    .append(encodedXML);
+                    new StringBuffer().append(SAML2Constants.SAML_REQUEST)
+                            .append(SAML2Constants.EQUAL)
+                            .append(encodedXML);
             //TODO:  should it be newAuthnRequest??? 
             if (relayStateID != null && relayStateID.length() > 0) {
                 queryString.append("&").append(SAML2Constants.RELAY_STATE)
-                    .append("=")
-                    .append(URLEncDec.encode(relayStateID));
+                        .append("=")
+                        .append(URLEncDec.encode(relayStateID));
             }
 
             StringBuffer redirectURL =
-                new StringBuffer().append(targetURL)
-                    .append(targetURL.contains("?") ? "&" : "?");
-             // sign the query string
+                    new StringBuffer().append(targetURL)
+                            .append(targetURL.contains("?") ? "&" : "?");
+            // sign the query string
             if (signingNeeded) {
                 String certAlias = SPSSOFederate.getParameter(
-                    SAML2MetaUtils.getAttributes(localDescriptorConfig),
-                    SAML2Constants.SIGNING_CERT_ALIAS);
+                        SAML2MetaUtils.getAttributes(localDescriptorConfig),
+                        SAML2Constants.SIGNING_CERT_ALIAS);
                 String signedQueryStr = SPSSOFederate.signQueryString(
                     queryString.toString(),certAlias);
                 redirectURL.append(signedQueryStr);
@@ -282,24 +279,24 @@ public class IDPProxyUtil {
         String[] data = { targetURL };
         LogUtil.access(Level.INFO, LogUtil.REDIRECT_TO_SP,data, null);
         AuthnRequestInfo reqInfo = new AuthnRequestInfo(request, response,
-            realm, hostedEntityId, preferredIDP, newAuthnRequest, relayState,
-            null);
+                realm, hostedEntityId, preferredIDP, newAuthnRequest, relayState,
+                null);
         synchronized(SPCache.requestHash) {
             SPCache.requestHash.put(requestID, reqInfo);
         }
         if (SAML2Utils.isSAML2FailOverEnabled()) {
             try {
-            // sessionExpireTime is counted in seconds
-            long sessionExpireTime = System.currentTimeMillis() / 1000 + SPCache.interval;                    
-            SAML2RepositoryFactory.getInstance().saveSAML2Token(requestID,
-                    new AuthnRequestInfoCopy(reqInfo), sessionExpireTime, null);
-            if (SAML2Utils.debug.messageEnabled()) {
-                SAML2Utils.debug.message(classMethod + " SAVE AuthnRequestInfoCopy for requestID " + requestID);
-            }
+                // sessionExpireTime is counted in seconds
+                long sessionExpireTime = System.currentTimeMillis() / 1000 + SPCache.interval;
+                SAML2RepositoryFactory.getInstance().saveSAML2Token(requestID,
+                        new AuthnRequestInfoCopy(reqInfo), sessionExpireTime, null);
+                if (SAML2Utils.debug.messageEnabled()) {
+                    SAML2Utils.debug.message(classMethod + " SAVE AuthnRequestInfoCopy for requestID " + requestID);
+                }
             } catch(StoreException se) {
                 SAML2Utils.debug.error(classMethod + " SAVE AuthnRequestInfoCopy for requestID " + requestID + ", has failed!",se);
             }
-        }        
+        }
     }
 
     /**
@@ -513,6 +510,7 @@ public class IDPProxyUtil {
      * provider which has originally requested for the authentication.
      * @param request HttpServletRequest 
      * @param response HttpServletResponse
+     * @param out the print writer for writing out presentation
      * @param requestID request ID 
      * @param idpMetaAlias meta Alias 
      * @param newSess Session object
@@ -521,6 +519,7 @@ public class IDPProxyUtil {
     private static void sendProxyResponse(
         HttpServletRequest request,
         HttpServletResponse response,
+        PrintWriter out,
         String requestID,
         String idpMetaAlias,
         Object newSess, 
@@ -568,6 +567,7 @@ public class IDPProxyUtil {
             IDPCache.relayStateCache.get(origRequest.getID()); 
         IDPSSOUtil.doSSOFederate( request,
                                   response,
+                                  out,
                                   origRequest, 
                                   origRequest.getIssuer().getValue(),
                                   idpMetaAlias, 
@@ -581,13 +581,14 @@ public class IDPProxyUtil {
      * service provider. 
      * @param request HttpServletRequest 
      * @param response HttpServletResponse
+     * @param out the print writer for writing out presentation
      * @param metaAlias meta Alias 
      * @param respInfo ResponseInfo object
      * @param newSession Session object 
      * @exception SAML2Exception for any SAML2 failure.
      */
     public static void generateProxyResponse(
-        HttpServletRequest request, HttpServletResponse response,
+        HttpServletRequest request, HttpServletResponse response, PrintWriter out,
         String metaAlias, ResponseInfo respInfo,
         Object newSession)
         throws SAML2Exception 
@@ -599,7 +600,7 @@ public class IDPProxyUtil {
             if (nameidFormat != null && SAML2Utils.debug.messageEnabled()) {
                 SAML2Utils.debug.message("NAME ID Format= " + nameidFormat ); 
             }
-            sendProxyResponse(request, response, requestID, metaAlias,
+            sendProxyResponse(request, response, out, requestID, metaAlias,
                 newSession, nameidFormat);
             return ;
         // } 
@@ -842,6 +843,7 @@ public class IDPProxyUtil {
    
    public static  void sendProxyLogoutResponse(
        HttpServletResponse response,
+       HttpServletRequest request,
        String originatingRequestID,
        Map infoMap,
        String remoteEntity,
@@ -869,7 +871,7 @@ public class IDPProxyUtil {
            SAML2Utils.debug.message("Proxy to: " + location); 
        }    
        String relayState = (String) infoMap.get(SAML2Constants.RELAY_STATE); 
-       LogoutUtil.sendSLOResponse(response, logoutRes, 
+       LogoutUtil.sendSLOResponse(response, request, logoutRes,
            location, relayState, "/", entityID, 
            SAML2Constants.IDP_ROLE,
            remoteEntity, binding);       
@@ -1000,7 +1002,8 @@ public class IDPProxyUtil {
    
    public static void sendIDPInitProxyLogoutRequest(
         HttpServletRequest request,
-        HttpServletResponse response, 
+        HttpServletResponse response,
+        PrintWriter out,
         LogoutResponse logoutResponse, 
         String location,
         String spEntityID, 
@@ -1047,7 +1050,7 @@ public class IDPProxyUtil {
                 paramsMap.put(SAML2Constants.LOGOUT_ALL, logoutAll);
             }
 
-            IDPSingleLogout.initiateLogoutRequest(request,response,
+            IDPSingleLogout.initiateLogoutRequest(request,response, out,
                 binding,paramsMap);
             
             /*TODO: 

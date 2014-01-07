@@ -24,8 +24,8 @@
  *
  * $Id: SAML2ServiceProviderAdapter.java,v 1.5 2008/08/19 19:11:15 veiming Exp $
  *
+ * Portions Copyrighted 2013 ForgeRock AS
  */
-
 package com.sun.identity.saml2.plugins;
 
 import com.sun.identity.saml2.common.SAML2Exception;
@@ -37,6 +37,7 @@ import com.sun.identity.saml2.protocol.ManageNameIDResponse;
 import com.sun.identity.saml2.protocol.Response;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.io.PrintWriter;
 import java.util.Map;
 
 /**
@@ -191,6 +192,7 @@ public abstract class SAML2ServiceProviderAdapter {
      * @param realm Realm of the hosted SP.
      * @param request servlet request
      * @param response servlet response
+     * @param out the print writer for writing out presentation
      * @param session user's session
      * @param authnRequest the original authentication request sent from SP, 
      *       null if this is IDP initiated SSO.
@@ -208,7 +210,8 @@ public abstract class SAML2ServiceProviderAdapter {
         String hostedEntityID, 
         String realm,
         HttpServletRequest request, 
-        HttpServletResponse response, 
+        HttpServletResponse response,
+        PrintWriter out,
         Object session,
         AuthnRequest authnRequest, 
         Response ssoResponse,

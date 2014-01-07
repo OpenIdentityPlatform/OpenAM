@@ -24,9 +24,8 @@
  *
  * $Id: SAMLAwareServlet.java,v 1.5 2009/06/12 22:21:39 mallas Exp $
  *
+ * Portions Copyrighted 2013 ForgeRock AS
  */
-
-
 package com.sun.identity.saml.servlet;
 
 import com.sun.identity.shared.encode.URLEncDec;
@@ -363,7 +362,7 @@ public class SAMLAwareServlet extends HttpServlet {
             if (SAMLUtils.debug.messageEnabled()) {
                 SAMLUtils.debug.message("POST to target:"+targeturl);
             }
-            SAMLUtils.postToTarget(response,assts, targeturl, attrMap);
+            SAMLUtils.postToTarget(response, response.getWriter(), assts, targeturl, attrMap);
         } else {
             response.sendRedirect(targeturl);
         }

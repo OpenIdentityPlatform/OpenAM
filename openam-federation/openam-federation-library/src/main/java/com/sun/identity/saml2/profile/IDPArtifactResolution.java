@@ -226,6 +226,7 @@ public class IDPArtifactResolution {
                     HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "invalidSOAPMessage",
                     SAML2Utils.bundle.getString("invalidSOAPMessage") +
                     " " + ex.getMessage());
+                return;
             } catch (SAML2Exception se) {
                 SAML2Utils.debug.error(classMethod + "SAML2 error", se);
                 SAMLUtils.sendError(request, response, 
@@ -234,6 +235,7 @@ public class IDPArtifactResolution {
                     SAML2Utils.bundle.getString(
                         "unableToCreateArtifactResponse") +
                     " " + se.getMessage());
+                return;
             }
         } catch (IOException ioe) {
             SAML2Utils.debug.error(classMethod + "I/O rrror", ioe);

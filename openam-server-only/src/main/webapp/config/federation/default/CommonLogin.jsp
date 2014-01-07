@@ -65,10 +65,12 @@ org.owasp.esapi.ESAPI"
     String realm = LibertyManager.getRealmByMetaAlias(metaAlias);
     String providerID = LibertyManager.getEntityID(metaAlias);
     Iterator providerIter = null;
-    if(providerID != null)
+    if(providerID != null) {
         providerIter = LibertyManager.getIDPList(realm, providerID);
-    else
-       response.sendError(response.SC_INTERNAL_SERVER_ERROR,"Not able to get Provider ID");
+    } else {
+        response.sendError(response.SC_INTERNAL_SERVER_ERROR,"Not able to get Provider ID");
+        return;
+    }
     String idpID = null;
     String encodedID = null;
     if(requestID == null || requestID.length() <= 0)

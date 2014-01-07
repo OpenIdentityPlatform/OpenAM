@@ -184,6 +184,7 @@ public class CookieReaderServlet extends HttpServlet {
             CookieUtils.sendError(request, response,
                     response.SC_INTERNAL_SERVER_ERROR, "readerServiceFailed",
                     e.getMessage());
+            return;
         }
     }    
     

@@ -223,6 +223,7 @@
             response.sendError(response.SC_BAD_REQUEST, 
                 "No Hosted Service or Identity Provider configured for this instance."
                 + "<br/>Please configure the sample first.");
+            return;
         }
     
         if (iAmIDP) {

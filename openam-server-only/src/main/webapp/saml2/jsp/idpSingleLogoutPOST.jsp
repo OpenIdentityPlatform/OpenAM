@@ -24,9 +24,6 @@
 
    $Id: idpSingleLogoutPOST.jsp,v 1.5 2009/06/24 23:05:30 mrudulahg Exp $
 
---%>
-
-<%--
    Portions Copyrighted 2013 ForgeRock AS
 --%>
 
@@ -37,6 +34,7 @@
 <%@ page import="com.sun.identity.saml2.profile.IDPCache" %>
 <%@ page import="com.sun.identity.saml2.profile.IDPSingleLogout" %>
 <%@ page import="org.owasp.esapi.ESAPI" %>
+<%@ page import="java.io.PrintWriter" %>
 
 <%--
     idpSingleLogoutPOST.jsp
@@ -142,7 +140,7 @@
              * @throws SAML2Exception if error processing
              *          <code>LogoutRequest</code>.
              */
-            IDPSingleLogout.processLogoutRequest(request,response,
+            IDPSingleLogout.processLogoutRequest(request,response, new PrintWriter(out, true),
                 samlRequest,relayState);
             } catch (SAML2Exception sse) {
                 SAML2Utils.debug.error("Error processing LogoutRequest :", sse);

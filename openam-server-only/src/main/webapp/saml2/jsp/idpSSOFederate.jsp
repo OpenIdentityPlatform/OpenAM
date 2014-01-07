@@ -24,6 +24,7 @@
 
    $Id: idpSSOFederate.jsp,v 1.6 2009/10/15 00:00:41 exu Exp $
 
+   Portions Copyrighted 2013 ForgeRock AS
 --%>
 
 
@@ -39,6 +40,7 @@
 <%@ page import="com.sun.identity.saml.common.SAMLUtils" %>
 <%@ page import="com.sun.identity.saml2.profile.IDPSSOUtil" %>
 <%@ page import="com.sun.identity.saml2.profile.IDPSSOFederate" %>
+<%@ page import="java.io.PrintWriter" %>
 <%
     // check request, response
     if ((request == null) || (response == null)) {
@@ -78,5 +80,5 @@
      * It sends back a response containing error status if
      * something is wrong during the request processing.
      */
-    IDPSSOFederate.doSSOFederate(request, response, reqBinding );
+    IDPSSOFederate.doSSOFederate(request, response, new PrintWriter(out, true), reqBinding );
 %>

@@ -152,6 +152,8 @@ public abstract class AjaxPage extends Page {
 
     protected void writeToResponse( String text ) {
         try {
+            // Note: this writer is obtained from the Apache Click context. Should this be triggered by a JSP this
+            // may not be in compliance with the JSP spec regarding mandatory use of the buffered JspWriter.
             getContext().getResponse().getWriter().write( text );
             this.rendering = true;
         } catch ( IOException e ) {

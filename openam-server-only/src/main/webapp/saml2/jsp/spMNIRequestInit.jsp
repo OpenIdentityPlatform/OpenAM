@@ -166,5 +166,6 @@
             "requestProcessingMNIError",
             SAML2Utils.bundle.getString("requestProcessingMNIError") + " " +
             e.getMessage());
+        return;
     }
 %>

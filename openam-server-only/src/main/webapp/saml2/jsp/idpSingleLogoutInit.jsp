@@ -24,10 +24,6 @@
 
    $Id: idpSingleLogoutInit.jsp,v 1.9 2009/10/15 00:00:41 exu Exp $
 
---%>
-
-
-<%--
    Portions Copyrighted 2010-2013 ForgeRock AS
 --%>
 
@@ -44,6 +40,7 @@
 <%@ page import="com.sun.identity.saml2.profile.LogoutUtil" %>
 <%@ page import="java.util.HashMap" %>
 <%@ page import="org.owasp.esapi.ESAPI" %>
+<%@ page import="java.io.PrintWriter" %>
 
 <%--
     idpSingleLogoutInit.jsp
@@ -181,7 +178,7 @@
             paramsMap.put(SAML2Constants.LOGOUT_ALL, logoutAll);
         }
 
-        IDPSingleLogout.initiateLogoutRequest(request,response,
+        IDPSingleLogout.initiateLogoutRequest(request,response, new PrintWriter(out, true),
             binding,paramsMap);
         if (!response.isCommitted()) {
             if (relayState != null && SAML2Utils.isRelayStateURLValid(request, relayState, SAML2Constants.IDP_ROLE)) {

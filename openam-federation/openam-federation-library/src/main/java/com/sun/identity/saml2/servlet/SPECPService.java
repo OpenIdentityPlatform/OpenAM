@@ -70,6 +70,7 @@ public class SPECPService extends HttpServlet {
             SAMLUtils.sendError(req, resp, 
                  HttpServletResponse.SC_INTERNAL_SERVER_ERROR,
                  "failedToInitECPRequest", ex.getMessage());
+            return;
         }
     }
 }

@@ -331,9 +331,11 @@
     } catch (SAML2MetaException se) {
         se.printStackTrace();
         response.sendError(response.SC_INTERNAL_SERVER_ERROR, se.getMessage());
+        return;
     } catch (SAML2Exception sse) {
         sse.printStackTrace();
         response.sendError(response.SC_INTERNAL_SERVER_ERROR, sse.getMessage());
+        return;
     }
 %>
 </body>

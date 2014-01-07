@@ -61,6 +61,7 @@ public final class AuthZFilter implements Filter {
         if (auth == null) {
             ((HttpServletResponse) response).sendError(
                 HttpServletResponse.SC_BAD_REQUEST);
+            return;
         } else {
             auth.doFilter(request, response, chain);
         }

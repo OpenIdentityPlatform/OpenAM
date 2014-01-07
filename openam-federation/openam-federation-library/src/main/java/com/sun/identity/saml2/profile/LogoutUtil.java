@@ -24,12 +24,8 @@
  *
  * $Id: LogoutUtil.java,v 1.16 2009/11/20 21:41:16 exu Exp $
  *
- */
-
-/*
  * Portions Copyrighted 2012-2013 ForgeRock, Inc.
  */
-
 package com.sun.identity.saml2.profile;
 
 import java.io.ByteArrayInputStream;
@@ -304,7 +300,7 @@ public class LogoutUtil {
                 debug.message(logoutReq.toXMLString(true, true));
             }
             doSLOByPOST(requestID, logoutReq.toXMLString(true, true), location, relayState, realm, requesterEntityID,
-                    hostEntityRole, response);
+                    hostEntityRole, response, request);
         }
         SPCache.logoutRequestIDHash.put(logoutRequestID.toString(), logoutReq);
         return logoutRequestID;
@@ -1154,13 +1150,13 @@ public class LogoutUtil {
             realm, hostEntity, hostEntityRole, remoteEntity);
     }
 
-    public static void sendSLOResponse(HttpServletResponse response,
+    public static void sendSLOResponse(HttpServletResponse response, HttpServletRequest request,
         LogoutResponse sloResponse, String sloURL, String relayState,
         String realm, String hostEntity, String hostEntityRole, 
         String remoteEntity, String binding) throws SAML2Exception {
 
         if (SAML2Constants.HTTP_POST.equals(binding)) {
-            sendSLOResponsePost(response, sloResponse, sloURL, relayState,
+            sendSLOResponsePost(response, request, sloResponse, sloURL, relayState,
                 realm, hostEntity, hostEntityRole, remoteEntity);
         } else {
             sendSLOResponseRedirect(response, sloResponse, sloURL, relayState,
@@ -1168,7 +1164,7 @@ public class LogoutUtil {
         }
     }
 
-    public static void sendSLOResponsePost(HttpServletResponse response,
+    public static void sendSLOResponsePost(HttpServletResponse response, HttpServletRequest request,
         LogoutResponse sloResponse, String sloURL, String relayState,
         String realm, String hostEntity, String hostEntityRole, 
         String remoteEntity) throws SAML2Exception {
@@ -1179,14 +1175,7 @@ public class LogoutUtil {
         String logoutResponseStr = sloResponse.toXMLString(true,true);
         String encMsg = SAML2Utils.encodeForPOST(logoutResponseStr);
 
-        try {
-            SAML2Utils.postToTarget(response, "SAMLResponse", encMsg,
-                "RelayState", relayState, sloURL);
-        } catch (IOException ioe) {
-            SAML2Utils.debug.error("LogoutUtil.sendSLOResponsePost:", ioe);
-            throw new SAML2Exception(SAML2Utils.bundle.getString(
-                "errorPostingLogoutResponse"));
-        }
+        SAML2Utils.postToTarget(request, response, "SAMLResponse", encMsg, "RelayState", relayState, sloURL);
     }
 
     public static void sendSLOResponseRedirect(HttpServletResponse response,
@@ -1418,7 +1407,7 @@ public class LogoutUtil {
     private static void doSLOByPOST(String requestID,
         String sloRequestXMLString, String sloURL, String relayState,
         String realm, String hostEntity, String hostRole, 
-        HttpServletResponse response) throws SAML2Exception, SessionException {
+        HttpServletResponse response, HttpServletRequest request) throws SAML2Exception, SessionException {
 
         if (debug.messageEnabled()) {
             debug.message("LogoutUtil.doSLOByPOST : SLORequestXML: " 
@@ -1427,16 +1416,9 @@ public class LogoutUtil {
                 + sloRequestXMLString + "\nPOSTURL : " + relayState);
         }
 
-	String encMsg = SAML2Utils.encodeForPOST(sloRequestXMLString);
-
-	try {
-	    SAML2Utils.postToTarget(response, "SAMLRequest", encMsg,
+	    String encMsg = SAML2Utils.encodeForPOST(sloRequestXMLString);
+	    SAML2Utils.postToTarget(request, response, "SAMLRequest", encMsg,
                 "RelayState", relayState, sloURL);
-	} catch (Exception e) {
-            debug.error("LogoutUtil.doSLOByPOST:", e);
-            throw new SAML2Exception(SAML2Utils.bundle.getString(
-                "postToTargetFailed"));
-        }
     }
 
     static LogoutResponse getLogoutResponseFromPost(String samlResponse,

@@ -339,6 +339,7 @@ public class CookieUtils {
             // no error processing URL set, use sendError
             try {
                 response.sendError(httpStatusCode, errorMsg);
+                return;
             } catch (IOException ioe) {
                 debug.error("CookieUtils.sendError", ioe);
             }

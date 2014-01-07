@@ -24,6 +24,7 @@
 
    $Id: index.jsp,v 1.5 2009/01/27 18:02:53 weisun2 Exp $
 
+   Portions copyright 2013 ForgeRock AS
 --%>
 
 <%@page contentType="text/html" pageEncoding="UTF-8"%>
@@ -208,7 +209,7 @@ height="55" width="31" /></td></tr></tbody></table>
         if(newpackage.getrelaystate() != null){
             relayState = newpackage.getrelaystate();
         }
-        SAML2Utils.postToTarget(response, "SAMLResponse",
+        SAML2Utils.postToTarget(request, response, "SAMLResponse",
                    encodedResMsg, "RelayState", relayState, acsURL);
     %>
     <BR>

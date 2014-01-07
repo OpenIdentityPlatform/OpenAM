@@ -72,6 +72,7 @@
         cotSet = LibertyManager.getListOfCOTs(providerID, providerRole);
     } else {
         response.sendError(response.SC_INTERNAL_SERVER_ERROR,"Not able to get Provider ID");
+        return;
     }
     if(LRURL == null || LRURL.length() <= 0) {
         LRURL = LibertyManager.getHomeURL(providerID, providerRole);
@@ -122,6 +123,7 @@
     } catch(Exception ex) {
         response.sendError(response.SC_INTERNAL_SERVER_ERROR,
             "Error in handling request");
+        return;
     }
 %>
         </select>

@@ -78,6 +78,7 @@
                 SAMLUtils.sendError(request, response, response.SC_BAD_REQUEST,
                     "requestProcessingMNIError",
                     SAML2Utils.bundle.getString("requestProcessingMNIError"));
+                return;
             }
         }
     } catch (SAML2Exception e) {
@@ -86,6 +87,7 @@
             "requestProcessingMNIError",
             SAML2Utils.bundle.getString("requestProcessingMNIError") + " " +
             e.getMessage());
+        return;
     }
 %>
 

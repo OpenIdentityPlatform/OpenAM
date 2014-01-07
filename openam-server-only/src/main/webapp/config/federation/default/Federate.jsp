@@ -24,10 +24,7 @@
 
    $Id: Federate.jsp,v 1.4 2008/06/25 05:48:31 qcheng Exp $
 
---%>
-
- <%--
-    Portions Copyrighted 2013 ForgeRock AS
+   Portions Copyrighted 2013 ForgeRock AS
  --%>
 
 <%@ page language="java" import="java.util.*,
@@ -43,10 +40,7 @@ if(bLECP) {
         LibertyManager.getLECPHeaderName(),
         request.getHeader(LibertyManager.getLECPHeaderName()));
     String responseData = LibertyManager.getAuthnRequestEnvelope(request);
-    PrintWriter writer = response.getWriter();
-    writer.write(responseData);
-    writer.flush();
-    writer.close();
+    out.print(responseData);
 }
 %>
 <%
@@ -106,6 +100,7 @@ if(bLECP) {
     } else {
         response.sendError(response.SC_INTERNAL_SERVER_ERROR,
             "Not able to get providerID");
+        return;
     }
     if (LRURL == null || LRURL.length() <= 0) {
         LRURL = LibertyManager.getFederationDonePageURL(
@@ -155,6 +150,7 @@ if(bLECP) {
         } catch(Exception ex) {
             response.sendError(response.SC_INTERNAL_SERVER_ERROR,
                 "Error in handling request");
+            return;
         }
     %>
             </select>
