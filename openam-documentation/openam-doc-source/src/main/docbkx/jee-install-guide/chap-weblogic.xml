@@ -20,7 +20,7 @@
   !
   ! CCPL HEADER END
   !
-  !      Copyright 2011-2013 ForgeRock AS
+  !      Copyright 2011-2014 ForgeRock AS
   !    
 -->
 <chapter xml:id='chap-weblogic'
@@ -350,36 +350,6 @@ Install log file location:
    </step>
    <step>
     <para>Start the WebLogic server.</para>
-   </step>
-   <!-- Fix for OpenAM-945: Document WebLogic install process change -->
-   <step>
-    <para>Configure shutdown classes for the environment.</para>
-    <substeps>
-     <step>
-      <para>In WebLogic console, browse to Environment &gt; Startup &amp;
-      Shutdown Classes.</para>
-     </step>
-     <step>
-      <para>Click Lock &amp; Edit.</para>
-     </step>
-     <step>
-      <para>Click New.</para>
-     </step>
-     <step>
-      <para>Select the Shutdown Class option, and then click Next.</para>
-     </step>
-     <step>
-      <para>Provide the Name <literal>Agent</literal>, and the Class Name
-      <literal>org.forgerock.agents.weblogic.v10.lifecycle.ShutdownListener</literal>.</para>
-     </step>
-     <step>
-      <para>Select the appropriate targets to call the shutdown class once per
-      Java Virtual Machine, and then click Finish.</para>
-     </step>
-     <step>
-      <para>Click Activate Changes.</para>
-     </step>
-    </substeps>
    </step>
   </procedure>
   
