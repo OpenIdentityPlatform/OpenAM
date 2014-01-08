@@ -27,7 +27,7 @@
  */
 
 /*
- * Portions Copyrighted [2011] [ForgeRock AS]
+ * Portions Copyrighted 2011-2014 ForgeRock AS
  */
 package com.sun.identity.setup;
 
@@ -56,10 +56,10 @@ import com.sun.identity.shared.encode.Base64;
  * property com.sun.identity.security.checkcaller must be set to true.
  */
 public class JCECrypt {
-    private static final String DEFAULT_ENCRYPTOR_CLASS = 
-        "com.iplanet.services.util.JCEEncryption";
-    private static final String DEFAULT_PWD = 
-        "KmhUnWR1MYWDYW4xuqdF5nbm+CXIyOVt";
+
+    private static final String ENCRYPTOR_CLASS_PROPERTY = "com.iplanet.security.encryptor";
+    private static final String DEFAULT_ENCRYPTOR_CLASS = "com.iplanet.services.util.JCEEncryption";
+    private static final String DEFAULT_PWD = "KmhUnWR1MYWDYW4xuqdF5nbm+CXIyOVt";
 
     private static AMEncryption encryptor;
 
@@ -70,15 +70,14 @@ public class JCECrypt {
     private static AMEncryption createInstance(String password) {
         AMEncryption instance;
         // Construct the encryptor class
-        String encClass = DEFAULT_ENCRYPTOR_CLASS;
+        String encClass = System.getProperty(ENCRYPTOR_CLASS_PROPERTY, DEFAULT_ENCRYPTOR_CLASS);
         
         try {
-            instance = (AMEncryption) Class.forName(encClass).newInstance();
+            instance = Class.forName(encClass).asSubclass(AMEncryption.class).newInstance();
         } catch (Exception e) {
             Debug debug = Debug.getInstance("amSDK");
-            debug.error(
-                "JCECrypt.createInstance Unable to get class instance: " +
-                encClass, e);
+            debug.error("JCECrypt.createInstance Unable to get class instance: " + encClass + ", falling back to the"
+                    + " default implementation: " + DEFAULT_ENCRYPTOR_CLASS, e);
             instance = new JCEEncryption();
         }
         try {
