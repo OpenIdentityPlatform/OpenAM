@@ -11,7 +11,7 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2013 ForgeRock Inc.
+ * Copyright 2013 ForgeRock AS
  */
 package org.forgerock.openam.entitlement.indextree;
 
@@ -23,6 +23,7 @@ import org.forgerock.openam.entitlement.indextree.events.IndexChangeObservable;
 import org.forgerock.opendj.ldap.Attribute;
 import org.forgerock.opendj.ldap.AttributeDescription;
 import org.forgerock.opendj.ldap.ByteString;
+import org.forgerock.opendj.ldap.CancelledResultException;
 import org.forgerock.opendj.ldap.DecodeException;
 import org.forgerock.opendj.ldap.DecodeOptions;
 import org.forgerock.opendj.ldap.ErrorResultException;
@@ -114,7 +115,13 @@ public class IndexChangeHandler implements SearchResultHandler {
 
     @Override
     public void handleErrorResult(ErrorResultException erE) {
-        DEBUG.error("Index change persistence search has failed", erE);
+        if ( erE instanceof CancelledResultException ) {
+        	//server should be in process of shutting down.
+        	DEBUG.message("Index change persistence search has been cancelled.");
+        	return;
+        } else {
+    	    DEBUG.error("Index change persistence search has failed.", erE);
+        }
         // Notify all observers of the error.
         observable.notifyObservers(ErrorEventType.SEARCH_FAILURE.createEvent());
     }

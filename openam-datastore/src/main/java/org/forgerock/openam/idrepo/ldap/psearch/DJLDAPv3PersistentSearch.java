@@ -11,7 +11,7 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2013 ForgeRock Inc.
+ * Copyright 2013 ForgeRock AS
  */
 package org.forgerock.openam.idrepo.ldap.psearch;
 
@@ -306,10 +306,12 @@ public class DJLDAPv3PersistentSearch {
         }
 
         public void handleErrorResult(ErrorResultException error) {
-            DEBUG.error("An error occurred while executing persistent search", error);
             if (!shutdown) {
-                clearCaches();
+            	DEBUG.error("An error occurred while executing persistent search", error);
+            	clearCaches();
                 restartPSearch();
+            } else {
+            	DEBUG.message("Persistence search has been cancelled",error);
             }
         }
 
