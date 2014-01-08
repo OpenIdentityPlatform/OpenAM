@@ -20,7 +20,7 @@
   !
   ! CCPL HEADER END
   !
-  !      Copyright 2012-2013 ForgeRock AS
+  !      Copyright 2012-2014 ForgeRock AS
   !    
 -->
 <chapter xml:id='chap-javaee-agents'
@@ -220,14 +220,9 @@
   <section xml:id="javaee-agent-limitations">
    <title>Limitations</title>
 
-   <!-- For OPENAM-1991 TODO: Remove when this is fixed -->
-   <para>Apache Tomcat can fail to shut down properly when the Java EE policy
-   agent for Tomcat is deployed. To work around this limitation, add the
-   following to your Tomcat configuration in the <literal>&lt;Server port="8005"
-   shutdown="SHUTDOWN"&gt;</literal> section.</para>
-   <literallayout class="monospaced"
-   >&lt;Listener
- className="org.forgerock.agents.tomcat.v6.TomcatLifeCycleListener" /&gt;</literallayout>
+   <para>
+    No particular limitations are identified for this release.
+   </para>
   </section>
 
   <section xml:id="javaee-agent-known-issues">
