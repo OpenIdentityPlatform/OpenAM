@@ -20,14 +20,15 @@
   !
   ! CCPL HEADER END
   !
-  !      Copyright 2011-2013 ForgeRock, Inc.
+  !      Copyright 2011-2014 ForgeRock AS
   !    
 -->
 <chapter xml:id='chap-authz-policy'
  xmlns='http://docbook.org/ns/docbook'
  version='5.0' xml:lang='en'
  xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance'
- xsi:schemaLocation='http://docbook.org/ns/docbook http://docbook.org/xml/5.0/xsd/docbook.xsd'
+ xsi:schemaLocation='http://docbook.org/ns/docbook
+                     http://docbook.org/xml/5.0/xsd/docbook.xsd'
  xmlns:xlink='http://www.w3.org/1999/xlink'>
  <title>Defining Authorization Policies</title>
 
@@ -332,6 +333,29 @@
       in the Edit Policy screen.</para>
      </step>
     </substeps>
+
+    <para>
+     When creating rules, know that you can also set not-enforced URLs or URIs
+     in web policy agent and Java EE policy agent configurations.
+     Not-enforced URLs or URIs indicate resource paths not to protect.
+     See <link xlink:href="admin-guide#web-agent-not-enforced-url-properties"
+     xlink:show="new" xlink:role="http://docbook.org/xlink/role/olink"><citetitle
+     >Not Enforced URL Processing properties</citetitle></link>
+     and <link xlink:href="admin-guide#j2ee-agent-not-enforced-uri-properties"
+     xlink:show="new" xlink:role="http://docbook.org/xlink/role/olink"><citetitle
+     >Not Enforced URI Processing properties</citetitle></link> for details.
+    </para>
+
+    <para>
+     Furthermore, the settings for not-enforced URLs or URIs can be inverted,
+     meaning that policy is enforced only for the specified resources.
+     Consider a policy whereby all resources on a web site
+     are public, except for resources under <literal>/protected/</literal>.
+     To protect this site, you would
+     configure a not-enforced URL for <literal>/protected/*</literal>,
+     then select Invert Not Enforced URLs,
+     and finally create a policy for resources under <literal>/protected/</literal>.
+    </para>
    </step>
    <step>
     <para>In the Subjects table, click New... to define a subject, identifying
@@ -359,9 +383,30 @@
       <para>Name the subject.</para>
      </step>
      <step performance="optional">
-      <para>If you want to apply the policy to everyone but the subjects
-      you identified, then select Exclusive.</para>
-      <para>For example</para>
+      <para>
+       To apply the policy to everyone except the subjects identified,
+       select Exclusive.
+      </para>
+
+      <para>
+       For example, consider a web application where you want to allow
+       HTTP GET and POST access for authenticated users,
+       and only HTTP GET access for unauthenticated users.
+       You could create one policy for all authenticated users,
+       and another similar policy Exclusive of all authenticated users,
+       where the latter allows only HTTP GET access.
+      </para>
+
+      <para>
+       The Exclusive setting inverses only the subject the policy applies to.
+       It does not affect the rules, conditions, or response providers.
+      </para>
+
+      <para>
+       For a policy with multiple subjects, the policy applies
+       as long as one subject definition matches the subject
+       for the policy decision.
+      </para>
      </step>
      <step performance="optional">
       <para>If you selected OpenAM Identity Subject, use the Filter section
@@ -374,8 +419,11 @@
     </substeps>
    </step>
    <step performance="optional">
-    <para>In the Conditions table, click New... to create a condition,
-    constraining the circumstances under which the policy applies.</para>
+    <para>
+     In the Conditions table, click New to create a condition,
+     constraining the circumstances under which the policy applies.
+    </para>
+
     <substeps>
      <step>
       <para>Select the Condition Type from the list.</para>
