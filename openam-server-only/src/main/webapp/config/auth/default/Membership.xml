@@ -94,8 +94,7 @@
     
     <Callbacks length="2" order="5" timeout="120" header="Self Registration" >
         <ChoiceCallback attribute="uid" >
-            <Prompt>A user already exists with&lt;br/&gt;the user name you entered.&lt;br/&gt;Please choose
-one&lt;br/&gt;of the following user names,&lt;br/&gt;or create your own:</Prompt>
+            <Prompt>A user already exists with&lt;br/&gt;the user name you entered.&lt;br/&gt;Please choose one&lt;br/&gt;of the following user names,&lt;br/&gt;or create your own:</Prompt>
             <ChoiceValues>
               <ChoiceValue>
                   <Value>Create My Own</Value>
