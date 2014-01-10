@@ -18,25 +18,27 @@ package org.forgerock.openam.cts.monitoring.impl.operations;
 
 import org.forgerock.openam.cts.CTSOperation;
 
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
 /**
  * A data structure that stores the cumulative count and rate for CTS operations.
+ * <p/>
+ * Thread-safe: All access to internal data structures are internally synchronised.
  *
  * @since 12.0.0
  */
 class OperationStore {
 
     private final OperationRateFactory operationRateFactory;
-    private transient Map<CTSOperation, OperationMonitor> operationRate;
+    private final Map<CTSOperation, OperationMonitor> operationRate;
 
     /**
      * Constructs a new instance of the OperationStore.
      */
     public OperationStore() {
-        this.operationRateFactory = new OperationRateFactory();
-        operationRate = new HashMap<CTSOperation, OperationMonitor>();
+        this(new OperationRateFactory(), new HashMap<CTSOperation, OperationMonitor>());
     }
 
     /**
@@ -48,7 +50,7 @@ class OperationStore {
     OperationStore(final OperationRateFactory operationRateFactory,
             final Map<CTSOperation, OperationMonitor> operationRate) {
         this.operationRateFactory = operationRateFactory;
-        this.operationRate = operationRate;
+        this.operationRate = Collections.synchronizedMap(operationRate);
     }
 
     /**
@@ -59,14 +61,12 @@ class OperationStore {
      * @param operation The operation performed.
      */
     void add(CTSOperation operation) {
-        OperationMonitor rate = operationRate.get(operation);
-        if (rate == null) {
-            synchronized (this) {
-                rate = operationRate.get(operation);
-                if (rate == null) {
-                    rate = operationRateFactory.createOperationRate();
-                    operationRate.put(operation, rate);
-                }
+        OperationMonitor rate;
+        synchronized (operationRate) {
+            rate = operationRate.get(operation);
+            if (rate == null) {
+                rate = operationRateFactory.createOperationRate();
+                operationRate.put(operation, rate);
             }
         }
         rate.increment();
@@ -79,10 +79,8 @@ class OperationStore {
      * @return The average number of operations made in a given period.
      */
     double getAverageRate(CTSOperation operation) {
-        if (!operationRate.containsKey(operation)) {
-            return 0.0;
-        }
-        return operationRate.get(operation).getAverageRate();
+        final OperationMonitor monitor = operationRate.get(operation);
+        return monitor == null ? 0.0 : monitor.getAverageRate();
     }
 
     /**
@@ -92,10 +90,8 @@ class OperationStore {
      * @return The minimum number of operations made in a given period.
      */
     long getMinRate(CTSOperation operation) {
-        if (!operationRate.containsKey(operation)) {
-            return 0L;
-        }
-        return operationRate.get(operation).getMinRate();
+        final OperationMonitor monitor = operationRate.get(operation);
+        return monitor == null ? 0L : monitor.getMinRate();
     }
 
     /**
@@ -105,10 +101,8 @@ class OperationStore {
      * @return The maximum number of operations made in a given period.
      */
     long getMaxRate(CTSOperation operation) {
-        if (!operationRate.containsKey(operation)) {
-            return 0L;
-        }
-        return operationRate.get(operation).getMaxRate();
+        final OperationMonitor monitor = operationRate.get(operation);
+        return monitor == null ? 0L : monitor.getMaxRate();
     }
 
     /**
@@ -118,10 +112,8 @@ class OperationStore {
      * @return The total number of operations made since server start up.
      */
     long getCount(CTSOperation operation) {
-        if (!operationRate.containsKey(operation)) {
-            return 0L;
-        }
-        return operationRate.get(operation).getCount();
+        final OperationMonitor monitor = operationRate.get(operation);
+        return monitor == null ? 0L : monitor.getCount();
     }
 
     /**

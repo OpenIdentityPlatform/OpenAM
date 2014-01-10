@@ -1,5 +1,5 @@
 /**
- * Copyright 2013 ForgeRock, AS.
+ * Copyright 2013-2014 ForgeRock, AS.
  *
  * The contents of this file are subject to the terms of the Common Development and
  * Distribution License (the License). You may not use this file except in compliance with the
@@ -18,7 +18,6 @@ package org.forgerock.openam.cts.impl;
 import com.google.inject.name.Named;
 import com.sun.identity.common.configuration.ConfigurationObserver;
 import com.sun.identity.shared.debug.Debug;
-import org.forgerock.openam.cts.CTSOperation;
 import org.forgerock.openam.cts.CoreTokenConfigListener;
 import org.forgerock.openam.cts.api.CoreTokenConstants;
 import org.forgerock.openam.cts.api.tokens.Token;
@@ -30,7 +29,6 @@ import org.forgerock.openam.cts.exceptions.SetFailedException;
 import org.forgerock.openam.cts.impl.query.QueryBuilder;
 import org.forgerock.openam.cts.impl.query.QueryFactory;
 import org.forgerock.openam.cts.impl.query.QueryFilter;
-import org.forgerock.openam.cts.monitoring.CTSOperationsMonitoringStore;
 import org.forgerock.openam.utils.IOUtils;
 import org.forgerock.opendj.ldap.Connection;
 import org.forgerock.opendj.ldap.ConnectionFactory;
@@ -54,7 +52,6 @@ public class CoreTokenAdapter {
     private final QueryFactory queryFactory;
     private final LDAPAdapter ldapAdapter;
     private final Debug debug;
-    private final CTSOperationsMonitoringStore monitoringStore;
 
     /**
      * Create a new instance of the CoreTokenAdapter with dependencies.
@@ -65,13 +62,11 @@ public class CoreTokenAdapter {
     @Inject
     public CoreTokenAdapter(ConnectionFactory connectionFactory, QueryFactory queryFactory,
                             LDAPAdapter ldapAdapter, ConfigurationObserver observer,
-                            CoreTokenConfigListener listener, @Named(CoreTokenConstants.CTS_DEBUG) Debug debug,
-                            CTSOperationsMonitoringStore monitoringStore) {
+                            CoreTokenConfigListener listener, @Named(CoreTokenConstants.CTS_DEBUG) Debug debug) {
         this.connectionFactory = connectionFactory;
         this.queryFactory = queryFactory;
         this.debug = debug;
         this.ldapAdapter = ldapAdapter;
-        this.monitoringStore = monitoringStore;
 
         // Register the listener to respond to configuration changes which will trigger an update to the connection
         /*
@@ -87,7 +82,7 @@ public class CoreTokenAdapter {
      * Create a token in the persistent store.
      *
      * @param token Token to create.
-     * @throws CoreTokenException If the Token exists already of there was
+     * @throws CoreTokenException If the Token exists already or there was
      * an error as a result of this operation.
      */
     public void create(Token token) throws CoreTokenException {
@@ -99,8 +94,8 @@ public class CoreTokenAdapter {
             if (debug.messageEnabled()) {
                 debug.message(MessageFormat.format(
                         CoreTokenConstants.DEBUG_HEADER +
-                        "Create: Created {0} Token {1}\n" +
-                        "{2}",
+                                "Create: Created {0} Token {1}\n" +
+                                "{2}",
                         token.getType(),
                         token.getTokenId(),
                         token));
@@ -109,7 +104,6 @@ public class CoreTokenAdapter {
         } catch (ErrorResultException e) {
             throw new CreateFailedException(token, e);
         } finally {
-            monitoringStore.addTokenOperation(token, CTSOperation.CREATE);
             IOUtils.closeIfNotNull(connection);
         }
     }
@@ -123,10 +117,9 @@ public class CoreTokenAdapter {
      */
     public Token read(String tokenId) throws CoreTokenException {
         Connection connection = null;
-        Token token = null;
         try {
             connection = connectionFactory.getConnection();
-            token = ldapAdapter.read(connection, tokenId);
+            final Token token = ldapAdapter.read(connection, tokenId);
 
             if (token == null) {
                 if (debug.messageEnabled()) {
@@ -150,9 +143,6 @@ public class CoreTokenAdapter {
             Result result = e.getResult();
             throw new LDAPOperationFailedException(result);
         } finally {
-            if (token != null) {
-                monitoringStore.addTokenOperation(token, CTSOperation.READ);
-            }
             IOUtils.closeIfNotNull(connection);
         }
     }
@@ -184,18 +174,19 @@ public class CoreTokenAdapter {
      * If this difference has no changes, then there is nothing to be done.
      *
      * @param token Token to update or create.
-     * @throws CoreTokenException If there was an error updating the token, or if there were
-     * multiple tokens present in the store that have the same id.
+     * @return True if the token was created or false if it already existed.
+     * @throws CreateFailedException If an error occurs attempting to create the token.
+     * @throws SetFailedException If an error occurs updating an existing token.
      */
-    public void updateOrCreate(Token token) throws CoreTokenException {
+    public boolean updateOrCreate(Token token) throws CoreTokenException {
 
         Connection connection = null;
-        boolean create = false;
         try {
             connection = connectionFactory.getConnection();
 
             // Start off by fetching the previous entry.
             Token previous = ldapAdapter.read(connection, token.getTokenId());
+            boolean createToken = (previous == null);
 
             if (debug.messageEnabled()) {
                 if (previous == null) {
@@ -212,8 +203,7 @@ public class CoreTokenAdapter {
             }
 
             // Handle create case
-            if (previous == null) {
-                create = true;
+            if (createToken) {
                 ldapAdapter.create(connection, token);
 
                 if (debug.messageEnabled()) {
@@ -226,40 +216,37 @@ public class CoreTokenAdapter {
                             token));
                 }
 
-                return;
-            }
-
-            boolean updateResult = ldapAdapter.update(connection, previous, token);
-
-            if (updateResult) {
-                if (debug.messageEnabled()) {
-                    debug.message(MessageFormat.format(
-                            CoreTokenConstants.DEBUG_HEADER +
-                            "Update: no modifications for Token {0}",
-                            token.getTokenId()));
-                }
             } else {
-                if (debug.messageEnabled()) {
-                    debug.message(MessageFormat.format(
-                            CoreTokenConstants.DEBUG_HEADER +
-                            "Update: Token {0} changed.\n" +
-                            "Previous:\n" +
-                            "{1}\n" +
-                            "Current:\n" +
-                            "{2}",
-                            token.getTokenId(),
-                            previous,
-                            token));
+
+                boolean updateResult = ldapAdapter.update(connection, previous, token);
+
+                if (updateResult) {
+                    if (debug.messageEnabled()) {
+                        debug.message(MessageFormat.format(
+                                CoreTokenConstants.DEBUG_HEADER +
+                                "Update: no modifications for Token {0}",
+                                token.getTokenId()));
+                    }
+                } else {
+                    if (debug.messageEnabled()) {
+                        debug.message(MessageFormat.format(
+                                CoreTokenConstants.DEBUG_HEADER +
+                                "Update: Token {0} changed.\n" +
+                                "Previous:\n" +
+                                "{1}\n" +
+                                "Current:\n" +
+                                "{2}",
+                                token.getTokenId(),
+                                previous,
+                                token));
+                    }
                 }
             }
+
+            return createToken;
         } catch (ErrorResultException e) {
             throw new SetFailedException(token, e);
         } finally {
-            if (create) {
-                monitoringStore.addTokenOperation(token, CTSOperation.CREATE);
-            } else {
-                monitoringStore.addTokenOperation(token, CTSOperation.UPDATE);
-            }
             IOUtils.closeIfNotNull(connection);
         }
     }
@@ -287,7 +274,6 @@ public class CoreTokenAdapter {
         } catch (LDAPOperationFailedException e) {
             throw new DeleteFailedException(tokenId, e);
         } finally {
-            monitoringStore.addTokenOperation(null, CTSOperation.DELETE);
             IOUtils.closeIfNotNull(connection);
         }
     }

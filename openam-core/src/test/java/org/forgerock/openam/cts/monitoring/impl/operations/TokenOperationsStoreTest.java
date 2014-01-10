@@ -24,8 +24,8 @@ import org.testng.annotations.Test;
 import java.util.HashMap;
 import java.util.Map;
 
+import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.*;
-import static org.mockito.BDDMockito.*;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertNotNull;
 import static org.testng.Assert.assertTrue;
@@ -37,6 +37,7 @@ public class TokenOperationsStoreTest {
     private TokenOperationsStore.OperationStoreFactory operationStoreFactory;
     private Map<TokenType, OperationStore> tokenOperations;
     private OperationStore operationStore;
+    private OperationStore operationFailureStore;
 
     @BeforeMethod
     public void setUp() {
@@ -44,8 +45,9 @@ public class TokenOperationsStoreTest {
         operationStoreFactory = mock(TokenOperationsStore.OperationStoreFactory.class);
         tokenOperations = new HashMap<TokenType, OperationStore>();
         operationStore = mock(OperationStore.class);
+        operationFailureStore = new OperationStore();
 
-        tokenOperationsStore = new TokenOperationsStore(operationStoreFactory, tokenOperations, operationStore);
+        tokenOperationsStore = new TokenOperationsStore(operationStoreFactory, tokenOperations, operationStore, operationFailureStore);
     }
 
     @Test
@@ -71,7 +73,7 @@ public class TokenOperationsStoreTest {
         given(operationStoreFactory.createOperationStore()).willReturn(typeOperationStore);
 
         //When
-        tokenOperationsStore.addTokenOperation(tokenType, operation);
+        tokenOperationsStore.addTokenOperation(tokenType, operation, true);
 
         //Then
         assertTrue(tokenOperations.containsKey(TokenType.OAUTH));
@@ -89,7 +91,7 @@ public class TokenOperationsStoreTest {
         tokenOperations.put(TokenType.OAUTH, typeOperationStore);
 
         //When
-        tokenOperationsStore.addTokenOperation(tokenType, operation);
+        tokenOperationsStore.addTokenOperation(tokenType, operation, true);
 
         //Then
         verifyZeroInteractions(operationStoreFactory);
@@ -103,13 +105,13 @@ public class TokenOperationsStoreTest {
         TokenOperationsStore.OperationStoreFactory operationStoreFactory =
                 new TokenOperationsStore.OperationStoreFactory();
         TokenOperationsStore localTokenOperationsStore = new TokenOperationsStore(operationStoreFactory,
-                tokenOperations, operationStore);
+                tokenOperations, operationStore, operationFailureStore);
 
         TokenType tokenType = TokenType.OAUTH;
         CTSOperation operation = CTSOperation.CREATE;
 
         //When
-        localTokenOperationsStore.addTokenOperation(tokenType, operation);
+        localTokenOperationsStore.addTokenOperation(tokenType, operation, true);
 
         //Then
         assertTrue(tokenOperations.containsKey(TokenType.OAUTH));
@@ -122,7 +124,7 @@ public class TokenOperationsStoreTest {
         CTSOperation operation = CTSOperation.CREATE;
 
         //When
-        tokenOperationsStore.addTokenOperation(operation);
+        tokenOperationsStore.addTokenOperation(operation, true);
 
         //Then
         verify(operationStore).add(operation);
@@ -144,6 +146,24 @@ public class TokenOperationsStoreTest {
 
         //Then
         assertEquals(result, 1D);
+    }
+
+    @Test
+    public void shouldGetAverageFailureRateForOperation() {
+        // Given
+        // Use mock failure store for this test for simplicity
+        operationFailureStore = mock(OperationStore.class);
+        tokenOperationsStore = new TokenOperationsStore(operationStoreFactory, tokenOperations, operationStore, operationFailureStore);
+        CTSOperation operation = CTSOperation.READ;
+        double failureRate = 3.14159;
+
+        given(operationFailureStore.getAverageRate(operation)).willReturn(failureRate);
+
+        // When
+        double result = tokenOperationsStore.getAverageOperationFailuresPerPeriod(operation);
+
+        // Then
+        assertEquals(result, failureRate);
     }
 
     @Test
@@ -315,5 +335,61 @@ public class TokenOperationsStoreTest {
 
         //Then
         assertEquals(result, 1L);
+    }
+
+    @Test
+    public void shouldUpdateFailureCountOnFailure() {
+        // Given
+        CTSOperation operation = CTSOperation.READ;
+        long originalFailureCount = tokenOperationsStore.getOperationFailuresCumulativeCount(operation);
+
+        // When
+        tokenOperationsStore.addTokenOperation(operation, false);
+
+        // Then
+        assertEquals(originalFailureCount + 1, tokenOperationsStore.getOperationFailuresCumulativeCount(operation));
+    }
+
+    @Test
+    public void shouldNotUpdateFailureCountOnSuccess() {
+        // Given
+        CTSOperation operation = CTSOperation.READ;
+        long originalFailureCount = tokenOperationsStore.getOperationFailuresCumulativeCount(operation);
+
+        // When
+        tokenOperationsStore.addTokenOperation(operation, true);
+
+        // Then
+        assertEquals(originalFailureCount, tokenOperationsStore.getOperationFailuresCumulativeCount(operation));
+    }
+
+    @Test
+    public void shouldUpdateFailureCountForAllTokenTypes() {
+        // Given
+        CTSOperation operation = CTSOperation.READ;
+        long originalFailureCount = tokenOperationsStore.getOperationFailuresCumulativeCount(operation);
+        tokenOperations.put(TokenType.REST, new OperationStore());
+        tokenOperations.put(TokenType.OAUTH, new OperationStore());
+
+        // When
+        tokenOperationsStore.addTokenOperation(TokenType.REST, operation, false);
+        tokenOperationsStore.addTokenOperation(TokenType.OAUTH, operation, false);
+
+        // Then
+        assertEquals(originalFailureCount + 2, tokenOperationsStore.getOperationFailuresCumulativeCount(operation));
+    }
+
+    @Test
+    public void shouldHaveSeparateFailureCountsPerOperation() {
+        // Given
+
+        // When
+        tokenOperationsStore.addTokenOperation(CTSOperation.CREATE, false);
+        tokenOperationsStore.addTokenOperation(CTSOperation.DELETE, false);
+        tokenOperationsStore.addTokenOperation(CTSOperation.DELETE, false);
+
+        // Then
+        assertEquals(1, tokenOperationsStore.getOperationFailuresCumulativeCount(CTSOperation.CREATE));
+        assertEquals(2, tokenOperationsStore.getOperationFailuresCumulativeCount(CTSOperation.DELETE));
     }
 }

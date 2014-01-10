@@ -1,5 +1,5 @@
 /**
- * Copyright 2013 ForgeRock, AS.
+ * Copyright 2013-2014 ForgeRock, AS.
  *
  * The contents of this file are subject to the terms of the Common Development and
  * Distribution License (the License). You may not use this file except in compliance with the
@@ -15,18 +15,15 @@
  */
 package org.forgerock.openam.cts.impl.query;
 
-import javax.inject.Inject;
 import com.google.inject.name.Named;
 import com.sun.identity.shared.debug.Debug;
 import org.apache.commons.lang.ArrayUtils;
 import org.apache.commons.lang.StringUtils;
-import org.forgerock.openam.cts.CTSOperation;
 import org.forgerock.openam.cts.api.CoreTokenConstants;
 import org.forgerock.openam.cts.api.fields.CoreTokenField;
 import org.forgerock.openam.cts.api.tokens.Token;
 import org.forgerock.openam.cts.exceptions.CoreTokenException;
 import org.forgerock.openam.cts.impl.LDAPConfig;
-import org.forgerock.openam.cts.monitoring.CTSOperationsMonitoringStore;
 import org.forgerock.openam.cts.utils.TokenAttributeConversion;
 import org.forgerock.opendj.ldap.ByteString;
 import org.forgerock.opendj.ldap.DecodeException;
@@ -39,6 +36,7 @@ import org.forgerock.opendj.ldap.requests.Requests;
 import org.forgerock.opendj.ldap.requests.SearchRequest;
 import org.forgerock.opendj.ldap.responses.Result;
 
+import javax.inject.Inject;
 import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -61,7 +59,6 @@ public class QueryBuilder {
     private final TokenAttributeConversion attributeConversion;
     private final LDAPConfig constants;
     private final LDAPSearchHandler handler;
-    private final CTSOperationsMonitoringStore monitoringStore;
 
     private String[] requestedAttributes = new String[]{};
     private int sizeLimit;
@@ -78,15 +75,13 @@ public class QueryBuilder {
     @Inject
     public QueryBuilder(TokenAttributeConversion attributeConversion,
                         LDAPConfig constants, LDAPSearchHandler handler,
-                        @Named(CoreTokenConstants.CTS_DEBUG) Debug debug,
-                        CTSOperationsMonitoringStore monitoringStore) {
+                        @Named(CoreTokenConstants.CTS_DEBUG) Debug debug) {
         this.attributeConversion = attributeConversion;
         this.constants = constants;
         this.handler = handler;
         sizeLimit = 0;
         this.debug = debug;
         pageSize = 0;
-        this.monitoringStore = monitoringStore;
     }
 
     /**
@@ -202,12 +197,7 @@ public class QueryBuilder {
 
         // Perform the search
         Collection<Entry> entries = createResultsList();
-        Result result;
-        try {
-            result = handler.performSearch(searchRequest, entries);
-        } finally {
-            monitoringStore.addTokenOperation(null, CTSOperation.LIST);
-        }
+        final Result result = handler.performSearch(searchRequest, entries);
 
         if (isPagingResults()) {
             try {

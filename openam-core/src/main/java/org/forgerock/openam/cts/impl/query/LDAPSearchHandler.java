@@ -1,5 +1,5 @@
 /**
- * Copyright 2013 ForgeRock, AS.
+ * Copyright 2013-2014 ForgeRock, AS.
  *
  * The contents of this file are subject to the terms of the Common Development and
  * Distribution License (the License). You may not use this file except in compliance with the
@@ -15,7 +15,6 @@
  */
 package org.forgerock.openam.cts.impl.query;
 
-import javax.inject.Inject;
 import org.forgerock.openam.cts.exceptions.QueryFailedException;
 import org.forgerock.openam.cts.impl.LDAPConfig;
 import org.forgerock.openam.utils.IOUtils;
@@ -27,6 +26,7 @@ import org.forgerock.opendj.ldap.Filter;
 import org.forgerock.opendj.ldap.requests.SearchRequest;
 import org.forgerock.opendj.ldap.responses.Result;
 
+import javax.inject.Inject;
 import java.util.Collection;
 
 /**

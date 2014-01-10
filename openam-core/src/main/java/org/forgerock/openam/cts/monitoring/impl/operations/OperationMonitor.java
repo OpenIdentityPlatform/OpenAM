@@ -16,9 +16,10 @@
 
 package org.forgerock.openam.cts.monitoring.impl.operations;
 
-import java.util.concurrent.atomic.AtomicLong;
 import org.forgerock.openam.cts.monitoring.impl.RateTimer;
 import org.forgerock.openam.cts.monitoring.impl.RateWindow;
+
+import java.util.concurrent.atomic.AtomicLong;
 
 /**
  * This class maintains a cumulative count and rate for a CTS operation.
@@ -33,7 +34,7 @@ class OperationMonitor {
     private final RateTimer timerGetter;
     private final RateWindow rateWindow;
 
-    private AtomicLong count = new AtomicLong(0);
+    private final AtomicLong count = new AtomicLong(0);
 
     /**
      * Constructs a new instance of the OperationMonitor.
@@ -70,9 +71,7 @@ class OperationMonitor {
      * Only synchronizes the count increment, NOT the whole method.
      */
     void increment() {
-        synchronized (this) {
-            count.incrementAndGet();
-        }
+        count.incrementAndGet();
         rateWindow.recalculate(timerGetter.now());
     }
     /**

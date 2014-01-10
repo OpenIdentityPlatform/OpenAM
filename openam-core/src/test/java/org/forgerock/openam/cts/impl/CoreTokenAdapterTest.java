@@ -1,5 +1,5 @@
 /**
- * Copyright 2013 ForgeRock, AS.
+ * Copyright 2013-2014 ForgeRock, AS.
  *
  * The contents of this file are subject to the terms of the Common Development and
  * Distribution License (the License). You may not use this file except in compliance with the
@@ -24,7 +24,6 @@ import org.forgerock.openam.cts.exceptions.CoreTokenException;
 import org.forgerock.openam.cts.exceptions.DeleteFailedException;
 import org.forgerock.openam.cts.exceptions.LDAPOperationFailedException;
 import org.forgerock.openam.cts.impl.query.QueryFactory;
-import org.forgerock.openam.cts.monitoring.CTSOperationsMonitoringStore;
 import org.forgerock.opendj.ldap.Connection;
 import org.forgerock.opendj.ldap.ConnectionFactory;
 import org.forgerock.opendj.ldap.ErrorResultException;
@@ -42,15 +41,14 @@ import static org.mockito.Mockito.verify;
  * @author robert.wapshott@forgerock.com
  */
 public class CoreTokenAdapterTest {
-    private Connection mockConnection;
-    private ConnectionFactory mockConnectionFactory;
-    private QueryFactory mockQueryFactory;
-    private Debug mockDebug;
-    private LDAPAdapter mockLDAPAdapter;
-    private ConfigurationObserver mockObserver;
-    private CoreTokenConfigListener mockListener;
-    private CoreTokenAdapter adapter;
-    private CTSOperationsMonitoringStore monitoringStore;
+    protected Connection mockConnection;
+    protected ConnectionFactory mockConnectionFactory;
+    protected QueryFactory mockQueryFactory;
+    protected Debug mockDebug;
+    protected LDAPAdapter mockLDAPAdapter;
+    protected ConfigurationObserver mockObserver;
+    protected CoreTokenConfigListener mockListener;
+    protected CoreTokenAdapter adapter;
 
     @BeforeMethod
     public void setup() {
@@ -69,16 +67,17 @@ public class CoreTokenAdapterTest {
         mockObserver = mock(ConfigurationObserver.class);
         mockListener = mock(CoreTokenConfigListener.class);
 
-        monitoringStore = mock(CTSOperationsMonitoringStore.class);
+        adapter = getTestObject();
+    }
 
-        adapter = new CoreTokenAdapter(
+    protected CoreTokenAdapter getTestObject() {
+        return new CoreTokenAdapter(
                 mockConnectionFactory,
                 mockQueryFactory,
                 mockLDAPAdapter,
                 mockObserver,
                 mockListener,
-                mockDebug,
-                monitoringStore);
+                mockDebug);
     }
 
 //    @Test

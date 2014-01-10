@@ -17,8 +17,6 @@
 package org.forgerock.openam.cts.monitoring;
 
 import com.sun.identity.shared.debug.Debug;
-import java.util.concurrent.Callable;
-import java.util.concurrent.ExecutorService;
 import org.forgerock.openam.cts.CTSOperation;
 import org.forgerock.openam.cts.api.TokenType;
 import org.forgerock.openam.cts.api.tokens.Token;
@@ -26,18 +24,19 @@ import org.forgerock.openam.cts.monitoring.impl.CTSMonitoringStoreImpl;
 import org.forgerock.openam.cts.monitoring.impl.connections.ConnectionStore;
 import org.forgerock.openam.cts.monitoring.impl.operations.TokenOperationsStore;
 import org.forgerock.openam.cts.monitoring.impl.reaper.ReaperMonitor;
-import static org.mockito.BDDMockito.given;
 import org.mockito.Matchers;
-import static org.mockito.Matchers.any;
-import static org.mockito.Mockito.eq;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.never;
-import static org.mockito.Mockito.verify;
 import org.mockito.invocation.InvocationOnMock;
 import org.mockito.stubbing.Answer;
-import static org.testng.Assert.assertEquals;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
+
+import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutorService;
+
+import static org.mockito.BDDMockito.given;
+import static org.mockito.Matchers.any;
+import static org.mockito.Mockito.*;
+import static org.testng.Assert.assertEquals;
 
 public class CTSMonitoringStoreImplTest {
 
@@ -76,12 +75,13 @@ public class CTSMonitoringStoreImplTest {
         //Given
         Token token = null;
         CTSOperation operation = CTSOperation.READ;
+        boolean successful = true;
 
         //When
-        ctsOperationsMonitoringStore.addTokenOperation(token, operation);
+        ctsOperationsMonitoringStore.addTokenOperation(token, operation, successful);
 
         //Then
-        verify(tokenOperationsStore, never()).addTokenOperation(Matchers.<TokenType>anyObject(), eq(operation));
+        verify(tokenOperationsStore, never()).addTokenOperation(Matchers.<TokenType>anyObject(), eq(operation), eq(successful));
     }
 
     @Test
@@ -91,14 +91,15 @@ public class CTSMonitoringStoreImplTest {
         Token token = mock(Token.class);
         CTSOperation operation = CTSOperation.READ;
         TokenType tokenType = TokenType.OAUTH;
+        boolean successful = true;
 
         given(token.getType()).willReturn(tokenType);
 
         //When
-        ctsOperationsMonitoringStore.addTokenOperation(token, operation);
+        ctsOperationsMonitoringStore.addTokenOperation(token, operation, successful);
 
         //Then
-        verify(tokenOperationsStore).addTokenOperation(tokenType, operation);
+        verify(tokenOperationsStore).addTokenOperation(tokenType, operation, successful);
     }
 
     @Test
@@ -106,12 +107,25 @@ public class CTSMonitoringStoreImplTest {
 
         //Given
         CTSOperation operation = CTSOperation.READ;
+        boolean successful = true;
 
         //When
-        ctsOperationsMonitoringStore.addTokenOperation(null, operation);
+        ctsOperationsMonitoringStore.addTokenOperation(null, operation, successful);
 
         //Then
-        verify(tokenOperationsStore).addTokenOperation(operation);
+        verify(tokenOperationsStore).addTokenOperation(operation, successful);
+    }
+
+    @Test
+    public void shouldAddFailureOperations() throws InterruptedException {
+        // Given
+        boolean successful = false;
+
+        // When
+        ctsOperationsMonitoringStore.addTokenOperation(null, CTSOperation.READ, successful);
+
+        // Then
+        verify(tokenOperationsStore).addTokenOperation(CTSOperation.READ, successful);
     }
 
     @Test

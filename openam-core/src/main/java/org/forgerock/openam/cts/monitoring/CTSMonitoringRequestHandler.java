@@ -16,7 +16,6 @@
 
 package org.forgerock.openam.cts.monitoring;
 
-import javax.inject.Inject;
 import javax.inject.Singleton;
 
 /**

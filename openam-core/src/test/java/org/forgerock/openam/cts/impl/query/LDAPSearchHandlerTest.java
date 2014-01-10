@@ -1,5 +1,5 @@
 /**
- * Copyright 2013 ForgeRock AS.
+ * Copyright 2013-2014 ForgeRock AS.
  *
  * The contents of this file are subject to the terms of the Common Development and
  * Distribution License (the License). You may not use this file except in compliance with the
@@ -41,11 +41,11 @@ import static org.mockito.Mockito.verify;
  */
 public class LDAPSearchHandlerTest {
 
-    private LDAPConfig mockConstants;
-    private ConnectionFactory mockFactory;
-    private Connection mockConnection;
-    private SearchRequest mockRequest;
-    private LDAPSearchHandler handler;
+    protected LDAPConfig mockConstants;
+    protected ConnectionFactory mockFactory;
+    protected Connection mockConnection;
+    protected SearchRequest mockRequest;
+    protected LDAPSearchHandler handler;
 
     @BeforeMethod
     public void setUp() throws Exception {
@@ -54,9 +54,13 @@ public class LDAPSearchHandlerTest {
         mockConnection = mock(Connection.class);
         mockRequest = mock(SearchRequest.class);
 
-        handler = new LDAPSearchHandler(mockFactory, mockConstants);
+        handler = getTestObject();
 
         given(mockFactory.getConnection()).willReturn(mockConnection);
+    }
+
+    protected LDAPSearchHandler getTestObject() {
+        return new LDAPSearchHandler(mockFactory, mockConstants);
     }
 
     @Test

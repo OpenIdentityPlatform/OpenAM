@@ -11,18 +11,12 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2013 ForgeRock AS.
+ * Copyright 2013-2014 ForgeRock AS.
  */
 
 package org.forgerock.openam.cts.monitoring.impl;
 
 import com.sun.identity.shared.debug.Debug;
-import java.util.concurrent.Callable;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.RejectedExecutionException;
-import javax.inject.Inject;
-import javax.inject.Named;
-import javax.inject.Singleton;
 import org.forgerock.openam.cts.CTSOperation;
 import org.forgerock.openam.cts.api.CoreTokenConstants;
 import org.forgerock.openam.cts.api.TokenType;
@@ -33,6 +27,13 @@ import org.forgerock.openam.cts.monitoring.CTSReaperMonitoringStore;
 import org.forgerock.openam.cts.monitoring.impl.connections.ConnectionStore;
 import org.forgerock.openam.cts.monitoring.impl.operations.TokenOperationsStore;
 import org.forgerock.openam.cts.monitoring.impl.reaper.ReaperMonitor;
+
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Singleton;
+import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.RejectedExecutionException;
 
 /**
  * An implementation of the CTSOperationsMonitoringStore that stores the CTS monitoring information
@@ -66,7 +67,7 @@ public class CTSMonitoringStoreImpl implements CTSOperationsMonitoringStore, CTS
      */
     @Inject
     public CTSMonitoringStoreImpl(@Named(CoreTokenConstants.CTS_DEBUG) Debug debug,
-                                  @Named(EXECUTOR_BINDING_NAME) ExecutorService executorService, TokenOperationsStore tokenOperationsStore,
+            @Named(EXECUTOR_BINDING_NAME) ExecutorService executorService, TokenOperationsStore tokenOperationsStore,
                                   final ReaperMonitor reaperMonitor, final ConnectionStore connectionStore) {
         this.debug = debug;
         this.executorService = executorService;
@@ -79,16 +80,16 @@ public class CTSMonitoringStoreImpl implements CTSOperationsMonitoringStore, CTS
      * {@inheritDoc}
      */
     @Override
-    public void addTokenOperation(final Token token, final CTSOperation operation) {
+    public void addTokenOperation(final Token token, final CTSOperation operation, final boolean success) {
         if (token == null) {
-            addTokenOperation(operation);
+            addTokenOperation(operation, success);
             return;
         }
 
         try {
             executorService.submit(new Callable<Void>() {
                 public Void call() throws Exception {
-                    tokenOperationsStore.addTokenOperation(token.getType(), operation);
+                    tokenOperationsStore.addTokenOperation(token.getType(), operation, success);
                     return null;
                 }
             });
@@ -101,11 +102,11 @@ public class CTSMonitoringStoreImpl implements CTSOperationsMonitoringStore, CTS
     /**
      * {@inheritDoc}
      */
-    private void addTokenOperation(final CTSOperation operation) {
+    private void addTokenOperation(final CTSOperation operation, final boolean success) {
         try {
             executorService.submit(new Callable<Void>() {
                 public Void call() throws Exception {
-                    tokenOperationsStore.addTokenOperation(operation);
+                    tokenOperationsStore.addTokenOperation(operation, success);
                     return null;
                 }
             });
@@ -160,6 +161,31 @@ public class CTSMonitoringStoreImpl implements CTSOperationsMonitoringStore, CTS
         } else {
             return tokenOperationsStore.getOperationsCumulativeCount(operation);
         }
+    }
+
+    /**
+     * {@inheritDoc}
+     *
+     * Uses the {@link TokenOperationsStore} to return the cumulative failure count.
+     */
+    @Override
+    public long getOperationFailuresCumulativeCount(CTSOperation operation) {
+        return tokenOperationsStore.getOperationFailuresCumulativeCount(operation);
+    }
+
+    @Override
+    public double getAverageOperationFailuresPerPeriod(CTSOperation operation) {
+        return tokenOperationsStore.getAverageOperationFailuresPerPeriod(operation);
+    }
+
+    @Override
+    public long getMinimumOperationFailuresPerPeriod(CTSOperation operation) {
+        return tokenOperationsStore.getMinimumOperationFailuresPerPeriod(operation);
+    }
+
+    @Override
+    public long getMaximumOperationFailuresPerPeriod(CTSOperation operation) {
+        return tokenOperationsStore.getMaximumOperationFailuresPerPeriod(operation);
     }
 
     /**

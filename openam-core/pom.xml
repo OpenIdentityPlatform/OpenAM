@@ -40,6 +40,11 @@
     <artifactId>openam-core</artifactId>
     <packaging>jar</packaging>
 
+    <properties>
+        <java.source.version>1.6</java.source.version>
+        <java.target.version>1.6</java.target.version>
+    </properties>
+
     <!-- Build -->
     <build>
         <plugins>

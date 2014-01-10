@@ -15,7 +15,7 @@
 
 --
 -- MIB for CTS Monitoring
--- Copyright (c) 2013, ForgeRock AS, All Rights Reserved.
+-- Copyright (c) 2013-2014, ForgeRock AS, All Rights Reserved.
 --
 
 FORGEROCK-OPENAM-CTS-MIB DEFINITIONS ::= BEGIN
@@ -165,7 +165,11 @@ CTSCRUDOperationsEntry ::=
                         sCumulativeCount     Counter64,
                         sAverage             Counter64,
                         sMinimum             Counter64,
-                        sMaximum             Counter64
+                        sMaximum             Counter64,
+                        sFailureCount        Counter64,
+                        sFailureAverage      Counter64,
+                        sFailureMinimum      Counter64,
+                        sFailureMaximum      Counter64
                     }
 
 sCumulativeCount  	OBJECT-TYPE
@@ -199,6 +203,38 @@ sMaximum  	OBJECT-TYPE
     DESCRIPTION     "Maximum value"
     DEFVAL    		{ 0 }
     ::= { ctsCRUDOperationsEntry 4 }
+
+sFailureCount       OBJECT-TYPE
+    SYNTAX          Counter64
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION     "Cumulative count of failures of this operation since server startup."
+    DEFVAL          { 0 }
+    ::= { ctsCRUDOperationsEntry 5 }
+
+sFailureAverage       OBJECT-TYPE
+    SYNTAX          Counter64
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION     "Average rate of failures of this operation in the current period."
+    DEFVAL          { 0 }
+    ::= { ctsCRUDOperationsEntry 6 }
+
+ sFailureMinimum     OBJECT-TYPE
+     SYNTAX          Counter64
+     MAX-ACCESS      read-only
+     STATUS          current
+     DESCRIPTION     "Minimum rate of failure of this operation in the current period."
+     DEFVAL          { 0 }
+     ::= { ctsCRUDOperationsEntry 7 }
+
+ sFailureMaximum     OBJECT-TYPE
+     SYNTAX          Counter64
+     MAX-ACCESS      read-only
+     STATUS          current
+     DESCRIPTION     "Maximum rate of failure of this operation in the current period."
+     DEFVAL          { 0 }
+     ::= { ctsCRUDOperationsEntry 8 }
 
 --
 -- ctsCRUDOperationsPerTokenTypeTable

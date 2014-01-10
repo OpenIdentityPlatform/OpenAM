@@ -1,5 +1,5 @@
 /*
- * Copyright 2013 ForgeRock AS.
+ * Copyright 2013-2014 ForgeRock AS.
  *
  * The contents of this file are subject to the terms of the Common Development and
  * Distribution License (the License). You may not use this file except in compliance with the
@@ -70,6 +70,7 @@ public class CtsCRUDOperationsEntryImpl extends CtsCRUDOperationsEntry {
         if (operation == null) {
             if (debug.messageEnabled()) {
                 debug.error("CTS Operation returned was null. Check supplied index.");
+                throw new InvalidSNMPQueryException();
             }
         }
 
@@ -83,13 +84,17 @@ public class CtsCRUDOperationsEntryImpl extends CtsCRUDOperationsEntry {
      */
     @Override
     public Long getSMaximum() {
-        final CTSOperation operation = getCTSOperation();
-
-        if (operation == null) {
-            throw new InvalidSNMPQueryException();
-        }
-
         return monitoringStore.getMaximumOperationsPerPeriod(null, getCTSOperation());
+    }
+
+    /**
+     * Gets the maximum failure rate of the specified CTS operation.
+     *
+     * @return the maximum failure rate.
+     */
+    @Override
+    public Long getSFailureMaximum() {
+        return monitoringStore.getMaximumOperationFailuresPerPeriod(getCTSOperation());
     }
 
     /**
@@ -99,13 +104,17 @@ public class CtsCRUDOperationsEntryImpl extends CtsCRUDOperationsEntry {
      */
     @Override
     public Long getSMinimum() throws SnmpStatusException {
-        final CTSOperation operation = getCTSOperation();
-
-        if (operation == null) {
-            throw new InvalidSNMPQueryException();
-        }
-
         return monitoringStore.getMinimumOperationsPerPeriod(null, getCTSOperation());
+    }
+
+    /**
+     * Gets the minimum failure rate of the given CTS operation in the current period.
+     *
+     * @return the minimum failure rate of the operation.
+     */
+    @Override
+    public Long getSFailureMinimum() {
+        return monitoringStore.getMinimumOperationFailuresPerPeriod(getCTSOperation());
     }
 
     /**
@@ -115,13 +124,17 @@ public class CtsCRUDOperationsEntryImpl extends CtsCRUDOperationsEntry {
      */
     @Override
     public Long getSAverage() throws SnmpStatusException {
-        final CTSOperation operation = getCTSOperation();
-
-        if (operation == null) {
-            throw new InvalidSNMPQueryException();
-        }
-
         return (long) monitoringStore.getAverageOperationsPerPeriod(null, getCTSOperation());
+    }
+
+    /**
+     * Gets the average failure rate of the given CTS operation in the current period.
+     *
+     * @return the average failure rate.
+     */
+    @Override
+    public Long getSFailureAverage() {
+        return (long) monitoringStore.getAverageOperationFailuresPerPeriod(getCTSOperation());
     }
 
     /**
@@ -138,6 +151,22 @@ public class CtsCRUDOperationsEntryImpl extends CtsCRUDOperationsEntry {
         }
 
         return monitoringStore.getOperationsCumulativeCount(null, getCTSOperation());
+    }
+
+    /**
+     * Gets the cumulative count for the specified CTS operation.
+     *
+     * @return The operations cumulative count.
+     */
+    @Override
+    public Long getSFailureCount() throws SnmpStatusException {
+        final CTSOperation operation = getCTSOperation();
+
+        if (operation == null) {
+            throw new InvalidSNMPQueryException();
+        }
+
+        return monitoringStore.getOperationFailuresCumulativeCount(operation);
     }
 
 }

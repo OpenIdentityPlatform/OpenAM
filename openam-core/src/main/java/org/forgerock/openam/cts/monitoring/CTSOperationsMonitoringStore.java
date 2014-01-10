@@ -11,7 +11,7 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2013 ForgeRock AS.
+ * Copyright 2013-2014 ForgeRock AS.
  */
 
 package org.forgerock.openam.cts.monitoring;
@@ -37,14 +37,15 @@ public interface CTSOperationsMonitoringStore {
      * The operation is mapped to the type of the token. The operations per configurable period and cumulative count
      * will be updated for the token type and operation.
      * <br/>
-     * Passing in <code>null</code> as the operation will mean that the operation is not mapped to a particular token
+     * Passing in <code>null</code> as the token will mean that the operation is not mapped to a particular token
      * type, this is for operations such as delete and list as the type of token cannot be determined.
      * The operations per configurable period and cumulative count will be updated for the operation.
      *
      * @param token The Token the operation was performed on.
      * @param operation The operation performed.
+     * @param success Whether the operation was successful or not.
      */
-    void addTokenOperation(Token token, CTSOperation operation);
+    void addTokenOperation(Token token, CTSOperation operation, boolean success);
 
     /**
      * Gets the average rate of operations made in a given period.
@@ -105,4 +106,39 @@ public interface CTSOperationsMonitoringStore {
      * @return The total number of operations made on the type of token since server start up.
      */
     long getOperationsCumulativeCount(TokenType type, CTSOperation operation);
+
+    /**
+     * Gets the cumulative count of failures of this operation type since server startup.
+     * <br/>
+     * Note that failure counts are not distinguished by token type as in most failure cases this information is not
+     * available.
+     *
+     * @param operation The operation to get the failure count for.
+     * @return The total number of failed operations of this type since server startup.
+     */
+    long getOperationFailuresCumulativeCount(CTSOperation operation);
+
+    /**
+     * Gets the average failure rate for the given operation in the current period.
+     *
+     * @param operation the operation to get the failure rate for.
+     * @return the average failure rate of the given operation in the current monitoring period.
+     */
+    double getAverageOperationFailuresPerPeriod(CTSOperation operation);
+
+    /**
+     * Gets the minimum observed failure rate for the given operation in the current period.
+     *
+     * @param operation the operation to get the failure rate for.
+     * @return the minimum observed failure rate of the given operation in the current monitoring period.
+     */
+    long getMinimumOperationFailuresPerPeriod(CTSOperation operation);
+
+    /**
+     * Gets the maximum observed failure rate for the given operation in the current period.
+     *
+     * @param operation the operation to get the failure rate for.
+     * @return the maximum observed failure rate of the given operation in the current monitoring period.
+     */
+    long getMaximumOperationFailuresPerPeriod(CTSOperation operation);
 }

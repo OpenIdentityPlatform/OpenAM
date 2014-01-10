@@ -11,7 +11,7 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2013 ForgeRock Inc.
+ * Copyright 2013-2014 ForgeRock Inc.
  */
 
 package org.forgerock.openam.core.guice;
@@ -34,11 +34,6 @@ import com.sun.identity.sm.DNMapper;
 import com.sun.identity.sm.SMSEntry;
 import com.sun.identity.sm.ServiceManagementDAO;
 import com.sun.identity.sm.ServiceManagementDAOWrapper;
-import java.security.PrivilegedAction;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.ScheduledExecutorService;
-import javax.inject.Inject;
-import javax.inject.Singleton;
 import org.forgerock.json.fluent.JsonValue;
 import org.forgerock.openam.cts.CTSPersistentStore;
 import org.forgerock.openam.cts.CoreTokenConfig;
@@ -46,7 +41,11 @@ import org.forgerock.openam.cts.ExternalTokenConfig;
 import org.forgerock.openam.cts.adapters.OAuthAdapter;
 import org.forgerock.openam.cts.adapters.TokenAdapter;
 import org.forgerock.openam.cts.api.CoreTokenConstants;
+import org.forgerock.openam.cts.impl.CoreTokenAdapter;
 import org.forgerock.openam.cts.impl.LDAPConfig;
+import org.forgerock.openam.cts.impl.MonitoredCoreTokenAdapter;
+import org.forgerock.openam.cts.impl.query.LDAPSearchHandler;
+import org.forgerock.openam.cts.impl.query.MonitoredLDAPSearchHandler;
 import org.forgerock.openam.cts.monitoring.CTSConnectionMonitoringStore;
 import org.forgerock.openam.cts.monitoring.CTSOperationsMonitoringStore;
 import org.forgerock.openam.cts.monitoring.CTSReaperMonitoringStore;
@@ -66,6 +65,12 @@ import org.forgerock.openam.sm.DataLayerConnectionFactory;
 import org.forgerock.openam.utils.ExecutorServiceFactory;
 import org.forgerock.opendj.ldap.ConnectionFactory;
 import org.forgerock.opendj.ldap.SearchResultHandler;
+
+import javax.inject.Inject;
+import javax.inject.Singleton;
+import java.security.PrivilegedAction;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.ScheduledExecutorService;
 
 /**
  * Guice Module for configuring bindings for the OpenAM Core classes.
@@ -116,6 +121,11 @@ public class CoreGuiceModule extends AbstractModule {
         bind(CoreTokenConstants.class).in(Singleton.class);
         bind(CTSPersistentStore.class).in(Singleton.class);
         bind(CoreTokenConfig.class).in(Singleton.class);
+
+        // Add hooks for monitoring operation success/failure rates
+        bind(CoreTokenAdapter.class).to(MonitoredCoreTokenAdapter.class);
+        bind(LDAPSearchHandler.class).to(MonitoredLDAPSearchHandler.class);
+
         // CTS Connection Management
         bind(ConnectionFactory.class).to(MonitoredCTSConnectionFactory.class).in(Singleton.class);
         bind(LDAPConfig.class).toProvider(new Provider<LDAPConfig>() {
