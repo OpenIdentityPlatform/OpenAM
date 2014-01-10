@@ -28,7 +28,7 @@
 
 -->
 
-<!-- Portions Copyrighted 2011-2013 ForgeRock AS -->
+<!-- Portions Copyrighted 2011-2014 ForgeRock AS -->
 
 <!DOCTYPE ServicesConfiguration
     PUBLIC "=//iPlanet//Service Management Services (SMS) 1.0 DTD//EN"
@@ -3034,6 +3034,19 @@
                         type="single"
                         syntax="boolean"
                         i18nKey="a260">
+                        <BooleanValues>
+                            <BooleanTrueValue i18nKey="a105">true</BooleanTrueValue>
+                            <BooleanFalseValue i18nKey="a106">false</BooleanFalseValue>
+                        </BooleanValues>
+                        <DefaultValues>
+                            <Value>false</Value>
+                        </DefaultValues>
+                    </AttributeSchema>
+                    <AttributeSchema
+                        name="com.sun.identity.agents.config.shortened.privileged.attribute"
+                        type="single"
+                        syntax="boolean"
+                        i18nKey="a268">
                         <BooleanValues>
                             <BooleanTrueValue i18nKey="a105">true</BooleanTrueValue>
                             <BooleanFalseValue i18nKey="a106">false</BooleanFalseValue>
