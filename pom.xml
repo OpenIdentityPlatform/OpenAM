@@ -2,7 +2,7 @@
 <!--
 * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS HEADER.
 *
-* Copyright (c) 2011-2013 ForgeRock AS. All Rights Reserved
+* Copyright (c) 2011-2014 ForgeRock AS. All Rights Reserved
 *
 * The contents of this file are subject to the terms
 * of the Common Development and Distribution License
@@ -120,7 +120,7 @@
 
         <!-- Version Properties -->
         <opendj.server.version>2.6.0</opendj.server.version>
-        <opendj.sdk.version>2.6.4</opendj.sdk.version>
+        <opendj.sdk.version>2.6.6</opendj.sdk.version>
 
         <commons.forgerock-util.version>1.1.0</commons.forgerock-util.version>
         <commons.json-resource.version>1.2.2</commons.json-resource.version>
