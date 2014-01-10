@@ -20,13 +20,14 @@
   !
   ! CCPL HEADER END
   !
-  !      Copyright 2011-2013 ForgeRock AS
+  !      Copyright 2011-2014 ForgeRock AS
   !    
 -->
 <chapter xml:id='chap-compatibility'
  xmlns='http://docbook.org/ns/docbook' version='5.0' xml:lang='en'
  xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance'
- xsi:schemaLocation='http://docbook.org/ns/docbook http://docbook.org/xml/5.0/xsd/docbook.xsd'
+ xsi:schemaLocation='http://docbook.org/ns/docbook
+                     http://docbook.org/xml/5.0/xsd/docbook.xsd'
  xmlns:xlink='http://www.w3.org/1999/xlink'>
  <title>OpenAM Changes &amp; Deprecated Functionality</title>
 
@@ -160,6 +161,20 @@
 
     <para>
      When you upgrade OpenAM, the upgrade tool converts existing referral rules.
+    </para>
+   </listitem>
+
+   <listitem>
+    <para>
+     Following a change to the SAML 2.0 pages in OpenAM,
+     you no longer customize <filename>saml2login.template</filename>
+     and <filename>saml2loginwithrelay.template</filename>
+     to add a progress bar for single sign on.
+     Instead, customize <filename>saml2/jsp/autosubmitaccessrights.jsp</filename>
+     as described in the procedure,
+     <link xlink:show="new" xlink:href="admin-guide#show-saml2-sso-login-progress"
+     xlink:role="http://docbook.org/xlink/role/olink"><citetitle
+     >To Indicate Progress During SSO</citetitle></link>.
     </para>
    </listitem>
   </itemizedlist>

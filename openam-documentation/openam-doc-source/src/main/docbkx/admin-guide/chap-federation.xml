@@ -2648,15 +2648,16 @@ CookieWriterServlet.doGetPost: Redirect to
     <para>Modify the templates to add a clue that SSO is in progress, such as
     an image.</para>
 
-    <para>Edit the templates found in OpenAM sources, <link xlink:show="new"
-    xlink:href="http://sources.forgerock.org/browse/openam/trunk/openam/openam-federation/openam-federation-library/src/main/resources/saml2login.template?r=HEAD"
-    ><filename>saml2login.template</filename></link> and <link xlink:show="new"
-    xlink:href="http://sources.forgerock.org/browse/openam/trunk/openam/openam-federation/openam-federation-library/src/main/resources/saml2loginwithrelay.template?r=HEAD"
-    ><filename>saml2loginwithrelay.template</filename></link>.</para>
+    <para>
+     Edit the source of the OpenAM Java Server Page,
+     <filename>saml2/jsp/autosubmitaccessrights.jsp</filename>,
+     under the file system directory where the OpenAM .war has been unpacked.
+    </para>
 
-    <para>When you add an image or other presentation element, make sure that
-    you retain the form and JavaScript as is. Also, as the files are templates,
-    what you add must be static HTML.</para>
+    <para>
+     When you add an image or other presentation element,
+     make sure that you retain the form and Java code as is.
+    </para>
    </step>
 
    <step>
