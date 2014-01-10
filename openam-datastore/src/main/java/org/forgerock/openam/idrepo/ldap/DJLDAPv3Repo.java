@@ -2240,15 +2240,34 @@ public class DJLDAPv3Repo extends IdRepo {
         Connection conn = null;
         try {
             conn = connectionFactory.getConnection();
-            SearchResultEntry entry = conn.searchSingleEntry(searchRequest);
+            ConnectionEntryReader reader = conn.search(searchRequest);
+            SearchResultEntry entry = null;
+            while (reader.hasNext()) {
+                if (reader.isEntry()) {
+                    if (entry != null) {
+                        throw ErrorResultException.newErrorResult(ResultCode.CLIENT_SIDE_UNEXPECTED_RESULTS_RETURNED);
+                    }
+                    entry = reader.readEntry();
+                } else {
+                    //ignore references
+                    reader.readReference();
+                }
+            }
+            if (entry == null) {
+                DEBUG.message("Unable to find entry with name: " + name + " under searchbase: " + searchBase
+                        + " with scope: " + defaultScope);
+                throw newIdRepoException(ResultCode.CLIENT_SIDE_NO_RESULTS_RETURNED, "223", name, type.getName());
+            }
             dn = entry.getName().toString();
-        } catch (EntryNotFoundException enfe) {
-            DEBUG.message("Unable to find entry with name: " + name + " under searchbase: " + searchBase
-                    + " with scope: " + defaultScope);
-            throw newIdRepoException(enfe.getResult().getResultCode(), "223", name, type.getName());
         } catch (ErrorResultException ere) {
             DEBUG.error("An error occurred while querying entry DN", ere);
-            throw newIdRepoException(ere.getResult().getResultCode(), "306", CLASS_NAME, ere.getResult().getResultCode());
+            handleErrorResult(ere);
+        } catch (ErrorResultIOException erioe) {
+            handleIOError(erioe, "#getDN");
+        } catch (SearchResultReferenceIOException srrioe) {
+            //should never ever happen...
+            DEBUG.error("Got reference instead of entry", srrioe);
+            throw newIdRepoException("219", CLASS_NAME);
         } finally {
             IOUtils.closeIfNotNull(conn);
         }
