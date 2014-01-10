@@ -90,7 +90,7 @@ public class ADRepoTest extends IdRepoTestBase {
             idrepo.getFullyQualifiedName(null, IdType.USER, "duplicate");
             fail();
         } catch (IdRepoException ire) {
-            assertThat(ire).hasMessage(getIdRepoExceptionMessage("311", DJLDAPv3Repo.class.getName(),
+            assertThat(ire).hasMessage(getIdRepoExceptionMessage("306", DJLDAPv3Repo.class.getName(),
                     ResultCode.CLIENT_SIDE_UNEXPECTED_RESULTS_RETURNED.intValue()));
             assertThat(ire.getLDAPErrorCode()).isNotNull().isEqualTo(
                     String.valueOf(ResultCode.CLIENT_SIDE_UNEXPECTED_RESULTS_RETURNED.intValue()));

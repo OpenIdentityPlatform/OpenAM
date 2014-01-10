@@ -90,7 +90,7 @@ public class GenericRepoTest extends IdRepoTestBase {
             fail();
         } catch (Exception ex) {
             assertThat(ex).isInstanceOf(IdRepoException.class)
-                    .hasMessage(getIdRepoExceptionMessage("311", DJLDAPv3Repo.class.getName(), "49"));
+                    .hasMessage(getIdRepoExceptionMessage("306", DJLDAPv3Repo.class.getName(), "49"));
         }
     }
 
