@@ -11,7 +11,7 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2013 ForgeRock AS.
+ * Copyright 2013-2014 ForgeRock AS.
  */
 package org.forgerock.openam.idrepo.ldap;
 
@@ -96,8 +96,6 @@ import org.forgerock.opendj.ldif.ConnectionEntryReader;
 
 /**
  * This is an IdRepo implementation that utilizes the LDAP protocol via OpenDJ LDAP SDK to access directory servers.
- *
- * @author Peter Major
  */
 public class DJLDAPv3Repo extends IdRepo {
 
@@ -2247,10 +2245,10 @@ public class DJLDAPv3Repo extends IdRepo {
         } catch (EntryNotFoundException enfe) {
             DEBUG.message("Unable to find entry with name: " + name + " under searchbase: " + searchBase
                     + " with scope: " + defaultScope);
-            throw newIdRepoException("223", name, type.getName());
+            throw newIdRepoException(enfe.getResult().getResultCode(), "223", name, type.getName());
         } catch (ErrorResultException ere) {
             DEBUG.error("An error occurred while querying entry DN", ere);
-            throw newIdRepoException("306", CLASS_NAME, ere.getResult().getResultCode());
+            throw newIdRepoException(ere.getResult().getResultCode(), "306", CLASS_NAME, ere.getResult().getResultCode());
         } finally {
             IOUtils.closeIfNotNull(conn);
         }
@@ -2380,7 +2378,7 @@ public class DJLDAPv3Repo extends IdRepo {
             throw new IdRepoFatalException(IdRepoBundle.BUNDLE_NAME, "220",
                     new Object[]{CLASS_NAME, ere.getResult().getDiagnosticMessage()});
         } else {
-            throw newIdRepoException("311", CLASS_NAME, resultCode.intValue());
+            throw newIdRepoException(resultCode, "306", CLASS_NAME, resultCode.intValue());
         }
     }
 
@@ -2394,7 +2392,7 @@ public class DJLDAPv3Repo extends IdRepo {
                 DEBUG.warning("Time limit exceeded in " + method);
             } else {
                 DEBUG.error("Unexpected IO error occurred in " + method, erioe);
-                throw newIdRepoException("311", erioe.getMessage());
+                throw newIdRepoException(resultCode, "311", erioe.getMessage());
             }
         } else {
             DEBUG.error("An IO problem occurred in" + method, erioe);
@@ -2402,8 +2400,12 @@ public class DJLDAPv3Repo extends IdRepo {
         }
     }
 
-    private IdRepoException newIdRepoException(String code, Object... args) {
-        return new IdRepoException(IdRepoBundle.BUNDLE_NAME, code, args);
+    private IdRepoException newIdRepoException(String key, Object... args) {
+        return new IdRepoException(IdRepoBundle.BUNDLE_NAME, key, args);
+    }
+
+    private IdRepoException newIdRepoException(ResultCode resultCode, String key, Object... args) {
+        return new IdRepoException(IdRepoBundle.BUNDLE_NAME, key, String.valueOf(resultCode.intValue()), args);
     }
 
     private static class StringAttributeExtractor implements Function<Attribute, Set<String>, Void> {
