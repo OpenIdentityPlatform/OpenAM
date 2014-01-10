@@ -29,12 +29,16 @@
 -->
 
 <!--
-   Portions Copyrighted 2011-2013 ForgeRock AS
+   Portions Copyrighted 2011-2014 ForgeRock AS
 -->
 <web-app version="2.4" xmlns="http://java.sun.com/xml/ns/j2ee" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://java.sun.com/xml/ns/j2ee http://java.sun.com/xml/ns/j2ee/web-app_2_4.xsd">
 
     <display-name>OpenAM Distributed Authentication UI</display-name>
-    
+
+    <context-param>
+        <param-name>jato:enforceStrictSessionTimeout</param-name>
+        <param-value>true</param-value>
+    </context-param>
     <context-param>
         <param-name>jato:com.sun.identity.authentication.distUI.*:moduleURL</param-name>
         <param-value>../UI</param-value>
