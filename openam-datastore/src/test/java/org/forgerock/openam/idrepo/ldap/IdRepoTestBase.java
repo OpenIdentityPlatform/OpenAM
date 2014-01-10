@@ -11,7 +11,7 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2013 ForgeRock AS.
+ * Copyright 2013-2014 ForgeRock AS.
  */
 package org.forgerock.openam.idrepo.ldap;
 
@@ -25,6 +25,8 @@ import org.forgerock.opendj.ldap.Connections;
 import org.forgerock.opendj.ldap.ErrorResultException;
 import org.forgerock.opendj.ldap.FutureResult;
 import org.forgerock.opendj.ldap.MemoryBackend;
+import org.forgerock.opendj.ldap.RequestContext;
+import org.forgerock.opendj.ldap.RequestHandler;
 import org.forgerock.opendj.ldap.ResultHandler;
 import org.forgerock.opendj.ldap.schema.Schema;
 import org.forgerock.opendj.ldif.LDIFEntryReader;
@@ -46,7 +48,7 @@ public abstract class IdRepoTestBase extends PowerMockTestCase {
     protected static final String USER0 = "user.0";
     protected static final String USER0_DN = "uid=user.0,ou=people,dc=openam,dc=forgerock,dc=org";
     protected static final String DEMO_DN = "uid=demo,ou=people,dc=openam,dc=forgerock,dc=org";
-    protected MemoryBackend memoryBackend;
+    protected RequestHandler<RequestContext> memoryBackend;
     protected IdRepoListener idRepoListener;
     protected DJLDAPv3Repo idrepo = new DJLDAPv3Repo() {
         @Override
@@ -66,7 +68,13 @@ public abstract class IdRepoTestBase extends PowerMockTestCase {
         idRepoListener = PowerMockito.mock(IdRepoListener.class);
         when(WebtopNaming.getAMServerID()).thenReturn("01");
         when(WebtopNaming.getSiteID(eq("01"))).thenReturn("02");
-        memoryBackend = new MemoryBackend(getDirectoryContent());
+        memoryBackend = decorateBackend(new MemoryBackend(
+                new LDIFEntryReader(getClass().getResourceAsStream(getLDIFPath()))));
+    }
+
+    protected RequestHandler<RequestContext> decorateBackend(MemoryBackend memoryBackend) {
+        //default implementation doesn't decorate, just returns the same backend
+        return memoryBackend;
     }
 
     @BeforeMethod
@@ -79,7 +87,7 @@ public abstract class IdRepoTestBase extends PowerMockTestCase {
         idrepo.shutdown();
     }
 
-    protected abstract LDIFEntryReader getDirectoryContent();
+    protected abstract String getLDIFPath();
 
     private class FakeConnectionFactory implements ConnectionFactory {
 

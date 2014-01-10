@@ -36,7 +36,6 @@ import static org.fest.assertions.Assertions.*;
 import static org.forgerock.openam.utils.CollectionUtils.*;
 import org.forgerock.opendj.ldap.Filter;
 import org.forgerock.opendj.ldap.ResultCode;
-import org.forgerock.opendj.ldif.LDIFEntryReader;
 import org.mockito.ArgumentCaptor;
 import static org.mockito.Mockito.*;
 import static org.testng.Assert.*;
@@ -55,8 +54,8 @@ public class GenericRepoTest extends IdRepoTestBase {
     }
 
     @Override
-    protected LDIFEntryReader getDirectoryContent() {
-        return new LDIFEntryReader(getClass().getResourceAsStream(GENERIC_DS_LDIF));
+    protected String getLDIFPath() {
+        return GENERIC_DS_LDIF;
     }
 
     @Test
