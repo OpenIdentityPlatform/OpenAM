@@ -27,6 +27,7 @@
 <!--
     Portions Copyrighted 2012-2013 ForgeRock Inc
     Portions Copyrighted 2012 Open Source Solution Technology Corporation
+    Portions Copyrighted 2013 Nomura Research Institute, Ltd
 -->
 
 <!DOCTYPE ServicesConfiguration
@@ -81,7 +82,7 @@ PUBLIC "=//iPlanet//Service Management Services (SMS) 1.0 DTD//EN"
                 <AttributeSchema name="iplanet-am-auth-oauth-sso-proxy-url"
                                  type="single" syntax="string" i18nKey="a108">
                         <DefaultValues>
-                                <Value>https://openam.server.name/openam/OAuthProxy.jsp</Value>
+                                <Value>@SERVER_PROTO@://@SERVER_HOST@:@SERVER_PORT@/@SERVER_URI@/oauth2c/OAuthProxy.jsp</Value>
                         </DefaultValues>
                 </AttributeSchema>
 	        <AttributeSchema name="org-forgerock-auth-oauth-account-mapper"
@@ -278,7 +279,7 @@ PUBLIC "=//iPlanet//Service Management Services (SMS) 1.0 DTD//EN"
                 <AttributeSchema name="iplanet-am-auth-oauth-sso-proxy-url"
                                  type="single" syntax="string" i18nKey="a108">
                         <DefaultValues>
-                                <Value>https://openam.server.name/openam/oauth2c/OAuthProxy.jsp</Value>
+                                <Value>@SERVER_PROTO@://@SERVER_HOST@:@SERVER_PORT@/@SERVER_URI@/oauth2c/OAuthProxy.jsp</Value>
                         </DefaultValues>
                 </AttributeSchema>
 		<AttributeSchema name="org-forgerock-auth-oauth-account-mapper"
