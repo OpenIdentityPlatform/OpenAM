@@ -28,6 +28,7 @@
 
 /*
  * Portions Copyrighted 2011 ForgeRock AS
+ * Portions Copyrighted 2013 Nomura Research Institute, Ltd
  */
 package com.sun.identity.log.service;
 
@@ -156,6 +157,8 @@ public class LogRecWrite implements LogOperation, ParseOutput {
                 rec.setLogInfoMap(logInfoMap);
             }
         }
+        rec.addLogInfo(LogConstants.LOG_LEVEL, rec.getLevel().toString());
+
         rec.setParameters(parameters);
         
         SSOToken loggedByToken = null;

@@ -26,16 +26,18 @@
  *
  */
 
-package com.sun.identity.log.s1is;
+/*
+ * Portions Copyrighted 2013 ForgeRock AS
+ * Portions Copyrighted 2013 Nomura Research Institute, Ltd
+ */
 
-import java.text.SimpleDateFormat;
-import java.util.Date;
+package com.sun.identity.log.s1is;
 
 import com.iplanet.sso.SSOException;
 import com.iplanet.sso.SSOToken;
-import com.sun.identity.log.Logger;
 import com.sun.identity.log.LogConstants;
 import com.sun.identity.log.LogRecord;
+import com.sun.identity.log.Logger;
 import com.sun.identity.log.spi.Debug;
 
 /**
@@ -45,13 +47,13 @@ import com.sun.identity.log.spi.Debug;
  * LogRecord.
  */
 public class LogSSOTokenDetails {
-    
+
     /**
      * Creates new LogSSOTokenDetails object.
      */
     public LogSSOTokenDetails() {
     }
-    
+
     /**
      * This method extracts the information from SSOToken and adds each of the
      * HashTable of LogRecord.
@@ -65,21 +67,14 @@ public class LogSSOTokenDetails {
         String clientID     = null;
         String ipAddress    = null;
         String hostName     = null;
-        
-        Date date = new Date();
-        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 
         /**
          * these are the compulsory fields ... to be logged even if there are
          * exceptions while getting domain, loginid, ipaddr, hostname
          */
-        lr.addLogInfo(LogConstants.TIME, sdf.format(date));
-        lr.addLogInfo(LogConstants.DATA, lr.getMessage());
-        lr.addLogInfo(LogConstants.LOG_LEVEL, lr.getLevel().toString());
-        
         String tokenID = ssoToken.getTokenID().toString();
         lr.addLogInfo(LogConstants.LOGIN_ID_SID, tokenID);
-        
+
         try {
             hostName = ssoToken.getHostName();
             lr.addLogInfo(LogConstants.HOST_NAME, hostName);
@@ -112,7 +107,7 @@ public class LogSSOTokenDetails {
             //clientDomain = ssoToken.getProperty("cdomain");
             clientDomain = ssoToken.getProperty("Organization");
             lr.addLogInfo(LogConstants.DOMAIN, clientDomain);
-            
+
             clientID = ssoToken.getPrincipal().getName();
             lr.addLogInfo(LogConstants.LOGIN_ID, clientID);
         } catch (SSOException ssoe) {
