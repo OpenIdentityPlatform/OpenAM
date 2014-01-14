@@ -77,7 +77,7 @@
     <licenses>
         <license>
             <name>CDDL-1.0</name>
-            <url>http://www.opensource.org/licenses/cddl1.php</url>
+            <url>http://www.opensource.org/licenses/CDDL-1.0</url>
             <comments>Common Development and Distribution License (CDDL) 1.0.
                 This license applies to OpenAM source code as indicated in the
                 sources themselves.
