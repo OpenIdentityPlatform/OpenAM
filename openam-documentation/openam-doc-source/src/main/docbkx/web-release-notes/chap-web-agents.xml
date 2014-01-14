@@ -20,13 +20,14 @@
   !
   ! CCPL HEADER END
   !
-  !      Copyright 2012-2013 ForgeRock AS
+  !      Copyright 2012-2014 ForgeRock AS
   !    
 -->
 <chapter xml:id='chap-web-agents'
          xmlns='http://docbook.org/ns/docbook' version='5.0' xml:lang='en'
          xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance'
-         xsi:schemaLocation='http://docbook.org/ns/docbook http://docbook.org/xml/5.0/xsd/docbook.xsd'
+         xsi:schemaLocation='http://docbook.org/ns/docbook
+                             http://docbook.org/xml/5.0/xsd/docbook.xsd'
          xmlns:xlink='http://www.w3.org/1999/xlink'
          xmlns:xinclude='http://www.w3.org/2001/XInclude'>
  <title>Web Policy Agents <?eval ${agentsDocTargetVersion}?></title>
@@ -289,6 +290,14 @@
 
     <para>The Varnish Cache web policy agents have been tested on Linux 2.6 or
     later, and on Oracle Solaris 10 or later.</para>
+
+    <para>
+     Before installing the IIS 7 web policy agent on Microsoft IIS 7 or IIS 8,
+     make sure that the optional Application Development component of
+     Web Server (IIS) is installed.
+     In the Windows Server 2012 Server Manager for example,
+     Application Development is a component of Web Server (IIS) | Web Server.
+    </para>
 
     <para>Before installing web policy agents on Solaris 10, make sure you have
     applied the latest shared library patch for C++, at least 119963-16 on SPARC,

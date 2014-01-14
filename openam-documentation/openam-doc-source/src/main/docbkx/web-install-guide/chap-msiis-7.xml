@@ -20,20 +20,25 @@
   !
   ! CCPL HEADER END
   !
-  !      Copyright 2011-2013 ForgeRock, Inc.
+  !      Copyright 2011-2014 ForgeRock AS
   !    
 -->
 <chapter xml:id='chap-msiis-7'
  xmlns='http://docbook.org/ns/docbook'
  version='5.0' xml:lang='en'
  xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance'
- xsi:schemaLocation='http://docbook.org/ns/docbook http://docbook.org/xml/5.0/xsd/docbook.xsd'
+ xsi:schemaLocation='http://docbook.org/ns/docbook
+                     http://docbook.org/xml/5.0/xsd/docbook.xsd'
  xmlns:xlink='http://www.w3.org/1999/xlink'
  xmlns:xinclude='http://www.w3.org/2001/XInclude'>
  <title>Installing the Microsoft IIS 7 Policy Agent</title>
  <indexterm><primary>Microsoft IIS</primary></indexterm>
- <para>This chapter covers installation of the policy agent for Microsoft 
- Internet Information Services 7.</para>
+
+ <para>
+  This chapter covers installation of the policy agent for
+  Microsoft Internet Information Services 7.
+  This policy agent also works with Microsoft IIS 8.
+ </para>
  
  <section xml:id="before-iis7-agent-install">
   <title>Before You Install</title>
@@ -56,7 +61,14 @@
   7 listens on the URL used during the web policy agent installation, such as
   <literal>http://windows7.example.com:80/</literal>. Furthermore, you
   must reset IIS 7 after installing the policy agent.</para>
-  
+
+  <para>
+   In addition, the Microsoft IIS 7 policy agent requires that
+   IIS Application Development features be installed with IIS.
+   Application Development is an optional component of the IIS web server.
+   The component provides infrastructure for developing and hosting web applications.
+  </para>
+
   <para>Go to <link xlink:href="install-guide#download-openam-software"
   xlink:role="http://docbook.org/xlink/role/olink"><citetitle>Obtaining OpenAM Software</citetitle></link>
   to determine which version of the agent to download and download the agent.
