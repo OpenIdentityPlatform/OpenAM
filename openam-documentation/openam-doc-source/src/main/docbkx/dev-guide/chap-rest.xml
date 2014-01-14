@@ -2790,6 +2790,11 @@ $ curl --request PUT --header "If-None-Match: *"
  https://openam.example.com:8443/openam/json/groups/myGroup
 {"success":"true"}</screen>
   </section>
+  <note>
+    <para>Deleting a user does not automatically remove any of the user's sessions.
+    After deleting a user, check for any sessions for the user and remove them under the Console's Sessions tab.
+    </para>
+  </note>
 
   <section xml:id="rest-api-query-identity">
    <title>Listing Identities</title>

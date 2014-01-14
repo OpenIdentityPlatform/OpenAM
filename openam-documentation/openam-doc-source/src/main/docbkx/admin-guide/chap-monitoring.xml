@@ -371,5 +371,11 @@ demo AQICvSe+tXEg8TUUT8ekzHb8IRzVSvm1Lc2u</screen>
   <para>To end a user session manually, select the user's session, and then
   click the Invalidate Session button. As a result, the user has to
   authenticate again.</para>
+  
+  <note>
+      <para>Deleting a user does not automatically remove any of the user's sessions.
+      After deleting a user, check for any sessions for the user and remove them under the Console's Sessions tab.
+      </para>
+  </note>
  </section>
 </chapter>
