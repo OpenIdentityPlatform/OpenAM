@@ -82,7 +82,7 @@ define("UserDelegate", [
         });
     };
     
-    obj.updateUser = function(user, realm, objectParam, successCallback, errorCallback) {
+    obj.updateUser = function(oldUserData, realm, objectParam, successCallback, errorCallback) {
         var headers = {};
         
         if(objectParam._rev) {
@@ -95,7 +95,7 @@ define("UserDelegate", [
             headers[constants.OPENAM_HEADER_PARAM_OLD_PASSWORD] = objectParam.oldPassword;
         }
 
-        this.serviceCall({url: realm + "/users/" +user,
+        this.serviceCall({url: realm + "/users/" + objectParam.username,
             type: "PUT",
             success: successCallback, 
             error: errorCallback, 

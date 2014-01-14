@@ -25,7 +25,6 @@
 /*global define*/
 
 define("org/forgerock/openam/ui/user/main", [
-    "./profile/UserProfileView",
     "./profile/ChangeSecurityDataDialog",
     //"./oauth2/TokensView",
     "./delegates/TokenDelegate",

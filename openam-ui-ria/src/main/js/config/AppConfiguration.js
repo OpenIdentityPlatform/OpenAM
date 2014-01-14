@@ -43,7 +43,7 @@ define("config/AppConfiguration", [
                    moduleClass: "org/forgerock/commons/ui/common/main/GenericRouteInterfaceMap",
                    configuration: {
                        LoginView : "org/forgerock/openam/ui/user/login/RESTLoginView",
-                       UserProfileView : "org/forgerock/openam/ui/user/profile/UserProfileView",
+                       UserProfileView : "org/forgerock/commons/ui/user/profile/UserProfileView",
                        LoginDialog : "org/forgerock/openam/ui/user/login/RESTLoginDialog",
                        RegisterView : "org/forgerock/openam/ui/user/profile/RegisterView",
                        ChangeSecurityDataDialog : "org/forgerock/openam/ui/user/profile/ChangeSecurityDataDialog"
