@@ -34,13 +34,6 @@ define("config/routes/AMRoutesConfig", [
 ], function() {
     
     var obj = {
-        "login" : {
-            view: "LoginView",
-            url: /login([^\&]+)?(&.+)?/,
-            pattern: "login??",
-            defaults: ["/"],
-            forceUpdate: true
-        },
         "forgotPassword": {
             view: "org/forgerock/openam/ui/user/profile/ForgotPasswordView",
             url: "forgotPassword/",
