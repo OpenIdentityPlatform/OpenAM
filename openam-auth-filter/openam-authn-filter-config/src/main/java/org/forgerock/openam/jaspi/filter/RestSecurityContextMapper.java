@@ -11,13 +11,15 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2013 ForgeRock AS.
+ * Copyright 2013-2014 ForgeRock AS.
  */
 
 package org.forgerock.openam.jaspi.filter;
 
-import org.forgerock.jaspi.filter.AuthNFilter;
+import com.sun.identity.shared.debug.Debug;
+import org.forgerock.jaspi.runtime.JaspiRuntime;
 import org.forgerock.json.resource.servlet.SecurityContextFactory;
+import org.forgerock.openam.jaspi.config.RestJaspiRuntimeConfigurationFactory;
 
 import javax.servlet.Filter;
 import javax.servlet.FilterChain;
@@ -26,6 +28,7 @@ import javax.servlet.ServletException;
 import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.util.Map;
 
@@ -33,10 +36,10 @@ import java.util.Map;
  * Maps the Commons AuthN Filter security parameters to CREST security parameters.
  *
  * {@link SecurityContextFactory}
- *
- * @author Phill Cunnington
  */
 public class RestSecurityContextMapper implements Filter {
+
+    private static final Debug DEBUG = Debug.getInstance(RestJaspiRuntimeConfigurationFactory.LOG_NAME);
 
     /**
      * Does nothing.
@@ -63,10 +66,22 @@ public class RestSecurityContextMapper implements Filter {
     public void doFilter(ServletRequest servletRequest, ServletResponse servletResponse, FilterChain filterChain)
             throws IOException, ServletException {
 
+        if ((!HttpServletRequest.class.isAssignableFrom(servletRequest.getClass())
+                || !HttpServletResponse.class.isAssignableFrom(servletResponse.getClass()))) {
+            DEBUG.error("Unsupported protocol");
+            throw new ServletException("Unsupported protocol");
+        }
+
         HttpServletRequest request = (HttpServletRequest) servletRequest;
 
-        String authcid = request.getHeader(AuthNFilter.ATTRIBUTE_AUTH_PRINCIPAL);
-        Map<String, Object> authzid = (Map<String, Object>) request.getAttribute(AuthNFilter.ATTRIBUTE_AUTH_CONTEXT);
+        Object principal = request.getAttribute(JaspiRuntime.ATTRIBUTE_AUTH_PRINCIPAL);
+        String authcid;
+        if (principal == null) {
+            authcid = null;
+        } else {
+            authcid = principal.toString();
+        }
+        Map<String, Object> authzid = (Map<String, Object>) request.getAttribute(JaspiRuntime.ATTRIBUTE_AUTH_CONTEXT);
 
         request.setAttribute(SecurityContextFactory.ATTRIBUTE_AUTHCID, authcid);
         request.setAttribute(SecurityContextFactory.ATTRIBUTE_AUTHZID, authzid);

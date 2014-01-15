@@ -11,7 +11,7 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2013 ForgeRock Inc.
+ * Copyright 2013-2014 ForgeRock Inc.
  */
 
 package org.forgerock.openam.authentication.modules.persistentcookie;
@@ -28,8 +28,8 @@ import com.sun.identity.sm.SMSException;
 import com.sun.identity.sm.ServiceConfig;
 import com.sun.identity.sm.ServiceConfigManager;
 import org.apache.commons.lang.StringUtils;
-import org.forgerock.jaspi.filter.AuthNFilter;
 import org.forgerock.jaspi.modules.session.jwt.JwtSessionModule;
+import org.forgerock.jaspi.runtime.JaspiRuntime;
 import org.forgerock.json.jose.jwt.Jwt;
 import org.forgerock.openam.authentication.modules.common.JaspiAuthModuleWrapper;
 import org.forgerock.openam.utils.AMKeyProvider;
@@ -48,8 +48,6 @@ import java.util.Map;
 /**
  * Authentication logic for persistent cookie authentication in OpenAM. Making use of the JASPI JwtSessionModule
  * to create and verify the persistent cookie.
- *
- * @author Phill Cunnington phill.cunnington@forgerock.com
  */
 public class PersistentCookieAuthModule extends JaspiAuthModuleWrapper<JwtSessionModule> {
 
@@ -208,7 +206,7 @@ public class PersistentCookieAuthModule extends JaspiAuthModuleWrapper<JwtSessio
         } else {
             //GOOD
 
-            Map<String, Object> claimsSetContext = jwt.getClaimsSet().getClaim(AuthNFilter.ATTRIBUTE_AUTH_CONTEXT, Map.class);
+            Map<String, Object> claimsSetContext = jwt.getClaimsSet().getClaim(JaspiRuntime.ATTRIBUTE_AUTH_CONTEXT, Map.class);
             if(claimsSetContext == null) {
                 throw new AuthLoginException(AUTH_RESOURCE_BUNDLE_NAME, "jaspiContextNotFound", null);
             }

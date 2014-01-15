@@ -11,7 +11,7 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2013 ForgeRock Inc.
+ * Copyright 2013-2014 ForgeRock Inc.
  */
 
 package org.forgerock.openam.authz.filter.configuration;
@@ -28,16 +28,17 @@ import org.forgerock.openam.auth.shared.AuthnRequestUtils;
 import org.forgerock.openam.auth.shared.LoggerFactory;
 import org.forgerock.openam.auth.shared.SSOTokenFactory;
 import org.mockito.ArgumentCaptor;
-import org.mockito.Matchers;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
 import javax.servlet.http.HttpServletRequest;
-
 import java.security.Principal;
 
-import static org.mockito.Mockito.*;
-import static org.mockito.BDDMockito.*;
+import static org.mockito.BDDMockito.given;
+import static org.mockito.Mockito.anyString;
+import static org.mockito.Mockito.eq;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertTrue;
 
@@ -76,7 +77,7 @@ public class AuthZAuditLoggerTest {
         SSOTokenID subjectTokenId = mock(SSOTokenID.class);
         Principal principal = mock(Principal.class);
 
-        given(auditRecord.getHttpServletRequest()).willReturn(request);
+        given(auditRecord.getAuditObject()).willReturn(request);
         given(auditRecord.getAuthResult()).willReturn(AuthResult.SUCCESS);
         given(request.getRequestURI()).willReturn("REQUEST_URI");
         given(requestUtils.getTokenId(request)).willReturn("TOKEN_ID");
@@ -110,7 +111,7 @@ public class AuthZAuditLoggerTest {
         SSOTokenID subjectTokenId = mock(SSOTokenID.class);
         Principal principal = mock(Principal.class);
 
-        given(auditRecord.getHttpServletRequest()).willReturn(request);
+        given(auditRecord.getAuditObject()).willReturn(request);
         given(auditRecord.getAuthResult()).willReturn(AuthResult.FAILURE);
         given(request.getRequestURI()).willReturn("REQUEST_URI");
         given(requestUtils.getTokenId(request)).willReturn("TOKEN_ID");

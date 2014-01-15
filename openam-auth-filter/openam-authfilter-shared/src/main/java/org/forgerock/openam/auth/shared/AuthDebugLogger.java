@@ -11,10 +11,10 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2013 ForgeRock AS.
+ * Copyright 2013-2014 ForgeRock AS.
  */
 
-package org.forgerock.openam.authz.filter.configuration;
+package org.forgerock.openam.auth.shared;
 
 import com.sun.identity.shared.debug.Debug;
 import org.forgerock.auth.common.DebugLogger;
@@ -22,7 +22,6 @@ import org.forgerock.auth.common.DebugLogger;
 /**
  * Implementation of the DebugLogger for deployment of the commons AuthZFilter in OpenAM.
  *
- * @author Phill Cunnington
  * @since 10.2.0
  */
 public class AuthDebugLogger implements DebugLogger {
@@ -30,10 +29,28 @@ public class AuthDebugLogger implements DebugLogger {
     private final Debug debug;
 
     /**
-     *{@inheritDoc}
+     * Constructs a new AuthDebugLogger.
+     *
+     * @param logName The name of the AM debug instance.
      */
     public AuthDebugLogger(String logName) {
         debug = Debug.getInstance(logName);
+    }
+
+    /**
+     *{@inheritDoc}
+     */
+    @Override
+    public void trace(String message) {
+        debug.message(message);
+    }
+
+    /**
+     *{@inheritDoc}
+     */
+    @Override
+    public void trace(String message, Throwable t) {
+        debug.message(message, t);
     }
 
     /**

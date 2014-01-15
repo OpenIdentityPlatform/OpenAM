@@ -11,7 +11,7 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2013 ForgeRock Inc.
+ * Copyright 2013-2014 ForgeRock Inc.
  */
 
 package org.forgerock.openam.authentication.modules.common;
@@ -22,8 +22,7 @@ import com.sun.identity.authentication.spi.AuthLoginException;
 import com.sun.identity.authentication.spi.AuthenticationException;
 import com.sun.identity.authentication.util.ISAuthConstants;
 import com.sun.identity.shared.debug.Debug;
-import org.forgerock.jaspi.container.MessageInfoImpl;
-import org.forgerock.jaspi.container.ProtectionPolicyImpl;
+import org.forgerock.jaspi.runtime.HttpServletMessageInfo;
 
 import javax.security.auth.Subject;
 import javax.security.auth.callback.Callback;
@@ -43,8 +42,6 @@ import java.util.Map;
  * to be used with JAAS Authentication Modules and the OpenAM Post Authentication Procoess.
  *
  * @param <T> Implementation of the ServerAuthModule interface.
- *
- * @author Phill Cunnington phill.cunnington@forgerock.com
  */
 public abstract class JaspiAuthModuleWrapper<T extends ServerAuthModule> extends AuthLoginModule
         implements AMPostAuthProcessInterface {
@@ -267,7 +264,12 @@ public abstract class JaspiAuthModuleWrapper<T extends ServerAuthModule> extends
      */
     protected MessagePolicy createRequestMessagePolicy() {
         MessagePolicy.Target[] targets = new MessagePolicy.Target[]{};
-        MessagePolicy.ProtectionPolicy protectionPolicy = new ProtectionPolicyImpl();
+        MessagePolicy.ProtectionPolicy protectionPolicy = new MessagePolicy.ProtectionPolicy() {
+            @Override
+            public String getID() {
+                return MessagePolicy.ProtectionPolicy.AUTHENTICATE_SENDER;
+            }
+        };
         MessagePolicy.TargetPolicy targetPolicy = new MessagePolicy.TargetPolicy(targets, protectionPolicy);
         MessagePolicy.TargetPolicy[] targetPolicies = new MessagePolicy.TargetPolicy[]{targetPolicy};
         return new MessagePolicy(targetPolicies, true);
@@ -284,9 +286,7 @@ public abstract class JaspiAuthModuleWrapper<T extends ServerAuthModule> extends
 
         Map<String, Object> messageProperties = new HashMap<String, Object>();
 
-        MessageInfo messageInfo = new MessageInfoImpl(messageProperties);
-        messageInfo.setRequestMessage(request);
-        messageInfo.setResponseMessage(response);
+        MessageInfo messageInfo = new HttpServletMessageInfo(request, response, messageProperties);
 
         return messageInfo;
     }

@@ -11,11 +11,12 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2013 ForgeRock AS.
+ * Copyright 2013-2014 ForgeRock AS.
  */
 
 package org.forgerock.openam.jaspi.filter;
 
+import org.forgerock.jaspi.runtime.JaspiRuntime;
 import org.forgerock.json.resource.servlet.SecurityContextFactory;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
@@ -48,8 +49,8 @@ public class RestSecurityContextMapperTest {
         HttpServletResponse response = mock(HttpServletResponse.class);
         FilterChain filterChain = mock(FilterChain.class);
 
-        given(request.getHeader(AMAuthNFilter.ATTRIBUTE_AUTH_PRINCIPAL)).willReturn(null);
-        given(request.getAttribute(AMAuthNFilter.ATTRIBUTE_AUTH_CONTEXT)).willReturn(null);
+        given(request.getAttribute(JaspiRuntime.ATTRIBUTE_AUTH_PRINCIPAL)).willReturn(null);
+        given(request.getAttribute(JaspiRuntime.ATTRIBUTE_AUTH_CONTEXT)).willReturn(null);
 
         //When
         restSecurityContextMapper.doFilter(request, response, filterChain);
@@ -71,8 +72,8 @@ public class RestSecurityContextMapperTest {
         Map<String, Object> authenticationContext = new HashMap<String, Object>();
         authenticationContext.put("ssoTokenId", "asdweq ED23RFCD");
 
-        given(request.getHeader(AMAuthNFilter.ATTRIBUTE_AUTH_PRINCIPAL)).willReturn("AUTHC_ID");
-        given(request.getAttribute(AMAuthNFilter.ATTRIBUTE_AUTH_CONTEXT)).willReturn(authenticationContext);
+        given(request.getAttribute(JaspiRuntime.ATTRIBUTE_AUTH_PRINCIPAL)).willReturn("AUTHC_ID");
+        given(request.getAttribute(JaspiRuntime.ATTRIBUTE_AUTH_CONTEXT)).willReturn(authenticationContext);
 
         //When
         restSecurityContextMapper.doFilter(request, response, filterChain);

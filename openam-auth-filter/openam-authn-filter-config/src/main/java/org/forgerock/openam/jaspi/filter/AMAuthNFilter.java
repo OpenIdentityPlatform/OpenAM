@@ -11,13 +11,14 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2013 ForgeRock AS.
+ * Copyright 2013-2014 ForgeRock AS.
  */
 
 package org.forgerock.openam.jaspi.filter;
 
 import com.sun.identity.shared.debug.Debug;
-import org.forgerock.jaspi.filter.AuthNFilter;
+import org.forgerock.jaspi.JaspiRuntimeFilter;
+import org.forgerock.jaspi.utils.FilterConfiguration;
 import org.forgerock.openam.forgerockrest.RestDispatcher;
 
 import javax.servlet.FilterChain;
@@ -33,10 +34,8 @@ import java.io.IOException;
  * Adds a check to see if the REST endpoint being hit is the authentication endpoint and if is then will skip
  * the authentication check. All other REST endpoints will be protected resulting in the request requiring a
  * SSOToken cookie set.
- *
- * @author Phill Cunnington
  */
-public class AMAuthNFilter extends AuthNFilter {
+public class AMAuthNFilter extends JaspiRuntimeFilter {
 
     private static final Debug DEBUG = Debug.getInstance("amAuthREST");
 
@@ -46,7 +45,8 @@ public class AMAuthNFilter extends AuthNFilter {
      * Constructs an instance of the AMAuthNFilter.
      */
     public AMAuthNFilter() {
-        this(RestDispatcher.getInstance());
+        endpointMatcher = new EndpointMatcher("/json", RestDispatcher.getInstance());
+        init();
     }
 
     /**
@@ -55,10 +55,18 @@ public class AMAuthNFilter extends AuthNFilter {
      * Used by tests.
      *
      * @param restDispatcher An instance of the RestDispatcher.
+     * @param filterConfiguration An instance of the FilterConfiguration.
      */
-    public AMAuthNFilter(RestDispatcher restDispatcher) {
+    AMAuthNFilter(final RestDispatcher restDispatcher, final FilterConfiguration filterConfiguration) {
+        super(filterConfiguration);
         endpointMatcher = new EndpointMatcher("/json", restDispatcher);
+        init();
+    }
 
+    /**
+     * Initialises the endpoint matcher with endpoint exceptions.
+     */
+    private void init() {
         /*
          * Only the REST Authentication Endpoint is unprotected. Other endpoints that don't need to be authenticated
          * as a "real" user can use the anonymous use to authenticate first, then use an Authorization Filter to
@@ -76,7 +84,7 @@ public class AMAuthNFilter extends AuthNFilter {
     /**
      * {@inheritDoc}
      */
-    public void init(FilterConfig filterConfig) throws ServletException {
+    public void init(FilterConfig filterConfig) {
         super.init(filterConfig);
     }
 

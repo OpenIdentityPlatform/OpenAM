@@ -11,7 +11,7 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2013 ForgeRock AS.
+ * Copyright 2013-2014 ForgeRock AS.
  */
 
 package org.forgerock.openam.authz.filter.configuration;
@@ -19,13 +19,13 @@ package org.forgerock.openam.authz.filter.configuration;
 import org.forgerock.auth.common.AuditLogger;
 import org.forgerock.auth.common.DebugLogger;
 import org.forgerock.authz.AuthorizationConfigurator;
+import org.forgerock.openam.auth.shared.AuthDebugLogger;
 import org.forgerock.openam.guice.InjectorHolder;
 
 /**
  * Common implementation of the Authorization Configurator that provides the correct AM debug and audit logs for
  * authorization.
  *
- * @author Phill Cunnington
  * @since 10.2.0
  */
 public abstract class AuthZConfigurator implements AuthorizationConfigurator {
@@ -35,7 +35,7 @@ public abstract class AuthZConfigurator implements AuthorizationConfigurator {
      */
     @Override
     public DebugLogger getDebugLogger() {
-        return new AuthDebugLogger("authorizationFilter");
+        return new AuthDebugLogger("restAuthorizationFilter");
     }
 
     /**

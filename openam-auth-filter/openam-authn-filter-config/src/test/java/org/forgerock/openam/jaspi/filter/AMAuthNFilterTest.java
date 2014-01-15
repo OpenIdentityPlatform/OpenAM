@@ -1,37 +1,32 @@
 /*
- * The contents of this file are subject to the terms of the Common Development and
- * Distribution License (the License). You may not use this file except in compliance with the
- * License.
- *
- * You can obtain a copy of the License at legal/CDDLv1.0.txt. See the License for the
- * specific language governing permission and limitations under the License.
- *
- * When distributing Covered Software, include this CDDL Header Notice in each file and include
- * the License file at legal/CDDLv1.0.txt. If applicable, add the following below the CDDL
- * Header, with the fields enclosed by brackets [] replaced by your own identifying
- * information: "Portions copyright [year] [name of copyright owner]".
- *
- * Copyright 2013 ForgeRock AS.
- */
+* The contents of this file are subject to the terms of the Common Development and
+* Distribution License (the License). You may not use this file except in compliance with the
+* License.
+*
+* You can obtain a copy of the License at legal/CDDLv1.0.txt. See the License for the
+* specific language governing permission and limitations under the License.
+*
+* When distributing Covered Software, include this CDDL Header Notice in each file and include
+* the License file at legal/CDDLv1.0.txt. If applicable, add the following below the CDDL
+* Header, with the fields enclosed by brackets [] replaced by your own identifying
+* information: "Portions copyright [year] [name of copyright owner]".
+*
+* Copyright 2013-2014 ForgeRock AS.
+*/
 
 package org.forgerock.openam.jaspi.filter;
 
-import org.forgerock.jaspi.container.AuthConfigFactoryImpl;
+import org.forgerock.jaspi.runtime.JaspiRuntime;
+import org.forgerock.jaspi.runtime.config.inject.RuntimeInjector;
+import org.forgerock.jaspi.utils.FilterConfiguration;
 import org.forgerock.json.resource.NotFoundException;
 import org.forgerock.openam.forgerockrest.RestDispatcher;
-import org.mockito.Matchers;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
-import javax.security.auth.Subject;
-import javax.security.auth.callback.CallbackHandler;
 import javax.security.auth.message.AuthException;
-import javax.security.auth.message.AuthStatus;
-import javax.security.auth.message.MessageInfo;
-import javax.security.auth.message.config.AuthConfigProvider;
-import javax.security.auth.message.config.ServerAuthConfig;
-import javax.security.auth.message.config.ServerAuthContext;
 import javax.servlet.FilterChain;
+import javax.servlet.FilterConfig;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -39,39 +34,38 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
-import static org.mockito.Mockito.*;
-import static org.mockito.BDDMockito.*;
+import static org.mockito.BDDMockito.given;
+import static org.mockito.Mockito.anyString;
+import static org.mockito.Mockito.eq;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.verify;
 
 public class AMAuthNFilterTest {
 
     private AMAuthNFilter amAuthNFilter;
 
+    private RuntimeInjector runtimeInjector;
+    private JaspiRuntime jaspiRuntime;
     private RestDispatcher restDispatcher;
 
     @BeforeMethod
-    public void setUp() throws AuthException {
+    public void setUp() throws AuthException, ServletException {
 
+
+        FilterConfiguration filterConfiguration = mock(FilterConfiguration.class);
+        runtimeInjector = mock(RuntimeInjector.class);
+        jaspiRuntime = mock(JaspiRuntime.class);
         restDispatcher = mock(RestDispatcher.class);
 
-        amAuthNFilter = spy(new AMAuthNFilter(restDispatcher));
+        amAuthNFilter = new AMAuthNFilter(restDispatcher, filterConfiguration);
 
-        //Set up underlying AuthNFilter to always fail so if the AMAuthNFilter lets the request through we can confirm
-        // FilterChain.doFilter() is never called.
-        AuthConfigProvider authConfigProvider = mock(AuthConfigProvider.class);
-        String layer = "";
-        String appContext = "";
-        ServerAuthConfig serverAuthConfig = mock(ServerAuthConfig.class);
-        ServerAuthContext serverAuthContext = mock(ServerAuthContext.class);
-        given(authConfigProvider.getServerAuthConfig(anyString(), anyString(), Matchers.<CallbackHandler>anyObject()))
-                .willReturn(serverAuthConfig);
-        given(serverAuthConfig.getAuthContext(anyString(), Matchers.<Subject>anyObject(), anyMap()))
-                .willReturn(serverAuthContext);
-        given(serverAuthContext.validateRequest(Matchers.<MessageInfo>anyObject(), Matchers.<Subject>anyObject(),
-                Matchers.<Subject>anyObject())).willReturn(AuthStatus.SEND_FAILURE);
-        given(serverAuthContext.secureResponse(Matchers.<MessageInfo>anyObject(), Matchers.<Subject>anyObject()))
-                .willReturn(AuthStatus.SUCCESS);
+        given(runtimeInjector.getInstance(JaspiRuntime.class)).willReturn(jaspiRuntime);
 
-        AuthConfigFactoryImpl.getInstance().registerConfigProvider(authConfigProvider, layer, appContext, "");
+        FilterConfig filterConfig = mock(FilterConfig.class);
+        given(filterConfiguration.get(eq(filterConfig), anyString(), anyString(), anyString()))
+                .willReturn(runtimeInjector);
+        amAuthNFilter.init(filterConfig);
     }
 
     @Test
@@ -97,7 +91,7 @@ public class AMAuthNFilterTest {
         amAuthNFilter.doFilter(request, response, filterChain);
 
         //Then
-        verify(filterChain).doFilter(request, response);
+        verify(jaspiRuntime, never()).processMessage(request, response, filterChain);
     }
 
     @Test
@@ -122,7 +116,7 @@ public class AMAuthNFilterTest {
         amAuthNFilter.doFilter(request, response, filterChain);
 
         //Then
-        verify(filterChain).doFilter(request, response);
+        verify(jaspiRuntime, never()).processMessage(request, response, filterChain);
     }
 
     @Test
@@ -147,7 +141,7 @@ public class AMAuthNFilterTest {
         amAuthNFilter.doFilter(request, response, filterChain);
 
         //Then
-        verify(filterChain).doFilter(request, response);
+        verify(jaspiRuntime, never()).processMessage(request, response, filterChain);
     }
 
     @Test
@@ -172,7 +166,7 @@ public class AMAuthNFilterTest {
         amAuthNFilter.doFilter(request, response, filterChain);
 
         //Then
-        verify(filterChain).doFilter(request, response);
+        verify(jaspiRuntime, never()).processMessage(request, response, filterChain);
     }
 
     @Test
@@ -197,7 +191,7 @@ public class AMAuthNFilterTest {
         amAuthNFilter.doFilter(request, response, filterChain);
 
         //Then
-        verify(filterChain).doFilter(request, response);
+        verify(jaspiRuntime, never()).processMessage(request, response, filterChain);
     }
 
     @Test
@@ -223,7 +217,7 @@ public class AMAuthNFilterTest {
         amAuthNFilter.doFilter(request, response, filterChain);
 
         //Then
-        verify(filterChain, never()).doFilter(request, response);
+        verify(jaspiRuntime).processMessage(request, response, filterChain);
     }
 
     @Test
@@ -248,7 +242,7 @@ public class AMAuthNFilterTest {
         amAuthNFilter.doFilter(request, response, filterChain);
 
         //Then
-        verify(filterChain, never()).doFilter(request, response);
+        verify(jaspiRuntime).processMessage(request, response, filterChain);
     }
 
     @Test
@@ -269,7 +263,7 @@ public class AMAuthNFilterTest {
         amAuthNFilter.doFilter(request, response, filterChain);
 
         //Then
-        verify(filterChain, never()).doFilter(request, response);
+        verify(jaspiRuntime).processMessage(request, response, filterChain);
     }
 
     @Test
@@ -290,7 +284,7 @@ public class AMAuthNFilterTest {
         amAuthNFilter.doFilter(request, response, filterChain);
 
         //Then
-        verify(filterChain, never()).doFilter(request, response);
+        verify(jaspiRuntime).processMessage(request, response, filterChain);
     }
 
     @Test
@@ -311,6 +305,6 @@ public class AMAuthNFilterTest {
         amAuthNFilter.doFilter(request, response, filterChain);
 
         //Then
-        verify(filterChain, never()).doFilter(request, response);
+        verify(jaspiRuntime).processMessage(request, response, filterChain);
     }
 }

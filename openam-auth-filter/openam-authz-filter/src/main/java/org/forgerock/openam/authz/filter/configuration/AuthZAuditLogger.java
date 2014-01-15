@@ -11,7 +11,7 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2013 ForgeRock AS.
+ * Copyright 2013-2014 ForgeRock AS.
  */
 
 package org.forgerock.openam.authz.filter.configuration;
@@ -20,26 +20,24 @@ import com.google.inject.Singleton;
 import com.iplanet.sso.SSOToken;
 import com.sun.identity.log.LogRecord;
 import com.sun.identity.log.Logger;
-import com.sun.identity.security.AdminTokenAction;
 import org.forgerock.auth.common.AuditLogger;
 import org.forgerock.auth.common.AuditRecord;
-import org.forgerock.auth.common.AuthResult;
 import org.forgerock.openam.auth.shared.AuthnRequestUtils;
 import org.forgerock.openam.auth.shared.LoggerFactory;
 import org.forgerock.openam.auth.shared.SSOTokenFactory;
 
 import javax.inject.Inject;
-import java.security.AccessController;
+import javax.security.auth.message.MessageInfo;
+import javax.servlet.http.HttpServletRequest;
 import java.util.logging.Level;
 
 /**
  * Implementation of the AuditLogger for AM authorization.
  *
- * @author Phill Cunnington
  * @since 10.2.0
  */
 @Singleton
-public class AuthZAuditLogger implements AuditLogger {
+public class AuthZAuditLogger implements AuditLogger<HttpServletRequest> {
 
     private static final String AUDIT_LOG_NAME = "amAuthorization";
 
@@ -68,20 +66,22 @@ public class AuthZAuditLogger implements AuditLogger {
      * @param auditRecord {@inheritDoc}
      */
     @Override
-    public void audit(AuditRecord auditRecord) {
+    public void audit(AuditRecord<HttpServletRequest> auditRecord) {
 
-        String tokenId = requestUtils.getTokenId(auditRecord.getHttpServletRequest());
+        HttpServletRequest request = auditRecord.getAuditObject();
+
+        String tokenId = requestUtils.getTokenId(request);
 
         String message;
         Logger logger;
         switch (auditRecord.getAuthResult()) {
             case SUCCESS: {
-                message = "Authorization Succeeded. " + auditRecord.getHttpServletRequest().getRequestURI();
+                message = "Authorization Succeeded. " + request.getRequestURI();
                 logger = loggerFactory.getLogger(AUDIT_LOG_NAME + ".access");
                 break;
             }
             default: {
-                message = "Authorization Failed. " + auditRecord.getHttpServletRequest().getRequestURI();
+                message = "Authorization Failed. " + request.getRequestURI();
                 logger = loggerFactory.getLogger(AUDIT_LOG_NAME + ".error");
             }
         }

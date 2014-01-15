@@ -125,7 +125,7 @@
         <commons.forgerock-util.version>1.1.0</commons.forgerock-util.version>
         <commons.json-resource.version>1.2.2</commons.json-resource.version>
         <commons.json-patch.version>1.0.0</commons.json-patch.version>
-        <commons.authfilter.version>1.2.1-SNAPSHOT</commons.authfilter.version>
+        <commons.authfilter.version>1.3.0-SNAPSHOT</commons.authfilter.version>
         <forgerock.json.version>2.0.2</forgerock.json.version>
         <forgerock-ui.version>1.0.3</forgerock-ui.version>
         <restlet.version>2.1.1</restlet.version>
@@ -1372,17 +1372,17 @@
             </dependency>
             <dependency>
                 <groupId>org.forgerock.commons</groupId>
-                <artifactId>forgerock-jaspi-container</artifactId>
+                <artifactId>forgerock-auth-filter-common</artifactId>
+                <version>${commons.authfilter.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.forgerock.commons</groupId>
+                <artifactId>forgerock-jaspi-runtime</artifactId>
                 <version>${commons.authfilter.version}</version>
             </dependency>
             <dependency>
                 <groupId>org.forgerock.commons</groupId>
                 <artifactId>forgerock-jaspi-jwt-session-module</artifactId>
-                <version>${commons.authfilter.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.forgerock.commons</groupId>
-                <artifactId>forgerock-auth-filter-common</artifactId>
                 <version>${commons.authfilter.version}</version>
             </dependency>
             <dependency>
