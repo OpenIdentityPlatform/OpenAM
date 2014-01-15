@@ -20,14 +20,15 @@
   !
   ! CCPL HEADER END
   !
-  !      Copyright 2011-2013 ForgeRock, Inc.
+  !      Copyright 2011-2014 ForgeRock AS
   !    
 -->
 <chapter xml:id='chap-auth-services'
  xmlns='http://docbook.org/ns/docbook'
  version='5.0' xml:lang='en'
  xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance'
- xsi:schemaLocation='http://docbook.org/ns/docbook http://docbook.org/xml/5.0/xsd/docbook.xsd'
+ xsi:schemaLocation='http://docbook.org/ns/docbook
+                     http://docbook.org/xml/5.0/xsd/docbook.xsd'
  xmlns:xlink='http://www.w3.org/1999/xlink'>
  <title>Defining Authentication Services</title>
  
@@ -2727,8 +2728,13 @@
     <varlistentry>
      <term>User Creation Attributes</term>
      <listitem>
-      <para>This list lets you map (external) attribute names from Active
-      Directory to (internal) attribute names used by OpenAM.</para>
+
+      <para>
+       This list lets you map (external) attribute names
+       from the LDAP directory server
+       to (internal) attribute names used by OpenAM.
+      </para>
+
       <para><command>ssoadm</command> attribute:
       <literal>iplanet-am-ldap-user-creation-attr-list</literal></para>
      </listitem>
