@@ -83,16 +83,14 @@ public class ServerInfoResource implements CollectionResourceProvider{
         JsonValue result = new JsonValue(new LinkedHashMap<String, Object>(1));
         Set<String> cookieDomains;
         Resource resource;
-        int rev;
         RestSecurity restSecurity = new RestSecurity(realm);
         try {
             cookieDomains = AuthClientUtils.getCookieDomains();
-            rev = cookieDomains.hashCode();
             result.put("domains", cookieDomains);
             result.put("cookieName", SystemProperties.get(Constants.AM_COOKIE_NAME,"iPlanetDirectoryPro"));
             result.put("forgotPassword", String.valueOf(restSecurity.isForgotPassword()));
             result.put("selfRegistration", String.valueOf(restSecurity.isSelfRegistration()));
-            resource = new Resource(resourceId, Integer.toString(rev), result);
+            resource = new Resource(resourceId, Integer.toString(result.asMap().hashCode()), result);
             handler.handleResult(resource);
         } catch (Exception e) {
             RestDispatcher.debug.error("ServerInforResource.getAllServerInfo:: Cannot retrieve all server info. " + e);
