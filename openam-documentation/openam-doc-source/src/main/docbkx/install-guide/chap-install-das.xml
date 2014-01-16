@@ -20,14 +20,15 @@
   !
   ! CCPL HEADER END
   !
-  !      Copyright 2011-2013 ForgeRock AS
+  !      Copyright 2011-2014 ForgeRock AS
   !    
 -->
 <chapter xml:id='chap-install-das'
  xmlns='http://docbook.org/ns/docbook'
  version='5.0' xml:lang='en'
  xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance'
- xsi:schemaLocation='http://docbook.org/ns/docbook http://docbook.org/xml/5.0/xsd/docbook.xsd'
+ xsi:schemaLocation='http://docbook.org/ns/docbook
+                     http://docbook.org/xml/5.0/xsd/docbook.xsd'
  xmlns:xlink='http://www.w3.org/1999/xlink'>
  <title>Installing OpenAM Distributed Authentication</title>
  <indexterm>
@@ -56,6 +57,20 @@
    <para>Make sure the realms used have a Realm/DNS alias for the DAS
    configured in OpenAM under Access Control &gt; <replaceable>Realm
    Name</replaceable> &gt; General.</para>
+  </listitem>
+  <listitem>
+   <para>
+    Create a 2.2 Agent profile in OpenAM for the DAS to connect to the server.
+   </para>
+
+   <para>
+    You can create the profile in OpenAM Console under
+    Access Control > <replaceable>Realm Name</replaceable> > Agents > 2.2 Agents.
+    See the <citetitle>Administration Guide</citetitle> section on
+    <link xlink:show="new" xlink:href="admin-guide#configure-22-policy-agent"
+    xlink:role="http://docbook.org/xlink/role/olink"><citetitle
+    >Configuring Version 2.2 Policy Agents</citetitle></link> for details.
+   </para>
   </listitem>
   <listitem>
    <para>Deploy the <?eval ${distauthWarFile}?> file into your web application container.</para>
@@ -127,8 +142,15 @@
     <varlistentry>
      <term>Application User Name</term>
      <listitem>
-      <para>The DAS uses this identity, such as
-      <literal>UrlAccessAgent</literal>, to authenticate to OpenAM.</para>
+      <para>
+       The DAS uses this 2.2 Agent identity to authenticate to OpenAM.
+      </para>
+
+      <para>
+       You can find the 2.2 Agent profile in OpenAM Console under
+       Access Control > <replaceable>Realm Name</replaceable> > Agents > 2.2 Agents
+       as described above.
+      </para>
      </listitem>
     </varlistentry>
     <varlistentry>
