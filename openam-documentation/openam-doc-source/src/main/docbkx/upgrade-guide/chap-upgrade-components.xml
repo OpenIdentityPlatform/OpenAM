@@ -20,14 +20,16 @@
   !
   ! CCPL HEADER END
   !
-  !      Copyright 2011-2013 ForgeRock AS
+  !      Copyright 2011-2014 ForgeRock AS
    !    
 -->
 <chapter xml:id='chap-upgrade-components'
  xmlns='http://docbook.org/ns/docbook'
  version='5.0' xml:lang='en'
  xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance'
- xsi:schemaLocation='http://docbook.org/ns/docbook http://docbook.org/xml/5.0/xsd/docbook.xsd'>
+ xsi:schemaLocation='http://docbook.org/ns/docbook
+                     http://docbook.org/xml/5.0/xsd/docbook.xsd'
+ xmlns:xlink='http://www.w3.org/1999/xlink'>
 <title>Upgrading OpenAM Components</title>
 
  <para>This chapter is concerned with upgrades for policy agents, OpenAM tools,
@@ -58,7 +60,24 @@
   </step>
 
   <step>
-   <para>Extract the new files over the old installation.</para>
+   <para>
+    Remove the old policy agent as described in the
+    <link xlink:show="new" xlink:href="web-install-guide#web-install-guide"
+    xlink:role="http://docbook.org/xlink/role/olink"><citetitle
+    >Web Policy Agent Installation Guide</citetitle></link>.
+   </para>
+
+   <para>
+    If the uninstallation process has changed, refer to the version of the
+    <citetitle>Web Policy Agent Installation Guide</citetitle> that corresponds
+    to your web policy agent.
+   </para>
+  </step>
+
+  <step>
+   <para>
+    Install the new policy agent using the existing configuration.
+   </para>
   </step>
 
   <step>
