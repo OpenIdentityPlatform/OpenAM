@@ -11,7 +11,7 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2012-2013 ForgeRock Inc.
+ * Copyright 2012-2014 ForgeRock AS 
  */
 package org.forgerock.openam.forgerockrest;
 
@@ -19,6 +19,8 @@ import java.lang.Exception;
 import java.lang.Object;
 import java.lang.String;
 import java.util.*;
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
 
 import com.sun.identity.sm.SMSException;
 import org.forgerock.openam.cts.CTSPersistentStore;
@@ -547,7 +549,7 @@ public final class IdentityResource implements CollectionResourceProvider {
 
             confirmationLink = confURLBuilder.append("?confirmationId=").append(confirmationId)
                     .append("&tokenId=").append(ctsToken.getTokenId())
-                    .append("&username=").append(username)
+                    .append("&username=").append(requestParamEncode(username))
                     .toString();
 
             // Send Registration
@@ -1204,5 +1206,14 @@ public final class IdentityResource implements CollectionResourceProvider {
             handler.handleError(new NotFoundException(exception.getMessage(), exception));
         }
     }
+    
+    private String requestParamEncode(String toEncode) throws UnsupportedEncodingException {
+        if (toEncode != null && !toEncode.isEmpty()) {
+            return URLEncoder.encode(toEncode, "UTF-8").replace("+", "%20");
+        } else {
+            return toEncode;
+        }
+    }
+
 
 }
