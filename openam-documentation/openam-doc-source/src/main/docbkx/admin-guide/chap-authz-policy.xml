@@ -520,15 +520,21 @@
    </step>
    <step performance="optional">
     <para>In the Response Providers table, click New to set up a response
-    provider that adds attributes retrieved from the user entry in the identity
-    repository into the headers of the request at policy decision time.</para>
+    provider that adds policy response attributes,
+    retrieved from the user entry in the identity repository,
+    into the headers of the request at policy decision time.
+    The policy agent for the protected resources/applications or the protected resources/applications themselves
+    retrieve the policy response attributes to customize or personalize the application.
+    Policy response attributes come in two formats: static attributes and dynamic attributes.
+    </para>
     <substeps>
      <step>
       <para>Name the provider.</para>
      </step>
      <step>
       <para>Add static attributes having the form
-      <literal><replaceable>attribute</replaceable>=<replaceable>value</replaceable></literal>.</para>
+      <literal><replaceable>attribute</replaceable>=<replaceable>value</replaceable></literal>.
+      Static attributes are <literal>attribute-value</literal> pairs that remain constant.</para>
      </step>
      <step>
       <para>Add dynamic attributes having the form
@@ -536,7 +542,11 @@
       where <replaceable>responseAttr</replaceable> is the attribute name
       to be put into the header of the request, and
       <replaceable>repoAttr</replaceable> is the attribute name used in the
-      identity repository.</para>
+      identity repository. Dynamic attributes are typically user repository attributes such as <literal>cn</literal> that may change over time.
+      If you have not defined any dynamic attributes,
+      you can return to this page after creating the new attributes for the realm under Access Control
+      &gt; <replaceable>Realm Name</replaceable> &gt; Services &gt; Policy Configuration.
+      </para>
      </step>
      <step>
       <para>Click Finish.</para>
