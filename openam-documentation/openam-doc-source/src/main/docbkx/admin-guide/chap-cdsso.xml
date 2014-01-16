@@ -20,14 +20,15 @@
   !
   ! CCPL HEADER END
   !
-  !      Copyright 2011-2013 ForgeRock AS
+  !      Copyright 2011-2014 ForgeRock AS
   !    
 -->
 <chapter xml:id='chap-cdsso'
  xmlns='http://docbook.org/ns/docbook'
  version='5.0' xml:lang='en'
  xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance'
- xsi:schemaLocation='http://docbook.org/ns/docbook http://docbook.org/xml/5.0/xsd/docbook.xsd'
+ xsi:schemaLocation='http://docbook.org/ns/docbook
+                     http://docbook.org/xml/5.0/xsd/docbook.xsd'
  xmlns:xlink='http://www.w3.org/1999/xlink'>
  <title>Configuring Cross-Domain Single Sign On</title>
 
@@ -219,7 +220,7 @@
  </procedure>
 
  <procedure xml:id="enable-cdsso-cookie-hijacking-protection">
-  <title>To Protect Against CDSSO Cookie Hijacking</title>
+  <title>To Protect Against Cookie Hijacking</title>
 
   <para>When cookies are set for an entire domain such as
   <literal>.example.com</literal>, an attacker who steals a cookie can use it
@@ -251,11 +252,11 @@
    Platform.</para>
   </step>
   <step>
-   <para>Remove the domain such as <literal>.example.com</literal> from the
-   Cookies Domains list, and replace it with the server host name such as
-   <literal>openam.example.com</literal>, or if OpenAM is behind a load
-   balancer with the load balancer host name, such as
-   <literal>load-balancer.example.com</literal>.</para>
+   <para>
+    Remove all domains from the Cookies Domains list,
+    or if OpenAM is behind a load balancer, use the load balancer host name
+    such as <literal>load-balancer.example.com</literal>.
+   </para>
   </step>
   <step>
    <para>Save your work.</para>
