@@ -27,7 +27,7 @@
  */
 
 /**
- * Portions Copyrighted 2010-2013 ForgeRock Inc
+ * Portions Copyrighted 2010-2014 ForgeRock AS
  */
 package com.sun.identity.cli.definition;
 
@@ -971,7 +971,7 @@ public class AccessManager {
         optionAliases={},
         macro="authentication",
         optionalOptions={
-            "realm|e|s|Name of realm (Sub Configuration shall be added to global configuration if this option is not provided)."},
+            "realm|e|s|Name of realm (Sub Configuration shall be deleted from the global configuration if this option is not provided)."},
         resourceStrings={
             "delete-sub-configuration-succeed=Sub Configuration {1} was deleted.",
             "delete-sub-configuration-to-realm-succeed=Sub Configuration {1} was deleted from realm {0}"})
@@ -987,7 +987,7 @@ public class AccessManager {
         optionAliases={},
         macro="authentication",
         optionalOptions={
-            "realm|e|s|Name of realm (Sub Configuration shall be added to global configuration if this option is not provided)."},
+            "realm|e|s|Name of realm (Sub Configuration shall be retrieved from the global configuration if this option is not provided)."},
         resourceStrings={
             "get-sub-configuration-succeed=Sub Configuration, {0} was retrieved.",
             "get-sub-configuration-to-realm-succeed=Sub Configuration, {1} was retrieved in realm {0}"})
