@@ -3199,10 +3199,21 @@
   
   <section xml:id="oauth2-module-conf-hints">
    <title>Hints For the OAuth 2.0 Authentication Module</title>
+
    <para>The OAuth 2.0 authentication module lets OpenAM authenticate clients
    of OAuth resource servers. References in this section are to RFC 6749, <link
    xlink:href="http://tools.ietf.org/html/rfc6749" xlink:show="new">The OAuth
    2.0 Authorization Framework</link>.</para>
+
+   <para>
+    If the module is configured to create an account if none exists,
+    then you must provide valid SMTP settings.
+    As part of account creation, the OAuth 2.0 client authentication module
+    sends the resource owner an email with an account activation code.
+    To send email, OpenAM uses the SMTP settings from the configuration
+    for the OAuth 2.0 authentication module.
+   </para>
+
    <indexterm>
     <primary>Authentication</primary>
     <secondary>OAuth 2.0</secondary>
