@@ -20,14 +20,15 @@
   !
   ! CCPL HEADER END
   !
-  !      Copyright 2012-2013 ForgeRock AS
+  !      Copyright 2012-2014 ForgeRock AS
   !    
 -->
 <chapter xml:id='chap-oauth2'
  xmlns='http://docbook.org/ns/docbook'
  version='5.0' xml:lang='en'
  xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance'
- xsi:schemaLocation='http://docbook.org/ns/docbook http://docbook.org/xml/5.0/xsd/docbook.xsd'
+ xsi:schemaLocation='http://docbook.org/ns/docbook
+                     http://docbook.org/xml/5.0/xsd/docbook.xsd'
  xmlns:xinclude='http://www.w3.org/2001/XInclude'
  xmlns:xlink='http://www.w3.org/1999/xlink'>
  <title>Managing OAuth 2.0 Authorization</title>
@@ -381,25 +382,6 @@
   <procedure xml:id="common-task-oauth2-authz">
    <title>To Set Up the OAuth 2.0 Authorization Service</title>
 
-   <important>
-    <para>
-     If your resource owners log in with a user name that is not their user ID,
-     notice that the steps in this procedure to use some other profile attribute
-     do remove the DataStore module from the default authentication chain.
-     That change is not recommended for / (Top Level Realm)
-     where the OpenAM administrator <literal>amadmin</literal> profile is held,
-     because the OpenAM administrator relies on the DataStore module to log in.
-    </para>
-
-    <para>
-     If you do remove the DataStore module from the default authentication chain
-     but it is still configured,
-     then you can use it to authenticate
-     by adding <literal>module=DataStore</literal> as a query string parameter
-     to the normal login URL.
-    </para>
-   </important>
-
    <para>Follow these steps.</para>
 
    <step>
@@ -429,6 +411,12 @@
    <step>
     <para>Click Create to complete the process.</para>
 
+    <para>
+     To access the authorization server configuration in OpenAM Console,
+     browse to Access Control > <replaceable>Realm Name</replaceable> > Services,
+     and then click OAuth2 Provider.
+    </para>
+
     <para>In addition to setting up an OAuth 2.0 authorization server for the
     realm, OpenAM sets up a policy to protect the authorization endpoint.
     The policy appears in the list of policies for the realm. Its name is
@@ -443,21 +431,35 @@
 
    <step performance="optional">
     <para>
-     If resource owners log in with a user name that is not their user ID,
-     but instead their mail address or some other profile attribute,
-     then complete the following steps.
+     If you use an external identity repository where
+     resource owners log in not with their user ID,
+     but instead with their mail address or some other profile attribute,
+     then complete this step.
     </para>
 
     <para>
-     The following steps describe how to use the LDAP profile attribute,
-     <literal>mail</literal>,
-     and the <literal>ldapService</literal> authentication chain.
+     The following steps describe how to configure OpenAM authentication
+     so OAuth 2.0 resource owners can log in using their email address,
+     stored on the LDAP profile attribute, <literal>mail</literal>.
+     Adapt the names if you use a different LDAP profile attribute,
+     such as <literal>cn</literal>.
     </para>
 
     <substeps>
      <step>
       <para>
-       Add the profile attribute name to the list
+       When configuring the data store for the LDAP identity repository,
+       make sure that you select Load schema when saved,
+       and that you set the Authentication Naming Attribute
+       to <literal>mail</literal>.
+       You can find the data store configuration under
+       Access Control > <replaceable>Realm Name</replaceable> > Data Stores.
+      </para>
+     </step>
+
+     <step>
+      <para>
+       Add the <literal>mail</literal> profile attribute name to the list
        of attributes that can be used for authentication.
       </para>
 
@@ -471,7 +473,7 @@
 
      <step>
       <para>
-       Edit the LDAP authentication module settings.
+       Create an LDAP authentication module to use with the external directory.
       </para>
 
       <substeps>
@@ -479,21 +481,22 @@
         <para>
          In OpenAM Console under Access Control > <replaceable>Realm
          Name</replaceable> > Authentication > Module Instances,
-         click the <literal>LDAP</literal> link.
+         create a module to access the LDAP identity repository,
+         such as <literal>LDAPAuthUsingMail</literal>.
         </para>
        </step>
 
        <step>
         <para>
          In the Attribute Used to Retrieve User Profile field,
-         change the attribute to <literal>mail</literal>.
+         set the attribute to <literal>mail</literal>.
         </para>
        </step>
 
        <step>
         <para>
          In the Attributes Used to Search for a User to be Authenticated list,
-         remove the existing attribute
+         remove the default <literal>uid</literal> attribute
          and add the <literal>mail</literal> attribute.
         </para>
        </step>
@@ -508,22 +511,17 @@
 
      <step>
       <para>
-       Edit the <literal>ldapService</literal> authentication chain settings.
+       Create an authentication chain to include the module
+       such as <literal>authUsingMail</literal>.
       </para>
 
       <substeps>
        <step>
         <para>
-         In OpenAM Console under Access Control > <replaceable>Realm
-         Name</replaceable> > Authentication > Authentication Chaining,
-         click the <literal>ldapService</literal> link.
-        </para>
-       </step>
-
-       <step>
-        <para>
-         Choose the LDAP module in the Instance drop-down list,
-         making sure criteria is set to REQUIRED.
+         When creating the authentication chain,
+         choose the <literal>LDAPAuthUsingMail</literal> module
+         in the Instance drop-down list,
+         and set the criteria to REQUIRED.
         </para>
        </step>
 
@@ -534,27 +532,89 @@
        </step>
       </substeps>
      </step>
+
+     <step>
+       <para>
+        Set Organization Authentication Configuration to use the new chain,
+        <literal>authUsingMail</literal>, and then click Save.
+       </para>
+
+       <para>
+        At this point OAuth 2.0 resource owners can authenticate
+        using their email address rather than their user ID.
+       </para>
+     </step>
     </substeps>
 
     <!--
          This capability was tested by setting up a realm under /, "realm",
-         with an external data store, "OpenDJ external",
-         that points to an OpenDJ server containing Example.ldif data.
+         and an external OpenDJ directory server.
 
          The realm had an OAuth 2.0 provider initially with default settings,
-         and a client myClientID:password with mail as the scope.
+         and a client myClientID:password.
 
-         After following all the steps, it seemed to work:
+         I then created a subject in the external directory:
+
+$ /path/to/opendj/bin/ldapsearch -p 1389 \
+-D "cn=Directory Manager" -w password \
+-b dc=example,dc=com mail=oa@fr.com dn
+dn: mail=oa@fr.com,ou=people,dc=example,dc=com
+
+         Then I followed the instructions above. It seems to work.
 
 $ curl -X POST -u "myClientID:password" \
--d "grant_type=password&username=bjensen@example.com&password=hifalutin&scope=mail" \
+-d "grant_type=password&username=oa@fr.com&password=password" \
 http://openam.example.com:8080/openam/oauth2/access_token?realm=realm
 {
-    "scope": "mail",
     "expires_in": 59,
     "token_type": "Bearer",
-    "refresh_token": "3413f35a-4829-4302-aa69-2d8b34c6def0",
-    "access_token": "4fc13e46-0ed6-4279-bc69-b474f67bc3a0"
+    "refresh_token": "64dc5806-04c7-46bd-89a6-e04ad5a3a3f5",
+    "access_token": "4298c411-3581-4778-942a-d44272208a03"
+}
+
+
+$ curl -X POST \
+-H "X-OpenAM-Username: oa@fr.com" \
+-H "X-OpenAM-Password: password" \
+-H "Content-Type: application/json" -d "{}" \
+http://openam.example.com:8080/openam/json/authenticate?realm=realm
+{
+    "tokenId": "AQIC5wM2LY4SfcyEP0TAhbdjalu4KiH4R3n-JitJxAmq__s.*AAJTSQACMDEAAlNLABQtMjU5NDUxNDk3MTIzMjIxMzg0NQ..*",
+    "successUrl": "/openam/console"
+}
+
+
+$ curl -H "iplanetDirectoryPro: AQIC5wM2LY4SfcyEP0TAhbdjalu4KiH4R3n-JitJxAmq__s.*AAJTSQACMDEAAlNLABQtMjU5NDUxNDk3MTIzMjIxMzg0NQ..*" \
+http://openam.example.com:8080/openam/frrest/oauth2/token/4298c411-3581-4778-942a-d44272208a03
+{
+    "id": [
+        "4298c411-3581-4778-942a-d44272208a03"
+    ],
+    "expireTime": [
+        "1389277895612"
+    ],
+    "tokenName": [
+        "access_token"
+    ],
+    "tokenType": [
+        "Bearer"
+    ],
+    "scope": [],
+    "realm": [
+        "realm"
+    ],
+    "nonce": [],
+    "redirectURI": [],
+    "clientID": [
+        "myClientID"
+    ],
+    "userName": [
+        "oa@fr.com"
+    ],
+    "parent": [],
+    "refreshToken": [
+        "64dc5806-04c7-46bd-89a6-e04ad5a3a3f5"
+    ]
 }
     -->
    </step>
