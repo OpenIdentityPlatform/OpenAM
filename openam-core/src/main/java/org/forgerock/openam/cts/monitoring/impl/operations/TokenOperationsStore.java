@@ -243,7 +243,7 @@ public class TokenOperationsStore {
         if (!tokenOperations.containsKey(type)) {
             return 0L;
         }
-        return tokenOperations.get(type).getCount(operation) + operationStore.getCount(operation);
+        return tokenOperations.get(type).getCount(operation);
     }
 
     /**

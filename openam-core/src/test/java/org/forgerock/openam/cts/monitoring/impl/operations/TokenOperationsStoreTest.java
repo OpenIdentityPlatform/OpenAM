@@ -11,7 +11,7 @@
  * Header, with the fields enclosed by brackets [] replaced by your own identifying
  * information: "Portions copyright [year] [name of copyright owner]".
  *
- * Copyright 2013 ForgeRock AS.
+ * Copyright 2013-2014 ForgeRock AS.
  */
 
 package org.forgerock.openam.cts.monitoring.impl.operations;
@@ -299,13 +299,12 @@ public class TokenOperationsStoreTest {
 
         tokenOperations.put(TokenType.OAUTH, typeOperationStore);
         given(typeOperationStore.getCount(operation)).willReturn(1L);
-        given(operationStore.getCount(operation)).willReturn(1L);
 
         //When
         long result = tokenOperationsStore.getOperationsCumulativeCount(tokenType, operation);
 
         //Then
-        assertEquals(result, 2L);
+        assertEquals(result, 1L);
     }
 
     @Test
