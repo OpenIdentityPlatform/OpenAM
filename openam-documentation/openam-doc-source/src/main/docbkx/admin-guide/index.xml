@@ -28,7 +28,6 @@
  xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance'
  xsi:schemaLocation='http://docbook.org/ns/docbook
                      http://docbook.org/xml/5.0/xsd/docbook.xsd'
- xmlns:xlink='http://www.w3.org/1999/xlink'
  xmlns:xinclude='http://www.w3.org/2001/XInclude'>
  <info>
   <title>OpenAM <?eval ${serverDocTargetVersion}?> Administration Guide</title>
@@ -78,10 +77,10 @@
  <xinclude:include href='chap-pwd-reset.xml' />
  <xinclude:include href='chap-sso.xml' />
  <xinclude:include href='chap-cdsso.xml' />
- <xinclude:include href='chap-dashboard.xml' />
  <xinclude:include href='chap-federation.xml' />
  <xinclude:include href='chap-oauth2.xml' />
  <xinclude:include href='chap-openid-connect.xml' />
+ <xinclude:include href='chap-dashboard.xml' />
  <xinclude:include href='chap-backup-restore.xml' />
  <xinclude:include href='chap-certs-keystores.xml' />
  <xinclude:include href='chap-monitoring.xml' />
